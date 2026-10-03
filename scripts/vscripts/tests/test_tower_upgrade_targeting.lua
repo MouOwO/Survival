@@ -14,6 +14,12 @@ for _, name in ipairs({"tower_skill_runtime", "tower_ability_sync", "building_po
         queue_particle = noop, complete = noop, cancel = noop, start = function() return {} end}
 end
 package.loaded["systems/building_relocation"] = {bind = noop}
+-- Movement/footprint behavior has its own integration tests. This fixture
+-- places the builder at an already validated construction work position.
+package.loaded["systems/builder_work_position_service"] = {
+    find = function(caster) return caster:GetAbsOrigin() end,
+    ready = function() return true end,
+}
 package.loaded["debug/dev_wall_stats"] = {apply = noop, reset = noop}
 package.loaded["core/team_alignment"] = {enforce = noop}
 package.loaded["systems/rogue_effect_state_service"] = {numeric = function() return 0 end, wall_health_flat = function() return 0 end}
@@ -36,6 +42,7 @@ LUA_MODIFIER_MOTION_NONE, MODIFIER_ATTRIBUTE_PERMANENT, MODIFIER_EVENT_ON_ATTACK
 DOTA_UNIT_CAP_RANGED_ATTACK, DOTA_UNIT_CAP_MOVE_NONE, DOTA_TEAM_GOODGUYS = 2, 0, 2
 DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 1, 2, 4
 DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_CLOSEST, ACT_DOTA_ATTACK = 8, 1, 3
+FIND_ANY_ORDER = 0
 DOTA_UNIT_ORDER_MOVE_TO_POSITION = 1
 local vector_mt = {}
 Vector = function(x, y, z) return setmetatable({x = x, y = y, z = z or 0}, vector_mt) end

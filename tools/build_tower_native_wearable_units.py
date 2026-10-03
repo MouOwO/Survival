@@ -118,21 +118,20 @@ def sync_component_csv(
             "attachment_point": "",
             "default_sequence": "idle",
             "model_scale": "1",
-            "model_skin": "",
-            "material_group": "",
+            "model_skin": wearable.get("model_skin", ""),
+            "material_group": wearable.get("material_group", ""),
             "sort_order": wearable.get("sort_order", "").strip(),
             "enabled": "1",
             "notes": metadata,
         }
         component_rows.append([values.get(header, "") for header in headers])
 
-    if len(component_rows) != 97:
-        raise RuntimeError(
-            f"expected 97 projected world components, found {len(component_rows)}"
-        )
-    io_asset_id = "tower_laser_od_blackgate"
-    if counts.get(io_asset_id) != 0:
-        raise RuntimeError("Io must project zero world components")
+    # Outfit presets have different slot counts. Validate declarations, not a
+    # historical total from the former 21-unrelated-heroes configuration.
+    for asset_id, count in counts.items():
+        stage = stages[asset_id]
+        if count == 0 and stage['hero_unit_name'] != 'npc_dota_hero_wisp':
+            raise RuntimeError('native outfit has no visible components: ' + asset_id)
 
     output = io.StringIO(newline="")
     csv.writer(output, lineterminator=newline).writerows(
@@ -172,8 +171,8 @@ def sync_csv_sources(check: bool) -> bool:
             "attachment_models": "",
             "environment_particles": "",
             "default_sequence": "idle",
-            "model_scale": "1",
-            "model_skin": "",
+            "model_scale": stage.get("model_scale", "") or "1",
+            "model_skin": stage.get("model_skin", ""),
             "material_group": "",
             "notes": stage["notes"]
                 + "；原Building承载英雄主体，CSV模型投影为prop_dynamic组件。",

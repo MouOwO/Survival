@@ -1,5 +1,5 @@
 'use strict';
-// Native Tinker layouts/timing; add a radius multiplier and recolor SR's red layers.
+// Native Tinker beam widths, persistent core, yellow SR and native red SSR.
 const fs=require('fs'),path=require('path'),cp=require('child_process'),assert=require('assert');
 const {Vpk,endOf}=require('./lib.cjs');
 const root=path.resolve(__dirname,'../..'),vpk=new Vpk(path.resolve(root,'../../dota/pak01_dir.vpk'));
@@ -17,8 +17,8 @@ function write(resource,data){const f=path.join(out,'source',resource);fs.mkdirS
 function dump(resource){if(cache.has(resource))return cache.get(resource);const f=path.join(temp,path.basename(resource)+'_c');fs.writeFileSync(f,vpk.read(resource+'_c'));let s=cp.execFileSync(path.resolve(root,'../../bin/win64/resourceinfo.exe'),['-i',f,'-all'],{encoding:'utf8',windowsHide:true});s=s.slice(s.indexOf(' block DATA'));s=s.slice(s.indexOf('{'));cache.set(resource,s);return s;}
 const materials={};
 for(const [name,shader,bright,tint,texture] of [
- ['cable','cables.vfx',12,'0.247059 0.60 1.0 0','materials/particle/beam_noise_01_psd_a34b319d.vtex'],
- ['pulse','global_lit_simple.vfx',10,'0.364706 0.65 1.0 0','materials/particle/beam_hot_slim_psd_58ebf0e9.vtex']]){
+ ['cable','cables.vfx',12,'1.0 0.78 0.12 0','materials/particle/beam_noise_01_psd_a34b319d.vtex'],
+ ['pulse','global_lit_simple.vfx',10,'1.0 0.9 0.22 0','materials/particle/beam_hot_slim_psd_58ebf0e9.vtex']]){
  const r='materials/survival/tinker_growth/sr_'+name+'.vmat';materials[name]=r;
  const textureInput=path.join(temp,path.basename(texture)+'_c');fs.writeFileSync(textureInput,vpk.read(texture+'_c'));
  const image='materials/survival/tinker_growth/'+name+'.png',imageOutput=path.join(out,'source',image);
@@ -37,17 +37,27 @@ function adapt(resource,tier){
  const dest='particles/survival/tinker_growth/'+tier.toLowerCase()+'_'+name+'.vpcf';created.set(key,dest);
  let data=dump(resource);
  if(beams.has(name)){
-  // CP60.x scales the existing initialized radius, preserving each native curve.
-  // Aghanim's native Q is smaller; normalize it to the SR beam before growth.
-  const calibration=name.endsWith('_aghs')?3:name.endsWith('_aghs_core')?2.25:name.endsWith('_aghs_burn')?4/3:1;
-  const at=data.indexOf('m_Initializers'),a=data.indexOf('[',at),end=endOf(data,a,'[',']');assert(at>=0);
-  const scale=`{ _class = "C_INIT_InitFloat" m_nOutputField = 3 m_nSetMethod = "PARTICLE_SET_SCALE_CURRENT_VALUE" m_InputValue = { m_nType = "PF_TYPE_CONTROL_POINT_COMPONENT" m_nControlPoint = 60 m_nVectorComponent = 0 m_nMapType = "PF_MAP_TYPE_MULT" m_flMultFactor = ${calibration} } },\n`;
-  data=data.slice(0,end-1)+scale+data.slice(end-1);
+  // Preserve native radius constants; only remove the one-shot pulse envelope.
+  for(const type of ['C_OP_InterpolateRadius','C_OP_FadeInSimple','C_OP_FadeOutSimple','C_OP_ColorInterpolate']){
+   for(;;){const m=new RegExp('_class = "'+type+'"').exec(data);if(!m)break;const a=data.lastIndexOf('{',m.index),b=endOf(data,a);data=data.slice(0,a)+data.slice(b).replace(/^\s*,/,'');}
+  }
+  let cursor=0;
+  while((cursor=data.indexOf('_class = "C_INIT_InitFloat"',cursor))>=0){
+   const a=data.lastIndexOf('{',cursor),b=endOf(data,a);let block=data.slice(a,b);
+   if(/m_nOutputField = 1\b/.test(block)){
+    block='{ _class = "C_INIT_InitFloat" m_nOutputField = 1 m_InputValue = { m_nType = "PF_TYPE_LITERAL" m_flLiteralValue = 999999.0 } }';
+    data=data.slice(0,a)+block+data.slice(b);
+   }
+   cursor=a+block.length;
+  }
+  // Immortal renderers also scale width/alpha against collection age. Those
+  // curves reach zero after one second even if the particles themselves live.
+  for(;;){const m=/m_nType = "PF_TYPE_COLLECTION_AGE"/.exec(data);if(!m)break;const a=data.lastIndexOf('{',m.index),b=endOf(data,a);const block=data.slice(a,b);let value=Number(block.match(/m_flLiteralValue = ([-\d.]+)/)?.[1]??1);if(/m_fl(?:RadiusScale|OverbrightFactor|AlphaScale)\s*=\s*$/.test(data.slice(Math.max(0,a-70),a)))value=1;data=data.slice(0,a)+'{ m_nType = "PF_TYPE_LITERAL" m_flLiteralValue = '+value+' }'+data.slice(b);}
  }
  if(tier==='SR'){
-  // All red/pink particle tints, including impact/embers, become cool blue.
+  // Gold-yellow SR: recolor beam, impact and ember tints together.
   data=data.replace(/(m_(?:ConstantColor|ColorMin|ColorMax|ColorFade|LiteralColor) = )\[([^\]]+)\]/g,(all,key,values)=>{
-   const c=values.split(',').map(Number);if(c[0]>c[2]){const r=c[0];c[0]=c[2];c[2]=r;c[1]=Math.max(c[1],Math.round(r*.45));}return key+'[ '+c.join(', ')+' ]';
+   const c=values.split(',').map(Number);const high=Math.max(...c.slice(0,3));if(Math.max(...c.slice(0,3))-Math.min(...c.slice(0,3))>0.05){c[0]=high;c[1]=high*.82;c[2]=high*.16;}return key+'[ '+c.join(', ')+' ]';
   }).replaceAll('materials/models/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_cable.vmat',materials.cable)
     .replaceAll('materials/models/items/tinker/tinker_ti10_immortal_laser/beam_glow.vmat',materials.pulse);
  }
@@ -55,5 +65,5 @@ function adapt(resource,tier){
  write(dest,header+data);return dest;
 }
 const selected=Object.fromEntries(Object.entries(roots).map(([tier,r])=>[tier,adapt(r,tier)]));
-fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify({roots:selected,native_roots:roots,width_control:60,outputs},null,2)+'\n');
+fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify({roots:selected,native_roots:roots,native_width:true,persistent_core:true,sr_color:"yellow",outputs},null,2)+'\n');
 console.log('TINKER_GROWTH_SOURCE_PASS files='+outputs.length);

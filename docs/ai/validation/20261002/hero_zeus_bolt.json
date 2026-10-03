@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-02",
+  "task": "Hero falling lightning / 怒雷 uses Zeus Righteous Thunderbolt W",
+  "status": "IMPLEMENTED_AND_OFFLINE_VALIDATED",
+  "skill_id": "proto_chain_lightning",
+  "item_def": 5412,
+  "item_name": "真霹实雳 / Righteous Thunderbolt",
+  "native_assets": {
+    "source": "Fresh installed Valve dota/core VPK and ItemDef5412 asset_modifiers",
+    "main": "particles/econ/items/zeus/lightning_weapon_fx/zuus_lightning_bolt_immortal_lightning.vpcf",
+    "cast": "particles/econ/items/zeus/lightning_weapon_fx/zuus_lb_cfx_il.vpcf",
+    "sound": "Hero_Zuus.LightningBolt.Righteous",
+    "particle_systems": 28,
+    "dependency_resources": 41,
+    "cracks_fire_and_crack_light_are_native_children": true,
+    "serialized_crack_lifetime_seconds": [7, 8],
+    "new_resource_compilation_needed": false
+  },
+  "runtime": {
+    "configuration_key": "hero_strike",
+    "separate_from_tower_disruptor_strike": true,
+    "successful_roots_per_strike": 2,
+    "successful_roots_for_three_strikes": 6,
+    "root_attachment": "PATTACH_WORLDORIGIN",
+    "root_owner": null,
+    "main_cp0": "hit snapshot + Vector(0,0,4000)",
+    "height_reference": "Statically decoded Watcher of Samsara zuus_2.lua invocation; third-party call reference, not Valve engine-source proof",
+    "main_cp1": "Optional target model sampling with non-FOLLOW PATTACH_ABSORIGIN, followed by fixed hit snapshot",
+    "main_cp3": "Fixed hit snapshot",
+    "cast_cp0": "Caster origin snapshot",
+    "normal_lifecycle": "Release each root once; no early Destroy; native finite children complete naturally",
+    "partial_failure_lifecycle": "Destroy and release only partially configured failed roots; failed cast preserves main",
+    "visual_callbacks_added": 0,
+    "visual_failure_isolation": "Engine failures and missing/throwing bolt helper cannot skip original damage",
+    "lethal_hit_order": "Both successful roots are created and released before the first damage request",
+    "native_stun_silence_damage_added": false
+  },
+  "behavior_consistency": {
+    "hero_damage_mark_targeting_schedule_statements_identical": true,
+    "passive_definitions_byte_identical": true,
+    "previous_three_effect_records_preserved_except_notes": true,
+    "other_sound_cues_and_rate_limits_unchanged": true,
+    "area_radius": 400,
+    "single_target_test_damage_levels_1_to_4": 300,
+    "single_target_test_damage_level_5": 900,
+    "level_5_damage_sequence": "300@0; 150+150@0.12; 150+150@0.24",
+    "three_target_test_total": 2700,
+    "two_target_fallback_test_total": 1725,
+    "mark_duration_seconds": 3,
+    "level_3_plus_attack_reduction_percent": 15,
+    "test_damage_values_are_fixture_results_not_new_balance_values": true
+  },
+  "verification": {
+    "native_resource_and_sound_audit": "PASS",
+    "normal_and_engine_failure_cases": 40,
+    "missing_or_throwing_helper_cases": 4,
+    "hero_runner_visual_damage_lifecycle": "PASS",
+    "tower_full_skill_regression": "PASS",
+    "addon_precache": "PASS",
+    "precache_direct_resources": 81,
+    "lua_5_1_parse": "PASS",
+    "targeted_generated_tables": 2,
+    "scoped_diff_check": "PASS"
+  },
+  "evidence": {
+    "native_resources": "output/hero_zeus_bolt_20261002/resources_validation.json",
+    "runtime": "output/hero_zeus_bolt_20261002/runtime_validation.json",
+    "behavior_comparison": "output/hero_zeus_bolt_20261002/config_consistency.json",
+    "source_audit": "output/hero_zeus_bolt_20261002/resource_audit/"
+  },
+  "acceptance": {
+    "live_visual": false,
+    "live_audio": false,
+    "model_cp_binding_rendering_verified": false,
+    "visible_residue_duration_measured": false,
+    "limits": "Mocked Lua renderer validates paths, control calls and ordering; native body electricity and visible ground tails require in-game confirmation",
+    "next_step": "Reload the map and trigger hero 怒雷; inspect single/triple strikes, crack tails and lethal hits"
+  }
+}

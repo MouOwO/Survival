@@ -6,7 +6,11 @@
     var panels = {};
     var states = {};
     var container = $("#SurvivalHeroWorldHealthBars");
-
+    var config = GameUI.CustomUIConfig(), context = $.GetContextPanel();
+    var frame = null, listener = null, stopped = false;
+    if (config.SurvivalWorldHealthBars && config.SurvivalWorldHealthBars.Stop) {
+        config.SurvivalWorldHealthBars.Stop();
+    }
 
     function localTeam() {
         try {
@@ -14,15 +18,6 @@
         } catch (error) {
             return -1;
         }
-    }
-
-    function windowPosition(panel) {
-        if (!panel || !panel.GetPositionWithinWindow) return { x: 0, y: 0 };
-        var position = panel.GetPositionWithinWindow();
-        return {
-            x: Number(position && position.x) || 0,
-            y: Number(position && position.y) || 0
-        };
     }
 
     function validPanel(target) {
@@ -59,6 +54,15 @@
         var bar = panels[key];
         if (validPanel(bar)) bar.DeleteAsync(0.0);
         delete panels[key];
+    }
+
+    function stop() {
+        if (stopped) return;
+        stopped = true;
+        if (frame !== null) $.CancelScheduled(frame);
+        if (listener !== null) CustomNetTables.UnsubscribeNetTableListener(listener);
+        Object.keys(panels).forEach(removePanel);
+        states = {};
     }
 
     function predictedLoss(forecasts, now) {
@@ -141,21 +145,21 @@
     }
 
     function onTableChanged(tableName, key, value) {
-        if (tableName === TABLE && key.indexOf(PREFIX) === 0) {
+        if (!stopped && tableName === TABLE && key.indexOf(PREFIX) === 0) {
             applyState(key, value);
         }
     }
 
     function updatePositions() {
-        if (!container) return;
+        if (stopped) return;
+        if (!validPanel(context)) { stop(); return; }
         // Schedule before touching entities: a unit can disappear between an
         // IsValidEntity check and a native API call during hero replacement.
         // Such an exception must never freeze every overhead bar on screen.
-        $.Schedule(0.0, updatePositions);
-        var scaleX = Number(container.actualuiscale_x) || 1;
-        var scaleY = Number(container.actualuiscale_y) || 1;
-        var containerPosition = windowPosition(container);
-        var visibility=typeof GameUI!=="undefined"?GameUI.CustomUIConfig().SurvivalWorldOverlayVisibility:null;
+        frame = $.Schedule(0.0, updatePositions);
+        if (!validPanel(container)) container = $("#SurvivalHeroWorldHealthBars");
+        if (!validPanel(container)) return;
+        var visibility=config.SurvivalWorldOverlayVisibility;
         var occlusion=visibility?visibility.Capture():null;
         Object.keys(states).forEach(function (key) {
             try {
@@ -166,6 +170,9 @@
                 return;
             }
             var bar = ensurePanel(key);
+            // A net-table update may arrive before XML creates the container.
+            // Restore the saved health when the first drawable panel is made.
+            if (bar && bar.__healthFraction === undefined) applyState(key, state);
             if (!bar || Number(state.alive) !== 1
                 || (Entities.IsAlive && !Entities.IsAlive(entindex))
                 || (Entities.IsDormant && Entities.IsDormant(entindex))
@@ -179,38 +186,23 @@
                 hide(key);
                 return;
             }
-            var height = 190;
-            try {
-                if (Entities.GetHealthBarOffset) {
-                    var configuredHeight = Number(Entities.GetHealthBarOffset(entindex));
-                    // A KV offset of -1 hides the native bar and is not a usable
-                    // world height for this custom continuous health bar.
-                    if (isFinite(configuredHeight) && configuredHeight > 0) {
-                        height = configuredHeight;
-                    }
-                }
-            } catch (error) {}
-            var screenX = Game.WorldToScreenX(
-                origin[0], origin[1], Number(origin[2]) + height
-            );
-            var screenY = Game.WorldToScreenY(
-                origin[0], origin[1], Number(origin[2]) + height
-            );
-            if (!isFinite(screenX) || !isFinite(screenY)
-                || screenX < 0 || screenY < 0) {
+            var helper = config.SurvivalWorldHealthBarAnchor;
+            var anchor = helper && helper.Project(entindex, origin, container);
+            if (!anchor) {
                 hide(key);
                 return;
             }
-            var localX = (screenX - containerPosition.x) / scaleX - 31;
-            var localY = (screenY - containerPosition.y) / scaleY - 26;
+            var localX = anchor.left, localY = anchor.top;
             if (!isFinite(localX) || !isFinite(localY)) {
                 hide(key);
                 return;
             }
-            if(visibility&&visibility.Overlaps(occlusion,screenX-31*scaleX,screenY-26*scaleY,62*scaleX,11*scaleY)){
+            if(visibility&&visibility.Overlaps(occlusion,anchor.screen_left,anchor.screen_top,
+                anchor.width*anchor.scale_x,anchor.height*anchor.scale_y)){
                 hide(key);return;
             }
             if (bar.__forecasts && bar.__forecasts.length) renderHealth(bar, state);
+            bar.__healthAnchor = anchor;
             bar.style.position = localX.toFixed(2) + "px "
                 + localY.toFixed(2) + "px 0px";
             bar.style.visibility = "visible";
@@ -222,6 +214,19 @@
         // visibly lagged behind the engine's native overhead bars while units
         // or the camera were moving.
     }
+
+    config.SurvivalWorldHealthBars = {Stop:stop, Refresh:function () {
+        if (stopped) return;
+        if (frame !== null) $.CancelScheduled(frame);
+        updatePositions();
+    }, DebugSnapshot:function () {
+        return {stopped:stopped, units:Object.keys(panels).map(function (key) {
+            var panel = panels[key];
+            return {key:key, entindex:states[key] && states[key].entindex,
+                visibility:String(panel.style.visibility), position:String(panel.style.position),
+                anchor:panel.__healthAnchor};
+        })};
+    }};
 
     var initialValues = CustomNetTables.GetAllTableValues(TABLE) || {};
     Object.keys(initialValues).forEach(function (indexOrKey) {
@@ -238,6 +243,6 @@
             applyState(String(indexOrKey), entry);
         }
     });
-    CustomNetTables.SubscribeNetTableListener(TABLE, onTableChanged);
+    listener = CustomNetTables.SubscribeNetTableListener(TABLE, onTableChanged);
     updatePositions();
 })();

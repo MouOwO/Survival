@@ -7,7 +7,8 @@ local skill_definitions = require("config/generated/hero_skill_definitions")
 local hero_definitions = require("config/generated/hero_definitions")
 local buff_manager = require("systems/buff_manager")
 local exclusive_passives = require("systems/hero_exclusive_passive_service")
-local storm_visual = require("systems/disruptor_storm_visual")
+local zeus_visual = require("systems/zeus_lightning_visual")
+local meteor_phoenix_visual = require("systems/meteor_phoenix_impact_visual")
 
 local M = {}
 M.sound_service = require("core/sound_service")
@@ -25,7 +26,7 @@ local active_meteor_casts = {}
 local meteor_slowed_units = {}
 local meteor_task = nil
 local meteor_explosion_visuals = {
-    active = {}, cast_sequence = 0, sequence = 0, duration = 1.2,
+    cast_sequence = 0,
 }
 local active_moving_ice_balls = {}
 local moving_ice_ball_sequence = 0
@@ -73,8 +74,6 @@ local MOVING_ICE_BALL_PARTICLE =
     "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf"
 local METEOR_FALL_PARTICLE =
     "particles/survival/skills/meteor_phoenix_fall.vpcf"
-local METEOR_EXPLOSION_PARTICLE =
-    "particles/survival/skills/meteor_impact.vpcf"
 local METEOR_LAVA_PARTICLE =
     "particles/survival/skills/meteor_lava.vpcf"
 local METEOR_LAVA_SLOW_BUFF = "debuff_hero_meteor_lava_move_slow"
@@ -1526,11 +1525,13 @@ local function run_frost(context, definition)
     return true
 end
 
-local function fury_thunder_visual(context, position, radius, previous)
+local function fury_thunder_visual(context, position, radius, target)
     M.sound_service.play("hero_fury_thunder_strike", {
         source = context.attacker, position = position,
     })
-    return storm_visual.play(context.attacker, position, radius, nil, previous)
+    -- A partial Tools reload or an optional visual failure cannot skip damage.
+    local ok, result = pcall(zeus_visual.bolt, context.attacker, position, target)
+    return ok and result or false
 end
 
 local function run_chain(context, definition)
@@ -1553,15 +1554,12 @@ local function run_chain(context, definition)
     end
     while #strike_targets < strike_count do strike_targets[#strike_targets + 1] = primary end
     local target_hit_counts = {}
-    local storm_by_target = {}
 
     local function execute_strike(target, strike_multiplier)
         if not alive(target) or not valid(context.attacker) then return end
         local position = unit_position(target)
         if not position then return end
-        local visual_key = tostring(target:entindex())
-        storm_by_target[visual_key] = fury_thunder_visual(context, position, radius,
-            storm_by_target[visual_key])
+        fury_thunder_visual(context, position, radius, target)
 
         local was_marked = context.level >= 2
             and buff_manager.has(target, "debuff_hero_fury_thunder_mark")
@@ -2176,16 +2174,6 @@ local function meteor_destroy_particle(particle, immediate)
     end
 end
 
-meteor_explosion_visuals.release = function(visual_id, immediate)
-    local visual = meteor_explosion_visuals.active[visual_id]
-    if not visual then return end
-    meteor_explosion_visuals.active[visual_id] = nil
-    if visual.task then scheduler.cancel(visual.task) end
-    visual.task = nil
-    meteor_destroy_particle(visual.particle, immediate == true)
-    visual.particle = nil
-end
-
 local function meteor_sync_slow_units(desired)
     for key, entry in pairs(desired) do
         if not meteor_slowed_units[key] and alive(entry.target) then
@@ -2223,13 +2211,7 @@ local function clear_meteors()
         keys[#keys + 1] = attacker_key
     end
     for _, attacker_key in ipairs(keys) do meteor_release_cast(attacker_key) end
-    local visual_ids = {}
-    for visual_id, _ in pairs(meteor_explosion_visuals.active) do
-        visual_ids[#visual_ids + 1] = visual_id
-    end
-    for _, visual_id in ipairs(visual_ids) do
-        meteor_explosion_visuals.release(visual_id, true)
-    end
+    meteor_phoenix_visual.clear()
     meteor_sync_slow_units({})
     if meteor_task then scheduler.cancel(meteor_task) end
     meteor_task = nil
@@ -2286,21 +2268,7 @@ local function meteor_create_fall_particle(cast)
 end
 
 local function meteor_explosion_visual(cast)
-    local particle = meteor_create_particle(
-        METEOR_EXPLOSION_PARTICLE, cast.position, cast.context.attacker,
-        {[1]=Vector(cast.radius, 0, 0)}
-    )
-    if not particle then return end
-
-    meteor_explosion_visuals.sequence = meteor_explosion_visuals.sequence + 1
-    local visual_id = meteor_explosion_visuals.sequence
-    local visual = { particle = particle, task = nil }
-    meteor_explosion_visuals.active[visual_id] = visual
-    visual.task = scheduler.after(
-        meteor_explosion_visuals.duration,
-        function() meteor_explosion_visuals.release(visual_id) end,
-        "hero_meteor_explosion_" .. tostring(visual_id)
-    )
+    meteor_phoenix_visual.impact(cast.position, cast.context.attacker, cast.radius)
 end
 
 local function meteor_start_fall(cast, meteor)
@@ -3602,7 +3570,6 @@ function M.init()
     clear_moving_ice_balls()
     clear_poison_clouds()
     clear_meteors()
-    storm_visual.clear()
     processed_attacks = {}
     exclusive_passives.init({ deal_group = deal_group })
     refresh_tokens = {}
@@ -3616,9 +3583,7 @@ function M.init()
     active_meteor_casts = {}
     meteor_slowed_units = {}
     meteor_task = nil
-    meteor_explosion_visuals.active = {}
     meteor_explosion_visuals.cast_sequence = 0
-    meteor_explosion_visuals.sequence = 0
     active_moving_ice_balls = {}
     moving_ice_ball_sequence = 0
     moving_ice_ball_task = nil

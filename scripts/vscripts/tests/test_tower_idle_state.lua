@@ -7,6 +7,7 @@ IsServer = function() return server end
 LUA_MODIFIER_MOTION_NONE = 0
 MODIFIER_ATTRIBUTE_PERMANENT = 1
 MODIFIER_EVENT_ON_ATTACK_START = 10
+MODIFIER_EVENT_ON_ATTACK = 14
 MODIFIER_EVENT_ON_DEATH = 11
 MODIFIER_PROPERTY_DISABLE_AUTOATTACK = 12
 MODIFIER_STATE_DISARMED = 13
@@ -17,6 +18,7 @@ DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES = 4
 DOTA_DAMAGE_CATEGORY_ATTACK = 1
 DOTA_UNIT_ORDER_ATTACK_TARGET = 4
 FIND_CLOSEST = 0
+FIND_ANY_ORDER = 1
 
 local auto = require("modifiers/modifier_tower_auto_attack")
 local tree_rules = require("systems/tree_damage_rules")
@@ -33,7 +35,7 @@ end
 local function unit(name, distance, team)
     next_index = next_index + 1
     local value = { name = name, alive = true, team = team or 3, index = next_index,
-        position = setmetatable({ x = distance or 0 }, vector) }
+        position = setmetatable({ x = distance or 0, y = 0, z = 0 }, vector) }
     function value:IsNull() return false end
     function value:IsAlive() return self.alive end
     function value:entindex() return self.index end

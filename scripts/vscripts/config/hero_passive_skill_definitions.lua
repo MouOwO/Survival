@@ -338,13 +338,13 @@ M.rows = {
         },
     }),
     skill({
-        skill_id = "skill_shadow_fiend_raze", display_name = "影压",
-        icon_name = "nevermore_shadowraze1", max_level = 1,
+        skill_id = "skill_shadow_fiend_raze", display_name = "致盲之光",
+        icon_name = "keeper_of_the_light_blinding_light", max_level = 1,
         trigger_chance = { 0.10 }, damage_multiplier = { 25.0 },
         radius = { 250 }, stack_duration = { 3.0 },
         max_stacks = { 5 }, damage_per_stack_pct = { 10 },
         level_text = {
-            "攻击命中10%概率释放250范围影压；先加层再造成全属性×27.5至×37.5纯粹伤害，最多5层，每层独立持续3秒。",
+            "攻击命中10%概率释放250范围致盲之光；先加层再造成全属性×27.5至×37.5纯粹伤害，最多5层，每层独立持续3秒。",
         },
     }),
     skill({

@@ -5,14 +5,21 @@
     var config = GameUI.CustomUIConfig(), states = {}, panels = {};
     var session = "", listener = null, frame = null, stopped = false;
     var debugListener = null, reasons = {};
+    // The fixed-width centered name and stars share the health bar's center.
+    // Keep a 20px name row above the bar for the larger 18px font.
+    // The 20px rarity image
+    // sits two pixels to its left and extends 4.5px below the 11px bar.
+    var ROW_WIDTH = 108, ROW_HEIGHT = 49.5, BAR_TOP = 34;
     var diagnostics = { frames: 0, lastError: "", lastApiWarning: "", lastRejected: null, viewport: null, occlusion: null };
     if (config.SurvivalTowerRanks && config.SurvivalTowerRanks.Stop) {
         config.SurvivalTowerRanks.Stop();
     }
     function valid(panel) { return panel && (!panel.IsValid || panel.IsValid()); }
     function setRowVisibility(panel, value) {
-        if (valid(panel) && panel.__rankVisibility !== value) {
+        if (valid(panel) && (panel.__rankVisibility !== value || panel.style.visibility !== value
+            || panel.visible !== (value === "visible"))) {
             panel.style.visibility = value;
+            panel.visible = value === "visible";
             panel.__rankVisibility = value;
         }
     }
@@ -57,18 +64,29 @@
             diagnostics.lastRejected = { key: key, reason: "invalid_rarity" }; return;
         }
         states[key] = value;
+        if (Number(value.constructing) === 1) { hide(key, "constructing"); return; }
         // Do not instantiate anything until the world position is drawable.
         if (valid(panels[key])) paint(panels[key], value);
     }
     function paint(panel, state) {
+        var name = String(state.display_name || "");
+        if (panel.__name.text !== name) panel.__name.text = name;
         ["N", "R", "SR", "SSR", "UR"].forEach(function (rarity) {
             panel.SetHasClass("Rank" + rarity, state.rarity === rarity);
         });
+        if (panel.__iconRarity !== state.rarity) {
+            panel.__letter.SetImage(state.rarity === "UR" ? "" :
+                "s2r://panorama/images/custom_game/survival_tower_rank/rareicon_"
+                + state.rarity.toLowerCase() + "_png.vtex");
+            panel.__iconRarity = state.rarity;
+        }
         // The native label starts collapsed. Set its visibility explicitly on
         // the first valid rank update instead of relying on parent-class restyle.
         panel.__ultimate.style.visibility = state.rarity === "UR" ? "visible" : "collapse";
         var count = Math.max(1, Math.min(5, Number(state.stars) || 1));
         var red = Math.max(0, Math.min(count, Number(state.red_stars) || 0));
+        panel.__starRow.style.width = (count * 14) + "px";
+        panel.__starRow.style.position = ((ROW_WIDTH - count * 14) / 2) + "px 2px 0px";
         panel.__stars.forEach(function (star, index) {
             star.SetHasClass("ActiveStar", index < count);
             star.SetHasClass("RedStar", index < red);
@@ -79,13 +97,21 @@
         var panel = $.CreatePanel("Panel", container, "TowerRank_" + key);
         setRowVisibility(panel, "collapse");
         panel.AddClass("TowerRank"); panel.hittest = false; panel.hittestchildren = false;
-        var letter = $.CreatePanel("Panel", panel, "");
+        var caption = $.CreatePanel("Panel", panel, "");
+        caption.AddClass("TowerRankCaption"); caption.hittest = false;
+        panel.__caption = caption;
+        var letter = $.CreatePanel("Image", caption, "");
         letter.AddClass("TowerRankLetter"); letter.hittest = false;
+        panel.__letter = letter;
         var ultimate = $.CreatePanel("Label", letter, "");
         ultimate.AddClass("TowerRankUltimate"); ultimate.text = "UR"; ultimate.hittest = false;
         panel.__ultimate = ultimate;
+        var name = $.CreatePanel("Label", caption, "");
+        name.AddClass("TowerRankName"); name.hittest = false;
+        panel.__name = name;
         var stars = $.CreatePanel("Panel", panel, "");
         stars.AddClass("TowerRankStars"); stars.hittest = false;
+        panel.__starRow = stars;
         panel.__stars = [];
         for (var i = 0; i < 5; i++) {
             var star = $.CreatePanel("Panel", stars, "");
@@ -137,6 +163,7 @@
         stateKeys.forEach(function (key) {
             try {
                 var state = states[key], entindex = Number(state.entindex);
+                if (Number(state.constructing) === 1) { hide(key, "constructing"); return; }
                 if (!Entities.IsValidEntity(entindex)) { remove(key); reasons[key] = "invalid_entity"; return; }
                 if (!Entities.IsAlive(entindex)) { hide(key, "dead"); return; }
                 // IsDormant is absent in some Dota Panorama API builds. Calling
@@ -145,27 +172,23 @@
                 if (Entities.GetUnitName(entindex) !== state.unit_name) { hide(key, "unit_name_mismatch"); return; }
                 var origin = Entities.GetAbsOrigin(entindex);
                 if (!origin || origin.length < 3 || Number(origin[2]) < -5000) { hide(key, "invalid_origin"); return; }
-                var heightOffset = 180;
-                try {
-                    if (Entities.GetHealthBarOffset) {
-                        var configuredHeight = Number(Entities.GetHealthBarOffset(entindex));
-                        if (isFinite(configuredHeight) && configuredHeight > 0) heightOffset = configuredHeight;
-                    }
-                } catch (offsetError) { diagnostics.lastApiWarning = "health_bar_offset: " + String(offsetError); }
-                var x = Number(Game.WorldToScreenX(origin[0], origin[1], Number(origin[2]) + heightOffset));
-                var y = Number(Game.WorldToScreenY(origin[0], origin[1], Number(origin[2]) + heightOffset));
-                var lx = (x - Number(offset.x || 0)) / sx - 51;
-                var ly = (y - Number(offset.y || 0)) / sy - 47;
-                if (!isFinite(x) || !isFinite(y) || x < 0 || y < 0) { hide(key, "invalid_projection"); return; }
+                var helper = config.SurvivalWorldHealthBarAnchor;
+                var anchor = helper && helper.Project(entindex, origin, container);
+                if (!anchor) { hide(key, "invalid_projection"); return; }
+                var lx = anchor.left + (anchor.width - ROW_WIDTH) / 2;
+                var ly = anchor.top - BAR_TOP;
                 if (width <= 0 || height <= 0) { hide(key, "zero_layout_size"); return; }
-                if (lx < 0 || ly < 0 || lx + 102 > width / sx || ly + 30 > height / sy) {
+                if (lx < 0 || ly < 0 || lx + ROW_WIDTH > width / sx || ly + ROW_HEIGHT > height / sy) {
                     hide(key, "outside_viewport"); return;
                 }
                 if (visibility && visibility.Overlaps && visibility.Overlaps(occlusion,
-                    x - 51 * sx, y - 47 * sy, 102 * sx, 30 * sy)) {
+                    anchor.screen_left + (anchor.width - ROW_WIDTH) / 2 * sx,
+                    anchor.screen_top - BAR_TOP * sy,
+                    ROW_WIDTH * sx, ROW_HEIGHT * sy)) {
                     hide(key, "hud_occlusion"); return;
                 }
                 var panel = ensure(key, state);
+                panel.__healthAnchor = anchor;
                 var position = lx.toFixed(2) + "px " + ly.toFixed(2) + "px 0px";
                 if (panel.__rankPosition !== position) {
                     panel.style.position = position;
@@ -182,14 +205,32 @@
     }
     function debugSnapshot() {
         var counts = {}, rows = [], visible = 0;
+        var parents = [];
+        for (var ancestor = container; valid(ancestor) && parents.length < 8;
+            ancestor = ancestor.GetParent ? ancestor.GetParent() : null) {
+            parents.push({id:String(ancestor.id), visible:ancestor.visible,
+                visibility:String(ancestor.style.visibility), opacity:String(ancestor.style.opacity)});
+        }
         Object.keys(states).forEach(function (key) {
             var reason = reasons[key] || "awaiting_frame";
             counts[reason] = (counts[reason] || 0) + 1;
             if (reason === "visible") visible++;
             if (rows.length >= 64) return;
             rows.push({ key: key, entindex: states[key].entindex,
-                rarity: states[key].rarity, stars: states[key].stars, reason: reason,
-                panel: valid(panels[key]), position: valid(panels[key]) ? String(panels[key].style.position) : "" });
+                rarity: states[key].rarity, stars: states[key].stars, display_name: states[key].display_name, reason: reason,
+                panel: valid(panels[key]), position: valid(panels[key]) ? String(panels[key].style.position) : "",
+                panel_visible:valid(panels[key]) ? panels[key].visible : false,
+                css_visibility:valid(panels[key]) ? String(panels[key].style.visibility) : ""});
+            if (valid(panels[key])) {
+                rows[rows.length - 1].name_label = {text:String(panels[key].__name.text),
+                    width:Number(panels[key].__name.actuallayoutwidth), height:Number(panels[key].__name.actuallayoutheight)};
+                rows[rows.length - 1].health_anchor = panels[key].__healthAnchor;
+                rows[rows.length - 1].letter = {
+                    width:Number(panels[key].__letter.actuallayoutwidth),
+                    height:Number(panels[key].__letter.actuallayoutheight),
+                    position:panels[key].__letter.GetPositionWithinWindow ? panels[key].__letter.GetPositionWithinWindow() : null
+                };
+            }
             if (states[key].rarity === "UR" && valid(panels[key])) {
                 var label = panels[key].__ultimate;
                 rows[rows.length - 1].ultimate_label = valid(label) ? {
@@ -206,14 +247,25 @@
                 health_bar_offset: typeof Entities.GetHealthBarOffset === "function" },
             viewport: diagnostics.viewport, occlusion: diagnostics.occlusion,
             lastError: diagnostics.lastError, lastApiWarning: diagnostics.lastApiWarning,
-            lastRejected: diagnostics.lastRejected };
+            lastRejected: diagnostics.lastRejected,
+            parents:parents,
+            health_overlay:config.SurvivalWorldHealthBars && config.SurvivalWorldHealthBars.DebugSnapshot
+                ? config.SurvivalWorldHealthBars.DebugSnapshot() : null };
     }
     config.SurvivalTowerRanks = { Stop: stop, DebugSnapshot: debugSnapshot };
     // Read-only server-triggered Tools diagnosis, useful without a JS console.
     // No client->server listener, permissions, inventory or gameplay mutation.
     if (typeof GameEvents !== "undefined" && GameEvents.Subscribe) {
         debugListener = GameEvents.Subscribe("survival_tower_rank_debug_request", function () {
-            if (!stopped) $.Msg("[TowerRankDebug] " + JSON.stringify(debugSnapshot()));
+            if (stopped) return;
+            // Tools can suspend zero-delay frame jobs while the game is in the
+            // background. Refresh the diagnostic once, retaining one frame job.
+            if (frame !== null) $.CancelScheduled(frame);
+            positions();
+            if (config.SurvivalWorldHealthBars && config.SurvivalWorldHealthBars.Refresh) {
+                config.SurvivalWorldHealthBars.Refresh();
+            }
+            $.Msg("[TowerRankDebug] " + JSON.stringify(debugSnapshot()));
         });
     }
     listener = CustomNetTables.SubscribeNetTableListener(TABLE, function (table, key, value) {

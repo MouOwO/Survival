@@ -6,6 +6,7 @@ _G.modifier_enemy_wall_ai = modifier_enemy_wall_ai
 local M = modifier_enemy_wall_ai
 local team_alignment = require("core/team_alignment")
 local contact = require("systems/wall_melee_contact")
+local navigation = require("systems/wall_navigation_service")
 function M:IsHidden() return true end
 function M:IsPurgable() return false end
 function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
@@ -68,6 +69,7 @@ function M:OnCreated(params)
     self.contact_range_delta = 0
     if self.SetHasCustomTransmitterData then self:SetHasCustomTransmitterData(true) end
     self.wall_entindex = tonumber(params.wall_entindex) or -1
+    self.boundary_position=nil
     self.ai_state="idle"
     -- Let the spawn caller finish FindClearSpaceForUnit, then issue the first
     -- goal on the next server frame instead of waiting half a second.
@@ -118,6 +120,7 @@ function M:SetWallEntIndex(entindex)
     local parent=self:GetParent()
     local previous=self.wall_entindex
     self.wall_entindex=next_index
+    self.boundary_position=nil
     if not parent or parent:IsNull() then return end
     contact.release(previous,parent:entindex())
     self:SetContactMode(0)
@@ -240,6 +243,14 @@ function M:OnIntervalThink()
     end
     if not team_alignment.are_enemies(parent, wall) then return end
 
+    -- All combat classifications use the ground-navigation wall boundary,
+    -- including ranged/flying-labelled and no-unit-collision challenge units.
+    if navigation.enforce_boundary then
+        navigation.enforce_boundary(wall,parent,self.boundary_position)
+    end
+    local boundary_position=parent:GetAbsOrigin()
+    self.boundary_position={x=boundary_position.x,y=boundary_position.y,z=boundary_position.z}
+
     local desired,point="chase",nil
     local ground=(parent.survival_wave_movement_type or parent.survival_movement_type or "ground") == "ground"
     local melee=parent.GetAttackCapability and parent:GetAttackCapability()==DOTA_UNIT_CAP_MELEE_ATTACK
@@ -247,15 +258,10 @@ function M:OnIntervalThink()
         local plan=contact.resolve(wall,parent)
         if plan then
             point=plan.point
-            local p,w=parent:GetAbsOrigin(),wall:GetAbsOrigin()
-            local dx,dy=math.abs(p.x-point.x),math.abs(p.y-point.y)
-            local x_face=math.abs(point.x-w.x)>math.abs(point.y-w.y)
-            local normal_error,lateral_error=x_face and dx or dy,x_face and dy or dx
             local retained=self.ai_state=="attack" and self.goal_wall==wall
             -- Small exit hysteresis prevents terrain/collision rounding from
             -- oscillating a settled unit between rooted and disarmed states.
-            local arrived=normal_error<=(retained and 60 or 56)
-                and lateral_error<=20
+            local arrived=contact.arrived(wall,parent,point,retained)
             desired=not plan.claimed and "waiting" or (arrived and "attack" or "approach")
         end
     else
@@ -266,6 +272,7 @@ end
 
 function M:OnDestroy()
     if not IsServer() then return end
+    self.boundary_position=nil
     local parent = self:GetParent()
     if parent and not parent:IsNull() then
         contact.release(self.wall_entindex,parent:entindex())

@@ -63,20 +63,6 @@ function sparks(impact){return {_class:'CParticleSystemDefinition',m_nBehaviorVe
         {_class:'C_OP_InterpolateRadius',m_flEndScale:0.1},
         {_class:'C_OP_EndCapTimedDecay',m_flDecayTime:0.12}]};}
 definitions.meteor_lava_embers=sparks(false);
-definitions.meteor_impact_sparks=sparks(true);
-definitions.meteor_impact={_class:'CParticleSystemDefinition',m_nBehaviorVersion:5,m_nMaxParticles:1,
-    m_flConstantLifespan:0.38,m_ConstantColor:[255,172,77,255],
-    m_BoundingBoxMin:[-560,-560,-8],m_BoundingBoxMax:[560,560,200],
-    m_Renderers:[sprite('materials/particle/ring01.vtex',true)],
-    m_Emitters:[{_class:'C_OP_InstantaneousEmitter',m_nParticlesToEmit:literal(1)}],
-    m_Initializers:[{_class:'C_INIT_CreateWithinSphere'},
-        {_class:'C_INIT_PositionOffset',m_OffsetMin:[0,0,12],m_OffsetMax:[0,0,12]},
-        init(3,cp(0)),init(7,literal(0.7))],
-    m_Operators:[{_class:'C_OP_BasicMovement'},{_class:'C_OP_Decay'},
-        {_class:'C_OP_FadeOutSimple',m_flFadeOutTime:0.8},
-        {_class:'C_OP_InterpolateRadius',m_flStartScale:0.08,m_flEndScale:1}],
-    m_Children:[child('meteor_impact_sparks'),{m_ChildRef:nativeRef('particles/units/heroes/hero_phoenix/phoenix_supernova_reborn_sphere.vpcf')} ],
-    m_PreEmissionOperators:[{_class:'C_OP_HSVShiftToCP',m_DefaultHSVColor:[226,158,0,255]}]};
 // Actual Supernova egg model plus its native moving-core fire and glow.
 // Both children follow CP3. Ground rings and full-screen flare stay out of flight.
 definitions.meteor_phoenix_fall={_class:'CParticleSystemDefinition',m_nBehaviorVersion:5,
@@ -98,13 +84,15 @@ definitions.meteor_phoenix_fall={_class:'CParticleSystemDefinition',m_nBehaviorV
         m_nControlPoint:2,m_nVectorComponent:0}}]};
 fs.mkdirSync(out,{recursive:true});
 for(const [name,value] of Object.entries(definitions))fs.writeFileSync(path.join(out,name+'.vpcf'),header+kv(value)+'\n');
+const impact=require('./build-phoenix-meteor-impact.cjs').build();
 fs.writeFileSync(path.join(root,'art/effects/skill_visuals/manifest.json'),JSON.stringify({
     generated_by:'tools/map_c6/build-meteor-visual-particles.cjs',
-    source_reference:'Valve Phoenix Supernova egg model, native egg glow/lava (with steam) and reborn sphere; native path solver',
+    source_reference:'Valve Phoenix Supernova egg flight and complete reborn impact DAG, spatially adapted to 500; native path solver',
     runtime_fall_duration:'0.4 seconds, down from 0.8; unchanged radius, per-cast damage, lava and second-meteor interval',
-    lava_particle_budget:26,impact_custom_particle_budget:25,
+    lava_particle_budget:26,impact,
     lava_ground_layer_heights:[lavaGroundHeight,lavaCrackHeight],
     lava_position_operator:'C_OP_SetToCP with explicit FLOAT vector offsets',
-    native_resources:[...nativeRefs],outputs:Object.keys(definitions).map(n=>'particles/survival/skills/'+n+'.vpcf')
+    native_resources:[...new Set([...nativeRefs,...impact.native_resources])],
+    outputs:[...Object.keys(definitions).map(n=>'particles/survival/skills/'+n+'.vpcf'),...impact.outputs]
 },null,2)+'\n');
 console.log('METEOR_VISUAL_SOURCES_PASS particles='+Object.keys(definitions).length+' native_refs='+nativeRefs.size);

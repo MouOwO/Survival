@@ -60,7 +60,7 @@
 		},
 		{
 			_class = "C_OP_ColorInterpolate"
-			m_ColorFade = [ 37, 21, 43, 255 ]
+			m_ColorFade = [ 43, 35.26, 6.88, 255 ]
 			m_flFadeEndTime = 0.75
 		},
 		{
@@ -553,8 +553,8 @@
 		},
 		{
 			_class = "C_INIT_RandomColor"
-			m_ColorMin = [ 62, 115, 255, 255 ]
-			m_ColorMax = [ 16, 115, 255, 255 ]
+			m_ColorMin = [ 255, 209.1, 40.800000000000004, 255 ]
+			m_ColorMax = [ 255, 209.1, 40.800000000000004, 255 ]
 		},
 		{
 			_class = "C_INIT_InitFloat"

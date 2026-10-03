@@ -106,14 +106,45 @@ test('successful session has bounded drain when the peer never closes', async t 
 });
 
 test('missing expected response still times out and buffered history cannot satisfy it', async t => {
-  const fake = await mockConsole(t, () => {});
+  let clientEnded = false, peerEnded = false;
+  const fake = await mockConsole(t, () => {}, socket => {
+    clientEnded = true;
+    setTimeout(() => {
+      // A late response must not turn an already failed request into success.
+      socket.write(print('late-secret\nTEST_DONE\n'));
+      peerEnded = true;
+      socket.end();
+    }, 35);
+  });
   const started = Date.now();
   await assert.rejects(runClient(fake.options), error => {
     assert.match(error.message, /Expected game response was not received/);
-    assert.doesNotMatch(error.output, /history-secret|TEST_DONE/);
+    assert.doesNotMatch(error.output, /history-secret|late-secret|TEST_DONE/);
     return true;
   });
   assert.ok(Date.now() - started < 2000);
+  assert.equal(clientEnded, true, 'a response timeout must still send FIN');
+  assert.equal(peerEnded, true, 'error reporting waits for bounded peer cleanup');
+});
+
+test('failed session bounds its drain when the engine is unresponsive', async t => {
+  let finAt = 0;
+  const fake = await mockConsole(t, () => {}, () => { finAt = Date.now(); });
+  await assert.rejects(runClient(fake.options), /Expected game response was not received/);
+  assert.ok(finAt > 0, 'timeout sends FIN before forced cleanup');
+  assert.ok(Date.now() - finAt >= 150 && Date.now() - finAt < 1500);
+});
+
+test('malformed response closes the established session gracefully and preserves the error', async t => {
+  let clientEnded = false;
+  const fake = await mockConsole(t, socket => {
+    const invalid = Buffer.alloc(12);
+    invalid.write('PRNT');
+    invalid.writeUInt32BE(1, 6);
+    socket.write(invalid);
+  }, socket => { clientEnded = true; socket.end(); });
+  await assert.rejects(runClient(fake.options), /Invalid console frame length/);
+  assert.equal(clientEnded, true);
 });
 
 test('collection without an expected marker also closes gracefully', async t => {

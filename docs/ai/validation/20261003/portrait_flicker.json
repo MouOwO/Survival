@@ -1,0 +1,381 @@
+{
+  "status": "TARGETED_BEHAVIOUR_AND_COMPILE_PASS",
+  "checked_at_utc": "2026-10-02T16:26:19.152280+00:00",
+  "root_cause": {
+    "root_cause": "The same HERO_COMBAT_STATS_CHANGED snapshot fed two UI transports. The selected event decorated a copy with portrait metadata; regular survival_combat_stats NetTable only projected stats and omitted all three portrait identity fields. Client accepted both equal-version snapshots for the same selected entity and replaced selectedUnitSnapshot wholesale, so the bare NetTable forced unsupported_portrait HIDE; the next decorated event remounted and SetUnit the unchanged asset.",
+    "direct_same_entity_mismatch_reproduced": true,
+    "heroes": [
+      "hero_doom",
+      "hero_blademaster"
+    ],
+    "version": 7,
+    "registration_orders": [
+      "router_then_publisher",
+      "publisher_then_router"
+    ],
+    "probe": "output/portrait_flicker_20261003/probe_before_channels.lua",
+    "log": "output/portrait_flicker_20261003/probe_before_channels.log",
+    "stat_projection_drops_existing_metadata": false,
+    "catalog_assets_missing": false,
+    "mixed_hero_tower_selection_required": false,
+    "regular_updates": "Stats-changed events, including attack_all_attribute_growth; this is not a new or assumed periodic timer."
+  },
+  "server_change": {
+    "shared_api": "require(\"ui/portrait_metadata\").apply(unit, ui_snapshot_copy)",
+    "module_dependencies": [
+      "config/asset_catalog"
+    ],
+    "router_test_seam_retained": true,
+    "regular_publisher": "combat_stat_projection.for_ui(raw) copy -> finite integral entindex validation -> pcall entity lookup and IsNull -> metadata.apply(unit_or_nil, copy) -> NetTable",
+    "invalid_entity_policy": "Preserve projected stat publication and explicitly clear the three portrait fields; no stale previous-hero identity is retained.",
+    "portrait_fields": [
+      "model_asset_id",
+      "portrait_unit_name",
+      "portrait_item_def"
+    ],
+    "new_polling_or_timers": false,
+    "raw_snapshot_immutable": true,
+    "damage_version_and_timestamp_values_unchanged": true
+  },
+  "hero_risk_classification": [
+    {
+      "hero_id": "hero_doom",
+      "asset_id": "hero_permanent_hero_doom",
+      "catalog_portrait_unit": "npc_dota_hero_doom_bringer",
+      "custom_scene_opt_in": true,
+      "ui_portrait_unit": "npc_dota_hero_doom_bringer",
+      "before_risk": "affected_by_conflicting_stat_transport",
+      "after": "same_metadata_from_both_stat_transports",
+      "notes": ""
+    },
+    {
+      "hero_id": "hero_blademaster",
+      "asset_id": "hero_permanent_hero_blademaster",
+      "catalog_portrait_unit": "npc_dota_hero_juggernaut",
+      "custom_scene_opt_in": true,
+      "ui_portrait_unit": "npc_dota_hero_juggernaut",
+      "before_risk": "affected_by_conflicting_stat_transport",
+      "after": "same_metadata_from_both_stat_transports",
+      "notes": ""
+    },
+    {
+      "hero_id": "hero_shadow_fiend",
+      "asset_id": "hero_permanent_hero_shadow_fiend",
+      "catalog_portrait_unit": "npc_dota_hero_keeper_of_the_light",
+      "custom_scene_opt_in": false,
+      "ui_portrait_unit": "",
+      "before_risk": "native_portrait_fallback_not_subject_to_custom_scene_restart",
+      "after": "native_fallback_preserved",
+      "notes": "Historical shadow_fiend ID intentionally maps to Keeper of the Light"
+    },
+    {
+      "hero_id": "hero_axe",
+      "asset_id": "hero_permanent_hero_axe",
+      "catalog_portrait_unit": "npc_dota_hero_axe",
+      "custom_scene_opt_in": false,
+      "ui_portrait_unit": "",
+      "before_risk": "native_portrait_fallback_not_subject_to_custom_scene_restart",
+      "after": "native_fallback_preserved",
+      "notes": ""
+    },
+    {
+      "hero_id": "hero_drow_ranger",
+      "asset_id": "hero_permanent_hero_drow_ranger",
+      "catalog_portrait_unit": "npc_dota_hero_drow_ranger",
+      "custom_scene_opt_in": false,
+      "ui_portrait_unit": "",
+      "before_risk": "native_portrait_fallback_not_subject_to_custom_scene_restart",
+      "after": "native_fallback_preserved",
+      "notes": ""
+    },
+    {
+      "hero_id": "hero_monkey_king",
+      "asset_id": "hero_permanent_hero_monkey_king",
+      "catalog_portrait_unit": "npc_dota_hero_monkey_king",
+      "custom_scene_opt_in": false,
+      "ui_portrait_unit": "",
+      "before_risk": "native_portrait_fallback_not_subject_to_custom_scene_restart",
+      "after": "native_fallback_preserved",
+      "notes": ""
+    }
+  ],
+  "mapping_equivalence": {
+    "original_function_body_equal_after_only_export_name_change": true,
+    "router_equal_after_only_require_and_alias_substitution": true,
+    "runtime_original_vs_extracted_cases": 394,
+    "enabled_catalog_rows": 194,
+    "sources_per_row": [
+      "survival_model_asset_id",
+      "survival_monster_default_wearable_asset_id"
+    ],
+    "extra_cases": [
+      "empty unit",
+      "hero Doom",
+      "hero Juggernaut",
+      "missing model asset with hero fallback",
+      "monkey clone",
+      "nil unit"
+    ],
+    "native_fallback_and_custom_opt_in_policy_changed": false
+  },
+  "scope_verification": {
+    "original_mapping_body_equal": true,
+    "router_only_require_and_alias": true,
+    "ui_service_only_require_and_publish_adapter": true
+  },
+  "client_geometry": {
+    "reject_unlaid_out_finite_sentinels": true,
+    "absolute_coordinate_limit": 1000000,
+    "invalid_geometry_does_not_overwrite_last_valid_style": true,
+    "collapsed_rect_not_reported_as_valid": true
+  },
+  "client_behaviour": {
+    "assets": [
+      {
+        "asset": "hero_permanent_hero_doom",
+        "unit": "npc_dota_hero_doom_bringer"
+      },
+      {
+        "asset": "hero_permanent_hero_blademaster",
+        "unit": "npc_dota_hero_juggernaut"
+      },
+      {
+        "asset": "tower_keeper_of_the_light",
+        "unit": "npc_dota_hero_tinker"
+      },
+      {
+        "asset": "monster_boss_rebirth_01_phalanx",
+        "unit": "npc_dota_hero_undying"
+      },
+      {
+        "asset": "monster_wave_humanoid_red_axe",
+        "unit": "npc_dota_hero_axe"
+      },
+      {
+        "asset": "monster_archive_shadow_1",
+        "unit": "npc_dota_hero_shadow_demon"
+      },
+      {
+        "asset": "challenge_monster_terrorblade_fractal_horns",
+        "unit": "npc_dota_hero_terrorblade"
+      },
+      {
+        "asset": "challenge_monster_beastmaster_legacy",
+        "unit": "npc_dota_hero_beastmaster",
+        "item_def": "21396"
+      },
+      {
+        "asset": "challenge_monster_morphling",
+        "unit": "npc_dota_hero_morphling"
+      },
+      {
+        "asset": "challenge_monster_ember_searing_path",
+        "unit": "npc_dota_hero_ember_spirit",
+        "item_def": "21383"
+      },
+      {
+        "asset": "challenge_monster_primal_beast_svarog",
+        "unit": "npc_dota_hero_primal_beast",
+        "item_def": "26799"
+      },
+      {
+        "asset": "challenge_monster_spectre_phantom_advent",
+        "unit": "npc_dota_hero_spectre",
+        "item_def": "21361"
+      }
+    ],
+    "production_functions": "Full current combat_stats.js VM entry; actual update, updateCosmeticPortrait, hide, mount, position, portraitRect and existing sentinel. Only native engine APIs mocked.",
+    "stable": {
+      "doom_frames": 300,
+      "matrix_assets": 12,
+      "matrix_frames_each": 64,
+      "scene_set_unit_each": 1,
+      "extra_set_unit": 0,
+      "steady_reparent": 0,
+      "steady_reorder": 0,
+      "steady_geometry_writes": 0,
+      "steady_visibility_transitions": 0,
+      "scheduled_sentinel_jobs": 1
+    },
+    "checks": [
+      "Null/stale/other-selection snapshots do not supersede accepted selected snapshot",
+      "Accepted unsupported metadata still restores native portrait; no indefinite client metadata retention",
+      "Finite +/-1.95e38 sentinels, abs >=1e6, bad dimensions, native position throws and tiny-scale overflow preserve prior valid style/signature and recover",
+      "Collapsed/invalid/oversized panels produce no diagnostic rectangle",
+      "New Scene object with same asset key reloads once; same Scene remains stable",
+      "Native anchor replacement restores old opacity, dims/reparents to new host without restarting same Scene",
+      "Doom/Juggernaut and 6 challenge exact allowlist plus tower/boss/wave/archive use shared path",
+      "True selection/multi/native-hero/no-selection/shutdown clears custom identity, restores native opacity/home and stops jobs",
+      "Original callback lifecycle, version filtering, talent icons and separate multiselect grid regression retain coverage"
+    ]
+  },
+  "compilation": {
+    "status": "PASS",
+    "compiled": 1,
+    "failed": 0,
+    "started_utc": "2026-10-02T16:13:01.0358464Z",
+    "source_sha256": "c2728f233f8acd3262583b7ece1f6dbbfb6a4b502c56a99d42058002342319f6",
+    "content_sha256": "c2728f233f8acd3262583b7ece1f6dbbfb6a4b502c56a99d42058002342319f6",
+    "artifact_sha256": "a193d2bf03daac2765910d35118f099ef4de29e85ef785228eca8d19386eda2c",
+    "artifact_write_utc": "2026-10-02T16:13:01.4078483Z",
+    "log_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\portrait_flicker_20261003\\compile\\20261003_001301\\combat_stats.compile.log",
+    "log_sha256": "9af37ab19787d4697e364300debb78f6e949019b5b798235bf3d8d43b1d09126"
+  },
+  "source_and_dependency_sha256": {
+    "scripts/vscripts/ui/ui_request_router.lua": "ec38d915c327bb97deb2cb9a485bfd678dc9f38c35598fe870390c229640f43b",
+    "scripts/vscripts/ui/combat_stats_ui_service.lua": "1f173233ae4824ebfdf17821c9bd4e5bc44177cf71d673384c40a0b8bb447408",
+    "scripts/vscripts/ui/portrait_metadata.lua": "a9971643f250f25d87f4ecea660d1ddb01a3bbc31647a5b380172879c57909f0",
+    "scripts/vscripts/tests/test_portrait_metadata_channels.lua": "f17c3260bf799af0b7acddb2b4bd6e6d4667e717679bb68dc84cf005d392c96e",
+    "scripts/vscripts/systems/hero_combat_stat_service.lua": "e7a5228d79e7b5a5b912f20828457d40d84b63c505db35955cd20eed6ad32ea5",
+    "scripts/vscripts/ui/combat_stat_projection.lua": "877e47f94235764eedbf46b05d54f70c4f71af530669bc9d3182b22be809a023",
+    "scripts/vscripts/config/asset_catalog.lua": "908d26b36afd7bc87195138e6711960587915754593cdc416b70946387907ca4",
+    "scripts/vscripts/config/generated/asset_catalog.lua": "e17213d22d347ecac9e5e166401fa904e6fd317dafc53bfac5e9d7aa9654acee",
+    "output/portrait_flicker_20261003/probe_before_channels.lua": "4951b9bcc4c3b5232780af0ad8f11c3448de4c7c79165bf30e6a7e8215602bd8",
+    "output/portrait_flicker_20261003/probe_before_channels.log": "e8c615e3103c489bcf40134b32617fb08781f03b9c0c684a6baf01ba6a11449a",
+    "output/portrait_flicker_20261003/test_portrait_metadata_channels.log": "05227e3d7a4fc40f4da020fa27517863e2473c5e1c2724d93a51a8e4b05f97e1",
+    "output/portrait_flicker_20261003/lua_syntax.log": "d0a110c454634370176d311209902b29fbf41a6319e81e05a432cad3d6e56f86",
+    "output/portrait_flicker_20261003/test_production_ui_router_before.log": "9cd42fa5b49ebc94420a597cddf6f3da13f0cfa572578e0dd59990154c5deeee",
+    "panorama/src/scripts/custom_game/combat_stats.js": "c2728f233f8acd3262583b7ece1f6dbbfb6a4b502c56a99d42058002342319f6",
+    "panorama/src/layout/custom_game/survival_hud.xml": "88c139677ae8b36c815b4a0402069b9a70b0dcc1f5aa91e718a04e0245b5796b",
+    "panorama/src/styles/custom_game/survival_hud.css": "67f6bd22a777be0e7bafd7ea34088e09457365da121fcf5d8f49a691a0a45d6e",
+    "tools/test_combat_stats_callbacks.cjs": "cf536ab417ec3077c9fd284143867d179104e304279fe3a941bd5725c0f64c64",
+    "tools/test_seven_sins_portrait.cjs": "1def49184216cf42b29f52e5af7d03fabfd39d429855bed4b80a2d84b73f796c",
+    "tools/test_multiselect_portraits.cjs": "f0bcd31633fddae145b89ecb773cdce89d7322333a2fd76041f895fa6e377224",
+    "tools/test_native_portrait_runtime_contract.ps1": "2649b293d0704dc6a8682fc826fa45108fe8acee3524fc8ddecb6ede63fe9197",
+    "panorama/scripts/custom_game/combat_stats.vjs_c": "a193d2bf03daac2765910d35118f099ef4de29e85ef785228eca8d19386eda2c",
+    ".gitignore": "8fb4cb538272c80721cc8cb6c26e7fa865d2e982084741572843b2d60725dd54"
+  },
+  "reports": {
+    "output/portrait_flicker_20261003/server_validation.json": "b538859447f24c180ffe75348b50cc0b3b19850a6c693c8b082e9d6b05f57de6",
+    "output/portrait_flicker_20261003/client_validation.json": "9acd976f0e9a6a2d8767a83acdff8d814e189f46204ecbb9a8061d9b6e6bc573",
+    "output/portrait_flicker_20261003/compile/20261003_001301/build.json": "e77467c1711a5f54bbea0e5e13601557be78d9bdb0d4dfdf4fcf6aaea961fd7a"
+  },
+  "checks": {
+    "server": [
+      {
+        "name": "test_portrait_metadata_channels",
+        "command": "\"C:/Program Files/lua/bin/lua5.1.exe\" scripts/vscripts/tests/test_portrait_metadata_channels.lua",
+        "status": "PASS",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/test_portrait_metadata_channels.log",
+        "coverage": [
+          "actual selected request plus HERO_COMBAT_STATS_CHANGED selected push and regular NetTable",
+          "six permanent heroes x equal/equal/new version x both subscription registration orders (36 request/change iterations)",
+          "Doom/Juggernaut custom scenes; other four native fallback",
+          "all projected nonvisual/stat fields deep equal including damage, refresh_version and server/cast timestamps",
+          "raw authoritative snapshot deep unchanged",
+          "missing, removed, lookup/IsNull-throw, absent IsNull, negative/fractional/nonnumeric/infinite/NaN/missing entity indices safely publish native fallback",
+          "zero scheduler tasks and zero additional game-time reads",
+          "existing tower/boss/challenge and fallback identity sources"
+        ]
+      },
+      {
+        "name": "saved_original_two_channel_reproduction_and_mapping_equivalence",
+        "command": "\"C:/Program Files/lua/bin/lua5.1.exe\" output/portrait_flicker_20261003/probe_before_channels.lua",
+        "status": "PASS_BASELINE_BUG_CONFIRMED",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/probe_before_channels.log"
+      },
+      {
+        "name": "Lua 5.1 syntax (four owned files)",
+        "command": "lua5.1.exe -e for each owned file assert(loadfile(path))",
+        "status": "PASS",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/lua_syntax.log"
+      },
+      {
+        "name": "owned-file git diff --check",
+        "command": "git diff --check -- scripts/vscripts/ui/ui_request_router.lua scripts/vscripts/ui/combat_stats_ui_service.lua scripts/vscripts/ui/portrait_metadata.lua scripts/vscripts/tests/test_portrait_metadata_channels.lua",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "name": "test_return_home_ui_router",
+        "command": "\"C:/Program Files/lua/bin/lua5.1.exe\" scripts/vscripts/tests/test_return_home_ui_router.lua",
+        "status": "PASS",
+        "exit_code": 0,
+        "evidence": "Actual tool output RETURN_HOME_UI_ROUTER_PASS; no dedicated saved log."
+      },
+      {
+        "name": "legacy test_production_ui_router current and saved-original baseline",
+        "status": "PRE_EXISTING_FIXTURE_FAILURE_CONFIRMED",
+        "baseline_exit_code": 1,
+        "current_evidence": "Observed runtime exception in original direct test command before the successful return-home command; shell combined exit did not separately capture first Lua exit.",
+        "baseline_command": "lua5.1.exe -e package.preload[\"ui/ui_request_router\"] = function() return assert(loadfile(\"output/portrait_flicker_20261003/before/scripts/vscripts/ui/ui_request_router.lua\"))() end; dofile(\"scripts/vscripts/tests/test_production_ui_router.lua\")",
+        "baseline_log": "output/portrait_flicker_20261003/test_production_ui_router_before.log",
+        "reason": "Existing fixture replaces hero_summon_projection with an empty table; actual ability_runtime_builder.lua:754 requires hero_id_for_summon_ability. Saved-original router fails identically at test line 101. No unrelated fixture or production runtime modified."
+      }
+    ],
+    "client": [
+      {
+        "name": "combat_stats_callbacks",
+        "command": "& 'C:/Program Files/nodejs/node.exe' tools/test_combat_stats_callbacks.cjs",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/logs/combat_stats_callbacks.log"
+      },
+      {
+        "name": "seven_sins_portrait",
+        "command": "& 'C:/Program Files/nodejs/node.exe' tools/test_seven_sins_portrait.cjs",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/logs/seven_sins_portrait.log"
+      },
+      {
+        "name": "multiselect_portraits",
+        "command": "& 'C:/Program Files/nodejs/node.exe' tools/test_multiselect_portraits.cjs",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/logs/multiselect_portraits.log"
+      },
+      {
+        "name": "native_portrait_runtime_contract",
+        "command": "& ./tools/test_native_portrait_runtime_contract.ps1",
+        "exit_code": 1,
+        "log": "output/portrait_flicker_20261003/logs/native_portrait_runtime_contract.log"
+      },
+      {
+        "name": "callbacks_node_syntax",
+        "command": "& 'C:/Program Files/nodejs/node.exe' --check tools/test_combat_stats_callbacks.cjs",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/logs/callbacks_node_syntax.log"
+      },
+      {
+        "name": "seven_sins_node_syntax",
+        "command": "& 'C:/Program Files/nodejs/node.exe' --check tools/test_seven_sins_portrait.cjs",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/logs/seven_sins_node_syntax.log"
+      },
+      {
+        "name": "target_diffcheck",
+        "command": "git diff --check -- tools/test_combat_stats_callbacks.cjs tools/test_seven_sins_portrait.cjs",
+        "exit_code": 0,
+        "log": "output/portrait_flicker_20261003/logs/target_diffcheck.log"
+      }
+    ]
+  },
+  "existing_checks_requiring_fixture_maintenance": [
+    {
+      "exit_code": 1,
+      "reason": "NON_TOWER_SCENE_PANEL_REMAINED",
+      "detail": "Existing PowerShell contract requires exactly one DOTAScenePanel. Current unchanged portrait layout already contains tower Scene and hidden opt-in Juggernaut editor Scene (two); its failure precedes this patch and is unrelated to finite geometry/identity guard. Script not modified.",
+      "scope_limit": "Later static assertions were not executed because script stops at this existing assertion."
+    },
+    {
+      "name": "legacy test_production_ui_router current and saved-original baseline",
+      "status": "PRE_EXISTING_FIXTURE_FAILURE_CONFIRMED",
+      "baseline_exit_code": 1,
+      "current_evidence": "Observed runtime exception in original direct test command before the successful return-home command; shell combined exit did not separately capture first Lua exit.",
+      "baseline_command": "lua5.1.exe -e package.preload[\"ui/ui_request_router\"] = function() return assert(loadfile(\"output/portrait_flicker_20261003/before/scripts/vscripts/ui/ui_request_router.lua\"))() end; dofile(\"scripts/vscripts/tests/test_production_ui_router.lua\")",
+      "baseline_log": "output/portrait_flicker_20261003/test_production_ui_router_before.log",
+      "reason": "Existing fixture replaces hero_summon_projection with an empty table; actual ability_runtime_builder.lua:754 requires hero_id_for_summon_ability. Saved-original router fails identically at test line 101. No unrelated fixture or production runtime modified."
+    }
+  ],
+  "in_game_visual_verified": false,
+  "live_acceptance": "pending",
+  "limitations": [
+    "VM validates production control flow/native API calls and style writes, not rendered ScenePanel pixels or camera frames.",
+    "Server two-channel metadata equivalence is tested separately by parent/server agent.",
+    "No camera editor experiments or asset changes performed.",
+    "Offline engine mocks cover transport contracts and failure handling; actual Panorama Scene rendering has not been verified in a running match by this agent.",
+    "The client asset/unit/selection guards are unchanged by this agent.",
+    "No native hero portrait model/resource mapping change was needed."
+  ]
+}

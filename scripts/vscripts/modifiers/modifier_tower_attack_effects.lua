@@ -19,6 +19,8 @@ local events = require("core/events")
 local buff_manager = require("systems/buff_manager")
 local asset_catalog = require("config/asset_catalog")
 local sound_service = require("core/sound_service")
+local machine_gun_feedback = require("systems/tower_machine_gun_feedback")
+local targeting = require("systems/tower_targeting")
 local global_rules = require("config/generated/global_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
 local anti_air_rules = require("systems/anti_air_rules")
@@ -150,6 +152,31 @@ local function uses_machine_gun_attack(unit)
     return skill_matching(unit, "machine_gun_") ~= nil
         or skill_matching(unit, "bounty_machine_gun_") ~= nil
         or skill_matching(unit, "explosive_gatling_") ~= nil
+end
+
+local function play_attack_gesture(caster)
+    local activity = rawget(_G, "ACT_DOTA_ATTACK")
+    local asset = asset_catalog.get(caster.survival_model_asset_id)
+    if not activity or not asset or not asset.native_wearable_stage then return end
+    if skill_matching(caster, "lightning_strike_")
+        and type(caster.StartGestureWithPlaybackRate) == "function" then
+        pcall(caster.StartGestureWithPlaybackRate, caster, activity, LIGHTNING_ATTACK_PLAYBACK_RATE)
+    elseif type(caster.StartGesture) == "function" then
+        pcall(caster.StartGesture, caster, activity)
+    end
+end
+
+local function basic_attack_cue(caster)
+    if skill_matching(caster, "frost_attack_") then return "tower_frost_launch" end
+    if skill_matching(caster, "anti_air_missile_") then
+        if caster.survival_model_asset_id == "tower_anti_air_skywrath_empyrean" then
+            return "tower_anti_air_attack_arcana"
+        end
+        return "tower_anti_air_attack"
+    end
+    if skill_matching(caster, "critical_strike_") or skill_matching(caster, "bone_cannon_")
+        or skill_matching(caster, "death_grenade_") then return "tower_death_attack" end
+    return "tower_basic_attack"
 end
 
 local function laser_config(unit, skill)
@@ -294,8 +321,9 @@ local function start_anti_air_sequence(modifier, tower, target, skill)
         modifier.anti_air_task_ids[task_id] = true
         scheduler.after(interval * (missile_index - 1), function()
             modifier.anti_air_task_ids[task_id] = nil
-            if not valid(tower) or not valid(target)
-                or not anti_air_rules.is_flying(target) then
+            if not valid(tower) then return false end
+            if not targeting.valid(tower, target) then target = targeting.select(tower, target) end
+            if not valid(target) or not anti_air_rules.is_flying(target) then
                 return false
             end
             modifier.anti_air_secondary_attack = true
@@ -569,12 +597,8 @@ local function apply_machine_gun_hit_effects(modifier, tower, target)
                 reason = "tower_bounty_machine_gun_attack",
             })
             if result and result.ok == true then
-                play_follow_particle(target, skill_effect_particle(
-                    tower, bounty, "skill_strike",
-                    "particles/units/heroes/hero_bounty_hunter/bounty_hunter_cutpurse.vpcf",
-                    MACHINE_GUN_ASSET_IDS.bounty
-                ))
-                play_tower_sound("tower_bounty_machine_gun", tower, target)
+                -- Gold is still granted on every hit; only its feedback is grouped.
+                pcall(machine_gun_feedback.gold, modifier, tower, gold)
             end
         end
     end
@@ -608,6 +632,8 @@ local function fire_machine_gun_hit(modifier, tower, target, hit_index)
         or target:GetTeamNumber() == tower:GetTeamNumber() then
         return false
     end
+    -- One cosmetic projectile per configured damage hit; no extra attack order.
+    pcall(machine_gun_feedback.shot, tower, target)
     local multiplier, source = roll_tower_critical(tower, target)
     modifier.machine_gun_instant_damage = true
     local ok, result = pcall(function()
@@ -644,6 +670,7 @@ local function machine_gun_sequence_is_current(modifier, tower, sequence)
 end
 
 local function stop_machine_gun_sequences(modifier)
+    pcall(machine_gun_feedback.flush_gold, modifier, modifier:GetParent())
     modifier.machine_gun_sequence =
         (tonumber(modifier.machine_gun_sequence) or 0) + 1
     for task_id in pairs(modifier.machine_gun_task_ids or {}) do
@@ -654,17 +681,24 @@ end
 
 local function start_machine_gun_sequence(modifier, tower, target, skill)
     if not valid(tower) or not valid(target) then return end
+    pcall(machine_gun_feedback.flush_gold, modifier, tower)
     local hit_count = math.max(1, math.floor(tonumber(skill.max_targets) or 1))
     modifier.machine_gun_sequence =
         (tonumber(modifier.machine_gun_sequence) or 0) + 1
     local sequence = modifier.machine_gun_sequence
     modifier.machine_gun_task_ids = modifier.machine_gun_task_ids or {}
+    -- One gesture per real attack cycle; the scheduled sub-hits never animate.
+    play_attack_gesture(tower)
     local function fire(hit_index)
         if not machine_gun_sequence_is_current(modifier, tower, sequence) then
             return
         end
+        -- Continue this same burst at its original scheduled cadence. A kill
+        -- changes the recipient, never starts a fresh 6-8-hit round.
+        if not targeting.valid(tower, target) then target = targeting.select(tower, target) end
         if not fire_machine_gun_hit(modifier, tower, target, hit_index)
             or hit_index >= hit_count then
+            pcall(machine_gun_feedback.flush_gold, modifier, tower)
             return
         end
         local next_index = hit_index + 1
@@ -821,7 +855,7 @@ local function start_blizzard(caster, position, skill)
         caster, skill, "skill_persistent", blizzard_visual.SNOW,
         "tower_frost_crystal_maiden_winter_raven"
     )
-    local visual = blizzard_visual.play(position, radius, ground_particle_name, snow_particle_name)
+    local visual = blizzard_visual.play(position, radius, ground_particle_name, snow_particle_name, math.max(5, duration))
     local function finish_visual() blizzard_visual.finish(visual, false) end
     play_tower_sound("tower_ice_blizzard", caster, caster, position)
     local tick = 0
@@ -861,7 +895,7 @@ local function start_blizzard(caster, position, skill)
                     "[TowerBlizzard] TICK tower=%d instance=%s tick=%d targets=%d",
                     caster:entindex(), instance_id, wave, hit_count
                 )
-                if wave >= tick_limit then finish_visual() end
+                -- Visual expiry is owned by the full storm duration, not a short impact child.
             end, finish_visual
         )
         if tick >= tick_limit then
@@ -1182,7 +1216,9 @@ local function create_laser_segment(self, effect, now)
     local segment = {
         index = index,
         native = effect.beam_mode == "native",
-        expires_at = effect.beam_mode == "continuous" and math.huge
+        particle_name = effect.particle_name,
+        expires_at = (effect.beam_mode == "continuous"
+            or (effect.beam_mode == "native" and effect.visual_refresh_interval == 0)) and math.huge
             or now + math.max(
                 0.03, tonumber(effect.visual_segment_duration) or 0.18
             ),
@@ -1335,7 +1371,18 @@ function modifier_tower_attack_effects:OnIntervalThink()
         self.current_update_interval = update_interval
         self:StartIntervalThink(update_interval)
     end
-    if effect.beam_mode == "continuous" then
+    local current = self.laser_particles[1]
+    local replaced_native = current and current.native and current.particle_name ~= effect.particle_name
+    if replaced_native then
+        -- Upgrade both sustained and unmodified one-shot art immediately.
+        -- Retire old colors together without resetting the damage clock.
+        destroy_particle(self)
+        self.laser_visual_elapsed = 0
+        self.laser_next_visual_retry = 0
+        create_laser_segment(self, effect, now)
+    end
+    if effect.beam_mode == "continuous"
+        or (effect.beam_mode == "native" and effect.visual_refresh_interval == 0) then
         if #self.laser_particles == 0 and now >= (self.laser_next_visual_retry or 0) then
             create_laser_segment(self, effect, now)
         end
@@ -1351,7 +1398,7 @@ function modifier_tower_attack_effects:OnIntervalThink()
             end
         end
         self.laser_particles = visible
-        self.laser_visual_elapsed = self.laser_visual_elapsed + elapsed
+        self.laser_visual_elapsed = self.laser_visual_elapsed + (replaced_native and 0 or elapsed)
         local visual_interval = math.max(
             update_interval, tonumber(effect.visual_refresh_interval) or 0.12
         )
@@ -1384,22 +1431,7 @@ function modifier_tower_attack_effects:OnAttackStart(params)
         reset_laser(self)
         return
     end
-    local attack_activity = rawget(_G, "ACT_DOTA_ATTACK")
-    local visual_asset = asset_catalog.get(caster.survival_model_asset_id)
-    if visual_asset and visual_asset.native_wearable_stage
-        and attack_activity ~= nil then
-        if skill_matching(caster, "lightning_strike_")
-            and type(caster.StartGestureWithPlaybackRate) == "function" then
-            pcall(
-                caster.StartGestureWithPlaybackRate,
-                caster,
-                attack_activity,
-                LIGHTNING_ATTACK_PLAYBACK_RATE
-            )
-        elseif type(caster.StartGesture) == "function" then
-            pcall(caster.StartGesture, caster, attack_activity)
-        end
-    end
+    if not uses_machine_gun_attack(caster) then play_attack_gesture(caster) end
     event_bus.emit(events.TOWER_ATTACK_START, {
         tower = caster,
         target = target,
@@ -1418,14 +1450,21 @@ end
 function modifier_tower_attack_effects:OnAttack(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
     local caster, primary = self:GetParent(), params.target
+    -- Also notify existing modifiers after a Tools hot reload, where the
+    -- engine may still cache their previous DeclareFunctions event list.
+    local auto = caster.FindModifierByName and caster:FindModifierByName("modifier_tower_auto_attack")
+    if auto and auto.OnAttack and not self.anti_air_secondary_attack then auto:OnAttack(params) end
     if not valid(primary) or primary:GetTeamNumber() == caster:GetTeamNumber() then
         return
     end
     local replacement_multi = uses_multi_replacement_arrows(caster)
     if not replacement_multi
         and not skill_matching(caster, "burning_great_arrow_")
-        and not uses_machine_gun_attack(caster) then
-        play_tower_sound("tower_basic_attack", caster, caster)
+        and not uses_machine_gun_attack(caster)
+        and not skill_matching(caster, "multi_attack_")
+        and not skill_matching(caster, "laser_")
+        and not skill_matching(caster, "lightning_strike_") then
+        play_tower_sound(basic_attack_cue(caster), caster, caster)
     end
     local machine_gun = skill_matching(caster, "machine_gun_")
     if machine_gun then

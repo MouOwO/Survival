@@ -10,6 +10,13 @@ local control_writes, control_entities, particle_releases = {}, {}, {}
 local immediate_destroys = {}
 local native_attacks = {}
 local gestures = {}
+local gold_numbers = {}
+OVERHEAD_ALERT_GOLD = 0
+PlayerResource = { GetPlayer = function(_, id) return id end }
+SendOverheadEventMessage = function(player, style, owner, amount)
+    assert(style == OVERHEAD_ALERT_GOLD)
+    gold_numbers[#gold_numbers+1] = {player=player, owner=owner, amount=amount}
+end
 local candidates, last_radius = {}, nil
 local now, next_task = 0, 0
 local function vector(x, y, z)
@@ -215,6 +222,7 @@ local function clear()
     control_writes, control_entities, particle_releases, immediate_destroys = {}, {}, {}, {}
     native_attacks = {}
     gestures = {}
+    gold_numbers = {}
     candidates = {}
 end
 local function drain()
@@ -291,7 +299,7 @@ tower.survival_model_asset_id = nil
 
 local laser = { skill_id = "laser_lv01", damage_interval = 1, damage_multiplier = 1 }
 local beam = require("config/generated/tower_laser_effects").by_id["laser_lv01:default"]
-assert(beam.beam_mode == "native" and beam.particle_name == "particles/survival/tinker_growth/r_tinker_laser.vpcf",
+assert(beam.beam_mode == "native" and beam.particle_name == "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
     "production laser CSV must select native Tinker")
 local production_beam = {}
 for key,value in pairs(beam) do production_beam[key] = value end
@@ -820,6 +828,164 @@ drain()
 assert(#damage == damage_before and count_request(events.RESOURCE_ADD_REQUEST) == rewards_before)
 dummy.name = "npc_dota_training_dummy"
 
+-- Real configuration: one cosmetic projectile per damage hit (6/7/8/8/8),
+-- one gesture per burst, unchanged hit clock and every-hit gold rewards.
+do
+    local skills = require("config/generated/tower_skill_definitions")
+    local buff_service = package.loaded["systems/buff_manager"]
+    local old_value = buff_service.value
+    tower.survival_model_asset_id = "test_native_stage"
+    for _, speed_bonus in ipairs({0, 100}) do
+        buff_service.value = function() return speed_bonus end
+        for level, hits in ipairs({6, 7, 8, 8, 8}) do
+            clear()
+            local skill = skills.by_id[string.format("machine_gun_lv%02d", level)]
+            assert(skill.max_targets == hits)
+            local burst = modifier({skill, bounty})
+            local started = now
+            burst:OnAttackStart({attacker=tower, target=dummy})
+            assert(#gestures == 0, "windup must not add a second burst gesture")
+            burst:OnAttack({attacker=tower, target=dummy})
+            assert(#damage == 1 and #tracking == 1 and #gestures == 1)
+            local step = 1
+            while #scheduled > 0 do
+                local task = table.remove(scheduled, 1)
+                assert(not task.cancelled and not task.repeating)
+                local interval = skill.barrage_interval / (1 + speed_bonus / 100)
+                assert(math.abs(task.delay - interval) < 0.000001)
+                now = now + task.delay
+                task.callback()
+                step = step + 1
+                assert(step <= hits and #damage == step and #tracking == step)
+            end
+            assert(step == hits and #gestures == 1 and #native_attacks == 0)
+            assert(count_request(events.RESOURCE_ADD_REQUEST) == hits)
+            assert(count_event(events.TOWER_ATTACK_LANDED) == hits)
+            assert(math.abs(now - started - (hits - 1) * skill.barrage_interval
+                / (1 + speed_bonus / 100)) < 0.000001)
+            for _, hit in ipairs(damage) do assert(hit.base_damage == 100) end
+            for _, request in ipairs(requested) do
+                if request.event == events.RESOURCE_ADD_REQUEST then
+                    assert(request.payload.gold == bounty.damage_multiplier)
+                end
+            end
+            for _, shot in ipairs(tracking) do
+                assert(shot.Source == tower and shot.Target == dummy)
+                assert(shot.Ability == nil and shot.bIsAttack == false)
+                assert(shot.EffectName == "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf")
+            end
+            local guns, coins = 0, 0
+            for _, cue in ipairs(sounds) do
+                if cue == "tower_machine_gun" then guns = guns + 1 end
+                if cue == "tower_bounty_machine_gun" then coins = coins + 1 end
+            end
+            assert(guns == hits and coins == 1, "gun per shot, coin feedback once per burst")
+            assert(#gold_numbers == 1 and gold_numbers[1].owner == tower
+                and gold_numbers[1].amount == hits * bounty.damage_multiplier,
+                "round popup must count every successful gold grant exactly once")
+            assert(#particles == 1 and particles[1].owner == tower)
+            assert(particles[1].path == "particles/generic_gameplay/lasthit_coins.vpcf")
+            assert(particle_releases[1] == 1 and #destroyed == 0)
+            local center
+            for _, write in ipairs(control_writes) do
+                if write.id == 1 and write.cp == 1 then center = write.position end
+            end
+            assert(center and center.x == tower.position.x and center.y == tower.position.y
+                and center.z > tower.position.z + 100, "native coin CP1 must sit over tower head")
+            burst:OnDestroy()
+        end
+    end
+    buff_service.value = old_value
+    tower.survival_model_asset_id = nil
+
+    -- The first and second victims die during one round. Remaining configured
+    -- shots must continue at the enemy nearest the wall, with one animation.
+    clear()
+    tower.survival_model_asset_id = "test_native_stage"
+    local saved_building_system = package.loaded["systems/building_system"]
+    package.loaded["systems/building_system"] = {wall_for_player=function(id)
+        assert(id==0)
+        return unit(90,"building_wall",600,2)
+    end}
+    local out_of_range = unit(91,"npc_survival_wave_monster",650)
+    candidates = {tree, dummy, second, out_of_range, third}
+    local combat = package.loaded["combat/damage_service"]
+    local saved_deal = combat.Deal
+    combat.Deal = function(self, payload)
+        local result = saved_deal(self, payload)
+        if payload.victim == dummy or payload.victim == third then payload.victim.alive=false end
+        return result
+    end
+    local chain = modifier({skills.by_id.machine_gun_lv03, bounty})
+    local chain_started = now
+    chain:OnAttack({attacker=tower,target=dummy})
+    for shot=2,8 do
+        local task = assert(table.remove(scheduled,1), "kill must retain the remaining configured hits")
+        assert(math.abs(task.delay-skills.by_id.machine_gun_lv03.barrage_interval)<0.000001)
+        now = now + task.delay
+        task.callback()
+        assert(#damage==shot)
+    end
+    assert(#scheduled==0, "handoff must not create an additional burst")
+    assert(#damage == 8 and #tracking == 8 and #gestures == 1)
+    assert(damage[1].victim==dummy and damage[2].victim==third and damage[3].victim==second,
+        "burst handoff must use wall proximity, while rejecting the closer-to-wall out-of-range enemy")
+    assert(math.abs(now-chain_started-7*skills.by_id.machine_gun_lv03.barrage_interval)<0.000001)
+    for _,hit in ipairs(damage) do assert(hit.base_damage==100) end
+    assert(count_request(events.RESOURCE_ADD_REQUEST)==8)
+    assert(#gold_numbers==1 and gold_numbers[1].amount==8*bounty.damage_multiplier)
+    chain:OnDestroy()
+    assert(#gold_numbers==1, "cleanup must not duplicate paid-gold popup")
+    combat.Deal=saved_deal
+    dummy.alive,third.alive=true,true
+    package.loaded["systems/building_system"] = saved_building_system
+    tower.survival_model_asset_id=nil
+
+    -- Broken presentation cannot consume damage, gold, or cancel later hits.
+    clear()
+    local create_shot, create_coin = ProjectileManager.CreateTrackingProjectile, ParticleManager.CreateParticle
+    ProjectileManager.CreateTrackingProjectile = function() error("injected projectile failure") end
+    ParticleManager.CreateParticle = function() error("injected coin failure") end
+    local burst = modifier({skills.by_id.machine_gun_lv01, bounty})
+    burst:OnAttack({attacker=tower, target=dummy})
+    drain()
+    assert(#damage == 6 and count_request(events.RESOURCE_ADD_REQUEST) == 6)
+    burst:OnDestroy()
+    ProjectileManager.CreateTrackingProjectile, ParticleManager.CreateParticle = create_shot, create_coin
+
+    -- A lethal first hit still launches its projectile before damage is applied.
+    clear()
+    local combat = package.loaded["combat/damage_service"]
+    local old_deal = combat.Deal
+    combat.Deal = function(self, payload)
+        assert(#tracking == 1, "lethal hit must not swallow its projectile")
+        local result = old_deal(self, payload)
+        dummy.alive = false
+        return result
+    end
+    burst = modifier({skills.by_id.machine_gun_lv01, bounty})
+    burst:OnAttack({attacker=tower, target=dummy})
+    drain()
+    assert(#damage == 1 and #tracking == 1 and count_request(events.RESOURCE_ADD_REQUEST) == 1)
+    assert(#gold_numbers == 1 and gold_numbers[1].amount == bounty.damage_multiplier,
+        "lethal hit without another target must display only the partial round's earned gold")
+    burst:OnDestroy()
+    combat.Deal, dummy.alive = old_deal, true
+
+    for _, case in ipairs({
+        {"critical_strike_lv01", "tower_death_attack"},
+        {"frost_attack_lv01", "tower_frost_launch"},
+        {"anti_air_missile_lv01", "tower_anti_air_attack"},
+    }) do
+        clear()
+        local attack = modifier({{skill_id=case[1]}})
+        attack:OnAttack({attacker=tower, target=dummy})
+        assert(#sounds == 1 and sounds[1] == case[2], "native attack launch cue missing")
+        attack:OnDestroy()
+    end
+    print("MACHINE_GUN_FEEDBACK_PASS: 5 levels, 2 speeds, hit timing/damage/gold, 6-8 projectiles, one gesture, coins, failure and lethal hits")
+end
+
 -- Flying classifications cannot let a resource tree into the anti-air burst
 -- or ensnare. A target that changes before the scheduled missile is rechecked.
 clear()
@@ -843,6 +1009,25 @@ drain()
 assert(#native_attacks > 0)
 dummy.survival_movement_type = nil
 tree.survival_movement_type = nil
+
+-- Anti-air missiles also retain their scheduled extra shots after a kill,
+-- using wall priority while ignoring ground enemies and resource trees.
+clear()
+tower.survival_tower_class = "class_7"
+dummy.survival_movement_type, third.survival_movement_type, fourth.survival_movement_type = "flying", "flying", "flying"
+local saved_building_system = package.loaded["systems/building_system"]
+package.loaded["systems/building_system"] = {wall_for_player=function() return unit(90,"building_wall",600,2) end}
+candidates = {tree, second, third, fourth}
+m = modifier({missile})
+effects._start_anti_air_sequence_for_test(m, tower, dummy, missile)
+dummy.alive = false
+drain()
+assert(#native_attacks == missile.max_targets - 1)
+for _, target in ipairs(native_attacks) do assert(target == fourth, "missile handoff must use wall priority") end
+dummy.alive = true
+dummy.survival_movement_type, third.survival_movement_type, fourth.survival_movement_type = nil, nil, nil
+package.loaded["systems/building_system"] = saved_building_system
+tower.survival_tower_class = nil
 
 -- Every real airborne hit rolls its own configured chance. Ensnare belongs to
 -- its visible skill, lasts two seconds, and never adds stun or extra damage.
@@ -889,12 +1074,12 @@ assert(#damage == 2 and damage[1].victim == third and damage[2].victim == fourth
 second.name = "npc_survival_wave_monster"
 tower.Script_GetAttackRange = saved_getter
 
--- Ballista visuals use Crimson Progenitor's Bane for all five levels, while
+-- The Clinkz SR outfit uses its chosen searing arrow for all five levels, while
 -- the existing tracking speed, split count, delay, damage and armor ignore stay.
 local ballista_asset_id = "tower_multi_drow_dread_retribution"
 local real_catalog = assert(loadfile("scripts/vscripts/config/asset_catalog.lua"))()
 local ballista_asset = real_catalog.by_id[ballista_asset_id]
-local ballista_path = "particles/survival/towers/mars_crimson_ballista.vpcf"
+local ballista_path = "particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
 assert(ballista_asset.attack.projectile == ballista_path)
 local preloaded = false
 for _, path in ipairs(ballista_asset.particle_resources) do
@@ -1068,9 +1253,9 @@ drain()
 -- legacy rarity. Exercise real modifier particle selection across every tier.
 local selector = require("systems/tower_laser_effect_selector")
 local rarity_paths = {
-    R = "particles/survival/tinker_growth/r_tinker_laser.vpcf",
-    SR = "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf",
-    SSR = "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf",
+    R = "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
+    SR = "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vpcf",
+    SSR = "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs.vpcf",
 }
 for level = 6, 25 do
     clear()
@@ -1080,9 +1265,11 @@ for level = 6, 25 do
         local chosen = selector.get(tower, "laser_lv0" .. skill_level)
         assert(chosen.particle_name == rarity_paths[rarity], "skin must follow displayed rarity")
         assert(math.abs(selector.width(tower, "laser_lv0" .. skill_level, chosen)
-            - (1 + (level - 6) * 0.1)) < 0.00001,
-            "width follows displayed tower level including red stars, not inherited skill rank")
-        assert((chosen.color_r > chosen.color_b) == (rarity == "SSR"), "only SSR is red")
+            - 1) < 0.00001,
+            "all ranks retain native width")
+        assert((rarity == "R" and chosen.color_b > chosen.color_r)
+            or (rarity ~= "R" and chosen.color_r > chosen.color_g and chosen.color_g < 100),
+            "orb colors follow the native blue/red beams; no artificial yellow")
     end
     local skill = {skill_id="laser_lv0" .. (level <= 10 and level-5 or 5),
         damage_interval=1, damage_multiplier=1}
@@ -1094,10 +1281,28 @@ for level = 6, 25 do
     for _, cp in ipairs(control_writes) do
         if cp.cp == 60 then
             widths = widths + 1
-            assert(math.abs(cp.position.x - (1 + (level - 6) * 0.1)) < 0.00001)
+            assert(math.abs(cp.position.x - 1) < 0.00001)
         end
     end
-    assert(widths == 1, "width is initialized once for the segment")
+    assert(widths == 0, "native width must not receive scaling control points")
+    m:OnDestroy()
+end
+for _, level in ipairs({6,11,16}) do
+    clear(); tower.survival_level, tower.attack_target = level, dummy
+    m = modifier({{skill_id="laser_lv01", damage_interval=1, damage_multiplier=1}})
+    m:OnAttackStart({attacker=tower,target=dummy})
+    local start, beam_id = now, m.laser_particles[1].index
+    for step=1,3000 do
+        now=start+step*.03; m:OnIntervalThink()
+        assert(#m.laser_particles >= 1 and #m.laser_particles <= 3,
+            "native one-shot overlap must stay bounded throughout the channel")
+        assert(m.laser_particles[#m.laser_particles].expires_at - now >= 0.38,
+            "native beam must be refreshed before its 0.7 second lifetime ends")
+    end
+    assert(#damage==91,"native visual replay must preserve original 90-second damage clock")
+    local count=0
+    for _,p in ipairs(particles) do if p.path==particles[beam_id].path then count=count+1 end end
+    assert(count>=300 and count<=301,"native art is replayed at 0.3s, not per frame")
     m:OnDestroy()
 end
 -- A live upgrade changes the next native segment without granting an extra
@@ -1113,15 +1318,16 @@ for _, upgrade in ipairs({{11,"SR"},{16,"SSR"}}) do
     m:OnIntervalThink()
     local segment = m.laser_particles[#m.laser_particles]
     assert(particles[segment.index].path == rarity_paths[upgrade[2]])
-    assert(math.abs(segment.width_scale - (1 + (upgrade[1] - 6) * 0.1)) < 0.00001)
+    assert(segment.width_scale == nil, "rarity switch retains native width")
     assert(#damage == 1, "cosmetic rarity change must not add damage")
 end
--- A level within the same skin must also grow, without an extra attack.
+-- A level within the same skin keeps the same beam handle and native width.
+local unchanged_beam = m.laser_particles[1].index
 now = now + 0.24
 tower.survival_level = 17
 m:OnIntervalThink()
-assert(math.abs(m.laser_particles[#m.laser_particles].width_scale - 2.1) < 0.00001)
-assert(#damage == 1, "width-only upgrade must not reset damage clock")
+assert(m.laser_particles[1].index == unchanged_beam and m.laser_particles[1].width_scale == nil)
+assert(#damage == 1, "same-rarity upgrade must not reset damage clock")
 assert(math.abs(m.laser_elapsed - (now-rarity_start)) < 0.001)
 m:OnDestroy()
 tower.survival_level = nil
@@ -1146,8 +1352,8 @@ for level = 6, 25 do
     end
     assert(chains==3 and impacts==0 and #particles==3, "no extra golden hit particles")
     if level>=16 then
-        assert(expected=="particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
-            "third-stage attacks and bounces must use default Zeus lightning")
+        assert(expected=="particles/survival/towers/trial/lightning_ssr_arc.vpcf",
+            "third-stage attacks and bounces use the native white-blue thick variant, never gold")
     end
     m:OnDestroy()
 end
@@ -1185,7 +1391,7 @@ for _, row in ipairs(effect_rows) do
     end
 end
 local scheduler_mock = package.loaded["core/scheduler"]
-local original_every = scheduler_mock.every
+local original_every, original_after = scheduler_mock.every, scheduler_mock.after
 -- Simulate the production scheduler's 50ms think; no time accumulator shortcut.
 local function timed_blizzard(level, cancel_at)
     clear()
@@ -1195,6 +1401,9 @@ local function timed_blizzard(level, cancel_at)
     local tasks, hit_times = {}, {}
     scheduler_mock.every = function(delay, callback)
         tasks[#tasks + 1] = {delay=delay, at=now+delay, callback=callback}
+    end
+    scheduler_mock.after = function(delay, callback)
+        tasks[#tasks + 1] = {delay=delay, at=now+delay, callback=function() callback(); return false end}
     end
     effects._start_blizzard_for_test(tower, vector(90,80,0), blizzard_skills["ice_blizzard_lv0" .. level])
     assert(#particles == 2 and #damage == 0, "field and snow start before first damage")
@@ -1209,6 +1418,7 @@ local function timed_blizzard(level, cancel_at)
     for frame = 1, 120 do
         now = frame * 0.05
         if cancel_at and now >= cancel_at then tower.alive = false end
+        if not cancel_at and now < 5 then assert(#destroyed == 0, "storm must remain visible for five seconds") end
         local due = {}
         for _, task in ipairs(tasks) do
             if task.at and task.at <= now + 0.0000001 then due[#due + 1] = task end
@@ -1235,7 +1445,7 @@ local function timed_blizzard(level, cancel_at)
     blizzard_visual.clear()
     assert(#destroyed == 2, "completion must be idempotent")
     tower.alive = true
-    scheduler_mock.every = original_every
+    scheduler_mock.every, scheduler_mock.after = original_every, original_after
 end
 for level = 1, 5 do timed_blizzard(level) end
 timed_blizzard(1, 1.2)

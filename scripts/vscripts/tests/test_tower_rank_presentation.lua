@@ -51,23 +51,68 @@ local function unit(index, player)
     function u:IsAlive() return self.alive end
     function u:GetUnitName() return "tower_" .. self.index end
     function u:GetTeamNumber() return 2 end
+    function u:HasModifier(name)
+        return name == "modifier_building_under_construction" and self.constructing == true
+    end
+    function u:IsNoDraw() return self.hidden == true end
     return u
 end
 local first, second = unit(100, 0), unit(101, 1)
-local a = { unit = first, entindex = 100, player_id = 0, building_id = "arrow_tower", level = 1 }
+local a = { unit = first, entindex = 100, player_id = 0, building_id = "arrow_tower", level = 1,
+    display_name = "【N】基础箭塔LV1" }
 local b = { unit = second, entindex = 101, player_id = 1, building_id = "arrow_tower", level = 10 }
+second.survival_display_name = "【R】机枪塔LV5"
 bus.handle_request(events.BUILDING_LIST_REQUEST, function() return { buildings = { a } } end)
 local service = require("systems/tower_rank_presentation_service")
 service.init()
 assert(values.unit_100.rarity == "N" and values.unit_100.player_id == 0)
+assert(values.unit_100.display_name == "基础箭塔LV1" and values.unit_100.constructing == 0,
+    "existing completed towers restore their public business name without the duplicate rarity")
 bus.emit(events.BUILDING_CREATED, b)
 assert(values.unit_101.rarity == "R" and values.unit_101.stars == 5)
+assert(values.unit_101.display_name == "机枪塔LV5", "unit business name is the compatibility fallback")
 local before = writes
 bus.emit(events.BUILDING_CHANGED, b)
 assert(writes == before, "unchanged stats must not retransmit ranks")
+b.display_name = "【R】赏金机枪LV5"
+bus.emit(events.BUILDING_CHANGED, b)
+assert(writes == before + 1 and values.unit_101.display_name == "赏金机枪LV5",
+    "name-only changes at the same rank must update the overhead name")
+bus.emit(events.BUILDING_CHANGED, b)
+assert(writes == before + 1, "stable names must not add network writes")
 a.level = 21
+a.display_name = "【SSR】重装箭塔LV6（进阶 1/5）"
 bus.emit(events.BUILDING_CHANGED, a)
 assert(values.unit_100.stars == 5 and values.unit_100.red_stars == 1)
+assert(values.unit_100.display_name == "重装箭塔LV6",
+    "red-star advancement is separate from the overhead unit name")
+
+local building = unit(103, 0)
+local construction = { unit = building, player_id = 0, building_id = "arrow_tower",
+    level = 11, constructing = true, display_name = "【SR】激光塔LV1" }
+before = writes
+bus.emit(events.BUILDING_CREATED, construction)
+assert(not values.unit_103 and writes == before, "construction must not publish a premature rank/name")
+construction.constructing = false
+bus.emit(events.BUILDING_CREATED, construction)
+assert(values.unit_103.rarity == "SR" and values.unit_103.display_name == "激光塔LV1"
+    and values.unit_103.constructing == 0, "the authoritative completion publishes the overhead row")
+building.constructing = true
+bus.emit(events.BUILDING_CHANGED, construction)
+assert(values.unit_103.removed == 1, "a construction modifier retires an existing row even without a state flag")
+before = writes
+bus.emit(events.BUILDING_CHANGED, construction)
+assert(writes == before, "construction does not repeatedly publish removed rows")
+building.constructing = false
+bus.emit(events.BUILDING_CHANGED, construction)
+assert(values.unit_103.removed == 0 and values.unit_103.display_name == "激光塔LV1")
+building.hidden = true
+bus.emit(events.BUILDING_CHANGED, construction)
+assert(values.unit_103.removed == 1, "hidden construction rendering never leaves a visible nameplate")
+building.hidden = false
+bus.emit(events.BUILDING_CHANGED, construction)
+assert(values.unit_103.removed == 0, "revealed completion can restore a removed row")
+
 service.remove(100, unit(100, 0))
 assert(values.unit_100.removed == 0, "late callback must not clear replacement entity")
 first.alive = false
@@ -77,10 +122,13 @@ second.null = true
 service._sweep_for_test()
 assert(values.unit_101.removed == 1)
 local ultimate = unit(102, 0)
+ultimate.survival_display_name = "【UR】终极之塔"
 bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED, {
     unit = ultimate, player_id = 0, building_id = "ultimate_tower", level = 1,
 })
 assert(values.unit_102.rarity == "UR" and values.unit_102.stars == 1)
+assert(values.unit_102.display_name == "终极之塔" and values.unit_102.constructing == 0,
+    "fusion events without display_name use the ultimate tower's business name")
 bus.emit(events.TOWER_FUSION_RUNTIME_REMOVED, { entindex = 102 })
 assert(values.unit_102.removed == 1)
 local old_session = values._session.id
@@ -91,4 +139,4 @@ first.alive = true
 before = writes
 bus.emit(events.BUILDING_CREATED, a)
 assert(writes == before + 1, "inactive old subscriptions must not publish twice")
-print("TOWER_RANK_PRESENTATION_SIMULATION_PASS: 7 routes, 25 levels, ownership, lifecycle, restart")
+print("TOWER_RANK_PRESENTATION_SIMULATION_PASS: 7 routes, 25 levels, names, construction, ownership, lifecycle, restart")

@@ -5,16 +5,8 @@ local projection = require("systems/tower_rank_projection")
 local M = {}
 
 function M.width(unit, skill, effect, state)
-    local rank = projection.project(state or {
-        building_id = unit and unit.survival_building_id,
-        level = unit and unit.survival_level,
-    })
-    if rank and rank.rarity == "UR" then return 2.9 end
-    local id = type(skill) == "table" and skill.skill_id or skill
-    local stage_level = rank and (rank.stars + rank.red_stars)
-        or tonumber(tostring(id):match("lv(%d+)$")) or 1
-    return math.min(2.9, (tonumber(effect.width_base) or 1)
-        + (math.max(1, stage_level) - 1) * (tonumber(effect.width_step) or 0.1))
+    -- Native width at every star/rank; rarity is expressed by art and color.
+    return 1
 end
 
 function M.get(unit, skill, state)

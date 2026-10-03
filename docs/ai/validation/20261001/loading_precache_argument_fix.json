@@ -1,0 +1,34 @@
+{
+  "status": "FIXED",
+  "root_cause": "addon_game_mode.lua PrecacheResource received four arguments: two blizzard particle paths in a single call. Engine aborted remaining static precache.",
+  "before": {
+    "ready": 366,
+    "total": 368,
+    "failed": 2,
+    "error": "startup_assets_require_map_reload",
+    "initial_resource_states": 0
+  },
+  "failed_models": [
+    "models/creeps/neutral_creeps/n_creep_kobold/kobold_c/n_creep_kobold_c.vmdl",
+    "models/heroes/nevermore/nevermore.vmdl"
+  ],
+  "fix": "Precache ground and snow separately in a loop using the three-argument engine API.",
+  "checks": [
+    "tools/test_addon_precache.lua: real entry body, 81 unique direct resources, strict engine signature and reaches startup precache",
+    "test_startup_asset_preload_service.lua: PASS, 368 resources",
+    "test_startup_loading_service.lua: PASS",
+    "addon_game_mode.lua Lua 5.1 syntax: PASS"
+  ],
+  "live_after_reload": {
+    "map": "template_map",
+    "engine_state": 2,
+    "phase": "party_waiting",
+    "error": null,
+    "ready_before_host_start": 359,
+    "total": 368,
+    "failed": 0,
+    "both_previously_failed_models": "ready",
+    "remaining_async_work": "awaiting host start loading"
+  },
+  "admission_complete_verified": false
+}

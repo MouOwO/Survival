@@ -1,7 +1,8 @@
--- Winter's Curse ground art + light snow, without the native ability's states.
+-- Freezing Field frost + swirling snow, without native ability gameplay.
 local M = {}
 local active = {}
-M.GROUND = "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf"
+local scheduler = require("core/scheduler")
+M.GROUND = "particles/survival/skills/blizzard_ground.vpcf"
 M.SNOW = "particles/survival/skills/wyvern_blizzard_snow.vpcf"
 local function world()
     return GameRules.GetGameModeEntity and GameRules:GetGameModeEntity() or GameRules
@@ -17,7 +18,7 @@ function M.finish(entry, immediate)
     end
 end
 
-function M.play(position, radius, ground, snow)
+function M.play(position, radius, ground, snow, duration)
     local entry = {world = world(), particles = {}}
     active[entry] = true
     local ok, err = pcall(function()
@@ -40,6 +41,7 @@ function M.play(position, radius, ground, snow)
         print("[WyvernBlizzardVisual] optional visual failed: " .. tostring(err))
         return nil
     end
+    scheduler.after(math.max(0.1, tonumber(duration) or 5), function() M.finish(entry, false) end)
     return entry
 end
 

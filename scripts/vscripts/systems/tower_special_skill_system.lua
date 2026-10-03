@@ -11,8 +11,8 @@ local M = {}
 local death_state = {}
 local active_waves = {}
 local next_wave_id = 0
-local WAVE_OF_TERROR_PARTICLE =
-    "particles/econ/items/vengeful/vengeful_arcana/vengeful_arcana_wave_of_terror_v2.vpcf"
+local BURNING_ARROW_PARTICLE =
+    "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf"
 local WAVE_OF_TERROR_SPEED = 1560
 -- Keep the source particle's 1200 length and 112 core radius while playing
 -- its travel at the approved 1.3x speed.
@@ -354,7 +354,7 @@ local function launch_burning_wave(payload, skill, fallback_width)
 
     wave.projectile_id = ProjectileManager:CreateLinearProjectile({
         Ability = ability,
-        EffectName = WAVE_OF_TERROR_PARTICLE,
+        EffectName = BURNING_ARROW_PARTICLE,
         Source = tower,
         vSpawnOrigin = start_pos,
         vVelocity = direction * WAVE_OF_TERROR_SPEED,

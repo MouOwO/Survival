@@ -738,7 +738,7 @@
     "asset_proxy_tower_keeper_of_the_light"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/storm_spirit/storm_spirit.vmdl"
+        "Model"                  "models/heroes/tinker/tinker.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -751,19 +751,22 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_stormspirit/stormspirit_base_attack.vpcf"
+        "ProjectileModel"        "particles/units/heroes/hero_tinker/tinker_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/storm_spirit/storm_hat.vmdl"
-            "model" "models/heroes/storm_spirit/storm_shoulder.vmdl"
-            "model" "models/heroes/storm_spirit/storm_shirt.vmdl"
+            "model" "models/heroes/tinker/tinker_cape.vmdl"
+            "model" "models/heroes/tinker/tinker_body_head.vmdl"
+            "model" "models/heroes/tinker/tinker_helmet.vmdl"
+            "model" "models/heroes/tinker/tinker_left_arm.vmdl"
+            "model" "models/heroes/tinker/tinker_shoulders.vmdl"
+            "model" "models/heroes/tinker/tinker_right_arm.vmdl"
         }
     }
 
     "asset_proxy_tower_laser_od_blackgate"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/wisp/wisp.vmdl"
+        "Model"                  "models/heroes/tinker/tinker.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -776,7 +779,16 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_wisp/wisp_base_attack.vpcf"
+        "ProjectileModel"        "particles/units/heroes/hero_tinker/tinker_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/heroes/tinker/tinker_cape.vmdl"
+            "model" "models/heroes/tinker/tinker_body_head.vmdl"
+            "model" "models/heroes/tinker/tinker_helmet.vmdl"
+            "model" "models/heroes/tinker/tinker_left_arm.vmdl"
+            "model" "models/heroes/tinker/tinker_shoulders.vmdl"
+            "model" "models/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vmdl"
+        }
     }
 
 
@@ -784,6 +796,61 @@
     "asset_proxy_tower_obsidian_destroyer" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/obsidian_destroyer/obsidian_destroyer.vmdl" "ProjectileModel" "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_base_attack.vpcf" }
     "asset_proxy_tower_zuus" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/zuus/zuus.vmdl" }
     "asset_proxy_tower_lightning_zeus_tempest"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/zeus/zeus.vmdl"
+        "ModelScale"             "1"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "HealthBarOffset"        "-1"
+        "StatusHealth"           "1"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
+        "VisionDaytimeRange"     "0"
+        "VisionNighttimeRange"   "0"
+        "ProjectileModel"        "particles/units/heroes/hero_zuus/zuus_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/heroes/zeus/zeus_bracers.vmdl"
+            "model" "models/heroes/zeus/zeus_vest.vmdl"
+            "model" "models/heroes/zeus/zeus_belt.vmdl"
+            "model" "models/heroes/zeus/zeus_hair.vmdl"
+        }
+    }
+
+
+    "asset_proxy_tower_lightning_disruptor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/disruptor/disruptor.vmdl" }
+    "asset_proxy_tower_lightning_razor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/razor/razor.vmdl" }
+    "asset_proxy_tower_lightning_leshrac"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/zeus/zeus.vmdl"
+        "ModelScale"             "1"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "HealthBarOffset"        "-1"
+        "StatusHealth"           "1"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
+        "VisionDaytimeRange"     "0"
+        "VisionNighttimeRange"   "0"
+        "ProjectileModel"        "particles/units/heroes/hero_zuus/zuus_base_attack.vpcf"
+        "precache"
+        {
+            "model" "models/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arms.vmdl"
+            "model" "models/heroes/zeus/zeus_vest.vmdl"
+            "model" "models/heroes/zeus/zeus_belt.vmdl"
+            "model" "models/heroes/zeus/zeus_hair.vmdl"
+        }
+    }
+
+    "asset_proxy_tower_lightning_razor_voidstorm"
     {
         "BaseClass"              "npc_dota_creature"
         "Model"                  "models/heroes/zeus/zeus_arcana.vmdl"
@@ -799,64 +866,14 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
+        "ProjectileModel"        "particles/units/heroes/hero_zuus/zuus_base_attack.vpcf"
         "precache"
         {
+            "model" "models/items/zeus/zeus_ti8_immortal_arms/zeus_ti8_immortal_arms.vmdl"
+            "model" "models/items/zeus/falcon_sovereign_back/falcon_sovereign_back.vmdl"
+            "model" "models/items/zeus/falcon_sovereign_belt/falcon_sovereign_belt.vmdl"
             "model" "models/heroes/zeus/zeus_hair_arcana.vmdl"
-        }
-    }
-
-
-    "asset_proxy_tower_lightning_disruptor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/disruptor/disruptor.vmdl" }
-    "asset_proxy_tower_lightning_razor" { "BaseClass" "npc_dota_creature" "Model" "models/heroes/razor/razor.vmdl" }
-    "asset_proxy_tower_lightning_leshrac"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/leshrac/leshrac.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "precache"
-        {
-            "model" "models/items/leshrac/dark_forest_punisher_head/dark_forest_punisher_head.vmdl"
-            "model" "models/items/leshrac/dark_forest_punisher_weapon/dark_forest_punisher_weapon.vmdl"
-            "model" "models/items/leshrac/dark_forest_punisher_tail/dark_forest_punisher_tail.vmdl"
-            "model" "models/items/leshrac/dark_forest_punisher_misc/dark_forest_punisher_misc.vmdl"
-            "model" "models/items/leshrac/dark_forest_punisher_back/dark_forest_punisher_back.vmdl"
-        }
-    }
-
-    "asset_proxy_tower_lightning_razor_voidstorm"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/items/razor/razor_arcana/razor_arcana.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "precache"
-        {
-            "model" "models/items/razor/razor_arcana/razor_arcana_weapon.vmdl"
-            "model" "models/items/razor/razor_arcana/razor_arcana_head.vmdl"
-            "model" "models/items/razor/razor_arcana/razor_arcana_armor_refit.vmdl"
-            "model" "models/items/razor/razor_arcana/razor_arcana_arms.vmdl"
-            "model" "models/heroes/razor/razor_robe_refit.vmdl"
+            "model" "models/items/zeus/lightning_weapon/mesh/zeus_lightning_weapon_model.vmdl"
         }
     }
 
@@ -879,19 +896,20 @@
         "ProjectileModel"        "particles/units/heroes/hero_tinker/tinker_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/tinker/tinker_right_arm.vmdl"
-            "model" "models/heroes/tinker/tinker_left_arm.vmdl"
-            "model" "models/heroes/tinker/tinker_shoulders.vmdl"
-            "model" "models/heroes/tinker/tinker_helmet.vmdl"
+            "model" "models/items/tinker/artillery_of_the_fortified_fabricator_back_alt/artillery_of_the_fortified_fabricator_back_alt.vmdl"
             "model" "models/heroes/tinker/tinker_body_head.vmdl"
-            "model" "models/heroes/tinker/tinker_cape.vmdl"
+            "model" "models/items/tinker/roller_mawster/roller_mawster.vmdl"
+            "model" "models/items/tinker/boots_of_travel.vmdl"
+            "model" "models/items/tinker/artillery_of_the_fortified_fabricator_off_hand_alt/artillery_of_the_fortified_fabricator_off_hand_alt.vmdl"
+            "model" "models/items/tinker/artillery_of_the_fortified_fabricator_shoulder_alt/artillery_of_the_fortified_fabricator_shoulder_alt.vmdl"
+            "model" "models/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vmdl"
         }
     }
 
     "asset_proxy_tower_anti_air_gyro_swooping"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/gyro/gyro.vmdl"
+        "Model"                  "models/heroes/techies/techies.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -904,22 +922,21 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf"
+        "ProjectileModel"        "particles/survival/towers/techies/techies_r_missile.vpcf"
         "precache"
         {
-            "model" "models/heroes/gyro/gyro_bottles.vmdl"
-            "model" "models/heroes/gyro/gyro_head.vmdl"
-            "model" "models/heroes/gyro/gyro_goggles.vmdl"
-            "model" "models/heroes/gyro/gyro_guns.vmdl"
-            "model" "models/heroes/gyro/gyro_propeller.vmdl"
-            "model" "models/heroes/gyro/gyro_missile.vmdl"
+            "model" "models/heroes/techies/techies_barrel.vmdl"
+            "model" "models/heroes/techies/techies_squee_costume.vmdl"
+            "model" "models/heroes/techies/techies_cart.vmdl"
+            "model" "models/heroes/techies/techies_spleen_costume.vmdl"
+            "model" "models/heroes/techies/techies_spleen_weapon.vmdl"
         }
     }
 
     "asset_proxy_tower_anti_air_batrider_empiric"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/batrider/batrider.vmdl"
+        "Model"                  "models/heroes/techies/techies.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -932,20 +949,21 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf"
+        "ProjectileModel"        "particles/survival/towers/techies/techies_sr_missile.vpcf"
         "precache"
         {
-            "model" "models/heroes/batrider/batrider_head.vmdl"
-            "model" "models/heroes/batrider/batrider_cloak.vmdl"
-            "model" "models/heroes/batrider/batrider_belt.vmdl"
-            "model" "models/heroes/batrider/batrider_mount.vmdl"
+            "model" "models/items/techies/techies_ti9_immortal_spoon/techies_ti9_immortal_spoon.vmdl"
+            "model" "models/items/techies/techies_ti9_immortal_squee/techies_ti9_immortal_squee.vmdl"
+            "model" "models/items/techies/techies_ti9_immortal_cart/techies_ti9_immortal_cart.vmdl"
+            "model" "models/items/techies/techies_ti9_immortal_spleen/techies_ti9_immortal_spleen.vmdl"
+            "model" "models/items/techies/techies_ti9_immortal_bazooka/techies_ti9_immortal_bazooka.vmdl"
         }
     }
 
     "asset_proxy_tower_anti_air_skywrath_empyrean"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/skywrath_mage/skywrath_mage.vmdl"
+        "Model"                  "models/heroes/techies/techies.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -958,15 +976,14 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_base_attack_v2.vpcf"
+        "ProjectileModel"        "particles/survival/towers/techies/techies_ssr_missile.vpcf"
         "precache"
         {
-            "model" "models/heroes/skywrath_mage/skywrath_mage_staff.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_head.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_wings.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_belt.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_shoulders.vmdl"
-            "model" "models/heroes/skywrath_mage/skywrath_mage_bracers.vmdl"
+            "model" "models/items/techies/bigshot/bigshot_barrel.vmdl"
+            "model" "models/items/techies/bigshot/bigshot_squee_costume.vmdl"
+            "model" "models/items/techies/bigshot/bigshot.vmdl"
+            "model" "models/items/techies/bigshot/bigshot_spleen_costume.vmdl"
+            "model" "models/heroes/techies/techies_spleen_weapon.vmdl"
         }
     }
 
@@ -992,21 +1009,21 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack.vpcf"
+        "ProjectileModel"        "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/sniper/weapon.vmdl"
+            "model" "models/heroes/sniper/bracer.vmdl"
             "model" "models/heroes/sniper/cape.vmdl"
             "model" "models/heroes/sniper/headitem.vmdl"
             "model" "models/heroes/sniper/shoulder.vmdl"
-            "model" "models/heroes/sniper/bracer.vmdl"
+            "model" "models/heroes/sniper/weapon.vmdl"
         }
     }
 
     "asset_proxy_tower_machine_gun_bounty_heartless"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/bounty_hunter/bounty_hunter.vmdl"
+        "Model"                  "models/heroes/sniper/sniper.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1019,22 +1036,21 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf"
+        "ProjectileModel"        "particles/econ/items/sniper/sniper_witch_hunter/sniper_witch_hunter_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/bounty_hunter/bounty_hunter_rweapon.vmdl"
-            "model" "models/heroes/bounty_hunter/bounty_hunter_lweapon.vmdl"
-            "model" "models/heroes/bounty_hunter/bounty_hunter_backpack.vmdl"
-            "model" "models/heroes/bounty_hunter/bounty_hunter_pads.vmdl"
-            "model" "models/heroes/bounty_hunter/bounty_hunter_bweapon.vmdl"
-            "model" "models/heroes/bounty_hunter/bounty_hunter_bandana.vmdl"
+            "model" "models/items/sniper/broomstick_boomstick_arms/broomstick_boomstick_arms.vmdl"
+            "model" "models/items/sniper/sniper_cape_immortal/sniper_cape_immortal.vmdl"
+            "model" "models/items/sniper/broomstick_boomstick_head/broomstick_boomstick_head.vmdl"
+            "model" "models/items/sniper/broomstick_boomstick_shoulder/broomstick_boomstick_shoulder.vmdl"
+            "model" "models/items/sniper/broomstick_boomstick_weapon/broomstick_boomstick_weapon.vmdl"
         }
     }
 
     "asset_proxy_tower_machine_gun_windranger_rising_gale"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/windrunner/windrunner.vmdl"
+        "Model"                  "models/heroes/sniper/sniper.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1047,47 +1063,21 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/econ/items/windrunner/windranger_arcana/windranger_arcana_base_attack.vpcf"
+        "ProjectileModel"        "particles/econ/items/sniper/sniper_fall20_immortal/sniper_fall20_immortal_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/windrunner/windrunner_head.vmdl"
-            "model" "models/heroes/windrunner/windrunner_bow.vmdl"
-            "model" "models/heroes/windrunner/windrunner_shoulderpads.vmdl"
-            "model" "models/heroes/windrunner/windrunner_cape.vmdl"
-            "model" "models/heroes/windrunner/windrunner_quiver.vmdl"
+            "model" "models/items/sniper/scifi_sniper_test_arms/scifi_sniper_test_arms.vmdl"
+            "model" "models/items/sniper/scifi_sniper_test_back/scifi_sniper_test_back.vmdl"
+            "model" "models/items/sniper/scifi_sniper_test_head/scifi_sniper_test_head.vmdl"
+            "model" "models/items/sniper/scifi_sniper_test_shoulder/scifi_sniper_test_shoulder.vmdl"
+            "model" "models/items/sniper/scifi_sniper_test_gun/scifi_sniper_test_gun.vmdl"
         }
     }
 
     "asset_proxy_tower_death_templar_assassin"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/lanaya/lanaya.vmdl"
-        "ModelScale"             "1"
-        "Level"                  "1"
-        "ConsideredHero"         "0"
-        "HasInventory"           "0"
-        "HealthBarOffset"        "-1"
-        "StatusHealth"           "1"
-        "StatusMana"             "0"
-        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
-        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
-        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
-        "VisionDaytimeRange"     "0"
-        "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_templar_assassin/templar_assassin_base_attack.vpcf"
-        "precache"
-        {
-            "model" "models/items/lanaya/templar_assasin_false_devotion_armor/templar_assasin_false_devotion_armor.vmdl"
-            "model" "models/items/lanaya/templar_assasin_false_devotion_head/templar_assasin_false_devotion_head.vmdl"
-            "model" "models/items/lanaya/templar_assasin_false_devotion_shoulder/templar_assasin_false_devotion_shoulder.vmdl"
-            "model" "models/items/lanaya/templar_assasin_false_devotion_weapon/templar_assasin_false_devotion_weapon.vmdl"
-        }
-    }
-
-    "asset_proxy_tower_death_nevermore_sundered_souls"
-    {
-        "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/wraith_king/wraith_king.vmdl"
+        "Model"                  "models/heroes/shadow_fiend/shadow_fiend.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1103,19 +1093,16 @@
         "ProjectileModel"        "particles/units/heroes/hero_nevermore/nevermore_base_attack.vpcf"
         "precache"
         {
-            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_arms/wraith_king_darkfeather_tyrant_arms.vmdl"
-            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_armor/wraith_king_darkfeather_tyrant_armor.vmdl"
-            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_back/wraith_king_darkfeather_tyrant_back.vmdl"
-            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_head/wraith_king_darkfeather_tyrant_head.vmdl"
-            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_shoulder/wraith_king_darkfeather_tyrant_shoulder.vmdl"
-            "model" "models/items/wraith_king/wraith_king_darkfeather_tyrant_weapon/wraith_king_darkfeather_tyrant_weapon.vmdl"
+            "model" "models/heroes/shadow_fiend/shadow_fiend_arms.vmdl"
+            "model" "models/heroes/shadow_fiend/shadow_fiend_head.vmdl"
+            "model" "models/heroes/shadow_fiend/shadow_fiend_shoulders.vmdl"
         }
     }
 
-    "asset_proxy_tower_death_warlock_seam_ripper"
+    "asset_proxy_tower_death_nevermore_sundered_souls"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/phantom_assassin/phantom_assassin.vmdl"
+        "Model"                  "models/heroes/shadow_fiend/shadow_fiend.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1128,14 +1115,37 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_warlock/warlock_base_attack.vpcf"
+        "ProjectileModel"        "particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation.vpcf"
         "precache"
         {
-            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_weapon/ti9_cache_pa_gothic_hunter_weapon.vmdl"
-            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_shoulder/ti9_cache_pa_gothic_hunter_shoulder.vmdl"
-            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_head/ti9_cache_pa_gothic_hunter_head.vmdl"
-            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_belt/ti9_cache_pa_gothic_hunter_belt.vmdl"
-            "model" "models/items/phantom_assassin/ti9_cache_pa_gothic_hunter_back/ti9_cache_pa_gothic_hunter_back.vmdl"
+            "model" "models/items/shadow_fiend/arms_deso/arms_deso.vmdl"
+            "model" "models/heroes/shadow_fiend/shadow_fiend_head.vmdl"
+            "model" "models/heroes/shadow_fiend/shadow_fiend_shoulders.vmdl"
+        }
+    }
+
+    "asset_proxy_tower_death_warlock_seam_ripper"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/shadow_fiend/shadow_fiend_arcana.vmdl"
+        "ModelScale"             "1"
+        "Level"                  "1"
+        "ConsideredHero"         "0"
+        "HasInventory"           "0"
+        "HealthBarOffset"        "-1"
+        "StatusHealth"           "1"
+        "StatusMana"             "0"
+        "MovementCapabilities"   "DOTA_UNIT_CAP_MOVE_NONE"
+        "AttackCapabilities"     "DOTA_UNIT_CAP_NO_ATTACK"
+        "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
+        "VisionDaytimeRange"     "0"
+        "VisionNighttimeRange"   "0"
+        "ProjectileModel"        "particles/econ/items/shadow_fiend/sf_desolation/sf_base_attack_desolation_fire_arcana.vpcf"
+        "precache"
+        {
+            "model" "models/items/shadow_fiend/arms_deso/arms_deso.vmdl"
+            "model" "models/items/nevermore/nevermores_shade_head/nevermores_shade_head.vmdl"
+            "model" "models/items/nevermore/nevermores_shade_shoulder/nevermores_shade_shoulder.vmdl"
         }
     }
 
@@ -1155,21 +1165,20 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
+        "ProjectileModel"        "particles/units/heroes/hero_lich/lich_chain_frost.vpcf"
         "precache"
         {
-            "model" "models/items/lich/lich_rime_lord_back/lich_rime_lord_back.vmdl"
-            "model" "models/items/lich/lich_rime_lord_belt/lich_rime_lord_belt.vmdl"
-            "model" "models/items/lich/lich_rime_lord_arms/lich_rime_lord_arms.vmdl"
-            "model" "models/items/lich/lich_rime_lord_neck/lich_rime_lord_neck.vmdl"
-            "model" "models/items/lich/lich_rime_lord_head/lich_rime_lord_head.vmdl"
+            "model" "models/heroes/lich/lich_bracer.vmdl"
+            "model" "models/heroes/lich/lich_horns.vmdl"
+            "model" "models/heroes/lich/lich_dress.vmdl"
+            "model" "models/heroes/lich/lich_neck_rock.vmdl"
         }
     }
 
     "asset_proxy_tower_frost_crystal_maiden_winter_raven"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/crystal_maiden/crystal_maiden_arcana.vmdl"
+        "Model"                  "models/heroes/lich/lich.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1182,22 +1191,20 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
+        "ProjectileModel"        "particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost.vpcf"
         "precache"
         {
-            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_arms.vmdl"
-            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_back.vmdl"
-            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_head_refit.vmdl"
-            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_shoulder_refit.vmdl"
-            "model" "models/items/crystal_maiden/cm_screeauk/cm_screeauk_weapon.vmdl"
-            "model" "models/heroes/crystal_maiden/crystal_maiden_arcana_back_refit.vmdl"
+            "model" "models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_arms.vmdl"
+            "model" "models/heroes/lich/lich_horns.vmdl"
+            "model" "models/heroes/lich/lich_dress.vmdl"
+            "model" "models/heroes/lich/lich_neck_rock.vmdl"
         }
     }
 
     "asset_proxy_tower_frost_ancient_apparition"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/ancient_apparition/ancient_apparition.vmdl"
+        "Model"                  "models/heroes/lich/lich.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1210,13 +1217,14 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_lich/lich_base_attack.vpcf"
+        "ProjectileModel"        "particles/survival/towers/trial/frost_ssr_chain.vpcf"
         "precache"
         {
-            "model" "models/items/ancient_apparition/extremely_cold_shackles_tail/extremely_cold_shackles_tail.vmdl"
-            "model" "models/items/ancient_apparition/extremely_cold_shackles_shoulder/extremely_cold_shackles_shoulder.vmdl"
-            "model" "models/items/ancient_apparition/extremely_cold_shackles_head/extremely_cold_shackles_head.vmdl"
-            "model" "models/items/ancient_apparition/extremely_cold_shackles_arms/extremely_cold_shackles_arms.vmdl"
+            "model" "models/items/lich/lich_ti8_immortal_arms/lich_ti8_immortal_arms.vmdl"
+            "model" "models/items/lich/glacier/glacier.vmdl"
+            "model" "models/items/lich/rags/rags.vmdl"
+            "model" "models/items/lich/lich_ti10_immortal_head/lich_ti10_immortal_head.vmdl"
+            "model" "models/items/lich/lich_immortal/lich_immortal.vmdl"
         }
     }
 
@@ -1225,7 +1233,7 @@
     "asset_proxy_tower_multi_medusa_anamnessa"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/vengeful/vengeful.vmdl"
+        "Model"                  "models/heroes/clinkz/clinkz.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1238,20 +1246,22 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_vengeful/vengeful_base_attack.vpcf"
+        "ProjectileModel"        "particles/units/heroes/hero_clinkz/clinkz_base_attack.vpcf"
         "precache"
         {
-            "model" "models/heroes/vengeful/vengeful_hair.vmdl"
-            "model" "models/heroes/vengeful/vengeful_weapon.vmdl"
-            "model" "models/heroes/vengeful/vengeful_upperbody.vmdl"
-            "model" "models/heroes/vengeful/vengeful_lowerbody.vmdl"
+            "model" "models/heroes/clinkz/clinkz_back.vmdl"
+            "model" "models/heroes/clinkz/clinkz_head.vmdl"
+            "model" "models/heroes/clinkz/clinkz_gloves.vmdl"
+            "model" "models/heroes/clinkz/clinkz_horns.vmdl"
+            "model" "models/heroes/clinkz/clinkz_pads.vmdl"
+            "model" "models/heroes/clinkz/clinkz_bow.vmdl"
         }
     }
 
     "asset_proxy_tower_multi_drow_dread_retribution"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/luna/luna.vmdl"
+        "Model"                  "models/heroes/clinkz/clinkz.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1264,22 +1274,22 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_luna/luna_base_attack.vpcf"
+        "ProjectileModel"        "particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
         "precache"
         {
-            "model" "models/heroes/luna/luna_weapon.vmdl"
-            "model" "models/heroes/luna/luna_shield.vmdl"
-            "model" "models/heroes/luna/luna_helmet.vmdl"
-            "model" "models/heroes/luna/luna_shoulder.vmdl"
-            "model" "models/heroes/luna/luna_mount.vmdl"
-            "model" "models/heroes/luna/luna_head.vmdl"
+            "model" "models/heroes/clinkz/clinkz_back.vmdl"
+            "model" "models/heroes/clinkz/clinkz_head.vmdl"
+            "model" "models/heroes/clinkz/clinkz_gloves.vmdl"
+            "model" "models/heroes/clinkz/clinkz_horns.vmdl"
+            "model" "models/heroes/clinkz/clinkz_pads.vmdl"
+            "model" "models/items/clinkz/clinkz_ti9_immortal_weapon/clinkz_ti9_immortal_weapon.vmdl"
         }
     }
 
     "asset_proxy_tower_multi_vengeful_shen_screeauk"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/medusa/medusa.vmdl"
+        "Model"                  "models/heroes/clinkz/clinkz.vmdl"
         "ModelScale"             "1"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -1292,14 +1302,15 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/units/heroes/hero_medusa/medusa_base_attack.vpcf"
+        "ProjectileModel"        "particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow.vpcf"
         "precache"
         {
-            "model" "models/heroes/medusa/medusa_bow.vmdl"
-            "model" "models/heroes/medusa/medusa_veil.vmdl"
-            "model" "models/heroes/medusa/medusa_torso.vmdl"
-            "model" "models/heroes/medusa/medusa_arms.vmdl"
-            "model" "models/heroes/medusa/medusa_tail.vmdl"
+            "model" "models/items/clinkz/ti7_clinkz_immortal/ti7_clinkz_immortal.vmdl"
+            "model" "models/heroes/clinkz/clinkz_head.vmdl"
+            "model" "models/items/clinkz/clinkz_skeleton_hands/clinkz_skeleton_hands.vmdl"
+            "model" "models/items/clinkz/clinkzhead/clinkzhead.vmdl"
+            "model" "models/items/clinkz/guard/guard.vmdl"
+            "model" "models/items/clinkz/clinkz_ti9_immortal_weapon/clinkz_ti9_immortal_weapon.vmdl"
         }
     }
 
@@ -1338,13 +1349,16 @@
     "asset_proxy_hero_shadow_fiend"
     {
         "BaseClass" "npc_dota_creature"
-        "Model" "models/heroes/shadow_fiend/shadow_fiend.vmdl"
+        "Model" "models/heroes/keeper_of_the_light/keeper_of_the_light.vmdl"
         "precache"
         {
-            "model" "models/heroes/nevermore/wings.vmdl"
-            "model" "models/heroes/shadow_fiend/shadow_fiend_shoulders.vmdl"
-            "model" "models/heroes/shadow_fiend/shadow_fiend_arms.vmdl"
-            "model" "models/heroes/shadow_fiend/shadow_fiend_head.vmdl"
+            "model" "models/heroes/keeper_of_the_light/kotl_mount.vmdl"
+            "model" "models/heroes/keeper_of_the_light/kotl_staff.vmdl"
+            "model" "models/heroes/keeper_of_the_light/kotl_hood.vmdl"
+            "model" "models/heroes/keeper_of_the_light/kotl_skirt.vmdl"
+            "model" "models/heroes/keeper_of_the_light/kotl_horse_accesories.vmdl"
+            "particle" "particles/units/heroes/hero_keeper_of_the_light/keeper_of_the_light_base_attack.vpcf"
+            "particle" "particles/units/heroes/hero_keeper_of_the_light/keeper_of_the_light_blinding_light_aoe.vpcf"
         }
     }
     "asset_proxy_hero_axe"
@@ -3448,7 +3462,7 @@
     "npc_survival_wave_named_armored_horned_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/axe/axe.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3471,7 +3485,7 @@
     "npc_survival_wave_named_armored_horned_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/axe/axe.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3494,7 +3508,7 @@
     "npc_survival_wave_named_beast_green_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/tidehunter/tidehunter.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3517,7 +3531,7 @@
     "npc_survival_wave_named_beast_striped_red"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/dragon_knight/dragon_knight.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3540,7 +3554,7 @@
     "npc_survival_wave_named_boss_blade_demon_wave_name_20"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/nightstalker/nightstalker.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3563,7 +3577,7 @@
     "npc_survival_wave_named_boss_dreadlord_wave_name_10"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3586,7 +3600,7 @@
     "npc_survival_wave_named_boss_dreadlord_wave_name_5"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3609,7 +3623,7 @@
     "npc_survival_wave_named_boss_twinblade_demon_wave_name_15"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/terrorblade/terrorblade_arcana.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3632,7 +3646,7 @@
     "npc_survival_wave_named_boss_twinblade_demon_wave_name_25"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/terrorblade/terrorblade_arcana.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3655,7 +3669,7 @@
     "npc_survival_wave_named_boss_twinblade_demon_wave_name_30"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/terrorblade/terrorblade_arcana.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3678,7 +3692,7 @@
     "npc_survival_wave_named_carpet_red_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/dark_willow/dark_willow.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3701,7 +3715,7 @@
     "npc_survival_wave_named_carpet_red_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/dark_willow/dark_willow.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3724,7 +3738,7 @@
     "npc_survival_wave_named_demon_purple_melee"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/blood_seeker/blood_seeker.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3747,7 +3761,7 @@
     "npc_survival_wave_named_dragon_black_red_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/winterwyvern/winterwyvern.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3770,7 +3784,7 @@
     "npc_survival_wave_named_dragon_black_red_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/winterwyvern/winterwyvern.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3793,7 +3807,7 @@
     "npc_survival_wave_named_dragon_purple_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/viper/viper.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3816,7 +3830,7 @@
     "npc_survival_wave_named_dragon_purple_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/viper/viper.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3839,7 +3853,7 @@
     "npc_survival_wave_named_dragon_red_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/items/dragon_knight/mh_dragon_knight/mh_dragon_knight_rathalos_capcom.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3862,7 +3876,7 @@
     "npc_survival_wave_named_dragon_red_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/items/dragon_knight/fireborn_dragon/fireborn_dragon.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3885,7 +3899,7 @@
     "npc_survival_wave_named_dwarf_white_rifle"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/hoodwink/hoodwink.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3908,7 +3922,7 @@
     "npc_survival_wave_named_flying_black_bone"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/visage/visage.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3931,7 +3945,7 @@
     "npc_survival_wave_named_flying_carpet_mage"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/dark_willow/dark_willow.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3954,7 +3968,7 @@
     "npc_survival_wave_named_flying_green_head"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/visage/visage.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3977,7 +3991,7 @@
     "npc_survival_wave_named_flying_red_gargoyle"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/items/dragon_knight/legacy_of_the_winterwyrm_form_of_the_winterwyrm/legacy_of_the_winterwyrm_form_of_the_winterwyrm.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4000,7 +4014,7 @@
     "npc_survival_wave_named_golem_gray_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/dark_seer/dark_seer.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4023,7 +4037,7 @@
     "npc_survival_wave_named_golem_gray_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/dark_seer/dark_seer.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4046,7 +4060,7 @@
     "npc_survival_wave_named_golem_green_fire"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/necrolyte/necrolyte.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4069,7 +4083,7 @@
     "npc_survival_wave_named_humanoid_red_axe"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/axe/axe.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4092,7 +4106,7 @@
     "npc_survival_wave_named_humanoid_red_sword"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/juggernaut/juggernaut.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4138,7 +4152,7 @@
     "npc_survival_wave_named_orc_brown_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/magnataur/magnataur.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4161,7 +4175,7 @@
     "npc_survival_wave_named_orc_brown_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/magnataur/magnataur.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4184,7 +4198,7 @@
     "npc_survival_wave_named_orc_large_melee"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/beastmaster/beastmaster.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4207,7 +4221,7 @@
     "npc_survival_wave_named_orc_longnose_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/spirit_breaker/spirit_breaker.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4230,7 +4244,7 @@
     "npc_survival_wave_named_orc_longnose_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/spirit_breaker/spirit_breaker.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4253,7 +4267,7 @@
     "npc_survival_wave_named_orc_small_axe"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/ogre_magi/ogre_magi.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4276,7 +4290,7 @@
     "npc_survival_wave_named_sea_beast_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/siren/siren.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4299,7 +4313,7 @@
     "npc_survival_wave_named_sea_beast_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/siren/siren.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4322,7 +4336,7 @@
     "npc_survival_wave_named_skeleton_bone"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/pugna/pugna.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4345,7 +4359,7 @@
     "npc_survival_wave_named_skeleton_melee"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/clinkz/clinkz.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4368,7 +4382,7 @@
     "npc_survival_wave_named_stitcher_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/pudge/pudge.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4391,7 +4405,7 @@
     "npc_survival_wave_named_stitcher_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/pudge/pudge.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4414,7 +4428,7 @@
     "npc_survival_wave_named_undead_red_mage_large"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/troll_warlord/troll_warlord.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -4437,7 +4451,7 @@
     "npc_survival_wave_named_undead_red_mage_small"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/troll_warlord/troll_warlord.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"

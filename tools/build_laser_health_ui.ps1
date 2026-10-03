@@ -3,7 +3,9 @@ $healthRepo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $healthEngine = (Resolve-Path (Join-Path $healthRepo '../../..')).Path
 $healthContent = Join-Path $healthEngine 'content/dota_addons/survival'
 $healthLogs = Join-Path $healthRepo 'output/laser_health_ui'
-$healthFiles = @('scripts/custom_game/hero_world_health_bar.js', 'styles/custom_game/hero_world_health_bar.css')
+$healthFiles = @('scripts/custom_game/world_health_bar_anchor.js',
+    'scripts/custom_game/hero_world_health_bar.js', 'styles/custom_game/hero_world_health_bar.css',
+    'layout/custom_game/survival_hud.xml')
 New-Item -ItemType Directory -Force -Path $healthLogs | Out-Null
 foreach ($relative in $healthFiles) {
     $source = Join-Path $healthRepo ('panorama/src/' + $relative)

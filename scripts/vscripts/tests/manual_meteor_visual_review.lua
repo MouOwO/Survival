@@ -8,6 +8,7 @@ local ACTIVE_KEY = "SURVIVAL_METEOR_VISUAL_REVIEW"
 local UNIT_NAME = "asset_proxy_monster_juggernaut"
 local scheduler = require("core/scheduler")
 local service = require("systems/hero_passive_skill_service")
+local meteor_phoenix_visual = require("systems/meteor_phoenix_impact_visual")
 local original_definition = require("config/hero_passive_skill_definitions").by_id.proto_meteor
 
 local function tools_only() return IsServer() and IsInToolsMode() end
@@ -54,7 +55,7 @@ function M.run(options)
     local fall = level_value(definition, "fall_duration", level)
     local second = level_value(definition, "second_meteor_delay", level)
     local lava = level_value(definition, "lava_duration", level)
-    local lifetime = fall + second + math.max(lava, 1.2) + 0.2
+    local lifetime = fall + second + math.max(lava, meteor_phoenix_visual.duration()) + 0.2
     local fixture = { ok = true, phase = "loading", finished = false, level = level,
         world = GameRules:GetGameModeEntity(), casts_started = 0, requested_count = count,
         origin = ground(options.origin or Vector(320, 3400, 384)), units = {},

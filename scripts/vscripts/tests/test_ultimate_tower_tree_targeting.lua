@@ -17,6 +17,7 @@ LUA_MODIFIER_MOTION_NONE, MODIFIER_ATTRIBUTE_PERMANENT, MODIFIER_EVENT_ON_ATTACK
 DOTA_UNIT_CAP_RANGED_ATTACK = 2
 DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 1, 2, 4
 DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_CLOSEST = 8, 1
+FIND_ANY_ORDER = 0
 DOTA_UNIT_ORDER_MOVE_TO_POSITION, DOTA_UNIT_ORDER_ATTACK_MOVE, DOTA_UNIT_ORDER_ATTACK_TARGET = 1, 2, 3
 local vector_mt = {}
 Vector = function(x, y, z) return setmetatable({x = x, y = y, z = z or 0}, vector_mt) end
@@ -121,7 +122,9 @@ assert(tower.target == nil, "manual selection cannot target the tree")
 package.loaded["systems/repair_order_service"] = {process = function() return false end}
 package.loaded["systems/lumberjack_order_service"] = {process = function() end}
 package.loaded["systems/destination_validation_service"] = {is_constrained_hero = function() return false end}
-package.loaded["systems/player_context_service"] = {owner_player_id = function() return 0 end}
+package.loaded["systems/player_context_service"] = {
+    owner_player_id = function() return 0 end, is_defeated = function() return false end,
+}
 package.loaded["systems/startup_loading_service"] = {is_ready = function() return true end,
     is_player_ready = function(id) return id == 0 end}
 local filter = require("systems/tree_attack_order_filter")._filter_for_test

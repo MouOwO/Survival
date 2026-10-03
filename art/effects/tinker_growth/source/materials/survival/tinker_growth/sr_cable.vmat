@@ -6,7 +6,7 @@
 "F_TRANSLUCENT" "1"
 "g_flOpacityScale" "1"
 "g_flOverbrightFactor" "12"
-"g_vColorTint" "[0.247059 0.60 1.0 0]"
+"g_vColorTint" "[1.0 0.78 0.12 0]"
 "g_vTexCoordScale" "[1 1 0 0]"
 "TextureColor" "materials/survival/tinker_growth/cable.png"
 }

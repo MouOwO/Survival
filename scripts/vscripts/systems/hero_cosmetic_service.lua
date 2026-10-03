@@ -2,12 +2,18 @@ local config = require("config/hero_cosmetics_config")
 local asset_catalog = require("config/asset_catalog")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
+local weapon_slot = require("visual/hero_weapon_slot")
 
 local M = {}
 
 local cosmetics_by_hero = {}
 local generation_by_hero = {}
 local SPAWN_PARTICLE_LIFETIME_SECONDS = 1.5
+
+local function current_world()
+    return GameRules and GameRules.GetGameModeEntity
+        and GameRules:GetGameModeEntity() or GameRules or _G
+end
 
 local function definition_for(hero_id)
     local asset = asset_catalog.resolve_bundle(
@@ -520,6 +526,12 @@ function M.apply(hero, hero_id)
         return false
     end
     local hero_entindex = hero:entindex()
+    local world = current_world()
+    local previous = cosmetics_by_hero[hero_entindex]
+    if previous and previous.world_token ~= world then
+        -- A fresh Tools world can reuse integer entity/particle IDs.
+        cosmetics_by_hero[hero_entindex] = nil
+    end
     local generation = (generation_by_hero[hero_entindex] or 0) + 1
     generation_by_hero[hero_entindex] = generation
     local spawned = {}
@@ -620,6 +632,11 @@ function M.apply(hero, hero_id)
     end
 
     cosmetics_by_hero[hero_entindex] = {
+        hero = hero,
+        hero_entindex = hero_entindex,
+        world_token = world,
+        components = components,
+        particle_definitions = definition.particles or {},
         wearables = spawned,
         particles = particles,
         spawn_particles = spawn_particles,
@@ -688,6 +705,89 @@ function M.apply(hero, hero_id)
         .. " spawn=" .. tostring(#spawn_particles)
     )
     return true
+end
+
+local function weapon_context(hero, token, allow_removed)
+    if not hero or (not allow_removed and not valid_entity(hero)) then return nil end
+    local index = token and token.hero_entindex
+    if not index then
+        local ok, value = safe_call(hero, "entindex")
+        if not ok then return nil end
+        index = value
+    end
+    local state = cosmetics_by_hero[index]
+    if not state or state.hero ~= hero or state.world_token ~= current_world() then
+        return nil
+    end
+    if token and token ~= state then return nil end
+    return state
+end
+
+local function spawn_weapon_wearable(hero, component_id, model_path, appearance)
+    local wearable = spawn_wearable(hero, component_id, model_path,
+        { entity_class = appearance.entity_class })
+    if not wearable then return nil end
+    if appearance.skin ~= nil then
+        local ok, result = safe_call(wearable, "SetSkin", tonumber(appearance.skin) or 0)
+        if not ok or result == false then remove_entity(wearable); return nil end
+    end
+    if appearance.material_group and appearance.material_group ~= "" then
+        local ok, result = safe_call(wearable, "SetMaterialGroup", appearance.material_group)
+        if not ok or result == false then remove_entity(wearable); return nil end
+    end
+    return wearable
+end
+
+local function weapon_engine(hero, state)
+    local function is_current()
+        local same_world = state.world_token == current_world()
+        return same_world and cosmetics_by_hero[state.hero_entindex] == state
+            and generation_by_hero[state.hero_entindex] == state.generation, same_world
+    end
+    return {
+        spawn_wearable = spawn_weapon_wearable,
+        spawn_particle = function(unit, particle, components)
+            return weapon_slot.spawn_particle(unit, particle, components, is_current)
+        end,
+        destroy_particle = function(particle_id)
+            local _, same_world = is_current()
+            if not same_world then return true end
+            local destroyed, destroy_result = safe_call(ParticleManager,
+                "DestroyParticle", particle_id, true)
+            -- Destroy callbacks can enter a fresh Tools world which has
+            -- already reused this integer ID; never release its new owner.
+            local _, still_same_world = is_current()
+            local released, release_result = true, nil
+            if still_same_world then
+                released, release_result = safe_call(ParticleManager,
+                    "ReleaseParticleIndex", particle_id)
+            end
+            return destroyed and destroy_result ~= false
+                and released and release_result ~= false
+        end,
+        remove_entity = remove_entity,
+        is_current = is_current,
+    }
+end
+
+function M.weapon_snapshot(hero, component_id)
+    local state = weapon_context(hero)
+    if not state then return nil end
+    return weapon_slot.snapshot(state, component_id)
+end
+
+function M.apply_weapon(hero, appearance)
+    local state = weapon_context(hero)
+    if not state or state.cosmetic_id ~= appearance.hero_id then
+        return false, "waiting_for_hero_cosmetics"
+    end
+    return weapon_slot.apply(hero, state, appearance, weapon_engine(hero, state))
+end
+
+function M.clear_weapon(hero, component_id, token)
+    local state = weapon_context(hero, token, true)
+    if not state then return false, "hero_cosmetics_unavailable" end
+    return weapon_slot.clear(hero, state, component_id, weapon_engine(hero, state))
 end
 
 function M.clear(hero)
