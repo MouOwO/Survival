@@ -4,11 +4,13 @@ $engine=(Resolve-Path (Join-Path $repo '../../..')).Path
 $content=Join-Path $engine 'content/dota_addons/survival/panorama'
 $compiler=Join-Path $engine 'game/bin/win64/resourcecompiler.exe'
 $files=@('scripts/custom_game/commerce_remaining_5d5c1152eb.js','scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','scripts/custom_game/payment_test.js','styles/custom_game/payment_test.css','layout/custom_game/payment_test.xml','layout/custom_game/custom_ui_manifest.xml')
+$files+=@('scripts/custom_game/commerce_wallet.js','styles/custom_game/commerce_wallet.css')
 $catalogFile=Join-Path $repo 'output/payment_catalog.json'
 if(Test-Path -LiteralPath $catalogFile){
  $catalog=Get-Content -LiteralPath $catalogFile -Raw -Encoding UTF8 | ConvertFrom-Json
  $images=@()
- foreach($icon in @($catalog.catalog.products.icon | Sort-Object -Unique)){
+ $commerceIcons=@(Import-Csv -LiteralPath (Join-Path $repo 'data/csv/商城兑换系统/commerce_products.csv') | Where-Object { $_.sku -notlike '#*' } | ForEach-Object { $_.icon })
+ foreach($icon in @((@($catalog.catalog.products.icon)+$commerceIcons) | Sort-Object -Unique)){
   if($icon -notmatch '^custom_game/[A-Za-z0-9_/-]+\.png$' -or $icon.Contains('..')){throw 'Invalid payment icon path.'}
   $files+=('images/'+$icon)
   $images+=('    <Image src="file://{images}/'+$icon+'" />')
@@ -28,6 +30,10 @@ foreach($relative in $files){
  if(Test-Path -LiteralPath $to){$old=Join-Path $backup $relative;New-Item -ItemType Directory -Force (Split-Path $old)|Out-Null;Copy-Item -LiteralPath $to -Destination $old}
  New-Item -ItemType Directory -Force (Split-Path $to)|Out-Null
  Copy-Item -LiteralPath $from -Destination $to -Force
+}
+# All referenced scripts/styles must exist before a layout is compiled.
+foreach($relative in $files){
+ $to=Join-Path $content $relative
  if($relative.StartsWith('images/')){continue}
  $result=@(& $compiler -i $to -game (Join-Path $engine 'game/dota') -nop4)
  $result|Where-Object{$_ -match 'ERROR:|FAIL|WARNING|OK:|Failed to'}|Write-Output

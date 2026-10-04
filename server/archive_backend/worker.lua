@@ -13,7 +13,8 @@ RandomInt=function(a,b)
     seed=(seed*48271)%2147483647
     return a+math.floor((seed/2147483647)*(b-a+1))
 end
-local settlement=require(input.command.kind:match("^lottery_") and "systems/lottery_http_settlement" or "systems/archive_settlement")
+local settlement=require(input.command.kind:match("^commerce_") and "systems/commerce_settlement"
+    or input.command.kind:match("^lottery_") and "systems/lottery_http_settlement" or "systems/archive_settlement")
 -- No remote code, filesystem IO, shell execution or clock access from the settlement.
 local write=io.write
 io=nil;os=nil;dofile=nil;loadfile=nil;loadstring=nil;debug=nil

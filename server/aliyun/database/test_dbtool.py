@@ -67,7 +67,7 @@ class DatabaseToolTests(unittest.TestCase):
                 (legacy / "supabase/migrations" / name).write_bytes(sql)
             (addon / "tools/sql/202609060001_archive_fishing_inventory.sql").write_bytes(sql)
             result = dbtool.collect(legacy, addon, target)
-            self.assertEqual(result["migrations"], 22)
+            self.assertEqual(result["migrations"], 23)
             manifest = dbtool.load_bundle(target)
             old_entries = manifest["entries"][:17]
             self.assertEqual([e["group"] for e in old_entries], ["legacy"] * 12 + ["addon"] * 3 + ["manual", "target"])
@@ -75,7 +75,8 @@ class DatabaseToolTests(unittest.TestCase):
             applied = {e["id"]: e["sha256"] for e in old_entries}
             applied["security/harden.sql"] = manifest["harden_sha256"]
             self.assertEqual(dbtool.applied_prefix(manifest, applied), old_entries)
-            self.assertEqual(manifest["entries"][-1]["id"], "target/202609230001_match_profile_sessions.sql")
+            self.assertEqual(manifest["entries"][21]["id"], "target/202609230001_match_profile_sessions.sql")
+            self.assertEqual(manifest["entries"][-1]["id"], "target/202610040001_commerce_exchange.sql")
             # All deployed test05 entries remain a complete unchanged prefix.
             latest_applied = {e["id"]: e["sha256"] for e in manifest["entries"][:21]}
             latest_applied["security/harden.sql"] = manifest["harden_sha256"]

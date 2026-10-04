@@ -180,6 +180,7 @@ end
 function M.init()
     if initialized then return end
     initialized=true
+    require("systems/commerce_service").init()
     CustomGameEventManager:RegisterListener("survival_payment_request",function(_,payload) M.handle(payload or {}) end)
     require("debug/payment_test_commands").init()
 end

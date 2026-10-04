@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import re
 import shutil
+import sys
 import tarfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,7 +67,8 @@ def build(backend_root: Path, output: Path, release_id: str):
         relative = Path("data/csv/玩家档案系统") / (name + ".csv")
         (addon / relative).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / relative, addon / relative)
-    bundle = load("release_archive_bundle", ROOT / "server/archive_backend/bundle.py")
+    sys.path.insert(0, str(ROOT / 'server'))
+    from archive_backend import bundle
     bundle_dest = addon / "server/bundles"
     # Keep old settlement versions for durable pending operations created before deployment.
     existing = ROOT / "server/bundles"

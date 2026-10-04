@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 
 MODULES = ("archive_settlement", "archive_challenge_rewards", "archive_social_rewards",
-           "archive_daily_rewards", "archive_online_rewards", "archive_endless_config", "archive_building_rewards", "lottery_http_settlement")
+           "archive_daily_rewards", "archive_online_rewards", "archive_endless_config", "archive_building_rewards", "lottery_http_settlement", "commerce_settlement")
 # Presentation tables have a different schema and never participate in settlement.
 PRESENTATION_CSV = {"archive_icon_presentation.csv", "archive_item_icons.csv", "archive_navigation_icons.csv"}
 
@@ -40,8 +40,12 @@ def read_csv(path):
     return {"key": header[0], "rows": rows}
 
 def build(root: Path, destination: Path | None = None, update_game_config: bool = True):
+    from .commerce_catalog import build_catalog
+    commerce = build_catalog(root)
     files = sorted(p for p in (root / "data/csv/存档系统").glob("*.csv") if p.name not in PRESENTATION_CSV)
     files += sorted((root / "data/csv/抽奖系统").glob("*.csv"))
+    files += [root / 'data/csv/商城兑换系统' / (name + '.csv')
+              for name in ('commerce_products', 'commerce_rewards')]
     files += [root / "data/csv/玩家档案系统" / (n+".csv") for n in ("player_gameplay_stats","map_level_effect_rules")]
     sources = {"systems/"+n+".lua": (root/"scripts/vscripts/systems"/(n+".lua")).read_text(encoding="utf-8-sig") for n in MODULES}
     for name in ("lottery_config", "content_id_aliases"):
@@ -50,6 +54,7 @@ def build(root: Path, destination: Path | None = None, update_game_config: bool 
         sources["core/"+name+".lua"] = (root/"scripts/vscripts/core"/(name+".lua")).read_text(encoding="utf-8-sig")
     sources["worker.lua"] = (root/"server/archive_backend/worker.lua").read_text(encoding="utf-8-sig")
     configs = {p.stem: read_csv(p) for p in files}
+    configs['commerce_catalog'] = {'key': 'sku', 'rows': commerce['products']}
     csv_hashes = {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes().replace(b"\r\n",b"\n")).hexdigest() for p in files}
     data = {"protocol":1,"configs":configs,"sources":sources,"csv_hashes":csv_hashes}
     raw = json.dumps(data,ensure_ascii=False,sort_keys=True,separators=(",",":"),allow_nan=False).encode()

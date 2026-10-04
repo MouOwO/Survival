@@ -13,6 +13,8 @@ class ArchiveError(ValueError):
     pass
 
 FIELDS = {
+    "commerce_catalog": set(),
+    "commerce_purchase": {"sku", "request_id"},
     "clear": {"difficulty_id","count","day_key"}, "boss_kill": set(),
     "endless": {"wave","difficulty"},
     "challenge": {"challenge_id","kill_sequence","difficulty_id","day_key"},
@@ -48,6 +50,13 @@ class ArchiveService:
         if kind not in FIELDS or set(command)-FIELDS[kind]-{"id","kind"}: raise ArchiveError("archive_command_fields_invalid")
         if not isinstance(command.get("id"),str) or not re.fullmatch(r"[A-Za-z0-9_:.-]{8,200}",command["id"]): raise ArchiveError("archive_id_invalid")
         c=dict(command)
+        if kind == 'commerce_purchase':
+            if c.get('sku') not in self.bundle.tables['commerce_catalog']:
+                raise ArchiveError('product_unavailable')
+            if not isinstance(c.get('request_id'), str) or not re.fullmatch(r'[A-Za-z0-9_.-]{8,96}', c['request_id']):
+                raise ArchiveError('commerce_request_id_invalid')
+            # Same account + purchase token is the same transaction across reconnects.
+            c['id'] = 'commerce:' + c['request_id']
         def integer(key,lo,hi):
             v=c.get(key)
             if isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or int(v)!=v or not lo<=v<=hi: raise ArchiveError("archive_number_invalid:"+key)
@@ -111,6 +120,9 @@ class ArchiveService:
         if not isinstance(account,str) or not re.fullmatch(r"[0-9]{1,20}",account): raise ArchiveError("account_id_invalid")
         if payload.get("config_hash")!=self.bundle.hash: return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
         command=self.validate(payload.get("command"))
+        if command['kind'] == 'commerce_catalog':
+            profile = self.profile({'account_id': account})
+            return self.settle(profile, command, False)
         database_id=self.app._database_account_id(account)
         self.app._ensure_gameplay_stats(database_id)
         fingerprint=hashlib.sha256(json.dumps(command,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
@@ -138,7 +150,7 @@ class ArchiveService:
                 "p_revision":profile["revision"],"p_archive":archive,"p_deltas":deltas,
                 "p_error":None if result.get("ok") else result.get("error","archive_rejected")}
             rpc="archive_commit"
-            if command["kind"].startswith("lottery_"):
+            if command["kind"].startswith("lottery_") or command['kind'] == 'commerce_purchase':
                 rpc="archive_commit_lottery"
                 commit_payload.update(p_inventory=result.get("content_inventory",{}),p_response=result.get("response",{}))
             committed=self.app.rpc_client.rpc(rpc,commit_payload)
