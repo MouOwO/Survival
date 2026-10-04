@@ -45,6 +45,8 @@ const Particles = {
     ReleaseParticleIndex(id) { released.push(id); }
 };
 let now = 1, world = [0, 0, 384], mouse, keyboard;
+let moveCooldown = 0, nativeAbility = -1;
+const nativeErrors = [];
 const shared = {
     SurvivalPointTargetState: { active: true, name: 'build', unit: 10, ability: 20 },
     SurvivalInputDispatcher: { RegisterMouseHandler(_, fn) { mouse = fn; },
@@ -57,8 +59,11 @@ vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/survival_gr
     GameUI: { CustomUIConfig: () => shared, GetCursorPosition: () => [500, 500],
         GetScreenWorldPosition: () => world },
     GameEvents: { Subscribe: (name, fn) => listeners[name] = fn,
-        SendCustomGameEventToServer: (name, data) => sent.push({ name, data }) },
-    Abilities: { GetLocalPlayerActiveAbility: () => -1 },
+        SendCustomGameEventToServer: (name, data) => sent.push({ name, data }),
+        SendEventClientSide: (name, data) => nativeErrors.push({name, data}) },
+    Abilities: { GetLocalPlayerActiveAbility: () => nativeAbility,
+        GetAbilityName: id => id === 20 ? 'ability_building_blink' : '',
+        GetCooldownTimeRemaining: () => moveCooldown },
     Entities: { GetUnitName: () => 'builder' }, CustomNetTables: {}
 });
 listeners.ui_grid_placement_profiles({ cell_size: 64, profiles: [{ ability_name: 'build',
@@ -510,6 +515,87 @@ for(const cancel of [() => keyboard('ESCAPE',true), () => mouse('pressed',1), ()
     assert.equal(commits().length,countBefore,'canceled cold click never resumes');
     assert(!shared.SurvivalGridPlacement.IsRelocating(10));
 }
+// The grid controller is also entered by native ability targeting and generic
+// point targeting; these paths must reject cooldown without the D adapter.
+function assertNoMoveWork(before, label) {
+    assert.equal(requests().length,before.requests,label+': no validation');
+    assert.equal(poses().length,before.poses,label+': no ghost');
+    assert.equal(commits().length,before.commits,label+': no commit');
+    assert(!shared.SurvivalGridPlacement.IsRelocating(10),label+': no relocation session');
+    assert(panels.get('GridPlacementRoot').classes.has('Hidden'),label+': grid stays hidden');
+}
+const moveWork = () => ({requests:requests().length,poses:poses().length,commits:commits().length});
+moveCooldown=5;
+let beforeCooldown=moveWork();
+assert.equal(shared.SurvivalGridPlacement.BeginRelocation(20,10),false,'direct grid call refuses cooldown');
+update(); assertNoMoveWork(beforeCooldown,'direct cooldown');
+shared.SurvivalPointTargetState={active:true,name:'ability_building_blink',ability:20,unit:10};
+beforeCooldown=moveWork(); update();
+assertNoMoveWork(beforeCooldown,'generic point-target bypass');
+assert(!shared.SurvivalPointTargetState.active,'cooldown cancels generic point targeting');
+nativeAbility=20; beforeCooldown=moveWork(); update();
+assertNoMoveWork(beforeCooldown,'native target bypass');
+const nativeErrorCount=nativeErrors.length;
+for(let frame=0;frame<10;frame++) update();
+assert.equal(nativeErrors.length,nativeErrorCount,'native targeting polling does not spam the error');
+nativeAbility=-1; update();
+assert(nativeErrors.some(e=>e.name==='dota_hud_error_message'&&e.data.message==='移动防御塔CD中'),
+    'cooldown uses the native HUD error event');
+
+// Cooldown can begin while the first D is waiting for profiles/input; a queued
+// click must be discarded before the delayed modules can create a preview.
+moveCooldown=0; listeners.ui_grid_placement_profiles({profiles:[]});
+delete shared.SurvivalPointTargetInput;
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+world=[129,191,384]; mouse('pressed',0);
+beforeCooldown=moveWork(); moveCooldown=5;
+listeners.ui_grid_placement_profiles(moveProfiles);
+shared.SurvivalPointTargetInput=pointInput; update();
+assertNoMoveWork(beforeCooldown,'cold cooldown race');
+moveCooldown=0; update();
+assertNoMoveWork(beforeCooldown,'canceled cold intent never resumes after cooldown');
+
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+beforeCooldown=moveWork(); moveCooldown=3; update();
+assertNoMoveWork(beforeCooldown,'active cooldown transition');
+assert(!shared.SurvivalPointTargetState.active);
+
+moveCooldown=0;
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+beforeCooldown=moveWork(); moveCooldown=3;
+mouse('pressed',0);
+assertNoMoveWork(beforeCooldown,'cooldown begins just before landing click');
+
+// A stale local cooldown snapshot still cannot preserve or reopen targeting
+// after the authoritative server reports that the move ability is cooling down.
+moveCooldown=0;
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+const serverCooldownRequest=requests().at(-1).data;
+beforeCooldown=moveWork();
+listeners.ui_grid_placement_validation({...moveResponse(serverCooldownRequest),
+    success:0,error:'move_ability_cooldown'});
+update(); assertNoMoveWork(beforeCooldown,'server validation cooldown');
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));
+mouse('pressed',0);
+const serverCooldownCommit=commits().at(-1).data;
+beforeCooldown=moveWork();
+listeners.ui_grid_placement_commit_result({session_id:serverCooldownCommit.session_id,
+    success:0,error:'move_ability_cooldown'});
+update(); assertNoMoveWork(beforeCooldown,'server commit cooldown');
+assert(shared.SurvivalGridPlacement.BeginRelocation(20,10),'ready ability recovers after rejection');
+shared.SurvivalGridPlacement.CancelRelocation();
+nativeAbility=20; update();
+const nativeCooldownRequest=requests().at(-1).data;
+beforeCooldown=moveWork();
+listeners.ui_grid_placement_validation({...moveResponse(nativeCooldownRequest),
+    success:0,error:'move_ability_cooldown'});
+for(let i=0;i<5;i++) update();
+assertNoMoveWork(beforeCooldown,'server cooldown blocks persistent native target with stale local snapshot');
+nativeAbility=-1; update(); nativeAbility=20; update();
+assert(!panels.get('GridPlacementRoot').classes.has('Hidden'),'fresh native intent recovers after target clears');
+nativeAbility=-1; update();
+console.log('TOWER_RELOCATION_COOLDOWN_PASS direct/custom/native entry, polling dedup, cold race, active transition, authoritative rejection and recovery');
+
 listeners.ui_grid_placement_profiles({profiles:[]});
 const retiredCommitCount=commits().length;
 assert(shared.SurvivalGridPlacement.BeginRelocation(20,10));

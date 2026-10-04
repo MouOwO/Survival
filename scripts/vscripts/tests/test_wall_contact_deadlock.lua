@@ -16,6 +16,7 @@ local function unit(id,x,y,radius)
     local u={p=Vector(x,y,384),radius=radius or 32,orders=0,stops=0}
     function u:entindex() return id end
     function u:GetAbsOrigin() return self.p end
+    function u:SetAbsOrigin(p) self.p=p end
     function u:IsNull() return false end
     function u:IsAlive() return not self.dead end
     function u:GetHullRadius() return self.radius end
@@ -76,19 +77,23 @@ local second=assert(contact.resolve(wall,big));assert(second.claimed);big.p=seco
 assert((small.p.x-big.p.x)^2+(small.p.y-big.p.y)^2>=(small.radius+big.radius)^2,
     'mixed radii share collision reservations on the same face')
 
--- A 60-unit lateral miss lies inside the former protected 64-radius circle.
+-- A displaced admission remains exclusive until release. A nearer neighbour
+-- must not create a second phased owner while the first is still moving.
 contact.reset();clock=0;front={}
 for i=1,4 do
     local u=unit(40+i,-400,(i-2.5)*64);front[i]=u
     local plan=assert(contact.resolve(wall,u));assert(plan.claimed);u.p=plan.point
 end
-front[4].p=Vector(-192,156,384)
+front[4].p=Vector(-192,164,384)
 local own=assert(contact.resolve(wall,front[4]))
 assert(own.claimed and not contact.arrived(wall,front[4],own.point,false))
 local replacement=unit(50,-217,91)
 local replaced=assert(contact.resolve(wall,replacement))
-assert(replaced.claimed and replaced.point.y==96,
-    'a closer reachable monster replaces a near but unarrived reservation')
+assert(not replaced.claimed,
+    'a new unit cannot steal an in-flight phased reservation and duplicate its owner')
+contact.release(wall:entindex(),front[4]:entindex())
+replaced=assert(contact.resolve(wall,replacement))
+assert(replaced.claimed and replaced.point.y==96,'released contact can be claimed by a replacement')
 
 -- Dynamic terrain/building changes invalidate a held point on the bounded
 -- cache cadence and later make the vacated point available again.
@@ -121,7 +126,7 @@ LinkLuaModifier=function() end
 EntIndexToHScript=function(index) return entities[index] end
 DOTA_UNIT_CAP_MELEE_ATTACK=1;DOTA_TEAM_BADGUYS=3
 DOTA_UNIT_ORDER_ATTACK_TARGET=2;DOTA_UNIT_ORDER_MOVE_TO_POSITION=3
-MODIFIER_STATE_ROOTED=4;MODIFIER_STATE_DISARMED=5
+MODIFIER_STATE_ROOTED=4;MODIFIER_STATE_DISARMED=5;MODIFIER_STATE_NO_UNIT_COLLISION=6
 package.loaded['core/team_alignment']={are_enemies=function() return true end,enforce=function() end}
 ExecuteOrderFromTable=function(order)
     local u=entities[order.UnitIndex];u.orders=u.orders+1;u.last_order=order
@@ -131,13 +136,23 @@ local function controller(u)
     local m=setmetatable({GetParent=function() return u end,StartIntervalThink=function() end}, {__index=ai})
     u.ai=m;m:OnCreated({wall_entindex=1});return m
 end
+local function finish_phase_frame(m)
+    while m.phase_order_frame do clock=clock+1/30;m:OnIntervalThink() end
+end
+local function think(m)
+    m:OnIntervalThink();finish_phase_frame(m)
+end
 contact.reset();clock=0
 local stalled=unit(60,-300,-96);local m=controller(stalled)
-m:OnIntervalThink();assert(m.ai_state=='approach' and stalled.orders==1)
+m:OnIntervalThink()
+assert(m.ai_state=='approach' and stalled.orders==0 and m.phase_order_frame,
+    'new admission must wait one native state frame before moving')
+finish_phase_frame(m)
+assert(stalled.orders==1,'native movement starts after the phase frame')
 local original=m.contact_move
-for i=1,5 do clock=i*.5;m:OnIntervalThink() end
+for i=1,5 do clock=i*.5;think(m) end
 assert(stalled.orders==1,'a collision wait does not issue repeated approach orders')
-clock=3;m:OnIntervalThink()
+clock=3;think(m)
 assert(m.ai_state=='approach' and m.contact_move.y~=original.y and m.contact_move.x==original.x,
     'after three stalled seconds choose another point on the same front')
 assert(stalled.orders==2 and stalled.stops==0,'one new destination order, no repeated Stop')
@@ -145,12 +160,12 @@ assert(stalled.orders==2 and stalled.stops==0,'one new destination order, no rep
 for _,control in ipairs({'stunned','restricted','rooted'}) do
     contact.reset();clock=0
     local controlled=unit(70,-300,-96);local cm=controller(controlled)
-    cm:OnIntervalThink();local point=cm.contact_move
+    think(cm);local point=cm.contact_move
     controlled[control]=true
-    for i=1,12 do clock=i*.5;cm:OnIntervalThink() end
+    for i=1,12 do clock=i*.5;think(cm) end
     assert(cm.ai_state=='approach' and cm.contact_move==point and controlled.orders==1,
         'control status protects a claim and does not change its goal')
-    controlled[control]=false;clock=6.5;cm:OnIntervalThink()
+    controlled[control]=false;clock=6.5;think(cm)
     assert(cm.contact_move==point,'control release receives normal progress grace')
 end
 
@@ -158,24 +173,24 @@ contact.reset();clock=0;front={}
 local controllers={}
 for i=1,4 do
     local u=unit(80+i,-400,(i-2.5)*64);front[i]=u
-    controllers[i]=controller(u);controllers[i]:OnIntervalThink()
-    u.p=controllers[i].contact_move;controllers[i]:OnIntervalThink()
+    controllers[i]=controller(u);think(controllers[i])
+    u.p=controllers[i].contact_move;think(controllers[i])
     assert(controllers[i].ai_state=='attack' and u.ai:CheckState()[MODIFIER_STATE_ROOTED])
 end
-local overflow=unit(90,-400,0);local waiting=controller(overflow);waiting:OnIntervalThink()
+local overflow=unit(90,-400,0);local waiting=controller(overflow);think(waiting)
 assert(waiting.ai_state=='waiting' and waiting:CheckState()[MODIFIER_STATE_DISARMED])
 local orders={};for i,u in ipairs(front) do orders[i]=u.orders end
 local waiting_orders=overflow.orders
 for pass=1,20 do
     clock=pass*.5
     for i,am in ipairs(controllers) do
-        am:OnAttackStart({attacker=front[i],target=wall});am:OnIntervalThink()
+        am:OnAttackStart({attacker=front[i],target=wall});think(am)
         assert(front[i].orders==orders[i] and front[i].stops==1,
             'arrived attackers keep native attack windup/cooldown without new orders')
     end
-    waiting:OnIntervalThink();assert(overflow.orders==waiting_orders)
+    think(waiting);assert(overflow.orders==waiting_orders)
 end
-front[3].dead=true;clock=10.5;waiting:OnIntervalThink()
+front[3].dead=true;clock=10.5;think(waiting)
 assert(waiting.ai_state=='approach' and overflow.orders==waiting_orders+1,
     'one death frees its front point and wakes a waiting monster once')
-print('WALL_CONTACT_DEADLOCK_PASS narrow four contacts, mixed/large hulls, lateral reservation replacement, bounded stall recovery, control protection, stable attacks')
+print('WALL_CONTACT_DEADLOCK_PASS narrow four contacts, mixed/large hulls, exclusive admission, bounded stall recovery, control protection, stable attacks')

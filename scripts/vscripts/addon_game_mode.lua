@@ -720,11 +720,12 @@ function M.precache(context)
         "particles/basic_explosion/basic_explosion.vpcf",
         context
     )
-    PrecacheResource(
-        "particle",
-        "particles/units/heroes/hero_skywrath_mage/skywrath_mage_mystic_flare.vpcf",
-        context
-    )
+    for _, particle in ipairs({
+        "particles/units/heroes/hero_snapfire/snapfire_lizard_blobs_arced.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger.vpcf",
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf",
@@ -747,7 +748,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_viper/viper_nethertoxin.vpcf",
+        "particles/survival/skills/poison_sullen_shroud.vpcf",
         context
     )
     for _, particle in ipairs({
@@ -768,11 +769,21 @@ function M.precache(context)
     }) do
         PrecacheResource("particle", particle, context)
     end
-    PrecacheResource(
-        "particle",
-        "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf",
-        context
-    )
+    for _, particle in ipairs({
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_lizard_blobs_arced.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_impact.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_shockwave.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_burst.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_shockwave.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_glow.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_torns.vpcf",
+        "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_sparks.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse.vpcf",
+        "particles/status_fx/status_effect_wyvern_curse_target.vpcf",
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
     PrecacheResource(
         "particle",
         "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf",
@@ -780,7 +791,12 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_puck/puck_illusory_orb_main.vpcf",
+        "particles/survival/skills/tusk_snowball_fixed_size.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_tusk/tusk_snowball_impact.vpcf",
         context
     )
     PrecacheResource(
@@ -800,7 +816,12 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_hoodwink/hoodwink_acorn_shot_tracking.vpcf",
+        "particles/survival/skills/magic_slingshot_arcane_orb.vpcf",
+        context
+    )
+    PrecacheResource(
+        "particle",
+        "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit.vpcf",
         context
     )
     PrecacheResource(
@@ -820,7 +841,7 @@ function M.precache(context)
     )
     PrecacheResource(
         "particle",
-        "particles/units/heroes/hero_magnataur/magnataur_shockwave.vpcf",
+        "particles/survival/skills/blade_swashbuckle.vpcf",
         context
     )
     PrecacheResource(

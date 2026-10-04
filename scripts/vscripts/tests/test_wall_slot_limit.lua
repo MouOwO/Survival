@@ -69,7 +69,7 @@ for i,m in ipairs(controllers) do
     assert(units[i]:Script_GetAttackRange()==units[i].range,"normal range restored when wall dies")
     assert(units[i].force==nil and m.wall_entindex==-1,"destroyed wall releases native target")
 end
-MODIFIER_STATE_INVULNERABLE=5;MODIFIER_STATE_UNSELECTABLE=6
+MODIFIER_STATE_INVULNERABLE=5;MODIFIER_STATE_UNSELECTABLE=6;MODIFIER_STATE_NO_HEALTH_BAR=7
 local construction=require("modifiers/modifier_building_under_construction")
 assert(not construction:CheckState()[MODIFIER_STATE_NO_UNIT_COLLISION],"construction must collide immediately")
 -- Retired collision units are removed, unrelated invisible units survive.

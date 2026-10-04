@@ -2436,6 +2436,15 @@
         if (!unitOwnsAbility(unit, abilityIndex)) return false;
         var name = "";
         try { name = Abilities.GetAbilityName(abilityIndex) || ""; } catch (error) {}
+        if (name === "ability_building_blink" && Abilities.GetCooldownTimeRemaining(abilityIndex) > 0) {
+            var towerTools = GameUI.CustomUIConfig().SurvivalArrowTowerTools;
+            if (towerTools && towerTools.RejectMoveCooldown) towerTools.RejectMoveCooldown(abilityIndex);
+            else {
+                cancelPointTarget("move_ability_cooldown");
+                GameEvents.SendEventClientSide("dota_hud_error_message", {reason: 80, message: "移动防御塔CD中"});
+            }
+            return false;
+        }
         pointTargetState.active = true;
         pointTargetState.unit = unit;
         pointTargetState.ability = abilityIndex;
@@ -2540,6 +2549,11 @@
         }
         var researchName = String(runtime.ability_name || "");
         try { if (!researchName) researchName = Abilities.GetAbilityName(abilityIndex) || ""; } catch (error) {}
+        // This dispatcher also owns native ability-button clicks after startup.
+        if (researchName === "ability_building_blink" || researchName === "ability_destroy_arrow_tower") {
+            var towerTools = GameUI.CustomUIConfig().SurvivalArrowTowerTools;
+            return !!(towerTools && towerTools.TriggerAbility && towerTools.TriggerAbility(researchName, unit));
+        }
         if (/^ability_research_/.test(researchName)) {
             var production = GameUI.CustomUIConfig().SurvivalProductionHUD;
             return !!(production && production.QueueResearch && production.QueueResearch(abilityIndex, unit));

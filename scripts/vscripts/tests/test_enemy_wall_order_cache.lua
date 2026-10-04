@@ -1,5 +1,7 @@
 return function(source)
     local clock,orders,stops,force_writes=0,{},0,0
+    local native_phase_ready=false
+    local ai
     local env=setmetatable({},{__index=_G});env._G=env
     env.LinkLuaModifier=function() end;env.class=function(t) return t end
     env.IsServer=function() return true end
@@ -7,23 +9,33 @@ return function(source)
     env.DOTA_UNIT_CAP_MELEE_ATTACK=1
     env.DOTA_UNIT_ORDER_ATTACK_TARGET=2;env.DOTA_UNIT_ORDER_MOVE_TO_POSITION=3
     env.MODIFIER_STATE_ROOTED=4;env.MODIFIER_STATE_DISARMED=5
+    env.MODIFIER_STATE_NO_UNIT_COLLISION=6
     env.DOTA_TEAM_BADGUYS=3
     local plan=nil
     local contact={release=function() end,resolve=function() return plan end,attack_range=function() return 210 end}
     contact.arrived=require('systems/wall_melee_contact').arrived
+    contact.settle=function(w,u,p)
+        if contact.arrived(w,u,p,false) then u.p=p;return true end
+        return false
+    end
     env.require=function(name)
         if name=='systems/wall_melee_contact' then return contact end
         return {are_enemies=function() return true end,enforce=function() error('unnecessary team update') end}
     end
-    env.ExecuteOrderFromTable=function(order) orders[#orders+1]=order end
+    env.ExecuteOrderFromTable=function(order)
+        if order.OrderType==env.DOTA_UNIT_ORDER_MOVE_TO_POSITION and ai.ai_state=='approach' then
+            assert(native_phase_ready,'native MOVE was issued before the phase frame')
+        end
+        orders[#orders+1]=order
+    end
     local function wall(id)
         return {entindex=function() return id end,IsNull=function() return false end,
-            IsAlive=function(self) return not self.dead end,GetAbsOrigin=function() return {x=0,y=0} end}
+            IsAlive=function(self) return not self.dead end,GetAbsOrigin=function() return {x=0,y=0,z=0} end}
     end
     local walls={[1]=wall(1),[2]=wall(2)}
     env.EntIndexToHScript=function(id) return walls[id] end
     local chunk=assert(loadstring(source));setfenv(chunk,env);local M=chunk()
-    local parent={idle=false,p={x=-400,y=40},rate=1}
+    local parent={idle=false,p={x=-400,y=40,z=0},rate=1}
     function parent:entindex() return 3 end
     function parent:IsNull() return false end
     function parent:IsAlive() return true end
@@ -39,17 +51,31 @@ return function(source)
     function parent:IsStunned() return self.stunned end
     function parent:IsDisarmed() return self.disarmed end
     local intervals={}
-    local ai=setmetatable({GetParent=function() return parent end,StartIntervalThink=function(_,dt) intervals[#intervals+1]=dt end},{__index=M})
+    ai=setmetatable({GetParent=function() return parent end,StartIntervalThink=function(self,dt)
+        intervals[#intervals+1]=dt
+        if dt==0 and self.phase_order_frame then native_phase_ready=false end
+    end},{__index=M})
     parent.ai=ai;ai:OnCreated({wall_entindex=1})
     assert(intervals[1]==0 and #orders==0,'first observation must run next frame, after spawn placement')
-    local function tick(dt) clock=clock+(dt or .5);ai:OnIntervalThink() end
+    local function finish_phase_frame()
+        while ai.phase_order_frame do
+            clock=clock+1/30;native_phase_ready=true;ai:OnIntervalThink()
+        end
+    end
+    local function tick(dt)
+        clock=clock+(dt or .5);ai:OnIntervalThink();finish_phase_frame()
+    end
     tick(1/30)
     assert(#orders==1 and intervals[2]==0.5,'first frame must issue a goal and restore the normal observation cadence')
-    for i=1,30 do parent.p={x=parent.p.x-10,y=40};tick() end
+    for i=1,30 do parent.p={x=parent.p.x-10,y=40,z=0};tick() end
     assert(#orders==1 and force_writes==1 and stops==0,'ongoing chase must not restart')
-    plan={point={x=-192,y=40},claimed=true};tick()
+    plan={point={x=-192,y=40,z=0},claimed=true}
+    clock=clock+.5;ai:OnIntervalThink()
+    assert(ai.ai_state=='approach' and #orders==1 and ai.phase_order_frame and not native_phase_ready,
+        'contact admission must schedule a native phase frame without issuing MOVE')
+    finish_phase_frame()
     assert(ai.ai_state=='approach' and #orders==2)
-    parent.p={x=-195,y=40};tick()
+    parent.p={x=-195,y=40,z=0};tick()
     assert(ai.ai_state=='attack' and #orders==3 and stops==1,'one arrival transition')
     -- Deliberately no GetAttackTarget: cooldown/backswing nil must be irrelevant.
     parent.idle=true
@@ -74,13 +100,13 @@ return function(source)
     assert(#orders==4 and stops==1,'actual prolonged interruption retries without Stop')
     for i=1,8 do tick() end
     assert(#orders==4,'failed recovery backs off')
-    plan={point={x=-192,y=40},claimed=false};tick()
+    plan={point={x=-192,y=40,z=0},claimed=false};tick()
     local before=#orders
-    for i=1,60 do plan.point={x=-192,y=(i%2==0 and 120 or -40)};tick() end
+    for i=1,60 do plan.point={x=-192,y=(i%2==0 and 120 or -40),z=0};tick() end
     assert(ai.ai_state=='waiting' and #orders==before,'blocked overflow must not repeat/redirect move orders')
-    plan={point={x=-192,y=-40},claimed=true};tick()
+    plan={point={x=-192,y=-40,z=0},claimed=true};tick()
     assert(ai.ai_state=='approach' and #orders==before+1,'free contact wakes waiting unit once')
-    parent.p={x=-192,y=-40};tick()
+    parent.p={x=-192,y=-40,z=0};tick()
     assert(ai.ai_state=='attack' and #orders==before+2)
     ai:SetWallEntIndex(-1)
     local stopped,writes=stops,force_writes
@@ -96,5 +122,18 @@ return function(source)
     assert(#orders==pending and ai.order_pending)
     parent.stunned=false;tick();tick()
     assert(#orders==pending+1 and not ai.order_pending)
+    -- Cancellation between admission and the native phase frame must restore
+    -- the normal observation cadence, without leaving a per-frame idle loop.
+    parent.p={x=-400,y=0,z=0}
+    plan={point={x=-192,y=32,z=0},claimed=true}
+    clock=clock+.5;ai:OnIntervalThink()
+    assert(ai.phase_order_frame and ai.order_pending and intervals[#intervals]==0)
+    local cancelled_orders=#orders
+    ai:SetWallEntIndex(-1)
+    assert(not ai.phase_order_frame and not ai.order_pending and intervals[#intervals]==.5,
+        'target release during phase deferral must cancel pending MOVE and restore the half-second cadence')
+    tick(1/30);tick(1/30)
+    assert(#orders==cancelled_orders and intervals[#intervals]==.5,
+        'cancelled phase frame must not send MOVE or resume a per-frame loop')
     print('[C6_AI_CHECK] PASS per-unit FSM, 60 stable attack ticks, cooldown/stun, bounded recovery, overflow, retarget/death')
 end

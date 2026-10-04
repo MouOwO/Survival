@@ -164,6 +164,24 @@
         return String(Abilities.GetAbilityName(index) || "");
     }
 
+    var blockedCooldownAbility = -1;
+    var blockedNativeCooldownAbility = -1;
+    function rejectRelocationCooldown(ability, force) {
+        if (!force && !(Abilities.GetCooldownTimeRemaining(ability) > 0)) {
+            blockedCooldownAbility = -1;
+            return false;
+        }
+        if (force && inputMode === "native") blockedNativeCooldownAbility = ability;
+        cancelCustomPointTarget("move_ability_cooldown");
+        cancelPreview("move_ability_cooldown");
+        // Native targeting can remain active over many preview frames.
+        if (blockedCooldownAbility !== ability) {
+            blockedCooldownAbility = ability;
+            GameEvents.SendEventClientSide("dota_hud_error_message", {reason: 80, message: "移动防御塔CD中"});
+        }
+        return true;
+    }
+
     function customPointTargetName() {
         var shared = GameUI.CustomUIConfig().SurvivalPointTargetState;
         if (shared && shared.active && shared.name) return String(shared.name);
@@ -382,6 +400,8 @@
     }
 
     function showProfile(profile, abilityIndex, unit, mode, session) {
+        if (mode === "native" && blockedNativeCooldownAbility === abilityIndex) return false;
+        if (profile.placement_action === "relocate" && rejectRelocationCooldown(abilityIndex)) return false;
         activePreviewSession = session || ++previewSessionSequence;
         activeProfile = profile;
         pendingRelocation = null;
@@ -419,6 +439,7 @@
         if(!gridState) ensureCellPanels(1);
         hideProjectedVisuals();
         setVisualValid(false);
+        return true;
         $.Msg("[GridPlacement][CLIENT] BEGIN session=" + String(activePreviewSession)
             + " ability_name=" + String(profile.ability_name)
             + " ability=" + String(abilityIndex)
@@ -1092,6 +1113,7 @@
 
     function submitRelocation(world) {
         if (pendingRelocation) return true;
+        if (rejectRelocationCooldown(activeAbility)) return true;
         var destination = snappedCursorWorld(world);
         if (!destination || !isFinite(destination[0]) || !isFinite(destination[1])
             || !isFinite(destination[2])) return true;
@@ -1111,13 +1133,14 @@
         if (!currentController()) return;
         var pending = pendingRelocationStart;
         if (!pending) return;
+        if (rejectRelocationCooldown(pending.ability)) return;
         if (selectedUnit() !== pending.unit) { cancelPreview("selection_changed"); return; }
         var profile = profiles.ability_building_blink;
         var pointInput = controllerConfig.SurvivalPointTargetInput;
         if (!profile || !pointInput || !pointInput.Begin) return;
         if (!pointInput.Begin(pending.ability, pending.unit)) { cancelPreview("ability_unavailable"); return; }
         pendingRelocationStart = null;
-        showProfile(profile, pending.ability, pending.unit, "custom", pending.session);
+        if (!showProfile(profile, pending.ability, pending.unit, "custom", pending.session)) return;
         // Cold profiles must not eat the first click or use a later cursor.
         if (pending.world) submitRelocation(pending.world);
         else {
@@ -1151,6 +1174,8 @@
         var nativeIndex = nativeActiveAbility();
         var nativeName = abilityName(nativeIndex);
         var nativeProfile = profiles[nativeName];
+        if (nativeIndex !== blockedNativeCooldownAbility) blockedNativeCooldownAbility = -1;
+        if (!customProfile && !nativeProfile && !activeProfile) blockedCooldownAbility = -1;
         if (customProfile) {
             var customState = customPointTargetState();
             var unit = Number(customState && customState.unit);
@@ -1168,6 +1193,8 @@
         }
         if (activeProfile && activeProfile.placement_action === "relocate"
             && selectedUnit() !== activeUnit) cancelPreview("selection_changed");
+        if (activeProfile && activeProfile.placement_action === "relocate"
+            && !pendingRelocation && rejectRelocationCooldown(activeAbility)) return;
         if (activeProfile) {
             var frameStarted=Date.now();
             renderCursorIcon();
@@ -1273,6 +1300,10 @@
             $.Msg("[GridPlacement][CLIENT] RESPONSE_REJECTED reason=anchor_mismatch");
             return;
         }
+        if (activeProfile.placement_action === "relocate" && data.error === "move_ability_cooldown") {
+            rejectRelocationCooldown(activeAbility, true);
+            return;
+        }
         if (fastMotion) return;
         if (Number(data.area_complete)===0 && completedArea) {
             data.area=completedArea; data.area_complete=1;
@@ -1296,9 +1327,13 @@
                 cancelCustomPointTarget("grid_submitted");
                 hidePreview(false);
             } else {
+                if (data.error === "move_ability_cooldown") {
+                    rejectRelocationCooldown(activeAbility, true);
+                    return;
+                }
                 // Rejection closes the server session; preserve placement in
                 // a fresh one so the next cell can be clicked without another D.
-                showProfile(activeProfile, activeAbility, activeUnit, inputMode);
+                if (!showProfile(activeProfile, activeAbility, activeUnit, inputMode)) return;
                 var world = cursorWorld(true);
                 if (world) requestValidation(world, true);
                 setVisualValid(false, "无法移动 · 请换个位置");
@@ -1335,7 +1370,7 @@
         var unit = Number(customState && customState.unit);
         var ability = Number(customState && customState.ability);
         if (ability < 0) return false;
-        showProfile(profile, ability, unit, "custom");
+        if (!showProfile(profile, ability, unit, "custom")) return false;
         var world = cursorWorld(true);
         if (world) requestValidation(world);
         return true;
@@ -1415,6 +1450,8 @@
     controllerConfig.SurvivalGridPlacement = {
         BeginRelocation: function (ability, unit) {
             if (!currentController()) return false;
+            blockedCooldownAbility = -1;
+            if (rejectRelocationCooldown(Number(ability))) return false;
             cancelPreview("relocation_restart");
             pendingRelocationStart = {session: ++previewSessionSequence, ability: Number(ability), unit: Number(unit)};
             if (!profiles.ability_building_blink) {

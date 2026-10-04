@@ -19,6 +19,7 @@ package.loaded["systems/rogue_effect_state_service"] = {numeric = function() ret
 package.loaded["systems/forbidden_region_service"] = {validate_building_footprint = function() return true end}
 local defeated = false
 package.loaded["systems/player_context_service"] = {is_defeated = function() return defeated end}
+package.loaded["systems/multiplayer_player_service"] = {is_disconnected = function() return false end}
 DOTA_TEAM_GOODGUYS = 2
 DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 3,1,2
 DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER = 4,16,0
@@ -28,6 +29,7 @@ Vector = function(x,y,z) return setmetatable({x=x,y=y,z=z or 0},mt) end
 mt.__add=function(a,b)return Vector(a.x+b.x,a.y+b.y,a.z+b.z)end
 mt.__sub=function(a,b)return Vector(a.x-b.x,a.y-b.y,a.z-b.z)end
 local clock, units, by_id, caster, move, paid, refunded, created, failed_create, reachable, foreign, account, cooldowns
+local counts_events, completed_events, destroyed_events, failed_move, authorized_builders
 GameRules = {GetGameTime = function() return clock end}
 GetGroundHeight = function() return 128 end
 GridNav = {IsTraversable = function() return true end, IsBlocked = function() return false end,
@@ -44,7 +46,7 @@ local config = require("config/buildings_config")
 config.main_city.build_cost = {wood = 100, gold = 50}
 local function entity(id, name, position)
     local unit = {index=id,name=name,position=position,alive=true,modifiers={},abilities={},health=5000}
-    function unit:IsNull() return false end
+    function unit:IsNull() return self.null == true end
     function unit:IsAlive() return self.alive end
     function unit:entindex() return self.index end
     function unit:GetUnitName() return self.name end
@@ -78,10 +80,14 @@ end
 local function reset()
     bus.reset();scheduler.clear();clock=0;units={};by_id={};defeated=false
     move=nil;paid=0;refunded=0;created=0;failed_create=false;reachable=true;foreign=false;cooldowns=0
+    counts_events={};completed_events=0;destroyed_events=0;failed_move=false
     account={gold=10000,wood=10000}
     caster=entity(1,"npc_survival_builder_proxy",Vector(0,0,128))
+    authorized_builders={[caster]=0}
     bus.handle_request(events.BUILDER_GET_REQUEST,function(payload)
-        return {ok=not foreign,player_id=0,builder=not foreign and caster or nil,error="builder_not_owned"}
+        local owner=authorized_builders[payload.caster]
+        return {ok=not foreign and owner~=nil,player_id=owner,
+            builder=not foreign and owner~=nil and payload.caster or nil,error="builder_not_owned"}
     end)
     bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST,function(p)
         paid=paid+1
@@ -97,6 +103,7 @@ local function reset()
     ExecuteOrderFromTable=function(order)
         assert(order.UnitIndex==1 and order.OrderType==DOTA_UNIT_ORDER_MOVE_TO_POSITION)
         assert(caster.survival_build_internal_order==true,"automated move must not cancel its own task")
+        if failed_move then error("injected builder movement failure") end
         move=order.Position
     end
     CreateUnitByName=function(name,position)
@@ -106,6 +113,11 @@ local function reset()
             "the builder must physically clear the footprint before creation")
         return entity(10+created,name,position)
     end
+    bus.subscribe(events.BUILDING_COUNTS_CHANGED,function(payload)
+        counts_events[#counts_events+1]=payload
+    end)
+    bus.subscribe(events.BUILDING_CREATED,function()completed_events=completed_events+1 end)
+    bus.subscribe(events.BUILDING_DESTROYED,function()destroyed_events=destroyed_events+1 end)
     grid.init();building.init()
 end
 local ability={IsNull=function()return false end,EndCooldown=function()cooldowns=cooldowns+1 end}
@@ -125,45 +137,113 @@ local function tick(time)
     clock=time;scheduler.think();assert(#errors == 0,table.concat(errors,"\n"))
 end
 local function arrived() caster.position=Vector(move.x,move.y,move.z) end
+local function occupied(player_id)
+    local result,error_code=bus.request(events.BUILDING_COUNTS_REQUEST,{player_id=player_id or 0})
+    assert(not error_code and result and result.ok,error_code)
+    assert(result.counts.main_city~=nil and result.counts.building_farm~=nil,
+        "authoritative snapshots must include zero counts for known building types")
+    return result.counts.main_city
+end
+local function actual_count()
+    return building._building_limit_for_test.count_for(0,"main_city")
+end
 
 reset()
+assert(occupied()==0 and actual_count()==0)
 assert(build().ok and move and paid==0 and created==0)
+assert(occupied()==1 and actual_count()==0 and completed_events==0,
+    "accepting a unique order reserves its allowance immediately without counting a completed building")
+assert(occupied(1)==0,"unique reservations must be scoped to the authenticated player")
+local accepted_task=caster.survival_build_task
+assert(not build(Vector(640,640,128)).ok and caster.survival_build_task==accepted_task,
+    "a second unique order must not replace the accepted travel task")
 assert(caster.position.x==0 and caster.position.y==0,"request issues movement without teleporting")
 tick(0.1);assert(paid==0 and created==0,"remaining inside footprint cannot spend or construct")
+assert(occupied()==1 and actual_count()==0)
 arrived();tick(0.2)
 assert(paid==1 and created==1 and refunded==0)
+assert(occupied()==1 and actual_count()==1 and completed_events==0,
+    "arrival transfers the reserved allowance into construction without advancing completed-building state")
+assert(#counts_events==2 and counts_events[1].counts.main_city==1 and counts_events[2].counts.main_city==1,
+    "travel-to-construction synchronization must never publish a reopened or double-counted unique allowance")
 assert(by_id[11].survival_hull_radius>0 and by_id[11]:HasModifier("modifier_building_under_construction"),
     "invisible construction must reserve a physical hull before completion")
 assert(account.wood==10000-config.main_city.build_cost.wood)
 assert(not build().ok and paid==1,"duplicate request cannot construct a second city")
 tick(20);assert(paid==1 and created==1)
+assert(occupied()==1 and actual_count()==1 and completed_events==1)
 local city=by_id[11]
 assert(not city:HasModifier("modifier_building_under_construction") and city.survival_hull_radius>0,
     "completed city retains its ordinary collision")
 assert(city.abilities.ability_train_lumberjack.hidden==true,"preserve the production-panel skill hiding fix")
 
-reset();assert(build().ok);assert(build().ok);assert(paid==0)
-arrived();tick(0.1);assert(paid==1 and created==1,"replacement orders produce exactly one paid construction")
+reset();assert(build().ok);accepted_task=caster.survival_build_task
+assert(not build().ok and caster.survival_build_task==accepted_task and paid==0)
+arrived();tick(0.1);assert(paid==1 and created==1,"duplicate unique orders still produce exactly one paid construction")
 
-reset();assert(build().ok);caster.survival_build_task=nil;tick(0.1)
+reset();assert(build().ok)
+local other_builder=entity(2,"npc_survival_builder_proxy",Vector(1000,1000,128))
+authorized_builders[other_builder]=0
+local second=bus.request(events.BUILD_REQUEST,{caster=other_builder,player_id=0,
+    building_id="main_city",position=Vector(640,640,128),source_ability=ability})
+assert(second and not second.ok and other_builder.survival_build_task==nil and occupied()==1,
+    "another authenticated builder must not bypass the player's queued unique reservation")
+
+reset();assert(build().ok);accepted_task=caster.survival_build_task
+caster.survival_build_task=nil;tick(0.1)
 assert(paid==0 and created==0 and cooldowns==1,"external cancellation before arrival is free")
-tick(1);assert(cooldowns==1)
+assert(occupied()==0 and actual_count()==0 and counts_events[#counts_events].counts.main_city==0)
+tick(1);assert(cooldowns==1 and occupied()==0 and #counts_events==2)
+assert(build().ok,"cancellation must restore the unique construction allowance")
+local replacement_task=caster.survival_build_task
+building._clear_build_task_for_test(caster,accepted_task)
+assert(caster.survival_build_task==replacement_task and occupied()==1,
+    "stale task cleanup must not release a newer accepted order")
 reset();assert(build().ok);caster.alive=false;tick(0.1)
-assert(paid==0 and created==0 and caster.survival_build_task==nil)
+assert(paid==0 and created==0 and caster.survival_build_task==nil and occupied()==0)
+reset();assert(build().ok);caster.null=true;tick(0.1)
+assert(paid==0 and created==0 and occupied()==0 and cooldowns==1,
+    "an invalid builder handle must still release its task's unique reservation")
 reset();assert(build().ok);defeated=true;arrived();tick(0.1)
-assert(paid==0 and created==0,"defeated players cannot begin delayed construction")
+assert(paid==0 and created==0 and occupied()==0,"defeated players cannot begin delayed construction")
 reset();assert(build().ok);foreign=true;arrived();tick(0.1)
-assert(paid==0 and created==0,"ownership is rechecked after movement")
+assert(paid==0 and created==0 and occupied()==0,"ownership is rechecked after movement")
 reset();reachable=false
-assert(not build().ok and move==nil and paid==0,"no safe reachable position rejects before movement or payment")
+assert(not build().ok and move==nil and paid==0 and occupied()==0,"no safe reachable position rejects before movement or payment")
+reset();failed_move=true
+assert(not build().ok and caster.survival_build_task==nil and occupied()==0 and #counts_events==0,
+    "a rejected engine move order must not reserve a unique building allowance")
 reset();assert(build().ok);tick(100)
-assert(paid==0 and created==0 and caster.survival_build_task==nil,"stalled movement expires without charging")
+assert(paid==0 and created==0 and caster.survival_build_task==nil and occupied()==0,"stalled movement expires without charging")
 reset();assert(build().ok);arrived();account.wood=0;tick(0.1)
-assert(paid==1 and created==0 and cooldowns==1,"resources are rechecked after arrival")
+assert(paid==1 and created==0 and cooldowns==1 and occupied()==0,"resources are rechecked after arrival")
 reset();assert(build().ok);arrived();failed_create=true;tick(0.1)
 assert(paid==1 and created==1 and refunded==1 and account.wood==10000 and account.gold==10000)
+assert(occupied()==0 and actual_count()==0 and completed_events==0)
 tick(10);assert(refunded==1,"failed creation refunds once")
 reset();assert(build().ok);arrived()
 entity(7,"enemy",Vector(0,0,128));tick(0.1)
-assert(paid==0 and created==0,"other units entering the requested footprint invalidate construction")
-print("BUILDER_YIELD_CONSTRUCTION_PASS: actual move before spend, one construction, full arrival validation, cancellation/death/defeat/ownership/timeout, resource failure and refund")
+assert(paid==0 and created==0 and occupied()==0,"other units entering the requested footprint invalidate construction")
+
+reset();assert(build().ok);arrived();tick(0.1)
+local failed_building=by_id[11]
+failed_building.alive=false;tick(0.2)
+assert(occupied()==0 and actual_count()==0 and refunded==1 and completed_events==0 and destroyed_events==0,
+    "construction watchdog failure must release the allowance without a completed-building event")
+tick(0.3);assert(refunded==1 and occupied()==0)
+
+reset();assert(build().ok);arrived();tick(0.1)
+local killed_building=by_id[11]
+killed_building.alive=false
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=killed_building})
+assert(occupied()==0 and actual_count()==0 and refunded==1 and destroyed_events==0,
+    "construction death must release its actual count even without BUILDING_DESTROYED")
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=killed_building});tick(0.2)
+assert(occupied()==0 and refunded==1,"late death and watchdog callbacks must not release twice")
+
+reset();assert(build().ok)
+bus.emit(events.PLAYER_DISCONNECTED,{player_id=0})
+assert(occupied()==0 and caster.survival_build_task==nil)
+tick(0.1);assert(paid==0 and created==0 and cooldowns==1,
+    "disconnect cleanup must cancel the pending allowance without later starting construction")
+print("BUILDER_YIELD_CONSTRUCTION_PASS: accepted unique reservation, atomic construction transfer, duplicate/multi-builder rejection; cancel/death/invalid/timeout/failure/disconnect release; actual move and one spend/refund")

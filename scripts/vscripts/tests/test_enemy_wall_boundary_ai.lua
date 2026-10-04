@@ -75,24 +75,35 @@ for i,case in ipairs(cases) do
     local m=setmetatable({GetParent=function() return u end,StartIntervalThink=function() end},{__index=ai})
     u.ai=m;m:OnCreated({wall_entindex=1,no_unit_collision=case.no_collision})
     m:OnIntervalThink()
-    assert(u.orders==1 and u.corrections==0 and m.boundary_position.x==case.x)
+    assert(u.orders==1 and u.corrections<=1 and m.boundary_position.x==u.p.x)
+    local initial_corrections=u.corrections
     if case.no_collision then assert(m:CheckState()[MODIFIER_STATE_NO_UNIT_COLLISION]) end
     local before_orders,before_stops=u.orders,u.stops
     local before_nav=nav_queries
     -- Movement across the entire wall can finish outside its far edge in one
     -- observation. This must still return to the previously observed front.
     u.p=Vector(-case.x,case.y,384);clock=.5;m:OnIntervalThink()
-    assert(u.p.x<0 and u.corrections==1,case.name..' crosses the square only through boundary correction')
+    assert(u.p.x<0 and u.corrections==initial_corrections+1,case.name..' crosses the square only through boundary correction')
     assert(m.boundary_position.x==u.p.x,'snapshot uses the corrected position')
+    local displaced_contact=m.ai_state=='approach'
     assert(u.orders==before_orders and u.stops==before_stops,
-        'boundary correction does not Stop or reissue stable attack/chase orders')
+        'a displaced contact waits for native phase; native chase does not restart')
+    if displaced_contact then
+        assert(m.phase_order_frame,'displaced contact must schedule its phase frame')
+        clock=clock+1/30;m:OnIntervalThink()
+        assert(not m.phase_order_frame,'the deferred phase frame must return to the normal cadence')
+    end
     if case.capability==2 then assert(u:Script_GetAttackRange()==550,'ranged reach unchanged') end
     local boundary_nav=nav_queries
     for pass=1,3 do
         clock=.5+pass*.25
         if m.ai_state=='attack' then m:OnAttackStart({attacker=u,target=wall}) end
         m:OnIntervalThink()
-        assert(u.corrections==1 and u.orders==before_orders and u.stops==before_stops)
+        assert(u.corrections==initial_corrections+(displaced_contact and 2 or 1)
+            and u.orders==before_orders+(displaced_contact and 1 or 0)
+            and u.stops==before_stops+(displaced_contact and 1 or 0),
+            'only a displaced precise contact aligns once and resumes its attack')
+        if pass==1 then boundary_nav=nav_queries end
     end
     assert(nav_queries==boundary_nav,'normal frames do no extra boundary GridNav work')
     assert(boundary_nav>before_nav,'only real penetration checks corrected destination')

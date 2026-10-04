@@ -44,10 +44,25 @@
         return abilityOnUnit(unit, abilityName);
     }
 
+    function rejectMoveCooldown(ability) {
+        if (Abilities.GetCooldownTimeRemaining(ability) > 0) {
+            cancelMove();
+            var pointInput = GameUI.CustomUIConfig().SurvivalPointTargetInput;
+            if (pointInput && pointInput.Cancel) pointInput.Cancel("move_ability_cooldown");
+            GameEvents.SendEventClientSide("dota_hud_error_message", {
+                reason: 80, message: "移动防御塔CD中"
+            });
+            return true;
+        }
+        return false;
+    }
+
     function beginMove(unit) {
         unit = Number(unit === undefined ? selectedUnit() : unit);
         var ability = visibleAbility(unit, MOVE_ABILITY);
         if (ability < 0) return false;
+        // Consume the input so native casting cannot start another targeting mode.
+        if (rejectMoveCooldown(ability)) return true;
         var grid = GameUI.CustomUIConfig().SurvivalGridPlacement;
         if (!grid || !grid.BeginRelocation || !grid.BeginRelocation(ability, unit)) return false;
         selectedEnt = unit;
@@ -142,6 +157,7 @@
         $.Msg("[ArrowTowerDestroy] server rejected " + String(data.error || "unknown"));
     });
     GameUI.CustomUIConfig().SurvivalArrowTowerTools = {
+        RejectMoveCooldown: rejectMoveCooldown,
         TriggerAbility: function (abilityName, unit) {
             if (abilityName === MOVE_ABILITY) return beginMove(unit);
             if (abilityName === DESTROY_ABILITY) return openDestroyConfirm(unit);

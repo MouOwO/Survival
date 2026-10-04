@@ -1,0 +1,80 @@
+{
+  "root": "particles/survival/skills/magic_slingshot_arcane_orb.vpcf",
+  "native_root": "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb.vpcf",
+  "native_ability": "obsidian_destroyer_arcane_orb",
+  "chinese": "奥术天球",
+  "transformation": "Only remove native hit endcap child; preserve every remaining native compiled DATA field verbatim",
+  "native_data_sha256": "45ae78b97b990379cf9f811a3983d4a390cc941072f7a2a4400dffc6f333b781",
+  "source_sha256": "fe3483772234cc04da343f7312427b5c1bcd60b02a796642f5827282baaf55c3",
+  "retained_native_children": [
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_core.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_launch_glow.vpcf"
+  ],
+  "removed_native_hit_endcap": "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit.vpcf",
+  "controls": {
+    "0": "tracking launch",
+    "1": "tracking target and target entity",
+    "2": "tracking speed override",
+    "3": "native moving child frame",
+    "9": "native launch frame"
+  },
+  "projectile_lifecycle": "CreateTrackingProjectile owns native projectile controls, movement and termination; no native hit endcap remains",
+  "manual_hit": {
+    "resource": "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit.vpcf",
+    "controls": {
+      "0": "hit position",
+      "1": "actual victim entity via SetParticleControlEnt",
+      "3": "hit position"
+    },
+    "entity_requirement": "hit_sparks and hit_energy use CreateOnModel CP1; sparks also LockToBone CP1",
+    "lifetime_seconds": [
+      0.1,
+      1.25
+    ],
+    "cleanup": "Native instantaneous emitters and ordinary decay; release particle index after control setup"
+  },
+  "dependencies": {
+    "native_particle_nodes": 18,
+    "native_resource_refs": 32,
+    "missing": []
+  },
+  "native_dependencies": [
+    "materials/particle/auras/aura_endurance.vtex",
+    "materials/particle/beam_hotblue2.vtex",
+    "materials/particle/burst01.vtex",
+    "materials/particle/orb/particle_circular_orb.vtex",
+    "materials/particle/particle_flares/anam_white.vtex",
+    "materials/particle/particle_flares/particle_flare_002.vtex",
+    "materials/particle/particle_glow_04.vtex",
+    "materials/particle/particle_glow_05.vtex",
+    "materials/particle/particle_glow_irregular1.vtex",
+    "materials/particle/particle_heroring_bad.vtex",
+    "materials/particle/particle_ring_soft.vtex",
+    "materials/particle/smoke/static/static_smoke.vtex",
+    "materials/particle/smoke3/smoke3b.vtex",
+    "materials/particle/sparks/sparks.vtex",
+    "materials/particle/yellowflare2.vtex",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_blue.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_core.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_edge.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_energy.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit_burst.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit_energy.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit_glow.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit_ring.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_hit_sparks.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_launch_flash.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_launch_glow.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_model.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_ring.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_streak.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_trail.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_trail_core.vpcf",
+    "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_arcane_orb_trail_smoke.vpcf"
+  ],
+  "outputs": [
+    "particles/survival/skills/magic_slingshot_arcane_orb.vpcf"
+  ],
+  "gameplay": "Lua retains targeting, speed, damage, stun and existing level5 rubble field; this asset changes visuals only",
+  "validation_limit": "Installed native DATA and dependencies verified; caller hit integration and in-game appearance are separate checks"
+}
