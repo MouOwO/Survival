@@ -9,6 +9,7 @@ package.loaded['systems/archive_http_adapter']={enabled=function()return true en
     submitted[#submitted+1]=command;done=callback
 end}
 package.loaded['core/scheduler']={after=function(_,f)f()end}
+package.loaded['systems/commerce_runtime']={init=function()end}
 PlayerResource={IsValidPlayerID=function(_,id)return id==0 end,IsFakeClient=function()return false end,GetPlayer=function()return {} end}
 CustomGameEventManager={RegisterListener=function(_,name,f)handlers[name]=f end,Send_ServerToPlayer=function(_,p,name,result)sent[#sent+1]=result end}
 Time=function()return clock end

@@ -20,6 +20,7 @@ local hero_damage_attack_bonus_by_player = {}
 local hero_basic_attack_bonus_by_player = {}
 local hero_growth_attributes_by_player = {}
 local tower_basic_attack_bonus_by_player = {}
+local commerce_boss_bonus, commerce_boss_seen = {}, {}
 local wall_ticks_by_player = {}
 local wall_tick_health_by_player = {}
 local wall_tick_armor_by_player = {}
@@ -94,6 +95,7 @@ local function refresh(payload)
         totals_by_player[player_id] = apply_map_level_effects(add_values(
             copy(save.permanent_effects), save.gameplay_stats
         ))
+        add_values(totals_by_player[player_id], require('systems/commerce_effects').project(save, totals_by_player[player_id]))
     end
     local boss_effects
     if profile and profile.mode == "pure" then
@@ -429,12 +431,7 @@ local function on_tower_attack(payload)
     local player_id = tower and tonumber(tower.survival_player_id)
     if player_id == nil then return end
     if phase_guard.post_clear_frozen() then return end
-    local damage_growth = M.value(player_id, "tower_damage_attack_growth")
     local attack_growth = M.value(player_id, "tower_basic_attack_growth")
-    if damage_growth > 0 then
-        tower_damage_bonus_by_player[player_id] =
-            (tower_damage_bonus_by_player[player_id] or 0) + damage_growth
-    end
     if attack_growth > 0 then
         tower_basic_attack_bonus_by_player[player_id] =
             (tower_basic_attack_bonus_by_player[player_id] or 0) + attack_growth
@@ -449,12 +446,22 @@ local function on_tower_attack(payload)
             armor_reduction_per_attack = reduction,
         })
     end
-    if damage_growth > 0 or attack_growth > 0 then
+    if attack_growth > 0 then
         event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
             player_id = player_id,
             reason = "gameplay_stats_tower_attack_growth",
         })
     end
+end
+
+local function on_tower_damage(payload)
+    local tower=payload and payload.tower
+    local player_id=tower and tonumber(tower.survival_player_id)
+    if not player_id or (tonumber(payload.damage) or 0)<=0 or phase_guard.post_clear_frozen() then return end
+    local growth=M.value(player_id,'tower_damage_attack_growth')
+    if growth<=0 then return end
+    tower_damage_bonus_by_player[player_id]=(tower_damage_bonus_by_player[player_id] or 0)+growth
+    event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=player_id,reason='tower_actual_damage_growth'})
 end
 
 local function get(payload)
@@ -489,6 +496,7 @@ local function get(payload)
     totals.hero_attack_bonus_pct = (totals.hero_attack_bonus_pct or 0) + (growth.hero or 0)
     totals.tower_attack_bonus_pct = (totals.tower_attack_bonus_pct or 0) + (growth.tower or 0)
     totals.hero_attribute_bonus_pct = (totals.hero_attribute_bonus_pct or 0) + (growth.attributes or 0)
+    totals.hero_attribute_bonus_pct=totals.hero_attribute_bonus_pct+(commerce_boss_bonus[player_id] or 0)
     totals.wall_health_growth_flat = wall_tick_health_by_player[player_id] or 0
     totals.wall_armor_growth_flat = wall_tick_armor_by_player[player_id] or 0
     return {
@@ -543,6 +551,7 @@ function M.clear_test_isolation(player_id, defer_refresh)
 end
 
 function M.init()
+    commerce_boss_bonus,commerce_boss_seen={},{}
     totals_by_player = {}
     live_draw_ids = {}
     boss_effects_by_player = {}
@@ -564,6 +573,15 @@ function M.init()
     event_bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, get)
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, refresh)
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
+    event_bus.subscribe('archive.wave_boss_killed',function(payload)
+        local id=tonumber(payload.player_id)
+        if not id or not require('systems/commerce_effects').owned(id,'time_orb') then return end
+        local key=tostring(id)..':'..tostring(payload.kill_id)
+        if commerce_boss_seen[key] then return end
+        commerce_boss_seen[key]=true;commerce_boss_bonus[id]=(commerce_boss_bonus[id] or 0)+2
+        event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=id,reason='commerce_assault_boss'})
+    end)
+    event_bus.subscribe('commerce.tower_damage', on_tower_damage)
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_hero_attack)
     event_bus.subscribe(events.TOWER_ATTACK_LANDED, on_tower_attack)
     event_bus.subscribe(events.MONSTER_SPAWNED, function(payload)

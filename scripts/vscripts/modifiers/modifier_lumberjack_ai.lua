@@ -198,6 +198,10 @@ function M:OnAttackLanded(keys)
     local target = keys.target
     if not target or target:IsNull() then return end
     if not tree_damage_rules.is_tree(target) then return end
+    if require('systems/commerce_effects').owned(self.player_id,'saw') then
+        target:AddNewModifier(parent,nil,'modifier_research_armor_reduction',
+            {armor_reduction_per_attack=require('config/armor_balance').from_war3_linear(1)})
+    end
     -- Harvest any player's tree, but keep an explicit foreign-tree order until
     -- the worker becomes idle. Automatic harvesting still uses its own tree.
     self.manual_control = target:entindex() ~= self.tree_entindex

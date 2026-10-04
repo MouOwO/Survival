@@ -70,7 +70,7 @@ local function profile_income(state, base_amount)
         + (tonumber(permanent.gold_mine_final_output_flat) or 0)
     local interval = math.max(0.05, config.production_interval
         - (tonumber(permanent.gold_mine_income_interval_reduction) or 0))
-    return math.max(0, amount), interval, percent
+    return math.max(0, amount)*(tonumber(state.unit.survival_commerce_mine_slots) or 1), interval, percent
 end
 
 local function set_ability_visible(unit, ability_name, visible)
@@ -161,11 +161,12 @@ local function state_from_payload(payload)
 end
 
 local function spend(state, cost, reason)
+    local slots=tonumber(state.unit.survival_commerce_mine_slots) or 1
     return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         player_id = state.player_id,
         team = state.team,
-        wood = cost.wood or 0,
-        gold = cost.gold or 0,
+        wood = (cost.wood or 0)*slots,
+        gold = (cost.gold or 0)*slots,
         population = 0,
         reason = reason,
     })
@@ -417,8 +418,8 @@ local function level_upgrade_quote(payload)
         ok = true,
         current_level = state.mine_level,
         target_level = state.mine_level + 1,
-        wood = tonumber(cost.wood) or 0,
-        gold = tonumber(cost.gold) or 0,
+        wood = (tonumber(cost.wood) or 0)*(tonumber(state.unit.survival_commerce_mine_slots) or 1),
+        gold = (tonumber(cost.gold) or 0)*(tonumber(state.unit.survival_commerce_mine_slots) or 1),
     }
 end
 

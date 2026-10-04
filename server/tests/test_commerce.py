@@ -25,7 +25,7 @@ class CommerceTests(unittest.TestCase):
     def test_reviewed_selection_and_original_prices(self):
         catalog=build_catalog(ROOT)
         products={p['sku']:p for p in catalog['products']}
-        self.assertEqual(len(products),64)
+        self.assertEqual(len(products),108)
         self.assertEqual(products['video_p033']['price'],100)
         self.assertEqual(products['video_p029']['price'],600)
         self.assertEqual(products['video_p037']['currency'],'shop_gold')
@@ -38,7 +38,7 @@ class CommerceTests(unittest.TestCase):
     def test_empty_wallet_catalog_is_read_only(self):
         before=copy.deepcopy(self.profile)
         result=self.send('commerce_catalog')
-        self.assertEqual(len(result['products']),64)
+        self.assertEqual(len(result['products']),108)
         self.assertEqual(result['balances'],dict(u_coin=0,shop_points=0,shop_gold=0))
         self.assertTrue(all(not p['enabled'] for p in result['products']))
         self.assertEqual(self.profile,before)
@@ -53,7 +53,7 @@ class CommerceTests(unittest.TestCase):
                 self.assertTrue(self.purchase(product['sku'])['ok'])
                 for field, amount in product['effects'].items():
                     self.assertAlmostEqual(self.profile['save']['gameplay_stats'][field],before['save']['gameplay_stats'][field]+amount)
-                self.assertEqual(self.profile['save']['content_inventory'][product['item_id']],1)
+                self.assertEqual(self.profile['save']['content_inventory'][product['item_id']],product.get('ownership_quantity',1))
                 self.assertEqual(self.profile['save']['archive']['commerce']['balances'][product['currency']],1000000-product['price'])
 
     def test_insufficient_and_client_tampering(self):
@@ -123,6 +123,32 @@ class CommerceTests(unittest.TestCase):
         self.profile['save']['gameplay_stats']['gold_mine_efficiency_pct']=10000
         before=copy.deepcopy(self.profile)
         self.assertEqual(self.purchase()['error'],'attribute_limit_reached')
+        self.assertEqual(self.profile,before)
+
+    def test_ember_bundles_share_quantity_and_duplicate_request_is_safe(self):
+        self.fund(shop_points=100000)
+        self.assertTrue(self.purchase('video_p089','ember_100')['ok'])
+        self.assertTrue(self.purchase('video_p103','ember_001')['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'],101)
+        before=copy.deepcopy(self.profile)
+        self.assertTrue(self.purchase('video_p089','ember_100')['ok'])
+        self.assertEqual(self.profile,before)
+        self.assertAlmostEqual(self.profile['save']['gameplay_stats']['hero_basic_attack_growth'],10.1)
+
+    def test_conditional_products_do_not_pregrant_collection_bonuses(self):
+        for sku in ('video_p023','video_p025'):
+            self.assertEqual(self.bundle.tables['commerce_catalog'][sku]['effects'],{'starjoy_points':298})
+        self.assertEqual(self.bundle.tables['commerce_catalog']['video_p075']['effects']['starjoy_points'],200)
+        self.assertNotIn('technology_cost_refund_pct',self.bundle.tables['commerce_catalog']['video_p018']['effects'])
+        self.assertEqual(self.bundle.tables['commerce_catalog']['video_p094']['effects']['hero_attack_attribute_efficiency_pct'],10)
+
+    def test_double_clear_counts_and_idempotency(self):
+        self.profile['save']['content_inventory']={'commerce_p005':1}
+        command=self.command('clear',difficulty_id='n1',count=1)
+        self.assertTrue(self.service.command(command)['ok'])
+        self.assertEqual(self.profile['save']['archive']['clear_counts']['n1'],2)
+        before=copy.deepcopy(self.profile)
+        self.assertTrue(self.service.command(command)['ok'])
         self.assertEqual(self.profile,before)
 
 if __name__=='__main__':unittest.main()

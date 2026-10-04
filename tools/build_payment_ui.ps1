@@ -5,6 +5,7 @@ $content=Join-Path $engine 'content/dota_addons/survival/panorama'
 $compiler=Join-Path $engine 'game/bin/win64/resourcecompiler.exe'
 $files=@('scripts/custom_game/commerce_remaining_5d5c1152eb.js','scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','scripts/custom_game/payment_test.js','styles/custom_game/payment_test.css','layout/custom_game/payment_test.xml','layout/custom_game/custom_ui_manifest.xml')
 $files+=@('scripts/custom_game/commerce_wallet.js','styles/custom_game/commerce_wallet.css')
+$files+=@('scripts/custom_game/commerce_actions.js','scripts/custom_game/hero_skill_ui.js','scripts/custom_game/ui_bootstrap.js')
 $catalogFile=Join-Path $repo 'output/payment_catalog.json'
 if(Test-Path -LiteralPath $catalogFile){
  $catalog=Get-Content -LiteralPath $catalogFile -Raw -Encoding UTF8 | ConvertFrom-Json

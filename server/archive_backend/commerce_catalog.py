@@ -31,16 +31,22 @@ def build_catalog(root):
             'purchase_limit', 'enabled', 'sort_order', 'icon', 'description', 'ownership_id')})
         # Only reuse reward validation. This value is never published as a cash price.
         converted[-1]['price_yuan'] = '1.00'
+        if p['source_id'] == 'P103':
+            if p['ownership_id'] != 'lottery_ember_of_legacy' or number(p['purchase_limit'], True) != 0:
+                raise ValueError('commerce_ember_ownership_invalid')
+            converted[-1]['ownership_id'] += '_single'
         if not (Path(root) / 'panorama/src/images' / p['icon']).is_file():
             raise ValueError('commerce_icon_missing:' + p['sku'])
     catalog = compile_catalog({
         'payment_categories': (base / '商城支付系统/payment_categories.csv').read_text(encoding='utf-8-sig'),
         'payment_products': csv_text(converted), 'payment_rewards': rewards,
-    }, {name: (base / name).read_text(encoding='utf-8-sig') for name in SOURCES})
+    }, {name: (base / name).read_text(encoding='utf-8-sig') for name in SOURCES}, max_products=200)
     originals = {p['sku']: p for p in products}
     for p in catalog['products']:
         row = originals[p['sku']]
+        p['item_id'] = row['ownership_id']
         del p['amount']
         p.update(currency=row['currency'], currency_name=CURRENCIES[row['currency']],
                  price=number(row['price'], True), source_id=row['source_id'], purchase_method='wallet')
+        p['ownership_quantity'] = number(row.get('ownership_quantity') or 1, True, 1, 100)
     return catalog

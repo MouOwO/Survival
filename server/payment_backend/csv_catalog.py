@@ -42,7 +42,7 @@ def indexed(data,key):
 
 def canonical(data):return json.dumps(data,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode()
 
-def compile_catalog(tables,reference):
+def compile_catalog(tables,reference, *, max_products=100):
     categories=indexed(rows(tables['payment_categories']),'category_id')
     products=indexed(rows(tables['payment_products']),'sku')
     rewards=indexed(rows(tables['payment_rewards']),'reward_id')
@@ -115,7 +115,7 @@ def compile_catalog(tables,reference):
             purchase_limit=number(p['purchase_limit'],True,0,10000),category_id=p['category_id'],product_type=p['product_type'],icon=icon,
             grants=dict(items=inventory,item_limits=limits,entitlements=entitlements,lines=lines,
                 effect_labels={field:re.split('[；。]',stats[field]['notes'])[0] or field for field in effects})))
-    if len(result)>100 or not any(x['enabled'] for x in result):raise ValueError('需有启用商品，最多100项')
+    if len(result)>max_products or not any(x['enabled'] for x in result):raise ValueError(f'需有启用商品，最多{max_products}项')
     return dict(protocol=4,categories=category_rows,products=sorted(result,key=lambda x:x['sort_order']))
 
 def build(root):

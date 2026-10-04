@@ -1,7 +1,9 @@
 local M = {}
 
-local function maximum_for(row)
-    return tonumber(row and row.max_count) or 0
+local function maximum_for(row, state)
+    local base=tonumber(row and row.max_count) or 0
+    local bonus=(tonumber(row and row.level) or 99)<=7 and ((state and state.bonus) or 0) or 0
+    return base>=0 and base+bonus or base
 end
 
 local function training_rows(definitions, prefix)
@@ -22,7 +24,7 @@ end
 local function snapshot(state, row)
     local training_id = row and row.training_id or nil
     local count = training_id and (state.counts[training_id] or 0) or 0
-    local maximum = maximum_for(row)
+    local maximum = maximum_for(row,state)
     local requires_city_level = row and tonumber(row.requires_city_level) or nil
     if requires_city_level == nil then
         requires_city_level = tonumber(string.match(
@@ -73,6 +75,17 @@ function M.create(definitions, prefix, error_prefix)
         self.states = {}
     end
 
+    function tracker:set_capacity_bonus(owner_key, bonus)
+        local state=state_for(owner_key)
+        state.bonus=math.max(0,math.floor(tonumber(bonus) or 0))
+        state.current_index=1
+        while state.current_index<#self.rows do
+            local row=self.rows[state.current_index]
+            if maximum_for(row,state)<0 or (state.counts[row.training_id] or 0)<maximum_for(row,state) then break end
+            state.current_index=state.current_index+1
+        end
+    end
+
     function tracker:current(team)
         local state = state_for(team)
         return self.rows[state.current_index]
@@ -102,7 +115,7 @@ function M.create(definitions, prefix, error_prefix)
 
         local count = (state.counts[training_id] or 0) + 1
         state.counts[training_id] = count
-        local maximum = maximum_for(row)
+        local maximum = maximum_for(row,state)
         local advanced = false
         if maximum > 0 and count >= maximum
             and state.current_index < #self.rows then
@@ -149,7 +162,7 @@ function M.create(definitions, prefix, error_prefix)
         local previous_index = state.current_index
         while state.current_index < #self.rows do
             local current = self.rows[state.current_index]
-            local maximum = maximum_for(current)
+            local maximum = maximum_for(current,state)
             if maximum < 0 or (state.counts[current.training_id] or 0) < maximum then break end
             state.current_index = state.current_index + 1
         end

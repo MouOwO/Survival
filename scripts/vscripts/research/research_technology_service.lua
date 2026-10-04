@@ -237,6 +237,10 @@ function M:CommitUpgrade(payload)
         return self:_finish(response)
     end
 
+    if require('systems/commerce_effects').owned(player_id,'time_technology') then
+        self.refund_resources(player_id,{gold=math.floor((cost.gold or 0)*.08+.5),
+            wood=math.floor((cost.wood or 0)*.08+.5)},tech_id)
+    end
     local response = build_result(
         true, tech_id, old_level, target_level, cost, nil
     )

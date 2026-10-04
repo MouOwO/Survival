@@ -1,0 +1,25 @@
+{
+  "status": "published",
+  "release": "20261004-commerce-batch2",
+  "previous_release": "20261004-commerce03",
+  "archive_bundle": "288f724bcfd79880c4fbd7d4ac77040a8636e2f8f3ef96836632001340d3b2a7",
+  "products": 108,
+  "second_batch": 44,
+  "scope": "A64+B44; C5 deferred by user; D14 deferred; E12 excluded; P140 missing description",
+  "schema_migrations": 0,
+  "currency_ids": ["u_coin", "shop_points", "shop_gold"],
+  "recharge_enabled": false,
+  "preserved": ["live stat defaults", "lottery configurations", "immutable previous bundles", "migration history", "432 pre-existing resource modifications"],
+  "checks": {
+    "python_archive_and_commerce": "31 tests passed, including all 108 products",
+    "postgres_lua_exchange": "108 products passed under goufayu_app; all fixtures rolled back",
+    "live_http_catalog": "108 products; original prices and currencies match; independent balances zero",
+    "lua_rules": "dynamic projections, strict quantity thresholds, shield expiry/cooldown, owner-specific capacity, fractional welfare and actual tower damage growth passed",
+    "runtime": "blink validation/cooldown, owner-only one-use bomb, starting research once, twenty orbital ticks, endless trigger and replay protection passed",
+    "regressions": "research queues, mine upgrade, worker training/fusion, skill points, pure-mode isolation and payment UI passed",
+    "dota_resources": "compiled successfully",
+    "service_health": "game API and payment service active",
+    "in_game_visual_acceptance": "not performed; requires a new match with the updated client scripts"
+  },
+  "confirmed_adaptation": "Supreme fishing rod doubles total probability of S/SS/SSR/UR rewards, capped at 100%, with unchanged interval."
+}

@@ -27,7 +27,7 @@ function M.settle(profile, command, pass)
     for _,key in ipairs({"clear_counts","completed","shadow_counts","processed"}) do archive[key]=archive[key] or {} end
     if archive.processed[command.id] then return {ok=true,duplicate=true,archive=archive,gameplay_stats=stats} end
     if command.kind == "online_checkpoint" or command.kind == "work_upgrade" then
-        local ok, reason = require("systems/archive_online_rewards").apply(command, archive, stats, apply_effects)
+        local ok, reason = require("systems/archive_online_rewards").apply(command, archive, stats, apply_effects, profile.save)
         if not ok then return { ok = false, terminal = true, error = reason } end
     elseif command.kind == "boss_kill" then
         archive.boss_kills=(tonumber(archive.boss_kills) or 0)+1
@@ -38,6 +38,9 @@ function M.settle(profile, command, pass)
         local ok, reason = require("systems/archive_building_rewards").apply(command, archive, stats, apply_effects)
         if not ok then return {ok=false,terminal=true,error=reason} end
     elseif command.kind == "clear" then
+        if require('systems/commerce_effects').has(profile.save,'double_clear') then
+            command=copy(command);command.count=command.count*2
+        end
         require("systems/archive_building_rewards").clear(archive, command)
         local difficulty = command.difficulty_id
         archive.clear_counts[difficulty] = (archive.clear_counts[difficulty] or 0) + command.count

@@ -111,6 +111,7 @@ local function spawn_target(player_id, action, marker)
 end
 
 local function spend(player_id, team, gold, reason)
+    if require('systems/commerce_effects').owned(player_id,'growth_ring') then gold=math.floor((tonumber(gold) or 0)*.75+.5) end
     return event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         player_id = player_id,
         team = team,

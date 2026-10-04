@@ -300,6 +300,13 @@
     }
 
     inputConfig.SurvivalHeroSelection = { Select: selectHero, CanSelect: canSelectHero };
+    registerHandler(keyHandlers,keyHandlerOrder,"commerce_blink",function(key,down){
+        return String(key).toUpperCase()==="D" && down!==false && !textInputActive()
+            && inputConfig.SurvivalCommerceBlink && inputConfig.SurvivalCommerceBlink();
+    },130);
+    registerHandler(mouseHandlers,mouseHandlerOrder,"commerce_aim",function(eventName,button){
+        return inputConfig.SurvivalCommerceAim && inputConfig.SurvivalCommerceAim(eventName,button);
+    },130);
     registerHandler(keyHandlers, keyHandlerOrder, "hero_f1_selection", function (key, down) {
         if (String(key).toUpperCase() !== "F1" || down === false) return false;
         if (textInputActive()) return false;

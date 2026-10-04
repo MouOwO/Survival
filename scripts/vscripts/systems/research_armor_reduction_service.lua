@@ -125,6 +125,8 @@ local function on_main_attack_landed(payload)
             reduction = reduction + math.max(0, current_armor) * percent / 100
         end
     end
+    if target.survival_is_boss==true and target.survival_is_wave_monster==true
+        and require('systems/commerce_effects').owned(player_id,'nano') then reduction=reduction*2 end
     if reduction <= 0 then
         if diagnostic then
             print(string.format(

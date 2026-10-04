@@ -15,6 +15,7 @@ end
 local function blocked(p,inventory,stats,state)
     if not p or not p.enabled then return 'product_unavailable' end
     if p.purchase_limit>0 and (tonumber(inventory[p.item_id]) or 0)>=p.purchase_limit then return 'already_owned' end
+    if (tonumber(inventory[p.item_id]) or 0)+(p.ownership_quantity or 1)>100000000 then return 'ownership_limit_reached' end
     for id,n in pairs(p.grants.items) do
         if (tonumber(inventory[id]) or 0)+n>p.grants.item_limits[id] then return 'component_already_owned' end
     end
@@ -54,7 +55,7 @@ function M.settle(profile,command)
     if reason~='' then return {ok=false,error=reason} end
     -- Never accept a price, balance, quantity or reward from the client.
     state.balances[p.currency]=balance(state,p.currency)-p.price
-    inventory[p.item_id]=(tonumber(inventory[p.item_id]) or 0)+1
+    inventory[p.item_id]=(tonumber(inventory[p.item_id]) or 0)+(p.ownership_quantity or 1)
     for id,n in pairs(p.grants.items) do inventory[id]=(tonumber(inventory[id]) or 0)+n end
     for field,n in pairs(p.effects) do
         stats[field]=(tonumber(stats[field]) or tonumber(definitions.by_id[field].default_value) or 0)+n

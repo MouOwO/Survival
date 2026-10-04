@@ -181,6 +181,10 @@ local function add_attacks(
     local agility_gain = tonumber(definition.agility_gain_per_attack) or 0
     local intellect_gain = tonumber(definition.intellect_gain_per_attack) or 0
     local multiplier = math.max(1, tonumber(income_multiplier) or 1)
+    if require('systems/commerce_effects').owned(player_id,'growth_ring') then
+        progress_count=progress_count*2
+        multiplier=multiplier*2
+    end
     current.stage_attack_count = current.stage_attack_count + progress_count
     current.lifetime_attack_count = current.lifetime_attack_count + growth_count
     current.growth_attack = current.growth_attack

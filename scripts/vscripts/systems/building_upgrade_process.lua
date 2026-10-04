@@ -235,6 +235,7 @@ function M.begin(unit, options)
         finished = false,
     }
     active_by_entindex[entindex] = state
+    if require('systems/commerce_effects').owned(unit.survival_player_id,'instant_build') then state.duration=0 end
     unit.survival_upgrade_in_progress = true
     unit.survival_upgrade_target_level = tonumber(options.target_level)
     unit.survival_upgrade_target_model_asset_id = options.target_model_asset_id

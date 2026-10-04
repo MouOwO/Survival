@@ -80,6 +80,7 @@ local function spawn_wave(run, number)
     end
     run.spawning = false
     run.deadline = now() + rules.time_limit_seconds
+    require('core/event_bus').emit('commerce.endless_wave',{player_id=run.player_id,wave=number})
     publish(run)
     return true
 end

@@ -4,7 +4,7 @@ local events = require("core/events")
 local M = {}
 
 -- Item ownership unlocks this hero only; it never grants global VIP rights.
-local unlock_items = { hero_monkey_king = "lottery_monkey_king" }
+local unlock_items = { hero_monkey_king = "lottery_monkey_king", hero_blademaster = "commerce_p012" }
 
 function M.context(player_id, entitlement)
     local result = event_bus.request(events.PLAYER_PROFILE_GET_REQUEST, {
@@ -34,7 +34,7 @@ function M.check(definition, context)
             and quantity < math.huge and quantity == math.floor(quantity) then
             return true, ""
         end
-        return false, "需要拥有齐天大圣存档道具或VIP权限"
+        return false, "需要拥有对应英雄商城道具或VIP权限"
     end
     return false, "需要VIP权限"
 end

@@ -120,6 +120,12 @@ local function apply_rewards(payload)
         end
     end
 
+    if state.rebirth_level>=10 and not state.commerce_nirvana_granted
+        and require('systems/commerce_effects').owned(player_id,'nirvana') then
+        local granted=event_bus.request(events.HERO_SKILL_POINT_GRANT_REQUEST,
+            {player_id=player_id,points=5,source='commerce_nirvana'})
+        if granted and granted.ok then state.commerce_nirvana_granted=true end
+    end
     state.version = state.version + 1
     local data = snapshot(player_id)
     data.reason = payload.reason or "reward_applied"
@@ -162,6 +168,7 @@ local function on_attack_landed(payload)
         payload.target
     )
     local amount = gain * multiplier
+    if require('systems/commerce_effects').owned(player_id,'growth_ring') then amount=amount*1.1 end
     state.all_attributes = state.all_attributes + amount
     state.version = state.version + 1
     local data = snapshot(player_id)

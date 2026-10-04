@@ -23,6 +23,11 @@ local function player_tree(player_id)
 end
 local population_training_counts = {}
 local lumberjack_training = worker_training_progress.create(training_definitions)
+function M.refresh_commerce_capacity(player_id)
+    local effects=require('systems/commerce_effects')
+    lumberjack_training:set_capacity_bonus(player_id,
+        effects.owned(player_id,'immortal') and effects.owned(player_id,'lumber_fury') and 1 or 0)
+end
 local repairer_training = worker_training_progress.create(
     training_definitions,
     "train_repairer_",
@@ -1246,7 +1251,7 @@ function M.commit_lumberjack_fusion(materials, target, data)
         local state = valid_entity(material) and workers[material:entindex()] or nil
         local material_entindex = material and material.entindex and material:entindex()
         if not state or state.worker_type ~= "lumberjack"
-            or material.survival_super_lumberjack then
+            or (material.survival_super_lumberjack and not data.commerce_immortal) then
             return { ok = false, error = "fusion_material_changed" }
         end
         states[#states + 1] = state
@@ -1258,6 +1263,7 @@ function M.commit_lumberjack_fusion(materials, target, data)
     if not registered or not registered.ok then
         return registered or { ok = false, error = "fusion_target_register_failed" }
     end
+    if data.commerce_immortal then target.survival_commerce_immortal=true;target.survival_display_name='伐木仙人' end
     if data.model_name and data.model_name ~= "" then
         target:SetModel(data.model_name)
         target:SetOriginalModel(data.model_name)
@@ -1292,6 +1298,47 @@ function M.commit_lumberjack_fusion(materials, target, data)
         removed_entindexes = removed_entindexes,
     })
     return { ok = true, population_released = 0, population_preserved = preserved_population }
+end
+
+function M.commerce_spawn_immortal(player_id,city)
+    if not valid_entity(city) or not require('systems/commerce_effects').owned(player_id,'immortal') then return false end
+    local row=training_definitions.by_id.train_lumberjack_01
+    local position=find_worker_spawn_position(city)
+    if not position then return false end
+    local unit=CreateUnitByName(row.unit_name,position,true,city,city,city:GetTeamNumber())
+    if not valid_entity(unit) then return false end
+    local result=M.register_fused_lumberjack(unit,{player_id=player_id,team=city:GetTeamNumber(),level=1,population=0,
+        base_attack=row.base_attack,wood_per_hit=row.wood_per_hit,attack_speed=row.attack_rate,health=row.health,
+        model_name=row.model_name,ability_names={},fusion_count=1})
+    if not result or not result.ok then unit:RemoveSelf();return false end
+    unit.survival_commerce_immortal=true;unit.survival_display_name='伐木仙人'
+    if row.model_name then unit:SetModel(row.model_name);unit:SetOriginalModel(row.model_name) end
+    FindClearSpaceForUnit(unit,position,true)
+    return true
+end
+
+function M.commerce_fuse_immortal(player_id)
+    local target,material
+    for _,s in pairs(workers) do
+        if s.player_id==player_id and valid_entity(s.unit) and s.unit:IsAlive() and s.unit.survival_commerce_immortal then target=s.unit;break end
+    end
+    if not target then return {ok=false,error='伐木仙人未在场'} end
+    for _,s in pairs(workers) do
+        if s.player_id==player_id and s.unit~=target and valid_entity(s.unit) and s.unit:IsAlive()
+            and s.unit.survival_super_lumberjack and (s.unit:GetAbsOrigin()-target:GetAbsOrigin()):Length2D()<=1200 then material=s.unit;break end
+    end
+    if not material then return {ok=false,error='仙人附近1200范围内没有自己的超级伐木工'} end
+    local abilities={}
+    for _,definition in ipairs(personality_definitions.rows) do
+        if material:FindAbilityByName(definition.ability_name) or target:FindAbilityByName(definition.ability_name) then abilities[#abilities+1]=definition.ability_name end
+    end
+    return M.commit_lumberjack_fusion({target,material},target,{commerce_immortal=true,player_id=player_id,team=target:GetTeamNumber(),
+        level=math.max(target.survival_lumberjack_level or 1,material.survival_lumberjack_level or 1),
+        fusion_count=(target.survival_lumberjack_fusion_count or 1)+(material.survival_lumberjack_fusion_count or 1),
+        base_attack=(target.survival_attack_min or target.survival_base_attack or 0)+(material.survival_attack_min or material.survival_base_attack or 0),
+        wood_per_hit=(target.survival_base_wood_per_hit or 0)+(material.survival_base_wood_per_hit or 0),
+        attack_speed=math.max(target.survival_attack_speed or .67,material.survival_attack_speed or .67),
+        health=target:GetMaxHealth()+material:GetMaxHealth(),ability_names=abilities})
 end
 
 function M.rollback_fused_lumberjack(target)

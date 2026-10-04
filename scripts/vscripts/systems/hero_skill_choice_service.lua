@@ -9,6 +9,7 @@ local M = {}
 
 local pending_by_player = {}
 local sequence = 0
+local rerolls_by_player = {}
 local reward_retry_by_player = {}
 
 local function state(player_id)
@@ -56,6 +57,7 @@ local function project_pending(player_id)
         choice_token = pending.token,
         candidates = pending.candidates,
         source = pending.source,
+        rerolls = rerolls_by_player[player_id] or 0,
     }
 end
 
@@ -115,6 +117,7 @@ local function create_offer(player_id, source, trigger_level)
         token = token,
         candidates = draw.candidates,
         source = source or "rebirth_reward",
+        trigger_level = level,
     }
     publish(player_id)
     event_bus.emit(events.UI_NOTIFICATION, {
@@ -264,6 +267,16 @@ local function select_request(payload)
         return { ok = false, error = "skill_choice_token_invalid" }
     end
 
+    if payload.reroll==true then
+        if (rerolls_by_player[player_id] or 0)<1 then return {ok=false,error='skill_reroll_empty'} end
+        pending_by_player[player_id]=nil
+        local result=create_offer(player_id,pending.source,pending.trigger_level)
+        if result and result.ok then
+            rerolls_by_player[player_id]=rerolls_by_player[player_id]-1;publish(player_id)
+        else pending_by_player[player_id]=pending;publish(player_id) end
+        return result
+    end
+
     local skill_id = tostring(payload.skill_id or "")
     local found = false
     for _, candidate in ipairs(pending.candidates) do
@@ -321,6 +334,13 @@ local function create_request(payload)
 end
 
 function M.init()
+    rerolls_by_player={}
+    event_bus.subscribe('commerce.skill_learned',function(payload)
+        if require('systems/commerce_effects').owned(payload.player_id,'sky_seal') then
+            rerolls_by_player[payload.player_id]=(rerolls_by_player[payload.player_id] or 0)+1
+            publish(payload.player_id)
+        end
+    end)
     pending_by_player = {}
     sequence = 0
     reward_retry_by_player = {}

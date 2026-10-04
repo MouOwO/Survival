@@ -188,6 +188,8 @@ local function filter(_, keys)
             + gameplay_bonus
             - target_reduction)
         * boss_multiplier
+    if tostring(victim.survival_encounter_id or ''):match('^encounter_rebirth_')
+        and attacker.survival_hero_id and require('systems/commerce_effects').owned(attacker.survival_player_id,'sky_seal') then multiplier=multiplier*1.5 end
     if rogue_effect_state.has_effect(attacker.survival_player_id,
         "slowed_target_damage_taken_pct")
         and (victim.survival_is_wave_monster == true
@@ -333,9 +335,18 @@ local function filter(_, keys)
         keys.damage = math.min(keys.damage, 1e30)
     end
     if tree_damage_rules.is_tree(victim) then
+        if attacker.survival_commerce_immortal then keys.damage=keys.damage*2 end
         -- Resource trees advance at 1 HP; never pass a lethal/overflowing hit
         -- to native integer health, even if the protection modifier is missing.
         keys.damage = math.min(keys.damage, math.max(0, victim:GetHealth() - 1))
+    end
+    if victim.survival_building_id=='wall'
+        and require('systems/commerce_effects').owned(victim.survival_player_id,'barrier') then
+        keys.damage,victim.survival_commerce_shield=require('systems/commerce_effects').shield(
+            victim.survival_commerce_shield,keys.damage,victim:GetHealth(),victim:GetMaxHealth(),GameRules:GetGameTime())
+        local s=victim.survival_commerce_shield
+        if CustomNetTables then CustomNetTables:SetTableValue('survival_commerce_wall',tostring(victim:entindex()),
+            {player_id=victim.survival_player_id,remaining=s.remaining,expires=s.expires or 0,ready_at=s.ready_at or 0}) end
     end
     return true
 end

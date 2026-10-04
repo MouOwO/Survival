@@ -33,13 +33,25 @@ local function enabled_rows()
     return result
 end
 
-local function choose(requested_id)
+local function choose(requested_id, player_id)
     if requested_id and requested_id ~= "" and requested_id ~= "random" then
         local row = rewards.by_id[requested_id]
         if not row or row.enabled == false then return nil, "reward_id_invalid" end
         return row
     end
     local rows = enabled_rows()
+    if player_id~=nil and require('systems/commerce_effects').owned(player_id,'fishing_rod') then
+        local rare,ordinary,rare_weight,total_weight={},{},0,0
+        for _,row in ipairs(rows) do
+            local weight=number(row.weight);total_weight=total_weight+weight
+            if tostring(row.rarity):match('^S') or row.rarity=='UR' then rare[#rare+1]=row;rare_weight=rare_weight+weight
+            else ordinary[#ordinary+1]=row end
+        end
+        if rare_weight>0 and total_weight>0 then
+            local probability=math.min(1,2*rare_weight/total_weight)
+            rows=(probability>=1 or RandomFloat(0,1)<probability) and rare or ordinary
+        end
+    end
     local total = 0
     for _, row in ipairs(rows) do total = total + number(row.weight) end
     if total <= 0 then return nil, "reward_pool_empty" end
@@ -148,7 +160,7 @@ end
 function M.grant(player_id, reward_id)
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then return { ok = false, error = "player_id_invalid" } end
-    local row, error_code = choose(reward_id)
+    local row, error_code = choose(reward_id, player_id)
     if not row then return { ok = false, error = error_code } end
     local ok, value = apply_row(player_id, row)
     if not ok then return { ok = false, error = "reward_apply_failed", reward_id = row.reward_id } end

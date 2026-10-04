@@ -27,6 +27,7 @@ end
 function M.maximum(base_maximum, building_id, player_id)
     local base = tonumber(base_maximum) or 0
     if base <= 0 then return base end
+    if building_id=='gold_mine' and require('systems/commerce_effects').owned(player_id,'giant_mine') then return 1 end
     return base + M.bonus(player_id, building_id)
 end
 

@@ -705,6 +705,14 @@ local function start_building(payload)
         return check
     end
     local cost = check.definition.build_cost
+    local mine_slots=1
+    if check.definition.id=='gold_mine' and require('systems/commerce_effects').owned(check.player_id,'giant_mine') then
+        mine_slots=math.max(1,(tonumber(check.definition.max_count) or 1)+building_count_limits.bonus(check.player_id,'gold_mine'))
+        local definition={};for k,v in pairs(check.definition) do definition[k]=v end
+        definition.build_cost={wood=(cost.wood or 0)*mine_slots,gold=(cost.gold or 0)*mine_slots}
+        definition.population_cost=(tonumber(definition.population_cost) or 0)*mine_slots
+        check.definition=definition;cost=definition.build_cost
+    end
     local free_hero_altar = check.definition.id == "hero_altar"
         and rogue_effect_state.numeric(check.player_id,
             "builder_free_hero_altar") > 0
@@ -803,6 +811,10 @@ local function start_building(payload)
         y = state.definition.footprint.y,
     }
     unit.survival_route_level = 1
+    if mine_slots>1 then
+        unit.survival_commerce_mine_slots=mine_slots
+        unit.survival_display_name='巨大金矿（'..tostring(mine_slots)..'座收益）'
+    end
     unit.survival_population_occupied = state.population_occupied
     -- Transfer the accepted order to the real construction entity without
     -- publishing an empty allowance between the two ownership states.
@@ -820,6 +832,7 @@ local function start_building(payload)
     dev_wall_stats.apply(state)
     local maximum_health = unit:GetMaxHealth()
     local build_time = math.max(0.1, tonumber(check.definition.build_time) or 3)
+    if require('systems/commerce_effects').owned(check.player_id,'instant_build') then build_time=.01 end
     local started_at = GameRules:GetGameTime()
     unit:SetHealth(1)
     local construction_visual_state = construction_visual.start(

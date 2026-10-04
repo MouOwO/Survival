@@ -126,7 +126,7 @@ local function research_snapshot(player_id, source_entindex)
         research_target_level = pending.target_level or 0,
         started_at = pending.started_at or 0,
         finish_at = pending.finish_at or 0,
-        duration = TECHNOLOGY_RESEARCH_DURATION,
+        duration = pending.transaction_id and math.max(0,(pending.finish_at or 0)-(pending.started_at or 0)) or TECHNOLOGY_RESEARCH_DURATION,
         auto_enabled = next(enabled) and 1 or 0,
         auto_research = enabled,
         next_start_at = next_start_at or 0,
@@ -838,6 +838,7 @@ local function purchase(payload)
         lane.sequence = lane.sequence + 1
         local research_sequence = lane.sequence
         local current_state = state
+        local research_duration=require('systems/commerce_effects').owned(player_id,'time_technology') and 0 or TECHNOLOGY_RESEARCH_DURATION
         lane.pending = {
             transaction_id = started.transaction_id,
             player_id = player_id,
@@ -847,7 +848,7 @@ local function purchase(payload)
             target_level = started.new_level,
             sequence = research_sequence,
             started_at = game_time(),
-            finish_at = game_time() + TECHNOLOGY_RESEARCH_DURATION,
+            finish_at = game_time() + research_duration,
             icon_name = entry.icon or "",
             job_id = payload.research_job_id,
             manual = payload.research_queue_start == true,
@@ -857,7 +858,7 @@ local function purchase(payload)
         notify(player_id, "正在研究：" .. research_definition.display_name
             .. " Lv." .. tostring(started.new_level))
         push_snapshot(player_id, "technology_research_started")
-        scheduler.after(TECHNOLOGY_RESEARCH_DURATION, function()
+        scheduler.after(research_duration, function()
             if current_state ~= state then return end
             local pending = lane.pending
             if not pending or pending.sequence ~= research_sequence

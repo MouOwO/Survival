@@ -8,7 +8,7 @@ local function state(archive)
     return archive.online
 end
 
-function M.apply(command, archive, stats, apply_effects)
+function M.apply(command, archive, stats, apply_effects, save)
     local s = state(archive)
     if command.kind == "online_checkpoint" then
         local raw, weighted = tonumber(command.actual_seconds), tonumber(command.map_seconds)
@@ -24,7 +24,13 @@ function M.apply(command, archive, stats, apply_effects)
         local old_minutes = math.floor(s.actual_seconds / 60)
         s.actual_seconds = s.actual_seconds + elapsed
         s.map_seconds = s.map_seconds + map_elapsed
-        s.coins = s.coins + math.floor(s.actual_seconds / 60) - old_minutes
+        local earned=math.floor(s.actual_seconds / 60)-old_minutes
+        local extra=0
+        if require('systems/commerce_effects').has(save,'diary') then
+            local fifths=(tonumber(s.commerce_bonus_fifths) or 0)+earned
+            extra=math.floor(fifths/5);s.commerce_bonus_fifths=fifths%5
+        end
+        s.coins = s.coins + earned + extra
         s.cursors[command.session] = { actual_seconds = raw, map_seconds = weighted }
         for _, item in ipairs(levels.rows) do
             if item.enabled and item.level > s.map_level and s.map_seconds >= item.required_seconds then

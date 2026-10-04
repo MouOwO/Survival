@@ -37,6 +37,7 @@ local function register_choice_request()
                         payload.choice_token or ""
                     ),
                     skill_id = tostring(payload.skill_id or ""),
+                    reroll = payload.reroll == 1,
                 }
             ) or { ok = false, error = "handler_missing" }
             send(player_id, "ui_hero_skill_choice_result", result)

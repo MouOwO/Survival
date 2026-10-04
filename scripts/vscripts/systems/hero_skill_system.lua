@@ -383,6 +383,7 @@ local function grant_to_state(state, skill_id, levels)
         }
     end
     publish(state.player_id, "skill_granted")
+    if (tonumber(current) or 0)==0 then event_bus.emit('commerce.skill_learned',{player_id=state.player_id,skill_id=skill_id}) end
     return {
         ok = true,
         skill_id = skill_id,

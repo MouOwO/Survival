@@ -647,6 +647,34 @@ local function on_hero_combat_stats_changed(payload)
     end
 end
 
+function M.commerce_build(player_id,caster,position)
+    if not alive(caster) or tonumber(caster.survival_player_id)~=player_id
+        or not require('systems/commerce_effects').owned(player_id,'tower_seal') then return {ok=false,error='ultimate_not_owned'} end
+    if #player_ultimates(player_id)>=ultimate_limit() or fusion_in_progress[player_id] then return {ok=false,error='ultimate_tower_already_exists'} end
+    if (position-caster:GetAbsOrigin()):Length2D()>1200 then return {ok=false,error='建造位置超出1200范围'} end
+    local selected,cost={}, {wood=0,gold=0}
+    local building=require('config/buildings_config').arrow_tower
+    local health=tonumber(building.levels[1].health) or 1000
+    for _,class_id in ipairs(config().route_ids) do
+        local row=final_row(class_id)
+        for _,base in ipairs(require('config/generated/arrow_tower_base').rows) do
+            cost.wood=cost.wood+(tonumber(base.upgrade_wood) or 0);cost.gold=cost.gold+(tonumber(base.upgrade_gold) or 0)
+        end
+        for _,stage in ipairs(routes.get_route(class_id)) do
+            cost.wood=cost.wood+(tonumber(stage.upgrade_wood) or 0);cost.gold=cost.gold+(tonumber(stage.upgrade_gold) or 0)
+        end
+        selected[#selected+1]={max_health=health,health=health,armor=0,base_attack_damage=row.base_attack_damage,
+            attack_damage=row.base_attack_damage,definition=building,entindex=-#selected-1}
+    end
+    fusion_in_progress[player_id]=true
+    local state,err=prepare_ultimate(player_id,caster:GetTeamNumber(),selected,position,nil)
+    if not state then fusion_in_progress[player_id]=nil;return {ok=false,error=err} end
+    local spent=event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST,{player_id=player_id,team=caster:GetTeamNumber(),wood=cost.wood,gold=cost.gold,reason='commerce_ultimate'})
+    if not spent or not spent.ok then state.unit:RemoveSelf();fusion_in_progress[player_id]=nil;return spent or {ok=false,error='资源不足'} end
+    commit_ultimate(state);fusion_in_progress[player_id]=nil
+    return {ok=true,entindex=state.unit:entindex()}
+end
+
 function M.init()
     ultimate_by_player = {}
     state_by_entindex = {}

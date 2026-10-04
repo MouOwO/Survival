@@ -190,6 +190,7 @@ function modifier_tower_attack_effects:GetAttributes()
 end
 function modifier_tower_attack_effects:DeclareFunctions()
     return {
+        MODIFIER_EVENT_ON_TAKEDAMAGE,
         MODIFIER_EVENT_ON_ATTACK_START,
         MODIFIER_EVENT_ON_ATTACK,
         MODIFIER_EVENT_ON_ATTACK_FAIL,
@@ -203,6 +204,12 @@ function modifier_tower_attack_effects:DeclareFunctions()
         MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT,
         MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE,
     }
+end
+
+function modifier_tower_attack_effects:OnTakeDamage(params)
+    if not IsServer() or params.attacker~=self:GetParent() or (tonumber(params.damage) or 0)<=0 then return end
+    if not params.unit or params.unit:IsNull() or params.unit:GetTeamNumber()==self:GetParent():GetTeamNumber() then return end
+    event_bus.emit('commerce.tower_damage',{tower=self:GetParent(),target=params.unit,damage=params.damage})
 end
 
 function modifier_tower_attack_effects:GetModifierCannotMiss()
