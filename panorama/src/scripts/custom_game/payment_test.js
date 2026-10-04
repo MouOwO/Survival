@@ -12,6 +12,28 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     var channel="wechat";
     var entry = $("#PaymentEntry"), dialog = $("#PaymentDialog"), status = $("#PaymentStatus"), buy = $("#PaymentBuy");
     var scrim=$("#PaymentScrim"), inputShield=$("#PaymentInputShield");
+    var shell=null, shellShield=null;
+    function setText(id,value){var panel=$("#"+id);if(panel)panel.text=value;}
+    function prepareShell(){
+        var U=cfg.SurvivalUI,R=cfg.RemainingHandoff,header=$("#PaymentHeader");
+        // Shared HUD helpers may load after the payment controller during live editing.
+        if(shell || !U || !U.ModalShell || !R || !header)return;
+        shell=U.ModalShell.Adopt({id:"payment_shop",root:$.GetContextPanel(),panel:dialog,header:header,
+            titlePanel:$("#PaymentHeading"),closeButton:$("#PaymentClose"),scrim:scrim,
+            width:960,height:740,fit:{reference:[1672,941]},onClose:closeShop});
+        shellShield=dialog.Children().filter(function(p){return p.BHasClass("UIModalInputShield");}).slice(-1)[0];
+        if(dialog._rhFrame && dialog._rhFrame.IsValid())dialog._rhFrame.DeleteAsync(0);
+        header.Children().forEach(function(p){if(p.BHasClass("RHTitleOrnamentLeft") || p.BHasClass("RHTitleOrnamentRight"))p.DeleteAsync(0);});
+        R.Window(dialog,header,$("#PaymentClose"));
+        R.SizeWindow(dialog,960,740);R.Box(header,0,0,960,84);R.Box($("#PaymentClose"),894,22,38,38);
+        ["PaymentBack","PaymentBuy","PaymentRefresh","PaymentCancel"].forEach(function(id){R.Action($("#"+id),id==="PaymentBuy",[260,64]);});
+        ["PaymentQuantityMinus","PaymentQuantityPlus"].forEach(function(id){R.Action($("#"+id),false,[70,48]);});
+        ["PaymentWeChat","PaymentAlipay"].forEach(function(id){
+            var button=$("#"+id);if(button._paymentSkin)return;
+            R.Image(button,"shop_payment_normal","PaymentMethodBase");R.Image(button,"shop_payment_selected","PaymentMethodSelected");button._paymentSkin=true;
+        });
+        if(opened)shell.Open();else shell.Close();
+    }
     // A live JS reload can precede the updated XML resource in Workshop Tools.
     if(!inputShield){inputShield=$.CreatePanel("Button",dialog,"PaymentInputShield");inputShield.AddClass("PaymentInputShield");}
     // Match ModalShell's input boundary: blank window space consumes clicks,
@@ -86,8 +108,13 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     }
     function render() {
         if (disposed) return;
+        prepareShell();
         var p = current(), order = orders[selected];
         var active=order && !terminal(order.state), shownChannel=active?(order.provider||"wechat"):channel;
+        var hasOrder=!!order && order.state!=="closed",receipt=!!order && (order.state==="delivered" || order.state==="paid_review");
+        dialog.SetHasClass("HasOrder",hasOrder);dialog.SetHasClass("Receipt",receipt);
+        setText("PaymentHeading",receipt?"支付结果":hasOrder?"扫码支付":"订单确认");
+        setText("PaymentHint",hasOrder?"订单有效期 30 分钟 · 付款后自动核对到账":"每单 1 件 · 请核对商品、金额和全部奖励");
         ["wechat","alipay"].forEach(function(value){
             var button=$(value==="wechat"?"#PaymentWeChat":"#PaymentAlipay");
             button.enabled=!busy && !active && channelAvailable(value);
@@ -96,6 +123,9 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         var shown=order && order.state!=="closed" ? order : p;
         $("#PaymentTitle").text = shown ? shown.title : "正在加载商品";
         $("#PaymentDescription").text = shown ? shown.description||"" : "请先完成对局登录";
+        var art=$("#PaymentProductArt"),icon=shown && (shown.icon || (p && p.icon));
+        if(art){var validIcon=typeof icon==="string" && /^custom_game\/[A-Za-z0-9_\/-]+\.png$/.test(icon) && icon.indexOf("..")<0;
+            art.style.visibility=validIcon?"visible":"collapse";if(validIcon && art.SetImage)art.SetImage("file://{images}/"+icon);}
         $("#PaymentPrice").text = shown ? money(shown.amount_fen) : "";
         $("#PaymentValues").text = valuesText(shown,order);
         buy.enabled = !busy && !!p && !!p.enabled && (!order || order.state === "closed" || order.state==="delivered");
@@ -106,9 +136,15 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         $("#PaymentOpenLabel").text=shownChannel==="alipay" && order && order.checkout_mode!=="qr"?"打开支付宝收银台":"浏览器备用付款页";
         $("#PaymentCancel").style.visibility=active?"visible":"collapse";
         $("#PaymentCancel").enabled=!busy;
-        $("#PaymentLink").style.visibility = canOpen ? "visible" : "collapse";
+        $("#PaymentLink").style.visibility = "collapse";
         if (canOpen) $("#PaymentLink").text = order.checkout_url;
         var hasQR=drawQR(canOpen ? order.qr_matrix : null);
+        setText("PaymentQRChannel",(order && order.provider==="alipay"?"支付宝":"微信支付")+" · 每单 1 件");
+        var qrState=$("#PaymentQRState");if(qrState){
+            qrState.style.visibility=hasQR?"collapse":"visible";
+            qrState.text=order && order.expired?"付款码已过期\n请查询付款结果":order && order.provider==="alipay" && order.checkout_mode!=="qr"
+                ?"请点击下方\n打开支付宝收银台":"付款码暂未显示\n请查询付款结果";
+        }
         if (order) {
             var pendingText=hasQR?"用手机"+(shownChannel==="alipay"?"支付宝":"微信")+"扫描上方二维码。付款后自动发放并刷新存档。"
                 : shownChannel==="alipay" && order.checkout_mode!=="qr"?"此订单使用网页收银台，点击“打开支付宝收银台”付款。内置二维码需商户开通扫码支付。"
@@ -195,13 +231,15 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         render();
     }
     function setOpen(value) {
+        prepareShell();
         opened=value;
         if (dialog && (!dialog.IsValid || dialog.IsValid())) {
             dialog.hittest=value;dialog.hittestchildren=value;dialog.SetHasClass("Open",value);
         }
         if(scrim && (!scrim.IsValid || scrim.IsValid())){scrim.hittest=value;scrim.hittestchildren=false;scrim.SetHasClass("Open",value);}
         if(inputShield && (!inputShield.IsValid || inputShield.IsValid())){inputShield.hittest=value;inputShield.hittestchildren=false;}
-        if (cfg.SurvivalUILayers) {
+        if(shell){if(value)shell.Open();else shell.Close();}
+        else if (cfg.SurvivalUILayers) {
             if (value) cfg.SurvivalUILayers.Open("payment_shop",dialog,closeShop,{scrim:scrim,click:scrim});
             else cfg.SurvivalUILayers.Close("payment_shop");
         }
@@ -214,7 +252,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         ageSeconds:catalogReady?Math.floor((Date.now()-catalogCheckedAt)/1000):null};}
     cfg.SurvivalPayments={Open:openShop,GetCatalog:function(){return catalog;},RefreshCatalog:refreshCatalog,Inspect:inspectCache,
         Checkout:function(sku){selected=sku;setOpen(true);render();refreshCatalog();},
-        Dispose:function(){closeShop();disposed=true;subscriptions.forEach(function(id){GameEvents.Unsubscribe(id);});}};
+        Dispose:function(){closeShop();disposed=true;if(shell)shell.Dispose();if(shellShield && shellShield.IsValid())shellShield.DeleteAsync(0);subscriptions.forEach(function(id){GameEvents.Unsubscribe(id);});}};
     PaymentBuy=function(){
         var p=current(), order=orders[selected];
         if (!p || !p.enabled || busy || (order && order.state!=="closed" && order.state!=="created" && order.state!=="delivered")) return;
