@@ -1,0 +1,28 @@
+{
+  "status": "published",
+  "release": "20261004-commerce03",
+  "previous_release": "20260923-mode02",
+  "baseline_bundle": "959ea2e8bb13418c2dcac8733aa3b29c848b5561d6796be5ef29bd0b4e1c1463",
+  "archive_bundle": "59ceaff2a7a59b88620fe7a38504d605a73b814851549829ec998d61b232867a",
+  "products": 64,
+  "currency_ids": ["u_coin", "shop_points", "shop_gold"],
+  "initial_balances": 0,
+  "recharge_enabled": false,
+  "configuration_preserved": "Existing server stats defaults, lottery configuration and historical migration checksums retained. Added only commerce_catalog, commerce_products, commerce_rewards, commerce_settlement and worker dispatch.",
+  "migration": "target/202610040001_commerce_exchange.sql",
+  "backup": "/var/backups/goufayu-payment/game-and-payments-20261004T080358Z.dump",
+  "checks": {
+    "release_manifest": "passed",
+    "migration_dry_run": "passed; transaction rolled back",
+    "database_function_privileges": "preserved",
+    "postgres_lua_products": "64 passed under goufayu_app; fixtures rolled back",
+    "idempotent_debit_and_ownership_limits": "passed",
+    "existing_players_inventory_orders": "fingerprints unchanged during migration",
+    "api_health_and_archive_hash": "passed",
+    "live_http_catalog": "64 products; all prices and currencies match",
+    "zero_starting_balances": "verified",
+    "payment_service": "active",
+    "local_dota_visual_acceptance": "not verified; local Tools console unavailable"
+  },
+  "deployment_note": "Candidate 02 was never activated. Candidate 03 was assembled on the server from its live baseline to avoid publishing unrelated local config changes. Keep all deployed immutable bundles when preparing subsequent releases. Restart the game session to reload the client bundle hash."
+}
