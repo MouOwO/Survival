@@ -5,6 +5,10 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     if (cfg.SurvivalPayments && cfg.SurvivalPayments.Dispose) cfg.SurvivalPayments.Dispose();
     var products = [], selected = "", orders = {}, busy = false, opened = false, generation = 0, lastMatrix = "", ticks = 0;
     var gameValues={}, gameEntitlements={}, wallet={}, matchFrozen=false, catalog={products:[],categories:[]};
+    // Cache only this HUD/session's authoritative snapshot, never another account's data.
+    var catalogReady=false, catalogCheckedAt=0, catalogRetryAt=0, catalogDirty=false, listRevision="";
+    var activeRequest=null, requestSerial=0, catalogRequests=0, requestEpoch=String(Date.now())+"_"+String(Math.random()).slice(2);
+    var CATALOG_TTL_MS=20000;
     var channel="wechat";
     var entry = $("#PaymentEntry"), dialog = $("#PaymentDialog"), status = $("#PaymentStatus"), buy = $("#PaymentBuy");
     var scrim=$("#PaymentScrim"), inputShield=$("#PaymentInputShield");
@@ -126,21 +130,47 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     function request(action, sku) {
         if (disposed || busy) return false;
         busy = true; render();
-        var ticket = ++generation, body = {action:action};
+        var ticket = ++generation, body = {action:action,request_id:requestEpoch+"_"+(++requestSerial)};
+        activeRequest=body;
         if (sku) body.sku = sku;
         if(action==="create")body.provider=channel;
+        if(action==="catalog")catalogRequests++;
         GameEvents.SendCustomGameEventToServer("survival_payment_request", body);
         $.Schedule(32, function() {
-            if (!disposed && ticket === generation && busy) { busy=false; render(); status.text="请求超时，请查询结果后重试。"; }
+            if (!disposed && ticket === generation && busy) {
+                busy=false;activeRequest=null;render();status.text="请求超时，请查询结果后重试。";
+                if(action==="catalog")catalogFailed("商品同步超时，稍后自动重试。");
+            }
         });
         return true;
     }
-    function refreshCatalog() { if (!disposed && !busy) request("catalog"); }
+    function refreshCatalog(force) {
+        if(disposed)return false;
+        if(force===true){catalogDirty=true;catalogRetryAt=0;}
+        if(busy || Date.now()<catalogRetryAt)return false;
+        if(!catalogDirty && catalogReady && Date.now()-catalogCheckedAt<CATALOG_TTL_MS)return false;
+        return request("catalog");
+    }
+    function catalogFailed(message, retry) {
+        catalogRetryAt=Date.now()+(retry===false?CATALOG_TTL_MS:3000);
+        if(cfg.SurvivalCommerceView && cfg.SurvivalCommerceView.SetNotice)
+            cfg.SurvivalCommerceView.SetNotice((catalogReady?"已保留商品列表。":"")+message);
+        if(retry!==false)$.Schedule(3.1,function(){if(!disposed && (shopVisible() || !catalogReady))refreshCatalog();});
+    }
+    function invalidateCatalog() { catalogDirty=true;catalogRetryAt=0; }
+    function shopVisible() {
+        return opened || !!(cfg.SurvivalCommerceView && cfg.SurvivalCommerceView.IsOpen && cfg.SurvivalCommerceView.IsOpen());
+    }
     function buildList(data) {
         catalog=data;
+        catalogReady=true;catalogCheckedAt=Date.now();catalogRetryAt=0;catalogDirty=false;
         if(channel==="alipay" && !channelAvailable("alipay"))channel="wechat";
+        var oldProducts=products;
         products = rows(data.products).filter(function(p) {
             return p && typeof p.sku === "string" && Number(p.amount_fen)>0 && Number(p.amount_fen)<=1000000 && Number(p.amount_fen)%1===0;
+        }).map(function(p){
+            // Panel handles must never be attached to the shared data snapshot.
+            var copy={};Object.keys(p).forEach(function(key){copy[key]=p[key];});return copy;
         });
         // Catalog edits cannot strand a checkout that was already created.
         Object.keys(orders).forEach(function(sku){
@@ -148,14 +178,18 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
             if((!terminal(order.state) || order.state==="paid_review") && !products.some(function(p){return p.sku===sku;}))
                 products.push({sku:sku,title:order.title,description:order.description,amount_fen:order.amount_fen,enabled:false,owned:0});
         });
-        var list = $("#PaymentProducts"); list.RemoveAndDeleteChildren();
-        products.forEach(function(p, index) {
+        var nextRevision=JSON.stringify(products.map(function(p){return [p.sku,p.title];}));
+        if(nextRevision!==listRevision){
+          listRevision=nextRevision;
+          var list = $("#PaymentProducts"); list.RemoveAndDeleteChildren();
+          products.forEach(function(p, index) {
             var card=$.CreatePanel("Button",list,""); card.AddClass("PaymentProduct"); p.panel=card;
             var number=$.CreatePanel("Label",card,""); number.AddClass("PaymentProductNumber"); number.text="0"+(index+1);
             var title=$.CreatePanel("Label",card,""); title.AddClass("PaymentProductTitle"); title.text=p.title;
             var price=$.CreatePanel("Label",card,""); price.AddClass("PaymentProductOwned"); p.ownedLabel=price;
             card.SetPanelEvent("onactivate",function(){selected=p.sku; render();});
-        });
+          });
+        }else products.forEach(function(p,index){p.panel=oldProducts[index].panel;p.ownedLabel=oldProducts[index].ownedLabel;});
         if (!current()) selected = products.length ? products[0].sku : "";
         if(cfg.SurvivalCommerceView)cfg.SurvivalCommerceView.UpdateCatalog(catalog);
         render();
@@ -176,7 +210,9 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     PaymentToggle=function(){setOpen(!opened);if(opened)refreshCatalog();};
     function openShop() { closeShop();if(cfg.SurvivalCommerceView)cfg.SurvivalCommerceView.Open();else {setOpen(true);refreshCatalog();} }
     PaymentShop=openShop;
-    cfg.SurvivalPayments={Open:openShop,GetCatalog:function(){return catalog;},RefreshCatalog:refreshCatalog,
+    function inspectCache(){return {ready:catalogReady,dirty:catalogDirty,pending:activeRequest?activeRequest.action:"",catalogRequests:catalogRequests,
+        ageSeconds:catalogReady?Math.floor((Date.now()-catalogCheckedAt)/1000):null};}
+    cfg.SurvivalPayments={Open:openShop,GetCatalog:function(){return catalog;},RefreshCatalog:refreshCatalog,Inspect:inspectCache,
         Checkout:function(sku){selected=sku;setOpen(true);render();refreshCatalog();},
         Dispose:function(){closeShop();disposed=true;subscriptions.forEach(function(id){GameEvents.Unsubscribe(id);});}};
     PaymentBuy=function(){
@@ -188,7 +224,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     PaymentChannel=function(value){var order=orders[selected];if(busy || (order && !terminal(order.state)))return;if((value==="wechat" || value==="alipay") && channelAvailable(value)){channel=value;render();}};
     PaymentCancel=function(){var order=orders[selected];if(order && !terminal(order.state) && request("cancel",selected))status.text="正在核对并关闭订单，请稍候…";};
     PaymentOpen=function(){var order=orders[selected];if(order && order.state==="pending" && !order.expired && validURL(order.checkout_url))$.DispatchEvent("ExternalBrowserGoToURL",order.checkout_url);};
-    PaymentRefresh=function(){request(orders[selected]?"status":"catalog",orders[selected]?selected:null);};
+    PaymentRefresh=function(){if(orders[selected])request("status",selected);else refreshCatalog(true);};
     var messages={test_account_required:"商城当前仅对指定测试账号开放。",already_owned:"你已经拥有此商品。",
         payment_channel_unavailable:"此支付方式尚未开放，请选择已开放的方式。",
         "ACQ.ACCESS_FORBIDDEN":"支付宝扫码支付权限尚未开通，请联系商户开通后再试。",
@@ -202,24 +238,40 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         product_unavailable:"此商品暂不可购买，请刷新列表。",order_not_in_session:"请重新点击购买，服务器会恢复已有订单。",
         test_reset_disabled:"测试清理功能未开启。",pending_payment_unresolved:"尚有订单需要核对，请再次输入清理命令重试。"};
     subscriptions.push(GameEvents.Subscribe("survival_payment_result",function(data) {
-        busy=false; generation++;
+        if(disposed)return;
+        // A late response cannot unlock or replace a newer request (including after a HUD reload).
+        if(data.request_id && (!activeRequest || data.request_id!==activeRequest.request_id))return;
+        if(activeRequest && data.action===activeRequest.action){busy=false;activeRequest=null;generation++;}
         if (!data.ok) {
             render(); if(data.error==="test_account_required")entry.style.visibility="collapse";
             status.text=messages[data.error]||"暂时无法完成请求，请稍后重试。";
-            if(data.action==="catalog" && cfg.SurvivalCommerceView)cfg.SurvivalCommerceView.UpdateCatalog({products:[],categories:[],error:status.text});
+            if(data.action==="catalog"){
+                var failure=status.text;
+                // Access/session loss invalidates the snapshot. Transient busy/network errors do not.
+                if(["test_account_required","match_session_missing","profile_not_ready","unauthorized"].indexOf(data.error)>=0){
+                    catalogReady=false;catalogDirty=false;catalog={products:[],categories:[],error:failure};products=[];listRevision="";
+                    orders={};lastMatrix="";
+                    $("#PaymentProducts").RemoveAndDeleteChildren();
+                    if(cfg.SurvivalCommerceView)cfg.SurvivalCommerceView.UpdateCatalog(catalog);
+                    render();
+                }
+                status.text=failure;
+                catalogFailed(failure,data.error!=="test_account_required" && data.error!=="unauthorized");
+            }
             return;
         }
         entry.style.visibility="visible";
         gameValues=data.game_values||gameValues; wallet=data.wallet||wallet; matchFrozen=!!data.match_frozen;
         gameEntitlements=data.game_entitlements||gameEntitlements;
         if (data.action==="reset") {
-            orders={}; lastMatrix=""; render(); status.text="远端测试数据已清理，正在更新商品列表。";
+            invalidateCatalog();orders={}; lastMatrix=""; render(); status.text="远端测试数据已清理，正在更新商品列表。";
             $.Schedule(1.1,refreshCatalog); return;
         }
         if (data.action==="catalog") { buildList(data); return; }
         var previous=orders[data.sku];
         if (!previous || previous.order_id!==data.order_id || !terminal(previous.state) || terminal(data.state)) orders[data.sku]=data;
         if (data.state==="delivered") {
+            invalidateCatalog();
             products.forEach(function(p){if(p.sku===data.sku){p.owned=1;p.enabled=false;}});
             $.Schedule(1.1,refreshCatalog);
         }
@@ -229,7 +281,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     subscriptions.push(GameEvents.Subscribe("survival_payment_open",openShop));
     // Read-only UI diagnostics: no prices, account identity, checkout tokens or grants.
     if(typeof Game!=="undefined" && Game.AddCommand)Game.AddCommand("survival_shop_open",function(){
-        openShop();$.Msg("PAYMENT_UI_DIAG:"+JSON.stringify({checkout:opened,products:products.length,
+        openShop();$.Msg("PAYMENT_UI_DIAG:"+JSON.stringify({checkout:opened,products:products.length,cache:inspectCache(),
             store:cfg.SurvivalCommerceView?cfg.SurvivalCommerceView.Inspect():null}));
     },"Open the authenticated shop UI without creating an order",0);
     function tick() {
@@ -238,7 +290,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         if (!busy) {
             var order=orders[selected];
             if (opened && order && !terminal(order.state)) request("status",selected);
-            else if (ticks===1 || ticks%4===0) refreshCatalog();
+            else if (ticks===1 || catalogDirty || shopVisible()) refreshCatalog();
         }
         $.Schedule(5,tick);
     }

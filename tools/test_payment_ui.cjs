@@ -23,7 +23,7 @@ assert.equal($("#PaymentPrice").text,"¥50.00");
 assert.match($("#PaymentValues").text,/80 → 180/);assert.match($("#PaymentValues").text,/110000000/);
 scope.PaymentBuy();scope.PaymentBuy();
 assert.equal(requests.filter(x=>x.action==="create").length,1);
-assert.deepEqual(Object.keys(requests[1]).sort(),["action","provider","sku"]);
+assert.deepEqual(Object.keys(requests[1]).sort(),["action","provider","request_id","sku"]);
 assert.equal(requests[1].provider,"wechat");
 assert.equal(requests[1].sku,"wood_100_test_50_v3");
 const order={ok:true,action:"create",sku:"wood_100_test_50_v3",title:"初始木材 +100",amount_fen:5000,state:"pending",order_id:"WX"+"1".repeat(30),

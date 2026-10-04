@@ -69,8 +69,10 @@
     function update(data) {
         catalog=data||{products:[],categories:[]};
         // Keep hovered cards stable when only numeric previews have changed.
-        var next=JSON.stringify({categories:catalog.categories,error:catalog.error,hash:catalog.catalog_hash,products:rows(catalog.products).map(function(p){return [p.sku,p.enabled,p.owned,p.amount_fen,p.disabled_reason];})});
+        var next=JSON.stringify({categories:catalog.categories,hash:catalog.catalog_hash,products:rows(catalog.products).map(function(p){return [p.sku,p.enabled,p.owned,p.amount_fen,p.disabled_reason,p.title,p.description,p.category_id,p.product_type,p.icon,p.reward_lines];})});
         if(next!==revision){revision=next;render();}
+        // Updating a connection notice must not destroy hovered cards or clear products.
+        notice.text=catalog.error?catalog.error:rows(catalog.categories).length?(catalog.alipay?"微信 / 支付宝":"微信支付")+" · 付款前请核对商品和全部奖励":"正在加载商品，请先完成对局登录。";
         if(ticketRequest){
             ticketRequest=false;
             var item=singleTicket();
@@ -78,8 +80,9 @@
         }
     }
     cfg.SurvivalCommerceView={
-        Open:function(){if(disposed)return;opened=true;if(cfg.SurvivalPayments && cfg.SurvivalPayments.GetCatalog)update(cfg.SurvivalPayments.GetCatalog());render();store.shell.Open();if(cfg.SurvivalPayments && cfg.SurvivalPayments.RefreshCatalog)cfg.SurvivalPayments.RefreshCatalog();},
-        Close:close,UpdateCatalog:update,
+        Open:function(){if(disposed)return;opened=true;if(cfg.SurvivalPayments && cfg.SurvivalPayments.GetCatalog)update(cfg.SurvivalPayments.GetCatalog());store.shell.Open();if(cfg.SurvivalPayments && cfg.SurvivalPayments.RefreshCatalog)cfg.SurvivalPayments.RefreshCatalog();},
+        Close:close,UpdateCatalog:update,IsOpen:function(){return opened;},
+        SetNotice:function(message){if(!disposed)notice.text=message;},
         OpenTicketPurchase:function(pool){
             if(pool && typeof pool==="object")pool=pool.id;
             var payments=cfg.SurvivalPayments;

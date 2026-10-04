@@ -6,6 +6,7 @@ local bus = require("core/event_bus")
 local events = require("core/events")
 local M = {}
 local busy, last, orders, refreshed, resets = {}, {}, {}, {}, {}
+local catalogs = {}
 local serial, initialized = 0, false
 -- Catalog membership and all prices/rewards are checked by the payment server.
 local function valid_sku(sku)
@@ -44,23 +45,40 @@ local function notify(id, message, level)
     bus.emit(events.UI_NOTIFICATION, {player_id=id, message=message, level=level or "info"})
 end
 local function session_id() return require("systems/match_setup_service").get_session_id() end
-local function request(id, action, sku, kind, channel)
+local function request(id, action, sku, kind, channel, request_id)
     if not id or id ~= math.floor(id) or not PlayerResource:IsValidPlayerID(id)
         or PlayerResource:IsFakeClient(id) then return false, "player_id_invalid" end
-    if busy[id] then send(id,{ok=false,action=action,error="payment_busy"}); return false,"payment_busy" end
+    local function reply(result, correlation)
+        local copy={};for key,value in pairs(result) do copy[key]=value end
+        copy.request_id=correlation or request_id
+        send(id,copy)
+    end
     local now = Time()
     local rate_key = tostring(id)..":"..action
-    if now-(last[rate_key] or -100)<1 then
-        send(id,{ok=false,action=action,error="payment_busy"}); return false,"payment_busy"
-    end
     local provider = profiles.get_provider()
     local account = provider and provider.resolve_account_id(id)
     if not account or not profiles.get_profile(id) then
-        send(id,{ok=false,action=action,error="profile_not_ready"}); return false,"profile_not_ready"
+        catalogs[id]=nil
+        reply({ok=false,action=action,error="profile_not_ready"}); return false,"profile_not_ready"
     end
     local token = tostring(Convars:GetStr("survival_fishing_api_token") or "")
-    if token=="" then send(id,{ok=false,action=action,error="payment_not_configured"}); return false,"payment_not_configured" end
+    if token=="" then reply({ok=false,action=action,error="payment_not_configured"}); return false,"payment_not_configured" end
     local session = session_id()
+    local cached=catalogs[id]
+    if cached and (cached.account~=account or cached.session~=session) then catalogs[id]=nil;cached=nil end
+    local pending=busy[id]
+    if pending and (pending.account~=account or pending.session~=session) then busy[id]=nil;pending=nil end
+    if action=="catalog" and pending and pending.action=="catalog" then
+        -- A reopened/reloaded HUD shares the existing read, not another HTTP request.
+        local key=request_id or ""
+        for _,waiter in ipairs(pending.waiters) do if waiter==key then return true end end
+        if #pending.waiters<8 then pending.waiters[#pending.waiters+1]=key;return true end
+    end
+    if pending then reply({ok=false,action=action,error="payment_busy"});return false,"payment_busy" end
+    if action=="catalog" and cached and now-cached.at<2 then reply(cached.result);return true end
+    if now-(last[rate_key] or -100)<1 then
+        reply({ok=false,action=action,error="payment_busy"}); return false,"payment_busy"
+    end
     local body = {account_id=account,match_session_id=session}
     if action=="create" then
         body.sku=sku
@@ -69,7 +87,7 @@ local function request(id, action, sku, kind, channel)
     if action=="status" or action=="cancel" then
         local order=orders[id] and orders[id][sku]
         if not order or order.account~=account or order.session~=session then
-            send(id,{ok=false,action=action,error="order_not_in_session",sku=sku}); return false,"order_not_in_session"
+            reply({ok=false,action=action,error="order_not_in_session",sku=sku}); return false,"order_not_in_session"
         end
         body.order_id=order.order_id
     end
@@ -85,21 +103,30 @@ local function request(id, action, sku, kind, channel)
         body.kind=kind; body.request_id=resets[id].request_id
     end
     local http=CreateHTTPRequestScriptVM("POST","https://pay.xiaofengnet.com/v1/payments/"..action)
-    if not http then send(id,{ok=false,action=action,error="payment_unavailable"});return false,"payment_unavailable" end
-    busy[id]=true; last[rate_key]=now
+    if not http then reply({ok=false,action=action,error="payment_unavailable"});return false,"payment_unavailable" end
+    local job={account=account,session=session,action=action,waiters={request_id or ""}}
+    busy[id]=job; last[rate_key]=now
+    if action~="catalog" then catalogs[id]=nil end
     http:SetHTTPRequestHeaderValue("Authorization","Bearer "..token)
     http:SetHTTPRequestRawPostBody("application/json; charset=utf-8",encoder.encode(body))
     if http.SetHTTPRequestAbsoluteTimeoutMS then http:SetHTTPRequestAbsoluteTimeoutMS(30000) end
     http:Send(function(response)
+        if busy[id]~=job then return end
         busy[id]=nil
         if provider.resolve_account_id(id)~=account or session_id()~=session then return end
         local parsed,result=pcall(decoder.decode,tostring(response and response.Body or ""))
         if not parsed or type(result)~="table" then result={ok=false,error="payment_unavailable"} end
         if tonumber(response and response.StatusCode)~=200 then result.ok=false end
         result.action=action; result.sku=result.sku or sku
+        if action=="catalog" then
+            if result.ok then catalogs[id]={account=account,session=session,at=Time(),result=result} end
+            for _,waiter in ipairs(job.waiters) do reply(result,waiter~="" and waiter or nil) end
+            return
+        end
+        catalogs[id]=nil
         if not result.ok then
             if action=="reset" then notify(id,"清理尚未完成，请稍后再次输入同一命令重试。未确认的付款会先核对并关闭。","error") end
-            send(id,result); return
+            reply(result); return
         end
         if type(result.order_id)=="string" and valid_sku(result.sku) then
             orders[id]=orders[id] or {}
@@ -114,12 +141,13 @@ local function request(id, action, sku, kind, channel)
                     notify(id,kind=="refreshdata" and "测试存档已恢复新号初始状态，远端已更新。已生成的本局单位需重开对局。"
                         or "购买内容及对应属性已清理，远端已更新，可以重新购买。")
                 else refreshed[result.order_id]=true end
-                send(id,result)
-            end,function() send(id,{ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku}) end)
-            if not loading.ok then send(id,{ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku}) end
+                catalogs[id]=nil
+                if provider.resolve_account_id(id)==account and session_id()==session then reply(result) end
+            end,function() reply({ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku}) end)
+            if not loading.ok then reply({ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku}) end
             return
         end
-        send(id,result)
+        reply(result)
     end)
     return true
 end
@@ -127,14 +155,17 @@ function M.handle(payload)
     local action=tostring(payload.action or "")
     if action~="catalog" and action~="create" and action~="status" and action~="cancel" then return end
     local sku=tostring(payload.sku or "")
+    -- Correlation is echoed only to this player; never forwarded as an identity or payment field.
+    local request_id=payload.request_id
+    if type(request_id)~="string" or #request_id>96 or not request_id:match("^[a-zA-Z0-9_%-]+$") then request_id=nil end
     if action~="catalog" and not valid_sku(sku) then
-        send(tonumber(payload.PlayerID),{ok=false,action=action,error="product_unavailable"});return
+        send(tonumber(payload.PlayerID),{ok=false,action=action,error="product_unavailable",request_id=request_id});return
     end
     local channel=payload.provider
     if action=="create" and channel~=nil and channel~="wechat" and channel~="alipay" then
-        send(tonumber(payload.PlayerID),{ok=false,action=action,error="payment_channel_unavailable"});return
+        send(tonumber(payload.PlayerID),{ok=false,action=action,error="payment_channel_unavailable",request_id=request_id});return
     end
-    return request(tonumber(payload.PlayerID),action,sku,nil,channel)
+    return request(tonumber(payload.PlayerID),action,sku,nil,channel,request_id)
 end
 function M.reset_player(context, kind)
     -- TODO(PAYMENT_TEST_ONLY): remove chat reset entry points before public release.

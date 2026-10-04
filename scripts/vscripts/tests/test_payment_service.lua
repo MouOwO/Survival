@@ -86,3 +86,49 @@ requests[9].done({StatusCode=200,Body='{"ok":true,"sku":"ticket_test","order_id"
 handle(0,{PlayerID=0,action='create',sku='ticket_test',provider='attacker'})
 assert(#requests==9,'unknown payment providers must be rejected')
 print('PAYMENT_GAME_SERVICE_PASS: trusted identity, fixed fields, duplicate requests, authoritative refresh')
+
+-- Reopening and HUD hot reloads must share the same authenticated read.
+Time=function()return clock end
+clock=1000
+local first=#requests+1
+handle(0,{PlayerID=0,action='catalog',request_id='hud_a_1'})
+handle(0,{PlayerID=0,action='catalog',request_id='hud_b_1'})
+assert(#requests==first,'in-flight catalog requests must coalesce')
+body=require('core/json_decoder').decode(requests[first].body)
+assert(body.account_id=='123' and body.request_id==nil,'UI correlation must not become a payment identity')
+requests[first].done({StatusCode=200,Body='{"ok":true,"catalog_hash":"v1","categories":[],"products":[{"sku":"wood_test","owned":0,"enabled":true}]}'})
+assert(sent[#sent-1].request_id=='hud_a_1' and sent[#sent].request_id=='hud_b_1','each waiting HUD must receive its own result')
+handle(0,{PlayerID=0,action='catalog',request_id='hud_b_2'})
+assert(#requests==first and sent[#sent].ok and sent[#sent].request_id=='hud_b_2','rapid reopen must return cached success instead of busy')
+clock=clock+3
+handle(0,{PlayerID=0,action='catalog',request_id='hud_b_3'})
+assert(#requests==first+1,'expired cache must check remote player state')
+requests[#requests].done({StatusCode=200,Body='{"ok":true,"catalog_hash":"v1","products":[{"sku":"wood_test","owned":1,"enabled":false}]}'})
+assert(sent[#sent].products[1].owned==1,'same catalog hash cannot hide ownership changes')
+handle(0,{PlayerID=1,action='catalog',request_id='player_2'})
+assert(#requests==first+2,'another player must not receive the first player cache')
+assert(require('core/json_decoder').decode(requests[#requests].body).account_id=='456')
+requests[#requests].done({StatusCode=503,Body='{"ok":false,"error":"payment_unavailable"}'})
+assert(not sent[#sent].ok and sent[#sent].request_id=='player_2')
+handle(0,{PlayerID=0,action='create',sku='wood_test',request_id='purchase_1'})
+requests[#requests].done({StatusCode=200,Body='{"ok":true,"sku":"wood_test","state":"pending"}'})
+clock=clock+1.1
+local before=#requests
+handle(0,{PlayerID=0,action='catalog',request_id='after_purchase'})
+assert(#requests==before+1,'payment actions invalidate the short catalog cache')
+requests[#requests].done({StatusCode=200,Body='{"ok":true,"catalog_hash":"v2","products":[]}'})
+clock=clock+1.1
+package.loaded['systems/match_setup_service'].get_session_id=function()return 'new_session' end
+before=#requests
+handle(0,{PlayerID=0,action='catalog',request_id='next_session'})
+assert(#requests==before+1,'a new session must not reuse the previous session cache')
+local oldRequest=requests[#requests]
+package.loaded['systems/match_setup_service'].get_session_id=function()return 'third_session' end
+clock=clock+2
+handle(0,{PlayerID=0,action='catalog',request_id='third_session'})
+local replies=#sent
+oldRequest.done({StatusCode=200,Body='{"ok":true,"catalog_hash":"old","products":[]}'})
+assert(#sent==replies,'late result from another session must not release or overwrite the new request')
+requests[#requests].done({StatusCode=200,Body='{"ok":true,"catalog_hash":"new","products":[]}'})
+assert(sent[#sent].request_id=='third_session' and sent[#sent].catalog_hash=='new')
+print('PAYMENT_CATALOG_SERVICE_PASS: coalescing, rate-limit cache, expiry, identity/session isolation, correlation, ownership refresh')
