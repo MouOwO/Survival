@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-05",
+  "branch": "dev",
+  "baseline": "300174f1fd1e4babffed45374a7ace69a4c92bc2",
+  "input": "SERVER: dota_base_game_mode([552]) thinking for 11.89 ms, native_hide delayed_2/3, research armor zero-reduction diagnostic and final attack damage diagnostics",
+  "findings": [
+    "The engine warning measures the whole game-mode Think callback. Neighboring log messages do not identify its most expensive task.",
+    "Scheduler scans every pending task each 50 ms, including future deadlines. Indexed deadline heap now examines only the earliest deadline and due tasks, with immediate removal for cancelled/replaced IDs.",
+    "Hero native wearable enumeration called both batch and iterator APIs. Batch success now returns directly, while missing/failed batch API retains the iterator fallback.",
+    "Every hero armor-reduction attack requested a full permanent-effect snapshot, copying unrelated attributes and computing shared projections. An explicit armor-only request now reads exactly three latest values without an event cache.",
+    "Multiple attacks on one target scheduled redundant UNIT_COMBAT_STATS_CHANGED publications. A stable per-target ID now publishes the latest result once per scheduler batch; every armor hit still applies immediately.",
+    "Several detailed logs ignored the existing runtime_detailed_diagnostics=0 flag. These logs, diagnostic field allocations/model reads and native armor reads are now guarded. Failure logs and damage numbers remain."
+  ],
+  "offline_measurements": {
+    "scheduler": {
+      "pending_future_tasks": 1000,
+      "idle_ticks": 200,
+      "before_entries_visited": 200000,
+      "after_entries_visited": 0,
+      "callbacks_at_deadline_before_and_after": 1000,
+      "timed_idle_ticks": 10000,
+      "before_cpu_ms": 268,
+      "after_cpu_ms": 1,
+      "warning": "Informational local Lua CPU simulation, not native Think duration or FPS. The scheduler scan reduction alone does not explain a native 11.89 ms spike."
+    },
+    "armor_snapshots": {
+      "requests": 100,
+      "unrelated_attributes": 2000,
+      "full_snapshot_entries_visited": 200500,
+      "armor_only_entries_visited": 0,
+      "current_values_and_isolation_verified": true
+    },
+    "armor_ui": {
+      "hits_applied_immediately": 50,
+      "pending_ui_tasks": 1,
+      "ui_publications": 1,
+      "exact_latest_reduction": 50
+    },
+    "quiet_gameplay": {
+      "armor_hits_unchanged": 100,
+      "native_diagnostic_armor_queries": 0,
+      "damage_number": 479,
+      "critical_dedup_and_debug_equivalence_verified": true,
+      "failure_native_armor_details_retained": true
+    }
+  },
+  "profiler": {
+    "command": "survival_perf_capture 15",
+    "stop_command": "survival_perf_capture stop",
+    "scope": "Server Workshop Tools only; scheduler tasks only. CPU ms via os.clock when available, otherwise engine Time; not the full engine frame.",
+    "default": "inactive, zero clock reads, no statistics table allocation",
+    "limit": "1-30 seconds, at most 129 aggregate rows and top 20 printed rows, no additional recurring thinker",
+    "window_clock": "engine Time if available; os.clock fallback uses CPU-time seconds rather than wall-clock seconds"
+  },
+  "validation": [
+    "test_deadline_scheduler.lua: 8000 mixed operations, bounded 10000 replacements, zero idle scans/clocks, deadline ordering, snapshot batches, cancellation/error continuation, explicit reschedule and clear/init reentry",
+    "test_scheduler_profile.lua: server/tools gates, timed/manual stop, bounded rows/output, measured CPU and error reporting",
+    "test_scheduler_replacement.lua: existing user scheduler invariants remain",
+    "test_attack_hot_path.lua: full/narrow values, authority isolation, fresh updates, 100-hit dedup, no native diagnostic reads, 50 immediate effects/one UI publication, quiet/debug critical damage numbers",
+    "test_pure_permanent_rewards.lua, test_custom_monster_armor.lua, test_hero_weapon_cosmetics.lua, test_hero_cosmetic_mirror.lua, test_visual_feedback_repairs.lua, test_wave_population_endgame.lua, test_combat_performance_capture.lua, test_weapon_synthesis_hot_path.lua, test_hero_growth_hot_path.lua"
+  ],
+  "live": {
+    "game_process_running": true,
+    "console_attempt": "127.0.0.1:29000 ECONNREFUSED; no Dota/VConsole TCP listener found",
+    "game_restarted_or_paused": false,
+    "live_scheduler_reloaded": false,
+    "native_warning_absence_or_fps_verified": false,
+    "next_step": "Reload the addon/map and, if spikes remain, use survival_perf_capture 15 to collect the top scheduler callback CPU costs."
+  },
+  "git": {
+    "sync_order": "stash -> pull -> exact pop -> review/tests -> commit -> push",
+    "stash_oid": "589b9ab62142806b7264e61494848d540fa80232",
+    "pull": "Already up to date",
+    "original_files": 468,
+    "overlap": "Existing scheduler replacement/cancellation/reentry fixes are required and retained in the new scheduler. Hero appearance mirror/weapon changes remain uncommitted; only performance/logging hunks are staged for that file. All other original edits/untracked files preserved."
+  },
+  "index_only_validation": {
+    "tests": 9,
+    "result": "PASS",
+    "isolation": "HEAD Lua tree plus exact staged task files; does not depend on unrelated user additions"
+  }
+}

@@ -6,6 +6,9 @@ _G.modifier_research_armor_reduction = modifier_research_armor_reduction
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
+local diagnostic_rule = require("config/generated/global_rules").by_id.runtime_detailed_diagnostics
+local detailed_diagnostics = diagnostic_rule and diagnostic_rule.enabled ~= false
+    and tonumber(diagnostic_rule.value) == 1
 local armor_balance = require("config/armor_balance")
 local M = modifier_research_technology
 
@@ -93,7 +96,7 @@ local function publish_armor_changed(modifier, diagnostic)
     -- frame so the selected-unit UI reads the resolved effective armor.
     scheduler.after(0, function()
         if not parent or parent:IsNull() then return end
-        if diagnostic and ARMOR_DIAGNOSTIC_MILESTONES[diagnostic.hit] then
+        if detailed_diagnostics and diagnostic and ARMOR_DIAGNOSTIC_MILESTONES[diagnostic.hit] then
             local armor_after = custom_war3
                 and tonumber(parent.survival_effective_war3_armor)
                 or tonumber(parent:GetPhysicalArmorValue(false))
@@ -124,7 +127,7 @@ local function publish_armor_changed(modifier, diagnostic)
             reason = "research_armor_reduction",
             research_armor_reduction = reduction,
         })
-    end)
+    end, "research_armor_ui_" .. tostring(entindex))
 end
 
 function D:IsHidden() return false end
@@ -155,7 +158,7 @@ function D:AddArmorReduction(value, diagnostic_hit, phase)
     local increment = math.max(0, tonumber(value) or 0)
     if increment <= 0 then return end
     local parent = self:GetParent()
-    local armor_before = tonumber(parent:GetPhysicalArmorValue(false))
+    local armor_before = detailed_diagnostics and tonumber(parent:GetPhysicalArmorValue(false)) or nil
     local mapping_version = tonumber(parent.survival_armor_mapping_version)
     local war3_mapping = mapping_version == armor_balance.MODERN_MAPPING_VERSION
         or mapping_version == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
@@ -184,7 +187,7 @@ function D:AddArmorReduction(value, diagnostic_hit, phase)
             self.armor_reduction = 0
             if target_stack <= (tonumber(self:GetStackCount()) or 0) then return end
             self:SetStackCount(target_stack)
-            publish_armor_changed(self, {
+            publish_armor_changed(self, detailed_diagnostics and {
                 hit = tonumber(diagnostic_hit),
                 phase = phase or "unknown",
                 increment = war3_increment,
@@ -208,7 +211,7 @@ function D:AddArmorReduction(value, diagnostic_hit, phase)
         self.armor_reduction = runtime_reduction
         if target_stack <= (tonumber(self:GetStackCount()) or 0) then return end
         self:SetStackCount(target_stack)
-        publish_armor_changed(self, {
+        publish_armor_changed(self, detailed_diagnostics and {
             hit = tonumber(diagnostic_hit),
             phase = phase or "unknown",
             increment = war3_increment,
@@ -242,7 +245,7 @@ function D:AddArmorReduction(value, diagnostic_hit, phase)
     self.armor_reduction = target_reduction
     if target_stack <= (tonumber(self:GetStackCount()) or 0) then return end
     self:SetStackCount(target_stack)
-    publish_armor_changed(self, {
+    publish_armor_changed(self, detailed_diagnostics and {
         hit = tonumber(diagnostic_hit),
         phase = phase or "unknown",
         increment = increment,

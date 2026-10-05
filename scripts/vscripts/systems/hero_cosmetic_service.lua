@@ -2,6 +2,9 @@ local config = require("config/hero_cosmetics_config")
 local asset_catalog = require("config/asset_catalog")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
+local diagnostic_rule = require("config/generated/global_rules").by_id.runtime_detailed_diagnostics
+local detailed_diagnostics = diagnostic_rule and diagnostic_rule.enabled ~= false
+    and tonumber(diagnostic_rule.value) == 1
 local weapon_slot = require("visual/hero_weapon_slot")
 
 local M = {}
@@ -210,8 +213,9 @@ local function each_live_entity(class_name, visitor)
             entities_api,
             class_name
         )
-        if ok then
+        if ok and type(entities) == "table" then
             for _, entity in ipairs(entities or {}) do visit(entity) end
+            return
         end
     end
     if type(entities_api.FindByClassname) == "function" then
@@ -311,23 +315,25 @@ local function hide_default_wearables(hero, custom_wearables, pass_label)
         if entity_belongs_to(wearable, hero) then
             owner_match_count = owner_match_count + 1
             hide_once(wearable)
-        elseif #unmatched_models < 8 then
+        elseif detailed_diagnostics and #unmatched_models < 8 then
             local model_ok, model_path = safe_call(wearable, "GetModelName")
             unmatched_models[#unmatched_models + 1] = model_ok
                 and tostring(model_path or "<empty>") or "<unknown>"
         end
     end)
 
-    logger.info(
-        "HeroCosmetic",
-        "native_hide hero=" .. tostring(hero:entindex())
-            .. " pass=" .. tostring(pass_label or "immediate")
-            .. " child=" .. tostring(child_native_count)
-            .. " global=" .. tostring(global_native_count)
-            .. " owner_match=" .. tostring(owner_match_count)
-            .. " hidden=" .. tostring(hidden_count)
-            .. " unmatched_models=" .. table.concat(unmatched_models, "|")
-    )
+    if detailed_diagnostics then
+        logger.info(
+            "HeroCosmetic",
+            "native_hide hero=" .. tostring(hero:entindex())
+                .. " pass=" .. tostring(pass_label or "immediate")
+                .. " child=" .. tostring(child_native_count)
+                .. " global=" .. tostring(global_native_count)
+                .. " owner_match=" .. tostring(owner_match_count)
+                .. " hidden=" .. tostring(hidden_count)
+                .. " unmatched_models=" .. table.concat(unmatched_models, "|")
+        )
+    end
 end
 
 local function show_default_wearables(hero)

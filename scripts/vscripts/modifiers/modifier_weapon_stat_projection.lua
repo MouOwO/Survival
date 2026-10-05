@@ -2,6 +2,9 @@
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local diagnostic_rule = require("config/generated/global_rules").by_id.runtime_detailed_diagnostics
+local detailed_diagnostics = diagnostic_rule and diagnostic_rule.enabled ~= false
+    and tonumber(diagnostic_rule.value) == 1
 
 modifier_weapon_stat_projection = _G.modifier_weapon_stat_projection or class({})
 _G.modifier_weapon_stat_projection = modifier_weapon_stat_projection
@@ -11,7 +14,7 @@ local displayed_damage_records = {}
 local damage_number_diagnostic_count = 0
 
 local function diagnose_damage_number(action, fields)
-    if not GameRules or not GameRules.GetGameTime
+    if not detailed_diagnostics or not GameRules or not GameRules.GetGameTime
         or damage_number_diagnostic_count >= 80 then return end
     damage_number_diagnostic_count = damage_number_diagnostic_count + 1
     print(string.format(
@@ -96,13 +99,15 @@ local function roll_critical_record(record, stats, attacker)
         tonumber(stats and stats.critical_damage_pct) or 200)
     local critical = chance > 0 and RandomFloat(0, 100) < chance
     critical_records[key] = critical and multiplier or false
-    diagnose_damage_number("roll", {
-        record = record,
-        attacker = attacker and attacker:entindex() or nil,
-        critical = critical,
-        chance = chance,
-        multiplier = multiplier,
-    })
+    if detailed_diagnostics then
+        diagnose_damage_number("roll", {
+            record = record,
+            attacker = attacker and attacker:entindex() or nil,
+            critical = critical,
+            chance = chance,
+            multiplier = multiplier,
+        })
+    end
     return critical and multiplier or 0
 end
 
@@ -131,12 +136,14 @@ function modifier_weapon_stat_projection.ClearCriticalAttackRecord(attacker, rec
     local key = record_key(attacker, record)
     if key then
         local value = critical_records[key]
-        diagnose_damage_number("clear", {
-            record = record,
-            attacker = attacker:entindex(),
-            critical = value ~= nil and value ~= false,
-            multiplier = value,
-        })
+        if detailed_diagnostics then
+            diagnose_damage_number("clear", {
+                record = record,
+                attacker = attacker:entindex(),
+                critical = value ~= nil and value ~= false,
+                multiplier = value,
+            })
+        end
         critical_records[key] = nil
         displayed_damage_records[key] = nil
     end
@@ -165,13 +172,15 @@ function modifier_weapon_stat_projection.ShowFinalAttackDamage(
     local victim_key = tostring(victim:entindex())
     displayed_damage_records[key] = displayed_damage_records[key] or {}
     if displayed_damage_records[key][victim_key] then
-        diagnose_damage_number("dedup", {
-            record = record,
-            attacker = attacker:entindex(),
-            victim = victim:entindex(),
-            damage = damage,
-            category = category,
-        })
+        if detailed_diagnostics then
+            diagnose_damage_number("dedup", {
+                record = record,
+                attacker = attacker:entindex(),
+                victim = victim:entindex(),
+                damage = damage,
+                category = category,
+            })
+        end
         return false
     end
     displayed_damage_records[key][victim_key] = true
@@ -182,17 +191,19 @@ function modifier_weapon_stat_projection.ShowFinalAttackDamage(
     local rounded_damage = math.max(1, math.floor(damage + 0.5))
     local style = critical and OVERHEAD_ALERT_CRITICAL
         or OVERHEAD_ALERT_BONUS_SPELL_DAMAGE
-    diagnose_damage_number("show", {
-        record = record,
-        attacker = attacker:entindex(),
-        victim = victim:entindex(),
-        critical = critical,
-        multiplier = state,
-        damage = damage,
-        category = category,
-        inflictor = params.inflictor,
-        style = style,
-    })
+    if detailed_diagnostics then
+        diagnose_damage_number("show", {
+            record = record,
+            attacker = attacker:entindex(),
+            victim = victim:entindex(),
+            critical = critical,
+            multiplier = state,
+            damage = damage,
+            category = category,
+            inflictor = params.inflictor,
+            style = style,
+        })
+    end
     local secondary = modifier_weapon_attack_tracker
         and modifier_weapon_attack_tracker.IsSecondaryAttackRecord
         and modifier_weapon_attack_tracker.IsSecondaryAttackRecord(record)

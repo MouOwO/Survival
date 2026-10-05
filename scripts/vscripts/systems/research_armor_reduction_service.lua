@@ -3,13 +3,16 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local armor_balance = require("config/armor_balance")
+local diagnostic_rule = require("config/generated/global_rules").by_id.runtime_detailed_diagnostics
+local detailed_diagnostics = diagnostic_rule and diagnostic_rule.enabled ~= false
+    and tonumber(diagnostic_rule.value) == 1
 
 local M = {}
 local hit_count_by_target = {}
 local last_attack_id_by_target = {}
 local callback_count = 0
 
-print("[RESEARCH_ARMOR_SERVICE_LOAD] version=20260801_upstream_diagnostic")
+if detailed_diagnostics then print("[RESEARCH_ARMOR_SERVICE_LOAD] version=20260801_upstream_diagnostic") end
 
 local DIAGNOSTIC_MILESTONES = {
     [1] = true,
@@ -46,7 +49,7 @@ local function on_main_attack_landed(payload)
     local player_id = tonumber(payload and payload.player_id)
     local attacker = payload and payload.attacker
     local target = payload and payload.target
-    local diagnostic = callback_count <= 5
+    local diagnostic = detailed_diagnostics and callback_count <= 5
     if diagnostic then
         print(string.format(
             "[RESEARCH_ARMOR_EVENT] callback=%s player_raw=%s player=%s "
@@ -89,7 +92,7 @@ local function on_main_attack_landed(payload)
     end
     local permanent = event_bus.request(
         events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-        { player_id = player_id }
+        { player_id = player_id, armor_reduction_only = true }
     )
     local technology = technology_stat_manager.get(player_id)
     local reduction = permanent and permanent.test_isolation and 0 or tonumber(
@@ -146,12 +149,10 @@ local function on_main_attack_landed(payload)
     local key = target_key(target)
     local hit_count = (tonumber(hit_count_by_target[key]) or 0) + 1
     hit_count_by_target[key] = hit_count
-    local armor_before = safe_call(
-        target,
-        "GetPhysicalArmorValue",
-        "unavailable",
-        false
-    )
+    local armor_before
+    if detailed_diagnostics then
+        armor_before = safe_call(target, "GetPhysicalArmorValue", "unavailable", false)
+    end
     local add_ok, modifier_or_error = pcall(
         target.AddNewModifier,
         target,
@@ -164,6 +165,7 @@ local function on_main_attack_landed(payload)
         }
     )
     if not add_ok or modifier_or_error == nil then
+        if armor_before == nil then armor_before = safe_call(target, "GetPhysicalArmorValue", "unavailable", false) end
         print(string.format(
             "[RESEARCH_ARMOR_APPLY_FAILED] hit=%s player=%s attacker=%s "
                 .. "target=%s reduction=%s armor_before=%s add_ok=%s result=%s",
@@ -178,7 +180,7 @@ local function on_main_attack_landed(payload)
         ))
         return
     end
-    if DIAGNOSTIC_MILESTONES[hit_count] then
+    if detailed_diagnostics and DIAGNOSTIC_MILESTONES[hit_count] then
         print(string.format(
             "[RESEARCH_ARMOR_APPLY] hit=%s player=%s attacker=%s target=%s "
                 .. "reduction=%s armor_before=%s stack=%s effective_immediate=%s",
@@ -207,12 +209,12 @@ function M.init()
         events.HERO_MAIN_ATTACK_LANDED,
         on_main_attack_landed
     )
-    print(string.format(
+    if detailed_diagnostics then print(string.format(
         "[RESEARCH_ARMOR_SERVICE_INIT] event=%s subscribed=%s token=%s",
         tostring(events.HERO_MAIN_ATTACK_LANDED),
         tostring(subscription ~= nil),
         tostring(subscription and subscription.token)
-    ))
+    )) end
 end
 
 -- An isolated field test must not inherit a cumulative shred modifier from a

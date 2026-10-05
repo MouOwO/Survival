@@ -469,6 +469,19 @@ local function get(payload)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
     end
+    if payload.armor_reduction_only == true then
+        local source = totals_by_player[player_id] or {}
+        return {
+            ok = true,
+            totals = {
+                hero_attack_armor_reduction = tonumber(source.hero_attack_armor_reduction),
+                global_attack_armor_reduction = tonumber(source.global_attack_armor_reduction),
+                hero_attack_armor_reduction_pct = tonumber(source.hero_attack_armor_reduction_pct),
+            },
+            test_isolation = test_isolated_field_by_player[player_id] ~= nil,
+            isolated_field_id = test_isolated_field_by_player[player_id],
+        }
+    end
     local totals = copy(totals_by_player[player_id])
     local isolated_field = test_isolated_field_by_player[player_id]
     if not isolated_field then
