@@ -14,6 +14,7 @@ local events = require("core/events")
 local building_count_limits = require("systems/building_count_limit_service")
 local hero_summon_projection = require("systems/hero_summon_projection")
 local hero_summon_rules = require("config/generated/hero_summon_rules")
+local rogue_effect_state = require("systems/rogue_effect_state_service")
 local M = {}
 local builder_slot_order_by_ability = {}
 local tooltip_definitions = require("config/generated/tooltip_definitions")
@@ -300,7 +301,10 @@ local function build_ability(ability_name, state, resources)
         definition.max_count, definition.id, state and state.player_id
     )
     local built = count(state or {}, definition.id)
-    local unlocked = city_level >= required
+    local free_altar = definition.id == "hero_altar" and state
+        and rogue_effect_state.numeric(state.player_id, "builder_free_hero_altar") > 0
+    local unlocked = free_altar or city_level >= required
+    local build_cost = free_altar and {wood = 0, gold = 0} or definition.build_cost
     local under_limit = maximum <= 0 or built < maximum
     local hero_allows = not (
         definition.id == "hero_altar"
@@ -323,14 +327,14 @@ local function build_ability(ability_name, state, resources)
         fields = required > 0 and {
             {
                 label = "解锁条件",
-                value = "主城Lv." .. tostring(required),
+                value = free_altar and "天赋已解锁，本次免费建造" or "主城Lv." .. tostring(required),
             },
         } or nil,
         population = definition.population_cost or 0,
-    }, cost_data(definition.build_cost))
+    }, cost_data(build_cost))
     return with_affordability(
         data,
-        definition.build_cost,
+        build_cost,
         definition.population_cost or 0,
         resources
     )
@@ -373,7 +377,8 @@ local function research_upgrade(ability_name, state, resources)
     if target > maximum then
         return {
             research_upgrade = 1,
-            auto_research_available = current < maximum and 1 or 0,
+            auto_research_available = (prerequisite_met or (transaction.auto_research or {})[mapping.technology_group])
+                and current < maximum and 1 or 0,
             auto_research_enabled = transaction.auto_research
                 and transaction.auto_research[mapping.technology_group] and 1 or 0,
             display_name = mapping.display_name,
@@ -407,8 +412,9 @@ local function research_upgrade(ability_name, state, resources)
         status_code = "research_queue_full"
         status = "研究队列已满（1个研究中＋6个等待）"
     elseif not prerequisite_met then
-        status_code = "queue_waiting_prerequisite"
-        status = "可加入队列，轮到时等待前置条件；开始研究时扣费"
+        available = false
+        status_code = "prerequisite_not_met"
+        status = "前置科技或转生条件未满足，暂不可研究"
     elseif queue_count > 0 then
         status_code = "queue_available"
         status = "可加入研究队列；开始研究时扣费"
@@ -417,7 +423,7 @@ local function research_upgrade(ability_name, state, resources)
     end
     local data = {
         research_upgrade = 1,
-        auto_research_available = 1,
+        auto_research_available = (prerequisite_met or (transaction.auto_research or {})[mapping.technology_group]) and 1 or 0,
         auto_research_enabled = transaction.auto_research
             and transaction.auto_research[mapping.technology_group] and 1 or 0,
         researching = researching and 1 or 0,

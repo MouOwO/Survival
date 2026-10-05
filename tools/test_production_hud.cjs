@@ -92,14 +92,21 @@ assert.equal(nodes.ProductionQueueSlot5.workerIcon.visible, true);
 assert.equal(nodes.ProductionQueueSlot5.icon.visible, false);
 assert.equal(nodes.ProductionQueueSlot5.classes.has('Empty'), false);
 assert.equal(nodes.ProductionQueueSlot5.style.width, '58px', 'adding the sixth cell retains readable icon size');
+assert.equal(nodes.ProductionCancelCurrent.visible, false, 'worker training does not expose research cancellation');
+const beforeTrainingCancel = sent.length;
+nodes.ProductionQueueSlot5.handlers.onactivate();
+assert.equal(sent.length, beforeTrainingCancel);
 assert.equal(nodes.ProductionTrainingSlot4, undefined, 'training level entrance count remains exactly four');
 
 unit = 11; refresh(); snapshot({options: freshOptions(), queued: []});
 assert.deepEqual(Array.from(hud.Inspect().slots), ['worker_1', 'worker_2', 'worker_3', 'worker_4'], 'cities retain independent entry slots');
 unit = 99; refresh(); assert.equal(nodes.SurvivalProductionPanel.visible, false, 'nonproduction units have no panel');
 unit = 20; refresh();
-runtime[201] = {owner_entindex: 20, technology_group: 'worker_attack', auto_research_available: 1, auto_research_enabled: 1};
-const research = {researching: 1, display_name: '伐木效率', ability_name: 'ability_research_worker_attack', target_level: 2, started_at: 10, finish_at: 12, duration: 2, auto_enabled: 1, auto_research: {worker_attack: 1}};
+runtime[201] = {ability_name: 'ability_research_worker_attack', owner_entindex: 20, technology_group: 'worker_attack', auto_research_available: 1, auto_research_enabled: 1};
+const privateAbility = {available: 1, auto_research_available: 1, auto_research_enabled: 1, technology_group: 'worker_attack'};
+const research = {researching: 1, display_name: '伐木效率', ability_name: 'ability_research_worker_attack', target_level: 2, started_at: 10, finish_at: 12, duration: 2, auto_enabled: 1, auto_research: {worker_attack: 1},
+    active_job: {job_id: '0:20:active', technology_group: 'worker_attack'},
+    abilities_by_name: {ability_research_worker_attack: privateAbility}};
 snapshot(undefined, {research});
 refresh([{ability: 201, name: 'ability_research_worker_attack'}]);
 assert.equal(nodes.ProductionTitle.text, '科技研究'); assert.equal(nodes.ProductionMode.text, '自动研究');
@@ -107,8 +114,8 @@ assert.equal(nodes.ProductionRemaining.text, '1s'); assert.equal(nodes.Productio
 assert.equal(nodes.ProductionCurrentIcon.abilityname, 'ability_research_worker_attack');
 assert.equal(nodes.ProductionQueueSlot0.visible, true, 'research also displays six waiting positions');
 const waiting = [
-    {technology_group: 'worker_attack', display_name: '伐木效率', target_level: 3, ability_name: 'ability_research_worker_attack'},
-    {technology_group: 'tower_attack', display_name: '箭塔攻击', target_level: 1, ability_name: 'ability_research_tower_attack'}
+    {job_id: '0:20:queued1', technology_group: 'worker_attack', display_name: '伐木效率', target_level: 3, ability_name: 'ability_research_worker_attack'},
+    {job_id: '0:20:queued2', technology_group: 'tower_attack', display_name: '箭塔攻击', target_level: 1, ability_name: 'ability_research_tower_attack'}
 ];
 snapshot(undefined, {research: {...research, queued: waiting, queue_count: 3, queue_capacity: 7}});
 assert.equal(nodes.ProductionQueue.text, '等待 2/6');
@@ -135,16 +142,43 @@ assert.equal(hud.QueueResearch(201, 20), true, 'a busy research ability can add 
 assert.equal(sent.at(-1).name, 'ui_research_queue_request');
 assert.equal(sent.at(-1).payload.source_entindex, 20);
 assert.equal(sent.at(-1).payload.technology_group, 'worker_attack');
+privateAbility.available = 0;privateAbility.status_text = '前置科技未满足，暂不可研究';
+const unavailableBefore = sent.length;
+assert.equal(hud.QueueResearch(201, 20), false, 'viewer prerequisite failure cannot send a queue request');
+assert.equal(sent.length, unavailableBefore);
+privateAbility.auto_research_available = 0;privateAbility.auto_research_enabled = 0;
+assert.equal(hud.ToggleResearch(201, 20), false, 'locked prerequisite cannot enable automatic research');
+assert.equal(sent.length, unavailableBefore);
+privateAbility.available = 1;privateAbility.auto_research_available = 1;privateAbility.auto_research_enabled = 1;
+time += 5;refresh();
+assert.equal(nodes.ProductionCancelCurrent.visible, true);
+nodes.ProductionCancelCurrent.handlers.onactivate();
+assert.equal(sent.at(-1).name, 'ui_research_cancel_request');
+assert.equal(sent.at(-1).payload.job_id, '0:20:active');
+assert.equal(sent.at(-1).payload.source_entindex, 20);
+assert.equal(nodes.ProductionQueueSlot0.type, 'Button');
+assert.equal(nodes.ProductionQueueSlot0.cancel.visible, true);
+nodes.ProductionQueueSlot0.handlers.onactivate();
+assert.equal(sent.at(-1).payload.job_id, waiting[0].job_id);
+modal = true;const modalBefore = sent.length;nodes.ProductionQueueSlot0.handlers.onactivate();
+assert.equal(sent.length, modalBefore);modal = false;
+assert.equal(hud.CancelResearch({}), false, 'empty slots cannot send cancellation');
+time = 11;
 assert.equal(hud.QueueResearch(201, 11), false, 'queue source must be the selected laboratory');
 modal = true; assert.equal(hud.QueueResearch(201, 20), false); modal = false;
+time = 16; // Let the deliberately injected prerequisite notice expire.
 snapshot(undefined, {research: {...research, researching: 0, blocked_head: waiting[0], blocked_reason: 'wood_not_enough', queued: [waiting[1]], queue_capacity: 7}});
 assert.equal(nodes.ProductionJobName.text, '等待研究：伐木效率 LV3');
 assert.equal(nodes.ProductionRemaining.text, '等待');
 assert.equal(nodes.ProductionCurrentIcon.abilityname, 'ability_research_worker_attack');
 assert.equal(nodes.ProductionQueue.text, '等待 1/6', 'the blocked head occupies the current position, not a waiting slot');
 assert.equal(nodes.ProductionFooter.text, '木材不足 · 开始时扣费');
+assert.equal(nodes.ProductionCancelCurrent.visible, true, 'unfunded queue head can also be cancelled');
+nodes.ProductionCancelCurrent.handlers.onactivate();
+assert.equal(sent.at(-1).payload.job_id, waiting[0].job_id);
 snapshot(undefined, {research: {...research, researching: 0, blocked_head: waiting[0], blocked_reason: '木材不足；开始研究时扣费', queued: []}});
 assert.equal(nodes.ProductionFooter.text, '木材不足；开始研究时扣费', 'server cost-timing text is not repeated');
+time = 11;
 snapshot(undefined, {research});
 
 runtime[201].auto_research_available = 0;
@@ -193,6 +227,14 @@ for (const code of ['queue_available', 'queue_waiting_prerequisite', 'research_q
     assert.equal(statusEnv.researchStatus({research_status_code: code, status_text: '个人队列状态'}), '个人队列状态');
 }
 const combatSource = fs.readFileSync('panorama/src/scripts/custom_game/combat_stats.js', 'utf8');
+const runtimeReader = combatSource.slice(combatSource.indexOf('    function abilityRuntime('), combatSource.indexOf('    function applyAbilityRuntime('));
+const privateReaderEnv = {selectedUnit: () => 20, GameUI: env.GameUI,
+    CustomNetTables: {GetTableValue: () => ({ability_name: 'ability_research_lumberjack_speed', available: 0, current_level: 9})}};
+vm.runInNewContext(runtimeReader, privateReaderEnv);
+assert.equal(privateReaderEnv.abilityRuntime(201).available, 1, 'native button appearance and click guard use viewer availability');
+viewerRuntime.available = 0;
+assert.equal(privateReaderEnv.abilityRuntime(201).available, 0, 'missing viewer prerequisites disable the native button');
+viewerRuntime.available = 1;
 const executeSource = combatSource.slice(combatSource.indexOf('    function executeAbility('), combatSource.indexOf('    GameUI.CustomUIConfig().SurvivalAbilityInput ='));
 let routedQueueCalls = 0;
 const routedCfg = {SurvivalProductionHUD: {QueueResearch: (ability, source) => {assert.equal(ability, 201); assert.equal(source, 20); routedQueueCalls++; return true;}}};
@@ -204,6 +246,13 @@ assert.equal(routedQueueCalls, 1);
 routedEnv.abilityRuntime = () => ({ability_name: 'ability_upgrade_tower', available: 0});
 assert.equal(routedEnv.executeAbility(201), false, 'non-research disabled actions retain their existing rejection');
 const takeoverSource = fs.readFileSync('panorama/src/scripts/custom_game/hud_takeover.js', 'utf8');
+const takeoverReader = takeoverSource.slice(takeoverSource.indexOf('    function runtimeFor('), takeoverSource.indexOf('    function unitAbilityCount('));
+privateReaderEnv.config = cfg;
+vm.runInNewContext(takeoverReader, privateReaderEnv);
+assert.equal(privateReaderEnv.runtimeFor(201).available, 1, 'fallback HUD also projects viewer availability');
+viewerRuntime.available = 0;
+assert.equal(privateReaderEnv.runtimeFor(201).available, 0);
+viewerRuntime.available = 1;
 const activateSource = takeoverSource.slice(takeoverSource.indexOf('    function activate(entry)'), takeoverSource.indexOf('    function ensureSlot('));
 const takeoverEnv = {config: routedCfg, selectedUnit: () => 20}; vm.runInNewContext(activateSource, takeoverEnv);
 takeoverEnv.activate({name: 'ability_research_worker_attack', ability: 201});

@@ -558,6 +558,22 @@ local function validate_research_source(player_id, source_entindex, definition)
     return building, nil
 end
 
+local function research_prerequisite_error(player_id, definition, levels)
+    local required = definition.prerequisite or {}
+    local prerequisite = required.tech_id and research_config.by_id[required.tech_id]
+    if required.tech_id and (not prerequisite
+        or (tonumber(levels[prerequisite.legacy_group]) or 0) < (tonumber(required.required_level) or 0)) then
+        return {ok = false, error = "前置科技未满足，暂不可研究", error_code = "prerequisite_not_met"}
+    end
+    if (tonumber(required.reincarnation_level) or 0) > 0 then
+        local progression = event_bus.request(events.HERO_PROGRESSION_GET_REQUEST, {player_id = player_id})
+        if (tonumber(progression and progression.snapshot and progression.snapshot.rebirth_level) or 0)
+            < required.reincarnation_level then
+            return {ok = false, error = "转生条件未满足，暂不可研究", error_code = "reincarnation_not_met"}
+        end
+    end
+end
+
 local function open_shop(payload)
     local player_id = tonumber(payload.player_id)
     if not valid_player_id(player_id) then
@@ -839,6 +855,11 @@ local function purchase(payload)
         local research_sequence = lane.sequence
         local current_state = state
         local research_duration=require('systems/commerce_effects').owned(player_id,'time_technology') and 0 or TECHNOLOGY_RESEARCH_DURATION
+        local job_id = payload.research_job_id
+        if not job_id then
+            lane.next_job_id = lane.next_job_id + 1
+            job_id = lane.key .. ":" .. tostring(lane.next_job_id)
+        end
         lane.pending = {
             transaction_id = started.transaction_id,
             player_id = player_id,
@@ -850,7 +871,7 @@ local function purchase(payload)
             started_at = game_time(),
             finish_at = game_time() + research_duration,
             icon_name = entry.icon or "",
-            job_id = payload.research_job_id,
+            job_id = job_id,
             manual = payload.research_queue_start == true,
         }
         lane.blocked_reason = ""
@@ -1086,6 +1107,9 @@ enqueue_research = function(payload)
     local current_state = event_bus.request(research_events.STATE_GET_REQUESTED,
         { player_id = player_id })
     merge_technology_levels(player_id, current_state and current_state.legacy_levels or {})
+    local prerequisite_error = research_prerequisite_error(player_id, definition,
+        current_state and current_state.legacy_levels or {})
+    if prerequisite_error then return prerequisite_error end
     local target = tonumber((state.technology_by_player[player_id] or {})[group]) or 0
     if lane.pending and lane.pending.technology_group == group then
         target = math.max(target, lane.pending.target_level)
@@ -1113,6 +1137,70 @@ enqueue_research = function(payload)
         research = research_snapshot(player_id, source) }
     remember_result(player_id, request_id, result)
     push_snapshot(player_id, "research_enqueued")
+    return result
+end
+
+local function cancel_research_job(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if not valid_player_id(player_id) then return {ok = false, error = "player_id_invalid"} end
+    local request_id = tostring(payload.request_id or "")
+    local cached = cached_result(player_id, request_id)
+    if cached then return cached end
+    local source = tonumber(payload.source_entindex)
+    local lane = research_lane(player_id, source, false)
+    local job_id = tostring(payload.job_id or "")
+    local job, queued_index
+    if lane and job_id ~= "" then
+        if lane.pending and lane.pending.job_id == job_id then job = lane.pending end
+        for index, candidate in ipairs(lane.queued) do
+            if candidate.job_id == job_id then job, queued_index = candidate, index;break end
+        end
+    end
+    if not job then return {ok = false, error = "研究任务已结束或已取消", error_code = "research_job_not_found"} end
+    local building, source_error = validate_research_source(player_id, source,
+        research_config.by_legacy_group[job.technology_group])
+    if not building then return {ok = false, error = source_error} end
+    local refunded = false
+    if queued_index then
+        table.remove(lane.queued, queued_index)
+    else
+        local rollback = event_bus.request(research_events.UPGRADE_ROLLBACK_REQUESTED, {
+            transaction_id = job.transaction_id, error_code = "research_cancelled",
+        })
+        if not rollback or rollback.rolled_back ~= true then
+            return {ok = false, error = "研究取消失败，请稍后重试", error_code = "research_cancel_failed"}
+        end
+        scheduler.cancel("shop_technology_research:" .. lane.key)
+        lane.pending = nil
+        refunded = true
+    end
+    -- A cancelled upgrade must not reappear through this group's automation.
+    lane.auto_research[job.technology_group] = nil
+    if not next(lane.auto_research) then scheduler.cancel("shop_auto_research:" .. lane.key) end
+    scheduler.cancel("shop_research_queue:" .. lane.key)
+    lane.blocked_reason = ""
+    local current = event_bus.request(research_events.STATE_GET_REQUESTED, {player_id = player_id}) or {}
+    local reserved = {}
+    for group, level in pairs(current.legacy_levels or {}) do reserved[group] = tonumber(level) or 0 end
+    if lane.pending then reserved[lane.pending.technology_group] = lane.pending.target_level end
+    -- Queue clicks represent upgrades, not absolute levels. Closing a gap after
+    -- cancellation preserves order, stable job IDs and prices at actual start.
+    local queued = {}
+    for _, remaining in ipairs(lane.queued) do
+        local group = remaining.technology_group
+        reserved[group] = (reserved[group] or 0) + 1
+        local entry = catalog.find_technology_entry(group, reserved[group])
+        if entry and entry.enabled ~= false then
+            remaining.target_level, remaining.entry_id = reserved[group], entry.entryid
+            queued[#queued + 1] = remaining
+        end
+    end
+    lane.queued = queued
+    if not lane.pending then run_research_queue(lane.key) else publish_research(lane) end
+    local result = {ok = true, cancelled = true, job_id = job_id, refunded = refunded,
+        research = research_snapshot(player_id, source)}
+    remember_result(player_id, request_id, result)
+    push_snapshot(player_id, "research_cancelled")
     return result
 end
 
@@ -1232,6 +1320,9 @@ local function toggle_auto_research(payload)
             { player_id = player_id })
         merge_technology_levels(player_id,
             research_state and research_state.legacy_levels or {})
+        local prerequisite_error = research_prerequisite_error(player_id, definition,
+            research_state and research_state.legacy_levels or {})
+        if prerequisite_error then return prerequisite_error end
         if (tonumber((state.technology_by_player[player_id] or {})[group]) or 0)
             >= (tonumber(definition.max_level) or 0) then
             return { ok = false, error = "科技已满级", error_code = "max_level_reached" }
@@ -1426,6 +1517,7 @@ function M.init()
         events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,
         purchase_next_technology
     )
+    event_bus.handle_request(events.TECHNOLOGY_RESEARCH_CANCEL_REQUEST, cancel_research_job)
     event_bus.handle_request(
         events.TECHNOLOGY_STATE_GET_REQUEST,
         get_technology_state

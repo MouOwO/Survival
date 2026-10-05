@@ -25,6 +25,7 @@ for _, name in ipairs({ "systems/building_system", "ui/weapon_synthesis_snapshot
     "systems/building_batch_upgrade_service", "systems/gold_mine_batch_upgrade_service" }) do
     package.loaded[name] = {}
 end
+package.loaded["systems/hero_summon_projection"] = {hero_id_for_summon_ability = function() return nil end}
 local function entity(index,owner)
     return { survival_player_id=owner, entindex=function() return index end,
         IsNull=function() return false end, IsAlive=function(self) return not self.dead end }
@@ -146,6 +147,23 @@ admitted[0]=false; research(0,202); admitted[0]=true
 defeated[0]=true; research(0,202); defeated[0]=nil
 queue(nil,{player_id=0,source_entindex=202,technology_group="fake"})
 assert(#research_requests==2 and #sent==before_research_packets)
+local cancel_requests = {}
+bus.handle_request(events.TECHNOLOGY_RESEARCH_CANCEL_REQUEST, function(payload)
+    cancel_requests[#cancel_requests + 1] = payload
+    return {ok = true, refunded = true}
+end)
+local cancel_listener = assert(listeners.ui_research_cancel_request)
+cancel_listener(nil, {PlayerID = 1, player_id = 0, source_entindex = 203,
+    job_id = "1:203:7", request_id = "cancel-test", refund_gold = 99999, target_level = 99})
+assert(#cancel_requests == 1 and cancel_requests[1].player_id == 1)
+assert(cancel_requests[1].job_id == "1:203:7" and cancel_requests[1].source_entindex == 203)
+assert(cancel_requests[1].refund_gold == nil and cancel_requests[1].target_level == nil)
+assert(sent[#sent].payload.operation == "research_cancel" and sent[#sent].payload.refunded == 1)
+cancel_listener(nil, {PlayerID = 1, source_entindex = 202, job_id = "0:202:1"})
+cancel_listener(nil, {PlayerID = 0, source_entindex = 200, job_id = "x"})
+cancel_listener(nil, {PlayerID = 0, source_entindex = 202.5, job_id = "x"})
+lab.dead = true;cancel_listener(nil, {PlayerID = 0, source_entindex = 202, job_id = "x"});lab.dead = nil
+assert(#cancel_requests == 1, "cancel route retains source ownership/alive/integer validation")
 -- Refresh only the affected player's currently selected building. The timing
 -- fields are stable server timestamps, so the UI animates without polling.
 bus.reset()
@@ -165,4 +183,4 @@ assert(pushes[3].player_id==0 and pushes[3].entindex==200)
 selected[0]=999 -- ordinary hero/tree selections must never receive building-stat projections
 bus.emit(events.RESOURCE_CHANGED,{player_id=0})
 assert(#pushes==3)
-print("PRODUCTION_UI_ROUTER_PASS: trusted sender, ownership, startup/defeat, one paid unit per click, private source snapshots and targeted refresh")
+print("PRODUCTION_UI_ROUTER_PASS: trusted sender, private queue/cancel routing, ownership/alive validation, cost stripping, snapshots and targeted refresh")

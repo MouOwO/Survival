@@ -490,7 +490,7 @@ local function project_entry(player_id, entry, context)
             prerequisite_text = (prerequisite_text ~= "" and prerequisite_text .. " · " or "")
                 .. "完成" .. tostring(required.reincarnation_level) .. "转"
         end
-        item.prerequisite_met = prerequisite_met and 1 or 0
+        item.prerequisite_met = prerequisite_met and reincarnation_met and 1 or 0
         item.prerequisite_technology_id = required.tech_id or ""
         item.prerequisite_technology_group = prerequisite_group
         item.prerequisite_current_level = prerequisite_current_level
@@ -533,7 +533,8 @@ local function project_entry(player_id, entry, context)
             item.purchase_condition_text = item.purchase_condition_text
                 .. "；开始研究时扣费"
             item.purchasable = queue_count < capacity
-                and math.max(current_level, reserved_level) < research.max_level and 1 or 0
+                and math.max(current_level, reserved_level) < research.max_level
+                and (context.debug_all_unlocked == true or (prerequisite_met and reincarnation_met)) and 1 or 0
             if queue_count >= capacity then
                 item.disabled_reason = "研究队列已满（1个研究中＋6个等待）"
                 item.disabled_reason_code = "research_queue_full"
@@ -655,7 +656,9 @@ function M.build_snapshot(player_id, context)
                     and authoritative_research.tech_id or ""
                 item.auto_research_available = authoritative_research
                     and (context.research_scope == "advanced"
-                        or context.research_scope == "normal") and 1 or 0
+                        or context.research_scope == "normal")
+                    and (context.debug_all_unlocked == true or item.prerequisite_met == 1
+                        or (context.auto_research or {})[group]) and 1 or 0
                 item.auto_research_enabled = context.auto_research
                     and context.auto_research[group] and 1 or 0
                 item.level_text = "Lv." .. tostring(current)

@@ -887,11 +887,11 @@ local function train_worker_one(payload)
         if worker.SetRangedProjectileName then
             worker:SetRangedProjectileName("")
         end
-        if worker.SetProjectileSpeed then
-            worker:SetProjectileSpeed(10000)
-        end
         if worker.SetAttackCapability then
-            worker:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
+            -- Harvest models can lack attach_attack1. Empty ranged projectiles
+            -- still request that attachment; direct attacks use the same range
+            -- and native attack clock without creating a projectile.
+            worker:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
         end
         local lumberjack = technology_stat_manager.get(city_state.player_id).final.lumberjack or {}
         technology_efficiency = tonumber(lumberjack.wood_per_hit_bonus) or 0
@@ -1164,9 +1164,8 @@ function M.register_fused_lumberjack(worker, data)
         worker:SetAcquisitionRange(worker.survival_attack_range)
     end
     if worker.SetRangedProjectileName then worker:SetRangedProjectileName("") end
-    if worker.SetProjectileSpeed then worker:SetProjectileSpeed(10000) end
     if worker.SetAttackCapability then
-        worker:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
+        worker:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
     end
     local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
     local inherited_technology_attack = (tonumber(lumberjack.attack_flat) or 0)

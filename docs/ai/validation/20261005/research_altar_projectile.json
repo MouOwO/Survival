@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-05",
+  "scope": ["research cancellation", "research prerequisite locking", "free rogue hero altar", "lumberjack attachment warning"],
+  "tests": [
+    "scripts/vscripts/tests/test_research_production_auto.lua",
+    "scripts/vscripts/tests/test_research_runtime_projection.lua",
+    "scripts/vscripts/tests/test_production_ui_router.lua",
+    "tools/test_free_altar_runtime.lua",
+    "scripts/vscripts/tests/test_worker_system_training.lua",
+    "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+    "scripts/vscripts/tests/test_builder_yield_construction.lua",
+    "tools/test_production_hud.cjs"
+  ],
+  "result": "PASS",
+  "isolated_commit_validation": "All eight tests also passed against synchronized HEAD plus staged task changes, excluding unrelated local changes.",
+  "checks": ["Lua 5.1 syntax", "JavaScript syntax", "git diff whitespace"],
+  "official_resource_compilation": {
+    "production_progress.vjs_c": {"result": "0 failed", "bytes": 31694},
+    "combat_stats.vjs_c": {"result": "0 failed", "task_only_bytes": 133654, "local_with_existing_user_changes_bytes": 136643},
+    "hud_takeover.vjs_c": {"result": "0 failed", "bytes": 72817}
+  },
+  "behavior_verified": [
+    "queued cancellation does not refund uncharged resources",
+    "active transaction refunds once and stale completion cannot grant levels",
+    "remaining same-group levels are rebased without changing job identities",
+    "shared lab cancellation and ability availability are private to the viewer",
+    "rollback failure preserves the active timer",
+    "technology and rebirth prerequisites disable manual/automatic research and shop cards",
+    "city0 and zero-resource free altar completes through real building pipeline",
+    "free altar charge is consumed only on construction completion",
+    "actual LV4 melee model and fused lumberjacks use native direct attacks with configured range400",
+    "200 growth hits create no range/timer/modifier resets"
+  ],
+  "synchronization": {
+    "branch": "dev",
+    "upstream_before_pull": "3e4f00cd",
+    "upstream_after_pull": "0a500a71",
+    "temporary_stash": "0ea75a09f933a198e19667733490e6071ea78ac2",
+    "restoration": "376 byte-identical files, 100 newline-only files, 5 reviewed upstream merges; 17 historical stashes retained",
+    "conflicts": "research duration and job IDs combined; existing user commerce binary retained outside task commit"
+  },
+  "engine_validation": "Not run in the current game. Reload the addon to verify visual controls and absence of projectile warnings.",
+  "logs": "output/research_altar_projectile_20261005 (ignored)"
+}

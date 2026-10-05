@@ -133,16 +133,30 @@
     currentIcon.abilityname = "ability_train_lumberjack";
     var jobName = label(panel, "ProductionJobName", "ProductionJobName");
     var remaining = label(panel, "ProductionRemaining", "ProductionRemaining");
+    var cancelCurrent = create("Button", panel, "ProductionCancelCurrent", "ProductionQueueSlot");
+    var cancelCurrentLabel = label(cancelCurrent, "", "ProductionQueueLevel");
+    text(cancelCurrentLabel, "取消");
+    style(cancelCurrentLabel, { width: "100%", height: "100%", textAlign: "center", verticalAlign: "center" });
+    cancelCurrent.visible = false;
+    cancelCurrent.SetPanelEvent("onactivate", function () { cancelResearch(cancelCurrent.job); });
+    cancelCurrent.SetPanelEvent("onmouseover", function () {
+        if (cancelCurrent.job) $.DispatchEvent("DOTAShowTextTooltip", cancelCurrent,
+            "取消本任务；已开始的研究退还费用，并关闭该科技的自动研究。");
+    });
+    cancelCurrent.SetPanelEvent("onmouseout", function () { $.DispatchEvent("DOTAHideTextTooltip"); });
     var track = create("Panel", panel, "ProductionProgressTrack", "ProductionProgressTrack");
     var fill = create("Panel", track, "ProductionProgressFill", "ProductionProgressFill");
     var queue = label(panel, "ProductionQueue", "ProductionQueue");
     var footer = label(panel, "ProductionFooter", "ProductionFooter");
     fullTextTooltip(jobName); fullTextTooltip(footer);
     for (var queueIndex = 0; queueIndex < 6; queueIndex++) {
-        var queueCell = create("Panel", panel, "ProductionQueueSlot" + queueIndex, "ProductionQueueSlot");
+        var queueCell = create("Button", panel, "ProductionQueueSlot" + queueIndex, "ProductionQueueSlot");
         queueCell.icon = create("DOTAAbilityImage", queueCell, "", "ProductionQueueIcon");
         queueCell.workerIcon = create("Image", queueCell, "", "ProductionQueueIcon");
         queueCell.level = label(queueCell, "", "ProductionQueueLevel");
+        queueCell.cancel = label(queueCell, "", "ProductionQueueLevel");
+        text(queueCell.cancel, "×");
+        style(queueCell.cancel, { position: "40px 0px 0px", width: "18px", height: "18px", fontSize: "18px", color: "#ffb2a6" });
         queueCell.hittest = true;
         (function (cell) {
             cell.SetPanelEvent("onmouseover", function () {
@@ -150,9 +164,10 @@
                 var task = cell.job;
                 $.DispatchEvent("DOTAShowTextTooltip", cell,
                     escape(cell.research ? (task.display_name || task.name || "科技") + " LV" + Number(task.target_level || task.level || 1) : workerName(task))
-                    + (cell.research ? "<br>等待研究 · 开始时扣费" : "<br>等待训练"));
+                    + (cell.research ? "<br>等待研究 · 开始时扣费<br>点击取消本任务" : "<br>等待训练"));
             });
             cell.SetPanelEvent("onmouseout", function () { $.DispatchEvent("DOTAHideTextTooltip"); });
+            cell.SetPanelEvent("onactivate", function () { if (cell.research) cancelResearch(cell.job); });
         })(queueCell);
         queueSlots.push(queueCell);
     }
@@ -207,6 +222,10 @@
         if (runtime.removed === 1 || !runtime.technology_group
             || unit !== selectedUnit() || !/^building_(advanced_)?research_lab$/.test(unitType(unit))) return false;
         if (runtime.owner_entindex !== undefined && Number(runtime.owner_entindex) !== unit) return false;
+        var personal = getResearchRuntime(ability, unit, runtime);
+        if (Number(personal.auto_research_available) !== 1 && Number(personal.auto_research_enabled) !== 1) {
+            notify(personal.status_text || "前置条件未满足，暂不可研究"); return false;
+        }
         GameEvents.SendCustomGameEventToServer("ui_shop_auto_research_toggle_request", {
             request_id: requestId("auto"), technology_group: runtime.technology_group, source_entindex: unit
         });
@@ -219,10 +238,22 @@
         if (runtime.removed === 1 || !runtime.technology_group || unit !== selectedUnit()
             || !/^building_(advanced_)?research_lab$/.test(unitType(unit))) return false;
         if (runtime.owner_entindex !== undefined && Number(runtime.owner_entindex) !== unit) return false;
-        // Availability on an owner runtime may mean "already researching" or a
-        // different player's max level. Queue admission is checked by the server.
+        // Shared labs use the viewer's authoritative projection, not the owner.
+        var personal = getResearchRuntime(ability, unit, runtime);
+        if (Number(personal.available) !== 1) {
+            notify(personal.status_text || "当前不可研究"); return false;
+        }
         GameEvents.SendCustomGameEventToServer("ui_research_queue_request", {
             request_id: requestId("research"), technology_group: runtime.technology_group, source_entindex: unit
+        });
+        return true;
+    }
+    function cancelResearch(job) {
+        var unit = selectedUnit(), snapshot = snapshots[unit];
+        if (!active() || blocked() || unit !== currentUnit || !snapshot || !snapshot.research
+            || !/^building_(advanced_)?research_lab$/.test(unitType(unit)) || !job || !job.job_id) return false;
+        GameEvents.SendCustomGameEventToServer("ui_research_cancel_request", {
+            request_id: requestId("cancel"), source_entindex: unit, job_id: String(job.job_id)
         });
         return true;
     }
@@ -244,6 +275,7 @@
             cell.visible = true; place(cell, 146 + 64 * index, 160, 58, 58);
             var entry = pending[index];
             cell.job = entry || null; cell.research = !!research;
+            cell.cancel.visible = !!(entry && research && entry.job_id);
             cell.SetHasClass("Empty", !entry); cell.icon.visible = !!entry && !!research;
             cell.workerIcon.visible = !!entry && !research;
             if (entry && research) cell.icon.abilityname = researchAbility(entry, research);
@@ -305,6 +337,7 @@
         panel.__survivalWindowHeight = height * panelScale * (Number(ctx.actualuiscale_y) || 1);
         place(title, 16, 8, width - 182, 44); place(badge, width - 166, 13, 150, 36);
         currentIcon.visible = false;
+        cancelCurrent.job = null; cancelCurrent.visible = false;
         currentWorkerIcon.visible = !!showTraining;
         place(currentWorkerIcon, 16, 66, 50, 50);
         place(currentIcon, 16, 66, 50, 50);
@@ -347,6 +380,12 @@
             blockedJob = !job && research.blocked_head && research.blocked_head.technology_group ? research.blocked_head : null;
             renderQueue(rows(research.queued), research.queue_capacity || research.capacity, research);
             currentIcon.visible = !!(job || blockedJob);
+            cancelCurrent.job = (job && research.active_job) || blockedJob;
+            cancelCurrent.visible = !!(cancelCurrent.job && cancelCurrent.job.job_id);
+            if (cancelCurrent.visible) {
+                place(cancelCurrent, width - 194, 70, 78, 38);
+                place(jobName, 76, 52, width - 280, 82);
+            }
             if (job || blockedJob) currentIcon.abilityname = researchAbility(job || blockedJob, research);
             waitUntil = Number(research.next_start_at || 0);
             autoEnabled = Number(research.auto_enabled) === 1 || Object.keys(research.auto_research || {}).some(function (key) {
@@ -357,7 +396,7 @@
             if (blockedText && blockedText.indexOf("扣费") < 0) blockedText += " · 开始时扣费";
             text(footer, status && now < statusUntil ? status
                 : blockedJob ? blockedText
-                : autoEnabled ? "自动：完成后间隔 1 秒 · 右键关闭" : "左键加入队列 · 右键自动研究");
+                : autoEnabled ? "自动：完成后间隔 1 秒 · 队列图标可取消" : "左键加入队列 · 右键自动研究 · 队列图标可取消");
         }
         badge.SetHasClass("Automatic", autoEnabled);
         if (job) {
@@ -406,13 +445,13 @@
         });
     });
     GameEvents.Subscribe("ui_operation_result", function (result) {
-        if (!active() || !result || (result.operation !== "worker_train" && result.operation !== "shop_auto_research_toggle" && result.operation !== "research_queue")) return;
+        if (!active() || !result || (result.operation !== "worker_train" && result.operation !== "shop_auto_research_toggle" && result.operation !== "research_queue" && result.operation !== "research_cancel")) return;
         if (String(result.request_id || "").indexOf("production_") !== 0) return;
         if (Number(result.success) !== 1) notify(result.error || result.message || "操作未完成");
         repaint();
     });
     cfg.SurvivalProductionHUD = {
-        Refresh: refresh, QueueResearch: queueResearch, ToggleResearch: toggleResearch, GetResearchRuntime: getResearchRuntime,
+        Refresh: refresh, QueueResearch: queueResearch, CancelResearch: cancelResearch, ToggleResearch: toggleResearch, GetResearchRuntime: getResearchRuntime,
         Inspect: function () { return { unit: currentUnit, visible: panel.visible, slots: citySlots[currentUnit] || [], snapshot: snapshots[currentUnit] || {} }; }
     };
 })();

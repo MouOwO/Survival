@@ -99,4 +99,27 @@ transactions[10] = { player_id = 0, source_entindex = 10, researching = 0,
     auto_research = { lumberjack_speed = 1 }, next_start_at = 8 }
 bus.emit(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, transactions[10])
 assert(buildings[1].unit.abilities[name].active, "completion activates manual research")
+local locked_name = "ability_research_ars_03"
+local definition = config.by_legacy_group.researcher_super_wall_health
+local prerequisite = assert(config.by_id[definition.prerequisite.tech_id])
+local function locked_runtime(rebirth)
+    return builder.build(locked_name, {
+        player_id = 0, building_id = "building_advanced_research_lab",
+        research_levels = levels[0], research_transaction = {}, reincarnation_level = rebirth,
+    }, {gold = 1000000, wood = 1000000})
+end
+assert(locked_runtime(10).available == 0 and locked_runtime(10).can_afford == 0)
+assert(locked_runtime(10).research_status_code == "prerequisite_not_met")
+assert(locked_runtime(10).auto_research_available == 0)
+sync.sync(buildings[3].unit, "building_advanced_research_lab", levels[0], {}, 10)
+assert(not buildings[3].unit.abilities[locked_name].active)
+levels[0][prerequisite.legacy_group] = definition.prerequisite.required_level
+assert(builder.build("ability_research_ars_08", {
+    player_id = 0, building_id = "building_advanced_research_lab",
+    research_levels = levels[0], research_transaction = {}, reincarnation_level = 0,
+}, {gold = 1000000, wood = 1000000}).available == 0,
+    "rebirth requirement also locks the research entrance")
+assert(locked_runtime(10).available == 1)
+sync.sync(buildings[3].unit, "building_advanced_research_lab", levels[0], {}, 10)
+assert(buildings[3].unit.abilities[locked_name].active)
 print("RESEARCH_RUNTIME_PROJECTION_PASS: source-specific activation, unrelated completion, right-click state, absolute timing")

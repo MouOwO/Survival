@@ -1747,8 +1747,12 @@
             "survival_ability_runtime",
             String(abilityIndex)
         ) || {};
-        var guard = GameUI.CustomUIConfig().SurvivalHeroSummonAvailability;
-        return guard ? guard(abilityIndex, runtime) : runtime;
+        var config = GameUI.CustomUIConfig();
+        var guard = config.SurvivalHeroSummonAvailability;
+        runtime = guard ? guard(abilityIndex, runtime) : runtime;
+        var production = config.SurvivalProductionHUD;
+        return production && production.GetResearchRuntime
+            ? production.GetResearchRuntime(abilityIndex, selectedUnit(), runtime) : runtime;
     }
 
     function applyAbilityRuntime(panel, abilityIndex) {

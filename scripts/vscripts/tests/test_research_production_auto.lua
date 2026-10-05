@@ -21,13 +21,13 @@ local shop = require("systems/shop_system")
 local config = require("config/research_technology_config")
 local catalog = require("systems/shop_catalog")
 local stats = require("systems/technology_stat_manager")
-local resources, buildings, log, commits, refunds
+local resources, buildings, log, commits, refunds, rebirth_level
 local function eq(actual, expected, label)
     assert(actual == expected, (label or "value") .. ": expected=" .. tostring(expected)
         .. " actual=" .. tostring(actual))
 end
 local function fixture()
-    bus.reset(); scheduler.clear(); clock = 0
+    bus.reset(); scheduler.clear(); clock = 0;rebirth_level = 10
     resources = { [0] = { gold = 1000000000, wood = 1000000000 },
         [1] = { gold = 1000000000, wood = 1000000000 } }
     buildings = {
@@ -58,7 +58,7 @@ local function fixture()
         return { buildings = list }
     end)
     bus.handle_request(events.HERO_PROGRESSION_GET_REQUEST, function()
-        return { snapshot = { rebirth_level = 10 } }
+        return { snapshot = { rebirth_level = rebirth_level } }
     end)
     bus.handle_request(events.HERO_SUMMON_SNAPSHOT_REQUEST, function()
         return { snapshot = { hero_summoned = 1 } }
@@ -149,10 +149,11 @@ resources[0].gold = 1000000000; resources[0].wood = 1000000000
 tick(2); eq(snapshot(0, 10).researching, 1, "funds restore auto research")
 
 fixture()
-assert(toggle(0, 10, "advanced_lumberjack_speed").enabled)
+eq(toggle(0, 10, "advanced_lumberjack_speed").error_code, "prerequisite_not_met")
 tick(0); eq(snapshot(0, 10).researching, 0)
-eq(snapshot(0, 10).auto_enabled, 1, "prerequisite shortage keeps auto enabled")
+eq(snapshot(0, 10).auto_enabled, 0, "unmet prerequisite cannot enable automatic research")
 research.repository():SetLevel(0, "RS-01", config.by_id["RS-01"].max_level)
+assert(toggle(0, 10, "advanced_lumberjack_speed").enabled)
 tick(1); eq(snapshot(0, 10).researching, 1, "prerequisite unlock retries")
 
 fixture()
@@ -316,11 +317,12 @@ tick(3); eq(snapshot(0, 10).research_group, "lumberjack_efficiency")
 eq(snapshot(0, 10).finish_at, 5)
 
 fixture()
-assert(manual(0, 10, "advanced_lumberjack_speed").ok)
+eq(manual(0, 10, "advanced_lumberjack_speed").error_code, "prerequisite_not_met")
 eq(snapshot(0, 10).researching, 0)
-assert(snapshot(0, 10).blocked_head.job_id)
+eq(snapshot(0, 10).queue_count, 0, "unmet prerequisites cannot reserve a queue position")
 research.repository():SetLevel(0, "RS-01", config.by_id["RS-01"].max_level)
-tick(1); eq(snapshot(0, 10).researching, 1, "queued prerequisite starts after it becomes valid")
+assert(manual(0, 10, "advanced_lumberjack_speed").ok)
+eq(snapshot(0, 10).researching, 1, "unlocked prerequisite permits a new request")
 
 fixture()
 research.repository():SetLevel(0, "RS-01", config.by_id["RS-01"].max_level - 1)
@@ -448,4 +450,129 @@ eq(snapshot(1, 12).finish_at, 5)
 tick(4); eq(level(0, "ARS-01"), 2); eq(level(1, "ARS-01"), 0)
 tick(5); eq(level(1, "ARS-01"), 1)
 eq(snapshot(1, 12).target_level, 2)
-print("RESEARCH_PRODUCTION_AUTO_PASS: two-second FIFO 1+6, start-time charge, idempotency, blocked head, auto pause/isolation, failure/lifecycle refunds")
+local function cancel(player, source, job_id, request_id)
+    return bus.request(events.TECHNOLOGY_RESEARCH_CANCEL_REQUEST, {
+        player_id = player, source_entindex = source, job_id = job_id, request_id = request_id,
+    })
+end
+
+local function research_card(group)
+    local result = bus.request(events.SHOP_OPEN_REQUEST,
+        { player_id = 0, source_entindex = 12, mode = "research" })
+    assert(result.ok)
+    for _, row in ipairs(result.snapshot.entries) do
+        if row.technology_group == group then return row end
+    end
+    error("missing research card: " .. group)
+end
+fixture()
+local locked_group = "researcher_super_wall_health"
+local locked_card = research_card(locked_group)
+eq(locked_card.purchasable, 0, "queue projection must not re-enable unmet prerequisites")
+eq(locked_card.prerequisite_met, 0);eq(locked_card.auto_research_available, 0)
+local prerequisite = config.by_legacy_group[locked_group].prerequisite
+research.repository():SetLevel(0, prerequisite.tech_id, prerequisite.required_level)
+eq(research_card(locked_group).purchasable, 1, "real prerequisite completion unlocks the card")
+rebirth_level = 0
+locked_card = research_card("researcher_hero_final_damage")
+eq(locked_card.purchasable, 0);eq(locked_card.prerequisite_met, 0)
+eq(locked_card.auto_research_available, 0, "rebirth gate also disables automatic research")
+rebirth_level = 3
+eq(research_card("researcher_hero_final_damage").purchasable, 1)
+
+fixture();rebirth_level = 0
+eq(manual(0, 12, "researcher_hero_final_damage").error_code, "reincarnation_not_met")
+eq(toggle(0, 12, "researcher_hero_final_damage").error_code, "reincarnation_not_met")
+eq(snapshot(0, 12).queue_count, 0);eq(snapshot(0, 12).auto_enabled, 0)
+rebirth_level = 3
+assert(manual(0, 12, "researcher_hero_final_damage").ok)
+
+-- Removing a middle upgrade closes the reserved-level gap without changing
+-- task identities or recharging the active research.
+fixture()
+local a = manual(0, 10, "lumberjack_speed")
+local b = manual(0, 10, "lumberjack_speed")
+local c = manual(0, 10, "lumberjack_speed")
+local d = manual(0, 10, "tower_attack")
+local before_cancel_wood = resources[0].wood
+assert(cancel(0, 10, b.job_id, "cancel-middle").ok)
+eq(refunds, 0, "queued research was never charged, so cancellation does not mint resources")
+eq(resources[0].wood, before_cancel_wood)
+eq(snapshot(0, 10).queue_count, 3)
+eq(snapshot(0, 10).queued[1].job_id, c.job_id)
+eq(snapshot(0, 10).queued[1].target_level, 2)
+eq(snapshot(0, 10).queued[2].job_id, d.job_id)
+assert(cancel(0, 10, b.job_id, "cancel-middle").ok, "same request is idempotent")
+eq(snapshot(0, 10).queue_count, 3)
+eq(cancel(0, 10, b.job_id, "stale-cancel").error_code, "research_job_not_found")
+tick(2);eq(snapshot(0, 10).active_job.job_id, c.job_id)
+eq(snapshot(0, 10).target_level, 2)
+tick(4);eq(level(0, "RS-01"), 2)
+tick(6);eq(snapshot(0, 10).queue_count, 0)
+
+-- Active cancellation refunds the real transaction exactly once and prevents
+-- its old completion callback from granting a level.
+fixture()
+local original_wood, original_gold = resources[0].wood, resources[0].gold
+a = manual(0, 10, "lumberjack_speed")
+local cancelled = cancel(0, 10, a.job_id, "cancel-active")
+assert(cancelled.ok and cancelled.refunded)
+eq(resources[0].wood, original_wood);eq(resources[0].gold, original_gold);eq(refunds, 1)
+assert(cancel(0, 10, a.job_id, "cancel-active").ok)
+eq(refunds, 1)
+tick(10);eq(level(0, "RS-01"), 0);eq(#commits, 0)
+eq(cancel(0, 10, a.job_id, "late-active").error_code, "research_job_not_found")
+
+fixture()
+a = manual(0, 10, "lumberjack_speed")
+b = manual(0, 10, "lumberjack_speed")
+assert(cancel(0, 10, a.job_id).ok)
+eq(snapshot(0, 10).active_job.job_id, b.job_id)
+eq(snapshot(0, 10).target_level, 1, "next queued click becomes the missing first upgrade")
+tick(2);eq(level(0, "RS-01"), 1);eq(#commits, 1)
+
+fixture()
+assert(toggle(0, 10, "lumberjack_speed").enabled);tick(0)
+local automatic_job = snapshot(0, 10).active_job
+assert(automatic_job.job_id and cancel(0, 10, automatic_job.job_id).ok)
+eq(snapshot(0, 10).auto_enabled, 0, "cancelled automatic task must not immediately recreate itself")
+tick(10);eq(level(0, "RS-01"), 0);eq(refunds, 1)
+
+fixture()
+resources[0].gold, resources[0].wood = 0, 0
+a = manual(0, 10, "lumberjack_speed")
+b = manual(0, 10, "lumberjack_speed")
+assert(cancel(0, 10, a.job_id).ok)
+eq(snapshot(0, 10).blocked_head.job_id, b.job_id)
+eq(snapshot(0, 10).blocked_head.target_level, 1)
+eq(snapshot(0, 10).queue_count, 1);eq(refunds, 0)
+assert(cancel(0, 10, b.job_id).ok)
+tick(10);eq(snapshot(0, 10).queue_count, 0)
+
+fixture()
+a = manual(0, 12, shared_group)
+b = manual(1, 12, shared_group)
+eq(cancel(1, 12, a.job_id).error_code, "research_job_not_found")
+eq(cancel(1, 10, a.job_id).error_code, "research_job_not_found")
+eq(cancel(0, 13, a.job_id).error_code, "research_job_not_found")
+eq(refunds, 0)
+assert(cancel(1, 12, b.job_id).ok)
+eq(snapshot(0, 12).researching, 1, "shared lab cancellation is private to the requesting player")
+tick(2);eq(level(0, "ARS-01"), 1);eq(level(1, "ARS-01"), 0)
+eq(cancel(0, 12, a.job_id).error_code, "research_job_not_found")
+eq(refunds, 1, "completed tasks cannot be cancelled for a refund")
+
+fixture()
+a = manual(0, 10, "lumberjack_speed")
+b = manual(0, 10, "lumberjack_speed")
+research.repository():SetLevel(0, "RS-01", config.by_id["RS-01"].max_level)
+assert(cancel(0, 10, a.job_id).ok)
+eq(snapshot(0, 10).queue_count, 0, "external max level safely drops superseded queued clicks")
+
+fixture()
+a = manual(0, 10, "lumberjack_speed")
+research.service().RollbackUpgrade = function() return nil end
+eq(cancel(0, 10, a.job_id).error_code, "research_cancel_failed")
+eq(snapshot(0, 10).active_job.job_id, a.job_id, "failed cancellation retains the active transaction and timer")
+tick(2);eq(level(0, "RS-01"), 1)
+print("RESEARCH_PRODUCTION_AUTO_PASS: FIFO 1+6, prerequisites locked, paid/current/queued cancellation, renumbering, refunds/idempotency, private shared labs, lifecycle")

@@ -8,7 +8,7 @@ local defeated = {}
 package.loaded["systems/player_context_service"] = {is_defeated = function(id) return defeated[id] == true end}
 DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_ALL = 3, 55
 DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER = 0, 0
-DOTA_UNIT_CAP_NO_ATTACK, DOTA_UNIT_CAP_RANGED_ATTACK = 0, 2
+DOTA_UNIT_CAP_NO_ATTACK, DOTA_UNIT_CAP_MELEE_ATTACK, DOTA_UNIT_CAP_RANGED_ATTACK = 0, 1, 2
 local vector = {}; vector.__add = function(a,b) return Vector(a.x+b.x,a.y+b.y,a.z+b.z) end
 Vector = function(x,y,z) return setmetatable({x=x,y=y,z=z or 0},vector) end
 local now = 0
@@ -87,6 +87,9 @@ local function reset()
         function unit:IsAlive() return not self.killed end
         function unit:entindex() return id end
         function unit:GetAbsOrigin() return self.position end
+        function unit:SetAttackCapability(value) self.attack_capability = value end
+        function unit:Script_SetAttackRange(value) self.attack_range = value end
+        function unit:SetModel(value) self.model = value end
         function unit:HasModifier() return false end
         function unit:FindModifierByName() return nil end
         function unit:FindAbilityByName() return nil end
@@ -198,6 +201,23 @@ for _, row in ipairs(definitions.rows) do
     if row.training_id:match("^train_lumberjack_") then assert(row.training_duration_seconds == 1) end
 end
 print("PASS lumberjack training integration: real completion, independent tiers/players, four entrances, capacity, resource/population reservations, cancel/refund, lifecycle and instant reward recruits")
+
+reset()
+result = bus.request(events.WORKER_TRAIN_REQUEST, {city = cities[0], source = "rogue_reward",
+    training_id = "train_lumberjack_04", count = 1, wood_cost_override = 0, gold_cost_override = 0})
+assert(result.ok and #spawned == 1)
+assert(spawned[1].model == definitions.by_id.train_lumberjack_04.model_name
+    and spawned[1].model:find("creep_2021_radiant_melee_mega", 1, true))
+assert(spawned[1].attack_capability == DOTA_UNIT_CAP_MELEE_ATTACK and spawned[1].attack_range == 400,
+    "the exact model in the warning must harvest without an attack projectile")
+print("LUMBERJACK_MODEL_ATTACK_PASS: actual LV4 melee model, direct native attacks, configured range400")
+assert(workers.register_fused_lumberjack(spawned[1], {
+    player_id = 0, team = 2, level = 4, population = 2, base_attack = 1500,
+    wood_per_hit = 15, attack_speed = 0.67, attack_range = 400, fusion_count = 3,
+}).ok)
+assert(spawned[1].survival_super_lumberjack and spawned[1].attack_capability == DOTA_UNIT_CAP_MELEE_ATTACK
+    and spawned[1].attack_range == 400, "fusion must not restore the invalid ranged projectile mode")
+print("SUPER_LUMBERJACK_ATTACK_PASS: fused registration retains direct attacks and configured range")
 
 -- Harvest growth exercises the real stat manager with the real worker subscriber.
 local stub_manager = package.loaded["systems/technology_stat_manager"]

@@ -15,7 +15,7 @@ package.loaded["systems/building_relocation"] = {bind = noop}
 package.loaded["debug/dev_wall_stats"] = {apply = noop, reset = noop}
 package.loaded["core/team_alignment"] = {enforce = noop}
 package.loaded["core/logger"] = {info = noop, warn = noop}
-package.loaded["systems/rogue_effect_state_service"] = {numeric = function() return 0 end}
+local rogue_effects = require("systems/rogue_effect_state_service")
 package.loaded["systems/forbidden_region_service"] = {validate_building_footprint = function() return true end}
 local defeated = false
 package.loaded["systems/player_context_service"] = {is_defeated = function() return defeated end}
@@ -78,6 +78,7 @@ local function entity(id, name, position)
     return unit
 end
 local function reset()
+    rogue_effects.reset()
     bus.reset();scheduler.clear();clock=0;units={};by_id={};defeated=false
     move=nil;paid=0;refunded=0;created=0;failed_create=false;reachable=true;foreign=false;cooldowns=0
     counts_events={};completed_events=0;destroyed_events=0;failed_move=false
@@ -247,3 +248,27 @@ assert(occupied()==0 and caster.survival_build_task==nil)
 tick(0.1);assert(paid==0 and created==0 and cooldowns==1,
     "disconnect cleanup must cancel the pending allowance without later starting construction")
 print("BUILDER_YIELD_CONSTRUCTION_PASS: accepted unique reservation, atomic construction transfer, duplicate/multi-builder rejection; cancel/death/invalid/timeout/failure/disconnect release; actual move and one spend/refund")
+
+-- The client talent projection and real construction must agree before the
+-- first city exists; only successful completion consumes the free charge.
+reset()
+local runtime_builder = require("ui/ability_runtime_builder")
+local view = {player_id = 0, city_level = 0, building_counts = {}, hero_summoned = 0}
+local resources = {wood = 0, gold = 0, population = 0, max_population = 0}
+local function build_altar()
+    return bus.request(events.BUILD_REQUEST, {caster = caster, player_id = 0,
+        building_id = "hero_altar", position = Vector(0,0,128), source_ability = ability})
+end
+assert(not build_altar().ok, "ordinary altar still requires a completed city level3")
+rogue_effects.add_numeric(0, "builder_free_hero_altar", 1)
+account.wood, account.gold = 0, 0
+local free_runtime = runtime_builder.build("ability_build_hero_altar", view, resources)
+assert(free_runtime.available == 1 and free_runtime.can_afford == 1)
+assert(build_altar().ok, "talent admits real altar construction at city0 with no resources")
+arrived();tick(0.1)
+assert(created == 1 and account.wood == 0 and account.gold == 0)
+assert(rogue_effects.numeric(0, "builder_free_hero_altar") == 1, "charge is retained during construction")
+tick(100)
+assert(completed_events == 1 and rogue_effects.numeric(0, "builder_free_hero_altar") == 0)
+assert(not build_altar().ok, "completion cannot reopen a duplicate free altar")
+print("FREE_ALTAR_CONSTRUCTION_PASS: real city0 placement/construction, zero cost, completion-only charge consumption, unique limit")

@@ -113,7 +113,7 @@ function M.init(options)
     event_bus.subscribe(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, refresh)
     event_bus.subscribe(research_events.LEVEL_CHANGED, refresh)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, refresh)
-    CustomGameEventManager:RegisterListener("ui_research_queue_request", function(_, payload)
+    local function research_request(operation, request_event, payload)
         payload = payload or {}
         local player_id = options.source_player_id(payload)
         if not options.valid_player_id(player_id) then return end
@@ -131,18 +131,20 @@ function M.init(options)
             or (unit.IsAlive and not unit:IsAlive()) then
             result = {ok = false, error = "请选择可用的研究所"}
         else
-            result = event_bus.request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, {
+            result = event_bus.request(request_event, {
                 player_id = player_id,
                 technology_group = tostring(payload.technology_group or ""),
+                job_id = tostring(payload.job_id or ""),
                 source_entindex = source,
                 request_id = tostring(payload.request_id or ""),
                 source = "research_queue_ui",
             }) or {ok = false, error = "研究请求未响应"}
         end
         options.send("ui_operation_result", player_id, {
-            operation = "research_queue", request_id = tostring(payload.request_id or ""),
+            operation = operation, request_id = tostring(payload.request_id or ""),
             source_entindex = source or -1, success = result.ok and 1 or 0,
             queued = result.queued and 1 or 0,
+            refunded = result.refunded and 1 or 0,
             error = result.ok and "" or (result.error or "研究排队失败"),
         })
         if result.ok then refresh({player_id = player_id, source_entindex = source})
@@ -150,6 +152,12 @@ function M.init(options)
             event_bus.emit(events.UI_NOTIFICATION, {player_id = player_id,
                 message = result.error or "研究排队失败", level = "error"})
         end
+    end
+    CustomGameEventManager:RegisterListener("ui_research_queue_request", function(_, payload)
+        research_request("research_queue", events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, payload)
+    end)
+    CustomGameEventManager:RegisterListener("ui_research_cancel_request", function(_, payload)
+        research_request("research_cancel", events.TECHNOLOGY_RESEARCH_CANCEL_REQUEST, payload)
     end)
     CustomGameEventManager:RegisterListener("ui_worker_train_request", function(_, payload)
         payload = payload or {}

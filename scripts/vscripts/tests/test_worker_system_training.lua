@@ -14,13 +14,13 @@ definitions.by_id = {}
 for _, row in ipairs(definitions.rows) do definitions.by_id[row.training_id] = row end
 package.loaded["config/generated/training_definitions"] = definitions
 package.loaded["systems/technology_stat_manager"] = {get = function() return {final = {lumberjack = {}}} end}
-package.loaded["systems/player_profile_service"] = {}
+package.loaded["systems/player_profile_service"] = {get_profile = function() return nil end}
 package.loaded["systems/rogue_effect_state_service"] = {numeric = function() return 0 end}
 package.loaded["core/modifier_registry"] = {ensure = function() return true end}
 
 DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_ALL = 3, 55
 DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER = 0, 0
-DOTA_UNIT_CAP_NO_ATTACK = 0
+DOTA_UNIT_CAP_NO_ATTACK, DOTA_UNIT_CAP_MELEE_ATTACK = 0, 1
 local vector = {}
 vector.__add = function(a, b) return Vector(a.x + b.x, a.y + b.y, a.z + b.z) end
 Vector = function(x, y, z) return setmetatable({x = x, y = y, z = z or 0}, vector) end
@@ -93,6 +93,9 @@ local function reset()
         function unit:entindex() return id end
         function unit:HasModifier() return false end
         function unit:GetAbsOrigin() return self.position end
+        function unit:FindModifierByName() return nil end
+        function unit:SetAttackCapability(value) self.attack_capability = value end
+        function unit:Script_SetAttackRange(value) self.attack_range = value end
         function unit:ForceKill() self.killed = true end
         setmetatable(unit, {__index = function(_, key)
             if key:match("^Set") or key == "AddNewModifier" then return function() end end
@@ -213,4 +216,14 @@ assert(#calls == 2 and calls[1].event == events.RESOURCE_TRY_SPEND_REQUEST)
 assert(calls[1].payload.wood == 0 and calls[1].payload.gold == 0)
 assert(calls[2].event == events.RESOURCE_RELEASE_POP_REQUEST and calls[2].payload.population == 1)
 
-print("PASS worker spawn safety: water/shore/height clearance, blocked/occupied/unavailable land, safe retry, spending, refunds, population and batch rollback")
+reset()
+assert(train({training_id = "train_lumberjack_01", source = "rogue_reward",
+    wood_cost_override = 0, gold_cost_override = 0}).ok)
+local lumberjack = units[100 + #created]
+assert(lumberjack.attack_capability == DOTA_UNIT_CAP_MELEE_ATTACK and lumberjack.attack_range == 400,
+    "native direct harvest attacks retain configured range without requesting a projectile attachment")
+reset()
+assert(train({training_id = "train_repairer_01"}).ok)
+assert(units[100 + #created].attack_capability == DOTA_UNIT_CAP_NO_ATTACK,
+    "repair workers must not gain attacks from the harvest fix")
+print("PASS worker spawn safety and direct harvest attacks: navigation, spending/refunds, population, rollback, range400, no-projectile lumberjack and non-attacking repairer")
