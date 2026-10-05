@@ -2,6 +2,8 @@ package.path = "scripts/vscripts/?.lua;" .. package.path
 local events = require("core/events")
 local handlers, wood, awarded, number_calls = {}, {}, 0, 0
 local frame, wall_reads, scans = 10, 0, 0
+GameRules = { GetGameTime = function() return frame end }
+local scheduler = require("core/scheduler")
 local next_index = 0
 local function entity(fields)
     local result = fields or {}
@@ -62,14 +64,18 @@ local function hit(player, count, attacker, target)
     end
 end
 
--- 100 real settlements remain 100 settlements/numbers, while repeated queries
+-- 100 real settlements remain 100 settlements; feedback is summed per tree.
+-- Repeated queries
 -- share one frame snapshot. Other players still use their own wall and bonus.
 hit(0, 100)
-assert(wood[0] == 500 and awarded == 100 and number_calls == 100)
+assert(wood[0] == 500 and awarded == 100 and number_calls == 0)
 assert(scans == 1 and wall_reads == 1)
 hit(1, 100)
 assert(wood[1] == 300 and awarded == 200)
 assert(scans == 1 and wall_reads == 2)
+frame = frame + 0.25
+scheduler.think()
+assert(number_calls == 2,"two private tree/player feedback batches replace 200 overheads")
 enemy.target = nil
 frame = frame + 0.03
 hit(1)

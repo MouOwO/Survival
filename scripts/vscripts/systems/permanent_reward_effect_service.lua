@@ -469,6 +469,16 @@ local function get(payload)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
     end
+    if payload.lumberjack_growth_only == true then
+        return {
+            ok = true,
+            totals = {lumberjack_attack_growth = tonumber(
+                (totals_by_player[player_id] or {}).lumberjack_attack_growth
+            )},
+            test_isolation = test_isolated_field_by_player[player_id] ~= nil,
+            isolated_field_id = test_isolated_field_by_player[player_id],
+        }
+    end
     if payload.armor_reduction_only == true then
         local source = totals_by_player[player_id] or {}
         return {

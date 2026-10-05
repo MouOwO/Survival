@@ -5,6 +5,7 @@ DOTA_TEAM_BADGUYS, DOTA_UNIT_CAP_NO_ATTACK = 3, 0
 class = function(t) return t end
 IsServer = function() return true end
 RandomFloat = function() return 99 end
+GameRules = {GetGameTime = function() return 0 end}
 PlayerResource = {GetPlayer = function(_, id) return {id=id} end}
 local events = require("core/events")
 local handlers, requests, grids, awards, created = {}, {}, {}, {}, {}
@@ -33,7 +34,7 @@ package.loaded["core/sound_service"] = {play = function() end}
 package.loaded["core/modifier_registry"] = {ensure = function() end}
 package.loaded["systems/rogue_effect_state_service"] = {numeric = function() return 0 end}
 package.loaded["systems/technology_stat_manager"] = {get = function() return {final={lumberjack={}}} end}
-package.loaded["systems/player_profile_service"] = {}
+package.loaded["systems/player_profile_service"] = {get_profile = function() return nil end}
 local function unit(name, id)
     local u = {name=name, id=id}
     function u:IsNull() return self.removed == true end

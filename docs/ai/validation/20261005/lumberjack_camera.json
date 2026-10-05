@@ -1,0 +1,251 @@
+{
+  "task": "Many lumberjacks harvesting while moving camera",
+  "baseline_ref": "960174ad42cd354f8924f577d0ba9e32245f1491",
+  "semantics": {
+    "resource_settlement": "immediate per hit",
+    "shared_and_personal_growth": "immediate per hit",
+    "native_damage_setters_and_stat_calculation": "unchanged immediate",
+    "harvest_feedback_window_seconds": 0.25,
+    "worker_ui_window_seconds": 0.1,
+    "visual_location": "actual harvested tree, private to harvesting player",
+    "hero_and_non_harvest_feedback": "unchanged"
+  },
+  "offline_counts": {
+    "200_technology_growth_field_visits": {
+      "before": 42000,
+      "after": 4600
+    },
+    "100_permanent_reward_queries_with_2000_unrelated_fields": {
+      "before": 200300,
+      "after": 0
+    },
+    "200_shared_and_personal_growth_hits": {
+      "immediate_native_damage_min_writes": 600,
+      "ui_events_before": 600,
+      "ui_events_after": 2
+    },
+    "1000_same_tree_harvest_hits": {
+      "wood_overheads_before": 1000,
+      "wood_overheads_after": 1,
+      "gold_events_before": 1000,
+      "gold_events_after": 1,
+      "wood_display_total": 500500,
+      "gold_display_total": 2000
+    },
+    "production_gold_ui_30_frames_with_moving_camera_for_1000_gold": {
+      "before": {
+        "labels": 1000,
+        "world_projections": 60002,
+        "entity_positions": 30001
+      },
+      "after": {
+        "labels": 1,
+        "world_projections": 62,
+        "entity_positions": 31
+      }
+    },
+    "limitations": "Burst fixtures and mocked engine boundaries; these counts are not measured native FPS or frame milliseconds."
+  },
+  "tests": {
+    "working": [
+      {
+        "test": "tools/test_lumberjack_feedback.lua",
+        "exit_code": 0,
+        "output": "LUMBERJACK_FEEDBACK_PASS: 1000 hits -> 1 wood overhead + 1 gold label; exact sums; private owners/trees; pause/removal/reuse/disconnect/reset\r\n"
+      },
+      {
+        "test": "tools/test_lumberjack_growth_projection.lua",
+        "exit_code": 0,
+        "output": "[PermanentReward] projection_refreshed player_id=0 revision=0 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=0 hero_all_attributes_flat=0 map_level=0\r\nLUMBERJACK_GROWTH_PROJECTION_PASS: 200 immediate growth requests visit 4600 fields; immutable earlier snapshots; all four growth mappings; rebuild/player isolation; live narrow permanent rewards\r\nLUMBERJACK_REWARD_QUERY_PASS: 100 queries full=200300 narrow=0\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+        "exit_code": 0,
+        "output": "[PLAYER_ASSET_CLEANUP] player=0 asset=worker requested=0\r\nPASS lumberjack training integration: real completion, independent tiers/players, four entrances, capacity, resource/population reservations, cancel/refund, lifecycle and instant reward recruits\r\nLUMBERJACK_MODEL_ATTACK_PASS: actual LV4 melee model, direct native attacks, configured range400\r\nSUPER_LUMBERJACK_ATTACK_PASS: fused registration retains direct attacks and configured range\r\n[PLAYER_ASSET_CLEANUP] player=0 asset=worker requested=1\r\nLUMBERJACK_GROWTH_FAST_PATH_PASS: 200 immediate shared/personality growth hits; 600 attack writes; 2 UI events; zero range/timer/modifier resets; player isolation; capped-tree skip\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_multiplayer_trees.lua",
+        "exit_code": 0,
+        "output": "[PLAYER_ASSET_CLEANUP] player=2 asset=worker requested=0\r\nMULTIPLAYER_TREES_PASS: four regions, reserved sockets, shared-region independent trees, cross-player harvest, fused-worker UI/targets, target-only upgrades and cleanup\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_hit_scan_coalescing.lua",
+        "exit_code": 0,
+        "output": "TREE_HIT_SCAN_COALESCING_PASS: 200 hits retain exact player rewards; 1 shared scan and 2 wall lookups per frame\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_health_projection.lua",
+        "exit_code": 0,
+        "output": "TREE_HEALTH_PROJECTION_PASS: all 100 levels fit native health and preserve logical health/damage ratios\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_attacker_whitelist.lua",
+        "exit_code": 0,
+        "output": "TREE_EVIDENCE_HOTPATH_PASS: 100 trees x 100 unrelated attacks cleanup calls=0; owned record cleanup=1\r\nTREE_EVIDENCE_LIFETIME_PASS: invalid attacker/parent cleanup and reused entity indices stay isolated\r\nTREE_EVIDENCE_EXPIRY_PASS: 1000 canceled nil-record starts bounded to 3 seconds; live projectiles preserved\r\nTREE_ATTACKER_WHITELIST_PASS: real heroes/workers, pre-identity towers, ultimate/hero-model towers, visual carriers, attack evidence and normal combat\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_worker_system_training.lua",
+        "exit_code": 0,
+        "output": "PASS worker spawn safety and direct harvest attacks: navigation, spending/refunds, population, rollback, range400, no-projectile lumberjack and non-attacking repairer\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_worker_training_queue.lua",
+        "exit_code": 0,
+        "output": "PASS independent training queue: serial completion, parallel players, reservations, capacity, ownership, refund and stale callbacks\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_lumberjack_fusion.lua",
+        "exit_code": 0,
+        "output": "PASS lumberjack fusion: 8 configured tiers, gates, retry/refund, ownership and duplicate prevention\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_resource_ui_coalescing.lua",
+        "exit_code": 0,
+        "output": "RESOURCE_UI_COALESCING_PASS: ability/research/shop burst/latest wallet/owner isolation/fixed deadline/structural updates/destruction/generation/closed shop\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_pure_permanent_rewards.lua",
+        "exit_code": 0,
+        "output": "[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\nPURE_PERMANENT_REWARDS_PASS: no old boss effects, new thresholds, signed effects, frozen social rewards and replay\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_gold_mine_reward_upgrade.lua",
+        "exit_code": 0,
+        "output": "PASS gold mine reward upgrade: owner, free one level, busy/dead target, normal upgrade payment\r\nLUMBERJACK_GOLD_ISOLATION_PASS\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_building_upgrade_lifecycle.lua",
+        "exit_code": 0,
+        "output": "[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\r\n[BuildingUpgrade] recovered unregistered arrow tower entindex=60\r\nBUILDING_UPGRADE_LIFECYCLE_PASS: expired handle/corpse exclusion/logical death/late publish/scan recovery/live rewards/index reuse/old-event isolation\r\nFARM_CITY_GATE_PASS: LV1-5 and same-team owner isolation\r\nLUMBERJACK_BUILDING_ISOLATION_PASS: 200 growth hits cause zero world scans and building refreshes\r\n"
+      },
+      {
+        "test": "tools/test_attack_hot_path.lua",
+        "exit_code": 0,
+        "output": "[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\nATTACK_HOT_PATH_PASS 100 queries full_visits=200500 narrow_visits=0; current stats/isolation/dedup; 100 unchanged armor hits; 50 hits/one UI update; unchanged quiet/debug critical numbers\r\n"
+      },
+      {
+        "test": "tools/test_deadline_scheduler.lua",
+        "exit_code": 0,
+        "output": "DEADLINE_SCHEDULER_PASS 8000 mixed queue operations, bounded replacement, zero idle scans/clocks, due snapshot, cancellation, errors\r\n"
+      },
+      {
+        "test": "tools/test_scheduler_profile.lua",
+        "exit_code": 0,
+        "output": "SCHEDULER_PROFILE_PASS tools-only opt-in, bounded aggregate rows/output, measured CPU costs, deadline stop, error reporting, manual stop\r\n"
+      },
+      {
+        "test": "tools/test_harvest_camera_projection.cjs",
+        "exit_code": 0,
+        "output": "HARVEST_CAMERA_PROJECTION_PASS {\"perHit\":{\"labels\":1000,\"projections\":60002,\"origins\":30001},\"batched\":{\"labels\":1,\"projections\":62,\"origins\":31}}\n"
+      }
+    ],
+    "index_only": [
+      {
+        "test": "tools/test_lumberjack_feedback.lua",
+        "exit_code": 0,
+        "output": "LUMBERJACK_FEEDBACK_PASS: 1000 hits -> 1 wood overhead + 1 gold label; exact sums; private owners/trees; pause/removal/reuse/disconnect/reset\r\n"
+      },
+      {
+        "test": "tools/test_lumberjack_growth_projection.lua",
+        "exit_code": 0,
+        "output": "[PermanentReward] projection_refreshed player_id=0 revision=0 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=0 hero_all_attributes_flat=0 map_level=0\r\nLUMBERJACK_GROWTH_PROJECTION_PASS: 200 immediate growth requests visit 4600 fields; immutable earlier snapshots; all four growth mappings; rebuild/player isolation; live narrow permanent rewards\r\nLUMBERJACK_REWARD_QUERY_PASS: 100 queries full=200300 narrow=0\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+        "exit_code": 0,
+        "output": "[PLAYER_ASSET_CLEANUP] player=0 asset=worker requested=0\r\nPASS lumberjack training integration: real completion, independent tiers/players, four entrances, capacity, resource/population reservations, cancel/refund, lifecycle and instant reward recruits\r\nLUMBERJACK_MODEL_ATTACK_PASS: actual LV4 melee model, direct native attacks, configured range400\r\nSUPER_LUMBERJACK_ATTACK_PASS: fused registration retains direct attacks and configured range\r\n[PLAYER_ASSET_CLEANUP] player=0 asset=worker requested=1\r\nLUMBERJACK_GROWTH_FAST_PATH_PASS: 200 immediate shared/personality growth hits; 600 attack writes; 2 UI events; zero range/timer/modifier resets; player isolation; capped-tree skip\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_multiplayer_trees.lua",
+        "exit_code": 0,
+        "output": "[PLAYER_ASSET_CLEANUP] player=2 asset=worker requested=0\r\nMULTIPLAYER_TREES_PASS: four regions, reserved sockets, shared-region independent trees, cross-player harvest, fused-worker UI/targets, target-only upgrades and cleanup\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_hit_scan_coalescing.lua",
+        "exit_code": 0,
+        "output": "TREE_HIT_SCAN_COALESCING_PASS: 200 hits retain exact player rewards; 1 shared scan and 2 wall lookups per frame\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_health_projection.lua",
+        "exit_code": 0,
+        "output": "TREE_HEALTH_PROJECTION_PASS: all 100 levels fit native health and preserve logical health/damage ratios\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_tree_attacker_whitelist.lua",
+        "exit_code": 0,
+        "output": "TREE_EVIDENCE_HOTPATH_PASS: 100 trees x 100 unrelated attacks cleanup calls=0; owned record cleanup=1\r\nTREE_EVIDENCE_LIFETIME_PASS: invalid attacker/parent cleanup and reused entity indices stay isolated\r\nTREE_EVIDENCE_EXPIRY_PASS: 1000 canceled nil-record starts bounded to 3 seconds; live projectiles preserved\r\nTREE_ATTACKER_WHITELIST_PASS: real heroes/workers, pre-identity towers, ultimate/hero-model towers, visual carriers, attack evidence and normal combat\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_worker_system_training.lua",
+        "exit_code": 0,
+        "output": "PASS worker spawn safety and direct harvest attacks: navigation, spending/refunds, population, rollback, range400, no-projectile lumberjack and non-attacking repairer\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_worker_training_queue.lua",
+        "exit_code": 0,
+        "output": "PASS independent training queue: serial completion, parallel players, reservations, capacity, ownership, refund and stale callbacks\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_lumberjack_fusion.lua",
+        "exit_code": 0,
+        "output": "PASS lumberjack fusion: 8 configured tiers, gates, retry/refund, ownership and duplicate prevention\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_resource_ui_coalescing.lua",
+        "exit_code": 0,
+        "output": "RESOURCE_UI_COALESCING_PASS: ability/research/shop burst/latest wallet/owner isolation/fixed deadline/structural updates/destruction/generation/closed shop\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_pure_permanent_rewards.lua",
+        "exit_code": 0,
+        "output": "[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\nPURE_PERMANENT_REWARDS_PASS: no old boss effects, new thresholds, signed effects, frozen social rewards and replay\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_gold_mine_reward_upgrade.lua",
+        "exit_code": 0,
+        "output": "PASS gold mine reward upgrade: owner, free one level, busy/dead target, normal upgrade payment\r\nLUMBERJACK_GOLD_ISOLATION_PASS\r\n"
+      },
+      {
+        "test": "scripts/vscripts/tests/test_building_upgrade_lifecycle.lua",
+        "exit_code": 0,
+        "output": "[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\r\n[BuildingUpgrade] recovered unregistered arrow tower entindex=60\r\nBUILDING_UPGRADE_LIFECYCLE_PASS: expired handle/corpse exclusion/logical death/late publish/scan recovery/live rewards/index reuse/old-event isolation\r\nFARM_CITY_GATE_PASS: LV1-5 and same-team owner isolation\r\nLUMBERJACK_BUILDING_ISOLATION_PASS: 200 growth hits cause zero world scans and building refreshes\r\n"
+      },
+      {
+        "test": "tools/test_attack_hot_path.lua",
+        "exit_code": 0,
+        "output": "[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\n[PermanentReward] projection_refreshed player_id=0 revision=1 hero_all_attributes_flat=0 map_level=0\r\nATTACK_HOT_PATH_PASS 100 queries full_visits=200500 narrow_visits=0; current stats/isolation/dedup; 100 unchanged armor hits; 50 hits/one UI update; unchanged quiet/debug critical numbers\r\n"
+      },
+      {
+        "test": "tools/test_deadline_scheduler.lua",
+        "exit_code": 0,
+        "output": "DEADLINE_SCHEDULER_PASS 8000 mixed queue operations, bounded replacement, zero idle scans/clocks, due snapshot, cancellation, errors\r\n"
+      },
+      {
+        "test": "tools/test_scheduler_profile.lua",
+        "exit_code": 0,
+        "output": "SCHEDULER_PROFILE_PASS tools-only opt-in, bounded aggregate rows/output, measured CPU costs, deadline stop, error reporting, manual stop\r\n"
+      },
+      {
+        "test": "tools/test_harvest_camera_projection.cjs",
+        "exit_code": 0,
+        "output": "HARVEST_CAMERA_PROJECTION_PASS {\"perHit\":{\"labels\":1000,\"projections\":60002,\"origins\":30001},\"batched\":{\"labels\":1,\"projections\":62,\"origins\":31}}\n"
+      }
+    ],
+    "lua_syntax": "All ten task Lua files parsed with Lua 5.1 luac -p"
+  },
+  "live": {
+    "dota_and_vconsole_running": true,
+    "tcp_console_listener": false,
+    "native_frame_time_or_fps_measured": false,
+    "game_restarted_or_paused": false,
+    "next_step": "Reload the addon/map and retest several lumberjacks plus camera panning; use survival_perf_capture 15 for scheduler callbacks if needed."
+  },
+  "git": {
+    "stash_oid": "bd90cc48689bbbd96aba786e550f1330b266acc0",
+    "pull": "Already up to date",
+    "original_dirty_files_preserved": 467,
+    "newline_only_normalization": [],
+    "historical_stashes_preserved": true,
+    "push": "Previously blocked by auto-review pending explicit MouOwO/Survival repository authorization; no push attempted for this task."
+  }
+}

@@ -17,6 +17,7 @@ local M = {}
 local training_queue
 local disconnected_players = {}
 local workers = {}
+local pending_growth_ui = {}
 local trees_by_player = {}
 local function player_tree(player_id)
     return trees_by_player[player_id] or { entindex = -1, lumber_efficiency_buff = 0 }
@@ -374,6 +375,32 @@ local function apply_lumberjack_attack(state, technology_attack)
     state.unit.survival_attack_max = maximum
 end
 
+local function queue_growth_ui(player_id, entindex, state, reason)
+    local pending = pending_growth_ui[player_id]
+    if not pending then
+        pending = {}
+        pending_growth_ui[player_id] = pending
+        scheduler.after(0.1, function()
+            if pending_growth_ui[player_id] ~= pending then return end
+            pending_growth_ui[player_id] = nil
+            for index, value in pairs(pending) do
+                if workers[index] == value.state and valid_entity(value.state.unit) then
+                    event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+                        unit = value.state.unit, entindex = index, player_id = player_id,
+                        reason = value.reason,
+                    })
+                end
+            end
+        end, "lumberjack_growth_ui_" .. tostring(player_id))
+    end
+    local value = pending[entindex]
+    if value and value.state == state then
+        value.reason = reason
+    else
+        pending[entindex] = {state = state, reason = reason}
+    end
+end
+
 local function refresh_worker_technology(player_id, refresh_reason)
     local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
     local permanent_result = event_bus.request(
@@ -503,10 +530,8 @@ local function on_technology_stats_changed(payload)
                 and valid_entity(state.unit) then
                 apply_lumberjack_attack(state, attack)
                 state.technology_attack_growth = attack * (tonumber(state.technology_multiplier) or 1)
-                event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
-                    unit = state.unit, entindex = entindex, player_id = player_id,
-                    reason = payload.reason or "lumberjack_attack_growth",
-                })
+                queue_growth_ui(player_id, entindex, state,
+                    payload.reason or "lumberjack_attack_growth")
             end
         end
         return
@@ -521,7 +546,7 @@ local function on_tree_hit(payload)
     local lumberjack = technology_stat_manager.get(player_id).final.lumberjack or {}
     local permanent_result = event_bus.request(
         events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-        { player_id = player_id }
+        { player_id = player_id, lumberjack_growth_only = true }
     )
     local permanent = permanent_result and permanent_result.totals or {}
     local amount = (tonumber(lumberjack.attack_gain_per_attack) or 0)
@@ -535,12 +560,8 @@ local function on_tree_hit(payload)
             (attacker_state.personality_attack_growth or 0)
                 + attacker_state.personality_attack_growth_per_hit
         apply_lumberjack_attack(attacker_state, lumberjack.attack_flat)
-        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
-            unit = attacker_state.unit,
-            entindex = attacker_entindex,
-            player_id = player_id,
-            reason = "lumberjack_self_pua_growth",
-        })
+        queue_growth_ui(player_id, attacker_entindex, attacker_state,
+            "lumberjack_self_pua_growth")
     end
     if amount <= 0 then return end
     event_bus.request(events.TECHNOLOGY_STATS_GROWTH_ADD_REQUEST, {
@@ -1493,6 +1514,8 @@ end
 local function on_player_disconnected(payload)
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
+    scheduler.cancel("lumberjack_growth_ui_" .. tostring(player_id))
+    pending_growth_ui[player_id] = nil
     disconnected_players[player_id] = true
     if training_queue then training_queue:cancel_player(player_id, "player_disconnected") end
     local targets = {}
@@ -1510,6 +1533,10 @@ local function on_player_disconnected(payload)
 end
 
 function M.init()
+    for player_id in pairs(pending_growth_ui) do
+        scheduler.cancel("lumberjack_growth_ui_" .. tostring(player_id))
+    end
+    pending_growth_ui = {}
     workers = {}
     trees_by_player = {}
     population_training_counts = {}

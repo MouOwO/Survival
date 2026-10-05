@@ -4,6 +4,7 @@ local config = require("config/tree_config")
 local particle_manager = require("core/particle_manager")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 local tree_damage_rules = require("systems/tree_damage_rules")
+local harvest_feedback = require("systems/harvest_feedback_service")
 
 local M = {}
 local trees_by_player = {}
@@ -313,13 +314,17 @@ local function on_tree_hit(payload)
             if type(callback) == "function" then callback(current_tree) end
         end
     end
-    local player = payload.player_id ~= nil
+    local player = payload.source ~= "lumberjack" and payload.player_id ~= nil
         and PlayerResource:GetPlayer(payload.player_id) or nil
-    particle_manager.show_green_number(attacker, efficiency, player)
     local gold_amount = math.max(0, math.floor(
         tonumber(payload.gold_per_hit_flat) or 0
     ))
-    if player and gold_amount > 0 then
+    if payload.source == "lumberjack" then
+        harvest_feedback.add(payload.player_id, current_tree, efficiency, gold_amount)
+    else
+        particle_manager.show_green_number(attacker, efficiency, player)
+    end
+    if payload.source ~= "lumberjack" and player and gold_amount > 0 then
         CustomGameEventManager:Send_ServerToPlayer(
             player,
             "survival_gold_mine_income_number",
@@ -340,6 +345,7 @@ end
 
 local function on_player_disconnected(payload)
     local player_id = tonumber(payload and payload.player_id)
+    if player_id ~= nil then harvest_feedback.reset(player_id) end
     local state = player_id and trees_by_player[player_id]
     if not state then return end
     trees_by_player[player_id] = nil
@@ -353,6 +359,7 @@ local function on_player_disconnected(payload)
 end
 
 function M.init()
+    harvest_feedback.reset()
     trees_by_player = {}
     trees_by_entity = {}
     region_slots = {}

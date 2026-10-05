@@ -248,6 +248,7 @@ end
 own[2].technology_multiplier=3
 own[2].personality_attack_growth=7
 own[2].personality_attack_pct=25
+own[1].personality_attack_growth_per_hit=0.5
 local foreign_before=foreign.unit.survival_attack_min
 bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,function()
     return {totals={lumberjack_attack_growth=0.25}}
@@ -255,12 +256,16 @@ end)
 for i=1,200 do
     bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[1].unit})
     assert(real_manager.get(0).final.lumberjack.attack_flat==i*0.25)
+    assert(own[1].personality_attack_growth==i*0.5,"individual growth is immediate too")
     for _,state in ipairs(own) do
         assert(state.unit.base_min==(state.base_damage_min+i*0.25*(state.technology_multiplier or 1)+(state.personality_attack_growth or 0))
             *(1+(state.personality_attack_pct or 0)/100),"each hit applies attack immediately")
     end
 end
-assert(attack_writes==400 and stat_events==400)
+assert(attack_writes==600 and stat_events==0,
+    "all damage writes are immediate; UI notifications wait for one bounded batch")
+tick(2.1)
+assert(stat_events==2,"200 hits publish the latest stats once per worker")
 assert(range_writes==0 and modifier_lookups==0,"growth must not reset attack timers/ranges or all modifiers")
 assert(foreign.unit.survival_attack_min==foreign_before,"growth stays player-private")
 -- Unscoped research still changes speed/range/modifiers.
@@ -272,5 +277,16 @@ for i=1,200 do bus.emit(events.TREE_CHANGED,{player_id=0,entindex=900,lumber_eff
 assert(modifier_lookups==0,"same capped tree must not walk all worker modifiers again")
 bus.emit(events.TREE_CHANGED,{player_id=0,entindex=901,lumber_efficiency_buff=99})
 assert(modifier_lookups>0,"replacement tree still updates targets")
+-- A pending display must not follow a dismissed/replaced worker or a
+-- disconnected player. Real stats above remain settled before cleanup.
+stat_events=0
+bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[1].unit})
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=own[2].unit,victim_entindex=own[2].unit:entindex()})
+tick(2.2)
+assert(stat_events==1,"removed worker does not receive a late growth UI event")
+bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[1].unit})
+bus.emit(events.PLAYER_DISCONNECTED,{player_id=0})
+tick(2.3)
+assert(stat_events==1,"disconnect cancels queued UI notifications")
 assert(#errors==0,table.concat(errors,"\n")); print=prior_print
-print("LUMBERJACK_GROWTH_FAST_PATH_PASS: 200 immediate shared growth hits; 400 attack writes; zero range/timer/modifier resets; player isolation; capped-tree skip")
+print("LUMBERJACK_GROWTH_FAST_PATH_PASS: 200 immediate shared/personality growth hits; 600 attack writes; 2 UI events; zero range/timer/modifier resets; player isolation; capped-tree skip")

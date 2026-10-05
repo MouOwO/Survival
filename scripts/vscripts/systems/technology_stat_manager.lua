@@ -181,6 +181,12 @@ local function copy_values(source)
     return result
 end
 
+local function shallow_copy(source)
+    local result = {}
+    for key, value in pairs(source) do result[key] = value end
+    return result
+end
+
 local function snapshot(state)
     if state.snapshot then return state.snapshot end
     local result = {
@@ -316,7 +322,25 @@ local function add_growth(payload)
         return { ok = false, error = "growth_field_invalid" }
     end
     state.growth[section][field] = state.growth[section][field] + amount
-    state.snapshot = nil
+    -- Growth affects one field. Preserve earlier snapshots while sharing their
+    -- unchanged sections, rather than copying every research group on each hit.
+    if state.snapshot then
+        local final_field = field == "attack" and "attack_flat"
+            or field == "wood_per_hit" and "wood_per_hit_bonus"
+            or "attributes_gain_per_second"
+        local next_snapshot = shallow_copy(state.snapshot)
+        next_snapshot.growth = shallow_copy(next_snapshot.growth)
+        next_snapshot.growth[section] = shallow_copy(next_snapshot.growth[section])
+        next_snapshot.growth[section][field] = state.growth[section][field]
+        next_snapshot.final = shallow_copy(next_snapshot.final)
+        next_snapshot.final[section] = shallow_copy(next_snapshot.final[section])
+        next_snapshot.final[section][final_field] =
+            number(state.technology[section][final_field])
+            + number((state.challenge[section] or {})[final_field])
+            + number((state.rogue[section] or {})[final_field])
+            + state.growth[section][field]
+        state.snapshot = next_snapshot
+    end
     publish(player_id, payload.reason or "runtime_growth", section, field)
     return { ok = true, snapshot = snapshot(state) }
 end
