@@ -1,0 +1,21 @@
+{
+  "asset": "models/survival_resources/resource_tree.vmdl",
+  "source_asset": "models/props_tree/mango_tree.vmdl",
+  "source_package": "Installed Valve Dota 2 pak01_dir.vpk",
+  "source_exporter": "Source 2 Viewer 20.0.0.0",
+  "build": "tools/build_resource_tree.ps1",
+  "change": "Add attach_hitloc to the existing tree_oak_01_root skeleton; no extra visible geometry, material, animation or particle systems.",
+  "attachment": {
+    "name": "attach_hitloc",
+    "parent_bone": "tree_oak_01_root",
+    "relative_origin": [0, 80, 0]
+  },
+  "compiled_geometry": {
+    "vertices": 4444,
+    "indices": 20838,
+    "draw_calls": 1,
+    "material": "materials/models/props_tree/mango_tree.vmat",
+    "bounds_min": [-120.56005, -116.65524, -0.6284085],
+    "bounds_max": [103.00073, 99.86029, 290.2768]
+  }
+}

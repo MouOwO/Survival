@@ -49,6 +49,7 @@ def main():
     by_id = {row['archetype_id']: row for row in archetypes[3]}
     units = {}
     models = {}
+    combat = {}
     for wave in waves[3]:
         row = by_id[wave['archetype_id']]
         boss = wave['member_role'] == 'assault_boss' or wave['is_boss'] == '1'
@@ -75,6 +76,7 @@ def main():
         row['unit_name'] = 'npc_survival_wave_named_' + row['archetype_id']
         units[row['unit_name']] = row['display_name']
         models[row['unit_name']] = row['model_path']
+        combat[row['unit_name']] = row
     write_table(archetypes)
     write_table(waves)
     for table in (archetypes, waves):
@@ -87,6 +89,14 @@ def main():
         # Spawn with the matching skeleton so the native movement graph initializes
         # correctly; copying the generic Undying model requires a late body swap.
         body = re.sub(r'("Model"\s*)"[^"]+"', lambda m: m[1] + '"' + models[key] + '"', template)
+        row = combat[key]
+        if row.get('projectile_model') == 'particles/units/heroes/hero_winter_wyvern/winter_wyvern_base_attack.vpcf':
+            body = re.sub(r'("AttackCapabilities"\s*)"[^"]+"', lambda m: m[1] + '"DOTA_UNIT_CAP_RANGED_ATTACK"', body)
+            body = re.sub(r'("AttackRange"\s*)"[^"]+"', lambda m: m[1] + '"' + row['attack_range'] + '"', body)
+            fields = '\n'.join('        "' + name + '" "' + value + '"' for name, value in (
+                ('ProjectileModel', row['projectile_model']), ('ProjectileSpeed', row['projectile_speed']),
+                ('AttackAnimationPoint', '0.25')))
+            body = body.rstrip()[:-1] + fields + '\n    }'
         definitions.append(f'    "{key}"\n    {body}')
     block = '\n'.join([BEGIN] + definitions + [END])
     if BEGIN in text:

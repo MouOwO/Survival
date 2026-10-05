@@ -87,7 +87,7 @@ function M.apply(unit, archetype, options)
     if not valid(unit) then return false, "invalid_unit" end
     local asset, reason = M.resolve(archetype, options)
     if not asset then return false, reason end
-    local ok, status, components = appearance.Apply(unit, asset)
+    local ok, status, components = appearance.Apply(unit, asset, options)
     if not ok then
         cosmetic_details.clear(unit)
         logger.warn("MonsterHeroVisual", "apply failed asset="

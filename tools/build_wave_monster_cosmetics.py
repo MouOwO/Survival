@@ -59,6 +59,24 @@ SPECS = {
     'boss_twinblade_demon': ('terrorblade', '5957', ''),
 }
 
+# Cosmetic tiers follow the first wave using each archetype. Item rarity and
+# equipped Immortal parts are the durable progression; market prices fluctuate.
+FLYING_SPECS = {
+    'flying_red_gargoyle': ('winter_wyvern', '20963', ''),  # W11, uncommon
+    'dragon_red_large': ('winter_wyvern', '21034', ''),    # W12, rare
+    'dragon_red_small': ('winter_wyvern', '21144', ''),    # W12, another rare set
+    'flying_green_head': ('winter_wyvern', '21370', ''),   # W13, rare
+    'dragon_purple_large': ('winter_wyvern', '21520', ''), # W14, mythical
+    'dragon_purple_small': ('winter_wyvern', '21074', ''), # W14, another mythical set
+    'flying_carpet_mage': ('winter_wyvern', '20811', ''),  # W16-17, mythical
+    'carpet_red_large': ('winter_wyvern', '21112', ''),    # W17, mythical
+    'carpet_red_small': ('winter_wyvern', '21818', ''),
+    'dragon_black_red_large': ('winter_wyvern', '21818+8017', ''), # W23, Immortal head
+    'dragon_black_red_small': ('winter_wyvern', '21818+29673', ''), # W23, Immortal back
+    'flying_black_bone': ('winter_wyvern', '21818+8017+29673', ''), # W24, two Immortals
+}
+SPECS.update(FLYING_SPECS)
+
 
 def parse_kv(text):
     tokens = iter(t for t in re.findall(r'//[^\n]*|"(?:\\.|[^"\\])*"|[{}]|[^\s{}"]+', text)
@@ -115,7 +133,7 @@ def modifiers(item):
             if k.startswith('asset_modifier') and isinstance(v, dict)]
 
 
-def import_rows(vpk):
+def import_rows(vpk, specs=None):
     schema = parse_kv(vpk.read('scripts/items/items_game.txt').decode('utf-8-sig'))['items_game']
     items = schema['items']
     by_name = {v.get('name'): k for k, v in items.items()}
@@ -126,11 +144,27 @@ def import_rows(vpk):
                          if isinstance(v, dict) and 'system' in v}
     output = {name: [] for name in ('asset_catalog', 'asset_components', 'asset_effects', 'asset_activity_modifiers')}
     models = {}
-    for order, (archetype, (hero, item_id, form_skin)) in enumerate(SPECS.items(), 100):
+    for archetype, (hero, item_id, form_skin) in (specs or SPECS).items():
+        order = 100 + list(SPECS).index(archetype)
         hero = 'npc_dota_hero_' + hero
-        selected = items[item_id]
-        label = loc.get(selected.get('item_name', '').lstrip('#').lower(), selected['name'])
-        ids = [by_name[name] for name in selected['bundle']] if 'bundle' in selected else [item_id]
+        if hero not in heroes:
+            # Current Dota splits hero definitions into per-hero resources.
+            definition = parse_kv(vpk.read('scripts/npc/heroes/' + hero + '.txt').decode('utf-8-sig'))
+            heroes[hero] = definition.get('DOTAHeroes', definition)[hero]
+        ids, labels = [], []
+        for selected_id in item_id.split('+'):
+            selected = items[selected_id]
+            labels.append(loc.get(selected.get('item_name', '').lstrip('#').lower(), selected['name']))
+            additions = [by_name[name] for name in selected['bundle']] if 'bundle' in selected else [selected_id]
+            # An extra Immortal replaces its slot rather than stacking two meshes.
+            for child_id in additions:
+                if hero not in items[child_id].get('used_by_heroes', {}):
+                    continue
+                slot = items[child_id].get('item_slot', 'weapon')
+                if '+' in item_id and selected_id != item_id.split('+')[0]:
+                    ids = [existing for existing in ids if items[existing].get('item_slot', 'weapon') != slot]
+                ids.append(child_id)
+        label = ' + '.join(labels)
         body = heroes[hero]['Model']
         asset_id = 'monster_wave_' + archetype
         skin = form_skin
@@ -218,6 +252,13 @@ def import_rows(vpk):
             output['asset_activity_modifiers'].append(dict(
                 modifier_key=asset_id + ':' + activity, asset_id=asset_id, modifier_name=activity,
                 sort_order=str(index), enabled='1', notes=f'{label}官方动作修饰'))
+        if archetype in FLYING_SPECS:
+            projectile = heroes[hero]['ProjectileModel']
+            vpk.verify(projectile)
+            output['asset_effects'].append(dict(
+                effect_key=asset_id + ':native_attack', asset_id=asset_id, effect_group_id='wave_native_attack',
+                effect_id='native_attack', effect_role='attack_projectile', phase='attack', particle_path=projectile,
+                sort_order='1', enabled='1', notes='寒冬飞龙原生普攻弹道；仅预加载，由原生攻击创建'))
         print(f'{archetype}: {label} [{item_id}] components={len(components)} particles={len(particles)}')
     return output, models
 
@@ -237,6 +278,10 @@ def sync(output, models, check):
         if row[headers.index('normal_flying_model_path')]:
             row[headers.index('normal_flying_model_path')] = models[archetype]
         row[headers.index('default_wearable_asset_id')] = 'monster_wave_' + archetype
+        if archetype in FLYING_SPECS:
+            row[headers.index('attack_type')] = 'ranged'
+            row[headers.index('projectile_model')] = 'particles/units/heroes/hero_winter_wyvern/winter_wyvern_base_attack.vpcf'
+            row[headers.index('projectile_speed')] = '700'
     assert seen == set(models), 'archetype not found: ' + str(set(models) - seen)
     expected = render_csv(rows, bom, newline)
     changes.append(expected != raw)
@@ -249,10 +294,14 @@ def sync(output, models, check):
     newline = '\r\n' if '\r\n' in text else '\n'
     text = text.replace('\r\n', '\n')
     begin, end = '    // BEGIN WAVE_MONSTER_COSMETICS', '    // END WAVE_MONSTER_COSMETICS'
-    lines = [begin]
+    proxy_blocks = {}
+    if begin in text:
+        existing = text[text.index(begin) + len(begin):text.index(end)]
+        for match in re.finditer(r'    "(asset_proxy_[^"]+)"\n    \{[\s\S]*?\n    \}', existing):
+            proxy_blocks[match[1]] = match[0]
     for asset in output['asset_catalog']:
         asset_id = asset['asset_id']
-        lines += ['    "' + asset['async_unit_name'] + '"', '    {',
+        lines = ['    "' + asset['async_unit_name'] + '"', '    {',
                   '        "BaseClass" "npc_dota_creature"',
                   '        "Model" "' + asset['primary_model'] + '"',
                   '        "precache"', '        {']
@@ -261,8 +310,8 @@ def sync(output, models, check):
         for effect in output['asset_effects']:
             if effect['asset_id'] == asset_id: lines.append('            "particle" "' + effect['particle_path'] + '"')
         lines += ['        }', '    }']
-    lines.append(end)
-    block = '\n'.join(lines)
+        proxy_blocks[asset['async_unit_name']] = '\n'.join(lines)
+    block = '\n'.join([begin] + list(proxy_blocks.values()) + [end])
     if begin in text:
         start = text.index(begin)
         stop = text.index(end, start) + len(end)
@@ -281,8 +330,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--vpk', type=Path, default=ROOT.parents[1] / 'dota/pak01_dir.vpk')
     parser.add_argument('--check', action='store_true')
+    parser.add_argument('--flying-only', action='store_true', help='Update only the twelve approved flying outfits')
     args = parser.parse_args()
-    output, models = import_rows(Vpk(args.vpk))
+    output, models = import_rows(Vpk(args.vpk), FLYING_SPECS if args.flying_only else None)
     changed = sync(output, models, args.check)
     print('WAVE_MONSTER_COSMETICS_' + ('STALE' if args.check and changed else 'PASS'))
     return int(args.check and changed)

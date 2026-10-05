@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-05",
+  "baseline": "4ad62bff65500b7631f334a22910aac9d3f2035d",
+  "input_log": "User attachment ef437c8b-a474-49fb-af43-11c65398e12d/已粘贴的文本.txt",
+  "observations": {
+    "server_think_ms": [
+      14.18,
+      16.01,
+      33.93,
+      17.6
+    ],
+    "tree_warning": "native mango_tree has no attach_hitloc; compiled replacement adds the attachment to the original bone",
+    "worker_warning": "creep melee models configured as ranged in the static definitions; 9 worker definitions now agree with the previously repaired direct-attack Lua",
+    "spawn_cost": "Appearance Apply scanned all creatures, props and wearables, then repeated discovery through a second engine API. Known state and fresh units no longer need world discovery.",
+    "flying_attack": "12 dragon, gargoyle and carpet archetypes now spawn with native Winter Wyvern model, ranged capability, projectile speed 700 and animation point 0.25; existing attack ranges retained."
+  },
+  "performance_fixture": {
+    "units": 90,
+    "components_per_unit": 2,
+    "before": {
+      "bulk_world_queries": 450,
+      "iterator_queries": 20745,
+      "entity_visits": 40590,
+      "props_created": 180
+    },
+    "after": {
+      "bulk_world_queries": 0,
+      "iterator_queries": 0,
+      "entity_visits": 0,
+      "props_created": 180
+    },
+    "scope": "Offline identical entity fixture, operation counts; not live frame-time or FPS measurements."
+  },
+  "cosmetics": {
+    "archetypes": 12,
+    "distinct_outfits": 12,
+    "tiers": "W11 uncommon; W12-13 rare; W14-17 mythical; W23 one Immortal; W24 two Immortals",
+    "market_prices_verified": false,
+    "parts_per_unit": 2,
+    "sum_parts_across_archetypes_before": 29,
+    "sum_parts_after": 24,
+    "sum_persistent_particle_roots_before": 2,
+    "sum_persistent_particle_roots_after": 2,
+    "custom_attack_timers_added": 0
+  },
+  "preserved": {
+    "wave_batches": 873,
+    "unselected_outfit_proxies": 27,
+    "attack_ranges": [
+      160,
+      180,
+      450,
+      500
+    ],
+    "health_damage_attack_speed_counts_passives_navigation": true
+  },
+  "tree": {
+    "compiler": "Valve resourcecompiler.exe",
+    "result": "1 compiled, 0 failed",
+    "attachment_verified_in_compiled_model": true,
+    "vertices": 4444,
+    "indices": 20838,
+    "draw_calls": 1,
+    "bounds_material_and_bone_match_original": true
+  },
+  "checks_passed": [
+    "test_model_appearance_spawn_cost.lua: zero discovery, stable reapply, rollback, delayed cleanup, hot reload, duplicate cleanup, owner/index reuse, old-engine iterator fallback",
+    "test_monster_ground_navigation.lua: 13 policies + 873 actual spawn configurations, original ranges, native capabilities/projectiles and fresh-unit option",
+    "test_flying_wave_resources.py --baseline-ref: 12 distinct native outfits, all model/particle paths in installed VPK, correct proxy preloads, compiled tree attachment, 9 direct workers, unchanged gameplay and 27 other proxies",
+    "test_wave_native_models.py: 44 named unit rebuild stability",
+    "build_wave_monster_cosmetics.py --flying-only --check: repeatable targeted generation",
+    "test_visual_feedback_repairs.lua: engine ownership of NPC activity graph",
+    "test_building_death_visual.lua",
+    "test_particle_cleanup_reentry.lua",
+    "test_hero_weapon_cosmetics.lua: selected hero props unaffected",
+    "test_enemy_wall_boundary_ai.lua: flying/ranged/ground collision boundary policies",
+    "test_wave_population_endgame.lua",
+    "7 CSV shapes and config module projection; monster wearable references; original 466 user files preserved modulo newline style"
+  ],
+  "live_validation": {
+    "game_running_at_check": false,
+    "fps_measured": false,
+    "native_animation_and_warning_absence_verified_in_game": false,
+    "required": "Reload the addon/map; verify W11-W24 attacks and worker/tree warning absence in a fresh match."
+  },
+  "sync": {
+    "branch": "dev",
+    "task_stash_oid": "596e98208d6571b4dcd803cc2b05781ea0928e2f",
+    "pull": "Already up to date",
+    "exact_task_stash_popped": true,
+    "other_stashes_preserved": 17,
+    "push": "Pending explicit authorization after previous automatic approval review rejected unverified remote destination MouOwO/Survival."
+  }
+}

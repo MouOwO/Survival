@@ -63,6 +63,7 @@ local function each_live_entity(class_name, callback)
         )
         if ok then
             for _, entity in ipairs(entities or {}) do visit(entity) end
+            return
         end
     end
     if type(Entities.FindByClassname) == "function" then
@@ -372,10 +373,10 @@ function M.Clear(unit)
         return true
     end
     if type(unit.entindex) ~= "function" then return false end
-    remove_legacy_carriers(unit)
     local entindex = unit:entindex()
     local state = states_by_unit[entindex]
     if state and state.owner ~= unit then return false end
+    if not state then remove_legacy_carriers(unit) end
     remove_all(state and state.wearables)
     states_by_unit[entindex] = nil
     unit.survival_model_appearance_asset_id = nil
@@ -392,15 +393,24 @@ function M.Matches(unit, appearance)
     return state_matches(unit, appearance, state)
 end
 
-function M.Apply(unit, appearance)
+function M.Apply(unit, appearance, options)
     if not valid(unit) or type(unit.entindex) ~= "function" then
         return false, "invalid_entity", nil
     end
     if unit.survival_building_death_visual then return false, "building_dead", nil end
-    remove_legacy_carriers(unit)
     local entindex = unit:entindex()
     local previous = states_by_unit[entindex]
-        or recover_live_state(unit, appearance)
+    if previous and previous.owner ~= unit then previous = nil end
+    local tracked = previous and previous.owner == unit
+    -- Newly spawned NPCs cannot have legacy carriers or orphan components.
+    -- Tracked NPCs already own an exact component list. Only cold recovery
+    -- needs to inspect the world (e.g. script reload with existing units).
+    local fresh = options and options.fresh_unit == true
+        and unit.survival_model_appearance_asset_id == nil
+    if not tracked and not fresh then
+        remove_legacy_carriers(unit)
+        previous = recover_live_state(unit, appearance)
+    end
     if state_matches(unit, appearance, previous) then
         return true, appearance and appearance.asset_id or "legacy_path",
             previous.components
@@ -485,7 +495,7 @@ function M.Apply(unit, appearance)
         components = components,
     }
     remove_all(previous and previous.wearables)
-    remove_owned_model_components(unit, spawned)
+    if not tracked and not fresh then remove_owned_model_components(unit, spawned) end
     unit.survival_model_appearance_asset_id = appearance and appearance.asset_id
         or "legacy_path"
     unit.survival_model_appearance_signature = component_signature(appearance)

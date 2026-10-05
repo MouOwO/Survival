@@ -62,6 +62,10 @@ local function unit_mock()
         "SetBaseMoveSpeed", "SetBaseAttackTime", "Script_SetAttackRange",
         "SetAttackCapability", "SetAcquisitionRange", "SetForwardVector",
         "AddAbility" }) do unit[method] = no_op end
+    function unit:Script_SetAttackRange(range) self.attack_range=range end
+    function unit:SetAttackCapability(capability) self.attack_capability=capability end
+    function unit:SetRangedProjectileName(path) self.projectile=path end
+    function unit:SetProjectileSpeed(speed) self.projectile_speed=speed end
     return unit
 end
 
@@ -116,7 +120,9 @@ local deps = {
     ["config/difficulty_config"] = require("config/difficulty_config"),
     ["core/team_alignment"] = { enforce = no_op },
     ["systems/monster_corpse_lifecycle_service"] = { track = no_op },
-    ["systems/monster_hero_visual_service"] = { apply = no_op },
+    ["systems/monster_hero_visual_service"] = { apply = function(_,_,options)
+        assert(options.fresh_unit == true,"new wave and challenge units must use bounded outfit attachment")
+    end },
     ["systems/challenge_monster_visual_service"] = { apply = no_op },
     ["systems/challenge_session_service"] = { handles = function() return false end },
     ["systems/player_room_locations"] = {
@@ -248,6 +254,13 @@ for _, row in ipairs(real_waves.rows) do
         spawn_wave(row, 0, row.wave_number, 1)
         assert(#created == previous_count + 1, "production batch was not spawned: " .. row.wave_id)
         local unit = created[#created]
+        assert(unit.attack_range == (definition.attack_range or 128),row.wave_id)
+        assert(unit.attack_capability == (definition.attack_type == "ranged"
+            and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK),row.wave_id)
+        if definition.projectile_model and definition.projectile_model ~= "" then
+            assert(unit.projectile == definition.projectile_model
+                and unit.projectile_speed == (definition.projectile_speed or 700),row.wave_id)
+        end
         assert(unit.unit_name == definition.unit_name
             and unit.survival_monster_role == row.member_role
             and unit.survival_is_boss == (row.member_role == "assault_boss"), row.wave_id)

@@ -715,6 +715,10 @@ local function apply_stats(unit, row, definition)
     local model_path = model_path_for(row, definition)
     if unit.SetModel and model_path then unit:SetModel(model_path) end
     if unit.SetOriginalModel and model_path then unit:SetOriginalModel(model_path) end
+    if definition.projectile_model and definition.projectile_model ~= "" then
+        if unit.SetRangedProjectileName then unit:SetRangedProjectileName(definition.projectile_model) end
+        if unit.SetProjectileSpeed then unit:SetProjectileSpeed(definition.projectile_speed or 700) end
+    end
     if unit.SetAttackCapability then
         unit:SetAttackCapability(definition.attack_type == "ranged"
             and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK)
@@ -780,6 +784,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     end
     pcall(monster_hero_visual_service.apply, unit, definition, {
         formal_wave = true,
+        fresh_unit = true,
         wave_number = wave_number,
         model_path = model_path_for(row, definition),
     })
@@ -1422,6 +1427,7 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
     pcall(monster_hero_visual_service.apply, unit, definition, {
         challenge = true,
+        fresh_unit = true,
         allow_outside_formal_wave = true,
         model_path = definition.model_path,
         default_wearable_asset_id = definition.default_wearable_asset_id,
