@@ -9,6 +9,7 @@ for route_number = 1, 7 do
         local rank = projection.project({ building_id = "arrow_tower", level = level })
         local row = level <= 5 and routes.arrow(level) or route[level - 5]
         local old_rarity, old_level = row.rarity, row.level
+        assert(row.rarity == rank.rarity, "CSV rarity must match the displayed rank at level " .. level)
         local name = routes.display_name(row)
         assert(name:find("【" .. rank.rarity .. "】", 1, true) == 1,
             "route/upgrade/overhead rarity mismatch at level " .. level)

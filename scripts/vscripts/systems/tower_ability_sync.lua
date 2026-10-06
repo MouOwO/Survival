@@ -11,6 +11,11 @@ local pending_by_entindex = {}
 local pending_queue = {}
 local next_generation = 0
 local drain_scheduled = false
+local upgrade_abilities = {
+    ability_upgrade_tower = true,
+    ability_upgrade_tower_lv01 = true,
+    ability_upgrade_tower_max = true,
+}
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -24,14 +29,17 @@ local function list_signature(values)
     return table.concat(result, ",")
 end
 
-local function ability_signature(state, row, fusion_enabled)
+local function ability_signature(state, row, wanted)
+    local names = {}
+    for name in pairs(wanted) do names[#names + 1] = name end
+    table.sort(names)
     return table.concat({
         tostring(state.tower_class or "base"),
         tostring(state.level or 0),
         tostring(row and row.record_id or ""),
         list_signature(row and row.active_skill_ids),
         list_signature(row and row.skill_ids),
-        fusion_enabled and "fusion" or "normal",
+        list_signature(names),
     }, "|")
 end
 
@@ -77,11 +85,6 @@ end
 local function remove_managed_abilities(state, row)
     local unit = state.unit
     local managed = {}
-    local upgrade_abilities = {
-        ability_upgrade_tower = true,
-        ability_upgrade_tower_lv01 = true,
-        ability_upgrade_tower_max = true,
-    }
     local function mark(ability_name)
         if ability_name and ability_name ~= "" then managed[ability_name] = true end
     end
@@ -138,11 +141,16 @@ local function sync_now(state, row, force)
     for _, ability_name in ipairs(row and row.active_skill_ids or {}) do
         local allowed = not base_tower_is_full
             and (ability_name ~= "ability_upgrade_tower_max"
-                or not row.rarity or row.rarity == "" or row.rarity == "N")
+                or tower_routes.can_upgrade_max(state))
         if allowed then wanted[ability_name] = true end
     end
     for _, skill_id in ipairs(row and row.skill_ids or {}) do
         wanted[skill_id] = true
+    end
+    if not tower_routes.can_upgrade(state) then
+        for name in pairs(upgrade_abilities) do wanted[name] = nil end
+    elseif not tower_routes.can_upgrade_max(state) then
+        wanted.ability_upgrade_tower_max = nil
     end
     local fusion = state.tower_class and row
         and tonumber(row.level) == tonumber(row.max_level)
@@ -157,7 +165,7 @@ local function sync_now(state, row, force)
         wanted.ability_upgrade_tower_max = nil
     end
 
-    local signature = ability_signature(state, row, wanted.ability_tower_fusion)
+    local signature = ability_signature(state, row, wanted)
     if not force
         and type(state.unit.survival_tower_managed_ability_names) == "table"
         and state.unit.survival_tower_ability_signature == signature then
@@ -212,7 +220,7 @@ local function sync_now(state, row, force)
         end
     end
     for _, skill_id in ipairs(row and row.skill_ids or {}) do
-        add_ability(state.unit, skill_id)
+        if wanted[skill_id] then add_ability(state.unit, skill_id) end
     end
     if not wanted.ability_tower_fusion
         and state.unit:FindAbilityByName("ability_tower_fusion") then

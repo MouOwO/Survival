@@ -517,9 +517,9 @@ local function tower_upgrade(ability_name, state, resources)
     local target = mode == "max" and tower_routes.stage_end_level(state) or state.level + 1
     local row = tower_routes.row_at_level(state, target)
     local current_row = tower_routes.current(state)
-    if mode == "max" and current_row and current_row.rarity
-        and current_row.rarity ~= "" and current_row.rarity ~= "N" then
-        return { available = 0, can_afford = 0, current_level = state.level, status_text = "当前稀有度不可升满" }
+    if mode == "max" and not tower_routes.can_upgrade_max(state) then
+        return { available = 0, can_afford = 0, current_level = state.level,
+            status_text = target <= state.level and "当前阶段已升满" or "当前阶段不支持一键升满" }
     end
     local cost = tower_routes.cost_to(state, target)
     if target <= state.level or not row or not cost then
@@ -791,6 +791,13 @@ local function hero_summon_runtime(ability_name, state)
     return result
 end
 function M.build(ability_name, state, resources, fusion_snapshot)
+    if ability_name == "ability_destroy_arrow_tower" then
+        local definition = tooltip_definitions.by_id["ability:" .. ability_name] or {}
+        return {available = 1, can_afford = 1,
+            display_name = definition.name or "销毁防御塔",
+            upgrade_description = definition.desc or "销毁本单位，不返还成长所消耗资源",
+            status_text = "可施法"}
+    end
     local fusion = lumberjack_fusion.runtime(ability_name, state, resources, fusion_snapshot)
     if fusion then return fusion end
     local summon = hero_summon_runtime(ability_name, state)

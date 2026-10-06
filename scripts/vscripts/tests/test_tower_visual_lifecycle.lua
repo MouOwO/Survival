@@ -295,8 +295,8 @@ local sentinel = unit(8)
 local route_config = require("config/tower_route_config")
 for level = 6, 10 do
     local actual_row = route_config.current(state(sentinel, level, "class_4"))
-    assert(actual_row.name == "火线哨兵" and actual_row.rarity == "N",
-        "real Fireline CSV N maps to global presentation R at levels 6–10")
+    assert(actual_row.name == "火线哨兵" and actual_row.rarity == "R",
+        "real Fireline CSV matches presentation R at levels 6–10")
     assert(service.apply(state(sentinel, level, "class_4")))
     local ids = service.debug_snapshot(sentinel.index).particle_ids
     assert(#ids == 1 and live_count() == 1 and particles[ids[1]].name == old_death_path)
@@ -317,7 +317,7 @@ assert(not service.apply(state(portal_failure, 6, "class_6")))
 assert(live_count() == 0 and not service.debug_snapshot(portal_failure.index).tracked)
 fail_control_at = nil
 
--- First profession forms are globally R, despite their legacy CSV N label.
+-- First profession forms use R in both CSV and presentation.
 -- Test the real row/position mapping rather than an impossible class-at-N state.
 for _, class_id in ipairs({"class_1", "class_6"}) do
     local initial = unit(7)
@@ -327,7 +327,7 @@ for _, class_id in ipairs({"class_1", "class_6"}) do
         assert(service.apply(state(initial, level, class_id)))
         local ids = service.debug_snapshot(initial.index).particle_ids
         assert(#ids == 4 and live_count() == 4)
-        assert(route_config.current(state(initial, level, class_id)).rarity == "N")
+        assert(route_config.current(state(initial, level, class_id)).rarity == "R")
         assert(initial.projectile == "row_default", "R towers retain their authored attack projectile")
         if previous then assert(created == before_created and ids[1] == previous) end
         previous = ids[1]

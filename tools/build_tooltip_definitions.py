@@ -1,6 +1,8 @@
 """Build the unified tooltip CSV and Lua index from existing CSV sources."""
 from __future__ import annotations
 import csv
+import argparse
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,7 +46,31 @@ def add(out, tooltip_id, tooltip_type, item_id, name, wood, gold, desc, icon, so
 def lua_string(value):
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"').replace("\r", "\\r").replace("\n", "\\n") + '"'
 
+def write_lua(out):
+    OUT_LUA.parent.mkdir(parents=True, exist_ok=True)
+    lines = ["-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.", "local M = {}", "M.rows = {"]
+    for key in sorted(out):
+        row = out[key]
+        lines.append("    { " + ", ".join(f"{field} = {lua_string(row[field])}" for field in FIELDS) + " },")
+    lines += ["}", "M.by_id = {}", "for _, row in ipairs(M.rows) do M.by_id[row.tooltip_id] = row end", "return M", ""]
+    OUT_LUA.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+
+
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--from-csv", action="store_true",
+                        help="Export the maintained tooltip CSV without rebuilding other definitions.")
+    args = parser.parse_args()
+    if args.from_csv:
+        from build_configs import build
+        rows = read_csv(OUT_CSV)
+        # Keep Lua string contents stable across Windows/Unix CSV checkouts.
+        with tempfile.TemporaryDirectory(prefix="survival_tooltips_") as directory:
+            source = Path(directory) / OUT_CSV.name
+            source.write_text(OUT_CSV.read_text(encoding="utf-8-sig"), encoding="utf-8", newline="\n")
+            build(source, OUT_LUA)
+        print(f"TOOLTIP_CSV_EXPORT_PASS rows={len(rows)} lua={OUT_LUA}")
+        return
     out = {}
     existing_tooltips = {
         clean(row.get("tooltip_id")): row
@@ -52,6 +78,7 @@ def main():
         if clean(row.get("tooltip_id")).startswith("ability:ability_build_")
         or clean(row.get("tooltip_id")).startswith("ability:ultimate_tower_passive_")
         or clean(row.get("tooltip_id")) == "ability:ability_survival_rogue_reward"
+        or clean(row.get("tooltip_id")) == "ability:ability_destroy_arrow_tower"
     }
     for row in existing_tooltips.values():
         add(
@@ -247,13 +274,7 @@ def main():
         for key in sorted(out):
             writer.writerow([out[key][field] for field in FIELDS])
 
-    OUT_LUA.parent.mkdir(parents=True, exist_ok=True)
-    lines = ["-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.", "local M = {}", "M.rows = {"]
-    for key in sorted(out):
-        row = out[key]
-        lines.append("    { " + ", ".join(f"{field} = {lua_string(row[field])}" for field in FIELDS) + " },")
-    lines += ["}", "M.by_id = {}", "for _, row in ipairs(M.rows) do M.by_id[row.tooltip_id] = row end", "return M", ""]
-    OUT_LUA.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    write_lua(out)
     print(f"TOOLTIP_BUILD_PASS rows={len(out)} csv={OUT_CSV} lua={OUT_LUA}")
 
 if __name__ == "__main__":

@@ -12,8 +12,8 @@ local modules = {
 }
 
 local M = {}
--- CSV rarity still controls existing gameplay (e.g. stage-max upgrades). UI
--- rank comes from the actual route position, shared with the overhead stars.
+-- CSV rarity matches the visible rank. Route positions remain the authority
+-- for upgrade limits so renaming a rarity never changes an upgrade/cost.
 local presentation_level_by_id = {}
 for index, row in ipairs(arrow.rows) do
     presentation_level_by_id[row.record_id] = index
@@ -127,6 +127,15 @@ function M.display_name(row)
     local level = presentation_level_by_id[row.record_id]
     return rank_projection.display_name({ building_id = "arrow_tower", level = level }, row.name)
         or row.name
+end
+
+function M.can_upgrade(state)
+    return M.row_at_level(state, state.level + 1) ~= nil
+end
+
+function M.can_upgrade_max(state)
+    -- Preserve quick-fill on the base N and first profession R stages.
+    return state.level < 10 and M.stage_end_level(state) > state.level
 end
 
 function M.display_name_for_unit(unit)

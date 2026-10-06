@@ -2,7 +2,9 @@
 -- Source: tooltip_definitions.csv
 local M = {}
 M.rows = {
+    { tooltip_id = "ability:ability_build_arrow_tower", tooltip_type = "ability", id = "ability_build_arrow_tower", name = "建造见习守望", needwood = 50, needgold = 0, desc = "建造可自动攻击敌人的见习守望。达到5星后，可选择七条转职路线之一。", icon = "survival/native/building_arrow_tower", source_id = "arrow_tower" },
     { tooltip_id = "ability:ability_build_farm", tooltip_type = "ability", id = "ability_build_farm", name = "建造人口农场", needwood = 100, needgold = 0, desc = "主城建成后解锁，最多建造1座。消耗100木材、0金币。", icon = "survival/native/building_farm", source_id = "building_farm" },
+    { tooltip_id = "ability:ability_destroy_arrow_tower", tooltip_type = "ability", id = "ability_destroy_arrow_tower", name = "销毁防御塔", needwood = 0, needgold = 0, desc = "销毁本单位，不返还成长所消耗资源", icon = "survival/native/skill_destroy", source_id = "ability_destroy_arrow_tower" },
     { tooltip_id = "ability:ability_enter_endless_training", tooltip_type = "ability", id = "ability_enter_endless_training", name = "无尽年轮圣殿", needwood = 0, needgold = 50000, desc = "传送至无尽年轮圣殿。英雄达到10转后解锁；每秒消耗50000金币；攻击练功建筑时攻击力与力量、敏捷、智力成长收益均为15倍。", icon = "survival/native/skill_endless", source_id = "altar_endless_training" },
     { tooltip_id = "ability:ability_enter_shadow_realm", tooltip_type = "ability", id = "ability_enter_shadow_realm", name = "暗影界前庭", needwood = 0, needgold = 50000, desc = "传送至暗影界前庭。当前版本仅开放传送，怪物与掉落逻辑暂不启用。", icon = "survival/native/skill_shadow", source_id = "altar_shadow_realm" },
     { tooltip_id = "ability:ability_fuse_lumberjack_01", tooltip_type = "ability", id = "ability_fuse_lumberjack_01", name = "超级伐木工LV1", needwood = 10000, needgold = 0, desc = "五个LV1普通伐木工合成；主城LV4；消耗10000木材；从11项性格池等概率抽取1项", icon = "survival/native/skill_fusion", source_id = "lumberjack_fusion_01" },
@@ -328,7 +330,6 @@ M.rows = {
     { tooltip_id = "inventory_item:weapon_legend_abyss_08", tooltip_type = "inventory_item", id = "weapon_legend_abyss_08", name = "传说：深渊审判+8", needwood = 0, needgold = 0, desc = "增加属性  - 140W攻击力  - 400%攻速  - 100%吸血  - 140W生命值  - 850护甲  - 全属性+700000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害", icon = "item_rapier", source_id = "weapon_legend_abyss_08" },
     { tooltip_id = "inventory_item:weapon_legend_abyss_09", tooltip_type = "inventory_item", id = "weapon_legend_abyss_09", name = "传说：深渊审判+9", needwood = 0, needgold = 0, desc = "增加属性  - 150W攻击力  - 400%攻速  - 100%吸血  - 150W生命值  - 850护甲  - 全属性+800000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害", icon = "item_rapier", source_id = "weapon_legend_abyss_09" },
     { tooltip_id = "inventory_item:weapon_legend_abyss_10", tooltip_type = "inventory_item", id = "weapon_legend_abyss_10", name = "传说：深渊审判+10", needwood = 0, needgold = 0, desc = "增加属性  - 200W攻击力  - 400%攻速  - 100%吸血  - 200W生命值  - 850护甲  - 全属性+900000 对周围200码敌人每秒造成全属性*5的伤害 每次造成伤害增加20点攻击力 每次造成伤害增加5点全属性 每次攻击10%概率对周围500码敌人发动焰爆造成全属性*50倍的伤害", icon = "item_rapier", source_id = "weapon_legend_abyss_10" },
-    { tooltip_id = "ability:ability_build_arrow_tower", tooltip_type = "ability", id = "ability_build_arrow_tower", name = "建造见习守望", needwood = 50, needgold = 0, desc = "建造可自动攻击敌人的见习守望。达到5星后，可选择七条转职路线之一。", icon = "survival/native/building_arrow_tower", source_id = "arrow_tower" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

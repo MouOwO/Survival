@@ -42,6 +42,10 @@ CSV 只填写策划可读的玩法数据：
 
 ## 塔等级与技能继承
 
+`rarity` 与游戏内品级一致：基础箭塔 N（总等级 1–5），第一阶段 R（6–10），第二阶段 SR（11–15），最终阶段 SSR（16–25）。SSR 前五级显示一至五星，后五级逐步变为红星；终极之塔使用 UR。路线的升级上限由实际等级行和 `level` / `max_level` 决定，不依赖品级名称。
+
+最终满级行的 `active_skill_ids` 不填写升级技能；运行时也会检查下一级是否存在并移除残留按钮。阶段之间仍有后续等级时保留单次升级，基础箭塔五级保留转职入口。
+
 每一级塔在所属路线表中填写：`base_attack_damage`、`upgrade_gold`、`upgrade_wood`、`population_cost` 和 `skill_ids`。
 
 - `base_attack_damage` 是升级完成后显示的基础攻击力。
