@@ -101,8 +101,7 @@ function modifier_tower_auto_attack:OnAttackStart(params)
     self:EnterIdle(true)
 end
 
--- A higher-priority enemy must not repeatedly cancel an existing shot windup.
--- Once the shot is released, select by proximity to the player's wall.
+-- Releasing a shot clears its windup, but does not release the combat target.
 function modifier_tower_auto_attack:OnAttack(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
     if params.no_attack_cooldown == true or params.no_attack_cooldown == 1 then return end
@@ -225,7 +224,11 @@ function modifier_tower_auto_attack:SelectTarget(excluded_target)
     end
     if not legal(self.manual_target) then self.manual_target = nil end
     if self.manual_target and not is_training_dummy(self.manual_target) then return self.manual_target end
-    -- Keep only the current windup; subsequent automatic selection uses the wall.
+    -- A living in-range combat victim remains locked across attack cycles.
+    -- Training dummies still yield to real enemies instead of pinning the tower.
+    if legal(self.forced_target) and not is_training_dummy(self.forced_target) then
+        return self.forced_target
+    end
     if legal(self.windup_target) and tower:GetAttackTarget() == self.windup_target
         and not is_training_dummy(self.windup_target) then return self.windup_target end
     self.windup_target = nil

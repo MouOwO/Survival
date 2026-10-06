@@ -24,25 +24,10 @@ function M.valid(tower, target, excluded)
     return legal(tower, target, excluded) and M.in_range(tower, target)
 end
 
-local function wall_origin(tower)
-    local player_id = tonumber(tower.survival_player_id)
-    if player_id == nil and tower.GetPlayerOwnerID then
-        player_id = tonumber(tower:GetPlayerOwnerID())
-    end
-    if player_id == nil or player_id < 0 then return nil end
-    -- Building ownership is player-specific, even when players share a team.
-    -- Lazy access avoids the building/modifier dependency cycle during startup.
-    local buildings = package.loaded["systems/building_system"]
-    local wall = type(buildings) == "table" and buildings.wall_for_player
-        and buildings.wall_for_player(player_id)
-    if wall and not wall:IsNull() and wall:IsAlive() then return wall:GetAbsOrigin() end
-end
-
 function M.select(tower, excluded)
     local range = combat.current_attack_range(tower)
     local range_squared = range*range
     local origin = tower:GetAbsOrigin()
-    local anchor = wall_origin(tower) or origin
     local units = FindUnitsInRadius(tower:GetTeamNumber(), origin, nil,
         range, DOTA_UNIT_TARGET_TEAM_ENEMY,
         DOTA_UNIT_TARGET_HERO+DOTA_UNIT_TARGET_BASIC,
@@ -51,8 +36,8 @@ function M.select(tower, excluded)
     for _, target in ipairs(units or {}) do
         if legal(tower,target,excluded) then
             local position = target:GetAbsOrigin()
-            if squared_distance(position, origin) <= range_squared then
-                local score = squared_distance(position, anchor)
+            local score = squared_distance(position, origin)
+            if score <= range_squared then
                 if target.survival_is_training_dummy then
                     if not dummy_distance or score < dummy_distance then
                         dummy, dummy_distance = target, score

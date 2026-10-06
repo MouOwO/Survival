@@ -18,9 +18,10 @@ local function enemy(id,x,name)
         entindex=function(self) return self.id end,GetTeamNumber=function() return 3 end,
         GetAbsOrigin=function(self) return self.position end,GetUnitName=function() return name or "wave_monster" end}
 end
-local candidates={}
+local candidates,queries={},0
 FindUnitsInRadius=function(_,_,_,_,_,_,_,order)
-    assert(order==FIND_ANY_ORDER,"selection must not request native nearest-to-tower sorting")
+    assert(order==FIND_ANY_ORDER,"use squared proximity without native sorting")
+    queries=queries+1
     return candidates
 end
 local wall=enemy(100,1000)
@@ -58,35 +59,51 @@ for _,route in ipairs({"base","class_1","class_2","class_3","class_4","class_5",
     local far,near,next_enemy=enemy(2,600),enemy(3,900),enemy(4,800)
     local closest_to_tower=enemy(6,50)
     local tree=enemy(5,10,"enemy_tree")
-    candidates={closest_to_tower,tree,far}
+    candidates={tree,far}
+    local initial_queries=queries
     m:OnIntervalThink()
     assert(tower.target==far and tower.orders==1)
     local stops=tower.stops
     m:OnAttackStart({attacker=tower,target=far})
     candidates={closest_to_tower,far,near,tree}
     m:OnIntervalThink()
-    assert(tower.target==far and tower.orders==1,"higher wall priority interrupted shot windup: "..route)
+    assert(tower.target==far and tower.orders==1,"new nearer enemy interrupted shot windup: "..route)
     m:OnAttack({attacker=tower,target=far})
     m:OnIntervalThink()
-    assert(tower.target==near and tower.orders==2,"enemy nearest the wall did not win next attack: "..route)
+    assert(tower.target==far and tower.orders==1,"released shot lost its living target: "..route)
     assert(tower.facing and tower.facing.x==1,"tower must face new target without turn-time delay")
-    for tick=1,30 do m:OnIntervalThink() end
-    assert(tower.orders==2 and tower.stops==stops,"stable attack repeatedly restarted")
+    for tick=1,1000 do
+        m:OnAttackStart({attacker=tower,target=far})
+        m:OnAttack({attacker=tower,target=far})
+        m:OnIntervalThink()
+    end
+    assert(queries==initial_queries+1,"locked combat target was rescanned: "..route)
+    assert(tower.orders==1 and tower.stops==stops,"stable attack repeatedly restarted")
     -- Engine may report IsAlive true until the death dispatch finishes.
     candidates={closest_to_tower,near,tree,next_enemy,far}
-    m:OnDeath({unit=near})
-    assert(tower.target==next_enemy and tower.orders==3,"death did not retarget in same callback")
+    m:OnDeath({unit=far})
+    assert(tower.target==closest_to_tower and tower.orders==2,"death did not acquire nearest enemy in same callback")
+    assert(queries==initial_queries+2,"one death should perform one replacement query")
     assert(tower.stops==stops and m:GetStackCount()==1,"retarget entered idle/disarm")
-    near.alive=false
+    far.alive=false
     tower.target=nil -- engine clears the dying order AFTER OnDeath handlers
     assert(tower.next_frame)
     tower.next_frame()
-    assert(tower.target==next_enemy and tower.orders==4,"post-death clear must recover next frame")
+    assert(tower.target==closest_to_tower and tower.orders==3,"post-death clear must recover next frame")
     tower.next_frame()
-    assert(tower.orders==4,"already accepted target must not be reordered")
+    assert(tower.orders==3 and queries==initial_queries+2,"accepted target must not be reordered or rescanned")
+    -- Range changes invalidate the lock; a missed death event also recovers.
+    closest_to_tower.position=vector(1001)
+    m:OnIntervalThink()
+    assert(tower.target==next_enemy and tower.orders==4 and queries==initial_queries+3,
+        "out-of-range target was retained")
+    next_enemy.alive=false
+    m:OnIntervalThink()
+    assert(tower.target==near and tower.orders==5 and queries==initial_queries+4,
+        "a missed death callback left the tower idle")
     local callback=tower.next_frame
     m:OnDestroy()
     callback()
-    assert(tower.orders==4,"deferred handoff resurrected destroyed tower AI")
+    assert(tower.orders==5,"deferred handoff resurrected destroyed tower AI")
 end
-print("TOWER_SEAMLESS_TARGETS_PASS: base, 7 routes, fusion; wall priority, protected windup, immediate kill switch, next-frame recovery, no cooldown reset or extra attack")
+print("TOWER_SEAMLESS_TARGETS_PASS: base, 7 routes, fusion; 9000 locked attack cycles without rescanning, nearest-on-death, range/death fallback, next-frame recovery, no cooldown reset or extra attack")

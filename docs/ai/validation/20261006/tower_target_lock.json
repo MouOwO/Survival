@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-06",
+  "task": "tower_combat_target_lock_and_nearest_reacquisition",
+  "baseline_commit": "74badd570eceebd8b16271c3af91a865da53ec2c",
+  "previous_behavior": {
+    "selection_interval_seconds": 0.25,
+    "priority": "distance_to_player_wall",
+    "lock": "current_windup_only"
+  },
+  "new_behavior": {
+    "lock": "current_living_legal_in_range_combat_target_across_attack_cycles",
+    "acquire_priority": "squared_2d_distance_from_tower",
+    "tie_break": "entindex",
+    "search_triggers": [
+      "initial_or_idle_acquisition",
+      "current_target_death_or_invalidity",
+      "out_of_range_or_ineligible_target",
+      "explicit_relocation_reset"
+    ],
+    "no_wall_lookup": true,
+    "manual_target_supported": true,
+    "training_dummy_yields_to_real_enemy": true,
+    "current_target_health_range_and_dropped_order_check_seconds": 0.25,
+    "immediate_death_handoff": true,
+    "next_frame_order_recovery": true,
+    "native_cooldown_and_damage": "unchanged"
+  },
+  "working_tree_tests": [
+    {
+      "test": "test_tower_seamless_targets",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_wall_targeting",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_target_selection",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_idle_state",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_skill_tree_exclusion",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_laser_damage",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_laser_visual",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_laser_health_prediction",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_attack_audio",
+      "exit_code": 0
+    },
+    {
+      "test": "test_ultimate_tower_tree_targeting",
+      "exit_code": 0
+    },
+    {
+      "test": "test_tower_upgrade_targeting",
+      "exit_code": 0
+    }
+  ],
+  "syntax_files": [
+    "scripts/vscripts/modifiers/modifier_tower_auto_attack.lua",
+    "scripts/vscripts/systems/tower_targeting.lua",
+    "scripts/vscripts/tests/test_tower_seamless_targets.lua",
+    "scripts/vscripts/tests/test_tower_wall_targeting.lua",
+    "scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua"
+  ],
+  "nine_tower_routes_locked_attack_cycles": 9000,
+  "radius_searches_during_those_locked_cycles": 0,
+  "additional_native_orders_during_those_locked_cycles": 0,
+  "machine_gun_and_anti_air_bursts": "original_hit_count_timing_and_damage; nearest_on_invalid_target",
+  "laser_damage": "original_immediate_hit_and_one_second_cumulative_totals",
+  "post_sync_validation": {
+    "status": "PASS",
+    "source": "isolated_task_only_git_index",
+    "tests": [
+      {
+        "test": "test_tower_seamless_targets",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_wall_targeting",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_target_selection",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_idle_state",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_skill_tree_exclusion",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_laser_damage",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_laser_visual",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_laser_health_prediction",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_attack_audio",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ultimate_tower_tree_targeting",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_upgrade_targeting",
+        "exit_code": 0
+      }
+    ],
+    "unrelated_working_tree_changes_not_used": true
+  },
+  "resource_compilation": "not_needed_Lua_only",
+  "live_engine": "not_verified; reload_map_to_validate",
+  "git_sync": {
+    "stash_pull_pop_completed": true,
+    "task_stash_oid": "e2c15556e120b8a3f290928c69e13d61372dbf85",
+    "head_after_pull": "7b228a44861028f94a3b4343ed4c9e747dc79262",
+    "restored_task_hashes_verified": true
+  }
+}

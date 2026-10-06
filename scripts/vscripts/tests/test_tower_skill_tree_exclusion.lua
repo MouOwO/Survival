@@ -899,7 +899,7 @@ do
     tower.survival_model_asset_id = nil
 
     -- The first and second victims die during one round. Remaining configured
-    -- shots must continue at the enemy nearest the wall, with one animation.
+    -- shots must continue at the enemy nearest the tower, with one animation.
     clear()
     tower.survival_model_asset_id = "test_native_stage"
     local saved_building_system = package.loaded["systems/building_system"]
@@ -913,7 +913,7 @@ do
     local saved_deal = combat.Deal
     combat.Deal = function(self, payload)
         local result = saved_deal(self, payload)
-        if payload.victim == dummy or payload.victim == third then payload.victim.alive=false end
+        if payload.victim == dummy or payload.victim == second then payload.victim.alive=false end
         return result
     end
     local chain = modifier({skills.by_id.machine_gun_lv03, bounty})
@@ -928,8 +928,8 @@ do
     end
     assert(#scheduled==0, "handoff must not create an additional burst")
     assert(#damage == 8 and #tracking == 8 and #gestures == 1)
-    assert(damage[1].victim==dummy and damage[2].victim==third and damage[3].victim==second,
-        "burst handoff must use wall proximity, while rejecting the closer-to-wall out-of-range enemy")
+    assert(damage[1].victim==dummy and damage[2].victim==second and damage[3].victim==third,
+        "burst handoff must use tower proximity while rejecting trees and out-of-range enemies")
     assert(math.abs(now-chain_started-7*skills.by_id.machine_gun_lv03.barrage_interval)<0.000001)
     for _,hit in ipairs(damage) do assert(hit.base_damage==100) end
     assert(count_request(events.RESOURCE_ADD_REQUEST)==8)
@@ -937,7 +937,7 @@ do
     chain:OnDestroy()
     assert(#gold_numbers==1, "cleanup must not duplicate paid-gold popup")
     combat.Deal=saved_deal
-    dummy.alive,third.alive=true,true
+    dummy.alive,second.alive=true,true
     package.loaded["systems/building_system"] = saved_building_system
     tower.survival_model_asset_id=nil
 
@@ -1011,7 +1011,7 @@ dummy.survival_movement_type = nil
 tree.survival_movement_type = nil
 
 -- Anti-air missiles also retain their scheduled extra shots after a kill,
--- using wall priority while ignoring ground enemies and resource trees.
+-- using tower proximity while ignoring ground enemies and resource trees.
 clear()
 tower.survival_tower_class = "class_7"
 dummy.survival_movement_type, third.survival_movement_type, fourth.survival_movement_type = "flying", "flying", "flying"
@@ -1023,7 +1023,7 @@ effects._start_anti_air_sequence_for_test(m, tower, dummy, missile)
 dummy.alive = false
 drain()
 assert(#native_attacks == missile.max_targets - 1)
-for _, target in ipairs(native_attacks) do assert(target == fourth, "missile handoff must use wall priority") end
+for _, target in ipairs(native_attacks) do assert(target == third, "missile handoff must use tower proximity") end
 dummy.alive = true
 dummy.survival_movement_type, third.survival_movement_type, fourth.survival_movement_type = nil, nil, nil
 package.loaded["systems/building_system"] = saved_building_system

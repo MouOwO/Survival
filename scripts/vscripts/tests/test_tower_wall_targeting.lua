@@ -1,4 +1,5 @@
--- Real targeting, auto-attack and relocation with unsorted engine candidates.
+-- The former wall-priority contract is replaced by nearest-to-tower acquisition
+-- and a combat lock; exercise real targeting, auto-attack and relocation.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 class = function(value) return value end
 LinkLuaModifier = function() end
@@ -21,7 +22,10 @@ local function unit(id,x,y,team)
     return value
 end
 local walls = {[0]=unit(90,1000,0,2), [1]=unit(91,-1000,0,2)}
-package.loaded["systems/building_system"] = {wall_for_player=function(id) return walls[id] end}
+local wall_queries = 0
+package.loaded["systems/building_system"] = {wall_for_player=function(id)
+    wall_queries=wall_queries+1; return walls[id]
+end}
 local tower = unit(1,0,0,2)
 tower.survival_player_id, tower.survival_building_id = 0, "arrow_tower"
 function tower:Script_GetAttackRange() return self.range or 1000 end
@@ -29,7 +33,7 @@ function tower:GetAttackRange() return 300 end -- stale getter cannot shrink scr
 function tower:GetPlayerOwnerID() return 0 end
 local candidates, queries = {}, {}
 FindUnitsInRadius = function(_,origin,_,radius,_,_,_,order)
-    assert(order == FIND_ANY_ORDER, "do not sort by tower proximity in the engine")
+    assert(order == FIND_ANY_ORDER, "use one squared-distance pass over unsorted candidates")
     queries[#queries+1] = {origin=origin, radius=radius}
     return candidates
 end
@@ -40,10 +44,10 @@ tree.name, dead.alive = "enemy_tree", false
 candidates = {near_tower, outside, tree, friendly, dead, near_wall}
 local original_sqrt = math.sqrt
 math.sqrt = function() error("target selection must not take a square root") end
-assert(targeting.select(tower) == near_wall, "wall proximity must override tower proximity and lower entity numbers")
+assert(targeting.select(tower) == near_tower, "choose the nearest in-range enemy to the tower")
 assert(queries[#queries].radius == 1000)
 assert(not targeting.valid(tower,outside), "old range tolerance must not retain an out-of-range target")
-assert(targeting.select(tower,near_wall) == near_tower, "excluded corpse can still report alive")
+assert(targeting.select(tower,near_tower) == near_wall, "excluded corpse can still report alive")
 near_wall.alive = false
 assert(targeting.select(tower) == near_tower)
 near_wall.alive = true
@@ -54,25 +58,26 @@ near_wall.position = Vector(900,0)
 local negative = unit(40,-900)
 candidates = {near_wall, negative, near_tower}
 tower.survival_player_id = 1
-assert(targeting.select(tower) == negative, "same-team players must use their own walls")
+assert(targeting.select(tower) == near_tower, "player slot cannot change distance from the tower")
 tower.survival_player_id = nil
-assert(targeting.select(tower) == near_wall, "native player owner is a compatibility fallback")
+assert(targeting.select(tower) == near_tower, "native owner cannot override tower proximity")
 tower.survival_player_id = 0
 walls[0].position = Vector(-1000,0)
-assert(targeting.select(tower) == negative, "wall location cannot be cached across relocation")
+assert(targeting.select(tower) == near_tower, "moving a wall must not change tower acquisition priority")
 walls[0].position = Vector(1000,0)
 walls[0].alive = false
-assert(targeting.select(tower) == near_tower, "no living wall falls back to tower priority")
+assert(targeting.select(tower) == near_tower, "tower priority does not require a living wall")
 walls[0].alive = true
+assert(wall_queries==0, "acquisition must not query building or wall ownership")
 
 local diagonal, beyond_diagonal = unit(50,600,800), unit(51,600,800.01)
-diagonal.position.z = 5000 -- range and wall priority are horizontal
+diagonal.position.z = 5000 -- range and proximity are horizontal
 candidates = {beyond_diagonal, diagonal}
 assert(targeting.select(tower) == diagonal and targeting.valid(tower,diagonal))
 assert(not targeting.valid(tower,beyond_diagonal), "squared range must include both horizontal axes")
 local tie_high, tie_low = unit(61,900,100), unit(60,900,-100)
 candidates = {tie_high,tie_low}
-assert(targeting.select(tower) == tie_low, "equal wall distances have a deterministic tie break")
+assert(targeting.select(tower) == tie_low, "equal tower distances have a deterministic tie break")
 candidates = {tie_low,tie_high}
 assert(targeting.select(tower) == tie_low)
 
@@ -86,7 +91,7 @@ local flying = unit(71,700)
 flying.survival_movement_type = "flying"
 tower.survival_tower_class = "class_7"
 candidates = {near_wall,tree,flying}
-assert(targeting.select(tower) == flying, "wall priority must retain anti-air eligibility")
+assert(targeting.select(tower) == flying, "nearest acquisition must retain anti-air eligibility")
 tower.survival_tower_class = nil
 math.sqrt = original_sqrt
 
@@ -113,16 +118,18 @@ local before_move, after_move = unit(80,700), unit(81,400)
 local closest_after_move = unit(82,-400)
 candidates = {closest_after_move,after_move,before_move}
 auto:OnIntervalThink()
-assert(tower.target == before_move)
-auto:OnAttackStart({attacker=tower,target=before_move})
-before_move.position = Vector(1001,0)
+assert(tower.target == after_move)
+auto:OnAttackStart({attacker=tower,target=after_move})
+after_move.position = Vector(1001,0)
 auto:OnIntervalThink()
-assert(tower.target == after_move and not auto.windup_target,
+assert(tower.target == closest_after_move and not auto.windup_target,
     "an out-of-range victim must be replaced even during windup")
-before_move.position = Vector(700,0)
+after_move.position = Vector(400,0)
+local locked_queries = #queries
 auto:OnIntervalThink()
-assert(tower.target == before_move)
-auto:OnAttackStart({attacker=tower,target=before_move})
+assert(tower.target == closest_after_move and #queries==locked_queries,
+    "returning enemies must not cause a fresh query while the victim remains legal")
+auto:OnAttackStart({attacker=tower,target=closest_after_move})
 
 local bus, events = require("core/event_bus"), require("core/events")
 local relocation = require("systems/building_relocation")
@@ -145,9 +152,9 @@ local function move_and_check(position,expected)
     assert(#queries==count+1 and queries[#queries].origin.x==position.x)
     assert(not auto.windup_target, "old windup must not lock the target after a move")
     assert(refresh() == nil)
-    assert(tower.target==expected, "network refresh must restore wall-priority targeting immediately")
+    assert(tower.target==expected, "network refresh must restore nearest-to-tower targeting immediately")
     assert(#queries==count+2 and queries[#queries].origin.x==position.x)
 end
-move_and_check(Vector(-500,0),after_move) -- previous victim now outside range
-move_and_check(Vector(500,0),before_move) -- former victim becomes eligible again
-print("TOWER_WALL_TARGETING_PASS: squared 2D wall priority, player isolation, range boundary, exclusions, ties, anti-air, real relocation and delayed refresh")
+move_and_check(Vector(-500,0),closest_after_move)
+move_and_check(Vector(500,0),after_move) -- old victim is still in range; moving resets acquisition
+print("TOWER_NEAREST_TARGETING_PASS: squared 2D tower proximity, wall independence, combat lock, range boundary, exclusions, ties, anti-air, real relocation and delayed refresh")
