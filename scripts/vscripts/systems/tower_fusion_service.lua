@@ -376,6 +376,11 @@ local function move_state(state, destination, grid)
         footprint = state.footprint,
         entindex = state.unit:entindex(),
     })
+    event_bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED, {
+        unit = state.unit, entindex = state.unit:entindex(),
+        player_id = state.player_id, team = state.team_number,
+        building_id = "ultimate_tower", level = 1,
+    })
     return true
 end
 

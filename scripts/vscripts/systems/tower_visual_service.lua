@@ -102,12 +102,13 @@ end
 
 local function add_anti_air_base(entry)
     for _, path in ipairs(anti_air_base) do
+        -- Native rings spawn stationary particles. An entity attachment can
+        -- still resolve the pre-teleport client origin during replication.
         local id = ParticleManager:CreateParticle(path,
-            PATTACH_ABSORIGIN_FOLLOW, entry.unit)
+            PATTACH_WORLDORIGIN, entry.unit)
         assert(type(id) == "number" and id >= 0, "anti-air base returned no valid ID")
         entry.particles[#entry.particles + 1] = id
-        ParticleManager:SetParticleControlEnt(id, 0, entry.unit,
-            PATTACH_ABSORIGIN_FOLLOW, "", entry.unit:GetAbsOrigin(), true)
+        ParticleManager:SetParticleControl(id, 0, entry.unit:GetAbsOrigin())
         -- These native children normally receive neutral HSV from the trap
         -- parent. Zero saturation/value would make the standalone rings dark.
         ParticleManager:SetParticleControl(id, 62, Vector(0, 1, 1))
@@ -156,13 +157,11 @@ function M.apply(state)
         key = key .. ":" .. tostring(radius) .. ":" .. tostring(profile.alpha)
             .. ":" .. table.concat(color or {}, ",")
     end
-    if profile_id == "class_7" then
-        -- Native trap rings initialize world-space particles, without position
-        -- lock. Recreate on the existing move event; no polling/update timer.
-        local origin = unit:GetAbsOrigin()
-        key = key .. ":" .. tostring(origin.x) .. ":" .. tostring(origin.y)
-            .. ":" .. tostring(origin.z)
-    end
+    -- Rebuild the entire base bundle on relocation, including native child
+    -- particles that only sample their spawn position. No movement polling.
+    local origin = unit:GetAbsOrigin()
+    key = key .. ":" .. tostring(origin.x) .. ":" .. tostring(origin.y)
+        .. ":" .. tostring(origin.z)
     local laser
     for id in pairs(tower_skills.get(unit) or {}) do
         local effect = laser_effect_selector.get(unit, id, state)

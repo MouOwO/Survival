@@ -445,3 +445,4 @@ __pycache__/
 !/scripts/vscripts/tests/test_tower_wall_targeting.lua
 !/scripts/vscripts/tests/test_visual_feedback_repairs.lua
 !/scripts/vscripts/tests/test_wall_repair_detection.lua
+!/scripts/vscripts/tests/test_tower_visual_relocation.lua

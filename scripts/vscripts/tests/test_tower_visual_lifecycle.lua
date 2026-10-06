@@ -33,6 +33,7 @@ assert(records == 8 and #profiles.rows == records)
 
 PATTACH_ABSORIGIN_FOLLOW = 10
 PATTACH_POINT_FOLLOW = 11
+PATTACH_WORLDORIGIN = 12
 DOTA_GAMERULES_STATE_POST_GAME = 8
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
 local world, phase = {}, 6
@@ -48,9 +49,9 @@ ParticleManager = {}
 function ParticleManager:CreateParticle(name, attach, unit)
     created = created + 1
     if created == invalid_create_at then return nil end
-    assert(attach == PATTACH_ABSORIGIN_FOLLOW and unit)
+    assert((attach == PATTACH_ABSORIGIN_FOLLOW or attach == PATTACH_WORLDORIGIN) and unit)
     local id = next_id; next_id = next_id + 1
-    particles[id] = { name = name, unit = unit, controls = {}, world = world }
+    particles[id] = { name = name, unit = unit, controls = {}, world = world, attach = attach }
     return id
 end
 function ParticleManager:SetParticleControlEnt(id, cp, unit, attach, attachment)
@@ -63,7 +64,7 @@ function ParticleManager:SetParticleControlEnt(id, cp, unit, attach, attachment)
 end
 function ParticleManager:SetParticleControl(id, cp, value)
     if created == fail_control_at then error("injected control failure") end
-    assert(cp == 1 or cp == 2 or cp == 62, "only size/alpha, color and native HSV are constant CPs")
+    assert(cp == 0 or cp == 1 or cp == 2 or cp == 62, "only size/alpha, color and native HSV are constant CPs")
     particles[id].controls[cp] = value
 end
 function ParticleManager:DestroyParticle(id, immediate)
@@ -181,7 +182,7 @@ laser_skills.apply(base, {})
 assert(live_count() == 0)
 
 -- One attached Shadow Realm ground root replaces every legacy death layer.
--- Tier changes rebuild once; stars, relocation and the red-star band do not.
+-- Tier changes and relocation rebuild once; same-tier stars retain the base.
 local death, death_profile = unit(9), profiles.by_id.class_1
 assert(death_profile.native_base == "io_amber_portal")
 local saved_death = {}
@@ -214,7 +215,10 @@ for level = 6, 25 do
     previous_id, previous_tier = ids[1], tier
     death.origin = Vector(level * 100, -level * 10, 384)
     bus.emit(events.BUILDING_CHANGED, state(death, level, "class_1"))
-    assert(service.debug_snapshot(death.index).particle_ids[1] == previous_id, "attached ground follows relocation")
+    local moved_id = service.debug_snapshot(death.index).particle_ids[1]
+    assert(moved_id ~= previous_id and particles[previous_id].destroyed and particles[previous_id].released,
+        "relocation must retire every old-position base layer")
+    previous_id = moved_id
 end
 
 -- Same-tier live configuration changes must not retain stale colors/size/alpha.
@@ -366,8 +370,11 @@ for class_number = 1, 7 do
         if class_number == 7 then
             for offset, path in ipairs(anti_air_base_paths) do
                 local effect = particles[ids[offset+1]]
-                assert(effect.name == path and effect.bindings[0].unit == u)
-                assert(effect.bindings[0].attachment == "")
+                assert(effect.name == path and effect.attach == PATTACH_WORLDORIGIN)
+                local center = assert(effect.controls[0])
+                assert(center.x == u.origin.x and center.y == u.origin.y and center.z == u.origin.z,
+                    "native trap center must use server coordinates, independent of client entity replication")
+                assert(not effect.bindings or not effect.bindings[0], "entity binding must not override the fixed trap center")
                 local hsv = effect.controls[62]
                 assert(hsv.x == 0 and hsv.y == 1 and hsv.z == 1, "trap rings need neutral HSV")
             end
@@ -393,13 +400,9 @@ for class_number = 1, 7 do
         assert(created == before_created, "unchanged state must not duplicate base effects")
         u.origin = Vector(u.origin.x + 300, u.origin.y - 400, 384)
         bus.emit(events.BUILDING_CHANGED, payload)
-        if class_number == 7 then
-            assert(created == before_created + expected_count and #destroyed == before_destroyed + expected_count,
-                "relocation must replace stationary native trap rings and retire old positions")
-            assert(live_count() == expected_count)
-        else
-            assert(created == before_created and #destroyed == before_destroyed, "D must not rebuild attached effects")
-        end
+        assert(created == before_created + expected_count and #destroyed == before_destroyed + expected_count,
+            "every route must replace the full old-position base bundle on relocation")
+        assert(live_count() == expected_count)
         for _, effect in pairs(particles) do
             if effect.world == world and not effect.released
                 and effect.name ~= mystery_base_path
@@ -458,8 +461,10 @@ for _ = 1, 20 do
     bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED, ultimate_state)
     service._sweep_for_test()
 end
-assert(created == shadow_created and live_count() == 4,
-    "persistent smoke survives idle/move/refresh without recreating")
+assert(created == shadow_created + 4 and live_count() == 4,
+    "ultimate relocation rebuilds once; stationary refreshes do not duplicate smoke")
+assert(particles[shadow_id].destroyed and particles[shadow_id].released)
+shadow_id = service.debug_snapshot(40).particle_ids[4]
 bus.emit(events.TOWER_FUSION_RUNTIME_REMOVED, { entindex = 40 })
 assert(live_count() == 0)
 assert(particles[shadow_id].destroyed and particles[shadow_id].released)

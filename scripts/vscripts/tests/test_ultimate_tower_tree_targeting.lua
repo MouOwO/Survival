@@ -134,6 +134,29 @@ assert(filter(nil, keys) == false, "real order filter denies ultimate tower orde
 keys.entindex_target = enemy:entindex()
 assert(filter(nil, keys) == true and tower.target == enemy, "normal enemy orders still acquire the target")
 
+-- Actual fusion relocation must notify base/portrait projections after moving.
+local move_events = 0
+local destination = Vector(320, 160, 384)
+function tower:FindAbilityByName(name) return self.abilities[name] end
+tower.abilities.ability_building_blink = {
+    IsNull = function() return false end, IsHidden = function() return false end,
+    IsActivated = function() return true end,
+}
+bus.subscribe(events.TOWER_FUSION_RUNTIME_CHANGED, function(payload)
+    assert(payload.unit == tower and payload.building_id == "ultimate_tower")
+    assert(payload.unit:GetAbsOrigin().x == destination.x
+        and payload.unit:GetAbsOrigin().y == destination.y)
+    move_events = move_events + 1
+end)
+result = bus.request(events.TOWER_FUSION_MOVE_REQUEST,
+    {player_id = 0, entindex = tower:entindex(), position = destination})
+assert(result and result.ok and move_events == 1,
+    "successful ultimate relocation publishes one new-position visual refresh")
+result = bus.request(events.TOWER_FUSION_MOVE_REQUEST,
+    {player_id = 1, entindex = tower:entindex(), position = Vector(400,160,384)})
+assert(result and not result.ok and move_events == 1,
+    "rejected relocation must leave particles and position unchanged")
+
 fail_modifier = true; initialize()
 result = bus.request(events.TOWER_FUSION_REQUEST, {caster = material[1].unit})
 assert(result and not result.ok and created.removed and consumed == 0,

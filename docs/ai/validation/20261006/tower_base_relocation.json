@@ -1,0 +1,168 @@
+{
+  "date": "2026-10-06",
+  "scope": "All tower base bundles follow relocation; native anti-air circles use explicit server world origin; ultimate movement publishes its visual projection",
+  "native_ring_issue": "Stationary spawn geometry lacks PositionLock; entity-follow creation depends on client entity replication. This is a demonstrated contract failure in delayed-client simulation, not claimed as directly measured visual engine root cause.",
+  "source_audit": "Native trap rings/inner have no PositionLock; other custom layers contain SetToCP or PositionLock; native Bulldoze and Slark child layers contain PositionLock. Rebuild complete bundles on explicit relocation to retire old-position children.",
+  "state_machine": [
+    "create bundle at current style/XYZ",
+    "reuse unchanged position and tier",
+    "successful move retires complete old bundle and creates current-origin bundle",
+    "rejected move preserves state",
+    "death/removal/world change clears owned particles"
+  ],
+  "simulation_forms": 145,
+  "simulation_actual_relocations": 435,
+  "working_tree_results": [
+    {
+      "test": "test_tower_visual_lifecycle",
+      "exit_code": 0,
+      "tail": [
+        "[TowerVisual] particle cleanup failed: ...ripts\\vscripts\\tests\\test_tower_visual_lifecycle.lua:76: injected destroy failure",
+        "TOWER_VISUAL_LIFECYCLE_SIMULATION_PASS: CSV, 7 routes, N projectile, tiers, move, replacement, teardown, failures, restart"
+      ]
+    },
+    {
+      "test": "test_tower_visual_relocation",
+      "exit_code": 0,
+      "tail": [
+        "[BuildingBlink] network refresh ent=145 actual=(960.0,-480.0,320.0)",
+        "TOWER_VISUAL_RELOCATION_PASS: 145 forms, 435 real moves, delayed client position, native world centers, no residue/duplicates/timers"
+      ]
+    },
+    {
+      "test": "test_ultimate_tower_tree_targeting",
+      "exit_code": 0,
+      "tail": [
+        "[TowerFusion] failed player=0 error=fusion_create_runtime_error",
+        "ULTIMATE_TOWER_TREE_TARGETING_PASS: real fusion, modifier installation, ordinary targets, automatic/manual tree rejection, order filter and failed-init rollback"
+      ]
+    },
+    {
+      "test": "test_tower_wall_targeting",
+      "exit_code": 0,
+      "tail": [
+        "[BuildingBlink] network refresh ent=1 actual=(500.0,0.0,0.0)",
+        "TOWER_NEAREST_TARGETING_PASS: squared 2D tower proximity, wall independence, combat lock, range boundary, exclusions, ties, anti-air, real relocation and delayed refresh"
+      ]
+    },
+    {
+      "test": "test_tower_relocation_grid",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_RELOCATION_ROUTER_PASS shared grid session, no build costs, duplicate/revalidation safety",
+        "TOWER_RELOCATION_IMMEDIATE_PASS cold commit, late ghost rejection, retry, new/closed session isolation, fresh ownership/range/occupancy/cooldown/finite checks"
+      ]
+    },
+    {
+      "test": "test_tower_seamless_targets",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_SEAMLESS_TARGETS_PASS: base, 7 routes, fusion; 9000 locked attack cycles without rescanning, nearest-on-death, range/death fallback, next-frame recovery, no cooldown reset or extra attack"
+      ]
+    },
+    {
+      "test": "test_tower_laser_visual",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_LASER_VISUAL_PASS: head surface, bounds/socket fallback, actual damage, scaling, finite burst ownership"
+      ]
+    },
+    {
+      "test": "test_tower_upgrade_targeting",
+      "exit_code": 0,
+      "tail": [
+        "[Survival][INFO][BuildingSystem] initialized recovered=2",
+        "TOWER_UPGRADE_TARGETING_PASS: actual construction, upgrade completion, technology/permanent range changes, technology-only and building recovery, zero native acquisition and ordinary-enemy targeting"
+      ]
+    }
+  ],
+  "old_native_ring_counterexample": "Fails server-origin contract while client origin deliberately lags, as expected",
+  "engine_runtime": {
+    "exit_code": 0,
+    "runtime_pass": true,
+    "lines": [
+      "BASE_MOVE_NATIVE_7d411ebdc74f4289acd8687d3b806e49\tRUNTIME_PASS\t9\tnative moves; production service isolated from active game",
+      "BASE_MOVE_NATIVE_7d411ebdc74f4289acd8687d3b806e49_DONE"
+    ],
+    "scope": "Private patched production visual service, one nonregistered thinker, R/SR/SSR native ring API calls and cleanup; active towers/economy/modules unchanged",
+    "visual_appearance_verified": false
+  },
+  "engine_test_production_source_sha256": "2f428e92422fa8a33ef6f58e1fbee12b3829a91947a06cee7576bee46a435660",
+  "active_user_game": "Only read-only inspection and isolated, nonregistered thinker API test. Private patched service not installed; test thinker and particle handles cleaned.",
+  "visual_appearance_verified": false,
+  "compile_required": false,
+  "new_periodic_timers": 0,
+  "post_sync_results": [
+    {
+      "test": "test_tower_visual_lifecycle",
+      "exit_code": 0,
+      "tail": [
+        "[TowerVisual] particle cleanup failed: ...ripts\\vscripts\\tests\\test_tower_visual_lifecycle.lua:76: injected destroy failure",
+        "TOWER_VISUAL_LIFECYCLE_SIMULATION_PASS: CSV, 7 routes, N projectile, tiers, move, replacement, teardown, failures, restart"
+      ]
+    },
+    {
+      "test": "test_tower_visual_relocation",
+      "exit_code": 0,
+      "tail": [
+        "[BuildingBlink] network refresh ent=145 actual=(960.0,-480.0,320.0)",
+        "TOWER_VISUAL_RELOCATION_PASS: 145 forms, 435 real moves, delayed client position, native world centers, no residue/duplicates/timers"
+      ]
+    },
+    {
+      "test": "test_ultimate_tower_tree_targeting",
+      "exit_code": 0,
+      "tail": [
+        "[TowerFusion] failed player=0 error=fusion_create_runtime_error",
+        "ULTIMATE_TOWER_TREE_TARGETING_PASS: real fusion, modifier installation, ordinary targets, automatic/manual tree rejection, order filter and failed-init rollback"
+      ]
+    },
+    {
+      "test": "test_tower_wall_targeting",
+      "exit_code": 0,
+      "tail": [
+        "[BuildingBlink] network refresh ent=1 actual=(500.0,0.0,0.0)",
+        "TOWER_NEAREST_TARGETING_PASS: squared 2D tower proximity, wall independence, combat lock, range boundary, exclusions, ties, anti-air, real relocation and delayed refresh"
+      ]
+    },
+    {
+      "test": "test_tower_relocation_grid",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_RELOCATION_ROUTER_PASS shared grid session, no build costs, duplicate/revalidation safety",
+        "TOWER_RELOCATION_IMMEDIATE_PASS cold commit, late ghost rejection, retry, new/closed session isolation, fresh ownership/range/occupancy/cooldown/finite checks"
+      ]
+    },
+    {
+      "test": "test_tower_seamless_targets",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_SEAMLESS_TARGETS_PASS: base, 7 routes, fusion; 9000 locked attack cycles without rescanning, nearest-on-death, range/death fallback, next-frame recovery, no cooldown reset or extra attack"
+      ]
+    },
+    {
+      "test": "test_tower_laser_visual",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_LASER_VISUAL_PASS: head surface, bounds/socket fallback, actual damage, scaling, finite burst ownership"
+      ]
+    },
+    {
+      "test": "test_tower_upgrade_targeting",
+      "exit_code": 0,
+      "tail": [
+        "[Survival][INFO][BuildingSystem] initialized recovered=2",
+        "TOWER_UPGRADE_TARGETING_PASS: actual construction, upgrade completion, technology/permanent range changes, technology-only and building recovery, zero native acquisition and ordinary-enemy targeting"
+      ]
+    }
+  ],
+  "syntax_checked": [
+    "scripts/vscripts/systems/tower_visual_service.lua",
+    "scripts/vscripts/systems/tower_fusion_service.lua",
+    "scripts/vscripts/tests/test_tower_visual_lifecycle.lua",
+    "scripts/vscripts/tests/test_tower_visual_relocation.lua",
+    "scripts/vscripts/tests/test_ultimate_tower_tree_targeting.lua"
+  ],
+  "sync_validation": "Exact stash/pull/pop completed; restored hashes match; 18 historical stashes preserved; independently staged code excludes unrelated portal graph and CP3 changes",
+  "completed_validation_date": "2026-10-07"
+}
