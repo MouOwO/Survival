@@ -3,7 +3,11 @@
 const fs = require('node:fs');
 const crypto = require('node:crypto');
 
-function analyze(text) {
+function analyze(input) {
+  // Logs can contain non-UTF-8 engine output. Parse decoded text, but identify
+  // the original bytes so a reviewer can verify the preserved source exactly.
+  const source = Buffer.isBuffer(input) ? input : Buffer.from(input, 'utf8');
+  const text = source.toString('utf8');
   const sessions = [];
   let session, wave = 0;
   function current() {
@@ -76,13 +80,13 @@ function analyze(text) {
     threshold_note: '33.33 ms is a comparison threshold, not a measured server tick interval.',
     client_fps_measured: false, gpu_time_measured: false,
     particle_alive_count_measured: false, line_count: lines.filter(Boolean).length,
-    source_sha256: crypto.createHash('sha256').update(text).digest('hex'), sessions };
+    source_sha256: crypto.createHash('sha256').update(source).digest('hex'), sessions };
 }
 
 if (require.main === module) {
   const [source, destination] = process.argv.slice(2);
   if (!source) throw new Error('Usage: node tools/analyze_combat_log.cjs console.log [summary.json]');
-  const result = JSON.stringify(analyze(fs.readFileSync(source, 'utf8')), null, 2) + '\n';
+  const result = JSON.stringify(analyze(fs.readFileSync(source)), null, 2) + '\n';
   if (destination) {
     // Do not overwrite the input log if the caller accidentally repeats its path.
     const path = require('node:path');

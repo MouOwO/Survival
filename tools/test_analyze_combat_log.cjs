@@ -36,5 +36,8 @@ assert.equal(first.damage_log_lines, 1);
 assert(!JSON.stringify(report).includes('SECRET_ACCOUNT_TOKEN'));
 assert.equal(report.client_fps_measured, false);
 assert.equal(report.gpu_time_measured, false);
+const bytes = Buffer.concat([Buffer.from(log), Buffer.from([0xff, 0xfe])]);
+assert.equal(analyze(bytes).source_sha256, require('node:crypto').createHash('sha256').update(bytes).digest('hex'));
+assert.deepEqual(analyze(bytes).sessions, report.sessions);
 assert.equal(analyze(log + '\n10/06 17:01:00 [SURVIVAL_MEMORY][LUA] phase=wave_started wave=1 game_time=1.0 lua_kib=1.0 alive=0 pending=1 enemies=0 scheduler=2 visuals=0').sessions.length, 3);
 console.log('COMBAT_LOG_ANALYSIS_PASS: wave boundaries, per-entity warnings, threshold, resource failures, privacy, multiple runs');
