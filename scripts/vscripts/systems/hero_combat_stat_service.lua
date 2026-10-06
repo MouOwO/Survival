@@ -54,6 +54,16 @@ local function safe_call(unit, method_name, ...)
     return pcall(method, unit, ...)
 end
 
+local function fixed_attack_interval(unit)
+    if not unit or type(unit.FindModifierByName) ~= "function" then return nil end
+    local ok, modifier = pcall(unit.FindModifierByName, unit,
+        "modifier_debug_fixed_attack_rate")
+    if not ok or not modifier then return nil end
+    local interval = safe_get(modifier, "GetModifierFixedAttackRate", 0)
+    if interval ~= interval or interval <= 0 or interval == math.huge then return nil end
+    return interval
+end
+
 local function snapshot_equal(left, right)
     if not left or not right then return false end
     for key, value in pairs(left) do
@@ -71,17 +81,16 @@ local function current(player_id)
     return state_by_player[player_id]
 end
 
-local function weapon_snapshot(player_id)
+local function weapon_snapshot(player_id, growth_snapshot)
     local equipment = event_bus.request(
         events.WEAPON_EQUIPMENT_GET_REQUEST,
         { player_id = player_id }
     )
-    local growth = event_bus.request(
-        events.WEAPON_GROWTH_GET_REQUEST,
-        { player_id = player_id }
+    local growth = not growth_snapshot and event_bus.request(
+        events.WEAPON_GROWTH_GET_REQUEST, { player_id = player_id }
     )
     return equipment and equipment.snapshot or {},
-        growth and growth.snapshot or {}
+        growth_snapshot or (growth and growth.snapshot) or {}
 end
 
 local function get_all_equipment_stats(player_id)
@@ -143,48 +152,57 @@ local function configured_damage_multiplier(definition)
     )
 end
 
-local function has_skill(player_id, skill_id)
+local function active_skills(player_id)
     local result = event_bus.request(
         events.HERO_SKILL_STATE_GET_REQUEST,
         { player_id = player_id }
     )
+    local active = {}
     for _, skill in ipairs(result and result.snapshot
             and result.snapshot.skills or {}) do
-        if skill.skill_id == skill_id and skill.locked ~= 1
+        if skill.locked ~= 1
             and (tonumber(skill.level) or 0) > 0 then
-            return true
+            active[skill.skill_id] = true
         end
     end
-    return false
+    return active
+end
+
+local function set_native_value(state, key, method, value)
+    state.native_projection = state.native_projection or {}
+    if state.native_projection[key] == value then return false end
+    local ok, result = safe_call(state.unit, method, value)
+    if not ok or result == false then return false end
+    state.native_projection[key] = value
+    return true
 end
 
 local function apply_base_projection(state)
     local unit = state.unit
+    local debug_attack = tonumber(state.debug_attack_override)
+    local multiplier = tonumber(state.exclusive_attack_multiplier) or 1
+    local attribute_attack_bonus = tonumber(state.attribute_attack_bonus) or 0
+    local minimum = debug_attack and 0 or math.max(0,
+        (state.engine_base_attack_min + attribute_attack_bonus * state.damage_multiplier) * multiplier)
+    local maximum = debug_attack and 0 or math.max(minimum,
+        (state.engine_base_attack_max + attribute_attack_bonus * state.damage_multiplier) * multiplier)
+    local previous = state.native_projection or {}
+    if previous.strength == 0 and previous.agility == 0 and previous.intellect == 0
+        and previous.damage_min == minimum and previous.damage_max == maximum then return false end
     hero_health_guard.preserve_current(unit, function()
-        safe_call(unit, "SetBaseStrength", 0)
-        safe_call(unit, "SetBaseAgility", 0)
-        safe_call(unit, "SetBaseIntellect", 0)
-        safe_call(unit, "CalculateStatBonus", true)
+        set_native_value(state, "strength", "SetBaseStrength", 0)
+        set_native_value(state, "agility", "SetBaseAgility", 0)
+        set_native_value(state, "intellect", "SetBaseIntellect", 0)
         -- Keep the legacy damage multiplier on native basic attacks while the
         -- logical/UI attack remains the unmultiplied CSV value.
-        local debug_attack = tonumber(state.debug_attack_override)
-        local multiplier = tonumber(state.exclusive_attack_multiplier) or 1
-        local attribute_attack_bonus = tonumber(state.attribute_attack_bonus) or 0
-        local minimum = debug_attack and 0 or math.max(0,
-            (state.engine_base_attack_min
-                + attribute_attack_bonus * state.damage_multiplier)
-                * multiplier)
-        local maximum = debug_attack and 0 or math.max(minimum,
-            (state.engine_base_attack_max
-                + attribute_attack_bonus * state.damage_multiplier)
-                * multiplier)
-        safe_call(unit, "SetBaseDamageMin", minimum)
-        safe_call(unit, "SetBaseDamageMax", maximum)
+        set_native_value(state, "damage_min", "SetBaseDamageMin", minimum)
+        set_native_value(state, "damage_max", "SetBaseDamageMax", maximum)
         safe_call(unit, "CalculateStatBonus", true)
     end)
+    return true
 end
 
-local function recalculate(player_id, reason)
+local function recalculate(player_id, reason, growth_snapshot)
     local state = current(player_id)
     if not state or not state.unit or state.unit:IsNull() then
         return nil
@@ -193,7 +211,7 @@ local function recalculate(player_id, reason)
         and safe_get(state.unit, "GetHealth", nil) or nil
     local current_max_health = state.unit.IsAlive and state.unit:IsAlive()
         and safe_get(state.unit, "GetMaxHealth", nil) or nil
-    local equipment, growth = weapon_snapshot(player_id)
+    local equipment, growth = weapon_snapshot(player_id, growth_snapshot)
     local equipment_stats = get_all_equipment_stats(player_id)
     local definition = weapons.by_id[equipment.main_hand_content_id] or {}
     local configured_base_armor = value(
@@ -218,6 +236,7 @@ local function recalculate(player_id, reason)
     local scale = 1
     local debug_attack = tonumber(state.debug_attack_override)
     local debug_attack_speed = tonumber(state.debug_attack_speed_override)
+    local runtime_attack_interval = fixed_attack_interval(state.unit)
     local hero_technology = technology_stat_manager.get(player_id).final.hero or {}
     local researcher_attack_flat = tonumber(hero_technology.attack_flat) or 0
     local researcher_attack_pct = tonumber(hero_technology.attack_bonus_pct) or 0
@@ -233,14 +252,16 @@ local function recalculate(player_id, reason)
         tonumber(hero_technology.attack_interval_flat) or 0
     local researcher_all_attributes =
         tonumber(hero_technology.all_attributes_flat) or 0
+    local skill_flags = (state.hero_id == "hero_monkey_king" or state.hero_id == "hero_blademaster")
+        and active_skills(player_id) or {}
     local monkey_w = state.hero_id == "hero_monkey_king"
-        and has_skill(player_id, "skill_monkey_king_fury")
+        and skill_flags.skill_monkey_king_fury == true
     local monkey_e = state.hero_id == "hero_monkey_king"
-        and has_skill(player_id, "skill_monkey_king_swiftness")
+        and skill_flags.skill_monkey_king_swiftness == true
     local blademaster_q = state.hero_id == "hero_blademaster"
-        and has_skill(player_id, "skill_blademaster_exclusive")
+        and skill_flags.skill_blademaster_exclusive == true
     local blademaster_r = state.hero_id == "hero_blademaster"
-        and has_skill(player_id, "skill_blademaster_mobility")
+        and skill_flags.skill_blademaster_mobility == true
     local monkey_config = monkey_runtime.by_id.monkey_king_exclusive or {}
     local blademaster_config = blademaster_runtime.by_id.blademaster_exclusive or {}
     local monkey_critical_chance_pct = monkey_e
@@ -384,13 +405,10 @@ local function recalculate(player_id, reason)
         final_intellect,
         global_rules.hero_intellect_attack_per_point
     )
-    hero_health_guard.preserve_missing(state.unit, function()
-        hero_stat_adapter.apply_configured_health(
-            state.unit,
-            state.definition,
-            attribute_health_bonus
-        )
-    end, "attribute_health_refresh")
+    -- The adapter protects missing health itself, and skips unchanged health
+    -- projections. A second guard here scheduled redundant work on every hit.
+    local _, _, _, health_changed = hero_stat_adapter.apply_configured_health(
+        state.unit, state.definition, attribute_health_bonus)
     local base_attack_time = math.max(0.1,
         hero_combat_stat_math.configured_base_attack_time(
             state.definition,
@@ -483,9 +501,11 @@ local function recalculate(player_id, reason)
         stat_units_version = 2,
         -- Keep the engine value separately for runtime mitigation diagnostics.
         runtime_armor = safe_get(state.unit, "GetPhysicalArmorValue", 0),
-        -- 配置值使用“每秒攻击次数”。由配置 BAT、固定间隔变化和装备
-        -- 攻速百分比直接投影，避免读取引擎当前帧临时攻击间隔。
-        attack_speed = debug_attack_speed
+        -- A fixed-rate modifier owns the real interval (including addspeed).
+        -- Otherwise project config/equipment directly, without reading a stale
+        -- engine frame during native stat recalculation.
+        attack_speed = runtime_attack_interval and 1 / runtime_attack_interval
+            or debug_attack_speed
             or hero_combat_stat_math.attacks_per_second(
                 base_attack_time,
                 equipment_stats.attack_speed_pct + researcher_attack_speed_pct
@@ -499,6 +519,7 @@ local function recalculate(player_id, reason)
         weapon_base_attack_min = value(definition, "base_attack_min", 0),
         weapon_base_attack_max = value(definition, "base_attack_max", 0),
         weapon_growth_attack = value(growth, "growth_attack", 0),
+        is_max_level = value(growth, "is_max_level", 0),
         stage_attack_count = value(growth, "stage_attack_count", 0),
         stage_attack_target = value(growth, "stage_attack_target", 0),
         stage_attack_remaining = value(growth, "stage_attack_remaining", 0),
@@ -528,11 +549,14 @@ local function recalculate(player_id, reason)
     end
     next_snapshot.refresh_version = tonumber(state.refresh_version) or 0
     state.snapshot = next_snapshot
+    -- Modifier ForceRefresh below can request this snapshot recursively.
+    state.fixed_attack_interval = runtime_attack_interval
     state.exclusive_attack_multiplier = exclusive_attack_multiplier
     state.attribute_attack_bonus = attribute_attack_bonus
-    apply_base_projection(state)
-    safe_call(state.unit, "SetBaseAttackTime", base_attack_time
-        / math.max(0.01, 1 + researcher_attack_speed_pct / 100))
+    local native_changed = apply_base_projection(state) or health_changed
+    local bat_changed = set_native_value(state, "base_attack_time", "SetBaseAttackTime",
+        base_attack_time / math.max(0.01, 1 + researcher_attack_speed_pct / 100))
+    native_changed = native_changed or bat_changed
     state.unit.survival_seven_sins_final_damage_pct =
         tonumber(essence.final_damage_pct) or 0
     state.unit.survival_gameplay_final_damage_pct =
@@ -545,20 +569,29 @@ local function recalculate(player_id, reason)
     local attack_range = value(state.definition, "attack_range", 0)
         + (tonumber(permanent.hero_attack_range) or 0)
     if attack_range > 0 then
-        safe_call(state.unit, "Script_SetAttackRange", attack_range)
-        safe_call(state.unit, "SetAcquisitionRange", attack_range + 200)
+        set_native_value(state, "attack_range", "Script_SetAttackRange", attack_range)
+        set_native_value(state, "acquisition_range", "SetAcquisitionRange", attack_range + 200)
         state.unit.survival_attack_range = attack_range
         local range_modifier = state.unit:FindModifierByName(
             "modifier_survival_hero_attack_range"
         )
-        if range_modifier and range_modifier.SetAttackRange then
+        if range_modifier and range_modifier.SetAttackRange
+            and (state.range_modifier ~= range_modifier or state.range_value ~= attack_range) then
             range_modifier:SetAttackRange(attack_range)
+            state.range_modifier, state.range_value = range_modifier, attack_range
         end
     end
     local research_modifier = modifier_registry.ensure(
         state.unit, "modifier_research_technology", {}
     )
-    if research_modifier and research_modifier.SetTechnologyValues then
+    local technology_values = {
+        attack_pct = researcher_attack_pct, final_damage_pct = researcher_final_damage_pct,
+        armor_reduction = researcher_armor_reduction, critical_chance_pct = researcher_critical_chance_pct,
+        armor_bonus = gameplay_armor_bonus,
+    }
+    if research_modifier and research_modifier.SetTechnologyValues
+        and (state.research_modifier ~= research_modifier
+            or not snapshot_equal(state.technology_values, technology_values)) then
         research_modifier:SetTechnologyValues(
             researcher_attack_pct,
             researcher_final_damage_pct,
@@ -566,15 +599,27 @@ local function recalculate(player_id, reason)
             researcher_critical_chance_pct,
             gameplay_armor_bonus
         )
+        state.research_modifier, state.technology_values = research_modifier, technology_values
+        native_changed = true
     end
     local modifier = modifier_registry.ensure(
         state.unit, "modifier_weapon_stat_projection", {player_id = player_id}
     )
-    local projection_refresh_required =
-        tostring(reason or "") ~= "attack_all_attribute_growth"
-        or essence_attributes_pct ~= 0
+    -- Only these fields are consumed by the native attack modifier. Counters,
+    -- UI metadata and unchanged growth events do not require ForceRefresh.
+    local modifier_values = {
+        base_attack_time = base_attack_time,
+        engine_weapon_attack_bonus = engine_weapon_attack_bonus,
+        engine_research_attack_bonus = engine_research_attack_bonus,
+        critical_chance_pct = next_snapshot.critical_chance_pct,
+        critical_damage_pct = next_snapshot.critical_damage_pct,
+    }
+    local projection_refresh_required = state.attack_modifier ~= modifier
+        or not snapshot_equal(state.modifier_values, modifier_values)
     if projection_refresh_required and modifier and modifier.ForceRefresh then
         modifier:ForceRefresh()
+        state.attack_modifier, state.modifier_values = modifier, modifier_values
+        native_changed = true
     end
     if changed then
         event_bus.emit(events.HERO_COMBAT_STATS_CHANGED, {
@@ -582,7 +627,7 @@ local function recalculate(player_id, reason)
             snapshot = state.snapshot,
         })
     end
-    if projection_refresh_required and current_health and current_health > 0
+    if native_changed and current_health and current_health > 0
         and current_max_health and current_max_health > 0
         and state.unit:IsAlive() then
         local final_max_health = safe_get(
@@ -662,8 +707,8 @@ local function on_hero_summoned(payload)
     hero_health_guard.preserve_missing(payload.unit, function()
         ensure_modifier("modifier_equipment_effects")
         safe_call(payload.unit, "CalculateStatBonus", true)
+        hero_stat_adapter.reapply_projectile_stats(payload.unit, definition)
     end, "hero_summoned_equipment_health")
-    hero_stat_adapter.reapply_projectile_stats(payload.unit, definition)
     ensure_modifier("modifier_weapon_attack_tracker")
     local snapshot = recalculate(payload.player_id, "hero_summoned") or {}
     print(string.format(
@@ -693,8 +738,8 @@ local function on_changed(payload)
         hero_health_guard.preserve_missing(state.unit, function()
             if modifier and modifier.ForceRefresh then modifier:ForceRefresh() end
             safe_call(state.unit, "CalculateStatBonus", true)
+            hero_stat_adapter.reapply_projectile_stats(state.unit, state.definition)
         end, "equipment_refresh:" .. tostring(payload.reason or "changed"))
-        hero_stat_adapter.reapply_projectile_stats(state.unit, state.definition)
     end
     recalculate(player_id, payload.reason)
 end
@@ -765,10 +810,17 @@ end
 local function get_stats(payload)
     local player_id = tonumber(payload.player_id)
     local state = current(player_id)
-    if not state then
+    if not state or not state.unit or state.unit:IsNull() then
         return { ok = false, error = "hero_not_summoned" }
     end
-    if state.snapshot and state.snapshot.level ~= safe_get(state.unit, "GetLevel", 1) then
+    if payload.entindex ~= nil
+        and tonumber(payload.entindex) ~= state.unit:entindex() then
+        return { ok = false, error = "hero_entity_mismatch" }
+    end
+    if state.snapshot
+        and state.fixed_attack_interval ~= fixed_attack_interval(state.unit) then
+        recalculate(player_id, "fixed_attack_rate_changed")
+    elseif state.snapshot and state.snapshot.level ~= safe_get(state.unit, "GetLevel", 1) then
         recalculate(player_id, "hero_level_changed")
     end
     return {
@@ -784,6 +836,27 @@ local function on_technology_stats_changed(payload)
     recalculate(player_id, "technology_stats_changed")
 end
 
+local function on_hero_removed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local state = player_id and state_by_player[player_id]
+    if not state or state.unit ~= payload.unit then return end
+    state_by_player[player_id] = nil
+    event_bus.emit(events.HERO_COMBAT_STATS_CHANGED, {
+        player_id = player_id,
+        reason = "hero_removed",
+        snapshot = { player_id = player_id, entindex = -1, hero_ready = 0,
+            attack_min = 0, attack_max = 0, attack_speed = 0,
+            strength = 0, agility = 0, intellect = 0,
+            health = 0, max_health = 0, runtime_armor = 0 },
+    })
+end
+
+local function on_growth_changed(payload)
+    -- Attack growth changes combat numbers, not equipment or projectile setup.
+    -- Use the committed snapshot rather than copying the inventory again.
+    recalculate(tonumber(payload.player_id), payload.reason, payload.snapshot)
+end
+
 function M.init()
     state_by_player = {}
     effect_handler_registry.init()
@@ -797,8 +870,9 @@ function M.init()
     )
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    event_bus.subscribe(events.HERO_REMOVED, on_hero_removed)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_changed)
-    event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_changed)
+    event_bus.subscribe(events.WEAPON_GROWTH_CHANGED, on_growth_changed)
     -- CONTENT_INVENTORY_CHANGED subscribers are unordered. Refresh only after
     -- the equipment aggregator has published its completed snapshot; otherwise
     -- this service can read the previous armor value and leave the HUD stale.

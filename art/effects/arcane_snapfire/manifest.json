@@ -1,0 +1,439 @@
+{
+  "native_ability": "Snapfire — Mortimer Kisses (R)",
+  "radius": 150,
+  "roots": {
+    "flight": "particles/survival/skills/arcane_snapfire_fall.vpcf",
+    "impact": "particles/survival/skills/arcane_snapfire_impact.vpcf",
+    "linger": "particles/survival/skills/arcane_snapfire_linger.vpcf"
+  },
+  "controls": {
+    "flight": {
+      "CP0": "Current sky position",
+      "CP3": "Same sky position; forward Vector(0,0,-1)",
+      "CP20_x": 150
+    },
+    "impact": {
+      "CP0": "Landing ground position",
+      "CP3": "Same landing ground position",
+      "CP20_x": 150
+    },
+    "linger": {
+      "CP0": "Landing ground position",
+      "CP3": "Same landing ground position for shared impact descendants",
+      "CP20_x": 150
+    }
+  },
+  "graph": {
+    "flight_resources": 6,
+    "impact_resources": 8,
+    "linger_resources": 17,
+    "shared_impact_glow_resources": 1,
+    "unique_resources": 30,
+    "removed_launch_children": [
+      "hero_snapfire_ultimate_mouthburst",
+      "hero_snapfire_ultimate_mouthsparks"
+    ],
+    "old_arced_explosion_used": false
+  },
+  "motion": "Lua owns sky descent and original damage timing; no native projectile attractor, automatic arc, mouth cast burst, delay, model growth or projectile endcap",
+  "lifecycle": {
+    "flight": "Immediate DestroyParticle(true)+Release at original landing time",
+    "impact": "Release only; all native finite impact emitter/lifetime/fade/decay behavior retained",
+    "linger": "Release only; native StopAfterCPDuration3.1s and all child emission/lifetime/fade/decay behavior retained"
+  },
+  "geometry": {
+    "pool_unit_XY_AABB_extent": 10.60660553617499,
+    "native_pool_curve_maximum_radius": 40,
+    "sphere_unit_XY_AABB_extent": 11.220378109884534,
+    "sphere_unit_3D_AABB_extent": 13.734001,
+    "native_projectile_unit_3D_AABB_extent": 5.615005461542527,
+    "native_projectile_maximum_particle_radius": 0.6,
+    "native_projectile_renderer_radius_scale": 40
+  },
+  "sizing": "CP20 radius scaling preserves native random initialization and interpolation. Native per-frame replacement curves receive one final SCALE_CURRENT_VALUE operator. Layer center/width/trail budgets and final fixed150-contract radius clamps keep nominal geometry within the described explosion radius. Pool/main sphere/bloom retain original models, materials, textures and colors.",
+  "color": "Shockwave explicitly uses its existing native orange color branch; native color-only CP61/62 inputs are removed. Other colors remain native.",
+  "validation_limit": "Compiled asset/operator verification does not establish in-game appearance, texture alpha fringe, bloom or rope tessellation bounds.",
+  "in_game_visual_verified": false,
+  "outputs": [
+    "particles/survival/skills/arcane_snapfire_fall.vpcf",
+    "particles/survival/skills/arcane_snapfire_fall_model.vpcf",
+    "particles/survival/skills/arcane_snapfire_fall_ribbon.vpcf",
+    "particles/survival/skills/arcane_snapfire_fall_magma.vpcf",
+    "particles/survival/skills/arcane_snapfire_fall_drips.vpcf",
+    "particles/survival/skills/arcane_snapfire_fall_glow.vpcf",
+    "particles/survival/skills/arcane_snapfire_impact.vpcf",
+    "particles/survival/skills/arcane_snapfire_impact_burst_ring.vpcf",
+    "particles/survival/skills/arcane_snapfire_impact_glow.vpcf",
+    "particles/survival/skills/arcane_snapfire_impact_parenttrails.vpcf",
+    "particles/survival/skills/arcane_snapfire_impact_sparks.vpcf",
+    "particles/survival/skills/arcane_snapfire_impact_emissive.vpcf",
+    "particles/survival/skills/arcane_snapfire_impact_sphere.vpcf",
+    "particles/survival/skills/arcane_snapfire_impact_rays.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_light.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_outer.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_bloom.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_directional.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_shockwave.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_burst.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_steam.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_ring.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_embers.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_flames.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_glow.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_splash_liquid.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_splash.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_splash_lava.vpcf",
+    "particles/survival/skills/arcane_snapfire_linger_bubble.vpcf"
+  ],
+  "layers": [
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_fall.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/snapfire_lizard_blobs_arced.vpcf",
+      "native_data_sha256": "e09eb3bb11cf920662c3052e536ab1df0b494596297fb6b014e1862a2fea1707",
+      "source_sha256": "7b2784c10b4d147e9877245c06e9d5cdef41c740c95d620fa45313547cf7fa4f",
+      "plan": {
+        "name": "fall",
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_fall_model.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/snapfire_lizard_blobs_arced_model.vpcf",
+      "native_data_sha256": "aa8ce5107bfacdc1476934a67f221c6b45e1bfaa381ae3e2f388dd404cc93026",
+      "source_sha256": "58413d17d228130a5fba37a1cb321d546e6b663a3d5e1ca62125b6e0c2964a58",
+      "plan": {
+        "name": "fall_model",
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_fall_ribbon.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_projectile_ribbon.vpcf",
+      "native_data_sha256": "09d53a99efeedfdc39114a63cb19cfaf4fbf4557fb6a063ba45b89a15c38e00a",
+      "source_sha256": "1dceabc00f7f6fa3f54cef85234112fdeae9e708d960f2bd2c0a6b7c37163da6",
+      "plan": {
+        "name": "fall_ribbon",
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_fall_magma.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_projectile_magma.vpcf",
+      "native_data_sha256": "d528ce52765971c478f456e81541da4cf275e3ddee55a0427acb8d1ec71d0501",
+      "source_sha256": "4a4304f141e01be08a44beea5178e2c98bb7423b4a8c834014110190c134fe5e",
+      "plan": {
+        "name": "fall_magma",
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_fall_drips.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_blob_drips.vpcf",
+      "native_data_sha256": "33b7f2ac3b4147de60fd95ad6d5df863daaaf04d52faf39b1c023562a6b82cd6",
+      "source_sha256": "48f949ac492e11b335d9330b3a992ecd2c06b78a5f1bbd89aaf5d8f44abde41a",
+      "plan": {
+        "name": "fall_drips",
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_fall_glow.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_glow.vpcf",
+      "native_data_sha256": "1da4cd37cf557d13340729a1594a5a94f6086b98f5d2dd6f7198774d3cd00280",
+      "source_sha256": "dda3a815c660778b2a4652e852d60f75a02d324ca1e87ade9bd194602f321db3",
+      "plan": {
+        "name": "fall_glow",
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_impact.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact.vpcf",
+      "native_data_sha256": "eff217eef612250626c6c272eb15c6125e16294c590632d6fdc3e729e1191f25",
+      "source_sha256": "00c89dec831eb6925199a27b40961a9441a130621f446e8558fcfc751ab7123b",
+      "plan": {
+        "name": "impact",
+        "ref": 750,
+        "center": 0.75,
+        "cap": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_impact_burst_ring.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_burst.vpcf",
+      "native_data_sha256": "8b061c067834a72099ff50e5d16e522c2f83fd75cde8249fae632cb823572b0f",
+      "source_sha256": "273f80ca4c1b09c9c207dfd716b7de8eaebef8013310495b7b0bbc480c4eba55",
+      "plan": {
+        "name": "impact_burst_ring",
+        "ref": 300,
+        "cap": 1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_impact_glow.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_glow.vpcf",
+      "native_data_sha256": "2cfa3c8f85c32b673ac2870b126a001c03f1571c8573c2e67c25ce7d0615beb0",
+      "source_sha256": "e09b51ef33ec1f40f26498455e16a9b27c7f716afec8a180acae2ecf8180313c",
+      "plan": {
+        "name": "impact_glow",
+        "ref": 800,
+        "center": 0.1,
+        "cap": 0.9
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_impact_parenttrails.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_parenttrails.vpcf",
+      "native_data_sha256": "e83ad695f8d757b4e0372b301c1d42e2f9af96ff53aaef44e35ffe4674f283ef",
+      "source_sha256": "edc9a2d8bca4a3ec8c74c08a881f04dec277959418c44057bfdb81ecbefa5b2b",
+      "plan": {
+        "name": "impact_parenttrails",
+        "ref": 1400,
+        "center": 0.85,
+        "cap": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_impact_sparks.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_sparks.vpcf",
+      "native_data_sha256": "9c1b52766f9299db2cf1e2f6cb0427d1253af53e31c40320e2af53a16218ca55",
+      "source_sha256": "9d34e4fc1821eb7e55d623c6da67d64e030e92b0b7f42fed20de498a870f1b94",
+      "plan": {
+        "name": "impact_sparks",
+        "ref": 400,
+        "center": 0.9,
+        "cap": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_impact_emissive.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_emissive.vpcf",
+      "native_data_sha256": "6834f04155c50a8753389d7b30f843abf674eb367eea7df21c0c37d73d6d5e40",
+      "source_sha256": "2d5f2586374c4e02ffbba7cec5a05ccb36f02cd47621c052bd43404664eebfcf",
+      "plan": {
+        "name": "impact_emissive",
+        "ref": 1440,
+        "cap": 1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_impact_sphere.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_sphere.vpcf",
+      "native_data_sha256": "187f987b4b362cb7ad7a4b29af4d9230a052059d9a8eda8afb4f744c4374e80c",
+      "source_sha256": "d489220621e872e09c11cc0134232e4f1c59303a4955474b10f493f27f23fb14",
+      "plan": {
+        "name": "impact_sphere",
+        "ref": 329.616024,
+        "model_extent": 13.734001
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_impact_rays.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_rays.vpcf",
+      "native_data_sha256": "ac4b867505b8b2ec487d2f7c934695008f6a74dd92df9d5f42dfe9ae305b70fb",
+      "source_sha256": "4ec958d621da3c8c30090d58cb585e528fa6e6f960345116f1421d10a28a234f",
+      "plan": {
+        "name": "impact_rays",
+        "ref": 2000,
+        "center": 0.7,
+        "cap": 0.1,
+        "trail": 0.2
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger.vpcf",
+      "native_data_sha256": "794ba2a3a1c63e6f48a565b1a08f819bb6489f7a4b9d0b3321718eebd6da64d4",
+      "source_sha256": "895fcaa5aa2649e5ab2f64de65d5525cedb01363c4f83bad59b4026038801dc2",
+      "plan": {
+        "name": "linger",
+        "ref": 400
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_light.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_light.vpcf",
+      "native_data_sha256": "cfa4baacc7c4beb767823f95b0da3da696762f01828230d6c6a1d604597b50e5",
+      "source_sha256": "e48f5b82f4aa579199add6f7f1dcf9b6b5eeab4df779b9e16320e25ca54368e4",
+      "plan": {
+        "name": "linger_light",
+        "ref": 300,
+        "cap": 1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_outer.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_outer.vpcf",
+      "native_data_sha256": "a84a72031524191efd87fe320a4941d3d99339a58878cde06674a69b0adfa62c",
+      "source_sha256": "b7467fb4fa0855e97bbb063b60dfdcccb9ea4418055b483a19364a8ba70926a9",
+      "plan": {
+        "name": "linger_outer",
+        "ref": 424.2642214469996,
+        "model_extent": 10.60660553617499
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_bloom.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_bloom.vpcf",
+      "native_data_sha256": "ca3cab6d0d4f27ba38f4935840e5432370fd27a3b522b51fb12284971365ff26",
+      "source_sha256": "7ae3961dc756b796e2fdc3a7856d4e64408ccd406128a569e68761afb700a576",
+      "plan": {
+        "name": "linger_bloom",
+        "ref": 520,
+        "cap": 1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_directional.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_directional.vpcf",
+      "native_data_sha256": "2b7009d7b7a4647a4b27fe1610b79f7d784562ad9717229793f013e648b06758",
+      "source_sha256": "e49ad87bed4d407ab004f59f70922700b6789e88c52e2dc5eb0827de990649af",
+      "plan": {
+        "name": "linger_directional",
+        "ref": 400,
+        "center": 0.8,
+        "cap": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_shockwave.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_shockwave.vpcf",
+      "native_data_sha256": "6f001bd321e88ce8ca008331152e530076136be42929a3ae2b1e4cdc0e9c1caf",
+      "source_sha256": "98bfb6e8445ce9f9f983bea292398c1ddce040ea8a36b203060b6e63f6582932",
+      "plan": {
+        "name": "linger_shockwave",
+        "ref": 400,
+        "center": 0.8,
+        "cap": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_burst.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_burst.vpcf",
+      "native_data_sha256": "d68410023e05a67c948a25f0e3b8b16573b376592798612361d69632fcdb5344",
+      "source_sha256": "9c192441408a9542ad36bcc7e89ebc9d96d058df05f13226c8014669b6f38a9d",
+      "plan": {
+        "name": "linger_burst",
+        "ref": 400,
+        "center": 0.1,
+        "cap": 0.9
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_steam.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger_steam.vpcf",
+      "native_data_sha256": "0b19e1095467b525a93aed3e1445ff9bd6b01398934e06104a2e97c5b9f4caa2",
+      "source_sha256": "4518eb65bf3dd926660ac149d0a65e160adaa4d0b3f74012ae03404ecf1d9a7e",
+      "plan": {
+        "name": "linger_steam",
+        "ref": 500,
+        "center": 0.45,
+        "cap": 0.55
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_ring.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_ring.vpcf",
+      "native_data_sha256": "b0b892ba9f3b2eb298b68a774ac9b6f7eaa22a745b0f1e2e0dc8ed4850da833f",
+      "source_sha256": "1bafd65875cb2ad64b9e9d7b734cec544f9b3a8fb8f86f25d926f8ac33a3c555",
+      "plan": {
+        "name": "linger_ring",
+        "ref": 300,
+        "center": 0.9166666666666666,
+        "cap": 0.08333333333333333
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_embers.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_embers.vpcf",
+      "native_data_sha256": "a1b05b13a543d4b152d21665770bfe890bfbc508341308bb3a5f0ae6724632f4",
+      "source_sha256": "2f5c6955e85683887a1bae4348e0d34e4f405d855e4bed91aab29b52412a5f7f",
+      "plan": {
+        "name": "linger_embers",
+        "ref": 400,
+        "center": 0.8,
+        "cap": 0.1,
+        "trail": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_flames.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_flames.vpcf",
+      "native_data_sha256": "5674c7b7a9f238dfbe7bc3338e4e6ba741e973d4d1c4b119554704e89c1e8a59",
+      "source_sha256": "bba273a17b33fdbb489f8facb7ce0a4ca25e649b4b8414baceccdefcae1b89cf",
+      "plan": {
+        "name": "linger_flames",
+        "ref": 400,
+        "center": 0.8,
+        "cap": 0.2
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_glow.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_ground_glow.vpcf",
+      "native_data_sha256": "decf47976cf31d908835e65c3b999787439a1b8e51a4c61fda3bd7ce4bef89f0",
+      "source_sha256": "d6ad9157e09368a815adbb36b3eb9c1a7c8aae11a9d6192f8245b1d662c59767",
+      "plan": {
+        "name": "linger_glow",
+        "ref": 125.99999999999999,
+        "cap": 1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_splash_liquid.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash_liquid.vpcf",
+      "native_data_sha256": "0fef579cb0e4f2366c6d5d95b830be5d0e4d4e9157f2a007514cf5d767ea72a1",
+      "source_sha256": "90ebd6ca33ab05594938831fcde738b9ec12bc0306e3fcd2c0e941be9fd3fc07",
+      "plan": {
+        "name": "linger_splash_liquid",
+        "ref": 500,
+        "center": 0.8,
+        "cap": 0.2
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_splash.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash.vpcf",
+      "native_data_sha256": "a9a06c4ed20437e65f199c021c853b21e071672a27b9cf2d429c81a516c26b32",
+      "source_sha256": "af962df9e58b55fe7fbd4fe696c1133e09a5dbbd38c8aafb4755454e6679b529",
+      "plan": {
+        "name": "linger_splash",
+        "ref": 500,
+        "center": 0.5,
+        "cap": 0.2,
+        "trail": 0.3
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_splash_lava.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash_lava.vpcf",
+      "native_data_sha256": "c09523900d4406ae13606ab2e50ea31fe6318dc88fd0ca9cd859ca2dc32dd612",
+      "source_sha256": "a6c17f9402747bfb464c451dbc1911a9af421dc7b9d46be60ddf825b7a4f1adb",
+      "plan": {
+        "name": "linger_splash_lava",
+        "ref": 500,
+        "center": 0.5,
+        "cap": 0.2,
+        "trail": 0.3
+      }
+    },
+    {
+      "resource": "particles/survival/skills/arcane_snapfire_linger_bubble.vpcf",
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_bubble.vpcf",
+      "native_data_sha256": "fc03942e2a21f350b9fc3e8e13a18b6d981fba34dfcbd58f76b0299f11f7d3e4",
+      "source_sha256": "a9ce5e53103175c0b5510b5eb93568b2411a32404fb656f776970f14f443ec43",
+      "plan": {
+        "name": "linger_bubble",
+        "ref": 224.40756219769068,
+        "model_extent": 11.220378109884534
+      }
+    }
+  ]
+}

@@ -11,6 +11,7 @@ local pending_by_player = {}
 local sequence = 0
 local rerolls_by_player = {}
 local reward_retry_by_player = {}
+local hero_by_player = {}
 
 local function state(player_id)
     local result = event_bus.request(
@@ -344,6 +345,7 @@ function M.init()
     pending_by_player = {}
     sequence = 0
     reward_retry_by_player = {}
+    hero_by_player = {}
     event_bus.handle_request(
         events.HERO_SKILL_CHOICE_CREATE_REQUEST,
         create_request
@@ -357,6 +359,20 @@ function M.init()
         select_request
     )
     event_bus.subscribe(events.HERO_SKILL_REWARD_REQUEST, on_skill_reward)
+    event_bus.subscribe(events.HERO_SUMMONED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id ~= nil then hero_by_player[player_id] = payload.unit end
+    end)
+    event_bus.subscribe(events.HERO_REMOVED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id == nil then return end
+        if hero_by_player[player_id] and hero_by_player[player_id] ~= payload.unit then return end
+        hero_by_player[player_id] = nil
+        pending_by_player[player_id] = nil
+        reward_retry_by_player[player_id] = nil
+        scheduler.cancel("rebirth_skill_choice_retry:" .. tostring(player_id))
+        publish(player_id)
+    end)
 end
 
 return M

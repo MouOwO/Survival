@@ -1,0 +1,469 @@
+{
+  "cosmetic": {
+    "item_id": 26401,
+    "item_name": "Silver Squall - Mount",
+    "chinese_name": "银白烈风 - 坐骑",
+    "ability": "Mortimer Kisses (R)"
+  },
+  "roots": {
+    "flight": "particles/survival/skills/ice_cone_silver_squall_fall.vpcf",
+    "impact": "particles/survival/skills/ice_cone_silver_squall_impact.vpcf",
+    "field": "particles/survival/skills/ice_cone_silver_squall_field.vpcf"
+  },
+  "controls": {
+    "flight": {
+      "CP0": "Current sky position",
+      "CP3": "Same sky position; forward Vector(0,0,-1)",
+      "CP20_x": 200
+    },
+    "impact": {
+      "CP0": "Small landing ground position",
+      "CP3": "Same ground position with default world orientation",
+      "CP20_x": 75
+    },
+    "field": {
+      "CP0": "Fixed ground center",
+      "CP3": "Same ground center",
+      "CP20_x": 500,
+      "CP21_x": "Skill duration3sec at levels1-4,5sec at level5"
+    }
+  },
+  "graph": {
+    "flight_resources": 7,
+    "impact_resources": 4,
+    "field_resources": 13,
+    "unique_resources": 24,
+    "removed_mouth_casts": [
+      "snapfire_frostivus_ultimate_mouthburst",
+      "snapfire_frostivus_ultimate_mouthsparks"
+    ],
+    "per_hit_ring_or_pool": false,
+    "field_instances_per_cast": 1,
+    "native_field_children": 12,
+    "hail_landings": {
+      "duration3": 48,
+      "duration5": 80
+    }
+  },
+  "lifecycle": {
+    "flight": "Caller owns .45-.65sec manual hail descent and immediate cleanup at landing; body/light/glow follow throughout; snow/ribbon/spark/flame grains retain native world-space motion and finite life",
+    "impact": "Caller releases the index after creation; native root, sphere,16-particle icy explosion and centered glow self-terminate with original finite emission/life/Decay and brief natural fade",
+    "field": "Complete native linger graph once; projection/ring/animated shard life=CP21.x; shard/flame/swirl emitters run forCP21.x; ember noise remains continuous; finite ember/flame grains decay and replenish; parent stop duration=CP21.x; immediate caller cleanup at3/5sec"
+  },
+  "sizing": "Hail flight nominal200; local landing nominal75; complete field nominal500. CP20 scales native initial radii. Native SCALE_INITIAL curves remain exact and are never scaled twice. Final fixed-contract radius caps, CP0 center constraints and bounded trail lengths reserve the whole geometry footprint.",
+  "geometry": {
+    "projectile_model_unit_3D_AABB_extent": 5.615005461542527,
+    "projectile_model_maximum_native_radius": 0.4,
+    "projectile_renderer_scale": 40,
+    "sphere_unit_3D_AABB_extent": 13.734001,
+    "sphere_maximum_native_radius": 20,
+    "sphere_maximum_interpolation_scale": 1.2,
+    "animated_shards_unit_XY_extent": 206.073359755,
+    "animated_shards_unit_XY_budget": 210,
+    "animated_shards_center_cap": 170,
+    "animated_shards_geometry_cap": 330,
+    "animated_shards_particle_radius_cap": 1.5714285714285714,
+    "animated_shards_curve_peak": 1.114228151772,
+    "animated_shards_sequence": "Snapfire_frostivus",
+    "animated_shards_max_particles": 3
+  },
+  "field": {
+    "full_native_interior": true,
+    "sustained_layers": [
+      "field_proj",
+      "field_ring",
+      "field_shards",
+      "field_embers",
+      "field_flames",
+      "field_torns"
+    ],
+    "projected_frost_curve_peak": 1.1393079459556,
+    "projected_frost_geometry_cap": 500,
+    "native_center_radius": 275,
+    "native_particle_radius": 15,
+    "maximum_renderer_radius_scale": 2,
+    "native_width_curve_peak": 1.141965259,
+    "bounded_width_curve_peak": 1.142,
+    "native_outer_radius_budget": 309.26,
+    "circle_center_at_R500": 444.60971350966827,
+    "maximum_particle_radius_at_R500": 27.69514324516588,
+    "maximum_outer_geometry_at_R500": 500,
+    "color": [
+      143,
+      222,
+      254
+    ],
+    "textures": [
+      "materials/particle/beam_ice.vtex",
+      "materials/particle/beam_generic_7.vtex"
+    ],
+    "orientation": "PARTICLE_ORIENTATION_WORLD_Z_ALIGNED",
+    "cases": [
+      {
+        "levels": "1-4",
+        "duration": 3
+      },
+      {
+        "level": 5,
+        "duration": 5
+      }
+    ]
+  },
+  "validation_limit": "Asset/operator checks do not establish in-game appearance, texture alpha fringe or bloom bounds.",
+  "in_game_visual_verified": false,
+  "outputs": [
+    "particles/survival/skills/ice_cone_silver_squall_fall.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_fall_ribbon.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_fall_snow.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_fall_sparks.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_fall_flame.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_fall_model.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_fall_glow.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_impact.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_impact_sphere.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_proj.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_shockwave.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_burst.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_ring.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_embers.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_flames.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_shards.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_ground_shockwave.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_sparks.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_glow.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_torns.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_field_parent_glow.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_impact_burst.vpcf",
+    "particles/survival/skills/ice_cone_silver_squall_impact_glow.vpcf"
+  ],
+  "layers": [
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_fall.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_lizard_blobs_arced.vpcf",
+      "native_data_sha256": "4f55ae985b19aa9a0a3621549ced2a927c331a10aeb8381556824eba02471d91",
+      "source_sha256": "a4fd1f95f0e3101ec677146e65ced27c9c785ab940b792a72fbd203fc17b81bc",
+      "plan": {
+        "name": "fall",
+        "radius": 200,
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_fall_ribbon.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_projectile_ribbon.vpcf",
+      "native_data_sha256": "bfa69f7198fcfaadfa0320e5692b0efadf7798d3a7ddfb4307720e437ee3931f",
+      "source_sha256": "7fd2838a3f90fffc49aff9cd2d152baf551cb68491b458b8117eacd8f1c77bdc",
+      "plan": {
+        "name": "fall_ribbon",
+        "radius": 200,
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_fall_snow.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_snow.vpcf",
+      "native_data_sha256": "eed4dfbb2baadd6f9bc0e24ccf7660f61687e373b665a9c8dc241dd6750fe8da",
+      "source_sha256": "36b7e44402e385c59d1314ec448c24673d8295b11172e031c6026d1bab66307e",
+      "plan": {
+        "name": "fall_snow",
+        "radius": 200,
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_fall_sparks.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_blobs_arced_sparks.vpcf",
+      "native_data_sha256": "42bc4835f08fe3b89d7b56a4f14e47f16af25673ab4d045a6d106497f573d105",
+      "source_sha256": "b664da74199f084d73f4a9ec6386f326e0ddd074cc10f5fb0135fafd2b8be97b",
+      "plan": {
+        "name": "fall_sparks",
+        "radius": 200,
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_fall_flame.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_blobs_arced_flame.vpcf",
+      "native_data_sha256": "6b2714b515fd8f19fa51775ef87590dddbe0f525e5485b5d924c76a80c649be5",
+      "source_sha256": "2bdbbaeff99e92b283bdbd004b9e23ce542fc7dea09a97df43daf40c41f4ab59",
+      "plan": {
+        "name": "fall_flame",
+        "radius": 200,
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_fall_model.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_blobs_arced_model.vpcf",
+      "native_data_sha256": "71136503b06c427c81645b29369556177b1ae185120b331e25ceb475ddd7b92d",
+      "source_sha256": "6ddc8f778cfef25175ce6869bcf638405d79863b755dc43d7498c8c6046ee375",
+      "plan": {
+        "name": "fall_model",
+        "radius": 200,
+        "ref": 400,
+        "flight": true,
+        "model_extent": 224.60021846170108
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_fall_glow.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_glow.vpcf",
+      "native_data_sha256": "e77a7811120f151041c14da9b988225ab17326594ac2931529276a1bfa9c184f",
+      "source_sha256": "7db028fdfffceec84c1837c91a1722aaa28fe8e54fe7217a2374df12889958eb",
+      "plan": {
+        "name": "fall_glow",
+        "radius": 200,
+        "ref": 400,
+        "flight": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_impact.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_impact.vpcf",
+      "native_data_sha256": "ccbb1949e8736e61ca7ca17989157111101539457cf6596e1390cc95e11fcb9d",
+      "source_sha256": "fc59962f788c01110329484dd4348f4f327b7cbcc77affa7945d33cd43f236cd",
+      "plan": {
+        "name": "impact",
+        "radius": 75,
+        "ref": 750
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_impact_sphere.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_impact_sphere.vpcf",
+      "native_data_sha256": "d3f7d583f72823c9a063dbf1f499ec31e20225b72c14f2c7557cd6b888c68cd2",
+      "source_sha256": "5bc84a1604f4c06bf022e6abeb4d9bc8e1151258ac80f71742bc2c1fb01b2044",
+      "plan": {
+        "name": "impact_sphere",
+        "radius": 75,
+        "ref": 329.616024,
+        "model_extent": 13.734001
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger.vpcf",
+      "native_data_sha256": "a568072a0588a3ee6590264a565456d353fcae5c95b1db8617079be4486ea40c",
+      "source_sha256": "d9b9ea02ebce2bef17ca2cbd00c2bc503179a6ec7aee7206c33c110367bb0189",
+      "plan": {
+        "name": "field",
+        "radius": 500,
+        "ref": 400,
+        "field": true,
+        "container": true
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_proj.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_proj.vpcf",
+      "native_data_sha256": "da6b7ef291881acb91a42dbf57efa01adc8c5a54defdce7bbfeec6dc87776049",
+      "source_sha256": "e61afb24f06001bb2712de00ac0b2293340f4f6826029868323be4169c1c51b7",
+      "plan": {
+        "name": "field_proj",
+        "radius": 500,
+        "ref": 300,
+        "field": true,
+        "singleton": true,
+        "width": 1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_shockwave.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_shockwave.vpcf",
+      "native_data_sha256": "fabbcba1337f1abd88513737529b036e9515737b439112593e8689309a95d93e",
+      "source_sha256": "5d09e1b89e613be1cb05dbfccc95d4ba855dcab3efe297ae5b8f231f611ef455",
+      "plan": {
+        "name": "field_shockwave",
+        "radius": 500,
+        "ref": 700,
+        "field": true,
+        "center": 0.9,
+        "width": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_burst.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_burst.vpcf",
+      "native_data_sha256": "fee5311edc70ee562f35340726eb0d6c20bf77ccecd8ce2be1a86a7e0a404281",
+      "source_sha256": "6183f270853dccbf565c6e6bf19d69800ad31f81dfdc318c713b4b4b7775ca5d",
+      "plan": {
+        "name": "field_burst",
+        "radius": 500,
+        "ref": 400,
+        "field": true,
+        "center": 0.1,
+        "width": 0.9
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_ring.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_ring.vpcf",
+      "native_data_sha256": "76fe3b4422ebe16150a58af91ab3a265d26b9648ffa26fe5c48a2d0995dca10c",
+      "source_sha256": "57fc9544220986f5cd7d90795f29afd6ca5756d5fd913cb09c53370f250afaf0",
+      "plan": {
+        "name": "field_ring",
+        "radius": 500,
+        "ref": 309.26,
+        "field": true,
+        "circle": true,
+        "singleton": true,
+        "native_curve_peak": 1.141965259,
+        "bounded_curve_peak": 1.142
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_embers.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_embers.vpcf",
+      "native_data_sha256": "660dfe7a866871191e94b13ef454ef3b6cb6dacce3356849f522f048b50d9093",
+      "source_sha256": "96a56aa2f18d00c3bd3013cbd15e2e278b3654fc7d98ef390a45c74a73395f7c",
+      "plan": {
+        "name": "field_embers",
+        "radius": 500,
+        "ref": 400,
+        "field": true,
+        "sustained": true,
+        "recycle": true,
+        "center": 0.8,
+        "width": 0.1,
+        "trail": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_flames.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_flames.vpcf",
+      "native_data_sha256": "cada7cd5fee85dffaf94506f1081d9d00fd2cc1379d0840ebbd3008c0df148b6",
+      "source_sha256": "abf99637c3c2535e620c2cf618a167e090f01e4b4ce577f5b348a60c03c65adb",
+      "plan": {
+        "name": "field_flames",
+        "radius": 500,
+        "ref": 800,
+        "field": true,
+        "sustained": true,
+        "recycle": true,
+        "center": 0.8,
+        "width": 0.2
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_shards.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_iceshards.vpcf",
+      "native_data_sha256": "7394d79d8d1876a8ab6ae0287b880390ee61a7551b59797f12865a2732eb4e91",
+      "source_sha256": "87c9e260ac3133d27a205b1a35295746d5dfd8a25a702bc9cebeb366d30ae53a",
+      "plan": {
+        "name": "field_shards",
+        "radius": 500,
+        "ref": 500,
+        "field": true,
+        "sustained": true,
+        "singleton": true,
+        "center": 0.34,
+        "width": 0.66,
+        "model_extent": 210
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_ground_shockwave.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_shockwave.vpcf",
+      "native_data_sha256": "23de303e320ec9a7eb0039bf44e5259aba057d49ac582d6106e40a72076c86d0",
+      "source_sha256": "66169ac504b1b26c1b12e3681aa23be0c078c00d65e0e2c6dc8f61052b468b2b",
+      "plan": {
+        "name": "field_ground_shockwave",
+        "radius": 500,
+        "ref": 400,
+        "field": true,
+        "center": 0.1,
+        "width": 0.9
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_sparks.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_ground_sparks.vpcf",
+      "native_data_sha256": "c88ae38898981aff28ebd2f52aeb6f4e573de32071e4dea76bccf84af5355b8c",
+      "source_sha256": "bbece8a4cd319007e16be5116c78e23ccaa728fa6162ec774fba80fc45324ac0",
+      "plan": {
+        "name": "field_sparks",
+        "radius": 500,
+        "ref": 1200,
+        "field": true,
+        "center": 0.9,
+        "width": 0.1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_glow.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_glow.vpcf",
+      "native_data_sha256": "562e21cdefa772856976e2a8e01fe5feb6bea78fd117316de1d8dd62a3f9eeba",
+      "source_sha256": "9ebff837e7cdc79d86edb7080839798320867e85080bfbc4cd48c9900c7591e0",
+      "plan": {
+        "name": "field_glow",
+        "radius": 500,
+        "ref": 500,
+        "field": true,
+        "width": 1
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_torns.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_torns.vpcf",
+      "native_data_sha256": "6fd2dd0027ba411a3bc63ed82902ae30cf8722824e8528a6c9a679d23c5fbefd",
+      "source_sha256": "248c70a82279f26cc6eb339c108484baf21ba774583d9a77bc4e07f8b22a2963",
+      "plan": {
+        "name": "field_torns",
+        "radius": 500,
+        "ref": 1250,
+        "field": true,
+        "sustained": true,
+        "center": 0.4,
+        "width": 0.2,
+        "trail": 0.4
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_field_parent_glow.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_impact_glow.vpcf",
+      "native_data_sha256": "ff7e181e57b2a62f6011207a46cdee37c4be657eaaded54f2017a9ec36854771",
+      "source_sha256": "0ae10948573b9a05238254256dfb0e3916d7f3cc7fe00daa2f5f68466bc02955",
+      "plan": {
+        "name": "field_parent_glow",
+        "radius": 500,
+        "ref": 800,
+        "field": true,
+        "center": 0.1,
+        "width": 0.9
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_impact_burst.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_burst.vpcf",
+      "native_data_sha256": "fee5311edc70ee562f35340726eb0d6c20bf77ccecd8ce2be1a86a7e0a404281",
+      "source_sha256": "0b2f8585639cfa09d87b65f3df39165620c0f3076a2bf795e779241e5a43079f",
+      "plan": {
+        "native_stem": "snapfire_frostivus_ultimate_linger_impact_burst",
+        "name": "impact_burst",
+        "radius": 75,
+        "ref": 400,
+        "center": 0.1,
+        "width": 0.9
+      }
+    },
+    {
+      "resource": "particles/survival/skills/ice_cone_silver_squall_impact_glow.vpcf",
+      "native_resource": "particles/econ/items/snapfire/snapfire_frostivus_2023/snapfire_frostivus_ultimate_linger_impact_glow.vpcf",
+      "native_data_sha256": "562e21cdefa772856976e2a8e01fe5feb6bea78fd117316de1d8dd62a3f9eeba",
+      "source_sha256": "317297a99cfbf5890591cf179bb2a81e9acd23d7b294d61cc68a3361814a284a",
+      "plan": {
+        "native_stem": "snapfire_frostivus_ultimate_linger_impact_glow",
+        "name": "impact_glow",
+        "radius": 75,
+        "ref": 500,
+        "width": 1
+      }
+    }
+  ]
+}

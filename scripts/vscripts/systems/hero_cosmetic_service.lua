@@ -6,12 +6,22 @@ local diagnostic_rule = require("config/generated/global_rules").by_id.runtime_d
 local detailed_diagnostics = diagnostic_rule and diagnostic_rule.enabled ~= false
     and tonumber(diagnostic_rule.value) == 1
 local weapon_slot = require("visual/hero_weapon_slot")
+local event_bus = require("core/event_bus")
+local events = require("core/events")
 
 local M = {}
 
 local cosmetics_by_hero = {}
+local mirrors_by_entity = {}
 local generation_by_hero = {}
 local SPAWN_PARTICLE_LIFETIME_SECONDS = 1.5
+
+local function copy_definition(value)
+    if type(value) ~= "table" then return value end
+    local result = {}
+    for key, child in pairs(value) do result[key] = copy_definition(child) end
+    return result
+end
 
 local function current_world()
     return GameRules and GameRules.GetGameModeEntity
@@ -106,13 +116,27 @@ local function clear_pending_cosmetics(wearables, particles, spawn_particles)
     end
 end
 
-local function clear_cosmetics(hero_entindex)
-    local state = cosmetics_by_hero[hero_entindex]
-    if not state then
+local function clear_mirror_resources(wearables, particles, world)
+    -- Destroy/remove callbacks may synchronously start another Tools world.
+    -- Its reused particle IDs must never be released or destroyed by this one.
+    for _, particle_id in ipairs(particles or {}) do
+        if world ~= current_world() then return end
+        safe_call(ParticleManager, "DestroyParticle", particle_id, true)
+        if world ~= current_world() then return end
+        safe_call(ParticleManager, "ReleaseParticleIndex", particle_id)
+    end
+    for _, wearable in ipairs(wearables or {}) do
+        if world ~= current_world() then return end
+        remove_entity(wearable)
+    end
+end
+
+local function retire_cosmetics(state)
+    if mirrors_by_entity[state.hero] == state then mirrors_by_entity[state.hero] = nil end
+    if state.mirror then
+        clear_mirror_resources(state.wearables, state.particles, state.world_token)
         return
     end
-    -- Retire ownership before engine cleanup can synchronously re-enter.
-    cosmetics_by_hero[hero_entindex] = nil
     for _, particle_id in ipairs(state.particles or {}) do
         destroy_particle(particle_id)
     end
@@ -125,6 +149,14 @@ local function clear_cosmetics(hero_entindex)
     for _, wearable in ipairs(state.wearables or {}) do
         remove_entity(wearable)
     end
+end
+
+local function clear_cosmetics(hero_entindex)
+    local state = cosmetics_by_hero[hero_entindex]
+    if not state then return end
+    -- Retire ownership before engine cleanup can synchronously re-enter.
+    cosmetics_by_hero[hero_entindex] = nil
+    retire_cosmetics(state)
 end
 
 local function walk_children(hero, visitor)
@@ -422,6 +454,9 @@ local function spawn_wearable(hero, component_id, model_path, appearance)
         remove_entity(wearable)
         return nil
     end
+    -- NPCs do not consistently expose skin/material getters. Keep the exact
+    -- successfully applied declaration on our own component for visual copies.
+    wearable.survival_cosmetic_appearance = copy_definition(appearance)
     return wearable
 end
 
@@ -648,6 +683,7 @@ function M.apply(hero, hero_id)
         spawn_particles = spawn_particles,
         spawn_cleanup_tasks = {},
         cosmetic_id = hero_id,
+        appearance_definition = copy_definition(definition),
         generation = generation,
     }
     local state = cosmetics_by_hero[hero_entindex]
@@ -741,6 +777,7 @@ local function spawn_weapon_wearable(hero, component_id, model_path, appearance)
         local ok, result = safe_call(wearable, "SetMaterialGroup", appearance.material_group)
         if not ok or result == false then remove_entity(wearable); return nil end
     end
+    wearable.survival_cosmetic_appearance = copy_definition(appearance)
     return wearable
 end
 
@@ -782,27 +819,242 @@ function M.weapon_snapshot(hero, component_id)
     return weapon_slot.snapshot(state, component_id)
 end
 
+local function publish_weapon_change(hero, state, reason)
+    if weapon_context(hero) ~= state then return end
+    local player_id = tonumber(hero.survival_player_id)
+    if player_id == nil then
+        local ok, value = safe_call(hero, "GetPlayerOwnerID")
+        if ok then player_id = tonumber(value) end
+    end
+    -- Notify mirrors only after the weapon transaction has committed and
+    -- unlocked. Equipment-event subscribers can otherwise observe the old
+    -- particle declarations, depending on their dispatch order.
+    event_bus.emit(events.HERO_COSMETICS_CHANGED, {
+        unit = hero, player_id = player_id, reason = "weapon_" .. reason,
+    })
+end
+
 function M.apply_weapon(hero, appearance)
     local state = weapon_context(hero)
     if not state or state.cosmetic_id ~= appearance.hero_id then
         return false, "waiting_for_hero_cosmetics"
     end
-    return weapon_slot.apply(hero, state, appearance, weapon_engine(hero, state))
+    local applied, reason, details = weapon_slot.apply(
+        hero, state, appearance, weapon_engine(hero, state)
+    )
+    if applied and reason == "applied" then publish_weapon_change(hero, state, reason) end
+    return applied, reason, details
 end
 
 function M.clear_weapon(hero, component_id, token)
     local state = weapon_context(hero, token, true)
     if not state then return false, "hero_cosmetics_unavailable" end
-    return weapon_slot.clear(hero, state, component_id, weapon_engine(hero, state))
+    local cleared, reason, details = weapon_slot.clear(
+        hero, state, component_id, weapon_engine(hero, state)
+    )
+    if cleared and reason == "cleared" then publish_weapon_change(hero, state, reason) end
+    return cleared, reason, details
+end
+
+local function optional_value(entity, method)
+    local ok, value = safe_call(entity, method)
+    if ok then return value end
+    return nil
+end
+
+local function current_appearance(entity, declared)
+    local appearance = copy_definition(declared or {})
+    local model = optional_value(entity, "GetModelName")
+    if type(model) == "string" and model ~= "" then appearance.model = model end
+    local scale = tonumber(optional_value(entity, "GetModelScale"))
+    if scale and scale > 0 then appearance.model_scale = scale end
+    local skin = tonumber(optional_value(entity, "GetSkin"))
+    if skin ~= nil then appearance.skin = skin end
+    local material = optional_value(entity, "GetMaterialGroup")
+    if type(material) == "string" and material ~= "" then appearance.material_group = material end
+    local material_hash = optional_value(entity, "GetMaterialGroupHash")
+    if material_hash ~= nil then appearance.material_group_hash = material_hash end
+    return appearance
+end
+
+local function appearance_key(value)
+    if type(value) ~= "table" then return type(value) .. ":" .. tostring(value) end
+    local keys, result = {}, {}
+    for key in pairs(value) do keys[#keys + 1] = key end
+    table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+    for _, key in ipairs(keys) do
+        local encoded = appearance_key(value[key])
+        result[#result + 1] = tostring(key) .. "=" .. #encoded .. ":" .. encoded
+    end
+    return "{" .. table.concat(result, ";") .. "}"
+end
+
+local function set_appearance(entity, appearance, body)
+    local function set(method, value)
+        if value == nil then return true end
+        local ok, result = safe_call(entity, method, value)
+        return ok and result ~= false
+    end
+    if body and (not set("SetOriginalModel", appearance.model)
+        or not set("SetModel", appearance.model)) then return false end
+    if not set("SetModelScale", appearance.model_scale)
+        or not set("SetSkin", appearance.skin)
+        or not set("SetMaterialGroup", appearance.material_group) then return false end
+    if appearance.material_group_hash ~= nil and type(entity.SetMaterialGroupHash) == "function"
+        and not set("SetMaterialGroupHash", appearance.material_group_hash) then return false end
+    return true
+end
+
+-- Copies committed visual declarations into separately owned entities/particles.
+-- It never enters the player equipment service or broadcasts a hero event.
+function M.sync_appearance(target, source)
+    if target == source or not valid_entity(target) or not valid_entity(source) then return false end
+    local source_state = weapon_context(source)
+    if source_state and source_state.weapon_slot_transaction then return false end
+    local hero_id = source_state and source_state.cosmetic_id or source.survival_hero_id
+    if not hero_id then return false end
+    local definition = source_state and source_state.appearance_definition or definition_for(hero_id)
+    if not definition then return false end
+    local body = current_appearance(source, {
+        model = definition.body_model, model_scale = definition.model_scale or 1,
+        skin = definition.body_skin or 0, material_group = definition.material_group,
+    })
+    if type(body.model) ~= "string" or body.model == "" then return false end
+    local declarations = {}
+    if source_state then
+        for id, component in pairs(source_state.components or {}) do
+            if not valid_entity(component) then return false end
+            local appearance = current_appearance(component, component.survival_cosmetic_appearance)
+            appearance.id, appearance.model = id, appearance.model
+            if not appearance.model or appearance.model == "" then return false end
+            declarations[#declarations + 1] = appearance
+        end
+    else
+        for index, entry in ipairs(definition.wearables or {}) do
+            local id, model, appearance = normalize_wearable(entry, index)
+            appearance = copy_definition(appearance)
+            appearance.id, appearance.model = id, model
+            declarations[#declarations + 1] = appearance
+        end
+    end
+    table.sort(declarations, function(a, b) return tostring(a.id) < tostring(b.id) end)
+    local particles = copy_definition(source_state and source_state.particle_definitions or definition.particles or {})
+    local signature = appearance_key({body = body, wearables = declarations, particles = particles,
+        activities = definition.activity_modifiers or {}})
+    local index, world = target:entindex(), current_world()
+    local previous = weapon_context(target)
+    local cached = previous and previous.mirror
+    if cached and cached.source == source and cached.source_state == source_state
+        and cached.source_generation == (source_state and source_state.generation)
+        and cached.components == previous.components and cached.particles == previous.particle_definitions
+        and cached.signature == signature then
+        local complete = true
+        for _, wearable in ipairs(previous.wearables or {}) do
+            if not valid_entity(wearable) then complete = false; break end
+        end
+        if complete then return true end
+    end
+    local generation = (generation_by_hero[index] or 0) + 1
+    generation_by_hero[index] = generation
+    local spawned, spawned_particles, components = {}, {}, {}
+    local old_body = current_appearance(target, previous and previous.mirror_body)
+    local body_changed = false
+    local source_components = source_state and source_state.components
+    local source_particles = source_state and source_state.particle_definitions
+    local function active()
+        local same_world = world == current_world()
+        return same_world and valid_entity(target) and valid_entity(source)
+            and generation_by_hero[index] == generation
+            and weapon_context(source) == source_state
+            and (not source_state or (not source_state.weapon_slot_transaction
+                and source_state.components == source_components
+                and source_state.particle_definitions == source_particles)), same_world
+    end
+    local function abort()
+        local _, same_world = active()
+        if same_world then clear_mirror_resources(spawned, spawned_particles, world) end
+        if world == current_world() and generation_by_hero[index] == generation
+            and valid_entity(target) and body_changed and old_body.model then
+            set_appearance(target, old_body, true)
+        end
+        return false
+    end
+    for _, appearance in ipairs(declarations) do
+        if not active() then return abort() end
+        local wearable = spawn_wearable(target, appearance.id, appearance.model, appearance)
+        if wearable then spawned[#spawned + 1] = wearable end
+        if not wearable or not active() or not set_appearance(wearable, appearance, false) then return abort() end
+        components[appearance.id] = wearable
+    end
+    body_changed = true
+    if not active() or not set_appearance(target, body, true) then return abort() end
+    -- The native CP helper also recreates hidden offset carriers. They belong
+    -- only to the target and are retired with its other visual entities.
+    local particle_components = {}
+    for id, component in pairs(components) do particle_components[id] = component end
+    particle_components.__mirror_body = target
+    for _, particle in ipairs(particles) do
+        local binding = copy_definition(particle)
+        if binding.owner == nil or binding.owner == "" then binding.owner = "__mirror_body" end
+        local particle_id, anchors = weapon_slot.spawn_particle(target, binding, particle_components, active)
+        if particle_id == nil then return abort() end
+        spawned_particles[#spawned_particles + 1] = particle_id
+        for _, anchor in ipairs(anchors or {}) do spawned[#spawned + 1] = anchor end
+        if not active() then return abort() end
+    end
+    if not active() then return abort() end
+    for _, modifier in ipairs(definition.activity_modifiers or {}) do
+        safe_call(target, "AddActivityModifier", modifier.modifier_name)
+    end
+    -- Hide only direct target wearables, never a global owner-chain sweep.
+    local owned = {}
+    for _, wearable in ipairs(spawned) do owned[wearable] = true end
+    walk_children(target, function(child)
+        if not owned[child] and optional_value(child, "GetClassname") == "dota_item_wearable" then
+            apply_native_wearable_visibility(child, false)
+        end
+    end)
+    local state = {hero = target, hero_entindex = index, world_token = world,
+        components = components, wearables = spawned, particles = spawned_particles,
+        particle_definitions = particles, spawn_particles = {}, spawn_cleanup_tasks = {},
+        cosmetic_id = hero_id, appearance_definition = copy_definition(definition), generation = generation,
+        mirror_body = body, mirror = {source = source, source_state = source_state,
+            source_generation = source_state and source_state.generation, signature = signature,
+            components = components, particles = particles}}
+    cosmetics_by_hero[index] = state
+    mirrors_by_entity[target] = state
+    if previous then retire_cosmetics(previous) end
+    return cosmetics_by_hero[index] == state and active() == true
 end
 
 function M.clear(hero)
-    if not valid_entity(hero) then
-        return
+    if not hero then return end
+    -- Removed NPC handles can no longer answer entindex(). Keep mirror ownership
+    -- by the exact handle, independent of a later unit reusing its integer ID.
+    local state = mirrors_by_entity[hero]
+    if not state then
+        for _, candidate in pairs(cosmetics_by_hero) do
+            if candidate.hero == hero then state = candidate; break end
+        end
     end
-    local entindex = hero:entindex()
-    generation_by_hero[entindex] = (generation_by_hero[entindex] or 0) + 1
-    clear_cosmetics(entindex)
+    if state then
+        local index = state.hero_entindex
+        if cosmetics_by_hero[index] == state then
+            cosmetics_by_hero[index] = nil
+            if state.world_token == current_world() then
+                generation_by_hero[index] = (generation_by_hero[index] or 0) + 1
+            end
+        end
+        if state.world_token == current_world() then retire_cosmetics(state)
+        elseif mirrors_by_entity[hero] == state then mirrors_by_entity[hero] = nil end
+    elseif valid_entity(hero) then
+        local index = hero:entindex()
+        -- A reentrant clear can cancel a first mirror build before its commit.
+        local current = cosmetics_by_hero[index]
+        if not current or current.hero == hero then
+            generation_by_hero[index] = (generation_by_hero[index] or 0) + 1
+        end
+    end
 end
 
 return M

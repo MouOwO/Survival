@@ -4,29 +4,59 @@ local weapons = require("config/generated/weapon_definitions")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local player_profile_service = require("systems/player_profile_service")
 local phase_guard = require("systems/gameplay_phase_guard")
+local weapon_progression = require("systems/weapon_progression")
 
 local M = {}
 local state_by_player = {}
+local inputs_by_player = {}
 local FORGING_HAMMER_ID = "item_forging_hammer"
 local FORGING_HAMMER_LIMIT = 4
 
+local function inputs(player_id)
+    inputs_by_player[player_id] = inputs_by_player[player_id] or {}
+    return inputs_by_player[player_id]
+end
+
+local function nonnegative_integer(value)
+    return math.max(0, math.floor(tonumber(value) or 0))
+end
+
 local function requirement_reduction(player_id)
+    local cached = inputs(player_id)
+    if cached.requirement_reduction ~= nil then return cached.requirement_reduction end
     local projected = event_bus.request(
         events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
         { player_id = player_id }
     )
-    local totals = projected and projected.totals or {}
-    local result = tonumber(totals.weapon_upgrade_requirement_reduction)
-    if result == nil then
-        local profile = player_profile_service.get_profile(player_id)
-        local stats = profile and profile.save
-            and profile.save.gameplay_stats or {}
-        result = tonumber(stats.weapon_upgrade_requirement_reduction)
+    if projected and projected.ok ~= false and type(projected.totals) == "table" then
+        -- This authoritative projection is sparse: a missing effect is zero,
+        -- not a reason to copy the player's complete saved profile every hit.
+        cached.requirement_reduction = nonnegative_integer(
+            projected.totals.weapon_upgrade_requirement_reduction)
+        return cached.requirement_reduction
     end
-    return math.max(0, math.floor(tonumber(result) or 0))
+    -- Preserve early-bootstrap/legacy fallback only while the projection is
+    -- unavailable. Do not cache it, so a newly available service takes over.
+    local profile = player_profile_service.get_profile(player_id)
+    local stats = profile and profile.save and profile.save.gameplay_stats or {}
+    return nonnegative_integer(stats.weapon_upgrade_requirement_reduction)
+end
+
+local function hammer_count(player_id)
+    local cached = inputs(player_id)
+    if cached.hammer_count ~= nil then return cached.hammer_count end
+    local inventory = event_bus.request(events.CONTENT_INVENTORY_GET_REQUEST,
+        {player_id = player_id})
+    local counts = inventory and inventory.ok ~= false and inventory.snapshot
+        and inventory.snapshot.counts
+    if type(counts) ~= "table" then return 0 end
+    cached.hammer_count = math.min(FORGING_HAMMER_LIMIT,
+        nonnegative_integer(counts[FORGING_HAMMER_ID]))
+    return cached.hammer_count
 end
 
 local function requirement_for(player_id, definition)
+    if weapon_progression.is_max_level(definition) then return 0 end
     local target = tonumber(definition and definition.progression_value) or 0
     if target <= 0 then target = 200 end
     return math.max(1, target - requirement_reduction(player_id))
@@ -51,16 +81,7 @@ local function snapshot(player_id)
     local current = state(player_id)
     local definition = weapons.by_id[current.content_id] or {}
     local target = requirement_for(player_id, definition)
-    local inventory = event_bus.request(
-        events.CONTENT_INVENTORY_GET_REQUEST,
-        { player_id = player_id }
-    )
-    local counts = inventory and inventory.snapshot
-        and inventory.snapshot.counts or {}
-    local hammer_count = math.min(FORGING_HAMMER_LIMIT, math.max(
-        0,
-        math.floor(tonumber(counts[FORGING_HAMMER_ID]) or 0)
-    ))
+    local hammers = hammer_count(player_id)
     local damage_growth = current.series_id == "ice_blade"
         or current.series_id == "epic_icefire"
         or current.series_id == "legend_abyss"
@@ -69,11 +90,12 @@ local function snapshot(player_id)
         content_id = current.content_id,
         series_id = current.series_id,
         stage = tonumber(definition.stage) or 0,
+        is_max_level = weapon_progression.is_max_level(definition) and 1 or 0,
         stage_attack_count = current.stage_attack_count,
         stage_attack_target = target,
         stage_attack_remaining = math.max(0, target - current.stage_attack_count),
-        forging_hammer_count = hammer_count,
-        progress_per_attack = 1 + hammer_count,
+        forging_hammer_count = hammers,
+        progress_per_attack = 1 + hammers,
         lifetime_attack_count = current.lifetime_attack_count,
         growth_attack = current.growth_attack,
         growth_strength = current.growth_strength,
@@ -317,7 +339,9 @@ end
 
 local function on_hero_summoned(payload)
     if payload.unit and not payload.unit:IsNull() then
-        state(tonumber(payload.player_id)).hero = payload.unit
+        local player_id = tonumber(payload.player_id)
+        inputs_by_player[player_id] = nil
+        state(player_id).hero = payload.unit
         payload.unit:AddNewModifier(
             payload.unit,
             nil,
@@ -332,9 +356,29 @@ local function get_growth(payload)
 end
 
 local function on_inventory_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    local cached = inputs(player_id)
+    local counts = payload.snapshot and payload.snapshot.counts
+    -- Inventory events already carry the committed snapshot. Read the one
+    -- needed field here instead of making a fresh full-inventory copy per hit.
+    cached.hammer_count = type(counts) == "table"
+        and math.min(FORGING_HAMMER_LIMIT, nonnegative_integer(counts[FORGING_HAMMER_ID])) or nil
     if payload.changes and payload.changes[FORGING_HAMMER_ID] then
-        publish(tonumber(payload.player_id), "forging_hammer_changed")
+        publish(player_id, "forging_hammer_changed")
     end
+end
+
+local function on_permanent_effects_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    inputs(player_id).requirement_reduction = type(payload.totals) == "table"
+        and nonnegative_integer(payload.totals.weapon_upgrade_requirement_reduction) or nil
+end
+
+local function invalidate_inputs(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id ~= nil then inputs_by_player[player_id] = nil end
 end
 
 local function debug_add(payload)
@@ -347,13 +391,23 @@ end
 
 function M.init()
     state_by_player = {}
+    inputs_by_player = {}
     event_bus.handle_request(events.WEAPON_GROWTH_GET_REQUEST, get_growth)
     event_bus.handle_request(events.WEAPON_GROWTH_DEBUG_REQUEST, debug_add)
     event_bus.subscribe(events.WEAPON_EQUIPPED_CHANGED, on_equipped)
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_attack_landed)
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage_dealt)
     event_bus.subscribe(events.CONTENT_INVENTORY_CHANGED, on_inventory_changed)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, on_permanent_effects_changed)
+    event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, invalidate_inputs)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    event_bus.subscribe(events.HERO_REMOVED, function(payload)
+        local current = state_by_player[tonumber(payload and payload.player_id)]
+        if current and current.hero == payload.unit then
+            current.hero = nil
+            invalidate_inputs(payload)
+        end
+    end)
 end
 
 return M

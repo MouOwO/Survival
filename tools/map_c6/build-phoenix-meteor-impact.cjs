@@ -5,10 +5,10 @@ const fs = require('fs'), path = require('path'), cp = require('child_process');
 const crypto = require('crypto'), assert = require('assert');
 const {Vpk,endOf} = require('./lib.cjs');
 const repo = path.resolve(__dirname,'../..');
-const output = path.join(repo,'output/meteor_phoenix_20261002');
-const sourceRoot = path.join(repo,'art/effects/skill_visuals/source');
+const defaultOutput = path.join(repo,'output/meteor_phoenix_20261002');
+const defaultSourceRoot = path.join(repo,'art/effects/skill_visuals/source');
 const nativeRoot = 'particles/units/heroes/hero_phoenix/phoenix_supernova_reborn.vpcf';
-const rootParticle = 'particles/survival/skills/meteor_phoenix_impact.vpcf';
+const defaultRootParticle = 'particles/survival/skills/meteor_phoenix_impact.vpcf';
 const header = '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf45:version{73c3d623-a141-4df2-b548-41dd786e6300} -->\n';
 const hash = value => crypto.createHash('sha256').update(value).digest('hex');
 const numeric = value => ({__number:value,raw:Number.isInteger(value)?value.toFixed(1):String(value)});
@@ -66,7 +66,7 @@ const plans = {
     sphere_shockwave:{size:.6,motion:.12,center:280,curve_envelope:1.5,extent:128*.6*.5*Math.SQRT2},
     star_sphere:{size:.7,motion:.35,center:345,extent:150*.7*Math.SQRT2},
 };
-function adaptSpatial(tree,plan) {
+function adaptSpatial(tree,plan,relativeScale=1) {
     scaleValue(tree,'m_flConstantRadius',plan.size);
     for(const initial of tree.m_Initializers||[]) {
         const kind=initial._class;
@@ -100,10 +100,21 @@ function adaptSpatial(tree,plan) {
     // Fresh resourcecompiler DATA still must verify their actual serialization.
     tree.m_Constraints=[...(tree.m_Constraints||[]),{_class:'C_OP_ConstrainDistance',m_fMinDistance:numeric(0),
         m_fMaxDistance:numeric(plan.center),m_nControlPointNumber:integer(0),m_CenterOffset:vector([0,0,0]),m_bGlobalCenter:false}];
-    tree.m_BoundingBoxMin=vector([-512,-512,-512]);tree.m_BoundingBoxMax=vector([512,512,512]);
+    tree.m_BoundingBoxMin=vector([-512,-512,-512].map(value=>value*relativeScale));
+    tree.m_BoundingBoxMax=vector([512,512,512].map(value=>value*relativeScale));
     return removed;
 }
-function build() {
+function build(options={}) {
+    const radius=options.radius===undefined?500:Number(options.radius),relativeScale=radius/500;
+    assert(Number.isFinite(radius)&&radius>0&&radius<=500,'Expected radius in (0, 500]');
+    const output=path.resolve(options.output||defaultOutput),sourceRoot=path.resolve(options.sourceRoot||defaultSourceRoot);
+    for(const directory of [output,sourceRoot])assert(directory.startsWith(repo+path.sep),'Build paths must stay inside the workspace');
+    const rootParticle=options.rootParticle||defaultRootParticle;
+    assert(/^particles\/survival\/skills\/[a-z0-9_]+\.vpcf$/.test(rootParticle),'Invalid impact resource path');
+    const particlePrefix=rootParticle.slice(0,-5);
+    const scaledPlans=Object.fromEntries(Object.entries(plans).map(([name,plan])=>[name,Object.fromEntries(
+        Object.entries(plan).map(([key,value])=>[key,key==='curve_envelope'?value:value*relativeScale])
+    )]));
     fs.mkdirSync(output,{recursive:true});
     const pack=new Vpk(path.resolve(repo,'../../dota/pak01_dir.vpk'));
     const reflectedBytes=fs.readFileSync(path.resolve(repo,'../../bin/win64/particles.dll'));
@@ -123,7 +134,7 @@ function build() {
     }
     load(nativeRoot);assert.equal(nodes.size,17);
     const mapping=Object.fromEntries([...nodes.keys()].map(resource=>[resource,resource===nativeRoot?rootParticle:
-        'particles/survival/skills/meteor_phoenix_impact_'+path.basename(resource,'.vpcf').replace('phoenix_supernova_reborn_','')+'.vpcf']));
+        particlePrefix+'_'+path.basename(resource,'.vpcf').replace('phoenix_supernova_reborn_','')+'.vpcf']));
     // Model bound is measured independently, not inferred from particle radius.
     const sphere=pack.read('models/particle/sphere.vmdl_c'),sphereDest=path.join(output,'builder_native/sphere.vmdl_c');
     fs.writeFileSync(sphereDest,sphere);
@@ -135,8 +146,8 @@ function build() {
     for(const node of nodes.values()) {
         const nativeTree=structuredClone(node.tree),tree=structuredClone(node.tree),resource=mapping[node.resource];
         const suffix=path.basename(node.resource,'.vpcf').replace('phoenix_supernova_reborn_','');
-        const plan=node.resource===nativeRoot?null:plans[suffix];assert(node.resource===nativeRoot||plan,'No range plan '+suffix);
-        const removed=plan?adaptSpatial(tree,plan):[];
+        const plan=node.resource===nativeRoot?null:scaledPlans[suffix];assert(node.resource===nativeRoot||plan,'No range plan '+suffix);
+        const removed=plan?adaptSpatial(tree,plan,relativeScale):[];
         for(const child of tree.m_Children||[])child.m_ChildRef.__resource=mapping[child.m_ChildRef.__resource];
         walk(tree,value=>{if(value&&value.__resource&&!Object.values(mapping).includes(value.__resource))nativeResources.add(value.__resource);});
         assert.equal(kv(tree.m_Emitters||[]),kv(nativeTree.m_Emitters||[]),'Emission changed '+suffix);
@@ -145,11 +156,11 @@ function build() {
         assert.equal(kv(nativeLife),kv(derivedLife),'Lifespan changed '+suffix);
         assert.deepEqual(fields(tree,k=>/Color|HSV|Texture|Material|m_ModelList|m_nSkin/.test(k)),fields(nativeTree,k=>/Color|HSV|Texture|Material|m_ModelList|m_nSkin/.test(k)),'Native drawing or colors changed '+suffix);
         const file=path.join(sourceRoot,resource);fs.mkdirSync(path.dirname(file),{recursive:true});const source=header+kv(tree)+'\n';fs.writeFileSync(file,source);outputs.push(resource);
-        const geometricBudget=plan?plan.center*(plan.curve_envelope||1)+plan.extent:0;assert(geometricBudget<=500);
+        const geometricBudget=plan?plan.center*(plan.curve_envelope||1)+plan.extent:0;assert(geometricBudget<=radius);
         layers.push({native_source:node.resource,resource,source:path.relative(repo,file).replace(/\\/g,'/'),
             source_sha256:hash(source),native_bytes_sha256:node.native_bytes_sha256,native_data_sha256:node.native_data_sha256,
             native_children:(nativeTree.m_Children||[]).map(child=>child.m_ChildRef.__resource),derived_children:(tree.m_Children||[]).map(child=>child.m_ChildRef.__resource),
-            range_contract:plan?{fixed_radius:500,spatial_size_scale:plan.size,motion_scale:plan.motion,
+            range_contract:plan?{fixed_radius:radius,spatial_size_scale:plan.size,motion_scale:plan.motion,
                 constraint_class:'C_OP_ConstrainDistance',constraint_cp:0,center_max_distance:plan.center,
                 renderer_extent_budget:plan.extent,curve_envelope:plan.curve_envelope||1,allocated_world_extent:geometricBudget,
                 radius_override:plan.radius_override??null,ring_radius_override:plan.ring_override??null,
@@ -158,9 +169,9 @@ function build() {
     }
     nativeResources.forEach(resource=>assert(pack.entries.has(resource+'_c'),'Missing native '+resource));
     const manifest={generated_by:'tools/map_c6/build-phoenix-meteor-impact.cjs',native_root:nativeRoot,root_particle:rootParticle,
-        fixed_radius:500,particle_systems:17,outputs,native_resources:[...nativeResources].sort(),layers,
-        cp_contract:{0:'Fixed world landing position. No owner attachment or unit follow.',1:[1,1,1],3:'Fixed landing position plus Vector(0,0,100); native local CP3 writers moved to Lua to preserve translation invariance.',
-            colors:'Keep native C_OP_HSVShiftToCP and authored default colors. Lua does not overwrite CP60/61/62.',radius:'Sources are spatially adapted for fixed 500. CP1 is the native parameter vector, not a radius input.'},
+        fixed_radius:radius,particle_systems:17,outputs,native_resources:[...nativeResources].sort(),layers,
+        cp_contract:{0:'Fixed world landing position. No owner attachment or unit follow.',1:[1,1,1],3:'Fixed landing position plus Vector(0,0,'+(100*relativeScale)+'); native local CP3 writers moved to Lua to preserve translation invariance.',
+            colors:'Keep native C_OP_HSVShiftToCP and authored default colors. Lua does not overwrite CP60/61/62.',radius:'Sources are spatially adapted for fixed '+radius+'. CP1 is the native parameter vector, not a radius input.'},
         maximum_native_tail_seconds:7,fallback_cleanup_seconds:8,
         native_model_bound:{resource:'models/particle/sphere.vmdl',sha256:hash(sphere),maximum_axis:axis,reserved_unit_radius:14},
         native_constraint_reflection:{binary:'game/bin/win64/particles.dll',sha256:hash(reflectedBytes),registered_fields:constraintFields},

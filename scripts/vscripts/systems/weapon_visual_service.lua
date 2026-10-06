@@ -352,6 +352,18 @@ local function on_player_unavailable(payload)
     hero_weapon.on_unavailable(payload)
 end
 
+local function on_hero_removed(payload)
+    owned_visual.on_hero_removed(payload)
+    hero_weapon.on_hero_removed(payload)
+    local id = player_id(payload.player_id)
+    local current = id and states[id]
+    if not current or current.hero ~= payload.unit then return end
+    current.hero = nil
+    clear(current)
+    current.model_name, current.anchor, current.anchor_index = nil, nil, nil
+    current.next_impact = 0
+end
+
 function M.init()
     local current_world = GameRules.GetGameModeEntity
         and GameRules:GetGameModeEntity() or GameRules
@@ -392,6 +404,7 @@ function M.init()
     for event_name, handler in pairs({
         [events.WEAPON_EQUIPPED_CHANGED] = on_equipped,
         [events.HERO_SUMMONED] = on_hero,
+        [events.HERO_REMOVED] = on_hero_removed,
         [events.HERO_MAIN_ATTACK_LANDED] = on_attack,
         [events.CONTENT_INVENTORY_CHANGED] = owned_visual.on_inventory_changed,
         [events.PLAYER_DEFEATED] = on_player_unavailable,

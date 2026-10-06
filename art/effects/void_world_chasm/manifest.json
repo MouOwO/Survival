@@ -1,0 +1,533 @@
+{
+  "root": "particles/survival/skills/void_world_chasm.vpcf",
+  "native_root": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5.vpcf",
+  "cosmetic": {
+    "item_definition": 8326,
+    "english": "World Chasm Artifact",
+    "chinese": "世界之渊珍宝",
+    "ability": "Black Hole (R)",
+    "slot": "arms",
+    "year": 2015
+  },
+  "controls": {
+    "0": "current moving ground center; sync every50ms",
+    "20": "x = damage radius300 at alllevels",
+    "21": "x = slow aura radius600 at levels3-5;0 at levels1-2"
+  },
+  "lifetime": "Caller owns3s main and2s secondary lifetime; immediate DestroyParticle(true) then ReleaseParticleIndex at every termination",
+  "graph": {
+    "native_resources": 32,
+    "root_native_immediate_children": 26,
+    "root_derived_immediate_children": 27,
+    "derived_resources": 33,
+    "native_endcaps": [
+      "_ground",
+      "_ground_darken",
+      "_ground_scorch"
+    ],
+    "endcap_duration_seconds": 6,
+    "endcap_cleanup": "retained ingraph; immediate destruction suppresses them at gameplay expiry"
+  },
+  "radius": {
+    "reference": 300,
+    "native_spatial_reference": 800,
+    "positions_velocity_noise_force_literal_scale": 0.375,
+    "nominal_main_footprint": "Per-layer CP20 sizes and CP20-centered constraints fit the300 damage area; native800light/flares and1424warp-ripple scale to300",
+    "flare_clamp": "Final native ClampScalar uses fixed300 max for the configured CP20.x300 contract; default renderer radius scale1, interpolation scale2 and active radius oscillation retained",
+    "galaxy": "sprite max0.55R plus moving center max0.45R",
+    "nebula": "sprite max0.5R plus moving center max0.5R",
+    "core_model": "explicit radius CP20.x/80; native sphere conservative3D unit extent13.734001",
+    "xray": "native column endpoint2000 scaled to750Z at R300; native oscillating particle radius capped80, renderer radius scale0.5",
+    "outer_aura": "CP21.x exact nominal radius; flat native amber softouterring atz8; alpha0.08;zero radius hides it"
+  },
+  "snapshot": {
+    "resource": "particles/models/items/enigma/enigma_ti5_blackhole_part.vsnap",
+    "point_count": 40,
+    "maximum_point_horizontal_extent": 7.782320599,
+    "native_warp_xy_range": [
+      30,
+      40
+    ],
+    "scaled_warp_xy_range": [
+      11.25,
+      15
+    ],
+    "maximum_scaled_snapshot_horizontal_center_extent": 116.734808985,
+    "storage_control": 6,
+    "spatial_controls": [
+      0,
+      7,
+      8,
+      9
+    ],
+    "preserve_native_storage": true,
+    "native_orientation_degrees": [
+      190,
+      20,
+      210
+    ],
+    "double_position_lock": false
+  },
+  "motion": "Exactly one position lock per rendered leaf; normalized start/end fadeout999999 keeps full follow beyond native short lifespans. A single lock precedes every axis orbit operator to translate into the current frame before orbiting. Native CP1 sphere birth frames use explicit modern TransformInput. CP3 trail locks useCP0. Snapshot leaves retain their single nativeCP0 lockRot=true; CP6 is storage and is untouched. Native local orbit/attraction follows the current center and stays visual-only.",
+  "culling_bounds": {
+    "minimum": [
+      -600,
+      -600,
+      -20
+    ],
+    "maximum": [
+      600,
+      600,
+      800
+    ],
+    "purpose": "include optional600slowrange and750-high native scaled xray"
+  },
+  "preserved": [
+    "All32native resource nodes and distinctive snapshot spiral arms/clouds, galaxy, sphere core, stars, amber flares and particle textures",
+    "Native colors, renderer styles, local rotations, particle-count gradients, fade curves, emitter rates and startup delays",
+    "Native control frames0..9 and snapshot binding6; external20/21 arefree and have no native writer"
+  ],
+  "gameplay": "Damage, slow ranges, proc chance, targeting, movement speed, timing and secondary count stay owned by existing Lua; no Black Hole pull/channel/stun behavior added",
+  "validation_limit": "Numerical particle/model contracts and compiled assets can be audited; texture alpha, bloom, refraction, rope tessellation and final appearance require in-game visual inspection",
+  "outputs": [
+    "particles/survival/skills/void_world_chasm.vpcf",
+    "particles/survival/skills/void_world_chasm_ground.vpcf",
+    "particles/survival/skills/void_world_chasm_ground_darken.vpcf",
+    "particles/survival/skills/void_world_chasm_ground_scorch.vpcf",
+    "particles/survival/skills/void_world_chasm_light.vpcf",
+    "particles/survival/skills/void_world_chasm_dark_swirl.vpcf",
+    "particles/survival/skills/void_world_chasm_star_perimeter.vpcf",
+    "particles/survival/skills/void_world_chasm_star_perimeter_sml.vpcf",
+    "particles/survival/skills/void_world_chasm_ember.vpcf",
+    "particles/survival/skills/void_world_chasm_warp_ripple.vpcf",
+    "particles/survival/skills/void_world_chasm_warp.vpcf",
+    "particles/survival/skills/void_world_chasm_ring_spiral.vpcf",
+    "particles/survival/skills/void_world_chasm_spiral_arm.vpcf",
+    "particles/survival/skills/void_world_chasm_spiral_armb.vpcf",
+    "particles/survival/skills/void_world_chasm_spiral_cloud.vpcf",
+    "particles/survival/skills/void_world_chasm_spiral_cloudb.vpcf",
+    "particles/survival/skills/void_world_chasm_swirl_orange.vpcf",
+    "particles/survival/skills/void_world_chasm_galaxy.vpcf",
+    "particles/survival/skills/void_world_chasm_core_rays.vpcf",
+    "particles/survival/skills/void_world_chasm_core_glow.vpcf",
+    "particles/survival/skills/void_world_chasm_model.vpcf",
+    "particles/survival/skills/void_world_chasm_ring.vpcf",
+    "particles/survival/skills/void_world_chasm_outer_debris.vpcf",
+    "particles/survival/skills/void_world_chasm_ember_streak.vpcf",
+    "particles/survival/skills/void_world_chasm_streak_start.vpcf",
+    "particles/survival/skills/void_world_chasm_ring_flash.vpcf",
+    "particles/survival/skills/void_world_chasm_nebula.vpcf",
+    "particles/survival/skills/void_world_chasm_flare.vpcf",
+    "particles/survival/skills/void_world_chasm_shake.vpcf",
+    "particles/survival/skills/void_world_chasm_flare_b.vpcf",
+    "particles/survival/skills/void_world_chasm_xray.vpcf",
+    "particles/survival/skills/void_world_chasm_flare_c.vpcf",
+    "particles/survival/skills/void_world_chasm_slow_range.vpcf"
+  ],
+  "layers": [
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5.vpcf",
+      "native_data_sha256": "d0864104604bbcc453f73fbb1c46bbb459390bdb6fc0a35db67c9b5fa2b4c832",
+      "native_child_count": 26,
+      "plan": {
+        "radius": 0.0025
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm.vpcf",
+      "source_sha256": "c2b44b0807b379a0d504cc61ce93677dcc50bf8c7ad580f8e0e2f2db8062243c"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ground.vpcf",
+      "native_data_sha256": "2a4eaea9daacfa3404d4bae2fa8a6fd23022e5287ef17e02118dc0e1727cb4ab",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_ground.vpcf",
+      "source_sha256": "dfc40c7d5cc25efc69d3e8aa88b73cfb09feac7738351a341c239a7b82cc27dc"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ground_darken.vpcf",
+      "native_data_sha256": "2962c8df4fa106a08e891c509bd3572474b497b44b1dc73873a750eb883e8a4f",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.002
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_ground_darken.vpcf",
+      "source_sha256": "ba315e4734dcf4b88aa42edee7994b4e5ae8c3003a380578f175cfd9e1039a0d"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ground_scorch.vpcf",
+      "native_data_sha256": "f51605cbe13189ca27a6a9e7d471a405f276f06b244c9baf465e41c831b880a8",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.7
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_ground_scorch.vpcf",
+      "source_sha256": "d3ae0a7270b934e3aa8bd9246570f955c3902dcc10f08d3181586e6a12d81cdc"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_light.vpcf",
+      "native_data_sha256": "6b7496e600588e750833977f1602d7ce8743f9269ab3ef12ea22411d9f201646",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_light.vpcf",
+      "source_sha256": "f2428480e50ef6f50273069c6d1903aba4410bd5ad5d188c56850bc6300167d3"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_dark_swirl.vpcf",
+      "native_data_sha256": "147da8229787d0317da93f16c6c08a0043f6facba1f73a856ea31d11a387d9e6",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.0012857142857142856,
+        "center": 0.1
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_dark_swirl.vpcf",
+      "source_sha256": "99d558740ea14af57fc540914d728e14a6ec9e173fc39b2149555bdfb3107698"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_star_perimeter.vpcf",
+      "native_data_sha256": "1b6ac056e511afb86ae99d56a5cba0b92e00a1558ad26b4d72c47617209589da",
+      "native_child_count": 1,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.95
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_star_perimeter.vpcf",
+      "source_sha256": "32d35c53d7ddbb6e75554e4b804d731062c215761f3d9aa60083163560292fa9"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_star_perimeter_sml.vpcf",
+      "native_data_sha256": "347b5c89320e709102f6e27bebffec1dbebbbbee4e4e47e626254e0d40534716",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.95
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_star_perimeter_sml.vpcf",
+      "source_sha256": "46dfe3984421e357a94645eceb6a3d7d1a403741ce177acb23c7b123753f0cc9"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ember.vpcf",
+      "native_data_sha256": "f7655fd275d930971107480ebf32749719debc1d0cf56287513c0f30042816ba",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.7
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_ember.vpcf",
+      "source_sha256": "a45fe482e3e5eb075d443ae95ab53b4f0dff8e66e45d6eeedc7fd65498393e7b"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_warp_ripple.vpcf",
+      "native_data_sha256": "5803dd5b9414e1171c43fcb6619d3d7b0c9f8a53a806d2b9b3432efbd926903b",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.0007022471910112359
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_warp_ripple.vpcf",
+      "source_sha256": "b5be8a74939ff74aa699baae9ab4d4c241f9882849841c4eaffd26c8b9f5e597"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_warp.vpcf",
+      "native_data_sha256": "bac1418842add2d2d9a425c4dd31b96e64fc1318787183b3a47b45203157e8fd",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_warp.vpcf",
+      "source_sha256": "18478be587e20843900cde08b4781b8e0046a6322e796432aefda3e6c9257fb2"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ring_spiral.vpcf",
+      "native_data_sha256": "ac3fce81aa01264a6f8df83b3399e36607e047aa2c485c3311f0bdb98bf93129",
+      "native_child_count": 4,
+      "plan": {},
+      "movement_lock": "container; native child frames retained",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_ring_spiral.vpcf",
+      "source_sha256": "428e4327d17bbced9716bf97e8a7eaa5e41937ad74ab24b501f06b8b8a5d06d3"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_spiral_arm.vpcf",
+      "native_data_sha256": "b3939179772117bbf4b17440e7bcd880c80252127b7098e657adebfc3a01cd57",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": 6,
+      "resource": "particles/survival/skills/void_world_chasm_spiral_arm.vpcf",
+      "source_sha256": "3a6ae1c03f1334bd0676171416d446e0f649b109cfa1cbb0ff40393c3bc7f8cd"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_spiral_armb.vpcf",
+      "native_data_sha256": "7bcad3eab49f049632124de9d3e2aec2ac19273252ecf8ce4089e2247069207b",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": 6,
+      "resource": "particles/survival/skills/void_world_chasm_spiral_armb.vpcf",
+      "source_sha256": "a0a1996517d732d5d056fb298e13e8084a87ba4bf8c97596297aea01ec415c85"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_spiral_cloud.vpcf",
+      "native_data_sha256": "c28c19d997237a53df749a67ef60f58dff8c8994ca05dd57394d90a79c827e69",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": 6,
+      "resource": "particles/survival/skills/void_world_chasm_spiral_cloud.vpcf",
+      "source_sha256": "489d4bb3c1d58ad8b7cb5a1fca6f746dbb11d57a6e4d0d6ab857ba5c622e5e3d"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_spiral_cloudb.vpcf",
+      "native_data_sha256": "c069c9621a480159365f630f1b2004b1b08bd1a6e1e528a5409e7e382cf54b43",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": 6,
+      "resource": "particles/survival/skills/void_world_chasm_spiral_cloudb.vpcf",
+      "source_sha256": "e9da0a9c95d4f8e5fdb9268d0edea3fa606f90022c157eb769250b6e2f89e4bc"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_swirl_orange.vpcf",
+      "native_data_sha256": "504eb797ccfd38ab91ed5fc32ec1a05b35177cd42ca5531bd7ee9a9464693c17",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.002285714285714286,
+        "center": 0.2
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_swirl_orange.vpcf",
+      "source_sha256": "cf97ca7c3c0e0a5c200671f73fc0cb42f750c515699c67ed642212302a635d49"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_galaxy.vpcf",
+      "native_data_sha256": "2cec391ce5b5569f0be320d33f78962ed8531256e2784f9cdfe6bf72755a1507",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.0007333333333333333,
+        "center": 0.45
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_galaxy.vpcf",
+      "source_sha256": "3175e1aa01c555762af1e7a7c072031d9a3c17552d92ad39701a313f88e753e2"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_core_rays.vpcf",
+      "native_data_sha256": "8e9b8fc86dba09de010eeb17dd311a98a949cf05bd7b578bfb039d5f29953011",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.45
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_core_rays.vpcf",
+      "source_sha256": "6fe04b6b71b51422a2a1c138eea31c6f2a9d55d0234b9f4b666f177e5bb43e26"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_core_glow.vpcf",
+      "native_data_sha256": "cd62bb98179a5e67e445e66d5969554f44c16ed163307459440b5ca9a0e7a720",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.0011111111111111111,
+        "center": 0.2
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_core_glow.vpcf",
+      "source_sha256": "e44bea3e5310adaa9a4cea0519c67995a4f01051a61625505aded7bbf08cf322"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_model.vpcf",
+      "native_data_sha256": "a701d50e74162434aedb80496d0726e8a53df4e02267649ae471474a50110ab6",
+      "native_child_count": 0,
+      "plan": {
+        "explicit_radius": 0.0125
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_model.vpcf",
+      "source_sha256": "9a42f2a97a06e4720d163ad5a2d9aae41d3940c7368a9302b96c6afc3cba2517"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ring.vpcf",
+      "native_data_sha256": "89be9db6514442c03d37e9a16c2763cd5f688dfc3d7049c2954d2ea78fa37ebf",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.0025
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_ring.vpcf",
+      "source_sha256": "ffb8bfabc6fda731ca45eb88664a84d31465e7cc3e62affbb5adafe51679a904"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_outer_debris.vpcf",
+      "native_data_sha256": "e793d2d83aaf7057f9a273dcbacd090fbc03bdbe8c740fc6de726829fd6fb1c5",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.95
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_outer_debris.vpcf",
+      "source_sha256": "4d5856bc00218c27058fe0b04f6fce0d034ce44666c66ded7bf8dea7db994989"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ember_streak.vpcf",
+      "native_data_sha256": "256bb103c8f599f9edb26da2ca8b61b57266247dc1a63a4c1385a8d810fc2a37",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.7
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_ember_streak.vpcf",
+      "source_sha256": "489549b2feda853be4eb4ba5203d34c10078d96668956cab13c1a6fb8f57e0c3"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_streak_start.vpcf",
+      "native_data_sha256": "216ae88f994c74e6fdbca904691ec3f8cd62ac2597ad5653e1e69f0571035a6b",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.35
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_streak_start.vpcf",
+      "source_sha256": "7b5a548005161f2cbb12f9ace0c7f778d11f01be5d1d072df71593ccd75fb720"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ring_flash.vpcf",
+      "native_data_sha256": "475e5f42f571dce0344472260a9da3a1ff2bd1783bd7f3943d72170e97378a78",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "center": 0.2
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_ring_flash.vpcf",
+      "source_sha256": "41985ffb7c133483f07d1e72d0743d342f397c5702a53914960144c9a5f40c07"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_nebula.vpcf",
+      "native_data_sha256": "af476c201d1f25328d415a055234d2507f2071d641e82676ebdef230e9a2eb02",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.0033333333333333335,
+        "center": 0.5
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_nebula.vpcf",
+      "source_sha256": "bcc3f1534466721fc1e6e81c7577de896797e2f60e872f24bcf326ceb732bb8c"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_flare.vpcf",
+      "native_data_sha256": "ddae7e1371db98aeffe4b13d2ce54dc11ed1957d3d014fe73f4870e194592ae9",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "radius_limit": 300
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_flare.vpcf",
+      "source_sha256": "6ea24ee9b7cae8648b839abfe844142614fd4d6852c9af7ab030ba55299775c0"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_shake.vpcf",
+      "native_data_sha256": "e31cc6abac47c47d37be294a3286258ebea41a1563ae591714c0b21f299cb3b3",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_shake.vpcf",
+      "source_sha256": "0345230756b5ab37947057984cf9772c686248f92477609aff643ff52ed97b7c"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_flare_b.vpcf",
+      "native_data_sha256": "2c7a615c98ab2d6cca18ab85d6fcd8b9fc6c58fa6917c6868155e62492d48c70",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_flare_b.vpcf",
+      "source_sha256": "f2773114d147c02304846c26328c08ad8155a54e15fc356a40249d491851ec00"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_xray.vpcf",
+      "native_data_sha256": "e77a7fec93d3e089fc3fcf3b695916c7c734608cee7dbc0697469e2c0498fe9e",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125,
+        "radius_limit": 80
+      },
+      "movement_lock": "one CP0 position lock added; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_xray.vpcf",
+      "source_sha256": "c16d379eb50ca818c06743a1afe6be181eaf52d1e2fe719a1e99b35f9c82400e"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_flare_c.vpcf",
+      "native_data_sha256": "4c49aeb51387c5c85b6365b297b97b65d36985826f46eb9d3e9005f79263d93c",
+      "native_child_count": 0,
+      "plan": {
+        "radius": 0.00125
+      },
+      "movement_lock": "single native position lock retained; CP3 trails remapped toCP0; normalized fadeout starts/ends999999",
+      "snapshot_binding_retained": null,
+      "resource": "particles/survival/skills/void_world_chasm_flare_c.vpcf",
+      "source_sha256": "7deeed137e4a20794d003ca61893482d3cbd13b14945719921eb59f85927e1d4"
+    },
+    {
+      "native_resource": "particles/econ/items/enigma/enigma_world_chasm/enigma_blackhole_ti5_ring.vpcf",
+      "role": "subtle600slowrange",
+      "resource": "particles/survival/skills/void_world_chasm_slow_range.vpcf",
+      "source_sha256": "db5e4a14ca73f3a2e1c308e1be30a9e8640219594b9961f37e97eb916303dda8"
+    }
+  ]
+}

@@ -7,6 +7,9 @@ local M = {
     BUILDER_GET_REQUEST = "player.builder_get.request",
     HERO_REPLACEMENT_SELECT = "hero.replacement.select",
     HERO_SUMMONED = "hero.summoned",
+    HERO_REMOVED = "hero.removed",
+    HERO_COSMETICS_CHANGED = "hero.cosmetics.changed",
+    HERO_DELETE_REQUEST = "hero.delete.request",
     HERO_SUMMON_GET_REQUEST = "hero.summon.get.request",
     ENGINE_ENTITY_KILLED = "engine.entity_killed",
 

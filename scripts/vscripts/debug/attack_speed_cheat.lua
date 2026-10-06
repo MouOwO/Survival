@@ -15,7 +15,7 @@ local function notify(player_id, message)
     })
 end
 
-local function apply(hero, attack_interval)
+local function apply(hero, attack_interval, player_id)
     if not hero or hero:IsNull() then
         return false
     end
@@ -26,6 +26,14 @@ local function apply(hero, attack_interval)
         }
     )
     if modifier then
+        -- The stat service detects the changed native fixed interval and
+        -- publishes the same effective rate used by the hero and its summons.
+        -- Entity identity also makes unordered HERO_SUMMONED subscribers safe:
+        -- a pending replacement must never refresh the previous hero's stats.
+        event_bus.request(events.HERO_COMBAT_STATS_GET_REQUEST, {
+            player_id = player_id,
+            entindex = hero:entindex(),
+        })
         print(
             "[AddSpeed] fixed attack rate applied to summoned hero "
                 .. tostring(hero:entindex())
@@ -46,13 +54,13 @@ local function on_hero_summoned(payload)
     local player_id = payload and tonumber(payload.player_id) or nil
     local attack_interval = player_id and interval_by_player[player_id] or nil
     if attack_interval then
-        apply(payload.unit, attack_interval)
+        apply(payload.unit, attack_interval, player_id)
     end
 end
 
 function M.set_rate(player_id, attacks_per_second)
     local rate = tonumber(attacks_per_second)
-    if not rate or rate <= 0 or rate > 100 then
+    if not rate or rate ~= rate or rate <= 0 or rate > 100 then
         return false, "fixed_attack_rate_invalid"
     end
     local attack_interval = 1 / rate
@@ -61,7 +69,7 @@ function M.set_rate(player_id, attacks_per_second)
     if not hero or hero:IsNull() then
         return false, "hero_not_summoned"
     end
-    if not apply(hero, attack_interval) then
+    if not apply(hero, attack_interval, player_id) then
         return false, "fixed_attack_rate_apply_failed"
     end
     return true

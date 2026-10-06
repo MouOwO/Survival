@@ -1,0 +1,667 @@
+{
+  "generated_by": "tools/map_c6/build-arcane-gyro-impact.cjs",
+  "native_root": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion.vpcf",
+  "root_particle": "particles/survival/skills/arcane_gyro_impact.vpcf",
+  "native_nominal_blast_radius": 500,
+  "nominal_blast_radius": 150,
+  "world_spatial_scale": 0.3,
+  "particle_systems": 22,
+  "outputs": [
+    "particles/survival/skills/arcane_gyro_impact.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_impact_a.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_impact_h.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_impact_d.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_impact_e.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_impact_f.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_impact_g.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_impact_i.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_impact_j.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flash_d.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flash_e.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flash_g.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flash_light.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flash.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flameouts.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_smoke.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flash_b.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flash_f.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_sphere.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_sphere_b.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_flash_core.vpcf",
+    "particles/survival/skills/arcane_gyro_impact_sparks.vpcf"
+  ],
+  "native_resources": [
+    "materials/particle/fire_particle_10/fire_particle_10_low.vtex",
+    "materials/particle/fire_particle_4/fire_particle_4_flat.vtex",
+    "materials/particle/particle_flares/aircraft_red.vtex",
+    "materials/particle/particle_flares/aircraft_white.vtex",
+    "materials/particle/particle_flares/particle_flare_004b_mod.vtex",
+    "materials/particle/particle_ring_wave_10.vtex",
+    "materials/particle/particle_ring_wave_12.vtex",
+    "materials/particle/particle_ring_wave_8.vtex",
+    "materials/particle/projected_crater.vmat",
+    "materials/particle/projected_ground_scorch.vmat",
+    "materials/particle/scorch_projected_02_add.vmat",
+    "materials/particle/smoke3/smoke3.vtex",
+    "materials/particle/sparks/sparks.vtex",
+    "models/particle/sphere.vmdl",
+    "models/props_structures/bad_ancient_sphere.vmdl"
+  ],
+  "layers": [
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact.vpcf",
+      "source_sha256": "3b1d9b17752190aba3988b466d2f06a59c78c7a40fa1df666e0b0c43f0903c08",
+      "native_bytes_sha256": "a196fc172ab15668bf1efc520f57e4f525ddafe1646ed56c1c504b9a408badb2",
+      "native_data_sha256": "4d721b1dc5a1a1ba082c329b5e5d0e24754c2b7e671a7dbec8c7dfe88df6dc19",
+      "native_children": [
+        "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_a.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_d.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_e.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_g.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_light.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flameouts.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_b.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_f.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_sphere.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_core.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_sparks.vpcf"
+      ],
+      "derived_children": [
+        "particles/survival/skills/arcane_gyro_impact_impact_a.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flash_d.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flash_e.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flash_g.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flash_light.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flash.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flameouts.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flash_b.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flash_f.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_sphere.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_flash_core.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_sparks.vpcf"
+      ],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_a.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_a.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_impact_a.vpcf",
+      "source_sha256": "8bb5d47e55d709312938213fca91000e8644282b3c37b824aa02c2251f3778c2",
+      "native_bytes_sha256": "8dd737628eac8d512a02aec7a0691aee47405ac1af27a2cc9048c27853206c39",
+      "native_data_sha256": "b6eebba1125332dff5ca11c68c4a338fb9b286fdd3a7131227e47583f50c2a00",
+      "native_children": [
+        "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_h.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_d.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_e.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_f.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_g.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_i.vpcf",
+        "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_j.vpcf"
+      ],
+      "derived_children": [
+        "particles/survival/skills/arcane_gyro_impact_impact_h.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_impact_d.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_impact_e.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_impact_f.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_impact_g.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_impact_i.vpcf",
+        "particles/survival/skills/arcane_gyro_impact_impact_j.vpcf"
+      ],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_h.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_h.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_impact_h.vpcf",
+      "source_sha256": "a2f15a7d0963b97547462633c249fd409467735344c3189816068c8afcae0fdd",
+      "native_bytes_sha256": "2481441eac0680e4419d8b1acb32cda399035cd008d13a333a86c625acb07fc6",
+      "native_data_sha256": "0335cdfeef8b33b7a584374a893f884df3bc5c97923349e71bcc23d1b471c618",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_d.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_d.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_impact_d.vpcf",
+      "source_sha256": "d87dc13c0891a41a58d1a785fac0bbc0b0d32f979b1d01cac44ef8a4e762e92e",
+      "native_bytes_sha256": "1f738fbd54a0148ca1466aa89beefff8b5baaede9fbb3ddcf3b9d08109192121",
+      "native_data_sha256": "522cf7c6fd8de1f1df050b0e56331061f4e955877e48196d011a4e21b0c41548",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_e.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_e.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_impact_e.vpcf",
+      "source_sha256": "012d870e071b5c78338f384105f522a63e5b6be22276460eba9cec3a5d761827",
+      "native_bytes_sha256": "d3fae8d314681f2aa6813ef1acc08141e2cf3fba80ecab5ef48b7b881257bf1b",
+      "native_data_sha256": "7ee236b110eaf57515c3411f2539a07eddf910ad7789f4c207709be723f1b47b",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_f.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_f.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_impact_f.vpcf",
+      "source_sha256": "1d9b2b8d7a8f0530b9bd5946d1ad9ec6d1b37f9a0d1c0892e4b5576bb946d38d",
+      "native_bytes_sha256": "746b84e7345d1b41345afc394f378711b0064ab31fba9b2362f23351a2bf644d",
+      "native_data_sha256": "41a46157a43bc27b790733886496709343f67b344bef37a3848d4cfb29ffa754",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_g.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_g.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_impact_g.vpcf",
+      "source_sha256": "823d919e77068ced4bd6aea8a7c9429c4c1299a972d133ef2b33b311b593c531",
+      "native_bytes_sha256": "70c98c3e651959539529308bbc840a15e727f597c1dbac8c690d0c9c475437ea",
+      "native_data_sha256": "4e35b76290a6c83f9b94a0fcb4e8f7098f98e2a60ca6564c8eff7356ac42d001",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_i.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_i.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_impact_i.vpcf",
+      "source_sha256": "d2abfdbbee9c9e2741e0968ed61933fba1b4f53644ff2280ca66ef5876f68a19",
+      "native_bytes_sha256": "912bb8a5e85d51bf2ad2fcd80a2e7708e508ea4d6284148d49a366d5ebaa553a",
+      "native_data_sha256": "3a2e5abe0ede22e16d31e0a7191c7fbb6cd7bdb0229bab50ead5f1ffedc9091d",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_call_down_explosion_impact_j.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_j.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_impact_j.vpcf",
+      "source_sha256": "f8e470fad1b4ca11707019f5960c9d80f270d6ded7a94dd1060adc10299c2321",
+      "native_bytes_sha256": "5b97ee00e2596dadc1fbea5ea6b0a55f2f233642cf8866ad14b6858117ab3469",
+      "native_data_sha256": "ff1290344fd5e456d7c94f48127874e332cdd80b34906f2246248ef4fd2fff7d",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 75,
+        "renderer_geometry_multiplier": 2,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_d.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_d.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flash_d.vpcf",
+      "source_sha256": "87a7d43c08fc67ab7d627dd5642ab5277aa77c01ac9a3be41b1e01c01b72af2d",
+      "native_bytes_sha256": "89e3017f56bb079460f06e5692aef42c3eb28337e1a96194bd31bed4bf3ed722",
+      "native_data_sha256": "70c4c68b251498ee6dca999d370e508673d6992dcaee10386aa3e09a6216c8ed",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_e.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_e.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flash_e.vpcf",
+      "source_sha256": "6dca494867cd8b6a2939c36e81bcb0abb0509c2a921d00ad15b15c37c5c419a9",
+      "native_bytes_sha256": "27841e50ef552883f0aaeaa16d6376633146f5d33aea4a3eca41aa9a585aa6ca",
+      "native_data_sha256": "67518f3e7b390f6f0a85c17693683ef786b423b280126457209195561cc826db",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_g.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_g.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flash_g.vpcf",
+      "source_sha256": "a6f05cda64813f157dd400e0f7d181712f949ef85f1e8c99a27709952042da28",
+      "native_bytes_sha256": "4ff8aa3830cf8cd918d95bee504b17bed15a6e52410f1aebb75c6881adce1b21",
+      "native_data_sha256": "17805a1987b951eb851f7504c61f4ded8ec4d9c9112057271e110ee9583d5896",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_light.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_light.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flash_light.vpcf",
+      "source_sha256": "1e9a90877f2bc7fb33d3501294a380dbb85da42d7743448a4097c09eb0dc8d2f",
+      "native_bytes_sha256": "46068a1a6f8ef48ad2e31a76f43487835c1aa129a8a08244e1e0127fa47b4766",
+      "native_data_sha256": "063d42edfc2609d9d5ebe52c75db21a2e0c761187d608677336e43bbdf831c9e",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flash.vpcf",
+      "source_sha256": "56efb2251ee0c7cdfb33b9ae840e786a9556e454832d583a67afa277c8bee9e4",
+      "native_bytes_sha256": "478547af37373210796031ef5f73cd6618f6386b441c8894444b1497031b7272",
+      "native_data_sha256": "08c5d7d82bddd1ebe2c3186cbe23e43fed676fec5bc6d4a1ef062cb3541511c0",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flameouts.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flameouts.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flameouts.vpcf",
+      "source_sha256": "e854a3b96849ab196423753afbfc01479b47fde043fa2ab4a136ea75ee6a3d41",
+      "native_bytes_sha256": "2809599f2a8ee30b6b2e609db19d43c01083d2227d0754f8cd802a0d332efe83",
+      "native_data_sha256": "c9fb6e25a58b0cbc77f04609650a8c58311b103f42713b0272732e529579c73b",
+      "native_children": [
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_smoke.vpcf"
+      ],
+      "derived_children": [
+        "particles/survival/skills/arcane_gyro_impact_smoke.vpcf"
+      ],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_smoke.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_smoke.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_smoke.vpcf",
+      "source_sha256": "073e388760f8dace28a0e7e407dc70fabab1d92ccbb543875f8c95785bb3dd02",
+      "native_bytes_sha256": "1203bb5e97c2162b3bd1da0b0ead3e599af6347c785249f0dae47fde18a5a5dd",
+      "native_data_sha256": "134bde985d55f6492a2dc290683df475154f6a919e2a5929c15216b6d9d7b78f",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_b.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_b.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flash_b.vpcf",
+      "source_sha256": "44767c86cc892731a0bd0a435e955ee78db435be333bf974a144b9c011ac5b32",
+      "native_bytes_sha256": "5688b5f253059d402ea3d39d38a5a9303048fc75fd78ae292cc91eb5ad7fd6a9",
+      "native_data_sha256": "88d4aac474a3ca3db99b5a18842ee72e9b93bac6080981e1e521a84ad1feba75",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_f.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_f.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flash_f.vpcf",
+      "source_sha256": "d6e8c6470eebf1f3537e8f552b3a43df109dbf874902e5e674dd7255da4ca853",
+      "native_bytes_sha256": "0077b5c2a258dc0a8c5da939e9c58f55df2b5791afdbcb9824e3b6d58e327609",
+      "native_data_sha256": "724641ffaee4efa95cc51a45583ca7bb184120928fcb73bcc23c7aa24d868bfa",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_sphere.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_sphere.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_sphere.vpcf",
+      "source_sha256": "9928bc952e64c685725562c0007c8d93159a0b9b62ecac380b79aab35e73d4c6",
+      "native_bytes_sha256": "9ce233a16d53fe5838b3ccb491f45d6ecc4a2eb96ebbfc44e677a23324d3b2af",
+      "native_data_sha256": "05105806107dc709e044db05d7633055e2b4e79339d1ca8df3026b6ecc721d30",
+      "native_children": [
+        "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_sphere_b.vpcf"
+      ],
+      "derived_children": [
+        "particles/survival/skills/arcane_gyro_impact_sphere_b.vpcf"
+      ],
+      "range_adaptation": {
+        "final_radius_limit": 1.069166901174146,
+        "renderer_geometry_multiplier": 140.29615005409522,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_sphere_b.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_sphere_b.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_sphere_b.vpcf",
+      "source_sha256": "6f7786a102f059e96ad4e93112de844188a597e22f2ff1ecc3a09d3a16c7e5de",
+      "native_bytes_sha256": "a5e8a3032feac671ea31de548c284f662ec5934d7a6152dd30549d955c608290",
+      "native_data_sha256": "2f80690bb5bd034520fcbfd36535ee3e66033ebdf0167524f2c839428baa36c4",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 7.5,
+        "renderer_geometry_multiplier": 20,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_flash_core.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_core.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_flash_core.vpcf",
+      "source_sha256": "0e42291e73208ca53069688643f446fb7c59a569b99d8f860e51b8af4d5bc789",
+      "native_bytes_sha256": "37c6535f0639d9174e6d6a27729c16857815323fed5c319f7fe06bd169b2ccf0",
+      "native_data_sha256": "d5c34d10f0dd60dc6da0a9eb267786cf6cecc5bcc2182295e7f9825711c99210",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    },
+    {
+      "native_source": "particles/units/heroes/hero_gyrocopter/gyro_calldown_explosion_sparks.vpcf",
+      "resource": "particles/survival/skills/arcane_gyro_impact_sparks.vpcf",
+      "source": "art/effects/arcane_gyro/source/particles/survival/skills/arcane_gyro_impact_sparks.vpcf",
+      "source_sha256": "5db2722fc210205c90f2b93f2d3cb06e35d4acc879fdcde628afc31e9f800215",
+      "native_bytes_sha256": "85db504b54fc2403393578da71fdb56a28566ac9a15e4a2630379d5ad12324a0",
+      "native_data_sha256": "ac5b3438ca019ec8fd576d60e9d57ef2fe1d8280c208568f3a2051830167e0f6",
+      "native_children": [],
+      "derived_children": [],
+      "range_adaptation": {
+        "final_radius_limit": 150,
+        "renderer_geometry_multiplier": 1,
+        "maximum_centered_renderer_radius": 150,
+        "boundary": "Radius only; no positional clipping of sparks or other particle centers"
+      },
+      "preserved_emission": true,
+      "preserved_lifespan": true,
+      "preserved_native_drawing_and_colors": true
+    }
+  ],
+  "measured_model_bounds": {
+    "models/props_structures/bad_ancient_sphere.vmdl": {
+      "sha256": "5b8c7275732132cf94fd048dc62b9fecb6af6f335492273f0acc167490169bc2",
+      "maximum_axis": 81.00002,
+      "unit_radius": 140.29615005409522
+    },
+    "models/particle/sphere.vmdl": {
+      "sha256": "2951e2237f448c4dd63748712c0e955d6259a798f3e74d9398dd99ab146b869f",
+      "maximum_axis": 7.94487,
+      "unit_radius": 13.760918499529746
+    }
+  },
+  "cp_contract": {
+    "0": "Fixed landing world position",
+    "3": "Same fixed landing world position",
+    "5": [
+      150,
+      0,
+      0
+    ],
+    "colors": "Native authored CP60/61/62 defaults; do not overwrite",
+    "radius": "Fixed world quantities scale by 150/500. Native CP5 radius remaps are unchanged and receive 150, so they scale once."
+  },
+  "emission": "Impact only: all 22 original landing endcap layers. Instant emitters and finite smoke emission (0.75 seconds) remain native; no marker, launch or descending missile.",
+  "maximum_native_tail_seconds": 10,
+  "fallback_cleanup_seconds": 11,
+  "validation": {
+    "native_graph": "PASS",
+    "world_units_scaled": "PASS",
+    "preserved_emission_and_lifespans": "PASS",
+    "compiler_serialization": "PASS",
+    "in_game_visual_verified": false,
+    "scope": "Main landing footprint uses radius150. Native world dimensions uniformly scale by0.3; final native particle radius clamps limit oversized flash, glow, model and light geometry to150 after animation multipliers. Sparks may travel beyond the core footprint. No hard positional clipping boundary is added; actual pixels and shader bloom need engine visual acceptance.",
+    "compiled_dependency_graph": "PASS"
+  },
+  "compiled_resources": [
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact.vpcf",
+      "sha256": "a8df105180a5407570e0d8b9863c187b73f11885783863fd9b05362e604907c0",
+      "bytes": 4079
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_a.vpcf",
+      "sha256": "8ee8a6831726b2609298db7e1db2dcb4077a0ae76df6a7175c5a56c592d1137e",
+      "bytes": 3735
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_h.vpcf",
+      "sha256": "97930a90ca854c788ce68c7e3c47e15c805afafa0085e02fc529bbf662f69a10",
+      "bytes": 2577
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_d.vpcf",
+      "sha256": "673723e94701587a83fcb0ddfccda176c631e5dca87ae8895f823d9215c6721e",
+      "bytes": 2536
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_e.vpcf",
+      "sha256": "5b28d7059e92eac6f37b431226f2076ef8a8eabfc26fd5ea95b3a1a9dd5e0293",
+      "bytes": 2499
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_f.vpcf",
+      "sha256": "165042515228165029bbf18a886e9877c1f404f88d7d7fbe5763804958e61540",
+      "bytes": 2373
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_g.vpcf",
+      "sha256": "7272b73d232eb0d3966b92da28b3fc4259905215fcdd9e3e0e3c792cc5d7763b",
+      "bytes": 2352
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_i.vpcf",
+      "sha256": "da540dbcda4900590b64063b2fcdea3f9dc6ca57866a0d459549440382c966ee",
+      "bytes": 2836
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_impact_j.vpcf",
+      "sha256": "9621204c62de15334a531b7da63da10240af41f568e954e638cd2833459f8aa2",
+      "bytes": 2825
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_d.vpcf",
+      "sha256": "7fcc4b26ee640202f227ff0c2c09a2ff736f7b8075fb033d7180290922436bfd",
+      "bytes": 2571
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_e.vpcf",
+      "sha256": "4d4f5c21b0a3192fa2b5b78ddec085202eb17fbb4c621e6a8f384b3e33fad039",
+      "bytes": 2555
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_g.vpcf",
+      "sha256": "190ed2173a6aa8abdfc0a3265c815dff92c4d83152369ed42fd66a60d182c6d2",
+      "bytes": 3024
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_light.vpcf",
+      "sha256": "a65bdf7178190cdf063c11a501c6c7805746156883e4583545d82c7fcda074e8",
+      "bytes": 2253
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash.vpcf",
+      "sha256": "89cac13a6b4c0773d8eb6d65f49e52ce6f7e2524c686a439dd2c5faf1d206e36",
+      "bytes": 2453
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flameouts.vpcf",
+      "sha256": "a0e60916680a238861db571b97cb51360aa25f244f5c951edef0fcb3748e538a",
+      "bytes": 3207
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_smoke.vpcf",
+      "sha256": "0aaa6bcb4ea45bcdbefeafc12822059ddae4bd942d7b9a5a973cc79060d5ba07",
+      "bytes": 3090
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_b.vpcf",
+      "sha256": "d10bd4541259098886d3c8add9213f9d5938c6d25d2024a369eec361be2e69c8",
+      "bytes": 2760
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_f.vpcf",
+      "sha256": "086820acf8ba002f8517e76cb944e0eebecb1dbbd2889dff0c5a85ae6c2e1ace",
+      "bytes": 2695
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_sphere.vpcf",
+      "sha256": "171de0c026d33db21c939e67967ee000ca38a85bb19293763dce2c043d0c4d3e",
+      "bytes": 3305
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_sphere_b.vpcf",
+      "sha256": "82a6c24fa6050cbf77985d40d48cad052a87e6c1ad2480ad197bf22feb552a8c",
+      "bytes": 3263
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_flash_core.vpcf",
+      "sha256": "1de6eb990dbc24d57b02703d5f3618ddc002c0d6e888f2fba3839333c9676651",
+      "bytes": 2521
+    },
+    {
+      "resource": "particles/survival/skills/arcane_gyro_impact_sparks.vpcf",
+      "sha256": "543761f1e1477a0e7f17f16634d642c6d08348df9fd63b2198b1c7f6ea61dab9",
+      "bytes": 2936
+    }
+  ]
+}

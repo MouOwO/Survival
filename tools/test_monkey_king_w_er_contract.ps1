@@ -67,7 +67,7 @@ Check ($serviceText.Contains("survival_critical_chance_pct")) "CLONE_CRITICAL_CH
 Check ($serviceText.Contains("w_clone_critical_damage_bonus_pct")) "CLONE_CRITICAL_DAMAGE_BONUS_MISSING"
 Check ($serviceText.Contains("survival_permanent_summon")) "CLONE_PERMANENCE_MARK_MISSING"
 Check ($serviceText.Contains("clone:SetHullRadius(0)")) "CLONE_ZERO_HULL_MISSING"
-Check ($serviceText.Contains('hero_cosmetic_service.apply(clone, "hero_monkey_king")')) "CLONE_NATIVE_COSMETIC_APPLY_MISSING"
+Check ($serviceText.Contains('hero_cosmetic_service.sync_appearance(current.clone, current.source_hero)')) "CLONE_NATIVE_COSMETIC_MIRROR_MISSING"
 Check ($cloneText.Contains("function modifier_monkey_king_clone:CheckState()")) "CLONE_COLLISION_STATE_MISSING"
 Check ($cloneText.Contains("[MODIFIER_STATE_NO_UNIT_COLLISION] = true")) "CLONE_NO_UNIT_COLLISION_MISSING"
 Check ($cloneText.Contains("RollCriticalAttackRecord")) "CLONE_CRITICAL_ROLL_MISSING"

@@ -98,6 +98,10 @@ local modifiers = {
         path = "modifiers/modifier_monkey_king_clone",
     },
     {
+        name = "modifier_blademaster_clone",
+        path = "modifiers/modifier_blademaster_clone",
+    },
+    {
         name = "modifier_weapon_stat_projection",
         path = "modifiers/modifier_weapon_stat_projection",
     },
@@ -129,6 +133,10 @@ local modifiers = {
     {
         name = "modifier_survival_drow_companion_invulnerable",
         path = "modifiers/modifier_survival_drow_companion_invulnerable",
+    },
+    {
+        name = "modifier_hero_exclusive_summon_attack_rate",
+        path = "modifiers/modifier_hero_exclusive_summon_attack_rate",
     },
     {
         name = "modifier_debug_fixed_attack_rate",

@@ -1,6 +1,7 @@
 local M = {}
 local deferred_serial = 0
 local generation_by_unit = setmetatable({}, { __mode = "k" })
+local task_prefix_by_unit = setmetatable({}, { __mode = "k" })
 
 local function valid(unit)
     return unit and not unit:IsNull()
@@ -53,8 +54,14 @@ local function schedule_refill_checks(unit, health, source, generation)
     if not GameRules or not GameRules.GetGameTime then return end
     local ok, scheduler = pcall(require, "core/scheduler")
     if not ok or not scheduler or not scheduler.after then return end
-    deferred_serial = deferred_serial + 1
-    local prefix = "hero_health_guard_" .. tostring(deferred_serial)
+    -- Only the latest guard can run for a unit. Replace its two pending jobs
+    -- instead of accumulating callbacks that the generation check will discard.
+    local prefix = task_prefix_by_unit[unit]
+    if not prefix then
+        deferred_serial = deferred_serial + 1
+        prefix = "hero_health_guard_" .. tostring(deferred_serial)
+        task_prefix_by_unit[unit] = prefix
+    end
     scheduler.after(0, function()
         if generation_by_unit[unit] ~= generation then return end
         restore_if_refilled(unit, health, source, "next_tick", true)

@@ -147,8 +147,13 @@ echo_slash.color = Vector(0.231373, 0.407843, 0.607843)
 echo_slash.emit_rate = 200
 earth_rock.visual_particle =
     "particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf"
-earth_rock.explosion_particle =
-    "particles/basic_projectile/basic_projectile_explosion.vpcf"
+earth_rock.explosion_particles = {
+    [75] = "particles/survival/skills/earth_phoenix_impact_75.vpcf",
+    [125] = "particles/survival/skills/earth_phoenix_impact_125.vpcf",
+    [300] = "particles/survival/skills/earth_phoenix_impact_300.vpcf",
+}
+earth_rock.explosion_core_particle =
+    "particles/survival/skills/earth_phoenix_impact_core.vpcf"
 earth_rock.cleanup_grace = 0.25
 local tornado_visual = {
     particle = "particles/survival_tornado/survival_tornado_follow.vpcf",
@@ -801,15 +806,19 @@ local function sync_poison_cloud_armor(target_key, target)
     poison_cloud_units[target_key] = target
 end
 
-local function release_poison_cloud(attacker_key)
+local function release_poison_cloud(attacker_key, immediate)
     local cloud = active_poison_clouds[attacker_key]
     if not cloud then return end
-    if cloud.particle then
-        ParticleManager:DestroyParticle(cloud.particle, true)
-        ParticleManager:ReleaseParticleIndex(cloud.particle)
-        cloud.particle = nil
-    end
     active_poison_clouds[attacker_key] = nil
+    local particle = cloud.particle
+    cloud.particle = nil
+    if particle ~= nil then
+        -- Normal expiry stops emission and plays the native shroud endcaps:
+        -- fading projections, dissipating mist and ghosts sinking into the ground.
+        -- The visual tail owns no damage, armor stacks or recast lock.
+        pcall(function() ParticleManager:DestroyParticle(particle, immediate == true) end)
+        pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+    end
     for target_key, member in pairs(cloud.members) do
         sync_poison_cloud_armor(target_key, member.target)
     end
@@ -820,7 +829,7 @@ local function clear_poison_clouds()
     for attacker_key, _ in pairs(active_poison_clouds) do
         keys[#keys + 1] = attacker_key
     end
-    for _, attacker_key in ipairs(keys) do release_poison_cloud(attacker_key) end
+    for _, attacker_key in ipairs(keys) do release_poison_cloud(attacker_key, true) end
     for target_key, target in pairs(poison_cloud_units) do
         if valid(target) then
             local modifier = target.FindModifierByName
@@ -867,7 +876,7 @@ local function sync_poison_clouds()
     local armor_targets = {}
     for attacker_key, cloud in pairs(active_poison_clouds) do
         if not valid(cloud.context.attacker) then
-            release_poison_cloud(attacker_key)
+            release_poison_cloud(attacker_key, true)
         else
             while cloud.next_tick <= cloud.total_ticks
                 and now + 0.0001 >= cloud.started_at
@@ -877,7 +886,7 @@ local function sync_poison_clouds()
             end
             if cloud.next_tick > cloud.total_ticks
                 and now + 0.0001 >= cloud.expires_at then
-                release_poison_cloud(attacker_key)
+                release_poison_cloud(attacker_key, false)
             else
                 has_active = true
                 for target_key, member in pairs(cloud.members) do
@@ -2230,29 +2239,59 @@ function echo_slash.run(context, definition)
     return true
 end
 
-function earth_rock.explosion_visual(context, position)
+function earth_rock.explosion_visual(context, position, radius)
     if not position or not ParticleManager then return end
+    local pending = {}
     local visual_ok, visual_error = pcall(function()
-        local particle = ParticleManager:CreateParticle(
-            earth_rock.explosion_particle,
-            PATTACH_WORLDORIGIN,
-            context.attacker
-        )
-        ParticleManager:SetParticleControl(particle, 0, position)
-        ParticleManager:ReleaseParticleIndex(particle)
+        local impact_radius = tonumber(radius) or 125
+        local resource = assert(earth_rock.explosion_particles[impact_radius],
+            "unsupported earth impact radius")
+        local ground = GetGroundPosition and GetGroundPosition(position, nil) or position
+        local function create(path, origin, orientation_height)
+            local particle = ParticleManager:CreateParticle(
+                path, PATTACH_WORLDORIGIN, context.attacker
+            )
+            assert(type(particle) == "number" and particle >= 0
+                and particle < math.huge and particle == math.floor(particle),
+                "invalid earth impact particle handle")
+            pending[#pending + 1] = particle
+            ParticleManager:SetParticleControl(particle, 0, origin)
+            ParticleManager:SetParticleControl(particle, 1, Vector(1, 1, 1))
+            ParticleManager:SetParticleControl(particle, 3, Vector(
+                origin.x, origin.y, origin.z + orientation_height
+            ))
+        end
+        -- Ground marks retain the skill's footprint. The rebirth fireball uses
+        -- the rolling rock's height and its own visible size: shrinking the
+        -- whole 3-D blast to the damage half-width buried it in the ground.
+        create(resource, ground, 100 * impact_radius / 500)
+        create(earth_rock.explosion_core_particle, Vector(
+            ground.x, ground.y, ground.z + 90
+        ), 60)
+        -- Both native finite graphs finish their complete burst/fade naturally.
+        for index = 1, #pending do
+            ParticleManager:ReleaseParticleIndex(pending[index])
+            pending[index] = nil
+        end
     end)
     if not visual_ok then
+        for _, particle in pairs(pending) do
+            pcall(function() ParticleManager:DestroyParticle(particle, true) end)
+            pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+        end
         print("[HeroPassiveSkill] earth rock explosion visual failed: "
             .. tostring(visual_error))
     end
 end
 
-function earth_rock.destroy_visual(state)
+function earth_rock.destroy_visual(state, immediate)
     if not state or not state.visual_particle then return end
     local particle = state.visual_particle
     state.visual_particle = nil
     local destroy_ok, destroy_error = pcall(function()
-        ParticleManager:DestroyParticle(particle, true)
+        -- Retire the rolling carrier while native fire, smoke and ground scorch
+        -- finish their own fades along the travelled path on normal completion.
+        ParticleManager:DestroyParticle(particle, immediate == true)
     end)
     local release_ok, release_error = pcall(function()
         ParticleManager:ReleaseParticleIndex(particle)
@@ -2280,7 +2319,7 @@ function earth_rock.create_visual(state)
         )
     end)
     if not visual_ok then
-        earth_rock.destroy_visual(state)
+        earth_rock.destroy_visual(state, true)
         print("[HeroPassiveSkill] earth rock rolling visual failed: "
             .. tostring(visual_error))
         return false
@@ -2288,19 +2327,19 @@ function earth_rock.create_visual(state)
     return true
 end
 
-function earth_rock.release(projectile_id, show_visual)
+function earth_rock.release(projectile_id, show_visual, immediate)
     local state = earth_rock.projectiles[projectile_id]
     if not state then return end
     earth_rock.projectiles[projectile_id] = nil
-    earth_rock.destroy_visual(state)
+    earth_rock.destroy_visual(state, immediate)
     if show_visual then
-        earth_rock.explosion_visual(state.context, state.destination)
+        earth_rock.explosion_visual(state.context, state.destination, state.impact_radius or 125)
     end
 end
 
 function earth_rock.clear()
     for projectile_id, _ in pairs(earth_rock.projectiles) do
-        earth_rock.release(projectile_id, false)
+        earth_rock.release(projectile_id, false, true)
     end
 end
 
@@ -2342,7 +2381,10 @@ function earth_rock.projectile_hit(ability, target, location, projectile_id)
 
     deal(state.context, target, earth_rock.damage_multiplier(state, target), false)
     local hit_position = location or unit_position(target) or state.destination
+    local impact_radius = not state.first_hit_exploded and state.first_hit_explosion_radius > 0
+        and state.first_hit_explosion_radius or state.impact_radius or 125
     earth_rock.first_hit_explosion(state, copy_position(hit_position))
+    earth_rock.explosion_visual(state.context, hit_position, impact_radius)
     if state.stun_chance > 0 and RandomFloat(0, 1) < state.stun_chance then
         stun(state.context.attacker, target, state.stun_duration)
     end
@@ -2382,6 +2424,7 @@ local function run_earth(context, definition)
         destination = destination,
         velocity = direction * speed,
         duration = distance / speed,
+        impact_radius = half_width,
         damage_multiplier = level_value(definition, "damage_multiplier", context.level),
         stunned_damage_multiplier = level_value(
             definition, "stunned_damage_multiplier", context.level
@@ -2414,9 +2457,12 @@ local function run_earth(context, definition)
     M.sound_service.play("hero_earth_launch", {
         source = context.attacker, unit = context.attacker,
     })
-    earth_rock.create_visual(earth_rock.projectiles[projectile_id])
+    local state = earth_rock.projectiles[projectile_id]
+    earth_rock.create_visual(state)
     scheduler.after(distance / speed + earth_rock.cleanup_grace, function()
-        earth_rock.release(projectile_id, true)
+        if earth_rock.projectiles[projectile_id] == state then
+            earth_rock.release(projectile_id, true)
+        end
     end)
     return true
 end
@@ -4194,7 +4240,8 @@ function M.init()
     echo_slash.projectiles = {}
     echo_slash.sequence = 0
     earth_rock.projectiles = {}
-    earth_rock.sequence = 0
+    -- Native hit callbacks and fallback timers can outlive a reset. Do not
+    -- reuse their projectile IDs for a new cast in the same Lua world.
     clear_tornadoes()
     active_tornadoes = {}
     tornado_sequence = 0

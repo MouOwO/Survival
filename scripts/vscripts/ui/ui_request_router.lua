@@ -82,12 +82,24 @@ end
 local apply_portrait_metadata = portrait_metadata.apply
 
 local function unit_combat_snapshot(unit)
-    local strength = safe_number(unit, "GetStrength", 0)
-    local agility = safe_number(unit, "GetAgility", 0)
-    local intellect = safe_number(unit, "GetIntellect", 0)
-    local attack_min = tonumber(unit.survival_attack_min)
+    -- Exclusive summons are creatures, so their native attributes are zero
+    -- and their native damage may be scaled to fit the engine integer range.
+    -- Read only inherited combat fields from their own logical snapshot; keep
+    -- this entity's identity, health and abilities independent of its hero.
+    local inherited = unit.survival_exclusive_summon == true
+        and type(unit.survival_exclusive_stat_snapshot) == "table"
+        and unit.survival_exclusive_stat_snapshot or {}
+    local strength = tonumber(inherited.strength)
+        or safe_number(unit, "GetStrength", 0)
+    local agility = tonumber(inherited.agility)
+        or safe_number(unit, "GetAgility", 0)
+    local intellect = tonumber(inherited.intellect)
+        or safe_number(unit, "GetIntellect", 0)
+    local inherited_attack_min = tonumber(inherited.attack_min)
+    local inherited_attack_max = tonumber(inherited.attack_max)
+    local attack_min = inherited_attack_min or tonumber(unit.survival_attack_min)
         or safe_number(unit, "GetDamageMin", nil)
-    local attack_max = tonumber(unit.survival_attack_max)
+    local attack_max = inherited_attack_max or tonumber(unit.survival_attack_max)
         or safe_number(unit, "GetDamageMax", nil)
     if attack_min == nil then attack_min = safe_number(unit, "GetBaseDamageMin", 0) end
     if attack_max == nil then attack_max = safe_number(unit, "GetBaseDamageMax", attack_min) end
@@ -136,8 +148,12 @@ local function unit_combat_snapshot(unit)
         health_scale = string.format("%.17g", tonumber(unit.survival_endless_health_scale) or 1),
         mana = safe_number(unit, "GetMana", 0),
         max_mana = safe_number(unit, "GetMaxMana", 0),
-        attack_min = require("combat/endless_stat_projection").for_ui(unit, attack_min, "attack"),
-        attack_max = require("combat/endless_stat_projection").for_ui(unit, attack_max, "attack"),
+        -- Inherited damage is already logical. Serializing it as text avoids
+        -- the event transport's integer overflow without applying scale twice.
+        attack_min = inherited_attack_min ~= nil and string.format("%.17g", attack_min)
+            or require("combat/endless_stat_projection").for_ui(unit, attack_min, "attack"),
+        attack_max = inherited_attack_max ~= nil and string.format("%.17g", attack_max)
+            or require("combat/endless_stat_projection").for_ui(unit, attack_max, "attack"),
         base_damage_outgoing_pct = outgoing_pct,
         -- 必须读取包含 Modifier 加减值的当前有效护甲；基础护甲和配置缓存
         -- 无法反映攻击减甲科技的实时叠层。
@@ -147,7 +163,7 @@ local function unit_combat_snapshot(unit)
         armor_mapping_version = armor_mapping_version,
         -- attack_speed 表示当前每秒攻击次数，不是 BAT，也不是 Dota
         -- 百分比攻速；非英雄单位必须包含光环等临时 Modifier。
-        attack_speed = effective_attack_speed(unit),
+        attack_speed = tonumber(inherited.attack_speed) or effective_attack_speed(unit),
         attack_speed_stat = safe_number(unit, "GetAttackSpeed", 100),
         strength = strength,
         agility = agility,

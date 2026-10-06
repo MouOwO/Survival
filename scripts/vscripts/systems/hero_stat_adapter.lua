@@ -302,6 +302,13 @@ function M.apply_configured_health(unit, definition, attribute_health_bonus)
     local native_maximum = math.max(1, current_maximum - old_bonus)
     local health_bonus = math.max(0, math.floor(target - native_maximum))
 
+    if modifier and health_bonus == old_bonus then
+        unit.survival_base_max_health = target
+        unit.survival_native_max_health = native_maximum
+        unit.survival_base_health_bonus = health_bonus
+        return target, health_bonus, native_maximum, false
+    end
+
     hero_health_guard.preserve_missing(unit, function()
         modifier = require("systems/hero_base_health_service").apply(unit, health_bonus)
         safe_call(unit, "CalculateStatBonus", true)
@@ -311,7 +318,7 @@ function M.apply_configured_health(unit, definition, attribute_health_bonus)
     unit.survival_base_max_health = target
     unit.survival_native_max_health = native_maximum
     unit.survival_base_health_bonus = health_bonus
-    return target, health_bonus, native_maximum
+    return target, health_bonus, native_maximum, true
 end
 
 local function apply_level(unit, definition)

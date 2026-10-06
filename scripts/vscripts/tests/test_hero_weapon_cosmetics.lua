@@ -720,3 +720,18 @@ print("HERO_WEAPON_MATRIX_PASS two selected heroes, 66 real main-hand definition
 print("HERO_WEAPON_SLOT_PASS body and arcana/armor/shoulder ambient preserved, delayed native hide, offset carrier, 14 failure rollbacks+poll recovery, 4 cleanup reentries")
 print("HERO_WEAPON_LIFECYCLE_PASS model readiness, death/revive, replacement, skin reapply, missing carrier/weapon, default restoration, defeat/disconnect+late events, two players, clone isolation, same/new-world init, one existing loop, no gameplay mutations")
 print("HERO_WEAPON_TRANSACTION_BOUNDARY_PASS reused world ID after Destroy not Released, successful+failed locked defeat/replacement clean old slot, invalid old hero cleans by cached token/index")
+
+boot();local deleting=hero(0,"hero_blademaster");summon(deleting)
+grant(0,grouped.ice_blade[1].content_id)
+local old_weapon=assert_weapon(deleting,"ice_blade")
+local old_particles=attached_particles(old_weapon)
+deleting.removed=true
+function deleting:entindex() error("removed hero entindex is unavailable") end
+bus.emit(events.HERO_REMOVED,{player_id=0,unit=deleting})
+retired_weapon(old_weapon,old_particles)
+assert(not weapon_cosmetic.debug_snapshot(0).unavailable)
+local again=hero(0,"hero_monkey_king");summon(again)
+local next_weapon=assert_weapon(again,"ice_blade")
+bus.emit(events.HERO_REMOVED,{player_id=0,unit=deleting})
+tick();assert(assert_weapon(again,"ice_blade")==next_weapon)
+print("HERO_WEAPON_REMOVAL_PASS invalid native handle cleanup, retained loadout, resummon, stale removal isolation")

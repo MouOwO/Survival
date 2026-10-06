@@ -11,6 +11,7 @@ local tooltip_view_model = require("ui/hero_skill_tooltip_view_model")
 local M = {}
 
 local state_by_player = {}
+local pending_hero_by_player = {}
 local RETURN_HOME_ABILITY = "ability_survival_return_home"
 local PICKUP_MATERIALS_ABILITY = "ability_survival_pickup_materials"
 local BALL_LIGHTNING_ABILITY = "ability_survival_hero_ball_lightning"
@@ -87,6 +88,7 @@ local function snapshot(player_id)
         return {
             player_id = player_id,
             hero_ready = 0,
+            unit_entindex = -1,
             skill_count = 0,
             skill_capacity = 10,
             public_skill_count = 0,
@@ -416,6 +418,14 @@ local function on_skill_reward(payload)
         ))
         return
     end
+    local state = state_by_player[tonumber(payload.player_id)]
+    local definition = skills.by_id[skill_id]
+    -- Some shared rebirth rewards name a Monkey King exclusive explicitly.
+    -- The choice service grants each other hero's own skills at its configured
+    -- gates; do not insert another hero's ability into the fixed Q/W/E/R bar.
+    local exclusive_hero_id = definition and definition.exclusive_hero_id
+    if state and exclusive_hero_id and exclusive_hero_id ~= ""
+        and exclusive_hero_id ~= state.hero_id then return end
     local result = grant_request({
         player_id = payload.player_id,
         skill_id = skill_id,
@@ -593,14 +603,34 @@ local function on_hero_summoned(payload)
     if payload.player_id == nil or not valid_entity(payload.unit) then
         return
     end
+    pending_hero_by_player[payload.player_id] = payload
     scheduler.after(0.03, function()
+        if pending_hero_by_player[payload.player_id] ~= payload then return end
+        pending_hero_by_player[payload.player_id] = nil
+        if not valid_entity(payload.unit) then return end
         initialize_hero(payload)
     end, "hero_skill_init_" .. tostring(payload.player_id))
+end
+
+local function on_hero_removed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    local pending = pending_hero_by_player[player_id]
+    if pending and pending.unit == payload.unit then
+        pending_hero_by_player[player_id] = nil
+        scheduler.cancel("hero_skill_init_" .. tostring(player_id))
+    end
+    local state = state_by_player[player_id]
+    if state and state.unit ~= payload.unit then return end
+    state_by_player[player_id] = nil
+    scheduler.cancel("hero_skill_audit_" .. tostring(player_id))
+    publish(player_id, "hero_removed")
 end
 
 function M.init()
     passive_skills.validate()
     state_by_player = {}
+    pending_hero_by_player = {}
     event_bus.handle_request(
         events.HERO_SKILL_STATE_GET_REQUEST,
         state_request
@@ -623,6 +653,7 @@ function M.init()
     )
     event_bus.subscribe(events.HERO_SKILL_REWARD_REQUEST, on_skill_reward)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    event_bus.subscribe(events.HERO_REMOVED, on_hero_removed)
 end
 
 return M

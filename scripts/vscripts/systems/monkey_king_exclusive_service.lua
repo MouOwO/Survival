@@ -4,6 +4,7 @@ local combat_events = require("combat/combat_events")
 local scheduler = require("core/scheduler")
 local config = require("config/generated/monkey_king_exclusive_runtime")
 local hero_cosmetic_service = require("systems/hero_cosmetic_service")
+local summon_attack_rate = require("systems/hero_summon_attack_rate")
 local phase_guard = require("systems/gameplay_phase_guard")
 
 local M = {}
@@ -70,6 +71,7 @@ local function state(player_id)
         agility = 0,
         intellect = 0,
         clone = nil,
+        owned_clones = {},
         clone_respawning = false,
         growth_started = false,
     }
@@ -279,10 +281,12 @@ local function resolve_q_impact(impact_id)
     return false
 end
 
-local function clear_q_impacts()
+local function clear_q_impacts(player_id)
     local impact_ids = {}
-    for impact_id, _ in pairs(q_impacts) do
-        impact_ids[#impact_ids + 1] = impact_id
+    for impact_id, impact in pairs(q_impacts) do
+        if player_id == nil or tonumber(impact.player_id) == player_id then
+            impact_ids[#impact_ids + 1] = impact_id
+        end
     end
     for _, impact_id in ipairs(impact_ids) do
         local impact = q_impacts[impact_id]
@@ -295,7 +299,10 @@ local function clear_q_impacts()
 end
 
 local function trigger_q(player_id, attacker, target)
-    if not alive(attacker) or not alive(target) then return false end
+    -- OnAttackLanded can run after the ordinary hit kills its target. Its
+    -- remaining position still aims the staff; only live units take line damage.
+    if not alive(attacker) or not valid(target)
+        or target:GetTeamNumber() == attacker:GetTeamNumber() then return false end
     local row = runtime()
     local chance = math.max(0, math.min(100,
         tonumber(row.q_proc_chance_pct) or 0))
@@ -364,6 +371,7 @@ local function on_main_attack_landed(payload)
     local attacker = payload and payload.attacker
     if not alive(attacker)
         or attacker.survival_hero_id ~= "hero_monkey_king"
+        or attacker.survival_monkey_king_clone == true
         or payload.is_main_attack ~= true then return end
     local player_id = tonumber(payload.player_id)
     if player_id == nil then return end
@@ -414,11 +422,21 @@ local function apply_clone_no_collision(clone)
     end
 end
 
-local function sync_clone(current, hero)
+local function sync_clone_appearance(current)
+    if not current or state_by_player[current.player_id] ~= current
+        or not alive(current.clone) or not valid(current.source_hero) then return end
+    hero_cosmetic_service.sync_appearance(current.clone, current.source_hero)
+end
+
+local function sync_clone(current, hero, snapshot)
     local clone = current.clone
-    if not alive(clone) or not alive(hero) then return end
+    if not alive(clone) or not valid(hero) or current.source_hero ~= hero then return end
+    if not alive(hero) then return end
     apply_clone_no_collision(clone)
-    local stats = combat_snapshot(current.player_id)
+    local stats = snapshot or combat_snapshot(current.player_id)
+    if state_by_player[current.player_id] ~= current or current.clone ~= clone
+        or not alive(clone) or not alive(hero) then return end
+    if stats.entindex ~= nil and tonumber(stats.entindex) ~= tonumber(hero:entindex()) then return end
     local previous_max = math.max(1, tonumber(clone:GetMaxHealth()) or 1)
     local health_pct = math.max(0, tonumber(clone:GetHealth()) or 0) / previous_max
     local maximum = math.max(1, tonumber(stats.max_health) or 1)
@@ -439,11 +457,9 @@ local function sync_clone(current, hero)
         tonumber(stats.engine_attack_min) or tonumber(stats.attack_min) or 0))
     clone:SetBaseDamageMax(math.max(0,
         tonumber(stats.engine_attack_max) or tonumber(stats.attack_max) or 0))
-    local attack_speed = tonumber(stats.attack_speed) or 0
-    if attack_speed > 0 then
-        clone:SetBaseAttackTime(1 / attack_speed)
-    end
-    clone.survival_attack_speed = attack_speed
+    -- The selected-unit HUD already shows inherited attacks/s, but a native
+    -- hero clone needs the same fixed attack interval in the actual engine.
+    local attack_speed = summon_attack_rate.apply(clone, hero, stats.attack_speed)
     clone.survival_strength = tonumber(stats.strength) or 0
     clone.survival_agility = tonumber(stats.agility) or 0
     clone.survival_intellect = tonumber(stats.intellect) or 0
@@ -458,6 +474,7 @@ local function sync_clone(current, hero)
     if clone_modifier and clone_modifier.SetCombatSnapshot then
         local clone_stats = {}
         for key, value in pairs(stats) do clone_stats[key] = value end
+        clone_stats.attack_speed = attack_speed
         clone_stats.critical_chance_pct = clone.survival_critical_chance_pct
         clone_stats.critical_damage_pct = clone.survival_critical_damage_pct
         clone_modifier:SetCombatSnapshot(clone_stats)
@@ -474,6 +491,7 @@ local function create_clone(player_id)
     local hero = summoned and summoned.unit
     if not alive(hero) or hero.survival_hero_id ~= "hero_monkey_king"
         or not skill_active(player_id, W_SKILL) then return nil end
+    current.source_hero = hero
     local clone = CreateUnitByName(
         hero:GetUnitName(), clone_position(player_id, hero), true,
         hero, hero, hero:GetTeamNumber()
@@ -486,7 +504,6 @@ local function create_clone(player_id)
     clone.survival_monkey_king_clone = true
     clone.survival_permanent_summon = runtime().w_clone_permanent ~= false
     clone.survival_display_name = "混沌神猿分身"
-    hero_cosmetic_service.apply(clone, "hero_monkey_king")
     apply_clone_no_collision(clone)
     if clone.SetBaseStrength then clone:SetBaseStrength(0) end
     if clone.SetBaseAgility then clone:SetBaseAgility(0) end
@@ -497,8 +514,10 @@ local function create_clone(player_id)
         player_id = player_id,
     })
     current.clone = clone
+    current.owned_clones[clone] = true
     current.clone_respawning = false
     sync_clone(current, hero)
+    sync_clone_appearance(current)
     FindClearSpaceForUnit(clone, clone:GetAbsOrigin(), true)
     return clone
 end
@@ -510,6 +529,7 @@ local function schedule_clone_respawn(player_id)
     local delay = math.max(0,
         tonumber(runtime().w_clone_respawn_delay) or 1)
     scheduler.after(delay, function()
+        if state_by_player[player_id] ~= current then return end
         current.clone_respawning = false
         create_clone(player_id)
     end, "monkey_clone_respawn:" .. tostring(player_id))
@@ -543,6 +563,7 @@ local function start_player_runtime(player_id)
     local interval = math.max(0.1,
         tonumber(runtime().w_growth_interval) or 60)
     scheduler.every(interval, function()
+        if state_by_player[player_id] ~= current then return false end
         growth_tick(player_id)
         return true
     end, "monkey_growth:" .. tostring(player_id))
@@ -573,20 +594,73 @@ local function on_entity_killed(payload)
     if not valid(victim) or victim.survival_monkey_king_clone ~= true then return end
     local player_id = tonumber(victim:GetPlayerOwnerID())
     if player_id == nil then return end
-    state(player_id).clone = nil
+    local current = state_by_player[player_id]
+    if not current or current.clone ~= victim then return end
+    current.clone = nil
     if skill_active(player_id, W_SKILL) then schedule_clone_respawn(player_id) end
 end
 
 local function sync_all_clones()
     for player_id, current in pairs(state_by_player) do
+        for clone in pairs(current.owned_clones) do
+            if not valid(clone) then
+                hero_cosmetic_service.clear(clone)
+                current.owned_clones[clone] = nil
+            end
+        end
         local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
             player_id = player_id,
         })
         if alive(current.clone) and summoned then
             sync_clone(current, summoned.unit)
+            -- Visual retries belong to lifecycle polling, not every damage or
+            -- growth stat event. Also works while the source hero is dead.
+            sync_clone_appearance(current)
         elseif current.clone == nil and skill_active(player_id, W_SKILL)
             and not current.clone_respawning then
             create_clone(player_id)
+        end
+    end
+end
+
+local function on_combat_stats_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local current = player_id and state_by_player[player_id]
+    local hero = current and current.source_hero
+    local snapshot = payload and payload.snapshot
+    if not valid(hero) or type(snapshot) ~= "table"
+        or tonumber(snapshot.entindex) ~= tonumber(hero:entindex()) then return end
+    sync_clone(current, hero, snapshot)
+end
+
+local function on_cosmetics_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local current = player_id and state_by_player[player_id]
+    if not current or current.source_hero ~= payload.unit then return end
+    sync_clone_appearance(current)
+end
+
+local function on_hero_removed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    local current = state_by_player[player_id]
+    if current and current.source_hero and payload.unit
+        and current.source_hero ~= payload.unit then return end
+    -- Invalidate callbacks before native removal can emit clone death events.
+    state_by_player[player_id] = nil
+    scheduler.cancel("monkey_growth:" .. tostring(player_id))
+    scheduler.cancel("monkey_clone_respawn:" .. tostring(player_id))
+    clear_q_impacts(player_id)
+    q_health_hits_by_player[player_id] = nil
+    for clone in pairs(current and current.owned_clones or {}) do
+        if valid(clone) then
+            clone.survival_monkey_king_clone = nil
+            if clone.AddNoDraw then clone:AddNoDraw() end
+        end
+        hero_cosmetic_service.clear(clone)
+        if valid(clone) then
+            if UTIL_Remove then UTIL_Remove(clone)
+            elseif clone.RemoveSelf then clone:RemoveSelf() end
         end
     end
 end
@@ -607,15 +681,29 @@ function M.init()
     event_bus.subscribe(events.HERO_FINAL_CRITICAL_ATTACK_DAMAGE,
         on_final_critical_attack_damage)
     event_bus.subscribe(events.HERO_SKILL_CHANGED, on_skill_changed)
+    event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, on_combat_stats_changed)
+    event_bus.subscribe(events.HERO_COSMETICS_CHANGED, on_cosmetics_changed)
     event_bus.subscribe(events.BUILDING_CREATED, on_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_building_destroyed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
+    event_bus.subscribe(events.HERO_REMOVED, on_hero_removed)
     scheduler.every(0.1, sync_all_clones, "monkey_clone_sync")
 end
 
 function M.trigger_clone_q(player_id, attacker, target)
+    player_id = tonumber(player_id)
+    local current = player_id and state_by_player[player_id]
+    if not current or current.clone ~= attacker or not alive(attacker)
+        or not valid(current.source_hero)
+        or current.source_hero.survival_hero_id ~= "hero_monkey_king"
+        or not valid(target) or target:GetTeamNumber() == attacker:GetTeamNumber() then return false end
     if not skill_active(player_id, Q_SKILL) then return false end
+    local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+        player_id = player_id,
+    })
+    if state_by_player[player_id] ~= current or current.clone ~= attacker
+        or not summoned or summoned.unit ~= current.source_hero then return false end
     return trigger_q(player_id, attacker, target)
 end
 M._test = {

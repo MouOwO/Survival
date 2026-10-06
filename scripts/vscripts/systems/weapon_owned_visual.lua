@@ -132,6 +132,15 @@ function M.on_unavailable(payload)
     clear(current)
 end
 
+function M.on_hero_removed(payload)
+    local id = player_id(payload.player_id)
+    local current = id and states[id]
+    if not current or current.hero ~= payload.unit then return end
+    -- Delete only the entity binding; ownership and player availability survive.
+    current.hero = nil
+    clear(current)
+end
+
 function M.poll()
     for _, current in pairs(states) do reconcile(current) end
 end

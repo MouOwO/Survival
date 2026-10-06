@@ -6,6 +6,7 @@ local content = require("config/generated/content_catalog")
 local equipment = require("config/equipment_definitions")
 local logger = require("core/logger")
 local original_icons = require("config/inventory_original_icons")
+local weapon_progression = require("systems/weapon_progression")
 
 local M = {}
 local state_by_player = {}
@@ -21,6 +22,7 @@ local function publish_item_identity(item, content_id, removed)
         {
             content_id = tostring(content_id or ""),
             removed = removed == true and 1 or 0,
+            is_max_level = weapon_progression.is_max_level(weapons.by_id[content_id]) and 1 or 0,
         }
     )
 end
@@ -283,7 +285,9 @@ local function set_item_counter(item, growth)
     if not valid_entity(item) or not item.SetCurrentCharges then
         return
     end
-    local target = tonumber(growth and growth.stage_attack_target) or 0
+    local definition = weapons.by_id[item.survival_content_id]
+    local target = weapon_progression.is_max_level(definition) and 0
+        or tonumber(growth and growth.stage_attack_target) or 0
     if target <= 0 then
         item:SetCurrentCharges(0)
         return
@@ -458,6 +462,18 @@ local function on_hero_summoned(payload)
     sync_content_shells(payload.player_id, current.inventory_counts)
 end
 
+local function on_hero_removed(payload)
+    local current = state_by_player[tonumber(payload and payload.player_id)]
+    if not current or current.hero ~= payload.unit then return end
+    -- Native item shells belong to the removed entity; logical inventory and
+    -- equipped slots survive so the next hero can rebuild the same loadout.
+    current.hero = nil
+    for content_id in pairs(current.content_shells) do
+        remove_content_shell(current, content_id)
+    end
+    for slot in pairs(current.item_by_slot) do remove_shell(current, slot) end
+end
+
 local function on_growth_changed(payload)
     if not payload.snapshot then return end
     local player_id = tonumber(payload.player_id)
@@ -509,6 +525,7 @@ function M.init()
         on_polar_crystal_progress
     )
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    event_bus.subscribe(events.HERO_REMOVED, on_hero_removed)
 end
 
 return M

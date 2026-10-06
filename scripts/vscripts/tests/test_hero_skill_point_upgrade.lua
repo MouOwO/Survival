@@ -250,3 +250,28 @@ for _, message in ipairs(sent) do
 end
 
 print("HERO_SKILL_POINT_UPGRADE_PASS: plus projection, bound hero/expected-level requests, single point spending, duplicate rejection, locked/unowned/max/no-point rejection, rollback, stable ability instances, retired management UI and preserved choices")
+
+local other_before = snapshot(1)
+own_hero.removed = true
+bus.emit(events.HERO_REMOVED, { player_id = 0, unit = own_hero, entindex = own_hero.index })
+assert(snapshot().hero_ready == 0 and snapshot().unit_entindex == -1 and snapshot().skill_count == 0)
+assert(snapshot(1).unit_entindex == other_before.unit_entindex and snapshot(1).version == other_before.version)
+assert(not request(events.HERO_SKILL_GRANT_REQUEST, {player_id = 0, skill_id = skill_id, levels = 1}).ok)
+local writes = own_hero.writes
+time = time + 1; scheduler.think()
+assert(own_hero.writes == writes, "removed hero cannot receive a deferred skill audit")
+local pending_hero = hero()
+bus.emit(events.HERO_SUMMONED, { player_id = 0, hero_id = "hero_axe", unit = pending_hero })
+pending_hero.removed = true
+bus.emit(events.HERO_REMOVED, { player_id = 0, unit = pending_hero, entindex = pending_hero.index })
+time = time + 1; scheduler.think()
+assert(snapshot().hero_ready == 0 and pending_hero.add_count == 0,
+    "deleting before delayed skill initialization must cancel it")
+local resummoned_hero = hero()
+bus.emit(events.HERO_SUMMONED, { player_id = 0, hero_id = "hero_doom", unit = resummoned_hero })
+time = time + 0.04; scheduler.think()
+assert(snapshot().hero_ready == 1 and snapshot().unit_entindex == resummoned_hero.index)
+assert(item("skill_doom_infernal") and item("skill_axe_counter_helix") == nil)
+bus.emit(events.HERO_REMOVED, { player_id = 0, unit = own_hero, entindex = own_hero.index })
+assert(snapshot().unit_entindex == resummoned_hero.index, "late removal of an old hero cannot clear a replacement")
+print("HERO_SKILL_REMOVAL_PASS: invalid old handle, delayed init/audit cancellation, isolated player, resummon and stale removal")

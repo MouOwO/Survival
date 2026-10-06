@@ -100,8 +100,8 @@
   },
   "movement": "stationary CP0; native local layer movement, noise and ghost animations retained and reduced to the skill footprint",
   "spatial_literals": "Offsets, vector noise, curl noise, gravity and plane offset scale to configured radius 400; particle sizes, ring radii/speeds, radial repulsion, sphere scatter and distance constraints use CP1.x",
-  "lifetime": "Native continuous emitters have no expiry; individual particles recycle. Native startup burst emits for 0.1s. Caller destroys immediately at skill expiry 5/7s and releases the particle index.",
-  "cleanup": "DestroyParticle(index, true), then ReleaseParticleIndex; no independent endcap children",
+  "lifetime": "Native continuous emitters have no fixed total duration; individual particles recycle. Native startup burst emits for 0.1s. At skill expiry 5/7s the caller stops emission, allowing native fades and ghost sinking to finish; residual particles have native lifetimes up to 2.5s and no gameplay effects.",
+  "cleanup": "Normal expiry: DestroyParticle(index, false), then ReleaseParticleIndex, preserving native endcap operators. Reset, invalid owner or setup failure: immediate destruction. No independent endcap children or artificial playback scaling.",
   "impact": "Existing poison death explosion remains unchanged in the gameplay service",
   "excluded_branches": [
     "hero debuff",

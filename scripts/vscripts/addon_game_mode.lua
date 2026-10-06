@@ -384,6 +384,12 @@ local function on_hero_picked(keys)
     if multiplayer_player_service.reject_defeated_unit(hero) then return end
 
     local player_id = hero:GetPlayerOwnerID()
+    -- deletehero owns this hidden native carrier. A late hero-picked event
+    -- must not force another hero replacement or initialize another builder.
+    if hero.survival_deleted_hero_placeholder == true then
+        hero_anchor_service.isolate_placeholder(player_id, hero)
+        return
+    end
     local unit_name = hero:GetUnitName()
     if unit_name ~= SURVIVAL_FORCE_HERO then
         if player_id >= 0
@@ -809,11 +815,14 @@ function M.precache(context)
         "particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf",
         context
     )
-    PrecacheResource(
-        "particle",
-        "particles/basic_projectile/basic_projectile_explosion.vpcf",
-        context
-    )
+    for _, particle in ipairs({
+        "particles/survival/skills/earth_phoenix_impact_75.vpcf",
+        "particles/survival/skills/earth_phoenix_impact_125.vpcf",
+        "particles/survival/skills/earth_phoenix_impact_300.vpcf",
+        "particles/survival/skills/earth_phoenix_impact_core.vpcf",
+    }) do
+        PrecacheResource("particle", particle, context)
+    end
     PrecacheResource(
         "particle",
         "particles/survival/skills/magic_slingshot_arcane_orb.vpcf",

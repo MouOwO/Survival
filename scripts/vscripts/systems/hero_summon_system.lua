@@ -428,6 +428,76 @@ local function snapshot_request(payload)
     return { ok = true, snapshot = snapshot(player_id) }
 end
 
+local function delete_hero(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if not valid_player_id(player_id) then
+        return { ok = false, error = "player_id_invalid" }
+    end
+    local blocked = unavailable_reason(player_id)
+    if blocked then return { ok = false, error = blocked } end
+    if replacing_by_player[player_id] then
+        return { ok = false, error = "hero_replacement_in_progress" }
+    end
+    local state = current_summon(player_id)
+    local pending = pending_by_player[player_id]
+    if not state then
+        -- Invalidate the queued generation before callbacks run. Its preload
+        -- may finish later, but must not summon a hero after deletehero.
+        if pending then
+            complete_pending(player_id, pending.generation, {
+                ok = false, error = "hero_summon_cancelled", cancelled = true,
+            })
+        end
+        publish(player_id, "cheat_hero_deleted")
+        return { ok = true, removed = false, cancelled = pending ~= nil,
+            snapshot = snapshot(player_id) }
+    end
+    if hero_anchor_service.phase(player_id) ~= "combat_ready" then
+        return { ok = false, error = "hero_anchor_not_ready" }
+    end
+
+    local old_unit, old_index = state.unit, state.unit:entindex()
+    replacing_by_player[player_id] = true
+    -- Keep the player bound to a native hero; deleting it with UTIL_Remove
+    -- alone leaves the engine/anchor unable to perform the next summon.
+    local ok, placeholder = pcall(PlayerResource.ReplaceHeroWithNoTransfer,
+        PlayerResource, player_id, "npc_dota_hero_wisp", 0, 0)
+    if not ok or not valid_entity(placeholder) then
+        replacing_by_player[player_id] = nil
+        return { ok = false, error = "hero_delete_failed" }
+    end
+    local restored, restore_error = hero_anchor_service.restore_placeholder(
+        player_id, old_unit, placeholder
+    )
+    if not restored then
+        replacing_by_player[player_id] = nil
+        return { ok = false, error = restore_error }
+    end
+    summoned_by_player[player_id] = nil
+    if pending then
+        complete_pending(player_id, pending.generation, {
+            ok = false, error = "hero_summon_cancelled", cancelled = true,
+        })
+    end
+    -- Do not impersonate defeat/disconnect: those paths disable the player
+    -- and destroy their buildings. Removal only retires this combat hero.
+    cosmetic_service.clear(old_unit)
+    event_bus.emit(events.HERO_REMOVED, {
+        player_id = player_id, unit = old_unit, entindex = old_index,
+        hero_id = state.hero_id, reason = "cheat_deletehero",
+    })
+    replacing_by_player[player_id] = nil
+    publish(player_id, "cheat_hero_deleted")
+    local builder = builder_by_player[player_id]
+    local player = PlayerResource:GetPlayer(player_id)
+    if player and CustomGameEventManager and valid_entity(builder) then
+        CustomGameEventManager:Send_ServerToPlayer(player, "survival_select_unit", {
+            entindex = builder:entindex(), reason = "combat_hero_removed",
+        })
+    end
+    return { ok = true, removed = true, snapshot = snapshot(player_id) }
+end
+
 local function get_summoned(payload)
     local state = current_summon(tonumber(payload.player_id))
     if not state then
@@ -536,6 +606,7 @@ function M.init()
         snapshot_request
     )
     event_bus.handle_request(events.HERO_SUMMON_REQUEST, summon)
+    event_bus.handle_request(events.HERO_DELETE_REQUEST, delete_hero)
     event_bus.handle_request(
         events.HERO_SUMMON_GET_REQUEST,
         get_summoned

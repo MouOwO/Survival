@@ -41,6 +41,16 @@ assert(calls["particles/survival/skills/wyvern_blizzard_snow.vpcf"]==1)
 assert(calls["particles/survival/skills/meteor_phoenix_fall.vpcf"]==1)
 assert(calls["particles/survival/skills/meteor_phoenix_impact.vpcf"]==1,
     "the complete Phoenix impact must be precached once with the native context")
+assert(calls["particles/survival/skills/earth_phoenix_impact_core.vpcf"] == 1,
+    "Earth Line must preload the complete elevated Phoenix explosion core")
+for _, radius in ipairs({75, 125, 300}) do
+    assert(calls["particles/survival/skills/earth_phoenix_impact_" .. radius .. ".vpcf"] == 1,
+        "each authored Earth Line Phoenix impact must be precached once")
+end
+assert(calls["particles/survival_earth_line/survival_earth_line_chaos_meteor.vpcf"] == 1,
+    "Earth Line must retain the complete rolling meteor and native trail")
+assert(calls["particles/basic_projectile/basic_projectile_explosion.vpcf"] == nil,
+    "the retired Earth Line explosion must not be precached")
 assert(calls["particles/survival/skills/meteor_lava.vpcf"]==1)
 for _, path in ipairs({
     "particles/units/heroes/hero_snapfire/snapfire_lizard_blobs_arced.vpcf",

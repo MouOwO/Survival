@@ -125,6 +125,14 @@ function M.on_unavailable(payload)
     clear_slot(current)
 end
 
+function M.on_hero_removed(payload)
+    local id = player_id(payload.player_id)
+    local current = id and states[id]
+    if not current or current.hero ~= payload.unit then return end
+    clear_slot(current)
+    current.hero_id = nil
+end
+
 function M.poll()
     for _, current in pairs(states) do reconcile(current) end
 end

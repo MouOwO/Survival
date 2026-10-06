@@ -11,9 +11,9 @@ M.rows = {
     { exclusive_entry_id = "exclusive_monkey_03", exclusive_group_id = "exclusive_monkey_king", hero_id = "hero_monkey_king", skill_id = "skill_monkey_king_swiftness", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 6, notes = "VIP" },
     { exclusive_entry_id = "exclusive_monkey_04", exclusive_group_id = "exclusive_monkey_king", hero_id = "hero_monkey_king", skill_id = "skill_monkey_king_agility", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 10, notes = "VIP" },
     { exclusive_entry_id = "exclusive_blademaster_01", exclusive_group_id = "exclusive_blademaster", hero_id = "hero_blademaster", skill_id = "skill_blademaster_exclusive", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 1 },
-    { exclusive_entry_id = "exclusive_blademaster_02", exclusive_group_id = "exclusive_blademaster", hero_id = "hero_blademaster", skill_id = "skill_blademaster_agility", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 1, notes = "VIP" },
-    { exclusive_entry_id = "exclusive_blademaster_03", exclusive_group_id = "exclusive_blademaster", hero_id = "hero_blademaster", skill_id = "skill_blademaster_swiftness", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 1, notes = "VIP" },
-    { exclusive_entry_id = "exclusive_blademaster_04", exclusive_group_id = "exclusive_blademaster", hero_id = "hero_blademaster", skill_id = "skill_blademaster_mobility", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 1, notes = "VIP" },
+    { exclusive_entry_id = "exclusive_blademaster_02", exclusive_group_id = "exclusive_blademaster", hero_id = "hero_blademaster", skill_id = "skill_blademaster_agility", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 3, notes = "VIP" },
+    { exclusive_entry_id = "exclusive_blademaster_03", exclusive_group_id = "exclusive_blademaster", hero_id = "hero_blademaster", skill_id = "skill_blademaster_swiftness", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 6, notes = "VIP" },
+    { exclusive_entry_id = "exclusive_blademaster_04", exclusive_group_id = "exclusive_blademaster", hero_id = "hero_blademaster", skill_id = "skill_blademaster_mobility", initial_level = 1, guaranteed = true, enabled = true, unlock_rebirth_level = 10, notes = "VIP" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

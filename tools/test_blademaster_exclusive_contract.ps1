@@ -18,6 +18,14 @@ function Check($condition, $message) {
 $csvText = Text $csv
 $runtimeText = Text $runtime
 $skillsText = Text $skills
+$skillsCsv = (Resolve-Path (Join-Path $root "data\csv\*\hero_skill_definitions.csv")).Path
+$exclusiveCsv = (Resolve-Path (Join-Path $root "data\csv\*\hero_exclusive_skills.csv")).Path
+$tooltipCsv = (Resolve-Path (Join-Path $root "data\csv\*\tooltip_definitions.csv")).Path
+$skillRows = @(ConvertFrom-Csv (Text $skillsCsv))
+$exclusiveRows = @(ConvertFrom-Csv (Text $exclusiveCsv) | Where-Object { $_.hero_id -eq "hero_blademaster" })
+$tooltipRows = @(ConvertFrom-Csv (Text $tooltipCsv))
+$exclusiveText = Text (Join-Path $root "scripts\vscripts\config\generated\hero_exclusive_skills.lua")
+$tooltipText = Text (Join-Path $root "scripts\vscripts\config\generated\tooltip_definitions.lua")
 $serviceText = Text $service
 $damageFilterText = Text $damageFilter
 $statsText = Text $stats
@@ -25,11 +33,68 @@ $fusionText = Text $fusion
 $skillSystemText = Text $skillSystem
 $gameModeText = Text (Join-Path $root "scripts\vscripts\addon_game_mode.lua")
 $rewardEffectsText = Text (Join-Path $root "scripts\vscripts\config\generated\reward_effects.lua")
+$choiceText = Text (Join-Path $root "scripts\vscripts\systems\hero_skill_choice_service.lua")
 $localizationPaths = @(
     (Join-Path $root "panorama\localization\addon_schinese.txt"),
     (Join-Path $root "resource\addon_schinese.txt"),
     (Join-Path $root "resource\localization\addon_schinese.txt")
 )
+
+# Check the authoritative unlock rows, generated consumers and every tooltip
+# projection together. Merely finding four ability names misses swapped W/E
+# descriptions and the old all-at-first-ascension configuration.
+$orderedSkills = @("exclusive", "agility", "swiftness", "mobility")
+$unlockLevels = @(1, 3, 6, 10)
+$slotNames = @("q", "w", "e", "r")
+$ascensionNames = @([string][char]0x4E00, [string][char]0x4E09, [string][char]0x516D, [string][char]0x5341)
+$activationSuffix = -join ([char[]]@(0x8F6C, 0x6FC0, 0x6D3B, 0x3002))
+Check ($exclusiveRows.Count -eq 4) "EXCLUSIVE_UNLOCK_ROW_COUNT_INVALID"
+for ($i = 0; $i -lt $orderedSkills.Count; $i++) {
+    $skillId = "skill_blademaster_" + $orderedSkills[$i]
+    $abilityName = "ability_survival_blademaster_" + $orderedSkills[$i]
+    $unlock = $exclusiveRows[$i]
+    Check ($unlock.skill_id -eq $skillId) ("EXCLUSIVE_SLOT_ORDER_INVALID: " + $skillId)
+    Check ([int]$unlock.unlock_rebirth_level -eq $unlockLevels[$i]) ("EXCLUSIVE_UNLOCK_LEVEL_INVALID: " + $skillId)
+    Check ($unlock.initial_level -eq "1" -and $unlock.guaranteed -eq "1" -and $unlock.enabled -eq "1") ("EXCLUSIVE_UNLOCK_FLAGS_INVALID: " + $skillId)
+    $generatedUnlock = @($exclusiveText -split "`n" | Where-Object { $_.Contains('skill_id = "' + $skillId + '"') })
+    Check ($generatedUnlock.Count -eq 1 -and $generatedUnlock[0] -match ('unlock_rebirth_level = ' + $unlockLevels[$i] + '(?:,| )')) ("EXCLUSIVE_GENERATED_UNLOCK_MISMATCH: " + $skillId)
+    $definitions = @($skillRows | Where-Object { $_.skill_id -eq $skillId })
+    Check ($definitions.Count -eq 1) ("SKILL_SOURCE_ROW_MISSING: " + $skillId)
+    $definition = $definitions[0]
+    Check ($definition.ability_name -eq $abilityName -and $definition.effect_type -eq ("blademaster_" + $slotNames[$i])) ("SKILL_SLOT_EFFECT_MISMATCH: " + $skillId)
+    Check ($definition.description.StartsWith($ascensionNames[$i] + $activationSuffix)) ("SKILL_UNLOCK_DESCRIPTION_MISMATCH: " + $skillId)
+    $generatedSkill = @($skillsText -split "`n" | Where-Object { $_.Contains('skill_id = "' + $skillId + '"') })
+    Check ($generatedSkill.Count -eq 1 -and $generatedSkill[0].Contains('description = "' + $definition.description + '"')) ("SKILL_GENERATED_DESCRIPTION_MISMATCH: " + $skillId)
+    $tooltip = @($tooltipRows | Where-Object { $_.tooltip_id -eq ("ability:" + $abilityName) })
+    Check ($tooltip.Count -eq 1 -and $tooltip[0].desc -eq $definition.description -and $tooltip[0].source_id -eq $skillId) ("TOOLTIP_CSV_DESCRIPTION_MISMATCH: " + $skillId)
+    $generatedTooltip = @($tooltipText -split "`n" | Where-Object { $_.Contains('tooltip_id = "ability:' + $abilityName + '"') })
+    Check ($generatedTooltip.Count -eq 1 -and $generatedTooltip[0].Contains('desc = "' + $definition.description + '"')) ("TOOLTIP_GENERATED_DESCRIPTION_MISMATCH: " + $skillId)
+    $token = "DOTA_Tooltip_ability_" + $abilityName + "_Description"
+    foreach ($localizationPath in $localizationPaths) {
+        $localized = [regex]::Matches((Text $localizationPath), '"' + [regex]::Escape($token) + '"\s+"([^\r\n"]*)"')
+        Check ($localized.Count -eq 1 -and $localized[0].Groups[1].Value -eq $definition.description) ("LOCALIZATION_DESCRIPTION_MISMATCH: " + $localizationPath + ":" + $skillId)
+    }
+}
+Check ($choiceText.Contains("rebirth_level >= (tonumber(row.unlock_rebirth_level) or 1)")) "RUNTIME_UNLOCK_THRESHOLD_CONSUMER_MISSING"
+$englishStages = @("first", "third", "sixth", "tenth")
+foreach ($directory in @("panorama\localization", "resource", "resource\localization")) {
+    $englishText = Text (Join-Path $root ($directory + "\addon_english.txt"))
+    for ($i = 0; $i -lt $orderedSkills.Count; $i++) {
+        $token = "DOTA_Tooltip_ability_ability_survival_blademaster_" + $orderedSkills[$i] + "_Description"
+        $localized = [regex]::Matches($englishText, '"' + [regex]::Escape($token) + '"\s+"([^\r\n"]*)"')
+        Check ($localized.Count -eq 1 -and $localized[0].Groups[1].Value.StartsWith("Activates after the " + $englishStages[$i] + " ascension.")) ("ENGLISH_UNLOCK_DESCRIPTION_MISMATCH: " + $token)
+        $description = $localized[0].Groups[1].Value
+        if ($i -eq 1) {
+            foreach ($term in @("permanent home-defending illusion", "automatically attacks", "attack damage and attack speed", "equipped appearance and effects", "1 second after death", "750%")) {
+                Check ($description.Contains($term)) ("W_ILLUSION_DESCRIPTION_MISSING: " + $term)
+            }
+            Check (-not $description.Contains("Blade Fury")) "W_INCORRECTLY_DESCRIBES_BLADE_FURY"
+        }
+        if ($i -eq 2) {
+            Check ($description.Contains("Blade Fury") -and $description.Contains("multiplied by 25")) "E_BLADE_FURY_DESCRIPTION_MISSING"
+        }
+    }
+}
 
 foreach ($contract in @(
     "q_critical_chance_pct = 30",
@@ -65,7 +130,21 @@ Check ($serviceText.Contains("hide_unit_and_wearables(unit)")) "Q_VISUAL_HIDE_MI
 Check ($serviceText.Contains("DOTA_UNIT_ORDER_CAST_POSITION")) "Q_POSITION_ORDER_MISSING"
 Check ($serviceText.Contains("AbilityIndex = native:entindex()")) "Q_POSITION_ABILITY_MISSING"
 Check ($gameModeText.Contains('require("systems/blademaster_exclusive_service").init()')) "BLADEMASTER_SERVICE_INIT_MISSING"
-Check ($serviceText.Contains("q_impact_visual(target:GetAbsOrigin(), attacker, payload.player_id)")) "Q_VISUAL_TARGET_POSITION_MISSING"
+Check ($serviceText.Contains("local position = target:GetAbsOrigin()") -and
+    $serviceText.Contains("q_impact_visual(position, attacker, player_id)")) "Q_VISUAL_TARGET_POSITION_MISSING"
+Check ($serviceText.Contains("function M.trigger_clone_q(player_id, clone, target, final_damage)")) "W_CLONE_Q_ENTRY_MISSING"
+Check ($serviceText.Contains("prepare_combat_clone(clone, player_id)") -and
+    $serviceText.Contains("native:GetAbilityName() ~= Q_ABILITY") -and
+    $serviceText.Contains("clone:RemoveAbility(name)")) "W_NATIVE_ABILITIES_NOT_STRIPPED"
+Check ($serviceText.Contains("clone:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)") -and
+    $serviceText.Contains("clone:SetIdleAcquire(true)")) "W_NORMAL_ATTACK_CAPABILITY_MISSING"
+Check ($serviceText.Contains('clone:AddNewModifier(clone, nil, "modifier_blademaster_clone"')) "W_COMBAT_MODIFIER_MISSING"
+Check ($serviceText.Contains("local function guard_point(player_id, current)") -and
+    $serviceText.Contains("local function guard_clone(player_id, current)") -and
+    $serviceText.Contains("OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET") -and
+    $serviceText.Contains("OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION")) "W_HOME_ATTACK_AND_RETURN_MISSING"
+Check ($serviceText.Contains("sync_clone_stats(player_id, current)") -and
+    $serviceText.Contains("guard_clone(player_id, current)")) "W_RUNTIME_SYNC_OR_GUARD_MISSING"
 Check ($serviceText.Contains("e_tick_interval")) "E_PERIODIC_TICK_MISSING"
 Check ($serviceText.Contains('local E_VISUAL_UNIT = "npc_dota_hero_juggernaut"')) "E_VISUAL_UNIT_MISSING"
 Check ($serviceText.Contains('local E_VISUAL_ABILITY = "juggernaut_blade_fury"')) "E_NATIVE_ABILITY_MISSING"

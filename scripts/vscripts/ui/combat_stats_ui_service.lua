@@ -266,6 +266,15 @@ function M.init()
     debug_state = {}
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, publish)
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    event_bus.subscribe(events.HERO_REMOVED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        local current = player_id and debug_state[player_id]
+        if not current or current.unit ~= payload.unit then return end
+        debug_state[player_id], pending_growth[player_id] = nil, nil
+        scheduler.cancel("combat_debug_damage_" .. tostring(player_id))
+        scheduler.cancel("lumberjack_publish_growth_debug_" .. tostring(player_id))
+        publish_debug(player_id)
+    end)
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
     event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)

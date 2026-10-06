@@ -39,6 +39,7 @@ package.loaded["systems/hero_stat_adapter"] = {apply = function(unit, row)
 end}
 package.loaded["systems/hero_cosmetic_service"] = {
     apply = function() count("cosmetics") end,
+    clear = function(unit) count("cosmetic_clear"); ctx.cleared_hero = unit end,
 }
 package.loaded["systems/hero_summon_projection"] = {
     entitlements = function() return {vip = 1} end,
@@ -114,8 +115,13 @@ PlayerResource = {
     GetPlayer = function() return ctx.player end,
     ReplaceHeroWithNoTransfer = function(_, id, name)
         eq(id, 0)
-        eq(name, definition.unit_name)
-        eq(anchor.phase(id), "replacing", "replacement requires a live transaction")
+        if name == "npc_dota_hero_wisp" then
+            eq(anchor.phase(id), "combat_ready", "deletion starts from the combat hero")
+            if ctx.delete_fails then return nil end
+        else
+            eq(name, definition.unit_name)
+            eq(anchor.phase(id), "replacing", "replacement requires a live transaction")
+        end
         count("replace")
         -- The engine discards the previous carrier. Keeping it valid would
         -- conceal the original abort-after-replacement retry deadlock.
@@ -330,4 +336,69 @@ eq(#errors, 1)
 eq(errors[1].message, "hero_spawn_blocked")
 no_replacement()
 
-print("test_hero_summon_flow: PASS (7 integrated summon and native ability scenarios)")
+-- 8. Delete returns the player to a hidden native carrier, releases the slot,
+-- publishes the removed identity and allows repeated full summon transactions.
+fixture()
+local removed = {}
+bus.subscribe(events.HERO_REMOVED, function(payload)
+    removed[#removed + 1] = payload
+    eq(bus.request(events.HERO_SUMMON_GET_REQUEST, {player_id = 0}).ok, false,
+        "removed hero is unavailable before lifecycle cleanup runs")
+end)
+for iteration = 1, 3 do
+    eq(request().ok, true)
+    local old_hero, old_index = ctx.selected, ctx.selected:entindex()
+    local deleted = assert(bus.request(events.HERO_DELETE_REQUEST, {player_id = 0}))
+    eq(deleted.ok, true)
+    eq(deleted.removed, true)
+    eq(deleted.snapshot.hero_summoned, 0)
+    eq(old_hero:IsNull(), true)
+    eq(ctx.cleared_hero, old_hero)
+    eq(removed[iteration].unit, old_hero)
+    eq(removed[iteration].entindex, old_index)
+    eq(anchor.phase(0), "placeholder")
+    eq(ctx.selected:GetUnitName(), "npc_dota_hero_wisp")
+    eq(ctx.selected.hidden, true)
+    eq(ctx.selected.controllable, false)
+    eq(ctx.selected:GetAbsOrigin().z, -10000)
+    eq(ctx.selected.survival_hero_id, nil)
+    eq(ctx.selected.survival_deleted_hero_placeholder, true)
+    eq(bus.request(events.HERO_DELETE_REQUEST, {player_id = 0}).ok, true,
+        "repeated deletion is harmless")
+    eq(#removed, iteration, "no duplicate removal lifecycle")
+end
+eq(request().ok, true)
+
+-- 9. Failed native deletion keeps the original summon and anchor intact.
+fixture(); eq(request().ok, true)
+local retained = ctx.selected
+ctx.delete_fails = true
+eq(bus.request(events.HERO_DELETE_REQUEST, {player_id = 0}).ok, false)
+eq(ctx.selected, retained)
+eq(retained:IsNull(), false)
+eq(anchor.phase(0), "combat_ready")
+eq(bus.request(events.HERO_SUMMON_GET_REQUEST, {player_id = 0}).unit, retained)
+eq(calls("cosmetic_clear"), 0)
+ctx.delete_fails = false
+eq(bus.request(events.HERO_DELETE_REQUEST, {player_id = 0}).ok, true)
+eq(request().ok, true)
+
+-- 10. Deleting during preload cancels exactly once. Late asset callbacks may
+-- not summon the cancelled hero or execute the old test-resource completion.
+fixture(); ctx.assets_ready = false
+local cancelled_count, cancellation = 0, nil
+eq(request({on_completed = function(result)
+    cancelled_count, cancellation = cancelled_count + 1, result
+end}).pending, true)
+local stale_preload = ctx.preload
+local cancelled = bus.request(events.HERO_DELETE_REQUEST, {player_id = 0})
+eq(cancelled.ok, true); eq(cancelled.cancelled, true)
+eq(cancelled_count, 1); eq(cancellation.cancelled, true)
+ctx.assets_ready = true
+stale_preload.on_ready(); stale_preload.on_failed("late")
+eq(cancelled_count, 1); eq(calls("replace"), 0)
+eq(request().ok, true)
+stale_preload.on_ready()
+eq(#ctx.summoned, 1)
+
+print("test_hero_summon_flow: PASS (10 integrated summon, deletion/retry and native ability scenarios)")

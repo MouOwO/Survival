@@ -53,6 +53,9 @@ end
 function M.init()
     tracked = {}
     event_bus.subscribe(events.HERO_SUMMONED, register)
+    event_bus.subscribe(events.HERO_REMOVED, function(payload)
+        if payload and payload.unit then tracked[payload.unit] = nil end
+    end)
     scheduler.every(INTERVAL, think, "hero_boundary_guard")
 end
 

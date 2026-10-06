@@ -660,8 +660,11 @@ local function summon_hero(context)
         result and result.error or "hero_summon_failed"
 end
 
-local function add_test_hero(context)
+local function add_test_hero(context, hero_id, display_name)
+    hero_id = hero_id or "hero_monkey_king"
+    display_name = display_name or "齐天大圣"
     local function finish_test_environment(result)
+        if result and result.cancelled then return true end
         if not result or result.ok ~= true then
             notify(context, "英雄自动召唤失败："
                 .. tostring(result and result.error or "unknown"), "error")
@@ -681,10 +684,12 @@ local function add_test_hero(context)
         })
         if not unlocked or not unlocked.ok then return false end
         show_shop(context)
-        notify(context, "测试环境已就绪：齐天大圣、金币1亿、木材1亿、商城全解锁")
+        notify(context, "测试环境已就绪：" .. display_name
+            .. "、金币1亿、木材1亿、商城全解锁")
         print(string.format(
-            "[CHEAT_ADDHERO_READY] player=%s team=%s hero=hero_monkey_king gold=%s wood=%s shop_unlocked=true",
+            "[CHEAT_ADDHERO_READY] player=%s team=%s hero=%s gold=%s wood=%s shop_unlocked=true",
             tostring(context.player_id), tostring(context.team),
+            hero_id,
             tostring(resources.snapshot and resources.snapshot.gold or ""),
             tostring(resources.snapshot and resources.snapshot.wood or "")))
         return true
@@ -696,7 +701,7 @@ local function add_test_hero(context)
     if not summoned or not summoned.ok then
         summoned = event_bus.request(events.HERO_SUMMON_REQUEST, {
             player_id = context.player_id,
-            hero_id = "hero_monkey_king",
+            hero_id = hero_id,
             reason = "cheat_addhero",
             debug_bypass = true,
             on_completed = finish_test_environment,
@@ -704,17 +709,30 @@ local function add_test_hero(context)
         if not summoned or not summoned.ok then
             return false, summoned and summoned.error or "hero_summon_failed"
         end
-    elseif summoned.hero_id ~= "hero_monkey_king" then
-        return false, "another_hero_already_summoned"
+    elseif summoned.hero_id ~= hero_id then
+        return false, "已有其他英雄，请先输入 deletehero 删除当前英雄"
     end
 
     if summoned.pending == true then
-        notify(context, "齐天大圣资源正在准备，完成后自动开启测试环境")
+        notify(context, display_name .. "资源正在准备，完成后自动开启测试环境")
         return true
     end
     if not finish_test_environment(summoned) then
         return false, "test_environment_setup_failed"
     end
+    return true
+end
+
+local function delete_test_hero(context)
+    local result = event_bus.request(events.HERO_DELETE_REQUEST, {
+        player_id = context.player_id, reason = "cheat_deletehero",
+    })
+    if not result or not result.ok then
+        return false, result and result.error or "hero_delete_failed"
+    end
+    notify(context, result.removed and "当前英雄已删除，可以重新召唤英雄"
+        or result.cancelled and "待召唤英雄已取消，可以重新召唤英雄"
+        or "当前没有英雄，可以直接召唤新英雄")
     return true
 end
 
@@ -1232,6 +1250,11 @@ local COMMANDS = {
     ordertest = test_gameplay_stat,
     orderreset = reset_gameplay_stats,
     addhero = add_test_hero,
+    addhero1 = add_test_hero,
+    addhero2 = function(context)
+        return add_test_hero(context, "hero_blademaster", "剑圣")
+    end,
+    deletehero = delete_test_hero,
     wudi = wudi,
     yitie = function(context) return require("systems/archive_service").yitie(context) end,
     zaixian = function(context) return require("systems/archive_service").zaixian(context) end,
@@ -1324,7 +1347,7 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: wudi, xinyang <amount>, choujiang <amount>, addhero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
+        "ready: wudi, xinyang <amount>, choujiang <amount>, addhero/addhero1 (monkey king), addhero2 (blademaster), deletehero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
     )
 end
 

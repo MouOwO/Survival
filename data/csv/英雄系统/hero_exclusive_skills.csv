@@ -10,6 +10,6 @@ exclusive_monkey_02,exclusive_monkey_king,hero_monkey_king,skill_monkey_king_fur
 exclusive_monkey_03,exclusive_monkey_king,hero_monkey_king,skill_monkey_king_swiftness,1,1,1,6,VIP
 exclusive_monkey_04,exclusive_monkey_king,hero_monkey_king,skill_monkey_king_agility,1,1,1,10,VIP
 exclusive_blademaster_01,exclusive_blademaster,hero_blademaster,skill_blademaster_exclusive,1,1,1,1,
-exclusive_blademaster_02,exclusive_blademaster,hero_blademaster,skill_blademaster_agility,1,1,1,1,VIP
-exclusive_blademaster_03,exclusive_blademaster,hero_blademaster,skill_blademaster_swiftness,1,1,1,1,VIP
-exclusive_blademaster_04,exclusive_blademaster,hero_blademaster,skill_blademaster_mobility,1,1,1,1,VIP
+exclusive_blademaster_02,exclusive_blademaster,hero_blademaster,skill_blademaster_agility,1,1,1,3,VIP
+exclusive_blademaster_03,exclusive_blademaster,hero_blademaster,skill_blademaster_swiftness,1,1,1,6,VIP
+exclusive_blademaster_04,exclusive_blademaster,hero_blademaster,skill_blademaster_mobility,1,1,1,10,VIP

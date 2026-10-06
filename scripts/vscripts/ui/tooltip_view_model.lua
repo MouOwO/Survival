@@ -1,3 +1,5 @@
+local weapons = require("config/generated/weapon_definitions")
+local weapon_progression = require("systems/weapon_progression")
 local M = {}
 
 local function field(fields, label, value)
@@ -6,11 +8,15 @@ local function field(fields, label, value)
 end
 
 local function item_view(content_id, quantity)
-    return {
+    local view = {
         content_id = tostring(content_id or ""),
         quantity = math.max(0, math.floor(tonumber(quantity) or 0)),
         fields = {},
     }
+    if weapon_progression.is_max_level(weapons.by_id[content_id]) then
+        field(view.fields, "当前进度", "MAX")
+    end
+    return view
 end
 
 function M.weapon_snapshot(equipment, growth, instances, equipment_growth)
@@ -35,7 +41,10 @@ function M.weapon_snapshot(equipment, growth, instances, equipment_growth)
 
     local target = math.max(0, tonumber(growth.stage_attack_target) or 0)
     local current = math.max(0, tonumber(growth.stage_attack_count) or 0)
-    if target > 0 then
+    local is_max_level = weapon_progression.is_max_level(weapons.by_id[main_id])
+    if is_max_level then
+        -- item_view also covers max weapons in inventory/synthesis materials.
+    elseif target > 0 then
         field(item.fields, "当前进度",
             tostring(math.min(current, target)) .. " / " .. tostring(target))
         field(item.fields, "剩余进度", math.max(0, target - current))
@@ -54,7 +63,7 @@ function M.weapon_snapshot(equipment, growth, instances, equipment_growth)
         field(item.fields, "累计成长攻击", "+" .. tostring(growth_attack))
     end
     local progress_per_attack = tonumber(growth.progress_per_attack) or 1
-    if progress_per_attack > 1 then
+    if progress_per_attack > 1 and not is_max_level then
         field(item.fields, "每次攻击进度", "+" .. tostring(progress_per_attack))
     end
     local hammer_count = math.max(

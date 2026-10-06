@@ -2,12 +2,21 @@ local scheduler = require("core/scheduler")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local armor_balance = require("config/armor_balance")
+local cosmetics = require("systems/hero_cosmetic_service")
+local stat_projection = require("combat/endless_stat_projection")
+local summon_attack_rate = require("systems/hero_summon_attack_rate")
 
 local M = { runners = {} }
 M.sound_service = require("core/sound_service")
 local deal_group = nil
 local exclusive_summons = {}
 local shadow_raze_stacks = {}
+local summon_sync_task = nil
+local summon_corpses = {}
+local corpse_sync_task = nil
+local sync_sequence = 0
+local service_generation = 0
+local CORPSE_VISUAL_SECONDS = 4
 
 local blinding_light_visual = require("systems/keeper_blinding_light_visual")
 local COUNTER_HELIX_PARTICLE =
@@ -40,8 +49,24 @@ end
 
 local function base_attack_time(attack_speed)
     attack_speed = tonumber(attack_speed) or 0
-    if attack_speed <= 0 then return nil end
+    if attack_speed <= 0 or attack_speed ~= attack_speed
+        or attack_speed == math.huge then return nil end
     return 1 / attack_speed
+end
+
+local function current_world()
+    return GameRules and GameRules.GetGameModeEntity
+        and GameRules:GetGameModeEntity() or GameRules or _G
+end
+
+local function copy_attributes(attributes)
+    local result = {}
+    for key, value in pairs(attributes or {}) do result[key] = value end
+    return result
+end
+
+local function current_attack_speed(source, fallback)
+    return summon_attack_rate.current(source, fallback)
 end
 
 local function enemies_in_radius(attacker, position, radius)
@@ -60,13 +85,76 @@ local function summon_key(attacker, skill_id)
     return key and key .. ":" .. tostring(skill_id) or nil
 end
 
+local function dispose_summon(state)
+    local unit = state.unit
+    -- A retained Lua callback must never hide/remove an entity in a new map.
+    if state.world == current_world() and valid(unit) then
+        if unit.AddNoDraw then unit:AddNoDraw() end
+    end
+    if state.world == current_world() and alive(unit) then unit:ForceKill(false) end
+    -- Cosmetic ownership uses the exact handle and guards its own world, even
+    -- when the engine has already deleted the corpse and entindex is unusable.
+    if state.mirror_appearance then cosmetics.clear(unit) end
+    if state.world == current_world() and valid(unit) then
+        if UTIL_Remove then UTIL_Remove(unit)
+        elseif unit.RemoveSelf then unit:RemoveSelf() end
+    end
+end
+
+local function finish_corpse(state)
+    if summon_corpses[state.unit] ~= state then return end
+    summon_corpses[state.unit] = nil
+    dispose_summon(state)
+    if next(summon_corpses) == nil and corpse_sync_task then
+        scheduler.cancel(corpse_sync_task)
+        corpse_sync_task = nil
+    end
+end
+
+local function retain_corpse(state)
+    state.corpse_expires_at = game_time() + CORPSE_VISUAL_SECONDS
+    summon_corpses[state.unit] = state
+    if corpse_sync_task then return end
+    sync_sequence = sync_sequence + 1
+    local task = "hero_exclusive_summon_corpses:" .. tostring(sync_sequence)
+    corpse_sync_task = task
+    scheduler.every(0.1, function()
+        if corpse_sync_task ~= task then return false end
+        for _, corpse in pairs(summon_corpses) do
+            if corpse.world ~= current_world() or not valid(corpse.unit)
+                or game_time() >= corpse.corpse_expires_at then
+                finish_corpse(corpse)
+            end
+        end
+        return corpse_sync_task == task and next(summon_corpses) ~= nil
+    end, task)
+end
+
+local function retire_summon(key, state, immediate)
+    if exclusive_summons[key] ~= state then return end
+    exclusive_summons[key] = nil
+    if state.expiry_task then scheduler.cancel(state.expiry_task) end
+    if immediate or not valid(state.unit) or state.world ~= current_world() then
+        dispose_summon(state)
+    else
+        -- Free the combat slot now, but keep bone-merged wearables attached
+        -- throughout native death. Clearing them before ForceKill exposes the
+        -- default body for the entire death animation.
+        if state.mirror_appearance then retain_corpse(state) end
+        if alive(state.unit) then state.unit:ForceKill(false) end
+    end
+    if next(exclusive_summons) == nil and summon_sync_task then
+        scheduler.cancel(summon_sync_task)
+        summon_sync_task = nil
+    end
+end
+
 function M.summon_locked(attacker, skill_id)
     local key = summon_key(attacker, skill_id)
     local state = key and exclusive_summons[key] or nil
     if not state then return false end
     if not alive(state.unit) or game_time() >= state.expires_at then
-        exclusive_summons[key] = nil
-        if alive(state.unit) then state.unit:ForceKill(false) end
+        retire_summon(key, state)
         return false
     end
     return true
@@ -101,6 +189,9 @@ local function inherited_stats(attributes, definition, level)
             * attack_speed_pct,
         max_health = (tonumber(attributes.max_health) or 1) * health_pct,
         armor = armor * armor_pct,
+        strength = tonumber(attributes.strength) or 0,
+        agility = tonumber(attributes.agility) or 0,
+        intellect = tonumber(attributes.intellect) or 0,
     }
 end
 
@@ -108,39 +199,134 @@ local function apply_combat_stats(unit, attributes, definition, level,
         preserve_health)
     if not valid(unit) then return false end
     local stats = inherited_stats(attributes, definition, level)
-    local health_fraction = 1
-    if preserve_health and unit.GetMaxHealth and unit.GetHealth then
-        local previous_max = math.max(1, tonumber(unit:GetMaxHealth()) or 1)
-        health_fraction = math.max(0, math.min(
-            1, (tonumber(unit:GetHealth()) or previous_max) / previous_max
-        ))
+    local previous = unit.survival_exclusive_combat_stats or {}
+    -- Native base damage/health are integers: a logical value above 2^31
+    -- becomes negative. Reuse the combat filter's bounded projection and
+    -- keep logical stats separately for the HUD and subsequent inheritance.
+    stats.attack_min = math.max(1, stats.attack_min)
+    stats.attack_max = math.max(stats.attack_min, stats.attack_max)
+    local projected = stat_projection.prepare(unit, {
+        attack = stats.attack_max, health = math.max(1, stats.max_health),
+    })
+    local attack_min = math.max(1, math.floor(
+        stats.attack_min / unit.survival_endless_attack_scale
+    ))
+    local attack_max = math.max(attack_min, math.floor(projected.attack))
+    if previous.attack_min ~= attack_min then unit:SetBaseDamageMin(attack_min) end
+    if previous.attack_max ~= attack_max then unit:SetBaseDamageMax(attack_max) end
+    local _, attack_time = summon_attack_rate.apply(unit, nil, stats.attack_speed)
+    if previous.armor ~= stats.armor then
+        unit:SetPhysicalArmorBaseValue(stats.armor)
     end
-    local attack_min = math.max(1, math.floor(stats.attack_min))
-    local attack_max = math.max(attack_min, math.floor(stats.attack_max))
-    unit:SetBaseDamageMin(attack_min)
-    unit:SetBaseDamageMax(attack_max)
-    local attack_time = base_attack_time(stats.attack_speed)
-    if attack_time and unit.SetBaseAttackTime then
-        unit:SetBaseAttackTime(attack_time)
-        unit.survival_attack_speed = stats.attack_speed
+    local maximum = math.max(1, math.floor(projected.health))
+    -- Polling must not heal a damaged infernal or restart its attack animation.
+    -- Only changing the maximum health needs to preserve its current fraction.
+    if previous.max_health ~= maximum then
+        local health_fraction = 1
+        if preserve_health and unit.GetMaxHealth and unit.GetHealth then
+            local previous_max = math.max(1, tonumber(unit:GetMaxHealth()) or 1)
+            health_fraction = math.max(0, math.min(
+                1, (tonumber(unit:GetHealth()) or previous_max) / previous_max
+            ))
+        end
+        unit:SetBaseMaxHealth(maximum)
+        unit:SetMaxHealth(maximum)
+        unit:SetHealth(math.max(1, math.min(
+            maximum, math.floor(maximum * health_fraction)
+        )))
     end
-    unit:SetPhysicalArmorBaseValue(stats.armor)
-    local maximum = math.max(1, math.floor(stats.max_health))
-    unit:SetBaseMaxHealth(maximum)
-    unit:SetMaxHealth(maximum)
-    unit:SetHealth(math.max(1, math.min(
-        maximum, math.floor(maximum * health_fraction)
-    )))
+    unit.survival_exclusive_combat_stats = {
+        attack_min = attack_min, attack_max = attack_max,
+        attack_time = attack_time, armor = stats.armor, max_health = maximum,
+    }
+    local snapshot = {
+        attack_min = stats.attack_min, attack_max = stats.attack_max,
+        attack_speed = unit.survival_attack_speed or stats.attack_speed,
+        strength = stats.strength, agility = stats.agility,
+        intellect = stats.intellect,
+        max_health = math.max(1, stats.max_health), armor = stats.armor,
+    }
+    local previous_snapshot = unit.survival_exclusive_stat_snapshot or {}
+    local changed = false
+    for name, value in pairs(snapshot) do
+        if previous_snapshot[name] ~= value then changed = true; break end
+    end
+    unit.survival_exclusive_stat_snapshot = snapshot
+    if changed then
+        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+            entindex = unit:entindex(), unit = unit,
+            reason = "exclusive_summon_stats_changed",
+        })
+    end
     return true
 end
 
-local function configure_summon(unit, context, definition)
+local function configure_summon(unit, context)
     unit:SetOwner(context.attacker)
     if unit.SetPlayerID then unit:SetPlayerID(context.player_id) end
     unit:SetControllableByPlayer(context.player_id, true)
-    apply_combat_stats(
-        unit, context.attributes, definition, context.level, false
+end
+
+local function snapshot_matches(state, snapshot)
+    return type(snapshot) == "table"
+        and tonumber(snapshot.entindex) == state.source_entindex
+end
+
+local function sync_summon(key, state, snapshot, initial)
+    -- A supplied snapshot is a numeric stat event. Appearance has its own
+    -- commit event and lifecycle retry, so attacks must not rescan cosmetics.
+    local sync_visual = snapshot == nil or initial == true
+    if exclusive_summons[key] ~= state then return false end
+    if state.world ~= current_world() or not valid(state.source_attacker) then
+        retire_summon(key, state, true)
+        return false
+    end
+    if not alive(state.unit) or game_time() >= state.expires_at then
+        retire_summon(key, state)
+        return false
+    end
+    local hero = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
+        player_id = state.player_id,
+    })
+    if hero and hero.ok and hero.unit and hero.unit ~= state.source_attacker then
+        retire_summon(key, state, true)
+        return false
+    end
+    if snapshot == nil then
+        local response = event_bus.request(events.HERO_COMBAT_STATS_GET_REQUEST, {
+            player_id = state.player_id,
+        })
+        snapshot = response and response.ok and response.snapshot or nil
+    end
+    -- Requests can emit a stat-change event themselves; a nested cleanup must
+    -- not allow this callback to touch a retired/replaced summon afterwards.
+    if exclusive_summons[key] ~= state then return false end
+    if snapshot_matches(state, snapshot) then
+        state.attributes = copy_attributes(snapshot)
+    end
+    local attributes = copy_attributes(state.attributes)
+    attributes.attack_speed = current_attack_speed(
+        state.source_attacker, attributes.attack_speed
     )
+    apply_combat_stats(
+        state.unit, attributes, state.definition, state.level, initial ~= true
+    )
+    if sync_visual and state.mirror_appearance then
+        cosmetics.sync_appearance(state.unit, state.source_attacker)
+    end
+    return true
+end
+
+local function ensure_summon_sync()
+    if summon_sync_task then return end
+    sync_sequence = sync_sequence + 1
+    local task = "hero_exclusive_summon_sync:" .. tostring(sync_sequence)
+    summon_sync_task = task
+    scheduler.every(0.1, function()
+        if summon_sync_task ~= task then return false end
+        for key, state in pairs(exclusive_summons) do sync_summon(key, state) end
+        return summon_sync_task == task and next(exclusive_summons) ~= nil
+    end, task)
 end
 
 local function create_summon(context, definition, unit_name, invulnerable)
@@ -156,7 +342,7 @@ local function create_summon(context, definition, unit_name, invulnerable)
         context.attacker:GetTeamNumber()
     )
     if not valid(unit) then return false end
-    configure_summon(unit, context, definition)
+    configure_summon(unit, context)
     unit.survival_exclusive_summon = true
     unit.survival_summon_skill_id = context.skill_id
     if invulnerable then
@@ -182,13 +368,18 @@ local function create_summon(context, definition, unit_name, invulnerable)
         player_id = tonumber(context.player_id),
         definition = definition,
         level = context.level,
+        source_attacker = context.attacker,
+        source_entindex = context.attacker:entindex(),
+        attributes = copy_attributes(context.attributes),
+        mirror_appearance = invulnerable,
+        world = current_world(),
     }
     exclusive_summons[key] = state
-    scheduler.after(duration, function()
-        if exclusive_summons[key] ~= state then return end
-        exclusive_summons[key] = nil
-        if alive(unit) then unit:ForceKill(false) end
+    if not sync_summon(key, state, nil, true) then return false end
+    state.expiry_task = scheduler.after(duration, function()
+        retire_summon(key, state)
     end, "hero_exclusive_summon:" .. key)
+    ensure_summon_sync()
     return true, unit
 end
 
@@ -320,15 +511,63 @@ local function on_hero_combat_stats_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     local snapshot = payload and payload.snapshot
     if player_id == nil or type(snapshot) ~= "table" then return end
+    for key, state in pairs(exclusive_summons) do
+        if state.player_id == player_id and snapshot_matches(state, snapshot) then
+            sync_summon(key, state, snapshot)
+        end
+    end
+end
+
+local function on_hero_cosmetics_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local source = payload and payload.unit
+    if player_id == nil or not valid(source) then return end
     for _, state in pairs(exclusive_summons) do
-        if state.player_id == player_id and alive(state.unit) then
-            apply_combat_stats(
-                state.unit,
-                snapshot,
-                state.definition,
-                state.level,
-                true
-            )
+        if state.player_id == player_id and state.source_attacker == source
+            and state.mirror_appearance and state.world == current_world()
+            and alive(state.unit) and game_time() < state.expires_at then
+            cosmetics.sync_appearance(state.unit, source)
+        end
+    end
+end
+
+local function on_hero_summoned(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil or not payload.unit then return end
+    for key, state in pairs(exclusive_summons) do
+        if state.player_id == player_id and state.source_attacker ~= payload.unit then
+            retire_summon(key, state, true)
+        end
+    end
+    for _, state in pairs(summon_corpses) do
+        if state.player_id == player_id and state.source_attacker ~= payload.unit then
+            finish_corpse(state)
+        end
+    end
+end
+
+local function on_player_removed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    for key, state in pairs(exclusive_summons) do
+        if state.player_id == player_id then retire_summon(key, state, true) end
+    end
+    for _, state in pairs(summon_corpses) do
+        if state.player_id == player_id then finish_corpse(state) end
+    end
+end
+
+local function on_hero_removed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil then return end
+    for key, state in pairs(exclusive_summons) do
+        if state.player_id == player_id and state.source_attacker == payload.unit then
+            retire_summon(key, state, true)
+        end
+    end
+    for _, state in pairs(summon_corpses) do
+        if state.player_id == player_id and state.source_attacker == payload.unit then
+            finish_corpse(state)
         end
     end
 end
@@ -336,12 +575,26 @@ end
 function M.init(dependencies)
     assert(type(dependencies and dependencies.deal_group) == "function")
     deal_group = dependencies.deal_group
+    for key, state in pairs(exclusive_summons) do retire_summon(key, state, true) end
+    for _, state in pairs(summon_corpses) do finish_corpse(state) end
     exclusive_summons = {}
+    summon_corpses = {}
     shadow_raze_stacks = {}
-    event_bus.subscribe(
-        events.HERO_COMBAT_STATS_CHANGED,
-        on_hero_combat_stats_changed
-    )
+    service_generation = service_generation + 1
+    local generation = service_generation
+    local function subscribe(event, handler)
+        -- EventBus.reset reuses subscription IDs. Guard old callbacks instead
+        -- of unsubscribing a token that may now belong to another service.
+        event_bus.subscribe(event, function(payload)
+            if generation == service_generation then handler(payload) end
+        end)
+    end
+    subscribe(events.HERO_COMBAT_STATS_CHANGED, on_hero_combat_stats_changed)
+    subscribe(events.HERO_COSMETICS_CHANGED, on_hero_cosmetics_changed)
+    subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    subscribe(events.HERO_REMOVED, on_hero_removed)
+    subscribe(events.PLAYER_DEFEATED, on_player_removed)
+    subscribe(events.PLAYER_DISCONNECTED, on_player_removed)
 end
 
 M._test = {

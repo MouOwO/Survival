@@ -2,10 +2,20 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/recipe_definitions")
 local content = require("config/generated/content_catalog")
+local global_rules = require("config/generated/global_rules")
 local M = {}
 local recipes, ordered_recipes, locks, done, auto_serial = {}, {}, {}, {}, {}
 local pending_check, check_dirty, pending_reason = {}, {}, {}
 local INFERNAL_RECIPE_ID = "recipe_equipment_set_to_infernal_01"
+local diagnostic_rule = global_rules.by_id.runtime_detailed_diagnostics
+local detailed_diagnostics = diagnostic_rule and diagnostic_rule.enabled ~= false
+  and tonumber(diagnostic_rule.value) == 1
+local progress_only_growth_reasons = {
+  attack_landed = true,
+  damage_dealt = true,
+  debug_attack_growth = true,
+  forging_hammer_changed = true,
+}
 local function index()
   recipes, ordered_recipes = {}, {}
   local recipe_ids = {}
@@ -16,8 +26,10 @@ local function index()
       recipe_ids[#recipe_ids + 1] = tostring(recipe.recipe_id)
     end
   end
-  print(string.format("[WEAPON_SYNTH_RECIPE_INDEX] count=%s ids=%s",
-    tostring(#ordered_recipes), table.concat(recipe_ids, ",")))
+  if detailed_diagnostics then
+    print(string.format("[WEAPON_SYNTH_RECIPE_INDEX] count=%s ids=%s",
+      tostring(#ordered_recipes), table.concat(recipe_ids, ",")))
+  end
 end
 local function maps(r)
  local c={}; for _,x in ipairs(r.ingredients or {}) do local id=tostring(x.content_id or ""); local n=math.floor(tonumber(x.quantity) or 0); if id=="" or n<1 then return nil end; if x.consume~=false then c[id]=(c[id] or 0)+n end end
@@ -43,7 +55,7 @@ end
 local function synth(x)
  local p=tonumber(x.player_id); local q=tostring(x.request_id or ""); local id=tostring(x.recipe_id or "")
  if not p or p<0 or q=="" then return {ok=false,error="synthesis_invalid_identity"} end
- done[p]=done[p] or {}; if done[p][q] then print("[WEAPON_SYNTH_IDEMPOTENT] request="..q); return done[p][q] end
+ done[p]=done[p] or {}; if done[p][q] then if detailed_diagnostics then print("[WEAPON_SYNTH_IDEMPOTENT] request="..q) end; return done[p][q] end
  if locks[p] then return {ok=false,error="synthesis_player_locked"} end
  local r=recipes[id]; if not r then return {ok=false,error="synthesis_recipe_closed"} end
  local c,g=maps(r); if not c then return {ok=false,error="synthesis_recipe_invalid"} end
@@ -72,18 +84,22 @@ local function schedule_auto_check(player_id, reason)
     -- 但也不能直接丢掉新事件：正在执行的任务可能已经读取过旧库存。
     -- 将 check_dirty 标记为 true，当前任务结束后会再安排一次检查。
     check_dirty[player_id] = true
-    print(string.format(
-      "[WEAPON_SYNTH_SCHEDULE] player=%s reason=%s action=merged pending=true dirty=true",
-      tostring(player_id), tostring(reason or "unknown")))
+    if detailed_diagnostics then
+      print(string.format(
+        "[WEAPON_SYNTH_SCHEDULE] player=%s reason=%s action=merged pending=true dirty=true",
+        tostring(player_id), tostring(reason or "unknown")))
+    end
     return
   end
 
   -- 占用该玩家的自动检查槽，直到 run() 完成后才清除。
   pending_check[player_id] = true
-  print(string.format(
-    "[WEAPON_SYNTH_SCHEDULE] player=%s reason=%s action=created pending=true dirty=%s",
-    tostring(player_id), tostring(reason or "unknown"),
-    tostring(check_dirty[player_id] == true)))
+  if detailed_diagnostics then
+    print(string.format(
+      "[WEAPON_SYNTH_SCHEDULE] player=%s reason=%s action=created pending=true dirty=%s",
+      tostring(player_id), tostring(reason or "unknown"),
+      tostring(check_dirty[player_id] == true)))
+  end
 
   -- 真正执行配方扫描的闭包。它会延迟 0.10 秒执行，让拾取入库、
   -- 装备壳同步等同一帧操作先完成，再读取最终的权威逻辑库存。
@@ -103,10 +119,12 @@ local function schedule_auto_check(player_id, reason)
     -- 最多连续合成 100 次。一次合成的产物可能又满足下一张配方，
     -- 因此成功后会重新读取库存继续扫描；100 是防止错误配方形成死循环的保险上限。
     for scan_round = 1, 100 do
-      print(string.format(
-        "[WEAPON_SYNTH_SCAN_BEGIN] player=%s round=%s recipe_count=%s",
-        tostring(player_id), tostring(scan_round),
-        tostring(#ordered_recipes)))
+      if detailed_diagnostics then
+        print(string.format(
+          "[WEAPON_SYNTH_SCAN_BEGIN] player=%s round=%s recipe_count=%s",
+          tostring(player_id), tostring(scan_round),
+          tostring(#ordered_recipes)))
+      end
       -- 从 content_inventory_service 获取该玩家当前的“权威逻辑背包”。
       -- 注意：英雄界面里看到的是物品壳，合成判断只认 snapshot.counts。
       local inv, inventory_error = event_bus.request(events.CONTENT_INVENTORY_GET_REQUEST,
@@ -146,15 +164,19 @@ local function schedule_auto_check(player_id, reason)
           -- counts[content_id] 是实际持有量；缺失字段按 0 处理。
           -- 任意一种材料不足，整张配方都不可合成，并立刻停止检查此配方。
           local owned = tonumber(counts[content_id]) or 0
-          print(string.format(
-            "[WEAPON_SYNTH_MATERIAL_CHECK] player=%s recipe=%s content_id=%s owned=%s required=%s",
-            tostring(player_id), tostring(recipe.recipe_id),
-            tostring(content_id), tostring(owned), tostring(quantity)))
-          if owned < quantity then
+          if detailed_diagnostics then
             print(string.format(
-              "[WEAPON_SYNTH_MATERIAL_MISSING] player=%s recipe=%s content_id=%s missing=%s",
+              "[WEAPON_SYNTH_MATERIAL_CHECK] player=%s recipe=%s content_id=%s owned=%s required=%s",
               tostring(player_id), tostring(recipe.recipe_id),
-              tostring(content_id), tostring(quantity - owned)))
+              tostring(content_id), tostring(owned), tostring(quantity)))
+          end
+          if owned < quantity then
+            if detailed_diagnostics then
+              print(string.format(
+                "[WEAPON_SYNTH_MATERIAL_MISSING] player=%s recipe=%s content_id=%s missing=%s",
+                tostring(player_id), tostring(recipe.recipe_id),
+                tostring(content_id), tostring(quantity - owned)))
+            end
             eligible = false
             break
           end
@@ -206,7 +228,7 @@ local function schedule_auto_check(player_id, reason)
     end
 
     -- 一次也没合成时，额外诊断“狱火熔铠”这张核心配方的材料状态。
-    if completed_count == 0 then
+    if detailed_diagnostics and completed_count == 0 then
       -- 再读一次最新库存，避免诊断信息引用扫描开始时的旧快照。
       local inv = event_bus.request(events.CONTENT_INVENTORY_GET_REQUEST,
         { player_id = player_id })
@@ -222,8 +244,10 @@ local function schedule_auto_check(player_id, reason)
     end
 
     -- 输出本轮汇总：玩家、触发原因以及成功合成次数。
-    print(string.format("[WEAPON_SYNTH_CHECK] player=%s reason=%s completed=%s",
-      tostring(player_id), tostring(run_reason), tostring(completed_count)))
+    if detailed_diagnostics then
+      print(string.format("[WEAPON_SYNTH_CHECK] player=%s reason=%s completed=%s",
+        tostring(player_id), tostring(run_reason), tostring(completed_count)))
+    end
   end
 
   local function run()
@@ -246,12 +270,14 @@ local function schedule_auto_check(player_id, reason)
     -- 如果检查执行期间又发生库存/装备事件，释放锁后再排一次检查。
     -- 即使本轮因异常中断，也不会丢掉已经标记为 dirty 的库存变化。
     local needs_follow_up = check_dirty[player_id] == true
-    print(string.format(
-      "[WEAPON_SYNTH_RUN_RELEASE] player=%s ok=%s pending=%s dirty=%s follow_up=%s next_reason=%s",
-      tostring(player_id), tostring(ok), tostring(needs_follow_up),
-      tostring(check_dirty[player_id] == true),
-      tostring(needs_follow_up),
-      tostring(pending_reason[player_id] or "none")))
+    if detailed_diagnostics then
+      print(string.format(
+        "[WEAPON_SYNTH_RUN_RELEASE] player=%s ok=%s pending=%s dirty=%s follow_up=%s next_reason=%s",
+        tostring(player_id), tostring(ok), tostring(needs_follow_up),
+        tostring(check_dirty[player_id] == true),
+        tostring(needs_follow_up),
+        tostring(pending_reason[player_id] or "none")))
+    end
     if needs_follow_up then
       check_dirty[player_id] = nil
       -- Do not register another ContextThink with the same name from inside
@@ -301,6 +327,11 @@ end
 
 -- 武器成长阶段发生变化时重新检查，处理由成长系统产生的新合成材料/装备。
 local function on_growth_changed(payload)
+  -- Per-hit growth changes attack progress and attributes, not recipe inputs.
+  -- A completed upgrade commits an inventory transaction (and equipment
+  -- change), whose existing subscriptions still schedule synthesis normally.
+  -- Keep unknown/structural growth reasons as a conservative compatibility path.
+  if progress_only_growth_reasons[payload and payload.reason] then return end
   schedule_auto_check(payload and payload.player_id, "weapon_growth_changed")
 end
 

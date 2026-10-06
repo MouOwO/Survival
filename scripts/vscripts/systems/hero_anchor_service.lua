@@ -109,6 +109,22 @@ function M.phase(player_id)
     return phase_by_player[player_id]
 end
 
+-- Debug hero deletion returns to an isolated native carrier, as at game start.
+-- Keep the next native replacement transaction available.
+function M.restore_placeholder(player_id, previous, placeholder)
+    if phase_by_player[player_id] ~= "combat_ready"
+        or hero_by_player[player_id] ~= previous
+        or not valid_entity(placeholder) then
+        return false, "placeholder_restore_invalid"
+    end
+    phase_by_player[player_id] = "placeholder"
+    hero_by_player[player_id] = placeholder
+    placeholder.survival_hero_id = nil
+    placeholder.survival_display_name = nil
+    placeholder.survival_deleted_hero_placeholder = true
+    return M.isolate_placeholder(player_id, placeholder)
+end
+
 function M.is_placeholder_phase(player_id)
     local phase = phase_by_player[player_id]
     return phase == nil or phase == "placeholder"

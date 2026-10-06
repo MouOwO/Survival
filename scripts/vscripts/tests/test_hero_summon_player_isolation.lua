@@ -12,7 +12,7 @@ package.loaded["core/modifier_registry"] = {ensure=function(unit,name,args)
     return unit:AddNewModifier(unit,nil,name,args)
 end}
 package.loaded["systems/hero_stat_adapter"] = {apply=noop}
-package.loaded["systems/hero_cosmetic_service"] = {apply=noop}
+package.loaded["systems/hero_cosmetic_service"] = {apply=noop,clear=noop}
 package.loaded["systems/multiplayer_player_service"] = {
     is_defeated=function(id) return ctx.defeated[id] == true end,
     reject_defeated_unit=function(unit)
@@ -198,4 +198,24 @@ bus.emit(events.PLAYER_DISCONNECTED,{player_id=1,reason="disconnect"})
 ctx.assets_ready=true; disconnected_callback.on_ready()
 assert(disconnected_result.error=="player_disconnected" and ctx.replacements[1]==nil)
 assert(snapshot(0).altar==ctx.altars[0] and request(0).ok)
-print("PASS hero summon player isolation: four same-team cities/altars, owner-only pending cancellation, stale callbacks, reentrant defeat, late events, survivor continuation")
+-- Deleting player zero's hero leaves the other three players, all cities and
+-- altars intact. Both players can continue independent summon transactions.
+fixture()
+assert(request(0).ok and request(1).ok)
+local other_hero = ctx.selected[1]
+local deletions = {}
+bus.subscribe(events.HERO_REMOVED, function(payload)
+    deletions[#deletions + 1] = payload.player_id
+end)
+local deleted = bus.request(events.HERO_DELETE_REQUEST, {player_id = 0})
+assert(deleted.ok and deleted.removed and #deletions == 1 and deletions[1] == 0)
+assert(snapshot(0).hero_summoned == 0 and snapshot(0).city_level == 10
+    and snapshot(0).altar == ctx.altars[0])
+assert(snapshot(1).hero_summoned == 1 and ctx.selected[1] == other_hero
+    and not other_hero:IsNull())
+assert(request(0).ok and request(2).ok and request(3).ok)
+assert(not bus.request(events.HERO_DELETE_REQUEST, {player_id = -1}).ok)
+assert(not bus.request(events.HERO_DELETE_REQUEST, {player_id = 99}).ok)
+assert(#deletions == 1)
+
+print("PASS hero summon player isolation: four same-team cities/altars, owner-only deletion and pending cancellation, stale callbacks, reentrant defeat, late events, survivor continuation")

@@ -1,4 +1,5 @@
--- Run the real stationary cloud simulation around a cosmetic aura replacement.
+-- Run the real stationary cloud and its natural/forced particle cleanup.
+-- Engine-owned particle fading is not rendered or timed by these mocks.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local definition = assert(require("config/hero_passive_skill_definitions").by_id.proto_poison_cloud)
 local file = assert(io.open("scripts/vscripts/systems/hero_passive_skill_service.lua", "rb"))
@@ -37,7 +38,8 @@ local modifier_name = "modifier_hero_poison_cloud_armor"
 local ground_center = vector(100, 200, 0)
 
 local function harness(level, visual_failure)
-    local h = {now = 0, tasks = {}, particles = {}, groups = {}, world = {}, errors = {}, sounds = {}}
+    local h = {now = 0, tasks = {}, particles = {}, groups = {}, world = {}, errors = {}, sounds = {}, events = {},
+        cleanup_failures = {}}
     local task_sequence = 0
     local function enqueue(delay, callback, task_id)
         task_sequence = task_sequence + 1
@@ -92,7 +94,8 @@ local function harness(level, visual_failure)
         assert(path == aura_path or path == burst_path, "retired Viper cloud particles must not be created")
         assert(attach == 0 and owner:GetTeamNumber() == 2, "the aura must use a world-origin particle")
         if path == aura_path and visual_failure == "create" then error("injected shroud creation failure") end
-        h.particles[#h.particles + 1] = {path = path, owner = owner, controls = {}, writes = {}, destroys = 0, releases = 0}
+        h.particles[#h.particles + 1] = {path = path, owner = owner, at = h.now,
+            controls = {}, writes = {}, destroys = 0, releases = 0}
         return #h.particles - 1 -- Particle zero must be cleaned up as an ordinary handle.
     end
     function manager:SetParticleControl(index, control, value)
@@ -104,13 +107,31 @@ local function harness(level, visual_failure)
     end
     function manager:DestroyParticle(index, immediate)
         local particle = assert(h.particles[index + 1])
+        assert(type(immediate) == "boolean")
+        for _, cloud in pairs(h.service and h.service.states or {}) do
+            assert(cloud.particle ~= index,
+                "detach gameplay and its particle handle before calling fallible cleanup APIs")
+        end
         particle.destroys = particle.destroys + 1
         particle.immediate = immediate
         particle.destroyed_at = h.now
+        h.events[#h.events + 1] = {kind = "destroy", index = index, at = h.now}
+        if particle.path == aura_path and (visual_failure == "destroy" or visual_failure == "cleanup")
+            and not h.cleanup_failures.destroy then
+            h.cleanup_failures.destroy = true
+            error("injected shroud destroy failure")
+        end
     end
     function manager:ReleaseParticleIndex(index)
         local particle = assert(h.particles[index + 1])
         particle.releases = particle.releases + 1
+        particle.released_at = h.now
+        h.events[#h.events + 1] = {kind = "release", index = index, at = h.now}
+        if particle.path == aura_path and (visual_failure == "release" or visual_failure == "cleanup")
+            and not h.cleanup_failures.release then
+            h.cleanup_failures.release = true
+            error("injected shroud release failure")
+        end
     end
     local env = setmetatable({
         Vector = vector, ParticleManager = manager, PATTACH_WORLDORIGIN = 0,
@@ -135,6 +156,7 @@ local function harness(level, visual_failure)
                 at = h.now, context = context, multiplier = multiplier, targets = targets,
                 position = h.last_area.position, radius = h.last_area.radius,
             }
+            h.events[#h.events + 1] = {kind = "damage", at = h.now}
         end,
         print = function(message) h.errors[#h.errors + 1] = message end,
     }, {__index = _G})
@@ -153,7 +175,7 @@ local function assert_aura(particle)
         "a stationary shroud must not follow a unit or receive movement controls")
 end
 
-for _, level in ipairs({1, 2, 3, 5}) do
+for _, level in ipairs({1, 2, 3, 4, 5}) do
     local h = harness(level)
     local victim = h.unit(2, 120, 200)
     local outside = h.unit(3, 501, 200)
@@ -184,8 +206,16 @@ for _, level in ipairs({1, 2, 3, 5}) do
         "the aura and caster lock must survive until the final scheduled tick")
     h.advance(duration)
     assert(#h.groups == duration and h.service.states["100"] == nil)
-    assert(particle.destroys == 1 and particle.releases == 1 and particle.immediate == true
-        and near(particle.destroyed_at, duration), "expiry must immediately destroy and release the aura once")
+    assert(particle.destroys == 1 and particle.releases == 1 and particle.immediate == false
+        and near(particle.destroyed_at, duration) and near(particle.released_at, duration),
+        "expiry stops emission once and hands the native fade to the engine at the original deadline")
+    local final_damage, stop
+    for index, event in ipairs(h.events) do
+        if event.kind == "damage" then final_damage = index end
+        if event.kind == "destroy" and event.index == 0 then stop = index end
+    end
+    assert(final_damage and stop and final_damage < stop,
+        "the last whole-second damage tick must finish before the natural particle stop")
     assert(cloud.particle == nil and victim.modifier == nil, "expiry must clear the particle reference and armor modifier")
     assert(same_position(cloud.position, ground_center))
     assert_aura(particle)
@@ -193,9 +223,20 @@ for _, level in ipairs({1, 2, 3, 5}) do
         assert(near(group.at, index) and group.multiplier == 1 and group.radius == 400 and same_position(group.position, ground_center),
             "all five or seven ticks must preserve timing, damage and stationary radius")
     end
+    victim.living = false
+    h.service.death({victim = victim})
+    assert(#h.groups == duration and #h.particles == 1,
+        "an engine-owned fading shroud cannot cause additional death explosions")
     assert(h.cast(), "the caster must be able to trigger again after expiry")
+    local next_particle = assert(h.particles[2])
     h.service.clear()
     assert(next(h.service.states) == nil and next(h.tasks) == nil and #h.errors == 0)
+    assert(next_particle.immediate == true and next_particle.destroys == 1 and next_particle.releases == 1,
+        "explicit clear still immediately removes the newly active shroud")
+    h.advance(duration + 20)
+    assert(#h.groups == duration and #h.particles == 2
+        and particle.destroys == 1 and particle.releases == 1 and particle.immediate == false,
+        "recast and clear cannot destroy, release or reuse the old engine-owned fade again")
 end
 
 local armor = harness(2)
@@ -217,14 +258,108 @@ local other_caster = independent.unit(101, 0, 0, 2)
 local other_context = {attacker = other_caster, target = independent.primary, level = 1, skill_id = "proto_poison_cloud"}
 assert(independent.cast() and independent.cast(other_context))
 assert(#independent.particles == 2 and independent.service.states["101"].particle == 1)
-independent.service.release("100")
-assert(independent.particles[1].destroys == 1 and independent.particles[1].releases == 1,
+independent.service.release("100", true)
+assert(independent.particles[1].destroys == 1 and independent.particles[1].releases == 1
+    and independent.particles[1].immediate == true,
     "particle zero must release correctly")
 independent.advance(1)
 assert(#independent.groups == 1 and independent.groups[1].context == other_context
     and independent.particles[2].destroys == 0, "releasing one caster's cloud must preserve another's aura and damage")
 independent.service.clear()
 assert(independent.particles[2].destroys == 1 and independent.particles[2].releases == 1)
+
+-- Natural expiry of one overlapping cloud must recalculate armor from the
+-- other caster instead of retaining expired stacks or ending the other aura.
+do
+    local h = harness(2)
+    local victim = h.unit(2, 120, 200)
+    local other = h.unit(101, 0, 0, 2)
+    local context = {attacker = other, target = h.primary, level = 3, skill_id = "proto_poison_cloud"}
+    assert(h.cast() and h.cast(context))
+    h.advance(5)
+    assert(h.service.states["100"] == nil and h.service.states["101"]
+        and #h.groups == 10 and victim.modifier.stacks == 3)
+    assert(h.particles[1].immediate == false and h.particles[1].releases == 1
+        and h.particles[2].destroys == 0 and h.particles[2].releases == 0)
+    h.advance(7)
+    assert(#h.groups == 12 and victim.modifier == nil and next(h.service.states) == nil
+        and next(h.tasks) == nil and h.particles[2].immediate == false)
+    for _, particle in ipairs(h.particles) do assert(particle.destroys == 1 and particle.releases == 1) end
+end
+
+-- Retriggering immediately after expiry creates a new gameplay cloud while
+-- the old released particle has no further ownership or cleanup callbacks.
+do
+    local h = harness(2)
+    local victim = h.unit(2, 120, 200)
+    assert(h.cast())
+    local old_cloud = h.service.states["100"]
+    h.advance(5)
+    assert(victim.modifier == nil and h.cast())
+    local new_cloud = h.service.states["100"]
+    assert(new_cloud ~= old_cloud and new_cloud.particle == 1 and old_cloud.particle == nil)
+    h.advance(5.99)
+    assert(#h.groups == 5 and victim.modifier == nil and h.service.states["100"] == new_cloud)
+    h.advance(6)
+    assert(#h.groups == 6 and victim.modifier.stacks == 1 and h.particles[2].destroys == 0)
+    h.advance(10)
+    assert(#h.groups == 10 and victim.modifier == nil and next(h.service.states) == nil and next(h.tasks) == nil)
+    for _, particle in ipairs(h.particles) do
+        assert(particle.immediate == false and particle.destroys == 1 and particle.releases == 1)
+    end
+end
+
+-- Explicit cancellation and invalid casters immediately clean owned handles,
+-- including index zero, and suppress every later damage/armor update.
+for _, ending in ipairs({"clear", "invalid"}) do
+    local h = harness(2)
+    local victim = h.unit(2, 120, 200)
+    assert(h.cast())
+    local cloud = h.service.states["100"]
+    h.advance(1)
+    assert(#h.groups == 1 and victim.modifier.stacks == 1)
+    if ending == "clear" then h.service.clear()
+    else h.attacker.null = true; h.advance(1.05) end
+    local particle = h.particles[1]
+    assert(particle.immediate == true and particle.destroys == 1 and particle.releases == 1
+        and cloud.particle == nil and victim.modifier == nil
+        and next(h.service.states) == nil and next(h.tasks) == nil)
+    h.advance(10)
+    assert(#h.groups == 1 and particle.destroys == 1 and particle.releases == 1)
+end
+
+-- Destroy and Release are separately protected. Even when both fail, gameplay
+-- ownership, armor removal, the remaining cleanup attempt and recasting survive.
+for _, failure in ipairs({"destroy", "release", "cleanup"}) do
+    for _, ending in ipairs({"natural", "clear", "invalid"}) do
+        local h = harness(2, failure)
+        local victim = h.unit(2, 120, 200)
+        assert(h.cast())
+        local cloud = h.service.states["100"]
+        h.advance(1)
+        if ending == "natural" then h.advance(5)
+        elseif ending == "clear" then h.service.clear()
+        else h.attacker.null = true; h.advance(1.05) end
+        assert(h.cleanup_failures.destroy == (failure ~= "release" and true or nil)
+            and h.cleanup_failures.release == (failure ~= "destroy" and true or nil))
+        local particle = h.particles[1]
+        assert(particle.destroys == 1 and particle.releases == 1
+            and particle.immediate == (ending ~= "natural")
+            and cloud.particle == nil and victim.modifier == nil and next(h.service.states) == nil,
+            "particle API errors cannot retain gameplay state or skip the independent release attempt")
+        if ending == "invalid" then h.attacker.null = false end
+        local prior_damage = #h.groups
+        assert(prior_damage == (ending == "natural" and 5 or 1) and h.cast())
+        local new_cloud = h.service.states["100"]
+        h.advance(h.now + 1)
+        assert(#h.groups == prior_damage + 1 and victim.modifier.stacks == 1
+            and h.service.states["100"] == new_cloud,
+            "old cleanup failure cannot block or corrupt a new cloud at the same caster key")
+        h.service.clear()
+        assert(victim.modifier == nil and next(h.service.states) == nil and next(h.tasks) == nil
+            and particle.destroys == 1 and particle.releases == 1)
+    end
+end
 
 local deaths = harness(5)
 local next_victim = deaths.unit(2, 200, 200)
@@ -260,4 +395,4 @@ for _, failure in ipairs({"create", "control"}) do
     assert(victim.modifier == nil and next(broken.service.states) == nil)
 end
 
-print("POISON_SULLEN_SHROUD_PASS: stationary CP0/1 radius400; exact5/7 ticks, caster lock, independent index0 cleanup, armor leave/expiry, death300x3 and cosmetic-failure gameplay")
+print("POISON_SULLEN_SHROUD_PASS: natural expiry soft-stops native shroud after exact5/7 ticks; radius400, armor/lock/death bounds, immediate clear/invalid, overlapping/recast isolation and independent failed cleanup; native fading not simulated")
