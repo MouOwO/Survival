@@ -20,6 +20,7 @@ FIELDS = {
     "social_draw": {"pool_id"}, "promotion": {"fragment_id","day_key"},
     "daily_init": {"today"}, "daily_claim": {"today","target_day"},
     "vip_claim": {"reward_id"}, "vip_purchase": {"reward_id"},
+    "title_equip": {"title_id"},
     "work_upgrade": {"item_id","expected_level"},
     "building_upgrade": {"item_id","expected_level"},
     # No simulated currency/faith grants in the HTTP integration.
@@ -73,6 +74,11 @@ class ArchiveService:
             item=self.bundle.tables["archive_vip_rewards"].get(c.get("reward_id"))
             group="privileges" if kind=="vip_claim" else "packages"
             if not item or not item.get("enabled") or item["group_id"]!=group: raise ArchiveError("vip_reward_invalid")
+        if kind=="title_equip":
+            title_id=c.get("title_id")
+            item=self.bundle.tables.get("archive_titles",{}).get(title_id) if isinstance(title_id,str) else None
+            if not isinstance(title_id,str) or (title_id!="" and (not item or not item.get("enabled"))):
+                raise ArchiveError("archive_title_invalid")
         if kind=="daily_claim": integer("target_day",0,1000000)
         if kind.startswith("lottery_"):
             if c.get("pool_id") not in self.bundle.tables["lottery_pool_definitions"]: raise ArchiveError("lottery_pool_invalid")

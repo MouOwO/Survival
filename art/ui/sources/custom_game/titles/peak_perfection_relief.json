@@ -1,0 +1,17 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Use case: precise-object-edit / 3D material style-transfer. Edit target: the attached transparent Chinese game title 登峰造极. Create a convincing sculpted 3D-relief version of THIS SAME emblem for an overhead game title. Preserve the exact four Chinese characters 登峰造极, their brush-calligraphy silhouettes, their current large readable front-face size and placement, the rich red outline, symmetric golden double dragons, red gems, and dark red ribbon. Main change: turn the flat lettering into thick extruded gold-metal calligraphy, with clearly visible deep burgundy/antique-gold SIDE WALLS extending down and slightly right, crisp beveled gold front edges, dimensional corner highlights and strong clean contact shadows cast onto the recessed red ribbon behind. The letter front faces must stay almost straight-on and fully readable; show depth through side faces rather than rotating the whole word into an illegible perspective. Make extrusion visibly substantial (roughly 15 percent of character height), but don't clutter or fill holes inside characters. Faces polished warm gold with controlled highlights and material shading, not flat white light. The dragons are a secondary recessed bas-relief frame with dark gold shadows and restrained rim light, visibly BEHIND the letters; no bright competing surrounding halo or glitter cloud. Existing gems stay as small rear accents. Upper-left key light, subtle warm rim light. Maintain compact horizontal 3:1 layout approximately 2172x724, keep full silhouette inside canvas with a tiny safe transparent margin, preserve lettering's current displayed size. No new decorations, no extra words, no pedestal, no scene, no background, no watermark, no checkerboard pixels. Output genuine transparent RGBA sprite. This is a baked 3D-looking UI asset; moving light is implemented separately in the game, do not bake a white sweep across the text.",
+  "asset": "art/ui/sources/custom_game/titles/peak_perfection_relief.png",
+  "implementation": "transparent sprite with baked 3D relief, not a world mesh",
+  "overhead_size": [
+    204,
+    68
+  ],
+  "sweep_period_seconds": 3,
+  "sweep_duration_seconds": 0.9,
+  "image_size": [
+    2169,
+    725
+  ],
+  "runtime_asset": "panorama/src/images/custom_game/titles/peak_perfection_dragons_red.png"
+}

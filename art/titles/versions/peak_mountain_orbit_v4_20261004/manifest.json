@@ -1,0 +1,335 @@
+{
+  "id": "peak_mountain_orbit_v4_20261004",
+  "display_name": "登峰造极·分段绕山 V4",
+  "recall_phrase": "恢复称号绕山 V4",
+  "created": "2026-10-04",
+  "timing": {
+    "ascent_seconds": 3,
+    "repeat_seconds": 5,
+    "sweep_seconds": 3
+  },
+  "files": [
+    {
+      "path": "files/panorama/src/scripts/custom_game/title_layered_art.js",
+      "workspace_path": "panorama/src/scripts/custom_game/title_layered_art.js",
+      "role": "title",
+      "sha256": "0e6c9bd7d598e383f99ed0cec3e0ea8dcc4fe29bf1837e10394d6e90ae7a4e23",
+      "bytes": 5969
+    },
+    {
+      "path": "files/panorama/src/scripts/custom_game/title_world.js",
+      "workspace_path": "panorama/src/scripts/custom_game/title_world.js",
+      "role": "title",
+      "sha256": "657e4a7f9a47f948037014eb86f9562259fd48784d8b259d59a6aa3d335f3f00",
+      "bytes": 11805
+    },
+    {
+      "path": "files/panorama/src/scripts/custom_game/title_layered_art_orbit_v4.js",
+      "workspace_path": "panorama/src/scripts/custom_game/title_layered_art_orbit_v4.js",
+      "role": "title",
+      "sha256": "0e6c9bd7d598e383f99ed0cec3e0ea8dcc4fe29bf1837e10394d6e90ae7a4e23",
+      "bytes": 5969
+    },
+    {
+      "path": "files/panorama/src/scripts/custom_game/title_world_orbit_v4.js",
+      "workspace_path": "panorama/src/scripts/custom_game/title_world_orbit_v4.js",
+      "role": "title",
+      "sha256": "657e4a7f9a47f948037014eb86f9562259fd48784d8b259d59a6aa3d335f3f00",
+      "bytes": 11805
+    },
+    {
+      "path": "files/panorama/src/styles/custom_game/archive_titles.css",
+      "workspace_path": "panorama/src/styles/custom_game/archive_titles.css",
+      "role": "title",
+      "sha256": "a5ae82bf6bec00d42f80198b61ad49993341ff980de2fb87f882fc0b15f0e214",
+      "bytes": 3769
+    },
+    {
+      "path": "files/panorama/scripts/custom_game/title_layered_art_orbit_v4.vjs_c",
+      "workspace_path": "panorama/scripts/custom_game/title_layered_art_orbit_v4.vjs_c",
+      "role": "title",
+      "sha256": "42034330aa26d1c91956259b6cdd7c6fc3689a7ca4a33a78fbb5750e3e053dd3",
+      "bytes": 6833
+    },
+    {
+      "path": "files/panorama/scripts/custom_game/title_world_orbit_v4.vjs_c",
+      "workspace_path": "panorama/scripts/custom_game/title_world_orbit_v4.vjs_c",
+      "role": "title",
+      "sha256": "fe5f3d06b4f7e3df1a9060d7aa43d34c07cbf3c538f9af4d479fe0e13cf592b7",
+      "bytes": 12669
+    },
+    {
+      "path": "files/panorama/styles/custom_game/archive_titles.vcss_c",
+      "workspace_path": "panorama/styles/custom_game/archive_titles.vcss_c",
+      "role": "title",
+      "sha256": "a3ca75e44a63fdda9ce8d115626d12b00c8399ad4c717743027ef4cbab898bf7",
+      "bytes": 8272
+    },
+    {
+      "path": "files/tools/build_title_25d.py",
+      "workspace_path": "tools/build_title_25d.py",
+      "role": "title",
+      "sha256": "60455c5999a749989ec3759fadec74420f5b22a773b8aff7af2ba793c88400a4",
+      "bytes": 2246
+    },
+    {
+      "path": "files/tools/test_titles_world_fx.cjs",
+      "workspace_path": "tools/test_titles_world_fx.cjs",
+      "role": "title",
+      "sha256": "157d3d6ab3bbd396ac328d6af12ee9f39a1ef5cee4e2089ae5d3d88e1590a043",
+      "bytes": 8454
+    },
+    {
+      "path": "files/tools/test_titles_ui.cjs",
+      "workspace_path": "tools/test_titles_ui.cjs",
+      "role": "title",
+      "sha256": "e79125146c05c72a5d099fff38e6b83d914e20cf14ead074c5132d09e82ddb09",
+      "bytes": 2197
+    },
+    {
+      "path": "files/art/ui/sources/custom_game/titles/peak_mountain_clean/body.png",
+      "workspace_path": "art/ui/sources/custom_game/titles/peak_mountain_clean/body.png",
+      "role": "title",
+      "sha256": "9a97d1097b0fd35c1991fd539843fc7ebd46b0e3fe950167b0d42f6976013437",
+      "bytes": 1401231
+    },
+    {
+      "path": "files/art/ui/sources/custom_game/titles/peak_mountain_clean/dragon.png",
+      "workspace_path": "art/ui/sources/custom_game/titles/peak_mountain_clean/dragon.png",
+      "role": "title",
+      "sha256": "26227042b3f1318bf256f955def4b2167b7b1470a1041acca2c684bdc0808caa",
+      "bytes": 1627230
+    },
+    {
+      "path": "files/art/ui/sources/custom_game/titles/peak_mountain_clean/generation.json",
+      "workspace_path": "art/ui/sources/custom_game/titles/peak_mountain_clean/generation.json",
+      "role": "title",
+      "sha256": "9af333929173d1733b4ed9f51474c12a963afc3b986f065ce1f066161188c874",
+      "bytes": 3604
+    },
+    {
+      "path": "files/art/ui/sources/custom_game/titles/peak_mountain_clean/head.png",
+      "workspace_path": "art/ui/sources/custom_game/titles/peak_mountain_clean/head.png",
+      "role": "title",
+      "sha256": "9715983950455e261cb55a20763e17b5c1f07ea92c434c2514d14288d8b5e67a",
+      "bytes": 1294722
+    },
+    {
+      "path": "files/art/ui/sources/custom_game/titles/peak_mountain_clean/letters.png",
+      "workspace_path": "art/ui/sources/custom_game/titles/peak_mountain_clean/letters.png",
+      "role": "title",
+      "sha256": "683c15b150598da1703070fe81dce1b71f0df7ff454c10940ff21172a6da8636",
+      "bytes": 1056932
+    },
+    {
+      "path": "files/art/ui/sources/custom_game/titles/peak_mountain_clean/mountains.png",
+      "workspace_path": "art/ui/sources/custom_game/titles/peak_mountain_clean/mountains.png",
+      "role": "title",
+      "sha256": "44a2e8c265fda8e9a7e0c43ccd1466f94004e8119dd7c92bc39f85d179838d21",
+      "bytes": 1528397
+    },
+    {
+      "path": "files/art/ui/sources/custom_game/titles/peak_mountain_clean/orbit_generation.json",
+      "workspace_path": "art/ui/sources/custom_game/titles/peak_mountain_clean/orbit_generation.json",
+      "role": "title",
+      "sha256": "e3bcc93095b0087c5b38ab39e2e257ee22d44c65397208e965ee1024d8c05f2b",
+      "bytes": 2456
+    },
+    {
+      "path": "files/panorama/src/images/custom_game/titles/peak_clean_mountains.png",
+      "workspace_path": "panorama/src/images/custom_game/titles/peak_clean_mountains.png",
+      "role": "title",
+      "sha256": "44a2e8c265fda8e9a7e0c43ccd1466f94004e8119dd7c92bc39f85d179838d21",
+      "bytes": 1528397
+    },
+    {
+      "path": "files/panorama/images/custom_game/titles/peak_clean_mountains_png.vtex_c",
+      "workspace_path": "panorama/images/custom_game/titles/peak_clean_mountains_png.vtex_c",
+      "role": "title",
+      "sha256": "96dcb93d35a0a78204d76ba093471f94ea9fe445696ece332113981ba861f7b2",
+      "bytes": 1530513
+    },
+    {
+      "path": "files/panorama/src/images/custom_game/titles/peak_clean_letters.png",
+      "workspace_path": "panorama/src/images/custom_game/titles/peak_clean_letters.png",
+      "role": "title",
+      "sha256": "683c15b150598da1703070fe81dce1b71f0df7ff454c10940ff21172a6da8636",
+      "bytes": 1056932
+    },
+    {
+      "path": "files/panorama/images/custom_game/titles/peak_clean_letters_png.vtex_c",
+      "workspace_path": "panorama/images/custom_game/titles/peak_clean_letters_png.vtex_c",
+      "role": "title",
+      "sha256": "a9efa8209fed8ad05d0a9297cd0d5c7872dbc82adc260e08ae7be80fa0a267e5",
+      "bytes": 1059048
+    },
+    {
+      "path": "files/panorama/src/images/custom_game/titles/peak_clean_dragon.png",
+      "workspace_path": "panorama/src/images/custom_game/titles/peak_clean_dragon.png",
+      "role": "title",
+      "sha256": "26227042b3f1318bf256f955def4b2167b7b1470a1041acca2c684bdc0808caa",
+      "bytes": 1627230
+    },
+    {
+      "path": "files/panorama/images/custom_game/titles/peak_clean_dragon_png.vtex_c",
+      "workspace_path": "panorama/images/custom_game/titles/peak_clean_dragon_png.vtex_c",
+      "role": "title",
+      "sha256": "de3e3707de1cd8557c7ce5a24b7d87c6e00ee38994f5402aa3d0d9b02897a878",
+      "bytes": 1629346
+    },
+    {
+      "path": "files/panorama/src/images/custom_game/titles/peak_clean_head.png",
+      "workspace_path": "panorama/src/images/custom_game/titles/peak_clean_head.png",
+      "role": "title",
+      "sha256": "9715983950455e261cb55a20763e17b5c1f07ea92c434c2514d14288d8b5e67a",
+      "bytes": 1294722
+    },
+    {
+      "path": "files/panorama/images/custom_game/titles/peak_clean_head_png.vtex_c",
+      "workspace_path": "panorama/images/custom_game/titles/peak_clean_head_png.vtex_c",
+      "role": "title",
+      "sha256": "ff1cfefa95fd1cf7600733e7c3aec476ab9b9958edc6cf1d98f985ad233cd214",
+      "bytes": 1296838
+    },
+    {
+      "path": "files/panorama/src/images/custom_game/titles/peak_clean_body.png",
+      "workspace_path": "panorama/src/images/custom_game/titles/peak_clean_body.png",
+      "role": "title",
+      "sha256": "9a97d1097b0fd35c1991fd539843fc7ebd46b0e3fe950167b0d42f6976013437",
+      "bytes": 1401231
+    },
+    {
+      "path": "files/panorama/images/custom_game/titles/peak_clean_body_png.vtex_c",
+      "workspace_path": "panorama/images/custom_game/titles/peak_clean_body_png.vtex_c",
+      "role": "title",
+      "sha256": "7e705b52bc1b4eef38a3c3b7eda098e4017d8406ad77c3f60242d62fff59c5de",
+      "bytes": 1403347
+    },
+    {
+      "path": "files/panorama/src/scripts/custom_game/archive_180de7e38b.js",
+      "workspace_path": "panorama/src/scripts/custom_game/archive_180de7e38b.js",
+      "role": "integration_reference",
+      "sha256": "fa23da6ba47e66f2cb00091e4e9383b603e916339746293cd54600bb1548d1e0",
+      "bytes": 30288
+    },
+    {
+      "path": "files/panorama/src/scripts/custom_game/archive_180de7e38b_clean_v2.js",
+      "workspace_path": "panorama/src/scripts/custom_game/archive_180de7e38b_clean_v2.js",
+      "role": "integration_reference",
+      "sha256": "fa23da6ba47e66f2cb00091e4e9383b603e916339746293cd54600bb1548d1e0",
+      "bytes": 30288
+    },
+    {
+      "path": "files/panorama/src/layout/custom_game/archive.xml",
+      "workspace_path": "panorama/src/layout/custom_game/archive.xml",
+      "role": "integration_reference",
+      "sha256": "bfd9e3c08a5898c61fbe24b323ff7c0bee631bdc386466aedb314f40d10a67c5",
+      "bytes": 14613
+    },
+    {
+      "path": "files/panorama/layout/custom_game/archive.vxml_c",
+      "workspace_path": "panorama/layout/custom_game/archive.vxml_c",
+      "role": "integration_reference",
+      "sha256": "892499d99e46af85347e95dba0f17e7ae1d135926c51ddd82b3c2af37c07036f",
+      "bytes": 8851
+    },
+    {
+      "path": "files/panorama/scripts/custom_game/archive_180de7e38b_clean_v2.vjs_c",
+      "workspace_path": "panorama/scripts/custom_game/archive_180de7e38b_clean_v2.vjs_c",
+      "role": "integration_reference",
+      "sha256": "cf563470d16b785961e22bf695c4ad7d2cb3228204bdc2a3ad70fe7f8bfa44e8",
+      "bytes": 31152
+    },
+    {
+      "path": "files/scripts/vscripts/systems/title_presentation_service.lua",
+      "workspace_path": "scripts/vscripts/systems/title_presentation_service.lua",
+      "role": "integration_reference",
+      "sha256": "650b07a0f9a2edef2b32b0ab7d2dcb7076ecf848dd276b383f6ca91a8833e877",
+      "bytes": 3467
+    },
+    {
+      "path": "files/scripts/vscripts/systems/title_model_service.lua",
+      "workspace_path": "scripts/vscripts/systems/title_model_service.lua",
+      "role": "integration_reference",
+      "sha256": "b8973ef331fcab00127062814a42f05a8231e9314592c444dfa176c7da4da825",
+      "bytes": 2996
+    },
+    {
+      "path": "files/scripts/vscripts/systems/archive_titles.lua",
+      "workspace_path": "scripts/vscripts/systems/archive_titles.lua",
+      "role": "integration_reference",
+      "sha256": "286cb643c97075b2410b39114e19f7978133fc4d99525809951191dcdea8c7f6",
+      "bytes": 1561
+    },
+    {
+      "path": "files/scripts/vscripts/config/generated/archive_titles.lua",
+      "workspace_path": "scripts/vscripts/config/generated/archive_titles.lua",
+      "role": "integration_reference",
+      "sha256": "c2f56f29ad635f511325fd6813d97befcda2f0745719b80402776e9d265b7c30",
+      "bytes": 567
+    },
+    {
+      "path": "files/scripts/vscripts/tests/test_titles.lua",
+      "workspace_path": "scripts/vscripts/tests/test_titles.lua",
+      "role": "integration_reference",
+      "sha256": "9432475b81fbed7082b3584bd5bdfbe5fdfd1509f3231c20bc22a68ae389d512",
+      "bytes": 3214
+    },
+    {
+      "path": "files/scripts/vscripts/addon_game_mode.lua",
+      "workspace_path": "scripts/vscripts/addon_game_mode.lua",
+      "role": "integration_reference",
+      "sha256": "26c5ec0c2a9584b5a9bf4ae353f90dbd140f6f0b943602701505e45da40c224e",
+      "bytes": 42979
+    },
+    {
+      "path": "files/data/csv/存档系统/archive_titles.csv",
+      "workspace_path": "data/csv/存档系统/archive_titles.csv",
+      "role": "integration_reference",
+      "sha256": "d804abdd6c53beab79886fd6daceac5088a5221f711f16ca49f14d89d595609b",
+      "bytes": 414
+    },
+    {
+      "path": "preview.html",
+      "role": "preview",
+      "sha256": "b231e5dfc8d6cfa173d9752ef9977b2f87cf23fb63f03532d2f21d125be351d8",
+      "bytes": 9222197
+    },
+    {
+      "path": "phase_0.55.png",
+      "role": "preview",
+      "sha256": "4cc5a9659efea0f9eacc684efa20132574a35f0481fa22a1c264cb969b822428",
+      "bytes": 390275
+    },
+    {
+      "path": "phase_1.4.png",
+      "role": "preview",
+      "sha256": "92890d65ae1ceffab5183d199e28b41f5419b8d2ed5596fe825cd5415a723ec1",
+      "bytes": 395428
+    },
+    {
+      "path": "phase_2.1.png",
+      "role": "preview",
+      "sha256": "20a06cdd7dbee496dc064f444446122b4ba9b9d73eefb4f560a5ad7104cb7776",
+      "bytes": 406640
+    },
+    {
+      "path": "phase_3.2.png",
+      "role": "preview",
+      "sha256": "abcf396c616943a57cc3988ab8b1534ff9e008eaa52931797b76aed5139d95f6",
+      "bytes": 453852
+    },
+    {
+      "path": "restore.py",
+      "role": "archive_tool",
+      "sha256": "57a8e8f37ae30f8687da0696f8cc7813db2be3e6aa0231a74e5cae2f837af5e3",
+      "bytes": 1675
+    },
+    {
+      "path": "README.txt",
+      "role": "archive_tool",
+      "sha256": "7535921659b0546e963d30a1ec5057cc57a0813fa975e786f768e5d64bc5014b",
+      "bytes": 1126
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+title_id,display_name,icon,description,unlock_condition,default_unlocked,enabled
+#中文表头:称号ID,名称,图案,说明,解锁条件,默认解锁,启用
+#types:string,string,string,string,string,boolean,boolean
+peak_perfection,登峰造极,file://{images}/custom_game/titles/peak_perfection_dragons_red.png,登临群峰之巅。穿戴后在出战英雄头顶显示。,首发体验称号·免费开放,1,1

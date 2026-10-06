@@ -18,3 +18,4 @@ category_id,display_name,renderer,sort_order,enabled
 "fishing","钓鱼存档","inventory","64","1"
 "building","存档神器","upgrades","65","1"
 "starjoy_points","星悦积分","achievements","31","1"
+"titles","称号","titles","33","1"

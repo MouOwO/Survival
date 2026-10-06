@@ -1,0 +1,28 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const harness=fs.readFileSync('tools/test_archive_compact.cjs','utf8').split('const data=')[0];
+const test=`
+Panel.prototype.SetPanelEvent=function(name,fn){this[name]=fn;};
+let sent=[];env.GameEvents.SendCustomGameEventToServer=(event,data)=>sent.push({event,data});
+vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/title_layered_art.js','utf8'),env);
+env.titleSubmitting=false;env.current='titles';
+const item={id:'peak_perfection',name:'登峰造极',icon:'title.png',count:1,unlocked:1,equipped:0};
+const data={category_id:'titles',categories:[{id:'titles',name:'称号',renderer:'titles'}],rows:[item],title_preview:1};
+env.render(data);
+let c=env.rowCards['titles:0'].panel;
+assert.equal(c.paneltype,'Button');assert(c.BHasClass('ArchiveTitleCard'));
+assert.equal(c.children.find(x=>x.BHasClass('ArchiveTitleName')).text,item.name);
+assert(!c.children.some(x=>x.BHasClass('ArchiveItemName')),'title uses its own layout, not the narrow legacy name wrapper');
+const art=c.children.find(x=>x.BHasClass('ArchiveTitleArt'));
+assert.equal(art.paneltype,'Panel');assert.equal(art.children.filter(x=>x.BHasClass('SurvivalTitleDragon')).length,3);
+assert(art.children.find(x=>x.BHasClass('SurvivalTitleBase')).image.endsWith('peak_clean_letters.png'));
+assert(art.children.find(x=>x.BHasClass('SurvivalTitleMountains')).image.endsWith('peak_clean_mountains.png'));
+c.onactivate();c.onactivate();assert.equal(sent.length,1);assert.equal(sent[0].data.title_id,'peak_perfection');
+env.titleSubmitting=false;item.equipped=1;env.render(data);c=env.rowCards['titles:0'].panel;
+assert(c.BHasClass('ArchiveTitleEquipped'));assert.equal(panel('ArchiveSummary').text,'当前称号：登峰造极');
+c.onactivate();assert.equal(sent[1].data.title_id,'');
+env.titleSubmitting=false;item.unlocked=0;item.count=0;item.equipped=0;env.render(data);
+env.rowCards['titles:0'].panel.onactivate();assert.equal(sent.length,2);
+console.log('PASS title archive UI: equip, unequip, locked rejection, repeated click guard');
+`;
+new Function('require',harness+test)(require);
+require('./test_titles_world_fx.cjs');

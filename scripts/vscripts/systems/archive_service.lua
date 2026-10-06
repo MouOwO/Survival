@@ -92,6 +92,7 @@ local function enabled_categories()
 end
 
 local renderers = {}
+renderers.titles = function(_, archive) return require("systems/archive_titles").rows(archive) end
 renderers.gift = function(_, archive) return require("systems/archive_welfare_rewards").rows(archive) end
 renderers.starjoy_points = function(profile) return require("systems/archive_starjoy_rewards").project(profile) end
 renderers.fishing = function(profile) return (require("systems/archive_fishing_view").project(profile)) end
@@ -177,7 +178,9 @@ function M.snapshot(player_id, category_id)
         upgrade_pending = upgrade_pending(player_id, category_id),
         buildings = category_id == "building" and require("systems/archive_building_rewards").info(saved(profile), require("systems/archive_calendar").day()) or nil,
         categories = enabled_categories(), has_pass = has_pass(profile) and 1 or 0,
-        rows = projector and projector(profile, saved(profile)) or {},
+        rows = category_id == "titles" and require("systems/title_presentation_service").rows(player_id,saved(profile))
+            or projector and projector(profile, saved(profile)) or {},
+        title_preview = category_id == "titles" and require("systems/title_presentation_service").preview_mode() and 1 or 0,
         online = (category_id == "map_level" or category_id == "work")
             and require("systems/archive_online_rewards").info(saved(profile)) or nil,
         social = require("systems/archive_social_rewards").info(saved(profile), category_id),
@@ -300,6 +303,19 @@ local function enqueue(player_id, command)
     pending[player_id] = pending[player_id] or {}
     pending[player_id][command.id] = pending[player_id][command.id] or command
     return flush(player_id) or { ok = true, pending = true }
+end
+
+function M.equip_title(player_id, title_id)
+    local profile = account_profile(player_id)
+    if not profile then return {ok=false,error="玩家档案尚未加载"} end
+    local presentation = require("systems/title_presentation_service")
+    if presentation.preview_mode() then return presentation.preview(player_id,title_id) end
+    if type(title_id)~="string" or title_id~="" and not require("systems/archive_titles").unlocked(saved(profile),title_id) then
+        return {ok=false,error="称号未解锁或不存在"}
+    end
+    if M.has_pending(player_id) then return {ok=false,error="正在保存进度，请稍候再试"} end
+    serial=(serial or 0)+1
+    return enqueue(player_id,{id=session_id..":title:"..serial,kind="title_equip",title_id=title_id})
 end
 
 function M.send_vip(player_id,result)
@@ -532,6 +548,7 @@ function M.begin_finalization()
 end
 
 function M.init()
+    require("systems/title_presentation_service").init()
     finalizing = false
     sent_pages = {}
     pending, busy, selected, throttles = {}, {}, {}, {}
@@ -671,6 +688,22 @@ function M.init()
         if not category or not category.enabled then return end
         selected[id] = category.category_id
         send(id)
+    end)
+    local title_times = {}
+    CustomGameEventManager:RegisterListener("survival_archive_title_equip",function(_,payload)
+        local id=tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local now=GameRules:GetGameTime()
+        if title_times[id] and now-title_times[id]<0.3 then return end
+        title_times[id]=now
+        local result=M.equip_title(id,payload.title_id)
+        if not result.ok then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
+        -- Always acknowledge, even when an unchanged snapshot would be suppressed.
+        local player=PlayerResource:GetPlayer(id)
+        if player then CustomGameEventManager:Send_ServerToPlayer(player,"survival_archive_title_result",
+            {ok=result.ok,error=result.error,preview=result.preview and 1 or 0}) end
+        sent_pages[id]=nil
+        send_page(id,"titles")
     end)
     local promotion_times = {}
     local draw_times = {}

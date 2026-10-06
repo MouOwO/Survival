@@ -427,3 +427,5 @@ __pycache__/
 !/scripts/vscripts/tests/test_worker_visuals.lua
 !/scripts/vscripts/tests/test_payment_service.lua
 !/scripts/vscripts/tests/test_paid_hero_unlock.lua
+
+!/scripts/vscripts/tests/test_titles.lua

@@ -1,0 +1,75 @@
+﻿{
+  "titles": [
+    {
+      "id": "jinghong",
+      "name": "惊鸿",
+      "motif": "One elegant ivory-white long-necked phoenix/swan in a graceful rightward flight, wings sweeping across upper left, restrained peach-pink wing shadows, a few broad feather groups. Thin rose-gold trim. The two calligraphy characters are ivory pearl with rose-gold beveled edges. Two large pale pink petals at most. No ribbon tangles.",
+      "ratio": "2:1"
+    },
+    {
+      "id": "youlong",
+      "name": "游龙",
+      "motif": "One powerful emerald-green Chinese dragon coiling BEHIND the two gold calligraphy characters, readable head at upper right, tail flowing to lower left. Dark jade body with large simplified scales, broad gold mane shapes, obvious claws. Smooth satin gold lettering with deep forest-green sides. One restrained cloud curl at the bottom, no decorative filigree.",
+      "ratio": "2:1"
+    },
+    {
+      "id": "jian_tianya",
+      "name": "仗剑天涯",
+      "motif": "A single elegant Chinese straight sword angled from lower left hilt to upper right blade tip behind four large silver-white calligraphy characters. Thin antique-gold letter edges, dark ink-blue shadow. A simple burgundy tassel hangs from left hilt. Two broad teal mist strokes, with large clear gaps, imply flowing sword qi. No detailed engraved gold filigree.",
+      "ratio": "3:1"
+    },
+    {
+      "id": "tianxia_diyi",
+      "name": "天下第一",
+      "motif": "A balanced symmetric composition: TWO strong golden Chinese dragons flank four dominant gold calligraphy characters, heads at upper left and upper right looking outward with matching weight, thick curved bodies supporting behind lettering. One small muted red sun centered behind them. Smooth satin gold letters with deep oxblood red bevel sides. Omit sword, crown, gemstones, floating rocks and baroque clouds. Dragons are framing accents, text must dominate.",
+      "ratio": "3:1"
+    },
+    {
+      "id": "cangqiong",
+      "name": "苍穹之巅",
+      "motif": "Wide regal violet and silver title: four dominant pearl-silver brush calligraphy characters with deep violet sides. TWO restrained indigo feather wings extend symmetrically at far ends, three simple mountain silhouettes behind text, one thin incomplete moon arc above center. Sparse pale lavender mist at base. No central jewelry pendant or star field, no overlapping magic circles.",
+      "ratio": "3:1"
+    },
+    {
+      "id": "sihai",
+      "name": "纵横四海",
+      "motif": "Wide maritime title: four dominant icy silver-blue brush calligraphy characters with navy depth. Two small readable sailing ship silhouettes flank text, three broad sweeping blue wave crests beneath. A single modest compass circle behind center, and one tiny compass-star at bottom center. Restrained silver edging; no baroque metal scrollwork, no spray droplets or foam particles.",
+      "ratio": "3:1"
+    },
+    {
+      "id": "daoyuan",
+      "name": "大道本源",
+      "motif": "Wide Daoist golden title: four dominant warm ivory-gold calligraphy characters. One clear black-and-gold yin-yang disk centered BEHIND upper half of text, only one thin ring around it. Two symmetrical long flowing gold cloud brush strokes at sides. Deep amber letter bevels. Lots of transparent breathing room. No rune grids, no concentric circles, no floating specks.",
+      "ratio": "3:1"
+    },
+    {
+      "id": "chushen",
+      "name": "出神入化",
+      "motif": "Wide violet arcane title: four dominant luminous ivory calligraphy characters with soft lavender face gradients and deep purple beveled sides. Two elegant purple energy-dragon silhouettes curl outward at left and right; each made of two or three smooth broad flowing strokes with a legible horned head, no scribbly lightning. One tiny yin-yang emblem and single arc behind center. Fine warm-gold rim accents, no tangled filaments.",
+      "ratio": "3:1"
+    }
+  ],
+  "rounds": [
+    {
+      "version": 1,
+      "purpose": "主题、文字和主体构图初稿"
+    },
+    {
+      "version": 2,
+      "purpose": "减去重复装饰，压低颗粒与密纹"
+    },
+    {
+      "version": 3,
+      "purpose": "逐张修正结构、文字与留白"
+    },
+    {
+      "version": 4,
+      "purpose": "接入克制动态与存档展示"
+    },
+    {
+      "version": 5,
+      "purpose": "实际尺寸与背景适配，选择最终版"
+    }
+  ],
+  "unlock_policy": "仅测试模式可试穿；正式解锁条件后补。"
+}

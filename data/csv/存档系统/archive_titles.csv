@@ -1,0 +1,12 @@
+title_id,display_name,icon,description,unlock_condition,default_unlocked,enabled
+#中文表头:称号ID,名称,图案,说明,解锁条件,默认解锁,启用
+#types:string,string,string,string,string,boolean,boolean
+peak_perfection,登峰造极,file://{images}/custom_game/titles/peak_perfection_dragons_red.png,登临群峰之巅。穿戴后在出战英雄头顶显示。,首发体验称号·免费开放,1,1
+jinghong,惊鸿,file://{images}/custom_game/titles/series/jinghong_v3.png,穿戴后在出战英雄头顶显示。,暂未开放,0,1
+youlong,游龙,file://{images}/custom_game/titles/series/youlong_v3.png,穿戴后在出战英雄头顶显示。,暂未开放,0,1
+jian_tianya,仗剑天涯,file://{images}/custom_game/titles/series/jian_tianya_v3.png,穿戴后在出战英雄头顶显示。,暂未开放,0,1
+tianxia_diyi,天下第一,file://{images}/custom_game/titles/series/tianxia_diyi_v3.png,穿戴后在出战英雄头顶显示。,暂未开放,0,1
+cangqiong,苍穹之巅,file://{images}/custom_game/titles/series/cangqiong_v3.png,穿戴后在出战英雄头顶显示。,暂未开放,0,1
+sihai,纵横四海,file://{images}/custom_game/titles/series/sihai_v3.png,穿戴后在出战英雄头顶显示。,暂未开放,0,1
+daoyuan,大道本源,file://{images}/custom_game/titles/series/daoyuan_v3.png,穿戴后在出战英雄头顶显示。,暂未开放,0,1
+chushen,出神入化,file://{images}/custom_game/titles/series/chushen_v3.png,穿戴后在出战英雄头顶显示。,暂未开放,0,1

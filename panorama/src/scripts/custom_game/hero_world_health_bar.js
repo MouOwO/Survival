@@ -8,6 +8,11 @@
     var container = $("#SurvivalHeroWorldHealthBars");
 
 
+    function barWidth(state) {
+        var width = Number(state && state.bar_width);
+        return width === 120 || width === 156 ? width : 62;
+    }
+
     function localTeam() {
         try {
             return Number(Players.GetTeam(Game.GetLocalPlayerID()));
@@ -70,6 +75,7 @@
         states[key] = value;
         var bar = ensurePanel(key);
         if (!bar) return;
+        bar.style.width = barWidth(value) + "px";
         var health = Math.max(0, Number(value.health) || 0);
         var maximum = Math.max(1, Number(value.max_health) || 1);
         var percent = Math.max(0, Math.min(100, 100 * health / maximum));
@@ -143,13 +149,14 @@
                 hide(key);
                 return;
             }
-            var localX = (screenX - containerPosition.x) / scaleX - 31;
+            var width = barWidth(state);
+            var localX = (screenX - containerPosition.x) / scaleX - width / 2;
             var localY = (screenY - containerPosition.y) / scaleY - 26;
             if (!isFinite(localX) || !isFinite(localY)) {
                 hide(key);
                 return;
             }
-            if(visibility&&visibility.Overlaps(occlusion,screenX-31*scaleX,screenY-26*scaleY,62*scaleX,11*scaleY)){
+            if(visibility&&visibility.Overlaps(occlusion,screenX-width/2*scaleX,screenY-26*scaleY,width*scaleX,11*scaleY)){
                 hide(key);return;
             }
             bar.style.position = localX.toFixed(2) + "px "

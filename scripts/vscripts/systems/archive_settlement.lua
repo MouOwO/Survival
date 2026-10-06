@@ -28,6 +28,13 @@ function M.settle(profile, command, pass)
     archive.version = 1
     for _,key in ipairs({"clear_counts","completed","shadow_counts","processed"}) do archive[key]=archive[key] or {} end
     if archive.processed[command.id] then return {ok=true,duplicate=true,archive=archive,gameplay_stats=stats} end
+    -- Equipping cosmetics must not reconcile or award unrelated gameplay bonuses.
+    if command.kind == "title_equip" then
+        local ok, reason = require("systems/archive_titles").apply(command, archive)
+        if not ok then return {ok=false,terminal=true,error=reason} end
+        archive.processed[command.id] = true
+        return {ok=true,archive=archive,gameplay_stats=stats}
+    end
     require("systems/archive_starjoy_rewards").reconcile(stats)
     if command.kind == "online_checkpoint" or command.kind == "work_upgrade" then
         local ok, reason = require("systems/archive_online_rewards").apply(command, archive, stats, apply_effects)

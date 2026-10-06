@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 
 MODULES = ("archive_settlement", "archive_challenge_rewards", "archive_social_rewards",
-           "archive_daily_rewards", "archive_online_rewards", "archive_endless_config", "archive_endless_rewards", "archive_building_rewards", "lottery_http_settlement", "archive_starjoy_rewards", "archive_vip_rewards", "archive_calendar", "archive_welfare_rewards")
+           "archive_daily_rewards", "archive_online_rewards", "archive_endless_config", "archive_endless_rewards", "archive_building_rewards", "lottery_http_settlement", "archive_starjoy_rewards", "archive_vip_rewards", "archive_calendar", "archive_welfare_rewards", "archive_titles")
 # Presentation tables have a different schema and never participate in settlement.
 PRESENTATION_CSV = {"archive_icon_presentation.csv", "archive_item_icons.csv", "archive_navigation_icons.csv"}
 

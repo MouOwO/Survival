@@ -1,0 +1,18 @@
+{
+  "tool": "built-in image_gen",
+  "asset": "art/ui/sources/custom_game/titles/peak_perfection_dragons.png",
+  "prompt": "Edit the attached image, which is the exact approved final appearance of the Chinese game title 登峰造极. Remove ONLY the black/dark background to produce a genuine transparent RGBA game sprite. Preserve the original double golden dragons, red banner, central red jewels, exact four Chinese characters 登峰造极, fine gold edges, flames and bright golden sparkles. Do not redesign, do not change the wording or lettering, do not change composition or colors of the emblem. Keep meaningful luminous gold effects with soft alpha; remove the dark rectangular background and dark haze so it overlays cleanly on gameplay. Trim excess empty space above and below, with a small safe transparent margin around the complete emblem and glow; deliver a wide horizontal badge sprite, centered and uncropped. This is an edit of the user's approved asset, not a new design.",
+  "transparent_background": true,
+  "image_size": [
+    1774,
+    887
+  ],
+  "overhead_size": [
+    204,
+    102
+  ],
+  "archive_preview_size": [
+    278,
+    139
+  ]
+}

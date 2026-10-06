@@ -1,0 +1,23 @@
+﻿{
+  "tool": "built-in image_gen",
+  "prompts": [
+    "Edit this transparent mountain sprite to remove visual clutter and noisy AI texture. Preserve its wide canvas aspect, general mountain silhouette, highest peak slightly left of center, overall placement and transparent alpha. Dramatically simplify to THREE main dark jade mountain silhouettes, broad clean shaded rock planes with just a few gold rim highlights, one or two restrained pale mist ribbons. Remove all gold dust, sparkles, floating fragments, leaf flecks, tiny trees, dense foliage, etched microtexture, granular lighting, sun halo and dense decorative curling gold base. Keep at most a single thin subdued gold mist stroke along base. Sophisticated clean hand-painted Chinese fantasy game UI art that reads clearly at only 180 pixels wide, NOT photorealistic, not pixelated, not blurred, not flat clipart. Crisp antialiased outer edges and smooth shaded interiors. Dark teal/jade, antique gold; brightness and detail subordinate to foreground lettering. No letters, no dragon, no plaque, no frame. True transparent background, no dark rectangle or checkerboard.",
+    "Edit only the material/detail of this exact four-character transparent lettering layer. Keep Chinese 登峰造极 exactly, keep all glyph silhouettes, brushstroke arrangement, size, canvas dimensions and positions including the transparent upper area. Remove the hammered gold grain, cracks, flecks, gritty specular noise, layered razor-edge clutter and thick dark extrusion. Make broad silky satin antique-gold faces with smooth continuous highlight gradients, a single clean narrow warm red outline, and restrained bevel shading. Much calmer mid-gold with pale highlights, not near-white overexposure. Preserve sharp calligraphic edges and readable strokes, NOT blur, NOT printed font, NOT flat cartoon. No sparkles, no extra ornaments, no clouds/mountains/dragons, no plaque, no other text. Real transparent alpha, clean antialiased edges. Target use: premium game title rendered only 180px wide. Elegant rather than encrusted, 70% less surface detail. Do not change the glyph geometry.",
+    "Edit this exact transparent Chinese gold dragon sprite into cleaner elegant game illustration. PRESERVE the outer S-coiled silhouette, head facing right, head and tail positions, square canvas and transparent alpha. Reduce ornament density by at least 60%: keep two clear horns, two flowing whiskers, a simple organized mane with 4-6 broad locks, and selective larger scale accents mostly along the back instead of hundreds of individually sparkling scales. Use smooth satin antique-gold shading with broad continuous highlight bands, restrained dark gold shadows, one small amber eye without bloom. Remove all gritty texture, gold flecks, tiny spines, needle-thin flyaway ornament, fractal edges, overexposed white specular dots and neon edge glow. Retain convincing dragon anatomy and elegant curved body, NOT toy cartoon and NOT a stiff metal bracelet. Clean crisp antialiased edges, no blur. No text, mountains, clouds, ornaments or background. Intended display about 80 pixels high: prioritize a strong simple silhouette and clearly readable head. Actual transparent background."
+  ],
+  "assets": {
+    "mountains": "mountains.png",
+    "letters": "letters.png",
+    "dragon": "dragon.png"
+  },
+  "animation": {
+    "ascent_seconds": 3,
+    "repeat_seconds": 5,
+    "sweep_seconds": 3
+  },
+  "changes": [
+    "Reduced microtexture and decorative flecks",
+    "Continuous helix with foreground visibility during ascent",
+    "Half-density movement residue"
+  ]
+}
