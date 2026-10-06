@@ -231,16 +231,18 @@ technology[0] = { attack_bonus_pct = 20, attack_speed_bonus_pct = 25 }
 bus.emit(events.TECHNOLOGY_STATS_CHANGED, { player_id = 0, changed_section = "hero" })
 near(snapshot(0).attack_min, 492 * 1.2, "effective technology attack change")
 near(snapshot(0).attack_speed, 2.5, "effective technology attack speed")
-assert(delta(first, before, "technology") == 1 and delta(first, before, "bat") == 1
+assert(delta(first, before, "technology") == 1 and delta(first, before, "bat") == 0
     and delta(first, before, "weapon_refresh") == 1)
+near(first.modifiers.modifier_weapon_stat_projection.snapshot.hero_attack_speed_bonus_pct,
+    25, "speed-only changes refresh the native attack-speed modifier")
 near(first.health, 600, "technology changes cannot refill health")
 before = copy_counts(first)
 first.fail_next_bat = true
-technology[0].attack_speed_bonus_pct = 50
+technology[0].attack_interval_flat = 0.1
 bus.emit(events.TECHNOLOGY_STATS_CHANGED, { player_id = 0, changed_section = "hero" })
-near(first.bat, 0.4, "a native setter can explicitly reject a projection")
+near(first.bat, 0.5, "a native setter can explicitly reject a projection")
 bus.emit(events.TECHNOLOGY_STATS_CHANGED, { player_id = 0, changed_section = "hero" })
-near(first.bat, 1 / 3, "failed setter must retry when the effective value remains unchanged")
+near(first.bat, 0.4, "failed setter must retry when the effective value remains unchanged")
 assert(delta(first, before, "bat") == 2, "the failed write cannot be cached as successfully applied")
 bus.emit(events.TECHNOLOGY_STATS_CHANGED, { player_id = 0, changed_section = "hero" })
 assert(delta(first, before, "bat") == 2, "successful retry restores stable-write suppression")

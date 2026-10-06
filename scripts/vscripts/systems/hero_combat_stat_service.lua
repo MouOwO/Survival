@@ -483,6 +483,10 @@ local function recalculate(player_id, reason, growth_snapshot)
         progression_all_attributes = progression_attributes,
         progression_attack_flat = progression_attack_flat,
         base_attack_time = base_attack_time,
+        -- Equipment owns its own flat attack-speed projection. Research,
+        -- roguelike and permanent bonuses add to it through the hero modifier,
+        -- exactly as in the panel formula; they must not also divide BAT.
+        hero_attack_speed_bonus_pct = researcher_attack_speed_pct,
         hero_damage_multiplier = hero_damage_multiplier,
         engine_attack_min = debug_attack or ((state.engine_base_attack_min
             + attribute_attack_bonus * state.damage_multiplier)
@@ -549,13 +553,14 @@ local function recalculate(player_id, reason, growth_snapshot)
     end
     next_snapshot.refresh_version = tonumber(state.refresh_version) or 0
     state.snapshot = next_snapshot
+    state.unit.survival_attack_speed = next_snapshot.attack_speed
     -- Modifier ForceRefresh below can request this snapshot recursively.
     state.fixed_attack_interval = runtime_attack_interval
     state.exclusive_attack_multiplier = exclusive_attack_multiplier
     state.attribute_attack_bonus = attribute_attack_bonus
     local native_changed = apply_base_projection(state) or health_changed
     local bat_changed = set_native_value(state, "base_attack_time", "SetBaseAttackTime",
-        base_attack_time / math.max(0.01, 1 + researcher_attack_speed_pct / 100))
+        base_attack_time)
     native_changed = native_changed or bat_changed
     state.unit.survival_seven_sins_final_damage_pct =
         tonumber(essence.final_damage_pct) or 0
@@ -609,6 +614,7 @@ local function recalculate(player_id, reason, growth_snapshot)
     -- UI metadata and unchanged growth events do not require ForceRefresh.
     local modifier_values = {
         base_attack_time = base_attack_time,
+        hero_attack_speed_bonus_pct = researcher_attack_speed_pct,
         engine_weapon_attack_bonus = engine_weapon_attack_bonus,
         engine_research_attack_bonus = engine_research_attack_bonus,
         critical_chance_pct = next_snapshot.critical_chance_pct,

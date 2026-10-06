@@ -320,7 +320,7 @@ local function on_tree_hit(payload)
         tonumber(payload.gold_per_hit_flat) or 0
     ))
     if payload.source == "lumberjack" then
-        harvest_feedback.add(payload.player_id, current_tree, efficiency, gold_amount)
+        harvest_feedback.add(payload.player_id, attacker, efficiency, gold_amount)
     else
         particle_manager.show_green_number(attacker, efficiency, player)
     end

@@ -702,6 +702,7 @@ function M.precache(context)
     end
     local precached_lasers = {}
     require("systems/zeus_lightning_visual").precache(context)
+    require("systems/hero_return_home_visual").precache(context)
     PrecacheResource("particle", "particles/units/heroes/hero_siren/siren_net.vpcf", context)
     PrecacheResource("particle", "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact.vpcf", context)
     for _, row in ipairs(require("config/generated/tower_laser_effects").rows or {}) do

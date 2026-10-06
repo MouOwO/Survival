@@ -2,13 +2,14 @@
   "reference_video": "https://www.bilibili.com/video/BV1Jg411C7Fm/?t=1635",
   "reference_time": "27:15",
   "identified_by_user": "Dark Willow W, Shadow Realm",
+  "current_binding": "class_4 first profession form: Fireline Sentinel, absolute levels 6–10 (UI R, legacy CSV N). Later machine-gun forms keep only their purple ring.",
   "root": "particles/survival/towers/death_willow/shadow_ground.vpcf",
   "outputs": [
     {
       "resource": "particles/survival/towers/death_willow/shadow_ground_soft.vpcf",
       "native": "particles/units/heroes/hero_dark_willow/dark_willow_shadow_realm_ground_soft.vpcf",
       "native_sha256": "22905d3de58e7d9db7869a6889c2a3fd98699a35c44f994ca4bd0fead3d03e6c",
-      "source_sha256": "f31bc1191d00ead1f1be1510514bf81f972b08d74b30030e8bb739d66ffb2d18",
+      "source_sha256": "ddf935fb4866038aea7127a8fa05ebd7448dcc39372662d752f3d11f3a8f80e7",
       "max_particles": 1,
       "children": [],
       "preserved_renderers": true,
@@ -19,7 +20,7 @@
       "resource": "particles/survival/towers/death_willow/shadow_ground.vpcf",
       "native": "particles/units/heroes/hero_dark_willow/dark_willow_shadow_realm_ground.vpcf",
       "native_sha256": "ff70bac2093d0a090df8900d051a930eea3db49277db21ac5796b9f495166ab8",
-      "source_sha256": "3d354fa154d6534d5a534c2795ff72af7224a8ecc0269b9eac08a009d572dd6d",
+      "source_sha256": "ce88c619cdfff22a5e6b9b378279ce2cdd6da3bb6db62336da52528e96dd5d45",
       "max_particles": 1,
       "children": [
         "particles/survival/towers/death_willow/shadow_ground_soft.vpcf"

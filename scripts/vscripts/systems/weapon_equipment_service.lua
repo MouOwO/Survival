@@ -118,11 +118,9 @@ local function visible_item_slot(hero, item)
     return -1
 end
 
--- A challenge reward has already occupied a visible equipment slot when the
--- engine publishes dota_item_picked_up. Adopt that exact entity as the
--- material shell instead of deleting it and hoping AddItem can create another
--- visible shell. Logical inventory remains authoritative for quantity and
--- recipe consumption.
+-- Adopt the engine-picked entity, or merge a ground reward into an existing
+-- visible shell. preview_only is a read-only capacity check for area pickup;
+-- logical inventory remains authoritative for quantity and recipe consumption.
 local function adopt_content_shell(payload)
     local player_id = tonumber(payload.player_id)
     local content_id = tostring(payload.content_id or "")
@@ -139,18 +137,14 @@ local function adopt_content_shell(payload)
     if hero:GetPlayerOwnerID() ~= player_id then
         return { ok = false, error = "content_shell_adopt_owner_mismatch" }
     end
-    local slot = visible_item_slot(hero, item)
-    if slot < 0 then
-        return { ok = false, error = "content_shell_adopt_not_visible" }
-    end
-
     local current = state(player_id)
     if valid_entity(current.hero) and current.hero ~= hero then
         return { ok = false, error = "content_shell_adopt_hero_mismatch" }
     end
-    current.hero = hero
     local existing = current.content_shells[content_id]
-    if valid_entity(existing) and existing ~= item then
+    -- An existing, carried shell can accept ground materials without a spare
+    -- slot. Never merge into a shell that was dropped or belongs to another hero.
+    if existing ~= item and visible_item_slot(hero, existing) >= 0 then
         return {
             ok = true,
             adopted = false,
@@ -158,6 +152,15 @@ local function adopt_content_shell(payload)
             entindex = existing:entindex(),
         }
     end
+
+    if payload.preview_only then
+        return { ok = true, merged = false }
+    end
+    local slot = visible_item_slot(hero, item)
+    if slot < 0 then
+        return { ok = false, error = "content_shell_adopt_not_visible" }
+    end
+    current.hero = hero
 
     item.survival_content_id = content_id
     item.survival_owner_player_id = player_id
@@ -172,6 +175,7 @@ local function adopt_content_shell(payload)
         adopted = true,
         slot = slot,
         entindex = item:entindex(),
+        replaced_shell = existing ~= item and valid_entity(existing) and existing or nil,
     }
 end
 
@@ -184,7 +188,8 @@ local function release_content_shell(payload)
     end
     local current = state(player_id)
     if current.content_shells[content_id] == item then
-        current.content_shells[content_id] = nil
+        current.content_shells[content_id] = valid_entity(payload.replaced_shell)
+            and payload.replaced_shell or nil
     end
     if valid_entity(item) then publish_item_identity(item, content_id, false) end
     return { ok = true }

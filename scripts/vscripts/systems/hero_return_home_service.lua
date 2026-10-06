@@ -3,6 +3,7 @@ local events = require("core/events")
 local destination_validation = require("systems/destination_validation_service")
 local home_destination = require("systems/hero_summon_destination")
 local player_context = require("systems/player_context_service")
+local return_visual = require("systems/hero_return_home_visual")
 
 local M = {}
 
@@ -65,6 +66,7 @@ function M.return_unit(hero, player_id)
             or "return_position_not_found" }
     end
 
+    local origin = hero:GetAbsOrigin()
     hero:Stop()
     ProjectileManager:ProjectileDodge(hero)
     local moved, move_error = destination_validation.teleport(hero, position, false)
@@ -73,6 +75,7 @@ function M.return_unit(hero, player_id)
         return { ok = false, error = move_error }
     end
     position = hero:GetAbsOrigin()
+    return_visual.play(hero, origin, position)
     -- Leave rooms only once movement succeeds. A blocked home destination must
     -- not cancel the player's current encounter or begin its retry cooldown.
     event_bus.request(events.TRAINING_ROOM_EXIT_REQUEST, {

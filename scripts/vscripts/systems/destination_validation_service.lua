@@ -44,12 +44,15 @@ function M.teleport(unit, position, clear_space)
     local valid, reason = M.validate(position, unit)
     local origin = unit:GetAbsOrigin()
     if not valid then return false, reason end
-    unit:SetAbsOrigin(position)
+    -- SetOrigin is the engine's scripted teleport path. SetAbsOrigin only
+    -- changes coordinates, which can leave client interpolation/cloth dragging
+    -- across a long jump. Keep normal per-frame motion outside this service.
+    unit:SetOrigin(position)
     if clear_space ~= false then FindClearSpaceForUnit(unit, position, true) end
     local final_position = unit:GetAbsOrigin()
     valid, reason = M.validate(final_position, unit)
     if valid then return true, nil, final_position end
-    unit:SetAbsOrigin(origin)
+    unit:SetOrigin(origin)
     return false, "final_" .. tostring(reason)
 end
 

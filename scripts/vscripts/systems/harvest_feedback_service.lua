@@ -13,26 +13,26 @@ local function task_id(player_id, entindex)
     return "harvest_feedback_" .. tostring(player_id) .. "_" .. tostring(entindex)
 end
 
-function M.add(player_id, tree, wood, gold)
+function M.add(player_id, worker, wood, gold)
     player_id = tonumber(player_id)
-    if player_id == nil or player_id < 0 or not valid(tree) then return end
-    local entindex = tree:entindex()
+    if player_id == nil or player_id < 0 or not valid(worker) then return end
+    local entindex = worker:entindex()
     local id = task_id(player_id, entindex)
     local entry = pending[id]
-    if entry and entry.tree ~= tree then
+    if entry and entry.worker ~= worker then
         scheduler.cancel(id)
         entry = nil
     end
     if not entry then
-        entry = {tree = tree, player_id = player_id, wood = 0, gold = 0}
+        entry = {worker = worker, player_id = player_id, wood = 0, gold = 0}
         pending[id] = entry
         scheduler.after(INTERVAL, function()
             if pending[id] ~= entry then return end
             pending[id] = nil
-            if not valid(entry.tree) then return end
+            if not valid(entry.worker) then return end
             local player = PlayerResource:GetPlayer(entry.player_id)
             if not player then return end
-            particle_manager.show_green_number(entry.tree, entry.wood, player)
+            particle_manager.show_green_number(entry.worker, entry.wood, player)
             if entry.gold > 0 then
                 CustomGameEventManager:Send_ServerToPlayer(player,
                     "survival_gold_mine_income_number", {

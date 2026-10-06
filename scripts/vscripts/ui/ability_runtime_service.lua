@@ -8,6 +8,7 @@ local hero_passive_definitions = require("config/hero_passive_skill_definitions"
 local hero_skill_tooltip = require("ui/hero_skill_tooltip_view_model")
 local research_events = require("research/research_event_names")
 local builder_ability_stages = require("config/generated/builder_ability_stages")
+local fusion_eligibility = require("systems/lumberjack_fusion_eligibility")
 
 local M = {}
 
@@ -18,6 +19,7 @@ local hero_runtime_trace_by_unit = {}
 local hero_skill_by_ability = {}
 local builder_slot_order_by_ability = {}
 local pending_resource_refresh = {}
+local pending_fusion_refresh = {}
 
 for _, row in ipairs(builder_ability_stages.rows or {}) do
     if row.enabled ~= false and row.ability_name then
@@ -51,13 +53,21 @@ local function ensure_tower_upgrade_active(ability, runtime)
     runtime.engine_activated = ability:IsActivated() and 1 or 0
 end
 
-local function sync_research_ability_active(ability, runtime)
-    if runtime.research_upgrade ~= 1 then return end
-    if ability:GetLevel() < 1 then ability:SetLevel(1) end
-    local active = runtime.available == 1
-    if ability:IsActivated() ~= active then ability:SetActivated(active) end
-    runtime.engine_level = ability:GetLevel()
-    runtime.engine_activated = ability:IsActivated() and 1 or 0
+local function sync_ability_active(ability, runtime)
+    if runtime.passive == 1 or not ability.SetActivated then return end
+    local managed = runtime.research_upgrade == 1 or runtime.lumberjack_fusion == 1
+    if managed and ability.GetLevel and ability:GetLevel() < 1 then ability:SetLevel(1) end
+    -- Restore only deactivation owned by this projection. Unknown/native skills
+    -- keep their own activation rules; costs for other actions remain advisory.
+    if runtime.available == 0 then
+        ability.survival_runtime_disabled = true
+        if not ability.IsActivated or ability:IsActivated() then ability:SetActivated(false) end
+    elseif managed or ability.survival_runtime_disabled then
+        if not ability.IsActivated or not ability:IsActivated() then ability:SetActivated(true) end
+        ability.survival_runtime_disabled = nil
+    end
+    if ability.GetLevel then runtime.engine_level = ability:GetLevel() end
+    if ability.IsActivated then runtime.engine_activated = ability:IsActivated() and 1 or 0 end
 end
 
 local function valid_entity(entity)
@@ -260,7 +270,7 @@ local function trace_combat_hero_runtime(state)
     ))
 end
 
-local function publish(state)
+local function publish(state, fusion_snapshot)
     local unit = state.unit
     if not valid_entity(unit) then
         return
@@ -328,7 +338,8 @@ local function publish(state)
         local runtime = builder.build(
             ability_name,
             state,
-            resource_state
+            resource_state,
+            fusion_snapshot
         )
         local hero_skill = hero_skill_by_ability[ability_name]
         local passive = hero_skill and (
@@ -370,7 +381,9 @@ local function publish(state)
         end
         runtime.resource_version =
             resource_state and resource_state.version or 0
-        sync_research_ability_active(ability, runtime)
+        local passive_ok, engine_passive = pcall(function() return ability:IsPassive() end)
+        runtime.passive = (passive_ok and engine_passive or passive ~= nil) and 1 or 0
+        sync_ability_active(ability, runtime)
         if is_tower_upgrade(ability_name) then
             ensure_tower_upgrade_active(ability, runtime)
             local trace_key = ability:entindex()
@@ -455,10 +468,18 @@ local function refresh_resources(payload)
     local player_id = tonumber(payload.player_id)
     local refreshed = 0
     local tower_transitions = 0
+    local fusion_snapshots = {}
     for _, state in pairs(state_by_unit) do
         if (player_id ~= nil and player_id >= 0 and tonumber(state.player_id) == player_id)
             or ((player_id == nil or player_id < 0) and state.team == payload.team) then
-            tower_transitions = tower_transitions + (publish(state) or 0)
+            local fusion_snapshot
+            if state.building_id == "lumberjack" then
+                local key = tostring(state.player_id) .. ":" .. tostring(state.team)
+                fusion_snapshots[key] = fusion_snapshots[key]
+                    or fusion_eligibility.snapshot(state.player_id, state.team)
+                fusion_snapshot = fusion_snapshots[key]
+            end
+            tower_transitions = tower_transitions + (publish(state, fusion_snapshot) or 0)
             refreshed = refreshed + 1
         end
     end
@@ -495,6 +516,28 @@ local function on_resources(payload)
     end, "ability_resource_refresh_" .. key)
 end
 
+local function queue_fusion_refresh(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    local team = payload and payload.team
+    if player_id == nil or player_id < 0 or team == nil then return end
+    local key = tostring(player_id) .. ":" .. tostring(team)
+    if pending_fusion_refresh[key] then return end
+    pending_fusion_refresh[key] = true
+    local pending = pending_fusion_refresh
+    scheduler.after(0.1, function()
+        if pending ~= pending_fusion_refresh then return end
+        pending[key] = nil
+        local snapshot
+        for _, state in pairs(state_by_unit) do
+            if tonumber(state.player_id) == player_id and state.team == team
+                and state.building_id == "lumberjack" then
+                snapshot = snapshot or fusion_eligibility.snapshot(player_id, team)
+                publish(state, snapshot)
+            end
+        end
+    end, "ability_fusion_refresh_" .. key)
+end
+
 local function on_worker_changed(payload)
     if not payload then return end
     for _, entindex in ipairs(payload.removed_entindexes or {}) do
@@ -509,8 +552,25 @@ local function on_worker_changed(payload)
         worker_payload.level = valid_entity(payload.unit)
             and tonumber(payload.unit.survival_lumberjack_level)
             or payload.level
-        publish_unit(worker_payload)
+        local unit = unit_from_payload(worker_payload)
+        if unit then
+            if worker_payload.building_id == "lumberjack" then
+                if not state_by_unit[unit:entindex()] then
+                    -- Start a newly trained worker safely disabled until the
+                    -- coalesced material snapshot arrives, avoiding a brief
+                    -- clickable button before its first authoritative publish.
+                    ability_utils.for_each(unit, function(ability)
+                        if fusion_eligibility.definition(ability:GetAbilityName())
+                            and ability.SetActivated then
+                            ability:SetActivated(false)
+                        end
+                    end)
+                end
+                state_by_unit[unit:entindex()] = normalize(worker_payload, unit)
+            else publish_unit(worker_payload) end
+        end
     end
+    if payload.worker_type == "lumberjack" then queue_fusion_refresh(payload) end
     for _, state in pairs(state_by_unit) do
         if state.team == payload.team and (
             state.building_id == "main_city"
@@ -596,6 +656,8 @@ local function on_builder_ready(payload)
 end
 
 function M.init()
+    for key in pairs(pending_fusion_refresh) do scheduler.cancel("ability_fusion_refresh_" .. key) end
+    pending_fusion_refresh = {}
     for key in pairs(pending_resource_refresh) do
         scheduler.cancel("ability_resource_refresh_" .. key)
     end
@@ -613,6 +675,12 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)
     event_bus.subscribe(events.BUILDING_DESTROYED, clear_unit)
+    local function on_city_changed(payload)
+        if payload.building_id == "main_city" then queue_fusion_refresh(payload) end
+    end
+    event_bus.subscribe(events.BUILDING_CREATED, on_city_changed)
+    event_bus.subscribe(events.BUILDING_CHANGED, on_city_changed)
+    event_bus.subscribe(events.BUILDING_DESTROYED, on_city_changed)
     event_bus.subscribe(events.TOWER_ABILITY_SYNC_COMPLETED, publish_unit)
     event_bus.subscribe(events.TOWER_FUSION_RUNTIME_CHANGED, publish_unit)
     event_bus.subscribe(events.TOWER_FUSION_RUNTIME_REMOVED, clear_unit)

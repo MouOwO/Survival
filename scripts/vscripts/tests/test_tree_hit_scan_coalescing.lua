@@ -34,7 +34,8 @@ package.loaded["systems/tree_damage_rules"] = {is_allowed_tree_attacker = functi
 package.loaded["systems/rogue_effect_state_service"] = {numeric = function(_, key)
     return key == "builder_peaceful_wood_per_hit" and 2 or 0
 end}
-package.loaded["core/particle_manager"] = {show_green_number = function(_, amount, player)
+package.loaded["core/particle_manager"] = {show_green_number = function(target, amount, player)
+    assert(target == worker, "harvesting numbers must appear on the attacking worker, not its tree")
     assert(player and amount > 0)
     number_calls = number_calls + 1
 end}

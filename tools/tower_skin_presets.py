@@ -27,8 +27,8 @@ ROUTES = {
  'anti_air': ('techies', ('', '', ''), ('21424',), ('20610',)),
 }
 NAMES = {'A':'原生清晰', 'B':'暗色猎手', 'C':'华丽典礼'}
-BASES = ['willow_shadow_realm','leshrac_edict','kinetic_markers','bulldoze','clinkz_embers','ice_vortex','psionic_trap']
-DEATH_BASE_COLORS = {'color_r':'25|219|241', 'color_sr':'180|95|255', 'color_ssr':'255|52|83'}
+BASES = ['io_amber_portal','leshrac_edict','kinetic_markers','bulldoze_ring','clinkz_embers','io_blue_portal','psionic_trap']
+DEATH_BASE_COLORS = {'color_r':'255|150|55', 'color_sr':'255|150|55', 'color_ssr':'255|150|55'}
 COLORS = {'A':['165|100|245','155|165|255','105|195|255','255|185|95','255|130|65','145|220|255','145|215|250'],
           'B':['135|80|210','145|115|235','95|155|240','215|145|70','220|85|50','110|175|235','135|175|235'],
           'C':['200|125|255','200|180|255','155|220|255','255|205|120','255|170|75','190|240|255','180|230|255']}
@@ -146,12 +146,16 @@ def write_base_profiles(preset):
         if not r['profile_id'].startswith('class_'):continue
         n=int(r['profile_id'].split('_')[1])-1
         for key in ('core','detail','detail_ssr','crown'):r[key]=''
-        r.update(native_base=BASES[n],color=COLORS[preset][n],radius_r='96',radius_sr='108',radius_ssr='120',alpha={'A':'0.9','B':'0.95','C':'0.95'}[preset],enabled='0' if r['profile_id']=='class_4' else '1')
+        r.update(native_base=BASES[n],color=COLORS[preset][n],radius_r='96',radius_sr='108',radius_ssr='120',alpha={'A':'0.9','B':'0.95','C':'0.95'}[preset],enabled='1',native_base_r='',color_r='',color_sr='',color_ssr='')
         if r['profile_id']=='class_1':
-            # Outfit presets may change the hero's clothes, never restore the
-            # discarded Dazzle ground layer or override the tier color policy.
+            # Outfit switches must preserve the requested orange portal and
+            # the transfer of the old sigil to the initial machine-gun tower.
             r.update(DEATH_BASE_COLORS,color=DEATH_BASE_COLORS['color_r'],alpha='0.95')
-    save(RES/'tower_visual_profiles.csv',profiles,[('color_r','list','R底座颜色'),('color_sr','list','SR底座颜色'),('color_ssr','list','SSR底座颜色')])
+        elif r['profile_id']=='class_4':
+            r.update(native_base_r='willow_shadow_realm',color_r='25|219|241',color='180|95|255',alpha='0.95')
+        elif r['profile_id']=='class_6':
+            r.update(color='110|175|235',alpha='0.95')
+    save(RES/'tower_visual_profiles.csv',profiles,[('color_r','list','R底座颜色'),('color_sr','list','SR底座颜色'),('color_ssr','list','SSR底座颜色'),('native_base_r','string','R阶段底座样式')])
 
 def write_preset(preset,data):
     aids={s['asset_id'] for s in data['stages']};models={s['asset_id']:s['body_model'] for s in data['stages']}

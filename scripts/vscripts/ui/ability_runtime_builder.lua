@@ -15,6 +15,7 @@ local building_count_limits = require("systems/building_count_limit_service")
 local hero_summon_projection = require("systems/hero_summon_projection")
 local hero_summon_rules = require("config/generated/hero_summon_rules")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
+local lumberjack_fusion = require("systems/lumberjack_fusion_eligibility")
 local M = {}
 local builder_slot_order_by_ability = {}
 local tooltip_definitions = require("config/generated/tooltip_definitions")
@@ -789,7 +790,9 @@ local function hero_summon_runtime(ability_name, state)
     end
     return result
 end
-function M.build(ability_name, state, resources)
+function M.build(ability_name, state, resources, fusion_snapshot)
+    local fusion = lumberjack_fusion.runtime(ability_name, state, resources, fusion_snapshot)
+    if fusion then return fusion end
     local summon = hero_summon_runtime(ability_name, state)
     if summon then return summon end
     local build = build_ability(ability_name, state, resources)

@@ -57,6 +57,7 @@ function ability_survival_pickup_materials:OnSpellStart()
     local candidates = {}
     for _, candidate in ipairs(upgrade_materials.nearby(caster, player_id, origin)) do
         candidate.kind = "upgrade_material"
+        candidate.pickup_origin = origin
         candidates[#candidates + 1] = candidate
     end
     for _, candidate in ipairs(ground_item_pickup.nearby(caster, player_id, origin)) do
@@ -76,20 +77,11 @@ function ability_survival_pickup_materials:OnSpellStart()
         return
     end
 
-    for _, candidate in ipairs(candidates) do
-        local result
+    ground_item_pickup.pickup_batch(caster, player_id, candidates, function(candidate)
         if candidate.kind == "upgrade_material" then
-            result = upgrade_materials.pickup_candidate(candidate, player_id)
+            return upgrade_materials.pickup_candidate(candidate, player_id)
         else
-            result = ground_item_pickup.pickup_candidate(caster, candidate)
+            return ground_item_pickup.pickup_candidate(caster, candidate)
         end
-        if result and result.full then
-            event_bus.emit(events.UI_NOTIFICATION, {
-                player_id = player_id,
-                message = "装备栏已满，已停止拾取剩余物品",
-                level = "error",
-            })
-            break
-        end
-    end
+    end)
 end

@@ -72,6 +72,7 @@ function modifier_weapon_stat_projection:DeclareFunctions()
     return {
         MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
         MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT,
+        MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
         MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE,
         MODIFIER_EVENT_ON_ATTACK_RECORD,
         MODIFIER_EVENT_ON_TAKEDAMAGE,
@@ -245,6 +246,7 @@ function modifier_weapon_stat_projection:AddCustomTransmitterData()
     local current = snapshot(self)
     return {
         base_attack_time = tonumber(current.base_attack_time) or 0,
+        hero_attack_speed_bonus_pct = tonumber(current.hero_attack_speed_bonus_pct) or 0,
         engine_weapon_attack_bonus =
             tonumber(current.engine_weapon_attack_bonus) or 0,
         engine_research_attack_bonus =
@@ -260,6 +262,10 @@ function modifier_weapon_stat_projection:GetModifierBaseAttackTimeConstant()
     local stats = snapshot(self)
     local value = tonumber(stats.base_attack_time)
     return value and math.max(0.1, value) or nil
+end
+
+function modifier_weapon_stat_projection:GetModifierAttackSpeedBonus_Constant()
+    return tonumber(snapshot(self).hero_attack_speed_bonus_pct) or 0
 end
 
 function modifier_weapon_stat_projection:GetModifierPreAttack_BonusDamage()

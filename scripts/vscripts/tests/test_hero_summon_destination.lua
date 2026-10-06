@@ -66,7 +66,8 @@ assert(queries == 1 and ground_calls == 9 and navigation_calls == 9,
     "center and all eight clearance samples validated once")
 local before_ground = ground_calls
 local hero = {IsNull = function() return false end, survival_hero_id = "hero_test",
-    GetAbsOrigin = function() return position end, SetAbsOrigin = function(_, p) position = p end}
+    GetAbsOrigin = function() return position end, SetOrigin = function(_, p) position = p end,
+    SetAbsOrigin = function() error("summon relocation must use scripted teleport") end}
 assert(validation.teleport(hero, position, false))
 assert(position.z == 128 and ground_calls == before_ground, "teleport uses the validated grounded vector")
 

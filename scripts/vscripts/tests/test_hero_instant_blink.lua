@@ -31,6 +31,7 @@ ProjectileManager={ProjectileDodge=function()dodges=dodges+1 end}
 local hero={pos=Vector(0,0,0),survival_hero_id='test',writes=0,
     IsNull=function()return false end,GetAbsOrigin=function(s)return s.pos end,
     SetAbsOrigin=function(s,p)s.pos=p;s.writes=s.writes+1 end,
+    SetOrigin=function(s,p)s.pos=p;s.writes=s.writes+1 end,
     Stop=function()end,EmitSound=function()sounds=sounds+1 end,
     StopSound=function()sounds=sounds-1 end,
     AddNewModifier=function()error('instant blink must not create a motion modifier')end}

@@ -4,7 +4,10 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const source=fs.readFileSync(process.argv[2]||'panorama/src/scripts/custom_game/combat_stats.js','utf8');
 const seam='    // NetTable is the single regular synchronization path.';
 assert(source.includes(seam));
-const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbilityRuntime,scheduleActive:scheduleActive, cosmeticPortraitSentinel:cosmeticPortraitSentinel,
+const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbilityRuntime,restoreAbilityRuntime:restoreAbilityRuntime,
+        hotkeyForAbilityEntry:hotkeyForAbilityEntry,orderVisibleAbilities:orderVisibleAbilities,
+        refreshOfficialUtilityHotkeys:refreshOfficialUtilityHotkeys,officialAbilityHotkeysMatch:officialAbilityHotkeysMatch,
+        executeAbility:executeAbility,scheduleActive:scheduleActive, cosmeticPortraitSentinel:cosmeticPortraitSentinel,
         resetScale:resetTowerPortraitContentScale, applyScale:applyTowerPortraitContentScale,
         restoreHotkey:restoreNativeAbilityHotkey, suppressHotkey:suppressNativeAbilityHotkey,
         refreshAbilities:refreshAbilities, shutdown:shutdownCombatContext,
@@ -47,7 +50,7 @@ function setup(options={}){
   SetParent(parent){assert(parent&&parent.alive===true);if(this.parent)this.parent.children=this.parent.children.filter(c=>c!==this);this.parent=parent;parent.children.push(this);metrics.parents++}
   MoveChildAfter(child,anchor){this.children=this.children.filter(c=>c!==child);this.children.splice(this.children.indexOf(anchor)+1,0,child);metrics.order++}
   SetUnit(...args){assert(this.alive===true);metrics.setUnit.push({panel:this,args});if(this.setUnitFailure==='throw')throw Error('SetUnit unavailable');if(this.setUnitFailure==='false')return false}
-  AddClass(){}SetHasClass(){}SetImage(uri){this.image=uri}
+  AddClass(){}SetHasClass(name,value){this.classes=this.classes||{};this.classes[name]=value}SetImage(uri){this.image=uri}
   GetChildCount(){return this.children.length}GetChild(i){return this.children[i]}
  }
  const root=new Panel('Hud');root.actuallayoutwidth=1920;root.actuallayoutheight=1080;
@@ -69,7 +72,8 @@ function setup(options={}){
  const subscribe=(name,fn)=>{const id=++serial;subscriptions.set(id,{name,fn});return id};
  vm.runInNewContext(instrumented,{$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,GetGameTime:()=>time},
   Players:{GetPlayerHeroEntityIndex:()=>selected},
-  Entities:{GetUnitName:id=>unitNames.get(Number(id))||'npc_dota_hero_test',GetAbility:()=>-1,GetLevel:()=>1,IsHero:()=>true},
+  Entities:Object.assign({GetUnitName:id=>unitNames.get(Number(id))||'npc_dota_hero_test',GetAbility:()=>-1,GetLevel:()=>1,IsHero:()=>true},options.entities||{}),
+  Abilities:options.abilities||{},
   CustomNetTables:{GetTableValue:(name,key)=>runtime[key]||null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},
   GameEvents:{Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},__test:x=>api=x},{filename:'combat_stats.js'});
  function run(id){const job=jobs.get(id);assert(job);jobs.delete(id);job.fn()}

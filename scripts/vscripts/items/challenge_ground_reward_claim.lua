@@ -85,6 +85,7 @@ function M.claim(self, caster)
                 player_id = player_id,
                 content_id = content_id,
                 item = self,
+                replaced_shell = adoption.replaced_shell,
             })
         end
         event_bus.emit(events.UI_NOTIFICATION, {
@@ -98,13 +99,33 @@ function M.claim(self, caster)
 
     self.survival_claimed = true
     self.survival_ground_reward = false
+    -- If the old logical stack was dropped, the newly adopted shell now holds
+    -- its full authoritative quantity. Retire the old representation only
+    -- after a successful grant; failures restore it through SHELL_RELEASE.
+    local replaced = adoption.replaced_shell
+    if replaced and not replaced:IsNull() then
+        local container = replaced.GetContainer and replaced:GetContainer()
+        CustomNetTables:SetTableValue("survival_inventory_item_identity",
+            tostring(replaced:entindex()), { content_id = content_id, removed = 1 })
+        UTIL_Remove(replaced)
+        if container and not container:IsNull() then UTIL_Remove(container) end
+    end
     if not adoption.adopted then
         CustomNetTables:SetTableValue(
             "survival_inventory_item_identity",
             tostring(self:entindex()),
             { content_id = content_id, removed = 1 }
         )
-        if caster.RemoveItem then caster:RemoveItem(self) end
+        -- Area pickup can merge straight from the ground with a full backpack.
+        -- RemoveItem only applies when the engine actually placed this entity.
+        if caster.RemoveItem then
+            for slot = 0, 8 do
+                if caster:GetItemInSlot(slot) == self then
+                    caster:RemoveItem(self)
+                    break
+                end
+            end
+        end
         UTIL_Remove(self)
     end
 

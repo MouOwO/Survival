@@ -11,7 +11,7 @@ foreach ($willowRow in $willowManifest.outputs) {
 }
 foreach ($willowRow in $willowManifest.outputs) {
     $willowTarget = Join-Path $willowEngine ('content/dota_addons/survival/' + $willowRow.resource)
-    $willowResult = @(& (Join-Path $willowEngine 'game/bin/win64/resourcecompiler.exe') -i $willowTarget -game (Join-Path $willowEngine 'game/dota') -f -nop4 2>&1)
+    $willowResult = @(& (Join-Path $willowEngine 'game/bin/win64/resourcecompiler.exe') -i $willowTarget -game (Join-Path $willowEngine 'game/dota') -fshallow -nop4 2>&1)
     $willowResult | Set-Content -LiteralPath (Join-Path $willowLogs ([IO.Path]::GetFileName($willowRow.resource) + '.log'))
     $willowResult | Where-Object { $_ -match 'RESOURCE COMPILE|ERROR:|failed' } | Write-Output
     if ($LASTEXITCODE -ne 0 -or -not ($willowResult -match '0 failed')) { throw "Willow base compile failed: $($willowRow.resource)" }

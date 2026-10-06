@@ -396,6 +396,7 @@ __pycache__/
 !/scripts/vscripts/tests/test_wave_spawn_routing.lua
 !/scripts/vscripts/tests/test_lumberjack_fusion.lua
 !/scripts/vscripts/tests/test_lumberjack_fusion_ui.lua
+!/scripts/vscripts/tests/test_lumberjack_fusion_runtime.lua
 !/scripts/vscripts/tests/test_rogue_item_rewards.lua
 !/scripts/vscripts/tests/test_gold_mine_reward_upgrade.lua
 !/scripts/vscripts/tests/test_rogue_reward_history.lua

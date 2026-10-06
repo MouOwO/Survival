@@ -7,6 +7,7 @@ local worker_system = require("systems/worker_system")
 local armor_balance = require("config/armor_balance")
 
 local M = {}
+local eligibility = require("systems/lumberjack_fusion_eligibility")
 local pending_by_caster = {}
 
 local function valid(unit)
@@ -48,13 +49,8 @@ local function collect_materials(caster, row)
     local caster_entindex = caster:entindex()
     for _, state in ipairs(listed) do
         local unit = state.unit
-        if valid(unit) and unit:entindex() ~= caster_entindex
-            and state.team == caster:GetTeamNumber()
-            and tonumber(state.player_id) == player_id
-            and state.worker_type == "lumberjack"
-            and unit.survival_super_lumberjack ~= true
-            and tonumber(unit.survival_lumberjack_level) == tonumber(row.level)
-            and not unit.survival_lumberjack_fusion_pending then
+        if eligibility.is_material(state, player_id, caster:GetTeamNumber(), row.level)
+            and unit:entindex() ~= caster_entindex then
             result[#result + 1] = unit
             if #result >= tonumber(row.required_count) then break end
         end
@@ -160,13 +156,13 @@ local function fuse(payload)
     end
     pending_by_caster[caster_key] = true
     local player_id = tonumber(caster.survival_player_id)
-    local required_city_level = tonumber(row.required_city_level) or 0
-    if main_city_level(player_id) < required_city_level then
+    local city_level = main_city_level(player_id)
+    if eligibility.prerequisite_error(row, city_level, tonumber(row.required_count)) then
         pending_by_caster[caster_key] = nil
         return { ok = false, error = "fusion_city_level_not_enough" }
     end
     local materials = collect_materials(caster, row)
-    if #materials < tonumber(row.required_count) then
+    if eligibility.prerequisite_error(row, city_level, #materials) then
         pending_by_caster[caster_key] = nil
         return { ok = false, error = "fusion_material_not_enough" }
     end

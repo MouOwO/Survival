@@ -29,8 +29,12 @@ function modifier_rogue_combat_bonus:GetModifierPreAttack_BonusDamage()
     local result = event_bus.request(events.HERO_COMBAT_STATS_GET_REQUEST, {
         player_id = self.player_id,
     }) or {}
-    return (tonumber(result.snapshot and result.snapshot.attack_total) or 0)
-        * pct / 100
+    local stats = result.snapshot or {}
+    -- Hero combat snapshots expose the logical damage range, not attack_total.
+    -- Read its midpoint so early grants and later hero growth both project.
+    local minimum = tonumber(stats.attack_min) or 0
+    local maximum = tonumber(stats.attack_max) or minimum
+    return (minimum + maximum) * 0.5 * pct / 100
 end
 function modifier_rogue_combat_bonus:OnTakeDamage(params)
     if not IsServer() or params.attacker ~= self:GetParent()

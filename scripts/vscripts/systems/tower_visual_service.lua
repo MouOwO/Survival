@@ -20,6 +20,8 @@ local trial_bases = {
     clinkz_embers = "trial/multi_ground",
     ice_vortex = "trial/frost_ground",
 }
+local portal_bases = { io_blue_portal = "ice_portal", io_amber_portal = "amber_portal" }
+local portal_layers = { "ground", "dark_center", "interior", "sparkles" }
 -- Native Shadow Dance smoke bundle, without Slark-specific eye attachments.
 local ultimate_shadow = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
 -- Bulldoze's persistent foot layers; omit its body/hand effects and cast flash.
@@ -83,16 +85,18 @@ local function add_ultimate_shadow(entry)
         Vector(origin.x, origin.y, origin.z + 80), true)
 end
 
-local function add_machine_base(entry)
-    for _, path in ipairs(machine_base) do
-        local id = ParticleManager:CreateParticle(path,
-            PATTACH_ABSORIGIN_FOLLOW, entry.unit)
-        assert(type(id) == "number" and id >= 0, "machine base returned no valid ID")
-        entry.particles[#entry.particles + 1] = id
-        -- Native layers supply their own ground offset (18/20 units) and size.
-        -- Binding at the origin keeps the ring at the feet, not at attach_hitloc.
-        ParticleManager:SetParticleControlEnt(id, 0, entry.unit,
-            PATTACH_ABSORIGIN_FOLLOW, "", entry.unit:GetAbsOrigin(), true)
+local function add_machine_base(entry, ring_only)
+    for offset, path in ipairs(machine_base) do
+        if not ring_only or offset == 2 then
+            local id = ParticleManager:CreateParticle(path,
+                PATTACH_ABSORIGIN_FOLLOW, entry.unit)
+            assert(type(id) == "number" and id >= 0, "machine base returned no valid ID")
+            entry.particles[#entry.particles + 1] = id
+            -- Native layers supply their own ground offset (18/20 units) and size.
+            -- Bind at the feet, not at attach_hitloc; ring_only omits the dark layer.
+            ParticleManager:SetParticleControlEnt(id, 0, entry.unit,
+                PATTACH_ABSORIGIN_FOLLOW, "", entry.unit:GetAbsOrigin(), true)
+        end
     end
 end
 
@@ -125,6 +129,13 @@ function M.apply(state)
     end
     local profile_id = rank.rarity == "UR" and "ultimate" or state.tower_class
     local profile = profiles.by_id[profile_id]
+    local native_base = ""
+    if profile and rank.rarity ~= "N" then
+        -- CSV row rarity differs from overhead rank. Resolve form overrides
+        -- using the authoritative absolute route position (Fireline is R).
+        native_base = profile["native_base_" .. string.lower(rank.rarity)]
+            or profile.native_base or ""
+    end
     local radius, color
     if profile then
         local tier = string.lower(rank.rarity)
@@ -136,10 +147,10 @@ function M.apply(state)
     -- The replacement has no red-star crown; all ten SSR upgrades share its
     -- color and lifetime. Other profiles retain their existing accent policy.
     local red_accent = rank.red_stars > 0
-        and not (profile and profile.native_base == "willow_shadow_realm")
+        and native_base ~= "willow_shadow_realm" and not portal_bases[native_base]
     local key = tostring(profile_id) .. ":" .. rank.rarity
         .. ":" .. tostring(red_accent)
-        .. ":" .. tostring(profile and profile.native_base or "")
+        .. ":" .. tostring(native_base)
     if profile then
         -- A same-tier visual configuration update must retire the old ring.
         key = key .. ":" .. tostring(radius) .. ":" .. tostring(profile.alpha)
@@ -185,12 +196,24 @@ function M.apply(state)
     end
     local ok, err = pcall(function()
         -- A replacement owns the whole base, including former detail/crown art.
-        local trial = trial_bases[profile.native_base]
+        local portal = portal_bases[native_base]
+        if portal then
+            -- Bind every layer explicitly. An invisible empty parent must not
+            -- decide the visibility or CP inheritance of the permanent base.
+            for _, layer in ipairs(portal_layers) do
+                add(entry, portal .. "/" .. layer, radius, profile.alpha, color)
+            end
+            return
+        end
+        local trial = trial_bases[native_base]
         if trial then add(entry, trial, radius, profile.alpha, color); return end
-        if profile.native_base == "bulldoze" then
+        if native_base == "bulldoze_ring" then
+            add_machine_base(entry, true); return
+        end
+        if native_base == "bulldoze" then
             add(entry, "trial/valley_durable", radius, profile.alpha, color)
             add_machine_base(entry); return end
-        if profile.native_base == "psionic_trap" then
+        if native_base == "psionic_trap" then
             add(entry, "trial/valley_evil", radius, profile.alpha, color)
             add_anti_air_base(entry); return end
         add(entry, profile.core, radius, profile.alpha, color)
@@ -218,6 +241,11 @@ function M.precache(context)
     PrecacheResource("particle", ultimate_shadow, context)
     for _, name in pairs(trial_bases) do
         PrecacheResource("particle", prefix .. name .. ".vpcf", context)
+    end
+    for _, portal in pairs(portal_bases) do
+        for _, layer in ipairs(portal_layers) do
+            PrecacheResource("particle", prefix .. portal .. "/" .. layer .. ".vpcf", context)
+        end
     end
     for _, style in ipairs({"dark", "durable", "evil"}) do
         PrecacheResource("particle", prefix .. "trial/valley_" .. style .. ".vpcf", context)

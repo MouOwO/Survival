@@ -5,7 +5,8 @@ $content = Join-Path $engine 'content/dota_addons/Survival/panorama'
 $compiler = Join-Path $engine 'game/bin/win64/resourcecompiler.exe'
 $files = @(
     'images/custom_game/survival_grid/range_mask.png',
-    'images/custom_game/survival_grid/corner.svg',
+    'images/custom_game/survival_grid/reference_edge.png',
+    'images/custom_game/survival_grid/reference_corner.png',
     'styles/custom_game/survival_grid_placement.css',
     'scripts/custom_game/survival_static_grid.js',
     'scripts/custom_game/survival_grid_state.js',
@@ -25,11 +26,14 @@ foreach ($relative in $files) {
 }
 foreach ($relative in $files) {
     # PNG inputs compile as dependencies of the CSS into *_png.vtex_c, not
-    # as standalone resourcecompiler inputs. Use -f to include dependencies.
+    # as standalone inputs. New dependencies compile automatically; avoid
+    # forcing recompilation of the entire dependency graph in the live editor.
     if ($relative.EndsWith('.png')) { continue }
-    & $compiler -i (Join-Path $content $relative) -game (Join-Path $engine 'game/dota') -f -nop4
+    & $compiler -i (Join-Path $content $relative) -game (Join-Path $engine 'game/dota') -fshallow -nop4
     if ($LASTEXITCODE -ne 0) { throw "Grid placement compile failed: $relative" }
 }
-$maskTexture = Join-Path $repo 'panorama/images/custom_game/survival_grid/range_mask_png.vtex_c'
-if (-not (Test-Path -LiteralPath $maskTexture)) { throw 'Compiled grid opacity texture missing' }
+foreach ($name in @('range_mask', 'reference_edge', 'reference_corner')) {
+    $texture = Join-Path $repo "panorama/images/custom_game/survival_grid/${name}_png.vtex_c"
+    if (-not (Test-Path -LiteralPath $texture)) { throw "Compiled grid texture missing: $name" }
+}
 Write-Output 'GRID_PLACEMENT_DEPLOY_PASS'

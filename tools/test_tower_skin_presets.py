@@ -17,7 +17,7 @@ try:
         out=run(PYTHON,'tools/tower_skin_presets.py','--preset',preset)
         assert combat_digest()==protected
         death_base={r['profile_id']:r for r in table(RES/'tower_visual_profiles.csv')[2]}['class_1']
-        assert death_base['native_base']=='willow_shadow_realm'
+        assert death_base['native_base']=='io_amber_portal'
         assert {k:death_base[k] for k in DEATH_BASE_COLORS}==DEATH_BASE_COLORS
         assert death_base['alpha']=='0.95'
         assert all(not death_base[k] for k in ('core','detail','detail_ssr','crown'))

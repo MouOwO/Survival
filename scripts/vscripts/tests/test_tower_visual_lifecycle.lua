@@ -114,14 +114,22 @@ service.precache({})
 local expected_precache = {["particles/base_attacks/ranged_goodguy.vpcf"] = true}
 expected_precache["particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf"] = true
 local trial_base_paths = {
-    [1] = "particles/survival/towers/death_willow/shadow_ground.vpcf",
+    [1] = "particles/survival/towers/amber_portal/ground.vpcf",
     [2] = "particles/survival/towers/trial/mystery_ground.vpcf",
     [3] = "particles/survival/towers/trial/lightning_ground.vpcf",
     [5] = "particles/survival/towers/trial/multi_ground.vpcf",
-    [6] = "particles/survival/towers/trial/frost_ground.vpcf",
+    [6] = "particles/survival/towers/ice_portal/ground.vpcf",
 }
 for _, path in pairs(trial_base_paths) do expected_precache[path] = true end
+local old_death_path = "particles/survival/towers/death_willow/shadow_ground.vpcf"
+expected_precache[old_death_path] = true
+for _, portal in ipairs({"ice_portal", "amber_portal"}) do
+    for _, layer in ipairs({"dark_center", "interior", "sparkles"}) do
+        expected_precache["particles/survival/towers/" .. portal .. "/" .. layer .. ".vpcf"] = true
+    end
+end
 expected_precache["particles/survival/towers/trial/death_ground.vpcf"] = true -- compatible old-profile transition
+expected_precache["particles/survival/towers/trial/frost_ground.vpcf"] = true -- compatible old frost profile
 for _, name in ipairs({"dark", "durable", "evil"}) do expected_precache["particles/survival/towers/trial/valley_" .. name .. ".vpcf"] = true end
 local shadow_path = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
 expected_precache[shadow_path] = true
@@ -175,6 +183,13 @@ assert(live_count() == 0)
 -- One attached Shadow Realm ground root replaces every legacy death layer.
 -- Tier changes rebuild once; stars, relocation and the red-star band do not.
 local death, death_profile = unit(9), profiles.by_id.class_1
+assert(death_profile.native_base == "io_amber_portal")
+local saved_death = {}
+for _, field in ipairs({"native_base", "color", "color_r", "color_sr", "color_ssr"}) do saved_death[field] = death_profile[field] end
+-- Exercise the transferred legacy sigil too, including compatible hot reloads.
+death_profile.native_base = "willow_shadow_realm"
+death_profile.color = {25,219,241}
+death_profile.color_r, death_profile.color_sr, death_profile.color_ssr = {25,219,241}, {180,95,255}, {255,52,83}
 assert(death_profile.native_base == "willow_shadow_realm")
 local tier_colors = {r = {25, 219, 241}, sr = {180, 95, 255}, ssr = {255, 52, 83}}
 local previous_id, previous_tier
@@ -185,7 +200,7 @@ for level = 6, 25 do
     local ids = service.debug_snapshot(death.index).particle_ids
     assert(#ids == 1 and live_count() == 1, "death has one root, including red-star levels")
     local effect = particles[ids[1]]
-    assert(effect.name == trial_base_paths[1])
+    assert(effect.name == old_death_path)
     assert(effect.bindings[0].unit == death and effect.bindings[0].attachment == "")
     assert(effect.controls[1].x == death_profile["radius_" .. tier] and effect.controls[1].z == 0.95)
     local color = effect.controls[2]
@@ -272,6 +287,54 @@ fail_control_at = nil
 assert(service.apply(state(death, 6, "class_1")) and live_count() == 1)
 service.remove(death.index)
 assert(live_count() == 0)
+for field, value in pairs(saved_death) do death_profile[field] = value end
+
+-- The initial Fireline Sentinel receives the old sigil; promotion retires it
+-- and creates only the native purple ring, without glyph or dark foot layers.
+local sentinel = unit(8)
+local route_config = require("config/tower_route_config")
+for level = 6, 10 do
+    local actual_row = route_config.current(state(sentinel, level, "class_4"))
+    assert(actual_row.name == "火线哨兵" and actual_row.rarity == "N",
+        "real Fireline CSV N maps to global presentation R at levels 6–10")
+    assert(service.apply(state(sentinel, level, "class_4")))
+    local ids = service.debug_snapshot(sentinel.index).particle_ids
+    assert(#ids == 1 and live_count() == 1 and particles[ids[1]].name == old_death_path)
+    assert(particles[ids[1]].controls[2].x == 25 and particles[ids[1]].controls[2].y == 219)
+end
+local old_sigil = service.debug_snapshot(sentinel.index).particle_ids[1]
+assert(route_config.current(state(sentinel, 11, "class_4")).name ~= "火线哨兵")
+assert(service.apply(state(sentinel, 11, "class_4")))
+local sentinel_ids = service.debug_snapshot(sentinel.index).particle_ids
+assert(#sentinel_ids == 1 and particles[sentinel_ids[1]].name == machine_base_paths[2])
+assert(particles[old_sigil].destroyed and particles[old_sigil].released and live_count() == 1)
+service.remove(sentinel.index)
+
+-- A late failure in one portal layer must retire every layer already created.
+local portal_failure = unit(6)
+fail_control_at = created + 4
+assert(not service.apply(state(portal_failure, 6, "class_6")))
+assert(live_count() == 0 and not service.debug_snapshot(portal_failure.index).tracked)
+fail_control_at = nil
+
+-- First profession forms are globally R, despite their legacy CSV N label.
+-- Test the real row/position mapping rather than an impossible class-at-N state.
+for _, class_id in ipairs({"class_1", "class_6"}) do
+    local initial = unit(7)
+    local previous
+    for level = 6, 10 do
+        local before_created = created
+        assert(service.apply(state(initial, level, class_id)))
+        local ids = service.debug_snapshot(initial.index).particle_ids
+        assert(#ids == 4 and live_count() == 4)
+        assert(route_config.current(state(initial, level, class_id)).rarity == "N")
+        assert(initial.projectile == "row_default", "R towers retain their authored attack projectile")
+        if previous then assert(created == before_created and ids[1] == previous) end
+        previous = ids[1]
+    end
+    service.remove(initial.index)
+    assert(live_count() == 0)
+end
 
 local cases = {{6,1}, {10,1}, {11,2}, {15,2}, {16,2}, {20,2}, {21,3}, {25,3}}
 for class_number = 1, 7 do
@@ -279,9 +342,9 @@ for class_number = 1, 7 do
     for _, case in ipairs(cases) do
         local payload = state(u, case[1], "class_" .. class_number)
         local applied = service.apply(payload)
-        assert((class_number == 4 and not applied) or (class_number ~= 4 and applied))
+        assert(applied)
         local replaced = true
-        local expected_count = class_number == 4 and 0 or class_number == 7 and 3 or 1
+        local expected_count = (class_number == 1 or class_number == 6) and 4 or class_number == 7 and 3 or 1
         assert(live_count() == expected_count and service.debug_snapshot().particles == expected_count)
         local profile = profiles.by_id[payload.tower_class]
         local rarity = case[1] <= 10 and "r" or case[1] <= 15 and "sr" or "ssr"
@@ -296,7 +359,9 @@ for class_number = 1, 7 do
             end
         end
         if class_number == 4 then
-            assert(profile.enabled == false and #ids == 0, "machine gun must have no foot effects")
+            local expected_path = rarity == "r" and old_death_path or machine_base_paths[2]
+            assert(profile.enabled and #ids == 1 and particles[ids[1]].name == expected_path,
+                "Fireline uses the transferred sigil; promoted machine gun keeps only the purple ring")
         end
         if class_number == 7 then
             for offset, path in ipairs(anti_air_base_paths) do
@@ -311,16 +376,16 @@ for class_number = 1, 7 do
         if expected_count > 0 and trial_base_paths[class_number] then
         assert(particles[ids[1]].name == trial_base_paths[class_number])
         assert(particles[ids[1]].controls[1].x == radius, "core keeps the profile radius")
-        if expected_count >= 2 then
-            local field = rarity == "ssr" and "detail_ssr" or "detail"
-            assert(particles[ids[2]].name == "particles/survival/towers/" .. profile[field] .. ".vpcf",
-                "SR and SSR must use their own profession detail")
-            assert(particles[ids[2]].controls[1].x <= radius, "detail cannot widen the core footprint")
-            assert(particles[ids[2]].controls[1].z <= profile.alpha * 0.5, "detail remains subdued")
-        end
-        if expected_count == 3 then
-            assert(particles[ids[3]].controls[1].x < radius * 0.8, "red-star accent stays inside the core")
-            assert(particles[ids[3]].controls[1].z < profile.alpha * 0.4)
+        if expected_count == 4 then
+            local portal = class_number == 1 and "amber_portal" or "ice_portal"
+            for offset, layer in ipairs({"ground", "dark_center", "interior", "sparkles"}) do
+                local effect = particles[ids[offset]]
+                assert(effect.name == "particles/survival/towers/" .. portal .. "/" .. layer .. ".vpcf")
+                assert(effect.bindings[0].unit == u and effect.bindings[0].attachment == "")
+                assert(effect.controls[1].x == radius and effect.controls[1].z == profile.alpha,
+                    "every portal layer receives its own size and alpha, without child inheritance")
+                assert(effect.controls[2], "every portal layer receives its own color")
+            end
         end
         end
         local before_created, before_destroyed = created, #destroyed
@@ -356,20 +421,20 @@ local u = unit(30)
 service.apply(state(u, 21, "class_1"))
 local before_destroyed = #destroyed
 service.apply(state(u, 21, "class_3"))
-assert(#destroyed == before_destroyed + 1 and live_count() == 1, "cross-route swap must retire every old layer")
+assert(#destroyed == before_destroyed + 4 and live_count() == 1, "cross-route swap must retire every old portal layer")
 before_destroyed = #destroyed
 service.apply(state(u, 21, "class_2"))
 assert(#destroyed == before_destroyed + 1 and live_count() == 1,
     "replacement base retires core, detail and red-star layers")
 assert(particles[service.debug_snapshot(u.index).particle_ids[1]].name == trial_base_paths[2])
 service.apply(state(u, 21, "class_4"))
-assert(live_count() == 0, "disabled machine-gun base must retire the previous route's effects")
+assert(live_count() == 1, "machine gun retains only the purple ring after a route change")
 local replacement = unit(30)
 service.apply(state(replacement, 11, "class_6"))
-assert(live_count() == 1)
+assert(live_count() == 4)
 u.alive = false
 bus.emit(events.ENGINE_ENTITY_KILLED, { victim = u })
-assert(live_count() == 1, "late death of reused entindex must not clear replacement")
+assert(live_count() == 4, "late death of reused entindex must not clear replacement")
 replacement.alive = false
 bus.emit(events.ENGINE_ENTITY_KILLED, { victim = replacement })
 assert(live_count() == 0)
@@ -422,16 +487,16 @@ assert(live_count() == 0)
 replacement.null = false
 listed = {state(replacement, 11, "class_6"), ultimate_state}
 service.init()
-assert(live_count() == 5 and service.debug_snapshot().towers == 2)
+assert(live_count() == 8 and service.debug_snapshot().towers == 2)
 before_destroyed = #destroyed
 service.init()
-assert(#destroyed == before_destroyed + 5 and live_count() == 5,
+assert(#destroyed == before_destroyed + 8 and live_count() == 8,
     "same-world init must destroy all old layers including smoke before rebuilding")
 assert(scheduler.task_count() == 1)
 local before_created = created
 bus.emit(events.BUILDING_CHANGED, state(replacement, 21, "class_6"))
-assert(created == before_created + 1, "old generation subscriptions must stay inactive")
-assert(live_count() == 5)
+assert(created == before_created + 4, "old generation subscriptions must stay inactive")
+assert(live_count() == 8)
 
 before_destroyed = #destroyed
 world, next_id, listed = {}, 0, {}

@@ -1,0 +1,26 @@
+{
+  "workshop_id": "3164617180",
+  "resource": "materials/grid_overlay.vtex_c",
+  "resource_sha256": "4fe29af0774935bb435f9793fd82f8f6264b873f3fe4d02cdc2ee208d8894346",
+  "source_image": "reference_cell.png",
+  "decode": "Source2Viewer export, independently checked against DXT5 decoding",
+  "edge": {
+    "image": "reference_edge.png",
+    "sample_column": 16,
+    "sample_rows": [
+      30,
+      31,
+      0,
+      1
+    ]
+  },
+  "corner": {
+    "image": "reference_corner.png",
+    "size": [
+      12,
+      12
+    ],
+    "sample_xy": "(26 + coordinate) modulo 32"
+  },
+  "rendering": "Shared screen-projected lines and cached corner panels; edge opacity 0.60, corner opacity 0.75. Cell fill remains controlled by placement validity."
+}

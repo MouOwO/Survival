@@ -10,6 +10,7 @@ Vector = function(x, y, z) return { x = x, y = y, z = z or 0 } end
 DOTA_TEAM_GOODGUYS, DOTA_UNIT_TARGET_TEAM_BOTH = 2, 3
 DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_BUILDING = 1, 2, 4
 DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER = 16, 0
+PATTACH_WORLDORIGIN = 0
 local bus, events = require("core/event_bus"), require("core/events")
 local regions = require("systems/forbidden_region_service")
 local context = require("systems/player_context_service")
@@ -17,6 +18,7 @@ local home = require("systems/hero_return_home_service")
 local serial, moves, stops, dodges, exits, returns, camera, notices
 local heroes, cities, registered, listed, obstacles, height, traversable, blocked
 local query_count, fail_move
+local effects, releases, destroyed, fail_particle, fail_control
 local function vector_copy(p) return Vector(p.x, p.y, p.z) end
 local function unit(owner, position, hull)
     serial = serial + 1
@@ -31,7 +33,8 @@ local function unit(owner, position, hull)
     function u:GetHullRadius() return self.hull end
     function u:GetForwardVector() return self.forward end
     function u:Stop() stops = stops + 1 end
-    function u:SetAbsOrigin(p)
+    function u:SetAbsOrigin() error("return must notify the engine of a teleport") end
+    function u:SetOrigin(p)
         moves = moves + 1
         if fail_move then
             fail_move = false
@@ -51,6 +54,26 @@ CustomGameEventManager = { Send_ServerToPlayer = function(_, player, name, paylo
     camera[#camera + 1] = { player = player.id, name = name, payload = payload }
 end }
 ProjectileManager = { ProjectileDodge = function() dodges = dodges + 1 end }
+ParticleManager = {
+    CreateParticle = function(_, path, attach, hero)
+        assert(attach == PATTACH_WORLDORIGIN, "return bursts must not trail the teleported hero")
+        assert(moves > 0, "only a successful relocation plays the return effect")
+        if fail_particle then fail_particle = false; return -1 end
+        local id = #effects + 1
+        effects[id] = {path = path, owner = hero, controls = {}}
+        return id
+    end,
+    SetParticleControl = function(_, id, cp, value)
+        if fail_control then fail_control = false; error("injected control failure") end
+        effects[id].controls[cp] = vector_copy(value)
+    end,
+    SetParticleControlEnt = function() error("no wearable/attack attachment should be needed") end,
+    DestroyParticle = function(_, id, immediate) assert(immediate); destroyed[id] = true end,
+    ReleaseParticleIndex = function(_, id)
+        assert(not releases[id], "release particle ownership exactly once")
+        releases[id] = true
+    end,
+}
 GridNav = {
     IsTraversable = function(_, p) return p.x ~= 99999 and traversable(p) end,
     IsBlocked = function(_, p) return blocked(p) end,
@@ -72,6 +95,8 @@ local function reset()
     bus.reset(); context._reset_for_test()
     serial, moves, stops, dodges, exits, query_count = 100, 0, 0, 0, 0, 0
     returns, camera, notices = {}, {}, {}
+    effects, releases, destroyed = {}, {}, {}
+    fail_particle, fail_control = false, false
     heroes = { [0] = unit(0, Vector(-4000, 0, 128)), [1] = unit(1, Vector(-5000, 0, 128)) }
     for id, hero in pairs(heroes) do hero.survival_hero_id = "hero_" .. tostring(id) end
     registered = { [0] = heroes[0], [1] = heroes[1] }
@@ -105,14 +130,23 @@ local function reset()
     bus.subscribe(events.UI_NOTIFICATION, function(p) notices[#notices + 1] = p end)
 end
 local function no_return_effects()
-    assert(exits == 0 and #returns == 0 and #camera == 0,
+    assert(exits == 0 and #returns == 0 and #camera == 0 and #effects == 0,
         "rejected/failed return cannot exit challenges, begin retry or move camera")
 end
 local function distance(a, b) return math.sqrt((a.x-b.x)^2+(a.y-b.y)^2) end
 
 reset()
 assert(home.return_unit(heroes[0], 0).ok)
+assert(moves == 1, "long-distance return relocates once, with no intermediate movement")
 assert(heroes[0].origin.x == 2256 and heroes[0].origin.y == 0)
+assert(#effects == 4, "two short native layers at each endpoint")
+for id, effect in ipairs(effects) do
+    local p = effect.controls[0]
+    assert(p.x == (id <= 2 and -4000 or 2256) and p.y == 0 and p.z == 128,
+        "departure stays at its old world position, arrival stays at its landing")
+    assert(effect.controls[1].x == p.x and effect.controls[2].z == 1)
+    assert(releases[id] and not destroyed[id], "native bursts expire without keeping Lua-owned handles")
+end
 assert(home.return_unit(heroes[1], 1).ok)
 assert(heroes[1].origin.x == 7256 and heroes[1].origin.y == 1000,
     "same-team second player returns beside own city")
@@ -197,4 +231,14 @@ local result = home.return_unit(heroes[0], 0)
 assert(not result.ok and result.error == "final_destination_not_traversable")
 assert(heroes[0].origin.x == -4000 and moves == 2, "invalid final relocation rolls back")
 assert(notices[#notices].message:find("请稍后重试", 1, true)); no_return_effects()
-print("HERO_RETURN_HOME_PASS: formal own hero/city, teammate isolation, collision/water/regions, actual hull, failure rollback, exit/camera only on success")
+
+for _, failure in ipairs({"creation", "control"}) do
+    reset()
+    fail_particle, fail_control = failure == "creation", failure == "control"
+    assert(home.return_unit(heroes[0], 0).ok, "visual failure must not break return")
+    assert(moves == 1 and exits == 1 and #returns == 1 and #camera == 1)
+    for id in ipairs(effects) do assert(releases[id], "failed setup cannot leak particle ownership") end
+    if failure == "creation" then assert(#effects == 3 and next(destroyed) == nil)
+    else assert(#effects == 4 and destroyed[1]) end
+end
+print("HERO_RETURN_HOME_PASS: native teleport, own-city safe landing/rollback, isolated endpoint bursts, particle release/failure cleanup, exit/camera only on success")

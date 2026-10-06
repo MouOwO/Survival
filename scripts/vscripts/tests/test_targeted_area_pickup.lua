@@ -12,8 +12,9 @@ UF_SUCCESS=0;UF_FAIL_CUSTOM=1;PATTACH_WORLDORIGIN=0;DOTA_TEAM_GOODGUYS=2
 local index=0
 local function entity(x)
  index=index+1;local id=index
- return {IsNull=function()return false end,GetAbsOrigin=function()return Vector(x)end,entindex=function()return id end,AddNewModifier=function()end}
+ return {IsNull=function(self)return self.removed==true end,GetAbsOrigin=function()return Vector(x)end,entindex=function()return id end,AddNewModifier=function()end}
 end
+function UTIL_Remove(ent) ent.removed=true end
 local caster=entity(0);caster.GetPlayerOwnerID=function()return 0 end
 local inventory,picked={},{}
 function caster:GetItemInSlot(slot) return inventory[slot] end
@@ -37,10 +38,17 @@ for _,v in ipairs({{800,0},{0,0},{900,1}})do
 end
 assert(#upgrades.nearby(caster,0,Vector(700))==1)
 assert(#upgrades.nearby(caster,0)==1)
-local upgrade_count=0;upgrades.pickup_candidate=function()upgrade_count=upgrade_count+1;return {ok=true}end
+local upgrade_count,consumed=0,{};upgrades.pickup_candidate=function(candidate)
+ if consumed[candidate.entindex] then return {ok=false,error='upgrade_material_unavailable'} end
+ consumed[candidate.entindex]=true;upgrade_count=upgrade_count+1;return {ok=true}
+end
 local cleanup={};local created,destroyed,released=0,0,0
 ParticleManager={CreateParticle=function(_,path)assert(path=='particles/units/heroes/hero_riki/riki_smokebomb.vpcf');created=created+1;return created end,SetParticleControl=function(_,particle,point,value)if point==1 then assert(value.x==300)end end,DestroyParticle=function(_,particle,immediate)assert(immediate==true);destroyed=destroyed+1 end,ReleaseParticleIndex=function()released=released+1 end}
-GameRules={GetGameModeEntity=function()return {SetContextThink=function(_,_,fn,delay)assert(delay==0.5);cleanup[#cleanup+1]=fn end}end}
+local retries={}
+GameRules={GetGameModeEntity=function()return {SetContextThink=function(_,name,fn,delay)
+ if name:find('pickup_area_',1,true)==1 then assert(delay==0.5);cleanup[#cleanup+1]=fn
+ else assert(delay==0.15);retries[#retries+1]=fn end
+end}end}
 require('abilities/ability_survival_pickup_materials')
 local ability=setmetatable({},{__index=ability_survival_pickup_materials})
 local target=Vector(700);ability.GetCaster=function()return caster end;ability.GetCursorPosition=function()return target end
@@ -54,8 +62,11 @@ assert(#picked==2 and picked[1]==at_target and picked[2]==edge and upgrade_count
 assert(picked[1]~=at_hero,'click must not collect around the hero')
 target=Vector(701);ability:OnSpellStart();assert(#picked==2 and refunded==1 and created==1)
 target=Vector(700);for i=0,8 do inventory[i]={}end
-ability:OnSpellStart();assert(#picked==2 and upgrade_count==1,'full inventory stops before later candidates')
-assert(notifications[#notifications].message:find('装备栏已满'))
+ground(700,0)
+assert(handlers.drop({authoritative=true,challenge_id='challenge_10',required_stage=0,player_id=0,position=Vector(800)}).ok)
+ability:OnSpellStart();assert(#picked==2 and upgrade_count==2,'full inventory must not stop later upgrade materials')
+for _,fn in ipairs(retries) do assert(fn()==nil) end
+assert(notifications[#notifications].message:find('装备栏空间不足'))
 for _,fn in ipairs(cleanup)do fn()end
 assert(created==destroyed and created==released,'area effects are cleaned up')
 print('TARGETED_AREA_PICKUP_PASS: 700 cast / 300 target radius, boundary, ownership, both drop types, full inventory, effect cleanup')

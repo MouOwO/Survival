@@ -13,6 +13,7 @@ function scenario(events) {
         labels.push(panel); return panel;
     };
     vm.runInNewContext(source, {$,
+        GameUI: {CustomUIConfig: () => ({})},
         Game: {GetGameTime: () => now, GetLocalPlayerID: () => 0,
             WorldToScreenX: x => {projections++; return x + camera;},
             WorldToScreenY: y => {projections++; return y + camera;}},
