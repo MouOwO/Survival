@@ -115,7 +115,9 @@ function modifier_tower_auto_attack:VerifyTargetNextFrame(target)
         if self.destroyed or not valid(tower) or self.forced_target ~= target then return nil end
         -- The engine may clear its old attack order after dispatching OnDeath.
         -- Recheck once next frame, without waiting for the 0.25s idle scan.
-        if targeting.valid(tower, target) and tower:GetAttackTarget() ~= target then
+        if not targeting.valid(tower, target) then
+            self:ReacquireTarget(target)
+        elseif tower:GetAttackTarget() ~= target then
             self:IssueAttackTarget(target, true)
         end
         return nil
@@ -124,6 +126,8 @@ end
 
 function modifier_tower_auto_attack:OnDeath(params)
     if not IsServer() or not params or not params.unit then return end
+    if params.unit == self.last_dead_target and params.unit ~= self.forced_target
+        and params.unit ~= self.manual_target then return end
     if self.attack_enabled == false and self.forced_target == nil and self.manual_target == nil then
         return
     end
@@ -131,20 +135,10 @@ function modifier_tower_auto_attack:OnDeath(params)
     if params.unit and (params.unit == self.forced_target or params.unit == self.manual_target
         or (valid(tower) and params.unit == tower:GetAttackTarget())) then
         if not valid(tower) then return end
-        if self.windup_target == params.unit then self.windup_target = nil end
-        -- A kill is a target change, not an idle transition. Disarming/Stop here
-        -- interrupted the next attack, then a forced-target hint could spend a
-        -- whole second waiting for the retry while native acquisition was off.
-        local target = self:SelectTarget(params.unit)
-        if target then
-            self:SetAttackEnabled(true)
-            if self.forced_target ~= target or tower:GetAttackTarget() ~= target then
-                self:IssueAttackTarget(target, tower:GetAttackTarget() ~= target)
-            end
-            self:VerifyTargetNextFrame(target)
-        else
-            self:EnterIdle()
-        end
+        self.last_dead_target = params.unit
+        -- Start a fresh selection even if Lua and the native order disagree.
+        -- SelectTarget preserves living locks and is only for normal updates.
+        self:ReacquireTarget(params.unit)
     end
 end
 
@@ -152,6 +146,7 @@ function modifier_tower_auto_attack:OnCreated()
     if not IsServer() then return end
     self.forced_target, self.manual_target = nil, nil
     self.windup_target, self.destroyed = nil, false
+    self.last_dead_target = nil
     self.idle_initialized = false
     local tower = self:GetParent()
     if valid(tower) then
@@ -168,6 +163,24 @@ function modifier_tower_auto_attack:ResetTarget()
         disable_native_acquisition(tower, self, true)
     end
     self:EnterIdle()
+end
+
+-- Death/upgrade invalidate the whole old selection. Hand off directly without
+-- Stop/disarm when a replacement exists; native attack cooldown remains intact.
+function modifier_tower_auto_attack:ReacquireTarget(excluded_target)
+    if not IsServer() or self.destroyed then return end
+    local tower = self:GetParent()
+    if not valid(tower) then return end
+    disable_native_acquisition(tower, self, true)
+    self.forced_target, self.manual_target, self.windup_target = nil, nil, nil
+    local target = find_target(tower, excluded_target)
+    if target then
+        self:SetAttackEnabled(true)
+        self:IssueAttackTarget(target, tower:GetAttackTarget() ~= target)
+        self:VerifyTargetNextFrame(target)
+    else
+        self:EnterIdle()
+    end
 end
 
 function modifier_tower_auto_attack:SetManualTarget(target)
@@ -280,6 +293,7 @@ function modifier_tower_auto_attack:OnDestroy()
         end
         self.forced_target = nil
         self.manual_target = nil
+        self.last_dead_target = nil
     end
 end
 

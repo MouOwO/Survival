@@ -1,0 +1,206 @@
+{
+  "date": "2026-10-07",
+  "policy": {
+    "locked_target": "retain while alive/legal/in-range",
+    "acquisition": "in-range boss/wave_leader first; nearest within same priority by squared tower distance; nearest ordinary fallback",
+    "refresh_triggers": [
+      "death",
+      "invalid",
+      "out_of_range",
+      "relocation",
+      "upgrade_completed"
+    ],
+    "priority_preemption": false,
+    "manual_player_override": true
+  },
+  "worktree_tests": [
+    {
+      "name": "test_tower_target_selection",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_seamless_targets",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_upgrade_targeting",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_wall_targeting",
+      "exit": 0
+    },
+    {
+      "name": "test_ultimate_tower_tree_targeting",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_attack_audio",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_gold_numbers",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_drag_net",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_laser_damage",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_laser_health_prediction",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_idle_state",
+      "exit": 0
+    },
+    {
+      "name": "test_tower_skill_tree_exclusion",
+      "exit": 0
+    }
+  ],
+  "old_code_counterexamples": [
+    {
+      "module": "systems/tower_targeting",
+      "test": "test_tower_target_selection",
+      "expected_failure": "nearest boss/leader",
+      "confirmed": true
+    },
+    {
+      "module": "modifiers/modifier_tower_auto_attack",
+      "test": "test_tower_seamless_targets",
+      "expected_failure": "stale Lua target",
+      "confirmed": true
+    },
+    {
+      "module": "systems/building_upgrade_system",
+      "test": "test_tower_upgrade_targeting",
+      "expected_failure": "upgrade completion must acquire nearest",
+      "confirmed": true
+    },
+    {
+      "module": "systems/tree_attack_order_filter",
+      "test": "test_ultimate_tower_tree_targeting",
+      "expected_failure": "automatic native/Lua order",
+      "confirmed": true
+    }
+  ],
+  "engine": {
+    "method": "private renamed final source module; unregistered isolated fixture on current Tools template_map",
+    "actual_attacks": 2,
+    "normal_deaths": 3,
+    "other_attacker_kills": true,
+    "native_handoff_and_next_frame_order": true,
+    "explicit_reacquisition": true,
+    "remaining_fixture_entities": 0,
+    "user_units_modified": false,
+    "full_user_upgrade_visual_verified": false,
+    "forcekill_control": "bypasses death events; normal other-attacker Kill succeeds without a global subscriber",
+    "normalized_source_sha256": {
+      "scripts/vscripts/modifiers/modifier_tower_auto_attack.lua": "384533126bd51fb5a819420db4358a0e8538f3e26fa259b7b91d5fca856d5e6e",
+      "scripts/vscripts/systems/tower_targeting.lua": "6b7d90b3615e8a108e263280bbfb3c65cde8b0a4027e59e66ac8d875826ad8f7"
+    },
+    "log": "output/tower_target_priority_20261007/native_final.log"
+  },
+  "sync": {
+    "stash_oid": "42a304e4327867b063d95cf9fa035453a45c0e90",
+    "stash_message": "codex-tower-priority-upgrade-20261007-004404523690",
+    "status": "pulled_and_restored",
+    "pull": "already_up_to_date",
+    "head_after_pull": "daaf681238a571e69a57ef1f7451b3690275d300",
+    "files_verified": 12,
+    "historical_stashes_preserved": true
+  },
+  "compiled_resources_changed": false,
+  "task_only_snapshot": {
+    "tests": [
+      {
+        "name": "test_tower_target_selection",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_seamless_targets",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_upgrade_targeting",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_wall_targeting",
+        "exit": 0
+      },
+      {
+        "name": "test_ultimate_tower_tree_targeting",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_attack_audio",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_gold_numbers",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_drag_net",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_laser_damage",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_laser_health_prediction",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_idle_state",
+        "exit": 0
+      },
+      {
+        "name": "test_tower_skill_tree_exclusion",
+        "exit": 0
+      }
+    ],
+    "syntax": [
+      {
+        "path": "scripts/vscripts/systems/tower_targeting.lua",
+        "exit": 0
+      },
+      {
+        "path": "scripts/vscripts/modifiers/modifier_tower_auto_attack.lua",
+        "exit": 0
+      },
+      {
+        "path": "scripts/vscripts/systems/tree_attack_order_filter.lua",
+        "exit": 0
+      },
+      {
+        "path": "scripts/vscripts/systems/building_upgrade_system.lua",
+        "exit": 0
+      },
+      {
+        "path": "scripts/vscripts/tests/test_tower_target_selection.lua",
+        "exit": 0
+      },
+      {
+        "path": "scripts/vscripts/tests/test_tower_seamless_targets.lua",
+        "exit": 0
+      },
+      {
+        "path": "scripts/vscripts/tests/test_ultimate_tower_tree_targeting.lua",
+        "exit": 0
+      },
+      {
+        "path": "scripts/vscripts/tests/test_tower_upgrade_targeting.lua",
+        "exit": 0
+      }
+    ],
+    "native_source_matches_staged": true
+  }
+}

@@ -96,3 +96,8 @@ Backend Integration Phase：当前 P0 是 Player Session、在线 checkpoint、�
 ## History
 
 重构前的完整稳定知识与历史混合文档保存在 `archive/2026-08-25-pre-knowledge-refactor/PROJECT_CONTEXT.md`。
+
+
+## 防御塔选敌更新（2026-10-07）
+
+自动攻击重选采用射程内首领/大头兵优先，同档离塔最近，无优先怪时最近普通怪；使用出生时缓存的boss/角色标记与二维距离平方。合法目标跨攻击周期锁定，新怪不抢占。死亡/升级清除旧manual/forced/windup立即重选，移动沿用原即时刷新；下一帧恢复失去的订单或再次失效的目标。系统订单不建立手动锁，明确玩家指定仍可覆盖。无新增轮询/全局死亡监听、CD重置或伤害改动。私有Tools交接通过且实体零残留，正式塔升级仍待新局画面确认。详见CURRENT_TASK与validation/20261007/tower_target_priority.json。

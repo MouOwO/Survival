@@ -101,9 +101,55 @@ for _,route in ipairs({"base","class_1","class_2","class_3","class_4","class_5",
     m:OnIntervalThink()
     assert(tower.target==near and tower.orders==5 and queries==initial_queries+4,
         "a missed death callback left the tower idle")
+    -- Native and Lua targets can temporarily disagree. Death of the actual
+    -- victim must invalidate ALL previous manual/forced/windup caches.
+    local dying,ordinary=enemy(60,700),enemy(61,15)
+    local leader,boss=enemy(62,600),enemy(63,800)
+    leader.survival_monster_role="wave_leader";boss.survival_is_boss=true
+    m.manual_target,m.forced_target,m.windup_target=near,near,near
+    tower.target=dying
+    candidates={ordinary,near,dying,boss,leader,tree}
+    local before=queries
+    m:OnDeath({unit=dying})
+    assert(tower.target==leader and m.manual_target==nil and m.windup_target==nil,
+        "stale Lua target overrode a fresh death selection: "..route)
+    assert(queries==before+1 and tower.stops==stops)
+    dying.alive=false
+    m:OnDeath({unit=leader});leader.alive=false
+    assert(tower.target==boss,"remaining in-range boss was not prioritized")
+    -- If the replacement dies before next frame without another event, recover
+    -- immediately rather than waiting for the 0.25s fallback.
+    boss.alive=false;tower.next_frame()
+    assert(tower.target==ordinary,"next-frame invalid replacement left a dead lock")
+    local replacement=enemy(64,400);replacement.survival_monster_role="wave_leader"
+    candidates={ordinary,near,replacement,tree}
+    before=queries
+    for i=1,100 do m:OnIntervalThink() end
+    assert(tower.target==ordinary and queries==before,
+        "a newly arriving priority target must not preempt a living lock")
+    -- Explicit upgrade reset is fresh and immediate, then resumes lock policy.
+    m:ReacquireTarget()
+    assert(tower.target==replacement and queries==before+1)
+    candidates={ordinary,near,tree}
+    m:OnDeath({unit=replacement})
+    assert(tower.target==ordinary,"after upgrade, death must select the nearest ordinary enemy")
+    -- A different tower/hero made the kill; native death still hands off.
+    local cross_kill_priority=enemy(65,700);cross_kill_priority.survival_is_boss=true
+    candidates={ordinary,near,cross_kill_priority,tree}
+    before=queries
+    m:OnDeath({unit=ordinary,attacker=near})
+    assert(tower.target==cross_kill_priority and queries==before+1,
+        "another attacker's kill waited for polling instead of immediate handoff")
+    tower.target=ordinary -- native order can lag behind both death notifications
+    m:OnDeath({unit=ordinary})
+    m:OnDeath({unit=ordinary,attacker=near})
+    assert(queries==before+1,"duplicate death rescanned")
+    tower.next_frame()
+    assert(tower.target==cross_kill_priority)
     local callback=tower.next_frame
+    local final_orders=tower.orders
     m:OnDestroy()
     callback()
-    assert(tower.orders==5,"deferred handoff resurrected destroyed tower AI")
+    assert(tower.orders==final_orders,"deferred handoff resurrected destroyed tower AI")
 end
 print("TOWER_SEAMLESS_TARGETS_PASS: base, 7 routes, fusion; 9000 locked attack cycles without rescanning, nearest-on-death, range/death fallback, next-frame recovery, no cooldown reset or extra attack")

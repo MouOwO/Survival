@@ -77,7 +77,9 @@ local function filter(_, keys)
             and anti_air_rules.can_attack(unit, target)
             and target:GetTeamNumber() ~= unit:GetTeamNumber() then
             local modifier = unit:FindModifierByName("modifier_tower_auto_attack")
-            if modifier and modifier.SetManualTarget then
+            -- Engine/Lua orders must not create persistent player overrides,
+            -- including orders delivered after the synchronous issuing guard.
+            if issuer and issuer >= 0 and modifier and modifier.SetManualTarget then
                 modifier:SetManualTarget(target)
             end
         end

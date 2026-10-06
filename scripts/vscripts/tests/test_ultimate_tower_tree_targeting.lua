@@ -133,6 +133,14 @@ local keys = {issuer_player_id_const = 0, units = {["0"] = tower:entindex()},
 assert(filter(nil, keys) == false, "real order filter denies ultimate tower orders against the tree")
 keys.entindex_target = enemy:entindex()
 assert(filter(nil, keys) == true and tower.target == enemy, "normal enemy orders still acquire the target")
+assert(modifier.manual_target == enemy, "a real player may deliberately override automatic priority")
+modifier.manual_target = nil
+for _, issuer in ipairs({-1, false}) do
+    keys.issuer_player_id_const = issuer == false and nil or issuer
+    assert(filter(nil, keys) == true and modifier.manual_target == nil,
+        "automatic native/Lua order must not become a manual lock after issuing guard clears")
+end
+keys.issuer_player_id_const = 0
 
 -- Actual fusion relocation must notify base/portrait projections after moving.
 local move_events = 0

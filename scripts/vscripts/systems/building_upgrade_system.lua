@@ -854,7 +854,10 @@ local function apply_tower_level(state, row, level, change_model)
     if not auto_attack then
         auto_attack = state.unit:AddNewModifier(state.unit, nil, "modifier_tower_auto_attack", {})
     end
-    if auto_attack and auto_attack.ResetTarget then
+    if auto_attack and auto_attack.ReacquireTarget then
+        -- New range/route is final: refresh the target now, then retain its lock.
+        auto_attack:ReacquireTarget()
+    elseif auto_attack and auto_attack.ResetTarget then
         auto_attack:ResetTarget()
     end
     if state.unit.SetControllableByPlayer

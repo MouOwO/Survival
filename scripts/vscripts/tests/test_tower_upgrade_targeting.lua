@@ -67,7 +67,7 @@ local function create_unit(name, position, team)
         max_health = 100, health = 100, modifiers = {}, abilities = {}, acquisition = 1000, attack_range = 1000,
         acquisition_writes = {}, survival_player_id = 0, base_damage = 1}
     function u:IsNull() return false end
-    function u:IsAlive() return true end
+    function u:IsAlive() return self.alive ~= false end
     function u:entindex() return self.index end
     function u:GetUnitName() return self.name end
     function u:GetAbsOrigin() return self.position end
@@ -94,7 +94,9 @@ local function create_unit(name, position, team)
         self.acquisition = value; self.acquisition_writes[#self.acquisition_writes + 1] = value
     end
     function u:GetAttackTarget() return self.target end
-    function u:SetForceAttackTarget(target) self.target = target end
+    function u:SetForceAttackTarget(target) self.forced = target end
+    function u:MoveToTargetToAttack(target) self.target = target end
+    function u:SetContextThink(_, callback) self.next_frame = callback end
     function u:Stop() self.target = nil end
     function u:HasModifier(name) return self.modifiers[name] ~= nil end
     function u:FindModifierByName(name) return self.modifiers[name] end
@@ -169,10 +171,24 @@ local function check_targeting(expected_range)
     assert(tower.target == nil, "tree alone never becomes a tower target")
 end
 check_targeting(base_range)
+local nearest = create_unit("npc_survival_nearest", Vector(100, 0, 0), 3)
+candidates = {tree, enemy, nearest}
+auto:SetManualTarget(enemy);tower.target = enemy
 result = bus.request(events.BUILDING_UPGRADE_REQUEST, {building = tower, upgrade_mode = "one", silent_notification = true})
 assert(result and result.ok and pending)
 local action = pending; pending = nil; action.options.on_complete()
 assert(tower.survival_level == 2, "real upgrade event advances the tower level")
+assert(tower.target == nearest and auto.manual_target == nil,
+    "upgrade completion must acquire nearest immediately without waiting for an AI interval")
+-- Simulate the engine clearing its attack order after stat/model changes.
+tower.target = nil;tower.next_frame()
+assert(tower.target == nearest, "upgrade next-frame recovery must restore the selected order")
+auto:OnDeath({unit = nearest});nearest.alive = false
+assert(tower.target == enemy, "after real upgrade, death reacquires the next in-range target")
+local later = create_unit("npc_survival_later", Vector(20, 0, 0), 3)
+candidates = {tree, enemy, later}
+for i=1,100 do auto:OnIntervalThink() end
+assert(tower.target == enemy, "after real upgrade a nearer arrival must not steal a living target")
 check_targeting(base_range)
 
 technology.tower.attack_range_bonus = 250

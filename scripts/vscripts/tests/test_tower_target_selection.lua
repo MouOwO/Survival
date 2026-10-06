@@ -120,4 +120,18 @@ flying.survival_movement_type = "flying"
 tree.survival_movement_type = "flying"
 units = { tree, enemy, flying }
 assert(auto._find_target_for_test(tower) == flying, "anti-air constraints still apply, including flying tree rejection")
+tower.survival_tower_class = "class_1"
+local boss = unit("boss", 800); boss.survival_is_boss = true
+local leader = unit("leader", 700); leader.survival_monster_role = "wave_leader"
+local closest = unit("ordinary", 10)
+units = {closest, boss, leader, tree}
+assert(auto._find_target_for_test(tower) == leader,
+    "nearest boss/leader in range outranks closer ordinary enemy")
+leader.pos.x, boss.pos.x = 2000, 2100
+assert(auto._find_target_for_test(tower) == closest,
+    "out-of-range priority units must never suppress an in-range ordinary enemy")
+boss.pos.x = 800; tower.survival_tower_class = "class_7"
+assert(auto._find_target_for_test(tower) == nil, "anti-air cannot select a ground boss")
+boss.survival_movement_type = "flying"
+assert(auto._find_target_for_test(tower) == boss, "anti-air priority still applies to flying bosses")
 print("TOWER_TARGET_SELECTION_PASS: native/stale/manual trees rejected; enemy, dummy, anti-air and upgraded ranges preserved")

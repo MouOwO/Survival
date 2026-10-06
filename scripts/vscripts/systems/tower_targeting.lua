@@ -24,6 +24,13 @@ function M.valid(tower, target, excluded)
     return legal(tower, target, excluded) and M.in_range(tower, target)
 end
 
+local function priority(target)
+    -- Spawned units already cache their wave role; no wall/AI lookup needed.
+    local role = target.survival_monster_role
+    return (target.survival_is_boss == true or role == "assault_boss"
+        or role == "wave_leader") and 1 or 0
+end
+
 function M.select(tower, excluded)
     local range = combat.current_attack_range(tower)
     local range_squared = range*range
@@ -32,7 +39,7 @@ function M.select(tower, excluded)
         range, DOTA_UNIT_TARGET_TEAM_ENEMY,
         DOTA_UNIT_TARGET_HERO+DOTA_UNIT_TARGET_BASIC,
         DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
-    local best, best_distance, dummy, dummy_distance
+    local best, best_priority, best_distance, dummy, dummy_distance
     for _, target in ipairs(units or {}) do
         if legal(tower,target,excluded) then
             local position = target:GetAbsOrigin()
@@ -42,9 +49,13 @@ function M.select(tower, excluded)
                     if not dummy_distance or score < dummy_distance then
                         dummy, dummy_distance = target, score
                     end
-                elseif not best_distance or score < best_distance
-                    or (score == best_distance and target:entindex() < best:entindex()) then
-                    best, best_distance = target, score
+                else
+                    local rank = priority(target)
+                    if not best or rank > best_priority
+                        or (rank == best_priority and (score < best_distance
+                            or (score == best_distance and target:entindex() < best:entindex()))) then
+                        best, best_priority, best_distance = target, rank, score
+                    end
                 end
             end
         end
