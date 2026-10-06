@@ -19,7 +19,7 @@ events = root / 'events.txt'
 name = Path(__file__).name
 action = sys.argv[1]
 if name == 'aliyun_test_connection.py':
-    event, result = 'tunnel:' + action, {'ok': True}
+    event, result = 'tunnel:' + action, scenario.get('tunnel', {'ok': True})
 elif name == 'aliyun_game_test_auth.py':
     event, result = 'auth:' + action, {'ok': True}
     if action == 'probe':
@@ -183,6 +183,23 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(events, ['tunnel:connect', 'process:get', 'auth:probe', 'auth:inject'])
         self.assertIn('GAME_AUTH_READY', output)
         self.assertNotIn('HAMMER_BACKEND_PAUSED_FOR_LAN', output)
+
+    def test_backend_failure_reports_reason_before_game_or_authentication(self):
+        for result in ({'ok': False, 'status': 'backend_unavailable'},
+                       {'ok': False, 'status': 'backend_unavailable', 'error': 'backend_unavailable'}):
+            with self.subTest(result=result):
+                code, output, events = self.run_launcher(expected=1, tunnel=result)
+                self.assertEqual(code, 31, output)
+                self.assertEqual(events, ['tunnel:connect'])
+                self.assertIn('SSH connection: backend_unavailable', output)
+                self.assertIn('existing tunnel and game were preserved', output)
+                self.assertNotIn('GAME_AUTH_READY', output)
+
+    def test_missing_connection_reason_has_nonempty_fallback(self):
+        code, output, events = self.run_launcher(expected=1, tunnel={'ok': False})
+        self.assertEqual(code, 31, output)
+        self.assertEqual(events, ['tunnel:connect'])
+        self.assertIn('SSH connection: ssh_tunnel_or_backend_unavailable', output)
 
     def test_gate_not_ready_does_not_authenticate_even_with_enough_players(self):
         code, output, events = self.run_launcher(game_running=True, rosters=[

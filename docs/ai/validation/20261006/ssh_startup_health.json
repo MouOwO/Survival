@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-06",
+  "task": "SSH launcher blank error and transient backend health failure",
+  "observed": {
+    "initial_owned_tunnel_status": "backend_unavailable",
+    "initial_error_field_missing": true,
+    "listener_address": "127.0.0.1:8765",
+    "subsequent_same_tunnel_health_checks": 6,
+    "subsequent_health_status": 200,
+    "subsequent_health_ok": true,
+    "observed_response_seconds": [0.480, 0.340, 0.369, 0.079, 0.138, 0.065],
+    "user_confirmed_game_recovered": true,
+    "specific_remote_or_network_cause": "not established"
+  },
+  "changes": {
+    "health_socket_timeout_seconds": 3,
+    "connect_health_attempts": 3,
+    "retry_delay_seconds": 0.5,
+    "failure_error_field": "nonempty fixed code",
+    "launcher_legacy_status_fallback": true,
+    "existing_tunnel_restarted": false,
+    "remote_service_or_database_modified": false,
+    "game_started_or_stopped_by_agent": false,
+    "resource_compile_required": false
+  },
+  "validation": {
+    "test_aliyun_test_connection.py": {"tests": 27, "result": "PASS"},
+    "test_launch_aliyun_test_game.py": {"tests": 11, "result": "PASS"},
+    "test_hammer_backend_bridge.py": {"tests": 23, "result": "PASS"},
+    "test_aliyun_test_host.py": {"tests": 12, "result": "PASS"},
+    "test_aliyun_game_test_auth.py": {"tests": 18, "skipped": 2, "result": "PASS"},
+    "launcher_powershell_parse": "PASS"
+  }
+}

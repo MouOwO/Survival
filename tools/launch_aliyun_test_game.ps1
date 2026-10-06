@@ -38,7 +38,15 @@ try {
         Write-Host 'After LAN testing, resume an installed Hammer helper with: tools/setup_hammer_backend.ps1 -Action Start'
     }
     $connected = Invoke-Check $tunnel 'connect'
-    if (-not $connected.ok) { throw ('SSH connection: ' + $connected.error) }
+    if (-not $connected.ok) {
+        $connectionError = [string]$connected.error
+        if ([string]::IsNullOrWhiteSpace($connectionError)) { $connectionError = [string]$connected.status }
+        if ([string]::IsNullOrWhiteSpace($connectionError)) { $connectionError = 'ssh_tunnel_or_backend_unavailable' }
+        $hint = if ($connectionError -eq 'backend_unavailable') {
+            ' The SSH tunnel is running, but the game backend did not answer its health check after retries. Wait briefly and run this launcher again; the existing tunnel and game were preserved.'
+        } else { '' }
+        throw ('SSH connection: ' + $connectionError + $hint)
+    }
     Write-Host 'ECS tunnel ready: 127.0.0.1:8765'
     $games = @(Get-Process -Name dota2 -ErrorAction SilentlyContinue)
     $startedGame = $games.Count -eq 0

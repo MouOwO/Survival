@@ -27,6 +27,8 @@ import aliyun_local_config as local_config
 
 ECS_HOST = "47.110.238.248"
 PORT = 8765
+HEALTH_TIMEOUT = 3
+CONNECT_HEALTH_ATTEMPTS = 3
 HOST_FINGERPRINT = "SHA256:3cUNJuxLSLLSw7CIDmtOis7yGlxaSt+D7DQJmc6Uno8"
 ROOT = Path(__file__).resolve().parents[1]
 HIDDEN = getattr(subprocess, "CREATE_NO_WINDOW", 0)
@@ -115,7 +117,7 @@ def port_free() -> bool:
 
 
 def health() -> bool:
-    connection = http.client.HTTPConnection("127.0.0.1", PORT, timeout=1)
+    connection = http.client.HTTPConnection("127.0.0.1", PORT, timeout=HEALTH_TIMEOUT)
     try:
         connection.request("GET", "/health")
         response = connection.getresponse()
@@ -262,17 +264,28 @@ def state_lock(path: Path):
             msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
 
 
-def check(path: Path) -> dict:
+def check(path: Path, *, health_attempts: int = 1) -> dict:
     state = read_state(path)
     if state is None:
-        return {"ok": False, "status": "not_started"}
+        return {"ok": False, "status": "not_started", "error": "tunnel_not_started"}
     with ProcessHandle(state["pid"]) as handle:
         validate_owned(state, handle.identity(), process_command(state["pid"]))
         if not listener_owned(state["pid"]):
             raise TunnelError("owned_tunnel_listener_missing")
-    ready = health()
-    return {"ok": ready, "status": "connected" if ready else "backend_unavailable",
-            "local_address": f"127.0.0.1:{PORT}", "ssh_pid": state["pid"]}
+    # An established tunnel can have a brief network/backend delay. Retry only
+    # health reads after ownership checks; never replace or stop its listener.
+    ready = False
+    for attempt in range(health_attempts):
+        ready = health()
+        if ready:
+            break
+        if attempt + 1 < health_attempts:
+            time.sleep(0.5)
+    result = {"ok": ready, "status": "connected" if ready else "backend_unavailable",
+              "local_address": f"127.0.0.1:{PORT}", "ssh_pid": state["pid"]}
+    if not ready:
+        result["error"] = "backend_unavailable"
+    return result
 
 
 def stop(path: Path) -> dict:
@@ -298,7 +311,7 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
         # Do not terminate or replace the current listener, even if unhealthy.
         state = read_state(path)
         if state is not None:
-            return check(path)
+            return check(path, health_attempts=CONNECT_HEALTH_ATTEMPTS)
         raise TunnelError("local_port_8765_in_use")
     old = read_state(path)
     if old is not None:
@@ -366,7 +379,7 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
             temporary.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
             temporary.replace(path)
             process = None  # The recorded process deliberately survives this command.
-        return check(path)
+        return check(path, health_attempts=CONNECT_HEALTH_ATTEMPTS)
     finally:
         if process is not None and process.poll() is None:
             process.terminate()  # The Popen handle belongs to this launch, never a port lookup.

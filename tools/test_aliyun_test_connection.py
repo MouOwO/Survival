@@ -116,6 +116,17 @@ class TunnelTests(unittest.TestCase):
             tunnel.ensure_agent_running()
         run.assert_not_called()
 
+    def test_health_allows_slow_response_and_closes_http_connection(self):
+        connection = Mock()
+        response = connection.getresponse.return_value
+        response.status = 200
+        response.read.return_value = b'{"ok": true}'
+        with patch.object(tunnel.http.client, "HTTPConnection", return_value=connection) as factory:
+            self.assertTrue(tunnel.health())
+        factory.assert_called_once_with("127.0.0.1", tunnel.PORT, timeout=3)
+        connection.request.assert_called_once_with("GET", "/health")
+        connection.close.assert_called_once_with()
+
     def test_public_key_failure_distinguishes_stopped_or_empty_agent(self):
         with patch.object(tunnel.shutil, "which", return_value="ssh-add.exe"), \
              patch.object(tunnel.subprocess, "run") as run:
@@ -180,6 +191,80 @@ class TunnelTests(unittest.TestCase):
             with self.assertRaisesRegex(tunnel.TunnelError, "owned_tunnel_listener_missing"):
                 tunnel.check(self.state)
             health.assert_not_called()
+
+    def test_check_without_recorded_tunnel_returns_nonempty_error(self):
+        result = tunnel.check(self.state)
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["status"], "not_started")
+        self.assertTrue(result.get("error"))
+
+    def test_check_retries_transient_backend_failure_without_touching_process(self):
+        state, command = self.write_state()
+        handle = Mock()
+        handle.identity.return_value = state
+        with patch.object(tunnel, "ProcessHandle") as factory, \
+             patch.object(tunnel, "process_command", return_value=command), \
+             patch.object(tunnel, "listener_owned", return_value=True), \
+             patch.object(tunnel, "health", side_effect=[False, False, True]) as health, \
+             patch.object(tunnel.time, "sleep"), \
+             patch.object(tunnel.subprocess, "Popen") as launch:
+            factory.return_value.__enter__.return_value = handle
+            result = tunnel.check(self.state, health_attempts=3)
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["status"], "connected")
+        self.assertEqual(health.call_count, 3)
+        handle.terminate.assert_not_called()
+        launch.assert_not_called()
+        self.assertEqual(json.loads(self.state.read_text()), state)
+
+    def test_check_persistent_backend_failure_returns_error_and_preserves_tunnel(self):
+        state, command = self.write_state()
+        handle = Mock()
+        handle.identity.return_value = state
+        with patch.object(tunnel, "ProcessHandle") as factory, \
+             patch.object(tunnel, "process_command", return_value=command), \
+             patch.object(tunnel, "listener_owned", return_value=True), \
+             patch.object(tunnel, "health", return_value=False) as health, \
+             patch.object(tunnel.time, "sleep"), \
+             patch.object(tunnel.subprocess, "Popen") as launch:
+            factory.return_value.__enter__.return_value = handle
+            result = tunnel.check(self.state, health_attempts=3)
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["status"], "backend_unavailable")
+        self.assertEqual(result["error"], "backend_unavailable")
+        self.assertEqual(health.call_count, 3)
+        handle.terminate.assert_not_called()
+        launch.assert_not_called()
+        self.assertEqual(json.loads(self.state.read_text()), state)
+
+    def test_check_healthy_tunnel_does_not_wait_or_retry(self):
+        state, command = self.write_state()
+        handle = Mock()
+        handle.identity.return_value = state
+        with patch.object(tunnel, "ProcessHandle") as factory, \
+             patch.object(tunnel, "process_command", return_value=command), \
+             patch.object(tunnel, "listener_owned", return_value=True), \
+             patch.object(tunnel, "health", return_value=True) as health, \
+             patch.object(tunnel.time, "sleep") as sleep:
+            factory.return_value.__enter__.return_value = handle
+            result = tunnel.check(self.state)
+        self.assertTrue(result["ok"])
+        self.assertNotIn("error", result)
+        health.assert_called_once_with()
+        sleep.assert_not_called()
+
+    def test_connect_reuses_owned_busy_port_after_transient_health_failure(self):
+        state, _ = self.write_state()
+        with self.connect_fixture(old_identity=state, free=False) as fixture, \
+             patch.object(tunnel, "health", side_effect=[False, False, True]) as health, \
+             patch.object(tunnel.time, "sleep"):
+            result = tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+            self.assertTrue(result["ok"])
+            self.assertEqual(result["ssh_pid"], state["pid"])
+            self.assertEqual(health.call_count, 3)
+            fixture["launch"].assert_not_called()
+            fixture["old"].terminate.assert_not_called()
+            self.assertEqual(json.loads(self.state.read_text()), state)
 
     def test_identity_diagnostics_never_expose_command_or_secret_output(self):
         error = subprocess.CalledProcessError(1, ["internal", "sensitive-fixture"], stderr=b"sensitive-fixture")
