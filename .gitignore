@@ -393,6 +393,7 @@ __pycache__/
 !/scripts/vscripts/tests/test_building_death_visual.lua
 !/scripts/vscripts/tests/test_tower_destruction_rebuild.lua
 !/scripts/vscripts/tests/test_wave_population_endgame.lua
+!/scripts/vscripts/tests/test_wave_spawn_routing.lua
 !/scripts/vscripts/tests/test_lumberjack_fusion.lua
 !/scripts/vscripts/tests/test_lumberjack_fusion_ui.lua
 !/scripts/vscripts/tests/test_rogue_item_rewards.lua

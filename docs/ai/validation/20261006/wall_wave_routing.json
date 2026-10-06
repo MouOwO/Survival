@@ -1,0 +1,125 @@
+{
+  "date": "2026-10-06",
+  "task": "wall_quadrant_wave_spawns_and_shared_assault_limit",
+  "base_commit": "1c7406ffacfcc79f73d3413ca18502e100edfd55",
+  "wall_quadrants": {
+    "north_east": "north",
+    "north_west": "west",
+    "south_west": "south",
+    "south_east": "east"
+  },
+  "map_center": "mean_xy_of_four_configured_physical_portals",
+  "parallel_spawns": {
+    "order": "player_id",
+    "default_spacing": 80,
+    "four_offsets": [
+      -120,
+      -40,
+      40,
+      120
+    ],
+    "ground_hull_radius": 32,
+    "native_entrance_width": 448,
+    "keep_individual_ownership_and_wall_target": true
+  },
+  "population": {
+    "scope": "global_formal_assault_waves",
+    "alive_limit": 90,
+    "overflow_grace_game_seconds": 10,
+    "at_or_below_limit_resets_clock": true,
+    "overflow_timer_count": 1,
+    "expired_result": "all_participating_players_defeated",
+    "freeze_generation_and_victory_before_cleanup": true,
+    "practice_and_nonwave_challenges": "existing_separate_policies"
+  },
+  "tests": [
+    {
+      "test": "test_wave_spawn_routing",
+      "exit_code": 0
+    },
+    {
+      "test": "test_wave_population_endgame",
+      "exit_code": 0
+    },
+    {
+      "test": "test_personal_wave_projection",
+      "exit_code": 0
+    },
+    {
+      "test": "test_monster_ground_navigation",
+      "exit_code": 0
+    },
+    {
+      "test": "test_player_elimination",
+      "exit_code": 0
+    },
+    {
+      "test": "test_player_challenge_cleanup",
+      "exit_code": 0
+    },
+    {
+      "test": "test_hero_summon_player_isolation",
+      "exit_code": 0
+    },
+    {
+      "test": "test_difficulty_unlocks",
+      "exit_code": 0
+    },
+    {
+      "test": "test_archive_challenge_hub_positions",
+      "exit_code": 0
+    },
+    {
+      "test": "test_boss_warning_projection",
+      "exit_code": 0
+    },
+    {
+      "test": "test_wave_four_lane_collision",
+      "exit_code": 0
+    },
+    {
+      "test": "test_debug_spawn_positions",
+      "exit_code": 0
+    }
+  ],
+  "hud_simulation_exit_code": 0,
+  "lua_5_1_syntax_files": [
+    "scripts/vscripts/systems/wave_system.lua",
+    "scripts/vscripts/systems/wave_population_limit.lua",
+    "scripts/vscripts/systems/wave_spawn_routing.lua",
+    "scripts/vscripts/ui/ui_projection.lua",
+    "scripts/vscripts/config/global_rules.lua",
+    "scripts/vscripts/config/generated/global_rules.lua",
+    "scripts/vscripts/tests/test_wave_spawn_routing.lua",
+    "scripts/vscripts/tests/test_wave_population_endgame.lua",
+    "scripts/vscripts/tests/test_personal_wave_projection.lua",
+    "scripts/vscripts/tests/test_monster_ground_navigation.lua"
+  ],
+  "config_generator_reproducible": true,
+  "production_wave_batches_checked": 873,
+  "live_engine": {
+    "status": "NOT_VERIFIED",
+    "console": "ECONNREFUSED at 127.0.0.1:29000",
+    "game_not_restarted_or_interrupted": true,
+    "remaining_acceptance": [
+      "same-side four-player physical spawns and paths",
+      "split-quadrant wall paths",
+      "shared HUD count and global defeat"
+    ]
+  },
+  "resource_compilation": "NOT_NEEDED: Lua/config only; existing portals reused",
+  "post_sync_validation": {
+    "status": "PASS",
+    "source": "isolated_task_only_git_index_after_stash_pull_pop",
+    "lua_suites": 12,
+    "hud_exit_code": 0,
+    "unrelated_working_tree_changes_not_used": true
+  },
+  "git_sync": {
+    "task_stash_oid": "234892a1f05226c553e4866b0fdd3ceae59967a7",
+    "stash_pull_pop_completed": true,
+    "restored_task_hashes_verified": true,
+    "head_after_pull": "1c7406ffacfcc79f73d3413ca18502e100edfd55",
+    "unrelated_work_preserved": true
+  }
+}

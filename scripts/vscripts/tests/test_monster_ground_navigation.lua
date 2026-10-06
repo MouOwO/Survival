@@ -70,6 +70,7 @@ local function unit_mock()
 end
 
 local env = setmetatable({
+    Vector = function(x, y, z) return { x = x, y = y, z = z } end,
     Entities = { FindByName = function() return marker end },
     GridNav = { IsBlocked = function() return false end,
         IsTraversable = function() return true end },
@@ -103,11 +104,14 @@ local env = setmetatable({
 
 local definitions, encounters, spawn_points = { by_id = {} }, { by_id = {} }, { by_id = {} }
 local deps = {
+    ["core/scheduler"] = { cancel = no_op },
     ["systems/player_context_service"] = { is_defeated = function() return false end },
     ["systems/monster_navigation_policy"] = navigation,
     ["systems/monster_hull_scale"] = hull,
     ["systems/wave_monster_collision"] = collision,
     ["systems/wave_spawn_sequence"] = require("systems/wave_spawn_sequence"),
+    ["systems/wave_population_limit"] = require("systems/wave_population_limit"),
+    ["config/generated/player_slots"] = require("config/generated/player_slots"),
     ["config/global_rules"] = require("config/global_rules"),
     ["config/generated/monster_archetypes"] = definitions,
     ["config/generated/monster_encounters"] = encounters,
@@ -214,10 +218,14 @@ for _, definition in ipairs(require("config/generated/monster_archetypes").rows)
     assert(unit.capability == DOTA_UNIT_CAP_MOVE_GROUND and anti_air.is_flying(unit) == before)
 end
 
+deps["systems/wave_spawn_routing"] = load_service("wave_spawn_routing")
 local wave = load_service("wave_system")
 local spawn_wave = find_function(wave, "spawn_one")
 set_upvalue(spawn_wave, "monster_spawn_marker", marker)
-set_upvalue(spawn_wave, "state", { pending = 4, spawned = 0, alive = 0 })
+-- Keep every batch alive in this navigation fixture; shared limit/defeat is
+-- exercised separately by test_wave_population_endgame with the real budget.
+set_upvalue(spawn_wave, "state", { pending = 4, spawned = 0, alive = 0,
+    alive_limit = math.huge, overflow_active = false })
 for _, case in ipairs({ { "ground", "normal" }, { "flying", "normal" },
     { "flying", "assault_boss" }, { "ground", "normal", "flying" } }) do
     local definition = archetype(case[1], case[2] == "assault_boss" and 4.5 or 1)

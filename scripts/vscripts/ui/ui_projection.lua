@@ -70,8 +70,8 @@ local function on_wave_changed(payload)
 end
 
 local function player_wave_snapshot(player_id)
-    -- Wave lifecycle stays global. Counts and defeat warnings belong only to
-    -- the recipient, even when all four players share DOTA_TEAM_GOODGUYS.
+    -- All recipients share the assault count/deadline; buildings, resources and
+    -- the individual eliminated/spectator status still belong to the recipient.
     local snapshot = {}
     for key, value in pairs(wave) do snapshot[key] = value end
     local personal = event_bus.request(events.WAVE_STATE_GET_REQUEST, {
@@ -83,6 +83,8 @@ local function player_wave_snapshot(player_id)
     end
     snapshot.player_id = player_id
     snapshot.alive = math.max(0, tonumber(personal.alive) or 0)
+    snapshot.player_alive = math.max(0, tonumber(personal.player_alive) or 0)
+    snapshot.population_scope = personal.population_scope
     snapshot.overflow_active = personal.overflow_active == true
     snapshot.overflow_remaining = tonumber(personal.overflow_remaining) or 0
     snapshot.player_defeated = personal.player_defeated == true

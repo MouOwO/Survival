@@ -37,6 +37,7 @@ M.wave_ground_monster_hull_radius = M.number(
 )
 M.wave_alive_limit = M.number("wave_alive_limit", 90)
 M.wave_overflow_grace_seconds = M.number("wave_overflow_grace_seconds", 10)
+M.wave_shared_spawn_spacing = M.number("wave_shared_spawn_spacing", 80)
 M.practice_monster_hull_radius = M.number(
     "practice_monster_hull_radius",
     12
