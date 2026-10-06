@@ -5,6 +5,7 @@ local runtime = require("config/generated/tower_fusion_runtime")
 local skill_bindings = require("config/generated/ultimate_tower_skill_bindings")
 local tower_skills = require("systems/tower_skill_runtime")
 local tower_ability_sync = require("systems/tower_ability_sync")
+local tower_combat_rules = require("config/tower_combat_rules")
 
 local M = {}
 
@@ -187,6 +188,10 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
     unit:SetOwner(PlayerResource:GetPlayer(player_id))
     unit:SetControllableByPlayer(player_id, true)
     unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
+    if unit.GetProjectileSpeed and unit.SetProjectileSpeed then
+        local speed = tower_combat_rules.projectile_speed(unit:GetProjectileSpeed())
+        if speed then unit:SetProjectileSpeed(speed) end
+    end
     -- Share the normal tower's filtered target selection; native acquisition
     -- otherwise starts attacking the hostile resource tree before Lua sees it.
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end

@@ -66,6 +66,7 @@ Supabase PostgreSQL
 - 真实逐单位碰撞的穿透直线技能使用 `ProjectileManager:CreateLinearProjectile()`。
 - 攻击射程复用项目现有回退辅助函数。
 - 定时逻辑优先使用项目 scheduler，并明确结束与清理路径。
+- 防御塔弹道按global_rules.csv的0.5倍率减速，激光class_2、机枪class_4、防空class_7路线豁免；多重箭与终极原生弹道同样适用，保持基础速度缓存不缩放，箭命中延迟匹配飞行时间（2026-10-06）。
 - 防御塔跨攻击周期保持当前合法战斗目标，死亡/失效/出射程或移动重置后才按塔自身二维距离平方选最近敌人；保留空闲发现、训练靶让位、手动命令和原生订单恢复。此规则替代此前按城墙距离周期重选（2026-10-06）。
 - 多人 Builder progression、建筑数量、普通波次通道、怪物城墙目标和断线生命周期均以数字 `player_id` 隔离；同属 `DOTA_TEAM_GOODGUYS` 不能作为共享或所有权依据。正式波次怪物上限与HUD数量为全场共享，持续超限时全员判负。
 - 玩家命令统一经过唯一 ExecuteOrderFilter；真实玩家命令的全部单位必须解析为该玩家 owner，系统/AI issuer `-1` 保持放行。服务端注册身份和 `survival_player_id` 优先于普通 creature 不可靠的引擎 owner getter。

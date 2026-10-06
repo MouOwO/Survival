@@ -32,9 +32,16 @@ function M.set_attack_range(unit, attack_range)
     if unit.SetAcquisitionRange then unit:SetAcquisitionRange(0) end
 end
 
-function M.projectile_speed(base_speed)
+local native_speed_routes = {
+    class_2 = true, -- laser
+    class_4 = true, -- machine gun
+    class_7 = true, -- anti-air
+}
+
+function M.projectile_speed(base_speed, tower_class)
     base_speed = tonumber(base_speed)
     if not base_speed then return nil end
+    if native_speed_routes[tower_class] then return base_speed end
     local multiplier = math.max(
         0,
         tonumber(global_rules.tower_projectile_speed_multiplier) or 1

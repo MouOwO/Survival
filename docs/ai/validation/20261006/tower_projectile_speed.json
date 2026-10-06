@@ -1,0 +1,170 @@
+{
+  "date": "2026-10-06",
+  "scope": "All tower basic-attack projectiles at 50% speed except class_2 laser, class_4 machine gun, class_7 anti-air",
+  "native_base_arrow_speed": {
+    "before": 5000,
+    "after": 2500,
+    "scope": "initial construction"
+  },
+  "native_explicit_route_speed": {
+    "before": 100000,
+    "after": 50000
+  },
+  "multi_tracking_speed": {
+    "before": 1250,
+    "after": 625
+  },
+  "excluded_route_speed": 1250,
+  "working_tree_results": [
+    {
+      "test": "test_tower_skill_tree_exclusion",
+      "exit_code": 0,
+      "tail": [
+        "[WyvernBlizzardVisual] optional visual failed: ...s\\vscripts\\tests\\test_tower_skill_tree_exclusion.lua:1462: injected snow failure",
+        "TOWER_SKILL_TREE_EXCLUSION_PASS: native visuals, blizzard five levels/timing/damage/cleanup"
+      ]
+    },
+    {
+      "test": "test_tower_laser_damage",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_LASER_DAMAGE_PASS: original immediate hit and one-second cumulative totals, all multipliers and cap"
+      ]
+    },
+    {
+      "test": "test_tower_laser_health_prediction",
+      "exit_code": 0,
+      "tail": [
+        "LASER_HEALTH_PREDICTION_PASS: actual health deltas, ramp, concurrent towers, stop, expiry, zero damage and lethal cleanup"
+      ]
+    },
+    {
+      "test": "test_tower_attack_audio",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_ATTACK_AUDIO_PASS: configured gunshots at two speeds, shared coin limiter, every enabled tower sound precached"
+      ]
+    },
+    {
+      "test": "test_tower_seamless_targets",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_SEAMLESS_TARGETS_PASS: base, 7 routes, fusion; 9000 locked attack cycles without rescanning, nearest-on-death, range/death fallback, next-frame recovery, no cooldown reset or extra attack"
+      ]
+    },
+    {
+      "test": "test_tower_upgrade_targeting",
+      "exit_code": 0,
+      "tail": [
+        "[Survival][INFO][BuildingSystem] initialized recovered=2",
+        "TOWER_UPGRADE_TARGETING_PASS: actual construction, upgrade completion, technology/permanent range changes, technology-only and building recovery, zero native acquisition and ordinary-enemy targeting"
+      ]
+    },
+    {
+      "test": "route_probe",
+      "exit_code": 0,
+      "tail": [
+        "[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325",
+        "PROJECTILE_SPEED_ROUTES_PASS: 140 real class/upgrade completions; three excluded routes unchanged"
+      ]
+    },
+    {
+      "test": "ultimate_probe",
+      "exit_code": 0,
+      "tail": [
+        "[TowerFusion] failed player=0 error=fusion_create_runtime_error",
+        "ULTIMATE_TOWER_TREE_TARGETING_PASS: real fusion, modifier installation, ordinary targets, automatic/manual tree rejection, order filter and failed-init rollback"
+      ]
+    }
+  ],
+  "route_completions_verified": 140,
+  "damage_and_attack_rate": "unchanged; multi-arrow impact delay follows doubled travel time",
+  "engine_validation": "not performed; re-enter map required; no new resources to compile",
+  "sync_validation": "stash/pull/pop succeeded; exact hashes restored; nine task-only checks passed",
+  "native_upgraded_base_speed": {
+    "before": 1250,
+    "after": 625
+  },
+  "base_probe": {
+    "exit_code": 0,
+    "note": "Initial construction, upgrade and recovery use their original per-level base speeds at 50%"
+  },
+  "post_sync_results": [
+    {
+      "test": "test_tower_skill_tree_exclusion",
+      "exit_code": 0,
+      "tail": [
+        "[WyvernBlizzardVisual] optional visual failed: ...s\\vscripts\\tests\\test_tower_skill_tree_exclusion.lua:1462: injected snow failure",
+        "TOWER_SKILL_TREE_EXCLUSION_PASS: native visuals, blizzard five levels/timing/damage/cleanup"
+      ]
+    },
+    {
+      "test": "test_tower_laser_damage",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_LASER_DAMAGE_PASS: original immediate hit and one-second cumulative totals, all multipliers and cap"
+      ]
+    },
+    {
+      "test": "test_tower_laser_health_prediction",
+      "exit_code": 0,
+      "tail": [
+        "LASER_HEALTH_PREDICTION_PASS: actual health deltas, ramp, concurrent towers, stop, expiry, zero damage and lethal cleanup"
+      ]
+    },
+    {
+      "test": "test_tower_attack_audio",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_ATTACK_AUDIO_PASS: configured gunshots at two speeds, shared coin limiter, every enabled tower sound precached"
+      ]
+    },
+    {
+      "test": "test_tower_seamless_targets",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_SEAMLESS_TARGETS_PASS: base, 7 routes, fusion; 9000 locked attack cycles without rescanning, nearest-on-death, range/death fallback, next-frame recovery, no cooldown reset or extra attack"
+      ]
+    },
+    {
+      "test": "test_tower_upgrade_targeting",
+      "exit_code": 0,
+      "tail": [
+        "[Survival][INFO][BuildingSystem] initialized recovered=2",
+        "TOWER_UPGRADE_TARGETING_PASS: actual construction, upgrade completion, technology/permanent range changes, technology-only and building recovery, zero native acquisition and ordinary-enemy targeting"
+      ]
+    },
+    {
+      "test": "route_probe",
+      "exit_code": 0,
+      "tail": [
+        "[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325",
+        "PROJECTILE_SPEED_ROUTES_PASS: 140 real class/upgrade completions; three excluded routes unchanged"
+      ]
+    },
+    {
+      "test": "ultimate_probe",
+      "exit_code": 0,
+      "tail": [
+        "[TowerFusion] failed player=0 error=fusion_create_runtime_error",
+        "ULTIMATE_TOWER_TREE_TARGETING_PASS: real fusion, modifier installation, ordinary targets, automatic/manual tree rejection, order filter and failed-init rollback"
+      ]
+    },
+    {
+      "test": "base_probe",
+      "exit_code": 0,
+      "tail": [
+        "TOWER_UPGRADE_TARGETING_PASS: actual construction, upgrade completion, technology/permanent range changes, technology-only and building recovery, zero native acquisition and ordinary-enemy targeting",
+        "BASE_PROJECTILE_SPEED_PASS: initial 2500, upgraded/recovered 625"
+      ]
+    }
+  ],
+  "syntax_checked": [
+    "scripts/vscripts/config/generated/global_rules.lua",
+    "scripts/vscripts/config/tower_combat_rules.lua",
+    "scripts/vscripts/modifiers/modifier_tower_attack_effects.lua",
+    "scripts/vscripts/systems/building_upgrade_system.lua",
+    "scripts/vscripts/systems/tower_fusion_service.lua",
+    "scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua"
+  ]
+}

@@ -1075,7 +1075,7 @@ second.name = "npc_survival_wave_monster"
 tower.Script_GetAttackRange = saved_getter
 
 -- The Clinkz SR outfit uses its chosen searing arrow for all five levels, while
--- the existing tracking speed, split count, delay, damage and armor ignore stay.
+-- tracking speed is halved; hit delay follows travel, with damage unchanged.
 local ballista_asset_id = "tower_multi_drow_dread_retribution"
 local real_catalog = assert(loadfile("scripts/vscripts/config/asset_catalog.lua"))()
 local ballista_asset = real_catalog.by_id[ballista_asset_id]
@@ -1102,9 +1102,9 @@ for level = 1, 5 do
     m:OnAttack({ attacker = tower, target = dummy })
     assert(#tracking == 4 and #scheduled == 4 and #damage == 0)
     for i, projectile in ipairs(tracking) do
-        assert(projectile.EffectName == ballista_path and projectile.iMoveSpeed == 1250)
+        assert(projectile.EffectName == ballista_path and projectile.iMoveSpeed == 625)
         assert(projectile.Ability == nil and projectile.bDodgeable == false)
-        local expected_delay = (projectile.Target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D() / 1250
+        local expected_delay = (projectile.Target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D() / 625
         assert(math.abs(scheduled[i].delay - expected_delay) < 1e-9)
     end
     drain()

@@ -53,7 +53,7 @@ local function set_attack_range(unit, attack_range)
     tower_combat_rules.set_attack_range(unit, attack_range)
 end
 
-local function set_tower_projectile_speed(unit, configured_speed)
+local function set_tower_projectile_speed(unit, configured_speed, tower_class)
     local base_speed = tonumber(configured_speed)
     if not base_speed and unit.survival_base_projectile_speed == nil then
         base_speed = tonumber(global_rules.tower_base_projectile_speed)
@@ -64,7 +64,8 @@ local function set_tower_projectile_speed(unit, configured_speed)
     if base_speed then unit.survival_base_projectile_speed = base_speed end
     base_speed = tonumber(unit.survival_base_projectile_speed)
     if base_speed and unit.SetProjectileSpeed then
-        local projectile_speed = tower_combat_rules.projectile_speed(base_speed)
+        local projectile_speed = tower_combat_rules.projectile_speed(
+            base_speed, tower_class or unit.survival_tower_class)
         unit:SetProjectileSpeed(projectile_speed)
         unit.survival_projectile_speed = projectile_speed
     end
@@ -328,7 +329,7 @@ local function apply_tower(unit, data, level)
             break
         end
     end
-    set_tower_projectile_speed(unit, data.projectile_speed)
+    set_tower_projectile_speed(unit, data.projectile_speed, data.tower_class)
     set_attack_range(unit, global_rules.tower_attack_range)
 end
 
@@ -785,6 +786,8 @@ end
 
 local function route_unit_data(state, row)
     return {
+        -- The unit still carries its previous class until apply_tower returns.
+        tower_class = state.tower_class or "",
         health = state.unit:GetMaxHealth(),
         armor = state.unit:GetPhysicalArmorBaseValue(),
         damage = row.base_attack_damage,

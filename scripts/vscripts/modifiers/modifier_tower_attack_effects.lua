@@ -993,17 +993,19 @@ local function split_arrow(caster, target, damage, projectile_name, multiplier,
         armor_ignore_pct)
     if not valid(caster) or not valid(target) then return end
     local distance = (target:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
+    local speed = tower_combat_rules.projectile_speed(
+        SPLIT_ARROW_SPEED, caster.survival_tower_class)
     ProjectileManager:CreateTrackingProjectile({
         Target = target,
         Source = caster,
         Ability = nil,
         EffectName = projectile_name
             or "particles/units/heroes/hero_drow/drow_base_attack.vpcf",
-        iMoveSpeed = SPLIT_ARROW_SPEED,
+        iMoveSpeed = speed,
         bDodgeable = false,
         bProvidesVision = false,
     })
-    scheduler.after(distance / SPLIT_ARROW_SPEED, function()
+    scheduler.after(distance / speed, function()
         if valid(caster) and valid(target) then
             detailed_log(
                 "[TowerMulti] HIT tower=%d target=%d raw_attack=%.1f multiplier=%.2f",
