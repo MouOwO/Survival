@@ -1,0 +1,594 @@
+{
+  "date": "2026-10-06",
+  "source_review_head": "74badd570eceebd8b16271c3af91a865da53ec2c",
+  "logged_session": {
+    "date": "2026-10-06",
+    "start": "16:25:16",
+    "end": "16:59:27",
+    "timezone": "Asia/Shanghai",
+    "map": "template_map",
+    "difficulty": "N1",
+    "same_as_user_reported_session_confirmed": false
+  },
+  "status": "SERVER_THINK_STALLS_CONFIRMED_FROM_LOCAL_LOG_CLIENT_VFX_CONTRIBUTION_UNMEASURED",
+  "live_connection_at_detection": false,
+  "analysis": {
+    "metric_scope": "Logged server entity Think warnings, grouped by the last wave-start marker; not full tick times or FPS.",
+    "threshold_note": "33.33 ms is a comparison threshold, not a measured server tick interval.",
+    "client_fps_measured": false,
+    "gpu_time_measured": false,
+    "particle_alive_count_measured": false,
+    "line_count": 26642,
+    "source_sha256": "30d3efe66f29b0089fc75b0dd7b70f7d48a09ea3682ef0690e7f635799841e52",
+    "sessions": [
+      {
+        "session": 1,
+        "waves": [
+          {
+            "wave": 0,
+            "warnings": 18,
+            "game_mode_warnings": 18,
+            "npc_warnings": 0,
+            "max_think_ms": 25.95,
+            "game_mode_max_ms": 25.95,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0
+          },
+          {
+            "wave": 1,
+            "warnings": 18,
+            "game_mode_warnings": 18,
+            "npc_warnings": 0,
+            "max_think_ms": 26.24,
+            "game_mode_max_ms": 26.24,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:28:47",
+            "memory_line": 4222,
+            "game_time": 176.6,
+            "lua_kib": 37364.2,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 38,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 2,
+            "warnings": 10,
+            "game_mode_warnings": 10,
+            "npc_warnings": 0,
+            "max_think_ms": 25.36,
+            "game_mode_max_ms": 25.36,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:30:17",
+            "memory_line": 5634,
+            "game_time": 266.6,
+            "lua_kib": 22980.2,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 38,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 3,
+            "warnings": 16,
+            "game_mode_warnings": 16,
+            "npc_warnings": 0,
+            "max_think_ms": 24.29,
+            "game_mode_max_ms": 24.29,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:31:47",
+            "memory_line": 5835,
+            "game_time": 356.6,
+            "lua_kib": 35682.1,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 40,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 4,
+            "warnings": 23,
+            "game_mode_warnings": 23,
+            "npc_warnings": 0,
+            "max_think_ms": 27.61,
+            "game_mode_max_ms": 27.61,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:33:17",
+            "memory_line": 6422,
+            "game_time": 446.7,
+            "lua_kib": 31372.1,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 40,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 5,
+            "warnings": 66,
+            "game_mode_warnings": 66,
+            "npc_warnings": 0,
+            "max_think_ms": 32.4,
+            "game_mode_max_ms": 32.4,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:34:47",
+            "memory_line": 6920,
+            "game_time": 536.7,
+            "lua_kib": 36007,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 43,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 6,
+            "warnings": 75,
+            "game_mode_warnings": 75,
+            "npc_warnings": 0,
+            "max_think_ms": 31.94,
+            "game_mode_max_ms": 31.94,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:36:17",
+            "memory_line": 8478,
+            "game_time": 626.7,
+            "lua_kib": 38780.8,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 42,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 7,
+            "warnings": 77,
+            "game_mode_warnings": 77,
+            "npc_warnings": 0,
+            "max_think_ms": 30.96,
+            "game_mode_max_ms": 30.96,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:37:47",
+            "memory_line": 10009,
+            "game_time": 716.7,
+            "lua_kib": 31408.3,
+            "alive_at_start": 0,
+            "pending_at_start": 9,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 37,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 8,
+            "warnings": 82,
+            "game_mode_warnings": 82,
+            "npc_warnings": 0,
+            "max_think_ms": 28.61,
+            "game_mode_max_ms": 28.61,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:39:17",
+            "memory_line": 10896,
+            "game_time": 806.7,
+            "lua_kib": 20088.1,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 41,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 9,
+            "warnings": 91,
+            "game_mode_warnings": 91,
+            "npc_warnings": 0,
+            "max_think_ms": 31.28,
+            "game_mode_max_ms": 31.28,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:40:47",
+            "memory_line": 11824,
+            "game_time": 896.8,
+            "lua_kib": 38070,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 40,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 10,
+            "warnings": 92,
+            "game_mode_warnings": 92,
+            "npc_warnings": 0,
+            "max_think_ms": 41.51,
+            "game_mode_max_ms": 41.51,
+            "over_33_33_ms": 1,
+            "game_mode_over_33_33_ms": 1,
+            "started": "10/06 16:42:17",
+            "memory_line": 12814,
+            "game_time": 986.8,
+            "lua_kib": 21563.9,
+            "alive_at_start": 0,
+            "pending_at_start": 14,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 42,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 11,
+            "warnings": 99,
+            "game_mode_warnings": 99,
+            "npc_warnings": 0,
+            "max_think_ms": 31.5,
+            "game_mode_max_ms": 31.5,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:43:47",
+            "memory_line": 13261,
+            "game_time": 1076.8,
+            "lua_kib": 29862.4,
+            "alive_at_start": 0,
+            "pending_at_start": 60,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 86,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 12,
+            "warnings": 101,
+            "game_mode_warnings": 101,
+            "npc_warnings": 0,
+            "max_think_ms": 32.35,
+            "game_mode_max_ms": 32.35,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:45:17",
+            "memory_line": 13698,
+            "game_time": 1166.8,
+            "lua_kib": 21188.6,
+            "alive_at_start": 0,
+            "pending_at_start": 60,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 90,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 13,
+            "warnings": 98,
+            "game_mode_warnings": 98,
+            "npc_warnings": 0,
+            "max_think_ms": 30.58,
+            "game_mode_max_ms": 30.58,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:46:47",
+            "memory_line": 14095,
+            "game_time": 1256.8,
+            "lua_kib": 38988.6,
+            "alive_at_start": 0,
+            "pending_at_start": 60,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 90,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 14,
+            "warnings": 89,
+            "game_mode_warnings": 89,
+            "npc_warnings": 0,
+            "max_think_ms": 31.34,
+            "game_mode_max_ms": 31.34,
+            "over_33_33_ms": 0,
+            "game_mode_over_33_33_ms": 0,
+            "started": "10/06 16:48:17",
+            "memory_line": 14910,
+            "game_time": 1346.8,
+            "lua_kib": 43923.8,
+            "alive_at_start": 0,
+            "pending_at_start": 60,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 88,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 15,
+            "warnings": 110,
+            "game_mode_warnings": 110,
+            "npc_warnings": 0,
+            "max_think_ms": 52.57,
+            "game_mode_max_ms": 52.57,
+            "over_33_33_ms": 10,
+            "game_mode_over_33_33_ms": 10,
+            "started": "10/06 16:49:47",
+            "memory_line": 15670,
+            "game_time": 1436.8,
+            "lua_kib": 32614.7,
+            "alive_at_start": 0,
+            "pending_at_start": 61,
+            "enemies_at_start": 0,
+            "scheduler_at_start": 87,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 16,
+            "warnings": 115,
+            "game_mode_warnings": 115,
+            "npc_warnings": 0,
+            "max_think_ms": 48.88,
+            "game_mode_max_ms": 48.88,
+            "over_33_33_ms": 8,
+            "game_mode_over_33_33_ms": 8,
+            "started": "10/06 16:51:17",
+            "memory_line": 17946,
+            "game_time": 1526.8,
+            "lua_kib": 34796.9,
+            "alive_at_start": 15,
+            "pending_at_start": 60,
+            "enemies_at_start": 15,
+            "scheduler_at_start": 97,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 17,
+            "warnings": 146,
+            "game_mode_warnings": 135,
+            "npc_warnings": 11,
+            "max_think_ms": 49.66,
+            "game_mode_max_ms": 49.66,
+            "over_33_33_ms": 8,
+            "game_mode_over_33_33_ms": 8,
+            "started": "10/06 16:52:47",
+            "memory_line": 19340,
+            "game_time": 1616.8,
+            "lua_kib": 38788.5,
+            "alive_at_start": 38,
+            "pending_at_start": 60,
+            "enemies_at_start": 38,
+            "scheduler_at_start": 95,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 18,
+            "warnings": 168,
+            "game_mode_warnings": 136,
+            "npc_warnings": 32,
+            "max_think_ms": 50.64,
+            "game_mode_max_ms": 50.64,
+            "over_33_33_ms": 8,
+            "game_mode_over_33_33_ms": 8,
+            "started": "10/06 16:54:18",
+            "memory_line": 21620,
+            "game_time": 1706.8,
+            "lua_kib": 31730.7,
+            "alive_at_start": 51,
+            "pending_at_start": 60,
+            "enemies_at_start": 51,
+            "scheduler_at_start": 103,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 19,
+            "warnings": 182,
+            "game_mode_warnings": 125,
+            "npc_warnings": 57,
+            "max_think_ms": 54.35,
+            "game_mode_max_ms": 54.35,
+            "over_33_33_ms": 21,
+            "game_mode_over_33_33_ms": 21,
+            "started": "10/06 16:55:48",
+            "memory_line": 23272,
+            "game_time": 1796.8,
+            "lua_kib": 45699.1,
+            "alive_at_start": 43,
+            "pending_at_start": 60,
+            "enemies_at_start": 43,
+            "scheduler_at_start": 110,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 20,
+            "warnings": 262,
+            "game_mode_warnings": 136,
+            "npc_warnings": 126,
+            "max_think_ms": 59.36,
+            "game_mode_max_ms": 59.36,
+            "over_33_33_ms": 21,
+            "game_mode_over_33_33_ms": 21,
+            "started": "10/06 16:57:18",
+            "memory_line": 25074,
+            "game_time": 1886.8,
+            "lua_kib": 37489.1,
+            "alive_at_start": 52,
+            "pending_at_start": 61,
+            "enemies_at_start": 52,
+            "scheduler_at_start": 105,
+            "tracked_monster_visuals_at_start": 0
+          },
+          {
+            "wave": 21,
+            "warnings": 74,
+            "game_mode_warnings": 36,
+            "npc_warnings": 38,
+            "max_think_ms": 62.35,
+            "game_mode_max_ms": 62.35,
+            "over_33_33_ms": 5,
+            "game_mode_over_33_33_ms": 5,
+            "started": "10/06 16:58:50",
+            "memory_line": 26013,
+            "game_time": 1976.8,
+            "lua_kib": 61985,
+            "alive_at_start": 83,
+            "pending_at_start": 60,
+            "enemies_at_start": 83,
+            "scheduler_at_start": 104,
+            "tracked_monster_visuals_at_start": 0
+          }
+        ],
+        "entity_warnings": {
+          "dota_base_game_mode([])": {
+            "count": 1748,
+            "max_ms": 62.35
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/heroes/winterwyvern/winterwyvern.vmdl)": {
+            "count": 1,
+            "max_ms": 12.16
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/creeps/lane_creeps/creep_radiant_melee/radiant_melee.vmdl)": {
+            "count": 68,
+            "max_ms": 14.72
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/creeps/lane_creeps/creep_dire_hulk/creep_dire_diretide_ancient_hulk.vmdl)": {
+            "count": 35,
+            "max_ms": 13.63
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/heroes/spirit_breaker/spirit_breaker.vmdl)": {
+            "count": 1,
+            "max_ms": 10.06
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/heroes/lich/lich.vmdl)": {
+            "count": 14,
+            "max_ms": 13.67
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_melee.vmdl)": {
+            "count": 31,
+            "max_ms": 15.23
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/creeps/lane_creeps/creep_bad_melee/creep_bad_flagbearer.vmdl)": {
+            "count": 24,
+            "max_ms": 15.87
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/creeps/lane_creeps/creep_2021_radiant/creep_2021_radiant_melee_mega.vmdl)": {
+            "count": 24,
+            "max_ms": 15.42
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/heroes/dark_seer/dark_seer.vmdl)": {
+            "count": 46,
+            "max_ms": 14.65
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/heroes/shadow_fiend/shadow_fiend.vmdl)": {
+            "count": 5,
+            "max_ms": 13.16
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/heroes/troll_warlord/troll_warlord.vmdl)": {
+            "count": 1,
+            "max_ms": 11.73
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/heroes/techies/techies.vmdl)": {
+            "count": 4,
+            "max_ms": 13.71
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/heroes/sniper/sniper.vmdl)": {
+            "count": 8,
+            "max_ms": 12.43
+          },
+          "npc_dota_creature(npc_dota_creature[], model: models/survival_buildings/arrow_tower_lv05.vmdl)": {
+            "count": 2,
+            "max_ms": 14.57
+          }
+        },
+        "resource_errors": [
+          {
+            "line": 889,
+            "path": "particles/neutral_fx/miniboss_damage_reflect_explosion.vpcf_c",
+            "reason": "ERROR_FILEOPEN: File not found"
+          },
+          {
+            "line": 955,
+            "path": "materials/particle/particle_ring_blurry_generic_projected.vmat_c",
+            "reason": "ERROR_FILEOPEN: File not found"
+          }
+        ],
+        "lua_errors": 0,
+        "damage_log_lines": 0
+      }
+    ]
+  },
+  "findings": {
+    "server": {
+      "confirmed": true,
+      "scope": "Logged native entity Think callbacks. Game-mode callbacks reach 52.57 ms in W15 and 62.35 ms by W21. Scheduler task attribution still requires live profiling."
+    },
+    "population": {
+      "confirmed": true,
+      "scope": "At W16/17/18/19/20/21 start, 15/38/51/43/52/83 monsters remained alive. This is actual surviving workload, not proof of orphaned dead entities."
+    },
+    "damage_record_retention": {
+      "confirmed_in_source_and_offline": true,
+      "production_module": "scripts/vscripts/combat/damage_transaction_repository.lua",
+      "mechanism": "create keeps a record in transactions; consume_pending removes only the pending entry; remove has no production callers; init clears records on initialization.",
+      "lua_version": "5.4.5",
+      "pending_records_consumed": true,
+      "gc_only_in_offline_benchmark": true,
+      "samples": [
+        {
+          "processed": 10000,
+          "retained": 10000,
+          "heap_delta_kib": 5792
+        },
+        {
+          "processed": 30000,
+          "retained": 30000,
+          "heap_delta_kib": 17146
+        },
+        {
+          "processed": 60000,
+          "retained": 60000,
+          "heap_delta_kib": 34304.9
+        }
+      ],
+      "in_game_record_count_measured": false,
+      "in_game_gc_cost_measured": false,
+      "root_cause_contribution_established": false
+    },
+    "client": {
+      "fps": false,
+      "frame_times": false,
+      "gpu_time": false,
+      "particle_alive_counts": false,
+      "particles_on_off_on_comparison": false,
+      "tearing_vs_motion_stutter_distinguished": false
+    },
+    "memory_note": "Lua heap snapshots fluctuate and tracked_monster_visuals=0 measures only monster_visual_service state; it does not measure all models, native wearables, tower VFX, RAM or VRAM."
+  },
+  "instrumentation": {
+    "autoloaded_by_gameplay": false,
+    "entry": "script_reload_code tests/manual_boss_performance",
+    "duration_seconds_default": 15,
+    "duration_range": [
+      1,
+      30
+    ],
+    "scheduler_entry": "survival_perf_capture 15",
+    "metrics": "Inclusive callback clock costs, bounded event and particle-create path counts, initial/final wave/difficulty/tasks/damage-record/Lua-heap snapshots.",
+    "native_hooks": "Writable methods only, unavailable native methods reported; released particle handles are not particle deaths.",
+    "cleanup": "Deadline/manual stop restores exact wrappers, respects hot reload; scheduler.init stops old-world hooks.",
+    "gameplay_changes": false
+  },
+  "checks_passed": [
+    "node tools/test_analyze_combat_log.cjs",
+    "lua tools/test_boss_performance_capture.lua",
+    "lua scripts/vscripts/tests/test_combat_performance_capture.lua",
+    "lua tools/test_scheduler_profile.lua",
+    "lua tools/benchmark_damage_retention.lua"
+  ],
+  "worktree_preservation": {
+    "original_files": 78,
+    "byte_hashes_verified_after_pop": true,
+    "original_stashes_preserved": 39,
+    "task_stash_oid": "d042630af0a25eab0465bebecda910073cfaa600",
+    "pull": "Already up to date",
+    "task_stash_popped": true,
+    "network_workaround": "Command-local OpenSSL / HTTP1.1; no persistent Git configuration change.",
+    "original_log": "Ignored output/boss_performance_20261006/console_original.log; raw log is not committed."
+  }
+}
