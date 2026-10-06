@@ -19,4 +19,17 @@ vm.runInNewContext(code.slice(code.indexOf('    function hideCustomTooltip('),co
 fadeEnv.hideCustomTooltip();assert(tip.BHasClass('FadingOut'));
 fadeEnv.tooltipAnimationSerial++;tip.RemoveClass('FadingOut');pending.shift()();assert(!tip.BHasClass('Hidden'),'old fade must not hide newly shown ability');
 fadeEnv.hideCustomTooltip();pending.shift()();assert(tip.BHasClass('Hidden'));assert.equal(tip.visible,undefined,'hiding must not collapse panel through visible property');
-console.log('ABILITY_TOOLTIP_STABILITY_PASS: fixed bottom across heights, synchronous skill switch, pooled fields, stale hide cancelled');
+const poolEnv = {};
+vm.runInNewContext(code.slice(code.indexOf('    function resetFieldRows('),code.indexOf('    function render(')),poolEnv);
+const validPanel = () => ({IsValid: () => true, visible: true});
+const pooledRow = validPanel();
+pooledRow.__iconHost = validPanel(); pooledRow.__left = validPanel(); pooledRow.__right = validPanel();
+pooledRow.__icons = {attack: validPanel()};
+let cleared = 0;
+const pool = {__fieldRows: [pooledRow], __fieldCursor: 5, RemoveAndDeleteChildren() {cleared++;}};
+poolEnv.resetFieldRows(pool);
+assert.equal(cleared, 0); assert.equal(pool.__fieldCursor, 0); assert.equal(pooledRow.visible, false);
+pooledRow.__right.IsValid = () => false;
+poolEnv.resetFieldRows(pool);
+assert.equal(cleared, 1); assert.equal(pool.__fieldRows.length, 0, 'hot reload must discard invalid cached child panels');
+console.log('ABILITY_TOOLTIP_STABILITY_PASS: fixed bottom across heights, synchronous skill switch, pooled fields, stale hide cancelled, hot-reload child recovery');
