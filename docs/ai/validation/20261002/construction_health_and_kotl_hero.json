@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "hero": "npc_dota_hero_keeper_of_the_light",
+  "compatibility_id": "hero_shadow_fiend",
+  "tower_shadow_fiend_unchanged": true,
+  "construction_health_bar": "Native and custom hidden during construction; restored after authoritative completion; collision/progress unchanged",
+  "skill": {
+    "particle": "particles/units/heroes/hero_keeper_of_the_light/keeper_of_the_light_blinding_light_aoe.vpcf",
+    "radius": 250,
+    "trigger_chance": 0.1,
+    "damage_multipliers": [
+      27.5,
+      30,
+      32.5,
+      35,
+      37.5
+    ],
+    "stack_duration": 3,
+    "max_stacks": 5,
+    "gameplay_changed": false
+  },
+  "checks": [
+    "Construction start/complete/cancel/optional-particle failure",
+    "Custom bars: 200 units/100 polls, no extra writes",
+    "250 radius 249/251 boundary and original stack expiry",
+    "Optional white-light failure still settles damage",
+    "Actual KotL summon transaction: seven scenarios",
+    "All six hero player-loadout precaches",
+    "Strict addon precache entry",
+    "42 resource dependencies and native sound/icon",
+    "Six generated tables match CSV; hero combat fields unchanged"
+  ],
+  "in_game_visual_verified": false,
+  "map_reload_required": true
+}

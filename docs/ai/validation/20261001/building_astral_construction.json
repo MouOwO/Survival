@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-01",
+  "task": "Native Outworld Destroyer Astral Imprisonment construction visual and progress bar",
+  "configuration": {
+    "building_rows": 9,
+    "duration_seconds": 3,
+    "duration_changed": false,
+    "loop": "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_prison.vpcf",
+    "complete": "particles/units/heroes/hero_obsidian_destroyer/obsidian_destroyer_prison_end.vpcf",
+    "resource_source": "Local Dota VPK; extracted resourceinfo DATA in output/build_astral",
+    "label": "建造中"
+  },
+  "behavior": {
+    "hide_building_until_server_completion": true,
+    "hide_even_if_optional_particle_fails": true,
+    "real_entity_and_grid_reserved_during_build": true,
+    "temporary_positive_hull_from_footprint": true,
+    "restore_normal_hull_at_completion": true,
+    "worker_clears_footprint_before_build": true,
+    "native_imprisonment_modifier_applied": false,
+    "progress_uses_paused_game_clock": true,
+    "network_updates": "Start and retirement only, through existing survival_ui_state table",
+    "ui_schedule": "0.03 seconds while construction states exist; stops when empty"
+  },
+  "validation": {
+    "scripts/vscripts/tests/test_building_astral_construction.lua": "PASS: nine config rows, native world anchor, hidden lifecycle, hull preserved, completion burst, idempotent cleanup, cancellation, particle failure",
+    "scripts/vscripts/tests/test_builder_yield_construction.lua": "PASS: worker clears footprint before construction; construction hull positive; normal completion collision restored",
+    "tools/test_construction_progress.cjs": "PASS: snapshot, label, timed progress, pause, server completion, dormancy, death, cleanup, no idle scheduling",
+    "lua_syntax": "PASS: building_system, building_construction_visual_service, building_warp_effects, generated building_construction_rules",
+    "git_diff_check": "PASS",
+    "ui_compile": {
+      "building_construction_progress.js": { "compiled": 1, "failed": 0 },
+      "building_construction_progress.css": { "compiled": 1, "failed": 0 },
+      "survival_hud.xml_and_dependencies": { "compiled": 13, "failed": 0 },
+      "logs": "output/build_astral/ui"
+    }
+  },
+  "in_game_visual_acceptance": "Not performed; current match was not restarted or unpaused. Native effect scale and appearance still require in-game observation."
+}

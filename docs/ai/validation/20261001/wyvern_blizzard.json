@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "roots": [
+    "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+    "particles/survival/skills/wyvern_blizzard_snow.vpcf"
+  ],
+  "resources": [
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ground.vpcf",
+      "sha256": "5af1dd4324f19d4f544f03b350497cdd11d169f572d77dc7ca65cbcb7499518b",
+      "dependencies": [
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_proj.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_blast_frost.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ring_crystal.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ring_dust.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_blast_frost_outer.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_twinkle.vpcf",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_beams_ovr.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_proj.vpcf",
+      "sha256": "e39d650562107b9f03f45e8b9d17c5fb503e7deecacf98094271045fc7a70939",
+      "dependencies": [
+        "materials/particle/projected_groundcracks_02.vmat"
+      ]
+    },
+    {
+      "resource": "materials/particle/projected_groundcracks_02.vmat",
+      "sha256": "f1314a85896c9951d613c13010ce442e661043bc49f8b52e6af32f4dde3b148e",
+      "dependencies": [
+        "materials/particle/projected_groundcracks_02_color_tga_61446d4.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/projected_groundcracks_02_color_tga_61446d4.vtex",
+      "sha256": "992caacca26fa7fc3799c1285d6aeccb2772f24cae971d9030ac34314b155faa"
+    },
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_blast_frost.vpcf",
+      "sha256": "1456fe34e3946f9fbd29c3d7ed7c4ad7786f898e4486474af96ee393703ad44a",
+      "dependencies": [
+        "materials/particle/frost/frost.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/frost/frost.vtex",
+      "sha256": "113fd5663853722c8b6ae936c643580e8153ea52b64771e04471c7ed6f964604"
+    },
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ring_crystal.vpcf",
+      "sha256": "32c1ce4e3cbd5a185fd4d7f7a1bc93d40d628199c9ba48dbfad2c96d51a76743",
+      "dependencies": [
+        "materials/particle/crystal/crystal.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/crystal/crystal.vtex",
+      "sha256": "5e78dcd5aef30578997b8c3f716240966ce199d5692de055bd36a8117a89672f"
+    },
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ring_dust.vpcf",
+      "sha256": "03b0072fcd8b48e1a7f6bd2c48c3d34a3f054b84eed8724b84bc5f08b060245b",
+      "dependencies": [
+        "materials/particle/smoke1/smoke1.vtex",
+        "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ring_dust_detail.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke1/smoke1.vtex",
+      "sha256": "3548ab013d8947b937c03e1f53b7f91f34bda786af4e5acd0f34183ec8aef75e"
+    },
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_ring_dust_detail.vpcf",
+      "sha256": "0471baa750378cbbd72ca266dd9e300874be8ca1d54f23345e8a3b7d69d60001",
+      "dependencies": [
+        "materials/particle/smoke/static/static_smoke.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke/static/static_smoke.vtex",
+      "sha256": "b4db32c0fb5cf71a6cda967c958ec062d3bac6fe05c15846c542fb9d467224db"
+    },
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_blast_frost_outer.vpcf",
+      "sha256": "919d90aef9d2a4920833d94657d5160660dffe1514e60ec9b96b398b1943f48e",
+      "dependencies": [
+        "materials/particle/frost/frost.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_twinkle.vpcf",
+      "sha256": "fcb11dfcbe683f8b0bd1455c49445ab657a231003a3975644466eb137910740a",
+      "dependencies": [
+        "materials/particle/yellowflare2.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/yellowflare2.vtex",
+      "sha256": "9dec6cb6b0846873ebba0215892c34b2198050fbbf2dc3f6df4d5b5c937f40fb"
+    },
+    {
+      "resource": "particles/units/heroes/hero_winter_wyvern/wyvern_winters_curse_beams_ovr.vpcf",
+      "sha256": "8abf8b3cbf26d4604ad2f85f32d61ced09ee4b636c1a67e18d2900342c455825",
+      "dependencies": [
+        "materials/particle/particle_cone_variamt_gradient_1.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_cone_variamt_gradient_1.vtex",
+      "sha256": "8136a323323a2f0c9a813d732ca888cef965486a2d2306d55c83ab342074b9d2"
+    },
+    {
+      "resource": "particles/survival/skills/wyvern_blizzard_snow.vpcf",
+      "sha256": "16830fbbcd76934c6100cd9679e30c576be2483efb469fa848ee31692f6bcd20",
+      "dependencies": [
+        "materials/particle/impact/fleks3.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/impact/fleks3.vtex",
+      "sha256": "3104f7900f1ce2ff310870f5291f66420949dab8a52f42d4c7e392b8ddfcce5a"
+    }
+  ],
+  "visuals": "Native Winter's Curse ground root including seven children, CP2 radius; native-derived isolated snowfall, 64/s, max 128, CP1 radius. No native ability states.",
+  "damage": "Five levels tested: four 50% attack snapshots, radius 300, 25% slow with 1.1s refresh; original twelve 0.03s fall callbacks retained (nominal hit times 1.60/2.60/3.60/4.60 with 50ms think).",
+  "lifecycle": "Two world-owned roots per proc; final wave/dead caster/session init clean up. No added per-frame visual timer or particle control writes.",
+  "tests": [
+    "test_tower_skill_tree_exclusion.lua",
+    "Lua 5.1 syntax",
+    "native dependency closure",
+    "resourcecompiler: 1 compiled, 0 failed"
+  ],
+  "in_game_visual_verified": false
+}

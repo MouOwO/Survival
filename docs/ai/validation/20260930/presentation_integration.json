@@ -1,0 +1,190 @@
+{
+  "date": "2026-10-01",
+  "feature": "Tower ranks and base effects, D grid relocation, weapon presentation and meteor presentation integration",
+  "status": "Planned first-pass D, tower, native Juggernaut weapon and final meteor Workshop checks completed within the explicitly limited scopes below",
+  "validation_levels": ["STATIC", "CONTRACT", "SIMULATION", "WORKSHOP"],
+  "all_workshop_checks_complete": true,
+  "all_workshop_checks_scope": "The planned Workshop acceptance cases for this first presentation pass are complete. This flag does not include the multiplayer, all-hero or progression cases explicitly excluded below.",
+  "evidence_policy": {
+    "workshop_observer": "root agent operating the actual Workshop client",
+    "assembly": "This integration record preserves root-observed outcomes and the existing independent validation reports. It does not label simulations as real matches.",
+    "screenshots": "Eight explicitly selected PNGs copied byte for byte, without cropping, drawing, recoloring or other edits.",
+    "screenshot_manifest": "art/effects/review/screenshots_manifest.json",
+    "console_privacy": "No full console log was copied. Only the exact allowlisted presentation/grid/weapon markers were searched. The active console had rolled into a later cold start and returned no historical matches at assembly time; root-observed prior-session values below are not presented as a newly extracted console transcript."
+  },
+  "workshop": {
+    "tower_d_relocation": {
+      "result": "PASS",
+      "scope": "Owned, normally constructed N tower; shared grid entry, repeated D, live occupancy rejection, snapped movement and proxy teardown",
+      "detail_report": "docs/ai/validation/20260930/tower_relocation_grid.json",
+      "original_tower_entindex": 667,
+      "initial_position": [256, 4736, 385.5],
+      "grid_entry_evidence": ["output/map_build_c6/d_grid_first.png", "output/map_build_c6/d_grid_repeated.png"],
+      "grid_entry_limit": "Initial grid-entry captures precede the GetSkin compatibility fix and attest grid behavior only.",
+      "occupied_click": {
+        "at": "2026-10-01T00:48:15+08:00",
+        "screenshot": "art/effects/review/d_move_completed.png",
+        "observed": "An enemy entered the destination, changing it to red. Clicking retained the original tower position and active placement preview.",
+        "server_position": [256, 4736, 385.5],
+        "ghost_count": 1
+      },
+      "green_click": {
+        "at": "2026-10-01T00:48:49+08:00",
+        "screenshot": "art/effects/review/d_move_green_result.png",
+        "server_position": [960, 4928, 385.5],
+        "ghost_count": 0,
+        "root_observed_markers": ["D_MOVE_REAL 960 4928 385.5", "D_GHOST_COUNT 0"]
+      }
+    },
+    "latest_normal_construction_cold_start": {
+      "result": "PASS",
+      "at": "2026-10-01T01:38:36+08:00",
+      "tower_entindex": 772,
+      "elapsed_seconds": 94.97,
+      "helper": "scripts/vscripts/tests/manual_tower_grid_review.lua",
+      "economy": "Normal initial 10 wood trains the 10-wood native lumberjack; real harvesting supplies the 50-wood arrow-tower price. Wall and city retain their ordinary free build prices. No resource grant or fake building registration was used for this tower.",
+      "root_observed": "The fresh match completed the native wall/city/worker/tower sequence without the old GetSkin or string EntIndexToHScript errors.",
+      "limit": "This is a cold-start smoke check for the runtime compatibility fixes. Exact named-tree reservation/live-tree retention behavior is additionally covered by simulation, not separately claimed as a manual occupied-cell probe."
+    },
+    "weapons": {
+      "result": "PASS_WITH_LIMITED_VISUAL_SCOPE",
+      "screenshot": "art/effects/review/weapons_verified.png",
+      "model": "models/heroes/juggernaut/juggernaut.vmdl",
+      "binding": "All five latest display statuses report attach_sword, the native attachment confirmed as index 2. attack1/weapon were absent and hitloc was index 5.",
+      "persistent_handle_counts": [2, 2, 3, 3, 3],
+      "left_to_right_profiles": ["weapon_growth_sword_max", "weapon_frost_blade_max", "weapon_ice_blade_max", "weapon_epic_icefire_06", "weapon_legend_abyss_10"],
+      "observed": "Small colored glows are visible near the sword grip. This is a restrained first pass; the observation does not establish large or strongly differentiated whole-blade effects.",
+      "limit": "The real-engine comparison uses isolated Tools display units and production visual profiles. It does not verify normal equipment progression on every hero, every hero attachment layout or all movement/attack trail combinations."
+    },
+    "tower_bases_and_ranks": {
+      "result": "PASS_WITH_DISPLAY_FIXTURE_SCOPE",
+      "r": {
+        "screenshot": "art/effects/review/towers_r_verified.png",
+        "observed": "R effects remained visible after leaving and returning the camera more than 60 seconds later."
+      },
+      "sr": {
+        "screenshot": "art/effects/review/towers_sr_verified.png",
+        "observed": "SR display was inspected in the real client."
+      },
+      "ssr": {
+        "screenshot": "art/effects/review/towers_ssr_actual.png",
+        "observed": "SSR display was inspected; missing death-test slot 3 is intentional and must not be described as an unexplained rendering failure."
+      },
+      "death_cleanup": {
+        "observed_around": "2026-10-01T01:49:00+08:00",
+        "root_observed_markers": ["DEATH_FLAG true", "DEATH_HANDLES false 0"],
+        "observed": "DEATH_FLAG is fixture.last_death_passed from the 1.25-second callback: it requires both untracked/zero particle handles and absent/removed rank replication. DEATH_HANDLES separately confirmed untracked with zero handles."
+      },
+      "limit": "Display fixtures exercise production visual/rank projection and lifecycle but do not spend progression resources or prove normal R/SR/SSR upgrade transactions. UR actual relocation remains simulation-only."
+    },
+    "meteor": {
+      "result": "PASS_WITH_DISPLAY_FIXTURE_SCOPE",
+      "detail_report": "docs/ai/validation/20260930/meteor_visuals.json",
+      "current_ground_layer_heights": [32, 40],
+      "implemented": "Angular Rubick Arcana cube with warm flight children, impact and ember ground visuals. A single ground particle system is shared by the same cast's two impacts. Final ground positioning uses SetToCP with explicit float height offsets, following the real cast control point.",
+      "final_cold_check": {
+        "reported_by": "root actual Workshop observation",
+        "observed_at": "2026-10-01T02:10:56+08:00",
+        "impact_screenshot": "art/effects/review/meteor_impact_verified.png",
+        "impact_source": "output/map_build_c6/meteor_cp_03.png",
+        "ground_screenshot": "art/effects/review/meteor_ground_verified.png",
+        "ground_source": "output/map_build_c6/meteor_cp_06.png",
+        "additional_ground_frame": "output/map_build_c6/meteor_cp_10.png",
+        "observed": "Frame 03 shows the angular cube with warm flames. Frames 06 and 10 show the final ground effect without the earlier horizontal stripe artifacts after the SetToCP correction.",
+        "scope": "Cold-loaded isolated Tools display using the actual meteor presentation path. This acceptance does not claim all combat-density, map-location or multiplayer cases."
+      },
+      "superseded_result": "Shared-ground-only and elevated-layer-only intermediate captures still showed stripes. They are retained as debugging history and are superseded by the final SetToCP cold-start images.",
+      "final_cleanup": {
+        "reported_by": "root final Workshop console observation",
+        "exact_markers": [
+          "[METEOR_VISUAL_REVIEW] STATUS phase=complete cast=false count=3/3",
+          "METEOR_FINAL complete false 3"
+        ],
+        "completed_casts": 3,
+        "active_cast": false,
+        "phase": "complete",
+        "panorama_ui_restored": "r_drawpanorama=1"
+      },
+      "unchanged_gameplay": "0.8-second true impact, radius 500, three-second lava per meteor, second impact delayed 0.5 seconds with 80% damage. Latest timing/cleanup/shared-ground tests passed."
+    }
+  },
+  "automated_validation": {
+    "initial_integration_suite_count": 17,
+    "initial_integration_result": "All 17 entries have explicit exit=0 in the two existing logs. These logs predate the latest attachment/ground-layer corrections; the additional checks below cover those later changes.",
+    "lua_log": "output/presentation_20260930/final_lua_tests.log",
+    "node_log": "output/presentation_20260930/final_node_tests.log",
+    "lua_suites": [
+      "scripts/vscripts/tests/test_tower_rank_presentation.lua",
+      "scripts/vscripts/tests/test_tower_relocation_grid.lua",
+      "scripts/vscripts/tests/test_grid_preview_model.lua",
+      "scripts/vscripts/tests/test_grid_preview_area.lua",
+      "scripts/vscripts/tests/test_weapon_visual_service.lua",
+      "scripts/vscripts/tests/test_meteor_visual_timing.lua",
+      "scripts/vscripts/tests/test_manual_tower_grid_review.lua",
+      "scripts/vscripts/tests/test_manual_tower_presentation_fixture.lua",
+      "scripts/vscripts/tests/test_manual_weapon_visual_fixture.lua",
+      "scripts/vscripts/tests/test_manual_meteor_visual_fixture.lua",
+      "scripts/vscripts/tests/test_tower_class_preflight.lua"
+    ],
+    "node_suites": [
+      "tools/test_tower_visual_lifecycle.cjs",
+      "tools/test_tower_rank_ui.cjs",
+      "tools/test_building_move_grid.cjs",
+      "tools/test_grid_placement_client.cjs",
+      "tools/test_meteor_visual_resources.cjs",
+      "tools/map_c6/verify-visual-particles.cjs"
+    ],
+    "additional_checks_after_changes": [
+      {
+        "name": "Final source formatting and content synchronization",
+        "result": "PASS",
+        "level": "STATIC_AND_CONTRACT",
+        "report": "art/effects/source_format_validation.json",
+        "scope": "All 18 tower/weapon sources and compiled DATA are semantically unchanged after whitespace-only normalization; 30 UI/particle source copies match the content repository byte for byte. No additional visual change was introduced after Workshop acceptance."
+      },
+      {
+        "name": "Weapon production service: faults, async model/bone changes and sword-before-hitloc",
+        "result": "PASS",
+        "level": "SIMULATION",
+        "log": "output/effect_reference/weapon_service_final_test.log"
+      },
+      {
+        "name": "Five-profile native-model-wait fixture with actual Juggernaut attachment layout",
+        "result": "PASS",
+        "level": "SIMULATION",
+        "log": "output/effect_reference/weapon_fixture_final_test.log"
+      },
+      {
+        "name": "Lua 5.1 syntax for weapon service, manual fixture and both tests",
+        "result": "PASS",
+        "level": "STATIC",
+        "log": "output/effect_reference/weapon_syntax_final_test.log"
+      },
+      {
+        "name": "Latest meteor five-tier damage/timing, shared-ground ownership, expiry and failure cleanup",
+        "result": "PASS",
+        "level": "SIMULATION",
+        "report": "docs/ai/validation/20260930/meteor_visuals.json"
+      },
+      {
+        "name": "Latest meteor compiled resources, SetToCP positioning with explicit float offsets at 32/40 ground heights, and native dependencies",
+        "result": "PASS",
+        "level": "STATIC_AND_CONTRACT",
+        "report": "docs/ai/validation/20260930/meteor_visuals.json"
+      },
+      {
+        "name": "Latest meteor real-runner fixture retains zero injected attributes and no gameplay equipment/hero events",
+        "result": "PASS",
+        "level": "SIMULATION",
+        "provenance": "root reported successful post-change fixture check; initial fixture pass is also retained in final_lua_tests.log"
+      }
+    ],
+    "expected_fault_messages": "Injected particle allocation/control/destruction failures and deliberately rejected fixture scenarios appear in test logs. Passing assertions and exit=0 distinguish these expected cases from unhandled regressions."
+  },
+  "remaining_limits": [
+    "The completed meteor check uses an isolated native Tools display; dense combat, all map locations and multiplayer visual combinations are outside its scope.",
+    "Real multiplayer/foreign-owner and UR D relocation are not claimed; corresponding server/client paths have simulation coverage.",
+    "Weapon appearance beyond the native Juggernaut display and all-hero attachment suitability need further art review.",
+    "The first-pass weapon effect is a small colored grip glow; it is not described as a completed elaborate weapon-skin system."
+  ]
+}

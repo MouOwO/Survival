@@ -1,0 +1,47 @@
+{
+  "status": "COMPILED_DATA_AND_SIMULATIONS_PASS",
+  "request": "Replace the thin red laser with Io's beam, add electric sparks on the target, remove the overhead red curtain.",
+  "native_evidence": "art/effects/laser/reference/io/manifest.json",
+  "beam": {
+    "source": "particles/units/heroes/hero_wisp/wisp_tether.vpcf",
+    "texture": "materials/particle/beam_hotblue.vtex",
+    "radius_before": 38,
+    "radius_after": 96,
+    "native_electric_strand": "particles/units/heroes/hero_wisp/wisp_tether_c.vpcf",
+    "adaptations": "CP9 to CP1, persistent main beam, capped strand emission, native blue-white core; tier colors remain in small impact and travel accents. Native distance-based attenuation and whole-effect extra glow children are omitted."
+  },
+  "target_arcs": {
+    "source": "particles/units/heroes/hero_zuus/zuus_static_field_b.vpcf",
+    "entity_control_point": 7,
+    "emit_rate": 24,
+    "max_particles": 16,
+    "lifetime_seconds": [0.25, 0.5],
+    "compiled_model_and_transform_inputs_verified": true,
+    "ownership": "Child of the existing beam, destroyed with that beam on switch/death/cleanup."
+  },
+  "overhead": {
+    "removed": ["glow halo", "extra fluid layer", "tier red tint", "radius oscillation"],
+    "orb_radius": 10,
+    "feed_radius": 2,
+    "feed_max_particles": 12
+  },
+  "performance_scope": {
+    "custom_particle_cap_before": 180,
+    "custom_particle_cap_after": 163,
+    "beam_handles_per_target": 1,
+    "additional_lua_timers": 0,
+    "live_frame_time_measurements": false
+  },
+  "checks": [
+    "tools/map_c6/verify-laser-visual.cjs --compiled --log-dir output/laser_head_polish",
+    "tools/test_laser_damage_baseline.cjs",
+    "scripts/vscripts/tests/test_tower_laser_damage.lua",
+    "scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua",
+    "tools/test_tower_visual_lifecycle.cjs",
+    "tools/test_world_health_bar.js",
+    "Lua 5.1 syntax"
+  ],
+  "compile": {"resources": 12, "failed": 0},
+  "damage": "Original authoritative first hit, cadence, multiplier, events and health bar smoothing retained.",
+  "limitations": "No new live rendered acceptance; no current-match restart or unpause. Width is a particle parameter, not a measured on-screen pixel width."
+}

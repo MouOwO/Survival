@@ -1,3 +1,8 @@
+local tower_routes = require("config/tower_route_config")
+local build_tower_text = require("config/generated/tooltip_definitions").by_id["ability:ability_build_arrow_tower"]
+local function tower_class_name(index)
+    return tower_routes.display_name(tower_routes.get("class_" .. index, 1))
+end
 local M = {
     ability_build_wall = {
         abilityid = "ability_build_wall",
@@ -13,8 +18,8 @@ local M = {
     },
     ability_build_arrow_tower = {
         abilityid = "ability_build_arrow_tower",
-        abilityname = "建造防御塔",
-        abilitydesc = "建造可自动攻击敌人的防御塔。防御塔5级后可以选择一个转职方向。",
+        abilityname = build_tower_text.name,
+        abilitydesc = build_tower_text.desc,
         abilityicon = "survival/native/building_arrow_tower",
     },
     ability_build_research_lab = {
@@ -122,13 +127,13 @@ local M = {
     ability_upgrade_tower = { abilityid = "ability_upgrade_tower", abilityname = "升级防御塔", abilitydesc = "按当前等级升1级。金币和木材不足时不会消耗，也不会进入冷却。", abilityicon = "survival/native/upgrade_one" },
     ability_upgrade_tower_lv01 = { abilityid = "ability_upgrade_tower_lv01", abilityname = "升级1级", abilitydesc = "按当前路线升1级；消耗由路线表自动计算。", abilityicon = "survival/native/upgrade_one" },
     ability_upgrade_tower_max = { abilityid = "ability_upgrade_tower_max", abilityname = "升满级", abilitydesc = "一次升至当前阶段最高等级；自动累计计算金币和木材消耗。", abilityicon = "survival/native/upgrade_large" },
-    ability_tower_class_1 = { abilityid = "ability_tower_class_1", abilityname = "【N】死亡之塔", abilitydesc = "转职为【N】死亡之塔；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_bone_cannon" },
-    ability_tower_class_2 = { abilityid = "ability_tower_class_2", abilityname = "【N】神秘之塔", abilitydesc = "转职为【N】神秘之塔；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_arcane_eye" },
-    ability_tower_class_3 = { abilityid = "ability_tower_class_3", abilityname = "【N】闪电塔", abilitydesc = "转职为【N】闪电塔；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_lightning" },
-    ability_tower_class_4 = { abilityid = "ability_tower_class_4", abilityname = "【N】机枪塔", abilitydesc = "转职为【N】机枪塔；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_machine_gun" },
-    ability_tower_class_5 = { abilityid = "ability_tower_class_5", abilityname = "【N】多重塔", abilitydesc = "转职为【N】多重塔；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_multi_arrow" },
-    ability_tower_class_6 = { abilityid = "ability_tower_class_6", abilityname = "【N】冰霜之塔", abilitydesc = "转职为【N】冰霜之塔；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_frost" },
-    ability_tower_class_7 = { abilityid = "ability_tower_class_7", abilityname = "【N】魔法塔", abilitydesc = "转职为【N】魔法塔；成长为大魔法塔与魔法至尊，使用魔法伤害克制高护甲敌人。", abilityicon = "survival/native/skill_missile" },
+    ability_tower_class_1 = { abilityid = "ability_tower_class_1", abilityname = tower_class_name(1), abilitydesc = "转职为" .. tower_class_name(1) .. "；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_bone_cannon" },
+    ability_tower_class_2 = { abilityid = "ability_tower_class_2", abilityname = tower_class_name(2), abilitydesc = "转职为" .. tower_class_name(2) .. "；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_arcane_eye" },
+    ability_tower_class_3 = { abilityid = "ability_tower_class_3", abilityname = tower_class_name(3), abilitydesc = "转职为" .. tower_class_name(3) .. "；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_lightning" },
+    ability_tower_class_4 = { abilityid = "ability_tower_class_4", abilityname = tower_class_name(4), abilitydesc = "转职为" .. tower_class_name(4) .. "；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_machine_gun" },
+    ability_tower_class_5 = { abilityid = "ability_tower_class_5", abilityname = tower_class_name(5), abilitydesc = "转职为" .. tower_class_name(5) .. "；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_multi_arrow" },
+    ability_tower_class_6 = { abilityid = "ability_tower_class_6", abilityname = tower_class_name(6), abilitydesc = "转职为" .. tower_class_name(6) .. "；转职后技能全部为被动技能。", abilityicon = "survival/native/skill_frost" },
+    ability_tower_class_7 = { abilityid = "ability_tower_class_7", abilityname = tower_class_name(7), abilitydesc = "转职为" .. tower_class_name(7) .. "；使用飞弹攻击敌人。", abilityicon = "survival/native/skill_missile" },
     ability_build_hero_altar = {
         abilityid = "ability_build_hero_altar",
         abilityname = "建造英雄祭坛",
@@ -170,8 +175,8 @@ ability_summon_doom = {
 },
 ability_summon_shadow_fiend = {
     abilityid = "ability_summon_shadow_fiend",
-    abilityname = "召唤影魔",
-    abilitydesc = "召唤影魔。专属技能固定显示在Q槽，完成一转后激活。",
+    abilityname = "召唤光之守卫",
+    abilitydesc = "召唤光之守卫。专属技能固定显示在Q槽，完成一转后激活。",
     abilityicon = "survival/native/portrait_nevermore",
 },
 ability_summon_drow_ranger = {

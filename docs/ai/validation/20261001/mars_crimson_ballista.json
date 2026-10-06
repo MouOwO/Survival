@@ -1,0 +1,327 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "item_id": 13572,
+  "item_name": "猩红始祖之祸 / Crimson Progenitor's Bane",
+  "source": "Local Valve items_game.txt and Dota/core VPK",
+  "particle": "particles/survival/towers/mars_crimson_ballista.vpcf",
+  "nativeRoot": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear.vpcf",
+  "adaptation": "Preserve crimson skin, Mars spear model and every original child/endcap; replace straight-line CP1 velocity and ground snapping with tracking CP1 attraction and CP2 speed cap. No Lua combat changes or extra thinkers.",
+  "compile": "1 compiled, 0 failed",
+  "tests": [
+    "Five ballista levels: configured path and preload, four targets, speed1250, distance/speed delay, original damage and armor ignore PASS",
+    "Compiled model/skin/children and dependency closure PASS"
+  ],
+  "resources": [
+    {
+      "resource": "particles/survival/towers/mars_crimson_ballista.vpcf",
+      "sha256": "ca710dc104f85eccc68ee16625382b5426e48770478b1b1f7ee9c4c3c3eba67b",
+      "dependencies": [
+        "models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_ability.vmdl",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_outline.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail_b.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge_b.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_flash.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_sparks.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end.vpcf"
+      ]
+    },
+    {
+      "resource": "models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_ability.vmdl",
+      "sha256": "28d978e62df5301d252d94ee3f4fdccfb4294dbd7959ffaf105966c33b70311f",
+      "dependencies": [
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon.vmat",
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_crimson_weapon.vmat"
+      ]
+    },
+    {
+      "resource": "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon.vmat",
+      "sha256": "fd6882d7d2ec446abbd73040953a838f5cbdba4eaff953a480f5b99779bbd1ce",
+      "dependencies": [
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_color_psd_36c712dc.vtex",
+        "materials/models/heroes/mars/mars_bronze_day_cube_psd_4c3a1092.vtex",
+        "materials/models/heroes/mars/mars_spear_detail_psd_3a9f511.vtex",
+        "materials/default/default_detail2_tga_70788555.vtex",
+        "materials/default/default_fresnelwarprim_tga_d9279d65.vtex",
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_detailmask_tga_ca69669d.vtex",
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_specmask_tga_4e4eaa6b.vtex",
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_normal_tga_fc517c91.vtex"
+      ]
+    },
+    {
+      "resource": "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_color_psd_36c712dc.vtex",
+      "sha256": "73f7f0495ba74d60504247e5bcc761990db576c4422efba461c8650d5ab70020"
+    },
+    {
+      "resource": "materials/models/heroes/mars/mars_bronze_day_cube_psd_4c3a1092.vtex",
+      "sha256": "670739db1bef90ca70b82cf12c2fe6b77901297ca8e135cd9db23278ff680ec3"
+    },
+    {
+      "resource": "materials/models/heroes/mars/mars_spear_detail_psd_3a9f511.vtex",
+      "sha256": "b2831a241dd87a6ef193e6228677b97ae6f637fdbc216e6c63787177b2795c3f"
+    },
+    {
+      "resource": "materials/default/default_detail2_tga_70788555.vtex",
+      "sha256": "8006a7447538c02e9945f255f5bca5f825b2df2ef843c186b4d561d2930961fd"
+    },
+    {
+      "resource": "materials/default/default_fresnelwarprim_tga_d9279d65.vtex",
+      "sha256": "55d9fe78c721b011fed77c808c2845c7349bea0c58ed172f71dc3c2b82df9a97"
+    },
+    {
+      "resource": "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_detailmask_tga_ca69669d.vtex",
+      "sha256": "cd734f14b5bb178b0d9497fa4de01f07ce45f362ec4587f5dd24414e19692f1e"
+    },
+    {
+      "resource": "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_specmask_tga_4e4eaa6b.vtex",
+      "sha256": "508f154ea7f21539f08349880ce6ae8ead1e53736bdac989c6fed06c54d253f0"
+    },
+    {
+      "resource": "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_normal_tga_fc517c91.vtex",
+      "sha256": "fd113e2306aee27f278f41a71f26cd39fe8e56ddd609d52f8c31a11ef9fd8c0a"
+    },
+    {
+      "resource": "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_crimson_weapon.vmat",
+      "sha256": "811422f8d19ecff9516a18df0a1d4fd712789161ad577a38f16f7e2d95fe460d",
+      "dependencies": [
+        "materials/default/default_fresnelwarprim_tga_d9279d65.vtex",
+        "materials/models/items/wraith_king/blistering_shade/blistering_shade_cube_psd_db442328.vtex",
+        "materials/default/default_detail2_tga_70788555.vtex",
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_detailmask_tga_ca69669d.vtex",
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_specmask_tga_4e4eaa6b.vtex",
+        "materials/models/heroes/mars/mars_spear_detail_psd_3a9f511.vtex",
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_crimson_color_psd_40b9a635.vtex",
+        "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_normal_tga_fc517c91.vtex"
+      ]
+    },
+    {
+      "resource": "materials/models/items/wraith_king/blistering_shade/blistering_shade_cube_psd_db442328.vtex",
+      "sha256": "4d42c5283cc1247caf3535bfd98d46db2da1cd2411de99f7b8da4edf82bd11d5"
+    },
+    {
+      "resource": "materials/models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_crimson_color_psd_40b9a635.vtex",
+      "sha256": "ee6e0a36f07d23603568b7c8ad08dfd6434e400f5260ac6fa819e680ba58132c"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_outline.vpcf",
+      "sha256": "f5aee8aeaf348c569745016fe3a2da044c5184e0c4db6d8b0ef18cbd9e8674af",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+        "materials/particle/beam_liquid_04.vtex",
+        "materials/particle/electricity/electricity_22_d.vtex",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_light.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_embers.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+      "sha256": "54d2fec8a30527ed1ce44401f862f2d33be47e6d00373676a871863ff1571262"
+    },
+    {
+      "resource": "materials/particle/beam_liquid_04.vtex",
+      "sha256": "3fbd59d807c9d5ffbd9b231a1f3c3d2b11215fc57778a8764c831665519d46d2"
+    },
+    {
+      "resource": "materials/particle/electricity/electricity_22_d.vtex",
+      "sha256": "2f30c91cb327232f81591b689df40e5d2158635b338a636fd1896403a77924ca"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_light.vpcf",
+      "sha256": "0690e39140bea936dca30b78eef6feba86ce7c002953967faf99d83b4e82248e",
+      "dependencies": []
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_embers.vpcf",
+      "sha256": "0c8b0a19894d9e005e2e3418cdf5b5b7416539b9f56f9dc8cd42c0a97159f6f9",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_004.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_004.vtex",
+      "sha256": "82d2a6b159d3d2150b72286a46fa7bdf115a4ea317b5549f169a43e2b71aceb1"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail.vpcf",
+      "sha256": "daa8c14a9b42a1a90cd17c99feacb2b0d04adbbb8306807a991c1e1efc101605",
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/electricity/electricity_22_d.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_generic_7.vtex",
+      "sha256": "a90d9a64be3b92465344b10e987ee80087dc96b1d3eb35d2dcf77fc1b86fb769"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail_b.vpcf",
+      "sha256": "f9df7c65d5a13d0d5a1762c627f3574ddba7ecf167e815638352b88af28dbc60",
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex",
+        "materials/particle/electricity/electricity_22_d.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge.vpcf",
+      "sha256": "8cdaa4e1158c1a4d9bc754821bee38e958e0b7a10d78d9253814909b71e241ad",
+      "dependencies": [
+        "materials/particle/electricity/electricity_28_a.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electricity/electricity_28_a.vtex",
+      "sha256": "045a48b2a3586c7b59349b84ab2865c6a1489376b78c906a8cdc14341e0db10c"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge_b.vpcf",
+      "sha256": "87208eb94e65f58090a4877123a40ded7bd63b383add9ffb04f11427df758012",
+      "dependencies": [
+        "materials/particle/bendibeam5.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/bendibeam5.vtex",
+      "sha256": "53d0ee46f5e996d38ec94f4fab1bbd20ef947e2a7b72360175e1dc889f6f026a"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_flash.vpcf",
+      "sha256": "2cd13637d5d5d06db79b070a136ba065174ff554b7edb3ca41dd22e4bff8564e",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_004b_mod.vtex",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_elec.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_004b_mod.vtex",
+      "sha256": "4d645dd2d8d783cc2a1192aaa115850e4bfe7092023c252008fd26ce2077269e"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_elec.vpcf",
+      "sha256": "b46070da84e318630d892a56f2ce8da74eac1517fec330adcfd274d2e058f739",
+      "dependencies": [
+        "materials/particle/electrical_arc/electrical_arc02.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electrical_arc/electrical_arc02.vtex",
+      "sha256": "3283ac3749214ad7cfae70fa7480c090ab05b8d78bf347ac1f97299ede9ea731"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_sparks.vpcf",
+      "sha256": "1a5c704e858698c2e2cb00997512fc696381c9230a86ba6c01cd5c185deb28c3",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/sparks/sparks.vtex",
+      "sha256": "f6a32d59a41ab1e61339814b48e910874730e8b840cb6af98181a4d04dafa988"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end.vpcf",
+      "sha256": "ce3e69db08cfa2daad3cab1b58c7de319e733ee91d93c2889aad6e1c4eddef97",
+      "dependencies": [
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_smoke.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_light.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_flash.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_burst.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_soot.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_embers.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_elec.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_flek.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_smoke.vpcf",
+      "sha256": "7f9043ca00879f551d9dbf729b3f8b16d7195ff89daef7ced9a2476b542a39e3",
+      "dependencies": [
+        "materials/particle/smoke3/smoke3.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke3/smoke3.vtex",
+      "sha256": "c55debf725f900d7419ccdb54c3bb2d8e297b035bf2615bc7dc84b684cd6bdd3"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_light.vpcf",
+      "sha256": "b9a9578ac6e6de0fd8862adfcd2a6257123154dc6731d1ec431d6e4167787ecb",
+      "dependencies": []
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_flash.vpcf",
+      "sha256": "39f1b80d735b230cc6dffb7f12db1552b3881e14e44d91ec77e0d855ab43f76c",
+      "dependencies": [
+        "materials/particles/light_flare/light_glow_01.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particles/light_flare/light_glow_01.vtex",
+      "sha256": "27875606d9a2df2859d4cf52ab9499842d5de2cf3e08d1afe2a6c6956febd55c"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_burst.vpcf",
+      "sha256": "4ee21df44379bd18b8638f6d54221d30b136eb418a161c43959cd0ca208a7356",
+      "dependencies": [
+        "materials/particle/smoke/steam/steam.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke/steam/steam.vtex",
+      "sha256": "093263df747d0464ab8bf96abaf815ce73ce0508941fb693a200d4b04137438a"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_soot.vpcf",
+      "sha256": "b6df8c9d3a90c3baba03e4fe0e9a4ee980032c2e84dc7989be71be3c447a8159",
+      "dependencies": [
+        "materials/particle/impact/fleks.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/impact/fleks.vtex",
+      "sha256": "b23e1e8b292fcb3f24f845c26a4c7b6b1d53d7ab738d6058c10f30934331442f"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_embers.vpcf",
+      "sha256": "fa8185bd058ab19352e0de376737b26f8ad109bad84d43f2588822d78bfa3179",
+      "dependencies": [
+        "materials/particle/particle_flares/aircraft_red.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/aircraft_red.vtex",
+      "sha256": "617e92007b5e24cae3a8bb0fd9604bda2e9327682ce2867e81f2ea67bed81ea7"
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_elec.vpcf",
+      "sha256": "4733b8b20b5fcb66b3f5c0f2819903be487a423b374af87c67114faaf7e7b630",
+      "dependencies": [
+        "materials/particle/electrical_arc/electrical_arc02.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end_flek.vpcf",
+      "sha256": "da155954b6af4d5330f9f8f13977bc2a7fb6e89bcd8dc0c709b2cde2ba78a14a",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear.vpcf",
+      "sha256": "9d93b83fb6dbbc2aff6238d1ddce275dc7aedc3513b0c1ccf6d984e8b23fa2b1",
+      "dependencies": [
+        "models/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_ability.vmdl",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_outline.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_trail_b.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_edge_b.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_flash.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_sparks.vpcf",
+        "particles/econ/items/mars/mars_ti9_immortal/mars_ti9_immortal_crimson_spear_end.vpcf"
+      ]
+    }
+  ],
+  "in_game_visual_verified": false
+}

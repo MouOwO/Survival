@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-01",
+  "purpose": "Root-observed Workshop presentation screenshots copied byte for byte; no image edits.",
+  "screenshots": [
+    {
+      "source": "output/map_build_c6/weapons_verified.png",
+      "artifact": "art/effects/review/weapons_verified.png",
+      "bytes": 3354985,
+      "sha256": "65adc3733ba66b730c1b724be0f1cdbb86bf68a529b45f09b31d2a0ac3b6a8cd",
+      "unedited": true
+    },
+    {
+      "source": "output/map_build_c6/towers_r_verified.png",
+      "artifact": "art/effects/review/towers_r_verified.png",
+      "bytes": 3154767,
+      "sha256": "c26cd53d54033c763688b0ac482922afc4b02af719fdaad9cd900bce5bb4a6c2",
+      "unedited": true
+    },
+    {
+      "source": "output/map_build_c6/towers_sr_verified.png",
+      "artifact": "art/effects/review/towers_sr_verified.png",
+      "bytes": 3088991,
+      "sha256": "99376466af5b26124d16d6f9da15a5e42570c391b0813594c2839a4cacc731c8",
+      "unedited": true
+    },
+    {
+      "source": "output/map_build_c6/towers_ssr_actual.png",
+      "artifact": "art/effects/review/towers_ssr_actual.png",
+      "bytes": 3204923,
+      "sha256": "f2c8a060c757473d4dc6ebfee6e705198bee5dfccec3e71367d21ccb0e1c6934",
+      "unedited": true
+    },
+    {
+      "source": "output/map_build_c6/d_move_completed.png",
+      "artifact": "art/effects/review/d_move_completed.png",
+      "bytes": 3348964,
+      "sha256": "10b9ba25ecdf57f2b4671452e405986e53bf59a511ce0d091c9888c25842a2e9",
+      "unedited": true
+    },
+    {
+      "source": "output/map_build_c6/d_move_green_result.png",
+      "artifact": "art/effects/review/d_move_green_result.png",
+      "bytes": 3470466,
+      "sha256": "39c5793c8f53741fd2b76c23c8f0c48f8e08b82f4106f69a733c7cf43ea0718a",
+      "unedited": true
+    },
+    {
+      "source": "output/map_build_c6/meteor_cp_03.png",
+      "artifact": "art/effects/review/meteor_impact_verified.png",
+      "bytes": 3165102,
+      "sha256": "76c27ab6f5656c13dc942c7569f529af71c602964b88b252bccca0d3620cea83",
+      "unedited": true
+    },
+    {
+      "source": "output/map_build_c6/meteor_cp_06.png",
+      "artifact": "art/effects/review/meteor_ground_verified.png",
+      "bytes": 3115018,
+      "sha256": "7d80d993ab48bf3c405691bfe7ab853578357f741b1ccbb984d9202eae8490f1",
+      "unedited": true
+    }
+  ]
+}

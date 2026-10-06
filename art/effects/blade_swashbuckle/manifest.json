@@ -1,0 +1,34 @@
+{
+  "root": "particles/survival/skills/blade_swashbuckle.vpcf",
+  "native_root": "particles/units/heroes/hero_pangolier/pangolier_swashbuckler.vpcf",
+  "controls": {
+    "0": "launch origin and facing; fixed ghost model anchor",
+    "1": "visual carrier velocity, capped by owner at hero attack range",
+    "2": "x = hero attack range / (805.9557 * 1.1); native ghost model radius scale",
+    "3": "launch origin and pulse orientation; native carrier updates position"
+  },
+  "native_sword_forward_extent": 805.9557,
+  "native_sword_radius": 1.1,
+  "ghost_models_at_launch_origin": true,
+  "ember_radius_maximum": 8,
+  "ember_forward_offset": -8,
+  "ember_forward_velocity": 0,
+  "duration_seconds": 1,
+  "owner_stops_at_endpoint": true,
+  "native_resources": [
+    "particles/units/heroes/hero_pangolier/pangolier_swashbuckler.vpcf",
+    "particles/units/heroes/hero_pangolier/pangolier_swashbuckler_images.vpcf",
+    "particles/units/heroes/hero_pangolier/pangolier_swashbuckler_bumper.vpcf",
+    "particles/units/heroes/hero_pangolier/pangolier_swashbuckler_bumper_halo.vpcf",
+    "particles/units/heroes/hero_pangolier/pangolier_swashbuckler_jab_embers.vpcf",
+    "particles/units/heroes/hero_pangolier/pangolier_swashbuckler_light.vpcf"
+  ],
+  "outputs": [
+    "particles/survival/skills/blade_swashbuckle.vpcf",
+    "particles/survival/skills/blade_swashbuckle_images.vpcf",
+    "particles/survival/skills/blade_swashbuckle_bumper.vpcf",
+    "particles/survival/skills/blade_swashbuckle_bumper_halo.vpcf",
+    "particles/survival/skills/blade_swashbuckle_jab_embers.vpcf",
+    "particles/survival/skills/blade_swashbuckle_light.vpcf"
+  ]
+}

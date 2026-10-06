@@ -1,0 +1,23 @@
+{
+  "status": "NATIVE_RESOURCE_AND_REGRESSION_CHECKS_PASS_UI_COMPILED",
+  "latest_direction": "Direct native Tinker Q effects; replaces the interrupted Io model request.",
+  "levels": {"1-2":"default Tinker Q", "3-4":"TI10 immortal Q", "5":"TI10 immortal aghanim Q"},
+  "skin_limit": "Three full usable native variants were found; no claim of five distinct skins.",
+  "native_evidence": "art/effects/laser/reference/tinker_native/manifest.json",
+  "visual_refresh_seconds": 0.24,
+  "segment_ownership_seconds": 0.48,
+  "death_residue_seconds": 0.3,
+  "max_death_residue_handles": 2,
+  "removed_from_production": ["Io beam", "overhead Io orb/model", "custom Zeus target arcs", "Io death tail"],
+  "health_prediction": {
+    "basis":"Observed native HP loss scaled by next multiplier; forecast uses original remaining damage clock.",
+    "updates":"Every real laser hit, source stop, health/max-health correction or forecast expiry.",
+    "authoritative_damage_changes":false,
+    "new_timers":0,
+    "tests":["5 second kill empties the bar at 5 seconds", "overkill does not empty early", "pause", "stop", "healing", "multiple sources", "expiry", "unchanged samples do not republish"],
+    "limits":"Future random damage, mitigation or external healing can change estimates; actual settlement corrects prediction."
+  },
+  "regressions":["test_tower_skill_tree_exclusion.lua", "test_tower_visual_lifecycle.cjs", "test_laser_damage_baseline.cjs", "test_tower_laser_damage.lua", "test_tower_laser_health_prediction.lua", "test_health_bar_cleanup.lua", "test_world_health_bar.js"],
+  "ui_compile":{"compiled":2,"failed":0},
+  "live_rendered_validation":false
+}

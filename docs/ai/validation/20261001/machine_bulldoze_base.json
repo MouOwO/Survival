@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "source": "Local Valve Dota/core VPK; native Bulldoze foot layers",
+  "roots": [
+    "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_dark.vpcf",
+    "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_timer.vpcf"
+  ],
+  "scope": "Machine-gun route R/SR/SSR and red-star upgrades; CP0 follows unit origin; original native foot offsets and colors. No gameplay modifiers, per-frame updates, or extra timers.",
+  "resources": [
+    {
+      "resource": "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_dark.vpcf",
+      "sha256": "f69eb7164ae1ed332e1b784f45f641e03584da5ef81d7a6e5953d74c5cd93413",
+      "dependencies": [
+        "materials/particle/ping_circle_01.vtex",
+        "materials/particle/particle_ring_wavy7.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/ping_circle_01.vtex",
+      "sha256": "d278f1d7277fe6184780b3229afa741e55e1eb793a65e1f91515d3aa97b86ea3"
+    },
+    {
+      "resource": "materials/particle/particle_ring_wavy7.vtex",
+      "sha256": "ccc145e56d9e1b01d97806da6a162cc8335e9ac7f1c45f0f1f1d3fae78232d7e"
+    },
+    {
+      "resource": "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_timer.vpcf",
+      "sha256": "d9d8db49b386bc96ba467945127b6715804304380d46d6257d65eeabf8264206",
+      "dependencies": [
+        "materials/particle/beam_generic_2.vtex",
+        "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_timer_glow.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_generic_2.vtex",
+      "sha256": "40c86e9cbff0e4b6ad1d10c000c37ffa21c95a98dc4df7ba78dc4b2961df319c"
+    },
+    {
+      "resource": "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_timer_glow.vpcf",
+      "sha256": "41fff608d8bd71e34d7ef1f8eae5a08fa0ceed59d1b36376791f3a29930aa4ee",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_007b.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_007b.vtex",
+      "sha256": "7c1cd31db44f3b9adcc857eb95b6ed8cde07d12a5a508cbce7b2854300eb0571"
+    }
+  ],
+  "tests": [
+    "test_tower_visual_lifecycle.cjs PASS: stages, native feet binding, move, no duplicates, cleanup and other route regression",
+    "luac5.1 syntax PASS",
+    "Native continuous emitters and dependency closure PASS"
+  ],
+  "in_game_visual_verified": false
+}

@@ -3,6 +3,8 @@ return {
     map_name = "template_map",
     center = { x = -1024, y = 4096, z = 4 },
     build_bounds = { min_x = -4096, max_x = 2048, min_y = 1024, max_y = 7168 },
+    -- 128 native terrain tiles x 256 world units, including the surrounding sea.
+    grid_display_bounds = { min_x = -16384, max_x = 16384, min_y = -16384, max_y = 16384 },
     resource_tree = { x = 646, y = 5462, z = 400 },
     -- Engine IDs 0..3 correspond to UI player1..4, NW/NE/SW/SE.
     player_training_markers = {

@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "source": "Local Valve Dota/core VPK, Psionic Trap native inner and outer circles",
+  "roots": [
+    "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings.vpcf",
+    "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
+  ],
+  "scope": "Anti-air route R/SR/SSR and red-star upgrades. Native pink-purple rings with neutral HSV CP62=(0,1,1). No trap unit, slow, damage, or extra timer.",
+  "relocation": "Existing BUILDING_CHANGED after SetAbsOrigin recreates stationary native particles at the new origin; old handles destroyed/released.",
+  "resources": [
+    {
+      "resource": "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings.vpcf",
+      "sha256": "fbdf3145622f29a409fe312bf2a03eb6db97312ae4859552f03ef0ce41d46d41",
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_generic_7.vtex",
+      "sha256": "a90d9a64be3b92465344b10e987ee80087dc96b1d3eb35d2dcf77fc1b86fb769"
+    },
+    {
+      "resource": "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf",
+      "sha256": "d0e1af1ea5db87424f5802d7f9cc92181aceab61997c3e0ccb94e43e1659001b",
+      "dependencies": [
+        "materials/particle/beam_generic_7.vtex"
+      ]
+    }
+  ],
+  "tests": [
+    "test_tower_visual_lifecycle.cjs PASS all routes, native rings and HSV, stable-state reuse, relocation cleanup, removal and world lifecycle",
+    "luac5.1 syntax PASS",
+    "Native child/lifetime/ground-projection/resource checks PASS"
+  ],
+  "in_game_visual_verified": false
+}

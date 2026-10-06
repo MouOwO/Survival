@@ -1,0 +1,49 @@
+{
+  "status": "PREVIEW_READY",
+  "main_map_replaced": false,
+  "preview_map": "valley_decor_review",
+  "source": "content/dota_addons/survival/maps/valley_decor_review.vmap",
+  "main_source_sha256": "e2faf32913ac1652bca714d67771c5794ac7fa267782e8ce176c2ae2d1845fdd",
+  "compile": {
+    "map": 293,
+    "particles": 1,
+    "failed": 0
+  },
+  "package": {
+    "crc_entries": 297,
+    "source_match": {
+      "source_name": "maps/valley_decor_review.vmap",
+      "compiled_search_path": "dota_addons/survival",
+      "raw_source_crc32": 1995383810,
+      "compiled_source_crc32": 1995383810,
+      "matches": true
+    }
+  },
+  "static": {
+    "preserved_existing_entities_and_meshes": true,
+    "preserved_height_navigation_wave_configuration": true,
+    "decor_props": 256,
+    "ambient_spawn_effects": 4,
+    "paint_samples": 12070
+  },
+  "workshop": {
+    "map_loaded": true,
+    "visual_inspected": true,
+    "spawn_and_lane_checks": 116,
+    "failed": 0,
+    "log": "output/valley_decor_v1/runtime_final.log"
+  },
+  "screenshots": [
+    "art/maps/c6/valley_decor_close.png",
+    "art/maps/c6/valley_decor_overview.png"
+  ],
+  "reference": {
+    "workshop_id": "3164617180",
+    "readable_wave_records": 67,
+    "spawner_source": "encrypted; implementation not verified",
+    "evidence": "output/valley_decor_v1/reference_study.json"
+  },
+  "approval": {
+    "main_map_installation": "Automatic review rejected main-map replacement as outside preview scope; completed separate preview instead."
+  }
+}

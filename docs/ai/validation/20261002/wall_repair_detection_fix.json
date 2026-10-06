@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "date": "2026-10-02",
+  "root_cause": "Repair search omitted DOTA_UNIT_TARGET_BUILDING while walls use npc_dota_building.",
+  "live_evidence": {
+    "wall_entindex": 591,
+    "survival_is_building": true,
+    "under_construction": false,
+    "repair_modifiers_present": [
+      579,
+      929,
+      950,
+      953
+    ],
+    "old_search_mask": 19,
+    "old_wall_matches_per_unit": 0,
+    "fixed_search_mask": 23,
+    "fixed_wall_matches_per_unit": 1,
+    "find_units_everywhere": -1
+  },
+  "additional_fixes": [
+    "Preserve the -1 all-map scan sentinel instead of clamping it to repair range.",
+    "Only choose safe work positions inside repair range, with 16 units of arrival tolerance."
+  ],
+  "regression": {
+    "test_wall_repair_detection.lua": "PASS; builder and repairer, native building categories, model changes, global and finite range, approach, healing, owner/construction guards, manual standby and cancellation",
+    "test_visual_feedback_repairs.lua": "PASS",
+    "test_builder_work_position.lua": "PASS",
+    "test_builder_yield_construction.lua": "PASS",
+    "test_startup_order_gate.lua": "PASS"
+  },
+  "live_hotfix": {
+    "applied": true,
+    "unit_count": 4,
+    "callback_binding_verified": true,
+    "existing_rate_range_and_manual_targets_preserved": true,
+    "paused_state_preserved": true
+  },
+  "in_game_navigation_verified": true,
+  "in_game_healing_verified": false,
+  "limitation": "Current match is paused; the repaired AI will run after the player resumes it. No health was directly modified for validation.",
+  "resource_recompile_required": false,
+  "changed_sources": {
+    "scripts/vscripts/modifiers/modifier_repair_worker_ai.lua": "f146715bdcce33e31ecdef2b5ae1b2852ee3b99fdfd88acb4eaf3be1d54f67cb",
+    "scripts/vscripts/systems/builder_work_position_service.lua": "1c56067df4523588fa35287c8739ca1c835f116c8b4124b142295ad31a568a1a"
+  }
+}

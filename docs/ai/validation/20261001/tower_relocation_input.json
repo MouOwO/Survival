@@ -1,0 +1,143 @@
+{
+  "date": "2026-10-01",
+  "feature": "Immediate tower D click without waiting for a ghost or preview validation reply",
+  "status": "WORKSHOP_FAST_CLICK_OCCUPIED_RETRY_CLEANUP_PASS",
+  "validation_level": ["STATIC", "SIMULATION", "CONTRACT", "WORKSHOP"],
+  "workshop_verified": true,
+  "workshop_verified_scope": "Two independent fresh Workshop games verified one-click movement of normally constructed owned towers. The first game used tower 647 with a 32.63 ms D-to-click input gap and normal cooldown, then verified occupied-wall rejection and retry without another D. A later game used tower 626 with a 32.94 ms input gap and independently confirmed zero remaining preview proxies. Both moves preserved entity identity. Profiles may already have been cached; genuine cold-profile delivery, multiplayer and UR remain simulation-only.",
+  "release_note": "修复防御塔按 D 后快速左键被吞掉的问题。有效落点无需等待预建造模型出现；服务端仍重新检查归属、距离和占格。首次资料尚未加载时保留一次点击，取消或再次按 D 会清除旧意图。",
+  "root_cause": "The relocation left-click handler consumed clicks until lastValidation was current and green. A first cold D also failed if profiles or the point-target input module were not ready.",
+  "changes": [
+    "Relocation submits the current snapped click immediately, independently of advisory validation, cursor settling and preview-model creation. Ordinary construction input retains its existing behavior.",
+    "A first cold D reserves a session and holds one raw click position until the profile and point-target input become available. Repeated D, Escape, right-click and selection changes invalidate that pending intent.",
+    "Only relocation can authenticate and open a fresh session at commit. It still uses the existing tower_relocation_service.move checks for ownership, real ability, alive/defeated state, cooldown, finite coordinates, exact snapped range and current occupancy.",
+    "Each result carries its session. In-flight duplicate clicks are suppressed, stale results cannot close a later D session, rejection leaves a fresh placement session available, and committed/closed sessions reject late pose and validation traffic.",
+    "NaN/infinite session numbers cannot poison the server session clock. No resource, damage, movement range, cooldown or native movement implementation was changed."
+  ],
+  "automated_checks": [
+    {"command": "node tools/test_grid_placement_client.cjs", "exit_code": 0, "scope": "Actual Panorama controller VM: immediate click before validation or pose, fast sweep, invalid cursor recovery, duplicate click, exact current click rather than old green position, delayed profile plus input module, stored first-click coordinates, retry after rejected destination, repeated D, stale result, Escape/right-click/selection cancellation; existing ordinary construction checks remain passing."},
+    {"command": "lua5.1 scripts/vscripts/tests/test_tower_relocation_grid.lua", "exit_code": 0, "scope": "Actual Lua router and relocation service with engine mocks: direct cold commit without preview/pose, exact fresh grid query, ownership and engine PlayerID, ability, alive/defeated/cooldown/finite input/range, occupancy rejection, closed and newer session isolation, no late ghost resurrection, ordinary construction cannot use fresh-session admission; existing UR simulation."},
+    {"command": "node tools/test_building_move_grid.cjs", "exit_code": 0, "scope": "Existing D/button adapter parity, repeated D and selection cancellation."},
+    {"command": "node tools/test_grid_static_integration.cjs", "exit_code": 0, "scope": "Actual shared grid modules: fixed ground-plane projection, existing model pose throttling, preloaded geometry and stale controller retirement."},
+    {"command": "lua5.1 scripts/vscripts/tests/test_grid_builder_preview.lua", "exit_code": 0, "scope": "Authenticated builder isolation, occupancy, static profiles, async area lifecycle and preview pose stale/closed protection."},
+    {"command": "lua5.1 scripts/vscripts/tests/test_grid_preview_model.lua", "exit_code": 0, "scope": "Preview reuse, actual tower appearance, plane snapping, missing GetSkin fallback, failed setup cleanup, expiry and recovery."},
+    {"command": "powershell tools/test_tower_grid_release_contract.ps1", "exit_code": 0, "scope": "Existing occupancy release and named-reservation safety contract."},
+    {"command": "luac5.1 -p scripts/vscripts/ui/grid_placement_router.lua", "exit_code": 0, "scope": "Lua 5.1 runtime syntax."}
+  ],
+  "deployment": {
+    "status": "COMPILED_PASS_COLD_START_FAST_CLICK_OCCUPIED_RETRY_VERIFIED",
+    "deployed_at": "2026-10-01T07:09:14+08:00",
+    "backup_directory": "tmp/presentation_input/content_backup_20261001_070913",
+    "full_hash_manifest": "output/relocation_input_20261001/deploy_two_panorama.json",
+    "files": [
+      {
+        "source": "panorama/src/scripts/custom_game/survival_grid_placement.js",
+        "content": "../../../content/dota_addons/survival/panorama/scripts/custom_game/survival_grid_placement.js",
+        "source_and_content_sha256": "6B87B311EF70DB22B3B8D1117D14C20D9CD98F2AE850D979C08B9054D28F431A",
+        "compiled": "panorama/scripts/custom_game/survival_grid_placement.vjs_c",
+        "compiled_sha256": "9C7A82243449767184234833168375A9084AAD2BB592E7860D971C6391B59F03",
+        "compiler_result": "1 compiled, 0 failed, 0 skipped",
+        "exit_code": 0
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/tower_rank_ui.js",
+        "content": "../../../content/dota_addons/survival/panorama/scripts/custom_game/tower_rank_ui.js",
+        "source_and_content_sha256": "7360AF397C2EDFAA8DB6D66859D5EBC7B0FD24145BFD52919A8D1C92E0832784",
+        "compiled": "panorama/scripts/custom_game/tower_rank_ui.vjs_c",
+        "compiled_sha256": "3D971CDCCCB984930A892EF129E8A539A09E081525AEC09539E3E9B45722E89C",
+        "compiler_result": "1 compiled, 0 failed, 0 skipped",
+        "exit_code": 0
+      }
+    ],
+    "scope": "Only these two JS content sources were copied and compiled at the root-approved shared window. Existing content sources were backed up first; SHA256 equality was checked after compilation. No manifest or particle compilation, console connection or Workshop test was performed by this agent."
+  },
+  "workshop_evidence": {
+    "observer": "Root agent performed the live input and server-state checks; this agent archived the unmodified screenshot and recorded the supplied observations.",
+    "environment": "Fresh Workshop game using newly compiled UI; tower created through normal construction economy.",
+    "tower_entindex_before": 647,
+    "tower_entindex_after": 647,
+    "move_ability_entindex": 654,
+    "source_position": [256, 4736, 385.5],
+    "destination_position": [704, 4736, 385.5],
+    "physical_keydown_to_left_button_down_ms": 32.63,
+    "input_delay_scope": "Measured gap between physical D keydown and left mouse button down; this is not a measurement of server move latency or frame rendering time.",
+    "left_click_count": 1,
+    "waited_for_preview_model": false,
+    "same_entity_moved": true,
+    "normal_cooldown_observed": true,
+    "profile_coldness": "Not established: profile may have been cached before D. Genuine delayed-profile replay remains covered by automated simulation.",
+    "before_screenshot": "output/map_build_c6/fast_d_before.png",
+    "after_screenshot": {
+      "source": "output/map_build_c6/fast_d_after.png",
+      "archive": "art/effects/review/20261001/fast_d_after.png",
+      "sha256": "D5843F44FDB8F3501308C57B3757F3FE8F28C5319A071D9427C0C0A822C78C08",
+      "bytes": 2899491,
+      "copied_without_modification": true,
+      "source_archive_hash_match": true
+    },
+    "occupied_destination": {
+      "result": "PASS",
+      "input": "D followed by left-click on the wall-occupied destination.",
+      "screen_click": [707, 430],
+      "tower_entindex": 647,
+      "position_before": [704, 4736, 385.5],
+      "position_after": [704, 4736, 385.5],
+      "red_rejection_visible": true,
+      "grid_remained_active": true,
+      "screenshot": {
+        "source": "output/map_build_c6/fast_d_occupied.png",
+        "archive": "art/effects/review/20261001/fast_d_occupied.png",
+        "sha256": "14E2761AF08E7B732823D335AA00B70E88996BB00A163AA9687BED4C50D0D35C",
+        "bytes": 3168606,
+        "copied_without_modification": true,
+        "source_archive_hash_match": true
+      }
+    },
+    "retry_without_another_d": {
+      "result": "PASS",
+      "input": "After occupied-destination rejection, one left-click on a legal cell without pressing D again.",
+      "screen_click": [1126, 411],
+      "tower_entindex_before": 647,
+      "tower_entindex_after": 647,
+      "position_before": [704, 4736, 385.5],
+      "position_after": [1024, 4736, 385.5],
+      "screenshot": {
+        "source": "output/map_build_c6/fast_d_retry.png",
+        "archive": "art/effects/review/20261001/fast_d_retry.png",
+        "sha256": "F8D3B69C0EC39B0E76A2F29A1115DEA523EC158FE941CC50775921CE8FDEBCBB",
+        "bytes": 3047957,
+        "copied_without_modification": true,
+        "source_archive_hash_match": true
+      }
+    }
+  },
+  "workshop_second_cold_game": {
+    "result": "PASS",
+    "observer": "Root agent performed the live physical input and server queries in a later independent cold-start game; this agent read the named result logs.",
+    "environment": "New Workshop game with normally constructed tower 626. This is separate from the earlier tower 647 game.",
+    "tower_entindex_before": 626,
+    "tower_entindex_after": 626,
+    "move_ability_entindex": 633,
+    "source_position": [256, 4736, 385.5],
+    "destination_position": [704, 4736, 385.5],
+    "physical_keydown_to_left_button_down_ms": 32.94,
+    "input_delay_scope": "Root measured the physical D keydown-to-left-button-down interval. It is an input gap, not server response latency or rendering time.",
+    "left_click_count": 1,
+    "same_entity_moved": true,
+    "preview_proxy_count_after_move": 0,
+    "laser_fixture_active_at_final_check": false,
+    "server_markers": ["FINAL_D_TOWER 626 [704.000000 4736.000000 385.500000]", "FINAL_D_GHOSTS 0", "FINAL_LASER_FIXTURE_ACTIVE false", "FINAL_D_CHECKED"],
+    "logs": ["output/tower_responsiveness_20261001/final_d_select.log", "output/tower_responsiveness_20261001/final_d_check.log"],
+    "evidence_boundary": "The zero-proxy observation applies only to this second game and is not assigned to the earlier tower 647 game. No new screenshot was created or archived for this check. Initial-profile coldness is not established; that scenario remains automated simulation coverage."
+  },
+  "workshop_remaining_plan": [
+    "Repeat D quickly and select a different valid cell, then verify that delayed old preview/result traffic neither relocates to an old cursor nor leaves a ghost after success.",
+    "Additional optional coverage: out-of-bounds and out-of-range destinations. Occupied-wall rejection and retry without another D already passed in Workshop; other invalid-cell categories remain automated coverage.",
+    "During pending placement cancel with Escape/right-click or switch selected unit; verify the pending click does not execute later."
+  ],
+  "limits": [
+    "Workshop coverage is limited to the two recorded normally constructed towers and measured input gaps. The zero-proxy result belongs only to the second game. Delayed initial profiles, multiplayer, UR and all protocol permutations retain their simulation-only status.",
+    "A cold profile may delay execution until authoritative profile delivery, but the first click is retained rather than requiring another click.",
+    "Advisory red/green and ghost rendering still load asynchronously. Only a fresh server landing check authorizes movement."
+  ]
+}

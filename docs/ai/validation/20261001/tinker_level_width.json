@@ -1,0 +1,608 @@
+{
+  "source": "Local Valve native resources adapted for presentation",
+  "status": "PASS",
+  "selections": [
+    {
+      "skill": "laser_lv01",
+      "rarity": "default",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv02",
+      "rarity": "default",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv03",
+      "rarity": "default",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv04",
+      "rarity": "default",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv05",
+      "rarity": "default",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv01",
+      "rarity": "R",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv02",
+      "rarity": "R",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv03",
+      "rarity": "R",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv04",
+      "rarity": "R",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv05",
+      "rarity": "R",
+      "particle": "particles/survival/tinker_growth/r_tinker_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv01",
+      "rarity": "SR",
+      "particle": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv02",
+      "rarity": "SR",
+      "particle": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv03",
+      "rarity": "SR",
+      "particle": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv04",
+      "rarity": "SR",
+      "particle": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv05",
+      "rarity": "SR",
+      "particle": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf"
+    },
+    {
+      "skill": "laser_lv01",
+      "rarity": "SSR",
+      "particle": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf"
+    },
+    {
+      "skill": "laser_lv02",
+      "rarity": "SSR",
+      "particle": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf"
+    },
+    {
+      "skill": "laser_lv03",
+      "rarity": "SSR",
+      "particle": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf"
+    },
+    {
+      "skill": "laser_lv04",
+      "rarity": "SSR",
+      "particle": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf"
+    },
+    {
+      "skill": "laser_lv05",
+      "rarity": "SSR",
+      "particle": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf"
+    }
+  ],
+  "implementation": "Preserved native children, emission, CP9/1 and segment lifetime. CP60 multiplies initialized beam radii. Blue SR particle tints plus cable/pulse materials; native SSR red.",
+  "selection_rule": "R 1.0-1.4; SR 1.5-1.9; SSR 2.0-2.4; SSR red stars 2.5-2.9. Native Aghanim shrink compensated. No combat changes.",
+  "records": [
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
+      "sha256": "3eb4588046cc6532cbd3663de0f8d4d45d1afbe4a9e0155ac25789aed1b57b76",
+      "dependencies": [
+        "materials/particle/beam_hotblue2.vtex",
+        "particles/units/heroes/hero_tinker/tinker_laser_e.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_b.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_c.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_d.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_j.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_f.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_g.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_h.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vpcf",
+      "sha256": "87cb0c7190fc27a0d0a44c9ae0348f420c1def030f3c6b9de639f3c8422d77b5",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+        "materials/models/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_cable.vmat",
+        "materials/particle/flat_beam.vtex",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact_smoke.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_embers.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_ring_b.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_ring.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_core.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_pulse.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_burn.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs.vpcf",
+      "sha256": "6721f3f80ec2514b6fd51e6fe789af7d964aa47f19d852f6a5b9ea9192010c50",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+        "materials/models/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_cable.vmat",
+        "materials/particle/flat_beam.vtex",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact_smoke.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_embers.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_core.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_pulse.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_burn.vpcf"
+      ]
+    }
+  ],
+  "adapted_resources": [
+    {
+      "resource": "particles/survival/tinker_growth/r_tinker_laser.vpcf",
+      "sha256": "7a33f611c937ff4f452b27b27478482e3dd876a7f55780dcf49ae600a6a2070d",
+      "dependencies": [
+        "materials/particle/beam_hotblue2.vtex",
+        "particles/survival/tinker_growth/r_tinker_laser_e.vpcf",
+        "particles/survival/tinker_growth/r_tinker_laser_b.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_c.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_d.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_j.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_f.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_g.vpcf",
+        "particles/units/heroes/hero_tinker/tinker_laser_h.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_hotblue2.vtex",
+      "sha256": "e5837b0336036bbef4b2110088547673f1af3e4c2de8944e0cb023e09a35728b"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/r_tinker_laser_e.vpcf",
+      "sha256": "48e60c9f4015ff1d63f42f4b25dcfac94821b706474e9070e355092492af0402",
+      "dependencies": [
+        "materials/particle/beam_hotblue.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_hotblue.vtex",
+      "sha256": "80f07e3be7662ac9680a6d0a13c447024659875c5136646c2ad6194d9797341e"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/r_tinker_laser_b.vpcf",
+      "sha256": "a3c68440f7556380523c49eb178a0dbd4b8c77808df19aa99146b5fa67fe7e4f",
+      "dependencies": [
+        "materials/particle/beam_hotblue2.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks.vpcf",
+      "sha256": "526a1c94da44383c01231273188155be903cf8e5c7db5c36ab8bbbc61da94773",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_b.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_c.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_d.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_e.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_f.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_g.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_h.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_i.vpcf",
+        "particles/units/heroes/hero_tinker/laser_cutter_sparks_k.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/sparks/sparks.vtex",
+      "sha256": "f6a32d59a41ab1e61339814b48e910874730e8b840cb6af98181a4d04dafa988"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_b.vpcf",
+      "sha256": "ad23c5cfa848301c8afc05f4c6ff9b49c7c284c42d10d37a3bcf7a876d03f9bd",
+      "dependencies": [
+        "materials/particle/smoke3/smoke3.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/smoke3/smoke3.vtex",
+      "sha256": "c55debf725f900d7419ccdb54c3bb2d8e297b035bf2615bc7dc84b684cd6bdd3"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_c.vpcf",
+      "sha256": "a9a1d90c18a69295a0ecff53a3b5acf22dbac72e36d0aebb2124f9913f8ca299",
+      "dependencies": [
+        "materials/particle/particle_glow_05.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_glow_05.vtex",
+      "sha256": "e9703c4c3ad6241cdad94e3138da6780fefdc82096f568d6538dbf5c0e3c3d02"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_d.vpcf",
+      "sha256": "25dcedcdbd7d58259655ff6fccb410542bc42b4f0d540203908efaf17d9cb6f0",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_001.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_001.vtex",
+      "sha256": "0678bc5b83672a4f388eb2a2ba475a5eae57e09961bccda75a6360e7c0ae3016"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_e.vpcf",
+      "sha256": "e9fbcebe9d36908783ab8ced643551c79aa32fd4dcc34204dcab1bd3bc38c2ec",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_f.vpcf",
+      "sha256": "146f538ed79a75dfa58c2a22bb75052de777cabd7e4ca527b879e9d847a602f2",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_g.vpcf",
+      "sha256": "39e5c0e8faddedaa8f7fae6eae2a0a680b38725a534ff1b230fcd080417bdca6",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_h.vpcf",
+      "sha256": "89ccda72a749a8a8e39088d5b50d84e480f96611ee1c7b26ca80ff15410e2b74",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_i.vpcf",
+      "sha256": "6b01d8e7077782a4ca64864213eb68ddcfe5b239e680452deaa04f5ed41fe9b5",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_k.vpcf",
+      "sha256": "02dfaeff0477753261af86072da4d0cd290256ed4a81aac8b9eb2b90b4ddf8cb",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_c.vpcf",
+      "sha256": "c957e713b20ccac8e4c3d60e353e517b6da4be23f3c054f324b7143408cd0148",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_001.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_d.vpcf",
+      "sha256": "113e914e3a02fc3b989fcdc050ba877cd5aaa8f57ae7c9e7e45d71108457dca1",
+      "dependencies": [
+        "materials/particle/particle_glow_05.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_j.vpcf",
+      "sha256": "a500915974603f5dd1795f1d29bd20f17ec224fe096385fbfcfe9e299798d945",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_f.vpcf",
+      "sha256": "7c8f0fe0f2245fc4809e3745ba5500e911b00762fa81526e4f23b4272f1febb6",
+      "dependencies": [
+        "materials/particle/particle_flares/aircraft_blue2.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/aircraft_blue2.vtex",
+      "sha256": "0494d473d28b7105f36ab3d296b98d8d5f3a3859c5b23e3bd4c57341c40fc5ff"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_g.vpcf",
+      "sha256": "8bf55da6cc346160350e6885f24926ffb53c8d83bf0be788b139781b35f9c307",
+      "dependencies": [
+        "materials/particle/particle_flares/aircraft_blue2.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_h.vpcf",
+      "sha256": "fc6fbd9462a9cd4a70768c2639ec8bf0605f4ac242437672f57bf1df556df86d",
+      "dependencies": [
+        "materials/particle/particle_flares/anam_white.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/anam_white.vtex",
+      "sha256": "8750f0baeae9d4ab1be52dc71d73114c4368ae6ae7957c701dabd1455bbcf63d"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser.vpcf",
+      "sha256": "e9d2d28bbd42daf424b4ba2a0bbf08e1a7499289a81cc2d45a51ffdb6fc39bb1",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+        "materials/survival/tinker_growth/sr_cable.vmat",
+        "materials/particle/flat_beam.vtex",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact_smoke.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_embers.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_ring_b.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_ring.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_core.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_pulse.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_burn.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+      "sha256": "54d2fec8a30527ed1ce44401f862f2d33be47e6d00373676a871863ff1571262"
+    },
+    {
+      "resource": "materials/survival/tinker_growth/sr_cable.vmat",
+      "sha256": "19199971937ed971dd04612e7726e0ed98663472de0b3d70cc935d3f52fc832e",
+      "dependencies": [
+        "materials/survival/tinker_growth/cable_png_f78908d9.vtex"
+      ]
+    },
+    {
+      "resource": "materials/survival/tinker_growth/cable_png_f78908d9.vtex",
+      "sha256": "981edd17eeef9f8b8fbc3620560a25733790bb340c69a92462b5345685b854b9"
+    },
+    {
+      "resource": "materials/particle/flat_beam.vtex",
+      "sha256": "c46cf98eb471e82fa1f6beb547bd7ef6391f712a788ba5b20076f8032df3d851"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact_smoke.vpcf",
+      "sha256": "ece7fe675c4f05b7d438356f8d1fb3f7f0aeff0fb1df070f04f041a64dbb2136",
+      "dependencies": [
+        "materials/particle/dust/large_swirl_dust.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/dust/large_swirl_dust.vtex",
+      "sha256": "317053e9bb103f3e386d81ec03cc4e3c998a1e202db50f4e2f6b37277af01457"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact.vpcf",
+      "sha256": "c376c16d6934aa00b7b3a6f45f7e879333eefd99b42a1aae9c03b2c84c430026",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_spot.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_spot_b.vpcf",
+        "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact_burst.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_spot.vpcf",
+      "sha256": "46da03daecd2b33c501b13436e6eb7fa570aa3efa89c96cd1b2d98d255830461",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_001.vtex"
+      ]
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_spot_b.vpcf",
+      "sha256": "584f8350acf7f8bda2a0d8b53d3e964c23b702b6d96a47970a34e9d3a22c2829",
+      "dependencies": [
+        "materials/particle/yellowflare2.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/yellowflare2.vtex",
+      "sha256": "9dec6cb6b0846873ebba0215892c34b2198050fbbf2dc3f6df4d5b5c937f40fb"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_impact_burst.vpcf",
+      "sha256": "e695dd0ce52f85780cdda84920fb99b75c8f0567f5358cd65fb1a4df9c39f68a",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_embers.vpcf",
+      "sha256": "591390facadf9614885b0791b51754082580bd4b6ed8779c1c953a2a1c4b6046",
+      "dependencies": [
+        "materials/particle/yellowflare.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/yellowflare.vtex",
+      "sha256": "1959d38776ce063c8bf63046d6f7b8752f10c5c30148d77081c37641c1491fc5"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_ring_b.vpcf",
+      "sha256": "71fe01555b33d0fd01eae0558f7c7562412620484e731da5c94a18619b8f2c3c",
+      "dependencies": [
+        "materials/particle/particle_ring_pulled.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/particle_ring_pulled.vtex",
+      "sha256": "34163c889482c6061bd649f9c529123ae693f10417a7e236fab6dce1af77c82c"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_ring.vpcf",
+      "sha256": "299a886962ae16ebd8d084863462beb56b5416ff202105ba591fb9f948ea881a",
+      "dependencies": [
+        "materials/particle/electricity/electricity_beam_a.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/electricity/electricity_beam_a.vtex",
+      "sha256": "7a3c0f5ca452b0f93f7add023139dbb1841f014623d25f0e0a1ce02b4243d38e"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_core.vpcf",
+      "sha256": "eadf32ea0023d43a5414e616f4852c373db45bda8fab5627ced039275c5e9533",
+      "dependencies": [
+        "materials/particle/beam_ground_crack.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_ground_crack.vtex",
+      "sha256": "69f36e504d84164a5d45520beacd5aee470b896c3f322be4c5271891c414ebd9"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_pulse.vpcf",
+      "sha256": "dbb1c3bc783d7b76b571178fb5e836396985f00c4de39feaaf4545e365e40b2d",
+      "dependencies": [
+        "models/particle/sphere.vmdl",
+        "materials/survival/tinker_growth/sr_pulse.vmat"
+      ]
+    },
+    {
+      "resource": "models/particle/sphere.vmdl",
+      "sha256": "2951e2237f448c4dd63748712c0e955d6259a798f3e74d9398dd99ab146b869f"
+    },
+    {
+      "resource": "materials/survival/tinker_growth/sr_pulse.vmat",
+      "sha256": "fcbc13017eadc4a9c080deee9a57d52a0fc2314dee8e022658bcdbdd11bcfb01",
+      "dependencies": [
+        "materials/survival/tinker_growth/pulse_png_94c3c02.vtex"
+      ]
+    },
+    {
+      "resource": "materials/survival/tinker_growth/pulse_png_94c3c02.vtex",
+      "sha256": "ce726511787c5899aa6138d54e836703b89d467a5b7d8e3c90e7f6fcfee98e3c"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/sr_tinker_ti10_immortal_laser_burn.vpcf",
+      "sha256": "259cec4a6b7b3a0dc7295c6105c6c320bdd36f86407a4877e5ae172f6c236c6a",
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_hotwhite.vtex",
+      "sha256": "ecb4c7de4411792b24905f5c5acfa62edf0d90aa63d70f075459f9cfe2037864"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs.vpcf",
+      "sha256": "6bac6531b00c9b1142bcd931629a85e717f2743cf61ff406ebac192488169d1c",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_004_mod.vtex",
+        "materials/models/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_cable.vmat",
+        "materials/particle/flat_beam.vtex",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact_smoke.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_embers.vpcf",
+        "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs_core.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_pulse.vpcf",
+        "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs_burn.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/models/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_cable.vmat",
+      "sha256": "6963968b2864557b08d340c00fc9ea0a3ef19fcb36cb037330e8cacba96837ec",
+      "dependencies": [
+        "materials/particle/beam_noise_01_psd_a34b319d.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_noise_01_psd_a34b319d.vtex",
+      "sha256": "ee9932f1a110c3184e611ad87770b96a757688098c902083d7a7ebcfddabcb68"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact_smoke.vpcf",
+      "sha256": "d93c9fc81d338eae1bfd40a551a5c256e5efbefb077cae2725daf9a53ebff315",
+      "dependencies": [
+        "materials/particle/dust/large_swirl_dust.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact.vpcf",
+      "sha256": "1a6ed16048c4997a4a7298475a890b540ae7477327d7277b6a3a867fb0cbb312",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_spot.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_spot_b.vpcf",
+        "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact_burst.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_spot.vpcf",
+      "sha256": "87067f7c141412b06a9f88fae07b2a04c450792c9ef5fe53b966d84dbfbc553f",
+      "dependencies": [
+        "materials/particle/particle_flares/particle_flare_001.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_spot_b.vpcf",
+      "sha256": "ee151526675e37f0d99f126525ede54313cb35f9a45d968ccfe8c04e9ae1c8be",
+      "dependencies": [
+        "materials/particle/yellowflare2.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact_burst.vpcf",
+      "sha256": "5215ed8b8dad9dbdc424076728328af88157ff4c07eae1497362f5ddf7cd3dd8",
+      "dependencies": [
+        "materials/particle/sparks/sparks.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_embers.vpcf",
+      "sha256": "46c56bd2a24a16cbaa4185e600989f3441ecbea87d7b535c074fb3670a182758",
+      "dependencies": [
+        "materials/particle/yellowflare.vtex"
+      ]
+    },
+    {
+      "resource": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs_core.vpcf",
+      "sha256": "0d375754446ba000db758ea8d8f93e2564016cce45b6bcdb17907d3303f50a23",
+      "dependencies": [
+        "materials/particle/beam_ground_crack.vtex"
+      ]
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_pulse.vpcf",
+      "sha256": "ff952d9f57874c672e1da050b6e1fe8bdf92d3fd2085743538e08711d54b7b08",
+      "dependencies": [
+        "models/particle/sphere.vmdl",
+        "materials/models/items/tinker/tinker_ti10_immortal_laser/beam_glow.vmat"
+      ]
+    },
+    {
+      "resource": "materials/models/items/tinker/tinker_ti10_immortal_laser/beam_glow.vmat",
+      "sha256": "3a0bd9dd7956da694745ee69068ae6c1f96804136421ccd837f6a84b2b29d311",
+      "dependencies": [
+        "materials/particle/beam_hot_slim_psd_58ebf0e9.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_hot_slim_psd_58ebf0e9.vtex",
+      "sha256": "5ab9928c5896552e59c2833fd62a141f9aa93f2b18c45927b68b0de7a2b0fc76"
+    },
+    {
+      "resource": "particles/survival/tinker_growth/ssr_tinker_ti10_immortal_laser_aghs_burn.vpcf",
+      "sha256": "faac618bb350a681519f6794d5ca4673ef4d6dc8858627cc9488fe89ba318fee",
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex"
+      ]
+    }
+  ],
+  "in_game_visual_verified": false
+}

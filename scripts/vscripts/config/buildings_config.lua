@@ -2,6 +2,7 @@ local building_levels = require("config/generated/building_levels")
 local building_definitions = require("config/generated/building_definitions")
 local building_visual_levels = require("config/generated/building_visual_levels")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
+local tower_routes = require("config/tower_route_config")
 local wall_visual_levels = require("config/generated/wall_visual_levels")
 local construction_rules = require(
     "config/generated/building_construction_rules"
@@ -145,7 +146,9 @@ M.wall = {
     id = "wall", display_name = configured_name("wall", "城墙"),
     unit_name = configured_unit_name("wall", "building_wall"),
     build_cost = build_cost("building_wall", 100, 0),
-    footprint = { x = 4, y = 4 }, hull_radius = 256,
+    -- Match the model. A shallow navigation crossbar seals side gaps without
+    -- inflating melee target distance or construction occupancy.
+    footprint = { x = 4, y = 4 }, hull_radius = 128,
     max_count = 1, build_once = true,
     show_health_bar = true, selectable = true,
     abilities = { "ability_upgrade_wall", "ability_upgrade_wall_9_1" }, levels = wall_levels,
@@ -220,13 +223,13 @@ M.arrow_tower = {
     },
     class_change_cost = { wood = 100, gold = 50 },
     class_options = {
-        [1] = { id = "class_1", display_name = "【N】死亡之塔", ability = "ability_tower_class_1" },
-        [2] = { id = "class_2", display_name = "【N】神秘之塔", ability = "ability_tower_class_2" },
-        [3] = { id = "class_3", display_name = "【N】闪电塔", ability = "ability_tower_class_3" },
-        [4] = { id = "class_4", display_name = "【N】机枪塔", ability = "ability_tower_class_4" },
-        [5] = { id = "class_5", display_name = "【N】多重塔", ability = "ability_tower_class_5" },
-        [6] = { id = "class_6", display_name = "【N】冰霜之塔", ability = "ability_tower_class_6" },
-    [7] = { id = "class_7", display_name = "【N】魔法塔", ability = "ability_tower_class_7" },
+        [1] = { id = "class_1", display_name = tower_routes.display_name(tower_routes.get("class_1", 1)), ability = "ability_tower_class_1" },
+        [2] = { id = "class_2", display_name = tower_routes.display_name(tower_routes.get("class_2", 1)), ability = "ability_tower_class_2" },
+        [3] = { id = "class_3", display_name = tower_routes.display_name(tower_routes.get("class_3", 1)), ability = "ability_tower_class_3" },
+        [4] = { id = "class_4", display_name = tower_routes.display_name(tower_routes.get("class_4", 1)), ability = "ability_tower_class_4" },
+        [5] = { id = "class_5", display_name = tower_routes.display_name(tower_routes.get("class_5", 1)), ability = "ability_tower_class_5" },
+        [6] = { id = "class_6", display_name = tower_routes.display_name(tower_routes.get("class_6", 1)), ability = "ability_tower_class_6" },
+        [7] = { id = "class_7", display_name = tower_routes.display_name(tower_routes.get("class_7", 1)), ability = "ability_tower_class_7" },
     },
 }
 

@@ -1,0 +1,121 @@
+{
+  "date": "2026-10-01",
+  "status": "PASS",
+  "source": "Local Valve Dota/core VPK",
+  "root": "particles/units/heroes/hero_siren/siren_net.vpcf",
+  "resources": [
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net.vpcf",
+      "sha256": "f5a2196ad36a561bc9aa140eed8a2011bf0df86ec353c75bae82ebc05f8aa597",
+      "dependencies": [
+        "materials/particle/urban_puddle01a_normal.vtex",
+        "particles/units/heroes/hero_siren/siren_net_main.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/urban_puddle01a_normal.vtex",
+      "sha256": "89e2a38ba103ed884ecae0bbac079c39e411222ae1da676a3b47dcf87d417435"
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_main.vpcf",
+      "sha256": "51a0de5962da680bfe56cd8d3c82aef01aa227da25a04d7950c6fac6591ffa91",
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex",
+        "particles/units/heroes/hero_siren/siren_net_parent.vpcf",
+        "particles/units/heroes/hero_siren/siren_net_sparkles.vpcf",
+        "particles/units/heroes/hero_siren/siren_net_sparkles_model.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/beam_hotwhite.vtex",
+      "sha256": "ecb4c7de4411792b24905f5c5acfa62edf0d90aa63d70f075459f9cfe2037864"
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_parent.vpcf",
+      "sha256": "baeb64cdc7e551bbfd797dac5bc8f29326cb0b53cafe59b584b06d69a56f9377",
+      "dependencies": [
+        "particles/units/heroes/hero_siren/siren_net_c.vpcf",
+        "particles/units/heroes/hero_siren/siren_net_b.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_c.vpcf",
+      "sha256": "0261f67ff5fae4dc1dd3bcacf8a2a38e5107c691aefe08a085db40351447a38d",
+      "dependencies": [
+        "particles/units/heroes/hero_siren/siren_net_bulk_b.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_bulk_b.vpcf",
+      "sha256": "e23d111cb46c1930c1469de7d6fe9811a66725e71d599500c6591f14321ed555",
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_b.vpcf",
+      "sha256": "b92f9c2bf20de2bb7ac271263ad7ac0facb2a873769030aed0634661c33923da",
+      "dependencies": [
+        "materials/particle/yellowflare2.vtex",
+        "particles/units/heroes/hero_siren/siren_net_ring.vpcf",
+        "particles/units/heroes/hero_siren/sinre_net_spoke.vpcf"
+      ]
+    },
+    {
+      "resource": "materials/particle/yellowflare2.vtex",
+      "sha256": "9dec6cb6b0846873ebba0215892c34b2198050fbbf2dc3f6df4d5b5c937f40fb"
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_ring.vpcf",
+      "sha256": "b5e2ac20c2974504108b1d3bad45e575e7684d4b1e384c9421dfc17ae8bbcd79",
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex",
+        "particles/units/heroes/hero_siren/siren_net_sparkles.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_sparkles.vpcf",
+      "sha256": "306ebd9cf1b6c5f885e53fb4876877988603fce482e285b4acd948b18b14c90f",
+      "dependencies": [
+        "materials/particle/yellowflare2.vtex"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/sinre_net_spoke.vpcf",
+      "sha256": "19cc2b2ebb01a9b64827d2352ce36941ff672243ad4f70a53edd76a9285c3109",
+      "dependencies": [
+        "materials/particle/beam_hotwhite.vtex",
+        "particles/units/heroes/hero_siren/siren_net_sparkles.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_sparkles_model.vpcf",
+      "sha256": "84f59a9b1775dc408741cedb35964f1a6a382916f451ab3bac64a3bbca40c864",
+      "dependencies": [
+        "materials/particle/yellowflare2.vtex",
+        "particles/units/heroes/hero_siren/siren_net_sparkles_model_b.vpcf"
+      ]
+    },
+    {
+      "resource": "particles/units/heroes/hero_siren/siren_net_sparkles_model_b.vpcf",
+      "sha256": "2b446d15d742e869efa4c5b52c6937ff27cd09ebd5ef8b21c963f28665a468e6",
+      "dependencies": [
+        "materials/particle/spray1/spray1.vtex"
+      ]
+    },
+    {
+      "resource": "materials/particle/spray1/spray1.vtex",
+      "sha256": "a220c48bddc643a5471069563b434c3aa66e78910d7fc0d618614aed4f71e8fa"
+    },
+    {
+      "resource": "panorama/images/spellicons/naga_siren_ensnare_png.vtex",
+      "sha256": "140d571d999615d2759d590f9d6d091cdb9451e49879da08a004785484170f62"
+    }
+  ],
+  "tests": [
+    "test_tower_drag_net.lua PASS",
+    "test_tower_skill_tree_exclusion.lua PASS",
+    "luac5.1 syntax PASS"
+  ],
+  "in_game_visual_verified": false
+}

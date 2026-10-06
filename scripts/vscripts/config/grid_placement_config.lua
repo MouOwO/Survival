@@ -13,8 +13,23 @@ local M = {
     preview_visual = {
         grid_z_offset = 6,
         preview_alpha = 125,
-        edge_thickness = 2,
-        fill_strip_count = 6,
+        edge_thickness = 1,
+        fill_strip_count = 8,
+        radius = 1280,
+        area_stride = 1,
+        area_refresh_interval = 0.60,
+        -- Advisory overview only; exact placement always checks fresh terrain.
+        area_terrain_cache_seconds = 2,
+        edge_fade_start = 0.40,
+        edge_fade_end = 0.94,
+        warm_pool_size = 640,
+        warm_batch_size = 8,
+        -- World units per second; separate thresholds prevent flickering at
+        -- the boundary. Fast sweeps pause colors; the static white grid,
+        -- feathered mask and locally snapped icon/range remain visible.
+        fast_move_speed = 2400,
+        slow_move_speed = 1200,
+        motion_settle_seconds = 0.12,
     },
     build_bounds = {
         min_x = -1800,
@@ -34,6 +49,7 @@ if GetMapName and GetMapName() == "survival_c6" then
     M.build_bounds = require("config/map_layouts/survival_c6").build_bounds
 elseif GetMapName and GetMapName() == "template_map" then
     M.build_bounds = require("config/map_layouts/template_map").build_bounds
+    M.grid_display_bounds = require("config/map_layouts/template_map").grid_display_bounds
     -- The four building lawns are at Z=384. Stairs and the lower approach
     -- remain walkable for monsters but are not construction surfaces.
     M.build_ground_height = 384

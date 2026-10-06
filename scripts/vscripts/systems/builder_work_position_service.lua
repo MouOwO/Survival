@@ -76,15 +76,19 @@ local function grounded_clear(caster, candidate, reference_height, units)
     return candidate
 end
 
-function M.find(caster, definition, origin)
+function M.find(caster, definition, origin, options)
     if not valid(caster) or not origin then return nil end
     local source = caster:GetAbsOrigin()
     local ok, height = pcall(GetGroundHeight, origin, caster)
     if not ok or not finite(height) then return nil end
     local x, y = half_size(definition)
     local clearance = CLEARANCE + unit_hull(caster)
+    local max_center_distance = tonumber(options and options.max_center_distance)
     local candidates, seen = {}, {}
     local function add(dx, dy)
+        -- Repairers need an actually usable work point, not the outermost
+        -- search ring nearest their current position. Construction is uncapped.
+        if max_center_distance and dx * dx + dy * dy > max_center_distance * max_center_distance then return end
         local key = string.format("%.3f:%.3f", dx, dy)
         if seen[key] then return end
         seen[key] = true

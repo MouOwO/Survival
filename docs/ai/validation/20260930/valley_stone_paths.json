@@ -1,0 +1,32 @@
+{
+  "status": "PREVIEW_READY",
+  "map": "valley_decor_review",
+  "implementation": "4 editable non-colliding paving meshes, 3392 quads, native Colosseum stone/grass vertex blending",
+  "existing_entities_meshes_tile_grid_preserved": true,
+  "main_source_unchanged": true,
+  "main_source_sha256": "b92f2eb0e21bbc7cb995d866adc10e3439bc47a3351627b835207284b13611d1",
+  "compile": {
+    "compiled": 306,
+    "failed": 0
+  },
+  "package": {
+    "sha256": "aab783a2568b878a5a06a12c6964c58866a124daaa085b8763516516efe1598d",
+    "crc_entries": 311,
+    "source_crc_match": true
+  },
+  "runtime": {
+    "checks": 116,
+    "failed": 0,
+    "ground_height": 129.5,
+    "previous_ground_height": 128,
+    "visual_inspected": true
+  },
+  "screenshots": [
+    "art/maps/c6/stone_paths/path_preview.png",
+    "art/maps/c6/stone_paths/overview.png"
+  ],
+  "limitations": [
+    "Original tile-grid-only paint attempt did not produce the intended visible road; its cause is unresolved. Final source restores the entire original tile grid.",
+    "Paving raises sampled ground by 1.5 units despite physicsType none; navigation checks pass."
+  ]
+}

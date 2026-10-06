@@ -1,3 +1,4 @@
+local wall_navigation = require("systems/wall_navigation_service")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/grid_placement_config")
@@ -5,7 +6,19 @@ local region_service = require("systems/forbidden_region_service")
 
 local M = {}
 local occupied = {}
+local occupied_entities = {}
+local function set_occupant(column, y, index)
+    local old = column[y]
+    if old == index then return end
+    if old then
+        occupied_entities[old] = (occupied_entities[old] or 1) - 1
+        if occupied_entities[old] <= 0 then occupied_entities[old] = nil end
+    end
+    column[y] = index
+    if index then occupied_entities[index] = (occupied_entities[index] or 0) + 1 end
+end
 local marker_regions = {}
+local static_terrain = {}
 local reconcile_occupied
 
 local function number(value, fallback)
@@ -24,11 +37,14 @@ end
 
 local function ground_height(position)
     local height = number(position.z, 0)
+    -- GetGroundHeight already returns the terrain height. Only use the more
+    -- expensive position query as a fallback, not a second query per sample.
+    local ok, value = pcall(function() return GetGroundHeight(position, nil) end)
+    if ok and type(value) == "number" then return value end
     pcall(function()
         local ground = GetGroundPosition(position, nil)
         if ground then height = number(ground.z, height) end
     end)
-    pcall(function() height = GetGroundHeight(position, nil) end)
     return height
 end
 
@@ -95,6 +111,12 @@ local function terrain_clear(center)
         local blocked_ok, blocked = pcall(function()
             return GridNav:IsBlocked(sample)
         end)
+        local original_traversable, original_blocked =
+            wall_navigation.original_nav(sample)
+        if original_traversable ~= nil then
+            traversable_ok, traversable = true, original_traversable
+            blocked_ok, blocked = true, original_blocked
+        end
         if not traversable_ok or traversable ~= true
             or not blocked_ok or blocked ~= false then return false, "terrain_blocked" end
         local height = ground_height(sample)
@@ -140,6 +162,10 @@ local function unit_overlaps_cell(unit, center, half)
 end
 
 local function construction_building_is_logical_only(unit, payload)
+    -- Registered buildings already block their exact footprint. Counting the
+    -- circular hull again incorrectly reserves neighboring cells after completion.
+    if occupied_entities[unit:entindex()] then return true end
+    if unit.survival_wall_collision_barrier == true then return true end
     if unit.survival_is_building ~= true or not unit.HasModifier then return false end
     local ok, constructing = pcall(
         unit.HasModifier,
@@ -247,10 +273,10 @@ local function validate_cell(grid_x, grid_y, payload)
         x = center.x,
         y = center.y,
         z = center.z,
-        corners = payload.compact and nil or cell_corners(grid_x, grid_y),
         ok = true,
         reason = "",
     }
+    if not payload.compact then result.corners = cell_corners(grid_x, grid_y) end
     if not within_bounds(center) then
         result.ok, result.reason = false, "build_out_of_bounds"
         return result
@@ -352,7 +378,7 @@ local function occupy(payload)
     for x = payload.grid_x, payload.grid_x + footprint.x - 1 do
         occupied[x] = occupied[x] or {}
         for y = payload.grid_y, payload.grid_y + footprint.y - 1 do
-            occupied[x][y] = payload.entindex
+            set_occupant(occupied[x], y, payload.entindex)
         end
     end
     return true
@@ -365,7 +391,7 @@ local function release(payload)
         if occupied[x] then
             for y = payload.grid_y, payload.grid_y + footprint.y - 1 do
                 if entindex == nil or occupied[x][y] == entindex then
-                    occupied[x][y] = nil
+                    set_occupant(occupied[x], y, nil)
                 end
             end
         end
@@ -377,7 +403,7 @@ local function clear_occupied_entindex(entindex)
     for x, column in pairs(occupied) do
         for y, occupant in pairs(column) do
             if occupant == entindex then
-                column[y] = nil
+                set_occupant(column, y, nil)
             end
         end
         if next(column) == nil then occupied[x] = nil end
@@ -389,6 +415,7 @@ local function occupied_entity_is_valid(unit)
     if unit_is_dead(unit) then return false end
     return unit.survival_is_building == true
         or unit.survival_building_id ~= nil
+        or unit.survival_tree_owner_id ~= nil
 end
 
 reconcile_occupied = function()
@@ -398,9 +425,14 @@ reconcile_occupied = function()
         for _, entindex in pairs(column) do
             if entindex ~= nil and not checked[entindex] then
                 checked[entindex] = true
-                local ok, unit = pcall(EntIndexToHScript, entindex)
-                if not ok or not occupied_entity_is_valid(unit) then
-                    clear_occupied_entindex(entindex)
+                -- Tree locations reserve named cells before their entity is
+                -- spawned. These markers are not stale entity handles.
+                local entity_index = tonumber(entindex)
+                if entity_index then
+                    local ok, unit = pcall(EntIndexToHScript, entity_index)
+                    if not ok or not occupied_entity_is_valid(unit) then
+                        clear_occupied_entindex(entindex)
+                    end
                 end
             end
         end
@@ -435,8 +467,161 @@ function M.is_position_occupied(position)
     return occupied_by_other(x, y, nil)
 end
 
+-- Map terrain only. Run once at startup; never include units or occupancy.
+-- This job is independent of mouse movement and preview cancellation.
+function M.static_preview(payload)
+    local b=config.build_bounds
+    if not b then return "" end
+    local size=number(config.cell_size,64)
+    local x0,y0=math.floor(b.min_x/size),math.floor(b.min_y/size)
+    local width,height=math.ceil(b.max_x/size)-x0,math.ceil(b.max_y/size)-y0
+    if width<1 or height<1 or width*height>65536 then return "" end
+    local states={}
+    local clock=type(Time)=="function" and Time or os.clock
+    local started,count=clock(),0
+    for x=x0,x0+width-1 do for y=y0,y0+height-1 do
+        local center=cell_center(x,y,0)
+        local clear=within_bounds(center) and not forbidden_marker(center)
+            and region_service.validate_building_footprint(x*size,y*size,(x+1)*size,(y+1)*size)
+            and terrain_clear(center) and not has_tree(center)
+        static_terrain[size..":"..x..":"..y]={clear=clear==true,static=true,time=0}
+        states[#states+1]=clear and 2 or 1
+        count=count+1
+        if payload and payload.yield_after and (count>=payload.yield_after
+            or (count>=8 and clock()-started>=number(payload.time_budget,0.002))) then
+            coroutine.yield()
+            started,count=clock(),0
+        end
+    end end
+    local packed={}
+    for i=1,#states,2 do packed[#packed+1]=string.format("%x",states[i]+4*(states[i+1] or 0)) end
+    return table.concat({3,size,x0,y0,width,height,number(config.build_ground_height,0),table.concat(packed)},"|")
+end
+
+-- Read-only local terrain overlay. One unit query per refresh; reuse exactly
+-- the same cell rules as placement. The footprint is still validated separately.
+function M.preview_area(payload)
+    local position = payload.position
+    local size = number(config.cell_size, 64)
+    local visual = config.preview_visual or {}
+    local radius = math.min(1536, math.max(size, number(visual.radius, 1280)))
+    local stride = math.max(1, math.floor(number(visual.area_stride, 1)))
+    local display_size = size * stride
+    -- A single construction plane avoids overlapping projected tiles on cliffs.
+    -- Terrain validation below still uses each underlying cell's actual height.
+    local display_height = math.floor(number(config.build_ground_height, ground_height(position)))
+    reconcile_occupied()
+    local clock = type(Time) == "function" and Time or os.clock
+    local now = GameRules and GameRules:GetGameTime() or 0
+    -- Cache only advisory terrain results. Occupancy and units are refreshed
+    -- every scan; GRID_CAN_PLACE / actual construction never use this cache.
+    local cache = payload.terrain_cache or {}
+    local ttl = number(visual.area_terrain_cache_seconds, 2)
+    local cache_count = 0
+    for key, entry in pairs(cache) do
+        -- Keep recently expired samples visible while refreshing them. Dropping
+        -- all expired cells at once made the whole overlay blink every TTL.
+        if now - entry.time >= ttl+2 or now < entry.time then cache[key] = nil
+        else cache_count = cache_count + 1 end
+    end
+    if cache_count > 8192 then for key in pairs(cache) do cache[key] = nil end end
+    local units = nearby_units_for_footprint(payload,
+        { x = radius * 2 / size + 2, y = radius * 2 / size + 2 }, position)
+    local unit_cells = {}
+    local ignored = number(payload.ignore_entindex, -1)
+    -- Rasterize each unit once instead of testing every unit against every
+    -- tile (and repeatedly calling GetAbsOrigin/GetHullRadius across Lua/C++).
+    for _, unit in ipairs(units) do
+        if unit and not unit:IsNull() and not unit_is_dead(unit)
+            and unit:entindex() ~= ignored
+            and not (payload.ignore_entindexes or {})[unit:entindex()]
+            and not unit.survival_is_grid_preview
+            and not construction_building_is_logical_only(unit, payload) then
+            local origin, hull = unit:GetAbsOrigin(), unit_hull_radius(unit)
+            for x = math.max(math.floor((origin.x-hull)/size)-1,math.floor((position.x-radius)/size)),
+                math.min(math.floor((origin.x+hull)/size),math.floor((position.x+radius)/size)) do
+                for y = math.max(math.floor((origin.y-hull)/size)-1,math.floor((position.y-radius)/size)),
+                    math.min(math.floor((origin.y+hull)/size),math.floor((position.y+radius)/size)) do
+                    local dx = origin.x-clamp(origin.x,x*size,(x+1)*size)
+                    local dy = origin.y-clamp(origin.y,y*size,(y+1)*size)
+                    if dx*dx+dy*dy <= hull*hull then unit_cells[x..":"..y] = true end
+                end
+            end
+        end
+    end
+    local min_x = math.floor((position.x - radius) / display_size)
+    local max_x = math.floor((position.x + radius) / display_size)
+    local min_y = math.floor((position.y - radius) / display_size)
+    local max_y = math.floor((position.y + radius) / display_size)
+    local height = max_y-min_y+1
+    local states, work = {}, {}
+    local function dynamic_clear(x, y)
+        for sx = 0, stride-1 do
+            for sy = 0, stride-1 do
+                local gx, gy = x*stride+sx, y*stride+sy
+                if occupied_by_other(gx,gy,ignored) or unit_cells[gx..":"..gy] then return false end
+            end
+        end
+        return true
+    end
+    local function encode()
+        local rows = {}
+        for i = 1, #states, 2 do rows[#rows+1] = string.format("%x",states[i]+4*(states[i+1] or 0)) end
+        return table.concat({3,display_size,min_x,min_y,max_x-min_x+1,height,
+            display_height,table.concat(rows)},"|")
+    end
+    for x = min_x, max_x do
+        for y = min_y, max_y do
+            local index = #states+1
+            states[index] = 0 -- unknown is absent, never assumed buildable
+            local distance = ((x+0.5)*display_size-position.x)^2+((y+0.5)*display_size-position.y)^2
+            if distance <= radius^2 then
+                local key = display_size..":"..x..":"..y
+                local entry = static_terrain[key] or cache[key]
+                -- Outside the legal construction rectangle is permanently red;
+                -- no terrain scan or TTL refresh is needed, including ocean.
+                if not within_bounds(cell_center(x*stride,y*stride,0)) then
+                    entry = {clear=false,static=true,time=0}
+                end
+                if entry then states[index] = entry.clear and dynamic_clear(x,y) and 2 or 1 end
+                if not entry or (not entry.static and now-entry.time >= ttl) then
+                    work[#work+1] = {x=x,y=y,index=index,key=key,distance=distance}
+                end
+            end
+        end
+    end
+    table.sort(work,function(a,b) return a.distance < b.distance end)
+    local batch_start, batch_count = clock(), 0
+    for wi, tile in ipairs(work) do
+        local x,y = tile.x,tile.y
+        local clear = region_service.validate_building_footprint(
+            x*display_size,y*display_size,(x+1)*display_size,(y+1)*display_size)
+        for sx = 0,stride-1 do
+            if not clear then break end
+            for sy = 0,stride-1 do
+                local center = cell_center(x*stride+sx,y*stride+sy,0)
+                if not within_bounds(center) or forbidden_marker(center)
+                    or not terrain_clear(center) or has_tree(center) then clear = false; break end
+            end
+        end
+        cache[tile.key] = {time=now,clear=clear}
+        states[tile.index] = clear and dynamic_clear(x,y) and 2 or 1
+        batch_count = batch_count+1
+        if payload.yield_after and wi < #work and (batch_count >= payload.yield_after
+            or (batch_count >= 8 and clock()-batch_start >= number(payload.time_budget,0.002))) then
+            -- Publish useful near-cursor cells immediately, before the distant
+            -- edge finishes. Completed work survives a cursor-driven restart.
+            coroutine.yield(encode())
+            batch_start,batch_count = clock(),0
+        end
+    end
+    return encode()
+end
+
 function M.init()
     occupied = {}
+    occupied_entities = {}
+    static_terrain = {}
     load_marker_regions()
     event_bus.handle_request(events.GRID_CAN_PLACE_REQUEST, can_place)
     event_bus.handle_request(events.GRID_OCCUPY_REQUEST, occupy)

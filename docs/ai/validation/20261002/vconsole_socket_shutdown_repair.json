@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-02",
+  "issue": "FATAL ERROR: Cannot recover from failed socket shutdown. (error 10038)",
+  "assessment": "Crash dump shows repeated localhost VConsole connections immediately before failure. The installed dota2-mcp 1.6.0 relay opened and destroyed an unhandshaken TCP socket every second, with no in-flight guard. This is the suspected trigger; the closed-source engine root cause is not proven.",
+  "dump": "game/bin/win64/dota2_2026_1002_093243_0_error.mdmp",
+  "dump_evidence": [
+    "3325(119.662020): VConsole client connection from 127.0.0.1",
+    "3340(122.663556): VConsole client connection from 127.0.0.1",
+    "3345(122.672480): VConsole client connection from 127.0.0.1",
+    "3347(122.675371): FATAL ERROR: Cannot recover from failed socket shutdown. (error 10038)"
+  ],
+  "repair": [
+    "Stopped the identified old relay process (18176).",
+    "Installed passive Windows netstat listener checks in place of game TCP probes.",
+    "Polling every five seconds, single query in flight, discard stale results after GUI attach or relay close.",
+    "Preserved VConsole GUI ownership and the existing complete protocol handshake.",
+    "Saved vcon-relay.js.before-survival-socket-fix beside the installed module.",
+    "Restarted the patched daemon hidden (32196), with automatic GUI opening disabled for this daemon instance.",
+    "Restarted the normal gameplay launcher; backend authentication succeeded."
+  ],
+  "repeatable_patch": "node tools/map_c6/patch-mcp.cjs (restart any running relay after applying; reapply after a package reinstall)",
+  "tests": {
+    "command": "node --test tools/map_c6/vcon-readiness.test.cjs tools/map_c6/console.test.cjs tools/map_c6/console-relay.test.cjs",
+    "passed": 16,
+    "failed": 0,
+    "installed_relay_readiness_ticks": 120,
+    "mock_engine_connections": 0,
+    "covers": [
+      "listener open/close",
+      "no active engine probing",
+      "overlapping queries",
+      "stale completion on GUI attach/shutdown",
+      "inspection failure",
+      "complete handshake",
+      "graceful close",
+      "relay dispatch and fallback",
+      "idempotent install reproduced from original backup"
+    ]
+  },
+  "live_validation": {
+    "checked_at": "2026-10-02T09:47:32.8233513+08:00",
+    "game_pid": 20804,
+    "uptime_seconds": 208.0,
+    "responding": true,
+    "window_title": "Dota 2",
+    "backend_status": "waiting_for_party",
+    "latest_crash": "dota2_2026_1002_093243_0_error.mdmp",
+    "new_crash_since_restart": false,
+    "socket_fatal_lines_in_new_log": 0,
+    "limitation": "Normal map reached party waiting room. Startup observation does not replace prolonged combat testing. No game wave, damage, asset, or save changes in this repair."
+  },
+  "followup": {
+    "checked_at": "2026-10-02T09:51:13.1698707+08:00",
+    "observed_recurrence": false,
+    "observation": "The repeated report arrived shortly after the previous repair. Current Dota window has no error dialog, no newer crash dump exists, and the installed passive relay patch is still present. Whether the user saw a distinct new crash is not confirmed.",
+    "additional_repair": "Direct console client now sends FIN and drains established writable connections on command timeout and parser failure as well as success, preserving the original error. Connecting, broken, and already destroyed sockets still use immediate bounded cleanup.",
+    "deployment": "Effective automatically for subsequent backend console subprocesses; no live game restart or data changes.",
+    "tests_passed": 18,
+    "tests_failed": 0,
+    "game_pid": 20804,
+    "game_responding": true,
+    "game_window": "Dota 2",
+    "game_uptime_seconds": 428.0,
+    "backend_status": "waiting_for_party",
+    "latest_crash": "dota2_2026_1002_093243_0_error.mdmp",
+    "new_crash_since_restart": false,
+    "limitation": "Observed only normal map/party waiting state, not extended active combat. Engine root cause remains an inference from the earlier crash dump."
+  }
+}

@@ -26,7 +26,7 @@ local tower_icon_by_family = {
     ice_blizzard = "survival/native/skill_frost",
     polar_obelisk = "survival/native/skill_ice_obelisk",
     anti_air_missile = "survival/native/skill_missile",
-    drag_net = "survival/native/skill_net",
+    drag_net = "naga_siren_ensnare",
     airspace_overlord = "survival/native/skill_air_overlord",
 }
 local tooltip_config = require("config/generated/tooltip_definitions")

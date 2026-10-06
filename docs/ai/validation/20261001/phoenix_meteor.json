@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-01",
+  "validation_level": [
+    "STATIC",
+    "CONTRACT",
+    "SIMULATION"
+  ],
+  "workshop_verified": false,
+  "native_reference": "Phoenix Supernova egg model, native egg glow/lava/steam, reborn sphere",
+  "changed_timing": {
+    "previous_fall_seconds": 0.8,
+    "fall_seconds": 0.4
+  },
+  "unchanged_gameplay": {
+    "radius": 500,
+    "lava_seconds": 3,
+    "lava_ticks": 3,
+    "second_meteor_delay": 0.5,
+    "second_meteor_scale": 0.8,
+    "trigger_chance": 0.12,
+    "impact_multiplier": 3,
+    "lava_multiplier": 1
+  },
+  "lava_presentation": {
+    "same_cast_ground_systems": 1,
+    "level5_visual_seconds": 3.5,
+    "rationale": "Two meteors at one cast position formerly created identical coplanar lava systems. Share only the ground visual through the final lava expiry; damage and slow retain separate per-meteor timers.",
+    "before_evidence": "output/map_build_c6/meteor_frame_04.png",
+    "shared_only_workshop_result": "Horizontal lines persisted in output/map_build_c6/meteor_fixed_05.png; duplicate systems were not the sole cause.",
+    "ground_layer_heights": [
+      32,
+      40
+    ],
+    "previous_ground_layer_heights": [
+      7,
+      9
+    ],
+    "depth_testing": "native defaults preserved",
+    "position_operator": "C_OP_SetToCP / native FLOAT offset vectors; legacy PositionOffset removed only from the two ground layers",
+    "height_only_workshop_result": "Horizontal lines persisted with legacy PositionOffset at 32/40; compiled vectors remained INT. Replaced with the same CP operator used by verified tower bases.",
+    "texture_check": "Decoded Valve lava/crack textures do not contain the horizontal line band.",
+    "after_workshop_verification": "NOT_VERIFIED for current resource hashes"
+  },
+  "compile": {
+    "compiled": 2,
+    "failed": 0,
+    "logs": "output/phoenix_meteor/compile"
+  },
+  "native_dependencies_checked": 8,
+  "simulation": "scripts/vscripts/tests/test_meteor_visual_timing.lua: all five tiers, 0.4s landing, unchanged radius/damage totals/slow/lava/second meteor gap, one shared ground visual, VFX failures and cleanup/reentry passed",
+  "tests": [
+    "node tools/test_meteor_visual_resources.cjs",
+    "lua5.1 scripts/vscripts/tests/test_meteor_visual_timing.lua"
+  ],
+  "runtime_precache": [
+    "particles/survival/skills/meteor_phoenix_fall.vpcf",
+    "particles/survival/skills/meteor_impact.vpcf",
+    "particles/survival/skills/meteor_lava.vpcf"
+  ],
+  "records": [
+    {
+      "resource": "particles/survival/skills/meteor_lava.vpcf",
+      "bytes": 2417,
+      "source_sha256": "f20305bd2fcb8b4691bbee106b8826ac2051b41c704044fd36d2c310d0fc2832",
+      "compiled_sha256": "206ab73a06caf249fe33b12a9b472b013cac0995d905bd93b8f2611c40f19528"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_lava_cracks.vpcf",
+      "bytes": 2248,
+      "source_sha256": "55c4346fadde81de2e18c29bcaf042e55d17389534247ed9cc9203310023251a",
+      "compiled_sha256": "52114d736c9ff61ffe4c0647f181c203311baa58912e7f78485c27d913520053"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_lava_embers.vpcf",
+      "bytes": 2374,
+      "source_sha256": "4338a8fd0ac5132a07fee8dee9ee84676d8df8e911caace69d50566318bbc68f",
+      "compiled_sha256": "a23425413cb5f0d0660692c1aec5b395b7dd44e4baac2dd0c9e8c7efcf31103c"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_impact_sparks.vpcf",
+      "bytes": 2224,
+      "source_sha256": "402119a3d0989199f00646ac41359c638d328f60b2688a6805a96084e06175d8",
+      "compiled_sha256": "5f061aee8aef3879e895c41d503275e23b93b44c56793d41205ed9f306521227"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_impact.vpcf",
+      "bytes": 2649,
+      "source_sha256": "09101f46a2ad18ffceb338fc899143a2e3a1625a45d952c2c2e6fe3335f8396e",
+      "compiled_sha256": "502e865066fb3644cb69b52254fc78d1da37a26fb7964209697288c199c5233b"
+    },
+    {
+      "resource": "particles/survival/skills/meteor_phoenix_fall.vpcf",
+      "bytes": 2619,
+      "source_sha256": "deb6bea3df8f6f0114857365084057f629db5e025e4323560cb821d17ba37922",
+      "compiled_sha256": "a95efb3e04737cd8a4136725fb4910319554b9e492a76dadae3a136ed1c22ed0"
+    }
+  ],
+  "workshop": {
+    "status": "NOT_VERIFIED",
+    "reason": "no_matching_workshop_record"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "validation": "STATIC: package membership, RERL and resourceinfo DATA inspected. Visual scale/orientation still requires WORKSHOP review.",
+  "reference_binding_limit": "Reference tower Lua is encrypted; selected aura assets exist in the package, but exact hero/tier bindings cannot be proven from the screenshots or filenames alone.",
+  "reference_basics": {
+    "source": "Workshop 3164617180 scripts/npc/units/online/npc_tower.kv",
+    "t02_t08_t11_t17_projectile": "particles/base_attacks/ranged_badguy.vpcf",
+    "t06_projectile": "particles/base_attacks/ranged_goodguy.vpcf",
+    "t04_projectile": "particles/neutral_fx/ghost_base_attack.vpcf",
+    "native": true,
+    "usage": "SetRangedProjectileName only. Preserve existing attack timing, speed, and all authoritative damage. N tier has no base aura."
+  },
+  "imported_auras": [
+    {
+      "resource": "particles/units/towers/aura_dark.vpcf",
+      "origin": "reference_custom_composition",
+      "native_textures": ["materials/particle/auras/aura_vlads.vtex", "materials/particle/legion/legion_overwhelming_odds.vtex"],
+      "cp": {"0": "unit origin; root adds Z +32"},
+      "attachment": "PATTACH_ABSORIGIN_FOLLOW",
+      "size": "Fixed 180 radius root /120 child; not parameterized by CP1. Consider trimmed adaptation for 128-wide build grid.",
+      "style": "Purple vampiric ground rune with outward pulse and short orbiting detail; death/mystery theme.",
+      "cleanup": "DestroyParticle(handle,false), ReleaseParticleIndex on replace, sell, death, session reset; endcap .25 s."
+    },
+    {
+      "resource": "particles/units/towers/aura_durable.vpcf",
+      "origin": "reference_custom_composition",
+      "native_textures": ["materials/particle/auras/aura_assaultc.vtex", "materials/particle/juggernaut/arcana/jugg_arcana_ground_symbol.vtex"],
+      "cp": {"0": "unit origin; root adds Z +32"},
+      "attachment": "PATTACH_ABSORIGIN_FOLLOW",
+      "size": "Fixed 144 root /96 child; not parameterized by CP1.",
+      "style": "Orange ground sigil and rotating/orbiting accents; physical/mechanical tower theme.",
+      "cleanup": "DestroyParticle then ReleaseParticleIndex; endcap .25 s."
+    },
+    {
+      "resource": "particles/units/towers/aura_evil.vpcf",
+      "origin": "reference_custom_composition",
+      "cp": {"0": "ground origin"},
+      "attachment": "PATTACH_ABSORIGIN_FOLLOW",
+      "size": "Fixed 200 radius green caustic layer, .5 initial scale. Ground tracing initializer.",
+      "style": "Green rolling caustic ground distortion; optional high-tier magic/death palette.",
+      "cleanup": "DestroyParticle then ReleaseParticleIndex; endcap .125 s."
+    },
+    {
+      "resource": "particles/units/towers/qualification_build_t04_base.vpcf",
+      "origin": "reference_custom_composition",
+      "cp": {"0": "world origin", "1": "source preview vector (1,0,0); scale-sensitive children; exact all-child semantics require runtime review", "2": "source preview world origin", "3": "source preview world origin"},
+      "style": "Ice-crystal formation skill effect, not proven suitable as permanent tower base.",
+      "recommendation": "Use only as finite upgrade/ice burst after review, not blindly looping.",
+      "cleanup": "Explicit bounded lifetime and DestroyParticle + ReleaseParticleIndex."
+    }
+  ],
+  "native_lightning_base": {
+    "resource": "particles/units/heroes/hero_disruptor/disruptor_kf_wall_floorground.vpcf",
+    "cp": {"0": "ground origin", "1": "(radius,0,0); RingWave uses x", "2": "(duration,0,0); lifetime maps 0..5 to 0..5.1"},
+    "recommendation": "Lightweight ground-only subset. Avoid full kineticfield wall around a tower. Infinite ambient needs adapted source or managed refresh; do not assume an arbitrary CP2 duration changes all child behavior.",
+    "style": "Blue electrical ground circle, native.",
+    "cleanup": "DestroyParticle + ReleaseParticleIndex."
+  },
+  "angular_meteor": {
+    "resource": "particles/units/heroes/hero_rubick/rubick_chaos_meteor_fly.vpcf",
+    "origin": "valve_native_rubick_arcana",
+    "model": "models/items/rubick/rubick_arcana/rubick_arcana_cube.vmdl",
+    "additional_cube_resource": "particles/units/heroes/hero_rubick/rubick_chaos_meteor_cubes.vpcf",
+    "cp": {"0": "flight origin", "1": "landing position", "2": "x: stop-after duration", "3": "written by SetControlPointsToParticle; do not manually move it", "60": "optional RGB color override", "62": "x enables RGB override"},
+    "timing": "ConstrainDistanceToPath has fixed travel time 1.5 seconds. CP2 only changes stop time. Adapt the visual asset to current skill timing; never delay authoritative damage to match this cosmetic.",
+    "cleanup": "DestroyParticle(false) at actual hit to start endcaps then ReleaseParticleIndex; guard against stale target/tower and duplicate cleanup.",
+    "evidence": "RERL explicitly names Rubick Arcana cube model, not Slark; package path and model confirmed locally."
+  },
+  "native_dark_center": {
+    "source_particle": "particles/units/heroes/hero_enigma/enigma_blackhole_m.vpcf",
+    "texture": "materials/particle/particle_modulate_03.vtex",
+    "blend": "PARTICLE_OUTPUT_BLEND_MODE_MOD2X",
+    "evidence": "Native RERL and DATA confirm texture and MOD2X. Decoded texture has soft black center and zero-alpha border. Adapted to one WORLD_Z_ALIGNED particle at CP1.x * 0.65; no full Black Hole spell or gameplay effect is spawned.",
+    "soft_boundary_source": "particles/units/heroes/hero_enigma/enigma_blackhole_b.vpcf",
+    "soft_boundary_texture": "materials/particle/particle_ring_softouter.vtex",
+    "soft_boundary_adaptation": "Decoded RGB is all white and ring shape is in alpha; our gentle ground boundary uses alpha blend at 0.20 times profile alpha."
+  },
+  "weapon_visual_constraints": [
+    "Use authoritative WEAPON_EQUIPPED_CHANGED main_hand slot and HERO_SUMMONED unit identity; never infer main hand from engine slot index.",
+    "Keep ambient effects bounded to at most three layers per hero and apply cooldown to hit accents.",
+    "Native item armlet requires hands hitbox set; do not use it as a universal weapon attachment without checking hero model.",
+    "Native radiance_owner uses 550 emissions/sec and 512 max particles; unsuitable as a light first weapon glow.",
+    "No damage, attack speed, stats, or projectile flight timing changes belong in the visual service."
+  ]
+}

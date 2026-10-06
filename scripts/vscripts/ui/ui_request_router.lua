@@ -13,6 +13,7 @@ local gold_mine_batch_upgrade = require("systems/gold_mine_batch_upgrade_service
 local tree_config = require("config/tree_config")
 local research_lab_abilities = require("config/generated/research_lab_abilities")
 local production_ui = require("ui/production_ui_service")
+local tower_routes = require("config/tower_route_config")
 
 local M = {}
 local synthesis_requests = {}
@@ -103,7 +104,8 @@ local function unit_combat_snapshot(unit)
     attack_max = attack_max * outgoing_multiplier
     local internal_name = (unit.GetUnitName and unit:GetUnitName()) or ""
     local configured_name = (unit_display_names.by_id or {})[internal_name]
-    local display_name = unit.survival_display_name
+    local display_name = tower_routes.display_name_for_unit(unit)
+        or unit.survival_display_name
         or (configured_name and configured_name.enabled ~= false
             and configured_name.display_name)
         or internal_name
@@ -1261,23 +1263,11 @@ local function register_building_move_request()
             })
             return
         end
-        local ok, error_code = building_system.relocate_for_player(
-            player_id,
-            tonumber(payload.entindex),
-            Vector(x, y, z)
-        )
-        if not ok and error_code == "building_not_found" then
-            local result = event_bus.request(events.TOWER_FUSION_MOVE_REQUEST, {
-                player_id = player_id,
-                entindex = tonumber(payload.entindex),
-                position = Vector(x, y, z),
-            })
-            ok = result and result.ok == true
-            error_code = result and result.error or "ultimate_tower_not_found"
-        end
+        local result = require("systems/tower_relocation_service").move(
+            player_id, tonumber(payload.entindex), Vector(x, y, z))
         send_to_player("ui_building_move_result", player_id, {
-            success = ok and 1 or 0,
-            error = error_code or "",
+            success = result.ok and 1 or 0,
+            error = result.error or "",
             entindex = tonumber(payload.entindex) or -1,
         })
     end)

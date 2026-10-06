@@ -1,0 +1,157 @@
+{
+  "timestamp_utc": "2026-10-02T15:25:02.117871+00:00",
+  "status": "PASS_OFFLINE_AND_COMPILED; LIVE_VISUAL_ACCEPTANCE_PENDING",
+  "request": "名字直接居中于血条上方，字体更大，R浅蓝、SR紫、SSR金，参照用户第二张截图",
+  "root_cause": "Previous test assumed content-sized Label horizontal-align applied in Panorama; fixed-width text rectangle removes that dependency",
+  "geometry": {
+    "row_width": 108,
+    "row_height": 49.5,
+    "bar_top": 34,
+    "name": {
+      "left": 0,
+      "top": 14,
+      "width": 108,
+      "height": 20,
+      "text_align": "center",
+      "font_size": 18,
+      "previous_font_size": 14,
+      "font_weight": "bold"
+    },
+    "stars": {
+      "top": 2,
+      "height": 12,
+      "gap_to_name": 0
+    },
+    "rarity_icon": {
+      "left": 1,
+      "top": 29.5,
+      "width": 20,
+      "height": 20,
+      "health_bar_relative_position_unchanged": true
+    },
+    "health_bar": {
+      "width": 62,
+      "height": 11,
+      "screen_anchor_unchanged": true
+    }
+  },
+  "name_colors": {
+    "N": "#f4f3e9",
+    "R": "#9cdbff",
+    "SR": "#cd9bff",
+    "SSR": "#ffdc75",
+    "UR": "#ffdc75"
+  },
+  "rarity_source": "Existing server display rarity projection and Rank classes; SSR red-star progression remains gold",
+  "construction_hidden_until_completion": true,
+  "viewport_and_hud_occlusion_bounds_adjusted": true,
+  "new_timers": 0,
+  "server_or_damage_changes": false,
+  "resource_compile": {
+    "status": "PASS",
+    "compiled": 4,
+    "failed": 0,
+    "source_and_engine_content_equal": true,
+    "manifest_unchanged": true,
+    "resources": [
+      {
+        "source": "panorama/src/scripts/custom_game/world_health_bar_anchor.js",
+        "source_sha256": "65f52c9e6e8ad9aec1ed12b0d1517ff50a2b006478815f9a7ca0fa22df0821d1",
+        "engine_content_equal": true,
+        "compiled": "panorama/scripts/custom_game/world_health_bar_anchor.vjs_c",
+        "compiled_sha256": "b3124b34a52401ab0af511f010b4f505625d785d38ff8e6854d91693d91aeb40",
+        "log": "output/tower_rank_build/20261002_231931/world_health_bar_anchor.js.log"
+      },
+      {
+        "source": "panorama/src/scripts/custom_game/tower_rank_ui.js",
+        "source_sha256": "747df645b955ae4653eff2f7e209da8ef35a06a88b3b9a5190ac399386a7479b",
+        "engine_content_equal": true,
+        "compiled": "panorama/scripts/custom_game/tower_rank_ui.vjs_c",
+        "compiled_sha256": "f3bb2cc9c3c5283f860e3372941282e127e26ecaaecf2f96b87e8c9170e64665",
+        "log": "output/tower_rank_build/20261002_231931/tower_rank_ui.js.log"
+      },
+      {
+        "source": "panorama/src/styles/custom_game/tower_rank_ui.css",
+        "source_sha256": "aa3738a2b12ffab909a0d027af7ad4fd52565587b1204f42db8a1a055105e520",
+        "engine_content_equal": true,
+        "compiled": "panorama/styles/custom_game/tower_rank_ui.vcss_c",
+        "compiled_sha256": "157ca3c0fbd0f9aa05026986a152206affadee52a48bccb5aaa28dd19c67d299",
+        "log": "output/tower_rank_build/20261002_231931/tower_rank_ui.css.log"
+      },
+      {
+        "source": "panorama/src/layout/custom_game/tower_rank_ui.xml",
+        "source_sha256": "88412528778ede4e1b47b3a6fe0ba277a1a08b7ce5fe804debb081341cef3ec7",
+        "engine_content_equal": true,
+        "compiled": "panorama/layout/custom_game/tower_rank_ui.vxml_c",
+        "compiled_sha256": "3c7cfb813eca655a819d70ddcd68705dcdf38e9ccb8bd958ff42a63b00364120",
+        "log": "output/tower_rank_build/20261002_231931/tower_rank_ui.xml.log"
+      }
+    ]
+  },
+  "ui_validation_evidence": {
+    "path": "output/tower_name_style_20261002/ui_validation.json",
+    "sha256": "2caf4328b203e9a783532618bf5b4cbbf950808c4a97ac70432ea86b2e2128aa"
+  },
+  "ui_checks": [
+    {
+      "command": "& 'C:/Program Files/nodejs/node.exe' tools/test_tower_rank_ui.cjs",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "tower_rank_ui.log"
+    },
+    {
+      "command": "& 'C:/Program Files/nodejs/node.exe' tools/test_tower_rank_ui.cjs --measure",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "tower_rank_ui_measure.log"
+    },
+    {
+      "command": "& 'C:/Program Files/nodejs/node.exe' tools/test_world_health_bar.js",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "world_health_bar.log"
+    },
+    {
+      "command": "& 'C:/Program Files/nodejs/node.exe' tools/test_world_overlay_visibility.cjs",
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "world_overlay_visibility.log"
+    }
+  ],
+  "stable_frame_counts": {
+    "kind": "offline_production_js_call_counts",
+    "source": "panorama/src/scripts/custom_game/tower_rank_ui.js",
+    "towers": 40,
+    "frames_per_scenario": 300,
+    "stable": {
+      "native_calls": 60000,
+      "projection_calls": 24000,
+      "style_writes": 0,
+      "overlay_captures": 300,
+      "panel_searches": 0
+    },
+    "full_screen_blocked": {
+      "native_calls": 0,
+      "projection_calls": 0,
+      "style_writes": 0,
+      "overlay_captures": 300,
+      "panel_searches": 0
+    },
+    "block_transition_style_writes": 40,
+    "no_towers": {
+      "native_calls": 0,
+      "projection_calls": 0,
+      "style_writes": 0,
+      "overlay_captures": 0,
+      "panel_searches": 0
+    },
+    "caveat": "Call counts only; not FPS, CPU/GPU frame time or measured Dota speedup."
+  },
+  "git_diff_check": "PASS",
+  "live_visual_verified": false,
+  "map_started": false,
+  "limits": [
+    "没有运行中的Dota进程或可用调试端口；未启动或重载用户地图。",
+    "布局模拟和原生编译不测中文字符的实际像素、字体回退和视觉大小；需重新进图验收。"
+  ]
+}

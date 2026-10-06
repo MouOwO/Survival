@@ -3,12 +3,16 @@ LinkLuaModifier("modifier_tower_attack_effects", "modifiers/modifier_tower_attac
 LinkLuaModifier("modifier_tower_explosive_gatling_buff", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_frost_slow", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_blizzard_slow", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_tower_drag_net", "modifiers/modifier_tower_drag_net", LUA_MODIFIER_MOTION_NONE)
 modifier_tower_attack_effects = class({})
 _G.modifier_tower_attack_effects = modifier_tower_attack_effects
 local M = modifier_tower_attack_effects
 
 local tower_skills = require("systems/tower_skill_runtime")
-local laser_effects = require("config/generated/tower_laser_effects")
+local laser_effect_selector = require("systems/tower_laser_effect_selector")
+local zeus_visual = require("systems/zeus_lightning_visual")
+local storm_visual = require("systems/disruptor_storm_visual")
+local blizzard_visual = require("systems/wyvern_blizzard_visual")
 local damage_service = require("combat/damage_service")
 local scheduler = require("core/scheduler")
 local event_bus = require("core/event_bus")
@@ -16,11 +20,16 @@ local events = require("core/events")
 local buff_manager = require("systems/buff_manager")
 local asset_catalog = require("config/asset_catalog")
 local sound_service = require("core/sound_service")
+local machine_gun_feedback = require("systems/tower_machine_gun_feedback")
+local targeting = require("systems/tower_targeting")
 local global_rules = require("config/generated/global_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
 local anti_air_rules = require("systems/anti_air_rules")
 local tower_multi_damage = require("systems/tower_multi_damage")
 local tower_laser_damage = require("systems/tower_laser_damage")
+local laser_visual = require("systems/tower_laser_visual")
+local laser_health = require("systems/tower_laser_health_prediction")
+LinkLuaModifier("modifier_tower_laser_pose", "modifiers/modifier_tower_laser_pose", LUA_MODIFIER_MOTION_NONE)
 local tree_damage_rules = require("systems/tree_damage_rules")
 
 local detailed_diagnostics = global_rules.by_id.runtime_detailed_diagnostics
@@ -49,7 +58,6 @@ local DEFAULT_BLIZZARD_DURATION = 4
 local DEFAULT_BLIZZARD_INTERVAL = 1
 local DEFAULT_BLIZZARD_DAMAGE_MULTIPLIER = 0.5
 local BLIZZARD_SLOW_PCT = 25
-local BLIZZARD_ICE_FALL_HEIGHT = 700
 local BLIZZARD_ICE_FALL_DURATION = 0.35
 local BLIZZARD_ICE_FALL_STEP = 0.03
 local AIRSPACE_AURA_REFRESH_INTERVAL = 0.20
@@ -59,6 +67,9 @@ local exists
 local valid
 local area_radius
 local enemies_in_radius
+local reset_laser
+local retire_native_laser
+local cleanup_native_residue
 
 local LIGHTNING_ASSET_ID = "tower_zuus"
 local MACHINE_GUN_ASSET_IDS = {
@@ -73,9 +84,7 @@ local LIGHTNING_ATTACK_PLAYBACK_RATE = 2
 local DEFAULT_CHAIN_PARTICLE =
     "particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf"
 local DEFAULT_STORM_CLOUD_PARTICLE =
-    "particles/units/heroes/hero_disruptor/disruptor_static_storm.vpcf"
-local DEFAULT_STORM_STRIKE_PARTICLE =
-    "particles/units/heroes/hero_leshrac/leshrac_lightning_bolt.vpcf"
+    storm_visual.particle_name()
 
 local function skill_effect_particle(unit, skill, role, fallback, fallback_asset_id)
     local skill_id = type(skill) == "table" and skill.skill_id or nil
@@ -146,13 +155,33 @@ local function uses_machine_gun_attack(unit)
         or skill_matching(unit, "explosive_gatling_") ~= nil
 end
 
+local function play_attack_gesture(caster)
+    local activity = rawget(_G, "ACT_DOTA_ATTACK")
+    local asset = asset_catalog.get(caster.survival_model_asset_id)
+    if not activity or not asset or not asset.native_wearable_stage then return end
+    if skill_matching(caster, "lightning_strike_")
+        and type(caster.StartGestureWithPlaybackRate) == "function" then
+        pcall(caster.StartGestureWithPlaybackRate, caster, activity, LIGHTNING_ATTACK_PLAYBACK_RATE)
+    elseif type(caster.StartGesture) == "function" then
+        pcall(caster.StartGesture, caster, activity)
+    end
+end
+
+local function basic_attack_cue(caster)
+    if skill_matching(caster, "frost_attack_") then return "tower_frost_launch" end
+    if skill_matching(caster, "anti_air_missile_") then
+        if caster.survival_model_asset_id == "tower_anti_air_skywrath_empyrean" then
+            return "tower_anti_air_attack_arcana"
+        end
+        return "tower_anti_air_attack"
+    end
+    if skill_matching(caster, "critical_strike_") or skill_matching(caster, "bone_cannon_")
+        or skill_matching(caster, "death_grenade_") then return "tower_death_attack" end
+    return "tower_basic_attack"
+end
+
 local function laser_config(unit, skill)
-    if not skill then return nil end
-    local by_id = laser_effects.by_id or {}
-    local asset_id = unit and unit.survival_model_asset_id or nil
-    local row = asset_id and by_id[skill.skill_id .. ":" .. asset_id] or nil
-    row = row or by_id[skill.skill_id .. ":default"] or by_id[skill.skill_id]
-    return row and row.enabled ~= false and row or nil
+    return laser_effect_selector.get(unit, skill)
 end
 
 function modifier_tower_attack_effects:IsHidden() return true end
@@ -206,6 +235,7 @@ end
 
 function modifier_tower_attack_effects:OnCreated()
     if not IsServer() then return end
+    laser_visual.sync_pose(self, laser_config(self:GetParent(), skill_matching(self:GetParent(), "laser_")))
     self.gatling_target_entindex = nil
     self.gatling_target_hits = 0
     self.laser_target = nil
@@ -225,7 +255,7 @@ function modifier_tower_attack_effects:OnCreated()
     self.anti_air_secondary_attack = false
     self.machine_gun_sequence = 0
     self.machine_gun_task_ids = {}
-    if uses_machine_gun_attack(self:GetParent())
+    if (uses_machine_gun_attack(self:GetParent()) or skill_matching(self:GetParent(), "laser_"))
         and type(self:GetParent().SetRangedProjectileName) == "function" then
         self:GetParent():SetRangedProjectileName("")
         self:GetParent().survival_projectile_model = ""
@@ -293,8 +323,9 @@ local function start_anti_air_sequence(modifier, tower, target, skill)
         modifier.anti_air_task_ids[task_id] = true
         scheduler.after(interval * (missile_index - 1), function()
             modifier.anti_air_task_ids[task_id] = nil
-            if not valid(tower) or not valid(target)
-                or not anti_air_rules.is_flying(target) then
+            if not valid(tower) then return false end
+            if not targeting.valid(tower, target) then target = targeting.select(tower, target) end
+            if not valid(target) or not anti_air_rules.is_flying(target) then
                 return false
             end
             modifier.anti_air_secondary_attack = true
@@ -314,8 +345,9 @@ local function trigger_drag_net(caster, target, skill)
         0, math.min(100, tonumber(skill.trigger_chance_pct) or 0)
     )
     if not RollPercentage(chance) then return false end
-    target:AddNewModifier(caster, nil, "modifier_stunned", {
-        duration = math.max(0.1, tonumber(skill.duration) or 3),
+    local ability = caster:FindAbilityByName(skill.skill_id)
+    target:AddNewModifier(caster, ability, "modifier_tower_drag_net", {
+        duration = math.max(0.1, tonumber(skill.duration) or 2),
     })
     return true
 end
@@ -387,6 +419,18 @@ function modifier_tower_attack_effects:OnDeath(params)
     if not IsServer() then return end
     local tower = self:GetParent()
     local victim = params.unit
+    if victim ~= tower and victim == self.laser_target then
+        retire_native_laser(self)
+        -- A lethal first hit can create and destroy the live beam in one frame.
+        -- Copy its last rendered coordinates into an engine-owned finite tail.
+        for _, segment in ipairs(self.laser_particles or {}) do
+            if segment.afterglow then laser_visual.afterglow(segment) end
+        end
+    end
+    if victim == tower or victim == self.laser_target then
+        reset_laser(self)
+    end
+    if victim == tower then cleanup_native_residue(self, true) end
     if params.attacker ~= tower or not exists(victim) then return end
 
     -- MODIFIER_EVENT_ON_DEATH is global. Tower effects must only react when
@@ -528,12 +572,8 @@ local function apply_machine_gun_hit_effects(modifier, tower, target)
                 reason = "tower_bounty_machine_gun_attack",
             })
             if result and result.ok == true then
-                play_follow_particle(target, skill_effect_particle(
-                    tower, bounty, "skill_strike",
-                    "particles/units/heroes/hero_bounty_hunter/bounty_hunter_cutpurse.vpcf",
-                    MACHINE_GUN_ASSET_IDS.bounty
-                ))
-                play_tower_sound("tower_bounty_machine_gun", tower, target)
+                -- Gold is still granted on every hit; only its feedback is grouped.
+                pcall(machine_gun_feedback.gold, modifier, tower, gold)
             end
         end
     end
@@ -567,6 +607,8 @@ local function fire_machine_gun_hit(modifier, tower, target, hit_index)
         or target:GetTeamNumber() == tower:GetTeamNumber() then
         return false
     end
+    -- One cosmetic projectile per configured damage hit; no extra attack order.
+    pcall(machine_gun_feedback.shot, tower, target)
     local multiplier, source = roll_tower_critical(tower, target)
     modifier.machine_gun_instant_damage = true
     local ok, result = pcall(function()
@@ -603,6 +645,7 @@ local function machine_gun_sequence_is_current(modifier, tower, sequence)
 end
 
 local function stop_machine_gun_sequences(modifier)
+    pcall(machine_gun_feedback.flush_gold, modifier, modifier:GetParent())
     modifier.machine_gun_sequence =
         (tonumber(modifier.machine_gun_sequence) or 0) + 1
     for task_id in pairs(modifier.machine_gun_task_ids or {}) do
@@ -613,17 +656,24 @@ end
 
 local function start_machine_gun_sequence(modifier, tower, target, skill)
     if not valid(tower) or not valid(target) then return end
+    pcall(machine_gun_feedback.flush_gold, modifier, tower)
     local hit_count = math.max(1, math.floor(tonumber(skill.max_targets) or 1))
     modifier.machine_gun_sequence =
         (tonumber(modifier.machine_gun_sequence) or 0) + 1
     local sequence = modifier.machine_gun_sequence
     modifier.machine_gun_task_ids = modifier.machine_gun_task_ids or {}
+    -- One gesture per real attack cycle; the scheduled sub-hits never animate.
+    play_attack_gesture(tower)
     local function fire(hit_index)
         if not machine_gun_sequence_is_current(modifier, tower, sequence) then
             return
         end
+        -- Continue this same burst at its original scheduled cadence. A kill
+        -- changes the recipient, never starts a fresh 6-8-hit round.
+        if not targeting.valid(tower, target) then target = targeting.select(tower, target) end
         if not fire_machine_gun_hit(modifier, tower, target, hit_index)
             or hit_index >= hit_count then
+            pcall(machine_gun_feedback.flush_gold, modifier, tower)
             return
         end
         local next_index = hit_index + 1
@@ -733,45 +783,19 @@ local function trigger_frost_attack(caster, primary, skill, damage)
     )
 end
 
-local function blizzard_explosion_particle(caster, position, particle_name)
-    local particle = ParticleManager:CreateParticle(
-        particle_name or
-            "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
-        PATTACH_WORLDORIGIN, caster
-    )
-    ParticleManager:SetParticleControl(particle, 0, position)
-    ParticleManager:ReleaseParticleIndex(particle)
-end
-
-local function falling_ice_particle(caster, position, particle_name, on_impact)
-    local particle = ParticleManager:CreateParticle(
-        particle_name or
-            "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
-        PATTACH_WORLDORIGIN, caster
-    )
+local function wait_blizzard_impact(caster, on_impact, on_cancel)
+    -- Preserve the old fall clock exactly. The shared scheduler thinks at 0.05s,
+    -- so replacing twelve 0.03s callbacks with after(0.36) changes damage timing.
     local elapsed = 0
-    ParticleManager:SetParticleControl(
-        particle, 0, position + Vector(0, 0, BLIZZARD_ICE_FALL_HEIGHT)
-    )
     scheduler.every(BLIZZARD_ICE_FALL_STEP, function()
         if not valid(caster) then
-            ParticleManager:DestroyParticle(particle, false)
-            ParticleManager:ReleaseParticleIndex(particle)
+            on_cancel()
             return false
         end
         elapsed = math.min(
             BLIZZARD_ICE_FALL_DURATION, elapsed + BLIZZARD_ICE_FALL_STEP
         )
-        local progress = elapsed / BLIZZARD_ICE_FALL_DURATION
-        ParticleManager:SetParticleControl(
-            particle, 0,
-            position + Vector(
-                0, 0, BLIZZARD_ICE_FALL_HEIGHT * (1 - progress)
-            )
-        )
-        if progress < 1 then return BLIZZARD_ICE_FALL_STEP end
-        ParticleManager:DestroyParticle(particle, false)
-        ParticleManager:ReleaseParticleIndex(particle)
+        if elapsed < BLIZZARD_ICE_FALL_DURATION then return BLIZZARD_ICE_FALL_STEP end
         on_impact()
         return false
     end)
@@ -797,16 +821,17 @@ local function start_blizzard(caster, position, skill)
         "blizzard_%d_%d_%d", caster:entindex(),
         math.floor(GameRules:GetGameTime() * 1000), RandomInt(1, 999999)
     )
-    local explosion_particle_name = skill_effect_particle(
+    local ground_particle_name = skill_effect_particle(
         caster, skill, "skill_strike",
-        "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf",
+        blizzard_visual.GROUND,
         "tower_frost_crystal_maiden_winter_raven"
     )
-    local falling_particle_name = skill_effect_particle(
-        caster, skill, "skill_chain",
-        "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_snow_arcana1_shard.vpcf",
+    local snow_particle_name = skill_effect_particle(
+        caster, skill, "skill_persistent", blizzard_visual.SNOW,
         "tower_frost_crystal_maiden_winter_raven"
     )
+    local visual = blizzard_visual.play(position, radius, ground_particle_name, snow_particle_name, math.max(5, duration))
+    local function finish_visual() blizzard_visual.finish(visual, false) end
     play_tower_sound("tower_ice_blizzard", caster, caster, position)
     local tick = 0
     detailed_log(
@@ -816,22 +841,16 @@ local function start_blizzard(caster, position, skill)
     scheduler.every(interval, function()
         tick = tick + 1
         if not valid(caster) then
+            finish_visual()
             return false
         end
-        local angle = RandomFloat(0, math.pi * 2)
-        local distance = radius * math.sqrt(RandomFloat(0, 1))
-        local impact_position = position + Vector(
-            math.cos(angle) * distance,
-            math.sin(angle) * distance,
-            0
-        )
+        -- Keep the old RNG consumption so cosmetic changes do not shift procs.
+        RandomFloat(0, math.pi * 2)
+        RandomFloat(0, 1)
         local wave = tick
-        falling_ice_particle(caster, impact_position, falling_particle_name,
+        wait_blizzard_impact(caster,
             function()
-                if not valid(caster) then return end
-                blizzard_explosion_particle(
-                    caster, impact_position, explosion_particle_name
-                )
+                if not valid(caster) then finish_visual(); return end
                 local hit_count = 0
                 for _, target in ipairs(
                         enemies_in_radius(caster, position, radius)) do
@@ -851,7 +870,8 @@ local function start_blizzard(caster, position, skill)
                     "[TowerBlizzard] TICK tower=%d instance=%s tick=%d targets=%d",
                     caster:entindex(), instance_id, wave, hit_count
                 )
-            end
+                -- Visual expiry is owned by the full storm duration, not a short impact child.
+            end, finish_visual
         )
         if tick >= tick_limit then
             return false
@@ -868,42 +888,6 @@ local function storm_radius(skill)
     local configured = skill.area
     if type(configured) == "table" then configured = configured[1] end
     return math.max(1, tonumber(configured) or DEFAULT_STORM_RADIUS)
-end
-
-local function storm_cloud_particle(caster, position, radius, duration,
-        particle_name)
-    local particle = ParticleManager:CreateParticle(
-        particle_name or DEFAULT_STORM_CLOUD_PARTICLE,
-        PATTACH_WORLDORIGIN, caster)
-    ParticleManager:SetParticleControl(particle, 0, position)
-    ParticleManager:SetParticleControl(particle, 1, Vector(radius, radius, radius))
-    -- Disruptor Static Storm reads its visual lifetime from CP2.x. It is only
-    -- an area marker here; storm damage is settled once before visual timing.
-    ParticleManager:SetParticleControl(
-        particle, 2, Vector(duration, 0, 0)
-    )
-    return particle
-end
-
-local function storm_strike_particle(caster, position, particle_name)
-    local particle = ParticleManager:CreateParticle(
-        particle_name or DEFAULT_STORM_STRIKE_PARTICLE,
-        PATTACH_WORLDORIGIN, caster)
-    ParticleManager:SetParticleControl(
-        particle, 0, position + Vector(0, 0, 900)
-    )
-    ParticleManager:SetParticleControl(particle, 1, position)
-    ParticleManager:ReleaseParticleIndex(particle)
-end
-
-local function random_point_in_circle(position, radius)
-    local angle = RandomFloat(0, math.pi * 2)
-    local distance = radius * math.sqrt(RandomFloat(0, 1))
-    return position + Vector(
-        math.cos(angle) * distance,
-        math.sin(angle) * distance,
-        0
-    )
 end
 
 local function apply_lightning_storm_damage(caster, position, radius, damage,
@@ -941,10 +925,6 @@ start_lightning_storm = function(caster, position, skill)
     local duration = math.max(
         0.1, tonumber(skill.duration) or DEFAULT_STORM_DURATION
     )
-    local strike_count = math.max(
-        1, math.floor(tonumber(skill.strike_count) or 1)
-    )
-    local interval = duration / strike_count
     local damage_multiplier = math.max(
         0, tonumber(skill.damage_multiplier)
             or DEFAULT_STORM_DAMAGE_MULTIPLIER
@@ -959,48 +939,16 @@ start_lightning_storm = function(caster, position, skill)
         caster, skill, "skill_persistent", DEFAULT_STORM_CLOUD_PARTICLE,
         LIGHTNING_ASSET_ID
     )
-    local strike_particle_name = skill_effect_particle(
-        caster, skill, "skill_strike", DEFAULT_STORM_STRIKE_PARTICLE,
-        LIGHTNING_ASSET_ID
-    )
-    local cloud = storm_cloud_particle(
-        caster, position, radius, duration, cloud_particle_name
-    )
+    local visual = storm_visual.play(caster, position, radius, duration, nil, cloud_particle_name)
     play_tower_sound("tower_lightning_storm", caster, caster, position)
     apply_lightning_storm_damage(
         caster, position, radius, damage, instance_id
     )
     detailed_log(
-        "[TowerLightningStorm] START tower=%d instance=%s radius=%.0f duration=%.2f visual_strikes=%d interval=%.3f multiplier=%.2f attack_snapshot=%.1f damage=%.1f",
-        caster:entindex(), instance_id, radius, duration, strike_count,
-        interval, damage_multiplier, attack_damage_snapshot, damage
+        "[TowerLightningStorm] START tower=%d instance=%s radius=%.0f duration=%.2f multiplier=%.2f damage=%.1f",
+        caster:entindex(), instance_id, radius, duration, damage_multiplier, damage
     )
-    local tick = 0
-    local task_id
-    task_id = scheduler.every(interval, function()
-        tick = tick + 1
-        if not valid(caster) then
-            ParticleManager:DestroyParticle(cloud, false)
-            ParticleManager:ReleaseParticleIndex(cloud)
-            return false
-        end
-        storm_strike_particle(
-            caster, random_point_in_circle(position, radius),
-            strike_particle_name
-        )
-        if tick >= strike_count then
-            ParticleManager:DestroyParticle(cloud, false)
-            ParticleManager:ReleaseParticleIndex(cloud)
-            detailed_log(
-                "[TowerLightningStorm] END tower=%s instance=%s ticks=%d",
-                valid(caster) and tostring(caster:entindex()) or "invalid",
-                instance_id, tick
-            )
-            return false
-        end
-        return interval
-    end, instance_id)
-    return task_id
+    return visual and visual.task
 end
 
 M._start_lightning_storm_for_test = start_lightning_storm
@@ -1103,52 +1051,214 @@ local function continue_lightning_chain(caster, source_unit, source_position,
     end)
 end
 
-local function destroy_particle(self)
-    for _, segment in ipairs(self.laser_particles or {}) do
-        ParticleManager:DestroyParticle(segment.index, false)
-        ParticleManager:ReleaseParticleIndex(segment.index)
-    end
-    self.laser_particles = {}
+local function laser_visual_error(self, message)
+    if self.laser_visual_error_logged then return end
+    self.laser_visual_error_logged = true
+    print("[TowerLaser] optional visual failed: " .. tostring(message))
 end
 
-local function reset_laser(self)
+local LASER_VISUAL_RETRY_SECONDS = 0.5
+
+local function dispose_laser_particle(self, index)
+    local destroyed, destroy_error = pcall(ParticleManager.DestroyParticle,
+        ParticleManager, index, true)
+    local released, release_error = pcall(ParticleManager.ReleaseParticleIndex,
+        ParticleManager, index)
+    if not destroyed or not released then
+        laser_visual_error(self, (not destroyed and destroy_error) or release_error)
+    end
+end
+
+cleanup_native_residue = function(self, force)
+    local kept, now = {}, GameRules:GetGameTime()
+    for _, segment in ipairs(self.laser_native_residue or {}) do
+        if force or now >= segment.retire_at then dispose_laser_particle(self, segment.index)
+        else kept[#kept+1] = segment end
+    end
+    self.laser_native_residue = kept
+end
+
+retire_native_laser = function(self)
+    local segments = self.laser_particles or {}
+    local segment = segments[#segments]
+    if not segment or not segment.native then return end
+    table.remove(segments)
+    -- Native CPs already hold world-space snapshots; do not attach to a corpse.
+    -- Reuse the existing think loop and cap overlapping deaths at two tails.
+    local tails = self.laser_native_residue or {}
+    self.laser_native_residue = tails
+    if #tails >= 2 then dispose_laser_particle(self, table.remove(tails, 1).index) end
+    segment.retire_at = GameRules:GetGameTime() + 0.3
+    tails[#tails+1] = segment
+end
+
+local function destroy_particle(self)
+    local segments = self.laser_particles or {}
+    self.laser_particles = {}
+    for _, segment in ipairs(segments) do
+        dispose_laser_particle(self, segment.index)
+    end
+end
+
+reset_laser = function(self)
+    laser_health.clear(self)
     destroy_particle(self)
     self.laser_target = nil
     self.laser_started_at = nil
     self.laser_elapsed = 0
     self.laser_visual_elapsed = 0
+    self.laser_next_visual_retry = nil
+end
+
+local function bind_laser_control(index, control, unit, attachments, position)
+    if type(unit.ScriptLookupAttachment) == "function"
+        and type(ParticleManager.SetParticleControlEnt) == "function" then
+        for _, attachment in ipairs(attachments) do
+            local ok, found = pcall(unit.ScriptLookupAttachment, unit, attachment)
+            if ok and (tonumber(found) or 0) > 0 then
+                local bound = pcall(ParticleManager.SetParticleControlEnt,
+                    ParticleManager, index, control, unit, PATTACH_POINT_FOLLOW,
+                    attachment, position, true
+                )
+                if bound then return true end
+            end
+        end
+    end
+    -- Models without these attachments retain the configured height fallback.
+    ParticleManager:SetParticleControl(index, control, position)
+    return false
 end
 
 local function update_laser_position(self, effect)
     if not valid(self.laser_target) then return end
     local caster = self:GetParent()
-    local source = caster:GetAbsOrigin()
-        + Vector(0, 0, tonumber(effect.source_offset_z) or 160)
-    local target = self.laser_target:GetAbsOrigin()
-        + Vector(0, 0, tonumber(effect.target_offset_z) or 70)
-    -- Tinker laser reads control 9 as its source. Keep control 0 synchronized
-    -- for alternate particle resources configured by CSV.
-    for _, segment in ipairs(self.laser_particles or {}) do
-        ParticleManager:SetParticleControl(segment.index, 9, source)
-        ParticleManager:SetParticleControl(segment.index, 0, source)
-        ParticleManager:SetParticleControl(segment.index, 1, target)
+    local source, target
+    -- Production uses the fixed overhead orb and the near head surface.
+    -- Legacy socket-based beams retain their entity bindings.
+    -- The native MaintainSequentialPath operator connects CP9 -> CP1.
+    local segments = self.laser_particles or {}
+    for i = #segments, 1, -1 do
+        local segment, updated = segments[i], true
+        if not segment.native and effect.target_surface == true and segment.color_key ~= effect.effect_key then
+            updated = pcall(ParticleManager.SetParticleControl, ParticleManager,
+                segment.index, 2, laser_visual.color(effect)) and updated
+            if updated then segment.color_key = effect.effect_key end
+        end
+        if not segment.source_follows then
+            source = source or caster:GetAbsOrigin()
+                + Vector(0, 0, tonumber(effect.source_offset_z) or 160)
+            if not segment.source9_follows then
+                updated = pcall(ParticleManager.SetParticleControl,
+                    ParticleManager, segment.index, 9, source) and updated
+            end
+            if not segment.source0_follows then
+                updated = pcall(ParticleManager.SetParticleControl,
+                    ParticleManager, segment.index, 0, source) and updated
+            end
+        end
+        if not segment.target_follows then
+            target = target or (effect.target_surface == true
+                and laser_visual.head_position(caster, self.laser_target, effect)
+                or self.laser_target:GetAbsOrigin()
+                    + Vector(0, 0, tonumber(effect.target_offset_z) or 70))
+            updated = pcall(ParticleManager.SetParticleControl,
+                ParticleManager, segment.index, 1, target) and updated
+        end
+        if updated and segment.afterglow then
+            segment.source_position, segment.target_position = source, target
+            segment.color = laser_visual.color(effect)
+        end
+        if not updated then
+            table.remove(segments, i)
+            dispose_laser_particle(self, segment.index)
+            laser_visual_error(self, "control update failed")
+        end
     end
 end
 
 local function create_laser_segment(self, effect, now)
-    local index = ParticleManager:CreateParticle(
+    -- A missing continuous collection can recover from optional engine errors
+    -- without retrying each think or resetting the independent damage clock.
+    self.laser_next_visual_retry = now + LASER_VISUAL_RETRY_SECONDS
+    local caster, target = self:GetParent(), self.laser_target
+    local created, index = pcall(ParticleManager.CreateParticle, ParticleManager,
         effect.particle_name or
             "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
         PATTACH_CUSTOMORIGIN, self:GetParent()
     )
-    table.insert(self.laser_particles, {
+    if not created or type(index) ~= "number" or index < 0 then
+        laser_visual_error(self, created and "particle creation returned no valid ID" or index)
+        return false
+    end
+    local segment = {
         index = index,
-        expires_at = effect.beam_mode == "continuous" and math.huge
+        native = effect.beam_mode == "native",
+        particle_name = effect.particle_name,
+        expires_at = (effect.beam_mode == "continuous"
+            or (effect.beam_mode == "native" and effect.visual_refresh_interval == 0)) and math.huge
             or now + math.max(
                 0.03, tonumber(effect.visual_segment_duration) or 0.18
             ),
-    })
-    update_laser_position(self, effect)
+    }
+    -- Own the handle before any optional engine binding can throw.
+    table.insert(self.laser_particles, segment)
+    local configured, error_message = pcall(function()
+        if segment.native and effect.width_control then
+            -- Initialize once per native segment; no new frame loop or damage state.
+            segment.width_scale = laser_effect_selector.width(caster, effect.skill_id, effect)
+            ParticleManager:SetParticleControl(index, effect.width_control,
+                Vector(segment.width_scale, 0, 0))
+        end
+        local source_position = caster:GetAbsOrigin()
+            + Vector(0, 0, tonumber(effect.source_offset_z) or 160)
+        local target_position = target:GetAbsOrigin()
+            + Vector(0, 0, tonumber(effect.target_offset_z) or 70)
+        local source_attachments = { "attach_attack1", "attach_hitloc" }
+        if effect.source_orb == true then
+            -- Same origin + configured height as the persistent charge orb.
+            -- No attack socket: the beam must never follow a moving hand.
+            ParticleManager:SetParticleControl(index, 9, source_position)
+            ParticleManager:SetParticleControl(index, 0, source_position)
+            segment.source9_follows, segment.source0_follows = false, false
+        else
+            segment.source9_follows = bind_laser_control(
+                index, 9, caster, source_attachments, source_position
+            )
+            segment.source0_follows = bind_laser_control(
+                index, 0, caster, source_attachments, source_position
+            )
+        end
+        segment.source_follows = segment.source9_follows and segment.source0_follows
+        if effect.target_surface == true then
+            target_position = laser_visual.head_position(caster, target, effect)
+            ParticleManager:SetParticleControl(index, 1, target_position)
+            if not segment.native then
+                ParticleManager:SetParticleControl(index, 2, laser_visual.color(effect))
+                -- Custom Io child arcs used CP7; native Tinker uses its own children.
+                ParticleManager:SetParticleControlEnt(index, 7, target,
+                    PATTACH_ABSORIGIN_FOLLOW, "", target:GetAbsOrigin(), true)
+            end
+            segment.color_key = effect.effect_key
+            segment.target_follows = false
+            if effect.source_orb == true and effect.beam_mode == "continuous" then
+                segment.afterglow = true
+                segment.source_position, segment.target_position = source_position, target_position
+                segment.color = laser_visual.color(effect)
+            end
+        else
+            segment.target_follows = bind_laser_control(
+                index, 1, target, { "attach_hitloc" }, target_position)
+        end
+    end)
+    if not configured then
+        for i, owned in ipairs(self.laser_particles) do
+            if owned == segment then table.remove(self.laser_particles, i); break end
+        end
+        dispose_laser_particle(self, index)
+        laser_visual_error(self, error_message)
+        return false
+    end
+    return true
 end
 
 local function laser_target_in_range(caster, target)
@@ -1170,6 +1280,7 @@ local function start_laser(self, target, effect)
     self.laser_ticks = 0
     self.laser_started_at = GameRules:GetGameTime()
     self.last_interval_time = self.laser_started_at
+    laser_visual.sync_pose(self, effect)
     create_laser_segment(self, effect, GameRules:GetGameTime())
     play_tower_sound(
         "tower_laser", self:GetParent(), target, target:GetAbsOrigin()
@@ -1197,7 +1308,14 @@ local function deal_laser_tick(self, caster, target, laser, effect, tick_time)
         caster:entindex(), target:entindex(), (self.laser_ticks or 0) + 1,
         multiplier, amount, 0
     )
-    deal(caster, target, amount)
+    local hit_position = effect.target_surface == true
+        and laser_visual.head_position(caster, target, effect) or nil
+    local health_before = target.GetHealth and target:GetHealth()
+    local result = deal(caster, target, amount)
+    laser_health.record(self, target, health_before, multiplier,
+        tower_laser_damage.multiplier(base_multiplier, increment, maximum,
+            (self.laser_ticks or 0) + 1, interval), interval)
+    if hit_position then laser_visual.hit(caster, hit_position, result) end
     event_bus.emit(events.TOWER_LASER_HIT, {
         tower = caster,
         target = target,
@@ -1209,6 +1327,7 @@ end
 
 function modifier_tower_attack_effects:OnIntervalThink()
     if not IsServer() then return end
+    cleanup_native_residue(self, false)
     local caster = self:GetParent()
     sync_polar_obelisk_aura(caster, self)
     local now = GameRules:GetGameTime()
@@ -1218,6 +1337,7 @@ function modifier_tower_attack_effects:OnIntervalThink()
     local laser = skill_matching(caster, "laser_")
     local effect = laser_config(caster, laser)
     local target = self.laser_target
+    laser_visual.sync_pose(self, effect)
     local active_attack_target = type(caster.GetAttackTarget) == "function"
         and caster:GetAttackTarget() or self.current_attack_target
     if not laser or not effect or not laser_target_in_range(caster, target)
@@ -1232,23 +1352,43 @@ function modifier_tower_attack_effects:OnIntervalThink()
         self.current_update_interval = update_interval
         self:StartIntervalThink(update_interval)
     end
-    if effect.beam_mode ~= "continuous" then
+    local current = self.laser_particles[1]
+    local replaced_native = current and current.native and current.particle_name ~= effect.particle_name
+    if replaced_native then
+        -- Upgrade both sustained and unmodified one-shot art immediately.
+        -- Retire old colors together without resetting the damage clock.
+        destroy_particle(self)
+        self.laser_visual_elapsed = 0
+        self.laser_next_visual_retry = 0
+        create_laser_segment(self, effect, now)
+    end
+    if effect.beam_mode == "continuous"
+        or (effect.beam_mode == "native" and effect.visual_refresh_interval == 0) then
+        if #self.laser_particles == 0 and now >= (self.laser_next_visual_retry or 0) then
+            create_laser_segment(self, effect, now)
+        end
+    else
         local visible = {}
         for _, segment in ipairs(self.laser_particles or {}) do
             if segment.expires_at > now then
                 table.insert(visible, segment)
             else
-                ParticleManager:DestroyParticle(segment.index, false)
-                ParticleManager:ReleaseParticleIndex(segment.index)
+                -- Retiring a segment must not leave unowned 0.7 s Tinker
+                -- tails which can outlive a target switch or relocation.
+                dispose_laser_particle(self, segment.index)
             end
         end
         self.laser_particles = visible
-        self.laser_visual_elapsed = self.laser_visual_elapsed + elapsed
+        self.laser_visual_elapsed = self.laser_visual_elapsed + (replaced_native and 0 or elapsed)
         local visual_interval = math.max(
             update_interval, tonumber(effect.visual_refresh_interval) or 0.12
         )
         if self.laser_visual_elapsed + 0.001 >= visual_interval then
-            self.laser_visual_elapsed = self.laser_visual_elapsed % visual_interval
+            -- The comparison admits a small floating-point undershoot. Clamp
+            -- it before modulo, or a near-full remainder emits again next think.
+            self.laser_visual_elapsed = math.max(
+                0, self.laser_visual_elapsed - visual_interval
+            ) % visual_interval
             create_laser_segment(self, effect, now)
         end
     end
@@ -1274,22 +1414,7 @@ function modifier_tower_attack_effects:OnAttackStart(params)
         reset_laser(self)
         return
     end
-    local attack_activity = rawget(_G, "ACT_DOTA_ATTACK")
-    local visual_asset = asset_catalog.get(caster.survival_model_asset_id)
-    if visual_asset and visual_asset.native_wearable_stage
-        and attack_activity ~= nil then
-        if skill_matching(caster, "lightning_strike_")
-            and type(caster.StartGestureWithPlaybackRate) == "function" then
-            pcall(
-                caster.StartGestureWithPlaybackRate,
-                caster,
-                attack_activity,
-                LIGHTNING_ATTACK_PLAYBACK_RATE
-            )
-        elseif type(caster.StartGesture) == "function" then
-            pcall(caster.StartGesture, caster, attack_activity)
-        end
-    end
+    if not uses_machine_gun_attack(caster) then play_attack_gesture(caster) end
     event_bus.emit(events.TOWER_ATTACK_START, {
         tower = caster,
         target = target,
@@ -1308,14 +1433,21 @@ end
 function modifier_tower_attack_effects:OnAttack(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
     local caster, primary = self:GetParent(), params.target
+    -- Also notify existing modifiers after a Tools hot reload, where the
+    -- engine may still cache their previous DeclareFunctions event list.
+    local auto = caster.FindModifierByName and caster:FindModifierByName("modifier_tower_auto_attack")
+    if auto and auto.OnAttack and not self.anti_air_secondary_attack then auto:OnAttack(params) end
     if not valid(primary) or primary:GetTeamNumber() == caster:GetTeamNumber() then
         return
     end
     local replacement_multi = uses_multi_replacement_arrows(caster)
     if not replacement_multi
         and not skill_matching(caster, "burning_great_arrow_")
-        and not uses_machine_gun_attack(caster) then
-        play_tower_sound("tower_basic_attack", caster, caster)
+        and not uses_machine_gun_attack(caster)
+        and not skill_matching(caster, "multi_attack_")
+        and not skill_matching(caster, "laser_")
+        and not skill_matching(caster, "lightning_strike_") then
+        play_tower_sound(basic_attack_cue(caster), caster, caster)
     end
     local machine_gun = skill_matching(caster, "machine_gun_")
     if machine_gun then
@@ -1503,6 +1635,7 @@ function modifier_tower_attack_effects:OnAttackLanded(params)
             caster, lightning, "skill_chain", DEFAULT_CHAIN_PARTICLE,
             LIGHTNING_ASSET_ID
         )
+        particle_name = zeus_visual.chain_particle(caster, particle_name)
         lightning_particle(
             caster, caster, primary,
             caster:GetAbsOrigin(), primary_position, particle_name
@@ -1529,12 +1662,15 @@ function modifier_tower_attack_effects:OnDestroy()
     stop_anti_air_sequence(self)
     stop_machine_gun_sequences(self)
     reset_laser(self)
+    cleanup_native_residue(self, true)
+    laser_visual.clear_pose(self)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     self.polar_obelisk_sound_active = false
 end
 
 function modifier_tower_attack_effects:OnRefresh()
     if not IsServer() then return end
+    laser_visual.sync_pose(self, laser_config(self:GetParent(), skill_matching(self:GetParent(), "laser_")))
     stop_anti_air_sequence(self)
     stop_machine_gun_sequences(self)
     self.gatling_target_entindex = nil
@@ -1560,6 +1696,7 @@ function modifier_tower_attack_effects:ResetAfterRelocation()
     stop_anti_air_sequence(self)
     stop_machine_gun_sequences(self)
     reset_laser(self)
+    cleanup_native_residue(self, true)
     buff_manager.remove_aura(tower, "debuff_polar_attack_slow")
     self.polar_obelisk_sound_active = false
     self.gatling_target_entindex = nil

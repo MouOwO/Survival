@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-01",
+  "status": "NATIVE_WAIT_PATH_OBSERVED_ROOT_CAUSE_UNCONFIRMED",
+  "scope": "Workshop Tools process 25900 became unresponsive during testing. This is a separate incident from the user's intermittent combat stutter.",
+  "dump": {
+    "path": "output/tower_responsiveness_20261001/dota25900_hang_minimal.dmp",
+    "bytes": 439872,
+    "type": "AMD64 MiniDumpNormal",
+    "exception_stream": false,
+    "threads": 96,
+    "modules": 215,
+    "raw_dump_committed": false
+  },
+  "method": "Used installed Windows dbghelp StackWalk64 with captured memory and x64 PE unwind metadata from matching local modules. All recovered frames matched PE timestamp and SizeOfImage; all 96 threads had zero missing-memory reads. No symbols downloaded, dependency installed or arbitrary memory strings exposed.",
+  "main_thread": {
+    "id": 29132,
+    "identity_evidence": "Minidump ThreadNames metadata and stack ending through dota2.exe startup.",
+    "recovered_frames": 25,
+    "essential_wait_path": [
+      "ntdll.dll+0xa07d4",
+      "ntdll.dll+0x63a3",
+      "KERNELBASE.dll+0x7d20f",
+      "tier0.dll+0x172821",
+      "tier0.dll+0x1291d1",
+      "tier0.dll+0x12b2d8",
+      "vconcomm.dll+0x829d",
+      "engine2.dll+0x1c2e95"
+    ]
+  },
+  "network_thread": {
+    "id": 27736,
+    "essential_wait_path": [
+      "ntdll.dll+0xa07d4",
+      "KERNELBASE.dll+0x7d20f",
+      "tier0.dll+0x172821",
+      "vconcomm.dll+0x8a04",
+      "vconcomm.dll+0x4bb7",
+      "tier0.dll+0x12937e",
+      "tier0.dll+0x12b0c7",
+      "networksystem.dll+0xed208",
+      "steamnetworkingsockets.dll+0xac3b1"
+    ]
+  },
+  "interpretation": {
+    "observed": "Main and network threads wait on mutex acquisition in console/logging call chains. Local PE exports and function ranges identify tier0+0x172821 as CAtomicMutex::AcquireLock, KERNELBASE+0x7d20f as WaitOnAddress, and the listed tier0 logging callers as LoggingSystem_Log.",
+    "priority_lead": "Console/logging synchronization contention; a deadlock is possible but not confirmed.",
+    "particle_or_gpu_conclusion": "No particles.dll frame was recovered. The main wait chain contains no Direct3D or display-driver module. This does not establish a particle or GPU fault, and does not rule out all indirect causes.",
+    "limits": "The minimal dump does not identify lock ownership or establish a cyclic wait. A single captured wait cannot prove the initiating cause or explain ordinary combat stutter."
+  },
+  "timeline_reported_by_root": {
+    "fixture_cleanup": "2026-10-01 07:43:01 +08:00, remaining=0",
+    "subsequent_log_activity_until": "2026-10-01 07:47:11 +08:00",
+    "gap_seconds": 250,
+    "conclusion": "The process continued logging for 4 minutes 10 seconds after cleanup; these facts do not support assigning the hang to cleanup."
+  },
+  "detailed_artifacts_ignored": [
+    "output/tower_responsiveness_20261001/dota25900_hang_analysis.json",
+    "output/tower_responsiveness_20261001/dota25900_main_unwind.json",
+    "output/tower_responsiveness_20261001/dota25900_all_unwind.json",
+    "output/tower_responsiveness_20261001/unwind_hang.ps1"
+  ]
+}

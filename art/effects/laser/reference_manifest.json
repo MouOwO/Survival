@@ -1,0 +1,33 @@
+{
+  "workshop_id": "3164617180",
+  "pack": "D:/SteamLibrary/steamapps/workshop/content/570/3164617180/3164617180.vpk",
+  "adaptation": "Rebuilt continuous variants from reference layer composition, spark trails, path motes and torso-to-orb attraction. No encrypted gameplay code executed. Native texture dependencies verified by builder.",
+  "records": [
+    {
+      "resource": "particles/rebuild/spell/tinker_1/big_laser/effect/tinker_laser.vpcf_c",
+      "sha256": "b270574ec2b3494ab8ce6680a5b8689fdf13bba7349410a59808d03538ddfb33",
+      "data": "art/effects/laser/reference/tinker_laser.txt"
+    },
+    {
+      "resource": "particles/rebuild/spell/tinker_1/big_laser/effect/laser_cutter_sparks.vpcf_c",
+      "sha256": "17c9b9c8d643aa3af9846b1f932e6c6386dcfb0a484de60866a48458a9680a91",
+      "data": "art/effects/laser/reference/laser_cutter_sparks.txt"
+    },
+    {
+      "resource": "particles/rebuild/spell/tinker_1/big_laser/effect/tinker_laser_g.vpcf_c",
+      "sha256": "bab4b5bc10df30cc132a098fbe935525f6bb4b647c634f2b6b36fca491962cec",
+      "data": "art/effects/laser/reference/tinker_laser_g.txt"
+    },
+    {
+      "resource": "particles/units/heroes/hero_keeper_of_the_light/keeper_of_the_light_illuminate_charge_b.vpcf_c",
+      "sha256": "5b4739509109b8ece92e7df4667336bbe28f6439cceccdbe987ed34c9768193e",
+      "data": "art/effects/laser/reference/illuminate_charge_b.txt"
+    },
+    {
+      "resource": "particles/rebuild/spell/tinker_1/big_laser/effect/tinker_laser_f.vpcf_c",
+      "sha256": "2f2c7e3c899d35c8382d1adef46aa3eca3e024a3826305341b111ec7f1e16438",
+      "data": "art/effects/laser/reference/tinker_laser_f.txt",
+      "adaptation": "CP9-to-CP1 ConstrainDistanceToPath travel; scaled down bright heads, sustained emission and finite lifetime, no broad sheet or depth bypass"
+    }
+  ]
+}

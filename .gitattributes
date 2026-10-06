@@ -16,6 +16,11 @@ output/** -whitespace
 *.vpcf -whitespace
 *.vmdl -whitespace
 
+# Custom effect manifests hash authored bytes; retain generator line endings.
+art/effects/**/*.vpcf text eol=lf
+art/effects/**/*.vmat text eol=lf
+art/effects/**/manifest.json text eol=lf
+
 # Linux deployment entrypoints must remain executable after a Windows checkout.
 server/aliyun/**/*.sh text eol=lf
 server/aliyun/deploy/pg-bin/* text eol=lf

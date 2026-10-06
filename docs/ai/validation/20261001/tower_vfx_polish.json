@@ -1,0 +1,346 @@
+{
+  "date": "2026-10-01",
+  "scope": "Solid continuous laser and contained profession tower bases",
+  "result": "COMPILE_CONTRACT_AND_SIMULATION_PASS_WORKSHOP_PENDING",
+  "gameplay_changes": false,
+  "compile": {
+    "targets": 33,
+    "failures": 0,
+    "source_content_equal": true,
+    "actual_data_and_dependencies_verified": true
+  },
+  "laser": {
+    "profile_rows": 5,
+    "mode": "continuous",
+    "core": "white-blue hotwhite",
+    "envelope": "compact blue hotblue2",
+    "impact": "two small depth-tested CP1 sprites",
+    "handles": 1,
+    "collections": 4,
+    "max_nodes": 26,
+    "source_cp": 9,
+    "target_cp": 1,
+    "visual_failure_retry_seconds": 0.5,
+    "configured_precache": true,
+    "seconds90_mock": {
+      "creates": 1,
+      "destroys_during_target": 0,
+      "entity_cp_binds": 3,
+      "world_cp_writes": 0,
+      "damage_ticks_including_first": 91
+    }
+  },
+  "bases": {
+    "classes": 7,
+    "radii": [
+      96,
+      100,
+      112,
+      128
+    ],
+    "ranks": [
+      "R",
+      "SR",
+      "SSR",
+      "UR"
+    ],
+    "max_handles": 3,
+    "max_sprites_including_children": 6,
+    "n_has_base": false,
+    "anti_air": "native circular crosshair",
+    "profession_specific_sr_ssr": true,
+    "old_15_resource_paths_unchanged": true
+  },
+  "tests": [
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua",
+      "level": "SIMULATION",
+      "result": "PASS",
+      "scope": "Continuous and legacy segmented beam, 90-second target, damage clock, native CP ownership, target switch, reset, destruction and injected API failures"
+    },
+    {
+      "command": "node tools/test_tower_base_sources.cjs",
+      "level": "CONTRACT",
+      "result": "PASS",
+      "scope": "29 source resources, 11 native textures, 7 professions, all tier budgets"
+    },
+    {
+      "command": "node tools/test_tower_visual_lifecycle.cjs",
+      "level": "SIMULATION",
+      "result": "PASS",
+      "scope": "CSV, N projectile, 7 routes, ranks, D same-entity follow, class replacement, death/disposal, index reuse, world change and failures"
+    },
+    {
+      "command": "node tools/map_c6/verify-laser-visual.cjs --compiled --log-dir output/tower_vfx_polish_20261001",
+      "level": "COMPILE_CONTRACT",
+      "result": "PASS"
+    },
+    {
+      "command": "node tools/map_c6/verify-visual-particles.cjs --family towers",
+      "level": "COMPILE_CONTRACT",
+      "result": "PASS"
+    },
+    {
+      "command": "luac5.1 -p on seven changed Lua files",
+      "level": "STATIC",
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "level": "STATIC",
+      "result": "PASS"
+    }
+  ],
+  "independent_review": {
+    "result": "PASS",
+    "scope": "Read-only Lua, CSV/generated, precache, final source/content/compiled hashes and four actual laser DATA blocks"
+  },
+  "workshop": {
+    "result": "NOT_VERIFIED",
+    "reason": "Existing user Tools match is paused. It was preserved; restart preference was requested with no reply. No new fixture, gameplay state mutation or restart performed.",
+    "next": "Fully restart Tools and open a new match, then check laser strength/body attachment, R visibility, SSR density and moving combat.",
+    "inherited_old_screenshots": false,
+    "inherited_old_fps": false
+  },
+  "limitations": [
+    "No live-rendered visual acceptance of this revision",
+    "No new frame-time or full-wave performance result",
+    "Mock allocation counts are not FPS improvements"
+  ],
+  "inputs": [
+    {
+      "file": "scripts/vscripts/addon_game_mode.lua",
+      "sha256": "8b551d526678b81ae750846d15066e98229172b45517e7001ff99923b8f18c63"
+    },
+    {
+      "file": "scripts/vscripts/modifiers/modifier_tower_attack_effects.lua",
+      "sha256": "a55c3b37c6ba32a0739a7583db54cf4cf161fde0fcfb75e83d08951ea9957750"
+    },
+    {
+      "file": "scripts/vscripts/systems/tower_visual_service.lua",
+      "sha256": "99085fae71f7e61aa1be358f37bfa20eff9476441ce98161ba2194799d85d88b"
+    },
+    {
+      "file": "data/csv/建筑与工人系统/防御塔/tower_laser_effects.csv",
+      "sha256": "b1feff08c693bc3abbd8a9e6f5a1f41791fee0e07a0c5e505c9b423ced2049f1"
+    },
+    {
+      "file": "data/csv/资源系统/tower_visual_profiles.csv",
+      "sha256": "a991aa2d045f6f4831993dbeecd97ccc881af504991dd6968226725c4671abb9"
+    },
+    {
+      "file": "scripts/vscripts/config/generated/tower_laser_effects.lua",
+      "sha256": "5406b9ff0a43834a4b52fe1e068ed8f7a3152ada1dded467b72190750c4ef1dc"
+    },
+    {
+      "file": "scripts/vscripts/config/generated/tower_visual_profiles.lua",
+      "sha256": "6b5e947e1c9b56c482b37a73bfbfade33705fb83f6dbdb7eb1e6328e55c65a6d"
+    }
+  ],
+  "resources": [
+    {
+      "resource": "particles/survival/towers/laser_beam.vpcf_c",
+      "sha256": "5b51e7be08f4d4227fbe2ce6bb03af345997a4a8331fdc2f1f0e235f195cb33d",
+      "source_sha256": "cfe795b6e17afd9e6d0f21fad900eeb882208ae7a90c1300d51214901e9e5f2e",
+      "source": "art/effects/laser/source/particles/survival/towers/laser_beam.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_envelope.vpcf_c",
+      "sha256": "659f59ddf1ba0abca84c6d34e1d9f8de619b23f3c9245c1794c080b036609743",
+      "source_sha256": "7a3d52448e9e539784648117bc2c4d007f660204597510728b4356e898571a2e",
+      "source": "art/effects/laser/source/particles/survival/towers/laser_beam_envelope.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_hit.vpcf_c",
+      "sha256": "1106c971c561d308c53bb76a87350d253cb5f816b30a0e8bc61031b2549a5b9a",
+      "source_sha256": "da626ecf3e6de5aaace73194fc9e225e60535ed6361856887914a347493ecdba",
+      "source": "art/effects/laser/source/particles/survival/towers/laser_beam_hit.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_hit_flare.vpcf_c",
+      "sha256": "dc46fb62c2c60e0d16b9c3e5ac5c30d17a8f3addc1b720c77732869ddd871bcf",
+      "source_sha256": "b94807d9f6bbd4865f26b20fe48460464adac7ab9563fde70e66cf9e2ae43afc",
+      "source": "art/effects/laser/source/particles/survival/towers/laser_beam_hit_flare.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/death.vpcf_c",
+      "sha256": "4b3b9010ac022f98432b42eb4d6b3a680a76de2c21e4eb3908736cb7c559bfe0",
+      "source_sha256": "9b25c6973ee27dcf0649e212c6b77399d9003a293dfc7a18995e3a7bc88b2247",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/death.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/mystery.vpcf_c",
+      "sha256": "04785beb65b4bceda2024d0ccb7f95ce0f836ded708193df8d076bbe2c8016f0",
+      "source_sha256": "d36311c2581c3c68b926c48b1a23787358394d9cfb6f7267b87f706793adf5e4",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/mystery.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/lightning.vpcf_c",
+      "sha256": "af7e5b6002b4bcb4c35f32f28418d22d34ba43aa5a506efd0a7aea61e6af8bbe",
+      "source_sha256": "5bfbce1380d501d4ecc6dc32ef231a1158e34decf3bc064922739e97a6fc9a0c",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/lightning.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/machine.vpcf_c",
+      "sha256": "475fb6d0c5a8fe88fba69adfcdfa32e95d6f237c26c3fe746e6ba8832c018927",
+      "source_sha256": "1c00e5b53cf77418b536a0b8cc6c045c5a83179f23cd2428f2e65e85097ac5e6",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/machine.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/multi.vpcf_c",
+      "sha256": "cbdf2620c1b1ac2c90dd890b57c5f114b6716ebb028874e188377098dea4f51a",
+      "source_sha256": "d49e0c14c899b61d224d84bb0da43d76eb5829cb9d3b71f9175648226a8d36f6",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/multi.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/frost.vpcf_c",
+      "sha256": "301649eb76c9ed9801cb2d9083d9949c5a7c1f7e220ddbbed401b169bd84e45b",
+      "source_sha256": "25fb9632e49c44f4b4fa8fdf91e074038f71f5f480016066c72f1cee7c47f422",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/frost.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/anti_air.vpcf_c",
+      "sha256": "18f414bce2710919cef890991d0ae1887eec609f7544d1a4e570a4550144afe5",
+      "source_sha256": "be83bf384ea53f1cfa099d7f99776f3badf46e1d18f48deaf997a4f65b16a27b",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/anti_air.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/ultimate.vpcf_c",
+      "sha256": "a2266980a800568a5641aab8bfd4cf42d34158685c24ce27a8bec9da0b885da1",
+      "source_sha256": "68ba012d3646bfc2b94d2cad624b54b0ccb7082347d7ff56273abf7374263d10",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/ultimate.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_ultimate.vpcf_c",
+      "sha256": "ccf38ad78508c9397841d21d4c2ee7e72acd654ed3037affbbffb4323a38f154",
+      "source_sha256": "e7bdb538ce14bfd6300cb17e7104c9543ea8215b7ff6d994d20760ec0661cee6",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_ultimate.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_motes.vpcf_c",
+      "sha256": "cfc5fc6a1b833cab6a7a4839e994ddd102ee7057d87f056182a3f3b1c865b647",
+      "source_sha256": "61a491907ab1fdf2b28c25c155aee0c8d040ca4d0bc6c52bdf12c46f3a440a86",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_motes.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_death_void.vpcf_c",
+      "sha256": "8e18633c88536cb48467015f85f246b1374106393b9b23aeb891a021a4087def",
+      "source_sha256": "9423dfda0f69dcd6f01e69e1cd940919d39aff31edd66789f556377497641684",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/base_death_void.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_multi_leaf_a.vpcf_c",
+      "sha256": "deb1b55465599469c6b51a4fdd25c478065683e9e73f30f8779228b561609d7e",
+      "source_sha256": "0eabc20b8091117dc87e9b492fe890924a6f78b9ee74cdc7d8d34e2d7f38c78f",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/base_multi_leaf_a.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_multi_leaf_b.vpcf_c",
+      "sha256": "0f65bdea9eb51d61ff4031509dae8d82527f0de62a66ed9e15922567fa3d9a1a",
+      "source_sha256": "ca15fae8f5318f3f49ecd13b556446c019de5f731b6687b30af935508f6bc8a6",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/base_multi_leaf_b.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_multi_leaf_c.vpcf_c",
+      "sha256": "89372a08e9ff6ab44010ad03bc94cc3eed7c0d91a135939277aa95a7fbbf2e24",
+      "source_sha256": "cf98078809dd73becf60d5c5f9fb5eeeccae337f03fcf87333684c23c1c21122",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/base_multi_leaf_c.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/base_thin_ring.vpcf_c",
+      "sha256": "9cd1f49c461b13ece19291bc504c6acb516918f0504727791835c55e5301e13e",
+      "source_sha256": "a5876773c1e4b530ad715e4185bc4baa1711f8738b03f4091080d0984a3885a7",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/base_thin_ring.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_death_sr.vpcf_c",
+      "sha256": "40e27bdb25c713941929e5bfe52b7ca7aafd00d2533f683d9801e82cd338bce0",
+      "source_sha256": "28d6f0d33f4bb5446a7f7379c559868d6965617ecc0f7c12767dbcf3e4c91db9",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_death_sr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_death_ssr.vpcf_c",
+      "sha256": "f77717c6d79f833fcf2db5fd6364c2f1b7543faaddccd20c0086f5e88b0b123e",
+      "source_sha256": "8da5959b4b41ac33a51077944f7921453d298d744642113a8aca9f069694aa37",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_death_ssr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_mystery_sr.vpcf_c",
+      "sha256": "cc75a6907896b8791ab1f63ddac447f9a44659738afd79ff5ab98a5e850c312b",
+      "source_sha256": "1d85d05db5ff80824575c9e0cc2ac0f4564510eac108ea6e1989e22eef06ea7b",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_mystery_sr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_mystery_ssr.vpcf_c",
+      "sha256": "4583265bc8f41f6d485509f6f3308a9c3b9662f2f736cc085c68fb2df3d58479",
+      "source_sha256": "281c65de943941ff31eda9861f880f782dc7bd34278d2af930934aa77ef39836",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_mystery_ssr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_lightning_sr.vpcf_c",
+      "sha256": "5d0b7cd6f54a59ca749a997b6d83e0ee94f4e9cc8a9fa079a59d3d2c7509c9e1",
+      "source_sha256": "506475ef85e8af3300c5923ca77fa251cac0031fa189b0c7ca174e73f1ac403e",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_lightning_sr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_lightning_ssr.vpcf_c",
+      "sha256": "ad87a27cfb461903da6cf999959760ef113093eb796490b85c3e34a496813fcd",
+      "source_sha256": "8099977aaae6ecee4e5254a5b9ed85e1c37a2a5c1fdc2b1847994998b24172c4",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_lightning_ssr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_machine_sr.vpcf_c",
+      "sha256": "bf42a0df680bf6775b09cd79bbfc6dfd8ffb0deb6c4bca6e3e2b221e1d67166f",
+      "source_sha256": "cd99c6b3f26c3f92b1783a66a00dcfd05cbc4c52463865c6422762c5dc476dea",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_machine_sr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_machine_ssr.vpcf_c",
+      "sha256": "cbec9627c37e759c0fa8b779a979a7b0496e2d1629d0b9fa803072a2f0451633",
+      "source_sha256": "cf874a8958daceb761ba116ddf4e9293d0d6145db4b35ab5d5ad908e0d0c175b",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_machine_ssr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_multi_sr.vpcf_c",
+      "sha256": "2b0c1ffbbfaa221e5087063b722079d160bffcb665b13f48d4cb13e33d0468e5",
+      "source_sha256": "788105a836525a476499488b43fb617c6abab3396f7abe0d9a03e06306f72371",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_multi_sr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_multi_ssr.vpcf_c",
+      "sha256": "46a6552ca0b5aeefb25d5317de4f949bf8331d4c5789959db0d3d1ef8644cbf9",
+      "source_sha256": "9488775acb47655d6e692017eab8001b82f99d6180d58424741bfd343443f8a0",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_multi_ssr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_frost_sr.vpcf_c",
+      "sha256": "8b837f25e8f035a880f123f332f0c121b784716278366ef02bd3f80774075f09",
+      "source_sha256": "35c61d52a26ee29bacbe58778bd8cd6f3c1e92c3e30e23ce7271ab0364566c7a",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_frost_sr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_frost_ssr.vpcf_c",
+      "sha256": "e3f6d96132619df7a9c912efe8e70f25cb575a468c95b8fbe033bf4931a1f167",
+      "source_sha256": "fbe51c2431383c3a3fb5964684fd55b356def98829844ff62e78ca3b5b25d28e",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_frost_ssr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_anti_air_sr.vpcf_c",
+      "sha256": "1a67df20d9f7d591d66a371e6bd67721382f43bfdd487644d622fb12f9dd0ea9",
+      "source_sha256": "d01b780cedb78383d0b3135b2bfd6f2620c1ce6d00c3256271b121813d190e77",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_anti_air_sr.vpcf"
+    },
+    {
+      "resource": "particles/survival/towers/bases/detail_anti_air_ssr.vpcf_c",
+      "sha256": "a57e402a9a52ba4c3e8685807089411e4cc212b37e079a34f3a2bf632b2c063e",
+      "source_sha256": "abbd658f687216d1110746653775539fc2703cae4267474c657e2bef92ccbfed",
+      "source": "art/effects/tower_bases/source/particles/survival/towers/bases/detail_anti_air_ssr.vpcf"
+    }
+  ],
+  "references": [
+    "art/effects/laser/validation.json",
+    "art/effects/laser/manifest.json",
+    "art/effects/tower_bases/validation.json",
+    "art/effects/tower_bases/source_manifest.json"
+  ]
+}

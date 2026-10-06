@@ -135,19 +135,24 @@ function send(options) {
       done = true;
       clearTimeout(connectTimer); clearTimeout(sendTimer); clearTimeout(responseTimer);
       input = Buffer.alloc(0);
+      let settled = false;
       function settle() {
+        if (settled) return;
+        settled = true;
         clearTimeout(closeTimer);
         if (error) reject(error);
         else resolve({sent, expected_output_received: options.expect ? matched : null,
           initial_print_frames_suppressed: initialPrintFrames});
       }
-      if (error || socket.destroyed) {
+      if (socket.destroyed || socket.connecting || !socket.writable) {
         socket.destroy();
         settle();
         return;
       }
-      // Finish successful sessions with FIN, then consume any remaining engine
-      // output until it closes. Never leave a hung peer holding this tool open.
+      // A command timeout/parser failure does not mean the TCP socket failed.
+      // Close every established writable session with FIN, including failures,
+      // then drain late output. Preserve the original error and a bounded wait.
+      // Repeated abrupt closes can trip Source 2's socket shutdown fatal error.
       socket.once('close', settle);
       closeTimer = setTimeout(() => { socket.destroy(); settle(); }, CLOSE_DRAIN_MS);
       socket.end();

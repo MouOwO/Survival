@@ -1,0 +1,186 @@
+{
+  "status": "PASS_OFFLINE_PENDING_LIVE_VISUAL",
+  "recorded_at_utc": "2026-10-02T14:21:34.696532+00:00",
+  "request": "英雄获得传说：深渊审判后显示神杖获取后的脚底效果。",
+  "particle": "particles/items4_fx/scepter_aura.vpcf",
+  "ownership": "Any positive authoritative match-inventory count from enabled legend_abyss stages 00..10, independent of main_hand.",
+  "stage_count": 11,
+  "native_closure": {
+    "particle_systems": 6,
+    "resources": 10,
+    "texture_or_material_resources": 4
+  },
+  "native_compiled_resources_present": true,
+  "new_assets_or_compilation_required": false,
+  "foot_binding": "One owned root; CP0 PATTACH_ABSORIGIN_FOLLOW, empty attachment, hero AbsOrigin fallback. Five native child systems; native color and size intact.",
+  "state_machine": [
+    "no owned copy",
+    "waiting for hero/model",
+    "alive with one aura root",
+    "dead with root retired",
+    "same-entity respawn restores on existing poll",
+    "last copy removed retires root",
+    "final defeat/disconnect retires root and blocks late events"
+  ],
+  "lifecycle": {
+    "real_legend_stages": 11,
+    "real_atomic_upgrade_transactions": 10,
+    "precache": "Native scepter_aura root exactly once through real weapon_visual_service.precache.",
+    "owned_semantics": [
+      "acquire before summon and summon before acquire",
+      "all 00..10 stages",
+      "real atomic 00->10 transactions preserve identical aura ID",
+      "real auto-equip switching to another main-hand keeps aura",
+      "multiple copies/stages retain one root",
+      "last owned copy removal destroys/releases once",
+      "two-player isolation and wrong-owner summon ignored"
+    ],
+    "lifecycle": [
+      "alive/dead/same-entity respawn",
+      "hero replacement clears old root, builds only one new root",
+      "empty model waits then creates on existing poll",
+      "nonempty model/body/bone changes and movement retain same foot root",
+      "defeat and final disconnect immediately clear and block late events",
+      "same-world init clears once and next existing poll restores without summon",
+      "new Tools world does not destroy reused foreign integer IDs",
+      "repeated init leaves one effective scheduler and generation-guarded subscriptions"
+    ],
+    "reentrancy": [
+      "same-world reset Destroy callback invokes previous lifecycle: no recreation while reset",
+      "hero replacement Destroy callback invokes existing lifecycle: old hero never recreated",
+      "CP0 setup failure Destroy callback invokes existing lifecycle: no allocation until next normal poll",
+      "last-copy removal Destroy callback invokes existing lifecycle: no recreation or double release"
+    ],
+    "fault_isolation": [
+      "CreateParticle throw/nil/negative",
+      "allocated root CP0 failure destroys/releases actual ID exactly once",
+      "Destroy and Release independent attempts on exceptions",
+      "existing poll retries failed optional aura",
+      "original main-hand particle count remains 3 after aura setup failure"
+    ],
+    "no_gameplay_changes": [
+      "no Scepter/Aghanim item added",
+      "no extra timer or damage/modifier/unit creation",
+      "hero health/attack/strength sentinels unchanged",
+      "baseline hand visual tests unchanged and PASS"
+    ]
+  },
+  "preserved": {
+    "prior_visual_profile_values": true,
+    "other_four_profile_notes": true,
+    "damage_and_item_stats": "No gameplay writes introduced; real acquisition/upgrade tests retain hero health/attack/strength sentinels; existing hand/equipment/inventory behavior passed.",
+    "no_native_scepter_item_granted": true,
+    "scheduler": "Existing weapon_visual_lifecycle 0.25s only; no new task."
+  },
+  "checks": {
+    "resource_closure": "PASS",
+    "runtime_tests": [
+      {
+        "test_script": "scripts/vscripts/tests/test_weapon_owned_visual.lua",
+        "command": [
+          "C:/Program Files/lua/bin/lua5.1.exe",
+          "scripts/vscripts/tests/test_weapon_owned_visual.lua"
+        ],
+        "exit_code": 0,
+        "status": "PASS",
+        "log": "output/abyss_scepter_20261002/test_weapon_owned_visual_final.log",
+        "pass_markers": [
+          "WEAPON_OWNED_VISUAL_PASS real inventory/equipment/service events, 11 legend stages, atomic0-10 stable handle, main-hand switch, last removal, player isolation",
+          "WEAPON_OWNED_LIFECYCLE_PASS death/revive, replacement+cleanup reentry, pending model, final disconnect, late events, same/new-world init+poll restoration, shared single0.25s loop",
+          "WEAPON_OWNED_FAILURE_PASS native CP0 feet binding, allocation/CP faults+cleanup reentry, independent cleanup/reentry, original main visuals retained, no Scepter/gameplay mutation"
+        ]
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_weapon_visual_service.lua",
+        "command": [
+          "C:/Program Files/lua/bin/lua5.1.exe",
+          "scripts/vscripts/tests/test_weapon_visual_service.lua"
+        ],
+        "exit_code": 0,
+        "status": "PASS",
+        "log": "output/abyss_scepter_20261002/test_weapon_visual_service_final.log",
+        "pass_markers": [
+          "WEAPON_VISUAL_SERVICE_PASS ownership/main_hand/stage99/stage0/impact_cooldown/lifecycle/reinit/isolated_preview",
+          "WEAPON_VISUAL_FAILURE_PASS partial rollback, invalid allocation, independent cleanup, impact CP failure, expiry release, preview recovery",
+          "WEAPON_VISUAL_MODEL_BINDING_PASS async model, late attachment, bone index change, cosmetic swap, stable reuse, delayed preview"
+        ]
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_match_inventory.lua",
+        "command": [
+          "C:/Program Files/lua/bin/lua5.1.exe",
+          "scripts/vscripts/tests/test_match_inventory.lua"
+        ],
+        "exit_code": 0,
+        "status": "PASS",
+        "log": "output/abyss_scepter_20261002/test_match_inventory_final.log",
+        "pass_markers": [
+          "MATCH_INVENTORY_PASS: shop grants/upgrades, evolution, refresh, player isolation, new match reset, permanent write protection and atomic failure"
+        ]
+      },
+      {
+        "test_script": "scripts/vscripts/tests/test_manual_weapon_visual_fixture.lua",
+        "command": [
+          "C:/Program Files/lua/bin/lua5.1.exe",
+          "scripts/vscripts/tests/test_manual_weapon_visual_fixture.lua"
+        ],
+        "exit_code": 0,
+        "status": "PASS",
+        "log": "output/abyss_scepter_20261002/test_manual_weapon_visual_fixture_final.log",
+        "pass_markers": [
+          "MANUAL_WEAPON_FIXTURE_PASS tools/nav/async_cancel/stages/isolation/move/cleanup/world/timeout"
+        ]
+      }
+    ],
+    "syntax_and_diff": {
+      "lua51_syntax": {
+        "exit_code": 0,
+        "status": "PASS"
+      },
+      "git_diff_check": {
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exit_code": 0,
+        "status": "PASS"
+      },
+      "log": "output/abyss_scepter_20261002/syntax_and_diff_check.log"
+    },
+    "csv_shape_and_before_field_comparison": "PASS",
+    "all_evidence_source_hashes_match_current_files": true,
+    "addon_precache_entry": {
+      "command": "lua5.1.exe tools/test_addon_precache.lua",
+      "exit_code": 0,
+      "marker": "ADDON_PRECACHE_ENTRY_PASS",
+      "scope": "Wrapper regression uses service mocks; actual native aura preload verified separately by owned runtime test."
+    }
+  },
+  "evidence": {
+    "resources": "output/abyss_scepter_20261002/resources_validation.json",
+    "runtime": "output/abyss_scepter_20261002/runtime_validation.json",
+    "independent_review": "output/abyss_scepter_20261002/production_lifecycle_audit.json"
+  },
+  "source_sha256": {
+    "scripts/vscripts/systems/weapon_owned_visual.lua": "c56d44b3b7309635a6204ff31e2d40af0aa237b210148ed9ed4da49ef65a83af",
+    "scripts/vscripts/systems/weapon_visual_service.lua": "fe8eadb612a0d28b9a2bb7b62c0ac1537b481f6876ab9c8e6c2ee64ac7d2bbd5",
+    "scripts/vscripts/systems/content_inventory_service.lua": "658ec67deb2c470657f744a811189a0f5db93bb56df88eb44b2a473b5bda74c8",
+    "scripts/vscripts/systems/weapon_equipment_service.lua": "653bbf21206fb137b8e43fdc6356ff8cd8afe42b0fc7d57b8f17c99eacceb652",
+    "scripts/vscripts/core/event_bus.lua": "c96e398f002ff7594fe86c5b1ebdf96a832e33984e56f7157fd297c4cab20a1f",
+    "scripts/vscripts/core/events.lua": "9c2e681159a09a1362be2d85487dd8bfe5d4cd34e0ab166f6e219b1b0f47f382",
+    "scripts/vscripts/core/scheduler.lua": "0f2d6ecd2818ff93504bf944d1bdfef76811d3d0c9983f77ab347d51795e9657",
+    "scripts/vscripts/config/generated/weapon_definitions.lua": "8a96621c06fffb0ef44aeb1d0f775707badd99af19cbb964bcbdfafe1e28a522",
+    "scripts/vscripts/config/generated/weapon_visual_profiles.lua": "264a92ce3abc01a64cf60fe945f8c38023df8e4cce5fd4b5b34800e0da999187",
+    "scripts/vscripts/tests/test_weapon_owned_visual.lua": "a473961e1aa04dd487d8c98b52b0faf12b95a9e1b0384f4159ddeb4d6d9d0f3b",
+    ".gitignore": "b61a5348f4a027fb9964823901aaf0feeaeb09eb08a7b76877114771e4f5cdaa",
+    "data/csv/物品系统/weapon_visual_profiles.csv": "37c52d917bc0ada4d16faedf807a8b18c5706ae05c0578c007f005b5067c3c73"
+  },
+  "in_game_visual_verified": false,
+  "limits": [
+    "Native Destroy(false) permits finite endcap/tail rendering after handle retirement.",
+    "Existing Tools weapon-only fixture has no authoritative acquired inventory and does not display the owned aura.",
+    "No map launched or live rendering/child-following observation in this task."
+  ],
+  "manual_check": "重新进图，获取深渊审判观察蓝色脚底光圈；移动、强化、换主手、死亡重生验证，移除最后一把时确认退场。"
+}

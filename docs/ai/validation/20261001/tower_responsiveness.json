@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-01",
+  "status": "SCOPED_WORKSHOP_VALIDATION_COMPLETE",
+  "changes": [
+    "D first click commits its actual cell without waiting for a visual preview, with fresh server authorization and occupancy checks.",
+    "Laser endpoints use entity attachments; expired and cancelled segments are immediately retired without changing the damage clock.",
+    "Tower rank UI skips empty/full-screen-hidden work and repeated styles while retaining per-frame following.",
+    "Per-transaction CombatDamage logging defaults to false and remains explicitly opt-in."
+  ],
+  "environment_reported_by_root": {
+    "map": "template_map",
+    "same_fresh_cold_started_session": true,
+    "normal_player_admission": true,
+    "existing_background": "One normally constructed ordinary tower and workers remain in the session.",
+    "isolation": "Wave progression paused only for Tools testing; sampled arena contains only the named isolated fixture.",
+    "camera_distance": 1900,
+    "camera_look_at": [12416, -3072],
+    "warmup_seconds_each": 8,
+    "sampling_seconds_each": 22,
+    "capture_method": "One console connection maintained; no extra commands during each sample; engine-timed cl_resetfps/cl_printfps."
+  },
+  "engine_frame_samples": {
+    "comparison": "Current build at two loads; not before/after code optimization.",
+    "empty_test_arena": {
+      "log": "output/tower_responsiveness_20261001/quiet_baseline.log",
+      "sha256": "94e8cb9cd33ec87153795034125e540bb2f75635b8a1e6e4f0ce6fa8fbb63754",
+      "reported_average_window_frames": 1000,
+      "fps": 60.0,
+      "average_frame_ms": 16.67,
+      "total_frames_since_reset": 1320,
+      "trailing_240_max_ms": 25.45,
+      "trailing_60_max_ms": 21.91
+    },
+    "four_active_laser_towers": {
+      "log": "output/tower_responsiveness_20261001/quiet_four_native.log",
+      "sha256": "f5b5c4476639b590136877e9fc2300820aa5db10d81869866651288caecfa2ea",
+      "reported_average_window_frames": 1000,
+      "fps": 60.0,
+      "average_frame_ms": 16.67,
+      "total_frames_since_reset": 1320,
+      "trailing_240_max_ms": 37.17,
+      "trailing_60_max_ms": 33.81
+    }
+  },
+  "active_combat_validation": {
+    "fixture": "Tools-only native ranged initialization, actual Storm model and production mystery row/laser/auto modules; modifier_creep_piercing removed.",
+    "tower_entities": [658, 667, 676, 685],
+    "moving_target_entities": [661, 670, 679, 688],
+    "final_status_seconds": 31,
+    "each_tower": {
+      "laser_ticks": 31,
+      "target_hp_drop": 71021,
+      "target_turns": 44,
+      "target_travelled": 7970,
+      "owned_segments": 2,
+      "source_and_target_entity_follow": true
+    },
+    "hp_drop_scope": "Total target HP drop includes native attacks and scripted laser damage; not a standalone laser balance claim.",
+    "runtime_debug_enabled": false,
+    "fresh_log_combat_damage_lines": 0,
+    "fresh_log_combat_damage_text_occurrences": 0,
+    "log_completion_marker": "PERF_FOUR_DONE"
+  },
+  "final_normal_D_check_reported_by_root": {
+    "status": "PASS",
+    "session": "Second cold-started Workshop session; normally constructed owned tower.",
+    "tower_entity_before_and_after": 626,
+    "move_ability_entity": 633,
+    "source_position": [256, 4736, 385.5],
+    "destination_position": [704, 4736, 385.5],
+    "D_keydown_to_left_button_down_ms": 32.94,
+    "left_click_count": 1,
+    "server_preview_ghost_count_after": 0,
+    "laser_fixture_active_after": false,
+    "earlier_occupied_rejection_and_retry_without_another_D": "PASS on tower 647, recorded in tower_relocation_input.json",
+    "limit": "Input interval is not server movement latency. This normal-tower check does not claim an attacking mystery tower was moved during its beam."
+  },
+  "archived_laser_screenshots": {
+    "paths": [
+      "art/effects/review/20261001/laser_four_follow_a.png",
+      "art/effects/review/20261001/laser_four_follow_b.png"
+    ],
+    "reviewed_by": "root agent",
+    "observation": "Both images show four beams following targets at different lateral positions.",
+    "limit": "Two static captured moments, not continuous video or all-frame rendering proof."
+  },
+  "related_evidence": {
+    "real_D_fast_click": "tower_relocation_input.json",
+    "laser_lifecycle_and_native_follow": "laser_follow_validation.json",
+    "rank_UI_simulated_call_counts_and_live_follow": "tower_rank_performance.json",
+    "logging_equivalence_and_live_quiet_damage": "combat_debug_logging.json",
+    "separate_Tools_hang": "tower_workshop_hang.json"
+  },
+  "delivery_checks": {
+    "source_content_panorama_sha256_equal": true,
+    "compiled_panorama_scripts": 2,
+    "panorama_compile_failures": 0,
+    "lua_5_1_and_javascript_syntax": "PASS",
+    "validation_json_and_git_diff_check": "PASS",
+    "test_cleanup": "Engine acknowledged RESPONSE_TEST_STATE_RESTORED and RESPONSE_TEST_CLEANUP_DONE: fixture and capture hooks removed, wave dev mode disabled, cl_showfps restored to 0. The agent-started test process was then closed after normal quit attempts.",
+    "raw_console_logs_and_minidump": "Remain in ignored output; not included in the commit."
+  },
+  "limits": [
+    "Both latest samples sustain a reported 60 FPS average, but the four-tower window still contains frame-time peaks; no all-stutter-fixed claim.",
+    "No pre-change engine frame-time sample was used, so no percentage speedup is established.",
+    "Earlier non-attacking proxy fixtures and FPS during the separate Tools hang are excluded.",
+    "No full wave, large enemy population, multiplayer or whole-effect-budget validation is claimed.",
+    "The displayed maxima cover only their trailing 60/240-frame windows, not the entire 22-second capture."
+  ]
+}

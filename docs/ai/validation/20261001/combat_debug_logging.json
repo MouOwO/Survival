@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-01",
+  "status": "STATIC_SIMULATION_AND_WORKSHOP_PASS",
+  "change": "Default combat/damage_rule_config.debug_enabled from true to false; original manual true opt-in remains available.",
+  "production_files_changed": [
+    "scripts/vscripts/combat/damage_rule_config.lua"
+  ],
+  "evidence": {
+    "before": "combat_debug_service.log formatted 14 fields and printed every submitted or blocked damage_service.Deal result when the default true flag was used.",
+    "tools_gate_or_rate_limit": "none in combat_debug_service.log",
+    "separate_existing_diagnostics": "runtime_detailed_diagnostics is already 0 in CSV/generated config, but does not control CombatDamage logs.",
+    "scope": "All scripted Deal transactions; direct native basic attacks reaching only damage_filter_service do not use this logger.",
+    "laser": "Current laser damage interval is 1 second per target, plus the initial hit; its 0.03 second visual tick is not a per-tick damage log.",
+    "aoe": "Frost splash, blizzard, lightning storm and other scripted effects submit one transaction per affected target.",
+    "offline_before_probe": {
+      "production_logger_calls": 1000,
+      "mock_tools_mode": false,
+      "format_calls": 1000,
+      "print_calls": 1000
+    }
+  },
+  "tests": {
+    "command": "lua5.1 scripts/vscripts/tests/test_custom_monster_armor.lua",
+    "status": "PASS",
+    "uses": "Existing armor test fixture, real damage service/context/repository/adapter/filter/debug modules, simulated native ApplyDamage.",
+    "default_log_count": 0,
+    "explicit_true_log_count": 2,
+    "existing_damage_test_command_gate": "Existing code still permits damage_test in Tools mode. Outside Tools it already depends on debug_enabled, so the quiet default also leaves that diagnostic command inactive there.",
+    "explicit_true_cases": ["success", "duplicate transaction blocked"],
+    "unchanged": [
+      "damage return values and trace",
+      "critical/pre-bonus/post-multiplier/armor calculation",
+      "duplicate transaction prevents engine application",
+      "DAMAGE_REQUESTED, DAMAGE_CALCULATED, DAMAGE_FILTERED, DAMAGE_RESOLVED, DAMAGE_SUBMITTED and DAMAGE_BLOCKED order and complete payloads"
+    ],
+    "shared_config_toggle_without_reinit": "PASS"
+  },
+  "workshop": {
+    "status": "REAL_DAMAGE_QUIET_LOGGING_PASS",
+    "console_command": "script require(\"combat/damage_rule_config\").debug_enabled = false",
+    "reported_by": "root agent, 2026-10-01",
+    "runtime_command_record": "output/tower_responsiveness_20261001/quiet_four_native.json",
+    "fresh_log": "output/tower_responsiveness_20261001/quiet_four_native.log",
+    "fresh_log_sha256": "f5b5c4476639b590136877e9fc2300820aa5db10d81869866651288caecfa2ea",
+    "runtime_debug_enabled": false,
+    "combat_damage_lines": 0,
+    "combat_damage_text_occurrences": 0,
+    "completion_marker": "PERF_FOUR_DONE",
+    "actual_damage_evidence": {
+      "isolated_towers": 4,
+      "final_elapsed_seconds": 31,
+      "laser_ticks_each": 31,
+      "target_hp_drop_each": 71021,
+      "note": "HP drop includes native attacks and scripted laser damage; it is not a laser-only balance assertion. The final native ranged fixture removes modifier_creep_piercing."
+    },
+    "scope": "Fresh cold-started template_map session, four moving targets and production mystery/laser/auto modules; existing Tools fixture, no normal-wave or multiplayer claim.",
+    "excluded": "Earlier non-attacking proxy samples and the separately captured Tools hang are not evidence for this pass."
+  },
+  "limits": [
+    "No damage, event, UI, sampling-system or combat-debug command code changed.",
+    "Other bounded diagnostic logs and error logs remain enabled as before.",
+    "Removed format/print work is established, but no native frame-time reduction or stall root cause is established by these tests."
+  ]
+}

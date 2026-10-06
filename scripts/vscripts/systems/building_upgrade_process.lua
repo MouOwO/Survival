@@ -1,5 +1,6 @@
 local scheduler = require("core/scheduler")
 local warp = require("systems/building_warp_effects")
+local upgrade_effect = require("systems/building_upgrade_effect")
 local asset_preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
 
@@ -22,7 +23,7 @@ local function safe_callback(callback, ...)
         print("[BuildingUpgradeProcess] callback failed: "
             .. tostring(error_message))
     end
-    return ok
+    return ok and error_message ~= false
 end
 
 local function log_particle(event, state, particle_id, lifecycle_state, detail)
@@ -129,9 +130,7 @@ local function complete_state(state)
     remove_state(state, "complete")
     local completed = safe_callback(state.options.on_complete)
     if completed and valid_entity(state.unit) and state.unit:IsAlive() then
-        local definition = state.options.definition or {}
-        warp.create(definition.build_complete_particle, state.unit,
-            definition, state.duration, true)
+        upgrade_effect.play(state.unit)
     end
 end
 

@@ -16,7 +16,12 @@ function M:IsPurgable() return false end
 function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
 function M:DeclareFunctions()
-    return { MODIFIER_EVENT_ON_TAKEDAMAGE }
+    return { MODIFIER_EVENT_ON_TAKEDAMAGE, MODIFIER_EVENT_ON_ATTACK_LANDED }
+end
+
+function M:OnAttackLanded(params)
+    if not IsServer() or params.target ~= self:GetParent() then return end
+    require("systems/wall_hit_effect").play(self:GetParent(),params.attacker)
 end
 
 function M:OnTakeDamage(params)

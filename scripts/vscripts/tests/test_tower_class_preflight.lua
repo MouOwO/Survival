@@ -330,4 +330,33 @@ native:OnSpellStart()
 assert(next(calls) == nil and slot().pending == native_pending, "client prediction cannot reserve or spend")
 equal_balances(native_balance, wallet(), "native client guard")
 IsServer = function() return true end
+-- Rank projection consumes the real building query/event contracts, including
+-- all-player recovery and the selected-unit UI's stale-name fallback.
+tower = fixture({owner = 1, towers = 2})
+local listed = assert(bus.request(events.BUILDING_LIST_REQUEST, {}))
+assert(#listed.buildings == 2, "rank initialization must recover every player's towers")
+assert(#bus.request(events.BUILDING_LIST_REQUEST, {player_id = 0}).buildings == 1)
+assert(#bus.request(events.BUILDING_LIST_REQUEST, {player_id = 1}).buildings == 1)
+local rank_values = {}
+CustomNetTables = {SetTableValue = function(_, name, key, value)
+    if name == "survival_tower_rank" then rank_values[key] = value end
+end}
+local rank_service = require("systems/tower_rank_presentation_service")
+rank_service.init()
+assert(rank_values.unit_1.player_id == 1 and rank_values.unit_2.player_id == 0)
+assert(rank_values.unit_1.rarity == "N" and rank_values.unit_2.rarity == "N")
+assert(request(tower, 1).ok)
+action = active[tower:entindex()]; active[tower:entindex()] = nil; action.on_complete()
+assert(rank_values.unit_1.rarity == "R" and rank_values.unit_1.stars == 1,
+    "real completed class-change payload must publish R one-star")
+assert(tower.survival_display_name:find("【R】", 1, true) == 1)
+tower.survival_display_name = "【N】stale cached name"
+packets = {}
+listeners.ui_selected_unit_stats_request(nil, {PlayerID = 1, entindex = tower:entindex()})
+local selected_name
+for _, packet in ipairs(packets) do
+    if packet.name == "ui_selected_unit_stats_snapshot" then selected_name = packet.payload.display_name end
+end
+assert(selected_name and selected_name:find("【R】", 1, true) == 1,
+    "selected UI must derive the current rank rather than the old cached rarity")
 print("TOWER_CLASS_PREFLIGHT_PASS: cached/uncached failure has no side effects; real wallet/route limits; UI cooldown and native filter; completion, competition, cancellation and debug semantics")

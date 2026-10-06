@@ -5,6 +5,17 @@ local construction_rules = require(
 local M = {}
 local active_by_entindex = {}
 local warp = require("systems/building_warp_effects")
+local function publish_progress(state, removed)
+    if not CustomNetTables or not CustomNetTables.SetTableValue then return end
+    local value = {removed=1}
+    if not removed then
+        local origin = state.unit:GetAbsOrigin()
+        value = {entindex=state.entindex, start=state.started_at, duration=state.duration,
+            team=state.unit:GetTeamNumber(), x=origin.x, y=origin.y, z=origin.z, text="建造中"}
+    end
+    pcall(CustomNetTables.SetTableValue, CustomNetTables,
+        "survival_ui_state", "construction_" .. state.entindex, value)
+end
 
 local function nonempty(value)
     return type(value) == "string" and value ~= ""
@@ -26,6 +37,12 @@ local function entindex_for(unit)
     return nil
 end
 
+local function refresh_health_bar(unit)
+    if not valid_entity(unit) or not unit.FindModifierByName then return end
+    local ok, bar = pcall(unit.FindModifierByName, unit, "modifier_single_health_bar")
+    if ok and bar and bar.publish_state then pcall(bar.publish_state, bar) end
+end
+
 local function hide_model(unit)
     if not valid_entity(unit) or type(unit.AddNoDraw) ~= "function" then
         return false
@@ -44,6 +61,7 @@ local function show_model(unit)
     if type(unit.SetRenderAlpha) == "function" then
         pcall(unit.SetRenderAlpha, unit, 255)
     end
+    refresh_health_bar(unit)
     return restored
 end
 
@@ -67,6 +85,7 @@ local function retire(state, reveal_model)
     state.loop_particles = {}
     warp.destroy(state.start_particle)
     state.start_particle = nil
+    publish_progress(state, true)
     if reveal_model then show_model(state.unit) end
     return true
 end
@@ -78,6 +97,7 @@ function M.start(unit, definition)
     M.cancel(entindex)
     -- Reveal the completed building only after the construction transaction.
     hide_model(unit)
+    refresh_health_bar(unit)
 
     definition = definition or {}
     local start_path = definition and definition.build_start_particle
@@ -94,14 +114,15 @@ function M.start(unit, definition)
         definition = definition,
         start_particle = start_particle,
         duration = duration,
+        started_at = GameRules:GetGameTime(),
         loop_particles = {},
         retired = false,
     }
     local particle = warp.create(loop_path, unit, definition, duration)
     if particle ~= nil then state.loop_particles[1] = particle end
-    -- Never leave only a health bar if a visual resource fails to spawn.
-    if particle == nil and warp.is_white(loop_path) then show_model(unit) end
+    -- Failed optional particles must not reveal an unfinished building.
     active_by_entindex[entindex] = state
+    publish_progress(state, false)
     return state
 end
 

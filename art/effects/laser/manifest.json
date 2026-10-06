@@ -1,0 +1,117 @@
+{
+  "generated_by": "tools/map_c6/build-laser-visual-particles.cjs",
+  "native_structure_references": [
+    "particles/units/heroes/hero_wisp/wisp_tether.vpcf",
+    "particles/units/heroes/hero_wisp/wisp_tether_c.vpcf",
+    "particles/units/heroes/hero_zuus/zuus_static_field_b.vpcf"
+  ],
+  "control_points": {
+    "0": "beam orb / burst origin / charge tower origin",
+    "1": "head surface / blood strength 1..4",
+    "2": "tier accent RGB 0..255; Io core and orb stay blue-white",
+    "3": "feed torso (origin +70)",
+    "4": "feed attractor (origin +185)",
+    "7": "enemy entity for model-bound Zeus arcs",
+    "9": "beam orb (tower origin +185)"
+  },
+  "lifecycle": "Beam rope/impact nodes persist until target exit. Motes have bounded continuous emission and decay; blood is a released finite burst; charge is owned by tower visual lifecycle.",
+  "custom_particle_budget": 187,
+  "lua_particle_handles_per_target": 1,
+  "death_afterglow": {
+    "seconds": 0.3,
+    "particles_per_kill": 24,
+    "lua_timers": 0,
+    "entity_bindings": 0,
+    "lifecycle": "Instant burst released to engine; snapshot endpoints survive target removal."
+  },
+  "reference_workshop": "3164617180: tinker_1/big_laser, laser_cutter_sparks, illuminate_charge_b; see reference_manifest.json",
+  "reference_native": "reference/io/manifest.json; native Io tether core and electric strand, Zeus model-bound static field arcs",
+  "art": "Legacy custom Io beam resources retained for compatibility. Production CSV now directly selects native Tinker Q variants; no Io charge orb is created in native mode.",
+  "native_textures": [
+    "materials/particle/beam_hotwhite.vtex",
+    "materials/particle/beam_hotblue2.vtex",
+    "materials/particle/particle_glow_05.vtex",
+    "materials/particle/particle_flares/particle_flare_001.vtex",
+    "materials/particle/blood_generic_spattering_color.vtex",
+    "materials/particle/spark_glow_01.vtex",
+    "materials/particle/beam_generic_3.vtex",
+    "materials/particle/sparks/sparks.vtex",
+    "materials/particle/particle_flares/aircraft_blue2.vtex",
+    "materials/particle/orb_tintable/particle_energy_orb_fluid_tintable.vtex",
+    "materials/particle/beam_hotblue.vtex",
+    "materials/particle/electricity/electricity_beam_white_a.vtex",
+    "materials/particle/electrical_arc/electrical_arc.vtex"
+  ],
+  "outputs": [
+    {
+      "resource": "particles/survival/towers/laser_beam.vpcf",
+      "max_particles": 16,
+      "sha256": "6fa6033d0a66632341a26cdb15f1ac52dcb9218167ff2177bc851dc1e88fab71"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_hit.vpcf",
+      "max_particles": 1,
+      "sha256": "25ff6f666f35d197763f75513e15c03795608e56d789084bf2449027fd76bbac"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_hit_flare.vpcf",
+      "max_particles": 1,
+      "sha256": "ca59042d1a3d6b7885c391ef55fcc40950966b2b8acfc4c9133fdc9f23cec64e"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_io_electric.vpcf",
+      "max_particles": 32,
+      "sha256": "8aec23e1cf053bbf35d079dcc5574be8f565d735763e7c34047eaca93afad31a"
+    },
+    {
+      "resource": "particles/survival/towers/laser_target_electric.vpcf",
+      "max_particles": 16,
+      "sha256": "640b716aea96d82064f6c7b8102bda90e386d456c88638acbb944ffc3b0498bb"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_motes.vpcf",
+      "max_particles": 24,
+      "sha256": "928e5341c286f38c40fa8a315642563feae88e53b94c1fa1d7fd1cc33606fc97"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_pulse.vpcf",
+      "max_particles": 8,
+      "sha256": "13d6b1acbdb7fbc9bba3adf52426b6b26f1af2e2ff9114d4c18d5a0aceb00d59"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_strike.vpcf",
+      "max_particles": 4,
+      "sha256": "79262b3e55b7ffe8cfd69c96fd046a73461d845dfa1d52ceb5ac6be90daf7d0b"
+    },
+    {
+      "resource": "particles/survival/towers/laser_beam_sparks.vpcf",
+      "max_particles": 16,
+      "sha256": "f645b409eddb6ee84e9bd35067c0794f40240001c9bd455c9fdb4b1751374cc0"
+    },
+    {
+      "resource": "particles/survival/towers/laser_blood.vpcf",
+      "max_particles": 32,
+      "sha256": "794835880f821e86ebce3b602e59294e8b39aee296354f7ab72407555de695ab"
+    },
+    {
+      "resource": "particles/survival/towers/laser_charge.vpcf",
+      "max_particles": 1,
+      "sha256": "b09db1a12784e8beb2620a34c3801efd9cbe043e8f3b1497d5d1e315d9c292d4"
+    },
+    {
+      "resource": "particles/survival/towers/laser_charge_feed.vpcf",
+      "max_particles": 12,
+      "sha256": "54881930c1c79c301cc0ab514eb82e111abfa25325893769cef2435f6476c021"
+    },
+    {
+      "resource": "particles/survival/towers/laser_afterglow.vpcf",
+      "max_particles": 16,
+      "sha256": "d63b1d66906ea9fc59034ccd919295577b76622bf490b344424dc3f6c5583192"
+    },
+    {
+      "resource": "particles/survival/towers/laser_afterglow_arcs.vpcf",
+      "max_particles": 8,
+      "sha256": "0492394efd9a0e0515cd74f9962c866eb5d897a443f92a9cad2589793e96b2cb"
+    }
+  ]
+}

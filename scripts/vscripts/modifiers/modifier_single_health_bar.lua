@@ -10,6 +10,7 @@ function modifier_single_health_bar:GetAttributes()
 end
 
 local TABLE = "survival_hero_health_bar"
+local laser_prediction = require("systems/tower_laser_health_prediction")
 
 local function publish(unit, value, cached_entindex)
     if not CustomNetTables
@@ -62,7 +63,8 @@ function modifier_single_health_bar:publish_state()
     end
     if unit.survival_hide_custom_health_bar
         or unit.survival_is_native_wearable_visual
-        or (unit.HasModifier and unit:HasModifier("modifier_native_wearable_visual_carrier"))
+        or (unit.HasModifier and (unit:HasModifier("modifier_native_wearable_visual_carrier")
+            or unit:HasModifier("modifier_building_under_construction")))
         or (unit.IsNoDraw and unit:IsNoDraw())
         or (unit.GetClassname and unit:GetClassname() == "npc_dota_thinker") then
         publish_removed(self, unit)
@@ -75,6 +77,8 @@ function modifier_single_health_bar:publish_state()
     local alive = unit:IsAlive() and 1 or 0
     local team = unit:GetTeamNumber()
     local unit_name = unit.GetUnitName and unit:GetUnitName() or nil
+    local forecast, revision = laser_prediction.snapshot(unit, max_health,
+        GameRules and GameRules:GetGameTime() or 0)
     -- These flags can be assigned after npc_spawned attaches the modifier.
     -- Include width in the sample so that a healthy newly classified boss/hero
     -- updates its bar even without taking damage.
@@ -88,6 +92,7 @@ function modifier_single_health_bar:publish_state()
     if previous and previous.health == health and previous.max_health == max_health
         and previous.scale == scale and previous.alive == alive
         and previous.team == team and previous.unit_name == unit_name
+        and previous.forecast_revision == revision
         and previous.bar_width == bar_width then
         return
     end
@@ -101,11 +106,12 @@ function modifier_single_health_bar:publish_state()
         alive = alive,
         team = team,
         unit_name = unit_name,
+        laser_forecast = forecast,
         bar_width = bar_width,
     })
     if sent then
         self.health_bar_last_sample = { health = health, max_health = max_health,
-            scale = scale, alive = alive, team = team, unit_name = unit_name, bar_width = bar_width }
+            scale = scale, alive = alive, team = team, unit_name = unit_name, forecast_revision = revision, bar_width = bar_width }
         self.health_bar_published_removed = false
     end
 end

@@ -1,0 +1,14 @@
+{
+  "status": "INTERNAL_SIMULATION_PASS_BUT_OLD_TOTAL_DAMAGE_INVARIANCE_FAILED",
+  "superseding_audit": "laser_damage_baseline_audit.json",
+  "tick_seconds": 0.2,
+  "first_damage": "after first 0.2s of continuous exposure; no prepaid full-second opening burst",
+  "damage_basis": "existing skill multiplier per original damage_interval; integrate per-second 5 percentage point ramp with existing maximum",
+  "timers_added": 0,
+  "max_damage_submissions_per_think": 1,
+  "lag": "constant-work integration, multiple elapsed slices combined in one damage_service transaction",
+  "splash_and_blood": "aggregate once per original one-second interval; flush dealt remainder on target exit; blood based on summed actual final damage",
+  "seconds90_simulation": {"observation_step": 0.03, "direct_damage_calls": 450, "splash_events": 90, "blood_bursts": 90, "beam_creations": 1, "same_target_attacks_reset_clock": false, "damage_total_matches_integral": true},
+  "tests": ["test_tower_laser_damage.lua: DPS conservation, ramp boundaries, cap, large delayed window", "test_tower_skill_tree_exclusion.lua: production slices, batched lag, splash totals, target switch/range exit, reentrant killing slice, 90s workload", "Lua 5.1 syntax", "verify-laser-visual.cjs --compiled", "git diff --check"],
+  "limitations": ["Five direct damage submissions per second instead of one; no zero-cost or FPS claim", "Less than one uncompleted 0.2s slice is discarded on beam interruption", "Actual in-game health-bar smoothness and large-wave performance not measured"]
+}

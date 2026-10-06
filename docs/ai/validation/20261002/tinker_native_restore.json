@@ -1,0 +1,180 @@
+{
+  "status": "PASS",
+  "source": "installed Dota pak01_dir.vpk",
+  "rows": 20,
+  "roots": {
+    "R": "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
+    "SR": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vpcf",
+    "SSR": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs.vpcf"
+  },
+  "unchanged_native_art": true,
+  "dependency_files": 58,
+  "native_width": true,
+  "visual_replay_seconds": 0.3,
+  "visual_segment_lifetime_seconds": 0.72,
+  "colors": [
+    "R native blue",
+    "SR original TI10 Immortal",
+    "SSR original red Immortal Aghanim variant"
+  ],
+  "excluded_color_candidate": {
+    "item": "Blackshield Protodrone Laser",
+    "itemdef": "14064",
+    "reason": "Blue mecha_hornet particle is particle_create weapon ambient, not a Q skill beam."
+  },
+  "in_game_visual_verified": false,
+  "records": [
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
+      "sha256": "3eb4588046cc6532cbd3663de0f8d4d45d1afbe4a9e0155ac25789aed1b57b76"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_e.vpcf",
+      "sha256": "fcaa181958a9522c441b42e3266e3ddae73046b4ef0e37af77b22a11297a35f2"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_b.vpcf",
+      "sha256": "41a65b6789752f8d0308394c922de8a1ab4c8aea6bcf9c8749bf4d74fadd38a2"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks.vpcf",
+      "sha256": "526a1c94da44383c01231273188155be903cf8e5c7db5c36ab8bbbc61da94773"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_b.vpcf",
+      "sha256": "ad23c5cfa848301c8afc05f4c6ff9b49c7c284c42d10d37a3bcf7a876d03f9bd"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_c.vpcf",
+      "sha256": "a9a1d90c18a69295a0ecff53a3b5acf22dbac72e36d0aebb2124f9913f8ca299"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_d.vpcf",
+      "sha256": "25dcedcdbd7d58259655ff6fccb410542bc42b4f0d540203908efaf17d9cb6f0"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_e.vpcf",
+      "sha256": "e9fbcebe9d36908783ab8ced643551c79aa32fd4dcc34204dcab1bd3bc38c2ec"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_f.vpcf",
+      "sha256": "146f538ed79a75dfa58c2a22bb75052de777cabd7e4ca527b879e9d847a602f2"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_g.vpcf",
+      "sha256": "39e5c0e8faddedaa8f7fae6eae2a0a680b38725a534ff1b230fcd080417bdca6"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_h.vpcf",
+      "sha256": "89ccda72a749a8a8e39088d5b50d84e480f96611ee1c7b26ca80ff15410e2b74"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_i.vpcf",
+      "sha256": "6b01d8e7077782a4ca64864213eb68ddcfe5b239e680452deaa04f5ed41fe9b5"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_k.vpcf",
+      "sha256": "02dfaeff0477753261af86072da4d0cd290256ed4a81aac8b9eb2b90b4ddf8cb"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_c.vpcf",
+      "sha256": "c957e713b20ccac8e4c3d60e353e517b6da4be23f3c054f324b7143408cd0148"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_d.vpcf",
+      "sha256": "113e914e3a02fc3b989fcdc050ba877cd5aaa8f57ae7c9e7e45d71108457dca1"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/laser_cutter_sparks_j.vpcf",
+      "sha256": "a500915974603f5dd1795f1d29bd20f17ec224fe096385fbfcfe9e299798d945"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_f.vpcf",
+      "sha256": "7c8f0fe0f2245fc4809e3745ba5500e911b00762fa81526e4f23b4272f1febb6"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_g.vpcf",
+      "sha256": "8bf55da6cc346160350e6885f24926ffb53c8d83bf0be788b139781b35f9c307"
+    },
+    {
+      "resource": "particles/units/heroes/hero_tinker/tinker_laser_h.vpcf",
+      "sha256": "fc6fbd9462a9cd4a70768c2639ec8bf0605f4ac242437672f57bf1df556df86d"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vpcf",
+      "sha256": "87cb0c7190fc27a0d0a44c9ae0348f420c1def030f3c6b9de639f3c8422d77b5"
+    },
+    {
+      "resource": "materials/models/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_cable.vmat",
+      "sha256": "6963968b2864557b08d340c00fc9ea0a3ef19fcb36cb037330e8cacba96837ec"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact_smoke.vpcf",
+      "sha256": "d93c9fc81d338eae1bfd40a551a5c256e5efbefb077cae2725daf9a53ebff315"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact.vpcf",
+      "sha256": "1a6ed16048c4997a4a7298475a890b540ae7477327d7277b6a3a867fb0cbb312"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_spot.vpcf",
+      "sha256": "87067f7c141412b06a9f88fae07b2a04c450792c9ef5fe53b966d84dbfbc553f"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_spot_b.vpcf",
+      "sha256": "ee151526675e37f0d99f126525ede54313cb35f9a45d968ccfe8c04e9ae1c8be"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_impact_burst.vpcf",
+      "sha256": "5215ed8b8dad9dbdc424076728328af88157ff4c07eae1497362f5ddf7cd3dd8"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_embers.vpcf",
+      "sha256": "cd336fe75646e679e57e141e52e4925f29692ac70e12a6ea5b9350f8331b4d39"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_ring_b.vpcf",
+      "sha256": "2fdf8a38e91e0fa425b3cc3cf6ff8c2ab31d636428eb0de1c35f072c71f7d859"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_ring.vpcf",
+      "sha256": "135e8c8d868d191d0cee9c9a5a1163032b73b171d8949be6ac01c130af6e3f34"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_core.vpcf",
+      "sha256": "e8258cdd14b82ae5de0c9172d3b6394db0cdde02097ce803cf627199e067d9bc"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_pulse.vpcf",
+      "sha256": "e3786d10eb31da8b7b79ad353a87d13450a75917af97c6f6927b43b0266ef47f"
+    },
+    {
+      "resource": "materials/models/items/tinker/tinker_ti10_immortal_laser/beam_glow.vmat",
+      "sha256": "3a0bd9dd7956da694745ee69068ae6c1f96804136421ccd837f6a84b2b29d311"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_burn.vpcf",
+      "sha256": "8c70d69372ecf194788b505f204ffde1938ae91cef8696245ce005fbc8e5178a"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs.vpcf",
+      "sha256": "6721f3f80ec2514b6fd51e6fe789af7d964aa47f19d852f6a5b9ea9192010c50"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_embers.vpcf",
+      "sha256": "46c56bd2a24a16cbaa4185e600989f3441ecbea87d7b535c074fb3670a182758"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_core.vpcf",
+      "sha256": "db9acfa2c0e41cf9c1a59de7bd94b081b3877721c1866d588058345116899ac7"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_pulse.vpcf",
+      "sha256": "ff952d9f57874c672e1da050b6e1fe8bdf92d3fd2085743538e08711d54b7b08"
+    },
+    {
+      "resource": "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs_burn.vpcf",
+      "sha256": "1caeb9e45dd8a9e23e41aab65feedc4661ec46ca25d0bf1e8740c2ed4014dbc8"
+    }
+  ]
+}

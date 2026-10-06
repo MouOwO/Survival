@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-03",
+  "task": "收紧四个攻墙怪与后排候位怪之间的空隙",
+  "status": "SOURCE_AND_OFFLINE_PASS_VISUAL_PENDING",
+  "user_confirmed": "此前四只同时攻击修复已在正式游戏生效",
+  "cause": {
+    "normal_hull_radius": 32,
+    "previous_wait_target_center_gap": 160,
+    "previous_nominal_hull_edge_gap": 96,
+    "live_move_stopping_distance": "NOT_MEASURED"
+  },
+  "change": {
+    "scope": "wall_melee_contact候位几何与缓存；攻击modifier本轮未改",
+    "ordinary_hull32_wait_target_center_gap": 72,
+    "clearance": 8,
+    "extra_retreat_only_when_inside_safe_band": 32,
+    "geometry": "全前排后缘+等待者半径+余量；横向按等待者体型限制",
+    "cache": "前排外缘、等待半径、普通/退回目标；分数半径独立；各自完整导航采样",
+    "new_timers_or_continuous_position_writes": 0
+  },
+  "checks": [
+    {"name": "test_wall_melee_contact", "result": "PASS", "coverage": "四面72/104目标、向后移动32容差、混合与分数半径、大小等待者导航、候选及满员缓存、障碍回退"},
+    {"name": "test_wall_contact_crowd", "result": "PASS", "coverage": "90怪、提前停步及真实半径碰撞模拟、四只命中、后排不重叠且零攻击、死亡补位、控制与击退、Hull64、稳定开销"},
+    {"name": "test_wall_contact_deadlock", "result": "PASS"},
+    {"name": "test_wall_contact_alignment", "result": "PASS"},
+    {"name": "test_enemy_wall_order_cache", "result": "PASS", "coverage": "60次稳定攻击观察不重发，控制、恢复、等待、换墙/死亡"},
+    {"name": "test_enemy_wall_boundary_ai", "result": "PASS"},
+    {"name": "test_wall_navigation", "result": "PASS"},
+    {"name": "test_wall_navigation_geometry", "result": "PASS", "cases": 76},
+    {"name": "test_monster_ground_navigation", "result": "PASS", "actual_wave_batches": 873, "other_policy_scenarios": 13},
+    {"name": "lua51_parse", "result": "PASS", "files": 3},
+    {"name": "targeted_diff_check", "result": "PASS"}
+  ],
+  "simulation": {
+    "native_move_acceptance_model": 32,
+    "four_attackers_by_seconds": 2.5,
+    "nearest_waiter_center_gap": 104,
+    "nearest_waiter_hull_edge_gap": 40,
+    "stable_seconds": 10,
+    "stable_new_orders": 0,
+    "stable_position_writes": 0,
+    "stable_path_queries": 0,
+    "stable_navigation_queries": 200,
+    "same_seed_previous_nearest_waiter_center_gap": 128,
+    "comparison_note": "旧场景已有后排出生在距前排128处，向后走到160目标时在32容差内停住；该测量不能误写成192。只有从远处接近160目标的理想单列模型才对应192。",
+    "negative_control": "旧contact在新增compact queue断言预期失败，旧版仍能通过原四怪攻击测试"
+  },
+  "source_sha256": {
+    "scripts/vscripts/systems/wall_melee_contact.lua": "DE88ECE2C275F48C3436E50CF03EEA32031DE09ABD464572788FE3873651823E",
+    "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua": "89AB3B8AC4414C4C5A4410C7887D356772AD81CC18BA05BDAB9D8863C27F1720",
+    "scripts/vscripts/tests/test_wall_melee_contact.lua": "DBE0BF29BB2FBD079DFBB2C5D11BF58ACD8A5459F2F8691F4DCFC9B93F724E66",
+    "scripts/vscripts/tests/test_wall_contact_crowd.lua": "437305E0CE66FD842417A5FC3337859B5254B456E4881B1E54F3C6A093637DFF"
+  },
+  "evidence_directory": "output/wall_queue_spacing_20261003",
+  "runtime": {
+    "new_spacing_live_validation": "NOT_RUN",
+    "reason": "当前用户VConsole直接占用游戏控制台连接；只读尝试未获得现场坐标，已停止且未断开其连接",
+    "user_session_restarted_reloaded_or_mutated": false,
+    "previous_engine_evidence": "wall_contact_admission.json的三轮通过对应160候位版，不是本轮72间距的实机证据",
+    "next_check": "重新进正式地图，确认前后排观感紧凑及四只继续攻击",
+    "limits": "静态混合体型已测；既有waiting保留原goal，动态改变已等待单位或前排体型后的整队重排不属于本轮验证。正式873波次统一Hull32。"
+  }
+}
