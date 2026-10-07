@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-07",
+  "kind": "live_Dota2_Tools_Panorama_grid_zoom_diagnostic",
+  "map": "template_map",
+  "viewport": [
+    1600,
+    900
+  ],
+  "camera_distance_range": [
+    1200,
+    2400
+  ],
+  "capture_ms": 5000,
+  "grid_update_schedule_seconds": 0.035,
+  "samples": [
+    {
+      "name": "preview_still",
+      "elapsed_ms": 5008,
+      "preview_active": true,
+      "ui_scheduler_samples": 487,
+      "ui_scheduler_gap_ms": {
+        "p50": 9,
+        "p95": 21,
+        "max": 40
+      },
+      "delta": {
+        "frame": {
+          "frames": 120,
+          "max_total_ms": 1,
+          "max_camera_ms": 1,
+          "max_range_ms": 1,
+          "max_state_ms": 1
+        },
+        "white": {
+          "geometry_builds": 0,
+          "view_builds": 0,
+          "layout_writes": 0,
+          "mask_updates": 0,
+          "line_panels": 0,
+          "mark_panels": 0,
+          "reference_rebases": 0,
+          "corner_candidates": 0
+        },
+        "state": {
+          "terrain_builds": 0,
+          "terrain_layouts": 0,
+          "footprint_layouts": 7,
+          "terrain_panels": 0,
+          "footprint_panels": 0
+        }
+      },
+      "after": {
+        "at": 1791367266717,
+        "preview_active": true,
+        "camera_api": {
+          "set": "function",
+          "get": "undefined"
+        },
+        "frame": {
+          "frames": 3469,
+          "max_total_ms": 1,
+          "max_camera_ms": 1,
+          "max_range_ms": 1,
+          "max_state_ms": 1
+        },
+        "white": {
+          "geometry_builds": 1,
+          "view_builds": 2841,
+          "layout_writes": 2970320,
+          "mask_updates": 2036,
+          "line_panels": 194,
+          "mark_panels": 1864,
+          "reference_rebases": 52,
+          "corner_candidates": 1984,
+          "state": "visible"
+        },
+        "state": {
+          "terrain_builds": 1,
+          "terrain_layouts": 627861,
+          "footprint_layouts": 2437,
+          "terrain_panels": 221,
+          "footprint_panels": 16
+        }
+      }
+    },
+    {
+      "name": "preview_zoom",
+      "elapsed_ms": 5005,
+      "preview_active": true,
+      "ui_scheduler_samples": 439,
+      "ui_scheduler_gap_ms": {
+        "p50": 9,
+        "p95": 25,
+        "max": 41
+      },
+      "delta": {
+        "frame": {
+          "frames": 118,
+          "max_total_ms": 16,
+          "max_camera_ms": 3,
+          "max_range_ms": 10,
+          "max_state_ms": 3
+        },
+        "white": {
+          "geometry_builds": 0,
+          "view_builds": 24,
+          "layout_writes": 30824,
+          "mask_updates": 24,
+          "line_panels": 0,
+          "mark_panels": 0,
+          "reference_rebases": 0,
+          "corner_candidates": 0
+        },
+        "state": {
+          "terrain_builds": 0,
+          "terrain_layouts": 5304,
+          "footprint_layouts": 44,
+          "terrain_panels": 0,
+          "footprint_panels": 0
+        }
+      },
+      "after": {
+        "at": 1791367273306,
+        "preview_active": true,
+        "camera_api": {
+          "set": "function",
+          "get": "undefined"
+        },
+        "frame": {
+          "frames": 3624,
+          "max_total_ms": 16,
+          "max_camera_ms": 3,
+          "max_range_ms": 10,
+          "max_state_ms": 3
+        },
+        "white": {
+          "geometry_builds": 1,
+          "view_builds": 2865,
+          "layout_writes": 3001144,
+          "mask_updates": 2060,
+          "line_panels": 194,
+          "mark_panels": 1864,
+          "reference_rebases": 52,
+          "corner_candidates": 1984,
+          "state": "visible"
+        },
+        "state": {
+          "terrain_builds": 1,
+          "terrain_layouts": 633165,
+          "footprint_layouts": 2483,
+          "terrain_panels": 221,
+          "footprint_panels": 16
+        }
+      }
+    }
+  ],
+  "interpretation": {
+    "white_layout_writes": "line or corner layout operations, not draw calls",
+    "terrain_layouts": "terrain panel layout attempts including offscreen early returns",
+    "ui_scheduler_gap_ms": "Panorama callback intervals; not measured GPU or presentation frame time",
+    "max_js_ms": "Date.now wall time through preview stages; excludes deferred native layout and GPU"
+  },
+  "limits": [
+    "First two attempted controls had an active preview and were discarded.",
+    "Subsequent inactive control was interrupted and did not complete; discarded.",
+    "No GPU timing or server profiling was collected concurrently.",
+    "No production performance optimization was applied."
+  ],
+  "cleanup": {
+    "temporary_probe_stopped": true,
+    "content_and_compiled_ui_restored_by_sha256": true,
+    "camera_distance_restored": 1200,
+    "no_build_commit_sent": true,
+    "game_not_restarted": true
+  }
+}
