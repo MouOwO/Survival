@@ -1,2 +1,2 @@
--- AUTO-GENERATED: activated lottery pool configuration, 2026-10-04
-return { protocol = 1, hash = "959ea2e8bb13418c2dcac8733aa3b29c848b5561d6796be5ef29bd0b4e1c1463" }
+-- Deployed archive bundle verified through the live service, 2026-10-07.
+return { protocol = 1, hash = "288f724bcfd79880c4fbd7d4ac77040a8636e2f8f3ef96836632001340d3b2a7" }

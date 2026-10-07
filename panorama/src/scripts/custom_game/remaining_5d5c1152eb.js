@@ -88,14 +88,16 @@
     };
     R.QualityText=function(value){return String(value||"").replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\b(SSR|SR|UR|N|R)\b/g,function(q){return '<font color="'+cfg.SurvivalRewardPresentation.NameColor(q)+'">'+q+'</font>';});};
     R.History=function(host,entries,createIcon,showTooltip,hideTooltip){
+        var formatter=cfg.SurvivalNumberFormatter;
+        function compact(value){return formatter&&formatter.Format?formatter.Format(value):String(value);}
         var index=0;
         entries.forEach(function(entry){entry.items.forEach(function(item){
             var row=$.CreatePanel("Panel",host,"");row.AddClass("RHHistoryRow");row.SetHasClass("RHAlternate",index++%2===0);row.hittestchildren=false;
             label(row,entry.time,"RHHistoryTime");var icon=createIcon(row,item,"RHHistoryRewardIcon");
             if(icon&&icon.SetScaling)icon.SetScaling("stretch-to-fit-preserve-aspect");
-            label(row,(item.name||item.id)+(item.duplicate===true||Number(item.duplicate)===1?" · 已转化 "+Number(item.converted_points||0)+" 积分":""),"RHHistoryName");
+            label(row,(item.name||item.id)+(item.duplicate===true||Number(item.duplicate)===1?" · 已转化 "+compact(Number(item.converted_points||0))+" 积分":""),"RHHistoryName");
             var q=String(item.quality||"n").toUpperCase(),quality=label(row,q,"RHHistoryQuality");quality.AddClass("RHQuality"+q);
-            label(row,"×"+Number(item.count||item.quantity||1),"RHHistoryQuantity");
+            label(row,"×"+compact(Number(item.count||item.quantity||1)),"RHHistoryQuantity");
             row.SetPanelEvent("onmouseover",function(){showTooltip(item,row,true);});row.SetPanelEvent("onmouseout",hideTooltip);
         });});
         if(!index){var empty=panel(host,"RHHistoryEmpty");image(empty,"history_empty","RHHistoryEmptyIcon");label(empty,"暂无抽奖记录","RHHistoryEmptyText");}

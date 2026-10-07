@@ -158,9 +158,14 @@
     }
 
     function runtimeFor(abilityIndex) {
-        var runtime = CustomNetTables.GetTableValue("survival_ability_runtime", String(abilityIndex)) || {};
-        var summonGuard = GameUI.CustomUIConfig().SurvivalHeroSummonAvailability;
-        if (summonGuard) runtime = summonGuard(abilityIndex, runtime);
+        var runtime = CustomNetTables.GetTableValue(
+            "survival_ability_runtime", String(abilityIndex)
+        ) || {};
+        var guard = GameUI.CustomUIConfig().SurvivalHeroSummonAvailability;
+        runtime = guard ? guard(abilityIndex, runtime) : runtime;
+        var production = config.SurvivalProductionHUD;
+        runtime = production && production.GetResearchRuntime
+            ? production.GetResearchRuntime(abilityIndex, selectedUnit(), runtime) : runtime;
         var queue = GameUI.CustomUIConfig().SurvivalLumberjackFusionQueue;
         return queue && queue.Decorate ? queue.Decorate(abilityIndex, runtime) : runtime;
     }

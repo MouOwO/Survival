@@ -1528,8 +1528,9 @@
         var target = Number(snapshot.stage_attack_target || 0);
         setText(
             "CombatProgressValue",
-            "攻击次数 " + formatNumber(snapshot.stage_attack_count)
-                + (target > 0 ? ("/" + formatNumber(target)) : "")
+            Number(snapshot.is_max_level) === 1 ? "MAX"
+                : "攻击次数 " + formatNumber(snapshot.stage_attack_count)
+                    + (target > 0 ? ("/" + formatNumber(target)) : "")
         );
         setText("CombatScaleValue", "战斗缩放 1:" + String(snapshot.scale || 10));
     }
@@ -1754,22 +1755,59 @@
     }
 
     function abilityRuntime(abilityIndex) {
-        var runtime = CustomNetTables.GetTableValue("survival_ability_runtime", String(abilityIndex)) || {};
-        var summonGuard = GameUI.CustomUIConfig().SurvivalHeroSummonAvailability;
-        if (summonGuard) runtime = summonGuard(abilityIndex, runtime);
+        var runtime = CustomNetTables.GetTableValue(
+            "survival_ability_runtime",
+            String(abilityIndex)
+        ) || {};
+        var config = GameUI.CustomUIConfig();
+        var guard = config.SurvivalHeroSummonAvailability;
+        runtime = guard ? guard(abilityIndex, runtime) : runtime;
+        var production = config.SurvivalProductionHUD;
+        runtime = production && production.GetResearchRuntime
+            ? production.GetResearchRuntime(abilityIndex, selectedUnit(), runtime) : runtime;
         var queue = GameUI.CustomUIConfig().SurvivalLumberjackFusionQueue;
         return queue && queue.Decorate ? queue.Decorate(abilityIndex, runtime) : runtime;
+    }
+
+    function setAbilityRuntimeDisabled(panel, unavailable) {
+        panel.SetHasClass("DOTADisabled", unavailable);
+        panel.__survivalRuntimeDisabled = unavailable;
+        // Native skins do not all style DOTADisabled. Shade the icon explicitly
+        // while leaving the tooltip and native input hierarchy intact.
+        var image = panel.FindChildTraverse("AbilityImage");
+        if (validPortraitPanel(image)) {
+            if (unavailable && image.__survivalDisabledImage !== true) {
+                image.__survivalOriginalSaturation = abilityPanelStyleValue(image, "saturation");
+                image.__survivalOriginalBrightness = abilityPanelStyleValue(image, "brightness");
+                image.__survivalDisabledImage = true;
+            }
+            if (unavailable) {
+                image.style.saturation = "0";
+                image.style.brightness = "0.45";
+            } else if (image.__survivalDisabledImage === true) {
+                image.style.saturation = image.__survivalOriginalSaturation || "1";
+                image.style.brightness = image.__survivalOriginalBrightness || "1";
+                image.__survivalDisabledImage = false;
+            }
+        }
+    }
+
+    function restoreAbilityRuntime(panel) {
+        if (!panel || !panel.__survivalRuntime) return;
+        if (panel.__survivalRuntimeDisabled) setAbilityRuntimeDisabled(panel, false);
+        panel.__survivalRuntime = null;
+        panel.__survivalRuntimeStatus = "";
     }
 
     function applyAbilityRuntime(panel, abilityIndex) {
         var runtime = abilityRuntime(abilityIndex);
         var unavailable = runtime.removed === 1
             || runtime.available === 0;
-        panel.SetHasClass("DOTADisabled", unavailable);
+        setAbilityRuntimeDisabled(panel, unavailable);
         var fusion = /^ability_fuse_lumberjack_\d+$/.test(String(runtime.ability_name || ""));
         if (fusion || panel.__survivalFusionTint) {
             var image = panel.FindChildTraverse("AbilityImage");
-            if (image) { image.style.saturation = fusion && (unavailable || runtime.can_afford === 0) ? "0" : "1"; image.style.brightness = fusion && unavailable ? "0.5" : "1"; }
+            if (image) { image.style.saturation = fusion && (unavailable || runtime.can_afford === 0) ? "0" : "1"; image.style.brightness = fusion && unavailable ? "0.45" : "1"; }
             panel.__survivalFusionTint = fusion;
         }
         // Affordability is advisory client data. Keep the button interactive and
@@ -1939,7 +1977,9 @@
             if (!key) {
                 if ((label && String(label.text || "")
                     && abilityPanelStyleValue(label, "visibility") !== "collapse")
-                    || nativeAbilityHotkeySuppressed(mapping.panel)) return false;
+                    || (isPassiveAbility(mapping.entry.ability)
+                        ? !nativeAbilityHotkeySuppressed(mapping.panel)
+                        : nativeAbilityHotkeySuppressed(mapping.panel))) return false;
                 continue;
             }
             if (!label || String(label.text || "") !== key
@@ -1954,11 +1994,13 @@
         if (!mappings) return;
         mappings.forEach(function (mapping) {
             var entry = mapping.entry;
-            if (entry.name === "ability_survival_return_home") return;
             var runtime = abilityRuntime(entry.ability);
             var managed = Number(runtime.ability_entindex) === Number(entry.ability)
                 && Number(runtime.owner_entindex) === Number(selectedUnit());
-            if (mapping.panel && managed) applyAbilityRuntime(mapping.panel, entry.ability);
+            if (mapping.panel) {
+                if (managed) applyAbilityRuntime(mapping.panel, entry.ability);
+                else restoreAbilityRuntime(mapping.panel);
+            }
         });
     }
 
@@ -2044,6 +2086,8 @@
             var abilityPanel = abilities.FindChildTraverse("Ability" + String(nodeIndex));
             if (!validPortraitPanel(abilityPanel) || belongsToLegacyHud(abilityPanel)) continue;
             restoreNativeAbilityHotkey(abilityPanel);
+            var clearMirror = customConfig.HandoffClearHotkey;
+            if (clearMirror) clearMirror(abilityPanel);
             ["SurvivalAbilityHotkey", "SurvivalUtilityHotkey"].forEach(function (labelId) {
                 var label = abilityPanel.FindChildTraverse
                     ? abilityPanel.FindChildTraverse(labelId) : null;
@@ -2101,10 +2145,15 @@
         },
         Shutdown: shutdownCombatContext
     };
-    function hotkeyForAbilityEntry(entry, unitName) {
+    function isPassiveAbility(abilityIndex) {
         var behavior = 0;
-        try { behavior = Number(Abilities.GetBehavior(entry.ability) || 0); } catch (error) {}
-        if ((behavior & 2) !== 0) return "";
+        try { behavior = Number(Abilities.GetBehavior(abilityIndex) || 0); } catch (error) {}
+        if ((behavior & 2) !== 0) return true;
+        try { if (Abilities.IsPassive && Abilities.IsPassive(abilityIndex)) return true; } catch (error) {}
+        return Number(abilityRuntime(abilityIndex).passive) === 1;
+    }
+    function hotkeyForAbilityEntry(entry, unitName) {
+        if (isPassiveAbility(entry.ability)) return "";
         var key = utilityHotkeys[entry.name] || "";
         if (!key && unitName === "npc_survival_builder_proxy") {
             var builderRuntime = abilityRuntime(entry.ability);
@@ -2160,9 +2209,13 @@
             var managed = Number(runtime.ability_entindex) === Number(entry.ability)
                 && Number(runtime.owner_entindex) === Number(unit);
             if (managed) applyAbilityRuntime(abilityPanel, entry.ability);
+            else restoreAbilityRuntime(abilityPanel);
 
             var key = hotkeyForAbilityEntry(entry, unitName);
-            if (!key) continue;
+            if (!key) {
+                if (isPassiveAbility(entry.ability)) suppressNativeAbilityHotkey(abilityPanel);
+                continue;
+            }
             if (!suppressNativeAbilityHotkey(abilityPanel)) {
                 complete = false;
                 continue;
@@ -2284,9 +2337,7 @@
         });
         var standardHotkeyIndex = 0;
         standard.forEach(function (entry) {
-            var behavior = 0;
-            try { behavior = Number(Abilities.GetBehavior(entry.ability) || 0); } catch (error) {}
-            entry.standardHotkeyIndex = (behavior & 2) !== 0
+            entry.standardHotkeyIndex = isPassiveAbility(entry.ability)
                 ? -1 : standardHotkeyIndex++;
         });
         return standard.concat(utility);
@@ -2319,9 +2370,7 @@
         var unit = selectedUnit();
         if (unit === undefined || unit < 0) return -1;
         var standard = visibleAbilityEntries(unit).filter(function (entry) {
-            var behavior = 0;
-            try { behavior = Number(Abilities.GetBehavior(entry.ability) || 0); } catch (error) {}
-            return !utilityHotkeys[entry.name] && (behavior & 2) === 0;
+            return !utilityHotkeys[entry.name] && !isPassiveAbility(entry.ability);
         });
         return standard[slot] === undefined ? -1 : standard[slot].ability;
     }
@@ -2573,22 +2622,19 @@
         if (fusionQueue && fusionQueue.Cast && fusionQueue.Cast(abilityIndex, unit)) return true;
         var researchName = String(runtime.ability_name || "");
         try { if (!researchName) researchName = Abilities.GetAbilityName(abilityIndex) || ""; } catch (error) {}
+        if (runtime.removed !== 1 && /^ability_research_/.test(researchName)) {
+            var production = GameUI.CustomUIConfig().SurvivalProductionHUD;
+            return !!(production && production.QueueResearch && production.QueueResearch(abilityIndex, unit));
+        }
+        if (runtime.removed === 1 || runtime.available === 0 || isPassiveAbility(abilityIndex)) {
+            $.Msg("[SURVIVAL_CAST][CLIENT] reject unavailable ability=", String(abilityIndex),
+                " available=", String(runtime.available), " status=", String(runtime.status_text || ""));
+            return false;
+        }
         // This dispatcher also owns native ability-button clicks after startup.
         if (researchName === "ability_building_blink" || researchName === "ability_destroy_arrow_tower") {
             var towerTools = GameUI.CustomUIConfig().SurvivalArrowTowerTools;
             return !!(towerTools && towerTools.TriggerAbility && towerTools.TriggerAbility(researchName, unit));
-        }
-        if (/^ability_research_/.test(researchName)) {
-            var production = GameUI.CustomUIConfig().SurvivalProductionHUD;
-            return !!(production && production.QueueResearch && production.QueueResearch(abilityIndex, unit));
-        }
-        if (runtime.removed === 1
-            || runtime.available === 0) {
-            $.Msg("[SURVIVAL_CAST][CLIENT] reject unavailable ability=", String(abilityIndex),
-                " available=", String(runtime.available),
-                " can_afford=", String(runtime.can_afford),
-                " status=", String(runtime.status_text || ""));
-            return false;
         }
         if (runtime.can_afford === 0) {
             // Never hard-reject from a replicated snapshot: it can be older than
@@ -2611,11 +2657,6 @@
             $.Msg("[SURVIVAL_CAST][CLIENT] reject selection_owner_mismatch selected=",
                 String(currentUnit), " runtime_owner=", String(unit),
                 " ability=", String(abilityIndex), " name=", name);
-            return false;
-        }
-        if ((behavior & 2) !== 0) {
-            $.Msg("[SURVIVAL_CAST][CLIENT] reject passive ability=", String(abilityIndex),
-                " name=", name, " behavior=", String(behavior));
             return false;
         }
         // Pickup uses the engine's point/AOE targeting cursor, including its

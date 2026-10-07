@@ -100,8 +100,8 @@
     function updateItemIcon(icon, contentId, itemName) {
         if(!icon)return;
         icon.itemname=itemName;
-        var art=GameUI.CustomUIConfig().SurvivalItemArt;
-        var resolved=art&&art.ResolveOriginal&&(art.ResolveOriginal(contentId)||art.ResolveOriginal(itemName));
+        var art=GameUI.CustomUIConfig().SurvivalNativeIcons;
+        var resolved=art&&(art.Resolve(contentId)||art.Resolve(itemName));
         var fitted=icon.FindChildTraverse("InventoryTooltipFittedIcon");
         if(resolved&&!fitted){
             fitted=$.CreatePanel("Image",icon,"InventoryTooltipFittedIcon");
@@ -112,7 +112,7 @@
         }
         if(fitted){
             fitted.visible=!!resolved;
-            if(resolved)fitted.SetImage("file://{images}/items/survival_shop_v2/"+resolved[0]+"_"+("0"+resolved[1]).slice(-2)+".png");
+            if(resolved)fitted.SetImage(resolved.uri);
         }
     }
     function equipmentLevelText(contentId, fallback) {
@@ -182,8 +182,9 @@
             if (field) addField(fields, field.label, field.value);
         });
         var quantity = Number(dynamic.quantity || 0);
+        var formatter = GameUI.CustomUIConfig().SurvivalNumberFormatter;
         setText("CustomInventoryItemStatus", quantity > 1
-            ? ("持有数量：" + String(quantity))
+            ? ("持有数量：" + (formatter && formatter.Format ? formatter.Format(quantity) : String(quantity)))
             : (contentId !== itemName ? "项目物品 · 实例数据已同步" : "背包物品"));
 
         var positioner = GameUI.CustomUIConfig().SurvivalTooltipPosition;
