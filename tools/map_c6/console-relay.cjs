@@ -21,10 +21,47 @@ function relayEndpoint() {
       const pidText = fs.readFileSync(pidPath, 'utf8').trim();
       if (!/^[a-f0-9]{48}$/.test(token) || !/^[1-9][0-9]{0,9}$/.test(pidText)) continue;
       process.kill(Number(pidText), 0); // Liveness check only; never stops a process.
-      return {port, token};
+      return {port, token, pid: Number(pidText)};
     } catch { /* No live local relay: retain the direct console transport. */ }
   }
   return null;
+}
+
+// Read-only control handshake. Used by Setup to choose a shared GUI endpoint;
+// no console command, backend credential or raw relay response is returned.
+function relayStatus(endpoint = relayEndpoint()) {
+  if (!endpoint) return Promise.resolve({relay_available: false});
+  const guiPort = Number(process.env.DOTA2_VCON_GUI_PORT || 29001);
+  if (!Number.isInteger(guiPort) || guiPort < 1 || guiPort > 65535 || guiPort === 29000) {
+    return Promise.resolve({relay_available: false});
+  }
+  return new Promise(resolve => {
+    let done = false, buffer = '';
+    const socket = net.createConnection({host: '127.0.0.1', port: endpoint.port});
+    const timer = setTimeout(() => finish({relay_available: false}), 1000);
+    function finish(value) {
+      if (done) return;
+      done = true; clearTimeout(timer); socket.destroy(); resolve(value);
+    }
+    socket.on('connect', () => socket.write('HELLO ' + endpoint.token + '\n'));
+    socket.on('error', () => finish({relay_available: false}));
+    socket.on('close', () => finish({relay_available: false}));
+    socket.on('data', bytes => {
+      buffer += bytes.toString('utf8');
+      if (buffer.length > 4096) { finish({relay_available: false}); return; }
+      for (const line of buffer.split('\n').slice(0, -1)) {
+        if (!line.trim() || line === 'OK') continue;
+        try {
+          const value = JSON.parse(line);
+          if (value?.type === 'hello-ok' && value.version === 1 && typeof value.dota === 'boolean') {
+            finish({relay_available: true, dota_connected: value.dota,
+              gui_port: guiPort, control_port: endpoint.port, pid: endpoint.pid});
+          } else finish({relay_available: false});
+        } catch { finish({relay_available: false}); }
+        return;
+      }
+    });
+  });
 }
 
 function sendRelay(options, endpoint) {
@@ -121,4 +158,4 @@ async function sendWithTransport(options, direct, endpoint = relayEndpoint()) {
   return direct(options);
 }
 
-module.exports = {relayEndpoint, sendRelay, sendWithTransport};
+module.exports = {relayEndpoint, relayStatus, sendRelay, sendWithTransport};

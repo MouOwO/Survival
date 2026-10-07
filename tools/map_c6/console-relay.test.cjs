@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const {execFile} = require('node:child_process');
 const {test} = require('node:test');
-const {relayEndpoint} = require('./console-relay.cjs');
+const {relayEndpoint,relayStatus} = require('./console-relay.cjs');
 
 async function mockRelay(t, action = 'success') {
   const commands = [], sockets = [];
@@ -118,4 +118,27 @@ test('discovery requires private local state and a live PID without creating a d
   fs.writeFileSync(path.join(directory,'relay.pid'),String(process.pid));
   fs.writeFileSync(path.join(directory,'relay.token'),'invalid\ncontrol text');
   assert.equal(relayEndpoint(),null);
+});
+
+for (const state of ['success','offline','deny']) {
+  test(`read-only relay status handles ${state} without commands or credentials`, async t => {
+    const relay = await mockRelay(t,state);
+    const result = await relayStatus(relay.endpoint);
+    assert.equal(result.relay_available,state !== 'deny');
+    if (state !== 'deny') assert.equal(result.dota_connected,state === 'success');
+    assert.deepEqual(relay.commands,[]);
+    assert.doesNotMatch(JSON.stringify(result),/a{48}|secret-server-message/);
+  });
+}
+
+test('read-only relay discovery is optional and rejects invalid GUI ports', async t => {
+  assert.deepEqual(await relayStatus(null),{relay_available:false});
+  const relay = await mockRelay(t);
+  const original=process.env.DOTA2_VCON_GUI_PORT;
+  process.env.DOTA2_VCON_GUI_PORT='29000';
+  assert.deepEqual(await relayStatus(relay.endpoint),{relay_available:false});
+  process.env.DOTA2_VCON_GUI_PORT='not-a-port';
+  assert.deepEqual(await relayStatus(relay.endpoint),{relay_available:false});
+  if(original===undefined) delete process.env.DOTA2_VCON_GUI_PORT;
+  else process.env.DOTA2_VCON_GUI_PORT=original;
 });

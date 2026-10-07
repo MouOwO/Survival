@@ -1,13 +1,14 @@
 # 新电脑复制与局域网联调
 
-更新：2026-09-26。适用于 Windows 上的 `survival/template_map` Workshop Tools 测试，后端为现有阿里云测试环境。
+更新：2026-10-07。适用于 Windows 上的 `survival/template_map` Workshop Tools 测试，后端为现有阿里云测试环境。
 
 ## 当前推荐：直接从 Hammer 开组队房
 
 1. 主机完成本机 Setup/OnlineCheck，并双击 `setup_hammer_backend.cmd` 安装或重新启用助手。
    之前 LAN 启动器可能暂停过它；只安装过一次不代表现在还在运行。
-2. 保存地图，退出旧 Dota 测试进程。主机关闭 VConsole GUI，避免与认证助手争用 29000；
-   不需要关闭 Hammer。由 Hammer 运行正式 `template_map`。
+2. 保存地图，正常结束旧测试后，由 Hammer 运行正式 `template_map`。
+   新版 Setup 自动修复 VConsole 连接设置和设备数组计数；有 MCP 时 GUI 共享 relay，
+   无 MCP 时助手直接连接，GUI 不自动占用 29000。修复已有游戏不要求重启 Dota。
 3. 新局显示“组队等待”，列出已连接玩家，不自动开始。房主先等其他电脑加入。
 4. 加入者使用下面的冷启动对照入口 `join_lan_game.cmd`，输入主机局域网 IPv4；
    不先在加入者上运行自己的地图，不用安装主机认证助手。
@@ -28,6 +29,28 @@ Panorama 行为测试、94 项 Python 相关回归通过，界面源码已同步
 此功能涉及游戏 Lua 和编译 UI，其他电脑必须同步完整相关 game 更新，不能只覆盖工具 ZIP。
 Git commit/push 本身不是联机条件；它只便于各电脑同步同一版本。手动同步同一组运行文件
 也可以联调。该自定义组队按钮仅在 Tools 测试启用，正常游廊使用官方大厅先组队再开局。
+
+### 反复要求运行 setup_hammer_backend 的修复
+
+2026-10-07 已确认一类本机连接故障：VConsole 直连占用 29000，保存的共享设备
+还可能被错误的 Qt `Devices/size` 隐藏。窗口已打开、CMD 已运行或助手任务为 Running
+都不能保证认证已经执行。新版 Setup 会自动调整本机设置，保留远端设备和当前游戏。
+详细证据与检查命令见 [HAMMER_BACKEND_RECONNECT.md](HAMMER_BACKEND_RECONNECT.md)。
+
+其他电脑更新方式：同步本次工具版本，或把
+`output/test_host_bundle/goufayu_test_host_tools.zip` 完整解压覆盖各自实际 `survival`
+addon 根目录。包包含 Python 解释器发现脚本和控制台修复器，不依赖开发机盘符，
+不包含 `.venv`、私钥、token 或完整游戏资源。所有参与电脑仍需一致的正式游戏资源。
+
+- **另一台开房主机**：先按本文配置本机后端环境并通过 OnlineCheck，然后运行
+  `setup_hammer_backend.cmd`。不需要安装 Codex/MCP；需要本机 Node.js、Python 和 SSH 凭据。
+- **只加入房间的电脑**：加入已经配置好的主机即可，不运行 Hammer 后端 Setup，
+  不接收主机密钥或 token。主机为所有已加入的真实玩家执行认证。
+
+主机通过 `tools/setup_hammer_backend.ps1 -Action Status` 查看实际状态。
+`waiting_for_party` 表示等待房主开始；开始加载后应出现 `authentication_applied`，
+随后 `connected`，认证人数应等于参与人数。连接修复已经在当前开发机验证；
+另一台实体电脑的本轮入场仍需实际确认，不能把可分发工具包视为双机验收结果。
 
 ### 2026-09-26 双机连接崩溃排查记录
 

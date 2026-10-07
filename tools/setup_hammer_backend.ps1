@@ -5,14 +5,34 @@ $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $python = Resolve-SurvivalBackendPython -RepoRoot $repo
 $bridge = Join-Path $PSScriptRoot 'hammer_backend_bridge.py'
 $runner = Join-Path $PSScriptRoot 'run_hammer_backend.ps1'
+$consoleRepair = Join-Path $PSScriptRoot 'repair_hammer_console.ps1'
 $powershell = Join-Path $env:SystemRoot 'System32/WindowsPowerShell/v1.0/powershell.exe'
 $taskName = 'Goufayu-Hammer-Test-Backend'
 $arguments = '-NoLogo -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $runner + '"'
 $stopFile = Join-Path $repo 'output/hammer_backend/bridge.stop'
 $user = [Security.Principal.WindowsIdentity]::GetCurrent().Name
 
-foreach ($path in @($python, $powershell, $bridge, $runner)) {
+foreach ($path in @($python, $powershell, $bridge, $runner, $consoleRepair)) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw 'Local backend Python or bridge is missing.' }
+}
+function Repair-ConsoleConnection {
+    if (-not (Get-Command node.exe -CommandType Application -ErrorAction SilentlyContinue)) {
+        throw 'Node.js is required by the console helper. Install Node.js and rerun Setup.'
+    }
+    & $consoleRepair -Action Repair
+}
+function Show-BridgeStatus {
+    $statusFile = Join-Path $repo 'output/hammer_backend/bridge_status.json'
+    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    while (Test-Path -LiteralPath $statusFile) {
+        try { $state = Get-Content -LiteralPath $statusFile -Raw | ConvertFrom-Json }
+        catch { break }
+        if ($state.status -ne 'stopped' -or [DateTime]::UtcNow -ge $deadline) { break }
+        Start-Sleep -Milliseconds 250
+    }
+    & $python -B $bridge status
+    Write-Output 'connected means a live game connection; waiting_for_party means the host has not started loading.'
+    Write-Output 'A start request alone does not confirm game authentication. Use -Action Status to inspect it.'
 }
 $existing = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
 if ($existing) {
@@ -36,6 +56,7 @@ function Stop-BridgeGracefully {
 }
 switch ($Action) {
     'Install' {
+        Repair-ConsoleConnection
         # A manual resident helper can own the instance lock even when the
         # scheduled task is Ready or missing. Drain it before removing STOP.
         Stop-BridgeGracefully
@@ -51,18 +72,22 @@ switch ($Action) {
         Start-ScheduledTask -TaskName $taskName
         Write-Output 'HAMMER_BACKEND_INSTALLED: hidden current-user helper starts at Windows sign-in.'
         Write-Output 'Hammer Run Map remains the entry point. The helper connects only survival/template_map Tools sessions.'
+        Show-BridgeStatus
     }
     'Start' {
         if (-not $existing) { throw 'Run Install first.' }
+        Repair-ConsoleConnection
         Stop-BridgeGracefully
         Remove-Item -LiteralPath $stopFile -Force -ErrorAction SilentlyContinue
         Enable-ScheduledTask -TaskName $taskName | Out-Null
         Start-ScheduledTask -TaskName $taskName
         Write-Output 'HAMMER_BACKEND_START_REQUESTED'
+        Show-BridgeStatus
     }
     'Status' {
         if ($existing) { Write-Output ('Scheduled task: ' + $existing.State) }
         else { Write-Output 'Scheduled task: not installed' }
+        & $consoleRepair -Action Check
         & $python -B $bridge status
     }
     'Stop' {
