@@ -3,7 +3,8 @@
     var controllerConfig=GameUI.CustomUIConfig();
     var controllerEpoch=(Number(controllerConfig.SurvivalGridControllerEpoch)||0)+1;
     controllerConfig.SurvivalGridControllerEpoch=controllerEpoch;
-    var framePerformance={frames:0,max_total_ms:0,max_camera_ms:0,max_range_ms:0,max_state_ms:0};
+    var framePerformance={frames:0,max_total_ms:0,max_camera_ms:0,max_range_ms:0,max_grid_ms:0,max_state_ms:0,
+        max_input_ms:0,max_complete_ms:0};
     controllerConfig.SurvivalGridFramePerformance=framePerformance;
     function currentController(){return controllerConfig.SurvivalGridControllerEpoch===controllerEpoch;}
 
@@ -257,7 +258,9 @@
     }
     if(staticGrid && sharedConfig.SurvivalGridState) {
         gridState=sharedConfig.SurvivalGridState.create({
-            visibleBounds:function(){return staticGrid.visibleBounds ? staticGrid.visibleBounds() : null;},
+            visibleBounds:function(){return staticGrid.drawBounds ? staticGrid.drawBounds()
+                : staticGrid.visibleBounds ? staticGrid.visibleBounds() : null;},
+            coverageKey:function(){return staticGrid.coverageKey ? staticGrid.coverageKey() : "";},
             terrainHost:$("#GridPlacementTerrain"),dynamicHost:cellHost,footHost:$("#GridPlacementFootprintTiles"),
             // Behind-camera/offscreen plane geometry must never fall back to
             // thousands of engine WorldToScreen calls while the camera pans.
@@ -274,8 +277,12 @@
     }
     function warmStaticGrid() {
         if(!currentController()) return;
-        if (staticGrid && !activeProfile) staticGrid.warm();
-        if (gridState && !activeProfile) {projectionCache={};projectionCacheSize=0;gridState.warm();}
+        if (staticGrid && !activeProfile) {
+            if(staticGrid.prewarm) staticGrid.prewarm();else staticGrid.warm();
+        }
+        if (gridState && !activeProfile) {
+            if(gridState.prewarmTerrain) gridState.prewarmTerrain();else gridState.warm();
+        }
         $.Schedule(profileCount ? 0.10 : 0.25,warmStaticGrid);
     }
     $.Schedule(0.1,warmStaticGrid);
@@ -1163,6 +1170,7 @@
 
     function updateLoop() {
         if(!currentController()) return;
+        var loopStarted=Date.now();
         // Keep input/validation alive even if a visual API rejects a frame.
         $.Schedule(0.035, updateLoop);
         if (pendingRelocationStart) {
@@ -1197,6 +1205,7 @@
             && !pendingRelocation && rejectRelocationCooldown(activeAbility)) return;
         if (activeProfile) {
             var frameStarted=Date.now();
+            framePerformance.max_input_ms=Math.max(framePerformance.max_input_ms,frameStarted-loopStarted);
             renderCursorIcon();
             if(staticGrid && staticGrid.enabled()) staticGrid.refreshView();
             var cameraFinished=Date.now();
@@ -1209,6 +1218,7 @@
                     requestValidation(world);
                 }
                 renderCursorRange(world);
+                var gridStarted=Date.now();
                 if (staticGrid) staticGrid.update(world,true);
                 var rangeFinished=Date.now();
                 if(gridState) {
@@ -1224,6 +1234,7 @@
                 framePerformance.max_total_ms=Math.max(framePerformance.max_total_ms,statesFinished-frameStarted);
                 framePerformance.max_camera_ms=Math.max(framePerformance.max_camera_ms,cameraFinished-frameStarted);
                 framePerformance.max_range_ms=Math.max(framePerformance.max_range_ms,rangeFinished-cameraFinished);
+                framePerformance.max_grid_ms=Math.max(framePerformance.max_grid_ms,rangeFinished-gridStarted);
                 framePerformance.max_state_ms=Math.max(framePerformance.max_state_ms,statesFinished-rangeFinished);
                 if (fastMotion) {
                     if(!gridState) setStyle(cellHost,"opacity","0.0000");
@@ -1240,6 +1251,7 @@
                 renderCursorIcon();
             }
         }
+        framePerformance.max_complete_ms=Math.max(framePerformance.max_complete_ms,Date.now()-loopStarted);
     }
 
     function onProfiles(data) {

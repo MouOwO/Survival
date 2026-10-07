@@ -31,7 +31,9 @@ for(const file of ['survival_static_grid.js','survival_grid_state.js','survival_
     if(process.env.GRID_LEGACY_HELPERS==='1' && file!=='survival_grid_placement.js') {
         const api=file==='survival_static_grid.js'?shared.SurvivalStaticGrid:shared.SurvivalGridState;
         const create=api.create;
-        api.create=options=>{const instance=create(options);delete instance.configureLayout;delete instance.visibleBounds;return instance;};
+        api.create=options=>{const instance=create(options);
+            for(const method of ['configureLayout','visibleBounds','drawBounds','coverageKey','prewarm','prewarmTerrain']) delete instance[method];
+            return instance;};
     }
 }
 listeners.ui_grid_placement_profiles({cell_size:64,static_grid:{height:384,

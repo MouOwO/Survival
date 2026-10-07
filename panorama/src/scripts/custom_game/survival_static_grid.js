@@ -2,7 +2,8 @@
     "use strict";
 
     // Pure plane geometry. The white grid has no dependency on validation,
-    // cursor position, units, terrain scans or server preview packets.
+    // units, terrain scans or server preview packets. Cursor motion only
+    // selects a buffered patch; geometry stays anchored to world coordinates.
     function geometry(layout, size) {
         var b=layout && layout.bounds;
         if (!b || !(size>0)) return null;
@@ -109,12 +110,14 @@
 
     function create(options) {
         var mesh=null,view=null,viewKey="",worldKey="",width=0,height=0;
-        var lines=[],marks=[],screenLines=[],screenMarks=[],revision=0;
+        var lines=[],marks=[],screenLines=[],screenMarks=[],revision=0,drawRevision=0;
+        var lineByKey={},markByKey={},freeLines=[],freeMarks=[];
+        var coverage=null,coverageKey="",geometryKey="",markStride=1,lodRevision=-1;
         var visual={},configured=false;
         var laidOutRevision=-1,laidOutLines=0,laidOutMarks=0;
         var mask=options.mask,host=options.host,outline=options.outline,planeRange=false;
         var set=options.setStyle;
-        var stats={geometry_builds:0,view_builds:0,layout_writes:0,mask_updates:0,line_panels:0,mark_panels:0,reference_rebases:0,corner_candidates:0};
+        var stats={geometry_builds:0,view_builds:0,layout_writes:0,mask_updates:0,line_panels:0,mark_panels:0,reference_rebases:0,corner_candidates:0,coverage_builds:0,visible_lines:0,visible_marks:0,mark_stride:1};
         var reportedState="";
         function report(state, details) {
             stats.state=state;
@@ -126,11 +129,11 @@
         function allocate(lineTarget,markTarget,budget) {
             while (lines.length<lineTarget && budget-->0) {
                 var line=$.CreatePanel("Panel",host,"StaticGridLine"+lines.length);
-                line.AddClass("StaticGridLine"); line.hittest=false; line.visible=false; lines.push(line);
+                line.AddClass("StaticGridLine"); line.hittest=false; line.visible=false; lines.push(line);freeLines.push(line);
             }
             while (marks.length<markTarget && budget-->0) {
                 var mark=$.CreatePanel("Panel",host,"StaticGridMark"+marks.length);
-                mark.AddClass("StaticGridMark"); mark.hittest=false; mark.visible=false; marks.push(mark);
+                mark.AddClass("StaticGridMark"); mark.hittest=false; mark.visible=false; marks.push(mark);freeMarks.push(mark);
             }
             stats.line_panels=lines.length; stats.mark_panels=marks.length;
         }
@@ -145,6 +148,26 @@
                 Math.min.apply(Math,corners.map(function(p){return p[1];})),
                 Math.max.apply(Math,corners.map(function(p){return p[0];})),
                 Math.max.apply(Math,corners.map(function(p){return p[1];}))];
+        }
+        function selectCoverage(world) {
+            if(!mesh || !world || !isFinite(world[0]) || !isFinite(world[1])) return;
+            var radius=Number(visual.radius),block=mesh.size*8;
+            if(!(radius>0)) return;
+            if(coverage && coverage.radius===radius && Math.abs(world[0]-coverage.x)<=block/2
+                && Math.abs(world[1]-coverage.y)<=block/2) return;
+            var x=Math.round(world[0]/block)*block,y=Math.round(world[1]/block)*block;
+            // Keep an extra half-block beyond the recenter threshold. Moving
+            // the mask inside the patch requires no grid projection/layout.
+            var extent=radius+block;
+            coverage={x:x,y:y,radius:radius,bounds:[x-extent,y-extent,x+extent,y+extent]};
+            coverageKey=x+":"+y+":"+extent;stats.coverage_builds++;
+        }
+        function drawBounds() {
+            var visible=visibleBounds(),patch=coverage && coverage.bounds;
+            if(!patch) return visible;
+            if(!visible) return patch;
+            return [Math.max(visible[0],patch[0]),Math.max(visible[1],patch[1]),
+                Math.min(visible[2],patch[2]),Math.min(visible[3],patch[3])];
         }
         function refreshView() {
             if (!mesh) return;
@@ -182,14 +205,24 @@
             width=viewport[0];height=viewport[1];viewKey=key;worldKey="";revision++;
             stats.view_builds++;
             set(host,"width",width.toFixed(2)+"px");set(host,"height",height.toFixed(2)+"px");
+        }
+        function refreshGeometry() {
+            if(!view) return;
+            var next=revision+":"+coverageKey;
+            if(geometryKey===next) return;
+            geometryKey=next;drawRevision++;
             screenLines=[];screenMarks=[];
+            var patch=coverage && coverage.bounds;
             for (var i=0;i<mesh.segments.length;i++) {
-                var clipped=segment(view,mesh.segments[i],width,height);
-                if (clipped) screenLines.push(clipped);
+                var line=mesh.segments[i];
+                if(patch && (Math.max(line[0],line[2])<patch[0] || Math.min(line[0],line[2])>patch[2]
+                    || Math.max(line[1],line[3])<patch[1] || Math.min(line[1],line[3])>patch[3])) continue;
+                var clipped=segment(view,line,width,height);
+                if (clipped) screenLines.push({key:"l"+i,points:clipped});
             }
             // Full-map geometry is cheap; never project 263,169 offscreen marks
             // when the camera moves. Only inspect the visible world rectangle.
-            var bounds=visibleBounds(),x0=0,y0=0,x1=mesh.xs.length-1,y1=mesh.ys.length-1;
+            var bounds=drawBounds(),x0=0,y0=0,x1=mesh.xs.length-1,y1=mesh.ys.length-1;
             if(bounds) {
                 x0=Math.max(0,Math.floor((bounds[0]-mesh.xs[0])/mesh.size));
                 y0=Math.max(0,Math.floor((bounds[1]-mesh.ys[0])/mesh.size));
@@ -197,41 +230,59 @@
                 y1=Math.min(y1,Math.ceil((bounds[3]-mesh.ys[0])/mesh.size));
             }
             // Bound work before enumeration, including a camera near the horizon.
-            var candidateCount=Math.max(0,x1-x0+1)*Math.max(0,y1-y0+1);
-            var markStep=Math.max(1,Math.ceil(Math.sqrt(candidateCount/4096)));
+            // Only decoration density changes. World-aligned grid lines and
+            // exact footprint cells retain every 64-unit boundary. Hysteresis
+            // keeps nearby zoom values from repeatedly changing the stride.
+            if(lodRevision!==revision) {
+                var cameraBounds=visibleBounds(),lodCount=mesh.xs.length*mesh.ys.length;
+                if(cameraBounds) {
+                    var lx0=Math.max(0,Math.floor((cameraBounds[0]-mesh.xs[0])/mesh.size));
+                    var ly0=Math.max(0,Math.floor((cameraBounds[1]-mesh.ys[0])/mesh.size));
+                    var lx1=Math.min(mesh.xs.length-1,Math.ceil((cameraBounds[2]-mesh.xs[0])/mesh.size));
+                    var ly1=Math.min(mesh.ys.length-1,Math.ceil((cameraBounds[3]-mesh.ys[0])/mesh.size));
+                    lodCount=Math.max(0,lx1-lx0+1)*Math.max(0,ly1-ly0+1);
+                }
+                while(lodCount>576*markStride*markStride) markStride++;
+                while(markStride>1 && lodCount<384*(markStride-1)*(markStride-1)) markStride--;
+                lodRevision=revision;
+            }
+            var markStep=markStride;
             x0=Math.ceil(x0/markStep)*markStep;y0=Math.ceil(y0/markStep)*markStep;
             stats.corner_candidates=0;
             for (var xi=x0;xi<=x1;xi+=markStep) for (var yi=y0;yi<=y1;yi+=markStep) {
                 stats.corner_candidates++;
                 var p=point(view,mesh.xs[xi],mesh.ys[yi]);
                 if (p && p[0]>=-4 && p[0]<=width+4 && p[1]>=-4 && p[1]<=height+4)
-                    screenMarks.push({x:p[0],y:p[1],gx:xi,gy:yi});
+                    screenMarks.push({key:"m"+xi+":"+yi,x:p[0],y:p[1]});
             }
-            // Only corner glyphs get a zoomed-out LOD. All 64-unit grid lines
-            // remain intact. Never instantiate thousands of offscreen cells.
-            if (screenMarks.length>2048) {
-                var stride=Math.ceil(Math.sqrt(screenMarks.length/2048));
-                screenMarks=screenMarks.filter(function(p){return p.gx%stride===0 && p.gy%stride===0;});
-            }
+            stats.visible_lines=screenLines.length;stats.visible_marks=screenMarks.length;stats.mark_stride=markStride;
         }
 
+        function layoutSet(items,byKey,free,isLine) {
+            var wanted={};
+            for(var i=0;i<items.length;i++) wanted[items[i].key]=true;
+            Object.keys(byKey).forEach(function(key){
+                if(wanted[key]) return;
+                var old=byKey[key];old.visible=false;free.push(old);delete byKey[key];
+            });
+            for(var j=0;j<items.length;j++) {
+                var item=items[j],panel=byKey[item.key];
+                if(!panel) {
+                    panel=free.pop();if(!panel) continue;
+                    byKey[item.key]=panel;panel.__revision=-1;panel.__gridKey=item.key;
+                }
+                if(panel.__revision!==revision) {
+                    if(isLine) options.positionSegment(panel,item.points[0],item.points[1],2);
+                    else set(panel,"position",(item.x-4).toFixed(2)+"px "+(item.y-4).toFixed(2)+"px 0px");
+                    panel.__revision=revision;stats.layout_writes++;
+                }
+                panel.visible=true;
+            }
+        }
         function layout() {
-            if (laidOutRevision===revision && laidOutLines===lines.length && laidOutMarks===marks.length) return;
-            for (var i=0;i<lines.length;i++) {
-                var line=lines[i],s=screenLines[i];
-                if (!s) { if(line.visible)line.visible=false; continue; }
-                if (line.__revision===revision) continue;
-                options.positionSegment(line,s[0],s[1],2);
-                line.visible=true;line.__revision=revision;stats.layout_writes++;
-            }
-            for (var j=0;j<marks.length;j++) {
-                var mark=marks[j],p=screenMarks[j];
-                if (!p) { if(mark.visible)mark.visible=false; continue; }
-                if (mark.__revision===revision) continue;
-                set(mark,"position",(p.x-4).toFixed(2)+"px "+(p.y-4).toFixed(2)+"px 0px");
-                mark.visible=true;mark.__revision=revision;stats.layout_writes++;
-            }
-            laidOutRevision=revision;laidOutLines=lines.length;laidOutMarks=marks.length;
+            if (laidOutRevision===drawRevision && laidOutLines===lines.length && laidOutMarks===marks.length) return;
+            layoutSet(screenLines,lineByKey,freeLines,true);layoutSet(screenMarks,markByKey,freeMarks,false);
+            laidOutRevision=drawRevision;laidOutLines=lines.length;laidOutMarks=marks.length;
         }
 
         function configure(data,size,settings) {
@@ -247,9 +298,9 @@
             }
             mask.AddClass("StaticGridActive");
             var key=JSON.stringify([data,size,settings.grid_z_offset]);
-            if (mesh && mesh.key===key && configured) return true;
+            if (mesh && mesh.key===key && configured) {visual=settings;return true;}
             mesh=next;mesh.key=key;mesh.height+=Number(settings.grid_z_offset)||0;
-            visual=settings;viewKey="";worldKey="";configured=true;
+            visual=settings;viewKey="";worldKey="";geometryKey="";coverage=null;coverageKey="";markStride=1;configured=true;
             stats.geometry_builds++;mask.visible=false;
             return true;
         }
@@ -257,15 +308,19 @@
         function warm() {
             if (!configured) return;
             refreshView();
-            allocate(Math.max(128,screenLines.length),Math.max(1024,screenMarks.length),32);
+            if(!coverage && options.referenceWorld) selectCoverage(options.referenceWorld());
+            refreshGeometry();
+            allocate(Math.max(128,screenLines.length),Math.max(640,screenMarks.length),32);
             layout();
         }
+        function prewarm() {if(configured) allocate(128,640,32);}
 
         function update(world,viewIsCurrent) {
             if (!world) {mask.visible=false;if(outline) outline.visible=false;return;}
             if (!configured) {mask.visible=true;return;}
             if(!viewIsCurrent) refreshView();
             if (!view) return;
+            selectCoverage(world);refreshGeometry();
             allocate(screenLines.length,screenMarks.length,32);layout();
             var key=world[0]+":"+world[1]+":"+visual.radius+":"+viewKey;
             if (worldKey!==key) {
@@ -302,9 +357,9 @@
                 matrix:view.matrix});
         }
 
-        return {configure:configure,warm:warm,update:update,hide:function(){mask.visible=false;if(outline)outline.visible=false;},
+        return {configure:configure,warm:warm,prewarm:prewarm,update:update,hide:function(){mask.visible=false;if(outline)outline.visible=false;},
             setPlaneRange:function(enabled){planeRange=enabled;return !!outline;},
-            refreshView:refreshView,visibleBounds:visibleBounds,
+            refreshView:refreshView,visibleBounds:visibleBounds,drawBounds:drawBounds,coverageKey:function(){return coverageKey;},
             worldAtScreen:function(screen){
                 var world=configured && screen ? unproject(view,screen[0],screen[1]) : null;
                 return world ? [world[0],world[1],mesh.height-(Number(visual.grid_z_offset)||0)] : null;

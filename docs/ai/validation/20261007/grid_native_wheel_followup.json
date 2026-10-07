@@ -1,0 +1,121 @@
+{
+  "date": "2026-10-07",
+  "kind": "native_wheel_preview_followup",
+  "status": "preview_only_stutter_reported_by_user; cause_not_fully_isolated",
+  "user_control": "Same position: mouse wheel zoom-in is smooth after cancelling preview, stutters during preview.",
+  "rejected_trial": {
+    "result": "User reported no stutter improvement and visual displacement of blocked red areas.",
+    "cleanup": "Rolled back fixed-size quad/scale3d transforms and camera-triggered high-frequency updates; restored square clip frame with original position/width/height projection.",
+    "native_wheel": "Temporary server camera target was released; wheel zoom remains native and unlocked."
+  },
+  "final_changes": [
+    "Buffered world-aligned grid retention, camera-only corner LOD, red-run spatial culling and allocation-only hidden prewarm.",
+    "Identical dynamic area delivery renews freshness without decoding/rebuilding/invalidation; changed payloads and late static atlas/bounds still rebuild.",
+    "Measure input polling and complete UI callback in addition to existing camera/grid/state timings.",
+    "Guard new prewarm and viewport methods during mixed-version Panorama hot reload."
+  ],
+  "display_capture": {
+    "tool": "Intel PresentMon 2.6.0 standalone console",
+    "source": "https://github.com/GameTechDev/PresentMon",
+    "map": "template_map",
+    "process_id": 22672,
+    "viewport": [
+      1600,
+      900
+    ],
+    "frames": 1381,
+    "present_mode": [
+      "Composed: Flip"
+    ],
+    "sync_interval": [
+      "1"
+    ],
+    "ms_between_presents": {
+      "samples": 1381,
+      "p50": 8.9771,
+      "p95": 30.1447,
+      "p99": 36.8694,
+      "max": 93.54910000000001
+    },
+    "ms_between_display_changes": {
+      "samples": 1381,
+      "p50": 9.9998,
+      "p95": 19.9937,
+      "p99": 20.2364,
+      "max": 99.9863
+    },
+    "ms_cpu_busy": {
+      "samples": 1381,
+      "p50": 4.7026,
+      "p95": 26.0079,
+      "p99": 33.1738,
+      "max": 93.3014
+    },
+    "ms_gpu_busy": {
+      "samples": 1381,
+      "p50": 4.4976,
+      "p95": 6.7117,
+      "p99": 7.6642,
+      "max": 9.6451
+    },
+    "ms_gpu_time": {
+      "samples": 1381,
+      "p50": 8.3538,
+      "p95": 10.1049,
+      "p99": 13.4343,
+      "max": 28.0144
+    },
+    "inference": "Long CPU-stage intervals are a lead. This unsegmented capture does not attribute the stalls to a particular preview component.",
+    "limits": [
+      "No complete no-preview/preview matched capture; subsequent attempts stopped when foreground was lost.",
+      "First records may include capture startup/focus changes. Whole-capture percentiles are not a before/after optimization benchmark.",
+      "UI callback gaps and Date.now timings are not display frame times.",
+      "Native VProf report includes a timing validity warning; not used as a root-cause conclusion."
+    ]
+  },
+  "dynamic_cache_validation": {
+    "test": "tools/test_grid_dynamic_cache.cjs",
+    "identical_deliveries": 200,
+    "decodes": 1,
+    "overlay_builds": 1,
+    "additional_native_callback_max_observed_ms": 1,
+    "interpretation": "Removes redundant work; its measured callback duration alone does not explain all reported stutter.",
+    "covers": [
+      "Freshness renewal, expiry and same-data refresh",
+      "Changed blockers",
+      "Invalid payload preserves valid key",
+      "Late static atlas and changed build bounds"
+    ]
+  },
+  "checks": [
+    "test_static_grid.cjs",
+    "test_grid_state.cjs",
+    "test_grid_static_integration.cjs",
+    "test_grid_zoom_layout.cjs",
+    "test_grid_dynamic_cache.cjs",
+    "test_grid_placement_client.cjs",
+    "test_grid_mask.cjs",
+    "test_building_move_grid.cjs",
+    "GRID_LEGACY_HELPERS=1 test_grid_static_integration.cjs"
+  ],
+  "compilation": {
+    "scripts": 3,
+    "failures": 0,
+    "temporary_probe_in_final_resources": false
+  },
+  "sources": {
+    "survival_static_grid": {
+      "source_sha256": "ba2661b3ab3720028eb0262b53da9bd03062217076f31e9bf097e9c9997e8cab",
+      "compiled_sha256": "94677eb36f146cd50fb02c7152aace3b0aa24d0084f6b2e2a3f7b31ba4813327"
+    },
+    "survival_grid_state": {
+      "source_sha256": "055306d6772c16bfde028a56d0950cbc9ab9987142ae325e5ff9168a54e6bcdc",
+      "compiled_sha256": "82b0d8f72194e09f0070ed2e8855cc507d73705fd5cb9270bbcbf67cfb2ec914"
+    },
+    "survival_grid_placement": {
+      "source_sha256": "910e43c3e12a32c134f634584a0f0d6ab8c3dbd9655ca1469bfd07fead2cf4a6",
+      "compiled_sha256": "868132d174eda4d9790bbb005fa2dd502523a4fdd656bfe34676436af28b2a82"
+    }
+  },
+  "remaining": "Need a valid native-wheel matched display-frame capture with Dota continuously foreground to isolate preview UI / range particle / preview model costs. No claim that all stutter is fixed."
+}

@@ -56,13 +56,45 @@
         return "radial("+(100*center[0]/width).toFixed(6)+"% "+(100*center[1]/height).toFixed(6)+
             "%,"+start.toFixed(6)+"deg,"+span.toFixed(6)+"deg)";
     }
+    function runIndex(rects,bucketSize) {
+        var buckets={},bounds=null,size=Math.max(512,Number(bucketSize)||512);
+        for(var i=0;i<rects.length;i++) {
+            var r=rects[i];
+            if(!bounds) bounds=r.slice();
+            else bounds=[Math.min(bounds[0],r[0]),Math.min(bounds[1],r[1]),Math.max(bounds[2],r[2]),Math.max(bounds[3],r[3])];
+            for(var x=Math.floor(r[0]/size);x<=Math.floor(r[2]/size);x++)
+                for(var y=Math.floor(r[1]/size);y<=Math.floor(r[3]/size);y++) {
+                    var key=x+":"+y;if(!buckets[key]) buckets[key]=[];buckets[key].push(i);
+                }
+        }
+        return {buckets:buckets,bounds:bounds,size:size,rects:rects};
+    }
+    function visibleRuns(index,visible) {
+        if(!index || !index.bounds) return [];
+        var b=index.bounds,r=visible?[Math.max(visible[0],b[0]),Math.max(visible[1],b[1]),
+            Math.min(visible[2],b[2]),Math.min(visible[3],b[3])]:b;
+        var seen={},selected=[];
+        if(r[2]<r[0] || r[3]<r[1]) return selected;
+        for(var x=Math.floor(r[0]/index.size);x<=Math.floor(r[2]/index.size);x++)
+            for(var y=Math.floor(r[1]/index.size);y<=Math.floor(r[3]/index.size);y++) {
+                var ids=index.buckets[x+":"+y]||[];
+                for(var i=0;i<ids.length;i++) {
+                    var id=ids[i],q=index.rects[id];
+                    if(seen[id] || q[2]<r[0] || q[0]>r[2] || q[3]<r[1] || q[1]>r[3]) continue;
+                    seen[id]=true;selected.push(id);
+                }
+            }
+        return selected;
+    }
     function create(options) {
         var atlas=null,redRuns=[],terrain=[],foot=[],marks=[],dynamic=null,dynamicUntil=0;
-        var dynamicRuns=[],dynamicPanels=[],dynamicRevision=0;
+        var dynamicRuns=[],dynamicPanels=[],dynamicRevision=0,dynamicSource="";
         var viewKey="",revision=0,footKey="",atlasSource="",drawKey="";
         var buildBounds=null,outsideRuns=[],outsidePanels=[],outsideZ=0,layoutKey="";
         var visibleWorld=null;
-        var stats={terrain_builds:0,terrain_layouts:0,footprint_layouts:0,terrain_panels:0,footprint_panels:0};
+        var terrainIndex=runIndex([]),dynamicIndex=runIndex([]),lastTerrain=[],lastDynamic=[],terrainVersion=0;
+        var stats={terrain_builds:0,terrain_layouts:0,footprint_layouts:0,terrain_panels:0,footprint_panels:0,terrain_candidates:0,
+            dynamic_decodes:0,dynamic_builds:0,dynamic_reuses:0};
         function newPanel(host,kind) {
             var p=$.CreatePanel("Panel",host,"");p.hittest=false;p.visible=false;
             p.AddClass("GridStateQuad");p.AddClass(kind);
@@ -113,7 +145,7 @@
             if(dynamic) rebuildDynamic();
         }
         function warm() {
-            var next=options.cameraKey(),budget=24;
+            var camera=options.cameraKey(),next=camera+":"+(options.coverageKey?options.coverageKey():""),budget=24;
             if(next!==viewKey) {viewKey=next;revision++;footKey="";}
             var nextDraw=revision+":"+dynamicRevision;
             if(drawKey===nextDraw && terrain.length>=redRuns.length && dynamicPanels.length>=dynamicRuns.length) return;
@@ -134,22 +166,36 @@
                 outer.__revision=revision;
             }
             while(terrain.length<redRuns.length && budget-->0) terrain.push(newPanel(options.terrainHost,"TerrainBlocked"));
-            for(var i=0;i<terrain.length;i++) {
-                var p=terrain[i];
-                if(i>=redRuns.length) {p.visible=false;continue;}
-                if(p.__revision===revision) continue;
-                paint(p,redRuns[i],atlas.z+options.zOffset());p.__revision=revision;stats.terrain_layouts++;
+            var candidates=visibleRuns(terrainIndex,visible),wanted={};
+            stats.terrain_candidates=candidates.length;
+            for(var c=0;c<candidates.length;c++) wanted[candidates[c]]=true;
+            for(var t=0;t<lastTerrain.length;t++) {
+                var old=lastTerrain[t];if(!wanted[old] && terrain[old]) terrain[old].visible=false;
             }
+            for(var i=0;i<candidates.length;i++) {
+                var id=candidates[i],p=terrain[id];if(!p) continue;
+                var paintKey=camera+":"+terrainVersion;
+                if(p.__paintKey!==paintKey) {
+                    paint(p,redRuns[id],atlas.z+options.zOffset());p.__paintKey=paintKey;p.__paintVisible=p.visible;stats.terrain_layouts++;
+                } else p.visible=p.__paintVisible;
+            }
+            lastTerrain=candidates;
             stats.terrain_panels=terrain.length;
             if(dynamic) {
                 while(dynamicPanels.length<dynamicRuns.length && budget-->0) dynamicPanels.push(newPanel(options.dynamicHost,"TerrainBlocked"));
-                for(var j=0;j<dynamicPanels.length;j++) {
-                    var p=dynamicPanels[j];
-                    if(j>=dynamicRuns.length) {p.visible=false;continue;}
-                    var key=revision+":"+dynamicRevision;
-                    if(p.__revision===key) continue;
-                    paint(p,dynamicRuns[j],dynamic.z+options.zOffset());p.__revision=key;
+                var selected=visibleRuns(dynamicIndex,visible),dynamicWanted={};
+                for(var s=0;s<selected.length;s++) dynamicWanted[selected[s]]=true;
+                for(var d=0;d<lastDynamic.length;d++) {
+                    var old=lastDynamic[d];if(!dynamicWanted[old] && dynamicPanels[old]) dynamicPanels[old].visible=false;
                 }
+                for(var j=0;j<selected.length;j++) {
+                    var p=dynamicPanels[selected[j]];if(!p) continue;
+                    var key=camera+":"+dynamicRevision;
+                    if(p.__paintKey!==key) {
+                        paint(p,dynamicRuns[selected[j]],dynamic.z+options.zOffset());p.__paintKey=key;p.__paintVisible=p.visible;
+                    } else p.visible=p.__paintVisible;
+                }
+                lastDynamic=selected;
             }
         }
         function update(world,profile,validation) {
@@ -201,7 +247,8 @@
         function configure(source) {
             if(source===atlasSource && atlas) return true;
             var next=decode(source);if(!next) return false;
-            atlasSource=source;atlas=next;redRuns=runs(atlas);revision++;viewKey="";footKey="";stats.terrain_builds++;
+            atlasSource=source;atlas=next;redRuns=runs(atlas);terrainIndex=runIndex(redRuns,atlas.size*8);terrainVersion++;
+            revision++;viewKey="";footKey="";stats.terrain_builds++;
             if(dynamic) rebuildDynamic();
             return true;
         }
@@ -211,20 +258,34 @@
                 var p=$.CreatePanel("Panel",options.footHost,"");p.hittest=false;p.visible=false;p.AddClass("StaticGridMark");marks.push(p);
             }
         }
+        function prewarmTerrain() {
+            var budget=24;
+            while(outsidePanels.length<outsideRuns.length && budget-->0) outsidePanels.push(newPanel(options.terrainHost,"TerrainBlocked"));
+            while(terrain.length<redRuns.length && budget-->0) terrain.push(newPanel(options.terrainHost,"TerrainBlocked"));
+            stats.terrain_panels=terrain.length;
+        }
         function rebuildDynamic() {
             var next=dynamic;
             var overlay={size:next.size,x:next.x,y:next.y,w:next.w,h:next.h,z:next.z,states:next.states.slice()};
             for(var x=0;x<next.w;x++) for(var y=0;y<next.h;y++) {
                 if(staticSample((next.x+x+0.5)*next.size,(next.y+y+0.5)*next.size)===1) overlay.states[x*next.h+y]=0;
             }
-            dynamicRuns=runs(overlay);dynamicRevision++;
+            dynamicRuns=runs(overlay);dynamicIndex=runIndex(dynamicRuns,dynamic.size*8);dynamicRevision++;stats.dynamic_builds++;
         }
         prewarm(16);
         return {configure:configure,warm:warm,update:update,hideFoot:hideFoot,stats:stats,
-            prewarm:prewarm,configureLayout:configureLayout,
+            prewarm:prewarm,prewarmTerrain:prewarmTerrain,configureLayout:configureLayout,
             ingestDynamic:function(source){
+                // Area notifications and validation replies can carry the same
+                // payload. Renew freshness without decoding, rebuilding the
+                // spatial index or invalidating an unchanged painted overlay.
+                // configure()/configureLayout() still rebuild on static changes.
+                if(dynamic && source===dynamicSource) {
+                    dynamicUntil=Date.now()+1000;stats.dynamic_reuses++;return;
+                }
+                stats.dynamic_decodes++;
                 var next=decode(source);if(!next) return;
-                dynamic=next;dynamicUntil=Date.now()+1000;footKey="";
+                dynamic=next;dynamicSource=source;dynamicUntil=Date.now()+1000;footKey="";
                 rebuildDynamic();
             },
             ready:function(){return !!atlas;}};
