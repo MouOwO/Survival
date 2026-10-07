@@ -4,6 +4,9 @@ local bus = require("core/event_bus")
 local events = require("core/events")
 local definition = assert(require("config/generated/hero_definitions").by_id.hero_doom)
 local ctx, anchor
+local scheduler=require("core/scheduler")
+GameRules={GetGameTime=function() return 0 end}
+ProjectileManager={ProjectileDodge=function() end}
 local noop = function() end
 Vector = function(x,y,z) return {x=x,y=y,z=z or 0} end
 DOTA_UNIT_CAP_NO_ATTACK, DOTA_UNIT_CAP_MOVE_NONE = 0, 0
@@ -29,10 +32,10 @@ package.loaded["systems/hero_summon_projection"] = {
             shop_unlocked=summoned and 1 or 0}
     end,
 }
-package.loaded["systems/hero_summon_destination"] = {resolve=function(altar,_,id)
-    assert(altar == ctx.altars[id], "must resolve from this player's altar")
+package.loaded["systems/hero_summon_destination"] = {resolve=function(altar,_,id,moving)
+    assert(altar == ctx.altars[id] or (altar==nil and moving and moving.owner_id==id), "must resolve from this player's altar or own-city return policy")
     ctx.last_resolved=id
-    return Vector(id*1000,0,32)
+    return Vector(id*1000+(ctx.home_offset or 0),0,32)
 end}
 package.loaded["systems/destination_validation_service"] = {teleport=function(unit,position)
     unit.position=position; return true
@@ -45,6 +48,9 @@ local function entity(name,id)
     ctx.serial=ctx.serial+1
     local unit={name=name,owner_id=id,index=ctx.serial,modifiers={},unhide_calls=0}
     function unit:IsNull() return self.removed == true end
+    function unit:IsAlive() return not self.dead end
+    function unit:Stop() self.stop_calls=(self.stop_calls or 0)+1 end
+    function unit:SetRespawnPosition(value) self.respawn_position=value end
     function unit:entindex() return self.index end
     function unit:GetUnitName() return self.name end
     function unit:GetPlayerOwnerID() return self.owner_id end
@@ -90,7 +96,7 @@ end
 local function fixture()
     ctx={serial=0,defeated={},assets_ready=true,preloads={},altars={},selected={},players={},
         replacements={},defeat_during_replace={},summoned={},notifications={},client_events={}}
-    bus.reset(); anchor.init(); service.init()
+    scheduler.clear(); bus.reset(); anchor.init(); service.init()
     for id=0,3 do
         ctx.players[id]={id=id}
         ctx.selected[id]=entity("npc_dota_hero_wisp",id)
@@ -219,3 +225,32 @@ assert(not bus.request(events.HERO_DELETE_REQUEST, {player_id = 99}).ok)
 assert(#deletions == 1)
 
 print("PASS hero summon player isolation: four same-team cities/altars, owner-only deletion and pending cancellation, stale callbacks, reentrant defeat, late events, survivor continuation")
+print("PASS hero summon player isolation: four same-team cities/altars, owner-only pending cancellation, stale callbacks, reentrant defeat, late events, survivor continuation")
+-- Death and native respawn share the actual F2 return path, owner and camera.
+fixture(); assert(request(0).ok and request(1).ok)
+local hero0,hero1=ctx.selected[0],ctx.selected[1]
+assert(hero0.respawn_position.x==0 and hero1.respawn_position.x==1000)
+local returned={}
+bus.subscribe(events.HERO_RETURNED_HOME,function(p) returned[#returned+1]=p end)
+ctx.home_offset=75; hero1.dead=true
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=hero1})
+assert(hero1.respawn_position.x==1075 and hero0.respawn_position.x==0)
+hero1.dead=false; hero1.position=Vector(-999,-999,0)
+service.on_npc_spawned(hero1); service.on_npc_spawned(hero1)
+ctx.home_offset=120 -- Landing occupancy may change while the hero is dead.
+local notes=#ctx.notifications
+scheduler.think()
+assert(hero1.position.x==1120 and hero1.respawn_position.x==1120)
+assert(hero0.position.x==0 and #returned==1 and returned[1].player_id==1)
+assert(hero1.stop_calls==1 and #ctx.notifications==notes, "respawn must not send the manual F2 success toast")
+assert(ctx.client_events[#ctx.client_events].name=="ui_camera_follow_hero")
+service.on_npc_spawned(hero1); scheduler.think(); assert(#returned==1)
+-- Foreign units, delayed duplicate spawns and eliminated owners must not move.
+local stranger=entity("npc_dota_hero_doom_bringer",1)
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=stranger})
+service.on_npc_spawned(stranger); scheduler.think(); assert(stranger.position==nil)
+hero1.dead=true; bus.emit(events.ENGINE_ENTITY_KILLED,{victim=hero1})
+hero1.dead=false; hero1.position=Vector(-500,0,0); service.on_npc_spawned(hero1)
+defeat(1); scheduler.think()
+assert(hero1.position.x==-500 and #returned==1)
+print("HERO_RESPAWN_HOME_PASS: actual F2 service, owner isolation, refreshed landing, camera, duplicate/foreign/defeated guards")

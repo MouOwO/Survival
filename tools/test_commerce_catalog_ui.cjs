@@ -10,7 +10,7 @@ const root=new Panel("Panel",null,"root");root.actuallayoutwidth=1920;root.actua
 function $(){return null;}$.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.Schedule=()=>1;$.CancelScheduled=()=>{};$.Msg=()=>{};
 const requests=[],cfg={};let refreshes=0;
 const product={sku:"configured_bundle",title:"组合礼包",category_id:"bundles",product_type:"bundle",amount_fen:777,enabled:true,owned:0,icon:"custom_game/archive_items_v2/lottery_attribute_crystal.png",
- reward_lines:[{id:"initial_wood",label:"木材",quantity:100},{id:"vip",label:"VIP",quantity:1},{id:"special_lottery_ticket",label:"特殊抽奖券",quantity:10}]};
+ reward_lines:[{id:"initial_wood",label:"木材",quantity:100},{id:"vip",label:"VIP",quantity:1},{id:"special_lottery_ticket",label:"金色抽奖券",quantity:10}]};
 const catalog={catalog_hash:"a",categories:[{id:"technology",label:"科技"},{id:"bundles",label:"礼包"}],products:[product]};
 let currentCatalog=catalog;
 cfg.SurvivalPayments={GetCatalog:()=>currentCatalog,RefreshCatalog:()=>refreshes++,Checkout:sku=>requests.push(sku)};
@@ -39,8 +39,8 @@ cfg.SurvivalCommerceView.UpdateCatalog({...catalog,catalog_hash:"b",products:[{.
 assert(all().some(p=>p.text==="服务端新礼包"));assert(all().some(p=>p.text==="9.00 元"));
 all().filter(p=>p.BHasClass("RCTab"))[0].events.onactivate();assert(all().some(p=>p.text==="本分类暂无上架商品"));
 assert.equal(cfg.SurvivalCommerceView.OpenTicketPurchase({id:"map"}),false,"normal gameplay tickets are not sold");
-const ticket={...product,sku:"special_lottery_ticket_single",title:"特殊抽奖券 ×1",category_id:"item",product_type:"single",amount_fen:5000,
- reward_lines:[{kind:"item",id:"special_lottery_ticket",label:"特殊抽奖券",quantity:1}]};
+const ticket={...product,sku:"special_lottery_ticket_single",title:"金色抽奖券 ×1",category_id:"item",product_type:"single",amount_fen:5000,
+ reward_lines:[{kind:"item",id:"special_lottery_ticket",label:"金色抽奖券",quantity:1}]};
 const ticketCatalog={...catalog,catalog_hash:"tickets",products:[product,ticket],categories:[...catalog.categories,{id:"item",label:"道具与材料"}]};
 currentCatalog=ticketCatalog;
 for(const id of ["cultivation","dragon_knight","summer"]){
@@ -51,14 +51,14 @@ currentCatalog={products:[],categories:[]};cfg.SurvivalCommerceView.UpdateCatalo
 const beforeCold=requests.length, beforeRefresh=refreshes;
 assert(cfg.SurvivalCommerceView.OpenTicketPurchase("summer"));
 assert.equal(requests.length,beforeCold);assert.equal(refreshes,beforeRefresh+1);
-assert(all().some(p=>p.text==="正在加载特殊抽奖券商品…"));
+assert(all().some(p=>p.text==="正在加载金色抽奖券商品…"));
 currentCatalog=ticketCatalog;cfg.SurvivalCommerceView.UpdateCatalog(currentCatalog);
 assert.equal(requests.at(-1),ticket.sku);assert.equal(cfg.SurvivalCommerceView.Inspect().opened,false);
 currentCatalog=catalog;const beforeMissing=requests.length;
 assert(cfg.SurvivalCommerceView.OpenTicketPurchase("summer"));
 cfg.SurvivalCommerceView.UpdateCatalog(currentCatalog);
 assert.equal(requests.length,beforeMissing,"missing ticket never substitutes a bundle");
-assert(all().some(p=>p.text==="特殊抽奖券暂未上架，请稍后重试。"));
+assert(all().some(p=>p.text==="金色抽奖券暂未上架，请稍后重试。"));
 currentCatalog={products:[],categories:[]};cfg.SurvivalCommerceView.UpdateCatalog(currentCatalog);
 cfg.SurvivalCommerceView.OpenTicketPurchase("summer");cfg.SurvivalCommerceView.Close();
 currentCatalog=ticketCatalog;cfg.SurvivalCommerceView.UpdateCatalog(currentCatalog);

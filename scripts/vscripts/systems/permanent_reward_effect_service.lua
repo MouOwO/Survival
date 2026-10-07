@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local armor_balance = require("config/armor_balance")
 local map_level_effect_rules = require("config/generated/map_level_effect_rules")
 local phase_guard = require("systems/gameplay_phase_guard")
+local lottery_dynamic_effects = require("systems/lottery_dynamic_effects")
 
 local M = {}
 local totals_by_player = {}
@@ -15,11 +16,9 @@ local tower_ticks_by_player = {}
 local hero_tick_attributes_by_player = {}
 local hero_tick_attack_by_player = {}
 local tower_tick_attack_by_player = {}
-local tower_damage_bonus_by_player = {}
 local hero_damage_attack_bonus_by_player = {}
 local hero_basic_attack_bonus_by_player = {}
 local hero_growth_attributes_by_player = {}
-local tower_basic_attack_bonus_by_player = {}
 local commerce_boss_bonus, commerce_boss_seen = {}, {}
 local wall_ticks_by_player = {}
 local wall_tick_health_by_player = {}
@@ -123,6 +122,7 @@ local function refresh(payload)
             copy(save.permanent_effects), save.gameplay_stats
         ))
         add_values(totals_by_player[player_id], require('systems/commerce_effects').project(save, totals_by_player[player_id]))
+        add_values(totals_by_player[player_id], lottery_dynamic_effects.project(save))
     end
     local boss_effects
     if profile and profile.mode == "pure" then
@@ -149,15 +149,12 @@ local function refresh(payload)
         hero_tick_attack_by_player[player_id] or 0
     tower_tick_attack_by_player[player_id] =
         tower_tick_attack_by_player[player_id] or 0
-    tower_damage_bonus_by_player[player_id] = tower_damage_bonus_by_player[player_id] or 0
     hero_damage_attack_bonus_by_player[player_id] =
         hero_damage_attack_bonus_by_player[player_id] or 0
     hero_basic_attack_bonus_by_player[player_id] =
         hero_basic_attack_bonus_by_player[player_id] or 0
     hero_growth_attributes_by_player[player_id] =
         hero_growth_attributes_by_player[player_id] or 0
-    tower_basic_attack_bonus_by_player[player_id] =
-        tower_basic_attack_bonus_by_player[player_id] or 0
     wall_ticks_by_player[player_id] = wall_ticks_by_player[player_id] or 0
     wall_tick_health_by_player[player_id] =
         wall_tick_health_by_player[player_id] or 0
@@ -269,7 +266,9 @@ local function apply_tower_tick(player_id)
     event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
         player_id = player_id,
         reason = "star_blessing_tower_attack_per_second",
-        changed_section = "tower",
+            changed_section = "tower", changed_field = "attack",
+            tower_attack_flat = M.value(player_id, "tower_attack_flat")
+                + (tower_tick_attack_by_player[player_id] or 0),
         amount = amount,
         tick = tower_ticks_by_player[player_id],
     })
@@ -355,6 +354,7 @@ local function on_damage(payload)
         event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
             player_id = player_id,
             reason = "gameplay_stats_hero_damage_growth",
+            changed_section = "hero",
         })
     end
 end
@@ -426,6 +426,7 @@ local function apply_wall_tick(player_id)
     event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
         player_id = player_id,
         reason = "gameplay_stats_wall_growth_per_second",
+        changed_section = "wall",
         tick = wall_ticks_by_player[player_id],
     })
 end
@@ -460,6 +461,7 @@ local function on_hero_attack(payload)
         event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
             player_id = player_id,
             reason = "gameplay_stats_hero_attack_growth",
+            changed_section = "hero",
         })
     end
 end
@@ -470,9 +472,10 @@ local function on_tower_attack(payload)
     if player_id == nil then return end
     if phase_guard.post_clear_frozen() then return end
     local attack_growth = M.value(player_id, "tower_basic_attack_growth")
-    if attack_growth > 0 then
-        tower_basic_attack_bonus_by_player[player_id] =
-            (tower_basic_attack_bonus_by_player[player_id] or 0) + attack_growth
+    local personal_gain = math.max(0, attack_growth)
+    if personal_gain > 0 then
+        tower.survival_tower_personal_attack_growth =
+            (tonumber(tower.survival_tower_personal_attack_growth) or 0) + personal_gain
     end
     local reduction = armor_balance.from_war3_linear(
         M.value(player_id, "tower_attack_armor_reduction")
@@ -485,11 +488,7 @@ local function on_tower_attack(payload)
         })
     end
     if attack_growth > 0 then
-        event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
-            player_id = player_id,
-            reason = "gameplay_stats_tower_attack_growth",
-            changed_section = "tower",
-        })
+        event_bus.emit("tower.personal_attack_changed", {tower=tower, player_id=player_id})
     end
 end
 
@@ -499,9 +498,8 @@ local function on_tower_damage(payload)
     if not player_id or (tonumber(payload.damage) or 0)<=0 or phase_guard.post_clear_frozen() then return end
     local growth=M.value(player_id,'tower_damage_attack_growth')
     if growth<=0 then return end
-    tower_damage_bonus_by_player[player_id]=(tower_damage_bonus_by_player[player_id] or 0)+growth
-    event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=player_id,
-        reason='tower_actual_damage_growth', changed_section='tower'})
+    tower.survival_tower_personal_attack_growth = (tonumber(tower.survival_tower_personal_attack_growth) or 0) + growth
+    event_bus.emit("tower.personal_attack_changed", {tower=tower, player_id=player_id})
 end
 
 local function get(payload)
@@ -542,6 +540,8 @@ local function get(payload)
             "enemy_initial_armor_reduction"
         )
     end
+    -- UI-only static sources: exclude tick, attack/damage and minute growth.
+    local display_totals = copy(totals)
     totals.hero_all_attributes_flat = (totals.hero_all_attributes_flat or 0)
         + (totals.hero_initial_attributes or 0)
         + (hero_tick_attributes_by_player[player_id] or 0)
@@ -553,8 +553,7 @@ local function get(payload)
         + (hero_tick_attack_by_player[player_id] or 0)
     totals.tower_attack_flat = (totals.tower_attack_flat or 0)
         + (tower_tick_attack_by_player[player_id] or 0)
-        + (tower_damage_bonus_by_player[player_id] or 0)
-        + (tower_basic_attack_bonus_by_player[player_id] or 0)
+
     local growth = minute_growth[player_id] or {}
     totals.hero_attack_bonus_pct = (totals.hero_attack_bonus_pct or 0) + (growth.hero or 0)
     totals.tower_attack_bonus_pct = (totals.tower_attack_bonus_pct or 0) + (growth.tower or 0)
@@ -565,6 +564,7 @@ local function get(payload)
     return {
         ok = true,
         totals = totals,
+        display_totals = display_totals,
         test_isolation = isolated_field ~= nil,
         isolated_field_id = isolated_field,
     }
@@ -587,11 +587,9 @@ function M.set_test_isolation(player_id, field_id, defer_refresh)
     hero_tick_attributes_by_player[player_id] = 0
     hero_tick_attack_by_player[player_id] = 0
     tower_tick_attack_by_player[player_id] = 0
-    tower_damage_bonus_by_player[player_id] = 0
     hero_damage_attack_bonus_by_player[player_id] = 0
     hero_basic_attack_bonus_by_player[player_id] = 0
     hero_growth_attributes_by_player[player_id] = 0
-    tower_basic_attack_bonus_by_player[player_id] = 0
     wall_ticks_by_player[player_id] = 0
     wall_tick_health_by_player[player_id] = 0
     wall_tick_armor_by_player[player_id] = 0
@@ -624,11 +622,9 @@ function M.init()
     hero_tick_attributes_by_player = {}
     hero_tick_attack_by_player = {}
     tower_tick_attack_by_player = {}
-    tower_damage_bonus_by_player = {}
     hero_damage_attack_bonus_by_player = {}
     hero_basic_attack_bonus_by_player = {}
     hero_growth_attributes_by_player = {}
-    tower_basic_attack_bonus_by_player = {}
     wall_ticks_by_player = {}
     wall_tick_health_by_player = {}
     wall_tick_armor_by_player = {}
@@ -647,6 +643,14 @@ function M.init()
         event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=id,reason='commerce_assault_boss'})
     end)
     event_bus.subscribe('commerce.tower_damage', on_tower_damage)
+    -- A combat effect, not progression: it continues using the frozen reward
+    -- totals after clearing, including subsequent archive challenge bosses.
+    event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if player_id == nil then return end
+        require("systems/hero_execution_service").try_execute(payload,
+            M.value(player_id, "hero_execute_health_threshold_pct"))
+    end)
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_hero_attack)
     event_bus.subscribe(events.TOWER_ATTACK_LANDED, on_tower_attack)
     event_bus.subscribe(events.MONSTER_SPAWNED, function(payload)

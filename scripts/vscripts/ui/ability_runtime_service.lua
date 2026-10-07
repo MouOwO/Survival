@@ -41,6 +41,8 @@ end
 
 local function ensure_tower_upgrade_active(ability, runtime)
     if runtime.available ~= 1 then
+        if ability:IsActivated() then ability:SetActivated(false) end
+        runtime.engine_activated = 0
         return
     end
     if ability:GetLevel() < 1 then
@@ -55,7 +57,7 @@ end
 
 local function sync_ability_active(ability, runtime)
     if runtime.passive == 1 or not ability.SetActivated then return end
-    local managed = runtime.research_upgrade == 1 or runtime.lumberjack_fusion == 1
+    local managed = runtime.research_upgrade == 1 or runtime.lumberjack_fusion == 1 or runtime.hero_summon == 1
     if managed and ability.GetLevel and ability:GetLevel() < 1 then ability:SetLevel(1) end
     -- Restore only deactivation owned by this projection. Unknown/native skills
     -- keep their own activation rules; costs for other actions remain advisory.
@@ -518,29 +520,22 @@ local function on_resources(payload)
 end
 
 local function queue_fusion_refresh(payload)
-    local player_id = tonumber(payload and payload.player_id)
-    local team = payload and payload.team
-    if player_id == nil or player_id < 0 or team == nil then return end
-    local key = tostring(player_id) .. ":" .. tostring(team)
-    if pending_fusion_refresh[key] then return end
-    pending_fusion_refresh[key] = true
-    local pending = pending_fusion_refresh
-    scheduler.after(0.1, function()
-        if pending ~= pending_fusion_refresh then return end
-        pending[key] = nil
-        local snapshot
+    local player = tonumber(payload and payload.player_id)
+    if player == nil or pending_fusion_refresh[player] then return end
+    local token = {}
+    pending_fusion_refresh[player] = token
+    scheduler.after(0.1,function()
+        if pending_fusion_refresh[player] ~= token then return end
+        pending_fusion_refresh[player] = nil
         for _, state in pairs(state_by_unit) do
-            if tonumber(state.player_id) == player_id and state.team == team
-                and state.building_id == "lumberjack" then
-                snapshot = snapshot or fusion_eligibility.snapshot(player_id, team)
-                publish(state, snapshot)
-            end
+            if tonumber(state.player_id)==player and state.building_id=="lumberjack" then publish(state) end
         end
-    end, "ability_fusion_refresh_" .. key)
+    end,"ability_fusion_refresh_"..tostring(player))
 end
 
 local function on_worker_changed(payload)
     if not payload then return end
+    queue_fusion_refresh(payload)
     for _, entindex in ipairs(payload.removed_entindexes or {}) do
         clear_unit({ entindex = tonumber(entindex) })
     end
@@ -657,8 +652,14 @@ local function on_builder_ready(payload)
 end
 
 function M.init()
-    for key in pairs(pending_fusion_refresh) do scheduler.cancel("ability_fusion_refresh_" .. key) end
+    for player in pairs(pending_fusion_refresh) do scheduler.cancel("ability_fusion_refresh_"..tostring(player)) end
     pending_fusion_refresh = {}
+    local function city_changed(payload)
+        if payload.building_id=="main_city" then queue_fusion_refresh(payload) end
+    end
+    event_bus.subscribe(events.BUILDING_CHANGED, city_changed)
+    event_bus.subscribe(events.BUILDING_CREATED, city_changed)
+    event_bus.subscribe(events.BUILDING_DESTROYED, city_changed)
     for key in pairs(pending_resource_refresh) do
         scheduler.cancel("ability_resource_refresh_" .. key)
     end

@@ -2,14 +2,17 @@ const fs=require('fs'),vm=require('vm'),path=require('path');
 let suite=fs.readFileSync('tools/test_lottery_ui.js','utf8').split('ui.Open();assert.equal')[0];
 suite=suite.replace("panorama/src/layout/custom_game/lottery_window.xml","panorama/src/layout/custom_game/survival_hud.xml");
 suite=suite.replace("vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui.js','utf8'),env);",`Panel.prototype.Children=function(){return this.children;};
-['ui_snapshot_cache','lottery_handoff_bb9968eef7','remaining_5d5c1152eb','lottery_ui_remaining_5d5c1152eb'].forEach(function(file){vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);});`);
+Panel.prototype.MoveChildBefore=function(child,before){this.children.splice(this.children.indexOf(child),1);this.children.splice(this.children.indexOf(before),0,child);};
+// The XML fixture stores named panels in a flat index.
+Panel.prototype.FindChildTraverse=function(id){return nodes[id]||null;};
+['reference_windows','ui_snapshot_cache','lottery_handoff_bb9968eef7','remaining_5d5c1152eb','lottery_ui_remaining_5d5c1152eb'].forEach(function(file){vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);});`);
 suite+=`
 function updated(pool,rev){const x=snapshot(pool);x.selected_pool.revision=rev;x.selected_pool.update_unread=true;x.selected_pool.notice_unread=true;x.selected_pool.update_notice={title:'奖励更新公告',summary:'新奖池'};x.pools=[x.selected_pool];x.items=['n','sr','ur','r','ssr'].map(q=>({id:q,name:q,quality:q,icon:'item_blink'}));return x;}
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1.15;root.actualuiscale_y=1.15;
 nodes.LotteryWindow.actuallayoutwidth=0;nodes.LotteryWindow.actuallayoutheight=0;
 ui.Open();assert.equal(requests.at(-1).p.read_action,'visit');
 const firstScale=nodes.LotteryMainCanvas.style.transform;
-assert.equal(firstScale,'scale3d('+Math.min(1920/1.15/1672,1080/1.15/941)+','+Math.min(1920/1.15/1672,1080/1.15/941)+',1)');
+assert.equal(firstScale,'scale3d('+Math.min(1920/1.15/1600,1080/1.15/900)+','+Math.min(1920/1.15/1600,1080/1.15/900)+',1)');
 assert.equal(nodes.LotteryMainCanvas.style.opacity,'1');
 nodes.LotteryWindow.actuallayoutwidth=1920;nodes.LotteryWindow.actuallayoutheight=1080;nodes.LotteryWindow.actualuiscale_x=1.15;nodes.LotteryWindow.actualuiscale_y=1.15;
 advance(.3);assert.equal(nodes.LotteryMainCanvas.style.transform,firstScale,'first frame and later frame must use the same viewport');
@@ -29,7 +32,7 @@ ui.CloseInfo();ui.SelectPool('summer');events.ui_lottery_snapshot(updated('summe
 ui.Close();events.ui_lottery_snapshot(updated('summer','v2'));assert(nodes.LotteryInfoOverlay.BHasClass('LotteryInfoHidden'));
 ui.Open();
 ['cultivation','dragon_knight','summer','map'].forEach(id=>{
- ui.SelectPool(id);assert(nodes.LotteryMainCanvas.style.backgroundImage.includes(id==='map'?'lottery_handoff_v1/scene.png':'lottery_pool_scenes_v1/'+id+'.png'),'background changes immediately on selection');
+ ui.SelectPool(id);assert.equal(nodes.LotteryMainCanvas.style.backgroundImage,'none','pool switching preserves shared window background');assert(nodes.LotterySceneBackground.BHasClass('LotteryScene_'+id),'full-screen scene changes immediately on selection');assert.equal(['map','cultivation','dragon_knight','summer'].filter(k=>nodes.LotterySceneBackground.BHasClass('LotteryScene_'+k)).length,1,'only selected scene is active');
  events.ui_lottery_snapshot(updated(id,'v3'));
 });
 ui.Close();root.actuallayoutwidth=0;root.actuallayoutheight=0;nodes.LotteryWindow.actuallayoutwidth=0;nodes.LotteryWindow.actuallayoutheight=0;

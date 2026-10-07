@@ -1,0 +1,14 @@
+level_id,level,required_recharge_fen,required_recharge_yuan
+#types:string,number,number,number
+vip_level_01,1,5000,50
+vip_level_02,2,10000,100
+vip_level_03,3,25000,250
+vip_level_04,4,50000,500
+vip_level_05,5,100000,1000
+vip_level_06,6,150000,1500
+vip_level_07,7,250000,2500
+vip_level_08,8,400000,4000
+vip_level_09,9,600000,6000
+vip_level_10,10,750000,7500
+vip_level_11,11,1000000,10000
+vip_level_12,12,1250000,12500

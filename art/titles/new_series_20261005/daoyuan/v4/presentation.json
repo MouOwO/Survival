@@ -1,0 +1,12 @@
+{
+  "art": "../v3/art.png",
+  "version": 4,
+  "width": 208,
+  "height": 69.33333333333333,
+  "period": 3,
+  "duration": 0.9,
+  "opacity": 0.48,
+  "bob": 1.5,
+  "tint": "#fff0bb",
+  "review": "接入完整透明素材、三秒扫光与轻微浮动；无颗粒发射。"
+}

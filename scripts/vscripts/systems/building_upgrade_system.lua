@@ -1,3 +1,4 @@
+local building_display_bonus = require("combat/building_display_bonus")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
@@ -133,6 +134,7 @@ local function apply_research_technology(state, reason, context)
     if state.building_id == "arrow_tower" then
         local base_damage = tonumber(state.research_base_attack_damage)
             or unit:GetBaseDamageMin()
+        unit.survival_hud_base_attack = base_damage
         local tower = technology.tower or {}
         local permanent = context.permanent
         unit.survival_gameplay_health_regen_pct =
@@ -140,8 +142,14 @@ local function apply_research_technology(state, reason, context)
                 + (tonumber(permanent.tower_health_regen_per_second) or 0)
         local bonus = (tonumber(tower.attack_flat) or 0)
             + (tonumber(permanent.tower_attack_flat) or 0)
+            + (tonumber(unit.survival_tower_personal_attack_growth) or 0)
+        state.runtime_tower_permanent_attack = tonumber(permanent.tower_attack_flat) or 0
         local bonus_pct = (tonumber(tower.attack_bonus_pct) or 0)
             + (tonumber(permanent.tower_attack_bonus_pct) or 0)
+        unit.survival_hud_stat_bonuses = building_display_bonus.tower(base_damage, tower,
+            permanent_result and permanent_result.display_totals or {})
+        state.runtime_tower_attack_multiplier = 1 + bonus_pct / 100
+        state.runtime_tower_technology_attack = tonumber(tower.attack_flat) or 0
         local damage = (base_damage + bonus) * (1 + bonus_pct / 100)
         unit:SetBaseDamageMin(damage)
         unit:SetBaseDamageMax(damage)
@@ -167,6 +175,12 @@ local function apply_research_technology(state, reason, context)
             - profile_interval_reduction
             - (tonumber(permanent.tower_attack_interval_reduction)
                 or tonumber(profile_stats.tower_attack_interval_reduction) or 0))
+        local _, cadence = require("combat/attack_cadence").calculate(
+            unit.survival_research_base_attack_time,
+            {{label="存档",value=unit.survival_research_base_attack_time-base_attack_time}},
+            {{label="科技",value=tonumber(tower.attack_speed_bonus_pct) or 0},
+             {label="存档",value=tonumber(permanent.tower_attack_speed_bonus_pct) or 0}})
+        unit.survival_attack_cadence = cadence
         apply_tower_attack_time(unit, base_attack_time, attack_speed_bonus)
         local attack_range = tower_combat_rules.attack_range(
             tower.attack_range_bonus
@@ -213,6 +227,8 @@ local function apply_research_technology(state, reason, context)
             + (tonumber(permanent.team_hero_wall_armor_bonus) or 0)
             + base_war3_armor
                 * (tonumber(permanent.wall_armor_bonus_pct) or 0) / 100
+        unit.survival_hud_stat_bonuses = building_display_bonus.wall(base_health, base_war3_armor, wall,
+            permanent_result and permanent_result.display_totals or {}, rogue_effect_state.wall_health_flat(player_id))
         local old_max = math.max(1, unit:GetMaxHealth())
         local old_health = math.max(0, unit:GetHealth())
         local health_ratio = old_health / old_max
@@ -541,6 +557,17 @@ local function play_upgrade_sound(state, options)
     options.building_id = state.building_id
     options.tower_class = state.tower_class
     building_sound.upgrade_completed(options)
+    if state.building_id == "arrow_tower" and ParticleManager then
+        local model = tower_routes.model_for(tower_routes.current(state)) or ""
+        if model:find("models/heroes/", 1, true) then
+            local ok = pcall(function()
+                local particle = ParticleManager:CreateParticle(
+                    "particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, state.unit)
+                ParticleManager:ReleaseParticleIndex(particle)
+            end)
+            if not ok then print("[TOWER_UPGRADE_VISUAL] native level-up particle unavailable") end
+        end
+    end
 end
 
 -- The upgrade system owns a runtime cache, while building_system owns the
@@ -657,8 +684,58 @@ local unrelated_building_growth_reasons = {
     gameplay_stats_hero_attack_growth = true,
     commerce_assault_boss = true,
 }
+local function on_personal_tower_growth(payload)
+    local unit = payload and payload.tower
+    if not unit or unit:IsNull() then return end
+    local index = unit:entindex()
+    local state = buildings[index]
+    if not active_state(state) or state.unit ~= unit then return end
+    if state.runtime_tower_attack_multiplier == nil then
+        apply_research_technology(state, "tower_personal_growth")
+    else
+        local damage = ((state.research_base_attack_damage or 0)
+            + (state.runtime_tower_technology_attack or 0)
+            + (state.runtime_tower_permanent_attack or 0)
+            + (tonumber(unit.survival_tower_personal_attack_growth) or 0))
+            * state.runtime_tower_attack_multiplier
+        unit:SetBaseDamageMin(damage); unit:SetBaseDamageMax(damage)
+        unit.survival_attack_min, unit.survival_attack_max = damage, damage
+    end
+    event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {unit=unit, entindex=index,
+        player_id=state.player_id, reason="tower_personal_growth"})
+end
 
 local function on_technology_stats_changed(payload)
+    if payload and payload.changed_section == "hero" then return end
+    if payload and payload.changed_section == "tower" and payload.changed_field == "attack"
+        and tonumber(payload.tower_attack_flat) ~= nil then
+        -- Growth changes only attack: keep damage immediate without map scans,
+        -- BAT/range resets, hero/worker recalculation or ability-table rebuilds.
+        local player_id = tonumber(payload.player_id)
+        if player_id == nil then return end
+        for entindex, state in pairs(buildings) do
+            if not active_state(state) then
+                buildings[entindex] = nil
+            elseif state.building_id == "arrow_tower" and tonumber(state.player_id) == player_id then
+                local unit = state.unit
+                state.runtime_tower_permanent_attack = payload.tower_attack_flat
+                if state.runtime_tower_attack_multiplier == nil or state.research_base_attack_damage == nil then
+                    apply_research_technology(state, payload.reason)
+                else
+                    local damage = (state.research_base_attack_damage
+                        + state.runtime_tower_technology_attack + payload.tower_attack_flat
+                        + (tonumber(unit.survival_tower_personal_attack_growth) or 0))
+                        * state.runtime_tower_attack_multiplier
+                    unit:SetBaseDamageMin(damage); unit:SetBaseDamageMax(damage)
+                    unit.survival_attack_min, unit.survival_attack_max = damage, damage
+                end
+                event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+                    unit = unit, entindex = entindex, player_id = player_id, reason = payload.reason,
+                })
+            end
+        end
+        return
+    end
     if payload and payload.changed_section == "lumberjack" then return end
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
@@ -666,41 +743,14 @@ local function on_technology_stats_changed(payload)
     -- Refreshing every tower here fans out into ability sync on each tree hit.
     if payload.reason == "lumberjack_attack_growth" then return end
     if unrelated_building_growth_reasons[payload.reason] then return end
-    if tower_attack_growth_reasons[payload.reason] then
-        -- Growth totals are player-wide. Apply immediately, but do not clone
-        -- the player's entire save or reconfigure walls/abilities/visuals.
-        local result = event_bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-            { player_id = player_id })
-        local permanent = result and result.totals or {}
-        local tower = technology_stat_manager.get(player_id).final.tower or {}
-        local bonus = (tonumber(tower.attack_flat) or 0)
-            + (tonumber(permanent.tower_attack_flat) or 0)
-        local multiplier = 1 + ((tonumber(tower.attack_bonus_pct) or 0)
-            + (tonumber(permanent.tower_attack_bonus_pct) or 0)) / 100
-        for entindex, state in pairs(buildings) do
-            if not active_state(state) then buildings[entindex] = nil
-            elseif tonumber(state.player_id) == player_id
-                and state.building_id == "arrow_tower" then
-                local unit = state.unit
-                local damage = ((tonumber(state.research_base_attack_damage)
-                    or unit:GetBaseDamageMin()) + bonus) * multiplier
-                if unit.survival_attack_min ~= damage or unit.survival_attack_max ~= damage then
-                    unit:SetBaseDamageMin(damage)
-                    unit:SetBaseDamageMax(damage)
-                    unit.survival_attack_min, unit.survival_attack_max = damage, damage
-                    publish(state, "tower_attack_growth", true)
-                end
-            end
-        end
-        return
-    end
-    recover_player_towers(player_id)
+    if not payload.changed_section then recover_player_towers(player_id) end
     local context
     for entindex, state in pairs(buildings) do
         if not active_state(state) then
             -- Use the cache key: querying entindex() on this handle is unsafe.
             buildings[entindex] = nil
-        elseif tonumber(state.player_id) == player_id then
+        elseif tonumber(state.player_id) == player_id
+            and (payload.changed_section ~= "wall" or state.building_id == "wall") then
             context = context or research_context(player_id)
             apply_research_technology(state, payload.reason, context)
             publish(state, "technology_stats_changed")
@@ -1398,6 +1448,20 @@ function M.init()
     upgrade_process.reset()
     tower_ability_sync.reset()
     buildings = {}
+    event_bus.subscribe("tower.personal_attack_changed", on_personal_tower_growth)
+    require("systems/tower_auto_upgrade_service").init({
+        query = recover_state, upgrade = on_upgrade_request, publish = publish,
+        can_upgrade = function(state, cost)
+            local free = rogue_effect_state.numeric(state.player_id,
+                "grant_building_upgrade_action") > 0
+            local result = event_bus.request(events.RESOURCE_CAN_SPEND_REQUEST, {
+                player_id = state.player_id, team = state.team,
+                wood = free and 0 or cost.wood, gold = free and 0 or cost.gold,
+                population = cost.population,
+            })
+            return result and result.ok == true
+        end,
+    })
     event_bus.handle_request(events.BUILDING_UPGRADE_QUOTE_REQUEST, upgrade_quote)
     event_bus.subscribe(events.BUILDING_CREATED, on_created)
     event_bus.subscribe(events.BUILDING_DESTROYED, on_destroyed)

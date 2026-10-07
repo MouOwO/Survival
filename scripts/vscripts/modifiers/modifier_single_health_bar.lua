@@ -79,11 +79,21 @@ function modifier_single_health_bar:publish_state()
     local unit_name = unit.GetUnitName and unit:GetUnitName() or nil
     local forecast, revision = laser_prediction.snapshot(unit, max_health,
         GameRules and GameRules:GetGameTime() or 0)
+    -- These flags can be assigned after npc_spawned attaches the modifier.
+    -- Include width in the sample so that a healthy newly classified boss/hero
+    -- updates its bar even without taking damage.
+    local bar_width = 62
+    if unit.survival_is_boss then
+        bar_width = 156
+    elseif unit.survival_hero_id ~= nil or (unit.IsRealHero and unit:IsRealHero()) then
+        bar_width = 120
+    end
     local previous = self.health_bar_last_sample
     if previous and previous.health == health and previous.max_health == max_health
         and previous.scale == scale and previous.alive == alive
         and previous.team == team and previous.unit_name == unit_name
-        and previous.forecast_revision == revision then
+        and previous.forecast_revision == revision
+        and previous.bar_width == bar_width then
         return
     end
 
@@ -97,10 +107,11 @@ function modifier_single_health_bar:publish_state()
         team = team,
         unit_name = unit_name,
         laser_forecast = forecast,
+        bar_width = bar_width,
     })
     if sent then
         self.health_bar_last_sample = { health = health, max_health = max_health,
-            scale = scale, alive = alive, team = team, unit_name = unit_name, forecast_revision = revision }
+            scale = scale, alive = alive, team = team, unit_name = unit_name, forecast_revision = revision, bar_width = bar_width }
         self.health_bar_published_removed = false
     end
 end

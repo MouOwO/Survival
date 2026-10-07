@@ -1,0 +1,775 @@
+{
+  "unlock_rule": "lifetime_earned_permanent",
+  "stacking": "cumulative",
+  "legacy_rule": "seed_from_current_balance",
+  "tiers": [
+    {
+      "level": 1,
+      "required_points": 50,
+      "effects": [
+        {
+          "label": "每秒木材+1",
+          "field_id": "wood_per_second",
+          "value": 1
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 2,
+      "required_points": 200,
+      "effects": [
+        {
+          "label": "伐木效率+1",
+          "field_id": "lumberjack_efficiency",
+          "value": 1
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 3,
+      "required_points": 400,
+      "effects": [
+        {
+          "label": "伐木工攻速+5%",
+          "field_id": "lumberjack_attack_speed_bonus_pct",
+          "value": 5
+        },
+        {
+          "label": "英雄属性加成+3%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 3
+        },
+        {
+          "label": "箭塔攻击加成+3%",
+          "field_id": "tower_attack_bonus_pct",
+          "value": 3
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 4,
+      "required_points": 800,
+      "effects": [
+        {
+          "label": "开局木材+100",
+          "field_id": "initial_wood",
+          "value": 100
+        },
+        {
+          "label": "箭塔攻击加成+5%",
+          "field_id": "tower_attack_bonus_pct",
+          "value": 5
+        },
+        {
+          "label": "英雄初始属性+1000",
+          "field_id": "hero_initial_attributes",
+          "value": 1000
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 5,
+      "required_points": 1000,
+      "effects": [
+        {
+          "label": "英雄造成伤害加木材+3",
+          "field_id": "hero_damage_wood_flat",
+          "value": 3
+        },
+        {
+          "label": "英雄最终伤害+3%",
+          "field_id": "hero_final_damage_bonus_pct",
+          "value": 3
+        },
+        {
+          "label": "金矿效率+3%",
+          "field_id": "gold_mine_efficiency_pct",
+          "value": 3
+        },
+        {
+          "label": "练功房收益+3%",
+          "field_id": "training_room_income_bonus_pct",
+          "value": 3
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 6,
+      "required_points": 1500,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+3",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 3
+        },
+        {
+          "label": "箭塔暴击几率+3%",
+          "field_id": "tower_critical_chance_pct",
+          "value": 3
+        },
+        {
+          "label": "箭塔暴击伤害+10%",
+          "field_id": "tower_critical_damage_bonus_pct",
+          "value": 10
+        },
+        {
+          "label": "箭塔每秒攻击+10",
+          "field_id": "tower_attack_per_second",
+          "value": 10
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 7,
+      "required_points": 2000,
+      "effects": [
+        {
+          "label": "墙生命+1000",
+          "field_id": "wall_initial_health",
+          "value": 1000
+        },
+        {
+          "label": "墙护甲+50",
+          "field_id": "wall_armor",
+          "value": 50
+        },
+        {
+          "label": "墙生命加成+3%",
+          "field_id": "wall_health_bonus_pct",
+          "value": 3
+        },
+        {
+          "label": "伐木工攻击成长+3",
+          "field_id": "lumberjack_attack_growth",
+          "value": 3
+        },
+        {
+          "label": "伐木工攻速+10%",
+          "field_id": "lumberjack_attack_speed_bonus_pct",
+          "value": 10
+        },
+        {
+          "label": "每秒木材+3",
+          "field_id": "wood_per_second",
+          "value": 3
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 8,
+      "required_points": 2500,
+      "effects": [
+        {
+          "label": "英雄攻击加成+20%",
+          "field_id": "hero_attack_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "英雄伤害减免+5%",
+          "field_id": "hero_damage_reduction_pct",
+          "value": 5
+        },
+        {
+          "label": "英雄生命加成+20%",
+          "field_id": "hero_health_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "英雄护甲加成+20%",
+          "field_id": "hero_armor_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "英雄造成伤害加攻击+5",
+          "field_id": "hero_damage_attack_growth",
+          "value": 5
+        },
+        {
+          "label": "英雄初始金币+5000",
+          "field_id": "hero_initial_gold",
+          "value": 5000
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 9,
+      "required_points": 3000,
+      "effects": [
+        {
+          "label": "每秒金币+10",
+          "field_id": "gold_per_second",
+          "value": 10
+        },
+        {
+          "label": "每秒木材+10",
+          "field_id": "wood_per_second",
+          "value": 10
+        },
+        {
+          "label": "伐木效率+3",
+          "field_id": "lumberjack_efficiency",
+          "value": 3
+        },
+        {
+          "label": "金矿效率+10%",
+          "field_id": "gold_mine_efficiency_pct",
+          "value": 10
+        },
+        {
+          "label": "练功房收益+10%",
+          "field_id": "training_room_income_bonus_pct",
+          "value": 10
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 10,
+      "required_points": 3500,
+      "effects": [
+        {
+          "label": "箭塔攻击加成+10%",
+          "field_id": "tower_attack_bonus_pct",
+          "value": 10
+        },
+        {
+          "label": "箭塔造成伤害加攻击+5",
+          "field_id": "tower_damage_attack_growth",
+          "value": 5
+        },
+        {
+          "label": "箭塔攻速+15%",
+          "field_id": "tower_attack_speed_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "箭塔攻击减甲+0.1",
+          "field_id": "tower_attack_armor_reduction",
+          "value": 0.1
+        },
+        {
+          "label": "英雄三围加成+15%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "英雄攻击加成+15%",
+          "field_id": "hero_attack_bonus_pct",
+          "value": 15
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 11,
+      "required_points": 4000,
+      "effects": [
+        {
+          "label": "墙生命+10000",
+          "field_id": "wall_initial_health",
+          "value": 10000
+        },
+        {
+          "label": "墙护甲+300",
+          "field_id": "wall_armor",
+          "value": 300
+        },
+        {
+          "label": "墙生命加成+20%",
+          "field_id": "wall_health_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "伐木工攻击成长+5",
+          "field_id": "lumberjack_attack_growth",
+          "value": 5
+        },
+        {
+          "label": "伐木工攻速+15%",
+          "field_id": "lumberjack_attack_speed_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "每秒木材+5",
+          "field_id": "wood_per_second",
+          "value": 5
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 12,
+      "required_points": 4500,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+5",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 5
+        },
+        {
+          "label": "箭塔暴击几率+5%",
+          "field_id": "tower_critical_chance_pct",
+          "value": 5
+        },
+        {
+          "label": "箭塔暴击伤害+15%",
+          "field_id": "tower_critical_damage_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "箭塔每秒攻击+20",
+          "field_id": "tower_attack_per_second",
+          "value": 20
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 13,
+      "required_points": 5000,
+      "effects": [
+        {
+          "label": "英雄造成伤害加木材+5",
+          "field_id": "hero_damage_wood_flat",
+          "value": 5
+        },
+        {
+          "label": "英雄最终伤害+10%",
+          "field_id": "hero_final_damage_bonus_pct",
+          "value": 10
+        },
+        {
+          "label": "金矿效率+10%",
+          "field_id": "gold_mine_efficiency_pct",
+          "value": 10
+        },
+        {
+          "label": "练功房收益+10%",
+          "field_id": "training_room_income_bonus_pct",
+          "value": 10
+        },
+        {
+          "label": "每秒金币+40",
+          "field_id": "gold_per_second",
+          "value": 40
+        },
+        {
+          "label": "每秒木材+40",
+          "field_id": "wood_per_second",
+          "value": 40
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 14,
+      "required_points": 5500,
+      "effects": [
+        {
+          "label": "箭塔攻击成长+10",
+          "field_id": "tower_basic_attack_growth",
+          "value": 10
+        },
+        {
+          "label": "箭塔攻击加成+20%",
+          "field_id": "tower_attack_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "箭塔攻击速度+30%",
+          "field_id": "tower_attack_speed_bonus_pct",
+          "value": 30
+        },
+        {
+          "label": "箭塔攻击范围+500",
+          "field_id": "tower_attack_range",
+          "value": 500
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 15,
+      "required_points": 6000,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+10",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 10
+        },
+        {
+          "label": "墙生命加成+20%",
+          "field_id": "wall_health_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "墙护甲加成+20%",
+          "field_id": "wall_armor_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "英雄攻击加三围+10",
+          "field_id": "hero_attribute_growth",
+          "value": 10
+        },
+        {
+          "label": "伐木效率+5",
+          "field_id": "lumberjack_efficiency",
+          "value": 5
+        },
+        {
+          "label": "金矿效率+15%",
+          "field_id": "gold_mine_efficiency_pct",
+          "value": 15
+        },
+        {
+          "label": "英雄暴击几率+20%",
+          "field_id": "hero_critical_chance_pct",
+          "value": 20
+        },
+        {
+          "label": "英雄暴击伤害+50%",
+          "field_id": "hero_critical_damage_bonus_pct",
+          "value": 50
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 16,
+      "required_points": 6800,
+      "effects": [
+        {
+          "label": "箭塔攻击加成+10%",
+          "field_id": "tower_attack_bonus_pct",
+          "value": 10
+        },
+        {
+          "label": "箭塔造成伤害加攻击+5",
+          "field_id": "tower_damage_attack_growth",
+          "value": 5
+        },
+        {
+          "label": "箭塔攻速+15%",
+          "field_id": "tower_attack_speed_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "箭塔攻击减甲+0.1",
+          "field_id": "tower_attack_armor_reduction",
+          "value": 0.1
+        },
+        {
+          "label": "英雄三围加成+15%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "英雄攻击加成+15%",
+          "field_id": "hero_attack_bonus_pct",
+          "value": 15
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 17,
+      "required_points": 7500,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+10",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 10
+        },
+        {
+          "label": "墙生命加成+20%",
+          "field_id": "wall_health_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "墙护甲加成+20%",
+          "field_id": "wall_armor_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "英雄攻击加三围+10",
+          "field_id": "hero_attribute_growth",
+          "value": 10
+        },
+        {
+          "label": "英雄暴击几率+5%",
+          "field_id": "hero_critical_chance_pct",
+          "value": 5
+        },
+        {
+          "label": "裁决：英雄造成伤害后斩杀生命低于15%的敌人（包含BOSS）",
+          "field_id": "hero_execute_health_threshold_pct",
+          "value": 15
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 18,
+      "required_points": 8000,
+      "effects": [
+        {
+          "label": "英雄三围加成+15%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "英雄攻击加成+15%",
+          "field_id": "hero_attack_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "英雄暴击伤害+30%",
+          "field_id": "hero_critical_damage_bonus_pct",
+          "value": 30
+        },
+        {
+          "label": "墙生命加成+20%",
+          "field_id": "wall_health_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "墙护甲加成+20%",
+          "field_id": "wall_armor_bonus_pct",
+          "value": 20
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 19,
+      "required_points": 8500,
+      "effects": [
+        {
+          "label": "箭塔攻击加成+20%",
+          "field_id": "tower_attack_bonus_pct",
+          "value": 20
+        },
+        {
+          "label": "箭塔造成伤害加攻击+10",
+          "field_id": "tower_damage_attack_growth",
+          "value": 10
+        },
+        {
+          "label": "箭塔攻击减甲+0.1",
+          "field_id": "tower_attack_armor_reduction",
+          "value": 0.1
+        },
+        {
+          "label": "英雄三围加成+15%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "英雄攻击加成+15%",
+          "field_id": "hero_attack_bonus_pct",
+          "value": 15
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 20,
+      "required_points": 9000,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+10",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 10
+        },
+        {
+          "label": "英雄攻击加三围+10",
+          "field_id": "hero_attribute_growth",
+          "value": 10
+        },
+        {
+          "label": "英雄三围加成+10%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 10
+        },
+        {
+          "label": "英雄最终伤害+10%",
+          "field_id": "hero_final_damage_bonus_pct",
+          "value": 10
+        },
+        {
+          "label": "英雄攻击加攻击+10",
+          "field_id": "hero_basic_attack_growth",
+          "value": 10
+        },
+        {
+          "label": "英雄暴击伤害+40%",
+          "field_id": "hero_critical_damage_bonus_pct",
+          "value": 40
+        },
+        {
+          "label": "金矿建造上限+1",
+          "field_id": "gold_mine_build_cap",
+          "value": 1
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 21,
+      "required_points": 10000,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+12",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 12
+        },
+        {
+          "label": "英雄攻击加三围+12",
+          "field_id": "hero_attribute_growth",
+          "value": 12
+        },
+        {
+          "label": "英雄三围加成+12%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 12
+        },
+        {
+          "label": "英雄最终伤害+12%",
+          "field_id": "hero_final_damage_bonus_pct",
+          "value": 12
+        },
+        {
+          "label": "英雄攻击加攻击+12",
+          "field_id": "hero_basic_attack_growth",
+          "value": 12
+        },
+        {
+          "label": "英雄暴击伤害+50%",
+          "field_id": "hero_critical_damage_bonus_pct",
+          "value": 50
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 22,
+      "required_points": 11000,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+13",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 13
+        },
+        {
+          "label": "英雄攻击加三围+13",
+          "field_id": "hero_attribute_growth",
+          "value": 13
+        },
+        {
+          "label": "英雄三围加成+13%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 13
+        },
+        {
+          "label": "英雄最终伤害+13%",
+          "field_id": "hero_final_damage_bonus_pct",
+          "value": 13
+        },
+        {
+          "label": "英雄攻击加攻击+13",
+          "field_id": "hero_basic_attack_growth",
+          "value": 13
+        },
+        {
+          "label": "英雄暴击伤害+50%",
+          "field_id": "hero_critical_damage_bonus_pct",
+          "value": 50
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 23,
+      "required_points": 12000,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+14",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 14
+        },
+        {
+          "label": "英雄攻击加三围+14",
+          "field_id": "hero_attribute_growth",
+          "value": 14
+        },
+        {
+          "label": "英雄三围加成+14%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 14
+        },
+        {
+          "label": "英雄最终伤害+14%",
+          "field_id": "hero_final_damage_bonus_pct",
+          "value": 14
+        },
+        {
+          "label": "英雄攻击加攻击+14",
+          "field_id": "hero_basic_attack_growth",
+          "value": 14
+        },
+        {
+          "label": "英雄暴击伤害+50%",
+          "field_id": "hero_critical_damage_bonus_pct",
+          "value": 50
+        }
+      ],
+      "pending_effect": ""
+    },
+    {
+      "level": 24,
+      "required_points": 13000,
+      "effects": [
+        {
+          "label": "英雄攻击减甲+15",
+          "field_id": "hero_attack_armor_reduction",
+          "value": 15
+        },
+        {
+          "label": "英雄攻击加三围+15",
+          "field_id": "hero_attribute_growth",
+          "value": 15
+        },
+        {
+          "label": "英雄三围加成+15%",
+          "field_id": "hero_attribute_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "英雄最终伤害+15%",
+          "field_id": "hero_final_damage_bonus_pct",
+          "value": 15
+        },
+        {
+          "label": "英雄攻击加攻击+15",
+          "field_id": "hero_basic_attack_growth",
+          "value": 15
+        },
+        {
+          "label": "英雄暴击伤害+50%",
+          "field_id": "hero_critical_damage_bonus_pct",
+          "value": 50
+        }
+      ],
+      "pending_effect": ""
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "pool_id": "summer",
+  "source": "用户第四宝箱截图及2026-10-03移除蔷薇之刃指示；当前23种奖励，沿用summer身份。",
+  "configuration_status": "active",
+  "probability_status": "pending_user_values",
+  "blocked_reason": "",
+  "ticket_content_id": "special_lottery_ticket",
+  "ten_guarantee": "ur",
+  "pending_items": {},
+  "items": [
+    {
+      "item_id": "lottery_kings_treasure",
+      "display_name": "王之财宝",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_muramasa",
+      "display_name": "妖刀村正",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_sword_of_promise",
+      "display_name": "誓约之剑",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_spear_of_longinus",
+      "display_name": "朗基努斯枪",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_law_of_cycles",
+      "display_name": "圆环之理",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_magic_book",
+      "display_name": "魔法书",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_raven_eye",
+      "display_name": "渡鸦之眼",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_withered_branch_lantern",
+      "display_name": "枯枝灯",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_echo_compass",
+      "display_name": "回响罗盘",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_magnetic_disruption_turret",
+      "display_name": "磁扰炮台",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_signal_hub",
+      "display_name": "信号枢元",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_crystalline_armor",
+      "display_name": "晶态护甲",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_rift_implant",
+      "display_name": "裂解插件",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_windspeed_bowstring",
+      "display_name": "风速弓弦",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_quick_dry_cement",
+      "display_name": "速干水泥",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_swift_emblem",
+      "display_name": "快速纹盘",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_gale_bow",
+      "display_name": "疾风弓",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_universal_tool",
+      "display_name": "万能工具",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_recovery_spirit",
+      "display_name": "回复精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_life_spirit",
+      "display_name": "生命精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_nature_spirit",
+      "display_name": "自然精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_sharp_spirit",
+      "display_name": "锋锐精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_divine_spirit",
+      "display_name": "神赐精粹",
+      "quality": "r"
+    }
+  ],
+  "pending_effects": {}
+}

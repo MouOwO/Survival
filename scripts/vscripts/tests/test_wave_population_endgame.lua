@@ -8,6 +8,8 @@ DOTA_GAMERULES_STATE_POST_GAME = 8
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
 local scheduled, winners, finalized, created, granted, archive_clears
 local active_players, markers_ready, reward_pending, last_projection, defeated, personal_finalized
+local cooperative_payloads, fake_players = {}, {}
+PlayerResource = { IsFakeClient = function(_, id) return fake_players[id] == true end }
 local serial, state_listener = 0, nil
 local noop = function() end
 local function marker(id)
@@ -41,16 +43,7 @@ local function unit(name)
         "SetPhysicalArmorBaseValue", "SetBaseMoveSpeed", "SetBaseAttackTime",
         "Script_SetAttackRange", "SetAttackCapability" }) do result[method] = noop end
     result.HasModifier = function() return false end
-    result.GetAbsOrigin = function(self) return self.position or Vector(0,0,0) end
-    result.AddNewModifier = function(self, _, _, key, params)
-        if key == "modifier_enemy_wall_ai" then
-            self.wall_target = params.wall_entindex
-            self.wall_modifier = {SetWallEntIndex=function(_, index) self.wall_target=index end}
-        end
-    end
-    result.FindModifierByName = function(self, key)
-        if key == "modifier_enemy_wall_ai" then return self.wall_modifier end
-    end
+    result.FindModifierByName = function() return nil end
     return result
 end
 GameRules = {
@@ -62,9 +55,8 @@ Entities = { FindByName = function(_, _, name)
     if markers_ready then return marker(tonumber(name:match("player_(%d+)")) or 0) end
 end }
 GetGroundPosition = function(position) return position end
-CreateUnitByName = function(name, position, find_clear)
-    local value = unit(name); value.position=position; value.implicit_clear=find_clear
-    created[#created + 1] = value; return value
+CreateUnitByName = function(name)
+    local value = unit(name); created[#created + 1] = value; return value
 end
 UTIL_Remove = function(value) value.removed = true end
 GetGroundHeight = function() return 0 end
@@ -81,13 +73,7 @@ for _, name in ipairs({ "systems/asset_preload_service", "config/asset_catalog",
     "config/monster_visual_config", "systems/monster_hull_scale",
     "systems/monster_navigation_policy", "systems/monster_corpse_lifecycle_service",
     "systems/wave_monster_collision" }) do package.loaded[name] = {} end
-package.loaded["config/monster_visual_config"] = {
-    resolve = function() return nil end, resources_for_wave = function() return {} end }
-package.loaded["systems/asset_preload_service"] = {
-    resources_for_models = function() return {} end,
-    resources_for_assets = function() return {} end,
-    queue_resources = function() return true, "queued", 0, 0 end,
-}
+package.loaded["config/monster_visual_config"] = { resolve = function() return nil end }
 package.loaded["core/team_alignment"] = { enforce = noop }
 package.loaded["systems/monster_navigation_policy"] = { apply = noop }
 package.loaded["systems/monster_corpse_lifecycle_service"] = { track = noop }
@@ -156,6 +142,7 @@ local function upvalue(wanted)
 end
 local function restart(difficulty, without_archive, players)
     clock, engine_state, serial = 0, 7, 0
+    cooperative_payloads, fake_players = {}, {}
     scheduled, winners, finalized, created, granted, archive_clears = {}, {}, {}, {}, {}, {}
     active_players, markers_ready, reward_pending = players or {0, 1}, true, {}
     defeated, last_projection, personal_finalized = {}, nil, {}
@@ -175,6 +162,7 @@ local function restart(difficulty, without_archive, players)
     bus.subscribe(events.WAVE_CHANGED, function(payload) last_projection = payload end)
     bus.subscribe("archive.final_wave_cleared", function(payload)
         archive_clears[#archive_clears + 1] = payload.player_id
+        cooperative_payloads[payload.player_id] = payload.cooperative_win
     end)
     assert(wave.set_difficulty(difficulty or "N1"))
     return upvalue("state"), upvalue("enemies")
@@ -186,8 +174,8 @@ local function snapshot(player)
 end
 local function tick(at, player)
     clock = at
-    local key = "wave_monster_overflow"
-    assert(scheduled[key], "one shared overflow timer must exist")()
+    local key = "wave_monster_overflow:" .. player
+    assert(scheduled[key], "overflow timer must exist for player " .. player)()
 end
 local function prepare_lanes()
     upvalue("rebuild_wave_channels")()
@@ -232,6 +220,7 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     kill(tail)
     assert(state.victory_settled and state.status == "archive_challenges")
     assert(#winners == 0 and #created == 8 and #archive_clears == 2)
+    assert(cooperative_payloads[0] == 1 and cooperative_payloads[1] == 1, "both winning human teammates count")
     final_check()
     assert(#created == 8 and #archive_clears == 2, "handoff/rewards must be idempotent")
     local players = archive._test.players()
@@ -255,6 +244,65 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     assert(archive.finish(hero_hub) and #winners == 1 and winners[1] == DOTA_TEAM_GOODGUYS)
 end
 
+-- Early completion uses the selected difficulty's real final wave and full batches.
+for difficulty_number = 1, 10 do
+    local difficulty = "N" .. difficulty_number
+    local last_wave = difficulty_number == 1 and 25 or 30
+    local state, enemies = restart(difficulty, false, {0})
+    local configured = upvalue("waves")
+    assert(state.total_waves == last_wave)
+    if difficulty == "N1" then assert(configured[30] == nil, "N1 must not borrow N2 wave 30") end
+    assert(not bus.request(events.WAVE_EARLY_FINAL_REQUEST, {}).ok)
+    bus.emit(events.GAME_STARTED, {})
+    clock = 59
+    assert(not bus.request(events.WAVE_EARLY_FINAL_REQUEST, {}).ok)
+    state.current_wave = last_wave - 1
+    local old_enemy = spawn_lane(0, 1)[1]
+    clock = 60
+    local result = bus.request(events.WAVE_EARLY_FINAL_REQUEST, {})
+    assert(result.ok and result.final_wave == last_wave, difficulty .. " early final target")
+    assert(state.current_wave == last_wave and state.total_waves == last_wave)
+    assert(result.removed_normal_enemies == 1 and old_enemy.removed)
+    assert(not state.victory_settled and not state.final_wave_generation_completed)
+    local expected_count = 0
+    for _, row in ipairs(configured[last_wave].batches) do
+        expected_count = expected_count + row.monster_count
+        assert(row.difficulty_id == difficulty, "must use this difficulty's final-wave stats")
+    end
+    assert(state.planned == expected_count)
+    local callbacks = {}
+    for key, callback in pairs(scheduled) do
+        if type(key) == "number" then callbacks[#callbacks + 1] = callback end
+    end
+    for _, callback in ipairs(callbacks) do callback() end
+    assert(state.spawned == expected_count and state.alive == expected_count)
+    local victims, final_bosses = {}, 0
+    for _, meta in pairs(enemies) do
+        assert(meta.wave_number == last_wave)
+        if meta.is_final_boss then final_bosses = final_bosses + 1 end
+        victims[#victims + 1] = meta.unit
+    end
+    assert(final_bosses > 0, "early final boss must retain final-boss classification")
+    scheduled.wave_generation_complete()
+    assert(state.final_wave_generation_completed and not state.victory_settled)
+    assert(not bus.request(events.WAVE_EARLY_FINAL_REQUEST, {}).ok)
+    for index = 1, #victims - 1 do kill(victims[index]) end
+    assert(not state.victory_settled, "early clear must wait for the entire final wave")
+    kill(victims[#victims])
+    assert(state.victory_settled and state.status == "archive_challenges")
+    assert(#archive_clears == 1 and #winners == 0)
+    assert(cooperative_payloads[0] == 0, "solo early final is not a cooperative win")
+    final_check()
+    assert(#archive_clears == 1, "early completion grants the clear only once")
+
+    state = restart(difficulty, false, {0})
+    bus.emit(events.GAME_STARTED, {})
+    clock = 60
+    state.current_wave = last_wave
+    assert(not bus.request(events.WAVE_EARLY_FINAL_REQUEST, {}).ok)
+    assert(not state.early_final_used, "cannot buy early completion once final wave has started")
+end
+
 -- Missing handler/assets/markers keep the game alive and retry, never show native victory.
 local state = restart("N1", true)
 final_ready(state)
@@ -272,168 +320,226 @@ markers_ready = true
 for id = 0, 1 do assert(scheduled["archive_hubs_retry:" .. id]() == false) end
 assert(#created == 6)
 
--- Four players share one fixed 90-enemy budget and one ten-second deadline.
+-- All four players have independent capacity: combined population is not a cap.
 local enemies
-state, enemies = restart("N1", false, {0,1,2,3})
+state, enemies = restart("N1", false, {0, 1, 2, 3})
 prepare_lanes()
 local lanes = {}
-for id=0,3 do lanes[id]=spawn_lane(id,20) end
-assert(state.alive==80 and not snapshot().overflow_active)
-for id=0,3 do
-    local own=snapshot(id)
-    assert(own.alive==80 and own.player_alive==20 and own.alive_limit==90)
-    assert(own.population_scope=="global" and not own.overflow_active)
-    assert(scheduled["wave_monster_overflow:"..id]==nil)
+for id = 0, 3 do
+    lanes[id] = spawn_lane(id, 80)
+    local own = snapshot(id)
+    assert(own.alive == 80 and own.alive_limit == 90 and not own.overflow_active)
+    assert(scheduled["wave_monster_overflow:" .. id] == nil)
 end
-spawn_lane(0,10)
-assert(snapshot().alive==90 and not snapshot().overflow_active)
-local extra=spawn_lane(1,1)[1]
-assert(snapshot().alive==91 and snapshot().overflow_remaining==10)
-for id=0,3 do assert(snapshot(id).overflow_active and snapshot(id).overflow_remaining==10) end
-assert(scheduled.wave_monster_overflow)
-tick(3.2)
-for id=0,3 do assert(snapshot(id).overflow_remaining==7) end
-clock=4
-spawn_lane(2,5)
-assert(snapshot().alive==96 and snapshot().overflow_remaining==6,"new spawns cannot extend the shared deadline")
--- Any player's kills count toward the shared recovery, including at the deadline.
-clock=5
-for index=1,6 do kill(lanes[3][index]) end
-assert(snapshot().alive==90 and not snapshot().overflow_active)
-assert(scheduled.wave_monster_overflow==nil and snapshot().overflow_remaining==0)
-kill(lanes[3][1])
-assert(snapshot().alive==90,"duplicate death must not decrement twice")
-clock=7
-spawn_lane(0,1)
-assert(snapshot().overflow_remaining==10,"recovered population starts a fresh deadline")
-local unrelated=unit("practice_or_archive_monster")
+assert(state.alive == 320 and state.spawned == 320 and state.pending == 0)
+assert(snapshot().alive == 320 and not snapshot().overflow_active,
+    "no-argument business snapshots preserve the global count without a global overflow timer")
+assert(last_projection.alive == 320)
+local lane_counts = { [0] = 0, [1] = 0, [2] = 0, [3] = 0 }
+for _, meta in pairs(enemies) do lane_counts[meta.player_id] = lane_counts[meta.player_id] + 1 end
+for id = 0, 3 do assert(lane_counts[id] == 80) end
+
+-- The 91st enemy starts only its owner's ten seconds. Each deadline is independent.
+spawn_lane(0, 10)
+assert(snapshot(0).alive == 90 and not snapshot(0).overflow_active)
+local extra_zero = spawn_lane(0, 1)
+assert(snapshot(0).alive == 91 and snapshot(0).overflow_remaining == 10)
+assert(snapshot(0).overflow_active and not snapshot(1).overflow_active)
+assert(not snapshot(2).overflow_active and not snapshot(3).overflow_active)
+clock = 2
+spawn_lane(1, 11)
+assert(snapshot(1).overflow_active and snapshot(1).overflow_remaining == 10)
+tick(3.2, 0)
+assert(last_projection.hud_clock_only==true,"clock ticks do not request HUD rebuilds")
+assert(snapshot(0).overflow_deadline==10 and snapshot(1).overflow_deadline==12,"absolute personal deadlines are exposed")
+assert(snapshot(0).overflow_remaining == 7 and snapshot(1).overflow_remaining == 9,
+    "a later owner's timer must not inherit the first owner's deadline")
+kill(lanes[2][1])
+assert(last_projection.hud_player_id==2,"enemy count change targets its lane owner")
+assert(snapshot(2).alive == 79 and snapshot(0).overflow_active and snapshot(1).overflow_active,
+    "another player's death must not cancel a player's overflow")
+local unrelated = unit("practice_or_archive_monster")
+local before = snapshot().alive
 kill(unrelated)
-assert(snapshot().alive==91,"practice/archive units retain their separate population rules")
-clock=17
-kill(extra)
-assert(snapshot().alive==90 and not snapshot().overflow_active and #defeated==0)
--- Disconnect removes only its owner but can recover the shared count.
-spawn_lane(1,5)
-active_players={0,2,3}
-bus.emit(events.PLAYER_DISCONNECTED,{player_id=1})
-assert(snapshot().alive<90 and not snapshot().overflow_active and #winners==0)
-assert(snapshot(1).player_alive==0 and upvalue("wave_channels")[1]==nil)
--- Exceeding the aggregate can defeat everyone although no owner has 90 enemies.
-state=restart("N1",false,{0,1,2,3})
+assert(snapshot().alive == before and snapshot(0).overflow_remaining == 7,
+    "independent challenge monsters do not enter assault-wave population")
+clock = 4
+local extra = spawn_lane(0, 5)
+assert(snapshot(0).alive == 96 and snapshot(0).overflow_remaining == 6,
+    "additional spawns must not restart the warning")
+clock = 5
+for _, value in ipairs(extra) do kill(value) end
+kill(extra_zero[1])
+assert(snapshot(0).alive == 90 and not snapshot(0).overflow_active)
+assert(snapshot(0).overflow_remaining == 0 and scheduled["wave_monster_overflow:0"] == nil)
+assert(snapshot(1).overflow_active and snapshot(1).overflow_remaining == 7)
+kill(extra_zero[1])
+assert(snapshot(0).alive == 90, "a duplicate death cannot lower the count again")
+clock = 7
+spawn_lane(0, 1)
+assert(snapshot(0).overflow_remaining == 10 and snapshot(1).overflow_remaining == 5,
+    "a recovered lane starts a fresh warning without resetting another player")
+active_players = {0, 2, 3}
+bus.emit(events.PLAYER_DISCONNECTED, { player_id = 1 })
+assert(snapshot(1).alive == 0 and not snapshot(1).overflow_active)
+assert(scheduled["wave_monster_overflow:1"] == nil and upvalue("wave_channels")[1] == nil)
+assert(snapshot(0).alive == 91 and snapshot(0).overflow_remaining == 10)
+assert(snapshot().alive == 250 and #winners == 0,
+    "disconnect removes only the disconnected lane's registered enemies")
+
+-- A personal deadline defeats only that player. Other players keep their channels and timers.
+state = restart("N1", false, {0, 1, 2, 3})
 prepare_lanes()
-local old_channel=upvalue("wave_channels")[0]
-for id=0,3 do spawn_lane(id,id==3 and 22 or 23) end
-assert(state.alive==91)
-for id=0,3 do assert(snapshot(id).player_alive<90 and snapshot(id).overflow_remaining==10) end
+local old_zero_channel = upvalue("wave_channels")[0]
+spawn_lane(0, 91)
+clock = 2
+spawn_lane(2, 91)
+tick(9.99, 0)
+assert(snapshot(0).overflow_remaining == 1 and #defeated == 0)
+tick(10, 0)
+assert(#defeated == 1 and defeated[1].player_id == 0 and defeated[1].reason == "monster_limit_exceeded")
+assert(#personal_finalized == 1 and personal_finalized[1] == 0 and #finalized == 0,
+    "personal defeat finalizes only the defeated player online session")
+assert(snapshot(0).player_defeated and snapshot(0).defeat_reason == "monster_limit_exceeded")
+assert(snapshot(0).alive == 0 and not snapshot(0).overflow_active)
+assert(upvalue("wave_channels")[0] == nil and scheduled["wave_monster_overflow:0"] == nil)
+assert(not state.defeat_settled and not state.post_clear_frozen and #winners == 0)
+assert(snapshot(2).alive == 91 and snapshot(2).overflow_remaining == 2)
+assert(snapshot().alive == 91, "personal cleanup must leave the other lane intact")
+local produced = #created
+state.pending = state.pending + 1
+upvalue("spawn_one")({archetype_id="humanoid_white_melee", health=200, attack=2},
+    upvalue("generation_token"), 1, 1, nil, old_zero_channel)
+assert(#created == produced, "a queued spawn cannot resurrect a defeated player's channel")
+spawn_lane(1, 91)
+assert(snapshot(1).alive == 91 and snapshot(1).overflow_remaining == 10,
+    "surviving players must continue real generation after another player's defeat")
+tick(12, 2)
+assert(#defeated == 2 and snapshot(2).player_defeated and #winners == 0)
+assert(snapshot(1).alive == 91 and snapshot(1).overflow_remaining == 8)
+spawn_lane(3, 91)
+tick(20, 1)
+assert(#defeated == 3 and #winners == 0 and not state.defeat_settled)
+tick(22, 3)
+assert(#defeated == 4 and state.defeat_settled and state.status == "defeat")
+assert(#winners == 1 and winners[1] == DOTA_TEAM_BADGUYS)
+assert(#finalized == 1 and finalized[1] == "all_players_defeated")
+for id = 0, 3 do assert(scheduled["wave_monster_overflow:" .. id] == nil) end
 final_ready(state)
-tick(9.99)
-assert(snapshot().overflow_remaining==1 and #defeated==0)
-tick(10)
-assert(#defeated==4 and #personal_finalized==4)
-assert(state.defeat_settled and state.post_clear_frozen and state.status=="defeat")
-assert(not state.victory_settled and #archive_clears==0)
-assert(#winners==1 and winners[1]==DOTA_TEAM_BADGUYS)
-assert(#finalized==1 and finalized[1]=="all_players_defeated")
-for id=0,3 do
-    assert(snapshot(id).player_defeated and snapshot(id).defeat_reason=="monster_limit_exceeded")
-    assert(snapshot(id).player_alive==0 and scheduled["wave_monster_overflow:"..id]==nil)
-    bus.emit(events.PLAYER_DISCONNECTED,{player_id=id,defeat_cleanup=true})
+final_check()
+bus.emit(events.WAVE_START_NEXT, {})
+publish("after_defeat")
+assert(#winners == 1 and #archive_clears == 0 and #defeated == 4,
+    "all-player defeat cannot reverse into archive victory or restart waves")
+
+-- Simultaneous deadlines must settle every expired player before global final-wave handoff.
+state = restart("N1", false, {0, 1, 2, 3})
+prepare_lanes()
+for id = 0, 3 do spawn_lane(id, 91) end
+final_ready(state)
+tick(10, 0)
+assert(#defeated == 4 and #personal_finalized == 4)
+assert(state.defeat_settled and not state.victory_settled and #archive_clears == 0)
+assert(snapshot().alive == 0 and #winners == 1 and winners[1] == DOTA_TEAM_BADGUYS)
+assert(#finalized == 1 and finalized[1] == "all_players_defeated")
+for id = 0, 3 do
+    bus.emit(events.PLAYER_DISCONNECTED, { player_id = id, defeat_cleanup = true })
+    assert(snapshot(id).alive == 0 and snapshot(id).player_defeated)
+    assert(scheduled["wave_monster_overflow:" .. id] == nil)
 end
-assert(snapshot().alive==0 and scheduled.wave_monster_overflow==nil)
-final_check();bus.emit(events.WAVE_START_NEXT,{});publish("after_defeat")
-local before=#created
-upvalue("spawn_one")({archetype_id="humanoid_white_melee",health=200,attack=2},
-    upvalue("generation_token")-1,1,1,nil,old_channel)
-assert(#created==before and #defeated==4 and #winners==1 and #archive_clears==0)
--- All participants lose, including a connected player whose own lane is empty.
-state=restart("N1",false,{0,1})
-prepare_lanes();spawn_lane(0,91);tick(10)
-assert(#defeated==2 and snapshot(1).player_defeated and #winners==1)
--- Other personal defeat reasons still let the surviving player finish the wave.
-state=restart("N1",false,{0,1})
+assert(#personal_finalized == 4 and #winners == 1 and #archive_clears == 0,
+    "duplicate disconnect cleanup after simultaneous defeat must remain idempotent")
+-- A defeated lane does not block surviving players from clearing the final wave.
+state = restart("N1", false, {0, 1})
 prepare_lanes()
-spawn_lane(0,1)
-local tail=spawn_lane(1,1)[1]
-assert(multiplayer.defeat(0,"unbuilt_wall"))
-assert(snapshot().alive==1 and not state.defeat_settled)
-final_ready(state);final_check()
-assert(not state.victory_settled)
-kill(tail)
-assert(state.status=="archive_challenges" and state.victory_settled)
-local challenges=archive._test.players()
-assert(challenges[0]==nil and challenges[1])
-assert(archive.finish(challenges[1].hubs[3]) and winners[1]==DOTA_TEAM_GOODGUYS)
--- Overflow inside other callbacks must freeze the match before those callbacks continue.
-state=restart("N1",false,{0})
-prepare_lanes();upvalue("start_countdown")(60);spawn_lane(0,91)
-clock=10
-assert(scheduled.wave_countdown()==false)
-assert(state.status=="defeat" and scheduled.wave_countdown==nil and #winners==1)
-state=restart("N1",false,{0})
-prepare_lanes();spawn_lane(0,91)
-assert(upvalue("start_wave")(state.total_waves,"fixture"))
-clock=10;scheduled.wave_generation_complete()
-assert(state.status=="defeat" and state.defeat_settled and #winners==1)
--- Engine removal without death, forced cleanup and game end clear the single clock.
-state=restart("N1",false,{0,1})
+spawn_lane(0, 91)
+local surviving_tail = spawn_lane(1, 1)[1]
+tick(10, 0)
+assert(snapshot(0).player_defeated and snapshot().alive == 1 and #winners == 0)
+final_ready(state)
+final_check()
+assert(not state.victory_settled, "the surviving player's last enemy still gates global completion")
+kill(surviving_tail)
+assert(state.status == "archive_challenges" and state.victory_settled and #winners == 0)
+local surviving_challenges = archive._test.players()
+assert(surviving_challenges[0] == nil and surviving_challenges[1] ~= nil,
+    "final challenge handoff must exclude the defeated player")
+assert(#archive_clears == 1 and archive_clears[1] == 1)
+assert(cooperative_payloads[1] == 0, "defeated teammate cannot turn a lone winner into cooperative victory")
+assert(archive.finish(surviving_challenges[1].hubs[3]))
+assert(#winners == 1 and winners[1] == DOTA_TEAM_GOODGUYS)
+-- Expiring inside other scheduler callbacks must not resurrect tasks after the last player's loss.
+state = restart("N1", false, {0})
 prepare_lanes()
-local orphaned=spawn_lane(0,46)
-spawn_lane(1,45)
-orphaned[1].removed=true
+upvalue("start_countdown")(60)
+spawn_lane(0, 91)
+clock = 10
+assert(scheduled.wave_countdown() == false)
+assert(state.status == "defeat" and scheduled.wave_countdown == nil and #winners == 1)
+state = restart("N1", false, {0})
+prepare_lanes()
+spawn_lane(0, 91)
+assert(upvalue("start_wave")(state.total_waves, "fixture"))
+clock = 10
+scheduled.wave_generation_complete()
+assert(state.status == "defeat" and state.defeat_settled and #winners == 1)
+
+-- A real death at the deadline restores that player's safe count before evaluation.
+state = restart("N1", false, {0, 1})
+prepare_lanes()
+local victims = spawn_lane(0, 91)
+clock = 10
+kill(victims[1])
+assert(snapshot(0).alive == 90 and not snapshot(0).overflow_active and #defeated == 0)
+assert(#winners == 0)
+
+-- Removal without a death event and forced cleanup cannot strand private counts or warnings.
+state = restart("N1", false, {0, 1})
+prepare_lanes()
+local orphaned = spawn_lane(0, 91)
+spawn_lane(1, 91)
+orphaned[1].removed = true
 upvalue("update_targets")()
-assert(snapshot().alive==90 and not snapshot().overflow_active)
-assert(upvalue("clear_normal_wave_enemies")()==90)
-assert(snapshot().alive==0 and scheduled.wave_monster_overflow==nil)
-spawn_lane(0,91)
-local stale_timer=scheduled.wave_monster_overflow
-engine_state=DOTA_GAMERULES_STATE_POST_GAME;state_listener()
-assert(not snapshot().overflow_active and scheduled.wave_monster_overflow==nil)
-state=restart("N1",false,{0,1})
-assert(stale_timer()==false,"an old world's timer cannot publish into a new match")
-assert(snapshot().alive==0 and not snapshot().overflow_active)
--- Real wave scheduling routes four players into one parallel row, preserving ownership.
-state=restart("N1",false,{0,1,2,3})
-local cx,cy=-1024,0
-local map_markers,wall_units={},{}
-local coordinates={{600,0},{0,-600},{-600,0},{0,600}}
-for id=0,3 do
-    local xy=coordinates[id+1]
-    local value={IsNull=function() return false end,
-        GetAbsOrigin=function() return Vector(cx+xy[1],cy+xy[2],16) end}
-    map_markers["monsterborn_player"..(id+1)],map_markers["player_"..id]=value,value
-    local wall=unit("wall");wall.id=1000+id;wall.position=Vector(cx+1000,cy+1000,384)
-    wall_units[wall.id]=wall
+assert(snapshot(0).alive == 90 and not snapshot(0).overflow_active)
+assert(snapshot(1).alive == 91 and snapshot(1).overflow_active)
+assert(snapshot().alive == 181)
+assert(upvalue("clear_normal_wave_enemies")() == 181)
+assert(snapshot().alive == 0 and #defeated == 0 and #archive_clears == 0)
+for id = 0, 1 do
+    assert(snapshot(id).alive == 0 and not snapshot(id).overflow_active)
+    assert(scheduled["wave_monster_overflow:" .. id] == nil)
 end
-Entities.FindByName=function(_,_,name) return map_markers[name] end
-EntIndexToHScript=function(id) return wall_units[id] end
+-- Terminal cleanup and reinitialization clear every independent warning.
+state = restart("N1", false, {0, 1})
 prepare_lanes()
-for id=0,3 do bus.emit(events.BUILDING_CREATED,{building_id="wall",player_id=id,entindex=1000+id}) end
-local queued_channel=upvalue("wave_channels")[0]
-assert(upvalue("start_wave")(1,"routing_fixture"))
-for index=1,4 do assert(scheduled[index])() end
-for id=0,3 do
-    local value=created[id+1]
-    assert(value.implicit_clear==false,"wave navigation must precede clear-space placement")
-    assert(value.survival_player_id==id and value.wall_target==1000+id)
-    assert(value.position.x==cx-120+id*80 and value.position.y==cy+600 and value.position.z==32)
+spawn_lane(0, 91)
+clock = 2
+spawn_lane(1, 91)
+engine_state = DOTA_GAMERULES_STATE_POST_GAME
+state_listener()
+for id = 0, 1 do
+    assert(not snapshot(id).overflow_active and scheduled["wave_monster_overflow:" .. id] == nil)
 end
-assert(state.alive==4 and state.spawned==4)
--- The same queued channel sees a changed wall position; other players stay in their row.
-wall_units[1000].position=Vector(cx-1000,cy-1000,384)
-bus.emit(events.BUILDING_CREATED,{building_id="wall",player_id=0,entindex=1000})
-assert(upvalue("wave_channels")[0]==queued_channel)
-assert(scheduled[5])()
-assert(created[5].position.x==cx and created[5].position.y==cy-600 and created[5].wall_target==1000)
-bus.emit(events.BUILDING_DESTROYED,{building_id="wall",player_id=1,entindex=1001})
-assert(created[2].wall_target==-1 and created[1].wall_target==1000,
-    "a missing owned wall cannot select another player's wall")
-local rebuilt=unit("wall");rebuilt.id=2001;rebuilt.position=Vector(cx+1000,cy+1000,384)
-wall_units[2001]=rebuilt
-bus.emit(events.BUILDING_CREATED,{building_id="wall",player_id=1,entindex=2001})
-assert(created[2].wall_target==2001,"existing enemies receive their replacement owned wall")
-bus.emit(events.PLAYER_DISCONNECTED,{player_id=2})
-assert(upvalue("wave_channels")[2]==nil and state.alive==4)
-local channels=upvalue("wave_channels")
-assert(channels[1].spawn_offset_x==-40 and channels[3].spawn_offset_x==40,
-    "remaining same-side players are recentered after a disconnect")
-print("PASS wave population/endgame: shared 90 cap, one game-time deadline, cross-player recovery, all-participant defeat, victory race protection, independent wall losses, final challenges, terminal cleanup")
+state = restart("N1", false, {0, 1})
+assert(snapshot().alive == 0)
+for id = 0, 1 do assert(snapshot(id).alive == 0 and not snapshot(id).overflow_active) end
+print("PASS wave population/endgame: N1/N2/N3 challenge handoff, global tail survivors, four independent lane counts/deadlines, death/disconnect recovery, personal defeat, surviving lane generation, all-player defeat once, terminal cleanup")
+
+-- Cooperative victory uses the final connected human roster, not the number of lanes at start.
+for _, case in ipairs({
+    {players={0}, expected={[0]=0}},
+    {players={0,1}, fake={[1]=true}, expected={[0]=0,[1]=0}},
+    {players={0,1,2}, fake={[2]=true}, expected={[0]=1,[1]=1,[2]=0}},
+    {players={0,1,2,3}, expected={[0]=1,[1]=1,[2]=1,[3]=1}},
+    {players={0,1}, disconnected=1, expected={[0]=0}},
+}) do
+    local state=restart("N1",false,case.players)
+    fake_players=case.fake or {}
+    if case.disconnected then upvalue("disconnected_players")[case.disconnected]=true end
+    final_ready(state);final_check()
+    assert(state.victory_settled)
+    for id, expected in pairs(case.expected) do assert(cooperative_payloads[id]==expected) end
+    if case.disconnected then assert(cooperative_payloads[case.disconnected]==nil) end
+    local count=#archive_clears;final_check();assert(#archive_clears==count)
+end
+print("PASS cooperative winner roster: solo, two humans, four humans, bots, defeated/disconnected teammate, duplicate victory")

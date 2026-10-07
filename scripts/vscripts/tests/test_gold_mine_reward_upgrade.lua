@@ -48,3 +48,11 @@ for i=1,200 do bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,
 assert(schedules==0 and harvest_publishes==0,
     "tower hits must not reschedule gold production or republish mine stats")
 print("LUMBERJACK_GOLD_ISOLATION_PASS")
+
+for i=1,200 do
+ for _,section in ipairs({"tower","hero","wall"}) do
+  bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=0,changed_section=section,reason="combat_growth"})
+ end
+end
+assert(schedules==0 and harvest_publishes==0,"combat growth cannot rebuild mine stats")
+print("COMBAT_GOLD_ISOLATION_PASS: 600 scoped events cause zero production scheduling and UI publications")

@@ -1,0 +1,74 @@
+{
+  "fragment_01": {
+    "item_definition": "7876",
+    "official_name": "Shattered Greatsword",
+    "icon_path": "econ/items/sven/shattered_greatsword/shattered_greatsword.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/sven/shattered_greatsword/shattered_greatsword_png.vtex"
+  },
+  "fragment_02": {
+    "item_definition": "13538",
+    "official_name": "Progenitor's Bane",
+    "icon_path": "econ/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/mars/mars_ti9_immortal_weapon/mars_ti9_immortal_weapon_png.vtex"
+  },
+  "fragment_03": {
+    "item_definition": "4446",
+    "official_name": "Pyre",
+    "icon_path": "econ/items/doom/pyre/pyre.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/doom/pyre/pyre_png.vtex"
+  },
+  "fragment_04": {
+    "item_definition": "6894",
+    "official_name": "Soul Diffuser",
+    "icon_path": "econ/items/spectre/spectre_diffusal.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/spectre/spectre_diffusal_png.vtex"
+  },
+  "fragment_05": {
+    "item_definition": "4020",
+    "official_name": "Battlefury",
+    "icon_path": "econ/items/faceless_void/battlefury/battlefury.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/faceless_void/battlefury/battlefury_png.vtex"
+  },
+  "fragment_06": {
+    "item_definition": "8271",
+    "official_name": "Basher of Mage Skulls",
+    "icon_path": "econ/items/antimage/skullbasher/skullbasher1.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/antimage/skullbasher/skullbasher1_png.vtex"
+  },
+  "fragment_07": {
+    "item_definition": "5321",
+    "official_name": "Kunkka's Shadow Blade",
+    "icon_path": "econ/items/kunkka/kunkka_shadow_blade/kunkka_shadow_blade.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/kunkka/kunkka_shadow_blade/kunkka_shadow_blade_png.vtex"
+  },
+  "fragment_08": {
+    "item_definition": "4007",
+    "official_name": "Dragonclaw Hook",
+    "icon_path": "econ/items/pudge/pudge_skeleton_hook_body.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/pudge/pudge_skeleton_hook_body_png.vtex"
+  },
+  "fragment_09": {
+    "item_definition": "7813",
+    "official_name": "Golden Cyrridae",
+    "icon_path": "econ/items/weaver/weaver_immortal_head_ti7/weaver_ti7_immortal_head_gold.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/weaver/weaver_immortal_head_ti7/weaver_ti7_immortal_head_gold_png.vtex"
+  },
+  "fragment_10": {
+    "item_definition": "5810",
+    "official_name": "Blades of Voth Domosh",
+    "icon_path": "econ/items/legion_commander/demon_sword.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/legion_commander/demon_sword_png.vtex"
+  },
+  "fragment_11": {
+    "item_definition": "13009",
+    "official_name": "Maraxiform's Fate",
+    "icon_path": "econ/items/clinkz/clinkz_ti9_immortal_weapon/clinkz_ti9_immortal_weapon.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/clinkz/clinkz_ti9_immortal_weapon/clinkz_ti9_immortal_weapon_png.vtex"
+  },
+  "fragment_12": {
+    "item_definition": "12451",
+    "official_name": "The Magus Cypher",
+    "icon_path": "econ/items/rubick/arcana/magus_cypher.png",
+    "runtime_uri": "s2r://panorama/images/econ/items/rubick/arcana/magus_cypher_png.vtex"
+  }
+}

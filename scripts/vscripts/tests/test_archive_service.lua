@@ -65,11 +65,11 @@ local function cheat(id, difficulty, count)
 end
 assert(cheat(0, "n1", 20))
 assert(profiles[0].save.archive.clear_counts.n1 == 20)
-assert(profiles[0].save.gameplay_stats.initial_wood == 10 + 50 + 80 + 100)
+assert(profiles[0].save.gameplay_stats.initial_wood == 10 + 50 + 80 + 100 + 560, "clear milestones plus all victory bundles")
 assert(profiles[1].save.gameplay_stats.initial_wood == 10, "player isolation")
 assert(cheat(0, "clear_n1_1", 20))
 assert(profiles[0].save.archive.clear_counts.n1 == 40)
-assert(profiles[0].save.gameplay_stats.initial_wood == 240, "milestones granted only once")
+assert(profiles[0].save.gameplay_stats.initial_wood == 800, "clear and victory milestones granted only once")
 tools_mode = false
 assert(not cheat(0, "n1", 1), "production cheat denied")
 tools_mode = true
@@ -81,6 +81,18 @@ assert(archive.record_clear(1, "N1").ok)
 local old_writes = writes
 assert(archive.record_clear(1, "N1").ok)
 assert(writes == old_writes and profiles[1].save.archive.clear_counts.n1 == 1, "match clear dedup")
+profiles[12] = new_profile()
+profiles[12].save.archive = {clear_counts={n1=4},cooperative_clear_count=4}
+local before_coop = profiles[12].save.gameplay_stats.gold_mine_efficiency_pct
+bus.emit("archive.final_wave_cleared",{player_id=12,difficulty_id="N1",cooperative_win=1})
+assert(profiles[12].save.archive.cooperative_clear_count==5 and profiles[12].save.archive.clear_counts.n1==5)
+assert(profiles[12].save.archive.completed.welfare_coop_01)
+assert(profiles[12].save.gameplay_stats.gold_mine_efficiency_pct==before_coop+5)
+local co_writes=writes
+bus.emit("archive.final_wave_cleared",{player_id=12,difficulty_id="N1",cooperative_win=1})
+assert(writes==co_writes and profiles[12].save.archive.cooperative_clear_count==5)
+local welfare_page=archive.snapshot(12,"gift")
+assert(#welfare_page.rows==36 and welfare_page.rows[14].completed==1 and welfare_page.rows[15].completed==0)
 local snapshot = archive.snapshot(0, "clear")
 assert(snapshot.rows[1].completed == 1 and snapshot.rows[4].completed == 0)
 assert(snapshot.gameplay_stats == nil and snapshot.entitlements == nil)
@@ -225,11 +237,13 @@ assert(profiles[5].save.archive.endless_score == 1, "wave score dedup")
 for wave = 2, 60 do assert(archive.record_endless_wave(5, wave, 10).ok) end
 assert(profiles[5].save.archive.endless_score == 1110)
 assert(profiles[5].save.archive.completed.endless_1)
-assert(profiles[5].save.gameplay_stats.lumberjack_efficiency == stats.by_id.lumberjack_efficiency.default_value + 1)
+assert(profiles[5].save.gameplay_stats.lumberjack_efficiency == stats.by_id.lumberjack_efficiency.default_value + 2)
 assert(not archive.record_endless_wave(5, 1001, 10).ok)
 local endless_rows = archive.snapshot(5, "endless").rows
-assert(#endless_rows == 50 and endless_rows[1].completed == 1 and endless_rows[2].completed == 0)
+assert(#endless_rows == 82 and endless_rows[1].completed == 1 and endless_rows[2].completed == 0)
 assert(endless_rows[1].count == 1110)
+assert(endless_rows[51].count == 60 and endless_rows[51].target == 11 and endless_rows[51].completed == 1)
+assert(endless_rows[56].target == 61 and endless_rows[56].completed == 0)
 for _, row in ipairs(require("config/generated/archive_endless_achievements").rows) do
     for _, field in ipairs(row.effect_ids) do assert(stats.by_id[field], field) end
 end
@@ -342,3 +356,45 @@ timestamp=25000*86400+16*3600-1
 assert(calendar.day()==25000)
 timestamp=timestamp+1
 assert(calendar.day()==25001,"UTC+8 midnight")
+
+-- Welfare purchases must remain available while unrelated boss rewards retry.
+profiles[9] = new_profile()
+local manual_commands, manual_done = {}, nil
+archive.set_provider({submit=function(id,command,done)
+    manual_commands[#manual_commands+1] = command
+    manual_done = done
+end})
+archive.record_boss(9,"welfare_background_boss")
+manual_done({ok=false,error="temporary_network_failure"})
+local welfare = archive.snapshot(9,"work")
+assert(welfare.pending==1 and welfare.upgrade_pending==0,"boss retry must not lock welfare cards")
+archive.work_upgrade(9,"work_01",0)
+assert(manual_commands[#manual_commands].kind=="work_upgrade","manual purchase must precede retrying background reward")
+assert(archive.snapshot(9,"work").upgrade_pending==1,"in-flight welfare is marked separately")
+assert(archive.snapshot(9,"building").upgrade_pending==0,"welfare pending state is scoped to its category")
+manual_done({ok=true})
+assert(archive.snapshot(9,"work").upgrade_pending==0)
+assert(archive.has_pending(9),"background reward is preserved, never discarded")
+tasks.archive_retry()
+assert(manual_commands[#manual_commands].kind=="boss_kill")
+manual_done({ok=true})
+assert(not archive.has_pending(9))
+print("ARCHIVE_WORK_PENDING_PASS: background retry isolation, purchase priority, category-scoped wait, no reward loss")
+
+local closing_commands,closing_done={},nil
+archive.set_provider({submit=function(id,command,done)
+ closing_commands[#closing_commands+1]=command;closing_done=done
+end})
+assert(cheat(0,"n2",1))
+archive.begin_finalization()
+assert(archive.has_pending(0),"finalization keeps in-flight reward")
+closing_done({ok=false,error="temporary_network_failure"})
+assert(archive.has_pending(0),"failed write remains queued")
+tasks.archive_retry()
+assert(#closing_commands==2 and closing_commands[1].id==closing_commands[2].id)
+closing_done({ok=true})
+assert(not archive.has_pending(0),"only confirmed completion drains queue")
+local before=#closing_commands
+local allowed=cheat(0,"n2",1)
+assert(not allowed and #closing_commands==before,"no new reward mutations during finalization")
+print("ARCHIVE_FINALIZATION_RETRY_PASS: pending preserved, retry same id, no new rewards, confirmed completion")

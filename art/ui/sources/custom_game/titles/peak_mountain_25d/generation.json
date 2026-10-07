@@ -1,0 +1,28 @@
+{
+  "tool": "built-in image_gen",
+  "prompts": [
+    "Use case: precise-object-edit. Input: the user's latest attached image is the exact STYLE AND COMPOSITION REFERENCE, with a large title above and a small gameplay example below. Create ONE production transparent PNG layer for that title, BACKGROUND MOUNTAINS AND CLOUDS ONLY. Preserve the top design's craggy dark jade mountains, tallest golden-lit peak slightly left of center, white cloud wisps and thin curling gold mist along the bottom. Remove ALL Chinese lettering and remove the entire dragon. Remove the dark background and the entire lower gameplay screenshot. No plaque, no frame, no text, no dragon, no black rectangle, no checkered pattern. TRUE TRANSPARENT ALPHA. Wide canvas 1536x640. The mountain/cloud composition occupies x=8%-92%, y=3%-95%, with the highest summit at x=46%, y=4%, leaving transparent upper-right space for a separately animated dragon. Keep center/lower mountains quiet and dark so separately composited large gold lettering at x=15%-85%, y=42%-88% will read clearly. Gold ground wisps thin and elegant, not an enclosing rigid border. High fidelity to reference rather than inventing a new badge. This is a single layer of a 2.5D game title.",
+    "Use case: precise-object-edit. References: the user's attached title design showing 登峰造极 over mountains with a golden dragon (upper design; disregard bottom gameplay screenshot), and the recently generated mountains-only layer. Produce ONE separate transparent FOREGROUND LETTERING layer matching the user's original lettering as closely as possible: exact four Chinese characters 登峰造极, in that order, oversized flowing thick gold brush calligraphy, pale ivory-gold bevel highlights, rich warm gold faces, deep red-brown fine outline and sculptural shaded edges, dramatic sweeping strokes. The second character 峰 has the long descending point as in reference. Only those four glyphs, no other text. Extract/reconstruct the lettering only, NO mountains, NO dragon, NO clouds, NO plaque or rectangular base, NO border, NO background; TRUE transparent alpha. Wide canvas 1536x640. Place the lettering across x=14%-87%, occupying y=39%-94% of this full canvas, leaving upper 38% entirely transparent for separate mountains and dragon. The visible four characters are much wider than tall (about 3.1:1 bounding box), handwritten brush variation, very legible when reduced to a 180px wide game title. Preserve the reference's distinctive shape; do not use simple printed font or a generic hotel sign. All surrounding pixels transparent, no checkered pattern.",
+    "Use case: precise-object-edit. The FIRST of the three reference images is the user's title design with a gold dragon coiling above and to the right of 登峰造极; later two are separate mountains and letters for context. Create ONLY the single GOLDEN CHINESE DRAGON from that first design, separated onto true transparent alpha for a game animation. No mountains, no writing, no cloud mass, no banner, no plaque, no dark background, no extra dragons. Dragon faces RIGHT, head at upper right, antlers and swept gold whiskers, long serpentine scaled gold body makes a graceful inverted S curl: upper coil arches toward left behind the head, lower body curves down at right and thin tail sweeps left below. Same polished golden lighting and elegant ferocious head as reference, strong readable silhouette, sharp gold scales, small warm amber eyes. Entire dragon visible including whiskers/tail. Fit dragon tightly but uncropped in a roughly square transparent canvas, with a little margin on all sides. This dragon will be composited at the upper right of a mountain title, head remaining above the text. NO attached rock or letter. Avoid generic clip-art, thick mechanical frame, Western wings, rigid circular bracelet shape. Production separated sprite layer, high fidelity to the reference dragon."
+  ],
+  "assets": {
+    "mountains": {
+      "source": "mountains.png",
+      "runtime": "panorama/src/images/custom_game/titles/peak_mountain_mountains.png"
+    },
+    "letters": {
+      "source": "letters.png",
+      "runtime": "panorama/src/images/custom_game/titles/peak_mountain_letters.png"
+    },
+    "dragon": {
+      "source": "dragon.png",
+      "runtime": "panorama/src/images/custom_game/titles/peak_mountain_dragon.png"
+    }
+  },
+  "animation": {
+    "sweep_period_seconds": 3,
+    "dragon_period_seconds": 5,
+    "dragon_ascent_seconds": 1.8,
+    "rest_pose": "upper right of mountains; behind lettering"
+  }
+}

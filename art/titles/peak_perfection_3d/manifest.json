@@ -1,0 +1,22 @@
+{
+  "mesh_vertices": 32216,
+  "triangles": 51036,
+  "bounds": [
+    [
+      -185.79281616210938,
+      -50.099998474121094,
+      -8.070653915405273
+    ],
+    [
+      185.79281616210938,
+      50.687164306640625,
+      16.562408447265625
+    ]
+  ],
+  "text": "登峰造极",
+  "font_source": "Windows KaiTi; glyph geometry only",
+  "collision": false,
+  "real_mesh": true,
+  "front_face": "local +Z",
+  "export_axis_compensation_degrees": -90
+}

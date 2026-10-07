@@ -112,6 +112,8 @@ local bus = {
     end,
 }
 package.loaded["core/event_bus"] = bus
+-- Native handle assertions in this fixture; visibility proxy has its own regression suite.
+package.loaded["systems/combat_effect_visibility"] = {manager=function() return ParticleManager end}
 package.loaded["core/scheduler"] = {
     after = function(delay, callback, id)
         next_task = next_task + 1
@@ -1236,6 +1238,7 @@ assert(#particles == 1)
 -- A penetrating wave may physically contact a tree, but its hit count,
 -- penetration decay and deduplication only advance for valid enemy hits.
 clear()
+tower.skills={burning};tower.survival_super_tower_crit_chance=0
 subscribers[events.TOWER_ATTACK_START]({ tower = tower, target = dummy, skills = { burning } })
 assert(#linear == 1)
 local extra = linear[1].ExtraData

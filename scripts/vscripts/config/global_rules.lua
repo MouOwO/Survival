@@ -9,7 +9,7 @@ function M.number(rule_id, fallback)
     return value ~= nil and value or fallback
 end
 
-M.tower_attack_range = M.number("tower_attack_range", 1000)
+M.tower_attack_range = M.number("tower_attack_range", 800)
 M.tower_acquisition_range = M.number(
     "tower_acquisition_range",
     M.tower_attack_range

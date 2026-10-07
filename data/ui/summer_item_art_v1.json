@@ -1,0 +1,194 @@
+[
+  {
+    "id": "lottery_kings_treasure",
+    "name": "王之财宝",
+    "quality": "UR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: A compact open royal treasure chest in three-quarter view, deep crimson lacquer and broad burnished gold metal bands, lid visibly open, a small bold mound of gold coins and three red gemstones inside and spilling immediately against the chest. Rich golden dominant color, dark red secondary. Strong chest silhouette; wealth not a landscape.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-c2f307f1-9529-4fe0-bce8-f6c2c097c843.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_kings_treasure.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_kings_treasure.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "986a9779692bed1ab250603291c0c6013d83e80e6c195afc4d22957b607937b2",
+    "alpha_bounds": [
+      53,
+      18,
+      1202,
+      1233
+    ]
+  },
+  {
+    "id": "lottery_muramasa",
+    "name": "妖刀村正",
+    "quality": "UR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One sinister Japanese-inspired curved katana, complete blade from lower-left hilt to upper-right tip. Broad enough to read at small size, blackened steel blade with a deep crimson glowing cutting edge, dark red wrapped grip, simple dark bronze guard and one short red cloth tassel attached to pommel. Elegant dangerous curved silhouette, no sheath, no hands, no blood.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-e63f0828-ac20-4366-961d-d8daf92b0a87.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_muramasa.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "ae7c28977927261984dc611c101ebd48fce6acae75e330c862531cb3445f8c9a",
+    "alpha_bounds": [
+      46,
+      15,
+      1224,
+      1240
+    ]
+  },
+  {
+    "id": "lottery_sword_of_promise",
+    "name": "誓约之剑",
+    "quality": "UR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One heroic holy longsword diagonally lower left hilt to upper right blade tip, wide polished ivory-silver blade with a single strong cobalt-blue central channel, thick gold cruciform guard, royal blue leather handle, one blue gemstone in pommel. Noble clean broad silhouette, blue white and gold; no sheath, no hand.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-09ccba26-d52c-4b5d-bab0-2867292b82b3.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_sword_of_promise.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sword_of_promise.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "3c7fbe3763ce783e9fcd3f7d65292dfc7ff7f24e82c1cccae40f9eacbea48806",
+    "alpha_bounds": [
+      35,
+      20,
+      1236,
+      1228
+    ]
+  },
+  {
+    "id": "lottery_spear_of_longinus",
+    "name": "朗基努斯枪",
+    "quality": "UR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One complete mythic crimson lance running lower left butt to upper right head, thick deep red metal shaft with a restrained dark gold grip, distinctive two long diverging blade prongs forming a forked spearhead. Broad angular red blades with orange bevel highlights and dark maroon recesses; small-size readability, no hands, no character, no background aura.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-6f608dd3-1aa6-4d02-8085-5c0eae450e2a.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_spear_of_longinus.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "c386b5a76fdd7d5be59783169556ce5e7979f9fd52b95727244eab1d94faf55a",
+    "alpha_bounds": [
+      78,
+      14,
+      1233,
+      1224
+    ]
+  },
+  {
+    "id": "lottery_rose_blade",
+    "name": "蔷薇之刃",
+    "quality": "UR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One graceful fantasy rapier diagonally lower left hilt to upper right tip, ivory-silver long pointed blade, a sculpted pink rose as guard with two clearly shaped emerald-green leaves, pale gold stem-like curved knuckle guard, wine-red wrapped handle. Blade substantial enough for an 80px icon. White and rose-pink dominant, rose is attached to weapon, no loose petals, no character.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-57ee42d0-4f26-43c0-a515-28cbb2c40727.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_rose_blade.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_rose_blade.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "3838769af92c930e73bbbae63daf94e9a596cb63f4631f9ee6231cdb79d9ef0f",
+    "alpha_bounds": [
+      41,
+      33,
+      1221,
+      1199
+    ]
+  },
+  {
+    "id": "lottery_law_of_cycles",
+    "name": "圆环之理",
+    "quality": "UR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One magical circular relic as the main object, an obliquely tilted thick ivory-gold ring shaped as two smoothly interlocking continuous arcs, framing a large luminous violet faceted crystal suspended within the ring. A small crescent shaped lavender metal feature integrated at the top. Bold circular silhouette with transparent open gaps, ivory gold lavender palette. The ring IS the object, not an icon border or ornamental frame. No text or runes.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-50a015d9-28cc-48ac-b9a8-a397e5844bf5.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_law_of_cycles.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_law_of_cycles.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "fc9e4f9790ebd470beb2e767e1ea29aa8ba8026453b4d7f8525080e8e201db25",
+    "alpha_bounds": [
+      95,
+      33,
+      1178,
+      1191
+    ]
+  },
+  {
+    "id": "lottery_magic_book",
+    "name": "魔法书",
+    "quality": "SSR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One thick closed wizard spellbook in three-quarter view, midnight-blue leather covers, thick ivory page block clearly visible, broad silver corner clasps, one large cyan luminous crystal set into a simple star-shaped metal boss on the front cover, short purple bookmark attached. Strong readable rectangular silhouette, indigo blue cyan silver. No writing, no letters, no loose effects.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-a8c4d6e3-3c00-4d48-a1e8-2574892993c4.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_magic_book.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "ac3eb385db6e23b5b8af490470c5b1af3cdc797562578e3a928fa49d316b4042",
+    "alpha_bounds": [
+      49,
+      38,
+      1208,
+      1217
+    ]
+  },
+  {
+    "id": "lottery_raven_eye",
+    "name": "渡鸦之眼",
+    "quality": "SSR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One spherical dark violet raven-eye magical orb, a large luminous magenta iris with dark vertical pupil embedded in its front. Thick antique-gold bands shaped like a raven's curved upper brow and hooked beak wrap around the orb without hiding the eye. A few attached short dark feather-shaped metal fins at rear. Round silhouette, purple-magenta-gold palette; artifact not a real animal or severed body part.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-f1ef486f-0477-48dc-b4f2-b71ab7b36bb5.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_raven_eye.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "179ca819b5a056fdcc161c9a6162bfdaa99706431bf91dc53ac40d1142ad14b0",
+    "alpha_bounds": [
+      45,
+      86,
+      1223,
+      1130
+    ]
+  },
+  {
+    "id": "lottery_withered_branch_lantern",
+    "name": "枯枝灯",
+    "quality": "SSR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One portable enchanted lantern in three-quarter view. A cage made from three thick gnarled weathered wooden branches wrapped around pale amber glass, warm golden flame visible inside, broad dark iron top and base, thick arched carry handle. Dry crooked branch forms clearly visible, tapering silhouette, brown wood and amber light with restrained iron gray. No smoke or background.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-0acea5ab-6287-47c9-9aa1-6da3cc8bfd71.png",
+    "generator": "built-in image_gen",
+    "previous_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-480381e7-c89e-4226-bf8f-3fee7fa83a5f.png",
+    "refinement_prompt": "Edit this game inventory icon. Preserve the exact hand-painted withered wooden branch lantern design, warm amber glass and flame, ironwork, colors and transparent background. Correct only framing: the top of the carrying handle is currently clipped by the canvas. Show the ENTIRE intact complete carrying handle and the whole lantern with generous transparent margin on ALL four sides, at least 8% of the square each side. Zoom out slightly so object is at most 84% canvas height. Center it. No new objects, no writing, no card background. Keep square.",
+    "icon_path": "custom_game/reward_art_v5/lottery_withered_branch_lantern.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_withered_branch_lantern.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "4927499b7835b9f06ad16c7f0065867d771b8d40b9dda106e1d41b3e3636c760",
+    "alpha_bounds": [
+      342,
+      111,
+      960,
+      1179
+    ]
+  },
+  {
+    "id": "lottery_echo_compass",
+    "name": "回响罗盘",
+    "quality": "SSR",
+    "prompt": "Use case: stylized-concept. Create ONE finished square game inventory icon, a single isolated item on a genuinely transparent background. Match a coherent hand-painted classic fantasy RTS item set: bold readable volumes, painterly material shading, crisp silhouette, saturated but controlled colors, bright bevel highlights, dark recesses. The existing set has chunky blue crystal armor and warmly painted golden cornucopia; match that visual finish. Readable at 80 pixels. Center the object, occupy 80-86% of the square with clean margins, complete silhouette fully inside image. No card plate, no border, no rarity badge, no words, letters or numbers, no watermark, no scenery, no ground shadow, no detached sparkles, no dense tiny filigree. Not photorealistic, not flat vector. Subject: One magical navigator's compass in three-quarter view, circular thick aged bronze housing with an open protective lid partly behind, dark teal enamel face, one large ivory needle with a turquoise luminous tip, two broad concentric silver ripple inlays suggesting an echo. Short loop attached at the top. Bronze teal ivory palette, clear circular dial silhouette, no digits, words, letters or tiny tick marks.",
+    "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0d3df-1dce-7281-87d8-b638b036c938\\exec-8908c57e-fa0b-4d83-a1e7-d95954c26d06.png",
+    "generator": "built-in image_gen",
+    "icon_path": "custom_game/reward_art_v5/lottery_echo_compass.png",
+    "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_echo_compass.vtex",
+    "source_width": 1254,
+    "source_height": 1254,
+    "sha256": "73f86f1c8238390eeacb4398a9020106cd74c787aec1a342835634058d45f50b",
+    "alpha_bounds": [
+      54,
+      31,
+      1197,
+      1194
+    ]
+  }
+]

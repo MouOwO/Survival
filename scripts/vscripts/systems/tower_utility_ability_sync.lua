@@ -60,8 +60,19 @@ function M.sync(state, row)
     -- route abilities. Keep this second clear for direct callers and make the
     -- final append order explicit: movement first (D), destruction last.
     M.clear(unit)
-    local free_slots = math.max(0, MAX_VISIBLE_ABILITIES - visible_non_utility_count(unit))
-    local show_destroy = configured(row, DESTROY_ABILITY) and free_slots >= 1
+    -- A retained final-level disabled upgrade occupies an extra HUD slot;
+    -- it must not displace the movement or destruction controls.
+    local final_upgrade_slot = state.tower_class
+        and not require("config/tower_route_config").row_at_level(state, state.level + 1)
+        and (unit:FindAbilityByName("ability_upgrade_tower_lv01")
+            or unit:FindAbilityByName("ability_upgrade_tower")) and 1 or 0
+    local free_slots = math.max(0, MAX_VISIBLE_ABILITIES + final_upgrade_slot
+        - visible_non_utility_count(unit))
+    -- Base 1-5 exposes seven route choices. Its custom HUD grows to eight
+    -- slots, so destruction must remain visible even beyond the legacy cap.
+    local base_route_selection = not state.tower_class and tonumber(state.level) == 5
+    local show_destroy = configured(row, DESTROY_ABILITY)
+        and (base_route_selection or free_slots >= 1)
     local show_move = configured(row, MOVE_ABILITY) and free_slots >= 2
 
     if configured(row, MOVE_ABILITY) then

@@ -4,6 +4,7 @@ package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")
 local events = require("core/events")
 local profiles, vip, last_state, altars = {}, {}, {}, {}
+GameRules = {GetGameTime = function() return 0 end}
 local destination_calls = 0
 local runtime_writes, event_errors = {}, {}
 local original_print = print
@@ -52,6 +53,9 @@ local function altar(id)
             self.abilities[name] = {
                 IsNull = function() return false end,
                 GetAbilityName = function() return name end,
+                GetLevel = function(a) return a.level or 1 end,
+                SetLevel = function(a, value) a.level = value end,
+                IsActivated = function(a) return a.activated == true end,
                 entindex = function() return index end,
                 SetActivated = function(a, value) a.activated = value end,
                 SetHidden = function(a, value) a.hidden = value end,

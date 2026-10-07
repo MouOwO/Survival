@@ -1,3 +1,4 @@
+local ParticleManager = require("systems/combat_effect_visibility").manager()
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local sound_service = require("core/sound_service")

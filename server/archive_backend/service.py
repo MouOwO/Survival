@@ -6,6 +6,7 @@ import math
 import re
 import subprocess
 import threading
+import time
 from pathlib import Path
 from .bundle import Bundle
 
@@ -15,11 +16,13 @@ class ArchiveError(ValueError):
 FIELDS = {
     "commerce_catalog": set(),
     "commerce_purchase": {"sku", "request_id"},
-    "clear": {"difficulty_id","count","day_key"}, "boss_kill": set(),
-    "endless": {"wave","difficulty"},
+    "clear": {"difficulty_id","count","day_key","cooperative_win"}, "boss_kill": set(),
+    "endless": {"wave","difficulty"}, "endless_reconcile": set(), "starjoy_reconcile": set(), "welfare_reconcile": set(),
     "challenge": {"challenge_id","kill_sequence","difficulty_id","day_key"},
     "social_draw": {"pool_id"}, "promotion": {"fragment_id","day_key"},
     "daily_init": {"today"}, "daily_claim": {"today","target_day"},
+    "vip_claim": {"reward_id"}, "vip_purchase": {"reward_id"},
+    "title_equip": {"title_id"},
     "work_upgrade": {"item_id","expected_level"},
     "building_upgrade": {"item_id","expected_level"},
     # No simulated currency/faith grants in the HTTP integration.
@@ -63,6 +66,7 @@ class ArchiveService:
             c[key]=int(v)
         if kind=="clear":
             if c.get("count")!=1 or not re.fullmatch(r"n(?:[1-9]|1[0-9]|20)",str(c.get("difficulty_id"))): raise ArchiveError("archive_clear_invalid")
+            if "cooperative_win" in c: integer("cooperative_win",0,1)
         if kind=="endless":
             integer("wave",1,1000);integer("difficulty",1,20)
         if kind=="challenge":
@@ -75,6 +79,15 @@ class ArchiveService:
             except (ValueError,TypeError): raise ArchiveError("archive_difficulty_invalid")
             if not max(3,definition["min_difficulty"])<=difficulty<=20: raise ArchiveError("archive_challenge_locked")
             c["difficulty_id"]="n"+str(difficulty);integer("kill_sequence",1,100000)
+        if kind in {"vip_claim", "vip_purchase"}:
+            item=self.bundle.tables["archive_vip_rewards"].get(c.get("reward_id"))
+            group="privileges" if kind=="vip_claim" else "packages"
+            if not item or not item.get("enabled") or item["group_id"]!=group: raise ArchiveError("vip_reward_invalid")
+        if kind=="title_equip":
+            title_id=c.get("title_id")
+            item=self.bundle.tables.get("archive_titles",{}).get(title_id) if isinstance(title_id,str) else None
+            if not isinstance(title_id,str) or (title_id!="" and (not item or not item.get("enabled"))):
+                raise ArchiveError("archive_title_invalid")
         if kind=="daily_claim": integer("target_day",0,1000000)
         if kind.startswith("lottery_"):
             if c.get("pool_id") not in self.bundle.tables["lottery_pool_definitions"]: raise ArchiveError("lottery_pool_invalid")
@@ -98,13 +111,14 @@ class ArchiveService:
         match=c["id"].split(":",1)[0]
         if kind=="clear": c["id"]=match+":clear"
         if kind=="endless": c["id"]=match+":endless:"+str(c["wave"])
+        if kind in {"endless_reconcile", "starjoy_reconcile", "welfare_reconcile"}: c["id"]=match+":"+kind
         if kind=="challenge": c["id"]=match+":challenge_kind:"+c["challenge_id"]
         return c
 
     def settle(self,profile,command,has_pass):
         seed=int.from_bytes(hmac.new(self.app.account_id_pepper.encode(),
             (profile["account_id"]+":"+command["id"]).encode(),hashlib.sha256).digest()[:4],"big")%2147483646+1
-        payload={"configs":self.bundle.configs,"profile":profile,"command":command,"has_pass":has_pass,"seed":seed}
+        payload={"configs":self.bundle.configs,"profile":profile,"command":command,"has_pass":has_pass,"seed":seed,"server_time":int(time.time())}
         if not self.slots.acquire(timeout=2): raise TimeoutError("archive_workers_busy")
         try:
             completed=subprocess.run([self.lua,"worker.lua"],cwd=self.bundle.directory,

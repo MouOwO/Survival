@@ -13,31 +13,21 @@ local function nonempty(value)
     return type(value) == "string" and value ~= ""
 end
 
--- Prop components need an initial sequence before bone merging. The NPC body
--- must stay under the engine's activity graph for walking/attack/death changes.
-local function play_idle(entity, sequence)
-    if not valid(entity) then return false end
-    sequence = nonempty(sequence) and sequence or "idle"
-    local reset_info = entity.ResetSequenceInfo
-    if type(reset_info) == "function" then
-        pcall(reset_info, entity)
+-- Refresh the body after SetModel, then let the NPC activity graph choose
+-- idle/run/attack. Hero and Arcana models do not share a literal "idle" name.
+-- Bone-merged wearables inherit the body pose and must not run their own idle.
+local function refresh_animation(entity, sequence)
+    if not valid(entity) then return end
+    if type(entity.ResetSequenceInfo) == "function" then
+        pcall(entity.ResetSequenceInfo, entity)
     end
-    local played = false
-    for _, method_name in ipairs({ "ResetSequence", "SetSequence", "SetAnimation" }) do
-        local method = entity[method_name]
-        if type(method) == "function" then
-            local ok, result = pcall(method, entity, sequence)
-            if ok and result ~= false then
-                played = true
-                break
-            end
-        end
+    if nonempty(sequence) and sequence ~= "idle"
+        and type(entity.ResetSequence) == "function" then
+        pcall(entity.ResetSequence, entity, sequence)
     end
-    local set_rate = entity.SetPlaybackRate
-    if type(set_rate) == "function" then
-        pcall(set_rate, entity, 1)
+    if type(entity.SetPlaybackRate) == "function" then
+        pcall(entity.SetPlaybackRate, entity, 1)
     end
-    return played
 end
 
 local function requested_asset_id(archetype, options)
@@ -95,20 +85,7 @@ function M.apply(unit, archetype, options)
         return false, status or "appearance_apply_failed"
     end
     cosmetic_details.apply(unit, asset, components)
-    -- The NPC animation graph owns idle, locomotion and attack transitions.
-    -- ResetSequence on the body can leave a manually selected idle after SetModel.
-    if type(unit.SetPlaybackRate) == "function" then unit:SetPlaybackRate(1) end
-    for component_id, component in pairs(components or {}) do
-        local declaration = nil
-        for _, candidate in ipairs(asset.components or {}) do
-            if tostring(candidate.component_id or "") == tostring(component_id) then
-                declaration = candidate
-                break
-            end
-        end
-        play_idle(component, declaration and declaration.default_sequence
-            or asset.default_sequence)
-    end
+    refresh_animation(unit, asset.default_sequence)
     unit.survival_monster_default_wearable_asset_id = asset.asset_id
     return true, asset.asset_id
 end

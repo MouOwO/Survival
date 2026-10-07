@@ -82,7 +82,7 @@ const sandbox = {
         GetCooldownTimeRemaining: id => abilities.get(id)?.cooldown || 0,
     },
     CustomNetTables: { GetTableValue: (t, k) => tables.get(tableKey(t, k)) || null },
-    GameEvents: { SendCustomGameEventToServer: (name, payload) => requests.push({ name, payload }) },
+    GameEvents: { Subscribe:()=>{}, SendCustomGameEventToServer: (name, payload) => requests.push({ name, payload }) },
     __test: value => { api = value; },
 };
 const context = vm.createContext(sandbox);
@@ -215,3 +215,24 @@ assert.equal(dispatch('F1', false), false);
 advance(); dispatch('SPACE'); assert.equal(selected, 20, 'Space still selects builder after F1');
 assert.equal(homeRequests().length, 3, 'F1 never casts return-home');
 console.log('MINIMAP_SHORTCUT_INPUT_PASS: shared button/key actions, builder identity, F1 current hero selection, F2 sender-only request, focus/modal/startup/defeat gates, cooldown, duplicate callbacks, reload');
+
+// A corner click selects and centers exactly once; there is no follow timer.
+const followPositions=[];
+sandbox.GameUI.SetCameraTargetPosition=(pos,time)=>followPositions.push({pos:Array.from(pos),time});
+advance();selected=40;
+let beforeJump=cameras.length, beforeJobs=jobs.length;
+assert(cfg.SurvivalHeroSelection.Select('top_left_portrait'));assert.equal(selected,31);
+assert.equal(cameras.length,beforeJump+1);assert.equal(jobs.length,beforeJobs);
+assert.equal(followPositions.length,0);assert.equal(cfg.SurvivalHeroSelection.IsFollowing(),false);
+selected=40;advance();dispatch('ESCAPE');
+assert.equal(cameras.length,beforeJump+1,'selection/Escape does not require releasing a camera lock');
+advance();beforeJump=cameras.length;
+assert(cfg.SurvivalHeroSelection.SelectAndFollow('cached_portrait_callback'));
+assert.equal(cameras.length,beforeJump+1,'old cached button entry also jumps once');
+assert.equal(jobs.length,beforeJobs);assert.equal(cfg.SurvivalHeroSelection.IsFollowing(),false);
+units.get(31).alive=false;advance();beforeJump=cameras.length;
+assert(cfg.SurvivalHeroSelection.Select('top_left_portrait'));assert.equal(selected,31);
+assert.equal(cameras.length,beforeJump,'dead hero selection does not move camera');
+units.get(31).alive=true;
+assert(!bootstrap.includes('function followHero('));assert(!bootstrap.includes('tickFollow'));
+console.log('HERO_PORTRAIT_SINGLE_JUMP_PASS: one jump per click, no timer/lock, cached callback, dead hero');

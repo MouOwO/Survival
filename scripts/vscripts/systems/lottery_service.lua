@@ -388,9 +388,9 @@ local function public_pity(pool, state)
     return rows
 end
 
-local function pool_public(pool, inventory, state)
+local function pool_public(pool, inventory, state, all_state)
     local currency = config.currencies[pool.ticket_content_id] or {}
-    return {
+    local result = {
         id = pool.id,
         revision = pool.revision,
         updated_at = tonumber(pool.update_notice.updated_at) or 0,
@@ -407,6 +407,8 @@ local function pool_public(pool, inventory, state)
         ten_cost = pool.ten_cost,
         pity = public_pity(pool, state),
     }
+    for key,value in pairs(config.unlock_status(pool,all_state)) do result[key]=value end
+    return result
 end
 
 local function snapshot(player_id, reason, requested_pool_id)
@@ -438,9 +440,9 @@ local function snapshot(player_id, reason, requested_pool_id)
     local pools = {}
     for _, candidate in ipairs(config.pool_order) do
         pools[#pools + 1] = pool_public(candidate, inventory,
-            selected_pool_state(state, candidate))
+            selected_pool_state(state, candidate), state)
     end
-    local selected = pool_public(pool, inventory, pool_state)
+    local selected = pool_public(pool, inventory, pool_state, state)
     return {
         version = config.version,
         reason = reason or "snapshot",
@@ -506,6 +508,7 @@ local function draw(payload)
     if busy_by_player[player_id] then return { ok = false, error = "lottery_player_busy" } end
 
     local state = hydrate(player_id)
+    if not config.unlock_status(pool,state).unlocked then return {ok=false,error="lottery_pool_locked"} end
     local current = selected_pool_state(state, pool)
     local inventory = inventory_snapshot(player_id)
     local tickets = tonumber(inventory.counts and inventory.counts[pool.ticket_content_id]) or 0
@@ -651,7 +654,7 @@ local function exchange(payload)
         reason = "lottery_points_exchange:" .. pool.id,
     })
     if not grant or grant.ok ~= true then
-        stats_order.order(player_id, config.starjoy_stat_id, cost)
+        stats_order.order(player_id, config.starjoy_stat_id, cost, true)
         local failed = { ok = false, error = "lottery_exchange_grant_failed" }
         exchange_cache[player_id][request_id] = failed
         busy_by_player[player_id] = nil

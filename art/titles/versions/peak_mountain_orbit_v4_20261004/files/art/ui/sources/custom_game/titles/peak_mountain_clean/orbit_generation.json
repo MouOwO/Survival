@@ -1,0 +1,25 @@
+﻿{
+  "tool": "built-in image_gen",
+  "assets": {
+    "head": "head.png",
+    "body": "body.png"
+  },
+  "prompts": {
+    "head": "Precise-object-edit for game animation: isolate ONLY the HEAD and very short NECK of this exact clean golden Chinese dragon. Keep its face, two horns, mane and whiskers, facing RIGHT, clean satin gold illustrated style and amber eye. Remove the entire long S-shaped body, legs and tail. At the LEFT CENTER edge of this head sprite provide a short simple gold neck connection, intended to attach to a separately animated thin golden serpentine body. The head and mane should form a compact horizontal silhouette, tightly centered in a transparent 4:3 canvas with small safety margin; no tiny ornamental sparkles or grain. NO body coil, NO text, no mountain, no background, no shadow backdrop, no checkerboard. True transparent alpha. Crisp readable game sprite for display at only 30 pixels wide. Same identity as reference, do not redesign into a different dragon.",
+    "body": "Produce a clean animation material sprite matching this golden dragon: ONLY a short straight HORIZONTAL SECTION OF DRAGON BODY, without head, neck mane, legs, tail or curved coil. A seamless-looking slim serpentine torso strip with 2-3 rows of broad clean overlapping gold scales, one restrained darker underside and continuous smooth warm-gold highlights. Left and right ends straight, same thickness and lighting so repeated sections join invisibly. No rounded end caps. Body fills almost the entire wide 3:1 canvas, upper and lower contours clean with tiny transparent margin. True transparent alpha outside the strip. Smooth satin gold, no particles, microtexture, bloom, jewelry, detached ornaments or spines. This material will be used on short rotated segments only 7 pixels high, so broad organized scale pattern and coherent shading matter more than detail. Do not make a whole dragon. Do not include text or background."
+  },
+  "animation": {
+    "ascent_seconds": 3,
+    "period_seconds": 5,
+    "sweep_seconds": 3,
+    "body_segments": 32,
+    "depth": "independent per segment; rear body below mountain, front body above mountain",
+    "rest": "blend into existing upper-right dragon artwork"
+  },
+  "verification": {
+    "compiled_game_resources": "pass",
+    "title_ui_and_fx_tests": "pass",
+    "browser_animation_preview": "visually inspected at four phases",
+    "live_game": "not checked; Dota process was not running"
+  }
+}

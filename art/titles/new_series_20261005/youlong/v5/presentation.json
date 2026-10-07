@@ -1,0 +1,12 @@
+{
+  "art": "../v3/art.png",
+  "version": 5,
+  "width": 192,
+  "height": 96,
+  "period": 3,
+  "duration": 1.05,
+  "opacity": 0.3,
+  "bob": 0,
+  "tint": "#fff2b3",
+  "review": "固定文字位置、收窄高光，保留三秒向下扫光；取消漂浮使血条上方更稳定。"
+}

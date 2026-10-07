@@ -1,4 +1,4 @@
--- Real private transport: shared wave counts/deadline and private assets/defeat status.
+-- Real private snapshot projection/transport: same-team player wave isolation.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")
 local events = require("core/events")
@@ -25,10 +25,10 @@ CustomGameEventManager = {
     end,
 }
 local individual = {
-    [0] = {player_alive=90},
-    [1] = {player_alive=91},
-    [2] = {player_alive=92},
-    [3] = {player_alive=0,
+    [0] = {alive=90, overflow_active=false, overflow_remaining=0},
+    [1] = {alive=91, overflow_active=true, overflow_remaining=7},
+    [2] = {alive=92, overflow_active=true, overflow_remaining=10},
+    [3] = {alive=0, overflow_active=false, overflow_remaining=0,
         player_defeated=true, defeat_reason="monster_limit_exceeded"},
 }
 local unavailable = false
@@ -36,8 +36,7 @@ bus.handle_request(events.WAVE_STATE_GET_REQUEST, function(payload)
     queries[#queries + 1] = payload.player_id
     assert(payload.player_id ~= nil, "private HUD must request an explicit player")
     if unavailable then return nil end
-    local result = {ok=true,player_id=payload.player_id,alive_limit=90,overflow_grace_seconds=10,
-        alive=273,population_scope="global",overflow_active=true,overflow_remaining=7}
+    local result = {ok=true,player_id=payload.player_id,alive_limit=90,overflow_grace_seconds=10}
     for key, value in pairs(individual[payload.player_id]) do result[key] = value end
     return result
 end)
@@ -54,15 +53,15 @@ for id = 0, 1 do
     bus.emit(events.BUILDING_CREATED, {player_id=id,team=2,building_id="building_advanced_research_lab"})
     bus.emit(events.WORKER_CHANGED, {player_id=id,team=2,count_delta=id+2})
 end
--- Private requests return the authoritative shared count/deadline for every HUD.
+-- Deliberately contradictory global warning must never leak into a player's HUD.
 bus.emit(events.WAVE_CHANGED, {alive=273,alive_limit=90,overflow_active=true,
     overflow_remaining=1,current_wave=8,total_waves=30,timer=35,status="countdown"})
 tasks.ui_snapshot_flush()
 for id = 0, 3 do
     local row=assert(sent[id]).wave
-    assert(row.player_id==id and row.alive==273 and row.population_scope=="global")
-    assert(row.player_alive==individual[id].player_alive)
-    assert(row.overflow_active and row.overflow_remaining==7)
+    assert(row.player_id==id and row.alive==individual[id].alive)
+    assert(row.overflow_active==individual[id].overflow_active)
+    assert(row.overflow_remaining==individual[id].overflow_remaining)
     assert(row.current_wave==8 and row.timer==35 and row.alive_limit==90)
 end
 assert(sent[3].wave.player_defeated and sent[3].wave.defeat_reason=="monster_limit_exceeded")
@@ -83,12 +82,36 @@ assert(sent[0].research_unlocked==0 and sent[0].advanced_researcher_unlocked==0)
 assert(sent[1].city_level==4 and sent[1].worker_count==3)
 assert(sent[1].research_unlocked==1 and sent[1].advanced_researcher_unlocked==1)
 local prior=sent[1]
-individual[0].player_alive=12
+individual[0].alive=12
 snapshots.publish_player(0)
-assert(sent[0].wave.player_alive==12 and sent[1]==prior and sent[1].wave.player_alive==91)
-assert(sent[0].wave.alive==273 and sent[1].wave.alive==273)
+assert(sent[0].wave.alive==12 and sent[1]==prior and sent[1].wave.alive==91)
 unavailable=true
 snapshots.publish_player(0)
 assert(sent[0].wave.alive==0 and not sent[0].wave.overflow_active,
     "missing player state cannot fall back to a global defeat warning")
-print("PERSONAL_WAVE_PROJECTION_PASS: four shared counters/deadlines, private ownership/defeat status, independent snapshot copies")
+print("PERSONAL_WAVE_PROJECTION_PASS: four same-team recipients, independent timers, personal defeat, global lifecycle, no shared mutation")
+local challenge={active=1,ended=0,remaining_seconds=1800,deadline=1825}
+bus.handle_request("archive.challenge_state",function() return challenge end)
+bus.emit(events.WAVE_CHANGED,{status="archive_challenges",current_wave=30,total_waves=30})
+for id=0,3 do snapshots.publish_player(id);assert(sent[id].wave.challenge_remaining_seconds==1800) end
+challenge.remaining_seconds=1799
+bus.emit("archive.challenge_timer_changed",challenge)
+tasks.ui_snapshot_flush()
+for id=0,3 do assert(sent[id].wave.challenge_remaining_seconds==1799 and sent[id].wave.challenge_deadline==1825) end
+challenge.active=0;challenge.ended=1;challenge.remaining_seconds=0
+bus.emit("archive.challenge_timer_changed",challenge);tasks.ui_snapshot_flush()
+for id=0,3 do assert(sent[id].wave.challenge_ended==1 and sent[id].wave.challenge_remaining_seconds==0) end
+print("SHARED_CHALLENGE_TIMER_UI_PASS: shared phase transitions reach all four private snapshots")
+
+sent,tasks={},{}
+for i=1,1000 do bus.emit(events.RESOURCE_CHANGED,{player_id=1,team=2,gold=i,wood=0})end
+tasks.ui_snapshot_flush()
+assert(sent[1] and sent[1].resources.gold==1000 and sent[0]==nil and sent[2]==nil and sent[3]==nil)
+sent,tasks={},{}
+bus.emit(events.WAVE_CHANGED,{status="countdown",countdown_deadline=60,timer=35,hud_clock_only=true})
+assert(next(tasks)==nil,"clock-only ticks do not rebuild HUD")
+bus.emit(events.WAVE_CHANGED,{status="countdown",countdown_deadline=60,timer=34,hud_player_id=2})
+tasks.ui_snapshot_flush()
+assert(sent[2] and sent[0]==nil and sent[1]==nil and sent[3]==nil)
+assert(sent[2].wave.countdown_deadline==60)
+print("PERSONAL_PROJECTION_PASS: resource and enemy updates target owner; countdown ticks do not schedule snapshots")

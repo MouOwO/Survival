@@ -219,28 +219,32 @@ function M.publish_player(player_id, reason)
     return snapshot
 end
 
+local pending_growth = {}
+local viewers = {}
 local function publish_payload(payload)
     local player_id = tonumber(payload and payload.player_id)
-    if player_id ~= nil then M.publish_player(player_id, payload.reason) end
-end
-
-local pending_growth = {}
-local function publish_growth(player_id, reason)
-    if pending_growth[player_id] then return end
-    local token = {}
+    if player_id == nil or not viewers[player_id] then return end
+    if pending_growth[player_id] then
+        pending_growth[player_id].reason = payload.reason
+        return
+    end
+    local token = {reason=payload.reason}
     pending_growth[player_id] = token
     scheduler.after(0.1, function()
         if pending_growth[player_id] ~= token then return end
         pending_growth[player_id] = nil
-        publish_payload({player_id = player_id, reason = reason or "lumberjack_attack_growth"})
-    end, "lumberjack_publish_growth_" .. tostring(player_id))
+        M.publish_player(player_id, token.reason)
+    end, "game_info_publish_" .. tostring(player_id))
+end
+local function publish_growth(player_id)
+    publish_payload({player_id=player_id, reason="lumberjack_attack_growth"})
 end
 
 function M.init()
     for player_id in pairs(pending_growth) do
-        scheduler.cancel("lumberjack_publish_growth_" .. tostring(player_id))
+        scheduler.cancel("game_info_publish_" .. tostring(player_id))
     end
-    pending_growth = {}
+    pending_growth, viewers = {}, {}
     event_bus.subscribe(events.HERO_SUMMONED, publish_payload)
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, publish_payload)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
@@ -263,7 +267,23 @@ function M.init()
     CustomGameEventManager:RegisterListener("ui_game_info_request", function(_, payload)
         local player_id = tonumber(payload and payload.PlayerID)
         if player_id == nil or not PlayerResource:IsValidPlayerID(player_id) then return end
+        if payload.open == 0 or payload.open == false then
+            viewers[player_id] = nil
+            pending_growth[player_id] = nil
+            scheduler.cancel("game_info_publish_" .. tostring(player_id))
+            return
+        end
+        viewers[player_id] = true
+        -- Opening always reads current state; no stale closed-panel cache.
+        pending_growth[player_id] = nil
+        scheduler.cancel("game_info_publish_" .. tostring(player_id))
         M.publish_player(player_id, "client_request")
+    end)
+    event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
+        local player_id = tonumber(payload.player_id)
+        if player_id == nil then return end
+        viewers[player_id], pending_growth[player_id] = nil, nil
+        scheduler.cancel("game_info_publish_" .. tostring(player_id))
     end)
 end
 

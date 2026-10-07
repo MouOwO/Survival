@@ -12,6 +12,7 @@ local research_cost_service = require("research/research_cost_service")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local building_count_limits = require("systems/building_count_limit_service")
+local lumberjack_fusions = require("config/generated/lumberjack_fusion_definitions")
 local hero_summon_projection = require("systems/hero_summon_projection")
 local hero_summon_rules = require("config/generated/hero_summon_rules")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
@@ -415,7 +416,7 @@ local function research_upgrade(ability_name, state, resources)
     elseif not prerequisite_met then
         available = false
         status_code = "prerequisite_not_met"
-        status = "前置科技或转生条件未满足，暂不可研究"
+        status = "前置科技或转职要求未满足，不能加入研究队列"
     elseif queue_count > 0 then
         status_code = "queue_available"
         status = "可加入研究队列；开始研究时扣费"
@@ -510,20 +511,21 @@ local function upgrade_level(definition, current_level, resources, state, displa
     ), state)
 end
 local function tower_upgrade(ability_name, state, resources)
+    local current_row = tower_routes.current(state)
+    local display_level = current_row and current_row.level or state.level
     local mode = ability_name == "ability_upgrade_tower_max" and "max" or "one"
     if not state.tower_class and state.level >= 5 then
-        return { available = 0, can_afford = 0, current_level = state.level, status_text = "请先选择一个转职方向" }
+        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level, status_text = "请先选择一个转职方向" }
     end
     local target = mode == "max" and tower_routes.stage_end_level(state) or state.level + 1
     local row = tower_routes.row_at_level(state, target)
-    local current_row = tower_routes.current(state)
     if mode == "max" and not tower_routes.can_upgrade_max(state) then
-        return { available = 0, can_afford = 0, current_level = state.level,
+        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level,
             status_text = target <= state.level and "当前阶段已升满" or "当前阶段不支持一键升满" }
     end
     local cost = tower_routes.cost_to(state, target)
     if target <= state.level or not row or not cost then
-        return { available = 0, can_afford = 0, current_level = state.level, status_text = "已达最高等级" }
+        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level, status_text = "已达最高等级" }
     end
     local tower_name = tower_routes.display_name(row)
     local attack_delta = (row.base_attack_damage or 0)
@@ -534,16 +536,17 @@ local function tower_upgrade(ability_name, state, resources)
         .. tostring(tower_name) .. "。升级后攻击力 +"
         .. tostring(attack_delta) .. "。"
     local result = merge({
-        available = 1, current_level = state.level, next_level = target,
+        available = 1, current_level = state.level, display_current_level = display_level, next_level = target,
         status_text = (mode == "max" and "升满至" or "升级至")
             .. tower_name,
         tower_name = tower_name, skill_ids = row.skill_ids,
         upgrade_description = description,
         target_level = target,
+        display_target_level = row.level or target,
         upgrade_attack_delta = attack_delta,
         population = cost.population or 0,
         fields = {
-            { label = "目标等级", value = target },
+            { label = "目标等级", value = row.level or target },
             { label = "升级目标", value = tower_name },
             { label = "攻击提升", value = "+" .. tostring(attack_delta) },
             { label = "攻击速度", value = value_delta(
@@ -802,6 +805,22 @@ function M.build(ability_name, state, resources, fusion_snapshot)
     if fusion then return fusion end
     local summon = hero_summon_runtime(ability_name, state)
     if summon then return summon end
+    if string.match(ability_name or "", "^ability_fuse_lumberjack_%d+$") then
+        for _, row in ipairs(lumberjack_fusions.rows or {}) do
+            if row.enabled ~= false and row.ability_id == ability_name then
+                local status = event_bus.request(events.LUMBERJACK_FUSION_STATUS_REQUEST, {
+                    player_id=state and state.player_id, ability_name=ability_name,
+                }) or {available=0, status_text="合体状态同步中"}
+                status.fusion_level, status.fusion_required_count = row.level, row.required_count
+                status.cost_wood, status.cost_gold = row.wood_cost, row.gold_cost
+                status.fields = {
+                    {label="合体材料",value=tostring(status.fusion_count or 0).."/"..row.required_count.." 个普通LV"..row.level.."伐木工"},
+                    {label="主城等级",value=tostring(status.fusion_city_level or 0).."/"..row.required_city_level},
+                }
+                return with_affordability(status,{wood=row.wood_cost,gold=row.gold_cost},0,resources)
+            end
+        end
+    end
     local build = build_ability(ability_name, state, resources)
     if build then
         return build
@@ -878,7 +897,17 @@ function M.build(ability_name, state, resources, fusion_snapshot)
     if ability_name == "ability_upgrade_tower"
         or ability_name == "ability_upgrade_tower_lv01"
         or ability_name == "ability_upgrade_tower_max" then
-        return tower_upgrade(ability_name, state, resources)
+        local result = tower_upgrade(ability_name, state, resources)
+        if ability_name ~= "ability_upgrade_tower_max" then
+            local row = tower_routes.current(state)
+            local next_row = tower_routes.row_at_level(state, state.level + 1)
+            result.tower_auto_upgrade = 1
+            result.auto_upgrade_enabled = state.unit
+                and state.unit.survival_tower_auto_upgrade and 1 or 0
+            result.auto_upgrade_available = state.tower_class and row and next_row and 1 or 0
+            result.auto_upgrade_visible = state.tower_class and 1 or 0
+        end
+        return result
     end
     if ability_name == "ability_upgrade_gold_mine" then
         return mine_level_upgrade(state, resources)

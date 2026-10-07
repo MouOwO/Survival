@@ -17,7 +17,9 @@ local function apply_effects(stats, item)
         if definition.max_value then value = math.min(value, definition.max_value) end
         if definition.min_value then value = math.max(value, definition.min_value) end
         assert(value == value and value < math.huge, "archive_nonfinite_stat")
-        stats[field] = value
+        if field == "starjoy_points" then
+            require("systems/archive_starjoy_rewards").change(stats, tonumber(stats[field]) or 0, value)
+        else stats[field] = value end
     end
 end
 
@@ -26,9 +28,24 @@ function M.settle(profile, command, pass)
     archive.version = 1
     for _,key in ipairs({"clear_counts","completed","shadow_counts","processed"}) do archive[key]=archive[key] or {} end
     if archive.processed[command.id] then return {ok=true,duplicate=true,archive=archive,gameplay_stats=stats} end
+    -- Equipping cosmetics must not reconcile or award unrelated gameplay bonuses.
+    if command.kind == "title_equip" then
+        local ok, reason = require("systems/archive_titles").apply(command, archive)
+        if not ok then return {ok=false,terminal=true,error=reason} end
+        archive.processed[command.id] = true
+        return {ok=true,archive=archive,gameplay_stats=stats}
+    end
+    require("systems/archive_starjoy_rewards").reconcile(stats)
     if command.kind == "online_checkpoint" or command.kind == "work_upgrade" then
         local ok, reason = require("systems/archive_online_rewards").apply(command, archive, stats, apply_effects, profile.save)
         if not ok then return { ok = false, terminal = true, error = reason } end
+    elseif command.kind == "vip_claim" or command.kind == "vip_purchase" then
+        local ok, reason = require("systems/archive_vip_rewards").apply(command, profile, archive, stats, apply_effects)
+        if not ok then return {ok=false,terminal=true,error=reason} end
+    elseif command.kind == "welfare_reconcile" then
+        -- Reconcile trusted saved wins below; callers cannot supply progress or effects.
+    elseif command.kind == "starjoy_reconcile" then
+        -- Reconcile above uses saved account points only; no client amount.
     elseif command.kind == "boss_kill" then
         archive.boss_kills=(tonumber(archive.boss_kills) or 0)+1
     elseif command.kind == "daily_init" or command.kind == "daily_claim" then
@@ -42,6 +59,10 @@ function M.settle(profile, command, pass)
             command=copy(command);command.count=command.count*2
         end
         require("systems/archive_building_rewards").clear(archive, command)
+        if command.cooperative_win == 1 then
+            -- One per successful match, regardless of teammate count; shares clear dedup.
+            archive.cooperative_clear_count = require("systems/archive_welfare_rewards").cooperative_wins(archive) + 1
+        end
         local difficulty = command.difficulty_id
         archive.clear_counts[difficulty] = (archive.clear_counts[difficulty] or 0) + command.count
         for _, item in ipairs(achievements.rows) do
@@ -57,12 +78,10 @@ function M.settle(profile, command, pass)
         if not config.wave(command.difficulty, command.wave) then return { ok = false, terminal = true, error = "endless_wave_invalid" } end
         archive.endless_score = (tonumber(archive.endless_score) or 0) + config.score(command.wave)
         archive.endless_best_wave = math.max(tonumber(archive.endless_best_wave) or 0, command.wave)
-        for _, item in ipairs(require("config/generated/archive_endless_achievements").rows) do
-            if item.enabled and archive.endless_score >= item.required_score and not archive.completed[item.achievement_id] then
-                apply_effects(stats, item)
-                archive.completed[item.achievement_id] = true
-            end
-        end
+        require("systems/archive_endless_rewards").reconcile(archive, stats, apply_effects)
+    elseif command.kind == "endless_reconcile" then
+        -- Only persisted server progress is considered; this command has no progress input.
+        require("systems/archive_endless_rewards").reconcile(archive, stats, apply_effects)
     elseif command.kind == "challenge" then
         local ok, reason = challenge_rewards.apply(command, archive, stats, pass, apply_effects)
         if not ok then return { ok = false, error = reason } end
@@ -75,6 +94,7 @@ function M.settle(profile, command, pass)
     else
         return { ok = false, error = "archive_command_invalid" }
     end
+    require("systems/archive_welfare_rewards").reconcile(archive, stats, apply_effects)
     -- Online checkpoints are deduplicated by their cumulative session cursor, without one saved ID per minute.
     if command.kind ~= "online_checkpoint" then archive.processed[command.id] = true end
     return {ok=true,archive=archive,gameplay_stats=stats}

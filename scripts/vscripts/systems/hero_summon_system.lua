@@ -11,6 +11,8 @@ local destination_validation = require("systems/destination_validation_service")
 local summon_destination = require("systems/hero_summon_destination")
 local hero_asset_preload = require("systems/hero_asset_preload_service")
 local player_context = require("systems/player_context_service")
+local scheduler = require("core/scheduler")
+local return_home = require("systems/hero_return_home_service")
 
 local M = {}
 
@@ -187,6 +189,8 @@ local function initialize_replacement(player_id, team, altar, definition, positi
         hero_anchor_service.abort_replacement(player_id, unit)
         return nil, move_error
     end
+    -- Seed native resurrection before the first death, instead of the map fountain.
+    if unit.SetRespawnPosition then pcall(unit.SetRespawnPosition, unit, position) end
     if not unit:HasModifier("modifier_single_health_bar") then
         require("core/modifier_registry").ensure(unit, "modifier_single_health_bar", {
             player_id = player_id,
@@ -590,6 +594,42 @@ local function on_hero_progression_changed(payload)
     )
 end
 
+local function on_hero_killed(payload)
+    local unit = payload and payload.victim
+    if not valid_entity(unit) or not unit.GetPlayerOwnerID then return end
+    local player_id = unit:GetPlayerOwnerID()
+    local state = current_summon(player_id)
+    if not state or state.unit ~= unit then return end
+    state.awaiting_respawn = true
+    state.respawn_serial = (state.respawn_serial or 0) + 1
+    -- Update native spawn placement too, so the engine never briefly shows the
+    -- hero at the obsolete fountain before npc_spawned finishes.
+    local position = summon_destination.resolve(nil, nil, player_id, unit)
+    if position and unit.SetRespawnPosition then
+        pcall(unit.SetRespawnPosition, unit, position)
+    end
+end
+
+function M.on_npc_spawned(unit)
+    if not valid_entity(unit) or not unit.GetPlayerOwnerID then return end
+    local player_id = unit:GetPlayerOwnerID()
+    local state = current_summon(player_id)
+    if not state or state.unit ~= unit or not state.awaiting_respawn then return end
+    local serial = state.respawn_serial
+    scheduler.after(0, function()
+        if current_summon(player_id) ~= state or state.unit ~= unit
+            or state.respawn_serial ~= serial or not state.awaiting_respawn
+            or not valid_entity(unit) or not unit:IsAlive() then return end
+        state.awaiting_respawn = false
+        -- Re-resolve after resurrection, since another building may now occupy
+        -- the earlier point. Ownership, room exit and camera follow match F2.
+        local result = return_home.return_unit(unit, player_id, { silent = true })
+        if result.ok and unit.SetRespawnPosition then
+            pcall(unit.SetRespawnPosition, unit, result.position)
+        end
+    end, "hero_respawn_home:" .. tostring(player_id))
+end
+
 function M.init()
     altar_by_player = {}
     builder_by_player = {}
@@ -616,6 +656,7 @@ function M.init()
         on_player_unavailable(payload, true)
     end)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_unavailable)
+    event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_hero_killed)
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)

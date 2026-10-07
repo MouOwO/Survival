@@ -99,6 +99,12 @@ function createHarness(options = {}) {
             if (parent) this.SetParent(parent);
         }
         IsValid() { return this.valid; }
+        get visible() { return this._visible; }
+        set visible(value) { assert(this.valid, 'Underlying panel is deleted!'); this._visible=value; }
+        RemoveAndDeleteChildren() {
+            const invalidate = panel => { panel.valid=false; panel.children.forEach(invalidate); };
+            this.children.forEach(invalidate); this.children=[];
+        }
         GetParent() { return this.parent; }
         SetParent(parent) {
             if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this);
@@ -191,7 +197,7 @@ function createHarness(options = {}) {
         }
     }
     function setUnit(unit, firstAbility) {
-        const names = ['ability_upgrade_city', 'ability_train_lumberjack',
+        const names = options.abilityNames || ['ability_upgrade_city', 'ability_train_lumberjack',
             'ability_train_repairer', 'ability_train_advanced_repairer'];
         const list = names.map((name, index) => ({ id: firstAbility + index, name }));
         units.set(unit, list);
@@ -199,7 +205,7 @@ function createHarness(options = {}) {
         for (const ability of list) {
             abilityData.set(ability.id, ability);
             setTable('survival_ability_runtime', ability.id, {
-                owner_entindex: unit, ability_entindex: ability.id, available: 1, fields: []
+                owner_entindex: unit, ability_entindex: ability.id, available: 1, fields: options.fields || []
             });
             setTable('survival_ability_data', ability.name, { abilityid: ability.name });
         }
@@ -207,6 +213,7 @@ function createHarness(options = {}) {
     }
     setUnit(827, 828);
     setUnit(900, 901);
+    if (options.hero) setTable('survival_hero_skills', 'player_0', {unit_entindex:827});
     if (options.runtimeIndexes) {
         units.get(827).forEach((ability, index) => {
             if (!options.runtimeIndexes.includes(index)) tables.delete('survival_ability_runtime:' + ability.id);
@@ -249,7 +256,7 @@ function createHarness(options = {}) {
                 return units.get(unit)?.[slot]?.id ?? -1;
             },
             IsValidEntity: unit => units.has(unit),
-            GetUnitName: unit => units.has(unit) ? (options.native ? 'npc_dota_neutral_test' : 'building_city') : '',
+            GetUnitName: unit => units.has(unit) ? (options.unitName || (options.native ? 'npc_dota_neutral_test' : 'building_city')) : '',
             GetAbilityCount: unit => units.get(unit)?.length || 0
         },
         Abilities: {
@@ -284,6 +291,7 @@ function createHarness(options = {}) {
         runUntil,
         now: () => time,
         setCursor: value => { cursor = value; },
+        fieldContainer: () => tooltip.FindChildTraverse('CustomAbilityFields'),
         rebuildPanels,
         setReadyAt: value => { readyAt = value; },
         select(unit, event = 'dota_player_update_selected_unit') {
@@ -502,9 +510,56 @@ test('native unit with no visible abilities settles without creating proxies', (
     assert.equal(h.executions.length, before);
 });
 
+for (const [unitName, abilityName, hero] of [
+    ['building_city','ability_upgrade_city',false],
+    ['building_farm','ability_upgrade_farm',false],
+    ['building_gold_mine','ability_upgrade_gold_mine_efficiency',false],
+    ['building_research_lab','ability_research_lumberjack_speed',false],
+    ['building_advanced_research_lab','ability_research_ars_01',false],
+    ['building_arrow_tower','ability_upgrade_tower_lv01',false],
+    ['building_wall','ability_upgrade_wall',false],
+    ['building_hero_altar','ability_summon_hero_doom',false],
+    ['npc_survival_builder_proxy','ability_build_arrow_tower',false],
+    ['npc_dota_hero_doom_bringer','ability_survival_doom_infernal',true]
+]) {
+    test(unitName + ' restores tooltip after cached rows are deleted', () => {
+        const h=createHarness({unitName,hero,abilityNames:[abilityName],panelCount:1,
+            fields:[{label:'attack',value:'25'}]});
+        h.runUntil(1.2);
+        const binding=h.inspect().bindings[0];
+        assert(binding,'Expected a managed tooltip binding');
+        const xy=binding.proxy.GetPositionWithinWindow();
+        h.setCursor([xy.x+10,xy.y+10]);
+        binding.proxy.events.onmouseover();
+        assert(!h.tooltip.BHasClass('Hidden'));
+        const fields=h.fieldContainer();
+        assert(fields.__fieldRows.length>0);
+        const old=fields.__fieldRows[0];
+        fields.RemoveAndDeleteChildren(); // Engine reload retains the JS property.
+        assert(!old.IsValid());
+        binding.proxy.events.onmouseover();
+        assert(!h.tooltip.BHasClass('Hidden'));
+        assert(fields.__fieldRows[0].IsValid());
+        assert.notStrictEqual(fields.__fieldRows[0],old);
+        assert.equal(fields.__fieldRows[0].__right.text,'25');
+        assert.deepEqual(h.logs.filter(line=>line.includes('[SURVIVAL_TOOLTIP_ERROR]')),[]);
+    });
+}
+
 if (failures) {
     process.exitCode = 1;
     console.error('ABILITY_TOOLTIP_RECOVERY_FAILED: ' + failures);
 } else {
     console.log('ABILITY_TOOLTIP_RECOVERY_PASS');
 }
+
+test('worker fusion mouse proxy uses project dispatcher instead of native order',()=>{
+ const h=createHarness({unitName:'npc_survival_lumberjack',abilityNames:['ability_fuse_lumberjack_06'],panelCount:1});
+ let requests=0;
+ h.config.SurvivalAbilityInput={ExecuteAbility:()=>{requests++;}};
+ h.runUntil(1.2);
+ const binding=h.inspect().bindings[0];assert(binding);
+ const before=h.executions.length;
+ binding.proxy.events.onactivate();
+ assert.equal(requests,1);assert.equal(h.executions.length,before);
+});

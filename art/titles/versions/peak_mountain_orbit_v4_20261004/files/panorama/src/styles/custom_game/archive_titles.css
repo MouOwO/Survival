@@ -1,0 +1,64 @@
+#SurvivalWorldTitles { width:100%; height:100%; position:0px 0px 0px; flow-children:none; z-index:-2; }
+.SurvivalWorldTitle { width:224px; height:96px; position:0px 0px 0px; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveCard.ArchiveTitleCard {
+    width:306px; height:244px; flow-children:down; padding:12px;
+    margin:8px; border:1px solid #766d52;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveTitleCard:hover { border-color:#e5bc65; brightness:1.12; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveTitleCard.ArchiveTitleEquipped { border:2px solid #ebc66f; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveTitleArt { width:278px; height:119px; horizontal-align:center; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveTitleCard .ArchiveTitleName {
+    width:100%; height:30px; position:0px 0px 0px; margin:0px; text-align:center; font-size:23px;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveTitleAction {
+    width:240px; height:34px; horizontal-align:center; margin-top:12px;
+    text-align:center; padding-top:4px; font-size:19px; color:#f4d58f;
+    border:1px solid #9b8251; background-color:#25424c;
+}
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveTitleCard.ArchiveContentLocked .ArchiveTitleArt { saturation:0; brightness:0.4; }
+.ArchiveRoot #ArchiveWindow #ArchiveGrid .ArchiveTitleCard .ArchiveStateIcon { visibility:collapse; }
+
+/* Animated light is separate from the clean title artwork. */
+.SurvivalWorldTitle { overflow:noclip; }
+.SurvivalTitleBase { width:92%; height:90%; position:4% 10% 0px; }
+.SurvivalTitleShineMask {
+    width:92%; height:90%; position:4% 10% 0px; overflow:clip;
+    opacity-mask:url("file://{images}/custom_game/titles/peak_clean_letters.png");
+}
+.SurvivalTitleSweep {
+    width:100%; height:24px; position:0px 0px 0px; opacity:0;
+    background-color:gradient(linear,0% 0%,0% 100%,from(#fff6cd00),color-stop(0.40,#fff4c877),color-stop(0.53,#ffffffed),to(#fff6cd00));
+}
+.SurvivalTitleStar { width:20px; height:20px; overflow:noclip; }
+.SurvivalTitleStarHorizontal {
+    width:20px; height:2px; align:center center;
+    background-color:gradient(linear,0% 0%,100% 0%,from(#ffc05200),color-stop(0.45,#fff7d6),color-stop(0.55,#ffffff),to(#ffc05200));
+    box-shadow:#ffd57066 0px 0px 5px 0px;
+}
+.SurvivalTitleStarVertical {
+    width:2px; height:20px; align:center center;
+    background-color:gradient(linear,0% 0%,0% 100%,from(#ffc05200),color-stop(0.45,#fff7d6),color-stop(0.55,#ffffff),to(#ffc05200));
+    box-shadow:#ffe8a777 0px 0px 4px 0px;
+}
+.SurvivalTitleEmber {
+    width:3px; height:5px; background-color:#ffe5a0;
+    box-shadow:#ffb83b99 0px 0px 4px 1px; border-radius:1px;
+}
+
+/* Independent raster planes: rear dragon, mountains, front dragon, lettering. */
+.SurvivalTitleMountains { width:100%; height:100%; position:0px 0px 0px; brightness:0.82; saturation:0.85; }
+.SurvivalTitleDragon { width:44%; height:102%; position:55% -5% 0px; transform-origin:0% 0%; }
+.SurvivalTitleDragonBack { opacity:0; }
+.SurvivalTitleDragonFront { opacity:1; }
+.ArchiveTitleArt { flow-children:none; overflow:noclip; }
+.ArchiveTitleArt .SurvivalTitleShineMask { visibility:collapse; }
+
+.SurvivalTitleDragonOver { opacity:0; }
+/* Segmented dragon follows one helical path; depth is evaluated per section. */
+.SurvivalTitleOrbitLayer { width:100%; height:100%; position:0px 0px 0px; overflow:noclip; }
+.SurvivalTitleOrbitBody {
+    width:8px; height:6px; border-radius:1px; transform-origin:50% 50%;
+    background-image:url("file://{images}/custom_game/titles/peak_clean_body.png");
+    background-size:72px 200%; background-position:center; background-repeat:repeat;
+}
+.SurvivalTitleOrbitHead { width:36px; height:30px; transform-origin:50% 50%; }

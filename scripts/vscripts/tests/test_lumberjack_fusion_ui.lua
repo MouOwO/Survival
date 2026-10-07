@@ -37,7 +37,7 @@ EntIndexToHScript=function(id) return id==1 and unit or id==2 and ability or nil
 local success=true
 bus.handle_request(events.LUMBERJACK_FUSION_REQUEST,function(p)
     dispatches[#dispatches+1]=p
-    return {ok=success,error=not success and "gold_not_enough" or nil}
+    return {ok=success,consumed_entindexes={1,3,4},entindex=1,error=not success and "gold_not_enough" or nil}
 end)
 for level=1,8 do
     ability.name=string.format("ability_fuse_lumberjack_%02d",level)
@@ -52,3 +52,12 @@ assert(#dispatches==count and responses[#responses].success==0,"client cannot fo
 ability.active=false;listener(nil,{PlayerID=0,entindex=1,ability_entindex=2})
 assert(#dispatches==count and responses[#responses].success==0)
 print("PASS lumberjack fusion UI: 8 abilities direct dispatch, service failure, forged owner, inactive ability")
+
+ability.active=true;success=true
+listener(nil,{PlayerID=0,entindex=1,ability_entindex=2,selected_entindexes={1,3,4},fusion_queue_request_id="queue:1"})
+assert(#dispatches[#dispatches].selected_entindexes==3)
+local response=responses[#responses]
+assert(response.fusion_queue_request_id=="queue:1" and #response.fusion_consumed_entindexes==3 and response.fusion_target_entindex==1)
+listener(nil,{PlayerID=0,entindex=1,ability_entindex=2,selected_entindexes={1}})
+assert(dispatches[#dispatches].selected_entindexes==nil,"legacy single-unit casts retain normal material search")
+print("PASS fusion UI queue metadata and legacy compatibility")

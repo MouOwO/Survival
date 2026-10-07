@@ -549,7 +549,7 @@ function M.init()
         end
     end)
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, function(payload)
-        if payload and payload.changed_section == "tower" then return end
+        if payload and payload.changed_section then return end -- Combat growth cannot change production/unlocks.
         for _, state in pairs(state_by_entindex) do
             if state.player_id == tonumber(payload and payload.player_id) then
                 publish(state)

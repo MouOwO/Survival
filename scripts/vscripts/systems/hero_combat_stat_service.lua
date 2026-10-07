@@ -64,15 +64,22 @@ local function fixed_attack_interval(unit)
     return interval
 end
 
+local function field_equal(a,b)
+    if type(a) ~= type(b) then return false end
+    if type(a) ~= "table" then return a == b end
+    for k,v in pairs(a) do if not field_equal(v,b[k]) then return false end end
+    for k in pairs(b) do if a[k] == nil then return false end end
+    return true
+end
 local function snapshot_equal(left, right)
     if not left or not right then return false end
     for key, value in pairs(left) do
         if key ~= "reason" and key ~= "refresh_version"
-            and right[key] ~= value then return false end
+            and not field_equal(right[key],value) then return false end
     end
     for key, value in pairs(right) do
         if key ~= "reason" and key ~= "refresh_version"
-            and left[key] ~= value then return false end
+            and not field_equal(left[key],value) then return false end
     end
     return true
 end
@@ -237,7 +244,8 @@ local function recalculate(player_id, reason, growth_snapshot)
     local debug_attack = tonumber(state.debug_attack_override)
     local debug_attack_speed = tonumber(state.debug_attack_speed_override)
     local runtime_attack_interval = fixed_attack_interval(state.unit)
-    local hero_technology = technology_stat_manager.get(player_id).final.hero or {}
+    local technology_snapshot = technology_stat_manager.get(player_id)
+    local hero_technology = technology_snapshot.final.hero or {}
     local researcher_attack_flat = tonumber(hero_technology.attack_flat) or 0
     local researcher_attack_pct = tonumber(hero_technology.attack_bonus_pct) or 0
     local researcher_final_damage_pct =
@@ -512,8 +520,24 @@ local function recalculate(player_id, reason, growth_snapshot)
             or debug_attack_speed
             or hero_combat_stat_math.attacks_per_second(
                 base_attack_time,
-                equipment_stats.attack_speed_pct + researcher_attack_speed_pct
-            ),
+                equipment_stats.attack_speed_pct
+            ) * math.max(0.01,1+researcher_attack_speed_pct/100)
+                * math.max(0.01,1+(tonumber(state.unit.survival_cheer_attack_speed_pct) or 0)/100),
+        attack_cadence = {base_interval=hero_combat_stat_math.configured_base_attack_time(
+            state.definition, state.engine_base_attack_time), reduced_interval=base_attack_time,
+            percentage=(100+equipment_stats.attack_speed_pct)
+                * math.max(0.01,1+researcher_attack_speed_pct/100)
+                * math.max(0.01,1+(tonumber(state.unit.survival_cheer_attack_speed_pct) or 0)/100),
+            engine_interval=base_attack_time/math.max(0.01,1+researcher_attack_speed_pct/100),
+            cheer_bonus=tonumber(state.unit.survival_cheer_attack_speed_pct) or 0,
+            interval_reductions={
+                {label="七宗罪",value=tonumber(essence.attack_interval_flat) or 0},
+                {label="科技与存档",value=researcher_attack_interval_flat},
+                {label="英雄技能",value=(monkey_w and (tonumber(monkey_config.w_attack_interval_reduction) or 0) or 0)
+                    +(blademaster_r and (tonumber(blademaster_config.r_attack_interval_reduction) or 0) or 0)}},
+            speed_bonuses={{label="装备",value=equipment_stats.attack_speed_pct},
+                {label="科技与存档",value=researcher_attack_speed_pct},
+                {label="欢呼光环",value=tonumber(state.unit.survival_cheer_attack_speed_pct) or 0}}},
         attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100),
         strength = final_strength,
         agility = unscaled_agility + agility_bonus,
@@ -547,6 +571,20 @@ local function recalculate(player_id, reason, growth_snapshot)
         reason = reason or "changed",
         refresh_version = tonumber(state.refresh_version) or 0,
     }
+    -- Display fixed sources separately. Gameplay totals and projection stay unchanged.
+    local display = require("combat/hero_display_bonus").calculate({
+        base=state.base, technology=require("combat/hero_display_bonus").static_technology(technology_snapshot),
+        permanent=permanent_result and permanent_result.display_totals or {},
+        equipment=equipment_stats, weapon=definition, progression=progression, essence=essence,
+        level=next_snapshot.level, base_armor=configured_base_armor,
+        intellect_attack_per_point=global_rules.hero_intellect_attack_per_point,
+        configured_attack_time=hero_combat_stat_math.configured_base_attack_time(
+            state.definition,state.engine_base_attack_time), final_attack_time=base_attack_time,
+        fixed_exclusive_multiplier=monkey_e and math.max(1,tonumber(monkey_config.e_attack_multiplier) or 1)
+            or (blademaster_r and math.max(1,tonumber(blademaster_config.r_attack_multiplier) or 1) or 1),
+        debug_attack=debug_attack, debug_attack_speed=debug_attack_speed,
+    })
+    for key, amount in pairs(display) do next_snapshot[key]=amount end
     local changed = not snapshot_equal(state.snapshot, next_snapshot)
     if changed then
         state.refresh_version = (tonumber(state.refresh_version) or 0) + 1
@@ -751,7 +789,7 @@ local function on_changed(payload)
 end
 
 local function on_progression_changed(payload)
-    if payload and payload.changed_section == "tower" then return end
+    if payload.changed_section and payload.changed_section ~= "hero" then return end
     -- Progression attributes are logical data only. They do not change native
     -- attributes or equipment health, so only the combat snapshot is rebuilt.
     recalculate(tonumber(payload.player_id), payload.reason)

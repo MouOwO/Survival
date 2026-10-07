@@ -22,8 +22,6 @@ local monster_corpse_lifecycle_service = require(
 )
 local wave_spawn_sequence = require("systems/wave_spawn_sequence")
 local wave_monster_collision = require("systems/wave_monster_collision")
-local wave_spawn_routing = require("systems/wave_spawn_routing")
-local wave_population_limit = require("systems/wave_population_limit")
 local wave_special_target = require("systems/wave_special_target")
 local global_rules = require("config/global_rules")
 local player_context = require("systems/player_context_service")
@@ -46,7 +44,6 @@ local monster_hull_multiplier = 1
 local game_started_at = nil
 local memory_cleared_wave = -1
 local EARLY_FINAL_UNLOCK_SECONDS = 1 * 60
-local FINAL_WAVE_NUMBER = 30
 local DEV_PRELOAD_POLL_INTERVAL = 0.05
 local DEV_PRELOAD_TASK_ID = "dev_wave_preload"
 local DEV_WAVE_COMPLETE_TASK_ID = "dev_wave_complete"
@@ -326,7 +323,6 @@ local function rebuild_wave_channels()
         local marker = monster_spawn_marker or find_monster_spawn_marker()
         if marker then wave_channels[-1] = { player_id = -1, marker = marker } end
     end
-    wave_spawn_routing.refresh(wave_channels, wall_by_player, monster_hull_multiplier)
     return wave_channels
 end
 
@@ -440,11 +436,11 @@ local function clear_player_overflow(player_id, population)
 end
 
 local function clear_overflow()
-    scheduler.cancel(OVERFLOW_TASK_ID)
+    scheduler.cancel(OVERFLOW_TASK_ID) -- retire the former shared timer on hot reload
     for player_id, population in pairs(player_populations) do
         clear_player_overflow(player_id, population)
     end
-    -- Retire any legacy personal timers along with the shared clock.
+    -- Global wave state is used for final-wave completion, never for an overflow clock.
     state.overflow_active, state.overflow_remaining = false, 0
     state.overflow_deadline = nil
 end
@@ -481,13 +477,35 @@ end
 
 local publish
 local function update_population_limit()
-    return wave_population_limit.update(state, {
-        scheduler = scheduler, task_id = OVERFLOW_TASK_ID,
-        now = current_game_time, ended = game_has_ended,
-        clear = clear_overflow, prune = prune_invalid_enemies,
-        current_state = function() return state end,
-        publish = function(reason) publish(reason) end,
-    })
+    -- Every player's assault lane has its own allowance and uninterrupted grace period.
+    -- Global alive remains solely the aggregate used to finish the last wave.
+    if state.defeat_settled or state.post_clear_frozen or game_has_ended() then
+        clear_overflow()
+        return {}
+    end
+    local expired = {}
+    for player_id, population in pairs(player_populations) do
+        if population.player_defeated or disconnected_players[player_id]
+            or population.alive <= state.alive_limit then
+            clear_player_overflow(player_id, population)
+        else
+            if not population.overflow_active then
+                population.overflow_active = true
+                population.overflow_deadline = current_game_time() + state.overflow_grace_seconds
+                local timer_player_id, timer_population = player_id, population
+                scheduler.every(1, function()
+                    if player_populations[timer_player_id] ~= timer_population then return false end
+                    local removed=prune_invalid_enemies()
+                    publish(removed>0 and "invalid_enemies_removed" or "monster_limit_countdown")
+                    return timer_population.overflow_active == true
+                end, OVERFLOW_TASK_ID .. ":" .. tostring(player_id))
+            end
+            population.overflow_remaining = math.max(0,
+                math.ceil(population.overflow_deadline - current_game_time()))
+            if population.overflow_remaining <= 0 then expired[#expired + 1] = player_id end
+        end
+    end
+    return expired
 end
 
 local function stop_defeated_match()
@@ -506,24 +524,13 @@ local function stop_defeated_match()
     cancel_pending_wave_resource_sessions("all_players_defeated", false)
 end
 
-publish = function(reason)
+publish = function(reason, hud_player_id)
     refresh_selection_state()
-    local expired_players = {}
-    if update_population_limit() then
-        local multiplayer = require("systems/multiplayer_player_service")
-        expired_players = multiplayer.participating_player_ids()
-        if #expired_players == 0 then expired_players = player_context.active_player_ids() end
-        -- Freeze generation/victory before synchronous player cleanup lowers alive.
-        stop_defeated_match()
-        reason = "monster_limit_exceeded"
-        if #expired_players == 0 and GameRules and GameRules.SetGameWinner then
-            GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
-        end
-    end
+    local expired_players = update_population_limit()
     -- Mark every expired player before dispatching cleanup, which can synchronously
     -- publish or check final-wave completion through PLAYER_DISCONNECTED.
     for _, player_id in ipairs(expired_players) do
-        local population = population_for(player_id, true)
+        local population = player_populations[player_id]
         population.player_defeated = true
         population.defeat_reason = "monster_limit_exceeded"
         clear_player_overflow(player_id, population)
@@ -536,6 +543,9 @@ publish = function(reason)
     local data = {}
     for key, value in pairs(state) do data[key] = value end
     data.reason = reason
+    data.hud_player_id = #expired_players==0 and hud_player_id or nil
+    data.hud_clock_only = #expired_players==0
+        and (reason=="countdown_tick" or reason=="monster_limit_countdown")
     event_bus.emit(events.WAVE_CHANGED, data)
 end
 
@@ -560,10 +570,23 @@ local function settle_victory_once()
         for _, player_id in ipairs(player_context.active_player_ids()) do
             if disconnected_players[player_id] ~= true then
                 archive_players[#archive_players + 1] = player_id
-                event_bus.emit("archive.final_wave_cleared", {
-                    player_id = player_id, difficulty_id = difficulty_id,
-                })
             end
+        end
+        -- Determine the complete winning roster before emitting any per-player rewards.
+        -- Active players are allied, non-defeated participants; disconnected lanes were excluded above.
+        local human_winners, human_count = {}, 0
+        for _, player_id in ipairs(archive_players) do
+            if PlayerResource and PlayerResource.IsFakeClient
+                and not PlayerResource:IsFakeClient(player_id) then
+                human_winners[player_id] = true
+                human_count = human_count + 1
+            end
+        end
+        for _, player_id in ipairs(archive_players) do
+            event_bus.emit("archive.final_wave_cleared", {
+                player_id = player_id, difficulty_id = difficulty_id,
+                cooperative_win = human_winners[player_id] and human_count >= 2 and 1 or 0,
+            })
         end
     end
     local function begin_archive_phase()
@@ -600,9 +623,7 @@ end
 
 local function check_final_victory()
     if state.defeat_settled or game_has_ended() then return end
-    local terminal_wave = state.current_wave == FINAL_WAVE_NUMBER
-        or (state.early_final_used ~= true
-            and state.current_wave == state.total_waves)
+    local terminal_wave = state.current_wave == state.total_waves
     if terminal_wave
         and state.final_wave_generation_completed == true
         and state.failed_spawn <= 0
@@ -622,12 +643,7 @@ end
 
 local function update_targets()
     local removed = prune_invalid_enemies()
-    for _, meta in pairs(enemies) do
-        if meta.player_id ~= nil and meta.player_id >= 0 then
-            meta.wall_entindex = wall_by_player[meta.player_id] or -1
-        end
-        set_wall(meta.unit)
-    end
+    for _, meta in pairs(enemies) do set_wall(meta.unit) end
     if removed > 0 then
         publish("invalid_enemies_removed")
         check_final_victory()
@@ -650,19 +666,6 @@ local function rebuild_waves()
             wait_seconds = batches[1] and batches[1].wait_seconds or 30,
             batches = batches,
         }
-    end
-    if not waves[FINAL_WAVE_NUMBER] then
-        local final_source = wave_difficulty_builder.build(wave_rows.rows, "N2")
-        local final_batches = final_source
-            and final_source.waves[FINAL_WAVE_NUMBER] or nil
-        if final_batches then
-            waves[FINAL_WAVE_NUMBER] = {
-                wave_number = FINAL_WAVE_NUMBER,
-                wait_seconds = final_batches[1]
-                    and final_batches[1].wait_seconds or 30,
-                batches = final_batches,
-            }
-        end
     end
     state.total_waves = built.total_waves
     return true
@@ -712,10 +715,6 @@ local function apply_stats(unit, row, definition)
     local model_path = model_path_for(row, definition)
     if unit.SetModel and model_path then unit:SetModel(model_path) end
     if unit.SetOriginalModel and model_path then unit:SetOriginalModel(model_path) end
-    if definition.projectile_model and definition.projectile_model ~= "" then
-        if unit.SetRangedProjectileName then unit:SetRangedProjectileName(definition.projectile_model) end
-        if unit.SetProjectileSpeed then unit:SetProjectileSpeed(definition.projectile_speed or 700) end
-    end
     if unit.SetAttackCapability then
         unit:SetAttackCapability(definition.attack_type == "ranged"
             and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK)
@@ -747,10 +746,8 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         return
     end
     local marker = channel and channel.marker
-    if not channel then marker = monster_spawn_marker or find_monster_spawn_marker() end
-    local position = channel and wave_spawn_routing.position(channel)
-        or (not channel and marker and marker:GetAbsOrigin())
-    if not position then
+        or monster_spawn_marker or find_monster_spawn_marker()
+    if not marker then
         state.failed_spawn = state.failed_spawn + 1
         publish("monster_spawn_marker_missing")
         release_wave_model_resources(session, "spawn_marker_missing")
@@ -758,6 +755,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         return
     end
     monster_spawn_marker = marker
+    local position = marker:GetAbsOrigin()
     position.z = GetGroundHeight(position, nil) + 32
     local unit = CreateUnitByName(definition.unit_name, position, false, nil, nil, DOTA_TEAM_BADGUYS)
     if not valid(unit) then
@@ -782,7 +780,6 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     end
     pcall(monster_hero_visual_service.apply, unit, definition, {
         formal_wave = true,
-        fresh_unit = true,
         wave_number = wave_number,
         model_path = model_path_for(row, definition),
     })
@@ -814,8 +811,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         unit = unit,
         is_boss = is_assault_boss,
         wave_number = wave_number,
-        is_final_boss = is_assault_boss and (wave_number == FINAL_WAVE_NUMBER
-            or (state.early_final_used ~= true and wave_number == state.total_waves)),
+        is_final_boss = is_assault_boss and wave_number == state.total_waves,
         base_hull_radius = base_hull_radius,
         player_id = channel and channel.player_id or nil,
         wall_entindex = wall_for_channel(channel),
@@ -838,7 +834,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         is_boss = is_assault_boss,
         boss_warning = row.boss_warning ~= false,
     })
-    publish("enemy_spawned")
+    publish("enemy_spawned", channel and channel.player_id)
 end
 
 local function spawn_callback(row, token, wave_number, normal_instance_index, session, channel)
@@ -851,6 +847,7 @@ local function start_countdown(seconds)
     if dev_mode or state.defeat_settled or state.victory_settled or game_has_ended() then return end
     state.status = "countdown"
     state.timer = seconds
+    state.countdown_deadline = current_game_time() + seconds
     local target_wave = next_wave_number_after(state.current_wave)
     local preload_lead = wave_timing_config.formal_wave_preload_lead_seconds
     local preload_reviewed = target_wave == nil or target_wave <= 1
@@ -880,7 +877,7 @@ local function start_countdown(seconds)
     scheduler.cancel("wave_countdown")
     scheduler.every(1.0, function()
         if state.defeat_settled or state.victory_settled or game_has_ended() then return false end
-        state.timer = math.max(0, state.timer - 1)
+        state.timer = math.max(0, state.countdown_deadline - current_game_time())
         if state.timer <= preload_lead and not preload_reviewed then
             preload_reviewed = true
             queue_target_wave("lead_review")
@@ -957,9 +954,7 @@ local function start_wave(number, reason)
         resource_session.pending = 0
         resource_session.generation_completed = true
         release_wave_model_resources(resource_session, "generation_completed")
-        if state.current_wave == FINAL_WAVE_NUMBER
-            or (state.early_final_used ~= true
-                and state.current_wave == state.total_waves) then
+        if state.current_wave == state.total_waves then
             state.final_wave_generation_completed = true
         end
         publish("wave_generation_completed")
@@ -1014,7 +1009,7 @@ local function on_killed(payload)
             })
         end
     end
-    publish("enemy_killed")
+    publish("enemy_killed", meta.player_id)
     if state.alive == 0 and state.pending == 0
         and memory_cleared_wave ~= state.current_wave then
         memory_cleared_wave = state.current_wave
@@ -1068,12 +1063,11 @@ local function get_wave_state(payload)
         current_wave = state.current_wave,
         total_waves = state.total_waves,
         player_id = player_id,
-        alive = state.alive,
-        player_alive = population and population.alive or 0,
-        population_scope = "global",
+        alive = player_id ~= nil and (population and population.alive or 0) or state.alive,
         alive_limit = state.alive_limit,
-        overflow_active = state.overflow_active == true,
-        overflow_remaining = state.overflow_remaining or 0,
+        overflow_active = population and population.overflow_active == true or false,
+        overflow_remaining = population and population.overflow_remaining or 0,
+        overflow_deadline = population and population.overflow_deadline or 0,
         overflow_grace_seconds = state.overflow_grace_seconds,
         player_defeated = population and population.player_defeated == true or false,
         defeat_reason = population and population.defeat_reason or "",
@@ -1094,13 +1088,15 @@ local function get_wave_state(payload)
 end
 
 local function request_early_final()
+    -- Use the selected difficulty's actual last wave, including its own batches.
+    local final_wave = state.total_waves
     if not game_started then
         return { ok = false, error = "游戏尚未开始" }
     end
     if state.early_final_used then
         return { ok = false, error = "本局已购买提前通关" }
     end
-    if state.victory_settled or state.defeat_settled or state.current_wave >= FINAL_WAVE_NUMBER then
+    if state.victory_settled or state.defeat_settled or state.current_wave >= final_wave then
         return { ok = false, error = "最终波已经开始" }
     end
     local remaining = early_final_remaining()
@@ -1111,14 +1107,13 @@ local function request_early_final()
             remaining_seconds = remaining,
         }
     end
-    if not waves[FINAL_WAVE_NUMBER] then
+    if not waves[final_wave] then
         return { ok = false, error = "最终波配置缺失" }
     end
     state.early_final_used = true
     local removed = clear_normal_wave_enemies()
-    state.total_waves = math.max(state.total_waves, FINAL_WAVE_NUMBER)
     local ok, error_code = start_wave(
-        FINAL_WAVE_NUMBER,
+        final_wave,
         "early_final_wave_started"
     )
     if not ok then
@@ -1127,7 +1122,7 @@ local function request_early_final()
     end
     return {
         ok = true,
-        final_wave = FINAL_WAVE_NUMBER,
+        final_wave = final_wave,
         removed_normal_enemies = removed,
     }
 end
@@ -1386,8 +1381,7 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     local channel = player_id and wave_channels[player_id] or nil
     local marker = channel and channel.marker or nil
     if not marker then return nil, "player_wave_spawn_marker_missing" end
-    local position = wave_spawn_routing.position(channel)
-    if not position then return nil, "player_wave_spawn_marker_missing" end
+    local position = marker:GetAbsOrigin()
     position.z = GetGroundHeight(position, nil) + 32
     local unit = CreateUnitByName(
         definition.unit_name,
@@ -1428,7 +1422,6 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
     pcall(monster_hero_visual_service.apply, unit, definition, {
         challenge = true,
-        fresh_unit = true,
         allow_outside_formal_wave = true,
         model_path = definition.model_path,
         default_wearable_asset_id = definition.default_wearable_asset_id,
@@ -1455,7 +1448,6 @@ function M.set_monster_hull_scale(multiplier)
     )
     if not ok then return false, result_or_error end
     monster_hull_multiplier = result_or_error.multiplier
-    wave_spawn_routing.refresh(wave_channels, wall_by_player, monster_hull_multiplier)
     return true, result_or_error
 end
 
@@ -1558,7 +1550,6 @@ function M.init()
         local player_id = tonumber(payload.player_id)
         if player_id ~= nil then wall_by_player[player_id] = payload.entindex end
         wall_entindex = payload.entindex
-        wave_spawn_routing.refresh(wave_channels, wall_by_player, monster_hull_multiplier)
         update_targets()
     end)
     event_bus.subscribe(events.BUILDING_DESTROYED, function(payload)
@@ -1568,7 +1559,6 @@ function M.init()
             wall_by_player[player_id] = nil
         end
         if wall_entindex == payload.entindex then wall_entindex = -1 end
-        wave_spawn_routing.refresh(wave_channels, wall_by_player, monster_hull_multiplier)
         update_targets()
     end)
     event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
@@ -1579,7 +1569,6 @@ function M.init()
         population.defeat_reason = tostring(payload.reason or "unknown")
         clear_player_overflow(player_id, population)
         wave_channels[player_id] = nil
-        wave_spawn_routing.refresh(wave_channels, wall_by_player, monster_hull_multiplier)
         if require("systems/multiplayer_player_service").all_participants_defeated() then
             stop_defeated_match()
         end
@@ -1590,7 +1579,6 @@ function M.init()
         disconnected_players[player_id] = true
         wave_channels[player_id] = nil
         wall_by_player[player_id] = nil
-        wave_spawn_routing.refresh(wave_channels, wall_by_player, monster_hull_multiplier)
         local removed = 0
         for entindex, meta in pairs(enemies) do
             if meta.player_id == player_id then

@@ -1,0 +1,145 @@
+{
+  "pool_id": "dragon_knight",
+  "source": "用户2026-09-30两张第三宝箱图鉴截图；共27种，无N。",
+  "probability_status": "pending_user_values",
+  "pending_items": {
+    "lottery_dragon_knight_vanguard_mk1": "用户确认先登记待补：缺少效果，保留图鉴记录，暂不抽取或兑换。"
+  },
+  "items": [
+    {
+      "item_id": "lottery_dimensional_barrier",
+      "display_name": "次元屏障",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_orbital_cannon_core",
+      "display_name": "轨道炮核心",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_dragon_knight_vanguard_mk1",
+      "display_name": "龙骑尖兵01型",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_nano_cluster",
+      "display_name": "纳米集群",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_cyber_overlord",
+      "display_name": "赛博主宰",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_neural_reconstruction_module",
+      "display_name": "神经重构模块",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_void_signal_terminal",
+      "display_name": "虚空信号终端",
+      "quality": "ur"
+    },
+    {
+      "item_id": "lottery_hero_medal",
+      "display_name": "英雄勋章",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_sharpwood_tower_core",
+      "display_name": "锐木塔源",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_seed_of_all_wood",
+      "display_name": "万木之种",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_oak_bulwark",
+      "display_name": "橡木壁垒",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_supreme_fishing_rod",
+      "display_name": "极品钓鱼杆",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_titan_shield",
+      "display_name": "泰坦巨盾",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_rift_implant",
+      "display_name": "裂解插件",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_magnetic_disruption_turret",
+      "display_name": "磁扰炮台",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_signal_hub",
+      "display_name": "信号枢元",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_crystalline_armor",
+      "display_name": "晶态护甲",
+      "quality": "ssr"
+    },
+    {
+      "item_id": "lottery_windspeed_bowstring",
+      "display_name": "风速弓弦",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_quick_dry_cement",
+      "display_name": "速干水泥",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_swift_emblem",
+      "display_name": "快速纹盘",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_gale_bow",
+      "display_name": "疾风弓",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_universal_tool",
+      "display_name": "万能工具",
+      "quality": "sr"
+    },
+    {
+      "item_id": "lottery_divine_spirit",
+      "display_name": "神赐精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_sharp_spirit",
+      "display_name": "锋锐精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_nature_spirit",
+      "display_name": "自然精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_life_spirit",
+      "display_name": "生命精粹",
+      "quality": "r"
+    },
+    {
+      "item_id": "lottery_recovery_spirit",
+      "display_name": "回复精粹",
+      "quality": "r"
+    }
+  ]
+}

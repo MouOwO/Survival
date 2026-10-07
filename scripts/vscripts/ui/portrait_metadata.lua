@@ -1,15 +1,24 @@
 local asset_catalog = require("config/asset_catalog")
-
 local M = {}
 
--- Shared presentation-only metadata; callers pass a UI snapshot copy.
 function M.apply(unit, snapshot)
     snapshot = snapshot or {}
     snapshot.model_asset_id = ""
     snapshot.portrait_unit_name = ""
     snapshot.portrait_item_def = ""
 
-    if not unit then return snapshot end
+    -- Dynamic wave/challenge units often share a name but replace their model.
+    -- Resolve the actual selected entity for periodic snapshots as well.
+    if not unit and EntIndexToHScript and tonumber(snapshot.entindex) then
+        local ok, resolved = pcall(EntIndexToHScript, tonumber(snapshot.entindex))
+        if ok and resolved and (not resolved.IsNull or not resolved:IsNull()) then unit = resolved end
+    end
+    snapshot.portrait_model_name = ""
+    if unit and unit.GetModelName then
+        local ok, model = pcall(unit.GetModelName, unit)
+        if ok then snapshot.portrait_model_name = tostring(model or "") end
+    end
+    unit = unit or {}
     local asset_id = tostring(unit.survival_model_asset_id or "")
     if asset_id == "" then
         -- Monster hero visuals keep their asset identity separately from the
@@ -33,6 +42,9 @@ function M.apply(unit, snapshot)
     if not asset then return snapshot end
 
     snapshot.model_asset_id = tostring(asset.asset_id or asset_id or "")
+    if snapshot.portrait_model_name == "" then
+        snapshot.portrait_model_name = tostring(asset.primary_model or "")
+    end
     -- Native wearable tower stages, Boss hero bundles, and explicitly opted-in
     -- permanent heroes use the custom portrait ScenePanel. Their world model is
     -- intentionally independent of the portrait unit, so the client can render

@@ -113,20 +113,27 @@ $enabledByQuality = @{}
 foreach ($group in ($items | Where-Object enabled -eq '1' | Group-Object quality)) {
     $enabledByQuality[$group.Name] = $group.Count
 }
-foreach ($expected in @{ n=11; r=4; sr=5; ssr=30; ur=38 }.GetEnumerator()) {
+foreach ($expected in @{ n=10; r=5; sr=5; ssr=31; ur=37 }.GetEnumerator()) {
     Check ($enabledByQuality[$expected.Key] -eq $expected.Value) `
         "enabled $($expected.Key) item count is incorrect"
 }
 Check ((@($items.source_row | ForEach-Object { [int]$_ } | Sort-Object) -join ',') -eq
     ((5..93) -join ',')) 'source rows must cover every workbook item row from 5 through 93'
+$references = @(Get-ChildItem -LiteralPath (Join-Path $repo "data/lottery") -Filter '*_pool_reference_*.json' | Sort-Object Name | ForEach-Object {
+    Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+})
+$referenceQuality = @{}
+foreach ($reference in $references) {
+    foreach ($entry in $reference.items) { $referenceQuality[[string]$entry.item_id] = [string]$entry.quality }
+}
 $rarityByCost = @{ '188'='n'; '588'='r'; '1288'='sr'; '2388'='ssr'; '5000'='ur' }
 $duplicatePointsByQuality = @{ n=5; r=25; sr=100; ssr=400; ur=1000 }
 foreach ($item in $items) {
-    $expected = $rarityByCost[[string]$item.exchange_points]
+    $expected = if ($referenceQuality.ContainsKey($item.item_id)) { $referenceQuality[$item.item_id] } else { $rarityByCost[[string]$item.exchange_points] }
     Check ($item.quality -eq $expected) `
         "lottery item $($item.item_id) quality does not match exchange points"
     Check ([int]$item.duplicate_points -eq
-        [int]$duplicatePointsByQuality[$item.quality]) `
+        [int]$duplicatePointsByQuality[$rarityByCost[[string]$item.exchange_points]]) `
         "lottery item $($item.item_id) duplicate conversion points are incorrect"
     if ($item.enabled -eq '1') {
         $effectIds = @(([string]$item.effect_ids -split '\|') |
@@ -153,24 +160,26 @@ foreach ($pool in $pools) {
 }
 
 $mapUr = $weights | Where-Object { $_.pool_id -eq 'map' -and $_.quality -eq 'ur' }
-Check ([int]$mapUr.weight -eq 10) 'map UR weight must be 0.1% (10/10000)'
+Check ([int]$mapUr.weight -eq 0 -and $mapUr.enabled -eq '0') 'map screenshot pool has no UR rewards'
 foreach ($poolId in @('cultivation', 'dragon_knight', 'summer')) {
     $urWeight = $weights | Where-Object { $_.pool_id -eq $poolId -and $_.quality -eq 'ur' }
     Check ([int]$urWeight.weight -gt [int]$mapUr.weight) `
         "$poolId UR weight must be higher than map UR weight"
     Check ([int]$urWeight.weight -eq 1000) `
         "$poolId provisional UR weight must remain unchanged at 10%"
-    $urPity = $pity | Where-Object { $_.pool_id -eq $poolId -and $_.target_quality -eq 'ur' }
+    $expectedPity = if ($poolId -eq 'cultivation') {'ssr'} else {'ur'}
+    $urPity = $pity | Where-Object { $_.pool_id -eq $poolId -and $_.target_quality -eq $expectedPity }
     Check ($null -ne $urPity -and [int]$urPity.threshold -eq 10) `
-        "$poolId must have a ten-draw UR guarantee"
+        "$poolId must have a ten-draw $expectedPity guarantee"
+    $expectedTicket = if ($poolId -eq 'cultivation') {'lottery_ticket'} else {'special_lottery_ticket'}
     Check (($pools | Where-Object pool_id -eq $poolId).ticket_content_id -eq
-        'special_lottery_ticket') "$poolId must consume special tickets"
+        $expectedTicket) "$poolId must consume its configured ticket type"
 }
 
 Check ($pity.Count -eq 4) 'expected one batch guarantee per pool'
 $mapGuarantee = $pity | Where-Object pool_id -eq 'map'
-Check ($mapGuarantee.target_quality -eq 'sr') `
-    'map ten-pull guarantee must be SR'
+Check ($mapGuarantee.target_quality -eq 'ssr') `
+    'map ten-pull guarantee must be SSR'
 foreach ($rule in $pity) {
     Check ($rule.trigger_mode -eq 'batch_only') `
         "pity rule $($rule.rule_id) must be batch_only"
@@ -193,8 +202,13 @@ foreach ($member in $members) {
     Check ($member.item_id -eq '*' -or $items.item_id -contains $member.item_id) `
         "membership $($member.membership_id) references unknown item"
 }
-Check ($members.Count -eq 4) 'each pool should use one all-items wildcard membership'
-foreach ($pool in $pools) {
+Check ($members.Count -eq 84) 'map has 30; cultivation has 26; dragon has 27 (one pending); summer retains wildcard membership'
+foreach ($reference in $references) {
+    if ($reference.configuration_status -eq "draft_missing_effects") { continue }
+    $poolMembers = @($members | Where-Object pool_id -eq $reference.pool_id)
+    Check ((@($poolMembers.item_id | Sort-Object) -join ',') -eq (@($reference.items.item_id | Sort-Object) -join ',')) "pool $($reference.pool_id) must match screenshot items exactly"
+}
+foreach ($pool in ($pools | Where-Object pool_id -eq 'summer')) {
     Check ($null -ne ($members | Where-Object {
         $_.pool_id -eq $pool.pool_id -and $_.item_id -eq '*'
     })) "pool $($pool.pool_id) does not include the enabled item catalog"

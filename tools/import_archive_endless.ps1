@@ -1,4 +1,4 @@
-param([string]$Workbook='C:\Users\Administrator\Desktop\通关存档效果.xlsx')
+﻿param([string]$Workbook='C:\Users\Administrator\Desktop\通关存档效果.xlsx')
 $ErrorActionPreference='Stop'
 $repo=Split-Path -Parent $PSScriptRoot
 $root=Join-Path $repo 'data/csv/存档系统'
@@ -29,5 +29,8 @@ foreach($i in ($rows.Keys|Sort-Object)) {
 }
 if($waves.Count -ne 1000 -or $rewards.Count -ne 50){throw 'Workbook count changed, review before import'}
 Write-Table 'archive_endless_waves.csv' $waves 'string,string,number,number,number,number,boolean'
-Write-Table 'archive_endless_achievements.csv' $rewards 'string,string,number,string,list,list,boolean'
+$rewards | ForEach-Object { $_ | Add-Member -NotePropertyName required_wave -NotePropertyValue '' }
+$floorRewards = @(Import-Csv (Join-Path $root 'archive_endless_achievements.csv') | Where-Object { $_.required_wave -match '^\d+$' })
+$rewards = @($rewards) + $floorRewards
+Write-Table 'archive_endless_achievements.csv' $rewards 'string,string,number,string,list,list,boolean,number'
 & (Join-Path $PSScriptRoot 'build_archive_configs.ps1')

@@ -1,3 +1,4 @@
+local ParticleManager = require("systems/combat_effect_visibility").manager()
 LinkLuaModifier("modifier_tower_attack_effects", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_explosive_gatling_buff", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_tower_frost_slow", "modifiers/modifier_tower_attack_effects", LUA_MODIFIER_MOTION_NONE)
@@ -245,6 +246,7 @@ function modifier_tower_attack_effects:OnCreated()
     self.gatling_target_entindex = nil
     self.gatling_target_hits = 0
     self.laser_target = nil
+    self.laser_started_at = nil
     self.laser_elapsed = 0
     self.laser_visual_elapsed = 0
     self.laser_particles = {}
@@ -466,36 +468,7 @@ function modifier_tower_attack_effects:OnDeath(params)
     )
 end
 
-local function roll_tower_critical(tower, target)
-    if not valid(target) then return 1, nil end
-    local special = event_bus.request(events.TOWER_CRITICAL_QUERY, {
-        tower = tower,
-        target = target,
-        skills = tower_skills.get(tower),
-    })
-    local multiplier = special and tonumber(special.multiplier_pct) or 0
-    local source = special and special.source or nil
-    local inherited_chance = math.max(
-        0, tonumber(tower.survival_inherited_critical_chance_pct) or 0
-    )
-    if multiplier <= 100 and inherited_chance > 0
-        and RandomFloat(0, 100) < inherited_chance then
-        multiplier = math.max(
-            100,
-            tonumber(tower.survival_inherited_critical_damage_pct) or 200
-        )
-        source = "monkey_king_r"
-    end
-    local research_chance = math.max(
-        0, tonumber(tower.survival_super_tower_crit_chance) or 0
-    )
-    if RandomFloat(0, 100) < research_chance and multiplier < 200 then
-        multiplier = math.max(200,
-            tonumber(tower.survival_gameplay_critical_damage_pct) or 200)
-        source = "research_critical"
-    end
-    return multiplier > 100 and multiplier / 100 or 1, source
-end
+local roll_tower_critical = require("systems/tower_attack_critical").roll
 
 function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
     if not IsServer() then return 0 end
@@ -506,7 +479,9 @@ function modifier_tower_attack_effects:GetModifierPreAttack_CriticalStrike()
         return 0
     end
     if skill_matching(tower, "burning_great_arrow_")
-        or uses_machine_gun_attack(tower) then
+        or uses_machine_gun_attack(tower)
+        or uses_multi_replacement_arrows(tower) then
+        -- Scripted hits roll once when they actually deal damage.
         return 0
     end
     if self.pending_critical_multiplier then
@@ -1012,7 +987,8 @@ local function split_arrow(caster, target, damage, projectile_name, multiplier,
                 caster:entindex(), target:entindex(), damage,
                 multiplier
             )
-            deal(caster, target, damage * multiplier, "splash", {
+            local critical_multiplier = roll_tower_critical(caster, target)
+            deal(caster, target, damage * multiplier * critical_multiplier, "splash", {
                 "tower_multi_arrow",
             }, nil, armor_ignore_pct)
         end
@@ -1137,6 +1113,7 @@ reset_laser = function(self)
     laser_health.clear(self)
     destroy_particle(self)
     self.laser_target = nil
+    self.laser_started_at = nil
     self.laser_elapsed = 0
     self.laser_visual_elapsed = 0
     self.laser_next_visual_retry = nil
@@ -1310,6 +1287,8 @@ local function start_laser(self, target, effect)
     reset_laser(self)
     self.laser_target = target
     self.laser_ticks = 0
+    self.laser_started_at = GameRules:GetGameTime()
+    self.last_interval_time = self.laser_started_at
     laser_visual.sync_pose(self, effect)
     create_laser_segment(self, effect, GameRules:GetGameTime())
     play_tower_sound(
@@ -1318,7 +1297,7 @@ local function start_laser(self, target, effect)
     return true
 end
 
-local function deal_laser_tick(self, caster, target, laser, effect)
+local function deal_laser_tick(self, caster, target, laser, effect, tick_time)
     if not laser_target_in_range(caster, target) then return false end
     local interval = math.max(0.1, tonumber(laser.damage_interval) or 1)
     local base_multiplier = tonumber(laser.damage_multiplier) or 1
@@ -1328,9 +1307,11 @@ local function deal_laser_tick(self, caster, target, laser, effect)
     )
     local multiplier = tower_laser_damage.multiplier(
         base_multiplier, increment, maximum,
-        self.laser_ticks or 0, interval
+        self.laser_started_at and math.max(0, (tick_time or GameRules:GetGameTime()) - self.laser_started_at) / interval
+            or self.laser_ticks or 0, interval
     )
-    local amount = caster:GetAverageTrueAttackDamage(caster) * multiplier
+    local critical_multiplier = roll_tower_critical(caster, target)
+    local amount = caster:GetAverageTrueAttackDamage(caster) * multiplier * critical_multiplier
     detailed_log(
         "[TowerMystery] LASER tower=%d target=%d tick=%d multiplier=%.2f raw_damage=%.1f buff_stacks=%d",
         caster:entindex(), target:entindex(), (self.laser_ticks or 0) + 1,
@@ -1422,10 +1403,12 @@ function modifier_tower_attack_effects:OnIntervalThink()
     end
     update_laser_position(self, effect)
     self.laser_elapsed = self.laser_elapsed + elapsed
-    local interval = math.max(0.1, tonumber(laser.damage_interval) or 1)
-    if self.laser_elapsed + 0.001 < interval then return end
-    self.laser_elapsed = self.laser_elapsed - interval
-    deal_laser_tick(self, caster, target, laser, effect)
+    local interval = tower_laser_damage.interval(caster, laser)
+    -- Catch up short frame delays without losing haste-driven ticks. Stop on death/range loss.
+    while self.laser_elapsed + 0.000001 >= interval and laser_target_in_range(caster, target) do
+        self.laser_elapsed = self.laser_elapsed - interval
+        deal_laser_tick(self, caster, target, laser, effect, now - self.laser_elapsed)
+    end
 end
 
 function modifier_tower_attack_effects:OnAttackStart(params)

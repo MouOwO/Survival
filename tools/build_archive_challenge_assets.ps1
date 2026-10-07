@@ -26,7 +26,9 @@ $units=@('"DOTAUnits"','{')
 for($i=1;$i -le 3;$i++){
     $units += '    "npc_archive_challenge_'+$i+'"'
     $units += '    {'
-    $values=[ordered]@{BaseClass='npc_dota_creature';Model=$rule.building_model;ModelScale=$rule.building_model_scale;Level='1';ConsideredHero='0';HasInventory='0';AbilityLayout='12';HealthBarOffset='-1';StatusHealth='2500';StatusMana='0';MovementCapabilities='DOTA_UNIT_CAP_MOVE_NONE';AttackCapabilities='DOTA_UNIT_CAP_NO_ATTACK';ArmorPhysical='0';BoundsHullName='DOTA_HULL_SIZE_BARRACKS';VisionDaytimeRange='1000';VisionNighttimeRange='1000'}
+    $hubModel=$rule.('building_model_'+$i)
+    if(-not $hubModel){$hubModel=$rule.building_model}
+    $values=[ordered]@{BaseClass='npc_dota_creature';Model=$hubModel;ModelScale=$rule.building_model_scale;Level='1';ConsideredHero='0';HasInventory='0';AbilityLayout='12';HealthBarOffset='-1';StatusHealth='2500';StatusMana='0';MovementCapabilities='DOTA_UNIT_CAP_MOVE_NONE';AttackCapabilities='DOTA_UNIT_CAP_NO_ATTACK';ArmorPhysical='0';BoundsHullName='DOTA_HULL_SIZE_BARRACKS';VisionDaytimeRange='1000';VisionNighttimeRange='1000'}
     foreach($key in $values.Keys){$units += '        "'+$key+'" "'+$values[$key]+'"'}
     $units += '    }'
     $tokens.Add('        "npc_archive_challenge_'+$i+'" "存档挑战'+$i+'"')

@@ -152,19 +152,47 @@ def process_command(pid: int) -> str:
         raise TunnelError("process_identity_unavailable") from None
 
 
+class Tcp4OwnerRow(ctypes.Structure):
+    _fields_ = [(name, ctypes.c_uint32) for name in
+                ("state", "local_address", "local_port", "remote_address", "remote_port", "pid")]
+
+
 def listener_owned(pid: int) -> bool:
-    script = (f"@(Get-NetTCPConnection -State Listen -LocalPort {PORT} -ErrorAction SilentlyContinue "
-              "| Select-Object LocalAddress,OwningProcess) | ConvertTo-Json -Compress")
+    # Query the OS directly: starting PowerShell/CIM for each check can exceed
+    # its timeout during game startup even when the SSH tunnel is healthy.
+    if type(pid) is not int or pid <= 0:
+        raise TunnelError("tunnel_state_invalid")
     try:
-        result = subprocess.run(["powershell.exe", "-NoLogo", "-NoProfile", "-NonInteractive",
-                                 "-Command", script], capture_output=True, check=True,
-                                timeout=10, creationflags=HIDDEN)
-        values = json.loads(result.stdout.decode("utf-8-sig") or "[]")
-        if isinstance(values, dict):
-            values = [values]
-        return any(value.get("LocalAddress") == "127.0.0.1" and value.get("OwningProcess") == pid
-                   for value in values)
-    except (OSError, ValueError, AttributeError, TypeError, subprocess.SubprocessError):
+        query = ctypes.WinDLL("iphlpapi", use_last_error=True).GetExtendedTcpTable
+        query.argtypes = [ctypes.c_void_p, ctypes.POINTER(wintypes.DWORD),
+                          wintypes.BOOL, wintypes.ULONG, ctypes.c_int, wintypes.ULONG]
+        query.restype = wintypes.DWORD
+        size = wintypes.DWORD(0)
+        # AF_INET=2, TCP_TABLE_OWNER_PID_LISTENER=3. The table can grow
+        # between calls; retry only a bounded number of times.
+        result = query(None, ctypes.byref(size), False, 2, 3, 0)
+        for _ in range(4):
+            if result not in (0, 122) or not 4 <= size.value <= 16 * 1024 * 1024:
+                raise ValueError
+            buffer = ctypes.create_string_buffer(size.value)
+            result = query(buffer, ctypes.byref(size), False, 2, 3, 0)
+            if result == 122:  # ERROR_INSUFFICIENT_BUFFER
+                continue
+            if result != 0:
+                raise ValueError
+            count = ctypes.c_uint32.from_buffer(buffer).value
+            row_size = ctypes.sizeof(Tcp4OwnerRow)
+            if 4 + count * row_size > len(buffer):
+                raise ValueError
+            loopback = int.from_bytes(socket.inet_aton("127.0.0.1"), "little")
+            for index in range(count):
+                row = Tcp4OwnerRow.from_buffer(buffer, 4 + index * row_size)
+                if (row.state == 2 and row.local_address == loopback
+                        and socket.ntohs(row.local_port & 0xffff) == PORT and row.pid == pid):
+                    return True
+            return False
+        raise ValueError
+    except (OSError, ValueError, AttributeError, TypeError):
         raise TunnelError("listener_identity_unavailable") from None
 
 

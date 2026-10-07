@@ -161,7 +161,7 @@ local function sync_now(state, row, force)
     if fusion and fusion.eligible == true then
         wanted.ability_tower_fusion = true
         wanted.ability_upgrade_tower = nil
-        wanted.ability_upgrade_tower_lv01 = nil
+        wanted.ability_upgrade_tower_lv01 = true
         wanted.ability_upgrade_tower_max = nil
     end
 
@@ -195,8 +195,7 @@ local function sync_now(state, row, force)
     end
     if wanted.ability_tower_fusion then
         for _, ability_name in ipairs({
-            "ability_upgrade_tower", "ability_upgrade_tower_lv01",
-            "ability_upgrade_tower_max",
+            "ability_upgrade_tower", "ability_upgrade_tower_max",
         }) do
             if state.unit:FindAbilityByName(ability_name) then
                 state.unit:RemoveAbility(ability_name)
@@ -227,6 +226,13 @@ local function sync_now(state, row, force)
         state.unit:RemoveAbility("ability_tower_fusion")
     end
     tower_utility_abilities.sync(state, row)
+    for _, name in ipairs({"ability_upgrade_tower", "ability_upgrade_tower_lv01"}) do
+        local ability = state.unit:FindAbilityByName(name)
+        if ability then
+            ability:SetActivated(not base_tower_is_full
+                and tower_routes.row_at_level(state, state.level + 1) ~= nil)
+        end
+    end
     state.unit.survival_tower_managed_ability_names = wanted
     state.unit.survival_tower_ability_signature = signature
     state.unit.survival_tower_ability_sync_pending = nil

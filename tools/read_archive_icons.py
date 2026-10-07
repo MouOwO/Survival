@@ -32,12 +32,31 @@ def read_icons():
         original = next((entry for entry in rows(source) if entry.get(source_key) == row['item_id']), None)
         if not original or original['display_name'] != row['display_name']:
             raise ValueError(f'Item missing or display name differs from real configuration: {key}')
+        if row.get('art_status') in ('valve_native', 'valve_shop'):
+            from build_wave_monster_cosmetics import Vpk
+            mapping_file = 'archive_artifact_icons.json' if row.get('art_status') == 'valve_shop' else 'archive_native_icons.json'
+            native = json.loads((ROOT/'data/ui'/mapping_file).read_text(encoding='utf-8'))[row['item_id']]
+            if row['icon_path'] != native['icon_path']: raise ValueError('Native icon CSV differs from verified mapping')
+            if not hasattr(read_icons, '_native_vpk'):
+                read_icons._native_vpk = Vpk(ROOT.parents[1]/'dota/pak01_dir.vpk')
+            asset = 'panorama/images/' + row['icon_path'][:-4] + '_png.vtex_c'
+            blob = read_icons._native_vpk.read(asset)
+            row.update(display_width=int(row['display_width']),display_height=int(row['display_height']),
+                runtime_uri=native['runtime_uri'],small_runtime_uri=native['runtime_uri'],
+                official_item_definition=native['item_definition'],sha256=hashlib.sha256(blob).hexdigest(),
+                description=original.get('description') or original.get('source_method',''),
+                quality=original.get('quality',''),content_id=original.get('content_id',''))
+            result.append(row)
+            continue
         image_root = ROOT / 'panorama/src/images'
         file = (image_root / row['icon_path']).resolve()
         if not file.is_relative_to(image_root.resolve()):
             raise ValueError('Icon path escapes project images')
         with Image.open(file) as im:
-            if im.mode != 'RGBA' or im.getchannel('A').getextrema() != (0, 255):
+            alpha = im.getchannel('A').getextrema() if im.mode == 'RGBA' else None
+            # Preserve generated masters byte-for-byte; 254/255 alpha is visually opaque.
+            minimum_subject_alpha = 250 if row.get('art_status') in ('generated_portrait_v3','generated_collection_v4','generated_reward_v5') else 255
+            if not alpha or alpha[0] != 0 or alpha[1] < minimum_subject_alpha:
                 raise ValueError(f'Icon requires real alpha and an opaque subject: {file}')
             if im.width != im.height:
                 raise ValueError(f'Use a square icon canvas: {file}')
@@ -61,6 +80,21 @@ def read_icons():
                 h=w*row['display_height']/row['display_width']
                 if not (0<=x<1 and 0<=y<1 and .3<=w<=1 and x+w<=1 and y+h<=1):raise ValueError('Portrait viewport outside master')
                 row['portrait']=[x,y,w,h]
+        if row.get('art_status') == 'generated_portrait_v3':
+            receipt = json.loads((ROOT/'data/ui/archive_portraits_v3.json').read_text(encoding='utf8'))[row['item_id']]
+            if row['icon_path'] != receipt['icon_path']: raise ValueError('Portrait identity differs from generated receipt')
+            row.update(runtime_uri=receipt['runtime_uri'],small_runtime_uri=receipt['runtime_uri'])
+        if row.get('art_status') == 'generated_collection_v4':
+            manifest = json.loads((ROOT/'data/ui/archive_collection_v4.json').read_text(encoding='utf8'))
+            receipt = manifest['assets'][manifest['items'][row['item_id']]]
+            if row['icon_path'] != receipt['icon_path']: raise ValueError('Collection icon identity mismatch')
+            row.update(runtime_uri=receipt['runtime_uri'],small_runtime_uri=receipt['runtime_uri'])
+            for key in ('portrait','tone_color','tint_icon'): row.pop(key,None)
+        if row.get('art_status') == 'generated_reward_v5':
+            receipt = json.loads((ROOT/'data/ui/reward_art_v5.json').read_text(encoding='utf8'))[row['item_id']]
+            if row['icon_path'] != receipt['icon_path']: raise ValueError('Reward icon identity mismatch')
+            row.update(runtime_uri=receipt['runtime_uri'],small_runtime_uri=receipt['runtime_uri'])
+            for key in ('portrait','tone_color','tint_icon'): row.pop(key,None)
         result.append(row)
     return result
 

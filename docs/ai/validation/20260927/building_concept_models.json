@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-27",
+  "request": "Install yesterday-approved building concept models",
+  "status": "PASS",
+  "models": 34,
+  "construction_shells": 34,
+  "families": 8,
+  "unchanged_gameplay_and_tower_files": 334,
+  "checks": [
+    "Compiled mesh and construction-shell alignment",
+    "Preserved collision hull bounds, volume and source",
+    "Idle animation and root bone",
+    "2K normal/specular material dependencies",
+    "Source/content byte identity",
+    "All new portrait bounds inside view",
+    "All unrelated portraits preserved"
+  ],
+  "regressions": [
+    {
+      "test": "test_building_upgrade_lifecycle",
+      "exit_code": 0
+    },
+    {
+      "test": "test_wall_quick_upgrade",
+      "exit_code": 0
+    },
+    {
+      "test": "test_builder_tower_rebuild",
+      "exit_code": 0
+    }
+  ],
+  "max_triangles": 64000,
+  "report": "docs/BUILDING_CONCEPT_MODELS_20260927.md",
+  "artifacts": "output/building_models_20260927",
+  "preview": "output/building_models_20260927/buildings_actual.jpg",
+  "game_visual_acceptance": "pending user new-match review",
+  "compile_failures": 0,
+  "known_compile_notes": [
+    "Compiler reports staged .blend authoring provenance as an unrecognized additional content file; runtime dependencies and compilation pass."
+  ]
+}

@@ -11,7 +11,7 @@ local membership_rows = require("config/generated/lottery_pool_items")
 local gameplay_stat_rows = require("config/generated/player_gameplay_stats")
 
 local M = {
-    version = 5,
+    version = 6,
     default_pool_id = "map",
     starjoy_stat_id = "starjoy_points",
     quality_order = { "n", "r", "sr", "ssr", "ur" },
@@ -103,6 +103,8 @@ for _, row in ipairs(pool_rows.rows or {}) do
             single_cost = math.max(1, math.floor(tonumber(row.single_cost) or 1)),
             ten_cost = math.max(1, math.floor(tonumber(row.ten_cost) or 10)),
             pool_group = row.pool_group,
+            unlock_pool_id = tostring(row.unlock_pool_id or ""),
+            unlock_draws = math.max(0, math.floor(tonumber(row.unlock_draws) or 0)),
             ui_order = tonumber(row.ui_order) or 999,
             quality_weights = {},
             pity_rules = {},
@@ -211,6 +213,18 @@ for _, pool in ipairs(M.pool_order) do
         if left.priority == right.priority then return left.id < right.id end
         return left.priority < right.priority
     end)
+end
+
+-- Shared by the HTTP settlement worker and the local tools-mode service.
+function M.unlock_status(pool, state)
+    local required=pool.unlock_draws or 0
+    local source=M.pools[pool.unlock_pool_id]
+    if required>0 then assert(source and source.id~=pool.id,"lottery_unlock_source_invalid") end
+    local prior=state and state.pools and state.pools[pool.unlock_pool_id] or {}
+    local progress=math.max(0,math.floor(tonumber(prior.draws) or 0))
+    return {unlocked=required==0 or progress>=required,
+        unlock_pool_id=pool.unlock_pool_id,unlock_pool_name=source and source.display_name or "",
+        unlock_required=required,unlock_progress=progress}
 end
 
 -- Deterministic fingerprint includes private weights, but only the digest is public.

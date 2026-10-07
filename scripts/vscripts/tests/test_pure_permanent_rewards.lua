@@ -41,3 +41,20 @@ profile.save.match_boss_effects = {wall_initial_health=999999}
 changed("standard_load")
 assert(totals().wall_initial_health == 500, "standard mode keeps native full-account boss projection")
 print("PURE_PERMANENT_REWARDS_PASS: no old boss effects, new thresholds, signed effects, frozen social rewards and replay")
+
+profile.save.gameplay_stats={tower_attack_flat=7,tower_basic_attack_growth=2,tower_damage_attack_growth=0.5}
+changed("growth_scoping_test")
+local seen,global=0,0
+local attacker={survival_player_id=0}
+local idle
+idle={survival_player_id=0}
+bus.subscribe("tower.personal_attack_changed",function(p)
+ seen=seen+1;assert(p.tower==attacker)
+ assert(p.tower.survival_tower_personal_attack_growth==seen*2.5)
+end)
+bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,function() global=global+1 end)
+local start=totals().tower_attack_flat or 0
+for i=1,100 do bus.emit(events.TOWER_ATTACK_LANDED,{tower=attacker}) end
+assert(seen==100 and global==0 and totals().tower_attack_flat==start)
+assert(idle.survival_tower_personal_attack_growth==nil)
+print("PERSONAL_TOWER_GROWTH_PASS: 100 hits grow attacker only; no shared pool/global notifications")

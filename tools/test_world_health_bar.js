@@ -70,6 +70,20 @@ screenX=NaN;tick();assert.equal(bar().style.visibility,'collapse','non-finite pr
 assert.equal(config.SurvivalWorldHealthBarAnchor.Project(42,origin,container),null);
 screenX=100;screenY=100;container.actualuiscale_x=container.actualuiscale_y=1;
 container.windowOffset={x:0,y:0};tick();assert.equal(bar().style.visibility,'visible');
+// Keep widened hero/boss bars centered while retaining remote laser forecasts.
+for (const size of [120,156,62]) {
+    send({bar_width:size});tick();
+    assert.equal(bar().style.width,size+'px');
+    assert.equal(parseFloat(bar().style.position),100-size/2);
+    assert.equal(bar().__healthAnchor.width,size);
+    assert.equal(bar().__healthAnchor.screen_left,100-size/2);
+}
+container.actualuiscale_x=0.75;send({bar_width:156});tick();
+assert.equal(bar().__healthAnchor.screen_left,100-78*0.75);
+container.windowOffset={x:3.402823e38,y:3.402823e38};tick();
+assert.equal(bar().style.visibility,'visible','unlaid-out root sentinel recovers');
+assert.equal(parseFloat(bar().style.position),55.33);
+container.actualuiscale_x=1;container.windowOffset={x:0,y:0};send({});tick();
 // Five future one-second hits kill at t=5. The lethal hit overkills; the bar
 // must reach zero at t=5, not at 4.25s and not trail the actual death by 0.9s.
 let hp=650, next=125;

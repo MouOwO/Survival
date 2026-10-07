@@ -194,8 +194,8 @@ ability_summon_monkey_king = {
 ability_summon_blademaster = {
     abilityid = "ability_summon_blademaster",
     abilityname = "召唤剑圣（VIP）",
-    abilitydesc = "召唤剑圣。需要VIP权限；当前使用Sven作为测试载体，初始获得4个项目技能。",
-    abilityicon = "juggernaut_omni_slash",
+    abilitydesc = "需购买激活",
+    abilityicon = "survival/native/portrait_juggernaut",
 },
 }
 

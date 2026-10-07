@@ -1,0 +1,632 @@
+[
+  {
+    "id": "lottery_attribute_crystal",
+    "name": "属性结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: three-color triangular prism, red blue green broad facets. Item meaning: 属性结晶."
+  },
+  {
+    "id": "lottery_protection_crystal",
+    "name": "防护结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: blue crystal shield with strong hexagonal silhouette. Item meaning: 防护结晶."
+  },
+  {
+    "id": "lottery_nature_crystal",
+    "name": "自然结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: green leafy crystal sprout, curled leaf silhouette. Item meaning: 自然结晶."
+  },
+  {
+    "id": "lottery_bombardment_crystal",
+    "name": "炮击结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: orange cannon barrel embedded in dark crystal, broad round muzzle. Item meaning: 炮击结晶."
+  },
+  {
+    "id": "lottery_recovery_crystal",
+    "name": "回复结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: mint crystal droplet with a bright healing cross incised in it. Item meaning: 回复结晶."
+  },
+  {
+    "id": "lottery_resistance_crystal",
+    "name": "抵抗结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: slate crystal barricade wedge blocking one arrow. Item meaning: 抵抗结晶."
+  },
+  {
+    "id": "lottery_expansion_crystal",
+    "name": "膨胀结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: pink crystal heart with large outward growing facets. Item meaning: 膨胀结晶."
+  },
+  {
+    "id": "lottery_shooting_crystal",
+    "name": "射击结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: white crystal arrowhead with crimson fletching. Item meaning: 射击结晶."
+  },
+  {
+    "id": "lottery_wealth_crystal",
+    "name": "财富结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: amber crystal coin with a square center hole. Item meaning: 财富结晶."
+  },
+  {
+    "id": "lottery_lumber_crystal",
+    "name": "伐木结晶",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: brown timber log with an emerald crystal axe blade. Item meaning: 伐木结晶."
+  },
+  {
+    "id": "lottery_recovery_spirit",
+    "name": "回复精神",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: silver-green healing spirit shaped as a curled leaf flame. Item meaning: 回复精神."
+  },
+  {
+    "id": "lottery_life_spirit",
+    "name": "生命精神",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: warm crimson heart spirit protected by two stone wings. Item meaning: 生命精神."
+  },
+  {
+    "id": "lottery_nature_spirit",
+    "name": "自然精神",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: small living tree spirit, emerald foliage and brown roots. Item meaning: 自然精神."
+  },
+  {
+    "id": "lottery_sharp_spirit",
+    "name": "锋锐精神",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: silver razor spirit with one long diagonal blade. Item meaning: 锋锐精神."
+  },
+  {
+    "id": "lottery_divine_spirit",
+    "name": "神赐精神",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: small golden blessing bell with a violet cord. Item meaning: 神赐精神."
+  },
+  {
+    "id": "lottery_universal_tool",
+    "name": "万能工具",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: heavy workman's adjustable wrench and small pickaxe crossed, iron and yellow grip. Item meaning: 万能工具."
+  },
+  {
+    "id": "lottery_gale_bow",
+    "name": "疾风弓",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: slender emerald longbow with a white wind ribbon. Item meaning: 疾风弓."
+  },
+  {
+    "id": "lottery_swift_emblem",
+    "name": "快速纹章",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: copper winged boot insignia, clear single boot silhouette. Item meaning: 快速纹章."
+  },
+  {
+    "id": "lottery_quick_dry_cement",
+    "name": "速干水泥",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: open burlap cement sack with gray powder and a steel trowel. Item meaning: 速干水泥."
+  },
+  {
+    "id": "lottery_windspeed_bowstring",
+    "name": "风速弓弦",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: coiled ivory bowstring with sky blue wind trails. Item meaning: 风速弓弦."
+  },
+  {
+    "id": "lottery_hippogryph_onslaught",
+    "name": "角鹰魔攻",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: fierce brown hippogryph eagle head with sweeping horns. Item meaning: 角鹰魔攻."
+  },
+  {
+    "id": "lottery_soul_devouring_blade",
+    "name": "噬魂灵剑",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: long black sword with a violet soul flame in the blade. Item meaning: 噬魂灵剑."
+  },
+  {
+    "id": "lottery_tower_retrofit",
+    "name": "箭塔改造",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: wooden archer watchtower with an added heavy crossbow. Item meaning: 箭塔改造."
+  },
+  {
+    "id": "lottery_steel_wall",
+    "name": "钢铁城墙",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: chunky grey steel fortress wall segment with rivets. Item meaning: 钢铁城墙."
+  },
+  {
+    "id": "lottery_gathering_grimoire",
+    "name": "采集秘典",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: closed brown leather gathering book with axe mark and green bookmark. Item meaning: 采集秘典."
+  },
+  {
+    "id": "lottery_gathering_divine_codex",
+    "name": "采集神典",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: open ivory gathering codex with floating green leaves. Item meaning: 采集神典."
+  },
+  {
+    "id": "lottery_aaron_cannon",
+    "name": "亚伦巨炮",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: massive dark cannon with bronze rings and one red-hot muzzle. Item meaning: 亚伦巨炮."
+  },
+  {
+    "id": "lottery_darksteel_wall",
+    "name": "玄铁城墙",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: black iron wall with square battlements and dark red rivets. Item meaning: 玄铁城墙."
+  },
+  {
+    "id": "lottery_lumber_legacy",
+    "name": "伐木传承",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: ancient scarred woodcutting axe, leather wrapping and tree-ring charm. Item meaning: 伐木传承."
+  },
+  {
+    "id": "lottery_titan_shield",
+    "name": "泰坦巨盾",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: huge rectangular titan shield with stone face and cobalt inlay. Item meaning: 泰坦巨盾."
+  },
+  {
+    "id": "lottery_reincarnation_orb",
+    "name": "轮回宝珠",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: violet orb entwined by two distinct circular rebirth arrows. Item meaning: 轮回宝珠."
+  },
+  {
+    "id": "lottery_time_orb",
+    "name": "时间宝珠",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: brass hourglass globe containing flowing blue sand. Item meaning: 时间宝珠."
+  },
+  {
+    "id": "lottery_divine_tower_blessing",
+    "name": "神塔赐福",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: ivory seven-story watchtower blessed by one narrow golden beam. Item meaning: 神塔赐福.\nMANDATORY COMPOSITION: the complete subject occupies at most 70% of canvas height and width with a minimum 15% completely transparent empty margin on ALL sides. All beams, hair ornaments and tips end well inside this boundary. No part touches canvas edges."
+  },
+  {
+    "id": "lottery_abundance_blessing",
+    "name": "丰饶赐福",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: harvest cornucopia filled with wheat and orange fruit. Item meaning: 丰饶赐福."
+  },
+  {
+    "id": "lottery_omniscience_blessing",
+    "name": "全知赐福",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: large open purple book with a clear silver eye above it. Item meaning: 全知赐福."
+  },
+  {
+    "id": "lottery_unbreakable_fortress",
+    "name": "不破要塞",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: compact black basalt fortress with tall square corner towers. Item meaning: 不破要塞."
+  },
+  {
+    "id": "lottery_struggle_diary",
+    "name": "奋斗日记",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: worn red diary and feather pen, leather clasp. Item meaning: 奋斗日记."
+  },
+  {
+    "id": "lottery_chosen_hero",
+    "name": "神选英雄",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: helmeted champion's bust with white cape and crimson crest. Item meaning: 神选英雄."
+  },
+  {
+    "id": "lottery_chief_god_blessing",
+    "name": "主神赐福",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: golden sun disc held above a white ceremonial altar. Item meaning: 主神赐福."
+  },
+  {
+    "id": "lottery_ember_of_legacy",
+    "name": "薪火余烬",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: black brazier holding a single orange ember and branching flame. Item meaning: 薪火余烬."
+  },
+  {
+    "id": "lottery_lumber_immortal",
+    "name": "伐木仙人",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: elder woodcutter bust with long white beard, green robe and axe. Item meaning: 伐木仙人."
+  },
+  {
+    "id": "lottery_supreme_fishing_rod",
+    "name": "极品钓鱼杆",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: bent bamboo fishing rod with a silver hook and scarlet float. Item meaning: 极品钓鱼杆."
+  },
+  {
+    "id": "lottery_flame_wall",
+    "name": "烈焰城墙",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: charred fortress wall with orange flames along its battlements. Item meaning: 烈焰城墙."
+  },
+  {
+    "id": "lottery_magical_girl_juggernaut",
+    "name": "魔法少女（剑圣）",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: adult female masked swordmaster with pink armor, silver hair, one katana, dignified bust. Item meaning: 魔法少女（剑圣）."
+  },
+  {
+    "id": "lottery_forest_burning_edge",
+    "name": "焚林之锋",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: large serrated axe with a vivid orange burning edge. Item meaning: 焚林之锋."
+  },
+  {
+    "id": "lottery_endless_growth_ring",
+    "name": "无尽年轮",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: thick round slice of ancient tree trunk with concentric glowing green rings. Item meaning: 无尽年轮."
+  },
+  {
+    "id": "lottery_lumber_fury",
+    "name": "伐木之怒",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: two massive woodcutting axes crossed, bright red handles. Item meaning: 伐木之怒."
+  },
+  {
+    "id": "lottery_candle_dragon_wing",
+    "name": "烛龙之翼",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: pair of deep crimson dragon wings with dark bone spars. Item meaning: 烛龙之翼."
+  },
+  {
+    "id": "lottery_oak_bulwark",
+    "name": "橡木壁垒",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: sturdy oak palisade shield with three large wood planks. Item meaning: 橡木壁垒."
+  },
+  {
+    "id": "lottery_seed_of_all_wood",
+    "name": "万木之种",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: large brown seed split open with two broad bright green leaves. Item meaning: 万木之种."
+  },
+  {
+    "id": "lottery_sharpwood_tower_core",
+    "name": "锐木塔源",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: wooden tower core built from three sharpened long stakes. Item meaning: 锐木塔源."
+  },
+  {
+    "id": "lottery_hero_medal",
+    "name": "英雄勋章",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: bronze hero medal with bold lion head and red ribbon. Item meaning: 英雄勋章."
+  },
+  {
+    "id": "lottery_monkey_king",
+    "name": "齐天大圣",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: legendary golden monkey warrior bust, red scarf and dark staff. Item meaning: 齐天大圣."
+  },
+  {
+    "id": "lottery_immortal_nirvana",
+    "name": "不灭涅槃",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: red phoenix rising with broad orange wings and small black ashes. Item meaning: 不灭涅槃."
+  },
+  {
+    "id": "lottery_soul_lock_box",
+    "name": "锁魂匣",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: sealed black coffin-shaped box with silver chains and violet keyhole. Item meaning: 锁魂匣."
+  },
+  {
+    "id": "lottery_sky_turning_seal",
+    "name": "焕天印",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: square vermilion seal with a jade dragon handle. Item meaning: 焕天印."
+  },
+  {
+    "id": "lottery_heaven_devouring_pill",
+    "name": "万噬通天丹",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: open dark ceramic pill jar containing one radiant purple sphere. Item meaning: 万噬通天丹."
+  },
+  {
+    "id": "lottery_heaven_reaching_tower_seal",
+    "name": "通天塔印",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: white pagoda stamped onto a thick red square seal. Item meaning: 通天塔印."
+  },
+  {
+    "id": "lottery_sovereign_under_heaven",
+    "name": "君临天下",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: black and gold imperial crown with a long red tassel. Item meaning: 君临天下."
+  },
+  {
+    "id": "lottery_greenwood_rampart",
+    "name": "青林筑垣",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: section of forest rampart, grey stone blocks and curling emerald ivy. Item meaning: 青林筑垣."
+  },
+  {
+    "id": "lottery_lumber_expert",
+    "name": "伐木高手",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: rugged woodcutter glove gripping a short iron axe. Item meaning: 伐木高手."
+  },
+  {
+    "id": "lottery_woodforged_thousand_arrows",
+    "name": "木筑万锋",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: bundle of long wooden spearheads fanning upward. Item meaning: 木筑万锋."
+  },
+  {
+    "id": "lottery_greenwood_nirvana",
+    "name": "青林涅槃",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: charred tree stump regrowing a bright green crown. Item meaning: 青林涅槃."
+  },
+  {
+    "id": "lottery_fallen_sky_mine",
+    "name": "堕落天矿",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: chunk of jagged violet meteor ore and a heavy mining pick. Item meaning: 堕落天矿."
+  },
+  {
+    "id": "lottery_jade_purity_sword_immortal",
+    "name": "玉清剑仙",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: adult white-robed sword immortal bust, blue scarf, silver sword. Item meaning: 玉清剑仙.\nMANDATORY COMPOSITION: the complete subject occupies at most 70% of canvas height and width with a minimum 15% completely transparent empty margin on ALL sides. All beams, hair ornaments and tips end well inside this boundary. No part touches canvas edges."
+  },
+  {
+    "id": "lottery_immortal_slaying_sword_array",
+    "name": "诛仙剑阵",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: three long silver swords floating in a red circular formation. Item meaning: 诛仙剑阵."
+  },
+  {
+    "id": "lottery_investiture_of_gods",
+    "name": "封神榜",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: unrolled ochre scroll with silk red ribbons, abstract unreadable marks. Item meaning: 封神榜."
+  },
+  {
+    "id": "lottery_heavenly_puppet",
+    "name": "天道傀儡",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: ivory articulated wooden automaton bust, blue joints. Item meaning: 天道傀儡."
+  },
+  {
+    "id": "lottery_mountain_sea_kunpeng",
+    "name": "山海鲲鹏",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: huge blue mythical whale with broad dark feathered wings. Item meaning: 山海鲲鹏."
+  },
+  {
+    "id": "lottery_reincarnation_immortal_stele",
+    "name": "轮回仙碑",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: weathered rectangular stone stele with a single violet circular symbol. Item meaning: 轮回仙碑."
+  },
+  {
+    "id": "lottery_ancient_pine_fortification",
+    "name": "苍松固城",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: pine tree behind a blocky mossy fortress wall. Item meaning: 苍松固城."
+  },
+  {
+    "id": "lottery_woodcraft_grandmaster",
+    "name": "研木宗师",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: woodcraft master plane tool shaving one broad curled strip from timber. Item meaning: 研木宗师."
+  },
+  {
+    "id": "lottery_forestcast_thousand_bolts",
+    "name": "林铸千矢",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: mechanical wooden crossbow launching three arrowheads. Item meaning: 林铸千矢."
+  },
+  {
+    "id": "lottery_emerald_wood_origin",
+    "name": "翠木归元",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: spiraling green tree roots wrapped around a bright seed. Item meaning: 翠木归元."
+  },
+  {
+    "id": "lottery_dimensional_barrier",
+    "name": "次元屏障",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: purple hexagonal energy barrier projected by a dark metal emitter. Item meaning: 次元屏障."
+  },
+  {
+    "id": "lottery_orbital_cannon_core",
+    "name": "轨道炮核心",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: long futuristic orange railgun core with two heavy parallel rails. Item meaning: 轨道炮核心."
+  },
+  {
+    "id": "lottery_dragon_knight_vanguard_mk1",
+    "name": "龙骑尖兵1型",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: red and steel dragon knight powered helmet with angular dragon jaw. Item meaning: 龙骑尖兵1型."
+  },
+  {
+    "id": "lottery_nano_cluster",
+    "name": "纳米集群",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: silver nanobot swarm coalescing into a hexagonal mechanical cube. Item meaning: 纳米集群."
+  },
+  {
+    "id": "lottery_cyber_overlord",
+    "name": "赛博主宰",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: adult cybernetic overlord helmet bust, black steel and magenta visor. Item meaning: 赛博主宰."
+  },
+  {
+    "id": "lottery_neural_reconstruction_module",
+    "name": "神经重构模块",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: curved silver neural spine module with clear red nerve cables. Item meaning: 神经重构模块."
+  },
+  {
+    "id": "lottery_void_signal_terminal",
+    "name": "虚空信号终端",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: violet signal antenna terminal with a dark screen and three broad arcs. Item meaning: 虚空信号终端."
+  },
+  {
+    "id": "lottery_nitride_alloy_wall",
+    "name": "氮化合金护墙",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: brushed steel alloy wall plate with three large bolts. Item meaning: 氮化合金护墙."
+  },
+  {
+    "id": "lottery_data_unit",
+    "name": "数据单元",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: compact blue data cartridge with copper connector teeth. Item meaning: 数据单元."
+  },
+  {
+    "id": "lottery_pulse_conduction_turret",
+    "name": "脉冲传导炮台",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: copper pulse turret with a large cyan coil. Item meaning: 脉冲传导炮台."
+  },
+  {
+    "id": "lottery_cybernetic_implant",
+    "name": "义体插件",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: silver cybernetic forearm implant with a green power strip. Item meaning: 义体插件."
+  },
+  {
+    "id": "lottery_crystalline_armor",
+    "name": "晶态护甲",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: blue angular crystal breastplate armor, strong shoulder silhouette. Item meaning: 晶态护甲."
+  },
+  {
+    "id": "lottery_signal_hub",
+    "name": "信号枢纽",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: orange satellite signal hub with a dish antenna. Item meaning: 信号枢纽."
+  },
+  {
+    "id": "lottery_magnetic_disruption_turret",
+    "name": "磁扰炮台",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: horseshoe-magnet turret with red and blue poles. Item meaning: 磁扰炮台."
+  },
+  {
+    "id": "lottery_rift_implant",
+    "name": "裂痕插件",
+    "kind": "lottery",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: black cybernetic eye implant split by a glowing purple rift. Item meaning: 裂痕插件."
+  },
+  {
+    "id": "daily_growth_gem",
+    "name": "成长宝石",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: faceted green spear-shaped growth gem with a single golden upward branch inside. Item meaning: 成长宝石."
+  },
+  {
+    "id": "daily_regen_shard",
+    "name": "回血碎片",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: flat mint healing shard with a large white cross, visibly broken edge. Item meaning: 回血碎片."
+  },
+  {
+    "id": "daily_attribute_gem",
+    "name": "攻击宝石",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: triangular ruby gem with three large colored points around its core. Item meaning: 攻击宝石."
+  },
+  {
+    "id": "daily_attack_shard",
+    "name": "攻击碎片",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: jagged orange arrowhead shard with a dark socket. Item meaning: 攻击碎片."
+  },
+  {
+    "id": "daily_health_gem",
+    "name": "生命宝石",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: smooth crimson heart-shaped life gem with a subtle stone outer edge. Item meaning: 生命宝石."
+  },
+  {
+    "id": "daily_wood_gem",
+    "name": "木材宝石",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: amber timber-shaped gemstone, distinct concentric wood rings. Item meaning: 木材宝石."
+  },
+  {
+    "id": "daily_block_shard",
+    "name": "格挡碎片",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: broad slate-blue shield shard with one chipped lower corner. Item meaning: 格挡碎片."
+  },
+  {
+    "id": "daily_attribute_shard",
+    "name": "属性碎片",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: three interlocking red blue green stone fragments in a triangular knot. Item meaning: 属性碎片."
+  },
+  {
+    "id": "daily_gold_gem",
+    "name": "金币宝石",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: round golden coin gemstone with a large square hole. Item meaning: 金币宝石."
+  },
+  {
+    "id": "daily_wealth_talisman",
+    "name": "聚财古符",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: red paper wealth talisman and three old gold coins, no readable text. Item meaning: 聚财古符."
+  },
+  {
+    "id": "daily_ancient_tree",
+    "name": "古树眷顾",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: ancient spreading oak tree with thick roots and bright green crown. Item meaning: 古树眷顾."
+  },
+  {
+    "id": "daily_forest_origin",
+    "name": "森罗本源",
+    "kind": "daily",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: one large emerald seed held by dark tree roots. Item meaning: 森罗本源."
+  },
+  {
+    "id": "pool_map",
+    "name": "地图宝箱",
+    "kind": "pool",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: weathered dark oak treasure chest, heavy bronze latch, slightly open lid, rich warm golden light inside, a map parchment partly tucked under the lid. Three-quarter view, wide chest silhouette, rich painterly material quality, suitable as the large centerpiece of a premium fantasy game reward screen."
+  },
+  {
+    "id": "pool_cultivation",
+    "name": "修仙宝箱",
+    "kind": "pool",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: white jade ceremonial coffer with dark green corner fittings, an elegant rounded lid, crimson silk hanging cord, soft emerald light inside. Three-quarter view, wide chest silhouette, rich painterly material quality, suitable as the large centerpiece of a premium fantasy game reward screen."
+  },
+  {
+    "id": "pool_dragon_knight",
+    "name": "龙脊尖兵",
+    "kind": "pool",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: angular black steel military supply chest with crimson panels, two strong dragon-horn corner brackets, subtle orange energy vents. Three-quarter view, wide chest silhouette, rich painterly material quality, suitable as the large centerpiece of a premium fantasy game reward screen."
+  },
+  {
+    "id": "pool_summer",
+    "name": "暑期宝箱",
+    "kind": "pool",
+    "prompt": "Create ONE finished square game inventory icon on a genuinely transparent background. Hand-painted Warcraft-inspired fantasy game item illustration with simple bold masses, material shading and crisp silhouette, readable at 80 pixels. Single isolated subject centered, occupies 80-86% of the square, generous clean margin. Strong light-dark separation. Use the subject-specific palette, only restrained metal accents. No decorative gem wreath, no filigree frame, no card border, no tiny repeated ornament, no text, no letters, no numbers, no watermark, no scenery, no detached sparkles, no cast ground shadow. This belongs to a coherent set whose items must differ strongly in silhouette, dominant color and material. Subject: warm honey-colored wooden sea chest with turquoise bands, a large seashell clasp and a short rope handle, soft sunny interior light. Three-quarter view, wide chest silhouette, rich painterly material quality, suitable as the large centerpiece of a premium fantasy game reward screen."
+  }
+]

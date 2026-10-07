@@ -117,8 +117,8 @@ function M.sync(unit, building_id, levels, transaction, reincarnation_level)
             local reserved = tonumber(transaction and transaction.reserved_levels
                 and transaction.reserved_levels[row.technology_group]) or 0
             ability:SetActivated(queue_count < queue_capacity
-                and math.max(current, reserved) < maximum(row)
-                and prerequisite_met(row, levels, reincarnation_level))
+                and prerequisite_met(row, levels, reincarnation_level)
+                and math.max(current, reserved) < maximum(row))
             if ability.SetAbilityIndex then
                 ability:SetAbilityIndex(math.max(0, (tonumber(row.slot_order) or 1) - 1))
             end

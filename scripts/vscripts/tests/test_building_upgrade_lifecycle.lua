@@ -60,11 +60,42 @@ local function make_unit(id)
         "SetAcquisitionRange", "SetProjectileSpeed"}) do unit[method] = live end
     return unit
 end
+local auto_service = require("systems/tower_auto_upgrade_service")
+local auto_init, auto_options = auto_service.init
+function auto_service.init(options)
+    auto_options = options
+    return auto_init(options)
+end
 local upgrade = require("systems/building_upgrade_system")
 upgrade.init()
-local reward = 7
+auto_service.init = auto_init
+-- Exercise the production preflight injected into the queue, including free
+-- upgrades that waive currency but still require available population.
+local free_actions, wallet = 0, {wood=10,gold=20,population=0,max_population=1}
+package.loaded["systems/rogue_effect_state_service"].numeric = function(player, effect)
+    assert(player==0 and effect=="grant_building_upgrade_action")
+    return free_actions
+end
+bus.handle_request(events.RESOURCE_CAN_SPEND_REQUEST, function(cost)
+    assert(cost.player_id==0)
+    return {ok=wallet.wood >= (cost.wood or 0) and wallet.gold >= (cost.gold or 0)
+        and wallet.population+(cost.population or 0)<=wallet.max_population}
+end)
+local quote = {wood=10,gold=20,population=1}
+assert(auto_options.can_upgrade({player_id=0},quote))
+wallet.wood=0
+assert(not auto_options.can_upgrade({player_id=0},quote))
+free_actions=1
+assert(auto_options.can_upgrade({player_id=0},quote),"free upgrade bypasses currency")
+wallet.population=1
+assert(not auto_options.can_upgrade({player_id=0},quote),"free upgrade cannot bypass population")
+assert(quote.wood==10 and quote.gold==20,"preflight never mutates cached quote")
+free_actions=0
+print("TOWER_AUTO_PREFLIGHT_PASS: real injected checker, currency, free actions and population")
+local reward, reward_pct, reward_reads = 7, 0, 0
 bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, function()
-    return {totals = {tower_attack_flat = reward}}
+    reward_reads=reward_reads+1
+    return {totals = {tower_attack_flat = reward, tower_attack_bonus_pct=reward_pct}}
 end)
 bus.subscribe(events.BUILDING_CHANGED, function(payload) published[#published + 1] = payload end)
 local function register(unit)
@@ -236,43 +267,49 @@ assert(scans==0 and registry_reads>0 and #published>0,
 assert(#errors==0,table.concat(errors,"\n"))
 print("LUMBERJACK_BUILDING_ISOLATION_PASS: 200 growth hits cause zero world scans and building refreshes")
 
--- Large tower groups apply each growth immediately. They share one reward
--- snapshot and do not copy saves or invoke recovery on each combat hit.
-local group = {}
-for i=1,100 do
-    group[i] = make_unit(2000+i)
-    register(group[i])
+-- Dense tower attacks: exact shared damage with no broad rebuilds per hit.
+reward_pct=50
+local dense={}
+for id=2001,2020 do dense[#dense+1]=make_unit(id);register(dense[#dense]) end
+local foreign=make_unit(3001);foreign.survival_player_id=1
+bus.emit(events.BUILDING_CREATED,{unit=foreign,entindex=3001,definition=config.arrow_tower,
+ building_id="arrow_tower",level=1,team=2,player_id=1,base_attack_damage=100})
+local foreign_damage=foreign.damage
+local timer_writes=0
+for _,u in ipairs(dense) do
+ u.SetBaseAttackTime=function()timer_writes=timer_writes+1 end
+ u.Script_SetAttackRange=function()timer_writes=timer_writes+1 end
 end
-local foreign = make_unit(3001)
-foreign.survival_player_id = 1
-bus.emit(events.BUILDING_CREATED, {unit=foreign, entindex=foreign.index,
-    definition=config.arrow_tower, building_id="arrow_tower", level=1,
-    team=2, player_id=1, base_attack_damage=100})
-local foreign_damage = foreign.damage
-local reads_before, registry_before = profile_reads, registry_reads
-for _, reason in ipairs({"gameplay_stats_tower_attack_growth",
-    "tower_actual_damage_growth", "star_blessing_tower_attack_per_second"}) do
-    reward = reward + 3
-    published = {}
-    bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id=0, reason=reason})
-    for _, unit in ipairs(group) do assert(unit.damage == 100+reward) end
-    for _, payload in ipairs(published) do
-        assert(payload.stats_only == true and payload.building_id == "arrow_tower")
-    end
-    assert(foreign.damage == foreign_damage, "growth must respect same-team ownership")
+scans,published,reward_reads=0,{},0
+local before=os.clock()
+for i=1,1000 do
+ reward=reward+0.25
+ bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=0,changed_section="tower",changed_field="attack",tower_attack_flat=reward,reason="gameplay_stats_tower_attack_growth"})
+ for _,u in ipairs(dense)do assert(math.abs(u.damage-(100+reward)*1.5)<1e-9,"growth visible immediately after every hit")end
 end
-assert(profile_reads == reads_before and registry_reads == registry_before and scans == 0)
-published = {}
-bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,
-    {player_id=0, reason="gameplay_stats_tower_attack_growth"})
-assert(#published == 0, "identical growth totals produce no native writes or UI fan-out")
-for _, reason in ipairs({"star_blessing_attributes_per_second",
-    "gameplay_stats_hero_damage_growth", "gameplay_stats_hero_attack_growth"}) do
-    bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id=0, reason=reason})
+assert(scans==0 and #published==0 and reward_reads==0 and timer_writes==0)
+assert(foreign.damage==foreign_damage and #errors==0,table.concat(errors,"\n"))
+local elapsed=os.clock()-before
+bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=0,reason="profile_refresh"})
+for _,u in ipairs(dense)do assert(math.abs(u.damage-(100+reward)*1.5)<1e-9,"full refresh agrees exactly")end
+print(string.format("TOWER_GROWTH_HOT_PATH_PASS: 1000 hits x 20 towers, %.4fs Lua mock; zero scans/full publications/reward copies/BAT-range resets; exact damage and owner isolation",elapsed))
+scans,published=0,{}
+bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=0,changed_section="hero",reason="gameplay_stats_hero_attack_growth"})
+assert(scans==0 and #published==0,"hero growth does not touch buildings")
+
+-- Personal attack growth is O(1): one attacker write; no peers, scans or skill refresh.
+local attacker=dense[1]
+local writes=0
+for _,u in ipairs(dense) do u.SetBaseDamageMin=function(self,v)self.damage=v;writes=writes+1 end end
+scans,published,reward_reads=0,{},0
+for i=1,1000 do
+ attacker.survival_tower_personal_attack_growth=i*0.25
+ bus.emit("tower.personal_attack_changed",{tower=attacker,player_id=0})
+ assert(math.abs(attacker.damage-(100+reward+i*0.25)*1.5)<1e-9)
+ assert(math.abs(dense[2].damage-(100+reward)*1.5)<1e-9)
 end
-assert(#published == 0 and profile_reads == reads_before)
-bus.emit(events.TECHNOLOGY_STATS_CHANGED, {player_id=0, reason="research_completed"})
-assert(profile_reads == reads_before+1,
-    "a normal research refresh clones the profile once for the entire group")
-assert(#errors == 0, table.concat(errors,"\n"))
-print("TOWER_RUNTIME_COST_PASS: 100 towers, immediate growth, zero world scans/save copies/recovery, same-team isolation, one snapshot for research")
+assert(writes==1000 and scans==0 and #published==0 and reward_reads==0)
+bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=0,reason="profile_refresh"})
+assert(math.abs(attacker.damage-(100+reward+250)*1.5)<1e-9,"full refresh retains personal growth")
+assert(#errors==0,table.concat(errors,"\n"))
+print("PERSONAL_TOWER_HOT_PATH_PASS: 1000 hits, exactly 1000 attack writes, peer isolation, refresh persistence")

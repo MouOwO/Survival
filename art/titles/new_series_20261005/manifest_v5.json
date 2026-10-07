@@ -1,0 +1,186 @@
+[
+  {
+    "path": "scripts/vscripts/config/generated/archive_titles.lua",
+    "sha256": "498f3994535bc6fb753c13d51e5d0fb9b50f5abacc099d1c6b0949d058e98bb4"
+  },
+  {
+    "path": "scripts/vscripts/systems/title_presentation_service.lua",
+    "sha256": "8c66b86130eef971366d8032ffb6de17671e8b2c79b0eeaefce757837dd34a3d"
+  },
+  {
+    "path": "panorama/src/scripts/custom_game/title_series_art.js",
+    "sha256": "dedaa1996a4a1e26921597bb3da58070b1db6ea214dd935f045eab30eada5361"
+  },
+  {
+    "path": "panorama/src/scripts/custom_game/title_world.js",
+    "sha256": "a27c6e6a73bb41e9ff3a680b6432ade3c8ede37779052cc372bc547d5d5ac5d9"
+  },
+  {
+    "path": "panorama/src/styles/custom_game/title_series.css",
+    "sha256": "2d3eb042d15962cf0236800015b346d7211d6d1621b0a2d0a6450e27525842d6"
+  },
+  {
+    "path": "panorama/src/layout/custom_game/archive.xml",
+    "sha256": "93ff0c22b41ed407cff7086b14eb96ef7096928cedc2850449e6649c2fea1f23"
+  },
+  {
+    "path": "jinghong/v1/art.png",
+    "sha256": "b3ac48eab63b3b59db0222f67b82d796365ca3055e91d5a51678a2ae990ca5ac"
+  },
+  {
+    "path": "jinghong/v2/art.png",
+    "sha256": "a7eff253f285ba8423224f756b132ed31fefd438bee3abebff09f09656ce4e91"
+  },
+  {
+    "path": "jinghong/v3/art.png",
+    "sha256": "0615f0dbbf4d90d5d002729e6bac4aa5a2af18213a93935ababc083bf9f2f93f"
+  },
+  {
+    "path": "jinghong/v4/presentation.json",
+    "sha256": "9a1b1cb23508cf70259ba705ee21de08fa50cd0d0c6f7a9c07118a077aa8d973"
+  },
+  {
+    "path": "jinghong/v5/presentation.json",
+    "sha256": "4d50204c4f9b5b39a5add9b848bb556dddee37f5d34e16e5571535ab76c26e43"
+  },
+  {
+    "path": "youlong/v1/art.png",
+    "sha256": "d50848cae9fafc2996178b400bf3f864c39aee516d15cf0b49828d253357970f"
+  },
+  {
+    "path": "youlong/v2/art.png",
+    "sha256": "49ba90397d41ba168700ae3b75621365404057591bf33eb13ad7c07557e99653"
+  },
+  {
+    "path": "youlong/v3/art.png",
+    "sha256": "c9c907f0d15bbf215371f88cfbab1c693e1c26506a175bb26383623e10acdaa2"
+  },
+  {
+    "path": "youlong/v4/presentation.json",
+    "sha256": "3ddf86063ea65f3923cfc9c083d3f87abbe7075c5446c9f5e276b5402ef14a29"
+  },
+  {
+    "path": "youlong/v5/presentation.json",
+    "sha256": "e43a990ef045f664e049681f5d8769fc368b4141764656210bb44e361d321acf"
+  },
+  {
+    "path": "jian_tianya/v1/art.png",
+    "sha256": "b12bfdfe20c1f2b6cfb397779eff4b19698cab82075cd5b957ab684ff8e43834"
+  },
+  {
+    "path": "jian_tianya/v2/art.png",
+    "sha256": "8ad5a951e4d38c6735186df8242c6b8bf59a859e7a9949ab7b040595e7ccb0ae"
+  },
+  {
+    "path": "jian_tianya/v3/art.png",
+    "sha256": "8cb98f80dd494b6564553ba99bd49ce97530deb718678a52e7891d7fc956391b"
+  },
+  {
+    "path": "jian_tianya/v4/presentation.json",
+    "sha256": "44b54a3617d3e9fefe1bf8a118e68b1af54f8067a231e50bb19ed85194724e97"
+  },
+  {
+    "path": "jian_tianya/v5/presentation.json",
+    "sha256": "9acc3d98f062c63ec1fdcacbb47b1fc275aebab04c0354688852141c83633d29"
+  },
+  {
+    "path": "tianxia_diyi/v1/art.png",
+    "sha256": "b1ac2cab3baed9fdaaebe43b4f1a1ad1559a071b8a2cfd66fd4751461dd760fb"
+  },
+  {
+    "path": "tianxia_diyi/v2/art.png",
+    "sha256": "86bed37b831818a389a33545bda48eb787fc2cf1e879dde51194ed02a2c4eb76"
+  },
+  {
+    "path": "tianxia_diyi/v3/art.png",
+    "sha256": "dedf915363d000fb981ff291f419c149ce12294d41015973de5fa7e4d2f3375c"
+  },
+  {
+    "path": "tianxia_diyi/v4/presentation.json",
+    "sha256": "889749d0bfbb859872265570767424fb108c72befcabc5f5b6fac254fa91961c"
+  },
+  {
+    "path": "tianxia_diyi/v5/presentation.json",
+    "sha256": "4328bee9dee8f37c4f6feec1d7f7252115dc83592bd80c64da7279c7e3a23351"
+  },
+  {
+    "path": "cangqiong/v1/art.png",
+    "sha256": "5d6c49a785a97ea60888b1f01c46f4e6d2ad9e6363d407205af50999bedfe072"
+  },
+  {
+    "path": "cangqiong/v2/art.png",
+    "sha256": "520b3a812d4ed413693146dfd0c5fd4f7f463fbf76fe251238e32cf8adcc577e"
+  },
+  {
+    "path": "cangqiong/v3/art.png",
+    "sha256": "0dbaa8de93928b0bc79ac50ad208e222e65120b5419109bd79ef717d38d19290"
+  },
+  {
+    "path": "cangqiong/v4/presentation.json",
+    "sha256": "4846fcd7ecc26153f07917385d887e8f5c283cc0180e4667e66fb1452dec9961"
+  },
+  {
+    "path": "cangqiong/v5/presentation.json",
+    "sha256": "2dd6edf05d9ef1723b3005b84ee30c98d0b40697f6ee16c0928b848635922bcf"
+  },
+  {
+    "path": "sihai/v1/art.png",
+    "sha256": "03c4d4340f4a96bc425f2c95e8fef5371bab6cce00f97d56d8d0bc1a3a93a65e"
+  },
+  {
+    "path": "sihai/v2/art.png",
+    "sha256": "0798a788376c73937156f44d38f88f8719e01dbcef035f0f88e26942b065c85f"
+  },
+  {
+    "path": "sihai/v3/art.png",
+    "sha256": "56d3ee844ef9db827650286dcf421463e873ee9717dd94cb88a4a3d4ea72cb9d"
+  },
+  {
+    "path": "sihai/v4/presentation.json",
+    "sha256": "2d75f34c55a47895c37fcd3a49674f95191a83a37a1a1a49c0aa6e1fb5663e1a"
+  },
+  {
+    "path": "sihai/v5/presentation.json",
+    "sha256": "f9f71a7bc9d608157b7d32f949225d746e4ff5e0794c08c1c6c39cc0d3f45a8e"
+  },
+  {
+    "path": "daoyuan/v1/art.png",
+    "sha256": "ce96eec2d369bcf41102cb5544ff2c0ebf63d2833e72f7c14fb50af55f92a5f1"
+  },
+  {
+    "path": "daoyuan/v2/art.png",
+    "sha256": "7ea43acda37660f7c8f1fa85b30999c25cab695cf506062b5728a0c323e6775d"
+  },
+  {
+    "path": "daoyuan/v3/art.png",
+    "sha256": "b694f0f13dd2b641382008f7cf86107a7981999423f200805bb60962dab35b9a"
+  },
+  {
+    "path": "daoyuan/v4/presentation.json",
+    "sha256": "0f29c21518dbb4590734da77daf2a674e931bba9067cae967509d671763db8c7"
+  },
+  {
+    "path": "daoyuan/v5/presentation.json",
+    "sha256": "71cf4a38b0df2c9e7d64eb3fb6041aff0dc27ca253586c7b9be44aedd5adfd10"
+  },
+  {
+    "path": "chushen/v1/art.png",
+    "sha256": "b17e4eaf5cb7cbb1f5d1c7113731fb2eaf85c428c4e15e7e09bce2511e953965"
+  },
+  {
+    "path": "chushen/v2/art.png",
+    "sha256": "ce845a9a2fdda0941aed8f4b5d424b1516d00f82d2ff51a9c20a4a3068aa38fa"
+  },
+  {
+    "path": "chushen/v3/art.png",
+    "sha256": "66badecacb2661056959c94ee855b8bb11dc33910f80856d683273102ffddd4b"
+  },
+  {
+    "path": "chushen/v4/presentation.json",
+    "sha256": "d7aca0c74fa3e43fcef89e0aa80bd45a8b332bae99ee7bed9c2a93b196bdfe22"
+  },
+  {
+    "path": "chushen/v5/presentation.json",
+    "sha256": "3932ce678ef4b7e1814a4e3f2fb3cb7a3c705bff48ae996e0e089d820e368cd8"
+  }
+]

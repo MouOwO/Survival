@@ -41,3 +41,18 @@ advance(.16)
 assert(#delivered>5 and #delivered<=11,"continuous updates are bounded without starvation")
 assert(delivered[#delivered].snapshot.armor==220,"last real update is retained")
 print("STAT_PUSH_PASS: burst100->1, latest value, unchanged skip, unselected skip, switch, two players, reset, sustained updates")
+
+queue.reset()
+local combat_sent=0
+local combat=factory.new({scheduler=scheduler,task_prefix="combat_ui_push_",interval=0.1,
+ is_selected=function(player,unit)return selected[player]==unit end,
+ merge=function(previous,latest)latest.armor_dirty=previous.armor_dirty or latest.armor_dirty end,
+ build=function(p)return {entindex=p.entindex,attack=p.attack,armor_dirty=p.armor_dirty}end,
+ send=function(_,value)combat_sent=combat_sent+1;assert(value.attack==500 and value.armor_dirty)end})
+queue.push({player_id=0,entindex=291,armor=250})
+combat.push({player_id=0,entindex=291,attack=1,armor_dirty=true})
+for i=2,500 do combat.push({player_id=0,entindex=291,attack=i}) end
+assert(scheduler.task_count()==2,"building and combat queues never replace each other's tasks")
+advance(.11);assert(combat_sent==1 and scheduler.task_count()==1)
+advance(.05);assert(scheduler.task_count()==0)
+print("COMBAT_PUSH_PASS: 500 changes -> 1 latest snapshot; 100ms; independent building queue; armor invalidation preserved")

@@ -6,7 +6,7 @@ local BASE_ARROW_TOWER_CANNOT_MISS =
     global_rules.number("base_arrow_tower_cannot_miss", 1) > 0
 
 function M.attack_range(technology_bonus)
-    return (tonumber(global_rules.tower_attack_range) or 1000)
+    return (tonumber(global_rules.tower_attack_range) or 800)
         + (tonumber(technology_bonus) or 0)
 end
 

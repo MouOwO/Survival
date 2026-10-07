@@ -109,6 +109,16 @@ local function weighted_draw(pool, count)
     return result
 end
 
+local function record_history(state, card, reward_type_id, grant_id, parent_card_id)
+    table.insert(state.history, 1, {
+        card_id = card.card_id, name = card.display_name,
+        description = card.description, icon_name = card.icon_name,
+        reward_type = reward_type_id, grant_id = grant_id,
+        parent_card_id = parent_card_id,
+    })
+    while #state.history > 20 do table.remove(state.history) end
+end
+
 local function grant_random_cards(payload)
     local player_id = tonumber(payload and payload.player_id)
     local state = player_id and state_for(player_id) or nil
@@ -140,6 +150,8 @@ local function grant_random_cards(payload)
                 player_id, card.card_id, child_grant_id, reward_type_id
             )
             if not result or not result.ok then
+                -- Earlier children remain applied and must stay visible while retrying.
+                publish(player_id, "random_grant_incomplete")
                 return {
                     ok = false,
                     error = result and result.error or "child_effect_failed",
@@ -149,8 +161,10 @@ local function grant_random_cards(payload)
             end
             transaction.completed[index] = true
             pool_state.claimed[card.card_id] = true
+            record_history(state, card, reward_type_id, child_grant_id, parent_card_id)
         end
     end
+    publish(player_id, "random_granted")
     return { ok = true, cards = transaction.cards }
 end
 
@@ -384,9 +398,7 @@ local function select_card(payload)
             description = selected.description, icon_name = "survival/native/talent_" .. card_id}
     end
     if selected then
-        table.insert(state.history, 1, {card_id=card_id, name=selected.display_name,
-            description=selected.description, icon_name=selected.icon_name, reward_type=offer.reward_type})
-        while #state.history > 20 do table.remove(state.history) end
+        record_history(state, selected, offer.reward_type, result.grant_id)
     end
     pool_state.offer = nil
     if state.visible_reward_type == offer.reward_type then

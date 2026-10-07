@@ -104,6 +104,18 @@ CustomNetTables.SetTableValue = publish
 modifier:OnIntervalThink()
 assert(writes == before + 1 and values.unit_43.health == 50)
 
+-- Classification may arrive after spawn without any health change.
+assert(values.unit_43.bar_width == 62)
+unit.survival_hero_id = "test_hero"
+modifier:OnIntervalThink()
+assert(values.unit_43.bar_width == 120)
+unit.survival_is_boss = true
+modifier:OnIntervalThink()
+assert(values.unit_43.bar_width == 156)
+unit.survival_is_boss, unit.survival_hero_id = nil, nil
+modifier:OnIntervalThink()
+assert(values.unit_43.bar_width == 62)
+
 local bars = {}
 before = writes
 local projection_before = projections

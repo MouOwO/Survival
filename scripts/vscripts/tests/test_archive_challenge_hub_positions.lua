@@ -5,6 +5,7 @@ local markers, wave_markers, created, scheduled, registered, lookups
 local wave_lookups, ground_calls, serial
 local function vector(x, y, z) return { x = x, y = y, z = z } end
 Vector = vector
+GameRules = {GetGameTime = function() return 0 end}
 DOTA_TEAM_GOODGUYS = 2
 local function marker(x, y, z)
     return { IsNull = function() return false end, GetAbsOrigin = function() return vector(x, y, z) end }
@@ -21,10 +22,10 @@ local function create_unit(name, position)
     function unit:FindAbilityByName(key) return self.abilities[key] end
     function unit:AddAbility(key) self.abilities[key] = ability(); return self.abilities[key] end
     function unit:SetControllableByPlayer(id) self.owner = id end
-    function unit:SetModel() end
-    function unit:SetOriginalModel() end
-    function unit:SetModelScale() end
-    function unit:AddNewModifier() end
+    function unit:SetModel(path) self.model = path end
+    function unit:SetOriginalModel(path) self.original_model = path end
+    function unit:SetModelScale(scale) self.scale = scale end
+    function unit:AddNewModifier(_, _, name) self[name] = true end
     created[#created + 1] = unit
     return unit
 end
@@ -35,6 +36,7 @@ package.loaded["config/generated/archive_challenge_stats"] = { by_id = {} }
 package.loaded["config/generated/archive_challenge_rules"] = { by_id = { default = {
     building_unlock_difficulty = 5, building_spacing = 240, building_offset_y = 360,
     building_model = "hub.vmdl", building_model_scale = 1,
+    building_model_1 = "hub1.vmdl", building_model_2 = "hub2.vmdl", building_model_3 = "hub3.vmdl",
 } } }
 package.loaded["systems/player_context_service"] = {
     register_unit = function(id, unit, role)
@@ -49,7 +51,9 @@ package.loaded["systems/wave_system"] = {
 }
 package.loaded["systems/archive_service"] = {}
 package.loaded["core/scheduler"] = {
-    every = function(_, callback, key) scheduled[#scheduled + 1] = { callback = callback, key = key } end,
+    after = function(_, callback, key) if key ~= "archive_challenge_phase_timer" then scheduled[#scheduled + 1] = {callback=callback,key=key} end end,
+    every = function(_, callback, key) if key ~= "archive_challenge_phase_timer" then scheduled[#scheduled + 1] = { callback = callback, key = key } end end,
+    cancel = function() end,
 }
 package.loaded["systems/archive_endless_service"] = { is_running = function() return false end }
 package.loaded["systems/archive_endless_config"] = { group = function() return {} end }
@@ -94,6 +98,9 @@ for player = 0, 3 do
         local unit = service._test.players()[player].hubs[index]
         same(unit.position, player * 1000, index * 100, 384)
         assert(unit.owner == player and unit.survival_archive_hub == index)
+        assert(unit.model == "hub" .. index .. ".vmdl" and unit.original_model == unit.model)
+        assert(unit.scale == 1 and unit.modifier_building_no_health_bar)
+        assert(unit.modifier_invulnerable)
         assert(registered[player * 3 + index].id == player)
         assert(registered[player * 3 + index].role == "archive_challenge")
     end

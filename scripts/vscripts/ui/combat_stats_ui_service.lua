@@ -7,6 +7,8 @@ local technology_stat_manager = require("systems/technology_stat_manager")
 local combat_stat_projection = require("ui/combat_stat_projection")
 local portrait_metadata = require("ui/portrait_metadata")
 
+local portrait_metadata = require("ui/portrait_metadata")
+
 local M = {}
 
 local debug_state = {}

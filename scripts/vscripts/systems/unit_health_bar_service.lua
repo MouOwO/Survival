@@ -2,6 +2,18 @@ local M = {}
 
 local initialized = false
 local TABLE = "survival_hero_health_bar"
+-- Hide the requested utility buildings, including population farms; combat
+-- units and walls keep their bars. Unit names remain stable across upgrades.
+local HIDDEN_BUILDING_NAMES = {
+    building_main_city = true,
+    building_gold_mine = true,
+    building_challenge = true,
+    building_research_lab = true,
+    building_advanced_research_lab = true,
+    building_hero_altar = true,
+    building_farm = true,
+}
+
 local EXCLUDED_UNIT_NAMES = {
     npc_survival_upgrade_material = true,
     npc_survival_grid_preview_proxy = true,
@@ -18,6 +30,7 @@ local function is_excluded(unit)
     local unit_name = unit and unit.GetUnitName and unit:GetUnitName() or nil
     return unit and (
         EXCLUDED_UNIT_NAMES[unit_name]
+        or HIDDEN_BUILDING_NAMES[unit_name]
         or unit.survival_wall_collision_barrier
         or unit.survival_hide_custom_health_bar
         or unit.survival_is_native_wearable_visual
@@ -60,6 +73,12 @@ function M.exclude(unit)
     if unit.HasModifier and unit:HasModifier("modifier_single_health_bar")
         and unit.RemoveModifierByName then
         unit:RemoveModifierByName("modifier_single_health_bar")
+    end
+    -- Removing the custom-bar modifier also removes its native-bar suppression.
+    -- Keep a dedicated suppression modifier on these buildings.
+    local name = unit.GetUnitName and unit:GetUnitName() or nil
+    if HIDDEN_BUILDING_NAMES[name] and unit.AddNewModifier then
+        require("core/modifier_registry").ensure(unit, "modifier_building_no_health_bar", {})
     end
     publish_removed(unit)
     return true

@@ -157,7 +157,8 @@ const source = fs.readFileSync(sourcePath, "utf8");
     assert.equal(h.rows("building")[0].children[1].text, "99", "initial opening renders the latest snapshot synchronously");
     assert.equal(h.rows("hero")[0].children[1].text, "120 / 300", "entity index zero is valid");
     for (let index = 0; index < 20; index++) h.api.Open();
-    assert.equal(h.requests.length, 1, "already-open calls do not request another server snapshot");
+    assert.equal(h.requests.filter(r => r.value.open === 1).length, 1, "already-open calls do not request another server snapshot");
+    assert.equal(h.requests[0].value.open, 0, "initialization clears any old server subscription");
     assert.equal(h.jobs.size, 1, "only the existing 0.25-second visible refresh is running");
     const originalRows = [...h.rows("building"), ...h.rows("hero")];
     const before = { ...h.stats };
@@ -178,6 +179,10 @@ const source = fs.readFileSync(sourcePath, "utf8");
     assert.equal(h.rows("hero")[0].children[1].text, "101 / 300", "visible health preserves the 0.25-second interval");
     h.publish(snapshot(500)); h.api.Close();
     assert.equal(h.jobs.size, 0, "closing cancels both a queued render and health refresh");
+    assert.equal(h.requests[h.requests.length - 1].value.open, 0, "closing unsubscribes the server");
+    const closedRequests = h.requests.length;
+    h.api.Refresh();
+    assert.equal(h.requests.length, closedRequests, "hidden refresh cannot resubscribe");
     const closedWrites = h.stats.textWrites;
     h.advance(60); h.publish(snapshot(700));
     assert.equal(h.stats.textWrites, closedWrites);
@@ -225,6 +230,7 @@ const source = fs.readFileSync(sourcePath, "utf8");
     assert(api.IsOpen(), "TAB still opens the current generation");
     h.root().valid = false; h.advance(0.25);
     assert.equal(h.jobs.size, 0); assert.equal(h.listeners.size, 0, "destroyed context disposes its listener");
+    assert.equal(h.requests[h.requests.length - 1].value.open, 0, "destroyed context also unsubscribes server");
 }
 {
     const h = fixture(source, { noUnsubscribe: true });

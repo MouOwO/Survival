@@ -1,3 +1,4 @@
+local ParticleManager = require("systems/combat_effect_visibility").manager()
 local catalog = require("config/asset_catalog")
 local preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
@@ -135,6 +136,12 @@ local function reset_main_animation(unit, asset)
     if asset and NATIVE_TOWER_MODELS[tostring(asset.primary_model or "")] then
         sequence = ""
     end
+    -- Hero bodies select their own ACT_DOTA_IDLE/attack/run sequences. Arcana
+    -- models use names such as wk_sk_idle and qop_arc_idle, not literal "idle".
+    local model = tostring(asset and asset.primary_model or "")
+    local hero_body = model:find("models/heroes/", 1, true) == 1
+        or tostring(asset and asset.portrait_unit_name or ""):find("npc_dota_hero_", 1, true) == 1
+    if sequence == "idle" and hero_body then sequence = "" end
     if sequence ~= "" then safe_call(unit, "ResetSequence", sequence) end
     safe_call(unit, "SetPlaybackRate", 1)
 end
@@ -159,6 +166,12 @@ local function configure_particle(particle, owner, descriptor)
     if descriptor.attachment_point ~= "" then
         ParticleManager:SetParticleControlEnt(particle, 0, owner,
             point_follow, descriptor.attachment_point, origin, true)
+    end
+    if descriptor.control_profile == "zeus_arcana_eyes" then
+        -- The arcana replaces Zeus's default eye system but inherits its
+        -- left/right eye bindings from Valve's attached_particles entry 568.
+        ParticleManager:SetParticleControlEnt(particle, 1, owner,
+            point_follow, "attach_eye_r", origin, true)
     end
     if descriptor.control_profile == "io_base_ambient" then
         -- Valve's default item 536 creates this body effect independently of
@@ -393,11 +406,13 @@ function M.apply(unit, data)
     unit.survival_pending_model_asset_id = nil
     unit.survival_pending_previous_model_asset_id = nil
 
+    require("systems/challenge_guardian_visual_service").apply(unit)
     return true, asset and asset.asset_id or "legacy_path"
 end
 
 function M.clear(unit)
     if not unit then return end
+    require("systems/challenge_guardian_visual_service").clear(unit)
     -- A clear requested by teardown supersedes the deferred corpse cleanup.
     -- Match the captured handle, since entindexes may be reused by new towers.
     for index, state in pairs(deaths_by_unit) do
@@ -431,6 +446,7 @@ function M.play_death(unit)
     if not valid_entity(unit) then return false, "invalid_entity" end
     local alive_ok, alive = safe_call(unit, "IsAlive")
     if not alive_ok or alive ~= false then return false, "unit_not_dead" end
+    require("systems/challenge_guardian_visual_service").clear(unit)
     local index_ok, index = safe_call(unit, "entindex")
     if not index_ok or not index then return false, "invalid_entindex" end
     local previous = deaths_by_unit[index]

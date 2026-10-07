@@ -96,3 +96,24 @@ assert(#sent == 0 and tasks.ui_snapshot_flush == fresh, "old-generation callback
 flush(4.25)
 assert(#sent == 3 and sent[1].snapshot.sequence == 1 and next(tasks) == nil)
 print("UI_SNAPSHOT_SCHEDULING_PASS: initial/owner-team/burst/fixed deadline/reentrant dirty/explicit resync/generation/no idle polling")
+
+-- Personal invalidations take precedence even when a team accompanies them.
+sent={};now=5
+local previous=builds
+for i=1,1000 do bus.emit(events.UI_DIRTY,{player_id=0,team=2}) end
+flush(5.25)
+assert(#sent==1 and sent[1].id==0 and builds==previous+1)
+assert(next(tasks)==nil)
+bus.emit(events.UI_DIRTY,{player_id=99,team=2})
+assert(next(tasks)==nil,"invalid personal recipient never broadcasts")
+sent={};now=6
+bus.emit(events.UI_DIRTY,{player_id=0,team=2})
+bus.emit(events.UI_DIRTY,{team=2})
+flush(6.25)
+assert(#sent==2,"overlapping personal/team invalidations do not duplicate recipients")
+sent={};now=7
+bus.emit(events.UI_DIRTY,{player_id=0})
+during_build=function()bus.emit(events.UI_DIRTY,{player_id=1})end
+flush(7.25);assert(#sent==1 and sent[1].id==0)
+flush(7.5);assert(#sent==2 and sent[2].id==1)
+print("PERSONAL_HUD_BATCH_PASS: 1000 changes => one owner build/send; invalid recipients, overlap and reentrant updates")

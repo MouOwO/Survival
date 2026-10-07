@@ -1,3 +1,4 @@
+local ParticleManager = require("systems/combat_effect_visibility").manager()
 LinkLuaModifier(
     "modifier_survival_hero_ball_lightning",
     "modifiers/modifier_survival_hero_ball_lightning",

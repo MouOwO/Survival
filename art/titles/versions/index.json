@@ -1,0 +1,12 @@
+{
+  "versions": [
+    {
+      "id": "peak_mountain_orbit_v4_20261004",
+      "display_name": "登峰造极·分段绕山 V4",
+      "recall_phrase": "恢复称号绕山 V4",
+      "directory": "peak_mountain_orbit_v4_20261004",
+      "zip": "peak_mountain_orbit_v4_20261004.zip",
+      "sha256": "18f690428dc20229a7fea07e7069575f76ec5463831be5fb26b9c9c3a701ae5f"
+    }
+  ]
+}

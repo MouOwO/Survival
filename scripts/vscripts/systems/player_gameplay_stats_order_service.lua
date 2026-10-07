@@ -57,7 +57,7 @@ local function valid_field_value(row, field_id, value)
     return value
 end
 
-local function build_packet(player_id, field_id, delta)
+local function build_packet(player_id, field_id, delta, refund)
     local profile = profile_service.get_profile(player_id)
     if not profile then return nil, "profile_not_loaded" end
     local row = gameplay_stats.by_id[field_id]
@@ -77,7 +77,9 @@ local function build_packet(player_id, field_id, delta)
     next_value = validated
 
     local next_stats = copy_table(stats)
-    next_stats[field_id] = next_value
+    if field_id == "starjoy_points" then
+        require("systems/archive_starjoy_rewards").change(next_stats, old_value, next_value, refund)
+    else next_stats[field_id] = next_value end
     local revision = tonumber(profile.revision) or 0
     return {
         schema_version = tonumber(profile.schema_version) or 1,
@@ -255,7 +257,7 @@ local function reset_applied_armor_reduction()
     end
 end
 
-function M.order(player_id, field_id, delta)
+function M.order(player_id, field_id, delta, refund)
     player_id = tonumber(player_id)
     field_id = tostring(field_id or "")
     delta = finite_number(delta)
@@ -267,7 +269,7 @@ function M.order(player_id, field_id, delta)
         return { ok = false, error = "delta_invalid" }
     end
     local packet, error_code, old_value, next_value = build_packet(
-        player_id, field_id, delta
+        player_id, field_id, delta, refund
     )
     if not packet then return { ok = false, error = error_code } end
     local result = M.apply_packet(packet)

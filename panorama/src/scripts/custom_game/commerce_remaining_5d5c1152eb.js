@@ -37,7 +37,10 @@
                 && rewards[0].id==="special_lottery_ticket" && Number(rewards[0].quantity)===1;
         })[0];
     }
-    function rewardText(item) { return rows(item.reward_lines).map(function(r){return r.label+" ×"+r.quantity;}).join("\n"); }
+    function isGoldenProduct(item){var r=rows(item.reward_lines);return item.product_type==="single"&&r.length===1&&r[0].id==="special_lottery_ticket";}
+    function rewardLabel(reward){return reward.id==="special_lottery_ticket"?"金色抽奖券":reward.label;}
+    function productIcon(item){return isGoldenProduct(item)?"custom_game/lottery_tickets_v2/gold_ticket.png":item.icon;}
+    function rewardText(item) { return rows(item.reward_lines).map(function(r){return rewardLabel(r)+" ×"+r.quantity;}).join("\n"); }
     function render() {
         if(disposed)return;
         tabs.RemoveAndDeleteChildren();grid.RemoveAndDeleteChildren();pager.RemoveAndDeleteChildren();
@@ -57,6 +60,19 @@
         if(totalPages>1){
             function turn(label,delta,enabled){var b=panel("Button",pager,"CJPageAction");text(b,label,"");b.enabled=enabled;b.SetPanelEvent("onactivate",function(){if(b.enabled){page+=delta;render();}});}
             turn("上一页",-1,page>0);text(pager,(page+1)+" / "+totalPages+" · "+items.length+"件","CJPageLabel");turn("下一页",1,page<totalPages-1);
+        }
+    }
+    function update(data) {
+        catalog=data||{products:[],categories:[]};
+        // Keep hovered cards stable when only numeric previews have changed.
+        var next=JSON.stringify({categories:catalog.categories,hash:catalog.catalog_hash,products:rows(catalog.products).map(function(p){return [p.sku,p.enabled,p.owned,p.amount_fen,p.price,p.currency,p.disabled_reason,p.title,p.description,p.category_id,p.product_type,p.icon,p.reward_lines];})});
+        if(next!==revision){revision=next;render();}
+        // Updating a connection notice must not destroy hovered cards or clear products.
+        notice.text=noticeText();
+        if(ticketRequest){
+            ticketRequest=false;
+            var item=singleTicket();
+            if(!item || !checkout(item))notice.text=catalog.error || "金色抽奖券暂未上架，请稍后重试。";
         }
     }
     function update(data) {
@@ -95,6 +111,53 @@
             // Show progress and continue to checkout when that catalog arrives.
             category="item";opened=true;render();store.shell.Open();ticketRequest=true;
             notice.text="正在加载特殊抽奖券商品…";payments.RefreshCatalog();return true;
+        },
+        Inspect:function(){var path=[],p=store.panel;while(p && p.IsValid() && path.length<10){path.push({id:p.id,classes:p.GetClasses?p.GetClasses():[],visible:p.visible,width:p.actuallayoutwidth,height:p.actuallayoutheight,visibility:p.style.visibility,opacity:p.style.opacity,z:p.style.zIndex,clip:p.style.clip});p=p.GetParent();}
+            return {category:category,page:page,opened:opened,valid:store.panel.IsValid(),visible:store.panel.visible,
+            width:store.panel.actuallayoutwidth,height:store.panel.actuallayoutheight,productCount:rows(catalog.products).length,path:path};},
+        Dispose:function(){if(disposed)return;disposed=true;store.shell.Dispose();[store.panel,store.scrim].forEach(function(p){if(p.IsValid())p.DeleteAsync(0);});}
+    };
+    if(cfg.SurvivalPayments && cfg.SurvivalPayments.GetCatalog)updatePaid(cfg.SurvivalPayments.GetCatalog());
+    if(cfg.SurvivalCommerceWallet){walletCatalog=cfg.SurvivalCommerceWallet.GetCatalog();mergeCatalogs();}
+    // Tools-only visual inspection uses the existing authenticated catalog and never checks out.
+    if(Game.IsInToolsMode && Game.IsInToolsMode() && Game.AddCommand){
+        function inspectVisual(){ $.Msg("[COMMERCE_JADE] "+JSON.stringify(cfg.SurvivalCommerceView.Inspect())); }
+        cfg.SurvivalCommerceVisual={Category:function(id){category=id;page=0;render();},Technology:function(){category="technology";page=0;render();},Hover:function(on){grid.Children().forEach(function(p,i){p.SetHasClass("CJVisualHover",on!==false && i===1);});},Geometry:function(){var p=store.panel;return {valid:p.IsValid(),window:p.GetPositionWithinWindow(),scale:root.actualuiscale_x,classes:p.BHasClass("UIClosed"),visible:p.visible,children:p.Children().map(function(c){return {type:c.paneltype,visible:c.visible,pos:c.GetPositionWithinWindow(),width:c.actuallayoutwidth,height:c.actuallayoutheight};})};}};
+        // Commands retain their creating JS context; use a generation suffix after hot reload.
+        var suffix=String(Date.now()),commands={open:"survival_commerce_open_"+suffix,close:"survival_commerce_close_"+suffix,technology:"survival_commerce_technology_"+suffix,hover:"survival_commerce_hover_"+suffix,inspect:"survival_commerce_inspect_"+suffix};
+        Game.AddCommand(commands.open,function(){cfg.SurvivalCommerceView.Open();inspectVisual();},"Open live mall; no checkout",0);
+        Game.AddCommand(commands.close,function(){cfg.SurvivalCommerceView.Close();},"Close visual mall",0);
+        Game.AddCommand(commands.technology,function(){cfg.SurvivalCommerceVisual.Technology();inspectVisual();},"Inspect technology category",0);
+        Game.AddCommand(commands.hover,function(){cfg.SurvivalCommerceVisual.Hover();inspectVisual();},"Show card hover for inspection",0);
+        commands.normal="survival_commerce_normal_"+suffix;
+        Game.AddCommand(commands.normal,function(){cfg.SurvivalCommerceVisual.Hover(false);},"Clear visual hover",0);
+        ["weapon","item","challenge","rebirth","bundles"].forEach(function(id){commands[id]="survival_commerce_"+id+"_"+suffix;Game.AddCommand(commands[id],function(){cfg.SurvivalCommerceVisual.Category(id);},"Inspect actual category; no checkout",0);});
+        Game.AddCommand(commands.inspect,function(){$.Msg("[COMMERCE_JADE_GEOMETRY] "+JSON.stringify(cfg.SurvivalCommerceVisual.Geometry()));},"Inspect current mall geometry",0);
+        $.Msg("[COMMERCE_JADE_COMMANDS] "+JSON.stringify(commands));
+    }
+    function mergeCatalogs(){
+        var categories=rows(paidCatalog.categories).slice();
+        rows(walletCatalog.categories).forEach(function(c){if(!categories.some(function(v){return v.id===c.id;}))categories.push(c);});
+        update({products:rows(walletCatalog.products).concat(rows(paidCatalog.products)),categories:categories,
+            catalog_hash:paidCatalog.catalog_hash,alipay:paidCatalog.alipay,error:paidCatalog.error});
+    }
+    function updatePaid(data){paidCatalog=data||{products:[],categories:[]};mergeCatalogs();}
+    cfg.SurvivalCommerceView={
+        Open:function(){if(disposed)return;opened=true;if(cfg.SurvivalPayments && cfg.SurvivalPayments.GetCatalog)updatePaid(cfg.SurvivalPayments.GetCatalog());store.shell.Open();if(cfg.SurvivalPayments && cfg.SurvivalPayments.RefreshCatalog)cfg.SurvivalPayments.RefreshCatalog();if(cfg.SurvivalCommerceWallet)cfg.SurvivalCommerceWallet.Refresh();},
+        Close:close,UpdateCatalog:updatePaid,UpdateWalletCatalog:function(data){walletCatalog=data;mergeCatalogs();},IsOpen:function(){return opened;},
+        SetNotice:function(message){if(!disposed)notice.text=message;},
+        OpenTicketPurchase:function(pool){
+            if(pool && typeof pool==="object"){if(pool.ticket_content_id&&pool.ticket_content_id!=="special_lottery_ticket")return false;pool=pool.id;}
+            var payments=cfg.SurvivalPayments;
+            if(disposed || !pool || pool==="map" || !payments || !payments.Checkout)return false;
+            if(payments.GetCatalog)updatePaid(payments.GetCatalog());
+            var item=singleTicket();
+            if(item)return checkout(item);
+            if(!payments.RefreshCatalog)return false;
+            // Opening directly from lottery can precede the first shop snapshot.
+            // Show progress and continue to checkout when that catalog arrives.
+            category="item";opened=true;render();store.shell.Open();ticketRequest=true;
+            notice.text="正在加载金色抽奖券商品…";payments.RefreshCatalog();return true;
         },
         Inspect:function(){var path=[],p=store.panel;while(p && p.IsValid() && path.length<10){path.push({id:p.id,classes:p.GetClasses?p.GetClasses():[],visible:p.visible,width:p.actuallayoutwidth,height:p.actuallayoutheight,visibility:p.style.visibility,opacity:p.style.opacity,z:p.style.zIndex,clip:p.style.clip});p=p.GetParent();}
             return {category:category,page:page,opened:opened,valid:store.panel.IsValid(),visible:store.panel.visible,

@@ -4,6 +4,7 @@ local M = class({})
 
 function M:GetBehavior() return DOTA_ABILITY_BEHAVIOR_NO_TARGET end
 function M:GetManaCost() return 0 end
+function M:GetCooldown() return 0 end
 function M:OnSpellStart()
     local result = event_bus.request(events.WORKER_TRAIN_REQUEST, {
         city = self:GetCaster(),

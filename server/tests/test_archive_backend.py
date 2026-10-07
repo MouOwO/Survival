@@ -1,4 +1,5 @@
 import copy
+import subprocess
 import hashlib
 import json
 import os
@@ -104,6 +105,37 @@ class ArchiveTests(unittest.TestCase):
         self.assertTrue((self.bundle.directory/'config/content_id_aliases.lua').is_file())
         self.assertEqual((ROOT/'scripts/vscripts/config/generated/archive_http_bundle.lua').read_bytes(),self.game_bundle_before)
         self.assertEqual((ROOT/'server/bundles/current.json').read_bytes(),self.current_before)
+    def test_endless_floor_backfill_is_atomic_and_idempotent(self):
+        self.profile['save']['archive']['endless_best_wave']=461
+        before=copy.deepcopy(self.profile['save']['gameplay_stats'])
+        command=self.command('endless_reconcile')
+        self.db.lose_reply=True
+        # A transport failure after commit must never double-apply rewards.
+        try: self.service.command(command)
+        except TimeoutError: pass
+        self.db.lose_reply=False
+        self.assertTrue(self.service.command(command)['ok'])
+        current=self.profile['save']
+        self.assertEqual(sum(bool(current['archive']['completed'].get('endless_'+str(i))) for i in range(51,83)),32)
+        self.assertFalse(current['archive']['completed'].get('endless_1'))
+        self.assertEqual(current['gameplay_stats']['hero_attribute_bonus_pct']-before['hero_attribute_bonus_pct'],52)
+        self.assertEqual(current['gameplay_stats']['hero_damage_wood_flat']-before['hero_damage_wood_flat'],2)
+        self.assertEqual(current['gameplay_stats']['hero_attributes_per_damage']-before['hero_attributes_per_damage'],13)
+        settled=copy.deepcopy(current['gameplay_stats'])
+        self.assertTrue(self.send('endless_reconcile')['ok'])
+        self.assertEqual(current['gameplay_stats'],settled)
+
+    def test_endless_reconcile_rejects_client_progress(self):
+        with self.assertRaises(ArchiveError):
+            self.service.command(self.command('endless_reconcile',wave=461))
+        self.assertFalse(self.profile['save']['archive'].get('completed'))
+
+    def test_endless_floor_strict_boundary(self):
+        self.assertTrue(self.send('endless',wave=10,difficulty=10)['ok'])
+        self.assertFalse(self.profile['save']['archive']['completed'].get('endless_51'))
+        self.assertTrue(self.send('endless',wave=11,difficulty=10)['ok'])
+        self.assertTrue(self.profile['save']['archive']['completed']['endless_51'])
+
     def test_clear_and_lost_response(self):
         payload=self.command('clear',difficulty_id='n1',count=1)
         self.db.lose_reply=True
@@ -278,5 +310,75 @@ class ArchiveTests(unittest.TestCase):
         self.service.finish_prepared=lambda *args:{'ok':False,'error':'archive_busy_retry'}
         with self.assertRaisesRegex(TimeoutError,'archive_pending_retry'):
             self.service.profile({'account_id':'100'})
+
+    def test_lottery_cultivation_locked_at_99_without_any_debit(self):
+        self.profile['save']['content_inventory']={'lottery_ticket':50,'special_lottery_ticket':80}
+        self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':99}}}}
+        before=copy.deepcopy(self.profile)
+        for count in (1,10):
+            result=self.send('lottery_draw',pool_id='cultivation',count=count,request_id='locked_'+str(count))
+            self.assertFalse(result['ok']);self.assertEqual(result['error'],'lottery_pool_locked')
+            self.assertEqual(self.profile,before)
+        projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
+        selected=next(s for s in projection['snapshots'] if s['selected_pool_id']=='cultivation')['selected_pool']
+        self.assertFalse(selected['unlocked']);self.assertEqual(selected['unlock_progress'],99)
+        self.assertEqual(selected['unlock_required'],100);self.assertEqual(selected['ticket_content_id'],'lottery_ticket')
+
+    def test_lottery_map_ten_unlocks_at_100_and_cultivation_spends_normal(self):
+        self.profile['save']['content_inventory']={'lottery_ticket':100,'special_lottery_ticket':17}
+        self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':90}}}}
+        payload=self.command('lottery_draw',pool_id='map',count=10,request_id='unlock_ten')
+        self.assertTrue(self.service.command(payload)['ok']);self.assertTrue(self.service.command(payload)['ok'])
+        self.assertEqual(self.profile['save']['archive']['lottery_state']['pools']['map']['draws'],100)
+        projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
+        selected=next(s for s in projection['snapshots'] if s['selected_pool_id']=='cultivation')['selected_pool']
+        self.assertTrue(selected['unlocked'])
+        self.assertTrue(self.send('lottery_draw',pool_id='cultivation',count=1,request_id='normal_one')['ok'])
+        self.assertTrue(self.send('lottery_draw',pool_id='cultivation',count=10,request_id='normal_ten')['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ticket'],79)
+        self.assertEqual(self.profile['save']['content_inventory']['special_lottery_ticket'],17)
+
+    def test_lottery_gold_pools_have_no_progress_gate(self):
+        self.profile['save']['content_inventory']={'lottery_ticket':17,'special_lottery_ticket':22}
+        for pool in ('dragon_knight','summer'):
+            self.assertTrue(self.send('lottery_draw',pool_id=pool,count=1,request_id=pool+'_one')['ok'])
+            self.assertTrue(self.send('lottery_draw',pool_id=pool,count=10,request_id=pool+'_ten')['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ticket'],17)
+        self.assertEqual(self.profile['save']['content_inventory']['special_lottery_ticket'],0)
+        self.assertNotIn('map',self.profile['save']['archive']['lottery_state']['pools'])
+
+    def test_lottery_ticket_types_cannot_substitute_each_other(self):
+        for pool in ('map','cultivation','dragon_knight','summer'):
+            normal=pool in ('map','cultivation')
+            self.profile['save']['content_inventory']={'lottery_ticket':0 if normal else 99,'special_lottery_ticket':99 if normal else 0}
+            self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':100}}}}
+            before=copy.deepcopy(self.profile)
+            result=self.send('lottery_draw',pool_id=pool,count=1,request_id='wrong_'+pool)
+            self.assertFalse(result['ok']);self.assertEqual(result['error'],'lottery_ticket_insufficient')
+            self.assertEqual(self.profile,before)
+
+    def test_lottery_pity_tiers_and_forced_ssr_fallback(self):
+        # Seed zero selects the lowest available tier; cultivation and dragon_knight have no N in their screenshot pools.
+        for pool,expected in [('map','ssr'),('cultivation','ssr'),('dragon_knight','ur'),('summer','ur')]:
+            profile=copy.deepcopy(self.profile)
+            profile['save']['content_inventory']={'lottery_ticket':100,'special_lottery_ticket':100}
+            profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':100}}}}
+            payload={'profile':profile,'configs':self.bundle.configs,'seed':0,'has_pass':False,
+                'command':{'kind':'lottery_draw','pool_id':pool,'count':10,'id':'guarantee_test','request_id':'guarantee_test'}}
+            completed=subprocess.run([self.lua,'worker.lua'],cwd=self.bundle.directory,input=json.dumps(payload),capture_output=True,text=True,check=True)
+            result=json.loads(completed.stdout);self.assertTrue(result['ok'],result)
+            response=result['response'];self.assertEqual(response['guarantee_quality'],expected)
+            self.assertTrue(response['guarantee_satisfied'])
+            natural='r' if pool in ('cultivation','dragon_knight') else 'n'
+            self.assertEqual([x['quality'] for x in response['results']],[natural]*9+[expected])
+            # A single draw at an existing 100-draw history still has no batch guarantee.
+            payload['command']['count']=1
+            completed=subprocess.run([self.lua,'worker.lua'],cwd=self.bundle.directory,input=json.dumps(payload),capture_output=True,text=True,check=True)
+            single=json.loads(completed.stdout)['response']
+            self.assertEqual(single['guarantee_quality'],'');self.assertEqual(single['results'][0]['quality'],natural)
+        projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
+        for snapshot in projection['snapshots']:
+            wanted='ssr' if snapshot['selected_pool_id'] in ('map','cultivation') else 'ur'
+            self.assertEqual(snapshot['selected_pool']['pity'][0]['quality'],wanted)
 
 if __name__=='__main__':unittest.main()

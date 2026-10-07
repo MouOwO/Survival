@@ -17,9 +17,11 @@ local challenge_rewards = require("systems/archive_challenge_rewards")
 local challenge_rules = require("config/generated/archive_challenge_rules").by_id.default
 local M = {}
 local pending, busy, selected, throttles = {}, {}, {}, {}
+local finalizing = false
 local session_id, serial, remote_provider
 local server_clock
 local daily_viewers, purchase_provider = {}, nil
+local vip_viewers = {}
 local archive_players = {}
 local sent_pages = {}
 
@@ -90,6 +92,9 @@ local function enabled_categories()
 end
 
 local renderers = {}
+renderers.titles = function(_, archive) return require("systems/archive_titles").rows(archive) end
+renderers.gift = function(_, archive) return require("systems/archive_welfare_rewards").rows(archive) end
+renderers.starjoy_points = function(profile) return require("systems/archive_starjoy_rewards").project(profile) end
 renderers.fishing = function(profile) return (require("systems/archive_fishing_view").project(profile)) end
 renderers.map_level = function(_, archive) return require("systems/archive_online_rewards").rows(archive, "map_level") end
 renderers.building = function(_, archive) return require("systems/archive_building_rewards").rows(archive) end
@@ -98,17 +103,8 @@ renderers.friend = function(_, archive) return require("systems/archive_social_r
 renderers.ex = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "ex") end
 renderers.beast = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "beast") end
 renderers.boss = function(profile) return (require("systems/archive_boss_rewards").project(profile)) end
-renderers.endless = function(profile, archive)
-    local rows = {}
-    for _, item in ipairs(require("config/generated/archive_endless_achievements").rows) do
-        if item.enabled then
-            rows[#rows + 1] = { id = item.achievement_id, name = item.display_name .. "（" .. item.required_score .. "分）",
-                description = item.description, icon_style = "seal", quality = "gold", rune = "∞",
-                count = archive.endless_score or 0, target = item.required_score,
-                completed = archive.completed[item.achievement_id] and 1 or 0 }
-        end
-    end
-    return rows
+renderers.endless = function(_, archive)
+    return require("systems/archive_endless_rewards").rows(archive)
 end
 renderers.fragment = challenge_rewards.fragment_rows
 renderers.pet = challenge_rewards.cage_rows
@@ -156,6 +152,15 @@ function M.register_category(category_id, projector)
     renderers[category_id] = projector
 end
 
+local function upgrade_pending(player_id, category_id)
+    local kind = category_id == "work" and "work_upgrade" or category_id == "building" and "building_upgrade"
+    if not kind then return 0 end
+    for _, command in pairs(pending[player_id] or {}) do
+        if command.kind == kind then return 1 end
+    end
+    return 0
+end
+
 function M.snapshot(player_id, category_id)
     local profile = account_profile(player_id)
     if not profile then return { ok = false, error = "profile_not_loaded" } end
@@ -169,9 +174,13 @@ function M.snapshot(player_id, category_id)
     end
     return { ok = true, category_id = category_id, revision = profile.revision,
         fishing = fishing,
+        starjoy = category_id == "starjoy_points" and require("systems/archive_starjoy_rewards").info(profile) or nil,
+        upgrade_pending = upgrade_pending(player_id, category_id),
         buildings = category_id == "building" and require("systems/archive_building_rewards").info(saved(profile), require("systems/archive_calendar").day()) or nil,
         categories = enabled_categories(), has_pass = has_pass(profile) and 1 or 0,
-        rows = projector and projector(profile, saved(profile)) or {},
+        rows = category_id == "titles" and require("systems/title_presentation_service").rows(player_id,saved(profile))
+            or projector and projector(profile, saved(profile)) or {},
+        title_preview = category_id == "titles" and require("systems/title_presentation_service").preview_mode() and 1 or 0,
         online = (category_id == "map_level" or category_id == "work")
             and require("systems/archive_online_rewards").info(saved(profile)) or nil,
         social = require("systems/archive_social_rewards").info(saved(profile), category_id),
@@ -233,7 +242,18 @@ local function flush(player_id)
     if busy[player_id] then return end
     local queue = pending[player_id]
     if not queue then return end
-    for id, command in pairs(queue) do
+    -- A retrying background reward must not starve an explicit purchase.
+    -- Keep every queued command; serialize purchases through the same provider.
+    local ordered = {}
+    for id, command in pairs(queue) do ordered[#ordered + 1] = { id = id, command = command } end
+    table.sort(ordered, function(a, b)
+        local ap = a.command.kind == "work_upgrade" or a.command.kind == "building_upgrade"
+        local bp = b.command.kind == "work_upgrade" or b.command.kind == "building_upgrade"
+        if ap ~= bp then return ap end
+        return a.id < b.id
+    end)
+    for _, entry in ipairs(ordered) do
+        local id, command = entry.id, entry.command
         local attempt = {}
         busy[player_id] = attempt
         local function complete(result)
@@ -245,6 +265,7 @@ local function flush(player_id)
                 bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=result.error or "存档请求被拒绝"})
             end
             send(player_id)
+            if vip_viewers[player_id] then M.send_vip(player_id,result) end
             if M.send_daily and daily_viewers[player_id] then
                 M.send_daily(player_id, command.kind=="daily_claim" and {
                     target_day=command.target_day,ok=result and result.ok==true,
@@ -274,6 +295,7 @@ local function flush(player_id)
 end
 
 local function enqueue(player_id, command)
+    if finalizing then return {ok=false,error="正在保存本局奖励，请等待结算"} end
     local adapter = require("systems/archive_http_adapter")
     if adapter.enabled() then remote_provider = adapter end
     player_id = tonumber(player_id)
@@ -281,6 +303,39 @@ local function enqueue(player_id, command)
     pending[player_id] = pending[player_id] or {}
     pending[player_id][command.id] = pending[player_id][command.id] or command
     return flush(player_id) or { ok = true, pending = true }
+end
+
+function M.equip_title(player_id, title_id)
+    local profile = account_profile(player_id)
+    if not profile then return {ok=false,error="玩家档案尚未加载"} end
+    local presentation = require("systems/title_presentation_service")
+    if presentation.preview_mode() then return presentation.preview(player_id,title_id) end
+    if type(title_id)~="string" or title_id~="" and not require("systems/archive_titles").unlocked(saved(profile),title_id) then
+        return {ok=false,error="称号未解锁或不存在"}
+    end
+    if M.has_pending(player_id) then return {ok=false,error="正在保存进度，请稍候再试"} end
+    serial=(serial or 0)+1
+    return enqueue(player_id,{id=session_id..":title:"..serial,kind="title_equip",title_id=title_id})
+end
+
+function M.send_vip(player_id,result)
+    if not PlayerResource or not CustomGameEventManager then return end
+    local player=PlayerResource:GetPlayer(player_id)
+    if player then
+        local snapshot=require("systems/archive_vip_rewards").snapshot(account_profile(player_id))
+        snapshot.pending=M.has_pending(player_id) and 1 or 0
+        if result then snapshot.action_result={ok=result.ok==true,error=result.error,terminal=result.terminal==true} end
+        CustomGameEventManager:Send_ServerToPlayer(player,"survival_vip_snapshot",snapshot)
+    end
+end
+function M.vip_action(player_id,kind,reward_id)
+    local row=require("config/generated/archive_vip_rewards").by_id[tostring(reward_id or "")]
+    if not row or not row.enabled then return {ok=false,error="VIP奖励不存在"} end
+    if (kind~="vip_claim" or row.group_id~="privileges") and (kind~="vip_purchase" or row.group_id~="packages") then
+        return {ok=false,error="VIP领取方式无效"}
+    end
+    serial=(serial or 0)+1
+    return enqueue(player_id,{id=session_id..":"..kind..":"..row.reward_id..":"..serial,kind=kind,reward_id=row.reward_id})
 end
 
 function M.set_provider(provider)
@@ -332,10 +387,11 @@ function M.set_purchase_provider(provider)
     purchase_provider=provider
 end
 
-function M.record_clear(player_id, difficulty_id)
+function M.record_clear(player_id, difficulty_id, cooperative_win)
     local difficulty = string.lower(tostring(difficulty_id or ""))
     return enqueue(player_id, { id = session_id .. ":clear", kind = "clear",
-        difficulty_id = difficulty, count = 1, day_key = tostring(require("systems/archive_calendar").day()) })
+        difficulty_id = difficulty, count = 1, cooperative_win = cooperative_win == 1 and 1 or 0,
+        day_key = tostring(require("systems/archive_calendar").day()) })
 end
 
 function M.record_endless_wave(player_id, wave_number, difficulty)
@@ -483,10 +539,21 @@ function M.cheat(context)
     return result.ok, result.error
 end
 
+function M.begin_finalization()
+    if finalizing then return end
+    local clock = require("systems/archive_online_clock")
+    for id in pairs(archive_players) do clock.flush(id) end
+    finalizing = true
+    for id in pairs(pending) do flush(id) end
+end
+
 function M.init()
+    require("systems/title_presentation_service").init()
+    finalizing = false
     sent_pages = {}
     pending, busy, selected, throttles = {}, {}, {}, {}
     daily_viewers = {}
+    vip_viewers = {}
     archive_players = {}
     serial = 0
     session_id = runtime_id()
@@ -499,8 +566,21 @@ function M.init()
         if id then
             archive_players[id]=true
             online_clock.observe(id, account_profile(id))
+            -- The server's saved best floor can unlock newly added milestones.
+            -- Never trust a floor/count supplied by the UI or award it on reads.
+            local profile = account_profile(id)
+            if profile and require("systems/archive_starjoy_rewards").needs_reconcile(profile.save.gameplay_stats) then
+                enqueue(id, {id=session_id..":starjoy_reconcile", kind="starjoy_reconcile"})
+            end
+            if profile and require("systems/archive_welfare_rewards").needs_reconcile(profile.save.archive) then
+                enqueue(id, {id=session_id..":welfare_reconcile", kind="welfare_reconcile"})
+            end
+            if profile and require("systems/archive_endless_rewards").needs_reconcile(profile.save.archive) then
+                enqueue(id, {id=session_id..":endless_reconcile", kind="endless_reconcile"})
+            end
             send(id)
             if daily_viewers[id] then M.send_daily(id) end
+            if vip_viewers[id] then M.send_vip(id) end
             if not busy[id] then flush(id) end
         end
     end)
@@ -509,7 +589,7 @@ function M.init()
         if id then online_clock.disconnect(id) end
     end)
     scheduler.every(1, function()
-        if http_adapter.enabled() then return end -- Remote online credit consumes the existing DB checkpoint only.
+        if finalizing or http_adapter.enabled() then return end -- Remote online credit consumes the existing DB checkpoint only.
         -- Iterate valid slots as well as profile events, so reopening the archive is never needed to earn time.
         for id = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
             if PlayerResource and PlayerResource:IsValidPlayerID(id) then
@@ -522,6 +602,18 @@ function M.init()
         end
     end, "archive_online_clock")
     bus.subscribe("archive.wave_boss_killed",function(payload) M.record_boss(payload.player_id,payload.kill_id) end)
+    local vip_times={}
+    CustomGameEventManager:RegisterListener("survival_vip_request",function(_,payload)
+        local id=tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local now=GameRules:GetGameTime()
+        if vip_times[id] and now-vip_times[id]<0.3 then return end
+        vip_times[id]=now;vip_viewers[id]=true
+        if payload.action=="claim" or payload.action=="purchase" then
+            local result=M.vip_action(id,payload.action=="claim" and "vip_claim" or "vip_purchase",payload.reward_id)
+            M.send_vip(id,result)
+        else M.send_vip(id) end
+    end)
     local daily_times, pass_states = {}, {}
     CustomGameEventManager:RegisterListener("survival_daily_request",function(_,payload)
         local id=tonumber(payload.PlayerID)
@@ -579,7 +671,7 @@ function M.init()
         end
     end,"archive_daily_clock")
     bus.subscribe("archive.final_wave_cleared", function(payload)
-        M.record_clear(payload.player_id, payload.difficulty_id)
+        M.record_clear(payload.player_id, payload.difficulty_id, payload.cooperative_win)
     end)
     scheduler.every(2, function()
         for id in pairs(pending) do flush(id) end
@@ -596,6 +688,22 @@ function M.init()
         if not category or not category.enabled then return end
         selected[id] = category.category_id
         send(id)
+    end)
+    local title_times = {}
+    CustomGameEventManager:RegisterListener("survival_archive_title_equip",function(_,payload)
+        local id=tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local now=GameRules:GetGameTime()
+        if title_times[id] and now-title_times[id]<0.3 then return end
+        title_times[id]=now
+        local result=M.equip_title(id,payload.title_id)
+        if not result.ok then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
+        -- Always acknowledge, even when an unchanged snapshot would be suppressed.
+        local player=PlayerResource:GetPlayer(id)
+        if player then CustomGameEventManager:Send_ServerToPlayer(player,"survival_archive_title_result",
+            {ok=result.ok,error=result.error,preview=result.preview and 1 or 0}) end
+        sent_pages[id]=nil
+        send_page(id,"titles")
     end)
     local promotion_times = {}
     local draw_times = {}

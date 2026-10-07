@@ -245,48 +245,100 @@ for _,state in ipairs(own) do
     state.unit.SetAcquisitionRange=function() range_writes=range_writes+1 end
     state.unit.FindModifierByName=function() modifier_lookups=modifier_lookups+1 end
 end
+local foreign_before=foreign.unit.survival_attack_min
+local other_before=own[2].unit.survival_attack_min
+local reward_growth,reward_speed,reward_interval=0,0,0
+bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,function()
+    return {totals={lumberjack_attack_growth=reward_growth,lumberjack_attack_speed_bonus_pct=reward_speed,lumberjack_attack_interval_reduction=reward_interval}}
+end)
+assert(require("config/generated/player_gameplay_stats").by_id.lumberjack_attack_growth.default_value==0)
+for _,state in ipairs(own) do assert(state.base_attack_speed==2/3 and state.unit.survival_attack_interval==1.5,"default interval 1.5 seconds / speed 100%") end
+reward_speed=60
+bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
+assert(math.abs(own[1].unit.survival_attack_speed-(2/3*1.6))<0.00001,"60% speed bonus multiplies the base rate by 1.6")
+reward_speed=0;reward_interval=0.2
+bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
+assert(math.abs(own[1].unit.survival_attack_interval-1.3)<0.00001)
+reward_interval=0
+bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
+assert(own[1].unit.survival_attack_interval==1.5,"removing bonuses restores true base speed")
+stat_events,range_writes,attack_writes,modifier_lookups=0,0,0,0
+
+for i=1,10 do bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[1].unit}) end
+assert(attack_writes==0 and stat_events==0,"no automatic baseline growth")
+reward_growth=0.25
+for i=1,200 do
+    bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[1].unit})
+    assert(real_manager.get(0).final.lumberjack.attack_flat==0,"hits never write shared attack")
+    assert(own[1].unit.base_min==own[1].base_damage_min+i*0.25,"growth applies to the attacker immediately")
+    assert(own[2].unit.survival_attack_min==other_before,"idle coworker cannot inherit growth")
+end
+assert(attack_writes==200 and stat_events==200)
+assert(range_writes==0 and modifier_lookups==0,"growth must not reset attack timers/ranges or all modifiers")
+assert(foreign.unit.survival_attack_min==foreign_before,"growth stays unit-private")
+local previous_writes=attack_writes
+bus.emit(events.TREE_HIT,{player_id=1,source="lumberjack",attacker=own[1].unit})
+bus.emit(events.TREE_HIT,{player_id=0,source="hero",attacker=own[1].unit})
+bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack"})
+assert(attack_writes==previous_writes,"reject incorrect source/owner or missing attacker")
+-- A super worker's growth rate still uses its configured fusion multiplier,
+-- and its personality growth combines once with the same private attack pool.
 own[2].technology_multiplier=3
 own[2].personality_attack_growth=7
 own[2].personality_attack_pct=25
-own[1].personality_attack_growth_per_hit=0.5
-local foreign_before=foreign.unit.survival_attack_min
-bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,function()
-    return {totals={lumberjack_attack_growth=0.25}}
-end)
-for i=1,200 do
-    bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[1].unit})
-    assert(real_manager.get(0).final.lumberjack.attack_flat==i*0.25)
-    assert(own[1].personality_attack_growth==i*0.5,"individual growth is immediate too")
-    for _,state in ipairs(own) do
-        assert(state.unit.base_min==(state.base_damage_min+i*0.25*(state.technology_multiplier or 1)+(state.personality_attack_growth or 0))
-            *(1+(state.personality_attack_pct or 0)/100),"each hit applies attack immediately")
-    end
-end
-assert(attack_writes==600 and stat_events==0,
-    "all damage writes are immediate; UI notifications wait for one bounded batch")
-tick(2.1)
-assert(stat_events==2,"200 hits publish the latest stats once per worker")
-assert(range_writes==0 and modifier_lookups==0,"growth must not reset attack timers/ranges or all modifiers")
-assert(foreign.unit.survival_attack_min==foreign_before,"growth stays player-private")
+own[2].personality_attack_growth_per_hit=2
+local first_before=own[1].unit.survival_attack_min
+bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[2].unit})
+assert(own[2].attack_growth==0.75 and own[2].personality_attack_growth==9)
+assert(own[2].unit.base_min==(own[2].base_damage_min+0.75+9)*1.25)
+assert(own[1].unit.survival_attack_min==first_before)
 -- Unscoped research still changes speed/range/modifiers.
 bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
 assert(range_writes>0 and modifier_lookups>0)
+assert(own[1].unit.survival_attack_min==first_before,"technology refresh retains private growth")
+assert(own[2].unit.base_min==(own[2].base_damage_min+0.75+9)*1.25)
+assert(train(0,3).ok);tick(3)
+local recruited
+for _,state in ipairs(bus.request(events.WORKER_LIST_REQUEST,{player_id=0})) do
+    if state.training_id=="train_lumberjack_03" then recruited=state end
+end
+assert(recruited and (recruited.attack_growth or 0)==0 and recruited.unit.survival_attack_min==recruited.base_damage_min,
+    "new recruits cannot inherit another worker's earned attack")
 bus.emit(events.TREE_CHANGED,{player_id=0,entindex=900,lumber_efficiency_buff=99})
 modifier_lookups=0
 for i=1,200 do bus.emit(events.TREE_CHANGED,{player_id=0,entindex=900,lumber_efficiency_buff=99,reason="tree_max_level_reset"}) end
 assert(modifier_lookups==0,"same capped tree must not walk all worker modifiers again")
 bus.emit(events.TREE_CHANGED,{player_id=0,entindex=901,lumber_efficiency_buff=99})
 assert(modifier_lookups>0,"replacement tree still updates targets")
--- A pending display must not follow a dismissed/replaced worker or a
--- disconnected player. Real stats above remain settled before cleanup.
-stat_events=0
-bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[1].unit})
-bus.emit(events.ENGINE_ENTITY_KILLED,{victim=own[2].unit,victim_entindex=own[2].unit:entindex()})
-tick(2.2)
-assert(stat_events==1,"removed worker does not receive a late growth UI event")
-bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=own[1].unit})
-bus.emit(events.PLAYER_DISCONNECTED,{player_id=0})
-tick(2.3)
-assert(stat_events==1,"disconnect cancels queued UI notifications")
+-- Real fused-worker registration inherits the materials' earned attack once.
+local inherited_attack=own[1].unit.survival_attack_min+own[2].unit.survival_attack_min
+local fused=CreateUnitByName("npc_test_super_lumberjack",Vector(0,0,0))
+assert(workers.register_fused_lumberjack(fused,{player_id=0,team=2,level=1,
+    fusion_count=2,base_attack=inherited_attack,attack_speed=0.5}).ok)
+assert(fused.survival_attack_min==inherited_attack,"fusion retains earned personal attack")
+bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
+assert(fused.survival_attack_min==inherited_attack,"fusion inheritance is not applied twice")
+local coworker_before=own[1].unit.survival_attack_min
+bus.emit(events.TREE_HIT,{player_id=0,source="lumberjack",attacker=fused})
+assert(fused.survival_attack_min==inherited_attack+0.5,"fused attacks grow only their own attack")
+assert(own[1].unit.survival_attack_min==coworker_before and real_manager.get(0).final.lumberjack.attack_flat==0)
 assert(#errors==0,table.concat(errors,"\n")); print=prior_print
-print("LUMBERJACK_GROWTH_FAST_PATH_PASS: 200 immediate shared/personality growth hits; 600 attack writes; 2 UI events; zero range/timer/modifier resets; player isolation; capped-tree skip")
+print("LUMBERJACK_PERSONAL_GROWTH_PASS: no default growth; 200 hits update only attacker; no shared pool; owner/source validation; fused rate/personality; refresh persistence; new recruits; capped-tree skip")
+
+local attack_before,range_before=attack_writes,range_writes
+for i=1,200 do
+ bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=0,changed_section="tower",changed_field="attack",tower_attack_flat=i,reason="gameplay_stats_tower_attack_growth"})
+ bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=0,changed_section="hero",reason="gameplay_stats_hero_damage_growth"})
+end
+assert(attack_writes==attack_before and range_writes==range_before,"unrelated growth never recalculates workers")
+local normal=CreateUnitByName("npc_test_normal",Vector(0,0,0))
+assert(workers.register_fused_lumberjack(normal,{player_id=0,team=2,level=1,base_attack=10,attack_speed=2/3,fusion_interval_reduction=0.5}).ok)
+assert(math.abs(normal.survival_attack_interval-1)<1e-9 and math.abs(normal.survival_attack_speed-1)<1e-9,"fusion alone changes 1.5s to 1s, not 1.6 attacks/s")
+print("WORKER_CADENCE_AND_ISOLATION_PASS: normal 1.5s, fusion 1s, no unrelated growth refresh")
+
+reward_speed=60
+bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="cadence_order_test"})
+assert(math.abs(normal.survival_attack_interval-0.625)<1e-9,"(1.5 - 0.5) / 1.6, not 1.5/1.6 - 0.5")
+local d=require("combat/attack_cadence").project(normal.survival_attack_cadence,normal.survival_attack_speed)
+assert(math.abs(d.percentage-160)<1e-9 and d.base_interval==1.5 and d.attack_interval==0.625)
+print("FUSION_SPEED_ORDER_PASS: interval reductions before percentage; display 160%, hover 0.625 seconds")

@@ -18,12 +18,14 @@ local function pool_public(pool,counts,state)
     local s=state.pools[pool.id] or {}
     local pity={}
     for _,rule in ipairs(pool.pity_rules) do pity[#pity+1]={quality=rule.target_quality,trigger_mode=rule.trigger_mode,batch_size=rule.threshold,label=tostring(rule.threshold)..'连保底 '..string.upper(rule.target_quality)} end
-    return {id=pool.id,revision=pool.revision,update_notice=pool.update_notice,
+    local result={id=pool.id,revision=pool.revision,update_notice=pool.update_notice,
         updated_at=tonumber(pool.update_notice.updated_at) or 0,
         update_unread=s.details_revision~=pool.revision,notice_unread=s.notice_revision~=pool.revision,
         display_name=pool.display_name,description=pool.description,pool_group=pool.pool_group,
         ticket_content_id=pool.ticket_content_id,ticket_name=config.currencies[pool.ticket_content_id].display_name,
         tickets=tonumber(counts[pool.ticket_content_id]) or 0,single_cost=pool.single_cost,ten_cost=pool.ten_cost,pity=pity}
+    for key,value in pairs(config.unlock_status(pool,state)) do result[key]=value end
+    return result
 end
 function M.snapshots(profile)
     local counts=profile.save.content_inventory or {}
@@ -47,7 +49,8 @@ local function add(stats,field,delta)
     local value=old+delta
     if spec.min_value then value=math.max(value,spec.min_value) end
     if spec.max_value then value=math.min(value,spec.max_value) end
-    stats[field]=value
+    if field=="starjoy_points" then require("systems/archive_starjoy_rewards").change(stats,old,value)
+    else stats[field]=value end
     if field=='map_level' then
         for _,rule in ipairs(require('config/generated/map_level_effect_rules').rows) do
             if rule.enabled~=false and rule.source_field_id==field then add(stats,rule.target_field_id,(value-old)*rule.value_per_level) end
@@ -77,6 +80,7 @@ function M.settle(profile,command)
     if command.kind=='lottery_snapshot' then return {ok=true,snapshots=M.snapshots(profile)} end
     local pool=config.pools[command.pool_id];if not pool then return {ok=false,error='lottery_pool_invalid'} end
     local archive=copy(profile.save.archive or {});local counts=copy(profile.save.content_inventory or {});local stats=copy(profile.save.gameplay_stats or {})
+    require("systems/archive_starjoy_rewards").reconcile(stats)
     archive.lottery_state=archive.lottery_state or {pools={}};local state=archive.lottery_state
     state.pools=state.pools or {};state.pools[pool.id]=state.pools[pool.id] or {draws=0};local current=state.pools[pool.id]
     local response={ok=true,pool_id=pool.id,request_id=command.request_id}
@@ -86,6 +90,7 @@ function M.settle(profile,command)
         current[field]=pool.revision
     elseif command.kind=='lottery_draw' then
         local count=command.count;if count~=1 and count~=10 then return {ok=false,error='lottery_count_invalid'} end
+        if not config.unlock_status(pool,state).unlocked then return {ok=false,error='lottery_pool_locked'} end
         local cost=count==10 and pool.ten_cost or pool.single_cost
         if (tonumber(counts[pool.ticket_content_id]) or 0)<cost then return {ok=false,error='lottery_ticket_insufficient'} end
         counts[pool.ticket_content_id]=counts[pool.ticket_content_id]-cost
