@@ -520,17 +520,25 @@ local function on_resources(payload)
 end
 
 local function queue_fusion_refresh(payload)
-    local player = tonumber(payload and payload.player_id)
-    if player == nil or pending_fusion_refresh[player] then return end
-    local token = {}
-    pending_fusion_refresh[player] = token
-    scheduler.after(0.1,function()
-        if pending_fusion_refresh[player] ~= token then return end
-        pending_fusion_refresh[player] = nil
+    local player_id = tonumber(payload and payload.player_id)
+    local team = payload and payload.team
+    if player_id == nil or player_id < 0 or team == nil then return end
+    local key = tostring(player_id) .. ":" .. tostring(team)
+    if pending_fusion_refresh[key] then return end
+    pending_fusion_refresh[key] = true
+    local pending = pending_fusion_refresh
+    scheduler.after(0.1, function()
+        if pending ~= pending_fusion_refresh then return end
+        pending[key] = nil
+        local snapshot
         for _, state in pairs(state_by_unit) do
-            if tonumber(state.player_id)==player and state.building_id=="lumberjack" then publish(state) end
+            if tonumber(state.player_id) == player_id and state.team == team
+                and state.building_id == "lumberjack" then
+                snapshot = snapshot or fusion_eligibility.snapshot(player_id, team)
+                publish(state, snapshot)
+            end
         end
-    end,"ability_fusion_refresh_"..tostring(player))
+    end, "ability_fusion_refresh_" .. key)
 end
 
 local function on_worker_changed(payload)

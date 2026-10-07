@@ -24,24 +24,23 @@ assert.equal(textValues.HandoffResource_gold,'1.2兆');
 assert.equal(textValues.HandoffResource_wood,'2京');
 assert.equal(textValues.HandoffResource_population,'3 / 10','small counts keep ordinary display');
 console.log('HUD_WAVE_COUNTER_PASS: next wave, server count, numeric-only grace timer, recovery, stale events, final challenge');
-console.log('HUD_WAVE_COUNTER_PASS: next wave, server count, numeric-only grace timer, recovery, stale events, final challenge');
 for(const [seconds,expected] of [[1800,'30:00'],[61,'01:01'],[1,'00:01'],[0,'00:00'],[-2,'00:00']])
  assert.equal(env.waveCaption({status:'archive_challenges',challenge_remaining_seconds:seconds}),'挑战剩余 '+expected);
 assert.equal(env.waveCaption({status:'archive_challenges',challenge_remaining_seconds:0,challenge_ended:1}),'挑战阶段已结束');
 
 let gameTime=100;
 env.Game={GetGameTime:()=>gameTime};
-env.data({sequence:10,wave:{status:'archive_challenges',challenge_deadline:1900,challenge_remaining_seconds:1800}});
+env.data({sequence:7,wave:{status:'archive_challenges',challenge_deadline:1900,challenge_remaining_seconds:1800}});
 assert.equal(textValues.HandoffWave,'挑战剩余 30:00');
 gameTime=161;env.renderCountdowns();assert.equal(textValues.HandoffWave,'挑战剩余 28:59');
 env.renderCountdowns();assert.equal(textValues.HandoffWave,'挑战剩余 28:59','paused game clock stays paused');
 env.data({sequence:5,wave:{status:'archive_challenges',challenge_deadline:3000}});
 assert.equal(textValues.HandoffWave,'挑战剩余 28:59','stale packets do not rewind timer');
 gameTime=2000;env.renderCountdowns();assert.equal(textValues.HandoffWave,'挑战剩余 00:00');
-env.data({sequence:10,wave:{status:'archive_challenges',challenge_ended:1,challenge_saving:1}});
+env.data({sequence:8,wave:{status:'archive_challenges',challenge_ended:1,challenge_saving:1}});
 assert.equal(textValues.HandoffWave,'挑战结束 · 正在保存奖励');
 gameTime=100;
-env.data({sequence:10,wave:{status:'countdown',current_wave:0,total_waves:30,countdown_deadline:165,timer:65,alive:91,alive_limit:90,overflow_active:true,overflow_deadline:110,overflow_remaining:10}});
+env.data({sequence:9,wave:{status:'countdown',current_wave:0,total_waves:30,countdown_deadline:165,timer:65,alive:91,alive_limit:90,overflow_active:true,overflow_deadline:110,overflow_remaining:10}});
 gameTime=105;env.renderCountdowns();assert.equal(textValues.HandoffWave,'下一波次 1  倒计时 01:00');assert.equal(textValues.HandoffEnemyCountdown,'5');
 gameTime=115;env.renderCountdowns();assert.equal(textValues.HandoffEnemyCountdown,'0');assert(countdown.visible,'client zero never declares defeat');
 env.data({sequence:10,wave:{player_defeated:true,alive_limit:90,overflow_active:false}});assert(!countdown.visible);

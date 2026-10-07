@@ -273,7 +273,9 @@ for i=1,200 do
     assert(own[1].unit.base_min==own[1].base_damage_min+i*0.25,"growth applies to the attacker immediately")
     assert(own[2].unit.survival_attack_min==other_before,"idle coworker cannot inherit growth")
 end
-assert(attack_writes==200 and stat_events==200)
+assert(attack_writes==200 and stat_events==0, "combat is immediate; UI waits for the coalesced flush")
+tick(2.11)
+assert(stat_events==1, "200 hits publish one attacker UI refresh")
 assert(range_writes==0 and modifier_lookups==0,"growth must not reset attack timers/ranges or all modifiers")
 assert(foreign.unit.survival_attack_min==foreign_before,"growth stays unit-private")
 local previous_writes=attack_writes
@@ -297,7 +299,7 @@ bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed
 assert(range_writes>0 and modifier_lookups>0)
 assert(own[1].unit.survival_attack_min==first_before,"technology refresh retains private growth")
 assert(own[2].unit.base_min==(own[2].base_damage_min+0.75+9)*1.25)
-assert(train(0,3).ok);tick(3)
+assert(train(0,3).ok);tick(3.2)
 local recruited
 for _,state in ipairs(bus.request(events.WORKER_LIST_REQUEST,{player_id=0})) do
     if state.training_id=="train_lumberjack_03" then recruited=state end

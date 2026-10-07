@@ -50,7 +50,11 @@ package.loaded['systems/player_profile_service']={get_profile=function()return {
 local permanent=require('systems/permanent_reward_effect_service');permanent.init()
 bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=0})
 local tower={survival_player_id=0}
-local function attack() return bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,{player_id=0}).totals.tower_attack_flat end
+local function attack()
+    local shared = bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,{player_id=0}).totals.tower_attack_flat
+    assert(shared == 0, "earned growth must not leak into another tower through player totals")
+    return tonumber(tower.survival_tower_personal_attack_growth) or 0
+end
 bus.emit(events.TOWER_ATTACK_LANDED,{tower=tower});assert(attack()==2,'attack event does not grant damage growth')
 bus.emit('commerce.tower_damage',{tower=tower,damage=0});assert(attack()==2)
 bus.emit('commerce.tower_damage',{tower=tower,damage=10});assert(attack()==5)

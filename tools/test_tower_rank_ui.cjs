@@ -324,7 +324,7 @@ assert.equal(projectedHeight, 330);
 assert.equal(bar.style.position, '546.00px 480.00px 0px', 'caption follows the native model health-bar height');
 healthBarOffset = 190; tick();
 entities[1].origin[0] = 2500; tick(); assert.equal(bar.style.visibility, 'collapse');
-assert.equal(config.SurvivalTowerRanks.DebugSnapshot().hidden_reasons.outside_viewport, 1);
+assert.equal(config.SurvivalTowerRanks.DebugSnapshot().hidden_reasons.invalid_projection, 1);
 for (const [x, y, expected, reason] of [
     [53, 400, 'collapse', 'partially clipped name at the left edge'],
     [54, 400, 'visible', 'name touching the left edge'],
