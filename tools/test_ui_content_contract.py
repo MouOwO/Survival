@@ -22,6 +22,9 @@ def verify(folder):
                     "LotteryUnlockNotice", "LotteryDrawPity", "SurvivalLocalHeroPortrait",
                     "SurvivalReturnCastleAsset"}
     assert required_ids <= ids, (str(folder), "missing panels", sorted(required_ids - ids))
+    preload = next(n for n in hud.iter("Image") if n.get("id") == "SurvivalReturnCastleAsset")
+    assert "visibility: collapse" in preload.get("style", ""), "resource preload must never render over navigation"
+    assert preload.get("hittest") == "false" and preload.get("hittestchildren") == "false"
     root = next(n for n in hud.iter("Panel") if "SurvivalHUDRoot" in n.get("class", "").split())
     assert {"UnifiedWindowsV4", "HandoffReadableStats", "HandoffResourceTree"} <= set(root.get("class").split())
     tabs = next(n for n in hud.iter() if n.get("id") == "LotteryPoolTabs")
