@@ -21,7 +21,7 @@ foreach ($row in $portalManifest.outputs) {
     $portalLog = @(& (Join-Path $portalEngine 'game/bin/win64/resourcecompiler.exe') -i $target -game (Join-Path $portalEngine 'game/dota') -fshallow -nop4 2>&1)
     $portalLog | Set-Content -LiteralPath (Join-Path $portalRepo ('output/ice_base_reference_20261006/' + $portalStyle + '_' + [IO.Path]::GetFileName($row.resource) + '.log'))
     $portalLog | Where-Object { $_ -match 'RESOURCE COMPILE|ERROR:|failed' } | Write-Output
-    if ($LASTEXITCODE -ne 0 -or -not ($portalLog -match '0 failed')) { throw "Portal compile failed: $($row.resource)" }
+    if ($LASTEXITCODE -ne 0 -or -not ($portalLog -match '0 failed') -or $portalLog -match 'LoadKV3ObjectInPlace error|ERROR:') { throw "Portal compile failed: $($row.resource)" }
 }
 }
 Write-Output 'ICE_AND_AMBER_PORTAL_COMPILE_PASS'

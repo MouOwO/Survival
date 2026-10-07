@@ -1,0 +1,1 @@
+[{"name":"dota_run_lua","arguments":{"code":"GameRules:SetGamePaused(true); print(\"[SHOP_TEST_PAUSED]\",GameRules:GetGameTime(),GameRules:State_Get())"}}]

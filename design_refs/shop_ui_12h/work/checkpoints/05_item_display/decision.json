@@ -1,0 +1,27 @@
+{
+  "group": "05_item_display",
+  "best": "I10",
+  "entries": [
+    {
+      "id": "I10",
+      "result": "保留",
+      "improvement": "独立投影减弱至55%，浮空物品底部不再显脏",
+      "cost": "接触感略轻，仍能辨认投影"
+    },
+    {
+      "id": "I11",
+      "result": "淘汰",
+      "improvement": "缩小6%增加留白",
+      "cost": "缩放使示例物品细节发软，宽大物品原比例更清楚"
+    },
+    {
+      "id": "I12",
+      "result": "淘汰",
+      "improvement": "展示底改成暖色柔雾",
+      "cost": "与卡体形成额外亮色块，原环纹更自然"
+    }
+  ],
+  "at": "2026-10-06T16:35:45.880Z",
+  "kind": "assembled_component_browser_preview",
+  "hash": "28d485bea42d770335603b9dbd2e09f75d38d0f0090ae893e96550b68e3605a9"
+}

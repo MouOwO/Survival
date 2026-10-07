@@ -1,0 +1,150 @@
+{
+  "canvas": [
+    1920,
+    1080
+  ],
+  "window": [
+    1600,
+    920
+  ],
+  "sidebar": [
+    320,
+    808
+  ],
+  "product": [
+    296,
+    348
+  ],
+  "grid": {
+    "x": 344,
+    "y": 174,
+    "columns": 4,
+    "rows": 2,
+    "stride": [
+      312,
+      366
+    ],
+    "leftGap": 24,
+    "rightGap": 24
+  },
+  "art": [
+    256,
+    192
+  ],
+  "artWell": [
+    264,
+    224
+  ],
+  "cardInternal": {
+    "art": [
+      16,
+      12,
+      264,
+      224
+    ],
+    "title": [
+      12,
+      244,
+      272,
+      34
+    ],
+    "price": [
+      16,
+      286,
+      264,
+      42
+    ]
+  },
+  "cardOverlay": {
+    "shadow": [
+      -12,
+      -8,
+      320,
+      376
+    ],
+    "halo": [
+      -12,
+      -8,
+      320,
+      376
+    ],
+    "hoverTranslateY": -2
+  },
+  "price": [
+    264,
+    42
+  ],
+  "navSelectedOverlay": {
+    "hitArea": [
+      320,
+      96
+    ],
+    "plateVisible": [
+      6,
+      4,
+      308,
+      92
+    ],
+    "cornerCut": 4,
+    "glow": [
+      -10,
+      -10,
+      340,
+      116
+    ],
+    "line": [
+      0,
+      94,
+      320,
+      2
+    ],
+    "lineAlign": "bottom",
+    "glowClipped": false
+  },
+  "itemFilter": {
+    "brightness": 0.98,
+    "saturation": 0.86,
+    "contrast": 1.02,
+    "shadowLayer": {
+      "file": "assets/item_shadow_XX.png",
+      "rect": [
+        -12,
+        -12,
+        288,
+        224
+      ],
+      "separateFromItem": true
+    },
+    "hoverScale": 1.035
+  },
+  "transitions": {
+    "header": [
+      320,
+      88,
+      1280,
+      96
+    ],
+    "sidebar": [
+      312,
+      112,
+      24,
+      808
+    ],
+    "nonInteractive": true
+  },
+  "materials": {
+    "card": "ivory with shallow jade bevel",
+    "hover": "soft local shade fading on all edges",
+    "price": "inset info line"
+  },
+  "atlas": {
+    "file": "assets/item_cutout_atlas.png",
+    "columns": 4,
+    "rows": 2,
+    "cell": [
+      512,
+      384
+    ],
+    "transparent": true
+  }
+}

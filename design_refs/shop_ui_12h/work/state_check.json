@@ -1,0 +1,1 @@
+[{"name":"dota_run_lua","arguments":{"code":"print('[SHOP_NATIVE_STATE]',GameRules:State_Get(),DOTA_GAMERULES_STATE_GAME_IN_PROGRESS,DOTA_GAMERULES_STATE_POST_GAME,DOTA_GAMERULES_STATE_DISCONNECT)"}}]

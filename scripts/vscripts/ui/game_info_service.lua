@@ -225,14 +225,14 @@ local function publish_payload(payload)
 end
 
 local pending_growth = {}
-local function publish_growth(player_id)
+local function publish_growth(player_id, reason)
     if pending_growth[player_id] then return end
     local token = {}
     pending_growth[player_id] = token
     scheduler.after(0.1, function()
         if pending_growth[player_id] ~= token then return end
         pending_growth[player_id] = nil
-        publish_payload({player_id = player_id, reason = "lumberjack_attack_growth"})
+        publish_payload({player_id = player_id, reason = reason or "lumberjack_attack_growth"})
     end, "lumberjack_publish_growth_" .. tostring(player_id))
 end
 
@@ -251,7 +251,14 @@ function M.init()
             publish_payload(payload)
         end
     end)
-    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, publish_payload)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, function(payload)
+        if payload and payload.changed_section == "tower" then
+            local player_id = tonumber(payload.player_id)
+            if player_id ~= nil then publish_growth(player_id, payload.reason) end
+        else
+            publish_payload(payload)
+        end
+    end)
     event_bus.subscribe(events.EQUIPMENT_STATS_CHANGED, publish_payload)
     CustomGameEventManager:RegisterListener("ui_game_info_request", function(_, payload)
         local player_id = tonumber(payload and payload.PlayerID)

@@ -3603,6 +3603,12 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "800"
         "VisionNighttimeRange"   "600"
+
+        "MovementSpeedActivityModifiers"
+        {
+            "walk" "0"
+            "run" "395"
+        }
     }
     "npc_survival_wave_named_boss_dreadlord_wave_name_5"
     {
@@ -3626,6 +3632,12 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "800"
         "VisionNighttimeRange"   "600"
+
+        "MovementSpeedActivityModifiers"
+        {
+            "walk" "0"
+            "run" "395"
+        }
     }
     "npc_survival_wave_named_boss_twinblade_demon_wave_name_15"
     {

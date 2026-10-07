@@ -1,0 +1,1 @@
+{"name":"shop-ui-reference-v8","private":true,"type":"module","scripts":{"assets":"node source/build.mjs","preview":"node source/render.mjs","board":"node source/component_board.mjs"},"dependencies":{"playwright":"1.62.1","sharp":"0.35.4"}}

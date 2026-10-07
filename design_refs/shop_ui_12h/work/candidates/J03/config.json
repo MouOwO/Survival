@@ -1,0 +1,11 @@
+{
+  "id": "J03",
+  "parent": "J02",
+  "changes": {
+    "seamOpacity": 0.35
+  },
+  "config": {
+    "header": "warm-mist",
+    "seamOpacity": 0.35
+  }
+}

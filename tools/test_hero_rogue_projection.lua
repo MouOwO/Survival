@@ -193,5 +193,15 @@ local initial_bonus = tower_bonus:GetModifierPreAttack_BonusDamage()
 permanent[5] = {hero_attack_flat = 20}
 bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id = 5})
 near(tower_bonus:GetModifierPreAttack_BonusDamage(), initial_bonus + 2, "live hero growth projection")
+local attack_time_writes, original_attack_time = 0, linked.SetBaseAttackTime
+linked.SetBaseAttackTime = function(self, value)
+    attack_time_writes = attack_time_writes + 1
+    original_attack_time(self, value)
+end
+for i=1,200 do
+    bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,
+        {player_id=5,changed_section="tower",reason="gameplay_stats_tower_attack_growth"})
+end
+assert(attack_time_writes == 0, "tower growth never rewrites the hero attack timer")
 print = original_print
 print("HERO_ROGUE_PROJECTION_PASS early/late summon; 6 heroes; additive equipment/permanent; client callbacks; replacement; idempotence; stable refresh; morale/lifesteal lifecycle; linked tower growth")

@@ -1,0 +1,11 @@
+{
+  "id": "J04",
+  "parent": "J02",
+  "changes": {
+    "seam": "soft"
+  },
+  "config": {
+    "header": "warm-mist",
+    "seam": "soft"
+  }
+}

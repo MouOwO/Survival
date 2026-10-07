@@ -2,6 +2,7 @@ local content_catalog = require("config/generated/content_catalog")
 local categories = require("config/generated/shop_categories")
 local aggregation = require("config/generated/shop_aggregation_rules")
 local shop_listings = require("config/generated/shop_entries")
+local native_icons = require("config/generated/native_ui_icon_mapping")
 local evaluator = require("systems/shop_condition_evaluator")
 local research_config = require("config/research_technology_config")
 local research_description = require("research/research_technology_description")
@@ -190,6 +191,13 @@ local function make_entry(rule, row)
         rule.category_default
     )
     local icon_type = rule.icon_type_default or "item"
+    local native_icon = native_icons.by_id["content:" .. content_id]
+    local icon = field(row, "icon_name",
+        icon_type == "ability" and "ability_upgrade_wall" or "item_branches")
+    if native_icon and native_icon.enabled then
+        icon_type = native_icon.icon_type
+        icon = (icon_type == "item" and "item_" or "") .. native_icon.icon_name
+    end
     return apply_listing({
         entryid = rule.source_id .. ":" .. content_id,
         tooltip_id = "shop_item:" .. rule.source_id .. ":" .. content_id,
@@ -198,12 +206,7 @@ local function make_entry(rule, row)
         contentid = content_id,
         name = content_name(content_id, row, rule),
         description = description(content_id, row, rule),
-        icon = field(
-            row,
-            "icon_name",
-            icon_type == "ability"
-                and "ability_upgrade_wall" or "item_branches"
-        ),
+        icon = icon,
         icon_type = icon_type,
         woodcost = wood,
         goldcost = gold,

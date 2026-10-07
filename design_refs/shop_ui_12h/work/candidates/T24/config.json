@@ -1,0 +1,8 @@
+{
+  "id": "T24",
+  "parent": "B17_production",
+  "changes": {
+    "legacySize": 128
+  },
+  "scope": "real shared factory with original CSV art; no live inventory changes"
+}

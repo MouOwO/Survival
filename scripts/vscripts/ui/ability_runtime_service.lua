@@ -432,6 +432,7 @@ local function publish(state, fusion_snapshot)
 end
 
 local function publish_unit(payload)
+    if payload and payload.stats_only == true then return end
     local unit = unit_from_payload(payload)
     if unit then
         publish(normalize(payload, unit))

@@ -43,4 +43,8 @@ bus.subscribe(events.GOLD_MINE_CHANGED,function() harvest_publishes=harvest_publ
 package.loaded["core/scheduler"].after=function() schedules=schedules+1 end
 for i=1,200 do bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,changed_section="lumberjack",changed_field="attack"}) end
 assert(schedules==0 and harvest_publishes==0,"wood attack growth must not reschedule gold production or republish mine stats")
+for i=1,200 do bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,
+    {player_id=0,changed_section="tower",reason="gameplay_stats_tower_attack_growth"}) end
+assert(schedules==0 and harvest_publishes==0,
+    "tower hits must not reschedule gold production or republish mine stats")
 print("LUMBERJACK_GOLD_ISOLATION_PASS")

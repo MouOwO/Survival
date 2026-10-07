@@ -1,0 +1,120 @@
+[
+  {
+    "id": "window",
+    "width": 1600,
+    "height": 920,
+    "file": "assets/window.png"
+  },
+  {
+    "id": "header",
+    "width": 1600,
+    "height": 112,
+    "file": "assets/header.png"
+  },
+  {
+    "id": "sidebar",
+    "width": 320,
+    "height": 808,
+    "file": "assets/sidebar.png"
+  },
+  {
+    "id": "nav_normal",
+    "width": 320,
+    "height": 96,
+    "file": "assets/nav_normal.png"
+  },
+  {
+    "id": "product_normal",
+    "width": 296,
+    "height": 348,
+    "file": "assets/product_normal.png",
+    "nativeSource": "source/materials/product_normal.svg"
+  },
+  {
+    "id": "nav_hover",
+    "width": 320,
+    "height": 96,
+    "file": "assets/nav_hover.png"
+  },
+  {
+    "id": "product_hover",
+    "width": 296,
+    "height": 348,
+    "file": "assets/product_hover.png",
+    "nativeSource": "source/materials/product_hover.svg"
+  },
+  {
+    "id": "product_selected",
+    "width": 296,
+    "height": 348,
+    "file": "assets/product_selected.png",
+    "nativeSource": "source/materials/product_selected.svg"
+  },
+  {
+    "id": "nav_selected_line",
+    "width": 320,
+    "height": 2,
+    "file": "assets/nav_selected_line.png"
+  },
+  {
+    "id": "art_well",
+    "width": 264,
+    "height": 224,
+    "file": "assets/art_well.png",
+    "nativeSource": "source/materials/art_well.svg"
+  },
+  {
+    "id": "price_strip",
+    "width": 264,
+    "height": 42,
+    "file": "assets/price_strip.png",
+    "nativeSource": "source/materials/price_strip.svg"
+  },
+  {
+    "id": "hover_shade",
+    "width": 264,
+    "height": 224,
+    "file": "assets/hover_shade.png",
+    "nativeSource": "source/materials/hover_shade.svg"
+  },
+  {
+    "id": "effect_backing",
+    "width": 264,
+    "height": 48,
+    "file": "assets/effect_backing.png",
+    "nativeSource": "source/materials/effect_backing.svg"
+  },
+  {
+    "id": "buy_button",
+    "width": 188,
+    "height": 46,
+    "file": "assets/buy_button.png",
+    "nativeSource": "source/materials/buy_button.svg"
+  },
+  {
+    "id": "buy_button_hover",
+    "width": 188,
+    "height": 46,
+    "file": "assets/buy_button_hover.png",
+    "nativeSource": "source/materials/buy_button_hover.svg"
+  },
+  {
+    "id": "buy_button_pressed",
+    "width": 188,
+    "height": 46,
+    "file": "assets/buy_button_pressed.png",
+    "nativeSource": "source/materials/buy_button_pressed.svg"
+  },
+  {
+    "id": "plus_button",
+    "width": 28,
+    "height": 28,
+    "file": "assets/plus_button.png"
+  },
+  {
+    "id": "backdrop",
+    "width": 1920,
+    "height": 1080,
+    "file": "assets/backdrop.png"
+  }
+]

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="296" height="348" viewBox="0 0 296 348"><defs>
+ <linearGradient id="base" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#fbfaf3"/><stop offset=".52" stop-color="#fbfaf2"/><stop offset="1" stop-color="#f5f6ee"/></linearGradient>
+ <radialGradient id="light" cx=".25" cy=".12" r=".88"><stop stop-color="#ffffff" stop-opacity=".8"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+ <linearGradient id="rim" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#e6e9db"/><stop offset=".46" stop-color="#9fafa8"/><stop offset="1" stop-color="#8faaa5"/></linearGradient>
+ <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".77" numOctaves="2" seed="31"/><feColorMatrix type="saturate" values="0"/></filter>
+ <clipPath id="clip"><rect x="2" y="2" width="292" height="344" rx="7"/></clipPath>
+ </defs>
+ <rect x=".8" y=".8" width="294.4" height="346.4" rx="8" fill="url(#base)" stroke="url(#rim)" stroke-width=".8"/>
+ <rect x="3" y="3" width="290" height="342" rx="6" fill="url(#light)" stroke="#fffffa" stroke-width="1" stroke-opacity=".9"/>
+ <g clip-path="url(#clip)"><rect width="296" height="348" filter="url(#grain)" opacity=".012" style="mix-blend-mode:multiply"/></g>
+ <path d="M8 333v5q0 3 4 3h272q4 0 4-4v-5" fill="none" stroke="#758f87" stroke-opacity=".05"/>
+ <path d="M16 16h12M16 16v12M280 16h-12M280 16v12" fill="none" stroke="#9fafa8" stroke-width=".9" opacity=".22"/>
+ <path d="M16 282h110m44 0h110" stroke="#aebcaf" opacity=".52"/><path d="M140 282l8-3 8 3-8 3z" fill="#b7a574" opacity=".55"/>
+ <path d="M17 283h107m48 0h107" stroke="#fffdf2" opacity=".9"/>
+ </svg>

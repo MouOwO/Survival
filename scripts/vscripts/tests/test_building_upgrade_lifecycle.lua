@@ -13,7 +13,11 @@ end
 package.loaded["debug/dev_wall_stats"] = {apply = noop}
 package.loaded["systems/rogue_effect_state_service"] = {wall_health_flat = function() return 0 end}
 package.loaded["systems/technology_stat_manager"] = {get = function() return {final = {tower = {}}} end}
-package.loaded["systems/player_profile_service"] = {get_profile = function() return nil end}
+local profile_reads = 0
+package.loaded["systems/player_profile_service"] = {get_profile = function()
+    profile_reads = profile_reads + 1
+    return nil
+end}
 local cancelled = {}
 package.loaded["systems/building_upgrade_process"] = {
     reset = noop, is_active = function() return false end,
@@ -26,8 +30,18 @@ print = function(message, ...)
     else original_print(message, ...) end
 end
 PlayerResource = {GetTeam = function() return 2 end}
-local world, published = {}, {}
-Entities = {FindAllByClassname = function() return world end}
+local world, published, scans, registry_reads = {}, {}, 0, 0
+Entities = {FindAllByClassname = function() scans = scans + 1; return world end}
+bus.handle_request(events.BUILDING_LIST_REQUEST, function(payload)
+    assert(payload.handles_only and payload.building_id == "arrow_tower")
+    registry_reads = registry_reads + 1
+    local result = {}
+    for _, unit in ipairs(world) do
+        result[#result + 1] = {unit=unit, player_id=unit.survival_player_id,
+            building_id="arrow_tower"}
+    end
+    return {ok=true, buildings=result}
+end)
 local function make_unit(id)
     local unit = {index = id, damage = 100, survival_player_id = 0, modifiers = {}, null_checks = 0, stat_writes = 0}
     local function live(self) assert(not self.removed, "Invalid object passed to native entity method.") end
@@ -211,14 +225,54 @@ assert(#errors == 0, table.concat(errors, "\n"))
 print("FARM_CITY_GATE_PASS: LV1-5 and same-team owner isolation")
 
 
-local scans=0
-Entities.FindAllByClassname=function() scans=scans+1;return world end
 published={}
 for i=1,200 do
     bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,changed_section="lumberjack",changed_field="attack",reason="lumberjack_attack_growth"})
 end
 assert(scans==0 and #published==0,"harvest growth must not rescan/rebuild unrelated buildings")
 bus.emit(events.TECHNOLOGY_STATS_CHANGED,{player_id=0,reason="research_completed"})
-assert(scans>0 and #published>0,"normal research must still refresh buildings")
+assert(scans==0 and registry_reads>0 and #published>0,
+    "normal research recovers registered buildings without a world scan")
 assert(#errors==0,table.concat(errors,"\n"))
 print("LUMBERJACK_BUILDING_ISOLATION_PASS: 200 growth hits cause zero world scans and building refreshes")
+
+-- Large tower groups apply each growth immediately. They share one reward
+-- snapshot and do not copy saves or invoke recovery on each combat hit.
+local group = {}
+for i=1,100 do
+    group[i] = make_unit(2000+i)
+    register(group[i])
+end
+local foreign = make_unit(3001)
+foreign.survival_player_id = 1
+bus.emit(events.BUILDING_CREATED, {unit=foreign, entindex=foreign.index,
+    definition=config.arrow_tower, building_id="arrow_tower", level=1,
+    team=2, player_id=1, base_attack_damage=100})
+local foreign_damage = foreign.damage
+local reads_before, registry_before = profile_reads, registry_reads
+for _, reason in ipairs({"gameplay_stats_tower_attack_growth",
+    "tower_actual_damage_growth", "star_blessing_tower_attack_per_second"}) do
+    reward = reward + 3
+    published = {}
+    bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id=0, reason=reason})
+    for _, unit in ipairs(group) do assert(unit.damage == 100+reward) end
+    for _, payload in ipairs(published) do
+        assert(payload.stats_only == true and payload.building_id == "arrow_tower")
+    end
+    assert(foreign.damage == foreign_damage, "growth must respect same-team ownership")
+end
+assert(profile_reads == reads_before and registry_reads == registry_before and scans == 0)
+published = {}
+bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,
+    {player_id=0, reason="gameplay_stats_tower_attack_growth"})
+assert(#published == 0, "identical growth totals produce no native writes or UI fan-out")
+for _, reason in ipairs({"star_blessing_attributes_per_second",
+    "gameplay_stats_hero_damage_growth", "gameplay_stats_hero_attack_growth"}) do
+    bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id=0, reason=reason})
+end
+assert(#published == 0 and profile_reads == reads_before)
+bus.emit(events.TECHNOLOGY_STATS_CHANGED, {player_id=0, reason="research_completed"})
+assert(profile_reads == reads_before+1,
+    "a normal research refresh clones the profile once for the entire group")
+assert(#errors == 0, table.concat(errors,"\n"))
+print("TOWER_RUNTIME_COST_PASS: 100 towers, immediate growth, zero world scans/save copies/recovery, same-team isolation, one snapshot for research")

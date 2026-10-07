@@ -1,0 +1,132 @@
+{
+  "kind": "browser_component_checks",
+  "longFields": [
+    {
+      "w": 1280,
+      "h": 720,
+      "status": "PASS",
+      "scope": "labelled pressure fixture, no live catalog modification"
+    },
+    {
+      "w": 1920,
+      "h": 1080,
+      "status": "PASS",
+      "scope": "labelled pressure fixture, no live catalog modification"
+    },
+    {
+      "w": 2560,
+      "h": 1440,
+      "status": "PASS",
+      "scope": "labelled pressure fixture, no live catalog modification"
+    },
+    {
+      "w": 2560,
+      "h": 1080,
+      "status": "PASS",
+      "scope": "labelled pressure fixture, no live catalog modification"
+    }
+  ],
+  "components": [
+    {
+      "src": "lottery_gale_bow.png",
+      "loaded": true,
+      "fit": "contain",
+      "box": {
+        "x": 524,
+        "y": 270,
+        "width": 256,
+        "height": 192,
+        "top": 270,
+        "right": 780,
+        "bottom": 462,
+        "left": 524
+      }
+    },
+    {
+      "src": "lottery_titan_shield.png",
+      "loaded": true,
+      "fit": "contain",
+      "box": {
+        "x": 836,
+        "y": 270,
+        "width": 256,
+        "height": 192,
+        "top": 270,
+        "right": 1092,
+        "bottom": 462,
+        "left": 836
+      }
+    },
+    {
+      "src": "lottery_supreme_fishing_rod.png",
+      "loaded": true,
+      "fit": "contain",
+      "box": {
+        "x": 1148,
+        "y": 270,
+        "width": 256,
+        "height": 192,
+        "top": 270,
+        "right": 1404,
+        "bottom": 462,
+        "left": 1148
+      }
+    },
+    {
+      "src": "lottery_time_orb.png",
+      "loaded": true,
+      "fit": "contain",
+      "box": {
+        "x": 1460,
+        "y": 270,
+        "width": 256,
+        "height": 192,
+        "top": 270,
+        "right": 1716,
+        "bottom": 462,
+        "left": 1460
+      }
+    },
+    {
+      "src": "lottery_magical_girl_juggernaut.png",
+      "loaded": true,
+      "fit": "contain",
+      "box": {
+        "x": 524,
+        "y": 636,
+        "width": 256,
+        "height": 192,
+        "top": 636,
+        "right": 780,
+        "bottom": 828,
+        "left": 524
+      }
+    },
+    {
+      "src": "ticket_illustrated.png",
+      "loaded": true,
+      "fit": "contain",
+      "box": {
+        "x": 916,
+        "y": 684,
+        "width": 96,
+        "height": 96,
+        "top": 684,
+        "right": 1012,
+        "bottom": 780,
+        "left": 916
+      }
+    }
+  ],
+  "states": [
+    {
+      "state": "card default/hover; nav default/hover/selected; buy default/hover/pressed",
+      "status": "CAPTURED",
+      "scope": "same production classes and factory"
+    },
+    {
+      "state": "independent close X / outside scrim",
+      "status": "PASS"
+    }
+  ]
+}

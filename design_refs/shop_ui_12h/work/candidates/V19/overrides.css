@@ -1,0 +1,12 @@
+.content-transition{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/content_transition.png')!important;}
+.sidebar-seam{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/sidebar_seam.png')!important;}
+.hoverbox{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/hover_shade.png')!important;}
+.nav.selected{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/nav_selected.png')!important;}
+.card{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/product_normal.png')!important;}
+.card.is-hover,.card:hover{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/product_hover.png')!important;}
+.buy{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/buy_button.png')!important;}
+.buy:hover{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/buy_button_hover.png')!important;}
+.buy:active,.buy.PreviewPressed{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/V19/assets/buy_button_pressed.png')!important;}
+.card::before{opacity:0.62;}
+.item-shadow,.card:hover .item-shadow,.card.is-hover .item-shadow{opacity:0.55;}
+.item-title{font-weight:500;letter-spacing:.2px;color:#214551;text-shadow:none}.price{color:#426269;}

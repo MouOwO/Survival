@@ -1,0 +1,362 @@
+[
+  {
+    "file": "assets/art_well.png",
+    "width": 264,
+    "height": 224,
+    "sha256": "36cf4773741ffd971ebe9bde1bcd9bcd7753b7b283ba2f95d402275ee10843fe"
+  },
+  {
+    "file": "assets/backdrop.png",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "3c87568c92ef5f6559e2e573ba097bd68ca3e9ec581eaa63786ed184ee2c05e2"
+  },
+  {
+    "file": "assets/buy_button.png",
+    "width": 188,
+    "height": 46,
+    "sha256": "926f27554746bfbc20a6d2b5a0be4deeba5e29103bd363c7a01809e68eed448f"
+  },
+  {
+    "file": "assets/buy_button_hover.png",
+    "width": 188,
+    "height": 46,
+    "sha256": "c5cd8e18e33b1b80048bb9779ebd7528129c761022896a1613950289cebcdd50"
+  },
+  {
+    "file": "assets/buy_button_pressed.png",
+    "width": 188,
+    "height": 46,
+    "sha256": "6e7066289183f1873ccbdc711da0ffaa3a06e3c28e03f4849692b2b79e735ff8"
+  },
+  {
+    "file": "assets/card_cloud.png",
+    "width": 264,
+    "height": 224,
+    "sha256": "8cdcccbbcbda5cc3395fd930ea572094d1637ab457a6278700d6c860dffc4196"
+  },
+  {
+    "file": "assets/card_halo.png",
+    "width": 320,
+    "height": 376,
+    "sha256": "ea1ab4962e014f5ebffc79da5e9df1be7cf6f8713619ee03d60b858d8a2463ea"
+  },
+  {
+    "file": "assets/card_shadow.png",
+    "width": 320,
+    "height": 376,
+    "sha256": "2e285a9c4ed88f00da29f6eb86f3e35bae1376d54b4cbca701bca4d1685d9a0c"
+  },
+  {
+    "file": "assets/close_hover.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "7a3e4751feb148fc604372cc4252262476aaa79292400b667ae4599acab910a0"
+  },
+  {
+    "file": "assets/close_normal.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "29d3fb065a72bd2ef065b728382d63176198beea1bc955c82890aa51e36324fa"
+  },
+  {
+    "file": "assets/close_pressed.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "04df05a431589e1b12b94460e1dbffec310a393cb50e785cacd0b45498995c5c"
+  },
+  {
+    "file": "assets/cloud_corner.png",
+    "width": 236,
+    "height": 132,
+    "sha256": "244c45048ca63188930336a663ffca5494777052fd5fbb60776101a29df35ad9"
+  },
+  {
+    "file": "assets/coin.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "70cd3d733dadd545bbec550a99002fc23d6355377c2b9af07881b5e0fa5c4639"
+  },
+  {
+    "file": "assets/content_transition.png",
+    "width": 1280,
+    "height": 96,
+    "sha256": "912ac7c83f467a03d2ce7053b4e58650d9c6908dd4af7cfb28b6d5ea036f1552"
+  },
+  {
+    "file": "assets/crystal.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "4d84be4f95e605d35bd5acdbe4f9190c215b200f96993762a386811ae21d472d"
+  },
+  {
+    "file": "assets/effect_backing.png",
+    "width": 264,
+    "height": 48,
+    "sha256": "10ca2fe5cade86bcb6248c2913342dc5655d08827aa617f05d91e441fde4da6e"
+  },
+  {
+    "file": "assets/frame.png",
+    "width": 1600,
+    "height": 920,
+    "sha256": "7dbbbe224be6e68e659d6d7c321eb0e8495022afe48fcd6dd2083a4a24ed1bdb"
+  },
+  {
+    "file": "assets/gift_hover.png",
+    "width": 48,
+    "height": 48,
+    "sha256": "debb431aa94c14153dd112a5f0bd5fd49063177e75d00b6a325e93afb45d98eb"
+  },
+  {
+    "file": "assets/gift_light.png",
+    "width": 48,
+    "height": 48,
+    "sha256": "0c047819cfa87c63f04804162f99b6aafb3b74fb3da84c411303f38f3e954702"
+  },
+  {
+    "file": "assets/header.png",
+    "width": 1600,
+    "height": 112,
+    "sha256": "1702026533d46cd1ac840f0972e2d25c7af14cf6e4eec46792add61732f01e57"
+  },
+  {
+    "file": "assets/hero_hover.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "1598584a178a0d5eb4f929320c1f72bf973661faa1271c7e9c5a384e555cfc88"
+  },
+  {
+    "file": "assets/hero_light.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "964f50a7d9461f91b7cff7b1dd708daf350a28e804a82565a881aed4a1f8bad9"
+  },
+  {
+    "file": "assets/hover_shade.png",
+    "width": 264,
+    "height": 224,
+    "sha256": "3568fb1b37571e1fa156c55a9035839963cd9c342b450d5944fbc08b2dc929af"
+  },
+  {
+    "file": "assets/item_cutout_01.png",
+    "width": 512,
+    "height": 384,
+    "sha256": "5c0e30fc3a78087cc288df682eecf64fb0b106fc7c21727ff39ac3c4455f5ced"
+  },
+  {
+    "file": "assets/item_cutout_02.png",
+    "width": 512,
+    "height": 384,
+    "sha256": "6d54360b2fdeaa62cce34fb5cf5d71a9feeef92ced6000ba5c3c31f51b597ee4"
+  },
+  {
+    "file": "assets/item_cutout_03.png",
+    "width": 512,
+    "height": 384,
+    "sha256": "9d0c1911a27e983f91d605920b9b8762d973399cca7e475eae812c41829027e9"
+  },
+  {
+    "file": "assets/item_cutout_04.png",
+    "width": 512,
+    "height": 384,
+    "sha256": "bc1b0a680b17a29347a196661158f553fb931d41e0911cabf737a90e85b02346"
+  },
+  {
+    "file": "assets/item_cutout_05.png",
+    "width": 512,
+    "height": 384,
+    "sha256": "cfbe9f9106e20da15492d6c120da4419a491326e942b3000a8220fffe22ca2d6"
+  },
+  {
+    "file": "assets/item_cutout_06.png",
+    "width": 512,
+    "height": 384,
+    "sha256": "a79bf8d9357d8a6109abd2adfd0e93965a952fb1749821105d3762f6763b040d"
+  },
+  {
+    "file": "assets/item_cutout_07.png",
+    "width": 512,
+    "height": 384,
+    "sha256": "1320a8c3b8731d153ba38bfcdd55d67fc458eb07d6c677eca342d02c6a8ce36f"
+  },
+  {
+    "file": "assets/item_cutout_08.png",
+    "width": 512,
+    "height": 384,
+    "sha256": "5e935e371aa93c3a8dd09f41ea6e018eff9ce9af8c8c91a4b54659106bb21ee3"
+  },
+  {
+    "file": "assets/item_cutout_atlas.png",
+    "width": 2048,
+    "height": 768,
+    "sha256": "69168472e5f7514debb813e61548d6fd79e5f10a83df5cb39a686ac653b831bb"
+  },
+  {
+    "file": "assets/item_shadow_01.png",
+    "width": 288,
+    "height": 224,
+    "sha256": "b220300e7cb7333df4746d5abeb5ecfdb755533b3920d1b9f34e37d9da1c4bed"
+  },
+  {
+    "file": "assets/item_shadow_02.png",
+    "width": 288,
+    "height": 224,
+    "sha256": "0ae276514b9f62314bd15dbd183b2e015a321c781700f89787e6b483bdc0a167"
+  },
+  {
+    "file": "assets/item_shadow_03.png",
+    "width": 288,
+    "height": 224,
+    "sha256": "a23d0955fe871d2bf6cd98313614e9efa982c635d4bf1e0cdc8692e9366e8f74"
+  },
+  {
+    "file": "assets/item_shadow_04.png",
+    "width": 288,
+    "height": 224,
+    "sha256": "52054cf272a48c7705af02cb5f2bfbc5321ccba4bf44d9a192a10bbc0ce3b677"
+  },
+  {
+    "file": "assets/item_shadow_05.png",
+    "width": 288,
+    "height": 224,
+    "sha256": "3f3feb63f97ded101200611fdfd901610995ef6441aab168ad157dd417ef9bbf"
+  },
+  {
+    "file": "assets/item_shadow_06.png",
+    "width": 288,
+    "height": 224,
+    "sha256": "7757bcaf69b9de8ef56d54b16ad93aaf57e219d8d7cefa09a9b00fd7c0168f2b"
+  },
+  {
+    "file": "assets/item_shadow_07.png",
+    "width": 288,
+    "height": 224,
+    "sha256": "2850e85ec6c308eb98807fabae4bd5336c0a148f9fb7086f436d233dcb3e4710"
+  },
+  {
+    "file": "assets/item_shadow_08.png",
+    "width": 288,
+    "height": 224,
+    "sha256": "4fe933a925b3eb0955b7553b149a92b67cd61718d5a76e0b64c2c91d7406b1b5"
+  },
+  {
+    "file": "assets/nav_hover.png",
+    "width": 320,
+    "height": 96,
+    "sha256": "65c6b4a9bbdc3b8a2f7873193bc94c9dc93fb4991595357d0e7e3ce0e1681c5d"
+  },
+  {
+    "file": "assets/nav_normal.png",
+    "width": 320,
+    "height": 96,
+    "sha256": "fc13d4b08124dc3feae6721e01a9afeddf835b1fe82ae4f3f1a2ff173947e18e"
+  },
+  {
+    "file": "assets/nav_selected.png",
+    "width": 320,
+    "height": 96,
+    "sha256": "a68c2b6ef2f4dcc86ea629ab53d3f33a6c96f20596f75c4570daa1adce5c9c39"
+  },
+  {
+    "file": "assets/nav_selected_glow.png",
+    "width": 340,
+    "height": 116,
+    "sha256": "1cf2df2c7905c1310a4fbec9985dec54f100f5441c5da9a491c3903494348621"
+  },
+  {
+    "file": "assets/nav_selected_line.png",
+    "width": 320,
+    "height": 2,
+    "sha256": "75f6dbdec937c83eaa134d74bfc8a2d13d88ac047190e493868e9b87492e0105"
+  },
+  {
+    "file": "assets/plus_button.png",
+    "width": 28,
+    "height": 28,
+    "sha256": "e3363f0644d6ea5de30a7b75185172c31f395bb7c2700370998bce95ca059a3f"
+  },
+  {
+    "file": "assets/plus_light.png",
+    "width": 48,
+    "height": 48,
+    "sha256": "cb697e5324a63c2e159ff027019be6481908272d154a6b4ed8e71398e7e0ca1e"
+  },
+  {
+    "file": "assets/price_strip.png",
+    "width": 264,
+    "height": 42,
+    "sha256": "cf0fb799659ac29d848b4de909ce16ad17d64d50096c5f51f4c8d3e162a4abe7"
+  },
+  {
+    "file": "assets/product_hover.png",
+    "width": 296,
+    "height": 348,
+    "sha256": "299207332abfc7ff0e4a6a4efe97f5dd1210f0b69f135a7b33a93e227f77c4be"
+  },
+  {
+    "file": "assets/product_normal.png",
+    "width": 296,
+    "height": 348,
+    "sha256": "5daaad8b5a270b0645330158ee0649bed203b337cb7e8b8c9795964e2b0fe0e8"
+  },
+  {
+    "file": "assets/product_selected.png",
+    "width": 296,
+    "height": 348,
+    "sha256": "299207332abfc7ff0e4a6a4efe97f5dd1210f0b69f135a7b33a93e227f77c4be"
+  },
+  {
+    "file": "assets/scenery.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "6e0368cd95059a52fdc64f64b8ca57458aa00965f3fab619fe5d2e8f6d77ccce"
+  },
+  {
+    "file": "assets/sidebar.png",
+    "width": 320,
+    "height": 808,
+    "sha256": "a0ae9f73aae4d4e8c0575d1af7c0af1d89413dcc2d33ac4f333af06c40061cb4"
+  },
+  {
+    "file": "assets/sidebar_seam.png",
+    "width": 24,
+    "height": 808,
+    "sha256": "9744ea95920c8a60e116badc3a8071b49283b20cf20f009e18d16a954da33930"
+  },
+  {
+    "file": "assets/sword_hover.png",
+    "width": 48,
+    "height": 48,
+    "sha256": "1b1eae70549f6186d831f9c16a5733cf3eaaf9c8021c7b376568a953a2ed9d40"
+  },
+  {
+    "file": "assets/sword_light.png",
+    "width": 48,
+    "height": 48,
+    "sha256": "71c1bef35b3131a6e6f87f156a39fb75be0948ec331d3629d2c2319c67b950b6"
+  },
+  {
+    "file": "assets/ticket_hover.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "83dad92c7fe91f2ef84662bf7ee1bce816323a7fd4d5efcafd65615ed3b1df79"
+  },
+  {
+    "file": "assets/ticket_light.png",
+    "width": 40,
+    "height": 40,
+    "sha256": "57555666b0e412737cba0dcfbaea66a806f0192ecf6e7e67dc4d2f443d914130"
+  },
+  {
+    "file": "assets/title_flourish.png",
+    "width": 200,
+    "height": 24,
+    "sha256": "b2201352b0571a51d2beb9ef3899f2a92d05b52f45378b431b708acafec8c7de"
+  },
+  {
+    "file": "assets/window.png",
+    "width": 1600,
+    "height": 920,
+    "sha256": "0677b451da6568e756868faef89a3fef9cf67391db0214e4c87048cbdbb36937"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "id": "J01",
+  "parent": "baseline",
+  "changes": {
+    "headerOpacity": 0.5
+  },
+  "config": {
+    "headerOpacity": 0.5
+  }
+}

@@ -9,7 +9,7 @@ function M:GetAbilityTextureName()
     local player_id = caster and caster:GetPlayerOwnerID() or -1
     local snapshot = CustomNetTables and CustomNetTables:GetTableValue("survival_rogue_reward", tostring(player_id))
     local talent = snapshot and snapshot.builder_talent
-    return talent and talent.icon_name or "survival/native/talent_question"
+    return talent and talent.icon_name or "ogre_magi_multicast"
 end
 
 function M:OnSpellStart()

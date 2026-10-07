@@ -26,3 +26,16 @@ server/aliyun/**/*.sh text eol=lf
 server/aliyun/deploy/pg-bin/* text eol=lf
 server/aliyun/deploy/*.service text eol=lf
 server/aliyun/deploy/*.timer text eol=lf
+
+# UI delivery manifests and recovery checkpoints compare exact authored bytes.
+design_refs/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Recovery snapshots preserve the original files, including their trailing lines.
+design_refs/**/checkpoints/** whitespace=blank-at-eol,space-before-tab,cr-at-eol,-blank-at-eof
+design_refs/shop_ui_12h/source/cutout_prompt.txt whitespace=blank-at-eol,space-before-tab,cr-at-eol,-blank-at-eof
+art/ui/development/commerce_jade_v1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+panorama/src/scripts/custom_game/common/commerce_art_manifest.js -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+panorama/src/scripts/custom_game/common/commerce_components.js -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+panorama/src/styles/custom_game/common/commerce_jade.css -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+panorama/src/layout/custom_game/commerce_resources.xml -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+panorama/src/layout/custom_game/survival_hud.xml -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

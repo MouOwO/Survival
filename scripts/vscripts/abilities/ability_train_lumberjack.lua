@@ -3,10 +3,7 @@ local events = require("core/events")
 local M = class({})
 
 function M:GetAbilityTextureName()
-    local runtime = CustomNetTables and CustomNetTables:GetTableValue(
-        "survival_ability_runtime", tostring(self:entindex())) or {}
-    local level = math.max(1, math.min(8, tonumber(runtime.current_level) or 1))
-    return "survival/native/train_lumberjack_" .. string.format("%02d", level)
+    return "furion_force_of_nature"
 end
 
 function M:GetBehavior() return DOTA_ABILITY_BEHAVIOR_NO_TARGET end

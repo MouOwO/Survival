@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="264" height="224" viewBox="0 0 264 224"><defs>
+ <radialGradient id="mist" cx=".48" cy=".5" r=".6"><stop stop-color="#d7e4df" stop-opacity=".7"/><stop offset=".6" stop-color="#dee8df" stop-opacity=".35"/><stop offset="1" stop-color="#eaf0e6" stop-opacity="0"/></radialGradient>
+ <radialGradient id="shadow"><stop stop-color="#294b51" stop-opacity=".23"/><stop offset=".5" stop-color="#4a6665" stop-opacity=".09"/><stop offset="1" stop-color="#476563" stop-opacity="0"/></radialGradient>
+ <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#93aba6" stop-opacity="0"/><stop offset=".5" stop-color="#a5b8ac" stop-opacity=".27"/><stop offset="1" stop-color="#93aba6" stop-opacity="0"/></linearGradient>
+ </defs><ellipse cx="132" cy="116" rx="129" ry="107" fill="url(#mist)"/>
+ <circle cx="132" cy="110" r="92" fill="none" stroke="url(#hair)" stroke-width=".8"/><circle cx="132" cy="110" r="86" fill="none" stroke="url(#hair)" stroke-width=".5"/>
+ <ellipse cx="132" cy="192" rx="85" ry="19" fill="url(#shadow)"/>
+</svg>

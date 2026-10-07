@@ -5,6 +5,18 @@ local definitions = require("config/generated/entitlement_definitions")
 local M = {}
 
 local state_by_player = {}
+local published_by_player = {}
+
+local function same_flags(previous, current)
+    if previous == nil then return false end
+    for key, value in pairs(previous) do
+        if (value == true) ~= (current[key] == true) then return false end
+    end
+    for key, value in pairs(current) do
+        if (value == true) ~= (previous[key] == true) then return false end
+    end
+    return true
+end
 
 local function default_state()
     local result = {}
@@ -59,6 +71,7 @@ local function set_entitlement(payload)
         or tonumber(payload.unlocked) == 1
     local data = snapshot(player_id)
     data.reason = tostring(payload.reason or "server_update")
+    published_by_player[player_id] = true
     event_bus.emit(events.PLAYER_ENTITLEMENT_CHANGED, data)
     return { ok = true, snapshot = data }
 end
@@ -89,15 +102,24 @@ function M.replace_all(player_id, entitlement_values, reason)
         end
         next_state[entitlement_id] = unlocked
     end
+    local changed = not published_by_player[player_id]
+        or not same_flags(state_by_player[player_id], next_state)
     state_by_player[player_id] = next_state
     local data = snapshot(player_id)
     data.reason = tostring(reason or "replace_all")
-    event_bus.emit(events.PLAYER_ENTITLEMENT_CHANGED, data)
+    -- Keep the first authoritative publication even if HERO_READY already
+    -- created defaults. Later online checkpoints with identical permissions
+    -- do not need to refresh summon and shop availability again.
+    if changed then
+        published_by_player[player_id] = true
+        event_bus.emit(events.PLAYER_ENTITLEMENT_CHANGED, data)
+    end
     return { ok = true, snapshot = data }
 end
 
 function M.init()
     state_by_player = {}
+    published_by_player = {}
     event_bus.handle_request(
         events.PLAYER_ENTITLEMENT_GET_REQUEST,
         get_entitlements

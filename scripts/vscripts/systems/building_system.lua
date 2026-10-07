@@ -1086,18 +1086,26 @@ end
 local function list_buildings(payload)
     local result = {}
     local player_id = tonumber(payload and payload.player_id)
+    local handles_only = payload and payload.handles_only == true
+    local building_id = payload and payload.building_id
     for _, state in pairs(buildings) do
         if valid_entity(state.unit)
             and not state.cleaned
             and (not state.unit.IsAlive or state.unit:IsAlive())
             and not state.constructing
-            and (player_id == nil or state.player_id == player_id) then
-            result[#result + 1] = public_state(state)
+            and (player_id == nil or state.player_id == player_id)
+            and (building_id == nil or state.building_id == building_id) then
+            -- Internal lifecycle consumers need live handles, not route/rank/
+            -- class-count presentation snapshots for every registered tower.
+            result[#result + 1] = handles_only and {
+                unit = state.unit, entindex = state.unit:entindex(),
+                player_id = state.player_id, building_id = state.building_id,
+            } or public_state(state)
         end
     end
-    table.sort(result, function(left, right)
+    if not handles_only then table.sort(result, function(left, right)
         return left.entindex < right.entindex
-    end)
+    end) end
     return { ok = true, buildings = result }
 end
 
@@ -1190,6 +1198,9 @@ local function consume_for_fusion(payload)
 end
 
 local function on_building_changed(payload)
+    -- Damage-only growth cannot change route, footprint or fusion eligibility.
+    -- Otherwise each updated tower triggers a second all-tower refresh here.
+    if payload.stats_only == true then return end
     local state = buildings[payload.entindex]
     if not state or state.cleaned or not valid_entity(state.unit)
         or (state.unit.IsAlive and not state.unit:IsAlive())

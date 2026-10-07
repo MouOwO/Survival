@@ -519,6 +519,7 @@ local function refresh_worker_technology(player_id, refresh_reason)
 end
 
 local function on_technology_stats_changed(payload)
+    if payload and payload.changed_section == "tower" then return end
     local player_id = tonumber(payload and payload.player_id)
     if player_id == nil then return end
     if payload.changed_section == "lumberjack" and payload.changed_field == "attack" then

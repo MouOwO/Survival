@@ -118,4 +118,16 @@ assert(!requests.some(r=>r.n==='ui_lottery_draw_request'||r.n==='ui_lottery_exch
 console.log('LOTTERY_LIVE_SNAPSHOT_PASS: 4 pools, 88 real rewards each, no draw/exchange/purchase');
 `;
 }
+suite+=`
+config.SurvivalLottery.CloseInfo();config.SurvivalLottery.Open();
+const closeStyles=fs.readFileSync('panorama/src/styles/custom_game/lottery_handoff_bb9968eef7.css','utf8');
+assert(/#LotteryMainCanvas #LotteryCloseButton \{[^}]*align:right top/.test(closeStyles),'close button must stay inside the resized canvas');
+assert(/#LotteryMainCanvas #LotteryCloseButton \\.LHCloseGlyph \{[^}]*visibility:visible/.test(closeStyles),'override the old style that hides close labels');
+assert(nodes.LotteryCloseButton.enabled && nodes.LotteryCloseButton.hittest);
+assert.equal(nodes.LotteryCloseButton.children[0].text,'×');
+assert.equal(nodes.LotteryCloseButton.hittestchildren,false);
+nodes.LotteryCloseButton.events.onactivate();
+assert(nodes.LotteryWindow.BHasClass('LotteryClosed'));
+console.log('LOTTERY_CLOSE_PASS: visible glyph, enabled button and close callback');
+`;
 vm.runInNewContext(suite,{require:require('module').createRequire(path.resolve('tools/test_lottery_ui.js')),console},{filename:'lottery_updates_behavior.cjs'});

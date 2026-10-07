@@ -1,0 +1,13 @@
+'use strict';
+const fs=require('fs'),z=require('zlib'),path=require('path');
+const src=process.argv[2],dest=process.argv[3],b=fs.readFileSync(src);
+if(b[2]!==2||![24,32].includes(b[16]))throw Error('Expected uncompressed RGB TGA');
+const w=b.readUInt16LE(12),h=b.readUInt16LE(14),n=b[16]/8,d=Buffer.alloc((w*3+1)*h);
+for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+ const a=18+b[0]+((b[17]&32?y:h-1-y)*w+x)*n,o=y*(w*3+1)+1+x*3;
+ d[o]=b[a+2];d[o+1]=b[a+1];d[o+2]=b[a];
+}
+function chunk(t,v){const c=Buffer.concat([Buffer.from(t),v]);let r=0xffffffff;for(const a of c){r^=a;for(let j=0;j<8;j++)r=(r>>>1)^((r&1)?0xedb88320:0);}const out=Buffer.alloc(c.length+8);out.writeUInt32BE(v.length);c.copy(out,4);out.writeUInt32BE((r^0xffffffff)>>>0,out.length-4);return out;}
+const ih=Buffer.alloc(13);ih.writeUInt32BE(w);ih.writeUInt32BE(h,4);ih[8]=8;ih[9]=2;
+fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',ih),chunk('IDAT',z.deflateSync(d)),chunk('IEND',Buffer.alloc(0))]));
+console.log('TGA_CONVERTED '+w+'x'+h+' '+dest);

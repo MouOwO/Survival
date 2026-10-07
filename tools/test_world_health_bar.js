@@ -1,12 +1,15 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const bars={},tasks=new Map(),listeners=new Map(),config={},table={};
+const costs={layout:0,position:0,visibility:0,entities:0};
 let nextTask=0,nextListener=0,clock=0,valid=true,alive=true,dormant=false;
 let origin=[0,0,0],name='hero',failOrigin=false,containerReady=false;
 let screenX=100,screenY=100,healthBarOffset=190,offsetThrows=false,projectedHeight;
-function panel(id){return {id,style:{},actualuiscale_x:1,actualuiscale_y:1,
+function panel(id){return {id,style:new Proxy({}, {set:(o,k,v)=>{
+    if(k==='position')costs.position++;if(k==='visibility')costs.visibility++;o[k]=v;return true;
+}}),actualuiscale_x:1,actualuiscale_y:1,
     actuallayoutwidth:1920,actuallayoutheight:1080,
     AddClass(){},SetHasClass(){},IsValid(){return !this.deleted},DeleteAsync(){this.deleted=true},
-    GetPositionWithinWindow(){return this.windowOffset||{x:0,y:0}}}}
+    GetPositionWithinWindow(){costs.layout++;return this.windowOffset||{x:0,y:0}}}}
 const container=panel('SurvivalHeroWorldHealthBars'),context=panel('context');
 const $=()=>containerReady?container:null;
 $.GetContextPanel=()=>context;
@@ -17,7 +20,7 @@ const sandbox={
     $,GameUI:{CustomUIConfig:()=>config},Players:{GetTeam:()=>2},
     Game:{GetGameTime:()=>clock,GetLocalPlayerID:()=>0,WorldToScreenX:()=>screenX,
         WorldToScreenY:(_,y,z)=>{projectedHeight=z;return screenY+z-190}},
-    Entities:{IsValidEntity:()=>valid,IsAlive:()=>alive,IsDormant:()=>dormant,
+    Entities:{IsValidEntity:()=>{costs.entities++;return valid},IsAlive:()=>alive,IsDormant:()=>dormant,
         GetAbsOrigin:()=>{if(failOrigin)throw Error('entity removed during frame');return origin},
         GetUnitName:()=>name,GetHealthBarOffset:()=>{if(offsetThrows)throw Error('offset temporarily unavailable');return healthBarOffset}},
     CustomNetTables:{GetAllTableValues:()=>table,
@@ -102,7 +105,11 @@ failOrigin=true;tick();assert.equal(bar().style.visibility,'collapse');
 assert.equal(tasks.size,1,'only the existing frame loop is used');
 failOrigin=false;origin=[10,20,0];tick();assert.equal(bar().style.visibility,'visible');
 valid=false;tick();assert(bar().deleted);
-valid=true;send({});tick();
+// A full-health spawn may never publish another sample. Preserve a packet
+// that reaches Panorama before its entity becomes valid on the client.
+send({});tick();
+valid=true;tick();assert.equal(bar().style.visibility,'visible',
+    'first spawn replication restores the retained packet without another update');
 emit({removed:1});assert(bar().deleted,'construction/removal packets discard the displayed bar');
 send({});tick();assert.equal(bar().style.visibility,'visible','completion state recreates the removed bar');
 const previousBar=bar();
@@ -114,6 +121,28 @@ tick();assert.equal(bar().style.visibility,'visible','hot reload restores replic
 assert.equal(width(),50);
 assert.equal(tasks.size,1);
 assert.equal(typeof config.SurvivalWorldHealthBars.DebugSnapshot,'function');
+// A stationary camera/unit must not invalidate Panorama layout every frame.
+const writesBefore={position:costs.position,visibility:costs.visibility};
+for(let i=0;i<60;i++)tick();
+assert.equal(costs.position,writesBefore.position);
+assert.equal(costs.visibility,writesBefore.visibility);
+// A crowd uses one container geometry capture per frame, rather than per bar.
+for(let i=100;i<200;i++){
+    const key='unit_'+i,value={...state,entindex:i};table[key]=value;
+    [...listeners.values()].forEach(fn=>fn('survival_hero_health_bar',key,value));
+}
+const layoutBefore=costs.layout;tick();assert.equal(costs.layout-layoutBefore,1);
+screenX=2500;const positionsBefore=costs.position;tick();
+assert.equal(costs.position,positionsBefore,'offscreen crowd produces no position writes');
+for(const p of Object.values(bars))if(!p.deleted)assert.equal(p.style.visibility,'collapse');
+screenX=100;tick();assert.equal(bar().style.visibility,'visible','camera return restores bars in the next frame');
+send({alive:0});const deadChecks=costs.entities;
+for(const key of Object.keys(table)){
+    if(key==='unit_42')continue;
+    [...listeners.values()].forEach(fn=>fn('survival_hero_health_bar',key,{...table[key],alive:0}));
+}
+for(let i=0;i<30;i++)tick();
+assert.equal(costs.entities,deadChecks,'dead snapshots perform no native checks or projections');
 context.deleted=true;tick();
 assert.equal(tasks.size,0,'a disposed root cancels the frame loop');
 assert.equal(listeners.size,0,'a disposed root unsubscribes its nettable listener');

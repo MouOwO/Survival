@@ -21,7 +21,8 @@ local trial_bases = {
     ice_vortex = "trial/frost_ground",
 }
 local portal_bases = { io_blue_portal = "ice_portal", io_amber_portal = "amber_portal" }
-local portal_layers = { "ground", "dark_center", "interior", "sparkles" }
+-- Each portal now owns the complete native parent/child particle graph.
+local portal_layers = { "native_full/ground" }
 -- Native Shadow Dance smoke bundle, without Slark-specific eye attachments.
 local ultimate_shadow = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
 -- Bulldoze's persistent foot layers; omit its body/hand effects and cast flash.
@@ -85,6 +86,22 @@ local function add_ultimate_shadow(entry)
         Vector(origin.x, origin.y, origin.z + 80), true)
 end
 
+local function add_portal(entry, portal, radius)
+    local unit = entry.unit
+    local id = ParticleManager:CreateParticle(prefix .. portal .. "/native_full/ground.vpcf",
+        PATTACH_ABSORIGIN_FOLLOW, unit)
+    assert(type(id) == "number" and id >= 0, "native portal returned no valid ID")
+    entry.particles[#entry.particles + 1] = id
+    local origin = unit:GetAbsOrigin()
+    -- Native CP1 is a world-space center, not our former radius/alpha vector.
+    -- Children inherit it from the root's native particle anchor.
+    for _, point in ipairs({0, 1}) do
+        ParticleManager:SetParticleControlEnt(id, point, unit,
+            PATTACH_ABSORIGIN_FOLLOW, "", origin, true)
+    end
+    ParticleManager:SetParticleControl(id, 3, Vector(radius, 0, 0))
+end
+
 local function add_machine_base(entry, ring_only)
     for offset, path in ipairs(machine_base) do
         if not ring_only or offset == 2 then
@@ -116,6 +133,7 @@ local function add_anti_air_base(entry)
 end
 
 function M.apply(state)
+    if state and state.stats_only == true then return end
     local rank = projection.project(state)
     local unit = state and state.unit
     if not rank or not valid(unit) then return false end
@@ -197,11 +215,7 @@ function M.apply(state)
         -- A replacement owns the whole base, including former detail/crown art.
         local portal = portal_bases[native_base]
         if portal then
-            -- Bind every layer explicitly. An invisible empty parent must not
-            -- decide the visibility or CP inheritance of the permanent base.
-            for _, layer in ipairs(portal_layers) do
-                add(entry, portal .. "/" .. layer, radius, profile.alpha, color)
-            end
+            add_portal(entry, portal, radius)
             return
         end
         local trial = trial_bases[native_base]

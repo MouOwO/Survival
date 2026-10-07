@@ -1,0 +1,12 @@
+{
+  "id": "C07",
+  "parent": "J04",
+  "changes": {
+    "card": "quiet"
+  },
+  "config": {
+    "header": "warm-mist",
+    "seam": "soft",
+    "card": "quiet"
+  }
+}

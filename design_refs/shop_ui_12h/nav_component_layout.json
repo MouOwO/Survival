@@ -1,0 +1,68 @@
+{
+  "hitArea": {
+    "width": 320,
+    "height": 96,
+    "unchanged": true
+  },
+  "selectedBase": {
+    "file": "assets/nav_selected.png",
+    "width": 320,
+    "height": 96,
+    "visibleBounds": [
+      6,
+      4,
+      308,
+      92
+    ],
+    "cornerCut": 4,
+    "material": {
+      "finish": "matte ivory",
+      "grainOpacity": 0.055,
+      "grainSeed": 19,
+      "edge": "shallow bevel",
+      "relief": "faint cloud motif"
+    }
+  },
+  "selectedGlow": {
+    "file": "assets/nav_selected_glow.png",
+    "width": 340,
+    "height": 116,
+    "position": [
+      -10,
+      -10
+    ],
+    "extendsBeyondHitArea": 10,
+    "blocksInput": false
+  },
+  "selectedLine": {
+    "file": "assets/nav_selected_line.png",
+    "width": 320,
+    "height": 2,
+    "position": [
+      0,
+      94
+    ],
+    "align": "bottom",
+    "blocksInput": false
+  },
+  "layerOrder": [
+    "continuousSidebar",
+    "stateBase",
+    "selectedGlow",
+    "iconAndLabel",
+    "bottomLine"
+  ],
+  "normalBase": {
+    "file": "assets/nav_normal.png",
+    "transparentExceptSeparator": true
+  },
+  "hoverBase": {
+    "file": "assets/nav_hover.png",
+    "transparentGradient": true
+  },
+  "reuse": [
+    "shop",
+    "save",
+    "otherSideNavigation"
+  ]
+}

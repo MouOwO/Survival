@@ -1,0 +1,14 @@
+{
+  "id": "I10",
+  "parent": "C09",
+  "changes": {
+    "itemShadow": 0.55
+  },
+  "config": {
+    "header": "warm-mist",
+    "seam": "soft",
+    "card": "quiet",
+    "cardShadow": 0.62,
+    "itemShadow": 0.55
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "group": "03_card_material",
+  "best": "C07",
+  "entries": [
+    {
+      "id": "C05",
+      "result": "淘汰",
+      "improvement": "象牙更暖，卡体保留玉石雕刻感",
+      "cost": "原厚边框与底部双线仍过重"
+    },
+    {
+      "id": "C06",
+      "result": "淘汰",
+      "improvement": "明显扁平化，减少外边与高光",
+      "cost": "浅色物品与底板层次过弱，失去浅玉质感"
+    },
+    {
+      "id": "C07",
+      "result": "保留",
+      "improvement": "细边框与较浅浮雕平衡商品轮廓，接近风格锚点",
+      "cost": "仍有微弱云纹，非纯白平面"
+    }
+  ],
+  "at": "2026-10-06T16:21:29.797Z",
+  "kind": "assembled_component_browser_preview",
+  "hash": "bc6a5573c2e0b822fa628b72ec776cd1e4f75957ea303a17cce5b750167c8e31"
+}

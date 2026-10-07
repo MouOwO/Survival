@@ -1,0 +1,974 @@
+/* Shared candidate theme. frame.window is a programmatic fallback pending clean approved art. */
+.UIClosed {display:none;}
+.UIModal {background-color:#EFEADF;border:1px solid #C7B88F;}
+.UIModalHeader {background-color:#173743;}
+.UIModalScrim {width:100%;height:100%;background-color:#0000008c;}
+.UIModal .label,.UIFullscreen .label,.UIHUDShell .label {text-shadow:none;}
+.UIIcon {width:28px;height:28px;left:50%;top:50%;transform:translate(-50%,-50%);overflow:visible;}
+.UIIconButton {width:56px;height:64px;background-color:transparent;border:0px;}
+.UIIconButton .UIIcon {transform:none;margin-top:5px;}
+.UIIconButton .UIIconLabel {width:100%;bottom:0;top:auto;text-align:center;font-size:16px;color:#D0D6D5;}
+.UIIconButton:hover,.UICloseButton:hover {filter:brightness(1.12);}
+.UIIconButton:active,.UICloseButton:active {filter:brightness(.9);}
+.UICloseButton {width:44px;height:44px;}
+.UIDisabled,.UIIconButton.UIDisabled {opacity:.45;}
+.UIBusy {filter:brightness(.65);}
+.UIActionButton {width:240px;height:56px;background-size:100% 100%;background-color:transparent;border:0px;transition-property:brightness;transition-duration:.1s;}
+.UIActionButton .label {left:50%;top:50%;transform:translate(-50%,-50%);color:#203E4A;font-size:18px;}
+.UIActionButton .UIIcon {transform:none;margin-left:20px;}
+.UIActionButton.UIIvory {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/ivory/normal.png");}
+.UIActionButton.UIIvory:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/ivory/hover.png");}
+.UIActionButton.UIIvory:active {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/ivory/pressed.png");}
+.UIActionButton.UIIvory.UIDisabled,.UIActionButton.UIIvory.UIDisabled,.UIActionButton.UIIvory.UIBusy {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/ivory/disabled.png");}
+.UIActionButton.UIGold {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/normal.png");}
+.UIActionButton.UIGold:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/hover.png");}
+.UIActionButton.UIGold:active {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/pressed.png");}
+.UIActionButton.UIGold.UIDisabled,.UIActionButton.UIGold.UIDisabled,.UIActionButton.UIGold.UIBusy {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/disabled.png");}
+.UINavToggle {width:225px;height:70px;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/normal.png");background-size:100% 100%;border:0px;}
+.UINavToggle:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/hover.png");}
+.UINavToggle:active {filter:brightness(.9);}
+.UINavToggle:selected,.UINavToggle.UISelected,.UINavToggle:selected:hover,.UINavToggle.UISelected:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/selected.png");}
+.UINavToggle.UIDisabled {opacity:.45;}
+.UINavToggle .RadioBox {display:none;}
+.UINavToggle .label {top:50%;transform:translateY(-50%);margin-left:58px;color:#D0D6D5;font-size:20px;}
+.UINavToggle:selected .label,.UINavToggle.UISelected .label {color:#203E4A;}
+.UINavToggle .UIIcon {transform:none;margin-left:20px;}
+.UITabBar {width:100%;height:56px;display:flex;flex-direction:row;;}
+.UITab {width:200px;height:56px;background-color:#173743;background-position:bottom;background-repeat:no-repeat;background-size:100% 24px;}
+.UITab .label {left:50%;top:50%;transform:translate(-50%,-50%);font-size:20px;color:#D0D6D5;}
+.UITab:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/overlay/tab_hover_overlay.png");}
+.UITab:active {filter:brightness(.9);}
+.UITab.UIDisabled {opacity:.45;}
+.UITab.UISelected,.UITab.Selected,.UITab.UISelected:hover,.UITab.Selected:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/overlay/tab_selected_overlay.png");}
+.UITab.UISelected .label,.UITab.Selected .label {color:#fff0c8;}
+.UICard {display:block;}
+.UICardSquare {width:167px;height:157px;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/card/body/ivory.png");background-size:100% 100%;background-color:#EFEADF;border:0px;}
+.UICardSquare:hover {filter:brightness(1.04);}
+.UICardSquare.UISelected,.UICardSquare.UISelected:hover {wash-color:#fff1d0;}
+.UICardProduct {width:280px;height:170px;background-color:#EFEADF;border:1px solid #c7b88f66;display:flex;flex-direction:column;;}
+.UICardProduct:hover {border-color:#C7B88F;}
+.UICardAugment:hover {transform:translateY(-4px) scale3d(1.035,1.035,1);}
+.UICardArt {width:96px;height:96px;align:center top;margin-top:8px;}
+.UICardTitle {width:100%;bottom:0;top:auto;color:#203E4A;text-align:center;font-size:18px;}
+.UIProgressBadge {right:0;left:auto;transform:none;color:#D0D6D5;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/badge/progress.png");background-size:100% 100%;width:70px;height:22px;text-align:center;font-size:15px;}
+.UIUnlockLabel {bottom:0;top:auto;font-size:14px;color:#203E4A;}
+.UIPriceLabel {display:flex;flex-direction:row;;}
+.UIPrice,.UIPriceMode,.UIOriginalPrice,.UICaption {color:#203E4A;font-size:16px;margin-right:8px;}
+.UIOriginalPrice {text-decoration:line-through;opacity:.65;}
+.UIBundleItem {display:flex;flex-direction:row;;height:36px;}
+.UIBundleArt {width:32px;height:32px;}
+.UIProgressBar {width:260px;height:20px;background-color:#173743;}
+.UIProgressFill {height:100%;background-color:#83B8AC;}
+.UIProgressLabel {width:100%;text-align:center;color:#D0D6D5;}
+.UICheckbox {width:200px;height:38px;}
+.UICheckbox .TickBox {display:none;}
+.UICheckOff,.UICheckOn {transform:none;top:50%;transform:translateY(-50%);}
+.UICheckbox .UICheckOn {display:none;}
+.UICheckbox:selected .UICheckOn {visibility:visible;}
+.UICheckbox:selected .UICheckOff {display:none;}
+.UICheckbox .label {margin-left:34px;top:50%;transform:translateY(-50%);font-size:16px;color:#D0D6D5;}
+.UICheckbox.UIDisabled {opacity:.5;}
+.UICheckbox:hover {filter:brightness(1.12);}
+.UICheckbox:active {filter:brightness(.9);}
+.UICheckOn {background-position:center;background-repeat:no-repeat;background-size:122.2222% 122.2222%;}
+.UICheckbox:selected:hover .UICheckOn {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/checkbox/on/hover.png");}
+.UICheckbox:selected:active .UICheckOn {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/checkbox/on/pressed.png");}
+.UICheckbox:selected.UIDisabled .UICheckOn,.UICheckbox.checked.UIDisabled .UICheckOn {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/checkbox/on/disabled.png");}
+.UICheckbox:selected:hover .UICheckOn .UIIconImage,.UICheckbox:selected:active .UICheckOn .UIIconImage,.UICheckbox:selected.UIDisabled .UICheckOn .UIIconImage,.UICheckbox.checked.UIDisabled .UICheckOn .UIIconImage {display:none;}
+/* Outline skin uses the packaged state frames without a second baked-in border. */
+.UICardSquare.UIOutlineCard {background-image:none;border:0px;}
+.UICardSquare.UIOutlineCard:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/card/border/hover.png");}
+.UICardSquare.UIOutlineCard.UISelected,.UICardSquare.UIOutlineCard.UISelected:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/card/border/selected.png");border:0px;}
+.UITooltip {background-color:#173743;border:1px solid #C7B88F;}
+.UIFilterBar {width:100%;height:42px;display:flex;flex-direction:row;;}
+.UISearch {width:220px;height:36px;}
+.UIRewardGrid {width:100%;height:100%;display:flex;flex-direction:row;flex-wrap:wrap;overflow-x:hidden;overflow-y:auto;}
+.UIReadingGradient {width:100%;height:100%;background-color:gradient(linear,0% 0%,100% 0%,from(#10232a55),to(#10232a00));z-index:-1;}
+/* Existing layouts keep their data slots; the shell chrome is shared. */
+#ArchiveWindow.UIModal,#CustomShopWindow.UIModal,#LotteryInfoDialog.UIModal {background-image:none;background-color:#EFEADF;border:1px solid #C7B88F;border-radius:6px;}
+#ArchiveHeader.UIModalHeader,#ShopHeader.UIModalHeader,#LotteryInfoHeader.UIModalHeader {background-image:none;background-color:#173743;border-bottom:1px solid #C7B88F;}
+#ArchiveWindow.UIModal #ArchiveHeader {width:100%;}
+#ArchiveWindow.UIModal #ArchiveTabs {background-color:#173743;}
+#ArchiveWindow.UIModal .ArchiveNineCard {display:none;}
+#ArchiveWindow.UIModal .ArchiveCard.UICardSquare {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/card/body/ivory.png");border:0px;}
+#ArchiveWindow.UIModal .ArchiveCard.UICardSquare:hover {border-color:#C7B88F;}
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/normal.png");}
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/hover.png");}
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle:selected,#ArchiveWindow.UIModal .ArchiveTab.UINavToggle:selected:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/selected.png");}
+#CustomShopWindow.UIModal {width:1208px;height:806px;left:50%;top:50%;transform:translate(-50%,-50%);position:absolute;left:0px;top:0px;margin:0px;padding:0px;display:flex;flex-direction:column;;opacity:1;transition-duration:0s;}
+#CustomShopWindow.UIModal #ShopHeader {height:94px;width:100%;padding:14px 18px;}
+#CustomShopWindow.UIModal #ShopModeToggles {width:300px;}
+#CustomShopWindow.UIModal .ShopModeToggle {width:96px;}
+#CustomShopWindow.UIModal #ShopBody {width:100%;height:fill-parent-flow(1);margin:0px;}
+#CustomShopWindow.UIModal #ShopShelfArea {background-color:#EFEADF;border:0px;}
+#CustomShopWindow.UIModal #ShopFooter {height:62px;background-color:#173743;}
+#CustomShopWindow.UIModal .ShopShelfSlot.UICardProduct {width:96px;height:76px;display:block;}
+#CustomShopWindow.UIModal #ShopTitle {color:#D0D6D5;}
+#LotteryInfoDialog.UIModal .LotteryModalSurface,#LotteryInfoDialog.UIModal .LotteryV3ModalFrame,#LotteryInfoDialog.UIModal .LotteryNineFrame {display:none;}
+#LotteryInfoDialog.UIModal #LotteryInfoHeader {width:100%;height:88px;padding:8px 26px;}
+#LotteryInfoDialog.UIModal #LotteryInfoBody {background-color:#EFEADF;}
+#LotteryInfoDialog.UIModal #LotteryInfoTitle {color:#D0D6D5;}
+.MainHudIconButton.UIIconButton .UIIcon {left:50%;transform:translateX(-50%);transform:none;position:absolute;left:0px;top:0px;}
+.MainHudIconButton.UIIconButton .UIIconImage {transform:none;transform:none;}
+#LotteryInfoDialog.UIModal #LotteryNineSlice {display:none;}
+#LotteryWindow .UITab .LotteryTabMark {display:none;}
+#LotteryWindow .LotteryPoolTab.UITab {background-size:100% 24px;background-position:bottom;background-color:#173743;}
+#LotteryWindow .LotteryPoolTab.UITab:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/overlay/tab_hover_overlay.png");}
+#LotteryWindow .LotteryPoolTab.UITab.Selected,#LotteryWindow .LotteryPoolTab.UITab.Selected:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/overlay/tab_selected_overlay.png");}
+#LotteryInfoDialog.UIModal .LotteryDetailRow.UICardSquare {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/card/body/ivory.png");background-color:#EFEADF;border:0px;}
+#LotteryInfoDialog.UIModal .LotteryDetailRow.UICardSquare.Selected {wash-color:#fff1d0;}
+#ArchiveWindow.UIModal #ArchiveDraw {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/normal.png");}
+#ArchiveWindow.UIModal #ArchiveDraw:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/hover.png");}
+#ArchiveWindow.UIModal #ArchiveDraw:active {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/pressed.png");}
+#ArchiveWindow.UIModal #ArchiveDraw.UIDisabled {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/disabled.png");}
+#CustomShopWindow.UIModal #ShopRefreshButton {background-color:transparent;border:0px;}
+#CustomShopWindow.UIModal #ShopRefreshButton .label {color:#203E4A;}
+#CustomShopWindow.UIModal .ShopSectionTitle,#CustomShopWindow.UIModal #ShopLoading .label {color:#203E4A;}
+#ArchiveWindow.UIModal .ArchivePromote.UIActionButton {width:100px;height:23px;}
+#ArchiveWindow.UIModal .ArchivePromote.UIActionButton .label {font-size:13px;}
+
+
+.UIIconButton.PreviewHover,.UICloseButton.PreviewHover {filter:brightness(1.12);}
+
+.UIIconButton.PreviewPressed,.UICloseButton.PreviewPressed {filter:brightness(.9);}
+
+.UIActionButton.UIIvory.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/ivory/hover.png");}
+
+.UIActionButton.UIIvory.PreviewPressed {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/ivory/pressed.png");}
+
+.UIActionButton.UIGold.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/hover.png");}
+
+.UIActionButton.UIGold.PreviewPressed {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/pressed.png");}
+
+.UINavToggle.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/hover.png");}
+
+.UINavToggle.PreviewPressed {filter:brightness(.9);}
+
+.UINavToggle:selected,.UINavToggle.UISelected,.UINavToggle:selected.PreviewHover,.UINavToggle.UISelected.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/selected.png");}
+
+.UITab.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/overlay/tab_hover_overlay.png");}
+
+.UITab.PreviewPressed {filter:brightness(.9);}
+
+.UITab.UISelected,.UITab.Selected,.UITab.UISelected.PreviewHover,.UITab.Selected.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/overlay/tab_selected_overlay.png");}
+
+.UICardSquare.PreviewHover {filter:brightness(1.04);}
+
+.UICardSquare.UISelected,.UICardSquare.UISelected.PreviewHover {wash-color:#fff1d0;}
+
+.UICardProduct.PreviewHover {border-color:#C7B88F;}
+
+.UICardAugment.PreviewHover {transform:translateY(-4px) scale3d(1.035,1.035,1);}
+
+.UICheckbox.PreviewHover {filter:brightness(1.12);}
+
+.UICheckbox.PreviewPressed {filter:brightness(.9);}
+
+.UICheckbox:selected.PreviewHover .UICheckOn {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/checkbox/on/hover.png");}
+
+.UICheckbox:selected.PreviewPressed .UICheckOn {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/checkbox/on/pressed.png");}
+
+.UICheckbox:selected.PreviewHover .UICheckOn .UIIconImage,.UICheckbox:selected.PreviewPressed .UICheckOn .UIIconImage,.UICheckbox:selected.UIDisabled .UICheckOn .UIIconImage,.UICheckbox.checked.UIDisabled .UICheckOn .UIIconImage {display:none;}
+
+.UICardSquare.UIOutlineCard.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/card/border/hover.png");}
+
+.UICardSquare.UIOutlineCard.UISelected,.UICardSquare.UIOutlineCard.UISelected.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/card/border/selected.png");border:0px;}
+
+#ArchiveWindow.UIModal .ArchiveCard.UICardSquare.PreviewHover {border-color:#C7B88F;}
+
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/hover.png");}
+
+#ArchiveWindow.UIModal .ArchiveTab.UINavToggle:selected,#ArchiveWindow.UIModal .ArchiveTab.UINavToggle:selected.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/nav/toggle/selected.png");}
+
+#LotteryWindow .LotteryPoolTab.UITab.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/overlay/tab_hover_overlay.png");}
+
+#LotteryWindow .LotteryPoolTab.UITab.Selected,#LotteryWindow .LotteryPoolTab.UITab.Selected.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/overlay/tab_selected_overlay.png");}
+
+#ArchiveWindow.UIModal #ArchiveDraw.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/hover.png");}
+
+#ArchiveWindow.UIModal #ArchiveDraw.PreviewPressed {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/ui/shared/button/gold/pressed.png");}
+/* Approved 1672x941 design canvas. Only the main page is restyled. */
+#LotteryWindow { background-image:none; background-color:#122d3a; border:0px; padding:0px; overflow:hidden; }
+#LotteryMainCanvas { width:1672px;height:941px;left:50%;top:50%;transform:translate(-50%,-50%);display:block;overflow:visible;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/scene.png");background-size:100% 100%; }
+#LotteryMainCanvas #LotteryReadingMask { width:100%;height:100%;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/frame_reading_overlay.png");background-size:100% 100%;background-color:transparent; }
+#LotteryMainCanvas .LHControls .label { font-family:"Source Han Sans SC";font-weight:400;font-size:25px;color:#f0e7d0;text-shadow:none;letter-spacing:0px; }
+#LotteryMainCanvas .LHControls .button { margin:0px;padding:0px;border:0px;background-color:transparent;box-shadow:none;display:block;border-radius:0px;transition-property:brightness;transition-duration:.1s; }
+#LotteryMainCanvas .LHControls .button:active { transform:none; }
+#LotteryMainCanvas #LotteryCelestialHeader { width:100%;height:100px;padding:0px;margin:0px;display:block;background-color:transparent;border:0px; }
+#LotteryMainCanvas .LHLogo { position:absolute;left:27px;top:5px;width:80px;height:80px;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/logo.png");background-size:100% 100%; }
+#LotteryMainCanvas #LotteryBrand { position:absolute;left:117px;top:18px;width:210px;height:60px;margin:0px;transform:none;font-family:"Source Han Serif SC";font-weight:bold;font-size:34px; }
+#LotteryMainCanvas #LotteryPoolTabs { position:absolute;left:323px;top:0px;width:628px;height:100px;margin:0px;display:flex;flex-direction:row;;overflow:visible; }
+#LotteryMainCanvas #LotteryPoolTabs .LHMainTab { width:157px;height:100px;min-width:0px;margin:0px;padding:0px;border:0px;background-image:none;background-color:transparent;box-shadow:none;overflow:visible; }
+#LotteryMainCanvas #LotteryPoolTabs .LotteryPoolTabName { align:center top;margin:32px 0px 0px;font-size:25px;color:#f0e7d0;z-index:1; }
+#LotteryMainCanvas #LotteryPoolTabs .LotteryPoolBadge { align:right top;margin:7px 4px 0px 0px;padding:1px 9px;width:110px;height:27px;font-size:13px;text-align:center;color:#594a31;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/badge_discount.png");background-size:100% 100%;background-color:transparent;border-radius:0px;z-index:2; }
+#LotteryMainCanvas #LotteryPoolTabs .LHMainTab:hover { background-image:none;background-color:transparent;filter:brightness(1.12);z-index:3; }
+#LotteryMainCanvas #LotteryPoolTabs .LotteryPoolTab:first-child .LotteryPoolBadge { display:none; }
+#LotteryMainCanvas #LotteryPoolTabs .LotteryTabMark { display:none; }
+#LotteryMainCanvas .LHTabGlow { width:155px;height:46px;position:absolute;left:0px;top:54px;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/tab_glow.png");background-size:100% 100%;display:none; }
+#LotteryMainCanvas .Selected .LHTabGlow { visibility:visible; }
+#LotteryMainCanvas #LotteryWallet { position:absolute;left:0px;top:0px;width:260px;height:44px;padding:0px;margin:26px 88px 0px 0px;display:block;align:right top;background-color:#193949dd;border:0px;border-radius:8px; }
+#LotteryMainCanvas .LHTicket { position:absolute;left:1px;top:-1px;width:53px;height:47px;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/ticket_illustrated.png");background-size:contain;opacity-mask:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/ticket_silhouette.svg"); }
+#LotteryMainCanvas #LotteryTicketValue { position:absolute;left:55px;top:6px;width:165px;height:36px;font-size:20px;text-overflow:ellipsis; }
+#LotteryMainCanvas #LotteryTicketPurchase { position:absolute;left:220px;top:2px;width:32px;height:39px; }
+#LotteryMainCanvas .LHPlus { width:100%;height:100%;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/currency_plus_normal.png");background-size:100% 100%; }
+#LotteryMainCanvas #LotteryCloseButton { position:absolute;left:0px;top:0px;width:48px;height:48px;align:right top;ignore-parent-flow:true;margin:22px 22px 0px 0px;z-index:20;background-color:#122d3aee;border:1px solid #cfbb86; }
+#LotteryMainCanvas #LotteryCloseButton .LHCloseGlyph { visibility:visible;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;height:100%;text-align:center;font-size:40px;line-height:44px;color:#f0e7d0; }
+#LotteryMainCanvas .LHClose { width:100%;height:100%;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/close_normal.png");background-size:100% 100%; }
+#LotteryMainCanvas #LotteryHeroCopy { position:absolute;left:202px;top:230px;width:690px;height:330px;margin:0px;display:block; }
+#LotteryMainCanvas #LotteryAnnouncement { position:absolute;left:8px;top:0px;height:38px;padding:0px;background-color:transparent; }
+#LotteryMainCanvas #LotteryAnnouncement .label { font-size:20px; }
+#LotteryMainCanvas #LotteryTitle { position:absolute;left:0px;top:15px;width:690px;height:152px;margin:0px;font-family:"Source Han Serif SC";font-weight:bold;font-size:112px; }
+#LotteryMainCanvas #LotteryTagline { position:absolute;left:6px;top:166px;margin:0px;font-size:34px; }
+#LotteryMainCanvas #LotteryGuaranteeRow { position:absolute;left:8px;top:234px;width:350px;height:49px;display:block;background-color:transparent;background-image:none;border:0px;border-radius:0px; }
+#LotteryMainCanvas #LotteryGuaranteeValue { left:0;top:0;margin:0px;font-size:24px;color:#ece3cb; }
+#LotteryMainCanvas .LHGuaranteeText { display:flex;flex-direction:row;; }
+#LotteryMainCanvas #LHGuaranteeQuality { margin-left:9px;font-size:24px;color:#e2b779; }
+#LotteryMainCanvas .LHGuaranteeLine { position:absolute;left:0px;top:47px;width:180px;height:1px;background-color:gradient(linear,0% 0%,100% 0%,from(#cebb8800),color-stop(.3,#cebb88bb),color-stop(.7,#cebb88bb),to(#cebb8800)); }
+#LotteryMainCanvas #LotteryCelestialFooter { position:absolute;left:0px;top:815px;left:0;top:0;width:100%;height:126px;padding:0px;margin:0px;display:block;background-color:transparent;border:0px; }
+#LotteryMainCanvas #LHDetails { position:absolute;left:55px;top:30px;width:184px;height:60px;display:flex;flex-direction:row;; }
+#LotteryMainCanvas #LHHistory { position:absolute;left:265px;top:30px;width:190px;height:60px;display:flex;flex-direction:row;; }
+#LotteryMainCanvas #LHDetails .label,#LotteryMainCanvas #LHHistory .label { top:50%;transform:translateY(-50%);margin-left:6px; }
+#LotteryMainCanvas .LHDetailsIcon { width:48px;height:55px;top:50%;transform:translateY(-50%);background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/pool_details_icon_normal.png");background-size:100% 100%; }
+#LotteryMainCanvas .LHHistoryIcon { width:53px;height:59px;top:50%;transform:translateY(-50%);background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/history_icon_normal.png");background-size:100% 100%; }
+#LotteryMainCanvas .LHUtilityDivider { position:absolute;left:240px;top:50px;width:1px;height:27px;background-color:#d8c79c99; }
+#LotteryMainCanvas #LotterySkipAnimation { position:absolute;left:621px;top:36px;width:220px;height:49px;transform:none;display:flex;flex-direction:row;;margin:0px;padding:0px; }
+#LotteryMainCanvas #LotterySkipAnimation .TickBox { visibility:visible;width:49px;height:49px;margin:0px;border:0px;box-shadow:none;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/skip_checkbox_normal.png");background-size:100% 100%;background-color:transparent; }
+#LotteryMainCanvas #LotterySkipAnimation .UICheckOff,#LotteryMainCanvas #LotterySkipAnimation .UICheckOn { display:none; }
+#LotteryMainCanvas #LotterySkipAnimation:selected .TickBox { background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/checkbox_checked_normal.png");background-color:transparent; }
+#LotteryMainCanvas #LotterySkipAnimation .label { font-size:24px;margin:0px 0px 0px 7px;top:50%;transform:translateY(-50%); }
+/* Static img bases never change source or opacity during pointer transitions.
+   The hit target stays fixed; only its non-interactive visual child responds. */
+#LotteryMainCanvas #LotterySingleButton,#LotteryMainCanvas #LotteryTenButton,
+#LotteryMainCanvas #LotterySingleButton:hover,#LotteryMainCanvas #LotteryTenButton:hover,
+#LotteryMainCanvas #LotterySingleButton:active,#LotteryMainCanvas #LotteryTenButton:active,
+#LotteryMainCanvas #LotterySingleButton.UIDisabled,#LotteryMainCanvas #LotteryTenButton.UIDisabled { width:312px;height:72px;background-image:none;border:0px;background-color:transparent;filter:brightness(1);saturation:1;opacity:1;box-shadow:none;transition-duration:0s;transform:none; }
+#LotteryMainCanvas #LotterySingleButton { position:absolute;left:969px;top:35px; }
+#LotteryMainCanvas #LotteryTenButton { position:absolute;left:1297px;top:35px; }
+#LotteryMainCanvas .LHDrawVisual { width:312px;height:72px;display:block;transform:none;filter:brightness(1);saturation:1;transition-property:brightness,transform;transition-duration:.08s; }
+#LotteryMainCanvas .LHDrawBase { width:312px;height:72px;opacity:1;visibility:visible; }
+#LotteryMainCanvas .LHSingleHover,#LotteryMainCanvas .LHTenHover { width:312px;height:72px;opacity:0;transition-property:opacity;transition-duration:.08s; }
+#LotteryMainCanvas .LHSingleHover { background-color:#e8c780;opacity-mask:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/single_button.png"); }
+#LotteryMainCanvas #LotterySingleButton:enabled:hover .LHSingleHover { opacity:.3; }
+#LotteryMainCanvas #LotteryTenButton:enabled:hover .LHTenHover { opacity:1; }
+#LotteryMainCanvas #LotterySingleButton:enabled:hover .LHDrawVisual { filter:brightness(1.12); }
+#LotteryMainCanvas #LotterySingleButton:enabled:active .LHDrawVisual,#LotteryMainCanvas #LotteryTenButton:enabled:active .LHDrawVisual { transform:translate3d(0px,2px,0px);filter:brightness(.86);transition-duration:.025s; }
+#LotteryMainCanvas #LotterySingleButton.UIDisabled .LHDrawVisual,#LotteryMainCanvas #LotteryTenButton.UIDisabled .LHDrawVisual { transform:none;filter:brightness(.72);saturation:.3;transition-duration:0s; }
+#LotteryMainCanvas #LotterySingleButton.UIDisabled .LHSingleHover,#LotteryMainCanvas #LotteryTenButton.UIDisabled .LHTenHover { opacity:0;transition-duration:0s; }
+#LotteryMainCanvas .LHDrawCaption { left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:row;;margin:0px 0px 6px 38px; }
+#LotteryMainCanvas #LotterySingleText,#LotteryMainCanvas #LotteryTenText,#LotteryMainCanvas #LHTenQuality { align:left center;margin:0px;padding:0px;font-size:27px;font-weight:500;color:#365665; }
+#LotteryMainCanvas #LotteryTenText { color:#fff9e5;text-shadow:none; }
+#LotteryMainCanvas #LHTenQuality { margin-left:9px;color:#855521; }
+#LotteryMainCanvas #LHTenQuality.LHQualitySR,#LotteryMainCanvas #LHGuaranteeQuality.LHQualitySR { color:#a16be0; }
+#LotteryMainCanvas #LHTenQuality.LHQualityUR { color:#9b435d; }
+#LotteryMainCanvas .LHDrawTicket { position:absolute;left:25px;top:8px;width:53px;height:47px;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/ticket_illustrated.png");background-size:contain;opacity-mask:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/ticket_silhouette.svg"); }
+#LotteryMainCanvas #LotteryCelestialFooter .LHCost { align:left bottom;margin:0px 0px 8px 41px;font-size:14px;color:#263f49;text-shadow:none; }
+#LotteryMainCanvas #LotteryStatus { position:absolute;left:55px;top:810px;left:0;top:0;margin:0px;width:850px;height:26px;font-size:15px; }
+#LotteryMainCanvas #LotteryStatus.LHIdle { display:none; }
+.LotteryResultsShown #LotteryMainCanvas #LotteryHeroCopy,.LotteryResultsShown #LotteryMainCanvas #LotteryCelestialFooter,.LotteryResultsShown #LotteryMainCanvas .LHLogo { display:none; }
+.LotteryResultsShown #LotteryMainCanvas #LotteryStatus { position:absolute;left:0px;top:894px;width:100%;text-align:center; }
+
+
+#LotteryMainCanvas .LHControls .button.PreviewPressed { transform:none; }
+
+#LotteryMainCanvas #LotteryPoolTabs .LHMainTab.PreviewHover { background-image:none;background-color:transparent;filter:brightness(1.12);z-index:3; }
+
+/* Static img bases never change source or opacity during pointer transitions.
+   The hit target stays fixed; only its non-interactive visual child responds. */
+#LotteryMainCanvas #LotterySingleButton,#LotteryMainCanvas #LotteryTenButton,
+#LotteryMainCanvas #LotterySingleButton.PreviewHover,#LotteryMainCanvas #LotteryTenButton.PreviewHover,
+#LotteryMainCanvas #LotterySingleButton.PreviewPressed,#LotteryMainCanvas #LotteryTenButton.PreviewPressed,
+#LotteryMainCanvas #LotterySingleButton.UIDisabled,#LotteryMainCanvas #LotteryTenButton.UIDisabled { width:312px;height:72px;background-image:none;border:0px;background-color:transparent;filter:brightness(1);saturation:1;opacity:1;box-shadow:none;transition-duration:0s;transform:none; }
+
+#LotteryMainCanvas #LotterySingleButton:enabled.PreviewHover .LHSingleHover { opacity:.3; }
+
+#LotteryMainCanvas #LotteryTenButton:enabled.PreviewHover .LHTenHover { opacity:1; }
+
+#LotteryMainCanvas #LotterySingleButton:enabled.PreviewHover .LHDrawVisual { filter:brightness(1.12); }
+
+#LotteryMainCanvas #LotterySingleButton:enabled.PreviewPressed .LHDrawVisual,#LotteryMainCanvas #LotteryTenButton:enabled.PreviewPressed .LHDrawVisual { transform:translate3d(0px,2px,0px);filter:brightness(.86);transition-duration:.025s; }
+.RHWindow {display:block;padding:0px;overflow:visible;}
+.RHWindow .label {font-family:"Source Han Sans SC";font-weight:400;color:#294d5b;text-shadow:none;letter-spacing:0px;}
+.RHFrame {width:100%;height:100%;z-index:0;}
+.RHFrame img {ignore-parent-flow:true;}
+.RHClose {width:40px;height:40px;background-color:transparent;background-image:none;border:0px;box-shadow:none;transition-property:brightness;transition-duration:.08s;}
+.RHCloseImage {width:100%;height:100%;opacity:0;}
+.RHClose_normal {opacity:1;}
+.RHClose:hover .RHClose_hover {opacity:1;}
+.RHClose:active .RHClose_pressed {opacity:1;}
+.RHWindow VerticalScrollBar {width:8px;height:100%;right:0;left:auto;margin:0px;opacity:1;visibility:visible;z-index:15;background-color:#97a6ae;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/remaining_handoff_ready/scroll_track.png");background-size:100% 100%;}
+.RHWindow VerticalScrollBar .ScrollThumb {width:8px;background-color:#b69d6c;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/remaining_handoff_ready/scroll_thumb.png");background-size:100% 100%;border:0px;min-height:38px;}
+.RHWindow VerticalScrollBar .ScrollThumb:hover {filter:brightness(1.18);}
+.RHTitleOrnamentLeft,.RHTitleOrnamentRight {width:64px;height:31px;top:50%;transform:translateY(-50%);}
+.RHTabBase {width:100%;height:100%;z-index:0;}
+.RHTabGlow {width:100%;height:59px;position:absolute;left:0px;top:24px;z-index:1;opacity:0;}
+.Selected .RHTabGlow {opacity:1;}
+.RHStandaloneTabGlow {ignore-parent-flow:true;z-index:20;}
+.RHRewardCardBase {width:100%;height:100%;z-index:0;}
+.RHRewardCount {right:0;left:auto;margin:8px 9px 0px 0px;font-size:14px;color:#59717b;z-index:3;}
+.RHAction {display:block;padding:0px;border:0px;box-shadow:none;background-color:transparent;}
+.RHActionArt {width:100%;height:100%;z-index:0;opacity:0;}
+.RHAction_normal {opacity:1;}
+.RHAction:hover .RHAction_hover {opacity:1;}
+.RHAction:active .RHAction_pressed {opacity:1;}
+.RHAction.UIDisabled .RHAction_disabled {opacity:1;}
+.RHAction.UIDisabled .RHAction_hover,.RHAction.UIDisabled .RHAction_pressed {opacity:0;}
+.RHAction .label {z-index:2;}
+.RHAction.UIDisabled {opacity:1;}
+.RHAction.UIDisabled .label {color:#657a81;}
+
+/* pool_grid_v2: 840x610 centered design; history: 1120x660. One root scale. */
+#LotteryInfoDialog.RHWindow {padding:0px;display:block;overflow:visible;}
+#LotteryInfoDialog.RHWindow #LotteryInfoHeader {position:absolute;left:0px;top:0px;width:100%;height:84px;display:block;border:0px;background-image:none;background-color:transparent;z-index:4;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTitle {position:absolute;left:0px;top:0px;width:330px;height:64px;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;font-family:"Source Han Serif SC";font-weight:bold;font-size:34px;color:#f4edd9;padding-top:5px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoIcon {display:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoHeader .RHTitleOrnamentLeft {position:absolute;left:210px;top:0px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoHeader .RHTitleOrnamentRight {right:0;left:auto;margin-right:210px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoClose {position:absolute;left:0px;top:0px;align:right top;margin:21px 25px 0px 0px;width:38px;height:38px;background-image:none;background-color:transparent;border:0px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs {position:absolute;left:22px;top:82px;width:796px;height:83px;display:flex;flex-direction:row;;overflow:visible;z-index:3;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab {width:199px;height:56px;min-width:0px;padding:0px;margin:0px;border:0px;display:block;background-image:none;background-color:transparent;box-shadow:none;overflow:visible;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab:hover {filter:brightness(1.12);background-color:transparent;z-index:4;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab:active {filter:brightness(.86);}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTabName {left:50%;top:50%;transform:translate(-50%,-50%);position:absolute;left:0px;top:0px;margin:0px;padding:0px;font-size:24px;color:#e5e9e2;z-index:2;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .Selected .LotteryPoolTabName {color:#fff0c6;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolBadge,#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryTabMark,#LotteryInfoDialog.RHWindow #LotteryInfoTabs .UITabGlow {display:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody {position:absolute;left:22px;top:139px;width:796px;height:356px;display:block;z-index:2;overflow:hidden;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody #LotteryInfoList {position:absolute;left:22px;top:22px;width:756px;height:332px;padding:0px;display:flex;flex-direction:column;;overflow-x:hidden;overflow-y:auto;background-color:transparent;}
+#LotteryInfoDialog.RHPool #LotteryInfoBody {height:382px;background-image:none;background-color:transparent;}
+.RHPoolMaterial {z-index:1;}
+.RHTabSeparator {width:1px;height:22px;align:left center;background-color:#81929b;z-index:1;}
+#LotteryInfoDialog.RHPool #LotteryInfoBody #LotteryInfoList {height:352px;display:flex;flex-direction:row;flex-wrap:wrap;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow {width:171px;height:163px;min-height:0px;margin:0px 21px 13px 0px;padding:0px;display:block;background-image:none;background-color:transparent;border:0px;box-shadow:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow.RHFourth {margin-right:0px;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow:hover {filter:brightness(1.06);}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow.Selected .RHRewardCardBase {filter:brightness(1.04);}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailIcon {position:absolute;left:25px;top:12px;width:120px;height:114px;left:0;top:0;margin:0px;padding:0px;border:0px;box-shadow:none;background-image:none;background-color:transparent;z-index:1;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryRewardIcon {width:120px;height:92px;left:50%;top:50%;transform:translate(-50%,-50%);background-color:transparent;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryRewardQuality,#LotteryInfoDialog .RHRewardCount {display:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailCopy {position:absolute;left:6px;top:126px;width:159px;height:32px;display:block;z-index:2;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailName {width:159px;height:30px;position:absolute;left:0px;top:0px;font-size:17px;white-space:nowrap;text-overflow:ellipsis;text-align:center;margin:0px;color:#294d5b;}
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .RHRewardName {position:absolute;left:6px;top:126px;width:159px;height:30px;font-size:17px;white-space:nowrap;text-overflow:ellipsis;text-align:center;margin:0px;color:#294d5b;z-index:2;}
+#LotteryInfoDialog.RHWindow .LotteryCardState,#LotteryInfoDialog.RHWindow .UICardBody,#LotteryInfoDialog.RHWindow .UICardBorder,#LotteryInfoDialog.RHPool .LotteryDetailDescription,#LotteryInfoDialog.RHPool .LotteryDetailMeta,#LotteryInfoDialog.RHWindow #LotteryPoolSelection,#LotteryInfoDialog.RHWindow #LotteryPoolGuarantee {display:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoNote {display:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoFooter {position:absolute;left:40px;top:534px;width:760px;height:54px;padding:0px;margin:0px;border-top:1px solid #bbc6c7;display:block;z-index:3;}
+#LotteryInfoDialog.RHWindow #LotteryInfoFooter > .LotteryFunctionIcon,#LotteryInfoDialog.RHWindow #LotteryInfoConfirm {display:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoRules {position:absolute;left:0px;top:8px;width:760px;height:47px;font-size:16px;text-align:center;white-space:pre-wrap;overflow-x:hidden;overflow-y:auto;}
+#LotteryInfoDialog.RHHistory #LotteryInfoHeader .RHTitleOrnamentLeft {position:absolute;left:264px;top:0px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoHeader .RHTitleOrnamentRight {margin-right:264px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoTabs {position:absolute;left:24px;top:84px;width:1072px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoTabs .LotteryPoolTab {width:268px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoBody {position:absolute;left:40px;top:208px;width:1055px;height:370px;background-image:none;}
+#LotteryInfoDialog.RHHistory #LotteryInfoBody #LotteryInfoList {position:absolute;left:0px;top:0px;width:1055px;height:370px;display:flex;flex-direction:column;;}
+.RHHistoryColumns {position:absolute;left:40px;top:155px;width:1040px;height:48px;border-bottom:1px solid #bdbaaa;z-index:2;display:block;}
+.RHHistoryColumn {font-size:22px;color:#778991;top:50%;transform:translateY(-50%);}
+.RHCol0 {position:absolute;left:13px;top:0px;}.RHCol1 {position:absolute;left:259px;top:0px;}.RHCol2 {position:absolute;left:782px;top:0px;}.RHCol3 {position:absolute;left:938px;top:0px;}
+.RHHistoryRow {width:1040px;height:60px;display:block;}
+.RHHistoryRow.RHAlternate {background-color:#819b9c12;}
+.RHHistoryTime {position:absolute;left:13px;top:0px;width:207px;font-size:20px;top:50%;transform:translateY(-50%);}
+.RHHistoryRewardIcon {position:absolute;left:228px;top:5px;width:55px;height:48px;}
+.RHHistoryName {position:absolute;left:294px;top:0px;width:463px;font-size:22px;top:50%;transform:translateY(-50%);text-overflow:ellipsis;}
+.RHHistoryQuality {position:absolute;left:782px;top:0px;width:90px;font-size:21px;top:50%;transform:translateY(-50%);}
+.RHHistoryQuantity {position:absolute;left:938px;top:0px;width:94px;font-size:21px;top:50%;transform:translateY(-50%);text-overflow:ellipsis;}
+.RHWindow .RHQualityN {color:#78888c;}.RHWindow .RHQualityR {color:#568496;}.RHWindow .RHQualitySR {color:#877297;}.RHWindow .RHQualitySSR {color:#947441;}.RHWindow .RHQualityUR {color:#824da3;}
+.RHHistoryEmpty {width:100%;height:100%;}
+.RHHistoryEmptyIcon {width:90px;height:90px;left:50%;top:50%;transform:translate(-50%,-50%);margin-bottom:75px;}
+.RHHistoryEmptyText {left:50%;top:50%;transform:translate(-50%,-50%);margin-top:75px;font-size:24px;color:#778991;}
+#LotteryInfoDialog.RHHistory #LotteryInfoNote {visibility:visible;position:absolute;left:49px;top:597px;width:730px;height:35px;font-size:18px;background-color:transparent;margin:0px;z-index:3;color:#778991;}
+#LotteryInfoDialog.RHHistory #LotteryInfoFooter {position:absolute;left:40px;top:583px;width:1040px;height:54px;}
+#LotteryInfoDialog.RHHistory #LotteryInfoRules {position:absolute;left:850px;top:10px;width:190px;height:35px;text-align:right;font-size:19px;}
+#LotteryWindow #LotteryResultActions .RHAction {width:304px;height:64px;background-image:none;background-color:transparent;border:0px;display:block;}
+#LotteryWindow #LotteryResultActions .RHAction .label {left:50%;top:50%;transform:translate(-50%,-50%);margin:0px;padding:0px;font-size:29px;color:#294958;}
+#LotteryWindow #LotterySkipReveal {background-image:none;border:0px;background-color:#1d3e4ccb;}
+/* Five cards plus their margins must fit without an implicit scrollbar stealing a column. */
+#LotteryWindow #LotteryItemList.LotteryTenResults {width:1120px;height:620px;padding:0px 10px;display:flex;flex-direction:row;flex-wrap:wrap;overflow:hidden;}
+/* Quality accents preserve the approved card texture, including on selection. */
+.RHWindow .RHQualityN {color:#398754;}
+.RHWindow .RHQualityR {color:#3283c5;}
+.RHWindow .RHQualitySR {color:#a052c8;}
+.RHWindow .RHQualitySSR {color:#bd8b25;}
+.RHWindow .RHQualityUR {color:#66338f;}
+
+/* daily_assembly_v3: 1344 x 752, live data uses existing seven-claim cycle. */
+#DailyWindow.RHWindow {border-radius:0px;overflow:visible;}
+#DailyWindow.RHWindow #DailyFrame {display:none;}
+#DailyWindow.RHWindow #DailyHeader {width:1344px;height:84px;z-index:3;}
+#DailyWindow.RHWindow #DailyHeading {position:absolute;left:0px;top:17px;width:280px;height:56px;left:50%;transform:translateX(-50%);text-align:center;font-family:"Source Han Serif SC";font-size:38px;font-weight:bold;color:#f4edd9;}
+#DailyWindow.RHWindow .RHTitleOrnamentLeft {position:absolute;left:414px;top:0px;width:56px;}
+#DailyWindow.RHWindow .RHTitleOrnamentRight {right:0;left:auto;margin-right:419px;width:56px;}
+#DailyWindow.RHWindow #DailyClose {position:absolute;left:1270px;top:26px;width:32px;height:32px;background-image:none;}
+#DailyWindow.RHWindow #DailyClaimPage {z-index:2;}
+#DailyWindow.RHWindow #DailySubtitle {position:absolute;left:42px;top:116px;width:850px;height:59px;font-family:"Source Han Serif SC";font-weight:bold;font-size:32px;}
+#DailyWindow.RHWindow #DailyPassStatus {position:absolute;left:1074px;top:107px;width:232px;height:42px;}
+#DailyWindow.RHWindow #DailyPassStatus .DailyIconArt {display:none;}
+#DailyWindow.RHWindow #DailyPassStatusText {width:100%;margin:0px;text-align:center;font-size:22px;color:#f4f3e8;}
+#DailyWindow.RHWindow #DailyPassStatus .RHDailyPassSkin {z-index:0;}
+#DailyWindow.RHWindow #DailyPassStatusText {z-index:2;}
+#DailyWindow.RHWindow #DailyCount {position:absolute;left:1074px;top:158px;width:232px;height:32px;font-size:18px;}
+#DailyWindow.RHWindow #DailyCards {height:595px;}
+#DailyWindow.RHWindow .DailyNormalCard,#DailyWindow.RHWindow .DailyWeekCard {background-image:none;background-color:transparent;border:0px;}
+.RHDailyCardBase {width:100%;height:100%;z-index:0;}
+.RHDailyCurrent .RHDailyCardBase {wash-color:#fff1cf;filter:brightness(1.025);}
+#DailyWindow.RHWindow .DailyDay {position:absolute;left:0px;top:18px;z-index:2;font-family:"Source Han Serif SC";font-size:23px;font-weight:bold;}
+#DailyWindow.RHWindow .DailyItems {position:absolute;left:0px;top:81px;width:153px;height:230px;z-index:2;}
+#DailyWindow.RHWindow .DailyItemArt {width:134px;height:134px;}
+#DailyWindow.RHWindow .DailyRewardName {margin-top:157px;font-size:20px;}
+#DailyWindow.RHWindow .DailyMultiItem .DailyReward {height:109px;}
+#DailyWindow.RHWindow .DailyMultiItem .DailyItemArt {width:80px;height:78px;}
+#DailyWindow.RHWindow .DailyMultiItem .DailyRewardName {margin-top:79px;font-size:16px;}
+#DailyWindow.RHWindow .DailyNormalCard > .DailyStateIcon {position:absolute;left:60px;top:302px;width:32px;height:32px;z-index:2;}
+#DailyWindow.RHWindow .DailyCardStatus {position:absolute;left:5px;top:338px;font-size:20px;z-index:2;}
+#DailyWindow.RHWindow .DailyBaseReward {position:absolute;left:15px;top:67px;width:280px;height:120px;z-index:2;}
+#DailyWindow.RHWindow .DailyBaseReward .DailyItemArt {width:113px;height:113px;}
+#DailyWindow.RHWindow .DailyBaseReward .DailyRewardName {position:absolute;left:120px;top:17px;width:159px; margin:0px;}
+#DailyWindow.RHWindow .DailyBaseStatus {position:absolute;left:120px;top:83px;width:159px;}
+#DailyWindow.RHWindow .DailyPremiumReward {position:absolute;left:23px;top:204px;width:270px;height:178px;border-top:1px solid #c9bc94;z-index:2;}
+#DailyWindow.RHWindow .DailyPremiumBadge {position:absolute;left:0px;top:10px;width:126px;height:32px;}
+#DailyWindow.RHWindow .DailyPremiumTag {position:absolute;left:0px;top:12px;width:126px;font-size:19px;}
+#DailyWindow.RHWindow .DailyPremiumName {position:absolute;left:0px;top:53px;width:130px;height:52px;font-size:19px;}
+#DailyWindow.RHWindow .DailyPremiumArt {position:absolute;left:111px;top:0px;width:154px;height:144px;}
+#DailyWindow.RHWindow .DailyPremiumReward .DailyStateIcon {position:absolute;left:16px;top:97px;width:32px;height:32px;}
+#DailyWindow.RHWindow .DailyPremiumState {position:absolute;left:0px;top:145px;width:270px;height:30px;font-size:19px;}
+#DailyWindow.RHWindow #DailyRuleLine {position:absolute;left:42px;top:605px;width:1266px;height:55px;padding:11px 0px;border-top:1px solid #b9c0b8;border-bottom:1px solid #b9c0b8;font-size:19px;}
+#DailyWindow.RHWindow #DailyRules {position:absolute;left:43px;top:677px;width:190px;height:45px;background-color:transparent;}
+#DailyWindow.RHWindow #DailyRules .DailyIconArt {width:32px;height:32px;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/remaining_handoff_ready/daily_rules.png");}
+#DailyWindow.RHWindow #DailyRules .label {margin-left:46px;font-size:22px;}
+#DailyWindow.RHWindow #DailyMakeup {display:none;}
+#DailyWindow.RHWindow #DailyClaim {position:absolute;left:1006px;top:669px;width:304px;height:64px;}
+#DailyWindow.RHWindow #DailyClaimText {margin:0px;padding:0px;font-size:25px;z-index:2;}
+#DailyWindow.RHWindow #DailyNotice {position:absolute;left:260px;top:679px;width:720px;height:45px;font-size:18px;z-index:4;}
+#DailyWindow.RHWindow #DailyRulesText {z-index:20;}
+#DailyWindow.RHWindow #DailyPassPage {z-index:2;}
+#DailyWindow.RHWindow #DailyTooltip {position:absolute;left:450px;top:465px;width:440px;height:max-content;display:flex;flex-direction:column;;padding:18px 22px;background-color:#173744;opacity:1;border:1px solid #bea57a;z-index:100;}
+#DailyWindow.RHWindow #DailyTooltipName {font-family:"Source Han Serif SC";font-size:25px;color:#f5e8c9;width:100%;}
+#DailyWindow.RHWindow #DailyTooltipEffect {font-size:20px;color:#f0ede2;width:100%;margin-top:12px;white-space:pre-wrap;}
+
+/* roguelike_alpha_v1: 352 x 816 sources, 290 x 672 design rectangles. */
+/* Transparent mandatory-choice input surface; no full-screen painted backdrop. */
+#RogueRewardBackdrop {background-image:none;background-color:transparent;}
+/* Hover grows beyond the original slot. Preserve clipping only for text scroll. */
+#RogueRewardSurface,#RogueRewardCards,
+#RogueRewardSurface .RogueSlot,#RogueRewardSurface .RoguePick,
+#RogueRewardSurface .RogueFlip {overflow:visible;}
+#RogueRewardSurface .RogueSlot {width:290px;height:672px;transition-duration:.65s,.12s;}
+#RogueRewardSurface .RogueFront,#RogueRewardSurface .RogueBack {background-color:transparent;}
+#RogueRewardSurface .RogueArt_combat {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/remaining_handoff_ready/rogue_combat.png");}
+#RogueRewardSurface .RogueArt_growth {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/remaining_handoff_ready/rogue_growth.png");}
+#RogueRewardSurface .RogueArt_defense {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/remaining_handoff_ready/rogue_defense.png");}
+#RogueRewardSurface .RogueBack {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/remaining_handoff_ready/rogue_back.png");}
+#RogueRewardSurface .RogueCopy {position:absolute;left:27px;top:454px;width:236px;height:168px;z-index:2;}
+#RogueRewardSurface .RogueCardName {font-family:"Source Han Serif SC";font-weight:bold;font-size:26px;color:#254755;}
+#RogueRewardSurface .RogueCardDescription {font-family:"Source Han Sans SC";font-size:18px;line-height:24px;color:#3e5962;}
+#RogueRewardSurface .RogueRewardTitle {font-family:"Source Han Serif SC";font-weight:bold;}
+#RogueRewardSurface .RoguePick {box-shadow:none;transition-duration:.16s;transition-property:transform,brightness;}
+#RogueRewardSurface .RoguePick:enabled:hover {box-shadow:none;filter:brightness(1.06);transform:translate3d(0px,-4px,0px) scale3d(1.035,1.035,1);}
+#RogueRewardSurface .RogueChosen .RoguePick {box-shadow:none;filter:brightness(1.10);}
+#RogueRewardStatus {position:absolute;left:400px;top:146px;height:30px;}
+#RogueRewardReroll {display:none;}
+/* Keep this control above the cards, clear of a widened native combat HUD. */
+#RogueReducedMotion {position:absolute;left:1130px;top:118px;}
+
+.RCWindow {display:block;}
+.RCHeader {z-index:3;}
+.RCHeader .RCTitle {width:100%;height:60px;position:absolute;left:0px;top:12px;text-align:center;font-family:"Source Han Serif SC";font-size:38px;color:#f4e8cc;}
+.RCHeader .RHTitleOrnamentLeft {left:50%;transform:translateX(-50%);margin-right:370px;}
+.RCHeader .RHTitleOrnamentRight {left:50%;transform:translateX(-50%);margin-left:370px;}
+.RCHeader .RCClose {margin:0px;transform:none;transform:none;}
+.RCTabs {position:absolute;left:48px;top:105px;width:1110px;height:60px;display:flex;flex-direction:row;;z-index:2;}
+.RCTabs .UITab {width:220px;height:58px;background-color:#244654;}
+.RCTabs .UITab .label {font-size:25px;color:#f4e8ce;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;}
+.RCTabs .UISelected {border-bottom:1px solid #e8c679;}
+.RCNavGlow {position:absolute;left:0px;top:24px;width:220px;height:59px;z-index:1;opacity:0;}
+.UISelected .RCNavGlow {opacity:1;}
+.RCNotice {position:absolute;left:48px;top:175px;width:1100px;height:35px;font-size:19px;z-index:2;}
+.RCGrid {position:absolute;left:64px;top:215px;width:1090px;height:569px;display:flex;flex-direction:row;flex-wrap:wrap;overflow-x:hidden;overflow-y:auto;z-index:2;}
+.RCProduct {width:225px;height:273px;margin:0px 55px 19px 0px;padding:0px;display:block;background-color:transparent;background-image:none;border:0px;}
+.RCProduct.RCFourth {margin-right:0px;}
+.RCCardBase,.RCCardHover {width:100%;height:100%;z-index:0;}
+.RCCardHover {opacity:0;}
+.RCProduct:hover .RCCardHover {opacity:1;}
+.RCProduct .UICardTitle {position:absolute;left:10px;top:202px;width:205px;height:35px;font-size:21px;text-align:center;z-index:2;text-overflow:ellipsis;}
+.RCProduct .UIPriceLabel {position:absolute;left:10px;top:237px;width:205px;height:30px;display:flex;flex-direction:row;;transform:none;z-index:2;}
+.RCProduct .UIPrice {font-size:21px;text-align:center;width:100%;}
+.RCProductArt {position:absolute;left:23px;top:17px;width:179px;height:179px;z-index:1;}
+.RCProductArtMissing {position:absolute;left:15px;top:55px;width:195px;font-size:17px;text-align:center;z-index:1;}
+.RCProductHover {width:100%;height:100%;z-index:4;opacity:0;transition-property:opacity;transition-duration:.10s;}
+.RCProduct:hover .RCProductHover {opacity:1;}
+.RCHoverScrim {width:100%;height:100%;z-index:0;}
+.RCProductEffect {position:absolute;left:16px;top:20px;width:193px;height:154px;white-space:pre-wrap;overflow-x:hidden;overflow-y:auto;font-size:19px;color:#f7edda;z-index:1;}
+.RCProductBuy {position:absolute;left:20px;top:191px;width:185px;height:62px;z-index:2;}
+.RCProductBuy .label {left:50%;top:50%;transform:translate(-50%,-50%);margin:0px;font-size:22px;color:#253e47;}
+.RCEmpty {width:100%;height:40px;top:50%;transform:translateY(-50%);text-align:center;font-size:22px;z-index:2;}
+.RCBundles {position:absolute;left:48px;top:218px;width:1122px;height:566px;}
+.RCBundles .RCProduct {width:540px;height:276px;margin:0px 30px 12px 0px;}
+.RCBundles .RCProduct.RCSecond {margin-right:0px;}
+.RCBundles .UICardTitle {position:absolute;left:22px;top:12px;width:496px;height:38px;font-size:22px;}
+.RCBundles .UIPriceLabel {position:absolute;left:28px;top:218px;width:270px;height:40px;}
+.RCBundles .UIPrice {font-size:26px;}
+.RCBundleContents {position:absolute;left:23px;top:63px;width:494px;height:134px;display:flex;flex-direction:row;;overflow-x:auto;overflow-y:hidden;}
+.RCBundleItem {width:88px;height:130px;margin-right:10px;}
+.RCBundleArt {width:64px;height:65px;left:50%;transform:translateX(-50%);}
+.RCBundleName {position:absolute;left:0px;top:72px;width:88px;height:44px;font-size:15px;text-align:center;white-space:pre-wrap;}
+.RCBundleQuantity {right:0;left:auto;font-size:16px;}
+.RCBundleBuy {position:absolute;left:337px;top:208px;width:180px;height:54px;}
+.RCBundleBuy .label {left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;}
+.RCFooter {position:absolute;left:700px;top:175px;width:460px;height:35px;font-size:19px;text-align:right;z-index:2;}
+.RCOrderBody {position:absolute;left:45px;top:112px;width:870px;height:465px;display:block;z-index:2;}
+.RCOrderName {width:100%;height:52px;font-size:30px;text-align:center;}
+.RCOrderPrice {position:absolute;left:0px;top:62px;width:100%;height:40px;display:flex;flex-direction:row;;}
+.RCOrderPrice .label {font-size:25px;text-align:center;width:100%;}
+.RCOrderHint {position:absolute;left:35px;top:114px;width:800px;height:70px;font-size:20px;white-space:pre-wrap;text-align:center;}
+.RCQuantity {position:absolute;left:302px;top:190px;width:265px;height:50px;display:flex;flex-direction:row;;}
+.RCQuantity .button {width:70px;height:48px;}
+.RCQuantityText {width:125px;height:48px;font-size:26px;text-align:center;top:50%;transform:translateY(-50%);}
+.RCMethods {position:absolute;left:100px;top:261px;width:670px;height:65px;display:flex;flex-direction:row;;}
+.RCMethod {width:210px;height:60px;margin-right:10px;}
+.RCMethodBase,.RCMethodSelected {width:100%;height:100%;}
+.RCMethodText {left:50%;top:50%;transform:translate(-50%,-50%);font-size:23px;}
+.RCOrderConfirm {position:absolute;left:280px;top:360px;width:310px;height:72px;}
+.RCOrderConfirm .label {left:50%;top:50%;transform:translate(-50%,-50%);font-size:26px;}
+.RCOrderStatus {position:absolute;left:48px;top:581px;width:864px;height:42px;white-space:pre-wrap;text-align:center;font-size:19px;z-index:2;}
+.RCActualAmount {position:absolute;left:0px;top:64px;width:100%;height:40px;font-size:28px;text-align:center;}
+.RCQR {position:absolute;left:325px;top:190px;width:220px;height:220px;}
+.RCQRFrame {width:100%;height:100%;}
+.RCQRCode {position:absolute;left:15px;top:15px;width:190px;height:190px;}
+.RCQRState {left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;text-align:center;}
+.RCExpiry {position:absolute;left:0px;top:420px;width:100%;height:32px;font-size:18px;text-align:center;}
+
+/* Row owns its separator; the scroll viewport continues to clip at its edges. */
+.ArchiveRoot #ArchiveTabs .ArchiveTab {
+    height:63.5px;min-height:63.5px;margin:0px;
+    background-size:209px 54px;background-repeat:no-repeat;
+    background-position:left top;
+}
+.ArchiveRoot #ArchiveTabs .ArchiveTab:selected {
+    background-size:209px 54px;
+}
+.ArchiveRoot #ArchiveTabs .ArchiveNavSeparator { z-index:0; }
+
+.ArchiveRoot #ArchiveArtTrialToggle {position:absolute;left:514px;top:22px;width:114px;height:29px;border:1px solid #bda97e;background-color:#1d424d;z-index:21;}
+/* A background cannot stack above item art. Foreground just the original corner;
+   retain the list viewport clipping and keep this decoration non-interactive. */
+.ArchiveRoot #ArchiveGrid .ArchiveHoverCorner {ignore-parent-flow:true;position:absolute;left:0px;top:0px;width:100%;height:100%;display:flex;flex-direction:column;;overflow:visible;z-index:50;display:none;}
+.ArchiveRoot #ArchiveGrid .ArchiveCard {overflow:visible;}
+.ArchiveRoot #ArchiveGrid .ArchiveCard:hover,.ArchiveRoot #ArchiveGrid .ArchiveHovered {z-index:5;}
+.ArchiveRoot #ArchiveGrid .ArchiveCard:hover .ArchiveHoverCorner,
+.ArchiveRoot #ArchiveGrid .ArchiveHovered .ArchiveHoverCorner {visibility:visible;}
+.ArchiveRoot #ArchiveArtTrialToggle:hover {filter:brightness(1.25);}
+.ArchiveRoot #ArchiveArtTrialToggle:active {filter:brightness(.9);}
+.ArchiveRoot #ArchiveArtTrialToggle .label {left:50%;top:50%;transform:translate(-50%,-50%);font-size:15px;color:#f3e9d0;}
+.ArchiveRoot #ArchiveArtTrial {position:absolute;left:0px;top:81px;width:655px;height:508px;padding:20px 22px;display:flex;flex-direction:column;;z-index:20;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/archive_handoff_v1/content_background.png");background-size:100% 100%;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialHeading {color:#234a58;font-size:23px;font-family:"Source Han Serif SC";}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialHint {color:#48626a;font-size:14px;margin:7px 0px;width:100%;white-space:pre-wrap;}
+.ArchiveRoot #ArchiveArtTrialGrid {width:100%;height:310px;display:flex;flex-direction:row;flex-wrap:wrap;overflow:hidden;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialUnit {width:143px;height:148px;display:flex;flex-direction:column;;margin-right:8px;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialCard {width:143px;height:138px;display:block;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/archive_handoff_v1/interaction_components_v2_card_normal.png");background-size:100% 100%;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArt {position:absolute;left:25px;top:18px;width:93px;height:74px;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveRewardIcon {width:100%;height:100%;}
+.ArchiveRoot #ArchiveGrid .ArchivePortraitViewport,.ArchiveRoot #ArchiveArtTrial .ArchivePortraitViewport {overflow:hidden;}
+.ArchiveRoot #ArchiveGrid .ArchiveToneArt,.ArchiveRoot #ArchiveArtTrial .ArchiveToneArt {padding:0px;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialName {position:absolute;left:7px;top:92px;width:129px;height:40px;text-align:center;color:#204957;font-size:14px;white-space:pre-wrap;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialDescription {width:143px;height:96px;margin-top:12px;white-space:pre-wrap;text-align:center;color:#37545f;font-size:15px;}
+.ArchiveRoot #ArchiveArtTrialNav {width:100%;height:37px;display:flex;flex-direction:row;;}
+.ArchiveRoot #ArchiveArtTrialFooter {width:100%;height:33px;display:flex;flex-direction:row;;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction {width:110px;height:29px;margin-right:10px;border:1px solid #bda97e;background-color:#1d424d;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction:hover {filter:brightness(1.25);}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction:active {filter:brightness(.9);}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction.Disabled {filter:brightness(.68);opacity:.7;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialActionText {left:50%;top:50%;transform:translate(-50%,-50%);color:#f3e9d0;font-size:15px;}
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialPageText {width:76px;height:29px;text-align:center;top:50%;transform:translateY(-50%);color:#234a58;font-size:15px;}
+
+/* Keep the existing card art and lottery timeline. Reserve separate text areas. */
+#LotteryWindow .LotteryRewardName {width:100%;height:58px;white-space:pre-wrap;text-overflow:ellipsis;text-align:center;padding:3px 8px;font-size:21px;}
+#LotteryWindow .LotteryDuplicateBadge {width:100%;height:38px;font-size:15px;white-space:pre-wrap;text-overflow:ellipsis;text-align:center;bottom:0;top:auto;padding:3px 2px;}
+#LotteryWindow .LotteryRewardQuality {z-index:2;}
+#LotteryWindow .LotteryRewardIconFrame .LotteryRewardIcon {top:50%;transform:translateY(-50%);}
+#LotteryWindow #LotteryItemList.LotterySingleResult .LotteryRewardName {height:82px;font-size:29px;padding:4px 14px;}
+#LotteryWindow #LotteryItemList.LotterySingleResult .LotteryDuplicateBadge {height:46px;font-size:21px;}
+#LotteryWindow .LotteryRewardQuantity {height:28px;min-width:66px;text-align:center;text-overflow:ellipsis;}
+#LotteryWindow .LotteryCardCovered .LotteryDuplicateBadge {opacity:0;}
+#LotteryWindow .LotteryQuality_N .LotteryRewardQuality {color:#398754;}
+#LotteryWindow .LotteryQuality_R .LotteryRewardQuality {color:#3283c5;}
+#LotteryWindow .LotteryQuality_SR .LotteryRewardQuality {color:#a052c8;}
+#LotteryWindow .LotteryQuality_SSR .LotteryRewardQuality {color:#bd8b25;}
+#LotteryWindow .LotteryQuality_UR .LotteryRewardQuality {color:#66338f;}
+/* Keep the original ivory card; quality is carried by its outer glow. */
+#LotteryWindow #LotteryItemList .LotteryRewardIconFrame {background-color:transparent;background-image:none;border:0px;box-shadow:none;}
+#LotteryWindow #LotteryItemList .LotteryRewardQuality {background-color:transparent;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_N {border-color:#66c98b;box-shadow:#55bf7a99 0px 0px 26px 3px;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_R {border-color:#65b5ef;box-shadow:#409fdf99 0px 0px 26px 3px;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_SR {border-color:#c58bea;box-shadow:#b565ddaa 0px 0px 28px 4px;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_SSR {border-color:#efd071;box-shadow:#e8b53baa 0px 0px 28px 4px;}
+#LotteryWindow #LotteryItemList .LotteryRewardCard.LotteryQuality_UR {border-color:#8b56bd;box-shadow:#7739aaaa 0px 0px 30px 4px;}
+/* Results have a fixed one/ten-card count; allow the halo past the list bounds. */
+#LotteryWindow #LotteryItemList.LotteryTenResults,#LotteryWindow #LotteryItemList.LotterySingleResult {overflow:visible;}
+
+.HandoffBossWarning {width:100%;height:100%;z-index:30;opacity:0;transition-property:opacity;transition-duration:.3s;}
+.HandoffBossWarning.BossWarningVisible {opacity:1;transition-duration:.2s;}
+.BossWarningEdge {width:100%;height:100%;background-color:gradient(radial,50% 50%,0% 0%,70% 70%,from(#541e2600),color-stop(.62,#541e2600),to(#541e2699));}
+.BossWarningBand {width:100%;height:260px;top:50%;transform:translateY(-50%);background-color:gradient(linear,0% 0%,0% 100%,from(#161e2600),color-stop(.3,#161e263d),color-stop(.7,#161e263d),to(#161e2600));}
+.BossWarningDesign {width:1672px;height:941px;left:50%;top:50%;transform:translate(-50%,-50%);overflow:visible;}
+.BossWarningIcon {position:absolute;left:813px;top:369px;width:46px;height:46px;}
+.BossWarningLineLeft,.BossWarningLineRight {width:265px;height:1px;background-color:#d9aa77;position:absolute;left:462px;top:393px;}
+.BossWarningLineRight {position:absolute;left:945px;top:393px;}
+/* Declare the script-loaded image as a compiler dependency. */
+.BossWarningAssetDependency {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/remaining_handoff_ready/boss_warning_icon.png");}
+.BossWarningTitle {position:absolute;left:336px;top:419px;width:1000px;height:92px;font-family:"Source Han Sans SC";font-weight:bold;font-size:72px;text-align:center;color:#f3dcad;text-shadow:none;}
+.BossWarningSubtitle {position:absolute;left:536px;top:523px;width:600px;height:44px;font-family:"Source Han Sans SC";font-size:26px;text-align:center;color:#ecd5ae;}
+
+/* Preview-specific geometry; other accepted pages keep their shared styles. */
+.RCWindow .RCTabs {width:1110px;overflow:visible;}
+.RCWindow .RCTab {width:185px;height:58px;display:block;}
+.RCWindow .RCTabText {left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;color:#f4e8ce;z-index:2;}
+.RCWindow .RCNavGlow {width:185px;}
+.RCWindow .RCProductHover {display:none;opacity:0;}
+.RCWindow .RCProduct:hover .RCProductHover {visibility:visible;opacity:1;}
+.RCWindow .RCProductEffect {color:#fff5e2;}
+.RCWindow .RCProductName {position:absolute;left:10px;top:199px;width:205px;height:38px;font-size:21px;text-align:center;white-space:nowrap;text-overflow:ellipsis;z-index:2;}
+.RCWindow .RCBundles .RCProductName {position:absolute;left:22px;top:12px;width:496px;height:38px;font-size:24px;}
+.RCWindow .RCStockState {position:absolute;left:105px;top:12px;width:105px;height:29px;background-color:#284750df;color:#ffedc4;text-align:center;font-size:18px;z-index:3;}
+.RCWindow .RCOrderBody {height:490px;}
+.RCWindow .RCOrderArt {position:absolute;left:30px;top:90px;width:140px;height:140px;}
+.RCWindow .RCOrderHint {position:absolute;left:190px;top:114px;width:640px;height:98px;overflow-x:hidden;overflow-y:auto;text-align:left;}
+.RCWindow .RCQuantity {position:absolute;left:302px;top:237px;}
+.RCWindow .RCMethods {position:absolute;left:216px;top:305px;width:440px;}
+.RCWindow .RCOrderBack {position:absolute;left:130px;top:408px;width:260px;height:64px;}
+.RCWindow .RCOrderConfirm {position:absolute;left:470px;top:408px;width:270px;height:64px;}
+.RCWindow .RCOrderBack .label,.RCWindow .RCQRBack .label,.RCWindow .RCQRRetry .label {left:50%;top:50%;transform:translate(-50%,-50%);font-size:23px;}
+.RCWindow .RCOrderStatus {position:absolute;left:48px;top:680px;width:864px;height:36px;font-size:18px;}
+.RCWindow .RCQRHint {position:absolute;left:0px;top:106px;width:100%;height:32px;text-align:center;font-size:19px;}
+.RCWindow .RCQR {position:absolute;left:319px;top:149px;width:232px;height:232px;background-color:white;overflow:hidden;box-shadow:none;border:0px;}
+.RCWindow .RCQRCode {position:absolute;left:0px;top:0px;width:232px;height:232px;wash-color:white;opacity:1;}
+.RCWindow .RCQRState {width:210px;white-space:pre-wrap;color:#375462;}
+.RCWindow .RCExpiry {position:absolute;left:0px;top:385px;height:32px;}
+.RCWindow .RCQRBack {position:absolute;left:305px;top:425px;width:260px;height:56px;}
+.RCWindow .RCQRRetry {position:absolute;left:600px;top:235px;width:210px;height:56px;}
+.RCWindow .RCPreviewControls {position:absolute;left:36px;top:615px;width:890px;height:51px;display:flex;flex-direction:row;;z-index:5;}
+.RCWindow .RCPreviewState {width:145px;height:44px;margin-right:3px;}
+.RCWindow .RCPreviewState .label {font-size:16px;left:50%;top:50%;transform:translate(-50%,-50%);}
+.RCWindow .RCStateSelected {filter:brightness(1.22);}
+
+.UINineSlice {width:100%;height:100%;ignore-parent-flow:true;position:absolute;left:0px;top:0px;display:flex;flex-direction:column;;overflow:hidden;}
+.UINineRow {width:100%;display:flex;flex-direction:row;;overflow:hidden;}
+.UINineTile {height:100%;background-repeat:no-repeat;overflow:hidden;}
+/* Row children must stay in their nine-slice flow, not legacy img rules. */
+.UINineSlice .UINineRow,.UINineSlice .UINineTile {ignore-parent-flow:false;}
+.ArchiveRoot #ArchiveTabs .ArchiveTab:selected {background-image:none;}
+.ArchiveRoot #ArchiveTabs .ArchiveNavSelectedFrame {width:209px;height:54px;display:none;z-index:0;}
+.ArchiveRoot #ArchiveTabs .ArchiveTab:selected .ArchiveNavSelectedFrame {visibility:visible;}
+.ArchiveRoot #ArchiveTabs .ArchiveNavIcon {z-index:2;wash-color:#e8c98a;opacity:1;}
+.ArchiveRoot #ArchiveTabs .ArchiveTab:selected .ArchiveNavIcon {wash-color:#000000;opacity:1;}
+.ArchiveRoot #ArchiveTabs .ArchiveTab .label {z-index:3;}
+.ArchiveRoot #ArchiveGrid .ArchiveCard,.ArchiveRoot #ArchiveGrid .ArchiveCard:hover,.ArchiveRoot #ArchiveGrid .ArchiveHovered {background-image:none;}
+.ArchiveNormalFrame,.ArchiveSelectedFrame {z-index:0;}
+.ArchiveRoot #ArchiveGrid .ArchiveNameHost {z-index:2;}
+.ArchiveSelectedFrame {display:none;}
+.ArchiveCard:hover .ArchiveSelectedFrame,.ArchiveHovered .ArchiveSelectedFrame {visibility:visible;}
+/* Foreground star samples the same fixed UV as this nine-slice corner. */
+.ArchiveRoot .ArchivePromote,.ArchiveRoot #ArchiveDraw {background-image:none;}
+.ArchiveRoot .ArchivePromote:hover,.ArchiveRoot #ArchiveDraw:hover {background-image:none;}
+.ArchiveRoot .ArchivePromote .label,.ArchiveRoot #ArchiveDraw .label {z-index:3;}
+.ArchiveRoot #ArchiveFilters RadioButton,.ArchiveRoot #ArchiveFilters RadioButton:selected {background-image:none;}
+.ArchiveFilterFrame {z-index:0;}
+.ArchiveFilter_selected {display:none;}
+RadioButton:selected .ArchiveFilter_selected {visibility:visible;}
+.ArchiveRoot #ArchiveFilters .label {z-index:2;}
+/* The old social-page rule compressed these same controls to 26px. */
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent #ArchiveFilters,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent.ArchiveHasDraw #ArchiveFilters {height:31px;min-height:31px;}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent #ArchiveFilters RadioButton,
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent.ArchiveHasDraw #ArchiveFilters RadioButton {width:111px;height:31px;min-height:31px;padding:0px;margin:0px 7px 0px 0px;background-image:none;}
+.ArchiveRoot #ArchiveWindow.ArchiveHandoff #ArchiveContent #ArchiveFilters #ArchiveFilter_all {width:130px;margin-right:10px;}
+#LotteryMainCanvas .PolishDrawBase {z-index:0;}
+#LotteryMainCanvas .PolishTenHover {z-index:1;opacity:0;transition-property:opacity;transition-duration:.08s;}
+#LotteryMainCanvas #LotteryTenButton:enabled:hover .PolishTenHover {opacity:1;}
+#LotteryMainCanvas .LHDrawTicket,#LotteryMainCanvas .LHDrawCaption,#LotteryMainCanvas .LHCost {z-index:3;}
+#LotteryMainCanvas .LHDrawVisual {width:100%;height:100%;}
+#LotteryMainCanvas .LHSingleHover {display:none;}
+#LotteryMainCanvas .PolishSingleHover {z-index:1;wash-color:#e8c780;opacity:0;transition-property:opacity;transition-duration:.08s;}
+#LotteryMainCanvas #LotterySingleButton:enabled:hover .PolishSingleHover {opacity:.3;}
+
+/* Shared confirmed storefront presentation; transaction and unlock logic stay in SurvivalShop. */
+#CustomShopWindow.UIModal.RHSurvivalShop {display:block;background-color:transparent;border:0px;border-radius:0px;}
+#CustomShopWindow.RHSurvivalShop .RHFrame {z-index:0;ignore-parent-flow:true;}
+#CustomShopWindow.RHSurvivalShop #ShopHeader {position:absolute;left:0px;top:0px;width:1208px;height:164px;display:block;padding:0px;border:0px;z-index:3;overflow:visible;}
+#CustomShopWindow.RHSurvivalShop #ShopTitleBlock {position:absolute;left:384px;top:15px;width:440px;height:54px;left:0;top:0;margin:0px;}
+#CustomShopWindow.RHSurvivalShop #ShopHeader .RHTitleOrnamentLeft {position:absolute;left:310px;top:27px;left:0;top:0;}
+#CustomShopWindow.RHSurvivalShop #ShopHeader .RHTitleOrnamentRight {position:absolute;left:834px;top:27px;left:0;top:0;}
+#CustomShopWindow.RHSurvivalShop #ShopTitle {width:440px;text-align:center;color:#f4e8cc;font-size:36px;}
+#CustomShopWindow.RHSurvivalShop #ShopSubtitle {display:none;}
+#CustomShopWindow.RHSurvivalShop #ShopModeToggles {position:absolute;left:44px;top:105px;width:597px;height:59px;margin:0px;left:0;top:0;overflow:visible;}
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle {width:199px;height:59px;margin:0px;border:0px;background-color:transparent;display:block;}
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle .label {z-index:3;font-size:23px;color:#eee3c8;}
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle.Selected {filter:brightness(1.25);border-bottom:2px solid #e8c679;}
+#CustomShopWindow.RHSurvivalShop #ShopRefreshButton {position:absolute;left:1008px;top:21px;width:100px;height:42px;margin:0px;left:0;top:0;}
+#CustomShopWindow.RHSurvivalShop #ShopCloseButton {position:absolute;left:1142px;top:23px;width:38px;height:38px;margin:0px;left:0;top:0;}
+#CustomShopWindow.RHSurvivalShop #ShopBody {position:absolute;left:40px;top:175px;width:1128px;height:555px;margin:0px;left:0;top:0;z-index:1;}
+#CustomShopWindow.RHSurvivalShop #ShopShelfArea {background-color:transparent;background-image:none;border:0px;}
+#CustomShopWindow.RHSurvivalShop #ShopItemList {padding:0px 10px;}
+#CustomShopWindow.RHSurvivalShop #ShopFooter {position:absolute;left:44px;top:746px;width:1120px;height:40px;margin:0px;left:0;top:0;background-color:transparent;z-index:1;}
+#CustomShopWindow.RHSurvivalShop #ShopFooter .label {color:#375462;}
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct {width:205px;height:249px;margin:8px 14px 14px 0px;padding:0px;background-color:transparent;background-image:none;border:0px;box-shadow:none;display:block;}
+#CustomShopWindow.RHSurvivalShop .ShopItemFrame {position:absolute;left:20px;top:15px;width:165px;height:165px;z-index:2;}
+.RHShopCardBase {width:100%;height:100%;z-index:0;}
+.RHShopName {position:absolute;left:10px;top:180px;width:185px;height:30px;text-align:center;text-overflow:ellipsis;font-size:20px;color:#375462;z-index:2;}
+.RHShopPrice {position:absolute;left:10px;top:213px;width:185px;height:26px;text-align:center;text-overflow:ellipsis;font-size:17px;color:#375462;z-index:2;}
+.RHShopHover {width:100%;height:100%;background-color:#000c;z-index:5;display:none;}
+.ShopShelfSlot:hover .RHShopHover {visibility:visible;}
+.RHShopEffect {position:absolute;left:14px;top:15px;width:177px;height:155px;font-size:18px;color:#fff3da;white-space:pre-wrap;overflow-x:hidden;overflow-y:auto;}
+.RHShopBuy {position:absolute;left:22px;top:182px;width:160px;height:50px;}
+.RHShopBuy .label {left:50%;top:50%;transform:translate(-50%,-50%);font-size:21px;}
+#LotteryInfoDialog .LotteryPoolTab,#LotteryInfoDialog .LotteryPoolTab:hover,#LotteryInfoDialog .LotteryPoolTab:active {transform:none;pre-transform-scale2d:1;box-shadow:none;}
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab:active {filter:brightness(1);background-color:transparent;}
+.RCWindow .RCProduct .UIPriceLabel {position:absolute;left:10px;top:229px;width:205px;height:30px;display:block;}
+.RCWindow .RCProduct .UIPriceRow {left:50%;transform:translateX(-50%);top:50%;transform:translateY(-50%);display:flex;flex-direction:row;;height:28px;}
+.RCWindow .RCProduct .UIPrice {width:max-content;height:28px;top:50%;transform:translateY(-50%);margin:0px;text-align:center;}
+.UIPriceRow {display:flex;flex-direction:row;;}
+.UIPriceCurrencyIcon {width:22px;height:22px;top:50%;transform:translateY(-50%);margin-left:5px;}
+
+#CustomShopWindow.RHSurvivalShop .ShopCardName {display:none;}
+
+.RCWindow .RCBundles .RCProduct .UIPriceLabel {position:absolute;left:28px;top:210px;width:270px;height:40px;}
+
+/* Lottery actions: crisp rarity outline; ticket cost duplicates the action caption. */
+#LotteryMainCanvas #LHTenQuality {font-weight:bold;text-shadow:none;}
+#LotteryMainCanvas #LotteryCelestialFooter .LHCost {display:none;}
+
+/* Archive and pool-item tooltips share the effect section vocabulary and typography. */
+#LotteryItemTooltip #LotteryTooltipEffectHeading {display:none;}
+#LotteryItemTooltip.LotterySimpleTooltip #LotteryTooltipEffectHeading {visibility:visible;color:#ede3bf;font-size:15px;font-weight:500;margin-top:12px;margin-bottom:6px;text-shadow:none;}
+#LotteryItemTooltip.LotterySimpleTooltip #LotteryTooltipDescription {margin-top:0px;}
+
+/* Independent pool updates: announcement + unread details. */
+.LotteryUpdateDot { width: 12px; height: 12px; border-radius: 50%; background-color: #ff4141; border: 1px solid #ffd4b0; right:0;left:auto; transform:none; margin: 4px; box-shadow: #ff302080 0px 0px 5px 0px; }
+.LotteryUpdateAnnouncement #LotteryInfoTitle { color: #ffba48; font-size: 28px; }
+.LotteryUpdateAnnouncement #LotteryInfoDialog { background-color: #403545; }
+.LotteryUpdateAnnouncement #LotteryInfoList { width: 100%; display:flex;flex-direction:row;flex-wrap:wrap; overflow: squish scroll; }
+.LotteryUpdateAnnouncement #LotteryPoolSelection, .LotteryUpdateAnnouncement #LotteryPoolGuarantee { visibility: collapse; }
+.LotteryUpdateAnnouncement #LotteryInfoDialog.RHWindow #LotteryInfoNote { visibility: visible; color: #efcb78; }
+
+/* Compact survival shop: 604px window, 90px icons, details in tooltip. */
+#CustomShopButton { visibility: collapse; }
+#CustomShopWindow.UIModal.RHSurvivalShop { width:604px; height:806px; }
+#CustomShopWindow.RHSurvivalShop #ShopHeader { width:604px;height:176px; }
+#CustomShopWindow.RHSurvivalShop #ShopTitleBlock { position:absolute;left:152px;top:18px;width:300px;height:48px; }
+#CustomShopWindow.RHSurvivalShop #ShopTitle { width:300px;font-size:30px; }
+#CustomShopWindow.RHSurvivalShop #ShopHeader .RHTitleOrnamentLeft { position:absolute;left:104px;top:27px;width:48px;height:24px; }
+#CustomShopWindow.RHSurvivalShop #ShopHeader .RHTitleOrnamentRight { position:absolute;left:452px;top:27px;width:48px;height:24px; }
+#CustomShopWindow.RHSurvivalShop #ShopCloseButton { position:absolute;left:548px;top:23px;width:32px;height:32px; }
+#CustomShopWindow.RHSurvivalShop #ShopModeToggles { position:absolute;left:40px;top:97px;width:314px;height:76px; }
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle,
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle.Selected,
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle:hover,
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle:active { width:157px;height:76px;background-image:none;background-color:transparent;border:0px;filter:brightness(1);transform:none;box-shadow:none;padding:0px; }
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle .label { align:center top;margin-top:10px;font-size:23px;color:#365562; }
+.RHShopTabGlow { position:absolute;left:0px;top:30px;width:155px;height:46px;display:none;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_handoff_v1/tab_glow.png");background-size:100% 100%; }
+.Selected .RHShopTabGlow { visibility:visible; }
+#CustomShopWindow.RHSurvivalShop #ShopBody { position:absolute;left:40px;top:181px;width:524px;height:553px; }
+#CustomShopWindow.RHSurvivalShop #ShopItemList { padding:0px; }
+#CustomShopWindow.RHSurvivalShop #ShopFooter { position:absolute;left:40px;top:753px;width:524px;height:38px; }
+#CustomShopWindow.RHSurvivalShop #ShopResourceSummary { width:240px;font-size:14px; }
+#CustomShopWindow.RHSurvivalShop #ShopStatus { font-size:14px; }
+#CustomShopWindow.RHSurvivalShop .ShopSectionTitle { width:100%;height:28px;margin:3px 0px 8px 0px;font-size:18px;color:#365562; }
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct:hover { width:90px;height:130px;min-width:0px;min-height:0px;margin:4px 12px 8px 0px;padding:0px;border:0px;box-shadow:none;background-color:transparent;background-image:none;filter:brightness(1);transform:none; }
+#CustomShopWindow.RHSurvivalShop .ShopItemFrame { position:absolute;left:0px;top:0px;width:90px;height:90px;padding:0px;border:0px;background-color:#000000;display:block; }
+#CustomShopWindow.RHSurvivalShop .ShopItemIcon { width:90px;height:90px; }
+#CustomShopWindow.RHSurvivalShop .ShopStockLabel { color:#171717;font-size:13px;background-color:transparent;background-image:none;padding:0px;margin:1px;text-shadow:none;z-index:4; }
+.RHShopPrices { position:absolute;left:0px;top:93px;width:90px;height:36px;display:flex;flex-direction:column;; }
+.RHShopCost { width:90px;height:18px;display:flex;flex-direction:row;; }
+.RHShopCostIcon { width:16px;height:16px;top:50%;transform:translateY(-50%);margin-right:3px; }
+#CustomShopWindow.RHSurvivalShop .RHShopCostValue { color:#29251f;font-size:13px;top:50%;transform:translateY(-50%); }
+#CustomShopWindow.RHSurvivalShop .RHShopHover,
+#CustomShopWindow.RHSurvivalShop .RHShopCardBase,
+#CustomShopWindow.RHSurvivalShop .RHShopName,
+#CustomShopWindow.RHSurvivalShop .RHShopPrice { display:none; }
+
+/* Approved original-icon drawer, scoped to survival shop only. */
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.Unavailable,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.Unavailable:hover { wash-color:none; saturation:1; filter:brightness(1); }
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.StockEmpty .ShopItemIcon { saturation:0; filter:brightness(0.55); }
+#CustomShopWindow.UIModal.RHSurvivalShop,
+#CustomShopWindow.UIModal.RHSurvivalShop.UIClosed { visibility:visible; opacity:1; transition-property:position; transition-duration:0.28s; transition-timing-function:ease-out; }
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct:hover { width:90px; height:90px; margin:6px 14px 18px 0px; }
+#CustomShopWindow.RHSurvivalShop .ShopStockLabel { align:right bottom; position:absolute;left:0px;top:0px; color:#ffffff; font-size:15px; font-weight:bold; background-color:transparent; background-image:none; padding:0px; margin:0px 3px 2px 0px; text-shadow:none; z-index:10; }
+#CustomShopWindow.RHSurvivalShop .RHShopPrices,
+#CustomShopWindow.RHSurvivalShop .ShopCardName { display:none; }
+#ShopEntryTooltip.UITooltip { width:300px; min-height:0px; padding:14px; background-color:#19262dfc; wash-color:none; }
+#ShopTooltipHeader { height:50px; }
+#ShopTooltipIconHost,.ShopTooltipMainIcon { width:48px; height:48px; }
+#ShopTooltipTitle { font-size:19px; max-width:210px; white-space:pre-wrap; }
+#ShopTooltipCostRow { height:30px; margin-top:10px; }
+#ShopEntryTooltip .TooltipCostBlock { width:130px; height:28px; }
+#ShopEntryTooltip .TooltipCostIcon { width:21px; height:21px; top:50%;transform:translateY(-50%); }
+#ShopTooltipType,#ShopTooltipCondition,#ShopTooltipOwned,#ShopTooltipFields,#ShopTooltipStatus { display:none; }
+
+#ShopEntryTooltip #ShopTooltipDescription { visibility:visible; width:100%; height:max-content; white-space:pre-wrap; font-size:16px; line-height:22px; color:#dce3e6; margin-top:10px; }
+
+/* Knowledge books retain native art, with independent purchase toggles beneath. */
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct.AutoBookCard,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct.AutoBookCard:hover { height:120px; }
+.AutoBookButton { position:absolute;left:0px;top:92px; width:90px; height:28px; background-color:#152e39; border:1px solid #776840; z-index:12; }
+.AutoBookButton .label { left:50%;transform:translateX(-50%); top:50%;transform:translateY(-50%); color:#ddc58a; font-size:18px; }
+.AutoBookButton:hover { filter:brightness(1.3); }
+.AutoBookButton.AutoBookEnabled { background-color:#285d4b; border-color:#c3ae6b; }
+.AutoBookButton.AutoBookEnabled .label { color:#f5e6b8; }
+
+
+.RHClose.PreviewHover .RHClose_hover {opacity:1;}
+
+.RHClose.PreviewPressed .RHClose_pressed {opacity:1;}
+
+.RHWindow VerticalScrollBar .ScrollThumb.PreviewHover {filter:brightness(1.18);}
+
+.RHAction.PreviewHover .RHAction_hover {opacity:1;}
+
+.RHAction.PreviewPressed .RHAction_pressed {opacity:1;}
+
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab.PreviewHover {filter:brightness(1.12);background-color:transparent;z-index:4;}
+
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab.PreviewPressed {filter:brightness(.86);}
+
+#LotteryInfoDialog.RHWindow #LotteryInfoBody .LotteryDetailRow.PreviewHover {filter:brightness(1.06);}
+
+#RogueRewardSurface .RoguePick:enabled.PreviewHover {box-shadow:none;filter:brightness(1.06);transform:translate3d(0px,-4px,0px) scale3d(1.035,1.035,1);}
+
+.RCProduct.PreviewHover .RCCardHover {opacity:1;}
+
+.RCProduct.PreviewHover .RCProductHover {opacity:1;}
+
+.ArchiveRoot #ArchiveGrid .ArchiveCard.PreviewHover,.ArchiveRoot #ArchiveGrid .ArchiveHovered {z-index:5;}
+
+.ArchiveRoot #ArchiveGrid .ArchiveCard.PreviewHover .ArchiveHoverCorner,
+.ArchiveRoot #ArchiveGrid .ArchiveHovered .ArchiveHoverCorner {visibility:visible;}
+
+.ArchiveRoot #ArchiveArtTrialToggle.PreviewHover {filter:brightness(1.25);}
+
+.ArchiveRoot #ArchiveArtTrialToggle.PreviewPressed {filter:brightness(.9);}
+
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction.PreviewHover {filter:brightness(1.25);}
+
+.ArchiveRoot #ArchiveArtTrial .ArchiveArtTrialAction.PreviewPressed {filter:brightness(.9);}
+
+.RCWindow .RCProduct.PreviewHover .RCProductHover {visibility:visible;opacity:1;}
+
+.ArchiveRoot #ArchiveGrid .ArchiveCard,.ArchiveRoot #ArchiveGrid .ArchiveCard.PreviewHover,.ArchiveRoot #ArchiveGrid .ArchiveHovered {background-image:none;}
+
+.ArchiveCard.PreviewHover .ArchiveSelectedFrame,.ArchiveHovered .ArchiveSelectedFrame {visibility:visible;}
+
+.ArchiveRoot .ArchivePromote.PreviewHover,.ArchiveRoot #ArchiveDraw.PreviewHover {background-image:none;}
+
+#LotteryMainCanvas #LotteryTenButton:enabled.PreviewHover .PolishTenHover {opacity:1;}
+
+#LotteryMainCanvas #LotterySingleButton:enabled.PreviewHover .PolishSingleHover {opacity:.3;}
+
+.ShopShelfSlot.PreviewHover .RHShopHover {visibility:visible;}
+
+#LotteryInfoDialog .LotteryPoolTab,#LotteryInfoDialog .LotteryPoolTab.PreviewHover,#LotteryInfoDialog .LotteryPoolTab.PreviewPressed {transform:none;pre-transform-scale2d:1;box-shadow:none;}
+
+#LotteryInfoDialog.RHWindow #LotteryInfoTabs .LotteryPoolTab.PreviewPressed {filter:brightness(1);background-color:transparent;}
+
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle,
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle.Selected,
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle.PreviewHover,
+#CustomShopWindow.RHSurvivalShop .ShopModeToggle.PreviewPressed { width:157px;height:76px;background-image:none;background-color:transparent;border:0px;filter:brightness(1);transform:none;box-shadow:none;padding:0px; }
+
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct.PreviewHover { width:90px;height:130px;min-width:0px;min-height:0px;margin:4px 12px 8px 0px;padding:0px;border:0px;box-shadow:none;background-color:transparent;background-image:none;filter:brightness(1);transform:none; }
+
+
+/* Approved original-icon drawer, scoped to survival shop only. */
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.Unavailable,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.Unavailable.PreviewHover { wash-color:none; saturation:1; filter:brightness(1); }
+
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct.PreviewHover { width:90px; height:90px; margin:6px 14px 18px 0px; }
+
+
+/* Knowledge books retain native art, with independent purchase toggles beneath. */
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct.AutoBookCard,
+#CustomShopWindow.RHSurvivalShop .ShopShelfSlot.UICardProduct.AutoBookCard.PreviewHover { height:120px; }
+
+.AutoBookButton.PreviewHover { filter:brightness(1.3); }
+/* Shared geometry: 1920x1080 stage / 1600x920 modal / 296x348 product. */
+
+
+.CommerceJade {display:block;padding:0px;overflow:visible;}
+.CommerceJade .label {font-family:"Source Han Sans SC";color:#244554;text-shadow:none;letter-spacing:0px;}
+.CJBackdrop {background-color:#102c3ac4;}
+.CommerceJade .RCHeader {padding:0px;border:0px;z-index:3;}
+.CommerceJade .RCTitle {font-family:"Source Han Serif SC";font-size:48px;font-weight:bold;letter-spacing:8px;text-align:center;transform:none;transform:none;z-index:2;}
+.CJHeaderArt {z-index:0;}.CJTitleLeft,.CJTitleRight {z-index:1;}.CJTitleRight {transform:scaleX(-1);}
+.CJWindowBase {z-index:0;}.CJSidebarArt {z-index:1;}.CJHeaderMist {z-index:4;}.CJSidebarSeam {z-index:2;}.CJFrame {z-index:20;}
+.CommerceJade .CJClose {background-image:none;background-color:transparent;border:0px;box-shadow:none;z-index:4;padding:0px;margin:0px;}
+.CJCloseArt {opacity:0;}.CJClose_normal {opacity:1;}
+.CJClose:hover .CJClose_hover {opacity:1;}.CJClose:active .CJClose_pressed {opacity:1;}
+.CommerceJade .RCTabs {position:absolute;left:0px;top:128px;width:320px;height:768px;display:block;overflow:visible;z-index:3;}
+.CommerceJade .CJNav {margin:0px;padding:0px;display:block;border:0px;overflow:visible;background-color:transparent;background-size:100% 100%;background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/nav_normal.png");}
+.CommerceJade .CJNav:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/nav_hover.png");}
+.CommerceJade .CJNav.UISelected {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/nav_selected.png");border:0px;}
+.CommerceJade .CJNav .RCTabText {font-family:"Source Han Serif SC";font-size:24px;color:#eeeedf;text-align:left;transform:none;transform:none;z-index:3;text-overflow:ellipsis;white-space:nowrap;}
+.CommerceJade .CJNav.UISelected .RCTabText {color:#244554;}
+.CJNavIcon {z-index:2;}.CJNavIconSelected {opacity:0;}.UISelected .CJNavIconNormal {opacity:0;}.UISelected .CJNavIconSelected {opacity:1;}
+.CJNavGlow {opacity:0;z-index:0;}.CJNavLine {opacity:0;z-index:1;}.UISelected .CJNavGlow,.UISelected .CJNavLine {opacity:1;}
+.CommerceJade .RCNotice {position:absolute;left:346px;top:121px;width:760px;height:38px;font-size:18px;color:#627e82;text-overflow:ellipsis;white-space:nowrap;z-index:4;}
+.CommerceJade .CJEmpty {position:absolute;left:0px;top:42px;width:1232px;height:60px;font-size:23px;text-align:center;color:#627e82;}
+.CommerceJade .RCGrid,.CommerceJade .RCGrid.RCBundles {position:absolute;left:344px;top:174px;width:1232px;height:714px;display:block;overflow:visible;z-index:5;}
+.CommerceJade .CJProduct {width:296px;height:348px;margin:0px;padding:0px;display:block;overflow:visible;box-shadow:none;background-image:none;background-color:transparent;border:0px;transition-property:transform;transition-duration:.18s;}
+.CommerceJade .CJProduct:hover,.CommerceJade .CJProduct.CJVisualHover {transform:translateY(-2px);z-index:6;}
+.CJCardShadow {z-index:-3;opacity:.62;}.CJCardHalo {z-index:-2;opacity:0;}
+.CJCardBase {z-index:0;}.CJCardHover {z-index:1;opacity:0;}
+.CJProduct:hover .CJCardHalo,.CJProduct:hover .CJCardHover,.CJProduct.CJVisualHover .CJCardHalo,.CJProduct.CJVisualHover .CJCardHover {opacity:1;}
+.CJArtWell {z-index:2;overflow:visible;}.CJWellTexture {z-index:0;}
+.CommerceJade .RCProductArt {z-index:2;transform:none;transform:none;transition-property:transform;transition-duration:.18s;}
+.CJItemShadow {z-index:1;opacity:.55;transition-property:transform;transition-duration:.18s;}
+.CJProduct:hover .RCProductArt,.CJProduct:hover .CJItemShadow,.CJProduct.CJVisualHover .RCProductArt,.CJProduct.CJVisualHover .CJItemShadow {transform:translateY(-3px) scale3d(1.035,1.035,1);}
+.CommerceJade .RCProductHover {display:block;z-index:3;opacity:0;display:none;transition-property:opacity;transition-duration:.18s;}
+.CommerceJade .CJProduct:hover .RCProductHover,.CommerceJade .CJProduct.CJVisualHover .RCProductHover {visibility:visible;opacity:1;}
+.CJHoverShade {z-index:0;}
+.CommerceJade .RCProductEffect {font-size:17px;text-align:center;white-space:pre-wrap;text-overflow:ellipsis;overflow:hidden;color:#fbf7e8;z-index:1;padding:0px;text-shadow:none;}
+.CommerceJade .RCProductEffect.CJLongEffect {font-size:16px;text-overflow:hidden;overflow-x:hidden;overflow-y:auto;text-align:left;padding:5px 6px;background-color:transparent;}
+.CommerceJade .RCProductName {font-family:"Source Han Serif SC";font-size:24px;font-weight:400;letter-spacing:.2px;color:#214551;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;text-align:center;z-index:3;margin:0px;}
+.CJNameRegion {z-index:3;overflow:hidden;}
+.CJPrice {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/price_strip.png");background-size:100% 100%;z-index:3;display:block;}
+.CJPriceRow {left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:row;;max-width:100%;height:38px;}
+.CJPriceIcon {width:26px;height:26px;top:50%;transform:translateY(-50%);margin-right:8px;}
+.CommerceJade .CJPriceValue {font-size:21px;color:#426269;top:50%;transform:translateY(-50%);white-space:nowrap;text-overflow:ellipsis;max-width:230px;}
+.CommerceJade .CJYuanIcon {width:26px;height:28px;font-size:23px;text-align:center;color:#a27f45;top:50%;transform:translateY(-50%);margin-right:8px;}
+.CommerceJade .CJBuy {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/buy_button.png");background-size:100% 100%;background-color:transparent;border:0px;display:block;padding:0px;transition-property:brightness;transition-duration:.1s;z-index:2;}
+.CommerceJade .CJBuy:hover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/buy_button_hover.png");}
+.CommerceJade .CJBuy:active {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/buy_button_pressed.png");}
+.CommerceJade .CJBuy .label {left:50%;top:50%;transform:translate(-50%,-50%);margin:0px;padding:0px;font-family:"Source Han Serif SC";font-size:20px;color:#fff9e7;text-align:center;text-overflow:ellipsis;max-width:180px;}
+.CommerceJade .RCStockState {background-color:#244d52c4;color:#f7efdc;font-size:16px;text-align:center;z-index:4;}
+.CommerceJade .CJBundle {width:608px;height:348px;margin:0px;padding:0px;border:1px solid #b1beb7;border-radius:7px;background-color:#f1f3eaf5;background-image:none;display:block;}
+.CommerceJade .RCBundleContents {display:flex;flex-direction:row;flex-wrap:wrap;overflow-x:hidden;overflow-y:auto;}
+.CommerceJade .RCBundleItem {width:262px;height:94px;display:block;margin:0px 12px 8px 0px;background-color:#dce6dd42;border-bottom:1px solid #d0d9cf;}
+.CommerceJade .RCBundleArt {position:absolute;left:8px;top:5px;width:80px;height:80px;transform:none;}
+.CommerceJade .RCBundleName {position:absolute;left:98px;top:12px;width:154px;height:42px;font-size:18px;white-space:pre-wrap;text-overflow:ellipsis;text-align:left;}
+.CommerceJade .RCBundleQuantity {position:absolute;left:98px;top:57px;width:160px;height:28px;transform:none;font-size:19px;color:#426269;}
+.CommerceJade .CJPager {position:absolute;left:1240px;top:892px;width:328px;height:28px;display:flex;flex-direction:row;;z-index:6;}
+.CommerceJade .CJPageAction {width:76px;height:28px;border:0px;background-color:transparent;}
+.CommerceJade .CJPageAction:hover {background-color:#d3dfd2;}
+.CommerceJade .CJPageAction .label {left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;}
+.CommerceJade .CJPageLabel {width:158px;height:28px;text-align:center;font-size:16px;top:50%;transform:translateY(-50%);}
+.CommerceJade VerticalScrollBar {width:6px;background-color:#dae4d7;}
+.CommerceJade VerticalScrollBar .ScrollThumb {background-color:#93ada6;min-height:24px;}
+
+
+.CJClose.PreviewHover .CJClose_hover {opacity:1;}
+.CJClose.PreviewPressed .CJClose_pressed {opacity:1;}
+
+.CommerceJade .CJNav.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/nav_hover.png");}
+
+.CommerceJade .CJProduct.PreviewHover,.CommerceJade .CJProduct.CJVisualHover {transform:translateY(-2px);z-index:6;}
+
+.CJProduct.PreviewHover .CJCardHalo,.CJProduct.PreviewHover .CJCardHover,.CJProduct.CJVisualHover .CJCardHalo,.CJProduct.CJVisualHover .CJCardHover {opacity:1;}
+
+.CJProduct.PreviewHover .RCProductArt,.CJProduct.PreviewHover .CJItemShadow,.CJProduct.CJVisualHover .RCProductArt,.CJProduct.CJVisualHover .CJItemShadow {transform:translateY(-3px) scale3d(1.035,1.035,1);}
+
+.CommerceJade .CJProduct.PreviewHover .RCProductHover,.CommerceJade .CJProduct.CJVisualHover .RCProductHover {visibility:visible;opacity:1;}
+
+.CommerceJade .CJBuy.PreviewHover {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/buy_button_hover.png");}
+
+.CommerceJade .CJBuy.PreviewPressed {background-image:url("file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/commerce_jade_v1/buy_button_pressed.png");}
+
+.CommerceJade .CJPageAction.PreviewHover {background-color:#d3dfd2;}

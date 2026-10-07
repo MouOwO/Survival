@@ -1,113 +1,108 @@
 'use strict';
-// Adapt the native blue Io portal's art to a bounded, persistent frost pedestal.
+// Clone the complete native graph, including parent-particle inheritance.
 const fs = require('fs'), path = require('path'), cp = require('child_process');
 const {Vpk, endOf} = require('./lib.cjs');
 const root = path.resolve(__dirname, '../..');
 const pack = new Vpk(path.resolve(root, '../../dota/pak01_dir.vpk'));
-let out, prefix, outputs;
-const temp = path.join(root, 'output/ice_base_reference_20261006/native');
+const temp = path.join(root, 'output/native_portal_full_20261006/native_source');
 fs.mkdirSync(temp, {recursive: true});
-const nativePrefix = 'particles/econ/items/wisp/wisp_relocate_marker_ti7_';
+const nativePrefix = 'particles/econ/items/wisp/wisp_relocate_marker_ti7';
 const header = '<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf45:version{73c3d623-a141-4df2-b548-41dd786e6300} -->\n';
-function data(name) {
-    const resource = nativePrefix + name + '.vpcf';
-    const file = path.join(temp, name + '.vpcf_c');
+const cache = new Map();
+function data(resource) {
+    if (cache.has(resource)) return cache.get(resource);
+    const file = path.join(temp, path.basename(resource) + '_c');
     fs.writeFileSync(file, pack.read(resource + '_c'));
-    const text = cp.execFileSync(path.resolve(root, '../../bin/win64/resourceinfo.exe'),
-        ['-i', file, '-all'], {encoding: 'utf8', windowsHide: true});
-    return text.slice(text.indexOf('{', text.indexOf('--- vpcf block DATA')));
+    const dump = cp.execFileSync(path.resolve(root, '../../bin/win64/resourceinfo.exe'), ['-i', file, '-all'], {encoding:'utf8', windowsHide:true});
+    const start = dump.indexOf('{', dump.indexOf('--- vpcf block DATA'));
+    const text = dump.slice(start, endOf(dump, start)); cache.set(resource, text); return text;
 }
-function array(text, key) {
-    const start = text.indexOf('[', text.indexOf(key + ' ='));
-    if (start < 0) throw Error('Missing native array: ' + key);
-    return text.slice(start, endOf(text, start, '[', ']'));
+const children = text => [...text.matchAll(/m_ChildRef = resource:"([^"]+)"/g)].map(m => m[1]);
+function editArray(text, key, callback) {
+    const at = text.indexOf(key + ' ='); if (at < 0) return text;
+    const open = text.indexOf('[', at), end = endOf(text, open, '[', ']');
+    const body = text.slice(open+1,end-1), blocks=[]; let cursor=0;
+    while ((cursor=body.indexOf('{',cursor))>=0) {
+        const next=endOf(body,cursor), changed=callback(body.slice(cursor,next));
+        if(changed)blocks.push(changed); cursor=next;
+    }
+    return text.slice(0,open)+'[\n'+blocks.join(',\n')+'\n]'+text.slice(end);
 }
-function renderer(name) {
-    return array(data(name), 'm_Renderers')
-        .replace(/\s*m_nScaleCP[12] = \d+/g, '')
-        .replace(/m_n(Min|Max)Tesselation = 4/g, 'm_n$1Tesselation = 2');
+function append(text, key, body) { return text.replace(/\}\s*$/, key+' = '+body+'\n}\n'); }
+function lock(text) {
+    if(text.includes('C_OP_PositionLock'))return text;
+    const at=text.indexOf('m_Operators =');
+    if(at<0)return append(text,'m_Operators','[{ _class = "C_OP_PositionLock" }]');
+    const open=text.indexOf('[',at);
+    return text.slice(0,open+1)+'\n{ _class = "C_OP_PositionLock" },\n'+text.slice(open+1);
 }
-const literal = n => `{ m_nType = "PF_TYPE_LITERAL" m_flLiteralValue = ${Number(n).toFixed(3)} }`;
-const cpInput = (axis, scale) => `{ m_nType = "PF_TYPE_CONTROL_POINT_COMPONENT" m_nControlPoint = 1 m_nVectorComponent = ${axis} m_nMapType = "PF_MAP_TYPE_MULT" m_flMultFactor = ${scale} }`;
-// A one-unit seed survives CP1=0 during client creation. Constraints expand it
-// to the requested ring radius after control points arrive; no respawn required.
-const ringRadius = `{ m_nType = "PF_TYPE_CONTROL_POINT_COMPONENT" m_nControlPoint = 1 m_nVectorComponent = 0 m_nMapType = "PF_MAP_TYPE_REMAP" m_flInput0 = 0.0 m_flInput1 = 160.0 m_flOutput0 = 1.0 m_flOutput1 = 145.0 }`;
-const init = (field, value) => `{ _class = "C_INIT_InitFloat" m_nOutputField = ${field} m_InputValue = ${value} }`;
-const set = (field, value) => `{ _class = "C_OP_SetFloat" m_nOutputField = ${field} m_InputValue = ${value} }`;
-const lock = '{ _class = "C_OP_PositionLock" }';
-const color = '{ _class = "C_OP_RemapCPtoVector" m_nCPInput = 2 m_nFieldOutput = 6 m_vInputMax = [255.0,255.0,255.0] m_vOutputMax = [1.0,1.0,1.0] }';
-const offset = z => `{ _class = "C_INIT_PositionOffset" m_OffsetMin = [0.0,0.0,${z}.0] m_OffsetMax = [0.0,0.0,${z}.0] }`;
-const once = n => `{ _class = "C_OP_InstantaneousEmitter" m_nParticlesToEmit = ${literal(n)} }`;
-const constraint = (distance, z) => `[ { _class = "C_OP_ConstrainDistance" m_nControlPointNumber = 0 m_CenterOffset = [0.0,0.0,${z}.0] m_bGlobalCenter = false m_fMinDistance = ${distance} m_fMaxDistance = ${distance} } ]`;
-function write(name, native, count, render, initial, operators, emitters, constraints = '[]', children = []) {
-    const resource = prefix + name + '.vpcf';
-    const file = path.join(out, 'source', resource);
-    fs.mkdirSync(path.dirname(file), {recursive: true});
-    if (!initial.some(op => op.includes('m_nOutputField = 1 '))) initial.push(init(1, literal(999999)));
-    const source = header + `{
- _class = "CParticleSystemDefinition" m_nBehaviorVersion = 12
- m_nMaxParticles = ${count} m_flConstantLifespan = 999999.0 m_ConstantColor = [255,255,255,255]
- m_BoundingBoxMin = [-180.0,-180.0,-16.0] m_BoundingBoxMax = [180.0,180.0,64.0]
- m_Renderers = ${render}
- m_Initializers = [${initial.join(',\n')}]
- m_Operators = [${operators.concat('{ _class = "C_OP_EndCapTimedDecay" m_flDecayTime = 0.15 }').join(',\n')}]
- m_Emitters = [${emitters.join(',\n')}]
- m_Constraints = ${constraints}
- m_Children = [${children.map(r => `{ m_ChildRef = resource:"${r}" }`).join(',')}]
-}\n`;
-    fs.writeFileSync(file, source);
-    outputs.push({resource, native: nativePrefix + native + '.vpcf', maximum_particles: count});
-    return resource;
-}
-for (const theme of ['ice_portal', 'amber_portal']) {
-out = path.join(root, 'art/effects', theme);
-prefix = 'particles/survival/towers/' + theme + '/';
-outputs = [];
-const blue = theme === 'ice_portal';
-const nativeRing = blue ? 'endpoint_ring' : 'ring';
-const nativeCore = blue ? 'endpoint_ring_core' : 'ring_core';
-// Both native rope layers share one closed orbit. The thinner core uses the
-// renderer's radius scale, avoiding a second particle simulation for the ring.
-const bodyRenderer = renderer(nativeRing);
-const coreRenderer = renderer(nativeCore).replace('m_flRadiusScale = 0.5', 'm_flRadiusScale = 0.20');
-if (!coreRenderer.includes('m_flRadiusScale = 0.20')) throw Error('Native core width changed');
-const ringRenderers = '[' + bodyRenderer.slice(1, -1).trim().replace(/,$/, '') + ',' + coreRenderer.slice(1, -1) + ']';
-// Every layer is attached directly, including the visible 17-particle root.
-// Radius/color must not depend on an empty parent's child CP inheritance.
-const entry = write('ground', nativeRing, 17, ringRenderers, [
-    '{ _class = "C_INIT_RingWave" m_bEvenDistribution = true m_flParticlesPerOrbit = 16.0 m_flInitialRadius = ' + literal(1) + ' m_flInitialSpeedMin = ' + literal(0) + ' m_flInitialSpeedMax = ' + literal(0) + ' }',
-    offset(12), init(3, cpInput(0, 0.16)), init(7, cpInput(2, 0.80)),
-], [lock, color, set(3, cpInput(0, 0.16)), set(7, cpInput(2, 0.80)),
-    '{ _class = "C_OP_MovementRotateParticleAroundAxis" m_flRotRate = 12.0 }'], [once(17)], constraint(ringRadius, 12));
-write('dark_center', blue ? 'endpoint_light' : 'light', 1, renderer(blue ? 'endpoint_light' : 'light'),
-    ['{ _class = "C_INIT_CreateWithinSphere" m_fRadiusMax = 0.0 }'],
-    ['{ _class = "C_OP_SetToCP" m_vecOffset = [0.0,0.0,8.0] }',
-        set(3, cpInput(0, 0.85)), set(7, cpInput(2, 0.50))], [once(1)]);
-write('interior', blue ? 'interior_blue' : 'interior', 3,
-    renderer(blue ? 'interior_blue' : 'interior').replace('m_flOverbrightFactor = 5.0', 'm_flOverbrightFactor = 1.5'),
-    ['{ _class = "C_INIT_CreateWithinSphere" m_fRadiusMax = 0.0 }',
-        '{ _class = "C_INIT_RandomSequence" m_nSequenceMax = 3 }',
-        init(4, '{ m_nType = "PF_TYPE_RANDOM_UNIFORM" m_flRandomMin = 0.0 m_flRandomMax = 360.0 }')],
-    ['{ _class = "C_OP_SetToCP" m_vecOffset = [0.0,0.0,10.0] }', color,
-        set(3, cpInput(0, 0.72)), set(7, cpInput(2, 0.12)),
-        '{ _class = "C_OP_SpinUpdate" }'], [once(3)]);
-write('sparkles', blue ? 'sparkle_blue' : 'sparkle', 6, renderer(blue ? 'sparkle_blue' : 'sparkle'), [
-    '{ _class = "C_INIT_RingWave" m_flInitialRadius = ' + literal(1) + ' }',
-    offset(12), init(1, literal(1.2)), init(3, cpInput(0, 0.035)),
-], [lock, color, set(3, cpInput(0, 0.035)), set(7, cpInput(2, 0.70)),
-    '{ _class = "C_OP_FadeInSimple" m_flFadeInTime = 0.1 }',
-    '{ _class = "C_OP_FadeOutSimple" m_flFadeOutTime = 0.4 }',
-    '{ _class = "C_OP_Decay" }'],
-    ['{ _class = "C_OP_ContinuousEmitter" m_flEmitRate = ' + literal(3) + ' }'], constraint(ringRadius, 12));
-const manifest = {
-    video: 'https://www.bilibili.com/video/BV13oLszLE9z/', timestamp: blue ? '53:01' : '16:47–17:05',
-    identification: 'Native Io Relocate art adapted to the supplied ' + (blue ? 'blue' : 'orange dark-center') + ' pedestal reference; exact original binding and in-engine visual comparison remain unverified.',
-    native_root: blue ? nativePrefix + 'endpoint.vpcf' : nativePrefix.slice(0, -1) + '.vpcf', entry, outputs,
-    binding: 'Four directly attached layers, explicit CP0 feet / CP1 radius and alpha / CP2 color; visible persistent root, no empty parent or child CP inheritance.',
-    particle_budget: outputs.reduce((n, r) => n + r.maximum_particles, 0),
-    adaptation: 'Two native rope renderers share a closed 16-segment orbit; native sprite textures, permanent bounded ring with late-CP recovery, 3 sparks/s; no dynamic lights, teleport flash, expanding velocity or Lua position polling.',
-};
-fs.mkdirSync(out, {recursive: true});
-fs.writeFileSync(path.join(out, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
-console.log(theme.toUpperCase() + '_SOURCE_PASS systems=' + outputs.length + ' particles<=' + manifest.particle_budget);
+// A nonzero seed preserves each rope point's direction before client CP data
+// arrives. A zero-radius constraint would collapse the entire ring permanently.
+const radius='{ m_nType = "PF_TYPE_CONTROL_POINT_COMPONENT" m_nControlPoint = 3 m_nVectorComponent = 0 m_nMapType = "PF_MAP_TYPE_REMAP" m_flInput0 = 0.0 m_flInput1 = 160.0 m_flOutput0 = 1.0 m_flOutput1 = 160.0 }';
+for(const theme of ['ice_portal','amber_portal']) {
+    const blue=theme==='ice_portal', nativeRoot=nativePrefix+(blue?'_endpoint':'')+'.vpcf';
+    // New paths prevent a running client from retaining the old stripped graph.
+    const prefix='particles/survival/towers/'+theme+'/native_full/';
+    const names=new Map([
+        [nativeRoot,prefix+'ground.vpcf'],
+        [nativePrefix+(blue?'_endpoint_light':'_light')+'.vpcf',prefix+'dark_center.vpcf'],
+        [nativePrefix+(blue?'_interior_blue':'_interior')+'.vpcf',prefix+'interior.vpcf'],
+        [nativePrefix+(blue?'_sparkle_blue':'_sparkle')+'.vpcf',prefix+'sparkles.vpcf'],
+    ]);
+    const visited=new Set(), resources=[];
+    function visit(resource) {
+        if(visited.has(resource))return; visited.add(resource); resources.push(resource);
+        if(!names.has(resource))names.set(resource,prefix+'native/'+path.basename(resource));
+        for(const child of children(data(resource)))visit(child);
+    }
+    visit(nativeRoot); const outputs=[];
+    for(const native of resources) {
+        let text=data(native); const isRoot=native===nativeRoot;
+        const ring=/_(?:endpoint_)?ring(?:_core)?\.vpcf$/.test(native);
+        // Retain native behavior and compatibility flags, especially the black
+        // center's MOD2X blend / negative overbright and the child simulations.
+        text=text.replace(/resource:"([^"]+\.vpcf)"/g,(_,value)=>{
+            if(!names.has(value))throw Error('Unmapped child: '+value);
+            return 'resource:"'+names.get(value)+'"';
+        });
+        text=editArray(text,'m_Renderers',block=>block.includes('C_OP_RenderDeferredLight')?null:block
+            .replace(/PARTICLE_ORIENTATION_ALIGN_TO_PARTICLE_NORMAL/g,'PARTICLE_ORIENTATION_WORLD_Z_ALIGNED')
+            .replace(/\s*m_nScaleCP[12] = \d+/g,''));
+        text=editArray(text,'m_PreEmissionOperators',block=>block.includes('C_OP_StopAfterCPDuration')?null:block);
+        text=editArray(text,'m_Initializers',block=>{
+            if(block.includes('C_INIT_PositionPlaceOnGround'))return null;
+            if(block.includes('C_INIT_PositionOffset'))block=block.replace(/(m_Offset(?:Min|Max) = \[\s*-?[\d.]+,\s*-?[\d.]+,)\s*-?[\d.]+\s*\]/g,'$1 8.0 ]');
+            if(ring&&block.includes('C_INIT_RingWave'))block=block.replace(/(m_flInitialSpeed(?:Min|Max) =\s*\{[^}]*m_flLiteralValue =) [\d.]+/g,'$1 0.0');
+            return block;
+        });
+        text=editArray(text,'m_Operators',block=>{
+            if(isRoot&&block.includes('C_OP_Decay'))return null;
+            if(native.endsWith('_ring_glow.vpcf')&&block.includes('C_OP_Decay'))return null;
+            return block;
+        });
+        if(isRoot&&!text.includes('C_OP_SetChildControlPoints')) {
+            text=append(text,'m_Initializers','[{ _class = "C_INIT_CreateWithinSphere" }]');
+            text=append(text,'m_Emitters','[{ _class = "C_OP_InstantaneousEmitter" m_nParticlesToEmit = { m_nType = "PF_TYPE_LITERAL" m_flLiteralValue = 1.0 } }]');
+            text=append(text,'m_Operators','[{ _class = "C_OP_SetChildControlPoints" m_nFirstControlPoint = 1 }]');
+        }
+        text=lock(text);
+        if(ring)text=append(text,'m_Constraints','[{ _class = "C_OP_ConstrainDistance" m_nControlPointNumber = 1 m_bGlobalCenter = false m_fMinDistance = '+radius+' m_fMaxDistance = '+radius+' m_CenterOffset = [0.0,0.0,8.0] }]');
+        // Keep all layers; bound only continuous density for persistent towers.
+        let cap,rate;
+        if(/_ring_swirl\.vpcf$/.test(native)){cap=24;rate=12;}
+        else if(/_embers\.vpcf$/.test(native)){cap=16;rate=8;}
+        else if(/_(?:rays|streaks|sparkle(?:_blue)?|end_sparkle)\.vpcf$/.test(native)){cap=12;rate=6;}
+        if(cap)text=text.replace(/m_nMaxParticles = \d+/,'m_nMaxParticles = '+cap)
+            .replace(/(m_flEmitRate =\s*\{[^}]*m_flLiteralValue =) [\d.]+/g,'$1 '+rate+'.0');
+        const resource=names.get(native), file=path.join(root,'art/effects',theme,'source',resource);
+        fs.mkdirSync(path.dirname(file),{recursive:true}); fs.writeFileSync(file,header+text+'\n');
+        outputs.push({resource,native,maximum_particles:Number(/m_nMaxParticles = (\d+)/.exec(text)?.[1]||1000)});
+    }
+    const manifest={native_root:nativeRoot,entry:names.get(nativeRoot),outputs,
+        identification:'Complete native Io TI7 Relocate graph. Exact video asset binding remains unconfirmed.',
+        binding:'One root; CP0/CP1 feet, CP3 orbit radius. Native parent-particle inheritance preserved.',
+        particle_budget:outputs.reduce((n,r)=>n+r.maximum_particles,0),
+        adaptation:'Native black center, nebula, swirl, embers, glow, rays and trails; ground orientation, persistent lifetime, bounded emission and radius; no terrain traces, dynamic lights or Lua polling.'};
+    fs.writeFileSync(path.join(root,'art/effects',theme,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+    console.log(theme.toUpperCase()+'_SOURCE_PASS systems='+outputs.length+' particles<='+manifest.particle_budget);
 }

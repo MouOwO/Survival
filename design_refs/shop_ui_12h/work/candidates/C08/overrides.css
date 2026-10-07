@@ -1,0 +1,5 @@
+.content-transition{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/C08/assets/content_transition.png')!important;}
+.sidebar-seam{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/C08/assets/sidebar_seam.png')!important;}
+.card{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/C08/assets/product_normal.png')!important;}
+.card.is-hover,.card:hover{background-image:url('file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/design_refs/shop_ui_12h/work/candidates/C08/assets/product_hover.png')!important;}
+.card::before{opacity:0.35;}

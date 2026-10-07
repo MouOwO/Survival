@@ -201,11 +201,36 @@ bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id = 0, reason = "lott
 enemy.position = Vector(base_range + 300, 0, 0)
 check_targeting(base_range + 350)
 
+local fusion_refreshes, growth_updates = 0, 0
+bus.subscribe(events.TOWER_FUSION_STATE_CHANGED, function() fusion_refreshes=fusion_refreshes+1 end)
+bus.subscribe(events.BUILDING_CHANGED, function(payload)
+    if payload.stats_only then growth_updates=growth_updates+1 end
+end)
+for i=1,50 do
+    permanent.tower_attack_flat = i
+    bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,
+        {player_id=0, reason="gameplay_stats_tower_attack_growth"})
+end
+assert(growth_updates==50 and fusion_refreshes==0,
+    "50 combat growth hits must not trigger whole-group fusion/ability refreshes")
+local listed = assert(bus.request(events.BUILDING_LIST_REQUEST,
+    {player_id=0, building_id="arrow_tower", handles_only=true}))
+assert(#listed.buildings==1 and listed.buildings[1].unit==tower
+    and listed.buildings[1].definition==nil,
+    "lightweight registry returns only owned completed tower handles")
+assert(#bus.request(events.BUILDING_LIST_REQUEST,
+    {player_id=1, building_id="arrow_tower", handles_only=true}).buildings==0)
+print("TOWER_GROWTH_FANOUT_PASS: 50 hits, immediate stats, zero fusion refreshes, lightweight owner-isolated registry")
+
 -- A hot-reloaded upgrade subsystem may recover a tower solely from a technology
 -- event, without building_system recovery or any BUILDING_CREATED notification.
 tower.modifiers.modifier_tower_auto_attack = nil
 tower.acquisition = 1000
 bus.reset(); upgrade.init()
+bus.handle_request(events.BUILDING_LIST_REQUEST, function(payload)
+    assert(payload.handles_only == true)
+    return {ok=true, buildings={{unit=tower, player_id=0, building_id="arrow_tower"}}}
+end)
 bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, function() return {totals = permanent} end)
 bus.emit(events.TECHNOLOGY_STATS_CHANGED, {player_id = 0, reason = "technology_recovery_test"})
 auto = assert(tower:FindModifierByName("modifier_tower_auto_attack"), "technology-only recovery reinstalls missing targeting")

@@ -1,32 +1,85 @@
 {
-  "video": "https://www.bilibili.com/video/BV13oLszLE9z/",
-  "timestamp": "53:01",
-  "identification": "Native Io Relocate art adapted to the supplied blue pedestal reference; exact original binding and in-engine visual comparison remain unverified.",
   "native_root": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint.vpcf",
-  "entry": "particles/survival/towers/ice_portal/ground.vpcf",
+  "entry": "particles/survival/towers/ice_portal/native_full/ground.vpcf",
   "outputs": [
     {
-      "resource": "particles/survival/towers/ice_portal/ground.vpcf",
-      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_ring.vpcf",
-      "maximum_particles": 17
+      "resource": "particles/survival/towers/ice_portal/native_full/ground.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint.vpcf",
+      "maximum_particles": 1
     },
     {
-      "resource": "particles/survival/towers/ice_portal/dark_center.vpcf",
+      "resource": "particles/survival/towers/ice_portal/native_full/dark_center.vpcf",
       "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_light.vpcf",
       "maximum_particles": 1
     },
     {
-      "resource": "particles/survival/towers/ice_portal/interior.vpcf",
+      "resource": "particles/survival/towers/ice_portal/native_full/interior.vpcf",
       "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_interior_blue.vpcf",
-      "maximum_particles": 3
+      "maximum_particles": 8
     },
     {
-      "resource": "particles/survival/towers/ice_portal/sparkles.vpcf",
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_end_sparkle.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_end_sparkle.vpcf",
+      "maximum_particles": 12
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_ring.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_ring.vpcf",
+      "maximum_particles": 33
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_ring_swirl.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_ring_swirl.vpcf",
+      "maximum_particles": 24
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_embers.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_embers.vpcf",
+      "maximum_particles": 16
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_ring_glow.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_ring_glow.vpcf",
+      "maximum_particles": 33
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_streaks.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_streaks.vpcf",
+      "maximum_particles": 12
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_ring_core.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_ring_core.vpcf",
+      "maximum_particles": 33
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_rays.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_rays.vpcf",
+      "maximum_particles": 12
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/sparkles.vpcf",
       "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_sparkle_blue.vpcf",
-      "maximum_particles": 6
+      "maximum_particles": 12
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_end.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_end.vpcf",
+      "maximum_particles": 64
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_core_flare.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_core_flare.vpcf",
+      "maximum_particles": 64
+    },
+    {
+      "resource": "particles/survival/towers/ice_portal/native_full/native/wisp_relocate_marker_ti7_endpoint_flash.vpcf",
+      "native": "particles/econ/items/wisp/wisp_relocate_marker_ti7_endpoint_flash.vpcf",
+      "maximum_particles": 24
     }
   ],
-  "binding": "Four directly attached layers, explicit CP0 feet / CP1 radius and alpha / CP2 color; visible persistent root, no empty parent or child CP inheritance.",
-  "particle_budget": 27,
-  "adaptation": "Two native rope renderers share a closed 16-segment orbit; native sprite textures, permanent bounded ring with late-CP recovery, 3 sparks/s; no dynamic lights, teleport flash, expanding velocity or Lua position polling."
+  "identification": "Complete native Io TI7 Relocate graph. Exact video asset binding remains unconfirmed.",
+  "binding": "One root; CP0/CP1 feet, CP3 orbit radius. Native parent-particle inheritance preserved.",
+  "particle_budget": 349,
+  "adaptation": "Native black center, nebula, swirl, embers, glow, rays and trails; ground orientation, persistent lifetime, bounded emission and radius; no terrain traces, dynamic lights or Lua polling."
 }

@@ -1,0 +1,21 @@
+{
+  "group": "01_junction",
+  "best": "J02",
+  "entries": [
+    {
+      "id": "J01",
+      "result": "淘汰",
+      "improvement": "减弱标题下方横带",
+      "cost": "背景过渡仍是窄带，侧栏深浅关系未改善"
+    },
+    {
+      "id": "J02",
+      "result": "保留",
+      "improvement": "暖雾衔接象牙标题与商品底，顶部接缝更连贯",
+      "cost": "比原版少一点青灰层次，仍保留山水细节"
+    }
+  ],
+  "at": "2026-10-06T16:21:29.777Z",
+  "kind": "assembled_component_browser_preview",
+  "hash": "ef226ee2e9c979a47f9bf04d19ccfeabf0e8acc2704b0203df4875cbdfbd8425"
+}

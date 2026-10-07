@@ -1,0 +1,1541 @@
+{
+  "version": "B17 + L21 + T23",
+  "generatedAt": "2026-10-06T18:41:08.926Z",
+  "materials": [
+    {
+      "id": "window",
+      "width": 1600,
+      "height": 920,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/window.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/window_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/component_recipes.json#window",
+      "sha256": "0677b451da6568e756868faef89a3fef9cf67391db0214e4c87048cbdbb36937"
+    },
+    {
+      "id": "header",
+      "width": 1600,
+      "height": 112,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/header.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/header_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/component_recipes.json#header",
+      "sha256": "1702026533d46cd1ac840f0972e2d25c7af14cf6e4eec46792add61732f01e57"
+    },
+    {
+      "id": "sidebar",
+      "width": 320,
+      "height": 808,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/sidebar.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/sidebar_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/component_recipes.json#sidebar",
+      "sha256": "a0ae9f73aae4d4e8c0575d1af7c0af1d89413dcc2d33ac4f333af06c40061cb4"
+    },
+    {
+      "id": "frame",
+      "width": 1600,
+      "height": 920,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/frame.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/frame_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/frame.svg",
+      "sha256": "7dbbbe224be6e68e659d6d7c321eb0e8495022afe48fcd6dd2083a4a24ed1bdb"
+    },
+    {
+      "id": "title_flourish",
+      "width": 200,
+      "height": 24,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/title_flourish.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/title_flourish_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/title_flourish.svg",
+      "sha256": "b2201352b0571a51d2beb9ef3899f2a92d05b52f45378b431b708acafec8c7de"
+    },
+    {
+      "id": "content_transition",
+      "width": 1280,
+      "height": 96,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/content_transition.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/content_transition_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/content_transition.svg",
+      "sha256": "6f35747fd748ef33b3ee946ddd0af20581c244a14304cb3e2c9256627580cd18"
+    },
+    {
+      "id": "sidebar_seam",
+      "width": 24,
+      "height": 808,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/sidebar_seam.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/sidebar_seam_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/sidebar_seam.svg",
+      "sha256": "21e685a640cc7eda49d31ae363eaa02715af939f8f1e3d7463b58415c8e8f414"
+    },
+    {
+      "id": "product_normal",
+      "width": 296,
+      "height": 348,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/product_normal.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/product_normal_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/product_normal.svg",
+      "sha256": "bb652d9fbaa3462c0113d11cfa7a6fb36f1b491e5a146de26151a94669d5594b"
+    },
+    {
+      "id": "product_hover",
+      "width": 296,
+      "height": 348,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/product_hover.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/product_hover_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/product_hover.svg",
+      "sha256": "960dfce296422febd83c1213c019d6b6539a577c9ee10a2698c14e0e33bf58d6"
+    },
+    {
+      "id": "product_selected",
+      "width": 296,
+      "height": 348,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/product_selected.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/product_selected_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/product_selected.svg",
+      "sha256": "960dfce296422febd83c1213c019d6b6539a577c9ee10a2698c14e0e33bf58d6"
+    },
+    {
+      "id": "art_well",
+      "width": 264,
+      "height": 224,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/art_well.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/art_well_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/art_well.svg",
+      "sha256": "36cf4773741ffd971ebe9bde1bcd9bcd7753b7b283ba2f95d402275ee10843fe"
+    },
+    {
+      "id": "price_strip",
+      "width": 264,
+      "height": 42,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/price_strip.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/price_strip_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/price_strip.svg",
+      "sha256": "cf0fb799659ac29d848b4de909ce16ad17d64d50096c5f51f4c8d3e162a4abe7"
+    },
+    {
+      "id": "hover_shade",
+      "width": 264,
+      "height": 224,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/hover_shade.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/hover_shade_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/hover_shade.svg",
+      "sha256": "d1a968f64ffc092ecc2129dd2b4c458f3b8037881d26d49374c0b1ed4ff4147d"
+    },
+    {
+      "id": "hover_shade_long",
+      "width": 264,
+      "height": 224,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/hover_shade_long.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/hover_shade_long_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/hover_shade_long.svg",
+      "sha256": "01432e22c2cb8e64a8419a1b135e4f4dadda14bbf2cfc1096387866273fb5fcd"
+    },
+    {
+      "id": "card_shadow",
+      "width": 320,
+      "height": 376,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/card_shadow.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/card_shadow_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/card_shadow.svg",
+      "sha256": "2e285a9c4ed88f00da29f6eb86f3e35bae1376d54b4cbca701bca4d1685d9a0c"
+    },
+    {
+      "id": "card_halo",
+      "width": 320,
+      "height": 376,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/card_halo.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/card_halo_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/card_halo.svg",
+      "sha256": "ea1ab4962e014f5ebffc79da5e9df1be7cf6f8713619ee03d60b858d8a2463ea"
+    },
+    {
+      "id": "buy_button",
+      "width": 188,
+      "height": 46,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/buy_button.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/buy_button_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/buy_button.svg",
+      "sha256": "f636d4d14dbce4e7e06258338e1c9b0461d90f9b22840a19418469bc459da009"
+    },
+    {
+      "id": "buy_button_hover",
+      "width": 188,
+      "height": 46,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/buy_button_hover.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/buy_button_hover_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/buy_button_hover.svg",
+      "sha256": "3750173fcbe0d1f826efe4c85f26840490216b9fca38b58f825bf669209a2ae5"
+    },
+    {
+      "id": "buy_button_pressed",
+      "width": 188,
+      "height": 46,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/buy_button_pressed.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/buy_button_pressed_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/buy_button_pressed.svg",
+      "sha256": "e21fd473bbad0a3defc0d000985968c4fb5d30b38a7aec337ee553c200f2fceb"
+    },
+    {
+      "id": "nav_normal",
+      "width": 320,
+      "height": 96,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/nav_normal.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/nav_normal_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/component_recipes.json#nav_normal",
+      "sha256": "fc13d4b08124dc3feae6721e01a9afeddf835b1fe82ae4f3f1a2ff173947e18e"
+    },
+    {
+      "id": "nav_hover",
+      "width": 320,
+      "height": 96,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/nav_hover.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/nav_hover_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/component_recipes.json#nav_hover",
+      "sha256": "65c6b4a9bbdc3b8a2f7873193bc94c9dc93fb4991595357d0e7e3ce0e1681c5d"
+    },
+    {
+      "id": "nav_selected",
+      "width": 320,
+      "height": 96,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/nav_selected.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/nav_selected_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/nav_selected.svg",
+      "sha256": "a68c2b6ef2f4dcc86ea629ab53d3f33a6c96f20596f75c4570daa1adce5c9c39"
+    },
+    {
+      "id": "nav_selected_glow",
+      "width": 340,
+      "height": 116,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/nav_selected_glow.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/nav_selected_glow_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/nav_selected_glow.svg",
+      "sha256": "1cf2df2c7905c1310a4fbec9985dec54f100f5441c5da9a491c3903494348621"
+    },
+    {
+      "id": "nav_selected_line",
+      "width": 320,
+      "height": 2,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/nav_selected_line.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/nav_selected_line_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/component_recipes.json#nav_selected_line",
+      "sha256": "75f6dbdec937c83eaa134d74bfc8a2d13d88ac047190e493868e9b87492e0105"
+    },
+    {
+      "id": "close_normal",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/close_normal.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/close_normal_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/close_normal.svg",
+      "sha256": "29d3fb065a72bd2ef065b728382d63176198beea1bc955c82890aa51e36324fa"
+    },
+    {
+      "id": "close_hover",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/close_hover.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/close_hover_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/close_hover.svg",
+      "sha256": "7a3e4751feb148fc604372cc4252262476aaa79292400b667ae4599acab910a0"
+    },
+    {
+      "id": "close_pressed",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/close_pressed.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/close_pressed_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/close_pressed.svg",
+      "sha256": "04df05a431589e1b12b94460e1dbffec310a393cb50e785cacd0b45498995c5c"
+    },
+    {
+      "id": "coin",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/coin.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/coin_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/coin.svg",
+      "sha256": "70cd3d733dadd545bbec550a99002fc23d6355377c2b9af07881b5e0fa5c4639"
+    },
+    {
+      "id": "crystal",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/crystal.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/crystal_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/crystal.svg",
+      "sha256": "4d84be4f95e605d35bd5acdbe4f9190c215b200f96993762a386811ae21d472d"
+    },
+    {
+      "id": "sword_light",
+      "width": 48,
+      "height": 48,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/sword_light.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/sword_light_png.vtex_c",
+      "editable": "art/ui/sources/custom_game/commerce_jade_v1/sword_light.png",
+      "sha256": "71c1bef35b3131a6e6f87f156a39fb75be0948ec331d3629d2c2319c67b950b6"
+    },
+    {
+      "id": "sword_hover",
+      "width": 48,
+      "height": 48,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/sword_hover.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/sword_hover_png.vtex_c",
+      "editable": "art/ui/sources/custom_game/commerce_jade_v1/sword_hover.png",
+      "sha256": "1b1eae70549f6186d831f9c16a5733cf3eaaf9c8021c7b376568a953a2ed9d40"
+    },
+    {
+      "id": "ticket_light",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/ticket_light.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/ticket_light_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/ticket_light.svg",
+      "sha256": "57555666b0e412737cba0dcfbaea66a806f0192ecf6e7e67dc4d2f443d914130"
+    },
+    {
+      "id": "ticket_hover",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/ticket_hover.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/ticket_hover_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/ticket_hover.svg",
+      "sha256": "83dad92c7fe91f2ef84662bf7ee1bce816323a7fd4d5efcafd65615ed3b1df79"
+    },
+    {
+      "id": "gift_light",
+      "width": 48,
+      "height": 48,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/gift_light.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex_c",
+      "editable": "art/ui/sources/custom_game/commerce_jade_v1/gift_light.png",
+      "sha256": "0c047819cfa87c63f04804162f99b6aafb3b74fb3da84c411303f38f3e954702"
+    },
+    {
+      "id": "gift_hover",
+      "width": 48,
+      "height": 48,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/gift_hover.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/gift_hover_png.vtex_c",
+      "editable": "art/ui/sources/custom_game/commerce_jade_v1/gift_hover.png",
+      "sha256": "debb431aa94c14153dd112a5f0bd5fd49063177e75d00b6a325e93afb45d98eb"
+    },
+    {
+      "id": "hero_light",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/hero_light.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/hero_light_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/hero_light.svg",
+      "sha256": "964f50a7d9461f91b7cff7b1dd708daf350a28e804a82565a881aed4a1f8bad9"
+    },
+    {
+      "id": "hero_hover",
+      "width": 40,
+      "height": 40,
+      "master": "art/ui/sources/custom_game/commerce_jade_v1/hero_hover.png",
+      "runtime": "panorama/images/custom_game/commerce_jade_v1/hero_hover_png.vtex_c",
+      "editable": "art/ui/development/commerce_jade_v1/source/hero_hover.svg",
+      "sha256": "1598584a178a0d5eb4f929320c1f72bf973661faa1271c7e9c5a384e555cfc88"
+    }
+  ],
+  "originalArtwork": [
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_lumber_crystal.png",
+      "sha256": "917adddd56f50c234fef98eb5b6e413e5fa54d0d539c81354f7a91af924cf11f",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        205,
+        64,
+        1119,
+        1182
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/38a195555f22.png",
+      "shadowSha256": "39f71d4c7417707a179c3110cfbece656b5776300cc1dbf3f61292b76983836d"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_wealth_crystal.png",
+      "sha256": "42b5551df47ad373275f79a6bd59f324fe8f7a81a01286b2e475c474beebf67d",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        188,
+        85,
+        1060,
+        1173
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/4c99e12d7388.png",
+      "shadowSha256": "7de2addf79e9ea6a2300333827c7534e02294ddb96c6a016c9651c52cf514cf6"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_protection_crystal.png",
+      "sha256": "c743792e4a1592477d452bc65c82d124c002114c9d11599aa2c55668a862b8b1",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        206,
+        104,
+        1067,
+        1127
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/8c030f4b3b55.png",
+      "shadowSha256": "f8380cd2150c870d6f98da8b8c277552cf2c90420e7db8bcbe2a74d1685d9a83"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_life_spirit.png",
+      "sha256": "3d594d9bd0747d5a6469b3ca02e6111abbd7ce035d14b23c2bf33a35869d86f8",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        133,
+        63,
+        1119,
+        1155
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/665ac8a0e595.png",
+      "shadowSha256": "b7d4a9da6e5bd52918fc49979281a8310e4ea1ae0eba68c987137f99fd8ce7a8"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_sharp_spirit.png",
+      "sha256": "10a528dc19d0ad132b91570b1b74b1a35c97cb87c3cae8ceab727a04da8bb820",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        163,
+        67,
+        1130,
+        1191
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/6419b99487f7.png",
+      "shadowSha256": "ca690fbdc1c8ab4875592ea45231df7af5aa8f44a3e2fcc6bc2564bb1569e81f"
+    },
+    {
+      "source": "panorama/src/images/custom_game/lottery_handoff_v1/ticket_illustrated.png",
+      "sha256": "f6d8efb990a0eebc6f709f370f1fade1ef7f4d5bf7df9c77ba4ba8a0ebb8cdb7",
+      "sourceSize": [
+        53,
+        47
+      ],
+      "alphaBounds": [
+        0,
+        0,
+        52,
+        46
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/aea08e083c2b.png",
+      "shadowSha256": "e4f0a756e35ddc34c14cab3b5a708f77f5ac0411fe5b24b0548d6103c222f53f"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_attribute_crystal.png",
+      "sha256": "3467f6b573637b28e870562ecb68ccf414202803ab3055d04ec9d4cd336f870c",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        252,
+        70,
+        1019,
+        1134
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/7fac37df44f3.png",
+      "shadowSha256": "65bbcaec6f2f8f11007b4282d50a6533e8ea11111285c73f7bc4da5c60eee650"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_rift_implant.png",
+      "sha256": "56e75498918540e7132628f493ccbbba6979eb0b809e1d4c9fcf123af7291160",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        234,
+        67,
+        1066,
+        1135
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/d1d376747d5f.png",
+      "shadowSha256": "2a64c84533fefbe1c671c0143ce3fd51f1223aaab7da863947fc7eab7db2d2a5"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_magnetic_disruption_turret.png",
+      "sha256": "448f3e794f138eff52ff65a8b2f6392e0d1c47ea90f5fa7bce5ef35e63662720",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        221,
+        73,
+        1204,
+        1167
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/83b6b46fb7fc.png",
+      "shadowSha256": "65d564876da7ed59afb840c2e583c4fa7dfdc21e54974cd4070ade3f92792b9b"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_pulse_conduction_turret.png",
+      "sha256": "2b72d9a7c4638587a2395f0fe296e26715c3892a3b1cdce966cbde28d5a31a12",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        142,
+        88,
+        1179,
+        1168
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/6d1fef7c23f2.png",
+      "shadowSha256": "4b714faa912f96faf341c244251657761a94662aa8698cd6e6fda996afe98389"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_cybernetic_implant.png",
+      "sha256": "0d9a76e74d094ccb3b38ab68af643b1efb232e6c99187a520dba88a9bd1a1009",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        172,
+        120,
+        1185,
+        1116
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/94bf62db24ef.png",
+      "shadowSha256": "02dbf779512fd2b2d9160ddd7352c035ae0f1cc9ebf5fbe20792cb5699bd2008"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_crystalline_armor.png",
+      "sha256": "34a7429306d58782da139ab506a7c8c58140e8bbd99767389f74bae2ff5cf915",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        85,
+        117,
+        1168,
+        1158
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/803f152ce8e3.png",
+      "shadowSha256": "9d3046e636415ee05b02bfcf19445ce348702c11bb081e0eded7b5a4a4850f8f"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_signal_hub.png",
+      "sha256": "56dd1c998435b3d122d37b8cd2e73425dc6f188c3daecb980473ee6c021636d4",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        185,
+        49,
+        1108,
+        1209
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/90c6947e7e7a.png",
+      "shadowSha256": "3872823bd908955590a97becaee906ae5bb3be5102535bf7288df2e680e925e9"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_data_unit.png",
+      "sha256": "70476b6fd7b25572cddfeabb60c5aca12fde0f1c7b17d13db41216c02df6e091",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        102,
+        116,
+        1172,
+        1111
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/417f26515a79.png",
+      "shadowSha256": "3a30fa55965b40e60f3ce3b10deff390b26ec523958af88cc23b330a1af16b10"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_nitride_alloy_wall.png",
+      "sha256": "43314e666ac2864fe165b7feadc36907d6a7ca133d016de9c16a469161397495",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        73,
+        61,
+        1209,
+        1172
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/899daeb89c2a.png",
+      "shadowSha256": "94e9728b612a9fcc5c3de750464f597ec4c9049cbdab771ced4a58c3a2bec2e2"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_orbital_cannon_core.png",
+      "sha256": "b23dd108242bdaf72e9e89414c79af3050105b73d918910461f77f31e3a63296",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        132,
+        46,
+        1182,
+        1211
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/cd6a8d27903a.png",
+      "shadowSha256": "a265f31d320a8e508539d4b78895e9d064b552f575f1527dc7714894372efbb6"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_nano_cluster.png",
+      "sha256": "bfbc40550f93e7da4c6afcc7e048c2b654485f9b8ee72c4a214699c69407fe3a",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        118,
+        124,
+        1141,
+        1120
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/61384e29956f.png",
+      "shadowSha256": "77ffec8bfe926ea3854ff154b1fd5a59911f341d0f8adf4562c71b673125f124"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_dimensional_barrier.png",
+      "sha256": "da3a5d80b5a7efa97dfe262a0b0710d70dc3956a5321120e18d42c114373e804",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        92,
+        53,
+        1162,
+        1205
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/cd26f59fc0fa.png",
+      "shadowSha256": "635a5d10ca93aec83cd01cc745447a59f7da02e270a041780e3098aa77692fc5"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_fallen_sky_mine.png",
+      "sha256": "b80510dc63ed3b5113ace66057d8ee783660e968db9d1c6dde937db092e1770b",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        99,
+        46,
+        1157,
+        1182
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/fa85db7454b6.png",
+      "shadowSha256": "8fb69f8655124adeda3b217ee604898537e400d6538cf4677266ebcbd090306b"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_mountain_sea_kunpeng.png",
+      "sha256": "bcc5b532c2879bd2ff613b81792fb73feafe06a96a977c522822e0e268be1aa6",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        35,
+        37,
+        1224,
+        1219
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/7d5e1f248dec.png",
+      "shadowSha256": "7bdee4a5288ce1940cdae7fb5a7d7a3630d9060ad295f68922dcaa7f59c853a3"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_reincarnation_immortal_stele.png",
+      "sha256": "13e585ae0ebafb902b8e5d0a910e0fcb23d481b88fdf4bd58ba3f33262d1c08e",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        247,
+        49,
+        1016,
+        1206
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/9e3b36e5c374.png",
+      "shadowSha256": "e79d45c80e12fe277468148620da9dd796381f1ad3a8c438b3f32cdace3eba5c"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_emerald_wood_origin.png",
+      "sha256": "afaf15f2268a8bdafabc75cdce2e3c57feccbe5f611bcaa98128b8f625c965b4",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        100,
+        50,
+        1128,
+        1190
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/3242c4586641.png",
+      "shadowSha256": "5ba08c6a3c24c4a3d772df2bd6c86f71c476bc0b77843c83bde06e9d704e604f"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_forestcast_thousand_bolts.png",
+      "sha256": "458fa53896662f97a31f7afc9e423da573a116ecb68a7f5dcc325257d1d4e962",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        249,
+        50,
+        1197,
+        1189
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/2dac14ea36c5.png",
+      "shadowSha256": "1e078518d9b4976e0b19ac372a0619778879f54f351d014839d7ae725beac498"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_woodcraft_grandmaster.png",
+      "sha256": "03f0ba5ced468a1a1cbb970b2ddacc5243b50d2b4836be309b0d4aabb402c9a0",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        135,
+        88,
+        1161,
+        1158
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/81fc95997203.png",
+      "shadowSha256": "6a076490015117519123abfb2474e8480698d1679ef25fc721e018e0644642fe"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_ancient_pine_fortification.png",
+      "sha256": "6681643bc6c7201649b6f102f79e98a949b3cdcfe1437955b4725526cecfd9f2",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        81,
+        58,
+        1193,
+        1208
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/5fa5e966c775.png",
+      "shadowSha256": "6908e70336396e0ef605412bf459c287d81baa7e25327365fac69a122684d732"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_immortal_slaying_sword_array.png",
+      "sha256": "111c5d0ce816ab3c523e6aeeaa23c69a42e8802e9efdcf47fd4e5b43bf4b0dcf",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        85,
+        22,
+        1183,
+        1237
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/cad0bb59758c.png",
+      "shadowSha256": "f1280376bb4f82187dbd77485c72c417add932f7523cf86743ed1ebde87fef3a"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_sky_turning_seal.png",
+      "sha256": "90a2382dee909813210ec8bc9b08ea6fea6d5a6487036967a96aa0ebdd8037d4",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        64,
+        38,
+        1185,
+        1183
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/20f63a10788a.png",
+      "shadowSha256": "381e274835e6013f08469657ffa77c74cb92a5ff182e1068209fd8610d6f2980"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_immortal_nirvana.png",
+      "sha256": "ca7030089c80c4cb3cc5d6e10c07e4b029c82076a764ae7fd26a8ec5818d581f",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        140,
+        30,
+        1143,
+        1167
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/dfd0af93af91.png",
+      "shadowSha256": "6edbedec71787e3fbc4bf07d2da67714ad625d97419f4ab35f96b3c102ef04fd"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_heaven_reaching_tower_seal.png",
+      "sha256": "77ef49bae4d139d7ffce12fbfbb73fa6cbd9e26771bc1621126807ec75bf9e39",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        215,
+        4,
+        1039,
+        1249
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/03a19b79e237.png",
+      "shadowSha256": "f739c9c61f8aa133c8cb3544cd1af9ebafd3bdc49c199807402cc583f361451e"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_sovereign_under_heaven.png",
+      "sha256": "6b1f689dafc946dc2c6b7b2f09989b09a99218ce1d08937964d689e1341a010e",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        123,
+        32,
+        1130,
+        1233
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/476bb1e07d59.png",
+      "shadowSha256": "5ad75ffefe14e7c0c9a77962cde2acb66ec724a8b8a04bd18997139fe8578c42"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_greenwood_rampart.png",
+      "sha256": "ab4b912a1ac6afc57d4297a8c6999a358600cf6fea4dfc727d064ec9780e1120",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        100,
+        96,
+        1187,
+        1209
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/e62598643131.png",
+      "shadowSha256": "359c83c1d594c812bb74656792f7f4ea9376a1014b2078c4afd6e1b0688c1ae8"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_greenwood_nirvana.png",
+      "sha256": "4b2962f5e40cee5689a26a8f634c831926135ef6fdf031a701158ca962b3ed77",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        155,
+        92,
+        1120,
+        1164
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/47112f41112e.png",
+      "shadowSha256": "ecd74ddb650ada4901c0e2c6d18e74ba4de3bf7ae93fd96564cec570cd660e29"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_woodforged_thousand_arrows.png",
+      "sha256": "15fb7edd8492a4f7a2e3ea5df137f910b95cc2e4859051476944b0ef4cab7b9e",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        151,
+        23,
+        1202,
+        1202
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/6aed4833e27d.png",
+      "shadowSha256": "983f80f28c745480a33d3b8d4a3177985e6d23a6a272fdd6fd1886d6d08b27fd"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_lumber_expert.png",
+      "sha256": "6d9b2a35c55f47a55184241aa426b93c915700432901a2d8d69dd4acf49677ae",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        97,
+        45,
+        1166,
+        1186
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/aafd827a8434.png",
+      "shadowSha256": "f547ee30eed01bf9e775de14bb113eec0753d89c3d866db87512c1a33d58bd59"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_ember_of_legacy.png",
+      "sha256": "f5afdde4cb83772b0d3199d19b3de0a8673485f34af45d72a499b9639c9411f3",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        191,
+        67,
+        1102,
+        1193
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/c07809a71854.png",
+      "shadowSha256": "e8e1c648c5962807207d4030d499a113db63cffc3312ddfdf11cc41a428b879c"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_flame_wall.png",
+      "sha256": "d151c3422c3752c36835ee50910ad44050bfe59102543859f3be51ee904c1741",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        88,
+        62,
+        1222,
+        1213
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/2641c94bc7bb.png",
+      "shadowSha256": "779ea65b9c0a09032c36f9cfa46b7abbfdfa1df439744b68c174844b5537e29e"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_lumber_immortal.png",
+      "sha256": "6b082d5102e087798ace990a2bad8a81954501ac0e42d16486bf970131f6216a",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        151,
+        83,
+        1097,
+        1170
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/581ec4ddb14a.png",
+      "shadowSha256": "ae971b76509c365663757b8cb6f3e375f21411b33cd133af7bbf0ecf271b1477"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_endless_growth_ring.png",
+      "sha256": "7fcb1d4e71fc0b3122966db4d054636addd08625da1b34cfc11057686dca26be",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        82,
+        55,
+        1172,
+        1177
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/8fbb52a53d9c.png",
+      "shadowSha256": "2e426d21730f12b5eead874e4fd6e1537559ffaddb0016711e426fe00e81a4a9"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_lumber_fury.png",
+      "sha256": "b0a9e16592ca1ebc8199d930c726505f65b881c02ad73401565653618d2fec2f",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        117,
+        60,
+        1164,
+        1164
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/c3c7a498cf72.png",
+      "shadowSha256": "a5bcd3857f9c0b993ead28ab471125d5a8747d31d055961388e31e6e7f8c71c3"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_supreme_fishing_rod.png",
+      "sha256": "38eab987c59da04de8dae94b9cf005533078ee44068ce984de600b8c389f11c0",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        76,
+        64,
+        1206,
+        1217
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/7e426b40dbe8.png",
+      "shadowSha256": "536f5fb29a6eb7b06397a957d12b17edfac5d0dfb0223c45f9446c8c15af5f3d"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_hero_medal.png",
+      "sha256": "5d9338b36bd493201ca5209e7da272b87a5c2c6d99e205354d631dba646a29cb",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        120,
+        80,
+        1133,
+        1120
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/afc8c8ae42d0.png",
+      "shadowSha256": "8f3b9517f956717561c1536846b517beb9c908d01db1e568af0a204324a7da34"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_sharpwood_tower_core.png",
+      "sha256": "aeb9bee1aeeae67e8e59311e0c55a97ef45132d48b7239cfa7373036f8b73cbc",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        50,
+        43,
+        1203,
+        1214
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/ce18feeff6d1.png",
+      "shadowSha256": "64c7fd4d8c90a4a7e2f578527d29b4965db87ac750a496141022297393a70897"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_seed_of_all_wood.png",
+      "sha256": "5b929ead3ae26afe65bc69d1a2eacb204a686c0f9741b1472d1f297574e91901",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        138,
+        70,
+        1146,
+        1190
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/350bfc067554.png",
+      "shadowSha256": "36882704b250d92282f3d159be27388ee5371195313e3980da5a756b010b1681"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_oak_bulwark.png",
+      "sha256": "58ed6f33fe64b041e3bcf87f6882037387cdccaf4358353f6f5b4e381adc5519",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        54,
+        111,
+        1198,
+        1150
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/dacc6541bf3a.png",
+      "shadowSha256": "4d7af661feb8feada296da07f7b36afc11b60d3497285ffbf1bba3601933debb"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_titan_shield.png",
+      "sha256": "3c1a3750ddd38be7a40707375a713cbad2fc5bfa63c2e746c4351ce10879fddd",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        77,
+        6,
+        1176,
+        1223
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/fb542ff42555.png",
+      "shadowSha256": "0c482876e0f5cc522b5f0d7ad2f799d2554cc3a05300e4a924d45ddf0303c4e8"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_omniscience_blessing.png",
+      "sha256": "e87fb6b6e131da5d0a9c9fca786c8d12a3ea4b4c35f0ed57231825c74a011645",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        112,
+        33,
+        1141,
+        1227
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/4486c408c1fe.png",
+      "shadowSha256": "6ef9b05b5b2a706e9fd3e5d3855e40ac092f025d26a9265850d8b84344d7f497"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_soul_devouring_blade.png",
+      "sha256": "379ab1fec3bdc7f72b9fb6a172bba395e3f3b9bcbe7fa5e7c4c1bd58ec7abf3d",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        31,
+        41,
+        1222,
+        1214
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/2fc709a904c7.png",
+      "shadowSha256": "b4f037ffc7810b027871836b92c73c63a15f5202d607bec1153e2130db0ef653"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_tower_retrofit.png",
+      "sha256": "611e8cbae9c9d77ab055e2d42946a07508140d1554828d88fad82bbe7b7dbf7e",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        243,
+        132,
+        1125,
+        1141
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/fbfc353f8ef1.png",
+      "shadowSha256": "606f29b0f825169acd9309cc4ceeb83f4aa731b4a70610715e0a5a05cb0620ac"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_steel_wall.png",
+      "sha256": "47571d4217f8493f67cff5ebf41c161b5a9d7c89afa8075b5463d915d65e9f4b",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        68,
+        152,
+        1198,
+        1151
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/a44cc3acc407.png",
+      "shadowSha256": "5bfdad04c340096b672ccbe0620183bedae0938ae75e4194f76d262ae6c9b693"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_gathering_grimoire.png",
+      "sha256": "1e99b65d6fdfafa0b00574bb5f103f8ee17186f654a014e2246a2b807c9a26e0",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        104,
+        66,
+        1142,
+        1185
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/fab43de6187a.png",
+      "shadowSha256": "b5a7e501bbce60b2c48f8e7dc97bbacb4a7cd2dfb43d5c5c74d7ed9f10c34832"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_time_orb.png",
+      "sha256": "aa76af4a9e1d5c18511c5001a1845f7346af683165e2e0a8e6ebe2eb11b91b08",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        126,
+        31,
+        1194,
+        1211
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/cfb5fcfd2bf8.png",
+      "shadowSha256": "7e28b1dc83428dbc70581683c5d433cd463e79ae3ade481b7b478cca6646d4e9"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_quick_dry_cement.png",
+      "sha256": "0af927fb7127bf3282d9dce8ee0674a67584a7464e3551676382cd62ec74dae2",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        124,
+        63,
+        1126,
+        1192
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/2e3b66ed26e6.png",
+      "shadowSha256": "287a7151d493b8d475207c64b806f092153426949b5158f75537706ac3f852c8"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_swift_emblem.png",
+      "sha256": "7edc21a09a2746aef421b6ba0e8f3f5630fb8c60bf4a62c1e32c57740c3a58be",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        146,
+        78,
+        1178,
+        1159
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/12273ef1ba48.png",
+      "shadowSha256": "f7198637ce935e74abc8565f2c07787bc09cfa4af8607282169549f8a5fbda5a"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_gale_bow.png",
+      "sha256": "add7115b8db8225ec0b8c82c7b516db105a558ff91dd16842acf21a3697f2990",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        113,
+        49,
+        1209,
+        1206
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/1e9e54e99ad6.png",
+      "shadowSha256": "87b8756d6e5705c76bd2931d7396876a6f1a3290c1dc7df36309e90ddd8080b8"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_universal_tool.png",
+      "sha256": "cc319f38ec054716f85013dd7c7b0dbdccb958b8ccfb0cb36a7f6492e999f2bc",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        82,
+        143,
+        1198,
+        1119
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/e6d0585200cb.png",
+      "shadowSha256": "eb620d36c1fde5f4cc0691fdb95b26b8748267d6f89dd0a2550ed6c08fd1d219"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_recovery_spirit.png",
+      "sha256": "90ba905939b2a5890f5ce208a5bdb0e8040a108aa33ab0a876b21881a42af827",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        192,
+        53,
+        1216,
+        1122
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/43d01fb56605.png",
+      "shadowSha256": "40829367897c27d3fe1de051e33e95addab7f2c961605e7c5f25738ff81d6b89"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_shooting_crystal.png",
+      "sha256": "70a2337b445d8ce8768181e9deccef9fb4f4fdc5a4128d3378c4ba657d135b7f",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        200,
+        110,
+        1158,
+        1094
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/5aa253460ba2.png",
+      "shadowSha256": "c25dcec58bd315cb77c1fab50aa1cb3d2ef8c8b256e2daa0ee9df73ecfba7444"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_nature_crystal.png",
+      "sha256": "b414720487673563ecfd4d968f9ccefaf33ceefb8747d74f64fe29d97eeaf8c8",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        141,
+        73,
+        1067,
+        1194
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/92a06664ef9e.png",
+      "shadowSha256": "3cd64f3546946049d311774d79804a9ed649f8bcb92cd841e3b038fc649da4ce"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_bombardment_crystal.png",
+      "sha256": "6d2e0811055ad094c0d3c45f0dcc157590bade7d3216936093bb2648b057a0ad",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        98,
+        74,
+        1179,
+        1196
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/9095780ad314.png",
+      "shadowSha256": "1b5a16355b3ca18bec0a095d2ab083db2b60b240fbc3551f4279172c3bfea323"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_resistance_crystal.png",
+      "sha256": "64957e8c94a7e9874e9a015f7dd39f22c3c9f50856257c6ba821d958e4282081",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        262,
+        63,
+        1043,
+        1191
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/455b01747191.png",
+      "shadowSha256": "1e1b0185042b5f336f9c8001798318f92121f56046def3dbcc94e2ea8bee6426"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_expansion_crystal.png",
+      "sha256": "30676e041b9153e273fb32eb1e201c27f00afc432ee806661208e85cd5ee9887",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        181,
+        76,
+        1100,
+        1185
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/8baaa4624b25.png",
+      "shadowSha256": "f082c5bea5741d6fe4c10f11450a6d27e72a2e69656d8a2163ddb8840066d262"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_recovery_crystal.png",
+      "sha256": "e136c1d833aa19d3d3e9ad1408292981ee040b603084906b18a13cd466aebc8f",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        224,
+        68,
+        1049,
+        1192
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/f2bc7b929b08.png",
+      "shadowSha256": "0e5c47d04344f60f71c83afbd3171c1249bc95c95f18a3a1f763023afcd45d1c"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_windspeed_bowstring.png",
+      "sha256": "9c1e6710aa4a432000e193ee78e4e02ffc9a26d1435baf516b08338e3594791d",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        67,
+        109,
+        1186,
+        1145
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/b9f67e8ea71d.png",
+      "shadowSha256": "908cc9d7459d02765045279e526837edcad54fb738b8006b08beaab247c549c0"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_darksteel_wall.png",
+      "sha256": "923b274ad9a30f17f4014280c774f4c7f294dd80afc80610599ab0c8e97772e0",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        35,
+        86,
+        1223,
+        1168
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/ac4799d60e0a.png",
+      "shadowSha256": "93bcaa065bcf5420aafd99bc71d7dd040d2cb7bc8d9063dd8184bde1fac32c96"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_aaron_cannon.png",
+      "sha256": "91a54297e17d2e4cf47adef357903559c2ad8309de27c14247051bba60c68b80",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        11,
+        58,
+        1240,
+        1144
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/c8379d15bf3a.png",
+      "shadowSha256": "35f3c716c4c4109d6c2160a52b3a5cead515ee6b769abaf7f4eeabb9132b2623"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_gathering_divine_codex.png",
+      "sha256": "1050cb05ecfbb9625d7708c5cd8e0f9ad41cf9190ce0e53178f86b35be7d2348",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        49,
+        83,
+        1204,
+        1210
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/6e4e3d191636.png",
+      "shadowSha256": "7489360ecf65c5974572a05ee2d9fddaa5bce9e1ca89f54df287235451bc57fc"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_hippogryph_onslaught.png",
+      "sha256": "ca0afbe67973ea92eb40931ecae981a3dd6dbc747f791a72aeec034a84bc4b6b",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        66,
+        19,
+        1204,
+        1213
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/edd54bb8bf2e.png",
+      "shadowSha256": "9486a4f0983832561f477faeac24df7d2bdd4391949b4c0aad25ce69d1488251"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_lumber_legacy.png",
+      "sha256": "d30549b6cdae9c81d7a8214ead7e20965ea9b687677ee2666e57c14fb20617f7",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        106,
+        64,
+        1210,
+        1198
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/98f5c3e58743.png",
+      "shadowSha256": "e9d397d61008002ba86f8f6bef6bf6e7653c0aa94a1cf665766095c4985bb38c"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_divine_tower_blessing.png",
+      "sha256": "460b4a669f4b4e7a935812d5cf5c392e17fa5440bc1d102f77e7eb02109769d4",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        297,
+        35,
+        1022,
+        1220
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/44a7ef846214.png",
+      "shadowSha256": "f441b2c245fe7c4aa55d74280c8a14ab68f0de025a7004b4fb9c75f4c3cf1b66"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_reincarnation_orb.png",
+      "sha256": "6296904da2085ec1bd0c551aa27c8b4c0be127486ef8c5d5f28ebe1366f4a5a7",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        39,
+        19,
+        1226,
+        1185
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/2b9892353542.png",
+      "shadowSha256": "38411a5f6b3d59ec4943a468dd1a96f792faead477f121db25730a23f1bcfb21"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_unbreakable_fortress.png",
+      "sha256": "c766f9bd90a39c0c179be51da6c6ee5a3c8bf56116fd74057863117867e9a729",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        65,
+        63,
+        1202,
+        1207
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/163126b3d221.png",
+      "shadowSha256": "fe9872dea58cafe04deed63a005beaef8743369438294e5034a6a02f6b5e4e16"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_abundance_blessing.png",
+      "sha256": "82f118dd50a2298a7663092a7e888f75d01ea5f07c54e0e7c3139b44fba30e5b",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        60,
+        35,
+        1195,
+        1228
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/f211b222b1e9.png",
+      "shadowSha256": "5e9ea4264982ce63541a5e3da6457305e290fab08c6bbb8b1a9888b948dc6cda"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_chief_god_blessing.png",
+      "sha256": "6f63e3324b88672894fe8d9190b3110bef5ad1a8021dff7ff3fb6191f5c9baee",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        51,
+        40,
+        1206,
+        1223
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/def35cf94f49.png",
+      "shadowSha256": "3a20bd72281f0158f73adbcfc629f93976e559262f368288f2a45a1d9af68d22"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_chosen_hero.png",
+      "sha256": "2b5f0047e18313e7a734edd96bb1fe75949651d0b3711fd29fdfeff23cffe85b",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        41,
+        65,
+        1214,
+        1125
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/6b68516fc568.png",
+      "shadowSha256": "2e35620ab64519d8a072616c1f7633ad8e44b67d1777acba77776b07546a1a14"
+    },
+    {
+      "source": "panorama/src/images/custom_game/archive_items_v2/lottery_struggle_diary.png",
+      "sha256": "b7eadd16d7dc2cf8bc80097d733c739ecc8bb4f22d743a8ed80160ca165aa205",
+      "sourceSize": [
+        1254,
+        1254
+      ],
+      "alphaBounds": [
+        132,
+        22,
+        1204,
+        1182
+      ],
+      "shadow": "art/ui/sources/custom_game/commerce_jade_v1/shadows/0106ed7dd454.png",
+      "shadowSha256": "082335a8bc4c11aab9a535ef7f12401bb4fa0ae0bb276897016d083362256bee"
+    }
+  ]
+}

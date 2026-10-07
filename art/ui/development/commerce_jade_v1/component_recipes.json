@@ -1,0 +1,44 @@
+[
+  {
+    "id": "window",
+    "width": 1600,
+    "height": 920,
+    "file": "assets/window.png",
+    "css": "background:linear-gradient(130deg,#f7f6eff5,#eff3ecf4);border-radius:7px;"
+  },
+  {
+    "id": "header",
+    "width": 1600,
+    "height": 112,
+    "file": "assets/header.png",
+    "css": "background:linear-gradient(90deg,#f7f5e914,#fbf9ebc4 40%,#fbf9ebc4 60%,#f7f5e914),url('../assets/scenery.png') center 50%/cover;border-radius:7px 7px 0 0;"
+  },
+  {
+    "id": "sidebar",
+    "width": 320,
+    "height": 808,
+    "file": "assets/sidebar.png",
+    "css": "background:linear-gradient(#153944f5 0%,#153944ee 24%,#1c3e49d9 48%,#24495680 68%,#24495638 100%),url('../assets/scenery.png') 4% 62%/auto 128%;border-right:1px solid #a5afa0;"
+  },
+  {
+    "id": "nav_normal",
+    "width": 320,
+    "height": 96,
+    "file": "assets/nav_normal.png",
+    "css": "background:transparent;border-bottom:1px solid #f2efe42b;"
+  },
+  {
+    "id": "nav_hover",
+    "width": 320,
+    "height": 96,
+    "file": "assets/nav_hover.png",
+    "css": "background:linear-gradient(90deg,transparent,#e9f0e620,transparent);border-bottom:1px solid #f2efe42b;"
+  },
+  {
+    "id": "nav_selected_line",
+    "width": 320,
+    "height": 2,
+    "file": "assets/nav_selected_line.png",
+    "css": "background:linear-gradient(90deg,#b4924099,#f0c762 24%,#f0c762 76%,#b4924099);"
+  }
+]

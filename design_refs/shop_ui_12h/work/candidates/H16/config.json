@@ -1,0 +1,16 @@
+{
+  "id": "H16",
+  "parent": "N13",
+  "changes": {
+    "overlay": "soft"
+  },
+  "config": {
+    "header": "warm-mist",
+    "seam": "soft",
+    "card": "quiet",
+    "cardShadow": 0.62,
+    "itemShadow": 0.55,
+    "title": "quiet",
+    "overlay": "soft"
+  }
+}

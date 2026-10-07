@@ -1,0 +1,31 @@
+{
+  "kind": "real_Dota2_Tools_screenshot",
+  "viewport": [
+    1280,
+    800
+  ],
+  "state": 10,
+  "scope": "Actual authenticated catalog, no checkout. Hover is Tools forced state. Other resolutions are browser preview only.",
+  "shots": [
+    {
+      "name": "native_final_normal",
+      "file": "shot_0030.tga",
+      "at": "2026-10-06T18:36:05.126Z"
+    },
+    {
+      "name": "native_final_hover",
+      "file": "shot_0031.tga",
+      "at": "2026-10-06T18:36:07.986Z"
+    },
+    {
+      "name": "native_final_item",
+      "file": "shot_0032.tga",
+      "at": "2026-10-06T18:36:10.839Z"
+    },
+    {
+      "name": "native_final_hud_closed",
+      "file": "shot_0033.tga",
+      "at": "2026-10-06T18:36:13.623Z"
+    }
+  ]
+}

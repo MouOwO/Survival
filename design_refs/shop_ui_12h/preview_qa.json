@@ -1,0 +1,47 @@
+{
+  "renderer": "local Chromium component assembly, not in-game validation",
+  "errors": [],
+  "fontCheck": {
+    "sans": true,
+    "serif": true
+  },
+  "interactionChecks": {
+    "productHover": {
+      "overlayVisible": true,
+      "frame": true
+    },
+    "buyHover": true,
+    "navHover": true,
+    "selectedBottomAlignment": true,
+    "glowExtendsOutside": true,
+    "itemSquareFree": {
+      "aspectRatio": 1.3333333333333333,
+      "filter": "saturate(0.9) brightness(1.015) contrast(1.025)"
+    },
+    "transitionsNonInteractive": true,
+    "contentFits": true
+  },
+  "viewportChecks": [
+    {
+      "viewport": [
+        1280,
+        720
+      ],
+      "contained": true
+    },
+    {
+      "viewport": [
+        2560,
+        1440
+      ],
+      "contained": true
+    },
+    {
+      "viewport": [
+        2560,
+        1080
+      ],
+      "contained": true
+    }
+  ]
+}

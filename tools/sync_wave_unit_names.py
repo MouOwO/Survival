@@ -9,6 +9,24 @@ ROOT = Path(__file__).resolve().parents[1]
 BEGIN = '// BEGIN GENERATED WAVE UNIT NAMES'
 END = '// END GENERATED WAVE UNIT NAMES'
 
+# Model activities are selected with these tags, not just ACT_DOTA_RUN.
+# Match Valve's npc_dota_hero_abyssal_underlord movement thresholds. Without
+# walk/run the body can select a loadout sequence and slide during navigation.
+MOVEMENT_ACTIVITIES = {
+    'models/heroes/abyssal_underlord/abyssal_underlord_v2.vmdl': (
+        ('walk', '0'), ('run', '395'),
+    ),
+}
+
+
+def with_movement_activities(body, model):
+    activities = MOVEMENT_ACTIVITIES.get(model)
+    if not activities:
+        return body
+    fields = '\n'.join(f'            "{tag}" "{speed}"' for tag, speed in activities)
+    declaration = '\n        "MovementSpeedActivityModifiers"\n        {\n' + fields + '\n        }\n'
+    return body.rstrip()[:-1] + declaration + '    }'
+
 
 def read_table(name):
     path = ROOT / 'data/csv/怪物与波次系统' / (name + '.csv')
@@ -89,6 +107,7 @@ def main():
         # Spawn with the matching skeleton so the native movement graph initializes
         # correctly; copying the generic Undying model requires a late body swap.
         body = re.sub(r'("Model"\s*)"[^"]+"', lambda m: m[1] + '"' + models[key] + '"', template)
+        body = with_movement_activities(body, models[key])
         row = combat[key]
         if row.get('projectile_model') == 'particles/units/heroes/hero_winter_wyvern/winter_wyvern_base_attack.vpcf':
             body = re.sub(r'("AttackCapabilities"\s*)"[^"]+"', lambda m: m[1] + '"DOTA_UNIT_CAP_RANGED_ATTACK"', body)

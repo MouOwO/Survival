@@ -115,23 +115,26 @@ local function apply_tower_attack_time(unit, base_attack_time, attack_speed_bonu
     return final_attack_time, attacks_per_second
 end
 
-local function apply_research_technology(state, reason)
+local function research_context(player_id)
+    local result = event_bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id })
+    local profile = player_profile_service.get_profile(player_id)
+    return { technology = technology_stat_manager.get(player_id).final,
+        permanent = result and result.totals or {},
+        profile_stats = profile and profile.save and profile.save.gameplay_stats or {} }
+end
+
+local function apply_research_technology(state, reason, context)
     local unit = state.unit
     if not active_state(state) then return end
     local player_id = state.player_id
-    local technology = technology_stat_manager.get(player_id).final
-    local profile = player_profile_service.get_profile(player_id)
-    local profile_stats = profile and profile.save
-        and profile.save.gameplay_stats or {}
+    context = context or research_context(player_id)
+    local technology, profile_stats = context.technology, context.profile_stats
     if state.building_id == "arrow_tower" then
         local base_damage = tonumber(state.research_base_attack_damage)
             or unit:GetBaseDamageMin()
         local tower = technology.tower or {}
-        local permanent_result = event_bus.request(
-            events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-            { player_id = player_id }
-        )
-        local permanent = permanent_result and permanent_result.totals or {}
+        local permanent = context.permanent
         unit.survival_gameplay_health_regen_pct =
             (tonumber(permanent.health_regen_per_second) or 0)
                 + (tonumber(permanent.tower_health_regen_per_second) or 0)
@@ -197,11 +200,7 @@ local function apply_research_technology(state, reason)
         local data = state.definition.levels[state.level or 1] or {}
         local base_health = tonumber(data.health) or unit:GetMaxHealth()
         local wall = technology.wall or {}
-        local permanent_result = event_bus.request(
-            events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
-            { player_id = player_id }
-        )
-        local permanent = permanent_result and permanent_result.totals or {}
+        local permanent = context.permanent
         local bonus_pct = (tonumber(wall.health_bonus_pct) or 0)
             + (tonumber(wall.technology_health_bonus_pct) or 0)
             + (tonumber(permanent.wall_health_bonus_pct) or 0)
@@ -370,16 +369,19 @@ local function configured_display_name(state, route_row)
     return state.unit.survival_display_name or state.definition.display_name
 end
 
-publish = function(state, reason)
+publish = function(state, reason, stats_only)
     -- Corpses remain valid during their death animation. Expired callbacks
     -- must not publish them or overwrite a replacement using the same index.
     if not active_state(state) then return end
-    wall_upgrade_rules.sync(state, upgrade_process.is_active(state.unit))
+    if not stats_only then
+        wall_upgrade_rules.sync(state, upgrade_process.is_active(state.unit))
+    end
     local route_row = state.building_id == "arrow_tower"
         and tower_routes.current(state) or nil
     local display_name = configured_display_name(state, route_row)
     state.unit.survival_display_name = display_name
     event_bus.emit(events.BUILDING_CHANGED, {
+        stats_only = stats_only == true,
         unit = state.unit,
         entindex = state.unit:entindex(),
         team = state.team,
@@ -632,20 +634,29 @@ local function recover_state(unit, read_only)
 end
 
 local function recover_player_towers(player_id)
-    local units = Entities:FindAllByClassname("npc_dota_creature") or {}
-    local player_team = PlayerResource:GetTeam(player_id)
-    for _, unit in ipairs(units) do
-        if live_building(unit) and unit:GetUnitName() == "building_arrow_tower"
-            and (tonumber(unit.survival_player_id) == player_id
-                or unit:GetPlayerOwnerID() == player_id
-                or unit:GetTeamNumber() == player_team) then
-            local state = recover_state(unit)
-            if state and (tonumber(state.player_id) or -1) < 0 then
-                state.player_id = player_id
-            end
+    local result = event_bus.request(events.BUILDING_LIST_REQUEST, {
+        player_id = player_id, building_id = "arrow_tower", handles_only = true,
+    })
+    for _, registered in ipairs(result and result.buildings or {}) do
+        if tonumber(registered.player_id) == player_id
+            and registered.building_id == "arrow_tower" then
+            recover_state(registered.unit)
         end
     end
 end
+
+local tower_attack_growth_reasons = {
+    star_blessing_tower_attack_per_second = true,
+    gameplay_stats_tower_attack_growth = true,
+    tower_actual_damage_growth = true,
+}
+
+local unrelated_building_growth_reasons = {
+    star_blessing_attributes_per_second = true,
+    gameplay_stats_hero_damage_growth = true,
+    gameplay_stats_hero_attack_growth = true,
+    commerce_assault_boss = true,
+}
 
 local function on_technology_stats_changed(payload)
     if payload and payload.changed_section == "lumberjack" then return end
@@ -654,13 +665,44 @@ local function on_technology_stats_changed(payload)
     -- A lumberjack's per-hit attack growth changes only the worker section.
     -- Refreshing every tower here fans out into ability sync on each tree hit.
     if payload.reason == "lumberjack_attack_growth" then return end
+    if unrelated_building_growth_reasons[payload.reason] then return end
+    if tower_attack_growth_reasons[payload.reason] then
+        -- Growth totals are player-wide. Apply immediately, but do not clone
+        -- the player's entire save or reconfigure walls/abilities/visuals.
+        local result = event_bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+            { player_id = player_id })
+        local permanent = result and result.totals or {}
+        local tower = technology_stat_manager.get(player_id).final.tower or {}
+        local bonus = (tonumber(tower.attack_flat) or 0)
+            + (tonumber(permanent.tower_attack_flat) or 0)
+        local multiplier = 1 + ((tonumber(tower.attack_bonus_pct) or 0)
+            + (tonumber(permanent.tower_attack_bonus_pct) or 0)) / 100
+        for entindex, state in pairs(buildings) do
+            if not active_state(state) then buildings[entindex] = nil
+            elseif tonumber(state.player_id) == player_id
+                and state.building_id == "arrow_tower" then
+                local unit = state.unit
+                local damage = ((tonumber(state.research_base_attack_damage)
+                    or unit:GetBaseDamageMin()) + bonus) * multiplier
+                if unit.survival_attack_min ~= damage or unit.survival_attack_max ~= damage then
+                    unit:SetBaseDamageMin(damage)
+                    unit:SetBaseDamageMax(damage)
+                    unit.survival_attack_min, unit.survival_attack_max = damage, damage
+                    publish(state, "tower_attack_growth", true)
+                end
+            end
+        end
+        return
+    end
     recover_player_towers(player_id)
+    local context
     for entindex, state in pairs(buildings) do
         if not active_state(state) then
             -- Use the cache key: querying entindex() on this handle is unsafe.
             buildings[entindex] = nil
         elseif tonumber(state.player_id) == player_id then
-            apply_research_technology(state, payload.reason)
+            context = context or research_context(player_id)
+            apply_research_technology(state, payload.reason, context)
             publish(state, "technology_stats_changed")
         end
     end
@@ -1313,6 +1355,7 @@ local function on_destroyed(payload)
 end
 
 local function on_building_changed(payload)
+    if payload.stats_only == true then return end
     local state = buildings[payload.entindex]
     if state and payload.unit and state.unit ~= payload.unit then return end
     if active_state(state) then

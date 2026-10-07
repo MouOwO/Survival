@@ -1,0 +1,1 @@
+[{"name":"dota_run_lua","arguments":{"code":"local s=require('systems/startup_loading_service').snapshot();print('[SHOP_TEST_PHASE] '..tostring(s.phase)..' '..tostring(s.admission_complete));print('[SHOP_STATE] '..GameRules:State_Get());print('[SHOP_PAUSE_API] '..type(PauseGame));if PauseGame then PauseGame(false) end"}}]

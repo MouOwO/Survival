@@ -11,7 +11,7 @@ const root=new Panel('Panel');function $(){};$.CreatePanel=(t,p)=>new Panel(t,p)
 const cfg={SurvivalUI:{ModalShell:{Adopt:()=>({Open(){},Close(){},Dispose(){}})},ActionButton:(p,o)=>{const b=new Panel('Button',p);b.events.onactivate=o.action;return b;},
  ProductCard:(p,o)=>{const b=new Panel('Panel',p);b.prices=o.prices;return b;}},RemainingHandoff:{Action(){},Window(){},SizeWindow(){},Box(){},Tab(){},Image(){}},
  SurvivalCommerceView:{UpdateWalletCatalog:c=>snapshot=c,Dispose(){}}};
-const env={$,GameUI:{CustomUIConfig:()=>cfg},GameEvents:{Subscribe:(n,f)=>{handlers[n]=f;return n;},Unsubscribe:n=>delete handlers[n],SendCustomGameEventToServer:(name,body)=>requests.push({name,...body})}};
+const env={$,Game:{},GameUI:{CustomUIConfig:()=>cfg},GameEvents:{Subscribe:(n,f)=>{handlers[n]=f;return n;},Unsubscribe:n=>delete handlers[n],SendCustomGameEventToServer:(name,body)=>requests.push({name,...body})}};
 vm.createContext(env);
 const script=fs.readFileSync('panorama/src/scripts/custom_game/commerce_wallet.js','utf8');
 vm.runInContext(script,env);
@@ -34,8 +34,10 @@ assert.equal(cfg.SurvivalCommerceWallet.GetCatalog().balances.u_coin,3200);
 let cashCheckout=null,walletCheckout=null;
 cfg.SurvivalPayments={GetCatalog:()=>({products:[{sku:'cash_sku',title:'现金商品',amount_fen:5000,category_id:'technology',enabled:1}],categories:[{id:'technology',label:'科技'}]}),Checkout:sku=>cashCheckout=sku};
 cfg.SurvivalCommerceWallet.Checkout=sku=>{walletCheckout=sku;return true;};
+require('./load_shared_ui_test.cjs')(env,Panel,root);
+vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/common/commerce_components.js','utf8'),env);
 vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js','utf8'),env);
-const cards=panels.filter(p=>p.prices);assert(cards.some(p=>p.prices[0].currencyName==='U币'));assert(cards.some(p=>p.prices[0].currencyName==='元'));
+const prices=panels.filter(p=>p.classes.has('CJPriceValue'));assert(prices.some(p=>p.text==='6800 U币'));assert(prices.some(p=>p.text==='50.00 元'));
 const actions=panels.filter(p=>p.classes.has('RCProductBuy'));
 actions.at(-2).events.onactivate();assert.equal(walletCheckout,product.sku);
 actions.at(-1).events.onactivate();assert.equal(cashCheckout,'cash_sku');

@@ -1,0 +1,16 @@
+{
+  "kind": "real_Dota2_Tools_screenshot",
+  "viewport": [
+    1280,
+    800
+  ],
+  "state": 10,
+  "scope": "Actual authenticated catalog, no checkout. Hover is Tools forced state. Other resolutions are browser preview only.",
+  "shots": [
+    {
+      "name": "native_before",
+      "file": "shot_0029.tga",
+      "at": "2026-10-06T18:35:55.963Z"
+    }
+  ]
+}

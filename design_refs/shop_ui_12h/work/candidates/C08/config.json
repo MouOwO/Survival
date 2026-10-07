@@ -1,0 +1,13 @@
+{
+  "id": "C08",
+  "parent": "C07",
+  "changes": {
+    "cardShadow": 0.35
+  },
+  "config": {
+    "header": "warm-mist",
+    "seam": "soft",
+    "card": "quiet",
+    "cardShadow": 0.35
+  }
+}

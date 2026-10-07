@@ -1,0 +1,34 @@
+'use strict';
+const fs=require('fs'),assert=require('node:assert/strict'),{browser,sleep}=require('./cdp.cjs');
+const base='design_refs/shop_ui_12h/work/production',report={kind:'browser_component_and_controller_preview',viewport:[],categories:[],states:[],limitations:['Browser is not Panorama; native rendering is separately recorded.','Local CSV fixture, no account or payment connection.']};
+(async()=>{const b=await browser();try{
+ for(const [w,h] of [[1920,1080],[1280,720],[2560,1440],[2560,1080]]){
+  await b.call('Emulation.setDeviceMetricsOverride',{width:w,height:h,deviceScaleFactor:1,mobile:false});await b.go(base+'/after.html','?category=technology');
+  assert(await b.run('cfg.SurvivalCommerceView.IsOpen()'));const k=Math.min(w/1920,h/1080);
+  const metrics=await b.run(`(()=>{const m=document.querySelector('.CommerceJade'),r=m.getBoundingClientRect(),cards=[...document.querySelectorAll('.CJProduct')].map(c=>c.getBoundingClientRect().toJSON());return{window:r.toJSON(),cards,missing:[...document.images].filter(i=>i.src&&(!i.complete||!i.naturalWidth)).map(i=>i.src),nav:document.querySelectorAll('.CJNav').length}})()`);
+  assert.equal(metrics.nav,6);assert.equal(metrics.cards.length,8);assert.equal(metrics.missing.length,0);assert(Math.abs(metrics.window.width-1600*k)<2);assert(Math.abs(metrics.window.height-920*k)<2);assert(metrics.window.left>=0&&metrics.window.right<=w&&metrics.window.bottom<=h);
+  for(let i=0;i<8;i++){assert(Math.abs(metrics.cards[i].width-296*k)<2);assert(Math.abs(metrics.cards[i].left-(metrics.window.left+(344+(i%4)*312)*k))<2);assert(Math.abs(metrics.cards[i].top-(metrics.window.top+(174+Math.floor(i/4)*366)*k))<2);}
+  await b.shot(base+`/qa_${w}x${h}_normal.png`);
+  await b.run(`document.querySelectorAll('.CJProduct')[1].classList.add('CJVisualHover')`);await sleep(230);await b.shot(base+`/qa_${w}x${h}_hover.png`);
+  const hit=await b.run(`(()=>{const e=document.querySelectorAll('.RCProductBuy')[1],r=e.getBoundingClientRect(),t=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return t===e||e.contains(t);})()`);assert(hit,'hover buy button must receive input');
+  report.viewport.push({w,h,geometry:'PASS',assets:'PASS',hoverButtonHit:'PASS',metrics});
+ }
+ await b.call('Emulation.setDeviceMetricsOverride',{width:1920,height:1080,deviceScaleFactor:1,mobile:false});
+ for(const id of ['weapon','item','technology','challenge','rebirth','bundles']){await b.go(base+'/after.html','?category='+id);assert.equal(await b.run('cfg.SurvivalCommerceView.Inspect().category'),id);await b.shot(base+'/category_'+id+'.png');report.categories.push({id,shown:await b.run('document.querySelectorAll(".RCProduct").length'),note:['weapon','challenge','rebirth','bundles'].includes(id)?'Actual enabled CSV catalog empty, kept category':'Original catalog'});}
+ await b.go(base+'/after.html','?category=technology');
+ // Every configured product is reachable; paging does not change catalog data.
+ const names=[];let pages=0;
+ do{names.push(...await b.run(`[...document.querySelectorAll('.RCProductName')].map(e=>e.textContent)`));pages++;if(!await b.run(`(()=>{const b=[...document.querySelectorAll('.CJPageAction')].at(-1);if(!b||b.classList.contains('UIDisabled'))return false;b.click();syncFlows();return true;})()`))break;}while(pages<20);
+ assert.equal(names.length,30);report.states.push({state:'pagination',products:30,pages,status:'PASS'});
+ await b.go(base+'/after.html','?category=technology');
+ const sku=await b.run('CATALOG_FIXTURE.wallet.products.find(p=>p.category_id==="technology").sku');await b.run(`document.querySelector('.CJProduct').classList.add('CJVisualHover');document.querySelector('.RCProductBuy').click()`);assert.equal(await b.run('previewCalls[0].sku'),sku);assert.equal(await b.run('previewCalls[0].method'),'wallet');assert(!await b.run('cfg.SurvivalCommerceView.IsOpen()'));await b.run('cfg.SurvivalCommerceView.Open()');assert(await b.run('cfg.SurvivalCommerceView.IsOpen()'));report.states.push({state:'checkout route / close / reopen',status:'PASS',orders:'stub only, zero real orders'});
+ await b.go(base+'/after.html','?category=technology');
+ await b.run(`CATALOG_FIXTURE.wallet.products.filter(p=>p.category_id===\"technology\")[1].title='极寒之刃·银白烈风限定永久纪念版本名称压力样例';CATALOG_FIXTURE.wallet.products.filter(p=>p.category_id===\"technology\")[1].price=999999999999;CATALOG_FIXTURE.wallet.products.filter(p=>p.category_id===\"technology\")[1].reward_lines=[];CATALOG_FIXTURE.wallet.products.filter(p=>p.category_id===\"technology\")[1].description='仅用于长字段组件压力检查。'+Array(20).fill('全属性增加，攻击和护甲说明保持动态文本。').join('\\n');cfg.SurvivalCommerceView.UpdateWalletCatalog(CATALOG_FIXTURE.wallet);selectCategory('technology');syncFlows();document.querySelectorAll('.CJProduct')[1].classList.add('CJVisualHover');`);
+ await sleep(230);await b.shot(base+'/stress_long_fields.png');
+ assert(await b.run(`(()=>{const d=document.querySelectorAll('.RCProductEffect')[1],b=document.querySelectorAll('.RCProductBuy')[1],dr=d.getBoundingClientRect(),br=b.getBoundingClientRect();return d.scrollHeight>d.clientHeight&&dr.bottom<=br.top+2;})()`));report.states.push({state:'long name / 12-digit price / scrolling effects',status:'PASS',scope:'labelled fixture stress sample'});
+ // The existing disabled bundle configuration is a component test, never an enabled live product.
+ const {csv}=require('./catalog.cjs');const bundle=csv('data/csv/商城支付系统/payment_products.csv').find(p=>p.sku==='starter_bundle_v4'),rewards=csv('data/csv/商城支付系统/payment_rewards.csv').filter(r=>r.sku===bundle.sku&&r.enabled==='1').map(r=>({label:r.display_name,quantity:Number(r.amount),id:r.target_id}));
+ await b.go(base+'/after.html','?category=bundles');await b.run(`cfg.SurvivalCommerceView.UpdateWalletCatalog({categories:CATALOG_FIXTURE.paid.categories,products:[],balances:{}});cfg.SurvivalCommerceView.UpdateCatalog({categories:CATALOG_FIXTURE.paid.categories,products:[{sku:'${bundle.sku}',title:${JSON.stringify(bundle.display_name)},category_id:'bundles',product_type:'bundle',amount_fen:${Number(bundle.price_yuan)*100},icon:${JSON.stringify(bundle.icon)},enabled:false,reward_lines:${JSON.stringify(rewards)}}]});selectCategory('bundles');syncFlows();document.querySelector('.PreviewCaption').textContent='组件压力样例：现有未上架礼包配置 · 未启用商品 / 无支付';`);
+ assert.equal(await b.run('document.querySelectorAll(".RCBundleItem").length'),rewards.length);await b.shot(base+'/bundle_component.png');report.states.push({state:'2x2 bundle rewards',rewards:rewards.length,status:'PASS',scope:'existing disabled CSV configuration, not live inventory'});
+ fs.writeFileSync(base+'/verification.json',JSON.stringify(report,null,2));console.log('JADE_PREVIEW_PASS: 4 viewports, 6 actual categories, 30 reachable tech products, input, long fields, bundle');
+ }finally{b.close();}})().catch(e=>{console.error(e);process.exitCode=1});

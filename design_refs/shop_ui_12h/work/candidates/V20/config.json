@@ -1,0 +1,18 @@
+{
+  "id": "V20",
+  "parent": "B17",
+  "changes": {
+    "navGlow": 0.5
+  },
+  "config": {
+    "header": "warm-mist",
+    "seam": "soft",
+    "card": "quiet",
+    "cardShadow": 0.62,
+    "itemShadow": 0.55,
+    "title": "quiet",
+    "overlay": "soft",
+    "button": "flat",
+    "navGlow": 0.5
+  }
+}

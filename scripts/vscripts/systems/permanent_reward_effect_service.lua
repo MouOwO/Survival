@@ -25,6 +25,10 @@ local wall_ticks_by_player = {}
 local wall_tick_health_by_player = {}
 local wall_tick_armor_by_player = {}
 local test_isolated_field_by_player = {}
+-- Spawn systems own live handles. Weak keys let units removed without a death
+-- event be collected instead of keeping an additional lifetime-long reference.
+local armor_targets = setmetatable({}, { __mode = "k" })
+local enemy_initial_armor_reduction = 0
 local refresh_existing_enemy_armor = nil
 
 local function copy(source)
@@ -35,12 +39,31 @@ local function copy(source)
     return result
 end
 
+local function same_values(previous, current)
+    if previous == nil then return false end
+    for key, value in pairs(previous) do
+        if (tonumber(value) or 0) ~= (tonumber(current[key]) or 0) then return false end
+    end
+    for key, value in pairs(current) do
+        if (tonumber(value) or 0) ~= (tonumber(previous[key]) or 0) then return false end
+    end
+    return true
+end
+
 local function add_values(target, source)
     for key, value in pairs(source or {}) do
         key = tostring(key)
         target[key] = (tonumber(target[key]) or 0) + (tonumber(value) or 0)
     end
     return target
+end
+
+local function shared_value(effect_key)
+    local total = 0
+    for _, values in pairs(totals_by_player) do
+        total = total + (tonumber(values[effect_key]) or 0)
+    end
+    return total
 end
 
 -- Map level is stored once as permanent player progression. Its gameplay
@@ -70,6 +93,10 @@ local function refresh(payload)
     local boss_refresh = payload and (payload.reason == "archive_boss_refresh" or payload.reason == "archive_boss_kill")
     local frozen = phase_guard.post_clear_frozen() and totals_by_player[player_id] ~= nil
     if frozen and not live_draw and not boss_refresh then return end
+    -- Frozen rewards update the existing table in place; retain its old values
+    -- for comparison. Ordinary profile projections replace the table instead.
+    local previous = totals_by_player[player_id]
+    if frozen then previous = copy(previous) end
     local profile_service = require("systems/player_profile_service")
     local profile = profile_service.get_profile(player_id)
     local save = profile and profile.save or {}
@@ -136,6 +163,22 @@ local function refresh(payload)
         wall_tick_health_by_player[player_id] or 0
     wall_tick_armor_by_player[player_id] =
         wall_tick_armor_by_player[player_id] or 0
+    local reason = payload and payload.reason or "profile_changed"
+    -- A checkpoint may only advance revision / online time. Preserve its
+    -- profile update without recalculating every live unit's combat stats.
+    -- Lifecycle and test resets must still reapply cached / reset growth.
+    local force_refresh = reason == "hero_ready_cached"
+        or reason == "gameplay_stats_test_isolation"
+        or reason == "gameplay_stats_test_reset"
+    if not force_refresh and same_values(previous, totals_by_player[player_id]) then return end
+    local armor_changed = (tonumber(previous and previous.enemy_initial_armor_reduction) or 0)
+        ~= (tonumber(totals_by_player[player_id].enemy_initial_armor_reduction) or 0)
+    local previous_reduction = enemy_initial_armor_reduction
+    if armor_changed then
+        -- Publish the new global value before listeners can spawn any units.
+        -- Spawns consume this cache directly without scanning players/entities.
+        enemy_initial_armor_reduction = math.max(0, shared_value("enemy_initial_armor_reduction"))
+    end
     print("[PermanentReward] projection_refreshed player_id=" .. tostring(player_id)
         .. " revision=" .. tostring(profile and profile.revision or 0)
         .. " hero_all_attributes_flat="
@@ -146,7 +189,7 @@ local function refresh(payload)
         player_id = player_id,
         totals = copy(totals_by_player[player_id]),
         revision = profile and profile.revision or 0,
-        reason = payload and payload.reason or "profile_changed",
+        reason = reason,
     })
     for other_player_id in pairs(totals_by_player) do
         if other_player_id ~= player_id then
@@ -156,7 +199,11 @@ local function refresh(payload)
             })
         end
     end
-    if refresh_existing_enemy_armor then refresh_existing_enemy_armor() end
+    -- New monsters receive this effect through MONSTER_SPAWNED. Update only
+    -- registered targets when the shared armor-reduction contribution changes.
+    if previous_reduction ~= enemy_initial_armor_reduction and refresh_existing_enemy_armor then
+        refresh_existing_enemy_armor()
+    end
 end
 
 local function valid_entity(unit)
@@ -222,6 +269,7 @@ local function apply_tower_tick(player_id)
     event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
         player_id = player_id,
         reason = "star_blessing_tower_attack_per_second",
+        changed_section = "tower",
         amount = amount,
         tick = tower_ticks_by_player[player_id],
     })
@@ -262,16 +310,17 @@ local function apply_health_regen_tick(player_id)
     local tower_amount = math.max(0,
         M.value(player_id, "health_regen_per_second")
             + M.value(player_id, "tower_health_regen_per_second"))
-    if tower_amount <= 0 or not Entities
-        or type(Entities.FindAllByClassname) ~= "function" then return end
-    for _, class_name in ipairs({ "npc_dota_creature", "npc_dota_building" }) do
-        for _, unit in ipairs(Entities:FindAllByClassname(class_name) or {}) do
-            if valid_entity(unit)
-                and tonumber(unit.survival_player_id) == tonumber(player_id)
-                and tostring(unit.survival_building_id or "") == "arrow_tower" then
-                unit.survival_gameplay_health_regen_pct = tower_amount
-                heal_unit(unit, tower_amount)
-            end
+    if tower_amount <= 0 then return end
+    local result = event_bus.request(events.BUILDING_LIST_REQUEST, {
+        player_id = player_id, building_id = "arrow_tower", handles_only = true,
+    })
+    for _, state in ipairs(result and result.buildings or {}) do
+        local unit = state.unit
+        if state.building_id == "arrow_tower"
+            and tonumber(state.player_id) == tonumber(player_id)
+            and valid_entity(unit) and unit.survival_building_destroyed ~= true then
+            unit.survival_gameplay_health_regen_pct = tower_amount
+            heal_unit(unit, tower_amount)
         end
     end
 end
@@ -310,19 +359,11 @@ local function on_damage(payload)
     end
 end
 
-local function shared_value(effect_key)
-    local total = 0
-    for _, values in pairs(totals_by_player) do
-        total = total + (tonumber(values[effect_key]) or 0)
-    end
-    return total
-end
-
-local function apply_enemy_initial_armor(unit, confirmed_monster)
+local function apply_enemy_initial_armor(unit, confirmed_monster, reduction)
     if not valid_entity(unit) or not (confirmed_monster == true
         or unit.survival_is_wave_monster == true
         or unit.survival_is_challenge_monster == true) then return end
-    local reduction = math.max(0, shared_value("enemy_initial_armor_reduction"))
+    reduction = reduction or enemy_initial_armor_reduction
     local previous_armor = nil
     local next_armor = nil
     if tonumber(unit.survival_war3_armor) ~= nil then
@@ -362,15 +403,12 @@ local function apply_enemy_initial_armor(unit, confirmed_monster)
 end
 
 refresh_existing_enemy_armor = function()
-    if not Entities or type(Entities.FindAllByClassname) ~= "function" then return end
-    for _, class_name in ipairs({ "npc_dota_creature", "npc_dota_building" }) do
-        for _, unit in ipairs(Entities:FindAllByClassname(class_name) or {}) do
-            local enemy = false
-            if unit and type(unit.GetTeamNumber) == "function" then
-                local ok, team = pcall(unit.GetTeamNumber, unit)
-                enemy = ok and team == (rawget(_G, "DOTA_TEAM_BADGUYS") or 3)
-            end
-            apply_enemy_initial_armor(unit, enemy)
+    local reduction = enemy_initial_armor_reduction
+    for unit in pairs(armor_targets) do
+        if not valid_entity(unit) or (unit.IsAlive and not unit:IsAlive()) then
+            armor_targets[unit] = nil
+        else
+            apply_enemy_initial_armor(unit, true, reduction)
         end
     end
 end
@@ -450,6 +488,7 @@ local function on_tower_attack(payload)
         event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {
             player_id = player_id,
             reason = "gameplay_stats_tower_attack_growth",
+            changed_section = "tower",
         })
     end
 end
@@ -461,7 +500,8 @@ local function on_tower_damage(payload)
     local growth=M.value(player_id,'tower_damage_attack_growth')
     if growth<=0 then return end
     tower_damage_bonus_by_player[player_id]=(tower_damage_bonus_by_player[player_id] or 0)+growth
-    event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=player_id,reason='tower_actual_damage_growth'})
+    event_bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,{player_id=player_id,
+        reason='tower_actual_damage_growth', changed_section='tower'})
 end
 
 local function get(payload)
@@ -593,6 +633,8 @@ function M.init()
     wall_tick_health_by_player = {}
     wall_tick_armor_by_player = {}
     test_isolated_field_by_player = {}
+    armor_targets = setmetatable({}, { __mode = "k" })
+    enemy_initial_armor_reduction = 0
     event_bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, get)
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, refresh)
     event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
@@ -608,10 +650,14 @@ function M.init()
     event_bus.subscribe(events.HERO_MAIN_ATTACK_LANDED, on_hero_attack)
     event_bus.subscribe(events.TOWER_ATTACK_LANDED, on_tower_attack)
     event_bus.subscribe(events.MONSTER_SPAWNED, function(payload)
-        apply_enemy_initial_armor(
-            payload and (payload.unit or payload.monster),
-            true
-        )
+        local unit = payload and (payload.unit or payload.monster)
+        if not valid_entity(unit) then return end
+        armor_targets[unit] = true
+        apply_enemy_initial_armor(unit, true)
+    end)
+    event_bus.subscribe(events.ENGINE_ENTITY_KILLED, function(payload)
+        local unit = payload and payload.victim
+        if unit then armor_targets[unit] = nil end
     end)
     scheduler.every(1, function()
         for player_id in pairs(totals_by_player) do

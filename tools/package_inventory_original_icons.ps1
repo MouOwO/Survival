@@ -1,6 +1,7 @@
 $ErrorActionPreference='Stop'
 $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'panorama/src/images/custom_game/shop_v2/inventory_manifest.json') | ConvertFrom-Json
+if ($manifest.mode -eq 'dota_native') { Write-Output 'Using original Dota textures; no inventory sprite packaging required'; return }
 $dest=Join-Path $repo 'panorama/src/images/items/survival_shop_v2'
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
 Add-Type -AssemblyName System.Drawing

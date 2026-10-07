@@ -1,0 +1,478 @@
+{
+  "best": "B17 + L21 + T23",
+  "at": "2026-10-06T18:48:28.760Z",
+  "files": [
+    {
+      "path": "panorama/scripts/custom_game/commerce_remaining_5d5c1152eb.vjs_c",
+      "sha256": "113a111dc71da131c4bcbb13acd22b02effdd2cbd92d97449e0209694f41cc8d"
+    },
+    {
+      "path": "panorama/scripts/custom_game/common/commerce_components.vjs_c",
+      "sha256": "f9427d7ffa17b17e7d5b7d41bce71855e4b1f3f78fdf4a852ae6a52dff168d6b"
+    },
+    {
+      "path": "panorama/scripts/custom_game/common/commerce_art_manifest.vjs_c",
+      "sha256": "e4dcbdd7ddf515d875db724a13077b5b47a3cc50a0685379dc3735047c51f8c1"
+    },
+    {
+      "path": "panorama/styles/custom_game/common/commerce_jade.vcss_c",
+      "sha256": "0b829ffc98305dea5dd4bdf124de16333453da03958b2e5b7ea4e604a2ee3f25"
+    },
+    {
+      "path": "panorama/layout/custom_game/commerce_resources.vxml_c",
+      "sha256": "092a2269887a73edb93a6af82d6cf5ca0dfb6c345db18bc4490f200ca26372cc"
+    },
+    {
+      "path": "panorama/layout/custom_game/survival_hud.vxml_c",
+      "sha256": "f1194967ee05e3a193f7abd4785eb172a138ccbe24f0e35ffb2abc5178acb271"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/art_well_png.vtex_c",
+      "sha256": "8237feeeb13f48df2338e4b790d0a37e1fe6733c07f5bdffa91f34bc32ee8916"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/buy_button_hover_png.vtex_c",
+      "sha256": "59c70ae2d7fb6ce31e74ce3698d82c84d930c6faf9fd5592a827ead14f8ab50f"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/buy_button_png.vtex_c",
+      "sha256": "e122f6d0f156603e727de0ff8c770544b31e9bc359c19a01348c46b01f662047"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/buy_button_pressed_png.vtex_c",
+      "sha256": "f98069e488ede852a400d5c6c2fa791f21c9d2bb2f1f41e78e61ee7bbd827a33"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/card_halo_png.vtex_c",
+      "sha256": "5e7977945e8e363c8628eb629f830cc2d93097335710bbb83c85d4843ba882d4"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/card_shadow_png.vtex_c",
+      "sha256": "43f133d313aff5bb8bdfd4661a97394b122348c563d1efdc33b6020c84b11774"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/close_hover_png.vtex_c",
+      "sha256": "9c91c822d6b17aa14cb9c36460b45a1217abaa0c48c7f6986edfb8e978ce3173"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/close_normal_png.vtex_c",
+      "sha256": "7136fb8abca7943eb426dccec0deec9df80420c4deadba77b1a6b3c4632b3b73"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/close_pressed_png.vtex_c",
+      "sha256": "5938e86cb7f7de942c303e2e4e7e1fc0529a175fb66fbcc10aeecdce993ee07a"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/coin_png.vtex_c",
+      "sha256": "d4d8bd7d36006e80402ddef62e4a0a1e23f911079e47e244767240ff12dd6f48"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/content_transition_png.vtex_c",
+      "sha256": "08c7f0547a351a6b59b2d08097c232ff2792d04cb6af531b5c650631dc07f618"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/crystal_png.vtex_c",
+      "sha256": "a982c7394d15e260c513228de3704565e138ce76d0ee5064e1849fbf267da977"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/frame_png.vtex_c",
+      "sha256": "398309b1b46343b6544d613dd467aabefe1c1e3ffd667893c7ed0f9353af3239"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/gift_hover_png.vtex_c",
+      "sha256": "8b4f7f524ecab40871a6a0468b5e751c4512dddfd3ab064ee5b080038a42c505"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex_c",
+      "sha256": "22508768d18227eee59d7af7a7dec12663bd456e93ee09d7ed44ef5b3ae99def"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/header_png.vtex_c",
+      "sha256": "58aa723ca2687b19e52715e89b8ff64f1c158d392fa8721542332c31a7a198f8"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/hero_hover_png.vtex_c",
+      "sha256": "3d7a48533e1e6e1ce808915f660ee9c8dc6294465b6224967b20ae88def85d12"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/hero_light_png.vtex_c",
+      "sha256": "1ac25da3cc7abc0c639f20fd3fcff2769e116cd4c46af32665b842256bcb7a11"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/hover_shade_long_png.vtex_c",
+      "sha256": "4d709498ad8aa76f3499934a4637ed11f65b6d4662a8c895dd14568bcddd8b45"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/hover_shade_png.vtex_c",
+      "sha256": "2b4859bfa160137469c59e85018e11759c2f839733a288e064d14a9ff2767fcf"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/nav_hover_png.vtex_c",
+      "sha256": "823dd06d28a1788cd7220d31ac40933c51cd5b9bf83984b01f4d84f608505ca0"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/nav_normal_png.vtex_c",
+      "sha256": "13c1cb1828780481d109681c7e7042aecd0f7321deeb9eeb0773f03194b06f65"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/nav_selected_glow_png.vtex_c",
+      "sha256": "16570eb3b672bf4f5b925bc05f26daf141bc5d322a3a2b41b3b55f676e31797c"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/nav_selected_line_png.vtex_c",
+      "sha256": "3b2099df9f5fb0965e67b227a1f655e6b6d0136f3ba6845bf1504fba16433d2a"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/nav_selected_png.vtex_c",
+      "sha256": "3ac3dd8f947752491a314f44321189271bf10651f9ab5bcbe689b77fc43993f7"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/price_strip_png.vtex_c",
+      "sha256": "ab61f0e6fbb31d231677b1e9bcd6f7fe866f077cc126200fb3014abd893eae48"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/product_hover_png.vtex_c",
+      "sha256": "080dba5d580104205b3fa23bc7597774d772f305da59f405e6dcb7e27eeb0a0a"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/product_normal_png.vtex_c",
+      "sha256": "b408b7c8bd484d003bb8fddc8e7fe050636c7f86bb7be87ea48ba51c6274947a"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/product_selected_png.vtex_c",
+      "sha256": "095eb8d75944160b3e15328dcdc0550c5ee84614f1aad491e4f58eb051a4c6a5"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/0106ed7dd454_png.vtex_c",
+      "sha256": "4275cd4f7277ecd8a0085aab3d45b6804ae63f60d0963ae4e9ab24b54809a276"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/03a19b79e237_png.vtex_c",
+      "sha256": "03a470dc62edd53c28bf68fb8cc62d44c44ea8106c79d5a98ed2f0cd33fbf76f"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/12273ef1ba48_png.vtex_c",
+      "sha256": "9297b0e25d81f2eda5f6265056d1408eb3545bb3eb559ed99aa3fb499f202f3d"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/163126b3d221_png.vtex_c",
+      "sha256": "cff4ea5bc206aed523e897932f31f02abe01e4cd3cab5891659f1b7751b1003a"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/1e9e54e99ad6_png.vtex_c",
+      "sha256": "3f626994c38dc0438d7560202e27e5910e1e2b437681643408897bf921c8f7be"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/20f63a10788a_png.vtex_c",
+      "sha256": "fdaa98b43b55834f71d2786e088f03375b0d206690547b97d688e5a7b225b7d4"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/2641c94bc7bb_png.vtex_c",
+      "sha256": "f394573b3f7e7ea78def0e719724c723aa71c7453d8dd30971972d789c65f031"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/2b9892353542_png.vtex_c",
+      "sha256": "0c402fc09e072f972d84ed35f851a7058fa8b7c2c2c2d2d2d266c7942c22f2c8"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/2dac14ea36c5_png.vtex_c",
+      "sha256": "8f4384221d7cd853a24ebc5b351ab05ad3770cfbfb400fa9093cd549c97841d5"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/2e3b66ed26e6_png.vtex_c",
+      "sha256": "f1671eb73ebc17e371a1063b4faa37512ae2c49f3bbbd75570985c47372f39e7"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/2fc709a904c7_png.vtex_c",
+      "sha256": "498762612a3377d2e2712d046f2362fb7a10dfcf9043fae971119863e412c9e0"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/3242c4586641_png.vtex_c",
+      "sha256": "d5d32b0262acd6afef8b7ce3545ea555eadd18ee9f53cbdff23b2772f089fed6"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/350bfc067554_png.vtex_c",
+      "sha256": "ad6b598e3e87a1323ef92eb0999ffebc9419128b21f812f603bb4656733ce3a7"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/38a195555f22_png.vtex_c",
+      "sha256": "ffde6cfab08840f0385ebb096937990bc955dc92ab0d954185e4cc42beb0b76f"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/417f26515a79_png.vtex_c",
+      "sha256": "b8d053e0bd9777ebb13c1e3ae0a3eeb6afc536b7549000147190065133915a08"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/43d01fb56605_png.vtex_c",
+      "sha256": "50248e2c94ffe7914e2edfb1175a80f963e0dbd025cebfa3d823760c521ca4dc"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/4486c408c1fe_png.vtex_c",
+      "sha256": "d56d83127d383b4f329b59f464fbcc658d69489326e545b1a528022669962aab"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/44a7ef846214_png.vtex_c",
+      "sha256": "e5a51b4ae7d17af6658051328fac4beb866cdf519a099b70a7494b5b3928d134"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/455b01747191_png.vtex_c",
+      "sha256": "04c776d06f6fdb7e8e1499bee64f6b15d39941943efb23ec2e4a5d34810fadb1"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/47112f41112e_png.vtex_c",
+      "sha256": "122a55b186bdfab38b79d7bb34a5a39023d07e2787680f4a9498cf04ac011564"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/476bb1e07d59_png.vtex_c",
+      "sha256": "49eb3988d2e4c2252e68518a5df7658be614f82960568402d3ddb2d804ca93fe"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/4c99e12d7388_png.vtex_c",
+      "sha256": "f8397303df1435b8ce0a7ae5077580887caa8cef5e72c40df944b26d8e2baf6e"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/581ec4ddb14a_png.vtex_c",
+      "sha256": "ef625524dc7adeca63ab0cac4ec0cba202bf3807fb3bed29790e2891c47b9d93"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/5aa253460ba2_png.vtex_c",
+      "sha256": "4433b3d139dbea7109d7ff31bd6542c3fae2c4d77a82ad540f940738061b4063"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/5fa5e966c775_png.vtex_c",
+      "sha256": "b837d0f37336a6c44ef8b95c4a51dbb7f92b1abff32352f71cf1b76f1c22268c"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/61384e29956f_png.vtex_c",
+      "sha256": "6804f863c259c29da5bc8d4e2269d5ffe808f672c386ed51d0abc1e6c425580a"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/6419b99487f7_png.vtex_c",
+      "sha256": "af85c1702060d2abb5ef53f83fd1e209971f9c3bd04981a6a5bebc01c4eb07a5"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/665ac8a0e595_png.vtex_c",
+      "sha256": "1f510517d8d891d5e94c9383820791b62825543f8e574eba8ade216ee256c3b4"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/6aed4833e27d_png.vtex_c",
+      "sha256": "8920875a213a62773a2c8d2413b801125d37685ef3741fdd58dde6313a61a55e"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/6b68516fc568_png.vtex_c",
+      "sha256": "80c7c74c27762826fd6d9720f1fbfe66ef808e4005c2a158958665ab786802e1"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/6d1fef7c23f2_png.vtex_c",
+      "sha256": "249003159b58a36d5eff99036165fce5f28769637d2fe87ed6c5d8aa98d3c02d"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/6e4e3d191636_png.vtex_c",
+      "sha256": "4b6fb63ba12fb040fa4d0afa54e4df6f3b39f5c72e03747d79e2656d35198e10"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/7d5e1f248dec_png.vtex_c",
+      "sha256": "0f0714298f729df294a657970631e701089fd309f0b2aab82617658004fc2a08"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/7e426b40dbe8_png.vtex_c",
+      "sha256": "d4a6e05780351115205f57401eb7929d5fd4fb6cbfe3073c72c803a1d2c4cceb"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/7fac37df44f3_png.vtex_c",
+      "sha256": "aba18003be91709882c2db34fa8f36324308c33d6c3223e7f88dd7da4d7c8007"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/803f152ce8e3_png.vtex_c",
+      "sha256": "6f631b59de137a886ae2f88d69d6cd78f5d19902c1edec7a0a0d152a0a77920f"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/81fc95997203_png.vtex_c",
+      "sha256": "2231c2e06ecb9aea536a31dddf2a94639592a2ff93b88e46592d0f8d5150b41f"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/83b6b46fb7fc_png.vtex_c",
+      "sha256": "ab4f3c43931787738bc64ba5d6b00f154753aed2f80ed0fa51317b41da67e467"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/899daeb89c2a_png.vtex_c",
+      "sha256": "5bf8010781cba263ad3ecc883736a95fca5cc3bb595f779e41697fecacbd0906"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/8baaa4624b25_png.vtex_c",
+      "sha256": "d72156613fa6fd63b2fe467b964c874ccf75ada996b91b684b435b548aa6a61a"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/8c030f4b3b55_png.vtex_c",
+      "sha256": "11baa6f39608d6828ae7a34f1939118b97535837926ad2aed718b68fe5346b06"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/8fbb52a53d9c_png.vtex_c",
+      "sha256": "c06500d400d6d6f6173d19a730c0195f9511ffbf06a6e14da10273daa51b5323"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/9095780ad314_png.vtex_c",
+      "sha256": "578405e02caf83e74a0b186260e7e3c4316ac61327288e0dc134b0ec97828f3c"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/90c6947e7e7a_png.vtex_c",
+      "sha256": "41ebf5e5c68f74d3156f6e5c0804365612d045aa1cf36b7603bf336a2e12f9ca"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/92a06664ef9e_png.vtex_c",
+      "sha256": "6d096bca830ba8b90e03fa91d18515b6075921c808f214596eabdb5f11f1cf57"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/94bf62db24ef_png.vtex_c",
+      "sha256": "e51c0ca7fc3aa24b7038f2b9b40f6eb2df28492258f1f087b6b44176c9ea61eb"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/98f5c3e58743_png.vtex_c",
+      "sha256": "2ec0f03faf091aa7beb0684997a87a3fa7739b923c2fad223dcac08f010cab88"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/9e3b36e5c374_png.vtex_c",
+      "sha256": "314ea57ee84e44efbc26bc5dd24d176de418e8a53753a011f16d6ea7e35d3e2e"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/a44cc3acc407_png.vtex_c",
+      "sha256": "a09c13513885945a326ba32e3bc8894b5d6efdaeabd68c5a58c1e10ddb82ac29"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/aafd827a8434_png.vtex_c",
+      "sha256": "62cadbee8d3f8a8a89111dd144cd407fe95753c09ae48aab23fd463c2984d568"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/ac4799d60e0a_png.vtex_c",
+      "sha256": "8c4424cb4e94384670d8af103ec356a9d3d7aa3528788991381911696fa72966"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/aea08e083c2b_png.vtex_c",
+      "sha256": "23e28c3aff8a73f1155190f698d45c0f6e29c2edec9b126faf83321b27bb0873"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/afc8c8ae42d0_png.vtex_c",
+      "sha256": "be2af5220c978bc02874e936ecae2342257718edf52eb3d3eb306ecec33dee24"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/b9f67e8ea71d_png.vtex_c",
+      "sha256": "26e81e83c5059dbb1b345a8ee19d800a752b39e9ec1219352b46abc552500c67"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/c07809a71854_png.vtex_c",
+      "sha256": "ac784a6fc39abc6590a763ea186536852180581a3b4ead10e21a8a1fb48b6205"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/c3c7a498cf72_png.vtex_c",
+      "sha256": "7d6c246450b1082103fa9466951a3ef211f81899924259588a86ad1a35ed0f31"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/c8379d15bf3a_png.vtex_c",
+      "sha256": "8dde6b8c7d2317f975fab7ba7c47335b1a9047cb473e9bb101e6105b78807f7e"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/cad0bb59758c_png.vtex_c",
+      "sha256": "b12004584b23222bb2ea6f9e23dd9de26fa214f2af02c623c0fa2beee86d13e0"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/cd26f59fc0fa_png.vtex_c",
+      "sha256": "413dd92f4fdf5d1f7d7e8b85740ac7fa68479d6d6725a9aade71e052f9d8a719"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/cd6a8d27903a_png.vtex_c",
+      "sha256": "718495a49fa2526d30565f82931ec3cba82a960c5386019fe66223cf889fec3d"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/ce18feeff6d1_png.vtex_c",
+      "sha256": "ab3bf4473b71c30bf8cd04232ecbc6b5ffc4038ada910d575e27e85b1d1cc8a4"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/cfb5fcfd2bf8_png.vtex_c",
+      "sha256": "6218a7e50509abd11eadf9944ff9d3c1ae23dfc0b7d86b2a9e4010197769a6ae"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/d1d376747d5f_png.vtex_c",
+      "sha256": "3e77e22d00ccd6e78f0625b73e322ed79aaf27de957c3247af578dfd8e04f2fa"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/dacc6541bf3a_png.vtex_c",
+      "sha256": "d61dcc9d08e48d3260669685ad498414e45e264ce48b6ef9409d1fd3db5f4316"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/def35cf94f49_png.vtex_c",
+      "sha256": "1794926b1769aa512a6faec5107b621e73f0e198ce07857e9079ab2c1da0884b"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/dfd0af93af91_png.vtex_c",
+      "sha256": "aecccc3d401f9daddea73eaa5d5015b30701ad8851d4e218e1c2a279992d791e"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/e62598643131_png.vtex_c",
+      "sha256": "1508cdb4e37bdd66ff154b1b1c382f44be0d0a92ad0321f355ae13b19466d276"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/e6d0585200cb_png.vtex_c",
+      "sha256": "a789817bd4525e58a00307b1d9f269b2f660e54f9eddbbfdc8c27cc85a501876"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/edd54bb8bf2e_png.vtex_c",
+      "sha256": "3671fefed6dc843e67310dcb1bd8b278cf1584210f66944ee967f26d459ff862"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/f211b222b1e9_png.vtex_c",
+      "sha256": "774bc2ad1b770e99acd8dc46140675198e3c29aa971eb99fe980584a42ade165"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/f2bc7b929b08_png.vtex_c",
+      "sha256": "da9c76ea739ea3a85137b59797ca2ee1ac69ca53066b1ed4248e6f707056d43d"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/fa85db7454b6_png.vtex_c",
+      "sha256": "17a177ecfce073663bc9eff7ff074418dbfb32b7fe6d87f96be17d204ef33d7c"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/fab43de6187a_png.vtex_c",
+      "sha256": "3edb21f0085074cb1a6d64d37798026ed1d68a8de3782cf4739ce3b6d51f1333"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/fb542ff42555_png.vtex_c",
+      "sha256": "075f00390f66fbf8be8c8f8ac2e980a7fa40ef5cbf93378f15c1384af2ab0355"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/shadows/fbfc353f8ef1_png.vtex_c",
+      "sha256": "10def2e811adf09a4e366d93d3c166bb4b08ef2d7b35d0455c297f5f7d2277b6"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/sidebar_png.vtex_c",
+      "sha256": "bcb72c2b5549bb61121bbe076e30bec5bded01d09844c6f7418c02084fda1b6d"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/sidebar_seam_png.vtex_c",
+      "sha256": "4d13dfe63415ddb14d5185934caaf1e04263556d5167fab579330715e938d3a3"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/sword_hover_png.vtex_c",
+      "sha256": "a52a2b625d76ac3d6cedcb7116df8f2cc72df57c6f6ffde7a29471fc32138ee5"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/sword_light_png.vtex_c",
+      "sha256": "6ff6d2dadeca3ad6e4de0c7fdba279e7f178e595e810815ef46323aa9e67bd6c"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/ticket_hover_png.vtex_c",
+      "sha256": "cbfe7aa0b9dcb2bbdc52785c270ee80c258dd588995dd237db7934aeee40e416"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/ticket_light_png.vtex_c",
+      "sha256": "f4e01976b08f7d121a4bd58689c6a95fd0a42914a60ec59c7300f14b3c2e9b26"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/title_flourish_png.vtex_c",
+      "sha256": "224c7b23854236b3af1d32e2099fb1c447de123b27b9f3c5cb0b48fc5540a389"
+    },
+    {
+      "path": "panorama/images/custom_game/commerce_jade_v1/window_png.vtex_c",
+      "sha256": "6b8c821b339d20e852b0c724855d6700997ad48812977500887d998fcbcba2f5"
+    }
+  ]
+}

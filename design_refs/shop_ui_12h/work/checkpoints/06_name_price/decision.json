@@ -1,0 +1,21 @@
+{
+  "group": "06_name_price",
+  "best": "N13",
+  "entries": [
+    {
+      "id": "N13",
+      "result": "保留",
+      "improvement": "名称重量减轻、字距收紧，名称和价格形成清晰层次",
+      "cost": "中文标题雕刻感比粗字稍弱"
+    },
+    {
+      "id": "N14",
+      "result": "淘汰",
+      "improvement": "柔软价格带减少下半部边缘",
+      "cost": "价格与卡体辨识不足，保留原内嵌信息底"
+    }
+  ],
+  "at": "2026-10-06T16:33:47.293Z",
+  "kind": "assembled_component_browser_preview",
+  "hash": "b698cc06073e03c40fb30c3e7395a93b5901c0bb5c8d51e88867175e026394b3"
+}

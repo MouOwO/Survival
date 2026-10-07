@@ -1,0 +1,21 @@
+{
+  "group": "09_navigation",
+  "best": "B17",
+  "entries": [
+    {
+      "id": "V19",
+      "result": "淘汰",
+      "improvement": "选中象牙材质稍暖",
+      "cost": "全图对比收益很小，原导航材质已符合参考，不叠加修改"
+    },
+    {
+      "id": "V20",
+      "result": "淘汰",
+      "improvement": "选中光晕减半，边缘更克制",
+      "cost": "底部金线与选中态弱化，保留原光晕与金线"
+    }
+  ],
+  "at": "2026-10-06T16:35:45.926Z",
+  "kind": "assembled_component_browser_preview",
+  "hash": "b698cc06073e03c40fb30c3e7395a93b5901c0bb5c8d51e88867175e026394b3"
+}

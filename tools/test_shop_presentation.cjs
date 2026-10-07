@@ -3,6 +3,7 @@ let suite=fs.readFileSync(__dirname+'/test_shop_shared_ui.cjs','utf8');
 suite=suite.replace('const root=new Panel','Panel.prototype.SetScaling=function(v){this.scaling=v;};Panel.prototype.Children=function(){return this.children;};const root=new Panel');
 suite=suite.replace("vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/shop_ui.js','utf8'),env);", "vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/remaining_5d5c1152eb.js','utf8'),env);vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/shop_remaining_5d5c1152eb.js','utf8'),env);");
 suite=suite.replace('assert.equal(jobs.size,0);', 'for(const [id,fn] of [...jobs]){jobs.delete(id);fn();}assert.equal(jobs.size,0);assert.equal(nodes.CustomShopWindow.visible,false);');
+suite=suite.replace('const U=cfg.SurvivalUI', 'env.CustomNetTables={GetTableValue:()=>({})};env.Game.GetLocalPlayerID=()=>0;const U=cfg.SurvivalUI');
 suite+=`\nconst parent=new Panel('Panel');U.PriceLabel(parent,{prices:[{amount:12,currencyName:'U币'},{amount:20,currencyName:'积分'}]});function find(p,c){let out=p.classes.has(c)?[p]:[];for(const x of p.children)out=out.concat(find(x,c));return out;}assert.equal(find(parent,'UIPriceCurrencyIcon').length,1);assert.deepEqual(find(parent,'UIPrice').map(p=>p.text),['12','20 积分']);assert(nodes.CustomShopWindow.BHasClass('RHSurvivalShop'));console.log('SHOP_PRESENTATION_PASS: accepted helper + actual shop controller, currency icon/text distinction');`;
 suite+=`
 assert.equal(nodes.CustomShopWindow.style.width,'604px');
@@ -23,16 +24,14 @@ const oldClose=[...jobs.values()];shop.Open();for(const fn of oldClose)fn();asse
 nodes.CustomShopWindow.actuallayoutwidth=1600;shop.Close();assert(parseFloat(nodes.CustomShopWindow.style.position)<=-1680,'account for measured scaled width');
 for(const [id,fn] of [...jobs]){jobs.delete(id);fn();}assert.equal(nodes.CustomShopWindow.visible,false,'hide full panel after exit animation');
 assert.equal(jobs.size,0);shop.Close();assert.equal(nodes.CustomShopWindow.visible,false);assert.equal(jobs.size,0);
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/native_ui_icons.js','utf8'),env);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/item_art_remaining_5d5c1152eb.js','utf8'),env);
-const sword=cfg.SurvivalItemArt.Create(parent,{content_id:'weapon_growth_sword_01',icon:'item_broadsword'},'icon');assert(sword.image.includes('items/survival_shop_v2/swords_00.png'));
+const sword=cfg.SurvivalItemArt.Create(parent,{content_id:'weapon_growth_sword_01',icon:'item_broadsword'},'icon');assert.equal(sword.image,'file://{images}/items/broadsword.png');
 const red=cfg.SurvivalItemArt.Create(parent,{content_id:'item_knowledge_book'},'icon'),blue=cfg.SurvivalItemArt.Create(parent,{content_id:'item_super_knowledge_book'},'icon');
-assert(red.image.includes('items/survival_shop_v2/shop_07.png'));assert.notEqual(red.image,blue.image);
-for(const family of ['growth_sword','frost_blade','ice_blade','epic_icefire','legend_abyss'])for(let level=0;level<=10;level++){
- const icon=cfg.SurvivalItemArt.Create(parent,{content_id:'weapon_'+family+'_'+String(level).padStart(2,'0')},'icon');assert(icon.image.includes('/swords_'));
-}
-for(let level=1;level<=11;level++){const icon=cfg.SurvivalItemArt.Create(parent,{content_id:'challenge_'+String(level).padStart(2,'0')},'icon');assert(icon.image.includes('/challenges_'));}
-for(let level=1;level<=10;level++){const icon=cfg.SurvivalItemArt.Create(parent,{content_id:'rebirth_challenge_'+String(level).padStart(2,'0')},'icon');assert(icon.image.includes('/challenges_'));}
-console.log('SHOP_V2_PASS: original art families, challenge art, drawer positioning, repeat stock, icon-only tiles, right-click preserved');
+assert.equal(red.image,'file://{images}/items/tome_of_knowledge.png');assert.notEqual(red.image,blue.image);
+const nativeManifest=JSON.parse(fs.readFileSync('panorama/src/images/custom_game/shop_v2/inventory_manifest.json','utf8'));
+for(const[id,value]of Object.entries(nativeManifest.icons))assert.equal(cfg.SurvivalItemArt.Create(parent,{content_id:id},'icon').image,value.uri,id);
+console.log('SHOP_V2_PASS: native item families, challenge skill icons, drawer positioning, repeat stock, icon-only tiles, right-click preserved');
 `;
 suite+=`
 shop.Open();let now=100;env.Game.GetGameTime=()=>now;

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="96" viewBox="0 0 320 96">
+  <defs>
+    <path id="plate" d="M10 4h300l4 4v84l-4 4H10l-4-4V8z"/>
+    <clipPath id="clip"><use href="#plate"/></clipPath>
+    <linearGradient id="ivory" x1="0" y1="0" x2="0.25" y2="1">
+      <stop stop-color="#fbf8e9"/>
+      <stop offset=".38" stop-color="#f2efdf"/>
+      <stop offset=".8" stop-color="#e9ead9"/>
+      <stop offset="1" stop-color="#d4d8c8"/>
+    </linearGradient>
+    <radialGradient id="light" cx=".28" cy=".08" r=".82">
+      <stop stop-color="#fffdf0" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#fffdf0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2=".5" y2="1">
+      <stop stop-color="#ebdca9"/>
+      <stop offset=".28" stop-color="#cdbd8b"/>
+      <stop offset=".75" stop-color="#a39369"/>
+      <stop offset="1" stop-color="#87784f"/>
+    </linearGradient>
+    <linearGradient id="recess" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#fffdf4" stop-opacity=".95"/>
+      <stop offset=".3" stop-color="#fffdf4" stop-opacity=".15"/>
+      <stop offset="1" stop-color="#7e826a" stop-opacity=".28"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="3" seed="19" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <path id="cloud" d="M240 24c14-7 23-2 22 5-1 8-12 8-13 1m-19 16c20-10 28 3 43-2 14-5 26 0 37 7M270 77c14-7 25 3 43-1M10 71c13-7 24-3 26 5 3 9-9 11-12 4m-16 10c17-7 26 2 44-1"/>
+  </defs>
+  <g clip-path="url(#clip)">
+    <use href="#plate" fill="url(#ivory)"/>
+    <use href="#plate" fill="url(#light)"/>
+    <rect x="6" y="4" width="308" height="92" filter="url(#grain)" opacity=".055" style="mix-blend-mode:multiply"/>
+    <use href="#cloud" fill="none" stroke="#fffff5" stroke-width="1.4" opacity=".55" transform="translate(0,1)"/>
+    <use href="#cloud" fill="none" stroke="#a9ae8f" stroke-width=".9" opacity=".22"/>
+    <path d="M12 7h296l3 3v79l-3 3H12l-3-3V10z" fill="none" stroke="url(#recess)" stroke-width="1.4"/>
+    <path d="M11 8v80M309 8v80" stroke="#fffdf2" stroke-width=".7" opacity=".52"/>
+  </g>
+  <use href="#plate" fill="none" stroke="url(#rim)" stroke-width="1.3"/>
+  <path d="M12 5.5h296l4.5 4v80" fill="none" stroke="#fffae3" stroke-width=".8" opacity=".85"/>
+  <path d="M10 94h300" stroke="#8f875d" stroke-width=".7" opacity=".44"/>
+</svg>

@@ -1,0 +1,38 @@
+﻿{
+    "scope":  "native compiler, not visual acceptance",
+    "time":  "2026-10-07T02:26:26.4689957+08:00",
+    "backup":  "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\commerce_ui_12h\\before_compile_20261007_022625",
+    "files":  [
+                  {
+                      "compiled_sha256":  "E4DCBDD7DDF515D875DB724A13077B5B47A3CC50A0685379DC3735047C51F8C1",
+                      "sha256":  "7CA84BE3DAB75AACDDBCF72C1049B5E9A995F24EE1ECAC9CA24A245487014671",
+                      "source":  "scripts/custom_game/common/commerce_art_manifest.js"
+                  },
+                  {
+                      "compiled_sha256":  "F9427D7FFA17B17E7D5B7D41BCE71855E4B1F3F78FDF4A852AE6A52DFF168D6B",
+                      "sha256":  "A0BED1C0FEEFBE45AA129604479567998520E6484BE8298446F561A963494165",
+                      "source":  "scripts/custom_game/common/commerce_components.js"
+                  },
+                  {
+                      "compiled_sha256":  "113A111DC71DA131C4BCBB13ACD22B02EFFDD2CBD92D97449E0209694F41CC8D",
+                      "sha256":  "AF72FC3152057C1EFA2CACF29E606C967E6176380009108C4F402D67BE03FCA3",
+                      "source":  "scripts/custom_game/commerce_remaining_5d5c1152eb.js"
+                  },
+                  {
+                      "compiled_sha256":  "0B829FFC98305DEA5DD4BDF124DE16333453DA03958B2E5B7EA4E604A2EE3F25",
+                      "sha256":  "E35CD82DFF1B979B42AFA05E93F180F4F52F9F6370BD986E30BB3B73E15D711E",
+                      "source":  "styles/custom_game/common/commerce_jade.css"
+                  },
+                  {
+                      "compiled_sha256":  "092A2269887A73EDB93A6AF82D6CF5CA0DFB6C345DB18BC4490F200CA26372CC",
+                      "sha256":  "1FFAF65393EF83A67B9DF6ED3E732643D4A4A345258D488E14A00BEE817E92C7",
+                      "source":  "layout/custom_game/commerce_resources.xml"
+                  },
+                  {
+                      "compiled_sha256":  "F1194967EE05E3A193F7ABD4785EB172A138CCBE24F0E35FFB2ABC5178ACB271",
+                      "sha256":  "0EEF4FBE49113D3A26D01414E2BC727F8EBB8E92F2EA2F24B64530E23C76915D",
+                      "source":  "layout/custom_game/survival_hud.xml"
+                  }
+              ],
+    "log":  "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\commerce_ui_12h\\before_compile_20261007_022625\\compile.log"
+}

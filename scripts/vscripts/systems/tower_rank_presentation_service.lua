@@ -31,6 +31,7 @@ local function display_name(state, unit)
 end
 
 function M.publish(state)
+    if state and state.stats_only == true then return end
     local rank = projection.project(state)
     local unit = state and state.unit
     if not rank or not valid(unit) or (unit.IsAlive and not unit:IsAlive()) then return end

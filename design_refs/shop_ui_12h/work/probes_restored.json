@@ -1,0 +1,32 @@
+[
+  {
+    "restored": true,
+    "probe": "startup_probe",
+    "extension": "js"
+  },
+  {
+    "restored": true,
+    "probe": "startup_probe",
+    "extension": "vjs_c"
+  },
+  {
+    "restored": true,
+    "probe": "mode_probe",
+    "extension": "js"
+  },
+  {
+    "restored": true,
+    "probe": "mode_probe",
+    "extension": "vjs_c"
+  },
+  {
+    "restored": true,
+    "probe": "native_before_probe",
+    "extension": "js"
+  },
+  {
+    "restored": true,
+    "probe": "native_before_probe",
+    "extension": "vjs_c"
+  }
+]

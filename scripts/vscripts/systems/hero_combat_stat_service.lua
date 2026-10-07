@@ -751,6 +751,7 @@ local function on_changed(payload)
 end
 
 local function on_progression_changed(payload)
+    if payload and payload.changed_section == "tower" then return end
     -- Progression attributes are logical data only. They do not change native
     -- attributes or equipment health, so only the combat snapshot is rebuilt.
     recalculate(tonumber(payload.player_id), payload.reason)

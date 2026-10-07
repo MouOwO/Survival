@@ -64,7 +64,7 @@ function ParticleManager:SetParticleControlEnt(id, cp, unit, attach, attachment)
 end
 function ParticleManager:SetParticleControl(id, cp, value)
     if created == fail_control_at then error("injected control failure") end
-    assert(cp == 0 or cp == 1 or cp == 2 or cp == 62, "only size/alpha, color and native HSV are constant CPs")
+    assert(cp == 0 or cp == 1 or cp == 2 or cp == 3 or cp == 62, "only cosmetic size/color/native controls are constant CPs")
     particles[id].controls[cp] = value
 end
 function ParticleManager:DestroyParticle(id, immediate)
@@ -115,20 +115,15 @@ service.precache({})
 local expected_precache = {["particles/base_attacks/ranged_goodguy.vpcf"] = true}
 expected_precache["particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf"] = true
 local trial_base_paths = {
-    [1] = "particles/survival/towers/amber_portal/ground.vpcf",
+    [1] = "particles/survival/towers/amber_portal/native_full/ground.vpcf",
     [2] = "particles/survival/towers/trial/mystery_ground.vpcf",
     [3] = "particles/survival/towers/trial/lightning_ground.vpcf",
     [5] = "particles/survival/towers/trial/multi_ground.vpcf",
-    [6] = "particles/survival/towers/ice_portal/ground.vpcf",
+    [6] = "particles/survival/towers/ice_portal/native_full/ground.vpcf",
 }
 for _, path in pairs(trial_base_paths) do expected_precache[path] = true end
 local old_death_path = "particles/survival/towers/death_willow/shadow_ground.vpcf"
 expected_precache[old_death_path] = true
-for _, portal in ipairs({"ice_portal", "amber_portal"}) do
-    for _, layer in ipairs({"dark_center", "interior", "sparkles"}) do
-        expected_precache["particles/survival/towers/" .. portal .. "/" .. layer .. ".vpcf"] = true
-    end
-end
 expected_precache["particles/survival/towers/trial/death_ground.vpcf"] = true -- compatible old-profile transition
 expected_precache["particles/survival/towers/trial/frost_ground.vpcf"] = true -- compatible old frost profile
 for _, name in ipairs({"dark", "durable", "evil"}) do expected_precache["particles/survival/towers/trial/valley_" .. name .. ".vpcf"] = true end
@@ -314,9 +309,9 @@ assert(#sentinel_ids == 1 and particles[sentinel_ids[1]].name == machine_base_pa
 assert(particles[old_sigil].destroyed and particles[old_sigil].released and live_count() == 1)
 service.remove(sentinel.index)
 
--- A late failure in one portal layer must retire every layer already created.
+-- A failure binding the native portal must retire its root and entire graph.
 local portal_failure = unit(6)
-fail_control_at = created + 4
+fail_control_at = created + 1
 assert(not service.apply(state(portal_failure, 6, "class_6")))
 assert(live_count() == 0 and not service.debug_snapshot(portal_failure.index).tracked)
 fail_control_at = nil
@@ -330,7 +325,7 @@ for _, class_id in ipairs({"class_1", "class_6"}) do
         local before_created = created
         assert(service.apply(state(initial, level, class_id)))
         local ids = service.debug_snapshot(initial.index).particle_ids
-        assert(#ids == 4 and live_count() == 4)
+        assert(#ids == 1 and live_count() == 1)
         assert(route_config.current(state(initial, level, class_id)).rarity == "R")
         assert(initial.projectile == "row_default", "R towers retain their authored attack projectile")
         if previous then assert(created == before_created and ids[1] == previous) end
@@ -348,7 +343,7 @@ for class_number = 1, 7 do
         local applied = service.apply(payload)
         assert(applied)
         local replaced = true
-        local expected_count = (class_number == 1 or class_number == 6) and 4 or class_number == 7 and 3 or 1
+        local expected_count = class_number == 7 and 3 or 1
         assert(live_count() == expected_count and service.debug_snapshot().particles == expected_count)
         local profile = profiles.by_id[payload.tower_class]
         local rarity = case[1] <= 10 and "r" or case[1] <= 15 and "sr" or "ssr"
@@ -382,17 +377,15 @@ for class_number = 1, 7 do
         local radius = profile["radius_" .. rarity]
         if expected_count > 0 and trial_base_paths[class_number] then
         assert(particles[ids[1]].name == trial_base_paths[class_number])
-        assert(particles[ids[1]].controls[1].x == radius, "core keeps the profile radius")
-        if expected_count == 4 then
+        if class_number == 1 or class_number == 6 then
             local portal = class_number == 1 and "amber_portal" or "ice_portal"
-            for offset, layer in ipairs({"ground", "dark_center", "interior", "sparkles"}) do
-                local effect = particles[ids[offset]]
-                assert(effect.name == "particles/survival/towers/" .. portal .. "/" .. layer .. ".vpcf")
-                assert(effect.bindings[0].unit == u and effect.bindings[0].attachment == "")
-                assert(effect.controls[1].x == radius and effect.controls[1].z == profile.alpha,
-                    "every portal layer receives its own size and alpha, without child inheritance")
-                assert(effect.controls[2], "every portal layer receives its own color")
-            end
+            local effect = particles[ids[1]]
+            assert(effect.name == "particles/survival/towers/" .. portal .. "/native_full/ground.vpcf")
+            assert(effect.bindings[0].unit == u and effect.bindings[1].unit == u)
+            assert(effect.controls[3].x == radius, "native CP3 supplies orbit radius")
+            assert(not effect.controls[1] and not effect.controls[2], "native position and colors must not be overwritten")
+        else
+            assert(particles[ids[1]].controls[1].x == radius, "core keeps the profile radius")
         end
         end
         local before_created, before_destroyed = created, #destroyed
@@ -408,11 +401,16 @@ for class_number = 1, 7 do
                 and effect.name ~= mystery_base_path
                 and effect.name ~= machine_base_paths[1] and effect.name ~= machine_base_paths[2]
                 and effect.name ~= anti_air_base_paths[1] and effect.name ~= anti_air_base_paths[2] then
-                assert(effect.bound_unit == u and effect.controls[1].x > 0)
+                assert(effect.bound_unit == u)
+                if class_number == 1 or class_number == 6 then
+                    assert(effect.controls[3].x > 0 and effect.bindings[1].unit == u)
+                else
+                assert(effect.controls[1].x > 0)
                 assert(effect.controls[1].z > 0 and effect.controls[1].z <= 1)
                 local color = profile["color_" .. rarity] or profile.color
                 assert(effect.controls[2].x == tonumber(color[1]) and effect.controls[2].y == tonumber(color[2])
                     and effect.controls[2].z == tonumber(color[3]))
+                end
             end
         end
     end
@@ -424,7 +422,7 @@ local u = unit(30)
 service.apply(state(u, 21, "class_1"))
 local before_destroyed = #destroyed
 service.apply(state(u, 21, "class_3"))
-assert(#destroyed == before_destroyed + 4 and live_count() == 1, "cross-route swap must retire every old portal layer")
+assert(#destroyed == before_destroyed + 1 and live_count() == 1, "cross-route swap must retire the complete native portal root")
 before_destroyed = #destroyed
 service.apply(state(u, 21, "class_2"))
 assert(#destroyed == before_destroyed + 1 and live_count() == 1,
@@ -434,10 +432,10 @@ service.apply(state(u, 21, "class_4"))
 assert(live_count() == 1, "machine gun retains only the purple ring after a route change")
 local replacement = unit(30)
 service.apply(state(replacement, 11, "class_6"))
-assert(live_count() == 4)
+assert(live_count() == 1)
 u.alive = false
 bus.emit(events.ENGINE_ENTITY_KILLED, { victim = u })
-assert(live_count() == 4, "late death of reused entindex must not clear replacement")
+assert(live_count() == 1, "late death of reused entindex must not clear replacement")
 replacement.alive = false
 bus.emit(events.ENGINE_ENTITY_KILLED, { victim = replacement })
 assert(live_count() == 0)
@@ -492,16 +490,16 @@ assert(live_count() == 0)
 replacement.null = false
 listed = {state(replacement, 11, "class_6"), ultimate_state}
 service.init()
-assert(live_count() == 8 and service.debug_snapshot().towers == 2)
+assert(live_count() == 5 and service.debug_snapshot().towers == 2)
 before_destroyed = #destroyed
 service.init()
-assert(#destroyed == before_destroyed + 8 and live_count() == 8,
+assert(#destroyed == before_destroyed + 5 and live_count() == 5,
     "same-world init must destroy all old layers including smoke before rebuilding")
 assert(scheduler.task_count() == 1)
 local before_created = created
 bus.emit(events.BUILDING_CHANGED, state(replacement, 21, "class_6"))
-assert(created == before_created + 4, "old generation subscriptions must stay inactive")
-assert(live_count() == 8)
+assert(created == before_created + 1, "old generation subscriptions must stay inactive")
+assert(live_count() == 5)
 
 before_destroyed = #destroyed
 world, next_id, listed = {}, 0, {}

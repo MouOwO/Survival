@@ -1,0 +1,56 @@
+{
+  "best": "B17 + L21 + T23",
+  "at": "2026-10-06T18:48:28.760Z",
+  "files": [
+    {
+      "path": "panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js",
+      "sha256": "af72fc3152057c1efa2cacf29e606c967e6176380009108c4f402d67be03fca3"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/common/commerce_components.js",
+      "sha256": "a0bed1c0feefbe45aa129604479567998520e6484be8298446f561a963494165"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/common/commerce_art_manifest.js",
+      "sha256": "7ca84be3dab75aacddbcf72c1049b5e9a995f24ee1ecac9ca24a245487014671"
+    },
+    {
+      "path": "panorama/src/styles/custom_game/common/commerce_jade.css",
+      "sha256": "e35cd82dff1b979b42afa05e93f180f4f52f9f6370bd986e30bb3b73e15d711e"
+    },
+    {
+      "path": "panorama/src/layout/custom_game/commerce_resources.xml",
+      "sha256": "1ffaf65393ef83a67b9df6ed3e732643d4a4a345258d488e14a00bee817e92c7"
+    },
+    {
+      "path": "panorama/src/layout/custom_game/survival_hud.xml",
+      "sha256": "0eef4fbe49113d3a26d01414e2bc727f8ebb8e92f2ea2f24b64530e23c76915d"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "L21",
+      "keep": true,
+      "improvement": "长说明改用全展示区软边遮罩，消除额外硬矩形；仍看得到商品",
+      "cost": "长说明覆盖更多商品，只有长说明启用"
+    },
+    {
+      "id": "L22",
+      "keep": false,
+      "improvement": "文字对比度更强",
+      "cost": "94%深色遮挡明显压过商品，84%已足够"
+    },
+    {
+      "id": "T23",
+      "keep": true,
+      "improvement": "53x48原券图内嵌96px，减少放大模糊，保持原图映射；独立投影跟随实际展示比例",
+      "cost": "该旧图仍有自带背景，需将来提供高分辨率透明原资源"
+    },
+    {
+      "id": "T24",
+      "keep": false,
+      "improvement": "128px券图轮廓更大",
+      "cost": "模糊和自带矩形更明显"
+    }
+  ]
+}

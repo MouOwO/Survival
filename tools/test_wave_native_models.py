@@ -13,6 +13,11 @@ archetypes=rows(ROOT/'data/csv/怪物与波次系统/monster_archetypes.csv')
 npc=parse_kv((ROOT/'scripts/npc/npc_units_custom.txt').read_text(encoding='utf-8-sig'))['DOTAUnits']
 selected=[r for r in archetypes if r['unit_name'].startswith('npc_survival_wave_named_')]
 for r in selected: assert npc[r['unit_name']]['Model']==r['model_path'],r['archetype_id']
+for wave in (5, 10):
+    boss = npc[f'npc_survival_wave_named_boss_dreadlord_wave_name_{wave}']
+    assert boss['MovementSpeedActivityModifiers'] == {'walk': '0', 'run': '395'}, \
+        f'wave {wave} Underlord needs native locomotion tags (including slowed walk)'
+    assert boss['MovementCapabilities'] == 'DOTA_UNIT_CAP_MOVE_GROUND'
 with tempfile.TemporaryDirectory(prefix='survival_wave_models_') as tmp:
     target=Path(tmp)
     for rel in ['data/csv/怪物与波次系统/monster_archetypes.csv','data/csv/怪物与波次系统/wave_definitions.csv','scripts/npc/npc_units_custom.txt','resource/addon_schinese.txt','resource/localization/addon_schinese.txt']:

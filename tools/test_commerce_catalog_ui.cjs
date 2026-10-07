@@ -17,6 +17,7 @@ cfg.SurvivalPayments={GetCatalog:()=>currentCatalog,RefreshCatalog:()=>refreshes
 const env={$,GameUI:{CustomUIConfig:()=>cfg},GameEvents:{Subscribe:()=>1,Unsubscribe:()=>{}},Game:{}};
 require("./load_shared_ui_test.cjs")(env,Panel,root);
 cfg.RemainingHandoff={Window:()=>{},SizeWindow:()=>{},Box:()=>{},Tab:()=>{},Action:()=>{},Image:()=>{}};
+vm.runInNewContext(fs.readFileSync("panorama/src/scripts/custom_game/common/commerce_components.js","utf8"),env);
 vm.runInNewContext(fs.readFileSync("panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js","utf8"),env);
 const all=()=>{const out=[];function walk(p){out.push(p);p.children.forEach(walk);}walk(root);return out;};
 cfg.SurvivalCommerceView.Open();assert.equal(refreshes,1);assert.equal(requests.length,0,"opening the shop must never create an order");
