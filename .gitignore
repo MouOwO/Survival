@@ -428,6 +428,8 @@ __pycache__/
 # Local failed capture attempts and one-off engine audit commands.
 /design_refs/shop_ui_12h/work/production/game_*.png
 /tools/wall_contact_readonly_audit.json
+# This local directory junction points at art/ui/sources; track only the canonical source path.
+/panorama/src/images/
 !/scripts/vscripts/tests/test_wall_melee_contact.lua
 !/scripts/vscripts/tests/test_wall_navigation.lua
 !/scripts/vscripts/tests/test_wall_slot_limit.lua
