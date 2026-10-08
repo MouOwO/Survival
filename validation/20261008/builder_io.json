@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-08",
+  "task": "Io arcana builder appearance, native construction feedback and audio",
+  "baseline": "91775f22",
+  "native_resource_authority": "Valve local game/dota/pak01_dir.vpk and scripts/npc/heroes/npc_dota_hero_wisp.txt",
+  "item": {
+    "id": 9235,
+    "name": "仁爱之友 / Benevolent Companion",
+    "rarity": "arcana",
+    "primary_model": "models/items/io/io_ti7/io_ti7.vmdl",
+    "activity": "ACT_DOTA_TAUNT",
+    "native_model_missing_cast_activities": true
+  },
+  "resources": {
+    "ambient": "particles/econ/items/wisp/wisp_ambient_ti7.vpcf",
+    "construction": "particles/econ/items/wisp/wisp_overcharge_ti7.vpcf",
+    "sound_library": "soundevents/game_sounds_heroes/game_sounds_wisp.vsndevts",
+    "voice_library": "soundevents/voscripts/game_sounds_vo_wisp.vsndevts",
+    "start_event": "Hero_Wisp.Spirits.Cast",
+    "complete_event": "Hero_Wisp.TeleportIn.Arc",
+    "preload_group": "initial_required"
+  },
+  "state_machine": "spawn/apply ambient -> actual start gesture+charge -> finish/cancel/death retire charge+gesture -> owner death/disconnect clear all; latest construction owns feedback; entity/world identity guarded; detach state/particle ownership before native cleanup calls",
+  "regressions": {
+    "tests": [
+      {
+        "name": "test_builder_io_presentation",
+        "exit_code": 0,
+        "last_line": "BUILDER_IO_PRESENTATION_PASS: real owner-isolated builder creation, Io arcana/phase/speed, native build gestures/audio, overlap/removal/death/disconnect/index/world cleanup and renderer failure"
+      },
+      {
+        "name": "test_builder_work_position",
+        "exit_code": 0,
+        "last_line": "BUILDER_PHASE_CREATION_PASS: live creation installs registered phase modifier once"
+      },
+      {
+        "name": "test_builder_yield_construction",
+        "exit_code": 0,
+        "last_line": "FREE_ALTAR_CONSTRUCTION_PASS: real city0 placement/construction, zero cost, completion-only charge consumption, unique limit"
+      },
+      {
+        "name": "test_builder_tower_rebuild",
+        "exit_code": 0,
+        "last_line": "BUILDER_UNIQUE_RESERVATION_PASS: immediate hide and deferred native removal, ready rollback, placeholder/cooldown/talent retention, builder recovery, completion-only gates, city/rogue resync, player isolation and unchanged multi-count caps"
+      },
+      {
+        "name": "test_building_astral_construction",
+        "exit_code": 0,
+        "last_line": "ASTRAL_CONSTRUCTION_PASS: native W, world anchor, hidden until complete, progress, collision untouched, cancel and particle failure"
+      },
+      {
+        "name": "test_wall_repair_detection",
+        "exit_code": 0,
+        "last_line": "WALL_REPAIR_DETECTION_PASS: native building masks, builder/repairer, model swaps, map-wide scan, safe approach, repair rate, manual standby, ownership and construction"
+      },
+      {
+        "name": "test_grid_builder_preview",
+        "exit_code": 0,
+        "last_line": "GRID_MODEL_POSE_PASS independent validation, authentication, stale/closed protection"
+      },
+      {
+        "name": "test_startup_asset_preload_service",
+        "exit_code": 0,
+        "last_line": "test_startup_asset_preload_service: PASS resources=377 async_requests=48"
+      },
+      {
+        "name": "test_initial_builder_camera",
+        "exit_code": 0,
+        "last_line": "INITIAL_BUILDER_CAMERA_PASS: four clients, late identity/entity, selected-builder focus, one-shot behavior, user selection and camera fallback"
+      }
+    ],
+    "known_unrelated_head_failure": {
+      "test": "test_tower_upgrade_targeting",
+      "exit_code": 1,
+      "same_line214": true,
+      "message": "50 combat growth hits must not trigger whole-group fusion/ability refreshes",
+      "baseline_building_system": "91775f22"
+    }
+  },
+  "config_checks": {
+    "builder_definitions": {
+      "generated_reproducible": true,
+      "unchanged_gameplay_and_unrelated_rows": true
+    },
+    "building_sound_definitions": {
+      "generated_reproducible": true,
+      "unchanged_gameplay_and_unrelated_rows": true
+    },
+    "asset_catalog": {
+      "generated_reproducible": true,
+      "unchanged_gameplay_and_unrelated_rows": true
+    },
+    "unit_kv_only_model_and_native_audio_changed": true
+  },
+  "verification_limits": "Offline contract/integration checks and native VPK audit only. Actual new-map rendering and voice playback need in-game acceptance. No current cosmetic price claim.",
+  "synchronization": {
+    "branch": "dev",
+    "pulled_head": "5437e3c4",
+    "own_task_stash": "c12531ba035c94bf8cde37ed340dd9ec34a061ad",
+    "pull_blocking_binary_stash": "bbdc8470ec22a7cd8895470291b274c698f5a28f",
+    "restoration": "17 task hashes and 50 unrelated workspace entries preserved; binary conflicts resolved by restoring original worktree bytes and keeping remote HEAD; both temporary stashes removed",
+    "historical_stashes_preserved": 20,
+    "isolated_tree_verification": "PASS final source: 9 relevant regressions including cleanup reentry, 8 changed Lua syntax files, 3 generated configs; 1293 tracked text dependencies exported from task index",
+    "candidate_tree_before_final_evidence": "96052dc4fe25037a78e3fda079a6702d053a88cd"
+  },
+  "isolated_verification": {
+    "tests": [
+      {
+        "name": "test_builder_io_presentation",
+        "exit_code": 0
+      },
+      {
+        "name": "test_builder_work_position",
+        "exit_code": 0
+      },
+      {
+        "name": "test_builder_yield_construction",
+        "exit_code": 0
+      },
+      {
+        "name": "test_builder_tower_rebuild",
+        "exit_code": 0
+      },
+      {
+        "name": "test_building_astral_construction",
+        "exit_code": 0
+      },
+      {
+        "name": "test_wall_repair_detection",
+        "exit_code": 0
+      },
+      {
+        "name": "test_grid_builder_preview",
+        "exit_code": 0
+      },
+      {
+        "name": "test_startup_asset_preload_service",
+        "exit_code": 0
+      },
+      {
+        "name": "test_initial_builder_camera",
+        "exit_code": 0
+      }
+    ],
+    "syntax_files": [
+      "scripts/vscripts/config/generated/builder_definitions.lua",
+      "scripts/vscripts/config/generated/building_sound_definitions.lua",
+      "scripts/vscripts/config/generated/asset_catalog.lua",
+      "scripts/vscripts/systems/builder_service.lua",
+      "scripts/vscripts/systems/building_system.lua",
+      "scripts/vscripts/tests/test_builder_yield_construction.lua",
+      "scripts/vscripts/systems/builder_presentation_service.lua",
+      "scripts/vscripts/tests/test_builder_io_presentation.lua"
+    ],
+    "generated_config_reproducibility": true,
+    "snapshot_dependency_files": 1293,
+    "reentrant_cleanup_covered": true
+  },
+  "native_vpk_audit": {
+    "compiled_resources": [
+      {
+        "path": "models/items/io/io_ti7/io_ti7.vmdl_c",
+        "crc": 3339054344,
+        "bytes": 283889
+      },
+      {
+        "path": "particles/econ/items/wisp/wisp_ambient_ti7.vpcf_c",
+        "crc": 946449538,
+        "bytes": 1571
+      },
+      {
+        "path": "particles/econ/items/wisp/wisp_overcharge_ti7.vpcf_c",
+        "crc": 220410890,
+        "bytes": 1485
+      },
+      {
+        "path": "soundevents/game_sounds_heroes/game_sounds_wisp.vsndevts_c",
+        "crc": 113175281,
+        "bytes": 4327
+      },
+      {
+        "path": "soundevents/voscripts/game_sounds_vo_wisp.vsndevts_c",
+        "crc": 1618342432,
+        "bytes": 3787
+      },
+      {
+        "path": "particles/econ/items/wisp/wisp_ambient_ti7_heart.vpcf_c",
+        "crc": 1001099852,
+        "bytes": 1545
+      },
+      {
+        "path": "particles/econ/items/wisp/wisp_ambient_ti7_trace.vpcf_c",
+        "crc": 945815030,
+        "bytes": 1512
+      },
+      {
+        "path": "particles/econ/items/wisp/wisp_overcharge_ti7_base.vpcf_c",
+        "crc": 521089095,
+        "bytes": 2172
+      },
+      {
+        "path": "particles/econ/items/wisp/wisp_overcharge_ti7_core.vpcf_c",
+        "crc": 1728676237,
+        "bytes": 2111
+      },
+      {
+        "path": "particles/econ/items/wisp/wisp_overcharge_ti7_halo.vpcf_c",
+        "crc": 1450570276,
+        "bytes": 1905
+      },
+      {
+        "path": "particles/econ/items/wisp/wisp_overcharge_ti7_hearts.vpcf_c",
+        "crc": 1797994367,
+        "bytes": 2176
+      }
+    ],
+    "events_valid": true,
+    "native_taunt_present": true,
+    "cast_activities_absent": true
+  },
+  "reentrant_cleanup_negative_control": {
+    "old_candidate": "prior task snapshot, cleanup detached after native calls",
+    "exit_code": 1,
+    "expected_assertion": "reentrant cleanup must destroy/release each native particle only once",
+    "fixed_worktree": "PASS",
+    "fixed_isolated_snapshot": "PASS"
+  }
+}

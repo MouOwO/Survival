@@ -336,7 +336,9 @@
     "npc_survival_builder_proxy"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/ogre_magi/ogre_magi.vmdl"
+        "Model"                  "models/items/io/io_ti7/io_ti7.vmdl"
+        "SoundSet"               "Hero_Wisp"
+        "VoiceFile"              "soundevents/voscripts/game_sounds_vo_wisp.vsndevts"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"

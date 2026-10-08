@@ -471,3 +471,5 @@ __pycache__/
 !/scripts/vscripts/tests/test_wall_repair_detection.lua
 !/scripts/vscripts/tests/test_tower_visual_relocation.lua
 !/scripts/vscripts/tests/test_titles.lua
+
+!/scripts/vscripts/tests/test_builder_io_presentation.lua

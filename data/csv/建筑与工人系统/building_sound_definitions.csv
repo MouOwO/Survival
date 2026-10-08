@@ -1,8 +1,8 @@
 cue_id,building_scope,phase,transition_type,tower_class,sound_events,sound_resources,playback_mode,attach_scope,cooldown_group,cooldown_seconds,max_plays_per_window,window_seconds,enabled,notes,max_concurrent,concurrency_seconds
 #中文名:音效Cue ID,建筑范围,阶段,转换类型,防御塔路线,原生音效事件列表,音效资源文件列表,播放模式,挂载范围,冷却组,冷却秒数,窗口最大播放次数,窗口秒数,是否启用,备注,最大并发数,并发占位秒数
 #types:string,string,enum,string,string,list,list,enum,enum,string,number,number,number,boolean,string,number,number
-building_construction_start,all,construction_start,construction_start,,General.SelectAction,soundevents/game_sounds_ui_imported.vsndevts,oneshot,unit,building_construction_start,0.12,3,0.4,1,资源扣除和施工实体创建成功后播放一次轻量提示；不在工人移动阶段提前播放。,3,0.35
-building_construction_complete,all,construction_complete,construction_complete,,DOTA_Item.Buckler.Activate,soundevents/game_sounds_items.vsndevts,oneshot,unit,building_construction_complete,0.15,2,0.6,1,施工达到100%且建筑状态完成提交后播放一次柔和完成提示。,2,0.55
+building_construction_start,all,construction_start,construction_start,,Hero_Wisp.Spirits.Cast,soundevents/game_sounds_heroes/game_sounds_wisp.vsndevts,oneshot,unit,building_construction_start,0.12,3,0.4,1,艾欧原生精灵施法短音；实际施工成功才播放，保留原限流，不启动循环声。,3,0.35
+building_construction_complete,all,construction_complete,construction_complete,,Hero_Wisp.TeleportIn.Arc,soundevents/game_sounds_heroes/game_sounds_wisp.vsndevts,oneshot,unit,building_construction_complete,0.15,2,0.6,1,仁爱之友原生降临完成音效；建造提交完成后播放一次，保留原限流。,2,0.55
 building_wall_damage,wall,hit,damage,,Building_Generic.PartialDestruction,soundevents/game_sounds.vsndevts,oneshot,unit,building_wall_damage,0.12,3,0.6,1,城墙实际受到正伤害后播放石质建筑受击声；按城墙实体限流。,2,0.4
 building_structure_upgrade_complete,wall|main_city|hero_altar,upgrade_complete,structure_upgrade,,General.LevelUp,soundevents/game_sounds_ui_imported.vsndevts,oneshot,unit,building_structure_upgrade,0.2,2,0.8,1,城墙、主城与祭坛升级完成使用Dota 2 英雄原生升级音效。,2,0.7
 building_standard_upgrade_complete,building_farm|gold_mine,upgrade_complete,standard_upgrade,,General.LevelUp,soundevents/game_sounds_ui_imported.vsndevts,oneshot,unit,building_standard_upgrade,0.15,3,0.8,1,农场与金矿本体等级完成提交后的Dota 2 英雄原生升级音效。,3,0.45

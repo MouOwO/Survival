@@ -23,7 +23,19 @@ package.loaded["systems/multiplayer_player_service"] = {is_disconnected = functi
 DOTA_TEAM_GOODGUYS = 2
 DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 3,1,2
 DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER = 4,16,0
-DOTA_UNIT_ORDER_MOVE_TO_POSITION, ACT_DOTA_ATTACK = 1,1
+DOTA_UNIT_ORDER_MOVE_TO_POSITION, ACT_DOTA_ATTACK, ACT_DOTA_TAUNT = 1,1,2
+PATTACH_ABSORIGIN_FOLLOW = 1
+local particle_id, charge, destroyed_charge, released_charge = 0,{}, {}, {}
+ParticleManager = {
+    CreateParticle = function(_,path,_,owner)
+        particle_id=particle_id+1
+        if path=="particles/econ/items/wisp/wisp_overcharge_ti7.vpcf" then charge[particle_id]=owner end
+        return particle_id
+    end,
+    DestroyParticle = function(_,id) if charge[id] then destroyed_charge[id]=true end end,
+    ReleaseParticleIndex = function(_,id) if charge[id] then released_charge[id]=true end end,
+    SetParticleControl = noop, SetParticleControlEnt = noop,
+}
 local mt = {}; mt.__index = {Length2D = function(v) return math.sqrt(v.x*v.x+v.y*v.y) end}
 Vector = function(x,y,z) return setmetatable({x=x,y=y,z=z or 0},mt) end
 mt.__add=function(a,b)return Vector(a.x+b.x,a.y+b.y,a.z+b.z)end
@@ -40,6 +52,7 @@ EntIndexToHScript = function(id) return by_id[id] end
 local scheduler = require("core/scheduler")
 local grid = require("systems/grid_placement_system")
 local building = require("systems/building_system")
+local presentation = require("systems/builder_presentation_service")
 local config = require("config/buildings_config")
 -- The starting city is free in gameplay; use a charged fixture to exercise
 -- the shared construction spend/refund boundary without changing live data.
@@ -72,7 +85,8 @@ local function entity(id, name, position)
         function ability:GetAbilityIndex() return 0 end
         self.abilities[name]=ability;return ability
     end
-    function unit:StartGesture() end
+    function unit:StartGesture(activity) self.last_gesture=activity;self.gesture_count=(self.gesture_count or 0)+1 end
+    function unit:FadeGesture(activity) self.last_fade=activity;self.fade_count=(self.fade_count or 0)+1 end
     setmetatable(unit,{__index=function(_,key)if key:match("^Set") then return noop end end})
     units[#units+1],by_id[id]=unit,unit
     return unit
@@ -84,6 +98,7 @@ local function reset()
     counts_events={};completed_events=0;destroyed_events=0;failed_move=false
     account={gold=10000,wood=10000}
     caster=entity(1,"npc_survival_builder_proxy",Vector(0,0,128))
+    presentation.init();presentation.apply(caster)
     authorized_builders={[caster]=0}
     bus.handle_request(events.BUILDER_GET_REQUEST,function(payload)
         local owner=authorized_builders[payload.caster]
@@ -160,9 +175,15 @@ assert(not build(Vector(640,640,128)).ok and caster.survival_build_task==accepte
     "a second unique order must not replace the accepted travel task")
 assert(caster.position.x==0 and caster.position.y==0,"request issues movement without teleporting")
 tick(0.1);assert(paid==0 and created==0,"remaining inside footprint cannot spend or construct")
+assert(caster.gesture_count==nil,"travel must not trigger Io construction feedback")
 assert(occupied()==1 and actual_count()==0)
 arrived();tick(0.2)
 assert(paid==1 and created==1 and refunded==0)
+assert(caster.last_gesture==ACT_DOTA_TAUNT and caster.gesture_count==1,
+    "actual construction must play the native Io cube presentation activity once")
+local actual_charge=particle_id
+assert(charge[actual_charge]==caster and not destroyed_charge[actual_charge],
+    "actual construction must create its Io charging particle")
 assert(occupied()==1 and actual_count()==1 and completed_events==0,
     "arrival transfers the reserved allowance into construction without advancing completed-building state")
 assert(#counts_events==2 and counts_events[1].counts.main_city==1 and counts_events[2].counts.main_city==1,
@@ -172,6 +193,8 @@ assert(by_id[11].survival_hull_radius>0 and by_id[11]:HasModifier("modifier_buil
 assert(account.wood==10000-config.main_city.build_cost.wood)
 assert(not build().ok and paid==1,"duplicate request cannot construct a second city")
 tick(20);assert(paid==1 and created==1)
+assert(destroyed_charge[actual_charge] and released_charge[actual_charge] and caster.last_fade==ACT_DOTA_TAUNT,
+    "actual completion must retire Io charging feedback and its gesture")
 assert(occupied()==1 and actual_count()==1 and completed_events==1)
 local city=by_id[11]
 assert(not city:HasModifier("modifier_building_under_construction") and city.survival_hull_radius>0,

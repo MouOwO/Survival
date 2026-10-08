@@ -61,6 +61,7 @@ Supabase PostgreSQL
 ## Core Gameplay Engineering Rules
 
 - Lua 生产代码兼容 Lua 5.1。
+- 建造者外观由 builder_definitions.csv + asset_catalog.csv 配置，默认艾欧仁爱之友至宝9235；独立 builder_presentation_service 管理常驻/施工反馈，主体仍是每玩家私有 npc_survival_builder_proxy，地面寻路/相位/修理身份不能随外观变化（2026-10-08）。
 - 英雄逻辑三维通过项目战斗属性快照获取，不以原生 `GetStrength()` 等为权威。
 - 技能伤害复用现有伤害服务、事件总线和事务。
 - 真实逐单位碰撞的穿透直线技能使用 `ProjectileManager:CreateLinearProjectile()`。

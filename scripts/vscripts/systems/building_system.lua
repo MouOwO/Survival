@@ -17,6 +17,7 @@ local war3_armor_target = require("systems/war3_armor_target")
 local blink_destination = require("systems/blink_destination")
 local building_visual = require("systems/building_visual_service")
 local building_sound = require("systems/building_sound_service")
+local builder_presentation = require("systems/builder_presentation_service")
 local wall_destruction = require("systems/wall_destruction_visual")
 local construction_visual = require(
     "systems/building_construction_visual_service"
@@ -840,15 +841,17 @@ local function start_building(payload)
         check.definition
     )
     if valid_entity(payload.caster) then
-        payload.caster:StartGesture(ACT_DOTA_ATTACK)
+        builder_presentation.construction_started(payload.caster, unit)
         clear_build_task(payload.caster, payload.build_task)
     end
     scheduler.every(0.1, function()
         if state.cleaned then
+            builder_presentation.construction_finished(unit, state.entindex)
             construction_visual.cancel(construction_visual_state)
             return false
         end
         if not valid_entity(unit) or (unit.IsAlive and not unit:IsAlive()) then
+            builder_presentation.construction_finished(unit, state.entindex)
             construction_visual.cancel(construction_visual_state)
             if not state.cleaned then
                 state.cleaned = true
@@ -880,6 +883,7 @@ local function start_building(payload)
         unit:SetHealth(math.max(1, math.floor(maximum_health * progress)))
         if progress < 1 then return true end
 
+        builder_presentation.construction_finished(unit, state.entindex)
         anchor_building(unit, check.grid.world_position)
         unit:RemoveModifierByName("modifier_building_under_construction")
         apply_hull_radius(unit, check.definition)
@@ -1263,6 +1267,7 @@ on_entity_killed = function(payload)
         return
     end
     if state.unit ~= victim then return end
+    builder_presentation.construction_finished(victim, state.entindex)
     if state.cleaned then return end
     state.cleaned = true
     victim.survival_building_destroyed = true

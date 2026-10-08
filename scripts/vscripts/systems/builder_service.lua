@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local definitions = require("config/generated/builder_definitions")
 local player_context = require("systems/player_context_service")
+local presentation = require("systems/builder_presentation_service")
 
 local M = {}
 
@@ -97,6 +98,7 @@ local function create_builder(payload)
         if UTIL_Remove then UTIL_Remove(builder) end
         error("failed to register builder owner: " .. tostring(register_error))
     end
+    presentation.apply(builder, config)
     FindClearSpaceForUnit(builder, position, true)
 
     builder_by_player[player_id] = builder
@@ -176,6 +178,7 @@ local function on_player_disconnected(payload)
     builder_by_player[player_id] = nil
     initialized_player[player_id] = nil
     if valid_entity(builder) then
+        presentation.clear(builder)
         player_context.unregister_unit(builder)
         if UTIL_Remove then UTIL_Remove(builder) end
     end
@@ -186,6 +189,7 @@ local function on_player_disconnected(payload)
 end
 
 function M.init()
+    presentation.init()
     builder_by_player = {}
     initialized_player = {}
     event_bus.handle_request(events.BUILDER_GET_REQUEST, get_builder)
