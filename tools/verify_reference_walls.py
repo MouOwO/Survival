@@ -78,6 +78,9 @@ for table,original in before.items():
         if table=='building_definitions' and key=='wall':allowed={'footprint_x','footprint_y'}
         if table=='building_construction_rules' and key=='wall':allowed={'build_visual_scale'}
         for field,value in row.items():
+            if table=='building_definitions' and key=='main_city' and field in ('footprint_x','footprint_y'):
+                assert int(new[key][field])==4,(table,key,field)
+                continue
             if field not in allowed:assert new[key][field]==value,(table,key,field)
 for level in range(1,31):
     row=current['building_levels'][f'building_wall_lv{level:02}']

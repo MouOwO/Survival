@@ -160,9 +160,8 @@ M.main_city = {
     id = "main_city", display_name = configured_name("main_city", "主城"),
     unit_name = configured_unit_name("main_city", "building_main_city"),
     build_cost = build_cost("building_main_city", 100, 50),
-    -- Navigation stays within the requested four cells. ModelDoc independently
-    -- enlarges the rendered mesh, selection boxes and model physics by 2x.
-    footprint = { x = 2, y = 2 },
+    -- Reserve 4x4 cells to fit the main city's enlarged model.
+    footprint = { x = 4, y = 4 },
     hull_radius = 48 * (tonumber((city_levels[1] or {}).model_scale) or 1),
     max_count = 1, show_health_bar = false, selectable = true,
     abilities = {

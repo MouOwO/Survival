@@ -10,6 +10,7 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'output/unique_buildings'
 SCALE='1.0'  # Enlargement is authored into ModelDoc, not the entity scale.
 FOOTPRINT=2
+FOOTPRINT_OVERRIDES={'building_main_city':4}
 YAW='0'  # South-facing orientation is baked into the FBX geometry.
 WARP='particles/survival_buildings/white_build_'
 FAMILIES={
@@ -32,6 +33,9 @@ def model(name):return 'models/survival_buildings/'+name+'.vmdl'
 
 def identity(value):
     return {'main_city':'building_main_city','gold_mine':'building_gold_mine','hero_altar':'building_hero_altar'}.get(value,value)
+
+def footprint_for(value):
+    return FOOTPRINT_OVERRIDES.get(identity(value),FOOTPRINT)
 
 def write_row(row,newline):
     f=io.StringIO(newline='');csv.writer(f,lineterminator=newline).writerow(row);return f.getvalue()
@@ -62,10 +66,11 @@ def update_table(name):
                      'notes':'稳定白光建筑轮廓；完成后白光平滑褪去；无循环光环与闪光。'}
         if bid in FAMILIES:
             level=int(values.get('level') or 1);mesh=mesh_for(bid,level)
-            if name=='building_definitions':changes={'footprint_x':str(FOOTPRINT),'footprint_y':str(FOOTPRINT)}
+            footprint=footprint_for(bid)
+            if name=='building_definitions':changes={'footprint_x':str(footprint),'footprint_y':str(footprint)}
             elif name=='building_levels':changes={'model_name':model(mesh)}
             elif name=='building_visual_levels':
-                seen.add((bid,level));changes={'model_name':model(mesh),'model_scale':SCALE,'model_yaw':YAW,'notes':FAMILIES[bid][2]+f'；模型资源等比例放大2倍；实体比例{SCALE}；正门朝南；{FOOTPRINT}×{FOOTPRINT}格居中。'}
+                seen.add((bid,level));changes={'model_name':model(mesh),'model_scale':SCALE,'model_yaw':YAW,'notes':FAMILIES[bid][2]+f'；模型资源等比例放大2倍；实体比例{SCALE}；正门朝南；{footprint}×{footprint}格居中。'}
             elif name=='building_construction_rules':
                 changes['build_visual_scale']=SCALE
         if name=='asset_catalog':
@@ -122,6 +127,6 @@ def main():
     # Runtime scale is configuration metadata; no mesh/texture rebake is needed.
     for asset in manifest:asset['runtime_scale']=float(SCALE)
     (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
-    print(f'REFERENCE_BUILDING_CONFIG_PASS variants=24 playable_levels=44 scale={SCALE} footprint={FOOTPRINT}x{FOOTPRINT}')
+    print(f'REFERENCE_BUILDING_CONFIG_PASS variants=24 playable_levels=44 scale={SCALE} default_footprint={FOOTPRINT}x{FOOTPRINT} main_city_footprint={footprint_for("main_city")}x{footprint_for("main_city")}')
 
 if __name__=='__main__':main()

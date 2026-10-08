@@ -5,7 +5,7 @@ import json
 import re
 import subprocess
 from pathlib import Path
-from sync_reference_building_config import FAMILIES,mesh_for,SCALE,FOOTPRINT,identity
+from sync_reference_building_config import FAMILIES,mesh_for,SCALE,footprint_for,identity
 from reference_building_modeldoc import MODEL_SOURCE_SCALE, BASE_WIDTH
 from asset_validation import installed_source
 
@@ -97,7 +97,8 @@ for bid,(_,count,_) in FAMILIES.items():
 definitions=rows(next((ROOT/'data/csv').rglob('building_definitions.csv')).read_text(encoding='utf-8-sig'))
 for bid,row in definitions.items():
     if identity(bid) in FAMILIES:
-        assert int(row['footprint_x'])==FOOTPRINT and int(row['footprint_y'])==FOOTPRINT
+        footprint=footprint_for(bid)
+        assert int(row['footprint_x'])==footprint and int(row['footprint_y'])==footprint
 
 city=['木石议事厅','双翼执政厅','古树议厅','古树王庭','翠晶圣城']
 farm=['丰穗粮仓','林地农舍','双院庄屋','风车庄园','丰饶大庄园']
@@ -114,10 +115,10 @@ for a in manifest:
     cards.append(f'<article data-group="{group}"><a href="previews/{name}.png"><img loading="lazy" src="previews/{name}.png" alt="{label}"></a><h2>{label}</h2><p>{a["triangles"]:,} 三角面 · 2K 独立贴图 · 凸碰撞体</p></article>')
 html='''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Survival · 参考图建筑模型</title><style>
 *{box-sizing:border-box}body{margin:0;background:#e8e7df;color:#253c3b;font:16px/1.6 system-ui,"Microsoft YaHei",sans-serif}header,main{max-width:1500px;margin:auto;padding:30px}header{padding-bottom:0}h1{font-size:30px;margin:0}header p{max-width:960px;color:#586761}nav{display:flex;gap:10px;flex-wrap:wrap}button{font:inherit;border:1px solid #9aa79c;border-radius:6px;padding:7px 18px;background:#f5f4ed;color:#253c3b;cursor:pointer}button[aria-pressed=true]{background:#376766;color:white}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}article{overflow:hidden;border:1px solid #c3cabd;border-radius:10px;background:#f7f6f0}article[hidden]{display:none}img{display:block;width:100%}h2{font-size:17px;margin:15px 18px 7px}article p{color:#68736a;margin:0 18px 18px;font-size:14px}</style>
-<header><h1>Survival · 24 款参考图建筑</h1><p>主城五级、农场五级、金矿十种外观，以及炼金工坊、星象塔、英雄祭坛和挑战竞技场。模型资源等比例放大两倍，游戏最大横向宽度约 236 码；实体比例保持 1.0，逻辑占地仍为 2×2、共四格。金矿每 3 个玩法等级切换一次外观。</p><p>下方为实际导出网格与贴图的 Blender 渲染。无展示底板；保留建筑台阶和矿场工作平台。Source 2 编译、选择盒、碰撞体方向和等级配置已离线检查；游戏内光照、相邻建筑间距和点击手感仍需新开一局确认。</p><nav aria-label="建筑类别">'''
+<header><h1>Survival · 24 款参考图建筑</h1><p>主城五级、农场五级、金矿十种外观，以及炼金工坊、星象塔、英雄祭坛和挑战竞技场。模型资源等比例放大两倍，游戏最大横向宽度约 236 码；实体比例保持 1.0，主城逻辑占地为 4×4、共十六格，其余参考图建筑为 2×2、共四格。金矿每 3 个玩法等级切换一次外观。</p><p>下方为实际导出网格与贴图的 Blender 渲染。无展示底板；保留建筑台阶和矿场工作平台。Source 2 编译、选择盒、碰撞体方向和等级配置已离线检查；游戏内光照、相邻建筑间距和点击手感仍需新开一局确认。</p><nav aria-label="建筑类别">'''
 for key,label in [('all','全部 24'),('city','主城 5'),('farm','农场 5'),('mine','金矿 10'),('other','研究所与其他 4')]:html+=f'<button data-filter="{key}" aria-pressed="{str(key=="all").lower()}">{label}</button>'
 html+='</nav></header><main>'+''.join(cards)+'''</main><script>document.querySelectorAll('button[data-filter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('button[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));document.querySelectorAll('article').forEach(a=>a.hidden=b.dataset.filter!=='all'&&a.dataset.group!==b.dataset.filter)}));</script></html>'''
 (OUT/'index.html').write_text(html,encoding='utf-8')
-report=dict(status='PASS',revision=4,models=24,playable_levels=44,triangles=sum(a['triangles'] for a in manifest),scale=float(SCALE),model_source_scale=MODEL_SOURCE_SCALE,footprint=[FOOTPRINT,FOOTPRINT],texture_resolution=2048,economy_fields='unchanged',city_hull_radius=48*float(SCALE),city_model_physics_radius=48*MODEL_SOURCE_SCALE,workshop_verified=False,assets=reports)
+report=dict(status='PASS',revision=4,models=24,playable_levels=44,triangles=sum(a['triangles'] for a in manifest),scale=float(SCALE),model_source_scale=MODEL_SOURCE_SCALE,footprints={bid:[footprint_for(bid),footprint_for(bid)] for bid in FAMILIES},texture_resolution=2048,economy_fields='unchanged',city_hull_radius=48*float(SCALE),city_model_physics_radius=48*MODEL_SOURCE_SCALE,workshop_verified=False,assets=reports)
 (OUT/'verification.json').write_text(json.dumps(report,indent=2))
 print('REFERENCE_BUILDING_ASSETS_PASS models=24 levels=44 physics=24 textures=72 economy=unchanged')
