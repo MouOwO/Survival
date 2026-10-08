@@ -265,3 +265,82 @@ for(const distance of [240,400,512]) {
     });
 }
 console.log('GRID_NEAR_PLANE_PASS distances=240,400,512; visible red polygon; complete 4x4 footprint; bounded surfaces');
+
+// Bounds are a coarse candidate filter, not part of the cached projected
+// geometry. Expanding a buffered coverage window with a fixed camera must not
+// reuse the small rectangle cut out when this terrain block first appeared.
+let windowBounds=[-40,-40,40,40],windowKey=0;
+const windowTerrain={},windowState=api.create({terrainHost:windowTerrain,dynamicHost:{},footHost:{},
+    visibleBounds:()=>windowBounds,coverageKey:()=>String(windowKey),range:()=>({x:0,y:0,radius:1000}),
+    project:p=>[p[0]+300,p[1]+300],cameraKey:()=> 'window-camera',
+    setStyle:(p,k,v)=>{p.style[k]=v;},cellSize:()=>64,zOffset:()=>6,viewport:()=>[600,600]});
+windowState.configure('3|64|-4|-4|8|8|384|'+'5'.repeat(32));windowState.warm();
+windowBounds=[-256,-256,256,256];windowKey++;windowState.warm();
+const windowFill=all.find(p=>p.host===windowTerrain&&p.visible);
+assert(paintedAt(windowFill,80,80)&&paintedAt(windowFill,520,520),
+    'expanding coverage never leaves the cached interior red rectangle cropped to its old bounds');
+
+// Reusing panels across atlas shrink/grow, changing blocked spans, circle
+// motion, and camera zoom must not leave old wedges or holes in the new fill.
+function changingAtlas(x,y,w,h,phase) {
+    const states=[];
+    for(let gx=0;gx<w;gx++)for(let gy=0;gy<h;gy++)states.push((gx*7+gy*3+phase)%11<6?1:2);
+    let packed='';for(let i=0;i<states.length;i+=2)packed+=(states[i]+4*(states[i+1]||0)).toString(16);
+    return {x,y,w,h,states,source:'3|64|'+[x,y,w,h,384,packed].join('|')};
+}
+function expectedState(atlas,x,y) {
+    const gx=Math.floor(x/64)-atlas.x,gy=Math.floor(y/64)-atlas.y;
+    return gx>=0&&gy>=0&&gx<atlas.w&&gy<atlas.h?atlas.states[gx*atlas.h+gy]:0;
+}
+const changingTerrain={},changingDynamic={};
+const changing=api.create({terrainHost:changingTerrain,dynamicHost:changingDynamic,footHost:{},
+    range:()=>nearGrid.range(),visibleBounds:()=>nearGrid.drawBounds(),coverageKey:()=>nearGrid.coverageKey(),
+    project:p=>nearGrid.project(p),projectPolygon:points=>nearGrid.projectPolygon(points),
+    cameraKey:()=>nearGrid.cameraKey(),setStyle:(p,k,v)=>{p.style[k]=v;},
+    cellSize:()=>64,zOffset:()=>6,viewport:()=>[1600,900]});
+let comparedPixels=0;
+for(let frame=0;frame<16;frame++) {
+    nearDistance=[240,600,1600,4000][frame%4];
+    const cursor=[[-768,-64],[512,512],[768,-256],[-128,0]][Math.floor(frame/4)];
+    nearGrid.update([cursor[0],cursor[1],384]);
+    const terrainAtlas=changingAtlas(-8,-8,frame%2?8:16,frame%3?16:8,frame);
+    const dynamicAtlas=changingAtlas(-5+frame%4,-4,frame%2?12:4,frame%3?8:12,frame+3);
+    changing.configure(terrainAtlas.source);changing.ingestDynamic(dynamicAtlas.source);
+    for(let i=0;i<12;i++)changing.warm();
+    const fills=all.filter(p=>(p.host===changingTerrain||p.host===changingDynamic)&&p.visible);
+    for(let sx=13;sx<1600;sx+=43)for(let sy=17;sy<900;sy+=41) {
+        const world=nearGrid.worldAtScreen([sx,sy]);
+        if(!world)continue;
+        const fx=((world[0]%64)+64)%64,fy=((world[1]%64)+64)%64;
+        if(Math.min(fx,64-fx,fy,64-fy)<0.001)continue;
+        const expected=inRangePolygon(world[0],world[1],nearGrid.range())&&
+            (expectedState(terrainAtlas,world[0],world[1])===1||expectedState(dynamicAtlas,world[0],world[1])===1);
+        assert.equal(fills.some(p=>paintedAt(p,sx,sy)),expected,
+            'atlas/range/camera replacement preserves exact blocked coverage on frame '+frame);
+        comparedPixels++;
+    }
+}
+console.log('GRID_REUSE_COVERAGE_PASS moving bounds; shrinking atlases; '+comparedPixels+' screen samples');
+
+// Native Panorama keeps the previous radial primitive when assigned "none".
+// Reproduce its getter/setter behavior: a circle needs sixteen clip layers,
+// while the later interior rectangle only needs two. The other fourteen must
+// become full radial clips, otherwise their old edges punch holes in the quad.
+let nativeRange={x:0,y:0,radius:220};
+const nativeHost={},nativeState=api.create({terrainHost:nativeHost,dynamicHost:{},footHost:{},
+    range:()=>nativeRange,project:p=>[p[0]+300,p[1]+300],cameraKey:()=> 'native-clip-reuse',
+    setStyle:(p,k,v)=>{if(k!=='clip'||v!=='none')p.style[k]=v;},
+    cellSize:()=>64,zOffset:()=>6,viewport:()=>[600,600]});
+nativeState.configure('3|64|-4|-4|8|8|384|'+'5'.repeat(32));nativeState.warm();
+const nativeFill=all.find(p=>p.host===nativeHost&&p.visible),nativeCount=all.length;
+assert.equal(nativeFill.__clips.length,16);
+assert(!paintedAt(nativeFill,60,60),'the first range correctly excludes the rectangle corners');
+nativeRange={x:0,y:0,radius:1000};nativeState.warm();
+assert.equal(all.length,nativeCount,'shrinking the clipping chain reuses its allocated nodes');
+for(let x=51;x<555;x+=19)for(let y=53;y<555;y+=23)
+    assert(paintedAt(nativeFill,x,y),'unused native radial clips must not cut holes in the newly enlarged red block');
+nativeRange={x:0,y:0,radius:220};nativeState.warm();
+assert.equal(all.length,nativeCount);
+assert(!paintedAt(nativeFill,60,60)&&paintedAt(nativeFill,300,300),
+    'the same layers resume exact circular clipping after their full-coverage reset');
+console.log('GRID_NATIVE_CLIP_REUSE_PASS retained-radial engine semantics; 16 -> 2 -> 16 clips; no holes or allocations');

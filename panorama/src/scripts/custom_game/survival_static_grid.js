@@ -147,15 +147,61 @@
         return {x:cx,y:cy,rx:Math.sqrt(scale/small),ry:Math.sqrt(scale/large),angle:angle};
     }
 
+    // One client-local world sprite retains every reference edge and corner.
+    // Camera movement is handled by the engine, without rewriting UI geometry.
+    function createNativeGrid(particles,attachment) {
+        var particle=null,phase=-1,positionKey="",retryAt=0;
+        var available=!!(particles && particles.CreateParticle && particles.SetParticleControl
+            && particles.DestroyParticleEffect && particles.ReleaseParticleIndex);
+        var stats={creates:0,destroys:0,control_updates:0,active:false,phase:-1};
+        function hide() {
+            var old=particle;particle=null;phase=-1;positionKey="";stats.active=false;stats.phase=-1;
+            if(old===null)return;
+            // A failed native API must not leave the UI fallback stuck behind
+            // an exception, or prevent releasing the index during hot reload.
+            try {particles.DestroyParticleEffect(old,true);} catch(error) {}
+            try {particles.ReleaseParticleIndex(old);} catch(error) {}
+            stats.destroys++;
+        }
+        function update(world,size,z,radius) {
+            // The four texture phases cover even and odd footprint centers.
+            // Other grid configurations retain the projected UI fallback.
+            if(!available || size!==64 || radius!==1280 || !world
+                || !isFinite(world[0]) || !isFinite(world[1]) || !isFinite(z)) {hide();return false;}
+            var x=world[0]/32,y=world[1]/32;
+            if(Math.abs(x-Math.round(x))>0.001 || Math.abs(y-Math.round(y))>0.001) {hide();return false;}
+            var next=((Math.round(x)%2+2)%2)+2*((Math.round(y)%2+2)%2);
+            if(particle!==null && next!==phase)hide();
+            if(particle===null) {
+                if(Date.now()<retryAt)return false;
+                try {
+                    var id=particles.CreateParticle("particles/survival_grid/reference_grid_"+next+".vpcf",attachment,-1);
+                    if(typeof id!=="number" || id<0)throw new Error("Grid particle unavailable");
+                    particle=id;phase=next;stats.phase=next;stats.creates++;
+                    particles.SetParticleControl(particle,3,[1,0,0]);stats.control_updates++;
+                } catch(error) {hide();retryAt=Date.now()+1000;return false;}
+            }
+            var key=world[0]+":"+world[1]+":"+z;
+            if(positionKey!==key) {
+                try {particles.SetParticleControl(particle,0,[world[0],world[1],z]);}
+                catch(error) {hide();retryAt=Date.now()+1000;return false;}
+                positionKey=key;stats.control_updates++;
+            }
+            stats.active=true;return true;
+        }
+        return {update:update,hide:hide,available:function(){return available;},stats:stats};
+    }
+
     function create(options) {
         var mesh=null,view=null,viewKey="",width=0,height=0,revision=0;
         var visual={},configured=false,range=null,rangeKey="",geometryKey="";
         var lines=[],marks=[],ring=[],lineByKey={},markByKey={},freeLines=[],freeMarks=[];
         var coverage=null,coverageKey="",markStride=1,lodKey="";
-        var mask=options.mask,host=options.host,outline=options.outline,planeRange=false;
+        var mask=options.mask,host=options.host,outline=options.outline,planeRange=false,nativeGrid=options.nativeGrid;
         var stats={geometry_builds:0,view_builds:0,layout_writes:0,mask_updates:0,line_panels:0,
             mark_panels:0,reference_rebases:0,corner_candidates:0,coverage_builds:0,
-            visible_lines:0,visible_marks:0,mark_stride:1,mask_pixels:0};
+            visible_lines:0,visible_marks:0,mark_stride:1,mask_pixels:0,native_active:false};
+        if(nativeGrid)stats.native=nativeGrid.stats;
         var reportedState="";
         function report(state) {
             stats.state=state;
@@ -246,34 +292,6 @@
                 set(p,"height",height.toFixed(2)+"px");set(p,"transform","none");
             });
         }
-        function gradient(points) {
-            var a=points[0],b=points[1],fractions=[0,0.125,0.25,0.375,0.5,0.625,0.75,0.875,1];
-            // Include the nearest world point and both opaque-core boundaries.
-            // They need not lie at the midpoint of a perspective screen line.
-            var wa=unproject(view,a[0],a[1]),wb=unproject(view,b[0],b[1]);
-            if(wa && wb) {
-                var dx=wb[0]-wa[0],dy=wb[1]-wa[1],length2=dx*dx+dy*dy;
-                var t=((range.x-wa[0])*dx+(range.y-wa[1])*dy)/length2;
-                var near=[wa[0]+t*dx,wa[1]+t*dy];
-                var distance2=(near[0]-range.x)*(near[0]-range.x)+(near[1]-range.y)*(near[1]-range.y);
-                var inner=range.radius*0.75,delta=Math.sqrt(Math.max(0,inner*inner-distance2)/length2);
-                [t-delta,t,t+delta].forEach(function(u){
-                    if(u<=0 || u>=1) return;
-                    var p=point(view,wa[0]+u*dx,wa[1]+u*dy);
-                    var f=Math.abs(b[0]-a[0])>Math.abs(b[1]-a[1])?(p[0]-a[0])/(b[0]-a[0]):(p[1]-a[1])/(b[1]-a[1]);
-                    if(f>0 && f<1) fractions.push(f);
-                });
-            }
-            fractions.sort(function(a,b){return a-b;});
-            var stops=[],last=-1;
-            for(var i=0;i<fractions.length;i++) {
-                var f=Number(fractions[i].toFixed(5));if(f===last)continue;last=f;
-                var world=unproject(view,a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f);
-                var alpha=world?rangeAlpha(range,world[0],world[1]):0;
-                stops.push("color-stop("+f.toFixed(5)+",rgba(213,230,211,"+alpha.toFixed(4)+"))");
-            }
-            return "gradient(linear,0% 0%,100% 0%,"+stops.join(",")+")";
-        }
         function layoutSet(items,byKey,free,isLine) {
             var wanted={};
             for(var i=0;i<items.length;i++) wanted[items[i].key]=true;
@@ -290,7 +308,7 @@
                     if(panel.__shapeKey!==shape) {
                         options.positionSegment(panel,item.points[0],item.points[1],2);panel.__shapeKey=shape;changed=true;
                     }
-                    changed=set(panel,"backgroundColor",gradient(item.points)) || changed;
+                    changed=set(panel,"opacity","0.6000") || changed;
                 } else {
                     changed=set(panel,"position",(item.x-4).toFixed(2)+"px "+(item.y-4).toFixed(2)+"px 0px");
                     changed=set(panel,"opacity",(0.75*item.alpha).toFixed(4)) || changed;
@@ -299,12 +317,18 @@
                 show(panel,true);
             }
         }
-        function layoutRing() {
-            if(!outline) return;
-            if(!planeRange) {show(outline,false);return;}
-            while(ring.length<64) {
+        function warmRing(budget) {
+            if(!outline)return;
+            while(ring.length<64 && budget-->0) {
                 var p=$.CreatePanel("Panel",outline,"");p.AddClass("StaticGridRangeLine");p.hittest=false;p.visible=false;ring.push(p);
             }
+        }
+        function layoutRing() {
+            if(!outline) return;
+            // The native atlas carries the circle as well as the white grid.
+            // Do not add a second ring or camera-driven UI work on that path.
+            if(!planeRange || stats.native_active) {show(outline,false);return;}
+            warmRing(64);
             for(var i=0;i<64;i++) {
                 var a=i*Math.PI/32,b=(i+1)*Math.PI/32;
                 var clipped=segment(view,[range.x+range.radius*Math.cos(a),range.y+range.radius*Math.sin(a),
@@ -359,29 +383,53 @@
         function configure(data,size,settings) {
             var next=geometry(data,size);mask.RemoveClass("StaticGridActive");
             if(!next) {
+                hide();
                 configured=false;view=null;range=null;geometryKey="";show(mask,false);if(outline)show(outline,false);
                 lines.concat(marks).forEach(function(p){show(p,false);});return false;
             }
             var key=JSON.stringify([data,size,settings.grid_z_offset]);
             if(mesh && mesh.key===key && configured) {visual=settings;return true;}
+            hide();
             mesh=next;mesh.key=key;mesh.height+=Number(settings.grid_z_offset)||0;
             visual=settings;view=null;viewKey="";geometryKey="";range=null;rangeKey="";coverage=null;coverageKey="";
             configured=true;stats.geometry_builds++;show(mask,false);return true;
         }
-        function prewarm() {if(configured)allocate(128,160,32);}
+        function prewarm() {
+            if(configured && !(nativeGrid && nativeGrid.available() && mesh.size===64
+                && (Number(visual.radius)||1280)===1280)) {allocate(128,160,32);warmRing(16);}
+        }
         function warm() {prewarm();}
         function update(world,viewIsCurrent) {
-            if(!world) {show(mask,false);if(outline)show(outline,false);return;}
+            if(!world) {hide();return;}
             if(!configured) {show(mask,true);return;}
             if(!viewIsCurrent)refreshView();
-            if(!view)return;
-            selectCoverage(world);layout();
+            if(!view) {hide();return;}
+            selectCoverage(world);
+            var wasNative=stats.native_active;
+            // The atlas represents a complete circle. At the outer map edge,
+            // retain the UI path that also clips to the finite grid bounds.
+            var inBounds=range.x-range.radius>=mesh.xs[0] && range.x+range.radius<=mesh.xs[mesh.xs.length-1]
+                && range.y-range.radius>=mesh.ys[0] && range.y+range.radius<=mesh.ys[mesh.ys.length-1];
+            stats.native_active=!!(nativeGrid && inBounds && nativeGrid.update(world,mesh.size,mesh.height,range.radius));
+            if(nativeGrid && !inBounds)nativeGrid.hide();
+            if(stats.native_active) {
+                if(!wasNative)lines.concat(marks).forEach(function(p){show(p,false);});
+                var ringKey=revision+":"+rangeKey+":"+planeRange;
+                if(geometryKey!==ringKey) {geometryKey=ringKey;layoutRing();}
+                stats.visible_lines=0;stats.visible_marks=0;stats.corner_candidates=0;
+                show(mask,true);report("native_visible");return;
+            }
+            if(wasNative)geometryKey="";
+            layout();
             show(mask,lines.length>=stats.visible_lines);
             if(outline)show(outline,planeRange && mask.visible);
             report(mask.visible?"visible":"warming");
         }
-        return {configure:configure,warm:warm,prewarm:prewarm,update:update,
-            hide:function(){show(mask,false);if(outline)show(outline,false);},
+        function hide() {
+            if(nativeGrid)nativeGrid.hide();
+            stats.native_active=false;geometryKey="";show(mask,false);if(outline)show(outline,false);
+        }
+        return {configure:configure,warm:warm,prewarm:prewarm,update:update,hide:hide,
             setPlaneRange:function(enabled){planeRange=enabled;return !!outline;},
             refreshView:refreshView,visibleBounds:visibleBounds,drawBounds:drawBounds,
             coverageKey:function(){return coverageKey;},range:function(){return range;},
@@ -396,5 +444,5 @@
     }
 
     GameUI.CustomUIConfig().SurvivalStaticGrid={geometry:geometry,projection:projection,
-        point:point,unproject:unproject,segment:segment,ellipse:ellipse,create:create};
+        point:point,unproject:unproject,segment:segment,ellipse:ellipse,create:create,createNativeGrid:createNativeGrid};
 })();

@@ -1,5 +1,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const all=[],ids=new Map(),sent=[],listeners={},scheduled=[];
+const all=[],ids=new Map(),sent=[],listeners={},scheduled=[],particleCalls=[];
+const useNative=process.env.GRID_NATIVE_GRID==='1';
+let particleSerial=0,lastDelay=-1;
 let writes=0,bridges=0,now=1,world=[0,0,384],cameraX=0,mouse,terrainMiss=false;
 function panel(id,parent) {
     const p={id,parent,visible:true,actuallayoutwidth:1600,actuallayoutheight:900,actualuiscale_x:1,actualuiscale_y:1,
@@ -15,19 +17,23 @@ const shared={SurvivalPointTargetState:{active:false,name:'build',unit:10,abilit
     SurvivalInputDispatcher:{RegisterMouseHandler(_,f){mouse=f;},RegisterKeyHandler(){}}};
 const $=s=>ids.get(s.replace(/^#/,''));
 $.CreatePanel=(_,p,id)=>panel(id,p);$.GetContextPanel=()=>ids.get('GridPlacementRoot');
-$.Msg=()=>{};$.Schedule=(_,fn)=>scheduled.push(fn);
+$.Msg=()=>{};$.Schedule=(delay,fn)=>{if(fn.name==='updateLoop')lastDelay=delay;scheduled.push(fn);};
 const context=vm.createContext({$,GameUI:{CustomUIConfig:()=>shared,
         GetCursorPosition:()=>[world[0]+800-cameraX,world[1]*0.5+447],
         GetScreenWorldPosition:p=>p[0]===800&&p[1]===450?[cameraX,0,384]:
             (terrainMiss?null:(world[2]===384?world:[world[0]+400,world[1]-500,world[2]]))},
     Game:{GetGameTime:()=>now,WorldToScreenX:x=>{bridges++;return x+800-cameraX;},
         WorldToScreenY:(_,y,z)=>{bridges++;return y*0.5+450-(z-384)*0.5;}},
-    Particles:{CreateParticle:()=>0,SetParticleControl(){},DestroyParticleEffect(){},ReleaseParticleIndex(){}},
+    Particles:{CreateParticle(path){const id=particleSerial++;particleCalls.push(['create',path,id]);return id;},
+        SetParticleControl(){},DestroyParticleEffect(id){particleCalls.push(['destroy',id]);},ReleaseParticleIndex(){}},
     ParticleAttachment_t:{PATTACH_WORLDORIGIN:6},
     GameEvents:{Subscribe:(name,fn)=>listeners[name]=fn,SendCustomGameEventToServer:(name,data)=>sent.push({name,data})},
     Abilities:{GetLocalPlayerActiveAbility:()=>-1},Entities:{GetUnitName:()=> 'builder'},CustomNetTables:{GetTableValue:()=>null}});
 for(const file of ['survival_static_grid.js','survival_grid_state.js','survival_grid_placement.js']) {
     vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file,'utf8'),context);
+    // The fallback fixture also models a retained pre-native helper during
+    // hot reload. A separate native run exercises the production controller.
+    if(file==='survival_static_grid.js'&&!useNative)delete shared.SurvivalStaticGrid.createNativeGrid;
     if(process.env.GRID_LEGACY_HELPERS==='1' && file!=='survival_grid_placement.js') {
         const api=file==='survival_static_grid.js'?shared.SurvivalStaticGrid:shared.SurvivalGridState;
         const create=api.create;
@@ -58,6 +64,8 @@ assert(coldCount<1500,'shared lines/corners and state cells fit a smaller preloa
 shared.SurvivalPointTargetState.active=true;update();
 assert(ids.get('GridPlacementStaticMask').visible);
 assert.equal(all.length,coldCount,'Q allocates no footprint or white grid nodes');
+assert(!particleCalls.some(c=>c[0]==='create'&&c[1]==='particles/ui_mouseactions/range_display.vpcf'),
+    'flat construction grid never adds a terrain-following range circle');
 const foot=()=>all.filter(p=>p.classes.has('FootprintTile')&&p.visible);
 assert.equal(foot().length,16,'wall remains 4 by 4 complete cells');
 assert.equal(foot().filter(p=>p.classes.has('Blocked')).length,1);
@@ -81,6 +89,11 @@ assert.equal(ids.get('GridPlacementCursorIcon').style.position,iconPosition,'cur
 assert(ids.get('GridPlacementStaticMask').visible);
 terrainMiss=false;
 const stats=shared.SurvivalStaticGridPerformance;
+if(useNative){
+    assert(stats.native_active,'controller uses the native renderer');
+    assert.equal(stats.line_panels+stats.mark_panels,0,'native path has no white UI pool');
+    assert.equal(lastDelay,0,'red/green projection follows the next rendered frame');
+}
 const beforeLayouts=stats.layout_writes,beforeViews=stats.view_builds,beforeNodes=all.length;
 const beforeTerrain=state.terrain_layouts;
 const requests=()=>sent.filter(e=>e.name==='ui_grid_placement_validate');
@@ -108,7 +121,8 @@ listeners.ui_grid_placement_validation({session_id:req.session_id,request_id:req
     world_x:0,world_y:0,world_z:384,success:0,cells:wall,area:'',area_complete:1});update();
 assert.equal(foot().filter(p=>p.classes.has('Blocked')).length,1,'server denial preserves per-cell colors');
 const layoutsBeforePan=stats.layout_writes;cameraX+=64;now+=0.11;update();
-assert(stats.layout_writes>layoutsBeforePan);
+if(useNative)assert.equal(stats.layout_writes,layoutsBeforePan,'camera pan does not lay out native white geometry');
+else assert(stats.layout_writes>layoutsBeforePan);
 assert.equal(stats.geometry_builds,1);
 const iconTick=scheduled.find(fn=>fn.name==='updateCursorIconLoop');
 const iconBridges=bridges,iconLayouts=stats.layout_writes,iconRequests=requests().length;
@@ -120,7 +134,8 @@ listeners.ui_grid_placement_profiles({cell_size:64,static_grid:{height:384,
     build_bounds:{min_x:-128,max_x:128,min_y:-128,max_y:128}},
     profiles:[{ability_name:'build',grid_footprint_x:4,grid_footprint_y:4,building_id:'wall'}]});
 world=[512,0,384];now+=0.1;update();
-assert(ids.get('GridPlacementPlaneRange').visible,'distant terrain uses the grid-plane outline');
+assert.equal(ids.get('GridPlacementPlaneRange').visible,!useNative,
+    'native circle is in the atlas; fallback uses the same grid-plane outline on distant terrain');
 assert.equal(ids.get('GridPlacementPlaneRange').style.position,ids.get('GridPlacementStaticMask').style.position);
 assert.equal(ids.get('GridPlacementPlaneRange').style.width,ids.get('GridPlacementStaticMask').style.width);
 assert(shared.SurvivalGridFramePerformance.frames>0,'retain stage timings for engine-side drag diagnosis');
@@ -148,10 +163,19 @@ assert.equal(poses().length,3);
 assert.equal(Number(poses().at(-1).data.x),2048,'latest snapped position sent after throttling');
 assert.equal(requests().length,requestsBeforeSweep,'fast model movement does not start terrain scans');
 mouse('pressed',1);shared.SurvivalPointTargetState.active=false;update();
+if(useNative){
+    assert.equal(stats.native.active,false,'cancel destroys the local white particle');
+    shared.SurvivalPointTargetState.active=true;world=[0,0,384];now+=0.1;update();
+    assert(stats.native.active,'reenter creates a fresh local white particle');
+    const destroyed=particleCalls.filter(c=>c[0]==='destroy').length;
+    vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/survival_grid_placement.js','utf8'),context);
+    assert.equal(stats.native.active,false,'controller reload cleans the old native renderer');
+    assert(particleCalls.filter(c=>c[0]==='destroy').length>destroyed);
+}
 const scheduledBefore=scheduled.length,writesBefore=writes;
 shared.SurvivalGridControllerEpoch++;
 update();warmWhite();warmColors();iconTick();
 assert.equal(scheduled.length,scheduledBefore,'old controller schedules stop after hot reload');
 assert.equal(writes,writesBefore,'old controller cannot compete over icon and grid positions');
-console.log('STATIC_GRID_INTEGRATION_PASS preloaded_nodes='+coldCount+
+console.log('STATIC_GRID_INTEGRATION_PASS native='+useNative+'; preloaded_nodes='+coldCount+
     '; 20 fast frames, bounded white layout; zero terrain relayouts/allocations/requests');

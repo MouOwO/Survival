@@ -34,8 +34,16 @@ env.PrecacheUnitByNameSync = function(...)
     assert(select('#',...)==2)
     local name,actual=...;assert(type(name)=="string" and actual==context)
 end
+-- Exercise the actual preview resource owner through the startup entry point.
+env.grid_system = require("systems/grid_placement_system")
+assert(env.grid_system.precache(context) == 0, "a non-engine load may omit the precache API")
+setfenv(env.grid_system.precache, env)
 local chunk=assert(loadstring(body,"@addon_precache_entry"));setfenv(chunk,env);chunk()
 env.M.precache(context)
+for phase = 0, 3 do
+    assert(calls["particles/survival_grid/reference_grid_" .. phase .. ".vpcf"] == 1,
+        "all four preview footprint phases must load once before the first placement")
+end
 assert(calls["particles/survival/skills/blizzard_ground.vpcf"]==1)
 assert(calls["particles/survival/skills/wyvern_blizzard_snow.vpcf"]==1)
 assert(calls["particles/survival/skills/meteor_phoenix_fall.vpcf"]==1)

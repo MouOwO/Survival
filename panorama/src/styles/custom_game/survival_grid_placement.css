@@ -78,8 +78,10 @@
 .StaticGridLine {
     z-index: 2;
     height: 2px;
-    /* Per-line gradients feather in world space, keeping the placement center
-       opaque even when the range circle crosses the camera horizon. */
+    /* Preserve the approved reference edge in the projected UI fallback.
+       The native grid uses the same edge/corner pixels in one world sprite. */
+    background-image: url("file://{images}/custom_game/survival_grid/reference_edge.png");
+    background-size: 100% 100%;
     opacity: 0.60;
 }
 

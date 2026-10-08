@@ -1,0 +1,384 @@
+{
+  "date": "2026-10-08",
+  "revision": "restore-approved-cell-and-native-world-grid",
+  "fixes": [
+    "Restore approved edge/corner pixels and every-cell intersections instead of gradients and sparse marks.",
+    "Replace retained native radial clips with full 360deg wedges; coarse bounds only cull, never cache truncated red geometry.",
+    "Use one client-local world-Z sprite for the white grid; camera-only motion does not change white UI styles or particle controls.",
+    "Schedule red/green projection on the next rendered frame while preserving validation/pose throttles; release particles on cancel, reload, and configuration changes."
+  ],
+  "approved_sources": {
+    "edge": "5a59481643d4c7d5ba83497fa0572d7844c32bc34484ec858b5d9a2be5f7cc1b",
+    "corner": "537fffae0c8fe5ccdf843cae80bc90d2760ee5bdd23d006c30a4f77b390538f6"
+  },
+  "asset_manifest": "art/effects/construction_grid/manifest.json",
+  "compiled_native_resources": [
+    {
+      "resource": "materials/survival_grid/reference_grid_0.vtex",
+      "bytes": 5594484,
+      "source_sha256": "9819904fe4adc3a82697a661a67f8b6e6cd8a8e5ee24172dc676b09ec5c6ab7f",
+      "compiled_sha256": "4a8affbd7b4812f040336e3eba7c4b04812cf9e4bfdac6c9ce1e5bac0e9ccaa1"
+    },
+    {
+      "resource": "particles/survival_grid/reference_grid_0.vpcf",
+      "bytes": 2079,
+      "source_sha256": "ea71f183e530c341c4df4a34983019e53545b42d97e61d33f45153c0562448fc",
+      "compiled_sha256": "3877e11e403f4eb55d1710570efa4e068f67e916e0ed0739749ed9d00ef821b2"
+    },
+    {
+      "resource": "materials/survival_grid/reference_grid_1.vtex",
+      "bytes": 5594484,
+      "source_sha256": "36687e1e1541ccfd52c42dd884274f8b0a5d6bba121bc3b433481780fb3a0e64",
+      "compiled_sha256": "b1f3bb7e554f6d7b3d4481f7e5a292b73a581b769abd052eee4722c270326db7"
+    },
+    {
+      "resource": "particles/survival_grid/reference_grid_1.vpcf",
+      "bytes": 2079,
+      "source_sha256": "943f02c7ccfd6162244973abff492f51f1dc6f41176cd1bcd9003fe577ee13ab",
+      "compiled_sha256": "6a511692acb4875c0091e9a1200b03c12c53b0eb3c2a7cb5d453fa21582438f1"
+    },
+    {
+      "resource": "materials/survival_grid/reference_grid_2.vtex",
+      "bytes": 5594484,
+      "source_sha256": "db8fc14afdcd98456e0e9eee10b372bd045245a84963bb5d212d5e3b40ae1066",
+      "compiled_sha256": "f66767cc793ba344e8680db43e086371ae4ab5cc1f854f12892050908f2a448f"
+    },
+    {
+      "resource": "particles/survival_grid/reference_grid_2.vpcf",
+      "bytes": 2079,
+      "source_sha256": "4a92c5941ca394b025e8854348a1644da7a9ced2ddb1ae90f3ce2975776bc801",
+      "compiled_sha256": "9e3cebf9433f2e47157f14055da37bcdd90936f592f83d1a42daadbe968b12d1"
+    },
+    {
+      "resource": "materials/survival_grid/reference_grid_3.vtex",
+      "bytes": 5594484,
+      "source_sha256": "602779c93d89edb6a9641cd89ec1e9e9591536300f821526cbc0f63dde5d0a9a",
+      "compiled_sha256": "8c536109007567935867393f747e44a0fb33e61b11f79b1c16135925f88d955a"
+    },
+    {
+      "resource": "particles/survival_grid/reference_grid_3.vpcf",
+      "bytes": 2079,
+      "source_sha256": "59197b1240f2507bd243daaba4cdc317ed03483aec6e8cb7ad6d594a241b7a8a",
+      "compiled_sha256": "5dfcd993386ab2b5671182ad3a1521adb6972b726644629d102754c0f6fa40c8"
+    }
+  ],
+  "native_clip_evidence": {
+    "panels": 35,
+    "inconsistent_before": 26,
+    "inconsistent_after": 0,
+    "before": "output/grid_revision_20261008/red_before_geometry.json",
+    "after": "output/grid_revision_20261008/red_after_geometry.json",
+    "semantics": "clip none and rect do not replace a prior radial; radial(50% 50%,0deg,360deg) does."
+  },
+  "world_texture_phase_evidence": {
+    "axis_mapping": "texture U/V = world Y/X",
+    "comparison": [
+      {
+        "comparison": "phase_32_0_xshift",
+        "region": [
+          960,
+          260,
+          1160,
+          540
+        ],
+        "rgb_mae": 18.25709523809524,
+        "samples": 42000
+      },
+      {
+        "comparison": "phase_0_32_xshift",
+        "region": [
+          960,
+          260,
+          1160,
+          540
+        ],
+        "rgb_mae": 0.5431904761904762,
+        "samples": 42000
+      }
+    ],
+    "proof": "A CP0 move of 32 in world X stays on the original world grid only with a texture phase of [0,32]."
+  },
+  "performance": {
+    "map": "template_map",
+    "viewport": [
+      1600,
+      900
+    ],
+    "preview": "ability_build_arrow_tower",
+    "trajectory": "5-second scripted sine zoom between 600 and 1800, not physical mouse-wheel input",
+    "strictly_camera_matched": false,
+    "limitation": "Camera target restoration has a small world-position offset. This proves elimination of white UI layout, not a controlled claim of overall FPS improvement.",
+    "camera_before": {
+      "start": [
+        -3046.5185546875,
+        5287.6708984375,
+        278.94915771484375
+      ],
+      "end": [
+        -3046.5185546875,
+        5287.6708984375,
+        278.94915771484375
+      ]
+    },
+    "camera_after": {
+      "start": [
+        -3102.03662109375,
+        5365.67236328125,
+        285.5612487792969
+      ],
+      "end": [
+        -3097.875244140625,
+        5359.82568359375,
+        285.5612487792969
+      ]
+    },
+    "white_ui_layouts": {
+      "before": 13753,
+      "after": 0
+    },
+    "camera_updates": {
+      "before": 107,
+      "after": 264
+    },
+    "red_layout_attempts": {
+      "before": 2862,
+      "after": 7019,
+      "reason": "Red state follows rendered-frame scheduling; layout attempts are not GPU draw calls."
+    },
+    "after_native_controls_during_zoom": 0,
+    "after_native_creates": 1,
+    "after_white_dom": {
+      "lines": 0,
+      "marks": 0,
+      "visibleLines": 0,
+      "visibleMarks": 0
+    },
+    "engine_fps": {
+      "method": "cl_printfps native frame statistics; not PresentMon",
+      "before": {
+        "frames": 325,
+        "fps": 59.4,
+        "last_240_average_ms": 16.89,
+        "last_240_max_ms": 41.99
+      },
+      "after": {
+        "frames": 325,
+        "fps": 59.4,
+        "last_240_average_ms": 16.71,
+        "last_240_max_ms": 30.03
+      }
+    },
+    "panorama_schedule_ms": {
+      "before": {
+        "median": 16,
+        "p95": 38,
+        "max": 44
+      },
+      "after": {
+        "median": 18,
+        "p95": 36,
+        "max": 76
+      },
+      "warning": "Panorama scheduling intervals are not display frame times."
+    },
+    "raw": [
+      "output/grid_revision_20261008/matched_before_sample.json",
+      "output/grid_revision_20261008/matched_after_sample.json",
+      "output/grid_revision_20261008/matched_ui_before_fps.log",
+      "output/grid_revision_20261008/matched_native_after_fps.log"
+    ],
+    "stage": "Native white grid before the later same-plane green-circle merge; not a live measurement of the final merged-circle version.",
+    "tested_runtime_source_sha256": {
+      "survival_static_grid": "d752807c64d01ac3ec5b69cf6522d2f1e52d1048c32ac1b3081550165a09ac06",
+      "survival_grid_state": "2c433c2e7d6f3a5013725c97642d502f747796207367a5ff7b54575832adf3f1",
+      "survival_grid_placement": "739c22ee9fc7c13fb822ad528f2625bec01918e7504f591b55e1a7381ae9dfa9"
+    },
+    "tested_compiled_native_resources": [
+      {
+        "resource": "materials/survival_grid/reference_grid_0.vtex",
+        "bytes": 5594484,
+        "source_sha256": "9819904fe4adc3a82697a661a67f8b6e6cd8a8e5ee24172dc676b09ec5c6ab7f",
+        "compiled_sha256": "5003e15d038a3ff8be47247b20363824f9c7061a8f8b130d60004b72ed567166"
+      },
+      {
+        "resource": "particles/survival_grid/reference_grid_0.vpcf",
+        "bytes": 2079,
+        "source_sha256": "ea71f183e530c341c4df4a34983019e53545b42d97e61d33f45153c0562448fc",
+        "compiled_sha256": "3877e11e403f4eb55d1710570efa4e068f67e916e0ed0739749ed9d00ef821b2"
+      },
+      {
+        "resource": "materials/survival_grid/reference_grid_1.vtex",
+        "bytes": 5594484,
+        "source_sha256": "36687e1e1541ccfd52c42dd884274f8b0a5d6bba121bc3b433481780fb3a0e64",
+        "compiled_sha256": "18a450a79eda0fb2c10a12609120595437dc3564e03b4e96973ab24f6e5e247f"
+      },
+      {
+        "resource": "particles/survival_grid/reference_grid_1.vpcf",
+        "bytes": 2079,
+        "source_sha256": "943f02c7ccfd6162244973abff492f51f1dc6f41176cd1bcd9003fe577ee13ab",
+        "compiled_sha256": "6a511692acb4875c0091e9a1200b03c12c53b0eb3c2a7cb5d453fa21582438f1"
+      },
+      {
+        "resource": "materials/survival_grid/reference_grid_2.vtex",
+        "bytes": 5594484,
+        "source_sha256": "db8fc14afdcd98456e0e9eee10b372bd045245a84963bb5d212d5e3b40ae1066",
+        "compiled_sha256": "141f80059747a7ea8fdd37230e1ac9d74175ba33c23ed628f9c62847e489a98c"
+      },
+      {
+        "resource": "particles/survival_grid/reference_grid_2.vpcf",
+        "bytes": 2079,
+        "source_sha256": "4a92c5941ca394b025e8854348a1644da7a9ced2ddb1ae90f3ce2975776bc801",
+        "compiled_sha256": "9e3cebf9433f2e47157f14055da37bcdd90936f592f83d1a42daadbe968b12d1"
+      },
+      {
+        "resource": "materials/survival_grid/reference_grid_3.vtex",
+        "bytes": 5594484,
+        "source_sha256": "602779c93d89edb6a9641cd89ec1e9e9591536300f821526cbc0f63dde5d0a9a",
+        "compiled_sha256": "6b0894e14e428be646f466340568fff2615de82534edeee3150b3aeab08899bc"
+      },
+      {
+        "resource": "particles/survival_grid/reference_grid_3.vpcf",
+        "bytes": 2079,
+        "source_sha256": "59197b1240f2507bd243daaba4cdc317ed03483aec6e8cb7ad6d594a241b7a8a",
+        "compiled_sha256": "5dfcd993386ab2b5671182ad3a1521adb6972b726644629d102754c0f6fa40c8"
+      }
+    ]
+  },
+  "checks": {
+    "node": [
+      "test_static_grid",
+      "test_grid_state",
+      "test_grid_native",
+      "test_grid_zoom_visibility",
+      "test_grid_zoom_layout",
+      "test_grid_mask",
+      "test_grid_placement_client",
+      "test_grid_dynamic_cache",
+      "test_building_move_grid",
+      "test_grid_static_integration (fallback, legacy helpers, native)"
+    ],
+    "lua": [
+      "tools/test_addon_precache.lua",
+      "scripts/vscripts/tests/test_grid_preview_area.lua",
+      "scripts/vscripts/tests/test_grid_builder_preview.lua"
+    ],
+    "result": "pass",
+    "coverage_samples": 13008,
+    "isolated_commit_sources": "native integration, placement client and addon precache also pass against task-only controller/addon copies",
+    "deterministic_asset_rebuild": "14 source asset files unchanged after regeneration; approved source PNG hashes unchanged",
+    "compiler": "4 Panorama resources plus 8 native particle/texture resources compiled and inspected successfully"
+  },
+  "runtime_source_sha256": {
+    "survival_static_grid": "b44bf4e747e3e2041488972cb19f0344feed430f066cc90cf3c581f325fd88f2",
+    "survival_grid_state": "2c433c2e7d6f3a5013725c97642d502f747796207367a5ff7b54575832adf3f1",
+    "survival_grid_placement": "2ebd4b4057a15939dfe9e28aa58cbd01663b3611e024ce6a3c5d2ddf19458d2c"
+  },
+  "commit_controller_sha256": "ea7d8ad53b4d713d734c4fba0328e654189282c7f3857e87c533db54cf622c24",
+  "commit_controller_resource_sha256": "af7fbffc415d22bc0be5a7067c1c2298a939c3f80d4af213fe79ed827b9fbc92",
+  "working_tree": "Original controller and addon edits verified against the saved stash; task-only source/resource copies exclude them from the commit.",
+  "final_red_clip_evidence": {
+    "panels": 46,
+    "layers": 127,
+    "inconsistent": 0,
+    "none_layers": 0,
+    "full_360_resets": 19,
+    "source": "output/grid_revision_20261008/final_native_red_geometry.json"
+  },
+  "same_plane_boundary": {
+    "requested_problem": "Terrain-following range boundary diverged from the fixed construction grid plane.",
+    "solution": "Bake the green preview outline into the same world-Z sprite. The native path creates no range_display particle and no UI ring.",
+    "settings": {
+      "radius": 1280,
+      "color": [
+        117,
+        225,
+        75
+      ],
+      "opacity": 0.6,
+      "width_world": 2,
+      "antialias_world": 2,
+      "support_world": [
+        1278,
+        1282
+      ],
+      "transparent_rgb_padding_world": 16,
+      "phase_independent": true,
+      "plane": "same sprite as white grid",
+      "purpose": "construction preview boundary; does not change ability or placement validation"
+    },
+    "gameplay": "No ability cast range or server placement validation changed.",
+    "decoded_boundary_audit": [
+      {
+        "phase": 0,
+        "degreeSamples": 360,
+        "minAlpha": 63,
+        "minGreenLead": 107
+      },
+      {
+        "phase": 1,
+        "degreeSamples": 360,
+        "minAlpha": 63,
+        "minGreenLead": 107
+      },
+      {
+        "phase": 2,
+        "degreeSamples": 360,
+        "minAlpha": 63,
+        "minGreenLead": 107
+      },
+      {
+        "phase": 3,
+        "degreeSamples": 360,
+        "minAlpha": 63,
+        "minGreenLead": 107
+      }
+    ],
+    "phase_equality": {
+      "samples": 8044,
+      "phases": 4,
+      "maxSourceBoundaryRgbaDifference": 0,
+      "maxDecodedBoundaryRgbaDifference": 3
+    },
+    "regression": "Native and fallback integration pass, including no terrain-following range_display, zero native UI ring and no camera-driven white layout; legacy helpers also pass.",
+    "compile": "Final four Panorama resources and eight native resources compiled successfully.",
+    "live_status": "Not confirmed: final read-only console attempt returned no ready/status/screenshot. No camera, selection or difficulty changes were made for this final attempt."
+  },
+  "visual_scope": {
+    "prototype_zoom": [
+      600,
+      1200,
+      1800
+    ],
+    "production_zoom": [
+      400,
+      600,
+      1200,
+      1800,
+      2400
+    ],
+    "production_screenshots": "output/grid_revision_20261008/final_native_{distance}.png",
+    "limitation": "Production captures show visible side grids, but a difficulty modal obscures the center; not complete footprint visual acceptance.",
+    "new_circle": "Final merged green boundary has asset, decoder, compiler and regression evidence only."
+  },
+  "cleanup": {
+    "files": [
+      {
+        "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\scripts\\custom_game\\grid_revision_probe_20261008_r1.js",
+        "exists": false
+      },
+      {
+        "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\layout\\custom_game\\grid_revision_probe_20261008_r1.xml",
+        "exists": false
+      },
+      {
+        "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\grid_revision_probe_20261008_r1.vjs_c",
+        "exists": false
+      },
+      {
+        "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\layout\\custom_game\\grid_revision_probe_20261008_r1.vxml_c",
+        "exists": false
+      }
+    ],
+    "context": "Destroy command sent without an acknowledgement; the newly requested probe also never returned READY. Four temporary probe source/compiled files are absent."
+  }
+}

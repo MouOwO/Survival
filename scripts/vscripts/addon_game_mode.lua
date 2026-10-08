@@ -578,6 +578,7 @@ local function on_item_picked_up(keys)
 end
 
 function M.precache(context)
+    grid_system.precache(context)
     PrecacheResource("particle", "particles/generic_hero_status/hero_levelup.vpcf", context)
     require("systems/valley_environment_service").precache(context)
     require("systems/tower_visual_service").precache(context)

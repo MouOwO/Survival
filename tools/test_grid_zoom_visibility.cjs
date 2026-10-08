@@ -35,19 +35,6 @@ function distanceToSegment(p,a,b) {
     const t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/length2));
     return Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dy);
 }
-function gradientAlpha(line,screen) {
-    const a=line.points[0],b=line.points[1],dx=b[0]-a[0],dy=b[1]-a[1];
-    const t=((screen[0]-a[0])*dx+(screen[1]-a[1])*dy)/(dx*dx+dy*dy);
-    const pattern=/color-stop\(([\d.]+),rgba\(213,230,211,([\d.]+)\)\)/g;
-    const stops=Array.from(String(line.style.backgroundColor).matchAll(pattern),m=>[Number(m[1]),Number(m[2])]);
-    assert(stops.length>=2,'world-clipped lines carry their own finite fade gradient');
-    assert.equal(stops[0][0],0);assert.equal(stops[stops.length-1][0],1);
-    for(let i=1;i<stops.length;i++)if(t<=stops[i][0]+1e-8) {
-        const left=stops[i-1],right=stops[i],f=(t-left[0])/(right[0]-left[0]);
-        return left[1]+f*(right[1]-left[1]);
-    }
-    return stops[stops.length-1][1];
-}
 function check(world) {
     assert(mask.visible,'preview remains visible while the circle crosses the camera horizon');
     for(const container of [mask,host]) {
@@ -63,8 +50,10 @@ function check(world) {
     const central=lines.filter(p=>distanceToSegment(screen,p.points[0],p.points[1])<1e-5);
     assert(central.length>=2,
         'both world-aligned grid boundaries through the cursor remain present');
-    for(const line of central)assert(gradientAlpha(line,screen)>0.999,
-        'the actual interpolated cursor gradient stays opaque even when the world circle crosses the horizon');
+    for(const line of central) {
+        assert.equal(Number(line.style.opacity),0.60,'reference-edge opacity stays constant across zoom');
+        assert(!line.style.backgroundColor,'a solid/gradient background cannot replace or fill the reference texture');
+    }
     for(const line of lines) {
         assert.equal(line.thickness,2,'white lines retain screen-space thickness while zooming');
         for(const p of line.points) {
@@ -131,6 +120,8 @@ assert(maximumPickError<8,'quantized camera probes retain picking precision afte
 
 const css=fs.readFileSync('panorama/src/styles/custom_game/survival_grid_placement.css','utf8');
 assert(!/opacity-mask\s*:/.test(css),'the preview never composites its subtree into an ellipse-sized opacity mask');
+assert(css.includes('background-image: url("file://{images}/custom_game/survival_grid/reference_edge.png")'),
+    'the approved edge image remains available in the projected fallback');
 console.log(JSON.stringify({result:'GRID_ZOOM_VISIBILITY_PASS',camera_samples:samples,
     minimum_distance:240,line_thickness:2,maximum_corners:160,
     still_style_writes:0,still_allocations:0,quantized_maximum_pick_error:maximumPickError,

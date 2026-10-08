@@ -168,8 +168,11 @@
                 if(panel.visible) panel.visible=false;
                 return;
             }
-            var r=visibleWorld?[Math.max(rect[0],visibleWorld[0]),Math.max(rect[1],visibleWorld[1]),
-                Math.min(rect[2],visibleWorld[2]),Math.min(rect[3],visibleWorld[3])]:rect;
+            // This bound can move with buffered coverage without changing the
+            // camera. Use it only to reject candidates: cropping a cached run
+            // here would leave holes when that coverage window expands again.
+            // Exact circle/viewport clipping below supplies all actual edges.
+            var r=rect;
             var relation=clipRange?rangeRelation(r):1;
             if(relation===0) {panel.visible=false;return;}
             var points=[[r[0],r[1]],[r[2],r[1]],[r[2],r[3]],[r[0],r[3]]];
@@ -209,8 +212,11 @@
             }
             for(var i=0;i<clips.length;i++) {
                 var vertex=i*2;
+                // Panorama does not clear an existing radial primitive for
+                // "none" (a rect clip is additive, too). Replace unused layers
+                // with a full radial sweep so old polygon edges cannot remain.
                 options.setStyle(clips[i],"clip",i<count?wedge(points[vertex],points[(vertex+1)%points.length],
-                    points[(vertex+points.length-1)%points.length],width,height):"none");
+                    points[(vertex+points.length-1)%points.length],width,height):"radial(50% 50%,0deg,360deg)");
             }
             panel.visible=true;
         }

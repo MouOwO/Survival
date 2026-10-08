@@ -5,6 +5,16 @@ local config = require("config/grid_placement_config")
 local region_service = require("systems/forbidden_region_service")
 
 local M = {}
+
+function M.precache(context)
+    if type(PrecacheResource) ~= "function" then return 0 end
+    -- Both footprint parities need their texture ready before entering preview.
+    for phase = 0, 3 do
+        PrecacheResource("particle", "particles/survival_grid/reference_grid_" .. phase .. ".vpcf", context)
+    end
+    return 4
+end
+
 local occupied = {}
 local occupied_entities = {}
 local function set_occupant(column, y, index)

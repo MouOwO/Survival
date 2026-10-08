@@ -20,7 +20,6 @@
     var nextParticleAttempt = -100;
     var RANGE_PARTICLE = "particles/ui_mouseactions/range_display.vpcf";
     var cursorIcon = $("#GridPlacementCursorIcon");
-    var nativeRangeBounds = null;
     function renderCursorIcon() {
         var cursor=GameUI.GetCursorPosition();
         if(!cursorIcon) return;
@@ -237,8 +236,13 @@
 
     // Dispose a live local particle when Panorama reloads this script.
     var sharedConfig = GameUI.CustomUIConfig();
+    if (sharedConfig.SurvivalGridNativeCleanup) sharedConfig.SurvivalGridNativeCleanup();
+    var nativeGrid = sharedConfig.SurvivalStaticGrid && sharedConfig.SurvivalStaticGrid.createNativeGrid
+        ? sharedConfig.SurvivalStaticGrid.createNativeGrid(Particles, ParticleAttachment_t.PATTACH_WORLDORIGIN) : null;
+    sharedConfig.SurvivalGridNativeCleanup = nativeGrid ? nativeGrid.hide : null;
     if (sharedConfig.SurvivalStaticGrid) {
         staticGrid=sharedConfig.SurvivalStaticGrid.create({
+            nativeGrid:nativeGrid,
             mask:$("#GridPlacementStaticMask"),host:$("#GridPlacementStaticMesh"),outline:$("#GridPlacementPlaneRange"),
             setStyle:setStyle,positionSegment:positionSegment,
             project:function(world){return screenPoint(world,true);},
@@ -934,10 +938,11 @@
 
     function renderCursorRange(world) {
         if (!world) return;
-        var b=nativeRangeBounds;
-        var usePlane=!!(b && (world[0]<b.min_x || world[0]>b.max_x || world[1]<b.min_y || world[1]>b.max_y));
-        var planeReady=staticGrid && staticGrid.setPlaneRange && staticGrid.setPlaneRange(usePlane);
-        if(usePlane && planeReady) {destroyRangeParticle();return;}
+        // This is our preview circle, not the ability's cast-range authority.
+        // Share the grid plane even over slopes: the native atlas includes its
+        // outline, and the UI fallback projects the same world circle.
+        var planeReady=staticGrid && staticGrid.enabled() && staticGrid.setPlaneRange && staticGrid.setPlaneRange(true);
+        if(planeReady) {destroyRangeParticle();return;}
         // Valve range_display: CP0 = center, CP1.x = radius, CP2 = HSL
         // adjustment (zero preserves native green), CP3.x = quickcast fade switch.
         // Its native children provide the ground-following edge/fill/shadow.
@@ -1175,7 +1180,9 @@
         if(!currentController()) return;
         var loopStarted=Date.now();
         // Keep input/validation alive even if a visual API rejects a frame.
-        $.Schedule(0.035, updateLoop);
+        // Native white geometry follows the camera each rendered frame. Keep
+        // the red/green UI in step; validation and model poses stay rate limited.
+        $.Schedule(activeProfile && staticGrid && staticGrid.stats.native_active ? 0 : 0.035, updateLoop);
         if (pendingRelocationStart) {
             resumeRelocationStart();
             if (pendingRelocationStart) return;
@@ -1271,7 +1278,6 @@
         }
         var list = normalizeLuaArray(data && data.profiles);
         buildPlaneHeight=data.static_grid && isFinite(Number(data.static_grid.height)) ? Number(data.static_grid.height) : null;
-        nativeRangeBounds=data.static_grid && data.static_grid.build_bounds || null;
         if (staticGrid) staticGrid.configure(data.static_grid,gridCellSize,previewVisual);
         // Panorama may hot-reload the controller before its shared helper.
         // Older retained instances must not abort profile registration.

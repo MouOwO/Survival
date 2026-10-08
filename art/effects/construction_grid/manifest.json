@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "radius": 1280,
+  "world_size": 2560,
+  "cell_size": 64,
+  "texture_size": [
+    2048,
+    2048
+  ],
+  "texture_world_size": 4096,
+  "particle_radius": 2048,
+  "texture_format": "DXT5",
+  "uv_scale": 1,
+  "uv_offset": 0,
+  "edge_world_width": 4,
+  "corner_world_size": 16,
+  "range_boundary": {
+    "radius": 1280,
+    "color": [
+      117,
+      225,
+      75
+    ],
+    "opacity": 0.6,
+    "width_world": 2,
+    "antialias_world": 2,
+    "support_world": [
+      1278,
+      1282
+    ],
+    "transparent_rgb_padding_world": 16,
+    "phase_independent": true,
+    "plane": "same sprite as white grid",
+    "purpose": "construction preview boundary; does not change ability or placement validation"
+  },
+  "source": {
+    "edge": "5a59481643d4c7d5ba83497fa0572d7844c32bc34484ec858b5d9a2be5f7cc1b",
+    "corner": "537fffae0c8fe5ccdf843cae80bc90d2760ee5bdd23d006c30a4f77b390538f6"
+  },
+  "controls": {
+    "CP0": "snapped world center, construction grid Z",
+    "CP3": "x=1 visible, x=0 hidden"
+  },
+  "attachment": "PATTACH_WORLDORIGIN",
+  "max_particles": 1,
+  "description": "Approved reference edge opacity .60 and corner opacity .75; transparent cell interiors except the explicit green boundary ring; every 64-world intersection; white circle .75R core and smooth .25R feather; green range boundary shares the same plane.",
+  "limits": [
+    "World-scaled edge/corner dimensions preserve the historical 2px/8px proportions at a 32px cell; dimensions follow camera perspective.",
+    "Mip filtering and DXT5 alpha compression intentionally use the native renderer; runtime proof is recorded separately."
+  ],
+  "resources": [
+    {
+      "particle": "particles/survival_grid/reference_grid_0.vpcf",
+      "texture": "materials/survival_grid/reference_grid_0.vtex",
+      "phase": [
+        0,
+        0
+      ],
+      "world_phase": [
+        0,
+        0
+      ],
+      "texture_phase": [
+        0,
+        0
+      ],
+      "png_sha256": "effe64d8a2949ec9980f5b9336b547501e16e8e436c623d73f4119a14aed5d29",
+      "white_core_sha256": "f685612477f837ebd2628a2df40b6bf909e24724c6f8edda45e9813f407359a0",
+      "nontransparent_pixels": 204384
+    },
+    {
+      "particle": "particles/survival_grid/reference_grid_1.vpcf",
+      "texture": "materials/survival_grid/reference_grid_1.vtex",
+      "phase": [
+        32,
+        0
+      ],
+      "world_phase": [
+        32,
+        0
+      ],
+      "texture_phase": [
+        0,
+        32
+      ],
+      "png_sha256": "79c388069dcf3b48bce16e20f66e9ad1c5b2f6d870baf21050d72a60580affcd",
+      "white_core_sha256": "519084a26edba46d34cb0aeffe69f620677f19a70d5ab021d174e6383b3fc709",
+      "nontransparent_pixels": 204851
+    },
+    {
+      "particle": "particles/survival_grid/reference_grid_2.vpcf",
+      "texture": "materials/survival_grid/reference_grid_2.vtex",
+      "phase": [
+        0,
+        32
+      ],
+      "world_phase": [
+        0,
+        32
+      ],
+      "texture_phase": [
+        32,
+        0
+      ],
+      "png_sha256": "899995c81d3acbff1cf2c5b190052358cc5ffedb2f0f765aaddbd6ec1285507e",
+      "white_core_sha256": "2933ce74895aa9f45a275455d026b8616e32f265598a47542f4a3e3089752a0d",
+      "nontransparent_pixels": 204851
+    },
+    {
+      "particle": "particles/survival_grid/reference_grid_3.vpcf",
+      "texture": "materials/survival_grid/reference_grid_3.vtex",
+      "phase": [
+        32,
+        32
+      ],
+      "world_phase": [
+        32,
+        32
+      ],
+      "texture_phase": [
+        32,
+        32
+      ],
+      "png_sha256": "4a066bd559f60929d4e8ebf3850bb80f659d5d2cbc398506760b7a760bc5ef74",
+      "white_core_sha256": "e8ad422cb793315f444be884bae8e59626cf4c7fa9412eee607c293f89d0df7d",
+      "nontransparent_pixels": 205127
+    }
+  ]
+}

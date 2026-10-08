@@ -3,6 +3,11 @@ $repo = Split-Path -Parent $PSScriptRoot
 $engine = [IO.Path]::GetFullPath((Join-Path $repo '../../..'))
 $content = Join-Path $engine 'content/dota_addons/Survival/panorama'
 $compiler = Join-Path $engine 'game/bin/win64/resourcecompiler.exe'
+# Build the approved edge/corner atlas and its four native footprint phases
+# before deploying a controller that can reference those particles.
+& node (Join-Path $repo 'tools/build_construction_grid.cjs')
+if ($LASTEXITCODE -ne 0) { throw 'Construction grid generation failed' }
+& (Join-Path $repo 'tools/compile_construction_grid.ps1')
 $files = @(
     'images/custom_game/survival_grid/range_mask.png',
     'images/custom_game/survival_grid/reference_edge.png',
