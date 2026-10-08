@@ -403,16 +403,23 @@
                 ||/^item_survival_(attack_gloves|burning_blade|iron_armor)_max$/.test(String(name||""));
             var weaponMax=!!(identity&&identity.removed!==1&&Number(identity.is_max_level)===1)
                 ||/^item_survival_(growth_sword|frost_blade|ice_blade)_max$/.test(String(name||""));
-            var showMax=equipmentMax||weaponMax;
-            hideCounter=hideCounter||weaponMax;
+            var levelMatch=/^item_survival_(epic_icefire|legend_abyss)_(\d+)$/.exec(String(name||""));
+            var upgradeLevel=identity&&identity.removed!==1&&Number(identity.upgrade_level)>0
+                ?Number(identity.upgrade_level):levelMatch?Math.max(1,Math.min(levelMatch[1]==="legend_abyss"?10:7,Number(levelMatch[2]))):0;
+            var showLevel=upgradeLevel>0&&!(identity&&identity.removed===1);
+            var showMax=(equipmentMax||weaponMax)&&!showLevel;
+            hideCounter=hideCounter||weaponMax||showLevel;
             var maxLabel=slot.FindChildTraverse("SurvivalInventoryArmorMax");
-            if(showMax&&!valid(maxLabel)){
+            if((showMax||showLevel)&&!valid(maxLabel)){
                 maxLabel=$.CreatePanel("Label",slot,"SurvivalInventoryArmorMax");
                 maxLabel.text="MAX";
                 maxLabel.hittest=false;maxLabel.hittestchildren=false;
                 style(maxLabel,{horizontalAlign:"right",verticalAlign:"bottom",margin:"0px 6px 6px 0px",fontSize:"26px",fontWeight:"bold",color:"#ffffff",textShadow:"0px 0px 2px 3 #000000",zIndex:"10"});
             }
-            if(valid(maxLabel))maxLabel.visible=showMax;
+            if(valid(maxLabel)){
+                maxLabel.visible=showMax||showLevel;
+                maxLabel.text=showLevel?"+"+upgradeLevel:"MAX";
+            }
             var imageHost=slot.FindChildTraverse("ItemImage");
             if(valid(imageHost)){
                 // DOTAItemImage renders its texture internally. background-size

@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-08",
+  "request": "post-clear three archive buildings and enhancement icon badges",
+  "evidence": {
+    "last_wave": 25,
+    "cleared_game_time": 1910.8,
+    "source_and_vpk_markers": 12,
+    "native_console": "no response to read-only probes; exact runtime failure not established"
+  },
+  "state_machine": [
+    "final-clear once",
+    "bounded grounded placement near owned wall",
+    "store newly created entity immediately",
+    "complete configuration and abilities",
+    "retry unavailable site or partial configuration without duplication",
+    "original deadline/finish/disconnect cleanup"
+  ],
+  "checks": [
+    {
+      "test": "scripts/vscripts/tests/test_archive_challenge_hub_positions.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "scripts/vscripts/tests/test_wave_population_endgame.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "scripts/vscripts/tests/test_archive_challenge_timer.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "scripts/vscripts/tests/test_post_clear_freeze.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "scripts/vscripts/tests/test_archive_difficulty_progression.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "scripts/vscripts/tests/test_archive_endless_rewards.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "tools/test_weapon_max_progress.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "tools/test_weapon_max_hud.cjs",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "tools/test_weapon_growth_inputs.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "tools/test_weapon_synthesis_hot_path.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "tools/test_weapon_snapshot_growth_batch.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    },
+    {
+      "test": "scripts/vscripts/tests/test_weapon_owned_visual.lua",
+      "exit_code": 0,
+      "candidate_exit_code": 0
+    }
+  ],
+  "negative_control": "HEAD archive service rejected for native clear-space=true",
+  "configuration": "archive_challenge_rules CSV reproducibility passed",
+  "ui_compile": "compiled upgrade_level field verified; native content equals candidate source; original binary backed up",
+  "balance_changes": false,
+  "limitations": [
+    "New-map visual acceptance still required.",
+    "Base _00 template displays +1; authored stage 1 remains +1; progression data unchanged."
+  ],
+  "git_workflow": "precise stash/pull/pop completed; 15 task paths and unrelated original files preserved; 20 historical stashes unchanged; isolated candidate verified",
+  "candidate_source_sha256": {
+    "scripts/vscripts/systems/archive_hub_placement.lua": "bd5aedc995f9a29103119f5bb5baad98b668062bf6bea535f808d6065b5b6140",
+    "scripts/vscripts/systems/archive_challenge_service.lua": "669cfa2769c9c98a17713e3a595b057a50fd17edfbc40822f5857456ffe69175",
+    "scripts/vscripts/systems/wave_system.lua": "6fe0b8380274e3f7a08aabd5c6349c75f112cd5e780b0c4176270897b8b57ab6",
+    "scripts/vscripts/systems/weapon_progression.lua": "73675df7ce143c696e5ba36cb921877242c2ceddaffcd396dc6d480c86adb2c1",
+    "scripts/vscripts/systems/weapon_equipment_service.lua": "45fd8d8f3cf7802ff32c0e2b0eda020a54a5fb7a434ee92c6ec6703972509602",
+    "scripts/vscripts/config/generated/archive_challenge_rules.lua": "30a20f13ab6bcbf96b6908285ded94527c5116b3e2edcb68a669baa4ffbf73ae",
+    "data/csv/存档系统/archive_challenge_rules.csv": "dffc91604beb53460918b2f10180e3cdcb9a7c9ef422f32bd72e13927b41527d",
+    "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js": "629bbdf592fe9ee89f299cee8ed8ed100c3bac7d08c37ffab0d7b6f08a023681",
+    "scripts/vscripts/tests/test_archive_challenge_hub_positions.lua": "f1af2b68669f9f7a6b9f0c875e1f17b93281366d8c03e887723d60d275c21be2",
+    "tools/test_weapon_max_hud.cjs": "8a5939da94191530755cc718b00774c4c2befbedbae413c686ad51caaa8a8887",
+    "tools/test_weapon_max_progress.lua": "dd72e23aba0ee6502bcbf3cb6aad89240bcef4e9ba318fd0bfced85d147b9864"
+  },
+  "historical_stashes_preserved": 20,
+  "candidate_text_dependencies": 1849
+}

@@ -560,6 +560,8 @@ end
 local function settle_victory_once()
     if state.victory_settled or state.defeat_settled or game_has_ended() then return false end
     state.victory_settled = true
+    print(string.format("[WaveSystem] final_clear difficulty=%s wave=%s failed_spawn=%s",
+        tostring(difficulty_id), tostring(state.current_wave), tostring(state.failed_spawn)))
     state.status = "cleared"
     state.post_clear_frozen = true
     phase_guard.set_post_clear_frozen(true)

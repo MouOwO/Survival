@@ -23,6 +23,7 @@ local function publish_item_identity(item, content_id, removed)
             content_id = tostring(content_id or ""),
             removed = removed == true and 1 or 0,
             is_max_level = weapon_progression.is_max_level(weapons.by_id[content_id]) and 1 or 0,
+            upgrade_level = weapon_progression.icon_level(weapons.by_id[content_id]),
         }
     )
 end
@@ -291,6 +292,10 @@ local function set_item_counter(item, growth)
         return
     end
     local definition = weapons.by_id[item.survival_content_id]
+    if weapon_progression.icon_level(definition) then
+        item:SetCurrentCharges(0)
+        return
+    end
     local target = weapon_progression.is_max_level(definition) and 0
         or tonumber(growth and growth.stage_attack_target) or 0
     if target <= 0 then

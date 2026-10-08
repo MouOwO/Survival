@@ -7,6 +7,7 @@ local context = require("systems/player_context_service")
 local wave = require("systems/wave_system")
 local archive = require("systems/archive_service")
 local scheduler = require("core/scheduler")
+local hub_placement = require("systems/archive_hub_placement")
 local M = {}
 local players, hubs, bosses = {}, {}, {}
 local sequence, active = 0, false
@@ -153,25 +154,6 @@ local function ensure_hub_abilities(unit, index)
         if valid(finish) then finish:SetLevel(1) end
     end
 end
-local function hub_position(player_id, index)
-    -- Keep buildings on their own player platform even when the monster lane
-    -- moves. Older maps retain the original offsets around the wave marker.
-    local marker = Entities and Entities.FindByName
-        and Entities:FindByName(nil, "player_" .. player_id .. "_archive_hub_" .. index)
-    local position = valid(marker) and marker:GetAbsOrigin()
-    if position then
-        if type(GetGroundPosition) == "function" then
-            local ok, ground = pcall(GetGroundPosition, position, nil)
-            if ok and ground then return ground end
-        end
-        return position
-    end
-    local channel = wave.get_player_spawn_marker(player_id)
-    local origin = valid(channel) and channel:GetAbsOrigin()
-    if not origin then return nil end
-    return Vector(origin.x + (index - 2) * rule.building_spacing,
-        origin.y + rule.building_offset_y, origin.z)
-end
 local function hub_model(index)
     return rule["building_model_" .. tostring(index)] or rule.building_model
 end
@@ -179,10 +161,20 @@ local function create_hubs(state)
     if state.finished then return end
     for index = 1, 3 do
         if not valid(state.hubs[index]) then
-            local position = hub_position(state.player_id, index)
-            if not position then return false end
-            local unit = CreateUnitByName("npc_archive_challenge_" .. index, position, true, nil, nil, DOTA_TEAM_GOODGUYS)
-            if not valid(unit) then return false end
+            local position, source = hub_placement.resolve(state.player_id, index, rule, context, wave, hubs)
+            if not position then return false, source end
+            print(string.format("[ArchiveChallenge] hub_creating player=%s slot=%s source=%s position=%s",
+                tostring(state.player_id), tostring(index), tostring(source), tostring(position)))
+            local unit = CreateUnitByName("npc_archive_challenge_" .. index, position, false, nil, nil, DOTA_TEAM_GOODGUYS)
+            if not valid(unit) then return false, "hub_unit_create_failed:" .. index end
+            -- Keep ownership immediately, even if later setup fails and retries.
+            state.hubs[index] = unit
+            hubs[unit:entindex()] = { state = state, unit = unit, index = index, position = position }
+            print(string.format("[ArchiveChallenge] hub_created player=%s slot=%s source=%s entindex=%s position=%s",
+                tostring(state.player_id), tostring(index), tostring(source), tostring(unit:entindex()), tostring(position)))
+        end
+        local unit = state.hubs[index]
+        if not unit.survival_archive_hub_ready then
             unit.survival_archive_hub = index
             unit.survival_display_name = "存档挑战" .. index
             unit:SetControllableByPlayer(state.player_id, true)
@@ -192,20 +184,21 @@ local function create_hubs(state)
             unit:SetModelScale(rule.building_model_scale)
             unit:AddNewModifier(unit, nil, "modifier_invulnerable", {})
             unit:AddNewModifier(unit, nil, "modifier_building_no_health_bar", {})
-            state.hubs[index] = unit
-            hubs[unit:entindex()] = { state = state, unit = unit, index = index }
+            if AddFOWViewer then AddFOWViewer(DOTA_TEAM_GOODGUYS, unit:GetAbsOrigin(), 600,
+                math.max(1, (deadline or now() + 1800) - now()), false) end
         end
         require("systems/challenge_guardian_visual_service").apply(state.hubs[index])
         ensure_hub_abilities(state.hubs[index], index)
+        unit.survival_archive_hub_ready = true
     end
     publish(state)
     return true
 end
 local function ensure_hubs(state)
-    local ok, ready = pcall(create_hubs, state)
+    local ok, ready, reason = pcall(create_hubs, state)
     if ok and ready then return true end
     print("[ArchiveChallenge] hubs pending player=" .. tostring(state.player_id)
-        .. " error=" .. tostring(ok and "spawn_marker_missing" or ready))
+        .. " error=" .. tostring(ok and reason or ready))
     scheduler.every(1, function()
         if not active or state.finished then return false end
         local retry_ok, retry_ready = pcall(create_hubs, state)
@@ -224,6 +217,8 @@ function M.begin(payload)
     end
     if not payload.player_ids or #payload.player_ids == 0 then return { ok = false } end
     active = true
+    print("[ArchiveChallenge] begin difficulty=" .. tostring(payload.difficulty_id)
+        .. " players=" .. tostring(#payload.player_ids))
     deadline = now() + (tonumber(rule.phase_duration_seconds) or 1800)
     scheduler.after(math.max(0, deadline-now()), function()
         if active then expire_if_due() end
@@ -335,7 +330,10 @@ function M.precache(precache_context)
     local function add(path)
         if not seen[path] then PrecacheResource("model", path, precache_context); seen[path] = true end
     end
-    for index = 1, 3 do add(hub_model(index)) end
+    for index = 1, 3 do
+        add(hub_model(index))
+        if PrecacheUnitByNameSync then PrecacheUnitByNameSync("npc_archive_challenge_" .. index, precache_context) end
+    end
     add(require("systems/archive_endless_config").rules.model_path)
     local catalog = require("config/asset_catalog")
     for _, row in ipairs(definitions.rows) do

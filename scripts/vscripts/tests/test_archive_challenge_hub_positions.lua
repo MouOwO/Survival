@@ -14,7 +14,8 @@ local function ability()
     return { IsNull = function() return false end, SetLevel = function() end,
         SetActivated = function() end }
 end
-local function create_unit(name, position)
+local function create_unit(name, position, find_clear_space)
+    assert(find_clear_space == false, "immobile hubs must never trigger native clear-space search")
     serial = serial + 1
     local unit = { name = name, position = position, index = serial, abilities = {} }
     function unit:IsNull() return false end
@@ -25,11 +26,12 @@ local function create_unit(name, position)
     function unit:SetModel(path) self.model = path end
     function unit:SetOriginalModel(path) self.original_model = path end
     function unit:SetModelScale(scale) self.scale = scale end
+    function unit:GetAbsOrigin() return self.position end
     function unit:AddNewModifier(_, _, name) self[name] = true end
     created[#created + 1] = unit
     return unit
 end
-package.loaded["core/event_bus"] = { emit = function() end }
+package.loaded["core/event_bus"] = { emit = function() end, request=function() end }
 package.loaded["core/events"] = { UI_NOTIFICATION = "notification" }
 package.loaded["config/generated/archive_challenge_definitions"] = { rows = {}, by_id = {} }
 package.loaded["config/generated/archive_challenge_stats"] = { by_id = {} }
@@ -161,3 +163,100 @@ for index = 1, 3 do markers["player_3_archive_hub_" .. index] = marker(300, inde
 assert(scheduled[1].callback() == false)
 assert(#created == 3)
 print("PASS archive hubs: player isolation, marker priority, ground alignment, old-map fallback, missing-marker retry")
+
+-- The rebuilt map no longer needs the old platform markers: resolve around
+-- each player's actual wall, including several players using the same area.
+service = reset()
+local rules = package.loaded["config/generated/archive_challenge_rules"].by_id.default
+rules.building_anchor = "player_wall"
+package.loaded["systems/building_system"] = {wall_for_player = function()
+    return marker(1000, 2000, 384)
+end}
+local queries, fog, clear_space = 0, 0, 0
+GridNav = {IsTraversable = function() queries=queries+1; return true end,
+    IsBlocked = function() return false end}
+FindClearSpaceForUnit = function() clear_space=clear_space+1; error("unbounded search forbidden") end
+AddFOWViewer = function(team, position, radius, duration)
+    assert(team == 2 and radius == 600 and duration == 1800 and position.z == 384)
+    fog=fog+1
+end
+begin(service, {0,1,2,3})
+assert(#created == 12 and #scheduled == 0 and wave_lookups == 0 and fog == 12 and clear_space == 0)
+for i, unit in ipairs(created) do
+    assert(unit.position.x >= 40 and unit.position.x <= 1960)
+    assert(unit.position.y >= 1640 and unit.position.y <= 3080)
+    for j=1,i-1 do
+        local p=created[j].position
+        local dx,dy=unit.position.x-p.x,unit.position.y-p.y
+        assert(dx*dx+dy*dy >= (rules.building_spacing*.8)^2, "shared-area hubs must not overlap")
+    end
+end
+local before=queries
+begin(service, {0,1,2,3})
+assert(#created == 12 and fog == 12 and queries == before, "duplicate begin must reuse completed hubs")
+
+-- Blocked terrain, underwater but traversable terrain, and building occupancy
+-- each reject the preferred point and use a bounded alternate on the wall lawn.
+for _, failure in ipairs({"blocked", "water", "occupied"}) do
+    service=reset()
+    rules.building_anchor="player_wall"
+    GetGroundPosition=function(p)
+        return vector(p.x,p.y,failure=="water" and p.y==2360 and 0 or 384)
+    end
+    GridNav={IsTraversable=function() return true end,
+        IsBlocked=function(_,p) return failure=="blocked" and p.y==2360 end}
+    package.loaded["core/event_bus"].request=function(_, payload)
+        if failure=="occupied" and payload.position.y==2360 then return {ok=false} end
+        return {ok=true,world_position=payload.position}
+    end
+    begin(service,{0})
+    assert(#created==3 and #scheduled==0)
+    for _,u in ipairs(created) do assert(u.position.y~=2360 and u.position.z==384) end
+end
+
+-- If every candidate is unavailable, retain a retry and never arbitrarily
+-- create at (0,0) or at a water marker. Restored navigation completes once.
+service=reset(); rules.building_anchor="player_wall"; fog=0
+local nav_open, failed_queries=false,0
+package.loaded["core/event_bus"].request=function(_,payload)
+    return {ok=true,world_position=payload.position}
+end
+GridNav={IsTraversable=function() failed_queries=failed_queries+1; return nav_open end,IsBlocked=function() return false end}
+begin(service,{0})
+assert(#created==0 and #scheduled==1)
+assert(failed_queries==25, "placement must stop after the bounded 25 wall candidates")
+nav_open=true
+assert(scheduled[1].callback()==false and #created==3 and fog==3)
+
+-- A setup exception after creation reuses the owned entity, instead of leaking
+-- it and creating a second colliding unit on the next attempt.
+service=reset(); rules.building_anchor="player_wall"; fog=0
+local fail=true
+CreateUnitByName=function(...)
+    local unit=create_unit(...)
+    local original=unit.SetModel
+    function unit:SetModel(path)
+        if fail then fail=false; error("temporary setup failure") end
+        return original(self,path)
+    end
+    return unit
+end
+begin(service,{0})
+assert(#created==1 and #scheduled==1)
+assert(scheduled[1].callback()==false and #created==3 and fog==3)
+assert(service._test.players()[0].hubs[1]==created[1])
+
+-- A missing wall uses this player's builder marker, not another player's slot.
+service=reset();rules.building_anchor="player_wall"
+package.loaded["systems/building_system"]={wall_for_player=function() end}
+package.loaded["systems/player_context_service"].slot=function(id)
+    return {builder_spawn_marker="player_"..id.."_builder_spawn"}
+end
+markers.player_2_builder_spawn=marker(800,900,384)
+markers.player_0_builder_spawn=marker(-800,-900,384)
+begin(service,{2})
+assert(#created==3 and #scheduled==0 and wave_lookups==0)
+same(created[1].position,560,1260,384)
+same(created[2].position,800,1260,384)
+same(created[3].position,1040,1260,384)
+print("PASS archive hub recovery: shared wall area, grounded bounded placement, blocked/water/occupied rejection, fog, retry and partial setup reuse")

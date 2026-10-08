@@ -134,6 +134,27 @@ assert(#transactions == 1, "MAX does not synthesize another series or stop perma
 assert(not progression.is_max_level(weapons.by_id.weapon_epic_icefire_06))
 assert(not progression.is_max_level(weapons.by_id.weapon_ice_blade_04))
 assert(not progression.is_max_level({}))
+-- Enhancement badges never consume or replace the authoritative growth state.
+for _, definition in ipairs(weapons.rows) do
+    local level = progression.icon_level(definition)
+    if level then
+        equip(definition.content_id)
+        local before, item = growth(), shell()
+        assert(item.charges == 0, "enhancement weapons must not display 200 attack charges")
+        assert(net.survival_inventory_item_identity[tostring(item.id)].upgrade_level == level)
+        assert(level == math.max(1, math.min(definition.max_stage, definition.stage)))
+        damages(2)
+        assert(growth().growth_attack == before.growth_attack + definition.attack_gain_per_attack * 2)
+        assert(growth().stage_attack_target == before.stage_attack_target)
+        assert(growth().stage_attack_count == before.stage_attack_count)
+        bus.emit(events.WEAPON_GROWTH_CHANGED, {player_id=0, snapshot={
+            content_id=definition.content_id, stage_attack_target=200, stage_attack_remaining=200}})
+        assert(item.charges == 0, "a fresh growth event must not overwrite the enhancement badge")
+    end
+end
+assert(progression.icon_level(weapons.by_id.weapon_epic_icefire_00) == 1)
+assert(progression.icon_level(weapons.by_id.weapon_legend_abyss_00) == 1)
+assert(progression.icon_level(weapons.by_id.weapon_legend_abyss_10) == 10)
 -- Inventory/synthesis material tooltips also show MAX when not equipped.
 counts.weapon_ice_blade_max = 1
 local material = snapshot().tooltip_view_model.items.weapon_ice_blade_max
