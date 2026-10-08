@@ -1,4 +1,4 @@
-﻿builder_id,unit_name,display_name,model_name,model_scale,move_speed,spawn_x,spawn_y,spawn_z,enabled,notes,visual_asset_id,construction_activity,construction_particle
-#中文表头:建造者ID,单位名称,显示名称,模型路径,模型缩放,移动速度,出生X,出生Y,出生Z,是否启用,备注,外观资源ID,建造动作,建造充能粒子
-#types:string,string,string,string,number,number,number,number,number,boolean,string,string,string,string
-default_builder,npc_survival_builder_proxy,建造者,models/items/io/io_ti7/io_ti7.vmdl,1,500,0,0,256,1,独立建造代理；艾欧仁爱之友至宝ItemDef9235；地面寻路/无碰撞/修理身份不变。,builder_io_benevolent_companion,ACT_DOTA_TAUNT,particles/econ/items/wisp/wisp_overcharge_ti7.vpcf
+builder_id,unit_name,display_name,model_name,model_scale,move_speed,spawn_x,spawn_y,spawn_z,enabled,notes,visual_asset_id,construction_activity,construction_particle,construction_sequence
+#中文表头:建造者ID,单位名称,显示名称,模型路径,模型缩放,移动速度,出生X,出生Y,出生Z,是否启用,备注,外观资源ID,建造动作,建造充能粒子,至宝建造展示动作
+#types:string,string,string,string,number,number,number,number,number,boolean,string,string,string,string,string
+default_builder,npc_survival_builder_proxy,建造者,models/heroes/wisp/wisp.vmdl,1,500,0,0,256,1,独立建造代理；艾欧本体保留原生拾取hitbox，仁爱之友9235作原生饰品挂载；地面/无碰撞/修理不变。,builder_io_benevolent_companion,ACT_DOTA_CAST_ABILITY_3,particles/econ/items/wisp/wisp_overcharge_ti7.vpcf,ti7_io_taunt

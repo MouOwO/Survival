@@ -1,3 +1,9 @@
+## DECISION-20261008-BUILDER-IO-NATIVE-PICK-BODY
+
+艾欧至宝是无hitbox饰品，不能替代可操作NPC主体；保留原生wisp本体作为拾取/悬停来源，以dota_item_wearable显式SetModel、SetOwner、FollowEntity挂载方块。不得为弥补模型缺陷扩大移动碰撞、隐藏主体或加入周期鼠标拾取脚本。此决定替代此前直接使用至宝作为主体的做法，原建造者身份和游戏参数仍保留。
+
+Tools证实native wearable spawn table model为空，显式SetModel后序列查询才返回真实taunt/idle。建造动作分为本体原生过载施法和至宝自身展示序列；粒子使用方块挂点。结束/断线/死亡统一回收owned饰品与粒子，先撤销缓存保证重入幂等。静态hitbox证据及私有模型/跟随检查不能代替玩家点击、悬停实机验收。
+
 ## DECISION-20261008-BUILDER-IO-ARCANA
 
 建造者外观使用艾欧「仁爱之友」ItemDef9235原生至宝主体和常驻粒子，不把建造者替换成原生英雄单位；保留独立代理身份、每玩家所有权、地面寻路/无单位碰撞和修理语义。官方伴侣方块模型有 ACT_DOTA_TAUNT / ATTACK 而没有 CAST_ABILITY，施工反馈选已有展示动作+临时TI7过载粒子，不调用不存在的施法动作。音效为原生短音和艾欧SoundSet/VoiceFile，不启动循环音；原限流参数保留。

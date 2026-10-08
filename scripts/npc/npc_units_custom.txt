@@ -336,7 +336,7 @@
     "npc_survival_builder_proxy"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/items/io/io_ti7/io_ti7.vmdl"
+        "Model"                  "models/heroes/wisp/wisp.vmdl"
         "SoundSet"               "Hero_Wisp"
         "VoiceFile"              "soundevents/voscripts/game_sounds_vo_wisp.vsndevts"
         "ModelScale"             "1.0"

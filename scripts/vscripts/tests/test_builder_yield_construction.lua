@@ -23,7 +23,7 @@ package.loaded["systems/multiplayer_player_service"] = {is_disconnected = functi
 DOTA_TEAM_GOODGUYS = 2
 DOTA_UNIT_TARGET_TEAM_BOTH, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 3,1,2
 DOTA_UNIT_TARGET_BUILDING, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER = 4,16,0
-DOTA_UNIT_ORDER_MOVE_TO_POSITION, ACT_DOTA_ATTACK, ACT_DOTA_TAUNT = 1,1,2
+DOTA_UNIT_ORDER_MOVE_TO_POSITION, ACT_DOTA_ATTACK, ACT_DOTA_TAUNT, ACT_DOTA_CAST_ABILITY_3 = 1,1,2,3
 PATTACH_ABSORIGIN_FOLLOW = 1
 local particle_id, charge, destroyed_charge, released_charge = 0,{}, {}, {}
 ParticleManager = {
@@ -179,8 +179,8 @@ assert(caster.gesture_count==nil,"travel must not trigger Io construction feedba
 assert(occupied()==1 and actual_count()==0)
 arrived();tick(0.2)
 assert(paid==1 and created==1 and refunded==0)
-assert(caster.last_gesture==ACT_DOTA_TAUNT and caster.gesture_count==1,
-    "actual construction must play the native Io cube presentation activity once")
+assert(caster.last_gesture==ACT_DOTA_CAST_ABILITY_3 and caster.gesture_count==1,
+    "actual construction must play the native Io construction cast activity once")
 local actual_charge=particle_id
 assert(charge[actual_charge]==caster and not destroyed_charge[actual_charge],
     "actual construction must create its Io charging particle")
@@ -193,7 +193,7 @@ assert(by_id[11].survival_hull_radius>0 and by_id[11]:HasModifier("modifier_buil
 assert(account.wood==10000-config.main_city.build_cost.wood)
 assert(not build().ok and paid==1,"duplicate request cannot construct a second city")
 tick(20);assert(paid==1 and created==1)
-assert(destroyed_charge[actual_charge] and released_charge[actual_charge] and caster.last_fade==ACT_DOTA_TAUNT,
+assert(destroyed_charge[actual_charge] and released_charge[actual_charge] and caster.last_fade==ACT_DOTA_CAST_ABILITY_3,
     "actual completion must retire Io charging feedback and its gesture")
 assert(occupied()==1 and actual_count()==1 and completed_events==1)
 local city=by_id[11]

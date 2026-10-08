@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-08",
+  "task": "Fix Io builder native picking/hover body while preserving arcana",
+  "baseline": "bd69bcbd",
+  "root_cause_evidence": {
+    "cube": "models/items/io/io_ti7/io_ti7.vmdl: m_hitboxsets=[]",
+    "native_io": "models/heroes/wisp/wisp.vmdl: default/select_low native hitboxes",
+    "live_builder_before": "579, cube body, hull0",
+    "wearable_spawn_table": "native model empty until explicit SetModel"
+  },
+  "fix": {
+    "npc_body": "models/heroes/wisp/wisp.vmdl",
+    "cosmetic": "models/items/io/io_ti7/io_ti7.vmdl",
+    "entity_class": "dota_item_wearable",
+    "attachment": "explicit SetModel + SetOwner + FollowEntity(true)",
+    "particle_owner": "arcana native card attachments",
+    "construction_activity": "ACT_DOTA_CAST_ABILITY_3",
+    "construction_sequence": "ti7_io_taunt",
+    "idle_sequence": "ti7_io_idle",
+    "collision_and_gameplay_unchanged": true,
+    "no_new_polling": true
+  },
+  "regressions": {
+    "passed_tests": [
+      "test_builder_io_presentation",
+      "test_builder_work_position",
+      "test_builder_yield_construction",
+      "test_builder_tower_rebuild",
+      "test_building_astral_construction",
+      "test_wall_repair_detection",
+      "test_grid_builder_preview",
+      "test_startup_asset_preload_service",
+      "test_initial_builder_camera",
+      "test_box_selection_filter"
+    ],
+    "additional_preexisting_failure": {
+      "test": "test_combat_selection_recovery",
+      "assertion_line": 178,
+      "message": "Expected actual to be strictly unequal to 0",
+      "head_source_control_exit": 1,
+      "baseline": "bd69bcbd"
+    }
+  },
+  "config_checks": {
+    "builder_definitions": {
+      "reproducible": true,
+      "gameplay_and_other_rows_unchanged": true
+    },
+    "asset_catalog": {
+      "reproducible": true,
+      "gameplay_and_other_rows_unchanged": true
+    },
+    "unit_kv_only_body_model_changed": true,
+    "native_body_hitboxes_vs_empty_cosmetic_hitboxes": true
+  },
+  "negative_control": "old cube-as-NPC builder CSV fails native clickable body regression as expected",
+  "native_probe": {
+    "exit": 0,
+    "lines": [
+      "BUILDER_IO_FINAL_NATIVE_260108 BASE=models/heroes/wisp/wisp.vmdl CHILD=models/items/io/io_ti7/io_ti7.vmdl OWNER_POS=Vector 0000000000BD0EA8 [-2000.000000 5000.000000 385.500000] CHILD_POS=Vector 0000000000BD0F50 [-2000.000000 5000.000000 385.500000] TAUNT=ti7_io_taunt HULL=0",
+      "BUILDER_IO_FINAL_NATIVE_260108 RESULT=true ERROR=nil CLEAN=true/true/true",
+      "BUILDER_IO_FINAL_NATIVE_260108_DONE"
+    ],
+    "error": ""
+  },
+  "native_probe_module_sha256": "63253a3fa8b13877ce31173b22d6e086df407928b2819419caefb38144cd794b",
+  "native_probe_limit": "final source verified after particle owner adjustment; actual client mouse/hover acceptance remains pending",
+  "verification_limits": "Private fixture model/ownership/follow/sequence/movement/cleanup checked; actual mouse picking and hover visuals await new map. Existing user entities and runtime modules not replaced.",
+  "sync": {
+    "branch": "dev",
+    "pulled_head": "bd69bcbdaed62ad2bc5773e34aa65a05a949aec3",
+    "stash": "7ff3187a6940a3310eaa2f9fa44698a0433fd914",
+    "restoration": "12 own files normalized hashes equal; all 51 original workspace entries preserved",
+    "historical_stashes_preserved": 20,
+    "isolated_snapshot": {
+      "dependency_files": 1295,
+      "passed_tests": [
+        "test_builder_io_presentation",
+        "test_builder_work_position",
+        "test_builder_yield_construction",
+        "test_builder_tower_rebuild",
+        "test_building_astral_construction",
+        "test_wall_repair_detection",
+        "test_grid_builder_preview",
+        "test_startup_asset_preload_service",
+        "test_initial_builder_camera",
+        "test_box_selection_filter"
+      ],
+      "lua_syntax_pass": [
+        "scripts/vscripts/config/generated/builder_definitions.lua",
+        "scripts/vscripts/config/generated/asset_catalog.lua",
+        "scripts/vscripts/systems/builder_presentation_service.lua",
+        "scripts/vscripts/tests/test_builder_io_presentation.lua",
+        "scripts/vscripts/tests/test_builder_yield_construction.lua"
+      ],
+      "two_csv_configs_reproduced": true,
+      "native_probed_source_matches_candidate": true,
+      "existing_combat_hud_failure_reproduces": true
+    }
+  }
+}
