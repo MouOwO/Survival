@@ -25,14 +25,6 @@ for (const coeff of [[1,0,800,0,0.5,500,0,0,1],
         assert(picked && Math.hypot(picked[0]-x,picked[1]-y)<1e-7,
             'screen cursor ray meets displayed construction plane for rotated/perspective cameras');
     }
-    const mask=api.ellipse(view,256,384,1280),angle=mask.angle*Math.PI/180;
-    for(let i=0;i<180;i++) {
-        const t=i*Math.PI/90,p=project(256+1280*Math.cos(t),384+1280*Math.sin(t));
-        const dx=p[0]-mask.x,dy=p[1]-mask.y;
-        const u=(dx*Math.cos(angle)+dy*Math.sin(angle))/mask.rx;
-        const v=(-dx*Math.sin(angle)+dy*Math.cos(angle))/mask.ry;
-        assert(Math.abs(u*u+v*v-1)<1e-7,'mask follows the projected world circle, including perspective');
-    }
     for (const line of mesh.segments) {
         const clipped=api.segment(view,line,1600,900);
         if (clipped) for(const p of clipped) assert(p[0]>=-1e-6&&p[1]>=-1e-6&&p[0]<=1600.000001&&p[1]<=900.000001);
@@ -41,7 +33,7 @@ for (const coeff of [[1,0,800,0,0.5,500,0,0,1],
 assert.equal(api.projection(reference,[[0,0],[0,0],[0,0],[0,0]]),null,'reject degenerate camera');
 assert.equal(api.unproject(null,0,0),null);
 assert.equal(api.unproject({inverse:[1,0,0,0,1,0,0,0,0]},10,10),null,'reject horizon without infinite styles');
-console.log('STATIC_GRID_GEOMETRY_PASS: 194 shared lines, 64-unit alignment, perspective mask and viewport clipping');
+console.log('STATIC_GRID_GEOMETRY_PASS: 194 shared lines, 64-unit alignment, exact perspective and viewport clipping');
 let camera=0,projectionCalls=0,segmentCalls=0;
 const mask=panel(),host=panel();
 const renderer=api.create({mask,host,viewport:()=>[1600,900],
@@ -57,19 +49,20 @@ const builds=renderer.stats.view_builds,layouts=renderer.stats.layout_writes,cre
 const segmentsBefore=segmentCalls,bridgeBefore=projectionCalls;
 for(let i=1;i<=30;i++) renderer.update([i*64,0,384]);
 assert.equal(renderer.stats.view_builds,builds,'mouse motion never rebuilds viewport geometry');
-assert.equal(renderer.stats.layout_writes,layouts,'mouse motion changes zero grid line/corner styles');
-assert.equal(segmentCalls,segmentsBefore);
+assert(renderer.stats.layout_writes>layouts && renderer.stats.layout_writes-layouts<=30*(128+160),
+    'mouse motion refreshes bounded circle-clipped endpoints and fade');
+assert(segmentCalls>segmentsBefore && segmentCalls-segmentsBefore<=30*128);
 assert.equal(panels.length,created,'mouse motion allocates no grid panels');
 assert.equal(projectionCalls-bridgeBefore,120,'four plane probes per frame, independent of cell count');
 const outer=mask.style.position.split(' ').map(parseFloat),inner=host.style.position.split(' ').map(parseFloat);
-assert(Math.abs(outer[0]+inner[0])<1e-6 && Math.abs(outer[1]+inner[1])<1e-6,
-    'mesh counter-translation keeps world grid stationary under moving mask');
+assert.deepEqual(outer,[0,0,0]);assert.deepEqual(inner,[0,0,0],
+    'world projection is rendered directly in a fixed viewport');
 camera+=128;renderer.update([30*64,0,384]);
 assert.equal(renderer.stats.view_builds,builds+1,'camera motion updates the plane projection');
 assert.equal(renderer.stats.geometry_builds,1,'fixed world geometry survives camera motion');
 renderer.hide();assert(!mask.visible);
 renderer.update([64,0,384]);assert(mask.visible,'cancel/re-enter reuses static mesh');
-console.log('STATIC_GRID_RENDER_PASS: 30 cursor steps, zero grid layout writes / allocations, one camera rebuild');
+console.log('STATIC_GRID_RENDER_PASS: 30 cursor steps, zero allocations / camera rebuilds, fixed viewport');
 const tiltedMask=panel(),tiltedHost=panel();
 const tilted=api.create({mask:tiltedMask,host:tiltedHost,viewport:()=>[1600,900],
     project:p=>[(0.67*p[0]-0.2*p[1]+820)/(0.00005*p[0]+0.00016*p[1]+1),
@@ -79,26 +72,17 @@ const tiltedLayout={bounds:{min_x:-1024,max_x:1024,min_y:-1024,max_y:1024},heigh
 tilted.configure(tiltedLayout,64,{radius:1280,grid_z_offset:6});
 for(let i=0;i<45;i++) tilted.warm();
 tilted.update([256,384,384]);
-function rotate(p,c,degrees) {
-    const r=degrees*Math.PI/180,dx=p[0]-c[0],dy=p[1]-c[1];
-    return [c[0]+Math.cos(r)*dx-Math.sin(r)*dy,c[1]+Math.sin(r)*dx+Math.cos(r)*dy];
-}
 const outerPos=tiltedMask.style.position.split(' ').map(parseFloat);
 const innerPos=tiltedHost.style.position.split(' ').map(parseFloat);
-const innerOrigin=tiltedHost.style.transformOrigin.split(' ').map((s,i)=>parseFloat(s)*(i?900:1600)/100);
-const outerOrigin=[parseFloat(tiltedMask.style.width)/2,parseFloat(tiltedMask.style.height)/2];
-const outerAngle=parseFloat(tiltedMask.style.transform.slice(8));
-const innerAngle=parseFloat(tiltedHost.style.transform.slice(8));
-assert(Math.abs(outerAngle)>0.1,'exercise a tilted perspective ellipse');
-for (const original of [[20,20],[700,600],[1590,890]]) {
-    let p=rotate(original,innerOrigin,innerAngle).map((v,i)=>v+innerPos[i]);
-    p=rotate(p,outerOrigin,outerAngle).map((v,i)=>v+outerPos[i]);
-    assert(Math.hypot(p[0]-original[0],p[1]-original[1])<0.03,'rotating mask must not rotate/move the underlying grid');
+assert.deepEqual(outerPos,[0,0,0]);assert.deepEqual(innerPos,[0,0,0]);
+for(const container of [tiltedMask,tiltedHost]) {
+    assert.equal(container.style.transform,'none','rotated cameras do not rotate or resize the viewport container');
+    assert.equal(parseFloat(container.style.width),1600);assert.equal(parseFloat(container.style.height),900);
 }
 tilted.configure(null,64,{});assert(!tilted.enabled());
 tilted.configure(tiltedLayout,64,{radius:1280,grid_z_offset:6});
 assert(tilted.enabled(),'same geometry can be restored after missing/invalid profiles');
-console.log('STATIC_GRID_TRANSFORM_PASS: tilted mask counter-transform preserves screen grid');
+console.log('STATIC_GRID_TRANSFORM_PASS: tilted camera retains fixed viewport containers');
 // Whole 128-native-tile map, including ocean beyond the construction island.
 const whole={bounds:{min_x:-16384,max_x:16384,min_y:-16384,max_y:16384},height:384};
 assert.equal(api.geometry(whole,64).segments.length,1026);
@@ -131,15 +115,16 @@ distant.configure(whole,64,{radius:1280,grid_z_offset:6});
 distant.setPlaneRange(true);
 for(const location of [[12000,13000],[-14000,-10000],[12000,-12000],[0,4000]]) {
     cameraWorld=location;for(let n=0;n<50;n++)distant.warm();
+    distant.update([location[0],location[1],384]);
     for(const offset of [[0,0],[512,512],[-512,-384]]) {
         const w=[location[0]+offset[0],location[1]+offset[1],390],screen=engineProject(w);
         const picked=distant.worldAtScreen(screen);assert(picked);
         assert(Math.hypot(picked[0]-w[0],picked[1]-w[1])<8,
             'distant quantized engine projection must remain well below half-cell picking error');
         distant.update([w[0],w[1],384]);roundTrips++;
-        assert(distantMask.visible&&distantOutline.visible);
-        for(const key of ['position','width','height','transform'])
-            assert.equal(distantOutline.style[key],distantMask.style[key],'remote outline and grid share the exact ellipse');
+        assert(distantMask.visible);
+        for(const container of [distantMask,distantOutline]) for(const value of Object.values(container.style))
+            assert(!/NaN|Infinity/.test(String(value)),'remote grid and outline styles remain finite');
     }
     assert(distant.stats.corner_candidates<=4356,'bounded mark work even for the whole map');
 }
@@ -148,4 +133,4 @@ projectionMissing=true;distant.refreshView();assert(!distantMask.visible);
 projectionMissing=false;distant.update([cameraWorld[0],cameraWorld[1],384]);
 assert(distantMask.visible,'same camera must recover after a temporary invalid engine projection');
 distant.hide();assert(!distantOutline.visible);
-console.log('STATIC_GRID_DISTANT_CAMERA_PASS quantized_projection_roundtrips='+roundTrips+'; synchronized outline; bounded corner work');
+console.log('STATIC_GRID_DISTANT_CAMERA_PASS quantized_projection_roundtrips='+roundTrips+'; finite outline; bounded corner work');

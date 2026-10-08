@@ -29,6 +29,6 @@ for (let y = 0; y < height; y += 17) for (let x = 0; x < width; x += 17) {
 }
 assert.equal(alphaAt(1, 0), 0);
 const css = fs.readFileSync('panorama/src/styles/custom_game/survival_grid_placement.css', 'utf8');
-assert(css.includes('opacity-mask: url("file://{images}/custom_game/survival_grid/range_mask.png")'),
-    'use a native texture for opacity-mask, never the SVG that hid the complete subtree');
-console.log('GRID_MASK_PASS: deterministic RGBA / opaque center / symmetric monotonic feather / texture reference');
+assert(!/opacity-mask\s*:/.test(css),
+    'the retained legacy texture must not reintroduce ellipse-sized preview compositing');
+console.log('GRID_MASK_PASS: legacy RGBA remains reproducible; live preview has no opacity-mask');

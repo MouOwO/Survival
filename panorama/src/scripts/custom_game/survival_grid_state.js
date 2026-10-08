@@ -56,6 +56,40 @@
         return "radial("+(100*center[0]/width).toFixed(6)+"% "+(100*center[1]/height).toFixed(6)+
             "%,"+start.toFixed(6)+"deg,"+span.toFixed(6)+"deg)";
     }
+    function clipPolygon(points,distance) {
+        if(!points.length) return points;
+        var result=[],previous=points[points.length-1],before=distance(previous);
+        for(var i=0;i<points.length;i++) {
+            var current=points[i],after=distance(current);
+            if((before>=0)!==(after>=0)) {
+                var t=before/(before-after);
+                result.push([previous[0]+(current[0]-previous[0])*t,previous[1]+(current[1]-previous[1])*t]);
+            }
+            if(after>=0) result.push(current);
+            previous=current;before=after;
+        }
+        return result;
+    }
+    function clipViewport(points,viewport) {
+        points=clipPolygon(points,function(p){return p[0];});
+        points=clipPolygon(points,function(p){return viewport[0]-p[0];});
+        points=clipPolygon(points,function(p){return p[1];});
+        return clipPolygon(points,function(p){return viewport[1]-p[1];});
+    }
+    function tidyPolygon(points) {
+        var clean=[];
+        for(var i=0;i<points.length;i++) {
+            var p=points[i],last=clean[clean.length-1];
+            if(!last || Math.abs(p[0]-last[0])+Math.abs(p[1]-last[1])>1e-6) clean.push(p);
+        }
+        if(clean.length>1 && Math.abs(clean[0][0]-clean[clean.length-1][0])+
+            Math.abs(clean[0][1]-clean[clean.length-1][1])<1e-6) clean.pop();
+        for(var j=clean.length-1;j>=0 && clean.length>=3;j--) {
+            var a=clean[(j+clean.length-1)%clean.length],b=clean[j],c=clean[(j+1)%clean.length];
+            if(Math.abs((b[0]-a[0])*(c[1]-b[1])-(b[1]-a[1])*(c[0]-b[0]))<1e-7) clean.splice(j,1);
+        }
+        return clean;
+    }
     function runIndex(rects,bucketSize) {
         var buckets={},bounds=null,size=Math.max(512,Number(bucketSize)||512);
         for(var i=0;i<rects.length;i++) {
@@ -91,7 +125,7 @@
         var dynamicRuns=[],dynamicPanels=[],dynamicRevision=0,dynamicSource="";
         var viewKey="",revision=0,footKey="",atlasSource="",drawKey="";
         var buildBounds=null,outsideRuns=[],outsidePanels=[],outsideZ=0,layoutKey="";
-        var visibleWorld=null;
+        var visibleWorld=null,range=null,rangeKey="",rangeEdges=[];
         var terrainIndex=runIndex([]),dynamicIndex=runIndex([]),lastTerrain=[],lastDynamic=[],terrainVersion=0;
         var stats={terrain_builds:0,terrain_layouts:0,footprint_layouts:0,terrain_panels:0,footprint_panels:0,terrain_candidates:0,
             dynamic_decodes:0,dynamic_builds:0,dynamic_reuses:0};
@@ -99,32 +133,85 @@
             var p=$.CreatePanel("Panel",host,"");p.hittest=false;p.visible=false;
             p.AddClass("GridStateQuad");p.AddClass(kind);
             p.__fill=$.CreatePanel("Panel",p,"");p.__fill.hittest=false;p.__fill.AddClass("GridStateFill");
+            p.__clips=[p,p.__fill];
             return p;
         }
-        function paint(panel,rect,z) {
+        function refreshRange() {
+            var next=options.range && options.range();
+            if(!next || !isFinite(next.x) || !isFinite(next.y) || !(next.radius>0) || !isFinite(next.radius)) next=null;
+            var key=next?[next.x,next.y,next.radius].join(":"):"";
+            if(key===rangeKey) return false;
+            rangeKey=key;range=next;rangeEdges=[];
+            if(next) {
+                // An inscribed polygon avoids a full-viewport opacity mask.
+                // The inner radius also identifies rectangles requiring no clip.
+                for(var i=0;i<32;i++) {
+                    var angle=(i+0.5)*Math.PI/16;
+                    rangeEdges.push([Math.cos(angle),Math.sin(angle),next.radius*Math.cos(Math.PI/32)]);
+                }
+            }
+            return true;
+        }
+        function rangeRelation(rect) {
+            if(!range) return 1;
+            var nearX=Math.max(rect[0]-range.x,0,range.x-rect[2]);
+            var nearY=Math.max(rect[1]-range.y,0,range.y-rect[3]);
+            if(nearX*nearX+nearY*nearY>range.radius*range.radius) return 0;
+            var farX=Math.max(Math.abs(rect[0]-range.x),Math.abs(rect[2]-range.x));
+            var farY=Math.max(Math.abs(rect[1]-range.y),Math.abs(rect[3]-range.y));
+            var inner=range.radius*Math.cos(Math.PI/32);
+            return farX*farX+farY*farY<=inner*inner?1:2;
+        }
+        function paint(panel,rect,z,clipRange) {
             if(visibleWorld && (rect[2]<visibleWorld[0] || rect[0]>visibleWorld[2]
                 || rect[3]<visibleWorld[1] || rect[1]>visibleWorld[3])) {
                 if(panel.visible) panel.visible=false;
                 return;
             }
-            var points=[[rect[0],rect[1],z],[rect[2],rect[1],z],
-                [rect[2],rect[3],z],[rect[0],rect[3],z]].map(options.project);
-            if(points.some(function(p){return !p;})) {panel.visible=false;return;}
-            var xs=points.map(function(p){return p[0];}),ys=points.map(function(p){return p[1];});
-            var left=Math.min.apply(Math,xs),top=Math.min.apply(Math,ys),viewport=options.viewport();
-            if(Math.max.apply(Math,xs)<0 || left>viewport[0] || Math.max.apply(Math,ys)<0 || top>viewport[1]) {
+            var r=visibleWorld?[Math.max(rect[0],visibleWorld[0]),Math.max(rect[1],visibleWorld[1]),
+                Math.min(rect[2],visibleWorld[2]),Math.min(rect[3],visibleWorld[3])]:rect;
+            var relation=clipRange?rangeRelation(r):1;
+            if(relation===0) {panel.visible=false;return;}
+            var points=[[r[0],r[1]],[r[2],r[1]],[r[2],r[3]],[r[0],r[3]]];
+            if(relation===2) for(var edge=0;edge<rangeEdges.length && points.length;edge++) {
+                var e=rangeEdges[edge];
+                points=clipPolygon(points,function(p){return e[2]-e[0]*(p[0]-range.x)-e[1]*(p[1]-range.y);});
+            }
+            if(points.length<3) {panel.visible=false;return;}
+            var world=points.map(function(p){return [p[0],p[1],z];}),viewport=options.viewport();
+            // Homogeneous clipping preserves the visible part when one world
+            // corner crosses the camera plane, before perspective division.
+            points=options.projectPolygon?options.projectPolygon(world):world.map(options.project);
+            if(!points || points.some(function(p){return !p || !isFinite(p[0]) || !isFinite(p[1]);})) {
                 panel.visible=false;return;
             }
-            left=Math.floor(left);top=Math.floor(top);
+            points=tidyPolygon(clipViewport(points,viewport));
+            if(points.length<3) {panel.visible=false;return;}
+            var xs=points.map(function(p){return p[0];}),ys=points.map(function(p){return p[1];});
+            var left=Math.max(0,Math.floor(Math.min.apply(Math,xs))),top=Math.max(0,Math.floor(Math.min.apply(Math,ys)));
             // A non-square clip frame skews the native radial edges. Keep the
             // projected vertices unchanged and only pad the invisible bounds.
-            var side=Math.max(1,Math.ceil(Math.max.apply(Math,xs))-left,Math.ceil(Math.max.apply(Math,ys))-top);
+            // Viewport clipping bounds every render target even at extreme zoom.
+            var side=Math.max(1,Math.min(viewport[0],Math.ceil(Math.max.apply(Math,xs)))-left,
+                Math.min(viewport[1],Math.ceil(Math.max.apply(Math,ys)))-top);
             var width=side,height=side;
             points=points.map(function(p){return [p[0]-left,p[1]-top];});
             options.setStyle(panel,"position",left+"px "+top+"px 0px");
             options.setStyle(panel,"width",width+"px");options.setStyle(panel,"height",height+"px");
-            options.setStyle(panel,"clip",wedge(points[0],points[1],points[3],width,height));
-            options.setStyle(panel.__fill,"clip",wedge(points[2],points[1],points[3],width,height));
+            // Each nested wedge supplies two polygon edges. Only the deepest
+            // panel paints, so clipping introduces no translucent overlap seams.
+            var count=Math.ceil(points.length/2),clips=panel.__clips;
+            while(clips.length<count) {
+                var previous=clips[clips.length-1];
+                options.setStyle(previous,"backgroundColor","#00000000");
+                var child=$.CreatePanel("Panel",previous,"");child.hittest=false;child.AddClass("GridStateFill");
+                options.setStyle(child,"overflow","clip");clips.push(child);
+            }
+            for(var i=0;i<clips.length;i++) {
+                var vertex=i*2;
+                options.setStyle(clips[i],"clip",i<count?wedge(points[vertex],points[(vertex+1)%points.length],
+                    points[(vertex+points.length-1)%points.length],width,height):"none");
+            }
             panel.visible=true;
         }
         function staticSample(x,y) {
@@ -147,21 +234,27 @@
         function warm() {
             var camera=options.cameraKey(),next=camera+":"+(options.coverageKey?options.coverageKey():""),budget=24;
             if(next!==viewKey) {viewKey=next;revision++;footKey="";}
+            if(refreshRange()) revision++;
             var nextDraw=revision+":"+dynamicRevision;
             if(drawKey===nextDraw && terrain.length>=redRuns.length && dynamicPanels.length>=dynamicRuns.length) return;
             drawKey=nextDraw;
-            // The whole non-buildable map is four static rectangles, not
-            // hundreds of thousands of ocean cells. Clip only on camera change.
+            // The non-buildable map uses four rectangles. Reclip their visible
+            // portions only when the camera or placement range changes.
             while(outsidePanels.length<outsideRuns.length) outsidePanels.push(newPanel(options.terrainHost,"TerrainBlocked"));
             var visible=options.visibleBounds && options.visibleBounds();
             visibleWorld=visible;
+            if(range) {
+                var circleBounds=[range.x-range.radius,range.y-range.radius,range.x+range.radius,range.y+range.radius];
+                visible=visible?[Math.max(visible[0],circleBounds[0]),Math.max(visible[1],circleBounds[1]),
+                    Math.min(visible[2],circleBounds[2]),Math.min(visible[3],circleBounds[3])]:circleBounds;
+            }
             for(var k=0;k<outsidePanels.length;k++) {
                 var outer=outsidePanels[k],r=outsideRuns[k];
                 if(!r) {outer.visible=false;continue;}
                 if(outer.__revision===revision) continue;
                 var clipped=visible?[Math.max(r[0],visible[0]),Math.max(r[1],visible[1]),
                     Math.min(r[2],visible[2]),Math.min(r[3],visible[3])]:r;
-                if(clipped[2]>clipped[0] && clipped[3]>clipped[1]) paint(outer,clipped,outsideZ+options.zOffset());
+                if(clipped[2]>clipped[0] && clipped[3]>clipped[1]) paint(outer,clipped,outsideZ+options.zOffset(),true);
                 else outer.visible=false;
                 outer.__revision=revision;
             }
@@ -174,9 +267,9 @@
             }
             for(var i=0;i<candidates.length;i++) {
                 var id=candidates[i],p=terrain[id];if(!p) continue;
-                var paintKey=camera+":"+terrainVersion;
+                var paintKey=camera+":"+terrainVersion+":"+(rangeRelation(redRuns[id])===1?"inside":rangeKey);
                 if(p.__paintKey!==paintKey) {
-                    paint(p,redRuns[id],atlas.z+options.zOffset());p.__paintKey=paintKey;p.__paintVisible=p.visible;stats.terrain_layouts++;
+                    paint(p,redRuns[id],atlas.z+options.zOffset(),true);p.__paintKey=paintKey;p.__paintVisible=p.visible;stats.terrain_layouts++;
                 } else p.visible=p.__paintVisible;
             }
             lastTerrain=candidates;
@@ -190,9 +283,9 @@
                 }
                 for(var j=0;j<selected.length;j++) {
                     var p=dynamicPanels[selected[j]];if(!p) continue;
-                    var key=camera+":"+dynamicRevision;
+                    var key=camera+":"+dynamicRevision+":"+(rangeRelation(dynamicRuns[selected[j]])===1?"inside":rangeKey);
                     if(p.__paintKey!==key) {
-                        paint(p,dynamicRuns[selected[j]],dynamic.z+options.zOffset());p.__paintKey=key;p.__paintVisible=p.visible;
+                        paint(p,dynamicRuns[selected[j]],dynamic.z+options.zOffset(),true);p.__paintKey=key;p.__paintVisible=p.visible;
                     } else p.visible=p.__paintVisible;
                 }
                 lastDynamic=selected;
@@ -234,8 +327,11 @@
             }
             stats.footprint_layouts++;stats.footprint_panels=foot.length;
             var corners=[[x0,y0,z],[x0+nx*size,y0,z],[x0+nx*size,y0+ny*size,z],[x0,y0+ny*size,z]];
+            var viewport=options.viewport();
             for(var m=0;m<4;m++) {
                 var p=options.project([corners[m][0],corners[m][1],z+options.zOffset()]);
+                if(p && (!isFinite(p[0]) || !isFinite(p[1]) || p[0]<-4 || p[1]<-4
+                    || p[0]>viewport[0]+4 || p[1]>viewport[1]+4)) p=null;
                 var mark=marks[m];mark.visible=!!p;
                 if(p) options.setStyle(mark,"position",(p[0]-4).toFixed(3)+"px "+(p[1]-4).toFixed(3)+"px 0px");
             }

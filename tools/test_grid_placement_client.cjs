@@ -64,7 +64,7 @@ vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/survival_gr
     Abilities: { GetLocalPlayerActiveAbility: () => nativeAbility,
         GetAbilityName: id => id === 20 ? 'ability_building_blink' : '',
         GetCooldownTimeRemaining: () => moveCooldown },
-    Entities: { GetUnitName: () => 'builder' }, CustomNetTables: {}
+    Entities: { GetUnitName: () => 'builder' }, CustomNetTables: {GetTableValue:()=>null}
 });
 listeners.ui_grid_placement_profiles({ cell_size: 64, profiles: [{ ability_name: 'build',
     grid_footprint_x: 2, grid_footprint_y: 2, building_id: 'tower' }] });

@@ -25,7 +25,7 @@ const context=vm.createContext({$,GameUI:{CustomUIConfig:()=>shared,
     Particles:{CreateParticle:()=>0,SetParticleControl(){},DestroyParticleEffect(){},ReleaseParticleIndex(){}},
     ParticleAttachment_t:{PATTACH_WORLDORIGIN:6},
     GameEvents:{Subscribe:(name,fn)=>listeners[name]=fn,SendCustomGameEventToServer:(name,data)=>sent.push({name,data})},
-    Abilities:{GetLocalPlayerActiveAbility:()=>-1},Entities:{GetUnitName:()=> 'builder'},CustomNetTables:{}});
+    Abilities:{GetLocalPlayerActiveAbility:()=>-1},Entities:{GetUnitName:()=> 'builder'},CustomNetTables:{GetTableValue:()=>null}});
 for(const file of ['survival_static_grid.js','survival_grid_state.js','survival_grid_placement.js']) {
     vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file,'utf8'),context);
     if(process.env.GRID_LEGACY_HELPERS==='1' && file!=='survival_grid_placement.js') {
@@ -94,7 +94,9 @@ for(let i=1;i<=20;i++) {
     assert(terrain.some(p=>p.visible),'static red terrain is never cleared on cursor movement');
     assert.equal(foot().filter(p=>p.classes.has('Blocked')).length,i%2?0:1,'local lookup colors the latest snapped footprint immediately');
 }
-assert.equal(stats.layout_writes,beforeLayouts);assert.equal(stats.view_builds,beforeViews);
+assert(stats.layout_writes-beforeLayouts<=20*(stats.line_panels+stats.mark_panels),
+    'cursor-dependent circle clipping refreshes only the bounded visible white pool');
+assert.equal(stats.view_builds,beforeViews);
 assert.equal(state.terrain_layouts,beforeTerrain,'mouse moves never relayout static red geometry');
 assert.equal(all.length,beforeNodes);assert.equal(requests().length,beforeRequests);
 assert(bridges-beforeBridges<=20*10,'projections reuse the cached plane transform');
@@ -151,4 +153,5 @@ shared.SurvivalGridControllerEpoch++;
 update();warmWhite();warmColors();iconTick();
 assert.equal(scheduled.length,scheduledBefore,'old controller schedules stop after hot reload');
 assert.equal(writes,writesBefore,'old controller cannot compete over icon and grid positions');
-console.log('STATIC_GRID_INTEGRATION_PASS preloaded_nodes='+coldCount+'; 20 fast frames, zero static relayouts/allocations/requests');
+console.log('STATIC_GRID_INTEGRATION_PASS preloaded_nodes='+coldCount+
+    '; 20 fast frames, bounded white layout; zero terrain relayouts/allocations/requests');

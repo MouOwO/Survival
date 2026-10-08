@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-08",
+  "task": "Preconstruction grid zoom visibility and rendering cost",
+  "changes": [
+    "Clip lines and feather alpha in world space before perspective projection.",
+    "Keep containers at viewport dimensions; remove whole-grid opacity-mask.",
+    "Limit decorative corner pool to 160; preserve every 64-unit boundary and exact footprint.",
+    "Clip terrain polygons against world range, camera plane and viewport; reuse cached interior geometry."
+  ],
+  "validation": {
+    "regression_suites": [
+      "test_static_grid",
+      "test_grid_state",
+      "test_grid_zoom_layout",
+      "test_grid_zoom_visibility",
+      "test_grid_static_integration",
+      "test_grid_placement_client",
+      "test_grid_dynamic_cache",
+      "test_building_move_grid",
+      "test_grid_mask"
+    ],
+    "all_passed": true,
+    "zoom_camera_samples": 77,
+    "minimum_mock_camera_distance": 240,
+    "maximum_quantized_pick_error_world_units": 5.372137646167555,
+    "zoom_layout_25_steps": {
+      "white_layout_operations": 3362,
+      "terrain_layout_attempts": 798
+    },
+    "stationary": {
+      "style_writes": 0,
+      "new_panels": 0
+    },
+    "near_plane_terrain_distances": [
+      240,
+      400,
+      512
+    ],
+    "full_footprint_cells": 16,
+    "resourcecompiler": {
+      "resources": 4,
+      "failed": 0
+    },
+    "sanitized_controller_regressions_passed": true
+  },
+  "native_observation": {
+    "preview_visible": true,
+    "white_lines_visible": 68,
+    "decorative_pool": 160,
+    "mask_pixels": 0,
+    "terrain_and_footprint_visible": true,
+    "new_grid_css_errors_observed": false,
+    "screenshot": "output/grid_zoom_runtime/after_visible_600.png",
+    "zoom_distance_not_verified": true,
+    "fps_improvement_measured": false,
+    "limitations": "The native renderer reported zero FPS samples and successive camera captures were identical. The frame is evidence of new grid rendering only, not a completed live zoom sweep or measured FPS gain. Existing game/map were preserved; temporary probe resources were removed."
+  },
+  "sync": {
+    "branch": "dev",
+    "upstream": "origin/dev",
+    "stash_object": "3d3a373f93fb58c033a33698debd1915f2510863",
+    "pull": "Already up to date",
+    "stash_popped_by_verified_identity": true,
+    "other_worktree_changes_preserved": true
+  },
+  "sources": {
+    "panorama/src/scripts/custom_game/survival_static_grid.js": "8f56747957a3de443a1db2d9b002d8cfff324e35e0556e7f56424c6181c4f1a2",
+    "panorama/src/scripts/custom_game/survival_grid_state.js": "ed7ba3d92b728eae56df9e43db6725a2e88185c35734c8e547e04732b5384574",
+    "panorama/src/styles/custom_game/survival_grid_placement.css": "6335eab84fe2839c5a8772a9553c5043eb0400276b675aa5496fa0a6eca2a186",
+    "panorama/src/scripts/custom_game/survival_grid_placement.js": "56b4d248a444e16ae6f287bf60bf35a785bc8cb4b7ed1e65d1ffdd47aa6c5261"
+  }
+}

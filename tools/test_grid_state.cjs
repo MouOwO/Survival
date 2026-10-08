@@ -1,7 +1,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const shared={},all=[];
 function panel(host) {
-    const p={host,visible:false,style:{},classes:new Set(),AddClass(c){this.classes.add(c);},
+    const p={host,visible:false,style:{},classes:new Set(),AddClass(c){this.classes.add(c);},RemoveClass(c){this.classes.delete(c);},
         SetHasClass(c,v){v?this.classes.add(c):this.classes.delete(c);}};all.push(p);return p;
 }
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/survival_grid_state.js','utf8'),
@@ -122,3 +122,146 @@ culled.configure('3|64|0|0|96|96|384|'+'5'.repeat(96*96/2));
 for(let i=0;i<60;i++)culled.warm();
 assert.equal(offscreenProjections,0,'offscreen island terrain must not enter projection or engine fallback');
 console.log('GRID_DISTANT_CULL_PASS 1152 strips -> 144 rectangles; 0 offscreen projections');
+
+function paintedAt(p,x,y) {
+    if(!p.visible)return false;
+    const position=p.style.position.split(' ').map(parseFloat),side=parseFloat(p.style.width);
+    const local=[x-position[0],y-position[1]];
+    return local[0]>=0&&local[1]>=0&&local[0]<=side&&local[1]<=side&&
+        p.__clips.every(c=>c.style.clip==='none'||contains(c.style.clip,local,side,side));
+}
+function inRangePolygon(x,y,range) {
+    return Array.from({length:32},(_,i)=>{
+        const angle=(i+0.5)*Math.PI/16;
+        return Math.cos(angle)*(x-range.x)+Math.sin(angle)*(y-range.y)<=range.radius*Math.cos(Math.PI/32);
+    }).every(Boolean);
+}
+let range={x:0,y:0,radius:220},rangeWrites=0;
+const rangeTerrain={},rangeDynamic={},rangeFoot={};
+const ranged=api.create({terrainHost:rangeTerrain,dynamicHost:rangeDynamic,footHost:rangeFoot,
+    range:()=>range,project:p=>[p[0]+300,p[1]+300],cameraKey:()=> 'fixed',
+    setStyle:(p,k,v)=>{p.style[k]=v;rangeWrites++;},cellSize:()=>64,zOffset:()=>6,viewport:()=>[600,600]});
+ranged.ingestDynamic('3|64|-4|-4|8|8|384|'+'5'.repeat(32));ranged.warm();
+const circularDynamic=all.filter(p=>p.host===rangeDynamic&&p.visible);
+assert.equal(circularDynamic.length,1);
+assert.equal(circularDynamic[0].__clips.length,16,'a complete range uses sixteen wedges for its 32 polygon edges');
+for(let x=2;x<600;x+=9)for(let y=3;y<600;y+=11) {
+    assert.equal(paintedAt(circularDynamic[0],x,y),inRangePolygon(x-300,y-300,range),
+        'all nested native wedges fill exactly the circle polygon with no outside color');
+}
+ranged.configure('3|64|-4|-4|8|8|384|'+'5'.repeat(32));ranged.warm();
+assert(!circularDynamic[0].visible,'late static terrain still removes duplicate dynamic range color');
+const circularTerrain=all.find(p=>p.host===rangeTerrain&&p.visible);
+assert(circularTerrain);
+for(let x=2;x<600;x+=9)for(let y=3;y<600;y+=11) {
+    assert.equal(paintedAt(circularTerrain,x,y),inRangePolygon(x-300,y-300,range));
+}
+const stillWrites=rangeWrites;ranged.warm();
+assert.equal(rangeWrites,stillWrites,'unchanged circle and camera perform no style writes');
+range={x:400,y:0,radius:220};ranged.warm();
+assert(!paintedAt(circularTerrain,100,300)&&paintedAt(circularTerrain,510,300),
+    'changing only the range center clips cached terrain to its new circle');
+
+// Fill panels remain bounded even when perspective maps a cell well past every
+// viewport edge. A fully visible cell must not disappear at extreme zoom.
+const closeFoot={};
+const close=api.create({terrainHost:{},dynamicHost:{},footHost:closeFoot,
+    range:()=>({x:0,y:0,radius:1}),project:p=>[p[0]*1e7+400,p[1]*1e7+300],cameraKey:()=> 'close',
+    setStyle:(p,k,v)=>{p.style[k]=v;},cellSize:()=>64,zOffset:()=>6,viewport:()=>[800,600]});
+close.update([0,0,384],{grid_footprint_x:1,grid_footprint_y:1},null);
+const closeCell=all.find(p=>p.host===closeFoot&&p.classes.has('FootprintTile')&&p.visible);
+assert(closeCell,'a footprint remains complete even when it extends beyond the terrain range');
+assert.equal(closeCell.style.width,'800px');
+assert.equal(closeCell.style.height,'800px');
+for(let x=10;x<800;x+=31)for(let y=10;y<600;y+=29)assert(paintedAt(closeCell,x,y));
+
+// The viewport turns a projected quad into a polygon with more than four edges.
+// Check actual fill membership against the inverse projection, including the
+// clipped edges, rather than only counting panels or testing bounds.
+const slicedFoot={},affine=p=>[p[0]*12+p[1]*7+120,-p[0]*6+p[1]*13+300];
+const sliced=api.create({terrainHost:{},dynamicHost:{},footHost:slicedFoot,
+    project:affine,cameraKey:()=> 'sliced',setStyle:(p,k,v)=>{p.style[k]=v;},
+    cellSize:()=>64,zOffset:()=>6,viewport:()=>[600,500]});
+sliced.update([0,0,384],{grid_footprint_x:1,grid_footprint_y:1},null);
+const slicedCell=all.find(p=>p.host===slicedFoot&&p.classes.has('FootprintTile')&&p.visible);
+assert(slicedCell.__clips.length>2,'viewport clipping can produce more than four polygon edges');
+assert(parseFloat(slicedCell.style.width)<=600);
+for(let sx=3;sx<600;sx+=11)for(let sy=5;sy<500;sy+=13) {
+    const x=(13*(sx-120)-7*(sy-300))/198,y=(6*(sx-120)+12*(sy-300))/198;
+    if(Math.min(Math.abs(Math.abs(x)-32),Math.abs(Math.abs(y)-32))<0.001)continue;
+    assert.equal(paintedAt(slicedCell,sx,sy),Math.abs(x)<32&&Math.abs(y)<32,
+        'clipped convex polygons retain every interior pixel and no outside pixel');
+}
+
+let cachingRange={x:0,y:0,radius:900};
+const cachingTerrain={},cachingFoot={};
+const caching=api.create({terrainHost:cachingTerrain,dynamicHost:{},footHost:cachingFoot,
+    range:()=>cachingRange,project:p=>[p[0]*0.2+300,p[1]*0.2+300],cameraKey:()=> 'range-cache',
+    setStyle:(p,k,v)=>{p.style[k]=v;},cellSize:()=>64,zOffset:()=>6,viewport:()=>[600,600]});
+caching.configure('3|64|-16|-16|32|32|384|'+'5'.repeat(512));
+caching.update([0,0,384],{grid_footprint_x:2,grid_footprint_y:2},null);
+const beforeRangeTerrain=caching.stats.terrain_layouts,beforeRangeFoot=caching.stats.footprint_layouts;
+cachingRange={x:8,y:8,radius:900};
+caching.update([0,0,384],{grid_footprint_x:2,grid_footprint_y:2},null);
+assert.equal(caching.stats.footprint_layouts,beforeRangeFoot,'range motion never invalidates an unchanged footprint');
+assert(caching.stats.terrain_layouts>beforeRangeTerrain&&caching.stats.terrain_layouts<beforeRangeTerrain*2,
+    'range motion only repaints boundary blocks, reusing interior terrain');
+console.log('GRID_RANGE_CLIP_PASS exact convex fills; viewport-bounded panels; boundary-only range repaint');
+
+// Exercise the production homography and polygon clip together. A rotated
+// close camera puts two corners of a single terrain block behind its plane;
+// its visible interior and every visible footprint cell must still be filled.
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/survival_static_grid.js','utf8'),
+    {GameUI:{CustomUIConfig:()=>shared},$:{CreatePanel:(_,host)=>panel(host)}});
+let nearDistance=240,crossingPolygons=0;
+function nearEngine(p) {
+    const u=(p[0]-p[1])*Math.SQRT1_2,v=(p[0]+p[1])*Math.SQRT1_2,w=nearDistance+v;
+    return w>1e-6?[800+600*u/w,450-600*v/w]:null;
+}
+const nearMask=panel({}),nearHost=panel({}),nearTerrain={},nearFoot={};
+const nearGrid=shared.SurvivalStaticGrid.create({mask:nearMask,host:nearHost,
+    viewport:()=>[1600,900],referenceWorld:()=>[0,0,384],project:nearEngine,
+    setStyle:(p,k,v)=>{p.style[k]=v;},positionSegment(){}});
+assert(nearGrid.configure({bounds:{min_x:-4096,max_x:4096,min_y:-4096,max_y:4096},height:384},64,
+    {radius:1280,grid_z_offset:6}));
+for(let i=0;i<12;i++)nearGrid.warm();
+const nearState=api.create({terrainHost:nearTerrain,dynamicHost:{},footHost:nearFoot,
+    range:()=>nearGrid.range(),visibleBounds:()=>nearGrid.drawBounds(),project:p=>nearGrid.project(p),
+    projectPolygon:points=>{
+        const visible=points.map(p=>!!nearGrid.project(p));
+        if(visible.some(Boolean)&&visible.some(v=>!v))crossingPolygons++;
+        return nearGrid.projectPolygon(points);
+    },cameraKey:()=>nearGrid.cameraKey(),setStyle:(p,k,v)=>{p.style[k]=v;},
+    cellSize:()=>64,zOffset:()=>6,viewport:()=>[1600,900]});
+nearState.configure('3|64|-8|-8|8|8|384|'+'5'.repeat(32));
+for(const distance of [240,400,512]) {
+    nearDistance=distance;nearGrid.update([0,0,384]);
+    const beforeCrossing=crossingPolygons;
+    nearState.update([0,0,384],{grid_footprint_x:4,grid_footprint_y:4},null);
+    assert(nearMask.visible,'the real grid projection survives close-camera horizon crossings');
+    assert(crossingPolygons>beforeCrossing,'terrain corners actually cross the camera plane at distance '+distance);
+    const reds=all.filter(p=>p.host===nearTerrain&&p.visible);
+    assert.equal(reds.length,1,'the partly behind-camera terrain block retains its visible portion');
+    const cells=all.filter(p=>p.host===nearFoot&&p.classes.has('FootprintTile')&&p.visible);
+    assert.equal(cells.length,16,'all 4 by 4 footprint cells remain represented at distance '+distance);
+    for(const p of reds.concat(cells)) {
+        assert.equal(p.style.width,p.style.height);
+        assert(parseFloat(p.style.width)<=1600,'near-plane clipping never allocates a giant color surface');
+        assert(!/NaN|Infinity/.test(JSON.stringify(p.style)));
+    }
+    for(let sx=9;sx<1600;sx+=37)for(let sy=7;sy<900;sy+=29) {
+        const world=nearGrid.worldAtScreen([sx,sy]);
+        if(world&&Math.min(Math.abs(world[0]),Math.abs(world[1]),Math.abs(world[0]+512),Math.abs(world[1]+512))<0.001)continue;
+        const expected=!!world&&world[0]>-512&&world[0]<0&&world[1]>-512&&world[1]<0;
+        assert.equal(paintedAt(reds[0],sx,sy),expected,'near-plane red fill matches the inverse world projection');
+    }
+    cells.forEach((p,i)=>{
+        const gx=Math.floor(i/4),gy=i%4;
+        for(let u=0.1;u<1;u+=0.2)for(let v=0.1;v<1;v+=0.2) {
+            const screen=nearGrid.project([-128+(gx+u)*64,-128+(gy+v)*64,390]);
+            if(screen&&screen[0]>0&&screen[0]<1600&&screen[1]>0&&screen[1]<900)
+                assert(paintedAt(p,screen[0],screen[1]),'every on-screen footprint interior remains filled');
+        }
+    });
+}
+console.log('GRID_NEAR_PLANE_PASS distances=240,400,512; visible red polygon; complete 4x4 footprint; bounded surfaces');

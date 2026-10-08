@@ -261,6 +261,9 @@
             visibleBounds:function(){return staticGrid.drawBounds ? staticGrid.drawBounds()
                 : staticGrid.visibleBounds ? staticGrid.visibleBounds() : null;},
             coverageKey:function(){return staticGrid.coverageKey ? staticGrid.coverageKey() : "";},
+            range:function(){return staticGrid.range ? staticGrid.range() : null;},
+            projectPolygon:function(points){return staticGrid.projectPolygon ? staticGrid.projectPolygon(points)
+                : points.map(function(world){return staticGrid.project(world);});},
             terrainHost:$("#GridPlacementTerrain"),dynamicHost:cellHost,footHost:$("#GridPlacementFootprintTiles"),
             // Behind-camera/offscreen plane geometry must never fall back to
             // thousands of engine WorldToScreen calls while the camera pans.
