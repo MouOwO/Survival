@@ -43,6 +43,7 @@ package.loaded["systems/wave_system"] = {
     get_player_spawn_marker=function() return {IsNull=function() return false end,GetAbsOrigin=function() return Vector(0,0,0) end} end,
     spawn_challenge_monster=function() return unit("boss",Vector(0,0,0)) end}
 local function setup()
+    require("systems/gameplay_phase_guard").reset()
     clock,winners,rewards,removed,cancels,units,serial,pending=100,0,0,0,{},{},0,false
     bus.reset();scheduler.clear()
     GameRules={GetGameTime=function() return clock end,SetGameWinner=function(_,team) assert(team==2);winners=winners+1 end}
@@ -99,6 +100,7 @@ package.loaded["systems/archive_endless_service"]=nil
 local endless=require("systems/archive_endless_service")
 local phase_expired=false
 local function endless_setup()
+    require("systems/gameplay_phase_guard").reset()
     bus.reset();scheduler.clear();clock=0;rewards=0;phase_expired=false
     bus.handle_request("archive.challenge_state",function() return {expired=phase_expired and 1 or 0} end)
     endless.init()

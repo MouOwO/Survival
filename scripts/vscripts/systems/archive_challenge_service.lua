@@ -111,6 +111,7 @@ local function finish_when_saved()
 end
 local function end_phase(timed_out)
     if ended then return end
+    require("systems/gameplay_phase_guard").freeze_for_settlement()
     active, ended, expired = false, true, timed_out == true
     scheduler.cancel(TIMER_ID)
     -- Mark everyone finished before removing monsters; late death events cannot award rewards.

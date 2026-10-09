@@ -1348,6 +1348,7 @@ on_entity_killed = function(payload)
     elseif victim.survival_disconnect_cleanup ~= true
         and building_defeat_rules.should_trigger(defeat_triggered, state) then
         defeat_triggered = true
+        require("systems/gameplay_phase_guard").freeze_for_settlement()
         online_time_service.finish("wall_destroyed")
         wall_destruction.after_burst(destruction_effect,function()
             GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)

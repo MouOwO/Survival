@@ -21,6 +21,13 @@ assert(totals().hero_attack_bonus_pct==10 and totals().hero_attribute_bonus_pct=
 guard.set_post_clear_frozen(true)
 for i=1,60 do tick() end
 assert(totals().hero_attack_bonus_pct==10, "post-clear growth frozen")
+guard.set_endless_active(0,true)
+for i=1,60 do tick() end
+assert(totals().hero_attack_bonus_pct==15 and totals().tower_attack_bonus_pct==15
+    and totals().hero_attribute_bonus_pct==30, "endless keeps ordinary timed growth")
+guard.set_endless_active(0,false)
+for i=1,60 do tick() end
+assert(totals().hero_attack_bonus_pct==15, "growth freezes after the last endless run")
 guard.set_post_clear_frozen(false)
 package.loaded["core/event_bus"]=nil
 package.loaded["systems/permanent_reward_effect_service"]=nil

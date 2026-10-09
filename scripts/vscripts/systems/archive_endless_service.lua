@@ -1,6 +1,7 @@
 local bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
+local phase_guard = require("systems/gameplay_phase_guard")
 local config = require("systems/archive_endless_config")
 local rules = config.rules
 local M = {}
@@ -45,6 +46,7 @@ local function cleanup(run)
 end
 local function stop(run, reason)
     run.status, run.reason = "finished", reason
+    phase_guard.set_endless_active(run.player_id, false)
     cleanup(run)
     publish(run)
 end
@@ -86,15 +88,28 @@ local function spawn_wave(run, number)
     publish(run)
     return true
 end
+local function try_spawn_wave(run, number)
+    local ok, result, reason = pcall(spawn_wave, run, number)
+    if ok then return result, reason end
+    -- Engine setup or publication may fail after a unit was created. Release
+    -- the gameplay window before cleanup, just as for ordinary spawn failure.
+    run.spawning = false
+    stop(run, "怪物生成失败，本波不计分")
+    print("[ArchiveEndless] wave setup failed: " .. tostring(result))
+    return false, "无尽怪物生成失败"
+end
 function M.start(id, difficulty)
     if require("systems/player_context_service").is_defeated(id) then return false, "player_defeated" end
     if M.is_running(id) then return false, "无尽挑战正在进行" end
     if runs[id] and runs[id].started then return false, "本局已开启无尽挑战" end
     if not config.wave(difficulty, 1) then return false, "该难度无尽属性尚未配置" end
+    if not phase_guard.set_endless_active(id, true) then return false, "本局已结束" end
     local run = { player_id = id, difficulty = difficulty, status = "running", wave = 0,
         cleared = 0, score = 0, units = {}, remaining = 0 }
     runs[id] = run
-    local ok, reason = spawn_wave(run, 1)
+    -- Keep ordinary production, upgrades and growth alive throughout the run,
+    -- including the queued frame between waves. stop() also covers spawn failure.
+    local ok, reason = try_spawn_wave(run, 1)
     run.started = ok == true
     return ok, reason
 end
@@ -117,12 +132,16 @@ local function killed(payload)
         require("systems/archive_service").record_endless_wave(run.player_id, run.wave, run.difficulty)
         -- Queue at zero delay to avoid recursive spawning inside a death event.
         scheduler.after(0, function()
-            if runs[run.player_id] == run and run.status == "running" then spawn_wave(run, run.wave + 1) end
+            if runs[run.player_id] == run and run.status == "running" then try_spawn_wave(run, run.wave + 1) end
         end, "archive_endless_next:" .. run.player_id)
     end
     publish(run)
 end
 function M.init(on_changed)
+    for id in pairs(runs) do
+        phase_guard.set_endless_active(id, false)
+        scheduler.cancel("archive_endless_next:" .. id)
+    end
     runs, enemies, changed = {}, {}, on_changed
     bus.subscribe(events.ENGINE_ENTITY_KILLED, killed)
     bus.subscribe(events.PLAYER_DEFEATED, function(payload)
