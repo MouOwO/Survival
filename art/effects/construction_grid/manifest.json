@@ -12,6 +12,13 @@
   "texture_format": "DXT5",
   "uv_scale": 1,
   "uv_offset": 0,
+  "texture_loading": {
+    "no_lod": true,
+    "compiled_flag": 8,
+    "mip_algorithm": "Box",
+    "mip_levels": 10,
+    "purpose": "Request full-resolution texture residency during particle precache; keep mip filtering for camera minification."
+  },
   "edge_world_width": 4,
   "corner_world_size": 16,
   "range_boundary": {

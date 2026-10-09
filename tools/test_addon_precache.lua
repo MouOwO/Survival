@@ -21,6 +21,16 @@ local env = setmetatable({M={}}, {__index=function(_, key)
 end})
 env.require = function(name)
     if name:find("config/",1,true)==1 then return require(name) end
+    if name == "systems/asset_preload_service" then
+        return { precache_resources = function(actual, resources)
+            assert(phases["asset_preload_service.precache_initial"],
+                "grid readiness must be recorded after the map preload reset")
+            for _, resource in ipairs(resources) do
+                env.PrecacheResource(resource.resource_type, resource.path, actual)
+            end
+            return true, #resources, 0
+        end }
+    end
     return service(name)
 end
 env.PrecacheResource = function(...)

@@ -36,4 +36,6 @@ foreach ($entry in $manifest.resources) {
     }
 }
 $results | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $logRoot 'compiled_manifest.json') -Encoding utf8
+& node (Join-Path $repo 'tools/test_construction_grid_resources.cjs')
+if ($LASTEXITCODE -ne 0) { throw 'Construction grid texture residency/mip validation failed' }
 Write-Output 'CONSTRUCTION_GRID_COMPILE_PASS'

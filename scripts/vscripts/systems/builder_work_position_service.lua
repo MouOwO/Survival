@@ -59,7 +59,8 @@ local function grounded_clear(caster, candidate, reference_height, units)
     end
     candidate.z = current_height
     for _, unit in ipairs(units or {}) do
-        if unit ~= caster and valid(unit) and not unit.survival_is_grid_preview then
+        if unit ~= caster and valid(unit) and not unit.survival_is_grid_preview
+            and not unit.survival_rebirth_scene_display then
             local other = unit:GetAbsOrigin()
             if math.abs(other.z - candidate.z) <= 48 then
                 local radius = unit_hull(unit) + margin

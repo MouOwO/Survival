@@ -98,6 +98,9 @@ local function build_manifest()
             extras[#extras + 1] = resource
         end
     end
+    for _, resource in ipairs(require("config/construction_grid_resources")) do
+        extras[#extras + 1] = resource
+    end
 
     -- Includes manual encounters, not only auto_spawn: rebirth bosses,
     -- practice-room monsters, challenge bosses and all ten-sin stage members.

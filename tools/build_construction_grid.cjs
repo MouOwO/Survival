@@ -95,7 +95,7 @@ function vtex(name){return `<!-- dmx encoding keyvalues2_noids 1 format vtex 1 -
   "m_outputColorSpace" "string" "srgb"
  } ]
  "m_vClamp" "vector3" "1 1 1"
- "m_bNoLod" "bool" "0"
+ "m_bNoLod" "bool" "1"
 }
 `;}
 function particle(name){return `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vpcf45:version{73c3d623-a141-4df2-b548-41dd786e6300} -->
@@ -137,6 +137,8 @@ function particle(name){return `<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c
 function build(){
 const manifest={schema_version:2,radius:RADIUS,world_size:2*RADIUS,cell_size:CELL,
  texture_size:[SIZE,SIZE],texture_world_size:SIZE*2,particle_radius:2048,texture_format:'DXT5',uv_scale:1,uv_offset:0,
+ texture_loading:{no_lod:true,compiled_flag:8,mip_algorithm:'Box',mip_levels:10,
+  purpose:'Request full-resolution texture residency during particle precache; keep mip filtering for camera minification.'},
  edge_world_width:EDGE_WORLD,corner_world_size:CORNER_WORLD,
  range_boundary:{radius:RADIUS,color:RING_COLOR,opacity:RING_OPACITY,width_world:RING_WIDTH,antialias_world:RING_AA,support_world:[RADIUS-RING_SUPPORT,RADIUS+RING_SUPPORT],transparent_rgb_padding_world:RING_RGB_PADDING,phase_independent:true,plane:'same sprite as white grid',purpose:'construction preview boundary; does not change ability or placement validation'},
  source:{edge:edge.sha256,corner:corner.sha256},controls:{CP0:'snapped world center, construction grid Z',CP3:'x=1 visible, x=0 hidden'},

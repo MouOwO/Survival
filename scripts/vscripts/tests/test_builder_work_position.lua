@@ -67,6 +67,8 @@ reset();point=service.find(caster,definition,origin);caster.position=point
 units[#units+1]={IsNull=function()return false end,IsAlive=function()return true end,
     GetAbsOrigin=function()return point end,GetHullRadius=function()return 24 end}
 assert(not service.ready(caster,definition,origin,point),"arrival is rechecked if another unit takes the work position")
+units[#units].survival_rebirth_scene_display=true
+assert(service.ready(caster,definition,origin,point),"idle rebirth display does not block the builder's work position")
 reset()
 local own = bus.request(events.GRID_CAN_PLACE_REQUEST,{position=origin,footprint=definition.footprint,
     team=2,ignore_entindex=1})

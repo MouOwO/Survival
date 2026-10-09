@@ -17,6 +17,7 @@ local monster_hull_scale = require("systems/monster_hull_scale")
 local monster_navigation = require("systems/monster_navigation_policy")
 local wave_monster_collision = require("systems/wave_monster_collision")
 local monster_hero_visual_service = require("systems/monster_hero_visual_service")
+local rebirth_scene = require("systems/rebirth_scene_display_service")
 
 local M = {}
 
@@ -327,6 +328,7 @@ local function start_encounter(payload)
 
     active_by_entindex[unit:entindex()] = meta
     active_by_encounter[encounter_id] = unit:entindex()
+    rebirth_scene.hide(encounter_id)
 
     event_bus.emit(events.MONSTER_SPAWNED, {
         unit = unit,
@@ -445,6 +447,7 @@ local function cancel_rebirth_attempts(player_id, hero, reason)
             meta.unit:Stop()
             UTIL_Remove(meta.unit)
         end
+        rebirth_scene.restore(meta.encounter_id)
         local duration = math.max(0, tonumber(challenge_rules.rebirth_retry_seconds) or 2)
         retry_until_by_player[player_id] = retry_until_by_player[player_id] or {}
         local until_time = game_time() + duration
@@ -492,6 +495,7 @@ local function on_entity_killed(payload)
     active_by_entindex[entindex] = nil
     active_by_encounter[meta.encounter_id] = nil
     monster_hero_visual_service.on_death(victim)
+    rebirth_scene.restore(meta.encounter_id, { after_corpse = true })
 
     event_bus.emit(events.MONSTER_KILLED, {
         victim = victim,
@@ -529,6 +533,7 @@ local function validate_all_markers()
 end
 
 function M.init()
+    rebirth_scene.reset()
     active_by_entindex = {}
     active_by_encounter = {}
     marker_cache = {}
@@ -561,6 +566,7 @@ function M.init()
                     monster_hero_visual_service.clear(meta.unit)
                     UTIL_Remove(meta.unit)
                 end
+                rebirth_scene.restore(meta.encounter_id)
             end
         end
         retry_until_by_player[player_id] = nil

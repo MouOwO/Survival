@@ -8,11 +8,9 @@ local M = {}
 
 function M.precache(context)
     if type(PrecacheResource) ~= "function" then return 0 end
-    -- Both footprint parities need their texture ready before entering preview.
-    for phase = 0, 3 do
-        PrecacheResource("particle", "particles/survival_grid/reference_grid_" .. phase .. ".vpcf", context)
-    end
-    return 4
+    local _, ready = require("systems/asset_preload_service").precache_resources(
+        context, require("config/construction_grid_resources"))
+    return ready
 end
 
 local occupied = {}
@@ -221,6 +219,7 @@ local function has_unit(center, payload)
             and unit:entindex() ~= ignored
             and ignored_set[unit:entindex()] ~= true
             and not unit.survival_is_grid_preview
+            and not unit.survival_rebirth_scene_display
             and not construction_building_is_logical_only(unit, payload)
             and unit_overlaps_cell(unit, center, half) then
             return true
@@ -546,6 +545,7 @@ function M.preview_area(payload)
             and unit:entindex() ~= ignored
             and not (payload.ignore_entindexes or {})[unit:entindex()]
             and not unit.survival_is_grid_preview
+            and not unit.survival_rebirth_scene_display
             and not construction_building_is_logical_only(unit, payload) then
             local origin, hull = unit:GetAbsOrigin(), unit_hull_radius(unit)
             for x = math.max(math.floor((origin.x-hull)/size)-1,math.floor((position.x-radius)/size)),

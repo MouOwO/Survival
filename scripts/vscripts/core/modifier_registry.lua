@@ -14,6 +14,10 @@ local modifiers = {
         path = "modifiers/modifier_native_wearable_visual_carrier",
     },
     {
+        name = "modifier_rebirth_scene_display",
+        path = "modifiers/modifier_rebirth_scene_display",
+    },
+    {
         name = "modifier_challenge_11_staging",
         path = "modifiers/modifier_challenge_11_staging",
     },

@@ -215,6 +215,23 @@ end
 assert(terrain_calls==0,"permanently forbidden ocean requires zero terrain checks")
 print("GRID_WALL_NEIGHBORS_PASS exact footprint, preview parity, release, retired barriers, ocean zero scans")
 
+-- Non-combat rebirth displays must not become invisible construction blockers.
+local display={IsNull=function() return false end,IsAlive=function() return true end,
+    entindex=function() return 101 end,GetAbsOrigin=function() return Vector(32,32,384) end,
+    GetHullRadius=function() return 0 end,survival_rebirth_scene_display=true}
+FindUnitsInRadius=function() return {display} end
+local at_display={position=Vector(64,64,384),footprint={x=2,y=2},team=2}
+assert(grid._can_place_for_test(at_display).ok,"display body does not reserve its center cell")
+local visible_cell=false
+for _,v in ipairs(decode(grid.preview_area({position=Vector(0,0,384),team=2}))) do
+    if v[1]==0 and v[2]==0 then assert(v[4]==1);visible_cell=true end
+end
+assert(visible_cell,"overview keeps the display cell available")
+display.survival_rebirth_scene_display=nil
+assert(not grid._can_place_for_test(at_display).ok,"real combat units still block placement")
+FindUnitsInRadius=function() return {} end
+print("GRID_REBIRTH_DISPLAY_PASS nonblocking preview and placement, live combat blockers preserved")
+
 -- Startup tree markers have no entity yet. Reconciliation must preserve them
 -- and live resource trees, while still clearing dead or missing buildings.
 local tree_alive=true

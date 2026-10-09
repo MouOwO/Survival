@@ -88,6 +88,10 @@ local complete = startup.snapshot()
 assert(complete.complete and complete.ready == complete.total)
 assert(complete.failed == 0 and complete.progress == 100 and complete.error == nil)
 for _, times in pairs(static) do assert(times == 1, "static resources deduplicated") end
+for phase = 0, 3 do
+    local key = "particle:particles/survival_grid/reference_grid_" .. phase .. ".vpcf"
+    assert(static[key] == 1, "construction grid loads during startup, before any placement")
+end
 
 -- Ensure every async proxy dispatched by the real current configuration exists
 -- in the shipped unit KV, rather than inventing generic proxy names.
@@ -192,6 +196,14 @@ assert(preload.resource_status("particle", static_path) == "failed")
 wall_time = 6
 local reload = startup.retry()
 assert(not reload.ok and reload.error == "startup_assets_require_map_reload")
+
+-- The loading barrier cannot release when a construction-grid dependency fails.
+local grid_path = "particles/survival_grid/reference_grid_0.vpcf"
+startup, preload, requests = new_session({ fail_static = grid_path })
+startup.init()
+for _, request in ipairs(requests) do request.callback() end
+assert(not startup.snapshot().complete and startup.snapshot().failed > 0)
+assert(preload.resource_status("particle", grid_path) == "failed")
 
 -- A failed attachment prevents its whole async bundle from reporting ready,
 -- including remaining model keys that the bundle has not visited yet.

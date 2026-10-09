@@ -578,7 +578,6 @@ local function on_item_picked_up(keys)
 end
 
 function M.precache(context)
-    grid_system.precache(context)
     PrecacheResource("particle", "particles/generic_hero_status/hero_levelup.vpcf", context)
     require("systems/valley_environment_service").precache(context)
     require("systems/tower_visual_service").precache(context)
@@ -917,6 +916,7 @@ function M.precache(context)
         end
     end
     asset_preload_service.precache_initial(context)
+    grid_system.precache(context)
     asset_preload_service.precache_group(context, "hero_permanent")
     asset_preload_service.precache_group(context, "monster_default_wearables")
     asset_preload_service.precache_group(context, "challenge_visuals")
@@ -1093,6 +1093,7 @@ function M.activate()
         wait_for_party = type(IsInToolsMode) == "function" and IsInToolsMode(),
         on_load_start = function() require("systems/startup_asset_preload_service").init() end,
         on_ready = function()
+            require("systems/rebirth_scene_display_service").start()
             multiplayer_player_service.assign_connected_players("loading_barrier_ready")
             on_game_state_changed()
             print("[MULTIPLAYER_SESSION] setup_finished authentication_and_assets_ready=true")
