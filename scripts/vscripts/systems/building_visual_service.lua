@@ -83,16 +83,44 @@ local function apply_activity_modifiers(unit, asset)
     if #applied > 0 then activity_modifiers_by_unit[entindex] = applied end
 end
 
-local function clear_particles(unit, replacing_owner)
-    local state = particles_by_unit[unit:entindex()]
-    if state and state.owner ~= unit and not replacing_owner then return end
-    for _, particle in ipairs(state and state.particles or {}) do
-        pcall(function()
-            ParticleManager:DestroyParticle(particle, false)
-            ParticleManager:ReleaseParticleIndex(particle)
-        end)
+local function retire_particles(index, state, immediate)
+    if not state or particles_by_unit[index] ~= state then return end
+    -- Consume ownership before engine calls so cleanup can safely re-enter.
+    particles_by_unit[index] = nil
+    for _, particle in ipairs(state.particles or {}) do
+        pcall(ParticleManager.DestroyParticle, ParticleManager, particle, immediate == true)
+        pcall(ParticleManager.ReleaseParticleIndex, ParticleManager, particle)
     end
-    particles_by_unit[unit:entindex()] = nil
+end
+
+local function clear_particles(unit, replacing_owner, immediate)
+    if not unit then return end
+    local index = tonumber(unit.survival_building_visual_index)
+    if valid_entity(unit) then
+        local ok, live_index = safe_call(unit, "entindex")
+        if ok then index = live_index end
+    end
+    if index then
+        local state = particles_by_unit[index]
+        if state and (state.owner == unit or replacing_owner) then
+            retire_particles(index, state, immediate)
+        end
+    else
+        -- A removed handle cannot supply its index. Match the retained owner
+        -- identity without touching a replacement that reused the old index.
+        for index, state in pairs(particles_by_unit) do
+            if state.owner == unit then retire_particles(index, state, immediate) end
+        end
+    end
+end
+
+local function clear_legacy_carrier(unit)
+    -- New bundles use owned props. Only older carrier visuals leave these
+    -- markers; ordinary spawn/cleanup must not scan all live NPCs.
+    if unit and (unit.survival_native_wearable_hide_mode ~= nil
+        or unit.survival_native_wearable_hide_identity == unit) then
+        native_carrier.Clear(unit)
+    end
 end
 
 local function clear_bodygroups(unit)
@@ -279,11 +307,12 @@ function M.matches(unit, data)
         and unit.survival_native_wearable_hide_mode == nil
 end
 
-function M.apply(unit, data)
+function M.apply(unit, data, options)
     if not valid_entity(unit) then return false, "invalid_entity" end
     if unit.survival_building_death_visual or unit.survival_building_destroyed
         or (unit.IsAlive and not unit:IsAlive()) then return false, "building_dead" end
     local unit_index = unit:entindex()
+    unit.survival_building_visual_index = unit_index
     if visual_owners_by_unit[unit_index] ~= unit then
         -- A new entity can reuse a recently removed corpse's index. It must
         -- receive its own activity/bodygroup writes, even for the same asset.
@@ -319,7 +348,7 @@ function M.apply(unit, data)
                     and unit.survival_model_asset_id == requested_asset_id then
                     unit.survival_pending_model_asset_id = nil
                     unit.survival_pending_previous_model_asset_id = nil
-                    M.apply(unit, data)
+                    M.apply(unit, data, options)
                 end
             end,
             on_failed = function()
@@ -343,7 +372,7 @@ function M.apply(unit, data)
     end
 
     if not same_model then
-        native_carrier.Clear(unit)
+        clear_legacy_carrier(unit)
         unit:SetModel(model_path)
         unit:SetOriginalModel(model_path)
     end
@@ -379,7 +408,7 @@ function M.apply(unit, data)
     else
         safe_call(unit, "SetSkin", 0)
     end
-    local appearance_ok, appearance_status, components = appearance.Refresh(unit, asset)
+    local appearance_ok, appearance_status, components = appearance.Refresh(unit, asset, options)
     if not appearance_ok then
         if previous_model_path and previous_model_path ~= model_path then
             safe_call(unit, "SetModel", previous_model_path)
@@ -410,8 +439,32 @@ function M.apply(unit, data)
     return true, asset and asset.asset_id or "legacy_path"
 end
 
+function M.stop_particles(unit)
+    clear_particles(unit, false, true)
+end
+
+local function clear_owned_visual_state(index, unit, live)
+    if visual_owners_by_unit[index] ~= unit then return end
+    local activities = activity_modifiers_by_unit[index]
+    local bodygroups = bodygroups_by_unit[index]
+    activity_modifiers_by_unit[index] = nil
+    bodygroups_by_unit[index] = nil
+    visual_owners_by_unit[index] = nil
+    if live then
+        if activities then safe_call(unit, "ClearActivityModifiers") end
+        for name in pairs(bodygroups or {}) do
+            safe_call(unit, "SetBodygroupByName", name, 0)
+        end
+    end
+end
+
 function M.clear(unit)
     if not unit then return end
+    -- Late preload callbacks must not recreate visuals after explicit teardown.
+    unit.survival_pending_model_asset_id = nil
+    unit.survival_pending_previous_model_asset_id = nil
+    unit.survival_model_asset_id = nil
+    unit.survival_applied_model_path = nil
     require("systems/challenge_guardian_visual_service").clear(unit)
     -- A clear requested by teardown supersedes the deferred corpse cleanup.
     -- Match the captured handle, since entindexes may be reused by new towers.
@@ -421,22 +474,25 @@ function M.clear(unit)
             deaths_by_unit[index] = nil
         end
     end
-    if valid_entity(unit) then
-        local index = unit:entindex()
-        if visual_owners_by_unit[index] and visual_owners_by_unit[index] ~= unit then
-            appearance.Clear(unit)
-            return
-        end
-        clear_activity_modifiers(unit)
-        appearance.Clear(unit)
-        native_carrier.Clear(unit)
-        clear_particles(unit)
-        clear_bodygroups(unit)
-        visual_owners_by_unit[index] = nil
-    else
-        -- The engine can remove a corpse before our one-shot deadline.
-        appearance.Clear(unit)
+    M.stop_particles(unit)
+    local live = valid_entity(unit)
+    local index = tonumber(unit.survival_building_visual_index)
+    if live then
+        local ok, live_index = safe_call(unit, "entindex")
+        if ok then index = live_index end
     end
+    if index then
+        clear_owned_visual_state(index, unit, live)
+    else
+        for old_index, owner in pairs(visual_owners_by_unit) do
+            if owner == unit then
+                clear_owned_visual_state(old_index, unit, false)
+            end
+        end
+    end
+    unit.survival_building_visual_index = nil
+    appearance.Clear(unit)
+    clear_legacy_carrier(unit)
 end
 
 -- The caller must release gameplay state/grid/counts immediately before this
@@ -472,7 +528,7 @@ function M.play_death(unit)
     -- Dead NPCs are not selectable/attackable in the engine; also remove our
     -- custom bar rather than leaving a zero-HP overlay on the now-free tile.
     require("systems/unit_health_bar_service").exclude(unit)
-    clear_particles(unit)
+    M.stop_particles(unit)
     local death_activity = rawget(_G, "ACT_DOTA_DIE")
     if death_activity ~= nil then safe_call(unit, "StartGesture", death_activity) end
     -- If the model does not expose this gesture, ForceKill/native death has
@@ -502,7 +558,7 @@ function M.play_death(unit)
         if visual_owners_by_unit[index] == unit then visual_owners_by_unit[index] = nil end
         appearance.Clear(unit)
         if valid_entity(unit) then
-            native_carrier.Clear(unit)
+            clear_legacy_carrier(unit)
             if type(UTIL_Remove) == "function" then pcall(UTIL_Remove, unit)
             else safe_call(unit, "RemoveSelf") end
         end

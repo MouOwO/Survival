@@ -58,6 +58,14 @@ local function add_ability(unit, ability_name)
     ability:SetActivated(true)
 end
 
+local function sync_fusion_activation(unit, available)
+    local ability = unit:FindAbilityByName("ability_tower_fusion")
+    if ability and (not ability.IsActivated
+        or ability:IsActivated() ~= available) then
+        ability:SetActivated(available)
+    end
+end
+
 local function mark_row_abilities(managed, row)
     for _, ability_name in ipairs(row and row.active_skill_ids or {}) do
         if ability_name and ability_name ~= "" then managed[ability_name] = true end
@@ -152,23 +160,26 @@ local function sync_now(state, row, force)
     elseif not tower_routes.can_upgrade_max(state) then
         wanted.ability_upgrade_tower_max = nil
     end
-    local fusion = state.tower_class and row
-        and tonumber(row.level) == tonumber(row.max_level)
-        and state.fusion_participated ~= true
-        and event_bus.request(events.TOWER_FUSION_ELIGIBILITY_REQUEST, {
+    -- Stage caps still have a next route row. Replace upgrading only at the
+    -- final route cap, and keep fusion visible while its materials are missing.
+    local fusion_available = false
+    if state.tower_class and row and not tower_routes.can_upgrade(state)
+        and state.fusion_participated ~= true then
+        local fusion = event_bus.request(events.TOWER_FUSION_ELIGIBILITY_REQUEST, {
             player_id = state.player_id,
-        })
-    if fusion and fusion.eligible == true then
+        }) or {}
         wanted.ability_tower_fusion = true
-        wanted.ability_upgrade_tower = nil
-        wanted.ability_upgrade_tower_lv01 = true
-        wanted.ability_upgrade_tower_max = nil
+        fusion_available = fusion.eligible == true
+        for name in pairs(upgrade_abilities) do wanted[name] = nil end
     end
 
     local signature = ability_signature(state, row, wanted)
     if not force
         and type(state.unit.survival_tower_managed_ability_names) == "table"
         and state.unit.survival_tower_ability_signature == signature then
+        -- Material upgrades/deaths change availability without changing the
+        -- ability list. Update the existing handle rather than rebuilding it.
+        sync_fusion_activation(state.unit, fusion_available)
         state.unit.survival_tower_ability_sync_pending = nil
         event_bus.emit(events.TOWER_ABILITY_SYNC_COMPLETED, {
             unit = state.unit,
@@ -193,16 +204,6 @@ local function sync_now(state, row, force)
             state.unit:RemoveAbility(ability_name)
         end
     end
-    if wanted.ability_tower_fusion then
-        for _, ability_name in ipairs({
-            "ability_upgrade_tower", "ability_upgrade_tower_max",
-        }) do
-            if state.unit:FindAbilityByName(ability_name) then
-                state.unit:RemoveAbility(ability_name)
-            end
-        end
-    end
-
     if wanted.ability_tower_fusion then
         add_ability(state.unit, "ability_tower_fusion")
     end
@@ -233,6 +234,7 @@ local function sync_now(state, row, force)
                 and tower_routes.row_at_level(state, state.level + 1) ~= nil)
         end
     end
+    sync_fusion_activation(state.unit, fusion_available)
     state.unit.survival_tower_managed_ability_names = wanted
     state.unit.survival_tower_ability_signature = signature
     state.unit.survival_tower_ability_sync_pending = nil

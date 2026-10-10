@@ -4,7 +4,7 @@ assert(not GameRules, "Run in a standalone Lua process, not in the game")
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local time = 0
 GameRules = { GetGameTime = function() return time end }
-local repository = require("combat/damage_transaction_repository")
+local repository = arg[1] and assert(loadfile(arg[1]))() or require("combat/damage_transaction_repository")
 repository.init({ maximum_recursion_depth = 6 })
 local attacker, victim = {}, {}
 collectgarbage("collect")
@@ -15,6 +15,7 @@ for i = 1, 60000 do
         attacker = attacker, victim = victim, source_kind = "tower" })
     repository.mark_submitted(record)
     assert(repository.consume_pending(attacker, victim) == record)
+    if repository.finish then repository.finish(record) end
     if i == 10000 or i == 30000 or i == 60000 then
         -- Collection is confined to this offline benchmark. Live capture never collects.
         collectgarbage("collect")

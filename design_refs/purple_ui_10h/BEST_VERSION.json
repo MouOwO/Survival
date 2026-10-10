@@ -1,0 +1,119 @@
+{
+  "status": "ready_for_user_review",
+  "selected": "compact_purple_component_winners_with_standalone_survival_shop_c25",
+  "work_budget_hours": 10,
+  "basis": "用户紫色参考图、精简单元补充、Ability Arena密度观察、真实游戏和真实组件同状态比較",
+  "verified_in_game": "范围见逐组件说明；组件预览不等于完整实机覆盖",
+  "components": {
+    "archive": {
+      "winner": "A14 compact + A15 lifecycle",
+      "layout": "七列图标、右上真实数量或进度、下方名称；称号独立适配",
+      "evidence": [
+        "work/native/c12_archive_retry_second_context.png",
+        "work/native/c12_archive_native_mouse_hover.png",
+        "work/native/c13_archive_fragments.png",
+        "work/native/c13_archive_friend.png",
+        "work/native/c15_archive_titles_synced.png",
+        "work/native/c15_archive_work_native.png",
+        "work/native/c15_archive_building_native.png",
+        "work/native/c15_archive_pet_native.png"
+      ],
+      "scope": "实机七类：通关44、碎片12、社交40、称号9、上班福利34、存档神器9、宠物0。18配置/17启用，未逐一实机验证全部17类。"
+    },
+    "survival_shop": {
+      "winner": "C25 standalone reference drawer",
+      "layout": "独立左侧平移；三个等宽页签；四列三行图标视口；右侧带尖角详情；仅底色改紫色",
+      "evidence": [
+        "work/native/c25_native_equipment_final.png",
+        "work/native/c25_native_challenge_final.png",
+        "work/native/c25_native_other_verified.png",
+        "work/native/c25_native_tooltip_button_hover.png",
+        "work/native/c25_native_entry_reopen_verified.png"
+      ],
+      "scope": "1600×900实机真实装备4/挑战12/其他6、完整页签与库存隐藏、单/双费用、鼠标进入详情、ESC与原HUD入口重开通过。临时启用展示入口，服务端英雄前置仍保留，未购买。四尺寸12组48图属于真实生产组件预览。",
+      "preview": "work/shop_reference_drawer/Comparison.html",
+      "native_acceptance": "work/native_shop_standalone_acceptance.json",
+      "checkpoint": "work/checkpoints/best_standalone_shop_c25"
+    },
+    "commerce": {
+      "winner": "A18 (A13 icons + A15 layer + A16 opaque + A17 window clip + A18 wheel)",
+      "layout": "五列；真实价格和完整权益放悬停详情",
+      "evidence": [
+        "work/native/c17_commerce_top_right_flip.png",
+        "work/native/c18_commerce_long_before_wheel.png",
+        "work/native/c18_commerce_long_after_wheel.png",
+        "work/native/c18_commerce_wheel_to_button_hover.png",
+        "work/native/c18_commerce_final_esc.png",
+        "work/native/c18_commerce_final_reopen_bottom_right.png"
+      ],
+      "scope": "实机真实25科技与账户余额/资格；右上左翻、右下上移、真实滚轮读到星悦积分×68末行、6800U币及按钮、ESC和重开通过。未购买或兑换。"
+    },
+    "daily": {
+      "winner": "A06 (A04 compact + A05 tooltip/rules + A06 rules fit)",
+      "evidence": [
+        "work/native/c12_daily_true_state.png",
+        "work/native/c13_daily_actual_reward_tooltip.png",
+        "work/native/c13_daily_after_hover_rules.png",
+        "work/native/c14_daily_rules_compact.png"
+      ],
+      "scope": "真实第2日资格、七日九奖励，悬停与规则互斥、不透明和规则自适应实机通过。未领奖或开通月卡。"
+    },
+    "treasure": {
+      "winner": "T03",
+      "evidence": [
+        "work/native/c12_treasure_true_state.png"
+      ],
+      "scope": "实机真实两件近期宝物及鼠标效果详情；更多/满级状态为独立组件样例，未发放。"
+    },
+    "lottery": {
+      "winner": "L04 compact metadata + L05 supplied terms + L07 original notes",
+      "evidence": [
+        "work/native/c16_lottery_main_final.png",
+        "work/native/c16_lottery_metadata_unit_fixed.png",
+        "work/native/c19_lottery_history_scope_preserved.png"
+      ],
+      "scope": "实机券0、单抽1/十连10、SSR保底、奖池真实品质/已有/期限/重复400积分，以及本局记录范围脚注。单件已获奖励、更新公告、揭晓为真实控制器本地样例，未在原生抽奖，未知期限不补永久。"
+    },
+    "vip": {
+      "winner": "V01",
+      "evidence": [],
+      "scope": "四尺寸组件预览及真实控制器回归；当前账号vip_badge=false，原生领取尚未验证。"
+    },
+    "checkout": {
+      "winner": "P01",
+      "evidence": [],
+      "scope": "现金/代币订单四尺寸真实组件及严格控制器回归；现金QR为不可付款布局样例，真实订单、支付和资格未验证。"
+    }
+  },
+  "recoverable_checkpoint": "work/checkpoints/best_standalone_shop_c25",
+  "notes": "逐组件按证据选择，最新版本不会自动成为赢家。历史失败图、旧snapshot和检查点保留；C16窗口裁切、C17真实滚轮无效及L06隐藏原记录提示已淘汰。保留战斗底部HUD和原业务事件、服务端价格/库存/资格；未真实购买、支付、抽奖、领取、升级或穿戴。 用户最新生存商店独立要求已覆盖旧A14选定：C20–C24保存为比较历史，C25按实机与源链证据选定；其它组件保留此前选择，公共导航移除生存商店。",
+  "updated_at": "2026-10-10T00:00:21.743Z",
+  "compile_evidence": "work/compile.json",
+  "preview_source_digest": "6fb899933e2bcd6e9a3a6fee14ca50fcaa5ba8f4ee97823a2b7fd14b0536bba3",
+  "validation_index": "work/qa/validation_index.json",
+  "density_comparison": "work/density/Comparison.html",
+  "previous_survival_shop_selection": {
+    "winner": "A14 (A07 layout + A10 captions + A12 opaque + A14 header)",
+    "layout": "四列，窗口按内容自适应",
+    "evidence": [
+      "work/native/c14_shop_header_purple.png",
+      "work/native/c14_shop_challenge_native.png",
+      "work/native/c14_shop_other_native.png",
+      "work/native/c13_shop_opaque_hover.png"
+    ],
+    "scope": "实机三分类、真实物品/库存/资源成本/鼠标详情。四五六列同状态比较后保留四列；六列在720p丢关键等级。"
+  },
+  "common_navigation": {
+    "survivalShopDetached": true,
+    "evidence": "work/native/c25_native_archive_detached_shop.png",
+    "scope": "公共弹窗六个页签保留，生存商店只沿原HUD入口；普通商城继续在公共弹窗中"
+  },
+  "standalone_validation": {
+    "controller": "work/qa/shop_standalone_d04_suite_report.json",
+    "integration_peer": "work/qa/shop_c25_integration_peer_report.json",
+    "source": "work/shop_reference_drawer/sourceproof.json",
+    "browser": "work/shop_reference_drawer/current/report.json",
+    "gallery": "work/shop_reference_drawer/gallery_verification.json",
+    "native": "work/native_shop_standalone_acceptance.json"
+  }
+}

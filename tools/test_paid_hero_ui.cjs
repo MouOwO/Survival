@@ -5,7 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const {execFileSync} = require('node:child_process');
 const root = path.resolve(__dirname, '..');
-const output = execFileSync('lua', ['scripts/vscripts/tests/test_paid_hero_unlock.lua', '--client-fixtures'],
+const output = execFileSync(process.env.LUA || 'lua', ['scripts/vscripts/tests/test_paid_hero_unlock.lua', '--client-fixtures'],
     {cwd: root, encoding: 'utf8', windowsHide: true});
 const prefix = 'HERO_RUNTIME_FIXTURES:';
 const fixtures = JSON.parse(output.split(/\r?\n/).find(line => line.startsWith(prefix)).slice(prefix.length));
@@ -24,6 +24,8 @@ assert.equal(guard(fixtures.owned).available, 1, 'paid owner must leave the sync
 assert.equal(guard(fixtures.owned).status_text, '可召唤');
 assert.equal(guard(fixtures.pure).available, 0, 'pure mode keeps old account items filtered');
 assert.equal(guard({available: 1}).available, 0, 'generic/default availability cannot grant paid access');
+assert.equal(guard({available: 1, prerequisite_met: 1}).prerequisite_met, 0,
+    'a generic unlock flag cannot override the private paid-hero syncing gate');
 assert.equal(guard(undefined).available, 0, 'missing nettable must fail closed');
 localPlayer = 0;
 assert.equal(guard(fixtures.owned).available, 0, 'teammate purchase cannot unlock local button');

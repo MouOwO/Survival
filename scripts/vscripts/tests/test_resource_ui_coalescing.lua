@@ -65,7 +65,8 @@ package.loaded["config/hero_passive_skill_definitions"] = {by_id = {}}
 package.loaded["config/generated/builder_ability_stages"] = {rows = {}}
 package.loaded["ui/hero_skill_tooltip_view_model"] = {}
 package.loaded["ui/ability_runtime_builder"] = {build = function(_, state, resources)
-    return {available = 1, observed_wood = resources.wood, observed_level = state.level}
+    return {available = 1, can_afford = resources.wood>=100 and 1 or 0,
+        cost_wood = 100, observed_wood = resources.wood, observed_level = state.level}
 end}
 local function unit(id, owner)
     local ability = {IsNull = function() return false end, GetAbilityName = function() return "mock_spell" end,
@@ -115,7 +116,23 @@ bus.emit(events.BUILDING_CREATED, {unit = a, building_id = "mock_building"})
 writes = {}; stale()
 assert(#writes == 0, "old generation cannot publish newly registered units")
 resource(0); run(id, 0.4)
-assert(#writes == 2)
+assert(#writes == 0,"same affordability does not republish descriptions")
+
+-- Upgrade/career/training projections opt into authoritative click-time costs.
+-- Even thousands of resource events must not schedule a view-model rebuild.
+local mock_builder=package.loaded["ui/ability_runtime_builder"]
+local original_build=mock_builder.build
+mock_builder.build=function(...)
+    local result=original_build(...)
+    result.can_afford,result.resource_check_on_cast,result.prerequisite_met=1,1,1
+    return result
+end
+reset();ability_service.init()
+bus.emit(events.BUILDING_CREATED,{unit=a,building_id="mock_building",level=1})
+writes={}
+for i=1,1000 do wallet[0]=i;resource(0) end
+assert(next(tasks)==nil and #writes==0,"cast-checked abilities must not scan or republish on wallet changes")
+mock_builder.build=original_build
 
 -- Research bootstrap: mocked domain service still fetches wallet via its real
 -- injected get_resources callback; personal research changes stay private.
@@ -136,29 +153,22 @@ package.loaded["research/research_technology_service"] = {new = function(options
 end}
 local research = require("bootstrap/research_technology_bootstrap")
 reset(); research.init()
-resource(0)
-id = "research_resource_refresh_0"
-first = tasks[id]
-for i = 1, 9 do now = i * 0.01; resource(0) end
-assert(scheduled[id] == 1 and tasks[id] == first and first.at == 0.1)
-wallet[0] = 345
-run(id, 0.1)
-assert(#writes == 1 and writes[1].key == "0" and writes[1].value.wood == 345)
-writes = {}; resource(0)
-bus.emit(events.HERO_READY, {player_id = 0})
-assert(#writes == 1, "hero readiness is not delayed by resource queue")
-local set_result = bus.request(research_events.LEVEL_SET_REQUESTED, {player_id = 0, tech_id = "mock", level = 1})
-assert(set_result and set_result.ok and find_value("survival_research", "0"),
-    "personal research update remains immediate")
-assert(not find_value("survival_research", "1"),
-    "researching must not update a same-team player's technology snapshot")
-stale = tasks[id].callback
+for i=1,1000 do resource(0) end
+assert(next(tasks)==nil and #writes==0,"wood changes cannot schedule a research snapshot rebuild")
+wallet[0]=345
+bus.emit(events.HERO_READY,{player_id=0})
+assert(#writes==1 and writes[1].key=="0" and writes[1].value.wood==345)
+writes={}
+local set_result=bus.request(research_events.LEVEL_SET_REQUESTED,{player_id=0,tech_id="mock",level=1})
+assert(set_result and set_result.ok and find_value("survival_research","0"))
+assert(not find_value("survival_research","1"),"research completion stays private")
 bus.reset()
-bus.handle_request(events.RESOURCE_GET_REQUEST, function(payload) return {wood = wallet[payload.player_id]} end)
-research.init(); writes = {}; stale()
-assert(#writes == 0 and tasks[id] == nil)
-resource(1); run("research_resource_refresh_1", 0.2)
-assert(#writes == 1 and writes[1].key == "1" and writes[1].value.generation == 2)
+bus.handle_request(events.RESOURCE_GET_REQUEST,function(payload) return {wood=wallet[payload.player_id]} end)
+research.init();writes={}
+for i=1,1000 do resource(1) end
+assert(#writes==0 and next(tasks)==nil)
+bus.emit(events.HERO_READY,{player_id=1})
+assert(#writes==1 and writes[1].key=="1" and writes[1].value.generation==2)
 
 -- Shop: real open/close/patch/queue path, minimal catalog with no purchases.
 package.loaded["systems/shop_catalog"] = {

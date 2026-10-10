@@ -1,0 +1,154 @@
+{
+  "date": "2026-10-09",
+  "status": "HUD correction compiled and verified in actual survival game; cosmetic client registration corrected, post-Activate link applied; full animated ultimate appearance remains unverified after registration",
+  "supersedes": "validation/20261009/ultimate_tower_display.json",
+  "causes": {
+    "interrupted_assembly": "Earlier passive tint repair used image.style.washColor='none'; actual Panorama native setter rejects it and throws inside fitNativeSkills/ApplyRuntime, interrupting HUD assembly. Mock previously accepted invalid value.",
+    "ancestor_corruption": "Earlier row repair broadened common ancestor styling. Still-valid cached panels could belong to a replaced tree. Original unbounded traversal could reach lower_hud/root and erase the outer scale. Reproduced from the saved actual source.",
+    "wrong_tooltip_mode": "Ultimate ownership was treated as building-upgrade rendering, giving aggregate passives an upgrade category and castable status.",
+    "client_modifier_registration": "Pure cosmetic modifier was linked during module loading, omitted from post-Activate registry. Server creation succeeded while client logged unknown modifier."
+  },
+  "fixes": {
+    "tint": "Use legal #ffffffff and canonical restoration; strict native-style mock now rejects none/empty color values.",
+    "layout": "Remove rejected broad per-refresh row repair; revalidate cached scope ownership; prove a bounded closed list-to-branch ancestor chain before any layout write.",
+    "tooltip": "Separate project takeover eligibility from upgrade rendering. Five passive aggregate slots show passive/automatic effect; D/G tools show active. Seven project tooltips and passive input protection retained.",
+    "presence": "Register modifier_ultimate_tower_presence through core/modifier_registry during Activate; tower_visual_service uses registry.ensure instead of early top-level LinkLuaModifier.",
+    "diagnostic": "Tools-only manual scoped lower_hud inspection, no geometry/cache writes; stops at slot boundaries to avoid scanning internal pips/tooltips; old local checkpoints are optional in portable tests."
+  },
+  "actual_game": {
+    "ordinary_tower": {
+      "unit": 640,
+      "visible_abilities": 8,
+      "result": "Native image positions aligned to frames, project tooltip and gold/wood costs visible after compiled reload."
+    },
+    "ultimate_fixture": {
+      "unit": 665,
+      "visible_abilities": 7,
+      "hidden_runtime_skills": 13,
+      "result": "Actual production prepare_ultimate initializes correct native order; aligned seven slots and D/G hotkeys visible. Project tooltip takeover verified. Tooltip text mode error discovered here and fixed afterward.",
+      "limitations": "Unregistered isolated fixture does not exercise move/destroy/fusion transactions. Screenshot predates final passive text correction and cosmetic registration correction."
+    },
+    "live_switches": "Subsequent running game independently changed selections, upgraded towers and changed visible ability counts; scoped native-ready snapshots remained valid with no missing scopes.",
+    "hud_errors_after_fix": 0,
+    "appearance": "Foot Nimbus native path/control points and pure cosmetic shader verified by native resource inspection and Lua lifecycle tests; old early link reproduced client unknown-modifier error. Correct post-Activate link executed successfully. No new real ultimate rendered after corrected binding, so final animation/body appearance is not claimed visually accepted.",
+    "fixture_safety": "Created while paused, using synthetic seven source snapshots, no fusion transaction, grid reservation, building count increment, spending or refunds. Creation assertions verified unchanged wallet and original unit. Player later resumed and operated the game independently; temporary fixture was removed without changing their current selection or pause.",
+    "console_timeout_note": "Initial fixture command printed ULTIMATE_FIXTURE_READY plus arguments, so strict expected-line matcher reported a timeout despite successful creation. Evidence is saved output and subsequent actual selection/screenshot. Rebind attempt rejected its paused-state assertion after the user resumed; final registration was applied without unit mutation."
+  },
+  "screenshots": [
+    {
+      "path": "output/map_build_c6/ultimate_correction_before_20261009.png",
+      "role": "Actual broken HUD before correction"
+    },
+    {
+      "path": "output/map_build_c6/ultimate_correction_after_reload_20261009.png",
+      "role": "Corrected ordinary Lv5 tower aligned row and project tooltip"
+    },
+    {
+      "path": "output/map_build_c6/ultimate_correction_ultimate_after_20261009.png",
+      "role": "Actual seven-slot fixture row after assembly fix; paused and before modifier correction"
+    },
+    {
+      "path": "output/map_build_c6/ultimate_correction_ultimate_tooltip_20261009.png",
+      "role": "Actual project tooltip takeover; revealed wrong upgrade/castable wording subsequently corrected"
+    },
+    {
+      "path": "output/map_build_c6/ultimate_correction_live_ordinary_final_20261009.png",
+      "role": "Running game farm/training tooltip after final text compilation; no focus or mouse manipulation"
+    }
+  ],
+  "validation": {
+    "tests": [
+      {
+        "test": "node tools/test_tower_passive_icons.cjs",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "node tools/test_ability_tooltip_recovery.cjs",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "node tools/test_ability_button_states.cjs",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "node tools/test_prerequisite_shading.cjs",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "node tools/test_ultimate_tower_hud.cjs",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "node tools/test_topnav_hotpath_recovery.cjs",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "node tools/test_handoff_numeric_layout.cjs",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "tooltip",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "destroy_tooltip",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "ability_buttons",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "ultimate_hud",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "modifier_registry",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "visual_relocation",
+        "exit_code": 0,
+        "passed": true
+      },
+      {
+        "test": "visual_lifecycle",
+        "exit_code": 0,
+        "passed": true
+      }
+    ],
+    "native_logs": [
+      "output/ultimate_tower_correction_20261009/native_ordinary_after.log",
+      "output/ultimate_tower_correction_20261009/native_ultimate_after.log",
+      "output/ultimate_tower_correction_20261009/native_live_final.log"
+    ],
+    "integrity": "output/ultimate_tower_correction_20261009/final_integrity.json",
+    "ui_manifests": [
+      "output/ultimate_tower_correction_20261009/ui_build_20261009_105421/manifest.json",
+      "output/ultimate_tower_correction_20261009/ui_build_20261009_111919/manifest.json",
+      "output/ultimate_tower_correction_20261009/ui_build_20261009_112233/manifest.json"
+    ],
+    "lua_syntax": "Passed for registry, visual service and pure cosmetic modifier",
+    "diff_check": "Passed for task files",
+    "portable_test": "Updated HUD test also passed when all ignored output checkpoints were treated as absent"
+  },
+  "restore": {
+    "before": "output/ultimate_tower_correction_20261009/before",
+    "rejected": "output/ultimate_tower_correction_20261009/rejected",
+    "registry_before": "output/ultimate_tower_correction_20261009/before_registry_fix",
+    "instructions": "Use per-file task snapshots and corresponding content/compiled artifact backups only. Do not reset HEAD or discard unrelated user changes. Current game-only post-Activate link is ephemeral; next map uses corrected unified registration."
+  },
+  "git": "No commit or push requested/performed; all pre-existing unrelated changes retained."
+}

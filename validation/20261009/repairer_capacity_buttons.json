@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "date": "2026-10-09",
+  "task": "Repairer training buttons gray out when current existing count reaches capacity",
+  "production_change": "Repairer prerequisite_met now uses unlocked (below capacity and city prerequisite met)",
+  "ordinary_base_cap": 5,
+  "advanced_base_cap": 2,
+  "capacity_bonus_preserved": true,
+  "restoration": "Existing WORKER_CHANGED event immediately republishes main city training runtime after death or self-destruct; no new polling",
+  "checks": [
+    "Real builder/service/event bus activation: independent caps, removal restoration, capacity bonus, no-wallet gating",
+    "Native/fallback HUD and tooltip input: gray/visible/hoverable, denied full-cap click, restored click",
+    "Regression fails with pre-change builder",
+    "Upgrade prerequisite projection regression",
+    "Worker training/spawn/resource rollback regression",
+    "Lua and JavaScript syntax",
+    "Scoped diff check"
+  ],
+  "live": {
+    "ordinary_count": 5,
+    "ordinary_cap": 5,
+    "ordinary_prerequisite_met": 0,
+    "ordinary_engine_activated": 0,
+    "advanced_count": 0,
+    "advanced_cap": 2,
+    "advanced_prerequisite_met": 1,
+    "advanced_engine_activated": 1,
+    "buttons_refreshed": 2,
+    "city_health_and_position_preserved": true,
+    "unit_count_unmodified": true,
+    "console": "output/repairer_capacity_20261009/live_after.log",
+    "visual_screenshot_verified": false
+  },
+  "checkpoint": "output/repairer_capacity_20261009/before",
+  "scope": "One production eligibility condition and two existing regression tests; previous workspace changes preserved"
+}

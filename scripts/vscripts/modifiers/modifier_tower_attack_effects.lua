@@ -21,6 +21,8 @@ local buff_manager = require("systems/buff_manager")
 local asset_catalog = require("config/asset_catalog")
 local sound_service = require("core/sound_service")
 local machine_gun_feedback = require("systems/tower_machine_gun_feedback")
+local projectile_visual = require("systems/tower_projectile_visual")
+local damage_observer = require("systems/tower_damage_observer")
 local targeting = require("systems/tower_targeting")
 local global_rules = require("config/generated/global_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
@@ -46,7 +48,7 @@ local DEFAULT_LIGHTNING_BOUNCE_RADIUS = 200
 local LIGHTNING_BOUNCE_DELAY = 0.10
 local LIGHTNING_SOURCE_OFFSET_Z = 160
 local LIGHTNING_TARGET_OFFSET_Z = 70
-local SPLIT_ARROW_SPEED = 1250
+local SPLIT_ARROW_SPEED = 500
 local DEFAULT_STORM_RADIUS = 500
 local DEFAULT_STORM_DURATION = 5
 local DEFAULT_STORM_DAMAGE_MULTIPLIER = 1
@@ -122,6 +124,7 @@ local function play_tower_sound(cue_id, tower, unit, position)
 end
 
 local function skill_matching(unit, prefix)
+    if tower_skills.matching then return tower_skills.matching(unit, prefix) end
     for _, row in pairs(tower_skills.get(unit)) do
         if row.skill_id and string.match(row.skill_id, "^" .. prefix) then
             return row
@@ -155,10 +158,16 @@ local function uses_machine_gun_attack(unit)
         or skill_matching(unit, "explosive_gatling_") ~= nil
 end
 
-local function play_attack_gesture(caster)
+local function play_attack_gesture(caster, native_attack)
     local activity = rawget(_G, "ACT_DOTA_ATTACK")
     local asset = asset_catalog.get(caster.survival_model_asset_id)
     if not activity or not asset or not asset.native_wearable_stage then return end
+    -- These visible hero bodies already animate their native attack. Replaying
+    -- an unscaled gesture at OnAttackStart makes one shot look like two swings.
+    -- Scripted machine-gun sequences still need their own single gesture.
+    if skill_matching(caster, "critical_strike_")
+        or (native_attack and (skill_matching(caster, "multi_attack_")
+            or skill_matching(caster, "frost_attack_"))) then return end
     if skill_matching(caster, "lightning_strike_")
         and type(caster.StartGestureWithPlaybackRate) == "function" then
         pcall(caster.StartGestureWithPlaybackRate, caster, activity, LIGHTNING_ATTACK_PLAYBACK_RATE)
@@ -190,12 +199,7 @@ function modifier_tower_attack_effects:GetAttributes()
     return MODIFIER_ATTRIBUTE_PERMANENT
 end
 function modifier_tower_attack_effects:DeclareFunctions()
-    return {
-        MODIFIER_EVENT_ON_TAKEDAMAGE,
-        MODIFIER_EVENT_ON_ATTACK_START,
-        MODIFIER_EVENT_ON_ATTACK,
-        MODIFIER_EVENT_ON_ATTACK_FAIL,
-        MODIFIER_EVENT_ON_ATTACK_LANDED,
+    local functions = {
         MODIFIER_EVENT_ON_DEATH,
         MODIFIER_PROPERTY_ATTACK_POINT_CONSTANT,
         MODIFIER_PROPERTY_CANNOT_MISS,
@@ -205,6 +209,14 @@ function modifier_tower_attack_effects:DeclareFunctions()
         MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT,
         MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE,
     }
+    if not damage_observer.is_ready() then
+        functions[#functions+1]=MODIFIER_EVENT_ON_TAKEDAMAGE
+        functions[#functions+1]=MODIFIER_EVENT_ON_ATTACK_START
+        functions[#functions+1]=MODIFIER_EVENT_ON_ATTACK
+        functions[#functions+1]=MODIFIER_EVENT_ON_ATTACK_FAIL
+        functions[#functions+1]=MODIFIER_EVENT_ON_ATTACK_LANDED
+    end
+    return functions
 end
 
 function modifier_tower_attack_effects:OnTakeDamage(params)
@@ -242,6 +254,9 @@ end
 
 function modifier_tower_attack_effects:OnCreated()
     if not IsServer() then return end
+    self:GetParent().survival_global_tower_damage=damage_observer.is_ready() and true or nil
+    self:GetParent().survival_global_tower_damage_owner=self
+    projectile_visual.clear(self:GetParent())
     laser_visual.sync_pose(self, laser_config(self:GetParent(), skill_matching(self:GetParent(), "laser_")))
     self.gatling_target_entindex = nil
     self.gatling_target_hits = 0
@@ -268,7 +283,8 @@ function modifier_tower_attack_effects:OnCreated()
         self:GetParent().survival_projectile_model = ""
     end
     self.airspace_aura_elapsed = AIRSPACE_AURA_REFRESH_INTERVAL
-    self:StartIntervalThink(0.03)
+    self.current_update_interval = 0.1
+    self:StartIntervalThink(self.current_update_interval)
 end
 
 local function sync_airspace_aura(modifier, tower, elapsed)
@@ -968,18 +984,16 @@ local function split_arrow(caster, target, damage, projectile_name, multiplier,
         armor_ignore_pct)
     if not valid(caster) or not valid(target) then return end
     local distance = (target:GetAbsOrigin() - caster:GetAbsOrigin()):Length2D()
-    local speed = tower_combat_rules.projectile_speed(
-        SPLIT_ARROW_SPEED, caster.survival_tower_class)
-    ProjectileManager:CreateTrackingProjectile({
-        Target = target,
-        Source = caster,
-        Ability = nil,
-        EffectName = projectile_name
-            or "particles/units/heroes/hero_drow/drow_base_attack.vpcf",
-        iMoveSpeed = speed,
-        bDodgeable = false,
-        bProvidesVision = false,
-    })
+    -- Share the speed applied by construction/upgrades with the native attack.
+    -- Use the route policy as a fallback before runtime stats are initialized.
+    local speed = tonumber(caster.survival_projectile_speed)
+        or tower_combat_rules.projectile_speed(
+            SPLIT_ARROW_SPEED, caster.survival_tower_class or "class_5")
+    if type(projectile_name)~="string" or projectile_name=="" then
+        projectile_name=projectile_visual.resolve(caster,
+            "particles/units/heroes/hero_drow/drow_base_attack.vpcf")
+    end
+    projectile_visual.emit(caster,target,projectile_name,speed)
     scheduler.after(distance / speed, function()
         if valid(caster) and valid(target) then
             detailed_log(
@@ -1079,6 +1093,7 @@ local function dispose_laser_particle(self, index)
 end
 
 cleanup_native_residue = function(self, force)
+    if not self.laser_native_residue or #self.laser_native_residue == 0 then return end
     local kept, now = {}, GameRules:GetGameTime()
     for _, segment in ipairs(self.laser_native_residue or {}) do
         if force or now >= segment.retire_at then dispose_laser_particle(self, segment.index)
@@ -1102,7 +1117,8 @@ retire_native_laser = function(self)
 end
 
 local function destroy_particle(self)
-    local segments = self.laser_particles or {}
+    local segments = self.laser_particles
+    if not segments or #segments == 0 then return end
     self.laser_particles = {}
     for _, segment in ipairs(segments) do
         dispose_laser_particle(self, segment.index)
@@ -1289,6 +1305,11 @@ local function start_laser(self, target, effect)
     self.laser_ticks = 0
     self.laser_started_at = GameRules:GetGameTime()
     self.last_interval_time = self.laser_started_at
+    local update_interval=math.max(0.01,tonumber(effect.beam_update_interval) or 0.03)
+    if self.current_update_interval~=update_interval then
+        self.current_update_interval=update_interval
+        self:StartIntervalThink(update_interval)
+    end
     laser_visual.sync_pose(self, effect)
     create_laser_segment(self, effect, GameRules:GetGameTime())
     play_tower_sound(
@@ -1352,6 +1373,10 @@ function modifier_tower_attack_effects:OnIntervalThink()
     if not laser or not effect or not laser_target_in_range(caster, target)
         or active_attack_target ~= target then
         reset_laser(self)
+        if self.current_update_interval~=0.1 then
+            self.current_update_interval=0.1
+            self:StartIntervalThink(0.1)
+        end
         return
     end
     local update_interval = math.max(
@@ -1423,7 +1448,7 @@ function modifier_tower_attack_effects:OnAttackStart(params)
         reset_laser(self)
         return
     end
-    if not uses_machine_gun_attack(caster) then play_attack_gesture(caster) end
+    if not uses_machine_gun_attack(caster) then play_attack_gesture(caster, true) end
     event_bus.emit(events.TOWER_ATTACK_START, {
         tower = caster,
         target = target,
@@ -1445,7 +1470,8 @@ function modifier_tower_attack_effects:OnAttack(params)
     -- Also notify existing modifiers after a Tools hot reload, where the
     -- engine may still cache their previous DeclareFunctions event list.
     local auto = caster.FindModifierByName and caster:FindModifierByName("modifier_tower_auto_attack")
-    if auto and auto.OnAttack and not self.anti_air_secondary_attack then auto:OnAttack(params) end
+    if auto and auto.OnAttack and auto.shared_attack_observer ~= true
+        and not self.anti_air_secondary_attack then auto:OnAttack(params) end
     if not valid(primary) or primary:GetTeamNumber() == caster:GetTeamNumber() then
         return
     end
@@ -1668,6 +1694,10 @@ end
 function modifier_tower_attack_effects:OnDestroy()
     if not IsServer() then return end
     local tower = self:GetParent()
+    projectile_visual.clear(tower)
+    if tower.survival_global_tower_damage_owner==self then
+        tower.survival_global_tower_damage,tower.survival_global_tower_damage_owner=nil,nil
+    end
     stop_anti_air_sequence(self)
     stop_machine_gun_sequences(self)
     reset_laser(self)
@@ -1679,6 +1709,7 @@ end
 
 function modifier_tower_attack_effects:OnRefresh()
     if not IsServer() then return end
+    projectile_visual.clear(self:GetParent())
     laser_visual.sync_pose(self, laser_config(self:GetParent(), skill_matching(self:GetParent(), "laser_")))
     stop_anti_air_sequence(self)
     stop_machine_gun_sequences(self)
@@ -1702,6 +1733,7 @@ M._split_arrow_speed_for_test = SPLIT_ARROW_SPEED
 function modifier_tower_attack_effects:ResetAfterRelocation()
     if not IsServer() then return end
     local tower = self:GetParent()
+    projectile_visual.clear(tower)
     stop_anti_air_sequence(self)
     stop_machine_gun_sequences(self)
     reset_laser(self)
@@ -1719,8 +1751,8 @@ function modifier_tower_attack_effects:ResetAfterRelocation()
         tower.survival_projectile_model = ""
     end
     self.last_interval_time = GameRules:GetGameTime()
-    self.current_update_interval = nil
-    self:StartIntervalThink(0.03)
+    self.current_update_interval = 0.1
+    self:StartIntervalThink(self.current_update_interval)
 end
 
 local function initialize_slow(modifier, params, fallback)

@@ -1,0 +1,192 @@
+{
+  "task": "Enlarge native skill level pips to span the skill image",
+  "date": "2026-10-09",
+  "outcome": "PASS_AUTOMATED_AND_COMPILED; native pixel verification pending",
+  "geometry": {
+    "image_width": 104,
+    "container": [
+      6,
+      118,
+      104,
+      12
+    ],
+    "five_pip_size": [
+      18.4,
+      12
+    ],
+    "gap": 3,
+    "five_pip_total_width": 104
+  },
+  "native_state_preserved": [
+    "active_level",
+    "next_level",
+    "Hidden",
+    "active gold gradient",
+    "inactive dark gradient"
+  ],
+  "lifecycle": {
+    "existing_native_children_only": true,
+    "actual_visible_point_count": true,
+    "single_or_zero_point_style_restoration": true,
+    "place_constraints_included_in_restoration": true,
+    "invalid_panel_snapshot_pruning": true,
+    "new_timer": false
+  },
+  "changes": [
+    "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+    "panorama/src/scripts/custom_game/handoff_hud.js",
+    "two compiled vjs_c resources",
+    "tools/test_topnav_hotpath_recovery.cjs: optional production helper extraction seam",
+    "docs/ai/CURRENT_TASK.md, PROJECT_CONTEXT.md, DECISIONS.md"
+  ],
+  "native_resource_audit": "output/hero_skill_pips_20261009/audit.json",
+  "regression": [
+    {
+      "name": "output/hero_skill_pips_20261009/verify_native_pip_geometry.cjs",
+      "status": 0,
+      "output": "NATIVE_PIP_GEOMETRY_PASS: both production helpers, 3/4/5/6 points fill 104px, 12px height, gold/next/hidden classes preserved, excluded nodes untouched, dynamic count, 5 to 1 exact styles restore, destroyed handles pruned, decimal pixel setters",
+      "stderr": ""
+    },
+    {
+      "name": "tools/test_handoff_numeric_layout.cjs",
+      "status": 0,
+      "output": "HANDOFF_NUMERIC_LAYOUT_PASS: both HUD scripts reproduce old exponent failure; real layout/nativeLayout/refresh/mirror/reveal recover; resize, UI scale, tiny clips/scales, negative offsets, zero, nonfinite and extreme dimensions",
+      "stderr": ""
+    },
+    {
+      "name": "tools/test_topnav_hotpath_recovery.cjs",
+      "status": 0,
+      "output": "SQUARE_STABLE_COUNTS {\"before\":{\"reads\":4100,\"writes\":960,\"queries\":300,\"classes\":0},\"after\":{\"reads\":680,\"writes\":0,\"queries\":20,\"classes\":0}}\nMIRROR_STABLE_COUNTS {\"before\":{\"reads\":800,\"writes\":0,\"queries\":400,\"classes\":60},\"after\":{\"reads\":800,\"writes\":0,\"queries\":0,\"classes\":0}}\nNATIVE_REFLOW_COUNTS {\"before\":200,\"after\":40,\"hits\":160}\nTOPNAV_HOTPATH_RECOVERY_PASS: live values/owner, valid detached subtree and replacements, immediate late ability children and geometry restoration, bounded cosmetic/optional retry, cooldown preservation",
+      "stderr": ""
+    }
+  ],
+  "geometry_validation": {
+    "passed": true,
+    "results": [
+      {
+        "filename": "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+        "rows": [
+          {
+            "count": 3,
+            "dotWidth": "32.666667px",
+            "height": "12px",
+            "total": 104.000001
+          },
+          {
+            "count": 4,
+            "dotWidth": "23.75px",
+            "height": "12px",
+            "total": 104
+          },
+          {
+            "count": 5,
+            "dotWidth": "18.4px",
+            "height": "12px",
+            "total": 104
+          },
+          {
+            "count": 6,
+            "dotWidth": "14.833333px",
+            "height": "12px",
+            "total": 103.99999799999999
+          }
+        ],
+        "statesPreserved": true,
+        "singleAndInventoryUntouched": true,
+        "dynamicCountPassed": true,
+        "reusedFiveToOneRestored": true,
+        "destroyedHandlesPruned": true
+      },
+      {
+        "filename": "panorama/src/scripts/custom_game/handoff_hud.js",
+        "rows": [
+          {
+            "count": 3,
+            "dotWidth": "32.666667px",
+            "height": "12px",
+            "total": 104.000001
+          },
+          {
+            "count": 4,
+            "dotWidth": "23.75px",
+            "height": "12px",
+            "total": 104
+          },
+          {
+            "count": 5,
+            "dotWidth": "18.4px",
+            "height": "12px",
+            "total": 104
+          },
+          {
+            "count": 6,
+            "dotWidth": "14.833333px",
+            "height": "12px",
+            "total": 103.99999799999999
+          }
+        ],
+        "statesPreserved": true,
+        "singleAndInventoryUntouched": true,
+        "dynamicCountPassed": true,
+        "reusedFiveToOneRestored": true,
+        "destroyedHandlesPruned": true
+      }
+    ],
+    "nativeRenderedPixelsVerified": false
+  },
+  "compiled_artifacts": [
+    {
+      "path": "panorama/scripts/custom_game/topnav_remaining_5d5c1152eb.vjs_c",
+      "sha256": "d83496aa9d8852cada48fec867831c506145062d8cfb8b06e45da27589f0f490",
+      "bytes": 110468,
+      "current_helper_present": true,
+      "log": "output/hero_skill_pips_20261009/topnav_remaining_5d5c1152eb.js.compile.log",
+      "result": "1 compiled, 0 failed"
+    },
+    {
+      "path": "panorama/scripts/custom_game/handoff_hud.vjs_c",
+      "sha256": "06e5849d910be070779e4dfbc753510c293b5731a87f75dcf6c2322ed488591f",
+      "bytes": 37793,
+      "current_helper_present": true,
+      "log": "output/hero_skill_pips_20261009/handoff_hud.js.compile.log",
+      "result": "1 compiled, 0 failed"
+    }
+  ],
+  "gameplay_changes": false,
+  "native_rendered_pixels_verified": false,
+  "git_mutations_performed": false,
+  "unrelated_changes_preserved": true,
+  "evidence_directory": "output/hero_skill_pips_20261009",
+  "final_workspace_checks": [
+    {
+      "name": "diff_check",
+      "exit_code": 0,
+      "log": "output/hero_skill_pips_20261009/diff_check.txt"
+    },
+    {
+      "name": "diff_stat_after",
+      "exit_code": 0,
+      "log": "output/hero_skill_pips_20261009/diff_stat_after.txt"
+    },
+    {
+      "name": "diff_names_after",
+      "exit_code": 0,
+      "log": "output/hero_skill_pips_20261009/diff_names_after.txt"
+    },
+    {
+      "name": "status_after",
+      "exit_code": 0,
+      "log": "output/hero_skill_pips_20261009/status_after.txt"
+    }
+  ],
+  "syntax_checks": [
+    {
+      "script": "topnav_remaining_5d5c1152eb.js",
+      "exit_code": 0
+    },
+    {
+      "script": "handoff_hud.js",
+      "exit_code": 0
+    }
+  ]
+}

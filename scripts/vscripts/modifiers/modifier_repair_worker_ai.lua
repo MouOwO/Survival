@@ -2,8 +2,18 @@ modifier_repair_worker_ai = class({})
 _G.modifier_repair_worker_ai = modifier_repair_worker_ai
 local M = modifier_repair_worker_ai
 local repair_math = require("core/repair_math")
+local repair_policy = require("systems/repair_target_policy")
+local repair_candidates = require("systems/repair_building_candidates")
+local repair_wakeup = require("systems/repair_worker_wakeup")
 
-local THINK_INTERVAL = 0.25
+local THINK_INTERVAL = repair_policy.think_interval
+local IDLE_INTERVAL = repair_policy.idle_interval
+
+function M:SetThinkInterval(interval)
+    if self.repair_think_interval == interval then return end
+    self.repair_think_interval = interval
+    self:StartIntervalThink(interval)
+end
 
 function M:IsHidden() return true end
 function M:IsPurgable() return false end
@@ -23,10 +33,22 @@ function M:OnCreated(params)
         and detection_range or math.max(self.repair_range, detection_range)
     self.repair_target_entindex = nil
     self.manual_repair_target_entindex = nil
+    self.repair_target_handle = nil
+    self.manual_repair_target_handle = nil
+    self.repairing = false
+    self.repair_standby = false
+    self.repair_gesture_elapsed = 0.25
     self.approaching_manual_target = false
+    self.approaching_repair_target = false
     self.repair_fractional_remainder = 0
     self.approach_retry = 0
-    self:StartIntervalThink(THINK_INTERVAL)
+    self.repair_think_interval = nil
+    repair_wakeup.register(self, self:GetParent())
+    self:SetThinkInterval(IDLE_INTERVAL)
+end
+
+function M:OnDestroy()
+    if IsServer() then repair_wakeup.unregister(self) end
 end
 
 local function valid_entity(entity)
@@ -55,7 +77,7 @@ local function repairable_building(parent, building, allow_full)
         and building:GetTeamNumber() == parent:GetTeamNumber()
         and same_owner(parent, building)
         and not building:HasModifier("modifier_building_under_construction")
-        and (allow_full or building:GetHealth() < building:GetMaxHealth())
+        and (allow_full or repair_policy.needs_repair(building))
 end
 
 local function issue_internal_order(parent, order)
@@ -73,10 +95,17 @@ function M:SetManualRepairTarget(building)
     if build_task and build_task.constructing then return false end
     if build_task then parent.survival_build_task = nil end
     self.approach_retry = 0
+    self.repair_standby = false
+    self.approaching_repair_target = false
     local entindex = building:entindex()
-    if self.manual_repair_target_entindex ~= entindex then
+    if self.manual_repair_target_entindex ~= entindex
+        or self.manual_repair_target_handle ~= building then
         self.manual_repair_target_entindex = entindex
+        self.manual_repair_target_handle = building
         self.repair_target_entindex = entindex
+        self.repair_target_handle = building
+        self.repairing = false
+        self.repair_gesture_elapsed = 0.25
         self.repair_fractional_remainder = 0
         self.approaching_manual_target = false
     end
@@ -85,18 +114,27 @@ function M:SetManualRepairTarget(building)
         OrderType = DOTA_UNIT_ORDER_STOP,
         Queue = false,
     })
+    self:SetThinkInterval(THINK_INTERVAL)
     return true
 end
 
 function M:ClearManualRepairTarget(reason)
     if not IsServer() then return end
     local parent = self:GetParent()
-    local should_stop = self.approaching_manual_target == true
+    local should_stop = (self.approaching_manual_target == true
+        or self.approaching_repair_target == true)
         and reason ~= "player_order"
     self.manual_repair_target_entindex = nil
+    self.manual_repair_target_handle = nil
     self.approaching_manual_target = false
+    self.approaching_repair_target = false
     self.repair_target_entindex = nil
+    self.repair_target_handle = nil
+    self.repairing = false
+    self.repair_standby = false
+    self.repair_gesture_elapsed = 0.25
     self.repair_fractional_remainder = 0
+    self:SetThinkInterval(IDLE_INTERVAL)
     if should_stop and valid_entity(parent) then
         issue_internal_order(parent, {
             UnitIndex = parent:entindex(),
@@ -107,25 +145,9 @@ function M:ClearManualRepairTarget(reason)
 end
 
 local function damaged_building(parent, detection_range)
-    local units = FindUnitsInRadius(
-        parent:GetTeamNumber(),
-        parent:GetAbsOrigin(),
-        nil,
-        detection_range,
-        DOTA_UNIT_TARGET_TEAM_FRIENDLY,
-        -- Walls use npc_dota_building; BASIC/HERO only sees creature-backed
-        -- buildings, regardless of the wall model or survival_is_building tag.
-        DOTA_UNIT_TARGET_BASIC + DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BUILDING,
-        DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
-        FIND_CLOSEST,
-        false
-    )
-    for _, unit in ipairs(units) do
-        if repairable_building(parent, unit) then
-            return unit
-        end
-    end
-    return nil
+    -- The formal registry includes native npc_dota_building walls. Its cached
+    -- owner/team candidates avoid a map-wide engine search on each idle tick.
+    return repair_candidates.closest(parent, detection_range, repairable_building)
 end
 
 local function unit_is_idle(unit)
@@ -134,48 +156,108 @@ local function unit_is_idle(unit)
     return not ok or idle == true
 end
 
+function M:WakeForDamagedBuilding(building)
+    if self.repair_think_interval == THINK_INTERVAL then return false end
+    local parent = self:GetParent()
+    if not valid_entity(parent) or not parent:IsAlive()
+        or parent.survival_build_task
+        or (parent.IsChanneling and parent:IsChanneling())
+        or (parent.GetCurrentActiveAbility and parent:GetCurrentActiveAbility())
+        or not repairable_building(parent, building, false) then return false end
+    if self.manual_repair_target_entindex then
+        if self.manual_repair_target_handle ~= building then return false end
+    elseif not unit_is_idle(parent) then
+        return false
+    end
+    -- Changing the timer only once leaves an already pending wake untouched.
+    self:SetThinkInterval(THINK_INTERVAL)
+    return true
+end
+
 function M:OnIntervalThink()
     if not IsServer() then return end
     local parent = self:GetParent()
-    if not parent or parent:IsNull() or not parent:IsAlive() then return end
+    if not parent or parent:IsNull() or not parent:IsAlive() then
+        self:SetThinkInterval(IDLE_INTERVAL)
+        return
+    end
     if parent.survival_build_task
         or (parent.IsChanneling and parent:IsChanneling())
         or (parent.GetCurrentActiveAbility and parent:GetCurrentActiveAbility()) then
+        self:SetThinkInterval(IDLE_INTERVAL)
         return
     end
     local manual_target = self.manual_repair_target_entindex ~= nil
     local building = manual_target
-        and entity(self.manual_repair_target_entindex) or nil
+        and self.manual_repair_target_handle or self.repair_target_handle
+    -- Keep the actual handle: recycled entity indices must not inherit work.
+    if building and (not valid_entity(building)
+        or entity(building:entindex()) ~= building) then building = nil end
     if manual_target and not repairable_building(parent, building, true) then
         self:ClearManualRepairTarget("target_invalid")
         return
     end
     if not manual_target then
-        if not unit_is_idle(parent) then return end
-        building = damaged_building(parent, self.detection_range)
+        if building and not repairable_building(parent, building, true) then building = nil end
+        -- Another worker or a regeneration effect can finish our target.
+        -- Retire it before seeking work instead of pinning a healthy building.
+        if building and (building:GetHealth() >= building:GetMaxHealth()
+            or (not self.repairing and not repair_policy.needs_repair(building))) then
+            building = nil
+        end
+        if not building then
+            if self.approaching_repair_target then
+                issue_internal_order(parent, {
+                    UnitIndex = parent:entindex(),
+                    OrderType = DOTA_UNIT_ORDER_STOP,
+                    Queue = false,
+                })
+                self.approaching_repair_target = false
+            end
+            self.repair_target_entindex = nil
+            self.repair_target_handle = nil
+            self.repairing = false
+            self.repair_standby = false
+            self.repair_fractional_remainder = 0
+            if not unit_is_idle(parent) then
+                self:SetThinkInterval(IDLE_INTERVAL)
+                return
+            end
+            building = damaged_building(parent, self.detection_range)
+        end
     end
     if not building then
         self.repair_target_entindex = nil
+        self.repair_target_handle = nil
+        self.repairing = false
+        self.repair_standby = false
         self.repair_fractional_remainder = 0
+        self:SetThinkInterval(IDLE_INTERVAL)
         return
     end
     local building_index = building:entindex()
-    if self.repair_target_entindex ~= building_index then
+    if self.repair_target_entindex ~= building_index or self.repair_target_handle ~= building then
         self.repair_target_entindex = building_index
+        self.repair_target_handle = building
+        self.approach_retry = 0
+        self.repairing = false
+        self.repair_standby = false
         self.repair_fractional_remainder = 0
     end
-    local center_distance = (
-        building:GetAbsOrigin() - parent:GetAbsOrigin()
-    ):Length2D()
+    if self.repair_standby and not self.repairing
+        and not repair_policy.needs_repair(building) then
+        self:SetThinkInterval(IDLE_INTERVAL)
+        return
+    end
+    self:SetThinkInterval(THINK_INTERVAL)
+    local building_position, worker_position = building:GetAbsOrigin(), parent:GetAbsOrigin()
+    local dx, dy = building_position.x - worker_position.x, building_position.y - worker_position.y
     local parent_hull = parent.GetHullRadius
         and (parent:GetHullRadius() or 0) or 0
     local building_hull = building.GetHullRadius
         and (building:GetHullRadius() or 0) or 0
-    local edge_distance = math.max(
-        0,
-        center_distance - parent_hull - building_hull
-    )
-    if edge_distance > self.repair_range then
+    local center_range = self.repair_range + parent_hull + building_hull
+    if dx * dx + dy * dy > center_range * center_range then
         self.approach_retry = math.max(0, (self.approach_retry or 0) - THINK_INTERVAL)
         if self.approach_retry <= 0 then
             -- Find a reachable point outside the wall footprint, never its blocked center.
@@ -190,6 +272,7 @@ function M:OnIntervalThink()
             self.approach_retry = 1
             if point then
                 if manual_target then self.approaching_manual_target = true end
+                self.approaching_repair_target = true
                 issue_internal_order(parent, {
                     UnitIndex = parent:entindex(),
                     OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
@@ -201,21 +284,34 @@ function M:OnIntervalThink()
         return
     end
 
-    if manual_target and self.approaching_manual_target then
+    if self.approaching_repair_target or (manual_target and self.approaching_manual_target) then
         issue_internal_order(parent, {
             UnitIndex = parent:entindex(),
             OrderType = DOTA_UNIT_ORDER_STOP,
             Queue = false,
         })
         self.approaching_manual_target = false
+        self.approaching_repair_target = false
     end
 
-    if building:GetHealth() >= building:GetMaxHealth() then
+    if building:GetHealth() >= building:GetMaxHealth()
+        or (not self.repairing and not repair_policy.needs_repair(building)) then
+        self.repairing = false
+        self.repair_standby = manual_target
         self.repair_fractional_remainder = 0
+        self:SetThinkInterval(IDLE_INTERVAL)
         return -- Keep the explicitly assigned wall; resume when it takes damage.
     end
-    parent:FaceTowards(building:GetAbsOrigin())
-    parent:StartGesture(ACT_DOTA_ATTACK)
+    self.repairing = true
+    self.repair_standby = false
+    -- A faster decision tick must not restart the attack gesture ten times a
+    -- second. Preserve its old cadence independently of the healing interval.
+    self.repair_gesture_elapsed = (self.repair_gesture_elapsed or 0.25) + THINK_INTERVAL
+    if self.repair_gesture_elapsed >= 0.25 then
+        self.repair_gesture_elapsed = self.repair_gesture_elapsed - 0.25
+        parent:FaceTowards(building:GetAbsOrigin())
+        parent:StartGesture(ACT_DOTA_ATTACK)
+    end
     local amount, remainder = repair_math.whole_amount_for_interval(
         building:GetMaxHealth(),
         self.repair_max_health_pct_per_second,
@@ -226,12 +322,16 @@ function M:OnIntervalThink()
     local next_health = math.min(max_health, building:GetHealth() + amount)
     building:SetHealth(next_health)
     if next_health >= max_health then
+        self.repairing = false
+        self.repair_standby = manual_target
         if manual_target then
             self.repair_fractional_remainder = 0
         else
             self.repair_target_entindex = nil
+            self.repair_target_handle = nil
             self.repair_fractional_remainder = 0
         end
+        self:SetThinkInterval(IDLE_INTERVAL)
     else
         self.repair_fractional_remainder = remainder
     end

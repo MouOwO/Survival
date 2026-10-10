@@ -581,6 +581,7 @@ function M.precache(context)
     PrecacheResource("particle", "particles/generic_hero_status/hero_levelup.vpcf", context)
     require("systems/valley_environment_service").precache(context)
     require("systems/tower_visual_service").precache(context)
+    require("systems/tower_projectile_visual").precache(context)
     require("systems/weapon_visual_service").precache(context)
     -- 魔法塔技能粒子不是单位的普通攻击弹道，必须单独预加载。
     tower_magic_supreme_system.precache(context)
@@ -709,6 +710,7 @@ function M.precache(context)
     local precached_lasers = {}
     require("systems/zeus_lightning_visual").precache(context)
     require("systems/hero_return_home_visual").precache(context)
+    require("systems/gold_mine_research_visual").precache(context)
     PrecacheResource("particle", "particles/units/heroes/hero_siren/siren_net.vpcf", context)
     PrecacheResource("particle", "particles/units/heroes/hero_phantom_assassin/phantom_assassin_crit_impact.vpcf", context)
     for _, row in ipairs(require("config/generated/tower_laser_effects").rows or {}) do
@@ -938,6 +940,9 @@ local function initialize_core_services()
     require("systems/challenge_asset_preload_service").init()
     unit_health_bar_service.init()
     combat_bootstrap.init()
+    require("systems/tower_damage_observer").init()
+    require("systems/lumberjack_attack_observer").init()
+    require("systems/enemy_attack_observer").init()
     assert(tree_attack_order_filter.register(),
         "tree attack order filter registration failed")
     assert(attack_range_display_service.init(),
@@ -1039,6 +1044,11 @@ function M.activate()
         .. " max_players=" .. tostring(configured_max_players())
         .. " setup_wait_seconds=" .. tostring(configured_setup_wait_seconds()))
 
+    -- Bind tower event declarations after the shared native observer exists.
+    -- Source 2 captures modifier functions while linking their class.
+    require("systems/tower_damage_observer").init()
+    require("systems/lumberjack_attack_observer").init()
+    require("systems/enemy_attack_observer").init()
     local runtime_modifiers_valid, runtime_modifier_count_or_error =
         modifier_registry.register()
     assert(runtime_modifiers_valid,

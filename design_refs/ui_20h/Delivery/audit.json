@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-07T11:13:57.222Z",
+  "checks": [
+    "Bottom HUD geometry/controller/common lifecycle and Lua/map/CSV unchanged",
+    "Merged title/VIP XML entries and health projection sentinel fix preserved",
+    "101 source/compiled dependencies present, content synchronized (line endings normalized), JS syntax valid",
+    "Temporary Tools observer restored byte-for-byte in runtime and removed from content source",
+    "Reusable material/icon pixels and recovered sources unchanged; 21 original title sources retained",
+    "10 distinct candidate purposes, 7 selections, decisions/costs/checkpoints recorded; latest not automatically selected",
+    "40 viewport/state cases, 16 layout and event cases, 15 archive categories and original title equip event",
+    "553 exact recovery files, final source/compiled hashes and all gallery links verified"
+  ],
+  "limitations": [
+    "Native 1280x720 archive captured with 44 real server rows before final compatibility changes",
+    "Dota client required update; local reload had zero players, final line-height/host/title/HUD and R08 training checks remain native-unverified",
+    "Higher resolutions and category fixtures are component previews, ScenePanel/engine nodes remain stand-ins",
+    "Worker per-item cancellation has no existing API; original research refund logic unchanged",
+    "No real checkout, lottery draw or reward claim"
+  ],
+  "status": "PASS_WITH_NATIVE_LIMITATIONS"
+}

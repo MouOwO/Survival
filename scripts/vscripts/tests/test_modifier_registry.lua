@@ -44,6 +44,7 @@ local reported = {
     "survival_hero_base_health", "survival_hero_mana_standard", "weapon_stat_projection",
     "equipment_effects", "weapon_attack_tracker", "research_technology",
     "survival_hero_skill", "monkey_king_clone", "debug_fixed_attack_rate",
+    "ultimate_tower_presence",
 }
 for _, suffix in ipairs(reported) do assert(bindings["modifier_" .. suffix], suffix) end
 bindings = {} -- Simulate engine bindings needing refresh, Lua cache intact.

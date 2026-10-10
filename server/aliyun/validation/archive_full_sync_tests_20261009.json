@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-09",
+  "status": "OFFLINE_CANDIDATE_AND_WORKSPACE_PASS",
+  "candidate_bundle": "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4",
+  "candidate_service_sha256": "61d5f01eccf2a34b2129ebb3280097d967b77bb5b4815df07ecdc7bcc501d723",
+  "executed": [
+    {
+      "suite": "tools.test_archive_full_sync",
+      "implementation": "exact staged service, compatibility policy, immutable bundle and packaged Lua worker",
+      "passed": 25,
+      "skipped": 0,
+      "seconds": 12.757
+    },
+    {
+      "suite": "tools.test_archive_challenge_unlock",
+      "implementation": "exact staged service and immutable bundle",
+      "passed": 8,
+      "skipped": 0
+    },
+    {
+      "suite": "tools.test_archive_command_contract",
+      "implementation": "workspace service command validation",
+      "passed": 5,
+      "skipped": 0
+    },
+    {
+      "suite": "server.tests.test_archive_backend",
+      "implementation": "workspace service and independently built current-source bundle; local simulated HTTP controller from D:/survival_database/backend",
+      "passed": 26,
+      "skipped": 0
+    },
+    {
+      "suite": "server.tests.test_commerce",
+      "implementation": "workspace service and independently built current-source bundle",
+      "passed": 13,
+      "skipped": 0
+    }
+  ],
+  "coverage": [
+    "All 21 production command field contracts; simulated currency and online checkpoint commands stay unavailable through the generic HTTP command route",
+    "N1 through N20 solo clear counts, configured achievements, first-win welfare and trusted-day faith awards",
+    "Early and regular clear command identifiers in the same match deduplicate to one canonical receipt",
+    "Lost reply after committed clear, revision conflict, completed legacy receipt and configuration-hash conflict",
+    "Both known pre-upgrade bundle hashes accept current clear and new archive commands while preserving each recorded hash",
+    "Cooperative wins count once per match; solo history does not manufacture cooperative welfare progress",
+    "Saved-point starjoy tier reconciliation retains earned progress after spending",
+    "VIP server-recharge gating, one-time claims, atomic paid-currency package and medal rewards",
+    "Title equip and removal persist without granting unrelated pending gameplay rewards",
+    "Trusted-date daily claims, work welfare, building upgrades, social draws, fragment promotion, low-difficulty challenge and endless progress",
+    "All 97 old stat rows remain exactly identical, only six zero-default fields are added, all unrelated economic tables and CSV hashes are preserved",
+    "Legacy commerce and lottery transaction reducers remain on their recorded immutable version"
+  ],
+  "fixture_changes": [
+    "Conflict test now includes the existing first-win welfare reward of 10 wood and asserts both clear and welfare completion markers",
+    "Summer lottery seed-zero fixture expects its actual lowest available rarity R"
+  ],
+  "limits": [
+    "No production player data was written by these tests",
+    "No ECS deployment or PostgreSQL migrations were performed by this test agent",
+    "Receipt tests enforce configuration hash and command fingerprint in an isolated in-memory database; root agent handles actual PostgreSQL acceptance",
+    "No native game map rendering or live early/regular victory was performed by this test agent"
+  ]
+}

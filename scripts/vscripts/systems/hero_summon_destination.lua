@@ -2,6 +2,7 @@ local destination_validation = require("systems/destination_validation_service")
 local placement = require("config/grid_placement_config")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local player_context = require("systems/player_context_service")
 
 local M = {}
 local SEARCH_RADIUS, STEP, HERO_RADIUS, MAX_HEIGHT_DELTA = 640, 64, 32, 64
@@ -114,20 +115,28 @@ local function candidate(origin, offset, anchor_height, obstacles, hero_radius)
     return position
 end
 
-function M.resolve(altar, definition, player_id, moving_unit)
+function M.resolve(altar, definition, player_id, moving_unit, options)
     local metadata = {attempts = 0, rejected = {}, grounded = false}
     local function rejected(reason)
         metadata.last_reason = reason
         metadata.rejected[reason] = (metadata.rejected[reason] or 0) + 1
     end
-    local city = player_main_city(player_id)
-    if not city then
+    local anchor = player_main_city(player_id)
+    metadata.source = anchor and "main_city" or nil
+    local no_destination = NO_DESTINATION
+    if not anchor and options and options.allow_without_city == true
+        and valid(altar) and type(altar.IsAlive) == "function" and altar:IsAlive()
+        and player_context.is_owned_by(player_id, altar) then
+        anchor = altar
+        metadata.source = options.anchor_source == "builder" and "builder" or "hero_altar"
+        no_destination = "召唤位置周围没有安全落点，请清理附近障碍后重试"
+    end
+    if not anchor then
         rejected("main_city_not_found")
         return nil, "玩家主城尚未建造，无法召唤英雄", metadata
     end
-    metadata.source = "main_city"
-    local origin = copied_position(city:GetAbsOrigin())
-    if not origin then rejected("spawn_anchor_unavailable"); return nil, NO_DESTINATION, metadata end
+    local origin = copied_position(anchor:GetAbsOrigin())
+    if not origin then rejected("spawn_anchor_unavailable"); return nil, no_destination, metadata end
     local hero_radius = HERO_RADIUS
     if valid(moving_unit) then
         local moving_hull = tonumber(moving_unit.survival_hull_radius)
@@ -137,15 +146,15 @@ function M.resolve(altar, definition, player_id, moving_unit)
         end
         if finite(moving_hull) and moving_hull > hero_radius then hero_radius = moving_hull end
     end
-    local obstacles, reason = nearby_obstacles(origin, city, moving_unit, hero_radius)
-    if not obstacles then rejected(reason); return nil, NO_DESTINATION, metadata end
-    local hull = tonumber(city.survival_hull_radius)
-        or (type(city.GetHullRadius) == "function" and tonumber(city:GetHullRadius())) or 0
+    local obstacles, reason = nearby_obstacles(origin, anchor, moving_unit, hero_radius)
+    if not obstacles then rejected(reason); return nil, no_destination, metadata end
+    local hull = tonumber(anchor.survival_hull_radius)
+        or (type(anchor.GetHullRadius) == "function" and tonumber(anchor:GetHullRadius())) or 0
     if not finite(hull) or hull < 0 then hull = 0 end
     -- Keep the hero visibly outside the city. Expand concentric rings on all
     -- sides, starting in front; never spill into a distant altar/training room.
     local first_radius = math.ceil(math.max(256, hull + hero_radius + STEP) / STEP) * STEP
-    local forward = type(city.GetForwardVector) == "function" and city:GetForwardVector() or nil
+    local forward = type(anchor.GetForwardVector) == "function" and anchor:GetForwardVector() or nil
     local fx, fy = 1, 0
     if forward and finite(forward.x) and finite(forward.y) then
         local length = math.sqrt(forward.x * forward.x + forward.y * forward.y)
@@ -165,8 +174,8 @@ function M.resolve(altar, definition, player_id, moving_unit)
             rejected(failure)
         end
     end
-    metadata.last_reason = metadata.last_reason or "main_city_clearance_exceeds_search"
-    return nil, NO_DESTINATION, metadata
+    metadata.last_reason = metadata.last_reason or (metadata.source .. "_clearance_exceeds_search")
+    return nil, no_destination, metadata
 end
 
 return M

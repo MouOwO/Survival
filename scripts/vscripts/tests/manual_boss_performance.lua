@@ -86,6 +86,9 @@ function M.stop(reason)
     for _, hook in ipairs(capture.hooks) do
         if hook.owner[hook.name] == hook.wrapper then hook.owner[hook.name] = hook.original end
     end
+    if capture.damage_filter and GameRules:GetGameModeEntity()==capture.damage_filter.mode then
+        capture.damage_filter.mode:SetDamageFilter(capture.damage_filter.original,capture.damage_filter.service)
+    end
     local elapsed = math.max(0.001, capture.wall() - capture.started)
     write(string.format("done reason=%s seconds=%.2f clock=%s hooks=%d unavailable=%d",
         reason or "manual", elapsed, capture.clock_kind, #capture.hooks, #capture.unavailable))
@@ -115,7 +118,9 @@ function M.run(seconds)
     local mode = GameRules and GameRules:GetGameModeEntity()
     if not mode or type(mode.SetContextThink) ~= "function" then return false, "active_match_required" end
     local measure, clock_kind
-    if clock_available(os and os.clock) then measure, clock_kind = os.clock, "os_clock"
+    if clock_available(GetSystemTimeMS) then
+        measure, clock_kind = function() return GetSystemTimeMS() / 1000 end, "engine_system_time_ms"
+    elseif clock_available(os and os.clock) then measure, clock_kind = os.clock, "os_clock"
     elseif clock_available(Time) then measure, clock_kind = Time, "engine_Time"
     else return false, "clock_unavailable" end
     local wall = clock_available(Time) and Time or measure
@@ -130,6 +135,16 @@ function M.run(seconds)
     install(capture, package.loaded["core/event_bus"], "emit", "event_bus.emit", "event")
     install(capture, package.loaded["core/event_bus"], "request", "event_bus.request", "event")
     install(capture, package.loaded["combat/damage_service"], "Deal", "damage_service.Deal")
+    local filter_service=package.loaded["combat/damage_filter_service"]
+    if filter_service and type(filter_service._filter_for_test)=="function"
+        and type(mode.SetDamageFilter)=="function" then
+        local original=filter_service._filter_for_test
+        install(capture,filter_service,"_filter_for_test","damage_filter")
+        if filter_service._filter_for_test~=original then
+            mode:SetDamageFilter(filter_service._filter_for_test,filter_service)
+            capture.damage_filter={mode=mode,service=filter_service,original=original}
+        end
+    end
     install(capture, _G, "FindUnitsInRadius", "FindUnitsInRadius")
     install(capture, ParticleManager, "CreateParticle", "ParticleManager.CreateParticle", "particle")
     install(capture, ParticleManager, "DestroyParticle", "ParticleManager.DestroyParticle")

@@ -1,5 +1,5 @@
--- Real repair AI, order service and work-position finder; engine search honors
--- entity type masks so a native building cannot masquerade as a basic unit.
+-- Real repair AI, formal building registry, order service and work-position
+-- finder. Native building walls must be found without an automatic engine scan.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 class = function(t) t.__index=t; return t end
 IsServer = function() return true end
@@ -41,6 +41,11 @@ local wall=unit(2,4,0)
 wall.survival_is_building=true
 wall.survival_building_id="wall"
 wall.survival_grid_footprint={x=4,y=4}
+local bus,events=require('core/event_bus'),require('core/events')
+bus.handle_request(events.BUILDING_LIST_REQUEST,function(payload)
+    assert(payload.handles_only==true)
+    return {buildings={{unit=wall,building_id='wall',player_id=0}}}
+end)
 local function contains(mask,flag) return mask%(flag*2)>=flag end
 FindUnitsInRadius=function(team,origin,_,radius,team_filter,mask)
     if team_filter==DOTA_UNIT_TARGET_TEAM_FRIENDLY then scan_calls=scan_calls+1 end
@@ -79,24 +84,24 @@ for _,kind in ipairs({"builder","repairer"}) do
     local m=setmetatable({},repair)
     worker.repair=m
     function m:GetParent() return worker end
-    function m:StartIntervalThink(interval) assert(interval==0.25) end
+    function m:StartIntervalThink(interval) assert(interval==0.1 or interval==1) end
     local function init(range)
         m:OnCreated({repair_max_health_pct_per_second=2,repair_range=200,detection_range=range})
     end
-    -- Explicit finite distance isolates the missing BUILDING bit from the
-    -- separate sentinel regression in the default builder configuration.
+    -- Both finite and all-map detection use registered native building walls.
     init(99999)
     m:OnIntervalThink()
+    assert(scan_calls==0,'Automatic repair must not call the engine unit search')
     assert(#orders==1 and orders[1].Position, kind.." failed to find native npc_dota_building wall")
     assert(not occupied(orders[1].Position), "repair must approach outside blocked footprint")
     assert((orders[1].Position-wall.position):Length2D()-worker:GetHullRadius()-wall:GetHullRadius()
         <=m.repair_range-16, "reachable work point still lies outside repair range")
     worker.position=orders[1].Position;worker.idle=true
-    for tick=1,4 do m:OnIntervalThink() end
+    for tick=1,10 do m:OnIntervalThink() end
     assert(wall.health==520, "repair remains 2% of max health each second")
     worker:SetModel("models/heroes/warlock/warlock.vmdl")
     m:OnIntervalThink()
-    assert(wall.health==525, "visual model replacement must not stop repair")
+    assert(wall.health==522, "visual model replacement must not stop repair")
 
     init(nil)
     assert(m.detection_range==FIND_UNITS_EVERYWHERE, "default all-map scan was clamped to melee range")
@@ -129,8 +134,9 @@ for _,kind in ipairs({"builder","repairer"}) do
     worker.position=orders[#orders].Position
     m:OnIntervalThink()
     assert(worker.idle and m.manual_repair_target_entindex==2, "manual assignment must station at full wall")
-    wall.health=990;m:OnIntervalThink();assert(wall.health==995)
+    wall.health=990;m:OnIntervalThink();assert(wall.health==990, "99% must stay on standby")
+    wall.health=970;m:OnIntervalThink();assert(wall.health==972)
     assert(not service.process({order_type=DOTA_UNIT_ORDER_MOVE_TO_POSITION,units={["0"]=1}}))
     assert(m.manual_repair_target_entindex==nil, "player move must release manual assignment")
 end
-print("WALL_REPAIR_DETECTION_PASS: native building masks, builder/repairer, model swaps, map-wide scan, safe approach, repair rate, manual standby, ownership and construction")
+print("WALL_REPAIR_DETECTION_PASS: registered native walls, builder/repairer, model swaps, map-wide candidates without engine scan, safe approach, repair rate, manual standby, ownership and construction")

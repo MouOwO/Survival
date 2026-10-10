@@ -28,7 +28,8 @@ end
 local function toggle(state, player)
     return bus.request(events.TOWER_AUTO_UPGRADE_TOGGLE_REQUEST, {entindex = state.unit:entindex(), player_id = player or 0})
 end
-local function tick() clock = clock + 0.36; scheduler.think() end
+local function advance(seconds) clock = clock + seconds; scheduler.think() end
+local function tick() advance(1.01) end
 local checks = 0
 local function finish(state)
     assert(state.unit.survival_upgrade_in_progress)
@@ -54,15 +55,29 @@ service.init({query = function(unit) return states[unit:entindex()] end, publish
 local state = fixture("class_1", 6)
 assert(not toggle(state, 1).ok, "reject another player's tower")
 assert(toggle(state).enabled)
-tick(); tick()
+local auto_view = runtime.build("ability_upgrade_tower_lv01", state,
+    {gold=1e12,wood=1e12,max_population=100})
+local auto_hint
+for _, field in ipairs(auto_view.fields or {}) do
+    if field.label == "自动升级" then auto_hint = field.value end
+end
+assert(auto_view.auto_upgrade_enabled == 1 and auto_hint
+    and auto_hint:find("右键", 1, true) and auto_hint:find("每秒", 1, true),
+    "upgrade tooltip shows active automation and the right-click control")
+advance(0.99)
+assert(checks == 0 and calls == 0, "enabling waits for the first one-second check")
+advance(0.02)
 assert(state.level == 6 and state.unit.survival_tower_auto_upgrade, "wait for resources")
 assert(calls == 0 and checks == 1, "insufficient resources never enter full upgrade")
 for i=1,1000 do bus.emit(events.RESOURCE_CHANGED,{player_id=1}) end
-tick(); assert(checks == 1, "other player resources cannot wake this tower")
+advance(0.2); assert(checks == 1, "other player resources cannot wake this tower")
 for i=1,1000 do bus.emit(events.RESOURCE_CHANGED,{player_id=0}) end
-tick(); assert(checks == 2 and calls == 0, "burst merges into one lightweight preflight")
+advance(0.2); assert(checks == 1 and calls == 0, "resource bursts cannot schedule early checks")
+advance(0.59); assert(checks == 1, "never repeat a check before one second")
+advance(0.02); assert(checks == 2 and calls == 0, "one lightweight preflight per second")
 money = 1000
 bus.emit(events.RESOURCE_CHANGED,{player_id=0})
+advance(0.2); assert(calls == 0, "new income waits for the next periodic check")
 tick()
 local paid, started = money, calls
 tick(); tick()
@@ -127,17 +142,17 @@ check_start=checks
 for i=1,1000 do
  bus.emit(events.BUILDING_CHANGED,{entindex=state.unit:entindex(),level=6,tower_class="class_1",reason="tower_personal_attack_changed"})
 end
-tick();assert(checks==check_start,"attack growth never wakes auto-upgrade")
--- No resource event: rare fallback recovers grants and missed notifications.
-money=1;clock=clock+3.1;scheduler.think();tick()
-assert(state.unit.survival_upgrade_in_progress and money==0,"fallback recovers missed event")
+advance(0.2);assert(checks==check_start,"attack growth never schedules an early auto-upgrade check")
+-- Normal one-second polling also notices grants without a resource event.
+money=1;tick()
+assert(state.unit.survival_upgrade_in_progress and money==0,"periodic check recovers missed event")
 assert(toggle(state).enabled==false)
 finish(state)
 assert(scheduler.task_count()==0)
-print("TOWER_AUTO_QUEUE_PASS: 24 towers, eight per slice, 3 upgrades/3 resources, synchronous spend events, ignored growth, missed-event recovery")
+print("TOWER_AUTO_QUEUE_PASS: one-second cadence, 24 towers, eight per slice, 3 upgrades/3 resources, ignored income/growth bursts, missed-event recovery")
 
--- Exercise the real ability sync: final upgrade remains grey even when fusion
--- is available, and the utility buttons keep their existing visibility.
+-- Exercise the real ability sync: the final route row removes upgrade buttons,
+-- while fusion and the utility buttons keep their existing visibility.
 package.loaded["systems/tower_skill_runtime"] = {get = function() return {} end}
 local ability_sync = require("systems/tower_ability_sync")
 local definition = require("config/buildings_config").arrow_tower
@@ -146,6 +161,7 @@ local abilities = {}
 local u = {survival_tower_auto_upgrade = nil}
 function u:IsNull() return false end
 function u:entindex() return 900 end
+function u:GetAbilityCount() return #abilities end
 function u:GetAbilityByIndex(i) return abilities[i + 1] end
 function u:FindAbilityByName(name)
     for _, a in ipairs(abilities) do if a.name == name then return a end end
@@ -167,8 +183,8 @@ end
 state = {unit = u, player_id = 0, building_id = "arrow_tower", tower_class = "class_5", level = 25, definition = definition}
 ability_sync.sync(state, routes.current(state), true)
 tick()
-assert(u:FindAbilityByName("ability_upgrade_tower_lv01"), "retain final upgrade icon")
-assert(not u:FindAbilityByName("ability_upgrade_tower_lv01").active, "final icon engine-disabled")
+assert(not u:FindAbilityByName("ability_upgrade_tower_lv01"), "final route removes upgrade icon")
+assert(not u:FindAbilityByName("ability_upgrade_tower_max"), "final route removes upgrade-max icon")
 assert(u:FindAbilityByName("ability_tower_fusion").active)
 assert(not u:FindAbilityByName("ability_building_blink").hidden)
 assert(not u:FindAbilityByName("ability_destroy_arrow_tower").hidden)
@@ -176,4 +192,4 @@ state.level = 10
 ability_sync.sync(state, routes.current(state), true)
 tick()
 assert(u:FindAbilityByName("ability_upgrade_tower_lv01").active, "manual cross-stage upgrade remains enabled")
-print("TOWER_MAX_ICON_PASS: retained disabled final icon, fusion and utility controls, manual promotion")
+print("TOWER_MAX_ICON_PASS: no final upgrade icons, fusion and utility controls, manual promotion")

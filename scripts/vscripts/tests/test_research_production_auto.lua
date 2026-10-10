@@ -21,7 +21,7 @@ local shop = require("systems/shop_system")
 local config = require("config/research_technology_config")
 local catalog = require("systems/shop_catalog")
 local stats = require("systems/technology_stat_manager")
-local resources, buildings, log, commits, refunds, rebirth_level
+local resources, buildings, log, commits, refunds, rebirth_level, notices
 local function eq(actual, expected, label)
     assert(actual == expected, (label or "value") .. ": expected=" .. tostring(expected)
         .. " actual=" .. tostring(actual))
@@ -36,7 +36,8 @@ local function fixture()
         [12] = { entindex = 12, building_id = "building_advanced_research_lab", player_id = 0, team = 2 },
         [13] = { entindex = 13, building_id = "building_research_lab", player_id = 0, team = 2 },
     }
-    log, commits, refunds = {}, {}, 0
+    log, commits, refunds, notices = {}, {}, 0, {}
+    bus.subscribe(events.UI_NOTIFICATION, function(p) notices[#notices + 1] = p end)
     bus.handle_request(events.RESOURCE_GET_REQUEST, function(p) return resources[p.player_id] end)
     bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST, function(p)
         local r = resources[p.player_id]
@@ -100,6 +101,15 @@ eq(level(0, "RS-01"), 0, "no instant effect")
 eq(snapshot(0, 10).finish_at, 2, "configured two-second duration")
 tick(1.99); eq(level(0, "RS-01"), 0)
 tick(2); eq(level(0, "RS-01"), 1)
+local completion_notice
+for _, notice in ipairs(notices) do
+    if notice.kind == "research_success" then
+        assert(not completion_notice, "a research commit emits only one completion notice")
+        completion_notice = notice
+    end
+end
+assert(completion_notice and completion_notice.player_id == 0 and completion_notice.audience == "player")
+eq(completion_notice.message, "研究" .. config.by_id["RS-01"].display_name:gsub("科技$", "") .. "科技成功")
 eq(snapshot(0, 10).researching, 0)
 eq(snapshot(0, 10).next_start_at, 3, "one-second wait deadline")
 bus.emit(events.RESOURCE_CHANGED, { player_id = 0, team = 2 })
@@ -284,37 +294,44 @@ tick(4); eq(snapshot(0, 10).research_group, "lumberjack_speed")
 tick(6); eq(snapshot(0, 10).research_group, "tower_attack")
 
 fixture()
-resources[0].gold = 0; resources[0].wood = 0
-for index = 1, 7 do assert(manual(0, 10, "lumberjack_speed").ok) end
-local blocked = snapshot(0, 10)
-eq(blocked.researching, 0); eq(blocked.queue_count, 7); eq(#blocked.queued, 6)
-eq(blocked.blocked_head.target_level, 1)
-for index = 1, 6 do
-    eq(blocked.queued[index].target_level, index + 1,
-        "blocked head keeps all six waiting tasks in order")
-end
-eq(manual(0, 10, "lumberjack_speed").error_code, "research_queue_full",
-    "eighth blocked task is rejected")
-assert(blocked.blocked_reason:find("开始研究时扣费", 1, true))
-eq(resources[0].wood, 0)
-tick(1); eq(snapshot(0, 10).researching, 0)
-resources[0].gold = 1000000000; resources[0].wood = 1000000000
-tick(2); eq(snapshot(0, 10).researching, 1); eq(snapshot(0, 10).target_level, 1)
-eq(snapshot(0, 10).finish_at, 4)
+resources[0].gold, resources[0].wood = 0, 0
+eq(manual(0,10,"lumberjack_speed").error_code,"insufficient_wood")
+eq(snapshot(0,10).queue_count,0);eq(refunds,0)
+eq(snapshot(0,10).researching,0);eq(snapshot(0,10).started_at,0);eq(snapshot(0,10).finish_at,0)
+assert(not snapshot(0,10).blocked_head.job_id, "rejected research does not create a blocked job")
+resources[0].wood=1000000000
+-- This technology costs only wood: zero gold must still be accepted.
+assert(manual(0,10,"lumberjack_speed").ok)
+eq(snapshot(0,10).researching,1)
 
 fixture()
 assert(manual(0, 10, "lumberjack_speed").ok)
-resources[0].wood = 0; resources[0].gold = 0
 assert(manual(0, 10, "lumberjack_efficiency").ok)
 assert(manual(0, 10, "tower_attack").ok)
+resources[0].wood = 0; resources[0].gold = 0
 tick(2)
 eq(level(0, "RS-01"), 1)
 eq(snapshot(0, 10).researching, 0)
+eq(snapshot(0, 10).started_at, 0);eq(snapshot(0, 10).finish_at, 0, "blocked research has no running clock")
 eq(snapshot(0, 10).blocked_head.technology_group, "lumberjack_efficiency")
+assert(snapshot(0, 10).blocked_reason:find("木材不足", 1, true), "waiting panel receives the resource reason")
 eq(snapshot(0, 10).queued[1].technology_group, "tower_attack", "unaffordable head cannot be overtaken")
+local blocked_queue_count = snapshot(0, 10).queue_count
+eq(manual(0, 10, "lumberjack_speed").error_code, "insufficient_wood")
+eq(snapshot(0, 10).queue_count, blocked_queue_count, "another unfunded click cannot join a blocked queue")
+tick(2.99);eq(snapshot(0, 10).researching, 0);eq(#commits, 1)
 resources[0].wood = 1000000000; resources[0].gold = 1000000000
 tick(3); eq(snapshot(0, 10).research_group, "lumberjack_efficiency")
 eq(snapshot(0, 10).finish_at, 5)
+resources[0].wood = 0;resources[0].gold = 0
+tick(5)
+eq(level(0, "RS-04"), 1);eq(snapshot(0, 10).researching, 0)
+eq(snapshot(0, 10).started_at, 0);eq(snapshot(0, 10).finish_at, 0)
+eq(snapshot(0, 10).blocked_head.technology_group, "tower_attack", "third task becomes the next blocked head")
+assert(snapshot(0, 10).blocked_reason:find("不足", 1, true))
+resources[0].wood = 1000000000; resources[0].gold = 1000000000
+tick(6);eq(snapshot(0, 10).research_group, "tower_attack");eq(snapshot(0, 10).finish_at, 8)
+tick(8);eq(snapshot(0, 10).queue_count, 0);eq(#commits, 3);eq(refunds, 0)
 
 fixture()
 local before_locked = resources[0].wood
@@ -425,37 +442,32 @@ eq(bus.request(events.SHOP_PURCHASE_REQUEST, { player_id = 0,
 -- Teammates sharing one advanced entity have private jobs, costs and levels.
 fixture()
 resources[1].gold = 0; resources[1].wood = 0
+eq(manual(1, 12, shared_group).error_code, "insufficient_gold", "unfunded manual click is rejected")
+eq(snapshot(1, 12).queue_count, 0)
+eq(snapshot(1, 12).researching, 0);eq(snapshot(1, 12).started_at, 0);eq(snapshot(1, 12).finish_at, 0)
+assert(not snapshot(1, 12).blocked_head.job_id, "gold rejection also creates no queued task")
+resources[1].gold, resources[1].wood = 1000000000, 1000000000
 for index = 1, 7 do
     assert(manual(0, 10, "lumberjack_speed").ok)
     assert(manual(0, 12, shared_group).ok)
-    assert(manual(1, 12, shared_group).ok, "shared advanced lab keeps teammate's queue independent")
+    assert(manual(1, 12, shared_group).ok)
 end
-for _, case in ipairs({ { 0, 10, "lumberjack_speed" }, { 0, 12, shared_group },
-    { 1, 12, shared_group } }) do
-    local view = snapshot(case[1], case[2])
-    eq(view.capacity, 7); eq(view.queue_count, 7); eq(#view.queued, 6)
-    eq(view.queued[6].target_level, 7)
-    eq(manual(case[1], case[2], case[3]).error_code, "research_queue_full",
-        "eighth ordinary/shared-advanced task is rejected")
+for _, case in ipairs({{0,10,"lumberjack_speed"},{0,12,shared_group},{1,12,shared_group}}) do
+    local view = snapshot(case[1],case[2])
+    eq(view.capacity,7);eq(view.queue_count,7);eq(#view.queued,6);eq(view.queued[6].target_level,7)
+    eq(manual(case[1],case[2],case[3]).error_code,"research_queue_full")
 end
-local private_blocked = snapshot(1, 12)
-eq(private_blocked.researching, 0); eq(private_blocked.blocked_head.target_level, 1)
-assert(private_blocked.blocked_head.job_id ~= snapshot(0, 12).active_job.job_id,
-    "shared entity never exposes another player's job identity")
-eq(resources[1].wood, 0, "unfunded teammate was not charged for seven waiting jobs")
+assert(snapshot(1,12).active_job.job_id ~= snapshot(0,12).active_job.job_id)
+-- Resources consumed after acceptance keep the existing six unpaid jobs.
+resources[1].gold, resources[1].wood = 0, 0
 tick(2)
-eq(level(0, "RS-01"), 1); eq(level(0, "ARS-01"), 1)
-eq(level(1, "ARS-01"), 0, "teammate does not inherit completed research")
-eq(snapshot(0, 12).target_level, 2)
-eq(snapshot(1, 12).blocked_head.target_level, 1)
-eq(#snapshot(1, 12).queued, 6, "blocked teammate keeps all six waiting icons")
-resources[1].gold = 1000000000; resources[1].wood = 1000000000
-tick(3)
-eq(snapshot(1, 12).researching, 1); eq(snapshot(1, 12).started_at, 3)
-eq(snapshot(1, 12).finish_at, 5)
-tick(4); eq(level(0, "ARS-01"), 2); eq(level(1, "ARS-01"), 0)
-tick(5); eq(level(1, "ARS-01"), 1)
-eq(snapshot(1, 12).target_level, 2)
+eq(level(0,"RS-01"),1);eq(level(0,"ARS-01"),1);eq(level(1,"ARS-01"),1)
+eq(snapshot(0,12).target_level,2);eq(snapshot(1,12).blocked_head.target_level,2)
+eq(#snapshot(1,12).queued,5)
+resources[1].gold, resources[1].wood = 1000000000,1000000000
+tick(3);eq(snapshot(1,12).researching,1);eq(snapshot(1,12).started_at,3);eq(snapshot(1,12).finish_at,5)
+tick(4);eq(level(0,"ARS-01"),2);eq(level(1,"ARS-01"),1)
+tick(5);eq(level(1,"ARS-01"),2);eq(snapshot(1,12).target_level,3)
 local function cancel(player, source, job_id, request_id)
     return bus.request(events.TECHNOLOGY_RESEARCH_CANCEL_REQUEST, {
         player_id = player, source_entindex = source, job_id = job_id, request_id = request_id,
@@ -545,15 +557,15 @@ eq(snapshot(0, 10).auto_enabled, 0, "cancelled automatic task must not immediate
 tick(10);eq(level(0, "RS-01"), 0);eq(refunds, 1)
 
 fixture()
-resources[0].gold, resources[0].wood = 0, 0
-a = manual(0, 10, "lumberjack_speed")
-b = manual(0, 10, "lumberjack_speed")
-assert(cancel(0, 10, a.job_id).ok)
-eq(snapshot(0, 10).blocked_head.job_id, b.job_id)
-eq(snapshot(0, 10).blocked_head.target_level, 1)
-eq(snapshot(0, 10).queue_count, 1);eq(refunds, 0)
-assert(cancel(0, 10, b.job_id).ok)
-tick(10);eq(snapshot(0, 10).queue_count, 0)
+a = manual(0,10,"lumberjack_speed")
+b = manual(0,10,"lumberjack_speed")
+resources[0].gold, resources[0].wood = 0,0
+tick(2)
+eq(snapshot(0,10).blocked_head.job_id,b.job_id);eq(snapshot(0,10).blocked_head.target_level,2)
+eq(snapshot(0,10).queue_count,1);eq(refunds,0)
+assert(cancel(0,10,b.job_id).ok)
+eq(manual(0,10,"lumberjack_speed").error_code,"insufficient_wood")
+tick(10);eq(snapshot(0,10).queue_count,0)
 
 fixture()
 a = manual(0, 12, shared_group)

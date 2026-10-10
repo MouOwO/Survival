@@ -1,0 +1,97 @@
+{
+  "task": "hero_clone_damage_sync",
+  "date": "2026-10-09",
+  "status": "source_fix_and_regressions_passed",
+  "production_files": [
+    "scripts/vscripts/combat/endless_stat_projection.lua",
+    "scripts/vscripts/systems/monkey_king_exclusive_service.lua",
+    "scripts/vscripts/systems/hero_combat_stat_service.lua"
+  ],
+  "test_files": [
+    "tools/test_monkey_clone_attack_rate.lua",
+    "tools/test_addspeed_snapshot.lua"
+  ],
+  "fixes": [
+    "Monkey clone huge attack was written to signed-native setter without projection; bound attack only and restore once through the existing filter.",
+    "Monkey omitted separate native equipment flat; authoritative contribution is zero under complete debug attack overrides including zero."
+  ],
+  "unchanged": [
+    "health projection",
+    "fixed attack rate/cooldown",
+    "hero native formula",
+    "other summons inheritance balance",
+    "independent Q damage"
+  ],
+  "checks": {
+    "monkey_real_service_filter_boundary": "output/hero_clone_damage_sync_20261009/monkey_damage_regression.json",
+    "authoritative_hero_debug_event": "output/hero_clone_damage_sync_20261009/hero_attack_snapshot_validation.json",
+    "other_summons": "output/hero_clone_damage_sync_20261009/other_clone_tests.json",
+    "addattack_source_audit": "output/hero_clone_damage_sync_20261009/addattack_audit.json",
+    "syntax": "output/hero_clone_damage_sync_20261009/syntax_verification.json"
+  },
+  "source_sha256": {
+    "scripts/vscripts/combat/endless_stat_projection.lua": "b7311276c0c7db2e37f5f4e1c40495f1440ca33e186bbc5995af65a2cd1ae273",
+    "scripts/vscripts/systems/monkey_king_exclusive_service.lua": "a299890b653c0b037da769e4b0503612e427eda510e5c77be1d40526e9bd33a5",
+    "scripts/vscripts/systems/hero_combat_stat_service.lua": "ea3797597ae096ca9f12f4049c9da56ce327d0421f24179fc24daebfe0866a80",
+    "tools/test_monkey_clone_attack_rate.lua": "f4a1eba760664b75361286bb2da9b634de0773332be4aa610063a2d8aa2fbbac",
+    "tools/test_addspeed_snapshot.lua": "a57067915ad732d2aad289ffc49e2d8ebbf41ee497858c98aed5ea69464368ef"
+  },
+  "limits": [
+    "Native setters/HP application are controlled fixtures, not live Dota measurement.",
+    "The exact user addattack amount has not been supplied.",
+    "Monkey Q visual fixture has a pre-existing particle-environment failure, recorded in the other-clone audit and left unchanged."
+  ],
+  "compilation": "Lua and authoritative snapshot only; no compiled resource changes.",
+  "git": "No stash, pull, commit or push requested/performed; previous and concurrent edits preserved.",
+  "final_checks": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output_bytes": 3060
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--stat"
+      ],
+      "exit_code": 0,
+      "output_bytes": 29194
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "output_bytes": 28161
+    }
+  ],
+  "final_doc_reads": [
+    {
+      "file": "docs\\ai\\PROJECT_CONTEXT.md",
+      "bytes": 12216,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\CURRENT_TASK.md",
+      "bytes": 408517,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\DECISIONS.md",
+      "bytes": 33225,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\KNOWN_ISSUES.md",
+      "bytes": 7296,
+      "read_complete": true
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "date": "2026-10-09",
+  "task": "Keep tower build ability visible and gray at player seven-tower cap",
+  "max_towers": 7,
+  "production_changes": [
+    "Builder progression retains tower skill and native slot at capacity",
+    "Immediate occupied-count event disables tower without hiding it",
+    "Tower build prerequisite_met includes capacity",
+    "Tooltip reports occupied count and maximum"
+  ],
+  "counts": "Per-player aggregate already includes base, promoted, ultimate towers and reserved orders",
+  "restoration": "Existing building-count events and deferred synchronization restore availability below cap",
+  "checks": [
+    "Builder stage: 6 to 7 to 6, same native handle and slot, cooldown retention, pending reservation/cancel, player isolation",
+    "Actual builder/runtime/event bus projection",
+    "Native and fallback HUD visibility/hover/click parity",
+    "Other unique-building and career prerequisite semantics preserved",
+    "Existing prerequisite UI runner 29 of 29 passed",
+    "Regression fails under old runtime gate",
+    "Temporary live loader state/event/pending-task preservation and repeated apply",
+    "Lua syntax and scoped diff checks"
+  ],
+  "live": {
+    "loaded": true,
+    "player_id": 0,
+    "current_count": 0,
+    "current_max": 7,
+    "hidden": false,
+    "activated": true,
+    "prerequisite_met": 1,
+    "full_cap_game_screenshot_verified": false,
+    "source": "output/tower_build_capacity_20261009/live_after.log",
+    "initial_loader_argument_error_recovered": true,
+    "recovery_source": "output/tower_build_capacity_20261009/restore_live.log",
+    "gameplay_counts_health_and_position_preserved": true
+  },
+  "checkpoint": "output/tower_build_capacity_20261009/before",
+  "frontend_changes_required": false,
+  "new_polling_added": false
+}

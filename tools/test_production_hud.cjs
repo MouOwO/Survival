@@ -258,7 +258,8 @@ viewerRuntime.available = 0;
 assert.equal(privateReaderEnv.runtimeFor(201).available, 0);
 viewerRuntime.available = 1;
 const activateSource = takeoverSource.slice(takeoverSource.indexOf('    function activate(entry)'), takeoverSource.indexOf('    function ensureSlot('));
-const takeoverEnv = {config: routedCfg, selectedUnit: () => 20}; vm.runInNewContext(activateSource, takeoverEnv);
+const takeoverEnv = {config: routedCfg, selectedUnit: () => 20,
+    runtimeFor: () => ({available: 1}), isPassiveAbility: () => false}; vm.runInNewContext(activateSource, takeoverEnv);
 takeoverEnv.activate({name: 'ability_research_worker_attack', ability: 201});
 assert.equal(routedQueueCalls, 2, 'fallback input uses the same research queue admission route');
 assert(parseFloat(nodes.SurvivalProductionPanel.style.transform.split('(')[1])>0);
@@ -385,3 +386,71 @@ const productionOffset=hud.Refresh(advancedGeometry,unit,true,[]);
 const dock=model.PanelGeometry(advancedGeometry,false);
 assert.equal(productionOffset,0,'side panel preserves normal buff positions');
 console.log('PRODUCTION_LEFT_PASS: fourteen-pixel horizontal gap, matching bottom edge, buff positions preserved');
+
+// Queue/wallet execution state must neither shade unlocked actions nor swallow
+// a request using a delayed client account. Rejections belong to the server.
+cfg.SurvivalActionResources={Reject(){throw Error('research must not read the client wallet');}};
+for (const research_status_code of ['research_queue_full','queued_max_level','queue_available']) {
+ const action={available:0,prerequisite_met:1,can_afford:0,resource_check_on_cast:1,
+  cost_wood:100,technology_group:'worker_attack',research_status_code};
+ snapshot(undefined,{research:{abilities_by_name:{ability_research_worker_attack:action}}});
+ const before=sent.length;
+ assert.equal(hud.QueueResearch(201,20),true,research_status_code+' reaches server validation');
+ assert.equal(sent.length,before+1);assert.equal(sent.at(-1).name,'ui_research_queue_request');
+ action.prerequisite_met=0;
+ assert.equal(hud.QueueResearch(201,20),false,'missing prerequisite still blocks learning');
+ action.prerequisite_met=1;action.completed=1;
+ assert.equal(hud.QueueResearch(201,20),false,'completed technology cannot be requested');
+}
+delete cfg.SurvivalActionResources;
+unit=10;refresh();
+const unlockedTraining=freshOptions();
+unlockedTraining[0]={...unlockedTraining[0],available:0,prerequisite_met:1,reason:'wood_not_enough'};
+snapshot({options:unlockedTraining,queued:[]},{refresh_sequence:10000});refresh();
+assert.equal(nodes.ProductionTrainingSlot0.classes.has('Unavailable'),false,'unfunded unlocked training stays in color');
+const beforeUnfundedTraining=sent.length;nodes.ProductionTrainingSlot0.handlers.onactivate();
+assert.equal(sent.length,beforeUnfundedTraining+1);assert.equal(sent.at(-1).name,'ui_worker_train_request');
+unlockedTraining[0].prerequisite_met=0;unlockedTraining[0].reason='training_city_level_required';
+snapshot({options:unlockedTraining,queued:[]},{refresh_sequence:10001});refresh();
+assert.equal(nodes.ProductionTrainingSlot0.classes.has('Unavailable'),true,'city-level gate stays gray');
+const beforeLockedTraining=sent.length;nodes.ProductionTrainingSlot0.handlers.onactivate();
+assert.equal(sent.length,beforeLockedTraining);
+console.log('PRODUCTION_PREREQUISITES_PASS: only learning prerequisites shade, current server wallet decides research/training admission');
+
+// A waiting head is not an active timer, even if later queued jobs can afford
+// their price. Show the specific shortage and keep the subsequent FIFO cells.
+time = 200; unit = 10; refresh();
+const waitingWorker = {job_id: 10, training_id: 'worker_1', level: 1,
+    name: '伐木工', duration: 1, started_at: 0, finish_at: 0};
+for (const [index, code, label] of [[0, 'wood_not_enough', '木材不足'],
+    [1, 'gold_not_enough', '金币不足'], [2, 'population_not_enough', '人口不足']]) {
+    snapshot({options: freshOptions(), active_job: {}, blocked_head: waitingWorker,
+        blocked_reason: code, queue_count: 3, queue_capacity: 7,
+        queued: [{...waitingWorker, job_id: 11, level: 2}, {...waitingWorker, job_id: 12, level: 3}]},
+        {refresh_sequence: 11000 + index}); refresh();
+    assert.equal(nodes.ProductionMode.text, label);
+    assert.equal(nodes.ProductionFooter.text, label);
+    assert.equal(nodes.ProductionRemaining.text, '等待');
+    assert.equal(nodes.ProductionProgressTrack.visible, false, 'blocked training does not show a progress bar');
+    assert.equal(nodes.ProductionProgressFill.style.width, '0%');
+    assert.equal(nodes.ProductionJobName.text, '等待训练：伐木工 LV1');
+    assert.equal(nodes.ProductionQueue.text, '等待 2/6');
+    assert.equal(nodes.ProductionQueueSlot0.level.text, 'LV2');
+}
+snapshot({options: freshOptions(), active_job: {...waitingWorker, started_at: 200, finish_at: 201},
+    blocked_head: {}, blocked_reason: '', queued: [], queue_capacity: 7}, {refresh_sequence: 11010});
+refresh(); assert.equal(nodes.ProductionProgressTrack.visible, true, 'successful payment starts the training bar');
+assert.equal(nodes.ProductionMode.text, '训练中');
+unit = 20; refresh();
+for (const [index, label] of [[0, '木材不足'], [1, '金币不足']]) {
+    snapshot(undefined, {refresh_sequence: 12000 + index, research: {researching: 0,
+        blocked_head: waiting[0], blocked_reason: label + '；开始研究时扣费',
+        queued: [waiting[1]], queue_count: 2, queue_capacity: 7}}); refresh();
+    assert.equal(nodes.ProductionMode.text, label);
+    assert.equal(nodes.ProductionProgressTrack.visible, false, 'blocked research does not show a progress bar');
+    assert.equal(nodes.ProductionProgressFill.style.width, '0%');
+    assert.equal(nodes.ProductionRemaining.text, '等待');
+    assert.equal(nodes.ProductionCancelCurrent.visible, true, 'waiting research remains cancellable');
+    assert.equal(nodes.ProductionQueueSlot0.icon.abilityname, waiting[1].ability_name);
+}
+console.log('PRODUCTION_BLOCKED_RESOURCES_PASS: wood/gold/population waiting labels, no progress bar, FIFO and funded resumption');

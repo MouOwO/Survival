@@ -4,7 +4,10 @@ package.path = "scripts/vscripts/?.lua;" .. package.path
 package.loaded["core/logger"] = {info=function() end, warn=function() end}
 local tasks, entities, scans, visits, spawns = {}, {}, 0, 0, 0
 local bulk_queries, iterator_queries = 0, 0
-package.loaded["core/scheduler"] = {after=function(_, callback, id) tasks[id]=callback end}
+package.loaded["core/scheduler"] = {
+    after=function(_, callback, id) tasks[id]=callback end,
+    cancel=function(id) tasks[id]=nil end,
+}
 IsValidEntity = function(entity) return not entity.removed end
 UTIL_Remove = function(entity) entity.removed=true end
 local function entity(class, index, model)
@@ -97,19 +100,40 @@ local legacy_piece=entity("dota_item_wearable",9002)
 legacy_piece.survival_is_native_wearable=true;legacy_piece.owner=legacy
 package.loaded["visual/model_appearance_service"]=nil
 module=require("visual/model_appearance_service")
-local ok,_, recovered=module.Apply(units[2],asset)
+-- Even if a caller repeats a fresh hint, the existing asset marker must keep
+-- cold recovery active instead of duplicating the original outfit.
+local ok,_, recovered=module.Apply(units[2],asset,{fresh_unit=true})
 assert(ok and recovered.head==parts[2].head and recovered.back==parts[2].back)
 assert(duplicate.removed and legacy.removed and legacy_piece.removed and spawns==before)
 assert(scans==4,"cold discovery uses each class API once without a second iterator pass")
 local queries=scans
 assert(module.Apply(units[2],asset) and scans==queries)
+-- Cold replacement cannot retain pieces from the previous asset, and it must
+-- not remove a different unit's components while filtering the world.
+package.loaded["visual/model_appearance_service"]=nil
+module=require("visual/model_appearance_service")
+assert(module.Apply(units[4],replacement))
+assert(parts[4].head.removed and parts[4].back.removed)
+assert(not recovered.head.removed and not recovered.back.removed)
+assert(scans==queries+5,"cold replacement retains the bounded legacy discovery path")
+-- Clear can be the first call after a hot reload (death/map cleanup). There
+-- is no Apply to rebuild the registry first; owned orphan props still go away.
+package.loaded["visual/model_appearance_service"]=nil
+module=require("visual/model_appearance_service")
+queries=scans
+assert(module.Clear(units[5]))
+assert(parts[5].head.removed and parts[5].back.removed and scans==queries,
+    "a captured outfit survives module reload and retires without cold scanning")
+assert(not parts[6].head.removed and not recovered.head.removed)
+assert(module.Apply(units[2],asset))
 -- A reused engine index cannot remove the previous owner's components.
 local reused=entity("npc_dota_creature",2,"body.vmdl")
 assert(module.Apply(reused,asset,{fresh_unit=true}))
 assert(not recovered.head.removed and not recovered.back.removed)
-assert(not module.Clear(units[2]),"stale owner must not clear the new owner's state")
+assert(module.Clear(units[2]),"old owner must retire its own captured outfit")
+assert(recovered.head.removed and recovered.back.removed)
+assert(module.Matches(reused,asset),"old owner cleanup must preserve the new owner's state")
 assert(module.Clear(reused))
-assert(not recovered.head.removed)
 -- A fresh module without FindAllByClassname retains the older engine fallback.
 Entities.FindAllByClassname=nil
 package.loaded["visual/model_appearance_service"]=nil

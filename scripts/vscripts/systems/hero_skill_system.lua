@@ -45,7 +45,7 @@ local function skill_projection(skill_id, level, locked)
         icon_name = definition and definition.icon_name or "",
         level = level,
         max_level = maximum,
-        passive = passive and 1 or 0,
+        passive = (passive or (definition and definition.skill_type == "passive")) and 1 or 0,
         hidden = 0,
         trigger_type = passive and passive.trigger_type or "",
         trigger_chance = passive and passive.trigger_chance[level] or 0,

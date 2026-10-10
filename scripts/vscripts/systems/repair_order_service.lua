@@ -1,6 +1,7 @@
 local M = {}
 
 local REPAIR_MODIFIER = "modifier_repair_worker_ai"
+local repair_policy = require("systems/repair_target_policy")
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -69,24 +70,33 @@ end
 -- be rejected by the single global ExecuteOrderFilter.
 function M.process(keys)
     keys = keys or {}
+    local issuer = tonumber(keys.issuer_player_id_const)
+        or tonumber(keys.issuer_player_id) or tonumber(keys.player_id)
+    -- Engine orders may reach the filter after the synchronous issuing guard
+    -- has cleared. They must not cancel a player's repair assignment.
+    if issuer and issuer < 0 then return false end
     local order_type = tonumber(keys.order_type)
     local units = ordered_units(keys)
     if #units == 0 then return false end
 
     local target = is_target_order(order_type)
         and entity(keys.entindex_target) or nil
+    if not target then target = repair_policy.wall_at_order_position(keys) end
     local consumed = false
 
     for _, unit in ipairs(units) do
-        cancel_pending_build(unit)
-        local modifier = repair_modifier(unit)
-        if modifier and unit.survival_repair_internal_order ~= true then
-            if target and is_repairable_target(unit, target) then
-                if modifier:SetManualRepairTarget(target) then
-                    consumed = true
+        if unit.survival_repair_internal_order ~= true
+            and unit.survival_build_internal_order ~= true then
+            cancel_pending_build(unit)
+            local modifier = repair_modifier(unit)
+            if modifier then
+                if target and is_repairable_target(unit, target) then
+                    if modifier:SetManualRepairTarget(target) then
+                        consumed = true
+                    end
+                else
+                    modifier:ClearManualRepairTarget("player_order")
                 end
-            else
-                modifier:ClearManualRepairTarget("player_order")
             end
         end
     end

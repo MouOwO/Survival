@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-07T13:49:54.484Z",
+  "activeUI": "Remote game/dev and content/dev",
+  "heads": {
+    "game": "91775f22dcbe5a2a167513f8ac0bb332dc0977f0",
+    "content": "e46b0cda264b18c438c487b75bd7361da9c919b9"
+  },
+  "localCandidate": "BEST_VERSION.json is retained for comparison; the local candidate is not active",
+  "backupState": "output/remote_update_20261007_211957/state.json",
+  "backupRefs": [
+    {
+      "repo": "game",
+      "ref": "refs/codex-backups/codex-remote-ui-first-20261007-211957/game",
+      "stash": "bb67a93a38fc83425ad1b7428d58109e6378fd5c"
+    },
+    {
+      "repo": "content",
+      "ref": "refs/codex-backups/codex-remote-ui-first-20261007-211957/content",
+      "stash": "ad01e66d6103cac5553ddaa533219a37d1feefd6"
+    }
+  ],
+  "resume": "Compare retained candidate screenshots with remote UI first, then merge selected presentation changes into updated dev sources"
+}

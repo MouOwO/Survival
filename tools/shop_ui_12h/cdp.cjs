@@ -2,8 +2,8 @@
 const fs=require('fs'),path=require('path'),{spawn}=require('child_process'),{pathToFileURL}=require('url');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function browser(){
- const profile=path.resolve('output/commerce_ui_12h/chrome_'+Date.now());fs.mkdirSync(profile,{recursive:true});
- const process=spawn('C:/Program Files/Google/Chrome/Application/chrome.exe',['--headless','--disable-gpu','--no-first-run','--no-default-browser-check','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{windowsHide:true,stdio:'ignore'});
+ const profile=path.resolve('output/commerce_ui_12h/chrome_'+Date.now()+'_'+process.pid+'_'+Math.random().toString(36).slice(2,10));fs.mkdirSync(profile,{recursive:true});
+ const chromeProcess=spawn('C:/Program Files/Google/Chrome/Application/chrome.exe',['--headless','--disable-gpu','--no-first-run','--no-default-browser-check','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{windowsHide:true,stdio:'ignore'});
  let ws;try{
   for(let i=0;i<100&&!fs.existsSync(path.join(profile,'DevToolsActivePort'));i++)await sleep(100);
   const port=fs.readFileSync(path.join(profile,'DevToolsActivePort'),'utf8').split('\n')[0];let list;
@@ -16,8 +16,8 @@ async function browser(){
   await call('Page.enable');await call('Emulation.setDeviceMetricsOverride',{width:1920,height:1080,deviceScaleFactor:1,mobile:false});
   const go=async(file,query='')=>{await call('Page.navigate',{url:pathToFileURL(path.resolve(file)).href+query});for(let i=0;i<100;i++){await sleep(60);if(await run('document.readyState==="complete"'))break;}await run('document.fonts.ready.then(()=>true)');await run('Promise.all([...document.images].map(i=>{i.loading="eager";return i.decode().catch(()=>false);})).then(()=>true)');await sleep(230);};
   const shot=async(file,clip)=>{fs.mkdirSync(path.dirname(file),{recursive:true});const r=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,...(clip?{clip:{...clip,scale:1}}:{})});fs.writeFileSync(file,Buffer.from(r.data,'base64'));};
-  return {call,run,go,shot,close:()=>{ws.close();process.kill();}};
- }catch(e){if(ws)ws.close();process.kill();throw e;}
+  return {call,run,go,shot,close:()=>{ws.close();chromeProcess.kill();}};
+ }catch(e){if(ws)ws.close();chromeProcess.kill();throw e;}
 }
 module.exports={browser,sleep};
 if(require.main===module)(async()=>{const b=await browser();try{await b.go(process.argv[2],process.argv[4]||'');await b.shot(process.argv[3]);console.log('SCREENSHOT_SAVED '+process.argv[3]);}finally{b.close();}})().catch(e=>{console.error(e);process.exitCode=1});

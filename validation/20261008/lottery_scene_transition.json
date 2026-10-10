@@ -1,0 +1,188 @@
+{
+  "task": "lottery_chest_horizontal_switch",
+  "date": "2026-10-08",
+  "status": "complete",
+  "source_files": [
+    "panorama/src/scripts/custom_game/lottery_scene_transition.js",
+    "panorama/src/scripts/custom_game/lottery_handoff_bb9968eef7.js",
+    "panorama/src/styles/custom_game/lottery_fullscreen_v2.css",
+    "panorama/src/layout/custom_game/survival_hud.xml"
+  ],
+  "state_machine": {
+    "initial_open": "snap selected page",
+    "select_changed": "native one-second transform + opacity",
+    "same_pool_or_snapshot": "no restart",
+    "rapid_select": "retarget from visible position, restart fade",
+    "close_reload": "cancel fade and snap",
+    "resize": "snap using full viewport page widths"
+  },
+  "checks": {
+    "regressions": [
+      {
+        "name": "tools/tests/lottery_scene_transition.test.cjs",
+        "exit_code": 0
+      },
+      {
+        "name": "tools/test_lottery_updates.cjs",
+        "exit_code": 0
+      },
+      {
+        "name": "tools/tests/lottery_cinematic_flow.test.cjs",
+        "exit_code": 0
+      },
+      {
+        "name": "tools/tests/lottery_cinematic.test.cjs",
+        "exit_code": 0
+      },
+      {
+        "name": "tools/test_lottery_ten_layout.cjs",
+        "exit_code": 0
+      },
+      {
+        "name": "tools/test_lottery_ui.js",
+        "exit_code": 0
+      },
+      {
+        "name": "tools/tests/lottery_ticket_rules.test.cjs",
+        "exit_code": 0
+      },
+      {
+        "name": "tools/tests/lottery_probability_notice.test.cjs",
+        "exit_code": 0
+      }
+    ],
+    "source_content_matching": {
+      "panorama/src/scripts/custom_game/lottery_scene_transition.js": true,
+      "panorama/src/scripts/custom_game/lottery_handoff_bb9968eef7.js": true,
+      "panorama/src/styles/custom_game/lottery_fullscreen_v2.css": true,
+      "panorama/src/layout/custom_game/survival_hud.xml": true
+    },
+    "compile": [
+      {
+        "artifact": "panorama/scripts/custom_game/lottery_scene_transition.vjs_c",
+        "sha256": "812134B399CFD6AA2F71DD6E804A44DEE04DFB3884B2FF01FDEF979B66DE9226",
+        "source": "panorama/src/scripts/custom_game/lottery_scene_transition.js",
+        "bytes": 3668
+      },
+      {
+        "artifact": "panorama/scripts/custom_game/lottery_handoff_bb9968eef7.vjs_c",
+        "sha256": "8A489AA5C6B4720D9F71492237078391689719577CC19C0A7F719C29CEA32AFE",
+        "source": "panorama/src/scripts/custom_game/lottery_handoff_bb9968eef7.js",
+        "bytes": 10593
+      },
+      {
+        "artifact": "panorama/styles/custom_game/lottery_fullscreen_v2.vcss_c",
+        "sha256": "C87FDD5614F4FFDF54DA7B26140B0A413C935BF8880EC44AD3FB6520FFB87DD1",
+        "source": "panorama/src/styles/custom_game/lottery_fullscreen_v2.css",
+        "bytes": 44666
+      },
+      {
+        "artifact": "panorama/layout/custom_game/survival_hud.vxml_c",
+        "sha256": "A101AD9ECDE298AEBCF133A443948238B5A4996DB37DDB9C42492C8FA3E6E8BE",
+        "source": "panorama/src/layout/custom_game/survival_hud.xml",
+        "bytes": 19459
+      }
+    ],
+    "final_diff_check_exit_code": 0
+  },
+  "native": {
+    "window": "verified survival Dota 2, 1600x900",
+    "passed": [
+      "three-page jump and reversal with visible intermediate pages",
+      "adjacent slide",
+      "opacity fade for labels and buttons",
+      "rapid consecutive clicks select cultivation last"
+    ],
+    "frames": "output/lottery_slide_20261008/native_frames",
+    "frame_times": [
+      {
+        "captured_ms": 251,
+        "requested_ms": 250,
+        "case": "reverse_three"
+      },
+      {
+        "captured_ms": 500,
+        "requested_ms": 500,
+        "case": "reverse_three"
+      },
+      {
+        "captured_ms": 751,
+        "requested_ms": 750,
+        "case": "reverse_three"
+      },
+      {
+        "captured_ms": 1020,
+        "requested_ms": 1020,
+        "case": "reverse_three"
+      },
+      {
+        "captured_ms": 1250,
+        "requested_ms": 1250,
+        "case": "reverse_three"
+      },
+      {
+        "captured_ms": 249,
+        "requested_ms": 250,
+        "case": "jump_three"
+      },
+      {
+        "captured_ms": 500,
+        "requested_ms": 500,
+        "case": "jump_three"
+      },
+      {
+        "captured_ms": 750,
+        "requested_ms": 750,
+        "case": "jump_three"
+      },
+      {
+        "captured_ms": 1031,
+        "requested_ms": 1020,
+        "case": "jump_three"
+      },
+      {
+        "captured_ms": 1262,
+        "requested_ms": 1250,
+        "case": "jump_three"
+      },
+      {
+        "captured_ms": 250,
+        "requested_ms": 250,
+        "case": "adjacent"
+      },
+      {
+        "captured_ms": 500,
+        "requested_ms": 500,
+        "case": "adjacent"
+      },
+      {
+        "captured_ms": 750,
+        "requested_ms": 750,
+        "case": "adjacent"
+      },
+      {
+        "captured_ms": 1020,
+        "requested_ms": 1020,
+        "case": "adjacent"
+      },
+      {
+        "captured_ms": 1250,
+        "requested_ms": 1250,
+        "case": "adjacent"
+      }
+    ],
+    "limitation": "Last native close/reopen attempt encountered the group waiting page; not counted as a native pass. The production UI integration regression covers close/reopen."
+  },
+  "no_new_timers": true,
+  "no_gameplay_or_transaction_changes": true,
+  "no_native_draw_or_purchase": true,
+  "git": {
+    "requested": false,
+    "head_before": "5b4e7eafa12bc6ef8dc606d0e7816082aef14a6a",
+    "head_after": "93fa5f1f40b75275b4060327b500d8cdadc0b26b",
+    "worktree": "left uncommitted; pre-existing/concurrent changes preserved",
+    "historical_stash_equal_at_final_check": true,
+    "agent_git_mutations": false,
+    "observation": "Workspace HEAD advanced during this task; this agent ran no stash, pull, commit or push. Historical stashes remain unchanged."
+  }
+}

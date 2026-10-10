@@ -1,0 +1,680 @@
+[
+  {
+    "id": "virtual_01",
+    "name": "幻象树枝",
+    "preview_quantity": "115/320",
+    "current": 115,
+    "cap": 320,
+    "row": 1,
+    "column": 1,
+    "icon_asset": "virtual_01",
+    "icon_bbox": [
+      420,
+      229,
+      537,
+      349
+    ],
+    "quantity_bbox": [
+      452,
+      226,
+      538,
+      258
+    ],
+    "name_bbox": [
+      415,
+      352,
+      544,
+      387
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_02",
+    "name": "贪婪金币",
+    "preview_quantity": "15/320",
+    "current": 15,
+    "cap": 320,
+    "row": 1,
+    "column": 2,
+    "icon_asset": "virtual_02",
+    "icon_bbox": [
+      558,
+      229,
+      675,
+      349
+    ],
+    "quantity_bbox": [
+      596,
+      226,
+      676,
+      258
+    ],
+    "name_bbox": [
+      553,
+      352,
+      682,
+      387
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_03",
+    "name": "虚无砖块",
+    "preview_quantity": "118/320",
+    "current": 118,
+    "cap": 320,
+    "row": 1,
+    "column": 3,
+    "icon_asset": "virtual_03",
+    "icon_bbox": [
+      695,
+      229,
+      814,
+      349
+    ],
+    "quantity_bbox": [
+      728,
+      226,
+      815,
+      258
+    ],
+    "name_bbox": [
+      690,
+      352,
+      821,
+      387
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_04",
+    "name": "粘稠之泥",
+    "preview_quantity": "16/320",
+    "current": 16,
+    "cap": 320,
+    "row": 1,
+    "column": 4,
+    "icon_asset": "virtual_04",
+    "icon_bbox": [
+      834,
+      229,
+      952,
+      349
+    ],
+    "quantity_bbox": [
+      873,
+      226,
+      953,
+      258
+    ],
+    "name_bbox": [
+      829,
+      352,
+      959,
+      387
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_05",
+    "name": "虚空箭头",
+    "preview_quantity": "13/320",
+    "current": 13,
+    "cap": 320,
+    "row": 1,
+    "column": 5,
+    "icon_asset": "virtual_05",
+    "icon_bbox": [
+      972,
+      229,
+      1090,
+      349
+    ],
+    "quantity_bbox": [
+      1011,
+      226,
+      1091,
+      258
+    ],
+    "name_bbox": [
+      967,
+      352,
+      1097,
+      387
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_06",
+    "name": "阴暗附着",
+    "preview_quantity": "13/330",
+    "current": 13,
+    "cap": 330,
+    "row": 1,
+    "column": 6,
+    "icon_asset": "virtual_06",
+    "icon_bbox": [
+      1110,
+      229,
+      1229,
+      349
+    ],
+    "quantity_bbox": [
+      1149,
+      226,
+      1230,
+      258
+    ],
+    "name_bbox": [
+      1105,
+      352,
+      1236,
+      387
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_07",
+    "name": "阴影碎布",
+    "preview_quantity": "15/330",
+    "current": 15,
+    "cap": 330,
+    "row": 1,
+    "column": 7,
+    "icon_asset": "virtual_07",
+    "icon_bbox": [
+      1250,
+      229,
+      1367,
+      349
+    ],
+    "quantity_bbox": [
+      1288,
+      226,
+      1368,
+      258
+    ],
+    "name_bbox": [
+      1245,
+      352,
+      1374,
+      387
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_08",
+    "name": "空明碎甲",
+    "preview_quantity": "13",
+    "current": 13,
+    "cap": null,
+    "row": 1,
+    "column": 8,
+    "icon_asset": "virtual_08",
+    "icon_bbox": [
+      1388,
+      229,
+      1507,
+      349
+    ],
+    "quantity_bbox": [
+      1461,
+      226,
+      1508,
+      258
+    ],
+    "name_bbox": [
+      1383,
+      352,
+      1514,
+      387
+    ],
+    "notes": [
+      "母图只显示当前数量；未出现上限，不补写分母。"
+    ]
+  },
+  {
+    "id": "virtual_09",
+    "name": "虚空护罩",
+    "preview_quantity": "—/330",
+    "current": null,
+    "cap": 330,
+    "row": 2,
+    "column": 1,
+    "icon_asset": "virtual_09",
+    "icon_bbox": [
+      420,
+      420,
+      537,
+      542
+    ],
+    "quantity_bbox": [
+      464,
+      418,
+      538,
+      449
+    ],
+    "name_bbox": [
+      415,
+      545,
+      544,
+      580
+    ],
+    "notes": [
+      "分子—是明确待核对占位，不代表0。"
+    ]
+  },
+  {
+    "id": "virtual_10",
+    "name": "大魔之锤",
+    "preview_quantity": "16/310",
+    "current": 16,
+    "cap": 310,
+    "row": 2,
+    "column": 2,
+    "icon_asset": "virtual_10",
+    "icon_bbox": [
+      558,
+      420,
+      675,
+      542
+    ],
+    "quantity_bbox": [
+      596,
+      418,
+      676,
+      449
+    ],
+    "name_bbox": [
+      553,
+      545,
+      682,
+      580
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_11",
+    "name": "虚无之盾",
+    "preview_quantity": "16/330",
+    "current": 16,
+    "cap": 330,
+    "row": 2,
+    "column": 3,
+    "icon_asset": "virtual_11",
+    "icon_bbox": [
+      695,
+      420,
+      814,
+      542
+    ],
+    "quantity_bbox": [
+      734,
+      418,
+      815,
+      449
+    ],
+    "name_bbox": [
+      690,
+      545,
+      821,
+      580
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_12",
+    "name": "坚韧甲壳",
+    "preview_quantity": "14/340",
+    "current": 14,
+    "cap": 340,
+    "row": 2,
+    "column": 4,
+    "icon_asset": "virtual_12",
+    "icon_bbox": [
+      834,
+      420,
+      952,
+      542
+    ],
+    "quantity_bbox": [
+      873,
+      418,
+      953,
+      449
+    ],
+    "name_bbox": [
+      829,
+      545,
+      959,
+      580
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_13",
+    "name": "动力齿轮",
+    "preview_quantity": "15/340",
+    "current": 15,
+    "cap": 340,
+    "row": 2,
+    "column": 5,
+    "icon_asset": "virtual_13",
+    "icon_bbox": [
+      972,
+      420,
+      1090,
+      542
+    ],
+    "quantity_bbox": [
+      1011,
+      418,
+      1091,
+      449
+    ],
+    "name_bbox": [
+      967,
+      545,
+      1097,
+      580
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_14",
+    "name": "无形之斧",
+    "preview_quantity": "14/305",
+    "current": 14,
+    "cap": 305,
+    "row": 2,
+    "column": 6,
+    "icon_asset": "virtual_14",
+    "icon_bbox": [
+      1110,
+      420,
+      1229,
+      542
+    ],
+    "quantity_bbox": [
+      1149,
+      418,
+      1230,
+      449
+    ],
+    "name_bbox": [
+      1105,
+      545,
+      1236,
+      580
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_15",
+    "name": "弦类道具",
+    "preview_quantity": "12/170",
+    "current": 12,
+    "cap": 170,
+    "row": 2,
+    "column": 7,
+    "icon_asset": "virtual_15",
+    "icon_bbox": [
+      1250,
+      420,
+      1367,
+      542
+    ],
+    "quantity_bbox": [
+      1288,
+      418,
+      1368,
+      449
+    ],
+    "name_bbox": [
+      1245,
+      545,
+      1374,
+      580
+    ],
+    "notes": [
+      "当前母图使用泛称占位；原游戏准确名称尚待配置，不得硬编。"
+    ]
+  },
+  {
+    "id": "virtual_16",
+    "name": "能类道具",
+    "preview_quantity": "12",
+    "current": 12,
+    "cap": null,
+    "row": 2,
+    "column": 8,
+    "icon_asset": "virtual_16",
+    "icon_bbox": [
+      1388,
+      420,
+      1507,
+      542
+    ],
+    "quantity_bbox": [
+      1461,
+      418,
+      1508,
+      449
+    ],
+    "name_bbox": [
+      1383,
+      545,
+      1514,
+      580
+    ],
+    "notes": [
+      "当前母图使用泛称占位；原游戏准确名称尚待配置，不得硬编。",
+      "母图只显示当前数量；未出现上限，不补写分母。"
+    ]
+  },
+  {
+    "id": "virtual_17",
+    "name": "相位之力",
+    "preview_quantity": "—/130",
+    "current": null,
+    "cap": 130,
+    "row": 3,
+    "column": 1,
+    "icon_asset": "virtual_17",
+    "icon_bbox": [
+      420,
+      613,
+      537,
+      735
+    ],
+    "quantity_bbox": [
+      464,
+      612,
+      538,
+      642
+    ],
+    "name_bbox": [
+      415,
+      739,
+      544,
+      774
+    ],
+    "notes": [
+      "分子—是明确待核对占位，不代表0。"
+    ]
+  },
+  {
+    "id": "virtual_18",
+    "name": "虚空炼金",
+    "preview_quantity": "12/290",
+    "current": 12,
+    "cap": 290,
+    "row": 3,
+    "column": 2,
+    "icon_asset": "virtual_18",
+    "icon_bbox": [
+      558,
+      613,
+      675,
+      735
+    ],
+    "quantity_bbox": [
+      596,
+      612,
+      676,
+      642
+    ],
+    "name_bbox": [
+      553,
+      739,
+      682,
+      774
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_19",
+    "name": "腐蚀魔能",
+    "preview_quantity": "15/215",
+    "current": 15,
+    "cap": 215,
+    "row": 3,
+    "column": 3,
+    "icon_asset": "virtual_19",
+    "icon_bbox": [
+      695,
+      613,
+      814,
+      735
+    ],
+    "quantity_bbox": [
+      734,
+      612,
+      815,
+      642
+    ],
+    "name_bbox": [
+      690,
+      739,
+      821,
+      774
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_20",
+    "name": "膨胀药剂",
+    "preview_quantity": "12/350",
+    "current": 12,
+    "cap": 350,
+    "row": 3,
+    "column": 4,
+    "icon_asset": "virtual_20",
+    "icon_bbox": [
+      834,
+      613,
+      952,
+      735
+    ],
+    "quantity_bbox": [
+      873,
+      612,
+      953,
+      642
+    ],
+    "name_bbox": [
+      829,
+      739,
+      959,
+      774
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_21",
+    "name": "梦魇狂躁",
+    "preview_quantity": "12/320",
+    "current": 12,
+    "cap": 320,
+    "row": 3,
+    "column": 5,
+    "icon_asset": "virtual_21",
+    "icon_bbox": [
+      972,
+      613,
+      1090,
+      735
+    ],
+    "quantity_bbox": [
+      1011,
+      612,
+      1091,
+      642
+    ],
+    "name_bbox": [
+      967,
+      739,
+      1097,
+      774
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_22",
+    "name": "虚无之终",
+    "preview_quantity": "14/320",
+    "current": 14,
+    "cap": 320,
+    "row": 3,
+    "column": 6,
+    "icon_asset": "virtual_22",
+    "icon_bbox": [
+      1110,
+      613,
+      1229,
+      735
+    ],
+    "quantity_bbox": [
+      1149,
+      612,
+      1230,
+      642
+    ],
+    "name_bbox": [
+      1105,
+      739,
+      1236,
+      774
+    ],
+    "notes": []
+  },
+  {
+    "id": "virtual_23",
+    "name": "虚无之眠",
+    "preview_quantity": "15/320",
+    "current": 15,
+    "cap": 320,
+    "row": 3,
+    "column": 7,
+    "icon_asset": "virtual_23",
+    "icon_bbox": [
+      1250,
+      613,
+      1367,
+      735
+    ],
+    "quantity_bbox": [
+      1288,
+      612,
+      1368,
+      642
+    ],
+    "name_bbox": [
+      1245,
+      739,
+      1374,
+      774
+    ],
+    "notes": []
+  }
+]

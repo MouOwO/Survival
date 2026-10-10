@@ -49,6 +49,9 @@ local function announce(payload)
     if not row or player_id == nil or amount == nil or amount < 0 then return end
     event_bus.emit(events.UI_NOTIFICATION, {
         audience = "all",
+        player_id = player_id,
+        kind = "reward",
+        actor_name = player_name(player_id),
         message = player_name(player_id) .. " 获得星之庇佑："
             .. tostring(row.display_name) .. "（" .. amount_text(amount) .. "）",
         level = "info",

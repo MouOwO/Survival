@@ -19,6 +19,8 @@ $repo=Join-Path ([IO.Path]::GetTempPath()) $fixtureName
 $guiExe='fixture-vconsole.exe'
 $Action='Repair'
 $relay=@{relay_available=$true;gui_port=29001}
+$originalRelayGuiPort=$env:DOTA2_VCON_GUI_PORT
+$env:DOTA2_VCON_GUI_PORT=$null
 $guis=@(); $owners=@(); $events=@()
 function Get-HammerRelayState { $script:relay }
 function Get-HammerGuiProcesses { $script:guis }
@@ -67,6 +69,31 @@ try {
     Invoke-HammerConsoleRepair | Out-Null
     Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '5')).GetValue('connectAtStartup') -eq 0) 'Handle DWORD settings.'
     Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '6')).GetValue('connectAtStartup') -eq 'true') 'Handle a missing startup setting.'
+    # A vanished daemon left only the enabled 29001 device, exactly as in the
+    # live failure. Check must report it, and Repair must preserve other devices.
+    $relay=@{relay_available=$false}
+    $Action='Check'
+    $stale=Invoke-HammerConsoleRepair
+    Assert-Console ($stale.mode -eq 'direct_helper' -and $stale.status -eq 'console_repair_needed') 'Detect an enabled endpoint with no relay.'
+    Assert-Console ($stale.settings_changes -eq 2) 'Detect both obsolete default relay devices.'
+    Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '2')).GetValue('connectAtStartup') -eq 'true') 'Stale relay Check must not modify settings.'
+    $Action='Repair'
+    $staleFixed=Invoke-HammerConsoleRepair
+    Assert-Console ($staleFixed.settings_changes -eq 2) 'Repair the obsolete relay startup settings.'
+    Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '2')).GetValue('connectAtStartup') -eq 'false') 'Disable the vanished default relay.'
+    Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '6')).GetValue('connectAtStartup') -eq 'false') 'Disable duplicate stale relay devices.'
+    Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '3')).GetValue('connectAtStartup') -eq 'true') 'Stale relay repair preserves remote devices.'
+    Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '4')).GetValue('connectAtStartup') -eq 'true') 'Stale relay repair preserves unrelated local ports.'
+    Assert-Console ((Invoke-HammerConsoleRepair).status -eq 'console_configuration_ready') 'Stale relay repair is idempotent.'
+    Add-Device 7 'localhost:29011' 1 'DWord'
+    $env:DOTA2_VCON_GUI_PORT='29011'
+    Invoke-HammerConsoleRepair | Out-Null
+    Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '7')).GetValue('connectAtStartup') -eq 0) 'Disable a vanished configured relay while preserving DWORD type.'
+    $relay=@{relay_available=$true;gui_port=29011}
+    Invoke-HammerConsoleRepair | Out-Null
+    Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '7')).GetValue('connectAtStartup') -eq 1) 'Enable the live configured relay.'
+    Assert-Console ((Get-Item -LiteralPath (Join-Path $deviceRoot '2')).GetValue('connectAtStartup') -eq 'false') 'A live custom relay keeps the old default relay disabled.'
+    $env:DOTA2_VCON_GUI_PORT=$null
     # New PC without an MCP installation: create a disconnected GUI default
     # while the existing protocol client remains free to connect directly.
     $deviceRoot='HKCU:\'+$fixtureKey+'\FreshDevices'
@@ -83,6 +110,7 @@ try {
     Assert-Console ((Get-HammerDeviceArray).Size -eq 2) 'New shared devices must be visible to Qt.'
     Write-Output ('HAMMER_CONSOLE_TESTS_PASSED: '+$checks)
 } finally {
+    $env:DOTA2_VCON_GUI_PORT=$originalRelayGuiPort
     if ($fixtureKey -notmatch '^Software\\SurvivalConsoleTest_[a-f0-9]{32}$') { throw 'Unsafe fixture key.' }
     [Microsoft.Win32.Registry]::CurrentUser.DeleteSubKeyTree($fixtureKey,$false)
     $resolvedFixture=[IO.Path]::GetFullPath($repo)

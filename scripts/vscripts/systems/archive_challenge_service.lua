@@ -34,45 +34,91 @@ local function allowed(state, definition)
     return state and not state.finished and definition and definition.enabled
         and state.difficulty >= definition.min_difficulty
 end
+-- One authority serves the archive publisher and generic HUD refreshes.
+-- Complete identity lets event-driven and native HUD painting agree.
+function M.ability_runtime(caster, ability_name)
+    local runtime = {ability_name = ability_name, archive_challenge = 1,
+        available = 0, prerequisite_met = 0, can_afford = 1,
+        cost_wood = 0, cost_gold = 0, resource_version = 0,
+        status_text = "挑战状态同步中"}
+    if not valid(caster) then return runtime end
+    runtime.owner_entindex = caster:entindex()
+    local ability = caster:FindAbilityByName(ability_name)
+    if valid(ability) and ability.entindex then runtime.ability_entindex = ability:entindex() end
+    local hub = hubs[runtime.owner_entindex]
+    local state = hub and hub.unit == caster and hub.state or nil
+    if not state or players[state.player_id] ~= state then return runtime end
+    runtime.player_id = state.player_id
+    local ready = active and not ended and not state.finished
+        and (not deadline or now() < deadline)
+    local busy = require("systems/archive_endless_service").is_running(state.player_id)
+    local boss = valid(state.active_boss) and state.active_boss:IsAlive()
+    local challenge_id = tostring(ability_name):match("^ability_archive_(.+)$")
+    local definition = challenge_id and definitions.by_id[challenge_id]
+    if challenge_id == "endless" and hub.index == 2 then
+        runtime.display_name = "开启无尽挑战"
+        runtime.upgrade_description = "每波5只小怪，限时60秒，清空后立即下一波。每10波积分提高7分，首10波每波1分。每局仅可开启一次。"
+        ready = ready and not state.used.endless and not busy and not boss
+            and require("systems/archive_endless_config").group(state.difficulty) ~= nil
+        runtime.status_text = busy and "无尽挑战进行中" or state.used.endless and "本局已开启"
+            or boss and "请先击败当前挑战BOSS" or ready and "可以开启" or "暂不可开启"
+    elseif challenge_id == "finish" and hub.index == 3 then
+        runtime.display_name = "结束存档挑战"
+        runtime.upgrade_description = "结束自己的挑战；所有玩家结束后胜利结算。未击败的BOSS不会获得奖励。"
+        runtime.status_text = ready and "可以结束挑战" or "挑战已结束"
+    elseif definition and definition.building_id == hub.index then
+        local unlocked = allowed(state, definition)
+        local used = state.used[challenge_id] == true
+        ready = ready and unlocked and not used and not boss and not busy
+        runtime.display_name = definition.display_name
+        runtime.upgrade_description = definition.description
+        runtime.icon_name = definition.ability_icon
+        runtime.fields = {{label = "解锁条件", value = "当前关卡≥N" .. definition.min_difficulty}}
+        runtime.status_text = busy and "无尽挑战进行中" or used and "本局已挑战（每个技能仅限一次）"
+            or not unlocked and ("需要当前关卡 N" .. definition.min_difficulty)
+            or boss and "请先击败当前挑战BOSS" or "可以挑战"
+    else
+        ready = false
+        runtime.status_text = "挑战入口无效"
+    end
+    if not active or ended or state.finished or (deadline and now() >= deadline) then
+        runtime.status_text = "挑战已结束"
+    end
+    runtime.available, runtime.prerequisite_met = ready and 1 or 0, ready and 1 or 0
+    return runtime
+end
 local function publish(state)
-    local endless = require("systems/archive_endless_service")
-    local endless_busy = endless.is_running(state.player_id)
     for _, hub in pairs(state.hubs) do
         if valid(hub) then
-            for _, definition in ipairs(definitions.rows) do
-                if definition.enabled and definition.building_id == hub.survival_archive_hub then
-                    local ability = hub:FindAbilityByName("ability_archive_" .. definition.challenge_id)
-                    if valid(ability) then
-                        local unlocked = allowed(state, definition)
-                        local used = state.used[definition.challenge_id] == true
-                        ability:SetActivated(unlocked and not used and not state.active_boss and not endless_busy)
-                        if CustomNetTables then
-                            CustomNetTables:SetTableValue("survival_ability_runtime", tostring(ability:entindex()), {
-                                ability_name = ability:GetAbilityName(), owner_entindex = hub:entindex(),
-                                available = unlocked and not used and not state.active_boss and not endless_busy and 1 or 0, can_afford = 1,
-                                status_text = endless_busy and "无尽挑战进行中" or used and "本局已挑战（每个技能仅限一次）" or not unlocked and ("需要当前关卡 N" .. definition.min_difficulty)
-                                    or (state.active_boss and "请先击败当前挑战BOSS" or "可以挑战"),
-                                upgrade_description = definition.description,
-                                fields = { { label = "解锁条件", value = "当前关卡≥N" .. definition.min_difficulty } },
-                            })
-                        end
-                    end
+            local count = 0
+            local function update(name)
+                local ability = hub:FindAbilityByName(name)
+                if not valid(ability) then return end
+                count = count + 1
+                local runtime = M.ability_runtime(hub, name)
+                local ready = runtime.available == 1
+                if not ability.IsActivated or ability:IsActivated() ~= ready then ability:SetActivated(ready) end
+                ability.survival_runtime_disabled = not ready or nil
+                runtime.engine_level = ability.GetLevel and ability:GetLevel() or 1
+                runtime.engine_activated = ready and 1 or 0
+                runtime.passive = 0
+                if CustomNetTables and runtime.ability_entindex then
+                    CustomNetTables:SetTableValue("survival_ability_runtime", tostring(runtime.ability_entindex), runtime)
                 end
             end
-        end
-    end
-    local hub = state.hubs[2]
-    local ability = valid(hub) and hub:FindAbilityByName("ability_archive_endless")
-    if valid(ability) then
-        local ready = not state.finished and not state.used.endless and not endless_busy and not state.active_boss
-            and require("systems/archive_endless_config").group(state.difficulty) ~= nil
-        ability:SetActivated(ready)
-        if CustomNetTables then
-            CustomNetTables:SetTableValue("survival_ability_runtime", tostring(ability:entindex()), {
-                ability_name = ability:GetAbilityName(), owner_entindex = hub:entindex(), available = ready and 1 or 0, can_afford = 1,
-                status_text = endless_busy and "无尽挑战进行中" or state.used.endless and "本局已开启" or state.active_boss and "请先击败当前挑战BOSS" or ready and "可以开启" or "暂不可开启",
-                upgrade_description = "每波5只小怪，限时60秒，清空后立即下一波。每10波积分提高7分，首10波每波1分。每局仅可开启一次。",
-            })
+            for _, definition in ipairs(definitions.rows) do
+                if definition.enabled and definition.building_id == hub.survival_archive_hub then
+                    update("ability_archive_" .. definition.challenge_id)
+                end
+            end
+            if hub.survival_archive_hub == 2 then update("ability_archive_endless") end
+            if hub.survival_archive_hub == 3 then update("ability_archive_finish") end
+            if CustomNetTables then
+                CustomNetTables:SetTableValue("survival_ability_runtime", "unit:" .. tostring(hub:entindex()), {
+                    owner_entindex = hub:entindex(),
+                    ability_count = hub.GetAbilityCount and hub:GetAbilityCount() or count,
+                })
+            end
         end
     end
 end
@@ -86,10 +132,37 @@ local function remove_boss(state)
     state.active_boss = nil
 end
 local function cleanup(state)
+    scheduler.cancel("archive_hubs_retry:" .. state.player_id)
     require("systems/archive_endless_service").cancel(state.player_id, "结束存档挑战")
     remove_boss(state)
     for _, unit in pairs(state.hubs) do
         if valid(unit) then
+            local unit_index = unit:entindex()
+            bus.emit(events.BUILDING_DESTROYED, {unit = unit, entindex = unit_index,
+                building_id = "archive_challenge", player_id = state.player_id,
+                team = DOTA_TEAM_GOODGUYS})
+            -- These hubs can also be discovered by generic runtime refreshes.
+            -- Clear both its owner registry and the archive's direct rows.
+            if CustomNetTables then
+                local function retire(name)
+                    local ability = unit:FindAbilityByName(name)
+                    if valid(ability) and ability.entindex then
+                        CustomNetTables:SetTableValue("survival_ability_runtime", tostring(ability:entindex()), {
+                            removed = 1, owner_entindex = unit_index, ability_entindex = ability:entindex(),
+                        })
+                    end
+                end
+                for _, definition in ipairs(definitions.rows) do
+                    if definition.enabled and definition.building_id == unit.survival_archive_hub then
+                        retire("ability_archive_" .. definition.challenge_id)
+                    end
+                end
+                if unit.survival_archive_hub == 2 then retire("ability_archive_endless") end
+                if unit.survival_archive_hub == 3 then retire("ability_archive_finish") end
+                CustomNetTables:SetTableValue("survival_ability_runtime", "unit:" .. tostring(unit_index), {
+                    removed = 1, owner_entindex = unit_index, ability_count = 0,
+                })
+            end
             require("systems/challenge_guardian_visual_service").clear(unit)
             hubs[unit:entindex()] = nil
             context.unregister_unit(unit)
@@ -142,17 +215,17 @@ local function ensure_hub_abilities(unit, index)
         if definition.enabled and definition.building_id == index then
             local name = "ability_archive_" .. definition.challenge_id
             local ability = unit:FindAbilityByName(name) or unit:AddAbility(name)
-            if valid(ability) then ability:SetLevel(1) end
+            if valid(ability) and (not ability.GetLevel or ability:GetLevel() < 1) then ability:SetLevel(1) end
         end
     end
     if index == 2 then
         local endless = unit:FindAbilityByName("ability_archive_endless") or unit:AddAbility("ability_archive_endless")
-        if valid(endless) then endless:SetLevel(1) end
+        if valid(endless) and (not endless.GetLevel or endless:GetLevel() < 1) then endless:SetLevel(1) end
     end
     if index == 3 then
         local finish = unit:FindAbilityByName("ability_archive_finish")
             or unit:AddAbility("ability_archive_finish")
-        if valid(finish) then finish:SetLevel(1) end
+        if valid(finish) and (not finish.GetLevel or finish:GetLevel() < 1) then finish:SetLevel(1) end
     end
 end
 local function hub_model(index)

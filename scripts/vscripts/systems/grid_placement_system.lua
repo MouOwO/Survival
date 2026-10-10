@@ -476,6 +476,15 @@ function M.is_position_occupied(position)
     return occupied_by_other(x, y, nil)
 end
 
+-- Read-only identity lookup for right-clicking a native wall's occupied cell.
+-- Consumers must validate the live entity and player ownership themselves.
+function M.occupant_at_position(position)
+    if not position then return nil end
+    local size = number(config.cell_size, 128)
+    local x, y = math.floor(position.x / size), math.floor(position.y / size)
+    return occupied[x] and occupied[x][y] or nil
+end
+
 -- Map terrain only. Run once at startup; never include units or occupancy.
 -- This job is independent of mouse movement and preview cancellation.
 function M.static_preview(payload)

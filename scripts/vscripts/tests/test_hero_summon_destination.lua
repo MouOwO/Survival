@@ -32,14 +32,18 @@ local regions = require("systems/forbidden_region_service")
 local validation = require("systems/destination_validation_service")
 local resolver = require("systems/hero_summon_destination")
 local bus, events = require("core/event_bus"), require("core/events")
+local serial = 0
 local function entity(x, y, z, hull)
-    local unit = {origin = Vector(x, y, z), forward = Vector(1, 0, 0)}
+    serial = serial + 1
+    local unit = {origin = Vector(x, y, z), forward = Vector(1, 0, 0), owner_id = 0, index = serial}
     function unit:IsNull() return false end
     function unit:IsAlive() return true end
     function unit:GetAbsOrigin() return self.origin end
     function unit:GetForwardVector() return self.forward end
     function unit:GetTeamNumber() return 2 end
     function unit:GetHullRadius() return hull or 0 end
+    function unit:GetPlayerOwnerID() return self.owner_id end
+    function unit:entindex() return self.index end
     return unit
 end
 local altar, city
@@ -162,7 +166,53 @@ assert(not position and info.attempts == 0 and info.last_reason == "main_city_cl
     "oversized hull must fail instead of expanding indefinitely into another player's base")
 
 reset()
-GetGroundHeight = function() return 0/0 end
+height = function() return 0/0 end
 position, reason, info = resolve()
 assert(not position and info.rejected.ground_height_unavailable == info.attempts, "invalid terrain response fails closed")
-print("HERO_SUMMON_DESTINATION_PASS: own live city, moving origin/facing, bounded rings, eight-point clearance, regions/heights, occupancy and no remote fallback")
+-- The summon service explicitly permits an early owned anchor. Return-home
+-- callers omit the option and keep the existing completed-city requirement.
+reset(); listed = {}
+position, reason, info = resolver.resolve(altar, {}, 0, nil,
+    {allow_without_city = true, anchor_source = "hero_altar"})
+assert(position and not reason and info.source == "hero_altar")
+assert(position.x == -3744 and position.z == 384 and info.attempts == 1)
+assert(queries == 1 and ground_calls == 9 and navigation_calls == 9,
+    "early summon checks terrain, navigation and all eight hull edges")
+
+reset(); listed = {}; altar.origin = Vector(-3200, 100, 384)
+position, reason, info = resolver.resolve(altar, {}, 0, nil,
+    {allow_without_city = true, anchor_source = "builder"})
+assert(position and info.source == "builder" and position.x == -2944 and position.y == 100,
+    "a pre-altar summon follows the owner's live builder")
+
+reset(); listed[1].player_id = 1
+position, reason, info = resolver.resolve(altar, {}, 0, nil, {allow_without_city = true})
+assert(position and info.source == "hero_altar" and position.x < -3000,
+    "a teammate's city never replaces the early owner's anchor")
+
+for _, invalid in ipairs({"foreign", "dead", "removed"}) do
+    reset(); listed = {}
+    if invalid == "foreign" then altar.owner_id = 1
+    elseif invalid == "dead" then altar.IsAlive = function() return false end
+    else altar.IsNull = function() return true end end
+    position, reason, info = resolver.resolve(altar, {}, 0, nil, {allow_without_city = true})
+    assert(not position and info.last_reason == "main_city_not_found" and queries == 0,
+        "an early summon requires a live anchor owned by the summoning player")
+end
+
+reset(); listed = {}; blocked = function() return true end
+position, reason, info = resolver.resolve(altar, {}, 0, nil, {allow_without_city = true})
+assert(not position and info.source == "hero_altar" and info.attempts == 112
+    and reason:find("召唤位置周围没有安全落点", 1, true), "early search remains bounded")
+
+reset(); listed = {}; height = function() return 0 end
+position, reason, info = resolver.resolve(altar, {}, 0, nil, {allow_without_city = true})
+assert(not position and info.rejected.destination_height_mismatch == info.attempts,
+    "early unlock cannot permit a fall into water")
+
+reset(); height = function(p) return p.x < 1000 and 384 or 0 end
+position, reason, info = resolver.resolve(altar, {}, 0, nil, {allow_without_city = true})
+assert(not position and info.source == "main_city" and info.attempts == 112,
+    "if the own city exists, a blocked city never falls back to a distant altar")
+
+print("HERO_SUMMON_DESTINATION_PASS: own live city, bounded clearance, regions/heights/occupancy, explicit early owned anchors and unchanged city-only return")

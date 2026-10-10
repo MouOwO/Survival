@@ -8,6 +8,18 @@ local runtime_builder = require("ui/ability_runtime_builder")
 -- Selected-building presentation and authenticated intent routing only.
 -- The worker/shop systems own jobs, prices, limits and completion timers.
 local M = {}
+local research_cache, research_generation = {}, {}
+local function operation_error(code, fallback)
+    local messages = {wood_not_enough = "木材不足", insufficient_wood = "木材不足",
+        gold_not_enough = "金币不足", insufficient_gold = "金币不足",
+        population_not_enough = "人口不足", insufficient_population = "人口不足",
+        insufficient_resources = "资源不足", resource_error = "资源信息尚未就绪"}
+    return messages[code] or code or fallback
+end
+local function invalidate_research(payload)
+    local player=tonumber(payload and payload.player_id)
+    if player~=nil then research_generation[player]=(research_generation[player] or 0)+1 end
+end
 
 local function entity_index(value)
     local n = tonumber(value)
@@ -60,9 +72,6 @@ function M.decorate(player_id, unit, snapshot)
         local progression = event_bus.request(events.HERO_PROGRESSION_GET_REQUEST, {
             player_id = player_id,
         }) or {}
-        local resources = event_bus.request(events.RESOURCE_GET_REQUEST, {
-            player_id = player_id,
-        })
         local view = {
             player_id = player_id, team = building.team,
             building_id = id, entindex = entindex,
@@ -71,19 +80,26 @@ function M.decorate(player_id, unit, snapshot)
             reincarnation_level = tonumber(progression.snapshot
                 and progression.snapshot.rebirth_level) or 0,
         }
-        local abilities = {}
-        for _, mapping in ipairs(research_abilities.rows or {}) do
-            if mapping.enabled ~= false and mapping.building_id == id then
-                abilities[mapping.ability_name] = runtime_builder.build(
-                    mapping.ability_name, view, resources)
+        local key=tostring(player_id)..":"..tostring(entindex)
+        local generation=research_generation[player_id] or 0
+        local cached=research_cache[key]
+        if not cached or cached.generation~=generation then
+            local abilities={}
+            for _, mapping in ipairs(research_abilities.rows or {}) do
+                if mapping.enabled ~= false and mapping.building_id == id then
+                    abilities[mapping.ability_name] = runtime_builder.build(mapping.ability_name,view,nil)
+                end
             end
+            cached={generation=generation,abilities=abilities}
+            research_cache[key]=cached
         end
-        snapshot.research.abilities_by_name = abilities
+        snapshot.research.abilities_by_name = cached.abilities
     end
     return snapshot
 end
 
 function M.init(options)
+    research_cache,research_generation={},{}
     local function refresh(payload)
         local player_id = tonumber(payload and payload.player_id)
         if player_id == nil then return end
@@ -120,10 +136,25 @@ function M.init(options)
         })
     end)
     event_bus.subscribe(events.WORKER_CHANGED, refresh)
-    event_bus.subscribe(events.RESOURCE_CHANGED, refresh)
-    event_bus.subscribe(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, refresh)
-    event_bus.subscribe(research_events.LEVEL_CHANGED, refresh)
-    event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, refresh)
+    -- Training prices and unlocks change with progression or queue events.
+    -- Wallet changes are checked on a training click and do not repaint options.
+    local function refresh_research(payload)
+        invalidate_research(payload)
+        refresh(payload)
+    end
+    event_bus.subscribe(events.TECHNOLOGY_RESEARCH_STATE_CHANGED,refresh_research)
+    event_bus.subscribe(research_events.LEVEL_CHANGED,refresh_research)
+    event_bus.subscribe(events.HERO_PROGRESSION_CHANGED,refresh_research)
+    event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED,function(payload)
+        -- Growth/income ticks share this event. Only a rebuilt cost projection
+        -- can change research prices, not each hero attack or wood increment.
+        if type(payload and payload.totals)=="table" then refresh_research(payload) end
+    end)
+    event_bus.subscribe(events.BUILDING_DESTROYED,function(payload)
+        for key in pairs(research_cache) do
+            if key:match(":"..tostring(payload.entindex).."$") then research_cache[key]=nil end
+        end
+    end)
     local function research_request(operation, request_event, payload)
         payload = payload or {}
         local player_id = options.source_player_id(payload)
@@ -156,12 +187,12 @@ function M.init(options)
             source_entindex = source or -1, success = result.ok and 1 or 0,
             queued = result.queued and 1 or 0,
             refunded = result.refunded and 1 or 0,
-            error = result.ok and "" or (result.error or "研究排队失败"),
+            error = result.ok and "" or operation_error(result.error, "研究排队失败"),
         })
         if result.ok then refresh({player_id = player_id, source_entindex = source})
         else
             event_bus.emit(events.UI_NOTIFICATION, {player_id = player_id,
-                message = result.error or "研究排队失败", level = "error"})
+                message = operation_error(result.error, "研究排队失败"), level = "error"})
         end
     end
     CustomGameEventManager:RegisterListener("ui_research_queue_request", function(_, payload)
@@ -203,14 +234,14 @@ function M.init(options)
             success = result.ok and 1 or 0,
             queued = result.queued and 1 or 0,
             job_id = result.job_id,
-            error = result.ok and "" or (result.error or "训练失败"),
+            error = result.ok and "" or operation_error(result.error, "训练失败"),
         })
         if result.ok then
             refresh({ player_id = player_id, source_entindex = source })
         else
             event_bus.emit(events.UI_NOTIFICATION, {
                 player_id = player_id,
-                message = result.error or "训练失败",
+                message = operation_error(result.error, "训练失败"),
                 level = "error",
             })
         end

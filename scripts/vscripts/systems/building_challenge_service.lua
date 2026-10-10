@@ -128,7 +128,12 @@ local function settle(meta, status)
     if team_alive and team_alive[meta.challenge_id] == meta.unit then
         team_alive[meta.challenge_id] = nil
     end
-    monster_hero_visual_service.clear(meta.unit)
+    if valid(meta.unit) and type(meta.unit.IsAlive) == "function"
+        and not meta.unit:IsAlive() then
+        monster_hero_visual_service.on_death(meta.unit)
+    else
+        monster_hero_visual_service.clear(meta.unit)
+    end
     return true
 end
 

@@ -34,7 +34,7 @@ local function get_stats(player_id)
     return result.snapshot
 end
 local function near(actual, expected, message)
-    assert(math.abs(actual - expected) < 1e-8,
+    assert(type(actual) == "number" and math.abs(actual - expected) < 1e-8,
         (message or "number mismatch") .. ": " .. tostring(actual) .. " ~= " .. expected)
 end
 
@@ -171,3 +171,66 @@ local replacement = summon(302)
 bus.emit(events.HERO_REMOVED, {player_id = 0, unit = deleted, entindex = 301})
 assert(get_stats().entindex == replacement:entindex(), "stale removal must preserve the replacement's combat stats")
 print("HERO_COMBAT_REMOVAL_PASS empty authoritative snapshot, resummon, stale identity protection")
+
+
+-- Equipment flat attack belongs to an independent native modifier on the hero.
+-- The clone snapshot must expose that contribution only outside an explicit
+-- final-attack override; addattack (including zero) must never add it twice.
+init(false)
+bus.handle_request(events.EQUIPMENT_STATS_GET_REQUEST, function(payload)
+    return { ok = true, snapshot = { values = {
+        attack_flat = payload.player_id == 0 and 25 or 50,
+    } } }
+end)
+local equipment_hero = summon(401, 0)
+local ordinary_attack = get_stats(0)
+near(ordinary_attack.engine_equipment_attack_bonus, 25,
+    "normal clone snapshot includes independent equipment flat")
+near(ordinary_attack.attack_min, ordinary_attack.engine_attack_min + 25,
+    "normal total minimum includes equipment exactly once")
+near(ordinary_attack.attack_max, ordinary_attack.engine_attack_max + 25,
+    "normal total maximum includes equipment exactly once")
+summon(402, 1)
+local other_player = get_stats(1)
+near(other_player.engine_equipment_attack_bonus, 50,
+    "other player's equipment contribution remains independent")
+
+local function debug_attack(payload, expected, label)
+    local previous_count = #publications
+    local result, problem = bus.request(events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST, payload)
+    assert(result and result.ok, tostring(problem))
+    assert(#publications == previous_count + 1,
+        label .. " must immediately publish its complete authoritative snapshot")
+    assert(publications[#publications] == result.snapshot,
+        label .. " publication and request response must use the same snapshot")
+    assert(result.snapshot.entindex == equipment_hero:entindex(),
+        label .. " must retain owner identity")
+    near(result.snapshot.attack_min, expected, label .. " logical minimum")
+    near(result.snapshot.attack_max, expected, label .. " logical maximum")
+    near(result.snapshot.engine_attack_min, expected, label .. " complete native minimum")
+    near(result.snapshot.engine_attack_max, expected, label .. " complete native maximum")
+    near(result.snapshot.engine_equipment_attack_bonus, 0,
+        label .. " must suppress the already-included equipment contribution")
+    return result.snapshot
+end
+local huge = ordinary_attack.attack_min + 11110000000
+debug_attack({ player_id = 0, attack_delta = 11110000000 }, huge, "addattack delta")
+assert(get_stats(1) == other_player,
+    "changing the owner's attack must not recalculate another player")
+debug_attack({ player_id = 0, attack = 0 }, 0, "zero final override")
+local before_reset = #publications
+local restored, reset_problem = bus.request(events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST,
+    { player_id = 0, reset = true })
+assert(restored and restored.ok, tostring(reset_problem))
+assert(#publications == before_reset + 1 and publications[#publications] == restored.snapshot,
+    "reset must immediately publish the same restored snapshot returned to callers")
+near(restored.snapshot.engine_equipment_attack_bonus, 25,
+    "reset restores equipment contribution for clone inheritance")
+near(restored.snapshot.attack_min, ordinary_attack.attack_min, "reset restores logical minimum")
+near(restored.snapshot.engine_attack_min, ordinary_attack.engine_attack_min,
+    "reset restores native minimum before the equipment modifier")
+near(restored.snapshot.engine_attack_max, ordinary_attack.engine_attack_max,
+    "reset restores native maximum before the equipment modifier")
+assert(get_stats(1) == other_player, "reset remains isolated to its owner")
+near(equipment_hero.health, 50000, "attack overrides and reset must not heal")
+print("HERO_CLONE_ATTACK_SNAPSHOT_PASS equipment flat contribution, huge addattack delta, zero override, reset, immediate authoritative publication and player isolation")

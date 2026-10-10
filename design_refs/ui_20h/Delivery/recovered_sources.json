@@ -1,0 +1,1041 @@
+{
+  "at": "2026-10-07T06:34:27.772Z",
+  "records": [
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attack_shard.vtex",
+      "sha256": "e5a4e9466dcf764e28fe08d6340848069c77788cbd441208004e81e944e0c0b3",
+      "originalSha256": "af59136c754826ba66a44346d278aea5179fab68d7ad2328115dcbc7bc175c11",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_attack_shard.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attack_shard.png",
+      "sha256": "34e23a11cc669d2543e771595f85b3a3e2a1d849dc343923e6d52dc6a0880ac1",
+      "originalSha256": "34e23a11cc669d2543e771595f85b3a3e2a1d849dc343923e6d52dc6a0880ac1",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_attack_shard.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attribute_gem.vtex",
+      "sha256": "00dd3011d26f15e8f782cd3ce93b0580652fdab5731b46aa093f37b091941a36",
+      "originalSha256": "fa7738e2c8af47c3dcadc5446021f9ca087b0b5887897897624e80325d264969",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_attribute_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attribute_gem.png",
+      "sha256": "25e5d8b76d0ddb1e61fbfaf9ba5b646a81249b2ebe1d863e07fe5898709d45c8",
+      "originalSha256": "25e5d8b76d0ddb1e61fbfaf9ba5b646a81249b2ebe1d863e07fe5898709d45c8",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_attribute_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attribute_shard.vtex",
+      "sha256": "1cdd6552daf427de1d06b8daf152e9eb58708e1c2cb2ff8e896844ad01cfe5ce",
+      "originalSha256": "7b4d5e0ca37046ef526d4e03043f3caec2e9885c492fd87c70c653669833ead3",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_attribute_shard.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attribute_shard.png",
+      "sha256": "6b39d6dee56a72f2425bab2c850bc89c3c8b42480f1037b8fdbbcdf5436d747e",
+      "originalSha256": "6b39d6dee56a72f2425bab2c850bc89c3c8b42480f1037b8fdbbcdf5436d747e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_attribute_shard.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_block_shard.vtex",
+      "sha256": "ae76a858f11dca785ad69f78eb66843e1cf60f795d6b28bca209566009065ae9",
+      "originalSha256": "ec00aeb143a72ddb3cf04058ab230552488e14e33b12bb99bfd0d936cf6ab2e1",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_block_shard.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_block_shard.png",
+      "sha256": "dd9bd625f3ae1fcc503fb0bab404a7759167fd103c4fb1c155d98ac202040203",
+      "originalSha256": "dd9bd625f3ae1fcc503fb0bab404a7759167fd103c4fb1c155d98ac202040203",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_block_shard.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_gold_gem.vtex",
+      "sha256": "2ea6616d5424009d75df72e9fabc1506476e697cf06ed6085397af0cff9b6885",
+      "originalSha256": "11434cc00f6223f9667feddc02a5e6f5d8a6f9b84e4ce4994b57ecbfc217cfb5",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_gold_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_gold_gem.png",
+      "sha256": "f9b4a8f70dbdba292fa9a59e2ee4cc79fe74a2811da71ecf37edffc293250970",
+      "originalSha256": "f9b4a8f70dbdba292fa9a59e2ee4cc79fe74a2811da71ecf37edffc293250970",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_gold_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_growth_gem.vtex",
+      "sha256": "e7ca598cf4db2cc0459cf46823b3b8eee8cef0a1d4904647c5ed601b0dd0013d",
+      "originalSha256": "73d6463f2ea685b97c6ad5d87ae29dda0ca0be0026b6fbf609de47eefcd520a9",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_growth_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_growth_gem.png",
+      "sha256": "365bd6003116193d68be4b4d0301205993e8eb2f97a6717101e9f0c835ad101d",
+      "originalSha256": "365bd6003116193d68be4b4d0301205993e8eb2f97a6717101e9f0c835ad101d",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_growth_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_health_gem.vtex",
+      "sha256": "731e7ff896cf5acf1d1e8adbb11979be682dc85802bacb8841dcf831cf8c1960",
+      "originalSha256": "119b1bdea2e8005049f1221c709c84e66223bf8d032b6354fdecd77d19b9ce34",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_health_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_health_gem.png",
+      "sha256": "f0fcd023dc3388a333a85de32a1a8f7ccd22e738835b9d9ecb27df617186a483",
+      "originalSha256": "f0fcd023dc3388a333a85de32a1a8f7ccd22e738835b9d9ecb27df617186a483",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_health_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_regen_shard.vtex",
+      "sha256": "e8c2374fd7f56cd478242bdae4359a8b38dcf374058386b43cb16d3266c1e9c6",
+      "originalSha256": "4c9c60ea14fccba9fa8f951b62a708716b1322c2af6046a8a57df98803d16895",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_regen_shard.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_regen_shard.png",
+      "sha256": "e12e97b3a21a0dd9c56dac32ed6a13fa12efd7d04f207ab40506d10fded04292",
+      "originalSha256": "e12e97b3a21a0dd9c56dac32ed6a13fa12efd7d04f207ab40506d10fded04292",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_regen_shard.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_wood_gem.vtex",
+      "sha256": "24f78b62b5d4a5856682b1dbf013782ca48f0fb279b24eafc0e27e7a7268c963",
+      "originalSha256": "ecf0996bf32c068be22bd6a8c6ad5d1b69c5833c22d4dca9481c578cba6efb97",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_wood_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_wood_gem.png",
+      "sha256": "40ce656fdc76283a7a41af8895021e32866d40fac8ec287927ac6cbe7f8063ae",
+      "originalSha256": "40ce656fdc76283a7a41af8895021e32866d40fac8ec287927ac6cbe7f8063ae",
+      "runtime": "panorama/images/custom_game/reward_art_v5/daily_wood_gem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_aaron_cannon.vtex",
+      "sha256": "179d7d1dfde0358ebf929dc318eea3312e961c6c9f0603fd201ac1b62f422efc",
+      "originalSha256": "3c7307c0dd6fbb8a2f6a9afcbd028cae84dfd818ff63bc3209867192f558fb07",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_aaron_cannon.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_aaron_cannon.png",
+      "sha256": "278cb3df3f98b51651abd2b9d3382cad25d80a2612d3fe14ce38cacec722dd19",
+      "originalSha256": "278cb3df3f98b51651abd2b9d3382cad25d80a2612d3fe14ce38cacec722dd19",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_aaron_cannon.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_ancient_pine_fortification.vtex",
+      "sha256": "2188fc7e90c6dce7de809406d4991c01a3b1188521e4d70ce91516fe710b2dd5",
+      "originalSha256": "72291d85d88de38562e44ca9aff38284a88c1bb414598e7aee7cf2e63cd3a8ff",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_ancient_pine_fortification.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_ancient_pine_fortification.png",
+      "sha256": "0fe4226662a8a5e30dc02fa20e50a334d6bb0da4bc04f528e233c0da516b833d",
+      "originalSha256": "0fe4226662a8a5e30dc02fa20e50a334d6bb0da4bc04f528e233c0da516b833d",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_ancient_pine_fortification.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_attribute_crystal.vtex",
+      "sha256": "2943e32804f7b15cb2655ab691749f17a024535aa34b31b06f9d1bef9e34a908",
+      "originalSha256": "3d4004e1dc1bdc62de97bd55a786de7e5367f9761a7c0b6f6c09d21d526023b5",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_attribute_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_attribute_crystal.png",
+      "sha256": "9315674a7ee2c2da09c5632c485a999db73d79802251e51b546c6247d9323c5f",
+      "originalSha256": "9315674a7ee2c2da09c5632c485a999db73d79802251e51b546c6247d9323c5f",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_attribute_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_bombardment_crystal.vtex",
+      "sha256": "2412fe9633aa4e02c4eafb3122aafcfa05065dfda9810a783c10f62bfccc0eca",
+      "originalSha256": "673e71c60112551688e295a5e1a3d362d15ef3c2874b7c52e5304500b832073a",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_bombardment_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_bombardment_crystal.png",
+      "sha256": "5421fba9faed009c5cc2ea77cec08f1ff822c9cb2182ab18a4aab47bd11d2faa",
+      "originalSha256": "5421fba9faed009c5cc2ea77cec08f1ff822c9cb2182ab18a4aab47bd11d2faa",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_bombardment_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_crystalline_armor.vtex",
+      "sha256": "c22edc325c99f56d36d544417523597fd01ca4a98c7c30b35de1b8611b310dfa",
+      "originalSha256": "f5f65e30592bacf9b727377f287ed174cb0384cf8f1c4dc8128113338c8a6504",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_crystalline_armor.png",
+      "sha256": "8c79a25d2d6933fc956456e126fbd00daba6611975105d2ad9043830693ea390",
+      "originalSha256": "8c79a25d2d6933fc956456e126fbd00daba6611975105d2ad9043830693ea390",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_cyber_overlord.vtex",
+      "sha256": "2411e9b98ac4e42e2a529f9517e8aed19339f85e17a193fcc016fa7fe1006e23",
+      "originalSha256": "ab063da53e0edee7fc54259e9b5ef25883be74aa89ec34c8f6822e6df41f66fe",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_cyber_overlord.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_cyber_overlord.png",
+      "sha256": "2a587c448714802a5dddc93996291416c056646b0648cc18f55520178fb427ae",
+      "originalSha256": "2a587c448714802a5dddc93996291416c056646b0648cc18f55520178fb427ae",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_cyber_overlord.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_darksteel_wall.vtex",
+      "sha256": "e55d5dcb50cb1b8c2b3900cebb0bdd098c72c6e1e4fc1b5ffd7b25280266e8cf",
+      "originalSha256": "a9a33d7550c321263a166d100b92fa28d70967f1a19174c8bb83ee651383eeb5",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_darksteel_wall.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_darksteel_wall.png",
+      "sha256": "f16c08fde8e31161e812826ca5e3d860521f00c1eec8390f5e9a28a263264635",
+      "originalSha256": "f16c08fde8e31161e812826ca5e3d860521f00c1eec8390f5e9a28a263264635",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_darksteel_wall.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_dimensional_barrier.vtex",
+      "sha256": "042cf9d192885b0ddeaf37644a258370712b7e34a2acd18ec44beff7a5701e9a",
+      "originalSha256": "b993e89330ae059b00a08a1c154339101f59294fc43cf5ad8e88a8ea6d661b37",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_dimensional_barrier.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_dimensional_barrier.png",
+      "sha256": "3bbace194940bb29f87d58b334124fd18527e3a89e6580a6eaa31879ad8f9b15",
+      "originalSha256": "3bbace194940bb29f87d58b334124fd18527e3a89e6580a6eaa31879ad8f9b15",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_dimensional_barrier.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_divine_spirit.vtex",
+      "sha256": "3a58352eb16701f0fac660a353fe1cd3a50008ba9115b6219c33c20dca53ff02",
+      "originalSha256": "6a344c12d9efe6c13eb22ae96d30fcaea8acc2a553761c5a5a55c41d16cd708c",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_divine_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_divine_spirit.png",
+      "sha256": "5507ccd7b66a2f615053498ca15256c8811394e9ffd18b0347270a3abd483769",
+      "originalSha256": "5507ccd7b66a2f615053498ca15256c8811394e9ffd18b0347270a3abd483769",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_divine_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_echo_compass.vtex",
+      "sha256": "378e84f295a199714555f940a7814eac7d7355884477a40362d2c2b4555a702d",
+      "originalSha256": "1abc110d45765df40f5c7a6aa755e852369d9a39e758a11305a3733087a64d09",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_echo_compass.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_echo_compass.png",
+      "sha256": "73f86f1c8238390eeacb4398a9020106cd74c787aec1a342835634058d45f50b",
+      "originalSha256": "73f86f1c8238390eeacb4398a9020106cd74c787aec1a342835634058d45f50b",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_echo_compass.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_emerald_wood_origin.vtex",
+      "sha256": "6e9080cc61820d37d393571c2e7c36f2b557f0357d6ad847ce5121ac403f973f",
+      "originalSha256": "6d73ed6ccd83894d0c1670f8e1986ef7df6fc600e2ff0ff84e3d4949b4a643fc",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_emerald_wood_origin.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_emerald_wood_origin.png",
+      "sha256": "62194693926b3dffeb6ccc4ba33b51157ce1e052e0e3374a739a449b5b60590c",
+      "originalSha256": "62194693926b3dffeb6ccc4ba33b51157ce1e052e0e3374a739a449b5b60590c",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_emerald_wood_origin.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_expansion_crystal.vtex",
+      "sha256": "3ecdcdb0dd7a181c67b174d706587335cc0cfc13a2573bc94055254a002cbda1",
+      "originalSha256": "f12e42f350485ad7c0fe2d18c479dedf59e2e4e6a2e076f61f5a1b36ba7871bd",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_expansion_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_expansion_crystal.png",
+      "sha256": "ac4bf0828b5bd9ea77280620ca29a4d296b374b7dd84b7e81bcc72304b504430",
+      "originalSha256": "ac4bf0828b5bd9ea77280620ca29a4d296b374b7dd84b7e81bcc72304b504430",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_expansion_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_fallen_sky_mine.vtex",
+      "sha256": "b149f23a28c7e3bdbfaaa1b31f28762788e43b3bd4b8ac88aa48f01f05e45ff7",
+      "originalSha256": "569fe280a9759336d08bc0f8908a9f075e192556c76b63eb83326389111b645f",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_fallen_sky_mine.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_fallen_sky_mine.png",
+      "sha256": "b7d2245a455ba2a038c4eceeab31531b3931a6ac48b67faf20ce5f7389935063",
+      "originalSha256": "b7d2245a455ba2a038c4eceeab31531b3931a6ac48b67faf20ce5f7389935063",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_fallen_sky_mine.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_forestcast_thousand_bolts.vtex",
+      "sha256": "76445bf21027cc65b6b581b259d98ef2a6e7f055dc1245a7a467cce9d281b82e",
+      "originalSha256": "46d19bb588584d41a98cace4fcf5ab5be81552583ec09ab7b189078e99ccc4d0",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_forestcast_thousand_bolts.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_forestcast_thousand_bolts.png",
+      "sha256": "8e92d1d9f22a2e2ba1f668f603ea3bf8468354b8e2b1eaac11e33b7128c1b189",
+      "originalSha256": "8e92d1d9f22a2e2ba1f668f603ea3bf8468354b8e2b1eaac11e33b7128c1b189",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_forestcast_thousand_bolts.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_gale_bow.vtex",
+      "sha256": "cf199a6185217856627cf18c890cd340da5bb325a30b816a2366e2938c950c5f",
+      "originalSha256": "346703214cbc39f8e943d59e2816170106a29f08830e7796c97ecae07ba87e9a",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_gale_bow.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_gale_bow.png",
+      "sha256": "477b26f9b288671b8ffd101ef4e65b705884ea9b32e388cbfe64a8c097d7e8f2",
+      "originalSha256": "477b26f9b288671b8ffd101ef4e65b705884ea9b32e388cbfe64a8c097d7e8f2",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_gale_bow.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex",
+      "sha256": "7a977906bfeba86d061e06eb5c4c0afb18f03d7bd417e09a21ddaa14999a472f",
+      "originalSha256": "e0fa2ec3f21fdd3a581d962a53d268fbc91c99ccf46b72c3f6d2299e07298b71",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_gathering_divine_codex.png",
+      "sha256": "07febd2d4a72c052fdd077d7024f480b04d0c2f2952ccbb3e28ceea3898e7b89",
+      "originalSha256": "07febd2d4a72c052fdd077d7024f480b04d0c2f2952ccbb3e28ceea3898e7b89",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex",
+      "sha256": "57f2479e4b42178a9d75c53e59192e3c062d2c559b570756c12f08793e46bf60",
+      "originalSha256": "65ba6cdcd1eac950eea4eeed7713ee0356a0e824cd45447e9f52f854052e5905",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_gathering_grimoire.png",
+      "sha256": "a10ab1b5f2f4f27d997801a9201b0286911399b35cc7e050853509885845c0ec",
+      "originalSha256": "a10ab1b5f2f4f27d997801a9201b0286911399b35cc7e050853509885845c0ec",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_heavenly_puppet.vtex",
+      "sha256": "60e9ceeca1bcc587f99de8f109dcbb87054409f4412c2de10a3b639729138604",
+      "originalSha256": "c0b16e662a051a159f58b97396a714b3c901cf27d9f1c67f7913540407145ba7",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_heavenly_puppet.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_heavenly_puppet.png",
+      "sha256": "ea9d9ca85d1805762242c88d69581debe8bc5bff31d835326be5f799ff25eb2e",
+      "originalSha256": "ea9d9ca85d1805762242c88d69581debe8bc5bff31d835326be5f799ff25eb2e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_heavenly_puppet.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_hero_medal.vtex",
+      "sha256": "420dee586f5c1e824217f6865f2866bd642471e9e94a56a0978390e7a0326326",
+      "originalSha256": "ca9718dc1bb67e2e9682af59e72348fbc04e894cdfedafe72eaa73e4c4ec529b",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_hero_medal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_hero_medal.png",
+      "sha256": "adce2e1f8c88b55c9444046c3054c0ebd34af14fac8997c9692d9229474de7a5",
+      "originalSha256": "adce2e1f8c88b55c9444046c3054c0ebd34af14fac8997c9692d9229474de7a5",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_hero_medal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_hippogryph_onslaught.vtex",
+      "sha256": "873c31d5336407f119833e921e7a838eba8d26fe9efa69f4737fa423b2b3bb86",
+      "originalSha256": "67993125caa362bf95d6f44eaa2887a7f137bf9aba17039b119848db325993a9",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_hippogryph_onslaught.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_hippogryph_onslaught.png",
+      "sha256": "bc32bf8d875c9addf40281111703c381383665519e2cd23dc758408ac2bd20f2",
+      "originalSha256": "bc32bf8d875c9addf40281111703c381383665519e2cd23dc758408ac2bd20f2",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_hippogryph_onslaught.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_immortal_slaying_sword_array.vtex",
+      "sha256": "dba34b8796e0c1c1468a466dd06018ffbe6e8917aa915d8f63036bf84a6a08dd",
+      "originalSha256": "0a689274b602be97fcacb7c2a63be66626cdbb5d104a926c8bb381004d9a3390",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_immortal_slaying_sword_array.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_immortal_slaying_sword_array.png",
+      "sha256": "4170e58fdbc72864618d3975a59dc26c5923f45866531520e8c67025bc93d787",
+      "originalSha256": "4170e58fdbc72864618d3975a59dc26c5923f45866531520e8c67025bc93d787",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_immortal_slaying_sword_array.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_investiture_of_gods.vtex",
+      "sha256": "3ef09d648603c444f761242c74139d8694c47471f1a8d623a0b41cba2a6507b0",
+      "originalSha256": "aae4cc9fca85a43604fe1e2f38cafbeb8ba3698cd794006e8110f3090b741811",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_investiture_of_gods.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_investiture_of_gods.png",
+      "sha256": "68d9d2978ff4f2afc65e26e5bcb24494a341d482647df853051a05604286b659",
+      "originalSha256": "68d9d2978ff4f2afc65e26e5bcb24494a341d482647df853051a05604286b659",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_investiture_of_gods.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_jade_purity_sword_immortal.vtex",
+      "sha256": "0193d8c3cf6b25f01fe292d1b185677bb3c277233952379784a73d6b0bfa8352",
+      "originalSha256": "1fae57e45b1e091c5d9324943259617d2ec49090fea9305fb5169f2440666b10",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_jade_purity_sword_immortal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_jade_purity_sword_immortal.png",
+      "sha256": "60a73c46cf1361b7d7b6ed9d21220525956f0e4ae82fad81a647bd47c5164eb3",
+      "originalSha256": "60a73c46cf1361b7d7b6ed9d21220525956f0e4ae82fad81a647bd47c5164eb3",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_jade_purity_sword_immortal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_kings_treasure.vtex",
+      "sha256": "c6de73c0fb342090f66f7a7d14fee300ab16a0db42840f100055b33a7d7f64a3",
+      "originalSha256": "ff89dd12626fe281d73df959b692bd4da281ba9ed648e76829387316cf76fa86",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_kings_treasure.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_kings_treasure.png",
+      "sha256": "986a9779692bed1ab250603291c0c6013d83e80e6c195afc4d22957b607937b2",
+      "originalSha256": "986a9779692bed1ab250603291c0c6013d83e80e6c195afc4d22957b607937b2",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_kings_treasure.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_law_of_cycles.vtex",
+      "sha256": "2c207f873576fd53547f716400bc96daea51ecd0290150418be1c7baa6901665",
+      "originalSha256": "7d9bead87772598290eeb7613e0edbf3c8379b0225ec2a7885682bc6df46b9e0",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_law_of_cycles.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_law_of_cycles.png",
+      "sha256": "fc9e4f9790ebd470beb2e767e1ea29aa8ba8026453b4d7f8525080e8e201db25",
+      "originalSha256": "fc9e4f9790ebd470beb2e767e1ea29aa8ba8026453b4d7f8525080e8e201db25",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_law_of_cycles.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_life_spirit.vtex",
+      "sha256": "998411229fb030a428691a1a10da192a5cdde10896ec210b25c648be8ce97282",
+      "originalSha256": "8dbe4bde1636f804596421d148ecdf1c6828eebd8bbc6daf1600de08c7c7ed8f",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_life_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_life_spirit.png",
+      "sha256": "b59780fd1a9dbfcd2a5e3b1080352a9d22bba7030924fa361b114957e2b07bf1",
+      "originalSha256": "b59780fd1a9dbfcd2a5e3b1080352a9d22bba7030924fa361b114957e2b07bf1",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_life_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_lumber_crystal.vtex",
+      "sha256": "c56c22e6843dc8b507853130ce5d40298ae242f34bbea95e4c37b7f0f29559d7",
+      "originalSha256": "755a7a4e19b0f68dc0a648c0f80cb9ec1959c91671d5432c44ecb35df03010e3",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_lumber_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_lumber_crystal.png",
+      "sha256": "b206b095cfa5911995cec050f109c321ceedce01af618a69d1bbebd6131e12b4",
+      "originalSha256": "b206b095cfa5911995cec050f109c321ceedce01af618a69d1bbebd6131e12b4",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_lumber_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_lumber_legacy.vtex",
+      "sha256": "2caf2205dce2d61a883a8660323499e581ecf40a136584185ad0d442cdabdcc9",
+      "originalSha256": "4be30806807917af7d962ae97f5bdd94d9955baeafb60a52b66252ddfecf6b8a",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_lumber_legacy.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_lumber_legacy.png",
+      "sha256": "7b6449fe3af1c2d6c75530cfb71261b188750f53cfc7561cff2dacc0fd2b828e",
+      "originalSha256": "7b6449fe3af1c2d6c75530cfb71261b188750f53cfc7561cff2dacc0fd2b828e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_lumber_legacy.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_magic_book.vtex",
+      "sha256": "de502936f9759aca8c7ec8d58747460670ec1adb2a1d3cc7bf06d8806cdbfcc0",
+      "originalSha256": "c7682d79b8e1bfea43a22e6e715fc43f0a7c1b4d8a14acf8371802ae9145d930",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_magic_book.png",
+      "sha256": "ac3eb385db6e23b5b8af490470c5b1af3cdc797562578e3a928fa49d316b4042",
+      "originalSha256": "ac3eb385db6e23b5b8af490470c5b1af3cdc797562578e3a928fa49d316b4042",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_magnetic_disruption_turret.vtex",
+      "sha256": "ab7c9a00c82a04953224ff60d21028965b33b1acfb40f60078784a40b9d8737b",
+      "originalSha256": "7838d8facab128e2de9484f9972a12f422c318b230fbd0f49caf116c65d2d269",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_magnetic_disruption_turret.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_magnetic_disruption_turret.png",
+      "sha256": "d957a69e84b318f49704d176f21397a795a0620e2a3861fd9962f998d3c14c2f",
+      "originalSha256": "d957a69e84b318f49704d176f21397a795a0620e2a3861fd9962f998d3c14c2f",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_magnetic_disruption_turret.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_mountain_sea_kunpeng.vtex",
+      "sha256": "a277e68d95bf0947e3bd1043acf938b24cdf5a3e51cd64f7156c014814a14d5c",
+      "originalSha256": "5180c27eef177019ddb17d9faf4568214b818c131a377e0208b5af3405c5ecb2",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_mountain_sea_kunpeng.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_mountain_sea_kunpeng.png",
+      "sha256": "de6d7f65c2bd45adb1ba7db26f9ca5e698310fbdef469d685b970647f63b042e",
+      "originalSha256": "de6d7f65c2bd45adb1ba7db26f9ca5e698310fbdef469d685b970647f63b042e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_mountain_sea_kunpeng.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_muramasa.vtex",
+      "sha256": "0d9bfe3ce7b2b08503a257898bf31bd60b43cfdbafb365282aaddff69b5ef7c9",
+      "originalSha256": "4758cb690c556c05a8f14c0cd7198f0d93d37f496541dc10cfe288d257087cbc",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_muramasa.png",
+      "sha256": "ae7c28977927261984dc611c101ebd48fce6acae75e330c862531cb3445f8c9a",
+      "originalSha256": "ae7c28977927261984dc611c101ebd48fce6acae75e330c862531cb3445f8c9a",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_nano_cluster.vtex",
+      "sha256": "f06091f27a709617b892e8bcf7c4941d06fcbae2022765787c77be35f1607079",
+      "originalSha256": "2593f3d8e3ef2dde801db4a11d1d171e2a79ec6cf84166ea4126f50f5cb36513",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_nano_cluster.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_nano_cluster.png",
+      "sha256": "fc97229eb5c08c873cf8972c01ba505376cffb996a2215c64f7feab8b15664c4",
+      "originalSha256": "fc97229eb5c08c873cf8972c01ba505376cffb996a2215c64f7feab8b15664c4",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_nano_cluster.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_nature_crystal.vtex",
+      "sha256": "1a134e4c45f22e9c954b2423531e5fd9829b49842216697d9f0cd980a0d2ff84",
+      "originalSha256": "7ea593fce1bc205636c74052b53d8d1d465abaafa9c8e93b23230716df35b735",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_nature_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_nature_crystal.png",
+      "sha256": "aba63fc013cabff7f03e929af70b43ea0897410a9964bf119ba831a780d82f07",
+      "originalSha256": "aba63fc013cabff7f03e929af70b43ea0897410a9964bf119ba831a780d82f07",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_nature_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_nature_spirit.vtex",
+      "sha256": "52acca6647c500eb382749bb5467989b5afff3709537bfc5ad7fb65c20769942",
+      "originalSha256": "2049c78925725798ba514755bee1b181558d64aa66f6739b2b3e55842b5cb706",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_nature_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_nature_spirit.png",
+      "sha256": "7470b37ef143ea34349b427439317b49f1e9215ddb97eaeea9bc7f0d6e8078bf",
+      "originalSha256": "7470b37ef143ea34349b427439317b49f1e9215ddb97eaeea9bc7f0d6e8078bf",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_nature_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_neural_reconstruction_module.vtex",
+      "sha256": "e706e34f60eb85d637cd0b6f76b2eaae58aafc126fbe2a08c097a82fdfd36888",
+      "originalSha256": "beadb774eb686c6cd457284f1300a981bb3c49198cc04e003e04324347f9d4ad",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_neural_reconstruction_module.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_neural_reconstruction_module.png",
+      "sha256": "5e2a83f5952b6c9253dc238f2f4d452655504a584d3baa5df36343afc71b37f7",
+      "originalSha256": "5e2a83f5952b6c9253dc238f2f4d452655504a584d3baa5df36343afc71b37f7",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_neural_reconstruction_module.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_oak_bulwark.vtex",
+      "sha256": "2f7429c8ce9036cf7e2b81d1107f1ca01073c61f04b4a93644b40c8c22709ef9",
+      "originalSha256": "c5ce42f1f63763e1062f448f593f3d4f42823c728dcb7761521fa50eb5f47b15",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_oak_bulwark.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_oak_bulwark.png",
+      "sha256": "31ec20ba3ed2d03a055c3195724f827048065e30c0c13c16dc1c4c59df513bfc",
+      "originalSha256": "31ec20ba3ed2d03a055c3195724f827048065e30c0c13c16dc1c4c59df513bfc",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_oak_bulwark.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_orbital_cannon_core.vtex",
+      "sha256": "d4da586d82d842c45ada6d9a58a5d4bcf2ce71f86d357e8e6cf343ced9ca585c",
+      "originalSha256": "de1261e23d2718f66cdd14b92ae42f961a73af04317b36336f8fb8370ade87fa",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_orbital_cannon_core.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_orbital_cannon_core.png",
+      "sha256": "64009d31708d2f38f468df824a6fc0904a41a1dfbf3387d3fbadce6b413a0022",
+      "originalSha256": "64009d31708d2f38f468df824a6fc0904a41a1dfbf3387d3fbadce6b413a0022",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_orbital_cannon_core.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_protection_crystal.vtex",
+      "sha256": "c0232ca9123eb248c26630435bd7902d593a86ead8a6982eebddf4f2c0270197",
+      "originalSha256": "85f188f89370b95316b18ff26bbc788200c1f026d98d1a7c18b3aacc13e3214e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_protection_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_protection_crystal.png",
+      "sha256": "cbdde42e9f699b6228c8c3b707415fd787d809506a7a84cf51cb916efd8e570e",
+      "originalSha256": "cbdde42e9f699b6228c8c3b707415fd787d809506a7a84cf51cb916efd8e570e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_protection_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_quick_dry_cement.vtex",
+      "sha256": "3a60de2dfb28617c25f9d320b6764cd5358a9e922f6d935cb0f9d87a66a649c9",
+      "originalSha256": "93f79ac4ad48f7e9ffabd8545a96d3c64d0e1b738ae01d19b36fba1a66ed0c4a",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_quick_dry_cement.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_quick_dry_cement.png",
+      "sha256": "d85c690de983f2ef33006e7cd14f30b72f404ad973bc4591a0b0505c7ee434c3",
+      "originalSha256": "d85c690de983f2ef33006e7cd14f30b72f404ad973bc4591a0b0505c7ee434c3",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_quick_dry_cement.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_raven_eye.vtex",
+      "sha256": "523fa5426d23df9799bf64cb0da11a9fec0508ac33aa4dffbf82945e860affe9",
+      "originalSha256": "441e0ffb9341fbc1c20fb8280b811327838e5dee7e824ddc313bda23fa90fa6c",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_raven_eye.png",
+      "sha256": "179ca819b5a056fdcc161c9a6162bfdaa99706431bf91dc53ac40d1142ad14b0",
+      "originalSha256": "179ca819b5a056fdcc161c9a6162bfdaa99706431bf91dc53ac40d1142ad14b0",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_recovery_crystal.vtex",
+      "sha256": "8559e9050c7b95060ed659d4cee97315b8b8fa2e58bd79d6d87b4fd640b87116",
+      "originalSha256": "a412e9f7d5e8c2c45c554ccb399f9e74958b35d81bc31588b093b78d75dc955b",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_recovery_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_recovery_crystal.png",
+      "sha256": "3521d82816400385d1d2fe213648db12dc28ccdcd7ede6b7ac6f356dca387c33",
+      "originalSha256": "3521d82816400385d1d2fe213648db12dc28ccdcd7ede6b7ac6f356dca387c33",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_recovery_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_recovery_spirit.vtex",
+      "sha256": "2c4a20039cf70d59e9dc24d3536c26cff6e4d04e94054dad522f5a80e88db8d2",
+      "originalSha256": "39e9c05c671e7df47c058c95aebf2dae0b4094068a4b80d229b587824677bbae",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_recovery_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_recovery_spirit.png",
+      "sha256": "07a0ca6e6f07b979001f5984da187ab937538df12c9bd45c2ccd822cd534c55a",
+      "originalSha256": "07a0ca6e6f07b979001f5984da187ab937538df12c9bd45c2ccd822cd534c55a",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_recovery_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_reincarnation_immortal_stele.vtex",
+      "sha256": "94e43185d15f2c7179dfb3173df39e62a2752d3c404d72923d1953968f2e5548",
+      "originalSha256": "9ca7fda655fb9f70b50582d67f719e49a2b10c441d8919c716863509433a97bc",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_reincarnation_immortal_stele.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_reincarnation_immortal_stele.png",
+      "sha256": "6d31edfd9ebf84f5b248c3d083a02cc22d65b6ad0b9266205a183cb4e6974222",
+      "originalSha256": "6d31edfd9ebf84f5b248c3d083a02cc22d65b6ad0b9266205a183cb4e6974222",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_reincarnation_immortal_stele.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_resistance_crystal.vtex",
+      "sha256": "565787dbb7fb14b9064138394d2e4171327134036c10592bb6fbfb91013125a7",
+      "originalSha256": "1466203f3948503c30294d0395abe4ba526e543fa1b45db1ba6cb4b2749b06b4",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_resistance_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_resistance_crystal.png",
+      "sha256": "c6dcaa8a5c22c5d950fd3d29c4dc821da2ab659fedfc7cede8998db8d1ea61f4",
+      "originalSha256": "c6dcaa8a5c22c5d950fd3d29c4dc821da2ab659fedfc7cede8998db8d1ea61f4",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_resistance_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_rift_implant.vtex",
+      "sha256": "4ce5fc9a1abc3a34e439fc4f3e3a2c27f1aa031f86d69baff0f7c7bfa88519d9",
+      "originalSha256": "9bd887012286c79e5dadce3143888def1fe90d357e324c5670f294d0d2251cab",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_rift_implant.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_rift_implant.png",
+      "sha256": "f94df3a68866b830cb48ed45aaeb98062d402354ecccb5a041382ca6c167b75e",
+      "originalSha256": "f94df3a68866b830cb48ed45aaeb98062d402354ecccb5a041382ca6c167b75e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_rift_implant.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_seed_of_all_wood.vtex",
+      "sha256": "9154142fa269f8aeb8cfcdf3d8c3c603dd62780501265c622135d9a677f3b564",
+      "originalSha256": "c5cd7686777ea14687bec3661cb04d2edbf38125402123eda76d83fcdad58ce0",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_seed_of_all_wood.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_seed_of_all_wood.png",
+      "sha256": "e8d9d4b3c552866a827ea1ad6dacd4a431d5ed8d003befb0c256ea9195b503d6",
+      "originalSha256": "e8d9d4b3c552866a827ea1ad6dacd4a431d5ed8d003befb0c256ea9195b503d6",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_seed_of_all_wood.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_sharpwood_tower_core.vtex",
+      "sha256": "acb6f839178326ed41a6f0959800bbcfe4b77d5e481981568a9369fd1e164a45",
+      "originalSha256": "c4837b26380262e51eb318bb6d7d1a48b7d1eb3e27e69fa5b446e3eae169e1f1",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_sharpwood_tower_core.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_sharpwood_tower_core.png",
+      "sha256": "5a6e38f137a646cbca1736c66d2d84cfeddcc2519d90b78d686ce2e86eaa345c",
+      "originalSha256": "5a6e38f137a646cbca1736c66d2d84cfeddcc2519d90b78d686ce2e86eaa345c",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_sharpwood_tower_core.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_sharp_spirit.vtex",
+      "sha256": "537505de363bab4e1da036bc47511be4cfd071873d8680b64bcf673c97f114d9",
+      "originalSha256": "d03f89c0a8814f1829d5f1d95a69ff352d497eefced16c6397b5cb461908b28c",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_sharp_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_sharp_spirit.png",
+      "sha256": "f84c21cf86f24a6474081705813dd044462887644f95655b2c21f27739052d0c",
+      "originalSha256": "f84c21cf86f24a6474081705813dd044462887644f95655b2c21f27739052d0c",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_sharp_spirit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_shooting_crystal.vtex",
+      "sha256": "6a7284f9c55a682136d89e72f2e8d71e4724678e58e38c73fb66eb74840f7d2d",
+      "originalSha256": "aa9784b5c5f7e84c56f83780a013f23c44274103a2b3324a37f6d73de09987dd",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_shooting_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_shooting_crystal.png",
+      "sha256": "f471ed93b7982aa1d3639ddda1e157190a3058f496a13b15c2e28156cd87b40c",
+      "originalSha256": "f471ed93b7982aa1d3639ddda1e157190a3058f496a13b15c2e28156cd87b40c",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_shooting_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_signal_hub.vtex",
+      "sha256": "ac226388c16601ad0708b3ae02565ecf4c78a11a96eeebaccf50f43697c63175",
+      "originalSha256": "a595125d1a42e2a46c7a39b9fcb7d78fac8f4955d7eaa2280ad002c45e679073",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_signal_hub.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_signal_hub.png",
+      "sha256": "8bdeb2b077b6133210069fcf8954585d43f7d6568ebb5f3cba7f2d8d29f6dd1d",
+      "originalSha256": "8bdeb2b077b6133210069fcf8954585d43f7d6568ebb5f3cba7f2d8d29f6dd1d",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_signal_hub.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex",
+      "sha256": "5f9ff0bc2e014cb69bdbc4203d09252e813e4f1c6a78c48721fcbd30e3b017cc",
+      "originalSha256": "702e717f0a396fac0594759caef8ff2ce8dd5fd5c7958e3a4bcfa3d295ea994e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_soul_devouring_blade.png",
+      "sha256": "13e8cfc408ca0f0a171ba3dccdae7546a0b519f0beea3fab7b1573a862cdb5da",
+      "originalSha256": "13e8cfc408ca0f0a171ba3dccdae7546a0b519f0beea3fab7b1573a862cdb5da",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex",
+      "sha256": "644b692f146d8574d560a0f1f0cda397dc8aa00ba2037bee07785aaac708e6b9",
+      "originalSha256": "743c6b84ad00f73156c8c08ebe5ea65f06a0cbc285ddd9945a6573f2841902ad",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_spear_of_longinus.png",
+      "sha256": "c386b5a76fdd7d5be59783169556ce5e7979f9fd52b95727244eab1d94faf55a",
+      "originalSha256": "c386b5a76fdd7d5be59783169556ce5e7979f9fd52b95727244eab1d94faf55a",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_steel_wall.vtex",
+      "sha256": "025017a48eda1294084f7911c0babea75298e85f4e859eb2e0121cd2acd547b9",
+      "originalSha256": "608087736439a2e10135ce33eaacac8876dc08418eab11dbf348baf03589b8c4",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_steel_wall.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_steel_wall.png",
+      "sha256": "52134829eede6316b196526bf8d67a2c111ff7c35b0180b7a14108d0f082f027",
+      "originalSha256": "52134829eede6316b196526bf8d67a2c111ff7c35b0180b7a14108d0f082f027",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_steel_wall.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_supreme_fishing_rod.vtex",
+      "sha256": "2b91268c35542d462dd0ca8c8880ff6459dd5191e33d0bc91216be13dc028a9f",
+      "originalSha256": "7b943acbc8f72eeb7f6b3a553251e41a4be6db4d38506cf3a1768677ee529601",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_supreme_fishing_rod.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_supreme_fishing_rod.png",
+      "sha256": "d61610c35793d59b5c0ea400375bbbb0c9cf75178d3ba0bfa340ba9aaf73dd15",
+      "originalSha256": "d61610c35793d59b5c0ea400375bbbb0c9cf75178d3ba0bfa340ba9aaf73dd15",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_supreme_fishing_rod.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_swift_emblem.vtex",
+      "sha256": "cbe8894876fe5179b85109ee73b48b532786a9e7336ed406435a00b607a326f9",
+      "originalSha256": "c18824671b1347850df19e30d2a138f7bf4c9fafd76f96979f6df5c665114493",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_swift_emblem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_swift_emblem.png",
+      "sha256": "f7f2dbda903641cea9eb636949aa390d0482476cdbeb8b74d70740e122d97780",
+      "originalSha256": "f7f2dbda903641cea9eb636949aa390d0482476cdbeb8b74d70740e122d97780",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_swift_emblem.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_sword_of_promise.vtex",
+      "sha256": "05252e14e295f770de4667d713eae3d0c36bfd0e028049eb1fd2ed1e16f40d3f",
+      "originalSha256": "f634a16f2362ff041d2b9a8db1328b7eaff7a35513ff1d7146155f799ce9c5cf",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_sword_of_promise.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_sword_of_promise.png",
+      "sha256": "3c7fbe3763ce783e9fcd3f7d65292dfc7ff7f24e82c1cccae40f9eacbea48806",
+      "originalSha256": "3c7fbe3763ce783e9fcd3f7d65292dfc7ff7f24e82c1cccae40f9eacbea48806",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_sword_of_promise.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_titan_shield.vtex",
+      "sha256": "84994ddec90a496bd78f9c0444eef4bb06552ebbde9bc73930aff734be6c09d5",
+      "originalSha256": "4d3f3830c24dce27e29f2cdf9cc33a44b20b741f50906533d325c91c2f9d4d4e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_titan_shield.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_titan_shield.png",
+      "sha256": "e2892f34a48f941cdca1f79d3fe36936d7f05669e7029d92903d0908a5eecc33",
+      "originalSha256": "e2892f34a48f941cdca1f79d3fe36936d7f05669e7029d92903d0908a5eecc33",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_titan_shield.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_tower_retrofit.vtex",
+      "sha256": "8db88b468084ed671a29e52d355a45c759a996c6673b3674ed3fa252421dac3f",
+      "originalSha256": "41215d906874c8449d0eff3851315e040702a37fcdafde39d71233fb109bed3b",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_tower_retrofit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_tower_retrofit.png",
+      "sha256": "5abd04715b0b3f8d6106a8a2e6f509c6af640ed3093de662edc63ea3fcd583f6",
+      "originalSha256": "5abd04715b0b3f8d6106a8a2e6f509c6af640ed3093de662edc63ea3fcd583f6",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_tower_retrofit.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_universal_tool.vtex",
+      "sha256": "abb42d7060985589f915d93124e0880a4cf5a2245670c10bced8c9eb6f589051",
+      "originalSha256": "1e250e1e42962b248ed33093175e39801f05e6c1e238e6a125412fa835a244c6",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_universal_tool.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_universal_tool.png",
+      "sha256": "787c4e17bc0efb119ab788df703a1897fb3def4d10ccee40d25bd627e1b74e3e",
+      "originalSha256": "787c4e17bc0efb119ab788df703a1897fb3def4d10ccee40d25bd627e1b74e3e",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_universal_tool.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_void_signal_terminal.vtex",
+      "sha256": "bcbc5d00c2c8cbbb7386038d9b61184756b0963aed4193c0cfdb5dca1c6fddca",
+      "originalSha256": "b3b8b3693c9b57cc55d418092defbcc5dc2a23a36e34c469a7fb3067b9fe646a",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_void_signal_terminal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_void_signal_terminal.png",
+      "sha256": "b0f0eee678a5b254975c42c7b7ca159592a275db41faad19a25d02ef79dc4a6b",
+      "originalSha256": "b0f0eee678a5b254975c42c7b7ca159592a275db41faad19a25d02ef79dc4a6b",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_void_signal_terminal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_wealth_crystal.vtex",
+      "sha256": "82d3040b368fd5c2621c2012d2a5a10655ee610338d68a99c2c093e4d084035a",
+      "originalSha256": "028762c3e32a312a41850aaee51c01d8f384f2582b5d5879b4c1b43f9dcedbe7",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_wealth_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_wealth_crystal.png",
+      "sha256": "60891a01ba82dd65abf75abfeddf6c21562f60a8ed553103fd9e23c83fb64b1d",
+      "originalSha256": "60891a01ba82dd65abf75abfeddf6c21562f60a8ed553103fd9e23c83fb64b1d",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_wealth_crystal.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_windspeed_bowstring.vtex",
+      "sha256": "4ea407f2c7d85c672a693f76b315bfe30e1794f3cd900e1109f14a3617b9abac",
+      "originalSha256": "3b7d40b3ac532e98622c837506b1b1fa2f942f9d4c42dad1651e20a34a050245",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_windspeed_bowstring.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_windspeed_bowstring.png",
+      "sha256": "73adb8a219cf12f58018d58772292394432c577eb9d6a7531ae4df65a76a68d0",
+      "originalSha256": "73adb8a219cf12f58018d58772292394432c577eb9d6a7531ae4df65a76a68d0",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_windspeed_bowstring.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_withered_branch_lantern.vtex",
+      "sha256": "8b96534926615570c7bf65bce7b231e9c32e18d910ce00357719154377671625",
+      "originalSha256": "ee6f0e8bc3ae69850b510afd68618acac6795adb8cccf4e3f4926c20b853c2f0",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_withered_branch_lantern.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_withered_branch_lantern.png",
+      "sha256": "4927499b7835b9f06ad16c7f0065867d771b8d40b9dda106e1d41b3e3636c760",
+      "originalSha256": "4927499b7835b9f06ad16c7f0065867d771b8d40b9dda106e1d41b3e3636c760",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_withered_branch_lantern.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_woodcraft_grandmaster.vtex",
+      "sha256": "30dae22961ae79cb55ca5ea436bc85471682597a492af5e55a88bdae39c2ec24",
+      "originalSha256": "bb6cba8d3a0f806259701ad5c8fb0c86e3e2d9b902848570fe9a640f2bff3509",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_woodcraft_grandmaster.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    },
+    {
+      "source": "art/ui/sources/custom_game/reward_art_v5/lottery_woodcraft_grandmaster.png",
+      "sha256": "903070e92f7dea30fefad2a34f826ae83ad0b8830cc87ae5838fd208d68943d3",
+      "originalSha256": "903070e92f7dea30fefad2a34f826ae83ad0b8830cc87ae5838fd208d68943d3",
+      "runtime": "panorama/images/custom_game/reward_art_v5/lottery_woodcraft_grandmaster.vtex_c",
+      "origin": "Existing Workshop source; PNG bytes preserved, texture definitions use repository LF endings"
+    }
+  ]
+}

@@ -180,7 +180,11 @@ class ArchiveTests(unittest.TestCase):
     def test_conflict_preserves_other_writer(self):
         before=self.profile['save']['gameplay_stats']['initial_wood'];self.db.conflict=True
         self.assertTrue(self.send('clear',difficulty_id='n1',count=1)['ok'])
-        self.assertEqual(self.profile['save']['gameplay_stats']['initial_wood'],before+100+50)
+        # The same atomic clear awards N1's 50 wood and the first-win welfare's
+        # 10 wood, while preserving the concurrent writer's 100 wood.
+        self.assertEqual(self.profile['save']['gameplay_stats']['initial_wood'],before+100+50+10)
+        self.assertTrue(self.profile['save']['archive']['completed']['clear_n1_1'])
+        self.assertTrue(self.profile['save']['archive']['completed']['welfare_victory_01'])
     def test_rejects_untrusted_fields_and_config(self):
         for c in (dict(kind='online_checkpoint',actual_seconds=100),dict(kind='social_ticket_cheat'),
             dict(kind='social_draw',pool_id='friend',roll=0),dict(kind='clear',difficulty_id='n1',count=20),
@@ -369,7 +373,7 @@ class ArchiveTests(unittest.TestCase):
             result=json.loads(completed.stdout);self.assertTrue(result['ok'],result)
             response=result['response'];self.assertEqual(response['guarantee_quality'],expected)
             self.assertTrue(response['guarantee_satisfied'])
-            natural='r' if pool in ('cultivation','dragon_knight') else 'n'
+            natural='r' if pool in ('cultivation','dragon_knight','summer') else 'n'
             self.assertEqual([x['quality'] for x in response['results']],[natural]*9+[expected])
             # A single draw at an existing 100-draw history still has no batch guarantee.
             payload['command']['count']=1

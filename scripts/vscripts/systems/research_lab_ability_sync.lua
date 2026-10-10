@@ -78,7 +78,13 @@ local function desired_rows(building_id, levels)
                 break
             end
         end
-        desired[#desired + 1] = selected
+        -- Shared advanced labs keep their native action slots: another player
+        -- may still need a technology the owner has completed. Their HUD hides
+        -- only the viewer's completed rows using the personal projection.
+        if building_id=="building_advanced_research_lab"
+            or (tonumber(levels[selected.technology_group]) or 0)<maximum(selected) then
+            desired[#desired + 1] = selected
+        end
     end
     return desired
 end
@@ -105,22 +111,25 @@ function M.sync(unit, building_id, levels, transaction, reincarnation_level)
         end
     end
 
-    local queue_count = tonumber(transaction and transaction.queue_count) or 0
-    local queue_capacity = tonumber(transaction and transaction.capacity) or 7
     for _, row in ipairs(desired) do
         local ability = unit:FindAbilityByName(row.ability_name)
             or unit:AddAbility(row.ability_name)
         if ability then
             local current = tonumber(levels[row.technology_group]) or 0
-            ability:SetLevel(1)
-            ability:SetHidden(false)
-            local reserved = tonumber(transaction and transaction.reserved_levels
-                and transaction.reserved_levels[row.technology_group]) or 0
-            ability:SetActivated(queue_count < queue_capacity
-                and prerequisite_met(row, levels, reincarnation_level)
-                and math.max(current, reserved) < maximum(row))
-            if ability.SetAbilityIndex then
-                ability:SetAbilityIndex(math.max(0, (tonumber(row.slot_order) or 1) - 1))
+            if not ability.GetLevel or ability:GetLevel()~=1 then ability:SetLevel(1) end
+            if not ability.IsHidden or ability:IsHidden() then ability:SetHidden(false) end
+            -- Queue capacity and reservations are checked by the click handler.
+            -- They do not change whether this technology has been unlocked.
+            local activated=prerequisite_met(row, levels, reincarnation_level)
+                and current < maximum(row)
+            if building_id == "building_advanced_research_lab" then activated = true end
+            if not ability.IsActivated or ability:IsActivated()~=activated then ability:SetActivated(activated) end
+            local slot=math.max(0,(tonumber(row.slot_order) or 1)-1)
+            local actual_slot = ability.GetAbilityIndex and ability:GetAbilityIndex()
+                or ability.survival_research_slot
+            if ability.SetAbilityIndex and actual_slot~=slot then
+                ability:SetAbilityIndex(slot)
+                ability.survival_research_slot=slot
             end
         end
     end

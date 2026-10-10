@@ -1,4 +1,166 @@
-## 当前修改（2026-10-08）：通关建筑安全生成与武器强化角标
+## 当前任务（2026-10-09）：无尽挑战50怪与四轮饰品设计表
+
+按用户最后“开始设计表格”交付设计阶段，不将尚未校准的200套组合直接接入游戏。已确定现有同模型根因：archive_endless_rules默认model_path固定为nevermore，archive_endless_service.spawn_next整局直接读取该路径/0.9尺度，没有读取波次视觉配置。本次未改该服务或任何战斗配置。
+
+用户明确回复：201波后固定原基础1.5倍，401/601/801不累乘。设计每波所有怪同外观；前50波50个唯一非人形主体，第51/101/151同怪物身份换第二/三/四饰品；201后重复200波组合。50独立资源并非50物种，交错狼/蛛/蛙/蜥/龙/猛禽/异虫/巨兽，最后肉山。11种怪物英雄用默认与3套真实原生完整饰品，39野怪/召唤物用骨饰、晶簇、晶棘+宝石3轮自定义几何；自定义资源存在但挂点比例未实机校准，不能宣称已显示。所有候选均有原生idle/run/attack，递归核对1780主体/原套依赖缺失0，另5个通用道具均存在；bbox初始尺度仅建议。
+
+触发/状态流设计：进入无尽→spawn_wave一次求slot=(wave-1)%50+1、outfit=floor((wave-1)/50)%4+1及固定尺寸倍率→本波缓存同一视觉定义→每个出生单位装配→移动自动父跟随→死亡/结束清理；无每帧换装定位。原生需要default_wearable_asset_id接线及启动预载；通用道具需独立attachment_parent分支，现有两装配服务实际强制bone_merge，跨骨架不能直接使用。只改未来视觉模型/饰物，保持属性、碰撞、ground、射程、出生间隔、评分和1000战斗属性波数，不能用外观循环凭空延长属性表。客户端/UI不新增面板，本次为可审阅文件。
+
+交付docs/endless_monster_visual_design_20261009.md；docs/design/endless_monster_visual_design_20261009.xlsx（说明、50怪、1000波、资源、200配方5张表）；同目录cycle/waves CSV与完整visual_plan JSON，含ItemDef、全部部件、动作要求、bbox、挂点及显式未接入状态。800组n/n+200的外观重复与固定1.5倍率、每怪4种几何/原套签名、50唯一主体、工作簿重开及51/1001/201行数均核对通过；现有战斗属性CSV哈希不变。证据validation/20261009/endless_monster_visual_design.json及output/endless_monster_design_20261009。未运行游戏穿戴/形态目测，未写源码、资源编译或Git同步。
+
+## 当前修改（2026-10-09）：猴子分身真实攻击同步与addattack大数伤害
+
+用户看到齐天大圣分身攻击面板正确，但打怪伤害可疑，使用了addattack。确认作弊入口调用HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST，最终attack_min/max与engine_attack_min/max均为完整override且会立即发HERO_COMBAT_STATS_CHANGED。猴子HUD复制玩家权威快照，所以面板正确不代表native setter成功。旧sync_clone直接将engine_attack写SetBaseDamageMin/Max，没有其他分身已有的限幅/还原；11110000000的派生signed-int边界fixture失败，超过原生整数上限的巨额attack存在溢出路径。另普通状态engine_attack不含由modifier_equipment_effects单独提供的equipment.attack_flat，猴子没有该modifier，导致漏继承固定装备攻击。
+
+最小新增endless_stat_projection.prepare_attack只设置attack scale/逻辑attack、返回以1e8为上限的native范围，不触碰生命投影；猴子保持engine_attack优先继承规则，加装备独立分量后限幅取整写入setter。既有damage_filter对普通native攻击恢复attack scale一次，再应用目标生命缩放；Q等有inflictor/技能类别的独立伤害不乘攻击scale。英雄快照增加engine_equipment_attack_bonus：正常状态为equipment.attack_flat，debug完整攻击override（包括0）时为0，避免装备重复加入。英雄本体伤害公式、其他分身继承规则、攻速/生命/皮肤与技能逻辑没有改变。
+
+状态流：addattack/装备更新→真实英雄recalculate和同一个snapshot发布→存活且身份匹配的猴子分身同步完整native攻击分量→bounded min/max与attack scale→普通攻击过滤时还原一次→目标生命投影换算→逻辑伤害/实际载体扣血保持一致；降低攻击后scale回到1，重置debug后恢复装备分量。单位重生沿原创建/同步入口，玩家隔离及攻速modifier复用保持。
+
+扩展既有test_monkey_clone_attack_rate，用真实monkey service+damage_filter/endless模块、受控native int32 setter与HP application：普通engine优先/逻辑fallback、1e11/9e15、降回普通、分数取整、装备55/65、debug不重复装备、重置与最终恢复共10组通过；普攻上下限、已乘暴击、技能不重复倍率、目标生命缩放后的扣血、健康元数据不变、原攻速/重生/轮询/事件/玩家隔离通过。旧源负例准确因50000000000写native int32失败；仅去掉装备继承的独立负例准确因30应55失败。test_addspeed_snapshot新增真实hero服务验证装备25、addattack delta11110000000、override0、reset恢复25、发布/返回同一snapshot、不回血与双玩家隔离；旧hero源准确因缺新分量失败。
+
+主宰分身、末日地狱火、小游侠已有bounded/还原机制，高攻击、次级箭、技能隔离、目标缩放及其他同步回归通过。test_monkey_clone_q既有粒子环境fixture在修改前即失败，未改无关fixture；不把该失败称为攻击同步通过。Lua语法与diff检查通过，证据见validation/20261009/hero_clone_damage_sync.json与output/hero_clone_damage_sync_20261009。本次未取得真实Dota原生攻击与扣血实测，原生边界及HP变化是受控fixture；用户本次addattack具体金额尚未回复，不断言该实机感觉只由大数溢出导致。Lua/快照字段变化无需资源编译，重新载入地图验证实际addattack。原有改动保留，本次未请求Git提交/推送。
+
+## 前次修改（2026-10-09）：暴击塔两次普攻之间的动作停顿
+
+用户观察噬魂术士两次攻击间像进入idle再攻击。源码审计确认合法存活射程内目标持续锁定，0.25秒think仅验证该目标，不重新FindUnits、不重发攻击命令、不Stop；死亡或失效才找下一目标。实际暴击/死亡路线是class_1，R/SR/SSR共20行均使用真实战斗实体上的影魔hero body，已有原生ranged攻击动画。OnAttackStart却又给native_wearable_stage额外StartGesture(ACT_DOTA_ATTACK)，默认播放速度不随实际攻击间隔改变，存在覆盖原生攻击周期造成动作停顿的风险。
+
+生产修改仅play_attack_gesture三行：有critical_strike_时跳过额外脚本动作，交给原生攻击动画。三阶每条配置均包含该技能，覆盖噬魂术士/冥火判官/阎狱君王；雷电固定2倍和机枪每轮一次脚本动作保留。寻敌、原生攻击CD/attack point、基础APS1.25及增益后的BAT、伤害、暴击/追加伤害、弹道与皮肤配置均没有修改，也没有新增计时器或查询。
+
+状态流：目标锁定→原生攻击开始→脚本保留TOWER_ATTACK_START及当前目标/暴击准备，但跳过重复gesture→原生发射/命中→保留暴击与proc结算→原生攻击CD结束后下次动作；目标死亡继续沿既有即时换靶和下一帧补命令机制。真实asset_catalog检查20行均为native Shadow Fiend body且包含critical技能。扩展既有完整modifier回归，20条实际路线各连续两次OnAttackStart/OnAttack/暴击查询/OnAttackLanded：无额外gesture、锁/事件保留、5倍暴击及SSR每次500追加伤害、无额外PerformAttack或替换弹道通过，原有机枪6–8弹道单动作和雷电2倍通过。旧生产源码在相同新测试明确因首条多余gesture失败，新源全套通过。
+
+既有共享攻击事件桥1000次同目标循环及目标选择回归通过，确认无多余搜索/命令/Stop，死亡换靶保留原生CD。安全console只读请求尝试一次未收到游戏返回，未改当前局单位、未热重载生产脚本，因此视觉原因仍为源码推断与模拟回归，未取得本次实机画面验收。Lua语法及diff检查通过，证据见validation/20261009/crit_tower_attack_gap.json与output/crit_tower_attack_gap_20261009。仅Lua改动，无资源编译需求；重新载入地图验证实际连续动作。原有改动保留，本次未请求Git提交/推送。
+
+## 前次修改（2026-10-09）：满级防御塔显示合成终极塔按钮
+
+根因是tower_ability_sync仅在七路材料齐全时添加ability_tower_fusion，且该分支又把ability_upgrade_tower_lv01设为wanted，导致未齐时入口缺失、齐全后满级升级按钮重新出现。路线阶段结束不等于最终满级：七条路线各20行，最终绝对等级25、SSR五红星；R5、SR5及仍有下一行的SSR阶段继续保留升级。
+
+最小修改使用tower_routes.can_upgrade判定最终路线满级，移除全部三种升级能力，并始终添加合成终极塔入口；资格不足时SetActivated(false)。七种路线各至少一座最终满级塔且无存活终极塔时解除置灰。沿用既有玩家材料资格与建筑升级/死亡/终极塔变化事件；同步签名相同的快速路径也更新原fusion能力激活状态，资格变化不重建技能、不加轮询。材料已参与标记不再显示入口，服务端满级校验保留，正常输入已无满级升级按钮；自动升级原有到顶停止且silent通知机制保留。
+
+状态流：可升级→最终升级完成→移除升级能力并显示灰态合成→七种路线材料齐全→同一技能亮起→材料死亡或已有终极塔→同一技能置灰→材料消耗/销毁或已参与→入口移除。合成仍消耗七种路线各1座最终满级塔，玩家上限1座；runtime与两份中文本地化统一显示“合成终极塔”并修正旧说明的不消耗/上限5座，无数值和合成事务变更。
+
+Lua5.1回归覆盖七路线×25级、阶段升阶、所有旧升级按钮清理、资格0→1→0、相同资格无重复激活写入、同一能力实体/签名且零重建、材料参与与玩家隔离；builder灰亮、材料6/7与7/7、上限与名称说明通过。修改前源码在新测试准确失败于满级灰态合成入口缺失；既有自动升级与前端按钮/tooltip恢复及真实生产模块融合UI夹具通过。Lua语法、两份本地化词条一致性与diff检查通过。证据见validation/20261009/tower_max_synthesis_ui.json及output/tower_max_synthesis_ui_20261009；未取得本次实机原生技能栏画面验收。仅Lua与文本变化，无Panorama资源编译需求；重新载入地图测试新逻辑。原有与并行修改保留，本次未请求Git提交/推送。
+
+## 前次修改（2026-10-09）：技能等级点放大并铺满图标
+
+用户截图中等级点太小，原因是原生AbilityLevelContainer的五级点仍为7×4、总宽50，而项目square已把技能图标放到104px后整体缩放。读取本机原生DOTAAbilityPanel XML/CSS确认原点由引擎动态创建，类为LevelPanel，active_level/next_level/Hidden负责亮暗与折叠。不能假定Level0固定ID或另造等级数据。
+
+实际加载的topnav_remaining_5d5c1152eb与同源handoff_hud各新增局部styleAbilityLevelPips适配，并在square最小接线。复用已有可见多级点，容器宽104、高12、位置(6,118)，对齐图标宽度并位于116高按钮下方避开左下快捷键；五点各18.4×12，四个3px间隔恰好总104，亮暗渐变保持原生。槽与原有父层允许noclip，新增缓存节点查找复用已有刷新时钟，不创建点、不加计时器。单级与无点容器不放大；多级复用到单级时恢复完整原inline styles，包括place的min/max约束。有效点快照只跟踪活面板，重建不会积累失效句柄。
+
+状态流：原生生成等级点→既有square取得当前容器→多级点按实际数量排列→引擎继续维护亮暗→单位/点数变化重排→单级/无点恢复→销毁重建时清理旧快照。两份生产helper的3/4/5/6点宽度、高度、五点18.4、原类/颜色/Hidden、5→1完整样式恢复、六轮销毁重建均由临时验证通过。现有HUD数值布局与缓存恢复回归通过，永久测试只增加可选helper的两行提取适配，没有新增永久测试。
+
+两份脚本官方重新编译成功，各1 compiled、0 failed，新vjs_c含最终helper且哈希更新。证据见validation/20261009/hero_skill_pips.json与output/hero_skill_pips_20261009。没有本次实机截图/像素验收，尺寸验证为生产helper配引擎桩；重新加载HUD/地图使用新资源。原有改动保留，本次未请求Git提交/推送。
+
+## 前次修改（2026-10-09）：英雄技能说明紧凑排版与当前等级高亮
+
+用户截图中LV1短标签占用了通用属性表164px固定列，右侧长文宽度不足，产生大块左侧空白；所有AbilityFieldValue又统一金色，因此无法识别当前等级。仅在英雄技能runtime.fields的LVn行增加紧凑与当前等级class，左列缩为52px，右列fill-parent-flow(1.0)自动换行，行间距2px。当前等级标签/文本金色#f0d48a，其余灰色#9da5ad；LV1与LV2以上使用同一比较，匹配标题显示的技能等级。
+
+状态流为悬停读取技能等级与runtime.fields→识别英雄LVn行→设置紧凑class与当前class→等级/快照刷新后复用原行并重算→切换到普通属性行显式清除两类样式→退出继续沿用原隐藏/行池生命周期。源改动只在addField与既有render分支小段适配及对应CSS；没有新增刷新时钟或服务端字段。通用建筑/科技属性表保持既有排版。
+
+两份Panorama官方编译成功，各1 compiled、0 failed，运行vjs_c/vcss_c已更新且含新class，记录位于output/hero_tooltip_compact_20261009。稳定性回归与JS语法检查通过；完整生产模块回归覆盖真实地裂冲击LV1–LV5长文、LV1/LV3当前高亮、同一悬停升级刷新、20次刷新无新增面板、切到普通字段及建筑时清除旧class。旧源码在独立Node进程加载新测试，仅新增两项因缺少紧凑行class而失败，准确命中本次修复。尚未取得本次实机中文字体像素验收，不把样式/模拟结果称作真实截图验收。原有修改保留，本次未请求Git提交/推送。
+
+## 前次修改（2026-10-09）：五转公共技能升级按钮缺失
+
+根因是奖励配置与公共技能容量冲突：hero_skill_system公共技能上限为3，二至四转已选满三个；五转reward_rebirth_05的effect_0027仍为grant_random_skill_or_upgrade，选择服务按容量拒绝，没有发放技能点。UI正确要求skill_points>0与can_upgrade=1，因此五转不会显示升级加号。不是五转隐藏规则或资源编译问题。
+
+只修改三条权威CSV业务行：五转奖励改为grant_skill_points +1，挑战说明改为公共技能点+1，新技能三选一规则只覆盖二至四转；定向生成对应三份Lua。五至十转每次+1公共技能点，沿用真实服务端升级校验和现有HUD加号。专属技能、公共技能容量、其他转生奖励、战斗数据和UI源代码保持既有规则，无新增定时器。
+
+新增test_hero_fifth_rebirth_skill_point.lua使用真实MONSTER_ENCOUNTER_COMPLETED→monster_reward_service→生成奖励→progression→skill/choice/pool→UI请求链，只桩引擎接口。二至四转选择、五转加点与升级标记、专属不能花点、公共技能升级只扣1点、六转延续和双玩家隔离通过。完整修改前配置在独立Lua进程替换package.loaded后，测试准确在五转point==1断言失败。现有公共技能升级/扣点回滚回归也通过；原生产Panorama模块的三公共技能+一点快照显示三个加号，正确发请求、等待锁与花完点隐藏通过，相关绑定/tooltip/选中恢复回归通过。
+
+三表逐字段比较只改预期字段，其余行相同；定向生成可重复且字节一致，Lua5.1语法通过。证据见validation/20261009/hero_fifth_rebirth_skill_point.json与output/hero_fifth_transfer_skill_20261009。未取得实机五转画面验证，不声称当前局已补发：旧局已结算的五转奖励不会自动重新发放，重新载入地图后的新局使用修复配置；无新粒子/Panorama资源编译需求。本次未请求Git提交/推送，原有及并行改动保留。
+
+## 前次修改（2026-10-08）：修复真实引擎无弹速setter导致分裂箭慢十倍
+
+用户实机反馈统一1500仍无效果。Tools局只读复现：逐风弩手638的CSV与基础缓存均为1500，但生效缓存nil、GetProjectileSpeed=5000，最后七支分裂箭iMoveSpeed全部500；暴击/寒冰/防空同样生效缓存nil且原生速度5000。真实引擎GetProjectileSpeed存在，SetProjectileSpeed为nil。旧building_upgrade_system把速度计算和缓存写入都放在不存在setter的条件内，因此原生使用KV默认5000，而分裂箭退回SPLIT_ARROW_SPEED=500。前次回归只验证预填缓存，升级测试还模拟了不存在的setter，未覆盖这一真实路径；前次文档的「生效1500」仅是配置/模拟结论，已由本次实机证据更正。
+
+新增小模块tower_projectile_speed，生产建筑setter最小接入：配置基础速度→按既有路线倍率算有效值→无条件写分裂箭缓存→真实引擎用隐藏常驻modifier_tower_projectile_speed的MODIFIER_PROPERTY_PROJECTILE_SPEED_BONUS设置原生速度。保留无自身bonus的native基础缓存，首次挂载，升级/转职更新同一modifier；缺失时重挂，死亡保留，实体重建自然重新初始化。负bonus通过原生stack同步，CalculateStatBonus更新生效值。兼容存在setter的测试/引擎，配置、皮肤、粒子和战斗数值不改；不新增搜索/表现轮询，命中时间继续用同一个有效速度计算。
+
+新增回归从实际建筑setter到实际分裂箭/视觉函数联测，无人工预填生效缓存；四路线80行、无setter、全局倍率、100次刷新不累乘、升阶/转职、缓存与modifier恢复、600距离0.4秒且到达后伤害均通过。旧源码加载新测试会在首个无setter缓存断言失败。完整转职预检、建筑升级生命周期/性能、技能攻击及弹道视觉回归通过。额外test_tower_upgrade_targeting在155行「资源信息尚未就绪」失败，加载修改前building_upgrade_system也同样失败，未改无关资源fixture。
+
+真实引擎私有building_arrow_tower验证setter=nil、5000→1500、bonus=-3500，连续10次刷新无累积，跨倍率路线2500→class_7的1500成功；私有实体已删除。随后当前局已到post_game，正式在场塔应用尝试为0个，没有实机新分裂箭/逐帧观感验收，不声称正式塔已热更新。新局加载完整代码；Lua直接加载，无新资源/编译需求。语法、diff检查和证据见validation/20261008/split_arrow_speed.json与output/split_arrow_speed_20261008。未请求Git提交/推送，其他改动保留。
+
+## 前次修改（2026-10-08）：防空炮同族灼热箭三阶弹道
+
+按用户要求，防空炮R采用与多重塔SR完全相同的clinkz_searing_arrow原生灼热箭，SR采用克林克兹9162「马拉克斯之怒」不朽的clinkz_maraxiform_searing_arrow，SSR采用其_deso红色余烬变体。不是假定存在的金色饰品：本机VPK未找到Golden Maraxiform，SSR是同不朽结合黯灭的原生视觉变体。保留工程师本体/饰品，只替换普攻粒子。每阶所有等级同一种弹道，三阶不同；弹速1500、攻速、伤害、连发数量、诱捕规则和底座均保持当前值。
+
+触发链为普攻/原生连发→building_upgrade_system根据当前CSV行设置RangedProjectileName→原生追踪弹道；没有新增表现计时器。权威tower_class_anti_air.csv共20行和asset_effects.csv中3条普攻映射同步，定向生成两个Lua；同步3个预载代理KV的ProjectileModel。tower_skin_presets的techies分支和A/B/C报告按同一三阶方案生成，切换外观不会还原为飞弹。游戏业务状态仍由原攻击/命中/诱捕逻辑处理，没有新增UI或提示。
+
+本机items_game和粒子DATA/RERL审计确认9162绑定、原生追踪控制、SSR红色火星，以及32/48/52项递归依赖全部存在。20行非弹道字段与施工前逐字段一致，asset_effects除三条路径/说明外不变，两个生成文件可重复生成一致；全部A/B/C实际生成投影/资源验证、目录预载/有效速度/多重SR同源检查、完整攻击及诱捕回归和语法检查通过。原生只读确认当前template_map为post_game；本次未进行三阶实机截图/攻击观感验收，也没有热改现有单位。全部使用游戏自带compiled资源，无需粒子/Panorama编译，重新载入地图生效。记录见validation/20261008/anti_air_arrow_visual.json。本次未请求Git提交/推送，其他已有改动保留。
+
+## 前次修改（2026-10-08）：四条塔路线普攻弹道统一三倍速度
+
+按用户要求，以逐风弩手当前实际弹速500为基准×3，统一为1500：多重箭（逐风弩手/裂空游侠/万箭天罚）、暴击（噬魂术士/冥火判官/阎狱君王）、寒冰（霜语学徒/暴雪领主/永冻君王）和防空炮（烟火工坊/追星炮手/苍穹终结）。四条路线各20行，覆盖所有阶级与等级。当前tower_combat_rules已对class_1/5/6/7豁免全局0.5倍率，因此CSV原值与有效速度相同；不按过期文档再乘0.5。仅改权威CSV的projectile_speed并调用现有build定向生成四份Lua，原生弹道、分裂箭与穿透箭沿既有速度缓存同步；命中延迟跟随飞行速度，不改变攻速、每击伤害、技能配置或特效资源。不改终极塔无缓存时的500备用值。
+
+80行源数据逐字段比较，除弹速外全部一致；生成Lua除对应字段外一致，重复定向生成完全相同。实际有效速度检查、多重箭飞行/延迟/伤害完整回归与弹道视觉回归均通过；更新原有多重箭回归中的500配置预期为1500，未新增常驻逻辑或定时器。Lua5.1语法与git diff --check通过。无需粒子或Panorama编译，重新载入地图加载配置；未做本次实机观感验收。记录见validation/20261008/tower_projectile_speed.json；本次未请求Git提交/推送，原有及其他并行改动保留。
+
+## 前次修改（2026-10-08）：城墙右键修理与0.1秒检测
+
+旧修理入口只接MOVE_TO_TARGET/ATTACK_TARGET；MOVE_TO_POSITION只会取消修理，落点在原生npc_dota_building城墙的占地内也没有转成修理。新增repair_target_policy，通过服务端格子占用表O(1)把落点解析为城墙，再复用既有存活/完工/队伍/玩家归属校验和安全工作点。普通地面、非城墙建筑落点仍按原移动处理，其他建筑的单位目标修理保持原路径。系统issuer=-1及内部建造/修理命令不得清掉玩家修理目标。旧入口加载到新回归时在城墙落点转换断言失败，修复后通过。
+
+检测原为0.25秒，并非每帧；现改为0.1秒。状态为idle→寻找血量≤98%的受损建筑→保留实际实体句柄并靠近→持续修理→自动完成后可寻找其他建筑，或手动指派后留在原建筑待命。靠近和修理中不再全图查找；手动待命且血量>98%时只做存活/身份及血量轻量检查，跳过全图搜索、距离/路径和修理动作。低于门槛后恢复，已开始的修理继续到满血，不在98%处截断。真实玩家命令清理任务，实体失效或编号复用不能继承修理。每秒修复量与小数累积保留；射程使用二维距离平方，不开根号。动画仍按原约0.25秒节奏触发，不随0.1秒检测变成每秒10次重启。
+
+7项完整相关Lua回归及7个修改/新增文件Lua5.1语法通过，覆盖两种工人、实际全局订单过滤与格子查询、普通/单位目标右键、异步系统订单、跨玩家拒绝、缓存靠近/治疗、98%边界、满血完成、修复量与实体复用。另一个test_visual_feedback_repairs中的技能槽和修理段通过，但无关怪物外观段第99行仍失败，加载本次修改前修理源码/测试同样失败，未改无关外观规则。
+
+原生只读确认城墙是带业务身份的npc_dota_building，艾欧建造者已有修理modifier，直接单位目标的原分支能保留指派；不能归咎于模型tag。当前读到的局状态为post_game，未完成真实鼠标右键到受损城墙回血的实机验收；私有新入口尝试也未计为通过，不声称现有局已热更新0.1秒。Lua直接从game脚本加载，无Panorama/粒子资源需要编译，新局加载全部新逻辑。验证见validation/20261008/wall_repair.json。本次未要求Git提交/推送，原改动及并行改动保留。
+
+## 前次修改（2026-10-08）：宝箱切换缩短至0.2秒
+
+按用户最新反馈，将背景原生滑动和文字/按钮淡入都从1秒缩短到0.2秒；跨多个宝箱仍在相同时间到位，保持连点转向、同池快照不重启与关闭/尺寸适配规则。仅改滑动模块的一处时长和CSS三处时长，更新既有回归的时间预期，不新增计时器。3项实际UI回归与JS语法通过，脚本/样式资源已备份后同步content并编译，全部0 failed且源码哈希一致。此次为参数调整，未重做实机分时截图；上一版实机验证保留在下文。验证见validation/20261008/lottery_scene_transition_fast.json；本次未要求Git提交/推送，原改动保留。
+
+## 前次修改（2026-10-08）：抽奖宝箱一秒横向切换与淡入
+
+用户要求四个宝箱背景放在同一层横向滑动，跨过一个或两个宝箱时加快移动、统一1秒到达，其他文字和按钮同步由0透明度淡入到1。实际入口为survival_hud.xml里的LotteryWindow，经SurvivalLottery.SelectPool→LotteryHandoff.Background，不是旧lottery_window.xml片段。新增小模块lottery_scene_transition，四张现有cinematic_v1插画成为同一LotterySceneTrack中的兄弟面板；CSS transform使用1秒linear原生过渡，移动距离决定速度。LotteryMainCanvas采用两组相同的1秒原生opacity关键帧交替启动，避免既有250ms fit()写opacity=1打断淡入。
+
+状态：未测量时等待既有fit→初次打开直接定位→选择不同宝箱启动滑动/淡入→引擎1秒结束；重复选择或同池快照无操作，不重启动画；连续选择从当前可见位置转向最新目标，不排队；关闭/准备打开/模块重载撤销淡入并定位选中页；视口大小改变直接修正页宽和目标位置。复用既有fit，不增加定时器、逐帧计算或服务端事件。服务端奖池、余额、抽奖费用/结果、缓存/详情、禁用和重复请求规则均未修改。
+
+8项相关回归全部通过，覆盖真实缓存切换/快照、跨三页与相邻/反向、连点、同池更新、关闭/重载、四种视口、无额外计时器/抽奖事件，及原电影/单十连/概率和券种规则。4份源文件已备份后同步content并编译，全部0 failed且源码SHA一致，HUD和CSS所需图片依赖也已生成。1600×900实机分时截图确认正反向跨三页、相邻页和文字按钮同步淡入，连点最终正确显示修仙宝箱；1秒后背景完成定位。实机关闭重开最后一次尝试时测试局已进入组队等待页，未计为此项实机通过；该路径由实际生产UI回归覆盖。验证见validation/20261008/lottery_scene_transition.json。本次未要求Git提交/推送，既有及并行产生的改动均保留。
+
+## 前次修改（2026-10-08）：左上导航图标与文字居中
+
+用户截图和1600×900实机确认，左上导航文字比图标偏左。caption原为width:100%且缺少显式水平居中，现让Label按文字实际宽度排版，并在既有captionHost中horizontalAlign:center；普通导航和完整/简化特效入口使用同一规则。图标位置、文字字号、按钮范围、上下间距与原点击/提示/禁用行为均保留；只修改两处表现样式，不增加轮询或额外面板。
+
+脚本语法、原导航测试的独立导航/依赖断言与单文件Panorama编译通过，content源与仓库源码相同。修复前/后截图均为同一1600×900测试窗口，确认返回、宝物、存档、抽奖、福利、商城、生存商店和完整特效文字都位于图标中心线下方。VIP原为无文字入口。旧test_archive_artifacts_navigation完整测试在导航断言之前因mock缺少view.CardProgress失败，替换成本次修改前导航源码也同样失败，未修改无关存档测试。验证见validation/20261008/nav_alignment.json；其他分辨率沿用已有按物理像素取整的同一布局。未进行购买/抽奖或游戏数值操作。本次未请求提交/推送，原未提交改动保留。
+
+## 前次修改（2026-10-08）：建造者头像与单次建造动画
+
+实机选中建造者时服务端portrait字段为空：实体仍是npc_survival_builder_proxy，外观通过survival_builder_id对应builder_definitions.visual_asset_id，原共享头像元数据没有读取这条映射；客户端头像白名单也没有允许builder资产。现补齐服务端和客户端的显式身份映射、切换时遮罩，复用原生艾欧SetUnit与既有ScenePanel稳定生命周期，不新增头像轮询。头像显示原版艾欧光球；9235保留为外观身份字段，不声称SetUnit会装备至宝。世界中的仁爱之友可渲染挂载保持原状。
+
+按用户新要求，建造开工使用ACT_DOTA_ATTACK及至宝原生attack序列（31帧/30fps，1秒），删除持续红色overcharge创建并清空对应CSV配置、移除该建造者资源预载。用原生SequenceDuration("attack")读取时长，失败回退1秒；只排一次原生回调恢复idle。动画token、实体句柄与世界检查避免旧动画/旧建筑完工打断新施工；取消/死亡/断线清理撤销回调。建造进度、费用、修理、碰撞与艾欧原音效保持原值。
+
+相关14套回归通过，覆盖真实请求/NetTable双通道、64帧头像稳定更新/切换/框选/引擎失败、连续施工/过期回调/提前完工与重入清理、实际建造/修理/预载。修复前的两份源码对新头像回归均按预期失败。额外旧test_combat_stats_callbacks在201行的空白快照断言失败，使用本次开始前combat_stats.js也同样失败，属既有HUD快照行为差异，未修改该规则或该旧测试。
+
+Panorama单文件编译成功且内容源哈希一致，截图确认建造者头像已显示。新测试局580实机验证attack→ti7_io_idle、1秒、animation_token清空、work_particle=nil；仅调用展示服务，无经济/实际建筑改动，私有info_target均已清理。最终源码补齐SequenceDuration的必需动作名参数，有离线与原生API验证；当前已加载函数的1秒兜底同样完成原生动画验证。验证记录见validation/20261008/builder_portrait_animation.json。本次未请求提交/推送，改动留工作区，保留原伐木工、祭坛和其他未提交修改。
+
+## 前次修改（2026-10-08）：合成伐木工的默认性格技能显示
+
+根因在combat_stats.js的visibleAbilityEntries：伐木工只允许ability_fuse_lumberjack_*，把合成后仍存在的ability_lumberjack_personality_*全部排除。服务端就地合成会移除已消费的合成技能，并给LV1–LV7添加一个已学习且未隐藏的性格被动；实体名称仍可为普通伐木工。原过滤规则最终让技能栏为空，不能把它误判为被动未添加。
+
+现允许性格被动与普通合成技能显示，继续排除隐藏、内部及天赋技能，保留原生槽位顺序、修理工自爆、英雄/建筑技能显示。合成配方、技能随机池、收益、数值继承和移除合成按钮的逻辑未改；LV8仍按现配置不挂性格技能。现有自定义tooltip已覆盖性格技能，无需另做入口。
+
+回归用实际11项技能配置覆盖LV1–LV7与就地合成普通实体名；真实训练→合成服务→工人注册链逐个验证11项技能均已学习/未隐藏且只授予一项，只有合成按钮删除、其余材料回收。新显示回归加载HEAD原UI时按预期失败，修复后通过。7项相关回归和JS/Lua5.1语法通过，包含技能悬停恢复、材料/资源权限与队列。额外旧tools/test_lumberjack_fusion_runtime.lua在11行失败：使用nil单位状态读取配方，该失败加载HEAD原runtime builder同样存在；实际状态的融合运行时回归通过，未改此旧测试。
+
+content源码预检仅本次显示条件一行不同，备份后同步并单独编译combat_stats，Valve结果1 compiled/0 failed/0 skipped，游戏产物141480字节。恢复点output/worker_skill_visibility_20261008/build_20261008_152642保留原content源码和游戏资源；未改其他现有compiled资源。当前游戏未运行，未做实机截图/热重载；新局加载已编译修复。本次无提交/推送请求，改动及前次修复均保留工作区。验证见validation/20261008/lumberjack_default_skill.json。
+
+## 前次修改（2026-10-08）：英雄召唤跟随祭坛解锁
+
+用户要求祭坛可以建造时即可召唤英雄，兼容肉鸽提前解锁。旧服务端与按钮运行状态同时要求已建祭坛、主城Lv.3，安全落点还强制要求已建主城；肉鸽免费祭坛建成后已消耗builder_free_hero_altar次数，单独检查剩余次数同样会错误拦截。
+
+新增hero_summon_eligibility，以建造配置hero_altar.unlock_city_level和本人肉鸽免费祭坛次数判断解锁，本人已完工活祭坛也直接符合资格。快照独立发布summon_unlocked、summon_disabled_reason和summon_unlock_source，altar_built继续反映实体是否存在。服务端、原生召唤/打开入口与按钮运行状态统一读取此资格，未建祭坛时使用本人活建筑师作为安全生成锚点；召唤不消费免费建造次数。肉鸽奖励、主城生成/升级/销毁均通过既有事件更新按钮，无新增轮询。
+
+安全落点保留本人活主城优先，只有召唤请求显式启用无主城模式，才使用本人活祭坛/建筑师；仍检查地面高差、可移动区域、导航、八点完整hull与单位占用，最多112个候选。已有主城阻塞时不回退远处祭坛，F2回城与复活回城接口的主城要求不变。VIP/付费英雄权限、单英雄、替换事务、失败回滚、资源加载后的再次校验、死亡/断线与同队玩家隔离保留。
+
+10项Lua/客户端回归和12个修改Lua的5.1语法检查通过，召唤事务覆盖18类场景，包括免费次数消耗后已建祭坛、未建主城/祭坛、普通解锁、他人解锁、加载中撤回、施工完成后次数消耗、VIP拒绝和活锚点归属。修正现有初始按钮测试缺少HUD config上下文，以及付费UI测试硬编码lua命令的解释器路径，两处仅调整测试环境。当前Dota进程已退出，未进行此功能实机召唤或热重载正式状态；需新局确认，无资源变更或编译要求。本次未请求提交/推送，改动留工作区，原Io修复及其他资源修改保留。验证见validation/20261008/hero_altar_unlock.json。
+
+## 前次修改（2026-10-08）：恢复艾欧建造者的可见外观
+
+实机确认建造者579仍存活，本体为wisp.vmdl，至宝dota_item_wearable581也有正确模型、父实体和idle序列，但客户端只留下血条。隔离对照中，两种raw wearable跟随方式均不可见，prop_dynamic可见；之前服务端挂载成功的检查不能证明客户端渲染成功。
+
+保持可拾取的原生wisp本体，至宝改为prop_dynamic父子挂载，局部位移/角度归零，使用自身idle/taunt序列，不合并两套不同骨架。按Valve原资源绑定常驻粒子的CP0到hitloc、CP1..6到上下/侧面卡片；挂载失败或实体工厂缺失时回退原生wisp光球，纳入initial_required预载。粒子绑定半途失败也完整销毁/释放；死亡、断线、换世界和重入清理保留，无新增轮询。
+
+10套相关回归、Lua5.1语法及两份CSV定向生成检查通过。原生私有实体验证模型、父子跟随和完整粒子创建；修复已同步当前测试局原建造者579，保留实体、位置、hull和当前施工引用；共享模块表身份保持不变，既有建造服务继续调用新展示函数。最终真实截图确认至宝已显示，隔离实体/粒子全部回收，镜头已释放，调试窗口恢复。真实鼠标点击/悬停未专门操作验收，原本体hitbox和相关客户端逻辑均保留。记录见validation/20261008/builder_io_visibility.json。
+
+附加旧test_io_building_ambient在HEAD对照中同样失败：其硬编码塔资源要求艾欧，但当前塔配置已是tinker；本次未改塔资源或该测试。此修复覆盖此前raw wearable挂载方案的可见性问题。
+
+## 前次修改（2026-10-08）：通关建筑安全生成与武器强化角标
 
 用户日志确认 N1 提前最终波（25）在 game_time=1910.8 清空，未提供后续建筑创建诊断。当前 Hammer 源文件和 template_map.vpk 的 default_ents 均包含每玩家3个 archive_hub 标记，不能把缺失建筑断定为地图没放点。旧标记仍是此前平台坐标；旧服务用 CreateUnitByName(find_clear_space=true)，运行时自动寻找空位且没有创建前后记录。此次消除该放置风险：CSV building_anchor=player_wall，优先当前玩家城墙附近，其次本人建造者出生标记、本人存档标记、旧波次点；新独立模块每锚点最多25个候选，校验地面高差、导航、原占格和已生成挑战建筑间距，禁止任意(0,0)兜底。通过检查后用 find_clear_space=false 创建不可移动建筑，三类原生单位在初始预载。
 

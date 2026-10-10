@@ -2,6 +2,7 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")
 local events = require("core/events")
+local effects = require("systems/rogue_effect_state_service")
 local definition = assert(require("config/generated/hero_definitions").by_id.hero_doom)
 local ctx, anchor
 local scheduler=require("core/scheduler")
@@ -97,6 +98,7 @@ local function fixture()
     ctx={serial=0,defeated={},assets_ready=true,preloads={},altars={},selected={},players={},
         replacements={},defeat_during_replace={},summoned={},notifications={},client_events={}}
     scheduler.clear(); bus.reset(); anchor.init(); service.init()
+    effects.reset()
     for id=0,3 do
         ctx.players[id]={id=id}
         ctx.selected[id]=entity("npc_dota_hero_wisp",id)
@@ -117,12 +119,15 @@ local function snapshot(id)
     return assert(bus.request(events.HERO_SUMMON_SNAPSHOT_REQUEST,{player_id=id})).snapshot
 end
 
--- All four players share team 2, but city requirements and altar destinations are private.
+-- All four players share team 2; a built early altar and its destination remain private.
 fixture()
 bus.emit(events.BUILDING_CHANGED,{player_id=0,team=2,building_id="main_city",level=2})
 assert(snapshot(0).city_level==2 and snapshot(1).city_level==10)
 assert(snapshot(0).altar==ctx.altars[0] and snapshot(1).altar==ctx.altars[1])
-assert(not request(0).ok and request(1).ok)
+bus.emit(events.BUILDING_DESTROYED,{player_id=0,team=2,building_id="hero_altar",unit=ctx.altars[0]})
+assert(not request(0).ok and request(1).ok, "a teammate's altar/city cannot grant eligibility")
+building(0,"hero_altar",ctx.altars[0])
+assert(request(0).ok, "own completed early altar permits summoning below city level three")
 bus.emit(events.BUILDING_DESTROYED,{player_id=0,team=2,building_id="hero_altar",unit=ctx.altars[0]})
 bus.emit(events.BUILDING_DESTROYED,{player_id=0,team=2,building_id="main_city"})
 assert(snapshot(0).altar==nil and snapshot(0).city_level==0)

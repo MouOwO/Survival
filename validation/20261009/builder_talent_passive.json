@@ -1,0 +1,35 @@
+{
+  "task": "Selected opening talent becomes passive and has no ability hotkey",
+  "production_files": [
+    "scripts/vscripts/abilities/ability_survival_rogue_reward.lua",
+    "scripts/vscripts/ui/ability_runtime_builder.lua",
+    "scripts/vscripts/ui/ability_runtime_service.lua"
+  ],
+  "behavior": {
+    "before_selection": "NO_TARGET | IMMEDIATE; opening shortcut G retained",
+    "after_selection": "PASSIVE; direct spell handler guarded; runtime.passive=1; shortcut fields empty",
+    "presentation": "Chosen icon and hover description retained; existing passive UI paths hide hotkeys and reject input",
+    "refresh": "Existing ROGUE_REWARD_CHANGED event republishes selected talent immediately; subsequent builder updates retain passive state"
+  },
+  "checks_passed": [
+    "Lua 5.1: tools/test_builder_talent_passive.lua",
+    "Lua 5.1: scripts/vscripts/tests/test_native_prerequisite_activation.lua",
+    "Lua 5.1: scripts/vscripts/tests/test_rogue_reward_history.lua",
+    "Lua 5.1: scripts/vscripts/tests/test_rogue_offer_effect_flag.lua",
+    "Node: tools/test_combat_stats_callbacks.cjs (real talent G-to-empty hotkey transition; active slot reuse)",
+    "Node: tools/test_tower_passive_icons.cjs (real production passive click/hover/hotkey handling)",
+    "Node: tools/test_ability_hotkey_refresh_cache.cjs",
+    "Node: tools/test_builder_challenge_hotkey.cjs",
+    "luac5.1 syntax checks and scoped git diff --check"
+  ],
+  "live_validation": {
+    "verified_in_game": false,
+    "console_echo": "passed",
+    "map": "template_map",
+    "game_state": "DOTA_GAMERULES_STATE_POST_GAME",
+    "reason": "Tools-only Lua inspection did not return its marker after the match ended; no game restart, talent selection or runtime mutation performed"
+  },
+  "task_only_diff": "output/builder_talent_passive_20261009/task_only.diff",
+  "backup": "output/builder_talent_passive_20261009/before",
+  "submission": "Not requested; pre-existing workspace changes preserved"
+}

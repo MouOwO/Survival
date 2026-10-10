@@ -91,8 +91,15 @@ local function tower(index, player_id, class_id)
 end
 
 assert(can_build(0) and can_build(1), "builders must initially be able to construct towers")
-for index = 1, 7 do bus.emit(events.BUILDING_CREATED, tower(200 + index)) end
-assert(count(0, "arrow_tower") == 7 and not can_build(0), "seven base towers must close the entry")
+for index = 1, 6 do bus.emit(events.BUILDING_CREATED, tower(200 + index)) end
+local tower_entry = builders[0]:FindAbilityByName("ability_build_arrow_tower")
+assert(count(0, "arrow_tower") == 6 and can_build(0), "six towers must leave construction ready")
+bus.emit(events.BUILDING_CREATED, tower(207))
+assert(count(0, "arrow_tower") == 7 and not can_build(0), "seven base towers must disable construction")
+assert(builders[0]:FindAbilityByName("ability_build_arrow_tower") == tower_entry
+    and builders[0]:GetAbilityByIndex(0) == tower_entry
+    and not tower_entry.hidden and not tower_entry:IsNull(),
+    "seven towers must keep the same disabled construction button visible in its native slot")
 assert(can_build(1), "another player's tower allowance must remain independent")
 
 local before = notifications[0]
@@ -107,6 +114,8 @@ dead.unit = { IsNull = function() return false end, IsAlive = function() return 
 bus.emit(events.BUILDING_DESTROYED, dead)
 assert(count(0, "arrow_tower") == 6 and can_build(0),
     "death must restore the native build ability synchronously while the corpse still exists")
+assert(builders[0]:FindAbilityByName("ability_build_arrow_tower") == tower_entry,
+    "a tower death must reactivate the retained button without replacing its handle")
 before = notifications[0]
 bus.emit(events.BUILDING_DESTROYED, dead)
 bus.emit(events.BUILDING_CHANGED, tower(201, 0, "class_1"))
@@ -116,8 +125,8 @@ assert(count(0, "arrow_tower") == 6 and count(0, "class_1") == 0 and notificatio
 bus.emit(events.BUILDING_CREATED, tower(301))
 assert(count(0, "arrow_tower") == 7 and not can_build(0), "a replacement must consume the released slot")
 bus.emit(events.BUILDING_CHANGED, tower(202, 0, "class_2"))
-assert(count(0, "arrow_tower") == 6 and count(0, "class_2") == 1 and can_build(0),
-    "class promotion must continue to release a base tower slot")
+assert(count(0, "arrow_tower") == 6 and count(0, "class_2") == 1 and not can_build(0),
+    "class promotion keeps the owner's seventh live tower slot occupied")
 before = notifications[0]
 bus.emit(events.BUILDING_CHANGED, tower(202, 0, "class_2"))
 assert(notifications[0] == before, "unchanged class upgrades must not refresh builder slots")
@@ -140,22 +149,22 @@ assert(count(0, "arrow_tower") == 0 and count(0, "class_3") == 1,
 bus.emit(events.BUILDING_CREATED, tower(401))
 assert(count(0, "arrow_tower") == 1 and can_build(0))
 
--- Fusion owns its own ultimate-tower limit. It must not permanently close the
--- base construction entry while the player's base count is below seven.
+-- Fusion status notifications do not fabricate a living ultimate entity;
+-- its actual committed occupancy arrives through BUILDING_COUNTS_CHANGED.
 before = notifications[0]
 bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
     player_id = 0, reason = "fusion_completed", ultimate_count = 1,
 })
 assert(can_build(0) and notifications[0] == before,
     "fusion completion must not hide or rebuild the base tower entry")
-for index = 1, 6 do bus.emit(events.BUILDING_CREATED, tower(500 + index)) end
-assert(count(0, "arrow_tower") == 7 and not can_build(0))
+for index = 1, 5 do bus.emit(events.BUILDING_CREATED, tower(500 + index)) end
+assert(count(0, "arrow_tower") == 6 and count(0, "class_3") == 1 and not can_build(0))
 bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
     player_id = 0, reason = "fusion_destroyed", ultimate_count = 0,
 })
 assert(not can_build(0), "ultimate destruction must not bypass a full base tower allowance")
 bus.emit(events.BUILDING_DESTROYED, tower(501))
-assert(count(0, "arrow_tower") == 6 and can_build(0),
+assert(count(0, "arrow_tower") == 5 and can_build(0),
     "a base tower death after fusion must immediately reopen its slot")
 bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
     player_id = 0, reason = "fusion_completed", ultimate_count = 1,
@@ -165,8 +174,8 @@ bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
 })
 assert(can_build(0), "base construction must remain governed by the current count after repeated fusion events")
 bus.emit(events.BUILDING_CREATED, tower(601))
-assert(count(0, "arrow_tower") == 7 and not can_build(0))
-print("BUILDER_TOWER_REBUILD_PASS: seven-base cap, synchronous death re-enable, duplicate events, class counts, recovery, player isolation, fusion does not permanently disable construction")
+assert(count(0, "arrow_tower") == 6 and count(0, "class_3") == 1 and not can_build(0))
+print("BUILDER_TOWER_REBUILD_PASS: retained seven-total capacity button, synchronous death re-enable, duplicate events, promotion retains slots, recovery and player isolation")
 
 -- The chosen talent is a permanent icon, including after construction rebuilds.
 talent_consumed = true
@@ -355,12 +364,39 @@ assert_empty_slot(0, "ability_build_farm", 2)
 assert_empty_slot(0, "ability_build_challenge", 5)
 assert_empty_slot(0, "ability_build_hero_altar", 3)
 
--- Only effective maximum-one rows change behavior. Existing tower/gold caps
--- remain tied to their completed counts, including tower promotion handling.
+-- Tower orders reserve the shared live cap too; unrelated multi-count gold
+-- mine behavior remains tied to its completed count.
+complete(1, "wall", 750)
+complete(1, "main_city", 751)
+local teammate_tower = assert_ready_entry(1, "ability_build_arrow_tower", 0)
+occupancy(0, "arrow_tower", 6, "six_live_towers")
+next_frame()
+local pending_tower = assert_ready_entry(0, "ability_build_arrow_tower", 0)
+pending_tower:StartCooldown(4)
 occupancy(0, "arrow_tower", 7, "constructing_multi_count")
+assert(entry(0, "ability_build_arrow_tower") == pending_tower
+    and not pending_tower.hidden and not pending_tower.active and not pending_tower:IsNull(),
+    "the seventh accepted tower order must disable the visible button immediately")
+assert(unique_builders[0]:GetAbilityByIndex(0) == pending_tower,
+    "the accepted tower order must retain its original native slot")
+assert(entry(1, "ability_build_arrow_tower") == teammate_tower
+    and teammate_tower.active and not teammate_tower.hidden,
+    "another player's tower construction must remain ready when the first player's cap fills")
 occupancy(0, "gold_mine", 5, "constructing_multi_count")
 next_frame()
-assert_ready_entry(0, "ability_build_arrow_tower", 0)
+assert(entry(0, "ability_build_arrow_tower") == pending_tower
+    and unique_builders[0]:GetAbilityByIndex(0) == pending_tower
+    and not pending_tower.hidden and not pending_tower.active and not pending_tower:IsNull(),
+    "the deferred count sync must retain the same visible disabled tower handle")
+assert(pending_tower:GetCooldownTimeRemaining() == 4,
+    "tower capacity updates must retain the construction cooldown")
+occupancy(0, "arrow_tower", 6, "tower_order_canceled")
+next_frame()
+assert(assert_ready_entry(0, "ability_build_arrow_tower", 0) == pending_tower,
+    "canceling the seventh tower order must reactivate the same native button")
+assert(entry(1, "ability_build_arrow_tower") == teammate_tower
+    and teammate_tower.active and not teammate_tower.hidden,
+    "canceling one player's tower order must not rebuild another player's button")
 assert_ready_entry(0, "ability_build_gold_mine", 4)
 for index = 1, 5 do complete(0, "gold_mine", 720 + index) end
 assert_empty_slot(0, "ability_build_gold_mine", 4)
@@ -368,5 +404,5 @@ bus.emit(events.BUILDING_DESTROYED, {
     player_id = 0, building_id = "gold_mine", entindex = 721,
 })
 assert_ready_entry(0, "ability_build_gold_mine", 4)
-assert_ready_entry(1, "ability_build_wall", 0)
-print("BUILDER_UNIQUE_RESERVATION_PASS: immediate hide and deferred native removal, ready rollback, placeholder/cooldown/talent retention, builder recovery, completion-only gates, city/rogue resync, player isolation and unchanged multi-count caps")
+assert_ready_entry(1, "ability_build_arrow_tower", 0)
+print("BUILDER_UNIQUE_RESERVATION_PASS: unique hide/deferred removal, tower visible capacity lock/rollback with retained handle, cooldown/talent retention, completion-only gates and player isolation")

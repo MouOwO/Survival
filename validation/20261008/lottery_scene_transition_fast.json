@@ -1,0 +1,33 @@
+{
+  "task": "lottery_chest_switch_duration",
+  "date": "2026-10-08",
+  "duration_seconds": 0.2,
+  "scope": [
+    "shared horizontal background strip",
+    "foreground text and button opacity fade"
+  ],
+  "checks": {
+    "pass": [
+      "tools/tests/lottery_scene_transition.test.cjs",
+      "tools/test_lottery_updates.cjs",
+      "tools/tests/lottery_cinematic_flow.test.cjs",
+      "node --check lottery_scene_transition.js"
+    ],
+    "compile": [
+      {
+        "sha256": "45BB8DB57BA9AD68DC456FB742B1FCC243602229C05F1922A1B4D6504A0657AA",
+        "bytes": 3728,
+        "artifact": "panorama/scripts/custom_game/lottery_scene_transition.vjs_c",
+        "source": "panorama/src/scripts/custom_game/lottery_scene_transition.js"
+      },
+      {
+        "sha256": "2FB0B07D1AE8CDAD64E68ACBB57B70487F1353C421BB476CAE46DB497C303698",
+        "bytes": 44686,
+        "artifact": "panorama/styles/custom_game/lottery_fullscreen_v2.vcss_c",
+        "source": "panorama/src/styles/custom_game/lottery_fullscreen_v2.css"
+      }
+    ]
+  },
+  "native_rechecked": false,
+  "git_mutations": false
+}

@@ -1,0 +1,37 @@
+{
+  "status": "PASS",
+  "date": "2026-10-09",
+  "task": "Challenge Juggernaut native locomotion configuration",
+  "unit": "npc_survival_named_challenge_monster_04",
+  "cause": [
+    "Birth model still Undying while runtime model switched to Juggernaut",
+    "Missing native MovementSpeedActivityModifiers"
+  ],
+  "model": "models/heroes/juggernaut/juggernaut.vmdl",
+  "movement_tags": {
+    "walk": 0,
+    "run": 345,
+    "run_fast": 373
+  },
+  "valve_source": "scripts/npc/heroes/npc_dota_hero_juggernaut.txt in local Valve pak01_dir.vpk",
+  "source_evidence": "output/challenge_jugger_walk_20261009/valve_juggernaut_locomotion_source.txt",
+  "checks": [
+    "Native model and movement tag assertions",
+    "Challenge and wave naming regression",
+    "Two generator passes intercepted in memory preserve Juggernaut unit block",
+    "Node and Lua syntax",
+    "Scoped diff check"
+  ],
+  "live": {
+    "updated_disk_kv_read_by_engine": true,
+    "active_challenge_juggernauts": 0,
+    "animation_visually_verified": false,
+    "current_map_unit_kv_reload_available": false,
+    "new_map_required_for_cached_unit_definitions": true,
+    "console": "output/challenge_jugger_walk_20261009/live_after.log"
+  },
+  "gameplay_fields_preserved": true,
+  "csv_change_required": false,
+  "checkpoint": "output/challenge_jugger_walk_20261009/before",
+  "scope": "Challenge Juggernaut native unit KV, existing generation script and regression check; no additional update timer"
+}

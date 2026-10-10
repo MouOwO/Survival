@@ -2,16 +2,30 @@ LinkLuaModifier("modifier_tower_auto_attack", "modifiers/modifier_tower_auto_att
 local tree_damage_rules = require("systems/tree_damage_rules")
 local anti_air_rules = require("systems/anti_air_rules")
 local targeting = require("systems/tower_targeting")
+local attack_observer = require("systems/tower_damage_observer")
 modifier_tower_auto_attack = class({})
 _G.modifier_tower_auto_attack = modifier_tower_auto_attack
+
+local function shared_attack_ready()
+    return type(attack_observer.register_auto_attack) == "function"
+        and type(attack_observer.unregister_auto_attack) == "function"
+        and type(attack_observer.can_route_auto_attack) == "function"
+        and attack_observer.can_route_auto_attack()
+end
 
 function modifier_tower_auto_attack:IsHidden() return true end
 function modifier_tower_auto_attack:IsPurgable() return false end
 function modifier_tower_auto_attack:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
 
 function modifier_tower_auto_attack:DeclareFunctions()
-    return { MODIFIER_EVENT_ON_ATTACK_START, MODIFIER_EVENT_ON_ATTACK, MODIFIER_EVENT_ON_DEATH,
-        MODIFIER_PROPERTY_DISABLE_AUTOATTACK }
+    local functions = { MODIFIER_EVENT_ON_DEATH, MODIFIER_PROPERTY_DISABLE_AUTOATTACK }
+    local shared = self.shared_attack_observer
+    if shared == nil then shared = shared_attack_ready() end
+    if not shared then
+        functions[#functions+1] = MODIFIER_EVENT_ON_ATTACK_START
+        functions[#functions+1] = MODIFIER_EVENT_ON_ATTACK
+    end
+    return functions
 end
 
 -- Replicated modifier stacks keep the server and client in the same state:
@@ -84,7 +98,14 @@ local function find_target(tower, excluded_target)
 end
 
 function modifier_tower_auto_attack:OnAttackStart(params)
-    if not IsServer() or params.attacker ~= self:GetParent() then
+    -- An existing native instance can retain its original event declaration
+    -- after a class reload. Shared instances must still handle each event once.
+    if self.shared_attack_observer then return end
+    return self:HandleAttackStart(params)
+end
+
+function modifier_tower_auto_attack:HandleAttackStart(params)
+    if not IsServer() or not params or params.attacker ~= self:GetParent() then
         return
     end
     local tower = self:GetParent()
@@ -103,7 +124,12 @@ end
 
 -- Releasing a shot clears its windup, but does not release the combat target.
 function modifier_tower_auto_attack:OnAttack(params)
-    if not IsServer() or params.attacker ~= self:GetParent() then return end
+    if self.shared_attack_observer then return end
+    return self:HandleAttack(params)
+end
+
+function modifier_tower_auto_attack:HandleAttack(params)
+    if not IsServer() or not params or params.attacker ~= self:GetParent() then return end
     if params.no_attack_cooldown == true or params.no_attack_cooldown == 1 then return end
     if self.windup_target == params.target then self.windup_target = nil end
 end
@@ -149,11 +175,19 @@ function modifier_tower_auto_attack:OnCreated()
     self.last_dead_target = nil
     self.idle_initialized = false
     local tower = self:GetParent()
+    self.shared_attack_observer = shared_attack_ready()
+        and attack_observer.register_auto_attack(tower, self) or false
     if valid(tower) then
         disable_native_acquisition(tower, self, true)
     end
     self:EnterIdle(true)
     self:StartIntervalThink(THINK_INTERVAL)
+end
+
+function modifier_tower_auto_attack:OnRefresh()
+    -- Old instances retain the local native path until recreated. ForceRefresh
+    -- during a stack change must never attach a second shared callback owner.
+    if IsServer() and self.shared_attack_observer == nil then self.shared_attack_observer = false end
 end
 
 function modifier_tower_auto_attack:ResetTarget()
@@ -209,9 +243,10 @@ function modifier_tower_auto_attack:IssueAttackTarget(target, issue_order)
     self.forced_target, self.attack_order_wait = target, 0
     self.issuing_attack_order = true
     local ok = pcall(function()
-        -- These are stationary towers. Face the next victim immediately so a
-        -- hero model's turn animation cannot add a separate targeting delay.
-        if tower.SetForwardVector then
+        -- Hero route models face their victim immediately. Base arrow towers
+        -- retain their placed orientation and attack without an angle gate.
+        local fixed_facing = tower.HasModifier and tower:HasModifier("modifier_tower_fixed_facing")
+        if tower.SetForwardVector and not fixed_facing then
             local direction = target:GetAbsOrigin()-tower:GetAbsOrigin()
             direction.z = 0
             if direction.x*direction.x + direction.y*direction.y > 0 and direction.Normalized then
@@ -286,6 +321,9 @@ function modifier_tower_auto_attack:OnDestroy()
     if IsServer() then
         self.destroyed = true
         local tower = self:GetParent()
+        if type(attack_observer.unregister_auto_attack) == "function" then
+            attack_observer.unregister_auto_attack(tower, self)
+        end
         if valid(tower) then
             tower:SetForceAttackTarget(nil)
             if tower.Stop then tower:Stop() end

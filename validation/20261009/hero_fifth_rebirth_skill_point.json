@@ -1,0 +1,186 @@
+{
+  "task": "hero fifth-rebirth missing public-skill upgrade button",
+  "date": "2026-10-09",
+  "result": "PASS_AUTOMATED; live fifth-rebirth screenshot not verified",
+  "root_cause": "Second-fourth choices fill the 3 public slots; fifth originally requested a fourth skill and was rejected without granting points. UI eligibility correctly required a positive skill point.",
+  "rule": {
+    "public_capacity": 3,
+    "new_skill_choices": [
+      2,
+      3,
+      4
+    ],
+    "public_skill_points_per_rebirth": {
+      "5": 1,
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1
+    },
+    "exclusive_upgrade_with_points": false
+  },
+  "changes": [
+    "data/csv/挑战与奖励系统/reward_effects.csv: effect_0027 becomes grant_skill_points +1",
+    "data/csv/挑战与奖励系统/rebirth_challenges.csv: fifth challenge description",
+    "data/csv/英雄系统/hero_skill_choice_rules.csv: rebirth_new_skill max_trigger_level=4",
+    "Corresponding three generated Lua configs via tools/build_configs.py build()",
+    "scripts/vscripts/tests/test_hero_fifth_rebirth_skill_point.lua and .gitignore whitelist",
+    "docs/ai/CURRENT_TASK.md, PROJECT_CONTEXT.md, DECISIONS.md"
+  ],
+  "config_audit": [
+    {
+      "source": "data/csv/挑战与奖励系统/reward_effects.csv",
+      "generated": "scripts/vscripts/config/generated/reward_effects.lua",
+      "changes": [
+        {
+          "line": 38,
+          "row_id": "effect_0027",
+          "fields": [
+            "effect_type",
+            "value_text",
+            "stack_mode",
+            "client_field",
+            "notes"
+          ]
+        }
+      ],
+      "generated_sha256": "00f8f827c4159fbc1f44146bbd0737ce7419a26ccee24f849d92f5efa9246338",
+      "reproducible": true
+    },
+    {
+      "source": "data/csv/挑战与奖励系统/rebirth_challenges.csv",
+      "generated": "scripts/vscripts/config/generated/rebirth_challenges.lua",
+      "changes": [
+        {
+          "line": 8,
+          "row_id": "rebirth_challenge_05",
+          "fields": [
+            "description"
+          ]
+        }
+      ],
+      "generated_sha256": "78e04eacb3d07c1516560b9634f2a7e1f0bce3acae5db57eda5593e7028c4ab7",
+      "reproducible": true
+    },
+    {
+      "source": "data/csv/英雄系统/hero_skill_choice_rules.csv",
+      "generated": "scripts/vscripts/config/generated/hero_skill_choice_rules.lua",
+      "changes": [
+        {
+          "line": 4,
+          "row_id": "rebirth_new_skill",
+          "fields": [
+            "max_trigger_level",
+            "notes"
+          ]
+        }
+      ],
+      "generated_sha256": "f9f7cc8c056df8324d2ef251ad3ebbfd2cd5c6e736a2d931b631b0fa90361bb5",
+      "reproducible": true
+    }
+  ],
+  "root_checks": [
+    {
+      "name": "fifth_rebirth_chain",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "log": "output/hero_fifth_transfer_skill_20261009/fifth_rebirth_chain.log"
+    },
+    {
+      "name": "fifth_rebirth_old_config",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "log": "output/hero_fifth_transfer_skill_20261009/fifth_rebirth_old_config.log"
+    },
+    {
+      "name": "lua_syntax",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "log": "output/hero_fifth_transfer_skill_20261009/lua_syntax.log"
+    }
+  ],
+  "existing_skill_point_regression": {
+    "command": "C:/Program Files/lua/bin/lua5.1.exe scripts/vscripts/tests/test_hero_skill_point_upgrade.lua",
+    "exit_code": 0,
+    "observed": "HERO_SKILL_POINT_UPGRADE_PASS; HERO_SKILL_REMOVAL_PASS; injected_engine_level_sync_failure is the intentional rollback fixture"
+  },
+  "client_checks": [
+    {
+      "command": "node tools/test_hero_skill_upgrade.cjs",
+      "exit_code": 0,
+      "pass": true,
+      "stdout": "HERO_SKILL_UPGRADE_PASS: native slot placement, ownership, points, response ordering, duplicate clicks, retry, selection and reload; old management removed, reward choice retained",
+      "stderr": ""
+    },
+    {
+      "command": "node tools/test_ability_tooltip_recovery.cjs",
+      "exit_code": 0,
+      "pass": true,
+      "stdout": "full binds=2, scans=2, ability reads=28, unit metadata reads=7\nPASS stable four-ability selection stops full recovery and avoids duplicate scans\nPASS HUD panels arriving at 0.35s still recover\nPASS HUD panels arriving at 0.6s still recover\nPASS late native HUD replacement refreshes stable proxy geometry\nPASS same-unit ability replacement updates bindings and restores a real hover\nPASS rapid selection switches cannot bind stale unit data\nPASS duplicate same-unit selection events coalesce\nPASS shutdown cancels pending recovery and prevents future work\nPASS late per-ability runtime arrives without changing the unit slot signature\nPASS diagnostics can be enabled and disabled without a lingering cursor probe\nPASS native unit with no visible abilities settles without creating proxies\nPASS building_city restores tooltip after cached rows are deleted\nPASS building_farm restores tooltip after cached rows are deleted\nPASS building_gold_mine restores tooltip after cached rows are deleted\nPASS building_research_lab restores tooltip after cached rows are deleted\nPASS building_advanced_research_lab restores tooltip after cached rows are deleted\nPASS building_arrow_tower restores tooltip after cached rows are deleted\nPASS building_wall restores tooltip after cached rows are deleted\nPASS building_hero_altar restores tooltip after cached rows are deleted\nPASS npc_survival_builder_proxy restores tooltip after cached rows are deleted\nPASS npc_dota_hero_doom_bringer restores tooltip after cached rows are deleted\nPASS worker fusion mouse proxy uses project dispatcher instead of native order\nPASS tower managed proxy rejects passive behavior without disabling tooltip\nPASS hero native proxy rejects passive behavior without disabling tooltip\nPASS tower managed proxy rejects passive server without disabling tooltip\nPASS hero native proxy rejects passive server without disabling tooltip\nPASS tower managed proxy rejects passive engine without disabling tooltip\nPASS hero native proxy rejects passive engine without disabling tooltip\nPASS ultimate tower binds all seven real project tooltips, retains passive input protection and follows native row recovery\nPASS real building upgrades retain their upgrade category, progress and fields\nABILITY_TOOLTIP_RECOVERY_PASS",
+      "stderr": ""
+    },
+    {
+      "command": "node tools/test_ability_enumeration_count.cjs",
+      "exit_code": 0,
+      "pass": true,
+      "stdout": "ABILITY_ENUMERATION_COUNT_PASS: one count per refresh, metadata fallback, sparse slots, learning/removal, hidden/completed filters, passive keys, worker roles and native exceptions",
+      "stderr": ""
+    },
+    {
+      "command": "node tools/test_combat_selection_recovery.cjs",
+      "exit_code": 0,
+      "pass": true,
+      "stdout": "COMBAT_TOWER_INPUT_PASS final button dispatcher, direct point Begin, native cooldown hint, stale runtime snapshot, ready recovery and destroy confirmation\nCOMBAT_SELECTION_RECOVERY_PASS: merged events, single mapping discovery, stable shortcuts, late/rebuilt HUD, runtime reconciliation, key assignments and shutdown",
+      "stderr": ""
+    },
+    {
+      "command": "node output/hero_fifth_transfer_skill_20261009/fifth_rebirth_ui_snapshot.cjs",
+      "exit_code": 0,
+      "pass": true,
+      "stdout": "FIFTH_REBIRTH_UI_SNAPSHOT_PASS: 3 public skills + 1 point creates 3 buttons, correct upgrade request, pending lock and final point consumption",
+      "stderr": ""
+    }
+  ],
+  "negative_control": "The complete before-task generated configuration is loaded only into an isolated Lua process; unchanged new regression fails exactly at the fifth skill_points==1 assertion.",
+  "runtime_boundary": {
+    "native_fifth_rebirth_verified": false,
+    "resource_compilation_required": false,
+    "reload_required_for_new_rewards": true,
+    "retroactive_grant_to_completed_old_session": false,
+    "new_polling": false,
+    "production_client_code_changed": false
+  },
+  "git": {
+    "commit_or_push_requested": false,
+    "git_mutations_performed": false,
+    "unrelated_workspace_changes_preserved": true
+  },
+  "evidence_directory": "output/hero_fifth_transfer_skill_20261009",
+  "final_workspace_checks": [
+    {
+      "name": "diff_check",
+      "exit_code": 0,
+      "stdout_lines": 0,
+      "log": "output\\hero_fifth_transfer_skill_20261009\\diff_check.txt"
+    },
+    {
+      "name": "diff_stat_after",
+      "exit_code": 0,
+      "stdout_lines": 367,
+      "log": "output\\hero_fifth_transfer_skill_20261009\\diff_stat_after.txt"
+    },
+    {
+      "name": "diff_names_after",
+      "exit_code": 0,
+      "stdout_lines": 366,
+      "log": "output\\hero_fifth_transfer_skill_20261009\\diff_names_after.txt"
+    },
+    {
+      "name": "status_after",
+      "exit_code": 0,
+      "stdout_lines": 505,
+      "log": "output\\hero_fifth_transfer_skill_20261009\\status_after.txt"
+    }
+  ]
+}

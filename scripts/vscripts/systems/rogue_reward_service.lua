@@ -56,7 +56,8 @@ local function rules()
     }
 end
 
-local function publish(player_id, reason, reward_type_id)
+-- false means only the offer UI changed; nil keeps legacy effect refreshes.
+local function publish(player_id, reason, reward_type_id, effects_changed)
     local state = state_for(player_id)
     reward_type_id = reward_type_id or state.visible_reward_type
         or DEFAULT_REWARD_TYPE
@@ -73,7 +74,9 @@ local function publish(player_id, reason, reward_type_id)
         payload.cards = offer.cards
     end
     CustomNetTables:SetTableValue("survival_rogue_reward", tostring(player_id), payload)
-    event_bus.emit(events.ROGUE_REWARD_CHANGED, { player_id = player_id, snapshot = payload })
+    event_bus.emit(events.ROGUE_REWARD_CHANGED, {
+        player_id = player_id, snapshot = payload, effects_changed = effects_changed,
+    })
 end
 
 local function available(state, reward_type_id)
@@ -151,7 +154,7 @@ local function grant_random_cards(payload)
             )
             if not result or not result.ok then
                 -- Earlier children remain applied and must stay visible while retrying.
-                publish(player_id, "random_grant_incomplete")
+                publish(player_id, "random_grant_incomplete", nil, true)
                 return {
                     ok = false,
                     error = result and result.error or "child_effect_failed",
@@ -164,17 +167,17 @@ local function grant_random_cards(payload)
             record_history(state, card, reward_type_id, child_grant_id, parent_card_id)
         end
     end
-    publish(player_id, "random_granted")
+    publish(player_id, "random_granted", nil, true)
     return { ok = true, cards = transaction.cards }
 end
 
-local function create_offer(player_id, source, reward_type_id, rerolls_remaining)
+local function create_offer(player_id, source, reward_type_id, rerolls_remaining, effects_changed)
     local state = state_for(player_id)
     local pool_state = pool_for(state, reward_type_id)
     local draw = weighted_draw(available(state, reward_type_id), tonumber(rules().choice_count) or 3)
     if #draw == 0 then
         if not state.visible_reward_type or state.visible_reward_type == reward_type_id then
-            publish(player_id, "pool_exhausted", reward_type_id)
+            publish(player_id, "pool_exhausted", reward_type_id, effects_changed)
         end
         return false
     end
@@ -198,17 +201,17 @@ local function create_offer(player_id, source, reward_type_id, rerolls_remaining
         state.visible_reward_type = reward_type_id
     end
     if state.visible_reward_type == reward_type_id then
-        publish(player_id, "offer_created", reward_type_id)
+        publish(player_id, "offer_created", reward_type_id, effects_changed)
     end
     return true
 end
 
-local function promote_next(player_id, reason)
+local function promote_next(player_id, reason, effects_changed)
     local state = state_for(player_id)
     for _, reward_type_id in ipairs({ BUILDER_REWARD_TYPE, DEFAULT_REWARD_TYPE }) do
         if pool_for(state, reward_type_id).offer then
             state.visible_reward_type = reward_type_id
-            publish(player_id, reason or "offer_promoted", reward_type_id)
+            publish(player_id, reason or "offer_promoted", reward_type_id, effects_changed)
             return true
         end
     end
@@ -217,11 +220,11 @@ local function promote_next(player_id, reason)
         if #pool_state.queue > 0 then
             local queued = table.remove(pool_state.queue, 1)
             state.visible_reward_type = reward_type_id
-            return create_offer(player_id, queued.source, reward_type_id)
+            return create_offer(player_id, queued.source, reward_type_id, nil, effects_changed)
         end
     end
     state.visible_reward_type = nil
-    publish(player_id, reason or "selected", DEFAULT_REWARD_TYPE)
+    publish(player_id, reason or "selected", DEFAULT_REWARD_TYPE, effects_changed)
     return false
 end
 
@@ -268,7 +271,7 @@ function M.debug_offer(player_id, card_ids)
         allow_claimed = true,
     }
     state.visible_reward_type = reward_type_id
-    publish(player_id, "debug_offer_created", reward_type_id)
+    publish(player_id, "debug_offer_created", reward_type_id, false)
     return { ok = true, token = state.pools[reward_type_id].offer.token }
 end
 
@@ -292,7 +295,7 @@ local function open(payload)
         if pool_state.offer and (not state.visible_reward_type
             or state.visible_reward_type == BUILDER_REWARD_TYPE) then
             state.visible_reward_type = BUILDER_REWARD_TYPE
-            publish(player_id, "talent_reopened", BUILDER_REWARD_TYPE)
+            publish(player_id, "talent_reopened", BUILDER_REWARD_TYPE, false)
         end
         return {ok = true, queued = state.visible_reward_type ~= BUILDER_REWARD_TYPE}
     end
@@ -304,13 +307,13 @@ local function open(payload)
         pool_state.queue[#pool_state.queue + 1] = {
             source = source,
         }
-    elseif not create_offer(player_id, source, reward_type_id) then
+    elseif not create_offer(player_id, source, reward_type_id, nil, false) then
         return { ok = false, error = "pool_exhausted" }
     end
     if reward_type_id == BUILDER_REWARD_TYPE then
         pool_state.consumed = true
         if state.visible_reward_type == reward_type_id then
-            publish(player_id, "builder_consumed", reward_type_id)
+            publish(player_id, "builder_consumed", reward_type_id, false)
         end
     end
     return { ok = true, queued = queued }
@@ -404,7 +407,7 @@ local function select_card(payload)
     if state.visible_reward_type == offer.reward_type then
         state.visible_reward_type = nil
     end
-    promote_next(player_id, "selected")
+    promote_next(player_id, "selected", true)
     return { ok = true, card_id = card_id, grant_id = result.grant_id }
 end
 
@@ -415,10 +418,10 @@ local function reroll(payload)
     local source = offer.source
     local reward_type_id = offer.reward_type
     if not create_offer(player_id, source, reward_type_id,
-        offer.rerolls_remaining - 1) then
+        offer.rerolls_remaining - 1, false) then
         return { ok = false, error = "pool_exhausted" }
     end
-    publish(player_id, "rerolled", reward_type_id)
+    publish(player_id, "rerolled", reward_type_id, false)
     return { ok = true }
 end
 

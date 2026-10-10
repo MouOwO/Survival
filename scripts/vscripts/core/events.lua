@@ -8,6 +8,8 @@ local M = {
     HERO_REPLACEMENT_SELECT = "hero.replacement.select",
     HERO_SUMMONED = "hero.summoned",
     HERO_REMOVED = "hero.removed",
+    HERO_CLONE_CREATED = "hero.clone.created",
+    HERO_CLONE_REMOVED = "hero.clone.removed",
     HERO_COSMETICS_CHANGED = "hero.cosmetics.changed",
     HERO_DELETE_REQUEST = "hero.delete.request",
     HERO_SUMMON_GET_REQUEST = "hero.summon.get.request",
@@ -83,6 +85,7 @@ local M = {
     GOLD_MINE_UPGRADE_REQUEST = "gold_mine.upgrade.request",
     GOLD_MINE_CRIT_UPGRADE_REQUEST = "gold_mine.crit_upgrade.request",
     GOLD_MINE_CHANGED = "gold_mine.changed",
+    GOLD_MINE_TECHNOLOGY_COMPLETED = "gold_mine.technology_completed",
 
     TREE_SPAWNED = "tree.spawned",
     TREE_HIT = "tree.hit",

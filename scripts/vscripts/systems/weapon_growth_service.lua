@@ -306,9 +306,9 @@ local function on_damage_dealt(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil or (tonumber(payload.final_damage) or 0) <= 0 then return end
     if phase_guard.post_clear_frozen() then return end
-    local data = snapshot(player_id)
-    if data.series_id ~= "ice_blade" and data.series_id ~= "epic_icefire"
-        and data.series_id ~= "legend_abyss" then
+    local current = state(player_id)
+    if current.series_id ~= "ice_blade" and current.series_id ~= "epic_icefire"
+        and current.series_id ~= "legend_abyss" then
         return
     end
     if not damage_source_belongs_to_hero(
@@ -319,7 +319,6 @@ local function on_damage_dealt(payload)
         player_id,
         payload.target
     )
-    local current = state(player_id)
     local definition = weapons.by_id[current.content_id]
     if not definition then return end
     local attack_gain = tonumber(definition.attack_gain_per_attack) or 0

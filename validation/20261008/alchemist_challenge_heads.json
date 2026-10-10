@@ -1,0 +1,119 @@
+{
+  "created_at": "2026-10-08T12:12:53.943Z",
+  "challenge_id": "challenge_monster_05",
+  "asset_id": "monster_default_alchemist",
+  "scope": "Production CSV/Lua and native unit configuration, local Valve VPK evidence, offline lifecycle tests; no live screenshot claim",
+  "complete_default_items": [
+    {
+      "item_def": 117,
+      "slot": "back",
+      "model_path": "models/heroes/alchemist/alchemist_goblin_body.vmdl",
+      "compiled_resource_exists": true
+    },
+    {
+      "item_def": 118,
+      "slot": "weapon",
+      "model_path": "models/heroes/alchemist/alchemist_scabbard.vmdl",
+      "compiled_resource_exists": true
+    },
+    {
+      "item_def": 119,
+      "slot": "armor",
+      "model_path": "models/heroes/alchemist/alchemist_saddlehat.vmdl",
+      "compiled_resource_exists": true
+    },
+    {
+      "item_def": 120,
+      "slot": "arms",
+      "model_path": "models/heroes/alchemist/alchemist_gauntlets.vmdl",
+      "compiled_resource_exists": true
+    },
+    {
+      "item_def": 121,
+      "slot": "neck",
+      "model_path": "models/heroes/alchemist/alchemist_goblinhat.vmdl",
+      "compiled_resource_exists": true
+    },
+    {
+      "item_def": 122,
+      "slot": "offhand_weapon",
+      "model_path": "models/heroes/alchemist/alchemist_leftbottle.vmdl",
+      "compiled_resource_exists": true
+    },
+    {
+      "item_def": 123,
+      "slot": "head",
+      "model_path": "models/heroes/alchemist/alchemist_goblin_head.vmdl",
+      "compiled_resource_exists": true
+    },
+    {
+      "item_def": 124,
+      "slot": "body_head",
+      "model_path": "models/heroes/alchemist/alchemist_ogre_head.vmdl",
+      "compiled_resource_exists": true
+    },
+    {
+      "item_def": 125,
+      "slot": "shoulder",
+      "model_path": "models/heroes/alchemist/alchemist_shoulderbottles.vmdl",
+      "compiled_resource_exists": true
+    }
+  ],
+  "models_precached": [
+    "models/heroes/alchemist/alchemist.vmdl",
+    "models/heroes/alchemist/alchemist_goblin_body.vmdl",
+    "models/heroes/alchemist/alchemist_scabbard.vmdl",
+    "models/heroes/alchemist/alchemist_saddlehat.vmdl",
+    "models/heroes/alchemist/alchemist_gauntlets.vmdl",
+    "models/heroes/alchemist/alchemist_goblinhat.vmdl",
+    "models/heroes/alchemist/alchemist_leftbottle.vmdl",
+    "models/heroes/alchemist/alchemist_goblin_head.vmdl",
+    "models/heroes/alchemist/alchemist_ogre_head.vmdl",
+    "models/heroes/alchemist/alchemist_shoulderbottles.vmdl"
+  ],
+  "native_initial_model": "models/heroes/alchemist/alchemist.vmdl",
+  "other_generated_bundles_preserved": true,
+  "regressions": [
+    {
+      "file": "scripts/vscripts/tests/test_alchemist_challenge_visuals.lua",
+      "passed": true,
+      "exit_code": 0,
+      "output": "ALCHEMIST_CHALLENGE_VISUALS_PASS: nine default pieces, both heads, stable reapply, corpse retention, cleanup, initial preload"
+    },
+    {
+      "file": "scripts/vscripts/tests/test_ten_sin_visuals.lua",
+      "passed": true,
+      "exit_code": 0,
+      "output": "TEN_SIN_VISUALS_PASS: ten complete outfits, 52 attached parts, Arcana state, cleanup, exact-bundle preload"
+    },
+    {
+      "file": "tools/test_model_appearance_spawn_cost.lua",
+      "passed": true,
+      "exit_code": 0,
+      "output": "APPEARANCE_SPAWN_COST units=90 props=180 world_queries=0 bulk_queries=0 iterator_queries=0 entity_visits=0\r\nAPPEARANCE_SPAWN_LIFECYCLE_PASS stable allocation, rollback, cleanup, cold recovery, index reuse, fallback"
+    },
+    {
+      "file": "tools/test_challenge_portrait_visuals.lua",
+      "passed": true,
+      "exit_code": 0,
+      "output": "SEVEN_SINS_VISUAL_PASS: four world pieces, inherited pose, Arcana activity, portrait identity, cleanup\r\nTEN_SINS_IDLE_PASS: WK/QOP/Mars activity graph, inherited wearables, staging remains invulnerable and restricted"
+    },
+    {
+      "file": "tools/test_addon_precache.lua",
+      "passed": true,
+      "exit_code": 0,
+      "output": "ADDON_PRECACHE_ENTRY_PASS: strict API signatures, current skill roots including poison Sullen Shroud without retired resources, tail startup preload; resources=111"
+    },
+    {
+      "file": "output/alchemist_challenge_20261008/verify_alchemist.cjs",
+      "passed": true,
+      "exit_code": 0,
+      "output": "ALCHEMIST_NATIVE_ASSET_CONTRACT_PASS: Valve ItemDefs 117-125, all ten native models, complete proxy, correct initial body, preserved generated bundles"
+    }
+  ],
+  "live_game_probe": {
+    "attempted": true,
+    "result": "No expected console response; no live screenshot verification",
+    "restarted_game": false
+  }
+}

@@ -22,8 +22,25 @@ for(const file of ['ability_tooltip.js','hud_takeover.js']) {
  const cfg={SurvivalAbilityInput:{ToggleTowerAutoUpgrade:a=>{assert.equal(a,100);count++;return true;}}};
  const proxy={__survivalAbilityIndex:100,__survivalAbilityName:'ability_upgrade_tower_lv01'};
  const scope={proxy,slot:{entry:{ability:100,name:'ability_upgrade_tower_lv01'}},config:cfg,GameUI:{CustomUIConfig:()=>cfg}};
+ assert(vm.runInNewContext('(function(){'+body+'})()',scope));
+ assert.equal(count,1,file+' right-click toggles tower automation');
+ proxy.__survivalAbilityName=scope.slot.entry.name='ability_upgrade_tower_max';
  assert(!vm.runInNewContext('(function(){'+body+'})()',scope));
- assert.equal(count,0,file+' right-click never toggles tower automation');
+ assert.equal(count,1,file+' upgrade-max does not toggle automation');
+ proxy.__survivalAbilityIndex=-1;scope.slot.entry=null;
+ assert(!vm.runInNewContext('(function(){'+body+'})()',scope));
+ assert.equal(count,1,file+' stale slots do not toggle automation');
+ let research=0;
+ cfg.SurvivalProductionHUD={ToggleResearch:(ability,unit)=>{assert.equal(ability,100);assert.equal(unit,10);research++;return true;}};
+ proxy.__survivalAbilityIndex=100;proxy.__survivalAbilityName='ability_research_tower_attack';
+ scope.slot.entry={ability:100,name:proxy.__survivalAbilityName};
+ scope.isSelectedResearchLab=()=>true;scope.selectedUnit=()=>10;scope.hideNativeTooltip=()=>{};
+ assert(vm.runInNewContext('(function(){'+body+'})()',scope));
+ assert.equal(research,1,file+' research right-click remains functional');
+ assert.equal(count,1,file+' research does not toggle tower automation');
 }
 runtime={auto_upgrade_visible:0,auto_upgrade_available:0};assert(!env.toggleTowerAutoUpgrade(100));
-console.log('TOWER_AUTO_INPUT_PASS: right-click removed; explicit toggle, cancel while busy; base/stale/removed rejected');
+const hud=fs.readFileSync('panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js','utf8');
+assert(!hud.includes('HandoffTowerAuto') && !hud.includes('updateTowerAuto('),
+ 'the separate auto-upgrade control and its HUD polling are removed');
+console.log('TOWER_AUTO_INPUT_PASS: both HUD paths use right-click, cancel while busy; base/stale/removed/max rejected');

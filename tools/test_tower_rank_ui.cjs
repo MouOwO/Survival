@@ -13,6 +13,7 @@ assert(!/<(?:Image|Label)\b/.test(xml), 'empty initial layout must contain no di
 assert(/\.TowerRank\s*\{[^}]*visibility:\s*collapse/.test(css));
 let nextTask = 0, nextListener = 0, nextPanel = 0;
 let styleWrites = 0, originReads = 0, projectionReads = 0;
+let nameWidthReads = 0, captionWidthReads = 0;
 let healthBarOffset = 190, offsetThrows = false, projectedHeight;
 const tasks = new Map(), listeners = new Map(), table = {}, config = {}, entities = {};
 const debugListeners = new Map(), messages = [];
@@ -40,7 +41,22 @@ function panel(id = '') {
     return { id, children: [], style: new Proxy({}, { set(target, key, value) {
             styleWrites++; target[key] = value; return true;
         } }), classes: new Set(), deleted: false,
-        actualuiscale_x: 1, actualuiscale_y: 1, actuallayoutwidth: 1920, actuallayoutheight: 1080,
+        actualuiscale_x: 1, actualuiscale_y: 1,
+        get actuallayoutwidth() {
+            // Preserve the original viewport model. Only descendants acquire
+            // measured dimensions from CSS/content and physical UI scaling.
+            if (!this.parent) return this.viewportWidth === undefined ? 1920 : this.viewportWidth;
+            if (this.classes.has('TowerRankName')) nameWidthReads++;
+            if (this.classes.has('TowerRankCaption')) captionWidthReads++;
+            if (this.layoutWidthOverride !== undefined) return this.layoutWidthOverride;
+            return layoutSize(this, 'width') * root.actualuiscale_x;
+        },
+        set actuallayoutwidth(value) { this.viewportWidth = value; },
+        get actuallayoutheight() {
+            if (!this.parent) return this.viewportHeight === undefined ? 1080 : this.viewportHeight;
+            return layoutSize(this, 'height') * root.actualuiscale_y;
+        },
+        set actuallayoutheight(value) { this.viewportHeight = value; },
         IsValid() { return !this.deleted; }, AddClass(c) {
             this.classes.add(c);
             Object.assign(this.style, stylesheetGeometry(c));
@@ -77,6 +93,7 @@ const sandbox = { $, GameUI: { CustomUIConfig: () => config },
         WorldToScreenY: (_, y, z) => { projectionReads++; projectedHeight = z; return y + z - 190; } }
 };
 function tick() { const due = [...tasks.values()]; tasks.clear(); due.forEach(fn => fn()); }
+function settleNameLayout() { for (let frame = 0; frame < 4; frame++) tick(); }
 function update(key, value) { table[key] = value; [...listeners.values()].forEach(fn => fn('survival_tower_rank', key, value)); }
 function bars() { return root.children.filter(p => !p.deleted); }
 function descendants(parent) { return parent.children.flatMap(child => [child, ...descendants(child)]); }
@@ -111,12 +128,14 @@ function assertPlacement(row, health) {
     close(image.x + image.width + 2, health.left, 'rarity image is two UI pixels left of the health bar');
     close(image.y + image.height / 2, health.top + health.height / 2, 'rarity and health bar centers align vertically');
     close(name.y + name.height, health.top, 'name lower edge touches the health bar upper edge');
-    close(name.width, 108, 'fixed name rectangle retains the requested readable width');
+    close(name.width, Math.min(108, Number(row.__name.intrinsicWidth === undefined ? 56 : row.__name.intrinsicWidth)),
+        'name uses measured content width capped at the caption width');
     close(name.height, 20, 'name reserves the enlarged text line');
     assert.equal(row.__name.style['font-size'], '18px', 'tower name is enlarged to the agreed reference proportion');
     assert.equal(row.__name.style['font-weight'], 'bold', 'tower name has the agreed bold weight');
-    assert.equal(row.__name.style['text-align'], 'center', 'glyph alignment is explicitly centered within the fixed name box');
-    assert.notEqual(row.__name.style.width, 'fit-children');
+    assert.equal(row.__name.style['text-align'], 'center', 'glyph alignment is explicitly centered within the measured name box');
+    assert.equal(row.__name.style.width, 'fit-children');
+    assert.equal(row.__name.style['max-width'], '108px');
     assert.equal(row.__name.style['horizontal-align'], undefined, 'centering must not depend on a mocked CSS horizontal-align rule');
     close(name.x + name.width / 2, health.left + health.width / 2, 'name centers over the health bar');
     close(stars.x + stars.width / 2, health.left + health.width / 2, 'stars center over the health bar');
@@ -175,13 +194,14 @@ if (process.argv.includes('--measure')) {
         entities[id] = { alive: true, name: 'tower', origin: [600, 400, 0] };
         table['unit_' + id] = { entindex: id, unit_name: 'tower', display_name: '神秘之塔', rarity: 'R', stars: 1, session: 'measure' };
     }
-    vm.runInNewContext(source, sandbox); tick();
+    vm.runInNewContext(source, sandbox); settleNameLayout();
     function captureFrames() {
         counts.native = counts.capture = counts.findPanel = 0;
-        styleWrites = projectionReads = 0;
+        styleWrites = projectionReads = nameWidthReads = captionWidthReads = 0;
         for (let index = 0; index < 300; index++) tick();
         return { native_calls: counts.native, projection_calls: projectionReads,
-            style_writes: styleWrites, overlay_captures: counts.capture, panel_searches: counts.findPanel };
+            style_writes: styleWrites, overlay_captures: counts.capture, panel_searches: counts.findPanel,
+            name_width_reads: nameWidthReads, caption_width_reads: captionWidthReads };
     }
     const stable = captureFrames();
     blocked = true;
@@ -192,9 +212,12 @@ if (process.argv.includes('--measure')) {
     blocked = false; tick();
     const noTowers = captureFrames();
     assert.equal(stable.style_writes, 0, 'stable captions must not rewrite geometry or style during 300 frames');
+    assert.equal(stable.name_width_reads, 0, 'settled names must not reread layout width during 300 frames');
+    assert.equal(stable.caption_width_reads, 0, 'settled captions must not reread parent layout width during 300 frames');
     assert.equal(fullScreenBlocked.native_calls, 0, 'covered captions skip entity queries');
     assert.equal(fullScreenBlocked.projection_calls, 0, 'covered captions skip world projection');
     assert.equal(fullScreenBlocked.style_writes, 0, 'fully hidden stable frames do not repeat visibility writes');
+    assert.equal(fullScreenBlocked.name_width_reads, 0, 'covered names do not force text layout');
     assert.equal(noTowers.native_calls, 0, 'empty sessions do not query entities');
     assert.equal(noTowers.overlay_captures, 0, 'empty sessions skip HUD capture');
     console.log(JSON.stringify({ kind: 'offline_production_js_call_counts', source: sourcePath,
@@ -231,21 +254,62 @@ assert.equal(bar.style.position, '546.00px 340.00px 0px', 'enlarged name line st
 let anchor = config.SurvivalWorldHealthBarAnchor.Project(1, entities[1].origin, root);
 assert.equal(anchor.left, 569); assert.equal(anchor.top, 374);
 assert.equal(anchor.width, 62); assert.equal(anchor.height, 11);
+settleNameLayout();
 assertPlacement(bar, anchor);
 for (const [displayName, naturalWidth] of [
-    ['塔', 32], ['噬魂术士', 56], ['进阶噬魂术士', 84], ['很长的终极死亡路线防御塔名称', 168]
+    ['塔', 32], ['噬魂术士', 56], ['见习守望', 72.5], ['进阶噬魂术士', 84], ['很长的终极死亡路线防御塔名称', 168]
 ]) {
     bar.__name.intrinsicWidth = naturalWidth;
-    update('unit_1', { ...firstState, display_name: displayName }); tick();
+    nameWidthReads = captionWidthReads = 0;
+    update('unit_1', { ...firstState, display_name: displayName }); settleNameLayout();
     assert.equal(bar.__name.text, displayName, 'content changes preserve the full name value');
     const name = uiRect(bar.__name);
-    close(name.width, 108, 'every content length uses the same fixed Label rectangle');
+    close(name.width, Math.min(108, naturalWidth), 'short text uses its own width; long text is capped');
     close(name.x + name.width / 2, anchor.left + anchor.width / 2,
-        'short and long names keep the fixed rectangle centered without simulating CSS horizontal-align');
+        'production JS centers the measured name bounds without CSS horizontal-align');
+    assert(nameWidthReads > 0 && nameWidthReads <= 3, 'name changes measure layout only during three bounded frames');
+    assert(captionWidthReads > 0 && captionWidthReads <= 3, 'caption scale normalization has the same bounded work');
+    assert.equal(tasks.size, 1, 'name measurement reuses the existing frame loop without adding timers');
     assertPlacement(bar, anchor);
 }
+// A Label can expose its old width immediately after changing its text. The
+// next layout passes must repair that measurement without another net update.
+bar.__name.layoutWidthOverride = 108;
+bar.__name.intrinsicWidth = 46;
+update('unit_1', { ...firstState, display_name: '短名' }); tick();
+delete bar.__name.layoutWidthOverride;
+settleNameLayout();
+assertPlacement(bar, anchor);
+close(parseFloat(bar.__name.style.position),31,'a stale prior text width is corrected on later frames');
+
+// Simulate children appearing before their first measured layout: neither a
+// zero text width nor a zero parent width may settle the name off center.
+bar.__name.intrinsicWidth = 78;
+bar.__name.layoutWidthOverride = 0;
+bar.__caption.layoutWidthOverride = 0;
+update('unit_1', { ...firstState, display_name: '延迟排版测试' }); tick();
+delete bar.__caption.layoutWidthOverride; tick();
+delete bar.__name.layoutWidthOverride; settleNameLayout();
+assertPlacement(bar, anchor);
+close(parseFloat(bar.__name.style.position),15,'late nonzero layout restores centered text');
+
+bar.__name.intrinsicWidth = 74;
+bar.__name.layoutWidthOverride = 3.402823466e38;
+bar.__caption.layoutWidthOverride = 3.402823466e38;
+update('unit_1', { ...firstState, display_name: '布局尚未就绪' }); settleNameLayout();
+assert(!/e\+|NaN|Infinity/.test(bar.__name.style.position),'invalid native layout never reaches the position style');
+delete bar.__name.layoutWidthOverride;delete bar.__caption.layoutWidthOverride;settleNameLayout();
+assertPlacement(bar,anchor);
+close(parseFloat(bar.__name.style.position),17,'FLT_MAX layout is retried once native dimensions arrive');
+
+nameWidthReads = captionWidthReads = 0;
+const settledWrites = styleWrites;
+for (let frame = 0; frame < 100; frame++) tick();
+assert.equal(nameWidthReads,0,'stable frames do not poll Label width');
+assert.equal(captionWidthReads,0,'stable frames do not poll caption width');
+assert.equal(styleWrites,settledWrites,'stable measured positions are not rewritten');
 delete bar.__name.intrinsicWidth;
-update('unit_1', firstState); tick();
+update('unit_1', firstState); settleNameLayout();
 assert.equal(config.SurvivalTowerRanks.DebugSnapshot().units[0].display_name, '神秘之塔');
 assert.equal(config.SurvivalTowerRanks.DebugSnapshot().units[0].name_label.text, '神秘之塔');
 assert.equal(config.SurvivalTowerRanks.DebugSnapshot().units[0].health_anchor.top, anchor.top);
@@ -276,6 +340,7 @@ assert.equal(bar.__stars.filter(s => s.classes.has('ActiveStar')).length, 3);
 assert.equal(bar.__stars.filter(s => s.classes.has('RedStar')).length, 0);
 assert.equal(bar.__starRow.style.width, '42px');
 assert.equal(bar.__starRow.style.position, '33px 2px 0px', 'fewer stars remain centered after upgrade at the lowered row position');
+settleNameLayout();
 assertPlacement(bar, anchor);
 update('unit_1', { ...firstState, constructing: 1 });
 assert.equal(bar.style.visibility, 'collapse', 'construction hides an existing caption as soon as its state arrives');
@@ -349,9 +414,20 @@ assert.equal(config.SurvivalTowerRanks.DebugSnapshot().hidden_reasons.hud_occlus
 config.SurvivalWorldOverlayVisibility.Capture = () => { throw Error('optional HUD capture failure'); };
 tick(); assert.equal(config.SurvivalTowerRanks.DebugSnapshot().hidden_reasons.frame_exception, 1);
 delete config.SurvivalWorldOverlayVisibility;
-root.actualuiscale_x = root.actualuiscale_y = 0.75; tick();
+nameWidthReads = captionWidthReads = 0;
+root.actualuiscale_x = root.actualuiscale_y = 0.75; settleNameLayout();
 assert.equal(bar.style.position, '746.00px 473.33px 0px', 'world pixels convert to UI scale');
+assert(nameWidthReads > 0 && nameWidthReads <= 3,'viewport scale invalidates the bounded name measurement');
+assert.equal(bar.__name.actuallayoutwidth,42,'56px text is measured in scaled physical pixels');
+assert.equal(bar.__caption.actuallayoutwidth,81,'108px parent is measured in the same physical pixels');
 assertPlacement(bar, config.SurvivalWorldHealthBarAnchor.Project(1, entities[1].origin, root));
+// Some native layouts report logical widths even under a scaled viewport.
+// Normalizing against the caption must work in either measurement convention.
+bar.__name.layoutWidthOverride = 56;bar.__caption.layoutWidthOverride = 108;
+update('unit_1', { ...firstState, display_name: '逻辑像素名称' });settleNameLayout();
+assertPlacement(bar,config.SurvivalWorldHealthBarAnchor.Project(1,entities[1].origin,root));
+close(parseFloat(bar.__name.style.position),26,'logical width APIs are not divided by viewport scale again');
+delete bar.__name.layoutWidthOverride;delete bar.__caption.layoutWidthOverride;
 root.actualuiscale_x = 0.75; root.actualuiscale_y = 0.5;
 root.windowOffset = { x: 90, y: 45 }; tick();
 assert.equal(bar.style.position, '626.00px 650.00px 0px', 'caption supports unequal scales and a shifted container');
@@ -417,4 +493,4 @@ assert.equal(JSON.parse(messages[0].slice('[TowerRankDebug] '.length)).state_cou
 delete entities[1]; tick(); assert.equal(bars().length, 0);
 config.SurvivalTowerRanks.Stop(); assert.equal(tasks.size, 0); assert.equal(listeners.size, 0);
 assert.equal(debugListeners.size, 0);
-console.log('TOWER_RANK_UI_SIMULATION_PASS: fixed 108px centered name rectangles, 18px bold text declarations, rarity name colors, stars touch enlarged name line, fixed health/rarity anchors, complete screen/occlusion bounds, construction, native images, scale, lifecycle, hot reload; font pixels not validated');
+console.log('TOWER_RANK_UI_SIMULATION_PASS: measured name centering, bounded layout retry, stale/zero widths, capped long text, no stable width reads, 18px bold text, rarity colors, stars/health anchors, screen/occlusion bounds, construction, native images, scale, lifecycle, hot reload; font pixels not validated');

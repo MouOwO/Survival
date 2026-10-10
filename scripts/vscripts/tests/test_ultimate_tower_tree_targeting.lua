@@ -29,7 +29,7 @@ local function unit(name, index, team, position)
     local result = {name = name, index = index, team = team, position = position,
         health = 100, max_health = 100, armor = 2, modifiers = {}, abilities = {}, survival_player_id = 0}
     function result:IsNull() return self.removed == true end
-    function result:IsAlive() return not self.removed end
+    function result:IsAlive() return not self.removed and not self.dead end
     function result:entindex() return self.index end
     function result:GetUnitName() return self.name end
     function result:GetTeamNumber() return self.team end
@@ -171,6 +171,22 @@ for i=1,100 do
  assert(grown.survival_attack_min==before+i*2)
 end
 print("ULTIMATE_PERSONAL_GROWTH_PASS: 100 hits, no repeated inheritance")
+local removed_events, freed_grid = 0, 0
+bus.subscribe(events.TOWER_FUSION_RUNTIME_REMOVED,function(payload)
+    assert(payload.entindex == tower:entindex() and payload.player_id == 0)
+    removed_events = removed_events + 1
+end)
+bus.handle_request(events.GRID_RELEASE_REQUEST,function(payload)
+    assert(payload.entindex == tower:entindex())
+    freed_grid = freed_grid + 1
+    return {ok=true}
+end)
+tower.dead = true
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=tower})
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=tower})
+assert(removed_events == 1 and freed_grid == 1 and #fusion._test.player_ultimates(0) == 0,
+    "natural ultimate death clears ownership, slot projection and grid exactly once")
+print("ULTIMATE_NATURAL_DEATH_PASS: real fusion lifecycle emits one removal and releases its grid")
 fail_modifier = true; initialize()
 result = bus.request(events.TOWER_FUSION_REQUEST, {caster = material[1].unit})
 assert(result and not result.ok and created.removed and consumed == 0,

@@ -1,0 +1,297 @@
+{
+  "task": "prerequisite-only shading",
+  "created_at": "2026-10-08T22:45:38.9824162+08:00",
+  "regressions_passed": 29,
+  "production_lua_syntax_files": 10,
+  "compiled_assets_verified": 10,
+  "validation_scope": "Offline production behavior tests and official resource compiler; Dota 2 not running",
+  "git_committed": false,
+  "git_pushed": false,
+  "checkpoint": "output/prerequisite_shading_20261008/final",
+  "regression_log": "output/prerequisite_shading_20261008/regression_final/results.json",
+  "known_baseline_fixture_failures": [
+    "test_tower_upgrade_targeting.lua: missing preflight resource mock",
+    "test_shop_presentation.cjs: missing ReferenceWindows.Apply",
+    "test_book_shop_ui.cjs: missing ReferenceWindows.Apply"
+  ],
+  "sources": [
+    {
+      "path": "scripts/vscripts/ui/ability_runtime_builder.lua",
+      "sha256": "D3E8A7355FD8FB486E1F7E54F953F5419FC759356919248B4CA9A6DFE94F7207"
+    },
+    {
+      "path": "scripts/vscripts/ui/ability_runtime_service.lua",
+      "sha256": "27D72B8BF380E4069FC0EA2501EB82FE28582206BB07B41A9C6B0A6D0E3D94E2"
+    },
+    {
+      "path": "scripts/vscripts/systems/research_lab_ability_sync.lua",
+      "sha256": "23A02E99D9E563338F0B7F4E20DE20A4A705F79B6A27B333A40E07E3EA744E02"
+    },
+    {
+      "path": "scripts/vscripts/research/research_technology_service.lua",
+      "sha256": "3C2D2B448E653CCBBBB33BED85ADA47CDAE5D368672F60FE512D7DF176B88D01"
+    },
+    {
+      "path": "scripts/vscripts/ui/production_ui_service.lua",
+      "sha256": "664F70860E80DE04AD2798C11FC3EB17AB1F7806BD027B33FEEE7F8C78A30571"
+    },
+    {
+      "path": "scripts/vscripts/systems/building_upgrade_system.lua",
+      "sha256": "9AAB9EF4072E82210603D765656A39A1C25EBCE2BA5E42FBCB1C120D859DFF59"
+    },
+    {
+      "path": "scripts/vscripts/ui/ui_request_router.lua",
+      "sha256": "7AEF3DE7DDE189A2725B017DCC1816B2606AC867B0CB9771D2A5B12EB7925CE7"
+    },
+    {
+      "path": "scripts/vscripts/systems/lumberjack_fusion_eligibility.lua",
+      "sha256": "5C8DD9765E53449A202D94BD060AED587DDE7EA6626E4F90D78E4724146FB51D"
+    },
+    {
+      "path": "scripts/vscripts/systems/worker_system.lua",
+      "sha256": "477D875B48A3C0C278F3BABEB22AF7553F35825F604D6678A6D2143DED7C0506"
+    },
+    {
+      "path": "scripts/vscripts/systems/shop_catalog.lua",
+      "sha256": "E7B24A35F9D8EF001E4E461A8B1B8C987EA03F55D5CF41E65053E6474C8148E5"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_native_prerequisite_activation.lua",
+      "sha256": "5A04EB7DCF8D943C03119A55BA962DC592FBC4A76DC71E2223629F2F543788B5"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_research_catalog_prerequisites.lua",
+      "sha256": "A173BAA9BB103E6941099C2E5BAEA4EA322BF0BD2E801E691B340365AC8A84E1"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_research_runtime_projection.lua",
+      "sha256": "6DAB92CC11A9285EF44227AAC4293BDE701087C17B63F5D97BFE6356DE87045A"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_resource_ui_coalescing.lua",
+      "sha256": "05E53FE6FDD1467DEA340EA00F4E9167CDD348133A3C4E6FF62715A3A26FFD0D"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_production_ui_router.lua",
+      "sha256": "7BF1923EF6D7816FF94231A10542A48EAAB55E5284A3477E7055C51CD9B836EC"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_building_upgrade_lifecycle.lua",
+      "sha256": "19DC1BC38FCCEE381A6F9C4B9BBF3B7675793647B752FD71372C1B722C0E0A08"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_tower_class_preflight.lua",
+      "sha256": "AA603AC38613677A60E3532DA36F76D31C4B1AE921E24B0D57114708E3685F7D"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_lumberjack_fusion_runtime.lua",
+      "sha256": "635E14FF3F0D5BBFA94C874A1C12F9E09812D4E5CD61EA01A91D6AD92138280E"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+      "sha256": "5A743F0A0B073C3EC10ECA1F145A60EAF0E190C17EA02B4C955817F579C56F87"
+    },
+    {
+      "path": "tools/test_upgrade_prerequisite_projection.lua",
+      "sha256": "C996FA6FDA06E4E52447AD47214D2EEE3E1E107814B3E9891D419CC99B476C38"
+    },
+    {
+      "path": "tools/test_lumberjack_fusion_runtime.lua",
+      "sha256": "CB7A532F4B45A914C4322DA93B98635DE9EF71D3FE2EA8088B58795BCB572010"
+    },
+    {
+      "path": "tools/test_prerequisite_shading.cjs",
+      "sha256": "38655C098F051527DE47690745E3FA823882AC4D57D0E49F02B315E30C5253DB"
+    },
+    {
+      "path": "tools/test_shop_prerequisites.cjs",
+      "sha256": "092CAE9E656B7FC0DBA1EA364F549ECA1E5A88E8826E38EDF3FBA80139CE87AB"
+    },
+    {
+      "path": "tools/test_action_resources_tooltip.cjs",
+      "sha256": "5195770B66B3887558A35033C4D5513429AC48AD409466B429DE5AD5CA97BF6E"
+    },
+    {
+      "path": "tools/test_production_hud.cjs",
+      "sha256": "EE8F0C31A5024A7484AAFF7EE9372F5135F2032AA53828468C9D46979C581745"
+    },
+    {
+      "path": "tools/test_lumberjack_fusion_queue.cjs",
+      "sha256": "6FDBDE03982408C101B4B790BDE2823D65E007E1592A9E921068C32E301BFD20"
+    },
+    {
+      "path": "tools/build_prerequisite_ui.ps1",
+      "sha256": "24C2B33E945A76F7954C0B38BB9CDDC74016166534D667A58749BE076C3D84EA"
+    },
+    {
+      "path": "tools/verify_prerequisite_ui.cjs",
+      "sha256": "CE357629C00D21FA2C69967B1A9150AD194667402B82D010A3BCE94FB2F50305"
+    },
+    {
+      "path": "docs/ai/tasks/prerequisite_shading_20261008/README.md",
+      "sha256": "3DFA06061CC0E80FDFAC9F253B7154D6F2E2DA22DB1EEB7FB583081EA16FBCC6"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\combat_stats.js",
+      "sha256": "463B9D542526796E759FFED5F4A74B4DDDD61A542E6D6CB9A4ABD2AE72325963"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\ability_tooltip.js",
+      "sha256": "B716F644C268ED6D3FF8978814AD64175FF95F4EDA52EC06FFAEF99506899E36"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\hud_takeover.js",
+      "sha256": "39DF1930FC27F176D41D5DD0C6A1881E413B90A1B2BFAA530C60BB9A3112BEE9"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\production_progress.js",
+      "sha256": "F754E40AD7D1599FC7AB9CFB2114017DF78E06DEDEFAF253A1FD95D017BE27A1"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\lumberjack_fusion_queue.js",
+      "sha256": "33F7901071996C51432D3998EB55441E646644AB1C442BAC082AB6CF0D3F7921"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\ui_bootstrap.js",
+      "sha256": "A8FD1B9F2BED826BC4A5F72CE1DDDF1ECA751A5588A90F38838A201104CEF663"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\shop_remaining_5d5c1152eb.js",
+      "sha256": "7E64D85D791008A23167895CFC93C69FF656380AF282BAC1FCCCCEEF0B46D79C"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\shop_ui.js",
+      "sha256": "C2E9222EBD430DCEEB9876B606AEBB0F9B68DA7F867DD88B001E7702636F30E1"
+    },
+    {
+      "path": "panorama\\src\\scripts\\custom_game\\shop_tooltip_remaining_5d5c1152eb.js",
+      "sha256": "DD8723B1B0C2A5A64DDE79109327D9B9A7387E1859A0866DC97FD4C13A918F0B"
+    },
+    {
+      "path": "panorama\\src\\styles\\custom_game\\remaining_5d5c1152eb.css",
+      "sha256": "56AD9852E486BDFF6AC5F501564E698DBA6F707B23ED247AADDFBC56DB7B8E9F"
+    }
+  ],
+  "compiled_assets": [
+    {
+      "name": "combat_stats",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\combat_stats.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\combat_stats.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\combat_stats.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\combat_stats.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\combat_stats.game.vjs_c",
+      "sourceHash": "463B9D542526796E759FFED5F4A74B4DDDD61A542E6D6CB9A4ABD2AE72325963",
+      "compiledHash": "5050B5C1440FA8E89D286557BCCF200329C978AF0D08D646C96A1FF570C1C7FA"
+    },
+    {
+      "name": "ability_tooltip",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\ability_tooltip.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\ability_tooltip.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\ability_tooltip.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\ability_tooltip.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\ability_tooltip.game.vjs_c",
+      "sourceHash": "B716F644C268ED6D3FF8978814AD64175FF95F4EDA52EC06FFAEF99506899E36",
+      "compiledHash": "13F1A66C085C2470DB6249BEC1EEA3D4C3CE7A200905885534456FCC52F69AD8"
+    },
+    {
+      "name": "hud_takeover",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\hud_takeover.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\hud_takeover.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\hud_takeover.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\hud_takeover.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\hud_takeover.game.vjs_c",
+      "sourceHash": "39DF1930FC27F176D41D5DD0C6A1881E413B90A1B2BFAA530C60BB9A3112BEE9",
+      "compiledHash": "99B8C8B17EEE158034A45E766FEF2552795503B30C0BA3C215AB2CDAD44F31A6"
+    },
+    {
+      "name": "production_progress",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\production_progress.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\production_progress.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\production_progress.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\production_progress.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\production_progress.game.vjs_c",
+      "sourceHash": "F754E40AD7D1599FC7AB9CFB2114017DF78E06DEDEFAF253A1FD95D017BE27A1",
+      "compiledHash": "C531AB578AAB7A828AAE36B384456006C00EE0E98B73C3ED21FED2D9A5D7921E"
+    },
+    {
+      "name": "lumberjack_fusion_queue",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\lumberjack_fusion_queue.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\lumberjack_fusion_queue.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\lumberjack_fusion_queue.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\lumberjack_fusion_queue.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\lumberjack_fusion_queue.game.vjs_c",
+      "sourceHash": "33F7901071996C51432D3998EB55441E646644AB1C442BAC082AB6CF0D3F7921",
+      "compiledHash": "9BED12EB098341C67CFD2DA2391A583DCA375EF37022C6FEEFFE8BCD5888C4EA"
+    },
+    {
+      "name": "ui_bootstrap",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\ui_bootstrap.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\ui_bootstrap.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\ui_bootstrap.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\ui_bootstrap.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_223744\\ui_bootstrap.game.vjs_c",
+      "sourceHash": "A8FD1B9F2BED826BC4A5F72CE1DDDF1ECA751A5588A90F38838A201104CEF663",
+      "compiledHash": "DE8DDDE39D1D55973B7160BDB0AC029A254A7C1D583B0B8EEB82A94575DC565F"
+    },
+    {
+      "name": "shop_remaining_5d5c1152eb",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\shop_remaining_5d5c1152eb.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\shop_remaining_5d5c1152eb.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\shop_remaining_5d5c1152eb.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_224459\\shop_remaining_5d5c1152eb.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_224459\\shop_remaining_5d5c1152eb.game.vjs_c",
+      "sourceHash": "7E64D85D791008A23167895CFC93C69FF656380AF282BAC1FCCCCEEF0B46D79C",
+      "compiledHash": "F6566DE6E21041CC7AFF030AC1A2BF1BF925067AE5648E65D033A314ECE26A82"
+    },
+    {
+      "name": "shop_ui",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\shop_ui.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\shop_ui.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\shop_ui.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_224459\\shop_ui.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_224459\\shop_ui.game.vjs_c",
+      "sourceHash": "C2E9222EBD430DCEEB9876B606AEBB0F9B68DA7F867DD88B001E7702636F30E1",
+      "compiledHash": "C22E134D8C6DDCADC0B55327768497E29E77264856DD2FA51871A4271660EB44"
+    },
+    {
+      "name": "shop_tooltip_remaining_5d5c1152eb",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\shop_tooltip_remaining_5d5c1152eb.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\shop_tooltip_remaining_5d5c1152eb.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\shop_tooltip_remaining_5d5c1152eb.vjs_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_224459\\shop_tooltip_remaining_5d5c1152eb.content.js",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_224459\\shop_tooltip_remaining_5d5c1152eb.game.vjs_c",
+      "sourceHash": "DD8723B1B0C2A5A64DDE79109327D9B9A7387E1859A0866DC97FD4C13A918F0B",
+      "compiledHash": "C652A5081DC0839C07A44F93392F4A989F81364D190F7C963D3BA37E7240902E"
+    },
+    {
+      "name": "style_remaining_5d5c1152eb",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\styles\\custom_game\\remaining_5d5c1152eb.css",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\styles\\custom_game\\remaining_5d5c1152eb.css",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\styles\\custom_game\\remaining_5d5c1152eb.vcss_c",
+      "contentExisted": true,
+      "artifactExisted": true,
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_224459\\remaining_5d5c1152eb.content.css",
+      "artifactBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\prerequisite_shading_20261008\\ui_build_20261008_224459\\remaining_5d5c1152eb.game.vcss_c",
+      "sourceHash": "56AD9852E486BDFF6AC5F501564E698DBA6F707B23ED247AADDFBC56DB7B8E9F",
+      "compiledHash": "5279DB6CAD7C008D66E9468A298AA156509826062102D75608568623937BC414"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ local rules = require("config/generated/fishing_system_rules")
 local M = {}
 local active_rule = nil
 local logged_in = {}
+local endless_batch_capability
 
 local function convar(name)
     if Convars and type(Convars.GetStr) == "function" then
@@ -60,6 +61,7 @@ end
 function M.init()
     active_rule = nil
     logged_in = {}
+    endless_batch_capability = nil
     for _, row in ipairs(rules.rows or {}) do
         if row.enabled ~= false then active_rule = row break end
     end
@@ -114,6 +116,43 @@ end
 
 function M.archive_submit(payload, on_success, on_error)
     request("/v1/archive/command", payload, on_success, on_error)
+end
+
+function M.archive_submit_endless_batch(payload, on_success, on_error)
+    local function send_batch()
+        if endless_batch_capability then
+            request("/v1/archive/endless-batch",payload,on_success,function(error,status)
+                if status==404 then endless_batch_capability=false;send_batch()
+                else on_error(error,status) end
+            end)
+            return
+        end
+        -- A previous server keeps the single-intent protocol. Submit only
+        -- the bounded batch selected by archive_service, then return one
+        -- authoritative profile to the game after its final receipt.
+        local results, index, profile = {}, 1, nil
+        local function submit_next()
+            local command=payload.commands[index]
+            if not command then on_success({ok=true,results=results,profile=profile});return end
+            M.archive_submit({account_id=payload.account_id,config_hash=payload.config_hash,command=command},function(result)
+                profile=result.profile or profile
+                local terminal=result.terminal==true and result.error~="archive_config_mismatch"
+                results[#results+1]={id=command.id,ok=result.ok==true,terminal=terminal,error=result.error}
+                if not result.ok and not terminal then
+                    on_success({ok=false,error=result.error,results=results,profile=profile});return
+                end
+                index=index+1;submit_next()
+            end,function(error,status)
+                on_success({ok=false,error=error,results=results,profile=profile})
+            end)
+        end
+        submit_next()
+    end
+    if endless_batch_capability~=nil then send_batch();return end
+    request("/v1/archive/config",{account_id=payload.account_id},function(result)
+        endless_batch_capability=result.capabilities and result.capabilities.endless_batch==1 or false
+        send_batch()
+    end,on_error)
 end
 
 function M.lottery_snapshot(payload, on_success, on_error)

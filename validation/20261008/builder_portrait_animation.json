@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-08",
+  "task": "Builder blank ScenePanel and one-shot construction feedback",
+  "root_cause": "Configured builder visual identity was absent from shared server portrait metadata and client portrait allowlist.",
+  "passed_suites": [
+    "scripts/vscripts/tests/test_builder_portrait_metadata.lua",
+    "tools/test_builder_portrait.cjs",
+    "scripts/vscripts/tests/test_builder_io_presentation.lua",
+    "scripts/vscripts/tests/test_builder_yield_construction.lua",
+    "scripts/vscripts/tests/test_builder_work_position.lua",
+    "scripts/vscripts/tests/test_builder_tower_rebuild.lua",
+    "scripts/vscripts/tests/test_wall_repair_detection.lua",
+    "scripts/vscripts/tests/test_building_astral_construction.lua",
+    "scripts/vscripts/tests/test_startup_asset_preload_service.lua",
+    "tools/test_seven_sins_portrait.cjs",
+    "tools/test_portrait_presentation.cjs",
+    "tools/test_multiselect_portraits.cjs",
+    "tools/test_portrait_metadata_sync.lua",
+    "tools/test_worker_ability_visibility.cjs"
+  ],
+  "lua51_syntax_files": 7,
+  "javascript_syntax": true,
+  "config_checks": [
+    {
+      "source": "data/csv/建筑与工人系统/builder_definitions.csv",
+      "generated_reproducible": true,
+      "changed_fields": [
+        "construction_activity",
+        "construction_particle",
+        "construction_sequence"
+      ],
+      "other_rows_unchanged": true
+    },
+    {
+      "source": "data/csv/资源系统/asset_catalog.csv",
+      "generated_reproducible": true,
+      "changed_fields": [
+        "particle_resources"
+      ],
+      "other_rows_unchanged": true
+    }
+  ],
+  "negative_baselines": {
+    "server_metadata_before_task": "new regression fails as expected",
+    "client_portrait_before_task": "new regression fails as expected"
+  },
+  "existing_failed_suite": {
+    "path": "tools/test_combat_stats_callbacks.cjs",
+    "line": 201,
+    "same_failure_before_task": true,
+    "reason": "Original HUD accepted-snapshot behavior retains the valid prior portrait; old fixture expects an unsupported blank update to clear it."
+  },
+  "native": {
+    "before": {
+      "entity": 156,
+      "portrait_unit_name": "",
+      "model_asset_id": ""
+    },
+    "after": {
+      "entity": 156,
+      "portrait_unit_name": "npc_dota_hero_wisp",
+      "model_asset_id": "builder_io_benevolent_companion",
+      "portrait_item_def": "9235"
+    },
+    "pixel_evidence": "output/map_build_c6/builder_portrait_after_20261008.png",
+    "portrait_mode": "Native default Io hero portrait; item_def is identity, not an equipped cosmetic API.",
+    "construction": {
+      "entity": 580,
+      "activity": "ACT_DOTA_ATTACK",
+      "sequence": "attack",
+      "duration_seconds": 1,
+      "finished_sequence": "ti7_io_idle",
+      "animation_token_cleared": true,
+      "work_particle": null,
+      "private_entities_cleaned": true
+    },
+    "api": "SequenceDuration(\"attack\") verified on actual prop_dynamic.",
+    "runtime_scope": "Live one-shot verification used the loaded 1-second fallback before the final explicit SequenceDuration argument correction. Final argument has native API and offline verification."
+  },
+  "compile": {
+    "combat_stats": true,
+    "content_source_equal": true,
+    "binary_bytes": 142736
+  },
+  "preservation": {
+    "original_lumberjack_filter_retained": true,
+    "concurrent_completed_ability_ui_retained": true,
+    "no_gameplay_numeric_changes": true
+  },
+  "git": "No commit/push requested in this task; changes remain in working tree.",
+  "file_sha256": {
+    "scripts/vscripts/ui/portrait_metadata.lua": "86ac25bd7c584d9e18904dc9efe48e04ec5ebcf18e201973988733a76a9cfb94",
+    "panorama/src/scripts/custom_game/combat_stats.js": "ff66f1ae9688871f35a81735a33589f2ae21bc76053e75dc181c8ae5b3537899",
+    "panorama/scripts/custom_game/combat_stats.vjs_c": "73e7ccbe238c70fd92afdbee4b7801ebe9a1e567264465b3589f076849e47a33",
+    "docs/ai/CURRENT_TASK.md": "65cb4d5c73188757099e8fe00bb98eebb9005b18d2de8d3d13f218bf1feed809",
+    "docs/ai/DECISIONS.md": "58ff6f002c942fc06d8f3244c80a583eda3f52b4bcbcd4503132a881f0acafb9",
+    "scripts/vscripts/systems/builder_presentation_service.lua": "e6adaac4af9b913d7d20936e0d8bd6f373c8d77a5b44811946f16bf51db15fe0",
+    "scripts/vscripts/tests/test_builder_io_presentation.lua": "892f7d7ef51a8470d43f3d5e7c3b2d7342879305e8fa4332cf0a72c270b0bee0",
+    "scripts/vscripts/tests/test_builder_yield_construction.lua": "4cea2ace5349fc5f76164f7b7becfd46d35276b6b4d888dbdb2f80626eb44fe7",
+    "data/csv/建筑与工人系统/builder_definitions.csv": "fd334c0ae1272415c4ff40ff77971985bf451b53bf67834169c69f3a0039e3c2",
+    "data/csv/资源系统/asset_catalog.csv": "8ad1022c0c9a304d0f7e5be2cc9e1e71b2a418cd96fcfcf783a1093562f542bc",
+    "scripts/vscripts/config/generated/builder_definitions.lua": "f856e87aaaf1e90155e4043277dc28a519ff60f444cb57914ba8d53aa32d479f",
+    "scripts/vscripts/config/generated/asset_catalog.lua": "02471c4e1f438fb043140fb0e4bf9a4ba897899a7d38b099d97e15ed62d88b26",
+    "docs/ai/PROJECT_CONTEXT.md": "83ab79fea1855e5c2183fb875e32aa8bb64d71c81ff00b17f0e1da8ab9bb021f",
+    "tools/test_builder_portrait.cjs": "bc25de5a9035b5c88a809ab0fe74909929c63b2926a456abc3d31c67cac2e2ca",
+    "scripts/vscripts/tests/test_builder_portrait_metadata.lua": "c23bf75e7a20fc82c26fb741a2fc2100848b0469b722c409f91bb88681e41d5a",
+    ".gitignore": "d068169411c1cc480c0cf76e984362bd7b0ee265740c465fecff170f82b0fbe9"
+  },
+  "test_tracking": "New Lua portrait regression explicitly allowed by .gitignore."
+}

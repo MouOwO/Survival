@@ -25,28 +25,54 @@ local function remove_entity(entity)
     end
 end
 
-local function clear_state(entindex)
-    local visual_state = state_by_unit[entindex]
+local function stop_particles(visual_state)
     if not visual_state then return end
-    state_by_unit[entindex] = nil
-    for _, particle in ipairs(visual_state.particles or {}) do
-        pcall(function()
-            ParticleManager:DestroyParticle(particle, true)
-            ParticleManager:ReleaseParticleIndex(particle)
-        end)
+    local particles = visual_state.particles
+    visual_state.particles = {}
+    for _, particle in ipairs(particles or {}) do
+        safe_call(ParticleManager, "DestroyParticle", particle, true)
+        safe_call(ParticleManager, "ReleaseParticleIndex", particle)
     end
+end
+
+local function clear_state(visual_state)
+    if not visual_state then return end
+    if state_by_unit[visual_state.entindex] == visual_state then
+        state_by_unit[visual_state.entindex] = nil
+    end
+    if visual_state.owner and visual_state.owner.survival_monster_visual_state == visual_state then
+        visual_state.owner.survival_monster_visual_state = nil
+    end
+    stop_particles(visual_state)
     for _, attachment in ipairs(visual_state.attachments or {}) do
         remove_entity(attachment)
     end
 end
 
-function M.cleanup(unit_or_entindex)
+local function owned_state(unit_or_entindex)
     local entindex = tonumber(unit_or_entindex)
+    if entindex then return state_by_unit[entindex] end
+    if not unit_or_entindex then return nil end
+    local owned = unit_or_entindex.survival_monster_visual_state
+    if owned and owned.owner == unit_or_entindex then return owned end
     if not entindex and valid(unit_or_entindex)
         and type(unit_or_entindex.entindex) == "function" then
         entindex = unit_or_entindex:entindex()
     end
-    if entindex then clear_state(entindex) end
+    local state = entindex and state_by_unit[entindex]
+    return state and state.owner == unit_or_entindex and state or nil
+end
+
+function M.cleanup(unit_or_entindex)
+    clear_state(owned_state(unit_or_entindex))
+end
+
+function M.on_death(unit)
+    stop_particles(owned_state(unit))
+    if unit and unit.survival_monster_corpse == true
+        and unit.survival_wave_cleanup ~= true then return true end
+    M.cleanup(unit)
+    return true
 end
 
 local function spawn_component(unit, component)
@@ -97,13 +123,13 @@ function M.apply(unit, resolved)
     end
 
     local entindex = unit:entindex()
-    clear_state(entindex)
+    clear_state(state_by_unit[entindex])
     local model_ok = safe_call(unit, "SetModel", resolved.model_path)
     local original_ok = safe_call(unit, "SetOriginalModel", resolved.model_path)
     if not model_ok and not original_ok then return false, "model_apply_failed" end
     safe_call(unit, "SetModelScale", tonumber(resolved.model_scale) or 1)
 
-    local visual_state = { attachments = {}, particles = {} }
+    local visual_state = { owner = unit, entindex = entindex, attachments = {}, particles = {} }
     for _, component in ipairs(resolved.components or {}) do
         if component.enabled ~= false and tostring(component.model_path or "") ~= "" then
             local attachment = spawn_component(unit, component)
@@ -124,6 +150,7 @@ function M.apply(unit, resolved)
         if #visual_state.particles >= MAX_PARTICLES_PER_UNIT then break end
     end
     state_by_unit[entindex] = visual_state
+    unit.survival_monster_visual_state = visual_state
     unit.survival_monster_visual_asset_id = resolved.visual_asset_id
     unit.survival_monster_visual_role = resolved.visual_role
     return true, resolved.visual_asset_id

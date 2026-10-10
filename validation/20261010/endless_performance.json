@@ -1,0 +1,73 @@
+{
+  "task": "无尽挑战卡顿、VConsole 连接和积分五秒批量上报",
+  "live_capture": {
+    "version": "before_game_lua_reload",
+    "real_seconds": 20.132,
+    "starting_wave": 20,
+    "scheduler_ticks": 264,
+    "scheduler_max_tick_ms": 4.168,
+    "spawn_max_ms": 0.727,
+    "profile_apply_max_ms": 4.642,
+    "hero_attack_dispatch_max_ms": 6.005,
+    "native_monkey_think_warnings_ms": [11.12, 10.22],
+    "nested_measurements_are_not_additive": true,
+    "half_second_server_stall_captured": false,
+    "after_reload_comparison_completed": false
+  },
+  "changes": {
+    "online_endless_batch_interval_game_seconds": 5,
+    "max_waves_per_http_batch": 32,
+    "apply_final_profile_once_per_batch": true,
+    "flush_on_end_disconnect_and_finalization": true,
+    "existing_per_wave_receipt_ids_preserved": true,
+    "retries_are_idempotent": true,
+    "same_dispatch_growth_commits_tested": 4,
+    "same_dispatch_final_projections": 1,
+    "growth_projection_deferral_crosses_frames": false,
+    "stable_monkey_clone_stat_recalculations_per_second_before": 20,
+    "stable_monkey_clone_stat_recalculations_per_second_after": 0,
+    "unchanged_native_setters_skipped": true
+  },
+  "console": {
+    "problem": "GUI 自动连接失效的 29001 中继，Dota 仍监听 29000",
+    "restored_with_hidden_existing_relay": true,
+    "gui_and_game_restarted": false,
+    "echo_confirmed": true,
+    "diagnostic_history_replay_suppressed": true,
+    "repair_script_regressions_per_shell": 36,
+    "shells": ["Windows PowerShell 5.1", "PowerShell 7"]
+  },
+  "deployment": {
+    "release": "20261010-endless-batch-v1",
+    "previous_release": "20261009-archive-sync-v1",
+    "bundle": "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4",
+    "package_sha256": "a3e1cd930e9539d79351614c02ace88ecc98b4f048be9c083d155d891fb075b7",
+    "activated_and_verified": true,
+    "changed_backend_files": ["archive_backend/service.py", "fishing_api/server.py"],
+    "service_state": "active/running",
+    "database_schema_changed": false,
+    "player_rewards_written_by_verification": false,
+    "previous_release_preserved": true
+  },
+  "verification": {
+    "endless_batch_game_and_http": "pass",
+    "archive_service_regression": "pass",
+    "new_backend_cases": 7,
+    "existing_backend_cases": 26,
+    "production_handler_auth_match_gate_and_pure_projection": "pass",
+    "event_bus_80000_deliveries_and_nested_reset": "pass",
+    "after_dispatch_order_reentry_error_reset": "pass",
+    "hero_growth_getter_equipment_deletion_rebirth": "pass",
+    "monkey_clone_native_cost_hp_ratio_and_attack_rate": "pass",
+    "monkey_clone_q_and_passive_lifecycle": "pass",
+    "endless_spawn_sequence_assertions": 824,
+    "four_player_spawn_cost_world_scans": 0,
+    "lua_and_node_syntax": "pass",
+    "changed_tracked_files_diff_check": "pass",
+    "unrelated_existing_failures": [
+      "test_hero_rogue_projection.lua:157: old attack-speed expectation also fails with original synchronous handlers",
+      "test_lumberjack_growth_ui.lua:43: existing UI task-count expectation fails before hero service is loaded"
+    ]
+  },
+  "git": {"commit_requested_in_current_task": false, "committed": false}
+}

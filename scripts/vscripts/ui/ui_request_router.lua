@@ -618,7 +618,7 @@ local function register_tower_auto_upgrade_toggle_request()
         event_bus.emit(events.UI_NOTIFICATION, {
             player_id = player_id,
             message = result and result.ok and (result.enabled
-                and "已开启当前阶段自动升级，资源不足时等待" or "已取消自动升级")
+                and "已开启自动升级，每秒检查一次，资源不足时等待" or "已取消自动升级")
                 or (result and result.error or "自动升级设置失败"),
             level = result and result.ok and "info" or "error",
         })
@@ -1359,18 +1359,50 @@ local function register_return_home_request()
     end)
 end
 
+-- Resource transactions keep stable error codes; every notification consumer
+-- receives the readable cost failure, including native and batch upgrade paths.
+local resource_failure_messages = {
+    wood_not_enough = "木材不足",
+    gold_not_enough = "金币不足",
+    population_not_enough = "人口不足",
+    not_enough_wood = "木材不足",
+    not_enough_gold = "金币不足",
+    not_enough_population = "人口不足",
+    insufficient_wood = "木材不足",
+    insufficient_gold = "金币不足",
+}
+
 local function on_notification(payload)
+    payload = payload or {}
+    local player_id = tonumber(payload.player_id)
+    local broadcast = payload.audience == "all" and payload.kind ~= "research_success"
     local notification = {
-        message = payload.message or "",
+        message = resource_failure_messages[payload.message] or payload.message or "",
         level = payload.level or "info",
+        audience = broadcast and "all" or "player",
+        player_id = player_id,
+        kind = payload.kind or "message",
+        subject = payload.subject,
+        ability_icon = payload.ability_icon,
+        actor_name = payload.actor_name,
+        hero_name = payload.hero_name,
     }
-    if payload.audience == "all" then
+    if broadcast and player_id and player_id >= 0 and PlayerResource then
+        if not notification.actor_name and type(PlayerResource.GetPlayerName) == "function" then
+            notification.actor_name = PlayerResource:GetPlayerName(player_id)
+        end
+        if not notification.hero_name and type(PlayerResource.GetSelectedHeroName) == "function" then
+            notification.hero_name = PlayerResource:GetSelectedHeroName(player_id)
+        end
+    end
+    if broadcast then
         CustomGameEventManager:Send_ServerToAllClients(
             "ui_notification", notification
         )
         return
     end
-    send_to_player("ui_notification", payload.player_id, notification)
+    if not player_id or player_id < 0 then return end
+    send_to_player("ui_notification", player_id, notification)
 end
 
 local function register_rogue_reward_requests()

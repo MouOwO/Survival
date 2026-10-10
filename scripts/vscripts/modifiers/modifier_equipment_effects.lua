@@ -88,10 +88,13 @@ function modifier_equipment_effects:OnIntervalThink()
                     local damage = attributes(self.player_id)
                         * (tonumber(value.multiplier) or 0)
                     for _, victim in ipairs(victims) do
-                        -- DAMAGE_MODULE_MIGRATION: legacy aura damage remains for compatibility;
-                        -- migrate after validating interval/aura transaction semantics.
-                        ApplyDamage({ victim = victim, attacker = parent, damage = damage,
-                            damage_type = DAMAGE_TYPE_MAGICAL, ability = nil })
+                        -- Native filter keys can omit both category and ability.
+                        -- This transaction preserves the aura's logical damage
+                        -- independently of the hero's native attack projection.
+                        require("combat/damage_service"):Deal({
+                            victim = victim, attacker = parent, base_damage = damage,
+                            source_kind = "item", damage_type = DAMAGE_TYPE_MAGICAL,
+                        })
                     end
                 end
             end
@@ -118,6 +121,8 @@ function modifier_equipment_effects:AddCustomTransmitterData()
     local current = values(self)
     return {
         attack_flat = tonumber(current.attack_flat) or 0,
+        native_attack_flat = (tonumber(current.attack_flat) or 0)
+            / math.max(1, tonumber(self:GetParent().survival_endless_attack_scale) or 1),
         attack_speed_pct = tonumber(current.attack_speed_pct) or 0,
         health_flat = tonumber(current.health_flat) or 0,
         armor_flat = tonumber(current.armor_flat) or 0,
@@ -130,7 +135,12 @@ function modifier_equipment_effects:HandleCustomTransmitterData(data)
 end
 
 function modifier_equipment_effects:GetModifierPreAttack_BonusDamage()
-    return tonumber(values(self).attack_flat) or 0
+    local current = values(self)
+    if IsServer() then
+        return (tonumber(current.attack_flat) or 0)
+            / math.max(1, tonumber(self:GetParent().survival_endless_attack_scale) or 1)
+    end
+    return tonumber(current.native_attack_flat) or tonumber(current.attack_flat) or 0
 end
 function modifier_equipment_effects:GetModifierAttackSpeedBonus_Constant()
     return tonumber(values(self).attack_speed_pct) or 0

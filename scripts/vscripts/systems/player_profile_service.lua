@@ -826,14 +826,35 @@ function M.is_loading(player_id)
     return pending_load_generation_by_player[tonumber(player_id)] ~= nil
 end
 
-function M.get_profile(player_id)
+local function loaded_profile(player_id)
     local profile = profiles_by_player[tonumber(player_id)]
-    return profile and matches_current_match(profile) and copy(profile) or nil
+    return profile and matches_current_match(profile) and profile or nil
 end
 
--- Account eligibility/UI only. Combat consumers must use get_profile instead.
+function M.get_profile(player_id)
+    local profile = loaded_profile(player_id)
+    return profile and copy(profile) or nil
+end
+
+-- Combat reads one scalar from the loaded match profile, never the account/UI
+-- inventory or a mutable save. Direct reads observe patches before their events
+-- are dispatched and cannot retain ownership across account or match changes.
+function M.get_content_inventory_count(player_id, content_id)
+    player_id = tonumber(player_id)
+    if not integer(player_id) or player_id == math.huge
+        or type(content_id) ~= "string" or content_id == "" then return nil end
+    local profile = loaded_profile(player_id)
+    if not profile or current_account_id(player_id) ~= profile.account_id then return nil end
+    local inventory = profile.save and profile.save.content_inventory
+    local count = tonumber(type(inventory) == "table" and inventory[content_id]) or 0
+    return count == count and count < math.huge and math.max(0, math.floor(count)) or 0
+end
+
+-- Account eligibility/UI only. Combat consumers use the match profile APIs.
 function M.get_account_profile(player_id)
-    local profile = M.get_profile(player_id)
+    -- Validate the same current-match profile without copying it just to pick
+    -- the separate account/UI snapshot. Callers still receive their own copy.
+    local profile = loaded_profile(player_id)
     if not profile then return nil end
     return copy(account_profiles_by_player[tonumber(player_id)] or profile)
 end
@@ -980,7 +1001,7 @@ function M.init(options)
             for id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do
                 if PlayerResource and PlayerResource:IsValidPlayerID(id)
                     and tonumber(PlayerResource:GetSteamAccountID(id) or 0)>0
-                    and not M.get_profile(id) and not pending_load_generation_by_player[id]
+                    and not loaded_profile(id) and not pending_load_generation_by_player[id]
                     and GameRules:GetGameTime()>=(next_retry[id] or -math.huge) then
                     local player_id=id
                     local function finished()

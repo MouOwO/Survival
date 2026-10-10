@@ -1,0 +1,31 @@
+'use strict';
+const fs=require('fs'),path=require('path'),cp=require('child_process'),vm=require('vm'),assert=require('assert');
+const root='D:/SteamLibrary/steamapps/common/dota 2 beta/content/dota_addons/Survival';
+const git=(...args)=>cp.execFileSync('git',args,{cwd:root,encoding:'utf8'});
+const out=path.resolve('output/content_merge_'+new Date().toISOString().replace(/[:.]/g,'_'));fs.mkdirSync(out,{recursive:true});
+fs.writeFileSync(path.join(out,'status.txt'),git('status','--porcelain=v1'));
+fs.writeFileSync(path.join(out,'stages.txt'),git('ls-files','--stage'));
+fs.writeFileSync(path.join(out,'stashes.txt'),git('stash','list','--format=%H %gs'));
+const files=['panorama/layout/custom_game/archive.xml','panorama/scripts/custom_game/world_health_bar_anchor.js'];
+for(const f of files){const target=path.join(out,f);fs.mkdirSync(path.dirname(target),{recursive:true});fs.copyFileSync(path.join(root,f),target);}
+let xml=git('show',':3:'+files[0]);
+assert(!xml.includes('native_ui_icons.js'));
+xml=xml.replace('<include src="file://{resources}/scripts/custom_game/item_art_remaining_5d5c1152eb.js"/>','<include src="file://{resources}/scripts/custom_game/native_ui_icons.js"/><include src="file://{resources}/scripts/custom_game/item_art_remaining_5d5c1152eb.js"/>');
+assert(xml.includes('native_ui_icons.js')&&xml.includes('title_world_overlap_v30.js')&&xml.includes('archive_180de7e38b_titles_compact_v6.js'));
+let js=git('show',':2:'+files[1]);
+js=js.replace('var sx = Number(container.actualuiscale_x) || 1;','var sx = Number(container.actualuiscale_x);\n        if (!isFinite(sx) || sx <= 0 || sx > 1000000) sx = 1;');
+js=js.replace('var sy = Number(container.actualuiscale_y) || 1;','var sy = Number(container.actualuiscale_y);\n        if (!isFinite(sy) || sy <= 0 || sy > 1000000) sy = 1;');
+js=js.replace('var ox = Number(offset.x) || 0, oy = Number(offset.y) || 0;','// Hidden/new Panorama hosts can report FLT_MAX before layout.\n        var ox = Number(offset && offset.x), oy = Number(offset && offset.y);\n        if (!isFinite(ox) || Math.abs(ox) > 1000000) ox = 0;\n        if (!isFinite(oy) || Math.abs(oy) > 1000000) oy = 0;');
+js=js.replace('if (!isFinite(x) || !isFinite(y) || x < 0 || y < 0) return null;','if (!isFinite(x) || !isFinite(y) || x < 0 || y < 0 || x > 1000000 || y > 1000000) return null;');
+const config={},coords={x:200,y:200};vm.runInNewContext(js,{GameUI:{CustomUIConfig:()=>config},Entities:{GetHealthBarOffset:()=>190},Game:{WorldToScreenX:()=>coords.x,WorldToScreenY:()=>coords.y},isFinite});
+const api=config.SurvivalWorldHealthBarAnchor;
+const host={actualuiscale_x:2,actualuiscale_y:2,actuallayoutwidth:500,actuallayoutheight:500,GetPositionWithinWindow:()=>({x:100,y:100})};
+let p=api.Project(1,[0,0,0],host,api.Capture(host));assert.equal(p.left,19);assert.equal(p.top,24);
+coords.x=1170;assert.equal(api.Project(1,[0,0,0],host),null);
+coords.x=1120;assert(api.Project(1,[0,0,0],host));
+coords.x=200;host.GetPositionWithinWindow=()=>({x:3.4028235e38,y:3.4028235e38});assert.equal(api.Capture(host).ox,0);assert.equal(api.Project(1,[0,0,0],host).left,69);
+host.GetPositionWithinWindow=()=>null;assert.equal(api.Capture(host).oy,0);
+host.actualuiscale_x=Infinity;host.actualuiscale_y=-1;assert.equal(api.Capture(host).sx,1);assert.equal(api.Capture(host).sy,1);
+coords.x=3.4028235e38;assert.equal(api.Project(1,[0,0,0],host),null);
+for(const [f,s] of [[files[0],xml],[files[1],js]]){assert(!/^(<<<<<<<|=======|>>>>>>>)/m.test(s));fs.writeFileSync(path.join(root,f),s.replace(/\r?\n/g,'\r\n'));}
+console.log(JSON.stringify({backup:out,resolved:files,anchorChecks:9,archive:'remote title controller + local native icons',stashes:'untouched'},null,2));

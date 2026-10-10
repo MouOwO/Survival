@@ -74,4 +74,4 @@ building_gold_mine_lv28,building_gold_mine,28,金矿LV28,3000,35,440000,0,0,3,�
 building_gold_mine_lv29,building_gold_mine,29,金矿LV29,3000,36,520000,0,0,3,金矿LV28,,models/survival_buildings/gold_mine_lv10.vmdl,1,建筑等级统一表,,1150
 building_gold_mine_lv30,building_gold_mine,30,金矿LV30,3000,37,620000,0,0,3,金矿LV29,,models/survival_buildings/gold_mine_lv10.vmdl,1,建筑等级统一表,最高等级。,1300
 building_hero_altar_lv01,building_hero_altar,1,英雄祭坛,,,300,100,0,3,主城LV3,,models/survival_buildings/hero_altar.vmdl,1,building_definitions.csv cost migration,LV1成本作为建造费用。,
-building_challenge_lv01,building_challenge,1,Challenge Building,2500,8,100,0,0,1,Research Lab,,models/survival_buildings/challenge_arena.vmdl,1,building challenge,No upgrade.,
+building_challenge_lv01,building_challenge,1,挑战建筑,2500,8,100,0,0,1,Research Lab,,models/survival_buildings/challenge_arena.vmdl,1,building challenge,No upgrade.,

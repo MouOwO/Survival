@@ -119,6 +119,7 @@ local function fixture()
     city.survival_grid_footprint = config.main_city.footprint
     city.position = Vector(64, 704, 0)
     bus.handle_request(events.BUILDER_GET_REQUEST, function() return {ok = true, player_id = 0, builder = builder} end)
+    bus.handle_request(events.RESOURCE_CAN_SPEND_REQUEST,function() return {ok=true} end)
     bus.handle_request(events.RESOURCE_RELEASE_POP_REQUEST, function(payload)
         pop_releases[#pop_releases + 1] = payload; return {ok = true}
     end)
@@ -161,7 +162,8 @@ assert(base_count() == 6 and #pop_releases == 1)
 -- reservation, not short-circuit after the first successful release.
 victim = fixture()
 local promoted = tower(14, "class_1")
-assert(query(promoted) and base_count() == 7 and slot("class_1").count == 1)
+assert(query(promoted) and base_count() == 8 and slot("class_1").count == 1,
+    "recovered promoted towers count toward the same owner total, including preexisting overflow")
 for index = 1, 7 do assert(slot("class_" .. tostring(index), "reserve", promoted).ok) end
 assert(slot("class_3", "reserve", victim).ok)
 promoted.alive = false
@@ -189,3 +191,48 @@ for _, unit in ipairs(units) do
 end
 assert(#destroyed == 8 and #pop_releases == 7, "late cleanup events cannot release resources twice")
 print("TOWER_DESTRUCTION_REBUILD_PASS: synchronous manual cleanup, live cap, immediate rebuild, delayed duplicate, natural death, visual failures, all route reservations")
+
+-- Promotion retains a slot; a true seven-material fusion replaces seven
+-- living source towers with one ultimate rather than reserving history.
+victim = fixture()
+bus.emit(events.BUILDING_CHANGED, {entindex=victim:entindex(),unit=victim,
+    player_id=0,team=2,building_id="arrow_tower",level=6,tower_class="class_1"})
+assert(base_count() == 7 and slot("class_1").count == 1 and not can_build(victim).ok)
+local consumed = bus.request(events.BUILDING_FUSION_CONSUME_REQUEST, {player_id=0})
+assert(consumed.ok and consumed.consumed == 7 and base_count() == 0)
+local ultimate = tower(30)
+ultimate.survival_building_id, ultimate.survival_ultimate_tower = nil, true
+local payload = {unit=ultimate,entindex=ultimate:entindex(),player_id=0,team=2,building_id="ultimate_tower"}
+bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED,payload)
+bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED,payload)
+assert(base_count() == 1 and bus.request(events.BUILDING_COUNTS_REQUEST,{player_id=0}).counts.arrow_tower == 1,
+    "one committed ultimate occupies one slot; movement/runtime refresh cannot duplicate it")
+building._recover_existing_for_test()
+assert(base_count() == 1, "recovery deduplicates already registered living ultimates")
+for i=1,6 do assert(query(tower(36+i*4))) end
+assert(base_count() == 7 and not can_build(victim).ok,
+    "one ultimate plus six base towers reaches the same seven-tower cap")
+ultimate.alive = false
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=ultimate})
+assert(base_count() == 6, "natural ultimate death releases its count before any delayed runtime removal")
+bus.emit(events.TOWER_FUSION_RUNTIME_REMOVED,{entindex=ultimate:entindex(),player_id=0})
+bus.emit(events.TOWER_FUSION_RUNTIME_REMOVED,{entindex=ultimate:entindex(),player_id=0})
+assert(base_count() == 6 and can_build(victim).ok, "ultimate death releases exactly one reusable slot")
+print("PLAYER_TOWER_FUSION_CAP_PASS: promotion retention, seven materials to one ultimate, deduplicated movement/recovery, combined cap and ultimate death")
+
+-- Direct commerce construction must use the same current total before any
+-- model preparation or resource spend, including accepted construction orders.
+local previous_commerce = package.loaded["systems/commerce_effects"]
+package.loaded["systems/commerce_effects"] = {owned = function() return true end}
+local fusion = require("systems/tower_fusion_service")
+local direct_caster = units[#units]
+building._building_limit_for_test.change_count(0,"arrow_tower",1)
+local rejected = fusion.commerce_build(0,direct_caster,Vector(10000,10000,0))
+assert(not rejected.ok and rejected.error:find("7",1,true),
+    "direct ultimate construction must reject the full shared cap before preparing a model")
+building._building_limit_for_test.change_count(0,"arrow_tower",-1)
+local next_check = fusion.commerce_build(0,direct_caster,Vector(10000,10000,0))
+assert(not next_check.ok and next_check.error:find("1200",1,true),
+    "freeing a slot allows normal placement validation to proceed")
+package.loaded["systems/commerce_effects"] = previous_commerce
+print("PLAYER_TOWER_COMMERCE_CAP_PASS: direct ultimate purchase shares the current per-owner limit before placement/spend")

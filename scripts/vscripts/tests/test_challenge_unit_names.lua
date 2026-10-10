@@ -38,6 +38,15 @@ for _, member in ipairs(members.rows) do
     end
 end
 for _, row in ipairs(buildings.rows) do check(row, row.display_name) end
+local juggernaut = assert(kv:match('"npc_survival_named_challenge_monster_04"%s*(%b{})'))
+assert(juggernaut:match('"Model"%s*"([^"]+)"')
+    == buildings.by_id.challenge_monster_04.model_path, "challenge Juggernaut must spawn with its declared body")
+local locomotion = assert(juggernaut:match('"MovementSpeedActivityModifiers"%s*(%b{})'),
+    "challenge Juggernaut needs Valve locomotion tags")
+for name, threshold in pairs({walk="0", run="345", run_fast="373"}) do
+    assert(locomotion:match('"' .. name .. '"%s*"([^"]+)"') == threshold, name)
+end
+print("CHALLENGE_JUGGERNAUT_LOCOMOTION_PASS: native body, walk, run and run_fast tags")
 for id, name in pairs({practice_wood_spirit="木头精",practice_gold_spirit="金币精",practice_attribute_spirit="属性精",practice_greater_attribute_spirit="大属性精"}) do
     check(archetypes.by_id[id], name)
 end

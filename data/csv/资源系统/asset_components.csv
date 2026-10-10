@@ -54,6 +54,15 @@ monster_default_juggernaut:back,monster_default_juggernaut,back,models/heroes/ju
 monster_default_juggernaut:head,monster_default_juggernaut,head,models/heroes/juggernaut/jugg_mask.vmdl,prop_dynamic,,bone_merge,,idle,1,,,3,1,Verified default Juggernaut head.
 monster_default_juggernaut:legs,monster_default_juggernaut,legs,models/heroes/juggernaut/juggernaut_pants.vmdl,prop_dynamic,,bone_merge,,idle,1,,,4,1,Verified default Juggernaut legs.
 monster_default_juggernaut:weapon,monster_default_juggernaut,weapon,models/heroes/juggernaut/jugg_sword.vmdl,prop_dynamic,,bone_merge,,idle,1,,,5,1,Verified default Juggernaut weapon.
+monster_default_alchemist:back,monster_default_alchemist,back,models/heroes/alchemist/alchemist_goblin_body.vmdl,prop_dynamic,,bone_merge,,idle,1,,,1,1,Valve默认炼金地精身体；ItemDef 117。
+monster_default_alchemist:weapon,monster_default_alchemist,weapon,models/heroes/alchemist/alchemist_scabbard.vmdl,prop_dynamic,,bone_merge,,idle,1,,,2,1,Valve默认炼金武器；ItemDef 118。
+monster_default_alchemist:armor,monster_default_alchemist,armor,models/heroes/alchemist/alchemist_saddlehat.vmdl,prop_dynamic,,bone_merge,,idle,1,,,3,1,Valve默认炼金护甲；ItemDef 119。
+monster_default_alchemist:arms,monster_default_alchemist,arms,models/heroes/alchemist/alchemist_gauntlets.vmdl,prop_dynamic,,bone_merge,,idle,1,,,4,1,Valve默认炼金护腕；ItemDef 120。
+monster_default_alchemist:neck,monster_default_alchemist,neck,models/heroes/alchemist/alchemist_goblinhat.vmdl,prop_dynamic,,bone_merge,,idle,1,,,5,1,Valve默认炼金地精帽；ItemDef 121。
+monster_default_alchemist:offhand_weapon,monster_default_alchemist,offhand_weapon,models/heroes/alchemist/alchemist_leftbottle.vmdl,prop_dynamic,,bone_merge,,idle,1,,,6,1,Valve默认炼金副手药瓶；ItemDef 122。
+monster_default_alchemist:head,monster_default_alchemist,head,models/heroes/alchemist/alchemist_goblin_head.vmdl,prop_dynamic,,bone_merge,,idle,1,,,7,1,Valve默认炼金地精头；ItemDef 123。
+monster_default_alchemist:body_head,monster_default_alchemist,body_head,models/heroes/alchemist/alchemist_ogre_head.vmdl,prop_dynamic,,bone_merge,,idle,1,,,8,1,Valve默认炼金食人魔头；ItemDef 124。
+monster_default_alchemist:shoulder,monster_default_alchemist,shoulder,models/heroes/alchemist/alchemist_shoulderbottles.vmdl,prop_dynamic,,bone_merge,,idle,1,,,9,1,Valve默认炼金肩部药瓶；ItemDef 125。
 hero_permanent_hero_axe:molten_fist_armor,hero_permanent_hero_axe,molten_fist_armor,models/items/axe/axe_lava_legion_commander_armor/axe_lava_legion_commander_armor.vmdl,prop_dynamic,,bone_merge,,idle,1,,,1,1,熔焰之拳护甲（物品25824）。
 hero_permanent_hero_axe:molten_fist_belt,hero_permanent_hero_axe,molten_fist_belt,models/items/axe/axe_lava_legion_commander_belt/axe_lava_legion_commander_belt.vmdl,prop_dynamic,,bone_merge,,idle,1,,,2,1,熔焰之拳腰带（物品25825）。
 hero_permanent_hero_axe:molten_fist_belt_underlay,hero_permanent_hero_axe,molten_fist_belt_underlay,models/items/axe/ti9_jungle_axe/axe_ti9__undie.vmdl,prop_dynamic,,bone_merge,,idle,1,,,3,1,熔焰之拳腰带物品25825声明的官方additional_wearable内衬。

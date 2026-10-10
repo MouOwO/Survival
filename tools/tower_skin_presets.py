@@ -27,6 +27,11 @@ ROUTES = {
  'anti_air': ('techies', ('', '', ''), ('21424',), ('20610',)),
 }
 NAMES = {'A':'原生清晰', 'B':'暗色猎手', 'C':'华丽典礼'}
+ANTI_AIR_PROJECTILES = (
+ 'particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf',
+ 'particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow.vpcf',
+ 'particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow_deso.vpcf',
+)
 BASES = ['io_amber_portal','leshrac_edict','kinetic_markers','bulldoze_ring','clinkz_embers','io_blue_portal','psionic_trap']
 DEATH_BASE_COLORS = {'color_r':'255|150|55', 'color_sr':'255|150|55', 'color_ssr':'255|150|55'}
 COLORS = {'A':['165|100|245','155|165|255','105|195|255','255|185|95','255|130|65','145|220|255','145|215|250'],
@@ -119,9 +124,9 @@ def projections(vpk, schema, loc, preset):
             elif hero=='lich':
                 attack=[skill_path('lich','lich_chain_frost'),'particles/econ/items/lich/lich_ti8_immortal_arms/lich_ti8_chain_frost.vpcf',{'A':'particles/survival/towers/trial/frost_ssr_comet.vpcf','B':'particles/survival/towers/trial/frost_ssr_chain.vpcf','C':'particles/survival/towers/trial/frost_ssr_chain.vpcf'}[preset]][tier];mode='fallback_native_skill' if tier==0 else 'native_cosmetic_skill_as_attack' if tier==1 else 'fallback_custom'
             elif hero=='techies':
-                # Techies' native attacks throw bombs/bananas. This route explicitly
-                # asks for missiles, so use native Clockwerk art on a tracking adapter.
-                attack='particles/survival/towers/techies/techies_'+['r','sr','ssr'][tier]+'_missile.vpcf';mode='adapted_native_missile'
+                # Match multi SR's searing arrow, then distinguish higher tiers
+                # with Maraxiform's Ire and its native red Desolator variant.
+                attack=ANTI_AIR_PROJECTILES[tier];mode='native_searing_arrow' if tier==0 else 'native_cosmetic_searing_arrow' if tier==1 else 'native_cosmetic_searing_arrow_deso'
             if hero in ('tinker','zuus'):mode='suppressed_by_continuous_laser' if hero=='tinker' else 'replaced_by_ranked_lightning'
             verify(vpk,attack);attacks[aid]=attack
             if hero=='nevermore' and tier==2:
@@ -147,6 +152,9 @@ def write_base_profiles(preset):
         n=int(r['profile_id'].split('_')[1])-1
         for key in ('core','detail','detail_ssr','crown'):r[key]=''
         r.update(native_base=BASES[n],color=COLORS[preset][n],radius_r='96',radius_sr='108',radius_ssr='120',alpha={'A':'0.9','B':'0.95','C':'0.95'}[preset],enabled='1',native_base_r='',color_r='',color_sr='',color_ssr='')
+        if r['profile_id'] in {'class_1', 'class_6'}:
+            # Retain the requested 75% portal size across outfit switches.
+            r.update(radius_r='72', radius_sr='81', radius_ssr='90', radius_ur='96')
         if r['profile_id']=='class_1':
             # Outfit switches must preserve the requested orange portal and
             # the transfer of the old sigil to the initial machine-gun tower.

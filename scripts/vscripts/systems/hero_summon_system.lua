@@ -1,11 +1,11 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local heroes = require("config/generated/hero_definitions")
-local summon_rules = require("config/generated/hero_summon_rules")
 local stat_adapter = require("systems/hero_stat_adapter")
 local cosmetic_service = require("systems/hero_cosmetic_service")
 local projection = require("systems/hero_summon_projection")
 local summon_access = require("systems/hero_summon_access")
+local summon_eligibility = require("systems/hero_summon_eligibility")
 local hero_anchor_service = require("systems/hero_anchor_service")
 local destination_validation = require("systems/destination_validation_service")
 local summon_destination = require("systems/hero_summon_destination")
@@ -19,6 +19,7 @@ local M = {}
 local altar_by_player = {}
 local builder_by_player = {}
 local city_level_by_player = {}
+local city_unit_by_player = {}
 local summoned_by_player = {}
 local replacing_by_player = {}
 local pending_by_player = {}
@@ -46,14 +47,6 @@ local function event_player_id(payload)
     return valid_player_id(player_id) and player_id or nil
 end
 
-local function rule()
-    return summon_rules.rows and summon_rules.rows[1] or {
-        max_summoned_heroes = 1,
-        requires_city_level = 3,
-        shop_unlock_after_summon = true,
-    }
-end
-
 local function current_summon(player_id)
     if unavailable_reason(player_id) then return nil end
     local state = summoned_by_player[player_id]
@@ -61,12 +54,18 @@ local function current_summon(player_id)
 end
 
 local function snapshot(player_id)
-    return projection.build(
+    local data = projection.build(
         player_id,
         altar_by_player[player_id],
         city_level_by_player[player_id] or 0,
         current_summon(player_id)
     )
+    local blocked = unavailable_reason(player_id)
+    if blocked then
+        data.summon_unlocked = 0
+        data.summon_disabled_reason = blocked
+    end
+    return data
 end
 
 local function publish(player_id, reason)
@@ -228,7 +227,15 @@ local function validate(player_id, hero_id, debug_bypass)
     end
 
     local altar = altar_by_player[player_id]
-    if debug_bypass and not valid_entity(altar) then
+    local unlocked, unlock_error = summon_eligibility.check(
+        player_id, city_level_by_player[player_id], altar
+    )
+    if not debug_bypass and not unlocked then
+        return nil, nil, unlock_error
+    end
+    local anchor_source = "hero_altar"
+    if not summon_eligibility.altar_built(altar) then
+        anchor_source = "builder"
         altar = builder_by_player[player_id]
         if not valid_entity(altar) then
             local result = event_bus.request(events.BUILDER_GET_REQUEST, {
@@ -237,12 +244,9 @@ local function validate(player_id, hero_id, debug_bypass)
             altar = result and result.ok and result.builder or nil
         end
     end
-    if not valid_entity(altar) then
-        return nil, nil, "英雄祭坛尚未建造"
-    end
-    if not debug_bypass and (city_level_by_player[player_id] or 0)
-        < (tonumber(rule().requires_city_level) or 3) then
-        return nil, nil, "主城等级不足"
+    if not valid_entity(altar) or (altar.IsAlive and not altar:IsAlive())
+        or not player_context.is_owned_by(player_id, altar) then
+        return nil, nil, "自己的英雄祭坛或建筑师暂不可用"
     end
 
     local definition = heroes.by_id[hero_id]
@@ -250,17 +254,20 @@ local function validate(player_id, hero_id, debug_bypass)
         return nil, nil, "英雄配置不存在"
     end
     local entitlement = projection.entitlements(player_id)
-    local unlocked, unlock_error = summon_access.check(
+    local hero_unlocked, hero_unlock_error = summon_access.check(
         definition, summon_access.context(player_id, entitlement)
     )
-    if not debug_bypass and not unlocked then
-        return nil, nil, unlock_error
+    if not debug_bypass and not hero_unlocked then
+        return nil, nil, hero_unlock_error
     end
     -- Resolve before replacing the hidden carrier. The exact grounded result
     -- is also used for placement; do not recompute the old, possibly blocked
     -- marker after validation. Pending asset loads call validate again.
     local position, destination_error, destination_info =
-        summon_destination.resolve(altar, definition, player_id)
+        summon_destination.resolve(altar, definition, player_id, nil, {
+            allow_without_city = true,
+            anchor_source = anchor_source,
+        })
     if destination_info and (not position or destination_info.attempts > 1) then
         print(string.format(
             "[HeroSummonDestination] player=%s source=%s attempts=%s last_rejection=%s position=%s",
@@ -530,17 +537,27 @@ local function on_building_created(payload)
         altar_by_player[player_id] = payload.unit
         publish(player_id, "altar_built")
     elseif payload.building_id == "main_city" then
+        city_unit_by_player[player_id] = payload.unit
         city_level_by_player[player_id] = payload.level or 1
+        publish(player_id, "city_built")
     end
 end
 
 local function on_building_changed(payload)
+    if not payload or payload.building_id ~= "main_city" then return end
     local player_id = event_player_id(payload)
     if player_id == nil or unavailable_reason(player_id) then return end
-    if payload.building_id == "main_city" then
-        city_level_by_player[player_id] = payload.level or 0
-        publish(player_id, "city_level_changed")
-    end
+    local level, unit = payload.level or 0, payload.unit
+    -- Research publishes every owned building even when its city level is
+    -- unchanged. This branch only projects city-level summon eligibility;
+    -- profile, entitlement, rogue and rebirth updates have their own handlers.
+    -- Unknown events, missing handles and city replacements remain observable.
+    if payload.reason == "technology_stats_changed" and type(payload.level) == "number"
+        and city_unit_by_player[player_id] == unit and valid_entity(unit)
+        and city_level_by_player[player_id] == level then return end
+    city_unit_by_player[player_id] = unit
+    city_level_by_player[player_id] = level
+    publish(player_id, "city_level_changed")
 end
 
 local function on_building_destroyed(payload)
@@ -552,7 +569,9 @@ local function on_building_destroyed(payload)
         altar_by_player[player_id] = nil
         publish(player_id, "altar_destroyed")
     elseif payload.building_id == "main_city" then
+        city_unit_by_player[player_id] = nil
         city_level_by_player[player_id] = 0
+        publish(player_id, "city_destroyed")
     end
 end
 
@@ -568,6 +587,7 @@ local function on_player_unavailable(payload, defeated)
     end
     replacing_by_player[player_id], summoned_by_player[player_id] = nil, nil
     builder_by_player[player_id], altar_by_player[player_id] = nil, nil
+    city_unit_by_player[player_id] = nil
     city_level_by_player[player_id] = 0
     publish(player_id, reason)
 end
@@ -580,6 +600,13 @@ local function on_profile_changed(payload)
     local player_id = event_player_id(payload)
     if player_id == nil or unavailable_reason(player_id) then return end
     publish(player_id, "profile_changed")
+end
+
+local function on_rogue_reward_changed(payload)
+    if payload and payload.effects_changed == false then return end
+    local player_id = event_player_id(payload)
+    if player_id == nil or unavailable_reason(player_id) then return end
+    publish(player_id, "rogue_unlock_changed")
 end
 
 local function on_hero_progression_changed(payload)
@@ -634,6 +661,7 @@ function M.init()
     altar_by_player = {}
     builder_by_player = {}
     city_level_by_player = {}
+    city_unit_by_player = {}
     summoned_by_player = {}
     replacing_by_player = {}
     pending_by_player = {}
@@ -669,6 +697,7 @@ function M.init()
         on_entitlement_changed
     )
     event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, on_profile_changed)
+    event_bus.subscribe(events.ROGUE_REWARD_CHANGED, on_rogue_reward_changed)
     event_bus.subscribe(
         events.HERO_PROGRESSION_CHANGED,
         on_hero_progression_changed

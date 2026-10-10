@@ -166,6 +166,7 @@
 
     var blockedCooldownAbility = -1;
     var blockedNativeCooldownAbility = -1;
+    var blockedNativeResourceAbility = -1;
     function rejectRelocationCooldown(ability, force) {
         if (!force && !(Abilities.GetCooldownTimeRemaining(ability) > 0)) {
             blockedCooldownAbility = -1;
@@ -415,7 +416,15 @@
 
     function showProfile(profile, abilityIndex, unit, mode, session) {
         if (mode === "native" && blockedNativeCooldownAbility === abilityIndex) return false;
+        if (mode === "native" && blockedNativeResourceAbility === abilityIndex) return false;
         if (profile.placement_action === "relocate" && rejectRelocationCooldown(abilityIndex)) return false;
+        var actionResources = GameUI.CustomUIConfig().SurvivalActionResources;
+        var runtime = actionResources ? CustomNetTables.GetTableValue("survival_ability_runtime", String(abilityIndex)) || {} : {};
+        if (actionResources && actionResources.Reject(runtime)) {
+            if (mode === "native") blockedNativeResourceAbility = abilityIndex;
+            cancelCustomPointTarget("resources_unavailable");
+            return false;
+        }
         activePreviewSession = session || ++previewSessionSequence;
         activeProfile = profile;
         pendingRelocation = null;
@@ -1193,6 +1202,7 @@
         var nativeName = abilityName(nativeIndex);
         var nativeProfile = profiles[nativeName];
         if (nativeIndex !== blockedNativeCooldownAbility) blockedNativeCooldownAbility = -1;
+        if (nativeIndex !== blockedNativeResourceAbility) blockedNativeResourceAbility = -1;
         if (!customProfile && !nativeProfile && !activeProfile) blockedCooldownAbility = -1;
         if (customProfile) {
             var customState = customPointTargetState();

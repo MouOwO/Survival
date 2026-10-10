@@ -35,7 +35,7 @@ local function apply_attack_presentation(unit, archetype)
     end
 end
 
-function M.apply(unit, archetype)
+function M.apply(unit, archetype, options)
     if not unit or type(archetype) ~= "table" then
         return false, "invalid_arguments"
     end
@@ -48,17 +48,37 @@ function M.apply(unit, archetype)
         model_asset_id = asset_id,
         model_name = archetype.model_path,
         model_scale = tonumber(archetype.model_scale),
-    })
+    }, options)
     if not ok or not applied then
         logger.warn("ChallengeMonsterVisual", "bundle apply failed asset="
             .. asset_id .. " status=" .. tostring(status or applied))
         return false, status or "visual_apply_failed"
     end
+    unit.survival_challenge_monster_visual = true
     return true, status
+end
+
+function M.on_death(unit)
+    if not unit then return false end
+    if unit.survival_challenge_monster_visual == nil
+        and unit.survival_model_asset_id ~= nil then
+        unit.survival_challenge_monster_visual = true
+    end
+    if unit.survival_challenge_monster_visual ~= true then return true end
+    building_visual.stop_particles(unit)
+    if unit.survival_monster_corpse == true
+        and unit.survival_wave_cleanup ~= true then return true end
+    return M.clear(unit)
 end
 
 function M.clear(unit)
     if not unit then return false end
+    -- Default hero outfits and attack-only creatures do not belong to this
+    -- service. Avoid a second appearance clear or legacy world discovery.
+    if unit.survival_challenge_monster_visual == false then return true end
+    if unit.survival_challenge_monster_visual ~= true
+        and unit.survival_model_asset_id == nil then return true end
+    unit.survival_challenge_monster_visual = false
     local ok = pcall(building_visual.clear, unit)
     return ok
 end

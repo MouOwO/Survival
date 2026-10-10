@@ -1,0 +1,104 @@
+{
+  "task": "hero_summon_follows_altar_unlock",
+  "date": "2026-10-08",
+  "status": "offline_validation_passed",
+  "behavior": [
+    "Own completed altar permits summoning below the normal city threshold, including after the rogue free-build charge is consumed.",
+    "Own rogue free-altar grant or the configured normal altar unlock permits a summon before altar construction.",
+    "Without an own completed city, only an owned live altar/builder may anchor the bounded safe landing search.",
+    "Existing own city retains priority; blocked city does not fall back to a distant anchor.",
+    "Paid/VIP ownership, one hero, defeat/disconnect isolation and preload revalidation remain enforced."
+  ],
+  "checks": [
+    {
+      "file": "scripts/vscripts/tests/test_hero_summon_flow.lua",
+      "result": "pass",
+      "output": [
+        "test_hero_summon_flow: PASS (18 integrated summon, rogue unlock, deletion/retry and native ability scenarios)"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_hero_summon_destination.lua",
+      "result": "pass",
+      "output": [
+        "HERO_SUMMON_DESTINATION_PASS: own live city, bounded clearance, regions/heights/occupancy, explicit early owned anchors and unchanged city-only return"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_hero_summon_runtime_availability.lua",
+      "result": "pass",
+      "output": [
+        "HERO_SUMMON_RUNTIME_AVAILABILITY_PASS: first snapshot, early/normal unlocks, entitlement, player isolation, consumed grants and one hero limit"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_paid_hero_unlock.lua",
+      "result": "pass",
+      "output": [
+        "PAID_HERO_UNLOCK_PASS"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_hero_summon_player_isolation.lua",
+      "result": "pass",
+      "output": [
+        "PASS hero summon player isolation: four same-team cities/altars, owner-only deletion and pending cancellation, stale callbacks, reentrant defeat, late events, survivor continuation",
+        "PASS hero summon player isolation: four same-team cities/altars, owner-only pending cancellation, stale callbacks, reentrant defeat, late events, survivor continuation",
+        "HERO_RESPAWN_HOME_PASS: actual F2 service, owner isolation, refreshed landing, camera, duplicate/foreign/defeated guards"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_hero_return_home.lua",
+      "result": "pass",
+      "output": [
+        "HERO_RETURN_HOME_PASS: native teleport, own-city safe landing/rollback, isolated endpoint bursts, particle release/failure cleanup, exit/camera only on success"
+      ]
+    },
+    {
+      "file": "tools/test_free_altar_runtime.lua",
+      "result": "pass",
+      "output": [
+        "FREE_ALTAR_RUNTIME_PASS: city0/no resources, private talent unlock, zero price, unique/summoned gates, consumed charge restores normal rules"
+      ]
+    },
+    {
+      "file": "tools/test_debug_hero_commands.lua",
+      "result": "pass",
+      "output": [
+        "DEBUG_HERO_COMMANDS_PASS numbered heroes, legacy alias, delete/retry, owner isolation, async completion/cancellation and preserved test environment"
+      ]
+    },
+    {
+      "file": "tools/test_hero_summon_initial_availability.cjs",
+      "result": "pass",
+      "output": [
+        "HERO_INITIAL_AVAILABILITY_PASS hud_takeover.js",
+        "HERO_INITIAL_AVAILABILITY_PASS combat_stats.js",
+        "HERO_INITIAL_AVAILABILITY_PASS ability_tooltip.js"
+      ]
+    },
+    {
+      "file": "tools/test_paid_hero_ui.cjs",
+      "result": "pass",
+      "output": [
+        "PAID_HERO_UI_PASS: actual server nettable -> actual client guard"
+      ]
+    }
+  ],
+  "syntax": {
+    "language": "Lua 5.1",
+    "files": 12,
+    "result": "pass"
+  },
+  "test_harness_updates": [
+    "Initial availability extraction supplies the existing HUD config dependency.",
+    "Paid hero UI bridge accepts the LUA environment variable for the installed interpreter."
+  ],
+  "live_verification": {
+    "game_running": false,
+    "performed": false,
+    "pending": "Reopen the map and validate the rogue early-altar summon in the native engine."
+  },
+  "compilation_required": false,
+  "git_commit_push": "not_requested; changes left in worktree"
+}

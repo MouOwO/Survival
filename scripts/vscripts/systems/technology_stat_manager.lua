@@ -291,16 +291,50 @@ local function on_technology_changed(payload)
     publish(player_id, payload.reason or "technology_changed")
 end
 
+-- Research snapshots describe effects, not a per-hit growth notification.
+-- Narrow only a proven single known legacy section; uncertain shapes stay full.
+local research_sections = { wall = true, tower = true, lumberjack = true, hero = true }
+local research_fields = fresh_values()
+local function research_changed_section(before, after)
+    if type(before) ~= "table" or type(after) ~= "table" then return nil end
+    local changed
+    for section, previous in pairs(before) do
+        local current = after[section]
+        if not research_sections[section] or type(previous) ~= "table"
+            or type(current) ~= "table" then return nil end
+        for field, value in pairs(previous) do
+            local next_value = current[field]
+            if research_fields[section][field] == nil or type(value) ~= "number"
+                or type(next_value) ~= "number" or value ~= value or next_value ~= next_value
+                or value == math.huge or value == -math.huge
+                or next_value == math.huge or next_value == -math.huge then return nil end
+            if value ~= next_value then
+                if changed and changed ~= section then return nil end
+                changed = section
+            end
+        end
+        for field in pairs(current) do if previous[field] == nil then return nil end end
+    end
+    for section in pairs(after) do if before[section] == nil then return nil end end
+    -- A tower research refresh also recovers old native towers after a module
+    -- reload. Keep its existing full recovery path (changed_section == nil).
+    if changed == "tower" then return nil end
+    return changed
+end
+
 local function on_research_effects_changed(payload)
     local player_id = tonumber(payload and payload.player_id)
     local projection = payload and payload.snapshot
     if player_id == nil or not projection then return end
-    local state = state_by_player[player_id] or fresh_state()
+    local previous = state_by_player[player_id]
+    local changed_section = previous and research_changed_section(
+        previous.technology, projection.legacy) or nil
+    local state = previous or fresh_state()
     state.levels = projection.levels or {}
     state.technology = projection.legacy or fresh_values()
     state.snapshot = nil
     state_by_player[player_id] = state
-    publish(player_id, "research_effects_changed")
+    publish(player_id, "research_effects_changed", changed_section)
 end
 
 local function get_stats(payload)

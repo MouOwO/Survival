@@ -693,6 +693,20 @@ def validate_monster_default_wearables(sources: list[Path]) -> None:
                 )
 
 
+def validate_monster_attack_speed_policy(
+    source: Path, headers: list[str], data_rows: list[tuple[int, list[str]]]
+) -> None:
+    if source.name != "monster_archetypes.csv":
+        return
+    for line, fields in data_rows:
+        row = dict(zip(headers, fields))
+        policy = row.get("native_attack_speed_policy", "").strip()
+        if policy not in {"", "bat_only_v1"}:
+            raise ValueError(f"unknown native attack speed policy: {source}:{line}: {policy}")
+        if policy and row.get("passive_skill_ids", "").strip():
+            raise ValueError(f"BAT-only archetype cannot declare native passives: {source}:{line}")
+
+
 def build(source: Path, output: Path) -> None:
     raw = source.read_bytes()
     for encoding in ("utf-8-sig", "utf-8", "gb18030", "gbk"):
@@ -751,6 +765,7 @@ def build(source: Path, output: Path) -> None:
         data_rows.append((row_number, fields))
     validate_build_regions(source, headers, data_rows)
     validate_wave_definitions(source, headers, data_rows)
+    validate_monster_attack_speed_policy(source, headers, data_rows)
     validate_sound_definitions(source, headers, data_rows)
     lines = [
         "-- AUTO-GENERATED. DO NOT EDIT THIS LUA FILE DIRECTLY.",

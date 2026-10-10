@@ -114,6 +114,7 @@
 !/scripts/vscripts/tests/test_gameplay_stats_order_isolation.lua
 !/scripts/vscripts/tests/test_player_gameplay_stats_isolated_profile.lua
 !/scripts/vscripts/tests/test_selected_unit_cosmetic_portrait.lua
+!/scripts/vscripts/tests/test_builder_portrait_metadata.lua
 !/scripts/vscripts/tests/test_building_sound_integration.lua
 !/scripts/vscripts/tests/test_building_construction_visual_service.lua
 !/scripts/vscripts/tests/test_building_upgrade_process.lua
@@ -374,6 +375,7 @@ __pycache__/
 !/scripts/vscripts/tests/test_difficulty_unlocks.lua
 !/scripts/vscripts/tests/test_archive_difficulty_progression.lua
 !/scripts/vscripts/tests/test_hero_skill_point_upgrade.lua
+!/scripts/vscripts/tests/test_hero_fifth_rebirth_skill_point.lua
 !/scripts/vscripts/tests/test_rebirth_return_retry.lua
 !/scripts/vscripts/tests/manual_spawn_land_check.lua
 !/scripts/vscripts/tests/test_archive_challenge_hub_positions.lua
@@ -408,6 +410,8 @@ __pycache__/
 !/scripts/vscripts/tests/test_production_ui_router.lua
 !/scripts/vscripts/tests/test_research_production_auto.lua
 !/scripts/vscripts/tests/test_research_runtime_projection.lua
+!/scripts/vscripts/tests/test_research_catalog_prerequisites.lua
+!/scripts/vscripts/tests/test_native_prerequisite_activation.lua
 !/scripts/vscripts/tests/test_worker_training_queue.lua
 !/scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua
 !/scripts/vscripts/tests/test_grid_builder_preview.lua
@@ -429,6 +433,7 @@ __pycache__/
 !/scripts/vscripts/tests/test_archive_endless_rewards.lua
 !/scripts/vscripts/tests/test_book_auto_purchase.lua
 !/scripts/vscripts/tests/test_challenge_respawn_pacing.lua
+!/scripts/vscripts/tests/test_gold_mine_research_visual.lua
 !/scripts/vscripts/tests/test_combat_effect_visibility.lua
 !/scripts/vscripts/tests/test_game_info_growth_coalescing.lua
 !/scripts/vscripts/tests/test_ground_core_synthesis.lua
@@ -437,6 +442,7 @@ __pycache__/
 !/scripts/vscripts/tests/test_portrait_metadata_sync.lua
 !/scripts/vscripts/tests/test_seven_sins_visuals.lua
 !/scripts/vscripts/tests/test_ten_sin_visuals.lua
+!/scripts/vscripts/tests/test_alchemist_challenge_visuals.lua
 !/scripts/vscripts/tests/test_tower_auto_upgrade.lua
 !/scripts/vscripts/tests/test_tower_upgrade_visual.lua
 !/scripts/vscripts/tests/test_tower_utility_visibility.lua
@@ -469,7 +475,28 @@ __pycache__/
 !/scripts/vscripts/tests/test_tower_wall_targeting.lua
 !/scripts/vscripts/tests/test_visual_feedback_repairs.lua
 !/scripts/vscripts/tests/test_wall_repair_detection.lua
+!/scripts/vscripts/tests/test_repair_order_lifecycle.lua
 !/scripts/vscripts/tests/test_tower_visual_relocation.lua
 !/scripts/vscripts/tests/test_titles.lua
 
 !/scripts/vscripts/tests/test_builder_io_presentation.lua
+
+# Reproducible late-combat regression and private Tools fixtures.
+!/scripts/vscripts/tests/test_combat_particle_lifecycle.lua
+!/scripts/vscripts/tests/test_damage_transaction_lifecycle.lua
+!/scripts/vscripts/tests/test_boss_performance_filter.lua
+!/scripts/vscripts/tests/test_tower_projectile_visual.lua
+!/scripts/vscripts/tests/test_tower_projectile_speed.lua
+!/scripts/vscripts/tests/test_tower_damage_observer.lua
+!/scripts/vscripts/tests/test_tower_skill_runtime.lua
+!/scripts/vscripts/tests/manual_late_combat_stress.lua
+/prof_template_map.csv
+
+# Local UI previews, captures and iteration checkpoints are reproducible output.
+/design_refs/purple_ui_10h/work/
+/design_refs/ui_20h/work/
+/design_refs/void_shadow_v1/work/
+/debug.log
+
+# Shared training fixture required by the worker attack-cap regression suite.
+!/scripts/vscripts/tests/test_worker_leader_refresh.lua

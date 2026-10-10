@@ -19,6 +19,7 @@ return function(source)
         return false
     end
     env.require=function(name)
+        if name=='systems/enemy_attack_observer' then return {is_ready=function() return false end} end
         if name=='systems/wall_melee_contact' then return contact end
         return {are_enemies=function() return true end,enforce=function() error('unnecessary team update') end}
     end

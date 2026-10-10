@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-09",
+  "request": "箭塔头顶名称居中",
+  "finding": "原有固定宽度文本框及编译样式已经声明text-align:center，用户截图中实际文字仍偏左；旧测试未测量文字内容",
+  "change": "名称宽度随文字排版，用自身与父框实际布局宽度之比换算UI宽度，再明确写入居中位置；不依赖Label内部或horizontal-align对齐",
+  "scope": [
+    "panorama/src/scripts/custom_game/tower_rank_ui.js",
+    "panorama/src/styles/custom_game/tower_rank_ui.css",
+    "tools/test_tower_rank_ui.cjs"
+  ],
+  "compiled": [
+    {
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\tower_rank_ui.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\tower_rank_ui.js",
+      "source_hash": "127BB970C238CB6EBFCBB09506BEDD39A53F03C6F4011024CF8AEACB62CEA500",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\tower_rank_ui.vjs_c",
+      "artifact_hash": "BBBD57798FE01E98FD3A348F8790261FCF69469C1D91B7341BFAC23CD3CBF776"
+    },
+    {
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\styles\\custom_game\\tower_rank_ui.css",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\styles\\custom_game\\tower_rank_ui.css",
+      "source_hash": "7F8D86B1E2E699A73C0ED4380B6486AF9B80545E04681F8089F171395EAD65C9",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\styles\\custom_game\\tower_rank_ui.vcss_c",
+      "artifact_hash": "5B1D1BB9BB99D257087763B4B7CC2CCBE6200EDE7811E7E08AE7F18466C1D63B"
+    }
+  ],
+  "tests": [
+    "test_tower_rank_ui.cjs",
+    "test_tower_rank_ui.cjs --measure",
+    "test_world_health_bar.js",
+    "test_world_overlay_visibility.cjs"
+  ],
+  "stable_name_layout_reads": 0,
+  "stable_name_style_writes": 0,
+  "live_visual_verified": false,
+  "live_validation": "一次游戏截图未出现可验收箭塔名称，控制台诊断无响应，后续游戏非前台未强行切换；尚未实机验收",
+  "backup": "output/tower_name_20261009/before",
+  "logs": "output/tower_name_20261009",
+  "git_committed": false
+}

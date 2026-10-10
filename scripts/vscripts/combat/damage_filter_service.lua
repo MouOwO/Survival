@@ -4,6 +4,7 @@ local anti_air_rules = require("systems/anti_air_rules")
 local global_rules = require("config/generated/global_rules")
 local armor_balance = require("config/armor_balance")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
+local endless_projection = require("combat/endless_stat_projection")
 local event_bus = nil
 local events = nil
 local repository = nil
@@ -58,16 +59,30 @@ local function filter(_, keys)
     -- reflection rule. Equipment auras submit their own independent damage.
     local attacker, victim = resolve_combatants(keys)
     if not valid(attacker) or not valid(victim) then return false end
+    local input_damage = tonumber(keys.damage)
+    if not endless_projection.is_finite(input_damage) or input_damage < 0 then return false end
+    keys.damage = input_damage
     -- Native abilities are used by short-lived visual casters only to let the
     -- engine assemble their complete effects. Their damage must never enter
     -- the addon transaction pipeline or affect any gameplay unit.
     if attacker.survival_visual_only == true then return false end
+    local record = repository.consume_pending(attacker, victim)
+    local damage_category = keys.damage_category_const or keys.damage_category
+    local inflictor_index = tonumber(
+        keys.entindex_inflictor_const or keys.entindex_inflictor
+    )
+    -- SPELL is a real category with value 0. Only an omitted category can use
+    -- the legacy no-inflictor attack fallback. Script transactions already
+    -- contain logical damage, so their provenance also prevents restoration.
+    local category_is_unknown = damage_category == nil
+    local is_basic_attack = not record
+        and (not inflictor_index or inflictor_index <= 0)
+        and (tree_damage_rules.is_basic_attack_category(damage_category)
+            or category_is_unknown)
     if attacker.survival_endless_attack_scale then
-        local inflictor = tonumber(keys.entindex_inflictor_const or keys.entindex_inflictor)
-        local category = keys.damage_category_const or keys.damage_category
-        keys.damage = require("combat/endless_stat_projection").outgoing(attacker, keys.damage,
-            (not inflictor or inflictor <= 0) and (category == nil or tonumber(category) == 0
-                or tree_damage_rules.is_basic_attack_category(category)))
+        local attack_scale = tonumber(attacker.survival_endless_attack_scale)
+        if not endless_projection.is_finite(attack_scale) or attack_scale < 1 then return false end
+        keys.damage = endless_projection.outgoing(attacker, keys.damage, is_basic_attack)
     end
     local diagnostic = should_diagnose(attacker)
     if diagnostic then
@@ -84,24 +99,15 @@ local function filter(_, keys)
                 or keys.entindex_inflictor or -1)
         ))
     end
-    local record = repository.consume_pending(attacker, victim)
     local transaction_id = record and record.transaction_id or nil
     if record and record.blocked then
         event_bus.emit(events.DAMAGE_BLOCKED, { transaction_id = transaction_id, reason = record.blocked })
         return false
     end
-    local damage_category = keys.damage_category_const or keys.damage_category
-    local inflictor_index = tonumber(
-        keys.entindex_inflictor_const or keys.entindex_inflictor
-    )
-    local category_is_unknown = damage_category == nil
-        or tonumber(damage_category) == 0
     local attack_evidence = false
     if tree_damage_rules.is_tree(victim)
         and tree_damage_rules.is_allowed_tree_attacker(attacker)
-        and (tree_damage_rules.is_basic_attack_category(damage_category)
-            or category_is_unknown)
-        and (not inflictor_index or inflictor_index <= 0) then
+        and is_basic_attack then
         attack_evidence = tree_damage_rules.consume_basic_attack(attacker, victim)
     end
     if not tree_damage_rules.allows_damage(
@@ -217,8 +223,6 @@ local function filter(_, keys)
     local effective_war3_armor = nil
     local pierced_war3_armor = nil
     local armor_ignore_pct = tonumber(record and record.physical_armor_ignore_pct) or 0
-    local is_basic_attack = tree_damage_rules.is_basic_attack_category(damage_category)
-        or (category_is_unknown and (not inflictor_index or inflictor_index <= 0))
     if damage_type == DAMAGE_TYPE_PHYSICAL and is_basic_attack
         and (attacker.survival_building_id == "arrow_tower"
             or (attacker.IsRealHero and attacker:IsRealHero())) then
@@ -312,6 +316,9 @@ local function filter(_, keys)
             tostring(keys.damage)
         ))
     end
+    if not endless_projection.is_finite(keys.damage) or keys.damage < 0 then return false end
+    local health_scale = tonumber(victim.survival_endless_health_scale) or 1
+    if not endless_projection.is_finite(health_scale) or health_scale < 1 then return false end
     local payload = {
         transaction_id = transaction_id, engine_damage = keys.damage,
         attacker_entindex = attacker:entindex(),
@@ -329,7 +336,7 @@ local function filter(_, keys)
     event_bus.emit(events.DAMAGE_FILTERED, payload)
     event_bus.emit(events.DAMAGE_RESOLVED, payload)
     if victim.survival_endless_health_scale or attacker.survival_endless_attack_scale then
-        keys.damage = require("combat/endless_stat_projection").incoming(victim, keys.damage)
+        keys.damage = endless_projection.incoming(victim, keys.damage)
         -- A hit beyond native health capacity is already lethal; never send
         -- infinity or oversized floats into the engine damage event.
         keys.damage = math.min(keys.damage, 1e30)
@@ -348,7 +355,7 @@ local function filter(_, keys)
         if CustomNetTables then CustomNetTables:SetTableValue('survival_commerce_wall',tostring(victim:entindex()),
             {player_id=victim.survival_player_id,remaining=s.remaining,expires=s.expires or 0,ready_at=s.ready_at or 0}) end
     end
-    return true
+    return endless_projection.is_finite(keys.damage) and keys.damage >= 0
 end
 
 function M.init(deps)

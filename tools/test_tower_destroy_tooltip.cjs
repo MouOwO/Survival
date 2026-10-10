@@ -10,7 +10,7 @@ const name = '销毁防御塔', desc = '销毁本单位，不返还成长所消�
 for (const useRuntime of [false, true]) {
     const texts = {};
     const env = {
-        managedUpgrade: () => true, isSelectedCombatHero: () => false,
+        managedProjectAbility: () => true, isSelectedCombatHero: () => false,
         localize: () => 'RAW_OR_STALE_LOCALIZATION',
         localizedAbilityDescription: () => 'STALE DESCRIPTION',
         readTooltipTable: table => table === 'survival_tooltips' ? {name, desc}
@@ -19,9 +19,10 @@ for (const useRuntime of [false, true]) {
         GameUI: {CustomUIConfig: () => ({})},
         Abilities: {GetLevel: () => 1, GetBehavior: () => 4}
     };
-    vm.runInNewContext(render, env);
+    vm.runInNewContext(source.slice(source.indexOf('    function isPassiveAbility('),source.indexOf('    function executeAbility('))+render, env);
     assert(env.render(1, 'ability_destroy_arrow_tower', {}));
     assert.equal(texts.CustomAbilityTitle, name);
     assert.equal(texts.CustomAbilityDescription, desc);
+    assert.equal(texts.CustomAbilityExtensionLabel, '生存防守 · 防御塔技能');
 }
 console.log('TOWER_DESTROY_TOOLTIP_PASS: exact Chinese title/description with runtime and CSV fallback');

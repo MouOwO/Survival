@@ -737,6 +737,23 @@
             "model" "models/heroes/juggernaut/jugg_sword.vmdl"
         }
     }
+    "asset_proxy_monster_default_alchemist"
+    {
+        "BaseClass"              "npc_dota_creature"
+        "Model"                  "models/heroes/alchemist/alchemist.vmdl"
+        "precache"
+        {
+            "model" "models/heroes/alchemist/alchemist_goblin_body.vmdl"
+            "model" "models/heroes/alchemist/alchemist_scabbard.vmdl"
+            "model" "models/heroes/alchemist/alchemist_saddlehat.vmdl"
+            "model" "models/heroes/alchemist/alchemist_gauntlets.vmdl"
+            "model" "models/heroes/alchemist/alchemist_goblinhat.vmdl"
+            "model" "models/heroes/alchemist/alchemist_leftbottle.vmdl"
+            "model" "models/heroes/alchemist/alchemist_goblin_head.vmdl"
+            "model" "models/heroes/alchemist/alchemist_ogre_head.vmdl"
+            "model" "models/heroes/alchemist/alchemist_shoulderbottles.vmdl"
+        }
+    }
     "asset_proxy_tower_keeper_of_the_light"
     {
         "BaseClass"              "npc_dota_creature"
@@ -924,7 +941,7 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/survival/towers/techies/techies_r_missile.vpcf"
+        "ProjectileModel"        "particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf"
         "precache"
         {
             "model" "models/heroes/techies/techies_barrel.vmdl"
@@ -951,7 +968,7 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/survival/towers/techies/techies_sr_missile.vpcf"
+        "ProjectileModel"        "particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow.vpcf"
         "precache"
         {
             "model" "models/items/techies/techies_ti9_immortal_spoon/techies_ti9_immortal_spoon.vmdl"
@@ -978,7 +995,7 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "0"
         "VisionNighttimeRange"   "0"
-        "ProjectileModel"        "particles/survival/towers/techies/techies_ssr_missile.vpcf"
+        "ProjectileModel"        "particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow_deso.vpcf"
         "precache"
         {
             "model" "models/items/techies/bigshot/bigshot_barrel.vmdl"
@@ -3399,7 +3416,7 @@
     "npc_survival_named_challenge_monster_03"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/creeps/neutral_creeps/n_creep_black_dragon/n_creep_black_dragon.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3422,7 +3439,7 @@
     "npc_survival_named_challenge_monster_04"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/juggernaut/juggernaut.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"
@@ -3441,11 +3458,17 @@
         "BoundsHullName"         "DOTA_HULL_SIZE_SMALL"
         "VisionDaytimeRange"     "800"
         "VisionNighttimeRange"   "600"
+        "MovementSpeedActivityModifiers"
+        {
+            "walk"                  "0"
+            "run"                   "345"
+            "run_fast"              "373"
+        }
     }
     "npc_survival_named_challenge_monster_05"
     {
         "BaseClass"              "npc_dota_creature"
-        "Model"                  "models/heroes/undying/undying.vmdl"
+        "Model"                  "models/heroes/alchemist/alchemist.vmdl"
         "ModelScale"             "1.0"
         "Level"                  "1"
         "ConsideredHero"         "0"

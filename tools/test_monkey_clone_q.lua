@@ -56,6 +56,9 @@ ParticleManager={
     DestroyParticle=function(_,id) particles[id].destroyed=true end,
     ReleaseParticleIndex=function(_,id) particles[id].released=true end,
 }
+-- This fixture inspects native render calls; visibility's virtual handles are
+-- covered by its own regression rather than indexing the native particle array.
+package.loaded["systems/combat_effect_visibility"]={manager=function() return ParticleManager end}
 local function unit(player_id)
     serial=serial+1
     local u={id=serial,player_id=player_id,abilities={},modifiers={},health=500,maximum=1000,

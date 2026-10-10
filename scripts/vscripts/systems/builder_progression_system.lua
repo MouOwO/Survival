@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local stages = require("config/generated/builder_ability_stages")
 local training = require("config/generated/training_definitions")
 local building_count_limits = require("systems/building_count_limit_service")
+local player_tower_limits = require("systems/player_tower_limit_service")
 
 local M = {}
 local BUILDER_BLINK_ABILITY = "ability_survival_builder_blink"
@@ -63,13 +64,13 @@ local function ensure(player_id, team)
 end
 
 local function count(state, building_id)
-    return state.counts[building_id] or 0
+    return player_tower_limits.count(state.counts, building_id)
 end
 
 local function limit_count(state, building_id, maximum)
-    -- Occupying a unique slot hides its entry, but only a completed building
-    -- may advance the stage or satisfy another building's prerequisite.
-    if maximum == 1 then
+    -- Unique buildings and towers reserve their capacity before completion,
+    -- but only completed buildings advance stages or satisfy prerequisites.
+    if maximum == 1 or building_id == "arrow_tower" then
         return state.occupied_counts[building_id] or count(state, building_id)
     end
     return count(state, building_id)
@@ -158,7 +159,10 @@ local function count_limit_reached(state, row)
 end
 
 local function should_show(state, row)
-    if count_limit_reached(state, row) then return false end
+    -- Tower capacity is temporary: keep its disabled button in the same slot.
+    if row.building_id ~= "arrow_tower" and count_limit_reached(state, row) then
+        return false
+    end
     if row.building_id == "hero_altar" and free_hero_altar(state) then
         return true
     end
@@ -490,6 +494,7 @@ local function public_counts(state)
     for building_id, value in pairs(state.counts) do
         result[building_id] = value
     end
+    result.arrow_tower = limit_count(state, "arrow_tower")
     return result
 end
 
@@ -562,14 +567,14 @@ local function on_building_counts_changed(payload)
         local maximum = building_count_limits.maximum(
             row.max_building_count, row.building_id, state.player_id
         )
-        if row.enabled ~= false and maximum == 1 then
+        if row.enabled ~= false and (maximum == 1 or row.building_id == "arrow_tower") then
             local before = previous[row.building_id] or count(state, row.building_id)
             local after = limit_count(state, row.building_id, maximum)
             if before ~= after then changed = true end
             if valid_entity(state.builder) and after >= maximum then
                 local ability = state.builder:FindAbilityByName(row.ability_name)
                 if ability then
-                    ability:SetHidden(true)
+                    ability:SetHidden(row.building_id ~= "arrow_tower")
                     ability:SetActivated(false)
                 end
             end
@@ -577,8 +582,8 @@ local function on_building_counts_changed(payload)
     end
     if not changed or state.count_sync_task then return end
     -- Placement callers still finish cooldown setup after BUILD_REQUEST.
-    -- Hide immediately, then replace the skill with its placeholder after
-    -- that call has returned so they never use an invalid ability handle.
+    -- Unique skills are hidden now and removed after the casting call returns.
+    -- The tower skill stays visible and keeps its handle across capacity changes.
     state.count_sync_task = scheduler.after(0, function()
         state.count_sync_task = nil
         if state_by_player[state.player_id] == state then sync(state) end
@@ -594,7 +599,7 @@ local function on_building_created(payload)
         if apply_tower_identity(state, payload, 1) then sync(state) end
         return
     end
-    state.counts[building_id] = count(state, building_id) + 1
+    change_count(state, building_id, 1)
     if building_id == "wall" then
         state.wall_built_once = true
     end
@@ -625,7 +630,7 @@ local function on_building_destroyed(payload)
         if apply_tower_identity(state, payload, -1) then sync(state) end
         return
     end
-    state.counts[building_id] = math.max(0, count(state, building_id) - 1)
+    change_count(state, building_id, -1)
     if building_id == "main_city" then
         state.city_level = 0
     end

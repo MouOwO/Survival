@@ -1,0 +1,92 @@
+{
+  "task": "crit_tower_attack_gap",
+  "date": "2026-10-09",
+  "status": "source_fix_and_regressions_passed",
+  "route": "class_1",
+  "production_change": "Skip redundant manual gesture for native critical tower attacks; engine owns the visible body attack animation.",
+  "source_files": [
+    "scripts/vscripts/modifiers/modifier_tower_attack_effects.lua",
+    "scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua"
+  ],
+  "unchanged": [
+    "attack interval/BAT/attack point",
+    "damage/critical/proc rules",
+    "target locking and selection",
+    "projectile speeds/art",
+    "other route gesture policy"
+  ],
+  "state_flow": [
+    "native target locked",
+    "native attack starts",
+    "attack-start consumers remain; no manual critical gesture",
+    "native shot and hit; same critical/proc result",
+    "native cooldown; next cycle retains target",
+    "death/invalid target uses existing handoff"
+  ],
+  "checks": {
+    "native_body_configuration": {
+      "rows": 20,
+      "real_catalog_native_body_verified": true,
+      "critical_skill_present": true,
+      "base_aps": 1.25
+    },
+    "new_regression": "output/crit_tower_attack_gap_20261009/native_animation_regression.json",
+    "animation_audit": "output/crit_tower_attack_gap_20261009/animation_audit.json",
+    "targeting_and_shared_observer": "output/crit_tower_attack_gap_20261009/runtime_audit.json",
+    "syntax": "output/crit_tower_attack_gap_20261009/syntax_verification.json"
+  },
+  "runtime_limit": "Read-only safe console attempted once, no game response; no live visual/native timing proof or gameplay state mutation.",
+  "compilation": "Lua only; no generated resources required.",
+  "git": "No stash/pull/commit/push requested or performed; existing edits preserved.",
+  "final_checks": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output_bytes": 2243
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--stat"
+      ],
+      "exit_code": 0,
+      "output_bytes": 27950
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "output_bytes": 27039
+    }
+  ],
+  "final_doc_reads": [
+    {
+      "file": "docs\\ai\\PROJECT_CONTEXT.md",
+      "bytes": 11842,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\CURRENT_TASK.md",
+      "bytes": 404999,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\DECISIONS.md",
+      "bytes": 32497,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\KNOWN_ISSUES.md",
+      "bytes": 7296,
+      "read_complete": true
+    }
+  ]
+}

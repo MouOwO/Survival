@@ -1,0 +1,84 @@
+{
+  "task": "wall_right_click_repair",
+  "date": "2026-10-08",
+  "status": "implemented_and_regression_verified",
+  "source_sha256": {
+    "scripts/vscripts/systems/repair_target_policy.lua": "224d01e7d44ea9d186d4f3ba8999064e3b63b38fca29e2b144b91793c4db121f",
+    "scripts/vscripts/systems/repair_order_service.lua": "4f644d22ff936d460d1f3da54f82de6224a2073186abd893d779b01b668b3abb",
+    "scripts/vscripts/systems/grid_placement_system.lua": "60e60e0a14704d95e792f3be8f007601dd4f58b8fd6fa0e8434abab5c3da9651",
+    "scripts/vscripts/modifiers/modifier_repair_worker_ai.lua": "d56db03a07435195dda2f5a5dd8bd60c7191f58bca1b94f73022af62f69d8944",
+    "scripts/vscripts/tests/test_repair_order_lifecycle.lua": "6234cce99e249bb53031c6c91b2563cd4bf0384c1ca5e4e14f42b284ca8043bb",
+    "scripts/vscripts/tests/test_wall_repair_detection.lua": "3db96fb552ceee3c33018b50780690f353b25a6f2a2ed2b68eabaf323a62d668",
+    "scripts/vscripts/tests/test_visual_feedback_repairs.lua": "2a9275fe88cca12a90df41f7f08d30be6ed4690941c25dcab28c47d65b3470b0"
+  },
+  "interval_seconds": 0.1,
+  "start_health_ratio": 0.98,
+  "ongoing_repair_finishes_to_full": true,
+  "cached_work_skips_unit_search": true,
+  "healthy_manual_standby_skips_range_path_gesture": true,
+  "per_second_healing_unchanged": true,
+  "state_machine": [
+    "idle",
+    "acquire eligible owned damaged building",
+    "approach cached handle",
+    "repair cached handle to full",
+    "manual standby or automatic idle"
+  ],
+  "regressions": [
+    {
+      "test": "test_repair_order_lifecycle",
+      "exit_code": 0,
+      "output": "REPAIR_ORDER_LIFECYCLE_PASS: builder/repairer wall position orders, real grid/filter, ownership, deferred commands, cached approach/heal, 98% standby, full completion, heal rate, fractional amount and entity reuse\n"
+    },
+    {
+      "test": "test_wall_repair_detection",
+      "exit_code": 0,
+      "output": "WALL_REPAIR_DETECTION_PASS: native building masks, builder/repairer, model swaps, map-wide scan, safe approach, repair rate, manual standby, ownership and construction\n"
+    },
+    {
+      "test": "test_visual_feedback_repairs",
+      "exit_code": 1,
+      "output": "ABILITY_SLOT_BOUNDS_PASS\nMANUAL_WALL_REPAIR_PASS: full wall, safe approach, throttled path, resume, unchanged heal rate, cancel, owner\nC:/Program Files/lua/bin/lua5.1.exe: ...ipts/vscripts/tests/test_visual_feedback_repairs.lua:99: assertion failed!\nstack traceback:\n\t[C]: in function 'assert'\n\t...ipts/vscripts/tests/test_visual_feedback_repairs.lua:99: in main chunk\n\t[C]: ?\n"
+    },
+    {
+      "test": "test_builder_work_position",
+      "exit_code": 0,
+      "output": "[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\nBUILDER_WORK_POSITION_PASS: nearest safe reachable point, shore/terrain/occupancy checks, no fallback, arrival revalidation and ground-only phase\n[BUILDER_READY] player=0 slot=test spawn=test source=test entindex=50 unit=npc_survival_builder_proxy proxy=true courier=false\nBUILDER_PHASE_CREATION_PASS: live creation installs registered phase modifier once\n"
+    },
+    {
+      "test": "test_startup_order_gate",
+      "exit_code": 0,
+      "output": "STARTUP_ORDER_GATE_PASS: engine registration, pre-ready side-effect prevention, frozen roster, ownership, destinations, repair and AI\n"
+    },
+    {
+      "test": "test_builder_io_presentation",
+      "exit_code": 0,
+      "output": "[BUILDER_READY] player=0 slot=0 spawn=test source=test entindex=100 unit=npc_survival_builder_proxy proxy=true courier=false\n[BUILDER_READY] player=1 slot=1 spawn=test source=test entindex=101 unit=npc_survival_builder_proxy proxy=true courier=false\n[PLAYER_ASSET_CLEANUP] player=0 asset=builder removed=false\nBUILDER_IO_PRESENTATION_PASS: selectable Io body, client-rendered independent arcana, all native ambient attachments, preloaded visible fallback, builder isolation, construction and complete lifecycle cleanup\n"
+    },
+    {
+      "test": "test_builder_yield_construction",
+      "exit_code": 0,
+      "output": "[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix\n[GridPlacement] server grid validation initialized\n[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path\n[BuildingAbility] add begin unit=11 ability=ability_upgrade_city\n[BuildingAbility] AddAbility OK unit=11 ability=ability_upgrade_city index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_lumberjack\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_lumberjack index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_repairer index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_advanced_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_advanced_repairer index=0\n[BuildingAbility] add begin unit=11 ability=ability_upgrade_city\n[BuildingAbility] AddAbility OK unit=11 ability=ability_upgrade_city index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_lumberjack\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_lumberjack index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_repairer index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_advanced_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_advanced_repairer index=0\n[GridPlacement] server grid validation initialized\n[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path\n[BuildingAbility] add begin unit=11 ability=ability_upgrade_city\n[BuildingAbility] AddAbility OK unit=11 ability=ability_upgrade_city index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_lumberjack\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_lumberjack index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_repairer index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_advanced_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_advanced_repairer index=0\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path\n[GridPlacement] server grid validation initialized\n[GridPlacement] server grid validation initialized\n[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path\n[BuildingAbility] add begin unit=11 ability=ability_upgrade_city\n[BuildingAbility] AddAbility OK unit=11 ability=ability_upgrade_city index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_lumberjack\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_lumberjack index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_repairer index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_advanced_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_advanced_repairer index=0\n[GridPlacement] server grid validation initialized\n[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path\n[BuildingAbility] add begin unit=11 ability=ability_upgrade_city\n[BuildingAbility] AddAbility OK unit=11 ability=ability_upgrade_city index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_lumberjack\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_lumberjack index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_repairer index=0\n[BuildingAbility] add begin unit=11 ability=ability_train_advanced_repairer\n[BuildingAbility] AddAbility OK unit=11 ability=ability_train_advanced_repairer index=0\n[GridPlacement] server grid validation initialized\n[PLAYER_ASSET_CLEANUP] player=0 asset=building requested=0\nBUILDER_YIELD_CONSTRUCTION_PASS: accepted unique reservation, atomic construction transfer, duplicate/multi-builder rejection; cancel/death/invalid/timeout/failure/disconnect release; actual move and one spend/refund\n[GridPlacement] server grid validation initialized\n[SURVIVAL_FINGERPRINT] create_building=20260720_1045_direct_path\n[BuildingAbility] add begin unit=11 ability=ability_summon_doom\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_doom index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_shadow_fiend\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_shadow_fiend index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_axe\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_axe index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_drow_ranger\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_drow_ranger index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_monkey_king\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_monkey_king index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_blademaster\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_blademaster index=0\n[BuildingAbility] add begin unit=11 ability=ability_enter_endless_training\n[BuildingAbility] AddAbility OK unit=11 ability=ability_enter_endless_training index=0\n[BuildingAbility] add begin unit=11 ability=ability_enter_shadow_realm\n[BuildingAbility] AddAbility OK unit=11 ability=ability_enter_shadow_realm index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_doom\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_doom index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_shadow_fiend\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_shadow_fiend index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_axe\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_axe index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_drow_ranger\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_drow_ranger index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_monkey_king\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_monkey_king index=0\n[BuildingAbility] add begin unit=11 ability=ability_summon_blademaster\n[BuildingAbility] AddAbility OK unit=11 ability=ability_summon_blademaster index=0\n[BuildingAbility] add begin unit=11 ability=ability_enter_endless_training\n[BuildingAbility] AddAbility OK unit=11 ability=ability_enter_endless_training index=0\n[BuildingAbility] add begin unit=11 ability=ability_enter_shadow_realm\n[BuildingAbility] AddAbility OK unit=11 ability=ability_enter_shadow_realm index=0\nFREE_ALTAR_CONSTRUCTION_PASS: real city0 placement/construction, zero cost, completion-only charge consumption, unique limit\n[GridPlacement] server grid validation initialized\nBUILD_RESOURCE_PREFLIGHT_PASS: no task, movement, reservation, spend or entity when materials are insufficient\n"
+    },
+    {
+      "test": "test_wall_navigation",
+      "exit_code": 0,
+      "output": "WALL_NAVIGATION_PASS square body, no protruding shoulders, no duplicate creation, terrain separation, overlap release\nWALL_METAL_HIT_PASS official asset, face position, burst limit, particle release\n"
+    }
+  ],
+  "negative_baseline": "prior repair_order_service fails the new ground-click regression at line 86",
+  "existing_test_failure": "test_visual_feedback_repairs:99 fails in monster visual tail with both original and modified repair code; repair and ability-slot assertions pass",
+  "native": {
+    "read_only_confirmed": [
+      "native building wall identity",
+      "builder has repair modifier",
+      "original direct unit-target assignment survives engine STOP"
+    ],
+    "live_post_fix_mouse_to_heal_verified": false,
+    "limitation": "Current reported game is post-game. Native ground-click experiment was not counted as a pass; no live modifier interval restart performed. Start a new match to load new logic."
+  },
+  "assets_compile_required": false,
+  "git_mutations": false,
+  "diff_check_exit_code": 0,
+  "git_head": "93fa5f1f40b75275b4060327b500d8cdadc0b26b"
+}

@@ -577,7 +577,7 @@ create_clone = function(player_id)
     clone.survival_display_name = "剑圣幻象"
     prepare_combat_clone(clone, player_id)
     current.clone = clone
-    current.owned_clones[clone] = true
+    current.owned_clones[clone] = clone:entindex()
     current.clone_respawning = false
     current.guard_target, current.guard_returning = nil, nil
     sync_clone_stats(player_id, current, nil, true)
@@ -585,6 +585,9 @@ create_clone = function(player_id)
     sync_clone_appearance(current)
     if FindClearSpaceForUnit then FindClearSpaceForUnit(clone, position, true) end
     guard_clone(player_id, current)
+    event_bus.emit(events.HERO_CLONE_CREATED, {
+        unit = clone, player_id = player_id, team = clone:GetTeamNumber(),
+    })
     return clone
 end
 
@@ -613,6 +616,9 @@ local function on_entity_killed(payload)
     if player_id == nil then return end
     local current = states[player_id]
     if not current or current.clone ~= victim then return end
+    event_bus.emit(events.HERO_CLONE_REMOVED, {
+        unit = victim, entindex = victim:entindex(), player_id = player_id,
+    })
     current.clone = nil
     if current.clone_respawning or not skill_active(player_id, W_SKILL) then return end
     current.clone_respawning = true
@@ -643,7 +649,10 @@ local function on_hero_removed(payload)
         if tonumber(visual.player_id) == player_id then casters[#casters + 1] = caster end
     end
     for _, caster in ipairs(casters) do remove_visual_caster(caster) end
-    for clone in pairs(current and current.owned_clones or {}) do
+    for clone, entindex in pairs(current and current.owned_clones or {}) do
+        event_bus.emit(events.HERO_CLONE_REMOVED, {
+            unit = clone, entindex = entindex, player_id = player_id,
+        })
         if valid(clone) then
             clone.survival_blademaster_clone = nil
             if clone.AddNoDraw then clone:AddNoDraw() end
@@ -690,8 +699,11 @@ function M.init()
             -- stat-only events must not rescan every cosmetic control point.
             sync_clone_appearance(current)
             guard_clone(player_id, current)
-            for clone in pairs(current.owned_clones) do
+            for clone, entindex in pairs(current.owned_clones) do
                 if not valid(clone) then
+                    event_bus.emit(events.HERO_CLONE_REMOVED, {
+                        unit = clone, entindex = entindex, player_id = player_id,
+                    })
                     hero_cosmetic_service.clear(clone)
                     current.owned_clones[clone] = nil
                 end

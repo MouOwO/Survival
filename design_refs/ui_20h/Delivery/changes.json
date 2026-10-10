@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-07T06:53:09.058Z",
+  "baselineCommit": "ab6c3070",
+  "sourceChanges": [
+    "panorama/src/layout/custom_game/archive.xml",
+    "panorama/src/layout/custom_game/survival_hud.xml",
+    "panorama/src/scripts/custom_game/archive_handoff_180de7e38b.js",
+    "panorama/src/scripts/custom_game/daily_remaining_5d5c1152eb.js",
+    "panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js",
+    "panorama/src/scripts/custom_game/production_progress.js",
+    "panorama/src/styles/custom_game/production_progress.css",
+    "panorama/src/styles/custom_game/common/jade_ui.css",
+    "panorama/src/scripts/custom_game/common/jade_components.js",
+    "panorama/src/scripts/custom_game/archive_jade.js"
+  ],
+  "runtimeChanges": [
+    "panorama/layout/custom_game/archive.vxml_c",
+    "panorama/layout/custom_game/survival_hud.vxml_c",
+    "panorama/scripts/custom_game/ability_tooltip.vjs_c",
+    "panorama/scripts/custom_game/archive_180de7e38b.vjs_c",
+    "panorama/scripts/custom_game/archive_handoff_180de7e38b.vjs_c",
+    "panorama/scripts/custom_game/building_move.vjs_c",
+    "panorama/scripts/custom_game/daily_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/game_info_panel.vjs_c",
+    "panorama/scripts/custom_game/geometry_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/hud_takeover.vjs_c",
+    "panorama/scripts/custom_game/icons_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/inventory_tooltip.vjs_c",
+    "panorama/scripts/custom_game/item_art_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/lottery_handoff_bb9968eef7.vjs_c",
+    "panorama/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/minimap_shortcuts.vjs_c",
+    "panorama/scripts/custom_game/navigation_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/production_progress.vjs_c",
+    "panorama/scripts/custom_game/reward_presentation.vjs_c",
+    "panorama/scripts/custom_game/shop_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/topnav_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/treasure_history.vjs_c",
+    "panorama/styles/custom_game/ability_tooltip.vcss_c",
+    "panorama/styles/custom_game/common/ui_components.vcss_c",
+    "panorama/styles/custom_game/handoff_v1.vcss_c",
+    "panorama/styles/custom_game/minimap_shortcuts.vcss_c",
+    "panorama/styles/custom_game/production_progress.vcss_c",
+    "panorama/styles/custom_game/remaining_5d5c1152eb.vcss_c",
+    "panorama/styles/custom_game/survival_hud.vcss_c"
+  ],
+  "newRuntime": [
+    "panorama/scripts/custom_game/common/jade_components.vjs_c",
+    "panorama/scripts/custom_game/archive_jade.vjs_c",
+    "panorama/styles/custom_game/common/jade_ui.vcss_c",
+    "panorama/images/custom_game/reward_art_v5/daily_*.vtex_c"
+  ],
+  "notes": [
+    "Compiled files are broader than edited source because outdated Workshop runtime dependencies were rebuilt from the current project",
+    "No map, Lua, CSV, combat, production, refund, commerce or payment rules were changed",
+    "This UI iteration is left uncommitted after the initial requested project submission"
+  ]
+}

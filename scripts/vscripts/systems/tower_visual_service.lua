@@ -7,6 +7,7 @@ local profiles = require("config/generated/tower_visual_profiles")
 local laser_effect_selector = require("systems/tower_laser_effect_selector")
 local tower_skills = require("systems/tower_skill_runtime")
 local laser_visual = require("systems/tower_laser_visual")
+local modifier_registry = require("core/modifier_registry")
 local M = {}
 local tracked = {}
 local generation, bound_world = 0, nil
@@ -23,8 +24,8 @@ local trial_bases = {
 local portal_bases = { io_blue_portal = "ice_portal", io_amber_portal = "amber_portal" }
 -- Each portal now owns the complete native parent/child particle graph.
 local portal_layers = { "native_full/ground" }
--- Native Shadow Dance smoke bundle, without Slark-specific eye attachments.
-local ultimate_shadow = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
+local ultimate_cloud = "particles/units/heroes/hero_zeus/zeus_cloud.vpcf"
+local ultimate_status = "particles/status_fx/status_effect_gods_strength.vpcf"
 -- Bulldoze's persistent foot layers; omit its body/hand effects and cast flash.
 local machine_base = {
     "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_dark.vpcf",
@@ -44,6 +45,11 @@ function M.remove(entindex, unit)
     if not entry or (unit and entry.unit ~= unit) then return end
     -- Drop ownership before engine calls; death/removal may re-enter cleanup.
     tracked[tonumber(entindex)] = nil
+    local presence = entry.presence_modifier
+    if presence and not presence:IsNull() then
+        local removed, remove_error = pcall(presence.Destroy, presence)
+        if not removed then print("[TowerVisual] presence cleanup failed: " .. tostring(remove_error)) end
+    end
     for _, id in ipairs(entry.particles) do
         -- A failed optional engine visual must not strand the remaining IDs.
         local destroyed, destroy_error = pcall(ParticleManager.DestroyParticle,
@@ -70,20 +76,24 @@ local function add(entry, name, radius, alpha, color)
         tonumber(color[1]) or 255, tonumber(color[2]) or 255, tonumber(color[3]) or 255))
 end
 
-local function add_ultimate_shadow(entry)
+local function add_ultimate_presence(entry, radius)
     local unit = entry.unit
-    local id = ParticleManager:CreateParticle(ultimate_shadow,
-        PATTACH_ABSORIGIN_FOLLOW, unit)
-    assert(type(id) == "number" and id >= 0, "ultimate shadow returned no valid ID")
+    local id = ParticleManager:CreateParticle(ultimate_cloud,
+        PATTACH_WORLDORIGIN, unit)
+    assert(type(id) == "number" and id >= 0, "ultimate cloud returned no valid ID")
     entry.particles[#entry.particles + 1] = id
     local origin = unit:GetAbsOrigin()
-    ParticleManager:SetParticleControlEnt(id, 0, unit,
-        PATTACH_ABSORIGIN_FOLLOW, "", origin, true)
-    -- All native smoke layers emit around CP1. Bind to the torso so the
-    -- cloud surrounds the model and follows relocation without a Lua thinker.
-    ParticleManager:SetParticleControlEnt(id, 1, unit,
-        PATTACH_POINT_FOLLOW, "attach_hitloc",
-        Vector(origin.x, origin.y, origin.z + 80), true)
+    -- Nimbus has independent ground (CP0) and cloud (CP2) centers. Its cloud
+    -- child adds -20 Z; keep the cloud just above the feet instead of overhead.
+    -- Fixed server positions avoid stale client origins during relocation;
+    -- the existing movement event rebuilds this bundle, without a new thinker.
+    ParticleManager:SetParticleControl(id, 0, origin)
+    ParticleManager:SetParticleControl(id, 1, Vector(radius, 0, 0))
+    ParticleManager:SetParticleControl(id, 2, Vector(origin.x, origin.y, origin.z + 40))
+    -- Sven's native status shader follows the whole model. Unlike his ambient
+    -- particle, it needs no Sven-only eyes or numbered arm hitboxes on Roshan.
+    entry.presence_modifier = modifier_registry.ensure(unit, "modifier_ultimate_tower_presence", {})
+    assert(entry.presence_modifier, "ultimate status modifier could not be applied")
 end
 
 local function add_portal(entry, portal, radius)
@@ -186,6 +196,7 @@ function M.apply(state)
         if effect and effect.enabled ~= false then laser = effect; break end
     end
     key = key .. ":" .. tostring(laser and laser.effect_key or "")
+    if rank.rarity == "UR" then key = key .. ":zeus_cloud_gods_strength" end
     if laser then
         unit.survival_projectile_model = ""
         unit:SetRangedProjectileName("")
@@ -239,7 +250,7 @@ function M.apply(state)
         if rank.rarity == "UR" or rank.red_stars > 0 then
             add(entry, profile.crown, radius * 0.78, profile.alpha * 0.38, color)
         end
-        if rank.rarity == "UR" then add_ultimate_shadow(entry) end
+        if rank.rarity == "UR" then add_ultimate_presence(entry, radius) end
     end)
     if not ok then
         M.remove(index)
@@ -251,7 +262,8 @@ end
 function M.precache(context)
     PrecacheResource("particle", base_projectile, context)
     PrecacheResource("particle", "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf", context)
-    PrecacheResource("particle", ultimate_shadow, context)
+    PrecacheResource("particle", ultimate_cloud, context)
+    PrecacheResource("particle", ultimate_status, context)
     for _, name in pairs(trial_bases) do
         PrecacheResource("particle", prefix .. name .. ".vpcf", context)
     end

@@ -1,0 +1,282 @@
+{
+  "date": "2026-10-09",
+  "status": "Implemented, regression-tested, native UI resources compiled; game visuals not verified",
+  "tower_limit": {
+    "per_player": 7,
+    "released_on": [
+      "cancellation",
+      "death",
+      "destruction"
+    ],
+    "concurrent_reservation": true,
+    "included": [
+      "base",
+      "promoted",
+      "ultimate",
+      "accepted construction orders"
+    ],
+    "promotion_releases_slot": false
+  },
+  "mine_research": {
+    "source": "primary eligible selected mine",
+    "duplicate_replay": false,
+    "efficiency": "omniknight_purification",
+    "batch_success_notifications": 1,
+    "critical": "phantom_assassin_crit_impact",
+    "success_only": true
+  },
+  "notifications": {
+    "research_format": "研究【科技名称】科技成功",
+    "max_visible": 4,
+    "research_audience": "owner only, broadcast blocked",
+    "appearance": "Inline icon/portrait, highlighted technology/player name, shaded text, subtle fade",
+    "fishing_audience": "all",
+    "position": "top center, 112px below top beneath resource bar",
+    "position_basis": "Assumed after optional placement question received no answer"
+  },
+  "training": {
+    "initial_population": "existing initial fill retained",
+    "room_ids": [
+      "challenge_01",
+      "challenge_02",
+      "challenge_03",
+      "challenge_04",
+      "challenge_06",
+      "challenge_07",
+      "challenge_10"
+    ],
+    "max_living": 10,
+    "cleanup": "identity and active checks prevent removed sessions spawning",
+    "refill_seconds": 1,
+    "return_home": "retains active room progress and refilling",
+    "single_boss_rooms": "unchanged",
+    "max_refill_per_tick": 1
+  },
+  "tower_icons": {
+    "passives": "remain hoverable, cannot cast",
+    "native_cooldown_preserved": true,
+    "fix": "Clear native wash-color and stale unlearned overlays for unlocked project skills",
+    "stable_refresh_style_writes": 0
+  },
+  "validation": {
+    "lua_syntax_files": [
+      "scripts/vscripts/systems/building_system.lua",
+      "scripts/vscripts/systems/builder_progression_system.lua",
+      "scripts/vscripts/systems/player_tower_limit_service.lua",
+      "scripts/vscripts/systems/tower_fusion_service.lua",
+      "scripts/vscripts/systems/challenge_session_service.lua",
+      "scripts/vscripts/systems/gold_mine_system.lua",
+      "scripts/vscripts/systems/gold_mine_research_visual.lua",
+      "scripts/vscripts/systems/shop_system.lua",
+      "scripts/vscripts/systems/fishing_reward_service.lua",
+      "scripts/vscripts/systems/fishing_service.lua",
+      "scripts/vscripts/systems/star_blessing_reward_service.lua",
+      "scripts/vscripts/ui/ui_request_router.lua",
+      "scripts/vscripts/core/events.lua",
+      "scripts/vscripts/addon_game_mode.lua",
+      "scripts/vscripts/config/challenge_runtime_rules.lua",
+      "scripts/vscripts/config/generated/building_definitions.lua",
+      "scripts/vscripts/config/generated/builder_ability_stages.lua",
+      "scripts/vscripts/config/generated/encounter_members.lua",
+      "scripts/vscripts/config/generated/monster_encounters.lua",
+      "scripts/vscripts/systems/gold_mine_batch_upgrade_service.lua"
+    ],
+    "compiled_resource_count": 6,
+    "selection_fixture": "Two old expectations failed both pre-fix backup and current code; fixture corrected without production change",
+    "diff_check": "passed",
+    "source_content_artifact_hash_check": "passed",
+    "js_regressions": [
+      {
+        "test": "test_tower_passive_icons",
+        "exit_code": 0
+      },
+      {
+        "test": "test_prerequisite_shading",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_button_states",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_tooltip_recovery",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_tooltip_stability",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_hover_bounds",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_hotkey_refresh_cache",
+        "exit_code": 0
+      },
+      {
+        "test": "test_combat_stats_callbacks",
+        "exit_code": 0
+      },
+      {
+        "test": "test_combat_selection_recovery",
+        "exit_code": 0
+      },
+      {
+        "test": "test_notification_presentation",
+        "exit_code": 0
+      }
+    ],
+    "native_game": "Screenshot unavailable: Dota window was minimized with zero client size and not foreground; console probe had no response. No game input, restart, or multiplayer visual verification performed",
+    "ui_manifest": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\gameplay_updates_20261009\\ui_build_20261009_090338\\manifest.json",
+    "lua_regressions": [
+      {
+        "test": "test_builder_tower_rebuild",
+        "exit_code": 0
+      },
+      {
+        "test": "test_builder_yield_construction",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_destruction_rebuild",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ultimate_tower_tree_targeting",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_class_preflight",
+        "exit_code": 0
+      },
+      {
+        "test": "test_challenge_respawn_pacing",
+        "exit_code": 0
+      },
+      {
+        "test": "test_gold_mine_research_visual",
+        "exit_code": 0
+      },
+      {
+        "test": "test_gold_mine_reward_upgrade",
+        "exit_code": 0
+      },
+      {
+        "test": "test_research_production_auto",
+        "exit_code": 0
+      },
+      {
+        "test": "test_shop_early_final_cooldown",
+        "exit_code": 0
+      },
+      {
+        "test": "test_practice_difficulty_profiles",
+        "exit_code": 0
+      },
+      {
+        "test": "test_player_challenge_cleanup",
+        "exit_code": 0
+      },
+      {
+        "test": "test_challenge_unit_names",
+        "exit_code": 0
+      },
+      {
+        "test": "test_commerce_fishing",
+        "exit_code": 0
+      }
+    ]
+  },
+  "source_hashes": [
+    {
+      "path": "scripts/vscripts/systems/building_system.lua",
+      "sha256": "AB7A64920FD48EAC184FC5AD606923E66142F55926C94CF653DA3EC9A5E4B620"
+    },
+    {
+      "path": "scripts/vscripts/systems/builder_progression_system.lua",
+      "sha256": "BD16DA5DD5719E6F24AC810ACD33393B60565276A6729B79C2FA165903B84C40"
+    },
+    {
+      "path": "scripts/vscripts/systems/player_tower_limit_service.lua",
+      "sha256": "DC907F0325097C6076C8A88A728DAB762FF3F06C2F2BF05ACB2CE2EA7A1484FE"
+    },
+    {
+      "path": "scripts/vscripts/systems/tower_fusion_service.lua",
+      "sha256": "6AB529AB3A247C335EAC7CDAE1E7AF96C22CDA7826025A15672D29E2D2C7945C"
+    },
+    {
+      "path": "scripts/vscripts/systems/challenge_session_service.lua",
+      "sha256": "422C3094AE53538465A5B212E4D0A3ACE34A322EA5BF590FA140AB4451F5522E"
+    },
+    {
+      "path": "scripts/vscripts/systems/gold_mine_system.lua",
+      "sha256": "8277E7678F88F6A792A41FA637583EBA8C5CE39856E5506BB463CFBDF39A6690"
+    },
+    {
+      "path": "scripts/vscripts/systems/gold_mine_research_visual.lua",
+      "sha256": "B47F6CD2841DB6C624A8B7DC3D6AAAEEDB49B944B87EB8824E96928B91911136"
+    },
+    {
+      "path": "scripts/vscripts/systems/shop_system.lua",
+      "sha256": "37FB5A475EAB87EADBC16D79B411C585375772984BAD843967CFFFB64CD5D91C"
+    },
+    {
+      "path": "scripts/vscripts/systems/fishing_reward_service.lua",
+      "sha256": "6335ED7D447943BBA1E8BC9A1E3C3496844EDEB5E0F5EF4313154A9D44B59368"
+    },
+    {
+      "path": "scripts/vscripts/systems/fishing_service.lua",
+      "sha256": "6B79379C233867D61FD1162918A284F9DF1808C810102374FBD62998856E0F7D"
+    },
+    {
+      "path": "scripts/vscripts/systems/star_blessing_reward_service.lua",
+      "sha256": "2D401313B463521823E42424EEAAD54A6F4014041C0DDD04ADE4EAD18035D82C"
+    },
+    {
+      "path": "scripts/vscripts/ui/ui_request_router.lua",
+      "sha256": "4933948B1031906B0F1D8557A8A9274A6C046526FBF74B6382AE837CFE0F2C39"
+    },
+    {
+      "path": "scripts/vscripts/core/events.lua",
+      "sha256": "8C6BA54B975779044F69B76825950C55751DDF08750591751A8763860249D352"
+    },
+    {
+      "path": "scripts/vscripts/addon_game_mode.lua",
+      "sha256": "3BDE6AC44E1C4CD0205CD230C2F4A317784D49DFDF5B16A19BB1A4C42FB2725C"
+    },
+    {
+      "path": "scripts/vscripts/config/challenge_runtime_rules.lua",
+      "sha256": "B303836E068B5E4960DF3D52308B7EC05E474BE89E4F868804E5FF24F27A3721"
+    },
+    {
+      "path": "scripts/vscripts/config/generated/building_definitions.lua",
+      "sha256": "851817E1BC79792EA6FC7BE639DCE3A58D6499638FDB1B629481929E435A0481"
+    },
+    {
+      "path": "scripts/vscripts/config/generated/builder_ability_stages.lua",
+      "sha256": "94E09B8C3C0F057418F424030C1912C9BA6582A24BC9C33A33D195814BC51CBD"
+    },
+    {
+      "path": "scripts/vscripts/config/generated/encounter_members.lua",
+      "sha256": "28E9311E57739D6BFE9C4595991F3F8217C8093CF1D42C78A63B6D3DD2A19CDC"
+    },
+    {
+      "path": "scripts/vscripts/config/generated/monster_encounters.lua",
+      "sha256": "55AF14FFC582B35F1CD9178F061D43B0E4A16E26FE7471A227C80841AC3A22BD"
+    },
+    {
+      "path": "scripts/vscripts/systems/gold_mine_batch_upgrade_service.lua",
+      "sha256": "97936C2E7A1A932BA2D3AC6DCCD19A9B91782F4BCD5108158CFD8A066A63DBD3"
+    }
+  ],
+  "restore": {
+    "tower_cap_before": "output/player_tower_cap_20261009/before",
+    "ui_checkpoint": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\gameplay_updates_20261009\\ui_build_20261009_090338",
+    "tower_icons_before": "output/tower_passive_icons_20261009/before",
+    "instruction": "Restore only affected paths from per-task backups; do not reset HEAD because prior unrelated user changes remain in the workspace",
+    "notification_before": "output/gameplay_updates_20261009/notification_before",
+    "mine_training_before": "output/mining_training_20261009/before"
+  },
+  "git": "No stash/pull/commit/push performed: this task requested fixes, not submission"
+}

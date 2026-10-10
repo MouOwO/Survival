@@ -1,0 +1,50 @@
+{
+  "hud": {
+    "background": "#173d46d9",
+    "edge": "#8da9a07a",
+    "text": "#f4f1df",
+    "muted": "#c1d0c8",
+    "gold": "#cfb679",
+    "shadow": "#061e2870",
+    "topBackdropOpacity": 0.55,
+    "resourceBackdrop": "#173d4675"
+  },
+  "modal": {
+    "background": "#f2f1e8",
+    "text": "#234957",
+    "muted": "#59756f",
+    "edge": "#93afa4",
+    "jade": "#477c7e",
+    "gold": "#cfb679",
+    "selectedGlowOpacity": 0.55
+  },
+  "type": {
+    "body": 16,
+    "small": 14,
+    "modalTitle": 38,
+    "archivePageTitle": 30,
+    "archiveName": 18,
+    "queueTitle": 30,
+    "queueCost": 28,
+    "dualCost": 24
+  },
+  "interaction": {
+    "hover": 0.12,
+    "press": 0.08
+  },
+  "queue": {
+    "designWidth": 600,
+    "option": 76,
+    "waiting": 48,
+    "padding": 16,
+    "active": 50,
+    "heightA": 252,
+    "heightB": 240,
+    "optionHeight": 126,
+    "dualCostOptionHeight": 134,
+    "activeTrack": [
+      50,
+      4
+    ]
+  }
+}

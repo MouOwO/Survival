@@ -15,10 +15,14 @@ local function unit(id)
     function u:RemoveAbility(name) abilities[name] = nil end
     function u:AddAbility(name)
         local a = { active = true }
-        function a:SetLevel(value) self.level = value end
-        function a:SetHidden(value) self.hidden = value end
-        function a:SetActivated(value) self.active = value end
-        function a:SetAbilityIndex(value) self.index = value end
+        function a:SetLevel(value) self.level = value; self.writes=(self.writes or 0)+1 end
+        function a:SetHidden(value) self.hidden = value; self.writes=(self.writes or 0)+1 end
+        function a:SetActivated(value) self.active = value; self.writes=(self.writes or 0)+1 end
+        function a:SetAbilityIndex(value) self.index = value; self.writes=(self.writes or 0)+1 end
+        function a:GetLevel() return self.level end
+        function a:IsHidden() return self.hidden end
+        function a:IsActivated() return self.active end
+        function a:GetAbilityIndex() return self.index end
         abilities[name] = a
         return a
     end
@@ -89,8 +93,9 @@ end
 assert(queue_runtime().available == 1, "runtime allows seventh task")
 transactions[10].queue_count = 7
 bus.emit(events.TECHNOLOGY_RESEARCH_STATE_CHANGED, transactions[10])
-assert(not buildings[1].unit.abilities[name].active, "eighth task rejected when queue full")
+assert(buildings[1].unit.abilities[name].active, "queue full keeps the unlocked action clickable for its error response")
 assert(queue_runtime().available == 0 and queue_runtime().research_status_code == "research_queue_full")
+assert(queue_runtime().prerequisite_met == 1, "queue occupancy is not a learning prerequisite")
 transactions[10].capacity = nil
 assert(queue_runtime().research_queue_capacity == 7, "default runtime capacity matches seven slots")
 transactions[10].capacity = 7
@@ -108,11 +113,11 @@ local function locked_runtime(rebirth)
         research_levels = levels[0], research_transaction = {}, reincarnation_level = rebirth,
     }, {gold = 1000000, wood = 1000000})
 end
-assert(locked_runtime(10).available == 0 and locked_runtime(10).can_afford == 0)
+assert(locked_runtime(10).available == 0 and locked_runtime(10).prerequisite_met == 0)
 assert(locked_runtime(10).research_status_code == "prerequisite_not_met")
 assert(locked_runtime(10).auto_research_available == 0)
 sync.sync(buildings[3].unit, "building_advanced_research_lab", levels[0], {}, 10)
-assert(not buildings[3].unit.abilities[locked_name].active)
+assert(buildings[3].unit.abilities[locked_name].active,"shared native action cannot use only the owner's prerequisites")
 levels[0][prerequisite.legacy_group] = definition.prerequisite.required_level
 assert(builder.build("ability_research_ars_08", {
     player_id = 0, building_id = "building_advanced_research_lab",
@@ -120,6 +125,7 @@ assert(builder.build("ability_research_ars_08", {
 }, {gold = 1000000, wood = 1000000}).available == 0,
     "rebirth requirement also locks the research entrance")
 assert(locked_runtime(10).available == 1)
+assert(locked_runtime(10).prerequisite_met == 1)
 sync.sync(buildings[3].unit, "building_advanced_research_lab", levels[0], {}, 10)
 assert(buildings[3].unit.abilities[locked_name].active)
 print("RESEARCH_RUNTIME_PROJECTION_PASS: source-specific activation, unrelated completion, right-click state, absolute timing")
@@ -137,10 +143,39 @@ for _, row in ipairs(mappings.rows) do
         assert(result.available == 0 and result.research_status_code == "prerequisite_not_met", row.ability_name)
         if row.building_id == "building_advanced_research_lab" then
             sync.sync(owner, row.building_id, {}, {}, 10)
-            assert(not owner.abilities[row.ability_name].active, "native locked research must be inactive")
+            assert(owner.abilities[row.ability_name].active, "shared action keeps teammate access; personal runtime remains gray")
         end
         checked = checked + 1
     end
 end
 assert(checked > 0)
 print("RESEARCH_PREREQUISITE_GREY_PASS " .. checked .. " dependent technologies")
+-- Equal state must not rewrite every native ability on each research event.
+local stable=unit(999)
+sync.sync(stable,"building_research_lab",{},nil,10)
+local writes=0
+for _,a in pairs(stable.abilities) do writes=writes+(a.writes or 0) end
+for index=1,1000 do sync.sync(stable,"building_research_lab",{},nil,10) end
+local after=0
+for _,a in pairs(stable.abilities) do after=after+(a.writes or 0) end
+assert(after==writes,"unchanged research state must not repeatedly reset native skills")
+local all_max={}
+for _,definition in ipairs(config.technologies) do all_max[definition.legacy_group]=definition.max_level end
+sync.sync(stable,"building_research_lab",all_max,nil,10)
+assert(next(stable.abilities)==nil,"terminal max-level research removes its action")
+local shared=unit(998)
+sync.sync(shared,"building_advanced_research_lab",all_max,nil,10)
+assert(next(shared.abilities),"shared lab keeps action slots for unfinished teammates")
+for _,a in pairs(shared.abilities) do assert(a.active,"owner max must not deactivate shared native actions") end
+local runtime=builder.build("ability_research_lumberjack_speed",{player_id=0,
+    research_levels={},research_transaction={},reincarnation_level=10},{wood=0,gold=0})
+assert(runtime.available==1 and runtime.can_afford==1,"resource shortage cannot change research prerequisite shading")
+assert(runtime.prerequisite_met==1 and runtime.resource_check_on_cast==1)
+local reserved_to_max = {queue_count=1,capacity=7,reserved_levels={lumberjack_speed=config.by_legacy_group.lumberjack_speed.max_level}}
+local reserved_runtime = builder.build(name,{player_id=0,building_id="building_research_lab",
+    research_levels={},research_transaction=reserved_to_max,reincarnation_level=10},{wood=0,gold=0})
+assert(reserved_runtime.available==0 and reserved_runtime.prerequisite_met==1
+    and reserved_runtime.completed==0,"a reserved last level must not look prerequisite-locked or completed")
+sync.sync(stable,"building_research_lab",{},reserved_to_max,10)
+assert(stable.abilities[name].active,"reserved levels are rejected on click, not by disabling the native action")
+print("RESEARCH_STATE_STABILITY_PASS: 1000 unchanged syncs, terminal removal, shared slots, resource-independent prerequisites")

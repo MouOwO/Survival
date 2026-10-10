@@ -46,7 +46,8 @@ assert(machine.enabled and machine.native_base == "bulldoze_ring" and machine.na
 assert(table.concat(machine.color_r, "|") == "25|219|241")
 local frost = assert(profiles.by_id.class_6)
 assert(frost.native_base == "io_blue_portal")
-assert(death.radius_r == 96 and death.radius_sr == 108 and death.radius_ssr == 120 and death.alpha == 0.95)
+assert(death.radius_r == 72 and death.radius_sr == 81 and death.radius_ssr == 90 and death.radius_ur == 96 and death.alpha == 0.95)
+assert(frost.radius_r == 72 and frost.radius_sr == 81 and frost.radius_ssr == 90 and frost.radius_ur == 96)
 for _, key in ipairs({"core", "detail", "detail_ssr", "crown"}) do assert(not death[key] or death[key] == "") end
 for _, row in ipairs(profiles.rows) do
     if row.profile_id ~= "class_1" then
@@ -85,7 +86,8 @@ print("DEATH_PRESET_GENERATED_LUA_PASS")
                 assert death['native_base'] == 'io_amber_portal'
                 assert {key: death[key] for key in COLORS} == COLORS
                 assert death['color'] == COLORS['color_r'] and death['alpha'] == '0.95'
-                assert [death['radius_' + tier] for tier in ('r', 'sr', 'ssr')] == ['96', '108', '120']
+                assert [death['radius_' + tier] for tier in ('r', 'sr', 'ssr', 'ur')] == ['72', '81', '90', '96']
+                assert [actual['class_6']['radius_' + tier] for tier in ('r', 'sr', 'ssr', 'ur')] == ['72', '81', '90', '96']
                 assert all(death[key] == '' for key in LEGACY_LAYERS)
                 types = next(row for row in comments if row[0].startswith('#types:'))
                 assert all(types[head.index(key)] == 'list' for key in COLORS)

@@ -171,6 +171,10 @@ local modifiers = {
         path = "modifiers/modifier_tower_attack_effects",
     },
     {
+        name = "modifier_ultimate_tower_presence",
+        path = "modifiers/modifier_ultimate_tower_presence",
+    },
+    {
         name = "modifier_survival_managed_buff",
         path = "modifiers/modifier_survival_managed_buff",
     },

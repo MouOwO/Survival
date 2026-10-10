@@ -6,18 +6,41 @@ local catalog = require("config/asset_catalog")
 local M = {}
 local owners, work = {}, {}
 local generation = 0
+local io_body_particle = "particles/units/heroes/hero_wisp/wisp_ambient.vpcf"
+local io_arcana_particle = "particles/econ/items/wisp/wisp_ambient_ti7.vpcf"
+local arcana_attachments = { "attach_hitloc", "attach_top_card", "attach_bot_card",
+    "attach_side_card_01", "attach_side_card_02", "attach_side_card_03", "attach_side_card_04" }
 
 local function valid(unit) return unit and not unit:IsNull() end
-local function particle(path, unit)
-    if not ParticleManager or not path or path == "" then return nil end
-    local ok, id = pcall(ParticleManager.CreateParticle, ParticleManager,
-        path, PATTACH_ABSORIGIN_FOLLOW, unit)
-    return ok and id or nil
-end
 local function retire(id)
     if id == nil or not ParticleManager then return end
     pcall(ParticleManager.DestroyParticle, ParticleManager, id, true)
     pcall(ParticleManager.ReleaseParticleIndex, ParticleManager, id)
+end
+local function particle(path, unit)
+    if not ParticleManager or not path or path == "" then return nil end
+    local id
+    local ok = pcall(function()
+        id = ParticleManager:CreateParticle(path, PATTACH_ABSORIGIN_FOLLOW, unit)
+        -- A creature has no equipped-item particle bindings. Reproduce Valve's
+        -- preview bindings explicitly instead of leaving all card CPs at zero.
+        if path == io_arcana_particle then
+            for index, point in ipairs(arcana_attachments) do
+                ParticleManager:SetParticleControlEnt(id, index - 1, unit,
+                    PATTACH_POINT_FOLLOW, point, unit:GetAbsOrigin(), true)
+            end
+        elseif path == io_body_particle then
+            ParticleManager:SetParticleControlEnt(id, 0, unit,
+                PATTACH_POINT_FOLLOW, "attach_hitloc", unit:GetAbsOrigin(), true)
+            ParticleManager:SetParticleControlEnt(id, 1, unit,
+                PATTACH_ABSORIGIN_FOLLOW, "", unit:GetAbsOrigin(), true)
+            ParticleManager:SetParticleControl(id, 10, Vector(1, 1, 0))
+            ParticleManager:SetParticleControl(id, 11, Vector(1, 0, 0))
+            ParticleManager:SetParticleControl(id, 13, Vector(0, 1, 1))
+        end
+    end)
+    if not ok then retire(id); return nil end
+    return id
 end
 local function remove_wearable(entity)
     if not valid(entity) then return end
@@ -33,13 +56,18 @@ end
 local function wearable(unit, path, entity_class, idle)
     if type(SpawnEntityFromTableSynchronous) ~= "function" then return nil end
     local ok, entity = pcall(SpawnEntityFromTableSynchronous,
-        entity_class or "dota_item_wearable", {model = path})
+        entity_class or "prop_dynamic", {model = path, solid = "0", spawnflags = "256",
+            DisableBoneFollowers = "1", DefaultAnim = idle})
     if not ok or not valid(entity) then return nil end
     local attached = pcall(function()
-        -- dota_item_wearable ignores the spawn table model in the Tools runtime.
+        -- An unbound dota_item_wearable exists on the server but does not render
+        -- on this creature. Parent a renderable prop without merging Io's root
+        -- skeleton with the arcana's independent root_immortal/card skeleton.
         entity:SetModel(path)
         assert(entity:SetOwner(unit) ~= false)
-        assert(entity:FollowEntity(unit, true) ~= false)
+        assert(entity:SetParent(unit, "") ~= false)
+        entity:SetLocalOrigin(Vector(0, 0, 0))
+        entity:SetLocalAngles(0, 0, 0)
     end)
     if not attached then remove_wearable(entity); return nil end
     set_sequence({entity}, idle)
@@ -49,12 +77,14 @@ local function stop_work(state)
     if state.building_index and work[state.building_index] == state then
         work[state.building_index] = nil
     end
-    local id, activity, owner = state.work_particle, state.activity, state.owner
+    local activity, owner = state.activity, state.owner
     -- Detach ownership before engine calls: cleanup callbacks may re-enter.
-    state.building, state.building_index, state.work_particle, state.activity = nil, nil, nil, nil
+    state.building, state.building_index, state.activity, state.animation_token = nil, nil, nil, nil
     if state.world == GameRules then
+        if valid(owner) and owner.SetContextThink then
+            pcall(owner.SetContextThink, owner, "survival_builder_construction_animation", nil, 0)
+        end
         set_sequence(state.wearables, state.idle_sequence)
-        retire(id)
     end
     if state.world == GameRules and activity and valid(owner) and owner.FadeGesture then
         pcall(owner.FadeGesture, owner, activity)
@@ -90,9 +120,11 @@ function M.apply(unit, definition)
         local entity = wearable(unit, path, asset.attachment_entity_class, asset.default_sequence)
         if entity then state.wearables[#state.wearables+1] = entity end
     end
-    -- TI7 particles read card attachments that exist on the cosmetic, not Io body.
+    -- The native Io model alone has no visible light body. If the cosmetic
+    -- cannot attach, retain a visible builder using Io's original body effect.
     local visual_owner = state.wearables[1] or unit
-    for _, path in ipairs(asset.environment_particles or {}) do
+    local ambient_paths = state.wearables[1] and asset.environment_particles or { io_body_particle }
+    for _, path in ipairs(ambient_paths or {}) do
         local id = particle(path, visual_owner)
         if id ~= nil then state.ambient[#state.ambient+1] = id end
     end
@@ -111,9 +143,29 @@ function M.construction_started(unit, building)
     state.activity = rawget(_G, state.definition.construction_activity or "")
     if state.activity and unit.StartGesture then pcall(unit.StartGesture, unit, state.activity) end
     set_sequence(state.wearables, state.definition.construction_sequence)
+    -- Play the native attack once, then return to idle independently of the
+    -- build duration. No charging emitter or recurring construction timer.
     local visual_owner = state.wearables[1]
-    state.work_particle = particle(state.definition.construction_particle,
-        valid(visual_owner) and visual_owner or unit)
+    local duration = 1 -- Native Io/arcana attack: 31 frames at 30 fps.
+    if valid(visual_owner) and visual_owner.SequenceDuration then
+        local ok, value = pcall(visual_owner.SequenceDuration, visual_owner,
+            state.definition.construction_sequence)
+        value = tonumber(value)
+        if ok and value and value > 0 and value < 10 then duration = value end
+    end
+    if unit.SetContextThink then
+        local token = {}
+        state.animation_token = token
+        pcall(unit.SetContextThink, unit, "survival_builder_construction_animation", function()
+            if state.world ~= GameRules or owners[state.index] ~= state
+                or state.animation_token ~= token or not valid(unit) then return end
+            state.animation_token = nil
+            local activity = state.activity
+            state.activity = nil
+            set_sequence(state.wearables, state.idle_sequence)
+            if activity and unit.FadeGesture then pcall(unit.FadeGesture, unit, activity) end
+        end, duration)
+    end
     return true
 end
 

@@ -255,8 +255,10 @@ end
 
 function M.precache(context)
     if not PrecacheResource then return 0 end
-    local seen = {}
-    local count = 0
+    local compatibility = "soundevents/survival_native_compat.vsndevts"
+    PrecacheResource("soundfile", compatibility, context)
+    local seen = {[compatibility]=true}
+    local count = 1
     for _, row in ipairs(definitions.rows or {}) do
         if row.enabled ~= false then
             for _, resource in ipairs(sound_resources(row)) do

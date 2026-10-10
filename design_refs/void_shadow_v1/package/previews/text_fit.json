@@ -1,0 +1,990 @@
+[
+  {
+    "id": "virtual_01_quantity",
+    "text": "115/320",
+    "fits": true,
+    "ink_size": [
+      67,
+      18
+    ],
+    "box_size": [
+      86,
+      29
+    ]
+  },
+  {
+    "id": "virtual_01_name",
+    "text": "幻象树枝",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "virtual_02_quantity",
+    "text": "15/320",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      29
+    ]
+  },
+  {
+    "id": "virtual_02_name",
+    "text": "贪婪金币",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "virtual_03_quantity",
+    "text": "118/320",
+    "fits": true,
+    "ink_size": [
+      67,
+      18
+    ],
+    "box_size": [
+      87,
+      29
+    ]
+  },
+  {
+    "id": "virtual_03_name",
+    "text": "虚无砖块",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      131,
+      35
+    ]
+  },
+  {
+    "id": "virtual_04_quantity",
+    "text": "16/320",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      29
+    ]
+  },
+  {
+    "id": "virtual_04_name",
+    "text": "粘稠之泥",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      130,
+      35
+    ]
+  },
+  {
+    "id": "virtual_05_quantity",
+    "text": "13/320",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      29
+    ]
+  },
+  {
+    "id": "virtual_05_name",
+    "text": "虚空箭头",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      130,
+      35
+    ]
+  },
+  {
+    "id": "virtual_06_quantity",
+    "text": "13/330",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      81,
+      29
+    ]
+  },
+  {
+    "id": "virtual_06_name",
+    "text": "阴暗附着",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      131,
+      35
+    ]
+  },
+  {
+    "id": "virtual_07_quantity",
+    "text": "15/330",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      29
+    ]
+  },
+  {
+    "id": "virtual_07_name",
+    "text": "阴影碎布",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "virtual_08_quantity",
+    "text": "13",
+    "fits": true,
+    "ink_size": [
+      20,
+      14
+    ],
+    "box_size": [
+      47,
+      29
+    ]
+  },
+  {
+    "id": "virtual_08_name",
+    "text": "空明碎甲",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      131,
+      35
+    ]
+  },
+  {
+    "id": "virtual_09_quantity",
+    "text": "—/330",
+    "fits": true,
+    "ink_size": [
+      53,
+      18
+    ],
+    "box_size": [
+      74,
+      28
+    ]
+  },
+  {
+    "id": "virtual_09_name",
+    "text": "虚空护罩",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "virtual_10_quantity",
+    "text": "16/310",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      28
+    ]
+  },
+  {
+    "id": "virtual_10_name",
+    "text": "大魔之锤",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "virtual_11_quantity",
+    "text": "16/330",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      81,
+      28
+    ]
+  },
+  {
+    "id": "virtual_11_name",
+    "text": "虚无之盾",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      131,
+      35
+    ]
+  },
+  {
+    "id": "virtual_12_quantity",
+    "text": "14/340",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      28
+    ]
+  },
+  {
+    "id": "virtual_12_name",
+    "text": "坚韧甲壳",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      130,
+      35
+    ]
+  },
+  {
+    "id": "virtual_13_quantity",
+    "text": "15/340",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      28
+    ]
+  },
+  {
+    "id": "virtual_13_name",
+    "text": "动力齿轮",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      130,
+      35
+    ]
+  },
+  {
+    "id": "virtual_14_quantity",
+    "text": "14/305",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      81,
+      28
+    ]
+  },
+  {
+    "id": "virtual_14_name",
+    "text": "无形之斧",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      131,
+      35
+    ]
+  },
+  {
+    "id": "virtual_15_quantity",
+    "text": "12/170",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      28
+    ]
+  },
+  {
+    "id": "virtual_15_name",
+    "text": "弦类道具",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "virtual_16_quantity",
+    "text": "12",
+    "fits": true,
+    "ink_size": [
+      20,
+      14
+    ],
+    "box_size": [
+      47,
+      28
+    ]
+  },
+  {
+    "id": "virtual_16_name",
+    "text": "能类道具",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      131,
+      35
+    ]
+  },
+  {
+    "id": "virtual_17_quantity",
+    "text": "—/130",
+    "fits": true,
+    "ink_size": [
+      53,
+      18
+    ],
+    "box_size": [
+      74,
+      27
+    ]
+  },
+  {
+    "id": "virtual_17_name",
+    "text": "相位之力",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "virtual_18_quantity",
+    "text": "12/290",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      27
+    ]
+  },
+  {
+    "id": "virtual_18_name",
+    "text": "虚空炼金",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "virtual_19_quantity",
+    "text": "15/215",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      81,
+      27
+    ]
+  },
+  {
+    "id": "virtual_19_name",
+    "text": "腐蚀魔能",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      131,
+      35
+    ]
+  },
+  {
+    "id": "virtual_20_quantity",
+    "text": "12/350",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      27
+    ]
+  },
+  {
+    "id": "virtual_20_name",
+    "text": "膨胀药剂",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      130,
+      35
+    ]
+  },
+  {
+    "id": "virtual_21_quantity",
+    "text": "12/320",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      27
+    ]
+  },
+  {
+    "id": "virtual_21_name",
+    "text": "梦魇狂躁",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      130,
+      35
+    ]
+  },
+  {
+    "id": "virtual_22_quantity",
+    "text": "14/320",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      81,
+      27
+    ]
+  },
+  {
+    "id": "virtual_22_name",
+    "text": "虚无之终",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      131,
+      35
+    ]
+  },
+  {
+    "id": "virtual_23_quantity",
+    "text": "15/320",
+    "fits": true,
+    "ink_size": [
+      57,
+      18
+    ],
+    "box_size": [
+      80,
+      27
+    ]
+  },
+  {
+    "id": "virtual_23_name",
+    "text": "虚无之眠",
+    "fits": true,
+    "ink_size": [
+      76,
+      19
+    ],
+    "box_size": [
+      129,
+      35
+    ]
+  },
+  {
+    "id": "project_title",
+    "text": "苟发育",
+    "fits": true,
+    "ink_size": [
+      93,
+      31
+    ],
+    "box_size": [
+      102,
+      39
+    ]
+  },
+  {
+    "id": "page_title",
+    "text": "虚空之影",
+    "fits": true,
+    "ink_size": [
+      152,
+      37
+    ],
+    "box_size": [
+      159,
+      44
+    ]
+  },
+  {
+    "id": "top_0",
+    "text": "宝物",
+    "fits": true,
+    "ink_size": [
+      42,
+      21
+    ],
+    "box_size": [
+      49,
+      25
+    ]
+  },
+  {
+    "id": "top_1",
+    "text": "存档",
+    "fits": true,
+    "ink_size": [
+      42,
+      21
+    ],
+    "box_size": [
+      58,
+      26
+    ]
+  },
+  {
+    "id": "top_2",
+    "text": "抽奖",
+    "fits": true,
+    "ink_size": [
+      42,
+      21
+    ],
+    "box_size": [
+      51,
+      25
+    ]
+  },
+  {
+    "id": "top_3",
+    "text": "商城",
+    "fits": true,
+    "ink_size": [
+      42,
+      21
+    ],
+    "box_size": [
+      53,
+      25
+    ]
+  },
+  {
+    "id": "top_4",
+    "text": "每日奖励",
+    "fits": true,
+    "ink_size": [
+      84,
+      21
+    ],
+    "box_size": [
+      85,
+      27
+    ]
+  },
+  {
+    "id": "top_5",
+    "text": "排行榜",
+    "fits": true,
+    "ink_size": [
+      63,
+      21
+    ],
+    "box_size": [
+      68,
+      27
+    ]
+  },
+  {
+    "id": "sidebar_01",
+    "text": "通关存档",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      39
+    ]
+  },
+  {
+    "id": "sidebar_02",
+    "text": "虚空之影",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      43
+    ]
+  },
+  {
+    "id": "sidebar_03",
+    "text": "地图等级",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      39
+    ]
+  },
+  {
+    "id": "sidebar_04",
+    "text": "上班福利",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      37
+    ]
+  },
+  {
+    "id": "sidebar_05",
+    "text": "福利礼包",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      39
+    ]
+  },
+  {
+    "id": "sidebar_06",
+    "text": "神兵碎片",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      39
+    ]
+  },
+  {
+    "id": "sidebar_07",
+    "text": "秘法牢笼",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      37
+    ]
+  },
+  {
+    "id": "sidebar_08",
+    "text": "BOSS存档",
+    "fits": true,
+    "ink_size": [
+      105,
+      23
+    ],
+    "box_size": [
+      133,
+      38
+    ]
+  },
+  {
+    "id": "sidebar_09",
+    "text": "积分道具",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      38
+    ]
+  },
+  {
+    "id": "sidebar_10",
+    "text": "商城道具",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      38
+    ]
+  },
+  {
+    "id": "sidebar_11",
+    "text": "无尽存档",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      38
+    ]
+  },
+  {
+    "id": "sidebar_12",
+    "text": "钓鱼存档",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      38
+    ]
+  },
+  {
+    "id": "sidebar_13",
+    "text": "存档建筑",
+    "fits": true,
+    "ink_size": [
+      92,
+      23
+    ],
+    "box_size": [
+      133,
+      39
+    ]
+  },
+  {
+    "id": "sidebar_14",
+    "text": "我的前男友",
+    "fits": true,
+    "ink_size": [
+      115,
+      23
+    ],
+    "box_size": [
+      133,
+      38
+    ]
+  },
+  {
+    "id": "sidebar_15",
+    "text": "我的前女友",
+    "fits": true,
+    "ink_size": [
+      115,
+      23
+    ],
+    "box_size": [
+      133,
+      38
+    ]
+  },
+  {
+    "id": "sidebar_16",
+    "text": "神兽",
+    "fits": true,
+    "ink_size": [
+      46,
+      23
+    ],
+    "box_size": [
+      133,
+      44
+    ]
+  },
+  {
+    "id": "filter_all_text",
+    "text": "全部",
+    "fits": true,
+    "ink_size": [
+      42,
+      21
+    ],
+    "box_size": [
+      50,
+      26
+    ]
+  },
+  {
+    "id": "filter_owned_text",
+    "text": "已拥有",
+    "fits": true,
+    "ink_size": [
+      63,
+      21
+    ],
+    "box_size": [
+      71,
+      27
+    ]
+  },
+  {
+    "id": "filter_unowned_text",
+    "text": "未解锁",
+    "fits": true,
+    "ink_size": [
+      63,
+      21
+    ],
+    "box_size": [
+      78,
+      28
+    ]
+  },
+  {
+    "id": "gold_text",
+    "text": "2,881",
+    "fits": true,
+    "ink_size": [
+      50,
+      19
+    ],
+    "box_size": [
+      63,
+      29
+    ]
+  },
+  {
+    "id": "purple_gem_text",
+    "text": "320",
+    "fits": true,
+    "ink_size": [
+      33,
+      15
+    ],
+    "box_size": [
+      46,
+      29
+    ]
+  },
+  {
+    "id": "ticket_text",
+    "text": "20",
+    "fits": true,
+    "ink_size": [
+      22,
+      15
+    ],
+    "box_size": [
+      29,
+      29
+    ]
+  }
+]

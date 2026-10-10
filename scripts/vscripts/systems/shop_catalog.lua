@@ -493,7 +493,16 @@ local function project_entry(player_id, entry, context)
             prerequisite_text = (prerequisite_text ~= "" and prerequisite_text .. " · " or "")
                 .. "完成" .. tostring(required.reincarnation_level) .. "转"
         end
-        item.prerequisite_met = prerequisite_met and reincarnation_met and 1 or 0
+        local access_met = context.debug_all_unlocked == true
+            or context.gold_mine_ability or context.validated_research_source == true
+            or (entry.technology_track == "advanced_researcher"
+                and context.advanced_researcher_unlocked == true)
+            or (entry.technology_track ~= "advanced_researcher"
+                and context.research_unlocked == true)
+        item.prerequisite_met = access_met
+            and (context.debug_all_unlocked == true or (prerequisite_met and reincarnation_met)) and 1 or 0
+        item.can_afford, item.resource_check_on_cast = 1, 1
+        item.completed = current_level >= research.max_level and 1 or 0
         item.prerequisite_technology_id = required.tech_id or ""
         item.prerequisite_technology_group = prerequisite_group
         item.prerequisite_current_level = prerequisite_current_level
@@ -516,12 +525,6 @@ local function project_entry(player_id, entry, context)
             locked_reason = "需要完成" .. tostring(required.reincarnation_level)
                 .. "转（当前" .. tostring(context.rebirth_level or 0) .. "转）"
             locked_reason_code = "rebirth_level_not_met"
-        elseif number((context.resources or {}).gold) < item.gold_cost then
-            locked_reason = "金币不足"
-            locked_reason_code = "insufficient_gold"
-        elseif number((context.resources or {}).wood) < item.wood_cost then
-            locked_reason = "木材不足"
-            locked_reason_code = "insufficient_wood"
         end
         if item.purchasable == 1 and locked_reason then
             item.purchasable = 0
@@ -537,7 +540,7 @@ local function project_entry(player_id, entry, context)
                 .. "；开始研究时扣费"
             item.purchasable = queue_count < capacity
                 and math.max(current_level, reserved_level) < research.max_level
-                and (context.debug_all_unlocked == true or (prerequisite_met and reincarnation_met)) and 1 or 0
+                and item.prerequisite_met == 1 and 1 or 0
             if queue_count >= capacity then
                 item.disabled_reason = "研究队列已满（1个研究中＋6个等待）"
                 item.disabled_reason_code = "research_queue_full"

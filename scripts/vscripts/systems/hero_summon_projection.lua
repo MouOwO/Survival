@@ -3,6 +3,7 @@ local events = require("core/events")
 local heroes = require("config/generated/hero_definitions")
 local altar_actions = require("config/generated/altar_actions")
 local summon_access = require("systems/hero_summon_access")
+local summon_eligibility = require("systems/hero_summon_eligibility")
 
 local M = {}
 
@@ -90,6 +91,8 @@ local function option(definition, access)
 end
 
 function M.build(player_id, altar, city_level, summoned)
+    local unlocked, disabled_reason, unlock_source =
+        summon_eligibility.check(player_id, city_level, altar)
     local entitlement = M.entitlements(player_id)
     local access = summon_access.context(player_id, entitlement)
     local options = {}
@@ -104,7 +107,10 @@ function M.build(player_id, altar, city_level, summoned)
 
     return {
         player_id = player_id,
-        altar_built = valid_entity(altar) and 1 or 0,
+        altar_built = summon_eligibility.altar_built(altar) and 1 or 0,
+        summon_unlocked = unlocked and 1 or 0,
+        summon_disabled_reason = disabled_reason or "",
+        summon_unlock_source = unlock_source or "",
         city_level = city_level or 0,
         hero_summoned = summoned and 1 or 0,
         summoned_hero_id = summoned and summoned.hero_id or "",

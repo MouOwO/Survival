@@ -9,16 +9,29 @@ local function call(entity, name, ...)
     return false
 end
 
+local function retire_particles(state)
+    if not state then return end
+    local particles = state.particles
+    state.particles = {}
+    for _, particle in ipairs(particles or {}) do
+        call(ParticleManager, "DestroyParticle", particle, true)
+        call(ParticleManager, "ReleaseParticleIndex", particle)
+    end
+end
+
+function M.stop_particles(unit)
+    retire_particles(unit and unit.survival_monster_cosmetic_details)
+end
+
 function M.clear(unit)
     local state = unit and unit.survival_monster_cosmetic_details
     if not state then return end
     unit.survival_monster_cosmetic_details = nil
-    for _, particle in ipairs(state.particles) do
-        call(ParticleManager, "DestroyParticle", particle, false)
-        call(ParticleManager, "ReleaseParticleIndex", particle)
+    if type(unit.IsNull) ~= "function" or not unit:IsNull() then
+        if state.original_skin ~= nil then call(unit, "SetSkin", state.original_skin) end
+        if state.has_activities then call(unit, "ClearActivityModifiers") end
     end
-    if state.original_skin ~= nil then call(unit, "SetSkin", state.original_skin) end
-    if state.has_activities then call(unit, "ClearActivityModifiers") end
+    retire_particles(state)
 end
 
 function M.apply(unit, asset, components)

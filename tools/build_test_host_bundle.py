@@ -22,6 +22,8 @@ FILES = (
     "tools/backend_python.ps1", "tools/test_backend_python.ps1", "tools/repair_hammer_console.ps1",
     "tools/test_repair_hammer_console.ps1", "tools/test_setup_hammer_backend.py",
     "tools/map_c6/console.cjs", "tools/map_c6/console-relay.cjs", "tools/deploy/goufayu_test_known_hosts",
+    "tools/hammer_console_transport.py", "tools/map_c6/console-session.cjs",
+    "tools/map_c6/hammer-console-worker.cjs",
     "tools/test_aliyun_local_config.py", "tools/test_aliyun_test_host.py", "tools/test_aliyun_lan_probe.py",
     "tools/test_aliyun_game_test_auth.py", "tools/test_aliyun_test_connection.py",
     "tools/test_hammer_backend_bridge.py", "tools/test_setup_aliyun_test_host.py",

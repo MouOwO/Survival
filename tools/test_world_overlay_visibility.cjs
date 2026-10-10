@@ -1,11 +1,11 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
-const nodes={},jobs=[];let onTable,modal=null,screenX=100,screenY=100;
+const nodes={},jobs=[];let onTable,modal=null,screenX=100,screenY=100,clock=1000,treeReads=0,originReads=0;
 function panel(id,parent){const p={id,parent,style:{},visible:true,actualuiscale_x:1,actualuiscale_y:1,classes:new Set(),IsValid(){return !this.deleted;},GetParent(){return this.parent;},FindChildTraverse(key){return nodes[key]||null;},BHasClass(c){return this.classes.has(c);},AddClass(c){this.classes.add(c);},SetHasClass(c,v){v?this.classes.add(c):this.classes.delete(c);},DeleteAsync(){this.deleted=true;},GetPositionWithinWindow(){return this.position||{x:0,y:0};}};if(id)nodes[id]=p;return p;}
 const root=panel('Hud'),ctx=panel('Context',root),container=panel('SurvivalHeroWorldHealthBars',ctx);
 const tooltip=panel('CustomAbilityTooltip',ctx);tooltip.position={x:60,y:60};tooltip.actuallayoutwidth=200;tooltip.actuallayoutheight=100;tooltip.AddClass('Hidden');
 const cfg={HandoffWorldOcclusion:[],SurvivalUILayers:{Top:()=>modal}};
 const $=id=>nodes[id.slice(1)];$.GetContextPanel=()=>ctx;$.CreatePanel=(_,parent,id)=>panel(id,parent);$.Schedule=(_,f)=>jobs.push(f);
-const env={$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,WorldToScreenX:()=>screenX,WorldToScreenY:()=>screenY},Players:{GetTeam:()=>2},Entities:{IsValidEntity:()=>true,IsAlive:()=>true,IsDormant:()=>false,GetAbsOrigin:()=>[0,0,0],GetUnitName:()=> 'monster'},CustomNetTables:{GetAllTableValues:()=>({}),SubscribeNetTableListener:(_,f)=>onTable=f}};
+const env={$,Date:{now:()=>clock},GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,WorldToScreenX:()=>screenX,WorldToScreenY:()=>screenY},Players:{GetTeam:()=>2},Entities:{IsValidEntity:()=>true,IsAlive:()=>true,IsDormant:()=>false,GetAbsOrigin:()=>{originReads++;return [0,0,0];},GetUnitName:()=> 'monster'},CustomNetTables:{GetAllTableValues:()=>({}),SubscribeNetTableListener:(_,f)=>onTable=f}};
 for(const file of ['world_overlay_visibility.js','world_health_bar_anchor.js','hero_world_health_bar.js'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file,'utf8'),env);
 onTable('survival_hero_health_bar','unit_7',{entindex:7,health:50,max_health:100,alive:1,team:3,unit_name:'monster'});
 const tick=()=>jobs.shift()(),bar=()=>nodes.SurvivalHeroWorldHealth_unit_7;
@@ -13,12 +13,16 @@ tick();assert.equal(bar().style.visibility,'visible','world bar stays visible aw
 cfg.HandoffWorldOcclusion=[{x:120,y:70,width:200,height:100}];tick();assert.equal(bar().style.visibility,'collapse','partial overlap with native HUD is hidden');
 screenX=400;tick();assert.equal(bar().style.visibility,'visible','bar moving out of HUD returns');
 screenX=100;cfg.HandoffWorldOcclusion=[];modal='treasure';tick();assert.equal(bar().style.visibility,'collapse','modal suppresses world overlays');
+const readsBeforeBlocked=originReads;
+for(let i=0;i<1000;i++)tick();
+assert.equal(originReads,readsBeforeBlocked,'full-screen windows must skip invisible native world projections');
 modal=null;tick();assert.equal(bar().style.visibility,'visible','closing modal restores bars');
 tooltip.classes.delete('Hidden');tick();assert.equal(bar().style.visibility,'collapse','visible tooltip occludes bars');
 tooltip.AddClass('Hidden');tick();assert.equal(bar().style.visibility,'visible','hidden tooltip does not occlude');
 container.actualuiscale_x=2;container.actualuiscale_y=2;cfg.HandoffWorldOcclusion=[{x:145,y:45,width:10,height:40}];tick();assert.equal(bar().style.visibility,'collapse','bar pixel bounds include UI scaling');
 assert(!cfg.SurvivalWorldOverlayVisibility.Overlaps({blocked:false,rects:[{x:20,y:20,width:10,height:10}]},0,0,20,20),'touching an edge without overlap is visible');
 const production=panel('SurvivalProductionPanel',ctx);
+clock+=100; // A missing late-created panel is discovered within 100ms.
 production.position={x:600,y:300};production.actuallayoutwidth=560;production.actuallayoutheight=376;
 production.__survivalWindowWidth=280;production.__survivalWindowHeight=188;
 const productionBounds=cfg.SurvivalWorldOverlayVisibility.Capture();
@@ -28,3 +32,13 @@ assert(!cfg.SurvivalWorldOverlayVisibility.Overlaps(productionBounds,700,510,10,
 production.visible=false;
 assert(!cfg.SurvivalWorldOverlayVisibility.Overlaps(cfg.SurvivalWorldOverlayVisibility.Capture(),610,310,10,10),'hidden production panels release their occlusion area');
 console.log('WORLD_OVERLAY_VISIBILITY_PASS: native HUD, partial overlap, movement, modal close, tooltip visibility, scaling, production CSS-transform bounds');
+const find=root.FindChildTraverse;
+root.FindChildTraverse=function(id){treeReads++;return find.call(this,id);};
+clock+=100;
+cfg.SurvivalWorldOverlayVisibility.Capture();
+const initialReads=treeReads;
+for(let i=0;i<1000;i++)cfg.SurvivalWorldOverlayVisibility.Capture();
+assert.equal(treeReads,initialReads,'absent HUD nodes must not rescan the full tree every frame');
+clock+=100;cfg.SurvivalWorldOverlayVisibility.Capture();
+assert(treeReads>initialReads,'missing nodes still retry after the bounded delay');
+console.log('WORLD_OVERLAY_MISSING_CACHE_PASS: 1000 captures reuse negative lookups, delayed recovery remains');

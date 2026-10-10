@@ -1,5 +1,16 @@
 local M = {}
 
+function M.count(counts, building_id)
+    counts = counts or {}
+    local total = tonumber(counts[building_id]) or 0
+    if building_id == "arrow_tower" then
+        -- Promotion changes a route bucket, never the owner's live-tower cap.
+        for index = 1, 7 do total = total + (tonumber(counts["class_" .. index]) or 0) end
+        total = total + (tonumber(counts.ultimate_tower) or 0)
+    end
+    return total
+end
+
 function M.limit_reached(maximum, current)
     maximum = tonumber(maximum) or 0
     return maximum > 0 and (tonumber(current) or 0) >= maximum
@@ -19,7 +30,7 @@ function M.new(maximum_provider)
 
     function service:count(player_id, building_id)
         local by_player = self.counts[player_id]
-        return by_player and (by_player[building_id] or 0) or 0
+        return M.count(by_player, building_id)
     end
 
     function service:change(player_id, building_id, delta)

@@ -1,4 +1,5 @@
 local M = {}
+local projection = require("combat/endless_stat_projection")
 
 function M:Apply(context)
     if type(context) ~= "table" then return { ok = false, error = "invalid_context" } end
@@ -6,7 +7,7 @@ function M:Apply(context)
         or not context.victim or context.victim:IsNull() then
         return { ok = false, error = "invalid_entity" }
     end
-    if type(context.damage) ~= "number" or context.damage < 0 then
+    if not projection.is_finite(context.damage) or context.damage < 0 then
         return { ok = false, error = "invalid_damage" }
     end
     ApplyDamage({

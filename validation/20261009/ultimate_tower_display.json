@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-09",
+  "status": "SUPERSEDED: actual game reported a broken common HUD; earlier mock checks missed invalid native color parsing and ancestor scope corruption. See validation/20261009/ultimate_tower_correction.json for corrected implementation and honest actual-game evidence.",
+  "causes": {
+    "tooltip": "managedUpgrade omitted npc_dota_unit_ultimate_tower",
+    "localization": "Five localized names drifted from current published names",
+    "cloud": "Slark Shadow Dance dummy cloud centered on torso hid the model",
+    "ability_layout": "Native ancestor containers could reset after selection/ability signature settled, leaving icons below seven frames"
+  },
+  "appearance": {
+    "control_points": {
+      "CP2": "server center + 40 Z; native cloud child adds -20 Z",
+      "CP1": "ground profile radius,0,0",
+      "CP0": "server ground center"
+    },
+    "cleanup": "cloud/base handles and cosmetic modifier retired on relocation, destruction, death, reset, and partial setup failure",
+    "body_mode": "Hidden non-purgable cosmetic modifier; native whole-model shader, no Sven damage or immunity",
+    "native_cloud_verified": true,
+    "ground": "particles/units/heroes/hero_zeus/zeus_cloud.vpcf",
+    "owned_roots": 4,
+    "body": "particles/status_fx/status_effect_gods_strength.vpcf",
+    "attachment_choice": "Status shader avoids Sven-specific eye attachment and numbered arm hitboxes missing on Roshan",
+    "shader": "engine-owned modifier status effect",
+    "movement": "existing relocation event rebuild, no new periodic work"
+  },
+  "display": {
+    "actual_runtime_skills": "existing thirteen hidden skills untouched",
+    "stable_refresh": "40 cycles: zero repeated ancestor style writes and tooltip recoveries",
+    "layout": "repair existing native row ancestors on existing refresh only when getter state or viewport changes",
+    "visible_slots": "five aggregate passives plus D move and G destroy",
+    "name": "万象归一",
+    "tooltip": "project tooltip for all visible ultimate abilities"
+  },
+  "validation": {
+    "game": "1600x900 survival window existed but was not foreground; screenshot helper refused capture; native console echo timed out. No game input or restart sent; appearance, hover and FPS not claimed game verified",
+    "ui_manifest": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\ultimate_tower_display_20261009\\ui_build_20261009_093641\\manifest.json",
+    "syntax": "four Lua and four JS syntax checks passed",
+    "lua": [
+      {
+        "test": "test_tower_visual_lifecycle",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_visual_relocation",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ultimate_tower_tree_targeting",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_destruction_rebuild",
+        "exit_code": 0
+      }
+    ],
+    "diff_check": "passed",
+    "js": [
+      {
+        "test": "test_ultimate_tower_hud",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_tooltip_recovery",
+        "exit_code": 0
+      },
+      {
+        "test": "test_topnav_hotpath_recovery",
+        "exit_code": 0
+      },
+      {
+        "test": "test_tower_passive_icons",
+        "exit_code": 0
+      },
+      {
+        "test": "test_prerequisite_shading",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_button_states",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_tooltip_stability",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_hover_bounds",
+        "exit_code": 0
+      },
+      {
+        "test": "test_handoff_numeric_layout",
+        "exit_code": 0
+      },
+      {
+        "test": "test_unit_stat_visibility",
+        "exit_code": 0
+      },
+      {
+        "test": "test_ability_hotkey_refresh_cache",
+        "exit_code": 0
+      }
+    ],
+    "source_content_compiled_hashes": "matched",
+    "native_particle_paths": "Verified directly from game/dota/pak01_dir.vpk and particle structures inspected with resourceinfo.exe"
+  },
+  "files": [
+    {
+      "path": "scripts/vscripts/systems/tower_visual_service.lua",
+      "sha256": "4C6ED8929855EEA7E4BD4AA026E0F8901E6A80F5E7FD968A472116EF84B2F7BD"
+    },
+    {
+      "path": "scripts/vscripts/modifiers/modifier_ultimate_tower_presence.lua",
+      "sha256": "DFBBD287D7D83689F48EA588BA12BA67839AC28673E1EB9CB91E0DEABC610A81"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_tower_visual_lifecycle.lua",
+      "sha256": "052158855A89A2529A4F6E28FB6C87DE6D843C13A645478A7CD44978B1581AC3"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_tower_visual_relocation.lua",
+      "sha256": "5FA4BE5B2F07DEDA335EB43563D017CA9F5473D6A8F00ADD79672A877681046A"
+    },
+    {
+      "path": "resource/localization/addon_schinese.txt",
+      "sha256": "1417F009987418D8E164B8C3A7A65EBD725EB575CFAF5A9F0FD4D4F57C875A09"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/ability_tooltip.js",
+      "sha256": "92EB2031F87500A6DA4F118ABFA27A792198512409B069FDD329654450267D90"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+      "sha256": "0B7624212CADE16B7DCCF9842C46A856FAD62FD49EAC4327AD128FBA333D040B"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/handoff_hud.js",
+      "sha256": "5EC4C357011698BCAB6B41B92EE59842926BF64C7AC3E7ABB8C024DC1AA4E45D"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/hud_takeover.js",
+      "sha256": "936566608D04F360328C57BC7F728A696F8C5D212FF6B242DCFA2192686AD967"
+    },
+    {
+      "path": "tools/test_ultimate_tower_hud.cjs",
+      "sha256": "1937DEB798D3D9C6D2816B28AA8C231188482509DC34D8A5BF792DA8F5F826B4"
+    },
+    {
+      "path": "tools/test_ability_tooltip_recovery.cjs",
+      "sha256": "7C155E37FEB8E6923F96EAB7F98240FDA0BBC591ED2D64313C1EB4616477C58A"
+    },
+    {
+      "path": "tools/test_topnav_hotpath_recovery.cjs",
+      "sha256": "4D98973BB1B8BA732D336D6D52FA38D9D4EA41616A8A3AF60E1AD7EF59042E4B"
+    }
+  ],
+  "restore": {
+    "new_file": "scripts/vscripts/modifiers/modifier_ultimate_tower_presence.lua",
+    "ui_checkpoint": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\ultimate_tower_display_20261009\\ui_build_20261009_093641",
+    "instructions": "Restore only corresponding task files/backups and compiled artifacts. Do not reset HEAD, because other user work remains uncommitted. Reload map to load native precaches and Lua modifier.",
+    "source_before": "output/ultimate_tower_display_20261009/before"
+  },
+  "git": "No commit or push requested/performed"
+}

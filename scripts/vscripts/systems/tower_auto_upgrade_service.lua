@@ -7,6 +7,7 @@ local M = {}
 local jobs, dependencies = {}, nil
 local players = {}
 local queue_player
+local CHECK_INTERVAL = 1
 local function player_task(player, suffix)
     return "tower_auto_upgrade_player_" .. tostring(player) .. suffix
 end
@@ -24,7 +25,7 @@ local function stop(index)
         if not next(bucket.jobs) then
             players[job.player_id] = nil
             scheduler.cancel(player_task(job.player_id, "_check"))
-            scheduler.cancel(player_task(job.player_id, "_fallback"))
+            scheduler.cancel(player_task(job.player_id, "_tick"))
         end
     end
     if valid(job.unit) then
@@ -46,6 +47,9 @@ end
 local function step(index)
     local job = jobs[index]
     if not job then return false end
+    local now = GameRules:GetGameTime()
+    if job.next_check_at and now < job.next_check_at then return true end
+    job.next_check_at = now + CHECK_INTERVAL
     local state = current(job)
     if not state then stop(index); return false end
     if job.unit.survival_upgrade_in_progress
@@ -59,24 +63,20 @@ local function step(index)
     if not job.cost or not dependencies.can_upgrade(state, job.cost) then return true end
     -- Use the same authoritative cost, population and upgrade lifecycle as a click.
     -- Keep the selected route through stage transitions; never choose a route.
-    local result = dependencies.upgrade({building = job.unit, upgrade_mode = "one",
+    dependencies.upgrade({building = job.unit, upgrade_mode = "one",
         silent_notification = true, player_id = job.player_id})
     if jobs[index] ~= job then return false end
     if not current(job) then stop(index); return false end
     job.waiting = job.unit.survival_upgrade_in_progress == true
-    if result and result.ok and not job.waiting then queue_player(job.player_id) end
     return true
 end
 
--- One coalesced queue per owner, with at most eight towers checked per slice.
--- Events emitted synchronously by spending only queue a later pass.
+-- One one-second timer per owner; at most eight registered towers per slice.
+-- Spending, income and upgrade completion never schedule additional checks.
 queue_player = function(player)
     local bucket = players[player]
     if not bucket then return end
-    if bucket.pending then
-        if bucket.running then bucket.again = true end
-        return
-    end
+    if bucket.pending then return end
     bucket.pending = true
     local indexes, cursor
     local function run()
@@ -87,7 +87,6 @@ queue_player = function(player)
             table.sort(indexes)
             cursor = 1
         end
-        bucket.running = true
         local last = math.min(#indexes, cursor + 7)
         while cursor <= last do
             step(indexes[cursor])
@@ -97,14 +96,10 @@ queue_player = function(player)
         if cursor <= #indexes then
             scheduler.after(0.05, run, player_task(player, "_check"))
         else
-            bucket.pending, bucket.running = false, false
-            if bucket.again then
-                bucket.again = false
-                queue_player(player)
-            end
+            bucket.pending = false
         end
     end
-    scheduler.after(0.2, run, player_task(player, "_check"))
+    run()
 end
 local function add_job(index, job)
     jobs[index] = job
@@ -113,15 +108,13 @@ local function add_job(index, job)
     if not bucket then
         bucket = {jobs = {}}
         players[player] = bucket
-        -- Recovers missed lifecycle/free-upgrade events; not the normal driver.
-        scheduler.every(3, function()
+        scheduler.every(CHECK_INTERVAL, function()
             if players[player] ~= bucket then return false end
             queue_player(player)
             return true
-        end, player_task(player, "_fallback"))
+        end, player_task(player, "_tick"))
     end
     bucket.jobs[index] = true
-    queue_player(player)
 end
 local function toggle(payload)
     payload = payload or {}
@@ -162,6 +155,7 @@ end
 function M.init(options)
     for player in pairs(players) do
         scheduler.cancel(player_task(player, "_check"))
+        scheduler.cancel(player_task(player, "_tick"))
         scheduler.cancel(player_task(player, "_fallback"))
     end
     for _, job in pairs(jobs) do
@@ -182,10 +176,6 @@ function M.init(options)
         local state = current(job)
         if not state then stop(payload.entindex); return end
         job.level, job.waiting = state.level, job.unit.survival_upgrade_in_progress == true
-        queue_player(job.player_id)
-    end)
-    event_bus.subscribe(events.RESOURCE_CHANGED, function(payload)
-        queue_player(tonumber(payload.player_id))
     end)
     event_bus.subscribe(events.BUILDING_DESTROYED, function(payload)
         local job = jobs[payload.entindex]

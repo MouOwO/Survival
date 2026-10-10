@@ -16,9 +16,12 @@ GameRules = {GetGameTime = function() return now end}
 local bus, events = require("core/event_bus"), require("core/events")
 local scheduler, workers = require("core/scheduler"), require("systems/worker_system")
 local cities, states, accounts, spawned, units, create_ok, land_ok, ability
-local function reset()
+local projection_resource_checks = 0
+local spend_attempts, charged_wood, charged_gold, charged_population, refunds
+local function reset(fusion_test)
     now, defeated, cities, states, accounts, spawned, units = 0, {}, {}, {}, {}, {}, {}
     create_ok, land_ok = true, true
+    spend_attempts, charged_wood, charged_gold, charged_population, refunds = 0, 0, 0, 0, 0
     scheduler.clear(); bus.reset(); workers.init()
     ability = {SetHidden = function(self, value) self.hidden = value end}
     for player = 0, 1 do
@@ -38,7 +41,10 @@ local function reset()
         accounts[player] = {wood = 1000000, gold = 1000000, population = 0, max_population = 100}
     end
     bus.handle_request(events.BUILDING_QUERY_REQUEST, function(payload) return states[payload.entindex] end)
-    bus.handle_request(events.BUILDING_LIST_REQUEST, function() return {buildings = {}} end)
+    bus.handle_request(events.BUILDING_LIST_REQUEST, function(payload)
+        return {ok = true, buildings = fusion_test
+            and {states[cities[payload.player_id]:entindex()]} or {}}
+    end)
     local function account_snapshot(player_id)
         local copy = {}
         for key, value in pairs(accounts[player_id]) do copy[key] = value end
@@ -55,17 +61,25 @@ local function reset()
         end
         return {ok = true}
     end
-    bus.handle_request(events.RESOURCE_CAN_SPEND_REQUEST, affordability)
+    bus.handle_request(events.RESOURCE_CAN_SPEND_REQUEST, function(payload)
+        projection_resource_checks = projection_resource_checks + 1
+        return affordability(payload)
+    end)
     bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST, function(payload)
+        spend_attempts = spend_attempts + 1
         local result = affordability(payload); if not result.ok then return result end
         local account = accounts[payload.player_id]
         if account.debug_mode then return {ok = true, snapshot = account_snapshot(payload.player_id)} end
+        charged_wood = charged_wood + (payload.wood or 0)
+        charged_gold = charged_gold + (payload.gold or 0)
+        charged_population = charged_population + (payload.population or 0)
         account.wood = account.wood - (payload.wood or 0)
         account.gold = account.gold - (payload.gold or 0)
         account.population = account.population + (payload.population or 0)
         return {ok = true, snapshot = account_snapshot(payload.player_id)}
     end)
     bus.handle_request(events.RESOURCE_ADD_REQUEST, function(payload)
+        refunds = refunds + 1
         local account = accounts[payload.player_id]
         account.wood = account.wood + (payload.wood or 0)
         account.gold = account.gold + (payload.gold or 0)
@@ -82,7 +96,7 @@ local function reset()
     FindClearSpaceForUnit = function() end
     CreateUnitByName = function(name, position)
         if not create_ok then return nil end
-        local id, unit = 100 + #spawned, {name = name, position = position}
+        local id, unit = 100 + #spawned, {name = name, position = position, abilities = {}}
         function unit:IsNull() return false end
         function unit:IsAlive() return not self.killed end
         function unit:entindex() return id end
@@ -92,8 +106,19 @@ local function reset()
         function unit:SetModel(value) self.model = value end
         function unit:HasModifier() return false end
         function unit:FindModifierByName() return nil end
-        function unit:FindAbilityByName() return nil end
-        function unit:AddAbility() return {GetLevel = function() return 1 end} end
+        function unit:GetTeamNumber() return 2 end
+        function unit:FindAbilityByName(ability_name) return self.abilities[ability_name] end
+        function unit:AddAbility(ability_name)
+            local ability = {level = 0, hidden = false}
+            function ability:GetLevel() return self.level end
+            function ability:SetLevel(value) self.level = value end
+            function ability:GetAbilityName() return ability_name end
+            function ability:GetCaster() return unit end
+            function ability:IsHidden() return self.hidden end
+            self.abilities[ability_name] = ability
+            return ability
+        end
+        function unit:RemoveAbility(ability_name) self.abilities[ability_name] = nil end
         function unit:ForceKill() self.killed = true end
         setmetatable(unit, {__index = function(_, key)
             if key:match("^Set") or key == "Script_SetAttackRange" or key == "AddNewModifier" then
@@ -140,8 +165,11 @@ for _ = 1, 5 do assert(train(0, 1).ok) end
 assert(not train(0, 1).ok, "LV1 quota stays five even though queue capacity is seven")
 assert(train(0, 2).ok, "sixth job can use a different training tier")
 assert(train(0, 3).ok, "seventh job can use another unlocked training tier")
-assert(not train(0, 4).ok and accounts[0].wood == 999350, "eighth job rejected without charge")
+assert(not train(0, 4).ok and accounts[0].wood == 999990 and accounts[0].population == 1,
+    "only the active job reserves currency/population; eighth job rejected without charge")
 assert(snapshot(0).queue_count == 7 and snapshot(0).queue_capacity == 7)
+assert(snapshot(0).options[4].available == 0 and snapshot(0).options[4].prerequisite_met == 1,
+    "full queue rejects another job without pretending its city prerequisite is missing")
 assert(#snapshot(0).queued == 6 and snapshot(0).queued[5].level == 2
     and snapshot(0).queued[6].level == 3, "six waiting jobs retain their tier order")
 assert(snapshot(0).options[1].queued_count == 5 and snapshot(0).options[1].count == 0)
@@ -152,6 +180,7 @@ assert(snapshot(0).options[5].available == 1 and train(0, 5).ok,
 assert(snapshot(1).options[1].count == 0 and train(1, 1).ok)
 
 reset(); states[10].level = 1
+assert(snapshot(0).options[4].prerequisite_met == 0 and snapshot(0).options[1].prerequisite_met == 1)
 assert(not train(0, 4).ok and accounts[0].wood == 1000000, "city prerequisite rejects before payment")
 assert(not train(0, 5).ok)
 result = bus.request(events.WORKER_TRAIN_REQUEST, {city = cities[1], player_id = 0, training_id = "train_lumberjack_01"})
@@ -159,7 +188,120 @@ assert(not result.ok and accounts[1].wood == 1000000)
 result = bus.request(events.WORKER_TRAINING_GET_REQUEST, {source_entindex = 11, player_id = 0})
 assert(result.ok == false and #result.options == 0, "foreign city snapshot rejected")
 accounts[0].max_population = 0
-assert(not train(0, 1).ok and snapshot(0).options[1].available == 0)
+assert(train(0, 1).error == "population_not_enough" and snapshot(0).options[1].prerequisite_met == 1)
+accounts[0].max_population = 100
+accounts[0].wood = 0
+projection_resource_checks = 0
+local training_option = snapshot(0).options[1]
+assert(training_option.available == 1 and training_option.prerequisite_met == 1
+    and training_option.can_afford == 1 and training_option.resource_check_on_cast == 1
+    and projection_resource_checks == 0, "training snapshots do not recheck funds or gray unlocked entries")
+assert(train(0, 1).error == "wood_not_enough" and snapshot(0).queue_count == 0,
+    "an unlocked but unaffordable training click is rejected before queueing")
+
+
+-- Admission is a read-only current-account check. Waiting jobs keep quota
+-- slots, but cannot charge currency or occupy population before their turn.
+local function unlock_gold_tier()
+    for _ = 1, 5 do
+        local grant = bus.request(events.WORKER_TRAIN_REQUEST, {city = cities[0], source = "rogue_reward",
+            training_id = "train_lumberjack_01", count = 1, wood_cost_override = 0, gold_cost_override = 0})
+        assert(grant.ok)
+    end
+    assert(snapshot(0).options[5].prerequisite_met == 1)
+end
+local shortages = {
+    {name = "wood", error = "wood_not_enough"},
+    {name = "gold", error = "gold_not_enough"},
+    {name = "population", error = "population_not_enough"},
+}
+local function make_short(account, name)
+    if name == "population" then account.max_population = account.population
+    else account[name] = 0 end
+end
+local function restore_short(account, name)
+    if name == "population" then account.max_population = 100
+    else account[name] = 1000000 end
+end
+for _, case in ipairs(shortages) do
+    reset(); unlock_gold_tier()
+    make_short(accounts[0], case.name)
+    local old_wood, old_gold, old_pop = accounts[0].wood, accounts[0].gold, accounts[0].population
+    local old_attempts, old_spawned = spend_attempts, #spawned
+    assert(train(0, 5).error == case.error, case.name .. " shortage rejects admission")
+    assert(snapshot(0).queue_count == 0 and not snapshot(0).blocked_head.job_id)
+    assert(accounts[0].wood == old_wood and accounts[0].gold == old_gold
+        and accounts[0].population == old_pop and spend_attempts == old_attempts and #spawned == old_spawned,
+        "rejected admission creates no job, payment or population reservation")
+    restore_short(accounts[0], case.name)
+    assert(train(0, 2).ok)
+    make_short(accounts[0], case.name)
+    old_wood, old_gold, old_pop = accounts[0].wood, accounts[0].gold, accounts[0].population
+    old_attempts = spend_attempts
+    assert(train(0, 5).error == case.error and snapshot(0).queue_count == 1,
+        "an existing queue does not permit an unfunded additional click")
+    assert(accounts[0].wood == old_wood and accounts[0].gold == old_gold
+        and accounts[0].population == old_pop and spend_attempts == old_attempts)
+end
+for _, case in ipairs(shortages) do
+    reset(); unlock_gold_tier()
+    local base_spawns, base_wood, base_gold, base_pop = #spawned, charged_wood, charged_gold, charged_population
+    local first, second, third = train(0, 2), train(0, 5), train(0, 5)
+    assert(first.ok and second.ok and third.ok)
+    assert(charged_wood == base_wood + 100 and charged_gold == base_gold
+        and charged_population == base_pop + 1, "two waiting jobs are wholly unpaid")
+    make_short(accounts[0], case.name)
+    tick(1)
+    local view = snapshot(0)
+    assert(#spawned == base_spawns + 1 and not view.active_job.job_id)
+    assert(view.blocked_head.job_id == second.job_id and view.blocked_reason == case.error)
+    assert(view.blocked_head.started_at == 0 and view.blocked_head.finish_at == 0,
+        "unfunded second task must not start its duration")
+    assert(view.queued[1].job_id == third.job_id and view.queue_count == 2, "blocked head retains FIFO")
+    local attempts = spend_attempts
+    tick(1.99)
+    assert(spend_attempts == attempts and #spawned == base_spawns + 1, "blocked retry runs at most once per second")
+    tick(2)
+    assert(snapshot(0).blocked_head.job_id == second.job_id and not snapshot(0).active_job.job_id)
+    assert(charged_wood == base_wood + 100 and charged_gold == base_gold
+        and charged_population == base_pop + 1 and refunds == 0, "failed starts cannot charge or refund")
+    restore_short(accounts[0], case.name)
+    tick(2.99); assert(not snapshot(0).active_job.job_id)
+    tick(3)
+    view = snapshot(0)
+    assert(view.active_job.job_id == second.job_id and view.active_job.started_at == 3
+        and view.active_job.finish_at == 4 and view.blocked_reason == "")
+    assert(charged_wood == base_wood + 5100 and charged_gold == base_gold + 100
+        and charged_population == base_pop + 4, "recovered head pays once, then receives its full duration")
+    make_short(accounts[0], case.name)
+    tick(4)
+    view = snapshot(0)
+    assert(#spawned == base_spawns + 2 and not view.active_job.job_id)
+    assert(view.blocked_head.job_id == third.job_id and view.blocked_reason == case.error
+        and view.blocked_head.started_at == 0 and view.blocked_head.finish_at == 0,
+        "the third task independently waits without running a progress bar")
+    restore_short(accounts[0], case.name)
+    tick(5); assert(snapshot(0).active_job.job_id == third.job_id)
+    tick(6)
+    assert(#spawned == base_spawns + 3 and snapshot(0).queue_count == 0)
+    assert(charged_wood == base_wood + 10100 and charged_gold == base_gold + 200
+        and charged_population == base_pop + 7 and refunds == 0,
+        "FIFO completion charges all three jobs exactly once despite blocked retries")
+end
+reset(); unlock_gold_tier()
+local finished = train(0, 2)
+local unpaid = train(0, 5)
+assert(finished.ok and unpaid.ok and train(0, 5).ok)
+accounts[0].gold = 0; tick(1)
+local cancel_wood, cancel_gold, cancel_pop, cancel_spawns = accounts[0].wood, accounts[0].gold,
+    accounts[0].population, #spawned
+assert(snapshot(0).blocked_head.job_id == unpaid.job_id)
+bus.emit(events.BUILDING_DESTROYED, {entindex = 10, player_id = 0})
+assert(accounts[0].wood == cancel_wood and accounts[0].gold == cancel_gold
+    and accounts[0].population == cancel_pop and refunds == 0,
+    "cancelling only unpaid waiting jobs cannot refund currency or release population")
+tick(10); assert(#spawned == cancel_spawns and snapshot(0).queue_count == 0)
+print("LUMBERJACK_QUEUE_RESOURCES_PASS: wood/gold/pop admission, unpaid wait, second/third blocked clocks, one-second FIFO retry, exact starts and unpaid cancellation")
 
 reset(); assert(train(0, 2).ok and train(0, 3).ok and train(1, 1).ok)
 states[10] = nil; cities[0].alive = false
@@ -200,7 +342,7 @@ bus.emit(events.BUILDING_CREATED, states[10]); assert(ability.hidden == true)
 for _, row in ipairs(definitions.rows) do
     if row.training_id:match("^train_lumberjack_") then assert(row.training_duration_seconds == 1) end
 end
-print("PASS lumberjack training integration: real completion, independent tiers/players, four entrances, capacity, resource/population reservations, cancel/refund, lifecycle and instant reward recruits")
+print("PASS lumberjack training integration: real completion, independent tiers/players, four entrances, capacity, pay-at-start currency/population, cancel/refund, lifecycle and instant reward recruits")
 
 reset()
 result = bus.request(events.WORKER_TRAIN_REQUEST, {city = cities[0], source = "rogue_reward",
@@ -344,3 +486,33 @@ assert(math.abs(normal.survival_attack_interval-0.625)<1e-9,"(1.5 - 0.5) / 1.6, 
 local d=require("combat/attack_cadence").project(normal.survival_attack_cadence,normal.survival_attack_speed)
 assert(math.abs(d.percentage-160)<1e-9 and d.base_interval==1.5 and d.attack_interval==0.625)
 print("FUSION_SPEED_ORDER_PASS: interval reductions before percentage; display 160%, hover 0.625 seconds")
+
+-- Real training -> real fusion service -> real worker registry. The original
+-- entity retains a level-one visible personality after its fusion is consumed.
+local fusion_service = require("systems/lumberjack_fusion_service")
+local fusion_row = require("config/generated/lumberjack_fusion_definitions").by_id.lumberjack_fusion_01
+local personalities = require("config/generated/lumberjack_personality_definitions")
+for pool_index, skill_id in ipairs(fusion_row.super_skill_ids) do
+    reset(true); fusion_service.init()
+    RandomInt = function(first, last)
+        assert(first == 1 and last == #fusion_row.super_skill_ids)
+        return pool_index
+    end
+    for i = 1, fusion_row.required_count do assert(train(0, 1).ok) end
+    for i = 1, fusion_row.required_count do tick(i) end
+    local target = spawned[1]
+    local native_fusion = assert(target:FindAbilityByName(fusion_row.ability_id))
+    local result, error_message = bus.request(events.LUMBERJACK_FUSION_REQUEST, {
+        player_id = 0, caster = target, ability = native_fusion,
+    })
+    assert(result and result.ok, error_message or result and result.error)
+    assert(target.survival_super_lumberjack and target.name == definitions.by_id.train_lumberjack_01.unit_name,
+        "in-place fusion keeps the ordinary unit name")
+    assert(not target:FindAbilityByName(fusion_row.ability_id), "only the consumed fusion button is removed")
+    local passive = assert(target:FindAbilityByName(personalities.by_id[skill_id].ability_name))
+    assert(passive:GetLevel() == 1 and not passive:IsHidden(), "default personality remains learned and visible")
+    local ability_count = 0; for _ in pairs(target.abilities) do ability_count = ability_count + 1 end
+    assert(ability_count == 1, "fusion grants exactly one configured personality")
+    for i = 2, fusion_row.required_count do assert(spawned[i].killed) end
+end
+print("LUMBERJACK_FUSION_PERSONALITY_PASS: all 11 defaults retained, visible/learned, real training+fusion+registry and in-place unit names")

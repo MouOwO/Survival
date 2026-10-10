@@ -34,10 +34,25 @@ assert(records == 8 and #profiles.rows == records)
 PATTACH_ABSORIGIN_FOLLOW = 10
 PATTACH_POINT_FOLLOW = 11
 PATTACH_WORLDORIGIN = 12
+LUA_MODIFIER_MOTION_NONE = 0
+local presence_links = 0
+LinkLuaModifier = function(name, path, motion)
+    assert(name == "modifier_ultimate_tower_presence" and path == "modifiers/modifier_ultimate_tower_presence"
+        and motion == LUA_MODIFIER_MOTION_NONE)
+    assert(GameRules and GameRules:GetGameModeEntity(), "link only after map activation")
+    presence_links = presence_links + 1
+end
+class = function(value) return value end
+local presence_type = require("modifiers/modifier_ultimate_tower_presence")
+assert(presence_type:IsHidden() and not presence_type:IsPurgable() and presence_type:RemoveOnDeath())
+assert(presence_type:GetStatusEffectName() == "particles/status_fx/status_effect_gods_strength.vpcf")
+assert(presence_type:StatusEffectPriority() > 0)
+assert(not presence_type.DeclareFunctions and not presence_type.CheckState,
+    "the visual modifier cannot add Sven damage, immunity or combat state")
 DOTA_GAMERULES_STATE_POST_GAME = 8
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
-local world, phase = {}, 6
-GameRules = { GetGameTime = function() return 0 end,
+local world, phase, now = {}, 6, 0
+GameRules = { GetGameTime = function() return now end,
     State_Get = function() return phase end,
     GetGameModeEntity = function() return world end }
 local function forbidden() error("presentation must not issue orders or damage") end
@@ -92,6 +107,19 @@ local function unit(index)
     function u:IsAlive() return self.alive end
     function u:GetAbsOrigin() return self.origin end
     function u:SetRangedProjectileName(value) self.projectile = value end
+    function u:FindModifierByName(name)
+        assert(name == "modifier_ultimate_tower_presence")
+        return self.presence and not self.presence:IsNull() and self.presence or nil
+    end
+    function u:AddNewModifier(caster, ability, name)
+        assert(caster == self and ability == nil and name == "modifier_ultimate_tower_presence")
+        if self.fail_presence then return nil end
+        local effect = {destroyed = false}
+        function effect:IsNull() return self.destroyed end
+        function effect:Destroy() assert(not self.destroyed); self.destroyed = true end
+        self.presence = effect
+        return effect
+    end
     u.SetBaseDamageMin, u.SetBaseDamageMax, u.SetProjectileSpeed, u.SetBaseAttackTime = forbidden, forbidden, forbidden, forbidden
     return u
 end
@@ -111,6 +139,7 @@ bus.handle_request(events.BUILDING_LIST_REQUEST, function(payload)
     return { buildings = listed }
 end)
 local service = require("systems/tower_visual_service")
+assert(presence_links == 0, "requiring the visual service must not bind a modifier before Activate")
 service.precache({})
 local expected_precache = {["particles/base_attacks/ranged_goodguy.vpcf"] = true}
 expected_precache["particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf"] = true
@@ -127,8 +156,10 @@ expected_precache[old_death_path] = true
 expected_precache["particles/survival/towers/trial/death_ground.vpcf"] = true -- compatible old-profile transition
 expected_precache["particles/survival/towers/trial/frost_ground.vpcf"] = true -- compatible old frost profile
 for _, name in ipairs({"dark", "durable", "evil"}) do expected_precache["particles/survival/towers/trial/valley_" .. name .. ".vpcf"] = true end
-local shadow_path = "particles/units/heroes/hero_slark/slark_shadow_dance_dummy.vpcf"
-expected_precache[shadow_path] = true
+local cloud_path = "particles/units/heroes/hero_zeus/zeus_cloud.vpcf"
+local status_path = "particles/status_fx/status_effect_gods_strength.vpcf"
+expected_precache[cloud_path] = true
+expected_precache[status_path] = true
 local machine_base_paths = {
     "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_dark.vpcf",
     "particles/units/heroes/hero_spirit_breaker/spirit_breaker_haste_owner_timer.vpcf",
@@ -449,23 +480,43 @@ local ultimate = unit(40)
 local ultimate_state = {unit = ultimate, entindex = 40, building_id = "ultimate_tower", level = 1, player_id = 1}
 bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED, ultimate_state)
 assert(live_count() == 4)
-local shadow_id = service.debug_snapshot(40).particle_ids[4]
-assert(particles[shadow_id].name == shadow_path)
-assert(particles[shadow_id].bindings[1].unit == ultimate)
-assert(particles[shadow_id].bindings[1].attachment == "attach_hitloc")
-local shadow_created = created
+local cloud_id = service.debug_snapshot(40).particle_ids[4]
+local presence = ultimate.presence
+local function assert_ultimate_cloud(id)
+    local cloud = particles[id]
+    assert(cloud.name == cloud_path and cloud.attach == PATTACH_WORLDORIGIN)
+    assert(not cloud.bindings, "client entity replication must not move the server-selected cloud center")
+    local ground, size, center = cloud.controls[0], cloud.controls[1], cloud.controls[2]
+    assert(ground.x == ultimate.origin.x and ground.y == ultimate.origin.y and ground.z == ultimate.origin.z)
+    assert(size.x == profiles.by_id.ultimate.radius_ur and size.y == 0 and size.z == 0,
+        "native Nimbus CP1 is a ground radius, not a three-axis size")
+    assert(center.x == ground.x and center.y == ground.y and center.z == ground.z + 40,
+        "Nimbus belongs at the feet, rather than at the torso or original spell height")
+end
+assert_ultimate_cloud(cloud_id)
+assert(presence and not presence:IsNull())
+assert(presence_links == 1, "the registry must bind the real status definition before its first creation")
+local cloud_created = created
 ultimate.origin = Vector(700, -200, 384)
 for _ = 1, 20 do
     bus.emit(events.TOWER_FUSION_RUNTIME_CHANGED, ultimate_state)
     service._sweep_for_test()
 end
-assert(created == shadow_created + 4 and live_count() == 4,
-    "ultimate relocation rebuilds once; stationary refreshes do not duplicate smoke")
-assert(particles[shadow_id].destroyed and particles[shadow_id].released)
-shadow_id = service.debug_snapshot(40).particle_ids[4]
+assert(created == cloud_created + 4 and live_count() == 4,
+    "ultimate relocation rebuilds once; stationary refreshes do not duplicate cloud or status")
+assert(presence_links == 1, "subsequent visual refreshes must reuse the registry binding")
+assert(particles[cloud_id].destroyed and particles[cloud_id].released and presence:IsNull())
+cloud_id = service.debug_snapshot(40).particle_ids[4]
+assert_ultimate_cloud(cloud_id)
+presence = ultimate.presence
 bus.emit(events.TOWER_FUSION_RUNTIME_REMOVED, { entindex = 40 })
 assert(live_count() == 0)
-assert(particles[shadow_id].destroyed and particles[shadow_id].released)
+assert(particles[cloud_id].destroyed and particles[cloud_id].released and presence:IsNull())
+ultimate.fail_presence = true
+assert(not service.apply(ultimate_state) and live_count() == 0 and not service.debug_snapshot(40).tracked,
+    "a failed status attachment must release all newly created cloud/base handles")
+ultimate.fail_presence = false
+now = 5 -- The shared registry deliberately bounds failed creation retries.
 
 -- A failed setup rolls back partial ownership; cleanup continues if one
 -- renderer destroy throws, including releasing that same index.

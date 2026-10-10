@@ -1,0 +1,791 @@
+{
+  "at": "2026-10-07T06:53:09.018Z",
+  "images": [
+    {
+      "id": "custom_game/commerce_jade_v1/buy_button.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/buy_button.png",
+      "size": [
+        188,
+        46
+      ],
+      "sha256": "f636d4d14dbce4e7e06258338e1c9b0461d90f9b22840a19418469bc459da009",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/buy_button_png.vtex_c",
+      "compiledSha256": "e122f6d0f156603e727de0ff8c770544b31e9bc359c19a01348c46b01f662047",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/buy_button_hover.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/buy_button_hover.png",
+      "size": [
+        188,
+        46
+      ],
+      "sha256": "3750173fcbe0d1f826efe4c85f26840490216b9fca38b58f825bf669209a2ae5",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/buy_button_hover_png.vtex_c",
+      "compiledSha256": "59c70ae2d7fb6ce31e74ce3698d82c84d930c6faf9fd5592a827ead14f8ab50f",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/buy_button_pressed.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/buy_button_pressed.png",
+      "size": [
+        188,
+        46
+      ],
+      "sha256": "e21fd473bbad0a3defc0d000985968c4fb5d30b38a7aec337ee553c200f2fceb",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/buy_button_pressed_png.vtex_c",
+      "compiledSha256": "f98069e488ede852a400d5c6c2fa791f21c9d2bb2f1f41e78e61ee7bbd827a33",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/close_normal.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/close_normal.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "29d3fb065a72bd2ef065b728382d63176198beea1bc955c82890aa51e36324fa",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/close_normal_png.vtex_c",
+      "compiledSha256": "7136fb8abca7943eb426dccec0deec9df80420c4deadba77b1a6b3c4632b3b73",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/close_hover.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/close_hover.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "7a3e4751feb148fc604372cc4252262476aaa79292400b667ae4599acab910a0",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/close_hover_png.vtex_c",
+      "compiledSha256": "9c91c822d6b17aa14cb9c36460b45a1217abaa0c48c7f6986edfb8e978ce3173",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/header.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/header.png",
+      "size": [
+        1600,
+        112
+      ],
+      "sha256": "1702026533d46cd1ac840f0972e2d25c7af14cf6e4eec46792add61732f01e57",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/header_png.vtex_c",
+      "compiledSha256": "58aa723ca2687b19e52715e89b8ff64f1c158d392fa8721542332c31a7a198f8",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/nav_selected.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/nav_selected.png",
+      "size": [
+        320,
+        96
+      ],
+      "sha256": "a68c2b6ef2f4dcc86ea629ab53d3f33a6c96f20596f75c4570daa1adce5c9c39",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/nav_selected_png.vtex_c",
+      "compiledSha256": "3ac3dd8f947752491a314f44321189271bf10651f9ab5bcbe689b77fc43993f7",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/nav_selected_glow.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/nav_selected_glow.png",
+      "size": [
+        340,
+        116
+      ],
+      "sha256": "1cf2df2c7905c1310a4fbec9985dec54f100f5441c5da9a491c3903494348621",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/nav_selected_glow_png.vtex_c",
+      "compiledSha256": "16570eb3b672bf4f5b925bc05f26daf141bc5d322a3a2b41b3b55f676e31797c",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/nav_selected_line.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/nav_selected_line.png",
+      "size": [
+        320,
+        2
+      ],
+      "sha256": "75f6dbdec937c83eaa134d74bfc8a2d13d88ac047190e493868e9b87492e0105",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/nav_selected_line_png.vtex_c",
+      "compiledSha256": "3b2099df9f5fb0965e67b227a1f655e6b6d0136f3ba6845bf1504fba16433d2a",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/art_well.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/art_well.png",
+      "size": [
+        264,
+        224
+      ],
+      "sha256": "36cf4773741ffd971ebe9bde1bcd9bcd7753b7b283ba2f95d402275ee10843fe",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/art_well_png.vtex_c",
+      "compiledSha256": "8237feeeb13f48df2338e4b790d0a37e1fe6733c07f5bdffa91f34bc32ee8916",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/card_halo.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/card_halo.png",
+      "size": [
+        320,
+        376
+      ],
+      "sha256": "ea1ab4962e014f5ebffc79da5e9df1be7cf6f8713619ee03d60b858d8a2463ea",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/card_halo_png.vtex_c",
+      "compiledSha256": "5e7977945e8e363c8628eb629f830cc2d93097335710bbb83c85d4843ba882d4",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/card_shadow.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/card_shadow.png",
+      "size": [
+        320,
+        376
+      ],
+      "sha256": "2e285a9c4ed88f00da29f6eb86f3e35bae1376d54b4cbca701bca4d1685d9a0c",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/card_shadow_png.vtex_c",
+      "compiledSha256": "43f133d313aff5bb8bdfd4661a97394b122348c563d1efdc33b6020c84b11774",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/close_pressed.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/close_pressed.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "04df05a431589e1b12b94460e1dbffec310a393cb50e785cacd0b45498995c5c",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/close_pressed_png.vtex_c",
+      "compiledSha256": "5938e86cb7f7de942c303e2e4e7e1fc0529a175fb66fbcc10aeecdce993ee07a",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/coin.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/coin.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "70cd3d733dadd545bbec550a99002fc23d6355377c2b9af07881b5e0fa5c4639",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/coin_png.vtex_c",
+      "compiledSha256": "d4d8bd7d36006e80402ddef62e4a0a1e23f911079e47e244767240ff12dd6f48",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/content_transition.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/content_transition.png",
+      "size": [
+        1280,
+        96
+      ],
+      "sha256": "6f35747fd748ef33b3ee946ddd0af20581c244a14304cb3e2c9256627580cd18",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/content_transition_png.vtex_c",
+      "compiledSha256": "08c7f0547a351a6b59b2d08097c232ff2792d04cb6af531b5c650631dc07f618",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/crystal.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/crystal.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "4d84be4f95e605d35bd5acdbe4f9190c215b200f96993762a386811ae21d472d",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/crystal_png.vtex_c",
+      "compiledSha256": "a982c7394d15e260c513228de3704565e138ce76d0ee5064e1849fbf267da977",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/frame.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/frame.png",
+      "size": [
+        1600,
+        920
+      ],
+      "sha256": "7dbbbe224be6e68e659d6d7c321eb0e8495022afe48fcd6dd2083a4a24ed1bdb",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/frame_png.vtex_c",
+      "compiledSha256": "398309b1b46343b6544d613dd467aabefe1c1e3ffd667893c7ed0f9353af3239",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/gift_hover.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/gift_hover.png",
+      "size": [
+        48,
+        48
+      ],
+      "sha256": "debb431aa94c14153dd112a5f0bd5fd49063177e75d00b6a325e93afb45d98eb",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/gift_hover_png.vtex_c",
+      "compiledSha256": "8b4f7f524ecab40871a6a0468b5e751c4512dddfd3ab064ee5b080038a42c505",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/gift_light.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/gift_light.png",
+      "size": [
+        48,
+        48
+      ],
+      "sha256": "0c047819cfa87c63f04804162f99b6aafb3b74fb3da84c411303f38f3e954702",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex_c",
+      "compiledSha256": "22508768d18227eee59d7af7a7dec12663bd456e93ee09d7ed44ef5b3ae99def",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/hero_hover.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/hero_hover.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "1598584a178a0d5eb4f929320c1f72bf973661faa1271c7e9c5a384e555cfc88",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/hero_hover_png.vtex_c",
+      "compiledSha256": "3d7a48533e1e6e1ce808915f660ee9c8dc6294465b6224967b20ae88def85d12",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/hero_light.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/hero_light.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "964f50a7d9461f91b7cff7b1dd708daf350a28e804a82565a881aed4a1f8bad9",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/hero_light_png.vtex_c",
+      "compiledSha256": "1ac25da3cc7abc0c639f20fd3fcff2769e116cd4c46af32665b842256bcb7a11",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/hover_shade.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/hover_shade.png",
+      "size": [
+        264,
+        224
+      ],
+      "sha256": "d1a968f64ffc092ecc2129dd2b4c458f3b8037881d26d49374c0b1ed4ff4147d",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/hover_shade_png.vtex_c",
+      "compiledSha256": "2b4859bfa160137469c59e85018e11759c2f839733a288e064d14a9ff2767fcf",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/hover_shade_long.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/hover_shade_long.png",
+      "size": [
+        264,
+        224
+      ],
+      "sha256": "01432e22c2cb8e64a8419a1b135e4f4dadda14bbf2cfc1096387866273fb5fcd",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/hover_shade_long_png.vtex_c",
+      "compiledSha256": "4d709498ad8aa76f3499934a4637ed11f65b6d4662a8c895dd14568bcddd8b45",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/nav_hover.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/nav_hover.png",
+      "size": [
+        320,
+        96
+      ],
+      "sha256": "65c6b4a9bbdc3b8a2f7873193bc94c9dc93fb4991595357d0e7e3ce0e1681c5d",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/nav_hover_png.vtex_c",
+      "compiledSha256": "823dd06d28a1788cd7220d31ac40933c51cd5b9bf83984b01f4d84f608505ca0",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/nav_normal.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/nav_normal.png",
+      "size": [
+        320,
+        96
+      ],
+      "sha256": "fc13d4b08124dc3feae6721e01a9afeddf835b1fe82ae4f3f1a2ff173947e18e",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/nav_normal_png.vtex_c",
+      "compiledSha256": "13c1cb1828780481d109681c7e7042aecd0f7321deeb9eeb0773f03194b06f65",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/price_strip.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/price_strip.png",
+      "size": [
+        264,
+        42
+      ],
+      "sha256": "cf0fb799659ac29d848b4de909ce16ad17d64d50096c5f51f4c8d3e162a4abe7",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/price_strip_png.vtex_c",
+      "compiledSha256": "ab61f0e6fbb31d231677b1e9bcd6f7fe866f077cc126200fb3014abd893eae48",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/product_hover.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/product_hover.png",
+      "size": [
+        296,
+        348
+      ],
+      "sha256": "960dfce296422febd83c1213c019d6b6539a577c9ee10a2698c14e0e33bf58d6",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/product_hover_png.vtex_c",
+      "compiledSha256": "080dba5d580104205b3fa23bc7597774d772f305da59f405e6dcb7e27eeb0a0a",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/product_normal.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/product_normal.png",
+      "size": [
+        296,
+        348
+      ],
+      "sha256": "bb652d9fbaa3462c0113d11cfa7a6fb36f1b491e5a146de26151a94669d5594b",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/product_normal_png.vtex_c",
+      "compiledSha256": "b408b7c8bd484d003bb8fddc8e7fe050636c7f86bb7be87ea48ba51c6274947a",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/product_selected.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/product_selected.png",
+      "size": [
+        296,
+        348
+      ],
+      "sha256": "960dfce296422febd83c1213c019d6b6539a577c9ee10a2698c14e0e33bf58d6",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/product_selected_png.vtex_c",
+      "compiledSha256": "095eb8d75944160b3e15328dcdc0550c5ee84614f1aad491e4f58eb051a4c6a5",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/sidebar.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/sidebar.png",
+      "size": [
+        320,
+        808
+      ],
+      "sha256": "a0ae9f73aae4d4e8c0575d1af7c0af1d89413dcc2d33ac4f333af06c40061cb4",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/sidebar_png.vtex_c",
+      "compiledSha256": "bcb72c2b5549bb61121bbe076e30bec5bded01d09844c6f7418c02084fda1b6d",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/sidebar_seam.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/sidebar_seam.png",
+      "size": [
+        24,
+        808
+      ],
+      "sha256": "21e685a640cc7eda49d31ae363eaa02715af939f8f1e3d7463b58415c8e8f414",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/sidebar_seam_png.vtex_c",
+      "compiledSha256": "4d13dfe63415ddb14d5185934caaf1e04263556d5167fab579330715e938d3a3",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/sword_hover.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/sword_hover.png",
+      "size": [
+        48,
+        48
+      ],
+      "sha256": "1b1eae70549f6186d831f9c16a5733cf3eaaf9c8021c7b376568a953a2ed9d40",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/sword_hover_png.vtex_c",
+      "compiledSha256": "a52a2b625d76ac3d6cedcb7116df8f2cc72df57c6f6ffde7a29471fc32138ee5",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/sword_light.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/sword_light.png",
+      "size": [
+        48,
+        48
+      ],
+      "sha256": "71c1bef35b3131a6e6f87f156a39fb75be0948ec331d3629d2c2319c67b950b6",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/sword_light_png.vtex_c",
+      "compiledSha256": "6ff6d2dadeca3ad6e4de0c7fdba279e7f178e595e810815ef46323aa9e67bd6c",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/ticket_hover.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/ticket_hover.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "83dad92c7fe91f2ef84662bf7ee1bce816323a7fd4d5efcafd65615ed3b1df79",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/ticket_hover_png.vtex_c",
+      "compiledSha256": "cbfe7aa0b9dcb2bbdc52785c270ee80c258dd588995dd237db7934aeee40e416",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/ticket_light.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/ticket_light.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "57555666b0e412737cba0dcfbaea66a806f0192ecf6e7e67dc4d2f443d914130",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/ticket_light_png.vtex_c",
+      "compiledSha256": "f4e01976b08f7d121a4bd58689c6a95fd0a42914a60ec59c7300f14b3c2e9b26",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/title_flourish.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/title_flourish.png",
+      "size": [
+        200,
+        24
+      ],
+      "sha256": "b2201352b0571a51d2beb9ef3899f2a92d05b52f45378b431b708acafec8c7de",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/title_flourish_png.vtex_c",
+      "compiledSha256": "224c7b23854236b3af1d32e2099fb1c447de123b27b9f3c5cb0b48fc5540a389",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/commerce_jade_v1/window.png",
+      "source": "art/ui/sources/custom_game/commerce_jade_v1/window.png",
+      "size": [
+        1600,
+        920
+      ],
+      "sha256": "0677b451da6568e756868faef89a3fef9cf67391db0214e4c87048cbdbb36937",
+      "compiled": "panorama/images/custom_game/commerce_jade_v1/window_png.vtex_c",
+      "compiledSha256": "6b8c821b339d20e852b0c724855d6700997ad48812977500887d998fcbcba2f5",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_attack_shard.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attack_shard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "34e23a11cc669d2543e771595f85b3a3e2a1d849dc343923e6d52dc6a0880ac1",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_attack_shard.vtex_c",
+      "compiledSha256": "f17d4baab96fdb78bb88db0ef668849b754ab4fac5e0b6f26dff18f79f25b466",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "68436dbb7d768003f01ad86bcc4a19f1982563e8fad2ec917aba8666cac822ef",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "34e23a11cc669d2543e771595f85b3a3e2a1d849dc343923e6d52dc6a0880ac1",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_attack_shard.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.839Z"
+      }
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_attribute_gem.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attribute_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "25e5d8b76d0ddb1e61fbfaf9ba5b646a81249b2ebe1d863e07fe5898709d45c8",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_attribute_gem.vtex_c",
+      "compiledSha256": "b27173a5ac4cc6c994e53230fb0b31671f57647762cce29def37381566f9373e",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "b4f2cf5dc53502515367fe4c778730cb97ed20c0ea0bac3a76bb34e55e6016fa",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "25e5d8b76d0ddb1e61fbfaf9ba5b646a81249b2ebe1d863e07fe5898709d45c8",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_attribute_gem.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.841Z"
+      }
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_attribute_shard.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_attribute_shard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "6b39d6dee56a72f2425bab2c850bc89c3c8b42480f1037b8fdbbcdf5436d747e",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_attribute_shard.vtex_c",
+      "compiledSha256": "18348c32c193e448299ed2c9c55af1e46521cec7f712f4205b29c34fa4f9b469",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "e4d52c8ce653a8a84585315d16b5ab0571c9e9bd0329e40b5170d3b5cd8167f7",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "6b39d6dee56a72f2425bab2c850bc89c3c8b42480f1037b8fdbbcdf5436d747e",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_attribute_shard.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.843Z"
+      }
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_block_shard.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_block_shard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "dd9bd625f3ae1fcc503fb0bab404a7759167fd103c4fb1c155d98ac202040203",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_block_shard.vtex_c",
+      "compiledSha256": "f84a8f0a316734be900fe9f9cd88d2f50961d94c33e1c7ed2cbfe53a1c80cc96",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "9561e3f19afed64f4fae88955142023cd22ae9ef986d1971de9e09413e279ead",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "dd9bd625f3ae1fcc503fb0bab404a7759167fd103c4fb1c155d98ac202040203",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_block_shard.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.846Z"
+      }
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_gold_gem.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_gold_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f9b4a8f70dbdba292fa9a59e2ee4cc79fe74a2811da71ecf37edffc293250970",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_gold_gem.vtex_c",
+      "compiledSha256": "0707fc15330a32fa33114d8ce3a84d7ab0ad1afe55cae75ddff5e6bf44d63d71",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "07ee74c9c226160cc7b4ce850afd6f968fb97e78c34a03ea1fae6bc76703d141",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "f9b4a8f70dbdba292fa9a59e2ee4cc79fe74a2811da71ecf37edffc293250970",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_gold_gem.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.849Z"
+      }
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_growth_gem.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_growth_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "365bd6003116193d68be4b4d0301205993e8eb2f97a6717101e9f0c835ad101d",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_growth_gem.vtex_c",
+      "compiledSha256": "ebdbfa1f56b9b32a1b4281762ce1d44c92d10a559c4c387763bae7b1167e0a45",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "d3bc8469f561eb258ab7ac4d332fcf932697fe16b511cdb7ab4a92bd59050aab",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "365bd6003116193d68be4b4d0301205993e8eb2f97a6717101e9f0c835ad101d",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_growth_gem.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.851Z"
+      }
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_health_gem.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_health_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "f0fcd023dc3388a333a85de32a1a8f7ccd22e738835b9d9ecb27df617186a483",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_health_gem.vtex_c",
+      "compiledSha256": "367a2aa2c42643b9a581712a0131f4644e83087fd0632f51aba9cc234a355f98",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "c743f892be719db4740d25ebbbbf0d9b9c77e178394f469b3441de13231fa581",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "f0fcd023dc3388a333a85de32a1a8f7ccd22e738835b9d9ecb27df617186a483",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_health_gem.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.853Z"
+      }
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_regen_shard.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_regen_shard.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "e12e97b3a21a0dd9c56dac32ed6a13fa12efd7d04f207ab40506d10fded04292",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_regen_shard.vtex_c",
+      "compiledSha256": "9d490e876a07725ddb1f26d75e8bb71b1e82029293e9e13e69bf7e917a7f7022",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "3c53970bd91e840291369e7d10dac7a9b3b263e4df9b40e10cd6108d68be473d",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "e12e97b3a21a0dd9c56dac32ed6a13fa12efd7d04f207ab40506d10fded04292",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_regen_shard.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.855Z"
+      }
+    },
+    {
+      "id": "custom_game/reward_art_v5/daily_wood_gem.png",
+      "source": "art/ui/sources/custom_game/reward_art_v5/daily_wood_gem.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "40ce656fdc76283a7a41af8895021e32866d40fac8ec287927ac6cbe7f8063ae",
+      "compiled": "panorama/images/custom_game/reward_art_v5/daily_wood_gem.vtex_c",
+      "compiledSha256": "1d17d3555ad22edfa1b037df8ced340cc3e2418f2fac3fd8b263dfd4955a8a9d",
+      "origin": "Existing project artwork, reused without raster modification",
+      "previousCompiledSha256": "b3d468d82c4014b1014bbc7614a206b788b937932040416e06107ac371e1065d",
+      "compiledProvenance": {
+        "reason": "Recompiled recovered Workshop texture source; original PNG bytes unchanged",
+        "verifiedSourceSha256": "40ce656fdc76283a7a41af8895021e32866d40fac8ec287927ac6cbe7f8063ae",
+        "compilerResult": "1 compiled, 0 failed",
+        "compileLog": "output/ui_20h/assets_compile_20261007_143756/daily_wood_gem.vtex.log",
+        "verifiedAt": "2026-10-07T11:13:56.858Z"
+      }
+    },
+    {
+      "id": "spellicons/survival/native/train_lumberjack_01.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_lumberjack_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "4e4280290968076aebd4996b96aea51a4fbaa481e9c8f9a981eb2bdaa20ad81a",
+      "compiled": "panorama/images/spellicons/survival/native/train_lumberjack_01_png.vtex_c",
+      "compiledSha256": "eb7951104407b3e07eb7da39bc2fb0e9650ab7db2a89898e26f965b17926224f",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_lumberjack_02.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_lumberjack_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "0280c898d1c8b70f906ae73c88e26be716466215c5fe29e07c81dc72b551f84d",
+      "compiled": "panorama/images/spellicons/survival/native/train_lumberjack_02_png.vtex_c",
+      "compiledSha256": "983fa8911bda1e3d2fc28b93da70b94cdd45e0d4aacd72b78cff7ebd45ac46e2",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_lumberjack_03.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_lumberjack_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "16a282d1154f3b4f39cef087c427db90f9395240e172ca95bcce3efd4a45ca48",
+      "compiled": "panorama/images/spellicons/survival/native/train_lumberjack_03_png.vtex_c",
+      "compiledSha256": "978725c2d7bb95713bbd44cadf58d1791c5bc01b2dc85461c2be85199b947795",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_lumberjack_04.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_lumberjack_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "ebbf1b491fb65796161e29d347918d12c5372d7dabec04c6600ea06c82b73f0b",
+      "compiled": "panorama/images/spellicons/survival/native/train_lumberjack_04_png.vtex_c",
+      "compiledSha256": "86d17634488782eb43a24cca9a3914f83a4778c8a0cad01d94f565f5173194f9",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_lumberjack_05.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_lumberjack_05.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "bfa4fb01620e3588c29e79d37bc76e39f3fc05666027d6fe3837ccb79f7b6caf",
+      "compiled": "panorama/images/spellicons/survival/native/train_lumberjack_05_png.vtex_c",
+      "compiledSha256": "1c2c269fe61abe56bdee02fadd4096090697827f6e5ff23f2243e9beeff20bfe",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_lumberjack_06.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_lumberjack_06.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "40fc2aa34b2cb749361b440838b01decd27a2453604a2fc0510493f3007965f9",
+      "compiled": "panorama/images/spellicons/survival/native/train_lumberjack_06_png.vtex_c",
+      "compiledSha256": "a6e3073b5d0b7a4cf6633541e4c9700f0a99396532364d30effca810d5bff536",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_lumberjack_07.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_lumberjack_07.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "44134c50262b0e589d501a61426dc46a3b8fff7f594b9a6414d098d61f716b44",
+      "compiled": "panorama/images/spellicons/survival/native/train_lumberjack_07_png.vtex_c",
+      "compiledSha256": "6263bf90352d3ac9e1ba8c01b7990e208fde6ee308ad0315795d3e16b6da7a59",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_lumberjack_08.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_lumberjack_08.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "529799bcb760d89c2e58f97107c1fdd55ff12d3dc9d0ed5044e552fbe272574a",
+      "compiled": "panorama/images/spellicons/survival/native/train_lumberjack_08_png.vtex_c",
+      "compiledSha256": "01cb908c4cc3ce075da2d12c3f1c870948f03c1097089392a3761427a5241826",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_repairer_01.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_repairer_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "9ff4e4fd8226f6846a4e0a4051b4bf329b466fe714ba7d23958463c650d58d34",
+      "compiled": "panorama/images/spellicons/survival/native/train_repairer_01_png.vtex_c",
+      "compiledSha256": "a3a5ae6ac1e4cbadbc1faa75626c2da01ad50e5ced6652e4b0c58e30029a2667",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/train_repairer_02.png",
+      "source": "art/ui/sources/spellicons/survival/native/train_repairer_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "02c0c3e67f90dc0c0ca480f800b2d48718bddf3c5b2025f91795d6f691a2255b",
+      "compiled": "panorama/images/spellicons/survival/native/train_repairer_02_png.vtex_c",
+      "compiledSha256": "3a32eb007d50a1a5a8f510e7337dd90be828d02bdd91584913def9fd3e80ff48",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/wood.png",
+      "source": "art/ui/sources/spellicons/survival/native/wood.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "22f07745d3b0f1f8058f9bf438c8c69dc2a3c997b499b4bda23512db273aac1f",
+      "compiled": "panorama/images/spellicons/survival/native/wood_png.vtex_c",
+      "compiledSha256": "8867ab00c50f830c9ea88d9e18c36930b68a0f401a7b5a7072a4afa5af681cca",
+      "origin": "Existing project artwork, reused without raster modification"
+    },
+    {
+      "id": "spellicons/survival/native/gold.png",
+      "source": "art/ui/sources/spellicons/survival/native/gold.png",
+      "size": [
+        256,
+        256
+      ],
+      "sha256": "f39bf4de369c935784d5cd48654f37b0438b5ad259dcd5a70229a24376c74c12",
+      "compiled": "panorama/images/spellicons/survival/native/gold_png.vtex_c",
+      "compiledSha256": "43433450d778c43907a28c29f87913ee4ed227fd98ea819ee6ef1e5dfec0e200",
+      "origin": "Existing project artwork, reused without raster modification"
+    }
+  ],
+  "fonts": [
+    {
+      "source": "design_refs/shop_ui_12h/fonts/SourceHanSansSC-Regular.otf",
+      "usage": "Browser preview; native keeps the existing UI typography registration"
+    }
+  ],
+  "sources": [
+    "panorama/src/styles/custom_game/common/jade_ui.css",
+    "panorama/src/scripts/custom_game/common/jade_components.js",
+    "panorama/src/scripts/custom_game/archive_jade.js"
+  ],
+  "existingBase": "design_refs/shop_ui_12h/Delivery/resources.json",
+  "feedback10": {
+    "titleSources": "../work/feedback10/title_sources.json",
+    "materials": "Existing commerce_jade_v1 PNG, nine-slice and code; original icon pixels unchanged",
+    "notes": "21 original title sources copied from merged content; 10 existing runtime assets are active, other originals retained for recovery"
+  },
+  "runtimeHashesVerifiedAt": "2026-10-07T11:13:56.861Z"
+}

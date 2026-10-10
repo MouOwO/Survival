@@ -46,7 +46,10 @@ function M.orbital(id,key)
         for _,target in ipairs(enemies(wall,1600)) do
             if strip>0 then target:AddNewModifier(unit,nil,'modifier_research_armor_reduction',
                 {armor_reduction_per_attack=require('config/armor_balance').from_war3_linear(strip)}) end
-            ApplyDamage({victim=target,attacker=unit,damage=damage,damage_type=DAMAGE_TYPE_PHYSICAL})
+            -- Native filters omit category/ability for these scripted hits.
+            -- Keep the logical orbital amount separate from scaled attacks.
+            require('combat/damage_service'):Deal({victim=target,attacker=unit,
+                base_damage=damage,source_kind='item',damage_type=DAMAGE_TYPE_PHYSICAL})
         end
         return ticks<20
     end,'commerce_orbital_'..id)

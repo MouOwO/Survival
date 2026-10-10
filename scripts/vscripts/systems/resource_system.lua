@@ -61,6 +61,7 @@ local function snapshot(player_id)
         gold = account.gold,
         population = account.population,
         max_population = account.max_population,
+        debug_mode = account.debug_mode and 1 or 0,
         version = version,
     }
 end

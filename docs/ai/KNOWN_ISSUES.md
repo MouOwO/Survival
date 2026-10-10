@@ -131,3 +131,18 @@ Last Reviewed: 2026-08-27
 **Next Action:** 退出Dota和Workshop Tools后新局复测；若复发，按新转储签名和完整日志单独隔离特效来源。详见 `docs/CRASH_20260926.md`。
 
 **Last Verified:** 2026-09-26；4项Lua5.1、攻击范围契约及静态检查通过，未完成Workshop验收。
+## ISSUE-ENDLESS-VISUAL-CYCLE-20261009
+
+**Status:** DESIGN_READY_NOT_IMPLEMENTED
+
+**Priority:** P2
+
+**Symptom:** 无尽怪每波都用同一套影魔模型，无法区分波次。
+
+**Known Cause:** archive_endless_rules默认固定model_path，archive_endless_service.spawn_next一直读取规则模型，不读取任何波次视觉表。
+
+**Current Workaround:** 50主体×4外观、1000波展开与固定201后1.5倍设计表已交付；本次用户最后要求先设计表格，没有把资源检查冒充实机换装。
+
+**Next Action:** 将设计接入独立视觉resolver和预载，11原生套装走完整同骨架装配；39自定义方案需补纯父跟随分支并逐模型校准挂点、角度、比例，之后实际验证1/51/101/151/201/401等波。不得改数值、碰撞或因视觉循环扩展现有1000波属性上限。
+
+**Last Verified:** 2026-10-09；50主体文件及idle/run/attack、1780递归资源无缺失；200外观签名与1000展开表通过静态核对，游戏换装尚未实施。

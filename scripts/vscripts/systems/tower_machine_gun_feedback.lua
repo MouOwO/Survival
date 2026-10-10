@@ -1,12 +1,12 @@
 -- Presentation only: never attacks, applies damage, grants gold, or changes speed.
-local asset_catalog = require("config/asset_catalog")
+local projectile_visual = require("systems/tower_projectile_visual")
 local sound_service = require("core/sound_service")
 local scheduler = require("core/scheduler")
 local M = { GOLD_PARTICLE = "particles/generic_gameplay/lasthit_coins.vpcf" }
 
 function M.shot(tower, target)
-    local asset = asset_catalog.get(tower.survival_model_asset_id)
-    local projectile = asset and asset.attack and asset.attack.projectile
+    local projectile = projectile_visual.resolve(tower,
+        "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf")
     local speed = 2000
     if type(tower.GetProjectileSpeed) == "function" then
         local ok, value = pcall(tower.GetProjectileSpeed, tower)
@@ -14,13 +14,8 @@ function M.shot(tower, target)
     end
     -- The native attack projectile is suppressed by the attack modifier. These
     -- per-hit projectiles are visual only, so they cannot add hits or delay DPS.
-    ProjectileManager:CreateTrackingProjectile({
-        Source = tower, Target = target, Ability = nil,
-        EffectName = projectile or "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf",
-        iMoveSpeed = speed, bIsAttack = false, bDodgeable = false,
-        bProvidesVision = false,
-        iSourceAttachment = rawget(_G, "DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"),
-    })
+    projectile_visual.emit(tower, target, projectile, speed,
+        rawget(_G, "DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"))
     sound_service.play("tower_machine_gun", {source=tower, unit=tower})
 end
 

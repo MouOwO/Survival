@@ -81,9 +81,14 @@ const begin='// BEGIN GENERATED CHALLENGE UNIT NAMES',end='// END GENERATED CHAL
 kv=kv.replace(new RegExp('\\s*'+begin+'[\\s\\S]*?'+end),'');
 const block=[begin,...[...units.keys()].map(id=>{
  // Start with the declared body, rather than loading Undying before SetModel.
- const archetype=archetypes.rows.find(r=>r.data.archetype_id===id);
+ const archetype=archetypes.rows.find(r=>r.data.archetype_id===id)
+  ||buildings.rows.find(r=>r.data.challenge_id===id);
  let body=template[1];
  if(archetype&&archetype.data.model_path)body=body.replace(/("Model"\s*)"[^"]*"/,'$1'+JSON.stringify(archetype.data.model_path));
+ if(archetype&&archetype.data.model_path==='models/heroes/juggernaut/juggernaut.vmdl'){
+  // Valve's locomotion tags select walking at the challenge movement speed.
+  body=body.replace(/\r?\n[ \t]*\}$/, '\n        "MovementSpeedActivityModifiers"\n        {\n            "walk" "0"\n            "run" "345"\n            "run_fast" "373"\n        }\n    }');
+ }
  return '    "npc_survival_named_'+id+'"\n    '+body;
 }),end].join('\n');
 const close=kv.lastIndexOf('}');write(kvPath,kv.slice(0,close)+'\n'+block+'\n'+kv.slice(close));

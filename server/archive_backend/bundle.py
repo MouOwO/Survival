@@ -78,6 +78,8 @@ class Bundle:
         self.hash = hashlib.sha256(raw).hexdigest()
         if self.hash != self.directory.name: raise ValueError("bundle_hash_mismatch")
         data=json.loads(raw);self.configs=data["configs"]
+        from .config_compatibility import parse
+        self.compatible_config_hashes = parse(data)
         for path,source in data["sources"].items():
             if (self.directory/path).read_text(encoding="utf-8")!=source: raise ValueError("bundle_source_mismatch")
         self.tables={name:{row[cfg["key"]]:row for row in cfg["rows"]} for name,cfg in self.configs.items()}

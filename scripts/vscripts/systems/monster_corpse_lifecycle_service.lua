@@ -4,6 +4,8 @@ local scheduler = require("core/scheduler")
 local rules = require("config/generated/global_rules")
 
 local hero_visual = require("systems/monster_hero_visual_service")
+local challenge_visual = require("systems/challenge_monster_visual_service")
+local wave_visual = require("systems/monster_visual_service")
 
 local M = {}
 
@@ -50,12 +52,18 @@ local function remove(unit)
     end
 end
 
+local function clear_visuals(unit)
+    hero_visual.clear(unit)
+    challenge_visual.clear(unit)
+    wave_visual.cleanup(unit)
+end
+
 local function update_corpses()
     local now = game_time()
     local remaining = 0
     for unit, state in pairs(corpses) do
         if not valid(unit) then
-            hero_visual.clear(unit)
+            clear_visuals(unit)
             corpses[unit] = nil
         elseif state.hidden_at then
             if now - state.hidden_at >= REMOVE_DELAY_SECONDS then
@@ -74,7 +82,7 @@ local function update_corpses()
             if progress >= 1 then
                 -- Keep the outfit on the animated corpse through the entire
                 -- hold/sink phase, then remove it alongside the hidden body.
-                hero_visual.clear(unit)
+                clear_visuals(unit)
                 hide(unit)
                 state.hidden_at = now
             end
@@ -104,6 +112,11 @@ local function on_entity_killed(payload)
     end
     local origin = unit:GetAbsOrigin()
     unit.survival_corpse_started = true
+    -- Other death subscribers may run before or after us. Each visual path
+    -- stops its loops idempotently while retaining the original dead outfit.
+    hero_visual.on_death(unit)
+    challenge_visual.on_death(unit)
+    wave_visual.on_death(unit)
     corpses[unit] = {
         origin = { x = origin.x, y = origin.y, z = origin.z },
         sink_at = game_time() + HOLD_SECONDS,
@@ -120,6 +133,10 @@ end
 
 function M.init()
     scheduler.cancel(TASK_ID)
+    for unit in pairs(corpses) do
+        clear_visuals(unit)
+        remove(unit)
+    end
     corpses = {}
     task_running = false
     event_bus.subscribe(events.MONSTER_SPAWNED, function(payload)

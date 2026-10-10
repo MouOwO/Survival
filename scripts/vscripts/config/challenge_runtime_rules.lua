@@ -3,7 +3,7 @@
 local M = {}
 
 -- An unsuccessful rebirth attempt may be retried, but completion is still
--- restricted by the hero's current rebirth level. Match room respawn pacing.
+-- restricted by the hero's current rebirth level. This is separate from monster respawns.
 M.rebirth_retry_seconds = 2
 
 M.rows = {}
@@ -13,7 +13,7 @@ local function add(challenge_id, completion_limit)
     local row = {
         challenge_id = challenge_id,
         repeatable = true,
-        respawn_seconds = 2,
+        respawn_seconds = 1,
         completion_limit = completion_limit or 0,
     }
     M.rows[#M.rows + 1] = row
@@ -24,9 +24,6 @@ for index = 1, 10 do
     add(string.format("challenge_%02d", index))
 end
 add("challenge_11", 10)
-for _, id in ipairs({"challenge_06", "challenge_07", "challenge_11"}) do
-    M.by_id[id].respawn_seconds = 1
-end
 
 function M.apply(config)
     for _, challenge in ipairs(config and config.rows or {}) do

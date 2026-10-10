@@ -1,0 +1,1016 @@
+{
+  "at": "2026-10-10T01:34:05.908Z",
+  "task": "存档 → 虚空之影 V1",
+  "scope": "第一版单页验收，保留既有业务与接口",
+  "counts": {
+    "productionSources": 6,
+    "originalPNGs": 38,
+    "runtimeArtifacts": 44,
+    "contentAuthoringCopies": 44
+  },
+  "productionSourceFiles": [
+    {
+      "path": "panorama/src/scripts/custom_game/archive_void_v1_data.js",
+      "purpose": "真实配置与正式素材的只读映射",
+      "sha256": "3a3905264fad42da032e212e99cc90ec2d967582cd40347dbe5b7fb0577f7bcb",
+      "compiledSourceSha256": "3a3905264fad42da032e212e99cc90ec2d967582cd40347dbe5b7fb0577f7bcb",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/archive_void_v1.js",
+      "purpose": "虚空之影动态视图、数量筛选、原 Tooltip、缩放和生命周期",
+      "sha256": "85ace7f130f4289c84f81164b8ce8effc3d5a24bec4f06830e733e39f83db14a",
+      "compiledSourceSha256": "85ace7f130f4289c84f81164b8ce8effc3d5a24bec4f06830e733e39f83db14a",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "panorama/src/styles/custom_game/archive_void_v1.css",
+      "purpose": "虚空之影局部样式",
+      "sha256": "16529f0567d18d105cffc558d57d62870f631af4896b0b9dba04c950a7e927cf",
+      "compiledSourceSha256": "16529f0567d18d105cffc558d57d62870f631af4896b0b9dba04c950a7e927cf",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js",
+      "purpose": "现有完整快照与视图生命周期局部钩子",
+      "sha256": "4d4ed41aef6978d25da965ff41b1f9fe590f7d921f11bbf30dd0726557863453",
+      "compiledSourceSha256": "4d4ed41aef6978d25da965ff41b1f9fe590f7d921f11bbf30dd0726557863453",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "panorama/src/layout/custom_game/archive_void_v1_assets.xml",
+      "purpose": "38 张正式 PNG 的精确资源依赖",
+      "sha256": "dee39dbeb3e96a1d6ef863dd60ca298a6d9a619d6e2214b440b6601b72d56efe",
+      "compiledSourceSha256": "dee39dbeb3e96a1d6ef863dd60ca298a6d9a619d6e2214b440b6601b72d56efe",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "panorama/src/layout/custom_game/archive.xml",
+      "purpose": "现有存档布局接入新视图，仅增加本页资源包含",
+      "sha256": "d08f752f1d2fb0bb3c15e2f3996e4e9afa19c8cee82898de6973fafb69155bd7",
+      "compiledSourceSha256": "d08f752f1d2fb0bb3c15e2f3996e4e9afa19c8cee82898de6973fafb69155bd7",
+      "matchesCompiledSource": true
+    }
+  ],
+  "originalPngFiles": [
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/top_navigation_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/backgrounds/top_navigation_no_text.png",
+      "sha256": "487be0b0c51ad138d6739373e698886f62dc4e6f14252d997ef4873cc87ce68b",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/resource_strip_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/backgrounds/resource_strip_no_text.png",
+      "sha256": "2305ae4d1eef9eddd54c3f0a5f6a9476bd076cd97615bbf463762fc1f13ff4c9",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/sidebar_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/backgrounds/sidebar_no_text.png",
+      "sha256": "37361967c86c5c79f24e2b3cdac7119c58041f9f811330c4be9a03b5cdfdbc7a",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/content_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/backgrounds/content_no_text.png",
+      "sha256": "abecfcfb19e9d7d9de6991bb30c071bb59ce2a0c814556b342dfed8d726367cc",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/sidebar_selected_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/sidebar_selected_no_text.png",
+      "sha256": "4f37c06d6205c07f6b438fbdbe66a46c52de4c6d58d2ca7ef6886ed7eb716c41",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/filter_selected_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/filter_selected_no_text.png",
+      "sha256": "0f2e92daddb14ff8541a5b8267693544a3219280c5c3c73478784f0a87fdb6b0",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/filter_default_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/filter_default_no_text.png",
+      "sha256": "a2442314c0cb5b465b433a1ae7c24450b06ef4529bc6f3d82d6c4533896adea0",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/top_tab_active_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/top_tab_active_no_text.png",
+      "sha256": "bd9df0f7bc101dc654dca00c88084c6ac53176642d0cf9097d1296d8b5753d51",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/window_frame_overlay.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/window_frame_overlay.png",
+      "sha256": "73a576a87b2b014dbf3063bf2254b040797c24010aca540812c1608e9974d138",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/close_cross.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/close_cross.png",
+      "sha256": "5ae80e43660bcb5bd2a30bcd311dcacce6a7a381e35c3c92f6986afb8ab01219",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/archive_icon.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/archive_icon.png",
+      "sha256": "4c7618a408dab49a2305b5c534c42269dabfcb0f9d0921d9300389b810b306b5",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/resource_gold.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/resource_gold.png",
+      "sha256": "4ffcee82b02cd75cefb07fd6f608eca334db7379fbfdeba8dadeecfd63a1cc35",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/resource_purple_gem.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/resource_purple_gem.png",
+      "sha256": "73658d99831e9ecce5578e43c936f3fa4eaf0a2597126b3dd545bc752711eccf",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/resource_ticket.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/resource_ticket.png",
+      "sha256": "8b263ddb03024349bbde14df13e7da9193c3243fdb91cfc7264604974aff9dd7",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/common/quantity_plate_no_text.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/common/quantity_plate_no_text.png",
+      "sha256": "7c5205a47a3bc3dd92a51e4724bf980c0a17e6a1bb96d588b832b57b57330f7c",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_01.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_01.png",
+      "sha256": "a47b1e6cbcd1a192c04da827ebd2f340169dc2d19c85f7c08c97c524b59ccca3",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_02.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_02.png",
+      "sha256": "9cdcdbf852c260c2bb9aa04f6f5fe188954d41c4ab141f5594165727d0464307",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_03.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_03.png",
+      "sha256": "d01bcf9c917baa83770e4ff8db1bd99763e1bbe60ab5e4e143f55f3047178453",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_04.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_04.png",
+      "sha256": "161f225d5a9b68e424ea4e88afa68b8d99bf88370b06ac3a18e531c0c038467f",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_05.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_05.png",
+      "sha256": "ca75296a6f0cd24a694e9d93fb7132edc791ebf0da51b46ebb41a48e68428112",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_06.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_06.png",
+      "sha256": "a476d08b259e8e32f379d95f5864cb23a82f326b72e9811f9f3850a1931b0318",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_07.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_07.png",
+      "sha256": "c8a97bc5230ef706706c1d0fccb4cc434a30a4cea9def928edaa746043bbc8d0",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_08.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_08.png",
+      "sha256": "9437d2629a411bf68f5b6b52d1aa8d77da78a06553d2cfd2b90d7155473407f1",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_09.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_09.png",
+      "sha256": "aabe40316acb90c604bd5ff17b9941f0539324dc7fc2733559080843910de5c7",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_10.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_10.png",
+      "sha256": "d4b985cb3566bea4f4d96e579c2c14a3d7c87d4b6eab8fb2b8735c525a48e106",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_11.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_11.png",
+      "sha256": "7c5e4e4509830ba4f6f4bae510b01dbdab5194f95f7049257260e712cb718487",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_12.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_12.png",
+      "sha256": "9052fb5e5dddc9f1f53bbc94976f4ace78d2c0c2d790b17af778dfaae594ce57",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_13.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_13.png",
+      "sha256": "42b8d79b707ac918fc996caf5ca0e366915f2813545104b85adbd8ebd16e1de5",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_14.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_14.png",
+      "sha256": "40b1dcbc9e4bae7c263bc6f7e8ef98eb6fe52fd8903c9646274dd893d459d9dd",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_15.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_15.png",
+      "sha256": "577fb9ac285ec161e8322f2a775d4cd0bc924e93fdb032a562cb536ef86be95c",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_16.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_16.png",
+      "sha256": "e24852cb7037f4d7d248c6a9802438b1e2878af8696f0fde42bad0d45d83b20e",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_17.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_17.png",
+      "sha256": "96d136c296e6c1ea6470e726b1828a2bffd98d6dd0e05e5afe3ae63f56f5f9ce",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_18.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_18.png",
+      "sha256": "92b342c5bb5dd62aa304e6b62674bfb5bf5f5b115935c8c2b2d21dcb03b52e54",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_19.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_19.png",
+      "sha256": "67708219945cef711e786e1d2eee475d48a4a256be278a733b872bfd7eba801c",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_20.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_20.png",
+      "sha256": "f150dfc36c8b4d332011ec279db031dec5acd18ae6efa802c9326fd03f7521c7",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_21.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_21.png",
+      "sha256": "664cefed9e8ef336caf8250a9adab27fd7a04ea7d82c7bacd0a7bf90b2f7cde3",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_22.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_22.png",
+      "sha256": "542255f61cd69509e9a1926809ddc92c80cec22945aa178d6377f20392d35191",
+      "unchangedFromPackage": true
+    },
+    {
+      "path": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_23.png",
+      "packageSource": "design_refs/void_shadow_v1/package/assets/items/virtual_23.png",
+      "sha256": "69a03a060b10828fcdb9e4f6f115f1c4a181603e78867ec9a63edd49b05a8412",
+      "unchangedFromPackage": true
+    }
+  ],
+  "runtimeArtifacts": [
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/backgrounds/top_navigation_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/top_navigation_no_text.png",
+      "sha256": "2384dbeddd46941b6e580ce93c4752518a538ffdd7b47e1f2f685bf51770f347",
+      "bytes": 13051,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/backgrounds/resource_strip_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/resource_strip_no_text.png",
+      "sha256": "020bbb30f82512876ff6fd4732f02fd6afd92a8473bb5da18e9fd7a120acf7af",
+      "bytes": 19234,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/backgrounds/sidebar_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/sidebar_no_text.png",
+      "sha256": "a5bf15227113565269aaf74eeb294e92a74ec2b8f6b50be6d5b445552d31e71b",
+      "bytes": 188898,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/backgrounds/content_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/content_no_text.png",
+      "sha256": "374f1cd709c7a9e0d2f245fc523f32203462ac9bde3675841b08f514953d9fb5",
+      "bytes": 1148149,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/sidebar_selected_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/sidebar_selected_no_text.png",
+      "sha256": "48e4347727d01162da65a4889318cfb64a5af9003d90d9f44857908004df0e6e",
+      "bytes": 10332,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/filter_selected_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/filter_selected_no_text.png",
+      "sha256": "9f2d066a67a6f24bba020e2e9a08a40a176407b94a06b028d67877f5e64b47b6",
+      "bytes": 7956,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/filter_default_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/filter_default_no_text.png",
+      "sha256": "737bc7e10b29580e5f2759b8736883fae1c000b9dd3cc27fec75f2a1a6b9d56b",
+      "bytes": 7940,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/top_tab_active_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/top_tab_active_no_text.png",
+      "sha256": "2fb4fbd1edf82f51d0a77c2550f602aad66c5c511ce01c01637329f75ecdbd58",
+      "bytes": 18433,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/window_frame_overlay_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/window_frame_overlay.png",
+      "sha256": "b3375621952988497a14de954790e7565a4ecfd9e529fd825bf2a19b3abe7028",
+      "bytes": 1991058,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/close_cross_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/close_cross.png",
+      "sha256": "bfbdaba7e1def320e2e1a50c5c7dfed3ef05d7f0683e231dc07adb9afc03e86c",
+      "bytes": 6484,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/archive_icon_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/archive_icon.png",
+      "sha256": "16a19fdf44dc3ae8e7072501c2faea5846668ba69f5e87d537eedba4b79d7df8",
+      "bytes": 5912,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/resource_gold_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/resource_gold.png",
+      "sha256": "927e86929c325ad4e8b12c8b3ece568b7a975ceebf751240ddac9000b0fb3f8e",
+      "bytes": 6488,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/resource_purple_gem_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/resource_purple_gem.png",
+      "sha256": "c5f3d893463f2ac1781414bb626bb84a2fc82cd163729df33478d7ffb8557d9b",
+      "bytes": 6484,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/resource_ticket_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/resource_ticket.png",
+      "sha256": "ae0609cfecd2678655e01f23a792af5963b315fa0f2fa4e30a3a897981ed625d",
+      "bytes": 7436,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/common/quantity_plate_no_text_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/quantity_plate_no_text.png",
+      "sha256": "9f20eddce7f5cecbe9158942ec2e0a380f8378bae97d0a8f6924bd12703f2d8c",
+      "bytes": 4964,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_01_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_01.png",
+      "sha256": "0c699cfa3806adec94940f16802d17e36fe6e1ab4e054746bbeb547e3a40c163",
+      "bytes": 23034,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_02_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_02.png",
+      "sha256": "c72db5d8e561be4b806f0b917862e6e8c8fad6b094d6afd664b0fd8b230ae760",
+      "bytes": 22527,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_03_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_03.png",
+      "sha256": "b2dc03bf3bce933bd36544ecae839d8ddeb7b00aec898a9126f25d39133364d7",
+      "bytes": 19779,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_04_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_04.png",
+      "sha256": "5a8d7c15e1d642826840bc444b194314a7fb117d2cc58ac206edc32545b49e83",
+      "bytes": 21240,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_05_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_05.png",
+      "sha256": "27d4209761b9cde60870860462e91e329d2572ce925bd0f7e3817fecca8c13e1",
+      "bytes": 20352,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_06_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_06.png",
+      "sha256": "70e0ba6249520cede9fa4de682ea7cfaef88abe40904df7a7b288248b57b6570",
+      "bytes": 22239,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_07_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_07.png",
+      "sha256": "22ec581ca52fa43ff1d11687fdf68ab60ab17e14491594f5b6907a9d9ecc3d39",
+      "bytes": 23971,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_08_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_08.png",
+      "sha256": "b2dcda15c8339718ae7e68838100fb8e66b047c7120d9de5c10062535e22af61",
+      "bytes": 27874,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_09_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_09.png",
+      "sha256": "041376712a690d21361176f09ef2c1ef606264707b5e7387c7d7e791789ec95d",
+      "bytes": 26623,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_10_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_10.png",
+      "sha256": "261374c5110855eb94bc9c6f6cfde498e51320e75fef82ce8ee93dcd1221c285",
+      "bytes": 27001,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_11_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_11.png",
+      "sha256": "713342e20af4d2513d224e4aba2933a9f0495b349a830f2e48802a4408c0a413",
+      "bytes": 24810,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_12_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_12.png",
+      "sha256": "1cbacb9b5a618c19c7bd4a34fac26c7e776efa6ad9d9494cd9aacc52f11507a3",
+      "bytes": 25192,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_13_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_13.png",
+      "sha256": "47876f5b608668bab8a324e8005b03e48094aed119730f84aa5aa043541c44fc",
+      "bytes": 27917,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_14_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_14.png",
+      "sha256": "a8516ac4bf519eeb53ca198086677848f27fe0960c1b12a7be2a742cac29b4f0",
+      "bytes": 24882,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_15_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_15.png",
+      "sha256": "b4c2cdc0b2a80b2a1c707cccebc3024b61f64ed89471b43bb278df55f2280987",
+      "bytes": 26012,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_16_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_16.png",
+      "sha256": "23d8e173b53a863e49f805cf126c49a82aa7b6be5642b267ac782e903468e41d",
+      "bytes": 24978,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_17_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_17.png",
+      "sha256": "9993c6c5a3dc686307761782c8951e9a03d1d288214fbaf0753cfaed89ab2128",
+      "bytes": 25149,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_18_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_18.png",
+      "sha256": "688806696ade92c782d086ceb8646b27d9a0a8a5a1ed06559f4caf9f35cd84e7",
+      "bytes": 24726,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_19_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_19.png",
+      "sha256": "0c07fdb0ae22678c93274653ed3dc4e77e78a1a21f842e32a80746059556f00c",
+      "bytes": 22847,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_20_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_20.png",
+      "sha256": "cd41c4f02145483419b88d5c22560d13a8e3726d9719754605aaf48b35501a0c",
+      "bytes": 24355,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_21_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_21.png",
+      "sha256": "78a6e12e4abad8d22e9d7211fe54c3d62fda83c7850e5bca8667d85187b5960e",
+      "bytes": 21693,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_22_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_22.png",
+      "sha256": "d94e8a65867cb59b20e4597a180e911fd98bdc5d8c4c53233b715161065a1f27",
+      "bytes": 26280,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/images/custom_game/void_shadow_v1/items/virtual_23_png.vtex_c",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_23.png",
+      "sha256": "5e83f11c789ea22ff8829cd9436c1d7543d9e957d4368e8fa0bcae26ce3e1bd6",
+      "bytes": 20181,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/scripts/custom_game/archive_void_v1_data.vjs_c",
+      "source": "panorama/src/scripts/custom_game/archive_void_v1_data.js",
+      "sha256": "31b422968474b77e9822cba21ddac87e92adbd5e3f01fd363b84f9417bb3fdbd",
+      "bytes": 25928,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/scripts/custom_game/archive_void_v1.vjs_c",
+      "source": "panorama/src/scripts/custom_game/archive_void_v1.js",
+      "sha256": "d9b40f07e8722b606b738d4a1d3a340212f1f4153243bda3e769566c2989775b",
+      "bytes": 17303,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/styles/custom_game/archive_void_v1.vcss_c",
+      "source": "panorama/src/styles/custom_game/archive_void_v1.css",
+      "sha256": "d0ea0e11a3b9790638b1ab27444db90d8f1551ee2f6f42c2c9854c6ef1524be3",
+      "bytes": 3572,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/scripts/custom_game/archive_180de7e38b_titles_compact_v6.vjs_c",
+      "source": "panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js",
+      "sha256": "1b75f23fc0a76b5c98b8db8399690bd108750b5498843f404796f90062a4945a",
+      "bytes": 37967,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/layout/custom_game/archive_void_v1_assets.vxml_c",
+      "source": "panorama/src/layout/custom_game/archive_void_v1_assets.xml",
+      "sha256": "37b72856debd518b014f9811291393b2497f8de06b73431213043ca5baf84eab",
+      "bytes": 10917,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    },
+    {
+      "path": "panorama/layout/custom_game/archive.vxml_c",
+      "source": "panorama/src/layout/custom_game/archive.xml",
+      "sha256": "807a786ccabacb58ef5386e29502081521ea4b0601cb84e5a5e92e93a65ec2b9",
+      "bytes": 14122,
+      "compileVerified": true,
+      "unchangedSinceCompile": true
+    }
+  ],
+  "contentAuthoringFiles": [
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\backgrounds\\top_navigation_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/top_navigation_no_text.png",
+      "sha256": "487be0b0c51ad138d6739373e698886f62dc4e6f14252d997ef4873cc87ce68b",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\backgrounds\\resource_strip_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/resource_strip_no_text.png",
+      "sha256": "2305ae4d1eef9eddd54c3f0a5f6a9476bd076cd97615bbf463762fc1f13ff4c9",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\backgrounds\\sidebar_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/sidebar_no_text.png",
+      "sha256": "37361967c86c5c79f24e2b3cdac7119c58041f9f811330c4be9a03b5cdfdbc7a",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\backgrounds\\content_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/backgrounds/content_no_text.png",
+      "sha256": "abecfcfb19e9d7d9de6991bb30c071bb59ce2a0c814556b342dfed8d726367cc",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\sidebar_selected_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/sidebar_selected_no_text.png",
+      "sha256": "4f37c06d6205c07f6b438fbdbe66a46c52de4c6d58d2ca7ef6886ed7eb716c41",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\filter_selected_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/filter_selected_no_text.png",
+      "sha256": "0f2e92daddb14ff8541a5b8267693544a3219280c5c3c73478784f0a87fdb6b0",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\filter_default_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/filter_default_no_text.png",
+      "sha256": "a2442314c0cb5b465b433a1ae7c24450b06ef4529bc6f3d82d6c4533896adea0",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\top_tab_active_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/top_tab_active_no_text.png",
+      "sha256": "bd9df0f7bc101dc654dca00c88084c6ac53176642d0cf9097d1296d8b5753d51",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\window_frame_overlay.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/window_frame_overlay.png",
+      "sha256": "73a576a87b2b014dbf3063bf2254b040797c24010aca540812c1608e9974d138",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\close_cross.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/close_cross.png",
+      "sha256": "5ae80e43660bcb5bd2a30bcd311dcacce6a7a381e35c3c92f6986afb8ab01219",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\archive_icon.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/archive_icon.png",
+      "sha256": "4c7618a408dab49a2305b5c534c42269dabfcb0f9d0921d9300389b810b306b5",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\resource_gold.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/resource_gold.png",
+      "sha256": "4ffcee82b02cd75cefb07fd6f608eca334db7379fbfdeba8dadeecfd63a1cc35",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\resource_purple_gem.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/resource_purple_gem.png",
+      "sha256": "73658d99831e9ecce5578e43c936f3fa4eaf0a2597126b3dd545bc752711eccf",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\resource_ticket.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/resource_ticket.png",
+      "sha256": "8b263ddb03024349bbde14df13e7da9193c3243fdb91cfc7264604974aff9dd7",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\quantity_plate_no_text.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/common/quantity_plate_no_text.png",
+      "sha256": "7c5205a47a3bc3dd92a51e4724bf980c0a17e6a1bb96d588b832b57b57330f7c",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_01.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_01.png",
+      "sha256": "a47b1e6cbcd1a192c04da827ebd2f340169dc2d19c85f7c08c97c524b59ccca3",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_02.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_02.png",
+      "sha256": "9cdcdbf852c260c2bb9aa04f6f5fe188954d41c4ab141f5594165727d0464307",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_03.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_03.png",
+      "sha256": "d01bcf9c917baa83770e4ff8db1bd99763e1bbe60ab5e4e143f55f3047178453",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_04.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_04.png",
+      "sha256": "161f225d5a9b68e424ea4e88afa68b8d99bf88370b06ac3a18e531c0c038467f",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_05.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_05.png",
+      "sha256": "ca75296a6f0cd24a694e9d93fb7132edc791ebf0da51b46ebb41a48e68428112",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_06.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_06.png",
+      "sha256": "a476d08b259e8e32f379d95f5864cb23a82f326b72e9811f9f3850a1931b0318",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_07.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_07.png",
+      "sha256": "c8a97bc5230ef706706c1d0fccb4cc434a30a4cea9def928edaa746043bbc8d0",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_08.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_08.png",
+      "sha256": "9437d2629a411bf68f5b6b52d1aa8d77da78a06553d2cfd2b90d7155473407f1",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_09.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_09.png",
+      "sha256": "aabe40316acb90c604bd5ff17b9941f0539324dc7fc2733559080843910de5c7",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_10.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_10.png",
+      "sha256": "d4b985cb3566bea4f4d96e579c2c14a3d7c87d4b6eab8fb2b8735c525a48e106",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_11.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_11.png",
+      "sha256": "7c5e4e4509830ba4f6f4bae510b01dbdab5194f95f7049257260e712cb718487",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_12.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_12.png",
+      "sha256": "9052fb5e5dddc9f1f53bbc94976f4ace78d2c0c2d790b17af778dfaae594ce57",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_13.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_13.png",
+      "sha256": "42b8d79b707ac918fc996caf5ca0e366915f2813545104b85adbd8ebd16e1de5",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_14.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_14.png",
+      "sha256": "40b1dcbc9e4bae7c263bc6f7e8ef98eb6fe52fd8903c9646274dd893d459d9dd",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_15.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_15.png",
+      "sha256": "577fb9ac285ec161e8322f2a775d4cd0bc924e93fdb032a562cb536ef86be95c",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_16.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_16.png",
+      "sha256": "e24852cb7037f4d7d248c6a9802438b1e2878af8696f0fde42bad0d45d83b20e",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_17.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_17.png",
+      "sha256": "96d136c296e6c1ea6470e726b1828a2bffd98d6dd0e05e5afe3ae63f56f5f9ce",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_18.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_18.png",
+      "sha256": "92b342c5bb5dd62aa304e6b62674bfb5bf5f5b115935c8c2b2d21dcb03b52e54",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_19.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_19.png",
+      "sha256": "67708219945cef711e786e1d2eee475d48a4a256be278a733b872bfd7eba801c",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_20.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_20.png",
+      "sha256": "f150dfc36c8b4d332011ec279db031dec5acd18ae6efa802c9326fd03f7521c7",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_21.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_21.png",
+      "sha256": "664cefed9e8ef336caf8250a9adab27fd7a04ea7d82c7bacd0a7bf90b2f7cde3",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_22.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_22.png",
+      "sha256": "542255f61cd69509e9a1926809ddc92c80cec22945aa178d6377f20392d35191",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_23.png",
+      "source": "panorama/src/images/custom_game/void_shadow_v1/items/virtual_23.png",
+      "sha256": "69a03a060b10828fcdb9e4f6f115f1c4a181603e78867ec9a63edd49b05a8412",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\scripts\\custom_game\\archive_void_v1_data.js",
+      "source": "panorama/src/scripts/custom_game/archive_void_v1_data.js",
+      "sha256": "3a3905264fad42da032e212e99cc90ec2d967582cd40347dbe5b7fb0577f7bcb",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\scripts\\custom_game\\archive_void_v1.js",
+      "source": "panorama/src/scripts/custom_game/archive_void_v1.js",
+      "sha256": "85ace7f130f4289c84f81164b8ce8effc3d5a24bec4f06830e733e39f83db14a",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\styles\\custom_game\\archive_void_v1.css",
+      "source": "panorama/src/styles/custom_game/archive_void_v1.css",
+      "sha256": "16529f0567d18d105cffc558d57d62870f631af4896b0b9dba04c950a7e927cf",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\scripts\\custom_game\\archive_180de7e38b_titles_compact_v6.js",
+      "source": "panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js",
+      "sha256": "4d4ed41aef6978d25da965ff41b1f9fe590f7d921f11bbf30dd0726557863453",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\layout\\custom_game\\archive_void_v1_assets.xml",
+      "source": "panorama/src/layout/custom_game/archive_void_v1_assets.xml",
+      "sha256": "dee39dbeb3e96a1d6ef863dd60ca298a6d9a619d6e2214b440b6601b72d56efe",
+      "matchesCompiledSource": true
+    },
+    {
+      "path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\layout\\custom_game\\archive.xml",
+      "source": "panorama/src/layout/custom_game/archive.xml",
+      "sha256": "d08f752f1d2fb0bb3c15e2f3996e4e9afa19c8cee82898de6973fafb69155bd7",
+      "matchesCompiledSource": true
+    }
+  ],
+  "tools": [
+    {
+      "path": "tools/void_shadow_v1/adapter.js",
+      "sha256": "2e2337d08ca3d2f07a2f852a0f5a40e5aaf16db0fa19a3073608466415b747c6"
+    },
+    {
+      "path": "tools/void_shadow_v1/capture.cjs",
+      "sha256": "1a10d679cc259aebf583ad8211a2999998b62bf5154f4a57247bb26a494bf026"
+    },
+    {
+      "path": "tools/void_shadow_v1/compile.ps1",
+      "sha256": "46153f2af391f081ec4b639ba8f05995c07f8b05424639c2d846a4ad3afd4ffb"
+    },
+    {
+      "path": "tools/void_shadow_v1/gallery.cjs",
+      "sha256": "835545729ab669d4feae6ed62d62f774c4ddd670c34a27c9fc4c6d1f092f6690"
+    },
+    {
+      "path": "tools/void_shadow_v1/import.cjs",
+      "sha256": "8f4d6fbf8a64bf5d08a89e0020c56731221c88cc531920ae2e59f84acc7b9dd6"
+    },
+    {
+      "path": "tools/void_shadow_v1/inspect.cjs",
+      "sha256": "04f57bd75752bb49e8752a8fab6fa03e7d8167b3b9105fd4ccd5bef0271c1542"
+    },
+    {
+      "path": "tools/void_shadow_v1/native.cjs",
+      "sha256": "4b7d6b68824b9064690d7d1ce81d7b043e02a95075f36be622872f7dcf6d137f"
+    },
+    {
+      "path": "tools/void_shadow_v1/prepare_window.cjs",
+      "sha256": "39fd81e5b70a08c21de4ac2884c96dcd7c6be902342bf01d4db3b4f6a69e7a96"
+    },
+    {
+      "path": "tools/void_shadow_v1/preview.cjs",
+      "sha256": "d3510d8f990be891e215443ce6168a4f970133b5a9a6cff86c099e47e3218ad5"
+    },
+    {
+      "path": "tools/void_shadow_v1/state.js",
+      "sha256": "1ae311d759a1e14fdde2dfdcd7a84160cb97d1fcb7f3a3e60d8295ee31f490dd"
+    },
+    {
+      "path": "tools/void_shadow_v1/window.ps1",
+      "sha256": "1cf4a0014f069e7b655036b7e6bf9f0515721149b292de7434f0cc51489b5c46"
+    },
+    {
+      "path": "tools/void_shadow_v1/wire.cjs",
+      "sha256": "139eb0d5f9921ef9982c0aa63e2859ac44d8c3434a40df837b5d852939873a4b"
+    }
+  ],
+  "font": {
+    "packagePath": "design_refs/void_shadow_v1/package/fonts/SourceHanSansSC-Regular.otf",
+    "reusedEnginePath": "panorama/fonts/Radiance-Survival-SourceHanSansSC-Regular.otf",
+    "sha256": "f1d8611151880c6c336aabeac4640ef434fa13cbfbf1ffe82d0a71b2a5637256",
+    "byteIdentical": true,
+    "systemFontChanged": false
+  },
+  "checkpoints": [
+    {
+      "path": "design_refs/void_shadow_v1/work/checkpoint/source/panorama/src/layout/custom_game/archive.xml",
+      "sha256": "d4fe59be644e1951f7e8e6be4a7e0ad124d6d5465541508e849049bb85ab0019",
+      "kind": "before_integration_existing_source"
+    },
+    {
+      "path": "design_refs/void_shadow_v1/work/checkpoint/source/panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js",
+      "sha256": "c546b473ba706a9f4c2e16587ae5e589e53827d462bf93b7b9566f5bc239bff1",
+      "kind": "before_integration_existing_source"
+    }
+  ],
+  "compile": {
+    "record": "design_refs/void_shadow_v1/work/compile.json",
+    "at": "2026-10-10T09:17:36.2375880+08:00",
+    "success": true,
+    "backup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\void_shadow_v1\\compile_20261010_091730_338_5480743c"
+  },
+  "browserValidation": {
+    "report": "design_refs/void_shadow_v1/work/browser_v1/report.json",
+    "at": "2026-10-10T01:20:48.712Z",
+    "status": "PASS_BROWSER_VOID_SHADOW_V1",
+    "sourceDigest": "8d279854525388a0921c87afecd321ed6438c643cc24141d369db940e014e4fe",
+    "resolutions": [
+      [
+        1672,
+        941
+      ],
+      [
+        1600,
+        900
+      ],
+      [
+        1280,
+        720
+      ]
+    ],
+    "notNativeGameBoundaryVerification": true
+  },
+  "exclusions": [
+    "reference/**",
+    "assets/backgrounds/scene_exterior_reference.png",
+    "data_preview.json"
+  ],
+  "realDataSources": [
+    "data/csv/存档系统/archive_shadow_items.csv",
+    "data/csv/存档系统/archive_categories.csv"
+  ],
+  "screenshotPolicy": "仅主代理最终前台游戏物理点击并实际查看后的截图用于原生验收。早期 work/native 筛选与回归文件存在后台帧缓存，不按名称认作成功证据。",
+  "git": {
+    "commitCreated": false,
+    "pushed": false,
+    "reason": "用户本轮要求提交验收，未要求 Git 提交推送。项目既有改动保留。"
+  }
+}

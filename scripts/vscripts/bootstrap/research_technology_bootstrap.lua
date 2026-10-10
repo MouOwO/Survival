@@ -80,28 +80,6 @@ local function sync_client(player_id, snapshot)
     end
 end
 
-local function each_team_player(team, callback)
-    local limit = tonumber(DOTA_MAX_TEAM_PLAYERS) or 24
-    for player_id = 0, limit - 1 do
-        if valid_player(player_id) and team_for(player_id) == team then
-            callback(player_id)
-        end
-    end
-end
-
-local function queue_resource_refresh(player_id)
-    if not valid_player(player_id) or pending_resource_refresh[player_id] then return end
-    local pending = pending_resource_refresh
-    pending[player_id] = true
-    scheduler.after(0.1, function()
-        if pending ~= pending_resource_refresh then return end
-        pending[player_id] = nil
-        if valid_player(player_id) then
-            sync_client(player_id, service:BuildClientSnapshot(player_id))
-        end
-    end, "research_resource_refresh_" .. player_id)
-end
-
 local function register_handlers()
     event_bus.handle_request(event_names.UPGRADE_REQUESTED, function(payload)
         return service:RequestUpgrade(payload)
@@ -177,14 +155,6 @@ function M.init()
     register_handlers()
     -- Levels/effects belong to the purchasing player. Team research broadcasts
     -- would change another player's pending target while its timer is running.
-    event_bus.subscribe(events.RESOURCE_CHANGED, function(payload)
-        local player_id = tonumber(payload and payload.player_id)
-        if valid_player(player_id) then
-            queue_resource_refresh(player_id)
-        elseif payload and payload.team then
-            each_team_player(payload.team, queue_resource_refresh)
-        end
-    end)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
         if valid_player(player_id) then

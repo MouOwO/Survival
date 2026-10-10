@@ -15,8 +15,9 @@ function M:CastFilterResult()
         { player_id = player_id }
     )
     local snapshot = result and result.snapshot or nil
-    if not snapshot or snapshot.altar_built ~= 1 then
-        self.cast_error = "英雄祭坛不可用"
+    if not snapshot or snapshot.summon_unlocked ~= 1 then
+        self.cast_error = snapshot and snapshot.summon_disabled_reason
+            or "英雄祭坛不可用"
         return UF_FAIL_CUSTOM
     end
     if snapshot.hero_summoned == 1 then

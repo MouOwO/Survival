@@ -1,0 +1,554 @@
+{
+  "at": "2026-10-07T11:08:40.055Z",
+  "baselineCommit": "2a190652",
+  "contentMergeCommit": "167407a23d4c80a66722dbfe019aca4701536d4f",
+  "version": "feedback10-selected-7",
+  "baseline": {
+    "baselineCommit": "ab6c3070",
+    "at": "2026-10-07T06:53:09.019Z",
+    "selected": {
+      "queue": [
+        "v001A",
+        "v008",
+        "v010",
+        "v029"
+      ],
+      "hud": [
+        "v011",
+        "v013"
+      ],
+      "archive": [
+        "v003",
+        "v018",
+        "v019",
+        "v021"
+      ],
+      "shared": [
+        "approved_shop_B17_L21_T23",
+        "v028"
+      ]
+    },
+    "validation": {
+      "native": {
+        "resolution": [
+          1280,
+          720
+        ],
+        "verified": [
+          "A/B layout with native cost visibility",
+          "selected city and hero HUD",
+          "training active, waiting, completion and capped-level replacement",
+          "archive with real 44 server rows and tooltip",
+          "daily rewards shared action",
+          "lottery details and empty history"
+        ],
+        "limitations": [
+          "mat_setvideomode is unavailable in this Tools build; three larger resolutions remain preview-verified",
+          "Native training full queue and alternative types were not reached under the current session unlocks",
+          "Research cancellation event contract was tested in component preview; backend refund rules were unchanged"
+        ]
+      },
+      "preview": {
+        "resolutions": [
+          [
+            1280,
+            720
+          ],
+          [
+            1920,
+            1080
+          ],
+          [
+            2560,
+            1440
+          ],
+          [
+            2560,
+            1080
+          ]
+        ],
+        "report": "work/qa/report.json",
+        "actions": "work/qa/actions.json",
+        "nativeUiScale": "1080 UI coordinate system with viewport scale",
+        "limitations": [
+          "ScenePanel and ability widgets are stand-ins",
+          "Browser ellipsis approximates native text shrinking",
+          "Explicit local sample data; no account/payment connection"
+        ]
+      }
+    },
+    "experiments": [
+      {
+        "id": "v001A",
+        "area": "queue",
+        "kept": true,
+        "reason": "双行布局对双成本与名额留白更充足；作为生产默认。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v001B",
+        "area": "queue",
+        "kept": false,
+        "reason": "普通四项更矮，但双成本需要扩高，收益不稳定；保留候选。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v002",
+        "area": "archive",
+        "kept": false,
+        "reason": "真实游戏截图发现透明底与浅色标题问题。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v003",
+        "area": "archive",
+        "kept": true,
+        "reason": "浅底与深色标题修正；后续结合 v018/v019/v021 公共组件。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v005",
+        "area": "queue",
+        "name": "降低训练衬底透明度",
+        "purpose": "训练玻璃更轻",
+        "css": "#SurvivalProductionPanel.CompactTraining{background:#31565d9c}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "透明度过低时场景纹理干扰队列剩余时间。",
+        "reason": "透明度过低时场景纹理干扰队列剩余时间。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v006",
+        "area": "queue",
+        "name": "象牙训练面板",
+        "purpose": "检验浅底是否适用于战斗 HUD",
+        "css": "#SurvivalProductionPanel.CompactTraining{background:#eeefe4ed}#SurvivalProductionPanel.CompactTraining .label{color:#234957}",
+        "script": null,
+        "variables": 2,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "浅底训练板抢占战场注意力，成本与头像块反差过强。",
+        "reason": "浅底训练板抢占战场注意力，成本与头像块反差过强。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v007",
+        "area": "queue",
+        "name": "移除选项的小框",
+        "purpose": "减少四块卡片的碎片感",
+        "css": ".ProductionTrainingSlot{border-color:transparent!important;background:transparent!important}",
+        "script": null,
+        "variables": 2,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "去框减轻碎片感，但禁用/可点击边界不如现版清楚。",
+        "reason": "去框减轻碎片感，但禁用/可点击边界不如现版清楚。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v008",
+        "area": "queue",
+        "name": "增大成本字号",
+        "purpose": "改善 720p 成本读取",
+        "css": "#SurvivalProductionPanel.CompactTraining .ProductionTrainingCost{font-size:28px}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": true,
+        "improvement": "单木材成本字号提高，双成本维持 24px 并保留两行。",
+        "tradeoff": "需原生截图与分辨率回归，主观效果待用户最终验收",
+        "reason": "单木材成本字号提高，双成本维持 24px 并保留两行。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v009",
+        "area": "queue",
+        "name": "缩小头像",
+        "purpose": "检查留白与辨识度的权衡",
+        "css": "",
+        "script": "document.querySelectorAll('.ProductionTrainingIcon').forEach(e=>{e.style.width='64px';e.style.height='64px';})",
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "小头像造成大片无效空白，单位辨识下降。",
+        "reason": "小头像造成大片无效空白，单位辨识下降。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v010",
+        "area": "queue",
+        "name": "队列 progress 青玉",
+        "purpose": "减少活动进度金色权重",
+        "css": ".ProductionProgressFill{background:#83b6ae}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": true,
+        "improvement": "活动头像底部细进度用玉色，研究进度原色保留。",
+        "tradeoff": "需原生截图与分辨率回归，主观效果待用户最终验收",
+        "reason": "活动头像底部细进度用玉色，研究进度原色保留。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v011",
+        "area": "hud",
+        "name": "减弱顶部衬底",
+        "purpose": "释放战场画面",
+        "css": "#HandoffTopBackdrop{opacity:.55}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": true,
+        "improvement": "顶部衬底减弱，头像/槽位几何保持。",
+        "tradeoff": "需原生截图与分辨率回归，主观效果待用户最终验收",
+        "reason": "顶部衬底减弱，头像/槽位几何保持。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v012",
+        "area": "hud",
+        "name": "属性字增大",
+        "purpose": "检验 720p 属性可读性",
+        "css": "",
+        "script": "document.querySelectorAll('.HandoffNumber').forEach(e=>e.style.fontSize='25px')",
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "属性字号实验需要真实高数值验证，先保留既有字级。",
+        "reason": "首次选择器未准确定位属性区，不作为属性字号证据；维持原字号。",
+        "replayBase": "work/checkpoints/best/manifest.json",
+        "validForPurpose": false
+      },
+      {
+        "id": "v013",
+        "area": "hud",
+        "name": "资源局部衬底",
+        "purpose": "避免整条黑顶栏",
+        "css": "#HandoffResource_goldRow,#HandoffResource_woodRow,#HandoffResource_populationRow{background:#173d4675;border-radius:4px}",
+        "script": null,
+        "variables": 2,
+        "parent": "v003 + shared prototype",
+        "kept": true,
+        "improvement": "资源各自有局部浅透明衬底，未移动数字。",
+        "tradeoff": "需原生截图与分辨率回归，主观效果待用户最终验收",
+        "reason": "资源各自有局部浅透明衬底，未移动数字。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v014",
+        "area": "hud",
+        "name": "技能槽金边减半",
+        "purpose": "保留正方形结构，降低描边重量",
+        "css": "",
+        "script": "document.querySelectorAll('[style*=\"border\"]').forEach(e=>{if(e.style.border.includes('2px solid'))e.style.borderWidth='1px'})",
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "原生替代预览不足以确定细边更好，保留已确认描边。",
+        "reason": "原生替代预览不足以确定细边更好，保留已确认描边。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v015",
+        "area": "hud",
+        "name": "入口标签淡玉色",
+        "purpose": "检验图标标签的一体化",
+        "css": "",
+        "script": "document.querySelectorAll('.HandoffNav .label').forEach(e=>e.style.color='#d0e2d9')",
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "淡玉文字对明亮地面更弱，保留象牙标签。",
+        "reason": "淡玉文字对明亮地面更弱，保留象牙标签。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v016",
+        "area": "hud",
+        "name": "悬停更亮",
+        "purpose": "检验入口反馈是否过重",
+        "css": ".HandoffNav:hover{background:#79b6af85;filter:brightness(1.35)}",
+        "script": null,
+        "variables": 3,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "过亮 hover 使导航比波次/资源更抢眼。",
+        "reason": "过亮 hover 使导航比波次/资源更抢眼。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v017",
+        "area": "archive",
+        "name": "条目更浅",
+        "purpose": "降低卡片底和窗口底的硬分界",
+        "css": ".ArchiveJade #ArchiveGrid .ArchiveCard{background:#ffffff42}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "与现版差异小，没有足够收益。",
+        "reason": "与现版差异小，没有足够收益。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v018",
+        "area": "archive",
+        "name": "条目细边",
+        "purpose": "检验无金色常驻边框的安静程度",
+        "css": ".ArchiveJade #ArchiveGrid .ArchiveCard{border-color:#97aea35a}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": true,
+        "improvement": "条目边线减弱，常驻金框隐藏。",
+        "tradeoff": "需原生截图与分辨率回归，主观效果待用户最终验收",
+        "reason": "条目边线减弱，常驻金框隐藏。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v019",
+        "area": "archive",
+        "name": "名称加大",
+        "purpose": "提高长名称与常规名称的可读性",
+        "css": "",
+        "script": "document.querySelectorAll('.ArchiveItemName').forEach(e=>e.style.fontSize='18px')",
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": true,
+        "improvement": "名称字号提升；长名称仍缩小/tooltip。",
+        "tradeoff": "需原生截图与分辨率回归，主观效果待用户最终验收",
+        "reason": "名称字号提升；长名称仍缩小/tooltip。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v020",
+        "area": "archive",
+        "name": "进度深浅对比",
+        "purpose": "避免角标盖过主图",
+        "css": ".ArchiveJade #ArchiveGrid .ArchiveCount{background:#31574f;color:#f4f1df}",
+        "script": null,
+        "variables": 2,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "深色计数标签比物品主图更抢眼。",
+        "reason": "深色计数标签比物品主图更抢眼。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v021",
+        "area": "archive",
+        "name": "导航光晕减弱",
+        "purpose": "检验金光与下对齐线的权重",
+        "css": ".ArchiveTab.Selected .ArchiveNavGlow{opacity:.55}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": true,
+        "improvement": "选中光晕 55%，独立下对齐金线保留。",
+        "tradeoff": "需原生截图与分辨率回归，主观效果待用户最终验收",
+        "reason": "选中光晕 55%，独立下对齐金线保留。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v022",
+        "area": "archive",
+        "name": "标题更强",
+        "purpose": "检查题头与条目层级",
+        "css": "",
+        "script": "document.querySelector('#ArchiveTitle').style.fontSize='42px'",
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "38px 标题已足够，42px 增加头部重量。",
+        "reason": "38px 标题已足够，42px 增加头部重量。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v023",
+        "area": "archive",
+        "name": "图标轻微增大",
+        "purpose": "检查 4 列卡片中图标辨识度",
+        "css": ".ArchiveJade #ArchiveGrid .ArchiveArt{width:99px;height:78px;left:22px;top:14px}",
+        "script": null,
+        "variables": 3,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "放大图标使角标与物品更接近，增加遮挡代价。",
+        "reason": "放大图标使角标与物品更接近，增加遮挡代价。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v024",
+        "area": "archive",
+        "name": "金色条目 hover",
+        "purpose": "对比细边与光晕",
+        "css": ".ArchiveJade #ArchiveGrid .ArchiveCard:hover{box-shadow:0 0 8px #cfb67980}",
+        "script": null,
+        "variables": 2,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "光晕容易在紧密网格裁切，细边反馈更稳定。",
+        "reason": "光晕容易在紧密网格裁切，细边反馈更稳定。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v025",
+        "area": "shared",
+        "name": "共享按钮浅玉",
+        "purpose": "购买/领取类按钮材质",
+        "css": ".JadeAction{filter:brightness(1.12)}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "浅玉按钮默认态接近 hover，减少状态区分。",
+        "reason": "浅玉按钮默认态接近 hover，减少状态区分。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v026",
+        "area": "shared",
+        "name": "共享按钮深玉",
+        "purpose": "检查 disabled 与默认按钮分离",
+        "css": ".JadeAction{filter:brightness(.85)}",
+        "script": null,
+        "variables": 1,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "默认态过暗更像禁用，未胜过既有公共按钮。",
+        "reason": "默认态过暗更像禁用，未胜过既有公共按钮。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v027",
+        "area": "shared",
+        "name": "tooltip 象牙",
+        "purpose": "检验浅 tooltip 与浅弹窗的层级",
+        "css": ".JadeTooltip{background:#f2f1e8;color:#234957}.JadeTooltip .label{color:#234957}",
+        "script": null,
+        "variables": 3,
+        "parent": "v003 + shared prototype",
+        "kept": false,
+        "improvement": "未胜过当前最佳",
+        "tradeoff": "浅 tooltip 与浅弹窗混成一层。",
+        "reason": "浅 tooltip 与浅弹窗混成一层。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v028",
+        "area": "shared",
+        "name": "tooltip 青玉",
+        "purpose": "检验沿用深玉提示层",
+        "css": ".JadeTooltip{background:#173d46f5;border:1px solid #92aaa4;border-radius:4px}",
+        "script": null,
+        "variables": 3,
+        "parent": "v003 + shared prototype",
+        "kept": true,
+        "improvement": "深玉 tooltip 与浅底窗口形成层级。",
+        "tradeoff": "需原生截图与分辨率回归，主观效果待用户最终验收",
+        "reason": "深玉 tooltip 与浅底窗口形成层级。",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      },
+      {
+        "id": "v029",
+        "area": "queue",
+        "name": "等待头像移除等级覆盖",
+        "variables": 1,
+        "parent": "selected v001A + v008 + v010",
+        "kept": true,
+        "improvement": "同状态局部比较中等待单位轮廓可辨认；真实游戏中 LV2 等待头像也正确显示。",
+        "tradeoff": "等待项内不直接显示等级，完整等级仍在 tooltip。",
+        "reason": "原生截图显示等级条覆盖小头像；移除之后保留图标识别与已有队列顺序。",
+        "before": "work/candidates/v029_parent_crop.png",
+        "after": "work/final/best_queue_waiting_crop.png",
+        "replayBase": "work/checkpoints/best/manifest.json"
+      }
+    ],
+    "status": "implemented_and_checked_for_user_visual_acceptance",
+    "checkpoint": "work/checkpoints/best/manifest.json",
+    "nativeBeforeAfter": [
+      "work/final/before_queue_native.png",
+      "work/final/best_queue_native.png"
+    ],
+    "resourceCommit": "2a190652f6b84c4e7ba9eb6ac866558ad95ff488",
+    "gitBranch": "origin/dev",
+    "substantiveExperimentCount": 28
+  },
+  "selected": [
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R07",
+    "R08",
+    "R10"
+  ],
+  "review": "work/feedback10/review.json",
+  "validation": {
+    "preview": {
+      "resolutions": [
+        [
+          1280,
+          720
+        ],
+        [
+          1920,
+          1080
+        ],
+        [
+          2560,
+          1440
+        ],
+        [
+          2560,
+          1080
+        ]
+      ],
+      "cases": 40,
+      "layoutAndEventCases": 16,
+      "archiveCategories": 15,
+      "reports": [
+        "work/qa/report.json",
+        "work/qa/actions.json",
+        "work/feedback10/categories/report.json"
+      ]
+    },
+    "native": {
+      "resolution": [
+        1280,
+        720
+      ],
+      "evidence": "work/feedback10/native/best_archive_initial.png",
+      "verified": [
+        "merged archive entry renders real 44 server rows; ivory window/sidebar and four-column structure"
+      ],
+      "status": "PARTIAL: client update prevented final verification",
+      "unverified": [
+        "last count line-height correction",
+        "final training layout R08",
+        "final full category/title/HUD interaction"
+      ],
+      "blockingEvidence": "work/feedback10/native/client_update_block.png"
+    }
+  },
+  "logic": "Server costs, queue order, unlocks, refunds and payments unchanged; bottom HUD geometry unchanged",
+  "checkpoint": "work/checkpoints/best/manifest.json"
+}

@@ -89,3 +89,134 @@ assert.equal(cfg.SurvivalPortraitPresentation.InspectBackdrop().color,'#943d20')
 cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:778,model_asset_id:'',portrait_unit_name:''});
 assert.equal(cfg.SurvivalPortraitPresentation.InspectBackdrop().color,'#29424b','explicit clear returns to fallback');
 console.log('PORTRAIT_HERO_PALETTE_PASS: hero colors, cosmetic identity, stale selection rejection, native/custom fills match');
+
+// Use the production scene controller with separate state so the native HUD
+// assertions above remain independent of the corner shortcut's live identity.
+const shortcutState={player:0,hero:101,selected:901,alive:true,canSelect:true,
+ identity:{hero_ready:1,hero_id:'hero_monkey_king',unit_entindex:101}};
+const shortcutNames={101:'npc_dota_hero_monkey_king',102:'npc_dota_hero_juggernaut',
+ 103:'npc_dota_hero_drow_ranger',901:'npc_survival_builder_proxy',902:'npc_dota_hero_axe'};
+const shortcutOwners={101:0,102:0,103:0,901:0,902:1};
+const shortcutClicks=[],shortcutConfig={SurvivalHeroSelection:{
+ CanSelect:()=>shortcutState.canSelect,Select:source=>shortcutClicks.push(source)}};
+vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_presentation.js','utf8'),{
+ GameUI:{CustomUIConfig:()=>shortcutConfig},
+ Game:{GetLocalPlayerID:()=>shortcutState.player,IsInToolsMode:()=>false},
+ CustomNetTables:{GetTableValue:(table,key)=>table==='survival_hero_skills'&&key==='player_0'?shortcutState.identity:null},
+ Players:{GetPlayerHeroEntityIndex:()=>shortcutState.hero,GetLocalPlayerPortraitUnit:()=>shortcutState.selected},
+ Entities:{GetUnitName:entity=>shortcutNames[entity]||'',GetPlayerOwnerID:entity=>shortcutOwners[entity],
+  IsValidEntity:entity=>Object.prototype.hasOwnProperty.call(shortcutNames,entity),IsAlive:()=>shortcutState.alive},
+ Date:{now:()=>now},$:{Msg(){},Warning(){}}
+});
+const shortcutPresentation=shortcutConfig.SurvivalPortraitPresentation;
+assert.equal(typeof shortcutPresentation.BindShortcutScene,'function','3D shortcuts share one cached scene binding helper');
+
+function sceneFixture(id){
+ const calls={local:[],unit:[],clear:0};
+ const scene=new Panel(id);
+ scene.paneltype='DOTAScenePanel';
+ scene.SetUnit=(...args)=>{calls.unit.push(args);return undefined;};
+ scene.ClearScene=()=>{calls.clear++;};
+ scene.SetScenePanelToLocalHero=(...args)=>{
+  calls.local.push(args);
+  throw new Error('post-game loadout API must not bind a live custom-game shortcut');
+ };
+ return {scene,calls};
+}
+const directHeroScene=sceneFixture('DirectHeroShortcut');
+for(let tick=0;tick<300;tick++)shortcutPresentation.BindShortcutScene(directHeroScene.scene,'hero:101:npc_dota_hero_monkey_king','npc_dota_hero_monkey_king',true);
+assert.equal(directHeroScene.calls.local.length,0,'live custom-game shortcut never uses the account-loadout/post-game hero API');
+assert.deepEqual(directHeroScene.calls.unit,[['npc_dota_hero_monkey_king','shortcut_soft',false]],'stable actual hero type binds one verified native scene');
+const builderScene=sceneFixture('BuilderShortcut');
+for(let tick=0;tick<300;tick++)shortcutPresentation.BindShortcutScene(builderScene.scene,'builder:901:npc_dota_hero_wisp','npc_dota_hero_wisp',false);
+assert.equal(builderScene.calls.local.length,0,'builder must not borrow the local summoned combat hero');
+assert.deepEqual(builderScene.calls.unit,[['npc_dota_hero_wisp','shortcut_soft',false]],'stable builder scene loads native Io once');
+// A hot update can retain the old identity cache while changing the native
+// portrait camera. Migrate that existing scene once, then retain steady caching.
+const cameraMigration=sceneFixture('CameraMigrationShortcut');
+cameraMigration.scene.__survivalSceneKey='hero:101:npc_dota_hero_monkey_king';
+cameraMigration.scene.__survivalSceneCamera='default';
+for(let tick=0;tick<300;tick++)shortcutPresentation.BindShortcutScene(cameraMigration.scene,'hero:101:npc_dota_hero_monkey_king','npc_dota_hero_monkey_king',true);
+assert.deepEqual(cameraMigration.calls.unit,[['npc_dota_hero_monkey_king','shortcut_soft',false]],'same identity with old default camera reloads exactly once into the soft portrait camera');
+assert.equal(cameraMigration.scene.__survivalSceneCamera,'shortcut_soft','successful migration updates the camera cache');
+assert.equal(cameraMigration.calls.local.length,0,'camera migration retains the native SetUnit path');
+const rebuiltBuilderScene=sceneFixture('BuilderShortcut');
+shortcutPresentation.BindShortcutScene(rebuiltBuilderScene.scene,'builder:901:npc_dota_hero_wisp','npc_dota_hero_wisp',false);
+assert.equal(rebuiltBuilderScene.calls.unit.length,1,'new scene node with same identity needs its own load');
+const failedScene=sceneFixture('FailedShortcut');
+failedScene.scene.SetUnit=(...args)=>{failedScene.calls.unit.push(args);throw new Error('simulated missing model');};
+const beforeFailedProbe=now;now=30000;
+for(let tick=0;tick<300;tick++){
+ now=30000+tick*10;
+ assert.equal(shortcutPresentation.BindShortcutScene(failedScene.scene,'hero:101:npc_dota_hero_monkey_king','npc_dota_hero_monkey_king',true),false);
+}
+assert.equal(failedScene.calls.local.length,0,'failed native scene never tries an unrelated account-loadout scene');
+assert.equal(failedScene.calls.unit.length,1,'failure cannot repeatedly load missing assets at HUD frequency');
+now=35000;
+assert.equal(shortcutPresentation.BindShortcutScene(failedScene.scene,'hero:101:npc_dota_hero_monkey_king','npc_dota_hero_monkey_king',true),false);
+assert.equal(failedScene.calls.local.length,0);
+assert.equal(failedScene.calls.unit.length,2,'failed identity permits one retry after the existing cooldown');
+now=beforeFailedProbe;
+console.log('SHORTCUT_SCENE_BINDING_PASS: stable 300-tick native SetUnit cache, one-time default-camera migration, no post-game/account-loadout calls, failure cooldown, independent Io and rebuilt scenes');
+
+const cornerRoot=new Panel('ShortcutHud'),cornerButton=new Panel('SurvivalLocalHeroPortrait',cornerRoot);
+cornerButton.events={};cornerButton.SetPanelEvent=(event,fn)=>{cornerButton.events[event]=fn;};
+const corner=sceneFixture('SurvivalLocalHeroPortraitImage');
+corner.scene.parent=cornerButton;cornerButton.children.push(corner.scene);
+for(let tick=0;tick<300;tick++)shortcutPresentation.RefreshLocalHeroPortrait(cornerRoot);
+assert.equal(corner.calls.unit.length,1,'live corner 300 stable refreshes load the actual hero only once');
+assert.deepEqual(corner.calls.unit[0],['npc_dota_hero_monkey_king','shortcut_soft',false]);
+assert.equal(corner.calls.local.length,0,'live corner does not borrow the Steam account loadout API');
+assert.equal(cornerButton.visible,true);assert.equal(cornerButton.enabled,true);assert.equal(cornerButton.hittest,true);
+cornerButton.events.onactivate();assert.deepEqual(shortcutClicks,['top_left_portrait'],'original hero selection entry point is preserved');
+assert.equal(shortcutState.selected,901,'model binding never changes the selected builder');
+
+shortcutState.selected=902;shortcutState.alive=false;
+for(let tick=0;tick<40;tick++)shortcutPresentation.RefreshLocalHeroPortrait(cornerRoot);
+assert.equal(corner.calls.unit.length,1,'selection/death changes do not rebuild the summoned hero model');
+assert.equal(cornerButton.visible,true,'dead summoned hero stays available for inspection');
+assert.equal(cornerButton.enabled,true,'original selection controller still owns dead-hero availability');
+shortcutState.canSelect=false;shortcutPresentation.RefreshLocalHeroPortrait(cornerRoot);
+assert.equal(cornerButton.enabled,false,'modal/input guard can disable the button without destroying its scene');
+assert.equal(corner.calls.unit.length,1);
+shortcutState.canSelect=true;
+
+shortcutState.hero=102;shortcutState.identity={hero_ready:1,hero_id:'hero_blademaster',unit_entindex:102};
+for(let tick=0;tick<40;tick++)shortcutPresentation.RefreshLocalHeroPortrait(cornerRoot);
+assert.equal(corner.calls.unit.length,2,'replacement hero entity binds exactly once');
+assert.deepEqual(corner.calls.unit[1],['npc_dota_hero_juggernaut','shortcut_soft',false],'replacement uses the new hero type rather than selected builder');
+assert.equal(cornerButton.visible,true);
+
+shortcutState.identity={hero_ready:0,hero_id:'',unit_entindex:102};
+for(let tick=0;tick<40;tick++)shortcutPresentation.RefreshLocalHeroPortrait(cornerRoot);
+assert.equal(cornerButton.visible,false);assert.equal(cornerButton.hittest,false);assert.equal(cornerButton.enabled,false);
+assert.equal(corner.calls.clear,0,'unready state hides its cached scene without repeated native teardown');
+assert.equal(corner.calls.unit.length,2);
+
+shortcutState.identity={hero_ready:1,hero_id:'hero_blademaster',unit_entindex:102};
+shortcutPresentation.RefreshLocalHeroPortrait(cornerRoot);
+assert.equal(corner.calls.unit.length,2,'same authoritative hero after temporary loading reuses the hidden cached scene');
+assert.equal(cornerButton.visible,true);
+corner.scene.removed=true;
+const replacementCorner=sceneFixture('SurvivalLocalHeroPortraitImage');
+replacementCorner.scene.parent=cornerButton;cornerButton.children.push(replacementCorner.scene);
+for(let tick=0;tick<40;tick++)shortcutPresentation.RefreshLocalHeroPortrait(cornerRoot);
+assert.equal(replacementCorner.calls.unit.length,1,'HUD node recreation reloads once even with the same hero entity');
+assert.equal(replacementCorner.calls.local.length,0);
+assert.equal(corner.calls.unit.length,2,'removed scene is not reused');
+cornerButton.events.onactivate();assert.deepEqual(shortcutClicks,['top_left_portrait','top_left_portrait']);
+
+// Authoritative identity must win over selected units and foreign/stale heroes.
+for(const identity of [
+ {hero_ready:1,hero_id:'hero_axe',unit_entindex:902},
+ {hero_ready:1,hero_id:'hero_blademaster',unit_entindex:null},
+ {hero_ready:1,hero_id:'hero_blademaster'},
+ {hero_ready:1,hero_id:'hero_blademaster',unit_entindex:103}
+]){
+ shortcutState.identity=identity;shortcutPresentation.RefreshLocalHeroPortrait(cornerRoot);
+ assert.equal(cornerButton.visible,false,'invalid/foreign/mismatched identity cannot populate the corner');
+}
+assert.equal(replacementCorner.calls.unit.length,1,'rejected identities never bind a model');
+assert.equal(shortcutState.selected,902,'all scene lifecycle work stays independent of current selection');
+assert(/<DOTAScenePanel\b[^>]*id="SurvivalLocalHeroPortraitImage"/.test(layout),'formal hero shortcut is an actual native 3D panel');
+console.log('HERO_CORNER_SCENE_LIFECYCLE_PASS: actual hero identity, replacement/death, guards, loading hide/reuse, node recreation, click preservation and selection isolation');

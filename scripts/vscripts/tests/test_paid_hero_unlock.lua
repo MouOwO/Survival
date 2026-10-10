@@ -25,7 +25,10 @@ package.loaded["systems/hero_cosmetic_service"] = {}
 package.loaded["systems/hero_anchor_service"] = {}
 package.loaded["systems/destination_validation_service"] = {}
 package.loaded["systems/hero_asset_preload_service"] = {}
-package.loaded["systems/player_context_service"] = { is_defeated = function() return false end }
+package.loaded["systems/player_context_service"] = {
+    is_defeated = function() return false end,
+    is_owned_by = function(id, unit) return unit:GetPlayerOwnerID() == id end,
+}
 package.loaded["systems/hero_summon_destination"] = { resolve = function()
     destination_calls = destination_calls + 1
     return nil, "test_destination_checked"
@@ -124,6 +127,9 @@ assert(runtime(0).available == 0 and runtime(1).available == 1 and runtime(2).av
 assert(runtime(1).status_text == "可召唤", "paid UI must leave the syncing state")
 assert(runtime(1, "ability_summon_blademaster").available == 0)
 assert(runtime(0, "ability_summon_doom").available == 1)
+bus.emit(events.BUILDING_CHANGED, {player_id = 1, building_id = "main_city", level = 0})
+assert(runtime(1).available == 1 and active(1),
+    "real altar nettable/native ability stays available below the normal city threshold")
 local client_fixtures = {
     owned = runtime(1), unowned = runtime(0), unloaded = runtime(2),
     other_hero = runtime(1, "ability_summon_blademaster"),
@@ -178,10 +184,15 @@ local view_state = {player_id = 0, hero_summon_snapshot = snapshot}
 assert(runtime_builder.build("ability_summon_monkey_king", view_state).available == 0,
     "one hero per match also locks the UI")
 snapshot.hero_summoned, snapshot.city_level = 0, 2
-assert(runtime_builder.build("ability_summon_monkey_king", view_state).available == 0)
-snapshot.city_level, snapshot.altar_built = 3, 0
-assert(runtime_builder.build("ability_summon_monkey_king", view_state).available == 0)
-snapshot.altar_built, snapshot.player_id = 1, 1
+assert(runtime_builder.build("ability_summon_monkey_king", view_state).available == 1,
+    "a completed early altar bypasses the ordinary city threshold")
+view_state.hero_summon_snapshot = projection.build(0, nil, 2, nil)
+assert(runtime_builder.build("ability_summon_monkey_king", view_state).available == 0,
+    "paid ownership alone does not unlock the altar stage")
+view_state.hero_summon_snapshot = projection.build(0, nil, 3, nil)
+assert(runtime_builder.build("ability_summon_monkey_king", view_state).available == 1,
+    "altar build eligibility permits direct summoning")
+view_state.hero_summon_snapshot.player_id = 1
 assert(runtime_builder.build("ability_summon_monkey_king", view_state).available == 0,
     "a mismatched owner's snapshot cannot unlock the button")
 assert(runtime_builder.build("ability_summon_monkey_king", {player_id = 0}).available == 0,

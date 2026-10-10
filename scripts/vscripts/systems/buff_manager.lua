@@ -1,5 +1,7 @@
 local definitions = require("config/generated/buff_definitions")
 
+local worker_attack_cap = require("systems/worker_native_attack_cap")
+
 local M = {}
 local BUFF_MODIFIER = "modifier_survival_managed_buff"
 local AURA_MODIFIER = "modifier_survival_managed_aura"
@@ -58,12 +60,16 @@ function M.apply(caster, target, buff_id, options)
         if def.polarity == "negative" and same_team then return nil end
         if def.polarity == "positive" and not same_team then return nil end
     end
+    local value = tonumber(options.value) or tonumber(def.default_value) or 0
+    if value ~= 0 and (def.effect_type == "attack_speed_bonus"
+        or def.effect_type == "attack_speed_pct") then
+        worker_attack_cap.restore_or_error(target)
+    end
     if not remove_lower_priority_exclusive(target, def) then
         return nil
     end
 
     local duration = math.max(0, tonumber(options.duration) or 0)
-    local value = tonumber(options.value) or tonumber(def.default_value) or 0
     local max_stacks = math.max(
         1, tonumber(options.max_stacks) or tonumber(def.max_stacks) or 1
     )

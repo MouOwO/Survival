@@ -35,7 +35,7 @@ effect_0023,reward_rebirth_04,30,add_all_attributes,10000,,,player_hero,add,hero
 effect_0024,reward_rebirth_04,40,add_attack_all_attribute_gain,4,,,player_hero,add,hero_progression_system,attack_all_attribute_gain,1,表示英雄每次攻击增加的全属性数值；实际攻击监听由英雄成长系统消费。
 effect_0025,reward_rebirth_04,50,add_multishot_count,1,,,player_hero,add,hero_progression_system,multishot_count,1,
 effect_0026,reward_rebirth_05,10,set_rebirth_level,5,,,player_hero,max,hero_progression_system,rebirth_level,1,
-effect_0027,reward_rebirth_05,20,grant_random_skill_or_upgrade,1,,公共技能三选一,player_hero,custom,hero_skill_reward_adapter,skill_reward,1,只展示未拥有的公共技能；选择后从本局技能池移除。
+effect_0027,reward_rebirth_05,20,grant_skill_points,1,,公共技能点+1,player_hero,add,hero_skill_reward_adapter,skill_points,1,五转起获得公共技能点；只能升级已拥有的公共技能池技能，不能升级专属技能。
 effect_0028,reward_rebirth_05,30,add_all_attributes,20000,,,player_hero,add,hero_progression_system,all_attributes,1,
 effect_0029,reward_rebirth_05,40,add_attack_all_attribute_gain,6,,,player_hero,add,hero_progression_system,attack_all_attribute_gain,1,表示英雄每次攻击增加的全属性数值；实际攻击监听由英雄成长系统消费。
 effect_0030,reward_rebirth_05,50,add_multishot_count,0,,,player_hero,add,hero_progression_system,multishot_count,1,

@@ -73,10 +73,10 @@ for i=1,3 do m:OnIntervalThink() end
 assert(path_calls==1,'path search and move order must not repeat every think')
 worker.position=approach;m:OnIntervalThink()
 assert(m.manual_repair_target_entindex==2 and worker.gestures==nil,'wait by a full wall')
-wall.health=985
-for i=1,3 do m:OnIntervalThink() end
+wall.health=980
+for i=1,10 do m:OnIntervalThink() end
 assert(wall.health==1000 and m.manual_repair_target_entindex==2,'repair same 2 percent per second then stay assigned')
-wall.health=900;m:OnIntervalThink();assert(wall.health==905,'later damage automatically resumes repair')
+wall.health=900;m:OnIntervalThink();assert(wall.health==902,'later damage automatically resumes repair')
 assert(not service.process({order_type=DOTA_UNIT_ORDER_MOVE_TO_POSITION,units={1}}))
 assert(m.manual_repair_target_entindex==nil,'player movement cancels manual repair')
 wall.survival_player_id=1

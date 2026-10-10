@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-08",
+  "scope": "anti-air basic attack native searing arrow tiers",
+  "paths": {
+    "R": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf",
+    "SR": "particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow.vpcf",
+    "SSR": "particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow_deso.vpcf"
+  },
+  "resources": "output/anti_air_arrow_visual_20261008/native_resource_audit.json",
+  "item_definition": "9162 Maraxiform's Ire; SSR native Desolator visual variant",
+  "rows": 20,
+  "effective_speed": 1500,
+  "other_combat_fields_unchanged": true,
+  "generated_source_match": true,
+  "precache_catalog_match": true,
+  "presets": "All A/B/C projections checked; only three anti-air projectile/policy report fields changed",
+  "native_proxy": "Only three ProjectileModel fields changed",
+  "tests": [
+    {
+      "i": 0,
+      "chunk_id": "756239",
+      "wall_time_seconds": 0.261269,
+      "exit_code": 0,
+      "original_token_count": 326,
+      "output": "LASER_FOLLOW_CALLS seconds=30 create=251 destroy=249 bind=753 setcp=0 peak_live=2\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:489: injected CreateParticle failure\r\n[TowerLaser] optional visual failed: control update failed\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:529: injected fallback binding failure\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:552: injected DestroyParticle failure\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:573: injected terminal destroy failure\r\nLASER_CONTINUOUS_CALLS seconds=90 create=1 destroy=0 bind=3 setcp=0 ticks=91\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:626: injected persistent creation failure\r\n[TowerLaser] optional visual failed: control update failed\r\nMACHINE_GUN_FEEDBACK_PASS: 5 levels, 2 speeds, hit timing/damage/gold, 6-8 projectiles, one gesture, coins, failure and lethal hits\r\n[WyvernBlizzardVisual] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:1479: injected snow failure\r\nTOWER_SKILL_TREE_EXCLUSION_PASS: native visuals, blizzard five levels/timing/damage/cleanup\r\n"
+    },
+    {
+      "i": 1,
+      "chunk_id": "ff033c",
+      "wall_time_seconds": 0.0140044,
+      "exit_code": 0,
+      "original_token_count": 20,
+      "output": "TOWER_DRAG_NET_PASS root, flight, model binding, refresh, engine-owned cleanup\r\n"
+    }
+  ],
+  "source_and_preset_validation_pass": true,
+  "catalog_validation_pass": true,
+  "syntax_pass": true,
+  "diff_check_pass": true,
+  "native_session": {
+    "map": "template_map",
+    "state": 10,
+    "time": 705.10003662109
+  },
+  "in_game_visual_verified": false,
+  "map_reload_required": true,
+  "compile_required": false,
+  "git_mutations": false
+}

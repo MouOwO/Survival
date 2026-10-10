@@ -1,0 +1,115 @@
+{
+  "task": "Compact hero skill level descriptions and highlight only current level",
+  "date": "2026-10-09",
+  "outcome": "PASS_AUTOMATED_AND_COMPILED; live pixel verification pending",
+  "root_cause": "LVn was rendered using a 164px generic property label column; all values used the generic gold style regardless of level.",
+  "behavior": {
+    "level_label_width_px": 52,
+    "description_width": "remaining row width; wraps",
+    "row_margin_top_px": 2,
+    "current_level_color": "#f0d48a",
+    "other_level_color": "#9da5ad",
+    "lv1_uses_same_rule": true,
+    "current_level_matches_title": true,
+    "reuse_resets_level_classes": true,
+    "scope": "only exact LVn fields of selected combat hero"
+  },
+  "source_changes": [
+    "panorama/src/scripts/custom_game/ability_tooltip.js",
+    "panorama/src/styles/custom_game/ability_tooltip.css",
+    "tools/test_ability_tooltip_recovery.cjs",
+    "tools/test_ability_tooltip_stability.cjs"
+  ],
+  "compilation": [
+    {
+      "source_kind": "js",
+      "log": "output/hero_tooltip_compact_20261009/ability_tooltip.js.compile.log",
+      "result": "1 compiled, 0 failed"
+    },
+    {
+      "source_kind": "css",
+      "log": "output/hero_tooltip_compact_20261009/ability_tooltip.css.compile.log",
+      "result": "1 compiled, 0 failed"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "panorama/scripts/custom_game/ability_tooltip.vjs_c",
+      "sha256": "7e5d81012fa7929cb3ab2e8c361583fc7efed87724a05b21c0e3e7973c832ec4",
+      "size": 124661,
+      "new_level_classes_present": true,
+      "changed": true
+    },
+    {
+      "path": "panorama/styles/custom_game/ability_tooltip.vcss_c",
+      "sha256": "f13b1f8eca2388b67d80bae2a86225bdb74d76593e0ecdf369b0f6cfb6b7e27c",
+      "size": 19500,
+      "new_level_classes_present": true,
+      "changed": true
+    }
+  ],
+  "checks": [
+    {
+      "command": "node --check panorama/src/scripts/custom_game/ability_tooltip.js",
+      "exit_code": 0
+    },
+    {
+      "command": "node --check tools/test_ability_tooltip_recovery.cjs",
+      "exit_code": 0,
+      "reported_by": "hero_tooltip_level_regression"
+    },
+    {
+      "command": "node tools/test_ability_tooltip_stability.cjs",
+      "exit_code": 0,
+      "result": "ABILITY_TOOLTIP_STABILITY_PASS"
+    },
+    {
+      "command": "node tools/test_ability_tooltip_recovery.cjs",
+      "exit_code": 0,
+      "result": "ABILITY_TOOLTIP_RECOVERY_PASS",
+      "log": "output/hero_tooltip_compact_20261009/recovery.log"
+    },
+    {
+      "name": "old-production-script negative control in isolated Node process",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "result": "only the 2 new tests fail on missing AbilitySkillLevelRow",
+      "log": "output/hero_tooltip_compact_20261009/recovery_before.log"
+    }
+  ],
+  "limitations": [
+    "No live Dota screenshot or font-pixel measurement was performed.",
+    "Engine-only fixture validates production render/refresh/pooling but does not emulate native CSS layout."
+  ],
+  "gameplay_changes": false,
+  "new_polling": false,
+  "server_changes": false,
+  "git": {
+    "commit_or_push_requested": false,
+    "git_mutations_performed": false,
+    "prior_changes_preserved": true
+  },
+  "evidence_directory": "output/hero_tooltip_compact_20261009",
+  "final_workspace_checks": [
+    {
+      "name": "diff_check",
+      "exit_code": 0,
+      "log": "output/hero_tooltip_compact_20261009/diff_check.txt"
+    },
+    {
+      "name": "diff_stat_after",
+      "exit_code": 0,
+      "log": "output/hero_tooltip_compact_20261009/diff_stat_after.txt"
+    },
+    {
+      "name": "diff_names_after",
+      "exit_code": 0,
+      "log": "output/hero_tooltip_compact_20261009/diff_names_after.txt"
+    },
+    {
+      "name": "status_after",
+      "exit_code": 0,
+      "log": "output/hero_tooltip_compact_20261009/status_after.txt"
+    }
+  ]
+}

@@ -13,6 +13,8 @@ local fusion_eligibility = require("systems/lumberjack_fusion_eligibility")
 local M = {}
 
 local state_by_unit = {}
+local published_runtime_by_unit = {}
+local resource_dependent_states = {}
 local ability_keys_by_unit = {}
 local tower_trace_by_ability = {}
 local hero_runtime_trace_by_unit = {}
@@ -20,6 +22,82 @@ local hero_skill_by_ability = {}
 local builder_slot_order_by_ability = {}
 local pending_resource_refresh = {}
 local pending_fusion_refresh = {}
+local progression_runtime_cache = {}
+local progression_unit_generation = {}
+local progression_unit_identity = {}
+local progression_refresh_epoch = {}
+local attribute_progression_fields = {
+    star_blessing_attributes_per_second = {
+        player_id = "id", reason = "string", amount = "number",
+        attack_amount = "number", tick = "number",
+    },
+    archive_building_minute_growth = { player_id = "id", reason = "string" },
+    attack_all_attribute_growth = {
+        player_id = "id", reason = "string", rebirth_level = "number",
+        all_attributes = "number", display_all_attributes = "number",
+        attack_flat = "number", attack_all_attribute_gain = "number",
+        split_multishot_unlocked = "boolean", multishot_count = "number",
+        pending_skill_rewards = "table", version = "number",
+        commerce_nirvana_granted = "boolean",
+    },
+}
+
+local function finite_number(value)
+    return type(value) == "number" and value == value
+        and value ~= math.huge and value ~= -math.huge
+end
+
+local function attribute_only_progression(payload)
+    local fields = type(payload) == "table" and attribute_progression_fields[payload.reason]
+    if not fields then return false end
+    for key, value in pairs(payload) do
+        local kind = fields[key]
+        if not kind or (kind == "number" and not finite_number(value))
+            or (kind == "id" and not finite_number(tonumber(value)))
+            or (kind ~= "number" and kind ~= "id" and type(value) ~= kind) then return false end
+    end
+    for key in pairs(fields) do
+        if key ~= "commerce_nirvana_granted" and payload[key] == nil then return false end
+    end
+    return true
+end
+
+local function progression_mode()
+    if not GameRules or type(GameRules.GetGameModeEntity) ~= "function" then return nil end
+    local mode = GameRules:GetGameModeEntity()
+    if mode and (not mode.IsNull or not mode:IsNull()) then return mode end
+end
+
+local function progression_rank(player_id)
+    local result = event_bus.request(events.HERO_PROGRESSION_GET_REQUEST, { player_id = player_id })
+    local rank = result and result.ok == true and type(result.snapshot) == "table"
+        and result.snapshot.rebirth_level or nil
+    return finite_number(rank) and rank >= 0 and rank == math.floor(rank) and rank or nil
+end
+
+local function bump_progression_units(player_id)
+    player_id = tonumber(player_id)
+    if finite_number(player_id) and player_id >= 0 then
+        progression_unit_generation[player_id] = (progression_unit_generation[player_id] or 0) + 1
+    end
+end
+
+local function track_progression_unit(state, unit_key)
+    -- Keep identity apart from mutable runtime state and register before every
+    -- state write, including workers awaiting their coalesced fusion publish.
+    local previous = progression_unit_identity[unit_key]
+    local player_id = tonumber(state.player_id)
+    if not previous or previous.unit ~= state.unit
+        or previous.player_id ~= player_id or previous.team ~= state.team
+        or previous.building_id ~= state.building_id then
+        if previous then bump_progression_units(previous.player_id) end
+        if not previous or previous.player_id ~= player_id then
+            bump_progression_units(player_id)
+        end
+        progression_unit_identity[unit_key] = { unit = state.unit,
+            player_id = player_id, team = state.team, building_id = state.building_id }
+    end
+end
 
 for _, row in ipairs(builder_ability_stages.rows or {}) do
     if row.enabled ~= false and row.ability_name then
@@ -39,8 +117,19 @@ local function is_tower_upgrade(ability_name)
         or ability_name == "ability_upgrade_tower_max"
 end
 
+local function runtime_can_activate(runtime)
+    if runtime.completed == 1 or runtime.removed == 1 then return false end
+    if (runtime.resource_check_on_cast == 1 or runtime.research_upgrade == 1)
+        and runtime.prerequisite_met ~= nil then
+        -- Capacity, queues and temporary busy states are reported by the cast
+        -- transaction. Only unmet learning prerequisites disable native input.
+        return runtime.prerequisite_met == 1
+    end
+    return runtime.available ~= 0
+end
+
 local function ensure_tower_upgrade_active(ability, runtime)
-    if runtime.available ~= 1 then
+    if not runtime_can_activate(runtime) then
         if ability:IsActivated() then ability:SetActivated(false) end
         runtime.engine_activated = 0
         return
@@ -55,13 +144,21 @@ local function ensure_tower_upgrade_active(ability, runtime)
     runtime.engine_activated = ability:IsActivated() and 1 or 0
 end
 
-local function sync_ability_active(ability, runtime)
+local function sync_ability_active(ability, runtime, shared_research)
     if runtime.passive == 1 or not ability.SetActivated then return end
-    local managed = runtime.research_upgrade == 1 or runtime.lumberjack_fusion == 1 or runtime.hero_summon == 1
+    local managed = runtime.resource_check_on_cast == 1
+        or runtime.research_upgrade == 1 or runtime.lumberjack_fusion == 1 or runtime.hero_summon == 1
+        or runtime.archive_challenge == 1
     if managed and ability.GetLevel and ability:GetLevel() < 1 then ability:SetLevel(1) end
     -- Restore only deactivation owned by this projection. Unknown/native skills
     -- keep their own activation rules; costs for other actions remain advisory.
-    if runtime.available == 0 then
+    local available = runtime_can_activate(runtime)
+    if shared_research and runtime.research_upgrade == 1 then
+        -- The native entity is shared. The viewer's personal runtime shades
+        -- the button; an owner's prerequisite must not disable a teammate.
+        if not ability.IsActivated or not ability:IsActivated() then ability:SetActivated(true) end
+        ability.survival_runtime_disabled = nil
+    elseif not available then
         ability.survival_runtime_disabled = true
         if not ability.IsActivated or ability:IsActivated() then ability:SetActivated(false) end
     elseif managed or ability.survival_runtime_disabled then
@@ -106,6 +203,20 @@ local function resources(player_id)
         events.RESOURCE_GET_REQUEST,
         { player_id = player_id }
     )
+end
+
+local function resource_dependent(runtime)
+    return runtime.resource_check_on_cast ~= 1 and runtime.available == 1
+        and runtime.can_afford ~= nil
+        and ((tonumber(runtime.cost_wood) or 0) > 0
+            or (tonumber(runtime.cost_gold) or 0) > 0
+            or (tonumber(runtime.population) or 0) > 0)
+end
+
+local function resource_owner_matches(state, payload)
+    local player_id = tonumber(payload.player_id)
+    return (player_id ~= nil and player_id >= 0 and tonumber(state.player_id) == player_id)
+        or ((player_id == nil or player_id < 0) and state.team == payload.team)
 end
 
 local function normalize(payload, unit)
@@ -280,6 +391,7 @@ local function publish(state, fusion_snapshot)
 
     reconcile_authoritative_unit_state(state)
     local unit_key = unit:entindex()
+    track_progression_unit(state, unit_key)
     state_by_unit[unit_key] = state
     if state.building_id == "hero_altar" then
         -- Fetch once for all six buttons, including the first building publish.
@@ -293,6 +405,7 @@ local function publish(state, fusion_snapshot)
     end
     if state.building_id == "arrow_tower"
         and unit.survival_tower_ability_sync_pending then
+        resource_dependent_states[unit_key] = nil
         CustomNetTables:SetTableValue(
             "survival_ability_runtime",
             "unit:" .. tostring(unit_key),
@@ -320,6 +433,8 @@ local function publish(state, fusion_snapshot)
         })
         state.reincarnation_level = tonumber(progression and progression.snapshot
             and progression.snapshot.rebirth_level) or 0
+        require("systems/research_lab_ability_sync").sync(unit,state.building_id,
+            state.research_levels,state.research_transaction,state.reincarnation_level)
     end
 
     CustomNetTables:SetTableValue(
@@ -333,6 +448,8 @@ local function publish(state, fusion_snapshot)
     )
     local resource_state = resources(state.player_id)
     local current = {}
+    local published = {}
+    local watches_resources = false
     local tower_transitions = 0
 
     ability_utils.for_each(unit, function(ability)
@@ -384,8 +501,20 @@ local function publish(state, fusion_snapshot)
         runtime.resource_version =
             resource_state and resource_state.version or 0
         local passive_ok, engine_passive = pcall(function() return ability:IsPassive() end)
-        runtime.passive = (passive_ok and engine_passive or passive ~= nil) and 1 or 0
-        sync_ability_active(ability, runtime)
+        runtime.passive = (runtime.passive == 1
+            or (hero_skill and hero_skill.skill_type == "passive") or (passive_ok and engine_passive)
+            or passive ~= nil) and 1 or 0
+        if state.building_id == "combat_clone" and runtime.passive == 1 then
+            -- A clone owns its Q entity; the main hero's row cannot paint it.
+            -- Publish a stable learned/passive state without disabling its proc.
+            local learned = safe_method_number(ability, "GetLevel", 0) > 0
+                and (not ability.IsActivated or ability:IsActivated())
+            runtime.current_level = safe_method_number(ability, "GetLevel", 0)
+            runtime.available = learned and 1 or 0
+            runtime.prerequisite_met = runtime.available
+            runtime.can_afford = 1
+        end
+        sync_ability_active(ability, runtime, state.building_id == "building_advanced_research_lab")
         if is_tower_upgrade(ability_name) then
             ensure_tower_upgrade_active(ability, runtime)
             local trace_key = ability:entindex()
@@ -425,10 +554,14 @@ local function publish(state, fusion_snapshot)
             runtime
         )
         current[ability:entindex()] = true
+        published[ability:entindex()] = runtime
+        watches_resources = watches_resources or resource_dependent(runtime)
     end)
 
     clear_removed(unit_key, current)
     ability_keys_by_unit[unit_key] = current
+    published_runtime_by_unit[unit_key] = published
+    resource_dependent_states[unit_key] = watches_resources and state or nil
     trace_combat_hero_runtime(state)
     return tower_transitions
 end
@@ -443,6 +576,9 @@ end
 
 local function clear_unit(payload)
     local entindex = payload.entindex
+    local previous = entindex and progression_unit_identity[entindex]
+    if previous then bump_progression_units(previous.player_id) end
+    if entindex then progression_unit_identity[entindex] = nil end
     local keys = entindex and ability_keys_by_unit[entindex]
         or nil
     for ability_entindex, _ in pairs(keys or {}) do
@@ -461,6 +597,8 @@ local function clear_unit(payload)
     end
     ability_keys_by_unit[entindex] = nil
     state_by_unit[entindex] = nil
+    published_runtime_by_unit[entindex] = nil
+    resource_dependent_states[entindex] = nil
     hero_runtime_trace_by_unit[entindex] = nil
     for ability_entindex, _ in pairs(keys or {}) do
         tower_trace_by_ability[ability_entindex] = nil
@@ -468,22 +606,40 @@ local function clear_unit(payload)
 end
 
 local function refresh_resources(payload)
-    local player_id = tonumber(payload.player_id)
     local refreshed = 0
     local tower_transitions = 0
-    local fusion_snapshots = {}
-    for _, state in pairs(state_by_unit) do
-        if (player_id ~= nil and player_id >= 0 and tonumber(state.player_id) == player_id)
-            or ((player_id == nil or player_id < 0) and state.team == payload.team) then
-            local fusion_snapshot
-            if state.building_id == "lumberjack" then
-                local key = tostring(state.player_id) .. ":" .. tostring(state.team)
-                fusion_snapshots[key] = fusion_snapshots[key]
-                    or fusion_eligibility.snapshot(state.player_id, state.team)
-                fusion_snapshot = fusion_snapshots[key]
+    local wallets, fusion_snapshots = {}, {}
+    for _, state in pairs(resource_dependent_states) do
+        if resource_owner_matches(state, payload)
+            and state.building_id ~= "building_research_lab"
+            and state.building_id ~= "building_advanced_research_lab"
+            and state.building_id ~= "combat_hero" and valid_entity(state.unit) then
+            local owner = tonumber(state.player_id)
+            local wallet = wallets[owner]
+            if not wallet then wallet = resources(owner); wallets[owner] = wallet end
+            local changed = false
+            for _, runtime in pairs(published_runtime_by_unit[state.unit:entindex()] or {}) do
+                if resource_dependent(runtime) and wallet then
+                    local affordable = (tonumber(wallet.debug_mode) == 1 or wallet.debug_mode == true)
+                        or ((tonumber(wallet.wood) or 0) >= (tonumber(runtime.cost_wood) or 0)
+                        and (tonumber(wallet.gold) or 0) >= (tonumber(runtime.cost_gold) or 0)
+                        and (tonumber(wallet.population) or 0) + (tonumber(runtime.population) or 0)
+                            <= (tonumber(wallet.max_population) or 0))
+                    if runtime.can_afford ~= (affordable and 1 or 0) then changed = true; break end
+                end
             end
-            tower_transitions = tower_transitions + (publish(state, fusion_snapshot) or 0)
-            refreshed = refreshed + 1
+            -- Only legacy actions that explicitly expose wallet-dependent
+            -- state can reach here. Cast-checked actions never rebuild it.
+            if changed then
+                local fusion_snapshot
+                if state.building_id == "lumberjack" then
+                    local key = tostring(owner) .. ":" .. tostring(state.team)
+                    fusion_snapshots[key] = fusion_snapshots[key] or fusion_eligibility.snapshot(owner,state.team)
+                    fusion_snapshot = fusion_snapshots[key]
+                end
+                tower_transitions = tower_transitions + (publish(state,fusion_snapshot) or 0)
+                refreshed = refreshed + 1
+            end
         end
     end
     if tower_transitions > 0 then
@@ -502,6 +658,11 @@ end
 
 local function on_resources(payload)
     if not payload then return end
+    local relevant = false
+    for _, state in pairs(resource_dependent_states) do
+        if resource_owner_matches(state, payload) then relevant = true; break end
+    end
+    if not relevant then return end
     local player_id = tonumber(payload.player_id)
     local key = player_id and player_id >= 0 and ("player:" .. player_id)
         or ("team:" .. tostring(payload.team))
@@ -570,7 +731,9 @@ local function on_worker_changed(payload)
                         end
                     end)
                 end
-                state_by_unit[unit:entindex()] = normalize(worker_payload, unit)
+                local state = normalize(worker_payload, unit)
+                track_progression_unit(state, unit:entindex())
+                state_by_unit[unit:entindex()] = state
             else publish_unit(worker_payload) end
         end
     end
@@ -611,9 +774,43 @@ end
 
 local function on_hero_progression_changed(payload)
     local player_id = tonumber(payload.player_id)
-    if player_id == nil or player_id < 0 then return end
+    if not finite_number(player_id) or player_id < 0 then return end
+    local epochs = progression_refresh_epoch
+    local epoch = (epochs[player_id] or 0) + 1
+    epochs[player_id] = epoch
+    local attributes_only = attribute_only_progression(payload)
+    local mode = progression_mode()
+    local generation = progression_unit_generation[player_id] or 0
+    local cached = progression_runtime_cache[player_id]
+    if attributes_only and mode and cached and cached.mode == mode
+        and cached.generation == generation then
+        local rank = progression_rank(player_id)
+        -- Requests can synchronously emit events or replace/register units.
+        -- Recheck after authority returns, including the exact cached baseline.
+        if rank == cached.rank and progression_runtime_cache[player_id] == cached
+            and epochs == progression_refresh_epoch and epochs[player_id] == epoch
+            and mode == progression_mode()
+            and generation == (progression_unit_generation[player_id] or 0) then return end
+    end
+    -- Unknown reasons/fields and unit/rank changes retain the original refresh.
+    progression_runtime_cache[player_id] = nil
+    local start_mode = progression_mode()
+    local start_generation = progression_unit_generation[player_id] or 0
+    local start_rank = attributes_only and progression_rank(player_id) or nil
     for _, state in pairs(state_by_unit) do
         if tonumber(state.player_id) == player_id then publish(state) end
+    end
+    local end_rank = attributes_only and progression_rank(player_id) or nil
+    -- Never certify mixed rows after a rank/identity/map change or a nested
+    -- progression refresh. An outer publish may overwrite an inner fresh row.
+    if attributes_only and start_mode and start_rank ~= nil and start_rank == end_rank
+        and epochs == progression_refresh_epoch and epochs[player_id] == epoch
+        and start_mode == progression_mode()
+        and start_generation == (progression_unit_generation[player_id] or 0) then
+        progression_runtime_cache[player_id] = { rank = end_rank, mode = start_mode,
+            generation = start_generation }
+    else
+        progression_runtime_cache[player_id] = nil
     end
 end
 
@@ -650,6 +847,23 @@ local function on_hero_skill_changed(payload)
     })
 end
 
+local function on_hero_clone_created(payload)
+    local unit = payload and unit_from_payload(payload)
+    if not valid_entity(unit) then return end
+    publish(normalize({ unit = unit, player_id = payload.player_id,
+        team = payload.team, building_id = "combat_clone", level = 1 }, unit))
+end
+
+local function on_hero_clone_removed(payload)
+    local entindex = tonumber(payload and payload.entindex)
+    local state = entindex and state_by_unit[entindex]
+    -- A corpse can disappear after the engine has reused its old entity index.
+    if state and state.building_id == "combat_clone"
+        and (not payload.unit or state.unit == payload.unit) then
+        clear_unit({ entindex = entindex })
+    end
+end
+
 local function on_builder_ready(payload)
     publish_unit({
         unit = payload.builder,
@@ -663,7 +877,16 @@ function M.init()
     for player in pairs(pending_fusion_refresh) do scheduler.cancel("ability_fusion_refresh_"..tostring(player)) end
     pending_fusion_refresh = {}
     local function city_changed(payload)
-        if payload.building_id=="main_city" then queue_fusion_refresh(payload) end
+        if payload.building_id~="main_city" or payload.stats_only == true then return end
+        queue_fusion_refresh(payload)
+        -- These prerequisites change with the city, not with the next harvest.
+        for _, state in pairs(state_by_unit) do
+            if (state.building_id == "wall" and state.team == payload.team)
+                or ((state.building_id == "farm" or state.building_id == "building_farm")
+                    and tonumber(state.player_id) == tonumber(payload.player_id)) then
+                publish(state)
+            end
+        end
     end
     event_bus.subscribe(events.BUILDING_CHANGED, city_changed)
     event_bus.subscribe(events.BUILDING_CREATED, city_changed)
@@ -673,11 +896,20 @@ function M.init()
     end
     pending_resource_refresh = {}
     state_by_unit = {}
+    progression_runtime_cache = {}
+    progression_unit_generation = {}
+    progression_unit_identity = {}
+    progression_refresh_epoch = {}
+    published_runtime_by_unit = {}
+    resource_dependent_states = {}
     ability_keys_by_unit = {}
     tower_trace_by_ability = {}
     hero_runtime_trace_by_unit = {}
     event_bus.subscribe(events.BUILDER_READY, on_builder_ready)
+    event_bus.subscribe(events.HERO_CLONE_CREATED, on_hero_clone_created)
+    event_bus.subscribe(events.HERO_CLONE_REMOVED, on_hero_clone_removed)
     event_bus.subscribe(events.ROGUE_REWARD_CHANGED, function(payload)
+        if payload and payload.effects_changed == false then return end
         for _, state in pairs(state_by_unit) do
             if tonumber(state.player_id) == tonumber(payload.player_id) then publish(state) end
         end
@@ -685,12 +917,6 @@ function M.init()
     event_bus.subscribe(events.BUILDING_CREATED, publish_unit)
     event_bus.subscribe(events.BUILDING_CHANGED, publish_unit)
     event_bus.subscribe(events.BUILDING_DESTROYED, clear_unit)
-    local function on_city_changed(payload)
-        if payload.building_id == "main_city" then queue_fusion_refresh(payload) end
-    end
-    event_bus.subscribe(events.BUILDING_CREATED, on_city_changed)
-    event_bus.subscribe(events.BUILDING_CHANGED, on_city_changed)
-    event_bus.subscribe(events.BUILDING_DESTROYED, on_city_changed)
     event_bus.subscribe(events.TOWER_ABILITY_SYNC_COMPLETED, publish_unit)
     event_bus.subscribe(events.TOWER_FUSION_RUNTIME_CHANGED, publish_unit)
     event_bus.subscribe(events.TOWER_FUSION_RUNTIME_REMOVED, clear_unit)

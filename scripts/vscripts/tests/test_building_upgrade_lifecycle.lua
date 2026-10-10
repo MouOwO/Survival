@@ -235,7 +235,14 @@ local own_city, other_city, farm = make_unit(1001), make_unit(1002), make_unit(1
 function own_city:GetUnitName() return "building_main_city" end
 function other_city:GetUnitName() return "building_main_city" end
 function farm:GetUnitName() return "building_farm" end
-function farm:FindAbilityByName() return nil end
+local farm_ability = {hidden = false, active = true, writes = 0}
+function farm_ability:IsHidden() return self.hidden end
+function farm_ability:IsActivated() return self.active end
+function farm_ability:SetHidden(value) self.hidden = value; self.writes = self.writes + 1 end
+function farm_ability:SetActivated(value) self.active = value; self.writes = self.writes + 1 end
+function farm:FindAbilityByName(name)
+    return name == "ability_upgrade_farm" and farm_ability or nil
+end
 local function register_level(unit, owner, kind, level)
     bus.emit(events.BUILDING_CREATED, {unit = unit, entindex = unit.index,
         definition = kind == "main_city" and config.main_city or config.farm,
@@ -247,13 +254,24 @@ for target = 2, 5 do
     register_level(own_city, 0, "main_city", target - 1)
     register_level(farm, 0, "building_farm", target - 1)
     local denied = bus.request(events.BUILDING_UPGRADE_QUOTE_REQUEST, {building = farm, player_id = 0})
-    assert(denied and not denied.ok, "requires owner's city LV" .. target)
+    assert(denied and not denied.ok and denied.prerequisite_met == 0, "requires owner's city LV" .. target)
+    assert(not farm_ability.hidden and not farm_ability.active, "only unmet city prerequisite greys the farm upgrade")
     register_level(own_city, 0, "main_city", target)
+    bus.emit(events.BUILDING_CHANGED, {unit = own_city, entindex = own_city.index,
+        building_id = "main_city", level = target, team = 2, player_id = 0})
     local allowed = bus.request(events.BUILDING_UPGRADE_QUOTE_REQUEST, {building = farm, player_id = 0})
-    assert(allowed and allowed.ok and allowed.target_level == target, "unlocks at own city LV" .. target)
+    assert(allowed and allowed.ok and allowed.prerequisite_met == 1
+        and allowed.target_level == target, "unlocks at own city LV" .. target)
+    assert(not farm_ability.hidden and farm_ability.active, "city event unlocks farm without checking wallet")
+    local writes = farm_ability.writes
+    bus.emit(events.BUILDING_CHANGED, {unit = own_city, entindex = own_city.index,
+        building_id = "main_city", level = target, team = 2, player_id = 0})
+    assert(farm_ability.writes == writes, "unchanged farm prerequisites do not rewrite ability flags")
 end
+register_level(farm, 0, "building_farm", 5)
+assert(farm_ability.hidden and not farm_ability.active, "max-level farm upgrade disappears")
 assert(#errors == 0, table.concat(errors, "\n"))
-print("FARM_CITY_GATE_PASS: LV1-5 and same-team owner isolation")
+print("FARM_CITY_GATE_PASS: LV1-5, owner isolation, prerequisite events, stable flags and max-level hiding")
 
 
 published={}

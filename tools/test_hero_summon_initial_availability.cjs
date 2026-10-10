@@ -6,7 +6,7 @@ for(const [file,start,end,fn] of [
  ['combat_stats.js','    function abilityRuntime(','    function applyAbilityRuntime(', 'abilityRuntime'],
  ['ability_tooltip.js','    function readTooltipTable(','    function cancelChecks(', 'readTooltipTable']]){
  let name='ability_summon_monkey_king',row;
- const cfg={},env={GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0},Abilities:{GetAbilityName:()=>name},CustomNetTables:{GetTableValue:()=>row},bindingSnapshot:null,selectedUnit:()=>10};
+ const cfg={},env={config:cfg,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0},Abilities:{GetAbilityName:()=>name},CustomNetTables:{GetTableValue:()=>row},bindingSnapshot:null,selectedUnit:()=>10};
  vm.createContext(env);vm.runInContext(guard,env);
  const source=fs.readFileSync('panorama/src/scripts/custom_game/'+file,'utf8');
  vm.runInContext(source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start))),env);

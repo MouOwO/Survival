@@ -1,4 +1,5 @@
 local asset_catalog = require("config/asset_catalog")
+local builder_definitions = require("config/generated/builder_definitions")
 local M = {}
 
 function M.apply(unit, snapshot)
@@ -27,6 +28,13 @@ function M.apply(unit, snapshot)
         asset_id = tostring(unit.survival_monster_default_wearable_asset_id or "")
     end
     local asset = asset_catalog.get(asset_id)
+    -- Builders retain their selectable proxy body; their appearance is owned
+    -- by the builder definition rather than survival_model_asset_id.
+    local builder = builder_definitions.by_id[tostring(unit.survival_builder_id or "")]
+    if not asset and builder and builder.enabled ~= false then
+        asset_id = tostring(builder.visual_asset_id or "")
+        asset = asset_catalog.get(asset_id)
+    end
     if not asset then
         local hero_id = tostring(unit.survival_hero_id or "")
         if hero_id == "" then hero_id = tostring(snapshot.hero_id or "") end
@@ -60,10 +68,15 @@ function M.apply(unit, snapshot)
         and asset.portrait_unit_name == "npc_dota_hero_terrorblade"
     local is_challenge_portrait = tostring(asset.asset_id or ""):find("challenge_monster_", 1, true) == 1
         and tostring(asset.portrait_unit_name or ""):find("npc_dota_hero_", 1, true) == 1
+    local is_builder_portrait = builder and builder.enabled ~= false
+        and asset.asset_id == builder.visual_asset_id
+        and asset.asset_id == "builder_io_benevolent_companion"
+        and asset.portrait_unit_name == "npc_dota_hero_wisp"
     if asset.native_wearable_stage == nil
         and not is_challenge_portrait
         and not is_seven_sins_portrait
         and not is_boss_portrait
+        and not is_builder_portrait
         and not is_split_hero_portrait then
         return snapshot
     end

@@ -7,6 +7,8 @@ local tower_skills = require("systems/tower_skill_runtime")
 local tower_ability_sync = require("systems/tower_ability_sync")
 local global_rules = require("config/global_rules")
 local tower_combat_rules = require("config/tower_combat_rules")
+local tower_projectile_speed = require("systems/tower_projectile_speed")
+local tower_fixed_facing = require("systems/tower_fixed_facing")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local player_profile_service = require("systems/player_profile_service")
 local building_population = require("systems/building_population_service")
@@ -64,11 +66,9 @@ local function set_tower_projectile_speed(unit, configured_speed, tower_class)
     end
     if base_speed then unit.survival_base_projectile_speed = base_speed end
     base_speed = tonumber(unit.survival_base_projectile_speed)
-    if base_speed and unit.SetProjectileSpeed then
-        local projectile_speed = tower_combat_rules.projectile_speed(
-            base_speed, tower_class or unit.survival_tower_class)
-        unit:SetProjectileSpeed(projectile_speed)
-        unit.survival_projectile_speed = projectile_speed
+    if base_speed then
+        tower_projectile_speed.apply(unit, base_speed,
+            tower_class or unit.survival_tower_class)
     end
 end
 
@@ -284,9 +284,15 @@ local function refresh_farm_upgrade_ability(state)
     local ability = state.unit:FindAbilityByName("ability_upgrade_farm")
     if ability then
         local has_next_level = state.definition.levels[(state.level or 1) + 1] ~= nil
-        ability:SetActivated(
-            has_next_level and (state.level or 1) < team_city_level(state.team, state.player_id)
-        )
+        local hidden = not has_next_level
+        local activated = has_next_level
+            and (state.level or 1) < team_city_level(state.team, state.player_id)
+        if ability.SetHidden and (not ability.IsHidden or ability:IsHidden() ~= hidden) then
+            ability:SetHidden(hidden)
+        end
+        if not ability.IsActivated or ability:IsActivated() ~= activated then
+            ability:SetActivated(activated)
+        end
     end
 end
 
@@ -345,6 +351,7 @@ local function apply_tower(unit, data, level)
         end
     end
     set_tower_projectile_speed(unit, data.projectile_speed, data.tower_class)
+    tower_fixed_facing.apply(unit, data.tower_class)
     set_attack_range(unit, global_rules.tower_attack_range)
 end
 
@@ -1074,7 +1081,7 @@ local function upgrade_quote(payload)
         local quote, error_message = wall_upgrade_rules.quote(state.definition, state.level, true)
         if not quote then return {ok = false, error = error_message} end
         if quote.requires_city_level > team_city_level(state.team) then
-            return {ok = false, error = "主城等级不足，无法直升9-1"}
+            return {ok = false, prerequisite_met = 0, error = "主城等级不足，无法直升9-1"}
         end
         target_level, cost = quote.target_level, quote.cost
     elseif state.building_id == "arrow_tower" then
@@ -1107,13 +1114,14 @@ local function upgrade_quote(payload)
             and data.requires_city_level > team_city_level(state.team) then
             return {
                 ok = false,
+                prerequisite_met = 0,
                 error = "基地达到Lv." .. tostring(data.requires_city_level)
                     .. "后才能升级城墙",
             }
         end
         if (state.building_id == "building_farm" or state.building_id == "farm")
             and state.level >= team_city_level(state.team, state.player_id) then
-            return { ok = false, error = "农场等级不能高于主城等级" }
+            return { ok = false, prerequisite_met = 0, error = "农场等级不能高于主城等级" }
         end
         cost = data.upgrade_cost
         if not cost then
@@ -1123,6 +1131,7 @@ local function upgrade_quote(payload)
 
     return {
         ok = true,
+        prerequisite_met = 1,
         building_id = state.building_id,
         current_level = state.level,
         target_level = target_level,
@@ -1382,6 +1391,7 @@ local function on_created(payload)
             -- is published, otherwise Panorama keeps the initial grey state.
             sync_tower_abilities(state, row)
             set_tower_projectile_speed(state.unit, row.projectile_speed)
+            tower_fixed_facing.apply(state.unit)
         end
     end
     apply_research_technology(state)

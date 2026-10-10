@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "date": "2026-10-09",
+  "task": "Critical and frost tower ground circles scaled to 75 percent",
+  "classes": [
+    "class_1",
+    "class_6"
+  ],
+  "factor": 0.75,
+  "previous_radius": [
+    96,
+    108,
+    120,
+    128
+  ],
+  "current_radius": [
+    72,
+    81,
+    90,
+    96
+  ],
+  "compiled_particle_systems": 28,
+  "spatial_components_scaled": 251,
+  "native_graph_and_lifetime_preserved": true,
+  "preset_regeneration_preserves_size": true,
+  "checks": [
+    "Static source spatial comparison",
+    "Deterministic generator regeneration",
+    "Complete compiled native graph and Game-Content source parity",
+    "Death preset variants and legacy schema",
+    "Tower visual lifecycle simulation",
+    "Node and Lua syntax"
+  ],
+  "live": {
+    "profiles_updated": [
+      "class_1",
+      "class_6"
+    ],
+    "active_towers_refreshed": 1,
+    "entity": 698,
+    "radius_before": 120,
+    "radius_after": 90,
+    "owned_roots_before": 1,
+    "owned_roots_after": 1,
+    "health_position_damage_unchanged": true,
+    "console": "output/tower_portal_scale_20261009/live_after.log"
+  },
+  "visual_acceptance": {
+    "screenshot_comparison": false,
+    "reason": "Current camera views challenge arena; target circles are outside current view. No camera or selection input was sent."
+  },
+  "checkpoint": "output/tower_portal_scale_20261009",
+  "compile_checkpoint": "output/tower_portal_scale_20261009/compile_20261009_140352",
+  "recovery": "Restore scoped CSV/generated Lua/preset tool/generator/art backups from checkpoint, restore compiled artifacts and Content files using compile manifest, then reapply restored cosmetic profiles or start a new tools map."
+}

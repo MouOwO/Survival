@@ -147,6 +147,7 @@ bus.handle_request(events.GRID_CAN_PLACE_REQUEST, function(payload)
     return {ok = true, grid_x = 0, grid_y = 0, world_position = payload.position}
 end)
 bus.handle_request(events.GRID_OCCUPY_REQUEST, function() return {ok = true} end)
+bus.handle_request(events.RESOURCE_CAN_SPEND_REQUEST, function() return {ok = true} end)
 bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST, function() return {ok = true} end)
 bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, function() return {totals = permanent} end)
 local created_events = 0
@@ -201,17 +202,19 @@ bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id = 0, reason = "lott
 enemy.position = Vector(base_range + 300, 0, 0)
 check_targeting(base_range + 350)
 
-local fusion_refreshes, growth_updates = 0, 0
+local fusion_refreshes, growth_updates, full_publications = 0, 0, 0
 bus.subscribe(events.TOWER_FUSION_STATE_CHANGED, function() fusion_refreshes=fusion_refreshes+1 end)
-bus.subscribe(events.BUILDING_CHANGED, function(payload)
-    if payload.stats_only then growth_updates=growth_updates+1 end
+bus.subscribe(events.BUILDING_CHANGED, function() full_publications=full_publications+1 end)
+bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, function(payload)
+    if payload.unit == tower then growth_updates=growth_updates+1 end
 end)
 for i=1,50 do
     permanent.tower_attack_flat = i
     bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED,
-        {player_id=0, reason="gameplay_stats_tower_attack_growth"})
+        {player_id=0, changed_section="tower", changed_field="attack",
+            tower_attack_flat=i, reason="gameplay_stats_tower_attack_growth"})
 end
-assert(growth_updates==50 and fusion_refreshes==0,
+assert(growth_updates==50 and fusion_refreshes==0 and full_publications==0,
     "50 combat growth hits must not trigger whole-group fusion/ability refreshes")
 local listed = assert(bus.request(events.BUILDING_LIST_REQUEST,
     {player_id=0, building_id="arrow_tower", handles_only=true}))

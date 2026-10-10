@@ -5,6 +5,7 @@ local M = {}
 local states_by_unit = {}
 local generation_by_unit = {}
 local verification_retries_by_unit = {}
+local next_generation = 0
 local VERIFY_DELAY_SECONDS = 0.05
 local MAX_VERIFICATION_RETRIES = 1
 
@@ -198,6 +199,8 @@ local function recover_live_state(unit, appearance)
         end
     end
     states_by_unit[owner_entindex] = state
+    unit.survival_model_appearance_state = state
+    unit.survival_model_appearance_entindex = owner_entindex
     return state
 end
 
@@ -344,7 +347,14 @@ local function schedule_verification(unit, appearance, generation)
         if retries >= MAX_VERIFICATION_RETRIES then
             remove_all(state.wearables)
             states_by_unit[entindex] = nil
+            generation_by_unit[entindex] = nil
             verification_retries_by_unit[entindex] = nil
+            if unit.survival_model_appearance_state == state then
+                unit.survival_model_appearance_state = nil
+                unit.survival_model_appearance_entindex = nil
+                unit.survival_model_appearance_asset_id = nil
+                unit.survival_model_appearance_signature = nil
+            end
             logger.warn("AppearanceWarning", "unit=" .. tostring(entindex)
                 .. " appearance=" .. tostring(appearance and appearance.asset_id)
                 .. " generation=" .. tostring(generation)
@@ -359,30 +369,36 @@ end
 
 function M.Clear(unit)
     if not unit then return false end
-    if not valid(unit) then
-        -- The engine may remove a corpse before its visual cleanup tick.
-        -- Use owner identity rather than calling entindex on a null handle.
-        for index, state in pairs(states_by_unit) do
-            if state.owner == unit then
-                remove_all(state.wearables)
-                states_by_unit[index] = nil
-                generation_by_unit[index] = (generation_by_unit[index] or 0) + 1
-                verification_retries_by_unit[index] = nil
-            end
-        end
-        return true
+    local is_valid = valid(unit)
+    local entindex = unit.survival_model_appearance_entindex
+    if not entindex and is_valid and type(unit.entindex) == "function" then
+        entindex = unit:entindex()
     end
-    if type(unit.entindex) ~= "function" then return false end
-    local entindex = unit:entindex()
-    local state = states_by_unit[entindex]
-    if state and state.owner ~= unit then return false end
-    if not state then remove_legacy_carriers(unit) end
-    remove_all(state and state.wearables)
-    states_by_unit[entindex] = nil
+    local current = entindex and states_by_unit[entindex]
+    local state = unit.survival_model_appearance_state
+    if not state or state.owner ~= unit then
+        state = current and current.owner == unit and current or nil
+    end
+    if not state and current and current.owner ~= unit then return false end
+    if not state and is_valid and unit.survival_model_appearance_asset_id ~= nil then
+        -- A script reload loses the Lua registry, not the live owned props.
+        -- Legacy outfits without a captured state still need cold recovery.
+        remove_legacy_carriers(unit)
+        remove_owned_model_components(unit)
+    end
+    -- Release the captured outfit even if its entity index now belongs to a
+    -- replacement. Its registry and verification belong to that new owner.
+    if entindex and (not current or current == state) then
+        pcall(scheduler.cancel, "appearance_verify_" .. tostring(entindex))
+        states_by_unit[entindex] = nil
+        generation_by_unit[entindex] = nil
+        verification_retries_by_unit[entindex] = nil
+    end
+    unit.survival_model_appearance_state = nil
+    unit.survival_model_appearance_entindex = nil
     unit.survival_model_appearance_asset_id = nil
     unit.survival_model_appearance_signature = nil
-    generation_by_unit[entindex] = (generation_by_unit[entindex] or 0) + 1
-    verification_retries_by_unit[entindex] = nil
+    remove_all(state and state.wearables)
     return true
 end
 
@@ -391,6 +407,12 @@ function M.Matches(unit, appearance)
     local state = states_by_unit[unit:entindex()]
         or recover_live_state(unit, appearance)
     return state_matches(unit, appearance, state)
+end
+
+local function abandon_generation(entindex, generation, previous)
+    if generation_by_unit[entindex] ~= generation then return end
+    generation_by_unit[entindex] = previous and previous.generation or nil
+    if not previous then verification_retries_by_unit[entindex] = nil end
 end
 
 function M.Apply(unit, appearance, options)
@@ -415,7 +437,8 @@ function M.Apply(unit, appearance, options)
         return true, appearance and appearance.asset_id or "legacy_path",
             previous.components
     end
-    local generation = (generation_by_unit[entindex] or 0) + 1
+    next_generation = next_generation + 1
+    local generation = next_generation
     generation_by_unit[entindex] = generation
     local spawned = {}
     local components = {}
@@ -423,6 +446,7 @@ function M.Apply(unit, appearance, options)
         local component_id, model_path, component = normalize(appearance, entry, index)
         if type(model_path) ~= "string" or model_path == "" then
             remove_all(spawned)
+            abandon_generation(entindex, generation, previous)
             return false, "attachment_model_missing:" .. component_id, nil
         end
         local ok, wearable = spawn(appearance, component, model_path)
@@ -465,6 +489,7 @@ function M.Apply(unit, appearance, options)
             else
                 remove_all({ wearable })
                 remove_all(spawned)
+                abandon_generation(entindex, generation, previous)
                 logger.warn("AppearanceWarning", "unit="
                     .. tostring(unit:entindex()) .. " appearance="
                     .. tostring(appearance and appearance.asset_id) .. " slot="
@@ -474,6 +499,7 @@ function M.Apply(unit, appearance, options)
             end
         else
             remove_all(spawned)
+            abandon_generation(entindex, generation, previous)
             logger.warn("AppearanceWarning", "unit="
                 .. tostring(unit:entindex()) .. " appearance="
                 .. tostring(appearance and appearance.asset_id) .. " slot="
@@ -494,6 +520,8 @@ function M.Apply(unit, appearance, options)
         wearables = spawned,
         components = components,
     }
+    unit.survival_model_appearance_state = states_by_unit[entindex]
+    unit.survival_model_appearance_entindex = entindex
     remove_all(previous and previous.wearables)
     if not tracked and not fresh then remove_owned_model_components(unit, spawned) end
     unit.survival_model_appearance_asset_id = appearance and appearance.asset_id
@@ -504,8 +532,8 @@ function M.Apply(unit, appearance, options)
     return true, appearance and appearance.asset_id or "legacy_path", components
 end
 
-function M.Refresh(unit, appearance)
-    return M.Apply(unit, appearance)
+function M.Refresh(unit, appearance, options)
+    return M.Apply(unit, appearance, options)
 end
 
 function M._count_for_test(unit)

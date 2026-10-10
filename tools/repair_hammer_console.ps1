@@ -43,9 +43,18 @@ function Get-HammerDeviceArray {
 function Get-HammerConsolePlan($Devices, $Relay) {
     $changes = @()
     $target = if ($Relay.relay_available) { [int]$Relay.gui_port } else { 0 }
+    # The standard relay endpoint can remain enabled after its daemon exits.
+    # Recognize our configured relay port too, without changing unrelated local
+    # devices. A live custom relay replaces the standard endpoint.
+    $relayPorts = @(29001)
+    $configuredRelayPort = 0
+    if ([int]::TryParse($env:DOTA2_VCON_GUI_PORT, [ref]$configuredRelayPort) -and
+        $configuredRelayPort -gt 0 -and $configuredRelayPort -le 65535 -and
+        $configuredRelayPort -ne 29000) { $relayPorts += $configuredRelayPort }
     foreach ($device in @($Devices)) {
         $desired = if ($device.Port -eq 29000) { 'false' }
-            elseif ($target -gt 0 -and $device.Port -eq $target) { 'true' } else { $null }
+            elseif ($target -gt 0 -and $device.Port -eq $target) { 'true' }
+            elseif ($device.Port -in $relayPorts) { 'false' } else { $null }
         if ($null -ne $desired -and $device.Auto -ne $desired -and
             -not ($desired -eq 'false' -and $device.Auto -eq '0') -and
             -not ($desired -eq 'true' -and $device.Auto -eq '1')) {

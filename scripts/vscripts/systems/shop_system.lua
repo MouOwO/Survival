@@ -6,6 +6,7 @@ local grant_service = require("systems/shop_grant_service")
 local challenge_definitions = require("config/generated/challenge_definitions")
 local rebirth_challenges = require("config/generated/rebirth_challenges")
 local research_config = require("config/research_technology_config")
+local research_cost_service = require("research/research_cost_service")
 local research_events = require("research/research_event_names")
 local research_abilities = require("config/generated/research_lab_abilities")
 local ability_by_research_group = {}
@@ -59,11 +60,16 @@ end
 local function player_team(player_id)
     return PlayerResource:GetTeam(player_id)
 end
-local function notify(player_id, message, level)
+local function notify(player_id, message, level, presentation)
+    presentation = presentation or {}
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = player_id,
+        audience = "player",
         message = message,
         level = level or "info",
+        kind = presentation.kind,
+        subject = presentation.subject,
+        ability_icon = presentation.ability_icon,
     })
 end
 -- Each player has an independent production slot at each research building.
@@ -682,6 +688,7 @@ local function purchase(payload)
     local gold_mine_source_entindex = tonumber(
         payload.source_entindex or payload.entindex
     )
+    local gold_mine_source_unit
     local mode = state.opened_players[player_id] or "shop"
     if not gold_mine_ability and not research_source then
         local allowed, mode_error = catalog.allowed_in_mode(entry, mode)
@@ -701,6 +708,7 @@ local function purchase(payload)
             or tonumber(building.player_id) ~= player_id then
             return { ok = false, error = "gold_mine_not_owned" }
         end
+        gold_mine_source_unit = building.unit
     elseif entry.definition
         and (entry.definition.technology_group == "gold_mine_efficiency"
             or entry.definition.technology_group == "gold_mine_crit") then
@@ -916,8 +924,11 @@ local function purchase(payload)
                     >= (tonumber(research_definition.max_level) or 0) then
                     lane.auto_research[technology_group] = nil
                 end
-                notify(player_id, "已完成研究：" .. pending.display_name
-                    .. " Lv." .. tostring(completed.new_level))
+                local technology_name = tostring(pending.display_name):gsub("科技$", "")
+                notify(player_id, "研究" .. technology_name .. "科技成功", "info", {
+                    kind = "research_success", subject = technology_name,
+                    ability_icon = pending.icon_name,
+                })
             else
                 if pending.manual then
                     table.insert(lane.queued, 1, {
@@ -1006,8 +1017,30 @@ local function purchase(payload)
     counts[entry.entryid] = (counts[entry.entryid] or 0) + 1
     consume_stock(player_id, entry)
     set_purchase_cooldown(player_id, entry)
+    if gold_mine_ability then
+        event_bus.emit(events.GOLD_MINE_TECHNOLOGY_COMPLETED, {
+            player_id = player_id,
+            entindex = gold_mine_source_entindex,
+            unit = gold_mine_source_unit,
+            technology_group = granted.technology_group,
+            level = granted.level,
+        })
+    end
     if not silent_notification then
-        notify(player_id, "购买成功：" .. catalog.content_name(entry))
+        if gold_mine_ability then
+            local efficiency = granted.technology_group == "gold_mine_efficiency"
+            local subject = efficiency and "提高采金效率" or "提升采金暴击"
+            event_bus.emit(events.UI_NOTIFICATION, {
+                player_id = player_id,
+                audience = "player",
+                message = "研究【" .. subject .. "】科技成功",
+                level = "info", kind = "research_success", subject = subject,
+                ability_icon = efficiency and "ability_upgrade_gold_mine_efficiency"
+                    or "ability_upgrade_gold_mine_crit",
+            })
+        else
+            notify(player_id, "购买成功：" .. catalog.content_name(entry))
+        end
     end
     push_snapshot(player_id, "purchase_completed")
     local result = {
@@ -1124,6 +1157,16 @@ enqueue_research = function(payload)
     local entry = catalog.find_technology_entry(group, target)
     if not entry or entry.enabled == false then
         return { ok = false, error = "研究配置不可用", error_code = "research_config_invalid" }
+    end
+    local quote = research_cost_service.for_player(
+        research_config.cost_for_level(definition, target), event_bus, events, player_id)
+    local funds = event_bus.request(events.RESOURCE_GET_REQUEST, { player_id = player_id })
+    if not funds then return { ok = false, error = "资源信息尚未就绪" } end
+    if (tonumber(funds.wood) or 0) < quote.wood then
+        return { ok = false, error = "木材不足", error_code = "insufficient_wood" }
+    end
+    if (tonumber(funds.gold) or 0) < quote.gold then
+        return { ok = false, error = "金币不足", error_code = "insufficient_gold" }
     end
     lane.next_job_id = lane.next_job_id + 1
     local job = { job_id = lane.key .. ":" .. tostring(lane.next_job_id),

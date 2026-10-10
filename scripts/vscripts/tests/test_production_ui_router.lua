@@ -43,8 +43,10 @@ local events = require("core/events")
 bus.reset()
 bus.handle_request(events.BUILDING_QUERY_REQUEST,function(payload) return states[payload.entindex] end)
 local requests = {}
+local forced_worker_error, forced_research_error
 bus.handle_request(events.WORKER_TRAIN_REQUEST,function(payload)
     requests[#requests+1]=payload
+    if forced_worker_error then return {ok=false,error=forced_worker_error} end
     return {ok=true,queued=true,job_id="job-1"}
 end)
 bus.handle_request(events.WORKER_TRAINING_GET_REQUEST,function(payload)
@@ -117,6 +119,7 @@ entities[203]=shared
 local research_requests={}
 bus.handle_request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,function(payload)
     research_requests[#research_requests+1]=payload
+    if forced_research_error then return {ok=false,error=forced_research_error} end
     return {ok=true,queued=true}
 end)
 local queue=assert(listeners.ui_research_queue_request)
@@ -178,11 +181,11 @@ bus.emit(events.WORKER_CHANGED,{player_id=1,source_entindex=201})
 bus.emit(events.WORKER_CHANGED,{player_id=0,source_entindex=999})
 bus.emit(events.RESOURCE_CHANGED,{player_id=0})
 bus.emit(events.TECHNOLOGY_RESEARCH_STATE_CHANGED,{player_id=0,source_entindex=202})
-assert(#pushes==3 and pushes[1].entindex==200 and pushes[2].entindex==201)
-assert(pushes[3].player_id==0 and pushes[3].entindex==200)
+assert(#pushes==2 and pushes[1].entindex==200 and pushes[2].entindex==201,
+    "wallet changes cannot rebuild training availability")
 selected[0]=999 -- ordinary hero/tree selections must never receive building-stat projections
 bus.emit(events.RESOURCE_CHANGED,{player_id=0})
-assert(#pushes==3)
+assert(#pushes==2)
 print("PRODUCTION_UI_ROUTER_PASS: trusted sender, ownership, startup/defeat, one paid unit per click, private source snapshots and targeted refresh")
 local before_fusion = #sent
 bus.emit(events.WORKER_CHANGED, { player_id = 1, super_lumberjack = true,
@@ -193,3 +196,48 @@ assert(notice.player == handles[1] and notice.name == "survival_lumberjack_fused
 assert(notice.payload.target_entindex == 300)
 assert(table.concat(notice.payload.consumed_entindexes, ",") == "300,301,302")
 print("FUSION_PRIVATE_SELECTION_EVENT_PASS")
+-- A resource burst must not rebuild the selected research description tree.
+local runtime_builder=require("ui/ability_runtime_builder")
+local original_build=runtime_builder.build
+local builds=0
+runtime_builder.build=function(...) builds=builds+1;return original_build(...) end
+selected[0]=202
+service.decorate(0,lab,{entindex=202})
+local initial=builds
+assert(initial>0)
+local before_push=#pushes
+for index=1,1000 do
+    bus.emit(events.RESOURCE_CHANGED,{player_id=0,wood=index})
+    service.decorate(0,lab,{entindex=202})
+end
+assert(builds==initial and #pushes==before_push,
+    "resource packets cannot invalidate personal research descriptions or trigger selected-lab refresh")
+bus.emit(research_events.LEVEL_CHANGED,{player_id=0})
+service.decorate(0,lab,{entindex=202})
+assert(builds>initial and #pushes==before_push+1,"completion invalidates exactly the affected player's research cache")
+runtime_builder.build=original_build
+print("RESEARCH_DESCRIPTION_CACHE_PASS: 1000 resource changes/decorations reuse rows; completion refreshes")
+
+local resource_notices = {}
+bus.handle_request(events.WORKER_TRAIN_REQUEST, function() return {ok=false,error=forced_worker_error} end)
+bus.handle_request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, function() return {ok=false,error=forced_research_error} end)
+bus.subscribe(events.UI_NOTIFICATION, function(payload) resource_notices[#resource_notices + 1] = payload end)
+for _, case in ipairs({{"wood_not_enough", "木材不足"}, {"gold_not_enough", "金币不足"},
+    {"population_not_enough", "人口不足"}}) do
+    forced_worker_error=case[1]
+    train(0,200)
+    local response=sent[#sent]
+    assert(response.name=="ui_operation_result" and response.payload.success==0)
+    assert(response.payload.error==case[2] and resource_notices[#resource_notices].message==case[2],
+        "rejected training must expose a specific Chinese resource error: "
+            .. tostring(response.payload.error) .. "/" .. tostring(resource_notices[#resource_notices].message))
+end
+for _, case in ipairs({{"insufficient_wood", "木材不足"}, {"insufficient_gold", "金币不足"}}) do
+    forced_research_error=case[1]
+    queue(nil,{PlayerID=0,source_entindex=202,
+        technology_group="lumberjack_speed",request_id="resource_reject"})
+    local response=sent[#sent]
+    assert(response.name=="ui_operation_result" and response.payload.success==0)
+    assert(response.payload.error==case[2] and resource_notices[#resource_notices].message==case[2])
+end
+print("PRODUCTION_RESOURCE_ERROR_PASS: failed admissions return localized wood/gold/population feedback and notifications")

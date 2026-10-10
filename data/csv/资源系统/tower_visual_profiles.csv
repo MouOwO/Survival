@@ -1,11 +1,11 @@
 profile_id,core,detail,detail_ssr,crown,color,radius_r,radius_sr,radius_ssr,radius_ur,alpha,enabled,native_base,color_r,color_sr,color_ssr,native_base_r
 #中文名:职业,基础图案,SR职业纹样,SSR职业纹样,红星与终极内圈浮光,颜色,转职半径,二阶半径,三阶半径,终极半径,透明度,启用,替换底座样式,R底座颜色,SR底座颜色,SSR底座颜色,R阶段底座样式
 #types:string,string,string,string,string,list,number,number,number,number,number,boolean,string,list,list,list,string
-class_1,,,,,255|150|55,96,108,120,128,0.95,1,io_amber_portal,255|150|55,255|150|55,255|150|55,
+class_1,,,,,255|150|55,72,81,90,96,0.95,1,io_amber_portal,255|150|55,255|150|55,255|150|55,
 class_2,,,,,145|115|235,96,108,120,128,0.95,1,leshrac_edict,,,,
 class_3,,,,,95|155|240,96,108,120,128,0.95,1,kinetic_markers,,,,
 class_4,,,,,180|95|255,96,108,120,128,0.95,1,bulldoze_ring,25|219|241,,,willow_shadow_realm
 class_5,,,,,220|85|50,96,108,120,128,0.95,1,clinkz_embers,,,,
-class_6,,,,,110|175|235,96,108,120,128,0.95,1,io_blue_portal,,,,
+class_6,,,,,110|175|235,72,81,90,96,0.95,1,io_blue_portal,,,,
 class_7,,,,,135|175|235,96,108,120,128,0.95,1,psionic_trap,,,,
 ultimate,bases/ultimate,bases/detail_ultimate,bases/detail_ultimate,bases/detail_motes,255|214|126,96,100,112,128,0.38,1,,,,,

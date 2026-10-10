@@ -16,9 +16,8 @@ local active_waves = {}
 local next_wave_id = 0
 local BURNING_ARROW_PARTICLE =
     "particles/units/heroes/hero_clinkz/clinkz_searing_arrow_linear_proj.vpcf"
-local WAVE_OF_TERROR_SPEED = 1560
--- Keep the source particle's 1200 length and 112 core radius while playing
--- its travel at the approved 1.3x speed.
+local BURNING_ARROW_DEFAULT_SPEED = 500
+-- Preserve the 1200 travel distance and 112 core radius; speed follows the tower.
 local WAVE_OF_TERROR_DISTANCE = 1200
 local WAVE_OF_TERROR_HALF_WIDTH = 112
 local WAVE_CLEANUP_GRACE = 0.25
@@ -326,6 +325,8 @@ local function launch_burning_wave(payload, skill, fallback_width)
     direction.z = 0
     if direction:Length2D() <= 0.001 then return end
     direction = direction:Normalized()
+    local speed = tonumber(tower.survival_projectile_speed)
+        or BURNING_ARROW_DEFAULT_SPEED
 
     local width = configured_area(skill, fallback_width)
     local damage = math.max(
@@ -360,7 +361,7 @@ local function launch_burning_wave(payload, skill, fallback_width)
         EffectName = BURNING_ARROW_PARTICLE,
         Source = tower,
         vSpawnOrigin = start_pos,
-        vVelocity = direction * WAVE_OF_TERROR_SPEED,
+        vVelocity = direction * speed,
         fDistance = WAVE_OF_TERROR_DISTANCE,
         fStartRadius = width,
         fEndRadius = width,
@@ -379,7 +380,7 @@ local function launch_burning_wave(payload, skill, fallback_width)
     local task_id = "burning_great_arrow_cleanup_"
         .. tostring(tower_entindex) .. "_" .. tostring(wave_id)
     wave.cleanup_task_id = scheduler.after(
-        WAVE_OF_TERROR_DISTANCE / WAVE_OF_TERROR_SPEED + WAVE_CLEANUP_GRACE,
+        WAVE_OF_TERROR_DISTANCE / speed + WAVE_CLEANUP_GRACE,
         function()
             clear_wave(wave_id, false)
             return false

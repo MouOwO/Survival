@@ -1,0 +1,1 @@
+const fs=require('fs');fs.mkdirSync('output/ui_20h',{recursive:true});fs.writeFileSync('output/ui_20h/feedback_publish.json',JSON.stringify([{name:'dota_run_lua',arguments:{code:"PauseGame(false);GameRules:GetGameModeEntity():SetContextThink('ui_feedback_pause',function() PauseGame(true);print('[UI_FEEDBACK_PAUSED]');return nil end,0.4)"}}]));

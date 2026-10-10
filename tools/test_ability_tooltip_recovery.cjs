@@ -197,7 +197,7 @@ function createHarness(options = {}) {
         }
     }
     function setUnit(unit, firstAbility) {
-        const names = options.abilityNames || ['ability_upgrade_city', 'ability_train_lumberjack',
+        const names = options.unitAbilityNames?.[unit] || options.abilityNames || ['ability_upgrade_city', 'ability_train_lumberjack',
             'ability_train_repairer', 'ability_train_advanced_repairer'];
         const list = names.map((name, index) => ({ id: firstAbility + index, name }));
         units.set(unit, list);
@@ -256,14 +256,16 @@ function createHarness(options = {}) {
                 return units.get(unit)?.[slot]?.id ?? -1;
             },
             IsValidEntity: unit => units.has(unit),
-            GetUnitName: unit => units.has(unit) ? (options.unitName || (options.native ? 'npc_dota_neutral_test' : 'building_city')) : '',
+            GetUnitName: unit => units.has(unit) ? (options.unitNames?.[unit] || options.unitName
+                || (options.native ? 'npc_dota_neutral_test' : 'building_city')) : '',
             GetAbilityCount: unit => units.get(unit)?.length || 0
         },
         Abilities: {
             GetAbilityName: id => abilityData.get(id)?.name || '',
             IsHidden: () => false,
             GetLevel: () => 1,
-            GetBehavior: () => 0
+            GetBehavior: () => 0,
+            ...options.abilities
         },
         CustomNetTables: {
             GetTableValue(name, key) {
@@ -286,7 +288,7 @@ function createHarness(options = {}) {
     };
     vm.runInNewContext(instrumentSource(), environment, { filename: sourcePath });
     return {
-        config, counters, logs, work, abilityReads, executions, queue, tooltip, layer,
+        config, counters, logs, work, abilityReads, executions, queue, tooltip, layer, setTable,
         inspect: () => hooks.inspect(),
         runUntil,
         now: () => time,
@@ -546,13 +548,6 @@ for (const [unitName, abilityName, hero] of [
     });
 }
 
-if (failures) {
-    process.exitCode = 1;
-    console.error('ABILITY_TOOLTIP_RECOVERY_FAILED: ' + failures);
-} else {
-    console.log('ABILITY_TOOLTIP_RECOVERY_PASS');
-}
-
 test('worker fusion mouse proxy uses project dispatcher instead of native order',()=>{
  const h=createHarness({unitName:'npc_survival_lumberjack',abilityNames:['ability_fuse_lumberjack_06'],panelCount:1});
  let requests=0;
@@ -563,3 +558,205 @@ test('worker fusion mouse proxy uses project dispatcher instead of native order'
  binding.proxy.events.onactivate();
  assert.equal(requests,1);assert.equal(h.executions.length,before);
 });
+
+for (const signal of ['behavior', 'server', 'engine']) {
+    for (const hero of [false, true]) {
+        test((hero ? 'hero native' : 'tower managed') + ' proxy rejects passive ' + signal + ' without disabling tooltip', () => {
+            let nativeCasts = 0, projectCasts = 0, passive = true;
+            const h = createHarness({
+                unitName: hero ? 'npc_dota_hero_drow_ranger' : 'building_arrow_tower', hero,
+                abilityNames: ['piercing_ballista_lv04'], panelCount: 1,
+                abilities: {
+                    GetBehavior: () => passive && signal === 'behavior' ? 2 : 4,
+                    IsPassive: () => passive && signal === 'engine',
+                    ExecuteAbility: () => { nativeCasts++; }
+                }
+            });
+            if (signal === 'server') h.setTable('survival_ability_runtime', 828, {
+                owner_entindex: 827, ability_entindex: 828, available: 1, passive: 1
+            });
+            h.config.SurvivalAbilityInput = {ExecuteAbility: () => { projectCasts++; }};
+            h.runUntil(1.2);
+            const binding = h.inspect().bindings[0];
+            assert(binding, 'passive must retain its tooltip binding');
+            assert.equal(binding.proxy.hittest, true);
+            binding.proxy.events.onactivate();
+            assert.equal(nativeCasts + projectCasts, 0, 'passive must reach neither native nor server dispatcher');
+            passive = false;
+            h.setTable('survival_ability_runtime', 828, {
+                owner_entindex: 827, ability_entindex: 828, available: 1, passive: 0
+            });
+            binding.proxy.events.onactivate();
+            assert.equal(hero ? nativeCasts : projectCasts, 1, 'active reuse still reaches its proper dispatcher');
+            assert.deepEqual(h.logs.filter(line => line.includes('[SURVIVAL_TOOLTIP_ERROR]')), []);
+        });
+    }
+}
+
+test('ultimate tower binds all seven real project tooltips, retains passive input protection and follows native row recovery', () => {
+    const names = Array.from({length: 5}, (_, index) => 'ultimate_tower_passive_' + (index + 1))
+        .concat(['ability_building_blink', 'ability_destroy_arrow_tower']);
+    const h = createHarness({unitName:'npc_dota_unit_ultimate_tower', abilityNames:names,
+        panelCount:7, runtimeIndexes:[5,6],
+        abilities:{GetBehavior:id => id >= 828 && id < 833 ? 2 : 4}});
+    const casts=[];
+    h.config.SurvivalAbilityInput={ExecuteAbility:id => casts.push(id)};
+    h.runUntil(1.2);
+    assert.equal(h.inspect().bindings.length, 2, 'initial tool metadata is managed before passive metadata arrives');
+    for (let index=0; index<5; index++) h.publishRuntime(index);
+    h.runUntil(1.6);
+    assert.equal(h.inspect().bindings.length, 7, 'late aggregate metadata binds five project passive tooltips');
+    for (const binding of h.inspect().bindings) {
+        h.setTable('survival_ability_runtime',binding.ability,{owner_entindex:827,
+            ability_entindex:binding.ability,available:1,passive:binding.ability < 833 ? 1 : 0,
+            display_name:'聚合技能 '+binding.ability,status_text:'可施法',
+            fields:[{label:'聚合效果',value:'当前合成塔效果 '+binding.ability}]});
+        const xy=binding.proxy.GetPositionWithinWindow();h.setCursor([xy.x+10,xy.y+10]);
+        binding.proxy.events.onmouseover();
+        assert(!h.tooltip.BHasClass('Hidden'), 'project tooltip opens for '+binding.ability);
+        assert.equal(h.tooltip.FindChildTraverse('CustomAbilityTitle').text,'聚合技能 '+binding.ability);
+        assert(h.fieldContainer().__fieldRows.some(row => row.__right.text === '当前合成塔效果 '+binding.ability));
+        const passive=binding.ability<833;
+        assert.equal(h.tooltip.FindChildTraverse('CustomAbilityExtensionLabel').text,
+            passive?'生存防守 · 被动技能':'生存防守 · 防御塔技能','project ownership is independent from upgrade presentation');
+        assert.equal(h.tooltip.FindChildTraverse('CustomAbilityType').text,passive?'被动':'主动');
+        assert.equal(h.tooltip.FindChildTraverse('CustomAbilityStatus').text,
+            passive?'自动生效 · 无需施放':'可施法','passive ignores a generic server cast-status string');
+        binding.proxy.events.onactivate();
+    }
+    assert.deepEqual(casts,[833,834], 'only D/G tools may reach the project dispatcher');
+    h.rebuildPanels(30);h.config.SurvivalTooltipBindings.Recover('native_ability_row_reflow');h.runUntil(2.1);
+    assert.equal(h.inspect().bindings.length,7);
+    assert.equal(h.inspect().bindings[0].x,730,'tooltip proxies follow a replaced native row');
+    assert.deepEqual(h.logs.filter(line => line.includes('[SURVIVAL_TOOLTIP_ERROR]')), []);
+});
+
+test('real building upgrades retain their upgrade category, progress and fields',()=>{
+    const h=createHarness({unitName:'building_city',abilityNames:['ability_upgrade_city'],panelCount:1});
+    h.setTable('survival_ability_runtime',828,{owner_entindex:827,ability_entindex:828,
+        available:1,prerequisite_met:1,upgrade_in_progress:1,
+        fields:[{label:'升级收益',value:'主城等级提高'}]});
+    h.runUntil(1.2);const binding=h.inspect().bindings[0];assert(binding);
+    const xy=binding.proxy.GetPositionWithinWindow();h.setCursor([xy.x+10,xy.y+10]);binding.proxy.events.onmouseover();
+    assert.equal(h.tooltip.FindChildTraverse('CustomAbilityExtensionLabel').text,'SURVIVAL · UPGRADE');
+    assert.equal(h.tooltip.FindChildTraverse('CustomAbilityType').text,'UPGRADING');
+    assert.equal(h.tooltip.FindChildTraverse('CustomAbilityStatus').text,'Upgrade completes in 1 second');
+    assert(h.fieldContainer().__fieldRows.some(row=>row.__right.text==='主城等级提高'));
+});
+
+function earthLineLevelFields() {
+    // Use the actual skill's long LV1 and LV5 descriptions as runtime payloads.
+    // The tests exercise the real renderer and its panel pool, not CSS pixels.
+    const definitions = fs.readFileSync(path.join(__dirname,
+        '../scripts/vscripts/config/hero_passive_skill_definitions.lua'), 'utf8');
+    const block = /skill_id\s*=\s*"proto_earth_line"[\s\S]*?level_text\s*=\s*\{([\s\S]*?)\}/.exec(definitions);
+    assert(block, 'Expected the actual earth-line passive level descriptions');
+    const values = Array.from(block[1].matchAll(/"(?:[^"\\]|\\.)*"/g), match => JSON.parse(match[0]));
+    assert.equal(values.length, 5, 'Earth-line passive must provide all five level descriptions');
+    assert(values[0].length > 100, 'LV1 fixture must retain the real long description');
+    return values.map((value, index) => ({label: 'LV' + (index + 1), value}));
+}
+
+function hoverFirstAbility(h) {
+    const binding = h.inspect().bindings[0];
+    assert(binding, 'Expected a managed tooltip binding');
+    const xy = binding.proxy.GetPositionWithinWindow();
+    h.setCursor([xy.x + 10, xy.y + 10]);
+    binding.proxy.events.onmouseover();
+    assert(!h.tooltip.BHasClass('Hidden'));
+    return binding;
+}
+
+function assertSkillLevelRows(h, fields, currentLevel) {
+    const rows = h.fieldContainer().__fieldRows.filter(row => row.visible);
+    assert.equal(rows.length, fields.length, 'All descriptions must remain visible');
+    rows.forEach((row, index) => {
+        assert.equal(row.__left.text, fields[index].label);
+        assert.equal(row.__right.text, fields[index].value, 'Long level text must remain intact');
+        assert.equal(row.BHasClass('AbilitySkillLevelRow'), true,
+            fields[index].label + ' must use the compact level-description layout');
+        assert.equal(row.BHasClass('AbilitySkillLevelCurrent'), index + 1 === currentLevel,
+            fields[index].label + ' must be current only at its own native ability level');
+    });
+    assert.equal(rows.filter(row => row.BHasClass('AbilitySkillLevelCurrent')).length, 1,
+        'Exactly the current level description receives the gold presentation');
+}
+
+test('hero level descriptions highlight LV1 and refresh to LV3 during the same hover without growing panels', () => {
+    let level = 1;
+    const fields = earthLineLevelFields();
+    const h = createHarness({hero: true, unitName: 'npc_dota_hero_doom_bringer',
+        abilityNames: ['ability_survival_earth_line'], panelCount: 1, fields,
+        abilities: {GetLevel: () => level}});
+    h.runUntil(1.2);
+    hoverFirstAbility(h);
+    assert.equal(h.inspect().activeAbility, 828);
+    assert.equal(h.tooltip.FindChildTraverse('CustomAbilityExtensionLabel').text, 'SURVIVAL · HERO');
+    assertSkillLevelRows(h, fields, 1);
+    const firstRow = h.fieldContainer().__fieldRows[0];
+    const created = h.counters.created;
+    level = 3;
+    const runtime = {owner_entindex: 827, ability_entindex: 828, available: 1, fields};
+    h.setTable('survival_ability_runtime', 828, runtime, true);
+    assert.equal(h.inspect().activeAbility, 828, 'An upgrade must preserve the active hover');
+    assert(!h.tooltip.BHasClass('Hidden'), 'An upgrade refresh must preserve the visible tooltip');
+    assertSkillLevelRows(h, fields, 3);
+    assert.strictEqual(h.fieldContainer().__fieldRows[0], firstRow, 'Refresh must reuse the live row pool');
+    assert(h.tooltip.FindChildTraverse('CustomAbilityLevel').text.endsWith(' 3'));
+    for (let index = 0; index < 20; index++) {
+        h.setTable('survival_ability_runtime', 828, runtime, true);
+    }
+    h.runUntil(2.4);
+    assertSkillLevelRows(h, fields, 3);
+    assert.equal(h.counters.created, created, 'Stable level refreshes must not create more panels');
+});
+
+test('reused hero and building field rows clear current-level styling and only exact LV labels qualify', () => {
+    const fields = earthLineLevelFields();
+    const h = createHarness({hero: true,
+        unitNames: {827: 'npc_dota_hero_doom_bringer', 900: 'building_city'},
+        unitAbilityNames: {827: ['ability_survival_earth_line'], 900: ['ability_upgrade_city']},
+        panelCount: 1, fields});
+    h.runUntil(1.2);
+    hoverFirstAbility(h);
+    assertSkillLevelRows(h, fields, 1);
+    const firstRow = h.fieldContainer().__fieldRows[0];
+    const ordinaryFields = [
+        {label: '触发概率', value: '12%'},
+        {label: 'LV1效果', value: '普通描述，非等级标题'},
+        {label: 'LV0', value: '普通描述，非可升级等级'}
+    ];
+    h.setTable('survival_ability_runtime', 828, {owner_entindex: 827, ability_entindex: 828,
+        available: 1, fields: ordinaryFields}, true);
+    assert.strictEqual(h.fieldContainer().__fieldRows[0], firstRow);
+    const rows = h.fieldContainer().__fieldRows.filter(row => row.visible);
+    assert.equal(rows.length, ordinaryFields.length);
+    rows.forEach((row, index) => {
+        assert.equal(row.__right.text, ordinaryFields[index].value);
+        assert.equal(row.BHasClass('AbilitySkillLevelRow'), false, 'Non-level hero fields keep their ordinary layout');
+        assert.equal(row.BHasClass('AbilitySkillLevelCurrent'), false, 'Reusing the LV1 row must clear its gold styling');
+    });
+    h.setTable('survival_ability_runtime', 828, {owner_entindex: 827, ability_entindex: 828,
+        available: 1, fields}, true);
+    assertSkillLevelRows(h, fields, 1);
+    h.select(900);
+    h.runUntil(2.4);
+    hoverFirstAbility(h);
+    assert.equal(h.tooltip.FindChildTraverse('CustomAbilityExtensionLabel').text, 'SURVIVAL · UPGRADE');
+    assert.strictEqual(h.fieldContainer().__fieldRows[0], firstRow, 'Changing units reuses the same tooltip row pool');
+    const buildingRows = h.fieldContainer().__fieldRows.filter(row => row.visible);
+    assert.equal(buildingRows.length, fields.length);
+    buildingRows.forEach((row, index) => {
+        assert.equal(row.__left.text, fields[index].label);
+        assert.equal(row.__right.text, fields[index].value);
+        assert.equal(row.BHasClass('AbilitySkillLevelRow'), false, 'Building LV-like fields must not adopt hero level layout');
+        assert.equal(row.BHasClass('AbilitySkillLevelCurrent'), false, 'Building rows must not inherit hero gold styling');
+    });
+});
+
+if (failures) {
+    process.exitCode = 1;
+    console.error('ABILITY_TOOLTIP_RECOVERY_FAILED: ' + failures);
+} else {
+    console.log('ABILITY_TOOLTIP_RECOVERY_PASS');
+}

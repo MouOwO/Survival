@@ -9,6 +9,7 @@ import threading
 import time
 from pathlib import Path
 from .bundle import Bundle
+from .config_compatibility import accepts, upgrades
 
 class ArchiveError(ValueError):
     pass
@@ -44,13 +45,20 @@ class ArchiveService:
         self.app,self.bundle,self.lua=application,bundle,lua
 
     def sync(self):
+        config = {"configs": self.bundle.configs}
+        compatibility = getattr(self.bundle, "compatible_config_hashes", {})
+        if compatibility:
+            config["compatible_config_hashes"] = {digest: {
+                "commands": sorted(rule["commands"]),
+                "upgrade_commands": sorted(rule["upgrade_commands"]),
+            } for digest, rule in compatibility.items()}
         return self.app.rpc_client.rpc("archive_sync_config",{
-            "p_hash":self.bundle.hash,"p_config":{"configs":self.bundle.configs}})
+            "p_hash":self.bundle.hash,"p_config":config})
 
     def validate(self, command):
         if not isinstance(command,dict): raise ArchiveError("archive_command_invalid")
         kind=command.get("kind")
-        if kind not in FIELDS or set(command)-FIELDS[kind]-{"id","kind"}: raise ArchiveError("archive_command_fields_invalid")
+        if not isinstance(kind, str) or kind not in FIELDS or set(command)-FIELDS[kind]-{"id","kind"}: raise ArchiveError("archive_command_fields_invalid")
         if not isinstance(command.get("id"),str) or not re.fullmatch(r"[A-Za-z0-9_:.-]{8,200}",command["id"]): raise ArchiveError("archive_id_invalid")
         c=dict(command)
         if kind == 'commerce_purchase':
@@ -77,7 +85,8 @@ class ArchiveService:
             if not re.fullmatch(r"(?:[1-9]|1[0-9]|20)",str(raw)): raise ArchiveError("archive_difficulty_invalid")
             try: difficulty=int(raw)
             except (ValueError,TypeError): raise ArchiveError("archive_difficulty_invalid")
-            if not max(3,definition["min_difficulty"])<=difficulty<=20: raise ArchiveError("archive_challenge_locked")
+            # Challenge definitions also drive the game's unlock buttons.
+            if not definition["min_difficulty"]<=difficulty<=20: raise ArchiveError("archive_challenge_locked")
             c["difficulty_id"]="n"+str(difficulty);integer("kill_sequence",1,100000)
         if kind in {"vip_claim", "vip_purchase"}:
             item=self.bundle.tables["archive_vip_rewards"].get(c.get("reward_id"))
@@ -132,7 +141,10 @@ class ArchiveService:
     def command(self,payload):
         account=payload.get("account_id")
         if not isinstance(account,str) or not re.fullmatch(r"[0-9]{1,20}",account): raise ArchiveError("account_id_invalid")
-        if payload.get("config_hash")!=self.bundle.hash: return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
+        requested_hash = payload.get("config_hash")
+        raw_command = payload.get("command")
+        kind = raw_command.get("kind") if isinstance(raw_command, dict) else None
+        if not accepts(self.bundle, requested_hash, kind): return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
         command=self.validate(payload.get("command"))
         if command['kind'] == 'commerce_catalog':
             profile = self.profile({'account_id': account})
@@ -141,9 +153,41 @@ class ArchiveService:
         self.app._ensure_gameplay_stats(database_id)
         fingerprint=hashlib.sha256(json.dumps(command,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
         prepared=self.app.rpc_client.rpc("archive_prepare",{"p_account":database_id,"p_id":command["id"],
-            "p_hash":self.bundle.hash,"p_fingerprint":fingerprint,"p_command":command})
+            "p_hash":requested_hash,"p_fingerprint":fingerprint,"p_command":command})
         result=self.finish_prepared(database_id,command["id"],prepared)
         return self.app._public_response(result,database_id,account)
+
+    def endless_batch(self, payload):
+        """Bounded transport batch; durable per-wave receipts remain unchanged."""
+        if not accepts(self.bundle, payload.get("config_hash"), "endless"):
+            # A game ahead of deployment keeps its earned score queued; an
+            # incompatible server is not an acknowledgement for any wave.
+            return {"ok": False, "error": "archive_config_mismatch", "results": [], "config_hash": self.bundle.hash}
+        commands = payload.get("commands")
+        if not isinstance(commands, list) or not 1 <= len(commands) <= 32:
+            raise ArchiveError("archive_batch_size_invalid")
+        # Validate the whole envelope before the first mutation. Only trusted
+        # existing endless intents are accepted, never client scores/deltas.
+        validated = [self.validate(command) for command in commands]
+        if any(command["kind"] != "endless" for command in validated):
+            raise ArchiveError("archive_batch_kind_invalid")
+        if len({command["id"] for command in validated}) != len(validated):
+            raise ArchiveError("archive_batch_duplicate_id")
+        if len({command["id"].split(":", 1)[0] for command in validated}) != 1:
+            raise ArchiveError("archive_batch_session_invalid")
+        results, profile = [], None
+        for original, command in zip(commands, validated):
+            request = dict(payload)
+            request.pop("commands", None)
+            request["command"] = command
+            result = self.command(request)
+            if result.get("profile"):
+                profile = result["profile"]
+            results.append({"id": original["id"], "ok": result.get("ok") is True,
+                "terminal": result.get("terminal") is True, "error": result.get("error")})
+            if not result.get("ok") and not result.get("terminal"):
+                return {"ok": False, "error": result.get("error"), "results": results, "profile": profile}
+        return {"ok": True, "results": results, "profile": profile}
 
     def finish_prepared(self,account,operation_id,prepared):
         for _ in range(4):
@@ -151,7 +195,10 @@ class ArchiveService:
             profile,command=prepared["profile"],prepared["command"]
             reducer=self
             version=prepared.get("config_hash",self.bundle.hash)
-            if version!=self.bundle.hash:
+            # Preserve the recorded hash and fingerprint for old-match replays.
+            # Only explicitly approved archive updates use the current reducer.
+            # Commerce and lottery operations keep their recorded rules.
+            if version!=self.bundle.hash and not upgrades(self.bundle, version, command.get("kind")):
                 if not re.fullmatch(r"[0-9a-f]{64}",version): raise ArchiveError("archive_config_invalid")
                 reducer=ArchiveService(self.app,Bundle(self.bundle.directory.parent/version),self.lua)
             result=reducer.settle(profile,command,prepared["has_pass"])
@@ -194,11 +241,12 @@ class ArchiveService:
         return self.app._public_response(value,account,payload["account_id"])
 
     def lottery_snapshot(self,payload):
-        if payload.get("config_hash")!=self.bundle.hash:
+        requested_hash = payload.get("config_hash")
+        if not accepts(self.bundle, requested_hash, "lottery_snapshot"):
             return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
         profile=self.profile({"account_id":payload.get("account_id")})
         projected=self.settle(profile,{"id":"lottery_snapshot","kind":"lottery_snapshot"},False)
-        projected["config_hash"]=self.bundle.hash
+        projected["config_hash"]=requested_hash
         return projected
 
 def install(application,addon_root,lua):

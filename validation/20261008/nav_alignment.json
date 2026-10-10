@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-08",
+  "task": "Center upper-left navigation captions beneath their icons",
+  "change": "Fit each caption to its text and explicitly center its panel in the existing caption host, including the combat effects toggle.",
+  "scope": "Two client style calls and one source comment. Icon assets/placement, font size, button bounds, vertical gap and handlers preserved.",
+  "verification": {
+    "javascript_syntax": true,
+    "existing_navigation_dependency_and_actions_regression": "PASS: navigation section of the existing fixture, run independently of its unrelated archive-art setup.",
+    "native_compile": true,
+    "content_source_equal": true,
+    "native_viewport": "1600x900",
+    "before_screenshot": "output/map_build_c6/nav_alignment_before_hud_20261008.png",
+    "after_screenshot": "output/map_build_c6/nav_alignment_after_20261008.png",
+    "visually_centered": true,
+    "other_viewports": "Existing layoutNavigation scaling and pixel rounding retained; no additional viewport capture."
+  },
+  "git": "No commit or push requested; task and original dirty changes retained.",
+  "sha256": {
+    "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js": "00eb49c9225c8327d0878945ded64a42b88b7b708b87f6a57c91bc6942f4e203",
+    "panorama/scripts/custom_game/topnav_remaining_5d5c1152eb.vjs_c": "76fd5b835643613ed1bbc214a327c10dec8230fbc3582acca57e97379b3a6f1b",
+    "docs/ai/CURRENT_TASK.md": "57aa5c004d90253ecf0f5f89305becddc01ae82f9826632b09252a749b55c70b",
+    "docs/ai/DECISIONS.md": "e19eed9af7cbb07649170c157e8eb74b07a160a9f2117349660e3d62204b4235",
+    "docs/ai/PROJECT_CONTEXT.md": "1e02d6c8fd8580d213ce702da75af0dc2fdbfec1769f9efc73a9de92ffa8b7f4"
+  },
+  "artifact_bytes": 84105,
+  "existing_failed_suite": {
+    "path": "tools/test_archive_artifacts_navigation.cjs",
+    "reason": "view.CardProgress is not a function in archive-art mock, before navigation assertions.",
+    "same_failure_with_original_navigation_source": true
+  }
+}

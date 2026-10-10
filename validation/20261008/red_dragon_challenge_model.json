@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-10-08T12:19:41.766Z",
+  "challenge_id": "challenge_monster_03",
+  "model_path": "models/creeps/neutral_creeps/n_creep_black_dragon/n_creep_black_dragon.vmdl",
+  "csv_lua_native_model_consistent": true,
+  "gameplay_values_preserved": true,
+  "other_challenges_preserved": true,
+  "native_resource_exists": true,
+  "native_neutral_unit": "npc_dota_neutral_black_dragon",
+  "actual_challenge_preload_verified": true,
+  "preload_output": "ADDON_PRECACHE_ENTRY_PASS: strict API signatures, current skill roots including poison Sullen Shroud without retired resources, tail startup preload; resources=116",
+  "live_attack_animation_verified": false,
+  "scope": "Local Valve model and configuration verified; native ACT_DOTA_ATTACK checked by resourceinfo audit; no live gameplay verification"
+}

@@ -93,6 +93,7 @@ end
 -- Tracked corpses retain bone-merged components, skins and activities until
 -- the corpse service finishes sinking them. Forced cleanup still uses clear.
 function M.on_death(unit)
+    cosmetic_details.stop_particles(unit)
     if valid(unit) and unit.survival_monster_corpse == true
         and unit.survival_wave_cleanup ~= true then
         return true

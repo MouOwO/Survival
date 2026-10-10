@@ -20,6 +20,7 @@ import time
 import aliyun_game_test_auth as auth
 import aliyun_test_connection as tunnel
 import aliyun_local_config as local_config
+from hammer_console_transport import ResidentInspector, TransportError
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output/hammer_backend"
@@ -45,7 +46,8 @@ local function inspect()
   local loading = package.loaded['systems/startup_loading_service']
   if not profiles or not setup or not loading or not PlayerResource
     or type(setup.get_session_id) ~= 'function'
-    or type(profiles.is_authenticated_for_account) ~= 'function' then return end
+    or type(profiles.is_authenticated_for_account) ~= 'function'
+    or type(profiles.is_loaded_for_account) ~= 'function' then return end
   local session = setup.get_session_id()
   if type(session) ~= 'string' or #session < 8 then return end
   result.session = session
@@ -66,7 +68,9 @@ local function inspect()
         if profiles.is_authenticated_for_account(id, string.format('%.0f', account)) then
           result.authenticated = result.authenticated + 1
         end
-        if profiles.get_profile(id) then result.loaded = result.loaded + 1 end
+        if profiles.is_loaded_for_account(id, string.format('%.0f', account)) then
+          result.loaded = result.loaded + 1
+        end
       end
     end
   end
@@ -129,9 +133,18 @@ class Bridge:
         self.key, self.environment, self.state, self.known_hosts = key, environment, state, known_hosts
         self.session = None
         self.next_health = 0.0
+        self.inspector = None
+
+    def enable_persistent_inspection(self):
+        if self.inspector is None:
+            self.inspector = ResidentInspector()
+
+    def close(self):
+        if self.inspector is not None:
+            self.inspector.close()
 
     def step(self) -> dict:
-        game = inspect_game()
+        game = self.inspector.inspect(inspection_lua()) if self.inspector is not None else inspect_game()
         if game["status"] not in {"configured", "authentication_required"}:
             self.session = None
             return {"ok": True, "status": game["status"]}
@@ -144,6 +157,11 @@ class Bridge:
                 raise tunnel.TunnelError("ssh_tunnel_or_backend_unavailable")
             self.next_health = current + 20
         if needs_auth:
+            # Credential injection retains its original guarded, one-shot
+            # transport and finally cleanup. Do not overlap its console sessions
+            # with the resident inspector; reconnect only after auth completes.
+            if self.inspector is not None:
+                self.inspector.disconnect()
             auth.inject(self.state, self.environment)
             self.session = game["session"]
             return {"ok": True, "status": "authentication_applied"}
@@ -153,14 +171,17 @@ class Bridge:
 
 def safe_step(bridge: Bridge) -> dict:
     try:
-        return bridge.step()
-    except (auth.AuthError, tunnel.TunnelError) as exc:
+        result = bridge.step()
+    except (auth.AuthError, tunnel.TunnelError, TransportError) as exc:
         # These classes expose fixed public status codes only.
-        return {"ok": False, "status": "retrying", "error": str(exc)}
+        result = {"ok": False, "status": "retrying", "error": str(exc)}
     except (OSError, ValueError, subprocess.SubprocessError):
-        return {"ok": False, "status": "retrying", "error": "local_bridge_operation_failed"}
+        result = {"ok": False, "status": "retrying", "error": "local_bridge_operation_failed"}
     except Exception:
-        return {"ok": False, "status": "retrying", "error": "unexpected_bridge_error"}
+        result = {"ok": False, "status": "retrying", "error": "unexpected_bridge_error"}
+    if bridge.inspector is not None:
+        result.update(bridge.inspector.stats)
+    return result
 
 
 def publish(value: dict) -> dict:
@@ -222,6 +243,8 @@ def _run_locked(bridge: Bridge, *, once: bool = False) -> dict:
             logger.addHandler(handler)
             previous, retry_delay = None, 2
             try:
+                if not once:
+                    bridge.enable_persistent_inspection()
                 while True:
                     if STOP.exists():
                         return publish({"ok": True, "status": "stopped"})
@@ -241,8 +264,13 @@ def _run_locked(bridge: Bridge, *, once: bool = False) -> dict:
                             return publish({"ok": True, "status": "stopped"})
                         time.sleep(0.25)
             finally:
-                logger.removeHandler(handler)
-                handler.close()
+                try:
+                    # Official stop confirms this lock has been released, so
+                    # the child and its sole console socket must be closed first.
+                    bridge.close()
+                finally:
+                    logger.removeHandler(handler)
+                    handler.close()
     except tunnel.TunnelError:
         raise
 

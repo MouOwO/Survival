@@ -23,4 +23,26 @@ function M.submit(player_id,command,complete)
         complete({ok=false,error=error,terminal=status and status>=400 and status<500 and status~=408 and status~=429 or false})
     end)
 end
+function M.submit_endless_batch(player_id,commands,complete)
+    local provider=profiles.get_provider()
+    local account=provider and provider.resolve_account_id(player_id)
+    if not account then complete({ok=false,error="account_id_unresolved"});return end
+    if not provider or type(provider.archive_submit_endless_batch)~="function" then
+        complete({ok=false,error="archive_batch_provider_required"});return
+    end
+    provider.archive_submit_endless_batch({account_id=account,config_hash=bundle.hash,commands=commands},function(result)
+        if result.profile then
+            if tostring(result.profile.account_id)~=tostring(account) then
+                complete({ok=false,error="account_id_mismatch"});return
+            end
+            local applied=profiles.apply_snapshot(player_id,result.profile,"archive_endless_batch")
+            if not applied.ok and applied.error~="snapshot_revision_stale" then complete(applied);return end
+        end
+        complete(result)
+    end,function(error,status)
+        -- Unsupported deployments preserve intents for retry after the server
+        -- capability is enabled; rejection must not discard earned waves.
+        complete({ok=false,error=error,terminal=false})
+    end)
+end
 return M

@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-10",
+  "scope": "Existing Tools match: Monkey King fighting endless enemies, with the original debug attack preserved",
+  "originalHero": {
+    "entindex": 709,
+    "logicalAttack": 1111111113374,
+    "attacksPerSecond": 9.9999998509884
+  },
+  "findings": [
+    "Largest measured initial hitches occurred in client UI callbacks; server GameFrame peaks in individual captures were 12–24 ms, not hundreds of milliseconds.",
+    "Unchanged combat debug packets rebuilt technology rows. Closed archive/VIP profile updates and topnav periodic native layout also dirtied unchanged native UI.",
+    "Opened void inventory used to rebuild its sidebar and item grid on unrelated accepted profile revisions. Its new path preserves cards, labels and hover data.",
+    "GetAverageTrueAttackDamage returned -2147483648 at ~1.11e12 while actual native basic filter inputs were positive ~1.11e12, or ~2.22e13 for 20x critical. This is not evidence of negative actual attack damage.",
+    "Native DamageFilter omits category and inflictor fields for script ApplyDamage. Consume the pending logical transaction before native attack restoration; explicit SPELL=0 remains a valid category."
+  ],
+  "captures": [
+    {
+      "artifact": "output/live_combat_diagnosis/1791594240433/capture.log",
+      "seconds": 20.42,
+      "averageFps": 29.73,
+      "peakFrameMs": 285.25,
+      "nativeCallbackPeakMs": 208.212,
+      "scene": "initial baseline; not a controlled same-scene comparison"
+    },
+    {
+      "artifact": "output/live_ui_callbacks/1791595895933/capture.log",
+      "averageFps": 48.54,
+      "peakFrameMs": 64.31,
+      "nativeCallbackPeakMs": 12.979,
+      "scene": "UI fixes + closed VIP gate; original large attack"
+    },
+    {
+      "artifact": "output/live_ui_callbacks/1791596131636/capture.log",
+      "averageFps": 52.83,
+      "peakFrameMs": 88.46,
+      "scene": "temporary 1e6 attack, restored afterward; survivor/skill workload differs"
+    },
+    {
+      "artifact": "output/live_ui_callbacks/1791598812994/capture.log",
+      "averageFps": 50.83,
+      "peakFrameMs": 48.8,
+      "nativeCallbackPeakMs": 13.079,
+      "serverGameFramePeakMs": 16.536,
+      "scene": "normal combat, zero modal-blocked frames, original large attack"
+    },
+    {
+      "artifact": "output/live_ui_callbacks/1791599499283/capture.log",
+      "averageFps": 53.01,
+      "peakFrameMs": 133.23,
+      "nativeCallbackPeakMs": 12.208,
+      "archiveRenderPeakMs": 99,
+      "scene": "archive initial data/card construction and closure; mixed scene"
+    },
+    {
+      "artifact": "output/live_ui_callbacks/1791599783339/capture.log",
+      "averageFps": 41.45,
+      "peakFrameMs": 56.07,
+      "nativeCallbackPeakMs": 12.319,
+      "serverGameFramePeakMs": 24.348,
+      "scene": "later endless combat, zero modal-blocked frames; original large attack",
+      "archiveSnapshots": 160,
+      "archiveRenderAttempts": 136,
+      "archiveRenderMeasuredMs": 0,
+      "vipRefreshes": 3,
+      "vipRenders": 0,
+      "worldBarApplyStates": 1119,
+      "worldBarApplyStatePeakMs": 1
+    }
+  ],
+  "limitations": [
+    "Live captures include explicit profiling overhead and natural endless progression; average FPS across different scenes is not a controlled before/after improvement percentage.",
+    "Archive open captures changed to closed during sampling; no valid continuous-open full native performance comparison was obtained. Full-source regression verifies 1000 accepted unchanged revisions without native creation, deletion, styling or Fit calls.",
+    "First construction of a complex archive page still measured about 99 ms. Stable closed combat captures did not reproduce the half-second hitch, but a 20-second sample cannot establish that all intermittent stalls are eliminated."
+  ],
+  "numericValidation": {
+    "artifact": "output/native_projection_filter_live.log",
+    "casesPassed": 12,
+    "casesTotal": 12,
+    "covers": [
+      "1e12 and 9e15",
+      "ordinary and scaled victims",
+      "actual native basic attack and 20x critical",
+      "real damage_service:Deal through native ApplyDamage"
+    ],
+    "isolatedFilterRestored": true,
+    "dummyUnitsRemoved": true,
+    "gameplayPackageCacheUnchanged": true
+  },
+  "regressionChecks": [
+    "hero large attack projection",
+    "136 category/provenance combinations",
+    "equipment aura/orbital logical damage delivery",
+    "finite damage boundary",
+    "monkey clone attack rate and Q",
+    "1000 unchanged combat-debug packets",
+    "1000 accepted opened archive revisions + live ownership, tooltip, wallet and action rejection",
+    "archive cross-context callback probes",
+    "VIP closed refresh",
+    "211 topnav style equivalence cases",
+    "world bar and topnav opt-in probes"
+  ],
+  "loadedState": {
+    "clientUI": "Compiled and synchronized to content and game; verified in the live match",
+    "numericServerChanges": "Written and isolated-native-tested; take effect on next map load, without resetting the current match",
+    "originalHeroAttackRestored": true,
+    "matchPausedAtEnd": true,
+    "explicitProbesStopped": true
+  },
+  "sourceContentChecks": "All seven affected UI sources match content; compiled artifacts exist",
+  "git": "No commit or push performed in this diagnosis; pre-existing workspace changes preserved"
+}

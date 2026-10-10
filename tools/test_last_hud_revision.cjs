@@ -1,16 +1,8 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const hud=fs.readFileSync('panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js','utf8');
-let value={},entries=[],selectedTower=true;
-const button={style:{}},caption={style:{}};
-const env={towerAuto:button,towerAutoText:caption,currentEntries:entries,CustomNetTables:{GetTableValue:()=>value},style:(p,s)=>Object.assign(p.style,s),place:(p,x,y,w,h)=>p.rect={x,y,w,h}};
-vm.createContext(env);vm.runInContext(hud.slice(hud.indexOf('    function updateTowerAuto('),hud.indexOf('    var inventory=art(')),env);
-function update(v,tower=true){value=v;env.currentEntries=[{ability:7,name:'ability_upgrade_tower_lv01'}];env.updateTowerAuto({tower});}
-update({auto_upgrade_visible:0});assert.equal(button.style.visibility,'collapse');
-update({auto_upgrade_visible:1,auto_upgrade_available:1,auto_upgrade_enabled:0});assert.equal(button.style.visibility,'visible');assert(button.enabled);assert.equal(button.__ability,7);assert(button.rect.y>=150&&button.rect.y+button.rect.h<240);
-update({auto_upgrade_visible:1,auto_upgrade_available:1,auto_upgrade_enabled:1});assert.equal(button.style.backgroundColor,'#285d4b');
-update({auto_upgrade_visible:1,auto_upgrade_available:0,auto_upgrade_enabled:0});assert(!button.enabled);
-update({auto_upgrade_visible:1,auto_upgrade_available:1},false);assert.equal(button.style.visibility,'collapse');assert.equal(button.__ability,-1);
-console.log('AUTO_TOWER_BUTTON_PASS: base hidden, routed toggle, active state, final disabled, stale selection hidden, below skill row');
+assert(!hud.includes('HandoffTowerAuto') && !hud.includes('updateTowerAuto('),
+ 'the separate tower auto-upgrade control and its refresh must be removed');
+console.log('AUTO_TOWER_BUTTON_PASS: separate control and per-HUD-update polling removed');
 const themeConfig={},skin={GameUI:{CustomUIConfig:()=>themeConfig}};
 vm.createContext(skin);
 ['archive_theme_tokens.js','archive_theme.js'].forEach(name=>vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name,'utf8'),skin));

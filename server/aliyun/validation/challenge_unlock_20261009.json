@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "verified_date": "2026-10-09",
+  "status": "DEPLOYED_VIA_FULL_ARCHIVE_SYNC",
+  "root_cause": "Python validation imposed max(3, definition.min_difficulty), rejecting configured N1 and N2 challenge rewards.",
+  "fix": "Use each enabled challenge definition's min_difficulty and keep the existing N1..N20 input validation.",
+  "checks": {
+    "challenge_unlock_tests": {
+      "passed": 8,
+      "failed": 0,
+      "actual_candidate_tested": true
+    },
+    "command_contract_tests": {
+      "passed": 5,
+      "failed": 0
+    },
+    "all_enabled_challenges_accept_configured_minimum": true,
+    "below_minimum_challenges_stay_locked": true,
+    "native_lua_n1_n2_fixture": "Each receives two items from its corresponding pool; duplicate receipts do not repeat rewards.",
+    "old_game_hash_compatible": true,
+    "actual_player_writes_tested": false
+  },
+  "deployment": {
+    "activated": true,
+    "release": "20261009-archive-sync-v1",
+    "approval_question_pending": false,
+    "authorization": "User explicitly requested synchronizing all archive functionality with the server in the current task.",
+    "validation_report": "server/aliyun/validation/archive_full_sync_20261009.json"
+  },
+  "historical_failure_recovery": "Earlier locked requests were rejected before a DB receipt and removed by the game's terminal-error handler; no automatic backfill is claimed.",
+  "original_candidate_scope": {
+    "file": "backend/archive_backend/service.py",
+    "baseline_release": "20261009-endless-achievements-v1",
+    "candidate_release": "20261009-challenge-unlock-v1",
+    "hash_unchanged": "2f4ee5dc4b4ff35378ef8b33eecd3d2ae150555c093ddf55f0bc0777058f5b8d",
+    "old_service_sha256": "e88148ebd53d9dc2fb2ccd69d40f6cf42322f171b0896f827d0a9b50609078d9",
+    "new_service_sha256": "71c404386f0c764e67c7bc58eb48670483fe840ebe40ffd6a238d2d7609859f6",
+    "bundle_changed": false,
+    "player_data_reset": false
+  },
+  "scope": {
+    "release": "20261009-archive-sync-v1",
+    "bundle": "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4",
+    "service_sha256": "61d5f01eccf2a34b2129ebb3280097d967b77bb5b4815df07ecdc7bcc501d723",
+    "player_data_reset": false
+  }
+}

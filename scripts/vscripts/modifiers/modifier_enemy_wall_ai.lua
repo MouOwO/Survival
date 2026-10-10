@@ -7,6 +7,12 @@ local M = modifier_enemy_wall_ai
 local team_alignment = require("core/team_alignment")
 local contact = require("systems/wall_melee_contact")
 local navigation = require("systems/wall_navigation_service")
+local attack_observer = require("systems/enemy_attack_observer")
+local function shared_death_ready()
+    return type(attack_observer.can_route_death)=='function' and type(attack_observer.register_death)=='function'
+        and type(attack_observer.bind_death_wall)=='function' and type(attack_observer.unregister_death)=='function'
+        and attack_observer.can_route_death()
+end
 function M:IsHidden() return true end
 function M:IsPurgable() return false end
 function M:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
@@ -25,12 +31,48 @@ local function interrupted(parent)
     return (parent.IsStunned and parent:IsStunned())
         or (parent.IsCommandRestricted and parent:IsCommandRestricted())
 end
+local function uses_contact_range_property(self)
+    if self.contact_range_property_enabled == nil then
+        -- DeclareFunctions can run before OnCreated. Only a completed formal
+        -- spawn may opt out; old/unknown instances and clients retain the
+        -- original property. Server-only entity fields are not replicated.
+        local enabled = true
+        if self.contact_range_delta == nil and self.ai_state == nil
+            and IsServer() and type(self.GetParent) == "function" then
+            local ok, parent = pcall(self.GetParent, self)
+            if ok and parent and (not parent.IsNull or not parent:IsNull()) then
+                enabled = not (parent.survival_is_wave_monster == true
+                    and parent.survival_wave_skip_contact_range_bonus == true)
+            end
+        end
+        -- Never let ForceRefresh or a later classification change alter an
+        -- engine-cached declaration. New attack types need a new instance.
+        self.contact_range_property_enabled = enabled
+    end
+    return self.contact_range_property_enabled
+end
 function M:DeclareFunctions()
-    return { MODIFIER_EVENT_ON_ATTACK_START, MODIFIER_EVENT_ON_ATTACK_LANDED,
-        MODIFIER_EVENT_ON_DEATH, MODIFIER_PROPERTY_ATTACK_RANGE_BONUS }
+    local functions
+    if self.shared_attack_observer ~= false and attack_observer.is_ready() then
+        functions = {}
+    else
+        functions = { MODIFIER_EVENT_ON_ATTACK_START, MODIFIER_EVENT_ON_ATTACK_LANDED,
+            }
+    end
+    local death_shared=self.shared_death_observer
+    if death_shared==nil then death_shared=shared_death_ready() end
+    if not death_shared then functions[#functions+1]=MODIFIER_EVENT_ON_DEATH end
+    if uses_contact_range_property(self) then
+        functions[#functions + 1] = MODIFIER_PROPERTY_ATTACK_RANGE_BONUS
+    end
+    return functions
 end
 function M:OnAttackStart(params)
-    if not IsServer() or params.attacker~=self:GetParent() then return end
+    if self.shared_attack_observer then return end
+    return self:HandleAttackStart(params)
+end
+function M:HandleAttackStart(params)
+    if not IsServer() or not params or params.attacker~=self:GetParent() then return end
     if params.target and params.target:entindex()==self.wall_entindex then
         self.last_attack_activity=now()
         self.recovery_delay=3
@@ -38,6 +80,10 @@ function M:OnAttackStart(params)
     end
 end
 function M:OnDeath(params)
+    if self.shared_death_observer then return end
+    return self:HandleDeath(params)
+end
+function M:HandleDeath(params)
     if not IsServer() then return end
     local parent=self:GetParent()
     if params.unit==parent then
@@ -50,8 +96,12 @@ function M:GetModifierAttackRangeBonus() return self.contact_range_delta or 0 en
 function M:AddCustomTransmitterData() return {contact_range_delta=self.contact_range_delta or 0} end
 function M:HandleCustomTransmitterData(data) self.contact_range_delta=tonumber(data.contact_range_delta) or 0 end
 function M:OnAttackLanded(params)
-    if not IsServer() then return end
-    self:OnAttackStart(params) -- Missed attack-start notifications still count as progress.
+    if self.shared_attack_observer then return end
+    return self:HandleAttackLanded(params)
+end
+function M:HandleAttackLanded(params)
+    if not IsServer() or not params then return end
+    self:HandleAttackStart(params) -- Missed attack-start notifications still count as progress.
     local parent, wall = self:GetParent(), params.target
     if params.attacker ~= parent or parent.survival_is_wave_monster ~= true
         or parent.survival_is_boss ~= true or not wall or wall:IsNull()
@@ -64,11 +114,20 @@ function M:OnAttackLanded(params)
 end
 
 function M:OnCreated(params)
+    uses_contact_range_property(self)
     self.no_unit_collision = tonumber(params.no_unit_collision) == 1
     if not IsServer() then return end
+    self.shared_attack_observer = attack_observer.is_ready() and true or false
+    if self.shared_attack_observer then self:GetParent().survival_enemy_attack_owner = self end
     self.contact_range_delta = 0
     if self.SetHasCustomTransmitterData then self:SetHasCustomTransmitterData(true) end
     self.wall_entindex = tonumber(params.wall_entindex) or -1
+    self.shared_death_observer=false
+    if shared_death_ready() then
+        local wall=self.wall_entindex>=0 and EntIndexToHScript(self.wall_entindex) or nil
+        self.shared_death_observer=attack_observer.register_death(self:GetParent(),self,wall) and true or false
+        if self.shared_death_observer then self.death_wall_handle=wall end
+    end
     self.boundary_position=nil
     self.ai_state="idle"
     -- Let the spawn caller finish FindClearSpaceForUnit, then issue the first
@@ -78,7 +137,13 @@ function M:OnCreated(params)
 end
 
 -- State refreshes must never reinitialize the target, timers or attack clock.
-function M:OnRefresh() end
+function M:OnRefresh()
+    -- Old native instances keep their original callback path until respawn.
+    -- Do not register an engine-cached callback a second time during refresh.
+    if IsServer() and self.shared_attack_observer == nil then self.shared_attack_observer = false end
+    if IsServer() and self.shared_death_observer == nil then self.shared_death_observer = false end
+    if self.contact_range_property_enabled == nil then self.contact_range_property_enabled = true end
+end
 
 function M:CheckState()
     local state = {}
@@ -127,6 +192,10 @@ function M:SetWallEntIndex(entindex)
     local parent=self:GetParent()
     local previous=self.wall_entindex
     self.wall_entindex=next_index
+    if self.shared_death_observer then
+        local wall=next_index>=0 and EntIndexToHScript(next_index) or nil
+        attack_observer.bind_death_wall(self,wall);self.death_wall_handle=wall
+    end
     self.boundary_position=nil
     if self.phase_order_frame then
         self.phase_order_frame=nil
@@ -169,6 +238,9 @@ function M:IssueStateOrder(parent,wall)
 end
 
 function M:EnterState(state,parent,wall,point)
+    if self.shared_death_observer and self.death_wall_handle~=wall then
+        attack_observer.bind_death_wall(self,wall);self.death_wall_handle=wall
+    end
     if self.ai_state==state and self.goal_wall==wall then
         -- Overflow keeps its original local approach until a contact is free.
         -- Re-sorting the nearest occupied point must not redirect it each tick.
@@ -308,8 +380,12 @@ end
 
 function M:OnDestroy()
     if not IsServer() then return end
+    if type(attack_observer.unregister_death)=='function' then attack_observer.unregister_death(self) end
     self.boundary_position=nil
     local parent = self:GetParent()
+    if parent and not parent:IsNull() and parent.survival_enemy_attack_owner == self then
+        parent.survival_enemy_attack_owner = nil
+    end
     self:SetContactMode(0)
     if parent and not parent:IsNull() then
         contact.release(self.wall_entindex,parent:entindex())

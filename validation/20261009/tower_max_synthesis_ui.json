@@ -1,0 +1,91 @@
+{
+  "task": "tower_max_synthesis_ui",
+  "date": "2026-10-09",
+  "status": "passed",
+  "source_changes": [
+    "scripts/vscripts/systems/tower_ability_sync.lua",
+    "scripts/vscripts/ui/ability_runtime_builder.lua",
+    "tools/test_tower_upgrade_visibility.lua",
+    "resource/addon_schinese.txt",
+    "resource/localization/addon_schinese.txt"
+  ],
+  "behavior": {
+    "final_absolute_level": 25,
+    "visible_before_eligible": true,
+    "upgrade_abilities_removed": 3,
+    "eligible_material_routes": 7,
+    "ultimate_limit": 1,
+    "ability_entity_preserved_on_eligibility_changes": true,
+    "new_polling": false,
+    "authoritative_guards_preserved": true
+  },
+  "checks": {
+    "route_regression": "output/tower_max_synthesis_ui_20261009/visibility_regression.json",
+    "old_source_negative_control": "output/tower_max_synthesis_ui_20261009/visibility_baseline_failure.json",
+    "syntax": "output/tower_max_synthesis_ui_20261009/syntax_verification.json",
+    "localization": "output/tower_max_synthesis_ui_20261009/localization_verification.json",
+    "frontend_button_tooltip_and_production_fusion_fixture": "output/tower_max_synthesis_ui_20261009/ui_audit.json",
+    "automatic_upgrading": "TOWER_AUTO_UPGRADE_PASS stages=14; TOWER_AUTO_QUEUE_PASS; TOWER_MAX_ICON_PASS"
+  },
+  "limitations": [
+    "No live native ability bar screenshot verification in this task.",
+    "Existing ultimate HUD test fixture lacks the skill pip helper; baseline issue unrelated to fusion, left unchanged."
+  ],
+  "git": "No stash, pull, commit or push requested or performed; unrelated existing and concurrent changes preserved.",
+  "compilation": "No new compiled UI/particle resources; Lua and localization text load with map reload.",
+  "final_checks": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output_bytes": 1773
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--stat"
+      ],
+      "exit_code": 0,
+      "output_bytes": 27783
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-only"
+      ],
+      "exit_code": 0,
+      "output_bytes": 26669
+    }
+  ],
+  "final_doc_reads": [
+    {
+      "file": "docs\\ai\\PROJECT_CONTEXT.md",
+      "bytes": 11533,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\CURRENT_TASK.md",
+      "bytes": 402503,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\DECISIONS.md",
+      "bytes": 31906,
+      "read_complete": true
+    },
+    {
+      "file": "docs\\ai\\KNOWN_ISSUES.md",
+      "bytes": 7296,
+      "read_complete": true
+    }
+  ],
+  "status_line_counts": {
+    "before": 541,
+    "final": 538
+  }
+}

@@ -75,6 +75,10 @@ function M.resolve(player_id, index, rule, context, wave, reserved)
             local position = nearby(ground(origin), index, rule, reserved)
             if position then return position, "builder_spawn" end
         end
+        -- A wall-area hub must wait for a safe point in this player's base.
+        -- Old platform and wave markers belong to the former map layout;
+        -- the wave markers now host portals, so they are not base fallbacks.
+        return nil, "safe_hub_position_missing"
     end
     local dedicated = marker("player_" .. player_id .. "_archive_hub_" .. index)
     if dedicated then

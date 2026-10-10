@@ -5,6 +5,8 @@ local scheduler = require("core/scheduler")
 package.loaded["systems/tower_skill_runtime"] = {get = function() return {} end}
 package.loaded["systems/tower_laser_effect_selector"] = {get = function() end}
 PATTACH_ABSORIGIN_FOLLOW, PATTACH_POINT_FOLLOW, PATTACH_WORLDORIGIN = 10, 11, 12
+LinkLuaModifier = function() end
+LUA_MODIFIER_MOTION_NONE = 0
 DOTA_GAMERULES_STATE_POST_GAME = 8
 Vector = function(x, y, z) return {x=x, y=y, z=z} end
 local deferred, refreshes, blocked = {}, 0, false

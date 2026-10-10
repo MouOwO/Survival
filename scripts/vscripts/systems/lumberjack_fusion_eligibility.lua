@@ -55,7 +55,8 @@ function M.runtime(name, state, resources, snapshot)
     local row = by_ability[name]
     if not row then return nil end
     local caster = state and state.unit
-    local result = {available = 0, can_afford = 0, lumberjack_fusion = 1,
+    local result = {available = 0, prerequisite_met = 0, can_afford = 1,
+        resource_check_on_cast = 1, lumberjack_fusion = 1,
         cost_wood = row.wood_cost, cost_gold = row.gold_cost,
         status_text = "当前伐木工不能合体"}
     if not caster or caster:IsNull() or not caster:IsAlive()
@@ -81,12 +82,10 @@ function M.runtime(name, state, resources, snapshot)
             .. tostring(row.level) .. "伐木工（当前" .. tostring(count) .. "个）"
     elseif not snapshot.eligible[caster:entindex()] then
         result.status_text = "当前伐木工不能作为合体材料"
-    elseif not resources or (resources.wood or 0) < row.wood_cost then
-        result.status_text = "合体木材不足，需要" .. tostring(row.wood_cost) .. "木材"
-    elseif (resources.gold or 0) < row.gold_cost then
-        result.status_text = "合体金币不足，需要" .. tostring(row.gold_cost) .. "金币"
     else
-        result.available, result.can_afford = 1, 1
+        -- The cast transaction checks the current wallet. Resource ticks must
+        -- not change the prerequisite projection or re-scan the worker roster.
+        result.available, result.prerequisite_met = 1, 1
         result.status_text = "可合体为" .. tostring(row.display_name)
     end
     return result

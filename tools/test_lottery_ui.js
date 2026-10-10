@@ -18,7 +18,7 @@ const root=new Panel('Panel',null,'root');
 const xml=fs.readFileSync('panorama/src/layout/custom_game/lottery_window.xml','utf8');
 for(const m of xml.matchAll(/id="([^"]+)"/g))new Panel('Panel',root,m[1]);
 for(const id of ['LotteryItemTooltip','LotteryTooltipIconHost','LotteryTooltipName','LotteryTooltipType','LotteryTooltipDuration','LotteryTooltipDescription'])new Panel('Panel',root,id);
-function $(id){return nodes[id.slice(1)]} $.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.Schedule=(seconds,cb)=>queue.push({at:now+seconds,cb});$.Msg=(message)=>logs.push(message);
+function $(id){return nodes[id.slice(1)]} $.GetContextPanel=()=>root; $.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.Schedule=(seconds,cb)=>queue.push({at:now+seconds,cb});$.Msg=(message)=>logs.push(message);
 const config={};const env={Date:EmbeddedDate,Intl:undefined,$,GameUI:{CustomUIConfig:()=>config},GameEvents:{Subscribe:(n,cb)=>events[n]=cb,SendCustomGameEventToServer:(n,p)=>requests.push({n,p})}};
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/ui_layers.js','utf8'),env);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/reward_presentation.js','utf8'),env);

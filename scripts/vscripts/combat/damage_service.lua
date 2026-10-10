@@ -6,6 +6,7 @@ local function chance(value)
 end
 
 local function blocked(request, transaction, reason)
+    repository.finish(transaction)
     local result = { success = false, transaction_id = transaction.transaction_id,
         requested_damage = request.base_damage, calculated_damage = 0,
         damage_type = request.damage_type, critical = false, critical_multiplier = 1,
@@ -55,9 +56,11 @@ function M:Deal(request)
     event_bus.emit(events.DAMAGE_REQUESTED, request)
     event_bus.emit(events.DAMAGE_CALCULATED, result)
     repository.mark_submitted(transaction)
-    local applied = adapter:Apply({ attacker = request.attacker, victim = request.victim,
+    local applied_ok, applied = pcall(adapter.Apply, adapter, { attacker = request.attacker, victim = request.victim,
         ability = request.ability, damage = damage, damage_type = request.damage_type,
         damage_flags = request.damage_flags })
+    repository.finish(transaction)
+    if not applied_ok then error(applied, 0) end
     if not applied.ok then return blocked(request, transaction, applied.error) end
     result.engine_damage = transaction.engine_damage
     result.post_multiplier = transaction.post_multiplier

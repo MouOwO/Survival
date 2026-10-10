@@ -3,6 +3,8 @@ local events = require("core/events")
 local effect_state = require("systems/rogue_effect_state_service")
 local builder_effects = require("systems/rogue_builder_start_effect_service")
 
+local worker_attack_cap = require("systems/worker_native_attack_cap")
+
 local M = {}
 local handlers = {}
 
@@ -342,8 +344,10 @@ local function apply_lumberjack_speed(instance, worker)
     local unit = worker and worker.unit
     if worker and worker.player_id == instance.player_id
         and worker.worker_type ~= "repairer" and valid(unit) then
+        local value = tonumber(instance.params.value) or 100
+        if value ~= 0 then worker_attack_cap.restore_or_error(unit) end
         unit:AddNewModifier(unit, nil, "modifier_rogue_lumberjack_attack_speed", {
-            value = tonumber(instance.params.value) or 100,
+            value = value,
         })
     end
 end

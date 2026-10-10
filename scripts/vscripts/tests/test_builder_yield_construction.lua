@@ -105,6 +105,9 @@ local function reset()
         return {ok=not foreign and owner~=nil,player_id=owner,
             builder=not foreign and owner~=nil and payload.caster or nil,error="builder_not_owned"}
     end)
+    bus.handle_request(events.RESOURCE_CAN_SPEND_REQUEST,function(p)
+        return {ok=account.wood >= p.wood and account.gold >= p.gold,error="poor"}
+    end)
     bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST,function(p)
         paid=paid+1
         if account.wood < p.wood or account.gold < p.gold then return {ok=false,error="poor"} end
@@ -179,11 +182,9 @@ assert(caster.gesture_count==nil,"travel must not trigger Io construction feedba
 assert(occupied()==1 and actual_count()==0)
 arrived();tick(0.2)
 assert(paid==1 and created==1 and refunded==0)
-assert(caster.last_gesture==ACT_DOTA_CAST_ABILITY_3 and caster.gesture_count==1,
-    "actual construction must play the native Io construction cast activity once")
-local actual_charge=particle_id
-assert(charge[actual_charge]==caster and not destroyed_charge[actual_charge],
-    "actual construction must create its Io charging particle")
+assert(caster.last_gesture==ACT_DOTA_ATTACK and caster.gesture_count==1,
+    "actual construction must play the native Io attack activity once")
+assert(next(charge)==nil,"actual construction must not create red charging particles")
 assert(occupied()==1 and actual_count()==1 and completed_events==0,
     "arrival transfers the reserved allowance into construction without advancing completed-building state")
 assert(#counts_events==2 and counts_events[1].counts.main_city==1 and counts_events[2].counts.main_city==1,
@@ -193,8 +194,8 @@ assert(by_id[11].survival_hull_radius>0 and by_id[11]:HasModifier("modifier_buil
 assert(account.wood==10000-config.main_city.build_cost.wood)
 assert(not build().ok and paid==1,"duplicate request cannot construct a second city")
 tick(20);assert(paid==1 and created==1)
-assert(destroyed_charge[actual_charge] and released_charge[actual_charge] and caster.last_fade==ACT_DOTA_CAST_ABILITY_3,
-    "actual completion must retire Io charging feedback and its gesture")
+assert(next(charge)==nil and caster.last_fade==ACT_DOTA_ATTACK,
+    "actual completion must end its gesture without charging particles")
 assert(occupied()==1 and actual_count()==1 and completed_events==1)
 local city=by_id[11]
 assert(not city:HasModifier("modifier_building_under_construction") and city.survival_hull_radius>0,
@@ -240,7 +241,7 @@ assert(not build().ok and caster.survival_build_task==nil and occupied()==0 and 
 reset();assert(build().ok);tick(100)
 assert(paid==0 and created==0 and caster.survival_build_task==nil and occupied()==0,"stalled movement expires without charging")
 reset();assert(build().ok);arrived();account.wood=0;tick(0.1)
-assert(paid==1 and created==0 and cooldowns==1 and occupied()==0,"resources are rechecked after arrival")
+assert(paid==0 and created==0 and cooldowns==1 and occupied()==0,"resources are rejected before final spend after arrival")
 reset();assert(build().ok);arrived();failed_create=true;tick(0.1)
 assert(paid==1 and created==1 and refunded==1 and account.wood==10000 and account.gold==10000)
 assert(occupied()==0 and actual_count()==0 and completed_events==0)
@@ -295,3 +296,61 @@ tick(100)
 assert(completed_events == 1 and rogue_effects.numeric(0, "builder_free_hero_altar") == 0)
 assert(not build_altar().ok, "completion cannot reopen a duplicate free altar")
 print("FREE_ALTAR_CONSTRUCTION_PASS: real city0 placement/construction, zero cost, completion-only charge consumption, unique limit")
+-- Unfunded requests cannot create a preview/travel task, reserve a unique
+-- building, issue movement, spend resources or create an entity.
+reset();account.wood,account.gold=0,0
+assert(not build().ok)
+assert(caster.survival_build_task==nil and occupied()==0 and move==nil and paid==0 and created==0)
+print("BUILD_RESOURCE_PREFLIGHT_PASS: no task, movement, reservation, spend or entity when materials are insufficient")
+
+-- Mixed promoted/base towers and accepted travel orders share one per-owner
+-- cap. In-progress construction transfers that reservation without opening it.
+reset()
+local original_unlock = config.arrow_tower.unlock_city_level
+config.arrow_tower.unlock_city_level = 0
+building._building_limit_for_test.change_count(0, "class_1", 3)
+building._building_limit_for_test.change_count(0, "class_2", 3)
+local function tower_count(player_id)
+    return bus.request(events.BUILDING_COUNTS_REQUEST, {player_id = player_id or 0}).counts.arrow_tower
+end
+local function tower_request(owner, builder_unit, position, task, event)
+    return bus.request(event or events.BUILD_REQUEST, {player_id = owner, caster = builder_unit,
+        building_id = "arrow_tower", position = position or Vector(0,0,128),
+        source_ability = ability, build_task = task})
+end
+assert(tower_count() == 6 and tower_request(0,caster).ok and tower_count() == 7)
+local seventh_task = caster.survival_build_task
+local competitor = entity(30,"npc_survival_builder_proxy",Vector(2000,2000,128))
+authorized_builders[competitor] = 0
+local blocked = tower_request(0,competitor,Vector(2400,2400,128))
+assert(not blocked.ok and competitor.survival_build_task == nil and paid == 0,
+    "the seventh travel order preoccupies the slot against another builder")
+assert(not tower_request(0,competitor,Vector(2400,2400,128),seventh_task,events.BUILD_CAN_PLACE_REQUEST).ok,
+    "another builder cannot bypass the cap with the first builder's task handle")
+assert(tower_request(0,caster,nil,seventh_task,events.BUILD_CAN_PLACE_REQUEST).ok,
+    "the authenticated pending order does not count itself twice on final preflight")
+local teammate = entity(31,"npc_survival_builder_proxy",Vector(800,800,128))
+authorized_builders[teammate] = 1
+local teammate_check = tower_request(1,teammate,Vector(512,512,128),nil,events.BUILD_CAN_PLACE_REQUEST)
+assert(tower_count(1) == 0 and teammate_check.ok,
+    "a full player on the same team does not consume another player's cap: " .. tostring(teammate_check.error))
+arrived();tick(0.1)
+assert(created == 1 and paid == 1 and tower_count() == 7
+    and building._building_limit_for_test.count_for(0,"arrow_tower") == 7,
+    "arrival atomically transfers the accepted order to the construction entity")
+assert(not tower_request(0,competitor,Vector(2400,2400,128)).ok)
+local seventh = by_id[11]
+seventh.alive = false
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=seventh})
+assert(tower_count() == 6 and refunded == 1)
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=seventh});tick(0.2)
+assert(tower_count() == 6 and refunded == 1,
+    "construction death and its delayed watchdog release exactly one live slot")
+assert(tower_request(0,caster).ok and tower_count() == 7,
+    "a dead construction can be immediately replaced without a historical build limit")
+local replacement = caster.survival_build_task
+caster.survival_build_task = nil;tick(0.31)
+assert(tower_count() == 6 and replacement ~= seventh_task,
+    "canceling the replacement travel order returns its reservation")
+config.arrow_tower.unlock_city_level = original_unlock
+print("PLAYER_TOWER_PENDING_CAP_PASS: promoted totals, seventh-order reservation, authenticated recheck, same-team owner isolation, atomic construction, death/refund and cancellation")

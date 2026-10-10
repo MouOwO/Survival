@@ -12,11 +12,8 @@ end
 function M.get(unit, skill, state)
     local id = type(skill) == "table" and skill.skill_id or skill
     if type(id) ~= "string" or id == "" then return nil end
-    local rank = projection.project(state or {
-        building_id = unit and unit.survival_building_id,
-        level = unit and unit.survival_level,
-    })
-    local rarity = rank and rank.rarity
+    local rarity = projection.rarity(state and state.building_id or unit and unit.survival_building_id,
+        state and (state.absolute_level or state.level) or unit and unit.survival_level)
     -- Ultimate fusion retains the highest existing laser presentation.
     if rarity == "UR" then rarity = "SSR" end
     local by_id = effects.by_id or {}

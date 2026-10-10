@@ -89,7 +89,7 @@ function M.think()
             running_tasks[task_id] = task
             local task_started = profile and profile.measure()
             local ok, result = pcall(task.callback)
-            if profile then profiler.record(profile, task_id, task_started, ok) end
+            if profile then profiler.record(profile, task_id, task_started, ok, task.callback) end
             if running_tasks[task_id] == task then running_tasks[task_id] = nil end
             if not ok then
                 print("[Scheduler] task failed: " .. tostring(result))

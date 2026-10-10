@@ -1,0 +1,60 @@
+{
+  "checks": {
+    "command_contract_and_candidate_receipts": {
+      "failed": 0,
+      "passed": 18
+    },
+    "commerce": {
+      "failed": 0,
+      "passed": 13
+    },
+    "local_and_live_bundle_hash_match": true,
+    "local_and_remote_source_sha256_match": true,
+    "workspace_archive_suite": {
+      "existing_configuration_expectation_mismatches": [
+        "test_conflict_preserves_other_writer: current workspace welfare adds 10 wood beyond fixture expectation",
+        "forced lottery pity: current workspace regular draw rarity differs from fixture expectation"
+      ],
+      "failed": 2,
+      "passed": 24
+    }
+  },
+  "format": 1,
+  "in_game_validation": {
+    "active_old_sessions_supported": true,
+    "new_kill_in_current_match_tested": false,
+    "pending_reward_recheck": "Next authoritative profile refresh or endless wave settlement reconciles saved progress."
+  },
+  "preserved": {
+    "new_floor_milestones": 32,
+    "old_achievement_rows": 50,
+    "other_configuration_changed": false,
+    "player_data_reset": false,
+    "previous_release": "20261004-commerce-batch2",
+    "stat_schema_changed": false
+  },
+  "root_cause": "Live endless achievements and command whitelist were older than the game endless_reconcile command.",
+  "server": {
+    "achievements": 82,
+    "compatibility_hash": "288f724bcfd79880c4fbd7d4ac77040a8636e2f8f3ef96836632001340d3b2a7",
+    "hash": "2f4ee5dc4b4ff35378ef8b33eecd3d2ae150555c093ddf55f0bc0777058f5b8d",
+    "http_checks_write_player_data": false,
+    "http_reconciliation_kind_accepted_for_both_hashes": true,
+    "native_lua_floor_400_awards": 28,
+    "native_lua_repeat_awards": 0,
+    "ok": true,
+    "release": "20261009-endless-achievements-v1",
+    "service_status": [
+      "NRestarts=0",
+      "ActiveState=active",
+      "SubState=running"
+    ],
+    "source_sha256": {
+      "bundle.py": "c152634dfd750f3134e0229e713580d84b2f34aadc7bf5dd1705743495facfef",
+      "config_compatibility.py": "bcc30da7372126a6973c0b09df2034f5a950e26e0e521a6d481a5a2b7e5cc559",
+      "service.py": "e88148ebd53d9dc2fb2ccd69d40f6cf42322f171b0896f827d0a9b50609078d9"
+    }
+  },
+  "status": "DEPLOYED_HTTP_AND_NATIVE_LUA_PASS",
+  "verified_date": "2026-10-09"
+}

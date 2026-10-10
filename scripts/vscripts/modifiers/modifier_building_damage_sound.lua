@@ -29,6 +29,8 @@ function M:OnTakeDamage(params)
     local wall = self:GetParent()
     if params.unit ~= wall or (tonumber(params.damage) or 0) <= 0 then return end
     building_sound.wall_damaged(wall)
+    local wakeup = package.loaded["systems/repair_worker_wakeup"]
+    if wakeup then wakeup.wall_damaged(wall) end
 end
 
 return M

@@ -37,7 +37,7 @@ local bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local health_guard = require("core/hero_health_guard")
-local counts, publications, growth_reads = {}, {}, {}
+local counts, publications, growth_reads, recalculations = {}, {}, {}, {}
 local function count(unit, key)
     local c = counts[unit]
     c[key] = (c[key] or 0) + 1
@@ -146,7 +146,9 @@ bus.handle_request(events.WEAPON_GROWTH_GET_REQUEST, function(payload)
     growth_reads[id] = (growth_reads[id] or 0) + 1
     return { ok = true, snapshot = growth[id] or {} }
 end)
-bus.handle_request(events.EQUIPMENT_STATS_GET_REQUEST, function()
+bus.handle_request(events.EQUIPMENT_STATS_GET_REQUEST, function(payload)
+    local id = payload.player_id
+    recalculations[id] = (recalculations[id] or 0) + 1
     return { ok = true, snapshot = { values = {} } }
 end)
 bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, function(payload)
@@ -281,6 +283,111 @@ assert(replacement ~= first and counts[replacement].strength_zero == 1
 bus.emit(events.HERO_REMOVED, { player_id = 0, unit = first })
 assert(snapshot(0).entindex == replacement.id and snapshot(1) == other_snapshot)
 
+-- One ordinary attack can commit weapon, rebirth and permanent growth through
+-- separate nested emissions. Use the real service/math/native projection to
+-- verify one final recalculation, without waiting for a scheduler frame.
+local progression = {}
+bus.handle_request(events.HERO_PROGRESSION_GET_REQUEST, function(payload)
+    return {ok = true, snapshot = progression[payload.player_id] or {}}
+end)
+local function advance_growth(id, attack, strength)
+    local next_value = {}
+    for key, amount in pairs(growth[id] or {}) do next_value[key] = amount end
+    next_value.growth_attack = (next_value.growth_attack or 0) + attack
+    next_value.growth_strength = (next_value.growth_strength or 0) + strength
+    growth[id] = next_value
+    bus.emit(events.WEAPON_GROWTH_CHANGED, {player_id = id, snapshot = next_value,
+        reason = "same_attack_growth"})
+end
+local before_snapshot, before_reads = snapshot(0), recalculations[0]
+local other_reads, before_publications = recalculations[1], publications[0]
+bus.subscribe("test.growth.attack", function()
+    advance_growth(0, 3, 1)
+    progression[0] = {all_attributes = 7}
+    bus.emit(events.HERO_PROGRESSION_CHANGED, {player_id = 0, reason = "rebirth_attack_growth"})
+    bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id = 0,
+        changed_section = "hero", reason = "damage_attribute_growth"})
+    advance_growth(0, 6, 2)
+    assert(recalculations[0] == before_reads, "growth must wait for the outer attack subscribers")
+end)
+bus.emit("test.growth.attack")
+local combined = snapshot(0)
+assert(recalculations[0] == before_reads + 1 and publications[0] == before_publications + 1,
+    "multiple growth commits in one attack must produce one final projection/publication")
+near(combined.attack_min, before_snapshot.attack_min + 9 * 1.2, "final combined weapon attack")
+near(combined.strength, before_snapshot.strength + 10, "weapon and rebirth attributes both committed")
+near(combined.agility, before_snapshot.agility + 7)
+near(combined.intellect, before_snapshot.intellect + 7)
+assert(recalculations[1] == other_reads and snapshot(1) == other_snapshot,
+    "one player's attack cannot recalculate the other player's hero")
+near(replacement.modifiers.modifier_weapon_stat_projection.snapshot.attack_min,
+    combined.attack_min, "recursive modifier GET sees the committed combined projection")
+
+-- A proc's synchronous GET must see growth immediately. It flushes only the
+-- requested player; the second player's final update drains at outer return.
+before_snapshot, before_reads = combined, recalculations[0]
+other_reads = recalculations[1]
+local getter_snapshot
+bus.subscribe("test.growth.getter", function()
+    advance_growth(0, 5, 2)
+    progression[1] = {all_attributes = 4}
+    bus.emit(events.HERO_PROGRESSION_CHANGED, {player_id = 1, reason = "other_attack_growth"})
+    getter_snapshot = snapshot(0)
+    near(getter_snapshot.attack_min, before_snapshot.attack_min + 5 * 1.2)
+    near(getter_snapshot.strength, before_snapshot.strength + 2)
+    assert(recalculations[0] == before_reads + 1 and recalculations[1] == other_reads,
+        "GET must flush exactly its player's growth before returning")
+    assert(snapshot(0) == getter_snapshot and recalculations[0] == before_reads + 1,
+        "unchanged recursive and repeated GET cannot duplicate the pending projection")
+end)
+bus.emit("test.growth.getter")
+assert(snapshot(0) == getter_snapshot and recalculations[0] == before_reads + 1,
+    "outer drain must not replay a projection already flushed by GET")
+assert(recalculations[1] == other_reads + 1)
+near(snapshot(1).strength, other_snapshot.strength + 4)
+
+-- Later growth after an earlier proc GET must still commit before the outer
+-- attack returns; the first proc is entitled to its earlier exact snapshot.
+before_reads = recalculations[0]
+bus.subscribe("test.growth.after_getter", function()
+    advance_growth(0, 2, 1)
+    getter_snapshot = snapshot(0)
+    advance_growth(0, 4, 1)
+end)
+bus.emit("test.growth.after_getter")
+assert(recalculations[0] == before_reads + 2, "growth after an early GET requires one newer final projection")
+near(snapshot(0).attack_min, getter_snapshot.attack_min + 4 * 1.2)
+
+-- Equipment replacement still performs its native setup inside the nested
+-- event, and absorbs earlier pending growth instead of replaying it later.
+before_reads = recalculations[0]
+local setup_before = copy_counts(replacement)
+bus.subscribe("test.growth.equipment", function()
+    advance_growth(0, 1, 1)
+    bus.emit(events.WEAPON_EQUIPPED_CHANGED, {player_id = 0, reason = "structural_equip"})
+    assert(recalculations[0] == before_reads + 1
+        and delta(replacement, setup_before, "equipment_refresh") == 1,
+        "structural equipment setup must remain immediate inside the event")
+end)
+bus.emit("test.growth.equipment")
+assert(recalculations[0] == before_reads + 1, "equipment's authoritative projection consumes queued growth")
+
+-- Removing and replacing a hero before the outer event returns discards the
+-- old state's queued callback, including native entity-index reuse.
+before_reads = recalculations[0]
+local next_hero, retired = nil, replacement
+bus.subscribe("test.growth.rebirth", function()
+    advance_growth(0, 8, 1)
+    retired.null = true
+    bus.emit(events.HERO_REMOVED, {player_id = 0, unit = retired})
+    next_hero = summon(retired.id, 0)
+    assert(recalculations[0] == before_reads + 1, "replacement hero initializes immediately")
+end)
+bus.emit("test.growth.rebirth")
+assert(recalculations[0] == before_reads + 1 and next_hero ~= retired
+    and snapshot(0).entindex == next_hero.id,
+    "retired pending growth must not re-project the new hero after initialization")
+
 -- Use the real scheduler to verify bounded pending callbacks, current-value
 -- precedence, intentional healing, player separation and reused entindexes.
 scheduler.clear()
@@ -325,5 +432,6 @@ scheduler.think()
 near(reused.health, 800, "old entity guard cannot alter new handle with reused index")
 assert(scheduler.task_count() == 0)
 print = print_original
+print("HERO_GROWTH_DISPATCH_PASS one attack/multiple growth commits=one immediate final projection; GET flush, later growth, recursive modifier GET, players, structural equipment and replaced hero identity")
 print("HERO_GROWTH_HOT_PATH_PASS 100 growth: equip/projectile/BAT/range/native-attribute rewrites=0, projection refresh=100; 100 counter-only: all native writes=0; exact stats, real adapter HP, gear/technology, players and identity")
 print("HERO_HEALTH_GUARD_BOUNDED_PASS 1000 protects=2 real scheduler tasks; native refill, intentional healing generations, two players and reused identity")

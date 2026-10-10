@@ -1,0 +1,1738 @@
+{
+  "schema": "virtual_shadow_coordinate_audit_v1",
+  "source_path": "/workspace/scratch/48deb03ca350/generated_images/exec-7b974e1f-6fdb-4737-b5b0-a6b99e43c5a3.png",
+  "source_size": [
+    1672,
+    941
+  ],
+  "coordinate_convention": "整数像素[x0,y0,x1,y1]，左上包含、右下不包含（Pillow crop标准）",
+  "page": "虚空之影",
+  "visible_item_count": 23,
+  "grid_rows": [
+    8,
+    8,
+    7
+  ],
+  "sidebar_count": 16,
+  "read_only_analysis": true,
+  "bbox_accuracy_note": "图标与数量区域含约1px抗锯齿边缘；名称另给统一透明组件裁剪区及阈值检测的可见字形范围。",
+  "layer_rules": [
+    "每项图标、数量板/数字、名称是独立层；不把整个单元做成大卡片。",
+    "数量板覆盖了图标顶部，纯裁切无法恢复遮挡后的底层图案。拆分时需保留覆盖层关系，或对图标遮挡区做同源修复；不得换风格或拿其他图替代。",
+    "名称区域包含母图紫色背景。若裁成透明文字需仅保留抗锯齿字形；若改为游戏文本应沿用坐标和字形尺度。",
+    "原图数量板文本不可被当作图标纹理的一部分重复叠加。",
+    "数量0才未解锁；数量大于0已拥有；达到上限与是否解锁是独立语义。",
+    "—表示待核对，不能转成0。"
+  ],
+  "unverified_names": [
+    "弦类道具",
+    "能类道具"
+  ],
+  "common_components": {
+    "screen": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "window_outer": [
+      133,
+      11,
+      1536,
+      903
+    ],
+    "top_navigation_background": [
+      136,
+      27,
+      1534,
+      92
+    ],
+    "resource_strip_background": [
+      136,
+      92,
+      1534,
+      129
+    ],
+    "sidebar_background": [
+      136,
+      128,
+      394,
+      897
+    ],
+    "content_background": [
+      394,
+      128,
+      1533,
+      897
+    ],
+    "sidebar_selected_background": [
+      136,
+      175,
+      394,
+      226
+    ],
+    "sidebar_unselected_background_sample": [
+      138,
+      229,
+      226,
+      269
+    ],
+    "sidebar_vertical_divider": [
+      392,
+      126,
+      396,
+      897
+    ],
+    "window_bottom_border": [
+      133,
+      885,
+      1536,
+      903
+    ],
+    "window_left_border": [
+      133,
+      89,
+      139,
+      903
+    ],
+    "window_right_border": [
+      1529,
+      87,
+      1536,
+      903
+    ],
+    "top_navigation_bottom_border": [
+      133,
+      87,
+      1536,
+      96
+    ],
+    "archive_active_tab_background": [
+      474,
+      11,
+      630,
+      91
+    ],
+    "archive_active_tab_icon": [
+      536,
+      25,
+      571,
+      52
+    ],
+    "archive_active_tab_label_region": [
+      522,
+      54,
+      580,
+      80
+    ],
+    "close_cross": [
+      1481,
+      42,
+      1515,
+      74
+    ],
+    "project_title_region": [
+      191,
+      40,
+      293,
+      79
+    ],
+    "page_title_region": [
+      417,
+      134,
+      576,
+      178
+    ],
+    "filters": [
+      {
+        "id": "filter_all",
+        "source_text": "全部",
+        "selected": true,
+        "background_bbox": [
+          699,
+          143,
+          831,
+          186
+        ],
+        "text_region_bbox": [
+          740,
+          151,
+          790,
+          177
+        ]
+      },
+      {
+        "id": "filter_owned",
+        "source_text": "已拥有",
+        "selected": false,
+        "background_bbox": [
+          839,
+          143,
+          970,
+          186
+        ],
+        "text_region_bbox": [
+          870,
+          151,
+          941,
+          178
+        ]
+      },
+      {
+        "id": "filter_unowned",
+        "source_text": "未解锁",
+        "selected": false,
+        "background_bbox": [
+          981,
+          144,
+          1112,
+          186
+        ],
+        "text_region_bbox": [
+          1008,
+          151,
+          1086,
+          179
+        ],
+        "note": "母图为未解锁，逻辑仅数量0才属于此项；未达上限不可被归入。正式文本是否统一为未拥有可由根任务决定。"
+      }
+    ],
+    "top_tabs": [
+      {
+        "name": "宝物",
+        "background_bbox": [
+          328,
+          30,
+          475,
+          91
+        ],
+        "label_region_bbox": [
+          379,
+          49,
+          428,
+          74
+        ]
+      },
+      {
+        "name": "存档",
+        "background_bbox": [
+          474,
+          11,
+          630,
+          91
+        ],
+        "label_region_bbox": [
+          522,
+          54,
+          580,
+          80
+        ]
+      },
+      {
+        "name": "抽奖",
+        "background_bbox": [
+          630,
+          30,
+          797,
+          91
+        ],
+        "label_region_bbox": [
+          686,
+          49,
+          737,
+          74
+        ]
+      },
+      {
+        "name": "商城",
+        "background_bbox": [
+          797,
+          30,
+          964,
+          91
+        ],
+        "label_region_bbox": [
+          854,
+          49,
+          907,
+          74
+        ]
+      },
+      {
+        "name": "每日奖励",
+        "background_bbox": [
+          964,
+          30,
+          1131,
+          91
+        ],
+        "label_region_bbox": [
+          1006,
+          48,
+          1091,
+          75
+        ]
+      },
+      {
+        "name": "排行榜",
+        "background_bbox": [
+          1131,
+          30,
+          1298,
+          91
+        ],
+        "label_region_bbox": [
+          1182,
+          48,
+          1250,
+          75
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "id": "gold",
+        "icon_bbox": [
+          1208,
+          95,
+          1241,
+          128
+        ],
+        "number_region_bbox": [
+          1248,
+          97,
+          1311,
+          126
+        ],
+        "source_text": "2,881"
+      },
+      {
+        "id": "purple_gem",
+        "icon_bbox": [
+          1337,
+          94,
+          1369,
+          128
+        ],
+        "number_region_bbox": [
+          1369,
+          97,
+          1415,
+          126
+        ],
+        "source_text": "320"
+      },
+      {
+        "id": "ticket",
+        "icon_bbox": [
+          1437,
+          94,
+          1476,
+          128
+        ],
+        "number_region_bbox": [
+          1477,
+          97,
+          1506,
+          126
+        ],
+        "source_text": "20"
+      }
+    ]
+  },
+  "sidebar": [
+    {
+      "id": "sidebar_01",
+      "name": "通关存档",
+      "selected": false,
+      "row_bbox": [
+        136,
+        128,
+        394,
+        175
+      ],
+      "label_region_bbox": [
+        220,
+        133,
+        363,
+        172
+      ],
+      "label_ink_bbox": [
+        260,
+        143,
+        352,
+        165
+      ]
+    },
+    {
+      "id": "sidebar_02",
+      "name": "虚空之影",
+      "selected": true,
+      "row_bbox": [
+        136,
+        175,
+        394,
+        226
+      ],
+      "label_region_bbox": [
+        220,
+        180,
+        363,
+        223
+      ],
+      "label_ink_bbox": [
+        259,
+        190,
+        352,
+        211
+      ]
+    },
+    {
+      "id": "sidebar_03",
+      "name": "地图等级",
+      "selected": false,
+      "row_bbox": [
+        136,
+        226,
+        394,
+        273
+      ],
+      "label_region_bbox": [
+        220,
+        231,
+        363,
+        270
+      ],
+      "label_ink_bbox": [
+        261,
+        239,
+        353,
+        261
+      ]
+    },
+    {
+      "id": "sidebar_04",
+      "name": "上班福利",
+      "selected": false,
+      "row_bbox": [
+        136,
+        273,
+        394,
+        318
+      ],
+      "label_region_bbox": [
+        220,
+        278,
+        363,
+        315
+      ],
+      "label_ink_bbox": [
+        261,
+        285,
+        352,
+        307
+      ]
+    },
+    {
+      "id": "sidebar_05",
+      "name": "福利礼包",
+      "selected": false,
+      "row_bbox": [
+        136,
+        318,
+        394,
+        365
+      ],
+      "label_region_bbox": [
+        220,
+        323,
+        363,
+        362
+      ],
+      "label_ink_bbox": [
+        261,
+        332,
+        353,
+        353
+      ]
+    },
+    {
+      "id": "sidebar_06",
+      "name": "神兵碎片",
+      "selected": false,
+      "row_bbox": [
+        136,
+        365,
+        394,
+        412
+      ],
+      "label_region_bbox": [
+        220,
+        370,
+        363,
+        409
+      ],
+      "label_ink_bbox": [
+        261,
+        378,
+        352,
+        400
+      ]
+    },
+    {
+      "id": "sidebar_07",
+      "name": "秘法牢笼",
+      "selected": false,
+      "row_bbox": [
+        136,
+        412,
+        394,
+        457
+      ],
+      "label_region_bbox": [
+        220,
+        417,
+        363,
+        454
+      ],
+      "label_ink_bbox": [
+        261,
+        424,
+        353,
+        446
+      ]
+    },
+    {
+      "id": "sidebar_08",
+      "name": "BOSS存档",
+      "selected": false,
+      "row_bbox": [
+        136,
+        457,
+        394,
+        503
+      ],
+      "label_region_bbox": [
+        220,
+        462,
+        363,
+        500
+      ],
+      "label_ink_bbox": [
+        249,
+        470,
+        352,
+        491
+      ]
+    },
+    {
+      "id": "sidebar_09",
+      "name": "积分道具",
+      "selected": false,
+      "row_bbox": [
+        136,
+        503,
+        394,
+        549
+      ],
+      "label_region_bbox": [
+        220,
+        508,
+        363,
+        546
+      ],
+      "label_ink_bbox": [
+        261,
+        516,
+        352,
+        537
+      ]
+    },
+    {
+      "id": "sidebar_10",
+      "name": "商城道具",
+      "selected": false,
+      "row_bbox": [
+        136,
+        549,
+        394,
+        595
+      ],
+      "label_region_bbox": [
+        220,
+        554,
+        363,
+        592
+      ],
+      "label_ink_bbox": [
+        262,
+        562,
+        352,
+        583
+      ]
+    },
+    {
+      "id": "sidebar_11",
+      "name": "无尽存档",
+      "selected": false,
+      "row_bbox": [
+        136,
+        595,
+        394,
+        641
+      ],
+      "label_region_bbox": [
+        220,
+        600,
+        363,
+        638
+      ],
+      "label_ink_bbox": [
+        262,
+        607,
+        352,
+        629
+      ]
+    },
+    {
+      "id": "sidebar_12",
+      "name": "钓鱼存档",
+      "selected": false,
+      "row_bbox": [
+        136,
+        641,
+        394,
+        687
+      ],
+      "label_region_bbox": [
+        220,
+        646,
+        363,
+        684
+      ],
+      "label_ink_bbox": [
+        262,
+        653,
+        352,
+        675
+      ]
+    },
+    {
+      "id": "sidebar_13",
+      "name": "存档建筑",
+      "selected": false,
+      "row_bbox": [
+        136,
+        687,
+        394,
+        734
+      ],
+      "label_region_bbox": [
+        220,
+        692,
+        363,
+        731
+      ],
+      "label_ink_bbox": [
+        261,
+        700,
+        353,
+        721
+      ]
+    },
+    {
+      "id": "sidebar_14",
+      "name": "我的前男友",
+      "selected": false,
+      "row_bbox": [
+        136,
+        734,
+        394,
+        780
+      ],
+      "label_region_bbox": [
+        220,
+        739,
+        363,
+        777
+      ],
+      "label_ink_bbox": [
+        241,
+        746,
+        353,
+        767
+      ]
+    },
+    {
+      "id": "sidebar_15",
+      "name": "我的前女友",
+      "selected": false,
+      "row_bbox": [
+        136,
+        780,
+        394,
+        826
+      ],
+      "label_region_bbox": [
+        220,
+        785,
+        363,
+        823
+      ],
+      "label_ink_bbox": [
+        240,
+        792,
+        352,
+        813
+      ]
+    },
+    {
+      "id": "sidebar_16",
+      "name": "神兽",
+      "selected": false,
+      "row_bbox": [
+        136,
+        826,
+        394,
+        897
+      ],
+      "label_region_bbox": [
+        220,
+        831,
+        363,
+        875
+      ],
+      "label_ink_bbox": [
+        308,
+        838,
+        352,
+        860
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "virtual_01",
+      "row": 1,
+      "column": 1,
+      "name": "幻象树枝",
+      "quantity_text": "115/320",
+      "icon_bbox": [
+        420,
+        229,
+        537,
+        349
+      ],
+      "quantity_board_bbox": [
+        452,
+        226,
+        538,
+        258
+      ],
+      "quantity_text_ink_bbox": [
+        462,
+        236,
+        527,
+        257
+      ],
+      "name_region_bbox": [
+        415,
+        352,
+        544,
+        387
+      ],
+      "name_ink_bbox": [
+        440,
+        359,
+        515,
+        377
+      ],
+      "unit_union_bbox": [
+        415,
+        226,
+        544,
+        387
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_02",
+      "row": 1,
+      "column": 2,
+      "name": "贪婪金币",
+      "quantity_text": "15/320",
+      "icon_bbox": [
+        558,
+        229,
+        675,
+        349
+      ],
+      "quantity_board_bbox": [
+        596,
+        226,
+        676,
+        258
+      ],
+      "quantity_text_ink_bbox": [
+        608,
+        236,
+        664,
+        250
+      ],
+      "name_region_bbox": [
+        553,
+        352,
+        682,
+        387
+      ],
+      "name_ink_bbox": [
+        579,
+        359,
+        653,
+        377
+      ],
+      "unit_union_bbox": [
+        553,
+        226,
+        682,
+        387
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_03",
+      "row": 1,
+      "column": 3,
+      "name": "虚无砖块",
+      "quantity_text": "118/320",
+      "icon_bbox": [
+        695,
+        229,
+        814,
+        349
+      ],
+      "quantity_board_bbox": [
+        728,
+        226,
+        815,
+        258
+      ],
+      "quantity_text_ink_bbox": [
+        737,
+        235,
+        803,
+        258
+      ],
+      "name_region_bbox": [
+        690,
+        352,
+        821,
+        387
+      ],
+      "name_ink_bbox": [
+        716,
+        359,
+        791,
+        377
+      ],
+      "unit_union_bbox": [
+        690,
+        226,
+        821,
+        387
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_04",
+      "row": 1,
+      "column": 4,
+      "name": "粘稠之泥",
+      "quantity_text": "16/320",
+      "icon_bbox": [
+        834,
+        229,
+        952,
+        349
+      ],
+      "quantity_board_bbox": [
+        873,
+        226,
+        953,
+        258
+      ],
+      "quantity_text_ink_bbox": [
+        884,
+        236,
+        941,
+        250
+      ],
+      "name_region_bbox": [
+        829,
+        352,
+        959,
+        387
+      ],
+      "name_ink_bbox": [
+        854,
+        359,
+        930,
+        377
+      ],
+      "unit_union_bbox": [
+        829,
+        226,
+        959,
+        387
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_05",
+      "row": 1,
+      "column": 5,
+      "name": "虚空箭头",
+      "quantity_text": "13/320",
+      "icon_bbox": [
+        972,
+        229,
+        1090,
+        349
+      ],
+      "quantity_board_bbox": [
+        1011,
+        226,
+        1091,
+        258
+      ],
+      "quantity_text_ink_bbox": [
+        1023,
+        236,
+        1079,
+        249
+      ],
+      "name_region_bbox": [
+        967,
+        352,
+        1097,
+        387
+      ],
+      "name_ink_bbox": [
+        993,
+        359,
+        1068,
+        377
+      ],
+      "unit_union_bbox": [
+        967,
+        226,
+        1097,
+        387
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_06",
+      "row": 1,
+      "column": 6,
+      "name": "阴暗附着",
+      "quantity_text": "13/330",
+      "icon_bbox": [
+        1110,
+        229,
+        1229,
+        349
+      ],
+      "quantity_board_bbox": [
+        1149,
+        226,
+        1230,
+        258
+      ],
+      "quantity_text_ink_bbox": [
+        1161,
+        235,
+        1217,
+        250
+      ],
+      "name_region_bbox": [
+        1105,
+        352,
+        1236,
+        387
+      ],
+      "name_ink_bbox": [
+        1132,
+        359,
+        1206,
+        377
+      ],
+      "unit_union_bbox": [
+        1105,
+        226,
+        1236,
+        387
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_07",
+      "row": 1,
+      "column": 7,
+      "name": "阴影碎布",
+      "quantity_text": "15/330",
+      "icon_bbox": [
+        1250,
+        229,
+        1367,
+        349
+      ],
+      "quantity_board_bbox": [
+        1288,
+        226,
+        1368,
+        258
+      ],
+      "quantity_text_ink_bbox": [
+        1300,
+        236,
+        1356,
+        250
+      ],
+      "name_region_bbox": [
+        1245,
+        352,
+        1374,
+        387
+      ],
+      "name_ink_bbox": [
+        1271,
+        360,
+        1346,
+        377
+      ],
+      "unit_union_bbox": [
+        1245,
+        226,
+        1374,
+        387
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_08",
+      "row": 1,
+      "column": 8,
+      "name": "空明碎甲",
+      "quantity_text": "13",
+      "icon_bbox": [
+        1388,
+        229,
+        1507,
+        349
+      ],
+      "quantity_board_bbox": [
+        1461,
+        226,
+        1508,
+        258
+      ],
+      "quantity_text_ink_bbox": [
+        1476,
+        236,
+        1492,
+        248
+      ],
+      "name_region_bbox": [
+        1383,
+        352,
+        1514,
+        387
+      ],
+      "name_ink_bbox": [
+        1410,
+        360,
+        1484,
+        377
+      ],
+      "unit_union_bbox": [
+        1383,
+        226,
+        1514,
+        387
+      ],
+      "notes": [
+        "母图只显示当前数量；未出现上限，不补写分母。"
+      ]
+    },
+    {
+      "id": "virtual_09",
+      "row": 2,
+      "column": 1,
+      "name": "虚空护罩",
+      "quantity_text": "—/330",
+      "icon_bbox": [
+        420,
+        420,
+        537,
+        542
+      ],
+      "quantity_board_bbox": [
+        464,
+        418,
+        538,
+        449
+      ],
+      "quantity_text_ink_bbox": [
+        475,
+        426,
+        527,
+        440
+      ],
+      "name_region_bbox": [
+        415,
+        545,
+        544,
+        580
+      ],
+      "name_ink_bbox": [
+        439,
+        554,
+        515,
+        572
+      ],
+      "unit_union_bbox": [
+        415,
+        418,
+        544,
+        580
+      ],
+      "notes": [
+        "分子—是明确待核对占位，不代表0。"
+      ]
+    },
+    {
+      "id": "virtual_10",
+      "row": 2,
+      "column": 2,
+      "name": "大魔之锤",
+      "quantity_text": "16/310",
+      "icon_bbox": [
+        558,
+        420,
+        675,
+        542
+      ],
+      "quantity_board_bbox": [
+        596,
+        418,
+        676,
+        449
+      ],
+      "quantity_text_ink_bbox": [
+        596,
+        427,
+        664,
+        449
+      ],
+      "name_region_bbox": [
+        553,
+        545,
+        682,
+        580
+      ],
+      "name_ink_bbox": [
+        578,
+        554,
+        653,
+        572
+      ],
+      "unit_union_bbox": [
+        553,
+        418,
+        682,
+        580
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_11",
+      "row": 2,
+      "column": 3,
+      "name": "虚无之盾",
+      "quantity_text": "16/330",
+      "icon_bbox": [
+        695,
+        420,
+        814,
+        542
+      ],
+      "quantity_board_bbox": [
+        734,
+        418,
+        815,
+        449
+      ],
+      "quantity_text_ink_bbox": [
+        746,
+        427,
+        803,
+        449
+      ],
+      "name_region_bbox": [
+        690,
+        545,
+        821,
+        580
+      ],
+      "name_ink_bbox": [
+        715,
+        554,
+        791,
+        572
+      ],
+      "unit_union_bbox": [
+        690,
+        418,
+        821,
+        580
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_12",
+      "row": 2,
+      "column": 4,
+      "name": "坚韧甲壳",
+      "quantity_text": "14/340",
+      "icon_bbox": [
+        834,
+        420,
+        952,
+        542
+      ],
+      "quantity_board_bbox": [
+        873,
+        418,
+        953,
+        449
+      ],
+      "quantity_text_ink_bbox": [
+        883,
+        427,
+        941,
+        449
+      ],
+      "name_region_bbox": [
+        829,
+        545,
+        959,
+        580
+      ],
+      "name_ink_bbox": [
+        854,
+        554,
+        930,
+        572
+      ],
+      "unit_union_bbox": [
+        829,
+        418,
+        959,
+        580
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_13",
+      "row": 2,
+      "column": 5,
+      "name": "动力齿轮",
+      "quantity_text": "15/340",
+      "icon_bbox": [
+        972,
+        420,
+        1090,
+        542
+      ],
+      "quantity_board_bbox": [
+        1011,
+        418,
+        1091,
+        449
+      ],
+      "quantity_text_ink_bbox": [
+        1023,
+        427,
+        1079,
+        449
+      ],
+      "name_region_bbox": [
+        967,
+        545,
+        1097,
+        580
+      ],
+      "name_ink_bbox": [
+        993,
+        554,
+        1068,
+        572
+      ],
+      "unit_union_bbox": [
+        967,
+        418,
+        1097,
+        580
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_14",
+      "row": 2,
+      "column": 6,
+      "name": "无形之斧",
+      "quantity_text": "14/305",
+      "icon_bbox": [
+        1110,
+        420,
+        1229,
+        542
+      ],
+      "quantity_board_bbox": [
+        1149,
+        418,
+        1230,
+        449
+      ],
+      "quantity_text_ink_bbox": [
+        1161,
+        426,
+        1217,
+        449
+      ],
+      "name_region_bbox": [
+        1105,
+        545,
+        1236,
+        580
+      ],
+      "name_ink_bbox": [
+        1131,
+        554,
+        1206,
+        572
+      ],
+      "unit_union_bbox": [
+        1105,
+        418,
+        1236,
+        580
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_15",
+      "row": 2,
+      "column": 7,
+      "name": "弦类道具",
+      "quantity_text": "12/170",
+      "icon_bbox": [
+        1250,
+        420,
+        1367,
+        542
+      ],
+      "quantity_board_bbox": [
+        1288,
+        418,
+        1368,
+        449
+      ],
+      "quantity_text_ink_bbox": [
+        1300,
+        427,
+        1356,
+        441
+      ],
+      "name_region_bbox": [
+        1245,
+        545,
+        1374,
+        580
+      ],
+      "name_ink_bbox": [
+        1270,
+        554,
+        1346,
+        571
+      ],
+      "unit_union_bbox": [
+        1245,
+        418,
+        1374,
+        580
+      ],
+      "notes": [
+        "当前母图使用泛称占位；原游戏准确名称尚待配置，不得硬编。"
+      ]
+    },
+    {
+      "id": "virtual_16",
+      "row": 2,
+      "column": 8,
+      "name": "能类道具",
+      "quantity_text": "12",
+      "icon_bbox": [
+        1388,
+        420,
+        1507,
+        542
+      ],
+      "quantity_board_bbox": [
+        1461,
+        418,
+        1508,
+        449
+      ],
+      "quantity_text_ink_bbox": [
+        1471,
+        427,
+        1492,
+        448
+      ],
+      "name_region_bbox": [
+        1383,
+        545,
+        1514,
+        580
+      ],
+      "name_ink_bbox": [
+        1410,
+        554,
+        1485,
+        572
+      ],
+      "unit_union_bbox": [
+        1383,
+        418,
+        1514,
+        580
+      ],
+      "notes": [
+        "当前母图使用泛称占位；原游戏准确名称尚待配置，不得硬编。",
+        "母图只显示当前数量；未出现上限，不补写分母。"
+      ]
+    },
+    {
+      "id": "virtual_17",
+      "row": 3,
+      "column": 1,
+      "name": "相位之力",
+      "quantity_text": "—/130",
+      "icon_bbox": [
+        420,
+        613,
+        537,
+        735
+      ],
+      "quantity_board_bbox": [
+        464,
+        612,
+        538,
+        642
+      ],
+      "quantity_text_ink_bbox": [
+        475,
+        621,
+        526,
+        634
+      ],
+      "name_region_bbox": [
+        415,
+        739,
+        544,
+        774
+      ],
+      "name_ink_bbox": [
+        439,
+        746,
+        515,
+        764
+      ],
+      "unit_union_bbox": [
+        415,
+        612,
+        544,
+        774
+      ],
+      "notes": [
+        "分子—是明确待核对占位，不代表0。"
+      ]
+    },
+    {
+      "id": "virtual_18",
+      "row": 3,
+      "column": 2,
+      "name": "虚空炼金",
+      "quantity_text": "12/290",
+      "icon_bbox": [
+        558,
+        613,
+        675,
+        735
+      ],
+      "quantity_board_bbox": [
+        596,
+        612,
+        676,
+        642
+      ],
+      "quantity_text_ink_bbox": [
+        608,
+        621,
+        664,
+        634
+      ],
+      "name_region_bbox": [
+        553,
+        739,
+        682,
+        774
+      ],
+      "name_ink_bbox": [
+        578,
+        746,
+        654,
+        764
+      ],
+      "unit_union_bbox": [
+        553,
+        612,
+        682,
+        774
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_19",
+      "row": 3,
+      "column": 3,
+      "name": "腐蚀魔能",
+      "quantity_text": "15/215",
+      "icon_bbox": [
+        695,
+        613,
+        814,
+        735
+      ],
+      "quantity_board_bbox": [
+        734,
+        612,
+        815,
+        642
+      ],
+      "quantity_text_ink_bbox": [
+        746,
+        621,
+        802,
+        634
+      ],
+      "name_region_bbox": [
+        690,
+        739,
+        821,
+        774
+      ],
+      "name_ink_bbox": [
+        716,
+        746,
+        792,
+        764
+      ],
+      "unit_union_bbox": [
+        690,
+        612,
+        821,
+        774
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_20",
+      "row": 3,
+      "column": 4,
+      "name": "膨胀药剂",
+      "quantity_text": "12/350",
+      "icon_bbox": [
+        834,
+        613,
+        952,
+        735
+      ],
+      "quantity_board_bbox": [
+        873,
+        612,
+        953,
+        642
+      ],
+      "quantity_text_ink_bbox": [
+        884,
+        621,
+        941,
+        642
+      ],
+      "name_region_bbox": [
+        829,
+        739,
+        959,
+        774
+      ],
+      "name_ink_bbox": [
+        854,
+        746,
+        930,
+        764
+      ],
+      "unit_union_bbox": [
+        829,
+        612,
+        959,
+        774
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_21",
+      "row": 3,
+      "column": 5,
+      "name": "梦魇狂躁",
+      "quantity_text": "12/320",
+      "icon_bbox": [
+        972,
+        613,
+        1090,
+        735
+      ],
+      "quantity_board_bbox": [
+        1011,
+        612,
+        1091,
+        642
+      ],
+      "quantity_text_ink_bbox": [
+        1023,
+        621,
+        1079,
+        634
+      ],
+      "name_region_bbox": [
+        967,
+        739,
+        1097,
+        774
+      ],
+      "name_ink_bbox": [
+        993,
+        746,
+        1068,
+        764
+      ],
+      "unit_union_bbox": [
+        967,
+        612,
+        1097,
+        774
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_22",
+      "row": 3,
+      "column": 6,
+      "name": "虚无之终",
+      "quantity_text": "14/320",
+      "icon_bbox": [
+        1110,
+        613,
+        1229,
+        735
+      ],
+      "quantity_board_bbox": [
+        1149,
+        612,
+        1230,
+        642
+      ],
+      "quantity_text_ink_bbox": [
+        1161,
+        620,
+        1218,
+        642
+      ],
+      "name_region_bbox": [
+        1105,
+        739,
+        1236,
+        774
+      ],
+      "name_ink_bbox": [
+        1131,
+        746,
+        1207,
+        764
+      ],
+      "unit_union_bbox": [
+        1105,
+        612,
+        1236,
+        774
+      ],
+      "notes": []
+    },
+    {
+      "id": "virtual_23",
+      "row": 3,
+      "column": 7,
+      "name": "虚无之眠",
+      "quantity_text": "15/320",
+      "icon_bbox": [
+        1250,
+        613,
+        1367,
+        735
+      ],
+      "quantity_board_bbox": [
+        1288,
+        612,
+        1368,
+        642
+      ],
+      "quantity_text_ink_bbox": [
+        1300,
+        621,
+        1356,
+        635
+      ],
+      "name_region_bbox": [
+        1245,
+        739,
+        1374,
+        774
+      ],
+      "name_ink_bbox": [
+        1270,
+        746,
+        1346,
+        764
+      ],
+      "unit_union_bbox": [
+        1245,
+        612,
+        1374,
+        774
+      ],
+      "notes": []
+    }
+  ]
+}

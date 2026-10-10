@@ -24,12 +24,17 @@ function M.has(save,key) return M.count(save,key)>0 end
 function M.owned(player_id,key)
     player_id=tonumber(player_id)
     if not player_id then return false end
+    local profiles=require('systems/player_profile_service')
+    if type(profiles.get_content_inventory_count)=='function' then
+        return (profiles.get_content_inventory_count(player_id,ids[key] or key) or 0)>0
+    end
+    -- Compatibility with independent layouts/tests that supply the old service.
     local now=GameRules and GameRules.GetGameTime and GameRules:GetGameTime()
     local cached=now and frame_profiles[player_id]
     local profile
     if cached and cached.time==now then profile=cached.profile
     else
-        profile=require('systems/player_profile_service').get_profile(player_id)
+        profile=profiles.get_profile(player_id)
         if now then frame_profiles[player_id]={time=now,profile=profile} end
     end
     return profile and M.has(profile.save,key) or false

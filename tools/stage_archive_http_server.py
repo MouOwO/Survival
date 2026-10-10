@@ -37,6 +37,8 @@ if '/v1/lottery/snapshot' not in text:
                     if not getattr(application, "archive", None): raise ApiError("archive_disabled", 503)
                     response = application.archive.lottery_snapshot(payload)
                 elif self.path == "/v1/archive/config":''')
+from patch_endless_batch_handler import patch_handler
+text = patch_handler(text)
 target=root/'server/staged/fishing_api/server.py'
 target.parent.mkdir(parents=True,exist_ok=True)
 target.write_text(text,encoding='utf-8')

@@ -1,6 +1,17 @@
 -- Presentation only: the 25 existing upgrade rows remain the gameplay authority.
 local M = {}
 
+-- Allocation-free rarity lookup for high-frequency beam presentation.
+function M.rarity(building_id, level)
+    if building_id=="ultimate_tower" then return "UR" end
+    level=math.floor(tonumber(level) or 0)
+    if building_id~="arrow_tower" or level<1 or level>25 then return nil end
+    if level<=5 then return "N" end
+    if level<=10 then return "R" end
+    if level<=15 then return "SR" end
+    return "SSR"
+end
+
 function M.project(state)
     if type(state) ~= "table" then return nil end
     local level = math.floor(tonumber(state.absolute_level or state.level) or 0)

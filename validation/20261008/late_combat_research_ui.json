@@ -1,0 +1,139 @@
+{
+  "created_at": "2026-10-08T11:48:18.916Z",
+  "status": "source_fixes_compiled_offline_verified_native_ui_and_highest_density_pending",
+  "requirements": [
+    "stable prerequisite shading",
+    "resources checked before placement/manual research",
+    "completed research removed or successor shown",
+    "no hidden completed tooltip hit area",
+    "wood and optional gold icons/counts"
+  ],
+  "offline": {
+    "passed": 47,
+    "total": 47,
+    "results": "output/late_combat_20261008/regression_final/results.json",
+    "syntax_checked_lua": 26,
+    "extra_ability_button_states": "passed",
+    "broader_known_failures": [
+      {
+        "test": "test_combat_selection_recovery.cjs",
+        "line": 178,
+        "note": "Same failure at line 334 invoking assertKeys on pre-round combat_stats.content.js from ui_build_20261008_191604."
+      },
+      {
+        "test": "test_combat_stats_callbacks.cjs",
+        "line": 201,
+        "note": "Same unsupported portrait snapshot assertion on pre-round content copy; not caused by completed-entry changes."
+      }
+    ]
+  },
+  "ui_build": "output/late_combat_20261008/ui_build_20261008_194440",
+  "ui": [
+    {
+      "name": "combat_stats",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\combat_stats.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\combat_stats.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\combat_stats.vjs_c",
+      "source_sha256": "02640d3052a1143e9a094a9167e8fc7fda84c57538d3d4df86adf623eb6d1886",
+      "artifact_sha256": "50a0d0ddae4a159789e4ac3755d65559789430ff748bc4aa206ab981d1b03480"
+    },
+    {
+      "name": "ability_tooltip",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\ability_tooltip.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\ability_tooltip.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\ability_tooltip.vjs_c",
+      "source_sha256": "ee85b42ca026a5ba1d1c2f461c637c445c4b72098bdff5ddc4ba13f63d651566",
+      "artifact_sha256": "563c1ef844b9cb6e13f8566f6172091715779f95ba3bddf7661bfb4df21b7e15"
+    },
+    {
+      "name": "ui_snapshot_cache",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\ui_snapshot_cache.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\ui_snapshot_cache.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\ui_snapshot_cache.vjs_c",
+      "source_sha256": "8a2bee66b8276d9e45269818fa540655d2146c77672889b690a8ca4bff08e05e",
+      "artifact_sha256": "83439bc1c5cabc4b3d9785e4b91382f546ec4cf402c51a96454968c00a487a43"
+    },
+    {
+      "name": "survival_ui",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\survival_ui.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\survival_ui.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\survival_ui.vjs_c",
+      "source_sha256": "41f0bbb3f2c00150f148a9f28bae5fb3aa6922088eba583e4929d4217bd78b4d",
+      "artifact_sha256": "8398c1e87339dbd5b7b87fd15b2361b91e751a8e5f6993494f7029bea3f37c59"
+    },
+    {
+      "name": "production_progress",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\production_progress.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\production_progress.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\production_progress.vjs_c",
+      "source_sha256": "7a11ac0810addbe8c5bd0c67db94f6b67707e5cee7e4647f4ee291eddf150ef1",
+      "artifact_sha256": "86f8675813ff6fb5fb7bd20c12ccb3e70535ffc0220b6ac5fee2c53d93531422"
+    },
+    {
+      "name": "survival_grid_placement",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\survival_grid_placement.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\survival_grid_placement.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\survival_grid_placement.vjs_c",
+      "source_sha256": "739c22ee9fc7c13fb822ad528f2625bec01918e7504f591b55e1a7381ae9dfa9",
+      "artifact_sha256": "09b46b384272d5d9f3cd54c3523dfe4b0ff2bc2d2f93582e8116fe3048159c03"
+    },
+    {
+      "name": "world_overlay_visibility",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\world_overlay_visibility.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\world_overlay_visibility.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\world_overlay_visibility.vjs_c",
+      "source_sha256": "248e5761d44badd23232dc2753903f128a99ac6e7cf13316448c695d78826bb7",
+      "artifact_sha256": "023577e3e161b74fe3168598d9d44eda37414a07a9d9c01024fe4bdc648c652b"
+    },
+    {
+      "name": "hero_world_health_bar",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\hero_world_health_bar.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\hero_world_health_bar.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\hero_world_health_bar.vjs_c",
+      "source_sha256": "2454a29f4a214ca835f954678989d0246d87e8593eebe9db732fce4716e7958a",
+      "artifact_sha256": "dd7d4c3275367eb5acce7a669cd11936a25ce10917cf00f019c5150bf1a30c62"
+    },
+    {
+      "name": "tower_rank_ui",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\tower_rank_ui.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\tower_rank_ui.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\tower_rank_ui.vjs_c",
+      "source_sha256": "e49c8356c44e5d56f47cde600acc025f7ae120c17eeb5942c57639195f74623a",
+      "artifact_sha256": "bfa67e3e22bc2ad0dec72f891db0de3403e8178f64ee0dda87fd18e5a1e1b93c"
+    },
+    {
+      "name": "topnav_remaining_5d5c1152eb",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\topnav_remaining_5d5c1152eb.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\topnav_remaining_5d5c1152eb.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\topnav_remaining_5d5c1152eb.vjs_c",
+      "source_sha256": "d6cca5d22ff458f8702163a213bda02059eec37c285435257b5495abfd6be8cf",
+      "artifact_sha256": "73b72036af7aaabe389a4f39562633d78b1904f40cd13c8d55bc4adb2296cf40"
+    },
+    {
+      "name": "handoff_hud",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\handoff_hud.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\handoff_hud.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\handoff_hud.vjs_c",
+      "source_sha256": "b49f15f40675bf41f535cddebf2acd236e38da9008807ab07175010e9f2141d5",
+      "artifact_sha256": "4ea10134631e77fb60487e1440b15e2f6283c0f92026db84fedfd0d7af034285"
+    }
+  ],
+  "checkpoint": "output/late_combat_20261008/checkpoint_20261008_1948",
+  "game_evidence": {
+    "image": "output/map_build_c6/late_observer_attacks32.png",
+    "density": "32 towers / 96 enemies / full effects / private Tools",
+    "cl240_fps": 37.2,
+    "vprof_fps": 36.84,
+    "paired_before_after": false,
+    "highest_density_no_stutter_verified": false
+  },
+  "pending": [
+    "Research panel live screenshot, hover, costs, completion/successor and affordability rejection",
+    "Visible 64/96 tower high-density and long-run capture after shared test window is available"
+  ],
+  "git": {
+    "action": "No commit/push requested or performed",
+    "external_synced_head": "93fa5f1f",
+    "user_existing_changes_preserved": true
+  }
+}

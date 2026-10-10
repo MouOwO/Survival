@@ -419,7 +419,11 @@ end
 
 local function apply_clone_no_collision(clone)
     if clone and clone.SetHullRadius then
-        clone:SetHullRadius(0)
+        local radius = clone.GetHullRadius and clone:GetHullRadius()
+        if radius ~= 0 and (radius ~= nil or not clone.survival_monkey_hull_zero) then
+            clone:SetHullRadius(0)
+            clone.survival_monkey_hull_zero = true
+        end
     end
 end
 
@@ -438,6 +442,12 @@ local function sync_clone(current, hero, snapshot)
     if state_by_player[current.player_id] ~= current or current.clone ~= clone
         or not alive(clone) or not alive(hero) then return end
     if stats.entindex ~= nil and tonumber(stats.entindex) ~= tonumber(hero:entindex()) then return end
+    local applied = current.clone_native_values
+    if not applied or applied.unit ~= clone then
+        applied = {unit = clone}
+        current.clone_native_values = applied
+    end
+    local native_changed = false
     local previous_max = math.max(1, tonumber(clone:GetMaxHealth()) or 1)
     local health_pct = math.max(0, tonumber(clone:GetHealth()) or 0) / previous_max
     local maximum = math.max(1, tonumber(stats.max_health) or 1)
@@ -448,29 +458,50 @@ local function sync_clone(current, hero, snapshot)
         and tonumber(health_modifier:GetStackCount()) or 0
     local native_maximum = math.max(1, previous_max - old_health_bonus)
     local health_bonus = math.max(0, math.floor(maximum - native_maximum))
-    health_modifier = require("systems/hero_base_health_service").apply(clone, health_bonus)
-    if clone.CalculateStatBonus then clone:CalculateStatBonus(true) end
-    local projected_maximum = math.max(1, tonumber(clone:GetMaxHealth()) or maximum)
-    clone:SetHealth(math.max(1, math.min(
-        projected_maximum, projected_maximum * health_pct
-    )))
-    clone:SetBaseDamageMin(math.max(0,
-        tonumber(stats.engine_attack_min) or tonumber(stats.attack_min) or 0))
-    clone:SetBaseDamageMax(math.max(0,
-        tonumber(stats.engine_attack_max) or tonumber(stats.attack_max) or 0))
+    if not health_modifier or old_health_bonus ~= health_bonus then
+        health_modifier = require("systems/hero_base_health_service").apply(clone, health_bonus)
+        native_changed = health_modifier ~= nil
+    end
+    local equipment_attack = tonumber(stats.engine_equipment_attack_bonus) or 0
+    local critical_damage_pct = math.max(100,
+        tonumber(stats.critical_damage_pct) or 200)
+        + math.max(0, tonumber(runtime().w_clone_critical_damage_bonus_pct) or 0)
+    local minimum, maximum = require("combat/endless_stat_projection").prepare_attack(
+        clone,
+        (tonumber(stats.engine_attack_min) or tonumber(stats.attack_min) or 0)
+            + equipment_attack,
+        (tonumber(stats.engine_attack_max) or tonumber(stats.attack_max) or 0)
+            + equipment_attack,
+        critical_damage_pct / 100
+    )
+    minimum, maximum = math.floor(minimum), math.floor(maximum)
+    local actual_minimum = clone.GetBaseDamageMin and clone:GetBaseDamageMin() or applied.minimum
+    local actual_maximum = clone.GetBaseDamageMax and clone:GetBaseDamageMax() or applied.maximum
+    if actual_minimum ~= minimum then
+        clone:SetBaseDamageMin(minimum)
+        native_changed = true
+    end
+    if actual_maximum ~= maximum then
+        clone:SetBaseDamageMax(maximum)
+        native_changed = true
+    end
+    applied.minimum, applied.maximum = minimum, maximum
     -- The selected-unit HUD already shows inherited attacks/s, but a native
     -- hero clone needs the same fixed attack interval in the actual engine.
-    local attack_speed = summon_attack_rate.apply(clone, hero, stats.attack_speed)
+    local rate_modifier = clone:FindModifierByName("modifier_hero_exclusive_summon_attack_rate")
+    local previous_interval = rate_modifier and rate_modifier.GetModifierFixedAttackRate
+        and rate_modifier:GetModifierFixedAttackRate() or clone.survival_summon_attack_interval
+    local attack_speed, attack_interval = summon_attack_rate.apply(clone, hero, stats.attack_speed)
+    if attack_interval and (not rate_modifier or previous_interval ~= attack_interval) then
+        native_changed = true
+    end
     clone.survival_strength = tonumber(stats.strength) or 0
     clone.survival_agility = tonumber(stats.agility) or 0
     clone.survival_intellect = tonumber(stats.intellect) or 0
     clone.survival_combat_refresh_version = tonumber(stats.refresh_version) or 0
     clone.survival_critical_chance_pct = math.max(0,
         tonumber(stats.critical_chance_pct) or 0)
-    clone.survival_critical_damage_pct = math.max(100,
-        tonumber(stats.critical_damage_pct) or 200)
-        + math.max(0,
-            tonumber(runtime().w_clone_critical_damage_bonus_pct) or 0)
+    clone.survival_critical_damage_pct = critical_damage_pct
     local clone_modifier = clone:FindModifierByName("modifier_monkey_king_clone")
     if clone_modifier and clone_modifier.SetCombatSnapshot then
         local clone_stats = {}
@@ -480,7 +511,16 @@ local function sync_clone(current, hero, snapshot)
         clone_stats.critical_damage_pct = clone.survival_critical_damage_pct
         clone_modifier:SetCombatSnapshot(clone_stats)
     end
-    if clone.CalculateStatBonus then clone:CalculateStatBonus(true) end
+    -- Growth is applied in this call; stable lifecycle polling does not dirty
+    -- native stats. One recalculation sees all health, attack and rate changes.
+    if native_changed then
+        if clone.CalculateStatBonus then clone:CalculateStatBonus(true) end
+        local projected_maximum = math.max(1, tonumber(clone:GetMaxHealth()) or previous_max)
+        local projected_health = math.max(1, math.min(
+            projected_maximum, projected_maximum * health_pct
+        ))
+        if tonumber(clone:GetHealth()) ~= projected_health then clone:SetHealth(projected_health) end
+    end
 end
 
 local function create_clone(player_id)
@@ -515,11 +555,14 @@ local function create_clone(player_id)
         player_id = player_id,
     })
     current.clone = clone
-    current.owned_clones[clone] = true
+    current.owned_clones[clone] = clone:entindex()
     current.clone_respawning = false
     sync_clone(current, hero)
     sync_clone_appearance(current)
     FindClearSpaceForUnit(clone, clone:GetAbsOrigin(), true)
+    event_bus.emit(events.HERO_CLONE_CREATED, {
+        unit = clone, player_id = player_id, team = clone:GetTeamNumber(),
+    })
     return clone
 end
 
@@ -597,14 +640,20 @@ local function on_entity_killed(payload)
     if player_id == nil then return end
     local current = state_by_player[player_id]
     if not current or current.clone ~= victim then return end
+    event_bus.emit(events.HERO_CLONE_REMOVED, {
+        unit = victim, entindex = victim:entindex(), player_id = player_id,
+    })
     current.clone = nil
     if skill_active(player_id, W_SKILL) then schedule_clone_respawn(player_id) end
 end
 
 local function sync_all_clones()
     for player_id, current in pairs(state_by_player) do
-        for clone in pairs(current.owned_clones) do
+        for clone, entindex in pairs(current.owned_clones) do
             if not valid(clone) then
+                event_bus.emit(events.HERO_CLONE_REMOVED, {
+                    unit = clone, entindex = entindex, player_id = player_id,
+                })
                 hero_cosmetic_service.clear(clone)
                 current.owned_clones[clone] = nil
             end
@@ -653,7 +702,10 @@ local function on_hero_removed(payload)
     scheduler.cancel("monkey_clone_respawn:" .. tostring(player_id))
     clear_q_impacts(player_id)
     q_health_hits_by_player[player_id] = nil
-    for clone in pairs(current and current.owned_clones or {}) do
+    for clone, entindex in pairs(current and current.owned_clones or {}) do
+        event_bus.emit(events.HERO_CLONE_REMOVED, {
+            unit = clone, entindex = entindex, player_id = player_id,
+        })
         if valid(clone) then
             clone.survival_monkey_king_clone = nil
             if clone.AddNoDraw then clone:AddNoDraw() end

@@ -54,7 +54,8 @@ for(const theme of ['ice_portal','amber_portal']) {
             // Legacy behavior omits the serialized false default; require the
             // explicit source setting and reject any compiled global override.
             assert(fs.readFileSync(source,'utf8').includes('m_bGlobalCenter = false')
-                && !text.includes('m_bGlobalCenter = true')&&text.includes('m_flOutput0 = 1.0'),
+                && !text.includes('m_bGlobalCenter = true')&&text.includes('m_flOutput0 = 0.75')
+                && text.includes('m_flInput1 = 120.0')&&text.includes('m_flOutput1 = 120.0'),
                 'Constraint follows the tower and survives late client CPs');
         }
         if(row.native.endsWith('_ring_swirl.vpcf')) {

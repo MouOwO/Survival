@@ -1,0 +1,32 @@
+{
+  "format": 1,
+  "date": "2026-10-09",
+  "status": "OFFLINE_REGRESSIONS_PASS_NATIVE_UNAVAILABLE",
+  "causes": [
+    "Automatic and standby repair started only at health <= 98%, rather than below 99%.",
+    "An automatic target healed by another worker or regeneration could remain pinned and block selection of damaged buildings."
+  ],
+  "behavior": {
+    "start_below_health_ratio": 0.99,
+    "finish_at_full_health": true,
+    "idle_interval_seconds": 1,
+    "active_interval_seconds": 0.1,
+    "damage_wakeup": "Existing wall damage callback, coalesced by team and owner once per second.",
+    "candidate_source": "Lifecycle-maintained formal building registry, own player and ownerless allies.",
+    "new_global_damage_listeners": 0,
+    "new_scheduler_tasks": 0,
+    "preserves_player_orders": true,
+    "cancel_obsolete_automatic_approach": true
+  },
+  "checks": {
+    "tools/test_repair_idle_recovery.lua": {"passed": true, "assertions": 167},
+    "scripts/vscripts/tests/test_wall_repair_detection.lua": {"passed": true},
+    "scripts/vscripts/tests/test_repair_order_lifecycle.lua": {"passed": true},
+    "scripts/vscripts/tests/test_repair_registry_candidates.lua": {"passed": true},
+    "four_player_idle_simulation": {"workers": 32, "seconds": 10, "maximum_decisions": 320, "maximum_candidate_queries": 320, "shared_registry_seeds": 1},
+    "create_destroy_cycles": {"cycles": 1000, "remaining_wakeup_entries": 0},
+    "syntax": "Lua 5.1 compiler passed",
+    "broader_visual_feedback": {"repair_sections_passed": true, "preexisting_failure": "Monster activity assertion at test_visual_feedback_repairs.lua:99 also fails with the before-change repair modules."}
+  },
+  "native": {"verified": false, "reason": "127.0.0.1:29000 ECONNREFUSED"}
+}

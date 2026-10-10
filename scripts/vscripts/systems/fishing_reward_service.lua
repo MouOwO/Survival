@@ -54,6 +54,9 @@ local function announce_grant(payload)
     if not definition or player_id == nil or amount == nil then return end
     event_bus.emit(events.UI_NOTIFICATION, {
         audience = "all",
+        player_id = player_id,
+        kind = "fishing_reward",
+        actor_name = player_name(player_id),
         message = player_name(player_id) .. " 钓到了："
             .. tostring(definition.display_name) .. "（"
             .. amount_text(amount) .. "）",

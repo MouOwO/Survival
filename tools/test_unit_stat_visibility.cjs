@@ -19,7 +19,9 @@ assert.equal(env.statVisibility(-1).combat,false);
 const stats=[['attack','a'],['armor','b'],['attack_speed','c'],['strength','d'],['agility','e'],['intelligence','f']],nodes={};
 for(const a of stats)for(const prefix of ['HandoffStatIcon_','HandoffStatName_','HandoffStat_','HandoffStatBonus_','HandoffStatPercent_'])nodes[prefix+a[0]]={style:{}};
 let multi=false;
-Object.assign(env,{buildingPresentation(){},stats,nodes,cfg:{SurvivalMultiSelectionPortraits:{IsActive:()=>multi}},ctx:{FindChildTraverse:()=>null},root:{FindChildTraverse:()=>null},valid:p=>!!p,selectedUnit:()=>selected,text(){},topButtons:{},available:()=>false,style:(p,v)=>{if(p)Object.assign(p.style,v);}});
+Object.assign(env,{generation:1,buildingPresentation(){},stats,nodes,cfg:{SurvivalMultiSelectionPortraits:{IsActive:()=>multi}},ctx:{FindChildTraverse:()=>null},root:{FindChildTraverse:()=>null},valid:p=>!!p,selectedUnit:()=>selected,text(){},topButtons:{vip:{style:{}}},available:()=>false,syncActiveNav(){},style:(p,v)=>{if(p)Object.assign(p.style,v);}});
+nodes.HandoffNavIcon_vip={SetImage(){}};
+vm.runInContext(source.slice(source.indexOf('    function findCached('),source.indexOf('    function style(')),env);
 vm.runInContext(source.slice(source.indexOf('    function mirror()'),source.indexOf('    function compact(')),env);
 for(const [n,isHero,expected] of [['npc_dota_hero_doom_bringer',true,[true,true]],['building_farm',false,[false,false]],['npc_survival_named_ten_sin_10',true,[true,false]],['npc_survival_super_lumberjack_04',false,[true,false]],['npc_survival_repairer',false,[false,false]],['npc_dota_hero_axe',true,[true,true]]]){
  name=n;hero=isHero;env.mirror();stats.forEach((a,i)=>{for(const prefix of ['HandoffStatIcon_','HandoffStatName_','HandoffStat_'])assert.equal(nodes[prefix+a[0]].style.visibility,prefix==='HandoffStatIcon_'?'collapse':(expected[i<3?0:1] && !(n.includes('lumberjack') && i===1))?'visible':'collapse',n+' '+prefix+a[0]);});

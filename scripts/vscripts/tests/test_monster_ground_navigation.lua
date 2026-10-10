@@ -11,6 +11,7 @@ local hull = require("systems/monster_hull_scale")
 local events = require("core/events")
 local no_op = function() end
 local created, emitted, next_index = {}, {}, 0
+local appearance_options_by_unit = {}
 local marker = {
     IsNull = function() return false end,
     GetAbsOrigin = function() return { x = 64, y = 128, z = 32 } end,
@@ -107,6 +108,7 @@ local deps = {
     ["core/scheduler"] = { cancel = no_op },
     ["systems/player_context_service"] = { is_defeated = function() return false end },
     ["systems/monster_navigation_policy"] = navigation,
+    ["systems/wave_native_attack_cap"] = require("systems/wave_native_attack_cap"),
     ["systems/monster_hull_scale"] = hull,
     ["systems/wave_monster_collision"] = collision,
     ["systems/wave_spawn_sequence"] = require("systems/wave_spawn_sequence"),
@@ -124,8 +126,10 @@ local deps = {
     ["config/difficulty_config"] = require("config/difficulty_config"),
     ["core/team_alignment"] = { enforce = no_op },
     ["systems/monster_corpse_lifecycle_service"] = { track = no_op },
-    ["systems/monster_hero_visual_service"] = { apply = function(_,_,options)
-        assert(options.fresh_unit == true,"new wave and challenge units must use bounded outfit attachment")
+    ["systems/monster_hero_visual_service"] = { apply = function(unit,_,options)
+        -- The production callers use pcall. Record the call and assert below,
+        -- outside that protected boundary, so a missing option cannot pass.
+        appearance_options_by_unit[unit] = options
     end },
     ["systems/challenge_monster_visual_service"] = { apply = no_op },
     ["systems/challenge_session_service"] = { handles = function() return false end },
@@ -360,6 +364,11 @@ for index, kind in ipairs({ "ground", "flying" }) do
 end
 
 assert(#created == 13 + configured_spawn_count, "all production spawn paths must be exercised")
+for _, unit in ipairs(created) do
+    local options = appearance_options_by_unit[unit]
+    assert(options and options.fresh_unit == true,
+        "every newly created wave/challenge/encounter NPC must use bounded outfit attachment")
+end
 print(string.format("MONSTER_GROUND_NAVIGATION_PASS: 13 policy scenarios + %d actual wave batches"
     .. " (normal=%d, wave_leader=%d, assault_boss=%d, flying=%d, visual_swaps=%d);"
     .. " shared radius32 after model swaps; challenge/practice policies preserved",

@@ -1,0 +1,28 @@
+{
+  "source_size": [
+    1672,
+    941
+  ],
+  "unique_item_icons": 23,
+  "grid": [
+    8,
+    8,
+    7
+  ],
+  "exact_reference_changed_pixels": 0,
+  "exact_reference_max_channel_error": 0,
+  "runtime_assets_read_from_disk": true,
+  "background_restore_method": "同源空白区域采样，不重新生成图案",
+  "all_asset_hashes_checked": true,
+  "quantities_with_unknown_current": [
+    "virtual_09",
+    "virtual_17"
+  ],
+  "fonts_license_included": true,
+  "scope": "仅虚空之影",
+  "text_fit_passed": true,
+  "counter_covers_all_23_occlusions": true,
+  "runtime_native_fonts_not_pixel_identical_to_source": true,
+  "quantity_plate_rebuilt_from_source_colors": true,
+  "all_pngs_decodable": true
+}

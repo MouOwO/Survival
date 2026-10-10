@@ -1,0 +1,152 @@
+{
+  "task": "lumberjack_fused_default_skill_visibility",
+  "date": "2026-10-08",
+  "root_cause": "combat_stats.js filtered all lumberjack abilities except the fusion button; the server removes that consumed button and retains the configured personality passive.",
+  "change": "Allow ability_lumberjack_personality_* alongside the ordinary fusion ability. Preserve hidden/internal/talent filtering and native slot order.",
+  "business_changes": false,
+  "baseline_counterexample": "The updated worker visibility regression fails with HEAD combat_stats.js and passes with the corrected source.",
+  "checks": [
+    {
+      "file": "tools/test_worker_ability_visibility.cjs",
+      "result": "pass",
+      "command": "node tools/test_worker_ability_visibility.cjs",
+      "summary": [
+        "PASS worker skill visibility: 11 configured passives across 7 fused tiers, in-place names, hidden/internal filtering, slot order, repairer, hero and building compatibility"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+      "result": "pass",
+      "command": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua",
+      "summary": [
+        "PASS lumberjack training integration: real completion, independent tiers/players, four entrances, capacity, resource/population reservations, cancel/refund, lifecycle and instant reward recruits",
+        "LUMBERJACK_MODEL_ATTACK_PASS: actual LV4 melee model, direct native attacks, configured range400",
+        "SUPER_LUMBERJACK_ATTACK_PASS: fused registration retains direct attacks and configured range",
+        "LUMBERJACK_PERSONAL_GROWTH_PASS: no default growth; 200 hits update only attacker; no shared pool; owner/source validation; fused rate/personality; refresh persistence; new recruits; capped-tree skip",
+        "WORKER_CADENCE_AND_ISOLATION_PASS: normal 1.5s, fusion 1s, no unrelated growth refresh",
+        "FUSION_SPEED_ORDER_PASS: interval reductions before percentage; display 160%, hover 0.625 seconds",
+        "LUMBERJACK_FUSION_PERSONALITY_PASS: all 11 defaults retained, visible/learned, real training+fusion+registry and in-place unit names"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_lumberjack_fusion.lua",
+      "result": "pass",
+      "command": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_lumberjack_fusion.lua",
+      "summary": [
+        "PASS lumberjack fusion: 8 configured tiers, gates, retry/refund, ownership and duplicate prevention",
+        "PASS fusion queue scope: selected materials only, caster required, deduplication, ownership, bounded payload and complete consumed IDs",
+        "FUSION_STATUS_PASS: city upgrade, death, super exclusion and roster restoration invalidate cache"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_lumberjack_fusion_runtime.lua",
+      "result": "pass",
+      "command": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_lumberjack_fusion_runtime.lua",
+      "summary": [
+        "PASS fusion runtime: city/material/resource gates, ownership, death/consumption, coalescing, native activation, passive metadata and generation cleanup"
+      ]
+    },
+    {
+      "file": "scripts/vscripts/tests/test_lumberjack_fusion_ui.lua",
+      "result": "pass",
+      "command": "& 'C:/Program Files/lua/bin/lua5.1.exe' scripts/vscripts/tests/test_lumberjack_fusion_ui.lua",
+      "summary": [
+        "PASS lumberjack fusion UI: 8 abilities direct dispatch, service failure, forged owner, inactive ability",
+        "PASS fusion UI queue metadata and legacy compatibility"
+      ]
+    },
+    {
+      "file": "tools/test_lumberjack_fusion_runtime.lua",
+      "result": "preexisting_failure",
+      "command": "& 'C:/Program Files/lua/bin/lua5.1.exe' tools/test_lumberjack_fusion_runtime.lua",
+      "summary": [
+        "C:\\Program Files\\lua\\bin\\lua5.1.exe: tools/test_lumberjack_fusion_runtime.lua:11: assertion failed!"
+      ]
+    },
+    {
+      "file": "tools/test_lumberjack_fusion_queue.cjs",
+      "result": "pass",
+      "command": "node tools/test_lumberjack_fusion_queue.cjs",
+      "summary": [
+        "PASS sort low to high, one request, success advances and excludes transformed product",
+        "PASS same level is exhausted before the next level",
+        "PASS recipe quantities are configured: LV1 needs five; incomplete levels remain at end",
+        "PASS failed fusion retains group and permits deliberate retry only",
+        "PASS one leftover stays scoped and cannot consume unselected units",
+        "PASS manual selection while awaiting response is respected",
+        "PASS single worker, mixed groups and other players retain normal selection",
+        "PASS super workers are not queued even when their entity name is unchanged",
+        "PASS delayed recipe metadata resumes sorting without guessing quantities",
+        "PASS reload invalidates stale response handlers",
+        "PASS city-gated levels remain grey while a ready lower group can fuse",
+        "PASS unknown metadata on another level does not block a complete known group",
+        "PASS selected count overrides all-owner availability for the grey icon",
+        "PASS native selection sorting cannot loop or change the logical fusion focus",
+        "PASS sparse engine ability slots still enter the scoped queue",
+        "PASS stale portrait of an excluded super worker cannot force an ordinary cast",
+        "PASS ordinary successful fusion response removes product from actual selected group",
+        "PASS successful ack excludes product while native ability removal is delayed",
+        "PASS ordinary late response does not steal a newly selected group",
+        "LUMBERJACK_FUSION_QUEUE_PASS 19 scenarios",
+        "PASS native death selection arrives before IsAlive and ack",
+        "PASS engine cast without custom acknowledgement removes product and stale materials",
+        "PASS deliberately selecting surviving subset while awaiting fusion is retained"
+      ]
+    },
+    {
+      "file": "tools/test_ability_tooltip_recovery.cjs",
+      "result": "pass",
+      "command": "node --test --test-name-pattern='worker|passive' tools/test_ability_tooltip_recovery.cjs",
+      "summary": [
+        "PASS stable four-ability selection stops full recovery and avoids duplicate scans",
+        "PASS HUD panels arriving at 0.35s still recover",
+        "PASS HUD panels arriving at 0.6s still recover",
+        "PASS late native HUD replacement refreshes stable proxy geometry",
+        "PASS same-unit ability replacement updates bindings and restores a real hover",
+        "PASS rapid selection switches cannot bind stale unit data",
+        "PASS duplicate same-unit selection events coalesce",
+        "PASS shutdown cancels pending recovery and prevents future work",
+        "PASS late per-ability runtime arrives without changing the unit slot signature",
+        "PASS diagnostics can be enabled and disabled without a lingering cursor probe",
+        "PASS native unit with no visible abilities settles without creating proxies",
+        "PASS building_city restores tooltip after cached rows are deleted",
+        "PASS building_farm restores tooltip after cached rows are deleted",
+        "PASS building_gold_mine restores tooltip after cached rows are deleted",
+        "PASS building_research_lab restores tooltip after cached rows are deleted",
+        "PASS building_advanced_research_lab restores tooltip after cached rows are deleted",
+        "PASS building_arrow_tower restores tooltip after cached rows are deleted",
+        "PASS building_wall restores tooltip after cached rows are deleted",
+        "PASS building_hero_altar restores tooltip after cached rows are deleted",
+        "PASS npc_survival_builder_proxy restores tooltip after cached rows are deleted",
+        "PASS npc_dota_hero_doom_bringer restores tooltip after cached rows are deleted",
+        "ABILITY_TOOLTIP_RECOVERY_PASS",
+        "PASS worker fusion mouse proxy uses project dispatcher instead of native order",
+        "ℹ tests 1",
+        "ℹ pass 1",
+        "ℹ fail 0"
+      ]
+    }
+  ],
+  "preexisting_failure": {
+    "file": "tools/test_lumberjack_fusion_runtime.lua",
+    "line": 11,
+    "reproduced_with": "HEAD ui/ability_runtime_builder.lua loaded in an isolated Lua process",
+    "reason": "Legacy test invokes the runtime builder without unit/player state; the real-state fusion runtime regression passes.",
+    "changed": false
+  },
+  "compilation": {
+    "result": "OK: 1 compiled, 0 failed, 0 skipped",
+    "source": "panorama/src/scripts/custom_game/combat_stats.js",
+    "game_artifact": "panorama/scripts/custom_game/combat_stats.vjs_c",
+    "compiled_bytes": 141480,
+    "content_source_matches": true,
+    "checkpoint": "output/worker_skill_visibility_20261008/build_20261008_152642",
+    "recovery": "Restore combat_stats.content.before.js to the project content source and combat_stats.before.vjs_c to the game artifact if reverting this display change."
+  },
+  "syntax": {
+    "lua51": true,
+    "javascript": true
+  },
+  "verification_scope": "Offline real-service training/fusion/registration for all 11 configured passives; actual client visibility across LV1-LV7 and retained ordinary entity names; native resource compilation. Game was not running, so no live visual acceptance.",
+  "git_commit_push": "not_requested; current changes retained in worktree"
+}

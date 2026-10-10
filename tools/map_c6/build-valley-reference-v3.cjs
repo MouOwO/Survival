@@ -76,12 +76,8 @@ for(let k=0;k<4;k++){
   const [x,y]=rot((t[3]-672)*fit,1112+(t[7]-672)*fit,k);
   place('spawn_reference_'+k,g,i,[x-1024,y+4096,128+(t[11]-168)*fit],fit,-90*k);
  }
- // A low, broad slab floor inside the three source stone walls; open exit.
- const quads=[];
- const q=(x0,y0,x1,y1,z)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(([x,y])=>{let p=rot(x,y+1112,k);return[p[0]-1024,p[1]+4096,z];});
- for(let y=-230;y<260;y+=35)for(let x=-245;x<245;x+=35)quads.push(q(x,y,x+35,y+35,131));
- let floor=M.mesh(quads,'maps/ti10_assets/blends/mod_radiant_ti10_angled_000.vmat',node++,()=>({blend:[0,.08,.92,.5],tint:[.82,.87,.9,0]}));
- add('spawn_reference_'+k,L.setValue(floor,'physicsType','none'));
+ // The existing continuous stone path is the exit floor. Extra tinted slabs
+ // leave four dark squares when the surrounding spawn decorations are removed.
  for(const side of [-1,1]){
   const [x,y]=rot(side*200,1400,k);
   prop('spawn_reference_'+k,'models/props_debris/candles001.vmdl',[x-1024,y+4096,136],[0,-90*k,0],[.7,.7,.7],[255,255,255],null);

@@ -12,9 +12,9 @@ local research_cost_service = require("research/research_cost_service")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local building_count_limits = require("systems/building_count_limit_service")
+local building_cost_quote = require("systems/building_cost_quote")
 local lumberjack_fusions = require("config/generated/lumberjack_fusion_definitions")
 local hero_summon_projection = require("systems/hero_summon_projection")
-local hero_summon_rules = require("config/generated/hero_summon_rules")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 local lumberjack_fusion = require("systems/lumberjack_fusion_eligibility")
 local M = {}
@@ -35,13 +35,14 @@ local function rogue_reward_runtime(state)
     return {
         available = 1,
         can_afford = 1,
+        passive = selected and 1 or 0,
         builder_slot_order = builder_slot_order_by_ability["ability_survival_rogue_reward"] or 7,
         display_name = "天赋",
         talent_pending = selected and 0 or 1,
         icon_name = selected and talent.icon_name or "survival/native/talent_question",
         upgrade_description = selected and talent.description or "选择一项开局天赋。",
         status_text = selected and ("已选择：" .. tostring(talent.name)) or "尚未选择天赋",
-        fields = {{ label = "快捷键", value = "G" }},
+        fields = selected and {} or {{ label = "快捷键", value = "G" }},
     }
 end
 local function cost_data(cost)
@@ -56,27 +57,12 @@ local function merge(base, extra)
     end
     return base
 end
-local function can_afford(cost, population_cost, resources)
-    if not resources then
-        return 1
-    end
-    if (resources.wood or 0) < (cost and cost.wood or 0) then
-        return 0
-    end
-    if (resources.gold or 0) < (cost and cost.gold or 0) then
-        return 0
-    end
-    if (resources.population or 0) + (population_cost or 0)
-        > (resources.max_population or 0) then
-        return 0
-    end
-    return 1
-end
-local function with_affordability(data, cost, population_cost, resources)
-    data.can_afford = can_afford(cost, population_cost, resources)
-    if data.available == 1 and data.can_afford == 0 then
-        data.status_text = "资源或人口不足"
-    end
+local function with_cast_resource_check(data)
+    -- Prices describe the action; a changing wallet cannot lock its icon.
+    -- The transaction validates current resources and reports the exact shortage.
+    data.can_afford = 1
+    data.resource_check_on_cast = 1
+    if data.prerequisite_met == nil then data.prerequisite_met = 1 end
     return data
 end
 local function value_delta(current, target, suffix)
@@ -150,6 +136,7 @@ local function lumberjack_training(state, resources)
         or ("主城达到LV" .. tostring(required) .. "后解锁")
     local result = merge({
         available = unlocked and 1 or 0,
+        prerequisite_met = unlocked and 1 or 0,
         display_name = "训练" .. tostring(training.name or "农民LV1"),
         current_level = tonumber(training.level) or 1,
         status_text = status,
@@ -165,7 +152,7 @@ local function lumberjack_training(state, resources)
             { label = "主城要求", value = "LV" .. tostring(required) },
         },
     }, cost_data(cost))
-    return with_affordability(result, cost, population, resources)
+    return with_cast_resource_check(result)
 end
 local function repairer_training(state, resources, training_id)
     local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
@@ -198,6 +185,9 @@ local function repairer_training(state, resources, training_id)
     local repair_rate = tonumber(training.repair_max_health_pct_per_second) or 0
     local result = merge({
         available = unlocked and 1 or 0,
+        -- Repairer capacity disables the training icon without hiding it.
+        -- Worker lifecycle events restore it as soon as a slot is released.
+        prerequisite_met = unlocked and 1 or 0,
         display_name = "训练" .. tostring(training.name or "修理工"),
         current_level = tonumber(training.level) or 1,
         status_text = status,
@@ -219,7 +209,7 @@ local function repairer_training(state, resources, training_id)
         result.can_afford = 0
         return result
     end
-    return with_affordability(result, cost, population, resources)
+    return with_cast_resource_check(result)
 end
 local function population_training(state, resources)
     local training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
@@ -267,6 +257,7 @@ local function population_training(state, resources)
     end
     local result = merge({
         available = unlocked and 1 or 0,
+        prerequisite_met = farm_level >= required and 1 or 0,
         current_level = tonumber(training.level) or 0,
         next_level = completed and nil or (tonumber(training.level) or 0),
         status_text = status,
@@ -276,7 +267,7 @@ local function population_training(state, resources)
         fields = fields,
     }, cost_data(cost))
     if completed then result.can_afford = 0 end
-    return completed and result or with_affordability(result, cost, 0, resources)
+    return completed and result or with_cast_resource_check(result)
 end
 local function build_ability(ability_name, state, resources)
     if ability_name == "ability_survival_rogue_reward" then
@@ -306,7 +297,8 @@ local function build_ability(ability_name, state, resources)
     local free_altar = definition.id == "hero_altar" and state
         and rogue_effect_state.numeric(state.player_id, "builder_free_hero_altar") > 0
     local unlocked = free_altar or city_level >= required
-    local build_cost = free_altar and {wood = 0, gold = 0} or definition.build_cost
+    local quote = building_cost_quote.for_player(definition, state.player_id)
+    local build_cost = { wood = quote.wood, gold = quote.gold }
     local under_limit = maximum <= 0 or built < maximum
     local hero_allows = not (
         definition.id == "hero_altar"
@@ -317,12 +309,18 @@ local function build_ability(ability_name, state, resources)
     if not unlocked then
         status = "主城达到Lv." .. tostring(required) .. "后解锁"
     elseif not under_limit then
-        status = definition.display_name .. "已建造"
+        status = definition.id == "arrow_tower"
+            and ("防御塔数量已达上限（" .. tostring(built) .. "/" .. tostring(maximum) .. "）")
+            or (definition.display_name .. "已建造")
     elseif not hero_allows then
         status = "已经召唤英雄，祭坛建造入口已关闭"
     end
     local data = merge({
         available = available and 1 or 0,
+        -- Keep the tower entrance visible, but disable it while all build
+        -- slots are occupied. Resource shortages remain a cast-time check.
+        prerequisite_met = unlocked and hero_allows
+            and (definition.id ~= "arrow_tower" or under_limit) and 1 or 0,
         builder_slot_order = builder_slot_order_by_ability[ability_name] or 0,
         current_level = city_level,
         status_text = status,
@@ -332,14 +330,10 @@ local function build_ability(ability_name, state, resources)
                 value = free_altar and "天赋已解锁，本次免费建造" or "主城Lv." .. tostring(required),
             },
         } or nil,
-        population = definition.population_cost or 0,
+        population = quote.population,
+        resource_check_on_cast = 1,
     }, cost_data(build_cost))
-    return with_affordability(
-        data,
-        build_cost,
-        definition.population_cost or 0,
-        resources
-    )
+    return with_cast_resource_check(data)
 end
 
 local function research_effect_value(definition, level)
@@ -354,7 +348,8 @@ local function research_upgrade(ability_name, state, resources)
     local definition = research_config.by_legacy_group[mapping.technology_group]
     if not definition or (state.building_id ~= nil
         and state.building_id ~= mapping.building_id) then
-        return { available = 0, can_afford = 0, status_text = "研究来源无效" }
+        return { available = 0, can_afford = 0, prerequisite_met = 0,
+            status_text = "研究来源无效" }
     end
     local levels = state.research_levels or {}
     local current = tonumber(levels[mapping.technology_group]) or 0
@@ -378,7 +373,10 @@ local function research_upgrade(ability_name, state, resources)
             >= (tonumber(required.reincarnation_level) or 0)
     if target > maximum then
         return {
+            completed = current >= maximum and 1 or 0,
             research_upgrade = 1,
+            prerequisite_met = prerequisite_met and 1 or 0,
+            resource_check_on_cast = 1,
             auto_research_available = (prerequisite_met or (transaction.auto_research or {})[mapping.technology_group])
                 and current < maximum and 1 or 0,
             auto_research_enabled = transaction.auto_research
@@ -409,14 +407,14 @@ local function research_upgrade(ability_name, state, resources)
     local status_code = "available"
     local status = "可以研究"
     local available = true
-    if queue_count >= queue_capacity then
-        available = false
-        status_code = "research_queue_full"
-        status = "研究队列已满（1个研究中＋6个等待）"
-    elseif not prerequisite_met then
+    if not prerequisite_met then
         available = false
         status_code = "prerequisite_not_met"
         status = "前置科技或转职要求未满足，不能加入研究队列"
+    elseif queue_count >= queue_capacity then
+        available = false
+        status_code = "research_queue_full"
+        status = "研究队列已满（1个研究中＋6个等待）"
     elseif queue_count > 0 then
         status_code = "queue_available"
         status = "可加入研究队列；开始研究时扣费"
@@ -425,6 +423,8 @@ local function research_upgrade(ability_name, state, resources)
     end
     local data = {
         research_upgrade = 1,
+        prerequisite_met = prerequisite_met and 1 or 0,
+        resource_check_on_cast = 1,
         auto_research_available = (prerequisite_met or (transaction.auto_research or {})[mapping.technology_group]) and 1 or 0,
         auto_research_enabled = transaction.auto_research
             and transaction.auto_research[mapping.technology_group] and 1 or 0,
@@ -458,9 +458,23 @@ local function research_upgrade(ability_name, state, resources)
         research_building_id = mapping.building_id,
         technology_group = mapping.technology_group,
     }
-    if not available then data.can_afford = 0 return data end
-    return with_affordability(data, cost, 0, resources)
+    return with_cast_resource_check(data)
 end
+local function with_upgrade_quote(data, state, mode)
+    if not data.next_level or not state or not state.unit then return data end
+    local quote = event_bus.request(events.BUILDING_UPGRADE_QUOTE_REQUEST, {
+        building = state.unit, player_id = state.player_id, upgrade_mode = mode,
+    })
+    if quote then
+        if quote.prerequisite_met ~= nil then data.prerequisite_met = quote.prerequisite_met end
+        if not quote.ok then
+            data.available = 0
+            data.status_text = quote.error or data.status_text
+        end
+    end
+    return data
+end
+
 local function upgrade_level(definition, current_level, resources, state, display)
     display = display or {}
     local next_level = current_level + 1
@@ -470,6 +484,8 @@ local function upgrade_level(definition, current_level, resources, state, displa
         return {
             available = 0,
             can_afford = 0,
+            prerequisite_met = 1,
+            completed = 1,
             current_level = current_level,
             status_text = "已达最高等级",
         }
@@ -503,29 +519,27 @@ local function upgrade_level(definition, current_level, resources, state, displa
         status_text = "可以升级",
         fields = fields,
     }, cost_data(data.upgrade_cost))
-    return mark_upgrade_state(with_affordability(
-        result,
-        data.upgrade_cost,
-        0,
-        resources
-    ), state)
+    return with_upgrade_quote(mark_upgrade_state(with_cast_resource_check(result), state), state)
 end
 local function tower_upgrade(ability_name, state, resources)
     local current_row = tower_routes.current(state)
     local display_level = current_row and current_row.level or state.level
     local mode = ability_name == "ability_upgrade_tower_max" and "max" or "one"
     if not state.tower_class and state.level >= 5 then
-        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level, status_text = "请先选择一个转职方向" }
+        return { available = 0, can_afford = 0, prerequisite_met = 0,
+            current_level = state.level, display_current_level = display_level,
+            status_text = "请先选择一个转职方向" }
     end
     local target = mode == "max" and tower_routes.stage_end_level(state) or state.level + 1
     local row = tower_routes.row_at_level(state, target)
     if mode == "max" and not tower_routes.can_upgrade_max(state) then
-        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level,
+        return { available = 0, can_afford = 0, prerequisite_met = 1, current_level = state.level, display_current_level = display_level,
             status_text = target <= state.level and "当前阶段已升满" or "当前阶段不支持一键升满" }
     end
     local cost = tower_routes.cost_to(state, target)
     if target <= state.level or not row or not cost then
-        return { available = 0, can_afford = 0, current_level = state.level, display_current_level = display_level, status_text = "已达最高等级" }
+        return { available = 0, can_afford = 0, prerequisite_met = 1, completed = 1,
+            current_level = state.level, display_current_level = display_level, status_text = "已达最高等级" }
     end
     local tower_name = tower_routes.display_name(row)
     local attack_delta = (row.base_attack_damage or 0)
@@ -560,12 +574,7 @@ local function tower_upgrade(ability_name, state, resources)
                     or "0") },
         },
     }, cost_data(cost))
-    local affordable = can_afford(cost, cost.population or 0, resources)
-    result.can_afford = affordable
-    if affordable == 0 then
-        result.status_text = result.status_text .. "（当前资源不足）"
-    end
-    return mark_upgrade_state(result, state)
+    return mark_upgrade_state(with_cast_resource_check(result), state)
 end
 local function tower_class(ability_name, state, resources)
     local available = state.level >= 5 and not state.tower_class
@@ -582,6 +591,7 @@ local function tower_class(ability_name, state, resources)
     available = available and not class_full
     local result = merge({
         available = available and row and 1 or 0,
+        prerequisite_met = state.level >= 5 and 1 or 0,
         current_level = state.level,
         status_text = class_full and ("该路线数量已达上限（"
                 .. tostring(completed + pending) .. "/" .. tostring(maximum) .. "）")
@@ -606,12 +616,7 @@ local function tower_class(ability_name, state, resources)
             },
         } or nil,
     }, cost_data(cost))
-    return mark_upgrade_state(with_affordability(
-        result,
-        cost,
-        cost and cost.population or 0,
-        resources
-    ), state)
+    return mark_upgrade_state(with_cast_resource_check(result), state)
 end
 local function mine_level_upgrade(state, resources)
     local level = state.mine_level or state.level or 1
@@ -621,6 +626,8 @@ local function mine_level_upgrade(state, resources)
             can_afford = 0,
             current_level = level,
             status_text = "金矿本体已满级",
+            prerequisite_met = 1,
+            completed = 1,
             upgrade_description = "金矿本体已经达到最高等级。",
         }
     end
@@ -642,7 +649,7 @@ local function mine_level_upgrade(state, resources)
             ) },
         },
     }, cost_data(cost))
-    return mark_upgrade_state(with_affordability(result, cost, 0, resources), state)
+    return mark_upgrade_state(with_cast_resource_check(result), state)
 end
 local function mine_efficiency(state, resources)
     local level = state.efficiency_level or 0
@@ -652,6 +659,8 @@ local function mine_efficiency(state, resources)
             can_afford = 0,
             current_level = level,
             status_text = "金矿收益已满级",
+            prerequisite_met = 1,
+            completed = 1,
             upgrade_description = "采金效率已经达到最高等级。",
         }
     end
@@ -673,7 +682,7 @@ local function mine_efficiency(state, resources)
             ) },
         },
     }, cost_data(cost))
-    return mark_upgrade_state(with_affordability(result, cost, 0, resources), state)
+    return mark_upgrade_state(with_cast_resource_check(result), state)
 end
 local function mine_crit(state, resources)
     local level = state.crit_level or 0
@@ -683,6 +692,8 @@ local function mine_crit(state, resources)
             can_afford = 0,
             current_level = level,
             status_text = "暴击率已满级",
+            prerequisite_met = 1,
+            completed = 1,
             upgrade_description = "采金暴击已经达到最高等级。",
         }
     end
@@ -702,7 +713,7 @@ local function mine_crit(state, resources)
             )) .. "x" },
         },
     }, cost_data(cost))
-    return mark_upgrade_state(with_affordability(result, cost, 0, resources), state)
+    return mark_upgrade_state(with_cast_resource_check(result), state)
 end
 local function altar_open(state)
     local summoned = state and state.hero_summoned == 1
@@ -733,19 +744,17 @@ local function altar_travel(ability_name, state, resources)
     local required = tonumber(action.required_rebirth_level) or 0
     local summoned = state and state.hero_summoned == 1
     local enough_rebirth = rebirth >= required
-    local enough_gold = not resources
-        or (tonumber(resources.gold) or 0) >= (tonumber(action.gold_cost) or 0)
     local status = "可施法"
     if not summoned then
         status = "前置条件：请先召唤英雄"
     elseif not enough_rebirth then
         status = "前置条件：英雄达到" .. tostring(required) .. "转"
-    elseif not enough_gold then
-        status = "前置条件：需要" .. tostring(action.gold_cost or 0) .. "金币"
     end
     return {
         available = summoned and enough_rebirth and 1 or 0,
-        can_afford = enough_gold and 1 or 0,
+        prerequisite_met = summoned and enough_rebirth and 1 or 0,
+        can_afford = 1,
+        resource_check_on_cast = 1,
         status_text = status,
         cost_wood = tonumber(action.wood_cost) or 0,
         cost_gold = tonumber(action.gold_cost) or 0,
@@ -774,13 +783,10 @@ local function hero_summon_runtime(ability_name, state)
     local snapshot = state and state.hero_summon_snapshot
     if player_id < 0 or not snapshot
         or tonumber(snapshot.player_id) ~= player_id then return result end
-    local rule = hero_summon_rules.rows and hero_summon_rules.rows[1] or {}
     if snapshot.hero_summoned == 1 then
         result.status_text = "本局已经召唤英雄"
-    elseif snapshot.altar_built ~= 1 then
-        result.status_text = "英雄祭坛尚未建造"
-    elseif (tonumber(snapshot.city_level) or 0) < (tonumber(rule.requires_city_level) or 3) then
-        result.status_text = "主城等级不足"
+    elseif snapshot.summon_unlocked ~= 1 then
+        result.status_text = snapshot.summon_disabled_reason or "英雄祭坛尚未解锁"
     else
         for _, option in ipairs(snapshot.heroes or {}) do
             if option.hero_id == hero_id then
@@ -794,6 +800,10 @@ local function hero_summon_runtime(ability_name, state)
     return result
 end
 function M.build(ability_name, state, resources, fusion_snapshot)
+    if string.match(ability_name or "", "^ability_archive_") then
+        return require("systems/archive_challenge_service").ability_runtime(
+            state and state.unit, ability_name)
+    end
     if ability_name == "ability_destroy_arrow_tower" then
         local definition = tooltip_definitions.by_id["ability:" .. ability_name] or {}
         return {available = 1, can_afford = 1,
@@ -817,7 +827,8 @@ function M.build(ability_name, state, resources, fusion_snapshot)
                     {label="合体材料",value=tostring(status.fusion_count or 0).."/"..row.required_count.." 个普通LV"..row.level.."伐木工"},
                     {label="主城等级",value=tostring(status.fusion_city_level or 0).."/"..row.required_city_level},
                 }
-                return with_affordability(status,{wood=row.wood_cost,gold=row.gold_cost},0,resources)
+                status.prerequisite_met = status.available
+                return with_cast_resource_check(status)
             end
         end
     end
@@ -852,7 +863,7 @@ function M.build(ability_name, state, resources, fusion_snapshot)
                 {label = "护甲", value = value_delta(current.war3_armor, quote.data.war3_armor)},
             },
         }, cost_data(quote.cost))
-        return mark_upgrade_state(with_affordability(result, quote.cost, 0, resources), state)
+        return with_upgrade_quote(mark_upgrade_state(with_cast_resource_check(result), state), state, "wall_9_1")
     end
     if ability_name == "ability_upgrade_wall" then
         return upgrade_level(buildings.wall, state.level, resources, state)
@@ -885,12 +896,6 @@ function M.build(ability_name, state, resources, fusion_snapshot)
             local target = buildings.farm.levels[result.next_level] or {}
             local required = tonumber(target.requires_city_level) or result.next_level
             result.fields[#result.fields + 1] = {label = "升级前置", value = "主城LV" .. tostring(required)}
-            local quote = state.unit and event_bus.request(events.BUILDING_UPGRADE_QUOTE_REQUEST,
-                {building = state.unit, player_id = state.player_id})
-            if quote and not quote.ok then
-                result.available = 0
-                result.status_text = quote.error or ("需要主城LV" .. tostring(required))
-            end
         end
         return result
     end
@@ -906,6 +911,14 @@ function M.build(ability_name, state, resources, fusion_snapshot)
                 and state.unit.survival_tower_auto_upgrade and 1 or 0
             result.auto_upgrade_available = state.tower_class and row and next_row and 1 or 0
             result.auto_upgrade_visible = state.tower_class and 1 or 0
+            if result.auto_upgrade_available == 1 or result.auto_upgrade_enabled == 1 then
+                result.fields[#result.fields + 1] = {
+                    label = "自动升级",
+                    value = result.auto_upgrade_enabled == 1
+                        and "已开启，每秒检查；右键升级图标关闭"
+                        or "右键升级图标开启，每秒检查一次",
+                }
+            end
         end
         return result
     end
@@ -950,8 +963,9 @@ function M.build(ability_name, state, resources, fusion_snapshot)
         }) or {}
         local ready = tonumber(fusion.route_count) or 0
         local count = tonumber(fusion.ultimate_count) or 0
-        local maximum = tonumber(fusion.maximum) or 5
+        local maximum = tonumber(fusion.maximum) or 1
         return {
+            display_name = "合成终极塔",
             available = fusion.eligible == true and 1 or 0,
             can_afford = 1,
             status_text = count >= maximum
@@ -963,7 +977,7 @@ function M.build(ability_name, state, resources, fusion_snapshot)
                 { label = "未参与满级路线", value = tostring(ready) .. "/7" },
                 { label = "终极塔数量", value = tostring(count) .. "/"
                     .. tostring(maximum) },
-                { label = "材料消耗", value = "不消耗；每座塔永久限参与一次" },
+                { label = "材料消耗", value = "消耗七种路线各1座最终满级塔" },
             },
         }
     end

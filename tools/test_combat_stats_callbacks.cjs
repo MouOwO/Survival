@@ -7,6 +7,8 @@ assert(source.includes(seam));
 const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbilityRuntime,restoreAbilityRuntime:restoreAbilityRuntime,
         hotkeyForAbilityEntry:hotkeyForAbilityEntry,orderVisibleAbilities:orderVisibleAbilities,
         refreshOfficialUtilityHotkeys:refreshOfficialUtilityHotkeys,officialAbilityHotkeysMatch:officialAbilityHotkeysMatch,
+        refreshHotkeys:refreshAbilityHotkeysIfChanged,refreshVitalsTick:refreshHeroVitalsTick,
+        beginNameTransition:beginUnitNameTransition,
         executeAbility:executeAbility,scheduleActive:scheduleActive, cosmeticPortraitSentinel:cosmeticPortraitSentinel,
         resetScale:resetTowerPortraitContentScale, applyScale:applyTowerPortraitContentScale,
         restoreHotkey:restoreNativeAbilityHotkey, suppressHotkey:suppressNativeAbilityHotkey,
@@ -22,7 +24,7 @@ const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbi
     return;
 `+seam);
 function setup(options={}){
- const cfg={},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api,time=0,selected=options.portrait?7:-1,multi=false;
+ const cfg=options.config||{},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api,time=0,selected=options.portrait?7:-1,multi=false;
  const runtime={},unitNames=new Map([[7,'npc_dota_hero_doom_bringer']]);
  const metrics={setUnit:[],parents:0,order:0,geometryWrites:0,visibilityTransitions:0};
  class Panel{
@@ -70,12 +72,12 @@ function setup(options={}){
  $.Schedule=(delay,fn)=>{const id=++serial;jobs.set(id,{delay,fn});return id};$.CancelScheduled=id=>jobs.delete(id);
  $.Msg=(...s)=>messages.push(s.join(''));$.Warning=$.Msg;$.Localize=s=>s;
  const subscribe=(name,fn)=>{const id=++serial;subscriptions.set(id,{name,fn});return id};
- vm.runInNewContext(instrumented,{$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,GetGameTime:()=>time},
+ vm.runInNewContext(instrumented,{$,GameUI:{CustomUIConfig:()=>cfg},Game:Object.assign({GetLocalPlayerID:()=>0,GetGameTime:()=>time},options.game||{}),
   Players:{GetPlayerHeroEntityIndex:()=>selected},
   Entities:Object.assign({GetUnitName:id=>unitNames.get(Number(id))||'npc_dota_hero_test',GetAbility:()=>-1,GetLevel:()=>1,IsHero:()=>true},options.entities||{}),
   Abilities:options.abilities||{},
   CustomNetTables:{GetTableValue:(name,key)=>runtime[key]||null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},
-  GameEvents:{Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},__test:x=>api=x},{filename:'combat_stats.js'});
+  GameEvents:Object.assign({Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},options.events||{}),__test:x=>api=x},{filename:'combat_stats.js'});
  function run(id){const job=jobs.get(id);assert(job);jobs.delete(id);job.fn()}
  return {api,root,context,overlay,scene,cfg,jobs,messages,subscriptions,run,Panel,runtime,metrics,mountNative,
   native:()=>nativeScene,nativeHost:()=>nativeHost,setTime:t=>time=t,select:(id,name)=>{selected=id;if(name)unitNames.set(id,name)},setMulti:value=>{multi=value}};
@@ -155,21 +157,26 @@ assert.throws(()=>f.subscriptions.get(eventId).fn(),x=>x===eventError);
 assert(f.messages.some(s=>s.includes('[COMBAT_STATS_EVENT_ERROR] event=stats_probe')&&s.includes('native event failure')));
 console.log('COMBAT_CALLBACK_TEST_PASS: timer/event lifecycle, stale queued snapshots, unsubscribe, native styles, coordinate vectors, scaling and recovery');
 
-const talentUI=setup(),button=new talentUI.Panel('TalentButton',talentUI.root);
+const talentUI=setup({abilities:{GetAbilityName:ability=>ability===42?'ability_survival_rogue_reward':'mock_active',
+ GetBehavior:()=>4,IsPassive:()=>false}}),button=new talentUI.Panel('TalentButton',talentUI.root);
+const talentEntry={ability:42,name:'ability_survival_rogue_reward'};
 new talentUI.Panel('AbilityImage',button);
-talentUI.runtime[42]={talent_pending:1,icon_name:'survival/native/talent_question'};
+talentUI.runtime[42]={talent_pending:1,passive:0,icon_name:'survival/native/talent_question'};
+assert.equal(talentUI.api.hotkeyForAbilityEntry(talentEntry,'npc_survival_builder_proxy'),'G','pending talent retains its opening shortcut');
 talentUI.api.applyAbilityRuntime(button,42);
 const icon=button.__survivalTalentIcon,brightness=icon.style.brightness;
 assert(icon.visible && !icon.hittest && !icon.hittestchildren,'art must preserve the native button input');
 talentUI.setTime(.3);talentUI.api.applyAbilityRuntime(button,42);
 assert.notEqual(icon.style.brightness,brightness,'unselected talent pulses over time');
-talentUI.runtime[42]={talent_pending:0,icon_name:'survival/native/talent_wall_recovery'};
+talentUI.runtime[42]={talent_pending:0,passive:1,icon_name:'survival/native/talent_wall_recovery'};
+assert.equal(talentUI.api.hotkeyForAbilityEntry(talentEntry,'npc_survival_builder_proxy'),'','selected talent hides its shortcut despite stale native active behavior');
 talentUI.api.applyAbilityRuntime(button,42);
 assert(icon.image.endsWith('/talent_wall_recovery.png') && icon.style.brightness==='1','successful selection switches icon and stops flashing');
 talentUI.api.applyAbilityRuntime(button,43);assert(!icon.visible,'native slot reuse must hide stale talent art');
+assert.equal(talentUI.api.hotkeyForAbilityEntry({ability:43,name:'mock_active',standardHotkeyIndex:0},'npc_dota_hero_test'),'Q','another unit using the slot retains its active shortcut');
 icon.alive='throw';talentUI.api.applyAbilityRuntime(button,42);
 assert(button.__survivalTalentIcon!==icon && button.__survivalTalentIcon.visible,'a released image handle can be recreated safely');
-console.log('TALENT_NATIVE_ICON_PASS: input isolation, pulse, selection, slot reuse, stale handle');
+console.log('TALENT_NATIVE_ICON_PASS: input isolation, pulse, selection, passive shortcut removal, slot reuse, stale handle');
 
 // Stable authoritative updates and the existing sentinel share one real scene.
 const doomSnapshot=(version=1)=>({entindex:7,refresh_version:version,model_asset_id:'hero_permanent_hero_doom',
@@ -197,11 +204,11 @@ function portraitGeometry(panel){return {position:panel.values.position,width:pa
  assert.equal(t.api.portraitState().acceptedVersion,301);
  // A genuinely accepted unsupported snapshot still restores the native portrait;
  // this fix does not invent metadata or keep a stale custom portrait indefinitely.
- t.api.updateSnapshot({entindex:7,refresh_version:302});
+ t.api.updateSnapshot({entindex:7,refresh_version:302,model_asset_id:""});
  assert.equal(t.api.portraitState().key,'');assert.equal(t.api.portraitState().scene,null);
  assert.equal(t.overlay.GetParent(),t.context);assert.equal(t.native().values.opacity,'0.35');
  assert.equal(t.overlay.values.visibility,'collapse');
- t.api.updateSnapshot(doomSnapshot(303));assert.equal(t.metrics.setUnit.length,2);
+ t.api.updateSnapshot(doomSnapshot(303));assert.equal(t.metrics.setUnit.length,1,'restored supported metadata reuses the unchanged loaded scene');
  t.api.shutdown('test');assert.equal(t.jobs.size,0);
 }
 // Unlaid-out finite sentinels and overflow from tiny scale cannot reach styles

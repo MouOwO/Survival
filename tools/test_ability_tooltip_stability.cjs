@@ -6,7 +6,7 @@ const tooltip={style:{},GetParent:()=>parent};let schedules=0;
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/tooltip_position.js','utf8'),{GameUI:{CustomUIConfig:()=>cfg},$:{Schedule:()=>schedules++}});
 for(const height of [80,350,120,260]){tooltip.actuallayoutheight=height;cfg.SurvivalTooltipPosition.PlaceAbilityAbove(tooltip,source,337);assert.equal(tooltip.style.marginBottom,'185px');assert.equal(tooltip.style.verticalAlign,'bottom');}
 const oldX=tooltip.style.position;x=900;cfg.SurvivalTooltipPosition.PlaceAbilityAbove(tooltip,source,337);assert.notEqual(oldX,tooltip.style.position);assert.equal(tooltip.style.marginBottom,'185px');assert.equal(schedules,0,'position must settle synchronously');
-let created=0;class Panel{constructor(){this.style={};this.valid=true;this.visible=true;}IsValid(){return this.valid;}set visible(v){assert(this.valid,'Underlying panel is deleted!');this._visible=v;}get visible(){return this._visible;}AddClass(){}SetImage(v){this.image=v;}}
+let created=0;class Panel{constructor(){this.style={};this.valid=true;this.visible=true;}IsValid(){return this.valid;}set visible(v){assert(this.valid,'Underlying panel is deleted!');this._visible=v;}get visible(){return this._visible;}AddClass(){}SetHasClass(){}SetImage(v){this.image=v;}}
 const env={$:{CreatePanel:()=>{created++;return new Panel();}},propertyIcon:label=>label==='attack'?{type:'item',name:'item_broadsword'}:null,localizedFieldLabel:v=>v,localizedFieldValue:(_,v)=>v};
 const code=fs.readFileSync('panorama/src/scripts/custom_game/ability_tooltip.js','utf8');
 vm.runInNewContext(code.slice(code.indexOf('    function addField('),code.indexOf('    function render(')),env);

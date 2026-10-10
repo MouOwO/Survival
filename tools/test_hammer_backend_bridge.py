@@ -88,6 +88,22 @@ class BridgeTests(unittest.TestCase):
         self.assertNotIn('secret', json.dumps(result))
         self.assertEqual(result['error'], 'local_bridge_operation_failed')
 
+    def test_resident_disconnects_inspector_before_original_auth_and_publishes_only_stats(self):
+        inspector = self.worker.inspector = Mock()
+        inspector.inspect.return_value = self.game
+        inspector.stats = {'console_transport': 'persistent_v1', 'console_connected': False}
+        sequence = []
+        inspector.disconnect.side_effect = lambda: sequence.append('fin')
+        self.inject.side_effect = lambda *args: sequence.append('original_auth')
+        result = bridge.safe_step(self.worker)
+        self.assertEqual(sequence, ['fin', 'original_auth'])
+        self.assertEqual(result['status'], 'authentication_applied')
+        self.assertEqual(result['console_transport'], 'persistent_v1')
+        self.inspect_game.assert_not_called()
+        self.game.update(status='configured', authenticated=1, loaded=1)
+        bridge.safe_step(self.worker)
+        self.assertEqual(sequence, ['fin', 'original_auth'], 'healthy polls do not disconnect or reauthenticate')
+
 
 class InspectionTests(unittest.TestCase):
     def test_resident_waits_for_startup_race_with_one_shot_diagnostic(self):
@@ -138,9 +154,12 @@ class InspectionTests(unittest.TestCase):
                     patch.object(bridge.tunnel, 'state_lock', return_value=nullcontext()), \
                     patch.object(bridge, 'safe_step', return_value={
                         'ok': True, 'status': 'authentication_applied'}) as step:
-                result = bridge.run(Mock(), once=True)
+                worker = Mock()
+                result = bridge.run(worker, once=True)
                 self.assertEqual(result['status'], 'authentication_applied')
                 step.assert_called_once()
+                worker.enable_persistent_inspection.assert_not_called()
+                worker.close.assert_called_once()
 
     def test_probe_uses_existing_strict_guard_and_loaded_survival_modules(self):
         code = bridge.inspection_lua()
@@ -150,6 +169,8 @@ class InspectionTests(unittest.TestCase):
         self.assertNotIn('LoadKeyValues(', code)
         self.assertNotIn('Convars:SetStr', code)
         self.assertNotIn('load_player', code)
+        self.assertIn('profiles.is_loaded_for_account(id,', code)
+        self.assertNotIn('profiles.get_profile(', code)
 
     def test_console_history_is_not_logged_and_session_is_only_returned_as_hash(self):
         with tempfile.TemporaryDirectory() as tmp, patch.object(bridge, 'OUTPUT', Path(tmp)), \

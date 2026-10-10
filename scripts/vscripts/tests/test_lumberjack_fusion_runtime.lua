@@ -65,12 +65,20 @@ city_level=5
 bus.emit(events.BUILDING_CHANGED,{unit=unit(90,"mock_city"),player_id=0,team=2,building_id="main_city",level=5})
 flush();for _,s in ipairs(workers) do check(s.unit,true) end
 local function resource() bus.emit(events.RESOURCE_CHANGED,{player_id=0,team=2}) end
-wallet.gold=4999;resource();flush("ability_resource_refresh_player:0");check(a,false)
-wallet.gold=5000;calls=0
-for i=1,100 do resource() end
-flush("ability_resource_refresh_player:0");assert(calls==1,"resource burst shares one registry scan");check(a,true)
-local writes=a.ability.writes;resource();flush("ability_resource_refresh_player:0")
-assert(a.ability.writes==writes,"unchanged state must not reset activation")
+local writes, ready_status = a.ability.writes, value(a).status_text
+calls=0
+for index=1,1000 do
+    wallet.gold=index % 2 == 0 and 0 or 100000
+    wallet.wood=index % 2 == 0 and 0 or 100000
+    resource()
+    if tasks["ability_resource_refresh_player:0"] then flush("ability_resource_refresh_player:0") end
+end
+check(a,true)
+assert(value(a).can_afford==1 and value(a).resource_check_on_cast==1
+    and value(a).prerequisite_met==1 and value(a).status_text==ready_status,
+    "wallet changes must not alter a prerequisite-ready fusion projection")
+assert(calls==0 and a.ability.writes==writes,
+    "crossing affordability thresholds skips worker scans and native activation writes")
 for _,flag in ipairs({"dead","survival_super_lumberjack","survival_lumberjack_fusion_pending"}) do
     c[flag]=true;changed(workers[3]);flush();check(a,false)
     c[flag]=nil;changed(workers[3]);flush();check(a,true)

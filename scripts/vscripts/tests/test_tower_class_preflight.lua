@@ -71,7 +71,12 @@ Entities = {FindAllByClassname = function() return units end}
 EntIndexToHScript = function(id) return entities[id] end
 CustomGameEventManager = {
     RegisterListener = function(_, name, callback) listeners[name] = callback return name end,
-    Send_ServerToPlayer = function(_, _, name, payload) packets[#packets + 1] = {name = name, payload = payload} end,
+    Send_ServerToPlayer = function(_, player, name, payload)
+        packets[#packets + 1] = {name = name, payload = payload, player = player}
+    end,
+    Send_ServerToAllClients = function(_, name, payload)
+        packets[#packets + 1] = {name = name, payload = payload, broadcast = true}
+    end,
 }
 
 local function create_tower(level, owner)
@@ -256,6 +261,39 @@ end
 tower = fixture()
 resources._test.accounts()[0].wood = cost.wood - 1
 assert_rejected("UI resource failure", tower, 0, function() return ui_request(tower) end)
+
+-- Transactions retain machine-readable errors while all notification paths
+-- show the missing resource to the player, including batch upgrade failures.
+for code, message in pairs({wood_not_enough = "木材不足", gold_not_enough = "金币不足",
+    population_not_enough = "人口不足"}) do
+    local payload = {player_id = 0, message = code, level = "error"}
+    bus.emit(events.UI_NOTIFICATION, payload)
+    local packet = packets[#packets]
+    assert(packet.name == "ui_notification" and packet.payload.message == message
+        and packet.payload.level == "error", "notification must name the missing resource")
+    assert(payload.message == code, "notification translation cannot mutate transaction errors")
+end
+bus.emit(events.UI_NOTIFICATION, {player_id = 0, message = "主城未达到5级", level = "error"})
+assert(packets[#packets].payload.message == "主城未达到5级", "prerequisite messages remain intact")
+
+-- Private research completion never reaches a teammate, even if an emitter
+-- accidentally marks it as broadcast. Public reward announcements remain public.
+bus.emit(events.UI_NOTIFICATION, {player_id = 1, audience = "all", kind = "research_success",
+    subject = "伐木速度", ability_icon = "ability_research_lumberjack_speed",
+    message = "研究伐木速度科技成功"})
+local research_notice = packets[#packets]
+assert(research_notice.player == player_handles[1] and not research_notice.broadcast
+    and research_notice.payload.audience == "player" and research_notice.payload.player_id == 1,
+    "research successes must be delivered only to their owner")
+assert(research_notice.payload.subject == "伐木速度"
+    and research_notice.payload.ability_icon == "ability_research_lumberjack_speed")
+bus.emit(events.UI_NOTIFICATION, {player_id = 0, audience = "all", kind = "fishing_reward",
+    actor_name = "玩家甲", message = "玩家甲 钓到了奖励"})
+assert(packets[#packets].broadcast and packets[#packets].payload.audience == "all"
+    and packets[#packets].payload.actor_name == "玩家甲", "fishing reward remains public")
+local notice_count = #packets
+bus.emit(events.UI_NOTIFICATION, {kind = "research_success", message = "缺少玩家的数据"})
+assert(#packets == notice_count, "a private notice without an owner is never broadcast")
 
 -- Success holds a route slot and the exact charge through the asynchronous
 -- transition; completion converts pending to built count without another fee.

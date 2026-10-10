@@ -73,7 +73,7 @@ archive_lottery_recovery_spirit_v2,points,lottery_recovery_spirit,回复精神,.
 archive_lottery_life_spirit_v2,points,lottery_life_spirit,生命精神,../抽奖系统/lottery_item_definitions.csv,item_id,custom_game/reward_art_v5/lottery_life_spirit.png,84,84,1,generated_reward_v5
 archive_fragment_08_v2,fragment,fragment_08,神兵-龙爪弯钩,../存档系统/archive_fragment_definitions.csv,fragment_id,econ/items/pudge/pudge_skeleton_hook_body.png,93,74,1,valve_native
 archive_fragment_09_v2,fragment,fragment_09,神兵-纯金之触,../存档系统/archive_fragment_definitions.csv,fragment_id,econ/items/weaver/weaver_immortal_head_ti7/weaver_ti7_immortal_head_gold.png,93,74,1,valve_native
-archive_fragment_10_v2,fragment,fragment_10,神兵-战鬼双刃,../存档系统/archive_fragment_definitions.csv,fragment_id,econ/items/legion_commander/demon_sword.png,93,74,1,valve_native
+archive_fragment_10_v2,fragment,fragment_10,神兵-战鬼双刃,../存档系统/archive_fragment_definitions.csv,fragment_id,econ/items/legion_commander/blades_voth_domosh/blades_voth_domosh.png,93,74,1,valve_native
 archive_fragment_11_v2,fragment,fragment_11,神兵-魔头之命,../存档系统/archive_fragment_definitions.csv,fragment_id,econ/items/clinkz/clinkz_ti9_immortal_weapon/clinkz_ti9_immortal_weapon.png,93,74,1,valve_native
 archive_fragment_12_v2,fragment,fragment_12,神兵-魔导师密钥,../存档系统/archive_fragment_definitions.csv,fragment_id,econ/items/rubick/arcana/magus_cypher.png,93,74,1,valve_native
 archive_cage_08_v2,pet,cage_08,疯狂呓语,../存档系统/archive_cage_items.csv,item_id,custom_game/archive_items_v2/cage_08.png,93,74,1,generated_review

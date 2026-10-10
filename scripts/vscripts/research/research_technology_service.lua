@@ -274,7 +274,6 @@ function M:RequestUpgrade(payload)
 end
 
 function M:BuildClientSnapshot(player_id)
-    local resources = self.get_resources(player_id) or {}
     local reincarnation = self.get_reincarnation_level(player_id)
     local access_state = self.get_access_state(player_id)
     local entries = {}
@@ -288,8 +287,9 @@ function M:BuildClientSnapshot(player_id)
                 >= (required.required_level or 0)
         local reincarnation_met = reincarnation
             >= (required.reincarnation_level or 0)
+        local access_met = self:_has_access(definition, access_state)
         local locked_reason = nil
-        if not self:_has_access(definition, access_state) then
+        if not access_met then
             locked_reason = "research_access_not_met"
         elseif level >= definition.max_level then
             locked_reason = "max_level_reached"
@@ -297,10 +297,6 @@ function M:BuildClientSnapshot(player_id)
             locked_reason = "prerequisite_not_met"
         elseif not reincarnation_met then
             locked_reason = "reincarnation_not_met"
-        elseif (tonumber(resources.gold) or 0) < (cost and cost.gold or 0) then
-            locked_reason = "insufficient_gold"
-        elseif (tonumber(resources.wood) or 0) < (cost and cost.wood or 0) then
-            locked_reason = "insufficient_wood"
         end
         entries[#entries + 1] = {
             tech_id = definition.tech_id,
@@ -309,7 +305,9 @@ function M:BuildClientSnapshot(player_id)
             max_level = definition.max_level,
             next_gold_cost = cost and cost.gold or 0,
             next_wood_cost = cost and cost.wood or 0,
-            prerequisite_met = prerequisite_met and 1 or 0,
+            prerequisite_met = prerequisite_met and reincarnation_met and access_met and 1 or 0,
+            completed = level >= definition.max_level and 1 or 0,
+            resource_check_on_cast = 1,
             can_upgrade = locked_reason == nil and 1 or 0,
             locked_reason = locked_reason or "",
             cumulative_effect_text = self:_effect_text(definition, level),

@@ -155,8 +155,15 @@ package.loaded["systems/buff_manager"] = {
 package.loaded["systems/tower_skill_runtime"] = {
     get = function(unit) return unit.skills or {} end,
 }
+local native_death_catalog = require("config/asset_catalog")
+local native_death_assets = {
+    tower_death_templar_assassin = true,
+    tower_death_nevermore_sundered_souls = true,
+    tower_death_warlock_seam_ripper = true,
+}
 package.loaded["config/asset_catalog"] = { by_id = {}, get = function(asset_id)
     if asset_id == "test_native_stage" then return { native_wearable_stage = true } end
+    if native_death_assets[asset_id] then return native_death_catalog.get(asset_id) end
 end }
 
 local ability = { IsNull = function() return false end, GetLevel = function() return 1 end }
@@ -219,6 +226,7 @@ local function modifier(skills)
     return result
 end
 local function clear()
+    require("systems/tower_projectile_visual").clear(tower)
     emitted, requested, damage, buffs, particles, destroyed = {}, {}, {}, {}, {}, {}
     tracking, linear, sounds, scheduled = {}, {}, {}, {}
     control_writes, control_entities, particle_releases, immediate_destroys = {}, {}, {}, {}
@@ -298,6 +306,64 @@ assert(#gestures == 0 and #emitted == 0, "tree started an accelerated body gestu
 gesture_modifier:OnAttackStart({ attacker = tower, target = dummy })
 assert(#gestures == 1 and gestures[1].activity == ACT_DOTA_ATTACK and gestures[1].rate == 2)
 tower.survival_model_asset_id = nil
+
+-- These real R/SR/SSR bodies already receive the engine's attack animation.
+-- Two successive legal attack cycles must not overlay a second unscaled
+-- gesture, lose their target/start events, or change critical/proc damage.
+do
+    local definitions = require("config/generated/tower_skill_definitions").by_id
+    local rows = require("config/generated/tower_class_death").rows
+    local original_id = tower.id
+    for index, row in ipairs(rows) do
+        clear()
+        tower.id = 1000 + index -- Keep this route's hit counters isolated.
+        tower.survival_model_asset_id = row.model_asset_id
+        tower.attack_target = dummy
+        local asset = assert(native_death_catalog.get(row.model_asset_id))
+        assert(asset.native_wearable_stage, "death route fixture must use its real native body")
+        local route_skills = {}
+        local has_grenade = false
+        for _, id in ipairs(row.skill_ids) do
+            route_skills[#route_skills + 1] = assert(definitions[id])
+            if id == "death_grenade_lv01" then has_grenade = true end
+        end
+        local attack = modifier(route_skills)
+        for cycle = 1, 2 do
+            attack:OnAttackStart({attacker=tower, target=dummy})
+            assert(#gestures == 0, row.record_id .. ": native attack received a redundant gesture")
+            assert(attack.current_attack_target == dummy and tower.attack_target == dummy,
+                row.record_id .. ": consecutive attacks lost their current target")
+            assert(count_event(events.TOWER_ATTACK_START) == cycle,
+                row.record_id .. ": native animation change swallowed attack-start consumers")
+            assert(attack:GetModifierPreAttack_CriticalStrike() == 500,
+                row.record_id .. ": critical multiplier changed")
+            attack:OnAttack({attacker=tower, target=dummy})
+            attack:OnAttackLanded({attacker=tower, target=dummy, damage=500})
+            assert(#gestures == 0 and #native_attacks == 0 and #tracking == 0,
+                row.record_id .. ": ordinary attacks were replaced or animated twice")
+            assert(count_event(events.TOWER_ATTACK_LANDED) == cycle)
+            assert(#damage == (has_grenade and cycle or 0),
+                row.record_id .. ": critical grenade damage count changed")
+            for _, hit in ipairs(damage) do
+                assert(hit.victim == dummy and hit.base_damage == 500,
+                    row.record_id .. ": critical grenade damage changed")
+            end
+            for _, event in ipairs(emitted) do
+                if event.event == events.TOWER_ATTACK_START then
+                    assert(event.payload.tower == tower and event.payload.target == dummy
+                        and event.payload.skills == route_skills)
+                elseif event.event == events.TOWER_ATTACK_LANDED then
+                    assert(event.payload.damage == 500 and event.payload.critical_multiplier == 5)
+                end
+            end
+            assert(attack.current_attack_target == dummy and tower.attack_target == dummy)
+            now = now + 1 / row.base_attack_speed
+        end
+        attack:OnDestroy()
+    end
+    tower.id, tower.survival_model_asset_id = original_id, nil
+    print("CRIT_NATIVE_ANIMATION_PASS: 20 R/SR/SSR rows, two consecutive native cycles, target/events/5x critical/grenade damage")
+end
 
 local laser = { skill_id = "laser_lv01", damage_interval = 1, damage_multiplier = 1 }
 local beam = require("config/generated/tower_laser_effects").by_id["laser_lv01:default"]
@@ -1077,7 +1143,7 @@ second.name = "npc_survival_wave_monster"
 tower.Script_GetAttackRange = saved_getter
 
 -- The Clinkz SR outfit uses its chosen searing arrow for all five levels, while
--- tracking speed is halved; hit delay follows travel, with damage unchanged.
+-- all arrows use the same configured speed; hit delay follows travel, with damage unchanged.
 local ballista_asset_id = "tower_multi_drow_dread_retribution"
 local real_catalog = assert(loadfile("scripts/vscripts/config/asset_catalog.lua"))()
 local ballista_asset = real_catalog.by_id[ballista_asset_id]
@@ -1093,10 +1159,16 @@ mock_catalog.by_id[ballista_asset_id] = ballista_asset
 local route = require("config/generated/tower_class_multi")
 local skills = require("config/generated/tower_skill_definitions")
 local saved_asset = tower.survival_model_asset_id
+local saved_class, saved_speed = tower.survival_tower_class, tower.survival_projectile_speed
+tower.survival_tower_class = "class_5"
 for level = 1, 5 do
     clear()
     local id = string.format("piercing_ballista_lv%02d", level)
     assert(route.by_id[id].projectile_model == ballista_path)
+    tower.survival_projectile_speed = require("config/tower_combat_rules").projectile_speed(
+        route.by_id[id].projectile_speed, tower.survival_tower_class)
+    assert(tower.survival_projectile_speed == 1500,
+        "multi tower's configured attack must use the updated threefold speed")
     tower.survival_model_asset_id = ballista_asset_id
     local multi = skills.by_id.multi_attack_lv05
     m = modifier({ multi, skills.by_id[id] })
@@ -1104,9 +1176,11 @@ for level = 1, 5 do
     m:OnAttack({ attacker = tower, target = dummy })
     assert(#tracking == 4 and #scheduled == 4 and #damage == 0)
     for i, projectile in ipairs(tracking) do
-        assert(projectile.EffectName == ballista_path and projectile.iMoveSpeed == 625)
+        assert(projectile.EffectName == ballista_path
+            and projectile.iMoveSpeed == tower.survival_projectile_speed)
         assert(projectile.Ability == nil and projectile.bDodgeable == false)
-        local expected_delay = (projectile.Target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D() / 625
+        local expected_delay = (projectile.Target:GetAbsOrigin() - tower:GetAbsOrigin()):Length2D()
+            / tower.survival_projectile_speed
         assert(math.abs(scheduled[i].delay - expected_delay) < 1e-9)
     end
     drain()
@@ -1118,6 +1192,7 @@ for level = 1, 5 do
     end
 end
 tower.survival_model_asset_id = saved_asset
+tower.survival_tower_class, tower.survival_projectile_speed = saved_class, saved_speed
 mock_catalog.by_id[ballista_asset_id] = nil
 
 -- A tree cannot consume a lightning bounce slot. A dead primary must still
@@ -1241,6 +1316,10 @@ clear()
 tower.skills={burning};tower.survival_super_tower_crit_chance=0
 subscribers[events.TOWER_ATTACK_START]({ tower = tower, target = dummy, skills = { burning } })
 assert(#linear == 1)
+assert(math.abs(linear[1].vVelocity:Length2D() - 500) < 1e-9,
+    "advanced multi tower's penetrating arrow must share the 500 projectile speed")
+assert(#scheduled == 1 and math.abs(scheduled[1].delay - (1200 / 500 + 0.25)) < 1e-9,
+    "penetrating arrow cleanup must allow the complete slower flight")
 local extra = linear[1].ExtraData
 assert(special.on_burning_wave_projectile_hit(ability, tree, nil, extra) == false)
 assert(#damage == 0)
@@ -1257,7 +1336,7 @@ drain()
 local selector = require("systems/tower_laser_effect_selector")
 local rarity_paths = {
     R = "particles/units/heroes/hero_tinker/tinker_laser.vpcf",
-    SR = "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser.vpcf",
+    SR = "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs.vpcf",
     SSR = "particles/econ/items/tinker/tinker_ti10_immortal_laser/tinker_ti10_immortal_laser_aghs.vpcf",
 }
 for level = 6, 25 do

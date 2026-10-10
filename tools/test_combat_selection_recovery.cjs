@@ -170,12 +170,17 @@ function setup() {
     }
     function key(index) { return abilities.FindChildTraverse('Ability' + index)?.FindChildTraverse('SurvivalAbilityHotkey'); }
     function native(index) { return abilities.FindChildTraverse('Ability' + index)?.FindChildTraverse('HotkeyContainer'); }
-    function assertKeys(expected) {
+    function assertKeys(expected, passiveSlots = []) {
         expected.forEach((text, index) => {
             const label = key(index);
             if (!text) {
                 assert(!label || label.text === '' || label.style.visibility === 'collapse');
-                assert.notEqual(native(index)?.style.opacity, '0');
+                if (passiveSlots.includes(index)) {
+                    assert.equal(native(index)?.style.opacity, '0', 'passive native shortcuts must stay hidden');
+                    assert.equal(native(index)?.hittest, false);
+                } else {
+                    assert.notEqual(native(index)?.style.opacity, '0', 'unbound active/cleared selection restores native shortcuts');
+                }
                 return;
             }
             assert(label, `missing shortcut ${text} for Ability${index}`);
@@ -315,6 +320,7 @@ for (const example of [
         name: 'npc_dota_hero_test',
         skills: [{ id: 101, name: 'test_passive', behavior: 2 }, { id: 102, name: 'test_active' }],
         keys: ['', 'Q'],
+        passiveSlots: [0],
     },
     {
         name: 'building_advanced_research_lab',
@@ -324,17 +330,17 @@ for (const example of [
     {
         name: 'npc_survival_builder_proxy',
         skills: [{ id: 101, name: 'ability_build_test', runtime: { builder_slot_order: 6 } }],
-        keys: ['A'],
+        keys: ['C'],
     },
 ]) {
     const t = setup();
     t.define(10, example.name, example.skills);
     t.mount(example.skills.length);
     t.api.refresh(false);
-    t.assertKeys(example.keys);
+    t.assertKeys(example.keys, example.passiveSlots);
     const writes = t.metrics.labelWrites;
     t.api.refresh(false);
-    t.assertKeys(example.keys);
+    t.assertKeys(example.keys, example.passiveSlots);
     assert.equal(t.metrics.labelWrites, writes, 'correct nonstandard bindings should remain stable');
 }
 
@@ -353,7 +359,7 @@ for (const example of [
     t.assertKeys(['D']);
     t.define(10, 'building_advanced_research_lab', [{ id: 101, name: 'ability_research_test', behavior: 2 }]);
     t.api.refresh(false);
-    t.assertKeys(['']);
+    t.assertKeys([''], [0]);
 }
 
 // Native reuse can overwrite runtime disabled state independently of shortcuts.
@@ -409,8 +415,14 @@ for (const example of [
     assert(t.cfg.SurvivalAbilityInput.ExecuteAbility(102),'generic destroy button retains confirmation route');
     assert.equal(t.requests.length,0,'tower buttons do not send generic ability casts');
     assert.equal(t.nativeCasts.length,0);
-    // A stale runtime disabled snapshot must not swallow the requested CD hint.
+    // Legacy unavailable state has no explicit unlock marker, so it must keep
+    // its rejection protection. A newer authoritative prerequisite marker can
+    // override stale execution availability and still reach the CD hint.
     t.cooldown(101,3); t.runtime(101,{available:0});
+    const errorCount=t.nativeErrors.length;
+    assert.equal(t.cfg.SurvivalAbilityInput.ExecuteAbility(101),false);
+    assert.equal(t.nativeErrors.length,errorCount,'legacy unavailable state stops before the move adapter');
+    t.runtime(101,{prerequisite_met:1});
     assert(t.cfg.SurvivalAbilityInput.ExecuteAbility(101));
     assert.equal(t.nativeErrors.at(-1).data.message,'移动防御塔CD中');
     assert.equal(gridCalls.length,1);

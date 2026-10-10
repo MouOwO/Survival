@@ -1,0 +1,125 @@
+{
+  "date": "2026-10-08",
+  "root_cause": "Real CDOTA_BaseNPC exposes GetProjectileSpeed but not SetProjectileSpeed; prior helper gated speed cache and native speed on the absent setter.",
+  "before": {
+    "configured": 1500,
+    "cache": null,
+    "native": 5000,
+    "split_projectile": 500
+  },
+  "code": [
+    "scripts/vscripts/systems/tower_projectile_speed.lua",
+    "scripts/vscripts/modifiers/modifier_tower_projectile_speed.lua",
+    "scripts/vscripts/systems/building_upgrade_system.lua",
+    "scripts/vscripts/tests/test_tower_projectile_speed.lua"
+  ],
+  "effective_target_speed": 1500,
+  "configuration_or_particle_changes": false,
+  "runtime_audit": "output/split_arrow_speed_20261008/runtime_audit.json",
+  "particle_audit": "output/split_arrow_speed_20261008/particle_audit.json",
+  "private_native_result": {
+    "chunk_id": "d3e4da",
+    "wall_time_seconds": 3.4903122,
+    "exit_code": 0,
+    "original_token_count": 75,
+    "output": "[TOWER_SPEED_PRIVATE] before=5000 setter=nil\n[TOWER_SPEED_PRIVATE] cache=1500 native=1500 bonus=-3500\n[TOWER_SPEED_PRIVATE] PASS repetitions=10 route_transition=1\n[TOWER_SPEED_PRIVATE] removed=true ok=true error=nil\n\n{\"sent\":1,\"expected_output_received\":null,\"initial_print_frames_suppressed\":6542}\n"
+  },
+  "integration": [
+    {
+      "test": "class_preflight",
+      "chunk_id": "445231",
+      "wall_time_seconds": 0.04155,
+      "exit_code": 0,
+      "original_token_count": 2291,
+      "output": "Warning: truncated output (original token count: 2291)\nTotal output lines: 130\n\n[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix\r\n[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=4 route_level=4 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=4 route_level=4 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v2…91 tokens truncated…em] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[Survival][INFO][BuildingSystem] initialized recovered=0\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[SURVIVAL_CAST][SERVER] RECV player=0 unit=1 ability=10001\r\n[SURVIVAL_CAST][SERVER] CHECK name=ability_tower_class_1 unit_valid=true ability_valid=true caster_matches=true owner=0 owner_matches=true passive=false behavior=0 level=1 cooldown=0 castable=true\r\n[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index=1\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[SURVIVAL_CAST][SERVER] RECV player=0 unit=1 ability=10001\r\n[SURVIVAL_CAST][SERVER] CHECK name=ability_tower_class_1 unit_valid=true ability_valid=true caster_matches=true owner=0 owner_matches=true passive=false behavior=0 level=1 cooldown=0 castable=true\r\n[SURVIVAL_CAST][SERVER] TOWER_CLASS_DISPATCHED index=1\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[BuildingSystem] recovered entindex=2 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=2\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\n[BuildingSystem] recovered entindex=1 id=arrow_tower level=5 route_level=5 class=nil\r\n[BuildingSystem] recovered entindex=2 id=arrow_tower level=5 route_level=5 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=2\r\n[SURVIVAL_CAST][SERVER] listener registered v20260720_2252\r\n[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325\r\nTOWER_CLASS_PREFLIGHT_PASS: cached/uncached failure has no side effects; real wallet/route limits; UI cooldown and native filter; completion, competition, cancellation and debug semantics\r\n"
+    },
+    {
+      "test": "upgrade_targeting",
+      "chunk_id": "61882f",
+      "wall_time_seconds": 0.039495,
+      "exit_code": 1,
+      "original_token_count": 148,
+      "output": "C:\\Program Files\\lua\\bin\\lua5.1.exe: ...ipts/vscripts/tests/test_tower_upgrade_targeting.lua:155: real construction request starts: 资源信息尚未就绪\r\nstack traceback:\r\n\t[C]: in function 'assert'\r\n\t...ipts/vscripts/tests/test_tower_upgrade_targeting.lua:155: in main chunk\r\n\t[C]: ?\r\n[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix\r\n[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\r\n[BuildingSystem] recovered entindex=2 id=main_city level=1 route_level=1 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n"
+    },
+    {
+      "test": "building_upgrade_lifecycle",
+      "chunk_id": "1dc7c0",
+      "wall_time_seconds": 0.0236696,
+      "exit_code": 1,
+      "original_token_count": 114,
+      "output": "C:\\Program Files\\lua\\bin\\lua5.1.exe: scripts/vscripts/systems/tower_projectile_speed.lua:3: attempt to call global 'LinkLuaModifier' (a nil value)\r\nstack traceback:\r\n\tscripts/vscripts/systems/tower_projectile_speed.lua:3: in main chunk\r\n\t[C]: in function 'require'\r\n\tscripts/vscripts/systems/building_upgrade_system.lua:10: in main chunk\r\n\t[C]: in function 'require'\r\n\t...s/vscripts/tests/test_building_upgrade_lifecycle.lua:69: in main chunk\r\n\t[C]: ?\r\n"
+    }
+  ],
+  "followup": [
+    {
+      "test": "building_upgrade_lifecycle",
+      "chunk_id": "62226e",
+      "wall_time_seconds": 0.0569877,
+      "exit_code": 0,
+      "original_token_count": 217,
+      "output": "[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\r\nTOWER_AUTO_PREFLIGHT_PASS: real injected checker, currency, free actions and population\r\n[BuildingUpgrade] recovered unregistered arrow tower entindex=60\r\nBUILDING_UPGRADE_LIFECYCLE_PASS: expired handle/corpse exclusion/logical death/late publish/scan recovery/live rewards/index reuse/old-event isolation\r\nFARM_CITY_GATE_PASS: LV1-5, owner isolation, prerequisite events, stable flags and max-level hiding\r\nLUMBERJACK_BUILDING_ISOLATION_PASS: 200 growth hits cause zero world scans and building refreshes\r\nTOWER_GROWTH_HOT_PATH_PASS: 1000 hits x 20 towers, 0.0230s Lua mock; zero scans/full publications/reward copies/BAT-range resets; exact damage and owner isolation\r\nPERSONAL_TOWER_HOT_PATH_PASS: 1000 hits, exactly 1000 attack writes, peer isolation, refresh persistence\r\n"
+    },
+    {
+      "test": "old_upgrade_targeting_baseline",
+      "chunk_id": "f44d5c",
+      "wall_time_seconds": 0.028524,
+      "exit_code": 1,
+      "original_token_count": 174,
+      "output": "C:\\Program Files\\lua\\bin\\lua5.1.exe: ...ipts/vscripts/tests/test_tower_upgrade_targeting.lua:155: real construction request starts: 资源信息尚未就绪\r\nstack traceback:\r\n\t[C]: in function 'assert'\r\n\t...ipts/vscripts/tests/test_tower_upgrade_targeting.lua:155: in main chunk\r\n\t[C]: in function 'dofile'\r\n\t...split_arrow_speed_20261008/old_upgrade_targeting.lua:5: in main chunk\r\n\t[C]: ?\r\n[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix\r\n[SURVIVAL_FINGERPRINT] building_upgrade_system=20260818_csv_attack_time_no_native_getter\r\n[BuildingSystem] recovered entindex=2 id=main_city level=1 route_level=1 class=nil\r\n[Survival][INFO][BuildingSystem] initialized recovered=1\r\n"
+    },
+    {
+      "test": "tower_skill_tree_exclusion",
+      "chunk_id": "0d6b35",
+      "wall_time_seconds": 0.2115267,
+      "exit_code": 0,
+      "original_token_count": 326,
+      "output": "LASER_FOLLOW_CALLS seconds=30 create=251 destroy=249 bind=753 setcp=0 peak_live=2\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:489: injected CreateParticle failure\r\n[TowerLaser] optional visual failed: control update failed\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:529: injected fallback binding failure\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:552: injected DestroyParticle failure\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:573: injected terminal destroy failure\r\nLASER_CONTINUOUS_CALLS seconds=90 create=1 destroy=0 bind=3 setcp=0 ticks=91\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:626: injected persistent creation failure\r\n[TowerLaser] optional visual failed: control update failed\r\nMACHINE_GUN_FEEDBACK_PASS: 5 levels, 2 speeds, hit timing/damage/gold, 6-8 projectiles, one gesture, coins, failure and lethal hits\r\n[WyvernBlizzardVisual] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:1479: injected snow failure\r\nTOWER_SKILL_TREE_EXCLUSION_PASS: native visuals, blizzard five levels/timing/damage/cleanup\r\n"
+    }
+  ],
+  "regression": [
+    {
+      "test": "new_native_api_regression",
+      "chunk_id": "26b00f",
+      "wall_time_seconds": 0.0243384,
+      "exit_code": 0,
+      "original_token_count": 34,
+      "output": "TOWER_PROJECTILE_SPEED_PASS: 4 routes, real modifier property, no setter, upgrade/refresh/recovery, split-arrow speed and flight delay\r\n"
+    },
+    {
+      "test": "old_code_negative",
+      "chunk_id": "15ef25",
+      "wall_time_seconds": 0.00813,
+      "exit_code": 1,
+      "original_token_count": 102,
+      "output": "C:\\Program Files\\lua\\bin\\lua5.1.exe: ...ripts/vscripts/tests/test_tower_projectile_speed.lua:90: death_tower_lv01 custom arrows must receive their speed without a setter\r\nstack traceback:\r\n\t[C]: in function 'assert'\r\n\t...ripts/vscripts/tests/test_tower_projectile_speed.lua:90: in main chunk\r\n\t[C]: in function 'dofile'\r\n\t...ut/split_arrow_speed_20261008/old_speed_negative.lua:8: in main chunk\r\n\t[C]: ?\r\n"
+    },
+    {
+      "test": "cosmetic_projectiles",
+      "chunk_id": "1d9c73",
+      "wall_time_seconds": 0.0129316,
+      "exit_code": 0,
+      "original_token_count": 34,
+      "output": "TOWER_PROJECTILE_VISUAL_PASS: blank fallback, all gun skins, same-frame overlap, different trajectories and next frames, rarity parity\r\n"
+    }
+  ],
+  "live_apply": {
+    "chunk_id": "e65f23",
+    "wall_time_seconds": 3.9570857999999998,
+    "exit_code": 0,
+    "original_token_count": 35,
+    "output": "[TOWER_SPEED_LIVE] applied=0 map=template_map state=10\n\n{\"sent\":1,\"expected_output_received\":null,\"initial_print_frames_suppressed\":6641}\n"
+  },
+  "native_validation": "Private real engine building: no setter, bonus -3500, cache and GetProjectileSpeed 1500; ten repeated applications and route transitions; private entity removed.",
+  "production_towers_hot_updated": false,
+  "production_visual_validation": false,
+  "baseline_failure": "test_tower_upgrade_targeting line155 resource info not ready reproduces with the before-task upgrade source",
+  "logic": "Cache always written; original native base cached; permanent hidden BONUS modifier reused across refresh and upgrade; no new polling.",
+  "compile_required": false,
+  "map_reload_required": true,
+  "git_mutations": false,
+  "syntax_pass": {
+    "files": 4,
+    "lua_version": "5.1"
+  },
+  "diff_check_pass": true
+}

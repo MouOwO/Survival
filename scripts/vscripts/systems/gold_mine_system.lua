@@ -6,6 +6,7 @@ local building_visual = require("systems/building_visual_service")
 local upgrade_process = require("systems/building_upgrade_process")
 local building_sound = require("systems/building_sound_service")
 local technology_stat_manager = require("systems/technology_stat_manager")
+local research_visual = require("systems/gold_mine_research_visual")
 
 local M = {}
 local state_by_entindex = {}
@@ -448,6 +449,21 @@ local function on_created(payload)
     schedule_production(state)
 end
 
+local function on_technology_completed(payload)
+    local state = state_from_payload(payload)
+    if not state or tonumber(state.player_id) ~= tonumber(payload.player_id)
+        or (payload.unit and payload.unit ~= state.unit)
+        or not valid(state.unit) or not state.unit:IsAlive() then return end
+    local group = tostring(payload.technology_group or "")
+    if not research_visual.particles[group] then return end
+    local level = tonumber(payload.level)
+    if not level or level <= 0 or technology_level(state.player_id, group) ~= level then return end
+    state.visualized_technology_levels = state.visualized_technology_levels or {}
+    if level <= (state.visualized_technology_levels[group] or 0) then return end
+    state.visualized_technology_levels[group] = level
+    research_visual.play(state.unit, group)
+end
+
 local function on_destroyed(payload)
     if payload.building_id == "gold_mine" then
         upgrade_process.cancel_by_entindex(payload.entindex, "building_destroyed")
@@ -539,6 +555,7 @@ function M.init()
     event_bus.handle_request(events.GOLD_MINE_AUTO_UPGRADE_REQUEST, toggle_auto_upgrade)
     event_bus.handle_request(events.GOLD_MINE_LEVEL_UPGRADE_REQUEST, upgrade_mine)
     event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
+    event_bus.subscribe(events.GOLD_MINE_TECHNOLOGY_COMPLETED, on_technology_completed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
         if payload and payload.changed_section == "lumberjack" then return end
         for _, state in pairs(state_by_entindex) do

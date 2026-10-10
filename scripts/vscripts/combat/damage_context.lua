@@ -1,4 +1,5 @@
 local M = {}
+local projection = require("combat/endless_stat_projection")
 
 local types = {
     ability = true, item = true, dot = true, reflection = true,
@@ -12,7 +13,7 @@ function M.validate(request)
         return false, "invalid_entity"
     end
     if not types[request.source_kind] then return false, "invalid_source_kind" end
-    if type(request.base_damage) ~= "number" or request.base_damage < 0 then
+    if not projection.is_finite(request.base_damage) or request.base_damage < 0 then
         return false, "invalid_base_damage"
     end
     if type(request.damage_type) ~= "number" then return false, "invalid_damage_type" end

@@ -11,11 +11,13 @@ local ACTIONS = {
         kind = "technology",
         group = "gold_mine_efficiency",
         label = "采金效率",
+        subject = "提高采金效率",
     },
     ability_upgrade_gold_mine_crit = {
         kind = "technology",
         group = "gold_mine_crit",
         label = "采金暴击",
+        subject = "提升采金暴击",
     },
     ability_gold_mine_auto_upgrade = {
         kind = "auto",
@@ -87,11 +89,16 @@ local function selected_candidates(primary, selected_entindexes)
     return result
 end
 
-local function notify(player_id, message, level)
+local function notify(player_id, message, level, presentation)
+    presentation = presentation or {}
     event_bus.emit(events.UI_NOTIFICATION, {
         player_id = player_id,
+        audience = "player",
         message = message,
         level = level or "info",
+        kind = presentation.kind,
+        subject = presentation.subject,
+        ability_icon = presentation.ability_icon,
     })
 end
 
@@ -213,6 +220,12 @@ local function execute_technology(payload, action, candidates)
 
     request_sequence = request_sequence + 1
     local source = eligible[1]
+    for _, candidate in ipairs(eligible) do
+        if candidate.unit == payload.primary then
+            source = candidate
+            break
+        end
+    end
     local result, request_error = event_bus.request(
         events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,
         {
@@ -342,12 +355,11 @@ function M.execute(payload)
             technology_levels_purchased = cooled > 0 and 1 or 0,
         }
         if result.ok then
-            notify(player_id, string.format(
-                "%s提升1级：同步冷却%d座，跳过%d座",
-                action.label,
-                cooled,
-                skipped
-            ))
+            notify(player_id, "研究【" .. action.subject .. "】科技成功", "info", {
+                kind = "research_success",
+                subject = action.subject,
+                ability_icon = ability_name,
+            })
         else
             result.error = first_error or (action.label .. "升级失败")
             notify(player_id, result.error, "error")

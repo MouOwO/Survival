@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-08",
+  "request": "逐风弩手普攻弹道速度×3，暴击/寒冰/防空路线同速",
+  "effective_speed_before": 500,
+  "effective_speed_after": 1500,
+  "routes": [
+    "class_5/multi",
+    "class_1/death",
+    "class_6/frost",
+    "class_7/anti_air"
+  ],
+  "rows": 80,
+  "scope": "All configured rarities and levels in the four routes",
+  "source_checks": "output/tower_projectile_speed_20261008/source_checks.json",
+  "tests": [
+    {
+      "name": "tower_skill_tree_exclusion",
+      "chunk_id": "c12ef3",
+      "wall_time_seconds": 0.2433924,
+      "exit_code": 0,
+      "original_token_count": 326,
+      "output": "LASER_FOLLOW_CALLS seconds=30 create=251 destroy=249 bind=753 setcp=0 peak_live=2\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:489: injected CreateParticle failure\r\n[TowerLaser] optional visual failed: control update failed\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:529: injected fallback binding failure\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:552: injected DestroyParticle failure\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:573: injected terminal destroy failure\r\nLASER_CONTINUOUS_CALLS seconds=90 create=1 destroy=0 bind=3 setcp=0 ticks=91\r\n[TowerLaser] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:626: injected persistent creation failure\r\n[TowerLaser] optional visual failed: control update failed\r\nMACHINE_GUN_FEEDBACK_PASS: 5 levels, 2 speeds, hit timing/damage/gold, 6-8 projectiles, one gesture, coins, failure and lethal hits\r\n[WyvernBlizzardVisual] optional visual failed: ...s/vscripts/tests/test_tower_skill_tree_exclusion.lua:1479: injected snow failure\r\nTOWER_SKILL_TREE_EXCLUSION_PASS: native visuals, blizzard five levels/timing/damage/cleanup\r\n"
+    },
+    {
+      "name": "tower_projectile_visual",
+      "chunk_id": "e3e382",
+      "wall_time_seconds": 0.0210013,
+      "exit_code": 0,
+      "original_token_count": 34,
+      "output": "TOWER_PROJECTILE_VISUAL_PASS: blank fallback, all gun skins, same-frame overlap, different trajectories and next frames, rarity parity\r\n"
+    },
+    {
+      "name": "effective_speeds",
+      "chunk_id": "b9c231",
+      "wall_time_seconds": 0.0000073,
+      "exit_code": 0,
+      "original_token_count": 19,
+      "output": "TOWER_EFFECTIVE_SPEEDS_PASS: 80 rows at 1500; other route rules retained\r\n"
+    }
+  ],
+  "syntax": {
+    "passed": true,
+    "files": 5,
+    "version": "Lua 5.1"
+  },
+  "diff_check": true,
+  "other_csv_fields_unchanged": true,
+  "generated_modules_only_speed_changed": true,
+  "combat_changes": "Projectile travel and matching hit delay only; damage amounts and attack rates unchanged",
+  "native_visual_validation": false,
+  "resource_compile_required": false,
+  "map_reload_required": true,
+  "git_sync_requested": false,
+  "git_mutations": false
+}

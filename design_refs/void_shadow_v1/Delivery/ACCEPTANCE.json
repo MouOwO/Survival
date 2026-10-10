@@ -1,0 +1,470 @@
+{
+  "at": "2026-10-10T01:43:46.097Z",
+  "version": "void_shadow_v1",
+  "scope": "Single page first-version review",
+  "native": {
+    "resolution": [
+      1600,
+      900
+    ],
+    "evidence": [
+      {
+        "source": "design_refs/void_shadow_v1/work/native/physical_shadow_current_1600.png",
+        "output": "full_page_game_1600x900.png",
+        "sha256": "2dfb0e71adc9b9d81b940f729cd599ed542ae054b504b7c9fae9f8e6dc22761e",
+        "capturedAt": "2026-10-10T01:34:56.434Z",
+        "state": "All: 23 actual archive items, 8+8+7; live counts and caps",
+        "kind": "actual_game_foreground_client_capture",
+        "size": [
+          1600,
+          900
+        ],
+        "method": "window.ps1: verified Survival Workshop process, guarded foreground mouse input and CopyFromScreen client rectangle",
+        "visuallyReviewed": true,
+        "unaltered": true
+      },
+      {
+        "source": "design_refs/void_shadow_v1/work/native/physical_owned_1600.png",
+        "output": "owned_game_1600x900.png",
+        "sha256": "d2b8aef392ae55cd56e691a6abcf025edd5a99a200f65c716332b2d073833f9f",
+        "capturedAt": "2026-10-10T01:31:14.558Z",
+        "state": "Owned: 3 items, counts 2, 1, 1",
+        "kind": "actual_game_foreground_client_capture",
+        "size": [
+          1600,
+          900
+        ],
+        "method": "window.ps1: verified Survival Workshop process, guarded foreground mouse input and CopyFromScreen client rectangle",
+        "visuallyReviewed": true,
+        "unaltered": true
+      },
+      {
+        "source": "design_refs/void_shadow_v1/work/native/physical_shadow_locked_1600.png",
+        "output": "locked_game_1600x900.png",
+        "sha256": "624a5fb7d08cbb144d9d4768ff6c7d8b72ceeb75b4f9b939d7fb00c03983a4c0",
+        "capturedAt": "2026-10-10T01:35:20.486Z",
+        "state": "Locked: 20 items with known count 0",
+        "kind": "actual_game_foreground_client_capture",
+        "size": [
+          1600,
+          900
+        ],
+        "method": "window.ps1: verified Survival Workshop process, guarded foreground mouse input and CopyFromScreen client rectangle",
+        "visuallyReviewed": true,
+        "unaltered": true
+      },
+      {
+        "source": "design_refs/void_shadow_v1/work/native/physical_shadow_tooltip_1600.png",
+        "output": "tooltip_game_1600x900.png",
+        "sha256": "6ff53cf7df7730b559ba80b56ca2cab6a330a2a16b89edd4773285278fc21e3c",
+        "capturedAt": "2026-10-10T01:36:04.035Z",
+        "state": "Physical hover: existing tooltip, real count 2 and effect wood +10",
+        "kind": "actual_game_foreground_client_capture",
+        "size": [
+          1600,
+          900
+        ],
+        "method": "window.ps1: verified Survival Workshop process, guarded foreground mouse input and CopyFromScreen client rectangle",
+        "visuallyReviewed": true,
+        "unaltered": true
+      },
+      {
+        "source": "design_refs/void_shadow_v1/work/native/physical_clear_restored_1600.png",
+        "output": "other_category_restored_game_1600x900.png",
+        "sha256": "871b3055eba34cf557277fcba23f361c60a1211ec628ce2f1dade960a18cc396",
+        "capturedAt": "2026-10-10T01:37:33.211Z",
+        "state": "Switch to clear: original archive view and shell restored",
+        "kind": "actual_game_foreground_client_capture",
+        "size": [
+          1600,
+          900
+        ],
+        "method": "window.ps1: verified Survival Workshop process, guarded foreground mouse input and CopyFromScreen client rectangle",
+        "visuallyReviewed": true,
+        "unaltered": true
+      },
+      {
+        "source": "design_refs/void_shadow_v1/work/native/physical_closed_verified_1600.png",
+        "output": "closed_game_1600x900.png",
+        "sha256": "dc5effadfe89566d8ab5f34c51ab712a9ee0d5f23793929c66199ea36901f09b",
+        "capturedAt": "2026-10-10T01:37:34.934Z",
+        "state": "Close: archive absent, battlefield and HUD visible",
+        "kind": "actual_game_foreground_client_capture",
+        "size": [
+          1600,
+          900
+        ],
+        "method": "window.ps1: verified Survival Workshop process, guarded foreground mouse input and CopyFromScreen client rectangle",
+        "visuallyReviewed": true,
+        "unaltered": true
+      },
+      {
+        "source": "design_refs/void_shadow_v1/work/native/physical_clear_reopen_verified_1600.png",
+        "output": "reopened_archive_game_1600x900.png",
+        "sha256": "b3451dc529832d64b6ccfbc43933c03594b043f14f4e7e71f46d6d36bddfbc9a",
+        "capturedAt": "2026-10-10T01:37:36.609Z",
+        "state": "Physical archive entry: default clear page opens",
+        "kind": "actual_game_foreground_client_capture",
+        "size": [
+          1600,
+          900
+        ],
+        "method": "window.ps1: verified Survival Workshop process, guarded foreground mouse input and CopyFromScreen client rectangle",
+        "visuallyReviewed": true,
+        "unaltered": true
+      },
+      {
+        "source": "design_refs/void_shadow_v1/work/native/physical_shadow_reopen_verified_1600.png",
+        "output": "reopened_shadow_game_1600x900.png",
+        "sha256": "fc3ed30b0d3f6226e3730288f453e7e233caa1d615ad16d758562bb73599f17b",
+        "capturedAt": "2026-10-10T01:37:38.317Z",
+        "state": "Physical shadow category: new page opens again",
+        "kind": "actual_game_foreground_client_capture",
+        "size": [
+          1600,
+          900
+        ],
+        "method": "window.ps1: verified Survival Workshop process, guarded foreground mouse input and CopyFromScreen client rectangle",
+        "visuallyReviewed": true,
+        "unaltered": true
+      }
+    ],
+    "verified": [
+      "complete 23 items in 8+8+7",
+      "owned 3, locked 20 using real counts",
+      "physical hover and original tooltip",
+      "switch category restores existing shell",
+      "close and reopen via physical game entry"
+    ],
+    "unchanged": "UI-only review; no profile fixtures or archive save calls"
+  },
+  "browser": {
+    "status": "PASS_BROWSER_VOID_SHADOW_V1",
+    "sourceDigest": "8d279854525388a0921c87afecd321ed6438c643cc24141d369db940e014e4fe",
+    "report": "../work/browser_v1/report.json",
+    "limitation": "Browser adapter approximates native layout and shrink; extra resolutions and extreme fixture values are browser-only"
+  },
+  "compilation": {
+    "at": "2026-10-10T09:17:36.2375880+08:00",
+    "success": true,
+    "exactFiles": 44,
+    "sourceContentRuntimeChecks": [
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\backgrounds\\top_navigation_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\backgrounds\\top_navigation_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\backgrounds\\resource_strip_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\backgrounds\\resource_strip_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\backgrounds\\sidebar_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\backgrounds\\sidebar_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\backgrounds\\content_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\backgrounds\\content_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\sidebar_selected_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\sidebar_selected_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\filter_selected_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\filter_selected_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\filter_default_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\filter_default_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\top_tab_active_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\top_tab_active_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\window_frame_overlay.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\window_frame_overlay_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\close_cross.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\close_cross_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\archive_icon.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\archive_icon_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\resource_gold.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\resource_gold_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\resource_purple_gem.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\resource_purple_gem_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\resource_ticket.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\resource_ticket_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\common\\quantity_plate_no_text.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\common\\quantity_plate_no_text_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_01.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_01_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_02.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_02_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_03.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_03_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_04.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_04_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_05.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_05_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_06.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_06_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_07.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_07_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_08.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_08_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_09.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_09_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_10.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_10_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_11.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_11_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_12.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_12_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_13.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_13_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_14.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_14_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_15.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_15_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_16.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_16_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_17.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_17_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_18.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_18_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_19.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_19_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_20.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_20_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_21.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_21_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_22.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_22_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\void_shadow_v1\\items\\virtual_23.png",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\images\\custom_game\\void_shadow_v1\\items\\virtual_23_png.vtex_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\archive_void_v1_data.js",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\archive_void_v1_data.vjs_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\archive_void_v1.js",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\archive_void_v1.vjs_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\styles\\custom_game\\archive_void_v1.css",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\styles\\custom_game\\archive_void_v1.vcss_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\archive_180de7e38b_titles_compact_v6.js",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\archive_180de7e38b_titles_compact_v6.vjs_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\layout\\custom_game\\archive_void_v1_assets.xml",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\layout\\custom_game\\archive_void_v1_assets.vxml_c",
+        "artifactMatches": true
+      },
+      {
+        "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\layout\\custom_game\\archive.xml",
+        "sourceMatches": true,
+        "contentMatches": true,
+        "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\layout\\custom_game\\archive.vxml_c",
+        "artifactMatches": true
+      }
+    ]
+  },
+  "excludedEvidence": "Early work/native captures with stale/background frames were not accepted as state-transition evidence.",
+  "visualDifferences": [
+    "Real names, quantities, category labels and caps differ from data_preview.json by design",
+    "Native text rasterization is heavier than the package dynamic preview",
+    "Existing tooltip presentation retained; outer background is the live battlefield"
+  ],
+  "blockers": [],
+  "reviewStatus": "Awaiting user review; no further visual iteration this round"
+}

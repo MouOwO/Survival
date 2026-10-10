@@ -664,6 +664,13 @@ function M.commerce_build(player_id,caster,position)
     if not alive(caster) or tonumber(caster.survival_player_id)~=player_id
         or not require('systems/commerce_effects').owned(player_id,'tower_seal') then return {ok=false,error='ultimate_not_owned'} end
     if #player_ultimates(player_id)>=ultimate_limit() or fusion_in_progress[player_id] then return {ok=false,error='ultimate_tower_already_exists'} end
+    local occupied = event_bus.request(events.BUILDING_COUNTS_REQUEST, {player_id = player_id})
+    local tower_definition = require("config/buildings_config").arrow_tower
+    if not occupied or not occupied.ok then return {ok=false,error="建筑数量信息尚未就绪"} end
+    if require("systems/building_count_limit_service").reached(tower_definition.max_count,
+        occupied.counts and occupied.counts.arrow_tower, "arrow_tower", player_id) then
+        return {ok=false,error="防御塔数量已达上限（每人最多" .. tostring(tower_definition.max_count) .. "座）"}
+    end
     if (position-caster:GetAbsOrigin()):Length2D()>1200 then return {ok=false,error='建造位置超出1200范围'} end
     local selected,cost={}, {wood=0,gold=0}
     local building=require('config/buildings_config').arrow_tower
@@ -726,6 +733,17 @@ function M.init()
         end)
     event_bus.subscribe(events.BUILDING_CREATED, on_building)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building)
+    event_bus.subscribe(events.ENGINE_ENTITY_KILLED, function(payload)
+        local victim = payload and payload.victim
+        if not valid(victim) then return end
+        local state = state_by_entindex[victim:entindex()]
+        if not state or state.unit ~= victim then return end
+        remove_ultimate_state(state)
+        event_bus.emit(events.TOWER_FUSION_STATE_CHANGED, {
+            player_id = state.player_id, ultimate_count = #player_ultimates(state.player_id),
+            maximum = ultimate_limit(), reason = "ultimate_tower_killed",
+        })
+    end)
     event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED,
         on_hero_combat_stats_changed)
 end

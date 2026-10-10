@@ -24,6 +24,9 @@ local daily_viewers, purchase_provider = {}, nil
 local vip_viewers = {}
 local archive_players = {}
 local sent_pages = {}
+local ENDLESS_FLUSH_INTERVAL, ENDLESS_BATCH_LIMIT = 5, 32
+local endless_due, endless_force = {}, {}
+local endless_generation = 0
 
 local function runtime_id()
     local parts = { "archive" }
@@ -91,7 +94,7 @@ local function enabled_categories()
     return result
 end
 
-local renderers = {}
+local renderers, custom_renderers = {}, {}
 renderers.titles = function(_, archive) return require("systems/archive_titles").rows(archive) end
 renderers.gift = function(_, archive) return require("systems/archive_welfare_rewards").rows(archive) end
 renderers.starjoy_points = function(profile) return require("systems/archive_starjoy_rewards").project(profile) end
@@ -150,6 +153,7 @@ end
 function M.register_category(category_id, projector)
     assert(categories.by_id[category_id] and type(projector) == "function")
     renderers[category_id] = projector
+    custom_renderers[category_id] = true
 end
 
 local function upgrade_pending(player_id, category_id)
@@ -161,8 +165,7 @@ local function upgrade_pending(player_id, category_id)
     return 0
 end
 
-function M.snapshot(player_id, category_id)
-    local profile = account_profile(player_id)
+local function snapshot_profile(player_id, category_id, profile)
     if not profile then return { ok = false, error = "profile_not_loaded" } end
     category_id = tostring(category_id or "clear")
     local category = categories.by_id[category_id]
@@ -188,11 +191,19 @@ function M.snapshot(player_id, category_id)
         pending = pending[player_id] and next(pending[player_id]) ~= nil and 1 or 0 }
 end
 
-local function send_page(player_id, category_id)
+function M.snapshot(player_id, category_id)
+    return snapshot_profile(player_id, category_id, account_profile(player_id))
+end
+
+local function send_page(player_id, category_id, profile)
     if not CustomGameEventManager or not PlayerResource then return end
     local player = PlayerResource:GetPlayer(player_id)
     if not player then return end
-    local result = M.snapshot(player_id, category_id)
+    -- Built-in projectors only read this private per-send account snapshot.
+    -- Extensions retain their own copy, as when each page fetched its profile.
+    local result = profile and snapshot_profile(player_id, category_id,
+        custom_renderers[category_id] and copy(profile) or profile)
+        or M.snapshot(player_id, category_id)
     if not result.ok then return end
     sent_pages[player_id] = sent_pages[player_id] or {}
     local previous = sent_pages[player_id][category_id]
@@ -213,8 +224,14 @@ local function send_page(player_id, category_id)
     sent_pages[player_id][category_id]={sequence=serial,data=copy(result)}
 end
 local function send(player_id)
+    if not CustomGameEventManager or not PlayerResource
+        or not PlayerResource:GetPlayer(player_id) then return end
+    -- A retry may have changed no data at all. Preserve every page's original
+    -- delta/checkpoint behavior while avoiding 17 full account-profile reads.
+    local profile = account_profile(player_id)
+    if not profile then return end
     for _, category in ipairs(enabled_categories()) do
-        if categories.by_id[category.id] then send_page(player_id,category.id) end
+        if categories.by_id[category.id] then send_page(player_id,category.id,profile) end
     end
 end
 
@@ -238,31 +255,107 @@ local function local_settle(player_id, command)
         { archive = archive, gameplay_stats = stats }, "archive_" .. command.kind)
 end
 
-local function flush(player_id)
+local flush
+local function endless_pending(player_id)
+    for _, command in pairs(pending[player_id] or {}) do
+        if command.kind == "endless" then return true end
+    end
+    return false
+end
+local function schedule_endless(player_id, delay)
+    local generation = endless_generation
+    scheduler.after(math.max(0, delay), function()
+        if generation == endless_generation then flush(player_id) end
+    end, "archive_endless_flush:" .. player_id)
+end
+local function submit_endless_batch(provider, player_id, commands, complete)
+    if type(provider.submit_endless_batch) == "function" then
+        return provider.submit_endless_batch(player_id, commands, complete)
+    end
+    -- Old/custom providers retain every existing intent. Drain a bounded
+    -- five-second batch serially instead of building a one-wave backlog.
+    local results, index = {}, 1
+    local function next_command()
+        local command = commands[index]
+        if not command then complete({ok=true,results=results}); return end
+        provider.submit(player_id, command, function(result)
+            result = result or {ok=false,error="archive_response_invalid"}
+            result.id = command.id
+            results[#results+1] = result
+            if not result.ok and not result.terminal then
+                complete({ok=false,error=result.error,results=results}); return
+            end
+            index = index + 1
+            next_command()
+        end)
+    end
+    next_command()
+end
+
+flush = function(player_id)
     if busy[player_id] then return end
     local queue = pending[player_id]
     if not queue then return end
     -- A retrying background reward must not starve an explicit purchase.
     -- Keep every queued command; serialize purchases through the same provider.
     local ordered = {}
-    for id, command in pairs(queue) do ordered[#ordered + 1] = { id = id, command = command } end
+    local held_delay
+    local current_time = remote_provider and GameRules:GetGameTime()
+    for id, command in pairs(queue) do
+        local held = false
+        if remote_provider and command.kind == "endless" and not finalizing and not endless_force[player_id] then
+            endless_due[player_id] = endless_due[player_id] or current_time + ENDLESS_FLUSH_INTERVAL
+            local delay = endless_due[player_id] - current_time
+            if delay > 0 then held_delay = held_delay or delay; held = true end
+        end
+        if not held then ordered[#ordered+1] = {id=id,command=command} end
+    end
+    if held_delay then schedule_endless(player_id, held_delay) end
     table.sort(ordered, function(a, b)
         local ap = a.command.kind == "work_upgrade" or a.command.kind == "building_upgrade"
         local bp = b.command.kind == "work_upgrade" or b.command.kind == "building_upgrade"
         if ap ~= bp then return ap end
+        if a.command.kind == "endless" and b.command.kind == "endless" then
+            return a.command.wave < b.command.wave
+        end
         return a.id < b.id
     end)
     for _, entry in ipairs(ordered) do
         local id, command = entry.id, entry.command
+        local batch
+        if remote_provider and command.kind == "endless" then
+            batch = {}
+            for _, candidate in ipairs(ordered) do
+                if candidate.command.kind == "endless" and #batch < ENDLESS_BATCH_LIMIT then
+                    batch[#batch+1] = copy(candidate.command)
+                end
+            end
+            endless_due[player_id] = GameRules:GetGameTime() + ENDLESS_FLUSH_INTERVAL
+            if not finalizing and not endless_force[player_id] then schedule_endless(player_id, ENDLESS_FLUSH_INTERVAL) end
+        end
         local attempt = {}
         busy[player_id] = attempt
         local function complete(result)
             if busy[player_id] ~= attempt then return end
             busy[player_id] = nil
             scheduler.cancel("archive_remote_timeout:" .. player_id)
-            if result and (result.ok or result.terminal) then queue[id] = nil end
-            if result and result.terminal and not result.ok then
-                bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=result.error or "存档请求被拒绝"})
+            local terminal_error
+            if batch then
+                local submitted = {}
+                for _, value in ipairs(batch) do submitted[value.id] = true end
+                local acknowledgements = result and type(result.results)=="table" and result.results or {}
+                for _, value in ipairs(acknowledgements) do
+                    if type(value)=="table" and submitted[value.id]
+                        and (value.ok==true or value.terminal==true) then
+                        queue[value.id], submitted[value.id] = nil, nil
+                        if value.terminal==true and value.ok~=true then
+                            terminal_error = terminal_error or value.error or "存档请求被拒绝"
+                        end
+                    end
+                end
+            elseif result and (result.ok or result.terminal) then queue[id] = nil end
+            if terminal_error or result and result.terminal and not result.ok then
+                bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=terminal_error or result.error or "存档请求被拒绝"})
             end
             send(player_id)
             if vip_viewers[player_id] then M.send_vip(player_id,result) end
@@ -272,6 +365,13 @@ local function flush(player_id)
                     error=result and result.error,terminal=result and result.terminal==true
                 } or nil)
             end
+            if not endless_pending(player_id) then
+                endless_force[player_id] = nil
+                scheduler.cancel("archive_endless_flush:" .. player_id)
+            elseif (finalizing or endless_force[player_id]) and result and result.ok then
+                -- Cross a server frame before the next bounded final batch.
+                schedule_endless(player_id, 0)
+            end
         end
         if remote_provider then
             scheduler.after(35, function()
@@ -279,7 +379,9 @@ local function flush(player_id)
             end, "archive_remote_timeout:" .. player_id)
             -- Adapter submits intent to the trusted backend. It must apply
             -- the returned authoritative profile before calling complete.
-            local ok, err = pcall(remote_provider.submit, player_id, copy(command), complete)
+            local ok, err
+            if batch then ok, err = pcall(submit_endless_batch, remote_provider, player_id, batch, complete)
+            else ok, err = pcall(remote_provider.submit, player_id, copy(command), complete) end
             if not ok then complete({ ok = false, error = tostring(err) }) end
             return
         end
@@ -401,6 +503,15 @@ function M.record_endless_wave(player_id, wave_number, difficulty)
     end
     return enqueue(player_id, { id = session_id .. ":endless:" .. wave_number,
         kind = "endless", wave = wave_number, difficulty = tonumber(difficulty) })
+end
+
+function M.flush_endless_rewards(player_id)
+    player_id = tonumber(player_id)
+    if not integer(player_id) then return {ok=false,error="player_invalid"} end
+    if not endless_pending(player_id) then return {ok=true} end
+    endless_force[player_id] = true
+    scheduler.cancel("archive_endless_flush:" .. player_id)
+    return flush(player_id) or {ok=true,pending=true}
 end
 
 local function day_key()
@@ -551,6 +662,9 @@ function M.init()
     require("systems/title_presentation_service").init()
     finalizing = false
     sent_pages = {}
+    endless_generation = endless_generation + 1
+    for id in pairs(pending) do scheduler.cancel("archive_endless_flush:" .. id) end
+    endless_due, endless_force = {}, {}
     pending, busy, selected, throttles = {}, {}, {}, {}
     daily_viewers = {}
     vip_viewers = {}
@@ -586,7 +700,7 @@ function M.init()
     end)
     bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
         local id = tonumber(payload.player_id)
-        if id then online_clock.disconnect(id) end
+        if id then online_clock.disconnect(id); M.flush_endless_rewards(id) end
     end)
     scheduler.every(1, function()
         if finalizing or http_adapter.enabled() then return end -- Remote online credit consumes the existing DB checkpoint only.

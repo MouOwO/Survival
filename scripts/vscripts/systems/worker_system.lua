@@ -1,6 +1,7 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/workers_config")
+local worker_attack_cap = require("systems/worker_native_attack_cap")
 local training_definitions = require("config/generated/training_definitions")
 local global_rules = require("config/global_rules")
 local technology_stat_manager = require("systems/technology_stat_manager")
@@ -17,6 +18,8 @@ local M = {}
 local training_queue
 local disconnected_players = {}
 local workers = {}
+local cheer_targets_by_player = {}
+local cheer_projection_owner = setmetatable({}, {__mode = "k"})
 local pending_growth_ui = {}
 local trees_by_player = {}
 local function player_tree(player_id)
@@ -88,31 +91,62 @@ local function personality_has(unit, skill_id)
     return definition and has_ability(unit, definition.ability_name) or false
 end
 
-local function leader_bonus_for(state)
-    local bonus = 0
+local function leader_bonuses_for(player_id)
+    local total, by_state = 0, {}
     for _, other in pairs(workers) do
-        if other ~= state and other.player_id == state.player_id
+        if other.player_id == player_id
             and valid_entity(other.unit)
             and personality_has(other.unit, "lumberjack_personality_leader") then
-            bonus = bonus + personality_value(
+            local bonus = personality_value(
                 other.unit, "other_lumberjack_attack_speed_pct"
             )
+            total = total + bonus
+            by_state[other] = bonus
         end
     end
-    return bonus
+    return total, by_state
+end
+
+local function cheer_owner_id(unit)
+    local unit_player_id = tonumber(unit.survival_player_id)
+    if unit_player_id == nil and unit.GetPlayerOwnerID then
+        unit_player_id = tonumber(unit:GetPlayerOwnerID())
+    end
+    return unit_player_id
+end
+
+local function publish_cheer_change(unit, player_id, previous, bonus_pct)
+    if previous ~= bonus_pct then
+        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {unit=unit,entindex=unit:entindex(),
+            player_id=player_id,reason="lumberjack_cheer_changed"})
+    end
+end
+
+local function clear_cheer_projection(unit, player_id, modifier)
+    -- A transferred unit may already carry its new owner's projection. Remove
+    -- only this owner's last applied handle, including targets retired from a
+    -- registry while the native unit/modifier still exists.
+    if cheer_projection_owner[unit] ~= player_id then return end
+    if valid_entity(unit) then
+        local previous = tonumber(unit.survival_cheer_attack_speed_pct) or 0
+        unit.survival_cheer_attack_speed_pct = 0
+        if modifier and not modifier:IsNull()
+            and unit:FindModifierByName("modifier_lumberjack_cheer") == modifier then
+            modifier:Destroy()
+        end
+        publish_cheer_change(unit, cheer_owner_id(unit) or player_id, previous, 0)
+    end
+    cheer_projection_owner[unit] = nil
 end
 
 local function apply_cheer_buff(unit, player_id, bonus_pct)
     if not valid_entity(unit) then return end
     local worker_state = unit.entindex and workers[unit:entindex()] or nil
-    local unit_player_id = tonumber(unit.survival_player_id)
-    if unit_player_id == nil and unit.GetPlayerOwnerID then
-        unit_player_id = tonumber(unit:GetPlayerOwnerID())
-    end
     local eligible = unit.IsRealHero and unit:IsRealHero()
         or unit.survival_building_id == "arrow_tower"
         or worker_state and worker_state.worker_type == "lumberjack"
-    if not eligible or unit_player_id ~= player_id then return end
+    if not eligible or cheer_owner_id(unit) ~= player_id then return end
+    if bonus_pct > 0 then worker_attack_cap.restore_or_error(unit) end
     local previous = tonumber(unit.survival_cheer_attack_speed_pct) or 0
     unit.survival_cheer_attack_speed_pct = bonus_pct
     local modifier = unit:FindModifierByName("modifier_lumberjack_cheer")
@@ -127,46 +161,84 @@ local function apply_cheer_buff(unit, player_id, bonus_pct)
     elseif modifier then
         modifier:Destroy()
     end
-    if previous ~= bonus_pct then
-        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {unit=unit,entindex=unit:entindex(),
-            player_id=player_id,reason="lumberjack_cheer_changed"})
-    end
+    cheer_targets_by_player[player_id][unit] = modifier or false
+    cheer_projection_owner[unit] = player_id
+    publish_cheer_change(unit, player_id, previous, bonus_pct)
+end
+
+local function cheer_native_candidate(unit, team)
+    if not valid_entity(unit) or unit.IsAlive and not unit:IsAlive()
+        or unit.GetTeamNumber and unit:GetTeamNumber() ~= team then return false end
+    if type(UnitFilter) == "function" and UF_SUCCESS ~= nil then
+        if UnitFilter(unit, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL,
+            DOTA_UNIT_TARGET_FLAG_NONE, team) ~= UF_SUCCESS then return false end
+    elseif unit.IsInvulnerable and unit:IsInvulnerable()
+        or unit.IsOutOfGame and unit:IsOutOfGame() then return false end
+    local position = unit.GetAbsOrigin and unit:GetAbsOrigin()
+    return not position or position.x * position.x + position.y * position.y <= 99999 * 99999
 end
 
 local function refresh_cheer_buffs(player_id)
     if not PlayerResource or not PlayerResource.GetTeam then return end
     local team = PlayerResource:GetTeam(player_id)
-    if not team or not FindUnitsInRadius then return end
+    if not team then return end
     local bonus_pct = 0
+    local owned_workers = {}
     for _, state in pairs(workers) do
-        if state.player_id == player_id and valid_entity(state.unit)
-            and personality_has(state.unit, "lumberjack_personality_cheer") then
-            bonus_pct = bonus_pct + personality_value(
-                state.unit, "owner_attack_speed_pct"
-            )
+        if state.player_id == player_id and valid_entity(state.unit) then
+            if personality_has(state.unit, "lumberjack_personality_cheer") then
+                bonus_pct = bonus_pct + personality_value(
+                    state.unit, "owner_attack_speed_pct"
+                )
+            end
+            if state.worker_type == "lumberjack" then owned_workers[#owned_workers + 1] = state.unit end
         end
     end
-    local units = FindUnitsInRadius(
-        team, Vector(0, 0, 0), nil, 99999,
-        DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL,
-        DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false
-    )
+    local projected = cheer_targets_by_player[player_id]
+    if bonus_pct <= 0 then
+        -- Ordinary workers never project cheer. In that common case there is
+        -- no previous buff to remove and no reason to enumerate target units.
+        if projected then
+            for unit, modifier in pairs(projected) do clear_cheer_projection(unit, player_id, modifier) end
+            cheer_targets_by_player[player_id] = nil
+        end
+        return
+    end
+    projected = projected or setmetatable({}, {__mode = "k"})
+    cheer_targets_by_player[player_id] = projected
     local seen = {}
-    for _, unit in ipairs(units or {}) do
-        if valid_entity(unit) then
+    local function apply_native(unit)
+        if valid_entity(unit) and cheer_owner_id(unit) == player_id
+            and not seen[unit:entindex()] and cheer_native_candidate(unit, team) then
             seen[unit:entindex()] = true
             apply_cheer_buff(unit, player_id, bonus_pct)
         end
     end
+    for _, unit in ipairs(owned_workers) do apply_native(unit) end
+    -- HeroList is the engine's hero registry, including native W clones that
+    -- are not the player's main summon. Preserve the old IsRealHero gate.
+    if HeroList and HeroList.GetAllHeroes then
+        for _, unit in ipairs(HeroList:GetAllHeroes() or {}) do
+            if valid_entity(unit) and unit.IsRealHero and unit:IsRealHero() then apply_native(unit) end
+        end
+    else
+        local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {player_id = player_id})
+        apply_native(summoned and (summoned.unit or summoned.hero))
+        if PlayerResource.GetSelectedHeroEntity then apply_native(PlayerResource:GetSelectedHeroEntity(player_id)) end
+    end
+    for unit in pairs(projected) do apply_native(unit) end
     local building_list = event_bus.request(events.BUILDING_LIST_REQUEST, {
-        player_id = player_id,
+        player_id = player_id, building_id = "arrow_tower", handles_only = true,
     }) or {}
     for _, building in ipairs(building_list.buildings or {}) do
         local entindex = tonumber(building.entindex)
-        if building.building_id == "arrow_tower" and entindex
-            and not seen[entindex] and type(EntIndexToHScript) == "function" then
-            local ok, unit = pcall(EntIndexToHScript, entindex)
-            if ok then apply_cheer_buff(unit, player_id, bonus_pct) end
+        if building.building_id == "arrow_tower" and entindex and not seen[entindex] then
+            local unit = building.unit
+            if not unit and type(EntIndexToHScript) == "function" then
+                local ok, resolved = pcall(EntIndexToHScript, entindex)
+                if ok then unit = resolved end
+            end
+            if unit then apply_cheer_buff(unit, player_id, bonus_pct) end
         end
     end
 end
@@ -446,6 +518,9 @@ local function refresh_worker_technology(player_id, refresh_reason)
         + armor_balance.from_war3_linear(
             tonumber(permanent.global_attack_armor_reduction) or 0
         )
+    -- Leaders affect every other owned lumberjack, regardless of distance.
+    -- Aggregate once per synchronous refresh and exclude each leader itself.
+    local leader_total, leader_bonuses = leader_bonuses_for(player_id)
     for entindex, state in pairs(workers) do
         if state.worker_type == "lumberjack"
             and state.player_id == player_id and valid_entity(state.unit) then
@@ -462,7 +537,7 @@ local function refresh_worker_technology(player_id, refresh_reason)
                 {{label="科技",value=tonumber(lumberjack.attack_speed_bonus_pct) or 0},
                  {label="存档",value=tonumber(permanent.lumberjack_attack_speed_bonus_pct) or 0},
                  {label="性格",value=state.personality_attack_speed_pct or 0},
-                 {label="领袖",value=leader_bonus_for(state)}})
+                 {label="领袖",value=leader_total - (leader_bonuses[state] or 0)}})
             state.unit.survival_attack_cadence = cadence
             state.unit:SetBaseAttackTime(final_attack_interval)
             state.unit.survival_attack_speed = 1 / final_attack_interval
@@ -875,7 +950,9 @@ local function train_worker_one(payload)
     )
     worker:SetBaseAttackTime(1 / attack_speed)
     worker.survival_attack_speed = attack_speed
-    if not worker:HasModifier("modifier_debug_attack_cap") then
+    local cap_candidate = worker_attack_cap.is_training_candidate(
+        training_id, training, training.unit_name or config.unit_name)
+    if not cap_candidate and not worker:HasModifier("modifier_debug_attack_cap") then
         worker:AddNewModifier(worker, nil, "modifier_debug_attack_cap", {})
     end
     worker:SetBaseMoveSpeed(tonumber(training.move_speed) or config.move_speed)
@@ -889,6 +966,10 @@ local function train_worker_one(payload)
     end
     require("systems/worker_visual_service").apply(worker, training)
     add_training_abilities(worker, training)
+    if cap_candidate and not worker_attack_cap.omit_new(worker, training_id, training, true)
+        and not worker:HasModifier("modifier_debug_attack_cap") then
+        worker:AddNewModifier(worker, nil, "modifier_debug_attack_cap", {})
+    end
     local is_repairer = training_id:match("^train_repairer_") ~= nil
     local technology_efficiency = 0
     if is_repairer then
@@ -1014,6 +1095,12 @@ local function initialize_training_queue()
         schedule = scheduler.after,
         cancel = scheduler.cancel,
         validate = training_source_valid,
+        can_reserve = function(job)
+            return event_bus.request(events.RESOURCE_CAN_SPEND_REQUEST, {
+                player_id = job.player_id, team = job.team,
+                wood = job.wood_cost, gold = job.gold_cost, population = job.population,
+            }) or {ok = false, error = "resource_error"}
+        end,
         reserve = function(job)
             local before = event_bus.request(events.RESOURCE_GET_REQUEST, {player_id = job.player_id})
             local spent = event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
@@ -1119,7 +1206,13 @@ local function lumberjack_training_state(payload)
         option.population = option.population_cost
         option.train_duration = math.max(0.05, option.train_duration)
         option.available, option.reason = 1, ""
+        option.can_afford, option.resource_check_on_cast = 1, 1
         if option.completed ~= 1 then slots = slots + 1 end
+        -- Queue capacity and currency are execution checks, not learning gates.
+        -- Admission checks the current account without holding resources.
+        -- The queue atomically pays and occupies population at actual start.
+        option.prerequisite_met = state and slots <= 4
+            and (tonumber(state.level) or 1) >= option.requires_city_level and 1 or 0
         if option.completed == 1 or (option.max_count >= 0 and option.count + option.queued_count >= option.max_count) then
             option.available, option.reason = 0, "training_max_count_reached"
         elseif slots > 4 then option.available, option.reason = 0, "training_not_available"
@@ -1130,12 +1223,6 @@ local function lumberjack_training_state(payload)
             option.available, option.reason = 0, "training_queue_full"
         elseif require("systems/player_context_service").is_defeated(player_id) or disconnected_players[player_id] then
             option.available, option.reason = 0, "player_defeated"
-        else
-            local spend = event_bus.request(events.RESOURCE_CAN_SPEND_REQUEST, {
-                player_id = player_id, team = state.team, wood = option.cost_wood,
-                gold = option.cost_gold, population = option.population,
-            })
-            if spend and not spend.ok then option.available, option.reason = 0, spend.error end
         end
     end
     return result
@@ -1144,6 +1231,9 @@ end
 function M.register_fused_lumberjack(worker, data)
     if not valid_entity(worker) or not data then
         return { ok = false, error = "fused_worker_invalid" }
+    end
+    if not worker_attack_cap.restore(worker) then
+        return { ok = false, error = "fused_worker_attack_cap_unavailable" }
     end
     local level = tonumber(data.level) or 0
     local player_id = tonumber(data.player_id) or -1
@@ -1536,6 +1626,12 @@ local function on_player_disconnected(payload)
 end
 
 function M.init()
+    worker_attack_cap.init()
+    for player_id, targets in pairs(cheer_targets_by_player) do
+        for unit, modifier in pairs(targets) do clear_cheer_projection(unit, player_id, modifier) end
+    end
+    cheer_targets_by_player = {}
+    cheer_projection_owner = setmetatable({}, {__mode = "k"})
     for player_id in pairs(pending_growth_ui) do
         scheduler.cancel("lumberjack_growth_ui_" .. tostring(player_id))
     end

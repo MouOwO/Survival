@@ -8,12 +8,12 @@ class Panel {
 }
 function panel(id){return panels[id]||(panels[id]=new Panel('Panel',null,id));}
 const cfg={ArchiveHandoffAssets:{},SurvivalArchiveColors:{number:'#fff'}};
-const env={current:'work',rowCards:{},filterMode:'all',lastData:null,array:x=>x||[],panel,GameUI:{CustomUIConfig:()=>cfg},
- A:{Observe(){},Unlocked:r=>!!r.completed,ApplyPalette(){}},hideTooltip(){},tabs(){},showDrawBar(){},isDrawPage:()=>false,icon(){},cardFrame(){},tooltip(){},request(){},
+const env={cfg,current:'work',opened:true,rowCards:{},filterMode:'all',lastData:null,lastPaletteKey:'',renderVoid:()=>false,array:x=>x||[],panel,GameUI:{CustomUIConfig:()=>cfg},
+ A:{Observe(){},Unlocked:r=>!!r.completed,ApplyPalette(){}},active:()=>true,valid:p=>!!p,later:(delay,fn)=>scheduled.push(fn),hideTooltip(){},tabs(){},showDrawBar(){},isDrawPage:()=>false,icon(){},cardFrame(){},tooltip(){},request(){},
  label(parent,text,cls){const p=new Panel('Label',parent);p.text=text;p.AddClass(cls);return p},
  $:{CreatePanel:(t,p,id)=>new Panel(t,p,id),Schedule:(delay,fn)=>scheduled.push(fn)},GameEvents:{SendCustomGameEventToServer:(name,payload)=>requests.push({name,payload})}};
-const source=fs.readFileSync('panorama/src/scripts/custom_game/archive_180de7e38b.js','utf8');
-vm.runInNewContext(source.slice(source.indexOf('    function render(data)'),source.indexOf('    GameEvents.Subscribe("survival_archive_snapshot"')),env);
+const source=fs.readFileSync('panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js','utf8');
+vm.runInNewContext(source.slice(source.indexOf('    function render(data)'),source.indexOf('    subscribe("survival_archive_snapshot"')),env);
 const row={id:'work_01',name:'Boss',count:0,level:0,cost:600,can_upgrade:1,completed:0};
 const data={category_id:'work',categories:[],pending:0,online:{coins:2294},rows:[row,{...row,id:'work_02',cost:3000,can_upgrade:0}]};
 function card(index=0){return env.rowCards['work:'+index].panel}

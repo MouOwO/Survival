@@ -8,6 +8,7 @@ local events = require("core/events")
 local heroes = require("config/generated/hero_definitions")
 local definition = assert(heroes.by_id.hero_doom)
 local hero_id = definition.hero_id
+local effects = require("systems/rogue_effect_state_service")
 local ctx, anchor
 local function count(name)
     ctx.calls[name] = (ctx.calls[name] or 0) + 1
@@ -41,17 +42,9 @@ package.loaded["systems/hero_cosmetic_service"] = {
     apply = function() count("cosmetics") end,
     clear = function(unit) count("cosmetic_clear"); ctx.cleared_hero = unit end,
 }
-package.loaded["systems/hero_summon_projection"] = {
-    entitlements = function() return {vip = 1} end,
-    update_altar = function() count("altar_updates") end,
-    build = function(player_id, altar, city_level, summoned)
-        return {player_id = player_id, city_level = city_level,
-            altar_built = altar and not altar:IsNull() and 1 or 0,
-            hero_summoned = summoned and 1 or 0,
-            shop_unlocked = summoned and 1 or 0,
-            heroes = {{hero_id = hero_id, available = summoned and 0 or 1}}}
-    end,
-}
+local projection = require("systems/hero_summon_projection")
+projection.entitlements = function() return {vip = ctx.vip == nil and 1 or ctx.vip} end
+projection.update_altar = function() count("altar_updates") end
 package.loaded["systems/hero_asset_preload_service"] = {
     is_ready = function(id) eq(id, hero_id); return ctx.assets_ready end,
     request = function(id, callbacks)
@@ -62,11 +55,14 @@ package.loaded["systems/hero_asset_preload_service"] = {
     end,
 }
 package.loaded["systems/hero_summon_destination"] = {
-    resolve = function(altar, row, player_id)
+    resolve = function(altar, row, player_id, moving_unit, options)
         count("resolve")
-        eq(altar, ctx.altar)
+        eq(altar, ctx.altar or ctx.builder)
         eq(row, definition)
         eq(player_id, 0)
+        eq(moving_unit, nil)
+        eq(options.allow_without_city, true)
+        eq(options.anchor_source, ctx.altar and "hero_altar" or "builder")
         if not ctx.destination then return nil, "hero_spawn_blocked" end
         return ctx.destination, nil
     end,
@@ -87,6 +83,7 @@ local function entity(name)
     local unit = {name = name, index = ctx.next_index, modifiers = {},
         owner_id = 0, origin = Vector(0, 0, 0), controllable = true}
     function unit:IsNull() return self.removed == true end
+    function unit:IsAlive() return not self.dead end
     function unit:entindex() return self.index end
     function unit:GetUnitName() return self.name end
     function unit:GetPlayerOwnerID() return self.owner_id end
@@ -147,25 +144,34 @@ anchor.begin_replacement = function(player_id)
 end
 local summon_system = require("systems/hero_summon_system")
 local factory = require("abilities/hero_summon_ability_factory")
+local altar_open = require("abilities/ability_open_hero_altar")
 
-local function fixture()
+local function fixture(options)
+    options = options or {}
     ctx = {calls = {}, next_index = 0, player = {}, assets_ready = true,
         destination = Vector(1280, -384, 384), client_events = {},
         summoned = {}, published = {}, unlocks = {}, notifications = {}}
     bus.reset()
+    effects.reset()
     anchor.init()
     summon_system.init()
     ctx.selected = entity("npc_dota_hero_wisp")
     ctx.original = ctx.selected
-    ctx.altar = entity("npc_dota_hero_altar")
+    ctx.altar = options.altar_built ~= false and entity("npc_dota_hero_altar") or nil
+    ctx.builder = entity("builder")
     ctx.old_marker = entity("old_hero_spawn_marker")
     ctx.old_marker.origin = Vector(1280, -384, -1024)
     assert(anchor.register_placeholder(0, ctx.selected))
-    bus.emit(events.BUILDER_READY, {player_id = 0, team = 2, builder = entity("builder")})
-    bus.emit(events.BUILDING_CREATED, {player_id = 0, team = 2,
-        building_id = "main_city", level = 10, unit = entity("city")})
-    bus.emit(events.BUILDING_CREATED, {player_id = 0, team = 2,
-        building_id = "hero_altar", unit = ctx.altar})
+    bus.emit(events.BUILDER_READY, {player_id = 0, team = 2, builder = ctx.builder})
+    local city_level = options.city_level == nil and 10 or options.city_level
+    if city_level > 0 then
+        bus.emit(events.BUILDING_CREATED, {player_id = 0, team = 2,
+            building_id = "main_city", level = city_level, unit = entity("city")})
+    end
+    if ctx.altar then
+        bus.emit(events.BUILDING_CREATED, {player_id = 0, team = 2,
+            building_id = "hero_altar", unit = ctx.altar})
+    end
     bus.subscribe(events.HERO_SUMMONED, function(p) ctx.summoned[#ctx.summoned + 1] = p end)
     bus.subscribe(events.HERO_SUMMON_STATE_CHANGED, function(p) ctx.published[#ctx.published + 1] = p end)
     bus.subscribe(events.SHOP_UNLOCK_CHANGED, function(p) ctx.unlocks[#ctx.unlocks + 1] = p end)
@@ -201,7 +207,7 @@ end
 local function ability()
     local instance = factory.create(hero_id)
     instance.cooldown_refunds = 0
-    function instance:GetCaster() return ctx.altar end
+    function instance:GetCaster() return ctx.altar or ctx.builder end
     function instance:IsNull() return false end
     function instance:EndCooldown() self.cooldown_refunds = self.cooldown_refunds + 1 end
     return instance
@@ -401,4 +407,90 @@ eq(request().ok, true)
 stale_preload.on_ready()
 eq(#ctx.summoned, 1)
 
-print("test_hero_summon_flow: PASS (10 integrated summon, deletion/retry and native ability scenarios)")
+local function snapshot()
+    return assert(bus.request(events.HERO_SUMMON_SNAPSHOT_REQUEST, {player_id = 0})).snapshot
+end
+local function open_ability()
+    return setmetatable({GetCaster = function() return ctx.altar or ctx.builder end}, {__index = altar_open})
+end
+
+-- 11. The free construction charge is consumed before BUILDING_CREATED. The
+-- completed early altar must still enable native casts and the summon itself.
+fixture({city_level = 0, altar_built = false})
+effects.add_numeric(0, "builder_free_hero_altar", 1)
+assert(effects.consume_numeric(0, "builder_free_hero_altar", 1))
+ctx.altar = entity("npc_dota_hero_altar")
+bus.emit(events.BUILDING_CREATED, {player_id = 0, building_id = "hero_altar", unit = ctx.altar})
+eq(snapshot().city_level, 0); eq(snapshot().summon_unlocked, 1)
+eq(snapshot().summon_unlock_source, "hero_altar")
+eq(ability():CastFilterResult(), UF_SUCCESS)
+eq(open_ability():CastFilterResult(), UF_SUCCESS)
+eq(request().ok, true)
+eq(effects.numeric(0, "builder_free_hero_altar"), 0)
+
+-- 12. An owner's rogue unlock enables a direct summon before either building,
+-- refreshes the snapshot immediately and does not consume the build charge.
+fixture({city_level = 0, altar_built = false})
+eq(snapshot().summon_unlocked, 0)
+effects.add_numeric(0, "builder_free_hero_altar", 1)
+bus.emit(events.ROGUE_REWARD_CHANGED, {player_id = 0})
+eq(#ctx.published, 1); eq(ctx.published[1].reason, "rogue_unlock_changed")
+eq(ctx.published[1].summon_unlocked, 1); eq(ctx.published[1].altar_built, 0)
+eq(ability():CastFilterResult(), UF_SUCCESS)
+eq(open_ability():CastFilterResult(), UF_SUCCESS)
+eq(request().ok, true); eq(effects.numeric(0, "builder_free_hero_altar"), 1)
+eq(request().ok, false, "early unlock does not permit a second hero")
+eq(open_ability():CastFilterResult(), UF_FAIL_CUSTOM)
+
+-- 13. Normal altar unlock also enables a summon without requiring construction.
+fixture({city_level = 3, altar_built = false})
+eq(snapshot().altar_built, 0); eq(snapshot().summon_unlocked, 1)
+eq(snapshot().summon_unlock_source, "city_level")
+eq(ability():CastFilterResult(), UF_SUCCESS); eq(request().ok, true)
+
+-- 14. No unlock, including another player's rogue effect, must fail closed.
+fixture({city_level = 2, altar_built = false})
+effects.add_numeric(1, "builder_free_hero_altar", 1)
+bus.emit(events.ROGUE_REWARD_CHANGED, {player_id = 1})
+eq(snapshot().summon_unlocked, 0)
+eq(ability():CastFilterResult(), UF_FAIL_CUSTOM)
+eq(open_ability():CastFilterResult(), UF_FAIL_CUSTOM)
+eq(request().ok, false); eq(calls("resolve"), 0); no_replacement()
+
+-- 15. Losing the early unlock while preloading revalidates before replacement.
+fixture({city_level = 0, altar_built = false})
+effects.add_numeric(0, "builder_free_hero_altar", 1)
+ctx.assets_ready = false
+local revoked
+eq(request({on_completed = function(result) revoked = result end}).pending, true)
+effects.set_numeric(0, "builder_free_hero_altar", 0)
+ctx.assets_ready = true; ctx.preload.on_ready()
+eq(revoked.ok, false); eq(calls("resolve"), 1); no_replacement()
+
+-- 16. Rogue stage eligibility does not grant a paid/VIP hero's access.
+fixture({city_level = 0, altar_built = false})
+effects.add_numeric(0, "builder_free_hero_altar", 1)
+ctx.vip = 0
+eq(request({hero_id = "hero_monkey_king", vip = 1}).ok, false)
+eq(calls("preload_requests"), 0); eq(calls("resolve"), 0); no_replacement()
+
+-- 17. Stage qualification is private and cannot use a foreign/dead builder.
+fixture({city_level = 0, altar_built = false})
+effects.add_numeric(0, "builder_free_hero_altar", 1)
+ctx.builder.owner_id = 1
+eq(request().ok, false); eq(calls("resolve"), 0); no_replacement()
+ctx.builder.owner_id = 0; ctx.builder.dead = true
+eq(request().ok, false); eq(calls("resolve"), 0); no_replacement()
+
+-- 18. Grant consumption during preload is allowed when the altar has finished.
+fixture({city_level = 0, altar_built = false})
+effects.add_numeric(0, "builder_free_hero_altar", 1); ctx.assets_ready = false
+local completed
+eq(request({on_completed = function(result) completed = result end}).pending, true)
+assert(effects.consume_numeric(0, "builder_free_hero_altar", 1))
+ctx.altar = entity("npc_dota_hero_altar")
+bus.emit(events.BUILDING_CREATED, {player_id = 0, building_id = "hero_altar", unit = ctx.altar})
+ctx.assets_ready = true; ctx.preload.on_ready()
+eq(completed.ok, true); eq(calls("replace"), 1)
+
+print("test_hero_summon_flow: PASS (18 integrated summon, rogue unlock, deletion/retry and native ability scenarios)")

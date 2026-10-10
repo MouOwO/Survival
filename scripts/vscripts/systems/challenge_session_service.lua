@@ -199,6 +199,13 @@ local function remove_dead(session)
 end
 
 local function destroy_session_monsters(session)
+    -- Prepared abyss groups share this cleanup but do not own a respawn timer.
+    if session.player_id ~= nil and session.encounter_id ~= nil then
+        scheduler.cancel("challenge_respawn:" .. session.player_id .. ":" .. session.encounter_id)
+    end
+    session.respawn_jobs, session.respawn_count = {}, 0
+    session.respawn_pending, session.respawn_at = nil, nil
+    session.respawn_timer_sequence = (session.respawn_timer_sequence or 0) + 1
     local all_monsters = {}
     for entindex, unit in pairs(session.monsters or {}) do
         all_monsters[entindex] = unit
@@ -393,9 +400,10 @@ local function spawn_member(session, member)
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
     apply_combat_stats(unit, combat_archetype, combat_profile)
-    monster_visual.apply(unit, archetype)
+    monster_visual.apply(unit, archetype, {fresh_unit = true})
     local visual_call_ok, visual_ok, visual_detail = pcall(
         monster_hero_visual_service.apply, unit, archetype, {
+            fresh_unit = true,
             challenge = true,
             allow_outside_formal_wave = true,
             model_path = archetype.model_path,
@@ -455,7 +463,10 @@ end
 local function release_challenge_11_unit(unit)
     if not valid(unit) then return end
     unit:RemoveModifierByName(challenge_11_staging)
-    if unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
+    local ai = unit.FindModifierByName and unit:FindModifierByName("modifier_practice_monster_ai")
+    if ai and not ai:IsNull() and type(ai.Resume) == "function" then
+        ai:Resume()
+    elseif unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
 end
 
 local function prepare_challenge_11(player_id, team, difficulty_id)
@@ -646,6 +657,12 @@ local function fill_member(session, member)
     return true
 end
 
+local function maintain_count_limit(session, member)
+    return math.max(1, math.floor(math.min(10,
+        tonumber(member.max_alive) or 10,
+        tonumber(session.encounter and session.encounter.max_alive) or 10)))
+end
+
 local function fill_current(session)
     local member = current_member(session)
     if not member then return false, "challenge_member_not_found" end
@@ -654,8 +671,8 @@ local function fill_current(session)
     end
     if member.spawn_mode == "maintain_count" then
         remove_dead(session)
-        local target = math.max(1, tonumber(member.max_alive) or 1)
-        while session.monster_count < target do
+        local target = maintain_count_limit(session, member)
+        while session.monster_count + (session.respawn_count or 0) < target do
             local unit, error_message = spawn_member(session, member)
             if not unit then return false, error_message end
         end
@@ -718,7 +735,7 @@ local function complete_session(session)
         )
     end
     local repeatable = session.challenge.repeatable == true
-    local delay = tonumber(session.challenge.respawn_seconds) or 2
+    local delay = tonumber(session.challenge.respawn_seconds) or 1
     local completion_limit = math.max(
         1,
         tonumber(session.challenge.completion_limit) or 10
@@ -1093,6 +1110,89 @@ local function drop_seven_sins_essence(session)
     }
 end
 
+-- Every death owns its deadline. One room timer wakes all due records in the
+-- same callback; sharing that wake-up never serializes simultaneous deaths.
+local function schedule_maintain_respawn(session, member)
+    if get_session(session.player_id, session.encounter_id) ~= session
+        or session.status ~= "active" then return 0 end
+    local delay, now = 1, GameRules:GetGameTime()
+    local jobs = session.respawn_jobs or {}
+    session.respawn_jobs = jobs
+    session.respawn_count = session.respawn_count or 0
+    local vacancies = maintain_count_limit(session, member) - session.monster_count
+    if vacancies <= 0 then return 0 end
+    -- External repairs may already have filled an old vacancy. Reserve the
+    -- newly dead monster's own deadline instead of borrowing an older one.
+    while session.respawn_count >= vacancies do
+        local oldest
+        for id, job in pairs(jobs) do
+            if not oldest or job.due_at < jobs[oldest].due_at then oldest = id end
+        end
+        if not oldest then break end
+        jobs[oldest] = nil
+        session.respawn_count = session.respawn_count - 1
+    end
+    session.respawn_serial = (session.respawn_serial or 0) + 1
+    jobs[session.respawn_serial] = {member = member, due_at = now + delay}
+    session.respawn_count = session.respawn_count + 1
+    if session.respawn_pending then return math.max(0, (session.respawn_at or now + delay) - now) end
+
+    local generation = session.generation
+    local function current()
+        return get_session(session.player_id, session.encounter_id) == session
+            and session.status == "active" and session.generation == generation
+            and session.respawn_jobs == jobs
+    end
+    local arm
+    arm = function()
+        local earliest
+        for _, job in pairs(jobs) do
+            if not earliest or job.due_at < earliest then earliest = job.due_at end
+        end
+        if not earliest then
+            session.respawn_pending, session.respawn_at = nil, nil
+            return 0
+        end
+        local wait = math.max(0, earliest - GameRules:GetGameTime())
+        session.respawn_timer_sequence = (session.respawn_timer_sequence or 0) + 1
+        local sequence = session.respawn_timer_sequence
+        session.respawn_pending, session.respawn_at = true, earliest
+        scheduler.after(wait, function()
+            if not current() or session.respawn_timer_sequence ~= sequence then return end
+            session.respawn_timer_sequence = sequence + 1
+            local due, clock = {}, GameRules:GetGameTime()
+            for id, job in pairs(jobs) do
+                if job.due_at <= clock then due[#due + 1] = {id = id, job = job} end
+            end
+            remove_dead(session) -- At most this room's ten handles, never the map.
+            local respawn_error
+            for _, entry in ipairs(due) do
+                if not current() then return end
+                local job = entry.job
+                if jobs[entry.id] == job then
+                    jobs[entry.id] = nil
+                    session.respawn_count = session.respawn_count - 1
+                    if session.monster_count < maintain_count_limit(session, job.member) then
+                        local ok, unit, error_message = pcall(spawn_member, session, job.member)
+                        if not current() then return end
+                        if not ok or not unit then
+                            job.due_at = GameRules:GetGameTime() + delay
+                            jobs[entry.id] = job
+                            session.respawn_count = session.respawn_count + 1
+                            respawn_error = ok and error_message or tostring(unit)
+                        end
+                    end
+                end
+            end
+            session.respawn_pending = nil
+            local next_spawn = arm()
+            publish(session, "active", {next_spawn_seconds = next_spawn, respawn_error = respawn_error})
+        end, "challenge_respawn:" .. session.player_id .. ":" .. session.encounter_id)
+        return wait
+    end
+    return arm()
+end
+
 local function on_killed(payload)
     local victim = payload.victim
     if not valid(victim) then return end
@@ -1100,12 +1200,14 @@ local function on_killed(payload)
     local meta = monster_meta[entindex]
     if not meta then return end
     monster_meta[entindex] = nil
-    monster_visual.clear(victim)
+    monster_visual.on_death(victim)
     monster_hero_visual_service.on_death(victim)
     local session = get_session(meta.player_id, meta.encounter_id)
     if not session then return end
-    session.monsters[entindex] = nil
-    session.monster_count = math.max(0, session.monster_count - 1)
+    if session.monsters[entindex] then
+        session.monsters[entindex] = nil
+        session.monster_count = math.max(0, session.monster_count - 1)
+    end
     session.killed_members = session.killed_members + 1
 
     local authorized_kill = owner_killed(meta, payload.attacker)
@@ -1201,21 +1303,10 @@ local function on_killed(payload)
     end
 
     if session.spawn_mode == "maintain_count" then
-        local delay = tonumber(meta.member.respawn_seconds)
-            or tonumber(session.challenge.respawn_seconds) or 2
-        publish(session, "active", { next_spawn_seconds = delay })
-        scheduler.after(delay, function()
-            if get_session(meta.player_id, meta.encounter_id) == session
-                and session.status == "active" then
-                local unit, error_message = spawn_member(session, meta.member)
-                if not unit then
-                    block_session(session, error_message)
-                    return
-                end
-                publish(session, "active")
-            end
-        end, "challenge_respawn:" .. meta.player_id .. ":"
-            .. meta.encounter_id .. ":" .. tostring(entindex))
+        local next_spawn = schedule_maintain_respawn(session, meta.member)
+        if get_session(session.player_id, session.encounter_id) == session and session.status == "active" then
+            publish(session, "active", {next_spawn_seconds = next_spawn})
+        end
         return
     end
 
@@ -1357,6 +1448,11 @@ local function on_player_disconnected(payload)
 end
 
 function M.init()
+    for player_id, owned in pairs(sessions) do
+        for encounter_id in pairs(owned) do
+            scheduler.cancel("challenge_respawn:" .. player_id .. ":" .. encounter_id)
+        end
+    end
     sessions = {}
     foreground_encounter_by_player = {}
     monster_meta = {}

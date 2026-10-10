@@ -30,11 +30,13 @@ local building_defeat_rules = require("systems/building_defeat_rules")
 local online_time_service = require("systems/online_time_service")
 local builder_work = require("systems/builder_work_position_service")
 local grid_config = require("config/grid_placement_config")
+local building_cost_quote = require("systems/building_cost_quote")
 local M = {}
 local RELOCATION_RANGE = 1000
 print("[SURVIVAL_FINGERPRINT] building_system=20260727_arrow_completion_fix")
 local buildings = {}
 local pending_unique_builds = {}
+local ultimate_towers = {}
 local on_entity_killed
 local fusion_replacements = {}
 local fusion_replacement_sequence = 0
@@ -100,7 +102,7 @@ local function building_counts_snapshot(payload)
         end
     end
     for building_id, value in pairs(tower_limits.counts[player_id] or {}) do
-        counts[building_id] = value
+        if building_id ~= "arrow_tower" then counts[building_id] = value end
     end
     for _, reservation in pairs(pending_unique_builds) do
         if reservation.player_id == player_id then
@@ -138,9 +140,10 @@ local function pending_unique_count(player_id, building_id, caster, own_task)
     return count
 end
 local function reserve_pending_unique_build(task, check, caster)
-    if building_count_limits.maximum(
+    local maximum = building_count_limits.maximum(
         check.definition.max_count, check.definition.id, check.player_id
-    ) ~= 1 then return end
+    )
+    if maximum ~= 1 and check.definition.id ~= "arrow_tower" then return end
     pending_unique_builds[task] = {
         player_id = check.player_id,
         building_id = check.definition.id,
@@ -154,6 +157,22 @@ local function change_count(player_id, building_id, delta, defer_publish)
     if not defer_publish and count_for(player_id, building_id) ~= previous then
         publish_building_counts(player_id, "building_count_changed")
     end
+end
+local function on_ultimate_changed(payload)
+    local unit, entindex = payload and payload.unit, tonumber(payload and payload.entindex)
+    local player_id = tonumber(payload and payload.player_id)
+    if not entindex or player_id == nil or not valid_entity(unit)
+        or (unit.IsAlive and not unit:IsAlive()) then return end
+    if ultimate_towers[entindex] then return end
+    ultimate_towers[entindex] = {player_id = player_id, unit = unit}
+    change_count(player_id, "ultimate_tower", 1)
+end
+local function on_ultimate_removed(payload)
+    local entindex = tonumber(payload and payload.entindex)
+    local previous = entindex and ultimate_towers[entindex]
+    if not previous then return end
+    ultimate_towers[entindex] = nil
+    change_count(previous.player_id, "ultimate_tower", -1)
 end
 local function class_id_for_state(state)
     if not state or state.building_id ~= "arrow_tower" then return nil end
@@ -390,19 +409,23 @@ local function add_ability(unit, ability_name, active)
     print("[BuildingAbility] AddAbility OK unit=" .. tostring(unit:entindex()) .. " ability=" .. tostring(ability_name) .. " index=" .. tostring(ability:GetAbilityIndex()))
     return true
 end
-local function add_building_abilities(unit, definition, active)
+local function add_building_abilities(unit, definition, active, only_missing)
     -- Building relocation is driven by Panorama; creature point abilities do
     -- not reliably enter OnSpellStart in this project.
+    local names = definition.abilities or {}
     if definition.id == "arrow_tower" then
         local row = arrow_data(1)
-        for _, ability_name in ipairs(row and row.active_skill_ids or {}) do
-            add_ability(unit, ability_name, active ~= false)
+        names = row and row.active_skill_ids or {}
+    end
+    local changed = false
+    for _, ability_name in ipairs(names) do
+        -- A delayed retry must not overwrite the prerequisite, level or hidden
+        -- state already assigned by the runtime/technology services.
+        if not only_missing or not unit:FindAbilityByName(ability_name) then
+            if add_ability(unit, ability_name, active ~= false) then changed = true end
         end
-        return
     end
-    for _, ability_name in ipairs(definition.abilities or {}) do
-        add_ability(unit, ability_name, active ~= false)
-    end
+    return changed
 end
 local function completion_level_data(definition, level)
     definition = definition or {}
@@ -611,7 +634,10 @@ local function recover_existing_buildings()
                 local entindex = valid_entity(unit) and unit:entindex() or nil
                 if entindex and not seen[entindex] then
                     seen[entindex] = true
-                    if recover_building(unit) then recovered = recovered + 1 end
+                    if unit.survival_ultimate_tower then
+                        on_ultimate_changed({unit = unit, entindex = entindex,
+                            player_id = unit.survival_player_id or unit:GetPlayerOwnerID()})
+                    elseif recover_building(unit) then recovered = recovered + 1 end
                 end
             end
         end
@@ -656,7 +682,9 @@ local function can_place(payload, require_clear_builder)
             builder.player_id, definition.id, caster, payload.build_task
         )
     if building_limit_reached(definition, occupied_count, builder.player_id) then
-        return { ok = false, error = "建筑数量已达上限" }
+        return { ok = false, error = definition.id == "arrow_tower"
+            and ("防御塔数量已达上限（每人最多" .. tostring(definition.max_count) .. "座）")
+            or "建筑数量已达上限" }
     end
     if definition.id == "building_challenge"
         and count_for(builder.player_id, "building_research_lab") < 1 then
@@ -679,6 +707,15 @@ local function can_place(payload, require_clear_builder)
         ) then
         return { ok = false, error = "需要先完成普通研究所" }
     end
+    local quote = building_cost_quote.for_player(definition, builder.player_id)
+    local funds = quote.free_wall and { ok = true }
+        or event_bus.request(events.RESOURCE_CAN_SPEND_REQUEST, {
+            player_id = builder.player_id, team = team,
+            wood = quote.wood, gold = quote.gold, population = quote.population,
+        })
+    if not funds or not funds.ok then
+        return funds or { ok = false, error = "资源信息尚未就绪" }
+    end
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = payload.position,
         footprint = definition.footprint,
@@ -695,6 +732,7 @@ local function can_place(payload, require_clear_builder)
         definition = definition,
         team = team,
         player_id = builder.player_id,
+        cost_quote = quote,
         grid = grid,
     }
 end
@@ -705,29 +743,26 @@ local function start_building(payload)
         notify(tonumber(payload.player_id) or -1, check.error, "error")
         return check
     end
-    local cost = check.definition.build_cost
-    local mine_slots=1
-    if check.definition.id=='gold_mine' and require('systems/commerce_effects').owned(check.player_id,'giant_mine') then
-        mine_slots=math.max(1,(tonumber(check.definition.max_count) or 1)+building_count_limits.bonus(check.player_id,'gold_mine'))
-        local definition={};for k,v in pairs(check.definition) do definition[k]=v end
-        definition.build_cost={wood=(cost.wood or 0)*mine_slots,gold=(cost.gold or 0)*mine_slots}
-        definition.population_cost=(tonumber(definition.population_cost) or 0)*mine_slots
-        check.definition=definition;cost=definition.build_cost
+    local quote = check.cost_quote
+    local mine_slots = quote.mine_slots
+    if mine_slots > 1 then
+        local definition = {}
+        for key, value in pairs(check.definition) do definition[key] = value end
+        definition.build_cost = { wood = quote.wood, gold = quote.gold }
+        definition.population_cost = quote.population
+        check.definition = definition
     end
-    local free_hero_altar = check.definition.id == "hero_altar"
-        and rogue_effect_state.numeric(check.player_id,
-            "builder_free_hero_altar") > 0
+    local free_hero_altar = quote.free_altar
     -- Post-clear resources are frozen. Rebuilding an endless participant's
     -- wall must not spend resources or reserve population again.
-    local free_wall_rebuild = check.definition.id == "wall"
-        and require("systems/archive_endless_service").can_rebuild_wall(check.player_id)
-    local charged_cost = (free_hero_altar or free_wall_rebuild) and { wood = 0, gold = 0 } or cost
+    local free_wall_rebuild = quote.free_wall
+    local charged_cost = { wood = quote.wood, gold = quote.gold }
     local spend = free_wall_rebuild and { ok = true } or event_bus.request(events.RESOURCE_TRY_SPEND_REQUEST, {
         player_id = check.player_id,
         team = check.team,
         wood = charged_cost.wood,
         gold = charged_cost.gold,
-        population = check.definition.population_cost or 0,
+        population = quote.population,
         reason = "build:" .. check.definition.id,
     })
     if not spend or not spend.ok then
@@ -920,11 +955,15 @@ local function start_building(payload)
                 state.player_id, "builder_free_hero_altar", 1)
             state.free_hero_altar = nil
         end
-        -- Keep ability entity indexes stable for runtime tooltip data. Activate
-        -- once now and once after the construction modifier state has replicated.
+        -- Retry failed creation only. Existing abilities already received their
+        -- authoritative availability through BUILDING_CREATED/BUILDING_CHANGED.
         scheduler.after(0.1, function()
             if not state.cleaned and valid_entity(unit) and unit:IsAlive() then
-                add_building_abilities(unit, check.definition, true)
+                if add_building_abilities(unit, check.definition, true, true) then
+                    local recovered = public_state(state)
+                    recovered.reason = "ability_recovery"
+                    event_bus.emit(events.BUILDING_CHANGED, recovered)
+                end
             end
         end, "activate_building_abilities_" .. tostring(unit:entindex()))
         if check.definition.id == "arrow_tower" then
@@ -1216,8 +1255,9 @@ local function on_building_changed(payload)
         next_class = nil
     end
     if previous_class ~= next_class then
-        change_count(state.player_id, previous_class or state.building_id, -1)
-        change_count(state.player_id, next_class or state.building_id, 1)
+        change_count(state.player_id, previous_class or state.building_id, -1, true)
+        change_count(state.player_id, next_class or state.building_id, 1, true)
+        publish_building_counts(state.player_id, "tower_class_changed")
     end
     state.level = payload.level or state.level
     state.tower_class = next_class
@@ -1257,6 +1297,10 @@ end
 on_entity_killed = function(payload)
     local victim = payload.victim
     if not valid_entity(victim) then return end
+    local ultimate = ultimate_towers[victim:entindex()]
+    if ultimate and ultimate.unit == victim then
+        on_ultimate_removed({entindex = victim:entindex()})
+    end
     if victim.survival_building_destroyed then return end
     rollback_build_cooldown(victim.survival_build_task)
     clear_build_task(victim, victim.survival_build_task)
@@ -1483,6 +1527,7 @@ function M.init()
     wall_destruction.reset()
     buildings = {}
     pending_unique_builds = {}
+    ultimate_towers = {}
     tower_limits:reset()
     wall_ever_built = {}
     defeat_triggered = false
@@ -1498,6 +1543,8 @@ function M.init()
     event_bus.handle_request(events.BUILD_REQUEST, queue_building)
     event_bus.handle_request(events.TOWER_CLASS_SLOT_REQUEST, tower_class_slot_request)
     event_bus.subscribe(events.BUILDING_CHANGED, on_building_changed)
+    event_bus.subscribe(events.TOWER_FUSION_RUNTIME_CHANGED, on_ultimate_changed)
+    event_bus.subscribe(events.TOWER_FUSION_RUNTIME_REMOVED, on_ultimate_removed)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_entity_killed)
     event_bus.subscribe(events.PLAYER_DISCONNECTED, on_player_disconnected)
     local recovered = recover_existing_buildings()

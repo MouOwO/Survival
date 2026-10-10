@@ -1,0 +1,37 @@
+{
+  "task": "clone_passive_q_20261010",
+  "result": "script_regression_passed",
+  "changes": [
+    "Publish each combat clone's own ability identity and passive runtime when it is created.",
+    "Clear runtime on death, owner removal and invalid-handle cleanup; guard against reused entity indexes.",
+    "Classify exclusive passive skills from their configured skill_type without changing native activation.",
+    "Use lifecycle events; no new timers, polling or resource-dependent clone refreshes."
+  ],
+  "passed_checks": [
+    "tools/test_clone_passive_ability.lua",
+    "tools/test_clone_passive_ui.cjs",
+    "tools/test_clone_ability_lifecycle.lua",
+    "tools/test_blademaster_rebirth_unlock.lua",
+    "tools/test_blademaster_clone.lua",
+    "tools/test_blademaster_attack_rate.lua",
+    "tools/test_monkey_clone_attack_rate.lua",
+    "scripts/vscripts/tests/test_hero_skill_point_upgrade.lua",
+    "scripts/vscripts/tests/test_native_prerequisite_activation.lua",
+    "Lua 5.1 syntax and JavaScript test syntax",
+    "git diff --check for task files"
+  ],
+  "ui_stability": {
+    "clone_types": ["monkey_king", "blademaster"],
+    "alternating_paint_frames_per_type": 80,
+    "repeated_color_writes_after_initial_bind": 0,
+    "passive_input_and_hotkeys_blocked": true,
+    "native_hover_preserved": true
+  },
+  "existing_unrelated_failure": {
+    "test": "tools/test_monkey_clone_q.lua",
+    "line": 173,
+    "message": "particles[impact.drop_particle] is nil",
+    "baseline_comparison": "A temporary candidate with only this task's monkey clone lifecycle changes reverted fails at the identical line. Production source was not overwritten."
+  },
+  "live_render_verification": "Not performed; local Dota console port 29000 was not listening. Reload the map to load the changed Lua services."
+}

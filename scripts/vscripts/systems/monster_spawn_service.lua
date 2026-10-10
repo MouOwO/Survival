@@ -297,6 +297,7 @@ local function start_encounter(payload)
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
     pcall(monster_hero_visual_service.apply, unit, archetype, {
+        fresh_unit = true,
         encounter = true,
         allow_outside_formal_wave = true,
         model_path = archetype.model_path,

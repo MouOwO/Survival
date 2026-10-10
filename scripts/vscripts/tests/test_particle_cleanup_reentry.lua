@@ -49,6 +49,14 @@ local details = load_service('visual/monster_cosmetic_details')
 details.apply(unit, {effects = {{effect_group_id = 'wave_cosmetic_ambient', particle_path = 'test'}}}, {})
 id = next_id; callback = function() details.clear(unit) end
 details.clear(unit); details.clear(unit); once(id, 'monster outfit')
+details.apply(unit, {effects = {{effect_group_id = 'wave_cosmetic_ambient', particle_path = 'test'}}}, {})
+id = next_id
+callback = function()
+    details.apply(unit, {effects = {{effect_group_id = 'wave_cosmetic_ambient', particle_path = 'replacement'}}}, {})
+end
+details.clear(unit); once(id, 'replaced monster outfit old state')
+assert(unit.survival_monster_cosmetic_details, 'old cleanup must retain replacement outfit state')
+details.clear(unit); once(next_id, 'replaced monster outfit new state')
 local listener, disconnect
 CustomGameEventManager = {RegisterListener = function(_, _, fn) listener = fn end}
 ListenToGameEvent = function(_, fn) disconnect = fn end

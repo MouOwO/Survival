@@ -33,8 +33,11 @@ function M.set_attack_range(unit, attack_range)
 end
 
 local native_speed_routes = {
+    class_1 = true, -- critical
     class_2 = true, -- laser
     class_4 = true, -- machine gun
+    class_5 = true, -- multi: primary and secondary arrows share the configured speed
+    class_6 = true, -- frost
     class_7 = true, -- anti-air
 }
 

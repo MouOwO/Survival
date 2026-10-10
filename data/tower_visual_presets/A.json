@@ -489,8 +489,8 @@
         "499",
         "827"
       ],
-      "projectile": "particles/survival/towers/techies/techies_r_missile.vpcf",
-      "projectile_policy": "adapted_native_missile",
+      "projectile": "particles/units/heroes/hero_clinkz/clinkz_searing_arrow.vpcf",
+      "projectile_policy": "native_searing_arrow",
       "market_links": [],
       "price_policy": "逐阶普通装束→不朽→至宝/成套不朽；不读取游戏外市场价格参与玩法"
     },
@@ -515,8 +515,8 @@
         "499",
         "827"
       ],
-      "projectile": "particles/survival/towers/techies/techies_sr_missile.vpcf",
-      "projectile_policy": "adapted_native_missile",
+      "projectile": "particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow.vpcf",
+      "projectile_policy": "native_cosmetic_searing_arrow",
       "market_links": [
         "https://steamcommunity.com/market/listings/570/Pachyderm%20Powderwagon"
       ],
@@ -543,8 +543,8 @@
         "499",
         "827"
       ],
-      "projectile": "particles/survival/towers/techies/techies_ssr_missile.vpcf",
-      "projectile_policy": "adapted_native_missile",
+      "projectile": "particles/econ/items/clinkz/clinkz_maraxiform/clinkz_maraxiform_searing_arrow_deso.vpcf",
+      "projectile_policy": "native_cosmetic_searing_arrow_deso",
       "market_links": [
         "https://steamcommunity.com/market/listings/570/Swine%20of%20the%20Sunken%20Galley%20Bundle"
       ],

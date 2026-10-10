@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-08",
+  "task": "Restore visible Io builder after native picking-body fix",
+  "baseline": "5b4e7eafa12bc6ef8dc606d0e7816082aef14a6a",
+  "root_cause": {
+    "live_builder": 579,
+    "old_child": 581,
+    "server_state": "Correct wisp body and arcana model/parent/idle; client cosmetic invisible",
+    "native_comparison": "Both raw dota_item_wearable variants invisible; prop_dynamic visible",
+    "ambient": "A creature has no item-definition automatic binding; explicitly bind CP0..6 to native card attachments",
+    "fallback": "wisp.vmdl alone does not provide its native ambient light body"
+  },
+  "fix": {
+    "selectable_body": "models/heroes/wisp/wisp.vmdl",
+    "cosmetic": "models/items/io/io_ti7/io_ti7.vmdl",
+    "entity_class": "prop_dynamic",
+    "attachment": "SetOwner + SetParent + zero local position/angles; independent sequence",
+    "native_ambient_bindings": 7,
+    "fallback": "preloaded particles/units/heroes/hero_wisp/wisp_ambient.vpcf with native preview controls",
+    "unit_kv_unchanged": true,
+    "gameplay_fields_unchanged": true,
+    "no_new_polling": true
+  },
+  "regressions": {
+    "passed_tests": [
+      "test_builder_io_presentation",
+      "test_builder_work_position",
+      "test_builder_yield_construction",
+      "test_builder_tower_rebuild",
+      "test_building_astral_construction",
+      "test_wall_repair_detection",
+      "test_grid_builder_preview",
+      "test_startup_asset_preload_service",
+      "test_initial_builder_camera",
+      "test_box_selection_filter"
+    ],
+    "lua_51_syntax_pass": true,
+    "negative_control": "HEAD service/catalog fail the new presentation regression",
+    "preexisting_failure": {
+      "test": "test_io_building_ambient",
+      "line": 84,
+      "head_control_exit": 1,
+      "reason": "Legacy test expects Io tower; unchanged HEAD tower asset is Tinker"
+    }
+  },
+  "configs": {
+    "asset_catalog": {
+      "reproducible": true,
+      "other_rows_unchanged": true,
+      "changed_fields": [
+        "attachment_entity_class",
+        "notes",
+        "particle_resources"
+      ]
+    },
+    "builder_definitions": {
+      "reproducible": true,
+      "other_rows_unchanged": true,
+      "changed_fields": [
+        "notes"
+      ]
+    }
+  },
+  "native": {
+    "evidence": [
+      "10/08 14:21:00 [VScript] IO_VISUAL_VARIANTS 1 class=dota_item_wearable model=models/items/io/io_ti7/io_ti7.vmdl origin=Vector 0000000002FDE900 [-2200.000000 5000.000000 385.500000] parent=true seq=ti7_io_idle alpha=255",
+      "10/08 14:21:00 [VScript] IO_VISUAL_VARIANTS 2 class=dota_item_wearable model=models/items/io/io_ti7/io_ti7.vmdl origin=Vector 0000000002FE0118 [-1990.000000 5000.000000 385.500000] parent=true seq=ti7_io_idle alpha=255",
+      "10/08 14:21:00 [VScript] IO_VISUAL_VARIANTS 3 class=prop_dynamic model=models/items/io/io_ti7/io_ti7.vmdl origin=Vector 000000000209B528 [-1780.000000 5000.000000 163.417175] parent=true seq=ti7_io_idle alpha=255",
+      "10/08 14:21:00 [VScript] IO_VISUAL_VARIANTS 4 class=prop_dynamic model=models/items/io/io_ti7/io_ti7.vmdl origin=Vector 000000000209CD38 [-1570.000000 5000.000000 162.827881] parent=true seq=ti7_io_idle alpha=255",
+      "10/08 14:40:48 [VScript] IO_FIXED_NATIVE 1 entity=1003 model=models/heroes/wisp/wisp.vmdl cosmetic=prop_dynamic pos=Vector 0000000001487B30 [-3122.987549 5408.000000 385.500000]",
+      "10/08 14:40:48 [VScript] IO_FIXED_NATIVE 2 entity=583 model=models/heroes/wisp/wisp.vmdl cosmetic=nil pos=Vector 00000000016789D0 [-2892.987549 5408.000000 385.500000]",
+      "10/08 14:43:45 [VScript] IO_NATIVE_PARTICLES entity=1003 ambient=1 first=3315",
+      "10/08 14:43:45 [VScript] IO_NATIVE_PARTICLES entity=583 ambient=1 first=3316",
+      "10/08 14:43:45 [VScript] IO_NATIVE_BODY_RESULT true err=nil",
+      "10/08 14:46:21 [VScript] IO_BUILDER_LIVE_REPAIRED entity=579 model=models/heroes/wisp/wisp.vmdl hull=0 position_preserved=true work_preserved=false",
+      "10/08 14:49:34 [VScript] IO_VISIBLE_CAMERA_RELEASED"
+    ],
+    "candidate_and_fallback_emitters_created": true,
+    "model_parent_movement_sequence_checked": true,
+    "live_applied": true,
+    "live_entity_position_model_hull_preserved": true,
+    "module_table_identity_preserved": true,
+    "private_entities_and_particles_cleaned": true,
+    "camera_released": true,
+    "visible_screenshot": "output/map_build_c6/builder_io_live_final_20261008.png",
+    "candidate_screenshot": "output/map_build_c6/builder_io_fixed_native_20261008.png",
+    "comparison_screenshot": "output/map_build_c6/builder_io_variants_grass_20261008.png",
+    "service_sha256": "c2a400376bf3361947968373b4d9402763cd70498f4ef1a2a6a0afe2421d2aec",
+    "limits": "Final live cosmetic visibility checked; physical mouse picking/hover was not separately exercised. Fallback emitter and bindings checked in engine; full fallback-only image not isolated."
+  },
+  "scope": "Builder presentation, two source configs plus generated modules, targeted tests and project documentation. Original unrelated workspace changes preserved."
+}

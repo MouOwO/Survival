@@ -22,10 +22,27 @@ function modifier_practice_monster_ai:OnCreated(params)
     )
     self.has_target = false
     self.returning_home = false
+    local unit = self:GetParent()
+    self.staging = unit and unit.HasModifier
+        and unit:HasModifier("modifier_challenge_11_staging") or false
+    if not self.staging then self:StartIntervalThink(0.5) end
+end
+
+function modifier_practice_monster_ai:Resume()
+    if not IsServer() or self.destroyed then return false end
+    local unit = self:GetParent()
+    if not valid(unit) or (unit.HasModifier
+        and unit:HasModifier("modifier_challenge_11_staging")) then return false end
+    unit:SetForceAttackTarget(nil)
+    self.has_target = false
+    self.returning_home = false
+    self.staging = false
     self:StartIntervalThink(0.5)
+    return true
 end
 
 function modifier_practice_monster_ai:OnIntervalThink()
+    if self.staging or self.destroyed then return end
     local unit = self:GetParent()
     if not valid(unit) then return end
 
@@ -71,6 +88,7 @@ function modifier_practice_monster_ai:OnIntervalThink()
 end
 
 function modifier_practice_monster_ai:OnDestroy()
+    self.destroyed = true
     if IsServer() and valid(self:GetParent()) then
         self:GetParent():SetForceAttackTarget(nil)
     end

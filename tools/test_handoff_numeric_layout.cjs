@@ -33,7 +33,7 @@ function panel(id, parent = null) {
                 throw new Error('Invalid value for property position: ' + value);
             }
             if (/^(?:width|height|minWidth|minHeight|maxWidth|maxHeight)$/.test(name)
-                && !pixel.test(String(value))) {
+                && value!=='fit-children' && !/^\d+(?:\.\d+)?%$/.test(String(value)) && !pixel.test(String(value))) {
                 throw new Error('Invalid pixel dimension ' + name + ': ' + value);
             }
             if (name === 'transform' && value !== 'none' && !transform.test(String(value))) {
@@ -47,8 +47,8 @@ function panel(id, parent = null) {
         },
     });
     return {
-        id, style, classes, parent, visible: true,
-        IsValid() { return true; },
+        id, style, classes, parent, visible: true,alive:true,
+        IsValid() { return this.alive; },
         GetParent() { return this.parent; },
         SetParent(next) { this.parent = next; },
         FindChildTraverse() { return null; },
@@ -56,6 +56,7 @@ function panel(id, parent = null) {
         BHasClass(value) { return classes.has(value); },
         AddClass(value) { classes.add(value); },
         RemoveClass(value) { classes.delete(value); },
+        SetImage(value) { this.image=value; },
         GetPositionWithinWindow() { return {x: 0, y: 0}; },
     };
 }
@@ -71,6 +72,9 @@ function harness(filename, oldPlace = false) {
     ].map(id => [id, panel(id)]));
     nativePanels.abilities.parent = nativePanels.AbilitiesAndStatBranch;
     const nodes = {};
+    const navKeys=['return','treasure','archive','lottery','benefit','shop','survival_shop','vip'];
+    for(const key of navKeys)for(const prefix of ['HandoffNavGlow_','HandoffNavIcon_','HandoffNavCaptionHost_','HandoffNavCaption_','HandoffNavUnderline_'])nodes[prefix+key]=panel(prefix+key);
+    for(const id of ['HandoffName','HandoffNameBounds','HandoffBuildingTitle','HandoffBuildingTitleBounds','HandoffBuildingLevel','HandoffBuildingSummary','HandoffBuildingBonus','HandoffBuildingHealthBonus','HandoffBuildingPercent','HandoffBuildingHealthPercent'])nodes[id]=panel(id);
     for (const type of ['hp', 'mp']) {
         for (const suffix of ['track', 'fill', 'value', 'valueBounds']) {
             const id = 'Handoff_' + type + '_' + suffix;
@@ -90,7 +94,7 @@ function harness(filename, oldPlace = false) {
     nativePanels.lower_hud.style.opacity = '0';
     const bottom = panel('bottom');
     const warnings = [], messages = [];
-    let fitCalls = 0, mirrorCalls = 0;
+    let fitCalls = 0, mirrorCalls = 0,navCalls=0,nativeCalls=0;
     const cfg = {
         HandoffGeneration: 1,
         HandoffGeometry: require(path.join(scripts,
@@ -99,7 +103,10 @@ function harness(filename, oldPlace = false) {
     };
     const context = vm.createContext({
         ctx, host, cfg, generation: 1, nodes,
+        Entities:{GetUnitName:()=> 'npc_dota_hero_axe',IsBuilding:()=>false,IsHero:()=>true},
         root: panel('root'), top: panel('top'), topBackdrop: panel('topBackdrop'),
+        topStatus:panel('topStatus'),nav:navKeys.map(key=>[key]),
+        fxButton:panel('fxButton'),fxHalo:panel('fxHalo'),fxIcon:panel('fxIcon'),fxCaptionHost:panel('fxCaptionHost'),fxText:panel('fxText'),
         enemyCounter: panel('enemyCounter'), bottom, background: panel('background', bottom),
         center: panel('center'), inventory: panel('inventory-decoration'),
         natives: nativePanels, slotFrames: Array.from({length: 6}, (_, i) => panel('slot-frame-' + i)),
@@ -107,25 +114,37 @@ function harness(filename, oldPlace = false) {
         presented: false, stableFrames: 0, bootSignature: '',
         currentEntries: [{ability: 101}, {ability: 102}, {ability: 103}],
         native: id => nativePanels[id] || null,
-        selectedUnit: () => 7, abilityCount: () => 3,
+        selectedForTest:7,selectedUnit: () => 7, abilityCount: () => 3,
         fitNativeSkills: () => { fitCalls++; },
-        refreshInventoryPresentation() {}, square() {}, nine() {},
-        stats: [], topButtons: {}, text() {}, available: () => false,
+        refreshInventoryPresentation() {}, square() {}, nine() {},layoutStats(){},
+        stats: [], topButtons: Object.fromEntries(navKeys.map(key=>[key,panel(key)])), text() {}, available: () => false,syncActiveNav(){},
+        buildingInlineIds:['HandoffBuildingSummary','HandoffBuildingBonus','HandoffBuildingPercent','HandoffBuildingHealthPercent'],buildingStatRow:panel('buildingStatRow'),slices:{},assets:{hp_fill:{file:'hp.png'}},
         __mirrorCalled: () => { mirrorCalls++; }, mirrorKeys() {},
+        __navCalled:()=>{navCalls++;},__nativeCalled:()=>{nativeCalls++;},
         art(parent, id) { return (nodes[id] = panel(id, parent)); },
         centered() {},
         $: {Warning: message => warnings.push(String(message)), Msg: (...args) => messages.push(args.join(' '))},
     });
+    context.selectedUnit=()=>context.selectedForTest;
+    context.abilityCount=()=>context.currentEntries.length;
+    context.natives={...nativePanels};
+    context.native=id=>(context.natives[id]=nativePanels[id]||null);
     const helpers = between(source, '    function style(', '    function create(');
     let seam = [
         between(source, '    function valid(', '    function native('),
+        source.includes('    function nativeAbilityWrappers(')?between(source,'    function nativeAbilityWrappers(',source.includes('    function findCached(')?'    function findCached(':'    function style('):'',
         helpers,
+        source.includes('    function findCached(')?between(source,'    function findCached(','    function style('):'function findCached(p,id){return p.FindChildTraverse(id);}',
+        source.includes('    function navBounds(')?between(source,'    function navBounds(','    // Navigation icons'): '',
         between(source, '    function canvas(', '    // Called synchronously'),
         between(source, '    function child(', '    function square('),
+        source.includes('    function layoutMinimap(')?between(source, '    function layoutMinimap(', '    function nativeLayout('):'',
         between(source, '    function nativeLayout(', '    function mirror('),
         between(source, '    function mirror(', '    function compact('),
         between(source, '    function refreshNow(', '    function tick('),
         'var productionMirror=mirror; mirror=function(){__mirrorCalled(); return productionMirror();};',
+        'var productionNativeLayout=nativeLayout;nativeLayout=function(g){__nativeCalled();return productionNativeLayout(g);};',
+        'if(typeof layoutNavigation==="function"){var productionNav=layoutNavigation;layoutNavigation=function(a,b){__navCalled();return productionNav(a,b);};}',
     ].join('\n');
     if (oldPlace) {
         seam += '\nplace = function(p,x,y,w,h) {style(p,{position:x+"px "+y+"px 0px",width:w+"px",height:h+"px"});};';
@@ -136,6 +155,7 @@ function harness(filename, oldPlace = false) {
         refresh: () => vm.runInContext('refreshNow()', context),
         place: (...args) => context.place(...args),
         fitCalls: () => fitCalls, mirrorCalls: () => mirrorCalls,
+        navCalls:()=>navCalls,nativeCalls:()=>nativeCalls,
     };
 }
 
@@ -159,8 +179,9 @@ for (const filename of [loadedHud, 'handoff_hud.js']) {
         assert.equal(fixed.context.presented, false, 'normal stable-frame gate must remain in effect');
     }
     fixed.refresh();
+    assert.deepEqual(fixed.warnings,[],filename+': refresh must complete without hidden native errors');
     assert.equal(fixed.context.presented, true, filename + ': refresh must reach the existing reveal gate');
-    assert.equal(fixed.context.top.style.position, '0px 0px 0px');
+    assert.equal(fixed.context.top.style.position, filename===loadedHud?'8px 6px 0px':'0px 0px 0px');
     assert.equal(fixed.host.style.opacity, '1');
     assert.equal(fixed.nativePanels.lower_hud.style.opacity, '1');
     assert(!fixed.ctx.classes.has('HandoffBoot'));
@@ -169,6 +190,29 @@ for (const filename of [loadedHud, 'handoff_hud.js']) {
     assert.equal(fixed.context.nodes.Handoff_mp_fill.style.clip, 'rect(0%, 0.000001%, 100%, 0%)');
     assert(fixed.fitCalls() >= 4, 'real nativeLayout and recurring refresh must both complete');
     assert.equal(fixed.warnings.length, 0);
+    if(filename===loadedHud){
+        const navBefore=fixed.navCalls(),nativeBefore=fixed.nativeCalls();
+        for(let i=0;i<20;i++)fixed.refresh();
+        assert.equal(fixed.navCalls(),navBefore,'stable viewport does not repeat navigation geometry');
+        assert.equal(fixed.nativeCalls(),nativeBefore,'stable selected ability handles keep bottom geometry');
+        fixed.context.selectedForTest=19;fixed.refresh();
+        assert.equal(fixed.nativeCalls(),nativeBefore+1,'a real selection reflows immediately');
+        fixed.context.currentEntries=[{ability:501},{ability:502},{ability:503}];fixed.refresh();
+        assert.equal(fixed.nativeCalls(),nativeBefore+2,'same count with different ability handles reflows');
+        fixed.context.currentEntries.push({ability:504});fixed.refresh();
+        assert.equal(fixed.nativeCalls(),nativeBefore+3,'learning an ability reflows immediately');
+        fixed.context.currentEntries.pop();fixed.refresh();
+        assert.equal(fixed.nativeCalls(),nativeBefore+4,'removing an ability reflows immediately');
+        const oldAbilities=fixed.nativePanels.abilities;oldAbilities.alive=false;
+        fixed.nativePanels.abilities=panel('abilities',fixed.nativePanels.AbilitiesAndStatBranch);fixed.refresh();
+        assert.equal(fixed.nativeCalls(),nativeBefore+5,'native ability row rebuild reflows even with unchanged handles');
+        assert.equal(fixed.navCalls(),navBefore,'selection, skill and native row changes do not affect viewport-only navigation');
+        const logicalWidth=fixed.ctx.actuallayoutwidth;
+        fixed.ctx.actuallayoutwidth*=2;fixed.ctx.actuallayoutheight*=2;fixed.ctx.actualuiscale_x=2;fixed.ctx.actualuiscale_y=2;fixed.refresh();
+        assert.equal(fixed.navCalls(),navBefore+1,'physical pixel snapping updates even when logical viewport size stays the same');
+        fixed.ctx.actuallayoutwidth=logicalWidth;fixed.ctx.actuallayoutheight/=2;fixed.ctx.actualuiscale_x=1;fixed.ctx.actualuiscale_y=1;fixed.refresh();
+        assert.equal(fixed.warnings.length,0);
+    }
 
     // Exercise the real layout after window/UI-scale changes, including the
     // zero-sized initial engine layout that uses the production fallbacks.

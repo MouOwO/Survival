@@ -25,6 +25,9 @@ DEFAULT_COMPONENT_COUNTS = {
     "monster_default_sniper": 5,
     "monster_default_juggernaut": 5,
 }
+CHALLENGE_COMPONENT_COUNTS = {
+    "monster_default_alchemist": 9,
+}
 BOSS_EXPECTED = {
     "rebirth_boss_01": "monster_boss_rebirth_01_phalanx",
     "rebirth_boss_02": "monster_boss_rebirth_02_bloodforge",
@@ -126,6 +129,7 @@ EXPECTED_COMPONENT_COUNTS = {
 }
 EXPECTED_CHALLENGES = {
     "challenge_monster_04": "monster_default_juggernaut",
+    "challenge_monster_05": "monster_default_alchemist",
 }
 EXCLUDED = {
     "boss_dreadlord",
@@ -148,11 +152,11 @@ def read_csv(relative: str) -> tuple[list[str], list[dict[str, str]]]:
     for line_number, row in enumerate(rows[1:], 2):
         if not row or not row[0].strip() or row[0].strip().startswith("#"):
             continue
-        assert len(row) == len(header), (
+        assert len(row) <= len(header), (
             f"CSV width mismatch: {path}:{line_number} "
             f"has {len(row)}, expected {len(header)}"
         )
-        result.append(dict(zip(header, row)))
+        result.append(dict(zip(header, row + [""] * (len(header) - len(row)))))
     return header, result
 
 
@@ -166,8 +170,8 @@ def main() -> int:
     catalog_header, catalog_rows = read_csv("资源系统/asset_catalog.csv")
     component_header, components = read_csv("资源系统/asset_components.csv")
     _, wave_rows = read_csv("怪物与波次系统/wave_definitions.csv")
-    assert len(archetype_header) == 26
-    assert archetype_header[-1] == "default_wearable_asset_id"
+    assert len(archetype_header) == 27
+    assert archetype_header[-2:] == ["default_wearable_asset_id", "native_attack_speed_policy"]
     assert len(challenge_header) == 20
     assert challenge_header[-1] == "default_wearable_asset_id"
     assert len(catalog_header) == 27
@@ -195,7 +199,7 @@ def main() -> int:
         asset_id
         for asset_id in catalog
         if asset_id.startswith("monster_default_")
-    } == set(DEFAULT_EXPECTED.values())
+    } == set(DEFAULT_COMPONENT_COUNTS) | set(CHALLENGE_COMPONENT_COUNTS)
     assert {
         asset_id
         for asset_id in catalog
@@ -233,6 +237,11 @@ def main() -> int:
     } == EXPECTED_CHALLENGES
     for challenge_id, asset_id in EXPECTED_CHALLENGES.items():
         assert challenges[challenge_id]["model_path"] == catalog[asset_id]["primary_model"]
+        expected_count = CHALLENGE_COMPONENT_COUNTS.get(
+            asset_id, DEFAULT_COMPONENT_COUNTS.get(asset_id)
+        )
+        assert component_counts[asset_id] == expected_count
+        assert catalog[asset_id]["load_group"] == "monster_default_wearables"
 
     for archetype_id in EXCLUDED:
         assert not archetypes[archetype_id]["default_wearable_asset_id"]
@@ -274,6 +283,8 @@ def main() -> int:
     for challenge_id, asset_id in EXPECTED_CHALLENGES.items():
         assert f'challenge_id = "{challenge_id}"' in generated_challenges
         assert f'default_wearable_asset_id = "{asset_id}"' in generated_challenges
+        assert f'asset_id = "{asset_id}"' in generated_catalog
+        assert f'asset_id = "{asset_id}"' in generated_components
 
     wave_system = (
         ROOT / "scripts" / "vscripts" / "systems" / "wave_system.lua"

@@ -17,6 +17,7 @@ local monster_visual_service = require("systems/monster_visual_service")
 local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
 local monster_navigation = require("systems/monster_navigation_policy")
+local wave_native_attack_cap = require("systems/wave_native_attack_cap")
 local monster_corpse_lifecycle_service = require(
     "systems/monster_corpse_lifecycle_service"
 )
@@ -673,7 +674,7 @@ local function rebuild_waves()
     return true
 end
 
-local function apply_stats(unit, row, definition)
+local function apply_stats(unit, row, definition, defer_attack_cap)
     unit.survival_movement_type = definition.movement_type or "ground"
     unit.survival_movement_type_override = row.movement_type_override
     unit:SetBaseMaxHealth(row.health)
@@ -702,7 +703,7 @@ local function apply_stats(unit, row, definition)
     attack_speed = math.max(0.01, attack_speed)
     unit.survival_attack_speed = attack_speed
     unit:SetBaseAttackTime(1 / attack_speed)
-    if not unit:HasModifier("modifier_debug_attack_cap") then
+    if not defer_attack_cap and not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
     if unit.Script_SetAttackRange then unit:Script_SetAttackRange(definition.attack_range or 128)
@@ -771,7 +772,12 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     monster_corpse_lifecycle_service.track(unit, "wave")
     local collision_profile = wave_monster_collision.profile(row, definition, true)
-    apply_stats(unit, row, definition)
+    -- Unknown/new archetypes and configured native skills keep the original
+    -- cap installation point, before passive skill initialization.
+    local defer_attack_cap = definition.native_attack_speed_policy == "bat_only_v1"
+        and (definition.passive_skill_ids == nil
+            or (type(definition.passive_skill_ids) == "table" and next(definition.passive_skill_ids) == nil))
+    apply_stats(unit, row, definition, defer_attack_cap)
     local resolved_visual = monster_visual_config.resolve(
         wave_number,
         row.member_role or "normal",
@@ -781,10 +787,18 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         pcall(monster_visual_service.apply, unit, resolved_visual)
     end
     pcall(monster_hero_visual_service.apply, unit, definition, {
+        fresh_unit = true,
         formal_wave = true,
         wave_number = wave_number,
         model_path = model_path_for(row, definition),
     })
+    -- Decide after all native/passive/appearance skills are present. Default
+    -- callers of apply_stats (including challenges) still install the old cap.
+    local omit_attack_cap = defer_attack_cap and wave_native_attack_cap.can_omit(unit, definition, true)
+    if not omit_attack_cap and not unit:HasModifier("modifier_debug_attack_cap") then
+        unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
+    end
+    unit.survival_wave_native_attack_cap = omit_attack_cap
     local base_hull_radius = collision_profile.base_hull_radius
     local hull_ok, hull_error = monster_hull_scale.apply(
         unit,
@@ -799,6 +813,15 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     unit.survival_is_wave_monster = true
     unit.survival_player_id = channel and channel.player_id or nil
     unit.survival_monster_role = row.member_role or "normal"
+    -- These formal-wave classifications are fixed for this unit's lifetime.
+    -- Their wall AI always chases, so native range queries need no Lua bonus.
+    -- Use the combat movement label: flying monsters also navigate on ground.
+    -- Set this only after final stats/visuals and before modifier declaration.
+    local attack_capability = unit.GetAttackCapability and unit:GetAttackCapability()
+    unit.survival_wave_skip_contact_range_bonus = collision_profile.movement_type == "flying"
+        or (collision_profile.movement_type == "ground"
+            and DOTA_UNIT_CAP_RANGED_ATTACK ~= nil
+            and attack_capability == DOTA_UNIT_CAP_RANGED_ATTACK)
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
         wall_entindex = wall_for_channel(channel),
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
@@ -992,7 +1015,7 @@ local function on_killed(payload)
     if not meta or (victim and meta.unit ~= victim) then return end
     if valid(meta.unit) then
         monster_hero_visual_service.on_death(meta.unit)
-        monster_visual_service.cleanup(meta.unit)
+        monster_visual_service.on_death(meta.unit)
     end
     unregister_enemy(entindex, "all_monsters_finished")
     state.killed = state.killed + 1
@@ -1146,7 +1169,44 @@ end
 
 function M.is_dev_mode() return dev_mode end
 
-local function begin_debug_wave_spawn(number, wave, token, preload_reason)
+local function debug_player_channels(player_ids, refresh)
+    if type(IsInToolsMode) ~= "function" or not IsInToolsMode() then
+        return nil, "tools_only"
+    end
+    if type(player_ids) ~= "table" or #player_ids == 0 then
+        return nil, "debug_player_ids_required"
+    end
+    for index = 1, #player_ids do
+        if rawget(player_ids, index) == nil then return nil, "debug_player_id_invalid" end
+    end
+    local requested, unique = {}, {}
+    for key, value in pairs(player_ids) do
+        if type(key) ~= "number" or key ~= math.floor(key) or key < 1 or key > #player_ids
+            or type(value) ~= "number" or value ~= math.floor(value)
+            or value < 0 or value >= player_context.max_players() then
+            return nil, "debug_player_id_invalid"
+        end
+        if not unique[value] then unique[value] = true; requested[#requested + 1] = value end
+    end
+    table.sort(requested)
+    local active = {}
+    for _, player_id in ipairs(player_context.active_player_ids()) do active[player_id] = true end
+    for _, player_id in ipairs(requested) do
+        if not active[player_id] then return nil, "debug_player_not_active:" .. tostring(player_id) end
+    end
+    if refresh then rebuild_wave_channels(); update_targets() end
+    local channels = {}
+    for _, player_id in ipairs(requested) do
+        local channel = wave_channels[player_id]
+        if not channel or not valid(channel.marker) then
+            return nil, "player_wave_spawn_marker_missing:" .. tostring(player_id)
+        end
+        channels[#channels + 1] = channel
+    end
+    return channels, nil, requested
+end
+
+local function begin_debug_wave_spawn(number, wave, token, preload_reason, player_ids)
     if token ~= generation_token then return false end
     state.current_wave = number
     state.status = "dev_spawn"
@@ -1154,19 +1214,34 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason)
     state.boss_alive = false
     if next(wave_channels) == nil then rebuild_wave_channels() end
     local channels = active_wave_channels()
+    if player_ids then
+        local selected, error_code = debug_player_channels(player_ids, false)
+        if not selected then
+            state.status, state.pending = "spawn_channel_missing", 0
+            publish(error_code)
+            return false
+        end
+        channels = selected
+    end
     local channel = channels[1]
     if not channel then
         state.status = "spawn_channel_missing"
         publish("player_wave_spawn_marker_missing")
         return false
     end
-    for _, row in ipairs(wave.batches) do state.planned = state.planned + (row.monster_count or 0) end
+    -- The ordinary monster<N> command keeps its original single channel.
+    -- Explicit Tools fixtures fan out the same production spawn transaction.
+    if not player_ids then channels = {channel} end
+    for _, row in ipairs(wave.batches) do
+        state.planned = state.planned + (row.monster_count or 0) * #channels
+    end
     state.pending = state.planned
     local resource_session = acquire_wave_model_resources(
         number,
         wave,
         token,
-        true
+        true,
+        #channels
     )
     local next_delay, last_delay = 0, 0
     local normal_instance_index = 0
@@ -1178,14 +1253,16 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason)
         end
         local delay = next_delay
         last_delay = delay
-        scheduler.after(delay, spawn_callback(
-            row,
-            token,
-            number,
-            visual_instance_index,
-            resource_session,
-            channel
-        ))
+        for _, selected_channel in ipairs(channels) do
+            scheduler.after(delay, spawn_callback(
+                row,
+                token,
+                number,
+                visual_instance_index,
+                resource_session,
+                selected_channel
+            ))
+        end
         next_delay = next_delay + (tonumber(row.spawn_interval) or 1.0)
     end
     scheduler.after(last_delay + 0.05, function()
@@ -1224,10 +1301,15 @@ local function debug_wave_model_asset_ids(wave)
     return asset_ids, failed
 end
 
-function M.debug_spawn_wave(number)
+function M.debug_spawn_wave(number, player_ids)
     number = tonumber(number)
     local wave = number and waves[number] or nil
     if not wave then return false, "wave_not_found" end
+    if player_ids ~= nil then
+        local channels, error_code, normalized = debug_player_channels(player_ids, true)
+        if not channels then return false, error_code end
+        player_ids = normalized
+    end
     dev_mode = true
     generation_token = generation_token + 1
     local token = generation_token
@@ -1283,7 +1365,7 @@ function M.debug_spawn_wave(number)
                 .. " reason=" .. reason .. " pending=" .. tostring(pending)
                 .. " failed=" .. tostring(preload_failed)
                 .. " elapsed=" .. string.format("%.2f", elapsed))
-            begin_debug_wave_spawn(number, wave, token, reason)
+            begin_debug_wave_spawn(number, wave, token, reason, player_ids)
             return false
         end
         return DEV_PRELOAD_POLL_INTERVAL
@@ -1293,6 +1375,13 @@ function M.debug_spawn_wave(number)
         scheduler.after(DEV_PRELOAD_POLL_INTERVAL, check_preload, DEV_PRELOAD_TASK_ID)
     end
     return true
+end
+
+-- Manual Tools scenarios only. Engine player objects, region channels, wall AI,
+-- population counters and resource leases remain owned by the normal system.
+function M.debug_spawn_wave_for_players(number, player_ids)
+    if player_ids == nil then return false, "debug_player_ids_required" end
+    return M.debug_spawn_wave(number, player_ids)
 end
 
 function M.set_difficulty(id)
@@ -1395,44 +1484,58 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     )
     if not valid(unit) then return nil, "unit_create_failed" end
 
-    monster_navigation.apply(unit)
-    team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "building_challenge_enemy")
-    monster_corpse_lifecycle_service.track(unit, "building_challenge")
-    local combat_row = {
-        health = tonumber(row.health) or 200,
-        attack = tonumber(row.attack) or 2,
-        armor = tonumber(row.war3_armor or row.armor) or 2,
-        attack_speed = tonumber(row.attack_speed) or 1,
-        is_boss = definition.endless ~= true,
-        member_role = definition.endless and "normal" or "assault_boss",
-        is_challenge_monster = true,
-    }
-    local collision_profile = wave_monster_collision.profile(combat_row, definition)
-    if definition.endless or combat_row.health > 100000000 or combat_row.attack > 100000000 then
-        combat_row = require("combat/endless_stat_projection").prepare(unit, combat_row)
+    -- Keep ownership until setup succeeds. A native setter/placement failure
+    -- must not leak a created unit that the challenge caller never receives.
+    local setup_ok, setup_error = pcall(function()
+        monster_navigation.apply(unit)
+        team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "building_challenge_enemy")
+        monster_corpse_lifecycle_service.track(unit, "building_challenge")
+        local combat_row = {
+            health = tonumber(row.health) or 200,
+            attack = tonumber(row.attack) or 2,
+            armor = tonumber(row.war3_armor or row.armor) or 2,
+            attack_speed = tonumber(row.attack_speed) or 1,
+            is_boss = definition.endless ~= true,
+            member_role = definition.endless and "normal" or "assault_boss",
+            is_challenge_monster = true,
+        }
+        local collision_profile = wave_monster_collision.profile(
+            combat_row, definition, definition.endless == true
+        )
+        if definition.endless or combat_row.health > 100000000 or combat_row.attack > 100000000 then
+            combat_row = require("combat/endless_stat_projection").prepare(unit, combat_row)
+        end
+        apply_stats(unit, combat_row, definition)
+        local hull_ok, hull_error = monster_hull_scale.apply(
+            unit,
+            1,
+            collision_profile.base_hull_radius
+        )
+        if not hull_ok then error(hull_error or "monster_hull_apply_failed") end
+        unit.survival_is_boss = definition.endless ~= true
+        unit.survival_is_challenge_monster = true
+        unit.survival_player_id = player_id
+        unit.survival_wave_movement_type = collision_profile.movement_type
+        unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
+        pcall(monster_hero_visual_service.apply, unit, definition, {
+            fresh_unit = true,
+            challenge = true,
+            allow_outside_formal_wave = true,
+            model_path = definition.model_path,
+            default_wearable_asset_id = definition.default_wearable_asset_id,
+        })
+        unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
+            wall_entindex = wall_by_player[player_id] or -1,
+            no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
+        })
+        FindClearSpaceForUnit(unit, position, true)
+    end)
+    if not setup_ok then
+        unit.survival_wave_cleanup = true
+        pcall(monster_hero_visual_service.clear, unit)
+        if UTIL_Remove then pcall(UTIL_Remove, unit) end
+        return nil, "challenge_monster_setup_failed:" .. tostring(setup_error)
     end
-    apply_stats(unit, combat_row, definition)
-    monster_hull_scale.apply(
-        unit,
-        1,
-        collision_profile.base_hull_radius
-    )
-    unit.survival_is_boss = definition.endless ~= true
-    unit.survival_is_challenge_monster = true
-    unit.survival_player_id = player_id
-    unit.survival_wave_movement_type = collision_profile.movement_type
-    unit.survival_wave_no_unit_collision = collision_profile.no_unit_collision
-    pcall(monster_hero_visual_service.apply, unit, definition, {
-        challenge = true,
-        allow_outside_formal_wave = true,
-        model_path = definition.model_path,
-        default_wearable_asset_id = definition.default_wearable_asset_id,
-    })
-    unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
-        wall_entindex = wall_by_player[player_id] or -1,
-        no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
-    })
-    FindClearSpaceForUnit(unit, position, true)
     event_bus.emit(events.MONSTER_SPAWNED, {
         unit = unit,
         entindex = unit:entindex(),
@@ -1497,6 +1600,8 @@ M._wave_channels_for_test = function()
 end
 
 function M.init()
+    -- Read static KV before wave spawning and reset its cache for a new map.
+    wave_native_attack_cap.init()
     monster_spawn_marker = nil
     difficulty_id = difficulty_config.default_id
     difficulty_selected = false
@@ -1587,6 +1692,7 @@ function M.init()
                 unregister_enemy(entindex, "player_disconnected")
                 if valid(meta.unit) then
                     meta.unit.survival_wave_cleanup = true
+                    monster_hero_visual_service.clear(meta.unit)
                     monster_visual_service.cleanup(meta.unit)
                     if UTIL_Remove then UTIL_Remove(meta.unit) end
                 end

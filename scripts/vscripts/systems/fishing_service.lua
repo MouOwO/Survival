@@ -144,6 +144,8 @@ local function announce(player_id, row, value)
     event_bus.emit(events.UI_NOTIFICATION, {
         audience = "all",
         player_id = player_id,
+        kind = "fishing_reward",
+        actor_name = player_name(player_id),
         message = string.format("%s 获得[%s] %s：%s", player_name(player_id),
             tostring(row.rarity or ""), tostring(row.display_name), tostring(row.notes or "")),
         level = "info",

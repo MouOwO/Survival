@@ -18,9 +18,12 @@ local hero_stat_adapter = require("systems/hero_stat_adapter")
 local monkey_runtime = require("config/generated/monkey_king_exclusive_runtime")
 local blademaster_runtime = require("config/generated/blademaster_exclusive_runtime")
 local armor_balance = require("config/armor_balance")
+local endless_projection = require("combat/endless_stat_projection")
 
 local M = {}
 local state_by_player = {}
+local pending_recalculations = {}
+local flush_recalculation
 
 local function on_damage(payload)
     local player_id = tonumber(payload.player_id)
@@ -193,6 +196,12 @@ local function apply_base_projection(state)
         (state.engine_base_attack_min + attribute_attack_bonus * state.damage_multiplier) * multiplier)
     local maximum = debug_attack and 0 or math.max(minimum,
         (state.engine_base_attack_max + attribute_attack_bonus * state.damage_multiplier) * multiplier)
+    if state.snapshot and state.snapshot.native_base_attack_min ~= nil then
+        minimum, maximum = state.snapshot.native_base_attack_min, state.snapshot.native_base_attack_max
+    else
+        local attack_scale = tonumber(state.unit.survival_endless_attack_scale) or 1
+        minimum, maximum = math.floor(minimum / attack_scale), math.floor(maximum / attack_scale)
+    end
     local previous = state.native_projection or {}
     if previous.strength == 0 and previous.agility == 0 and previous.intellect == 0
         and previous.damage_min == minimum and previous.damage_max == maximum then return false end
@@ -210,6 +219,10 @@ local function apply_base_projection(state)
 end
 
 local function recalculate(player_id, reason, growth_snapshot)
+    if player_id == nil then return nil end
+    -- Structural changes also absorb any earlier growth in this dispatch.
+    -- Read authoritative sources here rather than replaying an older payload.
+    pending_recalculations[player_id] = nil
     local state = current(player_id)
     if not state or not state.unit or state.unit:IsNull() then
         return nil
@@ -430,6 +443,22 @@ local function recalculate(player_id, reason, growth_snapshot)
                 and (tonumber(blademaster_config.r_attack_interval_reduction) or 0)
                 or 0))
     local hero_damage_multiplier = state.damage_multiplier
+    local critical_damage_pct = (monkey_w
+        and (tonumber(monkey_config.w_critical_damage_pct) or 200) or 200)
+        + (blademaster_q and math.max(0,
+            tonumber(blademaster_config.q_critical_damage_bonus_pct) or 0) or 0)
+        + (tonumber(permanent.hero_critical_damage_bonus_pct) or 0)
+    local engine_base_min = debug_attack and 0 or math.max(0,
+        (state.engine_base_attack_min + attribute_attack_bonus * state.damage_multiplier)
+            * exclusive_attack_multiplier)
+    local engine_base_max = debug_attack and 0 or math.max(engine_base_min,
+        (state.engine_base_attack_max + attribute_attack_bonus * state.damage_multiplier)
+            * exclusive_attack_multiplier)
+    local previous_attack_scale = tonumber(state.unit.survival_endless_attack_scale) or 1
+    local native_attack = endless_projection.prepare_attack_components(state.unit,
+        engine_base_min, engine_base_max, engine_weapon_attack_bonus,
+        engine_research_attack_bonus, equipment_stats.attack_flat,
+        math.max(1, critical_damage_pct / 100))
     local next_snapshot = {
         player_id = player_id,
         hero_id = state.hero_id,
@@ -466,11 +495,7 @@ local function recalculate(player_id, reason, growth_snapshot)
             + monkey_critical_chance_pct
             + (blademaster_q and math.max(0,
                 tonumber(blademaster_config.q_critical_chance_pct) or 0) or 0),
-        critical_damage_pct = (monkey_w
-            and (tonumber(monkey_config.w_critical_damage_pct) or 200) or 200)
-            + (blademaster_q and math.max(0,
-                tonumber(blademaster_config.q_critical_damage_bonus_pct) or 0) or 0)
-            + (tonumber(permanent.hero_critical_damage_bonus_pct) or 0),
+        critical_damage_pct = critical_damage_pct,
         exclusive_attack_multiplier = exclusive_attack_multiplier,
         monkey_king_w_unlocked = monkey_w and 1 or 0,
         monkey_king_e_unlocked = monkey_e and 1 or 0,
@@ -503,6 +528,9 @@ local function recalculate(player_id, reason, growth_snapshot)
             + attribute_attack_bonus * state.damage_multiplier)
                 * exclusive_attack_multiplier + engine_bonus_attack),
         debug_attack_override = debug_attack or 0,
+        -- Native heroes get this separately from modifier_equipment_effects;
+        -- clones need the missing component, while a debug override is complete.
+        engine_equipment_attack_bonus = debug_attack and 0 or equipment_stats.attack_flat,
         debug_attack_speed_override = debug_attack_speed or 0,
         -- The equipment aggregation snapshot already owns the authoritative
         -- War3/CSV armor value. Do not derive the HUD value from this frame's
@@ -563,6 +591,16 @@ local function recalculate(player_id, reason, growth_snapshot)
         equipment_attack = equipment_stats.attack_flat,
         engine_research_attack_bonus = engine_research_attack_bonus,
         engine_weapon_attack_bonus = engine_weapon_attack_bonus,
+        native_base_attack_min = native_attack.minimum,
+        native_base_attack_max = native_attack.maximum,
+        native_attack_min = native_attack.minimum + native_attack.weapon
+            + native_attack.research + native_attack.equipment,
+        native_attack_max = native_attack.maximum + native_attack.weapon
+            + native_attack.research + native_attack.equipment,
+        native_weapon_attack_bonus = native_attack.weapon,
+        native_research_attack_bonus = native_attack.research,
+        native_equipment_attack_bonus = native_attack.equipment,
+        native_attack_scale = native_attack.scale,
         equipment_attack_speed_pct = equipment_stats.attack_speed_pct,
         equipment_health = equipment_stats.health_flat,
         equipment_armor = equipment_stats.armor_flat,
@@ -597,6 +635,13 @@ local function recalculate(player_id, reason, growth_snapshot)
     state.exclusive_attack_multiplier = exclusive_attack_multiplier
     state.attribute_attack_bonus = attribute_attack_bonus
     local native_changed = apply_base_projection(state) or health_changed
+    if previous_attack_scale ~= native_attack.scale then
+        local equipment_modifier = state.unit:FindModifierByName("modifier_equipment_effects")
+        if equipment_modifier and equipment_modifier.ForceRefresh then
+            equipment_modifier:ForceRefresh()
+            native_changed = true
+        end
+    end
     local bat_changed = set_native_value(state, "base_attack_time", "SetBaseAttackTime",
         base_attack_time)
     native_changed = native_changed or bat_changed
@@ -655,6 +700,8 @@ local function recalculate(player_id, reason, growth_snapshot)
         hero_attack_speed_bonus_pct = researcher_attack_speed_pct,
         engine_weapon_attack_bonus = engine_weapon_attack_bonus,
         engine_research_attack_bonus = engine_research_attack_bonus,
+        native_weapon_attack_bonus = native_attack.weapon,
+        native_research_attack_bonus = native_attack.research,
         critical_chance_pct = next_snapshot.critical_chance_pct,
         critical_damage_pct = next_snapshot.critical_damage_pct,
     }
@@ -700,7 +747,34 @@ local function recalculate(player_id, reason, growth_snapshot)
     return state.snapshot
 end
 
+flush_recalculation = function(player_id, expected)
+    local pending = pending_recalculations[player_id]
+    if not pending or (expected and pending ~= expected) then return end
+    pending_recalculations[player_id] = nil
+    if pending.generation ~= event_bus.get_generation()
+        or current(player_id) ~= pending.state then return end
+    return recalculate(player_id, pending.reason, pending.growth_snapshot)
+end
+
+local function queue_recalculation(player_id, reason, growth_snapshot)
+    if player_id == nil then return end
+    local state = current(player_id)
+    if not state or not state.unit or state.unit:IsNull() then return end
+    local pending = pending_recalculations[player_id]
+    local generation = event_bus.get_generation()
+    if not pending or pending.state ~= state or pending.generation ~= generation then
+        pending = {state = state, generation = generation}
+        pending_recalculations[player_id] = pending
+    end
+    pending.reason = reason
+    if growth_snapshot then pending.growth_snapshot = growth_snapshot end
+    event_bus.after_dispatch("hero_combat_recalculate:" .. tostring(player_id), function()
+        flush_recalculation(player_id, pending)
+    end)
+end
+
 local function on_hero_summoned(payload)
+    pending_recalculations[tonumber(payload.player_id)] = nil
     local definition = heroes.by_id[payload.hero_id] or {}
     local base = base_snapshot(payload.unit, definition)
     local damage_multiplier = configured_damage_multiplier(definition)
@@ -792,7 +866,7 @@ local function on_progression_changed(payload)
     if payload.changed_section and payload.changed_section ~= "hero" then return end
     -- Progression attributes are logical data only. They do not change native
     -- attributes or equipment health, so only the combat snapshot is rebuilt.
-    recalculate(tonumber(payload.player_id), payload.reason)
+    queue_recalculation(tonumber(payload.player_id), payload.reason)
 end
 
 local function debug_set_attack(payload)
@@ -802,6 +876,7 @@ local function debug_set_attack(payload)
     if not state or not state.unit or state.unit:IsNull() then
         return { ok = false, error = "hero_not_summoned" }
     end
+    flush_recalculation(player_id)
     if payload.reset == true then
         state.debug_attack_override = nil
     else
@@ -831,7 +906,8 @@ local function debug_set_attack(payload)
         end
         if has_attack_speed then
             attack_speed = tonumber(payload.attack_speed)
-            if not attack_speed or attack_speed <= 0 or attack_speed > 100 then
+            if not attack_speed or not endless_projection.is_finite(attack_speed)
+                or attack_speed <= 0 or attack_speed > 100 then
                 return { ok = false, error = "debug_attack_speed_invalid" }
             end
         end
@@ -862,6 +938,9 @@ local function get_stats(payload)
         and tonumber(payload.entindex) ~= state.unit:entindex() then
         return { ok = false, error = "hero_entity_mismatch" }
     end
+    -- Attack procs can query attributes before the outer attack dispatch ends.
+    -- Commit this player's growth before returning any combat snapshot.
+    flush_recalculation(player_id)
     if state.snapshot
         and state.fixed_attack_interval ~= fixed_attack_interval(state.unit) then
         recalculate(player_id, "fixed_attack_rate_changed")
@@ -885,6 +964,7 @@ local function on_hero_removed(payload)
     local player_id = tonumber(payload and payload.player_id)
     local state = player_id and state_by_player[player_id]
     if not state or state.unit ~= payload.unit then return end
+    pending_recalculations[player_id] = nil
     state_by_player[player_id] = nil
     event_bus.emit(events.HERO_COMBAT_STATS_CHANGED, {
         player_id = player_id,
@@ -899,11 +979,12 @@ end
 local function on_growth_changed(payload)
     -- Attack growth changes combat numbers, not equipment or projectile setup.
     -- Use the committed snapshot rather than copying the inventory again.
-    recalculate(tonumber(payload.player_id), payload.reason, payload.snapshot)
+    queue_recalculation(tonumber(payload.player_id), payload.reason, payload.snapshot)
 end
 
 function M.init()
     state_by_player = {}
+    pending_recalculations = {}
     effect_handler_registry.init()
     equipment_stat_aggregation_service.init()
     equipment_effect_service.init()
