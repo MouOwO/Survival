@@ -145,7 +145,7 @@ console.log('MINIMAP_SHORTCUTS_PASS: one Io scene button, old F2 node cleanup, s
     assert.equal(legacyScene.hittest, false); assert.equal(legacyScene.hittestchildren, false);
     assert.equal(legacyUnits.length, 1, 'legacy controller fallback loads one Io scene');
     assert.equal(legacyUnits[0].node, legacyScene);
-    assert.deepEqual(legacyUnits[0].args, ['npc_dota_hero_wisp', 'shortcut_soft', false]);
+    assert.deepEqual(legacyUnits[0].args, ['npc_dota_hero_wisp', 'default', false]);
     for (let i = 0; i < 5; i++) legacyCfg.SurvivalMinimapShortcuts.Refresh(hudGeometry(1672, 941, 10), true);
     assert.equal(legacyUnits.length, 1, 'legacy fallback does not reload the model during availability refreshes');
     assert.equal(legacyShortcuts.style.height, '76px');

@@ -439,12 +439,6 @@
                 "PortraitAngles" "337.05 136.08 0.00"
                 "PortraitFOV" "17"
             }
-            "shortcut_soft"
-            {
-                "PortraitPosition" "166.15 -166.83 60.25"
-                "PortraitAngles" "337.05 136.08 0.00"
-                "PortraitFOV" "22.8136"
-            }
         }
         "PortraitHideDropShadow" "1"
         "PortraitBackgroundModel" ""
@@ -712,13 +706,6 @@
                 "PortraitPosition" "96.055130 12.757233 138.818634"
                 "PortraitAngles" "6.456027 192.804642 0.000000"
                 "PortraitFOV" "20.000000"
-                "PortraitFar" "1000.000000"
-            }
-            "shortcut_soft"
-            {
-                "PortraitPosition" "96.055130 12.757233 138.818634"
-                "PortraitAngles" "6.456027 192.804642 0.000000"
-                "PortraitFOV" "26.7792"
                 "PortraitFar" "1000.000000"
             }
         }
@@ -1517,12 +1504,6 @@
                 "PortraitPosition" "150.65 -44.70 303.53"
                 "PortraitAngles" "36.08 163.28 0.00"
                 "PortraitFOV" "18"
-            }
-            "shortcut_soft"
-            {
-                "PortraitPosition" "150.65 -44.70 303.53"
-                "PortraitAngles" "36.08 163.28 0.00"
-                "PortraitFOV" "25.0048"
             }
         }
         "PortraitHideDropShadow" "1"
@@ -3223,13 +3204,6 @@
                 "PortraitPosition" "331.764404 109.020172 93.554466"
                 "PortraitAngles" "354.919342 200.797699 0.000000"
                 "PortraitFOV" "10.000000"
-                "PortraitFar" "1000.000000"
-            }
-            "shortcut_soft"
-            {
-                "PortraitPosition" "331.764404 109.020172 93.554466"
-                "PortraitAngles" "354.919342 200.797699 0.000000"
-                "PortraitFOV" "13.4720"
                 "PortraitFar" "1000.000000"
             }
         }
@@ -6148,12 +6122,6 @@
                 "PortraitAngles" "346.26 147.12 0.00"
                 "PortraitFOV" "45"
             }
-            "shortcut_soft"
-            {
-                "PortraitPosition" "88.75 -41.51 195.67"
-                "PortraitAngles" "346.26 147.12 0.00"
-                "PortraitFOV" "68.7015"
-            }
         }
         "PortraitHideDropShadow" "1"
         "PortraitBackgroundModel" ""
@@ -6766,12 +6734,6 @@
                 "PortraitPosition" "314 -150 108"
                 "PortraitAngles" "354.14 153.33 0.00"
                 "PortraitFOV" "20"
-            }
-            "shortcut_soft"
-            {
-                "PortraitPosition" "314 -150 108"
-                "PortraitAngles" "354.14 153.33 0.00"
-                "PortraitFOV" "28.6836"
             }
         }
         "PortraitHideDropShadow" "1"
@@ -28270,13 +28232,6 @@
                 "PortraitPosition" "186.028931 -80.825043 208.742569"
                 "PortraitAngles" "13.690007 154.430176 0.000000"
                 "PortraitFOV" "16.000000"
-                "PortraitFar" "1000.000000"
-            }
-            "shortcut_soft"
-            {
-                "PortraitPosition" "186.028931 -80.825043 208.742569"
-                "PortraitAngles" "13.690007 154.430176 0.000000"
-                "PortraitFOV" "22.2623"
                 "PortraitFar" "1000.000000"
             }
         }
