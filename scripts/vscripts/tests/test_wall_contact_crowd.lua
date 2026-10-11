@@ -74,6 +74,7 @@ end
 
 local function unit(id, x, y, radius)
     local u={p=Vector(x,y,384),radius=radius or 32,orders=0,stops=0,
+        original_radius=radius or 32,hull_changes=0,
         corrections=0,hits=0,next_attack=0,contact_move_orders=0}
     function u:entindex() return id end
     function u:GetAbsOrigin() return self.p end
@@ -81,6 +82,7 @@ local function unit(id, x, y, radius)
     function u:IsNull() return false end
     function u:IsAlive() return not self.dead end
     function u:GetHullRadius() return self.radius end
+    function u:SetHullRadius(radius) self.radius=radius;self.hull_changes=self.hull_changes+1 end
     function u:GetPaddedCollisionRadius() return self.radius+10 end
     function u:GetTeamNumber() return 3 end
     function u:GetAttackCapability() return DOTA_UNIT_CAP_MELEE_ATTACK end
@@ -214,9 +216,10 @@ local function assert_front(label)
     local occupied={}
     for _,u in ipairs(actors) do
         assert(u.hits>0,label..': every contact must actually land attacks')
-        assert(math.abs(u.p.x+192)<.01,label..': contact is not precisely aligned normal to wall')
-        assert(u.p.y==-96 or u.p.y==-32 or u.p.y==32 or u.p.y==96,
+        assert(math.abs(u.p.x+184)<.01,label..': contact is not precisely aligned normal to wall')
+        assert(u.p.y==-72 or u.p.y==-24 or u.p.y==24 or u.p.y==72,
             label..': contact is not precisely aligned to a lane')
+        assert(u:GetHullRadius()==24,label..': admitted front must use the tactical navigation hull')
         assert(not occupied[u.p.y],label..': two contacts occupy the same lane')
         occupied[u.p.y]=true
         assert(phased(u),label..': crowd pressure must not move a locked contact')
@@ -227,8 +230,10 @@ local function assert_front(label)
         if u.ai.ai_state=='waiting' then
             assert(u.ai:CheckState()[MODIFIER_STATE_DISARMED],label..': overflow is not disarmed')
             assert(not phased(u),label..': overflow must retain normal collision')
-            local goal_gap=-u.ai.contact_move.x-192
-            assert(goal_gap>=72 and goal_gap<=104,
+            assert(u:GetHullRadius()==u.original_radius,label..': overflow inherited the tactical hull')
+            local goal_gap=-u.ai.contact_move.x-184
+            local minimum_gap=u.original_radius+24+8
+            assert(goal_gap>=minimum_gap and goal_gap<=minimum_gap+32,
                 label..': overflow goal must be compact and outside the front hulls')
             for _,attacker in ipairs(actors) do
                 assert(distance(u.p,attacker.p)>=u.radius+attacker.radius-.01,
@@ -240,15 +245,15 @@ local function assert_front(label)
     return actors
 end
 
--- Two middle monsters arrive before the rest, displaced ten units outward.
--- The old +/-20 arrival tolerance roots them in those positions; 54-unit gaps
--- prevent the outer Hull32 monsters from fitting. Populate a genuine 90-unit
+-- Two middle monsters arrive before the rest, displaced eighteen units outward.
+-- The old +/-20 arrival tolerance roots them in those positions; 30-unit gaps
+-- prevent the outer tactical contacts from fitting. Populate a genuine 90-unit
 -- crowd behind them, with the center columns processed before the outer ones.
 controller(unit(10,-224,-42))
 controller(unit(11,-224,42))
 for i=1,88 do
     local row=math.floor((i-1)/4)
-    local lanes={-32,32,-96,96}
+    local lanes={-24,24,-72,72}
     local u=unit(11+i,-320-row*64,lanes[(i-1)%4+1])
     u.cancel_first_contact_move=true
     controller(u)
@@ -281,9 +286,9 @@ end
 run(5.5)
 local closest_waiter=math.huge
 for _,u in ipairs(monsters) do
-    if u.ai.ai_state=='waiting' then closest_waiter=math.min(closest_waiter,-u.p.x-192) end
+    if u.ai.ai_state=='waiting' then closest_waiter=math.min(closest_waiter,-u.p.x-184) end
 end
-assert(closest_waiter>=64 and closest_waiter<=108,
+assert(closest_waiter>=56 and closest_waiter<=100,
     'MOVE stopping tolerance still leaves an empty row behind the four attackers')
 local first_attackers={}
 for _,u in ipairs(initial_front) do first_attackers[u:entindex()]=true end
@@ -294,11 +299,13 @@ end
 -- Settled combat must not produce orders, position writes, or further path
 -- searches. Navigation checks may refresh only on the existing cached cadence.
 local orders_before,positions_before,paths_before=total('orders'),total('corrections'),paths
+local hull_changes_before=total('hull_changes')
 local nav_before=nav_queries
 run(10)
 assert_front('stable crowd')
 assert(total('orders')==orders_before,'stable crowd reissued native orders')
 assert(total('corrections')==positions_before,'stable front writes its position every observation')
+assert(total('hull_changes')==hull_changes_before,'stable contacts rewrite native hulls every observation')
 assert(paths==paths_before,'stable full front repeated path queries')
 local stable_nav=nav_queries-nav_before
 assert(stable_nav<1500,'navigation work scales with all waiting monsters rather than cached wall geometry')
@@ -329,6 +336,7 @@ assert_front('return after external displacement')
 local victim=front()[2]
 victim.dead=true
 victim.ai:OnDeath({unit=victim})
+assert(victim:GetHullRadius()==victim.original_radius,'death must restore the previous front owner immediately')
 run(5)
 local replaced=assert_front('death replacement')
 local new_attackers=0
@@ -341,6 +349,7 @@ local next_wall=unit(2,1024,0,128)
 for _,m in ipairs(controllers) do
     m:SetWallEntIndex(next_wall:entindex())
     local u=m:GetParent()
+    assert(u:GetHullRadius()==u.original_radius,'target change retained the tactical collision hull')
     assert(not m:CheckState()[MODIFIER_STATE_NO_UNIT_COLLISION] and not u:IsRooted() and not u:IsDisarmed(),
         'target change retained temporary contact state')
     assert(u:Script_GetAttackRange()==128 and u.force==nil,'target change retained range or force attack target')
@@ -394,25 +403,26 @@ for i,control in ipairs({'stunned','restricted','rooted'}) do
     contact.reset()
 end
 
--- A large hull has only two physically valid lanes. The service must not
--- fabricate four overlapping attackers or run pathfinding for every waiter.
+-- Large original hulls must fill all four tactical contacts. Their rear units
+-- retain real collision and full fronts must still reuse cached navigation.
 local large={}
 for i=1,8 do
-    local u=unit(400+i,-400-math.floor((i-1)/2)*128,i%2==1 and -64 or 64,64)
+    local lateral={-64,-21,21,64}
+    local u=unit(400+i,-400-math.floor((i-1)/4)*128,lateral[(i-1)%4+1],64)
     controller(u)
     large[#large+1]=u
 end
 observe()
 run(8)
-assert(#front()==2,'Hull64 must use its two nonoverlapping contacts')
-for _,u in ipairs(front()) do
-    assert(u.hits>0 and u.p.x==-224 and math.abs(u.p.y)==64,'large contact is not aligned and attacking')
-end
+assert_front('large-body four-contact crowd')
 local large_paths,large_nav=paths,nav_queries
 run(4)
 assert(paths==large_paths,'large full front repeatedly searched paths for its extra waiters')
 assert(nav_queries-large_nav<300,'large full front repeatedly sampled navigation for each waiter')
-for _,u in ipairs(large) do u.ai:SetWallEntIndex(-1);u.ai:OnDestroy() end
+for _,u in ipairs(large) do
+    u.ai:SetWallEntIndex(-1);u.ai:OnDestroy()
+    assert(u:GetHullRadius()==64,'large contact cleanup failed to restore the original Hull64')
+end
 contact.reset()
 
 -- No reachable contact near the wall must remain disarmed. Falling back to
@@ -428,7 +438,8 @@ observe()
 assert(blocked_ai.ai_state=='waiting' and obstructed:IsDisarmed(),
     'no contact candidates must not fall back to unconstrained chase/attack')
 run(2)
-assert(obstructed.hits==0 and not phased(obstructed),'blocked admission granted collision/attack privileges')
+assert(obstructed.hits==0 and not phased(obstructed) and obstructed:GetHullRadius()==32,
+    'blocked admission granted collision/attack privileges')
 GridNav.IsTraversable=traversable
 run(4)
 assert(blocked_ai.ai_state=='attack' and obstructed.hits>0,'removed obstruction did not restore admission')
@@ -446,7 +457,8 @@ observe()
 local failed_paths=paths
 for i=1,3 do clock=clock+.5;observe() end
 assert(paths==failed_paths,'stationary failed paths were queried again before the backoff elapsed')
-assert(trapped_ai.ai_state=='waiting' and trapped:IsDisarmed(),'unreachable paths bypassed admission')
+assert(trapped_ai.ai_state=='waiting' and trapped:IsDisarmed() and trapped:GetHullRadius()==32,
+    'unreachable paths bypassed admission or retained the tactical hull')
 GridNav.FindPathLength=find_path
 run(3)
 assert(trapped_ai.ai_state=='attack' and trapped.hits>0,'failed path cache never recovered')

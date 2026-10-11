@@ -149,7 +149,7 @@ function M:CheckState()
     local state = {}
     local mode=self.GetStackCount and self:GetStackCount() or
         (self.contact_locked and 2 or (self.contact_advancing and 3 or (self.contact_waiting and 1 or 0)))
-    -- Only the four admitted contacts phase through units. GridNav and the
+    -- Only admitted front contacts phase through units. GridNav and the
     -- square wall boundary remain active. Keep phasing while rooted so a
     -- waiting unit cannot push an exact front-row contact sideways again.
     if self.no_unit_collision or mode==2 or mode==3 then state[MODIFIER_STATE_NO_UNIT_COLLISION] = true end
@@ -208,6 +208,7 @@ function M:SetWallEntIndex(entindex)
     self.ai_state="idle"
     self.contact_move,self.order_pending,self.last_attack_activity=nil,false,nil
     self.goal_wall=nil
+    self.wait_blocked,self.wait_face,self.wait_envelope,self.wait_radius=nil,nil,nil,nil
     if not parent.GetForceAttackTarget or parent:GetForceAttackTarget()~=nil then
         parent:SetForceAttackTarget(nil)
     end
@@ -237,19 +238,32 @@ function M:IssueStateOrder(parent,wall)
     self.last_order_time=now()
 end
 
-function M:EnterState(state,parent,wall,point)
+function M:EnterState(state,parent,wall,point,plan)
     if self.shared_death_observer and self.death_wall_handle~=wall then
         attack_observer.bind_death_wall(self,wall);self.death_wall_handle=wall
     end
     if self.ai_state==state and self.goal_wall==wall then
-        -- Overflow keeps its original local approach until a contact is free.
-        -- Re-sorting the nearest occupied point must not redirect it each tick.
-        if state=="waiting" or state=="attack" or state=="chase"
+        if state=="waiting" then
+            -- Hold a stable rear goal even when the nearest occupied lane or
+            -- retreat choice changes. Only real clearance/face changes renew it.
+            local blocked=plan and plan.waiting_blocked
+            local face=plan and plan.wait_face
+            local envelope=plan and plan.wait_envelope
+            local radius=plan and plan.wait_radius
+            if self.wait_blocked==blocked and self.wait_face==face
+                and self.wait_envelope==envelope and self.wait_radius==radius then return false end
+        elseif state=="attack" or state=="chase"
             or same_point(point,self.contact_move) then return false end
     end
     local previous=self.ai_state
     self.ai_state,self.goal_wall=state,wall
     self.contact_move=point
+    if state=="waiting" and plan then
+        self.wait_blocked,self.wait_face=plan.waiting_blocked,plan.wait_face
+        self.wait_envelope,self.wait_radius=plan.wait_envelope,plan.wait_radius
+    else
+        self.wait_blocked,self.wait_face,self.wait_envelope,self.wait_radius=nil,nil,nil,nil
+    end
     self.last_attack_activity=nil
     self.progress_position=parent:GetAbsOrigin()
     self.last_progress_time=now()
@@ -356,11 +370,12 @@ function M:OnIntervalThink()
     if navigation.enforce_boundary then
         navigation.enforce_boundary(wall,parent,self.boundary_position)
     end
-    local desired,point="chase",nil
-    local ground=(parent.survival_wave_movement_type or parent.survival_movement_type or "ground") == "ground"
+    local desired,point,plan="chase",nil,nil
     local melee=parent.GetAttackCapability and parent:GetAttackCapability()==DOTA_UNIT_CAP_MELEE_ATTACK
-    if ground and melee then
-        local plan=contact.resolve(wall,parent)
+    -- Flying is a combat label; these monsters also navigate on the ground.
+    -- Every native melee attacker must respect the wall's contact capacity.
+    if melee then
+        plan=contact.resolve(wall,parent)
         if plan then
             point=plan.point
             local retained=self.ai_state=="attack" and self.goal_wall==wall and same_point(point,self.contact_move)
@@ -373,7 +388,7 @@ function M:OnIntervalThink()
     else
         contact.release(self.wall_entindex,parent:entindex())
     end
-    if not self:EnterState(desired,parent,wall,point) then self:MonitorState(parent,wall) end
+    if not self:EnterState(desired,parent,wall,point,plan) then self:MonitorState(parent,wall) end
     local settled=parent:GetAbsOrigin()
     self.boundary_position={x=settled.x,y=settled.y,z=settled.z}
 end

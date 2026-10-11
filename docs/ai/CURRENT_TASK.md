@@ -1,3 +1,35 @@
+## 当前任务（2026-10-11）：同步提交并清理旧 UI 记录
+
+按用户固定顺序完成唯一 stash、当前 dev pull、精确 pop；远端无新提交且恢复无冲突。整理本轮现有玩法、联机奖励、无尽模型、V10 UI 与支付源码和配套运行资源，一起提交推送；不切换未部署的存档 bundle/hash。
+
+已逐份审阅并删除 36 份过期或重复 UI Markdown（33 份原已跟踪、3 份未跟踪的 V10 过程记录），有效规则归并到 docs/UI_GUIDE.md，保留业务契约、当前 V10 交付及原始素材包。删除 293 个截图/预览/旧日志等临时文件约 630 MiB；本地独立 apps/comfy-dashboard 保留且忽略。两个 V10 work 目录仅作本地输出，必要 scope 和图标审计工具迁到 tools；新 checkout 可从已提交原包重建源 PNG。
+
+验证：54 个 Lua 语法检查、26 个相关 Lua 套件、112 个后端测试、40 个 UI Node 套件及 4 个额外检查通过；9 个 PowerShell 语法检查通过。152 个当前 XML include 完整，24 对改动 JS 与编译资源内容一致；隔离重建 48 PNG 与原资源逐字节一致。测试修订针对已淘汰布局断言及缺少实际共享依赖，不改变生产 JS。无尽生成器 --check 修正 Windows CRLF 兼容，实质修改和额外空白负例仍拒绝。检查记录位于忽略的 output/git_sync_20261011。未执行真实游戏验收或云端发布。
+
+## 当前任务（2026-10-11）：联机共享基础奖励，个人月卡加成
+
+用户确认先共享团队基础奖励，额外奖励沿用现有月卡，不新增VIP倍率。已审计普通通关本来逐队员发放；无尽/挑战原先只给发起者，HTTP按账号随机导致队友基础物品不同。新增archive_cooperative_reward_service，以通关真人获胜名单冻结roster，同局同challenge首胜/同endless层一次；每账号完整基础份，不分人数，个人日限/持有上限仍独立。提前结束本人挑战不取消之后队友成功收益；失败/断线无新事件、已入队仍重试，profile未ready不漏奖。record_challenge本地ID对齐HTTP canonical challenge_kind。失败handoff精准查has_reward_pending并保留outbox；终局先等待handoff，再archive.begin_finalization，避免先关队列吞奖励。
+
+新CSV archive_cooperative_reward_rules/version1 控制共享随机。游戏local fixture用事件ID独立LCG，不动全局随机；后端新bundle用event HMAC，不携带发起者drops/权益，受奖账号自己月卡决定基础前N+额外数量。VIP-only无月卡不增加本次挑战数量；旧receipt以记录bundle锁原seed，个人抽奖不改。所有数量配置保持：shadow1–3=2；shadow4=2/月卡3；cage=1/月卡2且日30/90；fragment单次1且日20/40；social每池1券日10；endless积分不乘VIP。
+
+验证：真实Lua档案/多人状态/队列/reducer隔离211检查，后端真实worker+内存DB32项通过（含旧代码负例）；挑战53UI+提前finish共享+保存barrier、30分钟deadline、2920出生序列、玩法连续性、5秒批处理/HTTP、原通关6例、四人retry_snapshot、55472视觉集成与城墙/清理回归通过。tools/test_endless_spawn_cost.lua的旧固定模型/任务数夹具失败已用任务前service复现同一断言，非本次新回归；全仓原有UI尾空格未改。
+
+交付 docs/COOPERATIVE_REWARD_RULES_20261011.md；output/cooperative_rewards_20261011含审计、审查、负例、隔离bundle与验证。云端发布/真实四人验收尚未执行，运行archive_http_bundle.lua与server/bundles/current.json保持原值，避免新hash未部署时吞请求。本次未做Git同步/commit/push，原有改动保留。
+
+## 当前修改（2026-10-11）：无尽50模型及四轮饰品实际接入
+
+用户发现模型仍为旧影魔，要求接入游戏供测试。现已把20261009设计落到3个独立权威视觉CSV（200外观、153同骨架部件、176自定义小饰物）及对应generated Lua；build_endless_monster_visuals普通构建/--check仅依赖CSV，只有显式--import-plan才读设计文档。generated/index只增加3新模块，未顺带注册其他来源。旧战斗规则中的影魔仅为兼容旧配置值，无尽实际生成不再读取它作外观。
+
+触发/状态流：开启无尽→spawn_wave一次resolve并缓存同波视觉→factory使用该model_path/scale并保留原战斗参数→登记单位后完整装配→移动原生父/骨架跟随→死亡保留到沉降结束→沉降/取消/超时/失败清理。配置slot=(wave-1)%50+1、round=floor((wave-1)/50)%4+1，wave>200固定base*1.5，401/601不继续放大。同步出生已死跳过装配，装配失败由已有run持有实体后回滚，装配中取消/死亡不泄漏。客户端不新增UI，单位显示名追加怪名；数值/五只数量/0.5出生间隔/60秒期限/评分/ground/射程/hull与原状态一致，属性CSV字节哈希保持不变。
+
+archive_endless_visual_config只分组/缓存视觉配置与资源；endless_monster_visual_service复用原生model_appearance_service与cosmetic_details（ALL动作修饰、skin、完整默认部件，0环境粒子），不改共享装配服务；endless_monster_ornaments新增纯SetParent挂点与未缩放局部参数，一次乘最终主体scale，无bone_merge/定位timer/世界扫描。每怪最多2小饰物、0粒子，缺挂点回root_origin且root_angles默认0，不复用attachment旋转补偿。官方饰品的nyx第4轮按真实替换body装配。monster_corpse_lifecycle_service仅加1require和death/clear两处接线，保留0.6hold+0.8sink到末端清理。
+
+startup_asset_preload_service最小添加新resolver.resources到既有去重资源表，209模型入口的主体/原生部件/所有后轮饰物均纳入真实Precache(context)/既有proxy机制，资源包1811递归依赖无缺失，0新粒子。没有新增map/纹理/模型源，因此无新资源编译；用户需要退出当前局重新载入地图让新脚本及开局预载进入当前资源生命周期。
+
+验证：真实配置+wave_system factory+属性投影+导航/hull+完整原生/自定义装配+corpse/bus/scheduler受控401波集成55472检查通过（只替换native实体/地图定位/档案I/O）；前50实际body唯一、1/51/101/151四种几何、201/401固定1.5、五怪共享一次解析、20/25默认原生槽和175真实nyx变体、死亡沉尸、取消、factory/native组件/饰物/parent失败全清理；旧服务负例准确仍固定旧body而失败。既有出生序列2920检查与玩法连续性、城墙接触、addon precache通过；startup576资源/48异步请求完整，新增未来晶簇加载失败不放行；饰物27spawn/25有效props全部回收（2个native失败nil）；CSV-only构建/负例/生成一致/全部 touched Lua语法通过。证据output/endless_monster_runtime_20261011与validation/20261011/endless_monster_visual_runtime.json。尚未进行真实游戏镜头/缩放/饰物贴合目测，不把fixture当实机验证。
+
+测试入口docs/ENDLESS_MONSTER_VISUAL_RUNTIME_20261011.md：第1灰鬃狼、第2幼蛛、第3林间蛙兽，第51双骨角、第101晶簇、第151棘冠+宝石，第201/401固定1.5。本次未执行Git同步/提交/推送，保留原有改动。
+
 ## 当前任务（2026-10-09）：无尽挑战50怪与四轮饰品设计表
 
 按用户最后“开始设计表格”交付设计阶段，不将尚未校准的200套组合直接接入游戏。已确定现有同模型根因：archive_endless_rules默认model_path固定为nevermore，archive_endless_service.spawn_next整局直接读取该路径/0.9尺度，没有读取波次视觉配置。本次未改该服务或任何战斗配置。

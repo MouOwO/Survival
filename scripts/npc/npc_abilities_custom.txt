@@ -994,7 +994,7 @@
 {
     "BaseClass"          "ability_lua"
     "ScriptFile"         "abilities/survival_hero_skill"
-    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+    "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_PASSIVE"
     "AbilityTextureName" "monkey_king_wukongs_command"
     "MaxLevel"           "1"
     "AbilityManaCost"    "0"

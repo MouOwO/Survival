@@ -242,7 +242,14 @@ local function local_settle(player_id, command)
     if not provider or type(provider.persist_save) ~= "function" then
         return { ok = false, error = "archive_provider_required" }
     end
-    local result = require("systems/archive_settlement").settle(profile, command, has_pass(profile))
+    local context
+    if command.kind == "challenge" then
+        local policy = require("systems/archive_cooperative_reward_policy")
+        if policy.shared_challenge_roll() then
+            context = {challenge_random_seed = policy.local_seed(command.id)}
+        end
+    end
+    local result = require("systems/archive_settlement").settle(profile, command, has_pass(profile), context)
     if not result.ok or result.duplicate then return result end
     local archive, stats = result.archive, result.gameplay_stats
     -- Only current match IDs are needed locally; completed milestones and
@@ -528,9 +535,20 @@ function M.has_pending(player_id)
     return busy[player_id] ~= nil or (pending[player_id] and next(pending[player_id]) ~= nil) or false
 end
 
+-- A dispatcher retry must distinguish this reward from unrelated queued work.
+function M.has_reward_pending(player_id, kind, reward_id)
+    for _, command in pairs(pending[player_id] or {}) do
+        if command.kind == kind and (kind == "challenge" and command.challenge_id == reward_id
+            or kind == "endless" and command.wave == reward_id) then return true end
+    end
+    return false
+end
+
 function M.record_challenge(player_id, challenge_id, kill_sequence, difficulty_id)
     if not integer(kill_sequence) then return { ok = false, error = "archive_kill_id_invalid" } end
-    return enqueue(player_id, { id = session_id .. ":challenge:" .. kill_sequence,
+    local definition = require("config/generated/archive_challenge_definitions").by_id[challenge_id]
+    if not definition or not definition.enabled then return {ok=false,error="archive_challenge_unknown"} end
+    return enqueue(player_id, { id = session_id .. ":challenge_kind:" .. challenge_id,
         kind = "challenge", challenge_id = challenge_id, kill_sequence = kill_sequence,
         difficulty_id = difficulty_id, day_key = day_key() })
 end

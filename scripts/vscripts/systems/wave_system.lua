@@ -813,15 +813,12 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     unit.survival_is_wave_monster = true
     unit.survival_player_id = channel and channel.player_id or nil
     unit.survival_monster_role = row.member_role or "normal"
-    -- These formal-wave classifications are fixed for this unit's lifetime.
-    -- Their wall AI always chases, so native range queries need no Lua bonus.
-    -- Use the combat movement label: flying monsters also navigate on ground.
+    -- Native ranged attackers always chase and need no Lua contact bonus.
+    -- Flying-labelled melee attackers still use ground-navigation contacts.
     -- Set this only after final stats/visuals and before modifier declaration.
     local attack_capability = unit.GetAttackCapability and unit:GetAttackCapability()
-    unit.survival_wave_skip_contact_range_bonus = collision_profile.movement_type == "flying"
-        or (collision_profile.movement_type == "ground"
-            and DOTA_UNIT_CAP_RANGED_ATTACK ~= nil
-            and attack_capability == DOTA_UNIT_CAP_RANGED_ATTACK)
+    unit.survival_wave_skip_contact_range_bonus = DOTA_UNIT_CAP_RANGED_ATTACK ~= nil
+        and attack_capability == DOTA_UNIT_CAP_RANGED_ATTACK
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
         wall_entindex = wall_for_channel(channel),
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,

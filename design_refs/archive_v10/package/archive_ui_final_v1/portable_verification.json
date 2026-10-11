@@ -1,0 +1,40 @@
+{
+  "isolated_folder_rebuild": true,
+  "source_versions_present_alongside_package": false,
+  "passed": true,
+  "normal": {
+    "reference_exists": true,
+    "matches": true,
+    "changed_pixels": 0,
+    "total_pixels": 1573352,
+    "max_channel_difference": 0,
+    "mean_absolute_channel_difference": 0.0,
+    "difference_bbox": null,
+    "actual_pixel_sha256": "f76fe1c905b01fc76c2c646a6bb702db86ef304e05d7da9f25c94f5a55bc0e64",
+    "reference_pixel_sha256": "f76fe1c905b01fc76c2c646a6bb702db86ef304e05d7da9f25c94f5a55bc0e64"
+  },
+  "hover": {
+    "reference_exists": true,
+    "matches": true,
+    "changed_pixels": 0,
+    "total_pixels": 1573352,
+    "max_channel_difference": 0,
+    "mean_absolute_channel_difference": 0.0,
+    "difference_bbox": null,
+    "actual_pixel_sha256": "5dbceba860ab256479669db7b99f73851426fcf9721fc78ef58c402d9366def2",
+    "reference_pixel_sha256": "5dbceba860ab256479669db7b99f73851426fcf9721fc78ef58c402d9366def2"
+  },
+  "all_asset_hashes_match": true,
+  "runtime_external_paths": [],
+  "font_license_present": true,
+  "sidebar_hitboxes_non_overlapping": true,
+  "delivered_preview_png_bytes_match_portable_rebuild": {
+    "page_normal.png": true,
+    "page_hover.png": true,
+    "page_normal_ui_only.png": true,
+    "page_hover_ui_only.png": true,
+    "tooltip_assembled.png": true
+  },
+  "renderer_sha256": "b6a4a8e89fc22891577b1c6d1415d574992000c9001f15cdd0fd2053f4f98450",
+  "renderer_stdout": "{\"passed\": true, \"normal_changed_pixels\": 0, \"hover_changed_pixels\": 0, \"asset_count\": 61, \"font_license_exists\": true, \"output\": \"/tmp/archive_ui_portable_final_fzi0j6eu/archive_ui_final_v1/previews\"}"
+}

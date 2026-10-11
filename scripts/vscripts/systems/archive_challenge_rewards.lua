@@ -38,17 +38,18 @@ local function grant_fragment(save, stats, definition, count, apply)
     next_fragment_levels(save, stats, definition, apply)
     return accepted
 end
-local function roll(items, count, filter)
+local function roll(items, count, filter, random_int)
     local pool, result = {}, {}
     for _, row in ipairs(items) do if row.enabled and filter(row) then pool[#pool + 1] = row.item_id end end
     assert(#pool > 0, "archive_challenge_empty_pool")
     for _ = 1, count do
-        local index = RandomInt and RandomInt(1, #pool) or math.random(1, #pool)
+        local index = random_int and random_int(1, #pool)
+            or RandomInt and RandomInt(1, #pool) or math.random(1, #pool)
         result[#result + 1] = pool[index]
     end
     return result
 end
-function M.apply(command, save, stats, pass, apply)
+function M.apply(command, save, stats, pass, apply, random_int)
     normalize(save)
     local definition = challenges.by_id[command.challenge_id]
     if not definition or not definition.enabled then return false, "archive_challenge_unknown" end
@@ -69,7 +70,7 @@ function M.apply(command, save, stats, pass, apply)
         command.drops = command.drops or roll(shadow.rows, drop_count,
             function(row)
                 return row.source_boss_difficulty == drop_rule.source_boss_difficulty
-            end)
+            end, random_int)
         save.shadow_counts = save.shadow_counts or {}
         for _, id in ipairs(command.drops) do
             local item = shadow.by_id[id]
@@ -87,7 +88,7 @@ function M.apply(command, save, stats, pass, apply)
         local remaining = math.max(0, limit - (day.cage_total or 0))
         local count = rules.cage_drop_count + (pass and rules.pass_cage_extra_count or 0)
         command.drops = command.drops or roll(cage.rows, count,
-            function(row) return row.pool_id == definition.reward_key end)
+            function(row) return row.pool_id == definition.reward_key end, random_int)
         for _, id in ipairs(command.drops) do
             local item = cage.by_id[id]
             local owned = save.cage_counts[id] or 0

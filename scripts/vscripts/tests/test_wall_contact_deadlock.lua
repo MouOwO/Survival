@@ -20,6 +20,7 @@ local function unit(id,x,y,radius)
     function u:IsNull() return false end
     function u:IsAlive() return not self.dead end
     function u:GetHullRadius() return self.radius end
+    function u:SetHullRadius(radius) self.radius=radius end
     function u:IsStunned() return self.stunned end
     function u:IsCommandRestricted() return self.restricted end
     function u:IsRooted() return self.rooted or (self.ai and self.ai.contact_locked) end
@@ -38,10 +39,10 @@ local contact=require('systems/wall_melee_contact')
 local wall=unit(1,0,0,128)
 local front={}
 for i=1,4 do
-    local u=unit(i+1,-400,(i-2.5)*64);front[i]=u
+    local u=unit(i+1,-400,(i-2.5)*48);front[i]=u
     local plan=assert(contact.resolve(wall,u))
-    assert(plan.claimed and plan.point.x==-192 and plan.point.y==(i-2.5)*64,
-        'all four Hull32 contacts fit the actual 256-wide corridor')
+    assert(plan.claimed and plan.point.x==-184 and plan.point.y==(i-2.5)*48 and u:GetHullRadius()==24,
+        'all four admitted tactical contacts fit the actual 256-wide corridor')
     u.p=plan.point
 end
 for i=1,4 do for j=i+1,4 do
@@ -51,6 +52,7 @@ for i=1,4 do for j=i+1,4 do
 end end
 local fifth=unit(10,-400,0)
 assert(not contact.resolve(wall,fifth).claimed,'front remains capped at four')
+assert(fifth:GetHullRadius()==32,'overflow preserves its original physical hull')
 local previous_paths,previous_nav=paths,nav_queries
 for pass=1,3 do
     clock=pass*.5
@@ -61,15 +63,21 @@ assert(paths==previous_paths and nav_queries==previous_nav,
     'normal contact ticks do not repeat paths or navigation sampling')
 
 contact.reset();clock=0
+for _,u in ipairs(front) do assert(u:GetHullRadius()==32,'reset must restore all four physical hulls') end
 local large={}
-for i=1,3 do
-    local u=unit(20+i,-400,(i-2)*128,64);large[i]=u
+for i,lateral in ipairs({-72,-24,24,72,0}) do
+    local u=unit(20+i,-400,lateral,64);large[i]=u
     local plan=assert(contact.resolve(wall,u))
-    if i<=2 then assert(plan.claimed);u.p=plan.point
-    else assert(not plan.claimed,'larger hulls naturally reduce front capacity') end
+    if i<=4 then
+        assert(plan.claimed and u:GetHullRadius()==24,'large bodies must use all four tactical contacts')
+        u.p=plan.point
+    else
+        assert(not plan.claimed and u:GetHullRadius()==64,'large overflow must preserve Hull64 and wait')
+    end
 end
-assert(math.abs(large[1].p.y-large[2].p.y)==128)
+for i=1,3 do assert(math.abs(large[i].p.y-large[i+1].p.y)==48,'large tactical contacts must not overlap') end
 contact.reset()
+for _,u in ipairs(large) do assert(u:GetHullRadius()==64,'large-body reset must restore every original hull') end
 local small,big=unit(31,-400,96)
 local first=assert(contact.resolve(wall,small));small.p=first.point
 big=unit(32,-400,-64,64)
@@ -81,10 +89,10 @@ assert((small.p.x-big.p.x)^2+(small.p.y-big.p.y)^2>=(small.radius+big.radius)^2,
 -- must not create a second phased owner while the first is still moving.
 contact.reset();clock=0;front={}
 for i=1,4 do
-    local u=unit(40+i,-400,(i-2.5)*64);front[i]=u
+    local u=unit(40+i,-400,(i-2.5)*48);front[i]=u
     local plan=assert(contact.resolve(wall,u));assert(plan.claimed);u.p=plan.point
 end
-front[4].p=Vector(-192,164,384)
+front[4].p=Vector(-184,164,384)
 local own=assert(contact.resolve(wall,front[4]))
 assert(own.claimed and not contact.arrived(wall,front[4],own.point,false))
 local replacement=unit(50,-217,91)
@@ -92,8 +100,9 @@ local replaced=assert(contact.resolve(wall,replacement))
 assert(not replaced.claimed,
     'a new unit cannot steal an in-flight phased reservation and duplicate its owner')
 contact.release(wall:entindex(),front[4]:entindex())
+assert(front[4]:GetHullRadius()==32,'released in-flight contact must restore its physical hull')
 replaced=assert(contact.resolve(wall,replacement))
-assert(replaced.claimed and replaced.point.y==96,'released contact can be claimed by a replacement')
+assert(replaced.claimed and replaced.point.y==72,'released contact can be claimed by a replacement')
 
 -- Dynamic terrain/building changes invalidate a held point on the bounded
 -- cache cadence and later make the vacated point available again.
@@ -172,7 +181,7 @@ end
 contact.reset();clock=0;front={}
 local controllers={}
 for i=1,4 do
-    local u=unit(80+i,-400,(i-2.5)*64);front[i]=u
+    local u=unit(80+i,-400,(i-2.5)*48);front[i]=u
     controllers[i]=controller(u);think(controllers[i])
     u.p=controllers[i].contact_move;think(controllers[i])
     assert(controllers[i].ai_state=='attack' and u.ai:CheckState()[MODIFIER_STATE_ROOTED])
@@ -193,4 +202,6 @@ end
 front[3].dead=true;clock=10.5;think(waiting)
 assert(waiting.ai_state=='approach' and overflow.orders==waiting_orders+1,
     'one death frees its front point and wakes a waiting monster once')
+assert(front[3]:GetHullRadius()==32 and overflow:GetHullRadius()==24,
+    'death promotion must restore the dead owner and shrink only the admitted replacement')
 print('WALL_CONTACT_DEADLOCK_PASS narrow four contacts, mixed/large hulls, exclusive admission, bounded stall recovery, control protection, stable attacks')

@@ -4,7 +4,8 @@ class Panel {
  constructor(type,parent,id){this.type=type;this.parent=parent;this.id=id;this.children=[];this.classes=new Set();this.style={};this.events={};if(parent)parent.children.push(this);}
  AddClass(c){this.classes.add(c);}RemoveClass(c){this.classes.delete(c);}SetHasClass(c,on){on?this.AddClass(c):this.RemoveClass(c);}
  SetPanelEvent(n,fn){this.events[n]=fn;}RemoveAndDeleteChildren(){this.children=[];}Children(){return this.children;}
- SetScaling(){}DeleteAsync(){this.deleted=true;}FindChildTraverse(){return null;}
+ SetParent(p){if(this.parent)this.parent.children=this.parent.children.filter(c=>c!==this);this.parent=p;if(p)p.children.push(this);}
+ SetScaling(){}IsValid(){return !this.deleted;}DeleteAsync(){this.children.slice().forEach(p=>p.DeleteAsync());this.deleted=true;this.SetParent(null);}FindChildTraverse(){return null;}
 }
 const root=new Panel("Panel",null,"root");root.actuallayoutwidth=1920;root.actuallayoutheight=1080;
 function $(){return null;}$.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.Schedule=()=>1;$.CancelScheduled=()=>{};$.Msg=()=>{};
@@ -17,6 +18,7 @@ cfg.SurvivalPayments={GetCatalog:()=>currentCatalog,RefreshCatalog:()=>refreshes
 const env={$,GameUI:{CustomUIConfig:()=>cfg},GameEvents:{Subscribe:()=>1,Unsubscribe:()=>{}},Game:{}};
 require("./load_shared_ui_test.cjs")(env,Panel,root);
 cfg.RemainingHandoff={Window:()=>{},SizeWindow:()=>{},Box:()=>{},Tab:()=>{},Action:()=>{},Image:()=>{}};
+for(const file of ["archive_v10_data.js","common/menu_v10.js"])vm.runInNewContext(fs.readFileSync("panorama/src/scripts/custom_game/"+file,"utf8"),env);
 vm.runInNewContext(fs.readFileSync("panorama/src/scripts/custom_game/common/commerce_components.js","utf8"),env);
 vm.runInNewContext(fs.readFileSync("panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js","utf8"),env);
 const all=()=>{const out=[];function walk(p){out.push(p);p.children.forEach(walk);}walk(root);return out;};
@@ -37,7 +39,7 @@ cfg.SurvivalCommerceView.UpdateCatalog({...catalog,products:[{...product,enabled
 assert(all().some(p=>p.text==="已拥有 · 查看"));
 cfg.SurvivalCommerceView.UpdateCatalog({...catalog,catalog_hash:"b",products:[{...product,title:"服务端新礼包",enabled:false,owned:1,amount_fen:900}]});
 assert(all().some(p=>p.text==="服务端新礼包"));assert(all().some(p=>p.text==="9.00 元"));
-all().filter(p=>p.BHasClass("RCTab"))[0].events.onactivate();assert(all().some(p=>p.text==="本分类暂无上架商品"));
+all().find(p=>/Section_technology$/.test(p.id)).events.onactivate();assert(all().some(p=>p.text==="本分类暂无上架商品"));
 assert.equal(cfg.SurvivalCommerceView.OpenTicketPurchase({id:"map"}),false,"normal gameplay tickets are not sold");
 const ticket={...product,sku:"special_lottery_ticket_single",title:"金色抽奖券 ×1",category_id:"item",product_type:"single",amount_fen:5000,
  reward_lines:[{kind:"item",id:"special_lottery_ticket",label:"金色抽奖券",quantity:1}]};

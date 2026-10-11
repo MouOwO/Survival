@@ -37,9 +37,9 @@ assert.equal(root.FindChildTraverse('ArchiveBody').style.position,'0px 132px 0px
 assert.equal(root.FindChildTraverse('ArchiveTooltip').style.flowChildren,'down','the tooltip body must participate in its fit-content height');
 assert.equal(nativeLabel.style.width,'100%');assert.equal(nativeLabel.style.height,'35px');assert.equal(nativeLabel.style.textOverflow,'clip','native RadioButton defaults cannot shrink anonymous filter labels into a tiny text box');assert.equal(radioBox.style.visibility,'collapse');
 const controller=fs.readFileSync(path.join(project,'panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js'),'utf8');
-assert(controller.includes('archiveFit={reference:[1920,1080]}') && controller.includes('fit:archiveFit'));
+assert(controller.includes('archiveFit={reference:[1672,941]}') && controller.includes('fit:archiveFit'));
 let opens=0,requests=0;
-const apiEnv={active:()=>true,needsSync:()=>false,opened:false,fitGeneration:0,pageCache:{},current:'clear',panel:()=>({enabled:true,RemoveClass(){},AddClass(){}}),archiveShell:{Open(){opens++;}},dispose(){},request(){requests++;},render(){},renderVoid(){},hideTooltip(){},registerToolsProbe(){},GameUI:{CustomUIConfig:()=>cfg}};
+const apiEnv={cfg,active:()=>true,needsSync:()=>false,opened:false,fitGeneration:0,pageCache:{},voidView:null,current:'clear',panel:()=>({enabled:true,RemoveClass(){},AddClass(){}}),archiveShell:{Open(){opens++;}},dispose(){},request(){requests++;},render(){},renderVoid(){},hideTooltip(){},registerToolsProbe(){},GameUI:{CustomUIConfig:()=>cfg}};
 apiEnv.close=()=>{apiEnv.opened=false;};vm.createContext(apiEnv);
 vm.runInContext(controller.slice(controller.indexOf('    GameUI.CustomUIConfig().SurvivalArchive = api = {'),controller.indexOf('    $.RegisterEventHandler("Cancelled"')),apiEnv);
 cfg.SurvivalArchive.Open();cfg.SurvivalArchive.Open();assert.equal(opens,1);assert.equal(requests,1);cfg.SurvivalArchive.Close();cfg.SurvivalArchive.Open();assert.equal(opens,2);

@@ -1,0 +1,3553 @@
+{
+  "schema": "archive_ui_final_v1",
+  "status": "user_approved_visual_v10_not_game_imported",
+  "page": "存档 / 虚空之影",
+  "canvas": [
+    1672,
+    941
+  ],
+  "coordinate_system": "Top-left origin, integer design pixels; bbox right/bottom exclusive. Uniformly scale the whole root, never individually stretch icons.",
+  "fonts": {
+    "cjk": "fonts/SourceHanSansSC-Regular.otf"
+  },
+  "assets": {
+    "scene_reference": {
+      "file": "assets/preview_only/scene_exterior_reference.png",
+      "size": [
+        1672,
+        941
+      ],
+      "runtime_use": false,
+      "sha256": "f56cfd5eac84342c6116573d502e8da687a4ed67f6ab1d03e70b3581b3480df8",
+      "role": "preview_only_game_screenshot"
+    },
+    "top_navigation": {
+      "file": "assets/backgrounds/top_navigation_no_text.png",
+      "size": [
+        1398,
+        65
+      ],
+      "runtime_use": true,
+      "sha256": "487be0b0c51ad138d6739373e698886f62dc4e6f14252d997ef4873cc87ce68b",
+      "role": "component"
+    },
+    "filter_selected": {
+      "file": "assets/common/filter_selected_no_text.png",
+      "size": [
+        132,
+        43
+      ],
+      "runtime_use": true,
+      "sha256": "0f2e92daddb14ff8541a5b8267693544a3219280c5c3c73478784f0a87fdb6b0",
+      "role": "component"
+    },
+    "filter_default": {
+      "file": "assets/common/filter_default_no_text.png",
+      "size": [
+        131,
+        43
+      ],
+      "runtime_use": true,
+      "sha256": "a2442314c0cb5b465b433a1ae7c24450b06ef4529bc6f3d82d6c4533896adea0",
+      "role": "component"
+    },
+    "close": {
+      "file": "assets/common/close_cross.png",
+      "size": [
+        34,
+        32
+      ],
+      "runtime_use": true,
+      "sha256": "5ae80e43660bcb5bd2a30bcd311dcacce6a7a381e35c3c92f6986afb8ab01219",
+      "role": "component"
+    },
+    "archive_icon": {
+      "file": "assets/common/archive_icon.png",
+      "size": [
+        35,
+        27
+      ],
+      "runtime_use": true,
+      "sha256": "4c7618a408dab49a2305b5c534c42269dabfcb0f9d0921d9300389b810b306b5",
+      "role": "component"
+    },
+    "gold": {
+      "file": "assets/common/resource_gold.png",
+      "size": [
+        33,
+        33
+      ],
+      "runtime_use": true,
+      "sha256": "4ffcee82b02cd75cefb07fd6f608eca334db7379fbfdeba8dadeecfd63a1cc35",
+      "role": "component"
+    },
+    "purple_gem": {
+      "file": "assets/common/resource_purple_gem.png",
+      "size": [
+        32,
+        34
+      ],
+      "runtime_use": true,
+      "sha256": "73658d99831e9ecce5578e43c936f3fa4eaf0a2597126b3dd545bc752711eccf",
+      "role": "component"
+    },
+    "ticket": {
+      "file": "assets/common/resource_ticket.png",
+      "size": [
+        39,
+        34
+      ],
+      "runtime_use": true,
+      "sha256": "8b263ddb03024349bbde14df13e7da9193c3243fdb91cfc7264604974aff9dd7",
+      "role": "component"
+    },
+    "main_nebula": {
+      "file": "assets/backgrounds/main_nebula.png",
+      "size": [
+        1398,
+        769
+      ],
+      "runtime_use": true,
+      "sha256": "c5bdd7f29718361557d3a4795a71eaae89d8b84c15bcdee5dcd0922d8f79114b",
+      "role": "component"
+    },
+    "slot_shadow": {
+      "file": "assets/common/slot_shadow.png",
+      "size": [
+        144,
+        144
+      ],
+      "runtime_use": true,
+      "sha256": "006abc3e773905a5c8e34e3b711c4d932d0b752bd19c989a9fbde56a2f40f7ed",
+      "role": "component"
+    },
+    "slot_inner_shading": {
+      "file": "assets/common/slot_inner_shading.png",
+      "size": [
+        120,
+        120
+      ],
+      "runtime_use": true,
+      "sha256": "7af702dfb3fc355351f653c581b22828c1b75c974b4eb4f208cb6fcb72f18ad7",
+      "role": "component"
+    },
+    "slot_frame_normal": {
+      "file": "assets/common/slot_frame_normal.png",
+      "size": [
+        126,
+        126
+      ],
+      "runtime_use": true,
+      "sha256": "5b2813dcca5bbec0e4ffa3d6485e9779de00b705fb413eb6d370e19c892b514d",
+      "role": "component",
+      "svg_master": "assets/common/slot_frame_normal.svg"
+    },
+    "slot_frame_normal_svg_master": {
+      "file": "assets/common/slot_frame_normal.svg",
+      "size": [
+        126,
+        126
+      ],
+      "runtime_use": false,
+      "sha256": "a1e9070012c566261f4f4a7efb411621513a26ce6d59e98c490fd54678bfa5ea",
+      "role": "editable_svg_master"
+    },
+    "slot_frame_hover": {
+      "file": "assets/common/slot_frame_hover.png",
+      "size": [
+        126,
+        126
+      ],
+      "runtime_use": true,
+      "sha256": "6d308dd7580c7b37378c19cd7ad3628bf5ca0785b0dfe8222fac4526821862ae",
+      "role": "component",
+      "svg_master": "assets/common/slot_frame_hover.svg"
+    },
+    "slot_frame_hover_svg_master": {
+      "file": "assets/common/slot_frame_hover.svg",
+      "size": [
+        126,
+        126
+      ],
+      "runtime_use": false,
+      "sha256": "ef53a478ad222a606e915ac6b4e9004a2490f3103f66784e474d379f0398b7af",
+      "role": "editable_svg_master"
+    },
+    "sidebar_scrim": {
+      "file": "assets/common/sidebar_scrim.png",
+      "size": [
+        258,
+        769
+      ],
+      "runtime_use": true,
+      "sha256": "0c5010d1e90bcf36591ae81205fa81ad8b2eff9d0a658443808a4f5e892f2e3d",
+      "role": "component",
+      "svg_master": "assets/common/sidebar_scrim.svg"
+    },
+    "sidebar_scrim_svg_master": {
+      "file": "assets/common/sidebar_scrim.svg",
+      "size": [
+        258,
+        769
+      ],
+      "runtime_use": false,
+      "sha256": "099451ba1ba491cb89df058755308db9ce3e39ae83c1eeaea0c797b5830a59ed",
+      "role": "editable_svg_master"
+    },
+    "sidebar_selected": {
+      "file": "assets/common/sidebar_selected.png",
+      "size": [
+        258,
+        51
+      ],
+      "runtime_use": true,
+      "sha256": "086a10e3777e1b20ebc90a2413366a61abeb9b23186b6a0b9cbdf2e944e66132",
+      "role": "component",
+      "svg_master": "assets/common/sidebar_selected.svg"
+    },
+    "sidebar_selected_svg_master": {
+      "file": "assets/common/sidebar_selected.svg",
+      "size": [
+        258,
+        51
+      ],
+      "runtime_use": false,
+      "sha256": "1f2cd672ec1e7ecdeb5cfe7e57361d1fffcbd73a8eabccd6cff8805317dd41c9",
+      "role": "editable_svg_master"
+    },
+    "resource_scrim": {
+      "file": "assets/common/resource_scrim.png",
+      "size": [
+        1398,
+        54
+      ],
+      "runtime_use": true,
+      "sha256": "3a1ce597504740f88242cb85ed699d227c9f4fbbc2291ea129fa92be9c192b2a",
+      "role": "component",
+      "svg_master": "assets/common/resource_scrim.svg"
+    },
+    "resource_scrim_svg_master": {
+      "file": "assets/common/resource_scrim.svg",
+      "size": [
+        1398,
+        54
+      ],
+      "runtime_use": false,
+      "sha256": "449479c805ebe52ecd65845ed5782eb9257d9682bfd6615b7c6c9e4c0d07dede",
+      "role": "editable_svg_master"
+    },
+    "resource_separator": {
+      "file": "assets/common/resource_separator.png",
+      "size": [
+        1398,
+        20
+      ],
+      "runtime_use": true,
+      "sha256": "bfa4e607d002c4748eae00abaac9e98b394a01d28bc0a092cf34f85e035af92c",
+      "role": "component",
+      "svg_master": "assets/common/resource_separator.svg"
+    },
+    "resource_separator_svg_master": {
+      "file": "assets/common/resource_separator.svg",
+      "size": [
+        1398,
+        20
+      ],
+      "runtime_use": false,
+      "sha256": "7cc1b8a79fb052c7bbb9ea331acc38ed556d13f928f6b621b32855d990ae4bda",
+      "role": "editable_svg_master"
+    },
+    "top_edge_highlight": {
+      "file": "assets/common/top_edge_highlight.png",
+      "size": [
+        1398,
+        4
+      ],
+      "runtime_use": true,
+      "sha256": "0b8f8c3c1e3f8521603049afd2740546113311ec769f79aaf7140c4e9fc444f3",
+      "role": "component",
+      "svg_master": "assets/common/top_edge_highlight.svg"
+    },
+    "top_edge_highlight_svg_master": {
+      "file": "assets/common/top_edge_highlight.svg",
+      "size": [
+        1398,
+        4
+      ],
+      "runtime_use": false,
+      "sha256": "37f2857044f8faf1efdc603c70b5f50f28a5154b1e5bd8f88dfd0dc1bb64d133",
+      "role": "editable_svg_master"
+    },
+    "top_tab_selected": {
+      "file": "assets/common/top_tab_selected.png",
+      "size": [
+        156,
+        80
+      ],
+      "runtime_use": true,
+      "sha256": "6a440d7f385c6055844ad3001b51fc1a4950b2b007635e4d7ed3ec163aa65da0",
+      "role": "component",
+      "svg_master": "assets/common/top_tab_selected.svg"
+    },
+    "top_tab_selected_svg_master": {
+      "file": "assets/common/top_tab_selected.svg",
+      "size": [
+        156,
+        80
+      ],
+      "runtime_use": false,
+      "sha256": "823bdbf08f4dd63b7dd8be452693a75951eba3124d93e34dce4f727b9b4e04d6",
+      "role": "editable_svg_master"
+    },
+    "navigation_rail": {
+      "file": "assets/common/navigation_rail.png",
+      "size": [
+        1398,
+        8
+      ],
+      "runtime_use": true,
+      "sha256": "6cd39f1cd112b6650fbbd1b3c8f308b620a6f693f7941788b15e486e184d8cfa",
+      "role": "component",
+      "svg_master": "assets/common/navigation_rail.svg"
+    },
+    "navigation_rail_svg_master": {
+      "file": "assets/common/navigation_rail.svg",
+      "size": [
+        1398,
+        8
+      ],
+      "runtime_use": false,
+      "sha256": "215f4d03512574cfd400db5ab1baa7e0e6edfe5a225dccb5c9aea3dc687f0dc5",
+      "role": "editable_svg_master"
+    },
+    "footer_metal_downhook": {
+      "file": "assets/common/footer_metal_downhook.png",
+      "size": [
+        1438,
+        56
+      ],
+      "runtime_use": true,
+      "sha256": "9439c832a879e759114960a00a80d00d75adb0eb73d56e4e4bad2ea4e615c062",
+      "role": "component",
+      "svg_master": "assets/common/footer_metal_downhook.svg"
+    },
+    "footer_metal_downhook_svg_master": {
+      "file": "assets/common/footer_metal_downhook.svg",
+      "size": [
+        1438,
+        56
+      ],
+      "runtime_use": false,
+      "sha256": "9e848b6d69db131a9472a30ce64bf55a6f9a519e4b6cb1d488cb4092682864b8",
+      "role": "editable_svg_master"
+    },
+    "virtual_01": {
+      "file": "assets/items/virtual_01.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "e162452b6654c290c81c09dcecbf61274cab5bb8c00f8d568a0059b44ff0c77f",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_02": {
+      "file": "assets/items/virtual_02.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "ce646a0c8b03b5d4b602c24f982040dab0a270441b457930e4bf0bbfe6a97010",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_03": {
+      "file": "assets/items/virtual_03.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "8867ba9f3e3274c1410ac647ba78c4659ae229348e4ad4c6e642b2d0b56388e1",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_04": {
+      "file": "assets/items/virtual_04.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "69203ea76b12e1145c93ebabac8306b70b6bb979b4b1bf67fc2b5f92c46bbc6a",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_05": {
+      "file": "assets/items/virtual_05.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "9b5c45470d2709c58fe18f0df391946c254bde63e802c53770231b2aea8e05ae",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_06": {
+      "file": "assets/items/virtual_06.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "4207f3cff0fc730c49549ba5300ece0ee7548e022183d4fe3d33fa3288c51fe1",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_07": {
+      "file": "assets/items/virtual_07.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "c86112f20b8ffb0de2e8b9453fe23c9d6c0eebb4e1a4bbaee95240c113373f8f",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_08": {
+      "file": "assets/items/virtual_08.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "4531a3087f2797c5d99fa705de94eaba920fa91cc65f570dabef7080294ef1f5",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_09": {
+      "file": "assets/items/virtual_09.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "6fbbc89a93e6c23d5da273089b79fffaea82f43d5c35371bb849aef1ab88aa27",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_10": {
+      "file": "assets/items/virtual_10.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "6b3854ea0b29c1f0d54f440d5e920f182fe1aae52370e06cc10aac4085ffb436",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_11": {
+      "file": "assets/items/virtual_11.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "5ac0c9b377b1abde1b43516ef1cf90842155ab66a43dbfd10eb33290efd5d213",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_12": {
+      "file": "assets/items/virtual_12.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "67159d727bbfd6cb43d0c1d333bf53d8ee4e6287035e41ff435bd84ddfb0cc53",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_13": {
+      "file": "assets/items/virtual_13.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "dfbb9bf62137f8bb7aaf7251ddb50dd81802ba5747c4c5f8a983bcae126e8bf2",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_14": {
+      "file": "assets/items/virtual_14.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "0bcd8a99db19808e459b2e0a41322a3586b71c056ce4db9be954cb9e925af0b4",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_15": {
+      "file": "assets/items/virtual_15.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "0cf52c5bb11cc7bb047f83ec72123d6d284de2df009877854c7e4a33d387a42c",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_16": {
+      "file": "assets/items/virtual_16.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "dfa52d73ac59233d314aed2d1f1f1e6459c1868b7d385c78f28e5daed7853b64",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_17": {
+      "file": "assets/items/virtual_17.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "73af91b5eaffe593db0cb3fc8edae170e74b79169caca2be3a252fb6eb1746f7",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_18": {
+      "file": "assets/items/virtual_18.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "26eb2f389457b70421c0f7a71d8a7ed99bf9d885719f9e0c1c9d380029b096c5",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_19": {
+      "file": "assets/items/virtual_19.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "1ea80f85cfe45db68ff2479b7b12031b465d414a8d00ac41f1c27aede9fab2d0",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_20": {
+      "file": "assets/items/virtual_20.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "0eed070102a919da9c2377964c442e9af60d28d249aae29974bac554cbe32669",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_21": {
+      "file": "assets/items/virtual_21.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "f882be964ce55ba79683bcb79f9c1c94a3a8eb3b0542f54e6db32471e9ff4dca",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_22": {
+      "file": "assets/items/virtual_22.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "92d6394f54a72f991c5e69b2dc868135164e89c46a5465c2115c075c861136fd",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "virtual_23": {
+      "file": "assets/items/virtual_23.png",
+      "size": [
+        256,
+        256
+      ],
+      "runtime_use": true,
+      "sha256": "c1bb25fcfb4c30fad1d33f86a415b9403cb627d470eac68b9b57eb9d07c6afbb",
+      "role": "approved_virtual_shadow_icon"
+    },
+    "tooltip_background": {
+      "file": "assets/tooltip/tooltip_background.png",
+      "size": [
+        308,
+        254
+      ],
+      "runtime_use": true,
+      "sha256": "5b1a99a4079103b25dae87c5452dcb4ac42333f5ae44e927317a9d81e0ac42fe",
+      "role": "tooltip_component"
+    },
+    "tooltip_frame": {
+      "file": "assets/tooltip/tooltip_frame.png",
+      "size": [
+        308,
+        254
+      ],
+      "runtime_use": true,
+      "sha256": "6e538b8b160fa03a55519680a6d75ad189a2bfdc30aff66477cd5e6bece492cf",
+      "role": "tooltip_component"
+    },
+    "tooltip_separator": {
+      "file": "assets/tooltip/tooltip_separator.png",
+      "size": [
+        260,
+        4
+      ],
+      "runtime_use": true,
+      "sha256": "7e02cb26d3401cfec23f00abc473200f7eb18a404637f4f53b36a83397918fde",
+      "role": "tooltip_component"
+    },
+    "tooltip_shadow": {
+      "file": "assets/tooltip/tooltip_shadow.png",
+      "size": [
+        356,
+        302
+      ],
+      "runtime_use": true,
+      "sha256": "7fd97677b811b15b8ec69226344d308e77fb044a96ed89bc49a383baf5b4e5fb",
+      "role": "tooltip_component"
+    },
+    "source_han_sans": {
+      "file": "fonts/SourceHanSansSC-Regular.otf",
+      "size": null,
+      "runtime_use": true,
+      "sha256": "f1d8611151880c6c336aabeac4640ef434fa13cbfbf1ffe82d0a71b2a5637256",
+      "role": "font"
+    },
+    "source_han_sans_license": {
+      "file": "fonts/LICENSE-SourceHanSans.txt",
+      "size": null,
+      "runtime_use": false,
+      "sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "role": "font_license"
+    }
+  },
+  "layers": [
+    {
+      "kind": "image",
+      "asset": "scene_reference",
+      "x": 0,
+      "y": 0,
+      "scope": "preview_only"
+    },
+    {
+      "kind": "fill",
+      "id": "window_underlay",
+      "bbox": [
+        133,
+        27,
+        1536,
+        897
+      ],
+      "color": "#0E0B18",
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "top_navigation",
+      "x": 136,
+      "y": 29,
+      "source_crop": [
+        0,
+        2,
+        1398,
+        60
+      ],
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "main_nebula",
+      "x": 136,
+      "y": 92,
+      "source_crop": [
+        0,
+        0,
+        1398,
+        1
+      ],
+      "width": 1398,
+      "height": 36,
+      "resample": "bicubic",
+      "id": "resource_nebula_extension",
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "main_nebula",
+      "x": 136,
+      "y": 128,
+      "id": "main_nebula",
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "resource_scrim",
+      "x": 136,
+      "y": 92,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "sidebar_scrim",
+      "x": 136,
+      "y": 128,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "resource_separator",
+      "x": 136,
+      "y": 118,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "sidebar_selected",
+      "x": 136,
+      "y": 175,
+      "id": "sidebar_selected",
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "image",
+      "asset": "filter_selected",
+      "x": 699,
+      "y": 143,
+      "width": 132,
+      "height": 43,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "filter_default",
+      "x": 839,
+      "y": 143,
+      "width": 131,
+      "height": 43,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "filter_default",
+      "x": 981,
+      "y": 144,
+      "width": 131,
+      "height": 42,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "top_tab_selected",
+      "x": 474,
+      "y": 11,
+      "source_crop": [
+        0,
+        0,
+        156,
+        76
+      ],
+      "scope": "top_navigation_state"
+    },
+    {
+      "kind": "image",
+      "asset": "top_edge_highlight",
+      "x": 136,
+      "y": 25,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "navigation_rail",
+      "x": 136,
+      "y": 87,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "footer_metal_downhook",
+      "x": 116,
+      "y": 876,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "close",
+      "x": 1481,
+      "y": 42,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "archive_icon",
+      "x": 536,
+      "y": 25,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "gold",
+      "x": 1208,
+      "y": 95,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "purple_gem",
+      "x": 1337,
+      "y": 94,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "ticket",
+      "x": 1437,
+      "y": 94,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 408,
+      "y": 238,
+      "scope": "content",
+      "item_id": "virtual_01"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_01",
+      "x": 420,
+      "y": 247,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_01"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 420,
+      "y": 247,
+      "scope": "content",
+      "item_id": "virtual_01"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 417,
+      "y": 244,
+      "scope": "content",
+      "item_id": "virtual_01"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_01_quantity",
+      "text": "115/320",
+      "bbox": [
+        432,
+        254,
+        533,
+        276
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_01",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_01_name",
+      "text": "幻象树枝",
+      "bbox": [
+        415,
+        372,
+        545,
+        407
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_01",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 546,
+      "y": 238,
+      "scope": "content",
+      "item_id": "virtual_02"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_02",
+      "x": 558,
+      "y": 247,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_02"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 558,
+      "y": 247,
+      "scope": "content",
+      "item_id": "virtual_02"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 555,
+      "y": 244,
+      "scope": "content",
+      "item_id": "virtual_02"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_02_quantity",
+      "text": "15/320",
+      "bbox": [
+        570,
+        254,
+        671,
+        276
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_02",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_02_name",
+      "text": "贪婪金币",
+      "bbox": [
+        553,
+        372,
+        683,
+        407
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_02",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 683,
+      "y": 238,
+      "scope": "content",
+      "item_id": "virtual_03"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_03",
+      "x": 695,
+      "y": 247,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_03"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 695,
+      "y": 247,
+      "scope": "content",
+      "item_id": "virtual_03"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 692,
+      "y": 244,
+      "scope": "content",
+      "item_id": "virtual_03"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_03_quantity",
+      "text": "118/320",
+      "bbox": [
+        707,
+        254,
+        808,
+        276
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_03",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_03_name",
+      "text": "虚无砖块",
+      "bbox": [
+        690,
+        372,
+        820,
+        407
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_03",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 822,
+      "y": 238,
+      "scope": "content",
+      "item_id": "virtual_04"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_04",
+      "x": 834,
+      "y": 247,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_04"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 834,
+      "y": 247,
+      "scope": "content",
+      "item_id": "virtual_04"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 831,
+      "y": 244,
+      "scope": "content",
+      "item_id": "virtual_04"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_04_quantity",
+      "text": "16/320",
+      "bbox": [
+        846,
+        254,
+        947,
+        276
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_04",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_04_name",
+      "text": "粘稠之泥",
+      "bbox": [
+        829,
+        372,
+        959,
+        407
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_04",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 960,
+      "y": 238,
+      "scope": "content",
+      "item_id": "virtual_05"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_05",
+      "x": 972,
+      "y": 247,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_05"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 972,
+      "y": 247,
+      "scope": "content",
+      "item_id": "virtual_05"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 969,
+      "y": 244,
+      "scope": "content",
+      "item_id": "virtual_05"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_05_quantity",
+      "text": "13/320",
+      "bbox": [
+        984,
+        254,
+        1085,
+        276
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_05",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_05_name",
+      "text": "虚空箭头",
+      "bbox": [
+        967,
+        372,
+        1097,
+        407
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_05",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 1098,
+      "y": 238,
+      "scope": "content",
+      "item_id": "virtual_06"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_06",
+      "x": 1110,
+      "y": 247,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_06"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 1110,
+      "y": 247,
+      "scope": "content",
+      "item_id": "virtual_06"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 1107,
+      "y": 244,
+      "scope": "content",
+      "item_id": "virtual_06"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_06_quantity",
+      "text": "13/330",
+      "bbox": [
+        1122,
+        254,
+        1223,
+        276
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_06",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_06_name",
+      "text": "阴暗附着",
+      "bbox": [
+        1105,
+        372,
+        1235,
+        407
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_06",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 1238,
+      "y": 238,
+      "scope": "content",
+      "item_id": "virtual_07"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_07",
+      "x": 1250,
+      "y": 247,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_07"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 1250,
+      "y": 247,
+      "scope": "content",
+      "item_id": "virtual_07"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 1247,
+      "y": 244,
+      "scope": "content",
+      "item_id": "virtual_07"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_07_quantity",
+      "text": "15/330",
+      "bbox": [
+        1262,
+        254,
+        1363,
+        276
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_07",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_07_name",
+      "text": "阴影碎布",
+      "bbox": [
+        1245,
+        372,
+        1375,
+        407
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_07",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 1376,
+      "y": 238,
+      "scope": "content",
+      "item_id": "virtual_08"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_08",
+      "x": 1388,
+      "y": 247,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_08"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 1388,
+      "y": 247,
+      "scope": "content",
+      "item_id": "virtual_08"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 1385,
+      "y": 244,
+      "scope": "content",
+      "item_id": "virtual_08"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_08_quantity",
+      "text": "13",
+      "bbox": [
+        1400,
+        254,
+        1501,
+        276
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_08",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_08_name",
+      "text": "空明碎甲",
+      "bbox": [
+        1383,
+        372,
+        1513,
+        407
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_08",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 408,
+      "y": 412,
+      "scope": "content",
+      "item_id": "virtual_09"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_09",
+      "x": 420,
+      "y": 421,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_09"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 420,
+      "y": 421,
+      "scope": "content",
+      "item_id": "virtual_09"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 417,
+      "y": 418,
+      "scope": "content",
+      "item_id": "virtual_09"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_09_quantity",
+      "text": "—/330",
+      "bbox": [
+        432,
+        428,
+        533,
+        450
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_09",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_09_name",
+      "text": "虚空护罩",
+      "bbox": [
+        415,
+        546,
+        545,
+        581
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_09",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 546,
+      "y": 412,
+      "scope": "content",
+      "item_id": "virtual_10"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_10",
+      "x": 558,
+      "y": 421,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_10"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 558,
+      "y": 421,
+      "scope": "content",
+      "item_id": "virtual_10"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 555,
+      "y": 418,
+      "scope": "content",
+      "item_id": "virtual_10"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_10_quantity",
+      "text": "16/310",
+      "bbox": [
+        570,
+        428,
+        671,
+        450
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_10",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_10_name",
+      "text": "大魔之锤",
+      "bbox": [
+        553,
+        546,
+        683,
+        581
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_10",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 683,
+      "y": 412,
+      "scope": "content",
+      "item_id": "virtual_11"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_11",
+      "x": 695,
+      "y": 421,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_11"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 695,
+      "y": 421,
+      "scope": "content",
+      "item_id": "virtual_11"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 692,
+      "y": 418,
+      "scope": "content",
+      "item_id": "virtual_11"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_11_quantity",
+      "text": "16/330",
+      "bbox": [
+        707,
+        428,
+        808,
+        450
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_11",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_11_name",
+      "text": "虚无之盾",
+      "bbox": [
+        690,
+        546,
+        820,
+        581
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_11",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 822,
+      "y": 412,
+      "scope": "content",
+      "item_id": "virtual_12"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_12",
+      "x": 834,
+      "y": 421,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_12"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 834,
+      "y": 421,
+      "scope": "content",
+      "item_id": "virtual_12"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 831,
+      "y": 418,
+      "scope": "content",
+      "item_id": "virtual_12"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_12_quantity",
+      "text": "14/340",
+      "bbox": [
+        846,
+        428,
+        947,
+        450
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_12",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_12_name",
+      "text": "坚韧甲壳",
+      "bbox": [
+        829,
+        546,
+        959,
+        581
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_12",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 960,
+      "y": 412,
+      "scope": "content",
+      "item_id": "virtual_13"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_13",
+      "x": 972,
+      "y": 421,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_13"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 972,
+      "y": 421,
+      "scope": "content",
+      "item_id": "virtual_13"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 969,
+      "y": 418,
+      "scope": "content",
+      "item_id": "virtual_13"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_13_quantity",
+      "text": "15/340",
+      "bbox": [
+        984,
+        428,
+        1085,
+        450
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_13",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_13_name",
+      "text": "动力齿轮",
+      "bbox": [
+        967,
+        546,
+        1097,
+        581
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_13",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 1098,
+      "y": 412,
+      "scope": "content",
+      "item_id": "virtual_14"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_14",
+      "x": 1110,
+      "y": 421,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_14"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 1110,
+      "y": 421,
+      "scope": "content",
+      "item_id": "virtual_14"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 1107,
+      "y": 418,
+      "scope": "content",
+      "item_id": "virtual_14"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_14_quantity",
+      "text": "14/305",
+      "bbox": [
+        1122,
+        428,
+        1223,
+        450
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_14",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_14_name",
+      "text": "无形之斧",
+      "bbox": [
+        1105,
+        546,
+        1235,
+        581
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_14",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 1238,
+      "y": 412,
+      "scope": "content",
+      "item_id": "virtual_15"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_15",
+      "x": 1250,
+      "y": 421,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_15"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 1250,
+      "y": 421,
+      "scope": "content",
+      "item_id": "virtual_15"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 1247,
+      "y": 418,
+      "scope": "content",
+      "item_id": "virtual_15"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_15_quantity",
+      "text": "12/170",
+      "bbox": [
+        1262,
+        428,
+        1363,
+        450
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_15",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_15_name",
+      "text": "弦类道具",
+      "bbox": [
+        1245,
+        546,
+        1375,
+        581
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_15",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 1376,
+      "y": 412,
+      "scope": "content",
+      "item_id": "virtual_16"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_16",
+      "x": 1388,
+      "y": 421,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_16"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 1388,
+      "y": 421,
+      "scope": "content",
+      "item_id": "virtual_16"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 1385,
+      "y": 418,
+      "scope": "content",
+      "item_id": "virtual_16"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_16_quantity",
+      "text": "12",
+      "bbox": [
+        1400,
+        428,
+        1501,
+        450
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_16",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_16_name",
+      "text": "能类道具",
+      "bbox": [
+        1383,
+        546,
+        1513,
+        581
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_16",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 408,
+      "y": 586,
+      "scope": "content",
+      "item_id": "virtual_17"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_17",
+      "x": 420,
+      "y": 595,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_17"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 420,
+      "y": 595,
+      "scope": "content",
+      "item_id": "virtual_17"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 417,
+      "y": 592,
+      "scope": "content",
+      "item_id": "virtual_17"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_17_quantity",
+      "text": "—/130",
+      "bbox": [
+        432,
+        602,
+        533,
+        624
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_17",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_17_name",
+      "text": "相位之力",
+      "bbox": [
+        415,
+        720,
+        545,
+        755
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_17",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 546,
+      "y": 586,
+      "scope": "content",
+      "item_id": "virtual_18"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_18",
+      "x": 558,
+      "y": 595,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_18"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 558,
+      "y": 595,
+      "scope": "content",
+      "item_id": "virtual_18"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 555,
+      "y": 592,
+      "scope": "content",
+      "item_id": "virtual_18"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_18_quantity",
+      "text": "12/290",
+      "bbox": [
+        570,
+        602,
+        671,
+        624
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_18",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_18_name",
+      "text": "虚空炼金",
+      "bbox": [
+        553,
+        720,
+        683,
+        755
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_18",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 683,
+      "y": 586,
+      "scope": "content",
+      "item_id": "virtual_19"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_19",
+      "x": 695,
+      "y": 595,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_19"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 695,
+      "y": 595,
+      "scope": "content",
+      "item_id": "virtual_19"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 692,
+      "y": 592,
+      "scope": "content",
+      "item_id": "virtual_19"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_19_quantity",
+      "text": "15/215",
+      "bbox": [
+        707,
+        602,
+        808,
+        624
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_19",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_19_name",
+      "text": "腐蚀魔能",
+      "bbox": [
+        690,
+        720,
+        820,
+        755
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_19",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 822,
+      "y": 586,
+      "scope": "content",
+      "item_id": "virtual_20"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_20",
+      "x": 834,
+      "y": 595,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_20"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 834,
+      "y": 595,
+      "scope": "content",
+      "item_id": "virtual_20"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 831,
+      "y": 592,
+      "scope": "content",
+      "item_id": "virtual_20"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_20_quantity",
+      "text": "12/350",
+      "bbox": [
+        846,
+        602,
+        947,
+        624
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_20",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_20_name",
+      "text": "膨胀药剂",
+      "bbox": [
+        829,
+        720,
+        959,
+        755
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_20",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 960,
+      "y": 586,
+      "scope": "content",
+      "item_id": "virtual_21"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_21",
+      "x": 972,
+      "y": 595,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_21"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 972,
+      "y": 595,
+      "scope": "content",
+      "item_id": "virtual_21"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 969,
+      "y": 592,
+      "scope": "content",
+      "item_id": "virtual_21"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_21_quantity",
+      "text": "12/320",
+      "bbox": [
+        984,
+        602,
+        1085,
+        624
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_21",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_21_name",
+      "text": "梦魇狂躁",
+      "bbox": [
+        967,
+        720,
+        1097,
+        755
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_21",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 1098,
+      "y": 586,
+      "scope": "content",
+      "item_id": "virtual_22"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_22",
+      "x": 1110,
+      "y": 595,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_22"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 1110,
+      "y": 595,
+      "scope": "content",
+      "item_id": "virtual_22"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 1107,
+      "y": 592,
+      "scope": "content",
+      "item_id": "virtual_22"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_22_quantity",
+      "text": "14/320",
+      "bbox": [
+        1122,
+        602,
+        1223,
+        624
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_22",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_22_name",
+      "text": "虚无之终",
+      "bbox": [
+        1105,
+        720,
+        1235,
+        755
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_22",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_shadow",
+      "x": 1238,
+      "y": 586,
+      "scope": "content",
+      "item_id": "virtual_23"
+    },
+    {
+      "kind": "image",
+      "asset": "virtual_23",
+      "x": 1250,
+      "y": 595,
+      "width": 120,
+      "height": 120,
+      "scope": "content",
+      "item_id": "virtual_23"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_inner_shading",
+      "x": 1250,
+      "y": 595,
+      "scope": "content",
+      "item_id": "virtual_23"
+    },
+    {
+      "kind": "image",
+      "asset": "slot_frame_normal",
+      "x": 1247,
+      "y": 592,
+      "scope": "content",
+      "item_id": "virtual_23"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_23_quantity",
+      "text": "15/320",
+      "bbox": [
+        1262,
+        602,
+        1363,
+        624
+      ],
+      "size": 16,
+      "font": "cjk",
+      "color": "#eeeaf5",
+      "align": "right",
+      "shadow": true,
+      "item_id": "virtual_23",
+      "scope": "content",
+      "data_field": "preview_quantity"
+    },
+    {
+      "kind": "text",
+      "id": "virtual_23_name",
+      "text": "虚无之眠",
+      "bbox": [
+        1245,
+        720,
+        1375,
+        755
+      ],
+      "size": 18,
+      "font": "cjk",
+      "color": "#d9d3e5",
+      "align": "center",
+      "shadow": true,
+      "item_id": "virtual_23",
+      "scope": "content",
+      "data_field": "name"
+    },
+    {
+      "kind": "text",
+      "id": "project_title",
+      "text": "苟发育",
+      "bbox": [
+        191,
+        40,
+        293,
+        79
+      ],
+      "size": 31,
+      "font": "cjk",
+      "color": "#EAD369",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "page_title",
+      "text": "虚空之影",
+      "bbox": [
+        417,
+        134,
+        576,
+        178
+      ],
+      "size": 38,
+      "font": "cjk",
+      "color": "#E7DDF8",
+      "align": "left",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "content_header"
+    },
+    {
+      "kind": "text",
+      "id": "top_0",
+      "text": "宝物",
+      "bbox": [
+        379,
+        49,
+        428,
+        74
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#ECE7FC",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "top_1",
+      "text": "存档",
+      "bbox": [
+        522,
+        54,
+        580,
+        80
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#D7C59D",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "top_2",
+      "text": "抽奖",
+      "bbox": [
+        686,
+        49,
+        737,
+        74
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#ECE7FC",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "top_3",
+      "text": "商城",
+      "bbox": [
+        854,
+        49,
+        907,
+        74
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#ECE7FC",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "top_4",
+      "text": "每日奖励",
+      "bbox": [
+        1006,
+        48,
+        1091,
+        75
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#ECE7FC",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "top_5",
+      "text": "排行榜",
+      "bbox": [
+        1182,
+        48,
+        1250,
+        75
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#ECE7FC",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_01",
+      "text": "通关存档",
+      "bbox": [
+        156,
+        133,
+        372,
+        172
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_02",
+      "text": "虚空之影",
+      "bbox": [
+        156,
+        180,
+        372,
+        223
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#f4d194",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_03",
+      "text": "地图等级",
+      "bbox": [
+        156,
+        231,
+        372,
+        270
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_04",
+      "text": "上班福利",
+      "bbox": [
+        156,
+        278,
+        372,
+        315
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_05",
+      "text": "福利礼包",
+      "bbox": [
+        156,
+        323,
+        372,
+        362
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_06",
+      "text": "神兵碎片",
+      "bbox": [
+        156,
+        370,
+        372,
+        409
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_07",
+      "text": "秘法牢笼",
+      "bbox": [
+        156,
+        417,
+        372,
+        454
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_08",
+      "text": "BOSS存档",
+      "bbox": [
+        156,
+        462,
+        372,
+        500
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_09",
+      "text": "积分道具",
+      "bbox": [
+        156,
+        508,
+        372,
+        546
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_10",
+      "text": "商城道具",
+      "bbox": [
+        156,
+        554,
+        372,
+        592
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_11",
+      "text": "无尽存档",
+      "bbox": [
+        156,
+        600,
+        372,
+        638
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_12",
+      "text": "钓鱼存档",
+      "bbox": [
+        156,
+        646,
+        372,
+        684
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_13",
+      "text": "存档建筑",
+      "bbox": [
+        156,
+        692,
+        372,
+        731
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_14",
+      "text": "我的前男友",
+      "bbox": [
+        156,
+        739,
+        372,
+        777
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_15",
+      "text": "我的前女友",
+      "bbox": [
+        156,
+        785,
+        372,
+        823
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "sidebar_16",
+      "text": "神兽",
+      "bbox": [
+        156,
+        831,
+        372,
+        875
+      ],
+      "size": 23,
+      "font": "cjk",
+      "color": "#bbb2d2",
+      "align": "right",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "sidebar_state"
+    },
+    {
+      "kind": "text",
+      "id": "filter_all_text",
+      "text": "全部",
+      "bbox": [
+        740,
+        151,
+        790,
+        177
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#F5F0FF",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "content_header"
+    },
+    {
+      "kind": "text",
+      "id": "filter_owned_text",
+      "text": "已拥有",
+      "bbox": [
+        870,
+        151,
+        941,
+        178
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#F5F0FF",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "content_header"
+    },
+    {
+      "kind": "text",
+      "id": "filter_unowned_text",
+      "text": "未解锁",
+      "bbox": [
+        1008,
+        151,
+        1086,
+        179
+      ],
+      "size": 21,
+      "font": "cjk",
+      "color": "#F5F0FF",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "content_header"
+    },
+    {
+      "kind": "text",
+      "id": "gold_text",
+      "text": "2,881",
+      "bbox": [
+        1248,
+        97,
+        1311,
+        126
+      ],
+      "size": 20,
+      "font": "cjk",
+      "color": "#F4DF86",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "purple_gem_text",
+      "text": "320",
+      "bbox": [
+        1369,
+        97,
+        1415,
+        126
+      ],
+      "size": 20,
+      "font": "cjk",
+      "color": "#F4F1FF",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    },
+    {
+      "kind": "text",
+      "id": "ticket_text",
+      "text": "20",
+      "bbox": [
+        1477,
+        97,
+        1506,
+        126
+      ],
+      "size": 20,
+      "font": "cjk",
+      "color": "#F4F1FF",
+      "align": "center",
+      "stroke": 0,
+      "shadow": false,
+      "scope": "fixed_shell"
+    }
+  ],
+  "default_state": {
+    "selected_sidebar_id": "sidebar_02",
+    "page_title": "虚空之影",
+    "filter": "all",
+    "data_file": "data_preview.json",
+    "sample_only": true
+  },
+  "sidebar_toggles": [
+    {
+      "id": "sidebar_01",
+      "label": "通关存档",
+      "text_bbox": [
+        156,
+        133,
+        372,
+        172
+      ],
+      "selected_position": [
+        136,
+        128
+      ],
+      "hit_bbox": [
+        136,
+        128,
+        394,
+        177
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_02",
+      "label": "虚空之影",
+      "text_bbox": [
+        156,
+        180,
+        372,
+        223
+      ],
+      "selected_position": [
+        136,
+        175
+      ],
+      "hit_bbox": [
+        136,
+        177,
+        394,
+        226
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": true,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_03",
+      "label": "地图等级",
+      "text_bbox": [
+        156,
+        231,
+        372,
+        270
+      ],
+      "selected_position": [
+        136,
+        226
+      ],
+      "hit_bbox": [
+        136,
+        226,
+        394,
+        274
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_04",
+      "label": "上班福利",
+      "text_bbox": [
+        156,
+        278,
+        372,
+        315
+      ],
+      "selected_position": [
+        136,
+        273
+      ],
+      "hit_bbox": [
+        136,
+        274,
+        394,
+        320
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_05",
+      "label": "福利礼包",
+      "text_bbox": [
+        156,
+        323,
+        372,
+        362
+      ],
+      "selected_position": [
+        136,
+        318
+      ],
+      "hit_bbox": [
+        136,
+        320,
+        394,
+        366
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_06",
+      "label": "神兵碎片",
+      "text_bbox": [
+        156,
+        370,
+        372,
+        409
+      ],
+      "selected_position": [
+        136,
+        365
+      ],
+      "hit_bbox": [
+        136,
+        366,
+        394,
+        412
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_07",
+      "label": "秘法牢笼",
+      "text_bbox": [
+        156,
+        417,
+        372,
+        454
+      ],
+      "selected_position": [
+        136,
+        412
+      ],
+      "hit_bbox": [
+        136,
+        412,
+        394,
+        458
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_08",
+      "label": "BOSS存档",
+      "text_bbox": [
+        156,
+        462,
+        372,
+        500
+      ],
+      "selected_position": [
+        136,
+        457
+      ],
+      "hit_bbox": [
+        136,
+        458,
+        394,
+        504
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_09",
+      "label": "积分道具",
+      "text_bbox": [
+        156,
+        508,
+        372,
+        546
+      ],
+      "selected_position": [
+        136,
+        503
+      ],
+      "hit_bbox": [
+        136,
+        504,
+        394,
+        550
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_10",
+      "label": "商城道具",
+      "text_bbox": [
+        156,
+        554,
+        372,
+        592
+      ],
+      "selected_position": [
+        136,
+        549
+      ],
+      "hit_bbox": [
+        136,
+        550,
+        394,
+        596
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_11",
+      "label": "无尽存档",
+      "text_bbox": [
+        156,
+        600,
+        372,
+        638
+      ],
+      "selected_position": [
+        136,
+        595
+      ],
+      "hit_bbox": [
+        136,
+        596,
+        394,
+        642
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_12",
+      "label": "钓鱼存档",
+      "text_bbox": [
+        156,
+        646,
+        372,
+        684
+      ],
+      "selected_position": [
+        136,
+        641
+      ],
+      "hit_bbox": [
+        136,
+        642,
+        394,
+        688
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_13",
+      "label": "存档建筑",
+      "text_bbox": [
+        156,
+        692,
+        372,
+        731
+      ],
+      "selected_position": [
+        136,
+        687
+      ],
+      "hit_bbox": [
+        136,
+        688,
+        394,
+        735
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_14",
+      "label": "我的前男友",
+      "text_bbox": [
+        156,
+        739,
+        372,
+        777
+      ],
+      "selected_position": [
+        136,
+        734
+      ],
+      "hit_bbox": [
+        136,
+        735,
+        394,
+        781
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_15",
+      "label": "我的前女友",
+      "text_bbox": [
+        156,
+        785,
+        372,
+        823
+      ],
+      "selected_position": [
+        136,
+        780
+      ],
+      "hit_bbox": [
+        136,
+        781,
+        394,
+        828
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    },
+    {
+      "id": "sidebar_16",
+      "label": "神兽",
+      "text_bbox": [
+        156,
+        831,
+        372,
+        875
+      ],
+      "selected_position": [
+        136,
+        826
+      ],
+      "hit_bbox": [
+        136,
+        828,
+        394,
+        897
+      ],
+      "selected_asset": "sidebar_selected",
+      "selected_text_color": "#f4d194",
+      "normal_text_color": "#bbb2d2",
+      "preview_data_available": false,
+      "runtime_configuration_supplied": false
+    }
+  ],
+  "shared_regions": {
+    "main_panel": [
+      136,
+      27,
+      1534,
+      897
+    ],
+    "sidebar": [
+      136,
+      128,
+      394,
+      897
+    ],
+    "content": [
+      394,
+      128,
+      1534,
+      897
+    ],
+    "content_header": [
+      394,
+      129,
+      1534,
+      197
+    ],
+    "grid_scroll_bounds": [
+      407,
+      213,
+      1520,
+      882
+    ],
+    "tooltip_bounds": [
+      394,
+      129,
+      1533,
+      897
+    ]
+  },
+  "grid_template": {
+    "columns": 8,
+    "column_icon_x": [
+      420,
+      558,
+      695,
+      834,
+      972,
+      1110,
+      1250,
+      1388
+    ],
+    "first_row_icon_y": 247,
+    "row_step": 174,
+    "icon_size": [
+      120,
+      120
+    ],
+    "shadow_asset": "slot_shadow",
+    "shadow_offset": [
+      -12,
+      -9
+    ],
+    "inner_shading_asset": "slot_inner_shading",
+    "frame_normal_asset": "slot_frame_normal",
+    "frame_hover_asset": "slot_frame_hover",
+    "frame_offset": [
+      -3,
+      -3
+    ],
+    "quantity_bbox_relative": [
+      12,
+      7,
+      113,
+      29
+    ],
+    "name_bbox_relative": [
+      -5,
+      125,
+      125,
+      160
+    ],
+    "item_count_is_capacity": false,
+    "text_separate_from_images": true
+  },
+  "interaction_contract": {
+    "category_change_mutates_only": [
+      "selected_sidebar_id",
+      "selected_sidebar_position",
+      "sidebar_text_colors",
+      "page_title",
+      "right_content_data"
+    ],
+    "category_change_preserves": [
+      "canvas",
+      "shared_shell",
+      "resources_row",
+      "top_navigation",
+      "sidebar_geometry",
+      "grid_template",
+      "tooltip_template"
+    ],
+    "other_category_data": "Read original project config/icons. No other category data or effects are manufactured in this package."
+  },
+  "hover_preview": {
+    "item_id": "virtual_04",
+    "frame_asset": "slot_frame_hover",
+    "frame_position": [
+      831,
+      244
+    ],
+    "tooltip_sprite_position": [
+      943,
+      244
+    ],
+    "tooltip_panel_position": [
+      967,
+      268
+    ],
+    "data_file": "tooltip_preview_data.json"
+  },
+  "semantics": {
+    "owned": "current > 0",
+    "unowned": "current == 0",
+    "unknown": "current is null；不可按未解锁处理",
+    "cap": "持有上限；并非解锁门槛",
+    "visible_count": 23,
+    "visible_count_is_capacity": false,
+    "scope": "Virtual-shadow preview only; other archive categories use the project configuration and category contract."
+  },
+  "limitations": [
+    "Preview data does not replace saves or game config.",
+    "Only virtual-shadow preview art/data is bundled. Other archive categories reuse the shell and existing project icons.",
+    "External game screenshot is preview_only and runtime_use=false.",
+    "Panorama integration and in-game validation remain outstanding."
+  ],
+  "sidebar_click_region_rule": "Non-overlapping intervals divided at adjacent label center midpoints. Selected artwork may visually extend across a click boundary; it must not receive pointer events independently."
+}

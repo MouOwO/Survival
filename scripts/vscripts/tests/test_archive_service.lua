@@ -49,6 +49,9 @@ GameRules = { GetGameTime = function() return time end, IsCheatMode = function()
 IsInToolsMode = function() return tools_mode end
 DoUniqueString = function() return "test_match" end
 RandomInt = function(a, b) rolls = rolls + 1; return a end
+-- This fixture tests grants/quotas using the first two pool entries. Shared
+-- event randomness itself is covered with real seeds in the cooperative tests.
+require("systems/archive_cooperative_reward_policy").local_seed = function() return 1 end
 PlayerResource = { GetPlayer = function(_, id) return id end,
     IsValidPlayerID = function(_, id) return id == 0 or id == 1 end }
 CustomGameEventManager = {
@@ -300,6 +303,16 @@ assert(archive.snapshot(6,"beast").social.tickets == 2)
 assert(archive.snapshot(6,"beast").social.total == 1)
 profiles[7] = new_profile()
 for i=1,12 do assert(archive.record_challenge(7,"social_friend",1000+i,"N5").ok) end
+assert(archive.snapshot(7,"friend").social.tickets == 1, "same challenge only grants once per match, regardless of summon sequence")
+-- The daily quota is across successful matches, not twelve summons in one.
+for i=2,12 do
+    local result = require("systems/archive_settlement").settle(profiles[7], {
+        id="daily_match_"..i..":challenge_kind:social_friend", kind="challenge",
+        challenge_id="social_friend", day_key=tostring(require("systems/archive_calendar").day())
+    }, false)
+    assert(result.ok)
+    profiles[7].save.archive, profiles[7].save.gameplay_stats = result.archive, result.gameplay_stats
+end
 assert(archive.snapshot(7,"friend").social.tickets == 10, "daily challenge limit")
 assert(archive.record_challenge(7,"social_friend",1001,"N5").ok)
 assert(archive.snapshot(7,"friend").social.tickets == 10, "kill dedup")

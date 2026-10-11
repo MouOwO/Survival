@@ -31,7 +31,10 @@ local mode = {}
 GameRules = {GetGameTime=function() return clock end,
     GetGameModeEntity=function() return mode end,
     SetGameWinner=function(_,team) assert(team==2); winners=winners+1 end}
-PlayerResource = {GetTeam=function() return 2 end}
+PlayerResource = {GetTeam=function() return 2 end,
+    GetPlayer=function(_,id) return id end,
+    IsValidPlayerID=function(_,id) return id==0 or id==1 end,
+    IsFakeClient=function() return false end}
 CustomNetTables = {
     SetTableValue = function(_,table_name,key,row)
         if table_name == 'survival_ability_runtime' then
@@ -94,11 +97,14 @@ package.loaded['systems/player_context_service'] = {
     slot=function(id) return {builder_spawn_marker='player_'..id..'_builder_spawn'} end,
 }
 package.loaded['systems/wave_system'] = {
-    get_player_spawn_marker=function() return nil end,
+    get_player_spawn_marker=function(id)
+        return {IsNull=function() return false end,
+            GetAbsOrigin=function() return Vector(id*2000,0,0) end}
+    end,
     spawn_challenge_monster=function() return unit('boss',Vector(0,0,0)) end,
 }
 package.loaded['systems/archive_service'] = {has_pending=function() return false end,
-    record_challenge=function() rewards=rewards+1 end}
+    record_challenge=function() rewards=rewards+1; return {ok=true} end}
 package.loaded['systems/monster_hero_visual_service'] = {clear=function() end,on_death=function() end}
 package.loaded['systems/challenge_guardian_visual_service'] = {apply=function() end,clear=function() end}
 local endless_running,endless_callback={}
@@ -186,7 +192,7 @@ assert(archive.summon(hub,'shadow_1',a));verify(state,'active boss and used');in
 local boss=state.active_boss
 boss.alive=false
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=boss,victim_entindex=boss.id})
-assert(rewards==1 and not state.active_boss)
+assert(rewards==2 and not state.active_boss, 'one shared boss gives both winning accounts a reward')
 verify(state,'boss death');interleave(state,'used persists after death')
 assert(not a.active and hub.abilities.ability_archive_shadow_2.active,'used/unused transition')
 local hub2=state.hubs[2]
@@ -225,4 +231,54 @@ verify(other,'teammate unaffected')
 assert(archive.finish(other.hubs[3]));assert(winners==1)
 assert(scheduler.task_count()==0,'phase/runtime tasks accumulate after finish')
 no_errors()
-original_print('ARCHIVE_RUNTIME_FLICKER_REGRESSION_PASS '..checks..' checks: full identity, N gates, used, active boss, endless busy/end, finish, shared refresh interleaving, idempotent activation, cleanup')
+
+-- Finishing one's own challenge does not withdraw a legitimate winner from
+-- another teammate's later team reward. The real dispatcher owns this rule.
+bus.reset();scheduler.clear();archive.init()
+assert(archive.begin({difficulty_id='N5',player_ids={0,1}}).keep_running)
+local first,teammate=archive._test.players()[0],archive._test.players()[1]
+assert(archive.finish(teammate.hubs[3]))
+local handed_off={}
+package.loaded['systems/archive_service'].record_challenge=function(id)
+    handed_off[id]=(handed_off[id] or 0)+1;return {ok=true}
+end
+local first_hub=first.hubs[1]
+assert(archive.summon(first_hub,'shadow_1',first_hub.abilities.ability_archive_shadow_1))
+local first_boss=first.active_boss;first_boss.alive=false
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=first_boss,victim_entindex=first_boss.id})
+assert(handed_off[0]==1 and handed_off[1]==1,'finished teammate keeps the full shared reward')
+assert(archive.finish(first.hubs[3]))
+no_errors()
+
+-- The last player's finish cannot close the archive queue until even a
+-- pre-enqueue exception has handed off every previously-earned team intent.
+bus.reset();scheduler.clear();archive.init()
+assert(archive.begin({difficulty_id='N5',player_ids={0,1}}).keep_running)
+first,teammate=archive._test.players()[0],archive._test.players()[1]
+local fail_before_enqueue,finalizations=true,0
+handed_off={}
+package.loaded['systems/archive_service'].record_challenge=function(id)
+    if id==1 and fail_before_enqueue then error('fixture before enqueue') end
+    handed_off[id]=(handed_off[id] or 0)+1;return {ok=true}
+end
+package.loaded['systems/archive_service'].begin_finalization=function()
+    finalizations=finalizations+1
+    assert(not require('systems/archive_cooperative_reward_service').has_pending(),
+        'finalization cannot lock the queue before all earned team intents enqueue')
+end
+first_hub=first.hubs[1]
+assert(archive.summon(first_hub,'shadow_1',first_hub.abilities.ability_archive_shadow_1))
+first_boss=first.active_boss;first_boss.alive=false
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim=first_boss,victim_entindex=first_boss.id})
+assert(require('systems/archive_cooperative_reward_service').has_pending())
+local prior_winners=winners
+assert(archive.finish(first.hubs[3]));assert(archive.finish(teammate.hubs[3]))
+assert(winners==prior_winners and finalizations==0 and archive.phase_snapshot().saving==1,
+    'all finished players still wait for an earned intent that has not queued')
+fail_before_enqueue=false
+clock=clock+1;scheduler.think();clock=clock+0.3;scheduler.think()
+assert(handed_off[0]==1 and handed_off[1]==1,'missing account retries while successful account stays once')
+assert(winners==prior_winners+1 and finalizations==1 and scheduler.task_count()==0,
+    'winner follows successful handoff and finalization exactly once')
+no_errors()
+original_print('ARCHIVE_RUNTIME_FLICKER_REGRESSION_PASS '..checks..' UI checks plus team early-finish and reward handoff barrier: identity, N gates, used, active boss, endless busy/end, shared refresh, activation and cleanup')

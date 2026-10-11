@@ -2,13 +2,20 @@
 const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm");
 const panels={},requests=[],urls=[],scheduled=[],subscriptions={};
 function panel(){return {style:{},enabled:true,text:"",children:[],events:{},SetHasClass(name,value){this[name]=value;},
- RemoveAndDeleteChildren(){this.children=[];},AddClass(){},SetPanelEvent(name,fn){this.events[name]=fn;}};}
+ RemoveAndDeleteChildren(){this.children=[];},AddClass(){},BHasClass(name){return !!this[name];},Children(){return this.children;},SetPanelEvent(name,fn){this.events[name]=fn;}};}
 function $(id){return panels[id]||(panels[id]=panel());}
 $.CreatePanel=(_,parent)=>{const child=panel();parent.children.push(child);return child;};
 $.Schedule=(delay,fn)=>{scheduled.push({delay,fn});return scheduled.length;};
 $.DispatchEvent=(name,url)=>urls.push(url);
 let topLayer=null;
-const config={SurvivalUILayers:{Open:(id)=>topLayer=id,Close:()=>topLayer=null,Top:()=>topLayer}};
+const config={SurvivalUI:{},RemainingHandoff:{},SurvivalUILayers:{Open:(id)=>topLayer=id,Close:()=>topLayer=null,Top:()=>topLayer}};
+// This fixture exercises payment state; the real V10 geometry is covered by the XML fixture.
+config.SurvivalMenuV10={Adopt(props){
+ assert.equal(props.id,"payment_shop");assert.equal(props.navId,"commerce");assert.equal(props.panel,$("#PaymentDialog"));
+ const menu={shell:{},canvas:panel(),content:panel(),actions:panel(),Move(){},SetSidebar(){},SetTitle(){},
+  Open(){config.SurvivalUILayers.Open(props.id);},Close(){config.SurvivalUILayers.Close(props.id);},Dispose(){this.Close();}};
+ return menu;
+}};
 const scope={$,GameUI:{CustomUIConfig:()=>config},GameEvents:{SendCustomGameEventToServer:(name,data)=>requests.push(data),Subscribe:(name,fn)=>subscriptions[name]=fn,Unsubscribe:()=>{}}};
 vm.createContext(scope);vm.runInContext(fs.readFileSync("panorama/src/scripts/custom_game/payment_test.js","utf8"),scope);
 const handler=subscriptions.survival_payment_result;
@@ -50,6 +57,7 @@ const bundle={sku:"mixed_bundle",title:"完整礼包",description:"全部发放"
  reward_lines:[{kind:"stat",id:"initial_wood",quantity:100,label:"初始木材"},{kind:"stat",id:"wall_armor",quantity:100,label:"城墙护甲"},{kind:"entitlement",id:"vip",quantity:1,label:"VIP权限"}],
  stat_preview:[{field_id:"initial_wood",value:10,after:110,delta:100},{field_id:"wall_armor",value:0,after:100,delta:100}]};
 handler({ok:true,action:"catalog",products:[bundle]});
+config.SurvivalPayments.Checkout(bundle.sku);
 assert.equal($("#PaymentPrice").text,"¥7.77");assert.match($("#PaymentValues").text,/10 → 110/);assert.match($("#PaymentValues").text,/0 → 100/);assert.match($("#PaymentValues").text,/VIP权限/);
 scope.PaymentBuy();assert.equal(requests.at(-1).sku,"mixed_bundle");
 const bundleOrder={...order,...bundle,effects:{initial_wood:100,wall_armor:100}};

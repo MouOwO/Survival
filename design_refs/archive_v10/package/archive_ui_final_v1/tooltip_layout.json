@@ -1,0 +1,137 @@
+{
+  "schema": "archive_ui_final_v1_tooltip",
+  "scope": "存档 / 虚空之影",
+  "canvas": [
+    1672,
+    941
+  ],
+  "source": {
+    "file": "exec-7db2355e-60da-4832-ac36-3553cf9d1707.png",
+    "sha256": "89995c22eff0a482d5e29f8ad317064dd862418cc2d3281d2c8892391f411aa0",
+    "tooltip_bbox": [
+      838,
+      369,
+      1146,
+      623
+    ],
+    "note": "当前紫色母图不包含 Tooltip；本补充包复用早期深色细金边 Tooltip 外观，数量逻辑使用当前虚空之影规则。"
+  },
+  "assets": {
+    "background": {
+      "file": "assets/tooltip/tooltip_background.png",
+      "native_size": [
+        308,
+        254
+      ],
+      "method": "同源空白内边距采样补底；非恢复原分层",
+      "sha256": "5b1a99a4079103b25dae87c5452dcb4ac42333f5ae44e927317a9d81e0ac42fe",
+      "nine_slice_ltrb": [
+        8,
+        8,
+        8,
+        8
+      ]
+    },
+    "frame": {
+      "file": "assets/tooltip/tooltip_frame.png",
+      "native_size": [
+        308,
+        254
+      ],
+      "method": "从早期确认外观的深色细金边 Tooltip 原图裁取边框，中心透明",
+      "sha256": "6e538b8b160fa03a55519680a6d75ad189a2bfdc30aff66477cd5e6bece492cf",
+      "nine_slice_ltrb": [
+        10,
+        10,
+        10,
+        10
+      ]
+    },
+    "separator": {
+      "file": "assets/tooltip/tooltip_separator.png",
+      "native_size": [
+        260,
+        4
+      ],
+      "method": "从同一 Tooltip 第一条分隔线提取透明度；颜色按该线采样",
+      "sha256": "7e02cb26d3401cfec23f00abc473200f7eb18a404637f4f53b36a83397918fde"
+    },
+    "shadow": {
+      "file": "assets/tooltip/tooltip_shadow.png",
+      "native_size": [
+        356,
+        302
+      ],
+      "method": "独立中性柔阴影重建；不包含原图浅色场景背景",
+      "sha256": "7fd97677b811b15b8ec69226344d308e77fb044a96ed89bc49a383baf5b4e5fb",
+      "nine_slice_ltrb": [
+        32,
+        32,
+        32,
+        32
+      ]
+    }
+  },
+  "layout": {
+    "width": 320,
+    "padding": 22,
+    "minimum_height": 198,
+    "title_font_size": 22,
+    "body_font_size": 17,
+    "caption_font_size": 15,
+    "line_height": 26,
+    "header_title_top": 19,
+    "state_top": 52,
+    "separator_top": 79,
+    "effect_caption_top": 95,
+    "effect_text_top": 121,
+    "quantity_bottom": 22,
+    "shadow_padding": 24,
+    "anchor_gap": 13
+  },
+  "preview_anchor": {
+    "hovered_item": "virtual_04",
+    "item_bbox": [
+      834,
+      247,
+      954,
+      367
+    ],
+    "tooltip_position": [
+      967,
+      268
+    ],
+    "tooltip_sprite_position": [
+      943,
+      244
+    ]
+  },
+  "interaction": {
+    "show": "鼠标悬停图标",
+    "hide": "鼠标离开图标及当前允许的悬停范围",
+    "pointer_events": "Tooltip不截获物品点击",
+    "bounds": "按统一缩放后的逻辑坐标计算；优先右侧，越界翻至左侧并夹紧到UI可视区域",
+    "height": "随效果文本换行增长；不截断正文"
+  },
+  "text": "所有标题、状态、描述、数量均由动态文本绘制，不写入运行时PNG。",
+  "font": {
+    "path": "fonts/SourceHanSansSC-Regular.otf",
+    "license": "fonts/LICENSE-SourceHanSans.txt",
+    "note": "Self-contained font; no sibling-package dependency."
+  },
+  "quantity_rules": {
+    "current>0": "已拥有",
+    "current=0": "未解锁",
+    "current_unknown": "—，不当作0",
+    "cap": "持有上限，不是解锁条件",
+    "missing_cap": "只显示当前数量，不编造上限"
+  },
+  "optional_sections": "条件、生效范围等仅当当前项目配置真实提供字段时显示，不添加假条件或解锁进度条。",
+  "text_colors": {
+    "title": "#e1cc83",
+    "state": "#bab9b5",
+    "caption": "#aaa9a4",
+    "body": "#e9e7e1",
+    "quantity": "#dac98e"
+  }
+}

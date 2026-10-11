@@ -21,11 +21,20 @@ import qrcode.image.svg
 
 from .wechat import APPID, MCHID, ORIGIN, SKU, TITLE, WeChat, PaymentError, decode_json, validate_success
 from .alipay import Alipay, is_qr_code
+from .ucoin_catalog import U_COIN_PER_YUAN
 
 LOG = logging.getLogger('payments')
 ORDER = re.compile(r'(?:WX|AL)[0-9a-f]{30}\Z')
 CALLS = {'catalog':2,'create_order':4,'get_order':1,'pending':0,'update_gateway':3,'deliver':5,
     'begin_reset':4,'finish_reset':4,'create_order_channel':5}
+
+
+def ucoin_quote(amount_fen):
+    """Display the database-owned cash amount in U-coins, never client input."""
+    if type(amount_fen) is not int or not 1 <= amount_fen <= 1000000:
+        raise PaymentError('payment_amount_invalid',500)
+    return {'u_coin_price':amount_fen * U_COIN_PER_YUAN // 100,
+            'u_coin_per_yuan':U_COIN_PER_YUAN}
 
 
 @lru_cache(maxsize=128)
@@ -108,6 +117,12 @@ class Payments:
         if result['provider']=='alipay':
             result['checkout_url']=ORIGIN+'/checkout/alipay?order='+order['order_id']+'&token='+self.token(order['order_id'])
         result['checkout_mode']='qr' if native_qr(order) else 'page_pay' if order.get('code_url')=='alipay:page_pay' else 'preparing'
+        # Existing orders retain their stored amount even after a catalog edit.
+        result.update(ucoin_quote(order['amount']))
+        pricing=order['reward'].get('grants',{}).get('pricing')
+        if pricing is not None and pricing != {
+                'u_coin_price':result['u_coin_price'], 'u_coin_per_yuan':U_COIN_PER_YUAN}:
+            raise PaymentError('payment_pricing_mismatch',500)
         if native_qr(order) and order['state']=='pending' and not result['expired']:
             result['qr_matrix']=qr_matrix(order['code_url'])
         return result
@@ -218,7 +233,10 @@ class Payments:
             raise PaymentError('request_fields_invalid')
         account,session,catalog = self.identity(body)
         if path=='catalog':
-            return {**catalog,'wechat':True,'alipay':self.alipay is not None,'alipay_checkout_mode':self.alipay_mode}
+            products=[{**product,**ucoin_quote(product['amount_fen'])}
+                      for product in catalog.get('products',[])]
+            return {**catalog,'products':products,'u_coin_per_yuan':U_COIN_PER_YUAN,
+                    'wechat':True,'alipay':self.alipay is not None,'alipay_checkout_mode':self.alipay_mode}
         if path=='reset':
             # TODO(PAYMENT_TEST_ONLY): disabled by default, both HTTP and SQL gates required.
             if self.config.get('test_reset_enabled') is not True:

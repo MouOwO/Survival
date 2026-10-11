@@ -124,9 +124,23 @@ class ArchiveService:
         if kind=="challenge": c["id"]=match+":challenge_kind:"+c["challenge_id"]
         return c
 
-    def settle(self,profile,command,has_pass):
+    @staticmethod
+    def shared_challenge_roll(bundle):
+        rule = bundle.tables.get("archive_cooperative_reward_rules", {}).get("default", {})
+        return (rule.get("version") == 1 and rule.get("enabled") is True
+                and rule.get("shared_challenge_roll") is True)
+
+    def settle(self,profile,command,has_pass,shared_challenge_roll=None):
+        shared = (self.shared_challenge_roll(self.bundle)
+                  if shared_challenge_roll is None else shared_challenge_roll)
+        if command["kind"] == "challenge" and shared:
+            # Every recipient uses the same base roll. Their own prepared
+            # entitlement still decides how many entries they may receive.
+            scope = command["id"].split(":", 1)[0] + ":challenge_kind:" + command["challenge_id"]
+        else:
+            scope = profile["account_id"] + ":" + command["id"]
         seed=int.from_bytes(hmac.new(self.app.account_id_pepper.encode(),
-            (profile["account_id"]+":"+command["id"]).encode(),hashlib.sha256).digest()[:4],"big")%2147483646+1
+            scope.encode(),hashlib.sha256).digest()[:4],"big")%2147483646+1
         payload={"configs":self.bundle.configs,"profile":profile,"command":command,"has_pass":has_pass,"seed":seed,"server_time":int(time.time())}
         if not self.slots.acquire(timeout=2): raise TimeoutError("archive_workers_busy")
         try:
@@ -195,13 +209,25 @@ class ArchiveService:
             profile,command=prepared["profile"],prepared["command"]
             reducer=self
             version=prepared.get("config_hash",self.bundle.hash)
+            shared_roll = self.shared_challenge_roll(self.bundle)
             # Preserve the recorded hash and fingerprint for old-match replays.
             # Only explicitly approved archive updates use the current reducer.
             # Commerce and lottery operations keep their recorded rules.
-            if version!=self.bundle.hash and not upgrades(self.bundle, version, command.get("kind")):
+            if version!=self.bundle.hash:
                 if not re.fullmatch(r"[0-9a-f]{64}",version): raise ArchiveError("archive_config_invalid")
-                reducer=ArchiveService(self.app,Bundle(self.bundle.directory.parent/version),self.lua)
-            result=reducer.settle(profile,command,prepared["has_pass"])
+                upgraded = upgrades(self.bundle, version, command.get("kind"))
+                if command["kind"] == "challenge" or not upgraded:
+                    recorded_bundle = Bundle(self.bundle.directory.parent/version)
+                # Even an explicitly upgraded reducer must retain the seed
+                # policy recorded when this operation was first accepted.
+                if command["kind"] == "challenge":
+                    shared_roll = self.shared_challenge_roll(recorded_bundle)
+                if not upgraded:
+                    reducer=ArchiveService(self.app,recorded_bundle,self.lua)
+            if version == self.bundle.hash or command["kind"] != "challenge":
+                result=reducer.settle(profile,command,prepared["has_pass"])
+            else:
+                result=reducer.settle(profile,command,prepared["has_pass"],shared_roll)
             old=profile["save"]["gameplay_stats"]
             deltas={key:value-old.get(key,0) for key,value in result.get("gameplay_stats",{}).items() if value!=old.get(key,0)}
             archive=result.get("archive",{})

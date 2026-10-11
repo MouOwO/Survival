@@ -127,22 +127,29 @@ for player=0,3 do
             u=entity(100+player*10+lane,Vector(offset-400,0,0),ordinary.base_hull_radius)
             u.survival_is_wave_monster=true
         end
-        u.p=Vector(offset-400,(lane-2.5)*64,0)
+        u.p=Vector(offset-400,(lane-2.5)*48,0)
         local plan=assert(contact.resolve(wall,u))
-        assert(plan.claimed and plan.point.x==offset-192 and plan.point.y==(lane-2.5)*64,
-            "mixed formal/endless front must use four separate Hull32 contacts")
+        assert(plan.claimed and plan.point.x==offset-184 and plan.point.y==(lane-2.5)*48 and u:GetHullRadius()==24,
+            "mixed formal/endless front must use four separate tactical contacts")
         u.p=plan.point;front[#front+1]=u
     end
     local rear=assert(wave.spawn_challenge_monster({health=200,attack=2},definition,player))
     rear.p=Vector(offset-400,0,0)
     assert(not contact.resolve(wall,rear).claimed,"fifth endless monster must wait behind mixed front")
+    assert(rear:GetHullRadius()==32,"endless rear must retain its real Hull32 collision")
     local ordinary_rear=entity(150+player,Vector(offset-400,30,0),32)
     assert(not contact.resolve(wall,ordinary_rear).claimed,"ordinary waves share the same four-contact cap")
+    assert(ordinary_rear:GetHullRadius()==32,"ordinary rear must retain its real Hull32 collision")
     front[2].dead=true
     local refill=assert(contact.resolve(wall,rear))
     assert(refill.claimed,"endless waiter must replace a dead front owner without increasing contact count")
+    assert(front[2]:GetHullRadius()==32 and rear:GetHullRadius()==24,
+        "death replacement restores the previous owner and adjusts only the new contact")
     rear.p=refill.point
     assert(not contact.resolve(wall,ordinary_rear).claimed,"replacement must consume the single vacant contact")
+    contact.clear(wall:entindex())
+    for _,u in ipairs(front) do assert(u:GetHullRadius()==32,"mixed front cleanup must restore physical hulls") end
+    assert(rear:GetHullRadius()==32,"replacement cleanup must restore its physical hull")
 end
 definition.endless=false
 local preserved=assert(wave.spawn_challenge_monster({health=200,attack=2},definition,0))
@@ -163,4 +170,4 @@ end
 failure_mode=nil
 assert(wave.spawn_challenge_monster({health=200,attack=2},definition,0),
     "later valid spawn must recover after setup failures")
-print("ENDLESS_WALL_CONTACT_PASS: four players; mixed front capped at four; Hull32; boss policy; six native setup/cleanup failures")
+print("ENDLESS_WALL_CONTACT_PASS: four players; mixed tactical front capped at four; rear Hull32 and restoration; boss policy; six native setup/cleanup failures")

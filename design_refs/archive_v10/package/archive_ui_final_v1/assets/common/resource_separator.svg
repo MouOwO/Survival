@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1398" height="20" viewBox="0 0 1398 20">
+  <defs>
+    <linearGradient id="vertical-haze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#827695" stop-opacity="0"/>
+      <stop offset="0.25" stop-color="#827695" stop-opacity="0.025"/>
+      <stop offset="0.5" stop-color="#827695" stop-opacity="0.12"/>
+      <stop offset="0.75" stop-color="#827695" stop-opacity="0.025"/>
+      <stop offset="1" stop-color="#827695" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="horizontal-fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="0.035" stop-color="#FFFFFF" stop-opacity="0.65"/>
+      <stop offset="0.14" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.86" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.965" stop-color="#FFFFFF" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.18"/>
+    </linearGradient>
+    <mask id="soft-ends" x="0" y="0" width="1398" height="20">
+      <rect width="1398" height="20" fill="url(#horizontal-fade)"/>
+    </mask>
+  </defs>
+  <g mask="url(#soft-ends)">
+    <rect x="0" y="4" width="1398" height="12" fill="url(#vertical-haze)"/>
+    <path d="M0 10H1398" fill="none" stroke="#998FA9" stroke-opacity="0.55" stroke-width="1"/>
+  </g>
+</svg>

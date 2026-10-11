@@ -1,0 +1,1884 @@
+{
+  "schema": "archive_ui_final_v1_qa",
+  "status": "approved_visual_v10; portable_offline_assembly_validated; game_import_pending",
+  "canvas": [
+    1672,
+    941
+  ],
+  "visual_approved_by_user": true,
+  "user_visual_accepted": true,
+  "game_imported": false,
+  "backend_connected": false,
+  "item_count": 23,
+  "preview_data_only": true,
+  "other_category_data_supplied": false,
+  "shared_layout_locked": true,
+  "sidebar_hitboxes_non_overlapping": true,
+  "grid": [
+    8,
+    8,
+    7
+  ],
+  "icon_size": [
+    120,
+    120
+  ],
+  "row_y": [
+    247,
+    421,
+    595
+  ],
+  "row_step": 174,
+  "assets": {
+    "manifest_asset_count": 61,
+    "missing_paths": [],
+    "hash_mismatches": [],
+    "external_runtime_paths": [],
+    "all_paths_exist": true,
+    "all_copied_assets_match_hashes": true,
+    "all_runtime_paths_inside_package": true,
+    "font_license_exists": true
+  },
+  "pixel_comparison_to_approved_v10": {
+    "normal": {
+      "reference_exists": true,
+      "matches": true,
+      "changed_pixels": 0,
+      "total_pixels": 1573352,
+      "max_channel_difference": 0,
+      "mean_absolute_channel_difference": 0.0,
+      "difference_bbox": null,
+      "actual_pixel_sha256": "f76fe1c905b01fc76c2c646a6bb702db86ef304e05d7da9f25c94f5a55bc0e64",
+      "reference_pixel_sha256": "f76fe1c905b01fc76c2c646a6bb702db86ef304e05d7da9f25c94f5a55bc0e64"
+    },
+    "hover": {
+      "reference_exists": true,
+      "matches": true,
+      "changed_pixels": 0,
+      "total_pixels": 1573352,
+      "max_channel_difference": 0,
+      "mean_absolute_channel_difference": 0.0,
+      "difference_bbox": null,
+      "actual_pixel_sha256": "5dbceba860ab256479669db7b99f73851426fcf9721fc78ef58c402d9366def2",
+      "reference_pixel_sha256": "5dbceba860ab256479669db7b99f73851426fcf9721fc78ef58c402d9366def2"
+    }
+  },
+  "all_text_fits": true,
+  "text_fit": [
+    {
+      "id": "virtual_01_quantity",
+      "text": "115/320",
+      "bbox": [
+        432,
+        254,
+        533,
+        276
+      ],
+      "ink_size": [
+        62,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_01_name",
+      "text": "幻象树枝",
+      "bbox": [
+        415,
+        372,
+        545,
+        407
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_02_quantity",
+      "text": "15/320",
+      "bbox": [
+        570,
+        254,
+        671,
+        276
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_02_name",
+      "text": "贪婪金币",
+      "bbox": [
+        553,
+        372,
+        683,
+        407
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_03_quantity",
+      "text": "118/320",
+      "bbox": [
+        707,
+        254,
+        808,
+        276
+      ],
+      "ink_size": [
+        62,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_03_name",
+      "text": "虚无砖块",
+      "bbox": [
+        690,
+        372,
+        820,
+        407
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_04_quantity",
+      "text": "16/320",
+      "bbox": [
+        846,
+        254,
+        947,
+        276
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_04_name",
+      "text": "粘稠之泥",
+      "bbox": [
+        829,
+        372,
+        959,
+        407
+      ],
+      "ink_size": [
+        72,
+        19
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_05_quantity",
+      "text": "13/320",
+      "bbox": [
+        984,
+        254,
+        1085,
+        276
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_05_name",
+      "text": "虚空箭头",
+      "bbox": [
+        967,
+        372,
+        1097,
+        407
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_06_quantity",
+      "text": "13/330",
+      "bbox": [
+        1122,
+        254,
+        1223,
+        276
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_06_name",
+      "text": "阴暗附着",
+      "bbox": [
+        1105,
+        372,
+        1235,
+        407
+      ],
+      "ink_size": [
+        72,
+        19
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_07_quantity",
+      "text": "15/330",
+      "bbox": [
+        1262,
+        254,
+        1363,
+        276
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_07_name",
+      "text": "阴影碎布",
+      "bbox": [
+        1245,
+        372,
+        1375,
+        407
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_08_quantity",
+      "text": "13",
+      "bbox": [
+        1400,
+        254,
+        1501,
+        276
+      ],
+      "ink_size": [
+        20,
+        14
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_08_name",
+      "text": "空明碎甲",
+      "bbox": [
+        1383,
+        372,
+        1513,
+        407
+      ],
+      "ink_size": [
+        72,
+        19
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_09_quantity",
+      "text": "—/330",
+      "bbox": [
+        432,
+        428,
+        533,
+        450
+      ],
+      "ink_size": [
+        51,
+        20
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_09_name",
+      "text": "虚空护罩",
+      "bbox": [
+        415,
+        546,
+        545,
+        581
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_10_quantity",
+      "text": "16/310",
+      "bbox": [
+        570,
+        428,
+        671,
+        450
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_10_name",
+      "text": "大魔之锤",
+      "bbox": [
+        553,
+        546,
+        683,
+        581
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_11_quantity",
+      "text": "16/330",
+      "bbox": [
+        707,
+        428,
+        808,
+        450
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_11_name",
+      "text": "虚无之盾",
+      "bbox": [
+        690,
+        546,
+        820,
+        581
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_12_quantity",
+      "text": "14/340",
+      "bbox": [
+        846,
+        428,
+        947,
+        450
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_12_name",
+      "text": "坚韧甲壳",
+      "bbox": [
+        829,
+        546,
+        959,
+        581
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_13_quantity",
+      "text": "15/340",
+      "bbox": [
+        984,
+        428,
+        1085,
+        450
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_13_name",
+      "text": "动力齿轮",
+      "bbox": [
+        967,
+        546,
+        1097,
+        581
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_14_quantity",
+      "text": "14/305",
+      "bbox": [
+        1122,
+        428,
+        1223,
+        450
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_14_name",
+      "text": "无形之斧",
+      "bbox": [
+        1105,
+        546,
+        1235,
+        581
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_15_quantity",
+      "text": "12/170",
+      "bbox": [
+        1262,
+        428,
+        1363,
+        450
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_15_name",
+      "text": "弦类道具",
+      "bbox": [
+        1245,
+        546,
+        1375,
+        581
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_16_quantity",
+      "text": "12",
+      "bbox": [
+        1400,
+        428,
+        1501,
+        450
+      ],
+      "ink_size": [
+        20,
+        14
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_16_name",
+      "text": "能类道具",
+      "bbox": [
+        1383,
+        546,
+        1513,
+        581
+      ],
+      "ink_size": [
+        72,
+        19
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_17_quantity",
+      "text": "—/130",
+      "bbox": [
+        432,
+        602,
+        533,
+        624
+      ],
+      "ink_size": [
+        51,
+        20
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_17_name",
+      "text": "相位之力",
+      "bbox": [
+        415,
+        720,
+        545,
+        755
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_18_quantity",
+      "text": "12/290",
+      "bbox": [
+        570,
+        602,
+        671,
+        624
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_18_name",
+      "text": "虚空炼金",
+      "bbox": [
+        553,
+        720,
+        683,
+        755
+      ],
+      "ink_size": [
+        72,
+        19
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_19_quantity",
+      "text": "15/215",
+      "bbox": [
+        707,
+        602,
+        808,
+        624
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_19_name",
+      "text": "腐蚀魔能",
+      "bbox": [
+        690,
+        720,
+        820,
+        755
+      ],
+      "ink_size": [
+        72,
+        19
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_20_quantity",
+      "text": "12/350",
+      "bbox": [
+        846,
+        602,
+        947,
+        624
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_20_name",
+      "text": "膨胀药剂",
+      "bbox": [
+        829,
+        720,
+        959,
+        755
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_21_quantity",
+      "text": "12/320",
+      "bbox": [
+        984,
+        602,
+        1085,
+        624
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_21_name",
+      "text": "梦魇狂躁",
+      "bbox": [
+        967,
+        720,
+        1097,
+        755
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_22_quantity",
+      "text": "14/320",
+      "bbox": [
+        1122,
+        602,
+        1223,
+        624
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_22_name",
+      "text": "虚无之终",
+      "bbox": [
+        1105,
+        720,
+        1235,
+        755
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_23_quantity",
+      "text": "15/320",
+      "bbox": [
+        1262,
+        602,
+        1363,
+        624
+      ],
+      "ink_size": [
+        53,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "virtual_23_name",
+      "text": "虚无之眠",
+      "bbox": [
+        1245,
+        720,
+        1375,
+        755
+      ],
+      "ink_size": [
+        72,
+        18
+      ],
+      "fits": true
+    },
+    {
+      "id": "project_title",
+      "text": "苟发育",
+      "bbox": [
+        191,
+        40,
+        293,
+        79
+      ],
+      "ink_size": [
+        93,
+        31
+      ],
+      "fits": true
+    },
+    {
+      "id": "page_title",
+      "text": "虚空之影",
+      "bbox": [
+        417,
+        134,
+        576,
+        178
+      ],
+      "ink_size": [
+        152,
+        37
+      ],
+      "fits": true
+    },
+    {
+      "id": "top_0",
+      "text": "宝物",
+      "bbox": [
+        379,
+        49,
+        428,
+        74
+      ],
+      "ink_size": [
+        42,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "top_1",
+      "text": "存档",
+      "bbox": [
+        522,
+        54,
+        580,
+        80
+      ],
+      "ink_size": [
+        42,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "top_2",
+      "text": "抽奖",
+      "bbox": [
+        686,
+        49,
+        737,
+        74
+      ],
+      "ink_size": [
+        42,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "top_3",
+      "text": "商城",
+      "bbox": [
+        854,
+        49,
+        907,
+        74
+      ],
+      "ink_size": [
+        42,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "top_4",
+      "text": "每日奖励",
+      "bbox": [
+        1006,
+        48,
+        1091,
+        75
+      ],
+      "ink_size": [
+        84,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "top_5",
+      "text": "排行榜",
+      "bbox": [
+        1182,
+        48,
+        1250,
+        75
+      ],
+      "ink_size": [
+        63,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_01",
+      "text": "通关存档",
+      "bbox": [
+        156,
+        133,
+        372,
+        172
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_02",
+      "text": "虚空之影",
+      "bbox": [
+        156,
+        180,
+        372,
+        223
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_03",
+      "text": "地图等级",
+      "bbox": [
+        156,
+        231,
+        372,
+        270
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_04",
+      "text": "上班福利",
+      "bbox": [
+        156,
+        278,
+        372,
+        315
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_05",
+      "text": "福利礼包",
+      "bbox": [
+        156,
+        323,
+        372,
+        362
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_06",
+      "text": "神兵碎片",
+      "bbox": [
+        156,
+        370,
+        372,
+        409
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_07",
+      "text": "秘法牢笼",
+      "bbox": [
+        156,
+        417,
+        372,
+        454
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_08",
+      "text": "BOSS存档",
+      "bbox": [
+        156,
+        462,
+        372,
+        500
+      ],
+      "ink_size": [
+        105,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_09",
+      "text": "积分道具",
+      "bbox": [
+        156,
+        508,
+        372,
+        546
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_10",
+      "text": "商城道具",
+      "bbox": [
+        156,
+        554,
+        372,
+        592
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_11",
+      "text": "无尽存档",
+      "bbox": [
+        156,
+        600,
+        372,
+        638
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_12",
+      "text": "钓鱼存档",
+      "bbox": [
+        156,
+        646,
+        372,
+        684
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_13",
+      "text": "存档建筑",
+      "bbox": [
+        156,
+        692,
+        372,
+        731
+      ],
+      "ink_size": [
+        92,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_14",
+      "text": "我的前男友",
+      "bbox": [
+        156,
+        739,
+        372,
+        777
+      ],
+      "ink_size": [
+        115,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_15",
+      "text": "我的前女友",
+      "bbox": [
+        156,
+        785,
+        372,
+        823
+      ],
+      "ink_size": [
+        115,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "sidebar_16",
+      "text": "神兽",
+      "bbox": [
+        156,
+        831,
+        372,
+        875
+      ],
+      "ink_size": [
+        46,
+        23
+      ],
+      "fits": true
+    },
+    {
+      "id": "filter_all_text",
+      "text": "全部",
+      "bbox": [
+        740,
+        151,
+        790,
+        177
+      ],
+      "ink_size": [
+        42,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "filter_owned_text",
+      "text": "已拥有",
+      "bbox": [
+        870,
+        151,
+        941,
+        178
+      ],
+      "ink_size": [
+        63,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "filter_unowned_text",
+      "text": "未解锁",
+      "bbox": [
+        1008,
+        151,
+        1086,
+        179
+      ],
+      "ink_size": [
+        63,
+        21
+      ],
+      "fits": true
+    },
+    {
+      "id": "gold_text",
+      "text": "2,881",
+      "bbox": [
+        1248,
+        97,
+        1311,
+        126
+      ],
+      "ink_size": [
+        50,
+        19
+      ],
+      "fits": true
+    },
+    {
+      "id": "purple_gem_text",
+      "text": "320",
+      "bbox": [
+        1369,
+        97,
+        1415,
+        126
+      ],
+      "ink_size": [
+        33,
+        15
+      ],
+      "fits": true
+    },
+    {
+      "id": "ticket_text",
+      "text": "20",
+      "bbox": [
+        1477,
+        97,
+        1506,
+        126
+      ],
+      "ink_size": [
+        22,
+        15
+      ],
+      "fits": true
+    }
+  ],
+  "tooltip_text_fits": true,
+  "tooltip": {
+    "width": 320,
+    "height": 198,
+    "state": "已拥有",
+    "text_fit": [
+      {
+        "id": "title_0",
+        "text": "粘稠之泥",
+        "ink_size": [
+          88,
+          22
+        ],
+        "fits": true,
+        "panel_position": [
+          22,
+          19
+        ]
+      },
+      {
+        "id": "state",
+        "text": "虚空之影 · 已拥有",
+        "ink_size": [
+          127,
+          16
+        ],
+        "fits": true,
+        "panel_position": [
+          22,
+          52
+        ]
+      },
+      {
+        "id": "effect_caption",
+        "text": "道具效果",
+        "ink_size": [
+          60,
+          15
+        ],
+        "fits": true,
+        "panel_position": [
+          22,
+          95
+        ]
+      },
+      {
+        "id": "effect_0",
+        "text": "墙每秒生命 +1",
+        "ink_size": [
+          108,
+          17
+        ],
+        "fits": true,
+        "panel_position": [
+          22,
+          121
+        ]
+      },
+      {
+        "id": "quantity_label",
+        "text": "持有数量",
+        "ink_size": [
+          60,
+          16
+        ],
+        "fits": true,
+        "panel_position": [
+          22,
+          154
+        ]
+      },
+      {
+        "id": "quantity",
+        "text": "16 / 320",
+        "ink_size": [
+          61,
+          17
+        ],
+        "fits": true,
+        "panel_position": [
+          237,
+          154
+        ]
+      }
+    ],
+    "all_text_fits": true
+  },
+  "tooltip_layout_cases": [
+    {
+      "case": "owned",
+      "width": 320,
+      "height": 198,
+      "state": "已拥有",
+      "text_fit": [
+        {
+          "id": "title_0",
+          "text": "粘稠之泥",
+          "ink_size": [
+            88,
+            22
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            19
+          ]
+        },
+        {
+          "id": "state",
+          "text": "虚空之影 · 已拥有",
+          "ink_size": [
+            127,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            52
+          ]
+        },
+        {
+          "id": "effect_caption",
+          "text": "道具效果",
+          "ink_size": [
+            60,
+            15
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            95
+          ]
+        },
+        {
+          "id": "effect_0",
+          "text": "墙每秒生命 +1",
+          "ink_size": [
+            108,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            121
+          ]
+        },
+        {
+          "id": "quantity_label",
+          "text": "持有数量",
+          "ink_size": [
+            60,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            154
+          ]
+        },
+        {
+          "id": "quantity",
+          "text": "16 / 320",
+          "ink_size": [
+            61,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            237,
+            154
+          ]
+        }
+      ],
+      "all_text_fits": true
+    },
+    {
+      "case": "unowned",
+      "width": 320,
+      "height": 198,
+      "state": "未解锁",
+      "text_fit": [
+        {
+          "id": "title_0",
+          "text": "粘稠之泥",
+          "ink_size": [
+            88,
+            22
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            19
+          ]
+        },
+        {
+          "id": "state",
+          "text": "虚空之影 · 未解锁",
+          "ink_size": [
+            127,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            52
+          ]
+        },
+        {
+          "id": "effect_caption",
+          "text": "道具效果",
+          "ink_size": [
+            60,
+            15
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            95
+          ]
+        },
+        {
+          "id": "effect_0",
+          "text": "墙每秒生命 +1",
+          "ink_size": [
+            108,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            121
+          ]
+        },
+        {
+          "id": "quantity_label",
+          "text": "持有数量",
+          "ink_size": [
+            60,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            154
+          ]
+        },
+        {
+          "id": "quantity",
+          "text": "0 / 320",
+          "ink_size": [
+            52,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            246,
+            154
+          ]
+        }
+      ],
+      "all_text_fits": true
+    },
+    {
+      "case": "unknown",
+      "width": 320,
+      "height": 198,
+      "state": "—",
+      "text_fit": [
+        {
+          "id": "title_0",
+          "text": "粘稠之泥",
+          "ink_size": [
+            88,
+            22
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            19
+          ]
+        },
+        {
+          "id": "state",
+          "text": "虚空之影 · —",
+          "ink_size": [
+            95,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            52
+          ]
+        },
+        {
+          "id": "effect_caption",
+          "text": "道具效果",
+          "ink_size": [
+            60,
+            15
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            95
+          ]
+        },
+        {
+          "id": "effect_0",
+          "text": "墙每秒生命 +1",
+          "ink_size": [
+            108,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            121
+          ]
+        },
+        {
+          "id": "quantity_label",
+          "text": "持有数量",
+          "ink_size": [
+            60,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            154
+          ]
+        },
+        {
+          "id": "quantity",
+          "text": "— / 320",
+          "ink_size": [
+            58,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            240,
+            154
+          ]
+        }
+      ],
+      "all_text_fits": true
+    },
+    {
+      "case": "no_cap",
+      "width": 320,
+      "height": 198,
+      "state": "已拥有",
+      "text_fit": [
+        {
+          "id": "title_0",
+          "text": "粘稠之泥",
+          "ink_size": [
+            88,
+            22
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            19
+          ]
+        },
+        {
+          "id": "state",
+          "text": "虚空之影 · 已拥有",
+          "ink_size": [
+            127,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            52
+          ]
+        },
+        {
+          "id": "effect_caption",
+          "text": "道具效果",
+          "ink_size": [
+            60,
+            15
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            95
+          ]
+        },
+        {
+          "id": "effect_0",
+          "text": "墙每秒生命 +1",
+          "ink_size": [
+            108,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            121
+          ]
+        },
+        {
+          "id": "quantity_label",
+          "text": "持有数量",
+          "ink_size": [
+            60,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            154
+          ]
+        },
+        {
+          "id": "quantity",
+          "text": "16",
+          "ink_size": [
+            19,
+            13
+          ],
+          "fits": true,
+          "panel_position": [
+            279,
+            154
+          ]
+        }
+      ],
+      "all_text_fits": true
+    },
+    {
+      "case": "multiline",
+      "width": 320,
+      "height": 276,
+      "state": "已拥有",
+      "text_fit": [
+        {
+          "id": "title_0",
+          "text": "粘稠之泥",
+          "ink_size": [
+            88,
+            22
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            19
+          ]
+        },
+        {
+          "id": "state",
+          "text": "虚空之影 · 已拥有",
+          "ink_size": [
+            127,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            52
+          ]
+        },
+        {
+          "id": "effect_caption",
+          "text": "道具效果",
+          "ink_size": [
+            60,
+            15
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            95
+          ]
+        },
+        {
+          "id": "effect_0",
+          "text": "仅用于离线排版检查的长描述：确认",
+          "ink_size": [
+            272,
+            18
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            121
+          ]
+        },
+        {
+          "id": "effect_1",
+          "text": "同一 Tooltip 组件会随文本换行自动",
+          "ink_size": [
+            268,
+            19
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            147
+          ]
+        },
+        {
+          "id": "effect_2",
+          "text": "增高，并把持有数量保留在底部，不",
+          "ink_size": [
+            272,
+            18
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            173
+          ]
+        },
+        {
+          "id": "effect_3",
+          "text": "写入真实游戏配置。",
+          "ink_size": [
+            153,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            199
+          ]
+        },
+        {
+          "id": "quantity_label",
+          "text": "持有数量",
+          "ink_size": [
+            60,
+            16
+          ],
+          "fits": true,
+          "panel_position": [
+            22,
+            232
+          ]
+        },
+        {
+          "id": "quantity",
+          "text": "16 / 320",
+          "ink_size": [
+            61,
+            17
+          ],
+          "fits": true,
+          "panel_position": [
+            237,
+            232
+          ]
+        }
+      ],
+      "all_text_fits": true
+    }
+  ],
+  "tooltip_placement_cases": [
+    {
+      "anchor": [
+        834,
+        247,
+        954,
+        367
+      ],
+      "panel_position": [
+        967,
+        268
+      ],
+      "fits_bounds": true,
+      "does_not_cover_anchor": true
+    },
+    {
+      "anchor": [
+        1388,
+        247,
+        1508,
+        367
+      ],
+      "panel_position": [
+        1055,
+        268
+      ],
+      "fits_bounds": true,
+      "does_not_cover_anchor": true
+    },
+    {
+      "anchor": [
+        1388,
+        595,
+        1508,
+        715
+      ],
+      "panel_position": [
+        1055,
+        616
+      ],
+      "fits_bounds": true,
+      "does_not_cover_anchor": true
+    },
+    {
+      "anchor": [
+        420,
+        595,
+        540,
+        715
+      ],
+      "panel_position": [
+        553,
+        616
+      ],
+      "fits_bounds": true,
+      "does_not_cover_anchor": true
+    }
+  ],
+  "preview_scene_runtime_use": false,
+  "quantity_plates_used": false,
+  "outer_vertical_frame_used": false,
+  "renderer_dependencies": [
+    "Python 3",
+    "Pillow 12.3.0"
+  ],
+  "requires_sibling_version_packages": false,
+  "limits": [
+    "Offline pixel agreement does not substitute for Panorama in-game validation.",
+    "Font OTF and OFL license are included; font registration must be checked in the actual Dota project.",
+    "Virtual-shadow sample data and uncertain names/counts never overwrite actual game config or save data."
+  ],
+  "passed": true,
+  "portable_rebuild": {
+    "isolated_folder_rebuild": true,
+    "source_versions_present_alongside_package": false,
+    "passed": true,
+    "normal": {
+      "reference_exists": true,
+      "matches": true,
+      "changed_pixels": 0,
+      "total_pixels": 1573352,
+      "max_channel_difference": 0,
+      "mean_absolute_channel_difference": 0.0,
+      "difference_bbox": null,
+      "actual_pixel_sha256": "f76fe1c905b01fc76c2c646a6bb702db86ef304e05d7da9f25c94f5a55bc0e64",
+      "reference_pixel_sha256": "f76fe1c905b01fc76c2c646a6bb702db86ef304e05d7da9f25c94f5a55bc0e64"
+    },
+    "hover": {
+      "reference_exists": true,
+      "matches": true,
+      "changed_pixels": 0,
+      "total_pixels": 1573352,
+      "max_channel_difference": 0,
+      "mean_absolute_channel_difference": 0.0,
+      "difference_bbox": null,
+      "actual_pixel_sha256": "5dbceba860ab256479669db7b99f73851426fcf9721fc78ef58c402d9366def2",
+      "reference_pixel_sha256": "5dbceba860ab256479669db7b99f73851426fcf9721fc78ef58c402d9366def2"
+    },
+    "all_asset_hashes_match": true,
+    "runtime_external_paths": [],
+    "font_license_present": true,
+    "sidebar_hitboxes_non_overlapping": true,
+    "delivered_preview_png_bytes_match_portable_rebuild": {
+      "page_normal.png": true,
+      "page_hover.png": true,
+      "page_normal_ui_only.png": true,
+      "page_hover_ui_only.png": true,
+      "tooltip_assembled.png": true
+    },
+    "renderer_sha256": "b6a4a8e89fc22891577b1c6d1415d574992000c9001f15cdd0fd2053f4f98450",
+    "renderer_stdout": "{\"passed\": true, \"normal_changed_pixels\": 0, \"hover_changed_pixels\": 0, \"asset_count\": 61, \"font_license_exists\": true, \"output\": \"/tmp/archive_ui_portable_final_fzi0j6eu/archive_ui_final_v1/previews\"}"
+  }
+}

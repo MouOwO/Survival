@@ -1,0 +1,276 @@
+{
+  "generated_by": "tools/map_c6/build-meteor-snapfire-ground.cjs",
+  "root": "particles/survival/skills/meteor_snapfire_ground.vpcf",
+  "native_root": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger.vpcf",
+  "outputs": [
+    "particles/survival/skills/meteor_snapfire_ground.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_light.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_outer.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_bloom.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_impact_directional.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_impact_glow.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_shockwave.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_impact_burst.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_linger_steam.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_ring.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_embers.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_flames.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_glow.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_splash_liquid.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_splash.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_splash_lava.vpcf",
+    "particles/survival/skills/meteor_snapfire_ground_ground_bubble.vpcf"
+  ],
+  "layers": [
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground.vpcf",
+      "native_sha256": "84c1e6f78265a3bafdeb0260058ff280caca6d7e21fcc254072a1277ff8f28d0",
+      "source_sha256": "b12c9a1a6c790d311494ef5a56957c0e259bf6c1899d730307e6f952de5af578",
+      "native_children": [
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_light.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_outer.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_bloom.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_directional.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_shockwave.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_burst.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger_steam.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_ring.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_embers.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_flames.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_ground_glow.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash_liquid.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash.vpcf",
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_bubble.vpcf"
+      ],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "e37a60e561ef2c7ddbce4b284f774e5094e2cd1c5cad3ccacc91dbc28cb451fc"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_light.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_light.vpcf",
+      "native_sha256": "8f197f1d0b551447b91b515d6c1bc5d92830c50a8ee611d2e154e89497a7a2f3",
+      "source_sha256": "17d03f7c371ea846b23c5089148e69b197f5b12e844e5245b2657580144bbc77",
+      "native_children": [],
+      "core_duration_layer": true,
+      "preserved_emission": true,
+      "compiled_sha256": "efc75f65cac3597d67ad50ebe23ac2d5d107cb6ececfb09bc8b2eead2c306915"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_outer.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_outer.vpcf",
+      "native_sha256": "841df1445010e7e4b040939b143b8a434de20c40cc6dc84367a412458b3081d4",
+      "source_sha256": "8c7b7d09373cf73b403a46348f8c355ba2dc4f2add29a51da85611c09516e2fb",
+      "native_children": [],
+      "core_duration_layer": true,
+      "preserved_emission": true,
+      "compiled_sha256": "0b26cd66ddcd9db3e485510dbccd2b6ee64d839e57d92ac658d2052c14292cb3"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_bloom.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_bloom.vpcf",
+      "native_sha256": "68a5be9c5f0a944e19e26b199e6834eea8aba73117f64ee0868888d82a827e42",
+      "source_sha256": "622162bf59b19707ff41ca32f255c1d952cebf9b95cd2a9b5062bf8145b452e0",
+      "native_children": [],
+      "core_duration_layer": true,
+      "preserved_emission": true,
+      "compiled_sha256": "c917b8c256c7fc9dc6dd2a1c9ce1495f3b3c78403c3f2578a4f41c01aa244bd9"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_directional.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_impact_directional.vpcf",
+      "native_sha256": "ee2d4998effe135e60361809fb4a033d591ca4331ac14481440503a8fa885f66",
+      "source_sha256": "0ef64ee2e7888da0e644722e4fcf70d7d3159c2406396e971cf25e1f001b88c5",
+      "native_children": [
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_glow.vpcf"
+      ],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "84a60adb636de2bcede3b330a8a12f615cbed15f0e2f598eb160ed07f90cbeaa"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_glow.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_impact_glow.vpcf",
+      "native_sha256": "fe0a16d6ff81e2f9c36884e7cc2f5e04f247e69edeb1127d08383dc046d7d080",
+      "source_sha256": "f8d87a90dbbe38e34f4ccbe32459b943a996aebf0d389478a9438b6ccc897804",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "098d7c9285d76dee3965cf60e09fbaf3130a0071c7cfe326d980fc86b5713d4a"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_shockwave.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_shockwave.vpcf",
+      "native_sha256": "60b279623c6b3f352494c3b37038912838fb8370a8252a711b15d80bca93b544",
+      "source_sha256": "1094739ce4a37a840824681d0f60a069d2952a2770ecde67bc44e813d942a5c3",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "2436b8205918d83dce3af499eace3f529ef2f775bb884148e9c8880060406a99"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact_burst.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_impact_burst.vpcf",
+      "native_sha256": "9e4493e71c458d2fc52db59d8873c39a5d3a6f9fb3079da9d567d60237044454",
+      "source_sha256": "50b59b1a7db8d9eb01e9f03a90ff9ee9cbb92ce5165947a8659bcd8da67db861",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "58ba4213e99b82b7170ab260cada51f01cbc30742ab7a033f24c7d54e0254a1f"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_linger_steam.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_linger_steam.vpcf",
+      "native_sha256": "f0f250aeb395ba449bfb711cbeaf4ed57e4b2cb14cec048514679089e87fe6bc",
+      "source_sha256": "0d052056b6f8c2ce59075848a33141296470b5be53c4a7e740af8eebf0cc4e67",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "249ef349e1ec8edbde43a8802898a428e9f6da251581b43d7aa17815ca5cc021"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_ring.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_ring.vpcf",
+      "native_sha256": "97c3a384350aca454956c674a0ff05d8a8a6c40ac5cc06959446c3f9bc511376",
+      "source_sha256": "419ca12c54cbcd1fcaee9538c4f707f4a05f3cd35c397940c3b9ead4cd470d95",
+      "native_children": [],
+      "core_duration_layer": true,
+      "preserved_emission": true,
+      "compiled_sha256": "6c43b940d47b67a11f748b81c4743362b658dd9f6c7bc09001477c4ad0e3dcd7"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_embers.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_embers.vpcf",
+      "native_sha256": "d6394a617eba0ee326c57cdb4c331bc66c9679b07bbc37471d80be0f248228cb",
+      "source_sha256": "2fc68d1b3a585711c8492c8f262edbd2a00354089c48405efe2a7bc28297f582",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "b88c13afdffc892b82c79ab668de336590fa9dac15642e36ec2c6bb7876badb8"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_flames.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_flames.vpcf",
+      "native_sha256": "cef41180e73f9a1df9e4f811c59a67492e069c3b72574a700d6c7187275c84b1",
+      "source_sha256": "cc91dccb6e27d69e90245563ff81f0f68af333a4f230f42e6ccd0395fe6757e1",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "a0e00568589314f74cd35b7c7afa1b72ea10e97c392a74a135317b36a3fa45f3"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_ground_glow.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_glow.vpcf",
+      "native_sha256": "1871e9989e4f48f1710163d36270f6bc060109dc747f81837c61ce0b277745b2",
+      "source_sha256": "94c4eed47fabcd7f95efa0783750954c006693335a9e2ad3f2a1b1ad69461ca6",
+      "native_children": [],
+      "core_duration_layer": true,
+      "preserved_emission": true,
+      "compiled_sha256": "0f2a24479fc17b22e6adf81cb37941f852b1d88746fec883a42dc173b9057283"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash_liquid.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_splash_liquid.vpcf",
+      "native_sha256": "2eb3314d9c75f4caf2fc998f7f0b74a0beea74efe0ad170baa05951a13164865",
+      "source_sha256": "fc7f3e1ccd4546fbae0dec474ff87e00ebb6210d69bb456f4f411e92d8c441c3",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "821db0fbbd76c54581564478427bc40ad22322fb2812195209066f9fd3948da4"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_splash.vpcf",
+      "native_sha256": "24fa42173869d130c8aaca3806d0efacb3fdb21330ca9da9707180757d1f07a4",
+      "source_sha256": "f9549d3552d3b0de33bd0c71e0278a4d0adf52b45e0754159228a93dd93596d5",
+      "native_children": [
+        "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash_lava.vpcf"
+      ],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "939b5dc09313be95ff20679facf2fcf09869d5ee077f89de1245f2be2509960f"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_splash_lava.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_splash_lava.vpcf",
+      "native_sha256": "b3089a796b5afab1c946f3a6b7562d05b19faa51f4222ebc5934717d2391a705",
+      "source_sha256": "7eb6e9d725a34cd7a36c9ae844af2cea77cf937ae4c38d839476470a203e8962",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "ff78c056d039c0a5325f5178c198d8c25c199d226463e181a4bd8a53429a6353"
+    },
+    {
+      "native_resource": "particles/units/heroes/hero_snapfire/hero_snapfire_ult_ground_bubble.vpcf",
+      "resource": "particles/survival/skills/meteor_snapfire_ground_ground_bubble.vpcf",
+      "native_sha256": "6d0ff2e5b2c0032ed58489eda9a72b949be432157e5122ce55c9e75b2df64a26",
+      "source_sha256": "35b9af71f86b64ca6bef4a7de5ba887c3ca454246a04389debf13f54fb1b933f",
+      "native_children": [],
+      "core_duration_layer": false,
+      "preserved_emission": true,
+      "compiled_sha256": "73439dc7742be301f6290a5e3075a163ebd16cc7b671613203fc6673ad5aa38b"
+    }
+  ],
+  "native_resources": [
+    "materials/particle/blob_magma.vmat",
+    "materials/particle/fire/fire_beam.vtex",
+    "materials/particle/lanaya/plasma_flame.vtex",
+    "materials/particle/lava_blasts/lava_glow.vtex",
+    "materials/particle/lava_pool_glow.vtex",
+    "materials/particle/particle_flares/particle_flare_006_white.vtex",
+    "materials/particle/particle_glow_04.vtex",
+    "materials/particle/smoke/static/static_smoke.vtex",
+    "materials/particle/snapfire/beam_magma.vtex",
+    "materials/particle/snapfire/snapfire_magma_splat_bubble.vmat",
+    "materials/particle/snapfire_magma_splat_edge.vmat",
+    "materials/particle/sparks/sparks.vtex",
+    "materials/particle/spray1/spray1.vtex",
+    "models/heroes/snapfire/fx/snapfire_pool.vmdl",
+    "models/particle/sphere.vmdl"
+  ],
+  "radius": 500,
+  "uniform_spatial_scale": 1.6666655186777162,
+  "pool_model": {
+    "maximum_xy_radius": 7.500005165953835,
+    "vertices": 230,
+    "vertex_stride": 20,
+    "sha256": "76e7691093ec17aff43e3e567484d1ea77f5d44e85139c7c5b055081f1025c3c"
+  },
+  "main_pool_native_particle_radius": 40,
+  "main_pool_derived_world_radius": 500,
+  "cp_contract": {
+    "0": "Fixed landing position",
+    "1": "Same landing position: liquid repulsion origin",
+    "3": "Same landing position: native burst origins",
+    "20": [
+      500,
+      "active damage duration (3 or 3.5)",
+      0.6
+    ],
+    "21": [
+      "active duration + 0.6",
+      0,
+      0
+    ],
+    "colors": "CP61/62 retain engine defaults, matching the current native Arcane Barrage root"
+  },
+  "lifecycle": {
+    "begin": "One complete native root per Meteor cast at the first landing",
+    "stop": "DestroyParticle(false) at damage expiry starts native endcap; ReleaseParticleIndex once",
+    "fade_seconds": 0.6,
+    "core_lifetime": "CP21.x prevents original 3s hard cutoff",
+    "model_retirement": "Native alpha fade plus radius shrink to zero: original alpha-test material remains intact",
+    "bounded_emission": "Every layer stops emission at CP20.y; every rendered layer has EndCapTimedDecay 0.6",
+    "no_lua_tick_required": true
+  },
+  "validation": {
+    "full_native_graph": 17,
+    "emission_counts_unchanged": true,
+    "materials_textures_models_colors_unchanged": true,
+    "main_pool_vertex_radius_verified": true,
+    "compiled": true,
+    "in_game_visual_verified": false,
+    "limits": "500 is the main lava model footprint; native splash, flare/bloom and flying debris keep authored relative ratios and can extend beyond the damage circle. Shader pixels and rendered endcap require live visual acceptance."
+  }
+}

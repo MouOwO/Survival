@@ -101,10 +101,32 @@ return function(source)
     assert(#orders==4 and stops==1,'actual prolonged interruption retries without Stop')
     for i=1,8 do tick() end
     assert(#orders==4,'failed recovery backs off')
-    plan={point={x=-192,y=40,z=0},claimed=false};tick()
+    plan={point={x=-192,y=40,z=0},claimed=false,waiting_blocked=true,
+        wait_face=1,wait_envelope=208,wait_radius=32};tick()
     local before=#orders
-    for i=1,60 do plan.point={x=-192,y=(i%2==0 and 120 or -40),z=0};tick() end
+    for i=1,60 do
+        plan.point={x=-192,y=(i%2==0 and 120 or -40),z=0}
+        plan.wait_inside=i%2==0
+        tick()
+    end
     assert(ai.ai_state=='waiting' and #orders==before,'blocked overflow must not repeat/redirect move orders')
+    plan.waiting_blocked=false;plan.point={x=-248,y=-40,z=0};tick()
+    assert(#orders==before+1 and ai.contact_move==plan.point,
+        'a blocked rear point recovering must send one valid waiting goal')
+    before=#orders
+    for i=1,20 do plan.point={x=-248,y=(i%2==0 and 24 or -72),z=0};tick() end
+    assert(#orders==before,'stable clear rear point must ignore nearest-lane changes')
+    plan.wait_envelope=216;tick()
+    assert(#orders==before+1,'real front-envelope change updates rear clearance once')
+    before=#orders
+    plan.wait_radius=40;tick()
+    assert(#orders==before+1,'changed rear hull updates waiting goal once')
+    before=#orders
+    plan.wait_face=2;plan.point={x=264,y=-40,z=0};tick()
+    assert(#orders==before+1,'a new waiting face receives its own rear goal')
+    before=#orders
+    for i=1,20 do tick() end
+    assert(#orders==before,'new waiting geometry remains stable')
     plan={point={x=-192,y=-40,z=0},claimed=true};tick()
     assert(ai.ai_state=='approach' and #orders==before+1,'free contact wakes waiting unit once')
     parent.p={x=-192,y=-40,z=0};tick()
@@ -136,5 +158,5 @@ return function(source)
     tick(1/30);tick(1/30)
     assert(#orders==cancelled_orders and intervals[#intervals]==.5,
         'cancelled phase frame must not send MOVE or resume a per-frame loop')
-    print('[C6_AI_CHECK] PASS per-unit FSM, 60 stable attack ticks, cooldown/stun, bounded recovery, overflow, retarget/death')
+    print('[C6_AI_CHECK] PASS per-unit FSM, 60 stable attack ticks, cooldown/stun, bounded recovery, stable overflow and clearance recovery, retarget/death')
 end

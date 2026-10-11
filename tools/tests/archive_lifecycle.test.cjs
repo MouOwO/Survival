@@ -33,7 +33,7 @@ assert.equal(cards().length,44,'the authoritative full response restores all act
 realCategories.slice(1).forEach((id,i)=>handler(snapshot(210+i,[],{category_id:id})));
 const settled=requests.length;advance(3);assert.equal(requests.length,settled,'receiving the real full category baselines ends retries');
 handler(snapshot(201,[{path:['rows','1','count'],value:3}],{delta:1,base_sequence:200}));assert.equal(cfg.ArchiveHandoff.snapshot.rows[0].count,3);
-const oldApi=api,oldHandler=handler,oldCard=cards()[0];load();assert.equal(oldApi.IsOpen(),false);assert.equal(modalDisposals,1);assert.equal(purpleDisposals,1);assert.equal(unsubscribed.length,3);
+const oldApi=api,oldHandler=handler,oldCard=cards()[0];load();assert.equal(oldApi.IsOpen(),false);assert.equal(modalDisposals,1);assert.equal(purpleDisposals,0,'retired purple shell is never adopted by the V10 controller');assert.equal(unsubscribed.length,3);
 cfg.SurvivalArchive.Open();const latest=listeners.filter(l=>l.name==='survival_archive_snapshot').at(-1).fn;latest(snapshot(300,[{id:'new',name:'实际新记录',count:1,target:10,completed:0}]));
 const newCards=cards().length,requestCount=requests.length;oldHandler(snapshot(999,[]));oldApi.Refresh(true);oldCard.events.onmouseover();advance(.25);
 assert.equal(cards().length,newCards,'a retired subscriber cannot clear replacement categories/cards');assert.equal(cfg.ArchiveHandoff.snapshot.rows[0].id,'new');assert.equal(requests.length,requestCount,'retired subscriptions, APIs and timers cannot emit requests');

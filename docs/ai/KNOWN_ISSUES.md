@@ -133,16 +133,36 @@ Last Reviewed: 2026-08-27
 **Last Verified:** 2026-09-26；4项Lua5.1、攻击范围契约及静态检查通过，未完成Workshop验收。
 ## ISSUE-ENDLESS-VISUAL-CYCLE-20261009
 
-**Status:** DESIGN_READY_NOT_IMPLEMENTED
+**Status:** IMPLEMENTED_WAITING_GAME_TEST
 
 **Priority:** P2
 
-**Symptom:** 无尽怪每波都用同一套影魔模型，无法区分波次。
+**Symptom:** 用户发现无尽怪仍使用原固定影魔模型，要求把设计接入游戏。
 
-**Known Cause:** archive_endless_rules默认固定model_path，archive_endless_service.spawn_next一直读取规则模型，不读取任何波次视觉表。
+**Known Cause:** 20261009交付仅设计，archive_endless_service没有读取视觉表；20261011已修为每波解析独立200外观配置。
 
-**Current Workaround:** 50主体×4外观、1000波展开与固定201后1.5倍设计表已交付；本次用户最后要求先设计表格，没有把资源检查冒充实机换装。
+**Current Workaround:** 50主体、11原生四套、39自定义几何方案已接入，所有209模型入口开局预载；201之后固定1.5，旧属性CSV与hull保持。完整装配随移动及尸体父跟随、取消与失败清理已连到生产服务。
 
-**Next Action:** 将设计接入独立视觉resolver和预载，11原生套装走完整同骨架装配；39自定义方案需补纯父跟随分支并逐模型校准挂点、角度、比例，之后实际验证1/51/101/151/201/401等波。不得改数值、碰撞或因视觉循环扩展现有1000波属性上限。
+**Next Action:** 用户退出当前局并重新载入地图，先看1/2不同怪，再验证51/101/151饰品、175司夜主体、201/401固定放大，目测饰物贴合、部件缩放和移动/攻击动画。没有用Lua夹具证明真实骨骼缩放或镜头观感。
 
-**Last Verified:** 2026-10-09；50主体文件及idle/run/attack、1780递归资源无缺失；200外观签名与1000展开表通过静态核对，游戏换装尚未实施。
+**Last Verified:** 2026-10-11；1811资源依赖无缺失，真实生产路径401波55472检查、2920出生回归、玩法连续性、预载成功及新晶簇失败封闭、城墙与饰物生命周期通过。实际游戏画面尚待用户测试。
+
+## ISSUE-COOPERATIVE-ARCHIVE-REWARDS-20261011
+
+**Status:** CODE_READY_DEPLOYMENT_PENDING
+
+**Priority:** P1
+
+**Symptom:** 联机无尽/挑战只有发起者获奖；按账号随机导致基础物品不一致。
+
+**Known Cause:** 原complete_wave/killed只record源玩家，后台HMAC包含account；VIP与月卡权益不同。
+
+**Current Workaround:** 源码新增获胜队伍首成功事件fanout、账号独立命令、共享基础随机和保存交接barrier，用户确认只沿用月卡额外、不新增VIP倍率。211联机检查、32真实worker后端测试及相关回归通过。每日/持有满额的个人实收可能少于基础结果，遵循原上限。
+
+**Next Action:** 配套发布Python后台和新immutable bundle后同步运行hash，再真人四人检验相同基础掉落、个人月卡加成、提前finish、无尽重复层去重和失败重试。当前仅隔离测试包准备，未改运行hash/真实账号，不能称云端已经生效。
+
+**Last Verified:** 2026-10-11；隔离测试通过，云端和实机联机尚未验收。旧spawn_cost夹具失败已用任务前service复现同断言，原有UI尾空格保留。
+
+## 2026-10-11 提交检查补充
+
+相关 UI 测试已更新到当前 V10/native scene 入口，删除布局引用、构建 scope 依赖及旧 XML 尾空格已处理。无尽生成器的 Windows CRLF --check 误报已修复，严格内容校验保留。上述检查不替代实机 UI、怪物外观或联机验收；共享奖励云端配套发布状态仍是 CODE_READY_DEPLOYMENT_PENDING。

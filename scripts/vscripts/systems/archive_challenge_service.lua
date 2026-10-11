@@ -6,6 +6,7 @@ local rule = require("config/generated/archive_challenge_rules").by_id.default
 local context = require("systems/player_context_service")
 local wave = require("systems/wave_system")
 local archive = require("systems/archive_service")
+local cooperative_rewards = require("systems/archive_cooperative_reward_service")
 local scheduler = require("core/scheduler")
 local hub_placement = require("systems/archive_hub_placement")
 local M = {}
@@ -15,6 +16,7 @@ local deadline, ended, expired = nil, false, false
 local TIMER_ID = "archive_challenge_phase_timer"
 local SAVE_TIMER_ID = "archive_challenge_save_barrier"
 local settling, winner_sent = false, false
+local finalization_started = false
 local function valid(unit) return unit and not unit:IsNull() end
 local function now() return GameRules:GetGameTime() end
 function M.phase_snapshot()
@@ -172,6 +174,13 @@ local function cleanup(state)
     state.hubs = {}
 end
 local function finish_when_saved()
+    -- Do not close archive enqueue while a team event has yet to hand off an
+    -- account intent (e.g. an unexpected pre-enqueue provider exception).
+    if cooperative_rewards.has_pending() then return true end
+    if not finalization_started then
+        finalization_started = true
+        if archive.begin_finalization then archive.begin_finalization() end
+    end
     for id in pairs(players) do
         if archive.has_pending(id) then return true end
     end
@@ -194,7 +203,6 @@ local function end_phase(timed_out)
         if not ok then print("[ArchiveChallenge] final cleanup failed: " .. tostring(reason)) end
     end
     settling = true
-    if archive.begin_finalization then archive.begin_finalization() end
     publish_phase()
     if finish_when_saved() then
         for id in pairs(players) do
@@ -290,6 +298,7 @@ function M.begin(payload)
         return { ok = true, keep_running = true }
     end
     if not payload.player_ids or #payload.player_ids == 0 then return { ok = false } end
+    cooperative_rewards.begin(payload.player_ids, payload.difficulty_id)
     active = true
     print("[ArchiveChallenge] begin difficulty=" .. tostring(payload.difficulty_id)
         .. " players=" .. tostring(#payload.player_ids))
@@ -355,7 +364,8 @@ local function killed(payload)
     bosses[id] = nil
     meta.state.active_boss = nil
     require("systems/monster_hero_visual_service").on_death(meta.unit)
-    archive.record_challenge(meta.state.player_id, meta.challenge_id, meta.sequence, meta.state.difficulty_id)
+    cooperative_rewards.record_challenge(meta.state.player_id, meta.challenge_id,
+        meta.sequence, meta.state.difficulty_id)
     publish(meta.state)
 end
 local function finish_if_all()
@@ -428,10 +438,12 @@ function M.precache(precache_context)
     end
 end
 function M.init()
+    cooperative_rewards.init()
     players, hubs, bosses = {}, {}, {}
     sequence, active = 0, false
     deadline, ended, expired = nil, false, false
     settling, winner_sent = false, false
+    finalization_started = false
     scheduler.cancel(SAVE_TIMER_ID)
     scheduler.cancel(TIMER_ID)
     bus.handle_request("archive.challenge_state", M.phase_snapshot)

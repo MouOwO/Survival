@@ -69,7 +69,10 @@ assert(calls["particles/survival_earth_line/survival_earth_line_chaos_meteor.vpc
     "Earth Line must retain the complete rolling meteor and native trail")
 assert(calls["particles/basic_projectile/basic_projectile_explosion.vpcf"] == nil,
     "the retired Earth Line explosion must not be precached")
-assert(calls["particles/survival/skills/meteor_lava.vpcf"]==1)
+assert(calls["particles/survival/skills/meteor_snapfire_ground.vpcf"]==1,
+    "the complete meteor Snapfire ground graph must be precached once")
+assert(calls["particles/survival/skills/meteor_lava.vpcf"]==nil,
+    "the retired simple lava sprite must not be precached")
 for _, path in ipairs({
     "particles/units/heroes/hero_snapfire/snapfire_lizard_blobs_arced.vpcf",
     "particles/units/heroes/hero_snapfire/hero_snapfire_ultimate_impact.vpcf",

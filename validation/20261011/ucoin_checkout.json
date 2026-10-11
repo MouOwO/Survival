@@ -1,0 +1,141 @@
+{
+  "task": "ucoin_item_cash_checkout",
+  "date": "2026-10-11",
+  "status": "deployed",
+  "u_coin_per_yuan": 1000,
+  "release": "20261011-payment02",
+  "release_archive_sha256": "4465b2f451cf2efd2fa68d5847fbbd849bd53d67be382b04e49cd9bd862b9f34",
+  "local_tests": {
+    "python": 60,
+    "existing_node_scripts": 5,
+    "node_ucoin_and_v10": 10,
+    "lua_payment_transport": "passed"
+  },
+  "postgres_rollback_tests": {
+    "fixtures_rolled_back": true,
+    "skus": 24,
+    "passed": true,
+    "gateway_called": false
+  },
+  "backup": "/var/backups/goufayu-payment/game-and-payments-20261011T013750Z.dump",
+  "game_api_restarted": false,
+  "remote": {
+    "release": "20261011-payment02",
+    "payment_active": "active",
+    "catalog_hash": "6a9bb5d72b9ce943dbb503553e8eda1ac7d246487b4d50619d88d974a99cac1d",
+    "http_catalog_verified": true,
+    "public_https_catalog_verified": true,
+    "ucoin_products": 24,
+    "u_coin_per_yuan": 1000,
+    "all_cash_amounts_and_rewards_match": true,
+    "wechat": true,
+    "alipay": true,
+    "order_counts": [
+      [
+        "closed",
+        9
+      ],
+      [
+        "delivered",
+        3
+      ]
+    ],
+    "test_account_count": 1,
+    "real_orders_created": 0,
+    "game_api_healthy": true,
+    "sample": {
+      "sku": "video_p001",
+      "u_coin_price": 1200,
+      "amount_fen": 120
+    }
+  },
+  "browser": {
+    "kind": "production_component_browser_preview",
+    "server_connected": false,
+    "real_orders_created": 0,
+    "wechat": {
+      "price": "1200 U币 / ¥1.20，1元=1000U币",
+      "button": "微信购买 1200 U币",
+      "enabled": true,
+      "errors": []
+    },
+    "alipay": {
+      "price": "1200 U币 / ¥1.20，1元=1000U币",
+      "button": "支付宝购买 1200 U币",
+      "enabled": true,
+      "errors": []
+    },
+    "recorded": {
+      "calls": [
+        "catalog",
+        "catalog"
+      ],
+      "errors": []
+    }
+  },
+  "compile_success": true,
+  "compile_backup": [
+    "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093004_023_91dcdc51",
+    "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093618_247_4a50406e"
+  ],
+  "sources": [
+    {
+      "relative": "scripts/custom_game/commerce_remaining_5d5c1152eb.js",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\commerce_remaining_5d5c1152eb.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\scripts\\custom_game\\commerce_remaining_5d5c1152eb.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\commerce_remaining_5d5c1152eb.vjs_c",
+      "isImage": false,
+      "sourceHash": "1288951EE19A67AAC9F16E8211475E58B1D90496DD49CBD44A96571A12569D72",
+      "contentExisted": true,
+      "runtimeExisted": true,
+      "sourceBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093004_023_91dcdc51\\source\\scripts\\custom_game\\commerce_remaining_5d5c1152eb.js",
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093004_023_91dcdc51\\content\\scripts\\custom_game\\commerce_remaining_5d5c1152eb.js",
+      "runtimeBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093004_023_91dcdc51\\runtime\\scripts\\custom_game\\commerce_remaining_5d5c1152eb.vjs_c",
+      "compiledHash": "27E73D7EC0A5CE4A2D4B8A6D92E2A57D794DEAD1885968AF5AA33EA626CE0B3D",
+      "artifactBytes": 18027,
+      "artifactWriteUtc": "2026-10-11T01:30:04.4409731Z",
+      "compileStartedUtc": "2026-10-11T01:30:04.0982218Z",
+      "verified": true
+    },
+    {
+      "relative": "scripts/custom_game/common/commerce_components.js",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\common\\commerce_components.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\scripts\\custom_game\\common\\commerce_components.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\common\\commerce_components.vjs_c",
+      "isImage": false,
+      "sourceHash": "67804C4B266423CA113E30C139CB362DBFAFA9DDE53FC302AEB730CA07DB5ED0",
+      "contentExisted": true,
+      "runtimeExisted": true,
+      "sourceBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093004_023_91dcdc51\\source\\scripts\\custom_game\\common\\commerce_components.js",
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093004_023_91dcdc51\\content\\scripts\\custom_game\\common\\commerce_components.js",
+      "runtimeBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093004_023_91dcdc51\\runtime\\scripts\\custom_game\\common\\commerce_components.vjs_c",
+      "compiledHash": "079147562F384CDC17CC914671A393E1BBD32AE5647F55A055428FE8F6A77FE8",
+      "artifactBytes": 13080,
+      "artifactWriteUtc": "2026-10-11T01:30:04.831492Z",
+      "compileStartedUtc": "2026-10-11T01:30:04.5172487Z",
+      "verified": true
+    },
+    {
+      "relative": "scripts/custom_game/payment_test.js",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\payment_test.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\Survival\\panorama\\scripts\\custom_game\\payment_test.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\payment_test.vjs_c",
+      "isImage": false,
+      "sourceHash": "340BB6FE13137568D97F412B3180DF9C3DF302D43C022EF0A3ABE3B65CF4E2BF",
+      "contentExisted": true,
+      "runtimeExisted": true,
+      "sourceBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093618_247_4a50406e\\source\\scripts\\custom_game\\payment_test.js",
+      "contentBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093618_247_4a50406e\\content\\scripts\\custom_game\\payment_test.js",
+      "runtimeBackup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\menus_v10\\compile_20261011_093618_247_4a50406e\\runtime\\scripts\\custom_game\\payment_test.vjs_c",
+      "compiledHash": "BAD440E1371EEDF41D18DADFE06D8127A30A4E51F740087B2A018E80255388BF",
+      "artifactBytes": 29587,
+      "artifactWriteUtc": "2026-10-11T01:36:18.6434246Z",
+      "compileStartedUtc": "2026-10-11T01:36:18.319445Z",
+      "verified": true
+    }
+  ],
+  "real_payment_test": "not_performed",
+  "native_game_payment_acceptance": "not_performed",
+  "git_committed": false,
+  "git_pushed": false
+}

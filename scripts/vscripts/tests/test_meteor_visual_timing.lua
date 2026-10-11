@@ -44,7 +44,7 @@ ParticleManager={CreateParticle=function(_,name,attach,owner)
     local callback=create_reenter;create_reenter=nil;if callback then callback(id) end
     return id
 end,SetParticleControl=function(_,id,cp,value)
-    if fail_control and cp==1 then error("fixture: CP failure") end
+    if fail_control and cp==fail_control then error("fixture: CP failure") end
     if particles[id].name==impact_path and control_mode then
         if control_mode=="false" or (control_mode=="cp3_false" and cp==3) then return false end
         if control_mode=="throw" or (control_mode=="cp3_throw" and cp==3) then error("fixture: Phoenix CP failure") end
@@ -61,6 +61,8 @@ end,ReleaseParticleIndex=function(_,id)
     if release_mode=="throw" then error("fixture: release failure") end
     if release_mode=="false" then return false end
 end}
+-- This test checks engine particle IDs; viewer filtering has its own suite.
+package.loaded["systems/combat_effect_visibility"]={manager=function() return ParticleManager end}
 local bus=require("core/event_bus");bus.reset()
 bus.handle_request(require("combat/combat_events").DEAL_REQUEST,function(p)
     if require_impact_before_deal and not p.tags.is_secondary_effect then
@@ -93,7 +95,7 @@ local function assert_damage_schedule(level,started_at)
             "each original impact/lava clock, damage and secondary tag remains unchanged: "..index)
     end
 end
-local lava="particles/survival/skills/meteor_lava.vpcf"
+local lava="particles/survival/skills/meteor_snapfire_ground.vpcf"
 assert(impact_visual.duration()==8,"full native seven-second tail has an eight-second cleanup bound")
 assert(impact_visual.spec().maximum_radius==500)
 for level=1,5 do assert(definition.trigger_chance[level]==0.12 and definition.radius[level]==500) end
@@ -139,8 +141,13 @@ for level=1,5 do
         end
         if p.name==lava then
             lavas=lavas+1;lava_id=id
-            assert(p.controls[1].x==500 and p.controls[1].y==(level==5 and 3.5 or 3),
+            assert(p.controls[1].x==128 and p.controls[1].y==192 and p.controls[1].z==384
+                and p.controls[3]==p.controls[1],"native liquid repulsion stays at the actual impact point")
+            local duration=level==5 and 3.5 or 3
+            assert(p.controls[20].x==500 and p.controls[20].y==duration,
                 "one ground visual covers through the final meteor's own lava expiry")
+            assert(p.controls[20].z==0.6 and math.abs(p.controls[21].x-duration-0.6)<0.0001,
+                "ground material receives the active duration plus a bounded smooth fade")
         end
     end
     assert(impacts==1 and lavas==(level>=2 and 1 or 0))
@@ -156,6 +163,10 @@ for level=1,5 do
         assert(lava_count==1,"same-cast meteors must not create duplicate coplanar lava systems")
     end
     advance(3.9)
+    if lava_id then
+        assert(particles[lava_id].destroy==1 and particles[lava_id].release==1
+            and not particles[lava_id].immediate,"completed lava uses an engine endcap, never an immediate cut")
+    end
     local total=0;for _,hit in ipairs(damage) do total=total+hit.amount end
     assert(#damage==(level==1 and 1 or level==5 and 8 or 4))
     assert(total==(level==1 and 300 or level==5 and 1080 or 600),"tier damage totals unchanged")
@@ -186,9 +197,10 @@ for level=1,5 do
 end
 require_impact_before_deal=false
 -- Effect allocation/control errors are presentation failures only.
-for _,failure in ipairs({impact,lava,fly,"control"}) do
+for _,failure in ipairs({impact,lava,fly,"control", "control20", "control21"}) do
     clock=10;damage={};local first=#particles+1
-    fail_particle=failure;fail_control=failure=="control"
+    fail_particle=failure
+    fail_control=({control=1,control20=20,control21=21})[failure]
     assert(service._test.runners.proto_meteor(context(2),definition))
     advance(10);advance(10.4);advance(11.4);advance(12.4);advance(13.4);advance(16)
     assert(#damage==4,"missing visual must preserve explosion and all three DoT ticks")

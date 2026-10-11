@@ -92,6 +92,10 @@
 !/scripts/vscripts/tests/test_wall_contact_deadlock.lua
 !/scripts/vscripts/tests/test_wall_contact_crowd.lua
 !/scripts/vscripts/tests/test_wall_contact_alignment.lua
+!/scripts/vscripts/tests/test_wall_four_faces.lua
+!/scripts/vscripts/tests/test_wall_contact_exit.lua
+!/scripts/vscripts/tests/test_enemy_range_spawn_policy.lua
+!/scripts/vscripts/tests/test_enemy_range_declaration.lua
 !/scripts/vscripts/tests/manual_wall_crowd_contacts.lua
 !/scripts/vscripts/tests/wall_crowd_probe_modifier.lua
 !/scripts/vscripts/tests/test_enemy_wall_boundary_ai.lua
@@ -500,3 +504,8 @@ __pycache__/
 
 # Shared training fixture required by the worker attack-cap regression suite.
 !/scripts/vscripts/tests/test_worker_leader_refresh.lua
+
+# Local standalone app and reproducible V10 preview/capture output.
+/apps/comfy-dashboard/
+/design_refs/archive_v10/work/
+/design_refs/menus_v10/work/

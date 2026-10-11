@@ -3,6 +3,9 @@ local events = require("core/events")
 local scheduler = require("core/scheduler")
 local phase_guard = require("systems/gameplay_phase_guard")
 local config = require("systems/archive_endless_config")
+local cooperative_rewards = require("systems/archive_cooperative_reward_service")
+local visual_config = require("systems/archive_endless_visual_config")
+local visual_service = require("visual/endless_monster_visual_service")
 local rules = config.rules
 local M = {}
 local runs, enemies, changed = {}, {}, nil
@@ -48,7 +51,10 @@ local function cleanup(run)
         enemies[id] = nil
         if valid(unit) then
             unit.survival_wave_cleanup = true
-            require("systems/monster_hero_visual_service").clear(unit)
+        end
+        visual_service.clear(unit)
+        require("systems/monster_hero_visual_service").clear(unit)
+        if valid(unit) then
             UTIL_Remove(unit)
         end
     end
@@ -69,8 +75,7 @@ local function stop(run, reason)
     publish(run, true)
     -- Ending a challenge must not leave its last completed waves waiting for
     -- the next periodic online batch.
-    local archive = require("systems/archive_service")
-    if archive.flush_endless_rewards then archive.flush_endless_rewards(run.player_id) end
+    cooperative_rewards.flush_endless_rewards()
 end
 function M.cancel(id, reason)
     if M.is_running(id) then stop(runs[id], reason or "主动结束") end
@@ -86,7 +91,7 @@ local function complete_wave(run)
         or run.wave_cleared then return end
     local ok, score = pcall(function()
         local next_score = run.score + config.score(run.wave)
-        require("systems/archive_service").record_endless_wave(run.player_id, run.wave, run.difficulty)
+        cooperative_rewards.record_endless_wave(run.player_id, run.wave, run.difficulty)
         return next_score
     end)
     if not ok then
@@ -113,13 +118,14 @@ local function spawn_next(run)
     local unit, spawn_error = require("systems/wave_system").spawn_challenge_monster({
         health = run.row.health, attack = run.row.attack, war3_armor = run.row.war3_armor,
         attack_speed = rules.attack_speed,
-    }, { unit_name = "npc_survival_wave_monster", model_path = rules.model_path,
-        model_scale = rules.model_scale, movement_type = "ground", attack_type = "melee",
+    }, { unit_name = "npc_survival_wave_monster", model_path = run.visual.model_path,
+        model_scale = run.visual.model_scale, movement_type = "ground", attack_type = "melee",
         move_speed = rules.move_speed, attack_range = rules.attack_range, endless = true }, run.player_id)
     if not valid(unit) then error(spawn_error or "无尽怪物生成失败") end
     -- A spawn-event subscriber can end the run before the factory returns.
     if runs[run.player_id] ~= run or run.status ~= "running" then
         unit.survival_wave_cleanup = true
+        visual_service.clear(unit)
         require("systems/monster_hero_visual_service").clear(unit)
         UTIL_Remove(unit)
         run.creating = false
@@ -131,7 +137,19 @@ local function spawn_next(run)
     run.remaining = run.remaining + 1
     run.pending = run.pending - 1
     run.spawning = run.pending > 0
-    unit.survival_display_name = "无尽第" .. run.wave .. "波"
+    unit.survival_display_name = "无尽第" .. run.wave .. "波 · " .. run.visual.display_name
+    -- Own the unit before dressing it: failed or reentrant assembly must be
+    -- cleaned with the run. A factory listener can already have killed it.
+    if not unit.IsAlive or unit:IsAlive() then
+        local applied, visual_error = visual_service.apply(unit, run.visual)
+        if not applied then error(visual_error or "无尽怪物外观装配失败") end
+    end
+    if runs[run.player_id] ~= run or run.status ~= "running" then
+        visual_service.clear(unit)
+        run.creating = false
+        return false, run.reason
+    end
+    if not valid(unit) then error("无尽怪物装配过程中已失效") end
     if unit.SetDeathXP then unit:SetDeathXP(0) end
     if unit.SetMinimumGoldBounty then unit:SetMinimumGoldBounty(0) end
     if unit.SetMaximumGoldBounty then unit:SetMaximumGoldBounty(0) end
@@ -173,6 +191,11 @@ local function spawn_wave(run, number)
     local row = config.wave(run.difficulty, number)
     if not row then stop(run, "已完成全部配置波次"); return true end
     run.wave, run.row, run.remaining, run.units = number, row, 0, {}
+    -- Resolve once for the whole wave, keeping all five births identical and
+    -- leaving countdowns and death notifications free of model work.
+    local visual, visual_error = visual_config.resolve(number)
+    if not visual then error(visual_error or "无尽怪物外观配置缺失") end
+    run.visual = visual
     run.generation = (run.generation or 0) + 1
     run.pending = math.max(1, math.floor(tonumber(rules.monsters_per_wave) or 5))
     run.wave_cleared = false
@@ -228,6 +251,7 @@ killed = function(payload)
     if run.status ~= "running" or not check_deadline(run) then return end
     enemies[id], run.units[id] = nil, nil
     run.remaining = run.remaining - 1
+    visual_service.on_death(meta.unit)
     require("systems/monster_hero_visual_service").on_death(meta.unit)
     complete_wave(run)
     publish(run)

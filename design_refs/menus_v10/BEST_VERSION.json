@@ -1,0 +1,145 @@
+{
+  "version": "menus_v10_shared_20261010",
+  "at": "2026-10-10T15:40:37.648Z",
+  "visualBase": "archive_v10 approved assets/layout1672x941",
+  "sourceCheckpoint": "output/menus_v10/best_20261010/source",
+  "compileReport": "work/compile.json",
+  "nativeCompilePassed": true,
+  "sourceHashes": [
+    {
+      "path": "panorama/src/scripts/custom_game/common/menu_v10.js",
+      "sha256": "428f50018c4d2d02179366d33346698ea1d2a764e0c34d85e9febb918047e5aa"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/common/purple_shell.js",
+      "sha256": "7c388470c97145b376298397d9632e5f566e1a8a723695f0c036ed84da8fd4fc"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/archive_v10.js",
+      "sha256": "6c71520bea08f20153641c56faef3570e1849ff8f914a102a29c871f528abcf9"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js",
+      "sha256": "47811400c1c612a449aa94f0895817fa7bbea129110ae85afc0c42c5a189ea17"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/archive_handoff_180de7e38b.js",
+      "sha256": "0da4c07ae14f28ba71cbbdc64f3cfc315850ae120ee6290a4e6bc3ea0f5f3e5b"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/shop_remaining_5d5c1152eb.js",
+      "sha256": "fff12fba05e59f89a18b47091cd8907a81c8c5d1dbc5209f69862b9b7af56fb8"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/shop_tooltip_remaining_5d5c1152eb.js",
+      "sha256": "a67f562d6b9f69fb863a349615d9404617c0e00bb1edf389063e84f408ea6524"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/common/commerce_components.js",
+      "sha256": "a44b6db4b01da6869542b9ec121de2e27cad7eeb0a3a7b67c23c176f1f790b3d"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js",
+      "sha256": "f3edbcdc9a38cec1d6cce7fc944a2a5be366fc0638f6b1939e1517e267c8c03e"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/commerce_wallet.js",
+      "sha256": "57b14b07a90c21b53de59ee3f73b19e2bdba9201924c5714d030cab5da1ece75"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/payment_test.js",
+      "sha256": "bf1008263791c0617c15c5f5a2b56c742f2fbecbca3a1bc048c0c0168ae84594"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/menu_purple.js",
+      "sha256": "ef3482ccd72da08fb7780ea818bf1271575786fe55dbe54044185c33fee82e52"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/lottery_handoff_bb9968eef7.js",
+      "sha256": "53d88182972a1b4b343c0706cae328900b761658c0189b5616ac4c7109346354"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js",
+      "sha256": "4a7820773b246e60f88498950c96cee802ba6ddf81c2f7fe866e2597f308a2fb"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/lottery_cinematic_v1.js",
+      "sha256": "afe98141151b3c17253dd1d7e7c2594ac116710cda986a722fe8f5fd86f3179d"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/treasure_history.js",
+      "sha256": "e37f00e68f3d1fb9b1f87e821c9a563579fbc65c011d0dea15d1b9b4d797dc40"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/daily_remaining_5d5c1152eb.js",
+      "sha256": "6fe36314baf8c4a2e52adab69d31cec3f6f4a7d5aed9b94dd0e4a40729963a60"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/vip_window.js",
+      "sha256": "80641c03063a54e8334e306c99d6fcd13cf5780939d21f2be5125b282bdb6391"
+    },
+    {
+      "path": "panorama/src/styles/custom_game/common/menu_v10.css",
+      "sha256": "fc001540027fdbef432b9ede5c194b1177f2b96b745cb78e3f23706165f6261b"
+    },
+    {
+      "path": "panorama/src/styles/custom_game/menus_v10_commerce.css",
+      "sha256": "c44f26c43267d0bd9af9e687a5b8df2209d4f9f7af7f41248d2bc20ff63e20fb"
+    },
+    {
+      "path": "panorama/src/styles/custom_game/menus_v10_lottery.css",
+      "sha256": "53bdd559cd548b0e130debf440035a6cb25e9474ef5bffbb0f0d463881e81f20"
+    },
+    {
+      "path": "panorama/src/styles/custom_game/menus_v10_archive_pages.css",
+      "sha256": "b18e309323b2205edc023831c8ded4a05c3297d29929833c91ccce86bda0d247"
+    },
+    {
+      "path": "panorama/src/layout/custom_game/archive.xml",
+      "sha256": "2700667984c9465cdd604df229dc5a3e05f589628237176a6ee6e2b82ee7ef32"
+    },
+    {
+      "path": "panorama/src/layout/custom_game/survival_hud.xml",
+      "sha256": "aa44c7fca24770a76aa43aa1b8d7321bf464d2261328c457b4f3c91d0fe735ca"
+    },
+    {
+      "path": "panorama/src/layout/custom_game/payment_test.xml",
+      "sha256": "d1c0efb464b65059ca485ea1f2660734b07fdd5bc00b2eac904c32fa5bf2b1a7"
+    }
+  ],
+  "browserValidation": {
+    "report": "work/final/report.json",
+    "pages": 9,
+    "resolutions": 4,
+    "navigationTransitions": 5,
+    "detailStates": 9
+  },
+  "nativeValidation": {
+    "pages": [
+      "archive clear",
+      "archive shadow"
+    ],
+    "screenshots": [
+      "work/native/archive_clear.png",
+      "work/native/archive_shadow.png"
+    ],
+    "pending": [
+      "shop",
+      "commerce",
+      "treasure",
+      "lottery",
+      "daily",
+      "vip",
+      "exchange",
+      "checkout"
+    ],
+    "reason": "Updated controllers initialize without JS exceptions. Repeated fresh survival tools matches enter defeat on N1 confirmation; F9 reports pause unavailable in postgame. Other final menus cannot be captured in game. Component preview remains runnable."
+  },
+  "git": {
+    "committed": false,
+    "pushed": false,
+    "reason": "Current request is UI adaptation; submission not requested."
+  },
+  "retiredContent": "work/retired_content.json",
+  "gallery": "gallery.html"
+}

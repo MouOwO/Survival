@@ -10,6 +10,7 @@ local wave_builder = require("systems/wave_difficulty_builder")
 local spawn_sequence = require("systems/wave_spawn_sequence")
 local archive_definitions = require("config/generated/archive_challenge_definitions")
 local endless_rules = require("config/generated/archive_endless_rules")
+local endless_visuals = require("systems/archive_endless_visual_config")
 
 local M = {}
 local FIRST_WAVE, LAST_WAVE = 1, 10
@@ -123,6 +124,9 @@ local function build_manifest()
     end
     local endless = endless_rules.by_id.default
     if endless and endless.enabled ~= false then add_definition(endless) end
+    for _, resource in ipairs(endless_visuals.resources()) do
+        extras[#extras + 1] = resource
+    end
 
     local resources = preload.resources_for_assets(sorted_keys(asset_ids),
         preload.resources_for_models(sorted_keys(model_paths), extras))

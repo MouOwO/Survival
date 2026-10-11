@@ -3,6 +3,10 @@ local M = {}
 
 M["achievement_definitions"] = require("config/generated/achievement_definitions")
 M["altar_actions"] = require("config/generated/altar_actions")
+M["archive_cooperative_reward_rules"] = require("config/generated/archive_cooperative_reward_rules")
+M["archive_endless_visual_components"] = require("config/generated/archive_endless_visual_components")
+M["archive_endless_visual_ornaments"] = require("config/generated/archive_endless_visual_ornaments")
+M["archive_endless_visuals"] = require("config/generated/archive_endless_visuals")
 M["arrow_tower_base"] = require("config/generated/arrow_tower_base")
 M["asset_activity_modifiers"] = require("config/generated/asset_activity_modifiers")
 M["asset_bodygroups"] = require("config/generated/asset_bodygroups")

@@ -13,6 +13,10 @@ Panel.prototype.Play=function(){this.playing=true;};Panel.prototype.Stop=functio
 `);
 suite+=`
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;root.actualuiscale_y=1;
+// Production films occupy the fixed V10 right-content region. Window fitting
+// scales that entire region uniformly; the movie's logical size stays stable.
+nodes.LotteryMainCanvas.AddClass('LotteryV10');
+config.SurvivalPurpleLottery={Apply:function(){},Content:()=>nodes.LotteryMainCanvas,Fit:function(){config.SurvivalUI.Fit(nodes.LotteryMainCanvas,root,1672,941,{reference:[1672,941]});config.LotteryCinematic.Resize(1113,669);return true;}};
 ui.Open();events.ui_lottery_snapshot(snapshot('map',20));
 const n=requests.length;
 events.ui_lottery_result({ok:1,request_id:'film1',pool_id:'map',count:10,results:results(10)});
@@ -26,7 +30,7 @@ for(const [width,height,uiScale] of [[3440,1440,1],[1024,768,1.25],[1600,900,1.5
  advance(.3);
  assert.equal(nodes.LotteryCinematicMovie,playingMovie,'resize keeps the current movie');
  assert(playingMovie.playing);
- const w=width/uiScale,h=height/uiScale;
+ const w=1113,h=669;
  const mw=parseFloat(playingMovie.style.width),mh=parseFloat(playingMovie.style.height);
  assert(mw<=w+.01&&mh<=h+.01,'resized film stays entirely inside the viewport');
  assert(Math.abs(mw-w)<.01||Math.abs(mh-h)<.01,'film fills one axis');

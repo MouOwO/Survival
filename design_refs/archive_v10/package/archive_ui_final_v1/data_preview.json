@@ -1,0 +1,767 @@
+[
+  {
+    "id": "virtual_01",
+    "name": "幻象树枝",
+    "preview_quantity": "115/320",
+    "current": 115,
+    "cap": 320,
+    "row": 1,
+    "column": 1,
+    "icon_asset": "virtual_01",
+    "icon_bbox": [
+      420,
+      247,
+      540,
+      367
+    ],
+    "quantity_bbox": [
+      432,
+      254,
+      533,
+      276
+    ],
+    "name_bbox": [
+      415,
+      372,
+      545,
+      407
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_02",
+    "name": "贪婪金币",
+    "preview_quantity": "15/320",
+    "current": 15,
+    "cap": 320,
+    "row": 1,
+    "column": 2,
+    "icon_asset": "virtual_02",
+    "icon_bbox": [
+      558,
+      247,
+      678,
+      367
+    ],
+    "quantity_bbox": [
+      570,
+      254,
+      671,
+      276
+    ],
+    "name_bbox": [
+      553,
+      372,
+      683,
+      407
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_03",
+    "name": "虚无砖块",
+    "preview_quantity": "118/320",
+    "current": 118,
+    "cap": 320,
+    "row": 1,
+    "column": 3,
+    "icon_asset": "virtual_03",
+    "icon_bbox": [
+      695,
+      247,
+      815,
+      367
+    ],
+    "quantity_bbox": [
+      707,
+      254,
+      808,
+      276
+    ],
+    "name_bbox": [
+      690,
+      372,
+      820,
+      407
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_04",
+    "name": "粘稠之泥",
+    "preview_quantity": "16/320",
+    "current": 16,
+    "cap": 320,
+    "row": 1,
+    "column": 4,
+    "icon_asset": "virtual_04",
+    "icon_bbox": [
+      834,
+      247,
+      954,
+      367
+    ],
+    "quantity_bbox": [
+      846,
+      254,
+      947,
+      276
+    ],
+    "name_bbox": [
+      829,
+      372,
+      959,
+      407
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_05",
+    "name": "虚空箭头",
+    "preview_quantity": "13/320",
+    "current": 13,
+    "cap": 320,
+    "row": 1,
+    "column": 5,
+    "icon_asset": "virtual_05",
+    "icon_bbox": [
+      972,
+      247,
+      1092,
+      367
+    ],
+    "quantity_bbox": [
+      984,
+      254,
+      1085,
+      276
+    ],
+    "name_bbox": [
+      967,
+      372,
+      1097,
+      407
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_06",
+    "name": "阴暗附着",
+    "preview_quantity": "13/330",
+    "current": 13,
+    "cap": 330,
+    "row": 1,
+    "column": 6,
+    "icon_asset": "virtual_06",
+    "icon_bbox": [
+      1110,
+      247,
+      1230,
+      367
+    ],
+    "quantity_bbox": [
+      1122,
+      254,
+      1223,
+      276
+    ],
+    "name_bbox": [
+      1105,
+      372,
+      1235,
+      407
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_07",
+    "name": "阴影碎布",
+    "preview_quantity": "15/330",
+    "current": 15,
+    "cap": 330,
+    "row": 1,
+    "column": 7,
+    "icon_asset": "virtual_07",
+    "icon_bbox": [
+      1250,
+      247,
+      1370,
+      367
+    ],
+    "quantity_bbox": [
+      1262,
+      254,
+      1363,
+      276
+    ],
+    "name_bbox": [
+      1245,
+      372,
+      1375,
+      407
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_08",
+    "name": "空明碎甲",
+    "preview_quantity": "13",
+    "current": 13,
+    "cap": null,
+    "row": 1,
+    "column": 8,
+    "icon_asset": "virtual_08",
+    "icon_bbox": [
+      1388,
+      247,
+      1508,
+      367
+    ],
+    "quantity_bbox": [
+      1400,
+      254,
+      1501,
+      276
+    ],
+    "name_bbox": [
+      1383,
+      372,
+      1513,
+      407
+    ],
+    "notes": [
+      "母图只显示当前数量；未出现上限，不补写分母。",
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_09",
+    "name": "虚空护罩",
+    "preview_quantity": "—/330",
+    "current": null,
+    "cap": 330,
+    "row": 2,
+    "column": 1,
+    "icon_asset": "virtual_09",
+    "icon_bbox": [
+      420,
+      421,
+      540,
+      541
+    ],
+    "quantity_bbox": [
+      432,
+      428,
+      533,
+      450
+    ],
+    "name_bbox": [
+      415,
+      546,
+      545,
+      581
+    ],
+    "notes": [
+      "分子—是明确待核对占位，不代表0。",
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_10",
+    "name": "大魔之锤",
+    "preview_quantity": "16/310",
+    "current": 16,
+    "cap": 310,
+    "row": 2,
+    "column": 2,
+    "icon_asset": "virtual_10",
+    "icon_bbox": [
+      558,
+      421,
+      678,
+      541
+    ],
+    "quantity_bbox": [
+      570,
+      428,
+      671,
+      450
+    ],
+    "name_bbox": [
+      553,
+      546,
+      683,
+      581
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_11",
+    "name": "虚无之盾",
+    "preview_quantity": "16/330",
+    "current": 16,
+    "cap": 330,
+    "row": 2,
+    "column": 3,
+    "icon_asset": "virtual_11",
+    "icon_bbox": [
+      695,
+      421,
+      815,
+      541
+    ],
+    "quantity_bbox": [
+      707,
+      428,
+      808,
+      450
+    ],
+    "name_bbox": [
+      690,
+      546,
+      820,
+      581
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_12",
+    "name": "坚韧甲壳",
+    "preview_quantity": "14/340",
+    "current": 14,
+    "cap": 340,
+    "row": 2,
+    "column": 4,
+    "icon_asset": "virtual_12",
+    "icon_bbox": [
+      834,
+      421,
+      954,
+      541
+    ],
+    "quantity_bbox": [
+      846,
+      428,
+      947,
+      450
+    ],
+    "name_bbox": [
+      829,
+      546,
+      959,
+      581
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_13",
+    "name": "动力齿轮",
+    "preview_quantity": "15/340",
+    "current": 15,
+    "cap": 340,
+    "row": 2,
+    "column": 5,
+    "icon_asset": "virtual_13",
+    "icon_bbox": [
+      972,
+      421,
+      1092,
+      541
+    ],
+    "quantity_bbox": [
+      984,
+      428,
+      1085,
+      450
+    ],
+    "name_bbox": [
+      967,
+      546,
+      1097,
+      581
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_14",
+    "name": "无形之斧",
+    "preview_quantity": "14/305",
+    "current": 14,
+    "cap": 305,
+    "row": 2,
+    "column": 6,
+    "icon_asset": "virtual_14",
+    "icon_bbox": [
+      1110,
+      421,
+      1230,
+      541
+    ],
+    "quantity_bbox": [
+      1122,
+      428,
+      1223,
+      450
+    ],
+    "name_bbox": [
+      1105,
+      546,
+      1235,
+      581
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_15",
+    "name": "弦类道具",
+    "preview_quantity": "12/170",
+    "current": 12,
+    "cap": 170,
+    "row": 2,
+    "column": 7,
+    "icon_asset": "virtual_15",
+    "icon_bbox": [
+      1250,
+      421,
+      1370,
+      541
+    ],
+    "quantity_bbox": [
+      1262,
+      428,
+      1363,
+      450
+    ],
+    "name_bbox": [
+      1245,
+      546,
+      1375,
+      581
+    ],
+    "notes": [
+      "当前母图使用泛称占位；原游戏准确名称尚待配置，不得硬编。",
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_16",
+    "name": "能类道具",
+    "preview_quantity": "12",
+    "current": 12,
+    "cap": null,
+    "row": 2,
+    "column": 8,
+    "icon_asset": "virtual_16",
+    "icon_bbox": [
+      1388,
+      421,
+      1508,
+      541
+    ],
+    "quantity_bbox": [
+      1400,
+      428,
+      1501,
+      450
+    ],
+    "name_bbox": [
+      1383,
+      546,
+      1513,
+      581
+    ],
+    "notes": [
+      "当前母图使用泛称占位；原游戏准确名称尚待配置，不得硬编。",
+      "母图只显示当前数量；未出现上限，不补写分母。",
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_17",
+    "name": "相位之力",
+    "preview_quantity": "—/130",
+    "current": null,
+    "cap": 130,
+    "row": 3,
+    "column": 1,
+    "icon_asset": "virtual_17",
+    "icon_bbox": [
+      420,
+      595,
+      540,
+      715
+    ],
+    "quantity_bbox": [
+      432,
+      602,
+      533,
+      624
+    ],
+    "name_bbox": [
+      415,
+      720,
+      545,
+      755
+    ],
+    "notes": [
+      "分子—是明确待核对占位，不代表0。",
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_18",
+    "name": "虚空炼金",
+    "preview_quantity": "12/290",
+    "current": 12,
+    "cap": 290,
+    "row": 3,
+    "column": 2,
+    "icon_asset": "virtual_18",
+    "icon_bbox": [
+      558,
+      595,
+      678,
+      715
+    ],
+    "quantity_bbox": [
+      570,
+      602,
+      671,
+      624
+    ],
+    "name_bbox": [
+      553,
+      720,
+      683,
+      755
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_19",
+    "name": "腐蚀魔能",
+    "preview_quantity": "15/215",
+    "current": 15,
+    "cap": 215,
+    "row": 3,
+    "column": 3,
+    "icon_asset": "virtual_19",
+    "icon_bbox": [
+      695,
+      595,
+      815,
+      715
+    ],
+    "quantity_bbox": [
+      707,
+      602,
+      808,
+      624
+    ],
+    "name_bbox": [
+      690,
+      720,
+      820,
+      755
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_20",
+    "name": "膨胀药剂",
+    "preview_quantity": "12/350",
+    "current": 12,
+    "cap": 350,
+    "row": 3,
+    "column": 4,
+    "icon_asset": "virtual_20",
+    "icon_bbox": [
+      834,
+      595,
+      954,
+      715
+    ],
+    "quantity_bbox": [
+      846,
+      602,
+      947,
+      624
+    ],
+    "name_bbox": [
+      829,
+      720,
+      959,
+      755
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_21",
+    "name": "梦魇狂躁",
+    "preview_quantity": "12/320",
+    "current": 12,
+    "cap": 320,
+    "row": 3,
+    "column": 5,
+    "icon_asset": "virtual_21",
+    "icon_bbox": [
+      972,
+      595,
+      1092,
+      715
+    ],
+    "quantity_bbox": [
+      984,
+      602,
+      1085,
+      624
+    ],
+    "name_bbox": [
+      967,
+      720,
+      1097,
+      755
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_22",
+    "name": "虚无之终",
+    "preview_quantity": "14/320",
+    "current": 14,
+    "cap": 320,
+    "row": 3,
+    "column": 6,
+    "icon_asset": "virtual_22",
+    "icon_bbox": [
+      1110,
+      595,
+      1230,
+      715
+    ],
+    "quantity_bbox": [
+      1122,
+      602,
+      1223,
+      624
+    ],
+    "name_bbox": [
+      1105,
+      720,
+      1235,
+      755
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  },
+  {
+    "id": "virtual_23",
+    "name": "虚无之眠",
+    "preview_quantity": "15/320",
+    "current": 15,
+    "cap": 320,
+    "row": 3,
+    "column": 7,
+    "icon_asset": "virtual_23",
+    "icon_bbox": [
+      1250,
+      595,
+      1370,
+      715
+    ],
+    "quantity_bbox": [
+      1262,
+      602,
+      1363,
+      624
+    ],
+    "name_bbox": [
+      1245,
+      720,
+      1375,
+      755
+    ],
+    "notes": [
+      "本文件只用于复现确认预览；接入时用项目实际配置、数量与效果。"
+    ],
+    "sample_only": true,
+    "category_id": "sidebar_02"
+  }
+]

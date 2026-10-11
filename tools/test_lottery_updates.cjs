@@ -2,17 +2,25 @@ const fs=require('fs'),vm=require('vm'),path=require('path');
 let suite=fs.readFileSync('tools/test_lottery_ui.js','utf8').split('ui.Open();assert.equal')[0];
 suite=suite.replace("panorama/src/layout/custom_game/lottery_window.xml","panorama/src/layout/custom_game/survival_hud.xml");
 suite=suite.replace("vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui.js','utf8'),env);",`Panel.prototype.Children=function(){return this.children;};
+Panel.prototype.DeleteAsync=function(){this.deleted=true;if(this.parent)this.parent.children=this.parent.children.filter(c=>c!==this);};
 Panel.prototype.MoveChildBefore=function(child,before){this.children.splice(this.children.indexOf(child),1);this.children.splice(this.children.indexOf(before),0,child);};
 // The XML fixture stores named panels in a flat index.
 Panel.prototype.FindChildTraverse=function(id){return nodes[id]||null;};
 ['reference_windows','ui_snapshot_cache','lottery_scene_transition','lottery_handoff_bb9968eef7','remaining_5d5c1152eb','lottery_ui_remaining_5d5c1152eb'].forEach(function(file){vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);});`);
+// These are isolated business tests. Their presentation stub delegates to the
+// actual shared fit primitive; the production V10 renderer has its own suite.
+suite+=`config.SurvivalPurpleLottery={Apply:function(){},Fit:function(){
+const viewport=config.LotteryHandoff.Viewport(),canvas=nodes.LotteryMainCanvas;
+if(!viewport){canvas.style.opacity='0';return false;}
+config.SurvivalUI.Fit(canvas,root,1672,941,{reference:[1672,941]});canvas.style.backgroundImage='none';canvas.style.opacity='1';return true;
+}};`;
 suite+=`
 function updated(pool,rev){const x=snapshot(pool);x.selected_pool.revision=rev;x.selected_pool.update_unread=true;x.selected_pool.notice_unread=true;x.selected_pool.update_notice={title:'奖励更新公告',summary:'新奖池'};x.pools=[x.selected_pool];x.items=['n','sr','ur','r','ssr'].map(q=>({id:q,name:q,quality:q,icon:'item_blink'}));return x;}
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1.15;root.actualuiscale_y=1.15;
 nodes.LotteryWindow.actuallayoutwidth=0;nodes.LotteryWindow.actuallayoutheight=0;
 ui.Open();assert.equal(requests.at(-1).p.read_action,'visit');
 const firstScale=nodes.LotteryMainCanvas.style.transform;
-assert.equal(firstScale,'scale3d('+Math.min(1920/1.15/1600,1080/1.15/900)+','+Math.min(1920/1.15/1600,1080/1.15/900)+',1)');
+assert.equal(firstScale,'scale3d('+Math.min(1920/1.15/1672,1080/1.15/941)+','+Math.min(1920/1.15/1672,1080/1.15/941)+',1)');
 assert.equal(nodes.LotteryMainCanvas.style.opacity,'1');
 nodes.LotteryWindow.actuallayoutwidth=1920;nodes.LotteryWindow.actuallayoutheight=1080;nodes.LotteryWindow.actualuiscale_x=1.15;nodes.LotteryWindow.actualuiscale_y=1.15;
 advance(.3);assert.equal(nodes.LotteryMainCanvas.style.transform,firstScale,'first frame and later frame must use the same viewport');
@@ -73,7 +81,7 @@ const currentUI=config.SurvivalLottery;
 currentUI.CloseInfo();
 events.ui_lottery_snapshot({ok:false,error:'archive_config_mismatch'});
 currentUI.Feature('details');
-assert.equal(nodes.LotteryInfoList.children.length,0);
+assert.equal(nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow')).length,0,'loading/error copy is not a reward');
 assert(nodes.LotteryInfoRules.text.includes('游戏与服务器配置版本不一致'));
 assert.equal(nodes.LotterySelectedName.text,'奖池暂时无法加载');
 assert(!nodes.LotterySingleButton.enabled,'failed loading cannot enable drawing');
@@ -85,7 +93,7 @@ assert(!nodes.LotteryInfoRules.text.includes('加载失败'));
 currentUI.SelectPool('summer');
 const failedDetailRequest=requests.at(-1).p;
 events.ui_lottery_snapshot({snapshot_scope:'details',snapshot_request_id:failedDetailRequest.snapshot_request_id,ok:false,error:'archive_config_mismatch'});
-assert.equal(nodes.LotteryInfoList.children.length,0,'failed detail tab must not retain another pool rewards');
+assert.equal(nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow')).length,0,'failed detail tab must not retain another pool rewards');
 assert(nodes.LotteryInfoRules.text.includes('游戏与服务器配置版本不一致'));
 currentUI.SelectPool('map');
 const recoveredRequest=requests.at(-1).p;

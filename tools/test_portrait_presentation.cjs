@@ -7,6 +7,7 @@ class Panel {
  constructor(id,parent){this.id=id;this.parent=parent;this.children=[];this.style={};this.hittest=true;this.hittestchildren=true;if(parent)parent.children.push(this);}
  IsValid(){return !this.removed;}
  GetParent(){return this.parent;}
+ AddClass(name){if(!this.classes)this.classes=new Set();this.classes.add(name);}
  BAscendantHasClass(name){for(let p=this;p;p=p.parent)if(p.classes&&p.classes.has(name))return true;return false;}
  FindChildTraverse(id){if(this.id===id&&!this.removed)return this;for(const c of this.children){if(c.removed)continue;const found=c.FindChildTraverse(id);if(found)return found;}return null;}
 }
@@ -95,10 +96,11 @@ console.log('PORTRAIT_HERO_PALETTE_PASS: hero colors, cosmetic identity, stale s
 const shortcutState={player:0,hero:101,selected:901,alive:true,canSelect:true,
  identity:{hero_ready:1,hero_id:'hero_monkey_king',unit_entindex:101}};
 const shortcutNames={101:'npc_dota_hero_monkey_king',102:'npc_dota_hero_juggernaut',
- 103:'npc_dota_hero_drow_ranger',901:'npc_survival_builder_proxy',902:'npc_dota_hero_axe'};
-const shortcutOwners={101:0,102:0,103:0,901:0,902:1};
+ 103:'npc_dota_hero_drow_ranger',104:'npc_dota_hero_doom_bringer',901:'npc_survival_builder_proxy',902:'npc_dota_hero_axe'};
+const shortcutOwners={101:0,102:0,103:0,104:0,901:0,902:1};
 const shortcutClicks=[],shortcutConfig={SurvivalHeroSelection:{
  CanSelect:()=>shortcutState.canSelect,Select:source=>shortcutClicks.push(source)}};
+const shortcutSceneCreations=[];
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_presentation.js','utf8'),{
  GameUI:{CustomUIConfig:()=>shortcutConfig},
  Game:{GetLocalPlayerID:()=>shortcutState.player,IsInToolsMode:()=>false},
@@ -106,10 +108,17 @@ vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/portrait_pr
  Players:{GetPlayerHeroEntityIndex:()=>shortcutState.hero,GetLocalPlayerPortraitUnit:()=>shortcutState.selected},
  Entities:{GetUnitName:entity=>shortcutNames[entity]||'',GetPlayerOwnerID:entity=>shortcutOwners[entity],
   IsValidEntity:entity=>Object.prototype.hasOwnProperty.call(shortcutNames,entity),IsAlive:()=>shortcutState.alive},
- Date:{now:()=>now},$:{Msg(){},Warning(){}}
+ Date:{now:()=>now},$:{Msg(){},Warning(){},CreatePanel(type,parent,id,attrs){
+  const created=sceneFixture(id);
+  created.scene.paneltype=type;
+  created.scene.parent=parent;parent.children.push(created.scene);
+  shortcutSceneCreations.push({...created,parent,attrs:Object.assign({},attrs)});
+  return created.scene;
+ }}
 });
 const shortcutPresentation=shortcutConfig.SurvivalPortraitPresentation;
 assert.equal(typeof shortcutPresentation.BindShortcutScene,'function','3D shortcuts share one cached scene binding helper');
+assert.equal(typeof shortcutPresentation.BindLocalHeroScene,'function','hero shortcuts expose their cached native/isolated scene selection');
 
 function sceneFixture(id){
  const calls={local:[],unit:[],clear:0};
@@ -220,3 +229,55 @@ assert.equal(replacementCorner.calls.unit.length,1,'rejected identities never bi
 assert.equal(shortcutState.selected,902,'all scene lifecycle work stays independent of current selection');
 assert(/<DOTAScenePanel\b[^>]*id="SurvivalLocalHeroPortraitImage"/.test(layout),'formal hero shortcut is an actual native 3D panel');
 console.log('HERO_CORNER_SCENE_LIFECYCLE_PASS: actual hero identity, replacement/death, guards, loading hide/reuse, node recreation, click preservation and selection isolation');
+
+// Exercise the isolated Doom camera through the same authoritative identity
+// refresh used by the actual corner button, including native hero round trips.
+const doomRoot=new Panel('DoomShortcutHud'),doomButton=new Panel('SurvivalLocalHeroPortrait',doomRoot);
+doomButton.hittestchildren=false;
+doomButton.events={};doomButton.SetPanelEvent=(event,fn)=>{doomButton.events[event]=fn;};
+const doomNative=sceneFixture('SurvivalLocalHeroPortraitImage');
+doomNative.scene.parent=doomButton;doomButton.children.push(doomNative.scene);
+doomNative.scene.hittest=false;doomNative.scene.hittestchildren=false;
+shortcutState.hero=104;shortcutState.identity={hero_ready:1,hero_id:'hero_doom_bringer',unit_entindex:104};
+shortcutState.canSelect=true;shortcutState.alive=true;
+const selectionBeforeDoom=shortcutState.selected;
+for(let tick=0;tick<300;tick++)shortcutPresentation.RefreshLocalHeroPortrait(doomRoot);
+assert.equal(shortcutSceneCreations.length,1,'300 Doom ticks create exactly one isolated portrait map');
+const isolatedDoom=shortcutSceneCreations[0];
+assert.equal(isolatedDoom.parent,doomButton);
+assert.equal(doomButton.FindChildTraverse('SurvivalLocalHeroPortraitDoomScene'),isolatedDoom.scene,'created scene belongs to the actual button subtree');
+assert.equal(isolatedDoom.scene.paneltype,'DOTAScenePanel');
+assert.deepEqual(isolatedDoom.attrs,{map:'portraits/doom_soft_a',camera:'shortcut_camera',particleonly:'false'});
+assert(isolatedDoom.scene.classes.has('ShortcutHeroPortraitScene'));
+assert.equal(isolatedDoom.scene.hittest,false);assert.equal(isolatedDoom.scene.hittestchildren,false);
+assert.equal(isolatedDoom.scene.visible,true);assert.equal(isolatedDoom.scene.style.visibility,'visible');
+assert.equal(doomNative.scene.visible,false);assert.equal(doomNative.scene.style.visibility,'collapse');
+assert.equal(doomNative.calls.unit.length,0,'Doom never loads the clipped native portrait through SetUnit');
+assert.equal(isolatedDoom.calls.unit.length,0,'isolated map is loaded through creation attributes, never SetUnit');
+assert.equal(isolatedDoom.scene.__survivalSceneLoads,1);
+assert.equal(doomButton.__survivalActiveHeroScene,isolatedDoom.scene);
+assert.equal(doomButton.hittest,true);assert.equal(doomButton.hittestchildren,false,'original parent button exclusively handles clicks');
+const clicksBeforeDoom=shortcutClicks.length;
+doomButton.events.onactivate();assert.equal(shortcutClicks.length,clicksBeforeDoom+1);
+assert.equal(shortcutClicks[shortcutClicks.length-1],'top_left_portrait','isolated camera retains the existing click entry point');
+
+shortcutState.hero=101;shortcutState.identity={hero_ready:1,hero_id:'hero_monkey_king',unit_entindex:101};
+for(let tick=0;tick<300;tick++)shortcutPresentation.RefreshLocalHeroPortrait(doomRoot);
+assert.equal(shortcutSceneCreations.length,1,'switching to Monkey King retains the hidden Doom map');
+assert.deepEqual(doomNative.calls.unit,[['npc_dota_hero_monkey_king','default',false]],'native hero still uses one cached SetUnit binding');
+assert.equal(doomNative.scene.visible,true);assert.equal(doomNative.scene.style.visibility,'visible');
+assert.equal(isolatedDoom.scene.visible,false);assert.equal(isolatedDoom.scene.style.visibility,'collapse');
+assert.equal(doomButton.__survivalActiveHeroScene,doomNative.scene);
+assert.equal(doomNative.scene.hittest,false);assert.equal(doomNative.scene.hittestchildren,false);
+
+shortcutState.hero=104;shortcutState.identity={hero_ready:1,hero_id:'hero_doom_bringer',unit_entindex:104};
+for(let tick=0;tick<300;tick++)shortcutPresentation.RefreshLocalHeroPortrait(doomRoot);
+assert.equal(shortcutSceneCreations.length,1,'returning to Doom reuses the original map across 300 further ticks');
+assert.equal(doomButton.__survivalActiveHeroScene,isolatedDoom.scene);
+assert.equal(isolatedDoom.scene.visible,true);assert.equal(isolatedDoom.scene.style.visibility,'visible');
+assert.equal(doomNative.scene.visible,false);assert.equal(doomNative.scene.style.visibility,'collapse');
+assert.equal(doomNative.calls.unit.length,1);assert.equal(isolatedDoom.calls.unit.length,0);
+assert.equal(isolatedDoom.calls.clear,0);assert.equal(isolatedDoom.scene.__survivalSceneLoads,1);
+assert.equal(isolatedDoom.scene.hittest,false);assert.equal(isolatedDoom.scene.hittestchildren,false);
+assert.equal(shortcutState.selected,selectionBeforeDoom,'scene switching never changes the current game selection');
+console.log('DOOM_CORNER_ISOLATED_SCENE_PASS: one lazy map across 300-tick Doom/Monkey/Doom round trip, no Doom SetUnit, native cache, visibility switching and noninteractive scenes');

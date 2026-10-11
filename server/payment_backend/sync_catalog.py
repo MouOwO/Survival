@@ -7,7 +7,8 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from deploy import connection,backup,GAME
-from payment_backend.csv_catalog import SOURCES,canonical,compile_catalog,rows
+from payment_backend.csv_catalog import SOURCES,canonical,rows
+from payment_backend.ucoin_catalog import COMMERCE_SOURCES,COMMERCE_TABLES,compile_payment_catalog
 
 def validate(path,digest):
     raw=Path(path).read_bytes()
@@ -17,8 +18,8 @@ def validate(path,digest):
     # The archive server deploys most definitions inside an immutable bundle,
     # not as individual CSVs. Entitlements are the explicit v4 capability set.
     bundles=GAME/'addon/server/bundles'
-    bundle_hash=json.loads((bundles/'current.json').read_text())['hash']
-    bundle=json.loads((bundles/bundle_hash/'bundle.json').read_text())
+    bundle_hash=json.loads((bundles/'current.json').read_text(encoding='utf-8'))['hash']
+    bundle=json.loads((bundles/bundle_hash/'bundle.json').read_text(encoding='utf-8'))
     for name in SOURCES[1:]:
         if Path(name).stem=='player_gameplay_stats':
             # Payment adds to existing values. New-account defaults are owned by
@@ -36,7 +37,16 @@ def validate(path,digest):
     for name,text in reference.items():
         if hashlib.sha256(text.encode()).hexdigest()!=package['reference_hashes'].get(name):
             raise ValueError('客户端与服务端基础定义不同，请先同步基础配置: '+name)
-    catalog=compile_catalog(package['tables'],reference)
+    commerce_tables=package['commerce_tables']
+    for table,name in zip(COMMERCE_TABLES,COMMERCE_SOURCES):
+        path=ROOT/'reference_csv'/name
+        text=path.read_text(encoding='utf-8-sig')
+        if commerce_tables[table].replace('\r\n','\n')!=text.replace('\r\n','\n'):
+            raise ValueError('客户端与服务端商城兑换配置不同: '+name)
+        source=path.read_bytes().replace(b'\r\n',b'\n')
+        if hashlib.sha256(source).hexdigest()!=bundle['csv_hashes'].get('data/csv/'+name):
+            raise ValueError('支付与存档服务商城兑换配置不同，请先同步商城配置: '+name)
+    catalog=compile_payment_catalog(package['tables'],commerce_tables,reference)
     if canonical(catalog)!=canonical(package['catalog']):raise ValueError('catalog_recompile_mismatch')
     if hashlib.sha256(canonical(catalog)).hexdigest()!=package['catalog_hash']:raise ValueError('catalog_hash_mismatch')
     return package
@@ -74,7 +84,8 @@ def main(action,path,digest):
         with connection() as conn:apply(conn,package)
         dest=Path('/etc/goufayu-payment/catalog_history')/package['catalog_hash']
         dest.mkdir(parents=True,exist_ok=True)
-        for name,text in package['tables'].items():(dest/(name+'.csv')).write_text(text,encoding='utf-8')
+        for name,text in {**package['tables'],**package['commerce_tables']}.items():
+            (dest/(name+'.csv')).write_text(text,encoding='utf-8')
     print(json.dumps({'catalog_hash':package['catalog_hash'],'applied':action=='apply',
         'enabled_products':sum(p['enabled'] for p in package['catalog']['products']),
         'orders_changed':0,'players_reset':0}))

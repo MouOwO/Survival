@@ -769,7 +769,7 @@ function M.precache(context)
     for _, particle in ipairs({
         "particles/survival/skills/meteor_phoenix_fall.vpcf",
         "particles/survival/skills/meteor_phoenix_impact.vpcf",
-        "particles/survival/skills/meteor_lava.vpcf",
+        "particles/survival/skills/meteor_snapfire_ground.vpcf",
     }) do
         PrecacheResource("particle", particle, context)
     end

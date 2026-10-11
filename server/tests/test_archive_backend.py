@@ -1,6 +1,7 @@
 import copy
 import subprocess
 import hashlib
+import hmac
 import json
 import os
 import shutil
@@ -9,6 +10,7 @@ import sys
 import threading
 import tempfile
 import unittest
+from unittest.mock import patch
 import importlib.util
 import urllib.request
 import urllib.error
@@ -29,7 +31,8 @@ class Database:
     def resume(self,a,i):
         op=self.ops[(a,i)]
         return copy.deepcopy({'ok':not op.get('error'),'terminal':op['done'],'done':op['done'],'error':op.get('error'),
-            'profile':self.profile(a),'command':op['command'],'has_pass':op['pass'],'response':op.get('response')})
+            'profile':self.profile(a),'command':op['command'],'has_pass':op['pass'],
+            'config_hash':op['hash'],'response':op.get('response')})
     def rpc(self,name,p):
         with self.lock:
             a=p.get('p_account',p.get('p_account_id'));i=p.get('p_id')
@@ -220,6 +223,149 @@ class ArchiveTests(unittest.TestCase):
     def test_two_players_isolated(self):
         self.send('clear',difficulty_id='n1',count=1)
         self.assertEqual(self.db.profile(self.app._database_account_id('200'))['save']['archive'],{})
+
+    def test_cooperative_challenge_base_drops_and_personal_entitlements(self):
+        self.assertTrue(self.service.shared_challenge_roll(self.bundle))
+        command = {'id': 'sharedmatch:challenge_kind:shadow_4', 'kind': 'challenge',
+                   'challenge_id': 'shadow_4', 'kill_sequence': 7, 'difficulty_id': 'n10'}
+        profiles = {}
+        # VIP and the archive pass are separate entitlements. The existing
+        # pass bonus must never be borrowed from another reward recipient.
+        for account, vip, archive_pass in [('100', True, True), ('200', False, False),
+                                            ('300', True, False), ('400', False, True)]:
+            profile = self.db.profile(self.app._database_account_id(account))
+            if vip: profile['entitlements']['vip'] = {'active': True}
+            if archive_pass: profile['entitlements']['archive_pass'] = {'active': True}
+            profiles[account] = profile
+        entitlements = {account: copy.deepcopy(profile['entitlements'])
+                        for account, profile in profiles.items()}
+        for account in ('100', '200', '300', '400'):
+            payload = {'account_id': account, 'config_hash': self.bundle.hash,
+                       'command': copy.deepcopy(command)}
+            self.assertTrue(self.service.command(payload)['ok'])
+            before = copy.deepcopy(profiles[account])
+            self.assertTrue(self.service.command(payload)['ok'])
+            self.assertEqual(profiles[account], before)
+        counts = {account: profile['save']['archive']['shadow_counts']
+                  for account, profile in profiles.items()}
+        self.assertEqual(counts['200'], counts['300'])
+        self.assertEqual(counts['100'], counts['400'])
+        self.assertEqual(sum(counts['200'].values()), 2)
+        self.assertEqual(sum(counts['100'].values()), 3)
+        for item, count in counts['200'].items():
+            self.assertGreaterEqual(counts['100'].get(item, 0), count)
+        for account, profile in profiles.items():
+            self.assertEqual(profile['entitlements'], entitlements[account])
+
+    def test_cooperative_challenge_lost_reply_and_restart_preserve_base_roll(self):
+        payload = {'account_id': '100', 'config_hash': self.bundle.hash, 'command': {
+            'id': 'lostshared:challenge_kind:shadow_1', 'kind': 'challenge',
+            'challenge_id': 'shadow_1', 'kill_sequence': 23, 'difficulty_id': 'n10'}}
+        self.db.lose_reply = True
+        with self.assertRaises(TimeoutError):
+            self.service.command(payload)
+        saved = copy.deepcopy(self.profile)
+        restarted = ArchiveService(self.app, self.bundle, self.lua)
+        self.assertTrue(restarted.command(payload)['ok'])
+        self.assertEqual(self.profile, saved)
+        teammate = copy.deepcopy(payload)
+        teammate['account_id'] = '200'
+        self.assertTrue(restarted.command(teammate)['ok'])
+        other = self.db.profile(self.app._database_account_id('200'))
+        self.assertEqual(other['save']['archive']['shadow_counts'],
+                         self.profile['save']['archive']['shadow_counts'])
+
+    def test_shared_challenge_rejects_client_reward_and_entitlement_overrides(self):
+        for field, value in [('drops', ['shadow_001']), ('roll', 0), ('has_pass', True),
+                             ('vip_level', 12), ('score', 100000), ('seed', 1)]:
+            payload = self.command('challenge', challenge_id='shadow_4', kill_sequence=11,
+                                   difficulty_id='n10', **{field: value})
+            with self.assertRaises(ArchiveError):
+                self.service.command(payload)
+        self.assertEqual(self.profile['save']['archive'], {})
+        self.assertEqual(self.db.ops, {})
+
+    def test_non_challenge_random_seeds_remain_account_specific(self):
+        original_run = subprocess.run
+        captured = []
+        def capture(*args, **kwargs):
+            captured.append(json.loads(kwargs['input']))
+            return original_run(*args, **kwargs)
+        command = {'id': 'same_social_request:draw', 'kind': 'social_draw', 'pool_id': 'friend'}
+        with patch('archive_backend.service.subprocess.run', side_effect=capture):
+            for account in ('100', '200'):
+                profile = self.db.profile(self.app._database_account_id(account))
+                profile['save']['archive']['social_tickets'] = {'yitie': 1}
+                self.assertTrue(self.service.settle(profile, copy.deepcopy(command), False)['ok'])
+        self.assertNotEqual(captured[0]['seed'], captured[1]['seed'])
+        for payload in captured:
+            scope = payload['profile']['account_id'] + ':' + command['id']
+            expected = int.from_bytes(hmac.new(self.app.account_id_pepper.encode(),
+                scope.encode(), hashlib.sha256).digest()[:4], 'big') % 2147483646 + 1
+            self.assertEqual(payload['seed'], expected)
+
+    def test_upgraded_non_challenge_keeps_existing_bundle_requirements(self):
+        bundle = Bundle(self.bundle.directory)
+        prior_hash = '1' * 64
+        bundle.compatible_config_hashes[prior_hash] = {
+            'commands': frozenset({'clear'}), 'upgrade_commands': frozenset({'clear'})}
+        self.assertFalse((bundle.directory.parent / prior_hash).exists())
+        service = ArchiveService(self.app, bundle, self.lua)
+        payload = self.command('clear', difficulty_id='n1', count=1)
+        payload['config_hash'] = prior_hash
+        self.assertTrue(service.command(payload)['ok'])
+        self.assertEqual(self.profile['save']['archive']['clear_counts']['n1'], 1)
+
+    def test_old_prepared_challenge_preserves_seed_even_when_reducer_is_upgraded(self):
+        # A distinct immutable version records the previous per-account
+        # policy. Its sources stay executable by the actual Lua worker.
+        data = json.loads((self.bundle.directory / 'bundle.json').read_bytes())
+        rule = next(row for row in data['configs']['archive_cooperative_reward_rules']['rows']
+                    if row['rule_id'] == 'default')
+        rule['shared_challenge_roll'] = False
+        raw = json.dumps(data, ensure_ascii=False, sort_keys=True,
+                         separators=(',', ':'), allow_nan=False).encode()
+        digest = hashlib.sha256(raw).hexdigest()
+        directory = self.bundle.directory.parent / digest
+        directory.mkdir(exist_ok=True)
+        for name in data['sources']:
+            destination = directory / name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes((self.bundle.directory / name).read_bytes())
+        (directory / 'bundle.json').write_bytes(raw)
+        old_bundle = Bundle(directory)
+        self.assertFalse(self.service.shared_challenge_roll(old_bundle))
+        self.assertFalse(self.service.shared_challenge_roll(type('LegacyBundle', (), {'tables': {}})()))
+        for upgraded in (False, True):
+            app = App(Database(self.bundle))
+            old_service = ArchiveService(app, old_bundle, self.lua)
+            payload = {'account_id': '100', 'config_hash': old_bundle.hash, 'command': {
+                'id': 'legacyseed' + str(upgraded) + ':challenge_kind:shadow_4', 'kind': 'challenge',
+                'challenge_id': 'shadow_4', 'kill_sequence': 35, 'difficulty_id': 'n10'}}
+            old_service.settle = lambda *args: (_ for _ in ()).throw(TimeoutError('worker stopped'))
+            with self.assertRaises(TimeoutError):
+                old_service.command(payload)
+            current_bundle = Bundle(self.bundle.directory)
+            current_bundle.compatible_config_hashes[old_bundle.hash] = {
+                'commands': frozenset({'challenge'}),
+                'upgrade_commands': frozenset({'challenge'}) if upgraded else frozenset()}
+            resumed_service = ArchiveService(app, current_bundle, self.lua)
+            captured = []
+            original_run = subprocess.run
+            def capture(*args, **kwargs):
+                captured.append(json.loads(kwargs['input']))
+                return original_run(*args, **kwargs)
+            with patch('archive_backend.service.subprocess.run', side_effect=capture):
+                self.assertTrue(resumed_service.command(payload)['ok'])
+            self.assertEqual(len(captured), 1)
+            prepared = captured[0]
+            expected_scope = prepared['profile']['account_id'] + ':' + prepared['command']['id']
+            expected_seed = int.from_bytes(hmac.new(app.account_id_pepper.encode(),
+                expected_scope.encode(), hashlib.sha256).digest()[:4], 'big') % 2147483646 + 1
+            self.assertEqual(prepared['seed'], expected_seed)
+            profile = copy.deepcopy(app.rpc_client.profile(app._database_account_id('100')))
+            self.assertTrue(resumed_service.command(payload)['ok'])
+            self.assertEqual(app.rpc_client.profile(app._database_account_id('100')), profile)
     def test_concurrent_same_receipt(self):
         payload=self.command('clear',difficulty_id='n1',count=1);results=[]
         workers=[threading.Thread(target=lambda:results.append(self.service.command(payload))) for _ in range(4)]

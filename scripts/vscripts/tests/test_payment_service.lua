@@ -1,4 +1,7 @@
 package.path='scripts/vscripts/?.lua;'..package.path
+-- Commerce has its own scheduler/runtime tests; this fixture tests the
+-- authenticated payment transport without starting an unrelated game loop.
+package.loaded['systems/commerce_service']={init=function() end}
 local handlers,sent,requests={},{},{}
 local loaded=true
 local refreshed=0
@@ -26,11 +29,13 @@ CreateHTTPRequestScriptVM=function(method,url)
 end
 local service=require('systems/payment_service');service.init();service.init()
 local handle=handlers.survival_payment_request
-handle(0,{PlayerID=0,action='create',sku='wood_100_test_50_v3',account_id='attacker',amount=1})
+handle(0,{PlayerID=0,action='create',sku='wood_100_test_50_v3',account_id='attacker',amount=1,u_coin_price=1,u_coin_per_yuan=1,amount_fen=1})
 local body=require('core/json_decoder').decode(requests[1].body)
 assert(body.account_id=='123' and body.amount==nil and body.match_session_id=='safe_session')
+assert(body.u_coin_price==nil and body.u_coin_per_yuan==nil and body.amount_fen==nil,'client cannot forward its own cash/U-coin quote')
 handle(0,{PlayerID=0,action='create',sku='wood_100_test_50_v3'});assert(#requests==1,'in-flight duplicate blocked')
-requests[1].done({StatusCode=200,Body='{"ok":true,"sku":"wood_100_test_50_v3","order_id":"WX111111111111111111111111111111","state":"pending"}'})
+requests[1].done({StatusCode=200,Body='{"ok":true,"sku":"wood_100_test_50_v3","order_id":"WX111111111111111111111111111111","state":"pending","amount_fen":120,"u_coin_price":1200,"u_coin_per_yuan":1000}'})
+assert(sent[#sent].amount_fen==120 and sent[#sent].u_coin_price==1200 and sent[#sent].u_coin_per_yuan==1000,'authenticated order quote must reach the game UI unchanged')
 handle(0,{PlayerID=0,action='status',sku='wood_100_test_50_v3',order_id='other_player_order'})
 body=require('core/json_decoder').decode(requests[2].body)
 assert(body.order_id=='WX111111111111111111111111111111')
@@ -96,10 +101,11 @@ handle(0,{PlayerID=0,action='catalog',request_id='hud_b_1'})
 assert(#requests==first,'in-flight catalog requests must coalesce')
 body=require('core/json_decoder').decode(requests[first].body)
 assert(body.account_id=='123' and body.request_id==nil,'UI correlation must not become a payment identity')
-requests[first].done({StatusCode=200,Body='{"ok":true,"catalog_hash":"v1","categories":[],"products":[{"sku":"wood_test","owned":0,"enabled":true}]}'})
+requests[first].done({StatusCode=200,Body='{"ok":true,"catalog_hash":"v1","categories":[],"products":[{"sku":"wood_test","owned":0,"enabled":true,"amount_fen":120,"u_coin_price":1200,"u_coin_per_yuan":1000}]}'})
 assert(sent[#sent-1].request_id=='hud_a_1' and sent[#sent].request_id=='hud_b_1','each waiting HUD must receive its own result')
 handle(0,{PlayerID=0,action='catalog',request_id='hud_b_2'})
 assert(#requests==first and sent[#sent].ok and sent[#sent].request_id=='hud_b_2','rapid reopen must return cached success instead of busy')
+assert(sent[#sent].products[1].amount_fen==120 and sent[#sent].products[1].u_coin_price==1200 and sent[#sent].products[1].u_coin_per_yuan==1000,'catalog cache must retain the server quote')
 clock=clock+3
 handle(0,{PlayerID=0,action='catalog',request_id='hud_b_3'})
 assert(#requests==first+1,'expired cache must check remote player state')

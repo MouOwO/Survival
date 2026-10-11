@@ -43,7 +43,7 @@ local events = require("core/events")
 bus.reset()
 bus.handle_request(events.BUILDING_QUERY_REQUEST,function(payload) return states[payload.entindex] end)
 local requests = {}
-local forced_worker_error, forced_research_error
+local forced_worker_error, forced_research_error, forced_research_code
 bus.handle_request(events.WORKER_TRAIN_REQUEST,function(payload)
     requests[#requests+1]=payload
     if forced_worker_error then return {ok=false,error=forced_worker_error} end
@@ -119,7 +119,9 @@ entities[203]=shared
 local research_requests={}
 bus.handle_request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST,function(payload)
     research_requests[#research_requests+1]=payload
-    if forced_research_error then return {ok=false,error=forced_research_error} end
+    if forced_research_error then
+        return {ok=false,error=forced_research_error,error_code=forced_research_code}
+    end
     return {ok=true,queued=true}
 end)
 local queue=assert(listeners.ui_research_queue_request)
@@ -153,6 +155,9 @@ assert(#research_requests==2 and #sent==before_research_packets)
 local cancel_requests = {}
 bus.handle_request(events.TECHNOLOGY_RESEARCH_CANCEL_REQUEST, function(payload)
     cancel_requests[#cancel_requests + 1] = payload
+    if forced_research_error then
+        return {ok=false,error=forced_research_error,error_code=forced_research_code}
+    end
     return {ok = true, refunded = true}
 end)
 local cancel_listener = assert(listeners.ui_research_cancel_request)
@@ -167,6 +172,94 @@ cancel_listener(nil, {PlayerID = 0, source_entindex = 200, job_id = "x"})
 cancel_listener(nil, {PlayerID = 0, source_entindex = 202.5, job_id = "x"})
 lab.dead = true;cancel_listener(nil, {PlayerID = 0, source_entindex = 202, job_id = "x"});lab.dead = nil
 assert(#cancel_requests == 1, "cancel route retains source ownership/alive/integer validation")
+-- Public ability metadata can be stale while the viewer's private research
+-- snapshot is current. Neither identity nor response correlation may come from
+-- a fabricated ability owner, custom player_id, or the currently selected lab.
+local function last_operation_result()
+    for index=#sent,1,-1 do
+        if sent[index].name=="ui_operation_result" then return sent[index] end
+    end
+    error("missing operation result")
+end
+research(1,203,{request_id="viewer-shared-lab",owner_entindex=202,
+    entindex=202,ability_entindex=999,player_id=0,source="ability_runtime"})
+local private_request=research_requests[#research_requests]
+local private_response=last_operation_result()
+assert(private_request.player_id==1 and private_request.source_entindex==203)
+assert(private_request.request_id=="viewer-shared-lab")
+assert(private_request.owner_entindex==nil and private_request.ability_entindex==nil
+    and private_request.entindex==nil and private_request.source=="research_queue_ui")
+assert(private_response.player==handles[1]
+    and private_response.payload.request_id=="viewer-shared-lab"
+    and private_response.payload.source_entindex==203)
+assert(private_response.payload.error=="" and (private_response.payload.error_code==nil
+    or private_response.payload.error_code==""),
+    "successful research must not retain a failure code from another request")
+local before_invalid_source=#research_requests
+research(1,202,{request_id="viewer-foreign-private-lab",owner_entindex=203})
+private_response=last_operation_result()
+assert(#research_requests==before_invalid_source
+    and private_response.player==handles[1] and private_response.payload.success==0)
+assert(private_response.payload.request_id=="viewer-foreign-private-lab"
+    and private_response.payload.source_entindex==202,
+    "a rejected private lab preserves the attempted source, never another player's selection")
+research(0,202.5,{request_id=42,owner_entindex=202})
+private_response=last_operation_result()
+assert(#research_requests==before_invalid_source and private_response.player==handles[0])
+assert(private_response.payload.request_id=="42" and private_response.payload.source_entindex==-1,
+    "invalid source identities cannot be rescued by client owner metadata")
+for _, player in ipairs({0,1}) do
+    local source=player==0 and 202 or 203
+    research(player,source,{request_id="same-client-id",player_id=1-player})
+    private_request=research_requests[#research_requests]
+    private_response=last_operation_result()
+    assert(private_request.player_id==player and private_request.source_entindex==source)
+    assert(private_response.player==handles[player]
+        and private_response.payload.request_id=="same-client-id"
+        and private_response.payload.source_entindex==source,
+        "identical request IDs from different players retain independent response identities")
+end
+forced_research_error="研究队列已满（1个研究中＋6个等待）"
+forced_research_code="research_queue_full"
+research(1,203,{request_id="viewer-queue-full"})
+private_response=last_operation_result()
+assert(private_response.player==handles[1] and private_response.payload.success==0)
+assert(private_response.payload.request_id=="viewer-queue-full"
+    and private_response.payload.source_entindex==203
+    and private_response.payload.error==forced_research_error
+    and private_response.payload.error_code==forced_research_code,
+    "localized failures must also expose their stable code to the requesting viewer")
+forced_research_error,forced_research_code="研究任务不属于该玩家","research_job_invalid"
+cancel_listener(nil,{PlayerID=1,player_id=0,source_entindex=203,owner_entindex=202,
+    job_id="0:203:7",request_id="viewer-cancel-rejected",refund_gold=99999})
+private_request=cancel_requests[#cancel_requests]
+private_response=last_operation_result()
+assert(private_request.player_id==1 and private_request.source_entindex==203
+    and private_request.request_id=="viewer-cancel-rejected"
+    and private_request.owner_entindex==nil and private_request.refund_gold==nil)
+assert(private_response.player==handles[1] and private_response.payload.success==0
+    and private_response.payload.refunded==0
+    and private_response.payload.operation=="research_cancel"
+    and private_response.payload.request_id=="viewer-cancel-rejected"
+    and private_response.payload.source_entindex==203
+    and private_response.payload.error_code=="research_job_invalid",
+    "cancel failures retain their own operation, source, identity and code")
+forced_research_error,forced_research_code=nil,nil
+local tools_mode=false
+local original_tools_mode,original_print=IsInToolsMode,print
+local diagnostic_lines={}
+IsInToolsMode=function() return tools_mode end
+print=function(message) diagnostic_lines[#diagnostic_lines+1]=tostring(message) end
+research(0,202,{request_id="release-request"})
+assert(#diagnostic_lines==0,"normal research must not print tools diagnostics")
+tools_mode=true
+research(1,203,{request_id="tools-viewer-request"})
+assert(#diagnostic_lines==2 and diagnostic_lines[1]:find("request_id=tools%-viewer%-request")
+    and diagnostic_lines[1]:find("player=1 unit=203")
+    and diagnostic_lines[2]:find("success=1 queued=1"),
+    "tools diagnostics correlate the incoming research intent with its result")
+IsInToolsMode,print=original_tools_mode,original_print
+print("RESEARCH_RESPONSE_IDENTITY_PASS: trusted player/source, independent request correlation and stable error codes")
 -- Refresh only the affected player's currently selected building. The timing
 -- fields are stable server timestamps, so the UI animates without polling.
 bus.reset()
@@ -220,7 +313,9 @@ print("RESEARCH_DESCRIPTION_CACHE_PASS: 1000 resource changes/decorations reuse 
 
 local resource_notices = {}
 bus.handle_request(events.WORKER_TRAIN_REQUEST, function() return {ok=false,error=forced_worker_error} end)
-bus.handle_request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, function() return {ok=false,error=forced_research_error} end)
+bus.handle_request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, function()
+    return {ok=false,error=forced_research_error,error_code=forced_research_code}
+end)
 bus.subscribe(events.UI_NOTIFICATION, function(payload) resource_notices[#resource_notices + 1] = payload end)
 for _, case in ipairs({{"wood_not_enough", "木材不足"}, {"gold_not_enough", "金币不足"},
     {"population_not_enough", "人口不足"}}) do
@@ -234,10 +329,14 @@ for _, case in ipairs({{"wood_not_enough", "木材不足"}, {"gold_not_enough", 
 end
 for _, case in ipairs({{"insufficient_wood", "木材不足"}, {"insufficient_gold", "金币不足"}}) do
     forced_research_error=case[1]
+    forced_research_code=case[1]
     queue(nil,{PlayerID=0,source_entindex=202,
         technology_group="lumberjack_speed",request_id="resource_reject"})
     local response=sent[#sent]
     assert(response.name=="ui_operation_result" and response.payload.success==0)
     assert(response.payload.error==case[2] and resource_notices[#resource_notices].message==case[2])
+    assert(response.payload.error_code==case[1] and response.payload.request_id=="resource_reject"
+        and response.payload.source_entindex==202,
+        "resource failures retain their stable code and original research request identity")
 end
 print("PRODUCTION_RESOURCE_ERROR_PASS: failed admissions return localized wood/gold/population feedback and notifications")

@@ -1,48 +1,25 @@
 param([switch]$CheckOnly)
 $ErrorActionPreference = 'Stop'
-$repo = Split-Path -Parent $PSScriptRoot
-$gameRoot = Split-Path -Parent (Split-Path -Parent $repo)
-$engineRoot = Split-Path -Parent $gameRoot
-$contentRoot = Join-Path $engineRoot 'content/dota_addons/Survival/panorama'
-$hud = Join-Path $contentRoot 'layout/custom_game/survival_hud.xml'
-$source = Join-Path $repo 'panorama/src'
-$files = @('scripts/custom_game/ui_layers.js', 'scripts/custom_game/lottery_ui.js', 'styles/custom_game/lottery_celestial.css', 'images/custom_game/lottery_celestial/home.png', 'images/custom_game/lottery_celestial/results.png')
-$handoff = Join-Path $source 'images/custom_game/lottery_handoff'
-$files += Get-ChildItem -LiteralPath $handoff -File -Recurse | ForEach-Object { 'images/custom_game/lottery_handoff/' + $_.FullName.Substring($handoff.Length + 1).Replace('\', '/') }
-foreach ($relative in $files) { if (-not (Test-Path -LiteralPath (Join-Path $source $relative))) { throw "Missing: $relative" } }
-$fragment = [IO.File]::ReadAllText((Join-Path $source 'layout/custom_game/lottery_window.xml'))
-[xml]$validFragment = $fragment
-$text = [IO.File]::ReadAllText($hud)
-$pattern = '(?s)<Panel id="LotteryWindow".*?(?=<Panel id="LotteryItemTooltip")'
-if ([regex]::Matches($text, $pattern).Count -ne 1) { throw 'Expected exactly one existing lottery window before tooltip' }
-$text = [regex]::Replace($text, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($match) $fragment + "`r`n        " })
-$include = '<include src="file://{resources}/styles/custom_game/lottery_celestial.css" />'
-if (-not $text.Contains($include)) { $text = $text.Replace('</styles>', ('    ' + $include + "`r`n    </styles>")) }
-$layerInclude = '<include src="file://{resources}/scripts/custom_game/ui_layers.js" />'
-if (-not $text.Contains($layerInclude)) { $text = $text.Replace('<scripts>', ('<scripts>' + "`r`n        " + $layerInclude)) }
-[xml]$validHud = $text
-foreach ($id in @('LotteryWindow','LotterySingleButton','LotteryTenButton','LotteryAgain','LotteryItemTooltip')) {
-    if ($validHud.SelectNodes("//*[@id='$id']").Count -ne 1) { throw "Missing or duplicated panel: $id" }
+# The active lottery lives inside survival_hud.xml and the V10 shared shell.
+# Keep this historical entry point compatible without restoring retired skins.
+$lotteryRepo = Split-Path -Parent $PSScriptRoot
+$lotteryScope = Join-Path $lotteryRepo 'tools/menus_v10/compile_scope.json'
+$lotteryCompiler = Join-Path $lotteryRepo 'tools/menus_v10/compile.ps1'
+$lotteryLayout = Join-Path $lotteryRepo 'panorama/src/layout/custom_game/survival_hud.xml'
+[xml]$lotteryHud = [IO.File]::ReadAllText($lotteryLayout)
+if ($lotteryHud.SelectNodes("//*[@id='LotteryWindow']").Count -ne 1) {
+    throw 'Expected exactly one active lottery panel in survival_hud.xml.'
 }
-if ($CheckOnly) { Write-Output 'LOTTERY_DEPLOY_CHECK_PASS'; exit 0 }
-# Preserve the live HUD before the scoped replacement, including unrelated user edits.
-$backupDir = Join-Path $repo 'ui/lottery_celestial/backups'
-New-Item -ItemType Directory -Force -Path $backupDir | Out-Null
-Copy-Item -LiteralPath $hud -Destination (Join-Path $backupDir ((Get-Date -Format 'yyyyMMdd_HHmmss_fff') + '_survival_hud.xml'))
-foreach ($relative in $files) {
-    $destination = Join-Path $contentRoot $relative
-    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
-    Copy-Item -LiteralPath (Join-Path $source $relative) -Destination $destination -Force
+$lotteryFiles = Get-Content -LiteralPath $lotteryScope -Raw -Encoding UTF8 | ConvertFrom-Json
+foreach ($lotteryRelative in $lotteryFiles) {
+    if (-not (Test-Path -LiteralPath (Join-Path $lotteryRepo ('panorama/src/' + $lotteryRelative)) -PathType Leaf)) {
+        throw "Missing current V10 source: $lotteryRelative"
+    }
 }
-[IO.File]::WriteAllText($hud, $text, [Text.UTF8Encoding]::new($false))
-$compiler = Join-Path $gameRoot 'bin/win64/resourcecompiler.exe'
-foreach ($file in @((Join-Path $contentRoot 'scripts/custom_game/ui_layers.js'), (Join-Path $contentRoot 'styles/custom_game/lottery_celestial.css'), (Join-Path $contentRoot 'scripts/custom_game/lottery_ui.js'), $hud)) {
-    & $compiler -i $file -game (Join-Path $gameRoot 'dota') -f
-    if ($LASTEXITCODE -ne 0) { throw "Compile failed: $file" }
+if ($lotteryFiles -notcontains 'scripts/custom_game/menu_purple.js' -or
+    $lotteryFiles -notcontains 'layout/custom_game/survival_hud.xml') {
+    throw 'The shared compile scope must include the current lottery renderer and HUD.'
 }
-# Dynamic JS image paths are not automatically discovered by the layout compiler.
-foreach ($icon in (Get-ChildItem -LiteralPath (Join-Path $contentRoot 'images/custom_game/lottery_handoff/icons') -Filter '*.svg' -File)) {
-    & $compiler -i $icon.FullName -game (Join-Path $gameRoot 'dota') -f
-    if ($LASTEXITCODE -ne 0) { throw "Icon compile failed: $($icon.Name)" }
-}
-Write-Output 'LOTTERY_PANORAMA_DEPLOY_PASS'
+if ($CheckOnly) { Write-Output 'LOTTERY_V10_DEPLOY_CHECK_PASS'; exit 0 }
+& $lotteryCompiler -Scope 'tools/menus_v10/compile_scope.json' -Report 'output/lottery_v10_deploy/compile.json'
+Write-Output 'LOTTERY_V10_PANORAMA_DEPLOY_PASS'

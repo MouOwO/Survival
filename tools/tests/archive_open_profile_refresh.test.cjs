@@ -2,13 +2,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
+const {csv} = require('../shop_ui_12h/catalog.cjs');
 
 // Exercise the manifest's complete controllers, including the real delta and
 // icon warm cache. Changing a server revision must not erase an opened view.
 const project = path.resolve(__dirname, '../..');
 const scriptDirectory = path.join(project, 'panorama/src/scripts/custom_game');
 const manifest = fs.readFileSync(path.join(project, 'panorama/src/layout/custom_game/archive.xml'), 'utf8');
-const scripts = ['ui_snapshot_cache.js', 'archive_void_v1_data.js', 'archive_void_v1.js',
+const scripts = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'archive_v10.js',
     'archive_180de7e38b_titles_compact_v6.js'];
 for (const name of scripts) assert(manifest.includes('/' + name + '"'), 'test the active manifest source: ' + name);
 
@@ -57,6 +58,23 @@ class Panel {
     SetPanelEvent(name, callback) { this.events[name] = callback; }
     SetImage(value) { metrics.images++; this.image = value; }
     SetScaling(value) { this.scaling = value; }
+    SetParent(parent) {
+        if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this);
+        this.parent = parent; parent.children.push(this);
+    }
+    MoveChildBefore(child, before) {
+        this.children = this.children.filter(value => value !== child);
+        this.children.splice(Math.max(0, this.children.indexOf(before)), 0, child);
+    }
+    GetPositionWithinWindow() {
+        const own = String(this.style.position || '0px 0px 0px').split(/\s+/).map(parseFloat);
+        const parent = this.parent ? this.parent.GetPositionWithinWindow() : {x: 0, y: 0};
+        return {x: parent.x + (own[0] || 0), y: parent.y + (own[1] || 0)};
+    }
+    get actualuiscale_x() { return 1; }
+    get actualuiscale_y() { return 1; }
+    get actuallayoutwidth() { return parseFloat(this.style.width) || 1920; }
+    get actuallayoutheight() { return parseFloat(this.style.height) || 160; }
     ScrollToTop() {}
 }
 const root = new Panel('Panel', null, 'ArchiveRoot');
@@ -65,24 +83,34 @@ const root = new Panel('Panel', null, 'ArchiveRoot');
     'ArchiveFilter_unlocked', 'ArchiveFilter_locked', 'ArchiveFilterAllLabel', 'ArchiveTooltip',
     'ArchiveTooltipStateIcon', 'ArchiveDraw', 'ArchiveTickets', 'ArchiveDrawResult', 'ArchiveDrawBar',
     'ArchiveFaith', 'ArchiveCurrencySource', 'ArchiveEmpty', 'ArchivePageTitle', 'ArchiveSummary',
-    'ArchiveContext', 'ArchiveHint', 'ArchiveStatus', 'EndlessStatus'].forEach(id => new Panel('Panel', root, id));
-let shownTooltip = null, walletBalances = {u_coin: 10, shop_points: 20, shop_gold: 30};
+    'ArchiveContext', 'ArchiveHint', 'ArchiveStatus', 'ArchiveFooter', 'ArchiveBody', 'ArchivePageHeader',
+    'ArchiveTooltipBody', 'ArchiveTooltipName', 'ArchiveTooltipStateText', 'ArchiveTooltipProgress',
+    'ArchiveTooltipCondition', 'ArchiveTooltipProgressRow', 'EndlessStatus'].forEach(id => new Panel('Panel', root, id));
+let shownTooltip = null, walletBalances = {}, walletRefreshes = 0;
 const cfg = {
     SurvivalArchiveColors: {number: '#ffd800'},
     ArchiveHandoffAssets: {'icon_check_light.png': 'check', 'icon_lock_light.png': 'lock'},
-    SurvivalCommerceWallet: {GetCatalog() { return {balances: walletBalances}; }},
+    SurvivalCommerceWallet: {
+        GetCatalog() { return {balances: walletBalances}; },
+        Refresh() { walletRefreshes++; }
+    },
     SurvivalUI: {
         ModalShell: {Adopt() { return {Open() {}, Close() {}, Dispose() {}}; }},
         NavToggle: {Adopt() {}}, ActionButton: {Adopt() {}}, Tooltip: {Adopt() {}},
         Fit() { metrics.fits++; }
     },
     ArchiveHandoff: {
-        Init() {}, HideCardText() {}, NavIcon() {}, Card() {}, Icon() {},
+        Init() {}, HideCardText() {}, NavIcon() {}, Card() {}, Icon(parent) {
+            const art = new Panel('Panel', parent); art.AddClass('ArchiveArt');
+            const image = new Panel('Image', art); image.AddClass('ArchiveRewardIcon');
+        },
         Hide() { metrics.hiddenTooltips++; shownTooltip = null; },
         Show(item, category, card) { shownTooltip = {item, category, card}; },
         ShowEffectOnly(item, card) { shownTooltip = {item, card}; },
         Observe(data) { this.snapshot = data; },
+        Progress(item) { return String(item.count === undefined ? '—' : item.count) + ' / ' + String(item.target === undefined ? '—' : item.target); },
         Unlocked(item, category) {
+            if (cfg.ArchiveV10Semantics) return cfg.ArchiveV10Semantics.State(item, category);
             if (Number(item.count_known) === 0) return null;
             if (['building', 'work', 'fragment'].includes(category)) return Number(item.level) > 0;
             if (['clear', 'endless', 'boss', 'map_level'].includes(category)) return Number(item.completed) === 1;
@@ -103,7 +131,7 @@ const context = vm.createContext({
     $: {
         GetContextPanel: () => root,
         CreatePanel: (type, parent, id) => new Panel(type, parent, id),
-        Schedule(delay, callback) {
+        Msg() {}, Schedule(delay, callback) {
             const timer = {id: ++nextTimer, delay, callback}; scheduled.push(timer); return timer;
         },
         CancelScheduled(timer) { timer.cancelled = true; },
@@ -122,8 +150,10 @@ const context = vm.createContext({
     }
 });
 for (const name of scripts) vm.runInContext(fs.readFileSync(path.join(scriptDirectory, name), 'utf8'), context, {filename: name});
-const api = cfg.SurvivalArchive, voidView = cfg.SurvivalArchiveVoidV1;
-const categories = JSON.parse(JSON.stringify(cfg.ArchiveVoidV1Data.categories));
+const api = cfg.SurvivalArchive, view = cfg.SurvivalArchiveV10;
+const categories = csv(path.join(project, 'data/csv/存档系统/archive_categories.csv')).map(row => ({
+    id: row.category_id, name: row.display_name, disabled: row.enabled === '1' ? 0 : 1, renderer: row.renderer
+}));
 const versions = {}, dataByCategory = {};
 function emit(name, payload) {
     for (const listener of (subscriptions.get(name) || []).slice()) {
@@ -170,7 +200,9 @@ function descendant(panel, className) {
     return null;
 }
 function visibleCards() { return nodes.get('ArchiveGrid').children.filter(card => card.visible && card.classes.has('ArchiveCard')); }
-function voidCards() { return nodes.get('VoidShadowGrid').children.filter(card => card.visible); }
+function voidCards() { return visibleCards().filter(card => card.__archiveCategory === 'shadow'); }
+function itemCard(id) { return visibleCards().find(card => card.__archiveItem && card.__archiveItem.id === id); }
+function tooltipText(id) { return nodes.get('ArchiveV10Tooltip' + id).text; }
 function activate(panel) { assert(panel && panel.events.onactivate, 'an active control exists'); panel.events.onactivate(); }
 function hover(panel) { assert(panel && panel.events.onmouseover, 'a hover target exists'); panel.events.onmouseover(); }
 function noRebuildOrStyle(before, label) {
@@ -193,45 +225,59 @@ snapshot('friend', [{id: 'friend_01', name: '好友', count: 0, target: 100}],
 snapshot('fragment', [{id: 'fragment_01', name: '神兵-初阶', count: 20, level: 1,
     can_promote: 1, promotion_target: 'fragment_02', promotion_cost: 20},
 {id: 'fragment_02', name: '神兵-高阶', count: 0, level: 0}]);
-api.Open(); api.SelectCategory('shadow'); immediate();
-assert.equal(voidCards().length, cfg.ArchiveVoidV1Data.catalog.length, 'the actual catalog is visible');
-assert.equal(descendant(nodes.get('VoidShadowItem_shadow_01'), 'VoidShadowCount').text, '3/430');
-const originalCards = voidCards(), originalSidebar = nodes.get('VoidShadowSidebar').children.slice();
-const firstCard = nodes.get('VoidShadowItem_shadow_01');
-const firstCount = descendant(firstCard, 'VoidShadowCount');
-hover(nodes.get('VoidShadowItem_shadow_01'));
-const initialTooltip = shownTooltip, stable = {...metrics};
+assert.equal(walletRefreshes, 0, 'Closed profile snapshots do not request a commerce catalog');
+api.Open(); immediate();
+assert.equal(walletRefreshes, 1, 'Opening the archive requests the existing read-only commerce catalog exactly once');
+function walletText(index) { return cfg.SurvivalMenuV10.Entries().find(entry => entry.panel.id === 'ArchiveWindow').resources[index].text.text; }
+for (let id = 0; id < 3; id++) {
+    assert.equal(walletText(id), '—', 'Unknown wallet values stay unknown until a real result arrives: ' + id);
+}
+api.SelectCategory('shadow'); immediate();
+assert.equal(walletRefreshes, 1, 'A category switch does not request another commerce catalog');
+assert.equal(voidCards().length, cfg.ArchiveV10Data.catalog.length, 'the actual catalog is visible');
+assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '3/430');
+const originalCards = voidCards(), originalSidebar = nodes.get('ArchiveV10Sidebar').children.slice();
+const firstCard = itemCard('shadow_01');
+const firstCount = descendant(firstCard, 'ArchiveV10Count');
+hover(firstCard); immediate();
+assert.equal(tooltipText('MetricCaption'), '拥有数量', 'The tooltip metric caption is an independent text component');
+assert.equal(tooltipText('Quantity'), '3/430', 'The tooltip quantity is independent text without alignment spaces');
+assert.equal(nodes.get('ArchiveV10TooltipQuantity').style.textAlign, 'right', 'Independent quantity is actually right aligned');
+const initialTooltip = nodes.get('ArchiveV10Tooltip'), initialEffect = tooltipText('Effect'), stable = {...metrics};
 for (let revision = 1; revision <= 1000; revision++) {
     resend('shadow', {profile_revision: revision, server_time: revision,
         unrelated_endless_score: revision * 100});
 }
 noRebuildOrStyle(stable, '1000 accepted revisions with identical visible shadow data');
+assert.equal(walletRefreshes, 1, 'One thousand accepted profile revisions do not request commerce data again');
 assert.deepEqual(voidCards(), originalCards, 'revision changes retain the native card identities');
-assert.deepEqual(nodes.get('VoidShadowSidebar').children, originalSidebar, 'revision changes retain the sidebar');
-assert.equal(shownTooltip, initialTooltip, 'unrelated revisions preserve the currently hovered tooltip');
+assert.deepEqual(nodes.get('ArchiveV10Sidebar').children, originalSidebar, 'revision changes retain the sidebar');
+assert.equal(nodes.get('ArchiveV10Tooltip'), initialTooltip, 'unrelated revisions preserve the tooltip native identity');
+assert.equal(initialTooltip.visible, true, 'unrelated revisions preserve the currently hovered tooltip');
+assert.equal(tooltipText('Effect'), initialEffect);
 
 delta('shadow', [{path: ['rows', 1, 'count'], value: 7},
     {path: ['rows', 1, 'description'], value: '木材+70'}]);
-assert.equal(descendant(nodes.get('VoidShadowItem_shadow_01'), 'VoidShadowCount').text, '7/430', 'a visible delta is not dropped after skipped revisions');
-assert.equal(nodes.get('VoidShadowItem_shadow_01'), firstCard, 'changed quantities update the existing native card');
-assert.equal(descendant(firstCard, 'VoidShadowCount'), firstCount, 'changed quantities retain their native label');
-assert.deepEqual(nodes.get('VoidShadowSidebar').children, originalSidebar, 'item changes do not rebuild unrelated navigation');
-assert.equal(shownTooltip.card, firstCard, 'a changing hovered row keeps the tooltip on the same native card');
-assert.equal(shownTooltip.item.count, 7, 'an already visible tooltip refreshes without another mouse event');
-assert.equal(shownTooltip.item.description, '木材+70');
-hover(nodes.get('VoidShadowItem_shadow_01'));
-assert.equal(shownTooltip.item.description, '木材+70', 'hover uses the latest delta row');
-assert.equal(shownTooltip.item.count, 7);
+assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '7/430', 'a visible delta is not dropped after skipped revisions');
+assert.equal(itemCard('shadow_01'), firstCard, 'changed quantities update the existing native card');
+assert.equal(descendant(firstCard, 'ArchiveV10Count'), firstCount, 'changed quantities retain their native label');
+assert.deepEqual(nodes.get('ArchiveV10Sidebar').children, originalSidebar, 'item changes do not rebuild unrelated navigation');
+assert.equal(initialTooltip.visible, true, 'a changing hovered row keeps the tooltip visible on the same native card');
+assert.equal(tooltipText('Quantity'), '7/430', 'an already visible tooltip refreshes without another mouse event');
+assert.equal(tooltipText('Effect'), '木材+70');
+hover(firstCard);
+assert.equal(tooltipText('Effect'), '木材+70', 'hover uses the latest delta row');
+assert.equal(tooltipText('Quantity'), '7/430');
 emit('survival_archive_snapshot', {ok: 1, category_id: 'shadow', sequence: versions.shadow - 1,
     chunks: 1, chunk: 1, categories, rows: [{...shadowRows[0], count: 999}]});
-assert.equal(descendant(firstCard, 'VoidShadowCount').text, '7/430', 'an older snapshot cannot roll back the accepted cache');
+assert.equal(descendant(firstCard, 'ArchiveV10Count').text, '7/430', 'an older snapshot cannot roll back the accepted cache');
 resend('shadow', {has_pass: 1});
-assert(nodes.get('ArchiveHint').text.includes('3次'), 'pass benefits remain live even when rows are unchanged');
+assert(nodes.get('ArchiveHint').text.includes('3'), 'pass benefits remain live even when rows are unchanged');
 const rows = JSON.parse(JSON.stringify(dataByCategory.shadow.rows));
 rows[0].description = '仅说明更新';
 snapshot('shadow', rows, {has_pass: 1});
-hover(nodes.get('VoidShadowItem_shadow_01'));
-assert.equal(shownTooltip.item.description, '仅说明更新', 'tooltip-only changes replace stale hover closures');
+hover(itemCard('shadow_01'));
+assert.equal(tooltipText('Effect'), '仅说明更新', 'tooltip-only changes replace stale hover closures');
 api.Filter('unlocked');
 assert.equal(voidCards().length, 1, 'ownership filtering still uses actual counts');
 rows[1].count = 2;
@@ -241,31 +287,37 @@ rows[1].count_known = 0;
 snapshot('shadow', rows, {has_pass: 1});
 assert.equal(voidCards().length, 1, 'unknown inventory never appears as unlocked');
 api.Filter('all');
-assert.equal(descendant(nodes.get('VoidShadowItem_shadow_02'), 'VoidShadowCount').text, '—/430');
-hover(nodes.get('VoidShadowItem_shadow_02'));
-assert.equal(nodes.get('ArchiveTooltipStateIcon').visible, false, 'unknown ownership hides the misleading state icon');
-hover(nodes.get('VoidShadowItem_shadow_01'));
-assert.equal(nodes.get('ArchiveTooltipStateIcon').visible, true, 'known ownership restores the state icon');
+assert.equal(descendant(itemCard('shadow_02'), 'ArchiveV10Count').text, '—/430');
+hover(itemCard('shadow_02'));
+assert(tooltipText('State').includes('状态待同步'), 'unknown ownership hides a misleading owned/locked status');
+hover(itemCard('shadow_01'));
+assert(tooltipText('State').includes('已拥有'), 'known ownership restores the correct state');
 const renamedCategories = JSON.parse(JSON.stringify(categories));
 Object.assign(renamedCategories.find(category => category.id === 'clear'), {name: '通关进度', disabled: 1});
 resend('shadow', {categories: renamedCategories});
-const clearSidebar = nodes.get('VoidShadowCategory_clear');
-assert.equal(clearSidebar.enabled, false, 'updated category availability reaches the custom sidebar');
-assert(clearSidebar.children.some(child => child.text === '通关进度'), 'updated category names reach the custom sidebar');
+const clearSidebar = nodes.get('ArchiveV10Category_clear');
+const requestsBeforeDisabled = requests.length;
+activate(clearSidebar);
+assert.equal(view.Inspect().category, 'clear', 'a disabled category reaches the approved fixed shell empty view');
+assert.equal(visibleCards().length, 0, 'disabled categories cannot reuse stale content');
+assert.equal(requests.length, requestsBeforeDisabled, 'a disabled category must not submit an invalid server request');
+api.SelectCategory('shadow');
 resend('shadow', {categories});
 
 walletBalances = {u_coin: 41, shop_points: 52, shop_gold: 63};
 const walletBefore = {...metrics}, walletCards = voidCards();
 emit('survival_commerce_result', {ok: 1}); immediate();
-assert.equal(nodes.get('VoidShadow_gold_text').text, '41');
-assert.equal(nodes.get('VoidShadow_purple_gem_text').text, '52');
-assert.equal(nodes.get('VoidShadow_ticket_text').text, '63');
+assert.equal(walletText(0), '41');
+assert.equal(walletText(1), '52');
+assert.equal(walletText(2), '63');
 noRebuildOrStyle(walletBefore, 'wallet-only result updates balances without painting cards');
 assert.deepEqual(voidCards(), walletCards);
+assert.equal(walletRefreshes, 1, 'A successful commerce result renders the wallet without recursively refreshing it');
 
 api.SelectCategory('building');
 let building = visibleCards()[0];
-hover(building); assert.equal(shownTooltip.item.level, 0);
+hover(building); assert.equal(tooltipText('Quantity'), 'LV0/5');
+assert.equal(tooltipText('MetricCaption'), '建筑等级');
 const beforeUpgrade = requests.length;
 activate(building); activate(building);
 assert.equal(requests.length, beforeUpgrade + 1, 'double clicks submit one manual reward upgrade');
@@ -278,8 +330,8 @@ const upgraded = {...dataByCategory.building.rows[0], level: 2, description: '�
 snapshot('building', [upgraded], {upgrade_pending: 0,
     buildings: {faith: 60, earned_today: 2, daily_cap: 10, per_clear: 1}});
 building = visibleCards()[0]; hover(building);
-assert.equal(shownTooltip.item.level, 2, 'artifact levels are refreshed');
-assert.equal(shownTooltip.item.description, '当前Lv2');
+assert.equal(tooltipText('Quantity'), 'LV2/5', 'artifact levels are refreshed');
+assert.equal(tooltipText('Effect'), '当前Lv2');
 assert.equal(building.__archiveUnlocked, true, 'ownership shading follows the new level');
 assert(nodes.get('ArchiveSummary').text.includes('信仰值：60'), 'a balance-only header is current');
 activate(building);
@@ -290,9 +342,15 @@ activate(visibleCards()[0]);
 assert.equal(requests.length, lockedRequests, 'pending saves block manual actions even if rows stay the same');
 assert(nodes.get('ArchiveStatus').text.includes('保存'));
 const themeBefore = metrics.palettes;
+const approvedCountColor = descendant(visibleCards()[0], 'ArchiveV10Count').style.color;
+const approvedNameColor = descendant(visibleCards()[0], 'ArchiveV10Name').style.color;
+const approvedFrame = visibleCards()[0].__v10.normal.image;
 cfg.SurvivalArchiveColors.number = '#abcdef';
 resend('building', {upgrade_pending: 0});
-assert(metrics.palettes > themeBefore, 'a theme change still repaints existing native cards');
+assert.equal(metrics.palettes, themeBefore, 'Legacy palette changes cannot repaint the confirmed V10 components');
+assert.equal(descendant(visibleCards()[0], 'ArchiveV10Count').style.color, approvedCountColor, 'Independent V10 quantity text retains its confirmed color');
+assert.equal(descendant(visibleCards()[0], 'ArchiveV10Name').style.color, approvedNameColor, 'Independent V10 name text retains its confirmed color');
+assert.equal(visibleCards()[0].__v10.normal.image, approvedFrame, 'A legacy theme change cannot swap the approved original frame asset');
 
 api.SelectCategory('friend');
 assert.equal(nodes.get('ArchiveDraw').enabled, true);
@@ -311,25 +369,58 @@ assert(nodes.get('ArchiveTickets').text.includes('0'));
 api.SelectCategory('fragment');
 let fragment = visibleCards()[0], promotion = descendant(fragment, 'ArchivePromote');
 hover(promotion);
-assert(shownTooltip.item.description.includes('高阶'), 'promotion help still resolves the actual target name');
+assert(tooltipText('Effect').includes('高阶'), 'promotion help still resolves the actual target name');
 activate(promotion);
 const promotionRequests = requests.length; activate(promotion);
 assert.equal(requests.length, promotionRequests, 'promotion requests retain their local duplicate guard');
 assert.equal(requests.at(-1).name, 'survival_archive_promote');
 
+assert.equal(walletRefreshes, 1, 'All upgrade, draw, promotion, filter and category updates retain the initial single catalog refresh');
 api.SelectCategory('shadow'); api.Close();
 const closed = {...metrics};
 for (let revision = 101; revision <= 200; revision++) {
     snapshot('shadow', [{...rows[0], count: revision}, rows[1]], {has_pass: 1, profile_revision: revision});
 }
 assert.deepEqual(metrics, closed, 'closed profile updates remain data-only, including the custom void view');
+assert.equal(walletRefreshes, 1, 'Closed profile updates do not request a wallet refresh');
 api.Open();
-assert.equal(descendant(nodes.get('VoidShadowItem_shadow_01'), 'VoidShadowCount').text, '200/430', 'reopening renders the latest cache immediately');
-assert.equal(nodes.get('VoidShadow_gold_text').text, '41', 'reopening preserves the current commerce wallet');
+assert.equal(walletRefreshes, 2, 'Reopening may refresh the authoritative catalog once');
+assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430', 'reopening renders the latest cache immediately');
+assert.equal(walletText(0), '41', 'reopening preserves the current commerce wallet');
 api.SelectCategory('clear');
 snapshot('clear', [{id: 'clear_01', name: '第一阶', count: 1, target: 1, completed: 1}]);
 assert(nodes.get('ArchiveSummary').text.includes('已完成 1 / 1'), 'generic page completion remains live after leaving void');
 api.SelectCategory('shadow');
-assert.equal(descendant(nodes.get('VoidShadowItem_shadow_01'), 'VoidShadowCount').text, '200/430', 'switching back uses the latest shadow cache');
+assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430', 'switching back uses the latest shadow cache');
 
-console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, native card/sidebar reuse, live counts/ownership/pass/tooltips/wallet, upgrade/draw rejection and pending guards, promotion duplicate guard, theme, filters, tabs and 100 closed updates');
+// archive_service.enabled_categories() omits disabled CSV categories entirely.
+// A complete screenshot fixture that includes `shop, disabled:1` would conceal
+// the missing native ArchiveTab_shop that occurs with a real server snapshot.
+const serverEnabledCategories = categories.filter(category => Number(category.disabled) !== 1);
+assert(!serverEnabledCategories.some(category => category.id === 'shop'), 'The real server category list excludes the disabled shop');
+resend('shadow', {categories: serverEnabledCategories});
+assert.equal(nodes.get('ArchiveTab_shop'), undefined, 'The test exercises absence of a legacy native shop tab');
+assert(nodes.get('ArchiveV10Category_shop'), 'The approved fixed V10 sidebar still exposes the shop category');
+const shellBeforeUnavailableShop = nodes.get('ArchiveV10Canvas');
+const shopRequestCount = requests.length;
+activate(nodes.get('ArchiveV10Category_shop'));
+assert.equal(view.Inspect().category, 'shop', 'An omitted disabled shop still switches the fixed shell to its local category view');
+assert.equal(nodes.get('ArchiveV10_page_title').text, '商城道具');
+assert(nodes.get('ArchiveEmpty').text.includes('未启用'), 'Disabled shop presents the explicit unavailable empty state');
+assert.equal(visibleCards().length, 0, 'The local disabled shop view has no stale cards from another category');
+assert.equal(requests.length, shopRequestCount, 'Selecting an omitted disabled shop submits no invalid server request');
+assert.equal(nodes.get('ArchiveV10Canvas'), shellBeforeUnavailableShop, 'The unavailable category retains the same shell');
+api.Close(); api.Open(); immediate();
+assert.equal(walletRefreshes, 3, 'Reopening a disabled local category can refresh the wallet while avoiding archive requests');
+assert.equal(view.Inspect().category, 'shop', 'Reopening a locally unavailable category restores its empty directory');
+assert(nodes.get('ArchiveEmpty').text.includes('未启用'), 'Reopening retains the explicit unavailable state');
+assert.equal(requests.length, shopRequestCount, 'Reopening the local disabled directory cannot start an invalid snapshot request or retry');
+api.Refresh(true); immediate();
+assert.equal(walletRefreshes, 3, 'An explicit archive refresh is independent of commerce catalog refresh');
+assert.equal(requests.length, shopRequestCount, 'Explicit refresh of the disabled local directory does not request server data');
+assert.equal(nodes.get('ArchiveV10Canvas'), shellBeforeUnavailableShop, 'Reopening the local directory reuses the fixed shell');
+activate(nodes.get('ArchiveV10Category_shadow'));
+assert.equal(view.Inspect().category, 'shadow', 'The player can return from the local empty directory');
+assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430', 'Returning restores the unchanged authoritative shadow cache');
+
+console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, native card/sidebar reuse, live counts/ownership/pass/tooltips, once-per-open read-only wallet refresh and unknown balances, upgrade/draw rejection and pending guards, promotion duplicate guard, theme, filters, tabs and 100 closed updates');

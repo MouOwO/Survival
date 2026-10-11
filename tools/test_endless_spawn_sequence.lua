@@ -6,9 +6,12 @@ local bus, events = require("core/event_bus"), require("core/events")
 local scheduler = require("core/scheduler")
 local guard = require("systems/gameplay_phase_guard")
 local noop = function() end
+DOTA_TEAM_GOODGUYS = 2
 local clock, serial, units, attempts, rewards, publications, changes
 local removed, cleared_visuals, death_visuals, phase_expired, defeated
 local fail_attempt, fail_setter_attempt, throw_attempt, wave_limit, spawn_hook, record_hook, fail_score
+local visual_resolutions, visual_applies, visual_clears, fail_visual_attempt, throw_visual_attempt, visual_hook
+local fail_visual_wave
 local rules = {monsters_per_wave = 5, spawn_interval = 0.5, time_limit_seconds = 60,
     attack_speed = 1, magic_resistance = 20, model_path = "test/endless.vmdl",
     model_scale = 1, move_speed = 300, attack_range = 100}
@@ -31,6 +34,7 @@ package.loaded["systems/archive_service"] = {
     record_endless_wave = function(id, number, difficulty)
         if record_hook then record_hook(id, number, difficulty) end
         rewards[#rewards + 1] = {player_id = id, wave = number, difficulty = difficulty}
+        return {ok = true}
     end,
 }
 package.loaded["systems/monster_hero_visual_service"] = {
@@ -39,6 +43,37 @@ package.loaded["systems/monster_hero_visual_service"] = {
     end,
     on_death = function(unit)
         death_visuals[unit.id] = (death_visuals[unit.id] or 0) + 1
+    end,
+}
+package.loaded["systems/archive_endless_visual_config"] = {
+    resolve = function(number)
+        if number == fail_visual_wave then return nil, "visual_config_missing" end
+        local slot, round = (number - 1) % 50 + 1, math.floor((number - 1) / 50) % 4 + 1
+        local visual = {wave = number, cycle_slot = slot, outfit_round = round,
+            visual_id = "fixture_" .. slot .. "_" .. round, display_name = "Creature " .. slot,
+            model_path = "test/creature_" .. slot .. ".vmdl", model_scale = number <= 200 and 1 or 1.5}
+        visual_resolutions[number] = visual_resolutions[number] or {}
+        table.insert(visual_resolutions[number], visual)
+        return visual
+    end,
+}
+package.loaded["visual/endless_monster_visual_service"] = {
+    apply = function(unit, visual)
+        assert(unit:IsAlive(), "newborns killed in the factory cannot receive new decorations")
+        visual_applies[unit.id] = {visual = visual, count = (visual_applies[unit.id] or {}).count or 0}
+        visual_applies[unit.id].count = visual_applies[unit.id].count + 1
+        unit.fixture_visual_active = true
+        if unit.attempt == throw_visual_attempt then error("visual assembly exception") end
+        if unit.attempt == fail_visual_attempt then return false, "visual_attachment_failed" end
+        if visual_hook then visual_hook(unit) end
+        return true
+    end,
+    clear = function(unit)
+        visual_clears[unit.id] = (visual_clears[unit.id] or 0) + 1
+        unit.fixture_visual_active = nil
+    end,
+    on_death = function(unit)
+        return package.loaded["visual/endless_monster_visual_service"].clear(unit)
     end,
 }
 package.loaded["systems/wave_system"] = {
@@ -62,7 +97,10 @@ package.loaded["systems/wave_system"] = {
         return unit
     end,
 }
-PlayerResource = {GetPlayer = function(_, id) return {player_id = id} end}
+PlayerResource = {GetPlayer = function(_, id) return {player_id = id} end,
+    GetTeam = function() return DOTA_TEAM_GOODGUYS end,
+    IsValidPlayerID = function(_, id) return id >= 0 and id <= 3 end,
+    IsFakeClient = function() return false end}
 CustomGameEventManager = {
     Send_ServerToPlayer = function(_, player, event_name, snapshot)
         assert(event_name == "survival_endless_state")
@@ -82,12 +120,14 @@ local function check(value, reason)
     assertions = assertions + 1
     assert(value, reason)
 end
-local function setup()
+local function setup(reward_roster)
     -- Release any preceding scenario before resetting the mock's bookkeeping.
     if units then for id = 0, 3 do endless.cancel(id, "fixture reset") end end
     clock, serial, attempts = 0, 0, 0
     units, rewards, publications, changes = {}, {}, {}, {}
     removed, cleared_visuals, death_visuals, defeated = {}, {}, {}, {}
+    visual_resolutions, visual_applies, visual_clears = {}, {}, {}
+    fail_visual_attempt, throw_visual_attempt, visual_hook, fail_visual_wave = nil, nil, nil, nil
     phase_expired, fail_attempt, fail_setter_attempt, throw_attempt, wave_limit = false, nil, nil, nil, nil
     spawn_hook, record_hook, fail_score = nil, nil, false
     rules.monsters_per_wave, rules.spawn_interval, rules.time_limit_seconds = 5, 0.5, 60
@@ -95,6 +135,9 @@ local function setup()
     scheduler.clear()
     guard.reset()
     guard.set_post_clear_frozen(true)
+    local cooperative = require("systems/archive_cooperative_reward_service")
+    cooperative.init()
+    assert(cooperative.begin(reward_roster or {0}, 1))
     bus.handle_request("archive.challenge_state", function() return {expired = phase_expired and 1 or 0} end)
     endless.init(function(id) changes[id] = (changes[id] or 0) + 1 end)
 end
@@ -122,6 +165,8 @@ local function all_removed(reason)
     for _, unit in ipairs(units) do
         if not death_visuals[unit.id] then
             check(removed[unit.id] == 1 and cleared_visuals[unit.id] == 1, reason)
+            check(visual_clears[unit.id] ~= nil and not unit.fixture_visual_active,
+                reason .. ": endless decorations cannot survive cleanup")
         end
     end
 end
@@ -143,8 +188,27 @@ end
 check(endless.snapshot(0).remaining == 5 and endless.snapshot(0).seconds == 58,
     "births cannot extend the sixty-second deadline")
 check(changes[0] == 1, "births and countdowns must not republish every archive hub ability")
+check(#visual_resolutions[1] == 1, "one visual resolution is shared by all five births")
+for _, unit in ipairs(units) do
+    local applied = visual_applies[unit.id]
+    check(applied and applied.count == 1 and applied.visual == visual_resolutions[1][1],
+        "all five monsters reuse the exact cached wave appearance")
+    check(unit.definition.model_path == applied.visual.model_path
+            and unit.definition.model_scale == applied.visual.model_scale
+            and unit.definition.unit_name == "npc_survival_wave_monster"
+            and unit.definition.endless == true and unit.definition.movement_type == "ground"
+            and unit.definition.attack_type == "melee"
+            and unit.definition.move_speed == rules.move_speed
+            and unit.definition.attack_range == rules.attack_range
+            and unit.definition.default_wearable_asset_id == nil and unit.definition.model_asset_id == nil,
+        "appearance changes leave factory combat and collision policies unchanged")
+    check(unit.row.health == 100 and unit.row.attack == 1 and unit.row.war3_armor == 1
+            and unit.row.attack_speed == rules.attack_speed,
+        "appearance cannot alter configured battle values")
+end
 tick(3)
 check(changes[0] == 1, "idle countdown only sends the endless state")
+check(#visual_resolutions[1] == 1, "countdowns cannot resolve or reassemble the wave appearance")
 for _, unit in ipairs(living(0)) do kill(unit) end
 check(#rewards == 1 and rewards[1].wave == 1 and endless.snapshot(0).score == 7,
     "completed wave records exactly one reward")
@@ -153,6 +217,12 @@ kill(units[1])
 check(#rewards == 1, "duplicate death events cannot count twice")
 tick(3.01)
 check(#units == 6 and endless.snapshot(0).wave == 2, "next wave starts asynchronously with one monster")
+check(#visual_resolutions[2] == 1 and units[6].definition.model_path ~= units[1].definition.model_path,
+    "the next wave resolves and applies its own different monster model")
+for number = 1, 5 do
+    check(visual_clears[units[number].id] == 1 and not units[number].fixture_visual_active,
+        "normal death clears the owned endless appearance once")
+end
 
 setup()
 check(endless.start(0, 1))
@@ -181,6 +251,10 @@ for number = 2, 5 do
         "synchronous newborn deaths count once and never advance past pending births")
 end
 for _, unit in ipairs(units) do check(death_visuals[unit.id] == 1, "newborn death cleanup runs exactly once") end
+for _, unit in ipairs(units) do
+    check(not visual_applies[unit.id] and visual_clears[unit.id] == 1,
+        "synchronous factory deaths skip assembly and still clear the endless appearance")
+end
 check(endless.snapshot(0).remaining == 0 and endless.snapshot(0).score == 7,
     "five synchronous newborn deaths produce exactly one complete wave")
 tick(2.01)
@@ -228,7 +302,7 @@ check(#units == 2, "late birth schedules the next interval from its actual callb
 tick(10.5)
 check(#units == 3 and endless.snapshot(0).seconds == 50, "late scheduler does not reset the wave deadline")
 
-setup()
+setup({0, 1, 2, 3})
 for id = 0, 3 do check(endless.start(id, 1), "all four players can run an isolated challenge") end
 check(#units == 4, "four simultaneous players create four initial monsters rather than twenty")
 check(scheduler.task_count() <= 5, "four players share one countdown and at most one pending birth task each")
@@ -242,7 +316,8 @@ for number = 2, 5 do
     end
 end
 for _, unit in ipairs(living(0)) do kill(unit) end
-check(#rewards == 1 and rewards[1].player_id == 0, "kills only award their own player")
+check(#rewards == 4 and rewards[1].player_id == 0 and rewards[4].player_id == 3,
+    "the first completed team wave awards each of the four participants once")
 check(endless.snapshot(1).remaining == 5 and endless.snapshot(2).remaining == 5 and endless.snapshot(3).remaining == 5,
     "other players remain unchanged when one wave completes")
 endless.cancel(1, "manual stop")
@@ -311,12 +386,14 @@ check(#units == 2, "configured shorter interval creates the next monster")
 tick(0.6)
 check(#units == 3, "configured interval applies to subsequent births too")
 
-for _, failure_kind in ipairs({"return_nil", "throw_spawn", "throw_setter"}) do
+for _, failure_kind in ipairs({"return_nil", "throw_spawn", "throw_setter", "fail_visual", "throw_visual"}) do
     setup()
     check(endless.start(0, 1))
     if failure_kind == "return_nil" then fail_attempt = 3
     elseif failure_kind == "throw_spawn" then throw_attempt = 3
-    else fail_setter_attempt = 3 end
+    elseif failure_kind == "throw_setter" then fail_setter_attempt = 3
+    elseif failure_kind == "fail_visual" then fail_visual_attempt = 3
+    else throw_visual_attempt = 3 end
     tick(0.5)
     tick(1)
     check(not endless.is_running(0) and #rewards == 0 and guard.post_clear_frozen(),
@@ -357,7 +434,7 @@ tick(0)
 check(not endless.is_running(0) and #units == 1 and scheduler.task_count() == 0,
     "the last configured wave finishes without scheduling a new birth")
 
-for _, failure_kind in ipairs({"record", "score"}) do
+for _, failure_kind in ipairs({"score"}) do
     setup()
     rules.monsters_per_wave = 1
     check(endless.start(0, 1))
@@ -376,6 +453,22 @@ for _, failure_kind in ipairs({"record", "score"}) do
     check(#units == 1 and scheduler.task_count() == 0,
         "settlement exception never turns into a permanently running empty wave: " .. failure_kind)
 end
+
+setup()
+rules.monsters_per_wave, wave_limit = 1, 1
+check(endless.start(0, 1))
+record_hook = function() error("archive pre-enqueue exception") end
+kill(units[1])
+check(endless.snapshot(0).cleared == 1 and endless.snapshot(0).score == 7
+    and require("systems/archive_cooperative_reward_service").has_pending(),
+    "a completed combat layer retains its team reward when account handoff temporarily fails")
+tick(0)
+check(not endless.is_running(0) and #units == 1 and #rewards == 0,
+    "configured run completion does not erase the separate team reward outbox")
+record_hook = nil
+tick(1)
+check(#rewards == 1 and not require("systems/archive_cooperative_reward_service").has_pending()
+    and scheduler.task_count() == 0, "account handoff retries after the combat run finishes")
 
 setup()
 rules.monsters_per_wave = 1
@@ -397,7 +490,7 @@ check(not endless.is_running(0) and endless.snapshot(0).status == "idle" and sch
 tick(120)
 check(#units == 1 and scheduler.task_count() == 0, "obsolete settlement callback cannot spawn into the new session")
 
-setup()
+setup({0, 1, 2, 3})
 wave_limit = 20
 for id = 0, 3 do check(endless.start(id, 1)) end
 local expected_score = 0
@@ -427,5 +520,51 @@ for id = 0, 3 do
     check(not endless.is_running(id) and changes[id] == 2, "repeated waves only repaint archive abilities at start and finish")
 end
 
+setup()
+visual_hook = function(unit) endless.cancel(unit.owner, "visual listener cancelled") end
+check(not endless.start(0, 1) and not endless.is_running(0),
+    "cancelling during assembly invalidates the newly registered unit")
+all_removed("assembly cancellation releases partial decorations and the owned newborn")
+tick(2)
+check(#units == 1 and scheduler.task_count() == 0, "assembly cancellation cannot restart a birth task")
+
+setup()
+visual_hook = kill
+check(endless.start(0, 1), "a death callback during assembly is safely registered")
+check(endless.snapshot(0).remaining == 4 and visual_clears[1] == 1 and not units[1].fixture_visual_active,
+    "reentrant assembly death clears the appearance and decrements the unit exactly once")
+
+setup()
+rules.monsters_per_wave = 1
+fail_visual_wave = 2
+check(endless.start(0, 1))
+kill(units[1])
+tick(0)
+check(not endless.is_running(0) and #units == 1 and #rewards == 1,
+    "missing next-wave appearance stops before native creation and retains only the preceding wave reward")
+check(scheduler.task_count() == 0 and guard.post_clear_frozen(),
+    "visual resolution failure cannot leave an empty playable challenge")
+
+setup()
+rules.monsters_per_wave, wave_limit = 1, 1000
+check(endless.start(0, 1))
+for wave = 1, wave_limit do
+    local newborn = units[#units]
+    check(#visual_resolutions[wave] == 1 and visual_applies[newborn.id].count == 1,
+        "each configured wave resolves and assembles only once per monster")
+    if wave == 1 or wave == 51 or wave == 101 or wave == 151 or wave == 201 or wave == 401 or wave == 801 then
+        check(newborn.definition.model_path == units[1].definition.model_path,
+            "the first subject repeats every fifty waves")
+        check(newborn.definition.model_scale == (wave <= 200 and 1 or 1.5),
+            "waves after two hundred pass fixed 1.5 model scale to the unchanged factory")
+    end
+    kill(newborn)
+    check(visual_clears[newborn.id] == 1 and not newborn.fixture_visual_active,
+        "repeated death cleanup leaves no owned decoration behind")
+    tick(clock + 0.01)
+end
+check(#units == 1000 and #rewards == 1000 and not endless.is_running(0) and scheduler.task_count() == 0,
+    "the visual cycle preserves the existing one-thousand-wave configuration limit")
+
 print("ENDLESS_SPAWN_SEQUENCE_PASS: " .. assertions ..
-    " checks; sequential births, early deaths, late scheduling, four players, cancellation, timeout, failure and reset")
+    " checks; sequential births, early deaths, late scheduling, four players, cancellation, timeout, failure, reset and cached wave visuals")

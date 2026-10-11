@@ -6,6 +6,7 @@ local rules = require("config/generated/global_rules")
 local hero_visual = require("systems/monster_hero_visual_service")
 local challenge_visual = require("systems/challenge_monster_visual_service")
 local wave_visual = require("systems/monster_visual_service")
+local endless_visual = require("visual/endless_monster_visual_service")
 
 local M = {}
 
@@ -56,6 +57,7 @@ local function clear_visuals(unit)
     hero_visual.clear(unit)
     challenge_visual.clear(unit)
     wave_visual.cleanup(unit)
+    endless_visual.clear(unit)
 end
 
 local function update_corpses()
@@ -117,6 +119,7 @@ local function on_entity_killed(payload)
     hero_visual.on_death(unit)
     challenge_visual.on_death(unit)
     wave_visual.on_death(unit)
+    endless_visual.on_death(unit)
     corpses[unit] = {
         origin = { x = origin.x, y = origin.y, z = origin.z },
         sink_at = game_time() + HOLD_SECONDS,

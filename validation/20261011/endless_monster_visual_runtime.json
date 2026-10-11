@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-11",
+  "status": "implemented_pending_live_game_visual_test",
+  "runtime_authority": "data/csv/存档系统/archive_endless_visuals.csv + components + ornaments",
+  "appearances": 200,
+  "unique_first_round_subjects": 50,
+  "native_components": 153,
+  "static_ornaments": 176,
+  "direct_model_paths": 209,
+  "recursive_resource_checks": 1811,
+  "missing_resources": [],
+  "persistent_particles": 0,
+  "cycle": {
+    "model_period": 50,
+    "outfit_period": 200,
+    "large_start": 201,
+    "fixed_multiplier": 1.5,
+    "compounds": false
+  },
+  "combat_wave_csv_unchanged": true,
+  "shared_native_appearance_source_unchanged": true,
+  "gameplay_csv_sha256": "3a15080cb72d74f5f59ab553373c2d3f6211235a9f8709952db961e0930c58f6",
+  "verification": [
+    {
+      "name": "config_check",
+      "exit_code": 0,
+      "output": "ENDLESS_VISUAL_CONFIG_CHECK_PASS {\"archive_endless_visuals\": 200, \"archive_endless_visual_components\": 153, \"archive_endless_visual_ornaments\": 176}\n"
+    },
+    {
+      "name": "startup_preload",
+      "exit_code": 0,
+      "output": "test_startup_asset_preload_service: PASS resources=576 async_requests=48\n"
+    },
+    {
+      "name": "addon_precache",
+      "exit_code": 0,
+      "output": "ADDON_PRECACHE_ENTRY_PASS: strict API signatures, current skill roots including poison Sullen Shroud without retired resources, tail startup preload; resources=111\n"
+    },
+    {
+      "name": "wall_contact",
+      "exit_code": 0,
+      "output": "ENDLESS_WALL_CONTACT_PASS: four players; mixed tactical front capped at four; rear Hull32 and restoration; boss policy; six native setup/cleanup failures\n"
+    },
+    {
+      "name": "ornament_lifecycle",
+      "exit_code": 0,
+      "output": "ENDLESS_ORNAMENTS_PASS parent movement, scale, stable/reload reuse, rollback, attachment fallback, death cleanup, index reuse, reentrant cleanup; spawns=27 removals=25\n"
+    },
+    {
+      "name": "real_visual_integration",
+      "exit_code": 0,
+      "output": "ster_visual_service.lua:77: attachment_failed:endless_visual_020_1:back\n[ArchiveEndless] wave setup failed player=0 wave=51 error=scripts/vscripts/systems/archive_endless_service.lua:145: ...s/vscripts/visual/endless_monster_visual_service.lua:81: ornament_spawn_failed\n[ArchiveEndless] wave setup failed player=0 wave=51 error=scripts/vscripts/systems/archive_endless_service.lua:145: ...s/vscripts/visual/endless_monster_visual_service.lua:81: ornament_attach_failed\nENDLESS_MONSTER_VISUAL_INTEGRATION_PASS: 55472 checks; real 401-wave factory/appearance/corpse flow, 50 unique models, four geometries, fixed 1.5 growth, default/transformed native wearables, cached five births and failure cleanup\n"
+    },
+    {
+      "name": "luac_all_touched_production",
+      "exit_code": 0,
+      "files": [
+        "systems/archive_endless_visual_config.lua",
+        "systems/archive_endless_service.lua",
+        "systems/startup_asset_preload_service.lua",
+        "systems/monster_corpse_lifecycle_service.lua",
+        "visual/endless_monster_visual_service.lua",
+        "visual/endless_monster_ornaments.lua",
+        "config/generated/archive_endless_visuals.lua",
+        "config/generated/archive_endless_visual_components.lua",
+        "config/generated/archive_endless_visual_ornaments.lua",
+        "config/generated/index.lua"
+      ]
+    }
+  ],
+  "service_wiring_report": "output/endless_monster_runtime_20261011/service_wiring/verification.json",
+  "negative_old_service_and_real_integration": "output/endless_monster_runtime_20261011/visual_integration_verification.json",
+  "git_readonly_checks": {
+    "diff_check": {
+      "exit_code": 2,
+      "output_characters": 8049,
+      "outside_task_whitespace_findings": [
+        "panorama/src/layout/custom_game/archive.xml:5: trailing whitespace.",
+        "panorama/src/layout/custom_game/archive.xml:6: trailing whitespace.",
+        "panorama/src/layout/custom_game/archive.xml:40: trailing whitespace.",
+        "panorama/src/layout/custom_game/archive.xml:41: trailing whitespace.",
+        "panorama/src/layout/custom_game/payment_test.xml:8: trailing whitespace."
+      ]
+    },
+    "diff_stat": {
+      "exit_code": 0,
+      "output_characters": 14824
+    },
+    "diff_names": {
+      "exit_code": 0,
+      "output_characters": 13050
+    },
+    "task_diff_check": {
+      "exit_code": 0,
+      "output_characters": 869
+    }
+  },
+  "four_project_documents_read_after_final_edit": true,
+  "no_git_mutations": true,
+  "new_model_or_particle_compilation_required": false,
+  "live_visual_verified": false,
+  "owned_files": [
+    "scripts/vscripts/systems/archive_endless_service.lua",
+    "scripts/vscripts/systems/archive_endless_visual_config.lua",
+    "scripts/vscripts/systems/startup_asset_preload_service.lua",
+    "scripts/vscripts/systems/monster_corpse_lifecycle_service.lua",
+    "scripts/vscripts/visual/endless_monster_visual_service.lua",
+    "scripts/vscripts/visual/endless_monster_ornaments.lua",
+    "scripts/vscripts/config/generated/archive_endless_visuals.lua",
+    "scripts/vscripts/config/generated/archive_endless_visual_components.lua",
+    "scripts/vscripts/config/generated/archive_endless_visual_ornaments.lua",
+    "scripts/vscripts/config/generated/index.lua",
+    "scripts/vscripts/tests/test_startup_asset_preload_service.lua",
+    "tools/build_endless_monster_visuals.py",
+    "tools/test_endless_monster_ornaments.lua",
+    "tools/test_endless_monster_visual_integration.lua",
+    "tools/test_endless_spawn_sequence.lua",
+    "tools/test_endless_gameplay_continuity.lua",
+    "docs/ENDLESS_MONSTER_VISUAL_RUNTIME_20261011.md",
+    "docs/endless_monster_visual_design_20261009.md",
+    "docs/ai/PROJECT_CONTEXT.md",
+    "docs/ai/CURRENT_TASK.md",
+    "docs/ai/DECISIONS.md",
+    "docs/ai/KNOWN_ISSUES.md",
+    "data/csv/存档系统/archive_endless_visuals.csv",
+    "data/csv/存档系统/archive_endless_visual_components.csv",
+    "data/csv/存档系统/archive_endless_visual_ornaments.csv"
+  ],
+  "live_checks": [
+    "reload map with new Precache context",
+    "wave1 wolf vs wave2 spider",
+    "native default limbs/attack/run",
+    "custom ornament mounting and scale",
+    "wave201 and401 fixed1.5"
+  ]
+}

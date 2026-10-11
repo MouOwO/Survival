@@ -24,7 +24,8 @@ for path in source.iterdir():
 import sys
 sys.path.insert(0,str(ROOT/'server'))
 from payment_backend.csv_catalog import SOURCES
-for name in SOURCES:
+from payment_backend.ucoin_catalog import COMMERCE_SOURCES
+for name in SOURCES+COMMERCE_SOURCES:
     destination=target/'reference_csv'/name
     destination.parent.mkdir(parents=True,exist_ok=True)
     destination.write_bytes((ROOT/'data/csv'/name).read_bytes().replace(b'\r\n',b'\n'))

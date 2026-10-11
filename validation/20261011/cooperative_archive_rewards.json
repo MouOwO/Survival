@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-11",
+  "production_deployed": false,
+  "real_multiplayer_tested": false,
+  "git_mutated": false,
+  "evidence": "output/cooperative_rewards_20261011/final_validation.json",
+  "lua_syntax_exit": 0,
+  "task_diff_check_exit": 0,
+  "preexisting_full_diff_whitespace_exit": 2,
+  "preexisting_spawn_cost": {
+    "before_task": {
+      "exit_code": 1,
+      "error": "C:/Program Files/lua/bin/lua5.1.exe: ...ative_rewards_20261011\\spawn_cost_baseline_probe.lua:106: four waves share only the countdown after births"
+    },
+    "current": {
+      "exit_code": 1,
+      "error": "C:/Program Files/lua/bin/lua5.1.exe: ...ta_addons\\survival\\tools\\test_endless_spawn_cost.lua:105: four waves share only the countdown after births"
+    },
+    "preexisting": true
+  },
+  "backend_tests": 32,
+  "cooperative_checks": 211,
+  "policy": "base team share; own existing monthly-pass perks only"
+}

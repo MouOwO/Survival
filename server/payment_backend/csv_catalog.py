@@ -119,9 +119,12 @@ def compile_catalog(tables,reference, *, max_products=100):
     return dict(protocol=4,categories=category_rows,products=sorted(result,key=lambda x:x['sort_order']))
 
 def build(root):
+    from .ucoin_catalog import COMMERCE_TABLES,compile_payment_catalog
     base=Path(root)/'data/csv'
     tables={name:(base/'商城支付系统'/f'{name}.csv').read_text(encoding='utf-8-sig') for name in TABLES}
+    commerce_tables={name:(base/'商城兑换系统'/f'{name}.csv').read_text(encoding='utf-8-sig') for name in COMMERCE_TABLES}
     reference={name:(base/name).read_text(encoding='utf-8-sig') for name in SOURCES}
-    data=compile_catalog(tables,reference)
-    return dict(tables=tables,reference_hashes={k:hashlib.sha256(v.encode()).hexdigest() for k,v in reference.items()},
+    data=compile_payment_catalog(tables,commerce_tables,reference)
+    return dict(tables=tables,commerce_tables=commerce_tables,
+                reference_hashes={k:hashlib.sha256(v.encode()).hexdigest() for k,v in reference.items()},
                 catalog=data,catalog_hash=hashlib.sha256(canonical(data)).hexdigest())

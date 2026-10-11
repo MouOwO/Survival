@@ -37,7 +37,7 @@ for (const [file, id, panelId] of [
 ]) {
     assert(archiveLayout.includes('/' + file + '"'), file + ' is loaded by the active layout');
     const source = read('panorama/src/scripts/custom_game/' + file);
-    const registration = source.match(/\$\.RegisterEventHandler\(["']Cancelled["'],[\s\S]*?\r?\n    \}\);/);
+    const registration = source.match(/\$\.RegisterEventHandler\(["']Cancelled["'],[\s\S]*?\}\);/);
     assert(registration, file + ' registers a Cancelled callback');
     let handler;
     vm.runInNewContext(registration[0], {
@@ -57,7 +57,7 @@ for (const [file, id, panelId] of [
     assertRouting(handler, id, file);
 }
 
-for (const file of ['survival_hud.xml', 'lottery_window.xml']) {
+for (const file of ['survival_hud.xml']) {
     const source = read('panorama/src/layout/custom_game/' + file);
     const panel = source.match(/<Panel\b[^>]*\bid="LotteryWindow"[^>]*>/);
     assert(panel, file + ' contains the lottery panel');

@@ -105,7 +105,8 @@ local MOVING_ICE_BALL_PARTICLE =
 local METEOR_FALL_PARTICLE =
     "particles/survival/skills/meteor_phoenix_fall.vpcf"
 local METEOR_LAVA_PARTICLE =
-    "particles/survival/skills/meteor_lava.vpcf"
+    "particles/survival/skills/meteor_snapfire_ground.vpcf"
+local METEOR_LAVA_FADE_DURATION = 0.6
 local METEOR_LAVA_SLOW_BUFF = "debuff_hero_meteor_lava_move_slow"
 local METEOR_THINK_INTERVAL = 0.05
 local METEOR_FALL_HEIGHT = 1200
@@ -2510,6 +2511,8 @@ local function meteor_release_cast(attacker_key)
         meteor.fall_particle = nil
         meteor_destroy_particle(fall, true)
     end
+    -- Stop emission and release Lua ownership; the authored 0.6s endcap
+    -- fades the pool, flames and glow without keeping a cleanup timer alive.
     meteor_destroy_particle(lava_particle, false)
 end
 
@@ -2612,13 +2615,20 @@ local function meteor_impact(cast, meteor)
 
     if cast.lava_duration > 0 then
         -- All meteors in this cast share one fixed impact point. Two identical
-        -- ground quads otherwise overlap at the same depth during the second lava.
+        -- ground pools otherwise overlap during the second meteor's lava.
         -- Only the ground visual is shared; each meteor keeps its own damage
         -- ticks, scale, expiry and slow timing below.
         if not cast.lava_particle then
+            local duration = math.max(0, cast.unlock_at - meteor.land_at)
             cast.lava_particle = meteor_create_particle(
                 METEOR_LAVA_PARTICLE, cast.position, cast.context.attacker,
-                {[1]=Vector(cast.radius, cast.unlock_at - meteor.land_at, 0)}
+                {
+                    -- Native Snapfire CP1/3 are world positions, not radius.
+                    [1] = cast.position,
+                    [3] = cast.position,
+                    [20] = Vector(cast.radius, duration, METEOR_LAVA_FADE_DURATION),
+                    [21] = Vector(duration + METEOR_LAVA_FADE_DURATION, 0, 0),
+                }
             )
         end
         meteor.lava_expires_at = meteor.land_at + cast.lava_duration

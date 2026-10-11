@@ -23,7 +23,7 @@ local function apply_effects(stats, item)
     end
 end
 
-function M.settle(profile, command, pass)
+function M.settle(profile, command, pass, context)
     local archive, stats = copy(profile.save.archive or {}), copy(profile.save.gameplay_stats or {})
     archive.version = 1
     for _,key in ipairs({"clear_counts","completed","shadow_counts","processed"}) do archive[key]=archive[key] or {} end
@@ -83,7 +83,11 @@ function M.settle(profile, command, pass)
         -- Only persisted server progress is considered; this command has no progress input.
         require("systems/archive_endless_rewards").reconcile(archive, stats, apply_effects)
     elseif command.kind == "challenge" then
-        local ok, reason = challenge_rewards.apply(command, archive, stats, pass, apply_effects)
+        local random_int
+        if context and context.challenge_random_seed then
+            random_int = require("systems/archive_cooperative_reward_policy").random_int(context.challenge_random_seed)
+        end
+        local ok, reason = challenge_rewards.apply(command, archive, stats, pass, apply_effects, random_int)
         if not ok then return { ok = false, error = reason } end
     elseif command.kind == "social_draw" or command.kind == "social_ticket_cheat" then
         local ok, reason = require("systems/archive_social_rewards").apply(command, archive, stats, apply_effects)

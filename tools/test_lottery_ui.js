@@ -15,7 +15,7 @@ class Panel{
  RemoveAndDeleteChildren(){this.children=[]} SetPanelEvent(name,cb){this.events[name]=cb} SetImage(path){this.image=path}
 }
 const root=new Panel('Panel',null,'root');
-const xml=fs.readFileSync('panorama/src/layout/custom_game/lottery_window.xml','utf8');
+const xml=fs.readFileSync('panorama/src/layout/custom_game/survival_hud.xml','utf8');
 for(const m of xml.matchAll(/id="([^"]+)"/g))new Panel('Panel',root,m[1]);
 for(const id of ['LotteryItemTooltip','LotteryTooltipIconHost','LotteryTooltipName','LotteryTooltipType','LotteryTooltipDuration','LotteryTooltipDescription'])new Panel('Panel',root,id);
 function $(id){return nodes[id.slice(1)]} $.GetContextPanel=()=>root; $.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.Schedule=(seconds,cb)=>queue.push({at:now+seconds,cb});$.Msg=(message)=>logs.push(message);

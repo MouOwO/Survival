@@ -166,6 +166,29 @@ for _, definition in ipairs(archive.rows) do
     if definition.enabled ~= false then definition_ready(definition, true) end
 end
 
+-- Every endless round is visible in the same map resource lifetime. Checking
+-- the full resolver manifest catches missing default limbs and later outfits,
+-- not just a preloaded body for wave one.
+local endless_visuals = require("systems/archive_endless_visual_config")
+for _, resource in ipairs(endless_visuals.resources()) do
+    resource_ready(resource.resource_type, resource.path)
+end
+for number = 1, 200 do
+    local look = assert(endless_visuals.resolve(number))
+    resource_ready("model", look.model_path)
+    for _, component in ipairs(look.components) do resource_ready("model", component.model_path) end
+    for _, ornament in ipairs(look.ornaments) do resource_ready("model", ornament.model_path) end
+end
+
+local endless_prop = "models/props_rock/crystal_01.vmdl"
+startup, preload, requests, static = new_session({ fail_static = endless_prop })
+assert(static["model:" .. endless_prop], "later endless ornaments load in Precache(context)")
+startup.init()
+for _, request in ipairs(requests) do request.callback() end
+assert(not startup.snapshot().complete and startup.snapshot().failed > 0,
+    "an endless ornament failure cannot release the startup resource barrier")
+assert(preload.resource_status("model", endless_prop) == "failed")
+
 -- A direct model whose callback has not fired never becomes ready, regardless
 -- of stopped game time or repeated reads of the snapshot.
 startup, preload, requests = new_session()

@@ -158,7 +158,21 @@ function M.init(options)
     local function research_request(operation, request_event, payload)
         payload = payload or {}
         local player_id = options.source_player_id(payload)
-        if not options.valid_player_id(player_id) then return end
+        local request_id = tostring(payload.request_id or "")
+        local diagnostic = type(IsInToolsMode) == "function" and IsInToolsMode()
+        if diagnostic then
+            print("[SURVIVAL_RESEARCH][SERVER] RECV operation=" .. operation
+                .. " request_id=" .. request_id .. " player=" .. tostring(player_id)
+                .. " unit=" .. tostring(payload.source_entindex)
+                .. " group=" .. tostring(payload.technology_group))
+        end
+        if not options.valid_player_id(player_id) then
+            if diagnostic then
+                print("[SURVIVAL_RESEARCH][SERVER] REJECT request_id=" .. request_id
+                    .. " reason=player_not_ready_or_unavailable")
+            end
+            return
+        end
         local source = entity_index(payload.source_entindex)
         local unit = resolve_entity(source)
         local building = unit and event_bus.request(events.BUILDING_QUERY_REQUEST, {entindex = source})
@@ -182,12 +196,24 @@ function M.init(options)
                 source = "research_queue_ui",
             }) or {ok = false, error = "研究请求未响应"}
         end
+        if diagnostic then
+            local research = result.research or {}
+            print("[SURVIVAL_RESEARCH][SERVER] RESULT operation=" .. operation
+                .. " request_id=" .. request_id .. " player=" .. tostring(player_id)
+                .. " unit=" .. tostring(source) .. " success=" .. (result.ok and "1" or "0")
+                .. " queued=" .. (result.queued and "1" or "0")
+                .. " researching=" .. tostring(research.researching)
+                .. " blocked_reason=" .. tostring(research.blocked_reason or "")
+                .. " error=" .. tostring(result.error or "")
+                .. " status_code=" .. tostring(result.error_code or ""))
+        end
         options.send("ui_operation_result", player_id, {
-            operation = operation, request_id = tostring(payload.request_id or ""),
+            operation = operation, request_id = request_id,
             source_entindex = source or -1, success = result.ok and 1 or 0,
             queued = result.queued and 1 or 0,
             refunded = result.refunded and 1 or 0,
             error = result.ok and "" or operation_error(result.error, "研究排队失败"),
+            error_code = result.ok and "" or tostring(result.error_code or ""),
         })
         if result.ok then refresh({player_id = player_id, source_entindex = source})
         else

@@ -116,6 +116,14 @@ Backend Integration Phase：当前 P0 是 Player Session、在线 checkpoint、�
 ## 防御塔选敌更新（2026-10-07）
 
 自动攻击重选采用射程内首领/大头兵优先，同档离塔最近，无优先怪时最近普通怪；使用出生时缓存的boss/角色标记与二维距离平方。合法目标跨攻击周期锁定，新怪不抢占。死亡/升级清除旧manual/forced/windup立即重选，移动沿用原即时刷新；下一帧恢复失去的订单或再次失效的目标。系统订单不建立手动锁，明确玩家指定仍可覆盖。无新增轮询/全局死亡监听、CD重置或伤害改动。私有Tools交接通过且实体零残留，正式塔升级仍待新局画面确认。详见CURRENT_TASK与validation/20261007/tower_target_priority.json。
-## 无尽外观设计入口（2026-10-09）
+## 无尽外观入口（2026-10-11）
 
-用户确认的待接入方案见[50怪与四轮饰品设计](../endless_monster_visual_design_20261009.md)及docs/design下Excel/JSON/CSV。50主体每50波换饰品、200波重复；201之后固定基础体型1.5倍。当前运行入口仍使用archive_endless_rules固定模型，设计文件不是运行配置；实现及目测状态看CURRENT_TASK/KNOWN_ISSUES。
+无尽生成已使用独立archive_endless_visuals/components/ornaments三视觉CSV及resolver，不再用规则的固定模型；50身份、每50换饰品、200波循环，201之后固定基础体型1.5倍。原生完整部件走既有appearance，自定义道具独立纯父挂点，资源进入startup预载，死亡随尸体清理。战斗属性/hull独立。见[接入与测试](../ENDLESS_MONSTER_VISUAL_RUNTIME_20261011.md)及[设计表](../endless_monster_visual_design_20261009.md)，实机状态看CURRENT_TASK/KNOWN_ISSUES。
+
+## 联机存档基础奖励（2026-10-11）
+
+archive_cooperative_reward_service 在通关时冻结真人获胜队伍，挑战同局同kind首胜、无尽同局同层一次，逐账号完整基础份；个人archive_pass额外、日限、持有上限继续独立。VIP-only不新增数量。普通通关沿用既有逐人结算。新共享policy CSV进入immutable bundle；HTTP challenge event HMAC基础一致，旧pending seed保留，local fixture事件LCG不动global RNG。终局先等team outbox交archive队列，再关闭入队/等待保存。代码及211联机检查+32后端测试完成，云端尚未发布、正式四人尚未验收，运行hash未变。规则docs/COOPERATIVE_REWARD_RULES_20261011.md，证据output/cooperative_rewards_20261011。
+
+## 当前 UI 文档与构建入口（2026-10-11）
+
+菜单维护从 [当前 UI 指南](../UI_GUIDE.md) 与 design_refs/menus_v10/DELIVERY.md 进入。旧哥特、月光、C19/C25 和历史主题过程记录已清理；业务契约和原始素材包保留。V10 scope 位于 tools/archive_v10/compile_scope.json 与 tools/menus_v10/compile_scope.json，work 仅本地产物；源 PNG 可用 tools/archive_v10/import.cjs 从原包重建，游戏编译资源随仓库提交。本地 apps/comfy-dashboard 是独立应用，保留但不纳入游戏提交。

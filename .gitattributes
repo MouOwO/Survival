@@ -31,6 +31,8 @@ server/aliyun/deploy/*.timer text eol=lf
 design_refs/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Recovery snapshots preserve the original files, including their trailing lines.
 design_refs/**/checkpoints/** whitespace=blank-at-eol,space-before-tab,cr-at-eol,-blank-at-eof
+# Preserve the approved source package exactly, including original trailing lines.
+design_refs/archive_v10/package/archive_ui_final_v1/** whitespace=blank-at-eol,space-before-tab,cr-at-eol,-blank-at-eof
 design_refs/shop_ui_12h/source/cutout_prompt.txt whitespace=blank-at-eol,space-before-tab,cr-at-eol,-blank-at-eof
 art/ui/development/commerce_jade_v1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

@@ -1,0 +1,16 @@
+{
+  "sample_only": true,
+  "item_id": "virtual_04",
+  "title": "粘稠之泥",
+  "category": "虚空之影",
+  "current": 16,
+  "cap": 320,
+  "effects": [
+    "墙每秒生命 +1"
+  ],
+  "effect_evidence": {
+    "file": "image(20261009-125805).png",
+    "text": "粘稠之泥；墙每秒生命+1；当前数量：16"
+  },
+  "note": "数量与上限来自基础包预览数据；效果来自用户原游戏截图。接入时读取项目实际配置，不覆盖真实存档。"
+}

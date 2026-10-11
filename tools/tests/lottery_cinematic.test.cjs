@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 class Panel{
  constructor(type,parent,id){this.id=id;this.type=type;this.parent=parent;this.children=[];this.classes=new Set();this.style={};this.visible=true;this.events={};if(parent)parent.children.push(this);if(id)nodes[id]=this;}
- IsValid(){return !this.deleted;}AddClass(c){this.classes.add(c);}RemoveClass(c){this.classes.delete(c);}SetHasClass(c,b){b?this.AddClass(c):this.RemoveClass(c);}
+ IsValid(){return !this.deleted;}AddClass(c){this.classes.add(c);}RemoveClass(c){this.classes.delete(c);}SetHasClass(c,b){b?this.AddClass(c):this.RemoveClass(c);}BHasClass(c){return this.classes.has(c);}
  SetPanelEvent(n,f){this.events[n]=f;}DeleteAsync(){this.deleted=true;}Stop(){this.stopped=true;}SetControls(x){this.controls=x;}SetRepeat(x){this.repeat=x;}SetPlaybackVolume(x){this.volume=x;}SetMovie(x){this.source=x;}Play(){if(failPlayback)throw Error('missing decoder');this.played=true;}
 }
 const nodes={},cfg={},jobs=[];let now=0,failPlayback=false;
@@ -30,4 +30,14 @@ for(const [w,h] of [[1280,720],[1920,1080],[2560,1440],[3440,1440],[1024,768],[1
 failPlayback=true;assert.equal(c.Play('map',[],()=>done++),false);advance(8);assert.equal(done,2);assert(!nodes.LotteryCinematicSurface.visible,'decoder failure releases the UI');
 assert.equal(c.Highest([{quality:'N'},{quality:'SSR'},{quality:'r'}]),'ssr');
 assert(!fs.readFileSync('panorama/src/scripts/custom_game/lottery_cinematic_v1.js','utf8').includes('SendCustomGameEventToServer'),'cinematics must never submit draws or grants');
+c.Dispose();failPlayback=false;
+nodes.LotteryMainCanvas.AddClass('LotteryV10');
+const content=new Panel('Panel',nodes.LotteryMainCanvas,'V10LotteryContent');
+cfg.SurvivalPurpleLottery={Content:()=>content};
+assert.equal(c.Play('map',[],()=>done++),true);
+assert.equal(nodes.LotteryCinematicSurface.parent,content,'V10 film stays inside the shared right-content area');
+assert.equal(nodes.LotteryCinematicSurface.style.width,'1113px');assert.equal(nodes.LotteryCinematicSurface.style.height,'669px');
+assert.equal(parseFloat(nodes.LotteryCinematicMovie.style.width),1113);
+assert(parseFloat(nodes.LotteryCinematicMovie.style.height)<=669);
+c.Cancel();advance(8);assert.equal(done,2,'V10 close cancels the watchdog too');
 console.log('LOTTERY_CINEMATIC_PASS: 4 themes, local media, cancel/reopen/skip once, stale timers, decoder fallback, truthful quality and no transactions.');

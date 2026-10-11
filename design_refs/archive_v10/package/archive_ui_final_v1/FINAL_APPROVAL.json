@@ -1,0 +1,24 @@
+{
+  "version": "V10_final_v1",
+  "approved_at": "2026-10-10T15:24:45+08:00",
+  "user_accepted": true,
+  "package_filename": "存档UI_最终完整组件包_V10.zip",
+  "scope": "完整自包含的最终有效资产、字体许可、布局、manifest、正常/悬停预览、离线组装脚本和AI接入说明；既有业务数据由游戏项目读取。",
+  "shared_layout_locked": true,
+  "toggle_switch_contract": "仅右侧内容与对应左侧选中态变化，顶部/背景/左栏结构/资源栏位置/横轨/关闭固定。",
+  "preview_data_production_use": false,
+  "other_categories_actual_data_confirmed": false,
+  "game_imported": false,
+  "status": "交实现AI接入，未宣称已导入游戏",
+  "checks": {
+    "self_contained_package": true,
+    "manifest_asset_count": 61,
+    "runtime_bitmap_count": 48,
+    "font_and_license_included": true,
+    "normal_preview_difference_pixels": 0,
+    "hover_preview_difference_pixels": 0,
+    "isolated_folder_rebuild": true,
+    "all_asset_hashes_match": true,
+    "game_runtime_verified": false
+  }
+}

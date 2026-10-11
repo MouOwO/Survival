@@ -8,6 +8,7 @@ $repo=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 Push-Location -LiteralPath $repo
 try {
 $pythonCandidates=@((Join-Path $repo 'output/payment_venv/Scripts/python.exe'),
+    (Join-Path $env:LOCALAPPDATA 'Programs/Python/Python314/python.exe'),
     (Join-Path $env:LOCALAPPDATA 'Programs/Python/Python313/python.exe'))
 $python=$pythonCandidates | Where-Object {Test-Path -LiteralPath $_} | Select-Object -First 1
 if(-not $python){$python=(Get-Command python -ErrorAction Stop).Source}

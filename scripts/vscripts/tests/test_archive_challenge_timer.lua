@@ -4,6 +4,9 @@ local scheduler = require("core/scheduler")
 local clock, winners, rewards, removed, cancels, units, serial, pending
 local noop = function() end
 DOTA_TEAM_GOODGUYS = 2
+PlayerResource = {GetPlayer=function(_,id) return id end,
+    IsValidPlayerID=function(_,id) return id==0 or id==1 end,
+    IsFakeClient=function() return false end,GetTeam=function() return 2 end}
 Vector = function(x,y,z) return {x=x,y=y,z=z} end
 package.loaded["config/generated/archive_challenge_definitions"] = {rows = {
     {challenge_id="test",building_id=1,enabled=true,min_difficulty=1,description="test",cooldown_seconds=0}
@@ -16,7 +19,7 @@ package.loaded["systems/player_context_service"] = {
     register_unit=function(id,u) u.owner=id end, unregister_unit=noop,
     owner_player_id=function(u) return u.owner end}
 package.loaded["systems/archive_service"] = {has_pending=function() return pending end,
-    record_challenge=function() rewards=rewards+1 end}
+    record_challenge=function() rewards=rewards+1;return {ok=true} end}
 package.loaded["systems/archive_endless_service"] = {init=noop,is_running=function() return false end,
     cancel=function(id) cancels[id]=(cancels[id] or 0)+1 end, start=function() return true end}
 package.loaded["systems/archive_endless_config"] = {group=function() return {} end}
@@ -95,7 +98,7 @@ print("ARCHIVE_PHASE_TIMER_PASS: 30 minutes, shared deadline, duplicate begin, p
 package.loaded["systems/player_context_service"].is_defeated=function() return false end
 package.loaded["systems/archive_endless_config"]={rules={monsters_per_wave=1,time_limit_seconds=60},
     wave=function() return {health=100,attack=1,war3_armor=0} end,score=function() return 1 end}
-package.loaded["systems/archive_service"].record_endless_wave=function() rewards=rewards+1 end
+package.loaded["systems/archive_service"].record_endless_wave=function() rewards=rewards+1;return {ok=true} end
 package.loaded["systems/archive_endless_service"]=nil
 local endless=require("systems/archive_endless_service")
 local phase_expired=false
@@ -103,6 +106,8 @@ local function endless_setup()
     require("systems/gameplay_phase_guard").reset()
     bus.reset();scheduler.clear();clock=0;rewards=0;phase_expired=false
     bus.handle_request("archive.challenge_state",function() return {expired=phase_expired and 1 or 0} end)
+    local cooperative=require("systems/archive_cooperative_reward_service")
+    cooperative.init();assert(cooperative.begin({0},"N1"))
     endless.init()
 end
 endless_setup();assert(endless.start(0,1))

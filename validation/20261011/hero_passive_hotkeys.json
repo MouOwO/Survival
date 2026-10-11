@@ -1,0 +1,51 @@
+{
+  "task": "hide_passive_hero_hotkeys",
+  "date": "2026-10-11",
+  "ability": "ability_survival_monkey_king_agility",
+  "root_cause": "outdated active CSV and NO_TARGET KV after removal of the active effect",
+  "configured_hero_passives": 25,
+  "result": "pass",
+  "ui_runtime_source_changed": false,
+  "native_game_verification": "not_performed; reload match to apply ability KV",
+  "passed": [
+    "hero_passive_ability_class",
+    "monkey_king_w_er_contract",
+    "hero_passive_hotkeys",
+    "ability_hotkey_refresh_cache",
+    "clone_passive_ui",
+    "tower_passive_icons",
+    "blademaster_rebirth_unlock",
+    "clone_passive_ability_runtime",
+    "monkey_clone_q_runtime"
+  ],
+  "files": [
+    {
+      "path": "data/csv/英雄系统/hero_skill_definitions.csv",
+      "sha256": "30b9d550a3486fda24f80f4f08704b1df09bd4776307b5001a737b2fbbeaee16"
+    },
+    {
+      "path": "scripts/vscripts/config/generated/hero_skill_definitions.lua",
+      "sha256": "1a9ec0820d4f1b7f50641b9edd5316efe7b2235b89779770e4d43ed47e707669"
+    },
+    {
+      "path": "scripts/npc/npc_abilities_custom.txt",
+      "sha256": "e14d42c474f4aab2f139d8f1381cc9e2fa2a155d557daf3517cd2d2feeef6624"
+    },
+    {
+      "path": "scripts/vscripts/abilities/survival_hero_skill.lua",
+      "sha256": "df188c9e5903a23ea56c105cf60f6a749ce3d206864131e3a4df3bd7972f6911"
+    },
+    {
+      "path": "tools/test_monkey_king_w_er_contract.ps1",
+      "sha256": "8f973968840e53cb0741029825aec0eb21866afb5c52fb9272608d67574a8b08"
+    },
+    {
+      "path": "tools/test_hero_passive_ability_class.lua",
+      "sha256": "a871404f44e1b47ce1b8f59c1648e9625e801919cde39915e287b447fbf76cc2"
+    },
+    {
+      "path": "tools/test_hero_passive_hotkeys.cjs",
+      "sha256": "202283c187cae085bc8af9770274fceb4c7719a533a0e2239a1f7ec7edd402cf"
+    }
+  ]
+}

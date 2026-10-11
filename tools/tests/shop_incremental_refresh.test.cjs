@@ -14,7 +14,8 @@ const shopScript = 'shop_remaining_5d5c1152eb.js';
 assert(manifest.includes('/survival_hud.xml"'), 'the root manifest must load this HUD');
 assert(hud.includes('/' + shopScript + '"'), 'test the shop controller used by the real HUD');
 const scripts = ['common/ui_registry.js', 'common/ui_components.js', 'ui_layers.js',
-    'remaining_5d5c1152eb.js', 'shop_tooltip_remaining_5d5c1152eb.js', shopScript];
+    'remaining_5d5c1152eb.js', 'archive_v10_data.js', 'common/menu_v10.js',
+    'shop_tooltip_remaining_5d5c1152eb.js', shopScript];
 const sources = new Map(scripts.map(name => [name, fs.readFileSync(path.join(scriptDirectory, name), 'utf8')]));
 
 function harness() {
@@ -49,6 +50,10 @@ function harness() {
         SetHasClass(name, value) { value ? this.AddClass(name) : this.RemoveClass(name); }
         BHasClass(name) { return this.classes.has(name); }
         GetParent() { return this.parent; }
+        SetParent(parent) {
+            if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this);
+            this.parent = parent; if (parent) parent.children.push(this);
+        }
         GetChildCount() { return this.children.length; }
         GetChild(index) { return this.children[index]; }
         Children() { return this.children; }
@@ -229,7 +234,7 @@ test('stock and repeat-purchase availability update existing cards in full and d
     h.full({entries: [item({stock: 0, purchasable: 0, disabled_reason_code: 'stock_empty'})]});
     assert(h.card('sword') === original, 'stock is state, so changing it keeps the tile');
     assert(original.BHasClass('StockEmpty')); assert.equal(original.__survivalStockLabel.text, '0/5');
-    assert.equal(original.__survivalStockLabel.visible, false); assertNoRebuild(h, 'stock update');
+    assert.equal(original.__survivalStockLabel.visible, true, 'The shared V10 cell exposes the current stock corner count'); assertNoRebuild(h, 'stock update');
     h.delta({changed_entries: [item({stock: 1})]});
     assert(h.card('sword') === original, 'stock delta keeps the original card'); assert(!original.BHasClass('StockEmpty'));
     assert.equal(original.__survivalStockLabel.text, '1/5');

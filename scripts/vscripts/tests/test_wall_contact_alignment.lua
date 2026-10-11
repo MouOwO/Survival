@@ -27,6 +27,7 @@ local function unit(id,x,y,radius)
     function u:IsAlive() return true end
     function u:GetAbsOrigin() return self.p end
     function u:GetHullRadius() return self.radius end
+    function u:SetHullRadius(radius) self.radius=radius end
     function u:SetAbsOrigin(p) self.p=Vector(p.x,p.y,p.z);self.writes=self.writes+1 end
     return u
 end
@@ -35,7 +36,7 @@ local function claim(lateral)
     contact.reset();blocked=nil;ground=nil;clock=clock+10
     local u=unit(2,-400,lateral)
     local plan=assert(contact.resolve(wall,u))
-    assert(plan.claimed and plan.point.x==-192 and plan.point.y==lateral)
+    assert(plan.claimed and plan.point.x==-184 and plan.point.y==lateral and u:GetHullRadius()==24)
     return u,plan.point
 end
 local function unchanged(u,before,label)
@@ -49,10 +50,10 @@ local function reject(u,point,label)
 end
 
 for _,sign in ipairs({-1,1}) do
-    local u,point=claim(sign*96)
-    u.p=Vector(-192,sign*110,384)
+    local u,point=claim(sign*72)
+    u.p=Vector(-184,sign*110,384)
     assert(GridNav:IsTraversable(u.p) and not GridNav:IsBlocked(u.p),'native center must be navigable')
-    assert(contact.arrived(wall,u,point,false),'fourteen-unit correction must be in settle range')
+    assert(contact.arrived(wall,u,point,false),'thirty-eight-unit correction must be in settle range')
     assert(contact.settle(wall,u,point),'existing bank overlap must allow a short inward alignment')
     assert(u.p.x==point.x and u.p.y==point.y and u.writes==1,'bank recovery must align once')
     assert(contact.settle(wall,u,point) and u.writes==1,'already aligned contact must not write position again')
@@ -61,46 +62,46 @@ end
 -- Existing peripheral overlap into the wall may move out along a safe center
 -- segment. The center itself must never enter the wall or cross to its rear.
 do
-    local u,point=claim(32)
-    u.p=Vector(-150,32,384)
+    local u,point=claim(24)
+    u.p=Vector(-150,24,384)
     assert(not GridNav:IsBlocked(u.p),'overlapping hull still has an exterior center')
     assert(contact.settle(wall,u,point),'an already overlapping wall edge must be allowed to clear outward')
-    assert(u.p.x==-192 and u.p.y==32 and u.writes==1)
+    assert(u.p.x==-184 and u.p.y==24 and u.writes==1)
 end
 do
-    local u,point=claim(32)
-    u.p=Vector(192,32,384)
+    local u,point=claim(24)
+    u.p=Vector(184,24,384)
     reject(u,point,'opposite wall side')
 end
 
 -- Both endpoints have clear hulls, but the short center segment intersects a
 -- newly placed obstruction. The small sampled obstruction isolates this rule.
 do
-    local u,point=claim(32)
-    u.p=Vector(-256,32,384)
-    blocked=function(p) return math.abs(p.x+240)<2 and math.abs(p.y-32)<2 end
+    local u,point=claim(24)
+    u.p=Vector(-248,24,384)
+    blocked=function(p) return math.abs(p.x+232)<2 and math.abs(p.y-24)<2 end
     reject(u,point,'center segment obstacle')
 end
 do
-    local u,point=claim(32)
-    u.p=Vector(-256,32,384)
-    ground=function(p) return math.abs(p.x+240)<2 and 448 or 384 end
+    local u,point=claim(24)
+    u.p=Vector(-248,24,384)
+    ground=function(p) return math.abs(p.x+232)<2 and 448 or 384 end
     reject(u,point,'center segment elevation change')
 end
 
 -- Peripheral recovery is one-way: a sample that started clear may never
 -- become blocked, and one that has cleared its old overlap cannot reenter.
 do
-    local u,point=claim(32)
-    u.p=Vector(-256,32,384)
-    blocked=function(p) return math.abs(p.x+240)<2 and math.abs(p.y-63)<2 end
+    local u,point=claim(24)
+    u.p=Vector(-248,24,384)
+    blocked=function(p) return math.abs(p.x+232)<2 and math.abs(p.y-47)<2 end
     reject(u,point,'new peripheral penetration')
 end
 do
-    local u,point=claim(32)
-    u.p=Vector(-256,32,384)
+    local u,point=claim(24)
+    u.p=Vector(-248,24,384)
     blocked=function(p)
-        return math.abs(p.y-63)<2 and (math.abs(p.x+256)<2 or math.abs(p.x+224)<2)
+        return math.abs(p.y-47)<2 and (math.abs(p.x+248)<2 or math.abs(p.x+216)<2)
     end
     reject(u,point,'peripheral reentry after clearing')
 end
@@ -108,15 +109,16 @@ end
 -- The destination must be revalidated even if the unit happens to be at the
 -- exact cached point. A newly blocked contact does not authorize an attack.
 for _,already_aligned in ipairs({false,true}) do
-    local u,point=claim(32)
-    u.p=Vector(already_aligned and -192 or -224,32,384)
-    blocked=function(p) return math.abs(p.x+192)<2 and math.abs(p.y-32)<2 end
+    local u,point=claim(24)
+    u.p=Vector(already_aligned and -184 or -216,24,384)
+    blocked=function(p) return math.abs(p.x+184)<2 and math.abs(p.y-24)<2 end
     reject(u,point,already_aligned and 'unsafe exact destination' or 'unsafe destination')
 end
 do
-    local u,point=claim(32)
-    u.p=Vector(-224,32,384)
+    local u,point=claim(24)
+    u.p=Vector(-216,24,384)
     contact.release(wall:entindex(),u:entindex())
+    assert(u:GetHullRadius()==32,'released alignment admission must restore the physical hull')
     reject(u,point,'released admission')
 end
 contact.reset()

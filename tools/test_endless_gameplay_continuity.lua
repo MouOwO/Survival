@@ -11,7 +11,10 @@ local clock, serial, units, pending, winners, rewards, finalizations, fail_spawn
 local late_cleanup_write
 DOTA_TEAM_GOODGUYS = 2
 Vector = function(x, y, z) return {x = x, y = y, z = z} end
-PlayerResource = {GetTeam = function() return DOTA_TEAM_GOODGUYS end}
+PlayerResource = {GetTeam = function() return DOTA_TEAM_GOODGUYS end,
+    GetPlayer = function(_, id) return id end,
+    IsValidPlayerID = function(_, id) return id == 0 or id == 1 end,
+    IsFakeClient = function() return false end}
 
 package.loaded["config/resources_config"] = {
     initial_wood = 100, initial_gold = 50,
@@ -40,7 +43,7 @@ package.loaded["systems/player_profile_service"] = {
 }
 package.loaded["systems/archive_service"] = {
     has_pending = function() return pending end,
-    record_endless_wave = function() rewards = rewards + 1 end,
+    record_endless_wave = function() rewards = rewards + 1; return {ok = true} end,
     begin_finalization = function()
         assert(guard.post_clear_frozen(), "freeze before starting the final archive save")
         finalizations = finalizations + 1
@@ -49,6 +52,22 @@ package.loaded["systems/archive_service"] = {
 }
 package.loaded["systems/monster_hero_visual_service"] = {clear = noop, on_death = noop}
 package.loaded["systems/challenge_guardian_visual_service"] = {clear = noop, apply = noop}
+package.loaded["systems/archive_endless_visual_config"] = {
+    resolve = function(number)
+        return {visual_id = "fixture_" .. number, cycle_slot = (number - 1) % 50 + 1,
+            outfit_round = math.floor((number - 1) / 50) % 4 + 1,
+            display_name = "Creature " .. number, model_path = "test/creature_" .. number .. ".vmdl",
+            model_scale = number <= 200 and 1 or 1.5}
+    end,
+}
+package.loaded["visual/endless_monster_visual_service"] = {
+    apply = function(body, visual)
+        body.endless_visual = visual
+        return true
+    end,
+    clear = function(body) body.endless_visual = nil end,
+    on_death = function(body) body.endless_visual = nil end,
+}
 
 local function unit(name, position)
     serial = serial + 1
@@ -80,9 +99,11 @@ package.loaded["systems/wave_system"] = {
         return {IsNull = function() return false end,
             GetAbsOrigin = function() return Vector(id * 2000, 0, 0) end}
     end,
-    spawn_challenge_monster = function()
+    spawn_challenge_monster = function(row, definition)
         if fail_spawn then return nil end
-        return unit("endless_monster", Vector(0, 0, 0))
+        local body = unit("endless_monster", Vector(0, 0, 0))
+        body.battle_row, body.challenge_definition = row, definition
+        return body
     end,
 }
 
@@ -112,6 +133,7 @@ local function setup()
         end}
     CreateUnitByName = unit
     UTIL_Remove = function(body)
+        assert(not body.endless_visual, "forced removal must first release the endless decorations")
         body.removed = true
         if challenge.phase_snapshot().ended == 1 then
             local result = bus.request(events.RESOURCE_ADD_REQUEST,
@@ -168,6 +190,14 @@ local function start_endless(id)
     local hub = challenge._test.players()[id].hubs[2]
     assert(challenge.start_endless(hub, hub:FindAbilityByName("ability_archive_endless")))
     assert(endless.is_running(id))
+    local monster = units[#units]
+    assert(monster.endless_visual and monster.endless_visual.cycle_slot == 1,
+        "the first wave receives its appearance without altering the ordinary gameplay phase")
+    assert(monster.challenge_definition.model_path == monster.endless_visual.model_path
+        and monster.challenge_definition.endless == true
+        and monster.challenge_definition.movement_type == "ground"
+        and monster.battle_row.health == 100 and monster.battle_row.attack == 1,
+        "visual factory arguments preserve existing monster statistics and collision policy")
 end
 local function assert_saved_settlement()
     assert(finalizations == 1 and pending and winners == 0)
@@ -208,16 +238,19 @@ assert(balance().wood == before_income.wood + 2 and balance().gold == before_inc
     "passive income continues while endless monsters are alive")
 local monster = units[#units]
 bus.emit(events.ENGINE_ENTITY_KILLED, {victim = monster, victim_entindex = monster.id})
-assert(rewards == 1)
+assert(rewards == 2, "each winning account receives the completed team wave")
+assert(not monster.endless_visual, "death clears its owned endless appearance before advancing the wave")
 tick(3.1)
 assert(endless.snapshot(0).wave == 2 and endless.is_running(0))
+assert(units[#units].endless_visual.cycle_slot == 2,
+    "wave rollover changes the appearance while resource operations remain available")
 ordinary_gameplay()
 local deadline = challenge.phase_snapshot().deadline
 assert(challenge.begin(payload).keep_running and challenge.phase_snapshot().deadline == deadline,
     "retrying begin cannot extend the phase")
 tick(deadline)
 assert(challenge.phase_snapshot().expired == 1 and not endless.is_running(0))
-assert(rewards == 1, "timeout cleanup must not award another endless wave")
+assert(rewards == 2, "timeout cleanup must not award another endless wave")
 assert_saved_settlement()
 
 setup()
@@ -293,7 +326,7 @@ fail_setter = true
 tick(0.1)
 assert(not endless.is_running(0) and units[#units].removed,
     "a queued wave setup exception must stop endless and remove its partial monster")
-assert(rewards == 1, "failed next-wave setup cannot grant another clear reward")
+assert(rewards == 2, "failed next-wave setup cannot grant another clear reward")
 local failed_balance = assert_frozen()
 tick(1.1)
 assert(balance().wood == failed_balance.wood and balance().gold == failed_balance.gold,

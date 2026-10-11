@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1398" height="8" viewBox="0 0 1398 8">
+  <title>Dark gold navigation rail with gentle center lighting</title>
+  <desc>1398 by 8 transparent sprite at page 136,87. Ends stop at page x136 and x1534. The same seven painted rows and material profile are used by the V10 footer rail. Smooth central illumination, darker ends, no noise or glow.</desc>
+  <defs>
+    <linearGradient id="face" x1="0" y1="2" x2="0" y2="5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#967D49"/>
+      <stop offset="0.48" stop-color="#806539"/>
+      <stop offset="1" stop-color="#64502D"/>
+    </linearGradient>
+    <linearGradient id="endShade" x1="0" y1="0" x2="1398" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#17120C" stop-opacity="0.22"/>
+      <stop offset="0.20" stop-color="#17120C" stop-opacity="0.11"/>
+      <stop offset="0.50" stop-color="#17120C" stop-opacity="0"/>
+      <stop offset="0.80" stop-color="#17120C" stop-opacity="0.11"/>
+      <stop offset="1" stop-color="#17120C" stop-opacity="0.22"/>
+    </linearGradient>
+    <clipPath id="railClip"><path d="M0 0H1398V7H0Z"/></clipPath>
+  </defs>
+  <path d="M0 0H1398V1H0Z" fill="#29241D"/>
+  <path d="M0 1H1398V2H0Z" fill="#B29A65"/>
+  <path d="M0 2H1398V5H0Z" fill="url(#face)"/>
+  <path d="M0 5H1398V6H0Z" fill="#473721"/>
+  <path d="M0 6H1398V7H0Z" fill="#0F1011" fill-opacity="0.35"/>
+  <path d="M0 0H1398V7H0Z" fill="url(#endShade)" clip-path="url(#railClip)"/>
+</svg>

@@ -3,7 +3,7 @@ const path=require('node:path');const root=path.resolve(__dirname,'../..');
 function read(name){return fs.readFileSync(path.join(root,'panorama/src/scripts/custom_game',name),'utf8');}
 class Panel {
  constructor(id='',type='Panel',parent=null){this.id=id;this.paneltype=type;this.parent=parent;this.children=[];this.style={};this.classes=new Set();this.hittest=true;this.hittestchildren=true;if(parent)parent.children.push(this);}
- IsValid(){return true;}GetParent(){return this.parent;}Children(){return this.children.slice();}AddClass(c){this.classes.add(c);}RemoveClass(c){this.classes.delete(c);}BHasClass(c){return this.classes.has(c);}SetImage(uri){this.uri=uri;}MoveChildBefore(child,before){this.children.splice(this.children.indexOf(child),1);this.children.splice(this.children.indexOf(before),0,child);}
+ IsValid(){return true;}FindChildTraverse(id){if(this.id===id)return this;for(const child of this.children){const found=child.FindChildTraverse(id);if(found)return found;}return null;}GetParent(){return this.parent;}Children(){return this.children.slice();}AddClass(c){this.classes.add(c);}RemoveClass(c){this.classes.delete(c);}BHasClass(c){return this.classes.has(c);}SetImage(uri){this.uri=uri;}MoveChildBefore(child,before){this.children.splice(this.children.indexOf(child),1);this.children.splice(this.children.indexOf(before),0,child);}
 }
 const cfg={},panels={};const $=id=>panels[id.slice(1)];
 $.CreatePanel=(t,p,id)=>new Panel(id,t,p);$.Msg=()=>{};
@@ -26,20 +26,18 @@ item.style.textShadow='0px 1px 2px 3 #071018ff';item.style.fontWeight='bold';cfg
 assert.equal(item.style.textShadow,'none','Refresh must retain the approved TreasureHint text without an outline');assert.equal(item.style.fontWeight,'normal');assert.equal(item.style.fontFamily,'"Source Han Sans SC", "Microsoft YaHei", sans-serif');
 const tooltip=new Panel('ArchiveTooltip');cfg.ArchiveTheme.Apply(tooltip);assert.equal(tooltip.style.backgroundColor,cfg.SurvivalArchiveColors.surface_52,'Do not restyle accepted archive tooltips');
 const viewport=new Panel('viewport');$.GetContextPanel=()=>viewport;
-for(const id of ['LotteryWindow','LotteryMainCanvas','LotteryCelestialHeader','LotteryCloseButton'])panels[id]=new Panel(id);
+for(const id of ['LotteryWindow','LotteryMainCanvas','LotteryCelestialHeader','LotteryCloseButton'])panels[id]=new Panel(id,'Panel',viewport);
 vm.runInContext(read('lottery_handoff_bb9968eef7.js'),context);
 for(const [w,h] of [[1280,720],[1920,1080],[2560,1440],[3440,1440],[1024,768]]){
  viewport.actuallayoutwidth=w;viewport.actuallayoutheight=h;viewport.actualuiscale_x=1;viewport.actualuiscale_y=1;
- cfg.LotteryHandoff.Prepare();const s=Number(panels.LotteryMainCanvas.style.transform.match(/scale3d\(([^,]+)/)[1]);
- assert.ok(Math.abs(parseFloat(panels.LotteryMainCanvas.style.width)*s-w)<.01,'Canvas fills viewport width');
- assert.ok(Math.abs(parseFloat(panels.LotteryMainCanvas.style.height)*s-h)<.01,'Canvas fills viewport height');
- assert.ok(parseFloat(panels.LotteryMainCanvas.style.width)>=1599.99 && parseFloat(panels.LotteryMainCanvas.style.height)>=899.99,'Controls retain safe area');
+ cfg.LotteryHandoff.Prepare();
+ assert.equal(panels.LotteryMainCanvas.style.opacity,'0','Missing V10 integration never paints the retired full-screen layout');
 }
 // Read dimensions from the shipped CSS, so stale overflow fails the check.
 const css=fs.readFileSync(path.join(root,'panorama/src/styles/custom_game/reference_windows.css'),'utf8');
 function rule(selector){const esc=selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const matches=[...css.matchAll(new RegExp(esc+'\\s*\\{([^}]+)\\}','g'))];assert.ok(matches.length,selector);return matches.map(m=>m[1]).join(';');}
 function val(s,prop){const m=[...s.matchAll(new RegExp('(?:^|;)\\s*'+prop+'\\s*:\\s*([^;]+)','g'))];assert.ok(m.length,prop);return m.at(-1)[1].trim();}
-console.log('PASS: input-transparent archive frame, palette refresh and 5 full-screen viewport fits.');
+console.log('PASS: input-transparent archive frame, palette refresh and 5 viewport sizes with the missing-renderer guard.');
 
 const lockedCard=new Panel('','Panel',body);lockedCard.AddClass('ArchiveCard');lockedCard.AddClass('ArchiveContentLocked');
 const lockedArt=new Panel('','Panel',lockedCard);lockedArt.AddClass('ArchiveArt');

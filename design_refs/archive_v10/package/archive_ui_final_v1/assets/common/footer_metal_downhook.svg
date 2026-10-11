@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1438" height="56" viewBox="0 0 1438 56">
+  <title>Dark gold footer rail with larger downward metal hooks</title>
+  <desc>Transparent 1438 by 56 sprite at page 116,876. The rail is drawn at local x20..1418,y20..27: page x136..1534,y896..903, center y900. Hooks are 24 px wide, bend 20 px below center and have a one px bronze underside. Exterior page bounds x124..1546,bottom921. No upper vertical frame. Rail profile and center/end illumination match the V10 navigation rail exactly.</desc>
+  <defs>
+    <!-- Identical profile to navigation_rail.svg, applied inside its translated rail group. -->
+    <linearGradient id="face" x1="0" y1="2" x2="0" y2="5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#967D49"/>
+      <stop offset="0.48" stop-color="#806539"/>
+      <stop offset="1" stop-color="#64502D"/>
+    </linearGradient>
+    <linearGradient id="endShade" x1="0" y1="0" x2="1398" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#17120C" stop-opacity="0.22"/>
+      <stop offset="0.20" stop-color="#17120C" stop-opacity="0.11"/>
+      <stop offset="0.50" stop-color="#17120C" stop-opacity="0"/>
+      <stop offset="0.80" stop-color="#17120C" stop-opacity="0.11"/>
+      <stop offset="1" stop-color="#17120C" stop-opacity="0.22"/>
+    </linearGradient>
+    <clipPath id="railClip"><path d="M0 0H1398V7H0Z"/></clipPath>
+    <linearGradient id="hookFace" x1="11" y1="20" x2="25" y2="45" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8B7142"/>
+      <stop offset="0.15" stop-color="#A08A58"/>
+      <stop offset="0.34" stop-color="#5D4B2E"/>
+      <stop offset="0.50" stop-color="#8E7748"/>
+      <stop offset="0.66" stop-color="#B09965"/>
+      <stop offset="0.81" stop-color="#806439"/>
+      <stop offset="1" stop-color="#4E3D27"/>
+    </linearGradient>
+    <linearGradient id="hookBevel" x1="10" y1="20" x2="22" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#AC945E"/>
+      <stop offset="0.24" stop-color="#BFAB7A"/>
+      <stop offset="0.45" stop-color="#8E7950"/>
+      <stop offset="0.65" stop-color="#B7A16D"/>
+      <stop offset="1" stop-color="#8A7246"/>
+    </linearGradient>
+    <g id="downHook">
+      <!-- Filled bronze underside: one px lower than the upper brass face. -->
+      <path d="M32 21H20C13.35 21 8 26.4 8 33V35C8 41.1 12.8 45 18.4 45H26V39.4H18.6C15.5 39.4 13.6 37.7 13.6 35V33C13.6 29.6 16.55 26.6 20 26.6H32Z" fill="#362A1C"/>
+      <!-- 24 px visible width and 20 px downward bend from the main rail center. -->
+      <path d="M32 20H20C13.35 20 8 25.4 8 32V34C8 40.1 12.8 44 18.4 44H26V38.4H18.6C15.5 38.4 13.6 36.7 13.6 34V32C13.6 28.6 16.55 25.6 20 25.6H32Z" fill="url(#hookFace)"/>
+      <!-- Continuous narrow light-catching facet follows the rounded outside edge. -->
+      <path d="M32 20H20C13.35 20 8 25.4 8 32V34C8 40.1 12.8 44 18.4 44H26V42.7H18.4C13.42 42.7 9.3 39.4 9.3 34V32C9.3 26.18 14.06 21.3 20 21.3H32Z" fill="url(#hookBevel)"/>
+      <!-- The inner cut is intentionally darker and separate from the curved lit face. -->
+      <path d="M32 24.4H20C15.86 24.4 12.4 27.81 12.4 32V34C12.4 37.39 14.88 39.6 18.6 39.6H26V38.4H18.6C15.5 38.4 13.6 36.7 13.6 34V32C13.6 28.6 16.55 25.6 20 25.6H32Z" fill="#473721"/>
+      <!-- Short polished return-end facet and dark bottom bevel. -->
+      <path d="M24.9 38.4H26V42.7H24.9Z" fill="#AC965F"/>
+      <path d="M18.4 44H26V45H18.4Z" fill="#514027"/>
+      <path d="M9.55 28.75C9.2 29.79 9.1 30.85 9.1 32V34C9.1 35.27 9.25 36.5 9.63 37.68L10.28 37.43C9.94 36.31 9.78 35.18 9.78 34V32C9.78 30.96 9.9 29.92 10.23 28.98Z" fill="#BDAC80" fill-opacity="0.66"/>
+    </g>
+  </defs>
+  <use xlink:href="#downHook"/>
+  <use xlink:href="#downHook" transform="translate(1438 0) scale(-1 1)"/>
+  <!-- Same geometry, palette and gradient as the upper rail; ends stay on the panel width. -->
+  <g transform="translate(20 20)">
+    <path d="M0 0H1398V1H0Z" fill="#29241D"/>
+    <path d="M0 1H1398V2H0Z" fill="#B29A65"/>
+    <path d="M0 2H1398V5H0Z" fill="url(#face)"/>
+    <path d="M0 5H1398V6H0Z" fill="#473721"/>
+    <path d="M0 6H1398V7H0Z" fill="#0F1011" fill-opacity="0.35"/>
+    <path d="M0 0H1398V7H0Z" fill="url(#endShade)" clip-path="url(#railClip)"/>
+  </g>
+</svg>

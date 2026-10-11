@@ -1,0 +1,4 @@
+rule_id,version,enabled,shared_challenge_roll
+#中文表头:规则ID,版本,启用,挑战基础掉落共用随机序列
+#types:string,number,boolean,boolean
+default,1,1,1
