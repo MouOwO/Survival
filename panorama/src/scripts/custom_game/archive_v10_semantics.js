@@ -67,6 +67,33 @@
         var denominator = cap(item);
         return count(item) + (denominator === null ? "" : "/" + denominator);
     }
+    function progress(item, category) {
+        item = item || {};
+        if (category === "titles") {
+            var titleState = state(item, category);
+            return { known: titleState !== null, ratio: null, current: null, target: null,
+                text: titleState === null ? "状态待同步" : titleState
+                    ? (Number(item.equipped) === 1 ? "已穿戴" : "已解锁") : "未解锁" };
+        }
+        var current, target, text = quantity(item, category);
+        if (category === "map_level") {
+            current = number(item.__v10CurrentLevel);
+            target = number(item.__v10TargetLevel);
+        } else if (category === "work" || category === "building") {
+            current = level(item);
+            target = number(item.target);
+        } else {
+            current = known(item) ? number(item.count) : null;
+            target = category === "fragment" ? number(item.target) : number(cap(item));
+            if (category === "fragment") text = count(item) + (target !== null && target > 0 ? "/" + target : "");
+        }
+        // A known current value need not have a cap. Only a real positive target
+        // permits a fill; keeping null distinct from zero prevents invented goals.
+        if (target === null || target <= 0) target = null;
+        return { known: current !== null,
+            ratio: current !== null && target !== null ? Math.max(0, Math.min(1, current / target)) : null,
+            current: current, target: target, text: text };
+    }
     function metric(item, category) {
         item = item || {};
         if (category === "clear") return "累计通关次数";
@@ -125,5 +152,5 @@
         });
         return ordered;
     }
-    cfg.ArchiveV10Semantics = { Normalize: normalize, Quantity: quantity, Metric: metric, State: state, Known: known };
+    cfg.ArchiveV10Semantics = { Normalize: normalize, Quantity: quantity, Progress: progress, Metric: metric, State: state, Known: known };
 })();

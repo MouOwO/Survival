@@ -94,4 +94,93 @@ for (const category of ['shadow', 'pet', 'points', 'shop', 'friend', 'ex', 'beas
 assert.equal(S.Quantity({unlocked: 1, count: 1}, 'titles'), '');
 assert.equal(S.State({unlocked: 1}, 'titles'), true);
 assert.equal(S.State({unlocked: 0}, 'titles'), false);
-console.log('PASS: V10 official catalog joining; zero/unknown/caps; more-than-preview capacity; achievement overrun; independent level/activation; map and endless metrics; read-only normalization.');
+
+// Progress drives presentation only; it must preserve the authoritative values
+// even when the visual fill is bounded or no meaningful target exists.
+assert.deepEqual(plain(S.Progress(joined[0], 'shadow')), {
+    known: true, ratio: 2 / catalog[0].max_owned, current: 2, target: catalog[0].max_owned,
+    text: '2/' + catalog[0].max_owned
+});
+assert.deepEqual(plain(S.Progress(unavailable, 'shadow')), {
+    known: false, ratio: null, current: null, target: catalog[0].max_owned, text: '—/' + catalog[0].max_owned
+});
+for (const count of [undefined, null, '', ' ', '—', 'not-a-number', Infinity, NaN, -1, false]) {
+    assert.deepEqual(plain(S.Progress({count, target: 100}, 'shadow')), {
+        known: false, ratio: null, current: null, target: 100, text: '—/100'
+    }, 'Unavailable inventory never becomes a zero progress bar');
+}
+for (const count of [0, '0']) {
+    assert.deepEqual(plain(S.Progress({count, target: 100}, 'shadow')), {
+        known: true, ratio: 0, current: 0, target: 100, text: '0/100'
+    }, 'A real zero is known and has an empty fill');
+}
+assert.deepEqual(plain(S.Progress(null, 'shadow')), {
+    known: false, ratio: null, current: null, target: null, text: '—'
+});
+for (const target of [undefined, null, 0, '0', -1, '', false, Infinity, 'invalid']) {
+    assert.deepEqual(plain(S.Progress({count: 4, target}, 'shadow')), {
+        known: true, ratio: null, current: 4, target: null, text: '4'
+    }, 'No valid cap means no invented completion target');
+}
+assert.deepEqual(plain(S.Progress(uncapped, 'shadow')), {
+    known: true, ratio: null, current: 12, target: null, text: '12'
+}, 'Explicit server removal of a catalog cap also removes the visual fill');
+assert.deepEqual(plain(S.Progress({count: 4, max_owned: null, target: 100}, 'shadow')), {
+    known: true, ratio: null, current: 4, target: null, text: '4'
+}, 'An explicit uncapped inventory is not replaced with a fallback target');
+assert.deepEqual(plain(S.Progress({count: 4, max_owned: 20, target: 100}, 'shadow')), {
+    known: true, ratio: 0.2, current: 4, target: 20, text: '4/20'
+});
+for (const category of ['clear', 'boss', 'gift', 'endless', 'starjoy_points']) {
+    const achievement = Object.freeze({count: 25, target: 5, completed: 1});
+    assert.deepEqual(plain(S.Progress(achievement, category)), {
+        known: true, ratio: 1, current: 25, target: 5, text: '25/5'
+    }, 'Only the fill is capped; accumulated achievement counts remain real: ' + category);
+    assert.deepEqual(achievement, {count: 25, target: 5, completed: 1}, 'Progress never changes authoritative data');
+}
+assert.deepEqual(plain(S.Progress(mapRow, 'map_level')), {
+    known: true, ratio: 0.4, current: 2, target: 5, text: 'LV2/5'
+}, 'Map progress is a level milestone, not the online-minute detail');
+assert.deepEqual(plain(S.Progress(S.Normalize({rows: [{rune: '5', count: 800, target: 1200}]}, 'map_level')[0], 'map_level')), {
+    known: false, ratio: null, current: null, target: 5, text: 'LV—/5'
+}, 'Missing map level never falls back to minutes');
+assert.deepEqual(plain(S.Progress({__v10CurrentLevel: 0, __v10TargetLevel: 5, count: 800}, 'map_level')), {
+    known: true, ratio: 0, current: 0, target: 5, text: 'LV0/5'
+});
+assert.deepEqual(plain(S.Progress({__v10CurrentLevel: 7, __v10TargetLevel: 5}, 'map_level')), {
+    known: true, ratio: 1, current: 7, target: 5, text: 'LV7/5'
+});
+for (const category of ['building', 'work']) {
+    assert.deepEqual(plain(S.Progress({level: 2, count: 500, target: 5, max_owned: 1000}, category)), {
+        known: true, ratio: 0.4, current: 2, target: 5, text: 'LV2/5'
+    }, 'Upgrade progress uses the actual level and its target');
+    assert.deepEqual(plain(S.Progress({level: null, count: 500, target: 5}, category)), {
+        known: false, ratio: null, current: null, target: 5, text: 'LV—/5'
+    }, 'An explicitly unknown level cannot become an inventory count');
+    assert.deepEqual(plain(S.Progress({count: 2, target: 5}, category)), {
+        known: true, ratio: 0.4, current: 2, target: 5, text: 'LV2/5'
+    }, 'Legacy server count-as-level rows retain their established meaning');
+}
+assert.deepEqual(plain(S.Progress({level: 0, target: 1}, 'work')), {
+    known: true, ratio: 0, current: 0, target: 1, text: '0/1'
+}, 'One-time welfare stays a single activation');
+assert.deepEqual(plain(S.Progress({count: 19, level: 4, target: 100, max_owned: 999}, 'fragment')), {
+    known: true, ratio: 0.19, current: 19, target: 100, text: '19/100'
+}, 'Fragment holding progress is independent from its effect level and uses the server target');
+assert.deepEqual(plain(S.Progress({count: 0, level: 4, target: 100}, 'fragment')), {
+    known: true, ratio: 0, current: 0, target: 100, text: '0/100'
+}, 'An activated fragment effect can coexist with zero remaining fragments');
+assert.deepEqual(plain(S.Progress({count: 19, count_known: 0, level: 4, target: 100}, 'fragment')), {
+    known: false, ratio: null, current: null, target: 100, text: '—/100'
+}, 'Known effect level does not fill an unknown fragment inventory');
+for (const [item, known, text] of [
+    [{unlocked: 1, equipped: 1, count: 1, target: 1}, true, '已穿戴'],
+    [{unlocked: 1, count: 1, target: 1}, true, '已解锁'],
+    [{unlocked: 0, count: 0, target: 1}, true, '未解锁'],
+    [{}, false, '状态待同步']
+]) {
+    assert.deepEqual(plain(S.Progress(item, 'titles')), {
+        known, ratio: null, current: null, target: null, text
+    }, 'Title state never masquerades as a quantitative completion bar');
+}
+console.log('PASS: V10 official catalog joining; zero/unknown/caps; more-than-preview capacity; achievement overrun; independent level/activation; map and endless metrics; read-only normalization and category-aware progress.');

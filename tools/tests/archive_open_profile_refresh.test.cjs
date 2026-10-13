@@ -9,7 +9,7 @@ const {csv} = require('../shop_ui_12h/catalog.cjs');
 const project = path.resolve(__dirname, '../..');
 const scriptDirectory = path.join(project, 'panorama/src/scripts/custom_game');
 const manifest = fs.readFileSync(path.join(project, 'panorama/src/layout/custom_game/archive.xml'), 'utf8');
-const scripts = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'archive_v10.js',
+const scripts = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'archive_v10.js',
     'archive_180de7e38b_titles_compact_v6.js'];
 for (const name of scripts) assert(manifest.includes('/' + name + '"'), 'test the active manifest source: ' + name);
 
@@ -225,15 +225,17 @@ snapshot('friend', [{id: 'friend_01', name: '好友', count: 0, target: 100}],
 snapshot('fragment', [{id: 'fragment_01', name: '神兵-初阶', count: 20, level: 1,
     can_promote: 1, promotion_target: 'fragment_02', promotion_cost: 20},
 {id: 'fragment_02', name: '神兵-高阶', count: 0, level: 0}]);
+snapshot('work', [{id: 'work_01', name: '正式福利', count: 0, level: 0, target: 1,
+    cost: 15, completed: 0, can_upgrade: 1, description: '已配置福利效果'}],
+{upgrade_pending: 0, online: {coins: 30}});
+snapshot('titles', [{id: 'title_test', name: '正式称号', unlocked: 1, equipped: 0,
+    icon: 'file://{images}/custom_game/titles/peak_clean_letters.png', description: '纯外观称号'}]);
 assert.equal(walletRefreshes, 0, 'Closed profile snapshots do not request a commerce catalog');
 api.Open(); immediate();
-assert.equal(walletRefreshes, 1, 'Opening the archive requests the existing read-only commerce catalog exactly once');
-function walletText(index) { return cfg.SurvivalMenuV10.Entries().find(entry => entry.panel.id === 'ArchiveWindow').resources[index].text.text; }
-for (let id = 0; id < 3; id++) {
-    assert.equal(walletText(id), '—', 'Unknown wallet values stay unknown until a real result arrives: ' + id);
-}
+assert.equal(walletRefreshes, 0, 'The independent archive does not request the removed commerce resource strip');
+assert.equal(cfg.SurvivalMenuV10.Entries().length, 0, 'Opening the archive creates no global menu or commerce resource panels');
 api.SelectCategory('shadow'); immediate();
-assert.equal(walletRefreshes, 1, 'A category switch does not request another commerce catalog');
+assert.equal(walletRefreshes, 0, 'Category snapshots remain independent from the commerce catalog');
 assert.equal(voidCards().length, cfg.ArchiveV10Data.catalog.length, 'the actual catalog is visible');
 assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '3/430');
 const originalCards = voidCards(), originalSidebar = nodes.get('ArchiveV10Sidebar').children.slice();
@@ -249,7 +251,7 @@ for (let revision = 1; revision <= 1000; revision++) {
         unrelated_endless_score: revision * 100});
 }
 noRebuildOrStyle(stable, '1000 accepted revisions with identical visible shadow data');
-assert.equal(walletRefreshes, 1, 'One thousand accepted profile revisions do not request commerce data again');
+assert.equal(walletRefreshes, 0, 'One thousand accepted archive revisions require no commerce data');
 assert.deepEqual(voidCards(), originalCards, 'revision changes retain the native card identities');
 assert.deepEqual(nodes.get('ArchiveV10Sidebar').children, originalSidebar, 'revision changes retain the sidebar');
 assert.equal(nodes.get('ArchiveV10Tooltip'), initialTooltip, 'unrelated revisions preserve the tooltip native identity');
@@ -307,12 +309,10 @@ resend('shadow', {categories});
 walletBalances = {u_coin: 41, shop_points: 52, shop_gold: 63};
 const walletBefore = {...metrics}, walletCards = voidCards();
 emit('survival_commerce_result', {ok: 1}); immediate();
-assert.equal(walletText(0), '41');
-assert.equal(walletText(1), '52');
-assert.equal(walletText(2), '63');
-noRebuildOrStyle(walletBefore, 'wallet-only result updates balances without painting cards');
+assert.equal(cfg.SurvivalMenuV10.Entries().length, 0, 'An unrelated commerce result cannot recreate the removed resource strip');
+noRebuildOrStyle(walletBefore, 'an unrelated commerce result cannot paint archive cards');
 assert.deepEqual(voidCards(), walletCards);
-assert.equal(walletRefreshes, 1, 'A successful commerce result renders the wallet without recursively refreshing it');
+assert.equal(walletRefreshes, 0, 'A commerce result cannot make the independent archive request a catalog');
 
 api.SelectCategory('building');
 let building = visibleCards()[0];
@@ -344,13 +344,14 @@ assert(nodes.get('ArchiveStatus').text.includes('保存'));
 const themeBefore = metrics.palettes;
 const approvedCountColor = descendant(visibleCards()[0], 'ArchiveV10Count').style.color;
 const approvedNameColor = descendant(visibleCards()[0], 'ArchiveV10Name').style.color;
-const approvedFrame = visibleCards()[0].__v10.normal.image;
+const approvedFrame = visibleCards()[0].__v10.normal.style.backgroundImage;
+assert(approvedFrame.includes('archive_parchment_v1'), 'The row frame is the actual approved parchment component');
 cfg.SurvivalArchiveColors.number = '#abcdef';
 resend('building', {upgrade_pending: 0});
 assert.equal(metrics.palettes, themeBefore, 'Legacy palette changes cannot repaint the confirmed V10 components');
 assert.equal(descendant(visibleCards()[0], 'ArchiveV10Count').style.color, approvedCountColor, 'Independent V10 quantity text retains its confirmed color');
 assert.equal(descendant(visibleCards()[0], 'ArchiveV10Name').style.color, approvedNameColor, 'Independent V10 name text retains its confirmed color');
-assert.equal(visibleCards()[0].__v10.normal.image, approvedFrame, 'A legacy theme change cannot swap the approved original frame asset');
+assert.equal(visibleCards()[0].__v10.normal.style.backgroundImage, approvedFrame, 'A legacy theme change cannot swap the approved original frame asset');
 
 api.SelectCategory('friend');
 assert.equal(nodes.get('ArchiveDraw').enabled, true);
@@ -375,18 +376,44 @@ const promotionRequests = requests.length; activate(promotion);
 assert.equal(requests.length, promotionRequests, 'promotion requests retain their local duplicate guard');
 assert.equal(requests.at(-1).name, 'survival_archive_promote');
 
-assert.equal(walletRefreshes, 1, 'All upgrade, draw, promotion, filter and category updates retain the initial single catalog refresh');
+api.SelectCategory('work');
+const workCard = visibleCards()[0], beforeWork = requests.length;
+assert.equal(workCard.paneltype, 'Button', 'The original clickable welfare card remains the horizontal row');
+assert.equal(workCard.__v10.host.hittest, false, 'Decorative row components cannot intercept welfare clicks');
+assert.equal(nodes.get('ArchiveV10Context').text, '软妹币：30', 'The actual archive snapshot supplies the welfare balance');
+activate(workCard); activate(workCard);
+assert.equal(requests.length, beforeWork + 1, 'Welfare row clicks retain the single submission gate');
+assert.equal(requests.at(-1).name, 'survival_archive_work_upgrade');
+assert.equal(requests.at(-1).payload.item_id, 'work_01');
+assert.equal(nodes.get('ArchiveFooter').visible, true, 'The save acknowledgement is visible in the independent shell');
+resend('work'); activate(visibleCards()[0]);
+assert.equal(requests.length, beforeWork + 2, 'A rejected welfare activation can be retried from the same row');
+
+api.SelectCategory('titles');
+const beforeTitle = requests.length;
+activate(visibleCards()[0]); activate(visibleCards()[0]);
+assert.equal(requests.length, beforeTitle + 1, 'Title rows retain their equip double-click guard');
+assert.equal(requests.at(-1).name, 'survival_archive_title_equip');
+assert.equal(requests.at(-1).payload.title_id, 'title_test');
+emit('survival_archive_title_result', {ok: 1});
+snapshot('titles', [{...dataByCategory.titles.rows[0], equipped: 1}]);
+assert.equal(visibleCards()[0].__v10.count.text, '已穿戴', 'The row displays the authoritative equipped state');
+assert.equal(visibleCards()[0].__v10.track.visible, false, 'Titles do not invent numerical progress bars');
+activate(visibleCards()[0]);
+assert.equal(requests.at(-1).payload.title_id, '', 'Clicking the equipped title still unequips it');
+
+assert.equal(walletRefreshes, 0, 'Upgrade, draw, promotion, filter and category updates use their existing archive snapshots');
 api.SelectCategory('shadow'); api.Close();
 const closed = {...metrics};
 for (let revision = 101; revision <= 200; revision++) {
     snapshot('shadow', [{...rows[0], count: revision}, rows[1]], {has_pass: 1, profile_revision: revision});
 }
 assert.deepEqual(metrics, closed, 'closed profile updates remain data-only, including the custom void view');
-assert.equal(walletRefreshes, 1, 'Closed profile updates do not request a wallet refresh');
+assert.equal(walletRefreshes, 0, 'Closed profile updates do not request a wallet refresh');
 api.Open();
-assert.equal(walletRefreshes, 2, 'Reopening may refresh the authoritative catalog once');
+assert.equal(walletRefreshes, 0, 'Reopening reads archive snapshots without requesting the removed resource strip');
 assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430', 'reopening renders the latest cache immediately');
-assert.equal(walletText(0), '41', 'reopening preserves the current commerce wallet');
+assert.equal(cfg.SurvivalMenuV10.Entries().length, 0, 'Reopening preserves the independent shell');
 api.SelectCategory('clear');
 snapshot('clear', [{id: 'clear_01', name: '第一阶', count: 1, target: 1, completed: 1}]);
 assert(nodes.get('ArchiveSummary').text.includes('已完成 1 / 1'), 'generic page completion remains live after leaving void');
@@ -411,16 +438,16 @@ assert.equal(visibleCards().length, 0, 'The local disabled shop view has no stal
 assert.equal(requests.length, shopRequestCount, 'Selecting an omitted disabled shop submits no invalid server request');
 assert.equal(nodes.get('ArchiveV10Canvas'), shellBeforeUnavailableShop, 'The unavailable category retains the same shell');
 api.Close(); api.Open(); immediate();
-assert.equal(walletRefreshes, 3, 'Reopening a disabled local category can refresh the wallet while avoiding archive requests');
+assert.equal(walletRefreshes, 0, 'Reopening a disabled local category does not request commerce data');
 assert.equal(view.Inspect().category, 'shop', 'Reopening a locally unavailable category restores its empty directory');
 assert(nodes.get('ArchiveEmpty').text.includes('未启用'), 'Reopening retains the explicit unavailable state');
 assert.equal(requests.length, shopRequestCount, 'Reopening the local disabled directory cannot start an invalid snapshot request or retry');
 api.Refresh(true); immediate();
-assert.equal(walletRefreshes, 3, 'An explicit archive refresh is independent of commerce catalog refresh');
+assert.equal(walletRefreshes, 0, 'An explicit archive refresh is independent of commerce catalog refresh');
 assert.equal(requests.length, shopRequestCount, 'Explicit refresh of the disabled local directory does not request server data');
 assert.equal(nodes.get('ArchiveV10Canvas'), shellBeforeUnavailableShop, 'Reopening the local directory reuses the fixed shell');
 activate(nodes.get('ArchiveV10Category_shadow'));
 assert.equal(view.Inspect().category, 'shadow', 'The player can return from the local empty directory');
 assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430', 'Returning restores the unchanged authoritative shadow cache');
 
-console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, native card/sidebar reuse, live counts/ownership/pass/tooltips, once-per-open read-only wallet refresh and unknown balances, upgrade/draw rejection and pending guards, promotion duplicate guard, theme, filters, tabs and 100 closed updates');
+console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, native card/sidebar reuse, live counts/ownership/pass/tooltips, independent archive without commerce resource requests, upgrade/draw rejection and pending guards, promotion duplicate guard, theme, filters, tabs and 100 closed updates');

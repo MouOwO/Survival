@@ -1,24 +1,40 @@
 # 当前 UI 接入与文档入口
 
-当前普通菜单采用 V10 紫色外壳。存档、宝物、抽奖、商城、生存商店、每日奖励、VIP，以及兑换和支付确认复用已确认的组件。几何、素材与验证范围见 [V10 菜单交付](../design_refs/menus_v10/DELIVERY.md)，存档原组件说明见 [素材导入](../design_refs/archive_v10/ASSET_IMPORT.md)和[存档数据与交互](../design_refs/archive_v10/Delivery/DATA_AND_INTERACTIONS.md)。旧哥特、月光、青玉窗口和 C19/C25 的尺寸、CSS 与整套恢复点不再是当前菜单的接入依据。
+存档现在采用独立的旧纸纹两栏界面：左侧青灰分类列表，右侧黑褐条目、橙金进度条，不再显示一级导航和公共资源行。依据是[用户确认效果图](../design_refs/archive_parchment_v1/approved.png)，材质与控件清单见 [asset_manifest.json](../tools/archive_parchment/asset_manifest.json)。宝物、抽奖、商城、生存商店、每日奖励、VIP，以及兑换和支付确认仍采用 V10 紫色公共外壳；其几何与验证范围见 [V10 菜单交付](../design_refs/menus_v10/DELIVERY.md)。存档原业务说明仍见[存档数据与交互](../design_refs/archive_v10/Delivery/DATA_AND_INTERACTIONS.md)。历史外壳不能覆盖本次独立存档布局。
 
 ## 实际入口
 
-入口由 [custom_ui_manifest.xml](../panorama/src/layout/custom_game/custom_ui_manifest.xml)及三个活动布局决定：`archive.xml`、`survival_hud.xml`、`payment_test.xml`，均位于 `panorama/src/layout/custom_game/`。公共 V10 实现在 `panorama/src/scripts/custom_game/common/menu_v10.js`、`panorama/src/styles/custom_game/common/menu_v10.css`；存档由 `archive_v10.js`、`archive_v10_data.js` 等适配真实控制器。应沿 XML 的实际 include 顺序检查依赖，不能按历史文件名推断入口。
+入口由 [custom_ui_manifest.xml](../panorama/src/layout/custom_game/custom_ui_manifest.xml)及三个活动布局决定：`archive.xml`、`survival_hud.xml`、`payment_test.xml`，均位于 `panorama/src/layout/custom_game/`。公共 V10 实现在 `panorama/src/scripts/custom_game/common/menu_v10.js`、`panorama/src/styles/custom_game/common/menu_v10.css`；独立存档继续由 `archive_v10.js` 适配真实控制器，`archive_parchment_data.js` 提供新材质，`archive_v10_data.js` 保留原物品图标与必要契约。应沿 XML 的实际 include 顺序检查依赖，不能按历史文件名推断入口。
 
 作者源码位于 `panorama/src/`；运行资源位于 `panorama/layout/`、`panorama/scripts/`、`panorama/styles/`。后缀分别为 `.vxml_c`、`.vjs_c`、`.vcss_c`。资源编译成功后仍需确认新 HUD 执行链已加载，避免把旧闭包和旧截图当成本版效果。
 
 ## 素材、编译与验证
 
-批准的原始包保留在 `design_refs/archive_v10/package/archive_ui_final_v1/`，包括 PNG、SVG 编辑稿、布局、资源清单和字体许可。`tools/archive_v10/import.cjs` 逐项校验清单与哈希，再生成源图片、数据脚本和资源预载布局；不能删除原包或拿示例数量替代正式配置。
+独立存档的无字材质由 imagegen 从确认图提取，源图保存在 `design_refs/archive_parchment_v1/`；`tools/archive_parchment/split_assets.py` 按固定坐标拆出 37 个 PNG，生成哈希清单、材质数据和编译用资源布局。标题、搜索文字、分类名称、数量及进度均由独立控件绘制。正式源 PNG 位于 `art/ui/sources/custom_game/archive_parchment_v1/`，脚本同步一份至被忽略的 `panorama/src/images/custom_game/archive_parchment_v1/` 供编译。默认字体沿用已安装的思源黑体，标题与分类使用宋体。
 
-从项目根目录按需要执行：
+存档验证与编译使用独立范围，避免重写其他菜单：
 
 ```powershell
-node tools/archive_v10/import.cjs
-& tools/archive_v10/compile.ps1
+& 'C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe' tools/archive_parchment/split_assets.py
+node tools/archive_parchment/build_scope.cjs
+& tools/archive_parchment/compile.ps1 -CheckOnly
+node tools/archive_parchment/preview.cjs
+node tools/archive_parchment/acceptance.cjs
+& tools/archive_parchment/compile.ps1
+```
+
+`-CheckOnly` 只核对来源、哈希和依赖；实际编译会先保存 Content 与 Game 产物的具名备份，再更新限定范围，失败恢复。本次预览、组件总览与检查报告位于 `design_refs/archive_parchment_v1/work/`，属于可重建输出。浏览器使用隔离样例，不连接账户或发出升级、抽取请求；真实游戏渲染仍需单独核验。不要再运行旧 `tools/archive_v10/import.cjs` 覆盖当前存档材质接入。
+
+2026-10-13 已通过 43 个原生资源的编译及产物核验、5 种尺寸和 18 分类的浏览器检查，以及进度语义、图标、Tooltip、生命周期和业务点击回归。最终组装截图由 `node tools/archive_parchment/capture.cjs` 保存至 `work/final/`；状态文字按可见纸面下缘验证，不能只检查透明画布边界。本次未执行游戏客户端内的视觉验收。
+
+侧栏保留 18 个真实分类，支持搜索和滚动；“商城道具”未启用时保留真实空态。横条进度来自 `ArchiveV10Semantics.Progress`：地图等级使用等级而非在线分钟，神兵碎片使用持有余额而非晋升级数；未知或无目标时不填造进度，超额只限制填充长度，文字仍显示真实值。升级、神兵晋升、称号穿戴和社交抽取继续走原控制器。
+
+旧版存档原始包保留在 `design_refs/archive_v10/package/archive_ui_final_v1/`，包括仍在使用的物品图标、PNG、SVG 编辑稿、资源清单和字体许可。不能删除原包或拿示例数量替代正式配置。
+
+其他 V10 菜单从项目根目录按需要执行：
+
+```powershell
 & tools/menus_v10/compile.ps1
-node tools/archive_v10/preview.cjs
 node tools/menus_v10/preview.cjs
 ```
 

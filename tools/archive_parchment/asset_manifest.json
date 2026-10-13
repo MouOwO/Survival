@@ -1,0 +1,599 @@
+{
+  "version": 1,
+  "canvas": [
+    1200,
+    900
+  ],
+  "reference": "design_refs/archive_parchment_v1/approved.png",
+  "material_source": "design_refs/archive_parchment_v1/clean_plate.png",
+  "source_policy": "Approved image components + imagegen text-free material plate; dynamic labels, values and progress remain separate.",
+  "assets": {
+    "window_background": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/window_background.png",
+      "size": [
+        1164,
+        860
+      ],
+      "sha256": "b88ac5cfe85af63d4c988d6584ec72334a96326a929ed17aca08876a0c268805",
+      "source": "clean_plate.png",
+      "crop": [
+        32,
+        20,
+        1435,
+        1075
+      ],
+      "usage": "Text-free window substrate; no scenery or interface text."
+    },
+    "header_strip": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/header_strip.png",
+      "size": [
+        1164,
+        56
+      ],
+      "sha256": "25a9118c68c4f6013288b95a88e50e96e4e8c563b7bfc2e3b365b321312db124",
+      "source": "clean_plate.png / normalized plate",
+      "crop": [
+        0,
+        0,
+        1164,
+        56
+      ],
+      "usage": "Independent parchment title band."
+    },
+    "sidebar_background": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/sidebar_background.png",
+      "size": [
+        326,
+        782
+      ],
+      "sha256": "950df88d6cb43a2531cf1e3ed182e59e74d6c3db862c954e158cfddb3b63f363",
+      "source": "clean_plate.png / normalized plate",
+      "crop": [
+        12,
+        62,
+        338,
+        844
+      ],
+      "usage": "Second-level category surface."
+    },
+    "content_background": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/content_background.png",
+      "size": [
+        790,
+        782
+      ],
+      "sha256": "03a07fb864bc5773f3132a8660421c3eace02f8acc0cecddecf1ee530f268917",
+      "source": "clean_plate.png / normalized plate",
+      "crop": [
+        356,
+        62,
+        1146,
+        844
+      ],
+      "usage": "Third-level content surface."
+    },
+    "section_strip": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/section_strip.png",
+      "size": [
+        790,
+        34
+      ],
+      "sha256": "c5fcf32aefd280a37fa185ca2ae3d7ceb2099f872c447640856bfe05124f4c52",
+      "source": "approved.png",
+      "crop": [
+        580,
+        200,
+        1293,
+        237
+      ],
+      "usage": "Letter-free brush strip assembled from the empty left edge and right material."
+    },
+    "category_selected": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/category_selected.png",
+      "size": [
+        302,
+        36
+      ],
+      "sha256": "4a248f59f312b5c5e1c612a061663827f69fb8cfebb79cca67ed7658053b85f2",
+      "source": "approved.png",
+      "crop": [
+        452,
+        367,
+        534,
+        400
+      ],
+      "usage": "Empty end of the selected category, without name/icon."
+    },
+    "category_hover": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/category_hover.png",
+      "size": [
+        302,
+        36
+      ],
+      "sha256": "a4da55f3e57d1b756e6ea67d6a002b6d31803f944fa10939b4d01d92c6740b36",
+      "source": "native control material",
+      "crop": null,
+      "usage": "Subtle hover overlay above the material."
+    },
+    "row_background": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/row_background.png",
+      "size": [
+        756,
+        84
+      ],
+      "sha256": "1de6d2446a9b2fbc849d7eaac770d173c6a8d9eb625359760c771e24f4861e60",
+      "source": "native control material",
+      "crop": null,
+      "usage": "Alternating translucent list-row wash."
+    },
+    "row_hover": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/row_hover.png",
+      "size": [
+        756,
+        84
+      ],
+      "sha256": "44b1e9c2f6adb7df8e449a6c0df40bcacbcc04e01ca4b74c5d5c182d66a07cbc",
+      "source": "native control material",
+      "crop": null,
+      "usage": "Pointer highlight; no game state baked in."
+    },
+    "progress_track": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/progress_track.png",
+      "size": [
+        304,
+        19
+      ],
+      "sha256": "f101109518268c2fb2725d55cca451358e17e5166a9132aaec96322545749dfa",
+      "source": "approved.png",
+      "crop": [
+        990,
+        286,
+        1168,
+        305
+      ],
+      "usage": "Empty progress track; its original right edge also closes the left side."
+    },
+    "progress_fill": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/progress_fill.png",
+      "size": [
+        300,
+        14
+      ],
+      "sha256": "91f851668a1cd801cc09974296cc7effcab645931e3fd025ae402b7641241412",
+      "source": "approved.png",
+      "crop": [
+        862,
+        289,
+        972,
+        301
+      ],
+      "usage": "Actual orange progress material; width driven by server progress."
+    },
+    "progress_glint": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/progress_glint.png",
+      "size": [
+        9,
+        14
+      ],
+      "sha256": "2060899df6dbd33c1d4deb7dadcf03fd67401556cfe4dca49bf8176bb1850545",
+      "source": "approved.png",
+      "crop": [
+        972,
+        289,
+        981,
+        301
+      ],
+      "usage": "Trailing light, displayed only when fill is known and nonzero."
+    },
+    "close": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/close.png",
+      "size": [
+        30,
+        30
+      ],
+      "sha256": "66cf2bb4e56e8c0750cdad6f485ef8709b546ec64c6deb4ee1fb79454de301bc",
+      "source": "approved.png",
+      "crop": [
+        1295,
+        69,
+        1322,
+        95
+      ],
+      "usage": "Independent close button glyph."
+    },
+    "scroll_track": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/scroll_track.png",
+      "size": [
+        14,
+        475
+      ],
+      "sha256": "43a76ef669177606fa0cf1d017997e6846bfbce946a5f489a94c6d21a343dc52",
+      "source": "approved.png",
+      "crop": [
+        1307,
+        260,
+        1325,
+        735
+      ],
+      "usage": "Plain scroll material; native scroll thumb remains interactive."
+    },
+    "scroll_thumb": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/scroll_thumb.png",
+      "size": [
+        12,
+        384
+      ],
+      "sha256": "b375a4ebda9816348ee5239ae9436926b256e4d0f8b7dafb549a13cd3f18881e",
+      "source": "approved.png",
+      "crop": [
+        544,
+        362,
+        555,
+        746
+      ],
+      "usage": "Muted olive thumb material."
+    },
+    "search_background": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/search_background.png",
+      "size": [
+        282,
+        32
+      ],
+      "sha256": "5a68d99f8253b4e17932004393921ac54361eee15e32a652b01761b704d2ef80",
+      "source": "approved.png",
+      "crop": [
+        474,
+        246,
+        550,
+        274
+      ],
+      "usage": "Input backing; all input text is rendered by Panorama."
+    },
+    "icon_ring": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/icon_ring.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f1affec38ec3bca21cfd97646055b841752035d3a411a4d51aa1b290d9a8f5f2",
+      "source": "approved.png",
+      "crop": [
+        1235,
+        252,
+        1298,
+        314
+      ],
+      "usage": "Circular surround; the item graphic remains an independent live component."
+    },
+    "nav_clear": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_clear.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "6dcd188a0c531b8b61520ff6daf1b8ce583d006f3ee5a0deac3af24fe2c56433",
+      "source": "approved.png",
+      "crop": [
+        277,
+        330,
+        313,
+        365
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_shadow": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_shadow.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "4c8b4af0611f29aa2b080c293e5e60985e10939134cac825f62d883e7136bc8a",
+      "source": "approved.png",
+      "crop": [
+        277,
+        367,
+        313,
+        402
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_map_level": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_map_level.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "132c77b27f12cfb637ea2b2aba5ea0e288535b3482deac3387f94bd4b79d7524",
+      "source": "approved.png",
+      "crop": [
+        277,
+        403,
+        313,
+        438
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_work": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_work.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "5b23b3b3afb7d2464a8d4fc2d295c1684df46b2cbd16ea6a032d657cf831126b",
+      "source": "approved.png",
+      "crop": [
+        277,
+        439,
+        313,
+        474
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_gift": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_gift.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "a03cfefc6a4e67904d8a49e089b74019e6c4da4d5a56327f5cc563a20a96da60",
+      "source": "approved.png",
+      "crop": [
+        277,
+        475,
+        313,
+        510
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_fragment": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_fragment.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "04464a55553f757ffed4872522202412a3cd6554e607d29c5b5b5ee638e9f6eb",
+      "source": "approved.png",
+      "crop": [
+        277,
+        511,
+        313,
+        546
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_pet": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_pet.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "de989af9f14ec90ca5afeda2520eff0030c71cf72fe1fe2885e9b193f959ce70",
+      "source": "approved.png",
+      "crop": [
+        277,
+        548,
+        313,
+        583
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_boss": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_boss.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "22152a826eb0fe0d4bb02d96bebf4880cdf8a14ef90d747f8fb70e140a9bc23a",
+      "source": "approved.png",
+      "crop": [
+        277,
+        584,
+        313,
+        619
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_points": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_points.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "f834189da3b759213a357aaa1ca2697669d8fb98682e2ddf9937e4f32e493ed5",
+      "source": "approved.png",
+      "crop": [
+        277,
+        621,
+        313,
+        656
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_shop": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_shop.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "88988dd1bc06008c4bf2dbd065d9ee013f5db2893fce8778d6541031b1071149",
+      "source": "approved.png",
+      "crop": [
+        277,
+        657,
+        313,
+        692
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_endless": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_endless.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "74d6e3f0bb854f0ef6000a8be3e5af2dbdae48e097994f8fbbfff479e9a93cf3",
+      "source": "approved.png",
+      "crop": [
+        277,
+        694,
+        313,
+        729
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_fishing": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_fishing.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "d15f7ba2ed9fcc551f7342c0f454ac949efa1ae6a177f62a3be9f91583135002",
+      "source": "approved.png",
+      "crop": [
+        277,
+        730,
+        313,
+        765
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_building": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_building.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "51d424818d2e49d846f05185795245f3d9e531f12e73bc37104c354091800df2",
+      "source": "approved.png",
+      "crop": [
+        277,
+        765,
+        313,
+        800
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_friend": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_friend.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "3174b6bb29c8e7c54fd1d99b0704d60ac7137e2e03f8a3ef463d86cab983de6e",
+      "source": "approved.png",
+      "crop": [
+        277,
+        802,
+        313,
+        837
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_ex": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_ex.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "30bbe599c13af7ca784328d1417255229969c72d1744fac57afdad22ee083726",
+      "source": "approved.png",
+      "crop": [
+        277,
+        837,
+        313,
+        872
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "nav_beast": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/nav_beast.png",
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "dfe3ce4f989760ec38b282521804fdc5c6c15f1593fcd2933c00853aa1d0ba07",
+      "source": "approved.png",
+      "crop": [
+        277,
+        874,
+        313,
+        909
+      ],
+      "usage": "Decorative category emblem; no text or numeric data."
+    },
+    "archive_emblem": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/archive_emblem.png",
+      "size": [
+        80,
+        80
+      ],
+      "sha256": "eba838cf2162bd11f14baeb3f5dc2d8909dfb05e2682ae9a05e528cd6be2466c",
+      "source": "approved.png",
+      "crop": [
+        586,
+        120,
+        671,
+        196
+      ],
+      "usage": "Header emblem for the selected shadow archive."
+    },
+    "tooltip_background": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/tooltip_background.png",
+      "size": [
+        360,
+        420
+      ],
+      "sha256": "d801326eb76a10877c3d430bffb6f7941659af34a51a92c2b321665eb22864a2",
+      "source": "clean_plate.png / normalized plate",
+      "crop": [
+        430,
+        190,
+        850,
+        700
+      ],
+      "usage": "Dark tooltip material."
+    },
+    "tooltip_frame": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/tooltip_frame.png",
+      "size": [
+        360,
+        420
+      ],
+      "sha256": "415fa26f75102aa0707ee92e9498560c6ab8dc3982cfd70d5095e9dfdf2b972c",
+      "source": "clean_plate.png / normalized plate",
+      "crop": null,
+      "usage": "Rough outer edge with transparent center; nine-slice safe."
+    },
+    "tooltip_shadow": {
+      "file": "art/ui/sources/custom_game/archive_parchment_v1/tooltip_shadow.png",
+      "size": [
+        360,
+        420
+      ],
+      "sha256": "c62ba468d53678a073ce6a1a199598e10a75d69ffd282a8d44b2249cede20317",
+      "source": "native control material",
+      "crop": null,
+      "usage": "Tooltip drop-shadow backing."
+    }
+  },
+  "nav_icons": {
+    "clear": "nav_clear",
+    "shadow": "nav_shadow",
+    "map_level": "nav_map_level",
+    "work": "nav_work",
+    "gift": "nav_gift",
+    "fragment": "nav_fragment",
+    "pet": "nav_pet",
+    "boss": "nav_boss",
+    "points": "nav_points",
+    "shop": "nav_shop",
+    "endless": "nav_endless",
+    "fishing": "nav_fishing",
+    "building": "nav_building",
+    "friend": "nav_friend",
+    "ex": "nav_ex",
+    "beast": "nav_beast",
+    "starjoy_points": "nav_points",
+    "titles": "nav_gift"
+  }
+}
