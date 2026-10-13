@@ -220,8 +220,8 @@ snapshot('shadow', shadowRows);
 snapshot('building', [{id: 'building_01', name: '神器', count: 0, level: 0,
     target: 5, cost: 20, completed: 0, can_upgrade: 1, description: '当前Lv0'}],
 {upgrade_pending: 0, buildings: {faith: 100, earned_today: 1, daily_cap: 10, per_clear: 1}});
-snapshot('friend', [{id: 'friend_01', name: '好友', count: 0, target: 100}],
-{social: {currency_name: '友情券', tickets: 2, draw_cost: 1, remaining: 1, total: 0}});
+snapshot('beast', [{id: 'beast_01', name: '散魂钟', count: 0, target: 50}],
+{social: {currency_name: '福签', tickets: 2, draw_cost: 1, remaining: 1, total: 0}});
 snapshot('fragment', [{id: 'fragment_01', name: '神兵-初阶', count: 20, level: 1,
     can_promote: 1, promotion_target: 'fragment_02', promotion_cost: 20},
 {id: 'fragment_02', name: '神兵-高阶', count: 0, level: 0}]);
@@ -353,16 +353,20 @@ assert.equal(descendant(visibleCards()[0], 'ArchiveV10Count').style.color, appro
 assert.equal(descendant(visibleCards()[0], 'ArchiveV10Name').style.color, approvedNameColor, 'Independent V10 name text retains its confirmed color');
 assert.equal(visibleCards()[0].__v10.normal.style.backgroundImage, approvedFrame, 'A legacy theme change cannot swap the approved original frame asset');
 
-api.SelectCategory('friend');
+const collectionCalls=[];cfg.SurvivalCollection={Open:id=>collectionCalls.push(id)};
+api.SelectCategory('friend');api.SelectCategory('ex');
+assert.deepEqual(collectionCalls,['friend','ex'],'Legacy social links open the independent collection');
+assert(!api.IsOpen(),'Forwarding a collection link closes the archive');
+api.Open();api.SelectCategory('beast');
 assert.equal(nodes.get('ArchiveDraw').enabled, true);
 activate(nodes.get('ArchiveDraw'));
 const drawRequests = requests.length; activate(nodes.get('ArchiveDraw'));
 assert.equal(requests.length, drawRequests, 'draw requests keep their local double-click gate');
-resend('friend');
+resend('beast');
 assert.equal(nodes.get('ArchiveDraw').enabled, true, 'an unchanged draw rejection releases the local gate');
-resend('friend', {pending: 1});
+resend('beast', {pending: 1});
 assert.equal(nodes.get('ArchiveDraw').enabled, false, 'pending draw state invalidates the view independently of rows');
-resend('friend', {pending: 0, social: {currency_name: '友情券', tickets: 0,
+resend('beast', {pending: 0, social: {currency_name: '福签', tickets: 0,
     draw_cost: 1, remaining: 1, total: 0}});
 assert.equal(nodes.get('ArchiveDraw').enabled, false, 'a wallet-only change prevents an unaffordable draw');
 assert(nodes.get('ArchiveTickets').text.includes('0'));

@@ -10,7 +10,7 @@
     var canvas=null,gridHost=null,sidebar=null,filterMenu=null,search=null,headerIcon=null,tip=null,tipSurface=null,tipViewport=null,tipBody=null,tipBackground=null,tipFrame=null,tipShadow=null,viewScale=1;
     var active=false,disposed=false,current="",rows=[],categoryRows=[],filters={},balances=[],moved=[],subscriptions=[],sidebarKey="",tooltipEpoch=0,tooltipHideEpoch=0,hover=null,displayKey="";
     var textSpecs={},sidebarButtons={},missingIcons={},fitOptions=null,lastReportedCategory="";
-    var searchValue="",order=["clear","shadow","map_level","work","gift","fragment","pet","boss","points","shop","endless","fishing","building","friend","ex","beast","starjoy_points","titles"];
+    var searchValue="",order=["clear","shadow","map_level","work","gift","fragment","pet","boss","points","shop","endless","fishing","building","beast","starjoy_points","titles"];
     var names={clear:"通关存档",shadow:"虚空之影",map_level:"地图等级",work:"上班福利",gift:"福利礼包",fragment:"神兵碎片",pet:"秘法牢笼",boss:"BOSS存档",points:"积分道具",shop:"商城道具",endless:"无尽存档",fishing:"钓鱼存档",building:"存档神器",friend:"我的好基友",ex:"我的前女友",beast:"瑞兽赐福",starjoy_points:"星悦积分",titles:"称号"};
     var layers=D.layers;layers.forEach(function(layer){if(layer.kind==="text")textSpecs[layer.id]=layer;});
     var marker=$.CreatePanel("Panel",root,"");marker.visible=false;marker.hittest=false;
@@ -98,7 +98,7 @@
     }
     function renderSidebar(categories){
         var signature=JSON.stringify(categories||[]);if(signature!==sidebarKey){
-            sidebar.RemoveAndDeleteChildren();sidebarButtons={};var ids=order.slice();list(categories).forEach(function(row){if(ids.indexOf(row.id)<0)ids.push(row.id);});
+            sidebar.RemoveAndDeleteChildren();sidebarButtons={};var ids=order.slice();list(categories).forEach(function(row){if(row.id!=="ex"&&row.id!=="friend"&&ids.indexOf(row.id)<0)ids.push(row.id);});
             ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;var selected=component(button,"category_selected",0,0,285,35);selected.AddClass("ArchiveParchmentSelection");icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32);var text=serif(label(button,categoryName(id),47,5,231,29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text,selection:selected};});sidebarKey=signature;
         }
         layoutSidebar();

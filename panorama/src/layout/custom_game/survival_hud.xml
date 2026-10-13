@@ -51,6 +51,7 @@
         <include src="file://{resources}/scripts/custom_game/production_progress.js" />
         <include src="file://{resources}/scripts/custom_game/minimap_shortcuts.js" />
         <include src="file://{resources}/scripts/custom_game/topnav_remaining_5d5c1152eb.js" />
+        <include src="file://{resources}/scripts/custom_game/collection_nav.js" />
     <include src="file://{resources}/scripts/custom_game/common/commerce_art_manifest.js"/><include src="file://{resources}/scripts/custom_game/common/commerce_components.js"/><include src="file://{resources}/scripts/custom_game/commerce_remaining_5d5c1152eb.js"/><include src="file://{resources}/scripts/custom_game/boss_warning_remaining_5d5c1152eb.js"/><include src="file://{resources}/scripts/custom_game/menu_purple.js"/></scripts>
     <Panel class="SurvivalHUDRoot Theme_Native UnifiedWindowsV4 HandoffBoot HandoffReadableStats HandoffResourceTree HandoffBalancedStatValues HandoffNaturalStatCaptions HandoffReadableBuildingTitle HandoffTreeArmorCaption HandoffTreeRedHealth HandoffCompactWorkers HandoffCompactUtilityBuildings HandoffHeroCornerAltarJump HandoffBoxSelectionIntegrated PurpleMenusContext MenuV10Context" hittest="false">
         <!-- The top navigation treasure icon must compile with the HUD as well as the archive window. -->

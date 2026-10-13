@@ -34,8 +34,11 @@ async function main(){
   }
   await b.call('Emulation.setDeviceMetricsOverride',{width:1920,height:1080,deviceScaleFactor:1,mobile:false});await ready(b);
   await b.run('window.parchmentOriginalCanvas=nodes.ArchiveV10Canvas;window.parchmentOriginalSubscriptions=subscribers.size;true');
-  const categories=await b.run('PREVIEW_FIXTURE.v10.categories.map(category=>category.id)');
-  assert.equal(categories.length,18,'Current production category fixture must cover all 18 categories');
+  const serverCategories=await b.run('PREVIEW_FIXTURE.v10.categories.map(category=>category.id)');
+  assert.equal(serverCategories.length,18,'The server fixture retains all 18 categories, including the two collection pools');
+  const categories=await b.run('cfg.SurvivalArchiveV10.Inspect().categories');
+  assert.equal(categories.length,16,'The independent archive exposes 16 categories');
+  assert.deepEqual([...categories].sort(),serverCategories.filter(id=>id!=='ex'&&id!=='friend').sort(),'Only ex and friend move to the independent collection window; beast remains in archive');
   for(const category of categories){
    await b.run(`(async()=>{const id=${JSON.stringify(category)},button=nodes['ArchiveV10Category_'+id];if(!button?.events.onactivate)throw Error('Missing actual category button '+id);button.events.onactivate();emit('survival_archive_snapshot',previewSnapshot(id));await new Promise(resolve=>setTimeout(resolve,180));syncLayout();return true;})()`);
    const state=await frame(b,'category_'+category,1920,1080);validate(state,1920,1080);assert.equal(state.api.category,category);assert.equal(await b.run('nodes.ArchiveV10Canvas===parchmentOriginalCanvas'),true,'Category switches reuse canvas');assert(!state.tooltip?.visible,'Category switch clears former tooltip');
@@ -55,10 +58,10 @@ async function main(){
   async function search(query){await b.run(`(()=>{const panel=nodes[${JSON.stringify(searchId)}];panel.text=${JSON.stringify(query)};panel.el.dispatchEvent(new Event('input',{bubbles:true}));syncLayout();return true;})()`);await delay(250);return info(b);}
   const matching=await search(name);assert(matching.categoryButtons.length>0&&matching.categoryButtons.every(category=>category.label.includes(name)),'Search narrows sidebar to the requested category');assert.deepEqual(matching.cards.map(card=>card.id),baseline.cards.map(card=>card.id),'Category search preserves current page contents');
   const missing=await search('__ARCHIVE_LOCAL_NO_MATCH_20261013__');assert.equal(missing.categoryButtons.length,0,'No-match search hides unrelated category buttons');assert(missing.searchEmpty?.visible,'No-match category hint is visible');assert.equal(missing.api.category,baseline.api.category);assert.deepEqual(missing.cards.map(card=>card.id),baseline.cards.map(card=>card.id));
-  const restored=await search('');assert.equal(restored.categoryButtons.length,18,'Clearing search restores all categories');assert(!restored.searchEmpty?.visible,'Search empty hint hides after clearing');report.interactions.push({kind:'categorySearch',query:name,matching:matching.categoryButtons.length,noMatch:0,restored:restored.categoryButtons.length,currentRowsUnchanged:true});
+  const restored=await search('');assert.equal(restored.categoryButtons.length,categories.length,'Clearing search restores all 16 active archive categories');assert(!restored.searchEmpty?.visible,'Search empty hint hides after clearing');report.interactions.push({kind:'categorySearch',query:name,matching:matching.categoryButtons.length,noMatch:0,restored:restored.categoryButtons.length,currentRowsUnchanged:true});
   await b.run(`(()=>{const card=nodes.ArchiveGrid.Children().find(panel=>panel.visible&&panel.BHasClass('ArchiveCard'));if(!card?.events.onmouseover)throw Error('Missing production hover handler');card.events.onmouseover();syncLayout();return true;})()`);await delay(300);
   const tooltip=await frame(b,'shadow_tooltip',1920,1080);assert(tooltip.tooltip?.visible,'Actual hover opens tooltip');inViewport(tooltip.tooltip.bounds,1920,1080,'Tooltip');report.interactions.push({kind:'tooltip',bounds:tooltip.tooltip.bounds});
-  const scrollCategory=await b.run(`PREVIEW_FIXTURE.v10.categories.map(category=>category.id).sort((a,b)=>previewFixturePages[b].length-previewFixturePages[a].length)[0]`);
+  const scrollCategory=await b.run(`cfg.SurvivalArchiveV10.Inspect().categories.slice().sort((a,b)=>previewFixturePages[b].length-previewFixturePages[a].length)[0]`);
   await b.run('previewSelect('+JSON.stringify(scrollCategory)+')');let scroll=await info(b);assert(scroll.grid.scrollHeight>scroll.grid.clientHeight,'Configured long category has a scrollable list');
   const point={x:scroll.grid.bounds.x+scroll.grid.bounds.width*.65,y:scroll.grid.bounds.y+scroll.grid.bounds.height*.5};
   await b.call('Input.dispatchMouseEvent',{type:'mouseMoved',...point});await b.call('Input.dispatchMouseEvent',{type:'mouseWheel',...point,deltaX:0,deltaY:800});await delay(250);

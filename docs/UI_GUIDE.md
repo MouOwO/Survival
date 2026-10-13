@@ -4,6 +4,8 @@
 
 ## 实际入口
 
+收藏采用独立的背包网格界面：顶部标题、左侧三栏目、人物格子和右下抽取操作按用户参考图重组，素材清单见 [collection asset manifest](../tools/collection_gw2/asset_manifest.json)。现有前女友与男性角色池已从存档导航移入收藏，老婆栏目保留待配置空态。
+
 入口由 [custom_ui_manifest.xml](../panorama/src/layout/custom_game/custom_ui_manifest.xml)及三个活动布局决定：`archive.xml`、`survival_hud.xml`、`payment_test.xml`，均位于 `panorama/src/layout/custom_game/`。公共 V10 实现在 `panorama/src/scripts/custom_game/common/menu_v10.js`、`panorama/src/styles/custom_game/common/menu_v10.css`；独立存档继续由 `archive_v10.js` 适配真实控制器，`archive_parchment_data.js` 提供新材质，`archive_v10_data.js` 保留原物品图标与必要契约。应沿 XML 的实际 include 顺序检查依赖，不能按历史文件名推断入口。
 
 作者源码位于 `panorama/src/`；运行资源位于 `panorama/layout/`、`panorama/scripts/`、`panorama/styles/`。后缀分别为 `.vxml_c`、`.vjs_c`、`.vcss_c`。资源编译成功后仍需确认新 HUD 执行链已加载，避免把旧闭包和旧截图当成本版效果。
@@ -27,7 +29,7 @@ node tools/archive_parchment/acceptance.cjs
 
 2026-10-13 已通过 43 个原生资源的编译及产物核验、5 种尺寸和 18 分类的浏览器检查，以及进度语义、图标、Tooltip、生命周期和业务点击回归。最终组装截图由 `node tools/archive_parchment/capture.cjs` 保存至 `work/final/`；状态文字按可见纸面下缘验证，不能只检查透明画布边界。本次未执行游戏客户端内的视觉验收。
 
-侧栏保留 18 个真实分类，支持搜索和滚动；“商城道具”未启用时保留真实空态。横条进度来自 `ArchiveV10Semantics.Progress`：地图等级使用等级而非在线分钟，神兵碎片使用持有余额而非晋升级数；未知或无目标时不填造进度，超额只限制填充长度，文字仍显示真实值。升级、神兵晋升、称号穿戴和社交抽取继续走原控制器。
+侧栏现保留 16 个分类，支持搜索和滚动；前女友和男性角色收藏已移入独立“收藏”，瑞兽赐福继续留在存档。“商城道具”未启用时保留真实空态。横条进度来自 `ArchiveV10Semantics.Progress`：地图等级使用等级而非在线分钟，神兵碎片使用持有余额而非晋升级数；未知或无目标时不填造进度，超额只限制填充长度，文字仍显示真实值。升级、神兵晋升、称号穿戴继续走原控制器。
 
 旧版存档原始包保留在 `design_refs/archive_v10/package/archive_ui_final_v1/`，包括仍在使用的物品图标、PNG、SVG 编辑稿、资源清单和字体许可。不能删除原包或拿示例数量替代正式配置。
 
@@ -43,6 +45,10 @@ node tools/menus_v10/preview.cjs
 浏览器预览运行实际 XML、JS、CSS，使用明确标记的隔离状态；其截图、缓存和报告可以重建。原生图标预览首次导出及自动检查命令见 [存档工具说明](../tools/archive_v10/README.md)。浏览器通过、Lua/Node 测试通过、资源编译通过分别记录，均不能替代游戏内鼠标、滚轮、字体、裁切和热重载验收。当前完整实机矩阵的边界以 V10 交付说明为准。
 
 ## 保留的业务边界
+
+收藏界面由 `collection_gw2.js/css` 和 `collection_gw2_data.js` 独立提供，顶部“收藏”、左侧三选单、14 × 7 背包网格、右下抽取按钮均是独立组件。`tools/collection_gw2/split_assets.py` 拆出 22 张无字材质，来源及内置 imagegen 提示保存在 `design_refs/collection_gw2_v1/`。`build_scope.cjs`、`compile.ps1 -CheckOnly`、`preview.cjs`、`acceptance.cjs`、`capture.cjs` 和实际 `compile.ps1` 分别负责限定编译依赖、隔离预览与最终组装截图。新增 `collection_nav.js` 扩展 HUD 入口，避免重写原有顶部 HUD；编译白名单不包含 `topnav_remaining` 源码和产物。
+
+“我的前女友”沿用 `ex`，“我的前男友”沿用原男性角色 `friend` 池、持有数量及票券；头像使用现有 `archive_portraits_v3`，不重新生成角色。“我的老婆”按用户选择保留空栏、禁用抽取且不向服务器发送未配置类别请求。旧存档 `SelectCategory('ex'/'friend')` 转到收藏。抽取使用原 `survival_archive_social_draw`，回执 `survival_archive_social_result` 关联 pool/request_id 及档案版本；未确认意图跨选单、闭窗和重载保留，同一意图不生成第二个交易编号。其他确认弹窗继续拦截跨菜单导航。
 
 每日登录当前执行 `daily_remaining_5d5c1152eb.js`，由 `daily_gw2_data.js` 和 `daily_gw2.css` 提供独立外壳。`tools/daily_gw2/split_assets.py` 从 imagegen 生成的无字底板及控件图集中拆出 19 个组件，正式 PNG、源图与提示分别保存在 `art/ui/sources/custom_game/daily_gw2_v1/`、`design_refs/daily_gw2_v1/`。先运行拆分、`build_scope.cjs` 和 `compile.ps1 -CheckOnly`，再执行 `preview.cjs`、`acceptance.cjs` 与实际 `compile.ps1`；最终视觉刷新用 `capture.cjs`，输出位于该参考目录的 `work/`。
 

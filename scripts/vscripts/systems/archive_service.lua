@@ -54,6 +54,26 @@ local function integer(value)
         and value < math.huge and value == math.floor(value)
 end
 
+-- Correlate UI intent with the existing transaction; this event never grants
+-- rewards. Transient provider failures retain the queue and the client lock.
+local function social_result(player_id, pool_id, request_id, result)
+    if not PlayerResource or not CustomGameEventManager then return end
+    local player = PlayerResource:GetPlayer(player_id)
+    if not player then return end
+    result = result or {}
+    local terminal = result.ok == true and result.pending ~= true or result.terminal == true
+    local profile = result.ok == true and terminal and account_profile(player_id)
+    local revision = profile and tonumber(profile.revision)
+    CustomGameEventManager:Send_ServerToPlayer(player, "survival_archive_social_result", {
+        pool_id = tostring(pool_id or ""), request_id = tostring(request_id or ""),
+        ok = result.ok == true and terminal, terminal = terminal, pending = not terminal,
+        duplicate = result.duplicate == true, error = result.error,
+        -- last_draw can already belong to another pool; this authoritative
+        -- version lets the matching UI wait for a sufficiently recent page.
+        revision = integer(revision) and revision or nil,
+    })
+end
+
 local function saved(profile)
     local result = copy(profile.save.archive or {})
     result.version = 1
@@ -365,6 +385,11 @@ flush = function(player_id)
                 bus.emit(events.UI_NOTIFICATION,{player_id=player_id,level="error",message=terminal_error or result.error or "存档请求被拒绝"})
             end
             send(player_id)
+            if command.kind == "social_draw" then
+                -- Keep the trusted backend's strict command schema/fingerprint
+                -- unchanged; the client nonce is already encoded in this ID.
+                social_result(player_id, command.pool_id, command.id:match(":social_draw:([%w_-]+)$"), result)
+            end
             if vip_viewers[player_id] then M.send_vip(player_id,result) end
             if M.send_daily and daily_viewers[player_id] then
                 M.send_daily(player_id, command.kind=="daily_claim" and {
@@ -554,10 +579,29 @@ function M.record_challenge(player_id, challenge_id, kill_sequence, difficulty_i
 end
 
 function M.social_draw(player_id, pool_id, request_id)
-    if not require("config/generated/archive_social_rules").by_id[pool_id] then return {ok=false,error="奖池无效"} end
+    player_id = tonumber(player_id)
     request_id = tostring(request_id or "")
-    if #request_id < 1 or #request_id > 80 or request_id:find("[^%w_-]") then return {ok=false,error="请求无效"} end
-    return enqueue(player_id, {id=session_id..":social_draw:"..request_id, kind="social_draw", pool_id=pool_id})
+    if not integer(player_id) then return {ok=false,error="player_invalid",terminal=true} end
+    local function reject(message)
+        local result = {ok=false,error=message,terminal=true}
+        social_result(player_id, pool_id, request_id, result)
+        return result
+    end
+    if not require("config/generated/archive_social_rules").by_id[pool_id] then return reject("奖池无效") end
+    if #request_id < 1 or #request_id > 80 or request_id:find("[^%w_-]") then return reject("请求无效") end
+    local id = session_id..":social_draw:"..request_id
+    local existing = pending[player_id] and pending[player_id][id]
+    if existing and existing.pool_id ~= pool_id then return reject("请求奖池不一致") end
+    -- A previously accepted request must remain pending until its provider
+    -- settles, even if a profile refresh or end-of-match save is in progress.
+    if existing then
+        social_result(player_id, pool_id, request_id, {pending=true})
+        return {ok=true,pending=true}
+    end
+    if finalizing then return reject("正在保存本局奖励，请等待结算") end
+    if not account_profile(player_id) then return reject("玩家档案尚未加载") end
+    social_result(player_id, pool_id, request_id, {pending=true})
+    return enqueue(player_id, {id=id, kind="social_draw", pool_id=pool_id})
 end
 
 function M.zaixian(context)
@@ -866,7 +910,16 @@ function M.init()
         local id = tonumber(payload.PlayerID)
         if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
         local time = GameRules:GetGameTime()
-        if draw_times[id] and time - draw_times[id] < 0.3 then return end
+        if draw_times[id] and time - draw_times[id] < 0.3 then
+            local request_id = tostring(payload.request_id or "")
+            local queued = pending[id] and pending[id][session_id..":social_draw:"..request_id]
+            if queued and queued.pool_id == payload.pool_id then
+                social_result(id, payload.pool_id, request_id, {pending=true})
+            else
+                social_result(id, payload.pool_id, request_id, {ok=false,terminal=true,error="操作过于频繁，请稍后重试"})
+            end
+            return
+        end
         draw_times[id] = time
         local result = M.social_draw(id, payload.pool_id, payload.request_id)
         if not result.ok then bus.emit(events.UI_NOTIFICATION, {player_id=id,level="error",message=result.error}) end
