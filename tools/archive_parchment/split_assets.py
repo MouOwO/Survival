@@ -135,7 +135,8 @@ manifest = {
     "canvas": [1200, 900],
     "reference": "design_refs/archive_parchment_v1/approved.png",
     "material_source": "design_refs/archive_parchment_v1/clean_plate.png",
-    "source_policy": "Approved image components + imagegen text-free material plate; dynamic labels, values and progress remain separate.",
+    "material_reference": "design_refs/archive_parchment_v1/original_reference.jfif",
+    "source_policy": "Approved controls + imagegen text-free plate revised against the original reference for subdued smoky texture; dynamic labels, values and progress remain separate.",
     "assets": assets,
     "nav_icons": nav_icons,
 }

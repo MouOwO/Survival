@@ -6,7 +6,8 @@
   ],
   "reference": "design_refs/archive_parchment_v1/approved.png",
   "material_source": "design_refs/archive_parchment_v1/clean_plate.png",
-  "source_policy": "Approved image components + imagegen text-free material plate; dynamic labels, values and progress remain separate.",
+  "material_reference": "design_refs/archive_parchment_v1/original_reference.jfif",
+  "source_policy": "Approved controls + imagegen text-free plate revised against the original reference for subdued smoky texture; dynamic labels, values and progress remain separate.",
   "assets": {
     "window_background": {
       "file": "art/ui/sources/custom_game/archive_parchment_v1/window_background.png",
@@ -14,7 +15,7 @@
         1164,
         860
       ],
-      "sha256": "b88ac5cfe85af63d4c988d6584ec72334a96326a929ed17aca08876a0c268805",
+      "sha256": "dfcb308153ef8770855ac1ab54d2f311caeba0d1d884d1259e93ab0ed19e2f75",
       "source": "clean_plate.png",
       "crop": [
         32,
@@ -30,7 +31,7 @@
         1164,
         56
       ],
-      "sha256": "25a9118c68c4f6013288b95a88e50e96e4e8c563b7bfc2e3b365b321312db124",
+      "sha256": "1be5f9d3876c31aac49610e30251d4ef1186d3ccd0a87b41d4c389401e149551",
       "source": "clean_plate.png / normalized plate",
       "crop": [
         0,
@@ -46,7 +47,7 @@
         326,
         782
       ],
-      "sha256": "950df88d6cb43a2531cf1e3ed182e59e74d6c3db862c954e158cfddb3b63f363",
+      "sha256": "3b8b438a7170c1808d573c9434be0c31622722bb2f3838f3d4a1b463c21a6554",
       "source": "clean_plate.png / normalized plate",
       "crop": [
         12,
@@ -62,7 +63,7 @@
         790,
         782
       ],
-      "sha256": "03a07fb864bc5773f3132a8660421c3eace02f8acc0cecddecf1ee530f268917",
+      "sha256": "55524476eddaffd9ffdf772436a39492d88ed182ce42c8a2040c545a305f5149",
       "source": "clean_plate.png / normalized plate",
       "crop": [
         356,
@@ -543,7 +544,7 @@
         360,
         420
       ],
-      "sha256": "d801326eb76a10877c3d430bffb6f7941659af34a51a92c2b321665eb22864a2",
+      "sha256": "aad785249934a7d83f7b5c178b2d85fb1ae0aeca1b3e4680608c4103fb34c4bc",
       "source": "clean_plate.png / normalized plate",
       "crop": [
         430,
@@ -559,7 +560,7 @@
         360,
         420
       ],
-      "sha256": "415fa26f75102aa0707ee92e9498560c6ab8dc3982cfd70d5095e9dfdf2b972c",
+      "sha256": "cfc95bea9790d9efbbdfa550ac3c8aed38fc6820bb78a3903a44da60c60cf32f",
       "source": "clean_plate.png / normalized plate",
       "crop": null,
       "usage": "Rough outer edge with transparent center; nine-slice safe."
