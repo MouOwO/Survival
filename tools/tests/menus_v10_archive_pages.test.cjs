@@ -26,16 +26,54 @@ function vip(){
  console.log('VIP_V10_PASS: real shared shell, 33 original rewards, 1000 closed updates, gates, claims/prices/busy/errors, full tooltip, revoke and reload');
 }
 function daily(){
- const h=createHarness();h.load('daily_remaining_5d5c1152eb.js');const {cfg,nodes}=h,view=h.view('DailyWindow');checkFrame(view);cfg.SurvivalDaily.Open(false);assert.equal(h.sent.at(-1).name,'survival_daily_request');assert.equal(nodes.DailyClaimText.text,'加载中…');assert(!nodes.DailyClaim.enabled);
- const snapshot={ok:true,sequence:1,today:4,period_id:'week-1',count:3,ordinary_status:'claimable',pending:0,has_pass:1,purchase_enabled:1,duration_days:30,price:10,makeup_days:30,missed:[2],rule_text:'正式奖励规则',specials:[{id:'milestone',day:7,name:'正式奖励',description:'正式效果',owned:0}],premium:{name:'周末装备',description:'正式高级效果',status:'requires_pass'},cycle:Array.from({length:7},(_,i)=>({day:i+1,is_today:i===3?1:0,status:i<3?'claimed':i===3?'claimable':'not_open',rewards:[{id:'reward-'+i,name:'木材',count:10+i,description:'服务端效果'}]}))};
- h.emit('survival_daily_snapshot',snapshot);assert.equal(nodes.DailyCards.GetChildCount(),7);assert.equal(nodes.DailyCount.text,'本周已领取 3/7 天');assert(nodes.DailyClaim.enabled);assert(nodes.DailyMakeup.visible);const item=nodes.DailyCards.children[3].children.find(x=>x.BHasClass('DailyV10DayItems')).children[0];assert.equal(item.__menuV10Cell.name.text,'木材');assert.equal(item.__menuV10Cell.count.text,'13');item.events.onmouseover();h.flushFinite();assert(nodes.DailyTooltipEffect.text.includes('数量：13'));
- h.click(nodes.DailyClaim);assert.deepEqual(JSON.parse(JSON.stringify(h.sent.at(-1))),{name:'survival_daily_claim',payload:{target_day:4}});assert(!nodes.DailyClaim.enabled);const calls=h.sent.length;nodes.DailyClaim.events.onactivate();assert.equal(h.sent.length,calls,'pending claim is guarded');h.emit('survival_daily_snapshot',{...snapshot,sequence:2,count:4,ordinary_status:'claimed'});assert.equal(nodes.DailyClaimText.text,'今日已领取');assert(!nodes.DailyClaim.enabled);
- h.click(nodes.DailyMakeup);assert.equal(h.sent.at(-1).payload.target_day,2);h.emit('survival_daily_snapshot',{...snapshot,sequence:3,count:5,ordinary_status:'claimed',missed:[]});assert(!nodes.DailyMakeup.visible);
- cfg.SurvivalDaily.Open(true);assert(nodes.DailyPassPage.BHasClass('ArchiveHidden')===false);assert(!nodes.DailyMakeup.visible);assert(!nodes.DailyClaim.visible);assert(nodes.PassPurchase.visible);
- const special=nodes.DailySpecials.children[0];assert.equal(special.children.find(n=>n.BHasClass('DailyV10Milestone')).text,'7次奖励');assert.equal(special.children.find(n=>n.BHasClass('DailyV10MilestoneStatus')).text,'未领取');special.events.onmouseover();h.flushFinite();assert(nodes.DailyTooltipEffect.text.includes('正式效果'));assert(nodes.DailyTooltipEffect.text.includes('领取条件：累计签到7次'));assert(nodes.DailyTooltipEffect.text.includes('领取状态：未领取'));
- h.click(nodes.PassPurchase);assert.equal(h.sent.at(-1).name,'survival_pass_purchase');assert.deepEqual(Object.keys(h.sent.at(-1).payload),[]);
- h.emit('survival_daily_snapshot',{...snapshot,sequence:4,purchase_enabled:0,ordinary_status:'claimed'});assert(!nodes.PassPurchase.enabled);const purchaseCalls=h.sent.length;h.click(nodes.PassPurchase);assert.equal(h.sent.length,purchaseCalls);
- h.emit('survival_daily_snapshot',{...snapshot,sequence:3,count:999});assert.notEqual(cfg.SurvivalDaily.Inspect().count,999,'older server snapshot cannot replace current rewards');cfg.SurvivalDaily.Close();h.load('daily_remaining_5d5c1152eb.js');cfg.SurvivalDaily.Open(false);h.emit('survival_daily_snapshot',{...snapshot,sequence:1});assert.equal(nodes.DailyClaimPage.children.filter(x=>x.id==='DailyV10Premium').length,1,'hot reload reuses the real premium column');assert.equal(cfg.SurvivalMenuV10.Entries().filter(x=>x.panel.id==='DailyWindow').length,1);h.assertCleanDispose(cfg.SurvivalDaily);
- console.log('DAILY_V10_PASS: real shared shell, 7 days/premium, original rewards/counts, claim busy guard, oldest makeup, pass gating, stale snapshot and reload');
+ const h=createHarness();h.load('daily_remaining_5d5c1152eb.js');const {cfg,nodes}=h,view=cfg.SurvivalDailyGW2;
+ assert(view&&view.canvas.id==='DailyGW2Canvas');assert.equal(h.view('DailyWindow'),undefined,'The login calendar does not adopt a global navigation shell');
+ cfg.SurvivalDaily.Open(false);assert.equal(h.sent.at(-1).name,'survival_daily_request');assert.equal(nodes.DailyClaimText.text,'加载中…');assert(!nodes.DailyClaim.enabled);
+ assert.equal(nodes.DailyCards.GetChildCount(),28,'The loading state reserves 28 empty reward frames without fabricating rewards');
+ const calendar28=Array.from({length:28},(_,i)=>({day:i+1,absolute_count:i+1,is_today:i===3?1:0,status:i<3?'claimed':i===3?'claimable':'not_open',rewards:[{id:'reward-'+i,name:'木材',count:10+i,description:'服务端效果'}]}));
+ calendar28[4].rewards.push({id:'second',name:'第二项奖励',count:3,description:'第二项真实效果'});
+ const snapshot={ok:true,sequence:1,today:25004,period_id:'week-1',count:3,ordinary_status:'claimable',pending:0,has_pass:0,purchase_enabled:0,duration_days:30,price:'价格待配置',makeup_days:30,missed:[25002],rule_text:'正式奖励规则',calendar28,calendar_current_day:4,calendar_start_count:0,
+ specials:[{id:'milestone',day:7,name:'正式奖励',description:'正式效果',owned:0},{id:'second-milestone',day:14,name:'第二里程碑',description:'真实十四次效果',owned:0},{id:'third-milestone',day:21,name:'第三里程碑',description:'真实二十一次效果',owned:0}],
+ premium:{status:'unconfigured'},cycle:calendar28.slice(0,7)};
+ h.emit('survival_daily_snapshot',snapshot);
+ assert.equal(nodes.DailyCards.GetChildCount(),28);assert.equal(nodes.DailySpecials.GetChildCount(),3,'The premium column contains only the three formally configured milestones');
+ assert.equal(cfg.SurvivalDaily.Inspect().layout,'daily_gw2');assert.equal(cfg.SurvivalDaily.Inspect().days,28);
+ assert(nodes.DailyClaim.enabled);assert(!nodes.DailyMakeup.visible);assert(!nodes.PassPurchase.enabled,'An unconfigured server purchase remains disabled');
+ assert(nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'The pass column stays locked without authoritative entitlement');
+ const premiumFrame=nodes.DailyGW2Special_milestone.Children().find(x=>x.BHasClass('DailyGW2SpecialFrame'));assert.equal(premiumFrame.style.width,'100px');assert.equal(premiumFrame.style.height,'100px','Premium reward artwork keeps its square shape beside the name and status');
+ const fifth=nodes.DailyGW2Day_5;assert.equal(fifth.Children().filter(x=>x.BHasClass('DailyGW2Reward')).length,2,'Both formal rewards are rendered in a multi-reward day');
+ fifth.events.onmouseover();h.flushFinite();assert(nodes.DailyGW2Tooltip.visible);assert(nodes.DailyTooltipEffect.text.includes('第二项真实效果'));assert(nodes.DailyTooltipEffect.text.includes('第二项奖励 ×3'));
+ const item=nodes.DailyGW2Day_4.Children().find(x=>x.BHasClass('DailyGW2Reward'));item.events.onmouseover();h.flushFinite();assert(nodes.DailyTooltipEffect.text.includes('数量：13'));
+ h.click(nodes.DailyClaim);assert.deepEqual(JSON.parse(JSON.stringify(h.sent.at(-1))),{name:'survival_daily_claim',payload:{target_day:25004}},'Claims use the real server date rather than calendar slot 4');
+ assert(!nodes.DailyClaim.enabled);const claimCalls=h.sent.length;nodes.DailyClaim.events.onactivate();assert.equal(h.sent.length,claimCalls,'pending claim is guarded');
+ h.emit('survival_daily_snapshot',{...snapshot,sequence:2,claim_result:{target_day:25004,ok:false,error:'保存失败'}});
+ assert.equal(nodes.DailyClaimText.text,'重试领取');assert(nodes.DailyClaim.enabled,'An explicit rejected save can be retried');
+ h.click(nodes.DailyClaim);
+ h.emit('survival_daily_snapshot',{...snapshot,sequence:3,count:4,ordinary_status:'claimed',has_pass:1,purchase_enabled:1,expires_at:'2000000000'});
+ assert.equal(nodes.DailyClaimText.text,'今日已领取');assert(!nodes.DailyClaim.enabled);assert(nodes.DailyMakeup.visible);
+ assert(!nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'Only a server entitlement unlocks the pass column');
+ assert(nodes.PassPrice.text.includes('有效至'),'The pass information uses the actual server expiration');
+ h.click(nodes.DailyMakeup);assert.equal(h.sent.at(-1).payload.target_day,25002,'Makeup retains the earliest real missed date');
+ h.emit('survival_daily_snapshot',{...snapshot,sequence:4,count:5,ordinary_status:'claimed',has_pass:1,purchase_enabled:1,missed:[]});assert(!nodes.DailyMakeup.visible);
+ cfg.SurvivalDaily.Open(true);assert(nodes.DailyGW2PassInfo.BHasClass('DailyGW2PassFocus'));assert.equal(nodes.DailyCards.GetChildCount(),28,'Opening the pass entry retains the free calendar alongside it');
+ nodes.DailyGW2Special_milestone.events.onmouseover();h.flushFinite();assert(nodes.DailyTooltipEffect.text.includes('正式效果'));assert(nodes.DailyTooltipEffect.text.includes('累计签到7次'));
+ h.emit('survival_daily_snapshot',{...snapshot,sequence:5,purchase_enabled:1,ordinary_status:'claimed'});
+ assert(nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'));
+ h.click(nodes.PassPurchase);assert.equal(h.sent.at(-1).name,'survival_pass_purchase');assert.deepEqual(Object.keys(h.sent.at(-1).payload),[]);assert(!nodes.PassPurchase.enabled);
+ assert.equal(cfg.SurvivalDaily.Inspect().hasPass,false,'Creating a purchase request cannot unlock the pass locally');
+ assert(nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'Pending purchase keeps the reward lane locked until the server confirms entitlement');
+ h.emit('survival_daily_snapshot',{...snapshot,sequence:6,purchase_enabled:0,ordinary_status:'claimed'});
+ assert(!nodes.PassPurchase.enabled);assert(nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'Revoked entitlement restores the actual lock state');
+ const purchaseCalls=h.sent.length;h.click(nodes.PassPurchase);assert.equal(h.sent.length,purchaseCalls);
+ h.emit('survival_daily_snapshot',{...snapshot,sequence:4,count:999});assert.notEqual(cfg.SurvivalDaily.Inspect().count,999,'older server snapshot cannot replace current rewards');
+ h.click(nodes.DailyRules);assert(!nodes.DailyRulesText.BHasClass('ArchiveHidden'));assert(nodes.DailyRulesBody.text.includes('<br>补签范围'));h.click(nodes.DailyGW2RulesClose);assert(nodes.DailyRulesText.BHasClass('ArchiveHidden'));
+ const owned=[{...snapshot.specials[0],owned:1},...snapshot.specials.slice(1)];h.emit('survival_daily_snapshot',{...snapshot,sequence:7,specials:owned});assert(!nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'A previously granted reward is still shown as owned after pass expiry');
+ cfg.SurvivalDaily.Close();const old=cfg.SurvivalDaily,oldClaim=nodes.DailyClaim.events.onactivate,oldRules=nodes.DailyRules.events.onactivate;
+ h.load('daily_remaining_5d5c1152eb.js');cfg.SurvivalDaily.Open(false);h.emit('survival_daily_snapshot',{...snapshot,sequence:1});
+ assert.equal(nodes.DailyCards.GetChildCount(),28);assert.equal(cfg.SurvivalMenuV10.Entries().length,0,'Reload cannot leak a shared menu or resource strip');
+ const callsBeforeRetired=h.sent.length;oldClaim();oldRules();old.Open(true);assert.equal(h.sent.length,callsBeforeRetired,'Retired callbacks cannot submit or reopen the replacement controller');
+ h.click(nodes.DailyGW2Close);assert(!cfg.SurvivalDaily.Inspect().open);cfg.SurvivalDaily.Open(false);h.assertCleanDispose(cfg.SurvivalDaily);
+ console.log('DAILY_GW2_PASS: independent shell, server calendar28, multi-reward cells, three real premium milestones, real claim/makeup dates, rejection/busy guards, entitlement/price authority, tooltip/rules, stale snapshots, closure and reload');
 }
+
 module.exports={treasure,vip,daily};if(require.main===module){treasure();vip();daily();}

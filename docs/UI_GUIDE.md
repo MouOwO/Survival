@@ -1,6 +1,6 @@
 # 当前 UI 接入与文档入口
 
-存档现在采用独立的旧纸纹两栏界面：左侧青灰分类列表，右侧黑褐条目、橙金进度条，不再显示一级导航和公共资源行。依据是[用户确认效果图](../design_refs/archive_parchment_v1/approved.png)，材质与控件清单见 [asset_manifest.json](../tools/archive_parchment/asset_manifest.json)。宝物、抽奖、商城、生存商店、每日奖励、VIP，以及兑换和支付确认仍采用 V10 紫色公共外壳；其几何与验证范围见 [V10 菜单交付](../design_refs/menus_v10/DELIVERY.md)。存档原业务说明仍见[存档数据与交互](../design_refs/archive_v10/Delivery/DATA_AND_INTERACTIONS.md)。历史外壳不能覆盖本次独立存档布局。
+存档现在采用独立的旧纸纹两栏界面：左侧青灰分类列表，右侧黑褐条目、橙金进度条，不再显示一级导航和公共资源行。依据是[用户确认效果图](../design_refs/archive_parchment_v1/approved.png)，材质与控件清单见 [asset_manifest.json](../tools/archive_parchment/asset_manifest.json)。每日登录也已独立，采用金色皇冠、月相和蓝黑笔刷底板，28 格免费奖励按 7 列 × 4 行排列，右侧为方形蓝框战令奖励。宝物、抽奖、商城、生存商店、VIP，以及兑换和支付确认仍采用 V10 紫色公共外壳；其几何与验证范围见 [V10 菜单交付](../design_refs/menus_v10/DELIVERY.md)。存档原业务说明仍见[存档数据与交互](../design_refs/archive_v10/Delivery/DATA_AND_INTERACTIONS.md)。历史外壳不能覆盖独立存档和每日登录布局。
 
 ## 实际入口
 
@@ -43,6 +43,10 @@ node tools/menus_v10/preview.cjs
 浏览器预览运行实际 XML、JS、CSS，使用明确标记的隔离状态；其截图、缓存和报告可以重建。原生图标预览首次导出及自动检查命令见 [存档工具说明](../tools/archive_v10/README.md)。浏览器通过、Lua/Node 测试通过、资源编译通过分别记录，均不能替代游戏内鼠标、滚轮、字体、裁切和热重载验收。当前完整实机矩阵的边界以 V10 交付说明为准。
 
 ## 保留的业务边界
+
+每日登录当前执行 `daily_remaining_5d5c1152eb.js`，由 `daily_gw2_data.js` 和 `daily_gw2.css` 提供独立外壳。`tools/daily_gw2/split_assets.py` 从 imagegen 生成的无字底板及控件图集中拆出 19 个组件，正式 PNG、源图与提示分别保存在 `art/ui/sources/custom_game/daily_gw2_v1/`、`design_refs/daily_gw2_v1/`。先运行拆分、`build_scope.cjs` 和 `compile.ps1 -CheckOnly`，再执行 `preview.cjs`、`acceptance.cjs` 与实际 `compile.ps1`；最终视觉刷新用 `capture.cjs`，输出位于该参考目录的 `work/`。
+
+28 格由服务器 `calendar28` 快照展开正式七次循环四轮，保留原 `cycle`、`period_id` 和发奖逻辑；第 5、6 次的两项奖励都要展示。右栏三项真实战令奖励为累计 7、14、21 次的一次性里程碑，第四位置是购买和有效期信息。购买价格及 provider 当前未配置，界面按服务器状态显示暂未开放；购买不能在客户端解锁资格，已达标奖励仍在下一次有效签到时结算。补签请求使用服务器日历日期，不能发送 1–28 展示格号。宝物背包参考的去菜单、空网格美术稿保存在 `design_refs/treasure_gw2_v1/empty_inventory.png`，该图尚未作为游戏背景接入。
 
 - 存档的分类、数量、进度、升级、神兵晋升、社交抽取与称号操作继续使用原服务端接口。未知数量、期限和资格不填造默认值；同局共享奖励按[联机奖励规则](COOPERATIVE_REWARD_RULES_20261011.md)结算。
 - 生存商店保留真实目录、金币/木材、前置条件、库存、冷却、自动购买和科技队列；商城保留账户币种、原 SKU、价格和权益。悬停与选中不创建交易，只有原明确购买动作提交请求。

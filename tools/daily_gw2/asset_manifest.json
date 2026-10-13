@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "canvas": [
+    1200,
+    900
+  ],
+  "reference": "User-supplied Guild Wars 2 Login Rewards screenshot",
+  "material_source": "design_refs/daily_gw2_v1/blank_plate.png",
+  "source_policy": "Imagegen text-free material and control atlas; all reward icons, numbers and eligibility remain live.",
+  "assets": {
+    "crown": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/crown.png",
+      "size": [
+        1060,
+        182
+      ],
+      "sha256": "69c856bb99eeb8dd264326f9f16d08feb7ca6b7ea212e331a0b4b1cbf85ffb97",
+      "source": "blank_plate.png",
+      "crop": [
+        0,
+        0,
+        1448,
+        305
+      ],
+      "usage": "Gold crown and crescents; no text or reward values."
+    },
+    "title_brush": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/title_brush.png",
+      "size": [
+        1164,
+        61
+      ],
+      "sha256": "9bb96c2e4a569067d8d82693285f9d18b195077da7448d7b02e15193c7ad401e",
+      "source": "blank_plate.png",
+      "crop": [
+        0,
+        296,
+        1448,
+        387
+      ],
+      "usage": "Independent blue-black painted title ribbon."
+    },
+    "window_background": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/window_background.png",
+      "size": [
+        1164,
+        703
+      ],
+      "sha256": "f673cd0ecfafc7493ebafbf602ba74291f268026b56ecef9dc9452f15d92178a",
+      "source": "blank_plate.png",
+      "crop": [
+        0,
+        384,
+        1448,
+        1086
+      ],
+      "usage": "Empty smoky reward-panel material, with transparent rough perimeter."
+    },
+    "reward_frame": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/reward_frame.png",
+      "size": [
+        120,
+        120
+      ],
+      "sha256": "3796ac5215897774a22492918f0a37820e0d4c76d89f027cfdb603afa699c562",
+      "source": "grey_frames_atlas.png",
+      "crop": [
+        14,
+        14,
+        300,
+        300
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "reward_frame_hover": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/reward_frame_hover.png",
+      "size": [
+        120,
+        120
+      ],
+      "sha256": "b2ab8fb2040e762b860b2616c7474f62bb75245014d155b98427e286d9ec545e",
+      "source": "grey_frames_atlas.png",
+      "crop": [
+        328,
+        14,
+        613,
+        300
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "reward_frame_today": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/reward_frame_today.png",
+      "size": [
+        120,
+        120
+      ],
+      "sha256": "9febfde88c4261dbc8ec2899aadd1cd0b69a9b220145fc6abcc4c4ff602e566e",
+      "source": "control_atlas.png",
+      "crop": [
+        641,
+        14,
+        926,
+        300
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "reward_frame_claimed": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/reward_frame_claimed.png",
+      "size": [
+        120,
+        120
+      ],
+      "sha256": "3609e5f1df75087da7f712120085b51c797ef06f23e7c37a8bfff3a5f92e6b6e",
+      "source": "control_atlas.png",
+      "crop": [
+        954,
+        14,
+        1240,
+        300
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "premium_frame": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/premium_frame.png",
+      "size": [
+        120,
+        120
+      ],
+      "sha256": "dfc8346a67cf86fe0f37160a380171880ed2b4830c3ec3bb61e2e49cd32fef8b",
+      "source": "control_atlas.png",
+      "crop": [
+        14,
+        328,
+        300,
+        613
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "premium_frame_locked": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/premium_frame_locked.png",
+      "size": [
+        120,
+        120
+      ],
+      "sha256": "7962f51dcf8ae8c397c7a74c136e6e6784125108280b0013bf4ce29393f9252a",
+      "source": "control_atlas.png",
+      "crop": [
+        328,
+        328,
+        613,
+        613
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "selection_glow": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/selection_glow.png",
+      "size": [
+        120,
+        120
+      ],
+      "sha256": "10727dffe0b17489bb58d979f556b3ccc14da0a6dc3801432e0f080092162f41",
+      "source": "control_atlas.png",
+      "crop": [
+        641,
+        328,
+        926,
+        613
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "divider": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/divider.png",
+      "size": [
+        12,
+        485
+      ],
+      "sha256": "69feb65211f6973fae5f06ff0ad004a7b2da660de962533a04d9c2e8d5a4c338",
+      "source": "control_atlas.png",
+      "crop": [
+        954,
+        328,
+        1240,
+        613
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "button": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/button.png",
+      "size": [
+        248,
+        46
+      ],
+      "sha256": "c3ffdf6018b5f09579d15cdcd5bfa1aed9215271ad1f54739706cd6288d93328",
+      "source": "control_atlas.png",
+      "crop": [
+        14,
+        641,
+        300,
+        926
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "button_hover": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/button_hover.png",
+      "size": [
+        248,
+        46
+      ],
+      "sha256": "d4a1231479010c7db25c2a9769a07c1f377dc29abe9f24c7bd238a28b61f5839",
+      "source": "control_atlas.png",
+      "crop": [
+        328,
+        641,
+        613,
+        926
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "close": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/close.png",
+      "size": [
+        64,
+        63
+      ],
+      "sha256": "fd930efac61b468515e3cdd6991d6bdfd9e96953cd3e10b681e97d91023f355d",
+      "source": "control_atlas.png",
+      "crop": [
+        641,
+        641,
+        926,
+        926
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "lock": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/lock.png",
+      "size": [
+        46,
+        64
+      ],
+      "sha256": "76bc6340f17e4affa6c9f9995c30c07f38bbb31e9e65ee62389c95b7463d9dd4",
+      "source": "control_atlas.png",
+      "crop": [
+        954,
+        641,
+        1240,
+        926
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "check": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/check.png",
+      "size": [
+        64,
+        58
+      ],
+      "sha256": "a3622522734746cf8307e5325393564d0104c3cb49514d95c043ff52a27bc268",
+      "source": "control_atlas.png",
+      "crop": [
+        14,
+        954,
+        300,
+        1240
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "tooltip_background": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/tooltip_background.png",
+      "size": [
+        350,
+        240
+      ],
+      "sha256": "4026a94e1702a599438a29c275935c4698c1f9b42fd4429fc5ee1aa89059a3f4",
+      "source": "control_atlas.png",
+      "crop": [
+        328,
+        954,
+        613,
+        1240
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "tooltip_frame": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/tooltip_frame.png",
+      "size": [
+        350,
+        240
+      ],
+      "sha256": "5dff5a07f07abcacf530bb0859422ba9668f038bd05214dbaf7975b2df02650f",
+      "source": "control_atlas.png",
+      "crop": [
+        641,
+        954,
+        926,
+        1240
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    },
+    "premium_emblem": {
+      "file": "art/ui/sources/custom_game/daily_gw2_v1/premium_emblem.png",
+      "size": [
+        62,
+        64
+      ],
+      "sha256": "3fe4926e4adfd59c4aab045630691ded004094eedd6da7a830901cbbc29acd47",
+      "source": "control_atlas.png",
+      "crop": [
+        954,
+        954,
+        1240,
+        1240
+      ],
+      "usage": "Isolated live UI control; no reward data or quantities."
+    }
+  }
+}

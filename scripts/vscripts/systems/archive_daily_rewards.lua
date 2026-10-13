@@ -36,15 +36,32 @@ function M.snapshot(profile,day,pass)
     local cycle={}
     local claimed_today=daily.claimed[tostring(day)] == true
     local current=(claimed_today and math.max(0,daily.count-1) or daily.count)%7+1
-    for _, row in ipairs(schedule.rows) do
+    local function row_rewards(row)
         local rewards={}
         for i,id in ipairs(row.item_ids) do
             local item=items.by_id[id]
             rewards[#rewards+1]={id=id,name=item.display_name,count=tonumber(row.item_counts[i]),description=item.description,quality=item.quality}
         end
-        cycle[#cycle+1]={day=row.day_id,rewards=rewards,
+        return rewards
+    end
+    for _, row in ipairs(schedule.rows) do
+        cycle[#cycle+1]={day=row.day_id,rewards=row_rewards(row),
             status=row.day_id<current and "claimed" or row.day_id==current and (claimed_today and "claimed" or "claimable") or "not_open",
             is_today=row.day_id==current and 1 or 0}
+    end
+    -- A four-week presentation of the existing seven-claim reward schedule.
+    -- Keep today's completed claim visible at a window boundary; an unclaimed
+    -- day (including after makeup claims) points at the next cumulative claim.
+    local calendar_anchor=math.max(0,daily.count-(claimed_today and 1 or 0))
+    local calendar_start=math.floor(calendar_anchor/28)*28
+    local calendar_current=calendar_anchor-calendar_start+1
+    local calendar={}
+    for i=1,28 do
+        local absolute_count=calendar_start+i
+        local row=schedule.by_id[(absolute_count-1)%7+1]
+        calendar[#calendar+1]={day=i,absolute_count=absolute_count,rewards=row_rewards(row),
+            status=i<calendar_current and "claimed" or i==calendar_current and (claimed_today and "claimed" or "claimable") or "not_open",
+            is_today=i==calendar_current and 1 or 0}
     end
     local missed={}
     for d=math.max(daily.first_day,day-rules.makeup_days+1),day-1 do
@@ -58,6 +75,7 @@ function M.snapshot(profile,day,pass)
     local entitlement=(profile.entitlements or {})[rules.pass_entitlement_id] or {}
     return {today=day,claimed=daily.claimed[tostring(day)] and 1 or 0,count=daily.count,
         cycle_mode="claim_count",current_day=current,period_id=tostring(math.floor(math.max(0,daily.count-(claimed_today and 1 or 0))/7)),
+        calendar28=calendar,calendar_current_day=calendar_current,calendar_start_count=calendar_start,
         ordinary_status=claimed_today and "claimed" or "claimable",
         premium={status="unconfigured",name="周末高级装备",description="周周期与装备候选池尚未配置；现有累计签到通行证奖励仍按原规则发放。"},
         subtitle="每日领取 · 七次循环",rule_text="每日零点刷新；断签不重置累计进度。通行证奖励按累计签到次数发放。",
