@@ -1,354 +1,325 @@
 {
-  "version": 1,
+  "version": 2,
   "canvas": [
     1200,
-    800
+    778
   ],
-  "reference": "User-supplied marked Guild Wars 2 Inventory screenshot",
-  "material_source": "design_refs/collection_gw2_v1/blank_plate.png",
-  "source_policy": "Imagegen text-free shell and atlas, deterministically isolated; portraits, count and draw state use authoritative game data.",
+  "reference": "Original annotated Guild Wars 2 Inventory, 815x528",
+  "reference_source": "design_refs/collection_gw2_v2/reference_inventory.png",
+  "material_source": "design_refs/collection_gw2_v2/blank_plate.png",
+  "source_policy": "Built-in imagegen removes contents/annotations from the original plate; exact original empty-cell and close-control crops; flat live borders; existing portraits/business values remain untouched.",
   "assets": {
     "window_background": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/window_background.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/window_background.png",
       "size": [
-        1160,
-        744
+        1200,
+        778
       ],
-      "sha256": "bef88889024121a1e731f7a18e9b0543fdc7cee6da3022473c65fa87c52c026e",
+      "sha256": "3b4459b6ecdae97307f70d6c622d4363fa8a0069839de5a42e3e3b04cc544f87",
       "source": "blank_plate.png",
       "crop": null,
-      "usage": "Text-free shell; no slots or baked UI values."
+      "usage": "Single original-reference translucent flat plate, no raised perimeter or baked values."
     },
     "header_strip": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/header_strip.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/header_strip.png",
       "size": [
-        1160,
-        74
+        1130,
+        60
       ],
-      "sha256": "9aafcf8fe2ea8d8172125680789280494ba17b8a1e93b0292a1b6854b3880972",
-      "source": "blank_plate.png / 1200x800",
+      "sha256": "abc27e091e4d7ddd51d8e55a6bee0ca0a282e4a05f77b278e951f3946220c9dd",
+      "source": "blank_plate.png / 1200x778",
       "crop": [
-        29,
-        25,
-        1173,
-        86
+        70,
+        5,
+        1190,
+        61
       ],
-      "usage": "Independent empty title band."
+      "usage": "Thin flat title band; optional material, not a second frame."
     },
     "sidebar_background": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/sidebar_background.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/sidebar_background.png",
       "size": [
-        112,
-        598
+        66,
+        634
       ],
-      "sha256": "f1c7dfb81895b3bfa2ab2378f0d56eb1197e3f7b9a931179145b72e6a8af7dd0",
-      "source": "blank_plate.png / 1200x800",
+      "sha256": "674da904611e6d176dca7a4f45b5c3f2239bfb0910bb8f1bd0453efb084beaf6",
+      "source": "blank_plate.png / 1200x778",
       "crop": [
-        29,
-        87,
-        88,
-        699
+        5,
+        78,
+        63,
+        713
       ],
-      "usage": "Blank category rail, with no old bag menu."
+      "usage": "Extremely narrow flat icon rail."
     },
     "footer_strip": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/footer_strip.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/footer_strip.png",
       "size": [
-        1016,
-        86
+        1118,
+        60
       ],
-      "sha256": "8c2334aaa5f702b75eb0a0d2830c2f9de16db6e1b82299c02faee86e752cbda7",
-      "source": "blank_plate.png / 1200x800",
+      "sha256": "a05408c406d68435790b331c2b9282952734069bb9025f45fbe541c065ed760e",
+      "source": "blank_plate.png / 1200x778",
       "crop": [
-        88,
-        701,
-        1173,
-        771
+        80,
+        719,
+        1190,
+        777
       ],
-      "usage": "Empty draw/currency band; real values remain live."
+      "usage": "Shallow flat footer; no bronze button frame."
     },
     "tab_background": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/tab_background.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_background.png",
       "size": [
-        98,
-        104
+        62,
+        70
       ],
-      "sha256": "575260cd4bf56846a68deb4466c4b862e6534bb4d6039e0d33e009e7e3b93432",
-      "source": "blank_plate.png / 1200x800",
+      "sha256": "e628f2aabbf22a6423344d48f9173d39aa6b2a1e6310772e17d86b20d1dbf9d6",
+      "source": "blank_plate.png / 1200x778",
       "crop": [
-        35,
-        128,
-        82,
-        192
+        6,
+        99,
+        57,
+        141
       ],
-      "usage": "Unselected category background."
-    },
-    "slot_frame": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/slot_frame.png",
-      "size": [
-        72,
-        72
-      ],
-      "sha256": "4cda078d9a5bbfa78a90c9e222653fbda6bc600c45fd13d1465f7fb6144304c9",
-      "source": "control_atlas.png",
-      "crop": [
-        12,
-        12,
-        302,
-        302
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
-    },
-    "slot_hover": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/slot_hover.png",
-      "size": [
-        72,
-        72
-      ],
-      "sha256": "6620c88f8cbfe99db29a4684ca2d1d79002dc9a6f3180bd464062c732919d845",
-      "source": "control_atlas.png",
-      "crop": [
-        326,
-        12,
-        615,
-        302
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
-    },
-    "slot_selected": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/slot_selected.png",
-      "size": [
-        72,
-        72
-      ],
-      "sha256": "4b9e79acceaf296d515eb8088fc80bd7e2f910adfcf2d672557ba1ac978a8a95",
-      "source": "control_atlas.png",
-      "crop": [
-        639,
-        12,
-        928,
-        302
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
-    },
-    "slot_background": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/slot_background.png",
-      "size": [
-        72,
-        72
-      ],
-      "sha256": "2c720f1220f385829ee26efa08ca1c4849810c6cc12a6d225321336463fa9ae0",
-      "source": "control_atlas.png",
-      "crop": [
-        952,
-        12,
-        1242,
-        302
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
-    },
-    "tab_ex": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/tab_ex.png",
-      "size": [
-        80,
-        72
-      ],
-      "sha256": "76112b54e989a01aeb670233fd15925e336ce70d4d7195abdf7b0532bee051ab",
-      "source": "control_atlas.png",
-      "crop": [
-        12,
-        326,
-        302,
-        615
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
-    },
-    "tab_friend": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/tab_friend.png",
-      "size": [
-        74,
-        80
-      ],
-      "sha256": "c99849d4a86de453af375fa46e2a63228665bdcce95ccac406a0b7ad638c2b23",
-      "source": "control_atlas.png",
-      "crop": [
-        326,
-        326,
-        615,
-        615
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
-    },
-    "tab_wife": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/tab_wife.png",
-      "size": [
-        80,
-        51
-      ],
-      "sha256": "96af72f8424d68c4407f0812744af9fa5a92e1e11f775be54a100589cf2c798f",
-      "source": "control_atlas.png",
-      "crop": [
-        639,
-        326,
-        928,
-        615
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "usage": "Matte flat category material; no embossed tab border."
     },
     "tab_selected": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/tab_selected.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_selected.png",
       "size": [
-        98,
-        104
+        62,
+        70
       ],
-      "sha256": "6f2124692252f58e4a7a124fb33bf9e90557f7b0f37b11d175e1ae96e9a5adfa",
-      "source": "control_atlas.png",
+      "sha256": "e628f2aabbf22a6423344d48f9173d39aa6b2a1e6310772e17d86b20d1dbf9d6",
+      "source": "blank_plate.png / 1200x778",
       "crop": [
-        952,
-        326,
-        1242,
-        615
+        6,
+        99,
+        57,
+        141
       ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "usage": "Same flat material; selection drawn as a thin live highlight."
+    },
+    "slot_background": {
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/slot_background.png",
+      "size": [
+        74,
+        74
+      ],
+      "sha256": "7fbc51b7459f36a16273cbdee0de6c68425bf492095ddb676d9e2cb62dff8e15",
+      "source": "reference_inventory.png",
+      "crop": [
+        108,
+        323,
+        159,
+        376
+      ],
+      "usage": "Actual original empty inventory cell; rendered as a low-opacity backing below portraits."
+    },
+    "slot_frame": {
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/slot_frame.png",
+      "size": [
+        74,
+        74
+      ],
+      "sha256": "7049af3fed2fc426f915191db34c243c804d3c3d146a42cfacd30e1b3c462f7f",
+      "source": "reference_inventory.png / empty cell boundary strips",
+      "crop": [
+        108,
+        323,
+        159,
+        376
+      ],
+      "usage": "One-pixel original boundary strips with transparent center; live CSS supplies flat selection."
+    },
+    "slot_hover": {
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/slot_hover.png",
+      "size": [
+        74,
+        74
+      ],
+      "sha256": "7049af3fed2fc426f915191db34c243c804d3c3d146a42cfacd30e1b3c462f7f",
+      "source": "reference_inventory.png / empty cell boundary strips",
+      "crop": [
+        108,
+        323,
+        159,
+        376
+      ],
+      "usage": "One-pixel original boundary strips with transparent center; live CSS supplies flat selection."
+    },
+    "slot_selected": {
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/slot_selected.png",
+      "size": [
+        74,
+        74
+      ],
+      "sha256": "7049af3fed2fc426f915191db34c243c804d3c3d146a42cfacd30e1b3c462f7f",
+      "source": "reference_inventory.png / empty cell boundary strips",
+      "crop": [
+        108,
+        323,
+        159,
+        376
+      ],
+      "usage": "One-pixel original boundary strips with transparent center; live CSS supplies flat selection."
+    },
+    "tab_ex": {
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_ex.png",
+      "size": [
+        32,
+        29
+      ],
+      "sha256": "03ee08938e7d7e212e9b0324052d5f68d3e4e54f4681af0da38a54682a14f597",
+      "source": "collection_gw2_v1/tab_ex.png",
+      "crop": null,
+      "usage": "Existing category glyph kept small and matte; no new raised badge."
+    },
+    "tab_friend": {
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_friend.png",
+      "size": [
+        30,
+        32
+      ],
+      "sha256": "d6596deb54239324bfc41b9bcba1437a0ffdc2e086f987fe7988886226f47889",
+      "source": "collection_gw2_v1/tab_friend.png",
+      "crop": null,
+      "usage": "Existing category glyph kept small and matte; no new raised badge."
+    },
+    "tab_wife": {
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_wife.png",
+      "size": [
+        32,
+        20
+      ],
+      "sha256": "ba9f9abc43c59f5586104c50961f0b4bda4aac17e99be28c4a7f61ac9cf8f347",
+      "source": "collection_gw2_v1/tab_wife.png",
+      "crop": null,
+      "usage": "Existing category glyph kept small and matte; no new raised badge."
     },
     "draw_button": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/draw_button.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/draw_button.png",
       "size": [
-        240,
-        44
+        162,
+        30
       ],
-      "sha256": "b2c31eb3864713ac2b28f8ccebbb3c955913e88cf9f4afaee569aa494206fb62",
-      "source": "control_atlas.png",
+      "sha256": "b2e4e7a00c1940b219dba690a9c8b95f8c3c66990cd8b9ae435a755a2f6899bd",
+      "source": "blank_plate.png / 1200x778",
       "crop": [
-        25,
-        687,
-        314,
-        844
+        380,
+        17,
+        645,
+        51
       ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "usage": "Plain original title-band material for a small flat action."
     },
     "draw_button_hover": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/draw_button_hover.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/draw_button_hover.png",
       "size": [
-        240,
-        44
+        162,
+        30
       ],
-      "sha256": "0838242e80453a2f37252431adfa7bcbe6585a3cfdb9e03fd82312a9cac9e262",
-      "source": "control_atlas.png",
+      "sha256": "b2e4e7a00c1940b219dba690a9c8b95f8c3c66990cd8b9ae435a755a2f6899bd",
+      "source": "blank_plate.png / 1200x778",
       "crop": [
-        326,
-        639,
-        615,
-        928
+        380,
+        17,
+        645,
+        51
       ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "usage": "Same flat material; live brightness supplies hover."
     },
     "close": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/close.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/close.png",
       "size": [
-        80,
-        78
+        20,
+        20
       ],
-      "sha256": "b0c41645d4fa74d6e482e5862f0a91282cb5300c04f0bb6a87f39ba773b5de81",
-      "source": "control_atlas.png",
+      "sha256": "76be4c44fb599f6d2d549a09d4b617627e979ea533563bfd8427a208ee61816d",
+      "source": "reference_inventory.png",
       "crop": [
-        639,
-        639,
-        928,
-        928
+        787,
+        16,
+        804,
+        33
       ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "usage": "Original small close control, no added bezel."
     },
     "collection_icon": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/collection_icon.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/collection_icon.png",
       "size": [
         80,
         62
       ],
       "sha256": "177dc1d42d64445eac60fe5d99cf6ae79a28d76bbad9658788d5ab177bc15215",
-      "source": "control_atlas.png",
-      "crop": [
-        952,
-        639,
-        1242,
-        928
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "source": "collection_gw2_v1/collection_icon.png",
+      "crop": null,
+      "usage": "Existing navigation/scroll bitmap retained; native controls remain thin."
     },
     "scroll_track": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/scroll_track.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/scroll_track.png",
       "size": [
         12,
         320
       ],
       "sha256": "5b83276d6b00420d07539035ccf43a4285c882ea1dba6a65b1560b0a16fa9ef4",
-      "source": "control_atlas.png",
-      "crop": [
-        132,
-        897,
-        207,
-        1210
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "source": "collection_gw2_v1/scroll_track.png",
+      "crop": null,
+      "usage": "Existing navigation/scroll bitmap retained; native controls remain thin."
     },
     "scroll_thumb": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/scroll_thumb.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/scroll_thumb.png",
       "size": [
         12,
         100
       ],
       "sha256": "ffab2f31c80f634ab782b9b0a3e197f408d37f5d40936176b88c326ea779b8c9",
-      "source": "control_atlas.png",
-      "crop": [
-        326,
-        959,
-        391,
-        1147
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "source": "collection_gw2_v1/scroll_thumb.png",
+      "crop": null,
+      "usage": "Existing navigation/scroll bitmap retained; native controls remain thin."
     },
     "tooltip_background": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/tooltip_background.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/tooltip_background.png",
       "size": [
         360,
-        240
+        260
       ],
-      "sha256": "a800328367e67b93294bb9c76aaad29b30cc0a003aa1178eff7f1cfc3be6e08c",
-      "source": "control_atlas.png",
+      "sha256": "57e286867a4ee9cafa9db0a75c566f796ef4a1b9f5c3df726de6ee7ba6a226f3",
+      "source": "blank_plate.png / 1200x778",
       "crop": [
-        479,
-        940,
-        865,
-        1160
+        330,
+        260,
+        820,
+        610
       ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "usage": "Flat translucent original wash for readable tooltip."
     },
     "tooltip_frame": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/tooltip_frame.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/tooltip_frame.png",
       "size": [
         360,
-        240
+        260
       ],
-      "sha256": "8f765c337e2c8d712c9eb212a91a0d6306573848fe27e3f6aed08e3651f9f3b5",
-      "source": "control_atlas.png",
-      "crop": [
-        880,
-        940,
-        1226,
-        1160
-      ],
-      "usage": "Isolated live UI component; no player data or example loot."
+      "sha256": "804fa9495804b0d8f4470502140ebd603eb23a10e299fc4a813e56add1921b22",
+      "source": "Code-native single-line frame",
+      "crop": null,
+      "usage": "One-pixel flat neutral outline; no bevel or shadow."
     },
     "search_background": {
-      "file": "art/ui/sources/custom_game/collection_gw2_v1/search_background.png",
+      "file": "art/ui/sources/custom_game/collection_gw2_v2/search_background.png",
       "size": [
-        287,
+        1090,
         35
       ],
-      "sha256": "703fc6d413c178081d1dcd1b8c22f0a66153266352e0a52539a10042d86233e7",
-      "source": "control_atlas.png / tooltip background",
-      "crop": null,
-      "usage": "Text-free search-field backing."
+      "sha256": "7a592f24fd28ee111815ede0f9c36c115aaed2a3208a4b9ce988c55870ad19d0",
+      "source": "blank_plate.png / 1200x778",
+      "crop": [
+        83,
+        82,
+        1187,
+        119
+      ],
+      "usage": "Original long flat search surface."
     }
   }
 }

@@ -1,6 +1,6 @@
 param(
     [string]$Scope='tools/collection_gw2/compile_scope.json',
-    [string]$Report='design_refs/collection_gw2_v1/work/compile.json',
+    [string]$Report='design_refs/collection_gw2_v2/work/compile.json',
     [switch]$CheckOnly
 )
 $ErrorActionPreference='Stop'
@@ -10,7 +10,7 @@ $collectionGW2Content=Join-Path $collectionGW2Engine 'content/dota_addons/Surviv
 $collectionGW2Runtime=Join-Path $collectionGW2Repo 'panorama'
 $collectionGW2Compiler=Join-Path $collectionGW2Engine 'game/bin/win64/resourcecompiler.exe'
 $collectionGW2Assets='layout/custom_game/collection_gw2_assets.xml'
-$collectionGW2Allowed='^(?:scripts/custom_game/(?:collection_gw2|collection_gw2_data|collection_nav|archive_v10|archive_180de7e38b_titles_compact_v6|common/purple_shell)\.js|styles/custom_game/collection_gw2\.css|layout/custom_game/(?:archive|survival_hud|collection_gw2_assets)\.xml|images/custom_game/collection_gw2_v1/[a-z0-9_]+\.png)$'
+$collectionGW2Allowed='^(?:scripts/custom_game/(?:collection_gw2|collection_gw2_data)\.js|styles/custom_game/collection_gw2\.css|layout/custom_game/collection_gw2_assets\.xml|images/custom_game/collection_gw2_v2/[a-z0-9_]+\.png)$'
 function Get-WorkspacePath([string]$Relative) {
     $resolved=[IO.Path]::GetFullPath((Join-Path $collectionGW2Repo $Relative))
     if(-not $resolved.StartsWith($collectionGW2Repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw "Path outside the workspace: $Relative"}
@@ -22,14 +22,14 @@ $collectionGW2Files=@(Get-Content -LiteralPath $collectionGW2ScopePath -Raw -Enc
 if(-not $collectionGW2Files.Count){throw 'Compile scope is empty.'}
 if(@($collectionGW2Files|Select-Object -Unique).Count -ne $collectionGW2Files.Count){throw 'Compile scope contains duplicates.'}
 foreach($relative in $collectionGW2Files){if($relative -isnot [string] -or $relative -notmatch $collectionGW2Allowed){throw "Path is outside the collectionGW2 task: $relative"}}
-$collectionGW2Required=@('scripts/custom_game/collection_gw2.js','scripts/custom_game/collection_gw2_data.js','scripts/custom_game/collection_nav.js','scripts/custom_game/archive_v10.js','scripts/custom_game/archive_180de7e38b_titles_compact_v6.js','scripts/custom_game/common/purple_shell.js','styles/custom_game/collection_gw2.css','layout/custom_game/archive.xml','layout/custom_game/survival_hud.xml',$collectionGW2Assets)
+$collectionGW2Required=@('scripts/custom_game/collection_gw2.js','scripts/custom_game/collection_gw2_data.js','styles/custom_game/collection_gw2.css',$collectionGW2Assets)
 foreach($required in $collectionGW2Required){if($collectionGW2Files -notcontains $required){throw "Required collection source is missing from scope: $required"}}
 if(-not(Test-Path -LiteralPath $collectionGW2Compiler -PathType Leaf)){throw 'Native resourcecompiler is missing.'}
 [xml]$collectionGW2Xml=Get-Content -LiteralPath (Get-WorkspacePath ('panorama/src/'+$collectionGW2Assets)) -Raw -Encoding UTF8
 if($collectionGW2Xml.SelectNodes('//include').Count){throw 'Asset preload XML must not include other resources.'}
 $collectionGW2Dependencies=@($collectionGW2Xml.SelectNodes('//Image[@src]')|ForEach-Object {
     $src=$_.GetAttribute('src')
-    if($src -notmatch '^file://\{images\}/custom_game/collection_gw2_v1/[a-z0-9_]+\.png$'){throw "Unexpected preload image: $src"}
+    if($src -notmatch '^file://\{images\}/custom_game/collection_gw2_v2/[a-z0-9_]+\.png$'){throw "Unexpected preload image: $src"}
     'images/'+$src.Substring('file://{images}/'.Length)
 })
 $collectionGW2Pngs=@($collectionGW2Files|Where-Object {$_ -like '*.png'})
@@ -39,7 +39,7 @@ $collectionGW2Manifest=Get-Content -LiteralPath (Get-WorkspacePath 'tools/collec
 $collectionGW2ManifestHashes=@{}
 $collectionGW2ManifestImages=@($collectionGW2Manifest.assets.PSObject.Properties|ForEach-Object {
     $asset=$_.Value
-    if($asset.file -notmatch '^art/ui/sources/custom_game/collection_gw2_v1/[a-z0-9_]+\.png$'){throw "Unexpected manifest path: $($asset.file)"}
+    if($asset.file -notmatch '^art/ui/sources/custom_game/collection_gw2_v2/[a-z0-9_]+\.png$'){throw "Unexpected manifest path: $($asset.file)"}
     $assetPath=Get-WorkspacePath $asset.file
     if((Get-FileHash -LiteralPath $assetPath -Algorithm SHA256).Hash -ne $asset.sha256){throw "Manifest hash mismatch: $($asset.file)"}
     $imageRelative='images/'+$asset.file.Substring('art/ui/sources/'.Length)
@@ -51,8 +51,8 @@ if($collectionGW2ManifestImages.Count -ne $collectionGW2Pngs.Count -or @($collec
 # Check every collectionGW2 image referenced by the selected production sources.
 foreach($relative in @($collectionGW2Files|Where-Object {$_ -notlike '*.png'})){
     $sourceText=Get-Content -LiteralPath (Get-WorkspacePath ('panorama/src/'+$relative)) -Raw -Encoding UTF8
-    foreach($match in [regex]::Matches($sourceText,'(?:file://\{images\}/)?custom_game/collection_gw2_v1/([a-z0-9_]+\.png)')){
-        $dependency='images/custom_game/collection_gw2_v1/'+$match.Groups[1].Value
+    foreach($match in [regex]::Matches($sourceText,'(?:file://\{images\}/)?custom_game/collection_gw2_v2/([a-z0-9_]+\.png)')){
+        $dependency='images/custom_game/collection_gw2_v2/'+$match.Groups[1].Value
         if($collectionGW2Pngs -notcontains $dependency){throw "Referenced image is absent from scope/preload: $dependency"}
     }
 }

@@ -4,7 +4,7 @@
 
 ## 实际入口
 
-收藏采用独立的背包网格界面：顶部标题、左侧三栏目、人物格子和右下抽取操作按用户参考图重组，素材清单见 [collection asset manifest](../tools/collection_gw2/asset_manifest.json)。现有前女友与男性角色池已从存档导航移入收藏，老婆栏目保留待配置空态。
+收藏采用独立的背包网格界面：薄标题条、窄三栏目、长搜索条、人物格子和底部平面抽取操作按原版背包的比例重组，素材清单见 [collection asset manifest](../tools/collection_gw2/asset_manifest.json)。背景从用户原始 GW2 Inventory 参考图清除物品和标注后提取，格底直接取原图空格纹理，取消旧厚框与凸起按钮。现有前女友与男性角色池已从存档导航移入收藏，老婆栏目保留待配置空态。
 
 入口由 [custom_ui_manifest.xml](../panorama/src/layout/custom_game/custom_ui_manifest.xml)及三个活动布局决定：`archive.xml`、`survival_hud.xml`、`payment_test.xml`，均位于 `panorama/src/layout/custom_game/`。公共 V10 实现在 `panorama/src/scripts/custom_game/common/menu_v10.js`、`panorama/src/styles/custom_game/common/menu_v10.css`；独立存档继续由 `archive_v10.js` 适配真实控制器，`archive_parchment_data.js` 提供新材质，`archive_v10_data.js` 保留原物品图标与必要契约。应沿 XML 的实际 include 顺序检查依赖，不能按历史文件名推断入口。
 
@@ -52,7 +52,9 @@ node tools/menus_v10/preview.cjs
 
 按顺序执行 `split_assets.py`、`node tools/lottery_gw2/build_scope.cjs`、`tools/lottery_gw2/compile.ps1 -CheckOnly`，再用 `preview.cjs`、`acceptance.cjs`／`capture.cjs` 检查实际源码组装，最后运行定向 `compile.ps1`。编译只更新新的抽奖 JS/CSS、HUD XML、资源预载布局及 16 个 PNG，保留现有卡图、影片和其他 HUD 源码／产物。`design_refs/lottery_gw2_v1/work/` 是可重建的隔离预览、组件图和验收报告；数值为明确标记的浏览器样例，不连接账号、服务器或支付，也不是游戏客户端截图。
 
-收藏界面由 `collection_gw2.js/css` 和 `collection_gw2_data.js` 独立提供，顶部“收藏”、左侧三选单、14 × 7 背包网格、右下抽取按钮均是独立组件。`tools/collection_gw2/split_assets.py` 拆出 22 张无字材质，来源及内置 imagegen 提示保存在 `design_refs/collection_gw2_v1/`。`build_scope.cjs`、`compile.ps1 -CheckOnly`、`preview.cjs`、`acceptance.cjs`、`capture.cjs` 和实际 `compile.ps1` 分别负责限定编译依赖、隔离预览与最终组装截图。新增 `collection_nav.js` 扩展 HUD 入口，避免重写原有顶部 HUD；编译白名单不包含 `topnav_remaining` 源码和产物。
+收藏界面由 `collection_gw2.js/css` 和 `collection_gw2_data.js` 独立提供，当前画布为 1200 × 778，按原始 815 × 528 背包参考调整比例。顶部“收藏”、窄三选单、14 × 7 背包网格、底部小抽取按钮均是平面组件；背景独立透明度为 0.84，格底为 0.45，人物与文字不整体降透明。`tools/collection_gw2/split_reference_assets.py` 包装 22 张 v2 无字材质，来源、原图及内置 imagegen 编辑提示保存在 `design_refs/collection_gw2_v2/`。新版格底及关闭控件取原图，框线为低对比细线；不再堆叠厚标题、侧栏、底栏和三层格框。
+
+`build_scope.cjs`、`compile.ps1 -CheckOnly`、`preview.cjs`、`acceptance.cjs`、`capture.cjs` 和实际 `compile.ps1` 负责限定编译、隔离预览与最终截图。本版只编译收藏 JS、data、CSS、资源预载 XML 和 22 个 v2 PNG；原 HUD、导航、存档控制器及抽取业务不在重编范围。`collection_nav.js` 继续扩展原 HUD 入口。旧 `split_assets.py`、v1 参考和材质保留供历史交付及抽奖皮肤使用，不要执行旧拆分脚本覆盖当前 v2 数据。六种预览尺寸含原图 815 × 528；底栏边界、装饰透明度、细框和 Tooltip 前景遮挡均单独核对，输出位于 `design_refs/collection_gw2_v2/work/`。
 
 “我的前女友”沿用 `ex`，“我的前男友”沿用原男性角色 `friend` 池、持有数量及票券；头像使用现有 `archive_portraits_v3`，不重新生成角色。“我的老婆”按用户选择保留空栏、禁用抽取且不向服务器发送未配置类别请求。旧存档 `SelectCategory('ex'/'friend')` 转到收藏。抽取使用原 `survival_archive_social_draw`，回执 `survival_archive_social_result` 关联 pool/request_id 及档案版本；未确认意图跨选单、闭窗和重载保留，同一意图不生成第二个交易编号。其他确认弹窗继续拦截跨菜单导航。
 

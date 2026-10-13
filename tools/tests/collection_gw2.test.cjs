@@ -12,6 +12,20 @@ function ack(pending,extra){h.emit('survival_archive_social_result',{pool_id:pen
 function draws(){return h.sent.filter(r=>r.name==='survival_archive_social_draw');}
 function images(node){return (node.paneltype==='Image'?[node]:[]).concat(node.Children().flatMap(images));}
 let api=cfg.SurvivalCollection;
+assert.equal(nodes.CollectionScrim.style.backgroundColor,'#00000022','The flat inventory overrides the generic modal dark scrim after adoption');
+assert.equal(nodes.CollectionGW2Canvas.style.width,'1200px');assert.equal(nodes.CollectionGW2Canvas.style.height,'778px');
+assert.equal(nodes.CollectionGW2Background.style.position,'0px 0px 0px');assert.equal(nodes.CollectionGW2Background.style.width,'1200px');
+assert.equal(nodes.CollectionGW2Background.style.opacity,'0.84','Only the background wash is translucent');assert.notEqual(nodes.CollectionGW2Canvas.style.opacity,'0.84');
+assert.equal(nodes.CollectionGW2Header.style.position,'70px 0px 0px');assert.equal(nodes.CollectionGW2Header.style.height,'60px');
+assert.equal(nodes.CollectionGW2Sidebar.style.width,'66px');assert.equal(nodes.CollectionGW2Sidebar.style.backgroundImage,'none');
+assert.equal(nodes.CollectionGW2SearchBacking.style.position,'82px 109px 0px');assert.equal(nodes.CollectionGW2SearchBacking.style.width,'1090px');
+assert.equal(nodes.CollectionGW2Grid.style.position,'82px 156px 0px');assert.equal(nodes.CollectionGW2Grid.style.width,'1110px');assert.equal(nodes.CollectionGW2Grid.style.height,'560px');
+assert.equal(nodes.CollectionGW2Summary.style.position,'385px 73px 0px');
+assert.equal(nodes.CollectionGW2Draw.style.position,'1010px 730px 0px');assert.equal(nodes.CollectionGW2Draw.style.width,'162px');assert.equal(nodes.CollectionGW2Draw.style.height,'30px');
+assert.equal(nodes.CollectionGW2Draw.style.border,'1px solid #a7a99970');assert.equal(nodes.CollectionGW2Tooltip.style.boxShadow,'none');
+assert.equal(nodes.CollectionGW2Result.style.position,'82px 753px 0px');assert.equal(nodes.CollectionGW2Result.style.height,'18px');assert.equal(nodes.CollectionGW2Result.style.width,'900px');
+function bounds(node){const [x,y]=node.style.position.split(' ').map(parseFloat);return {x,y,right:x+parseFloat(node.style.width),bottom:y+parseFloat(node.style.height)};}
+nodes.CollectionGW2Result.text='服务端返回的完整长错误说明'.repeat(50);assert(bounds(nodes.CollectionGW2Result).right+28<=bounds(nodes.CollectionGW2Draw).x,'Even a long response is contained before the draw button');assert.equal(nodes.CollectionGW2Result.style.textOverflow,'ellipsis');
 api.Open('wife');assert.equal(h.sent.length,0,'An unconfigured wife page never requests an invalid pool');assert.equal(api.Inspect().slots,98);assert(!nodes.CollectionGW2Draw.enabled);assert.equal(nodes.CollectionGW2Empty.text,'暂无收藏配置');
 h.click(nodes.CollectionGW2Draw);assert.equal(draws().length,0);
 api.Select('ex');assert.equal(h.sent.at(-1).payload.category_id,'ex');assert.equal(h.sent.at(-1).payload.prefetch,1);assert.equal(api.Inspect().slots,98);
@@ -21,7 +35,8 @@ assert.equal(api.Inspect().rows.length,0,'Partial server pages cannot show incom
 emit({...packet('ex',10,pieces[1]),chunk:2,chunks:4});
 assert.equal(api.Inspect().rows.length,40);assert.equal(api.Inspect().slots,98);assert(nodes.CollectionGW2Draw.enabled);
 assert.equal(images(nodes.CollectionGW2Item_ex_01)[0].image,'s2r://panorama/images/custom_game/archive_gpu_regular/head_v3_ex_01.vtex','The current formal portrait replaces the old heads catalog');
-assert.equal(nodes.CollectionGW2Item_ex_01.style.width,'66px');
+assert.equal(nodes.CollectionGW2Item_ex_01.style.width,'74px');assert.equal(images(nodes.CollectionGW2Item_ex_01)[0].style.width,'70px');
+assert.equal(nodes.CollectionGW2Item_ex_14.style.position,'1014px 0px 0px');assert.equal(nodes.CollectionGW2Item_ex_15.style.position,'0px 80px 0px');assert.equal(nodes.CollectionGW2EmptySlot_97.style.position,'1014px 480px 0px');
 const cells=nodes.CollectionGW2GridBody.Children().slice(),created=h.counts.created;
 for(let i=11;i<41;i++)snapshot('ex',i,rows);
 assert.equal(h.counts.created,created,'Equal snapshots do not rebuild the 98 inventory slots');assert.deepEqual(nodes.CollectionGW2GridBody.Children(),cells);
@@ -46,7 +61,7 @@ const acquired=rows.map((r,i)=>({...r,count:i?0:3}));snapshot('ex',55,acquired,{
 snapshot('ex',56,acquired,{revision:80,last_draw:{id:'later-beast-draw',pool_id:'beast',name:'散魂钟'}});assert.equal(api.Inspect().pending,null,'A later blessing draw may replace last_draw without trapping the completed collection intent');
 snapshot('ex',57,[{...acquired[0],count_known:0},...acquired.slice(1)]);assert(nodes.CollectionGW2Item_ex_01.BHasClass('CollectionGW2Unknown'));nodes.CollectionGW2Item_ex_01.events.onmouseover();assert(nodes.CollectionGW2TooltipBody.text.includes('持有数量：—'));assert(nodes.CollectionGW2Summary.text.includes('已收藏 0 / 40'),'Unknown ownership is not counted as owned');snapshot('ex',58,acquired);
 const requestsBeforeGap=h.sent.length;emit(packet('ex',60,[{path:['rows',1,'count'],value:99}],{delta:1,base_sequence:999}));assert.equal(api.Inspect().rows[0].count,3);h.flushFinite();assert(h.sent.length>requestsBeforeGap);assert.equal(h.sent.at(-1).payload.prefetch,1,'Missing delta baselines request a full authoritative page');
-const many=Array.from({length:113},(_,i)=>({...rows[i%40],id:rows[i%40].id}));snapshot('ex',61,many);assert.equal(api.Inspect().slots,126);assert.equal(nodes.CollectionGW2GridBody.style.height,'630px','Additional real entries extend the scrolling inventory');
+const many=Array.from({length:113},(_,i)=>({...rows[i%40],id:rows[i%40].id}));snapshot('ex',61,many);assert.equal(api.Inspect().slots,126);assert.equal(nodes.CollectionGW2GridBody.style.height,'720px','Additional real entries extend the scrolling inventory');
 api.Close();const beforeClosed=h.counts.created;snapshot('ex',62,rows);assert.equal(h.counts.created,beforeClosed,'Hidden updates cache ownership without rebuilding UI');
 api.Open('wife');const wifeRequests=h.sent.length;h.flushFinite();assert.equal(h.sent.length,wifeRequests);assert.equal(api.Inspect().rows.length,0);assert.equal(api.Inspect().slots,98);assert(!nodes.CollectionGW2Draw.enabled);
 for(let i=0;i<12;i++){api.Close();api.Open('wife');}assert.equal(h.sent.length,wifeRequests,'Repeated wife opens do not invent a backend category');

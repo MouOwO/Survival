@@ -2,7 +2,7 @@
 // Execute the actual archive component chain; topnav_remaining is never loaded.
 const fs=require('fs'),path=require('path'),crypto=require('crypto'),{spawnSync}=require('child_process'),{pathToFileURL}=require('url');
 const repo=path.resolve(__dirname,'../..'),arg=process.argv.indexOf('--out');
-const out=path.resolve(repo,arg<0?'design_refs/collection_gw2_v1/work/preview':process.argv[arg+1]);
+const out=path.resolve(repo,arg<0?'design_refs/collection_gw2_v2/work/preview':process.argv[arg+1]);
 if(!out.startsWith(repo+path.sep))throw Error('Preview output must remain inside the workspace.');
 process.chdir(repo);
 const child=spawnSync(process.execPath,[path.join(repo,'tools/archive_v10/preview.cjs'),'--out',out],{cwd:repo,encoding:'utf8',windowsHide:true});
@@ -25,9 +25,10 @@ html=html.replace(/(<div id="PreviewCaption">)[\s\S]*?(<\/div>)/,'$1收藏 · �
 // Native scrollbar panels are CSS pseudo-elements in Chrome. Copy their authored
 // declarations only; geometry, portraits and all component textures remain real.
 const collectionCss=fs.readFileSync(path.join(repo,'panorama/src/styles/custom_game/collection_gw2.css'),'utf8');
-const track=collectionCss.match(/#CollectionWindow VerticalScrollBar\s*\{([^}]+)\}/),thumb=collectionCss.match(/#CollectionWindow VerticalScrollBar \.ScrollThumb\s*\{([^}]+)\}/);
+const track=collectionCss.match(/#CollectionWindow VerticalScrollBar\s*\{([^\r\n]*)\}/),thumb=collectionCss.match(/#CollectionWindow VerticalScrollBar \.ScrollThumb\s*\{([^\r\n]*)\}/);
 if(!track||!thumb)throw Error('Production collection scrollbar declarations are missing.');
-html=html.replace('<div id="PreviewRoot">','<style>#CollectionWindow .panel::-webkit-scrollbar{'+track[1]+'}#CollectionWindow .panel::-webkit-scrollbar-track{'+track[1]+'}#CollectionWindow .panel::-webkit-scrollbar-thumb{'+thumb[1]+'}</style><div id="PreviewRoot">');
+const scrollbarStyle=text=>text.replace(/file:\/\/\{images\}\/([^"')\s]+)/g,(_,file)=>pathToFileURL(path.join(repo,fs.existsSync(path.join(repo,'art/ui/sources',file))?'art/ui/sources':'panorama/src/images',file)).href);
+html=html.replace('<div id="PreviewRoot">','<style>#CollectionWindow .panel::-webkit-scrollbar{'+scrollbarStyle(track[1])+'}#CollectionWindow .panel::-webkit-scrollbar-track{'+scrollbarStyle(track[1])+'}#CollectionWindow .panel::-webkit-scrollbar-thumb{'+scrollbarStyle(thumb[1])+'}</style><div id="PreviewRoot">');
 fs.writeFileSync(entry,html);fs.writeFileSync(path.join(out,'collection_fixture.json'),JSON.stringify(fixture,null,2));
 const file=path.join(out,'assembly.json'),assembly=JSON.parse(fs.readFileSync(file,'utf8'));
 assembly.kind='collection_gw2_production_component_browser_preview';assembly.notGameCapture=true;assembly.fixtureRuntimeValues=fixture.runtimeValues;assembly.collectionFixtureSource=fixture.source;assembly.excludedUserEditedSources=excluded;assembly.sourceGraph=assembly.sourceGraph.filter(record=>!excluded.includes(record.path));
