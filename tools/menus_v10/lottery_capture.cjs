@@ -7,7 +7,7 @@ const hold=setInterval(()=>{},1000);
 (async()=>{const b=await browser(),reports=[];try{
  for(const state of ['idle','details','unknown','reward_known']){
   await b.go(preview,'?page=lottery&state='+state);await b.run('previewReady');await b.run('syncLayout();true');
-  const r=await b.run(`({ready:previewState.ready,errors:previewErrors,calls:previewCalls,title:cfg.SurvivalMenuV10.Entries().find(x=>x.panel.id==='LotteryMainCanvas').title.text})`);
+  const r=await b.run(`({ready:previewState.ready,errors:previewErrors,calls:previewCalls,title:nodes.LotteryGW2Title?.text||cfg.SurvivalPurpleLottery?.Inspect()?.title||nodes.LotteryTitle?.text||''})`);
   await b.shot(out+'/'+state+'.png');reports.push({state,...r});
  }
  await b.go(preview,'?page=lottery');await b.run('previewReady');
@@ -16,6 +16,6 @@ const hold=setInterval(()=>{},1000);
  reports.push({state:'ten_results',...await b.run(`({errors:previewErrors,count:nodes.LotteryItemList.Children().length,positions:nodes.LotteryItemList.Children().map(c=>c.style.position),calls:previewCalls})`)});
  await b.run(`cfg.SurvivalLottery.Feature('history');syncLayout();true`);await b.shot(out+'/history.png');
  reports.push({state:'history',...await b.run(`({errors:previewErrors,rows:nodes.LotteryInfoList.Children().length,calls:previewCalls})`)});
- fs.writeFileSync(out+'/report.json',JSON.stringify({kind:'production_component_browser_preview',gameVerified:false,reports},null,2));
+ fs.writeFileSync(out+'/report.json',JSON.stringify({kind:'active_lottery_production_component_browser_preview',gameVerified:false,reports},null,2));
  console.log('LOTTERY_V10_BROWSER_SAVED '+out);
  }finally{b.close();clearInterval(hold);}})().catch(e=>{clearInterval(hold);console.error(e);process.exitCode=1;});

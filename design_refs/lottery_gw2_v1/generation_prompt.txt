@@ -1,0 +1,13 @@
+Mode: built-in imagegen (no CLI/API fallback).
+Use case: ui-mockup.
+Input references: user-supplied Octopath Traveler gacha layout; existing design_refs/collection_gw2_v1/blank_plate.png painterly material.
+Output: blank_plate.png. Existing four card-pool scene images and reward art are reused unchanged.
+
+Use case: ui-mockup
+Asset type: text-free raster window background plate for a real Dota 2 Panorama gacha interface.
+Reference roles: the Octopath Traveler gacha screenshot supplies only the wide rectangular composition and left-category/right-hero hierarchy; the brown/slate blank Guild Wars 2 inventory plate supplies the actual painterly material style. Do not reproduce characters, card art or any text from the Octopath screenshot.
+Primary request: create ONE production-quality blank 16:9 wide window plate, 1536x864 preferred. Keep it compatible with the supplied Guild Wars 2 brown-charcoal/slate-blue painted inventory material, but cleaner and less dirty. A fine irregular iron/bronze perimeter, discreet aged scratches only along the edges, muted warm brown at left fading through dark charcoal to cool blue slate at right, soft hand-painted brush texture. Transparent outside a gently feathered rectangular window perimeter. Very thin subdued gold/steel outline. Outer margin about 2%. Large uninterrupted usable center, no baked internal lines, no slot grid, no decorative objects. The left category rail, header, footer, selected tabs, numbers and buttons will be added as separate actual UI components in code.
+Lighting/mood: restrained, readable, fantasy painterly wash, low noise, no overexposed glow.
+Constraints: EMPTY background only. No people, no creatures, no weapons, no icons, no letters, no glyphs, no words, no numbers, no logos, no watermark, no cards, no separate button panels. Avoid ornate filigree, bright purple, busy stains, dirt clouds, glowing particles and sharp modern glass gradients. Preserve real transparency outside the single bordered plate.
+
+Component packaging: tools/lottery_gw2/split_assets.py creates the new window plate and reuses the existing Collection GW2 bitmap controls at their runtime sizes. No characters, card art, numbers or business values are generated.

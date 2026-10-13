@@ -1,0 +1,172 @@
+{
+  "version": 1,
+  "canvas": [
+    1536,
+    864
+  ],
+  "reference": "User-supplied Octopath Traveler gacha composition with existing GW2 Collection material style.",
+  "material_source": "design_refs/lottery_gw2_v1/blank_plate.png",
+  "source_policy": "Built-in imagegen blank plate; existing GW2 controls reused; four scene cards and all reward art remain authoritative existing assets.",
+  "assets": {
+    "window_background": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/window_background.png",
+      "size": [
+        1536,
+        864
+      ],
+      "sha256": "8161e8f9a012103965bd79bd0760c5c430136d58a34ac5ea233674dd47651f0a",
+      "source": "design_refs/lottery_gw2_v1/blank_plate.png",
+      "usage": "Generated text-free wide painterly perimeter plate."
+    },
+    "header_strip": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/header_strip.png",
+      "size": [
+        1456,
+        74
+      ],
+      "sha256": "100e1215f7c43d983b7747e6e2280d70dd912ba4fae9a1591b5c4f05ba1429f9",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/header_strip.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "sidebar_background": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/sidebar_background.png",
+      "size": [
+        276,
+        669
+      ],
+      "sha256": "e9107d31d1c616b0c200e17401242c788b1aba1ee22a15161fc43f70934dd065",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/sidebar_background.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "footer_strip": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/footer_strip.png",
+      "size": [
+        1113,
+        70
+      ],
+      "sha256": "a9940cf74a049d01a0b0410ed9f0b796db6937d5da3f00c9bfdcc3993ab72c15",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/footer_strip.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "tab_background": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/tab_background.png",
+      "size": [
+        250,
+        104
+      ],
+      "sha256": "27d7d82de677f75b147c71ce5927ac95dc8eff40b58ab9a611c49a53d7480399",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/draw_button.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "tab_selected": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/tab_selected.png",
+      "size": [
+        250,
+        104
+      ],
+      "sha256": "27d7d82de677f75b147c71ce5927ac95dc8eff40b58ab9a611c49a53d7480399",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/draw_button.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "draw_button": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/draw_button.png",
+      "size": [
+        240,
+        60
+      ],
+      "sha256": "42f2fb1311edfbcde260891be6be2387d328207a88eb8eaf43d44b81d455c0e9",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/draw_button.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "draw_button_hover": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/draw_button_hover.png",
+      "size": [
+        240,
+        60
+      ],
+      "sha256": "42f2fb1311edfbcde260891be6be2387d328207a88eb8eaf43d44b81d455c0e9",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/draw_button.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "slot_background": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/slot_background.png",
+      "size": [
+        120,
+        120
+      ],
+      "sha256": "bd8748f7f17c108617bfbd97f4cbbeb258e2e18bf68ab801058b56e1041a6ba7",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/slot_background.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "slot_frame": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/slot_frame.png",
+      "size": [
+        144,
+        170
+      ],
+      "sha256": "bb77d685be14f00fb2ac561cf335bd63b3b31a2b2c8449de9c60d18aec7a40da",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/slot_frame.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "slot_selected": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/slot_selected.png",
+      "size": [
+        144,
+        170
+      ],
+      "sha256": "96823f4c5d581f62611a0647ec3d617d16cb47f987ff53a975dacd7d3323e456",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/slot_selected.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "close": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/close.png",
+      "size": [
+        40,
+        40
+      ],
+      "sha256": "cb64130999d8e4a576ab5d6005c42f0a2370edf9a1b2d9d395f7f42bc8c80c88",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/close.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "scroll_track": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/scroll_track.png",
+      "size": [
+        12,
+        320
+      ],
+      "sha256": "5b83276d6b00420d07539035ccf43a4285c882ea1dba6a65b1560b0a16fa9ef4",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/scroll_track.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "scroll_thumb": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/scroll_thumb.png",
+      "size": [
+        12,
+        100
+      ],
+      "sha256": "ffab2f31c80f634ab782b9b0a3e197f408d37f5d40936176b88c326ea779b8c9",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/scroll_thumb.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "tooltip_background": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/tooltip_background.png",
+      "size": [
+        400,
+        280
+      ],
+      "sha256": "ed7e587ac961cf96b3dd21ede5fc7cafcc338fdaa91b69ba4fe87e90db6c20f5",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/tooltip_background.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    },
+    "tooltip_frame": {
+      "file": "art/ui/sources/custom_game/lottery_gw2_v1/tooltip_frame.png",
+      "size": [
+        400,
+        280
+      ],
+      "sha256": "f34c124f27d7c34ede46224b5d71124ba007b8107e103625029b9cc78640a9d5",
+      "source": "art/ui/sources/custom_game/collection_gw2_v1/tooltip_frame.png",
+      "usage": "Existing Collection GW2 bitmap control, packaged at lottery runtime size; no baked business values."
+    }
+  }
+}

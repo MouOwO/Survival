@@ -1,6 +1,6 @@
 # 当前 UI 接入与文档入口
 
-存档现在采用独立的旧纸纹两栏界面：左侧青灰分类列表，右侧黑褐条目、橙金进度条，不再显示一级导航和公共资源行。依据是[用户确认效果图](../design_refs/archive_parchment_v1/approved.png)，材质与控件清单见 [asset_manifest.json](../tools/archive_parchment/asset_manifest.json)。每日登录也已独立，采用金色皇冠、月相和蓝黑笔刷底板，28 格免费奖励按 7 列 × 4 行排列，右侧为方形蓝框战令奖励。宝物、抽奖、商城、生存商店、VIP，以及兑换和支付确认仍采用 V10 紫色公共外壳；其几何与验证范围见 [V10 菜单交付](../design_refs/menus_v10/DELIVERY.md)。存档原业务说明仍见[存档数据与交互](../design_refs/archive_v10/Delivery/DATA_AND_INTERACTIONS.md)。历史外壳不能覆盖独立存档和每日登录布局。
+存档现在采用独立的旧纸纹两栏界面：左侧青灰分类列表，右侧黑褐条目、橙金进度条，不再显示一级导航和公共资源行。依据是[用户确认效果图](../design_refs/archive_parchment_v1/approved.png)，材质与控件清单见 [asset_manifest.json](../tools/archive_parchment/asset_manifest.json)。每日登录也已独立，采用金色皇冠、月相和蓝黑笔刷底板，28 格免费奖励按 7 列 × 4 行排列，右侧为方形蓝框战令奖励。抽奖采用八方旅人参考布局和激战 2 材质的独立外壳，左侧选择现有四池，右侧展示原卡池场景并操作单抽／十连。宝物、商城、生存商店、VIP，以及兑换和支付确认仍采用 V10 紫色公共外壳；其几何与验证范围见 [V10 菜单交付](../design_refs/menus_v10/DELIVERY.md)。存档原业务说明仍见[存档数据与交互](../design_refs/archive_v10/Delivery/DATA_AND_INTERACTIONS.md)。历史外壳不能覆盖已经独立的界面。
 
 ## 实际入口
 
@@ -45,6 +45,12 @@ node tools/menus_v10/preview.cjs
 浏览器预览运行实际 XML、JS、CSS，使用明确标记的隔离状态；其截图、缓存和报告可以重建。原生图标预览首次导出及自动检查命令见 [存档工具说明](../tools/archive_v10/README.md)。浏览器通过、Lua/Node 测试通过、资源编译通过分别记录，均不能替代游戏内鼠标、滚轮、字体、裁切和热重载验收。当前完整实机矩阵的边界以 V10 交付说明为准。
 
 ## 保留的业务边界
+
+抽奖由 `survival_hud.xml` 加载 `lottery_gw2_data.js`、`lottery_gw2.js/css`，替代原抽奖专属 `menu_purple.js`／`menus_v10_lottery.css` 展示层。外壳为 1536 × 864，电影、翻牌结果及详情内容区保留 1113 × 669 契约；原控制器继续管理 `lottery`／`lottery_info` 层栈，外观不重复注册模态层。16 个无字材质由 `tools/lottery_gw2/split_assets.py` 包装，背景使用内置 imagegen，控件复用收藏的激战 2 材质；完整提示和来源位于 `design_refs/lottery_gw2_v1/generation_prompt.txt`，哈希清单见 [lottery asset manifest](../tools/lottery_gw2/asset_manifest.json)。
+
+四池继续使用 `map`、`cultivation`、`dragon_knight`、`summer` 及现有 `lottery_cinematic_v1` 场景卡图、`reward_art_v5` 奖励图。抽奖展示层在原图标工厂生成 Image 后，仅对本窗口内、已有 `lottery_*` 专属图谱记录的奖励设置既有 `runtime_uri`，防止通用 Dota 道具图遮住现成卡图；未知记录沿原回退，退出展示层时还原工厂，其他菜单图标选择不变。真实奖励列表、名称、持有量、票券余额、费用、概率及保底均由服务端快照驱动，不以预览样例填造；修仙池保留地图累计 100 抽解锁，前两池普通券、后两池金券。原单抽／十连／再抽、影片及跳过、独立详情选池、当前局记录、公告和票券获取流程不变。普通开关窗口保留未完成请求；现有业务控制器的抽奖 pending 不跨脚本热重载保存，此次视觉改动不扩展该事务契约。
+
+按顺序执行 `split_assets.py`、`node tools/lottery_gw2/build_scope.cjs`、`tools/lottery_gw2/compile.ps1 -CheckOnly`，再用 `preview.cjs`、`acceptance.cjs`／`capture.cjs` 检查实际源码组装，最后运行定向 `compile.ps1`。编译只更新新的抽奖 JS/CSS、HUD XML、资源预载布局及 16 个 PNG，保留现有卡图、影片和其他 HUD 源码／产物。`design_refs/lottery_gw2_v1/work/` 是可重建的隔离预览、组件图和验收报告；数值为明确标记的浏览器样例，不连接账号、服务器或支付，也不是游戏客户端截图。
 
 收藏界面由 `collection_gw2.js/css` 和 `collection_gw2_data.js` 独立提供，顶部“收藏”、左侧三选单、14 × 7 背包网格、右下抽取按钮均是独立组件。`tools/collection_gw2/split_assets.py` 拆出 22 张无字材质，来源及内置 imagegen 提示保存在 `design_refs/collection_gw2_v1/`。`build_scope.cjs`、`compile.ps1 -CheckOnly`、`preview.cjs`、`acceptance.cjs`、`capture.cjs` 和实际 `compile.ps1` 分别负责限定编译依赖、隔离预览与最终组装截图。新增 `collection_nav.js` 扩展 HUD 入口，避免重写原有顶部 HUD；编译白名单不包含 `topnav_remaining` 源码和产物。
 

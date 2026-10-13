@@ -1,0 +1,23 @@
+[
+  "scripts/custom_game/lottery_gw2.js",
+  "scripts/custom_game/lottery_gw2_data.js",
+  "styles/custom_game/lottery_gw2.css",
+  "layout/custom_game/survival_hud.xml",
+  "layout/custom_game/lottery_gw2_assets.xml",
+  "images/custom_game/lottery_gw2_v1/close.png",
+  "images/custom_game/lottery_gw2_v1/draw_button.png",
+  "images/custom_game/lottery_gw2_v1/draw_button_hover.png",
+  "images/custom_game/lottery_gw2_v1/footer_strip.png",
+  "images/custom_game/lottery_gw2_v1/header_strip.png",
+  "images/custom_game/lottery_gw2_v1/scroll_thumb.png",
+  "images/custom_game/lottery_gw2_v1/scroll_track.png",
+  "images/custom_game/lottery_gw2_v1/sidebar_background.png",
+  "images/custom_game/lottery_gw2_v1/slot_background.png",
+  "images/custom_game/lottery_gw2_v1/slot_frame.png",
+  "images/custom_game/lottery_gw2_v1/slot_selected.png",
+  "images/custom_game/lottery_gw2_v1/tab_background.png",
+  "images/custom_game/lottery_gw2_v1/tab_selected.png",
+  "images/custom_game/lottery_gw2_v1/tooltip_background.png",
+  "images/custom_game/lottery_gw2_v1/tooltip_frame.png",
+  "images/custom_game/lottery_gw2_v1/window_background.png"
+]
