@@ -10,8 +10,8 @@
         if (!U || !U.Lifecycle || !D || !S || !A) throw new Error("Archive tooltip dependencies must load before Create");
         var parent = options.parent, root = options.root || parent, prefix = options.idPrefix || "ArchiveSharedTooltip";
         var life = U.Lifecycle(), disposed = false, showEpoch = 0, hideEpoch = 0, anchor = null;
-        var currentItem = null, currentCategory = "", elements = {}, pieces = {}, panel;
-        var surfaceWidth = 320, bodyWidth = 276, padding = 24, measuredHeight = 198;
+        var currentItem = null, currentCategory = "", elements = {}, pieces = {}, panel, dismiss;
+        var surfaceWidth = 320, bodyWidth = 276, padding = 24, measuredHeight = 198, fitScale = 1;
         function valid(node) { return node && (!node.IsValid || node.IsValid()); }
         function alive() { return !disposed && valid(parent) && valid(root) && valid(panel) && (!options.isAlive || options.isAlive()); }
         function active() { return alive() && (!options.isActive || options.isActive()); }
@@ -86,6 +86,7 @@
             if (valid(anchor)) anchor.RemoveClass("ArchiveHovered");
             anchor=null;
             if (valid(panel)) panel.visible=false;
+            if (dismiss) dismiss.Hidden();
             if (options.onHide) options.onHide();
         }
         function queueHide() {
@@ -93,7 +94,8 @@
             var epoch=++hideEpoch;
             life.Later(.15,function () { if (active() && epoch===hideEpoch) hide(); });
         }
-        surface.SetPanelEvent("onmouseover",function () { if (active()) hideEpoch++; });
+        function tooltipRect(node) { var at=node.GetPositionWithinWindow(); return {x:at.x,y:at.y,width:node.actuallayoutwidth*fitScale,height:node.actuallayoutheight*fitScale}; }
+        dismiss=cfg.SurvivalTooltipDismiss.Create({panel:panel,surface:surface,getRect:tooltipRect,hide:hide,isAlive:alive,isVisible:function () { return active() && panel.visible; }});
         surface.SetPanelEvent("onmouseout",queueHide);
         function getBounds() {
             var value=options.getBounds ? options.getBounds() : {width:1200,height:900};
@@ -101,7 +103,7 @@
         }
         function position(epoch) {
             if (epoch!==showEpoch || !active() || !valid(anchor) || !panel.visible) return;
-            var scale=Number(options.getScale ? options.getScale() : 1) || 1;
+            var scale=Number(options.getScale ? options.getScale() : 1) || 1; fitScale=scale;
             var cp=parent.GetPositionWithinWindow(), at=anchor.GetPositionWithinWindow();
             var sx=(parent.actualuiscale_x||1)*scale, sy=(parent.actualuiscale_y||1)*scale, bounds=getBounds();
             var contentHeight=0;
@@ -138,7 +140,7 @@
             });
         }
         function show(item, category, card, onlyEffect) {
-            if (!active() || !valid(card)) return false;
+            if (!active() || !valid(card) || !dismiss.CanShow(card)) return false;
             hide(); anchor=card; currentItem=item; currentCategory=category; card.AddClass("ArchiveHovered");
             var state=S.State(item,category), name=options.categoryName ? options.categoryName(category) : category;
             elements.Title.text=String(item.name||"");
@@ -160,7 +162,7 @@
                 style(elements[role],{width:bodyWidth+"px",height:"fit-children",ignoreParentFlow:"false",fontSize:(role==="Title"?22:role==="State"||role==="EffectCaption"?15:17)+"px",color:role==="Title"?colors.title:role==="Effect"?colors.body:role==="State"?colors.state:colors.caption,margin:"0px 0px "+(role==="Title"?6:role==="State"?8:role==="Effect"?8:4)+"px",whiteSpace:"normal",textOverflow:"clip"});
             });
             body.style.height="fit-children"; panel.visible=true;
-            var epoch=showEpoch; position(epoch);
+            var epoch=showEpoch; position(epoch); dismiss.Shown(card);
             [0,.05,.1,.2,.4,.8].forEach(function (delay) { life.Later(delay,function () { position(epoch); }); });
             if (options.watchAnchor) trackAnchor(epoch,card.GetPositionWithinWindow());
             return true;
@@ -168,7 +170,7 @@
         return {
             Show:show, Hide:hide, QueueHide:queueHide, IsVisible:function () { return alive() && panel.visible; }, panel:panel, elements:elements,
             Inspect:function () { return {visible:alive()&&panel.visible,category:currentCategory,itemId:currentItem&&currentItem.id,anchorId:anchor&&anchor.id,prefix:prefix,surfaceHeight:measuredHeight,nineSlices:{Backing:{count:pieces.Backing.length,asset:backing.__v10Slice.asset,insets:backing.__v10Slice.insets.slice()},Frame:{count:pieces.Frame.length,asset:frame.__v10Slice.asset,insets:frame.__v10Slice.insets.slice()}}}; },
-            Dispose:function () { if (disposed) return; hide(); disposed=true; life.Dispose(); if (valid(panel)) panel.DeleteAsync(0); }
+            Dispose:function () { if (disposed) return; hide(); dismiss.Dispose(); disposed=true; life.Dispose(); if (valid(panel)) panel.DeleteAsync(0); }
         };
     }
     cfg.SurvivalArchiveTooltip = {Create:create};

@@ -85,6 +85,20 @@
     var externalHoverExitSerial = 0;
     var selectiveTooltipOwner = "selective_proxy";
     var tooltipAnimationSerial = 0;
+    var tooltipDismiss = null, tooltipDismissPanel = null;
+    function dismissFor(tooltip) {
+        if (!customConfig.SurvivalTooltipDismiss || !tooltip) return null;
+        if (tooltipDismissPanel !== tooltip) {
+            if (tooltipDismiss) tooltipDismiss.Dispose();
+            tooltipDismissPanel = tooltip;
+            tooltipDismiss = customConfig.SurvivalTooltipDismiss.Create({panel:tooltip,
+                hide:function () { var source = activeSourcePanel; hideCustomTooltip(true); hideNativeTooltip(source); },
+                isAlive:contextActive,
+                isVisible:function () { return tooltip.__survivalTooltipOwner === selectiveTooltipOwner
+                    && !tooltip.BHasClass("Hidden"); }});
+        }
+        return tooltipDismiss;
+    }
     var defaultTooltipFadeDuration = 0.1;
     var tooltipFadeDuration = defaultTooltipFadeDuration;
     var tooltipAnimationFrame = 0.016;
@@ -400,7 +414,8 @@
         return true;
     }
 
-    function hideCustomTooltip() {
+    function hideCustomTooltip(immediate) {
+        if (tooltipDismiss) tooltipDismiss.Hidden();
         setExternalProxyHighlight(activeSourcePanel, false);
         externalHoverExitSerial += 1;
         nativeTooltipSuppressionSerial += 1;
@@ -418,7 +433,8 @@
         tooltip.hittestchildren = false;
         tooltipAnimationSerial += 1;
         var animationSerial = tooltipAnimationSerial;
-        if (tooltip.BHasClass("Hidden")) {
+        if (immediate || tooltip.BHasClass("Hidden")) {
+            tooltip.AddClass("Hidden");
             tooltip.RemoveClass("FadingOut");
             releaseSelectiveTooltip(tooltip);
             return;
@@ -579,6 +595,8 @@
     }
 
     function render(abilityIndex, abilityName, sourcePanel) {
+        var dismiss = dismissFor(byId("CustomAbilityTooltip"));
+        if (dismiss && !dismiss.CanShow(sourcePanel)) { hideCustomTooltip(true); return false; }
         var projectMode = managedProjectAbility(abilityIndex, abilityName);
         var heroMode = isSelectedCombatHero()
             && unitOwnsAbility(selectedUnit(), abilityIndex);
@@ -725,6 +743,7 @@
         // reversing an in-flight fade needs no frame delay or reconstruction.
         tooltip.RemoveClass("Hidden");
         tooltip.RemoveClass("FadingOut");
+        if (dismiss) dismiss.Shown(sourcePanel);
         return true;
     }
 
@@ -2444,6 +2463,7 @@
     function shutdownTooltipContext(reason) {
         if (contextShutdown) return;
         contextShutdown = true;
+        if (tooltipDismiss) tooltipDismiss.Dispose();
         cancelBindingRecovery();
         cancelChecks(selectionChecks);
         cancelChecks(runtimeChecks);

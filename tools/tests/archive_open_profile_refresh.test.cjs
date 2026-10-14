@@ -9,7 +9,7 @@ const {csv} = require('../shop_ui_12h/catalog.cjs');
 const project = path.resolve(__dirname, '../..');
 const scriptDirectory = path.join(project, 'panorama/src/scripts/custom_game');
 const manifest = fs.readFileSync(path.join(project, 'panorama/src/layout/custom_game/archive.xml'), 'utf8');
-const scripts = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'archive_v10.js',
+const scripts = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/tooltip_dismiss.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'archive_v10.js',
     'archive_180de7e38b_titles_compact_v6.js'];
 for (const name of scripts) assert(manifest.includes('/' + name + '"'), 'test the active manifest source: ' + name);
 

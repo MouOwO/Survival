@@ -33,7 +33,7 @@ for(let i=0;i<10;i++){env.resetFieldRows(fields);env.addField(fields,'attack',i)
 assert.equal(created,stableCreated,'Valid fields must still be reused');
 assert.equal(cleared,3,'Steady hover must not rebuild the field pool');
 const pending=[],tip={owner:'selective_proxy',classes:new Set(),style:{},BHasClass(c){return this.classes.has(c)},AddClass(c){this.classes.add(c)},RemoveClass(c){this.classes.delete(c)}};tip.__survivalTooltipOwner='selective_proxy';
-const fadeEnv={setExternalProxyHighlight:()=>{},activeSourcePanel:{},externalHoverExitSerial:0,nativeTooltipSuppressionSerial:0,activeAbilityIndex:1,activeAbilityName:'test',byId:()=>tip,selectiveTooltipOwner:'selective_proxy',tooltipAnimationSerial:0,tooltipFadeDuration:.1,tooltipAnimationFrame:.016,scheduleActive:(d,f)=>pending.push(f),releaseSelectiveTooltip:()=>{tip.__survivalTooltipOwner='';}};
+const fadeEnv={tooltipDismiss:null,setExternalProxyHighlight:()=>{},activeSourcePanel:{},externalHoverExitSerial:0,nativeTooltipSuppressionSerial:0,activeAbilityIndex:1,activeAbilityName:'test',byId:()=>tip,selectiveTooltipOwner:'selective_proxy',tooltipAnimationSerial:0,tooltipFadeDuration:.1,tooltipAnimationFrame:.016,scheduleActive:(d,f)=>pending.push(f),releaseSelectiveTooltip:()=>{tip.__survivalTooltipOwner='';}};
 vm.runInNewContext(code.slice(code.indexOf('    function hideCustomTooltip('),code.indexOf('    function showNativeAbilityTooltip(')),fadeEnv);
 fadeEnv.hideCustomTooltip();assert(tip.BHasClass('FadingOut'));
 fadeEnv.tooltipAnimationSerial++;tip.RemoveClass('FadingOut');pending.shift()();assert(!tip.BHasClass('Hidden'),'old fade must not hide newly shown ability');

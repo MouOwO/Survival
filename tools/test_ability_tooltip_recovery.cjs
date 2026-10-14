@@ -286,6 +286,7 @@ function createHarness(options = {}) {
             }
         }
     };
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../panorama/src/scripts/custom_game/common/tooltip_dismiss.js'), 'utf8'), environment);
     vm.runInNewContext(instrumentSource(), environment, { filename: sourcePath });
     return {
         config, counters, logs, work, abilityReads, executions, queue, tooltip, layer, setTable,
@@ -752,6 +753,29 @@ test('reused hero and building field rows clear current-level styling and only e
         assert.equal(row.BHasClass('AbilitySkillLevelRow'), false, 'Building LV-like fields must not adopt hero level layout');
         assert.equal(row.BHasClass('AbilitySkillLevelCurrent'), false, 'Building rows must not inherit hero gold styling');
     });
+});
+
+test('tooltip entry synchronously dismisses current ability and blocks hover/refresh until physical exit', () => {
+    const h = createHarness();
+    h.runUntil(1.2);
+    const binding = hoverFirstAbility(h), xy = binding.proxy.GetPositionWithinWindow();
+    h.tooltip.rect = {x:xy.x-20,y:xy.y-20,width:337,height:200};
+    h.tooltip.events.onmouseover();
+    assert(h.tooltip.BHasClass('Hidden'), 'Tooltip entry does not wait for the usual fade');
+    assert(!h.tooltip.BHasClass('FadingOut'));
+    assert.equal(h.inspect().activeAbility,-1);
+    binding.proxy.events.onmouseover();
+    h.config.SurvivalTooltipBindings.RefreshVisible();
+    h.runUntil(1.5);
+    assert(h.tooltip.BHasClass('Hidden'), 'Underlying anchor and queued refresh cannot revive it');
+    h.setCursor([1900,1000]); h.runUntil(1.55);
+    h.tooltip.rect = {x:20,y:20,width:337,height:200};
+    hoverFirstAbility(h);
+    h.setCursor([40,40]);h.runUntil(1.59);
+    assert(h.tooltip.BHasClass('Hidden'), 'Non-hit-testable native tooltip uses cursor geometry');
+    assert.equal(h.inspect().activeAbility,-1);
+    h.config.SurvivalTooltipBindings.Shutdown('dismiss_test');
+    assert.equal(h.config.SurvivalTooltipDismiss.Inspect().owners,0,'Owner disposal removes its watch');
 });
 
 if (failures) {

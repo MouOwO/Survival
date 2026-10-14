@@ -10,6 +10,7 @@ const name = '销毁防御塔', desc = '销毁本单位，不返还成长所消�
 for (const useRuntime of [false, true]) {
     const texts = {};
     const env = {
+        dismissFor: () => null,
         managedProjectAbility: () => true, isSelectedCombatHero: () => false,
         localize: () => 'RAW_OR_STALE_LOCALIZATION',
         localizedAbilityDescription: () => 'STALE DESCRIPTION',

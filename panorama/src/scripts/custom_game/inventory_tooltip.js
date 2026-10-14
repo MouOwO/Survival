@@ -6,6 +6,25 @@
     var activePanel = null;
     var activeItem = -1;
     var boundPanels = {};
+    var config = GameUI.CustomUIConfig(), context = $.GetContextPanel(), api = null;
+    var tooltipDismiss = null, tooltipDismissPanel = null;
+    var previousTooltip = config.SurvivalInventoryTooltip;
+    if (previousTooltip && previousTooltip.DisposeTooltip) previousTooltip.DisposeTooltip();
+    function dismissFor(tooltip) {
+        if (!config.SurvivalTooltipDismiss || !tooltip) return null;
+        if (tooltipDismissPanel !== tooltip) {
+            if (tooltipDismiss) tooltipDismiss.Dispose();
+            tooltipDismissPanel = tooltip;
+            tooltipDismiss = config.SurvivalTooltipDismiss.Create({panel:tooltip,
+                hide:function () { var source = activePanel; hide(); hideNativeTooltip(source); },
+                isAlive:active,
+                isVisible:function () { return activePanel !== null && !tooltip.BHasClass("Hidden"); }});
+        }
+        return tooltipDismiss;
+    }
+    function active() {
+        return (!context.IsValid || context.IsValid()) && (!api || config.SurvivalInventoryTooltip === api);
+    }
 
     function byId(id) { return $("#" + id); }
 
@@ -61,6 +80,8 @@
     }
 
     function hide() {
+        if (!active()) return;
+        if (tooltipDismiss) tooltipDismiss.Hidden();
         activeSlot = -1;
         activePanel = null;
         activeItem = -1;
@@ -120,6 +141,7 @@
         return match?(match[1]==="max"?"MAX":"Lv."+Number(match[1])):(fallback||"");
     }
     function render(slot, panel) {
+        if (!active()) return;
         if (!panel || (panel.IsValid && !panel.IsValid())) {
             hide();
             return;
@@ -152,6 +174,8 @@
         var fields = byId("CustomInventoryItemFields");
         var icon = byId("CustomInventoryItemIcon");
         if (!tooltip || !fields) return;
+        var dismiss = dismissFor(tooltip);
+        if (dismiss && !dismiss.CanShow(panel)) { hide(); return; }
 
         activeSlot = slot;
         activePanel = panel;
@@ -195,6 +219,7 @@
             positioner.PlaceInventoryAbove(tooltip, panel, upperRow);
         }
         tooltip.RemoveClass("Hidden");
+        if (dismiss) dismiss.Shown(panel);
     }
 
     function inventoryRoot() {
@@ -237,6 +262,7 @@
     }
 
     function recover(reason) {
+        if (!active()) return;
         var inventory = inventoryRoot();
         if (!inventory) return;
         for (var slot = 0; slot < 6; slot++) bindSlot(findSlot(inventory, slot), slot);
@@ -245,13 +271,15 @@
     }
 
     function refreshVisible() {
+        if (!active()) return;
         if (activeSlot >= 0 && activePanel) render(activeSlot, activePanel);
     }
 
-    GameUI.CustomUIConfig().SurvivalInventoryTooltip = {
+    api = config.SurvivalInventoryTooltip = {
         Recover: recover,
         RefreshVisible: refreshVisible,
-        Hide: hide
+        Hide: hide,
+        DisposeTooltip: function () { hide(); if (tooltipDismiss) tooltipDismiss.Dispose(); }
     };
 
     CustomNetTables.SubscribeNetTableListener(

@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const {csv} = require('../shop_ui_12h/catalog.cjs');
 const repo = path.resolve(__dirname, '../..');
 const sourceRoot = path.join(repo, 'panorama/src/scripts/custom_game');
-const graph = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'archive_v10.js', 'archive_180de7e38b_titles_compact_v6.js'];
+const graph = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/tooltip_dismiss.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'archive_v10.js', 'archive_180de7e38b_titles_compact_v6.js'];
 const manifest = fs.readFileSync(path.join(repo, 'panorama/src/layout/custom_game/archive.xml'), 'utf8');
 graph.forEach(name => assert(manifest.includes('/' + name + '"'), 'Exercise the active production graph: ' + name));
 const sources = Object.fromEntries(graph.map(name => [name, fs.readFileSync(path.join(sourceRoot, name), 'utf8')]));

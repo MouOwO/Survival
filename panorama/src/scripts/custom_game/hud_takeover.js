@@ -4,6 +4,24 @@
     var config = GameUI.CustomUIConfig();
     var takeover = config.SurvivalHudTakeover || {};
     var playerId = Game.GetLocalPlayerID();
+    var tooltipContext = $.GetContextPanel(), tooltipApi = null;
+    var tooltipDismiss = null, tooltipDismissPanel = null;
+    var previousTooltip = config.SurvivalAbilityTakeover;
+    if (previousTooltip && previousTooltip.DisposeTooltip) previousTooltip.DisposeTooltip();
+    function dismissFor(tooltip) {
+        if (!config.SurvivalTooltipDismiss || !tooltip) return null;
+        if (tooltipDismissPanel !== tooltip) {
+            if (tooltipDismiss) tooltipDismiss.Dispose();
+            tooltipDismissPanel = tooltip;
+            tooltipDismiss = config.SurvivalTooltipDismiss.Create({panel:tooltip,
+                hide:hideTooltip,
+                isAlive:function () { return tooltipContext && tooltipContext.IsValid()
+                    && (!tooltipApi || config.SurvivalAbilityTakeover === tooltipApi); },
+                isVisible:function () { return tooltip.__survivalTooltipOwner === takeoverTooltipOwner
+                    && !tooltip.BHasClass("Hidden"); }});
+        }
+        return tooltipDismiss;
+    }
     var hotkeys = ["Q", "W", "E", "R", "T", "Y", "U"];
     var builderHotkeysBySlotOrder = {
         1: "Q", 2: "W", 3: "E", 4: "R", 5: "T", 6: "C", 7: "G"
@@ -1056,6 +1074,7 @@
     }
 
     function hideTooltip() {
+        if (tooltipDismiss) tooltipDismiss.Hidden();
         nativeTooltipSuppressionSerial += 1;
         activeAbility = -1;
         activePanel = null;
@@ -1101,6 +1120,8 @@
     }
 
     function showTooltip(entry, panel) {
+        var dismiss = dismissFor(byId("CustomAbilityTooltip"));
+        if (dismiss && !dismiss.CanShow(panel)) { hideTooltip(); return; }
         activeAbility = entry.ability;
         activePanel = panel;
         suppressNativeAbilityTooltipBurst(entry, panel);
@@ -1170,6 +1191,7 @@
         if (positioner) positioner.PlaceAbilityAbove(tooltip, panel, 337);
         tooltip.RemoveClass("FadingOut");
         tooltip.RemoveClass("Hidden");
+        if (dismiss) dismiss.Shown(panel);
     }
 
     function activate(entry) {
@@ -1606,7 +1628,8 @@
         }
     }
 
-    config.SurvivalAbilityTakeover = {
+    config.SurvivalAbilityTakeover = tooltipApi = {
+        DisposeTooltip: function () { hideTooltip(); if (tooltipDismiss) tooltipDismiss.Dispose(); },
         Refresh: refresh,
         RefreshTooltip: refreshTooltip,
         SetEnabled: function (enabled) {

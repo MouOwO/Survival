@@ -4,7 +4,7 @@
 // authoritative daily snapshot; the shell never grants or unlocks an entitlement.
 var cfg=GameUI.CustomUIConfig(),U=cfg.SurvivalUI,RH=cfg.RemainingHandoff,P=cfg.DailyGW2Data||{},size=P.canvas||[1200,900];
 var data=null,waiting=null,errorText="",buying=false,sequence=0,active=true,life=U.Lifecycle(),viewLife=U.Lifecycle(),fetching=false,fetchSerial=0;
-var dailyRoot=$.GetContextPanel(),view=null,shell=null,canvas=null,tipPanel=null,tipFrame=null,tipBody=null,tipTitle=null,tipViewport=null,tipAnchor=null,tipEpoch=0,tipHideJob=null,moved=[];
+var dailyRoot=$.GetContextPanel(),view=null,shell=null,canvas=null,tipPanel=null,tipFrame=null,tipBody=null,tipTitle=null,tipViewport=null,tipAnchor=null,tipEpoch=0,tipHideJob=null,tipDismiss=null,moved=[];
 var cardSignature="",specialSignature="",statusText="",scale=1;
 function valid(node){return node&&(!node.IsValid||node.IsValid());}
 function p(id){return valid(dailyRoot)?dailyRoot.FindChildTraverse(id):null;}
@@ -22,7 +22,8 @@ function label(parent,text,x,y,w,h,font,color,id){var node=make("Label",parent,i
 function move(id,parent){var node=p(id);if(!valid(node))return null;moved.push({node:node,parent:node.GetParent()});node.SetParent(parent);node.style.visibility="visible";return node;}
 function escapedLines(value){return String(value||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\r?\n/g,"<br>");}
 function cancelTooltipHide(){tipEpoch++;if(tipHideJob!==null&&$.CancelScheduled)$.CancelScheduled(tipHideJob);tipHideJob=null;}
-function hideTooltip(){cancelTooltipHide();tipAnchor=null;if(valid(tipPanel))tipPanel.visible=false;if(valid(p("DailyTooltip")))p("DailyTooltip").AddClass("ArchiveHidden");}
+function tooltipRect(node){var at=node.GetPositionWithinWindow();return {x:at.x,y:at.y,width:node.actuallayoutwidth*scale,height:node.actuallayoutheight*scale};}
+function hideTooltip(){cancelTooltipHide();tipAnchor=null;if(valid(tipPanel))tipPanel.visible=false;if(tipDismiss)tipDismiss.Hidden();if(valid(p("DailyTooltip")))p("DailyTooltip").AddClass("ArchiveHidden");}
 function leaveTooltip(){cancelTooltipHide();var epoch=tipEpoch;tipHideJob=$.Schedule(.18,function(){tipHideJob=null;if(epoch===tipEpoch)hideTooltip();});}
 function fitTooltip(epoch){
  if(!active||epoch!==tipEpoch||!valid(tipAnchor)||!valid(tipPanel)||!shell.IsOpen())return;
@@ -35,9 +36,10 @@ function fitTooltip(epoch){
 function tip(anchor,title,body){
  anchor.hittest=true;anchor.SetPanelEvent("onmouseover",function(){
   if(!active||!viewValid()||!shell.IsOpen()||!p("DailyRulesText").BHasClass("ArchiveHidden")){hideTooltip();return;}
+  if(!tipDismiss.CanShow(anchor))return;
   hideTooltip();tipAnchor=anchor;tipTitle.text=String(title||"奖励说明");tipBody.text=String(body||"奖励说明待同步");
   p("DailyTooltipName").text=tipTitle.text;p("DailyTooltipEffect").text=tipBody.text;tipPanel.visible=true;
-  var epoch=tipEpoch;fitTooltip(epoch);[0,.05,.15,.35].forEach(function(delay){viewLife.Later(delay,function(){fitTooltip(epoch);});});
+  var epoch=tipEpoch;fitTooltip(epoch);tipDismiss.Shown(anchor);[0,.05,.15,.35].forEach(function(delay){viewLife.Later(delay,function(){fitTooltip(epoch);});});
  });anchor.SetPanelEvent("onmouseout",leaveTooltip);
 }
 function close(){
@@ -72,12 +74,12 @@ function build(){
  style(p("DailyRulesBody"),{width:"790px",height:"fit-children",fontSize:"20px",color:"#eee6d2",whiteSpace:"normal",textOverflow:"clip",lineHeight:"28px"});p("DailyRulesBody").html=true;
  var rulesClose=make("Button",rules,"DailyGW2RulesClose","DailyGW2Button");rect(rulesClose,0,0,750,34);label(rulesClose,"关闭奖励说明",0,0,750,34,18,"#e3c68a");rulesClose.SetPanelEvent("onactivate",function(){if(active)p("DailyRulesText").AddClass("ArchiveHidden");});
  tipPanel=make("Panel",canvas,"DailyGW2Tooltip","DailyGW2Tooltip");tipPanel.visible=false;tipPanel.hittest=true;tipPanel.hittestchildren=true;skin(tipPanel,"tooltip_background");
- tipPanel.SetPanelEvent("onmouseover",cancelTooltipHide);tipPanel.SetPanelEvent("onmouseout",leaveTooltip);
+ tipDismiss=cfg.SurvivalTooltipDismiss.Create({panel:tipPanel,getRect:tooltipRect,hide:hideTooltip,isAlive:function(){return active&&viewValid();},isVisible:function(){return valid(tipPanel)&&tipPanel.visible&&shell.IsOpen();}});tipPanel.SetPanelEvent("onmouseout",leaveTooltip);
  tipFrame=component(tipPanel,"tooltip_frame",0,0,350,180,"DailyGW2TooltipFrame");
  tipViewport=make("Panel",tipPanel,"DailyGW2TooltipViewport","DailyGW2TooltipViewport");rect(tipViewport,17,16,316,230);
  tipTitle=label(tipViewport,"",0,0,316,32,23,"#f0d899","DailyGW2TooltipTitle");style(tipTitle,{height:"fit-children",whiteSpace:"normal",marginBottom:"10px"});
  tipBody=label(tipViewport,"",0,0,316,180,18,"#e1dfd7","DailyGW2TooltipBody");style(tipBody,{height:"fit-children",whiteSpace:"normal",textOverflow:"clip"});
- view=cfg.SurvivalDailyGW2={canvas:canvas,shell:shell,Open:function(){shell.Open();canvas.visible=true;scale=Number(U.Fit(win,dailyRoot,size[0],size[1],{reference:size.slice()}))||1;},Close:function(){shell.Close();if(valid(canvas))canvas.visible=false;},IsOpen:function(){return shell.IsOpen();},Dispose:function(){shell.Dispose();moved.forEach(function(e){if(valid(e.node)&&valid(e.parent))e.node.SetParent(e.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(win))win.RemoveClass("DailyGW2Page");}};
+ view=cfg.SurvivalDailyGW2={canvas:canvas,shell:shell,Open:function(){shell.Open();canvas.visible=true;scale=Number(U.Fit(win,dailyRoot,size[0],size[1],{reference:size.slice()}))||1;},Close:function(){shell.Close();if(valid(canvas))canvas.visible=false;},IsOpen:function(){return shell.IsOpen();},Dispose:function(){if(tipDismiss)tipDismiss.Dispose();shell.Dispose();moved.forEach(function(e){if(valid(e.node)&&valid(e.parent))e.node.SetParent(e.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(win))win.RemoveClass("DailyGW2Page");}};
 }
 build();
 p("DailyClose").SetPanelEvent("onactivate",function(){if(active)close();});

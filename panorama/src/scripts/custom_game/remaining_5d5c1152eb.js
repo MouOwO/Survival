@@ -139,13 +139,16 @@
         var tip=valid(scope)?scope.FindChildTraverse("DailyTooltip"):null;
         if(!valid(tip))return;
         U.Tooltip.Adopt(tip);anchor.hittest=true;
+        var dismiss=tip.__tooltipDismiss;
+        if(!dismiss){dismiss=cfg.SurvivalTooltipDismiss.Create({panel:tip,isVisible:function(){return !tip.BHasClass("ArchiveHidden");},hide:function(){tip.AddClass("ArchiveHidden");dismiss.Hidden();}});tip.__tooltipDismiss=dismiss;}
         anchor.SetPanelEvent("onmouseover",function(){
-            if(!valid(tip))return;
+            if(!valid(tip)||!dismiss.CanShow(anchor))return;
             tip.FindChildTraverse("DailyTooltipName").text=title;
             tip.FindChildTraverse("DailyTooltipEffect").text=body;
             tip.RemoveClass("ArchiveHidden");
+            dismiss.Shown(anchor);
         });
-        anchor.SetPanelEvent("onmouseout",function(){if(valid(tip))tip.AddClass("ArchiveHidden");});
+        anchor.SetPanelEvent("onmouseout",function(){if(valid(tip))tip.AddClass("ArchiveHidden");dismiss.Hidden();});
     };
     R.SurvivalShopWindow=function(window){
         var w=window||$("#CustomShopWindow");if(!valid(w))return;

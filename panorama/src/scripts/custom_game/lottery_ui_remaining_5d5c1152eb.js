@@ -26,7 +26,7 @@
     var requestSerial = 0;
     var selectedPoolId = "map";
     var visibleResults = [];
-    var activeTooltipItem = null, archiveEffectTooltipActive = false;
+    var activeTooltipItem = null, archiveEffectTooltipActive = false, tooltipDismiss = null;
     var animating = false, animationSerial = 0, skipAnimation = !!$("#LotterySkipAnimation").checked;
     var resultCards = [], lastDrawCount = 1, history = [], seenResults = {};
     var activeRequest = null, opened = false, switchingPool = false;
@@ -166,6 +166,7 @@
     }
 
     function hideTooltip() {
+        if(tooltipDismiss)tooltipDismiss.Hidden();
         if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.HideTooltip)cfg.SurvivalPurpleLottery.HideTooltip();
         if(archiveEffectTooltipActive){var archiveTip=GameUI.CustomUIConfig().ArchiveHandoff;if(archiveTip)archiveTip.Hide();archiveEffectTooltipActive=false;}
         activeTooltipItem = null;
@@ -174,6 +175,9 @@
     }
 
     function showTooltip(item, sourcePanel, simple) {
+        var tip=panel("LotteryItemTooltip");
+        if(tip&&!tooltipDismiss)tooltipDismiss=cfg.SurvivalTooltipDismiss.Create({panel:tip,hide:hideTooltip,isAlive:alive,isVisible:function(){return !!activeTooltipItem&&!tip.BHasClass("Hidden");}});
+        if(tooltipDismiss&&!tooltipDismiss.CanShow(sourcePanel))return;
         hideTooltip();
         if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Tooltip&&item&&sourcePanel&&cfg.SurvivalPurpleLottery.Tooltip(item,sourcePanel))return;
         if(simple){
@@ -222,6 +226,7 @@
             if (positioner && positioner.PlaceRight) {
                 positioner.PlaceRight(tooltip, sourcePanel, 340, 210);
             }
+            if(tooltipDismiss)tooltipDismiss.Shown(sourcePanel);
         });
     }
 
@@ -805,6 +810,7 @@
     api.Dispose=function(){
         if(disposed)return;
         if(alive())close();
+        if(tooltipDismiss)tooltipDismiss.Dispose();
         disposed=true;animationSerial++;detailRequestSerial++;
         drawSequence.Dispose();
         subscriptions.forEach(function(id){if(GameEvents.Unsubscribe)GameEvents.Unsubscribe(id);});subscriptions=[];

@@ -3,7 +3,7 @@
     // Presentation only. The existing controller owns requests, balances and layers.
     var cfg = GameUI.CustomUIConfig(), root = $.GetContextPanel(), U = cfg.SurvivalUI, R = cfg.RemainingHandoff;
     if (cfg.SurvivalPurpleLottery && cfg.SurvivalPurpleLottery.Dispose) cfg.SurvivalPurpleLottery.Dispose();
-    var disposed = false, life = $.CreatePanel("Panel", root, ""), view = null, nodes = {}, moved = [], owned = [];
+    var disposed = false, life = $.CreatePanel("Panel", root, ""), view = null, nodes = {}, moved = [], owned = [], tipDismiss = null;
     var mode = "", pools = [], selected = "map", snapshot = null, opened = false, scale = 1, tabKey = "", previewKey = "";
     life.visible = false;
     function valid(n) { return n && (!n.IsValid || n.IsValid()); }
@@ -75,6 +75,7 @@
         var tipDescription=label(tipScroll,"LotteryGW2TooltipDescription","",0,0,316,178,18,"#e0d6c5"); style(tipDescription,{height:"fit-children",ignoreParentFlow:"false",whiteSpace:"normal"});
         var tipCount=label(tooltip,"LotteryGW2TooltipQuantity","",22,304,322,24,17,"#b5bfbb");
         view={root:shell,header:header,sidebar:sidebarPanel,content:content,detailLayer:detail,tooltip:tooltip,tipName:tipName,tipState:tipState,tipDescription:tipDescription,tipCount:tipCount,tipScroll:tipScroll,tabs:[]};
+        tipDismiss=cfg.SurvivalTooltipDismiss.Create({panel:tooltip,getRect:tooltipRect,hide:hideTooltip,isAlive:alive,isVisible:function(){return canAct()&&valid(tooltip)&&tooltip.visible;}});
         view.title=label(header,"LotteryGW2Title","抽奖",112,10,474,45,31,"#efdfbc");
         view.back=button(header,"LotteryGW2Back","‹ 返回",function(){if(mode)invoke("CloseInfo");else invoke("Close");}); place(view.back,0,10,106,45);
         view.ticket=label(header,"LotteryGW2TicketBalance","抽奖券 —",628,16,278,36,20,"#e6d4ad");
@@ -204,9 +205,10 @@
         if(name==="reward")p("LotteryInfoList").Children().forEach(function(child){if(child.BHasClass("LotteryDetailIcon")){place(child,20,0,120,120);walk(child,function(n){if(n.BHasClass("LotteryRewardIcon")){place(n,0,0,120,120);if(n.SetScaling)n.SetScaling("stretch-to-fit-preserve-aspect");}});}else if(child.BHasClass("LotteryDetailDescription"))place(child,20,136,1060,bodyHeight-136);});
         var names={details:"奖池详情",history:"抽奖记录",announcement:"开奖公告",update:"奖励更新公告",reward:p("LotteryInfoTitle")&&p("LotteryInfoTitle").text||"奖励详情",firstgift:"首充礼包",privilege:"礼包特权"};view.title.text=names[name]||"功能提示";sidebar();
     }
-    function hideTooltip() {if(view)view.tooltip.visible=false;}
+    function tooltipRect(node) {var at=node.GetPositionWithinWindow();return {x:at.x,y:at.y,width:node.actuallayoutwidth*scale,height:node.actuallayoutheight*scale};}
+    function hideTooltip() {if(view)view.tooltip.visible=false;if(tipDismiss)tipDismiss.Hidden();}
     function tooltip(item,anchor) {
-        if(!ensure()||!valid(anchor))return false;if(!canAct()){hideTooltip();return true;}item=item||{};
+        if(!ensure()||!valid(anchor))return false;if(!canAct()){hideTooltip();return true;}if(!tipDismiss.CanShow(anchor))return true;item=item||{};
         var lines=[String(item.description||"暂无效果说明")];if(item.duration_text)lines.push("期限："+item.duration_text);if(item.duplicate_points!==undefined&&item.duplicate_points!==null)lines.push("重复转化："+item.duplicate_points+" 积分");
         if(item.count!==undefined||item.quantity!==undefined)lines.push("本次获得："+number(item.count===undefined?item.quantity:item.count));
         if(item.duplicate===true||Number(item.duplicate)===1)lines.push("本次已转化 "+number(item.converted_points)+" 积分");
@@ -214,7 +216,7 @@
         var h=Math.max(252,Math.min(530,178+Math.ceil(lines.join("").length/17)*25+lines.length*15));
         var cp=p("LotteryMainCanvas").GetPositionWithinWindow(),at=anchor.GetPositionWithinWindow(),sx=(p("LotteryMainCanvas").actualuiscale_x||1)*scale,sy=(p("LotteryMainCanvas").actualuiscale_y||1)*scale;
         var x=(at.x-cp.x)/sx+128,y=(at.y-cp.y)/sy;if(x+366>1508)x=(at.x-cp.x)/sx-378;x=Math.max(28,Math.min(1142,x));y=Math.max(25,Math.min(839-h,y));
-        place(view.tooltip,x,y,366,h);place(p("LotteryGW2TooltipFrame"),0,0,366,h);place(view.tipScroll,22,116,322,h-162);place(view.tipCount,22,h-36,322,24);view.tooltip.visible=true;return true;
+        place(view.tooltip,x,y,366,h);place(p("LotteryGW2TooltipFrame"),0,0,366,h);place(view.tipScroll,22,116,322,h-162);place(view.tipCount,22,h-36,322,24);view.tooltip.visible=true;tipDismiss.Shown(anchor);return true;
     }
     var originalDialog=R&&R.LotteryDialog,originalReward=R&&R.RewardCard,presentation=cfg.SurvivalRewardPresentation,originalIcon=presentation&&presentation.CreateIcon;
     function iconWrapper(parent,item,className){var icon=originalIcon.call(presentation,parent,item,className);return alive()&&lotteryParent(parent)?existingRewardArt(icon,item):icon;}
@@ -231,7 +233,7 @@
         CloseInfo:function(){mode="";hideTooltip();apply();},
         Content:function(){return ensure()?view.content:null;},Fit:fit,Tooltip:tooltip,HideTooltip:hideTooltip,
         Dispose:function(){
-            if(disposed)return;hideTooltip();
+            if(disposed)return;hideTooltip();if(tipDismiss)tipDismiss.Dispose();
             if(R&&R.LotteryDialog===dialogWrapper)R.LotteryDialog=originalDialog;if(R&&R.RewardCard===rewardWrapper)R.RewardCard=originalReward;
             if(presentation&&presentation.CreateIcon===iconWrapper)presentation.CreateIcon=originalIcon;
             // Restore original business nodes before deleting any presentation hosts.

@@ -4,7 +4,24 @@
     var activeEntry = null, activeSource = null, pinned = false;
     var tooltipHovered = false, hideJob = null, generation = 0;
     var purchaseButton = null, purchaseLabel = null, autoButton = null, autoLabel = null;
-    var tooltipSkin = null;
+    var tooltipSkin = null, tooltipDismiss = null, tooltipDismissPanel = null;
+    var tooltipContext = $.GetContextPanel ? $.GetContextPanel() : null, api = null;
+    var previousTooltip = cfg.SurvivalShopTooltip;
+    if (previousTooltip && previousTooltip.DisposeTooltip) previousTooltip.DisposeTooltip();
+    function dismissFor(tooltip) {
+        if (!cfg.SurvivalTooltipDismiss || !tooltip) return null;
+        if (tooltipDismissPanel !== tooltip) {
+            if (tooltipDismiss) tooltipDismiss.Dispose();
+            tooltipDismissPanel = tooltip;
+            tooltipDismiss = cfg.SurvivalTooltipDismiss.Create({panel:tooltip,
+                surface:tooltipSkin && tooltipSkin.surface,
+                hide:hide,
+                isAlive:function () { return (!tooltipContext || valid(tooltipContext))
+                    && (!api || cfg.SurvivalShopTooltip === api); },
+                isVisible:function () { return activeEntry !== null && !tooltip.BHasClass("Hidden"); }});
+        }
+        return tooltipDismiss;
+    }
     function byId(id) { return $("#" + id); }
     function valid(p) { return p && (!p.IsValid || p.IsValid()); }
     function setText(id, value) { var p = byId(id); if (p) p.text = String(value === undefined ? "" : value); }
@@ -19,6 +36,7 @@
         hideJob = null;
     }
     function hide() {
+        if (tooltipDismiss) tooltipDismiss.Hidden();
         cancelHide();
         if (valid(activeSource) && activeSource.SetHasClass) activeSource.SetHasClass("ShopSelected", false);
         activeEntry = null; activeSource = null; pinned = false; tooltipHovered = false;
@@ -28,8 +46,7 @@
     function requestHide() {
         cancelHide();
         var serial = generation;
-        // The frame-to-tooltip gap is traversable. An old callback cannot dismiss
-        // another item selected while moving across the grid.
+        // Preserve the source leave grace without allowing tooltip hover to keep it open.
         hideJob = $.Schedule(0.18, function () {
             hideJob = null;
             if (serial === generation && !tooltipHovered && !pinned) hide();
@@ -40,8 +57,7 @@
         var parent = tooltip.GetParent ? tooltip.GetParent() : null;
         if (!parent || !parent.GetPositionWithinWindow) return;
         function place() {
-            // Entering the tooltip cancels a hide timer, but must not cancel
-            // the layout pass that measures its newly revealed contents.
+            // A dismissed or replaced entry cannot run stale placement callbacks.
             if (!valid(tooltip) || !valid(source) || activeSource !== source) return;
             var owner = byId("CustomShopWindow");
             if (!valid(owner)) return;
@@ -105,8 +121,9 @@
             if (activeEntry && cfg.SurvivalShop && cfg.SurvivalShop.ToggleAutoPurchaseEntry)
                 cfg.SurvivalShop.ToggleAutoPurchaseEntry(activeEntry.entry_id);
         });
-        tooltip.SetPanelEvent("onmouseover", function () { tooltipHovered = true; cancelHide(); });
-        tooltip.SetPanelEvent("onmouseout", function () { tooltipHovered = false; requestHide(); });
+        tooltip.SetPanelEvent("onmouseover", function () {
+            if (tooltipDismiss) tooltipDismiss.Dismiss(); else hide();
+        });
     }
     function updateAutoPurchaseState() {
         if (!autoButton || !activeEntry) return;
@@ -117,15 +134,17 @@
     }
     function show(entry, source, keepOpen) {
         if (!entry) return;
+        var tooltip = byId("ShopEntryTooltip"), iconHost = byId("ShopTooltipIconHost"), fields = byId("ShopTooltipFields");
+        if (!tooltip || !iconHost || !fields) return;
+        ensureActions(tooltip);
+        var dismiss = dismissFor(tooltip);
+        if (dismiss && !dismiss.CanShow(source)) { hide(); return; }
         cancelHide();
         if (activeSource !== source) tooltipHovered = false;
         if (activeSource !== source && valid(activeSource) && activeSource.SetHasClass) activeSource.SetHasClass("ShopSelected", false);
         pinned = keepOpen === true || !!(activeEntry && activeEntry.entry_id === entry.entry_id && pinned);
         activeEntry = entry; activeSource = source || null;
         if (valid(source) && source.SetHasClass) source.SetHasClass("ShopSelected", true);
-        var tooltip = byId("ShopEntryTooltip"), iconHost = byId("ShopTooltipIconHost"), fields = byId("ShopTooltipFields");
-        if (!tooltip || !iconHost || !fields) return;
-        ensureActions(tooltip);
         var owner = byId("CustomShopWindow");
         tooltip.style.zIndex = String(Math.max(100000, Number(owner && owner.style.zIndex) || 0) + 1);
         var definition = CustomNetTables.GetTableValue("survival_tooltips", entry.tooltip_id || ("shop_item:" + entry.entry_id)) || {};
@@ -160,8 +179,10 @@
         }
         tooltip.hittest = true; tooltip.hittestchildren = true; tooltip.RemoveClass("Hidden");
         placeBesideSource(tooltip, source);
+        if (dismiss) dismiss.Shown(source);
     }
-    cfg.SurvivalShopTooltip = { Show:show, Hide:hide, RequestHide:requestHide,
+    cfg.SurvivalShopTooltip = api = { Show:show, Hide:hide, RequestHide:requestHide,
+        DisposeTooltip:function () { hide(); if (tooltipDismiss) tooltipDismiss.Dispose(); },
         UpdateAutoPurchaseState:updateAutoPurchaseState,
         UpdateEntry:function (entry) { if (activeEntry && entry && entry.entry_id === activeEntry.entry_id) show(entry, activeSource, pinned); },
         Inspect:function () { return {entry:activeEntry && activeEntry.entry_id,pinned:pinned,hovered:tooltipHovered,purchaseEnabled:purchaseButton && purchaseButton.enabled}; }

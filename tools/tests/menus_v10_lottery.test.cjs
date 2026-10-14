@@ -12,7 +12,7 @@ Panel.prototype.SetScaling=function(value){this.scaling=value;};
 Panel.prototype.FindChildTraverse=function(id){if(this.reparented)return null;if(this.id===id)return this;for(const c of this.children){if(c.reparented)continue;if(c.id===id)return c;const hit=c.FindChildTraverse(id);if(hit)return hit;}return null;};
 Panel.prototype.GetPositionWithinWindow=function(){let x=0,y=0;for(let p=this;p;p=p.parent){let v=String(p.style.position||'0px 0px 0px').split(' ');x+=parseFloat(v[0])||0;y+=parseFloat(v[1])||0;}return{x,y};};
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;root.actualuiscale_y=1;
-for(const name of ['archive_v10_data','common/menu_v10'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
+for(const name of ['archive_v10_data','common/tooltip_dismiss','common/menu_v10'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
 // Reload the same business controller now that the shared shell is available.
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','utf8'),env);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/menu_purple.js','utf8'),env);

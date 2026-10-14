@@ -18,7 +18,7 @@ root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;
 // Retain the production controller's existing inline-info feature detection,
 // and reject any accidental use of the old shared navigation shell.
 config.SurvivalMenuV10={Adopt(){throw new Error('independent lottery must not adopt shared menus')}};
-for(const name of ['native_ui_icons','item_art_remaining_5d5c1152eb'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
+for(const name of ['common/tooltip_dismiss','native_ui_icons','item_art_remaining_5d5c1152eb'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','utf8'),env);
 const current=config.SurvivalLottery;
 const originalDialog=config.RemainingHandoff.LotteryDialog,originalReward=config.RemainingHandoff.RewardCard;
@@ -70,7 +70,7 @@ assert(cells.some(c=>c.__lotteryGW2Cell.count.text==='2/5'),'only actual maximum
 presentation.Fit();const steady=presentation.Inspect();
 for(let i=0;i<30;i++){current.Feature('details');presentation.Fit();assert(presentation.Inspect().trackedOwned<=steady.trackedOwned,'deleted reward visuals cannot accumulate');assert(presentation.Inspect().trackedMoved<=steady.trackedMoved,'deleted native icons cannot accumulate');}
 const first=nodes.LotteryInfoList.children.find(c=>c.BHasClass('LotteryDetailRow')),before=requests.length;first.events.onmouseover();assert.equal(requests.length,before,'hover is read-only');
-assert(nodes.LotteryGW2Tooltip.visible);assert(nodes.LotteryGW2TooltipDescription.text.includes('效果'));first.events.onmouseout();assert(!nodes.LotteryGW2Tooltip.visible);
+assert(nodes.LotteryGW2Tooltip.visible);assert(nodes.LotteryGW2TooltipDescription.text.includes('效果'));nodes.LotteryGW2Tooltip.events.onmouseover();assert(!nodes.LotteryGW2Tooltip.visible,'Entering the tooltip dismisses it immediately');first.events.onmouseover();assert(!nodes.LotteryGW2Tooltip.visible,'The dismissed source cannot immediately reopen its tooltip');assert(nodes.LotteryItemTooltip.BHasClass('Hidden'),'A consumed tooltip request cannot fall through to the old XML tooltip');first.events.onmouseout();assert(!nodes.LotteryGW2Tooltip.visible);
 const retiredModal=config.SurvivalUI.ModalManager.Get('lottery_info');assert(!retiredModal||!retiredModal.IsOpen(),'no second details modal');
 const mainTitle=nodes.LotteryTitle.text,mainTickets=nodes.LotteryGW2TicketBalance.text;
 nodes.LotteryGW2Pool_summer.events.onactivate();

@@ -51,7 +51,7 @@ console.log('PASS: all 14 archive categories, partial progress, activated upgrad
 // Exercise the real tooltip path, including the shared palette's late color reset.
 const panels={};
 ctx.p=id=>panels[id]||(panels[id]={style:{},AddClass(){},RemoveClass(){},SetImage(){}});
-ctx.hide=()=>{};ctx.position=()=>{};ctx.generation=1;ctx.assets={};ctx.cfg.SurvivalArchiveColors.body='#d8e0e8';
+ctx.tipDismiss={CanShow:()=>true,Shown(){}};ctx.hide=()=>{};ctx.position=()=>{};ctx.generation=1;ctx.assets={};ctx.cfg.SurvivalArchiveColors.body='#d8e0e8';
 ctx.progress=()=> '0 / 1';
 ctx.palette=()=>{ctx.p('ArchiveTooltipEffect').style.color='#d8e0e8';};
 vm.runInContext(source.slice(source.indexOf('    function show('),source.indexOf('    function icon(')),ctx);

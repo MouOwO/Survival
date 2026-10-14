@@ -1,0 +1,17 @@
+[
+  "scripts/custom_game/common/tooltip_dismiss.js",
+  "scripts/custom_game/common/archive_tooltip.js",
+  "scripts/custom_game/common/menu_v10.js",
+  "scripts/custom_game/daily_remaining_5d5c1152eb.js",
+  "scripts/custom_game/lottery_gw2.js",
+  "scripts/custom_game/archive_handoff_180de7e38b.js",
+  "scripts/custom_game/inventory_tooltip.js",
+  "scripts/custom_game/ability_tooltip.js",
+  "scripts/custom_game/hud_takeover.js",
+  "scripts/custom_game/shop_tooltip_remaining_5d5c1152eb.js",
+  "scripts/custom_game/remaining_5d5c1152eb.js",
+  "scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js",
+  "layout/custom_game/archive.xml",
+  "layout/custom_game/survival_hud.xml",
+  "layout/custom_game/payment_test.xml"
+]
