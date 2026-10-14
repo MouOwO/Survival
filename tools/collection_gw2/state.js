@@ -12,7 +12,8 @@ function collectionNavFixture(){
  const owner=new Panel('Panel',root,'PreviewContext_collection_nav');owner.AddClass('PreviewContext');
  const hud=new Panel('Panel',owner,'HandoffHUD');hud.style.width='100%';hud.style.height='100%';hud.hittest=false;hud.hittestchildren=true;
  const top=new Panel('Panel',hud,'HandoffTop');top.style.width='630px';top.style.height='94px';top.style.position='8px 6px 0px';
- const effects=new Panel('Panel',top,'HandoffCombatEffects');effects.style.width='630px';effects.style.height='94px';effects.hittest=false;
+ const archive=new Panel('Button',top,'HandoffNav_archive');archive.style.width='56px';archive.style.height='86px';archive.style.position='130px 6px 0px';archive.hittest=false;
+ const effects=new Panel('Panel',top,'HandoffCombatEffects');effects.style.width='96px';effects.style.height='86px';effects.style.position='522px 6px 0px';effects.hittest=false;
  cfg.HandoffGeneration=1;
  const previous=currentContext;currentContext=owner;
  const rel='scripts/custom_game/collection_nav.js';try{window.eval(PREVIEW_SOURCES[rel]+'\n//# sourceURL='+rel);previewScriptResults.push({rel,ok:true,fixture:'minimal_HandoffTop'});}finally{currentContext=previous;}

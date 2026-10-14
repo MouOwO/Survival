@@ -32,17 +32,17 @@ win.AddClass("CollectionGW2Page");
 var shell=U.ModalShell.Adopt({id:"collection",panel:win,root:root,scrim:scrim,width:size[0],height:size[1],fit:{reference:size.slice()},onClose:close});
 style(scrim,{backgroundColor:"#00000022"});
 // ModalShell establishes input/layer ownership and writes its generic fallback.
-// Apply this independent window's alpha shell after adoption so it stays exact.
-style(win,{width:size[0]+"px",height:size[1]+"px",horizontalAlign:"center",verticalAlign:"center",flowChildren:"none",backgroundColor:"transparent",backgroundImage:"none",border:"0px",boxShadow:"none",padding:"0px",margin:"0px",overflow:"noclip",transformOrigin:"50% 50%"});
+// The opaque surface also covers the source texture's partially transparent pixels.
+style(win,{width:size[0]+"px",height:size[1]+"px",horizontalAlign:"center",verticalAlign:"center",flowChildren:"none",backgroundColor:"#171e24",backgroundImage:"none",border:"0px",boxShadow:"none",padding:"0px",margin:"0px",overflow:"noclip",transformOrigin:"50% 50%"});
 canvas=make("Panel",win,"CollectionGW2Canvas","CollectionGW2Canvas");rect(canvas,0,0,size[0],size[1]);canvas.hittest=false;canvas.hittestchildren=true;
-var background=art(canvas,"window_background",0,0,1200,778,"CollectionGW2Background");style(background,{opacity:"0.84"});
-// One translucent wash supplies the surface; flat regional tints avoid raised plates.
+var background=art(canvas,"window_background",0,0,1200,778,"CollectionGW2Background");style(background,{opacity:"1",backgroundColor:"#171e24"});
+// Flat regional tints sit over the opaque texture without raised plates.
 var header=make("Panel",canvas,"CollectionGW2Header","CollectionGW2FlatRegion");rect(header,0,0,1200,60);style(header,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});header.hittest=false;
 var sidebar=make("Panel",canvas,"CollectionGW2Sidebar","CollectionGW2FlatRegion");rect(sidebar,0,60,70,658);style(sidebar,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});sidebar.hittest=false;
 var footer=make("Panel",canvas,"CollectionGW2Footer","CollectionGW2FlatRegion");rect(footer,0,718,1200,60);style(footer,{backgroundImage:"none",backgroundColor:"#090b0d80",border:"0px"});footer.hittest=false;
-label(canvas,"收藏",95,10,940,42,30,"#f0eee2","CollectionGW2Title");
-var closeButton=make("Button",canvas,"CollectionGW2Close","CollectionGW2Button");rect(closeButton,1160,18,20,20);style(closeButton,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});
-var closeGlyph=label(closeButton,"×",0,0,20,20,24,"#dedfd4");style(closeGlyph,{height:"fit-children",horizontalAlign:"center",verticalAlign:"center",textAlign:"center"});
+label(canvas,"收藏",20,10,1096,42,30,"#f0eee2","CollectionGW2Title");
+var closeButton=make("Button",canvas,"CollectionGW2Close","CollectionGW2Button");rect(closeButton,1148,12,32,32);style(closeButton,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});
+var closeIcon=make("Image",closeButton,"CollectionGW2CloseIcon");rect(closeIcon,6,6,20,20);closeIcon.SetImage(P.assets&&P.assets.close?P.assets.close.file:"file://{images}/custom_game/collection_gw2_v2/close.png");closeIcon.hittest=false;closeIcon.hittestchildren=false;
 closeButton.hittestchildren=false;closeButton.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("button");});
 scrim.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("scrim");});
 Object.keys(names).forEach(function(id,i){

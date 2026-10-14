@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const {createHarness}=require('./fixtures/menus_v10_harness.cjs');
 const h=createHarness(),{cfg,nodes}=h;
 cfg.ArchiveHandoff={Icon(){throw new Error('Formal social portraits must resolve through the CSV icon catalog');},Init(){},Observe(){},CardProgress:item=>String(item.count)+'/'+String(item.target)};
-h.load('ui_snapshot_cache.js');h.load('icons_remaining_5d5c1152eb.js');h.load('collection_gw2.js');
+h.load('ui_snapshot_cache.js');h.load('icons_remaining_5d5c1152eb.js');h.load('collection_gw2_data.js');h.load('collection_gw2.js');
 const rows=Array.from({length:40},(_,i)=>({id:'ex_'+String(i+1).padStart(2,'0'),name:i?'正式收藏'+i:'胡桃',count:i===0?2:0,target:60,description:'真实奖励效果'+i}));
 const friendRows=rows.map((r,i)=>({...r,id:'friend_'+String(i+1).padStart(2,'0'),name:i?'正式好友'+i:'哆啦A梦'}));
 function packet(category,sequence,items,extra={}){return {ok:1,category_id:category,sequence,chunk:1,chunks:1,rows:items,social:{tickets:3,currency_name:category==='ex'?'邀请函':'义帖',draw_cost:1,remaining:999,total:2},pending:0,...extra};}
@@ -15,7 +15,8 @@ let api=cfg.SurvivalCollection;
 assert.equal(nodes.CollectionScrim.style.backgroundColor,'#00000022','The flat inventory overrides the generic modal dark scrim after adoption');
 assert.equal(nodes.CollectionGW2Canvas.style.width,'1200px');assert.equal(nodes.CollectionGW2Canvas.style.height,'778px');
 assert.equal(nodes.CollectionGW2Background.style.position,'0px 0px 0px');assert.equal(nodes.CollectionGW2Background.style.width,'1200px');
-assert.equal(nodes.CollectionGW2Background.style.opacity,'0.84','Only the background wash is translucent');assert.notEqual(nodes.CollectionGW2Canvas.style.opacity,'0.84');
+assert.equal(nodes.CollectionGW2Background.style.opacity,'1','The collection texture is not faded');assert.equal(nodes.CollectionGW2Background.style.backgroundColor,'#171e24','Opaque backing covers the source texture alpha');assert.equal(nodes.CollectionWindow.style.backgroundColor,'#171e24');
+assert.equal(nodes.CollectionGW2CloseIcon.paneltype,'Image');assert(!nodes.CollectionGW2Close.Children().some(child=>child.paneltype==='Label'),'Close uses the fixed image instead of a font glyph');
 assert.equal(nodes.CollectionGW2Header.style.position,'0px 0px 0px');assert.equal(nodes.CollectionGW2Header.style.width,'1200px');assert.equal(nodes.CollectionGW2Header.style.height,'60px');
 assert.equal(nodes.CollectionGW2Sidebar.style.position,'0px 60px 0px');assert.equal(nodes.CollectionGW2Sidebar.style.width,'70px');assert.equal(nodes.CollectionGW2Sidebar.style.height,'658px');assert.equal(nodes.CollectionGW2Sidebar.style.backgroundImage,'none');
 assert.equal(nodes.CollectionGW2Sidebar.style.backgroundColor,nodes.CollectionGW2Header.style.backgroundColor,'Header and sidebar share one flat tint');

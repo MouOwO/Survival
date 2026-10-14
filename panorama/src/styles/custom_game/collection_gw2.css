@@ -1,10 +1,10 @@
-#CollectionWindow.CollectionGW2Page { horizontal-align:center; vertical-align:center; transform-origin:50% 50%; flow-children:none; overflow:noclip; background-image:none; background-color:transparent; padding:0px; margin:0px; border:0px; box-shadow:none; }
+#CollectionWindow.CollectionGW2Page { horizontal-align:center; vertical-align:center; transform-origin:50% 50%; flow-children:none; overflow:noclip; background-image:none; background-color:#171e24; padding:0px; margin:0px; border:0px; box-shadow:none; }
 #CollectionScrim { width:100%; height:100%; background-color:#00000022; }
 .CollectionGW2Canvas { flow-children:none; overflow:noclip; }
 .CollectionGW2Art { background-size:100% 100%; background-repeat:no-repeat; border:0px; box-shadow:none; }
 .CollectionGW2FlatRegion { flow-children:none; background-image:none; border:0px; box-shadow:none; }
 .CollectionGW2Text { font-family:"Source Han Sans SC"; font-weight:normal; padding:0px; margin:0px; text-shadow:#00000088 0px 1px 1px 1.0; }
-#CollectionGW2Background { background-color:#171e24c0; border:0px; box-shadow:none; }
+#CollectionGW2Background { background-color:#171e24; opacity:1; border:0px; box-shadow:none; }
 .CollectionGW2Tab { flow-children:none; background-color:transparent; border:0px; box-shadow:none; }
 .CollectionGW2TabSelected { opacity:0; }
 .CollectionGW2Selected { brightness:1.1; }
