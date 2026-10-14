@@ -15,8 +15,17 @@ for (const [w,h] of [[842,441],[962,409],[800,600],[1024,768],[1280,720],[1672,9
             assert.equal(keys.x,original.x);
             assert(!shortcuts.Overlaps(keys,rect));
             assert(p.x>=keys.x+keys.width+13.99);
-            assert(Math.abs(p.x+rect.width+14-anchor.x)<.001);
-            assert(Math.abs(p.y+rect.height-(h-6))<.001);
+            assert(p.scale >= anchor.productionQueueScale - .000001,
+                `${w}x${h}: retain the readable queue scale instead of crushing the left column`);
+            if (p.mode === 'above') {
+                assert(Math.abs(p.y+rect.height+14-(anchor.y-126*anchor.scale))<.001);
+                assert(!shortcuts.Overlaps(rect,{x:anchor.x,y:anchor.y,width:anchor.width*anchor.scale,height:anchor.height*anchor.scale}));
+                assert(p.y>=8 && p.x+rect.width<=w-8);
+            } else {
+                assert.equal(p.mode,'left');
+                assert(Math.abs(p.x+rect.width+14-anchor.productionAnchorX)<.001);
+                assert(Math.abs(p.y+rect.height-(h-6))<.001);
+            }
             assert(anchor.x+anchor.width*anchor.scale<=w-6);
         }
     }
@@ -28,4 +37,4 @@ const env={Entities:{GetUnitName:()=>name},cfg:{}};
 vm.runInNewContext(source.slice(source.indexOf('    function statVisibility('),source.indexOf('    function buildingPresentation(')),env);
 for(name of ['building_main_city','building_research_lab','building_advanced_research_lab']) assert(env.statVisibility(1).production);
 for(name of ['building_wall','building_arrow_tower','npc_dota_hero_ogre_magi']) assert(!env.statVisibility(1).production);
-console.log('PRODUCTION_SHORTCUT_SPACING_PASS: nine viewport sizes, city and laboratories, stable shortcuts, aligned queue and ability row, live unit classification');
+console.log('PRODUCTION_SHORTCUT_SPACING_PASS: nine viewport sizes, city and laboratories, stable shortcuts, readable side/above responsive queue and ability row, live unit classification');

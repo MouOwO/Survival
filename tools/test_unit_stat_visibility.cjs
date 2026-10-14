@@ -19,12 +19,12 @@ assert.equal(env.statVisibility(-1).combat,false);
 const stats=[['attack','a'],['armor','b'],['attack_speed','c'],['strength','d'],['agility','e'],['intelligence','f']],nodes={};
 for(const a of stats)for(const prefix of ['HandoffStatIcon_','HandoffStatName_','HandoffStat_','HandoffStatBonus_','HandoffStatPercent_'])nodes[prefix+a[0]]={style:{}};
 let multi=false;
-Object.assign(env,{generation:1,buildingPresentation(){},stats,nodes,cfg:{SurvivalMultiSelectionPortraits:{IsActive:()=>multi}},ctx:{FindChildTraverse:()=>null},root:{FindChildTraverse:()=>null},valid:p=>!!p,selectedUnit:()=>selected,text(){},topButtons:{vip:{style:{}}},available:()=>false,syncActiveNav(){},style:(p,v)=>{if(p)Object.assign(p.style,v);}});
+Object.assign(env,{generation:1,layoutRevision:0,buildingPresentation(){},stats,nodes,cfg:{SurvivalMultiSelectionPortraits:{IsActive:()=>multi}},ctx:{FindChildTraverse:()=>null},root:{FindChildTraverse:()=>null},valid:p=>!!p,selectedUnit:()=>selected,text(){},topButtons:{vip:{style:{}}},available:()=>false,syncActiveNav(){},style:(p,v)=>{if(p)Object.assign(p.style,v);}});
 nodes.HandoffNavIcon_vip={SetImage(){}};
 vm.runInContext(source.slice(source.indexOf('    function findCached('),source.indexOf('    function style(')),env);
 vm.runInContext(source.slice(source.indexOf('    function mirror()'),source.indexOf('    function compact(')),env);
 for(const [n,isHero,expected] of [['npc_dota_hero_doom_bringer',true,[true,true]],['building_farm',false,[false,false]],['npc_survival_named_ten_sin_10',true,[true,false]],['npc_survival_super_lumberjack_04',false,[true,false]],['npc_survival_repairer',false,[false,false]],['npc_dota_hero_axe',true,[true,true]]]){
- name=n;hero=isHero;env.mirror();stats.forEach((a,i)=>{for(const prefix of ['HandoffStatIcon_','HandoffStatName_','HandoffStat_'])assert.equal(nodes[prefix+a[0]].style.visibility,prefix==='HandoffStatIcon_'?'collapse':(expected[i<3?0:1] && !(n.includes('lumberjack') && i===1))?'visible':'collapse',n+' '+prefix+a[0]);});
+ name=n;hero=isHero;env.mirror();stats.forEach((a,i)=>{for(const prefix of ['HandoffStatIcon_','HandoffStatName_','HandoffStat_'])assert.equal(nodes[prefix+a[0]].style.visibility,prefix==='HandoffStatName_'?'collapse':(expected[i<3?0:1] && !(n.includes('lumberjack') && i===1))?'visible':'collapse',n+' '+prefix+a[0]);});
 }
 multi=true;env.mirror();assert.equal(nodes.HandoffStat_attack.style.visibility,'collapse');multi=false;env.mirror();assert.equal(nodes.HandoffStat_strength.style.visibility,'visible');
 console.log('UNIT_STAT_VISIBILITY_PASS: all building/proxy variants, monsters/Bosses, worker levels, six heroes, live selection switching, all row elements and multiselect recovery');
@@ -78,3 +78,51 @@ for(const n of ['enemy_tree','npc_survival_lumberjack','npc_survival_repairer','
  name=n;hero=false;assert(!env.statVisibility(1).monster,n+' must retain its own presentation');
 }
 console.log('MONSTER_CLASSIFICATION_PASS: '+monsterNames.length+' wave/challenge definitions, native hero enemies, friendly units and selection recovery');
+
+// Builder portraits may use native hero definitions; portrait metadata keeps
+// their empty attribute gutter from reserving width, even on the same entity.
+name='npc_dota_hero_wisp';hero=true;env.Entities.GetTeamNumber=()=>2;
+env.cfg.HandoffCombat.Snapshot=()=>({model_asset_id:'builder_io_benevolent_companion'});
+assert.equal(env.statVisibility(1).attributes,false);
+env.mirror();assert.equal(nodes.HandoffStatIcon_attack.style.visibility,'visible');
+assert.equal(nodes.HandoffStatIcon_strength.style.visibility,'collapse');
+const layout=require('../panorama/src/scripts/custom_game/geometry_remaining_5d5c1152eb.js');
+for(const [w,h] of [[960,720],[1600,900],[1920,1080],[3440,1440]]){
+ const builder=layout(w,h,4,false,false,env.statVisibility(1));
+ const heroLayout=layout(w,h,4,false,false,{combat:true,attributes:true});
+ assert.equal(builder.attributeWidth,0);
+ assert.equal(builder.inventoryX,builder.centerX+builder.centerWidth,'no blank gap between skills and inventory');
+ assert.equal(heroLayout.inventoryX-builder.inventoryX,240,'hero alone reserves the attribute column');
+ assert.equal(heroLayout.actionX,builder.actionX,'selection keeps the accepted skill anchor');
+}
+env.cfg.HandoffCombat.Snapshot=()=>null;env.mirror();
+assert.equal(nodes.HandoffStatIcon_strength.style.visibility,'visible');
+assert.equal(nodes.HandoffStatName_strength.style.visibility,'collapse');
+console.log('BUILDER_ATTRIBUTE_GUTTER_PASS: native Io builder, six icon visibility recovery, compact inventory and stable skill origin');
+
+// Hidden rows still reach Panorama's layout writer when selecting a building
+// or resource tree. Their dimensions must remain valid even without a portrait.
+for(const a of stats)nodes['HandoffStatRow_'+a[0]]={style:{}};
+env.place=(p,x,y,w,h)=>{
+ assert(p,'all stat row components exist');
+ for(const n of [x,y,w,h])assert(Number.isFinite(n),'finite layout coordinate');
+ assert(w>=0 && h>=0,'hidden stat rows must not write negative dimensions');
+ Object.assign(p.style,{x,y,width:w,height:h});
+};
+vm.runInContext(source.slice(source.indexOf('    function layoutStats('),source.indexOf('    ["hp","mp"].forEach')),env);
+for(const args of [
+ [false,false,{attributes:true}],
+ [false,false,{attributes:false}],
+ [true,false,{building:true}],
+ [false,true,{tree:true}],
+ [false,false,{worker:true}],
+ [false,false,{worker:true,lumberjack:true}],
+ [false,false,{worker:true,lumberjack:true,multi:true}]
+]){
+ env.layoutStats(layout(1600,900,4,...args));
+ for(const a of stats){
+  assert.equal(nodes['HandoffStatIcon_'+a[0]].style.height,64);
+  assert.equal(nodes['HandoffStat_'+a[0]].style.verticalAlign,'center');
+ }
+}
+console.log('STAT_ROW_DIMENSIONS_PASS: heroes, builders, buildings, resources and workers; centered values and nonnegative hidden rows');

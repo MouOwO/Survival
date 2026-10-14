@@ -26,18 +26,46 @@
         if (!g || ![g.x, g.y, g.scale, g.height, g.centerWidth, g.minimapSize].every(function (v) {
             return typeof v === "number" && isFinite(v);
         }) || g.scale <= 0 || g.height <= 0 || g.centerWidth <= 0 || g.minimapSize < 0) return null;
-        var scale = Math.max(g.scale, 0.5) * 1.15;
-        var width = Math.max(600, Math.min(800, (g.centerWidth - 20) * g.scale / scale));
+        var anchored = typeof g.productionQueueWidth === "number" && isFinite(g.productionQueueWidth)
+            && g.productionQueueWidth >= 600 && typeof g.productionQueueScale === "number"
+            && isFinite(g.productionQueueScale) && g.productionQueueScale > 0;
+        var scale = anchored ? g.productionQueueScale : Math.max(g.scale, 0.5) * 1.15;
+        var width = anchored ? g.productionQueueWidth
+            : Math.max(600, Math.min(800, (g.centerWidth - 20) * g.scale / scale));
         var height = training ? 426 : 270;
-        // Stay beside the action bar with matching bottom edges. On a narrow
-        // viewport fit the available left column instead of jumping above it.
+        // Prefer the action bar's left side with matching bottom edges. The
+        // shared anchored layout keeps readable text by using the space above
+        // on narrow viewports; legacy callers retain bounded left-column fit.
         var left = typeof g.productionLeft === "number" ? g.productionLeft : 8;
-        scale = Math.min(scale, (g.x - left - 14) / width);
+        var actionLeft = anchored && typeof g.productionAnchorX === "number"
+            && isFinite(g.productionAnchorX) ? g.productionAnchorX : g.x;
+        if (anchored && actionLeft - left - 14 < width * scale) {
+            // Keep the same readable queue on small viewports. Moving only this
+            // custom panel above the action bar leaves portraits, shortcuts and
+            // the fixed first-skill screen origin untouched.
+            var viewportWidth = Number(g.viewportWidth);
+            if (!(viewportWidth > 16)) return null;
+            scale = Math.min(scale, (viewportWidth - 16) / width);
+            if (!(scale > 0)) return null;
+            // Preserve the existing title, buff and debuff rows. Debuffs are
+            // the highest attachment at -126px in the shared building canvas.
+            var bottom = g.y - 126 * g.scale - 14;
+            var availableHeight = bottom - 8;
+            if (!(availableHeight > 0)) return null;
+            // A short window keeps readable pixels and scrolls the existing
+            // absolute-positioned controls instead of shrinking their text or
+            // hiding another HUD row. The viewport alone owns occlusion bounds.
+            var viewportHeight = Math.min(height, availableHeight / scale);
+            return { x: Math.max(8, Math.min(actionLeft, viewportWidth - width * scale - 8)),
+                y: bottom - viewportHeight * scale, width: width, height: viewportHeight,
+                contentHeight: height, scrollable: viewportHeight < height, scale: scale, mode: "above" };
+        }
+        scale = Math.min(scale, (actionLeft - left - 14) / width);
         if (!(scale > 0)) return null;
         var physicalHeight = height * scale;
-        var x = Math.max(left, g.x - width * scale - 14);
+        var x = Math.max(left, actionLeft - width * scale - 14);
         var y = g.y + g.height * g.scale - physicalHeight;
-        return { x: x, y: Math.max(8, y), width: width, height: height, scale: scale };
+        return { x: x, y: Math.max(8, y), width: width, height: height, scale: scale, mode: "left" };
     }
     var model = { Rows: rows, TrainingSlots: trainingSlots, Progress: progress, PanelGeometry: panelGeometry };
     if (typeof module !== "undefined" && module.exports) { module.exports = model; return; }
@@ -364,7 +392,7 @@
             if (!valid(marker)) continue;
             marker.visible = enabled;
             if (!enabled) continue;
-            place(marker, g.x + (g.heroWidth + 10 + 120 * index) * g.scale,
+            place(marker, g.x + ((typeof g.actionOffset === "number" ? g.actionOffset : g.heroWidth + 10) + 120 * index) * g.scale,
                 g.y + 61 * g.scale, 116 * g.scale, 116 * g.scale);
             style(marker.tag, { fontSize: Math.max(10, Math.round(23 * g.scale)) + "px" });
         }
@@ -388,13 +416,15 @@
         if (!show) return 0;
         // Dense research ability rows shrink the native HUD. Keep production
         // text legible while aligning this attachment's right edge to that row.
-        var panelScale = placement.scale, width = placement.width, height = placement.height;
-        place(panel, placement.x, placement.y, width, height);
-        style(panel, { transform: "scale3d(" + panelScale + "," + panelScale + ",1)", transformOrigin: "0% 0%" });
+        var panelScale = placement.scale, width = placement.width;
+        var height = placement.contentHeight || placement.height;
+        place(panel, placement.x, placement.y, width, placement.height);
+        style(panel, { transform: "scale3d(" + panelScale + "," + panelScale + ",1)", transformOrigin: "0% 0%",
+            overflow: placement.scrollable ? "squish scroll" : "clip" });
         // Layout measurements omit our CSS transform. World-overlay occlusion
         // consumes physical window pixels, matching GetPositionWithinWindow().
         panel.__survivalWindowWidth = width * panelScale * (Number(ctx.actualuiscale_x) || 1);
-        panel.__survivalWindowHeight = height * panelScale * (Number(ctx.actualuiscale_y) || 1);
+        panel.__survivalWindowHeight = placement.height * panelScale * (Number(ctx.actualuiscale_y) || 1);
         place(title, 16, 8, width - 182, 44); place(badge, width - 166, 13, 150, 36);
         currentIcon.visible = false;
         cancelCurrent.job = null; cancelCurrent.visible = false;

@@ -358,13 +358,18 @@
     place(art(bottom,"HandoffLevelPlate","level_plate"),16,229,81,81);
     centered(bottom,"HandoffLevel",20,241,73,50,33);
     var statNames = ["攻击", "护甲", "攻速", "力量", "敏捷", "智力"];
+    var statIcons={attack:"hud/reborn/icon_damage_psd",armor:"hud/reborn/icon_armor_psd",attack_speed:"hud/reborn/icon_attack_speed_psd",
+        strength:"primary_attribute_icons/primary_attribute_icon_strength_psd",agility:"primary_attribute_icons/primary_attribute_icon_agility_psd",intelligence:"primary_attribute_icons/primary_attribute_icon_intelligence_psd"};
     stats.forEach(function(a,i){
-        art(bottom,"HandoffStatIcon_"+a[0],"stat_"+a[0]);
-        var caption=label(bottom,"HandoffStatName_"+a[0]);caption.text=statNames[i];
+        var row=create("Panel",bottom,"HandoffStatRow_"+a[0],false);row.hittestchildren=true;style(row,{flowChildren:"none",overflow:"noclip"});
+        var icon=create("Image",row,"HandoffStatIcon_"+a[0],false);icon.SetImage("s2r://panorama/images/"+statIcons[a[0]]+".vtex");
+        if(icon.SetScaling)icon.SetScaling("stretch-to-fit-preserve-aspect");
+        icon.hittest=true;tooltip(icon,function(){return statNames[i]+"<br>"+statBonusHelp(a[0]);});
+        var caption=label(row,"HandoffStatName_"+a[0]);caption.text=statNames[i];
         style(caption,{fontSize:"32px",fontWeight:"medium",textOverflow:"clip",color:i<3?"#b8c5c8":["#e99c92","#a6d393","#9cbfde"][i-3]});
-        label(bottom,"HandoffStat_"+a[0]);
-        label(bottom,"HandoffStatBonus_"+a[0]);
-        label(bottom,"HandoffStatPercent_"+a[0]);
+        label(row,"HandoffStat_"+a[0]);
+        label(row,"HandoffStatBonus_"+a[0]);
+        label(row,"HandoffStatPercent_"+a[0]);
         style(nodes["HandoffStatPercent_"+a[0]],{color:"#f08078",fontSize:"24px"});
         ["HandoffStatBonus_","HandoffStatPercent_"].forEach(function(prefix){
             nodes[prefix+a[0]].hittest=true;tooltip(nodes[prefix+a[0]],function(){return statBonusHelp(a[0]);});
@@ -390,21 +395,18 @@
     function layoutStats(g) {
         stats.forEach(function(a,i){
             var x=i<3?306:g.attributeX+14,y=32+(i%3)*98;
-            place(nodes["HandoffStatIcon_"+a[0]],x,y,72,72);
-            var textX=x+6,textWidth=i<3?g.heroWidth-x-12:g.attributeWidth-28;
-            // CJK captions need their natural line height. A short fixed Label
-            // with text-overflow: shrink can silently undo an increased font size.
-            place(nodes["HandoffStatName_"+a[0]],textX,y,textWidth,44);
-            style(nodes["HandoffStatName_"+a[0]],{fontSize:"32px",height:"fit-children",minHeight:"0px",textOverflow:"clip"});
-            place(nodes["HandoffStat_"+a[0]],textX,y+42,textWidth,32);
-            style(nodes["HandoffStat_"+a[0]],{fontSize:"28px",fontWeight:"normal",height:"fit-children",minHeight:"0px"});
-            place(nodes["HandoffStatBonus_"+a[0]],textX,y+74,textWidth*.55,24);
-            place(nodes["HandoffStatPercent_"+a[0]],textX+textWidth*.55,y+74,textWidth*.45,24);
+            var rowWidth=Math.max(0,i<3?g.heroWidth-x-12:g.attributeWidth-28);
             if(g.lumberjack && (i===0 || i===2)) {
-                var workerX=g.heroWidth+(i===0?24:g.centerWidth/2+12),workerWidth=g.centerWidth/2-36;
-                place(nodes["HandoffStatName_"+a[0]],workerX,195,82,44);
-                place(nodes["HandoffStat_"+a[0]],workerX+88,198,workerWidth-88,40);
+                x=g.heroWidth+(i===0?24:g.centerWidth/2+12);y=185;rowWidth=g.centerWidth/2-36;
             }
+            var iconSize=64,textX=72,textWidth=Math.max(40,rowWidth-textX);
+            place(nodes["HandoffStatRow_"+a[0]],x,y,rowWidth,64);
+            place(nodes["HandoffStatIcon_"+a[0]],0,0,iconSize,iconSize);
+            place(nodes["HandoffStat_"+a[0]],textX,0,textWidth,44);
+            style(nodes["HandoffStat_"+a[0]],{fontSize:"32px",fontWeight:"normal",height:"fit-children",minHeight:"0px",verticalAlign:"center",textAlign:"left"});
+            place(nodes["HandoffStatBonus_"+a[0]],textX,65,textWidth*.58,24);
+            place(nodes["HandoffStatPercent_"+a[0]],textX+textWidth*.58,65,textWidth*.42,24);
+            style(nodes["HandoffStatBonus_"+a[0]],{fontSize:"22px"});style(nodes["HandoffStatPercent_"+a[0]],{fontSize:"22px"});
         });
     }
     ["hp","mp"].forEach(function(type){art(center,"Handoff_"+type+"_track",type+"_track");if(type==="hp")create("Panel",center,"Handoff_hp_fill",false);else art(center,"Handoff_"+type+"_fill",type+"_fill");label(center,"Handoff_"+type+"_value","HandoffNumber");style(nodes["Handoff_"+type+"_value"],{fontSize:"30px",textAlign:"center"});});
@@ -465,6 +467,10 @@
     function abilityCount() {
         currentEntries=abilityEntries();return currentEntries.length;
     }
+    function actionOffset(g) {
+        return g&&isFinite(Number(g.actionOffset))?Number(g.actionOffset):g.heroWidth+10;
+    }
+    function centerOffset(g) {return actionOffset(g)-10;}
     function fitNativeSkills(g,force){
         g=g||geometry;
         if(!g||!isFinite(Number(g.scale))||Number(g.scale)<=0)return;
@@ -524,7 +530,7 @@
             var matching=binding&&binding.unit===unit&&currentEntries[i]&&Number(currentEntries[i].ability)===binding.ability;
             if(!bounds&&matching){bounds=create("Panel",bottom,id+"Bounds",false);label(bounds,id,"HandoffNumber");}
             if(!bounds)continue;bounds.visible=!!matching&&!!binding.text;
-            if(bounds.visible){centered(bottom,id,geometry.heroWidth+13+i*120,138,43,33,25);style(bounds,{backgroundImage:'url("file://{images}/'+assets.key_plate.file+'")',backgroundSize:"100% 100%",zIndex:"100"});text(id,binding.text);}
+            if(bounds.visible){centered(bottom,id,actionOffset(geometry)+3+i*120,138,43,33,25);style(bounds,{backgroundImage:'url("file://{images}/'+assets.key_plate.file+'")',backgroundSize:"100% 100%",zIndex:"100"});text(id,binding.text);}
         }
         mirrorKeys.signature=keySignature;mirrorKeys.checkedAt=now;
     }
@@ -865,12 +871,12 @@
         // End legacy corner cleanup.
         place(native("portraitHUD"),0,0,g.portraitSize,g.portraitSize);style(native("portraitHUD"),{transform:"none"});
         ["stats_container","unitname","health_mana","center_bg","left_flare","right_flare","PortraitBacker","PortraitBackerColor"].forEach(function(id){var n=block.FindChildTraverse(id);style(n,{opacity:"0"});if(valid(n)){n.hittest=false;n.hittestchildren=false;}});
-        place(branch,g.heroWidth+10,61,g.centerWidth-20,116);style(branch,{flowChildren:"none",minWidth:"0px",overflow:"noclip"});
+        place(branch,actionOffset(g),61,g.centerWidth-20,116);style(branch,{flowChildren:"none",minWidth:"0px",overflow:"noclip"});
         // Valve inserts an anonymous talent/ability wrapper; clear its stock left gutter.
         wrappers.forEach(function(wrapper){
             place(wrapper,0,0,g.centerWidth-20,116);style(wrapper,{flowChildren:"none",transform:"none",overflow:"noclip"});
         });
-        place(native("StatBranch"),g.heroWidth+10,-85,74,74);
+        place(native("StatBranch"),actionOffset(g),-85,74,74);
         style(native("InnateIcon"),{visibility:"collapse"});
         // Hiding the icon alone leaves its anonymous framing Image visible.
         // Hide only its DOTAInnateDisplay ancestor, never the shared abilities row.
@@ -901,7 +907,7 @@
         // Preserve backpack, neutral slot, buffs and all original interaction handlers.
         var backpack=inv.FindChildTraverse("inventory_backpack_list");if(valid(backpack))place(backpack,0,-60,358,52);
         place(native("inventory_composition_layer_container"),g.inventoryX+280,-75,110,70);
-        place(native("buffs"),g.heroWidth+10,g.heroWidth===0?-82:-42,g.centerWidth-20,40);place(native("debuffs"),g.heroWidth+10,g.heroWidth===0?-126:-86,g.centerWidth-20,40);
+        place(native("buffs"),actionOffset(g),g.heroWidth===0?-82:-42,g.centerWidth-20,40);place(native("debuffs"),actionOffset(g),g.heroWidth===0?-126:-86,g.centerWidth-20,40);
         layoutMinimap(g);
         ["ArchiveEntry","TreasureEntry","LotteryButton"].forEach(function(id){style(root.FindChildTraverse(id),{visibility:"collapse"});});
         layoutNativeWrappers=wrappers;
@@ -922,10 +928,10 @@
         place(native("PortraitGroup"),29,49,g.portraitSize,g.portraitSize,{overflow:"clip",transform:"none",transitionProperty:"none",animationName:"none"});
         place(native("PortraitContainer"),0,0,g.portraitSize,g.portraitSize);
         place(native("portraitHUD"),0,0,g.portraitSize,g.portraitSize,{transform:"none"});
-        place(branch,g.heroWidth+10,61,g.centerWidth-20,116,{flowChildren:"none",minWidth:"0px",overflow:"noclip"});
+        place(branch,actionOffset(g),61,g.centerWidth-20,116,{flowChildren:"none",minWidth:"0px",overflow:"noclip"});
         wrappers.forEach(function(wrapper){place(wrapper,0,0,g.centerWidth-20,116,{flowChildren:"none",transform:"none",overflow:"noclip"});});
         place(list,0,0,g.centerWidth-20,116,{flowChildren:"right",minWidth:"0px",minHeight:"0px",overflow:"noclip",transform:"none"});
-        place(native("StatBranch"),g.heroWidth+10,-85,74,74);
+        place(native("StatBranch"),actionOffset(g),-85,74,74);
         style(native("InnateIcon"),{visibility:"collapse"});
         for(var innate=native("InnateIcon");valid(innate)&&innate!==branch;innate=innate.GetParent()){
             if(innate.paneltype==="DOTAInnateDisplay"){style(innate,{visibility:"collapse"});break;}
@@ -946,8 +952,8 @@
         // The production HUD moves both rows on the fast refresh path. Avoid
         // undoing its current height before it immediately restores the rows.
         if(!cfg.SurvivalProductionHUD){
-            place(native("buffs"),g.heroWidth+10,g.heroWidth===0?-82:-42,g.centerWidth-20,40);
-            place(native("debuffs"),g.heroWidth+10,g.heroWidth===0?-126:-86,g.centerWidth-20,40);
+            place(native("buffs"),actionOffset(g),g.heroWidth===0?-82:-42,g.centerWidth-20,40);
+            place(native("debuffs"),actionOffset(g),g.heroWidth===0?-126:-86,g.centerWidth-20,40);
         }
         var block=native("center_block");
         if(valid(block))for(var childIndex=0;childIndex<block.GetChildCount();childIndex++){
@@ -994,7 +1000,7 @@
         var unit=selectedUnit(),presentation=statVisibility(unit);
         presentation.multi=!!(cfg.SurvivalMultiSelectionPortraits&&cfg.SurvivalMultiSelectionPortraits.IsActive());
         var count=presentation.tree?0:abilityCount(),g=cfg.HandoffGeometry(w,h,count,presentation.building,presentation.tree,presentation);
-        var signature=[viewportSignature,count,g.heroWidth,g.height,unit,presentation.multi?1:0,
+        var signature=[viewportSignature,count,g.heroWidth,g.height,g.actionOffset,g.x,g.scale,g.attributeWidth,g.inventoryX,unit,presentation.multi?1:0,
             currentEntries.map(function(e){return e.ability;}).join(",")].join(":");
         var panels=[native("abilities"),native("inventory"),native("PortraitGroup"),native("minimap_container"),native("minimap")];
         var changed=signature!==lastSignature||panels.some(function(panel,index){return panel!==layoutPanels[index];});
@@ -1040,7 +1046,7 @@
             nine(background,"HandoffCombatPlate","center_base",293,23,Math.max(36,g.heroWidth-293),307,18,20);
             nine(background,"HandoffAttributesPlate","center_base",g.attributeX,23,g.attributeWidth,307,18,20);
             layoutStats(g);
-            place(center,g.heroWidth,23,g.centerWidth,g.height-23);nine(background,"HandoffCenterPlate","center_base",g.heroWidth,23,g.centerWidth,g.height-23,18,20);
+            place(center,centerOffset(g),23,g.centerWidth,g.height-23);nine(background,"HandoffCenterPlate","center_base",centerOffset(g),23,g.centerWidth,g.height-23,18,20);
             place(inventory,g.inventoryX,23,401,307);
             ["hp","mp"].forEach(function(type,index){var y=175+index*60;
                 place(nodes["Handoff_"+type+"_track"],20,y+4,g.barWidth-8,44);
@@ -1082,7 +1088,9 @@
         var wall=id==="wall" || /^(building_wall|npc_dota_unit_building_wall|asset_proxy_wall_)/.test(name);
         var tower=id==="arrow_tower" || /^(building_arrow_tower|npc_dota_unit_building_arrow_tower|asset_proxy_tower_)/.test(name) || name==="npc_dota_unit_ultimate_tower";
         building=building || !!id || wall || tower;
-        var hero=/^npc_dota_hero_/.test(name) && name!=="npc_dota_hero_undying";
+        var builder=name==="npc_dota_hero_undying" || /^npc_survival_builder_proxy(?:_|$)/.test(name)
+            || !!(snapshot && /^builder_/.test(String(snapshot.model_asset_id || "")));
+        var hero=/^npc_dota_hero_/.test(name) && !builder;
         try {if(Entities.IsHero) hero=hero && !!Entities.IsHero(unit);} catch(error) {}
         // Creature names cover every wave/practice/challenge family before a snapshot arrives.
         // Team detection also covers bosses created from native hero definitions.
@@ -1121,7 +1129,7 @@
         ["HandoffHeroBase","HandoffPortraitFrame","HandoffNamePlate","HandoffInventoryBase"].forEach(function(id){
             presentationStyle(nodes[id],{visibility:(building && !(id==="HandoffPortraitFrame" && workerMulti)) || (shown.monster && id==="HandoffInventoryBase")?"collapse":"visible"});
         });
-        ["HandoffCombatPlate","HandoffAttributesPlate"].forEach(function(id){presentationStyle(slices[id],{visibility:building || (shown.monster && id==="HandoffAttributesPlate")?"collapse":"visible"});});
+        ["HandoffCombatPlate","HandoffAttributesPlate"].forEach(function(id){presentationStyle(slices[id],{visibility:building || (!shown.attributes && id==="HandoffAttributesPlate")?"collapse":"visible"});});
         slotFrames.forEach(function(p){presentationStyle(p,{visibility:building || shown.monster?"collapse":"visible"});});
         ["HandoffLevelPlate","HandoffLevelBounds"].forEach(function(id){if(valid(nodes[id]))nodes[id].visible=!multi&&!building&&!shown.monster;});
         ["hp","mp"].forEach(function(type){
@@ -1146,7 +1154,7 @@
         presentationStyle(nodes.HandoffBuildingSummary,{textAlign:shown.tree?"left":"center",color:"#f3ebd4",height:"fit-children",minHeight:"0px"});
         if(!g)return;
         if(!building) {presentationPlace(nodes.HandoffNameBounds,34,5,250,40);presentationStyle(nodes.HandoffName,{fontSize:"27px",height:"fit-children"});return;}
-        presentationPlace(nodes.HandoffBuildingTitleBounds,g.x+(g.heroWidth+20)*g.scale,g.y-50*g.scale,g.centerWidth-40,48);
+        presentationPlace(nodes.HandoffBuildingTitleBounds,g.x+(actionOffset(g)+10)*g.scale,g.y-50*g.scale,g.centerWidth-40,48);
         // Reapply the shared title contrast during selection refresh as well.
         presentationStyle(nodes.HandoffBuildingTitle,{color:"#fff0ce",backgroundColor:"#081d27dd",textShadow:"0px 1px 2px 3.0 #000000"});
         presentationStyle(nodes.HandoffBuildingTitleBounds,{transform:"scale3d("+g.scale+","+g.scale+",1)"});
@@ -1262,8 +1270,9 @@
             var hasBonus=visible && shown.attributes && key!=="attack_speed" && amount!==undefined && amount!==null;
             var visibilityKey=[unit,visible?1:0,hasBonus?1:0].join(":"),statNode=nodes["HandoffStat_"+a[0]];
             if(repaint||!statNode||statNode.__handoffVisibilityKey!==visibilityKey){
-                style(nodes["HandoffStatIcon_"+a[0]],{visibility:"collapse"});
-                ["HandoffStatName_","HandoffStat_"].forEach(function(prefix){style(nodes[prefix+a[0]],{visibility:visible?"visible":"collapse"});});
+                style(nodes["HandoffStatIcon_"+a[0]],{visibility:visible?"visible":"collapse"});
+                style(nodes["HandoffStatName_"+a[0]],{visibility:"collapse"});
+                style(statNode,{visibility:visible?"visible":"collapse"});
                 ["HandoffStatBonus_","HandoffStatPercent_"].forEach(function(prefix){style(nodes[prefix+a[0]],{visibility:hasBonus?"visible":"collapse"});});
                 if(statNode)statNode.__handoffVisibilityKey=visibilityKey;
             }
@@ -1360,8 +1369,8 @@
         if(cfg.SurvivalProductionHUD){
             var productionHeight=cfg.SurvivalProductionHUD.Refresh(geometry,selectedUnit(),ready,currentEntries);
             if(ready&&geometry){
-                place(native("buffs"),geometry.heroWidth+10,(geometry.heroWidth===0?-82:-42)-productionHeight,geometry.centerWidth-20,40);
-                place(native("debuffs"),geometry.heroWidth+10,(geometry.heroWidth===0?-126:-86)-productionHeight,geometry.centerWidth-20,40);
+                place(native("buffs"),actionOffset(geometry),(geometry.heroWidth===0?-82:-42)-productionHeight,geometry.centerWidth-20,40);
+                place(native("debuffs"),actionOffset(geometry),(geometry.heroWidth===0?-126:-86)-productionHeight,geometry.centerWidth-20,40);
             }
         }
         if(cfg.SurvivalMinimapShortcuts)cfg.SurvivalMinimapShortcuts.Refresh(geometry,ready);

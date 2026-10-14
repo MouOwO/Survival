@@ -21,6 +21,7 @@ function fixture(s){
   statVisibility:()=>({combat:true,attributes:true}),buildingPresentation(){},available:id=>env.availability[id],availability:{vip:true,benefit:true,survival_shop:true},navWindowIds:{survival_shop:'survival_shop',treasure:'treasure',archive:'archive',lottery:'lottery',benefit:'benefit'},activeNavId:undefined,
   valid:p=>!!(p&&p.IsValid()),$: {Msg(){}}});
  vm.createContext(env);
+ if(s.includes('    function actionOffset('))vm.runInContext(between(s,'    function actionOffset(','    function fitNativeSkills('),env);
  const cached=s.includes('    function findCached(')?between(s,'    function findCached(','    function style('):'function findCached(p,id){return p.FindChildTraverse(id);}';
  const levelPips=s.includes('    function styleAbilityLevelPips(')?between(s,'    function styleAbilityLevelPips(','    function child('):'';
  vm.runInContext(cached+between(s,'    function style(','    function create(')+levelPips+between(s,'    function child(','    function refreshInventoryPresentation(')+between(s,'    function markActiveNav(','    function topMetric(')+between(s,'    function mirror()','    function compact('),env);
