@@ -21,7 +21,7 @@
 .CollectionGW2Hover { opacity:0; }
 .CollectionGW2Slot:hover .CollectionGW2Hover,
 .CollectionGW2Button:hover .CollectionGW2Hover { opacity:.65; }
-.CollectionGW2Search { font-size:18px; color:#d8ddd6; background-color:transparent; border:0px; padding:0px; box-shadow:none; }
+.CollectionGW2Search { font-size:16px; color:#d8ddd6; background-color:transparent; border:0px; padding:0px; box-shadow:none; }
 .CollectionGW2Button { flow-children:none; background-color:transparent; border:0px; padding:0px; margin:0px; box-shadow:none; }
 .CollectionGW2Button:hover { brightness:1.12; }
 .CollectionGW2Button:active { brightness:.9; }

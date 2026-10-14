@@ -1,6 +1,7 @@
 param(
     [string]$Scope='tools/collection_gw2/compile_scope.json',
     [string]$Report='design_refs/collection_gw2_v2/work/compile.json',
+    [string]$SourceRoot='panorama/src',
     [switch]$CheckOnly
 )
 $ErrorActionPreference='Stop'
@@ -16,6 +17,23 @@ function Get-WorkspacePath([string]$Relative) {
     if(-not $resolved.StartsWith($collectionGW2Repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw "Path outside the workspace: $Relative"}
     return $resolved
 }
+$collectionGW2SourceInput=if([IO.Path]::IsPathRooted($SourceRoot)){$SourceRoot}else{Join-Path $collectionGW2Repo $SourceRoot}
+$collectionGW2Source=[IO.Path]::GetFullPath($collectionGW2SourceInput).TrimEnd([IO.Path]::DirectorySeparatorChar)
+if(-not $collectionGW2Source.StartsWith($collectionGW2Repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw "SourceRoot is outside the workspace: $SourceRoot"}
+$collectionGW2DefaultSource=Join-Path $collectionGW2Runtime 'src'
+if(($collectionGW2Source.Equals($collectionGW2Runtime,[StringComparison]::OrdinalIgnoreCase) -or $collectionGW2Source.StartsWith($collectionGW2Runtime+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) -and
+    -not($collectionGW2Source.Equals($collectionGW2DefaultSource,[StringComparison]::OrdinalIgnoreCase) -or $collectionGW2Source.StartsWith($collectionGW2DefaultSource+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase))){throw 'SourceRoot must not point into Panorama runtime artifacts.'}
+if(-not(Test-Path -LiteralPath $collectionGW2Source -PathType Container)){throw "SourceRoot directory is missing: $SourceRoot"}
+function Get-SourcePath([string]$Relative) {
+    $resolved=[IO.Path]::GetFullPath((Join-Path $collectionGW2Source $Relative))
+    if(-not $resolved.StartsWith($collectionGW2Source+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw "Source path escaped SourceRoot: $Relative"}
+    $item=Get-Item -LiteralPath $resolved -Force
+    while($item -and -not $item.FullName.Equals($collectionGW2Repo,[StringComparison]::OrdinalIgnoreCase)){
+        if($item.Attributes -band [IO.FileAttributes]::ReparsePoint){throw "Source path must not traverse a link: $Relative"}
+        $item=if($item.PSIsContainer){$item.Parent}else{$item.Directory}
+    }
+    return $resolved
+}
 $collectionGW2ScopePath=Get-WorkspacePath $Scope
 $collectionGW2Report=Get-WorkspacePath $Report
 $collectionGW2Files=@(Get-Content -LiteralPath $collectionGW2ScopePath -Raw -Encoding UTF8|ConvertFrom-Json)
@@ -25,7 +43,7 @@ foreach($relative in $collectionGW2Files){if($relative -isnot [string] -or $rela
 $collectionGW2Required=@('scripts/custom_game/collection_gw2.js','scripts/custom_game/collection_gw2_data.js','styles/custom_game/collection_gw2.css',$collectionGW2Assets)
 foreach($required in $collectionGW2Required){if($collectionGW2Files -notcontains $required){throw "Required collection source is missing from scope: $required"}}
 if(-not(Test-Path -LiteralPath $collectionGW2Compiler -PathType Leaf)){throw 'Native resourcecompiler is missing.'}
-[xml]$collectionGW2Xml=Get-Content -LiteralPath (Get-WorkspacePath ('panorama/src/'+$collectionGW2Assets)) -Raw -Encoding UTF8
+[xml]$collectionGW2Xml=Get-Content -LiteralPath (Get-SourcePath $collectionGW2Assets) -Raw -Encoding UTF8
 if($collectionGW2Xml.SelectNodes('//include').Count){throw 'Asset preload XML must not include other resources.'}
 $collectionGW2Dependencies=@($collectionGW2Xml.SelectNodes('//Image[@src]')|ForEach-Object {
     $src=$_.GetAttribute('src')
@@ -50,7 +68,7 @@ if($collectionGW2ManifestImages.Count -ne $collectionGW2Pngs.Count -or @($collec
     @(Compare-Object $collectionGW2ManifestImages $collectionGW2Pngs).Count){throw 'Manifest and compile scope PNGs differ. Run node tools/collection_gw2/build_scope.cjs.'}
 # Check every collectionGW2 image referenced by the selected production sources.
 foreach($relative in @($collectionGW2Files|Where-Object {$_ -notlike '*.png'})){
-    $sourceText=Get-Content -LiteralPath (Get-WorkspacePath ('panorama/src/'+$relative)) -Raw -Encoding UTF8
+    $sourceText=Get-Content -LiteralPath (Get-SourcePath $relative) -Raw -Encoding UTF8
     foreach($match in [regex]::Matches($sourceText,'(?:file://\{images\}/)?custom_game/collection_gw2_v2/([a-z0-9_]+\.png)')){
         $dependency='images/custom_game/collection_gw2_v2/'+$match.Groups[1].Value
         if($collectionGW2Pngs -notcontains $dependency){throw "Referenced image is absent from scope/preload: $dependency"}
@@ -68,7 +86,7 @@ $collectionGW2Backup=Get-WorkspacePath ('output/collection_gw2/compile_'+(Get-Da
 $collectionGW2Records=@()
 foreach($relative in $collectionGW2Files){
     if($relative -isnot [string] -or $relative -notmatch $collectionGW2Allowed){throw "Path is outside the collectionGW2 task: $relative"}
-    $source=Get-WorkspacePath ('panorama/src/'+$relative)
+    $source=Get-SourcePath $relative
     $destination=[IO.Path]::GetFullPath((Join-Path $collectionGW2Content $relative))
     $artifactRelative=$relative -replace '\.js$','.vjs_c' -replace '\.css$','.vcss_c' -replace '\.xml$','.vxml_c' -replace '\.png$','_png.vtex_c'
     $artifact=[IO.Path]::GetFullPath((Join-Path $collectionGW2Runtime $artifactRelative))
@@ -86,7 +104,7 @@ foreach($relative in $collectionGW2Files){
         compiledHash=$null;artifactBytes=$null;artifactWriteUtc=$null;verified=$false
     }
 }
-if($CheckOnly){[pscustomobject]@{success=$true;checkOnly=$true;files=$collectionGW2Records.Count;pngs=$collectionGW2Pngs.Count;scope=$Scope;report=$Report}|ConvertTo-Json;return}
+if($CheckOnly){[pscustomobject]@{success=$true;checkOnly=$true;files=$collectionGW2Records.Count;pngs=$collectionGW2Pngs.Count;scope=$Scope;sourceRoot=$collectionGW2Source;report=$Report}|ConvertTo-Json;return}
 New-Item -ItemType Directory -Path $collectionGW2Backup -Force|Out-Null
 foreach($record in $collectionGW2Records){
     foreach($target in @($record.sourceBackup,$record.contentBackup,$record.runtimeBackup)){New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force|Out-Null}
@@ -123,7 +141,7 @@ try {
         $record.artifactBytes=$file.Length;$record.artifactWriteUtc=$file.LastWriteTimeUtc.ToString('o');$record.verified=$true
     }
     New-Item -ItemType Directory -Path (Split-Path -Parent $collectionGW2Report) -Force|Out-Null
-    @{at=(Get-Date -Format o);success=$true;backup=$collectionGW2Backup;records=$collectionGW2Records;scope=$Scope;compileStartedUtc=$compileStart.ToString('o');pngDependencies=$collectionGW2Dependencies}|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $collectionGW2Report -Encoding UTF8
+    @{at=(Get-Date -Format o);success=$true;backup=$collectionGW2Backup;records=$collectionGW2Records;scope=$Scope;sourceRoot=$collectionGW2Source;compileStartedUtc=$compileStart.ToString('o');pngDependencies=$collectionGW2Dependencies}|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $collectionGW2Report -Encoding UTF8
 } catch {
     $failure=$_
     foreach($record in $collectionGW2Records){

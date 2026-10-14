@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "commit": "1b7db5d1",
+  "notGameCapture": true,
+  "units": "CSS pixels measured from browser getBoundingClientRect at deviceScaleFactor 1",
+  "provenance": "Previous opaque collection source assembly; these are saved measured values, not geometry-derived expectations.",
+  "canvasSource": {
+    "path": "design_refs/collection_gw2_v2/work/opaque_final/report.json",
+    "sha256": "00f224173fa48a650badea9ca0dde4015d1e812ff8ac1ef066e13bb9b377d136"
+  },
+  "portraitSource": {
+    "path": "design_refs/collection_gw2_v2/work/final/ex_1920x1080.json",
+    "sha256": "2b6c2f0823221f9bb05dc3211393b13279ec1ac8216ca7555ff41bd01ae5ce2b"
+  },
+  "viewports": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "canvas": {
+        "x": 127.09515380859375,
+        "y": 0,
+        "width": 1665.8095703125,
+        "height": 1080
+      }
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "canvas": {
+        "x": 84.73009490966797,
+        "y": 0,
+        "width": 1110.5396728515625,
+        "height": 719.9999389648438
+      }
+    },
+    {
+      "width": 2560,
+      "height": 1440,
+      "canvas": {
+        "x": 169.46018981933594,
+        "y": 0,
+        "width": 2221.079345703125,
+        "height": 1439.9998779296875
+      }
+    },
+    {
+      "width": 2560,
+      "height": 1080,
+      "canvas": {
+        "x": 447.09515380859375,
+        "y": 0,
+        "width": 1665.8095703125,
+        "height": 1080
+      }
+    },
+    {
+      "width": 960,
+      "height": 720,
+      "canvas": {
+        "x": 0,
+        "y": 48.799983978271484,
+        "width": 959.9999389648438,
+        "height": 622.4000244140625
+      }
+    },
+    {
+      "width": 815,
+      "height": 528,
+      "canvas": {
+        "x": 0.2986029088497162,
+        "y": 0,
+        "width": 814.3956909179688,
+        "height": 527.9998779296875
+      }
+    }
+  ],
+  "portrait1920": {
+    "width": 97.1722412109375,
+    "height": 97.17222595214844
+  }
+}

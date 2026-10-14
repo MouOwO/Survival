@@ -12,6 +12,10 @@
 
 作者源码位于 `panorama/src/`；运行资源位于 `panorama/layout/`、`panorama/scripts/`、`panorama/styles/`。后缀分别为 `.vxml_c`、`.vjs_c`、`.vcss_c`。资源编译成功后仍需确认新 HUD 执行链已加载，避免把旧闭包和旧截图当成本版效果。
 
+菜单 Tooltip 共用 `common/menu_v10.css` 的透明外容器、独立底板和原生柔阴影规则，覆盖存档、每日奖励、收藏、抽奖及公共商店／商城／宝物。只对底板使用原生 `softedge_box` 遮罩，并以 `opacity-mask-threshold:0% 12%` 收紧过渡，避免长提示的标题区域透出底层条目；正文、数值、边框和滚动条不做整体透明或遮罩。装饰层不接收鼠标，动态高度同步底板与阴影。存档旧 `tooltip_shadow.png` 的透明度恒为95，已不再绘制该平黑矩形，资源保留供历史素材追溯。
+
+2026-10-14 本轮8个JS/CSS源文件已定向同步Content并原生编译、校验哈希；预览与验证位于 `output/tooltip_surface_20261014/`。显示修复不改奖励、解锁、字体层级或数量语义；新JS需要重新载入HUD，完整重启游戏可避免旧闭包继续显示旧阴影。
+
 ## 素材、编译与验证
 
 独立存档的无字材质由 imagegen 从确认图提取，源图保存在 `design_refs/archive_parchment_v1/`；`tools/archive_parchment/split_assets.py` 按固定坐标拆出 37 个 PNG，生成哈希清单、材质数据和编译用资源布局。标题、搜索文字、分类名称、数量及进度均由独立控件绘制。正式源 PNG 位于 `art/ui/sources/custom_game/archive_parchment_v1/`，脚本同步一份至被忽略的 `panorama/src/images/custom_game/archive_parchment_v1/` 供编译。默认字体沿用已安装的思源黑体，标题与分类使用宋体。
@@ -54,15 +58,19 @@ node tools/menus_v10/preview.cjs
 
 按顺序执行 `split_assets.py`、`node tools/lottery_gw2/build_scope.cjs`、`tools/lottery_gw2/compile.ps1 -CheckOnly`，再用 `preview.cjs`、`acceptance.cjs`／`capture.cjs` 检查实际源码组装，最后运行定向 `compile.ps1`。编译只更新新的抽奖 JS/CSS、HUD XML、资源预载布局及 16 个 PNG，保留现有卡图、影片和其他 HUD 源码／产物。`design_refs/lottery_gw2_v1/work/` 是可重建的隔离预览、组件图和验收报告；数值为明确标记的浏览器样例，不连接账号、服务器或支付，也不是游戏客户端截图。
 
-收藏界面由 `collection_gw2.js/css` 和 `collection_gw2_data.js` 独立提供，当前画布为 1200 × 778，按原始 815 × 528 背包参考调整比例。顶部“收藏”、窄三图标选单、14 × 7 背包网格、底部小抽取按钮均是平面组件；窗口和背景采用不透明 `#171e24` 衬底，背景节点透明度为 1，原 PNG 的透明通道不再透出游戏。格底为 0.45，人物与文字不整体降透明。`tools/collection_gw2/split_reference_assets.py` 包装 22 张 v2 无字材质，来源、原图及内置 imagegen 编辑提示保存在 `design_refs/collection_gw2_v2/`。底图为连续无分栏的材质，不带头像空块、袋子分格或底栏接缝；代码统一绘制全宽 60px 标题、y60–718 的 70px 侧栏和全宽底栏。标题基础左边距为 20px；关闭按钮统一使用已有 `collection_gw2_v2/close.png` 的 X 图片，20px 图片居中放在 32px 点击区内，不使用会被省略的字体符号。左侧为 62px 纯图标按钮，40px 图标居中，选中框内缩 2px。格底只截取原图空格内侧，排除原边框，正常框线仅绘制一层低对比细线。
+收藏界面由 `collection_gw2.js/css` 和 `collection_gw2_data.js` 独立提供，当前画布为 760 × 410。窗口及提示框的缩放仍参考原来的 1200 × 778，使同一分辨率下占屏面积约为旧版的 33.4%，而不会因画布缩小再次撑满屏幕。网格改为六列，头像从 70px 放大到 100px，格子为 104px、间距为 8px；窗口显示完整两行，其余条目通过滚动查看。只为真实条目创建格子，40 项就是 40 格，不补齐末行；未拥有但已配置的角色继续显示，搜索无结果和老婆空栏均为零格。
+
+顶部“收藏”、窄三图标选单和底部抽取按钮保留平面风格；窗口和背景采用不透明 `#171e24` 衬底，背景节点透明度为 1，原 PNG 的透明通道不透出游戏。格底为 0.45，人物与文字不整体降透明。`tools/collection_gw2/split_reference_assets.py` 包装 22 张 v2 无字材质，画布元数据共用 760 × 410 常量；材质仍使用原采样尺寸和哈希，不重画头像或纹理。底图为连续无分栏的材质，不带头像空块、袋子分格或底栏接缝；全宽标题栏为 46px，52px 侧栏位于 y46–354，底栏为 56px。标题左边距为 16px；关闭继续使用已有 `collection_gw2_v2/close.png` 的 20px X 图片和 32px 点击区。左侧为 44px 纯图标按钮，36px 图标居中，选中框内缩 2px。格底只截取原图空格内侧，正常框线仅绘制一层低对比细线。提示框在紧凑窗口内限制高度，长说明内部滚动；卡片因滚动或缩放移动时隐藏旧提示，关闭和重载取消其跟踪定时器。
 
 `build_scope.cjs`、`compile.ps1 -CheckOnly`、`preview.cjs`、`acceptance.cjs`、`capture.cjs` 和实际 `compile.ps1` 负责限定编译、隔离预览与最终截图。本版只编译收藏 JS、data、CSS、资源预载 XML 和 22 个 v2 PNG；原 HUD、导航、存档控制器及抽取业务不在重编范围。`collection_nav.js` 继续扩展原 HUD 入口。旧 `split_assets.py`、v1 参考和材质保留供历史交付及抽奖皮肤使用，不要执行旧拆分脚本覆盖当前 v2 数据。六种预览尺寸含原图 815 × 528；底栏边界、装饰透明度、细框和 Tooltip 前景遮挡均单独核对，输出位于 `design_refs/collection_gw2_v2/work/`。
+
+收藏编译的 `-SourceRoot` 默认是 `panorama/src`，也可指定工作区内经过审阅的完整源码快照，资源范围和 PNG 哈希检查不变。有其他工作修改同一文件时，以本次提交的源码快照编译，保留工作区原改动；编译报告记录实际来源及产物哈希。
 
 “我的前女友”沿用 `ex`，“我的前男友”沿用原男性角色 `friend` 池、持有数量及票券；头像使用现有 `archive_portraits_v3`，不重新生成角色。“我的老婆”按用户选择保留空栏、禁用抽取且不向服务器发送未配置类别请求。旧存档 `SelectCategory('ex'/'friend')` 转到收藏。抽取使用原 `survival_archive_social_draw`，回执 `survival_archive_social_result` 关联 pool/request_id 及档案版本；未确认意图跨选单、闭窗和重载保留，同一意图不生成第二个交易编号。其他确认弹窗继续拦截跨菜单导航。
 
 收藏导航入口单独使用 `tools/collection_gw2/entry_compile.ps1 -CheckOnly` 和实际 `entry_compile.ps1`，只编译 `collection_nav.js`、`collection.svg` 两项；保存备份并核对原顶部导航源码、产物及 HUD XML 的哈希。`entry_preview.cjs` 加载活动顶部导航与收藏源码，`entry_capture.cjs` 验证六种尺寸的真实鼠标命中、开关、分类和重载。截图与报告位于 `design_refs/collection_gw2_v2/work/entry_final/`，编译报告为 `work/entry_compile.json`。浏览器原生 HUD 占位和数据样例有明确标记，不连接游戏服务器，也不等同于客户端实机截图。
 
-背景不透底与窗口角落控件的复核使用 `node tools/collection_gw2/entry_preview.cjs`，再运行 `node tools/collection_gw2/entry_capture.cjs --opaque`，输出至 `work/opaque_final/`；验证两种底层纯色下窗口内部像素完全相同、窗口外像素实际变化，以及标题左边距、图片解码和鼠标点击 X 关闭。
+紧凑窗口复核使用 `node tools/collection_gw2/entry_preview.cjs`，再运行 `node tools/collection_gw2/entry_capture.cjs --compact`，输出至 `work/compact_final/`；对照旧窗口的实测面积和头像像素，验证真实滚轮到达第 40 项、卡片命中、提示框、搜索和空栏，以及两种底层纯色下窗口内部像素不变、图片解码和鼠标点击 X 关闭。上一版不透底证据保留在 `work/opaque_final/`。
 
 每日登录当前执行 `daily_remaining_5d5c1152eb.js`，由 `daily_gw2_data.js` 和 `daily_gw2.css` 提供独立外壳。`tools/daily_gw2/split_assets.py` 从 imagegen 生成的无字底板及控件图集中拆出 19 个组件，正式 PNG、源图与提示分别保存在 `art/ui/sources/custom_game/daily_gw2_v1/`、`design_refs/daily_gw2_v1/`。先运行拆分、`build_scope.cjs` 和 `compile.ps1 -CheckOnly`，再执行 `preview.cjs`、`acceptance.cjs` 与实际 `compile.ps1`；最终视觉刷新用 `capture.cjs`，输出位于该参考目录的 `work/`。
 
