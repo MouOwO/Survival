@@ -517,7 +517,7 @@ function M.daily_claim(player_id,target)
     return enqueue(player_id,{id=session_id..":daily:"..target,kind="daily_claim",today=today,target_day=target})
 end
 function M.set_purchase_provider(provider)
-    assert(provider==nil or type(provider.create_order)=="function")
+    assert(provider==nil or type(provider.open_checkout)=="function" or type(provider.create_order)=="function")
     purchase_provider=provider
 end
 
@@ -825,8 +825,10 @@ function M.init()
             bus.emit(events.UI_NOTIFICATION,{player_id=id,level="info",message="月卡购买尚未开放"});return
         end
         serial=serial+1
-        -- Only a server-selected SKU and server-generated order key reach the payment adapter.
-        local ok=pcall(purchase_provider.create_order,id,{sku=rules.pass_entitlement_id,
+        -- Opening checkout does not create a charge. Legacy adapters retain
+        -- their server-generated correlation key; the client cannot pick a SKU.
+        local open_checkout=purchase_provider.open_checkout or purchase_provider.create_order
+        local ok=pcall(open_checkout,id,{sku=rules.pass_sku or rules.pass_entitlement_id,
             request_id=session_id..":pass_order:"..serial},function(result)
             bus.emit(events.UI_NOTIFICATION,{player_id=id,level="info",message=result and result.message or "订单处理中"})
             M.send_daily(id)

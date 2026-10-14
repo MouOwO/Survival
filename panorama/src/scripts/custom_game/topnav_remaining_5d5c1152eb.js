@@ -185,7 +185,16 @@
         return frame;
     }
     // End shared uniform slot outline.
-    function art(parent,id,key) {/* survival unified icon art */var unified={"top_wave":"skill_morale","stat_attack":"broadsword","stat_armor":"platemail","stat_attack_speed":"gloves","stat_strength":"reaver","stat_agility":"swift_blink","stat_intelligence":"arcane_blink"};if(unified[key]){var refined=create("Image",parent,id,false);refined.SetImage("file://{images}/spellicons/survival/native/"+unified[key]+".png");return refined;}if(key==="top_shop_64"){var icon=create("Panel",parent,id,false),handle=create("Panel",icon,"",false),bag=create("Panel",icon,"",false);place(handle,26,18,12,15);style(handle,{border:"2px solid #e3ded0",borderRadius:"6px 6px 0px 0px"});place(bag,21,29,22,20);style(bag,{border:"2px solid #e3ded0",borderRadius:"2px"});return icon;}if(key==="slot_frame")return uniformSlotFrame(parent,id);if(key==="top_population"){var food=create("Image",parent,id,false);food.SetImage("file://{images}/custom_game/survival/food_population.png");return food;}if(key==="top_gold"||key==="top_wood"){
+    function art(parent,id,key) {
+        // Dedicated transparent wave marker; morale remains a separate skill icon.
+        if(key==="top_wave"){
+            var beast=create("Image",parent,id,false);
+            beast.SetImage("s2r://panorama/images/custom_game/topnav_reference_v2/wave_beast_v2.vtex");
+            if(beast.SetScaling)beast.SetScaling("stretch-to-fit-preserve-aspect");
+            style(beast,{backgroundColor:"transparent",border:"0px solid transparent"});
+            return beast;
+        }
+        /* survival unified icon art */var unified={"top_wave":"skill_morale","stat_attack":"broadsword","stat_armor":"platemail","stat_attack_speed":"gloves","stat_strength":"reaver","stat_agility":"swift_blink","stat_intelligence":"arcane_blink"};if(unified[key]){var refined=create("Image",parent,id,false);refined.SetImage("file://{images}/spellicons/survival/native/"+unified[key]+".png");return refined;}if(key==="top_shop_64"){var icon=create("Panel",parent,id,false),handle=create("Panel",icon,"",false),bag=create("Panel",icon,"",false);place(handle,26,18,12,15);style(handle,{border:"2px solid #e3ded0",borderRadius:"6px 6px 0px 0px"});place(bag,21,29,22,20);style(bag,{border:"2px solid #e3ded0",borderRadius:"2px"});return icon;}if(key==="slot_frame")return uniformSlotFrame(parent,id);if(key==="top_population"){var food=create("Image",parent,id,false);food.SetImage("file://{images}/custom_game/survival/food_population.png");return food;}if(key==="top_gold"||key==="top_wood"){
  var resource=create("Panel",parent,id,false);
  function part(x,y,w,h,values){var q=create("Panel",resource,"",false);place(q,x,y,w,h);style(q,values);return q;}
  if(key==="top_gold"){

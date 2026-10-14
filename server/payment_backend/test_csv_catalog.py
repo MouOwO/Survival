@@ -1,7 +1,7 @@
 import copy
 from pathlib import Path
 import unittest
-from .csv_catalog import build,compile_catalog,SOURCES
+from .csv_catalog import build,compile_catalog,rows,SOURCES
 
 ROOT=Path(__file__).resolve().parents[2]
 class CatalogTests(unittest.TestCase):
@@ -30,9 +30,36 @@ class CatalogTests(unittest.TestCase):
 
     def test_money_is_exact_fen(self):
         self.tables['payment_products']=self.tables['payment_products'].replace('50.00','7.77')
-        self.assertTrue(all(p['amount']==777 for p in self.compile()['products']))
+        self.assertTrue(all(p['amount']==777 for p in self.compile()['products'] if p['sku']!='archive_pass_monthly'))
         self.tables['payment_products']=self.tables['payment_products'].replace('7.77','7.777')
         with self.assertRaises(ValueError):self.compile()
+    def test_monthly_pass_price_duration_and_no_invented_rewards(self):
+        p=next(p for p in self.package['catalog']['products'] if p['sku']=='archive_pass_monthly')
+        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],2000)
+        self.assertEqual(p['purchase_limit'],0)
+        self.assertEqual(p['effects'],{});self.assertEqual(p['grants']['items'],{})
+        self.assertEqual(p['grants']['entitlements'],['archive_pass'])
+        self.assertEqual(p['grants']['entitlement_days'],{'archive_pass':30})
+        self.assertEqual(p['grants']['lines'][0]['duration_days'],30)
+        legacy=next(p for p in self.compile()['products'] if p['sku']=='starter_bundle_v4')
+        self.assertNotIn('entitlement_days',legacy['grants'],'legacy VIP remains permanent')
+    def test_monthly_duration_cannot_be_invalid_or_applied_to_other_rewards(self):
+        original=self.tables['payment_rewards']
+        for old,new in [('签到月卡30天,1,30','签到月卡30天,1,0'),
+                        ('签到月卡30天,1,30','签到月卡30天,1,'),
+                        ('签到月卡30天,1,30','签到月卡30天,1,1.5'),
+                        ('签到月卡30天,1,30','签到月卡30天,1,366'),
+                        ('entitlement,archive_pass','entitlement,vip'),
+                        ('stat,initial_wood,100,初始木材,1,','stat,initial_wood,100,初始木材,1,30')]:
+            with self.subTest(new=new):
+                self.tables['payment_rewards']=original.replace(old,new)
+                with self.assertRaises(ValueError):self.compile()
+    def test_daily_entry_agrees_with_the_authoritative_monthly_product(self):
+        rule=rows((ROOT/'data/csv/存档系统/archive_daily_rules.csv').read_text(encoding='utf-8-sig'))[0]
+        product=next(p for p in self.package['catalog']['products'] if p['sku']==rule['pass_sku'])
+        self.assertEqual(rule['purchase_enabled'],'1')
+        self.assertEqual(rule['price_text'],'20元');self.assertEqual(product['amount'],2000)
+        self.assertEqual(int(rule['duration_days']),product['grants']['entitlement_days'][rule['pass_entitlement_id']])
     def test_unknown_or_unimplemented_rewards_fail_whole_catalog(self):
         for old,new in [('stat,initial_wood','stat,imaginary_buff'),('entitlement,vip','entitlement,admin'),
                         ('item,special_lottery_ticket','item,lottery_ticket'),('item,special_lottery_ticket,10','item,lottery_monkey_king,1')]:

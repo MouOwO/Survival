@@ -11,7 +11,7 @@ COMMERCE_SOURCES = tuple('商城兑换系统/' + name + '.csv' for name in COMME
 COMMERCE_CURRENCIES = {'u_coin', 'shop_points', 'shop_gold'}
 PRODUCT_FIELDS = ('sku', 'display_name', 'category_id', 'product_type', 'price_yuan',
                   'purchase_limit', 'enabled', 'sort_order', 'icon', 'description', 'ownership_id')
-REWARD_FIELDS = ('reward_id', 'sku', 'reward_type', 'target_id', 'amount', 'display_name', 'enabled')
+REWARD_FIELDS = ('reward_id', 'sku', 'reward_type', 'target_id', 'amount', 'display_name', 'enabled', 'duration_days')
 
 
 def ucoin_amount_fen(price):
@@ -24,7 +24,7 @@ def csv_text(records, fields):
     output = io.StringIO()
     writer = csv.DictWriter(output, fieldnames=fields)
     writer.writeheader()
-    writer.writerows({key: row[key] for key in fields} for row in records)
+    writer.writerows({key: row.get(key,'') for key in fields} for row in records)
     return output.getvalue()
 
 

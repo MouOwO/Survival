@@ -10,7 +10,7 @@ $taskRelativeFiles+=Get-ChildItem (Join-Path $taskRepo 'panorama/src/images/cust
 foreach($taskPrefix in @('friend','ex')) {for($taskIndex=1;$taskIndex -le 40;$taskIndex++){
  $taskId=$taskPrefix+'_'+('{0:d2}' -f $taskIndex)
  $taskRelativeFiles+='images/custom_game/archive_portraits_v3/'+$taskId+'.png'
- $taskRelativeFiles+='images/custom_game/archive_gpu_regular/head_v3_'+$taskId+'.vtex'
+ $taskRelativeFiles+='images/custom_game/archive_gpu_regular/head_v4_'+$taskId+'.vtex'
 }}
 foreach($taskRelative in $taskRelativeFiles){
  $taskDestination=Join-Path $taskContent $taskRelative
@@ -26,6 +26,8 @@ foreach($taskRelative in ($taskRelativeFiles | Where-Object {$_ -like '*.vtex'})
  $taskCompleted++
  if($taskCompleted % 10 -eq 0){Write-Output ('PORTRAIT_TEXTURES '+$taskCompleted+'/80')}
 }
+& node (Join-Path $PSScriptRoot 'audit_archive_portrait_textures.cjs') --version v4 | Out-Null
+if($LASTEXITCODE -ne 0){throw 'Formal portrait texture byte audit failed.'}
 foreach($taskLayout in @('archive','survival_hud')){
  $taskResult=@(& $taskCompiler -i (Join-Path $taskContent ('layout/custom_game/'+$taskLayout+'.xml')) -game (Join-Path $taskEngine 'game/dota') -f -nop4 2>&1)
  $taskExit=$LASTEXITCODE

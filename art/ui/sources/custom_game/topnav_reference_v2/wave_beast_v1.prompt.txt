@@ -1,0 +1,4 @@
+Mode: built-in image_gen; transparent_background=true.
+Generated master: 1254x1254 RGBA, retained without raster editing.
+Prompt:
+Single game HUD asset: an original Warcraft-inspired horned beast HEAD icon only, frontal three-quarter horned wolf-ogre monster, brown fur, ivory horns and fangs, orange eyes, hand-painted fantasy game style, bold readable silhouette and simple sharp features that remain recognizable at 36px, medium bright face and light edges readable over terrain. Centered square composition, full horns and chin visible with transparent margins. Actual transparent RGBA background. No black backdrop, no square panel, no frame, no text, no torso, no other objects. Intended high-resolution 1024x1024 master.

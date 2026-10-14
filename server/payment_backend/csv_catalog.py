@@ -69,7 +69,7 @@ def compile_catalog(tables,reference, *, max_products=100):
         markers.add(marker)
         icon=p['icon']
         if '..' in icon or not re.fullmatch(r'custom_game/[a-zA-Z0-9_/-]+\.png',icon):raise ValueError(sku+': 图标路径不正确')
-        effects={};inventory={};limits={};entitlements=[];lines=[]
+        effects={};inventory={};limits={};entitlements=[];entitlement_days={};lines=[]
         def add(field,value):
             rule=stats.get(field)
             if not rule or not flag(rule['enabled']) or field in {'online_seconds_total','vip_level','vip_recharge_total_fen'}:raise ValueError(sku+': 不支持的属性 '+field)
@@ -82,6 +82,9 @@ def compile_catalog(tables,reference, *, max_products=100):
         if not selected:raise ValueError(sku+': 商品没有奖励')
         for r in selected:
             kind,target=r['reward_type'],r['target_id']
+            duration=r.get('duration_days','')
+            if duration and (kind!='entitlement' or target!='archive_pass'):
+                raise ValueError(sku+': 仅签到月卡权限支持有效期')
             amount=number(r['amount'],kind!='stat',0.000001,1000000)
             if not ID.fullmatch(target):raise ValueError(sku+': 奖励目标无效')
             if kind=='stat':add(target,amount)
@@ -103,8 +106,13 @@ def compile_catalog(tables,reference, *, max_products=100):
                 if target not in SUPPORTED_ENTITLEMENTS or target not in permissions or not flag(permissions[target]['enabled']) or amount!=1 or target in entitlements:
                     raise ValueError(sku+': 权限不存在、重复或数量不是1 '+target)
                 entitlements.append(target)
+                if target=='archive_pass' and number(p['purchase_limit'],True,0,10000)==0 and not duration:
+                    raise ValueError(sku+': 可续费月卡必须设置有效期，不能发布为永久权益')
+                if duration:entitlement_days[target]=number(duration,True,1,365)
             else:raise ValueError(sku+': 未支持的奖励类型 '+kind)
-            lines.append(dict(kind=kind,id=target,quantity=amount,label=r['display_name'] or target))
+            line=dict(kind=kind,id=target,quantity=amount,label=r['display_name'] or target)
+            if duration:line['duration_days']=entitlement_days[target]
+            lines.append(line)
         if marker in inventory:raise ValueError(sku+': 持有标记不能兼作礼包道具')
         # Follow the existing settlement's map-level derived fields.
         if effects.get('map_level'):
@@ -115,6 +123,7 @@ def compile_catalog(tables,reference, *, max_products=100):
             purchase_limit=number(p['purchase_limit'],True,0,10000),category_id=p['category_id'],product_type=p['product_type'],icon=icon,
             grants=dict(items=inventory,item_limits=limits,entitlements=entitlements,lines=lines,
                 effect_labels={field:re.split('[；。]',stats[field]['notes'])[0] or field for field in effects})))
+        if entitlement_days:result[-1]['grants']['entitlement_days']=entitlement_days
     if len(result)>max_products or not any(x['enabled'] for x in result):raise ValueError(f'需有启用商品，最多{max_products}项')
     return dict(protocol=4,categories=category_rows,products=sorted(result,key=lambda x:x['sort_order']))
 

@@ -55,6 +55,9 @@ def apply(conn,package):
     from psycopg.types.json import Jsonb
     catalog=package['catalog'];conn.execute('SET ROLE goufayu_owner')
     conn.execute("SELECT pg_advisory_xact_lock(hashtext('payments.catalog.publish'))")
+    if any(p['grants'].get('entitlement_days') for p in catalog['products']):
+        if not conn.execute("SELECT to_regprocedure('payments.entitlement_days(jsonb,text)') IS NOT NULL").fetchone()[0]:
+            raise ValueError('时限月卡尚未部署：先验证并应用 upgrade_monthly_pass.sql，禁止按永久权限发布')
     conn.execute('UPDATE payments.products SET enabled=false')
     for p in catalog['products']:
         previous=conn.execute('SELECT item_id FROM payments.products WHERE sku=%s',(p['sku'],)).fetchone()

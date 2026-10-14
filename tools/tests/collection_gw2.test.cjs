@@ -63,7 +63,7 @@ assert.equal(api.Inspect().rows.length,0,'Partial server pages cannot show incom
 emit({...packet('ex',10,pieces[1]),chunk:2,chunks:4});
 assert.equal(api.Inspect().rows.length,40);assert.equal(api.Inspect().slots,api.Inspect().rows.length);assert(nodes.CollectionGW2Draw.enabled);
 assertOnePage('ex');
-assert.equal(images(nodes.CollectionGW2Item_ex_01)[0].image,'s2r://panorama/images/custom_game/archive_gpu_regular/head_v3_ex_01.vtex','The current formal portrait replaces the old heads catalog');
+assert.equal(images(nodes.CollectionGW2Item_ex_01)[0].image,'s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_01.vtex','The current filtered formal portrait replaces the old heads catalog');
 assert.equal(nodes.CollectionGW2GridBody.Children().length,rows.length);assert(nodes.CollectionGW2GridBody.Children().every(card=>card.__collectionItem),'No empty placeholder cells are created');
 const cells=nodes.CollectionGW2GridBody.Children().slice(),created=h.counts.created;
 for(let i=11;i<41;i++)snapshot('ex',i,rows);
@@ -73,7 +73,7 @@ nodes.CollectionGW2Item_ex_01.events.onmouseover();h.flushFinite();assert(api.In
 nodes.CollectionGW2Search.text='胡桃';nodes.CollectionGW2Search.events.ontextentrychange();assert.equal(api.Inspect().rows.length,1);assert.equal(api.Inspect().slots,api.Inspect().rows.length);assert(!api.Inspect().tooltipVisible);
 nodes.CollectionGW2Search.text='不存在';nodes.CollectionGW2Search.events.ontextentrychange();assert.equal(api.Inspect().rows.length,0);assert.equal(api.Inspect().slots,0);assert.equal(nodes.CollectionGW2Empty.text,'没有找到匹配的收藏');
 nodes.CollectionGW2Search.text='';nodes.CollectionGW2Search.events.ontextentrychange();
-snapshot('friend',42,friendRows);api.Select('friend');assert.equal(api.Inspect().rows.length,40);assert.equal(nodes.CollectionGW2Category.text,'我的前男友');assert(images(nodes.CollectionGW2Item_friend_01)[0].image.includes('head_v3_friend_01'));
+snapshot('friend',42,friendRows);api.Select('friend');assert.equal(api.Inspect().rows.length,40);assert.equal(nodes.CollectionGW2Category.text,'我的前男友');assert(images(nodes.CollectionGW2Item_friend_01)[0].image.includes('head_v4_friend_01'));
 assertOnePage('friend');
 api.Select('ex');h.click(nodes.CollectionGW2Draw);const first=api.Inspect().pending;assert(first&&first.pool_id==='ex');assert.equal(draws().length,1);nodes.CollectionGW2Draw.events.onactivate();assert.equal(draws().length,1,'Double clicks share one draw intent');
 api.Select('friend');assert(!nodes.CollectionGW2Draw.enabled,'The pending intent also guards the other pool');api.Close();api.Open('friend');assert(!nodes.CollectionGW2Draw.enabled,'Reopening cannot spend again while a draw is unresolved');
@@ -109,4 +109,4 @@ h.flushFinite();assert.equal(draws().length,overwrittenDraws+1,'No polling cycle
 ack(overwritten,{ok:true,revision:90,duplicate:true});snapshot('ex',73,acquired,{revision:90,last_draw:{id:'later-beast-draw',pool_id:'beast',name:'散魂钟'}});assert.equal(api.Inspect().pending,null,'Idempotent duplicate ACK and current revision recover an overwritten last_draw');
 h.click(nodes.CollectionGW2Draw);const beforeCancelled=draws().length;api.Close();api.Open('ex');api.Close();h.flushFinite();assert.equal(draws().length,beforeCancelled,'Closing cancels the lifecycle recovery timer');api.Open('wife');h.flushFinite();assert.equal(draws().length,beforeCancelled,'The unconfigured wife page never replays another pool');
 h.assertCleanDispose(api);
-console.log('COLLECTION_GW2_PASS: independent inventory, real item cards only, formal v3 portraits, search, wife empty, chunk/delta/stale recovery, no hidden rebuild, request/ACK authority, retry-safe hot reload and closure');
+console.log('COLLECTION_GW2_PASS: independent inventory, real item cards only, filtered v4 portrait textures, search, wife empty, chunk/delta/stale recovery, no hidden rebuild, request/ACK authority, retry-safe hot reload and closure');

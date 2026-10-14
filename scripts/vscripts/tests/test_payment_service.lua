@@ -2,6 +2,8 @@ package.path='scripts/vscripts/?.lua;'..package.path
 -- Commerce has its own scheduler/runtime tests; this fixture tests the
 -- authenticated payment transport without starting an unrelated game loop.
 package.loaded['systems/commerce_service']={init=function() end}
+local pass_provider
+package.loaded['systems/archive_service']={set_purchase_provider=function(value)pass_provider=value end}
 local handlers,sent,requests={},{},{}
 local loaded=true
 local refreshed=0
@@ -138,3 +140,24 @@ assert(#sent==replies,'late result from another session must not release or over
 requests[#requests].done({StatusCode=200,Body='{"ok":true,"catalog_hash":"new","products":[]}'})
 assert(sent[#sent].request_id=='third_session' and sent[#sent].catalog_hash=='new')
 print('PAYMENT_CATALOG_SERVICE_PASS: coalescing, rate-limit cache, expiry, identity/session isolation, correlation, ownership refresh')
+
+-- Opening a pass from the daily panel enters confirmation without submitting
+-- an order, using only the server-configured product and authenticated player.
+local pass_rules=require('config/generated/archive_daily_rules').by_id.default
+assert(pass_provider and type(pass_provider.open_checkout)=='function')
+local before_checkout=#requests
+local result
+assert(pass_provider.open_checkout(0,{sku=pass_rules.pass_sku,amount_fen=1,account_id='attacker'},function(value)result=value end))
+assert(result.ok and sent[#sent].sku=='archive_pass_monthly')
+assert(#requests==before_checkout,'opening the monthly confirmation cannot create a payment intent')
+assert(not pass_provider.open_checkout(0,{sku='forged_product'},function(value)result=value end) and not result.ok)
+loaded=false
+assert(not pass_provider.open_checkout(0,{sku=pass_rules.pass_sku},function(value)result=value end))
+loaded=true
+assert(not pass_provider.open_checkout(-1,{sku=pass_rules.pass_sku}))
+local get_token=Convars.GetStr
+Convars.GetStr=function()return '' end
+assert(not pass_provider.open_checkout(0,{sku=pass_rules.pass_sku}))
+Convars.GetStr=get_token
+assert(#requests==before_checkout,'invalid checkout entries cannot contact the gateway')
+print('MONTHLY_CHECKOUT_SERVICE_PASS: trusted SKU and player, profile/token validation, confirmation creates no order')

@@ -1,4 +1,4 @@
-"""Install individually generated portrait masters and explicit 256px game textures.
+"""Install original portrait masters and explicit 256px, filtered v4 game textures.
 No reward IDs or gameplay data are modified. Input: built-in imagegen receipts JSON.
 """
 import csv, hashlib, json, re, shutil, struct, sys
@@ -10,7 +10,22 @@ assert len(receipts)==80 and {r['id'] for r in receipts}==expected, 'Require all
 masters=ROOT/'panorama/src/images/custom_game/archive_portraits_v3'
 textures=ROOT/'panorama/src/images/custom_game/archive_gpu_regular'
 masters.mkdir(parents=True,exist_ok=True)
-template=(textures/'head_v2_friend_01.vtex').read_text(encoding='utf8')
+def portrait_texture_recipe(identity):
+    # Native compilation scales only its internal texture, preserving the PNG.
+    # Dota requires a power-of-two input before it can build Box minification mips.
+    return f'''<!-- dmx encoding keyvalues2_noids 1 format vtex 1 -->
+"CDmeVtex"
+{{
+"m_inputTextureArray" "element_array" [ "CDmeInputTexture" {{ "m_name" "string" "0" "m_fileName" "string" "panorama/images/custom_game/archive_portraits_v3/{identity}.png" "m_colorSpace" "string" "srgb" "m_typeString" "string" "2D" "m_imageProcessorArray" "element_array" [ "CDmeImageProcessor" {{ "m_algorithm" "string" "ScaleToPowerOfTwo" "m_stringArg" "string" "" "m_vFloat4Arg" "vector4" "0 0 0 0" }} ] }} ]
+"m_outputTypeString" "string" "2D"
+"m_outputFormat" "string" "BGRA8888"
+"m_outputClearColor" "vector4" "0 0 0 0"
+"m_nOutputMinDimension" "int" "0"
+"m_nOutputMaxDimension" "int" "256"
+"m_bNoLod" "bool" "1"
+"m_textureOutputChannelArray" "element_array" [ "CDmeTextureOutputChannel" {{ "m_inputTextureArray" "string_array" [ "0" ] "m_srcChannels" "string" "rgba" "m_dstChannels" "string" "rgba" "m_mipAlgorithm" "CDmeImageProcessor" {{ "m_algorithm" "string" "Box" "m_stringArg" "string" "" "m_vFloat4Arg" "vector4" "0 0 0 0" }} "m_outputColorSpace" "string" "srgb" }} ]
+}}
+'''
 results={}
 for row in receipts:
     identity=row['id']
@@ -22,10 +37,9 @@ for row in receipts:
     width,height=struct.unpack('>II',blob[16:24])
     assert min(width,height)>=512, 'Master too small: '+identity
     target=masters/(identity+'.png');shutil.copyfile(source,target)
-    texture=template.replace('custom_game/archive_heads_v2/friend_01.png','custom_game/archive_portraits_v3/'+identity+'.png')
-    (textures/('head_v3_'+identity+'.vtex')).write_text(texture,encoding='utf8')
+    (textures/('head_v4_'+identity+'.vtex')).write_text(portrait_texture_recipe(identity),encoding='utf8')
     results[identity]={'id':identity,'icon_path':'custom_game/archive_portraits_v3/'+identity+'.png',
-        'runtime_uri':'s2r://panorama/images/custom_game/archive_gpu_regular/head_v3_'+identity+'.vtex',
+        'runtime_uri':'s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_'+identity+'.vtex',
         'source_width':width,'source_height':height,'sha256':hashlib.sha256(blob).hexdigest(),
         'prompt':row['prompt'],'generator':'built-in image_gen','original_file':str(source)}
 # Update only visual rows, keeping the original identity/name and effect mappings.
@@ -54,4 +68,4 @@ for row in entries:
 assert updated==80
 path.write_text(source[:start]+json.dumps(entries,ensure_ascii=False,separators=(',',':'))+source[start+consumed:],encoding='utf8')
 (ROOT/'data/ui/archive_portraits_v3.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
-print('ARCHIVE_PORTRAITS_V3_IMPORTED: 80 untouched masters, 80 separate 256px BGRA textures, 80 identity mappings; official artifacts retained')
+print('ARCHIVE_PORTRAITS_V3_IMPORTED: 80 untouched masters, 80 separate v4 256px BGRA textures with Box mips and NO_LOD, 80 identity mappings; official artifacts retained')

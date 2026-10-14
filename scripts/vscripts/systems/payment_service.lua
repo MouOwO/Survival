@@ -177,10 +177,37 @@ function M.reset_player(context, kind)
     if ok then notify(context.player_id,"正在核对订单并清理远端测试数据，请等待完成提示…") end
     return ok,err
 end
+function M.open_pass_checkout(id, selection, done)
+    local function finish(ok,message)
+        if done then done({ok=ok,message=message}) end
+        return ok
+    end
+    if not id or id~=math.floor(id) or not PlayerResource:IsValidPlayerID(id) or PlayerResource:IsFakeClient(id) then
+        return finish(false,"玩家尚未进入对局")
+    end
+    local rules=require("config/generated/archive_daily_rules").by_id.default
+    if not rules.purchase_enabled or not valid_sku(rules.pass_sku) or not selection or selection.sku~=rules.pass_sku then
+        return finish(false,"月卡商品尚未开放")
+    end
+    local provider=profiles.get_provider()
+    if not provider or not provider.resolve_account_id(id) or not profiles.get_profile(id) or not session_id() then
+        return finish(false,"请先进入对局，等待存档加载")
+    end
+    if tostring(Convars:GetStr("survival_fishing_api_token") or "")=="" then
+        return finish(false,"支付服务尚未配置")
+    end
+    local player=PlayerResource:GetPlayer(id)
+    if not player then return finish(false,"玩家连接已断开，请重试") end
+    -- The catalog supplies the authenticated price. A financial order is only
+    -- created by the player's subsequent purchase action in this confirmation.
+    CustomGameEventManager:Send_ServerToPlayer(player,"survival_payment_open",{sku=rules.pass_sku})
+    return finish(true,"请核对月卡价格并选择支付方式")
+end
 function M.init()
     if initialized then return end
     initialized=true
     require("systems/commerce_service").init()
+    require("systems/archive_service").set_purchase_provider({open_checkout=M.open_pass_checkout})
     CustomGameEventManager:RegisterListener("survival_payment_request",function(_,payload) M.handle(payload or {}) end)
     require("debug/payment_test_commands").init()
 end

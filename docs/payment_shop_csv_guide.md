@@ -4,6 +4,30 @@
 
 **特殊抽奖券购买入口**：特殊奖池的券数量旁“＋”按钮，或“商城 → 道具与材料 → 特殊抽奖券 ×1”。点击后先显示商品确认页，选择微信或支付宝，再点击对应的“购买 ¥50.00”。微信在游戏内显示付款码；支付宝当前需主动点击打开官方收银台，开通扫码权限并启用后也会在游戏内显示付款码，详见 [内置二维码说明](payments/alipay_native_qr_20260930.md)。每次支付获得 `special_lottery_ticket` ×1，可重复购买。商品 ID 为 `special_lottery_ticket_single`，商品表 `price_yuan=50.00`、`purchase_limit=0`，奖励表为 `item,special_lottery_ticket,1`。普通地图抽奖券仍由玩法产出。
 
+**签到月卡配置（2026-10-14）**：签到面板的“开通20元／续费20元”进入 `archive_pass_monthly` 的确认页，价格 **20 元／30 天**。打开确认页不创建支付订单；玩家选择支付方式并点击购买后，既有支付服务才按服务端价格 **2000 分**下单。月卡权益为 `archive_pass`；实际付款验签、金额核对、发放及存档刷新继续走原支付链路。有效月卡续费保留剩余天数，再增加 30 个 24 小时；到期或撤销后重新开通从付款发放时起算。旧永久 VIP 和永久月卡不改写；永久月卡禁止重复购买。代码验证和目录发布不代表真实付款验收。
+
+月卡上线必须先更新支付代码和时限发放函数，再发布商品。直接改客户端按钮、只同步 CSV 或重跑旧 `upgrade_csv_shop.sql` 都不能安装时限权益。按已有命名支付版本流程执行：
+
+1. 本地运行 `python tools/build_payment_catalog.py --output output/payment_catalog.json`；运行月卡 CSV、发布门禁、Lua 和 Panorama 专项。用 `python tools/build_payment_release.py --release-id 20261014-payment01` 打包新的命名版本；该目录必须不存在。打包器自动包含本次 `.py`／`.sql` 和基础定义，不包含密钥。
+2. 把已核对哈希的包放入 `/opt/goufayu/payments/20261014-payment01`，目录 JSON 放入临时路径。调用新版本 [upgrade_monthly_pass.py](../server/payment_backend/upgrade_monthly_pass.py) 的 `validate` 动作，并传目录文件、SHA256 和审阅时 `current` 指向的绝对版本路径。该动作校验命名版本清单与商品包，在**外层回滚事务**中按 `goufayu_owner` 应用 [SQL](../server/payment_backend/upgrade_monthly_pass.sql)、目录和 [数据库专项](../server/payment_backend/test_monthly_pass_database.py)，随后回滚；只使用随机合成账号，包含续费、到期、撤销、金额错误、重复回调、永久 VIP／月卡、订单创建后改价改时长及测试重置。失败时不会发布。
+3. 审阅验证结果后，用相同参数运行 `activate`。它重新验证、运行回滚测试、调用既有 `deploy.backup()` 保存游戏与支付同一快照；随后在锁超时 5 秒的事务中应用 SQL 与目录，核对已有订单／玩家数据哈希未变，再切换命名版本、只重启 `goufayu-payment.service` 并检查健康。账号白名单、凭据、支付渠道配置和游戏服务保留。切换失败时按目录哈希恢复旧目录并恢复旧支付代码；增量时限发放函数保留，以继续正确处理切换期间可能产生的不可变月卡订单。不要运行初次安装 `deploy.activate()` 或旧 CSV 表结构升级。
+4. 核对动作返回 `catalog_hash` 与本地一致。以后改商品可以继续执行 `sync_payment_shop.cmd` 或 `tools/sync_payment_shop.ps1`；新编译器核对完整目录和基础定义。发布门禁检查 `payments.entitlement_days(jsonb,text)` 已存在，缺少升级会在改写任何商品前拒绝发布。只在本地检查时加 `-CheckOnly`。
+5. 同步生成的 `archive_daily_rules.lua`、游戏支付／存档 Lua 与两份 Panorama JS；新对局会注册月卡支付入口。实机核对签到按钮可用、“30天 · 20元”、确认页 `¥20.00`、真实服务器月卡目录和付款后到期日；实际付款由玩家单独执行。本地 UI 通过不代表远端版本已上线。
+
+环境沿用现有配置：游戏服务器仅从 `survival_fishing_api_token` ConVar 取 Bearer token；已有 `tools/aliyun_game_test_auth.py` 注入工具负责本地测试凭据。支付代码由 `/opt/goufayu/payments/current` 提供，服务为 `goufayu-payment.service`；支付渠道和账号许可由 `/etc/goufayu-payment/config.json` 管理，数据库连接沿用 `deploy.connection()` 的 PostgreSQL service/passfile。以上路径来自项目源码／说明，本次没有读取或修改其中的密钥。启用月卡入口不会放宽白名单、支付鉴权或测试重置权限。
+
+部署端命令形式如下（使用新命名目录的 Python 路径；`EXPECTED_CURRENT` 来自审阅过的 `readlink -f /opt/goufayu/payments/current`，不接受运行过程中自动更新该预期）：
+
+```sh
+NEW_RELEASE=/opt/goufayu/payments/20261014-payment01
+"$NEW_RELEASE/.venv/bin/python" "$NEW_RELEASE/payment_backend/upgrade_monthly_pass.py" \
+  validate "$CATALOG_PATH" "$CATALOG_SHA256" "$EXPECTED_CURRENT"
+"$NEW_RELEASE/.venv/bin/python" "$NEW_RELEASE/payment_backend/upgrade_monthly_pass.py" \
+  activate "$CATALOG_PATH" "$CATALOG_SHA256" "$EXPECTED_CURRENT"
+```
+
+新目录的 `.venv` 沿用既有命名版本环境，不能链接经过 `current`。脚本不会调用支付网关建单；`gateway_orders_created=0`。目录激活会启用可购买商品，实际付款仍必须由玩家点击购买并付款。
+
 ## 最简单的操作
 
 1. 用 Excel/WPS 打开 `data/csv/商城支付系统/payment_products.csv`，修改商品名、价格或上下架。
@@ -65,6 +89,7 @@
 | `amount` | 属性增加值或物品数量；权限固定填 `1`。必须大于 0。 |
 | `display_name` | 奖励清单显示名称，如“初始木材”。 |
 | `enabled` | `1` 发放这行奖励；`0` 停用这行。商品必须至少有一项启用奖励。 |
+| `duration_days` | 仅 `entitlement,archive_pass` 可填写整数 `1`～`365`；月卡填 `30`。空值保持原永久权限语义，属性／道具／VIP 权限不得填写。时长随订单奖励快照保存，后续改表不改变已下单权益。 |
 
 目前五个属性的 ID：
 

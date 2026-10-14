@@ -163,8 +163,8 @@ function render(){
  p("DailyClaimText").text=busy?"领取中…":errorText&&ready.enabled?"重试领取":ready.text;U.State.Set(p("DailyClaim"),{enabled:ready.enabled&&!busy,busy:busy});
  U.State.Set(p("DailyMakeup"),{enabled:pass&&array(data.missed).length>0&&!busy});p("DailyMakeup").visible=pass&&array(data.missed).length>0;
  p("PassValidity").text=pass?"战令已解锁":"购买战令后解锁";
- var expiry=Number(data.expires_at),until=expiry>0?new Date((expiry+8*3600)*1000):null;p("PassPrice").text=pass?(until?"有效至 "+until.getUTCFullYear()+"/"+(until.getUTCMonth()+1)+"/"+until.getUTCDate():"权益已生效"):(data.duration_days?data.duration_days+"天 · ":"")+(data.price||"价格待配置");
- p("PassPurchaseText").text=Number(data.purchase_enabled)===1?(pass?"续费战令":"购买战令"):"购买暂未开放";U.State.Set(p("PassPurchase"),{enabled:Number(data.purchase_enabled)===1&&!busy});
+ var expiry=Number(data.expires_at),until=expiry>0?new Date((expiry+8*3600)*1000):null;p("PassPrice").text=(data.duration_days?data.duration_days+"天 · ":"")+(data.price||"价格待配置")+(pass?(until?" · 有效至 "+until.getUTCFullYear()+"/"+(until.getUTCMonth()+1)+"/"+until.getUTCDate():" · 权益已生效"):"");
+ p("PassPurchaseText").text=(pass?"续费":"开通")+(data.price||"月卡");U.State.Set(p("PassPurchase"),{enabled:Number(data.purchase_enabled)===1&&!busy});
  p("DailyRulesBody").text=escapedLines((data.rule_text||"奖励以服务端配置为准")+"\n补签范围：最近"+(data.makeup_days||30)+"天，需有效战令。\n"+array(data.specials).map(function(s){return "累计"+s.day+"次："+s.name+"；"+s.description;}).join("\n"));
  renderCards();renderSpecials();paintActions();setStatus(errorText||(busy?"正在等待服务端保存，请勿重复提交。":data.calendar28?"每日零点刷新，断签不重置累计进度。":"28日奖励视图待同步，当前展示已配置奖励。"));
 }
