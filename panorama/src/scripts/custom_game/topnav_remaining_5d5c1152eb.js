@@ -394,19 +394,35 @@
     });
     function layoutStats(g) {
         stats.forEach(function(a,i){
-            var x=i<3?306:g.attributeX+14,y=32+(i%3)*98;
-            var rowWidth=Math.max(0,i<3?g.heroWidth-x-12:g.attributeWidth-28);
+            var x=i<3?301:g.attributeX+8,y=32+(i%3)*98;
+            var rowWidth=Math.max(0,i<3?g.heroWidth-293-16:g.attributeWidth-16);
             if(g.lumberjack && (i===0 || i===2)) {
                 x=g.heroWidth+(i===0?24:g.centerWidth/2+12);y=185;rowWidth=g.centerWidth/2-36;
             }
-            var iconSize=64,textX=72,textWidth=Math.max(40,rowWidth-textX);
-            place(nodes["HandoffStatRow_"+a[0]],x,y,rowWidth,64);
+            var row=nodes["HandoffStatRow_"+a[0]],mainId="HandoffStatMain_"+a[0],bonusId="HandoffStatBonusRow_"+a[0];
+            var main=nodes[mainId],bonus=nodes[bonusId];
+            if(!valid(main)){main=create("Panel",row,mainId,false);main.hittestchildren=true;}
+            if(!valid(bonus)){bonus=create("Panel",row,bonusId,false);bonus.hittestchildren=true;}
+            [["HandoffStatIcon_",main],["HandoffStat_",main],["HandoffStatBonus_",bonus],["HandoffStatPercent_",bonus]].forEach(function(entry){
+                var node=nodes[entry[0]+a[0]];if(node.GetParent()!==entry[1])node.SetParent(entry[1]);
+            });
+            var iconSize=g.worker?64:48,textWidth=Math.max(0,rowWidth-iconSize-8);
+            place(row,x,y,rowWidth,88);
+            place(main,0,0,rowWidth,iconSize);
+            // Natural-width icon/value pairs center short and long numbers as
+            // one group. The bounded label can shrink unusually long values.
+            style(main,{flowChildren:"right",width:"fit-children",minWidth:"0px",maxWidth:rowWidth+"px",horizontalAlign:g.worker?"left":"center",overflow:"noclip"});
             place(nodes["HandoffStatIcon_"+a[0]],0,0,iconSize,iconSize);
-            place(nodes["HandoffStat_"+a[0]],textX,0,textWidth,44);
-            style(nodes["HandoffStat_"+a[0]],{fontSize:"32px",fontWeight:"normal",height:"fit-children",minHeight:"0px",verticalAlign:"center",textAlign:"left"});
-            place(nodes["HandoffStatBonus_"+a[0]],textX,65,textWidth*.58,24);
-            place(nodes["HandoffStatPercent_"+a[0]],textX+textWidth*.58,65,textWidth*.42,24);
-            style(nodes["HandoffStatBonus_"+a[0]],{fontSize:"22px"});style(nodes["HandoffStatPercent_"+a[0]],{fontSize:"22px"});
+            place(nodes["HandoffStat_"+a[0]],0,0,textWidth,44);
+            style(nodes["HandoffStat_"+a[0]],{width:"fit-children",minWidth:"0px",maxWidth:textWidth+"px",marginLeft:"8px",fontSize:"32px",fontWeight:"normal",height:"fit-children",minHeight:"0px",verticalAlign:"center",textAlign:"center",textOverflow:"shrink"});
+            var bonusWidth=Math.max(0,(rowWidth-6)*.52),percentWidth=Math.max(0,rowWidth-6-bonusWidth);
+            place(bonus,0,g.worker?65:58,rowWidth,24);
+            style(bonus,{flowChildren:"right",width:"fit-children",minWidth:"0px",maxWidth:rowWidth+"px",horizontalAlign:"center",overflow:"noclip"});
+            place(nodes["HandoffStatBonus_"+a[0]],0,0,bonusWidth,24);
+            place(nodes["HandoffStatPercent_"+a[0]],0,0,percentWidth,24);
+            style(nodes["HandoffStatBonus_"+a[0]],{width:"fit-children",minWidth:"0px",maxWidth:bonusWidth+"px",fontSize:"22px",textAlign:"center",textOverflow:"shrink"});
+            style(nodes["HandoffStatPercent_"+a[0]],{width:"fit-children",minWidth:"0px",maxWidth:percentWidth+"px",marginLeft:"6px",fontSize:"22px",textAlign:"center",textOverflow:"shrink"});
+            style(nodes["HandoffStatName_"+a[0]],{minWidth:"0px"});
         });
     }
     ["hp","mp"].forEach(function(type){art(center,"Handoff_"+type+"_track",type+"_track");if(type==="hp")create("Panel",center,"Handoff_hp_fill",false);else art(center,"Handoff_"+type+"_fill",type+"_fill");label(center,"Handoff_"+type+"_value","HandoffNumber");style(nodes["Handoff_"+type+"_value"],{fontSize:"30px",textAlign:"center"});});
@@ -1506,6 +1522,18 @@
         }
         Game.AddCommand(windowReview,function(){
             var args=Array.prototype.slice.call(arguments),id=String(args[args.length-1]||"");
+            if(id==="stats"){
+                var unit=selectedUnit(),snapshot=selectedSnapshot();
+                var net=CustomNetTables.GetTableValue("survival_combat_stats","player_"+Game.GetLocalPlayerID());
+                var value=nodes.HandoffStat_attack_speed,nativeValue=root.FindChildTraverse("CombatAttackSpeedValue");
+                function bounds(p){return valid(p)?{xy:p.GetPositionWithinWindow(),width:p.actuallayoutwidth,height:p.actuallayoutheight}:null;}
+                $.Msg("[HUD_STATS_NATIVE_SAMPLE] "+JSON.stringify({unit:unit,snapshotUnit:snapshot&&snapshot.entindex,
+                    snapshotPercent:snapshot&&snapshot.attack_speed_percentage,nettablePercent:net&&net.attack_speed_percentage,
+                    displayText:value&&value.text,nativeText:valid(nativeValue)?nativeValue.text:null,
+                    geometry:geometry,left:bounds(nodes.HandoffStatRow_attack),right:bounds(nodes.HandoffStatRow_strength),
+                    leftMain:bounds(nodes.HandoffStatMain_attack),rightMain:bounds(nodes.HandoffStatMain_strength),
+                    percentMain:bounds(nodes.HandoffStatMain_attack_speed)}));return;
+            }
             if(id==="native"){inspectNativeTree();return;}
             if(id==="nav"){
                 var captions=nav.map(function(a){return ["HandoffNavCaption_"+a[0],"HandoffNavIcon_"+a[0]];});

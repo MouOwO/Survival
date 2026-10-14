@@ -92,22 +92,33 @@ for(const [w,h] of [[960,720],[1600,900],[1920,1080],[3440,1440]]){
  const heroLayout=layout(w,h,4,false,false,{combat:true,attributes:true});
  assert.equal(builder.attributeWidth,0);
  assert.equal(builder.inventoryX,builder.centerX+builder.centerWidth,'no blank gap between skills and inventory');
- assert.equal(heroLayout.inventoryX-builder.inventoryX,240,'hero alone reserves the attribute column');
- assert.equal(heroLayout.actionX,builder.actionX,'selection keeps the accepted skill anchor');
+ assert.equal(heroLayout.inventoryX-builder.inventoryX,180,'hero alone reserves the compact attribute column');
+ for(const g of [heroLayout,builder])assert(Math.abs(g.x+g.width*g.scale/2-w/2)<.001,'each visible selection HUD centers without an empty column');
 }
 env.cfg.HandoffCombat.Snapshot=()=>null;env.mirror();
 assert.equal(nodes.HandoffStatIcon_strength.style.visibility,'visible');
 assert.equal(nodes.HandoffStatName_strength.style.visibility,'collapse');
-console.log('BUILDER_ATTRIBUTE_GUTTER_PASS: native Io builder, six icon visibility recovery, compact inventory and stable skill origin');
+console.log('BUILDER_ATTRIBUTE_GUTTER_PASS: native Io builder, six icon visibility recovery, compact inventory and centered visible columns');
 
 // Hidden rows still reach Panorama's layout writer when selecting a building
 // or resource tree. Their dimensions must remain valid even without a portrait.
-for(const a of stats)nodes['HandoffStatRow_'+a[0]]={style:{}};
-env.place=(p,x,y,w,h)=>{
+function layoutPanel(id,parent=null){return {id,parent,style:{},GetParent(){return this.parent;},SetParent(next){this.parent=next;}};}
+for(const a of stats){
+ const row=nodes['HandoffStatRow_'+a[0]]=layoutPanel('HandoffStatRow_'+a[0]);
+ for(const prefix of ['HandoffStatIcon_','HandoffStatName_','HandoffStat_','HandoffStatBonus_','HandoffStatPercent_']){
+  const node=nodes[prefix+a[0]];node.parent=row;node.GetParent=function(){return this.parent;};node.SetParent=function(next){this.parent=next;};
+ }
+}
+env.create=(type,parent,id)=>nodes[id]=layoutPanel(id,parent);
+// Use the production place() writer: it establishes minWidth as well as width.
+// A fit-children group must clear that minimum to center its natural content.
+vm.runInContext(source.slice(source.indexOf('    function cssNumber('),source.indexOf('    function create(')),env);
+const panoramaPlace=env.place;
+env.place=(p,x,y,w,h,overrides)=>{
  assert(p,'all stat row components exist');
  for(const n of [x,y,w,h])assert(Number.isFinite(n),'finite layout coordinate');
  assert(w>=0 && h>=0,'hidden stat rows must not write negative dimensions');
- Object.assign(p.style,{x,y,width:w,height:h});
+ panoramaPlace(p,x,y,w,h,overrides);
 };
 vm.runInContext(source.slice(source.indexOf('    function layoutStats('),source.indexOf('    ["hp","mp"].forEach')),env);
 for(const args of [
@@ -121,8 +132,24 @@ for(const args of [
 ]){
  env.layoutStats(layout(1600,900,4,...args));
  for(const a of stats){
-  assert.equal(nodes['HandoffStatIcon_'+a[0]].style.height,64);
+  assert.equal(nodes['HandoffStatIcon_'+a[0]].style.height,args[2].worker?'64px':'48px');
   assert.equal(nodes['HandoffStat_'+a[0]].style.verticalAlign,'center');
+  for(const prefix of ['HandoffStatMain_','HandoffStatBonusRow_','HandoffStat_','HandoffStatBonus_','HandoffStatPercent_']){
+   const style=nodes[prefix+a[0]].style;
+   assert.equal(style.width,'fit-children');assert.equal(style.minWidth,'0px','production place minimum must not fill '+prefix+a[0]);
+  }
  }
 }
-console.log('STAT_ROW_DIMENSIONS_PASS: heroes, builders, buildings, resources and workers; centered values and nonnegative hidden rows');
+// Real sample values keep their font; long values have a bounded shrink path.
+env.layoutStats(layout(1920,1080,7,false,false,{attributes:true}));
+for(const a of stats){
+ const row=nodes['HandoffStatRow_'+a[0]],main=nodes['HandoffStatMain_'+a[0]],bonus=nodes['HandoffStatBonusRow_'+a[0]];
+ const icon=nodes['HandoffStatIcon_'+a[0]],value=nodes['HandoffStat_'+a[0]],amount=nodes['HandoffStatBonus_'+a[0]],pct=nodes['HandoffStatPercent_'+a[0]];
+ assert.equal(main.style.horizontalAlign,'center');assert.equal(bonus.style.horizontalAlign,'center');
+ assert.equal(icon.GetParent(),main);assert.equal(value.GetParent(),main);assert.equal(amount.GetParent(),bonus);assert.equal(pct.GetParent(),bonus);
+ assert.equal(value.style.fontSize,'32px');assert.equal(value.style.textOverflow,'shrink');
+ assert(parseFloat(value.style.maxWidth)>=100,'1291.4 fits beside the icon at normal font size');
+ assert(parseFloat(icon.style.width)+parseFloat(value.style.marginLeft)+parseFloat(value.style.maxWidth)<=parseFloat(row.style.width),'long values stay within the compact gutter');
+ assert(parseFloat(amount.style.maxWidth)+parseFloat(pct.style.marginLeft)+parseFloat(pct.style.maxWidth)<=parseFloat(row.style.width)+.001,'bonus and percentage never overlap');
+}
+console.log('STAT_ROW_DIMENSIONS_PASS: production place minima, natural centered groups, normal-font sample values, bounded long values, nonoverlapping bonuses, heroes/builders/workers and nonnegative hidden rows');

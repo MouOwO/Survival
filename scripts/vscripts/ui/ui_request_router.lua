@@ -6,6 +6,7 @@ local weapon_snapshot = require("ui/weapon_synthesis_snapshot_service")
 local unit_display_names = require("config/generated/unit_display_names")
 local research_events = require("research/research_event_names")
 local combat_stat_projection = require("ui/combat_stat_projection")
+local hero_attack_cadence_projection = require("ui/hero_attack_cadence_projection")
 local armor_balance = require("config/armor_balance")
 local hero_summon_projection = require("systems/hero_summon_projection")
 local building_batch_upgrade = require("systems/building_batch_upgrade_service")
@@ -275,20 +276,7 @@ local function hero_ui_snapshot(player_id, entindex, unit)
         snapshot.display_name = unit.survival_display_name
             or snapshot.display_name
     end
-    -- Cheer is a temporary engine modifier; use its explicit authoritative
-    -- amount without replacing stable hero values with transient engine reads.
-    if snapshot.attack_cadence and not is_monkey_clone then
-        local old = tonumber(snapshot.attack_cadence.cheer_bonus) or 0
-        local current = tonumber(unit.survival_cheer_attack_speed_pct) or 0
-        snapshot.attack_speed = (tonumber(snapshot.attack_speed) or 0)
-            * math.max(1,100+current) / math.max(1,100+old)
-        local native_speed = safe_number(unit,"GetAttackSpeed",nil,false)
-        local engine_interval = tonumber(snapshot.attack_cadence.engine_interval)
-        if native_speed and native_speed > 0 and engine_interval and engine_interval > 0
-            and not (tonumber(snapshot.debug_attack_speed_override) and tonumber(snapshot.debug_attack_speed_override)>0) then
-            snapshot.attack_speed = native_speed / engine_interval
-        end
-    end
+    snapshot = hero_attack_cadence_projection.for_ui(snapshot, unit)
     -- The hero combat snapshot is authoritative and internally consistent.
     -- Never replace one field with a transient engine-frame value here: doing
     -- so made request responses alternate between projected armor and zero

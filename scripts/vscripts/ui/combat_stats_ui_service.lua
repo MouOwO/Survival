@@ -5,6 +5,7 @@ local technology_definitions = require("config/generated/technology_definitions"
 local technology_effects = require("config/technology_effect_config")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local combat_stat_projection = require("ui/combat_stat_projection")
+local hero_attack_cadence_projection = require("ui/hero_attack_cadence_projection")
 local portrait_metadata = require("ui/portrait_metadata")
 
 local portrait_metadata = require("ui/portrait_metadata")
@@ -12,6 +13,12 @@ local portrait_metadata = require("ui/portrait_metadata")
 local M = {}
 
 local debug_state = {}
+local hero_authority = {}
+local subscriptions = {}
+
+local function subscribe(event_name, callback)
+    subscriptions[#subscriptions + 1] = event_bus.subscribe(event_name, callback)
+end
 
 local technology_names = {
     gold_mine_efficiency = "金矿采集效率",
@@ -160,6 +167,10 @@ end
 local function on_hero_summoned(payload)
     local player_id = tonumber(payload.player_id)
     if player_id == nil then return end
+    local cached = hero_authority[player_id]
+    -- The combat service can publish the new hero during this same summon
+    -- dispatch, before this listener runs. Keep that hero's current snapshot.
+    if cached and cached.unit ~= payload.unit then hero_authority[player_id] = nil end
     debug_state[player_id] = {
         unit = payload.unit,
         entindex = payload.unit and payload.unit:entindex() or -1,
@@ -227,8 +238,7 @@ local function publish(payload)
     -- Both selected-unit responses and regular stat updates must carry the
     -- same portrait identity. Decorate only the projected copy, leaving the
     -- authoritative combat snapshot and its version untouched.
-    local projected = combat_stat_projection.for_ui(payload.snapshot)
-    local entindex = tonumber(projected.entindex)
+    local entindex = tonumber(payload.snapshot.entindex)
     local unit
     if entindex and entindex >= 0 and entindex < math.huge
         and entindex == math.floor(entindex) then
@@ -238,6 +248,12 @@ local function publish(payload)
         end)
         if ok then unit = resolved end
     end
+    -- Retain the raw service snapshot, never the already projected UI value:
+    -- a later temporary-buff event must not multiply a previous slowdown again.
+    hero_authority[player_id] = unit and {snapshot = payload.snapshot, unit = unit} or nil
+    local projected = combat_stat_projection.for_ui(
+        hero_attack_cadence_projection.for_ui(payload.snapshot, unit)
+    )
     portrait_metadata.apply(unit, projected)
     CustomNetTables:SetTableValue(
         "survival_combat_stats",
@@ -246,6 +262,26 @@ local function publish(payload)
     )
     -- NetTable is the single regular synchronization path. Selected-unit
     -- requests still use their direct response event for immediate feedback.
+end
+
+local function on_unit_combat_stats_changed(payload)
+    local entindex = tonumber(payload and payload.entindex)
+    if not entindex then return end
+    for player_id, cached in pairs(hero_authority) do
+        if tonumber(cached.snapshot.entindex) == entindex
+            and (not payload.unit or payload.unit == cached.unit) then
+            -- Entity indices can be reused. Only refresh the precise cached
+            -- hero handle, and avoid delayed buff updates after death/removal.
+            local ok, current = pcall(function()
+                local unit = EntIndexToHScript(entindex)
+                if unit ~= cached.unit or unit:IsNull() then return false end
+                if unit.IsAlive and not unit:IsAlive() then return false end
+                if unit.GetPlayerOwnerID and unit:GetPlayerOwnerID() ~= player_id then return false end
+                return true
+            end)
+            if ok and current then publish({player_id = player_id, snapshot = cached.snapshot}) end
+        end
+    end
 end
 
 local pending_growth = {}
@@ -261,15 +297,21 @@ local function publish_growth_debug(player_id)
 end
 
 function M.init()
+    for _, subscription in ipairs(subscriptions) do event_bus.unsubscribe(subscription) end
+    subscriptions = {}
+    hero_authority = {}
     for player_id in pairs(pending_growth) do
         scheduler.cancel("lumberjack_publish_growth_debug_" .. tostring(player_id))
     end
     pending_growth = {}
     debug_state = {}
-    event_bus.subscribe(events.HERO_COMBAT_STATS_CHANGED, publish)
-    event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
-    event_bus.subscribe(events.HERO_REMOVED, function(payload)
+    subscribe(events.HERO_COMBAT_STATS_CHANGED, publish)
+    subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_unit_combat_stats_changed)
+    subscribe(events.HERO_SUMMONED, on_hero_summoned)
+    subscribe(events.HERO_REMOVED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
+        local cached = player_id and hero_authority[player_id]
+        if cached and cached.unit == payload.unit then hero_authority[player_id] = nil end
         local current = player_id and debug_state[player_id]
         if not current or current.unit ~= payload.unit then return end
         debug_state[player_id], pending_growth[player_id] = nil, nil
@@ -277,9 +319,9 @@ function M.init()
         scheduler.cancel("lumberjack_publish_growth_debug_" .. tostring(player_id))
         publish_debug(player_id)
     end)
-    event_bus.subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
-    event_bus.subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
-    event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
+    subscribe(events.COMBAT_DAMAGE_RESOLVED, on_damage)
+    subscribe(events.TECHNOLOGY_CHANGED, on_technology_changed)
+    subscribe(events.TECHNOLOGY_STATS_CHANGED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
         if player_id == nil then return end
         debug_state[player_id] = debug_state[player_id] or {
