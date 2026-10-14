@@ -7,8 +7,8 @@
     function createView(){
     if(cfg.SurvivalArchiveV10&&cfg.SurvivalArchiveV10.IsAlive&&cfg.SurvivalArchiveV10.IsAlive())return cfg.SurvivalArchiveV10;
     var P=cfg.ArchiveParchmentData||{},size=P.canvas||[1200,900];
-    var canvas=null,gridHost=null,sidebar=null,filterMenu=null,search=null,headerIcon=null,tip=null,tipSurface=null,tipViewport=null,tipBody=null,tipBackground=null,tipFrame=null,tipShadow=null,viewScale=1;
-    var active=false,disposed=false,current="",rows=[],categoryRows=[],filters={},balances=[],moved=[],subscriptions=[],sidebarKey="",tooltipEpoch=0,tooltipHideEpoch=0,hover=null,displayKey="";
+    var canvas=null,gridHost=null,sidebar=null,filterMenu=null,search=null,headerIcon=null,tip=null,tooltip=null,viewScale=1;
+    var active=false,disposed=false,current="",rows=[],categoryRows=[],filters={},balances=[],moved=[],subscriptions=[],sidebarKey="",hover=null,displayKey="";
     var textSpecs={},sidebarButtons={},missingIcons={},fitOptions=null,lastReportedCategory="";
     var searchValue="",order=["clear","shadow","map_level","work","gift","fragment","pet","boss","points","shop","endless","fishing","building","beast","starjoy_points","titles"];
     var names={clear:"通关存档",shadow:"虚空之影",map_level:"地图等级",work:"上班福利",gift:"福利礼包",fragment:"神兵碎片",pet:"秘法牢笼",boss:"BOSS存档",points:"积分道具",shop:"商城道具",endless:"无尽存档",fishing:"钓鱼存档",building:"存档神器",friend:"我的好基友",ex:"我的前女友",beast:"瑞兽赐福",starjoy_points:"星悦积分",titles:"称号"};
@@ -37,21 +37,6 @@
     }
     function headerEmblem(id){return id==="shadow"&&asset("archive_emblem")?asset("archive_emblem").file:categoryIcon(id);}
     function icon(parent,uri,x,y,w,h,id){var node=make("Image",parent,id,"ArchiveV10Icon");node.SetImage(uri);node.SetScaling("stretch-to-fit-preserve-aspect");node.hittest=false;pos(node,x,y,w,h);return node;}
-    function nineFrame(parent,key){
-        var asset=P.assets&&P.assets[key]||D.assets[key],spec=D.tooltip.assets[key.replace(/^tooltip_/,"")]||{},insets=asset.nine_slice_ltrb||spec.nine_slice_ltrb||[10,10,10,10],host=make("Panel",parent,"","ArchiveV10NineFrame"),pieces=[];
-        host.__v10Slice={asset:key,insets:insets.slice()};
-        for(var r=0;r<3;r++)for(var c=0;c<3;c++){
-            var clip=make("Panel",host,"","ArchiveV10Crop"),art=make("Panel",clip,"","ArchiveV10Image");
-            // Native Image scaling keeps an aspect-fitted raster inside its
-            // resized panel. A panel background explicitly stretches both axes.
-            style(clip,{flowChildren:"none",overflow:"clip"});
-            style(art,{backgroundImage:'url("'+asset.file+'")',backgroundSize:"100% 100%",backgroundPosition:"0px 0px",backgroundRepeat:"no-repeat",flowChildren:"none"});
-            clip.hittest=false;clip.hittestchildren=false;art.hittest=false;art.hittestchildren=false;
-            pieces.push({clip:clip,art:art,col:c,row:r});
-        }
-        host.hittest=false;host.hittestchildren=false;
-        host.Resize=function(x,y,w,h){var l=insets[0],t=insets[1],r=insets[2],b=insets[3];w=Math.max(w,l+r);h=Math.max(h,t+b);pos(host,x,y,w,h);var xs=[0,l,asset.size[0]-r,asset.size[0]],ys=[0,t,asset.size[1]-b,asset.size[1]],dx=[0,l,w-r,w],dy=[0,t,h-b,h];pieces.forEach(function(cell){var c=cell.col,r=cell.row,sw=xs[c+1]-xs[c],sh=ys[r+1]-ys[r],dw=dx[c+1]-dx[c],dh=dy[r+1]-dy[r],sx=dw/sw,sy=dh/sh;pos(cell.clip,dx[c],dy[r],dw,dh);pos(cell.art,-xs[c]*sx,-ys[r]*sy,asset.size[0]*sx,asset.size[1]*sy);});};return host;
-    }
     function move(id,parent){var node=p(id);if(!valid(node))return null;if(!moved.some(function(x){return x.node===node;}))moved.push({node:node,parent:node.GetParent()});
         // Legacy initialization styles these retained panels between view reloads.
         // Their previous V10 cache no longer describes the actual native style.
@@ -181,57 +166,14 @@
         return true;
     }
     function buildTooltip(){
-        tip=make("Panel",canvas,"ArchiveV10Tooltip","ArchiveV10Tooltip");tip.hittest=false;tip.hittestchildren=true;tip.visible=false;pos(tip,0,0,368,246);
-        tipShadow=nineFrame(tip,"tooltip_shadow");tipShadow.Resize(0,0,368,246);tipBackground=nineFrame(tip,"tooltip_background");tipBackground.Resize(24,24,320,198);tipFrame=nineFrame(tip,"tooltip_frame");tipFrame.Resize(24,24,320,198);
-        tipSurface=make("Panel",tip,"ArchiveV10TooltipSurface","");pos(tipSurface,24,24,320,198);tipSurface.hittest=true;
-        style(tipSurface,{flowChildren:"none",overflow:"clip"});
-        tipSurface.SetPanelEvent("onmouseover",function(){if(alive()&&active)tooltipHideEpoch++;});
-        tipSurface.SetPanelEvent("onmouseout",queueTooltipHide);
-        tipViewport=make("Panel",tipSurface,"ArchiveV10TooltipViewport","ArchiveV10TooltipViewport");pos(tipViewport,22,19,276,157);style(tipViewport,{flowChildren:"none",overflow:"squish scroll"});
-        tipBody=make("Panel",tipViewport,"ArchiveV10TooltipBody","ArchiveV10TooltipBody");pos(tipBody,0,0,276,160);style(tipBody,{height:"fit-children",flowChildren:"down",overflow:"noclip"});
-        ["Title","State","EffectCaption","Effect","Condition"].forEach(function(id){var el=make("Label",tipBody,"ArchiveV10Tooltip"+id,"ArchiveV10Text");el.hittest=false;});
-        var metric=make("Panel",tipBody,"ArchiveV10TooltipMetric","ArchiveV10TooltipMetric");
-        pos(metric,0,0,276,27);style(metric,{flowChildren:"none",marginBottom:"4px"});
-        label(metric,"",0,0,162,27,17,D.tooltip.text_colors.caption,"left","ArchiveV10TooltipMetricCaption");
-        label(metric,"",162,0,114,27,17,D.tooltip.text_colors.quantity,"right","ArchiveV10TooltipQuantity");
-        style(p("ArchiveV10TooltipQuantity"),{position:"0px 0px 0px",width:"fit-children",maxWidth:"114px",horizontalAlign:"right"});
-        var sep=image(tipBody,"tooltip_separator",0,0,276,4,"ArchiveV10TooltipSeparator");sep.AddClass("ArchiveV10TooltipSeparator");
-        style(sep,{marginBottom:"8px"});
-        tipBody.MoveChildBefore(sep,p("ArchiveV10TooltipEffectCaption"));
+        tooltip=cfg.SurvivalArchiveTooltip.Create({parent:canvas,root:root,idPrefix:"ArchiveV10Tooltip",isAlive:alive,isActive:function(){return active;},getScale:function(){return viewScale;},getBounds:function(){return size.slice();},maxHeight:778,categoryName:categoryName,currencySourceText:function(){var source=p("ArchiveCurrencySource");return source&&source.__archivePlainText||"";},onHide:function(){hover=null;}});
+        tip=tooltip.panel;
     }
-    function hideTooltip(){tooltipEpoch++;tooltipHideEpoch++;if(valid(hover))hover.RemoveClass("ArchiveHovered");hover=null;if(valid(tip))tip.visible=false;}
-    function queueTooltipHide(){if(!alive()||!active)return;var epoch=++tooltipHideEpoch;$.Schedule(.15,function(){if(alive()&&active&&epoch===tooltipHideEpoch)hideTooltip();});}
-    function positionTooltip(epoch){
-        if(epoch!==tooltipEpoch||!active||!valid(hover)||!valid(tip))return;
-        var cp=canvas.GetPositionWithinWindow(),at=hover.GetPositionWithinWindow(),sx=(canvas.actualuiscale_x||1)*viewScale,sy=(canvas.actualuiscale_y||1)*viewScale;
-        var x=(at.x-cp.x)/sx,y=(at.y-cp.y)/sy;
-        // Measure the flowing children, not the already constrained scroll body.
-        // Otherwise a first-frame 160px height keeps long tooltips permanently short.
-        var contentHeight=0;
-        tipBody.Children().forEach(function(child){if(child.visible===false)return;var margin=String(child.style.margin||"").split(/\s+/),bottom=child.style.marginBottom||margin[2]||margin[0];contentHeight+=(child.actuallayoutheight||0)/(root.actualuiscale_y||1)+(parseFloat(bottom)||0)+(parseFloat(child.style.marginTop)||0);});
-        var height=Math.max(198,Math.min(730,Math.ceil(contentHeight)+41));
-        var tx=x+Math.min(hover.actuallayoutwidth||745,745)-340;tx=Math.max(40,Math.min(size[0]-360,tx));var ty=Math.max(80,Math.min(size[1]-35-height,y+72));
-        pos(tip,tx-24,ty-24,368,height+48);tipBackground.Resize(24,24,320,height);pos(tipSurface,24,24,320,height);tipFrame.Resize(24,24,320,height);tipShadow.Resize(0,0,368,height+48);
-        tipViewport.style.height=Math.max(130,height-41)+"px";
-    }
+    function hideTooltip(){if(tooltip)tooltip.Hide();hover=null;}
+    function queueTooltipHide(){if(tooltip)tooltip.QueueHide();}
     function showTooltip(item,category,card,onlyEffect){
         if(!active||!valid(canvas)){originalShow(item,category,card,onlyEffect);return;}
-        hideTooltip();originalHide();hover=card;card.AddClass("ArchiveHovered");var state=S.State(item,category),color=D.tooltip.text_colors;
-        p("ArchiveV10TooltipTitle").text=String(item.name||"");p("ArchiveV10TooltipState").text=onlyEffect?"":categoryName(category)+" · "+(state===null?"状态待同步":state?(["shadow","pet","fishing","friend","ex","beast","points","shop"].indexOf(category)>=0?"已拥有":"已解锁"):"未解锁");
-        p("ArchiveV10TooltipEffectCaption").text="道具效果";var effect=p("ArchiveV10TooltipEffect"),description=String(item.description||"服务端未提供效果说明");
-        effect.html=true;effect.text=A.FormatEffects?A.FormatEffects(description,category==="fragment"?(item.level===undefined?0:item.level):undefined,item.id?state:undefined):description;
-        var details=item.unlock_condition||item.condition_text||"";
-        if(category==="work"||category==="building")details+=(details?"\n":"")+(Number(item.completed)===1?"已达到最高等级":"点击"+(category==="building"?"升级":"激活")+" · 消耗 "+item.cost+(category==="building"?" 信仰值":" 软妹币"));
-        if(category==="titles")details+=(details?"\n":"")+(Number(item.equipped)===1?"当前已穿戴 · 点击卸下":state?"点击穿戴称号":"达成条件后解锁称号");
-        if(category==="fragment"&&item.level!==undefined)details+=(details?"\n":"")+"神兵等级 LV"+item.level;
-        var source=p("ArchiveCurrencySource");if(["building","work","starjoy_points"].indexOf(category)>=0&&source&&source.__archivePlainText)details+=(details?"\n":"")+source.__archivePlainText;
-        if(category==="map_level"&&item.count!==undefined)details+=(details?"\n":"")+"累计有效在线 "+item.count+" 分钟";
-        p("ArchiveV10TooltipCondition").text=details;p("ArchiveV10TooltipCondition").visible=!!details;
-        p("ArchiveV10TooltipMetric").visible=!onlyEffect;
-        p("ArchiveV10TooltipMetricCaption").text=S.Metric(item,category);
-        p("ArchiveV10TooltipQuantity").text=S.Quantity(item,category);
-        ["Title","State","EffectCaption","Effect","Condition"].forEach(function(id){var el=p("ArchiveV10Tooltip"+id);style(el,{width:"276px",height:"fit-children",ignoreParentFlow:"false",fontSize:(id==="Title"?22:id==="State"||id==="EffectCaption"?15:17)+"px",fontFamily:'"Source Han Sans SC"',color:id==="Title"?color.title:id==="Effect"?color.body:id==="State"?color.state:color.caption,margin:"0px 0px "+(id==="Title"?6:id==="State"?8:id==="Effect"?8:4)+"px",whiteSpace:"normal",textOverflow:"clip"});});
-        tipBody.style.height="fit-children";tip.visible=true;var epoch=tooltipEpoch;positionTooltip(epoch);[0,.05,.1,.2,.4,.8].forEach(function(delay){$.Schedule(delay,function(){positionTooltip(epoch);});});
+        originalHide();if(tooltip.Show(item,category,card,onlyEffect))hover=card;
     }
     var originalShow=A.__v10OriginalShow||A.Show,originalHide=A.__v10OriginalHide||A.Hide,originalEffect=A.__v10OriginalEffect||A.ShowEffectOnly;
     A.__v10OriginalShow=originalShow;A.__v10OriginalHide=originalHide;A.__v10OriginalEffect=originalEffect;
@@ -241,7 +183,7 @@
     var api=cfg.SurvivalArchiveV10={
         Render:render,Fit:fit,IsAlive:alive,RequestTooltipHide:queueTooltipHide,Leave:function(){hideTooltip();active=false;displayKey="";if(valid(filterMenu))filterMenu.visible=false;if(valid(canvas))canvas.visible=false;},
         Inspect:function(){var win=p("ArchiveWindow"),cp=valid(canvas)?canvas.GetPositionWithinWindow():null,cards=valid(p("ArchiveGrid"))?p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}):[];return {active:active,category:current,categories:order.slice(),shellIdentity:canvas&&canvas.id,layout:"parchment_rows",search:searchValue,rows:rows.map(function(item){return {id:item.id,count:item.count,quantity:S.Quantity(item,current),unlocked:S.State(item,current),name:item.name};}),geometry:{canvas:cp,window:valid(win)?win.GetPositionWithinWindow():null,width:valid(win)?win.actuallayoutwidth:0,height:valid(win)?win.actuallayoutheight:0,firstCount:cards.length?{position:cards[0].__v10.count.GetPositionWithinWindow(),width:cards[0].__v10.count.actuallayoutwidth,textAlign:cards[0].__v10.count.style.textAlign,font:cards[0].__v10.count.style.fontFamily,weight:cards[0].__v10.count.style.fontWeight}:null},tooltipVisible:valid(tip)&&tip.visible,missingIcons:Object.keys(missingIcons)};},
-        Dispose:function(){if(disposed)return;hideTooltip();active=false;disposed=true;subscriptions.forEach(function(id){if(GameEvents.Unsubscribe)GameEvents.Unsubscribe(id);});subscriptions=[];moved.forEach(function(entry){if(valid(entry.node)&&valid(entry.parent))entry.node.SetParent(entry.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(marker))marker.DeleteAsync(0);canvas=null;balances=[];filters={};sidebarKey="";var win=p("ArchiveWindow");if(valid(win)){win.RemoveClass("ArchiveV10Page");win.RemoveClass("ArchiveParchmentPage");}}
+        Dispose:function(){if(disposed)return;hideTooltip();if(tooltip)tooltip.Dispose();tooltip=null;active=false;disposed=true;subscriptions.forEach(function(id){if(GameEvents.Unsubscribe)GameEvents.Unsubscribe(id);});subscriptions=[];moved.forEach(function(entry){if(valid(entry.node)&&valid(entry.parent))entry.node.SetParent(entry.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(marker))marker.DeleteAsync(0);canvas=null;balances=[];filters={};sidebarKey="";var win=p("ArchiveWindow");if(valid(win)){win.RemoveClass("ArchiveV10Page");win.RemoveClass("ArchiveParchmentPage");}}
     };
     return api;
     }

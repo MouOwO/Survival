@@ -1,0 +1,8 @@
+[
+  "scripts/custom_game/common/archive_tooltip.js",
+  "styles/custom_game/common/archive_tooltip.css",
+  "scripts/custom_game/archive_v10.js",
+  "scripts/custom_game/collection_gw2.js",
+  "styles/custom_game/collection_gw2.css",
+  "layout/custom_game/archive.xml"
+]

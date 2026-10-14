@@ -1,0 +1,15 @@
+.ArchiveSharedTooltipHost { flow-children:none; overflow:noclip; z-index:150; background-image:none; background-color:transparent; border:0px; box-shadow:none; }
+.ArchiveSharedTooltipBacking { opacity-mask:url("s2r://panorama/images/masks/softedge_box_png.vtex"); opacity-mask-threshold:0% 12%; }
+.ArchiveSharedTooltipShadow { flow-children:none; background-image:none; background-color:transparent; border:0px; border-radius:4px; box-shadow:#00000066 0px 3px 12px 0px; }
+.ArchiveSharedTooltipNineFrame,.ArchiveSharedTooltipArt { flow-children:none; background-color:transparent; border:0px; margin:0px; padding:0px; }
+.ArchiveSharedTooltipCrop { flow-children:none; overflow:clip; }
+.ArchiveSharedTooltipSurface { flow-children:none; overflow:clip; }
+.ArchiveSharedTooltipViewport { flow-children:none; overflow:squish scroll; }
+.ArchiveSharedTooltipBody { flow-children:down; overflow:noclip; height:fit-children; }
+.ArchiveSharedTooltipText { margin:0px; padding:0px; font-family:"Source Han Sans SC"; font-weight:normal; font-style:normal; letter-spacing:0px; white-space:nowrap; text-overflow:ellipsis; text-shadow:none; }
+.ArchiveSharedTooltipBody Label { width:100%; height:fit-children; white-space:normal; text-overflow:clip; }
+.ArchiveSharedTooltipSeparator { position:0px 0px 0px; width:276px; height:4px; margin:0px 0px 8px; }
+.ArchiveSharedTooltipViewport VerticalScrollBar,
+#CollectionWindow .ArchiveSharedTooltipViewport VerticalScrollBar { width:13px; background-color:#1b190f; background-image:url("file://{images}/custom_game/archive_parchment_v1/scroll_track.png"); background-size:100% 100%; border:1px solid #15130d; }
+.ArchiveSharedTooltipViewport VerticalScrollBar .ScrollThumb,
+#CollectionWindow .ArchiveSharedTooltipViewport VerticalScrollBar .ScrollThumb { background-color:#8b835c; background-image:url("file://{images}/custom_game/archive_parchment_v1/scroll_thumb.png"); background-size:100% 100%; border:1px solid #b0a573; border-radius:0px; }

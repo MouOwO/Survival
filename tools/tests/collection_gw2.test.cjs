@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const {createHarness}=require('./fixtures/menus_v10_harness.cjs');
 const h=createHarness(),{cfg,nodes}=h;
 cfg.ArchiveHandoff={Icon(){throw new Error('Formal social portraits must resolve through the CSV icon catalog');},Init(){},Observe(){},CardProgress:item=>String(item.count)+'/'+String(item.target)};
-h.load('ui_snapshot_cache.js');h.load('icons_remaining_5d5c1152eb.js');h.load('collection_gw2_data.js');h.load('collection_gw2.js');
+h.load('ui_snapshot_cache.js');h.load('icons_remaining_5d5c1152eb.js');h.load('archive_parchment_data.js');h.load('archive_v10_semantics.js');h.load('common/archive_tooltip.js');h.load('collection_gw2_data.js');h.load('collection_gw2.js');
 const rows=Array.from({length:40},(_,i)=>({id:'ex_'+String(i+1).padStart(2,'0'),name:i?'正式收藏'+i:'胡桃',count:i===0?2:0,target:60,description:'真实奖励效果'+i}));
 const friendRows=rows.map((r,i)=>({...r,id:'friend_'+String(i+1).padStart(2,'0'),name:i?'正式好友'+i:'哆啦A梦'}));
 function packet(category,sequence,items,extra={}){return {ok:1,category_id:category,sequence,chunk:1,chunks:1,rows:items,social:{tickets:3,currency_name:category==='ex'?'邀请函':'义帖',draw_cost:1,remaining:999,total:2},pending:0,...extra};}
@@ -43,7 +43,7 @@ const cells=nodes.CollectionGW2GridBody.Children().slice(),created=h.counts.crea
 for(let i=11;i<41;i++)snapshot('ex',i,rows);
 assert.equal(h.counts.created,created,'Equal snapshots do not rebuild the actual item cards');assert.deepEqual(nodes.CollectionGW2GridBody.Children(),cells);
 h.click(nodes.CollectionGW2Item_ex_01);assert.equal(h.counts.created,created,'Selecting an item changes only its outline and tooltip');assert.equal(draws().length,0,'Viewing an item never draws a reward');
-nodes.CollectionGW2Item_ex_01.events.onmouseover();h.flushFinite();assert(api.Inspect().tooltipVisible);assert(nodes.CollectionGW2TooltipBody.text.includes('真实奖励效果0'));assert(nodes.CollectionGW2TooltipBody.text.includes('持有数量：2 / 60'));
+nodes.CollectionGW2Item_ex_01.events.onmouseover();h.flushFinite();assert(api.Inspect().tooltipVisible);assert(nodes.CollectionGW2TooltipEffect.text.includes('真实奖励效果0'));assert.equal(nodes.CollectionGW2TooltipQuantity.text,'2/60');
 nodes.CollectionGW2Search.text='胡桃';nodes.CollectionGW2Search.events.ontextentrychange();assert.equal(api.Inspect().rows.length,1);assert.equal(api.Inspect().slots,api.Inspect().rows.length);assert(!api.Inspect().tooltipVisible);
 nodes.CollectionGW2Search.text='不存在';nodes.CollectionGW2Search.events.ontextentrychange();assert.equal(api.Inspect().rows.length,0);assert.equal(api.Inspect().slots,0);assert.equal(nodes.CollectionGW2Empty.text,'没有找到匹配的收藏');
 nodes.CollectionGW2Search.text='';nodes.CollectionGW2Search.events.ontextentrychange();
@@ -61,7 +61,7 @@ h.click(nodes.CollectionGW2Draw);const rejected=api.Inspect().pending;ack(reject
 h.click(nodes.CollectionGW2Draw);const concurrent=api.Inspect().pending;ack(concurrent,{ok:true,revision:80});assert(api.Inspect().pending,'A success cannot unlock before its authoritative profile revision');
 const acquired=rows.map((r,i)=>({...r,count:i?0:3}));snapshot('ex',55,acquired,{revision:79,last_draw:{id:'match:social_draw:'+concurrent.request_id,pool_id:'ex',name:'胡桃'}});assert(api.Inspect().pending,'A matching draw name cannot bypass the newer acknowledged profile version');
 snapshot('ex',56,acquired,{revision:80,last_draw:{id:'later-beast-draw',pool_id:'beast',name:'散魂钟'}});assert.equal(api.Inspect().pending,null,'A later blessing draw may replace last_draw without trapping the completed collection intent');
-snapshot('ex',57,[{...acquired[0],count_known:0},...acquired.slice(1)]);assert(nodes.CollectionGW2Item_ex_01.BHasClass('CollectionGW2Unknown'));nodes.CollectionGW2Item_ex_01.events.onmouseover();assert(nodes.CollectionGW2TooltipBody.text.includes('持有数量：—'));assert(nodes.CollectionGW2Summary.text.includes('已收藏 0 / 40'),'Unknown ownership is not counted as owned');snapshot('ex',58,acquired);
+snapshot('ex',57,[{...acquired[0],count_known:0},...acquired.slice(1)]);assert(nodes.CollectionGW2Item_ex_01.BHasClass('CollectionGW2Unknown'));nodes.CollectionGW2Item_ex_01.events.onmouseover();assert.equal(nodes.CollectionGW2TooltipQuantity.text,'—/60');assert(nodes.CollectionGW2TooltipState.text.includes('状态待同步'));assert(nodes.CollectionGW2Summary.text.includes('已收藏 0 / 40'),'Unknown ownership is not counted as owned');snapshot('ex',58,acquired);
 const requestsBeforeGap=h.sent.length;emit(packet('ex',60,[{path:['rows',1,'count'],value:99}],{delta:1,base_sequence:999}));assert.equal(api.Inspect().rows[0].count,3);h.flushFinite();assert(h.sent.length>requestsBeforeGap);assert.equal(h.sent.at(-1).payload.prefetch,1,'Missing delta baselines request a full authoritative page');
 const many=Array.from({length:113},(_,i)=>({...rows[i%40],id:rows[i%40].id}));snapshot('ex',61,many);assert.equal(api.Inspect().slots,many.length);assert(parseFloat(nodes.CollectionGW2GridBody.style.height)>parseFloat(nodes.CollectionGW2Grid.style.height),'Additional real entries extend the scrolling inventory');
 api.Close();const beforeClosed=h.counts.created;snapshot('ex',62,rows);assert.equal(h.counts.created,beforeClosed,'Hidden updates cache ownership without rebuilding UI');

@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const {csv} = require('../shop_ui_12h/catalog.cjs');
 const repo = path.resolve(__dirname, '../..');
 const sourceRoot = path.join(repo, 'panorama/src/scripts/custom_game');
-const graph = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'archive_v10.js', 'archive_180de7e38b_titles_compact_v6.js'];
+const graph = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'archive_v10.js', 'archive_180de7e38b_titles_compact_v6.js'];
 const manifest = fs.readFileSync(path.join(repo, 'panorama/src/layout/custom_game/archive.xml'), 'utf8');
 graph.forEach(name => assert(manifest.includes('/' + name + '"'), 'Exercise the active production graph: ' + name));
 const sources = Object.fromEntries(graph.map(name => [name, fs.readFileSync(path.join(sourceRoot, name), 'utf8')]));
@@ -52,7 +52,8 @@ fixture();
 const cfg = {
     SurvivalArchiveColors: {number: '#ffd800'}, ArchiveHandoffAssets: {'icon_check_light.png': 'check', 'icon_lock_light.png': 'lock'},
     SurvivalCommerceWallet: {GetCatalog: () => ({balances: {u_coin: 2, shop_points: 3, shop_gold: 4}})},
-    SurvivalUI: {ModalShell: {Adopt: () => ({Open() {}, Close() {}, Dispose() {}})}, NavToggle: {Adopt() {}}, ActionButton: {Adopt() {}}, Tooltip: {Adopt() {}}, Fit() {}},
+    SurvivalUI: {
+        Lifecycle() { let active=true,epoch=0; return {Later(delay,callback) { const expected=epoch; return context.$.Schedule(delay,()=>{if(active&&expected===epoch)callback();}); },Cancel(){epoch++;},Dispose(){active=false;epoch++;}}; },ModalShell: {Adopt: () => ({Open() {}, Close() {}, Dispose() {}})}, NavToggle: {Adopt() {}}, ActionButton: {Adopt() {}}, Tooltip: {Adopt() {}}, Fit() {}},
     ArchiveHandoff: {
         Init() {}, Hide() {}, HideCardText() {}, NavIcon() {}, Card() {}, ApplyPalette() {}, Show() {}, ShowEffectOnly() {},
         Observe(value) { this.snapshot = value; }, Unlocked: (item, category) => cfg.ArchiveV10Semantics.State(item, category),

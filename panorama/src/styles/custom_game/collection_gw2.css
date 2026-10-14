@@ -26,8 +26,6 @@
 .CollectionGW2Button:hover { brightness:1.12; }
 .CollectionGW2Button:active { brightness:.9; }
 .CollectionGW2Disabled { saturation:.2; brightness:.55; }
-.CollectionGW2Tooltip { flow-children:none; overflow:noclip; z-index:150; background-color:#101719f2; border:1px solid #a9b4ad60; box-shadow:none; }
-.CollectionGW2TooltipViewport { flow-children:down; overflow:squish scroll; }
-.CollectionGW2TooltipViewport Label { width:324px; white-space:normal; text-overflow:clip; }
+.CollectionGW2Tooltip { flow-children:none; overflow:noclip; z-index:150; }
 #CollectionWindow VerticalScrollBar { width:8px; background-image:url("file://{images}/custom_game/collection_gw2_v2/scroll_track.png"); background-size:100% 100%; background-color:#12191d55; border:0px; }
 #CollectionWindow VerticalScrollBar .ScrollThumb { background-image:url("file://{images}/custom_game/collection_gw2_v2/scroll_thumb.png"); background-size:100% 100%; background-color:#718b9660; border:0px; border-radius:0px; }

@@ -1,0 +1,22 @@
+const assert=require('node:assert/strict');
+const {createHarness}=require('./fixtures/menus_v10_harness.cjs');
+const h=createHarness(),{cfg,nodes,root}=h;
+cfg.ArchiveHandoff={};
+h.load('archive_parchment_data.js');h.load('archive_v10_semantics.js');h.load('common/archive_tooltip.js');
+const Panel=root.constructor,firstParent=new Panel('Panel',root,'FirstOwner'),secondParent=new Panel('Panel',root,'SecondOwner');
+const firstCard=new Panel('Button',firstParent,'FirstCard'),secondCard=new Panel('Button',secondParent,'SecondCard');
+firstCard.style.position='100px 100px 0px';secondCard.style.position='200px 100px 0px';
+const options=(parent,idPrefix)=>({parent,root,idPrefix,getBounds:()=>[760,410],getScale:()=>1,maxHeight:338,watchAnchor:true,position:()=>({x:24,y:48}),categoryName:()=> '收藏'});
+const a=cfg.SurvivalArchiveTooltip.Create(options(firstParent,'FirstTip')),b=cfg.SurvivalArchiveTooltip.Create(options(secondParent,'SecondTip'));
+const item={id:'ex_01',name:'真实字段',description:'攻击力+5',count:2,count_known:1,target:60};
+assert(a.Show(item,'ex',firstCard));assert(b.Show({...item,count_known:0},'ex',secondCard));
+assert.equal(a.elements.Quantity.text,'2/60');assert.equal(b.elements.Quantity.text,'—/60');assert(b.elements.State.text.includes('状态待同步'));assert.equal(a.elements.Effect.text,item.description);
+assert.notEqual(a.panel,b.panel);assert.notEqual(a.elements.Backing,b.elements.Backing);assert.equal(a.elements.Surface.hittest,true);assert.equal(a.panel.hittest,false,'Shadow bounds do not steal card input');
+function corners(tip){return ['Backing','Frame'].map(role=>tip.elements[role].Children().filter((_,index)=>[0,2,6,8].includes(index)).map(clip=>({width:clip.style.width,height:clip.style.height,artWidth:clip.Children()[0].style.width,artHeight:clip.Children()[0].style.height})));}
+const shortCorners=corners(a),shortHeight=a.Inspect().surfaceHeight;a.Show({...item,description:'长说明\n'.repeat(150)},'ex',firstCard);h.flushFinite();assert.deepEqual(corners(a),shortCorners,'Changing content height never stretches material corners');assert(a.Inspect().surfaceHeight>shortHeight,'Long content actually changes the material height');assert.equal(a.Inspect().nineSlices.Backing.count,9);assert.equal(a.Inspect().nineSlices.Frame.count,9);
+a.QueueHide();a.elements.Surface.events.onmouseover();h.flushFinite();assert(a.IsVisible(),'Entering the surface cancels the queued card leave');assert(b.IsVisible());
+a.QueueHide();h.flushFinite();assert(!a.IsVisible());assert(b.IsVisible(),'One owner hiding never affects another owner');
+a.Show(item,'ex',firstCard);firstCard.style.position='101px 100px 0px';h.flushFinite();assert(!a.IsVisible(),'Moving the anchor invalidates the floating description');assert(b.IsVisible());
+const retiredSurface=a.elements.Surface,queued=h.scheduled.slice();a.Dispose();a.Dispose();assert(!a.panel.IsValid());assert.doesNotThrow(()=>{retiredSurface.events.onmouseover();retiredSurface.events.onmouseout();queued.filter(job=>!job.cancelled).forEach(job=>job.fn());});assert(!a.IsVisible());assert(b.IsVisible(),'Disposing one instance preserves its sibling');
+b.Hide();h.flushFinite();assert(!b.IsVisible());b.Dispose();assert.equal(h.sent.length,0,'Tooltip rendering never emits a game event');
+console.log('ARCHIVE_SHARED_TOOLTIP_PASS: isolated owners, real quantity semantics, hover grace, anchored movement, stable material corners, disposal guards');
