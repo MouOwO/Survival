@@ -1,0 +1,60 @@
+{
+  "kind": "exact_official_dota_vpk_preview_only",
+  "vpk": "../../dota/pak01_dir.vpk",
+  "game_uses_native_s2r_uri": true,
+  "no_image_editing": true,
+  "aliases": {
+    "s2r://panorama/images/masks/softedge_box_png.vtex": "design_refs/daily_gw2_v2/work/native_masks/softedge_box_png.png",
+    "s2r://panorama/images/masks/softedge_box_softer_png.vtex": "design_refs/daily_gw2_v2/work/native_masks/softedge_box_softer_png.png",
+    "s2r://panorama/images/masks/softedge_box_irregular_png.vtex": "design_refs/daily_gw2_v2/work/native_masks/softedge_box_irregular_png.png",
+    "s2r://panorama/images/masks/softedge_horizontal_softer_png.vtex": "design_refs/daily_gw2_v2/work/native_masks/softedge_horizontal_softer_png.png",
+    "s2r://panorama/images/masks/softedge_bottom_png.vtex": "design_refs/daily_gw2_v2/work/native_masks/softedge_bottom_png.png"
+  },
+  "records": [
+    {
+      "name": "softedge_box",
+      "uri": "s2r://panorama/images/masks/softedge_box_png.vtex",
+      "resource": "panorama/images/masks/softedge_box_png.vtex_c",
+      "compiledSourceSha256": "a49c2295a4f0868bd7b498042c05e9a4ef3b1b58152ecb59d19758ba469ea068",
+      "previewPng": "design_refs/daily_gw2_v2/work/native_masks/softedge_box_png.png",
+      "previewPngSha256": "6ed841b7daeacfdfc17621848a20cc44e9326a7611b0908e768461a381a3c616",
+      "export_method": "Source2Viewer-CLI -i exact native vtex_c -o png -d; no postprocessing"
+    },
+    {
+      "name": "softedge_box_softer",
+      "uri": "s2r://panorama/images/masks/softedge_box_softer_png.vtex",
+      "resource": "panorama/images/masks/softedge_box_softer_png.vtex_c",
+      "compiledSourceSha256": "2071b683359d452a39ef57fe61cf482055074bb130fcbb78e12eeef84b5f5110",
+      "previewPng": "design_refs/daily_gw2_v2/work/native_masks/softedge_box_softer_png.png",
+      "previewPngSha256": "d9e0fde0ffb824937c267356f8f3ede3b23e87e7e7758a6737553369403032de",
+      "export_method": "Source2Viewer-CLI -i exact native vtex_c -o png -d; no postprocessing"
+    },
+    {
+      "name": "softedge_box_irregular",
+      "uri": "s2r://panorama/images/masks/softedge_box_irregular_png.vtex",
+      "resource": "panorama/images/masks/softedge_box_irregular_png.vtex_c",
+      "compiledSourceSha256": "64894197837eb1e35fbbf6837794adf09ba972afdba9dd8e3b8fe230b976f4a5",
+      "previewPng": "design_refs/daily_gw2_v2/work/native_masks/softedge_box_irregular_png.png",
+      "previewPngSha256": "ef43c44f63024a66125a28ccf5e76c308ff7b6a71746bfe2cf7f174cf2a5e82c",
+      "export_method": "Source2Viewer-CLI -i exact native vtex_c -o png -d; no postprocessing"
+    },
+    {
+      "name": "softedge_horizontal_softer",
+      "uri": "s2r://panorama/images/masks/softedge_horizontal_softer_png.vtex",
+      "resource": "panorama/images/masks/softedge_horizontal_softer_png.vtex_c",
+      "compiledSourceSha256": "09fe6a318e0ff14bbf78fbfa2117469331177f84e2662139300df56259782b3c",
+      "previewPng": "design_refs/daily_gw2_v2/work/native_masks/softedge_horizontal_softer_png.png",
+      "previewPngSha256": "77355860a22bfd8fa53ace5583343fa16e1a872a392577aae2707933e026aa6f",
+      "export_method": "Source2Viewer-CLI -i exact native vtex_c -o png -d; no postprocessing"
+    },
+    {
+      "name": "softedge_bottom",
+      "uri": "s2r://panorama/images/masks/softedge_bottom_png.vtex",
+      "resource": "panorama/images/masks/softedge_bottom_png.vtex_c",
+      "compiledSourceSha256": "a1429f029139059f333e10c1f049f8c979dca148de24a0faf19013dd47ee91c1",
+      "previewPng": "design_refs/daily_gw2_v2/work/native_masks/softedge_bottom_png.png",
+      "previewPngSha256": "80db20bd5f4b552bf2a7ff307c4d13bb77b7c7a9708756bb7204675fdfbe67fa",
+      "export_method": "Source2Viewer-CLI -i exact native vtex_c -o png -d; no postprocessing"
+    }
+  ]
+}

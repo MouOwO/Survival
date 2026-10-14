@@ -1,5 +1,6 @@
-const fs=require('fs'),vm=require('vm'),assert=require('assert');
-const source=fs.readFileSync('panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js','utf8');
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
+const scripts=path.resolve(process.argv[2]||'panorama/src/scripts/custom_game');
+const source=fs.readFileSync(path.join(scripts,'topnav_remaining_5d5c1152eb.js'),'utf8');
 const classify=source.slice(source.indexOf('    function statVisibility('),source.indexOf('    function buildingPresentation('));
 let name='',building=false,hero=false,selected=1;
 const env={cfg:{},Entities:{GetUnitName:()=>name,IsBuilding:()=>building,IsHero:()=>hero}};
@@ -22,6 +23,7 @@ let multi=false;
 Object.assign(env,{generation:1,layoutRevision:0,buildingPresentation(){},stats,nodes,cfg:{SurvivalMultiSelectionPortraits:{IsActive:()=>multi}},ctx:{FindChildTraverse:()=>null},root:{FindChildTraverse:()=>null},valid:p=>!!p,selectedUnit:()=>selected,text(){},topButtons:{vip:{style:{}}},available:()=>false,syncActiveNav(){},style:(p,v)=>{if(p)Object.assign(p.style,v);}});
 nodes.HandoffNavIcon_vip={SetImage(){}};
 vm.runInContext(source.slice(source.indexOf('    function findCached('),source.indexOf('    function style(')),env);
+vm.runInContext(source.slice(source.indexOf('    function attackFrequencyText('),source.indexOf('    ["HandoffStatName_attack_speed"')),env);
 vm.runInContext(source.slice(source.indexOf('    function mirror()'),source.indexOf('    function compact(')),env);
 for(const [n,isHero,expected] of [['npc_dota_hero_doom_bringer',true,[true,true]],['building_farm',false,[false,false]],['npc_survival_named_ten_sin_10',true,[true,false]],['npc_survival_super_lumberjack_04',false,[true,false]],['npc_survival_repairer',false,[false,false]],['npc_dota_hero_axe',true,[true,true]]]){
  name=n;hero=isHero;env.mirror();stats.forEach((a,i)=>{for(const prefix of ['HandoffStatIcon_','HandoffStatName_','HandoffStat_'])assert.equal(nodes[prefix+a[0]].style.visibility,prefix==='HandoffStatName_'?'collapse':(expected[i<3?0:1] && !(n.includes('lumberjack') && i===1))?'visible':'collapse',n+' '+prefix+a[0]);});
@@ -29,17 +31,17 @@ for(const [n,isHero,expected] of [['npc_dota_hero_doom_bringer',true,[true,true]
 multi=true;env.mirror();assert.equal(nodes.HandoffStat_attack.style.visibility,'collapse');multi=false;env.mirror();assert.equal(nodes.HandoffStat_strength.style.visibility,'visible');
 console.log('UNIT_STAT_VISIBILITY_PASS: all building/proxy variants, monsters/Bosses, worker levels, six heroes, live selection switching, all row elements and multiselect recovery');
 
-// Green fixed bonuses never leak into a different unit or multiselect.
+// Only final totals remain visible, including signed armor.
 let snapshot={entindex:1,attack_max:500,display_attack_bonus:60.7,display_attack_pct:10,armor:12,display_armor_bonus:14,display_armor_pct:20};
 env.cfg.HandoffCombat={Snapshot:()=>snapshot};env.compact=n=>String(n);env.text=(id,value)=>{if(nodes[id])nodes[id].text=String(value);};
 name='npc_dota_hero_doom_bringer';hero=true;env.mirror();
-assert.equal(nodes.HandoffStat_attack.text,'439.3');assert.equal(nodes.HandoffStat_armor.text,'-2');
-assert.equal(nodes.HandoffStatBonus_attack.style.visibility,'visible');assert(nodes.HandoffStatPercent_attack.text.includes('10%'));
+assert.equal(nodes.HandoffStat_attack.text,'500');assert.equal(nodes.HandoffStat_armor.text,'12');
+assert.equal(nodes.HandoffStatBonus_attack.style.visibility,'collapse');assert.equal(nodes.HandoffStatPercent_attack.style.visibility,'collapse');
 name='npc_survival_named_ten_sin_10';env.mirror();assert.equal(nodes.HandoffStatBonus_attack.style.visibility,'collapse');
 name='npc_dota_hero_doom_bringer';snapshot=null;env.mirror();assert.equal(nodes.HandoffStatBonus_attack.style.visibility,'collapse');
-console.log('HERO_BONUS_HUD_PASS: fixed amount + actual percentage, negative armor, monster and stale snapshot isolation');
+console.log('HERO_FINAL_STATS_HUD_PASS: final totals include bonuses, hidden bonus rows, monster and stale snapshot isolation');
 
-assert(!nodes.HandoffStatBonus_attack.text.includes('%'));assert(!nodes.HandoffStatBonus_attack.text.includes('('));
+assert.equal(nodes.HandoffStatBonus_attack.style.visibility,'collapse');
 name='enemy_tree';env.cfg.HandoffCombat.Snapshot=()=>null;hero=false;
 assert.equal(env.statVisibility(1).tree,true);assert.equal(env.statVisibility(1).building,false);
 assert.equal(env.statVisibility(1).combat,false);assert.equal(env.statVisibility(1).attributes,false);
@@ -86,7 +88,7 @@ env.cfg.HandoffCombat.Snapshot=()=>({model_asset_id:'builder_io_benevolent_compa
 assert.equal(env.statVisibility(1).attributes,false);
 env.mirror();assert.equal(nodes.HandoffStatIcon_attack.style.visibility,'visible');
 assert.equal(nodes.HandoffStatIcon_strength.style.visibility,'collapse');
-const layout=require('../panorama/src/scripts/custom_game/geometry_remaining_5d5c1152eb.js');
+const layout=require(path.join(scripts,'geometry_remaining_5d5c1152eb.js'));
 for(const [w,h] of [[960,720],[1600,900],[1920,1080],[3440,1440]]){
  const builder=layout(w,h,4,false,false,env.statVisibility(1));
  const heroLayout=layout(w,h,4,false,false,{combat:true,attributes:true});
@@ -134,7 +136,7 @@ for(const args of [
  for(const a of stats){
   assert.equal(nodes['HandoffStatIcon_'+a[0]].style.height,args[2].worker?'64px':'48px');
   assert.equal(nodes['HandoffStat_'+a[0]].style.verticalAlign,'center');
-  for(const prefix of ['HandoffStatMain_','HandoffStatBonusRow_','HandoffStat_','HandoffStatBonus_','HandoffStatPercent_']){
+  for(const prefix of ['HandoffStatBonusRow_','HandoffStatBonus_','HandoffStatPercent_']){
    const style=nodes[prefix+a[0]].style;
    assert.equal(style.width,'fit-children');assert.equal(style.minWidth,'0px','production place minimum must not fill '+prefix+a[0]);
   }
@@ -145,11 +147,12 @@ env.layoutStats(layout(1920,1080,7,false,false,{attributes:true}));
 for(const a of stats){
  const row=nodes['HandoffStatRow_'+a[0]],main=nodes['HandoffStatMain_'+a[0]],bonus=nodes['HandoffStatBonusRow_'+a[0]];
  const icon=nodes['HandoffStatIcon_'+a[0]],value=nodes['HandoffStat_'+a[0]],amount=nodes['HandoffStatBonus_'+a[0]],pct=nodes['HandoffStatPercent_'+a[0]];
- assert.equal(main.style.horizontalAlign,'center');assert.equal(bonus.style.horizontalAlign,'center');
+ assert.equal(main.style.horizontalAlign,'left');assert.equal(bonus.style.horizontalAlign,'center');
  assert.equal(icon.GetParent(),main);assert.equal(value.GetParent(),main);assert.equal(amount.GetParent(),bonus);assert.equal(pct.GetParent(),bonus);
  assert.equal(value.style.fontSize,'32px');assert.equal(value.style.textOverflow,'shrink');
+ assert.equal(value.style.textAlign,'left');assert.equal(value.style.marginLeft,'4px');
  assert(parseFloat(value.style.maxWidth)>=100,'1291.4 fits beside the icon at normal font size');
  assert(parseFloat(icon.style.width)+parseFloat(value.style.marginLeft)+parseFloat(value.style.maxWidth)<=parseFloat(row.style.width),'long values stay within the compact gutter');
  assert(parseFloat(amount.style.maxWidth)+parseFloat(pct.style.marginLeft)+parseFloat(pct.style.maxWidth)<=parseFloat(row.style.width)+.001,'bonus and percentage never overlap');
 }
-console.log('STAT_ROW_DIMENSIONS_PASS: production place minima, natural centered groups, normal-font sample values, bounded long values, nonoverlapping bonuses, heroes/builders/workers and nonnegative hidden rows');
+console.log('STAT_ROW_DIMENSIONS_PASS: fixed left icon/value columns, normal-font sample values, bounded long values, heroes/builders/workers and nonnegative hidden rows');

@@ -1,0 +1,317 @@
+{
+  "kind": "exact_official_dota_vpk_hud_stats_icons_preview_only",
+  "at": "2026-10-14T06:48:39.284Z",
+  "vpk": "../../dota/pak01_dir.vpk",
+  "game_uses_native_s2r_uri": true,
+  "no_image_editing": true,
+  "recommendedIds": [
+    "attack",
+    "armor",
+    "attack_speed",
+    "strength",
+    "agility",
+    "intelligence"
+  ],
+  "aliases": {
+    "s2r://panorama/images/hud/reborn/icon_damage_psd.vtex": "design_refs/hud_stats_20261014/native_icons/icon_damage_psd.png",
+    "s2r://panorama/images/hud/reborn/icon_armor_psd.vtex": "design_refs/hud_stats_20261014/native_icons/icon_armor_psd.png",
+    "s2r://panorama/images/hud/reborn/icon_attack_speed_psd.vtex": "design_refs/hud_stats_20261014/native_icons/icon_attack_speed_psd.png",
+    "s2r://panorama/images/primary_attribute_icons/primary_attribute_icon_strength_psd.vtex": "design_refs/hud_stats_20261014/native_icons/primary_attribute_icon_strength_psd.png",
+    "s2r://panorama/images/primary_attribute_icons/primary_attribute_icon_agility_psd.vtex": "design_refs/hud_stats_20261014/native_icons/primary_attribute_icon_agility_psd.png",
+    "s2r://panorama/images/primary_attribute_icons/primary_attribute_icon_intelligence_psd.vtex": "design_refs/hud_stats_20261014/native_icons/primary_attribute_icon_intelligence_psd.png",
+    "s2r://panorama/images/primary_attribute_icons/mini_primary_attribute_icon_strength_psd.vtex": "design_refs/hud_stats_20261014/native_icons/mini_primary_attribute_icon_strength_psd.png",
+    "s2r://panorama/images/primary_attribute_icons/mini_primary_attribute_icon_agility_psd.vtex": "design_refs/hud_stats_20261014/native_icons/mini_primary_attribute_icon_agility_psd.png",
+    "s2r://panorama/images/primary_attribute_icons/mini_primary_attribute_icon_intelligence_psd.vtex": "design_refs/hud_stats_20261014/native_icons/mini_primary_attribute_icon_intelligence_psd.png"
+  },
+  "records": [
+    {
+      "id": "attack",
+      "resource": "panorama/images/hud/reborn/icon_damage_psd.vtex_c",
+      "binding": "panorama/styles/hud/dota_hud_stats_region.vcss_c",
+      "selector": "#DamageIcon",
+      "recommended": true,
+      "uri": "s2r://panorama/images/hud/reborn/icon_damage_psd.vtex",
+      "compiledSourceSha256": "032e021f9f629174202adc35d72acfd9ad47518bc5311f57d6e04103d872f9ab",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/icon_damage_psd.png",
+      "previewPngSha256": "53f2aa9b9c506614ed2148a6fd0bdd8b1ee2e578aa0fb694632dfbec4cc85eaa",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        32,
+        32
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        0,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "armor",
+      "resource": "panorama/images/hud/reborn/icon_armor_psd.vtex_c",
+      "binding": "panorama/styles/hud/dota_hud_stats_region.vcss_c",
+      "selector": "#ArmorIcon",
+      "recommended": true,
+      "uri": "s2r://panorama/images/hud/reborn/icon_armor_psd.vtex",
+      "compiledSourceSha256": "fc2625927f70af928defca5e6f5f4cff7f91396145dba782bf08a8cc4a1eed71",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/icon_armor_psd.png",
+      "previewPngSha256": "5675912d2c105b9fd9c0fb48e7d8730ce438abeda2141e3b3e1f5bdd682b0430",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        32,
+        32
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        2,
+        1,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "attack_speed",
+      "resource": "panorama/images/hud/reborn/icon_attack_speed_psd.vtex_c",
+      "binding": "panorama/styles/hud/dota_hud_stats_region.vcss_c",
+      "selector": "#AttackSpeedIcon",
+      "recommended": true,
+      "uri": "s2r://panorama/images/hud/reborn/icon_attack_speed_psd.vtex",
+      "compiledSourceSha256": "be235ec1fa1339117bacd5c361a9e4d2e30f351c807a390a0f8d43ce385b8109",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/icon_attack_speed_psd.png",
+      "previewPngSha256": "272c065e80056890c798f1d5820e6201464855634b17a71197ac5265736c6d31",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        32,
+        32
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        3,
+        0,
+        32,
+        32
+      ]
+    },
+    {
+      "id": "strength",
+      "resource": "panorama/images/primary_attribute_icons/primary_attribute_icon_strength_psd.vtex_c",
+      "binding": "panorama/styles/hud/tooltip_unit_damage_armor.vcss_c",
+      "selector": "#StrengthIcon",
+      "recommended": true,
+      "uri": "s2r://panorama/images/primary_attribute_icons/primary_attribute_icon_strength_psd.vtex",
+      "compiledSourceSha256": "3dfe2fccb70ffa11b7a3f05a96a6ed1eb5456c61d3cf57a233eb2ddba6de2966",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/primary_attribute_icon_strength_psd.png",
+      "previewPngSha256": "0ad3f55684c9cba0fa209c6f02b566d7ffa935adae425848febc761155168856",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        45,
+        45
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        2,
+        2,
+        43,
+        43
+      ]
+    },
+    {
+      "id": "agility",
+      "resource": "panorama/images/primary_attribute_icons/primary_attribute_icon_agility_psd.vtex_c",
+      "binding": "panorama/styles/hud/tooltip_unit_damage_armor.vcss_c",
+      "selector": "#AgilityIcon",
+      "recommended": true,
+      "uri": "s2r://panorama/images/primary_attribute_icons/primary_attribute_icon_agility_psd.vtex",
+      "compiledSourceSha256": "b17291604b57c8f41dbe044d5cd86fcf08728344c2d1019c740589ebdcb874c3",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/primary_attribute_icon_agility_psd.png",
+      "previewPngSha256": "233fdb26bb5c1bbaf36db4b23b2a7659c9ee4cbb9e2b7d0a13ac45d43fc734f4",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        45,
+        45
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        2,
+        2,
+        43,
+        43
+      ]
+    },
+    {
+      "id": "intelligence",
+      "resource": "panorama/images/primary_attribute_icons/primary_attribute_icon_intelligence_psd.vtex_c",
+      "binding": "panorama/styles/hud/tooltip_unit_damage_armor.vcss_c",
+      "selector": "#IntelligenceIcon",
+      "recommended": true,
+      "uri": "s2r://panorama/images/primary_attribute_icons/primary_attribute_icon_intelligence_psd.vtex",
+      "compiledSourceSha256": "52c6d97c340fb53500ffd88ba611ac3ee70f80156101c08029d74da32a2491fb",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/primary_attribute_icon_intelligence_psd.png",
+      "previewPngSha256": "9d505c15421bf4c86a8435ea45a3a6c080b12e2cd77483b12cd7a8b2264e2bc5",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        45,
+        45
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        2,
+        2,
+        43,
+        43
+      ]
+    },
+    {
+      "id": "strength_mini",
+      "resource": "panorama/images/primary_attribute_icons/mini_primary_attribute_icon_strength_psd.vtex_c",
+      "recommended": false,
+      "note": "Exact official small attribute asset; recommended full-size icon binding is documented above.",
+      "uri": "s2r://panorama/images/primary_attribute_icons/mini_primary_attribute_icon_strength_psd.vtex",
+      "compiledSourceSha256": "e660db49cc9eb461aa4016df919bef7ef5c97344ff8fc1f28671330c4fa667e6",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/mini_primary_attribute_icon_strength_psd.png",
+      "previewPngSha256": "1b67e3ac1da926bbb46c47a2900b1d8a2e3bc179defa8002a42053f5de39114a",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        24,
+        24
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        1,
+        1,
+        23,
+        23
+      ]
+    },
+    {
+      "id": "agility_mini",
+      "resource": "panorama/images/primary_attribute_icons/mini_primary_attribute_icon_agility_psd.vtex_c",
+      "recommended": false,
+      "note": "Exact official small attribute asset; recommended full-size icon binding is documented above.",
+      "uri": "s2r://panorama/images/primary_attribute_icons/mini_primary_attribute_icon_agility_psd.vtex",
+      "compiledSourceSha256": "26ecf409c97a0112690e302207413ead87cfdc110aa7642851126e67dcee15bc",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/mini_primary_attribute_icon_agility_psd.png",
+      "previewPngSha256": "5e6151ad1865a7bef401a9001f1e7c10ad1907aac9f787245f84ceead4794be3",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        24,
+        24
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        1,
+        1,
+        23,
+        23
+      ]
+    },
+    {
+      "id": "intelligence_mini",
+      "resource": "panorama/images/primary_attribute_icons/mini_primary_attribute_icon_intelligence_psd.vtex_c",
+      "recommended": false,
+      "note": "Exact official small attribute asset; recommended full-size icon binding is documented above.",
+      "uri": "s2r://panorama/images/primary_attribute_icons/mini_primary_attribute_icon_intelligence_psd.vtex",
+      "compiledSourceSha256": "9960360c2094f6174aaf9e3a65c6111bfc6c8d28401fd581693085fa66f7496b",
+      "previewPng": "design_refs/hud_stats_20261014/native_icons/mini_primary_attribute_icon_intelligence_psd.png",
+      "previewPngSha256": "ebed271532d62d4ff3c805976829833a3f9b61264a0dac6d8d4ab43997e153f9",
+      "export_method": "Source2Viewer-CLI exact VPK texture -d; no postprocessing",
+      "png_size": [
+        24,
+        24
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_subject_bounds_gt16": [
+        1,
+        1,
+        23,
+        23
+      ]
+    }
+  ],
+  "nativeSources": [
+    {
+      "resource": "panorama/styles/hud/dota_hud_hero_attribute.vcss_c",
+      "compiledSourceSha256": "1dcb52169612ff2317ba15c3f33e5ef15fe648dfb3d29a89abab35af97f997ca",
+      "decodedDataSha256": "fde7413a90ef1e31606319988d0fcbc05392520656c2d2678eae9c9c397e86e8"
+    },
+    {
+      "resource": "panorama/layout/hud/dota_hud_hero_attribute.vxml_c",
+      "compiledSourceSha256": "b37b0eef928bb046dd0203200ead0e5626f9c18639b1c4be546f7cd7d04df462",
+      "decodedDataSha256": "463ae9f892ffb642dfeb290e7e622572426ff851e3d408e9fdcceb0c474fadc5"
+    },
+    {
+      "resource": "panorama/styles/hud/dota_hud_query_unit_stats.vcss_c",
+      "compiledSourceSha256": "92c0ca35ed1a8fb7ec73a8c3df3bb8a7933d0a14c81d935c2027ad7d237f2914",
+      "decodedDataSha256": "be3b206012ed51b67ae42ab1c6ae199aa47caa8862af2c53cad293e13396aa47"
+    },
+    {
+      "resource": "panorama/layout/hud/dota_hud_query_unit_stats.vxml_c",
+      "compiledSourceSha256": "82569c50eaa5e56193a3af6c7dc05342eb5706e9e2264cce0411ed6e040d0968",
+      "decodedDataSha256": "5296f63517e581002cf19e73df3d238dddfe1fa62ec0c65c80997b3ed99be101"
+    },
+    {
+      "resource": "panorama/styles/hud/dota_hud_stats_region.vcss_c",
+      "compiledSourceSha256": "e0c5ea2c2258e9a228caf622afe2b85a7bf7d0026fce52dba33d566f9c369136",
+      "decodedDataSha256": "39ffbdd6a0629741b6918e4873d9963a57f492d47adcf38cafe20297f92350c2"
+    },
+    {
+      "resource": "panorama/layout/hud/dota_hud_stats_region.vxml_c",
+      "compiledSourceSha256": "62cf26926d2bd6341adefa8baac8ebd933320c1d65808ce7cb7ecdb36d3a82b7",
+      "decodedDataSha256": "fa172af787b199e7317532a6213d61b7dc037d75754f7f9460dfcdf44f07e8c9"
+    },
+    {
+      "resource": "panorama/styles/hud/dota_hud_stat_branch.vcss_c",
+      "compiledSourceSha256": "f873868c7a1ba09db4ac366ffc32490fe915c5e271e97d9167df74e823e7249d",
+      "decodedDataSha256": "f5b49f1f38d10f82aa1a855cac4b2df49b17ba1482f7387f6a7903c80d2dc587"
+    },
+    {
+      "resource": "panorama/layout/hud/dota_hud_stat_branch.vxml_c",
+      "compiledSourceSha256": "61022f1500c7b3f7eb4dc621a6d90d3441fc6cbfdaaad67bb8a3999ff8d4d477",
+      "decodedDataSha256": "65b05e69acc0eeae9909c140c5fb45b6dc87565381788a88dffcbb8d41a38fac"
+    },
+    {
+      "resource": "panorama/styles/hud/dota_hud_unit_damage_armor.vcss_c",
+      "compiledSourceSha256": "492ad61666590e6d3546e91d66d803b6dfcdece735bda978d7192ed2a071e63a",
+      "decodedDataSha256": "e45e33ac7db2c3f571fadad0ca0a61595d50f2cb22102019f4ddd11cf058b909"
+    },
+    {
+      "resource": "panorama/layout/hud/dota_hud_unit_damage_armor.vxml_c",
+      "compiledSourceSha256": "84e05ec2cd1bef8f7888c1214bceee9a0a229c327d9c3dd8c1c4952f11eb65d6",
+      "decodedDataSha256": "acb556f960e8973f7a85fa7def0bcecfef5b477850649c4233d644091fbd46b6"
+    },
+    {
+      "resource": "panorama/styles/hud/tooltip_unit_damage_armor.vcss_c",
+      "compiledSourceSha256": "7d017b49704d8e7a03f4888f5ee4f04fb75bff59bfefb742a9987e18466559f6",
+      "decodedDataSha256": "8637496e97fb4386d3c40de3168fc975a9767e703f5c6b7834a1db475cb0f41d"
+    }
+  ],
+  "native_source_cache": "Optional exports from the official VPK; resource names and hashes are retained."
+}

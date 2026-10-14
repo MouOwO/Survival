@@ -56,9 +56,9 @@ for(const args of [
  for(const [key] of stats){
   assert.equal(nodes['HandoffStatIcon_'+key].style.height,g.worker?'64px':'48px');
   assert.equal(nodes['HandoffStat_'+key].style.verticalAlign,'center');
-  for(const prefix of ['HandoffStatMain_','HandoffStatBonusRow_','HandoffStat_','HandoffStatBonus_','HandoffStatPercent_']){
+  for(const prefix of ['HandoffStatBonusRow_','HandoffStatBonus_','HandoffStatPercent_']){
    assert.equal(nodes[prefix+key].style.width,'fit-children');
-   assert.equal(nodes[prefix+key].style.minWidth,'0px','fixed production minimum must not defeat natural-width centering');
+   assert.equal(nodes[prefix+key].style.minWidth,'0px');
   }
  }
  if(g.lumberjack)for(const key of ['attack','attack_speed']){
@@ -71,12 +71,42 @@ env.layoutStats(geometry(1920,1080,7,false,false,{attributes:true}));
 for(const [key] of stats){
  const row=nodes['HandoffStatRow_'+key],main=nodes['HandoffStatMain_'+key],bonus=nodes['HandoffStatBonusRow_'+key];
  const icon=nodes['HandoffStatIcon_'+key],value=nodes['HandoffStat_'+key],amount=nodes['HandoffStatBonus_'+key],pct=nodes['HandoffStatPercent_'+key];
- assert.equal(main.style.horizontalAlign,'center');assert.equal(bonus.style.horizontalAlign,'center');
+ assert.equal(main.style.horizontalAlign,'left');assert.equal(bonus.style.horizontalAlign,'center');
  assert.equal(icon.GetParent(),main);assert.equal(value.GetParent(),main);assert.equal(amount.GetParent(),bonus);assert.equal(pct.GetParent(),bonus);
  assert.equal(value.style.fontSize,'32px');assert.equal(value.style.textOverflow,'shrink');
+ assert.equal(value.style.textAlign,'left');assert.equal(value.style.marginLeft,'4px');
+ assert.equal(main.style.width,row.style.width,'fixed main columns occupy the same width for short and long values');
+ assert.equal(value.style.width,value.style.maxWidth,'value columns retain their full budget');
  assert(parseFloat(value.style.maxWidth)>=100,'1291.4 retains normal font space beside the icon');
  assert(parseFloat(icon.style.width)+parseFloat(value.style.marginLeft)+parseFloat(value.style.maxWidth)<=parseFloat(row.style.width),'long numbers have a bounded shrink path inside the gutter');
  assert(parseFloat(amount.style.maxWidth)+parseFloat(pct.style.marginLeft)+parseFloat(pct.style.maxWidth)<=parseFloat(row.style.width)+.001,'bonuses and percentages have disjoint width budgets');
 }
+for(let row=0;row<3;row++){
+ const left=nodes['HandoffStatRow_'+stats[row][0]].style,right=nodes['HandoffStatRow_'+stats[row+3][0]].style;
+ assert.equal(left.position.split(' ')[1],right.position.split(' ')[1],'left and right stats share row height');
+ assert.equal(left.width,right.width,'both gutters use the same icon/value columns');
+ assert.equal(left.position.split(' ')[0],'295px','left rows use the reduced outer padding');
+}
+for(const key of ['attack','armor','attack_speed'])assert.equal(nodes['HandoffStat_'+key].style.position,'0px 0px 0px');
+const cornerStart=source.indexOf('            var centerPlate=nine(');
+const cornerEnd=source.indexOf('            place(inventory,',cornerStart);
+assert(cornerStart>=0&&cornerEnd>cornerStart);
+const plate={style:{}};
+const corners={g:null,background:{},nine:()=>plate,centerOffset:g=>g.centerX,style:(p,v)=>{assert.equal(p,plate,'only background plate receives corner clipping');Object.assign(p.style,v);}};
+vm.createContext(corners);
+for(const [presentation,building,tree,rounded] of [
+ [{attributes:true},false,false,false],
+ [{monster:true},false,false,false],
+ [{worker:true},false,false,true],
+ [{worker:true,lumberjack:true,multi:true},false,false,true],
+ [{building:true},true,false,true],
+ [{tree:true},false,true,true],
+ [{attributes:true},false,false,false]
+]){
+ corners.g=geometry(1920,1080,4,building,tree,presentation);
+ vm.runInContext(source.slice(cornerStart,cornerEnd),corners);
+ assert.equal(plate.style.overflow,rounded?'clip':'noclip','clipping restores when switching between compact and hero selection');
+ assert.equal(plate.style.borderRadius,rounded?'14px 14px 0px 0px':'0px');
+}
 assert.equal(created,12,'layout reuses its six main/bonus groups across selection changes');
-console.log('HUD_COMPACT_GEOMETRY_PASS: 640/1280/1920/2560px; four/seven/32 native abilities; six items; centered actual widths; hero/monster/builder; production place minima; natural stat groups; sample and long numbers; nonoverlapping bonuses; worker/tree/building transitions');
+console.log('HUD_COMPACT_GEOMETRY_PASS: 640/1280/1920/2560px; four/seven/32 native abilities; six items; centered whole HUD; fixed left icon/value columns; matching row heights; compact padding; long values; worker/tree/building transitions; isolated compact top-corner clipping');

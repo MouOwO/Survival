@@ -456,7 +456,8 @@ __pycache__/
 # Local failed capture attempts and one-off engine audit commands.
 /design_refs/shop_ui_12h/work/production/game_*.png
 /tools/wall_contact_readonly_audit.json
-# This local directory junction points at art/ui/sources; track only the canonical source path.
+# New image exports duplicate canonical art/ui/sources or tracked design packages.
+# Existing tracked legacy sources in this directory remain versioned.
 /panorama/src/images/
 !/scripts/vscripts/tests/test_wall_melee_contact.lua
 !/scripts/vscripts/tests/test_wall_navigation.lua
@@ -509,3 +510,19 @@ __pycache__/
 /apps/comfy-dashboard/
 /design_refs/archive_v10/work/
 /design_refs/menus_v10/work/
+
+# Keep reusable native masks and final UI references; omit generated iterations.
+/design_refs/daily_gw2_v2/work/*
+!/design_refs/daily_gw2_v2/work/native_masks/
+/design_refs/daily_gw2_v2/work/native_masks/*
+!/design_refs/daily_gw2_v2/work/native_masks/*.png
+!/design_refs/daily_gw2_v2/work/native_masks/manifest.json
+!/design_refs/daily_gw2_v2/work/final/
+/design_refs/daily_gw2_v2/work/final/*
+!/design_refs/daily_gw2_v2/work/final/*.png
+!/design_refs/daily_gw2_v2/work/native/
+/design_refs/daily_gw2_v2/work/native/*
+!/design_refs/daily_gw2_v2/work/native/*.png
+/design_refs/hud_stats_20261014/before/
+/design_refs/hud_stats_20261014/compile.json
+/design_refs/hud_stats_20261014/verification.json

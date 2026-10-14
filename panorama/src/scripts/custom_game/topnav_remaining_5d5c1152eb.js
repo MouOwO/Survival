@@ -376,12 +376,18 @@
         });
         style(nodes["HandoffStatBonus_"+a[0]],{color:"#8fe080",fontSize:"24px"});
     });
+    function attackFrequencyText(value) {
+        if(value===undefined||value===null)return "…";
+        var rate=Number(value),rounded=Math.round(rate*10)/10;
+        return isFinite(rate)&&rate>=0&&isFinite(rounded)?rounded.toFixed(1):"…";
+    }
     ["HandoffStatName_attack_speed","HandoffStat_attack_speed","HandoffStatIcon_attack_speed"].forEach(function(id){
         nodes[id].hittest=true;tooltip(nodes[id],function(){
             var s=selectedSnapshot(),d=s&&s.stat_tooltips&&s.stat_tooltips.attack_speed;
-            if(!d)return "正在读取攻速来源";
+            if(!d)return "攻速（刀/秒）<br>正在读取攻速来源";
             function n(v){return Number(v||0).toFixed(2).replace(/\.?0+$/,"");}
-            var lines=["当前攻速："+n(d.percentage)+"%"];
+            var lines=["当前攻速："+attackFrequencyText(s.attack_speed)+" 刀/秒"];
+            lines.push("攻速倍率："+n(d.percentage)+"%");
             if(d.base_interval)lines.push("基础攻击间隔："+n(d.base_interval)+" 秒");
             var reductions=d.interval_reductions||{},bonuses=d.speed_bonuses||{};
             Object.keys(reductions).forEach(function(k){var r=reductions[k];if(Number(r.value))lines.push(r.label+"：间隔减少 "+n(r.value)+" 秒");});
@@ -394,8 +400,8 @@
     });
     function layoutStats(g) {
         stats.forEach(function(a,i){
-            var x=i<3?301:g.attributeX+8,y=32+(i%3)*98;
-            var rowWidth=Math.max(0,i<3?g.heroWidth-293-16:g.attributeWidth-16);
+            var x=i<3?295:g.attributeX+2,y=32+(i%3)*98;
+            var rowWidth=Math.max(0,i<3?g.heroWidth-293-4:g.attributeWidth-4);
             if(g.lumberjack && (i===0 || i===2)) {
                 x=g.heroWidth+(i===0?24:g.centerWidth/2+12);y=185;rowWidth=g.centerWidth/2-36;
             }
@@ -406,15 +412,14 @@
             [["HandoffStatIcon_",main],["HandoffStat_",main],["HandoffStatBonus_",bonus],["HandoffStatPercent_",bonus]].forEach(function(entry){
                 var node=nodes[entry[0]+a[0]];if(node.GetParent()!==entry[1])node.SetParent(entry[1]);
             });
-            var iconSize=g.worker?64:48,textWidth=Math.max(0,rowWidth-iconSize-8);
+            var iconSize=g.worker?64:48,textWidth=Math.max(0,rowWidth-iconSize-4);
             place(row,x,y,rowWidth,88);
             place(main,0,0,rowWidth,iconSize);
-            // Natural-width icon/value pairs center short and long numbers as
-            // one group. The bounded label can shrink unusually long values.
-            style(main,{flowChildren:"right",width:"fit-children",minWidth:"0px",maxWidth:rowWidth+"px",horizontalAlign:g.worker?"left":"center",overflow:"noclip"});
+            // Fixed icon/value columns align every row, regardless of digit count.
+            style(main,{flowChildren:"right",horizontalAlign:"left",overflow:"noclip"});
             place(nodes["HandoffStatIcon_"+a[0]],0,0,iconSize,iconSize);
             place(nodes["HandoffStat_"+a[0]],0,0,textWidth,44);
-            style(nodes["HandoffStat_"+a[0]],{width:"fit-children",minWidth:"0px",maxWidth:textWidth+"px",marginLeft:"8px",fontSize:"32px",fontWeight:"normal",height:"fit-children",minHeight:"0px",verticalAlign:"center",textAlign:"center",textOverflow:"shrink"});
+            style(nodes["HandoffStat_"+a[0]],{maxWidth:textWidth+"px",marginLeft:"4px",fontSize:"32px",fontWeight:"normal",height:"fit-children",minHeight:"0px",verticalAlign:"center",textAlign:"left",textOverflow:"shrink"});
             var bonusWidth=Math.max(0,(rowWidth-6)*.52),percentWidth=Math.max(0,rowWidth-6-bonusWidth);
             place(bonus,0,g.worker?65:58,rowWidth,24);
             style(bonus,{flowChildren:"right",width:"fit-children",minWidth:"0px",maxWidth:rowWidth+"px",horizontalAlign:"center",overflow:"noclip"});
@@ -464,8 +469,8 @@
             "<br>来自装备、研究、固定奖励与固定技能效果。"+
             "<br>加成合计："+compact(snapshot["display_"+key+"_bonus"]||0)+
             "<br>百分比效果："+compact(snapshot["display_"+key+"_pct"]||0)+"%"+
-            "<br>红色百分比已计入绿色合计，不需要再加一次。"+
-            "<br>逐秒、攻击、伤害、杀敌累积成长计入白色数值。";
+            "<br>所有加成与百分比已计入面板最终数值。"+
+            "<br>逐秒、攻击、伤害、杀敌累积成长也计入最终数值。";
     }
     for(var i=0;i<6;i++)slotFrames.push(art(bottom,"HandoffItemFrame_"+i,"slot_frame"));
     function nine(parent,id,key,x,y,w,h,cx,cy) {
@@ -1062,7 +1067,11 @@
             nine(background,"HandoffCombatPlate","center_base",293,23,Math.max(36,g.heroWidth-293),307,18,20);
             nine(background,"HandoffAttributesPlate","center_base",g.attributeX,23,g.attributeWidth,307,18,20);
             layoutStats(g);
-            place(center,centerOffset(g),23,g.centerWidth,g.height-23);nine(background,"HandoffCenterPlate","center_base",centerOffset(g),23,g.centerWidth,g.height-23,18,20);
+            place(center,centerOffset(g),23,g.centerWidth,g.height-23);
+            var centerPlate=nine(background,"HandoffCenterPlate","center_base",centerOffset(g),23,g.centerWidth,g.height-23,18,20);
+            // Round only the compact outer plate. Portraits, title plaques and
+            // native ability hit targets remain outside this clipping group.
+            style(centerPlate,{borderRadius:g.heroWidth===0||g.worker?"14px 14px 0px 0px":"0px",overflow:g.heroWidth===0||g.worker?"clip":"noclip"});
             place(inventory,g.inventoryX,23,401,307);
             ["hp","mp"].forEach(function(type,index){var y=175+index*60;
                 place(nodes["Handoff_"+type+"_track"],20,y+4,g.barWidth-8,44);
@@ -1280,25 +1289,20 @@
         buildingPresentation(shown,multi);
         stats.forEach(function(a,i){
             var visible=shown.lumberjack ? (i===0 || i===2) : !multi && (i<3?shown.combat:shown.attributes);
-            var source=findCached(ctx,a[1]);if(source)text("HandoffStat_"+a[0],source.text);
-            var key=a[0]==="intelligence"?"intellect":a[0];
-            var amount=snapshot && snapshot["display_"+key+"_bonus"];
-            var hasBonus=visible && shown.attributes && key!=="attack_speed" && amount!==undefined && amount!==null;
-            var visibilityKey=[unit,visible?1:0,hasBonus?1:0].join(":"),statNode=nodes["HandoffStat_"+a[0]];
+            var source=findCached(ctx,a[1]),key=a[0]==="intelligence"?"intellect":a[0];
+            var finalValue=snapshot&&snapshot[key==="attack"?"attack_max":key];
+            // Frequency has its own authoritative field; a legacy percentage
+            // source must never be presented as attacks per second.
+            if(key==="attack_speed")text("HandoffStat_"+a[0],attackFrequencyText(finalValue));
+            else if(finalValue!==undefined&&finalValue!==null&&isFinite(Number(finalValue)))text("HandoffStat_"+a[0],compact(Number(finalValue)));
+            else text("HandoffStat_"+a[0],source&&source.text||"…");
+            var visibilityKey=[unit,visible?1:0].join(":"),statNode=nodes["HandoffStat_"+a[0]];
             if(repaint||!statNode||statNode.__handoffVisibilityKey!==visibilityKey){
                 style(nodes["HandoffStatIcon_"+a[0]],{visibility:visible?"visible":"collapse"});
                 style(nodes["HandoffStatName_"+a[0]],{visibility:"collapse"});
                 style(statNode,{visibility:visible?"visible":"collapse"});
-                ["HandoffStatBonus_","HandoffStatPercent_"].forEach(function(prefix){style(nodes[prefix+a[0]],{visibility:hasBonus?"visible":"collapse"});});
+                ["HandoffStatBonus_","HandoffStatPercent_"].forEach(function(prefix){style(nodes[prefix+a[0]],{visibility:"collapse"});});
                 if(statNode)statNode.__handoffVisibilityKey=visibilityKey;
-            }
-            if(hasBonus) {
-                var total=Number(snapshot[key==="attack"?"attack_max":key]);
-                var pct=Math.round(Number(snapshot["display_"+key+"_pct"]||0)*10)/10;
-                if(isFinite(total))text("HandoffStat_"+a[0],compact(Math.round((total-Number(amount))*100)/100));
-                var rounded=Math.round(Number(amount)*100)/100;
-                text("HandoffStatBonus_"+a[0],(rounded>=0?"+":"")+compact(rounded));
-                text("HandoffStatPercent_"+a[0],(pct>=0?"+":"")+pct+"%");
             }
         });
         var availability={};
