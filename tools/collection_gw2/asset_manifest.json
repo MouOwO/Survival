@@ -1,9 +1,6 @@
 {
   "version": 2,
-  "canvas": [
-    760,
-    410
-  ],
+  "canvas": [900, 478],
   "reference": "Original annotated Guild Wars 2 Inventory, 815x528",
   "reference_source": "design_refs/collection_gw2_v2/reference_inventory.png",
   "material_source": "design_refs/collection_gw2_v2/blank_plate.png",

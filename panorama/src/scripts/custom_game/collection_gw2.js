@@ -3,8 +3,9 @@
 var cfg=GameUI.CustomUIConfig(),U=cfg.SurvivalUI,A=cfg.ArchiveHandoff,root=$.GetContextPanel();
 if(!U||!A)return;
 if(cfg.SurvivalCollection&&cfg.SurvivalCollection.Dispose)cfg.SurvivalCollection.Dispose();
-var P=cfg.CollectionGW2Data||{},size=P.canvas||[760,410],fitReference=[1200,778],life=U.Lifecycle(),viewLife=U.Lifecycle();
-var columns=6,slotSize=104,portraitSize=100,pitch=112,gridHeight=216;
+var P=cfg.CollectionGW2Data||{},size=P.canvas||[900,478],fitReference=[1200,778],life=U.Lifecycle(),viewLife=U.Lifecycle();
+var columns=10,slotSize=78,portraitSize=74,pitch=84,rowsPerPage=4;
+var gridWidth=(columns-1)*pitch+slotSize,gridHeight=(rowsPerPage-1)*pitch+slotSize;
 // Intent and authoritative caches outlive an individual layout/script instance.
 // Closing or reloading must never turn one pending draw into another purchase.
 var shared=cfg.SurvivalCollectionState||(cfg.SurvivalCollectionState={pages:{},versions:{},pending:null,serial:0});
@@ -38,35 +39,35 @@ style(win,{width:size[0]+"px",height:size[1]+"px",horizontalAlign:"center",verti
 canvas=make("Panel",win,"CollectionGW2Canvas","CollectionGW2Canvas");rect(canvas,0,0,size[0],size[1]);canvas.hittest=false;canvas.hittestchildren=true;
 var background=art(canvas,"window_background",0,0,size[0],size[1],"CollectionGW2Background");style(background,{opacity:"1",backgroundColor:"#171e24"});
 // Flat regional tints sit over the opaque texture without raised plates.
-var header=make("Panel",canvas,"CollectionGW2Header","CollectionGW2FlatRegion");rect(header,0,0,size[0],46);style(header,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});header.hittest=false;
-var sidebar=make("Panel",canvas,"CollectionGW2Sidebar","CollectionGW2FlatRegion");rect(sidebar,0,46,52,308);style(sidebar,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});sidebar.hittest=false;
-var footer=make("Panel",canvas,"CollectionGW2Footer","CollectionGW2FlatRegion");rect(footer,0,354,size[0],56);style(footer,{backgroundImage:"none",backgroundColor:"#090b0d80",border:"0px"});footer.hittest=false;
-label(canvas,"收藏",16,7,660,32,24,"#f0eee2","CollectionGW2Title");
-var closeButton=make("Button",canvas,"CollectionGW2Close","CollectionGW2Button");rect(closeButton,712,7,32,32);style(closeButton,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});
-var closeIcon=make("Image",closeButton,"CollectionGW2CloseIcon");rect(closeIcon,6,6,20,20);closeIcon.SetImage(P.assets&&P.assets.close?P.assets.close.file:"file://{images}/custom_game/collection_gw2_v2/close.png");closeIcon.hittest=false;closeIcon.hittestchildren=false;
+var header=make("Panel",canvas,"CollectionGW2Header","CollectionGW2FlatRegion");rect(header,0,0,size[0],34);style(header,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});header.hittest=false;
+var sidebar=make("Panel",canvas,"CollectionGW2Sidebar","CollectionGW2FlatRegion");rect(sidebar,0,34,42,size[1]-82);style(sidebar,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});sidebar.hittest=false;
+var footer=make("Panel",canvas,"CollectionGW2Footer","CollectionGW2FlatRegion");rect(footer,0,size[1]-48,size[0],48);style(footer,{backgroundImage:"none",backgroundColor:"#090b0d80",border:"0px"});footer.hittest=false;
+label(canvas,"收藏",12,4,size[0]-72,26,18,"#f0eee2","CollectionGW2Title");
+var closeButton=make("Button",canvas,"CollectionGW2Close","CollectionGW2Button");rect(closeButton,size[0]-40,3,28,28);style(closeButton,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});
+var closeIcon=make("Image",closeButton,"CollectionGW2CloseIcon");rect(closeIcon,4,4,20,20);closeIcon.SetImage(P.assets&&P.assets.close?P.assets.close.file:"file://{images}/custom_game/collection_gw2_v2/close.png");closeIcon.hittest=false;closeIcon.hittestchildren=false;
 closeButton.hittestchildren=false;closeButton.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("button");});
 scrim.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("scrim");});
 Object.keys(names).forEach(function(id,i){
- var tab=make("Button",canvas,"CollectionGW2Tab_"+id,"CollectionGW2Tab");rect(tab,4,64+i*58,44,44);style(tab,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});tab.hittestchildren=false;
- var selectedArt=make("Panel",tab,"","CollectionGW2TabSelected");rect(selectedArt,2,2,40,40);style(selectedArt,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid #afc4c54a"});selectedArt.hittest=false;
- var icon=art(tab,"tab_"+id,4,4,36,36);style(icon,{saturation:"0.5",brightness:"0.8",opacity:"0.76"});
+ var tab=make("Button",canvas,"CollectionGW2Tab_"+id,"CollectionGW2Tab");rect(tab,4,44+i*44,34,34);style(tab,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});tab.hittestchildren=false;
+ var selectedArt=make("Panel",tab,"","CollectionGW2TabSelected");rect(selectedArt,2,2,30,30);style(selectedArt,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid #afc4c54a"});selectedArt.hittest=false;
+ var icon=art(tab,"tab_"+id,3.5,3.5,27,27);style(icon,{saturation:"0.5",brightness:"0.8",opacity:"0.76"});
  tab.SetPanelEvent("onactivate",function(){if(alive())select(id);});
  tab.SetPanelEvent("onmouseover",function(){if(alive()&&opened)$.DispatchEvent("DOTAShowTextTooltip",tab,names[id]);});tab.SetPanelEvent("onmouseout",function(){$.DispatchEvent("DOTAHideTextTooltip");});tabs[id]=tab;
 });
-label(canvas,"",66,50,236,26,17,"#dfdfd5","CollectionGW2Category");
-var searchBacking=make("Panel",canvas,"CollectionGW2SearchBacking","CollectionGW2FlatRegion");rect(searchBacking,66,82,678,28);style(searchBacking,{backgroundImage:"none",backgroundColor:"#0a10122e",border:"1px solid #a2aaa32b"});searchBacking.hittest=false;
-search=make("TextEntry",canvas,"CollectionGW2Search","CollectionGW2Search");rect(search,74,86,662,22);search.SetAttributeString&&search.SetAttributeString("placeholder","搜索收藏");
-var searchHint=label(canvas,"搜索收藏",75,86,661,22,16,"#a9b0ac","CollectionGW2SearchHint");
+label(canvas,"",54,36,220,24,16,"#dfdfd5","CollectionGW2Category");
+var searchBacking=make("Panel",canvas,"CollectionGW2SearchBacking","CollectionGW2FlatRegion");rect(searchBacking,54,64,gridWidth,26);style(searchBacking,{backgroundImage:"none",backgroundColor:"#0a10122e",border:"1px solid #a2aaa32b"});searchBacking.hittest=false;
+search=make("TextEntry",canvas,"CollectionGW2Search","CollectionGW2Search");rect(search,62,67,gridWidth-16,20);style(search,{fontSize:"14px"});search.SetAttributeString&&search.SetAttributeString("placeholder","搜索收藏");
+var searchHint=label(canvas,"搜索收藏",63,67,gridWidth-17,20,14,"#a9b0ac","CollectionGW2SearchHint");
 search.SetPanelEvent("ontextentrychange",function(){if(!alive())return;query=String(search.text||"").trim();searchHint.visible=!String(search.text||"").length;selected="";grid.ScrollToTop();hideTooltip();render();});
-grid=make("Panel",canvas,"CollectionGW2Grid","CollectionGW2Grid");rect(grid,66,120,680,gridHeight);
-gridBody=make("Panel",grid,"CollectionGW2GridBody","CollectionGW2GridBody");rect(gridBody,0,0,672,gridHeight);
-empty=label(canvas,"",66,198,678,54,19,"#c4c7c6","CollectionGW2Empty");style(empty,{whiteSpace:"normal",textAlign:"center"});empty.visible=false;
-summary=label(canvas,"",310,50,434,25,15,"#c0c6be","CollectionGW2Summary");
-tickets=label(canvas,"",66,360,530,20,15,"#cad1cb","CollectionGW2Tickets");
-result=label(canvas,"",66,384,530,18,14,"#bdbdaf","CollectionGW2Result");
-draw=make("Button",canvas,"CollectionGW2Draw","CollectionGW2Button CollectionGW2Draw");rect(draw,612,367,132,30);skin(draw,"draw_button");style(draw,{backgroundColor:"#63665a30",border:"1px solid #a7a99970",boxShadow:"none"});draw.hittestchildren=false;
-var drawHover=art(draw,"draw_button_hover",0,0,132,30);style(drawHover,{border:"0px"});drawHover.AddClass("CollectionGW2Hover");
-drawText=label(draw,"抽取",0,0,132,30,17,"#e6e3ce","CollectionGW2DrawText");style(drawText,{width:"100%",height:"fit-children",horizontalAlign:"center",verticalAlign:"center",textAlign:"center"});
+grid=make("Panel",canvas,"CollectionGW2Grid","CollectionGW2Grid");rect(grid,54,98,gridWidth,gridHeight);
+gridBody=make("Panel",grid,"CollectionGW2GridBody","CollectionGW2GridBody");rect(gridBody,0,0,gridWidth,gridHeight);
+empty=label(canvas,"",54,236,gridWidth,54,19,"#c4c7c6","CollectionGW2Empty");style(empty,{whiteSpace:"normal",textAlign:"center"});empty.visible=false;
+summary=label(canvas,"",282,36,size[0]-294,24,14,"#c0c6be","CollectionGW2Summary");
+tickets=label(canvas,"",54,size[1]-44,size[0]-218,20,14,"#cad1cb","CollectionGW2Tickets");
+result=label(canvas,"",54,size[1]-22,size[0]-218,18,13,"#bdbdaf","CollectionGW2Result");
+draw=make("Button",canvas,"CollectionGW2Draw","CollectionGW2Button CollectionGW2Draw");rect(draw,size[0]-144,size[1]-38,132,28);skin(draw,"draw_button");style(draw,{backgroundColor:"#63665a30",border:"1px solid #a7a99970",boxShadow:"none"});draw.hittestchildren=false;
+var drawHover=art(draw,"draw_button_hover",0,0,132,28);style(drawHover,{border:"0px"});drawHover.AddClass("CollectionGW2Hover");
+drawText=label(draw,"抽取",0,0,132,28,16,"#e6e3ce","CollectionGW2DrawText");style(drawText,{width:"100%",height:"fit-children",horizontalAlign:"center",verticalAlign:"center",textAlign:"center"});
 draw.SetPanelEvent("onactivate",drawOne);
 tooltip=cfg.SurvivalArchiveTooltip.Create({parent:canvas,root:root,idPrefix:"CollectionGW2Tooltip",isAlive:alive,isActive:function(){return opened;},
  getScale:function(){scale=Number(U.Fit(win,root,size[0],size[1],{reference:fitReference.slice()}))||1;return scale;},
@@ -79,16 +80,23 @@ function leaveTooltip(){if(tooltip)tooltip.QueueHide();}
 function showTooltip(card,item){if(alive()&&opened&&valid(card))tooltip.Show(item,current,card,false);}
 function rewardIcon(card,item){
  var host=make("Panel",card,"","CollectionGW2Portrait");rect(host,2,2,portraitSize,portraitSize);host.hittest=false;host.hittestchildren=false;
- // ArchiveHandoff.Icon is backed by archive_item_icons.csv / portraits_v3.
- // SurvivalItemArt's older social head catalog is deliberately not used here.
+ // The formal social catalog is private to ArchiveHandoff.Icon. Preserve the
+ // exact Image it resolves, including its head_v3 URI, without copying a catalog.
  A.Icon(host,item,current,{});
- function fit(n){n.hittest=false;n.hittestchildren=false;if(n.paneltype==="Image"){rect(n,0,0,portraitSize,portraitSize);if(n.SetScaling)n.SetScaling("stretch-to-fit-preserve-aspect");}else if(n.BHasClass("ArchiveArt")){rect(n,0,0,portraitSize,portraitSize);style(n,{overflow:"clip"});}else if(n.paneltype==="Label")n.visible=false;array(n.Children()).forEach(fit);}
- array(host.Children()).forEach(fit);
+ var portrait=null;
+ function find(n){if(portrait)return;if(n.paneltype==="Image"){portrait=n;return;}array(n.Children()).forEach(find);}
+ array(host.Children()).forEach(find);
+ if(!portrait)return;
+ portrait.SetParent(host);
+ array(host.Children()).forEach(function(child){if(child!==portrait)child.DeleteAsync(0);});
+ host.RemoveClass("ArchiveSocialPortraitCard");portrait.RemoveClass("ArchiveRewardIcon");portrait.AddClass("CollectionGW2PortraitImage");
+ rect(portrait,0,0,portraitSize,portraitSize);style(portrait,{horizontalAlign:"left",verticalAlign:"top",margin:"0px",padding:"0px",border:"0px",backgroundColor:"transparent",boxShadow:"none",transform:"none"});
+ portrait.hittest=false;portrait.hittestchildren=false;if(portrait.SetScaling)portrait.SetScaling("stretch-to-fit-preserve-aspect");
 }
 function renderCards(rows){
  var signature=JSON.stringify([current,query,rows]);if(signature===cardsKey)return;cardsKey=signature;hideTooltip();gridBody.RemoveAndDeleteChildren();slots=[];
  visibleRows=rows.filter(function(item){return !query||String(item.name||"").toLowerCase().indexOf(query.toLowerCase())>=0;});
- var count=visibleRows.length,rowCount=Math.ceil(count/columns);rect(gridBody,0,0,672,Math.max(gridHeight,rowCount?(rowCount-1)*pitch+slotSize:0));
+ var count=visibleRows.length,rowCount=Math.ceil(count/columns);rect(grid,54,98,gridWidth+(rowCount>rowsPerPage?8:0),gridHeight);rect(gridBody,0,0,gridWidth,Math.max(gridHeight,rowCount?(rowCount-1)*pitch+slotSize:0));
  for(var i=0;i<count;i++){
   var item=visibleRows[i],card=make("Button",gridBody,"CollectionGW2Item_"+item.id,"CollectionGW2Slot");rect(card,(i%columns)*pitch,Math.floor(i/columns)*pitch,slotSize,slotSize);style(card,{backgroundImage:"none",border:"0px",backgroundColor:"transparent",boxShadow:"none"});card.hittest=true;card.hittestchildren=false;card.__collectionItem=item;
   var backing=art(card,"slot_background",0,0,slotSize,slotSize);style(backing,{opacity:"0.45"});
@@ -96,7 +104,7 @@ function renderCards(rows){
   var frame=make("Panel",card,"","CollectionGW2SlotFrame");rect(frame,0,0,slotSize,slotSize);style(frame,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid #5b5a5970"});frame.hittest=false;
   var hover=make("Panel",card,"","CollectionGW2Hover");rect(hover,0,0,slotSize,slotSize);style(hover,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid #abb9b68c"});hover.hittest=false;
   var selection=make("Panel",card,"","CollectionGW2SlotSelection");rect(selection,0,0,slotSize,slotSize);style(selection,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid #d1cba5c0"});selection.hittest=false;selection.visible=item.id===selected;card.__collectionSelection=selection;
-  var quantity=label(card,countKnown(item)?number(item.count):"—",6,slotSize-24,slotSize-12,22,16,"#f0eee0");style(quantity,{textAlign:"right",textShadow:"#000000 0px 1px 2px 2.0"});bindCard(card,item);
+  var quantity=label(card,countKnown(item)?number(item.count):"—",4,slotSize-19,slotSize-8,18,12,"#f0eee0");style(quantity,{textAlign:"right",textShadow:"#000000 0px 1px 2px 2.0"});bindCard(card,item);
   slots.push(card);
  }
 }

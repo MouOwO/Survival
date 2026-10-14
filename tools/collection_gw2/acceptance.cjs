@@ -20,6 +20,31 @@ async function inspect(){
 }
 function inside(inner,outer,label){assert(inner&&outer,label+' bounds exist');assert(inner.x>=outer.x-1&&inner.y>=outer.y-1&&inner.right<=outer.right+1&&inner.bottom<=outer.bottom+1,label+' remains inside its container');}
 function inViewport(rect,width,height,label){assert(rect&&rect.width>0&&rect.height>0,label+' has visible geometry');inside(rect,{x:0,y:0,right:width,bottom:height},label+' at '+width+'x'+height);}
+// The one-page layout is a separate contract. Historical compact/scroll tests
+// continue to describe the earlier six-column design without rewritten asserts.
+function validateOnePage(state,width,height,expectedItems=40){
+ const bounds=value=>({...value,right:value.right??value.x+value.width,bottom:value.bottom??value.y+value.height});
+ const canvas=bounds(state.canvas.bounds),grid=bounds(state.grid.bounds),scale=canvas.width/900,close=(actual,wanted,label)=>assert(Math.abs(actual-wanted)<1.25,label+': '+actual+' / '+wanted);
+ assert.deepEqual(state.errors,[]);assert.deepEqual(state.designCanvas,[900,478]);assert(state.collection.open);assert.equal(state.collection.columns,10);assert.equal(state.collection.portraitSize,74);
+ inViewport(canvas,width,height,'One-page collection');close(canvas.height/scale,478,'Canvas height');
+ close((grid.x-canvas.x)/scale,54,'Grid x');close((grid.y-canvas.y)/scale,98,'Grid y');close(grid.width/scale,expectedItems>40?842:834,'Grid width');close(grid.height/scale,330,'Grid height');
+ assert.equal(state.cards.length,expectedItems);assert.equal(state.collection.slots,expectedItems);assert.equal(state.collection.rows.length,expectedItems);assert.equal(state.emptySlots,0,'No filler slots are created');
+ assert.equal(state.chrome.background.opacity,1);assert.equal(state.chrome.windowColor,'rgb(23, 30, 36)');assert.equal(state.chrome.backgroundColor,'rgb(23, 30, 36)');
+ assert.equal(state.chrome.title.text,'收藏');close(state.chrome.title.font.size,18,'Title font');close(state.chrome.header.bounds.height/scale,34,'Header height');
+ assert.equal(state.chrome.closeLabels,0);assert(state.chrome.closeIcon.image.decoded);assert(/collection_gw2_v2\/close\.png$/.test(state.chrome.closeIcon.image.src));
+ close(state.onePage.sidebar.bounds.width/scale,42,'Rail width');state.onePage.tabs.forEach(tab=>{close(tab.bounds.width/scale,34,'Tab width');close(tab.bounds.height/scale,34,'Tab height');assert.equal(tab.labels,0);assert.equal(tab.icons.length,1);close(tab.icons[0].width/scale,27,'Tab icon width');close(tab.icons[0].height/scale,27,'Tab icon height');});
+ assert(state.onePage.assets.length>0&&state.onePage.assets.every(asset=>asset.decoded),'Every authored component decodes');
+ for(const [index,card]of state.cards.entries()){
+  const rect=bounds(card.bounds);close(rect.width/scale,78,'Slot width '+index);close(rect.height/scale,78,'Slot height '+index);assert(card.image?.decoded,'Portrait decoded '+index);
+  close(card.image.bounds.width/scale,74,'Portrait width '+index);close(card.image.bounds.height/scale,74,'Portrait height '+index);inside(bounds(card.image.bounds),rect,'Portrait '+index);
+  assert(/archive_portraits_v3|head_v3_/.test(card.image.src),'Only the existing v3 portrait is used');assert(state.onePage.portraitParents[index].direct&&!state.onePage.portraitParents[index].legacyWrapper,'Portrait image is directly fitted without old card transforms');
+  if(expectedItems<=40){inside(rect,grid,'One-page card '+index);close((rect.x-grid.x)/scale,(index%10)*84,'Column position '+index);close((rect.y-grid.y)/scale,Math.floor(index/10)*84,'Row position '+index);}
+ }
+ if(expectedItems<=40){assert(state.scroll.height<=state.scroll.clientHeight+1,'Forty portraits have no vertical overflow');assert(state.onePage.scrollWidth<=state.onePage.clientWidth+1,'One-page grid has no horizontal overflow');assert.equal(state.scroll.top,0);}
+ else assert(state.scroll.height>state.scroll.clientHeight,'Additional real rows retain scrolling');
+ inside(bounds(state.onePage.result.bounds),bounds(state.onePage.footer.bounds),'Result');inside(bounds(state.onePage.draw.bounds),bounds(state.onePage.footer.bounds),'Draw');assert(bounds(state.onePage.result.bounds).right+4*scale<=state.onePage.draw.bounds.x,'Result cannot overlap the action');
+ return {width,height,canvas,grid,scale,items:expectedItems,columns:10,slot:78,portrait:74,noEmptySlots:true,noScroll:expectedItems<=40};
+}
 function validateTooltip(state,width,height){assert(state.tooltip?.visible,'Collection tooltip is visible');inViewport(state.tooltip.bounds,width,height,'Collection tooltip');assert(state.tooltipPaint?.frontmost,'Tooltip actually paints in front of inventory');assert(state.tooltipPaint.opacity>=.99,'Tooltip ancestors do not fade its text');assert(state.tooltipPaint.background.includes(state.tooltipPaint.shared?'/archive_parchment_v1/tooltip_background.png':'/collection_gw2_v2/tooltip_background.png'),'Tooltip uses the current background texture');assert(state.tooltipPaint.borderWidth<=1.1,'Tooltip uses a thin authored border');if(!state.tooltipPaint.shared)assert(Number((state.tooltipPaint.backgroundColor.match(/[\d.]+/g)||[])[3]||1)>=.85,'Tooltip backing keeps its text readable');}
 function seamGeometry(state){
  const scale=state.canvas.bounds.width/state.designCanvas[0],origin=state.canvas.bounds;
@@ -90,5 +115,5 @@ async function main(){
  finally{fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));b.close();}
  console.log('COLLECTION_GW2_BROWSER_PASS '+out+'/report.json');
 }
-module.exports={inspect,info,validate,validateSeams,seamGeometry,validateTooltip,assetMetrics,inViewport,ready,shot,assertFrozen,sizes};
+module.exports={inspect,info,validate,validateOnePage,validateSeams,seamGeometry,validateTooltip,assetMetrics,inViewport,ready,shot,assertFrozen,sizes};
 if(require.main===module){let settled=false;process.on('beforeExit',()=>{if(!settled){console.error('COLLECTION_GW2_BROWSER_INCOMPLETE: Chrome/CDP ended before validation.');process.exitCode=1;}});main().then(()=>{settled=true;},error=>{settled=true;console.error(error.stack||error);process.exitCode=1;});}

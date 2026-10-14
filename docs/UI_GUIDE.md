@@ -58,11 +58,13 @@ node tools/menus_v10/preview.cjs
 
 按顺序执行 `split_assets.py`、`node tools/lottery_gw2/build_scope.cjs`、`tools/lottery_gw2/compile.ps1 -CheckOnly`，再用 `preview.cjs`、`acceptance.cjs`／`capture.cjs` 检查实际源码组装，最后运行定向 `compile.ps1`。编译只更新新的抽奖 JS/CSS、HUD XML、资源预载布局及 16 个 PNG，保留现有卡图、影片和其他 HUD 源码／产物。`design_refs/lottery_gw2_v1/work/` 是可重建的隔离预览、组件图和验收报告；数值为明确标记的浏览器样例，不连接账号、服务器或支付，也不是游戏客户端截图。
 
-收藏界面由 `collection_gw2.js/css` 和 `collection_gw2_data.js` 独立提供，当前画布为 760 × 410。窗口及提示框的缩放仍参考原来的 1200 × 778，使同一分辨率下占屏面积约为旧版的 33.4%，而不会因画布缩小再次撑满屏幕。网格改为六列，头像从 70px 放大到 100px，格子为 104px、间距为 8px；窗口显示完整两行，其余条目通过滚动查看。只为真实条目创建格子，40 项就是 40 格，不补齐末行；未拥有但已配置的角色继续显示，搜索无结果和老婆空栏均为零格。
+收藏界面由 `collection_gw2.js/css` 和 `collection_gw2_data.js` 独立提供，当前画布为 900 × 478。窗口及提示框继续参考 1200 × 778 缩放，避免调整画布后再次撑满屏幕。格子从 104px 缩到 78px（75%），步长 84px，头像为 74px、内缩 2px；网格十列四行，前女友和男性角色各 40 项可一页全部显示。只为真实条目创建格子，不补齐末行；搜索无结果和老婆空栏均为零格。未来超过 40 项时保留滚动，另外给 8px 滚条预留空间，不截掉最右列。
 
-顶部“收藏”、窄三图标选单和底部抽取按钮保留平面风格；窗口和背景采用不透明 `#171e24` 衬底，背景节点透明度为 1，原 PNG 的透明通道不透出游戏。格底为 0.45，人物与文字不整体降透明。`tools/collection_gw2/split_reference_assets.py` 包装 22 张 v2 无字材质，画布元数据共用 760 × 410 常量；材质仍使用原采样尺寸和哈希，不重画头像或纹理。底图为连续无分栏的材质，不带头像空块、袋子分格或底栏接缝；全宽标题栏为 46px，52px 侧栏位于 y46–354，底栏为 56px。标题左边距为 16px；关闭继续使用已有 `collection_gw2_v2/close.png` 的 20px X 图片和 32px 点击区。左侧为 44px 纯图标按钮，36px 图标居中，选中框内缩 2px。格底只截取原图空格内侧，正常框线仅绘制一层低对比细线。
+顶部“收藏”、窄三图标选单和底部抽取按钮保留平面风格；窗口和背景采用不透明 `#171e24` 衬底，背景节点透明度为 1，原 PNG 的透明通道不透出游戏。格底为 0.45，人物与文字不整体降透明。`tools/collection_gw2/split_reference_assets.py` 的画布元数据、`collection_gw2_data.js` 和素材 manifest 同为 900 × 478；22 张材质的原采样尺寸和哈希不变。底图连续无分栏；全宽标题栏压薄到 34px，42px 侧栏位于 y34–430，底栏为 48px。标题左边距 12px、字号从 24px 降到 18px（75%）；关闭继续使用统一的 20px X 图片，点击区为 28px。左侧按钮 34px，图标从 36px 降到 27px。格底继续只截取原图空格内侧，正常框线仅绘制一层低对比细线。
 
-存档和收藏的提示框共用 `common/archive_tooltip.js/css`，各创建一个独立实例，使用同一九宫格底板、边框、分隔线、文字颜色及数量排版。素材优先采用 `ArchiveParchmentData`，效果文本继续由 `ArchiveHandoff.FormatEffects` 格式化，状态和数量沿用存档语义；未知数量显示“—”。收藏只提供自己的分类名、缩放、位置和高度限制：外框含阴影最大 338px，长说明保留受限滚动视口；鼠标移入提示框即隐藏。滚动或缩放移动头像时隐藏旧提示，关闭和重载取消提示框自身的计时器，不干扰抽取恢复流程。
+角色头像仍由 `ArchiveHandoff.Icon` 解析正式 `head_v3` 资源，随后把它创建的同一个 Image 直接放进收藏头像容器，去掉旧存档装饰层和图标样式的继承。两个池共 80 张原图均为 1254 × 1254，现有 GPU 贴图均为 313 × 313、BGRA8888、单 mip，足够本次 74px 显示；不重新画角色或编译头像图片。
+
+存档和收藏的提示框共用 `common/archive_tooltip.js/css`，各创建一个独立实例，使用同一九宫格底板、边框、分隔线、文字颜色及数量排版。素材优先采用 `ArchiveParchmentData`，效果文本继续由 `ArchiveHandoff.FormatEffects` 格式化，状态和数量沿用存档语义；未知数量显示“—”。收藏只提供自己的分类名、缩放、位置和高度限制：外框含阴影最大 406px，长说明保留受限滚动视口；鼠标移入提示框即隐藏。滚动或缩放移动头像时隐藏旧提示，关闭和重载取消提示框自身的计时器，不干扰抽取恢复流程。
 
 `build_scope.cjs`、`compile.ps1 -CheckOnly`、`preview.cjs`、`acceptance.cjs`、`capture.cjs` 和实际 `compile.ps1` 负责限定编译、隔离预览与最终截图。本版只编译收藏 JS、data、CSS、资源预载 XML 和 22 个 v2 PNG；原 HUD、导航、存档控制器及抽取业务不在重编范围。`collection_nav.js` 继续扩展原 HUD 入口。旧 `split_assets.py`、v1 参考和材质保留供历史交付及抽奖皮肤使用，不要执行旧拆分脚本覆盖当前 v2 数据。六种预览尺寸含原图 815 × 528；底栏边界、装饰透明度、细框和 Tooltip 前景遮挡均单独核对，输出位于 `design_refs/collection_gw2_v2/work/`。
 
@@ -72,7 +74,7 @@ node tools/menus_v10/preview.cjs
 
 收藏导航入口单独使用 `tools/collection_gw2/entry_compile.ps1 -CheckOnly` 和实际 `entry_compile.ps1`，只编译 `collection_nav.js`、`collection.svg` 两项；保存备份并核对原顶部导航源码、产物及 HUD XML 的哈希。`entry_preview.cjs` 加载活动顶部导航与收藏源码，`entry_capture.cjs` 验证六种尺寸的真实鼠标命中、开关、分类和重载。截图与报告位于 `design_refs/collection_gw2_v2/work/entry_final/`，编译报告为 `work/entry_compile.json`。浏览器原生 HUD 占位和数据样例有明确标记，不连接游戏服务器，也不等同于客户端实机截图。
 
-紧凑窗口复核使用 `node tools/collection_gw2/entry_preview.cjs`，再运行 `node tools/collection_gw2/entry_capture.cjs --compact`，输出至 `work/compact_final/`；对照旧窗口的实测面积和头像像素，验证真实滚轮到达第 40 项、卡片命中、提示框、搜索和空栏，以及两种底层纯色下窗口内部像素不变、图片解码和鼠标点击 X 关闭。上一版不透底证据保留在 `work/opaque_final/`。
+原六列紧凑版的基准及截图保留在 `compact_baseline.json`、`work/compact_final/`；其约三分之一面积和第 40 项滚动断言不适用于当前十列一页布局。当前一页版本只使用 `onepage_compile.ps1` 编译收藏 JS 与 data 两项，不重编 CSS、图片、布局或导航。定向预览检查两个池的 40 格全部落在网格视口内、首尾及行边界真实鼠标命中、统一 tooltip 隐藏、搜索、老婆空栏和更大列表的滚动兜底；先运行 `entry_preview.cjs`，再运行 `onepage_capture.cjs`，截图及头像局部图位于 `work/onepage_final/`，编译报告为 `work/onepage_compile.json`。
 
 提示框共享改动单独用 `tools/collection_gw2/tooltip_compile.ps1 -CheckOnly` 和实际编译，限定六项源码：共享 JS/CSS、存档 JS、收藏 JS/CSS、`archive.xml`。已存在的提示框图片和其他菜单资源只读核对，不重编。先运行 `entry_preview.cjs`，再运行 `tooltip_capture.cjs` 检查两页面外观一致、九宫格、长内容滚动及悬停生命周期；截图与报告位于 `work/tooltip_final/`，编译报告为 `work/tooltip_compile.json`。
 

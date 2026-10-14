@@ -10,7 +10,7 @@ OUT = ROOT / 'art/ui/sources/custom_game/collection_gw2_v2'
 MIRROR = ROOT / 'panorama/src/images/custom_game/collection_gw2_v2'
 OLD = ROOT / 'art/ui/sources/custom_game/collection_gw2_v1'
 # Logical layout size is independent of the unchanged 1200x778 material sampling.
-CANVAS = [760, 410]
+CANVAS = [900, 478]
 for directory in (OUT, MIRROR, REF / 'work'):
     directory.mkdir(parents=True, exist_ok=True)
 resample = Image.Resampling.LANCZOS
