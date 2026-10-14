@@ -15,58 +15,63 @@
         1200,
         778
       ],
-      "sha256": "3b4459b6ecdae97307f70d6c622d4363fa8a0069839de5a42e3e3b04cc544f87",
-      "source": "blank_plate.png",
-      "crop": null,
-      "usage": "Single original-reference translucent flat plate, no raised perimeter or baked values."
+      "sha256": "48e95154cb08f29fc6bd2ca4a12797cd953bd7008192648c8240640202bdb81c",
+      "source": "blank_plate.png / continuous interior material",
+      "crop": [
+        218,
+        120,
+        1400,
+        886
+      ],
+      "usage": "Continuous translucent wash without baked title/avatar/rail/footer blocks or seams."
     },
     "header_strip": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/header_strip.png",
       "size": [
-        1130,
+        1200,
         60
       ],
-      "sha256": "abc27e091e4d7ddd51d8e55a6bee0ca0a282e4a05f77b278e951f3946220c9dd",
+      "sha256": "fdaead5516be181b90d62cedd76d691527acec46339bfe5d72bd59a3cb7d10fd",
       "source": "blank_plate.png / 1200x778",
       "crop": [
-        70,
-        5,
-        1190,
-        61
+        0,
+        0,
+        1200,
+        60
       ],
-      "usage": "Thin flat title band; optional material, not a second frame."
+      "usage": "Full-width flat title material; boundary belongs to live layout."
     },
     "sidebar_background": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/sidebar_background.png",
       "size": [
-        66,
-        634
+        70,
+        658
       ],
-      "sha256": "674da904611e6d176dca7a4f45b5c3f2239bfb0910bb8f1bd0453efb084beaf6",
+      "sha256": "9b2ffe99ee06c9ea19243c90a90112099ccdf5fdee0f5035d0002490107abb48",
       "source": "blank_plate.png / 1200x778",
       "crop": [
-        5,
-        78,
-        63,
-        713
+        0,
+        60,
+        70,
+        718
       ],
-      "usage": "Extremely narrow flat icon rail."
+      "usage": "Continuous flat icon rail, joined to header and footer."
     },
     "footer_strip": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/footer_strip.png",
       "size": [
-        1118,
+        1200,
         60
       ],
-      "sha256": "a05408c406d68435790b331c2b9282952734069bb9025f45fbe541c065ed760e",
+      "sha256": "81c3f427664fb2f95acd2d3cc1330d7901078eebb452349d292e7956d35abb9f",
       "source": "blank_plate.png / 1200x778",
       "crop": [
-        80,
-        719,
-        1190,
-        777
+        0,
+        718,
+        1200,
+        778
       ],
-      "usage": "Shallow flat footer; no bronze button frame."
+      "usage": "Full-width flat footer; no separate framed end piece."
     },
     "tab_background": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_background.png",
@@ -74,7 +79,7 @@
         62,
         70
       ],
-      "sha256": "e628f2aabbf22a6423344d48f9173d39aa6b2a1e6310772e17d86b20d1dbf9d6",
+      "sha256": "4d711eaf1de755ac814b26987c61b834efc1a3412d5c68704c4506314dad4bd5",
       "source": "blank_plate.png / 1200x778",
       "crop": [
         6,
@@ -90,7 +95,7 @@
         62,
         70
       ],
-      "sha256": "e628f2aabbf22a6423344d48f9173d39aa6b2a1e6310772e17d86b20d1dbf9d6",
+      "sha256": "4d711eaf1de755ac814b26987c61b834efc1a3412d5c68704c4506314dad4bd5",
       "source": "blank_plate.png / 1200x778",
       "crop": [
         6,
@@ -106,15 +111,15 @@
         74,
         74
       ],
-      "sha256": "7fbc51b7459f36a16273cbdee0de6c68425bf492095ddb676d9e2cb62dff8e15",
+      "sha256": "8262f9742e4bc9026773594c460fd5cc6af7a34c1480c56434679248205b767f",
       "source": "reference_inventory.png",
       "crop": [
-        108,
-        323,
-        159,
-        376
+        112,
+        328,
+        155,
+        371
       ],
-      "usage": "Actual original empty inventory cell; rendered as a low-opacity backing below portraits."
+      "usage": "Original empty-cell interior only; excludes the baked frame so live CSS draws one boundary."
     },
     "slot_frame": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/slot_frame.png",
@@ -167,35 +172,35 @@
     "tab_ex": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_ex.png",
       "size": [
-        32,
-        29
+        40,
+        36
       ],
-      "sha256": "03ee08938e7d7e212e9b0324052d5f68d3e4e54f4681af0da38a54682a14f597",
+      "sha256": "3088fee8d863b302fd1e5f5212a8e6b52b0d003204d6a99d3d539c812cf81dca",
       "source": "collection_gw2_v1/tab_ex.png",
       "crop": null,
-      "usage": "Existing category glyph kept small and matte; no new raised badge."
+      "usage": "Existing category glyph for an icon-only rail; names remain in content and hover text."
     },
     "tab_friend": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_friend.png",
       "size": [
-        30,
-        32
+        37,
+        40
       ],
-      "sha256": "d6596deb54239324bfc41b9bcba1437a0ffdc2e086f987fe7988886226f47889",
+      "sha256": "01141a39b7adb6eec821356a52ebf0504671ed4bca42d2a7f6b0f10437673aa2",
       "source": "collection_gw2_v1/tab_friend.png",
       "crop": null,
-      "usage": "Existing category glyph kept small and matte; no new raised badge."
+      "usage": "Existing category glyph for an icon-only rail; names remain in content and hover text."
     },
     "tab_wife": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/tab_wife.png",
       "size": [
-        32,
-        20
+        40,
+        26
       ],
-      "sha256": "ba9f9abc43c59f5586104c50961f0b4bda4aac17e99be28c4a7f61ac9cf8f347",
+      "sha256": "469e3a45c0138efd3afd73d1295900fc146bbc42242013ef25d584330f0117a0",
       "source": "collection_gw2_v1/tab_wife.png",
       "crop": null,
-      "usage": "Existing category glyph kept small and matte; no new raised badge."
+      "usage": "Existing category glyph for an icon-only rail; names remain in content and hover text."
     },
     "draw_button": {
       "file": "art/ui/sources/custom_game/collection_gw2_v2/draw_button.png",
@@ -203,7 +208,7 @@
         162,
         30
       ],
-      "sha256": "b2e4e7a00c1940b219dba690a9c8b95f8c3c66990cd8b9ae435a755a2f6899bd",
+      "sha256": "1bcfc9152cb03d5bd5e0b7d5dcc3534f3a789ca7ba04f48cdaa9b354ad134f9a",
       "source": "blank_plate.png / 1200x778",
       "crop": [
         380,
@@ -219,7 +224,7 @@
         162,
         30
       ],
-      "sha256": "b2e4e7a00c1940b219dba690a9c8b95f8c3c66990cd8b9ae435a755a2f6899bd",
+      "sha256": "1bcfc9152cb03d5bd5e0b7d5dcc3534f3a789ca7ba04f48cdaa9b354ad134f9a",
       "source": "blank_plate.png / 1200x778",
       "crop": [
         380,
@@ -284,7 +289,7 @@
         360,
         260
       ],
-      "sha256": "57e286867a4ee9cafa9db0a75c566f796ef4a1b9f5c3df726de6ee7ba6a226f3",
+      "sha256": "f493d002b3452aceb67036cef91c71b9edb7991dc1f9901ecabf113d604ec732",
       "source": "blank_plate.png / 1200x778",
       "crop": [
         330,
@@ -311,7 +316,7 @@
         1090,
         35
       ],
-      "sha256": "7a592f24fd28ee111815ede0f9c36c115aaed2a3208a4b9ce988c55870ad19d0",
+      "sha256": "eb6c5666d34bd594404084b0b04c1371a8d0b6349acfc479b532fe13e4c19807",
       "source": "blank_plate.png / 1200x778",
       "crop": [
         83,

@@ -16,8 +16,10 @@ assert.equal(nodes.CollectionScrim.style.backgroundColor,'#00000022','The flat i
 assert.equal(nodes.CollectionGW2Canvas.style.width,'1200px');assert.equal(nodes.CollectionGW2Canvas.style.height,'778px');
 assert.equal(nodes.CollectionGW2Background.style.position,'0px 0px 0px');assert.equal(nodes.CollectionGW2Background.style.width,'1200px');
 assert.equal(nodes.CollectionGW2Background.style.opacity,'0.84','Only the background wash is translucent');assert.notEqual(nodes.CollectionGW2Canvas.style.opacity,'0.84');
-assert.equal(nodes.CollectionGW2Header.style.position,'70px 0px 0px');assert.equal(nodes.CollectionGW2Header.style.height,'60px');
-assert.equal(nodes.CollectionGW2Sidebar.style.width,'66px');assert.equal(nodes.CollectionGW2Sidebar.style.backgroundImage,'none');
+assert.equal(nodes.CollectionGW2Header.style.position,'0px 0px 0px');assert.equal(nodes.CollectionGW2Header.style.width,'1200px');assert.equal(nodes.CollectionGW2Header.style.height,'60px');
+assert.equal(nodes.CollectionGW2Sidebar.style.position,'0px 60px 0px');assert.equal(nodes.CollectionGW2Sidebar.style.width,'70px');assert.equal(nodes.CollectionGW2Sidebar.style.height,'658px');assert.equal(nodes.CollectionGW2Sidebar.style.backgroundImage,'none');
+assert.equal(nodes.CollectionGW2Sidebar.style.backgroundColor,nodes.CollectionGW2Header.style.backgroundColor,'Header and sidebar share one flat tint');
+assert.equal(nodes.CollectionGW2Footer.style.position,'0px 718px 0px');assert.equal(nodes.CollectionGW2Footer.style.width,'1200px');assert.equal(nodes.CollectionGW2Footer.style.height,'60px');
 assert.equal(nodes.CollectionGW2SearchBacking.style.position,'82px 109px 0px');assert.equal(nodes.CollectionGW2SearchBacking.style.width,'1090px');
 assert.equal(nodes.CollectionGW2Grid.style.position,'82px 156px 0px');assert.equal(nodes.CollectionGW2Grid.style.width,'1110px');assert.equal(nodes.CollectionGW2Grid.style.height,'560px');
 assert.equal(nodes.CollectionGW2Summary.style.position,'385px 73px 0px');
@@ -25,6 +27,20 @@ assert.equal(nodes.CollectionGW2Draw.style.position,'1010px 730px 0px');assert.e
 assert.equal(nodes.CollectionGW2Draw.style.border,'1px solid #a7a99970');assert.equal(nodes.CollectionGW2Tooltip.style.boxShadow,'none');
 assert.equal(nodes.CollectionGW2Result.style.position,'82px 753px 0px');assert.equal(nodes.CollectionGW2Result.style.height,'18px');assert.equal(nodes.CollectionGW2Result.style.width,'900px');
 function bounds(node){const [x,y]=node.style.position.split(' ').map(parseFloat);return {x,y,right:x+parseFloat(node.style.width),bottom:y+parseFloat(node.style.height)};}
+assert.equal(bounds(nodes.CollectionGW2Header).bottom,bounds(nodes.CollectionGW2Sidebar).y,'The left rail joins the header without a gap');
+assert.equal(bounds(nodes.CollectionGW2Sidebar).bottom,bounds(nodes.CollectionGW2Footer).y,'The left rail joins the full-width footer');
+function descendants(node){return node.Children().flatMap(child=>[child,...descendants(child)]);}
+['ex','friend','wife'].forEach((id,i)=>{
+ const tab=nodes['CollectionGW2Tab_'+id],children=descendants(tab),frame=children.find(n=>n.BHasClass('CollectionGW2TabSelected')),icon=children.find(n=>n.BHasClass('CollectionGW2Art'));
+ assert.equal(tab.style.position,'4px '+(84+i*74)+'px 0px');assert.equal(tab.style.width,'62px');assert.equal(tab.style.height,'62px');
+ assert(!children.some(n=>n.paneltype==='Label'),'Category rail is icons only');
+ assert.equal(icon.style.position,'11px 11px 0px');assert.equal(icon.style.width,'40px');assert.equal(icon.style.height,'40px');
+ assert.equal(frame.style.position,'2px 2px 0px');assert.equal(frame.style.width,'58px');assert.equal(frame.style.height,'58px');
+ assert.equal(frame.style.backgroundColor,'transparent');assert.equal(frame.style.border,'1px solid #afc4c54a');assert.equal(frame.style.borderLeft,undefined,'No protruding left selection edge');
+ assert(bounds(tab).x>=bounds(nodes.CollectionGW2Sidebar).x&&bounds(tab).right<=bounds(nodes.CollectionGW2Sidebar).right,'Icon buttons stay inside the rail');
+ assert(bounds(frame).x>0&&bounds(frame).y>0&&bounds(frame).right<62&&bounds(frame).bottom<62,'The selection outline stays inset');
+ assert.equal(typeof tab.events.onmouseover,'function');assert.equal(typeof tab.events.onmouseout,'function');
+});
 nodes.CollectionGW2Result.text='服务端返回的完整长错误说明'.repeat(50);assert(bounds(nodes.CollectionGW2Result).right+28<=bounds(nodes.CollectionGW2Draw).x,'Even a long response is contained before the draw button');assert.equal(nodes.CollectionGW2Result.style.textOverflow,'ellipsis');
 api.Open('wife');assert.equal(h.sent.length,0,'An unconfigured wife page never requests an invalid pool');assert.equal(api.Inspect().slots,98);assert(!nodes.CollectionGW2Draw.enabled);assert.equal(nodes.CollectionGW2Empty.text,'暂无收藏配置');
 h.click(nodes.CollectionGW2Draw);assert.equal(draws().length,0);

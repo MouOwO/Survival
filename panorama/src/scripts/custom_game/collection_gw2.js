@@ -37,18 +37,18 @@ style(win,{width:size[0]+"px",height:size[1]+"px",horizontalAlign:"center",verti
 canvas=make("Panel",win,"CollectionGW2Canvas","CollectionGW2Canvas");rect(canvas,0,0,size[0],size[1]);canvas.hittest=false;canvas.hittestchildren=true;
 var background=art(canvas,"window_background",0,0,1200,778,"CollectionGW2Background");style(background,{opacity:"0.84"});
 // One translucent wash supplies the surface; flat regional tints avoid raised plates.
-var header=make("Panel",canvas,"CollectionGW2Header","CollectionGW2FlatRegion");rect(header,70,0,1130,60);style(header,{backgroundImage:"none",backgroundColor:"#080c10b8",border:"0px"});header.hittest=false;
-var sidebar=make("Panel",canvas,"CollectionGW2Sidebar","CollectionGW2FlatRegion");rect(sidebar,4,78,66,634);style(sidebar,{backgroundImage:"none",backgroundColor:"#07101518",border:"0px"});sidebar.hittest=false;
-var footer=make("Panel",canvas,"CollectionGW2Footer","CollectionGW2FlatRegion");rect(footer,70,718,1130,60);style(footer,{backgroundImage:"none",backgroundColor:"#090b0d80",border:"0px"});footer.hittest=false;
+var header=make("Panel",canvas,"CollectionGW2Header","CollectionGW2FlatRegion");rect(header,0,0,1200,60);style(header,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});header.hittest=false;
+var sidebar=make("Panel",canvas,"CollectionGW2Sidebar","CollectionGW2FlatRegion");rect(sidebar,0,60,70,658);style(sidebar,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});sidebar.hittest=false;
+var footer=make("Panel",canvas,"CollectionGW2Footer","CollectionGW2FlatRegion");rect(footer,0,718,1200,60);style(footer,{backgroundImage:"none",backgroundColor:"#090b0d80",border:"0px"});footer.hittest=false;
 label(canvas,"收藏",95,10,940,42,30,"#f0eee2","CollectionGW2Title");
 var closeButton=make("Button",canvas,"CollectionGW2Close","CollectionGW2Button");rect(closeButton,1160,18,20,20);style(closeButton,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});
 var closeGlyph=label(closeButton,"×",0,0,20,20,24,"#dedfd4");style(closeGlyph,{height:"fit-children",horizontalAlign:"center",verticalAlign:"center",textAlign:"center"});
 closeButton.hittestchildren=false;closeButton.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("button");});
 scrim.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("scrim");});
 Object.keys(names).forEach(function(id,i){
- var tab=make("Button",canvas,"CollectionGW2Tab_"+id,"CollectionGW2Tab");rect(tab,7,84+i*74,62,70);style(tab,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});tab.hittestchildren=false;
- var selectedArt=make("Panel",tab,"","CollectionGW2TabSelected");rect(selectedArt,0,0,62,70);style(selectedArt,{backgroundImage:"none",backgroundColor:"#a3b5be12",border:"0px",borderLeft:"1px solid #afc4c58c"});selectedArt.hittest=false;
- var icon=art(tab,"tab_"+id,15,7,32,32);style(icon,{saturation:"0.5",brightness:"0.8",opacity:"0.76"});var text=label(tab,names[id],0,45,62,19,12,"#c5cdca");style(text,{textAlign:"center"});
+ var tab=make("Button",canvas,"CollectionGW2Tab_"+id,"CollectionGW2Tab");rect(tab,4,84+i*74,62,62);style(tab,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});tab.hittestchildren=false;
+ var selectedArt=make("Panel",tab,"","CollectionGW2TabSelected");rect(selectedArt,2,2,58,58);style(selectedArt,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid #afc4c54a"});selectedArt.hittest=false;
+ var icon=art(tab,"tab_"+id,11,11,40,40);style(icon,{saturation:"0.5",brightness:"0.8",opacity:"0.76"});
  tab.SetPanelEvent("onactivate",function(){if(alive())select(id);});
  tab.SetPanelEvent("onmouseover",function(){if(alive()&&opened)$.DispatchEvent("DOTAShowTextTooltip",tab,names[id]);});tab.SetPanelEvent("onmouseout",function(){$.DispatchEvent("DOTAHideTextTooltip");});tabs[id]=tab;
 });

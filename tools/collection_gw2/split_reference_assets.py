@@ -12,7 +12,11 @@ OLD = ROOT / 'art/ui/sources/custom_game/collection_gw2_v1'
 for directory in (OUT, MIRROR, REF / 'work'):
     directory.mkdir(parents=True, exist_ok=True)
 resample = Image.Resampling.LANCZOS
-plate = Image.open(REF / 'blank_plate.png').convert('RGBA').resize((1200, 778), resample)
+plate_source = Image.open(REF / 'blank_plate.png').convert('RGBA')
+# Material sampling removes only the generated cutout margin; native code owns
+# the single rectangular window boundary and draws each structural band once.
+plate_box = (218, 120, 1400, 886)
+plate = plate_source.crop(plate_box).resize((1200, 778), resample)
 reference = Image.open(REF / 'reference_inventory.png').convert('RGBA')
 assets = {}
 
@@ -28,30 +32,32 @@ def save(key, image, source, crop, usage):
 def material(key, box, size, usage):
     save(key, plate.crop(box).resize(size, resample), 'blank_plate.png / 1200x778', list(box), usage)
 
-save('window_background', plate, 'blank_plate.png', None,
-     'Single original-reference translucent flat plate, no raised perimeter or baked values.')
-material('header_strip', (70, 5, 1190, 61), (1130, 60), 'Thin flat title band; optional material, not a second frame.')
-material('sidebar_background', (5, 78, 63, 713), (66, 634), 'Extremely narrow flat icon rail.')
-material('footer_strip', (80, 719, 1190, 777), (1118, 60), 'Shallow flat footer; no bronze button frame.')
+save('window_background', plate, 'blank_plate.png / continuous interior material', list(plate_box),
+     'Continuous translucent wash without baked title/avatar/rail/footer blocks or seams.')
+material('header_strip', (0, 0, 1200, 60), (1200, 60), 'Full-width flat title material; boundary belongs to live layout.')
+material('sidebar_background', (0, 60, 70, 718), (70, 658), 'Continuous flat icon rail, joined to header and footer.')
+material('footer_strip', (0, 718, 1200, 778), (1200, 60), 'Full-width flat footer; no separate framed end piece.')
 material('tab_background', (6, 99, 57, 141), (62, 70), 'Matte flat category material; no embossed tab border.')
 material('tab_selected', (6, 99, 57, 141), (62, 70), 'Same flat material; selection drawn as a thin live highlight.')
 
-slot_box = (108, 323, 159, 376)
+slot_box = (112, 328, 155, 371)
 slot = reference.crop(slot_box).resize((74, 74), resample)
 save('slot_background', slot, 'reference_inventory.png', list(slot_box),
-     'Actual original empty inventory cell; rendered as a low-opacity backing below portraits.')
+     'Original empty-cell interior only; excludes the baked frame so live CSS draws one boundary.')
 # Isolate the four existing boundary strips mechanically; the center stays clear.
+boundary_box = (108, 323, 159, 376)
+boundary = reference.crop(boundary_box).resize((74, 74), resample)
 frame = Image.new('RGBA', (74, 74), (0, 0, 0, 0))
 for edge in [(0, 0, 74, 1), (0, 73, 74, 74), (0, 0, 1, 74), (73, 0, 74, 74)]:
-    frame.paste(slot.crop(edge), (edge[0], edge[1]))
+    frame.paste(boundary.crop(edge), (edge[0], edge[1]))
 for key in ('slot_frame', 'slot_hover', 'slot_selected'):
-    save(key, frame, 'reference_inventory.png / empty cell boundary strips', list(slot_box),
+    save(key, frame, 'reference_inventory.png / empty cell boundary strips', list(boundary_box),
          'One-pixel original boundary strips with transparent center; live CSS supplies flat selection.')
 for key in ('tab_ex', 'tab_friend', 'tab_wife'):
     icon = Image.open(OLD / (key + '.png')).convert('RGBA')
-    icon.thumbnail((32, 32), resample)
+    icon.thumbnail((40, 40), resample)
     save(key, icon, 'collection_gw2_v1/' + key + '.png', None,
-         'Existing category glyph kept small and matte; no new raised badge.')
+         'Existing category glyph for an icon-only rail; names remain in content and hover text.')
 material('draw_button', (380, 17, 645, 51), (162, 30), 'Plain original title-band material for a small flat action.')
 material('draw_button_hover', (380, 17, 645, 51), (162, 30), 'Same flat material; live brightness supplies hover.')
 save('close', reference.crop((787, 16, 804, 33)).resize((20, 20), resample),
