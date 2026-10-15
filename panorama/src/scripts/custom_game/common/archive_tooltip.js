@@ -34,8 +34,8 @@
             style(node, {fontFamily:'"Source Han Sans SC"', fontWeight:"normal", textShadow:"none", letterSpacing:"0px"});
             return node;
         }
-        function nineFrame(role, key) {
-            var asset = P.assets && P.assets[key] || D.assets[key];
+        function nineFrame(role, key, assetOverride) {
+            var asset = assetOverride || P.assets && P.assets[key] || D.assets[key];
             var spec = D.tooltip.assets[key.replace(/^tooltip_/, "")] || {};
             var insets = asset.nine_slice_ltrb || spec.nine_slice_ltrb || [10,10,10,10];
             var host = make("Panel", panel, role, "ArchiveSharedTooltipNineFrame"), cells = [];
@@ -64,7 +64,7 @@
         panel.AddClass("ArchiveSharedTooltipHost"); panel.hittest=false; panel.hittestchildren=true; panel.visible=false;
         rect(panel,0,0,368,246);
         var shadow=make("Panel",panel,"Shadow","ArchiveSharedTooltipShadow"); rect(shadow,24,24,320,198);
-        var backing=nineFrame("Backing","tooltip_background"); backing.AddClass("ArchiveSharedTooltipBacking"); backing.Resize(24,24,320,198);
+        var backing=nineFrame("Backing","tooltip_reference_clean",{file:"file://{images}/custom_game/gw2_tooltip_v1/background.png",size:[354,103],nine_slice_ltrb:[3,3,3,3]}); backing.AddClass("ArchiveSharedTooltipBacking"); backing.Resize(24,24,320,198);
         var frame=nineFrame("Frame","tooltip_frame"); frame.AddClass("ArchiveSharedTooltipFrame"); frame.Resize(24,24,320,198);
         var surface=make("Panel",panel,"Surface","ArchiveSharedTooltipSurface"); rect(surface,24,24,320,198);
         surface.hittest=true; surface.hittestchildren=true; style(surface,{flowChildren:"none",overflow:"clip"});

@@ -2,10 +2,8 @@
 .ArchiveSharedTooltipShadow { flow-children:none; background-image:none; background-color:transparent; border:0px; border-radius:4px; box-shadow:#00000066 0px 3px 12px 0px; }
 .ArchiveSharedTooltipNineFrame,.ArchiveSharedTooltipArt { flow-children:none; background-color:transparent; border:0px; margin:0px; padding:0px; }
 .ArchiveSharedTooltipCrop { flow-children:none; overflow:clip; }
-.ArchiveSharedTooltipBacking { background-image:none; background-color:gradient(linear,0% 0%,0% 100%,from(#1d2b31),to(#141e24)); opacity-mask:none; }
-.ArchiveSharedTooltipFrame { border:1px solid #080d10; box-shadow:inset #667b8233 0px 1px 1px 0px; }
-.ArchiveSharedTooltipBacking .ArchiveSharedTooltipCrop,
-.ArchiveSharedTooltipFrame .ArchiveSharedTooltipCrop { visibility:collapse; }
+.ArchiveSharedTooltipBacking { background-image:none; background-color:#141e24; opacity-mask:none; }
+.ArchiveSharedTooltipFrame { visibility:collapse; }
 .ArchiveSharedTooltipSurface { flow-children:none; overflow:clip; }
 .ArchiveSharedTooltipViewport { flow-children:none; overflow:squish scroll; }
 .ArchiveSharedTooltipBody { flow-children:down; overflow:noclip; height:fit-children; }

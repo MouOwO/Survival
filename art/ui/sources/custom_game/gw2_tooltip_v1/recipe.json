@@ -1,0 +1,90 @@
+{
+    "schema":  "survival.original_tooltip_extract.v1",
+    "reference":  {
+                      "file":  "design_refs/gw2_tooltip_v1/reference.png",
+                      "size":  [
+                                   426,
+                                   177
+                               ],
+                      "sha256":  "291bf9020c15bf2f8265c997248e3d1ad659a1a7f0cebccf2d195d2ea08d43ae"
+                  },
+    "output":  {
+                   "file":  "art/ui/sources/custom_game/gw2_tooltip_v1/background.png",
+                   "panorama_source":  "panorama/src/images/custom_game/gw2_tooltip_v1/background.png",
+                   "size":  [
+                                354,
+                                103
+                            ],
+                   "nine_slice_ltrb":  [
+                                           3,
+                                           3,
+                                           3,
+                                           3
+                                       ],
+                   "sha256":  "af972e96a7c91a69e5de50cb53057e314f70a48d9f0e61e61ce202e97b5329ad"
+               },
+    "crop_xywh":  [
+                      46,
+                      17,
+                      354,
+                      103
+                  ],
+    "method":  "Original-pixel crop, text luminance mask with two-pixel dilation, deterministic clean-original-patch clone repair, one-pixel feather. No generated imagery or solid-color replacement.",
+    "text_seed_rectangles_xyxy":  [
+                                      [
+                                          4,
+                                          8,
+                                          49,
+                                          27
+                                      ],
+                                      [
+                                          4,
+                                          31,
+                                          331,
+                                          49
+                                      ],
+                                      [
+                                          4,
+                                          47,
+                                          351,
+                                          65
+                                      ],
+                                      [
+                                          4,
+                                          63,
+                                          247,
+                                          81
+                                      ],
+                                      [
+                                          4,
+                                          79,
+                                          98,
+                                          96
+                                      ]
+                                  ],
+    "repair":  {
+                   "seed_max_channel_threshold":  90,
+                   "dilation_chebyshev_radius":  2,
+                   "preserved_border_pixels":  3,
+                   "unchanged_outside_mask_pixels":  24120,
+                   "donor_patch_size":  [
+                                            5,
+                                            5
+                                        ],
+                   "donor_policy":  "Only 5x5 patches containing no text-mask pixels; squared RGB context error plus spatial distance penalty 0.004",
+                   "copy_patch_size":  [
+                                           3,
+                                           3
+                                       ],
+                   "feather_alpha_by_dilation":  [
+                                                     1,
+                                                     0.95,
+                                                     0.65
+                                                 ],
+                   "text_seed_pixels":  4042,
+                   "repair_pixels":  12342,
+                   "donor_patches":  15209,
+                   "clone_steps":  3262
+               },
+    "regenerate":  "powershell -NoProfile -ExecutionPolicy Bypass -File tools/gw2_tooltip/extract.ps1"
+}
