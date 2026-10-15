@@ -27,7 +27,7 @@ const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbi
 function setup(options={}){
  const cfg=options.config||{},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api,time=0,selected=options.portrait?7:-1,multi=false;
  const runtime={},unitNames=new Map([[7,'npc_dota_hero_doom_bringer']]);
- const metrics={setUnit:[],parents:0,order:0,geometryWrites:0,visibilityTransitions:0,nativeWashWrites:0};
+ const metrics={setUnit:[],econHero:[],econItem:[],sceneCalls:[],created:[],parents:0,order:0,geometryWrites:0,visibilityTransitions:0,nativeWashWrites:0};
  class Panel{
   constructor(id,parent,type='Panel'){
    this.id=id;this.parent=parent;this.paneltype=type;this.children=[];this.alive=true;this.visible=true;
@@ -46,7 +46,7 @@ function setup(options={}){
      assert(numbers.every(n=>Number.isFinite(Number(n))&&Math.abs(Number(n))<1e6),'invalid portrait layout must not reach native setter');
      metrics.geometryWrites++;
     }
-    if(k==='visibility'&&o[k]!==v&&['SurvivalTowerPortraitOverlay','SurvivalTowerPortraitScene'].includes(this.id))metrics.visibilityTransitions++;
+    if(k==='visibility'&&o[k]!==v&&['SurvivalTowerPortraitOverlay','SurvivalTowerPortraitScene','SurvivalBuilderIoPortraitScene'].includes(this.id))metrics.visibilityTransitions++;
     o[k]=v;return true;
    }});
   }
@@ -56,8 +56,10 @@ function setup(options={}){
   GetPositionWithinWindow(){if(this.point==='throw')throw Error('layout not ready');return this.point}
   SetParent(parent){assert(parent&&parent.alive===true);if(this.parent)this.parent.children=this.parent.children.filter(c=>c!==this);this.parent=parent;parent.children.push(this);metrics.parents++}
   MoveChildAfter(child,anchor){this.children=this.children.filter(c=>c!==child);this.children.splice(this.children.indexOf(anchor)+1,0,child);metrics.order++}
-  SetUnit(...args){assert(this.alive===true);metrics.setUnit.push({panel:this,args});if(this.setUnitFailure==='throw')throw Error('SetUnit unavailable');if(this.setUnitFailure==='false')return false}
-  AddClass(){}SetHasClass(name,value){this.classes=this.classes||{};this.classes[name]=value}SetImage(uri){this.image=uri}
+  SetUnit(...args){assert(this.alive===true);const call={panel:this,args};metrics.setUnit.push(call);metrics.sceneCalls.push({...call,method:'SetUnit'});if(this.setUnitFailure==='throw')throw Error('SetUnit unavailable');if(this.setUnitFailure==='false')return false}
+  SetScenePanelToLocalHero(...args){assert(this.alive===true);const call={panel:this,args};metrics.econHero.push(call);metrics.sceneCalls.push({...call,method:'SetScenePanelToLocalHero'});if(this.econHeroFailure==='throw')throw Error('econ hero unavailable');if(this.econHeroFailure==='false')return false}
+  ReplaceEconItemSlot(...args){assert(this.alive===true);const call={panel:this,args};metrics.econItem.push(call);metrics.sceneCalls.push({...call,method:'ReplaceEconItemSlot'});if(this.econItemFailure==='throw')throw Error('econ item unavailable');if(this.econItemFailure==='false')return false}
+  AddClass(name){(this.classNames||(this.classNames=new Set())).add(name)}SetHasClass(name,value){this.classes=this.classes||{};this.classes[name]=value}SetImage(uri){this.image=uri}
   GetChildCount(){return this.children.length}GetChild(i){return this.children[i]}
  }
  const root=new Panel('Hud');root.actuallayoutwidth=1920;root.actuallayoutheight=1080;
@@ -82,7 +84,10 @@ function setup(options={}){
  cfg.SurvivalSelectionResolver={Resolve:()=>selected,ResolveDisplayUnit:()=>selected};
  cfg.SurvivalMultiSelectionPortraits={IsActive:()=>multi};
  const $=id=>context.FindChildTraverse(id.slice(1));
- $.CreatePanel=(type,parent,id)=>new Panel(id,parent,type);$.GetContextPanel=()=>context;
+ $.CreatePanel=(type,parent,id,attributes)=>{
+  const created=new Panel(id,parent,type);created.attributes={...(attributes||{})};
+  metrics.created.push({type,parent,id,attributes:created.attributes,panel:created});return created;
+ };$.GetContextPanel=()=>context;
  $.Schedule=(delay,fn)=>{const id=++serial;jobs.set(id,{delay,fn});return id};$.CancelScheduled=id=>jobs.delete(id);
  $.Msg=(...s)=>messages.push(s.join(''));$.Warning=$.Msg;$.Localize=s=>s;
  const subscribe=(name,fn)=>{const id=++serial;subscriptions.set(id,{name,fn});return id};
@@ -93,7 +98,7 @@ function setup(options={}){
   CustomNetTables:{GetTableValue:(name,key)=>runtime[key]||null,SubscribeNetTableListener:subscribe,UnsubscribeNetTableListener:id=>subscriptions.delete(id)},
   GameEvents:Object.assign({Subscribe:subscribe,Unsubscribe:id=>subscriptions.delete(id)},options.events||{}),__test:x=>api=x},{filename:'combat_stats.js'});
  function run(id){const job=jobs.get(id);assert(job);jobs.delete(id);job.fn()}
- return {api,root,context,overlay,scene,cfg,jobs,messages,subscriptions,run,Panel,runtime,metrics,mountNative,
+ return {api,root,context,overlay,scene,cfg,jobs,messages,subscriptions,run,Panel,runtime,metrics,mountNative,panorama:$,
   native:()=>nativeScene,nativeHost:()=>nativeHost,setTime:t=>time=t,select:(id,name)=>{selected=id;if(name)unitNames.set(id,name)},setMulti:value=>{multi=value}};
 }
 module.exports={setup};
@@ -207,6 +212,7 @@ function portraitGeometry(panel){return {position:panel.values.position,width:pa
   assert.equal(t.jobs.size,1);
  }
  assert.equal(t.metrics.setUnit.length,1,'stable updates/sentinel must not restart SetUnit');
+ assert.equal(t.metrics.econHero.length,0);assert.equal(t.metrics.econItem.length,0,'ordinary heroes keep the native SetUnit path');
  assert.deepStrictEqual({parents:t.metrics.parents,order:t.metrics.order,geometryWrites:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions},baseline,
   'stable frames cannot reparent home, reorder, hide or rewrite geometry');
  assert(!t.messages.some(m=>m.includes('HIDE ')||m.includes('TRANSITION_MASK')));

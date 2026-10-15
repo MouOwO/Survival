@@ -30,6 +30,7 @@ for(const [asset,unit,item]of cases){
   assert.equal(t.jobs.size,1);
  }
  assert.equal(t.metrics.setUnit.length,1,asset+' must keep one Scene load for complete stable snapshots');
+ assert.equal(t.metrics.econHero.length,0);assert.equal(t.metrics.econItem.length,0,'nonbuilder assets must not enter the Io econ path');
  assert.deepStrictEqual({parents:t.metrics.parents,order:t.metrics.order,geometryWrites:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions},initial,
   asset+' must not repeatedly return home, hide or remount');
  assert(!t.messages.some(m=>m.includes('HIDE ')||m.includes('TRANSITION_MASK')),asset);

@@ -41,26 +41,32 @@ function nativeVisible(t) {
     assert.equal(state.scene, null, 'Hidden loaded content must not remain an active portrait');
 }
 
+function builderVisible(t, entity) {
+    const scene = t.overlay.FindChildTraverse('SurvivalBuilderIoPortraitScene');
+    assert(scene, 'builder owns a separate lazy map Scene');customVisible(t, entity, scene);
+    assert.equal(t.scene.values.visibility, 'collapse');
+}
+function builderCreations(t) {return t.metrics.created.filter(call => call.id === 'SurvivalBuilderIoPortraitScene').length;}
+
 function selectBuilder(t, entity, version) {
     t.select(entity, 'npc_survival_builder_proxy');
     t.api.portraitTransition('builder_selected');
     t.api.updateSnapshot(builder(entity, version));
-    customVisible(t, entity);
+    builderVisible(t, entity);
 }
 
 {
     const t = setup({portrait: true});
     selectBuilder(t, 7, 1);
-    assert.deepEqual(t.metrics.setUnit.map(call => call.args),
-        [['npc_dota_hero_wisp', 'default', false]]);
+    assert.equal(builderCreations(t), 1);assert.equal(t.metrics.econHero.length, 0);assert.equal(t.metrics.econItem.length, 0);assert.equal(t.metrics.setUnit.length, 0);
     t.api.cosmeticPortraitSentinel();
     for (let version = 2; version <= 65; version++) {
         t.api.updateSnapshot(builder(7, version, {health: 1000 - version, attack_min: version}));
         t.run([...t.jobs.keys()][0]);
-        customVisible(t, 7);
+        builderVisible(t, 7);
         assert.equal(t.jobs.size, 1);
     }
-    assert.equal(t.metrics.setUnit.length, 1, '64 authoritative stat updates reuse the loaded Scene');
+    assert.equal(builderCreations(t), 1, '64 authoritative stat updates reuse the loaded map Scene');
 
     for (let cycle = 0; cycle < 10; cycle++) {
         t.select(8, 'building_main_city');
@@ -74,20 +80,20 @@ function selectBuilder(t, entity, version) {
         nativeVisible(t);
         selectBuilder(t, 7, 66 + cycle);
         t.run([...t.jobs.keys()][0]);
-        customVisible(t, 7);
+        builderVisible(t, 7);
     }
-    assert.equal(t.metrics.setUnit.length, 1,
+    assert.equal(builderCreations(t), 1,
         'Ten builder/main-city cycles reuse one loaded model despite hide and parent moves');
     assert(t.metrics.parents > 10, 'The test must exercise real native-layer/home reparenting');
 
     // Reusing model content does not transfer ownership from an old entity.
     selectBuilder(t, 9, 1);
-    assert.equal(t.metrics.setUnit.length, 1, 'Another allowed builder with the same signature reuses content');
+    assert.equal(builderCreations(t), 1, 'Another allowed builder with the same signature reuses content');
     const acceptedNewBuilder = t.api.portraitState().snapshot;
     t.api.updateSnapshot(builder(7, 99999));
     assert.equal(t.api.portraitState().snapshot, acceptedNewBuilder);
-    customVisible(t, 9);
-    assert.equal(t.metrics.setUnit.length, 1);
+    builderVisible(t, 9);
+    assert.equal(builderCreations(t), 1);assert.equal(t.metrics.econHero.length, 0);assert.equal(t.metrics.econItem.length, 0);assert.equal(t.metrics.setUnit.length, 0);
     t.api.shutdown('selection_reuse_complete');
     nativeVisible(t);
     assert.equal(t.jobs.size, 0);
@@ -145,26 +151,6 @@ function selectBuilder(t, entity, version) {
 }
 
 for (const failure of ['false', 'throw']) {
-    const t = setup({portrait: true});
-    t.select(7, 'npc_survival_builder_proxy');
-    t.scene.setUnitFailure = failure;
-    t.api.portraitTransition('first_load_pending');
-    t.api.updateSnapshot(builder(7, 1));
-    nativeVisible(t);
-    assert.equal(t.metrics.setUnit.length, 1);
-    t.api.updateSnapshot(builder(7, 2));
-    nativeVisible(t);
-    assert.equal(t.metrics.setUnit.length, 2, 'Failed native loads never become reusable cache entries');
-    t.scene.setUnitFailure = null;
-    t.api.updateSnapshot(builder(7, 3));
-    customVisible(t, 7);
-    assert.equal(t.metrics.setUnit.length, 3, 'A later successful update retries the exact failed signature');
-    t.api.portraitHide('temporary_hidden');
-    t.api.updateSnapshot(builder(7, 4));
-    customVisible(t, 7);
-    assert.equal(t.metrics.setUnit.length, 3, 'Only a successful native load can be reused after hiding');
-    t.api.shutdown('first_load_failure_complete');
-
     // Failure after a previous successful model must invalidate that older
     // cache as well: the native SetUnit attempt may have altered Scene content.
     const changed = setup({portrait: true});
@@ -195,7 +181,7 @@ for (const failure of ['false', 'throw']) {
         'The diagnostic API is absent outside Tools mode');
     assert.deepEqual(Object.keys(commands), []);
     selectBuilder(ordinary, 7, 1);
-    assert.equal(ordinary.metrics.setUnit.length, 1);
+    assert.equal(ordinary.metrics.setUnit.length, 0);assert.equal(ordinary.metrics.econHero.length, 0);assert.equal(ordinary.metrics.econItem.length, 0);assert.equal(builderCreations(ordinary), 1);
     assert(!ordinary.messages.some(message => message.includes('[PORTRAIT_CACHE_PROBE]')));
     ordinary.api.shutdown('ordinary_game_complete');
 }
@@ -215,7 +201,7 @@ for (const failure of ['false', 'throw']) {
     assert.equal(probe.Inspect().enabled, false);
     assert.equal(probe.Inspect().setUnitCalls, 0);
     selectBuilder(t, 7, 1);
-    assert.equal(t.metrics.setUnit.length, 1);
+    assert.equal(t.metrics.setUnit.length, 0);assert.equal(t.metrics.econHero.length, 0);assert.equal(t.metrics.econItem.length, 0);assert.equal(builderCreations(t), 1);
     assert.equal(probe.Inspect().setUnitCalls, 0,
         'Tools mode alone must not enable counting of real SetUnit calls');
     assert.equal(probeMessages().length, 0);
@@ -226,7 +212,7 @@ for (const failure of ['false', 'throw']) {
     t.select(20, 'building_arrow_tower');
     t.api.portraitTransition('probe_tower_selected');
     t.api.updateSnapshot(tower(1));
-    assert.equal(t.metrics.setUnit.length, 2);
+    assert.equal(t.metrics.setUnit.length, 1);
     assert.equal(probe.Inspect().setUnitCalls, 1, 'Only a new native load increments the enabled probe');
     assert.equal(probe.Inspect().activeEntity, 20);
     assert.equal(probe.Inspect().sceneValid, true);
@@ -242,7 +228,7 @@ for (const failure of ['false', 'throw']) {
     t.api.portraitTransition('probe_cached_return');
     t.api.updateSnapshot(tower(2));
     customVisible(t, 20);
-    assert.equal(t.metrics.setUnit.length, 2);
+    assert.equal(t.metrics.setUnit.length, 1);
     assert.equal(probe.Inspect().setUnitCalls, 1, 'A cached hide/return is not a native load');
     assert.equal(probeMessages().length, 0, 'Direct API calls and portrait updates do not emit probe reports');
 
@@ -250,7 +236,7 @@ for (const failure of ['false', 'throw']) {
     assert.equal(stopped.enabled, false);
     assert.equal(stopped.setUnitCalls, 1);
     t.api.updateSnapshot(tower(3, {portrait_item_def: '101'}));
-    assert.equal(t.metrics.setUnit.length, 3);
+    assert.equal(t.metrics.setUnit.length, 2);
     assert.equal(probe.Inspect().setUnitCalls, 1, 'Stop freezes counters even when another native model load occurs');
 
     commands.survival_portrait_cache_probe_v2();
@@ -308,6 +294,18 @@ for (const failure of ['false', 'throw']) {
     commands[secondProbe.Commands.start]();
     assert.equal(secondProbe.Inspect().enabled, false, 'dead context cannot re-enable the counter');
     assert(second.messages.at(-1).includes('start_failed'));
+}
+
+// The opt-in probe reports real SetUnit calls, not independent map creation.
+{
+    const t = setup({portrait: true, game: {IsInToolsMode: () => true, AddCommand() {}}});
+    const probe = t.cfg.SurvivalPortraitSceneProbe;
+    probe.Start();selectBuilder(t, 7, 1);
+    assert.equal(builderCreations(t), 1);assert.equal(t.metrics.econHero.length, 0);assert.equal(t.metrics.econItem.length, 0);
+    assert.equal(t.metrics.setUnit.length, 0);assert.equal(probe.Inspect().setUnitCalls, 0);
+    t.select(20, 'building_arrow_tower');t.api.updateSnapshot(tower(1));
+    assert.equal(t.metrics.setUnit.length, 1);assert.equal(probe.Inspect().setUnitCalls, 1);
+    t.api.shutdown('map_probe_isolation');
 }
 
 console.log('PORTRAIT_SELECTION_REUSE_PASS: ten builder/main-city cycles, 64 stat updates, entity ownership and stale packets, three signature fields, Scene replacement/disposal, false/throw recovery, successful-load-only reuse and Tools-only opt-in silent probe; rendered pixels not simulated');

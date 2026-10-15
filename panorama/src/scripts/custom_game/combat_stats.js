@@ -119,6 +119,7 @@
     var dimmedNativePortraits = [];
     var towerPortraitOverlay = null;
     var towerPortraitScene = null;
+    var builderPortraitScene = null;
     var towerPortraitHome = null;
     var towerPortraitLayerAnchor = null;
     var TOWER_PORTRAIT_CONTENT_SCALE = 0.90;
@@ -394,6 +395,47 @@
         if (!validPortraitPanel(candidate)) return null;
         towerPortraitScene = candidate;
         return towerPortraitScene;
+    }
+
+    function builderPortraitScenePanel(create) {
+        if (validPortraitPanel(builderPortraitScene)) return builderPortraitScene;
+        if (loadedPortraitScene === builderPortraitScene) {
+            loadedPortraitKey = "";
+            loadedPortraitScene = null;
+        }
+        var overlay = towerPortraitOverlayPanel();
+        if (!validPortraitPanel(overlay)) return null;
+        var candidate = overlay.FindChildTraverse("SurvivalBuilderIoPortraitScene");
+        if (!validPortraitPanel(candidate) && create) {
+            // Io's light body is a particle effect. This isolated map includes
+            // its companion model and attachments without account loadouts.
+            try {
+                candidate = $.CreatePanel("DOTAScenePanel", overlay, "SurvivalBuilderIoPortraitScene", {
+                    map: "portraits/builder_io_companion_v1", camera: "builder_io_camera",
+                    particleonly: "false", antialias: "true", "animate-during-pause": "true"
+                });
+            } catch (error) {
+                $.Warning("[SURVIVAL_PORTRAIT] BUILDER_MAP_FAILED reason=" + String(error && error.message || error));
+                return null;
+            }
+            if (!validPortraitPanel(candidate)) return null;
+            candidate.AddClass("SurvivalTowerPortraitScene");
+            candidate.hittest = false;
+            candidate.hittestchildren = false;
+            candidate.style.visibility = "collapse";
+        }
+        builderPortraitScene = validPortraitPanel(candidate) ? candidate : null;
+        return builderPortraitScene;
+    }
+
+    function hidePortraitScenesExcept(activeScene) {
+        [towerPortraitScenePanel(), builderPortraitScenePanel(false)].forEach(function (scene) {
+            if (!validPortraitPanel(scene) || scene === activeScene) return;
+            if (String(scene.style.visibility) !== "collapse") {
+                resetTowerPortraitContentScale(scene);
+                scene.style.visibility = "collapse";
+            }
+        });
     }
 
     function belongsToCustomPortraitHud(candidate) {
@@ -707,8 +749,7 @@
             || !positionCosmeticPortrait(overlay, anchor, scene)) return false;
         restoreNativePortraitsExcept(anchor);
         dimNativePortraitOpacity(anchor);
-        resetTowerPortraitContentScale(scene);
-        scene.style.visibility = "collapse";
+        hidePortraitScenesExcept(null);
         overlay.style.visibility = "visible";
         var signature = [unit, String(anchor.id || anchor.paneltype || "anonymous")]
             .join(":");
@@ -735,12 +776,8 @@
 
     function hideCosmeticPortrait(reason) {
         var overlay = towerPortraitOverlayPanel();
-        var scene = towerPortraitScenePanel();
         if (overlay) overlay.style.visibility = "collapse";
-        if (scene) {
-            resetTowerPortraitContentScale(scene);
-            scene.style.visibility = "collapse";
-        }
+        hidePortraitScenesExcept(null);
         restoreNativePortraitOpacity();
         restoreTowerPortraitHome(overlay);
         portraitGeometrySignature = "";
@@ -831,6 +868,7 @@
         var portraitItemDef = String(snapshot && snapshot.portrait_item_def || "");
         var isBuilderPortrait = modelAssetId === "builder_io_benevolent_companion"
             && portraitUnit === "npc_dota_hero_wisp"
+            && portraitItemDef === "9235"
             && String(Entities.GetUnitName(Number(displayUnit())) || "") === "npc_survival_builder_proxy";
         var isTowerPortrait = /^(tower_|monster_boss_|monster_wave_|monster_archive_|hero_permanent_hero_(blademaster|doom)$|challenge_monster_(beastmaster_legacy|morphling|ember_searing_path|primal_beast_svarog|spectre_phantom_advent|terrorblade_fractal_horns)$)/
             .test(modelAssetId)
@@ -841,7 +879,7 @@
             return false;
         }
         var overlay = towerPortraitOverlayPanel();
-        var scene = towerPortraitScenePanel();
+        var scene = isBuilderPortrait ? builderPortraitScenePanel(true) : towerPortraitScenePanel();
         var anchor = officialPortraitPanel();
         var portraitMode = "tower_scene";
         if (!overlay || !anchor || !scene) {
@@ -855,6 +893,7 @@
             hideCosmeticPortrait("native_layer_unavailable");
             return false;
         }
+        hidePortraitScenesExcept(scene);
         applyTowerPortraitContentScale(scene);
         scene.style.visibility = "visible";
         if (!positionCosmeticPortrait(overlay, anchor, scene)) {
@@ -866,14 +905,16 @@
         var portraitKey = [modelAssetId, portraitUnit, portraitItemDef].join(":");
         if (loadedPortraitKey !== portraitKey || loadedPortraitScene !== scene) {
             try {
-                if (portraitSceneProbe && portraitSceneProbe.enabled) portraitSceneProbe.setUnitCalls += 1;
-                var setUnitResult = scene.SetUnit(portraitUnit, "default", false);
-                if (setUnitResult === false) throw new Error("SetUnit returned false");
+                if (!isBuilderPortrait) {
+                    if (portraitSceneProbe && portraitSceneProbe.enabled) portraitSceneProbe.setUnitCalls += 1;
+                    var setUnitResult = scene.SetUnit(portraitUnit, "default", false);
+                    if (setUnitResult === false) throw new Error("SetUnit returned false");
+                }
             } catch (error) {
                 loadedPortraitKey = "";
                 loadedPortraitScene = null;
                 $.Warning("[SURVIVAL_PORTRAIT] SCENE_FAILED unit=" + portraitUnit
-                    + " asset=" + modelAssetId);
+                    + " asset=" + modelAssetId + " reason=" + String(error && error.message || error));
                 hideCosmeticPortrait("scene_failed");
                 return false;
             }

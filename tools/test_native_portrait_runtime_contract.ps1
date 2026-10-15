@@ -29,6 +29,11 @@ Check ($script.Contains('__survivalPortraitOriginalWashColor')) 'NATIVE_PORTRAIT
 Check (-not $script.Contains('anchor.style.opacity = "0"')) 'NATIVE_PORTRAIT_INPUT_DISABLED'
 Check ($script.Contains('var nativeZIndex = Number(anchor.style.zIndex);')) 'NATIVE_PORTRAIT_DECIMAL_LAYER_MISSING'
 Check ($script.Contains('isFinite(nativeZIndex) ? nativeZIndex + 1 : 1')) 'NATIVE_PORTRAIT_FOREGROUND_LAYER_MISSING'
+Check ($script.Contains('portraitItemDef === "9235"')) 'BUILDER_PORTRAIT_ITEM_GUARD_MISSING'
+Check ($script.Contains('"SurvivalBuilderIoPortraitScene"')) 'BUILDER_PORTRAIT_MAP_SCENE_MISSING'
+Check ($script.Contains('map: "portraits/builder_io_companion_v1", camera: "builder_io_camera"')) 'BUILDER_PORTRAIT_MAP_BINDING_MISSING'
+Check (-not $script.Contains('scene.SetScenePanelToLocalHero(91)')) 'BUILDER_PORTRAIT_ACCOUNT_ECON_PATH_REMAINED'
+Check (-not $script.Contains('scene.ReplaceEconItemSlot(0, 9235, 0)')) 'BUILDER_PORTRAIT_ACCOUNT_ITEM_PATH_REMAINED'
 Check ([regex]::IsMatch($layout, '<Panel\b[^>]*id="SurvivalTowerPortraitOverlay"[^>]*hittest="false"[^>]*hittestchildren="false"')) 'TOWER_OVERLAY_INPUT_NOT_PASSTHROUGH'
 Check ([regex]::IsMatch($layout, '<DOTAScenePanel\b[^>]*id="SurvivalTowerPortraitScene"[^>]*hittest="false"')) 'TOWER_SCENE_INPUT_NOT_PASSTHROUGH'
 if ($InputOnly) {
