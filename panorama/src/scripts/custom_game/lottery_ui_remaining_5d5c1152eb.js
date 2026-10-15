@@ -30,10 +30,11 @@
     var animating = false, animationSerial = 0, skipAnimation = !!$("#LotterySkipAnimation").checked;
     var resultCards = [], lastDrawCount = 1, history = [], seenResults = {};
     var activeRequest = null, opened = false, switchingPool = false;
+    var feedbackRequest = null, rewardReceipt = null, rewardFX = null, rewardFXRoot = null;
     var motion = { single: {enter:650, flip:1250, ready:2000}, ten: {enter:800, enterStep:40, flip:1350, flipStep:110, ready:2800}, flipHalf:100 };
     var historyPoolId = "map", detailPoolId = null, detailState = null, detailRequestSerial = 0;
     var animationTimers = [], activeFeature = "", reopenDetails = false, knownPools = [], selectedRewardId = null, poolCards = [];
-    var skipRevealButton=$("#LotterySkipReveal");skipRevealButton.hittest=true;skipRevealButton.hittestchildren=false;skipRevealButton.SetPanelEvent("onactivate",function(){finishReveal();$.Msg("[LOTTERY_SKIP_UI] actual_results="+visibleResults.length);});
+    var skipRevealButton=$("#LotterySkipReveal");skipRevealButton.hittest=true;skipRevealButton.hittestchildren=false;skipRevealButton.SetPanelEvent("onactivate",function(){completeReveal();$.Msg("[LOTTERY_SKIP_UI] actual_results="+visibleResults.length);});
     function cancelAnimation() { animationSerial++; drawSequence.Cancel(); if(GameUI.CustomUIConfig().LotteryCinematic)GameUI.CustomUIConfig().LotteryCinematic.Cancel(); animationTimers = []; }
     function cardState(card, name, on) { if (card && (!card.IsValid || card.IsValid())) card.SetHasClass(name, on); }
     function drawCost(selected, count) { var value = Number(count === 10 ? selected.ten_cost : selected.single_cost); return isFinite(value) && value >= 0 ? value : count; }
@@ -73,8 +74,27 @@
         resultCards.forEach(function (card) { ["LotteryCardCovered", "LotteryCardEntering", "LotteryCardNarrow"].forEach(function (name) { cardState(card, name, false); }); });
         updateButtons();
     }
+    function clearRewardFeedback() { rewardReceipt = null; if (rewardFX) rewardFX.Clear(); }
+    function playRewardFeedback() {
+        var receipt = rewardReceipt; rewardReceipt = null;
+        if (!receipt || !alive() || !opened || receipt.pool !== selectedPoolId || !U.RewardFX) return;
+        var view = cfg.SurvivalPurpleLottery;
+        var host = view && view.Content ? view.Content() : null;
+        if (!host || host.IsValid && !host.IsValid()) host = panel("LotteryMainCanvas") || panel("LotteryWindow");
+        if (!host) return;
+        if (!rewardFX || rewardFXRoot !== host) {
+            if (rewardFX) rewardFX.Dispose();
+            // The GW2 content is a child of the fitted MainCanvas. The helper
+            // reads that ancestor transform; no second Fit scale is applied.
+            rewardFX = U.RewardFX.Create(host, {channel:"lottery"}); rewardFXRoot = host;
+        }
+        rewardFX.Play({key:receipt.key,anchor:resultCards.length === 1 ? resultCards[0] : panel("LotteryItemList"),
+            title:"抽奖成功",text:visibleResults.length === 1 ? String(visibleResults[0].name || "获得奖励") : "获得 " + visibleResults.length + " 件奖励"});
+    }
+    function completeReveal() { finishReveal(); playRewardFeedback(); }
     function revealResults() {
-        if (skipAnimation || !opened || !visibleResults.length) return;
+        if (!opened || !visibleResults.length) return;
+        if (skipAnimation) { playRewardFeedback(); return; }
         cancelAnimation();
         var generation = animationSerial, ten = lastDrawCount === 10, timing = ten ? motion.ten : motion.single;
         animating = true; rootClass("LotteryAnimating", true); rootClass("LotteryCharging", true);
@@ -84,7 +104,7 @@
             if(!alive()||generation!==animationSerial || !opened)return;
             rootClass("LotteryCharging",false);
             var cardTiming=ten?{enter:60,enterStep:70,flip:320,flipStep:100,ready:1550}:{enter:60,flip:350,ready:1000};
-            drawSequence.Play(visibleResults,{timing:cardTiming,flipHalf:100,onCharged:function(){},onEnter:function(i){cardState(resultCards[i],"LotteryCardEntering",false);},onFlip:function(i){cardState(resultCards[i],"LotteryCardNarrow",true);},onReveal:function(i){cardState(resultCards[i],"LotteryCardCovered",false);cardState(resultCards[i],"LotteryCardNarrow",false);},onReady:finishReveal});
+            drawSequence.Play(visibleResults,{timing:cardTiming,flipHalf:100,onCharged:function(){},onEnter:function(i){cardState(resultCards[i],"LotteryCardEntering",false);},onFlip:function(i){cardState(resultCards[i],"LotteryCardNarrow",true);},onReveal:function(i){cardState(resultCards[i],"LotteryCardCovered",false);cardState(resultCards[i],"LotteryCardNarrow",false);},onReady:completeReveal});
         }
         var cinema=GameUI.CustomUIConfig().LotteryCinematic;
         if(!cinema || !cinema.Play(selectedPoolId,visibleResults,showCards))showCards();
@@ -366,6 +386,7 @@
 
     function resetDrawStage() {
         if (pending) return;
+        clearRewardFeedback();
         finishReveal();
         visibleResults = [];
         renderChest();
@@ -399,6 +420,7 @@
     function close() {
         if(!alive())return;
         opened = false;
+        feedbackRequest = null; clearRewardFeedback();
         var layers = GameUI.CustomUIConfig().SurvivalUILayers; if (layers) layers.Close("lottery");
         finishReveal(); closeInfo();
         hideTooltip();
@@ -425,6 +447,7 @@
     function selectPool(poolId) {
         if (activeFeature === "details") { selectDetailPool(poolId); return; }
         if (pending || animating || switchingPool) return;
+        clearRewardFeedback();
         selectedPoolId = String(poolId || "map");
         LH.Background(selectedPoolId);
         if(poolCache[selectedPoolId]){
@@ -585,6 +608,7 @@
             return;
         }
         pending = true;
+        clearRewardFeedback();
         lastDrawCount = count;
         closeInfo();
         updateButtons();
@@ -592,6 +616,7 @@
         setText("LotteryStatus", count === 10
             ? "十连抽进行中……" : "单抽进行中……");
         activeRequest = requestId();
+        feedbackRequest = opened ? activeRequest : null;
         GameEvents.SendCustomGameEventToServer("ui_lottery_draw_request", {
             request_id: activeRequest,
             pool_id: selectedPoolId,
@@ -602,6 +627,8 @@
     function renderResult(payload) {
         if (payload && payload.request_id && seenResults[payload.request_id]) return;
         if (payload && payload.request_id && activeRequest && payload.request_id !== activeRequest) return;
+        var feedbackAllowed = opened && payload && payload.request_id && payload.request_id === feedbackRequest;
+        feedbackRequest = null;
         $.Msg("[SURVIVAL_LOTTERY_UI] stage=result_received request="
             + String(payload && payload.request_id || "none"));
         pending = false;
@@ -615,10 +642,12 @@
             return;
         }
         if (payload.request_id) seenResults[payload.request_id] = true;
+        clearRewardFeedback();
         finishReveal();
         visibleResults = rows(payload.results);
         lastDrawCount = visibleResults.length > 1 ? 10 : 1;
         if (payload.pool_id) selectedPoolId = String(payload.pool_id);
+        if (feedbackAllowed) rewardReceipt = {key:payload.request_id,pool:selectedPoolId};
         history.unshift({ time: historyTime(), pool: selectedPoolId, items: visibleResults.slice(0) });
         if (history.length > 30) history.pop();
         $.Msg("[SURVIVAL_LOTTERY_UI] result_count=" + visibleResults.length
@@ -788,7 +817,7 @@
     subscriptions.push(GameEvents.Subscribe("ui_lottery_exchange_result", active(renderExchangeResult)));
     $.Schedule(0.3,active(function(){GameEvents.SendCustomGameEventToServer("ui_lottery_snapshot_request",{prefetch:1,pool_id:selectedPoolId});}));
     var api={
-        SkipCinematic: finishReveal,
+        SkipCinematic: completeReveal,
         Open: open,
         OpenFromShop: openFromShop,
         Close: close,
@@ -799,8 +828,8 @@
         DrawAgain: function () { draw(lastDrawCount); },
         Feature: feature,
         CloseInfo: closeInfo,
-        SkipReveal: finishReveal,
-        SetSkipAnimation: function () { skipAnimation = !!panel("LotterySkipAnimation").checked; if (skipAnimation && animating) finishReveal(); },
+        SkipReveal: completeReveal,
+        SetSkipAnimation: function () { skipAnimation = !!panel("LotterySkipAnimation").checked; if (skipAnimation && animating) completeReveal(); },
         SelectPool: selectPool,
         SelectHistoryPool: function(id){if(pending||animating)return;historyPoolId=String(id||selectedPoolId);feature("history");},
         Refresh: function () { if (!pending && !animating) requestSnapshot(); }
@@ -811,6 +840,8 @@
         if(disposed)return;
         if(alive())close();
         if(tooltipDismiss)tooltipDismiss.Dispose();
+        feedbackRequest = null; rewardReceipt = null;
+        if(rewardFX)rewardFX.Dispose();rewardFX=null;rewardFXRoot=null;
         disposed=true;animationSerial++;detailRequestSerial++;
         drawSequence.Dispose();
         subscriptions.forEach(function(id){if(GameEvents.Unsubscribe)GameEvents.Unsubscribe(id);});subscriptions=[];

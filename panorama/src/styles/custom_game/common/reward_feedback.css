@@ -1,0 +1,61 @@
+.RewardFXBurst {
+    width: 220px;
+    height: 152px;
+    ignore-parent-flow: true;
+    horizontal-align: left;
+    vertical-align: top;
+    flow-children: none;
+    z-index: 100050;
+    overflow: noclip;
+    animation-duration: 1.6s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: 1;
+}
+.RewardFXParticle {
+    width: 220px;
+    height: 152px;
+    align: center center;
+    opacity: 0.48;
+}
+.RewardFXWords {
+    width: 100%;
+    height: fit-children;
+    align: center center;
+    flow-children: down;
+}
+.RewardFXTitle {
+    width: 100%;
+    text-align: center;
+    font-family: "Source Han Sans SC";
+    font-size: 25px;
+    font-weight: bold;
+    color: #fff2c5;
+    text-shadow: 0px 2px 4px 3.0 #201507ee;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.RewardFXDetail {
+    width: 100%;
+    margin-top: 4px;
+    text-align: center;
+    font-family: "Source Han Sans SC";
+    font-size: 17px;
+    color: #f4ddb0;
+    text-shadow: 0px 1px 3px 3.0 #201507ee;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.RewardFXPlayA { animation-name: RewardFXPulseA; }
+.RewardFXPlayB { animation-name: RewardFXPulseB; }
+@keyframes 'RewardFXPulseA' {
+    0% { opacity: 0; transform: translateY(8px) scale3d(0.96, 0.96, 1); }
+    14% { opacity: 1; transform: translateY(0px) scale3d(1, 1, 1); }
+    72% { opacity: 1; transform: translateY(-4px); }
+    100% { opacity: 0; transform: translateY(-12px); }
+}
+@keyframes 'RewardFXPulseB' {
+    0% { opacity: 0; transform: translateY(8px) scale3d(0.96, 0.96, 1); }
+    14% { opacity: 1; transform: translateY(0px) scale3d(1, 1, 1); }
+    72% { opacity: 1; transform: translateY(-4px); }
+    100% { opacity: 0; transform: translateY(-12px); }
+}

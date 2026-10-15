@@ -10,7 +10,7 @@ var gridWidth=(columns-1)*pitch+slotSize,gridHeight=(rowsPerPage-1)*pitch+slotSi
 // Closing or reloading must never turn one pending draw into another purchase.
 var shared=cfg.SurvivalCollectionState||(cfg.SurvivalCollectionState={pages:{},versions:{},pending:null,serial:0});
 var active=true,opened=false,current="ex",query="",selected="",assemblies={},resync={},fetchJob=null,fetching=false;
-var canvas,grid,gridBody,empty,search,draw,drawText,tickets,summary,result,tooltip,tipPanel;
+var canvas,grid,gridBody,empty,search,draw,drawText,tickets,summary,result,tooltip,tipPanel,rewardFX;
 var scale=1,cardsKey="",visibleRows=[],slots=[],tabs={},nodes={},api,createdRoots=[];
 var names={ex:"我的前女友",friend:"我的前男友",wife:"我的老婆"};
 function valid(n){return n&&(!n.IsValid||n.IsValid());}
@@ -37,6 +37,7 @@ style(scrim,{backgroundColor:"#00000022"});
 // The opaque surface also covers the source texture's partially transparent pixels.
 style(win,{width:size[0]+"px",height:size[1]+"px",horizontalAlign:"center",verticalAlign:"center",flowChildren:"none",backgroundColor:"#171e24",backgroundImage:"none",border:"0px",boxShadow:"none",padding:"0px",margin:"0px",overflow:"noclip",transformOrigin:"50% 50%"});
 canvas=make("Panel",win,"CollectionGW2Canvas","CollectionGW2Canvas");rect(canvas,0,0,size[0],size[1]);canvas.hittest=false;canvas.hittestchildren=true;
+rewardFX=U.RewardFX&&U.RewardFX.Create(canvas,{channel:"collection",getScale:function(){return scale;}});
 var background=art(canvas,"window_background",0,0,size[0],size[1],"CollectionGW2Background");style(background,{opacity:"1",backgroundColor:"#171e24"});
 // Flat regional tints sit over the opaque texture without raised plates.
 var header=make("Panel",canvas,"CollectionGW2Header","CollectionGW2FlatRegion");rect(header,0,0,size[0],34);style(header,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});header.hittest=false;
@@ -136,21 +137,34 @@ function snapshot(packet){
  var complete=group.header;complete.rows=[];for(var i=1;i<=group.count;i++){if(!group.chunks[i])return;complete.rows=complete.rows.concat(group.chunks[i]);}delete assemblies[category];
  if(Number(complete.delta)===1){if(!shared.pages[category]||Number(shared.versions[category])!==Number(complete.base_sequence)){queueResync(category);return;}complete=cfg.SurvivalSnapshotCache.Apply(shared.pages[category],complete.rows);}else delete resync[category];
  shared.pages[category]=complete;shared.versions[category]=sequence;fetching=false;
- if(shared.pending&&shared.pending.pool_id===category&&(shared.pending.acknowledged?matchesDraw(complete,shared.pending):committedDraw(complete,shared.pending)))shared.pending=null;
- if(opened&&current===category)render();
+ if(shared.pending&&shared.pending.pool_id===category&&(shared.pending.acknowledged?matchesDraw(complete,shared.pending):committedDraw(complete,shared.pending)))finishDraw(shared.pending,complete);
+ else if(opened&&current===category)render();
 }
 function committedDraw(data,intent){var draw=data&&data.last_draw,suffix=":social_draw:"+intent.request_id;return !!draw&&Number(data.pending)===0&&draw.pool_id===intent.pool_id&&String(draw.id||"").slice(-suffix.length)===suffix;}
 function matchesDraw(data,intent){if(!data)return false;if(known(intent.revision))return known(data.revision)&&Number(data.revision)>=Number(intent.revision);return committedDraw(data,intent);}
+function finishDraw(intent,data){
+ // Consume the intent before rendering: both ACK orders and reload recovery
+ // converge here, while later snapshots cannot replay an old reward.
+ shared.pending=null;shared.outcome={pool_id:intent.pool_id,ok:true};render();
+ if(!rewardFX||!opened||current!==intent.pool_id)return;
+ var matched=committedDraw(data,intent),reward=matched&&data.last_draw,name=reward&&String(reward.name||""),anchor=result;
+ if(matched&&intent.counts){
+  var acquired=array(data.rows).filter(function(item){return countKnown(item)&&known(intent.counts[item.id])&&Number(item.count)>Number(intent.counts[item.id])&&(!name||item.name===name);});
+  if(acquired.length===1){var card=p("CollectionGW2Item_"+acquired[0].id);if(valid(card)&&card.visible)anchor=card;}
+ }
+ rewardFX.Play({key:intent.request_id,anchor:anchor,title:"获得奖励",text:name||"收藏奖励已到账"});
+}
 function drawOne(){
  if(!alive()||!canDraw())return;var requestId="collection_"+Date.now()+"_"+(++shared.serial);
- shared.pending={pool_id:current,request_id:requestId};shared.outcome=null;render();
+ var counts={};array(shared.pages[current]&&shared.pages[current].rows).forEach(function(item){if(countKnown(item))counts[item.id]=Number(item.count);});
+ shared.pending={pool_id:current,request_id:requestId,counts:counts};shared.outcome=null;render();
  GameEvents.SendCustomGameEventToServer("survival_archive_social_draw",{pool_id:current,request_id:requestId});
 }
 function drawResult(message){
  if(!alive()||!message||!shared.pending)return;var intent=shared.pending;
  if(message.request_id!==intent.request_id||message.pool_id!==intent.pool_id)return;
  // Transient persistence failures remain queued server-side: never issue a new intent.
- if((message.ok===true||Number(message.ok)===1)&&(message.terminal===true||Number(message.terminal)===1)){shared.outcome={pool_id:intent.pool_id,ok:true};if(known(message.revision))intent.revision=Number(message.revision);if(matchesDraw(shared.pages[intent.pool_id],intent))shared.pending=null;else{intent.acknowledged=true;if(opened&&current!=="wife")request(true);}}
+ if((message.ok===true||Number(message.ok)===1)&&(message.terminal===true||Number(message.terminal)===1)){shared.outcome={pool_id:intent.pool_id,ok:true};if(known(message.revision))intent.revision=Number(message.revision);if(matchesDraw(shared.pages[intent.pool_id],intent)){finishDraw(intent,shared.pages[intent.pool_id]);return;}else{intent.acknowledged=true;if(opened&&current!=="wife")request(true);}}
  else if(message.terminal===true||Number(message.terminal)===1){shared.outcome={pool_id:intent.pool_id,ok:false,error:message.error};shared.pending=null;}
  render();
 }
@@ -165,10 +179,10 @@ function recoverIntent(){
   GameEvents.SendCustomGameEventToServer("survival_archive_social_draw",{pool_id:pool,request_id:requestId});
  });
 }
-function select(id){if(!alive()||!names[id])return;current=id;query="";selected="";search.text="";searchHint.visible=true;grid.ScrollToTop();hideTooltip();render();if(opened&&id!=="wife"&&!shared.pages[id])request(true);}
-function open(id){if(!alive())return;var wasOpen=opened;if(id&&names[id]&&id!==current){current=id;query="";selected="";search.text="";searchHint.visible=true;grid.ScrollToTop();}if(cfg.SurvivalArchive&&cfg.SurvivalArchive.IsOpen&&cfg.SurvivalArchive.IsOpen())cfg.SurvivalArchive.Close();opened=true;win.RemoveClass("ArchiveHidden");scrim.RemoveClass("ArchiveHidden");shell.Open();scale=Number(U.Fit(win,root,size[0],size[1],{reference:fitReference.slice()}))||1;render();if(current!=="wife")request(!shared.pages[current]||Object.keys(resync).length>0);if(!wasOpen)recoverIntent();}
-function close(){if(!active)return;opened=false;hideTooltip();viewLife.Cancel();if(valid(win)){shell.Close();win.AddClass("ArchiveHidden");}if(valid(scrim))scrim.AddClass("ArchiveHidden");$.DispatchEvent("DOTAHideTextTooltip");}
-function dispose(){if(!active)return;close();active=false;life.Dispose();viewLife.Dispose();shell.Dispose();if(tooltip)tooltip.Dispose();if(valid(canvas))canvas.DeleteAsync(0);createdRoots.forEach(function(n){if(valid(n))n.DeleteAsync(0);});if(valid(win))win.RemoveClass("CollectionGW2Page");}
+function select(id){if(!alive()||!names[id])return;if(rewardFX)rewardFX.Clear();current=id;query="";selected="";search.text="";searchHint.visible=true;grid.ScrollToTop();hideTooltip();render();if(opened&&id!=="wife"&&!shared.pages[id])request(true);}
+function open(id){if(!alive())return;var wasOpen=opened;if(id&&names[id]&&id!==current){if(rewardFX)rewardFX.Clear();current=id;query="";selected="";search.text="";searchHint.visible=true;grid.ScrollToTop();}if(cfg.SurvivalArchive&&cfg.SurvivalArchive.IsOpen&&cfg.SurvivalArchive.IsOpen())cfg.SurvivalArchive.Close();opened=true;win.RemoveClass("ArchiveHidden");scrim.RemoveClass("ArchiveHidden");shell.Open();scale=Number(U.Fit(win,root,size[0],size[1],{reference:fitReference.slice()}))||1;render();if(current!=="wife")request(!shared.pages[current]||Object.keys(resync).length>0);if(!wasOpen)recoverIntent();}
+function close(){if(!active)return;opened=false;if(rewardFX)rewardFX.Clear();hideTooltip();viewLife.Cancel();if(valid(win)){shell.Close();win.AddClass("ArchiveHidden");}if(valid(scrim))scrim.AddClass("ArchiveHidden");$.DispatchEvent("DOTAHideTextTooltip");}
+function dispose(){if(!active)return;close();active=false;if(rewardFX)rewardFX.Dispose();life.Dispose();viewLife.Dispose();shell.Dispose();if(tooltip)tooltip.Dispose();if(valid(canvas))canvas.DeleteAsync(0);createdRoots.forEach(function(n){if(valid(n))n.DeleteAsync(0);});if(valid(win))win.RemoveClass("CollectionGW2Page");}
 api=cfg.SurvivalCollection={Open:open,Close:close,Toggle:function(){if(alive()){if(opened)close();else open();}},Select:select,IsOpen:function(){return alive()&&opened;},Dispose:dispose,Inspect:function(){return {open:opened,layout:"collection_gw2",canvas:size.slice(),columns:columns,portraitSize:portraitSize,category:current,search:query,rows:visibleRows.map(function(item){return {id:item.id,name:item.name,count:item.count,target:item.target};}),slots:slots.length,drawEnabled:!!draw.enabled,pending:shared.pending?copy(shared.pending):null,versions:copy(shared.versions),tooltipVisible:tooltip&&tooltip.IsVisible()};}};
 life.Subscribe("survival_archive_snapshot",snapshot);life.Subscribe("survival_archive_social_result",drawResult);
 win.AddClass("ArchiveHidden");scrim.AddClass("ArchiveHidden");shell.Close();

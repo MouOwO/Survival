@@ -6,12 +6,13 @@ var cfg=GameUI.CustomUIConfig(),U=cfg.SurvivalUI,RH=cfg.RemainingHandoff,P=cfg.D
 var data=null,waiting=null,errorText="",buying=false,sequence=0,active=true,life=U.Lifecycle(),viewLife=U.Lifecycle(),fetching=false,fetchSerial=0;
 var dailyRoot=$.GetContextPanel(),view=null,shell=null,canvas=null,tipPanel=null,tipFrame=null,tipBody=null,tipTitle=null,tipViewport=null,tipAnchor=null,tipEpoch=0,tipHideJob=null,tipDismiss=null,moved=[];
 var cardSignature="",specialSignature="",statusText="",scale=1;
+var rewardFX=null;
 function valid(node){return node&&(!node.IsValid||node.IsValid());}
 function p(id){return valid(dailyRoot)?dailyRoot.FindChildTraverse(id):null;}
 function viewValid(){return valid(p("DailyWindow"));}
 if(!viewValid()){active=false;return;}
 if(cfg.SurvivalDaily&&cfg.SurvivalDaily.Dispose)cfg.SurvivalDaily.Dispose();
-function stopIfInvalid(){if(!active)return true;if(viewValid())return false;active=false;life.Dispose();viewLife.Dispose();if(view)view.Dispose();return true;}
+function stopIfInvalid(){if(!active)return true;if(viewValid())return false;active=false;if(rewardFX)rewardFX.Dispose();life.Dispose();viewLife.Dispose();if(view)view.Dispose();return true;}
 function array(v){return Array.isArray(v)?v:Object.keys(v||{}).sort(function(a,b){return Number(a)-Number(b);}).map(function(k){return v[k];});}
 function style(node,values){Object.keys(values).forEach(function(key){if(node.style[key]!==values[key])node.style[key]=values[key];});}
 function rect(node,x,y,w,h){style(node,{position:x+"px "+y+"px 0px",width:w+"px",height:h+"px",margin:"0px",padding:"0px",horizontalAlign:"left",verticalAlign:"top"});}
@@ -43,6 +44,7 @@ function tip(anchor,title,body){
  });anchor.SetPanelEvent("onmouseout",leaveTooltip);
 }
 function close(){
+ if(rewardFX)rewardFX.Clear();if(waiting)waiting.present=false;
  if(!active)return;hideTooltip();viewLife.Cancel();fetching=false;fetchSerial++;if(view)view.Close();
  if(valid(p("DailyWindow")))p("DailyWindow").AddClass("ArchiveHidden");if(valid(p("DailyScrim")))p("DailyScrim").AddClass("ArchiveHidden");
  if(valid(p("DailyRulesText")))p("DailyRulesText").AddClass("ArchiveHidden");$.DispatchEvent("DOTAHideTextTooltip");
@@ -82,6 +84,7 @@ function build(){
  view=cfg.SurvivalDailyGW2={canvas:canvas,shell:shell,Open:function(){shell.Open();canvas.visible=true;scale=Number(U.Fit(win,dailyRoot,size[0],size[1],{reference:size.slice()}))||1;},Close:function(){shell.Close();if(valid(canvas))canvas.visible=false;},IsOpen:function(){return shell.IsOpen();},Dispose:function(){if(tipDismiss)tipDismiss.Dispose();shell.Dispose();moved.forEach(function(e){if(valid(e.node)&&valid(e.parent))e.node.SetParent(e.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(win))win.RemoveClass("DailyGW2Page");}};
 }
 build();
+if(U.RewardFX)rewardFX=U.RewardFX.Create(canvas,{channel:"daily",getScale:function(){return scale;}});
 p("DailyClose").SetPanelEvent("onactivate",function(){if(active)close();});
 U.State.Bind(p("DailyRules"),function(){if(!active||!viewValid())return;hideTooltip();p("DailyRulesText").ToggleClass("ArchiveHidden");});
 U.State.Bind(p("DailyPassStatus"),function(){if(!active||!viewValid())return;buying=true;p("DailyGW2PassInfo").AddClass("DailyGW2PassFocus");});
@@ -168,17 +171,38 @@ function render(){
  p("DailyRulesBody").text=escapedLines((data.rule_text||"奖励以服务端配置为准")+"\n补签范围：最近"+(data.makeup_days||30)+"天，需有效战令。\n"+array(data.specials).map(function(s){return "累计"+s.day+"次："+s.name+"；"+s.description;}).join("\n"));
  renderCards();renderSpecials();paintActions();setStatus(errorText||(busy?"正在等待服务端保存，请勿重复提交。":data.calendar28?"每日零点刷新，断签不重置累计进度。":"28日奖励视图待同步，当前展示已配置奖励。"));
 }
-function claim(target){if(!active||!data||waiting||Number(data.pending)===1||target===undefined)return;waiting={target:Number(target),day:Number(data.today),period:String(data.period_id),count:Number(data.count)};errorText="";render();GameEvents.SendCustomGameEventToServer("survival_daily_claim",{target_day:Number(target)});}
+function claim(target){
+ if(!active||!data||waiting||Number(data.pending)===1||target===undefined)return;
+ var slot=Number(data.calendar_current_day)||1,day=calendar()[slot-1],bonus=Number(target)===Number(data.today)&&data.ordinary_status==="claimed";
+ waiting={target:Number(target),day:Number(data.today),period:String(data.period_id),count:Number(data.count),
+  ordinary:data.ordinary_status,premium:data.premium&&data.premium.status,slot:slot,calendarStart:Number(data.calendar_start_count)||0,
+  text:bonus?"月卡奖励":array(day&&day.rewards).map(function(item){return item.name;}).join("、"),present:shell.IsOpen(),bonus:bonus};
+ errorText="";render();GameEvents.SendCustomGameEventToServer("survival_daily_claim",{target_day:Number(target)});
+}
+function confirmedClaim(next,intent){
+ var result=next.claim_result,matching=result&&Number(result.target_day)===intent.target;
+ if(Number(next.pending)===1||(matching&&(result.pending===true||Number(result.pending)===1)))return false;
+ if(matching)return result.ok===true||Number(result.ok)===1;
+ return Number(next.count)>intent.count||(intent.target===Number(next.today)&&(
+  (intent.ordinary==="claimable"&&next.ordinary_status==="claimed")||
+  (intent.premium==="claimable"&&next.premium&&next.premium.status==="claimed")));
+}
+function showClaim(intent){
+ if(!rewardFX||!intent.present||!shell.IsOpen())return;
+ var samePage=(Number(data.calendar_start_count)||0)===intent.calendarStart;
+ rewardFX.Play({key:intent.period+":"+intent.target+":"+intent.count+":"+intent.ordinary+":"+intent.premium,
+  anchor:!intent.bonus&&samePage?p("DailyGW2Day_"+intent.slot):p("DailyClaim"),title:"领取成功",text:intent.text||"奖励已领取",tone:"gold"});
+}
 life.Subscribe("survival_daily_snapshot",function(next){
  if(!active)return;fetching=false;fetchSerial++;if(!(next.ok===true||Number(next.ok)===1)){errorText=next.error||"正在读取档案";render();return;}
  if(Number(next.sequence)>0&&Number(next.sequence)<=sequence)return;if(data&&Number(next.today)<Number(data.today))return;sequence=Number(next.sequence)||sequence;
- var result=next.claim_result;if(waiting){if(Number(next.today)!==waiting.day||String(next.period_id)!==waiting.period){waiting=null;errorText="";}else if(Number(next.count)>waiting.count||(waiting.target===Number(next.today)&&next.ordinary_status==="claimed")){waiting=null;errorText="";}else if(result&&Number(result.target_day)===waiting.target&&Number(next.pending)!==1&&!result.pending){waiting=null;errorText=result.ok?"":result.error||"领取失败，请重试";}}
- data=next;if(!waiting&&!(result&&!result.ok))errorText="";render();
+ var result=next.claim_result,claimed=null;if(waiting){if(Number(next.today)!==waiting.day||String(next.period_id)!==waiting.period){waiting=null;errorText="";}else if(confirmedClaim(next,waiting)){claimed=waiting;waiting=null;errorText="";}else if(result&&Number(result.target_day)===waiting.target&&Number(next.pending)!==1&&!(result.pending===true||Number(result.pending)===1)){waiting=null;errorText=result.error||"领取失败，请重试";}}
+ data=next;if(!waiting&&!(result&&!(result.ok===true||Number(result.ok)===1)))errorText="";render();if(claimed)showClaim(claimed);
 });
 function poll(){if(stopIfInvalid()||!shell.IsOpen())return;request();viewLife.Later(3,poll);}
 cfg.SurvivalDaily={Open:function(pass){
  if(!active||!viewValid())return;hideTooltip();buying=pass===true;p("DailyWindow").RemoveClass("ArchiveHidden");p("DailyScrim").RemoveClass("ArchiveHidden");view.Open();viewLife.Cancel();fetching=false;render();request();viewLife.Later(3,poll);
 },Close:close,Inspect:function(){var cards=p("DailyCards");return {open:active&&viewValid()&&shell.IsOpen(),layout:"daily_gw2",pass:buying,waiting:!!waiting,fetching:fetching,today:data&&data.today,count:data&&data.count,hasPass:!!data&&Number(data.has_pass)===1,calendarDay:data&&data.calendar_current_day,days:valid(cards)?cards.GetChildCount():0,status:statusText};},
-Dispose:function(){if(!active)return;close();active=false;viewLife.Dispose();life.Dispose();view.Dispose();}};
+Dispose:function(){if(!active)return;close();active=false;if(rewardFX)rewardFX.Dispose();viewLife.Dispose();life.Dispose();view.Dispose();}};
 life.Later(1,request);
 })();
