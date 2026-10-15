@@ -16,7 +16,7 @@ function M.check(player_id, city_level, altar)
     if rogue_effect_state.numeric(player_id, "builder_free_hero_altar") > 0 then
         return true, nil, "rogue"
     end
-    local required = tonumber(buildings.hero_altar.unlock_city_level) or 3
+    local required = tonumber(buildings.hero_altar.unlock_city_level) or 4
     if (tonumber(city_level) or 0) >= required then
         return true, nil, "city_level"
     end

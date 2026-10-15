@@ -137,7 +137,7 @@ local M = {
     ability_build_hero_altar = {
         abilityid = "ability_build_hero_altar",
         abilityname = "建造英雄祭坛",
-        abilitydesc = "主城达到3级后可建造。祭坛可以召唤一个战斗英雄；召唤完成后祭坛停止工作，并解锁商店。",
+        abilitydesc = "主城达到4级后可建造。祭坛可以召唤一个战斗英雄；召唤完成后祭坛停止工作，并解锁商店。",
         abilityicon = "chen_hand_of_god",
     },
     ability_open_hero_altar = {

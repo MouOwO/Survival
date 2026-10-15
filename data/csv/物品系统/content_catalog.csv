@@ -108,7 +108,7 @@ building_farm,,building,buildable,人口农场,,,1,设计拆分,,0,ok,
 building_research_lab,,building,buildable,研究所,,,1,设计拆分,,0,ok,
 building_advanced_research_lab,,building,buildable,高级研究所,,,1,设计拆分,,0,ok,
 building_gold_mine,,building,buildable,金矿,主城3级解锁；具体建造费用由building_levels或正式配置补充。,,1,设计拆分,,0,ok,
-building_hero_altar,,building,buildable,英雄祭坛,祭坛建造前置为主城3级；祭坛被使用后shop_root_visible=true。,,1,设计拆分,,0,ok,
+building_hero_altar,,building,buildable,英雄祭坛,祭坛建造前置为主城4级；祭坛被使用后shop_root_visible=true。,,1,设计拆分,,0,ok,
 lottery_ticket,,material,lottery_currency,普通抽奖券,用于地图宝箱与修仙宝箱；修仙宝箱在地图宝箱累计开启100次后解锁。,,1,抽奖系统,,0,ok,逻辑资产；服务端内容背包持有。
 special_lottery_ticket,,material,premium_lottery_currency,金色抽奖券,用于龙骑与暑期宝箱；无前置宝箱解锁要求。,custom_game/lottery_tickets_v2/gold_ticket.png,1,抽奖系统,,0,ok,不可加入消耗木材或金币的普通shop_entries表。
 lottery_attribute_crystal,,item,lottery_reward,属性结晶,英雄全属性+50,item_greater_crit,1,积分道具,5,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。

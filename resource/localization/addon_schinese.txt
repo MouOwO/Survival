@@ -350,7 +350,7 @@
         "DOTA_Tooltip_ability_ability_build_arrow_tower_Description" "建造见习守望，自动攻击敌人。升至5星后可选择一个转职方向。"
         "DOTA_Tooltip_ability_ability_build_gold_mine" "建造金矿"
         "DOTA_Tooltip_ability_ability_build_gold_mine_Description" "主城达到 3 级后解锁。建造后每秒自动产出金币，并可升级采集效率和暴击率。"
-        "DOTA_Tooltip_ability_ability_build_hero_altar_Description" "主城达到 3 级后可建造。祭坛可以召唤一个战斗英雄；召唤完成后祭坛停止工作，并解锁商店。"
+        "DOTA_Tooltip_ability_ability_build_hero_altar_Description" "主城达到 4 级后可建造。祭坛可以召唤一个战斗英雄；召唤完成后祭坛停止工作，并解锁商店。"
         "DOTA_Tooltip_ability_ability_build_main_city_Description" "建造主城。主城拥有升级和训练伐木工两个技能。"
         "DOTA_Tooltip_ability_ability_build_research_lab" "建造研究所"
         "DOTA_Tooltip_ability_ability_build_research_lab_Description" "主城建成后解锁；建造费用读取建筑配置表。"

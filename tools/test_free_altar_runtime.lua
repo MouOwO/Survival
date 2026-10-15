@@ -22,6 +22,9 @@ state.hero_summoned = 0
 assert(effects.consume_numeric(0, "builder_free_hero_altar", 1))
 assert(altar().available == 0, "consumed free charge must restore the city prerequisite")
 state.city_level = 3
+assert(altar().available == 0, "city level 3 must not unlock the altar")
+assert(altar().fields[1].value == "主城Lv.4", "tooltip must show the same city prerequisite")
+state.city_level = 4
 local paid = altar()
 assert(paid.available == 1 and paid.cost_wood == buildings.hero_altar.build_cost.wood
     and paid.cost_gold == buildings.hero_altar.build_cost.gold, "normal access restores configured prices")

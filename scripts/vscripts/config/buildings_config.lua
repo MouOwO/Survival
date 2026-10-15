@@ -326,7 +326,7 @@ local hero_altar_levels = level_rows("building_hero_altar")
 hero_altar_levels[1] = hero_altar_levels[1] or {}
 hero_altar_levels[1].health = hero_altar_levels[1].health or 2500
 hero_altar_levels[1].armor = hero_altar_levels[1].armor or dota_armor(8)
-M.hero_altar = { id = "hero_altar", display_name = configured_name("hero_altar", "英雄祭坛"), unit_name = configured_unit_name("hero_altar", "building_hero_altar"), build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 3, show_health_bar = false, selectable = true, abilities = { "ability_summon_doom", "ability_summon_shadow_fiend", "ability_summon_axe", "ability_summon_drow_ranger", "ability_summon_monkey_king", "ability_summon_blademaster", "ability_enter_endless_training", "ability_enter_shadow_realm" }, levels = hero_altar_levels }
+M.hero_altar = { id = "hero_altar", display_name = configured_name("hero_altar", "英雄祭坛"), unit_name = configured_unit_name("hero_altar", "building_hero_altar"), build_cost = build_cost("building_hero_altar", 300, 100), footprint = { x = 2, y = 2 }, max_count = 1, unlock_city_level = 4, show_health_bar = false, selectable = true, abilities = { "ability_summon_doom", "ability_summon_shadow_fiend", "ability_summon_axe", "ability_summon_drow_ranger", "ability_summon_monkey_king", "ability_summon_blademaster", "ability_enter_endless_training", "ability_enter_shadow_realm" }, levels = hero_altar_levels }
 
 M.wall = apply_construction(M.wall, "wall")
 M.main_city = apply_construction(M.main_city, "main_city")

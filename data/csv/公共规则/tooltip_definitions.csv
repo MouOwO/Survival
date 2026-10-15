@@ -138,7 +138,7 @@ inventory_item:building_advanced_research_lab,inventory_item,building_advanced_r
 inventory_item:building_arrow_tower,inventory_item,building_arrow_tower,见习守望,0,0,见习守望达到5星后，可选择七条转职路线之一。,,building_arrow_tower
 inventory_item:building_farm,inventory_item,building_farm,人口农场,0,0,,,building_farm
 inventory_item:building_gold_mine,inventory_item,building_gold_mine,金矿,0,0,主城3级解锁；具体建造费用由building_levels或正式配置补充。,,building_gold_mine
-inventory_item:building_hero_altar,inventory_item,building_hero_altar,英雄祭坛,0,0,祭坛建造前置为主城3级；祭坛被使用后shop_root_visible=true。,,building_hero_altar
+inventory_item:building_hero_altar,inventory_item,building_hero_altar,英雄祭坛,0,0,祭坛建造前置为主城4级；祭坛被使用后shop_root_visible=true。,,building_hero_altar
 inventory_item:building_main_city,inventory_item,building_main_city,主城,0,0,建造成功后Undying的建造主城技能在客户端置灰；服务端仍验证max_count=1。,,building_main_city
 inventory_item:building_research_lab,inventory_item,building_research_lab,研究所,0,0,,,building_research_lab
 inventory_item:building_wall,inventory_item,building_wall,城墙,0,0,建造成功后Undying的建造城墙技能在客户端置灰；服务端仍验证max_count=1。,,building_wall

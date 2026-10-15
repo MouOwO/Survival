@@ -443,13 +443,13 @@ eq(request().ok, false, "early unlock does not permit a second hero")
 eq(open_ability():CastFilterResult(), UF_FAIL_CUSTOM)
 
 -- 13. Normal altar unlock also enables a summon without requiring construction.
-fixture({city_level = 3, altar_built = false})
+fixture({city_level = 4, altar_built = false})
 eq(snapshot().altar_built, 0); eq(snapshot().summon_unlocked, 1)
 eq(snapshot().summon_unlock_source, "city_level")
 eq(ability():CastFilterResult(), UF_SUCCESS); eq(request().ok, true)
 
 -- 14. No unlock, including another player's rogue effect, must fail closed.
-fixture({city_level = 2, altar_built = false})
+fixture({city_level = 3, altar_built = false})
 effects.add_numeric(1, "builder_free_hero_altar", 1)
 bus.emit(events.ROGUE_REWARD_CHANGED, {player_id = 1})
 eq(snapshot().summon_unlocked, 0)

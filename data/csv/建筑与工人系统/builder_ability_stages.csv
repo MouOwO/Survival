@@ -9,5 +9,5 @@ city_built,30,main_city_built,ability_build_research_lab,2,1,building_research_l
 city_built,30,main_city_built,ability_build_advanced_research_lab,2,4,building_advanced_research_lab,1,building_research_lab,0,1,普通研究所完工后替换W槽；主城达到Lv.4后可建造高级研究所。
 city_built,30,main_city_built,ability_build_challenge,6,1,building_challenge,1,building_research_lab,0,1,普通研究所完工后在C槽显示独立挑战建筑；不替换普通或高级研究所。
 city_built,30,main_city_built,ability_build_farm,3,1,building_farm,1,,0,1,主城完成后解锁人口农场，最多建造1座；达到上限后移除建造技能。
-city_built,30,main_city_built,ability_build_hero_altar,4,3,hero_altar,1,,1,1,祭坛显示在技能列表中；主城不足3级时置灰；召唤英雄后永久置灰。
+city_built,30,main_city_built,ability_build_hero_altar,4,4,hero_altar,1,,1,1,祭坛显示在技能列表中；主城不足4级时置灰；召唤英雄后永久置灰。
 city_built,30,main_city_built,ability_build_gold_mine,5,3,gold_mine,5,,0,1,主城3级后显示，最多建造5座金矿；达到上限后移除建造技能。

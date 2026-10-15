@@ -46,6 +46,8 @@ assert(runtime("ability_summon_monkey_king",0).available==0,"early stage does no
 effects.consume_numeric(0,"builder_free_hero_altar",1)
 assert(runtime("ability_summon_doom",0).available==0,"consumed grant without a completed altar locks again")
 city_level=3
+assert(runtime("ability_summon_doom",0).available==0,"city level three remains locked without an altar")
+city_level=4
 assert(runtime("ability_summon_doom",0).available==1,"normal build unlock permits pre-altar summoning")
 summoned[0]={hero_id="hero_doom"}
 assert(runtime("ability_summon_doom",0).available==0,"normal unlock preserves the one hero limit")
