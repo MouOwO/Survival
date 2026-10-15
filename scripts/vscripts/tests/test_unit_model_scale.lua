@@ -28,7 +28,7 @@ assert(body.hull == 64 and body.attack_range == 500 and body.footprint.x == 4)
 body.scale = 2.4 -- Native respawn restored the authored model scale.
 assert(scale.ensure(body)); near(body.scale, 1.6)
 
-for _, name in ipairs({"building_arrow_tower", "npc_dota_unit_ultimate_tower"}) do
+for _, name in ipairs({"building_arrow_tower", "npc_dota_unit_ultimate_tower", "building_wall"}) do
     local tower = unit(name, 1.8)
     assert(scale.ensure(tower)); near(tower.scale, 1.8)
     assert(scale.apply(tower, 2.5)); near(tower.scale, 2.5)
@@ -39,6 +39,7 @@ assert(scale.ensure(renamed)); near(renamed.scale, 1.7)
 local preview = unit("npc_survival_grid_preview_proxy")
 assert(scale.apply(preview, 1.9, "arrow_tower")); near(preview.scale, 1.9)
 assert(scale.copy_final(preview, 1.9, "arrow_tower")); near(preview.scale, 1.9)
+assert(scale.apply(preview, 2.2, "wall")); near(preview.scale, 2.2)
 
 local mirror = unit("npc_dota_hero_axe")
 assert(scale.copy_final(mirror, body:GetModelScale())); near(mirror.scale, 1.6)
@@ -75,4 +76,4 @@ for _, name in ipairs({"npc_survival_grid_preview_proxy", "npc_survival_upgrade_
 end
 local thinker = unit("thinker"); thinker.classname = "npc_dota_thinker"
 assert(not service.apply(thinker)); assert(thinker.writes == 0)
-print("UNIT_MODEL_SCALE_PASS: two-thirds output, tower forms exempt, refresh/respawn idempotence, exact copies, unchanged gameplay geometry, one spawn hook and no polling")
+print("UNIT_MODEL_SCALE_PASS: two-thirds output, towers and walls exempt, refresh/respawn idempotence, exact copies, unchanged gameplay geometry, one spawn hook and no polling")

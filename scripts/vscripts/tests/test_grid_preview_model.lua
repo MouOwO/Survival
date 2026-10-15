@@ -35,7 +35,7 @@ local scheduler=require("core/scheduler")
 model.update(0,caster,profile,Vector(10,10,-512))
 assert(created==1 and moved==1 and unit.position.x==0 and unit.position.y==0 and unit.position.z==384)
 assert(unit.hull==0 and unit.hidden_health and unit.survival_is_grid_preview and unit.movement==DOTA_UNIT_CAP_MOVE_FLY)
-assert(unit.model=="wall.vmdl" and math.abs(unit.scale-2*2/3)<1e-9 and unit.alpha==125)
+assert(unit.model=="wall.vmdl" and math.abs(unit.scale-2)<1e-9 and unit.alpha==125)
 assert(unit.modifier=="modifier_grid_building_preview")
 for i=1,20 do model.update(0,caster,profile,Vector(i,i,-512)) end
 assert(created==1 and moved==1,"same grid cell never recreates or moves a model")
@@ -108,4 +108,4 @@ assert(unit.scale==1.7,"new arrow tower previews preserve their authored excepti
 assert(require("visual/model_scale").ensure(unit) and unit.scale==1.7,
     "a late global spawn check cannot shrink the tower preview")
 model.clear_all()
-print("GRID_PREVIEW_SCALE_PASS reduced wall construction, copied relocation scale and exempt tower preview")
+print("GRID_PREVIEW_SCALE_PASS original wall construction, copied relocation scale and exempt tower preview")

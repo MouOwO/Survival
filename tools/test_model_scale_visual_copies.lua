@@ -60,7 +60,7 @@ assert(wall_model,"a real configured wall model has both shell and destruction v
 local wall=entity("building_wall",wall_model);wall.survival_building_id="wall"
 assert(scale.apply(wall,2,"wall"))
 local configured=assert(shells.create(wall,{id="wall",levels={{model_scale=2}}},3,false))
-near(configured.entity.scale,2*2/3*1.006,"authored shell scale reduced once")
+near(configured.entity.scale,2*1.006,"wall shell retains its original scale")
 assert(configured.entity.origin.x==100 and configured.entity.origin.y==200 and configured.entity.origin.z==384,
     "world position is not scaled")
 shells.destroy(configured)
@@ -76,7 +76,7 @@ shells.destroy(tower_shell)
 
 local dying=assert(death.play({unit=wall,building_id="wall"}))
 near(dying.proxy.scale,wall.scale,"death proxy copies final wall scale")
-near(dying.height,death_models[wall_model]*wall.scale,"destruction height follows the smaller wall")
+near(dying.height,death_models[wall_model]*wall.scale,"destruction height follows the original wall")
 assert(dying.origin.x==100 and dying.origin.y==200 and dying.origin.z==384)
 near(particles[1].cp[1].x,128*wall.scale,"existing particle radius follows final scale")
 death.reset();assert(death.active_count()==0)

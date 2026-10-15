@@ -1,7 +1,7 @@
 -- Preserve authored proportions and gameplay geometry; scale only model output.
 local M = { multiplier = 2 / 3 }
-local tower_ids = { arrow_tower = true, building_arrow_tower = true, ultimate_tower = true }
-local tower_names = { building_arrow_tower = true, npc_dota_unit_ultimate_tower = true }
+local original_size_ids = { arrow_tower = true, building_arrow_tower = true, ultimate_tower = true, wall = true, building_wall = true }
+local original_size_names = { building_arrow_tower = true, npc_dota_unit_ultimate_tower = true, building_wall = true }
 
 local function valid(entity)
     return entity and (not entity.IsNull or not entity:IsNull())
@@ -19,14 +19,14 @@ local function current(entity)
 end
 
 function M.factor(entity, building_id)
-    if tower_ids[building_id] then return 1 end
+    if original_size_ids[building_id] then return 1 end
     if valid(entity) then
-        if tower_ids[entity.survival_building_id] then return 1 end
+        if original_size_ids[entity.survival_building_id] then return 1 end
         if type(entity.GetUnitName) == "function" then
             local ok, name = pcall(entity.GetUnitName, entity)
-            if ok and tower_names[name] then return 1 end
+            if ok and original_size_names[name] then return 1 end
         end
-        -- Props and previews may carry an explicit tower identity without an NPC name.
+        -- Props and previews may carry an explicit exempt building identity without an NPC name.
         if building_id == nil and entity.survival_visual_scale_exempt then return 1 end
     end
     return M.multiplier
