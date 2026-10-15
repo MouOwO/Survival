@@ -1,5 +1,6 @@
 param(
-    [string]$ContentRoot = ''
+    [string]$ContentRoot = '',
+    [switch]$InputOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -20,6 +21,19 @@ function ReadText([string]$path) {
 
 $script = ReadText (Join-Path $ContentRoot 'panorama\scripts\custom_game\combat_stats.js')
 $layout = ReadText (Join-Path $ContentRoot 'panorama\layout\custom_game\survival_hud.xml')
+
+# Check the native input contract independently of the legacy layout/style audit.
+Check ($script.Contains('anchor.style.opacity = "1"')) 'NATIVE_PORTRAIT_INPUT_OPACITY_MISSING'
+Check ($script.Contains('anchor.style.washColor = "#ffffff00"')) 'NATIVE_PORTRAIT_PIXEL_TINT_MISSING'
+Check ($script.Contains('__survivalPortraitOriginalWashColor')) 'NATIVE_PORTRAIT_TINT_RESTORE_MISSING'
+Check (-not $script.Contains('anchor.style.opacity = "0"')) 'NATIVE_PORTRAIT_INPUT_DISABLED'
+Check ([regex]::IsMatch($layout, '<Panel\b[^>]*id="SurvivalTowerPortraitOverlay"[^>]*hittest="false"[^>]*hittestchildren="false"')) 'TOWER_OVERLAY_INPUT_NOT_PASSTHROUGH'
+Check ([regex]::IsMatch($layout, '<DOTAScenePanel\b[^>]*id="SurvivalTowerPortraitScene"[^>]*hittest="false"')) 'TOWER_SCENE_INPUT_NOT_PASSTHROUGH'
+if ($InputOnly) {
+    Write-Output 'NATIVE_PORTRAIT_INPUT_CONTRACT_PASS'
+    return
+}
+
 $style = ReadText (Join-Path $ContentRoot 'panorama\styles\custom_game\survival_hud.css')
 
 Check ($layout.Contains('id="SurvivalTowerPortraitOverlay"')) 'TOWER_OVERLAY_MISSING'
@@ -63,7 +77,6 @@ Check ($script.Contains('function mountTowerPortraitAtNativeLayer(overlay, ancho
 Check ($script.Contains('overlay.SetParent(host)')) 'NATIVE_LAYER_REPARENT_MISSING'
 Check ($script.Contains('host.MoveChildAfter(overlay, anchor)')) 'NATIVE_LAYER_ORDER_MISSING'
 Check ($script.Contains('function restoreTowerPortraitHome(overlay)')) 'TOWER_LAYER_HOME_RESTORE_MISSING'
-Check ($script.Contains('anchor.style.opacity = "0"')) 'NATIVE_PORTRAIT_TRANSPARENCY_MISSING'
 Check ($script.Contains('function unitUsesTowerPortrait(unit)')) 'TOWER_TRANSITION_IDENTITY_MISSING'
 Check ($script.Contains('=== "ability_destroy_arrow_tower"')) 'TOWER_TRANSITION_ABILITY_IDENTITY_MISSING'
 Check ($script.Contains('function holdTowerPortraitTransition(reason)')) 'TOWER_TRANSITION_MASK_MISSING'

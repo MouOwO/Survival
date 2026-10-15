@@ -6,7 +6,8 @@ const snapshot = version => ({entindex:7,refresh_version:version,
 {
  const t=setup({portrait:true});t.select(7,'npc_survival_builder_proxy');
  t.api.portraitTransition('builder_selected');
- assert.equal(t.native().values.opacity,'0','mask the invisible proxy until its snapshot arrives');
+ assert.equal(t.native().values.opacity,'1','keep the native portrait input until its snapshot arrives');
+ assert.equal(t.native().values.washColor,'#ffffff00','mask only the invisible proxy pixels');
  t.api.updateSnapshot(snapshot(1));
  assert.deepStrictEqual(t.metrics.setUnit.map(call=>call.args),[['npc_dota_hero_wisp','default',false]]);
  assert.equal(t.overlay.values.visibility,'visible');assert.equal(t.overlay.GetParent(),t.nativeHost());

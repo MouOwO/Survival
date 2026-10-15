@@ -22,7 +22,7 @@ for(const [asset,unit,item]of cases){
  t.api.updateSnapshot(snapshot);
  assert.deepStrictEqual(t.metrics.setUnit.map(call=>call.args),[[unit,'default',false]]);
  assert.equal(t.overlay.values.visibility,'visible');assert.equal(t.scene.values.visibility,'visible');
- assert.equal(t.overlay.GetParent(),t.nativeHost());assert.equal(t.native().values.opacity,'0');
+ assert.equal(t.overlay.GetParent(),t.nativeHost());assert.equal(t.native().values.opacity,'1');assert.equal(t.native().values.washColor,'#ffffff00');
  const initial={parents:t.metrics.parents,order:t.metrics.order,geometryWrites:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions};
  t.api.cosmeticPortraitSentinel();
  for(let frame=0;frame<64;frame++){

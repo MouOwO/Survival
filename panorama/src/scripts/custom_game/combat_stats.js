@@ -557,14 +557,20 @@
         if (target.__survivalPortraitDimmed === true) {
             original = target.__survivalPortraitOriginalOpacity;
         }
+        var hasRecordedWash = Object.prototype.hasOwnProperty.call(entry, "washColor")
+            || Object.prototype.hasOwnProperty.call(target, "__survivalPortraitOriginalWashColor");
+        var originalWash = Object.prototype.hasOwnProperty.call(target, "__survivalPortraitOriginalWashColor")
+            ? target.__survivalPortraitOriginalWashColor : entry.washColor;
         try {
             target.style.opacity = restoredOpacity(original);
+            if (hasRecordedWash) target.style.washColor = originalWash && ["none", "null", "undefined"].indexOf(originalWash) < 0 ? originalWash : "#ffffffff";
         } catch (error) {
             if (!validPortraitPanel(target)) return;
             throw error;
         }
         target.__survivalPortraitDimmed = false;
         target.__survivalPortraitOriginalOpacity = "";
+        delete target.__survivalPortraitOriginalWashColor;
     }
 
     function dimNativePortraitOpacity(anchor) {
@@ -573,10 +579,10 @@
             return entry && entry.panel === anchor;
         });
         if (alreadyDimmed) {
-            // Valve may rewrite inline opacity while rebuilding the same HUD node.
-            if (String(anchor.style.opacity || "") !== "0") {
-                anchor.style.opacity = "0";
-            }
+            // Keep DOTAPortrait in the engine's input tree. Only its pixels
+            // are hidden, so native press/hold/release and modifiers survive.
+            if (String(anchor.style.opacity || "") !== "1") anchor.style.opacity = "1";
+            if (String(anchor.style.washColor || "").toLowerCase() !== "#ffffff00") anchor.style.washColor = "#ffffff00";
             return;
         }
         if (anchor.__survivalPortraitDimmed === true) {
@@ -586,15 +592,19 @@
             anchor.style.opacity = "1";
         }
         var originalOpacity = String(anchor.style.opacity || "");
+        var originalWash = String(anchor.style.washColor || "#ffffffff");
         dimmedNativePortraits.push({
             panel: anchor,
-            opacity: originalOpacity
+            opacity: originalOpacity,
+            washColor: originalWash
         });
         anchor.__survivalPortraitDimmed = true;
         anchor.__survivalPortraitOriginalOpacity = originalOpacity;
-        // Keep Valve's panel alive for layout/selection updates, but fully hide
-        // its incorrect pixels while the custom SetUnit scene is visible.
-        anchor.style.opacity = "0";
+        anchor.__survivalPortraitOriginalWashColor = originalWash;
+        // Zero panel opacity also disables native portrait mouse interaction.
+        // Transparent tint hides the replaced model while retaining C++ input.
+        anchor.style.washColor = "#ffffff00";
+        anchor.style.opacity = "1";
     }
 
     function mountTowerPortraitAtNativeLayer(overlay, anchor) {

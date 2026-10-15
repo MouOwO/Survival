@@ -22,7 +22,8 @@ function customVisible(t, entity, scene = t.scene) {
     assert.equal(t.overlay.values.visibility, 'visible');
     assert.equal(scene.values.visibility, 'visible');
     assert.equal(t.overlay.GetParent(), t.nativeHost());
-    assert.equal(t.native().values.opacity, '0');
+    assert.equal(t.native().values.opacity, '1');
+    assert.equal(t.native().values.washColor, '#ffffff00');
     const state = t.api.portraitState();
     assert.equal(state.entity, entity, 'Visible ownership follows the current selected entity');
     assert.equal(state.scene, scene);

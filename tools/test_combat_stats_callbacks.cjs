@@ -2,6 +2,7 @@
 // startup work. Native portrait hide/mount/position/update/sentinel are real.
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const source=fs.readFileSync(process.argv[2]||'panorama/src/scripts/custom_game/combat_stats.js','utf8');
+const portraitLayout=fs.readFileSync('panorama/src/layout/custom_game/survival_hud.xml','utf8');
 const seam='    // NetTable is the single regular synchronization path.';
 assert(source.includes(seam));
 const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbilityRuntime,restoreAbilityRuntime:restoreAbilityRuntime,
@@ -36,6 +37,11 @@ function setup(options={}){
    this.style=new Proxy(this.values,{set:(o,k,v)=>{
     if(this.alive!==true)throw Error('native panel destroyed');
     if(v===null||v===undefined||/NaN|Infinity/.test(String(v)))throw Error('native style rejected '+k+'='+v);
+    if(k==='washColor'&&this.id==='portraitHUD'){
+     if(!/^(?:#[\da-f]{6}(?:[\da-f]{2})?|rgba?\([\d.,\s]+\))$/i.test(String(v)))throw Error('native washColor requires a color');
+     if(options.nativeWashCanonicalization&&v==='#ffffff00')v='rgba(255,255,255,0)';
+     if(options.nativeWashCanonicalization&&v==='#ffffffff')v='rgba(255,255,255,1)';
+    }
     if(['position','width','height'].includes(k)&&this.id==='SurvivalTowerPortraitOverlay'){
      const numbers=String(v).match(/[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/gi)||[];
      assert(numbers.every(n=>Number.isFinite(Number(n))&&Math.abs(Number(n))<1e6),'invalid portrait layout must not reach native setter');
@@ -57,6 +63,15 @@ function setup(options={}){
  }
  const root=new Panel('Hud');root.actuallayoutwidth=1920;root.actuallayoutheight=1080;
  const context=new Panel('Context',root),overlay=new Panel('SurvivalTowerPortraitOverlay',context),scene=new Panel('SurvivalTowerPortraitScene',overlay,'DOTAScenePanel');
+ // Use the real layout's input flags; a visual overlay cannot eat native input.
+ for(const panel of [overlay,scene]){
+  const tag=portraitLayout.match(new RegExp('<[^>]+\\bid="'+panel.id+'"[^>]*>'));
+  assert(tag,'missing production portrait layout '+panel.id);
+  for(const key of ['hittest','hittestchildren']){
+   const value=tag[0].match(new RegExp('\\b'+key+'="(true|false)"'));
+   if(value)panel[key]=value[1]==='true';
+  }
+ }
  let nativeHost,nativeScene;
  function mountNative(){
   nativeHost=new Panel('PortraitContainer',new Panel('PortraitGroup',root));
@@ -72,7 +87,7 @@ function setup(options={}){
  $.Schedule=(delay,fn)=>{const id=++serial;jobs.set(id,{delay,fn});return id};$.CancelScheduled=id=>jobs.delete(id);
  $.Msg=(...s)=>messages.push(s.join(''));$.Warning=$.Msg;$.Localize=s=>s;
  const subscribe=(name,fn)=>{const id=++serial;subscriptions.set(id,{name,fn});return id};
- vm.runInNewContext(instrumented,{$,GameUI:{CustomUIConfig:()=>cfg},Game:Object.assign({GetLocalPlayerID:()=>0,GetGameTime:()=>time},options.game||{}),
+ vm.runInNewContext(instrumented,{$,GameUI:Object.assign({CustomUIConfig:()=>cfg},options.gameUI||{}),Game:Object.assign({GetLocalPlayerID:()=>0,GetGameTime:()=>time},options.game||{}),
   Players:{GetPlayerHeroEntityIndex:()=>selected},
   Entities:Object.assign({GetUnitName:id=>unitNames.get(Number(id))||'npc_dota_hero_test',GetAbility:()=>-1,GetLevel:()=>1,IsHero:()=>true},options.entities||{}),
   Abilities:options.abilities||{},
@@ -185,7 +200,7 @@ function portraitGeometry(panel){return {position:panel.values.position,width:pa
 {
  const t=setup({portrait:true});t.api.updateSnapshot(doomSnapshot());
  assert.equal(t.metrics.setUnit.length,1);assert.equal(t.overlay.GetParent(),t.nativeHost());
- assert.equal(t.native().values.opacity,'0');assert.equal(t.overlay.values.visibility,'visible');
+ assert.equal(t.native().values.opacity,'1');assert.equal(t.native().values.washColor,'#ffffff00');assert.equal(t.overlay.values.visibility,'visible');
  const baseline={parents:t.metrics.parents,order:t.metrics.order,geometryWrites:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions};
  t.api.cosmeticPortraitSentinel();assert.equal(t.jobs.size,1);
  for(let frame=0;frame<300;frame++){
@@ -272,13 +287,13 @@ for(const scale of [1,.75]){
  assert.equal(t.metrics.setUnit.length,2);assert.equal(t.metrics.parents,1);
  t.api.shutdown('test');
 }
-// Anchor replacement restores a still-valid old leaf and dims the new leaf,
+// Anchor replacement restores a still-valid old leaf and tints the new leaf,
 // without recreating the same Scene or returning the overlay to its home.
 {
  const t=setup({portrait:true});t.api.updateSnapshot(doomSnapshot());const old=t.native();
  old.GetParent().children=old.GetParent().children.filter(child=>child!==old);old.parent=null;
  const next=t.mountNative();t.api.updateSnapshot(doomSnapshot(2));
- assert.equal(old.values.opacity,'0.35');assert.equal(next.values.opacity,'0');
+ assert.equal(old.values.opacity,'0.35');assert.equal(next.values.opacity,'1');assert.equal(next.values.washColor,'#ffffff00');
  assert.equal(t.overlay.GetParent(),next.GetParent());assert.equal(t.metrics.setUnit.length,1);
  assert.equal(t.metrics.parents,2);assert.equal(t.metrics.order,2);
  t.api.shutdown('test');assert.equal(next.values.opacity,'0.35');
@@ -301,5 +316,88 @@ for(const scale of [1,.75]){
  assert.equal(t.jobs.size,0);assert.equal(t.metrics.setUnit.length,2);
 }
 console.log('PORTRAIT_FLICKER_CLIENT_PASS: real metadata updates/sentinel, 300 stable frames, unsupported and stale snapshot semantics, finite layout sentinels, recovery, Scene/anchor replacement and true transition cleanup; rendered pixels not simulated');
+
+// Keep the existing native input path, rather than emulating a camera action.
+// The engine mock checks ownership/handler identity and all input phases; actual
+// camera behavior and native hit testing still require a game-level check.
+{
+ const unexpectedCamera=()=>{throw Error('portrait must retain native input instead of issuing a camera command')};
+ const t=setup({portrait:true,
+  gameUI:{MoveCameraToEntity:unexpectedCamera,SetCameraTarget:unexpectedCamera,SetCameraTargetPosition:unexpectedCamera,SetMouseCallback:unexpectedCamera}});
+ const native=t.native(),host=native.GetParent(),group=host.GetParent(),calls=[];
+ const phases=['press','hold','release','double_click','modifier_press','right_click'];
+ const handlers=Object.fromEntries(phases.map(phase=>[phase,details=>calls.push({phase,details})]));
+ native.engineInputHandlers={...handlers};
+ let eventWrites=0;
+ for(const panel of [native,host,group])panel.SetPanelEvent=()=>{eventWrites++};
+ const originalInput=[native,host,group].map(panel=>({panel,hittest:panel.hittest,hittestchildren:panel.hittestchildren}));
+ function retained(){
+  assert.equal(native.values.opacity,'1','Valve portrait must remain in the native input tree');
+  assert.equal(native.values.washColor,'#ffffff00','hide only the replaced native model pixels');
+  assert.equal(t.overlay.hittest,false);assert.equal(t.overlay.hittestchildren,false);assert.equal(t.scene.hittest,false);
+  for(const saved of originalInput){assert.equal(saved.panel.hittest,saved.hittest);assert.equal(saved.panel.hittestchildren,saved.hittestchildren)}
+  for(const phase of phases)assert.strictEqual(native.engineInputHandlers[phase],handlers[phase]);
+  assert.equal(eventWrites,0,'do not replace native event handlers with a custom click callback');
+ }
+ t.api.portraitTransition('pending_input');retained();
+ t.api.updateSnapshot(doomSnapshot());retained();
+ t.api.cosmeticPortraitSentinel();retained();
+ for(const phase of phases){const details={button:phase==='right_click'?'right':'left',ctrl:phase==='modifier_press'};native.engineInputHandlers[phase](details)}
+ assert.deepStrictEqual(calls.map(call=>call.phase),phases);
+ assert.equal(calls[4].details.ctrl,true);
+ // Valve can rewrite both inline properties without replacing the panel.
+ native.values.opacity='0';native.values.washColor='#123456ff';
+ t.run([...t.jobs.keys()][0]);retained();assert.equal(t.metrics.setUnit.length,1);
+ t.api.shutdown('native_input_complete');
+ assert.equal(native.values.opacity,'0.35');assert.equal(native.values.washColor,'#ffffffff');assert.equal(eventWrites,0);
+}
+
+// Exact previous colors and opacity survive every ownership boundary. Empty
+// colors use the engine's untinted default; legacy opacity-only markers must
+// not erase an unrelated native tint while a new context takes ownership.
+for(const originalWash of [undefined,'','none','#aabbccdd','rgb(12,34,56)','rgba(12,34,56,0.4)']){
+ for(const exit of ['unit','multi','replacement','shutdown']){
+  const t=setup({portrait:true}),native=t.native();native.values.washColor=originalWash;
+  t.api.updateSnapshot(doomSnapshot());
+  assert.equal(native.values.opacity,'1');assert.equal(native.values.washColor,'#ffffff00');
+  if(exit==='unit'){t.select(8,'building_main_city');t.api.portraitTransition('native_selected')}
+  if(exit==='multi'){t.setMulti(true);t.api.cosmeticPortraitSentinel()}
+  if(exit==='replacement'){
+   native.GetParent().children=native.GetParent().children.filter(panel=>panel!==native);native.parent=null;
+   const next=t.mountNative();next.values.washColor='#765432ff';t.api.updateSnapshot(doomSnapshot(2));
+   assert.equal(next.values.opacity,'1');assert.equal(next.values.washColor,'#ffffff00');
+   t.api.shutdown('replacement_complete');assert.equal(next.values.washColor,'#765432ff');assert.equal(next.values.opacity,'0.35');
+  }
+  if(exit==='shutdown')t.api.shutdown('restore_color');
+  assert.equal(native.values.opacity,'0.35',exit+' restores the previous leaf opacity');
+  assert.equal(native.values.washColor,originalWash&&originalWash!=='none'?originalWash:'#ffffffff',exit+' restores the previous native tint');
+  assert.equal(native.__survivalPortraitDimmed,false);
+  assert(!Object.prototype.hasOwnProperty.call(native,'__survivalPortraitOriginalWashColor'));
+  if(exit!=='shutdown'&&exit!=='replacement')t.api.shutdown('color_case_complete');
+ }
+}
+for(const hasWashMarker of [false,true]){
+ const t=setup({portrait:true}),native=t.native();
+ native.__survivalPortraitDimmed=true;native.__survivalPortraitOriginalOpacity='0.6';
+ native.values.opacity='0';native.values.washColor=hasWashMarker?'#ffffff00':'#334455aa';
+ if(hasWashMarker)native.__survivalPortraitOriginalWashColor='#334455aa';
+ t.api.updateSnapshot(doomSnapshot());
+ assert.equal(native.values.opacity,'1');assert.equal(native.values.washColor,'#ffffff00');
+ assert.equal(native.__survivalPortraitOriginalOpacity,'0.6');assert.equal(native.__survivalPortraitOriginalWashColor,'#334455aa');
+ t.api.shutdown('hot_reload_complete');assert.equal(native.values.opacity,'0.6');assert.equal(native.values.washColor,'#334455aa');
+}
+for(const opacity of ['','0','0.65']){
+ const t=setup({portrait:true}),native=t.native();native.values.opacity=opacity;
+ t.api.updateSnapshot(doomSnapshot());assert.equal(native.values.opacity,'1');
+ t.api.shutdown('restore_opacity');assert.equal(native.values.opacity,opacity||'1');
+}
+{
+ const t=setup({portrait:true,nativeWashCanonicalization:true}),native=t.native();native.values.washColor='#112233aa';
+ t.api.updateSnapshot(doomSnapshot());assert.equal(native.values.washColor,'rgba(255,255,255,0)');
+ t.api.cosmeticPortraitSentinel();native.values.opacity='0.2';native.values.washColor='#556677ff';
+ t.run([...t.jobs.keys()][0]);assert.equal(native.values.opacity,'1');assert.equal(native.values.washColor,'rgba(255,255,255,0)');
+ t.api.shutdown('canonical_color_complete');assert.equal(native.values.opacity,'0.35');assert.equal(native.values.washColor,'#112233aa');
+}
+console.log('NATIVE_PORTRAIT_INPUT_PASS: native handler/input preservation, pass-through art, pending/visible/sentinel paths, Valve rewrites, exact tint/opacity restore for unit/multi/replacement/shutdown and legacy/new-context markers; camera behavior not simulated');
 
 }
