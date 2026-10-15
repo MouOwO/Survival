@@ -6,6 +6,7 @@
 .ArchiveV10Page #ArchiveFrame, .ArchiveV10Page #ArchiveAtmosphere { visibility:collapse; }
 #ArchiveV10Canvas { flow-children:none; overflow:noclip; }
 .ArchiveV10Image { margin:0px; padding:0px; }
+#ArchiveV10SectionStrip { overflow:clip; opacity-mask:url("s2r://panorama/images/masks/softedge_right_png.vtex"); }
 .ArchiveV10Crop { overflow:clip; }
 .ArchiveV10Text { margin:0px; padding:0px; font-family:"Source Han Sans SC"; font-weight:normal; letter-spacing:0px; white-space:nowrap; text-overflow:ellipsis; text-shadow:none; }
 .ArchiveRoot #ArchiveWindow.ArchiveV10Page .ArchiveV10Text { font-weight:normal; font-style:normal; }

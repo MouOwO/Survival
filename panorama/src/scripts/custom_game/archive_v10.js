@@ -115,7 +115,7 @@
             pos(art,0,0,62,62);style(art,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",overflow:"noclip",brightness:"1",saturation:"1",opacity:"1",washColor:"none",transform:"none"});art.hittest=false;
             if(current==="titles"){pos(art,0,18,62,62*55/128);if(art.SetScaling)art.SetScaling("stretch-to-fit-preserve-aspect");}
             else if(current!=="shadow")art.Children().forEach(function(child){
-                if(child.BHasClass("ArchiveRarityBadge"))return;
+                if(child.BHasClass("ArchiveRarityBadge")){child.visible=false;return;}
                 if(child.BHasClass("ArchiveEndlessEmblem")){pos(child,0,7,72,56);style(child,{transformOrigin:"0% 0%",transform:"scale3d(0.861111, 0.861111, 1)"});}
                 else if(child.SetImage||child.BHasClass("ArchiveRewardIcon")){pos(child,0,0,62,62);if(child.SetScaling)child.SetScaling("stretch-to-fit-preserve-aspect");style(child,{horizontalAlign:"left",verticalAlign:"top",margin:"0px",padding:"0px",brightness:"1",saturation:"1",opacity:"1",transform:"none"});}
             });
