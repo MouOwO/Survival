@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local model_scale = require("visual/model_scale")
 local config = require("config/workers_config")
 local worker_attack_cap = require("systems/worker_native_attack_cap")
 local training_definitions = require("config/generated/training_definitions")
@@ -1380,7 +1381,7 @@ function M.commit_lumberjack_fusion(materials, target, data)
         target:SetModel(data.model_name)
         target:SetOriginalModel(data.model_name)
     end
-    if target.SetModelScale then target:SetModelScale(tonumber(data.model_scale) or 1) end
+    model_scale.apply(target, tonumber(data.model_scale) or 1)
     local target_state = workers[target_entindex]
     local removed_entindexes = {}
     for _, state in ipairs(states) do

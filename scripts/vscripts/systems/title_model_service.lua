@@ -1,5 +1,6 @@
 -- Actual Source 2 mesh attached to the combat hero; never grants stats or collision.
 local M = {}
+local model_scale = require("visual/model_scale")
 local MODEL = "models/survival_titles/peak_perfection.vmdl"
 local active = {}
 local function valid(e) return e and (not e.IsNull or not e:IsNull()) end
@@ -14,7 +15,7 @@ local function update(state, now)
     if not alive(unit) or not valid(body) then return false end
     -- Parent handles translation at engine frame rate. Keep readable world-facing
     -- orientation independent of the hero's attack/turn animation.
-    body:SetLocalOrigin(Vector(0, 0, 285))
+    body:SetLocalOrigin(Vector(0, 0, 285*model_scale.factor(unit)))
     body:SetAngles(0, math.sin(now * 0.8) * 6, 35)
     local cycle = now % 3
     local band = cycle < 0.9 and math.min(12, math.floor(cycle / 0.075) + 1) or 0
@@ -45,7 +46,7 @@ function M.sync(id, unit, title_id)
         local configured, err = pcall(function()
             body:SetOwner(unit)
             body:SetParent(unit, "")
-            body:SetModelScale(0.48)
+            assert(model_scale.apply(body, 0.48), "title model scale failed")
             body.survival_title_prop = true
             update(state, GameRules:GetGameTime())
         end)
@@ -53,7 +54,8 @@ function M.sync(id, unit, title_id)
             M.clear(id); print("[TitleModel] setup failed: " .. tostring(err)); return nil
         end
     end
-    return {entindex=state.body:entindex(), height=285, width=178.4}
+    local factor = model_scale.factor(unit)
+    return {entindex=state.body:entindex(), height=285*factor, width=178.4*factor}
 end
 function M.init()
     require("core/scheduler").every(0.05, function()

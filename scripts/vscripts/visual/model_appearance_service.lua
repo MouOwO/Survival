@@ -1,5 +1,6 @@
 local logger = require("core/logger")
 local scheduler = require("core/scheduler")
+local model_scale = require("visual/model_scale")
 
 local M = {}
 local states_by_unit = {}
@@ -476,7 +477,11 @@ function M.Apply(unit, appearance, options)
                 end
                 local scale = component and tonumber(component.model_scale)
                 if scale then
-                    safe_call(wearable, "SetModelScale", scale)
+                    -- Callers supply authored component sizes, including the
+                    -- authored body multiplier for an endless outfit. Use the
+                    -- owner to preserve arrow-tower exemptions on its props.
+                    wearable.survival_visual_scale_exempt = model_scale.factor(unit) == 1
+                    model_scale.copy_final(wearable, model_scale.value(unit, scale))
                 end
                 wearable.survival_is_model_component = true
                 wearable.survival_model_component_owner_entindex = entindex

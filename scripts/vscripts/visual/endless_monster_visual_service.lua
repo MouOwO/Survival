@@ -1,6 +1,7 @@
 local appearance = require("visual/model_appearance_service")
 local details = require("visual/monster_cosmetic_details")
 local ornaments = require("visual/endless_monster_ornaments")
+local model_scale = require("visual/model_scale")
 
 local M = {}
 
@@ -53,6 +54,8 @@ function M.apply(unit, visual)
     for _, component in ipairs(visual.components or {}) do
         local copy = {}
         for key, value in pairs(component) do copy[key] = value end
+        -- Component overrides remain authored values. The shared appearance
+        -- service applies the owner's world-size factor exactly once.
         copy.model_scale = (tonumber(component.model_scale) or 1) * visual.model_scale
         asset.components[#asset.components + 1] = copy
     end
@@ -72,7 +75,7 @@ function M.apply(unit, visual)
             assert(call(unit, "SetModel", visual.model_path), "endless_model_set_failed")
             call(unit, "SetOriginalModel", visual.model_path)
         end
-        assert(call(unit, "SetModelScale", visual.model_scale), "endless_scale_set_failed")
+        assert(model_scale.apply(unit, visual.model_scale), "endless_scale_set_failed")
         local applied, status, native_components = appearance.Apply(unit, asset, { fresh_unit = true })
         assert(applied, status or "endless_components_failed")
         assert(unit.survival_endless_monster_visual == state and valid(unit), "endless_visual_superseded")

@@ -4,6 +4,7 @@ local logger = require("core/logger")
 local scheduler = require("core/scheduler")
 local challenge_rules = require("config/challenge_runtime_rules")
 local armor_balance = require("config/armor_balance")
+local model_scale = require("visual/model_scale")
 
 local archetypes = require("config/generated/monster_archetypes")
 local spawn_points = require("config/generated/monster_spawn_points")
@@ -240,7 +241,7 @@ local function start_encounter(payload)
         unit:SetModel(archetype.model_path)
         unit:SetOriginalModel(archetype.model_path)
     end
-    unit:SetModelScale(tonumber(archetype.model_scale) or 1)
+    model_scale.apply(unit, tonumber(archetype.model_scale) or 1)
     if marker.GetForwardVector and unit.SetForwardVector then
         unit:SetForwardVector(marker:GetForwardVector())
     end

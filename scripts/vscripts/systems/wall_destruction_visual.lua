@@ -1,6 +1,7 @@
 -- A dead wall becomes a non-solid visual prop. Gameplay cleanup stays immediate.
 local scheduler = require("core/scheduler")
 local profiles = require("config/generated/wall_destruction_models")
+local model_scale = require("visual/model_scale")
 local M = { shake_seconds=1.0, defeat_delay=1.45, lifetime=2.6 }
 local active, next_id = {}, 0
 local prefix = "particles/survival_buildings/wall_death_"
@@ -117,7 +118,7 @@ function M.play(state)
         assert(valid(handle.proxy),"wall visual prop creation failed")
         handle.proxy:SetAbsOrigin(handle.origin)
         handle.proxy:SetAngles(0,handle.yaw,0)
-        handle.proxy:SetModelScale(handle.scale)
+        assert(model_scale.copy_final(handle.proxy, handle.scale, "wall"), "wall visual scale failed")
         unit:AddNoDraw()
         handle.hid_unit=true
         -- Keep the charging core above the opaque deck / crenellations.

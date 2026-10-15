@@ -19,6 +19,7 @@ CreateUnitByName=function(name,position,clear)
     function unit:SetOriginalModel(path) self.original=path end
     function unit:SetModel(path) self.model=path end
     function unit:SetModelScale(scale) self.scale=scale end
+    function unit:GetModelScale() return self.scale end
     function unit:SetAngles() end
     function unit:SetSkin(skin) self.skin=skin end
     function unit:SetRenderAlpha(a) self.alpha=a end
@@ -34,7 +35,7 @@ local scheduler=require("core/scheduler")
 model.update(0,caster,profile,Vector(10,10,-512))
 assert(created==1 and moved==1 and unit.position.x==0 and unit.position.y==0 and unit.position.z==384)
 assert(unit.hull==0 and unit.hidden_health and unit.survival_is_grid_preview and unit.movement==DOTA_UNIT_CAP_MOVE_FLY)
-assert(unit.model=="wall.vmdl" and unit.scale==2 and unit.alpha==125)
+assert(unit.model=="wall.vmdl" and math.abs(unit.scale-2*2/3)<1e-9 and unit.alpha==125)
 assert(unit.modifier=="modifier_grid_building_preview")
 for i=1,20 do model.update(0,caster,profile,Vector(i,i,-512)) end
 assert(created==1 and moved==1,"same grid cell never recreates or moves a model")
@@ -99,3 +100,12 @@ assert(not unit.removed and unit.skin==0,"next update recovers after engine fail
 model.clear_all()
 assert(scheduler.task_count()==0)
 print("GRID_PREVIEW_ENGINE_API_PASS missing GetSkin, asset fallback, failed setup cleanup, recovery")
+
+package.loaded["config/buildings_config"].arrow_tower={levels={{model_name="tower.vmdl",model_scale=1.7}}}
+profile={building_id="arrow_tower",grid_footprint_x=2,grid_footprint_y=2}
+model.update(0,caster,profile,Vector(192,256,384))
+assert(unit.scale==1.7,"new arrow tower previews preserve their authored exception scale")
+assert(require("visual/model_scale").ensure(unit) and unit.scale==1.7,
+    "a late global spawn check cannot shrink the tower preview")
+model.clear_all()
+print("GRID_PREVIEW_SCALE_PASS reduced wall construction, copied relocation scale and exempt tower preview")

@@ -7,6 +7,7 @@ local rules = require("config/generated/global_rules")
 local visuals = require("systems/monster_hero_visual_service")
 local scheduler = require("core/scheduler")
 local logger = require("core/logger")
+local model_scale = require("visual/model_scale")
 
 local M = {}
 local bodies, unavailable, revisions = {}, {}, {}
@@ -73,7 +74,7 @@ local function create_body(id)
         call(body, "SetHullRadius", 0)
         body:SetModel(archetype.model_path)
         body:SetOriginalModel(archetype.model_path)
-        body:SetModelScale(tonumber(archetype.model_scale) or 1)
+        model_scale.apply(body, tonumber(archetype.model_scale) or 1)
         -- Arena markers sit above their deck. Sample the local ground, keeping
         -- marker XY exact; FindClearSpace could displace a decorative body.
         local ground = GetGroundPosition(origin, body)

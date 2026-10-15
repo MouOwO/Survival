@@ -211,7 +211,7 @@ local function assert_body(body, number)
         "factory and visual assembly preserve the configured actual body")
     check(body.survival_endless_monster_visual and body.survival_endless_visual_id == visual.visual_id,
         "real visual service owns the resolved outfit")
-    near(body.scale, visual.model_scale, "configured final visual scale")
+    near(body.scale, visual.model_scale * (2 / 3), "authored body scale shrinks exactly once")
     near(body.survival_endless_health, stats.health, "logical health remains authored")
     near(body.survival_endless_attack, stats.attack, "logical attack remains authored")
     near(body.health * body.survival_endless_health_scale, stats.health, "native health projection remains exact")
@@ -231,7 +231,15 @@ local function assert_body(body, number)
         local actual = body.survival_model_appearance_state.components[declared.component_id]
         check(actual and not actual.removed and actual.model == declared.model_path and actual.bone_merge,
             "complete native outfit contains its exact declared component")
-        near(actual.scale, visual.model_scale, "native wearable scales with its owner's final visual scale")
+        near(actual.scale, (tonumber(declared.model_scale) or 1) * visual.model_scale * (2 / 3),
+            "native wearable scales with its owner's final visual scale")
+        local assembled = body.survival_endless_monster_visual.asset.components
+        for _, component in ipairs(assembled) do
+            if component.component_id == declared.component_id then
+                near(component.model_scale, (tonumber(declared.model_scale) or 1) * visual.model_scale,
+                    "assembly cache retains an authored component scale")
+            end
+        end
     end
     for _, prop in ipairs(actual_parts) do
         if prop.survival_is_endless_monster_ornament then

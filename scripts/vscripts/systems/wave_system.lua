@@ -14,6 +14,7 @@ local wave_timing_config = require("config/wave_timing_config")
 local asset_catalog = require("config/asset_catalog")
 local monster_visual_config = require("config/monster_visual_config")
 local monster_visual_service = require("systems/monster_visual_service")
+local model_scale = require("visual/model_scale")
 local monster_hero_visual_service = require("systems/monster_hero_visual_service")
 local monster_hull_scale = require("systems/monster_hull_scale")
 local monster_navigation = require("systems/monster_navigation_policy")
@@ -713,7 +714,7 @@ local function apply_stats(unit, row, definition, defer_attack_cap)
     else
         unit:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
     end
-    unit:SetModelScale((definition.model_scale or 1.0)
+    model_scale.apply(unit, (definition.model_scale or 1.0)
         * (tonumber(row.model_scale_multiplier) or 1.0))
     local model_path = model_path_for(row, definition)
     if unit.SetModel and model_path then unit:SetModel(model_path) end

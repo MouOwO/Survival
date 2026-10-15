@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local model_scale = require("visual/model_scale")
 local config = require("config/tree_config")
 local particle_manager = require("core/particle_manager")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
@@ -201,7 +202,7 @@ local function spawn_tree(payload)
     tree:SetAbsOrigin(position)
     tree:SetModel(config.model_name)
     tree:SetOriginalModel(config.model_name)
-    tree:SetModelScale(config.model_scale)
+    model_scale.apply(tree, config.model_scale)
     tree:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
     tree.survival_tree_owner_id = player_id
     tree.survival_tree_depleted_callback = upgrade_tree

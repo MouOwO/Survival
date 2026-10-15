@@ -1,5 +1,6 @@
 local visual_config = require("config/monster_visual_config")
 local asset_preload = require("systems/asset_preload_service")
+local model_scale = require("visual/model_scale")
 
 local M = {}
 local state_by_unit = {}
@@ -127,7 +128,7 @@ function M.apply(unit, resolved)
     local model_ok = safe_call(unit, "SetModel", resolved.model_path)
     local original_ok = safe_call(unit, "SetOriginalModel", resolved.model_path)
     if not model_ok and not original_ok then return false, "model_apply_failed" end
-    safe_call(unit, "SetModelScale", tonumber(resolved.model_scale) or 1)
+    model_scale.apply(unit, tonumber(resolved.model_scale) or 1)
 
     local visual_state = { owner = unit, entindex = entindex, attachments = {}, particles = {} }
     for _, component in ipairs(resolved.components or {}) do

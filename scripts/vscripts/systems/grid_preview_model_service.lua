@@ -2,6 +2,7 @@
 local scheduler = require("core/scheduler")
 local geometry = require("core/building_grid_geometry")
 local config = require("config/grid_placement_config")
+local model_scale = require("visual/model_scale")
 local previews = {}
 local M = {}
 local function now() return GameRules:GetGameTime() end
@@ -60,8 +61,14 @@ function M.update(player_id, caster, profile, position)
         unit:AddNewModifier(unit, nil, "modifier_grid_building_preview", {})
         unit:SetOriginalModel(model)
         unit:SetModel(model)
-        unit:SetModelScale(moving and caster:GetModelScale()
-            or tonumber(data.model_scale) or (asset and tonumber(asset.model_scale)) or 1)
+        local scaled
+        if moving then
+            scaled = model_scale.copy_final(unit, caster:GetModelScale(), profile.building_id)
+        else
+            scaled = model_scale.apply(unit, tonumber(data.model_scale)
+                or (asset and tonumber(asset.model_scale)) or 1, profile.building_id)
+        end
+        assert(scaled, "preview model scale failed")
         local skin = asset and tonumber(asset.model_skin) or 0
         if moving then
             -- Dota NPC handles expose SetSkin but may have no GetSkin. Resolve

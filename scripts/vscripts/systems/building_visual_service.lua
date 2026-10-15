@@ -3,6 +3,7 @@ local catalog = require("config/asset_catalog")
 local preload = require("systems/asset_preload_service")
 local logger = require("core/logger")
 local appearance = require("visual/model_appearance_service")
+local model_scale = require("visual/model_scale")
 -- Only used to clean up carriers left by an older script version.
 local native_carrier = require("visual/native_wearable_carrier_service")
 local scheduler = require("core/scheduler")
@@ -311,6 +312,8 @@ function M.apply(unit, data, options)
     if not valid_entity(unit) then return false, "invalid_entity" end
     if unit.survival_building_death_visual or unit.survival_building_destroyed
         or (unit.IsAlive and not unit:IsAlive()) then return false, "building_dead" end
+    local building_id = (options and options.building_id)
+        or (data and data.building_id) or unit.survival_building_id
     local unit_index = unit:entindex()
     unit.survival_building_visual_index = unit_index
     if visual_owners_by_unit[unit_index] ~= unit then
@@ -391,10 +394,10 @@ function M.apply(unit, data, options)
         reset_main_animation(unit, asset)
     end
     apply_bodygroups(unit, asset)
-    local model_scale = tonumber(data and data.model_scale)
+    local authored_scale = tonumber(data and data.model_scale)
         or (asset and tonumber(asset.model_scale))
-    if model_scale then
-        unit:SetModelScale(model_scale)
+    if authored_scale then
+        model_scale.apply(unit, authored_scale, building_id)
     end
     local model_yaw = tonumber(data and data.model_yaw)
         or (asset and tonumber(asset.model_yaw))
@@ -418,7 +421,7 @@ function M.apply(unit, data, options)
             reset_main_animation(unit, previous_asset)
             apply_bodygroups(unit, previous_asset)
             if previous_asset and tonumber(previous_asset.model_scale) then
-                safe_call(unit, "SetModelScale", tonumber(previous_asset.model_scale))
+                model_scale.apply(unit, tonumber(previous_asset.model_scale), building_id)
             end
             safe_call(unit, "SetSkin",
                 previous_asset and tonumber(previous_asset.model_skin) or 0)

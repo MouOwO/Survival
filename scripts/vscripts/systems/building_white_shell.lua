@@ -1,5 +1,6 @@
 local shells = require("config/generated/building_white_shells")
 local scheduler = require("core/scheduler")
+local model_scale = require("visual/model_scale")
 local M = { reveal_seconds = 1.5, reveal_steps = 48 }
 local active = {}
 local next_id = 0
@@ -37,7 +38,10 @@ function M.create(unit, definition, duration, reveal)
         local origin = unit:GetAbsOrigin()
         local level = tonumber(unit.survival_level) or 1
         local visual = ((definition or {}).levels or {})[level] or {}
-        local scale = tonumber(visual.model_scale) or (unit.GetModelScale and unit:GetModelScale()) or 1
+        local building_id = unit.survival_building_id or (definition or {}).id
+        local configured_scale = tonumber(visual.model_scale)
+        local scale = configured_scale and model_scale.value(unit, configured_scale, building_id)
+            or (unit.GetModelScale and unit:GetModelScale()) or model_scale.value(unit, 1, building_id)
         local yaw = tonumber(visual.model_yaw)
         if yaw == nil then yaw = unit.GetAnglesAsVector and unit:GetAnglesAsVector().y or 0 end
         handle.entity = SpawnEntityFromTableSynchronous("prop_dynamic", {
@@ -51,7 +55,8 @@ function M.create(unit, definition, duration, reveal)
         -- this prop. Follow its world position explicitly, including Z.
         handle.entity:SetAbsOrigin(origin)
         handle.entity:SetAngles(0,yaw,0)
-        handle.entity:SetModelScale(scale*1.006)
+        assert(model_scale.copy_final(handle.entity, scale*1.006, building_id),
+            "white shell model scale failed")
         handle.entity:SetRenderAlpha(255)
         local started = GameRules:GetGameTime()
         active[handle.id] = handle

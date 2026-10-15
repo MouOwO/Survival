@@ -105,6 +105,7 @@ local env = setmetatable({
 
 local definitions, encounters, spawn_points = { by_id = {} }, { by_id = {} }, { by_id = {} }
 local deps = {
+    ["visual/model_scale"] = require("visual/model_scale"),
     ["core/scheduler"] = { cancel = no_op },
     ["systems/player_context_service"] = { is_defeated = function() return false end },
     ["systems/monster_navigation_policy"] = navigation,
@@ -209,7 +210,7 @@ local function check(unit, definition, override, expected_model)
     local tower = { IsNull = function() return false end, survival_tower_class = "class_7" }
     assert(anti_air.can_attack(tower, unit) == flying, "anti-air targeting changed")
     assert(unit.model == expected_model and unit.original_model == expected_model)
-    assert(unit.scale == definition.model_scale, "visual size changed")
+    assert(unit.scale == definition.model_scale * (2 / 3), "authored visual size must shrink exactly once")
 end
 
 -- Every configured monster may retain its combat classification, independent
@@ -290,7 +291,7 @@ for _, row in ipairs(real_waves.rows) do
             visual_swap_count = visual_swap_count + 1
         end
         assert(unit.model == expected_model and unit.original_model == expected_model, row.wave_id)
-        assert(unit.scale == expected_scale, "production visual scale changed: " .. row.wave_id)
+        assert(unit.scale == expected_scale * (2 / 3), "production visual scale must shrink exactly once: " .. row.wave_id)
         assert(unit.hull == 32 and unit.survival_base_monster_hull_radius == 32
             and unit.survival_monster_hull_radius == 32 and unit.placement_hull == 32
             and unit.survival_monster_hull_multiplier == 1,

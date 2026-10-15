@@ -1,5 +1,6 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local model_scale = require("visual/model_scale")
 local config = require("config/buildings_config")
 local arrow_tower_base = require("config/generated/arrow_tower_base")
 local tower_routes = require("config/tower_route_config")
@@ -375,7 +376,7 @@ local function apply_initial_stats(unit, definition)
     -- Apply before construction/reveal; async appearance loading must not be
     -- responsible for the building's initial orientation or size.
     if data.model_scale and unit.SetModelScale then
-        unit:SetModelScale(data.model_scale)
+        model_scale.apply(unit, data.model_scale, definition.id)
     end
     if data.model_yaw ~= nil and unit.SetAngles then
         unit:SetAngles(0, data.model_yaw, 0)

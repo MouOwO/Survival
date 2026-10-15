@@ -1,5 +1,6 @@
 -- Small static ornaments follow a parent transform; they never borrow a
 -- different creature's skeleton or run a positioning timer.
+local model_scale = require("visual/model_scale")
 local M = {}
 local STATE_KEY = "survival_endless_monster_ornaments_state"
 local GENERATION_KEY = "survival_endless_monster_ornaments_generation"
@@ -92,6 +93,7 @@ end
 local function normalized(unit, visual)
     local scale = number(visual.model_scale, 1)
     if not scale or scale <= 0 then return nil, "invalid_model_scale" end
+    scale = model_scale.value(unit, scale)
     local entries, signature = {}, { tostring(scale) }
     for index, entry in ipairs(visual.ornaments or {}) do
         if type(entry) ~= "table" or type(entry.model_path) ~= "string"
@@ -178,7 +180,7 @@ function M.apply(unit, visual)
             or not call(part, "SetParent", unit, entry.attachment)
             or not call(part, "SetLocalOrigin", Vector(unpack(entry.origin)))
             or not call(part, "SetLocalAngles", unpack(entry.angles))
-            or not call(part, "SetModelScale", entry.scale) then
+            or not model_scale.copy_final(part, entry.scale) then
             return abandon("ornament_attach_failed")
         end
         if unit[GENERATION_KEY] ~= generation then return abandon("superseded") end

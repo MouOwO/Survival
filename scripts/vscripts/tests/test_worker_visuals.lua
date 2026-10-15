@@ -14,9 +14,9 @@ local unit={SetModel=function(self,m)self.model=m end,SetOriginalModel=function(
     SetModelScale=function(self,s)self.scale=s end}
 for level=1,8 do
     local row=definitions.by_id[string.format("train_lumberjack_%02d",level)]
-    visual.apply(unit,row);assert(unit.scale==row.model_scale)
-    visual.apply(unit,row,true);assert(unit.scale==row.model_scale*1.5)
-    visual.apply(unit,row,true);assert(unit.scale==row.model_scale*1.5,"refresh cannot compound scaling")
+    visual.apply(unit,row);assert(unit.scale==row.model_scale*(2/3))
+    visual.apply(unit,row,true);assert(unit.scale==row.model_scale*1.5*(2/3))
+    visual.apply(unit,row,true);assert(unit.scale==row.model_scale*1.5*(2/3),"refresh cannot compound scaling")
 end
 for level=1,2 do
     local row=definitions.by_id[string.format("train_repairer_%02d",level)]

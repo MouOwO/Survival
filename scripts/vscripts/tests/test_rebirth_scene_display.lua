@@ -142,7 +142,7 @@ for _, unit in ipairs(displays()) do
     local marker = markers[points.by_id[encounter.spawn_point_id].hammer_target_name]
     assert(unit.origin.x == marker.origin.x and unit.origin.y == marker.origin.y
         and unit.origin.z == marker.origin.z - 24 and unit.forward.y == -1)
-    assert(unit.model == definition.model_path and unit.original == unit.model and unit.scale == definition.model_scale)
+    assert(unit.model == definition.model_path and unit.original == unit.model and unit.scale == definition.model_scale*(2/3))
     assert(unit.outfit == definition.default_wearable_asset_id)
     assert(unit.team == 4 and unit.acquire == false and unit.acquisition == 0 and unit.day == 0 and unit.night == 0)
     assert(unit.hull == 0 and unit.xp == 0 and unit.gold_min == 0 and unit.gold_max == 0)

@@ -1,5 +1,6 @@
 -- Worker presentation only: gameplay stats and abilities remain owned by worker_system.
 local M = {}
+local model_scale = require("visual/model_scale")
 local function valid(unit)
     return unit and (not unit.IsNull or not unit:IsNull())
 end
@@ -20,7 +21,7 @@ function M.apply(unit, training, fused)
         unit:SetOriginalModel(training.model_name)
     end
     local scale = (tonumber(training.model_scale) or 1) * (fused and 1.5 or 1)
-    if unit.SetModelScale then unit:SetModelScale(scale) end
+    model_scale.apply(unit, scale)
     unit.survival_worker_model_parts = {}
     if not SpawnEntityFromTableSynchronous then return end
     for _, model in ipairs(training.model_components or {}) do

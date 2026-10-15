@@ -931,6 +931,7 @@ end
 -- compile failure here prevents even the early launch rules from running.
 local function initialize_core_services()
     local unit_health_bar_service = require("systems/unit_health_bar_service")
+    require("systems/unit_model_scale_service").init()
     hero_anchor_service.init()
     require("systems/forbidden_region_service").init()
     require("systems/player_context_service").init()

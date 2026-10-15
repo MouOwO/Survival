@@ -9,6 +9,7 @@ local archive = require("systems/archive_service")
 local cooperative_rewards = require("systems/archive_cooperative_reward_service")
 local scheduler = require("core/scheduler")
 local hub_placement = require("systems/archive_hub_placement")
+local model_scale = require("visual/model_scale")
 local M = {}
 local players, hubs, bosses = {}, {}, {}
 local sequence, active = 0, false
@@ -263,7 +264,7 @@ local function create_hubs(state)
             context.register_unit(state.player_id, unit, "archive_challenge")
             unit:SetModel(hub_model(index))
             unit:SetOriginalModel(hub_model(index))
-            unit:SetModelScale(rule.building_model_scale)
+            model_scale.apply(unit, rule.building_model_scale, "archive_challenge")
             unit:AddNewModifier(unit, nil, "modifier_invulnerable", {})
             unit:AddNewModifier(unit, nil, "modifier_building_no_health_bar", {})
             if AddFOWViewer then AddFOWViewer(DOTA_TEAM_GOODGUYS, unit:GetAbsOrigin(), 600,

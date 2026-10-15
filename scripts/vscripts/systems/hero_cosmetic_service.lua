@@ -9,6 +9,7 @@ local detailed_diagnostics = diagnostic_rule and diagnostic_rule.enabled ~= fals
 local weapon_slot = require("visual/hero_weapon_slot")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local model_scale = require("visual/model_scale")
 
 local M = {}
 
@@ -633,6 +634,7 @@ function M.apply(hero, hero_id)
     if definition.material_group then
         safe_call(hero, "SetMaterialGroup", definition.material_group)
     end
+    model_scale.ensure(hero)
     -- SetModel/SetOriginalModel can recreate or re-expose Valve's native
     -- wearables. Hide them only after the final body model is in place; custom
     -- prop_dynamic components remain visible because the helper filters by
@@ -868,7 +870,10 @@ local function current_appearance(entity, declared)
     local model = optional_value(entity, "GetModelName")
     if type(model) == "string" and model ~= "" then appearance.model = model end
     local scale = tonumber(optional_value(entity, "GetModelScale"))
-    if scale and scale > 0 then appearance.model_scale = scale end
+    if scale and scale > 0 then
+        appearance.model_scale = scale
+        appearance.model_scale_final = true
+    end
     local skin = tonumber(optional_value(entity, "GetSkin"))
     if skin ~= nil then appearance.skin = skin end
     local material = optional_value(entity, "GetMaterialGroup")
@@ -898,8 +903,18 @@ local function set_appearance(entity, appearance, body)
     end
     if body and (not set("SetOriginalModel", appearance.model)
         or not set("SetModel", appearance.model)) then return false end
-    if not set("SetModelScale", appearance.model_scale)
-        or not set("SetSkin", appearance.skin)
+    if appearance.model_scale ~= nil then
+        local scale_ok
+        if body and not appearance.model_scale_final then
+            scale_ok = model_scale.apply(entity, appearance.model_scale)
+        else
+            -- Bone-merged wearable scales are local to their already scaled
+            -- owner; copying their current value must not shrink them again.
+            scale_ok = model_scale.copy_final(entity, appearance.model_scale)
+        end
+        if not scale_ok then return false end
+    end
+    if not set("SetSkin", appearance.skin)
         or not set("SetMaterialGroup", appearance.material_group) then return false end
     if appearance.material_group_hash ~= nil and type(entity.SetMaterialGroupHash) == "function"
         and not set("SetMaterialGroupHash", appearance.material_group_hash) then return false end
@@ -917,7 +932,8 @@ function M.sync_appearance(target, source)
     local definition = source_state and source_state.appearance_definition or definition_for(hero_id)
     if not definition then return false end
     local body = current_appearance(source, {
-        model = definition.body_model, model_scale = definition.model_scale or 1,
+        model = definition.body_model,
+        model_scale = model_scale.original(source, definition.model_scale or 1), model_scale_final = false,
         skin = definition.body_skin or 0, material_group = definition.material_group,
     })
     if type(body.model) ~= "string" or body.model == "" then return false end

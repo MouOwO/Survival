@@ -23,7 +23,7 @@ local function entity(class, index, model)
     function value:GetModelName() return self.model end
     function value:SetSolid() end
     function value:SetSkin() end
-    function value:SetModelScale() end
+    function value:SetModelScale(scale) self.scale=scale end
     entities[#entities+1]=value
     return value
 end
@@ -141,3 +141,25 @@ module=require("visual/model_appearance_service")
 assert(module.Apply(units[3],asset))
 assert(module.Clear(units[3]) and parts[3].head.removed and parts[3].back.removed)
 print("APPEARANCE_SPAWN_LIFECYCLE_PASS stable allocation, rollback, cleanup, cold recovery, index reuse, fallback")
+-- Explicit overrides are authored values. Parent identity supplies the single
+-- world-size factor, including an arrow tower's unchanged native parts.
+local explicit_asset={asset_id="explicit_scale",components={
+    {component_id="head",model_path="head.vmdl",attach_mode="bone_merge",model_scale=0.9},
+}}
+local scaled=entity("npc_dota_creature",9600,"body.vmdl")
+local scaled_ok,_,scaled_parts=module.Apply(scaled,explicit_asset,{fresh_unit=true})
+assert(scaled_ok and math.abs(scaled_parts.head.scale-0.6)<1e-9)
+local scale_spawns=spawns
+for _=1,20 do
+    local stable,_,retained=module.Apply(scaled,explicit_asset)
+    assert(stable and retained==scaled_parts and math.abs(retained.head.scale-0.6)<1e-9)
+end
+assert(spawns==scale_spawns and explicit_asset.components[1].model_scale==0.9,
+    "stable applies cannot compound scale or mutate authored component data")
+local arrow=entity("npc_dota_building",9601,"tower.vmdl")
+arrow.survival_building_id="arrow_tower"
+local arrow_ok,_,arrow_parts=module.Apply(arrow,explicit_asset,{fresh_unit=true})
+assert(arrow_ok and arrow_parts.head.scale==0.9
+    and arrow_parts.head.survival_visual_scale_multiplier==1,
+    "an explicit tower component keeps the owner's exemption and baseline")
+print("APPEARANCE_MODEL_SCALE_PASS authored overrides, single factor, repeated apply, immutable cache and arrow-tower exemption")

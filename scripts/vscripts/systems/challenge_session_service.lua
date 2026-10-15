@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local armor_balance = require("config/armor_balance")
+local model_scale = require("visual/model_scale")
 
 local challenge_runtime_rules = require("config/challenge_runtime_rules")
 local challenges = challenge_runtime_rules.apply(
@@ -387,7 +388,7 @@ local function spawn_member(session, member)
         unit:SetModel(archetype.model_path)
         unit:SetOriginalModel(archetype.model_path)
     end
-    unit:SetModelScale(tonumber(archetype.model_scale) or 1)
+    model_scale.apply(unit, tonumber(archetype.model_scale) or 1)
     local combat_archetype = archetypes.by_id[
         tostring(member.combat_archetype_id or "")
     ] or archetype

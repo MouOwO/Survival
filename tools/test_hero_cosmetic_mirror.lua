@@ -112,6 +112,9 @@ local function active_particles(unit)
     end;return result
 end
 local source=hero();assert(service.apply(source,"hero_drow_ranger"))
+assert(math.abs(source.scale-2/3)<1e-9, "normal cosmetics apply the global hero visual scale")
+assert(service.apply(source,"hero_drow_ranger"))
+assert(math.abs(source.scale-2/3)<1e-9, "reapplying cosmetics cannot compound the hero scale")
 source:SetModelScale(1.25);source:SetSkin(2);source:SetMaterialGroup("blue");source.material_hash=123
 local original=owned(source);assert(#original==7 and #active_particles(source)==5)
 local original_particles=active_particles(source)
@@ -119,6 +122,8 @@ local target=entity("npc_dota_creature","models/heroes/drow/drow_base.vmdl");tar
 local native=entity("dota_item_wearable","default.vmdl");native.parent=target;native.owner=target
 assert(service.sync_appearance(target,source))
 assert(target.model==source.model and target.scale==1.25 and target.skin==2)
+assert(require("visual/model_scale").ensure(target) and target.scale==1.25,
+    "the global spawn guard must recognize a copied final scale")
 assert(target.material_group=="blue" and target.material_hash==123)
 assert(native.hidden and #active_particles(target)==5)
 local initial=owned(target);assert(#initial==8)
@@ -180,7 +185,11 @@ assert(service.sync_appearance(target,source),"clear must invalidate the mirror 
 
 local fallback=hero();local fallback_target=entity("npc_dota_creature",fallback.model)
 fallback.GetSkin=false
+assert(require("visual/model_scale").apply(fallback,1.35))
+fallback.GetModelScale=false
 assert(service.sync_appearance(fallback_target,fallback))
+assert(math.abs(fallback_target.scale-1.35*2/3)<1e-9,
+    "missing getter uses the recorded original scale and reduces the mirrored body exactly once")
 assert(#owned(fallback_target)==7 and #active_particles(fallback_target)==5)
 -- A removed handle must still retire independent props/particles. A newer
 -- target reusing the same integer entity index keeps its separate ownership.

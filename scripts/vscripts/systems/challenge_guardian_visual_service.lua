@@ -1,4 +1,5 @@
 local definitions = require("config/challenge_guardians")
+local model_scale = require("visual/model_scale")
 local M = {}
 local active = {}
 local TASK = "challenge_guardian_cleanup"
@@ -48,9 +49,11 @@ function M.apply(unit)
         state.body = body
         body:SetOwner(unit)
         body:SetParent(unit, "")
-        body:SetLocalOrigin(Vector(unpack(definition.offset)))
+        local factor = model_scale.factor(unit)
+        body:SetLocalOrigin(Vector(definition.offset[1]*factor,
+            definition.offset[2]*factor, definition.offset[3]*factor))
         body:SetLocalAngles(0, definition.yaw, 0)
-        body:SetModelScale(definition.scale)
+        assert(model_scale.apply(body, definition.scale), "guardian model scale failed")
         body.survival_challenge_guardian = true
         for _, model in ipairs(definition.parts) do
             local part = assert(SpawnEntityFromTableSynchronous("prop_dynamic", {

@@ -101,7 +101,7 @@ for player = 0, 3 do
         same(unit.position, player * 1000, index * 100, 384)
         assert(unit.owner == player and unit.survival_archive_hub == index)
         assert(unit.model == "hub" .. index .. ".vmdl" and unit.original_model == unit.model)
-        assert(unit.scale == 1 and unit.modifier_building_no_health_bar)
+        assert(unit.scale == 2/3 and unit.modifier_building_no_health_bar)
         assert(unit.modifier_invulnerable)
         assert(registered[player * 3 + index].id == player)
         assert(registered[player * 3 + index].role == "archive_challenge")

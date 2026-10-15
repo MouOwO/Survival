@@ -34,6 +34,7 @@ local archetype = {unit_name="npc_test",model_path="test.vmdl",movement_type="gr
     model_scale=1,health=1000,attack=10,attack_speed=1,attack_type="melee",enabled=true}
 local events=require("core/events")
 local deps={
+    ["visual/model_scale"]=require("visual/model_scale"),
     ["core/events"]=events,
     ["core/scheduler"]={cancel=no_op},
     ["core/team_alignment"]={enforce=no_op},
