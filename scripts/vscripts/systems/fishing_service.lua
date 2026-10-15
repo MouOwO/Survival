@@ -18,6 +18,10 @@ local RESOURCE_EFFECTS = {
     wood_per_second = true,
 }
 
+local function match_rewards_enabled()
+    return require("systems/match_setup_service").get_mode() ~= "fishing"
+end
+
 local function number(value, fallback)
     local result = tonumber(value)
     return result ~= nil and result or (fallback or 0)
@@ -133,6 +137,7 @@ end
 
 
 local function on_building_created(payload)
+    if not match_rewards_enabled() then return end
     if payload and payload.building_id == "wall" then
         local state = effects_by_player[tonumber(payload.player_id)] or {}
         local unit = EntIndexToHScript and EntIndexToHScript(tonumber(payload.entindex)) or nil
@@ -160,6 +165,9 @@ local function announce(player_id, row, value)
 end
 
 function M.grant(player_id, reward_id)
+    if not match_rewards_enabled() then
+        return { ok = false, error = "fishing_mode_match_rewards_disabled" }
+    end
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then return { ok = false, error = "player_id_invalid" } end
     local row, error_code = choose(reward_id, player_id)
@@ -171,6 +179,7 @@ function M.grant(player_id, reward_id)
 end
 
 local function tick_resources()
+    if not match_rewards_enabled() then return 1 end
     for player_id, state in pairs(effects_by_player) do
         if PlayerResource and PlayerResource:GetPlayer(player_id) then
             event_bus.request(events.RESOURCE_ADD_REQUEST, {
@@ -185,6 +194,7 @@ local function tick_resources()
 end
 
 local function on_wave_changed(payload)
+    if not match_rewards_enabled() then return end
     local state = payload and (payload.state or payload) or nil
     if started_at ~= nil or not state or state.difficulty_selected ~= true then return end
     started_at = GameRules:GetGameTime()
@@ -194,6 +204,7 @@ local function on_wave_changed(payload)
 end
 
 local function on_tick()
+    if not match_rewards_enabled() then return 1 end
     if started_at == nil then return 1 end
     local elapsed = GameRules:GetGameTime() - started_at
     if elapsed >= next_tick then

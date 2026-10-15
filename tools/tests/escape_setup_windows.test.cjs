@@ -3,7 +3,8 @@ const assert = require("node:assert/strict");
 const {harness, ready} = require("../test_startup_loading_ui.js");
 const options = [{difficulty_id: "N1", unlocked: true}, {difficulty_id: "N2", unlocked: true}];
 const setup = {mode_selected: false, selector_player_id: 0, difficulty_options: options,
-    mode_options: [{mode_id: "pure", display_name: "纯净模式"}, {mode_id: "standard", display_name: "常规模式"}]};
+    mode_options: [{mode_id: "pure", display_name: "纯净模式"}, {mode_id: "standard", display_name: "常规模式"},
+        {mode_id: "fishing", display_name: "摸鱼模式"}]};
 const click = panel => panel.events.onactivate();
 const rows = ui => ui.nodes.DifficultySelectionButtons.children;
 {
@@ -11,9 +12,9 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     const ui = harness({startupState: startup, hud: true, loadSharedUI: true});
     ui.advance(0.11);
     const modal = ui.config.SurvivalUI.ModalManager.Get("survival_difficulty");
-    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px");
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "246px");
     click(ui.nodes.MatchModeOptions.children[0]);
-    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px");
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "246px");
     ui.config.SurvivalUILayers.HandleEscape("survival_difficulty");
     assert(!modal.IsOpen());
     assert(ui.nodes.DifficultySelectionOverlay.BHasClass("DifficultySelectionHidden"));
@@ -27,7 +28,7 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     assert(modal.IsOpen()); assert(!ui.nodes.DifficultySelectionResume.visible);
     assert(ui.nodes.MatchModeOptions.children[0].BHasClass("UISelected"));
     assert(ui.nodes.MatchModeOptions.children[0].BHasClass("UIBusy"));
-    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px");
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "246px");
     click(ui.nodes.MatchModeOptions.children[1]);
     assert.equal(ui.requests.filter(request => request.name === "survival_loading_mode_select").length, 1);
     ui.setStartup({...startup, setup: {...setup, mode_selected: true, mode_id: "pure"}});
@@ -45,18 +46,33 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     click(modes[0]);
     ui.emit("survival_loading_mode_result", {success: 0, error: "match_session_mismatch", session_id: "match-123"});
     assert(ui.nodes.DifficultySelectionError.visible);
-    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "248px");
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "304px");
     ui.config.SurvivalUILayers.HandleEscape("survival_difficulty");
     assert(!modal.IsOpen());
     click(ui.nodes.DifficultySelectionResume);
     assert(modal.IsOpen());
     assert(ui.nodes.DifficultySelectionError.text.includes("游戏状态已更新"));
-    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "248px", "resuming an error preserves its readable height");
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "304px", "resuming an error preserves its readable height");
     click(modes[1]); click(modes[1]); click(modes[0]);
     assert.equal(ui.requests.filter(request => request.name === "survival_loading_mode_select").length, 2);
     assert.equal(ui.nodes.DifficultySelectionError.text, "");
     assert(!ui.nodes.DifficultySelectionError.visible);
-    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px", "explicit retry restores compact mode layout");
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "246px", "explicit retry restores compact mode layout");
+}
+{
+    const startup = ready({admission_complete: true, profiles_ready: false, setup});
+    const ui = harness({startupState: startup, hud: true, loadSharedUI: true}); ui.advance(0.11);
+    const modal = ui.config.SurvivalUI.ModalManager.Get("survival_difficulty");
+    click(ui.nodes.MatchModeOptions.children[2]);
+    ui.config.SurvivalUILayers.HandleEscape("survival_difficulty");
+    assert(!modal.IsOpen() && ui.nodes.DifficultySelectionResume.visible);
+    ui.emit("survival_loading_mode_result", {success: 1, mode_id: "fishing", session_id: "match-123"});
+    assert(!modal.IsOpen() && !ui.nodes.DifficultySelectionResume.visible, "fishing completes a hidden mode popup without a difficulty resume");
+    click(ui.nodes.DifficultySelectionResume); ui.advance(13);
+    assert(!modal.IsOpen() && !ui.nodes.DifficultySelectionButtons.visible);
+    assert.equal(ui.requests.filter(request => request.name === "survival_loading_mode_select").length, 1);
+    assert(!ui.requests.some(request => request.name === "ui_difficulty_select_request"));
+    assert.equal(ui.config.SurvivalUILayers.Top(), null, "fishing releases the mandatory selection layer");
 }
 {
     const wave = {status: "selecting_difficulty", mode_selected: true, game_mode: "pure", selector_player_id: 0,
@@ -88,7 +104,7 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     ui.setStartup({...startup, session_id: "new-session"});
     assert(ui.config.SurvivalUI.ModalManager.Get("survival_difficulty").IsOpen(), "new match is not dismissed by the old one");
     assert(!ui.nodes.DifficultySelectionResume.visible);
-    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px");
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "246px");
 }
 {
     // A native modal may leave inline visibility behind when its old closure is

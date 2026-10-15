@@ -18,13 +18,22 @@ local function definition()
     return (definitions.by_id or {}).default_builder
 end
 
-local function publish_selection(player_id, unit)
+local function publish_selection(player_id, unit, spawn)
     local player = PlayerResource:GetPlayer(player_id)
     if player and CustomGameEventManager then
         CustomGameEventManager:Send_ServerToPlayer(player, "survival_select_unit", {
             entindex = unit:entindex(),
             reason = "builder_ready",
         })
+        if spawn and spawn.mode == "fishing" then
+            -- One existing, non-locking camera jump to the visible builder;
+            -- the native hero remains an isolated engine placeholder.
+            local position = unit:GetAbsOrigin()
+            CustomGameEventManager:Send_ServerToPlayer(player, "ui_camera_follow_hero", {
+                entindex = unit:entindex(), reason = "fishing_ready",
+                target_x = position.x, target_y = position.y, target_z = position.z,
+            })
+        end
     end
 end
 
@@ -100,7 +109,14 @@ local function create_builder(payload)
         error("failed to register builder owner: " .. tostring(register_error))
     end
     presentation.apply(builder, config)
-    FindClearSpaceForUnit(builder, position, true)
+    if spawn.mode == "fishing" then
+        -- The landing was already grounded and checked in its own player
+        -- patch. This hull-free builder need not be displaced by clear-space.
+        builder:SetAbsOrigin(position)
+        builder:Stop()
+    else
+        FindClearSpaceForUnit(builder, position, true)
+    end
 
     builder_by_player[player_id] = builder
     publish_identity(player_id, builder)
@@ -116,7 +132,7 @@ local function create_builder(payload)
         spawn_source = spawn.source,
     }
     event_bus.emit(events.BUILDER_READY, ready)
-    publish_selection(player_id, builder)
+    publish_selection(player_id, builder, spawn)
     print(string.format(
         "[BUILDER_READY] player=%s slot=%s spawn=%s source=%s entindex=%s unit=%s proxy=true courier=false",
         tostring(player_id), tostring(spawn.slot_id), tostring(spawn.marker),

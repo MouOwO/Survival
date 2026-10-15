@@ -7,6 +7,8 @@ local mode_options = {
         description = "默认属性开局，不继承已有存档加成；本局奖励正常获得并保存。" },
     { mode_id = "standard", display_name = "常规模式",
         description = "继承已有存档与永久加成；本局奖励正常获得并保存。" },
+    { mode_id = "fishing", display_name = "摸鱼模式",
+        description = "不选择难度、不生成波次，自动挂机；沿用常规档案并正常保存奖励。" },
 }
 
 local function resource(method, id)
@@ -31,6 +33,8 @@ end
 
 function M.get_session_id() return session_id end
 function M.get_mode() return mode_id end
+function M.get_profile_mode() return mode_id == "fishing" and "standard" or mode_id end
+function M.is_fishing_mode() return mode_id == "fishing" end
 function M.is_mode_selected() return mode_id ~= nil end
 
 function M.selector_player_id()
@@ -62,7 +66,7 @@ function M.select_mode(id, requested, request_session)
         return { ok = false, error = "match_session_mismatch" }
     end
     if not M.is_selector(id) then return { ok = false, error = "selection_not_host" } end
-    if requested ~= "pure" and requested ~= "standard" then
+    if requested ~= "pure" and requested ~= "standard" and requested ~= "fishing" then
         return { ok = false, error = "mode_not_found" }
     end
     if mode_id ~= nil then

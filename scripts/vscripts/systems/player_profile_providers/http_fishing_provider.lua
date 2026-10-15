@@ -7,6 +7,11 @@ local active_rule = nil
 local logged_in = {}
 local endless_batch_capability
 
+local function profile_mode(setup)
+    return type(setup.get_profile_mode) == "function"
+        and setup.get_profile_mode() or setup.get_mode()
+end
+
 local function convar(name)
     if Convars and type(Convars.GetStr) == "function" then
         return tostring(Convars:GetStr(name) or "")
@@ -25,7 +30,7 @@ local function request(path, payload, on_success, on_error)
     local body = {}
     for key, value in pairs(payload) do body[key] = value end
     body.match_session_id = session
-    if path == "/v1/session/login" then body.mode = setup.get_mode() end
+    if path == "/v1/session/login" then body.mode = profile_mode(setup) end
     local token = convar("survival_fishing_api_token")
     if token == "" then on_error("fishing_api_token_missing") return end
     local http = CreateHTTPRequestScriptVM(
@@ -80,11 +85,11 @@ end
 
 function M.fetch_snapshot(account_id, on_success, on_error)
     local setup = require("systems/match_setup_service")
-    local session, mode = setup.get_session_id(), setup.get_mode()
+    local session, mode = setup.get_session_id(), profile_mode(setup)
     local path = logged_in[tostring(account_id)] == session and "/v1/profile" or "/v1/session/login"
     request(path, { account_id = tostring(account_id) }, function(snapshot)
         if snapshot.account_id ~= tostring(account_id) or snapshot.match_session_id ~= session
-            or snapshot.mode ~= mode or setup.get_session_id() ~= session or setup.get_mode() ~= mode then
+            or snapshot.mode ~= mode or setup.get_session_id() ~= session or profile_mode(setup) ~= mode then
             on_error("match_profile_mismatch") return
         end
         logged_in[tostring(account_id)] = session

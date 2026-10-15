@@ -30,6 +30,11 @@ local player_context = require("systems/player_context_service")
 local archive_challenge_rules = require("config/generated/archive_challenge_rules").by_id.default
 local phase_guard = require("systems/gameplay_phase_guard")
 
+local function fishing_mode()
+    local setup = require("systems/match_setup_service")
+    return type(setup.get_mode) == "function" and setup.get_mode() == "fishing"
+end
+
 local M = {}
 local state = {}
 local enemies = {}
@@ -367,6 +372,12 @@ local function refresh_selection_state()
         and setup.is_mode_selected() == true
     state.game_mode = state.mode_selected and setup.get_mode() or ""
     state.selector_player_id = tonumber(selector) or -1
+    if state.game_mode == "fishing" then
+        state.status, state.timer, state.total_waves = "fishing", 0, 0
+        state.difficulty_id, state.difficulty_options = "", {}
+        state.can_confirm_difficulty = false
+        return
+    end
     local startup = package.loaded["systems/startup_loading_service"]
     state.can_confirm_difficulty = startup ~= nil and type(startup.is_gameplay_ready) == "function"
         and startup.is_gameplay_ready() == true
@@ -867,6 +878,7 @@ local function spawn_callback(row, token, wave_number, normal_instance_index, se
 end
 
 local function start_countdown(seconds)
+    if fishing_mode() then return end
     if dev_mode or state.defeat_settled or state.victory_settled or game_has_ended() then return end
     state.status = "countdown"
     state.timer = seconds
@@ -899,6 +911,7 @@ local function start_countdown(seconds)
     if state.defeat_settled or game_has_ended() then return end
     scheduler.cancel("wave_countdown")
     scheduler.every(1.0, function()
+        if fishing_mode() then return false end
         if state.defeat_settled or state.victory_settled or game_has_ended() then return false end
         state.timer = math.max(0, state.countdown_deadline - current_game_time())
         if state.timer <= preload_lead and not preload_reviewed then
@@ -913,6 +926,7 @@ local function start_countdown(seconds)
 end
 
 local function start_wave(number, reason)
+    if fishing_mode() then return false, "fishing_mode_no_waves" end
     if state.defeat_settled or state.victory_settled or game_has_ended() then
         return false, "match_ended"
     end
@@ -994,6 +1008,7 @@ local function start_wave(number, reason)
 end
 
 local function start_next_wave()
+    if fishing_mode() then return end
     if dev_mode or state.defeat_settled or state.victory_settled or game_has_ended() then return end
     if state.current_wave >= state.total_waves then
         state.status = "all_waves_spawned"
@@ -1076,7 +1091,7 @@ local function get_wave_state(payload)
     )
     return {
         ok = true,
-        difficulty_id = difficulty_id,
+        difficulty_id = fishing_mode() and "" or difficulty_id,
         difficulty_selected = difficulty_selected,
         mode_selected = state.mode_selected,
         game_mode = state.game_mode,
@@ -1111,6 +1126,7 @@ local function get_wave_state(payload)
 end
 
 local function request_early_final()
+    if fishing_mode() then return { ok = false, error = "摸鱼模式没有波次" } end
     -- Use the selected difficulty's actual last wave, including its own batches.
     local final_wave = state.total_waves
     if not game_started then
@@ -1300,6 +1316,7 @@ local function debug_wave_model_asset_ids(wave)
 end
 
 function M.debug_spawn_wave(number, player_ids)
+    if fishing_mode() then return false, "fishing_mode_no_waves" end
     number = tonumber(number)
     local wave = number and waves[number] or nil
     if not wave then return false, "wave_not_found" end
@@ -1383,6 +1400,7 @@ function M.debug_spawn_wave_for_players(number, player_ids)
 end
 
 function M.set_difficulty(id)
+    if fishing_mode() then return false, "fishing_mode_no_difficulty" end
     if type(id) ~= "string" or id == "" then
         return false, "difficulty_not_found"
     end
@@ -1639,6 +1657,12 @@ function M.init()
     event_bus.subscribe(events.GAME_STARTED, function()
         game_started = true
         game_started_at = current_game_time()
+        if fishing_mode() then
+            -- Preserve GAME_STARTED/HERO_READY for online settlement without
+            -- starting combat channels, a countdown, or difficulty selection.
+            publish("fishing_mode_started")
+            return
+        end
         rebuild_wave_channels()
         if difficulty_selected then
             start_countdown(wave_timing_config.initial_delay_seconds)

@@ -8,6 +8,8 @@ local production_definitions = require("config/generated/star_blessing_reward_de
 local M = {}
 local sessions = {}
 local finalizing_sessions = {}
+local pending_fishing_resumes = {}
+local game_finished = false
 local generation = 0
 local session_sequence = 0
 
@@ -34,6 +36,42 @@ local checkpoint
 local SESSION_ACTIVE = "ACTIVE"
 local SESSION_FINALIZING = "FINALIZING"
 local SESSION_CLOSED = "CLOSED"
+
+local function fishing_mode()
+    local setup = require("systems/match_setup_service")
+    return type(setup.get_mode) == "function" and setup.get_mode() == "fishing"
+end
+
+local function fishing_resume_binding(player_id)
+    if not fishing_mode() then return nil, "fishing_mode_required" end
+    if game_finished or (GameRules and type(GameRules.State_Get) == "function"
+        and GameRules:State_Get() >= (DOTA_GAMERULES_STATE_POST_GAME or 8)) then
+        return nil, "game_finished"
+    end
+    if require("systems/player_context_service").is_defeated(player_id) then
+        return nil, "player_defeated"
+    end
+    local loading = require("systems/startup_loading_service")
+    if not loading.is_player_ready(player_id) then return nil, "player_not_ready" end
+    local provider = profile_service.get_provider()
+    local account = provider and provider.resolve_account_id(player_id)
+    if not account or not profile_service.is_loaded_for_account(player_id, account) then
+        return nil, "profile_account_not_ready"
+    end
+    return {account = tostring(account), match_session = require("systems/match_setup_service").get_session_id()}
+end
+
+local function same_binding(left, right)
+    return left and right and left.account == right.account and left.match_session == right.match_session
+end
+
+local function resume_after_final(player_id, state)
+    local pending = pending_fishing_resumes[player_id]
+    if not pending or pending.generation ~= generation or pending.waiting ~= state then return end
+    pending_fishing_resumes[player_id] = nil
+    local binding = fishing_resume_binding(player_id)
+    if same_binding(binding, pending.binding) then M.resume_fishing(player_id) end
+end
 
 local function convar(name)
     if not Convars or type(Convars.GetStr) ~= "function" then return "" end
@@ -102,11 +140,12 @@ local function complete_checkpoint(player_id, state, final, current_request_id)
         end
         print("[OnlineTime] session_closed player_id=" .. tostring(player_id)
             .. " session_id=" .. tostring(state.session_id) .. " request_id=" .. tostring(current_request_id) .. " final=true")
+        resume_after_final(player_id, state)
         return
     end
     if state.final_requested then
         state.final_requested = false
-        checkpoint(player_id, true)
+        checkpoint(player_id, true, state)
         return
     end
     if state.status ~= SESSION_ACTIVE or sessions[player_id] ~= state then
@@ -152,9 +191,11 @@ local function request_id(player_id, state)
     return string.format("online-%s-%s-%d", tostring(player_id), state.session_id, state.sequence)
 end
 
-checkpoint = function(player_id, final)
+checkpoint = function(player_id, final, expected_state)
     player_id = tonumber(player_id)
-    local state = sessions[player_id] or finalizing_sessions[player_id]
+    -- An old in-flight checkpoint must finalize its own session after a reconnect.
+    local state = expected_state or sessions[player_id] or finalizing_sessions[player_id]
+    if state and state.generation ~= generation then return end
     if not state then
         print("[OnlineTime] checkpoint_skipped reason=session_missing player_id="
             .. tostring(player_id) .. " final=" .. tostring(final == true))
@@ -180,7 +221,10 @@ checkpoint = function(player_id, final)
             .. tostring(player_id) .. " final=" .. tostring(final == true))
         return
     end
-    local account_id = provider.resolve_account_id(player_id)
+    if not final and state.fishing_binding
+        and not same_binding(fishing_resume_binding(player_id), state.fishing_binding) then return end
+    local account_id = state.fishing_binding and state.fishing_binding.account
+        or provider.resolve_account_id(player_id)
     if not account_id then
         print("[OnlineTime] checkpoint_skipped reason=account_id_unresolved player_id="
             .. tostring(player_id) .. " final=" .. tostring(final == true))
@@ -266,7 +310,7 @@ local function debug_checkpoint(_, player_id)
     checkpoint(player_id, false)
 end
 
-local function start(player_id)
+local function start(player_id, fishing_binding)
     player_id = tonumber(player_id)
     if require("systems/player_context_service").is_defeated(player_id) then return end
     if player_id == nil or player_id < 0 then return end
@@ -274,7 +318,7 @@ local function start(player_id)
     if current then
         print("[OnlineTime] session_start_skipped reason=session_present player_id="
             .. tostring(player_id) .. " status=" .. tostring(current.status))
-        return
+        return true
     end
     session_sequence = session_sequence + 1
     sessions[player_id] = {
@@ -285,21 +329,58 @@ local function start(player_id)
         final_requested = false,
         status = SESSION_ACTIVE,
         grants = {},
+        generation = generation,
+        fishing_binding = fishing_binding,
     }
     checkpoint(player_id, false)
+    return true
+end
+
+function M.resume_fishing(player_id)
+    player_id = tonumber(player_id)
+    if player_id == nil or player_id < 0 or player_id ~= math.floor(player_id) then
+        return false, "player_id_invalid"
+    end
+    local binding, reason = fishing_resume_binding(player_id)
+    if not binding then return false, reason end
+    local current = sessions[player_id]
+    if current then
+        if same_binding(binding, current.fishing_binding) then return true end
+        return false, "online_session_identity_changed"
+    end
+    local previous = finalizing_sessions[player_id]
+    if previous and previous.status ~= SESSION_CLOSED then
+        pending_fishing_resumes[player_id] = {generation = generation, waiting = previous, binding = binding}
+        return true, "waiting_for_final_checkpoint"
+    end
+    pending_fishing_resumes[player_id] = nil
+    return start(player_id, binding)
 end
 
 function M.init()
     generation = generation + 1
     sessions = {}
     finalizing_sessions = {}
+    pending_fishing_resumes = {}
+    game_finished = false
     local active_rule = rule()
     if not active_rule then return end
     local interval = math.max(5, tonumber(active_rule.online_time_checkpoint_interval_seconds) or 60)
     scheduler.every(interval, function()
         for player_id in pairs(sessions) do checkpoint(player_id, false) end
+        -- Reuse the existing minute checkpoint for a final request whose
+        -- provider was temporarily unavailable; no additional polling task.
+        for player_id, pending in pairs(pending_fishing_resumes) do
+            if pending.generation == generation and not pending.waiting.in_flight then
+                if pending.waiting.status == SESSION_CLOSED then resume_after_final(player_id, pending.waiting)
+                else checkpoint(player_id, true, pending.waiting) end
+            end
+        end
     end, task_id)
-    event_bus.subscribe(events.HERO_READY, function(payload) start(payload.player_id) end)
+    event_bus.subscribe(events.HERO_READY, function(payload)
+        if fishing_mode() then M.resume_fishing(payload.player_id)
+        else start(payload.player_id) end
+    end)
     event_bus.subscribe(events.GAME_STARTED, function()
         for player_id in pairs(sessions) do checkpoint(player_id, false) end
     end)
@@ -317,6 +398,8 @@ end
 
 function M.disconnect(player_id)
     player_id = tonumber(player_id)
+    if player_id == nil or player_id < 0 or player_id ~= math.floor(player_id) then return end
+    pending_fishing_resumes[player_id] = nil
     print("[OnlineTime] disconnect_requested player_id=" .. tostring(player_id)
         .. " session_present=" .. tostring(sessions[player_id] ~= nil))
     if sessions[player_id] then
@@ -326,11 +409,13 @@ function M.disconnect(player_id)
         finalizing_sessions[player_id] = state
         print("[OnlineTime] session_detached_for_final player_id=" .. tostring(player_id)
             .. " session_id=" .. tostring(state.session_id))
-        checkpoint(player_id, true)
+        checkpoint(player_id, true, state)
     end
 end
 
 function M.finish(source)
+    game_finished = true
+    pending_fishing_resumes = {}
     print("[OnlineTime] game_end_final_requested source=" .. tostring(source or "unknown"))
     local pending = {}
     for player_id, state in pairs(sessions) do
@@ -344,7 +429,7 @@ function M.finish(source)
             state.final_requested = true
             print("[OnlineTime] final_checkpoint_queued player_id=" .. tostring(player_id))
         else
-            checkpoint(player_id, true)
+            checkpoint(player_id, true, state)
         end
     end
 end

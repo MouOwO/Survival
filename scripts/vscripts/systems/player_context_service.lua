@@ -90,11 +90,50 @@ function M.slot(player_id)
     return player_id and slot_by_player[player_id] or nil
 end
 
+local function resolve_fishing_spawn(player_id, slot)
+    local config = require("config/idle_fishing_config")
+    local offset = config.player_offsets[player_id]
+    if not offset then return nil, "fishing_player_slot_not_configured" end
+    local origin, marker_name, source = config.fallback, "", "fishing_coordinates"
+    for _, name in ipairs(config.markers) do
+        local marker = find_marker(name)
+        if marker then
+            origin, marker_name, source = marker:GetAbsOrigin(), name, "fishing_marker"
+            break
+        end
+    end
+    if not GridNav or type(GridNav.IsTraversable) ~= "function"
+        or type(GridNav.IsBlocked) ~= "function" then
+        return nil, "fishing_navigation_unavailable"
+    end
+    if type(GetGroundPosition) ~= "function" then return nil, "fishing_ground_unavailable" end
+    for _, sample in ipairs(config.samples) do
+        local position = Vector(origin.x + offset.x + sample[1], origin.y + offset.y + sample[2], origin.z)
+        local grounded, ground = pcall(GetGroundPosition, position, nil)
+        local height = grounded and ground and tonumber(ground.z)
+        if height and height == height and height > -math.huge and height < math.huge then
+            position = Vector(position.x, position.y, height)
+            local walked, traversable = pcall(GridNav.IsTraversable, GridNav, position)
+            local checked, blocked = pcall(GridNav.IsBlocked, GridNav, position)
+            if walked and traversable == true and checked and blocked == false then
+                return {
+                    position = position, marker = marker_name, slot_id = slot.slot_id,
+                    source = source, mode = "fishing",
+                }
+            end
+        end
+    end
+    return nil, "fishing_spawn_not_traversable"
+end
+
 function M.resolve_builder_spawn(player_id)
     player_id = normalized_player_id(player_id)
     local slot = M.slot(player_id)
     if player_id == nil or not slot then
         return nil, "player_slot_not_configured"
+    end
+    if require("systems/match_setup_service").get_mode() == "fishing" then
+        return resolve_fishing_spawn(player_id, slot)
     end
 
     local marker = find_marker(slot.builder_spawn_marker)

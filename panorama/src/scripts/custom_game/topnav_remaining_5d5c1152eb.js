@@ -1328,6 +1328,7 @@
         if(repaint||mirror.combatDebug!==cfg.HandoffShowCombatDebug){style(findCached(ctx,"HeroCombatDebugPanel",true),{visibility:cfg.HandoffShowCombatDebug?"visible":"collapse"});mirror.combatDebug=cfg.HandoffShowCombatDebug;}
     }
     function compact(v) {var f=cfg.SurvivalNumberFormatter;return f&&f.Compact?f.Compact(v):f&&f.Format?f.Format(v):String(v===undefined?"—":v);}
+    function fishingWave(wave) {return wave.game_mode==="fishing"||wave.status==="fishing";}
     var countdownWave=null;
     function remaining(deadline,fallback) {
         var at=Number(deadline);
@@ -1339,10 +1340,11 @@
         if(!countdownWave)return;
         text("HandoffWave",waveCaption(countdownWave));
         var w=countdownWave,defeated=w.player_defeated===true||Number(w.player_defeated)===1;
-        var overflow=!defeated&&(w.overflow_active===true||Number(w.overflow_active)===1);
+        var overflow=!fishingWave(w)&&!defeated&&(w.overflow_active===true||Number(w.overflow_active)===1);
         text("HandoffEnemyCountdown",overflow?String(remaining(w.overflow_deadline,w.overflow_remaining)):"");
     }
     function waveCaption(wave) {
+        if(fishingWave(wave))return "摸鱼模式 · 自动挂机";
         var current=Math.max(0,Math.floor(Number(wave.current_wave)||0));
         var total=Math.max(0,Math.floor(Number(wave.total_waves)||0));
         var t=remaining(wave.status==="countdown"?wave.countdown_deadline:0,wave.timer);
@@ -1363,16 +1365,16 @@
         if(!next)return;var incoming=Number(next.sequence);if(isFinite(incoming)&&incoming<=sequence)return;if(isFinite(incoming))sequence=incoming;
         var r=next.resources||{},wave=next.wave||{},t=Math.max(0,Math.ceil(Number(wave.timer)||0));
         text("HandoffResource_gold",compact(r.gold));text("HandoffResource_wood",compact(r.wood));text("HandoffResource_population",compact(r.population)+" / "+compact(r.max_population));
-        var selected=wave.difficulty_selected===true||Number(wave.difficulty_selected)===1;
+        var fishing=fishingWave(wave),selected=!fishing&&(wave.difficulty_selected===true||Number(wave.difficulty_selected)===1);
         var difficulty=String(wave.difficulty_id||"").toUpperCase();
         text("HandoffDifficulty",selected&&/^N[1-9][0-9]*$/.test(difficulty)?difficulty:"");
         countdownWave=wave;renderCountdowns();
         var alive=Math.max(0,Math.floor(Number(wave.alive)||0)),limit=Number(wave.alive_limit);
-        enemyCounter.visible=isFinite(limit)&&limit>0;
-        var defeated=wave.player_defeated===true||Number(wave.player_defeated)===1;
-        text("HandoffEnemyTitle",defeated?"本局失败":"进攻怪物");
-        text("HandoffEnemyValue",defeated?"可继续观战":String(alive)+" / "+(limit>0?Math.floor(limit):"—"));
-        var overflow=!defeated&&(wave.overflow_active===true||Number(wave.overflow_active)===1);
+        enemyCounter.visible=!fishing&&isFinite(limit)&&limit>0;
+        var defeated=!fishing&&(wave.player_defeated===true||Number(wave.player_defeated)===1);
+        text("HandoffEnemyTitle",fishing?"":defeated?"本局失败":"进攻怪物");
+        text("HandoffEnemyValue",fishing?"":defeated?"可继续观战":String(alive)+" / "+(limit>0?Math.floor(limit):"—"));
+        var overflow=!fishing&&!defeated&&(wave.overflow_active===true||Number(wave.overflow_active)===1);
         enemyCounter.SetHasClass("EnemyOverflow",overflow);
         enemyCounter.SetHasClass("EnemyDefeated",defeated);
         enemyCountdown.visible=overflow;

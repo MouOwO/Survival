@@ -45,3 +45,26 @@ gameTime=105;env.renderCountdowns();assert.equal(textValues.HandoffWave,'下一�
 gameTime=115;env.renderCountdowns();assert.equal(textValues.HandoffEnemyCountdown,'0');assert(countdown.visible,'client zero never declares defeat');
 env.data({sequence:10,wave:{player_defeated:true,alive_limit:90,overflow_active:false}});assert(!countdown.visible);
 console.log('CLIENT_COUNTDOWNS_PASS: next wave/challenge/overflow without packets; pause, stale rejection, zero clamp and server-only outcome');
+
+assert.equal(env.waveCaption({game_mode:'fishing',status:'countdown',current_wave:3,total_waves:30,timer:60}),'摸鱼模式 · 自动挂机');
+assert.equal(env.waveCaption({game_mode:'standard',status:'fishing'}),'摸鱼模式 · 自动挂机','Either authoritative fishing field suppresses wave captions');
+env.data({sequence:11,wave:{status:'countdown',difficulty_selected:true,difficulty_id:'N2',alive:91,alive_limit:90,overflow_active:true,overflow_deadline:130}});
+assert.equal(textValues.HandoffDifficulty,'N2');assert(counter.visible&&countdown.visible&&counter.classes.EnemyOverflow);
+env.data({sequence:12,wave:{game_mode:'fishing',status:'fishing',difficulty_selected:true,difficulty_id:'N1',alive:91,alive_limit:90,
+    player_defeated:true,overflow_active:true,overflow_deadline:130,overflow_remaining:10,countdown_deadline:180,timer:60}});
+assert.equal(textValues.HandoffWave,'摸鱼模式 · 自动挂机');assert.equal(textValues.HandoffDifficulty,'');
+assert(!counter.visible&&!countdown.visible,'Fishing hides the enemy counter and its overflow timer');
+assert(!counter.classes.EnemyOverflow&&!counter.classes.EnemyDefeated,'Fishing clears stale warning and defeat presentation');
+assert.equal(textValues.HandoffEnemyTitle,'');assert.equal(textValues.HandoffEnemyValue,'');assert.equal(textValues.HandoffEnemyCountdown,'');
+gameTime=120;env.renderCountdowns();
+assert.equal(textValues.HandoffWave,'摸鱼模式 · 自动挂机');assert.equal(textValues.HandoffEnemyCountdown,'');
+assert(!counter.visible&&!countdown.visible,'Client countdown ticks cannot revive fishing combat warnings');
+env.data({sequence:13,wave:{game_mode:'standard',status:'countdown',difficulty_selected:true,difficulty_id:'N3',current_wave:2,total_waves:30,
+    alive:17,alive_limit:90,overflow_active:false,countdown_deadline:180}});
+assert.equal(textValues.HandoffDifficulty,'N3');assert.equal(textValues.HandoffWave,'下一波次 3  倒计时 01:00');
+assert(counter.visible&&!countdown.visible);assert.equal(textValues.HandoffEnemyTitle,'进攻怪物');assert.equal(textValues.HandoffEnemyValue,'17 / 90');
+env.data({sequence:14,wave:{game_mode:'standard',status:'fishing',difficulty_selected:true,difficulty_id:'N1',alive_limit:90,overflow_active:true}});
+assert.equal(textValues.HandoffWave,'摸鱼模式 · 自动挂机');assert.equal(textValues.HandoffDifficulty,'');assert(!counter.visible&&!countdown.visible);
+env.data({sequence:13,wave:{status:'fighting',difficulty_selected:true,difficulty_id:'N1',alive_limit:90,overflow_active:true}});
+assert.equal(textValues.HandoffDifficulty,'');assert(!counter.visible&&!countdown.visible,'Stale combat packets cannot restore fishing HUD warnings');
+console.log('FISHING_HUD_PASS: idle caption, no difficulty/enemies/overflow/defeat, ticking and stale packet safety, normal-mode recovery');

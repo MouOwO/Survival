@@ -271,6 +271,10 @@ local function configure_game_rules()
     end
 end
 
+local function is_fishing_mode()
+    return require("systems/match_setup_service").get_mode() == "fishing"
+end
+
 local function on_player_connected(keys)
     local player_id, resolution, userid =
         multiplayer_player_service.resolve_player_id(keys)
@@ -287,6 +291,9 @@ local function on_player_connected(keys)
     if player_id ~= nil then
         multiplayer_player_service.mark_connected(player_id)
         require("systems/fishing_reward_service").connect(player_id)
+        if is_fishing_mode() then
+            require("systems/online_time_service").resume_fishing(player_id)
+        end
     end
 end
 
@@ -306,12 +313,18 @@ local function on_player_disconnected(keys)
     multiplayer_player_service.mark_disconnected(player_id)
     require("systems/fishing_reward_service").disconnect(player_id)
     require("systems/online_time_service").disconnect(player_id)
-    require("systems/player_context_service").unregister_player(player_id)
+    -- The visible fishing builder survives the reconnect grace period. Keep
+    -- its authoritative ownership until actual defeat performs asset cleanup.
+    if not is_fishing_mode() then
+        require("systems/player_context_service").unregister_player(player_id)
+    end
 end
 
 local function schedule_unbuilt_wall_defeat_check()
+    if is_fishing_mode() then return end
     local delay = require("config/wave_timing_config").initial_delay_seconds
     scheduler.after(delay, function()
+        if is_fishing_mode() then return false end
         local building_system = require("systems/building_system")
         for _, player_id in ipairs(multiplayer_player_service.participating_player_ids()) do
             if not building_system.wall_for_player(player_id)
@@ -360,7 +373,9 @@ local function initialize_survival_hero(hero)
     if display and display.enabled ~= false then
         hero.survival_display_name = display.display_name
     end
-    FindClearSpaceForUnit(hero, Vector(0, 0, 256), true)
+    if not is_fishing_mode() then
+        FindClearSpaceForUnit(hero, Vector(0, 0, 256), true)
+    end
     hero_anchor_service.register_placeholder(player_id, hero)
 
     event_bus.emit(events.HERO_READY, {

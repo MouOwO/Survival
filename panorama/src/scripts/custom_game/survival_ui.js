@@ -22,6 +22,7 @@
         dev_mode: "准备阶段",
         waiting: "准备阶段",
         selecting_difficulty: "选择难度",
+        fishing: "自动挂机",
         countdown: "准备阶段",
         spawning: "生成阶段",
         fighting: "战斗阶段",
@@ -89,7 +90,7 @@
     function modeOptions() {
         var seen = {};
         return optionArray(setup() && setup().mode_options).filter(function (option) {
-            if (!option || (option.mode_id !== "pure" && option.mode_id !== "standard") || seen[option.mode_id]) return false;
+            if (!option || (option.mode_id !== "pure" && option.mode_id !== "standard" && option.mode_id !== "fishing") || seen[option.mode_id]) return false;
             seen[option.mode_id] = true; return true;
         });
     }
@@ -121,8 +122,8 @@
     function handleModeResult(payload) {
         if (!modePending || !needsMode() || payload && payload.session_id && payload.session_id !== setupSession) return;
         if (payload && yes(payload.success) && payload.mode_id === modeChoice) {
-            // A successful server acknowledgement moves this same dialog to
-            // difficulty immediately; it never asserts profile readiness.
+            // Combat modes continue to difficulty in this dialog. Fishing has
+            // no difficulty; neither acknowledgement asserts profile readiness.
             modeAcknowledged = payload.mode_id; modePending = false; modeError = ""; modeRequestSerial++;
             renderDifficultySelection(difficultyWave); readStartup(); requestSnapshot(); return;
         }
@@ -143,7 +144,7 @@
             options.forEach(function (option) {
                 var button = $.CreatePanel("Button", panel("MatchModeOptions"), ""); button.AddClass("MatchModeOption"); button.hittestchildren = false;
                 var name = $.CreatePanel("Label", button, ""); name.AddClass("MatchModeOptionName"); name.html = false;
-                name.text = option.display_name || (option.mode_id === "pure" ? "纯净模式" : "常规模式");
+                name.text = option.display_name || (option.mode_id === "pure" ? "纯净模式" : option.mode_id === "fishing" ? "摸鱼模式" : "常规模式");
                 ui.State.Bind(button, function () {
                     if (!admissionComplete() || !needsMode() || !modeSelector() || modePending) return;
                     modeChoice = option.mode_id; modeError = ""; confirmMode();
@@ -166,7 +167,7 @@
         return id >= 0 && selector !== undefined && id === Number(selector);
     }
     function difficultyAvailable() {
-        return admissionComplete() && !!confirmedMode() && (!difficultyWave || !isDifficultySelected(difficultyWave))
+        return admissionComplete() && !!confirmedMode() && confirmedMode() !== "fishing" && (!difficultyWave || !isDifficultySelected(difficultyWave))
             && (!!setup() || difficultyWave && difficultyWave.status === "selecting_difficulty");
     }
     function canConfirmDifficulty() {
@@ -270,6 +271,8 @@
             difficultyResume.__survivalResumeText.text = choosingMode ? "继续选择模式" : "继续选择难度";
         }
         if (!shouldShow) {
+            panel("MatchModeOptions").visible = false;
+            container.visible = false;
             difficultyRequestPending = false;
             overlay.SetHasClass("DifficultyPending", false);
             if (difficultyModal && difficultyModal.IsOpen()) difficultyModal.Close();
@@ -307,7 +310,8 @@
         }
         panel("DifficultySelectionDialog").style.width = "275px";
         var modeNotice = choosingMode && (!!modeError || !modeSelector());
-        panel("DifficultySelectionDialog").style.height = (choosingMode ? (modeNotice ? 248 : 190) : 670) + "px";
+        var extraModeHeight = Math.max(0, modeOptions().length - 2) * 56;
+        panel("DifficultySelectionDialog").style.height = (choosingMode ? (modeNotice ? 248 : 190) + extraModeHeight : 670) + "px";
         panel("DifficultySelectionDialog").SetHasClass("MatchSetupMode", choosingMode);
         if (!difficultyDismissed && !difficultyModal.IsOpen()) difficultyModal.Open();
         var wasChoosingMode = panel("MatchModeOptions").visible;
@@ -401,14 +405,14 @@
         });
         setText(
             "WaveNumber",
-            (isDifficultySelected(wave)
+            wave.game_mode === "fishing" || wave.status === "fishing" ? "摸鱼模式" : (isDifficultySelected(wave)
                 ? String(wave.difficulty_id || "N1") + " · " : "")
                 + "波次 " + numberValue(wave.current_wave)
                 + "/" + numberValue(wave.total_waves || 30)
         );
         var phase = waveStatusText[wave.status] || "准备阶段";
         setText("WaveState", phase);
-        setText("WaveTimer", "倒计时 " + Math.max(0, Math.ceil(Number(wave.timer || 0))) + "秒");
+        setText("WaveTimer", wave.game_mode === "fishing" || wave.status === "fishing" ? "" : "倒计时 " + Math.max(0, Math.ceil(Number(wave.timer || 0))) + "秒");
         setText("AliveValue", "存活 " + numberValue(wave.alive));
         setText("PendingValue", "待生成 " + numberValue(wave.pending));
     }

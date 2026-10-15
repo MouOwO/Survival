@@ -8,8 +8,18 @@ DOTA_GAMERULES_STATE_POST_GAME = 8
 Vector = function(x, y, z) return { x = x, y = y, z = z } end
 local scheduled, winners, finalized, created, granted, archive_clears
 local active_players, markers_ready, reward_pending, last_projection, defeated, personal_finalized
+local match_mode, preload_calls, scheduled_count = "standard", 0, 0
 local cooperative_payloads, fake_players = {}, {}
-PlayerResource = { IsFakeClient = function(_, id) return fake_players[id] == true end }
+local function active_player(id)
+    for _, value in ipairs(active_players or {}) do if value == id then return true end end
+    return false
+end
+PlayerResource = {
+    IsFakeClient = function(_, id) return fake_players[id] == true end,
+    IsValidPlayerID = function(_, id) return active_player(id) end,
+    GetTeam = function() return DOTA_TEAM_GOODGUYS end,
+    GetPlayer = function(_, id) return active_player(id) and id or nil end,
+}
 local serial, state_listener = 0, nil
 local noop = function() end
 local function marker(id)
@@ -64,8 +74,8 @@ FindClearSpaceForUnit = noop
 ListenToGameEvent = function(_, callback) state_listener = callback; return 1 end
 StopListeningToGameEvent = noop
 package.loaded["core/scheduler"] = {
-    every = function(_, callback, key) scheduled[key] = callback end,
-    after = function(_, callback, key) scheduled[key or (#scheduled + 1)] = callback end,
+    every = function(_, callback, key) scheduled_count = scheduled_count + 1; scheduled[key] = callback end,
+    after = function(_, callback, key) scheduled_count = scheduled_count + 1; scheduled[key or (#scheduled + 1)] = callback end,
     cancel = function(key) scheduled[key] = nil end,
     task_count = function() return 0 end,
 }
@@ -73,7 +83,20 @@ for _, name in ipairs({ "systems/asset_preload_service", "config/asset_catalog",
     "config/monster_visual_config", "systems/monster_hull_scale",
     "systems/monster_navigation_policy", "systems/monster_corpse_lifecycle_service",
     "systems/wave_monster_collision" }) do package.loaded[name] = {} end
-package.loaded["config/monster_visual_config"] = { resolve = function() return nil end }
+package.loaded["config/monster_visual_config"] = {
+    resolve = function() return nil end,
+    resources_for_wave = function() preload_calls = preload_calls + 1; return {} end,
+}
+package.loaded["systems/asset_preload_service"] = {
+    resources_for_models = function(paths)
+        preload_calls = preload_calls + 1
+        local resources = {}
+        for _, path in ipairs(paths) do resources[#resources + 1] = { type = "model", path = path } end
+        return resources
+    end,
+    resources_for_assets = function(_, resources) preload_calls = preload_calls + 1; return resources end,
+    queue_resources = function(resources) preload_calls = preload_calls + 1; return true, "ready", #resources, 0 end,
+}
 package.loaded["core/team_alignment"] = { enforce = noop }
 package.loaded["systems/monster_navigation_policy"] = { apply = noop }
 package.loaded["systems/monster_corpse_lifecycle_service"] = { track = noop }
@@ -81,7 +104,7 @@ package.loaded["systems/monster_hull_scale"] = { apply = function() return true 
 package.loaded["systems/wave_monster_collision"] = { profile = function()
     return { base_hull_radius = 32, movement_type = "ground", no_unit_collision = false }
 end }
-package.loaded["systems/monster_visual_service"] = { cleanup = noop }
+package.loaded["systems/monster_visual_service"] = { on_death = noop, cleanup = noop }
 package.loaded["systems/monster_hero_visual_service"] = { on_death = noop, clear = noop }
 package.loaded["systems/monster_spawn_marker"] = { find = function()
     return markers_ready and marker(0) or nil
@@ -95,13 +118,17 @@ package.loaded["systems/player_context_service"] = {
     owner_player_id = function(value) return value.owner end,
 }
 package.loaded["systems/match_setup_service"] = {
-    is_mode_selected = function() return true end, get_mode = function() return "standard" end,
+    is_mode_selected = function() return true end, get_mode = function() return match_mode end,
     selector_player_id = function() return 0 end,
+    is_selector = function(id) return id == 0 end,
 }
 package.loaded["systems/player_profile_service"] = {
     get_progression = function() return { loaded = true, clear_counts = {} } end,
 }
-package.loaded["systems/startup_loading_service"] = { is_gameplay_ready = function() return true end }
+package.loaded["systems/startup_loading_service"] = {
+    is_gameplay_ready = function() return true end,
+    is_player_ready = function() return true end,
+}
 package.loaded["systems/online_time_service"] = { disconnect = function(id) personal_finalized[#personal_finalized + 1] = id end, finish = function(reason)
     finalized[#finalized + 1] = reason
 end }
@@ -113,6 +140,7 @@ package.loaded["systems/archive_service"] = {
     record_challenge = function(id, challenge, sequence, difficulty)
         granted[#granted + 1] = { id = id, challenge = challenge, difficulty = difficulty }
         reward_pending[id] = true
+        return { ok = true }
     end,
 }
 local multiplayer = require("systems/multiplayer_player_service")
@@ -140,8 +168,9 @@ local function upvalue(wanted)
     end
     error("missing wave fixture: " .. wanted)
 end
-local function restart(difficulty, without_archive, players)
+local function restart(difficulty, without_archive, players, mode)
     clock, engine_state, serial = 0, 7, 0
+    match_mode, preload_calls, scheduled_count = mode or "standard", 0, 0
     cooperative_payloads, fake_players = {}, {}
     scheduled, winners, finalized, created, granted, archive_clears = {}, {}, {}, {}, {}, {}
     active_players, markers_ready, reward_pending = players or {0, 1}, true, {}
@@ -164,7 +193,7 @@ local function restart(difficulty, without_archive, players)
         archive_clears[#archive_clears + 1] = payload.player_id
         cooperative_payloads[payload.player_id] = payload.cooperative_win
     end)
-    assert(wave.set_difficulty(difficulty or "N1"))
+    if difficulty ~= false then assert(wave.set_difficulty(difficulty or "N1")) end
     return upvalue("state"), upvalue("enemies")
 end
 local publish, final_check = upvalue("publish"), upvalue("check_final_victory")
@@ -200,6 +229,7 @@ local function kill(value)
     bus.emit(events.ENGINE_ENTITY_KILLED, { victim = value, victim_entindex = value:entindex() })
 end
 local function final_ready(state)
+    if next(upvalue("wave_channels")) == nil then prepare_lanes() end
     state.current_wave = state.total_waves
     state.pending, state.failed_spawn = 0, 0
     state.final_wave_generation_completed = true
@@ -238,9 +268,11 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     local challenge_boss = players[1].active_boss
     kill(challenge_boss)
     kill(challenge_boss)
-    assert(#granted == 1 and granted[1].challenge == "social_beast")
+    assert(#granted == 2 and granted[1].id == 0 and granted[2].id == 1
+        and granted[1].challenge == "social_beast" and granted[2].challenge == "social_beast",
+        "one challenge death awards each eligible human account once")
     assert(not archive.finish(hero_hub) and #winners == 0, "pending rewards delay final exit")
-    reward_pending[1] = false
+    reward_pending[0], reward_pending[1] = false, false
     assert(archive.finish(hero_hub) and #winners == 1 and winners[1] == DOTA_TEAM_GOODGUYS)
 end
 
@@ -317,6 +349,7 @@ final_ready(state)
 final_check()
 assert(state.status == "archive_challenges" and #created == 0 and #winners == 0)
 markers_ready = true
+prepare_lanes()
 for id = 0, 1 do assert(scheduled["archive_hubs_retry:" .. id]() == false) end
 assert(#created == 6)
 
@@ -543,3 +576,100 @@ for _, case in ipairs({
     local count=#archive_clears;final_check();assert(#archive_clears==count)
 end
 print("PASS cooperative winner roster: solo, two humans, four humans, bots, defeated/disconnected teammate, duplicate victory")
+
+-- Fishing is a separate playable mode, not an empty difficulty that can clear
+-- wave zero. Use the real event handlers with a selected mode and ready host.
+local original_print, handler_errors = print, {}
+print = function(...)
+    local message = tostring(select(1, ...))
+    if message:find("[EventBus] handler error", 1, true) then handler_errors[#handler_errors + 1] = message end
+    original_print(...)
+end
+local fishing_state = restart(false, false, {0, 1}, "fishing")
+local function fishing_idle(label)
+    local view = snapshot(0)
+    assert(view.game_mode == "fishing" and view.mode_selected and view.status == "fishing", label .. ": fishing projection")
+    assert(view.difficulty_id == "" and view.difficulty_selected == false
+        and view.can_confirm_difficulty == false and next(view.difficulty_options) == nil,
+        label .. ": no difficulty or confirmation")
+    assert(view.total_waves == 0 and view.current_wave == 0 and view.alive == 0
+        and fishing_state.timer == 0 and fishing_state.pending == 0 and fishing_state.spawned == 0,
+        label .. ": no countdown or wave population")
+    assert(view.next_wave_number == nil and view.next_special_wave_number == nil, label .. ": no next-wave target")
+    assert(not view.victory_settled and not view.defeat_settled and not view.post_clear_frozen
+        and not view.early_final_used and not wave.is_dev_mode(), label .. ": no combat settlement")
+    assert(not require("systems/gameplay_phase_guard").post_clear_frozen(), label .. ": gameplay remains available")
+    assert(next(wave._wave_channels_for_test()) == nil, label .. ": no combat lane allocation")
+    local resources = wave._resource_snapshot_for_test()
+    assert(resources.session_count == 0 and resources.lease_count == 0 and preload_calls == 0,
+        label .. ": no wave preload or model lease")
+    local challenge = bus.request("archive.challenge_state", {})
+    assert(challenge.active == 0 and challenge.ended == 0 and challenge.expired == 0 and challenge.deadline == 0
+        and next(archive._test.players()) == nil, label .. ": no automatic archive challenge phase")
+    assert(#created == 0 and #winners == 0 and #granted == 0 and #archive_clears == 0
+        and #finalized == 0 and #defeated == 0, label .. ": no spawn, reward, clear record or victory")
+    assert(scheduled_count == 0 and next(scheduled) == nil, label .. ": no wave or challenge timers")
+end
+local function reject_fishing_combat(label)
+    local ok, reason = wave.set_difficulty("N1")
+    assert(ok == false and reason == "fishing_mode_no_difficulty", label .. ": direct difficulty rejected")
+    local requested = bus.request(events.WAVE_DIFFICULTY_SET_REQUEST, {player_id = 0, difficulty_id = "N1"})
+    assert(requested and requested.ok == false and requested.error == "fishing_mode_no_difficulty",
+        label .. ": authorized host cannot choose a fishing difficulty")
+    ok, reason = wave.debug_spawn_wave(1)
+    assert(ok == false and reason == "fishing_mode_no_waves", label .. ": direct debug wave rejected")
+    ok, reason = wave.debug_spawn_wave_for_players(1, {0, 1})
+    assert(ok == false and reason == "fishing_mode_no_waves", label .. ": explicit debug lanes rejected")
+    bus.emit(events.WAVE_START_NEXT, {})
+    local early = bus.request(events.WAVE_EARLY_FINAL_REQUEST, {})
+    assert(early and early.ok == false and early.error == "摸鱼模式没有波次", label .. ": early clear rejected")
+    upvalue("start_countdown")(0)
+    final_check()
+    fishing_idle(label)
+end
+fishing_idle("before game start")
+assert(snapshot().game_started == false)
+reject_fishing_combat("before game start")
+bus.emit(events.GAME_STARTED, {})
+assert(snapshot().game_started == true, "fishing still receives the ordinary game-start lifecycle")
+fishing_idle("after game start")
+for _, at in ipairs({60, 1801, 7200}) do
+    clock = at
+    -- If a regression schedules combat or a challenge timeout, execute it in
+    -- this standalone Lua fixture; this never calls an in-engine Tools command.
+    local callbacks = {}
+    for _, callback in pairs(scheduled) do callbacks[#callbacks + 1] = callback end
+    for _, callback in ipairs(callbacks) do callback() end
+    bus.emit(events.PLAYER_PROFILE_CHANGED, {player_id = 0})
+    reject_fishing_combat("fishing at " .. at .. " seconds")
+end
+bus.emit(events.BUILDING_CREATED, {building_id = "wall", player_id = 0, entindex = 42})
+kill(unit("unrelated_fishing_encounter"))
+bus.emit(events.PLAYER_DISCONNECTED, {player_id = 1})
+fishing_idle("unrelated death, wall creation and disconnect")
+
+-- Both combat modes retain the real difficulty selection, countdown, wave
+-- preloading and first-wave spawning after a fishing match is reinitialized.
+for _, mode in ipairs({"standard", "pure"}) do
+    local combat_state = restart(false, false, {0}, mode)
+    bus.emit(events.GAME_STARTED, {})
+    assert(snapshot().status == "selecting_difficulty" and snapshot().can_confirm_difficulty)
+    assert(next(scheduled) == nil and #created == 0, mode .. ": combat waits for difficulty confirmation")
+    local chosen = bus.request(events.WAVE_DIFFICULTY_SET_REQUEST, {player_id = 0, difficulty_id = "N1"})
+    assert(chosen and chosen.ok and chosen.total_waves == 25, mode .. ": N1 difficulty remains selectable")
+    assert(snapshot().game_mode == mode and snapshot().difficulty_selected and combat_state.status == "countdown")
+    assert(type(scheduled.wave_countdown) == "function" and #created == 0)
+    clock = require("config/wave_timing_config").initial_delay_seconds
+    assert(scheduled.wave_countdown() == false)
+    assert(combat_state.current_wave == 1 and combat_state.planned > 0 and preload_calls > 0,
+        mode .. ": countdown starts wave one and queues the following wave")
+    local callbacks = {}
+    for key, callback in pairs(scheduled) do if type(key) == "number" then callbacks[#callbacks + 1] = callback end end
+    for _, callback in ipairs(callbacks) do callback() end
+    assert(#created == combat_state.planned and combat_state.spawned == combat_state.planned
+        and combat_state.alive == combat_state.planned, mode .. ": actual configured first-wave population spawns")
+    assert(#winners == 0 and #archive_clears == 0, mode .. ": first wave does not settle the match")
+end
+print = original_print
+assert(#handler_errors == 0, table.concat(handler_errors, "\n"))
+print("PASS fishing wave isolation: no difficulty/countdown/preload/spawn/challenge/clear; direct, event and debug requests denied; two-hour lifecycle stays playable; standard/pure still start real waves")

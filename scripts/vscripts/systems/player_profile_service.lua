@@ -35,7 +35,9 @@ local function selected_match()
     if injected_provider then return "standard", "injected_fixture" end
     local setup = require("systems/match_setup_service")
     if not setup.is_mode_selected() then return nil, nil, "mode_not_selected" end
-    local mode, session = setup.get_mode(), setup.get_session_id()
+    local mode = type(setup.get_profile_mode) == "function"
+        and setup.get_profile_mode() or setup.get_mode()
+    local session = setup.get_session_id()
     if (mode ~= "pure" and mode ~= "standard") or type(session) ~= "string" or #session < 8 then
         return nil, nil, "match_session_missing"
     end
