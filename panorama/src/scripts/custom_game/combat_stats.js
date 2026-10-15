@@ -579,10 +579,9 @@
             return entry && entry.panel === anchor;
         });
         if (alreadyDimmed) {
-            // Keep DOTAPortrait in the engine's input tree. Only its pixels
-            // are hidden, so native press/hold/release and modifiers survive.
+            // The opaque, input-transparent sibling covers the native pixels.
+            // DOTAPortrait itself stays visible to retain engine mouse input.
             if (String(anchor.style.opacity || "") !== "1") anchor.style.opacity = "1";
-            if (String(anchor.style.washColor || "").toLowerCase() !== "#ffffff00") anchor.style.washColor = "#ffffff00";
             return;
         }
         if (anchor.__survivalPortraitDimmed === true) {
@@ -592,18 +591,14 @@
             anchor.style.opacity = "1";
         }
         var originalOpacity = String(anchor.style.opacity || "");
-        var originalWash = String(anchor.style.washColor || "#ffffffff");
         dimmedNativePortraits.push({
             panel: anchor,
-            opacity: originalOpacity,
-            washColor: originalWash
+            opacity: originalOpacity
         });
         anchor.__survivalPortraitDimmed = true;
         anchor.__survivalPortraitOriginalOpacity = originalOpacity;
-        anchor.__survivalPortraitOriginalWashColor = originalWash;
-        // Zero panel opacity also disables native portrait mouse interaction.
-        // Transparent tint hides the replaced model while retaining C++ input.
-        anchor.style.washColor = "#ffffff00";
+        // wash-color alpha controls tint strength, not pixel transparency.
+        // Hide the native pixels with the opaque sibling, keeping input alive.
         anchor.style.opacity = "1";
     }
 
@@ -617,8 +612,10 @@
         if (overlay.GetParent() !== host) overlay.SetParent(host);
         if (overlay.GetParent() !== host) return false;
         overlay.style.ignoreParentFlow = true;
-        var nativeZIndex = String(anchor.style.zIndex || "");
-        overlay.style.zIndex = /^-?\d+$/.test(nativeZIndex) ? nativeZIndex : "0";
+        // Native getters return decimal strings such as "0.0". The custom
+        // scene must paint above DOTAPortrait while mouse input passes through.
+        var nativeZIndex = Number(anchor.style.zIndex);
+        overlay.style.zIndex = String(isFinite(nativeZIndex) ? nativeZIndex + 1 : 1);
         if (layerChanged && host.MoveChildAfter) host.MoveChildAfter(overlay, anchor);
         if (layerChanged) {
             towerPortraitLayerAnchor = anchor;

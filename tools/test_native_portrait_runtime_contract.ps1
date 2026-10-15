@@ -24,9 +24,11 @@ $layout = ReadText (Join-Path $ContentRoot 'panorama\layout\custom_game\survival
 
 # Check the native input contract independently of the legacy layout/style audit.
 Check ($script.Contains('anchor.style.opacity = "1"')) 'NATIVE_PORTRAIT_INPUT_OPACITY_MISSING'
-Check ($script.Contains('anchor.style.washColor = "#ffffff00"')) 'NATIVE_PORTRAIT_PIXEL_TINT_MISSING'
+Check (-not $script.Contains('anchor.style.washColor =')) 'NATIVE_PORTRAIT_TINT_MODIFIED'
 Check ($script.Contains('__survivalPortraitOriginalWashColor')) 'NATIVE_PORTRAIT_TINT_RESTORE_MISSING'
 Check (-not $script.Contains('anchor.style.opacity = "0"')) 'NATIVE_PORTRAIT_INPUT_DISABLED'
+Check ($script.Contains('var nativeZIndex = Number(anchor.style.zIndex);')) 'NATIVE_PORTRAIT_DECIMAL_LAYER_MISSING'
+Check ($script.Contains('isFinite(nativeZIndex) ? nativeZIndex + 1 : 1')) 'NATIVE_PORTRAIT_FOREGROUND_LAYER_MISSING'
 Check ([regex]::IsMatch($layout, '<Panel\b[^>]*id="SurvivalTowerPortraitOverlay"[^>]*hittest="false"[^>]*hittestchildren="false"')) 'TOWER_OVERLAY_INPUT_NOT_PASSTHROUGH'
 Check ([regex]::IsMatch($layout, '<DOTAScenePanel\b[^>]*id="SurvivalTowerPortraitScene"[^>]*hittest="false"')) 'TOWER_SCENE_INPUT_NOT_PASSTHROUGH'
 if ($InputOnly) {

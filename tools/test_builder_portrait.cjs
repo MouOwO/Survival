@@ -7,7 +7,7 @@ const snapshot = version => ({entindex:7,refresh_version:version,
  const t=setup({portrait:true});t.select(7,'npc_survival_builder_proxy');
  t.api.portraitTransition('builder_selected');
  assert.equal(t.native().values.opacity,'1','keep the native portrait input until its snapshot arrives');
- assert.equal(t.native().values.washColor,'#ffffff00','mask only the invisible proxy pixels');
+ assert.equal(t.native().values.washColor,undefined,'keep the native proxy tint untouched');
  t.api.updateSnapshot(snapshot(1));
  assert.deepStrictEqual(t.metrics.setUnit.map(call=>call.args),[['npc_dota_hero_wisp','default',false]]);
  assert.equal(t.overlay.values.visibility,'visible');assert.equal(t.overlay.GetParent(),t.nativeHost());
@@ -44,4 +44,27 @@ for(const failure of ['false','throw']){
  t.scene.setUnitFailure=null;t.api.updateSnapshot(snapshot(2));assert.equal(t.overlay.values.visibility,'visible');
  t.scene.alive='throw';assert.doesNotThrow(()=>t.api.portraitHide('released'));t.api.shutdown('done');
 }
-console.log('BUILDER_PORTRAIT_PASS: real production update/transition/sentinel, proxy-to-Io mapping, stable snapshots, strict role, selection and native failure recovery');
+// Native style getters return decimal z-index strings, not just integer text.
+// Keep the Io scene above the native proxy while all native input stays intact.
+for(const [nativeZ,overlayZ] of [['0.0',1],['4.0',5],['2.5',3.5],['-2.5',-1.5],['invalid',1],['Infinity',1],[undefined,1]]){
+ const t=setup({portrait:true});t.select(7,'npc_survival_builder_proxy');const native=t.native();
+ native.values.zIndex=nativeZ;native.values.washColor='#345678cc';
+ native.SetPanelEvent=()=>{throw Error('builder portrait must not replace native input handlers')};
+ const input={hittest:native.hittest,hittestchildren:native.hittestchildren};
+ function visible(z){
+  assert.equal(Number(t.overlay.values.zIndex),z);assert.equal(native.values.zIndex,nativeZ);
+  if(Number.isFinite(Number(nativeZ)))assert(Number(t.overlay.values.zIndex)>Number(nativeZ),'the custom Io scene must paint above DOTAPortrait');
+  assert.equal(native.values.opacity,'1');assert.equal(native.values.washColor,'#345678cc');assert.equal(t.metrics.nativeWashWrites,0);
+  assert.equal(native.hittest,input.hittest);assert.equal(native.hittestchildren,input.hittestchildren);
+  assert.equal(t.overlay.hittest,false);assert.equal(t.overlay.hittestchildren,false);assert.equal(t.scene.hittest,false);
+ }
+ t.api.portraitTransition('builder_layer_pending');visible(overlayZ);
+ t.api.updateSnapshot(snapshot(1));visible(overlayZ);assert.equal(t.scene.values.visibility,'visible');
+ t.api.cosmeticPortraitSentinel();visible(overlayZ);
+ // A same-node Valve layer rewrite is repaired without reloading the model.
+ native.values.zIndex='9.0';t.run([...t.jobs.keys()][0]);
+ assert.equal(Number(t.overlay.values.zIndex),10);assert.equal(native.values.zIndex,'9.0');
+ assert.equal(t.metrics.setUnit.length,1);assert.equal(t.scene.values.visibility,'visible');
+ t.api.shutdown('builder_layer_complete');assert.equal(native.values.opacity,'0.35');assert.equal(native.values.washColor,'#345678cc');
+}
+console.log('BUILDER_PORTRAIT_PASS: real production update/transition/sentinel, proxy-to-Io mapping, stable snapshots, strict role, selection/failure recovery, decimal/nonzero/invalid native layers, same-anchor layer repair and native input/tint preservation');
