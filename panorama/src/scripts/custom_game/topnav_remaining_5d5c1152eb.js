@@ -399,8 +399,10 @@
         });
     });
     function layoutStats(g) {
+        // Keep the requested shift at five screen pixels after both HUD scales.
+        var statOffsetY=5/Math.max(0.001,(Number(g.scale)||1)*(Number(ctx.actualuiscale_y)||1));
         stats.forEach(function(a,i){
-            var x=i<3?295:g.attributeX+2,y=32+(i%3)*98;
+            var x=i<3?295:g.attributeX+2,y=32+(i%3)*98+statOffsetY;
             var rowWidth=Math.max(0,i<3?g.heroWidth-293-4:g.attributeWidth-4);
             if(g.lumberjack && (i===0 || i===2)) {
                 x=g.heroWidth+(i===0?24:g.centerWidth/2+12);y=185;rowWidth=g.centerWidth/2-36;

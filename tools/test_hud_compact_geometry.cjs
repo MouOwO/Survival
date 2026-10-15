@@ -29,7 +29,7 @@ for(const [key] of stats){
  const row=nodes['HandoffStatRow_'+key]=panel('HandoffStatRow_'+key);
  for(const prefix of ['HandoffStatIcon_','HandoffStatName_','HandoffStat_','HandoffStatBonus_','HandoffStatPercent_'])nodes[prefix+key]=panel(prefix+key,row);
 }
-const env={stats,nodes,valid:p=>!!p,style:(p,v)=>Object.assign(p.style,v),create:(type,parent,id)=>{created++;return nodes[id]=panel(id,parent);}};
+const env={stats,nodes,ctx:{actualuiscale_y:1},valid:p=>!!p,style:(p,v)=>Object.assign(p.style,v),create:(type,parent,id)=>{created++;return nodes[id]=panel(id,parent);}};
 vm.createContext(env);
 // Exercise production place(), including its fixed minWidth assignment.
 vm.runInContext(source.slice(source.indexOf('    function cssNumber('),source.indexOf('    function create(')),env);
@@ -108,5 +108,17 @@ for(const [presentation,building,tree,rounded] of [
  assert.equal(plate.style.overflow,rounded?'clip':'noclip','clipping restores when switching between compact and hero selection');
  assert.equal(plate.style.borderRadius,rounded?'14px 14px 0px 0px':'0px');
 }
+// The five-pixel adjustment remains exact under HUD and window scaling.
+for(const [width,height] of [[1280,720],[1920,1080],[2560,1440]])for(const uiScale of [.75,1,1.25]){
+ const g=geometry(width,height,7,false,false,{attributes:true});
+ env.ctx.actualuiscale_y=uiScale;env.layoutStats(g);
+ for(let index=0;index<6;index++){
+  const row=nodes['HandoffStatRow_'+stats[index][0]].style;
+  const y=parseFloat(row.position.split(' ')[1]);
+  assert(Math.abs((y-(32+(index%3)*98))*g.scale*uiScale-5)<.001,'all six stats move down five physical pixels');
+  assert.equal(row.position.split(' ')[1],nodes['HandoffStatRow_'+stats[(index+3)%6][0]].style.position.split(' ')[1],'opposing stats stay level');
+ }
+}
+env.ctx.actualuiscale_y=1;
 assert.equal(created,12,'layout reuses its six main/bonus groups across selection changes');
 console.log('HUD_COMPACT_GEOMETRY_PASS: 640/1280/1920/2560px; four/seven/32 native abilities; six items; centered whole HUD; fixed left icon/value columns; matching row heights; compact padding; long values; worker/tree/building transitions; isolated compact top-corner clipping');
