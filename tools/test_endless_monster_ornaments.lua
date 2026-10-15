@@ -21,12 +21,13 @@ local function forbidden() error("must not scan, bone merge or schedule position
 Entities = { FindAllByClassname = forbidden, FindByClassname = forbidden }
 Timers = { CreateTimer = forbidden }
 package.loaded["core/scheduler"] = { after = forbidden, every = forbidden }
-local function unit(index)
+local function unit(index, name)
     local u = { index = index, alive = true, position = Vector(0, 0, 0),
         attachments = { attach_hitloc = 1, attach_attack1 = 2 } }
     function u:IsNull() return self.removed == true end
     function u:IsAlive() return self.alive end
     function u:entindex() return self.index end
+    function u:GetUnitName() return name or "npc_survival_wave_monster" end
     function u:ScriptLookupAttachment(name) return self.attachments[name] or 0 end
     function u:SetThink() forbidden() end
     return u
@@ -83,14 +84,16 @@ equal(live_count(), 2)
 equal(pieces[1].parent, first)
 equal(pieces[1].owner, first)
 equal(pieces[1].attachment, "attach_hitloc")
-near(pieces[1].scale, 0.06 * (2 / 3))
-near(pieces[1].origin.y, 9.6 * (2 / 3))
-near(pieces[1].origin.z, 14.4 * (2 / 3))
+near(pieces[1].scale, 0.06)
+near(pieces[1].origin.y, 9.6)
+near(pieces[1].origin.z, 14.4)
+equal(pieces[1].survival_visual_scale_multiplier, 1, "prop records the monster owner's exemption")
+near(pieces[1].survival_visual_base_scale, 0.06)
 equal(pieces[1].angles[2], 10)
 -- Static native parenting must follow movement without another Apply or tick.
 first.position = Vector(200, -300, 30)
 local world = pieces[1]:world_position()
-near(world.x, 200); near(world.y, -300 + 9.6 * (2 / 3)); near(world.z, 30 + 14.4 * (2 / 3))
+near(world.x, 200); near(world.y, -290.4); near(world.z, 44.4)
 for _ = 1, 20 do
     local stable, result, retained = module.apply(first, appearance())
     assert(stable and result == "unchanged" and retained == pieces)
@@ -105,9 +108,9 @@ assert(reloaded == "unchanged" and retained == pieces and spawn_calls == 2)
 local grown = appearance(1.8)
 ok, _, retained = module.apply(first, grown)
 assert(ok and pieces[1].removed and pieces[2].removed)
-near(retained[1].scale, 0.09 * (2 / 3))
-near(retained[1].origin.y, 14.4 * (2 / 3))
-near(retained[1].origin.z, 21.6 * (2 / 3))
+near(retained[1].scale, 0.09)
+near(retained[1].origin.y, 14.4)
+near(retained[1].origin.z, 21.6)
 assert(grown.model_scale == 1.8 and grown.ornaments[1].model_scale == 0.05
     and grown.ornaments[1].local_origin[3] == 12, "authored cached ornament rows remain immutable")
 equal(live_count(), 2)
@@ -133,7 +136,7 @@ fallback_visual.ornaments[1].attachment = "not_a_real_attachment"
 ok, _, pieces = module.apply(fallback, fallback_visual)
 assert(ok)
 equal(pieces[1].attachment, "")
-near(pieces[1].origin.x, 1.5 * (2 / 3)); near(pieces[1].origin.y, 3 * (2 / 3)); near(pieces[1].origin.z, 105 * (2 / 3))
+near(pieces[1].origin.x, 1.5); near(pieces[1].origin.y, 3); near(pieces[1].origin.z, 105)
 equal(pieces[1].angles[1], 0); equal(pieces[1].angles[2], 0); equal(pieces[1].angles[3], 0)
 equal(pieces[2].attachment, "", "missing mouth attachment must also use the root")
 equal(pieces[2].angles[1], 0); equal(pieces[2].angles[3], 0)
@@ -150,7 +153,7 @@ fallback_visual.ornaments[1].root_origin = nil
 fallback_visual.bounds = { min = { -20, -10, 0 }, max = { 60, 10, 80 } }
 ok, _, pieces = module.apply(fallback, fallback_visual)
 assert(ok)
-near(pieces[1].origin.x, 30 * (2 / 3)); near(pieces[1].origin.z, 120 * (2 / 3))
+near(pieces[1].origin.x, 30); near(pieces[1].origin.z, 120)
 -- A native skin or the first outfit round clears custom props instead of
 -- reusing the previous round's ornaments over the native bundle.
 local empty = { model_scale = 1.5, ornaments = {} }
@@ -209,4 +212,12 @@ failed, reason = module.apply(invalid, { ornaments = {
 } })
 assert(not failed and reason == "invalid_ornament_transform" and live_count() == 0)
 assert(module.clear(nil))
+-- Sharing a model or prop implementation with a monster does not exempt a worker.
+local worker = unit(8, "npc_survival_lumberjack")
+ok, _, pieces = module.apply(worker, appearance())
+assert(ok)
+near(pieces[1].scale, 0.06 * (2 / 3))
+near(pieces[1].origin.z, 14.4 * (2 / 3))
+near(pieces[1].survival_visual_scale_multiplier, 2 / 3)
+assert(module.clear(worker) and live_count() == 0)
 print("ENDLESS_ORNAMENTS_PASS parent movement, scale, stable/reload reuse, rollback, attachment fallback, death cleanup, index reuse, reentrant cleanup; spawns=" .. spawn_calls .. " removals=" .. removes)

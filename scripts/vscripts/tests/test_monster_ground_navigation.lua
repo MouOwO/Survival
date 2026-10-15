@@ -28,6 +28,7 @@ local function unit_mock()
     function unit:IsNull() return false end
     function unit:IsAlive() return true end
     function unit:entindex() return self.index end
+    function unit:GetUnitName() return self.unit_name end
     function unit:GetAbsOrigin() return self.position or marker:GetAbsOrigin() end
     function unit:GetHullRadius() return self.hull end
     function unit:SetHullRadius(radius)
@@ -195,7 +196,7 @@ local function set_upvalue(fn, wanted, value)
     error("missing fixture state: " .. wanted)
 end
 local function archetype(kind, scale)
-    return { unit_name = "test_native_flying_unit", model_path = "boss.vmdl",
+    return { unit_name = "npc_survival_wave_test_native_flying_unit", model_path = "boss.vmdl",
         normal_flying_model_path = "flying.vmdl", movement_type = kind,
         model_scale = scale or 1, health = 1000, attack = 10, attack_speed = 1,
         attack_type = "melee", enabled = true }
@@ -210,7 +211,7 @@ local function check(unit, definition, override, expected_model)
     local tower = { IsNull = function() return false end, survival_tower_class = "class_7" }
     assert(anti_air.can_attack(tower, unit) == flying, "anti-air targeting changed")
     assert(unit.model == expected_model and unit.original_model == expected_model)
-    assert(unit.scale == definition.model_scale * (2 / 3), "authored visual size must shrink exactly once")
+    assert(unit.scale == definition.model_scale, "monster visual size must remain authored")
 end
 
 -- Every configured monster may retain its combat classification, independent
@@ -291,7 +292,7 @@ for _, row in ipairs(real_waves.rows) do
             visual_swap_count = visual_swap_count + 1
         end
         assert(unit.model == expected_model and unit.original_model == expected_model, row.wave_id)
-        assert(unit.scale == expected_scale * (2 / 3), "production visual scale must shrink exactly once: " .. row.wave_id)
+        assert(unit.scale == expected_scale, "production monster scale must remain authored: " .. row.wave_id)
         assert(unit.hull == 32 and unit.survival_base_monster_hull_radius == 32
             and unit.survival_monster_hull_radius == 32 and unit.placement_hull == 32
             and unit.survival_monster_hull_multiplier == 1,

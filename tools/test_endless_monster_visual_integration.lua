@@ -211,7 +211,7 @@ local function assert_body(body, number)
         "factory and visual assembly preserve the configured actual body")
     check(body.survival_endless_monster_visual and body.survival_endless_visual_id == visual.visual_id,
         "real visual service owns the resolved outfit")
-    near(body.scale, visual.model_scale * (2 / 3), "authored body scale shrinks exactly once")
+    near(body.scale, visual.model_scale, "monster body retains its original authored scale")
     near(body.survival_endless_health, stats.health, "logical health remains authored")
     near(body.survival_endless_attack, stats.attack, "logical attack remains authored")
     near(body.health * body.survival_endless_health_scale, stats.health, "native health projection remains exact")
@@ -231,8 +231,10 @@ local function assert_body(body, number)
         local actual = body.survival_model_appearance_state.components[declared.component_id]
         check(actual and not actual.removed and actual.model == declared.model_path and actual.bone_merge,
             "complete native outfit contains its exact declared component")
-        near(actual.scale, (tonumber(declared.model_scale) or 1) * visual.model_scale * (2 / 3),
+        near(actual.scale, (tonumber(declared.model_scale) or 1) * visual.model_scale,
             "native wearable scales with its owner's final visual scale")
+        near(actual.survival_visual_scale_multiplier, 1,
+            "native wearables retain their monster owner's original-size context")
         local assembled = body.survival_endless_monster_visual.asset.components
         for _, component in ipairs(assembled) do
             if component.component_id == declared.component_id then
@@ -245,6 +247,8 @@ local function assert_body(body, number)
         if prop.survival_is_endless_monster_ornament then
             check(not prop.bone_merge and prop.parent == body and prop.local_origin,
                 "custom ornaments use static parent transforms instead of unrelated skeletons")
+            near(prop.survival_visual_scale_multiplier, 1,
+                "custom ornaments retain their monster owner's original-size context")
         end
     end
     return visual

@@ -3,6 +3,11 @@ local M = { multiplier = 2 / 3 }
 local original_size_ids = { arrow_tower = true, building_arrow_tower = true, ultimate_tower = true, wall = true, building_wall = true }
 local original_size_names = { building_arrow_tower = true, npc_dota_unit_ultimate_tower = true, building_wall = true }
 
+local function monster_name(name)
+    return type(name) == "string" and (name:match("^npc_survival_wave_")
+        or name:match("^npc_survival_named_")) ~= nil
+end
+
 local function valid(entity)
     return entity and (not entity.IsNull or not entity:IsNull())
 end
@@ -22,11 +27,14 @@ function M.factor(entity, building_id)
     if original_size_ids[building_id] then return 1 end
     if valid(entity) then
         if original_size_ids[entity.survival_building_id] then return 1 end
+        if entity.survival_is_wave_monster == true or entity.survival_is_challenge_monster == true
+            or entity.survival_rebirth_scene_display == true then return 1 end
         if type(entity.GetUnitName) == "function" then
             local ok, name = pcall(entity.GetUnitName, entity)
-            if ok and original_size_names[name] then return 1 end
+            -- The spawn event precedes monster role flags and authored scale assignment.
+            if ok and (original_size_names[name] or monster_name(name)) then return 1 end
         end
-        -- Props and previews may carry an explicit exempt building identity without an NPC name.
+        -- Props and previews inherit their owner's exemption without an NPC name.
         if building_id == nil and entity.survival_visual_scale_exempt then return 1 end
     end
     return M.multiplier

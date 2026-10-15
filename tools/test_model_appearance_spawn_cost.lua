@@ -162,4 +162,17 @@ local arrow_ok,_,arrow_parts=module.Apply(arrow,explicit_asset,{fresh_unit=true}
 assert(arrow_ok and arrow_parts.head.scale==0.9
     and arrow_parts.head.survival_visual_scale_multiplier==1,
     "an explicit tower component keeps the owner's exemption and baseline")
-print("APPEARANCE_MODEL_SCALE_PASS authored overrides, single factor, repeated apply, immutable cache and arrow-tower exemption")
+local monster=entity("npc_dota_creature",9602,"body.vmdl")
+function monster:GetUnitName() return "npc_survival_wave_monster" end
+local monster_ok,_,monster_parts=module.Apply(monster,explicit_asset,{fresh_unit=true})
+assert(monster_ok and monster_parts.head.scale==0.9
+    and monster_parts.head.survival_visual_scale_multiplier==1
+    and monster_parts.head.survival_visual_base_scale==0.9,
+    "monster parts retain their authored scale and owner's original-size baseline")
+local monster_spawns=spawns
+for _=1,20 do
+    local stable,_,retained=module.Apply(monster,explicit_asset)
+    assert(stable and retained==monster_parts and retained.head.scale==0.9)
+end
+assert(spawns==monster_spawns and explicit_asset.components[1].model_scale==0.9)
+print("APPEARANCE_MODEL_SCALE_PASS authored overrides, single factor, repeated apply, immutable cache, arrow-tower and monster exemptions")

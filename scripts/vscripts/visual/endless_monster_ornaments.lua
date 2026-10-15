@@ -176,6 +176,9 @@ function M.apply(unit, visual)
         })
         if not ok or not valid(part) then return abandon("ornament_spawn_failed") end
         parts[#parts + 1] = part
+        -- This final size was calculated in the owner's scale context. Props
+        -- have no NPC name, so preserve that context when recording the base.
+        part.survival_visual_scale_exempt = model_scale.factor(unit) == 1
         if not call(part, "SetOwner", unit)
             or not call(part, "SetParent", unit, entry.attachment)
             or not call(part, "SetLocalOrigin", Vector(unpack(entry.origin)))

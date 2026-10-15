@@ -142,7 +142,8 @@ for _, unit in ipairs(displays()) do
     local marker = markers[points.by_id[encounter.spawn_point_id].hammer_target_name]
     assert(unit.origin.x == marker.origin.x and unit.origin.y == marker.origin.y
         and unit.origin.z == marker.origin.z - 24 and unit.forward.y == -1)
-    assert(unit.model == definition.model_path and unit.original == unit.model and unit.scale == definition.model_scale*(2/3))
+    assert(unit.model == definition.model_path and unit.original == unit.model and unit.scale == definition.model_scale,
+        "rebirth display keeps its original monster scale")
     assert(unit.outfit == definition.default_wearable_asset_id)
     assert(unit.team == 4 and unit.acquire == false and unit.acquisition == 0 and unit.day == 0 and unit.night == 0)
     assert(unit.hull == 0 and unit.xp == 0 and unit.gold_min == 0 and unit.gold_max == 0)
@@ -155,6 +156,8 @@ assert(not start(1).ok and #displays() == 10, "combat creation failure must reta
 failure = nil
 local first = assert(start(1))
 assert(first.ok and #displays() == 9 and spawned == 1 and completed == 0)
+assert(units[first.entindex].scale == definitions.by_id.rebirth_boss_01.model_scale,
+    "combat and displayed rebirth bosses use the same original size")
 assert(not start(1, 1).ok and #displays() == 9, "failed competing challenge must not restore active arena")
 bus.emit(events.HERO_RETURNED_HOME, { player_id = 0, hero = hero })
 assert(#displays() == 10 and completed == 0, "cancel returns the display without a kill reward")

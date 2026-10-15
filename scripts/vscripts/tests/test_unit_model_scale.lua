@@ -41,6 +41,30 @@ assert(scale.apply(preview, 1.9, "arrow_tower")); near(preview.scale, 1.9)
 assert(scale.copy_final(preview, 1.9, "arrow_tower")); near(preview.scale, 1.9)
 assert(scale.apply(preview, 2.2, "wall")); near(preview.scale, 2.2)
 
+local archetypes = require("config/generated/monster_archetypes")
+local monster_count = 0
+for _, definition in ipairs(archetypes.rows) do
+    local monster = unit(definition.unit_name, definition.model_scale)
+    assert(scale.ensure(monster)); near(monster.scale, definition.model_scale)
+    assert(scale.apply(monster, definition.model_scale)); near(monster.scale, definition.model_scale)
+    near(scale.original(monster), definition.model_scale)
+    assert(monster.survival_visual_scale_multiplier == 1, definition.unit_name)
+    assert(monster.hull == 64 and monster.attack_range == 500 and monster.footprint.x == 4)
+    monster_count = monster_count + 1
+end
+assert(monster_count > 0)
+for _, name in ipairs({"npc_dota_hero_axe", "npc_survival_worker", "building_hero_altar",
+    "npc_archive_challenge_1", "asset_proxy_monster_undying_golem"}) do
+    local other = unit(name, 1.5)
+    assert(scale.ensure(other)); near(other.scale, 1)
+end
+for _, flag in ipairs({"survival_is_wave_monster", "survival_is_challenge_monster",
+    "survival_rebirth_scene_display"}) do
+    local renamed_monster = unit("renamed_monster", 1.5)
+    renamed_monster[flag] = true
+    assert(scale.ensure(renamed_monster)); near(renamed_monster.scale, 1.5)
+end
+
 local mirror = unit("npc_dota_hero_axe")
 assert(scale.copy_final(mirror, body:GetModelScale())); near(mirror.scale, 1.6)
 assert(scale.ensure(mirror)); near(mirror.scale, 1.6)
@@ -50,7 +74,7 @@ assert(not scale.apply(failed, 3)); assert(failed.survival_visual_final_scale ==
 assert(not scale.apply(body, -1)); assert(not scale.apply(body, 0/0))
 assert(not scale.apply(body, math.huge))
 
-local existing, spawned = unit("npc_dota_hero_doom_bringer", 1.2), unit("monster_boss", 3)
+local existing, spawned = unit("npc_dota_hero_doom_bringer", 1.2), unit("npc_survival_wave_monster", 3)
 local callback, listeners, scans = nil, 0, 0
 ListenToGameEvent = function(name, fn)
     assert(name == "npc_spawned"); callback = fn; listeners = listeners + 1
@@ -62,10 +86,10 @@ EntIndexToHScript = function(id) return id == 12 and spawned or nil end
 local service = require("systems/unit_model_scale_service")
 service.init(); service.init()
 assert(listeners == 1 and scans == 3); near(existing.scale, 0.8)
-callback({entindex = 12}); callback({entindex = 12}); near(spawned.scale, 2)
+callback({entindex = 12}); callback({entindex = 12}); near(spawned.scale, 3)
 assert(spawned.writes == 1)
-assert(scale.apply(spawned, 4.5)); near(spawned.scale, 3)
-callback({entindex = 12}); near(spawned.scale, 3)
+assert(scale.apply(spawned, 4.5)); near(spawned.scale, 4.5)
+callback({entindex = 12}); near(spawned.scale, 4.5)
 local illusion = unit("npc_dota_hero_doom_bringer", existing.scale)
 function illusion:IsIllusion() return true end
 function illusion:GetReplicatingOtherHero() return existing end
@@ -76,4 +100,4 @@ for _, name in ipairs({"npc_survival_grid_preview_proxy", "npc_survival_upgrade_
 end
 local thinker = unit("thinker"); thinker.classname = "npc_dota_thinker"
 assert(not service.apply(thinker)); assert(thinker.writes == 0)
-print("UNIT_MODEL_SCALE_PASS: two-thirds output, towers and walls exempt, refresh/respawn idempotence, exact copies, unchanged gameplay geometry, one spawn hook and no polling")
+print("UNIT_MODEL_SCALE_PASS: " .. monster_count .. " monster definitions at original size, towers and walls exempt, other units at two-thirds, unchanged geometry, one spawn hook and no polling")
