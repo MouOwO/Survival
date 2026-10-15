@@ -234,7 +234,7 @@ test('stock and repeat-purchase availability update existing cards in full and d
     h.full({entries: [item({stock: 0, purchasable: 0, disabled_reason_code: 'stock_empty'})]});
     assert(h.card('sword') === original, 'stock is state, so changing it keeps the tile');
     assert(original.BHasClass('StockEmpty')); assert.equal(original.__survivalStockLabel.text, '0/5');
-    assert.equal(original.__survivalStockLabel.visible, true, 'The shared V10 cell exposes the current stock corner count'); assertNoRebuild(h, 'stock update');
+    assert.equal(original.__survivalStockLabel.visible, false, 'The compact shop keeps the stock corner label hidden after updates'); assertNoRebuild(h, 'stock update');
     h.delta({changed_entries: [item({stock: 1})]});
     assert(h.card('sword') === original, 'stock delta keeps the original card'); assert(!original.BHasClass('StockEmpty'));
     assert.equal(original.__survivalStockLabel.text, '1/5');

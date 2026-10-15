@@ -4,7 +4,7 @@
     var activeEntry = null, activeSource = null, pinned = false;
     var tooltipHovered = false, hideJob = null, generation = 0;
     var purchaseButton = null, purchaseLabel = null, autoButton = null, autoLabel = null;
-    var tooltipSkin = null, tooltipDismiss = null, tooltipDismissPanel = null;
+    var tooltipDismiss = null, tooltipDismissPanel = null;
     var tooltipContext = $.GetContextPanel ? $.GetContextPanel() : null, api = null;
     var previousTooltip = cfg.SurvivalShopTooltip;
     if (previousTooltip && previousTooltip.DisposeTooltip) previousTooltip.DisposeTooltip();
@@ -14,7 +14,7 @@
             if (tooltipDismiss) tooltipDismiss.Dispose();
             tooltipDismissPanel = tooltip;
             tooltipDismiss = cfg.SurvivalTooltipDismiss.Create({panel:tooltip,
-                surface:tooltipSkin && tooltipSkin.surface,
+                getRect:tooltipRect,
                 hide:hide,
                 isAlive:function () { return (!tooltipContext || valid(tooltipContext))
                     && (!api || cfg.SurvivalShopTooltip === api); },
@@ -30,6 +30,19 @@
         return formatter && formatter.Format ? formatter.Format(value) : String(value || 0);
     }
     function numberOr(value, fallback) { return typeof value === "number" && isFinite(value) ? value : fallback; }
+    function shopFitScale(node) {
+        for (var owner = node; owner && owner !== tooltipContext; owner = owner.GetParent ? owner.GetParent() : null) {
+            if (owner.id !== "CustomShopWindow") continue;
+            var match = String(owner.style.transform || "").match(/scale3d\(\s*([\d.eE+-]+)/);
+            return match && Number(match[1]) > 0 && isFinite(Number(match[1])) ? Number(match[1]) : 1;
+        }
+        return 1;
+    }
+    function tooltipRect(node) {
+        var at = node.GetPositionWithinWindow(), scale = shopFitScale(node);
+        // Native layout sizes omit CSS Fit; the root-level tooltip stays unscaled.
+        return {x:at.x,y:at.y,width:node.actuallayoutwidth * scale,height:node.actuallayoutheight * scale};
+    }
     function cancelHide() {
         generation++;
         if (hideJob !== null && $.CancelScheduled) $.CancelScheduled(hideJob);
@@ -62,24 +75,20 @@
             var owner = byId("CustomShopWindow");
             if (!valid(owner)) return;
             var pp = parent.GetPositionWithinWindow(), sp = source.GetPositionWithinWindow(), wp = owner.GetPositionWithinWindow();
-            var menu=owner.__shopMenuV10, viewScale=menu?menu.Scale():1;
-            var sx = Math.max(0.001, numberOr(parent.actualuiscale_x, 1)*viewScale);
-            var sy = Math.max(0.001, numberOr(parent.actualuiscale_y, 1)*viewScale);
+            var sx = Math.max(0.001, numberOr(parent.actualuiscale_x, 1));
+            var sy = Math.max(0.001, numberOr(parent.actualuiscale_y, 1));
             var y = (numberOr(sp.y, 0) - numberOr(pp.y, 0)) / sy;
             var wx = (numberOr(wp.x, 0) - numberOr(pp.x, 0)) / sx;
-            var ww = 1672;
-            var nativeScale=Math.max(.001,numberOr(parent.actualuiscale_y,1));
-            var frame=byId("ShopTooltipFrame"),th=Math.min(704,Math.max(246,(Number(frame&&frame.actuallayoutheight)||250*nativeScale)/nativeScale+48));
-            var tw=368;
-            if(tooltipSkin)tooltipSkin.Resize(tw,th);
-            tooltip.style.width=tw+"px";tooltip.style.height=th+"px";
-            var ph=941;
-            var sw=144;
-            var sourceX=(numberOr(sp.x,0)-numberOr(pp.x,0))/sx;
-            var left=sourceX+sw+8;
-            if(left+tw>wx+ww-24)left=sourceX-tw-8;
-            left=Math.max(wx+24,Math.min(left,wx+ww-tw-24));
-            var top = Math.max(128, Math.min(y - 24, ph - th - 40));
+            var ww = numberOr(owner.actuallayoutwidth, 680) * shopFitScale(owner) / sx;
+            var tw = (numberOr(tooltip.actuallayoutwidth, 370) || 370) / sx;
+            var th = (numberOr(tooltip.actuallayoutheight, 300) || 300) / sy;
+            var pw = numberOr(parent.actuallayoutwidth, 1920) / sx;
+            var ph = numberOr(parent.actuallayoutheight, 1080) / sy;
+            // The transparent 22px gutter contains the pointer; native parents clip negative children.
+            var left = wx + ww;
+            if (left + tw > pw - 12) left = wx - tw - 22;
+            left = Math.max(12, Math.min(left, pw - tw - 12));
+            var top = Math.max(12, Math.min(y - 32, ph - th - 12));
             tooltip.style.position = Math.round(left) + "px " + Math.round(top) + "px 0px";
             var arrow = byId("ShopTooltipArrow");
             if (arrow) {
@@ -100,12 +109,14 @@
     function ensureActions(tooltip) {
         if (purchaseButton || !$.CreatePanel || !tooltip.SetPanelEvent) return;
         tooltip.AddClass("ShopPurpleTooltip");
-        tooltip.AddClass("MenuV10ShopTooltip");
         var frame = byId("ShopTooltipFrame") || tooltip;
-        if(cfg.SurvivalMenuV10){tooltipSkin=cfg.SurvivalMenuV10.SkinTooltip(tooltip);frame.SetParent(tooltipSkin.surface);}
         var arrow = $.CreatePanel("Panel", tooltip, "ShopTooltipArrow");
         arrow.hittest = false; arrow.hittestchildren = false;
-        arrow.visible=false;
+        ["TL","TR","BL","BR"].forEach(function(c) {
+            var corner = $.CreatePanel("Panel", tooltip, "");
+            corner.AddClass("ShopFrameCorner"); corner.AddClass("ShopFrameCorner" + c);
+            corner.hittest = false; corner.hittestchildren = false;
+        });
         purchaseButton = $.CreatePanel("Button", frame, "ShopTooltipPurchase");
         purchaseButton.AddClass("ShopTooltipPurchase"); purchaseButton.hittestchildren = false;
         purchaseLabel = $.CreatePanel("Label", purchaseButton, ""); purchaseLabel.hittest = false;

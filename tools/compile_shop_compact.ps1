@@ -6,7 +6,7 @@ $compiler=Join-Path $engine 'game/bin/win64/resourcecompiler.exe'
 $files=@('images/custom_game/shop_compact_v1/knowledge_red.png','images/custom_game/shop_compact_v1/knowledge_blue.png',
  'scripts/custom_game/remaining_5d5c1152eb.js','scripts/custom_game/shop_remaining_5d5c1152eb.js',
  'scripts/custom_game/shop_tooltip_remaining_5d5c1152eb.js','scripts/custom_game/topnav_remaining_5d5c1152eb.js',
- 'scripts/custom_game/item_art_remaining_5d5c1152eb.js','styles/custom_game/remaining_5d5c1152eb.css',
+ 'scripts/custom_game/item_art_remaining_5d5c1152eb.js','styles/custom_game/remaining_5d5c1152eb.css','styles/custom_game/shop.css',
  'layout/custom_game/shop_compact_assets.xml','layout/custom_game/survival_hud.xml')
 foreach($rel in $files){
  $target=Join-Path $content $rel
