@@ -115,7 +115,6 @@
                 <Panel id="DifficultySelectionArt" hittest="false" hittestchildren="false" />
                 <Panel id="DifficultySelectionHeader" class="UIModalHeader" hittest="false">
                     <Label id="DifficultySelectionTitle" class="UIFontTitle" text="难度选择" />
-                    <Label id="DifficultySelectionMode" text="" visible="false" />
                 </Panel>
                 <Panel id="DifficultySelectionBody">
                     <Label id="DifficultySelectionHint" text="" visible="false" />
@@ -125,10 +124,6 @@
                     </Panel>
                     <Label id="DifficultySelectionError" text="" visible="false" />
                     <Panel id="MatchSetupRetryHost" visible="false" />
-                </Panel>
-                <Panel id="DifficultySelectionFooter" visible="false">
-                    <Label id="DifficultySelectionCurrent" text="当前选择：尚未选择" />
-                    <Panel id="DifficultySelectionConfirmHost" />
                 </Panel>
             </Panel>
         </Panel>

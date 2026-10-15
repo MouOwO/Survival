@@ -9,7 +9,7 @@
     var difficultyRequestPending = false;
     var difficultyOptionsSignature = "";
     var difficultyWave = null, difficultyChoice = "", difficultyRows = {};
-    var difficultyModal = null, difficultyConfirm = null, difficultyRequestSerial = 0;
+    var difficultyModal = null, difficultyRequestSerial = 0;
     var difficultyDismissed = false, difficultyPhase = "", difficultyResume = null;
     var startupState = null, setupSession = "", modeChoice = "", modeAcknowledged = "";
     var modePending = false, modeError = "", modeRequestSerial = 0, modeSignature = "", modeRows = {};
@@ -108,13 +108,13 @@
     function confirmMode() {
         if (!admissionComplete() || !needsMode() || !modeSelector() || modePending || !setupSession
             || !modeOptions().some(function (option) { return option.mode_id === modeChoice; })) return;
-        modePending = true; modeError = "正在确认模式……";
+        modePending = true; modeError = "";
         var serial = ++modeRequestSerial, requestedSession = setupSession;
         GameEvents.SendCustomGameEventToServer("survival_loading_mode_select", {session_id: setupSession, mode_id: modeChoice});
         renderDifficultySelection(difficultyWave);
         $.Schedule(12, function () {
             if (serial !== modeRequestSerial || requestedSession !== setupSession || !modePending || !needsMode()) return;
-            modePending = false; modeError = "确认尚未完成，请检查连接后重试。";
+            modePending = false; modeError = "选择未完成，请检查连接后重试。";
             renderDifficultySelection(difficultyWave);
         });
     }
@@ -128,10 +128,10 @@
         }
         modePending = false; modeRequestSerial++;
         var messages = {selection_not_host: "由房主统一选择本局模式。", mode_selector_required: "由房主统一选择本局模式。",
-            mode_locked: "本局模式已经确认，正在刷新状态。", invalid_mode: "该模式不可用，请重新选择。",
+            mode_locked: "本局模式已选择，正在刷新。", invalid_mode: "该模式不可用，请重新选择。",
             mode_not_found: "该模式不可用，请重新选择。", match_session_mismatch: "游戏状态已更新，请等待刷新后重试。",
             session_mismatch: "游戏状态已更新，请等待刷新后重试。", startup_not_ready: "入场准备尚未完成，请稍候。"};
-        modeError = messages[payload && payload.error] || "模式确认失败，请重试。";
+        modeError = messages[payload && payload.error] || "模式选择失败，请重试。";
         readStartup(); renderDifficultySelection(difficultyWave);
     }
     function renderModeChoice(ui) {
@@ -144,24 +144,20 @@
                 var button = $.CreatePanel("Button", panel("MatchModeOptions"), ""); button.AddClass("MatchModeOption"); button.hittestchildren = false;
                 var name = $.CreatePanel("Label", button, ""); name.AddClass("MatchModeOptionName"); name.html = false;
                 name.text = option.display_name || (option.mode_id === "pure" ? "纯净模式" : "常规模式");
-                var description = $.CreatePanel("Label", button, ""); description.AddClass("MatchModeOptionDescription"); description.html = false;
-                description.text = option.description || "";
                 ui.State.Bind(button, function () {
-                    if (!needsMode() || !modeSelector() || modePending) return;
-                    modeChoice = option.mode_id; modeError = ""; renderDifficultySelection(difficultyWave);
+                    if (!admissionComplete() || !needsMode() || !modeSelector() || modePending) return;
+                    modeChoice = option.mode_id; modeError = ""; confirmMode();
                 });
                 modeRows[option.mode_id] = button;
             });
         }
-        options.forEach(function (option) { ui.State.Set(modeRows[option.mode_id], {selected: option.mode_id === modeChoice, enabled: selector && !modePending}); });
-        var selected = options.filter(function (option) { return option.mode_id === modeChoice; })[0];
+        options.forEach(function (option) { ui.State.Set(modeRows[option.mode_id], {
+            selected: option.mode_id === modeChoice, enabled: selector && !modePending,
+            busy: modePending && option.mode_id === modeChoice}); });
         setText("DifficultySelectionTitle", "模式选择");
-        setText("DifficultySelectionMode", "选择模式  ·  选择难度");
-        setText("DifficultySelectionHint", selector ? "请选择本局模式，确认后立即选择难度" : "等待房主统一选择本局模式");
-        panel("DifficultySelectionHint").visible = true;
-        setText("DifficultySelectionCurrent", "当前选择：" + (selected ? selected.display_name || selected.mode_id : "尚未选择"));
+        setText("DifficultySelectionHint", selector ? "" : "等待房主选择模式");
+        panel("DifficultySelectionHint").visible = !selector;
         setText("DifficultySelectionError", modeError);
-        ui.State.Set(difficultyConfirm, {enabled: selector && !!selected && !modePending, busy: modePending});
     }
     function difficultyUnlocked(option) { return !!option && (option.unlocked === true || Number(option.unlocked) === 1); }
     function difficultySelector() {
@@ -225,7 +221,6 @@
                 : "";
             row.availability.visible = !difficultyUnlocked(row.option);
         });
-        if (difficultyConfirm) ui.State.Set(difficultyConfirm, {enabled: false, busy: false});
     }
     function selectDifficulty() {
         var selected = selectedDifficulty();
@@ -298,9 +293,6 @@
             panel("DifficultySelectionHeader").style.backgroundColor = "transparent";
             panel("DifficultySelectionHeader").style.borderBottom = "1px solid #9d804b";
             panel("DifficultySelectionTitle").style.color = "#f3e4b0";
-            difficultyConfirm = ui.ActionButton(panel("DifficultySelectionConfirmHost"), {
-                id: "DifficultySelectionConfirm", variant: "gold", label: "确认模式", enabled: false,
-                action: confirmMode});
             difficultyResume = $.CreatePanel("Button", $.GetContextPanel(), "DifficultySelectionResume");
             difficultyResume.AddClass("DifficultySelectionResume");
             difficultyResume.hittest = true; difficultyResume.hittestchildren = false;
@@ -313,14 +305,13 @@
                 difficultyDismissed = false; renderDifficultySelection(difficultyWave);
             });
         }
-        panel("DifficultySelectionDialog").style.width = (choosingMode ? 620 : 275) + "px";
-        panel("DifficultySelectionDialog").style.height = (choosingMode ? 440 : 670) + "px";
+        panel("DifficultySelectionDialog").style.width = "275px";
+        var modeNotice = choosingMode && (!!modeError || !modeSelector());
+        panel("DifficultySelectionDialog").style.height = (choosingMode ? (modeNotice ? 248 : 190) : 670) + "px";
+        panel("DifficultySelectionDialog").SetHasClass("MatchSetupMode", choosingMode);
         if (!difficultyDismissed && !difficultyModal.IsOpen()) difficultyModal.Open();
         var wasChoosingMode = panel("MatchModeOptions").visible;
         panel("MatchModeOptions").visible = choosingMode;
-        panel("DifficultySelectionFooter").visible = choosingMode;
-        panel("DifficultySelectionCurrent").visible = choosingMode;
-        panel("DifficultySelectionMode").visible = false;
         container.visible = !choosingMode;
         if (choosingMode) { panel("MatchSetupRetryHost").visible = false; renderModeChoice(ui); return; }
         setText("DifficultySelectionTitle", "难度选择");

@@ -11,24 +11,52 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     const ui = harness({startupState: startup, hud: true, loadSharedUI: true});
     ui.advance(0.11);
     const modal = ui.config.SurvivalUI.ModalManager.Get("survival_difficulty");
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px");
     click(ui.nodes.MatchModeOptions.children[0]);
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px");
     ui.config.SurvivalUILayers.HandleEscape("survival_difficulty");
     assert(!modal.IsOpen());
     assert(ui.nodes.DifficultySelectionOverlay.BHasClass("DifficultySelectionHidden"));
     assert(ui.nodes.DifficultySelectionResume.visible);
     assert.equal(ui.nodes.DifficultySelectionResume.children[0].text, "继续选择模式");
-    assert(!ui.requests.some(request => request.name === "survival_loading_mode_select"));
+    assert.equal(ui.requests.filter(request => request.name === "survival_loading_mode_select").length, 1,
+        "the mode name submits once before Escape");
     ui.setStartup({...startup}); ui.advance(0.5);
     assert(!modal.IsOpen(), "same-phase updates do not reopen the popup");
     click(ui.nodes.DifficultySelectionResume);
     assert(modal.IsOpen()); assert(!ui.nodes.DifficultySelectionResume.visible);
     assert(ui.nodes.MatchModeOptions.children[0].BHasClass("UISelected"));
-    click(ui.nodes.DifficultySelectionConfirm);
+    assert(ui.nodes.MatchModeOptions.children[0].BHasClass("UIBusy"));
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px");
+    click(ui.nodes.MatchModeOptions.children[1]);
     assert.equal(ui.requests.filter(request => request.name === "survival_loading_mode_select").length, 1);
     ui.setStartup({...startup, setup: {...setup, mode_selected: true, mode_id: "pure"}});
     assert(modal.IsOpen(), "next setup phase remains usable");
     assert.equal(ui.nodes.DifficultySelectionTitle.text, "难度选择");
-    assert(!ui.nodes.DifficultySelectionFooter.visible && !ui.nodes.DifficultySelectionConfirm.enabled);
+    assert.equal(ui.nodes.DifficultySelectionConfirm, undefined);
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "670px");
+    assert(!ui.nodes.DifficultySelectionDialog.BHasClass("MatchSetupMode"));
+}
+{
+    const startup = ready({admission_complete: true, profiles_ready: true, setup});
+    const ui = harness({startupState: startup, hud: true, loadSharedUI: true}); ui.advance(0.11);
+    const modal = ui.config.SurvivalUI.ModalManager.Get("survival_difficulty");
+    const modes = ui.nodes.MatchModeOptions.children;
+    click(modes[0]);
+    ui.emit("survival_loading_mode_result", {success: 0, error: "match_session_mismatch", session_id: "match-123"});
+    assert(ui.nodes.DifficultySelectionError.visible);
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "248px");
+    ui.config.SurvivalUILayers.HandleEscape("survival_difficulty");
+    assert(!modal.IsOpen());
+    click(ui.nodes.DifficultySelectionResume);
+    assert(modal.IsOpen());
+    assert(ui.nodes.DifficultySelectionError.text.includes("游戏状态已更新"));
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "248px", "resuming an error preserves its readable height");
+    click(modes[1]); click(modes[1]); click(modes[0]);
+    assert.equal(ui.requests.filter(request => request.name === "survival_loading_mode_select").length, 2);
+    assert.equal(ui.nodes.DifficultySelectionError.text, "");
+    assert(!ui.nodes.DifficultySelectionError.visible);
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px", "explicit retry restores compact mode layout");
 }
 {
     const wave = {status: "selecting_difficulty", mode_selected: true, game_mode: "pure", selector_player_id: 0,
@@ -46,7 +74,7 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     click(ui.nodes.DifficultySelectionResume);
     assert(modal.IsOpen()); assert(rows(ui)[1].BHasClass("UISelected"));
     assert(!rows(ui)[1].enabled, "pending difficulty cannot be resubmitted after resume");
-    click(ui.nodes.DifficultySelectionConfirm);
+    click(rows(ui)[0]);
     const requests = ui.requests.filter(request => request.name === "ui_difficulty_select_request");
     assert.equal(requests.length, 1); assert.equal(requests[0].payload.difficulty_id, "N2");
     ui.setState({sequence: 3, wave: {...wave, difficulty_selected: true, status: "countdown"}, resources: {}});
@@ -56,9 +84,11 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     const startup = ready({admission_complete: true, profiles_ready: true, setup});
     const ui = harness({startupState: startup, hud: true, loadSharedUI: true}); ui.advance(0.11);
     ui.config.SurvivalUILayers.HandleEscape("survival_difficulty");
+    assert(!ui.requests.some(request => request.name === "survival_loading_mode_select"), "Escape alone cannot choose a mode");
     ui.setStartup({...startup, session_id: "new-session"});
     assert(ui.config.SurvivalUI.ModalManager.Get("survival_difficulty").IsOpen(), "new match is not dismissed by the old one");
     assert(!ui.nodes.DifficultySelectionResume.visible);
+    assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "190px");
 }
 {
     // A native modal may leave inline visibility behind when its old closure is
@@ -75,4 +105,4 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     assert.equal(ui.config.SurvivalUILayers.Top(),null,"completed match removes an orphaned mandatory layer");
     assert(!ui.requests.some(r=>r.name==="ui_difficulty_select_request"),"visibility recovery does not select a difficulty");
 }
-console.log("ESCAPE_SETUP_WINDOWS_PASS: mode draft and pending direct difficulty survive hide/resume without extra requests; same-phase updates stay hidden, completed choices remove resume, new session reopens");
+console.log("ESCAPE_SETUP_WINDOWS_PASS: pending one-click mode and difficulty survive hide/resume without extra requests; same-phase updates stay hidden, completed choices remove resume, new session reopens");
