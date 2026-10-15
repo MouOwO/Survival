@@ -65,7 +65,7 @@
         rect(panel,0,0,368,246);
         var shadow=make("Panel",panel,"Shadow","ArchiveSharedTooltipShadow"); rect(shadow,24,24,320,198);
         var backing=nineFrame("Backing","tooltip_background"); backing.AddClass("ArchiveSharedTooltipBacking"); backing.Resize(24,24,320,198);
-        var frame=nineFrame("Frame","tooltip_frame"); frame.Resize(24,24,320,198);
+        var frame=nineFrame("Frame","tooltip_frame"); frame.AddClass("ArchiveSharedTooltipFrame"); frame.Resize(24,24,320,198);
         var surface=make("Panel",panel,"Surface","ArchiveSharedTooltipSurface"); rect(surface,24,24,320,198);
         surface.hittest=true; surface.hittestchildren=true; style(surface,{flowChildren:"none",overflow:"clip"});
         var viewport=make("Panel",surface,"Viewport","ArchiveSharedTooltipViewport"); rect(viewport,22,19,bodyWidth+16,157);
