@@ -78,13 +78,13 @@
     function categoryName(id){var row=categoryRows.filter(function(x){return x.id===id;})[0];return names[id]||row&&row.name||id;}
     function layoutSidebar(){
         if(!valid(sidebar))return;var index=0,needle=searchValue.toLowerCase();
-        Object.keys(sidebarButtons).forEach(function(id){var cell=sidebarButtons[id],show=!needle||categoryName(id).toLowerCase().indexOf(needle)>=0;cell.panel.visible=show;cell.panel.SetHasClass("ArchiveV10Selected",id===current);cell.selection.visible=id===current;cell.text.style.color=id===current?"#fff2ca":"#f0eadb";if(show)pos(cell.panel,0,(index++)*35,285,35);});
+        Object.keys(sidebarButtons).forEach(function(id){var cell=sidebarButtons[id],show=!needle||categoryName(id).toLowerCase().indexOf(needle)>=0;cell.panel.visible=show;cell.panel.SetHasClass("ArchiveV10Selected",id===current);cell.text.style.color=id===current?"#fff2ca":"#f0eadb";if(show)pos(cell.panel,0,(index++)*35,285,35);});
         p("ArchiveV10SearchEmpty").visible=index===0;
     }
     function renderSidebar(categories){
         var signature=JSON.stringify(categories||[]);if(signature!==sidebarKey){
             sidebar.RemoveAndDeleteChildren();sidebarButtons={};var ids=order.slice();list(categories).forEach(function(row){if(row.id!=="ex"&&row.id!=="friend"&&ids.indexOf(row.id)<0)ids.push(row.id);});
-            ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;var selected=component(button,"category_selected",0,0,285,35);selected.AddClass("ArchiveParchmentSelection");icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32);var text=serif(label(button,categoryName(id),47,5,231,29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text,selection:selected};});sidebarKey=signature;
+            ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32);var text=serif(label(button,categoryName(id),47,5,231,29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text};});sidebarKey=signature;
         }
         layoutSidebar();
     }
