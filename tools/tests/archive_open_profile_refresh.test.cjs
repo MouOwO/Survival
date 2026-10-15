@@ -355,22 +355,17 @@ assert.equal(descendant(visibleCards()[0], 'ArchiveV10Name').style.color, approv
 assert.equal(visibleCards()[0].__v10.normal.style.backgroundImage, approvedFrame, 'A legacy theme change cannot swap the approved original frame asset');
 
 const collectionCalls=[];cfg.SurvivalCollection={Open:id=>collectionCalls.push(id)};
-api.SelectCategory('friend');api.SelectCategory('ex');
-assert.deepEqual(collectionCalls,['friend','ex'],'Legacy social links open the independent collection');
-assert(!api.IsOpen(),'Forwarding a collection link closes the archive');
-api.Open();api.SelectCategory('beast');
-assert.equal(nodes.get('ArchiveDraw').enabled, true);
-activate(nodes.get('ArchiveDraw'));
-const drawRequests = requests.length; activate(nodes.get('ArchiveDraw'));
-assert.equal(requests.length, drawRequests, 'draw requests keep their local double-click gate');
-resend('beast');
-assert.equal(nodes.get('ArchiveDraw').enabled, true, 'an unchanged draw rejection releases the local gate');
+for (const category of ['friend', 'ex', 'beast']) {
+    api.Open();
+    const beforeForward = requests.length;
+    api.SelectCategory(category);
+    assert(!api.IsOpen(), 'Forwarding a collection link closes the archive: ' + category);
+    assert.equal(requests.length, beforeForward, 'The retired archive entry delegates its request to the collection controller: ' + category);
+}
+assert.deepEqual(collectionCalls,['friend','ex','beast'],'Legacy social and blessing links open their matching independent collection');
 resend('beast', {pending: 1});
-assert.equal(nodes.get('ArchiveDraw').enabled, false, 'pending draw state invalidates the view independently of rows');
-resend('beast', {pending: 0, social: {currency_name: '福签', tickets: 0,
-    draw_cost: 1, remaining: 1, total: 0}});
-assert.equal(nodes.get('ArchiveDraw').enabled, false, 'a wallet-only change prevents an unaffordable draw');
-assert(nodes.get('ArchiveTickets').text.includes('0'));
+assert(!api.IsOpen(), 'A background blessing snapshot cannot reopen its retired archive page');
+api.Open();
 
 api.SelectCategory('fragment');
 let fragment = visibleCards()[0], promotion = descendant(fragment, 'ArchivePromote');
@@ -455,4 +450,4 @@ activate(nodes.get('ArchiveV10Category_shadow'));
 assert.equal(view.Inspect().category, 'shadow', 'The player can return from the local empty directory');
 assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430', 'Returning restores the unchanged authoritative shadow cache');
 
-console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, native card/sidebar reuse, live counts/ownership/pass/tooltips, independent archive without commerce resource requests, upgrade/draw rejection and pending guards, promotion duplicate guard, theme, filters, tabs and 100 closed updates');
+console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, native card/sidebar reuse, live counts/ownership/pass/tooltips, independent archive without commerce resource requests, upgrade rejection and pending guards, social/blessing collection routing, promotion duplicate guard, theme, filters, tabs and 100 closed updates');

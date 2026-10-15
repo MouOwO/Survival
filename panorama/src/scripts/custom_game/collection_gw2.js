@@ -12,7 +12,7 @@ var shared=cfg.SurvivalCollectionState||(cfg.SurvivalCollectionState={pages:{},v
 var active=true,opened=false,current="ex",query="",selected="",assemblies={},resync={},fetchJob=null,fetching=false;
 var canvas,grid,gridBody,empty,search,draw,drawText,tickets,summary,result,tooltip,tipPanel,rewardFX;
 var scale=1,cardsKey="",visibleRows=[],slots=[],tabs={},nodes={},api,createdRoots=[];
-var names={ex:"我的前女友",friend:"我的前男友",wife:"我的老婆"};
+var names={ex:"我的前女友",friend:"我的前男友",wife:"我的老婆",beast:"瑞兽赐福"};
 function valid(n){return n&&(!n.IsValid||n.IsValid());}
 function p(id){return valid(root)?root.FindChildTraverse(id):null;}
 function make(type,parent,id,cls){var n=$.CreatePanel(type,parent,id||"");if(cls)n.AddClass(cls);if(id)nodes[id]=n;return n;}
@@ -129,7 +129,7 @@ function request(full){
 }
 function queueResync(category){resync[category]=true;if(!opened||current==="wife"||fetchJob)return;fetchJob=life.Later(.2,function(){fetchJob=null;if(alive()&&opened)request(true);});}
 function snapshot(packet){
- if(!alive()||!packet||["ex","friend"].indexOf(packet.category_id)<0)return;
+ if(!alive()||!packet||["ex","friend","beast"].indexOf(packet.category_id)<0)return;
  var category=packet.category_id,sequence=Number(packet.sequence)||0;if(sequence<=Number(shared.versions[category]||0)||!(packet.ok===true||Number(packet.ok)===1))return;
  var group=assemblies[category];if(!group||sequence>group.sequence)group=assemblies[category]={sequence:sequence,header:copy(packet),chunks:{},count:Number(packet.chunks)||1};
  if(sequence!==group.sequence)return;var chunk=Number(packet.chunk)||1;if(chunk<1||chunk>group.count)return;group.chunks[chunk]=copy(array(packet.rows));

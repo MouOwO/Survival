@@ -155,7 +155,7 @@
         }
         lastData=data; A.Observe(data);
         var order=["clear","shadow","points","starjoy_points","gift","fragment","pet","endless","friend","ex","beast"];
-        categories = array(data.categories).filter(function(category){return category.id!=="ex"&&category.id!=="friend";}).sort(function(a,b){var ai=a.id==="titles"?1000:order.indexOf(a.id),bi=b.id==="titles"?1000:order.indexOf(b.id);return (ai<0?100:ai)-(bi<0?100:bi);});
+        categories = array(data.categories).filter(function(category){return category.id!=="ex"&&category.id!=="friend"&&category.id!=="beast";}).sort(function(a,b){var ai=a.id==="titles"?1000:order.indexOf(a.id),bi=b.id==="titles"?1000:order.indexOf(b.id);return (ai<0?100:ai)-(bi<0?100:bi);});
         var paletteDirty = tabs();
         if(!cfg.SurvivalArchiveV10 && renderVoid(data))return;
         if(!cfg.SurvivalArchiveV10)hideTooltip();
@@ -542,7 +542,7 @@
         Open: function () { if(active()&&!opened)this.Toggle(); },
         SelectCategory: function(id) {
             if(!active())return;
-            if(id==="ex"||id==="friend"){
+            if(id==="ex"||id==="friend"||id==="beast"){
                 if(cfg.SurvivalCollection&&cfg.SurvivalCollection.Open){close();cfg.SurvivalCollection.Open(id);}
                 return;
             }
