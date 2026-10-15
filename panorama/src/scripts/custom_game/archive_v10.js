@@ -6,7 +6,12 @@
     if(cfg.SurvivalArchiveV10&&cfg.SurvivalArchiveV10.Dispose)cfg.SurvivalArchiveV10.Dispose();
     function createView(){
     if(cfg.SurvivalArchiveV10&&cfg.SurvivalArchiveV10.IsAlive&&cfg.SurvivalArchiveV10.IsAlive())return cfg.SurvivalArchiveV10;
-    var P=cfg.ArchiveParchmentData||{},size=P.canvas||[1200,900];
+    var P=cfg.ArchiveParchmentData||{},size=(P.canvas||[1200,900]).slice();
+    // Keep the content rows and typography at their original size as the rail narrows.
+    var sidebarWidth=326*2/3,sidebarReduction=326-sidebarWidth;
+    size[0]-=sidebarReduction;
+    function narrow(width){return width-sidebarReduction;}
+    function contentX(x){return x-sidebarReduction;}
     var canvas=null,gridHost=null,sidebar=null,filterMenu=null,search=null,headerIcon=null,tip=null,tooltip=null,viewScale=1;
     var active=false,disposed=false,current="",rows=[],categoryRows=[],filters={},balances=[],moved=[],subscriptions=[],sidebarKey="",hover=null,displayKey="";
     var textSpecs={},sidebarButtons={},missingIcons={},fitOptions=null,lastReportedCategory="";
@@ -44,47 +49,47 @@
     function fit(){if(!active||!alive())return;viewScale=Number(cfg.SurvivalUI.Fit(p("ArchiveWindow"),root,size[0],size[1],{reference:size.slice()}))||1;}
     function build(){
         canvas=make("Panel",p("ArchiveWindow"),"ArchiveV10Canvas","ArchiveParchmentCanvas");pos(canvas,0,0,size[0],size[1]);canvas.hittest=false;canvas.hittestchildren=true;
-        component(canvas,"window_background",18,20,1164,860,"ArchiveV10Shell_Background");
-        component(canvas,"sidebar_background",30,76,326,788,"ArchiveV10Shell_Sidebar");
-        component(canvas,"content_background",356,76,808,788,"ArchiveV10Shell_Content");
-        component(canvas,"header_strip",18,20,1164,56,"ArchiveV10Shell_Header");
+        component(canvas,"window_background",18,20,narrow(1164),860,"ArchiveV10Shell_Background");
+        component(canvas,"sidebar_background",30,76,sidebarWidth,788,"ArchiveV10Shell_Sidebar");
+        component(canvas,"content_background",contentX(356),76,808,788,"ArchiveV10Shell_Content");
+        component(canvas,"header_strip",18,20,narrow(1164),56,"ArchiveV10Shell_Header");
         serif(label(canvas,"存档",53,30,330,44,34,"#fff5d9","left","ArchiveV10WindowTitle"));
-        var close=make("Button",canvas,"ArchiveV10Close","ArchiveV10Button ArchiveParchmentClose");pos(close,1123,33,31,31);skin(close,"close");
+        var close=make("Button",canvas,"ArchiveV10Close","ArchiveV10Button ArchiveParchmentClose");pos(close,contentX(1123),33,31,31);skin(close,"close");
         if(!asset("close"))label(close,"×",0,-3,31,35,30,"#17150f","center");
         close.SetPanelEvent("onactivate",function(){if(alive())cfg.SurvivalArchive.Close();});
-        serif(label(canvas,"存档总览",52,100,285,36,28,"#fff5df","left","ArchiveV10OverviewTitle"));
-        label(canvas,"正在读取…",52,143,292,38,25,"#eda42c","left","ArchiveV10Overview");
-        var filter=make("Button",canvas,"ArchiveV10FilterToggle","ArchiveV10Button ArchiveParchmentInput");pos(filter,48,191,290,34);
-        label(filter,"全部存档",10,3,240,29,21,"#f4edda","left","ArchiveV10FilterText");label(filter,"▾",258,2,22,28,20,"#ddcfb0","center");
+        serif(label(canvas,"存档总览",52,100,narrow(285),36,28,"#fff5df","left","ArchiveV10OverviewTitle"));
+        label(canvas,"正在读取…",52,143,narrow(292),38,21,"#eda42c","left","ArchiveV10Overview");
+        var filter=make("Button",canvas,"ArchiveV10FilterToggle","ArchiveV10Button ArchiveParchmentInput");pos(filter,48,191,narrow(290),34);
+        label(filter,"全部存档",10,3,narrow(240),29,21,"#f4edda","left","ArchiveV10FilterText");label(filter,"▾",narrow(258),2,22,28,20,"#ddcfb0","center");
         filter.SetPanelEvent("onactivate",function(){if(alive()){hideTooltip();filterMenu.visible=!filterMenu.visible;}});
-        search=make("TextEntry",canvas,"ArchiveV10Search","ArchiveParchmentSearch");pos(search,48,234,290,34);search.text="";
-        var searchHint=label(canvas,"搜索分类…",59,237,258,30,20,"#a7a393","left","ArchiveV10SearchHint");
+        search=make("TextEntry",canvas,"ArchiveV10Search","ArchiveParchmentSearch");pos(search,48,234,narrow(290),34);search.text="";
+        var searchHint=label(canvas,"搜索分类…",59,237,narrow(258),30,20,"#a7a393","left","ArchiveV10SearchHint");
         search.SetPanelEvent("ontextentrychange",function(){if(!alive())return;searchValue=String(search.text||"").replace(/^\s+|\s+$/g,"");searchHint.visible=!searchValue;filterMenu.visible=false;hideTooltip();layoutSidebar();sidebar.ScrollToTop();});
-        component(canvas,"section_strip",36,278,310,34,"ArchiveV10SidebarStrip");serif(label(canvas,"分类",54,281,260,29,23,"#f4eeda"));
-        sidebar=make("Panel",canvas,"ArchiveV10Sidebar","ArchiveV10Sidebar");pos(sidebar,42,314,302,531);sidebar.hittest=false;sidebar.hittestchildren=true;
-        label(canvas,"未找到匹配分类",52,333,280,29,19,"#b5ac98","left","ArchiveV10SearchEmpty").visible=false;
-        headerIcon=icon(canvas,categoryIcon("clear"),394,95,68,68,"ArchiveV10CategoryIcon");component(canvas,"icon_ring",392,93,72,72);
-        serif(label(canvas,"存档",480,103,650,54,42,"#fff5df","left","ArchiveV10_page_title"));
-        component(canvas,"section_strip",375,195,780,35,"ArchiveV10SectionStrip");serif(label(canvas,"收集条目",392,198,700,28,23,"#fff1d6","left","ArchiveV10SectionTitle"));
-        gridHost=make("Panel",canvas,"ArchiveV10GridHost","ArchiveV10GridHost");pos(gridHost,385,235,767,577);gridHost.hittest=false;gridHost.hittestchildren=true;
+        component(canvas,"section_strip",36,278,narrow(310),34,"ArchiveV10SidebarStrip");serif(label(canvas,"分类",54,281,narrow(260),29,23,"#f4eeda"));
+        sidebar=make("Panel",canvas,"ArchiveV10Sidebar","ArchiveV10Sidebar");pos(sidebar,42,314,narrow(302),531);sidebar.hittest=false;sidebar.hittestchildren=true;
+        label(canvas,"未找到匹配分类",52,333,narrow(280),29,19,"#b5ac98","left","ArchiveV10SearchEmpty").visible=false;
+        headerIcon=icon(canvas,categoryIcon("clear"),contentX(394),95,68,68,"ArchiveV10CategoryIcon");component(canvas,"icon_ring",contentX(392),93,72,72);
+        serif(label(canvas,"存档",contentX(480),103,650,54,42,"#fff5df","left","ArchiveV10_page_title"));
+        component(canvas,"section_strip",contentX(375),195,780,35,"ArchiveV10SectionStrip");serif(label(canvas,"收集条目",contentX(392),198,700,28,23,"#fff1d6","left","ArchiveV10SectionTitle"));
+        gridHost=make("Panel",canvas,"ArchiveV10GridHost","ArchiveV10GridHost");pos(gridHost,contentX(385),235,767,577);gridHost.hittest=false;gridHost.hittestchildren=true;
         var grid=move("ArchiveGrid",gridHost);pos(grid,0,0,767,577);grid.style.flowChildren="none";
         move("ArchiveEmpty",canvas);move("ArchiveDrawBar",canvas);move("ArchiveFooter",canvas);move("ArchiveContext",canvas);
-        var hint=label(canvas,"",391,170,741,25,17,"#d0c0a2","left","ArchiveV10Context");hint.visible=false;
-        filterMenu=make("Panel",canvas,"ArchiveV10FilterMenu","ArchiveParchmentFilterMenu");pos(filterMenu,48,226,290,111);filterMenu.visible=false;
-        ["all","unlocked","locked"].forEach(function(mode,i){var button=make("Button",filterMenu,"ArchiveV10Filter_"+mode,"ArchiveV10Button ArchiveParchmentFilterOption");pos(button,1,1+i*36,288,36);var text=label(button,["全部存档","已解锁 / 已拥有","未解锁 / 未拥有"][i],10,5,260,29,20,"#f5ecd5");button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;filterMenu.visible=false;hideTooltip();p("ArchiveGrid").ScrollToTop();cfg.SurvivalArchive.Filter(mode);});filters[mode]={panel:button,text:text};});
+        var hint=label(canvas,"",contentX(391),170,741,25,17,"#d0c0a2","left","ArchiveV10Context");hint.visible=false;
+        filterMenu=make("Panel",canvas,"ArchiveV10FilterMenu","ArchiveParchmentFilterMenu");pos(filterMenu,48,226,narrow(290),111);filterMenu.visible=false;
+        ["all","unlocked","locked"].forEach(function(mode,i){var button=make("Button",filterMenu,"ArchiveV10Filter_"+mode,"ArchiveV10Button ArchiveParchmentFilterOption");pos(button,1,1+i*36,narrow(288),36);var text=label(button,["全部存档","已解锁 / 已拥有","未解锁 / 未拥有"][i],10,5,narrow(260),29,20,"#f5ecd5");button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;filterMenu.visible=false;hideTooltip();p("ArchiveGrid").ScrollToTop();cfg.SurvivalArchive.Filter(mode);});filters[mode]={panel:button,text:text};});
         buildTooltip();
     }
     function enter(options){var opening=!active;fitOptions=options||fitOptions;if(fitOptions)fitOptions.reference=size.slice();if(!valid(canvas))build();active=true;canvas.visible=true;var win=p("ArchiveWindow");if(opening)win.__v10Style={};win.AddClass("ArchiveV10Page");win.AddClass("ArchiveParchmentPage");style(win,{width:size[0]+"px",height:size[1]+"px",padding:"0px",margin:"0px",flowChildren:"none",backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderTop:"0px",borderBottom:"0px",borderRadius:"0px",boxShadow:"none",overflow:"noclip"});fit();}
     function categoryName(id){var row=categoryRows.filter(function(x){return x.id===id;})[0];return names[id]||row&&row.name||id;}
     function layoutSidebar(){
         if(!valid(sidebar))return;var index=0,needle=searchValue.toLowerCase();
-        Object.keys(sidebarButtons).forEach(function(id){var cell=sidebarButtons[id],show=!needle||categoryName(id).toLowerCase().indexOf(needle)>=0;cell.panel.visible=show;cell.panel.SetHasClass("ArchiveV10Selected",id===current);cell.text.style.color=id===current?"#fff2ca":"#f0eadb";if(show)pos(cell.panel,0,(index++)*35,285,35);});
+        Object.keys(sidebarButtons).forEach(function(id){var cell=sidebarButtons[id],show=!needle||categoryName(id).toLowerCase().indexOf(needle)>=0;cell.panel.visible=show;cell.panel.SetHasClass("ArchiveV10Selected",id===current);cell.text.style.color=id===current?"#ffe6a6":"#f0eadb";if(show)pos(cell.panel,0,(index++)*35,narrow(285),35);});
         p("ArchiveV10SearchEmpty").visible=index===0;
     }
     function renderSidebar(categories){
         var signature=JSON.stringify(categories||[]);if(signature!==sidebarKey){
             sidebar.RemoveAndDeleteChildren();sidebarButtons={};var ids=order.slice();list(categories).forEach(function(row){if(row.id!=="ex"&&row.id!=="friend"&&row.id!=="beast"&&ids.indexOf(row.id)<0)ids.push(row.id);});
-            ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32);var text=serif(label(button,categoryName(id),47,5,231,29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text};});sidebarKey=signature;
+            ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32);var text=serif(label(button,categoryName(id),47,5,narrow(231),29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text};});sidebarKey=signature;
         }
         layoutSidebar();
     }
@@ -155,11 +160,11 @@
         if(current==="fishing"&&data&&data.fishing&&data.fishing.faith!==undefined)details="信仰值："+data.fishing.faith;
         if(current==="starjoy_points"&&data&&data.starjoy)details="累计星悦积分 "+data.starjoy.earned+" · 可用余额 "+data.starjoy.balance;
         context.text=details;context.visible=!!details;
-        var empty=p("ArchiveEmpty");pos(empty,399,280,731,50);style(empty,{fontSize:"21px",color:"#d0c4aa",textAlign:"center"});empty.SetHasClass("ArchiveHidden",slot>0);empty.text=data&&Number(data.unavailable)===1?"该分类尚未启用，暂无已获得条目":!data?"正在读取存档…":slot===0?(mode!=="all"?"当前筛选下暂无存档":"当前分类暂无存档"):"";
-        var grid=p("ArchiveGrid");pos(grid,0,0,767,draw?511:577);style(grid,{flowChildren:"none"});pos(gridHost,385,235,767,draw?511:577);
-        var drawBar=p("ArchiveDrawBar");pos(drawBar,397,755,735,52);drawBar.SetHasClass("ArchiveHidden",!draw||!data||!data.social);drawBar.style.visibility=draw&&data&&data.social?"visible":"collapse";
+        var empty=p("ArchiveEmpty");pos(empty,contentX(399),280,731,50);style(empty,{fontSize:"21px",color:"#d0c4aa",textAlign:"center"});empty.SetHasClass("ArchiveHidden",slot>0);empty.text=data&&Number(data.unavailable)===1?"该分类尚未启用，暂无已获得条目":!data?"正在读取存档…":slot===0?(mode!=="all"?"当前筛选下暂无存档":"当前分类暂无存档"):"";
+        var grid=p("ArchiveGrid");pos(grid,0,0,767,draw?511:577);style(grid,{flowChildren:"none"});pos(gridHost,contentX(385),235,767,draw?511:577);
+        var drawBar=p("ArchiveDrawBar");pos(drawBar,contentX(397),755,735,52);drawBar.SetHasClass("ArchiveHidden",!draw||!data||!data.social);drawBar.style.visibility=draw&&data&&data.social?"visible":"collapse";
         pos(p("ArchiveTickets"),0,0,515,23);pos(p("ArchiveDrawResult"),0,26,515,23);pos(p("ArchiveDraw"),537,4,190,42);
-        var footer=p("ArchiveFooter");pos(footer,390,815,748,24);style(footer,{flowChildren:"none",backgroundColor:"transparent",border:"0px",marginTop:"0px",marginBottom:"0px",marginLeft:"0px",marginRight:"0px"});footer.visible=true;pos(p("ArchiveStatus"),0,0,748,24);style(p("ArchiveStatus"),{fontSize:"15px",color:"#c4b89e",textOverflow:"ellipsis",marginTop:"0px",marginBottom:"0px",marginLeft:"0px",marginRight:"0px",horizontalAlign:"left",verticalAlign:"top"});p("ArchiveContext").visible=false;
+        var footer=p("ArchiveFooter");pos(footer,contentX(390),815,748,24);style(footer,{flowChildren:"none",backgroundColor:"transparent",border:"0px",marginTop:"0px",marginBottom:"0px",marginLeft:"0px",marginRight:"0px"});footer.visible=true;pos(p("ArchiveStatus"),0,0,748,24);style(p("ArchiveStatus"),{fontSize:"15px",color:"#c4b89e",textOverflow:"ellipsis",marginTop:"0px",marginBottom:"0px",marginLeft:"0px",marginRight:"0px",horizontalAlign:"left",verticalAlign:"top"});p("ArchiveContext").visible=false;
         if(valid(hover)&&hover.visible&&hover.__archiveItem)showTooltip(hover.__archiveItem,current,hover);else if(hover)hideTooltip();
         if(A.HideCardText)A.HideCardText();
         if(Game.IsInToolsMode&&Game.IsInToolsMode()&&lastReportedCategory!==current){lastReportedCategory=current;$.Schedule(.15,function(){if(alive()&&active)$.Msg("ARCHIVE_V10_VIEW "+JSON.stringify(api.Inspect()));});}

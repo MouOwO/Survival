@@ -75,6 +75,54 @@ function cards() { return nodes.get('ArchiveGrid').Children().filter(card => car
 function canvases() { return allPanels.filter(panel => panel.IsValid() && panel.id === 'ArchiveV10Canvas'); }
 function native(panel, cls) { if (panel.BHasClass(cls)) return panel; for (const child of panel.Children()) { const found = native(child, cls); if (found) return found; } return null; }
 function liveSubscriptions() { return listeners.filter(listener => !listener.cancelled).map(listener => listener.name).sort(); }
+const sidebarDelta = 326 / 3, compactWidth = 1200 - sidebarDelta;
+function near(actual, expected, message, tolerance = 0.001) { assert(Math.abs(actual - expected) <= tolerance, message + ': ' + actual + ' ≈ ' + expected); }
+function bounds(panel) { const at = panel.GetPositionWithinWindow(), width = parseFloat(panel.style.width), height = parseFloat(panel.style.height); return {...at, width, height, right: at.x + width, bottom: at.y + height}; }
+function contains(parent, child) {
+    const outer = bounds(parent), inner = bounds(child);
+    assert(inner.x >= outer.x - .51 && inner.y >= outer.y - .51 && inner.right <= outer.right + .51 && inner.bottom <= outer.bottom + .51,
+        (child.id || child.paneltype) + ' stays inside ' + parent.id);
+}
+function selectedCategory(expected) {
+    const selected = nodes.get('ArchiveV10Sidebar').Children().filter(panel => panel.BHasClass('ArchiveV10Selected'));
+    assert.deepEqual(selected.map(panel => panel.id), ['ArchiveV10Category_' + expected], 'Exactly the current category keeps its selected state');
+}
+function compactSidebar() {
+    near(parseFloat(nodes.get('ArchiveWindow').style.width), compactWidth, 'Window gives back the removed sidebar width');
+    near(parseFloat(nodes.get('ArchiveV10Canvas').style.width), compactWidth, 'Canvas matches the compact window');
+    const shell = nodes.get('ArchiveV10Shell_Sidebar');
+    near(parseFloat(shell.style.width), 326 * 2 / 3, 'Stone sidebar is two thirds of its former width');
+    for (const [id, originalWidth] of [['ArchiveV10OverviewTitle', 285], ['ArchiveV10Overview', 292],
+        ['ArchiveV10FilterToggle', 290], ['ArchiveV10Search', 290], ['ArchiveV10SidebarStrip', 310],
+        ['ArchiveV10Sidebar', 302], ['ArchiveV10SearchEmpty', 280], ['ArchiveV10FilterMenu', 290]]) {
+        const panel = nodes.get(id);
+        near(parseFloat(panel.style.width), originalWidth - sidebarDelta, id + ' uses the compact width');
+        contains(shell, panel);
+    }
+    contains(nodes.get('ArchiveV10FilterToggle'), nodes.get('ArchiveV10FilterText'));
+    contains(nodes.get('ArchiveV10Search'), nodes.get('ArchiveV10SearchHint'));
+    for (const mode of ['all', 'unlocked', 'locked']) {
+        const option = nodes.get('ArchiveV10Filter_' + mode);
+        near(parseFloat(option.style.width), 288 - sidebarDelta, 'Dropdown option width');
+        contains(nodes.get('ArchiveV10FilterMenu'), option);
+        option.Children().forEach(child => contains(option, child));
+    }
+    for (const button of nodes.get('ArchiveV10Sidebar').Children()) {
+        near(parseFloat(button.style.width), 285 - sidebarDelta, 'Category button width');
+        contains(nodes.get('ArchiveV10Sidebar'), button);
+        const name = button.Children().find(child => child.paneltype === 'Label');
+        const icon = button.Children().find(child => child.paneltype === 'Image');
+        near(parseFloat(name.style.width), 231 - sidebarDelta, 'Category name shrinks without changing its font');
+        assert.equal(name.style.fontSize, '21px');
+        assert.equal(icon.style.width, '28px'); assert.equal(icon.style.height, '28px');
+        button.Children().forEach(child => contains(button, child));
+    }
+    near(bounds(nodes.get('ArchiveV10Shell_Content')).x, 356 - sidebarDelta, 'Content follows the compact sidebar', .51);
+    assert.equal(nodes.get('ArchiveV10Shell_Content').style.width, '808px', 'Right content keeps its width');
+    near(bounds(nodes.get('ArchiveV10GridHost')).x, 385 - sidebarDelta, 'Grid shifts left with the content', .51);
+    assert.equal(nodes.get('ArchiveGrid').style.width, '767px', 'The row viewport keeps its authored width');
+    contains(nodes.get('ArchiveV10Canvas'), nodes.get('ArchiveV10Shell_Content'));
+}
 const shadowRows = [{id: 'shadow_01', count: 3, target: 430, description: '真实测试效果'}, {id: 'shadow_02', count: 0, target: 430}, {id: 'shadow_03', count: 3, count_known: 0, target: 430}];
 const api = load();
 snapshot('clear', 1, [{id: 'clear_01', name: '通关', count: 2, target: 1, completed: 1}]);
@@ -87,25 +135,30 @@ for (const category of ['ex', 'friend', 'beast']) {
     assert(!nodes.has('ArchiveV10Category_' + category), 'Migrated collection pool is absent from the fixed archive sidebar: ' + category);
     assert(!nodes.has('ArchiveTab_' + category), 'Migrated collection pool is absent from legacy archive navigation: ' + category);
 }
-assert.equal(nodes.get('ArchiveWindow').style.width, '1200px');
+compactSidebar(); selectedCategory('shadow');
 assert.equal(nodes.get('ArchiveWindow').style.height, '900px');
 assert.equal(nodes.get('ArchiveV10Shell_Background').style.backgroundColor, 'transparent', 'PNG edge alpha is never flattened by a CSS backing rectangle');
 assert.equal(nodes.get('ArchiveV10CategoryIcon').image, cfg.ArchiveParchmentData.assets.archive_emblem.file, 'The large shadow header uses the full-resolution emblem');
 assert.equal(nodes.get('ArchiveFooter').visible, true, 'Gameplay save/rejection feedback remains visible');
 assert.equal(nodes.get('ArchiveStatus').style.marginTop, '0px', 'The retained status label cannot inherit the old 12px top margin');
-assert.equal(nodes.get('ArchiveFooter').style.position, '390px 815px 0px');
+near(bounds(nodes.get('ArchiveFooter')).x, 390 - sidebarDelta, 'Footer shifts with the unchanged content', .51);
+assert.equal(bounds(nodes.get('ArchiveFooter')).y, 815);
 assert(parseFloat(nodes.get('ArchiveFooter').style.position.split(' ')[1]) + parseFloat(nodes.get('ArchiveFooter').style.height) < 840, 'The complete footer stays above the textured bottom edge and its transparent margin');
 nodes.get('ArchiveV10FilterToggle').events.onactivate();
 assert.equal(nodes.get('ArchiveV10FilterMenu').visible, true);
 nodes.get('ArchiveV10Filter_all').events.onactivate();
 assert.equal(nodes.get('ArchiveV10FilterMenu').visible, false);
+selectedCategory('shadow');
 const categorySearch = nodes.get('ArchiveV10Search');
 categorySearch.text = '星悦'; categorySearch.events.ontextentrychange();
 assert.deepEqual(nodes.get('ArchiveV10Sidebar').Children().filter(node => node.visible).map(node => node.id), ['ArchiveV10Category_starjoy_points']);
+assert.equal(nodes.get('ArchiveV10Category_shadow').visible, false);
+selectedCategory('shadow');
 categorySearch.text = '不存在的分类'; categorySearch.events.ontextentrychange();
 assert.equal(nodes.get('ArchiveV10SearchEmpty').visible, true, 'Search provides a truthful empty state');
 categorySearch.text = ''; categorySearch.events.ontextentrychange();
 assert.equal(nodes.get('ArchiveV10Sidebar').Children().filter(node => node.visible).length, 15);
+selectedCategory('shadow'); compactSidebar();
 assert.equal(cards()[0].style.width, '745px', 'The controller cards are complete horizontal rows');
 assert.equal(cards()[1].style.position, '0px 82px 0px', 'Rows occupy a single vertical column');
 assert.equal(cards().find(card => card.__archiveItem.id === 'shadow_03').__v10.track.visible, false, 'Unknown inventory is never painted as zero progress');
@@ -125,14 +178,20 @@ assert.equal(JSON.stringify(oldHost.style), approvedHostGeometry, 'Legacy decora
 assert.equal(JSON.stringify(canvas.style), shellBounds, 'Legacy page palette cannot change the approved fixed shell');
 api.Filter('unlocked');
 assert.deepEqual(cards().map(card => card.__archiveItem.id), ['shadow_01'], 'Unknown ownership is excluded from owned filtering');
+selectedCategory('shadow'); assert(nodes.get('ArchiveV10Filter_unlocked').BHasClass('ArchiveV10Selected'));
 api.Filter('locked');
 assert(cards().every(card => card.__archiveItem.count_known === 1 && card.__archiveItem.count === 0), 'Unknown inventory never enters locked filtering');
+selectedCategory('shadow'); assert(nodes.get('ArchiveV10Filter_locked').BHasClass('ArchiveV10Selected'));
+assert(!nodes.get('ArchiveV10Filter_unlocked').BHasClass('ArchiveV10Selected'));
 api.Filter('all');
-api.SelectCategory('clear');
+selectedCategory('shadow'); assert(nodes.get('ArchiveV10Filter_all').BHasClass('ArchiveV10Selected'));
+nodes.get('ArchiveV10Category_clear').events.onactivate();
+selectedCategory('clear'); assert(!nodes.get('ArchiveV10Category_shadow').BHasClass('ArchiveV10Selected'));
 assert.equal(canvases()[0], canvas, 'Category switching retains native shell identity');
 assert.deepEqual(canvas.Children().filter(panel => panel.id.startsWith('ArchiveV10Shell_')), rails, 'Background, navigation and metal rails remain the same native components');
 assert.equal(JSON.stringify(canvas.style), shellBounds, 'Category switching does not change shell geometry');
 api.SelectCategory('shadow');
+selectedCategory('shadow'); assert(!nodes.get('ArchiveV10Category_clear').BHasClass('ArchiveV10Selected'));
 const liveCard = cards().find(card => card.__archiveItem.id === 'shadow_01');
 // The real legacy controller deletes its decorative children on a fingerprint
 // change. V10 must recognize that cached .__v10 references have become invalid.
@@ -161,6 +220,7 @@ api.Open(); advance(.1);
 assert.equal(canvases().length, 1, 'Reopening does not append another canvas');
 assert.equal(canvases()[0], canvas, 'Reopening preserves the existing fixed shell');
 assert.deepEqual(liveSubscriptions(), subscriptionsBefore, 'Reopening does not register repeated handlers');
+selectedCategory('shadow'); compactSidebar();
 const oldApi = api, oldView = cfg.SurvivalArchiveV10, oldSidebar = nodes.get('ArchiveV10Category_clear');
 const retiredFilter = nodes.get('ArchiveV10Filter_locked').events.onactivate;
 const retiredClose = nodes.get('ArchiveV10Close').events.onactivate;
@@ -172,7 +232,9 @@ assert.equal(oldApi.IsOpen(), false, 'Reload disposes the preceding controller')
 assert.equal(nodes.get('ArchiveGrid'), retainedGrid, 'Controller reload retains the actual native grid');
 assert.equal(retainedGrid.style.width, '1000px', 'Legacy initialization really overwrites the retained grid between V10 views');
 cfg.SurvivalArchive.Open(); snapshot('clear', 20, [{id: 'fresh', name: '新记录', count: 1, target: 1, completed: 1}]);
+selectedCategory('clear');
 cfg.SurvivalArchive.SelectCategory('shadow'); snapshot('shadow', 21, shadowRows);
+selectedCategory('shadow'); compactSidebar();
 assert.equal(retainedGrid.style.position, '0px 0px 0px', 'V10 restores actual grid origin after legacy initialization');
 assert.equal(retainedGrid.style.width, '767px', 'Stale visual cache cannot resize the retained row viewport');
 assert.equal(retainedGrid.style.height, '577px', 'The independent archive restores the retained viewport height');
@@ -199,6 +261,7 @@ assert.equal(canvases().length, 0, 'Disposed renderer cannot resurrect its forme
 assert.equal(requests.length, disposedRequests, 'No retired retry loop continues after disposal');
 
 load(); cfg.SurvivalArchive.Open(); snapshot('clear', 30, [{id: 'reload', name: '重载', count: 0, target: 1, completed: 0}]);
+selectedCategory('clear'); compactSidebar();
 const childApi = cfg.SurvivalArchive, childHandler = listeners.find(listener => !listener.cancelled && listener.name === 'survival_archive_snapshot').callback;
 root.RemoveAndDeleteChildren(); fixture(true);
 const beforeChildReload = requests.length;
@@ -207,6 +270,7 @@ assert.equal(requests.length, beforeChildReload, 'A surviving root cannot revive
 load(); cfg.SurvivalArchive.Open(); snapshot('clear', 40, [{id: 'replacement', name: '替换', count: 0, target: 1, completed: 0}]);
 assert.equal(cards().length, 1, 'Replacing children and reloading the active graph restores real data');
 assert.equal(canvases().length, 1);
+selectedCategory('clear'); compactSidebar();
 const rootApi = cfg.SurvivalArchive; root.DeleteAsync();
 assert.doesNotThrow(() => { rootApi.Close(); rootApi.Dispose(); rootApi.Dispose(); advance(5); });
 cfg.SurvivalMenuV10.Dispose(); assert.equal(liveSubscriptions().length, 0);

@@ -21,6 +21,7 @@
 .ArchiveV10Cell:hover .ArchiveV10HoverFrame,
 .ArchiveV10Cell.ArchiveHovered .ArchiveV10HoverFrame { opacity:1; }
 .ArchiveV10Count { text-overflow:shrink; z-index:10; background-color:transparent; }
+#ArchiveV10Overview { text-overflow:shrink; }
 .ArchiveV10CountHost { flow-children:none; z-index:10; }
 .ArchiveV10Name { text-overflow:ellipsis; }
 .ArchiveV10Page #ArchiveDrawBar { flow-children:none; background-color:transparent; border:0px; }
@@ -50,8 +51,18 @@
 .ArchiveParchmentFilterMenu { background-color:#24241cfb; border:1px solid #8a7953; box-shadow:#00000099 0px 3px 12px 1px; z-index:30; flow-children:none; }
 .ArchiveParchmentFilterOption:hover,
 .ArchiveParchmentFilterOption.ArchiveV10Selected { background-color:#6c572b88; }
-.ArchiveParchmentCategory { border-bottom:1px solid #9b926316; }
+.ArchiveParchmentCategory { border-left:3px solid transparent; border-bottom:1px solid #9b926316; }
 .ArchiveParchmentCategory:hover { background-color:#93835d27; brightness:1.16; }
+.ArchiveParchmentCategory.ArchiveV10Selected,
+.ArchiveParchmentCategory.ArchiveV10Selected:hover {
+    background-image:url("file://{images}/custom_game/archive_parchment_v1/category_selected.png");
+    background-size:100% 100%;
+    background-repeat:no-repeat;
+    background-color:#6c572b99;
+    border-left:3px solid #e9bd63;
+    border-bottom:1px solid #b89a5780;
+    brightness:1.12;
+}
 .ArchiveParchmentClose { background-color:#e0d5b5; border:1px solid #100f0c; }
 .ArchiveParchmentRowBacking { background-color:#080b0b55; }
 .ArchiveParchmentRowAlternate .ArchiveParchmentRowBacking { opacity:.6; }
