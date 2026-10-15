@@ -164,6 +164,7 @@ function createHarness(options = {}) {
     for (const id of ['CustomAbilityFields', 'CustomAbilityIcon', 'CustomAbilityTitle',
         'CustomAbilityLevel', 'CustomAbilityDescription', 'CustomAbilityExtensionLabel',
         'CustomAbilityCostRow', 'CustomAbilityGoldCostBlock', 'CustomAbilityWoodCostBlock',
+        'CustomAbilityPopulationCostBlock', 'CustomAbilityPopulationCost',
         'CustomAbilityGoldCost', 'CustomAbilityWoodCost', 'CustomAbilityType', 'CustomAbilityStatus']) {
         new Panel('Panel', tooltip, id);
     }

@@ -598,6 +598,8 @@
         var dismiss = dismissFor(byId("CustomAbilityTooltip"));
         if (dismiss && !dismiss.CanShow(sourcePanel)) { hideCustomTooltip(true); return false; }
         var projectMode = managedProjectAbility(abilityIndex, abilityName);
+        var repairerTrainingMode = abilityName === "ability_train_repairer"
+            || abilityName === "ability_train_advanced_repairer";
         var heroMode = isSelectedCombatHero()
             && unitOwnsAbility(selectedUnit(), abilityIndex);
         var definition = readTooltipTable(
@@ -633,6 +635,7 @@
         if (!tooltip || !fields) return false;
         tooltip.RemoveClass("ItemOnly");
         tooltip.RemoveClass("ExtensionOnly");
+        tooltip.SetHasClass("RepairerTraining", repairerTrainingMode);
         setText("CustomAbilityExtensionLabel", passiveMode ? "生存防守 · 被动技能"
             : towerToolMode ? "生存防守 · 防御塔技能" : upgradeMode
             ? localize("Survival_UpgradeTooltip_Category", "SURVIVAL · UPGRADE")
@@ -673,14 +676,19 @@
             ? runtime.cost_gold : Number(tooltipDefinition.needgold || 0);
         var woodCost = runtime.cost_wood !== undefined
             ? runtime.cost_wood : Number(tooltipDefinition.needwood || 0);
+        var populationCost = Math.max(0, Number(runtime.population) || 0);
+        var hasPopulationCost = populationCost > 0;
         var hasGoldCost = Number(goldCost || 0) > 0;
         var hasWoodCost = Number(woodCost || 0) > 0;
         var costRow = byId("CustomAbilityCostRow");
         var goldCostBlock = byId("CustomAbilityGoldCostBlock");
         var woodCostBlock = byId("CustomAbilityWoodCostBlock");
-        if (costRow) costRow.SetHasClass("Hidden", !hasGoldCost && !hasWoodCost);
+        var populationCostBlock = byId("CustomAbilityPopulationCostBlock");
+        if (costRow) costRow.SetHasClass("Hidden", !hasGoldCost && !hasWoodCost && !hasPopulationCost);
         if (goldCostBlock) goldCostBlock.SetHasClass("Hidden", !hasGoldCost);
         if (woodCostBlock) woodCostBlock.SetHasClass("Hidden", !hasWoodCost);
+        if (populationCostBlock) populationCostBlock.SetHasClass("Hidden", !hasPopulationCost);
+        setText("CustomAbilityPopulationCost", populationCost);
         setText("CustomAbilityGoldCost", goldCost);
         setText("CustomAbilityWoodCost", woodCost);
 
@@ -698,6 +706,8 @@
         } else if (projectMode || heroMode) {
             asArray(runtime.fields).forEach(function (field) {
                 if (!field) return;
+                if (repairerTrainingMode
+                    && /^(当前数量|人口消耗|木材消耗|金币消耗|修理范围|修复范围|训练上限)$/.test(String(field.label || ""))) return;
                 var levelMatch = heroMode && /^LV([1-9][0-9]*)$/.exec(String(field.label || ""));
                 addField(fields, field.label, field.value, levelMatch
                     ? { current: Number(levelMatch[1]) === Number(displayedLevel) } : null);

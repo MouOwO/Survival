@@ -118,6 +118,9 @@
 .AbilityFieldLabel { width: 164px; color: #9db0bf; font-size: 22px; }
 .AbilityFieldValue { color: #f0d48a; font-size: 22px; }
 
+/* Repairer details have no property icon; align them with the description. */
+.RepairerTraining .AbilityFieldIcon { visibility: collapse; }
+
 /* Hero skill level prose needs the full remaining width, not a stat column. */
 .AbilityFieldRow.AbilitySkillLevelRow { margin-top: 2px; }
 .AbilitySkillLevelRow .AbilityFieldLabel { width: 52px; color: #9da5ad; }

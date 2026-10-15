@@ -325,6 +325,10 @@
                     <Image class="AbilityCostIcon" src="file://{images}/spellicons/survival/native/wood.png" hittest="false" />
                     <Label id="CustomAbilityWoodCost" class="AbilityCostValue" text="0" />
                 </Panel>
+                <Panel id="CustomAbilityPopulationCostBlock" class="AbilityCostBlock Hidden">
+                    <Image class="AbilityCostIcon" src="file://{images}/custom_game/survival/food_population.png" hittest="false" />
+                    <Label id="CustomAbilityPopulationCost" class="AbilityCostValue" text="0" />
+                </Panel>
             </Panel>
             <Panel id="CustomAbilityFields" />
             <Label id="CustomAbilityStatus" text="" />
