@@ -35,6 +35,7 @@ function fitTooltip(epoch){
  rect(tipPanel,x,y,350,height);rect(tipFrame,0,0,350,height);rect(tipViewport,17,16,316,height-32);
 }
 function tip(anchor,title,body){
+ if(/^DailyGW2Weekday_[0-6]$/.test(anchor.id||"")){anchor.hittest=false;return;}
  anchor.hittest=true;anchor.SetPanelEvent("onmouseover",function(){
   if(!active||!viewValid()||!shell.IsOpen()||!p("DailyRulesText").BHasClass("ArchiveHidden")){hideTooltip();return;}
   if(!tipDismiss.CanShow(anchor))return;

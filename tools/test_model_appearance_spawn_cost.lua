@@ -175,4 +175,11 @@ for _=1,20 do
     assert(stable and retained==monster_parts and retained.head.scale==0.9)
 end
 assert(spawns==monster_spawns and explicit_asset.components[1].model_scale==0.9)
-print("APPEARANCE_MODEL_SCALE_PASS authored overrides, single factor, repeated apply, immutable cache, arrow-tower and monster exemptions")
+local hero=entity("npc_dota_creature",9603,"body.vmdl")
+function hero:IsHero() return true end
+local hero_ok,_,hero_parts=module.Apply(hero,explicit_asset,{fresh_unit=true})
+assert(hero_ok and hero_parts.head.scale==0.9
+    and hero_parts.head.survival_visual_scale_multiplier==1
+    and hero_parts.head.survival_visual_base_scale==0.9,
+    "hero components preserve the authored scale and original-size owner context")
+print("APPEARANCE_MODEL_SCALE_PASS authored overrides, single factor, repeated apply, immutable cache, hero/tower/monster exemptions")

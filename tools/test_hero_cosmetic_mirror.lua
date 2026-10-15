@@ -22,6 +22,8 @@ local function entity(class_name,model)
     function unit:IsNull() return self.removed==true end
     function unit:entindex() return self.index end
     function unit:GetClassname() return self.class_name end
+    function unit:GetUnitName() return self.unit_name or self.class_name end
+    function unit:IsHero() return self.class_name=="npc_dota_hero" or self.class_name:match("^npc_dota_hero_")~=nil end
     function unit:GetModelName() return self.model end
     function unit:GetModelScale() return self.scale end
     function unit:GetSkin() return self.skin end
@@ -96,6 +98,7 @@ ParticleManager={
     ReleaseParticleIndex=function(_,id) assert(not particles[id].released,"double particle release");particles[id].released=true end,
 }
 local service=require("systems/hero_cosmetic_service")
+local model_scale=require("visual/model_scale")
 local function hero()
     local unit=entity("npc_dota_hero_drow_ranger","models/heroes/drow/drow_base.vmdl")
     unit.survival_hero_id="hero_drow_ranger";return unit
@@ -112,26 +115,67 @@ local function active_particles(unit)
     end;return result
 end
 local source=hero();assert(service.apply(source,"hero_drow_ranger"))
-assert(math.abs(source.scale-2/3)<1e-9, "normal cosmetics apply the global hero visual scale")
+assert(source.scale==1, "normal cosmetics preserve the original hero size")
 assert(service.apply(source,"hero_drow_ranger"))
-assert(math.abs(source.scale-2/3)<1e-9, "reapplying cosmetics cannot compound the hero scale")
+assert(source.scale==1, "reapplying cosmetics cannot change the original hero size")
 source:SetModelScale(1.25);source:SetSkin(2);source:SetMaterialGroup("blue");source.material_hash=123
 local original=owned(source);assert(#original==7 and #active_particles(source)==5)
+for _,entry in ipairs(original) do
+    assert(entry.scale==1 and model_scale.factor(entry)==1,
+        "bone-merged hero equipment keeps its local scale and inherits the hero exemption")
+end
 local original_particles=active_particles(source)
 local target=entity("npc_dota_creature","models/heroes/drow/drow_base.vmdl");target:SetOwner(source)
+target.unit_name="npc_survival_drow_companion"
+assert(model_scale.factor(target)==2/3, "hero ownership alone does not exempt another NPC")
+assert(model_scale.apply(target,.9))
+local old_scale={base=target.survival_visual_base_scale,multiplier=target.survival_visual_scale_multiplier,
+    final=target.survival_visual_final_scale,exempt=target.survival_visual_scale_exempt}
+fail_particle=particles[original_particles[1]].path
+assert(not service.sync_appearance(target,source), "a particle failure after body copy must abort the mirror")
+assert(target.scale==old_scale.final and target.survival_visual_base_scale==old_scale.base
+    and target.survival_visual_scale_multiplier==old_scale.multiplier
+    and target.survival_visual_final_scale==old_scale.final
+    and target.survival_visual_scale_exempt==old_scale.exempt,
+    "failed first mirror restores all original scale metadata")
+local untouched=entity("npc_dota_creature",target.model)
+fail_particle=particles[original_particles[1]].path
+assert(not service.sync_appearance(untouched,source))
+assert(untouched.scale==1 and untouched.survival_visual_base_scale==nil
+    and untouched.survival_visual_scale_multiplier==nil
+    and untouched.survival_visual_final_scale==nil
+    and untouched.survival_visual_scale_exempt==nil,
+    "failed first mirror cannot leave new scale metadata on an untracked target")
 local native=entity("dota_item_wearable","default.vmdl");native.parent=target;native.owner=target
 assert(service.sync_appearance(target,source))
 assert(target.model==source.model and target.scale==1.25 and target.skin==2)
+assert(model_scale.factor(target)==1 and model_scale.original(target)==1.25,
+    "custom hero mirrors inherit the source policy before recording the copied final size")
 assert(require("visual/model_scale").ensure(target) and target.scale==1.25,
     "the global spawn guard must recognize a copied final scale")
 assert(target.material_group=="blue" and target.material_hash==123)
 assert(native.hidden and #active_particles(target)==5)
 local initial=owned(target);assert(#initial==8)
+for _,entry in ipairs(initial) do
+    if entry~=native then assert(entry.scale==1 and model_scale.factor(entry)==1,
+        "mirrored bone-merged equipment retains its unscaled local size") end
+end
 local initial_spawns,initial_particles=spawns,particle_serial
 for _=1,100 do assert(service.sync_appearance(target,source)) end
 assert(spawns==initial_spawns and particle_serial==initial_particles,"unchanged polls must reuse all visuals")
 for _,entry in ipairs(original) do assert(not entry:IsNull() and not entry.hidden and entry.parent==source) end
 for _,id in ipairs(original_particles) do assert(not particles[id].destroyed) end
+
+local reentrant=entity("npc_dota_creature",target.model)
+on_create=function() assert(service.sync_appearance(reentrant,source)) end
+assert(not service.sync_appearance(reentrant,source), "a superseded transaction must abort")
+assert(reentrant.scale==source.scale and reentrant.survival_visual_scale_multiplier==1
+    and reentrant.survival_visual_base_scale==source.scale
+    and reentrant.survival_visual_final_scale==source.scale
+    and reentrant.survival_visual_scale_exempt==true,
+    "an old abort cannot restore metadata over a newer committed mirror")
+assert(#owned(reentrant)==7 and #active_particles(reentrant)==5)
+service.clear(reentrant)
 
 -- Actual body changes invalidate the cache without changing the main hero.
 source:SetModel("models/heroes/drow/current_body.vmdl");source:SetModelScale(1.5)
@@ -188,8 +232,8 @@ fallback.GetSkin=false
 assert(require("visual/model_scale").apply(fallback,1.35))
 fallback.GetModelScale=false
 assert(service.sync_appearance(fallback_target,fallback))
-assert(math.abs(fallback_target.scale-1.35*2/3)<1e-9,
-    "missing getter uses the recorded original scale and reduces the mirrored body exactly once")
+assert(math.abs(fallback_target.scale-1.35)<1e-9 and model_scale.factor(fallback_target)==1,
+    "missing getter uses the original scale with the source hero exemption")
 assert(#owned(fallback_target)==7 and #active_particles(fallback_target)==5)
 -- A removed handle must still retire independent props/particles. A newer
 -- target reusing the same integer entity index keeps its separate ownership.
@@ -258,6 +302,8 @@ for index, hero_id in ipairs({"hero_monkey_king", "hero_blademaster"}) do
     local clone = entity("npc_dota_hero", model)
     assert(service.apply(owner, hero_id))
     assert(service.sync_appearance(clone, owner))
+    assert(owner.scale==1 and clone.scale==1 and model_scale.factor(clone)==1,
+        "MK and Blade bodies and their clones preserve the original hero size")
     clone_by_source[owner] = clone
     weapon_cosmetic.on_hero_summoned({player_id = index - 1, unit = owner, hero_id = hero_id})
     local component = hero_id == "hero_monkey_king" and "demon_trickster_staff" or "weapon"

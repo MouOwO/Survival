@@ -14,7 +14,7 @@ function M.apply(unit)
         or unit.survival_is_native_wearable_visual then return false end
     if unit.GetClassname and unit:GetClassname() == "npc_dota_thinker" then return false end
     if unit.GetUnitName and excluded[unit:GetUnitName()] then return false end
-    -- Native illusions may already inherit their source's reduced model size.
+    -- Native illusions may already inherit their source's final model scale.
     if unit.IsIllusion and unit:IsIllusion() then
         for _, method in ipairs({"GetReplicatingOtherHero", "GetOwnerEntity"}) do
             if type(unit[method]) == "function" then

@@ -46,6 +46,7 @@ function M.sync(id, unit, title_id)
         local configured, err = pcall(function()
             body:SetOwner(unit)
             body:SetParent(unit, "")
+            body.survival_visual_scale_exempt = model_scale.factor(unit) == 1
             assert(model_scale.apply(body, 0.48), "title model scale failed")
             body.survival_title_prop = true
             update(state, GameRules:GetGameTime())

@@ -458,6 +458,7 @@ local function spawn_wearable(hero, component_id, model_path, appearance)
     end
     -- NPCs do not consistently expose skin/material getters. Keep the exact
     -- successfully applied declaration on our own component for visual copies.
+    wearable.survival_visual_scale_exempt = model_scale.factor(hero) == 1
     wearable.survival_cosmetic_appearance = copy_definition(appearance)
     return wearable
 end
@@ -903,6 +904,9 @@ local function set_appearance(entity, appearance, body)
     end
     if body and (not set("SetOriginalModel", appearance.model)
         or not set("SetModel", appearance.model)) then return false end
+    if appearance.model_scale_exempt ~= nil then
+        entity.survival_visual_scale_exempt = appearance.model_scale_exempt
+    end
     if appearance.model_scale ~= nil then
         local scale_ok
         if body and not appearance.model_scale_final then
@@ -934,6 +938,7 @@ function M.sync_appearance(target, source)
     local body = current_appearance(source, {
         model = definition.body_model,
         model_scale = model_scale.original(source, definition.model_scale or 1), model_scale_final = false,
+        model_scale_exempt = model_scale.factor(source) == 1,
         skin = definition.body_skin or 0, material_group = definition.material_group,
     })
     if type(body.model) ~= "string" or body.model == "" then return false end
@@ -953,6 +958,9 @@ function M.sync_appearance(target, source)
             appearance.id, appearance.model = id, model
             declarations[#declarations + 1] = appearance
         end
+    end
+    for _, appearance in ipairs(declarations) do
+        appearance.model_scale_exempt = body.model_scale_exempt
     end
     table.sort(declarations, function(a, b) return tostring(a.id) < tostring(b.id) end)
     local particles = copy_definition(source_state and source_state.particle_definitions or definition.particles or {})
@@ -975,6 +983,12 @@ function M.sync_appearance(target, source)
     generation_by_hero[index] = generation
     local spawned, spawned_particles, components = {}, {}, {}
     local old_body = current_appearance(target, previous and previous.mirror_body)
+    local old_scale = {
+        base = target.survival_visual_base_scale,
+        multiplier = target.survival_visual_scale_multiplier,
+        final = target.survival_visual_final_scale,
+        exempt = target.survival_visual_scale_exempt,
+    }
     local body_changed = false
     local source_components = source_state and source_state.components
     local source_particles = source_state and source_state.particle_definitions
@@ -991,8 +1005,17 @@ function M.sync_appearance(target, source)
         local _, same_world = active()
         if same_world then clear_mirror_resources(spawned, spawned_particles, world) end
         if world == current_world() and generation_by_hero[index] == generation
-            and valid_entity(target) and body_changed and old_body.model then
-            set_appearance(target, old_body, true)
+            and valid_entity(target) and body_changed then
+            if old_body.model then set_appearance(target, old_body, true) end
+            -- A failed mirror must retain the previous scale policy as well
+            -- as the body. Never overwrite a newer reentrant transaction.
+            if world == current_world() and generation_by_hero[index] == generation
+                and valid_entity(target) then
+                target.survival_visual_base_scale = old_scale.base
+                target.survival_visual_scale_multiplier = old_scale.multiplier
+                target.survival_visual_final_scale = old_scale.final
+                target.survival_visual_scale_exempt = old_scale.exempt
+            end
         end
         return false
     end
@@ -1003,8 +1026,9 @@ function M.sync_appearance(target, source)
         if not wearable or not active() or not set_appearance(wearable, appearance, false) then return abort() end
         components[appearance.id] = wearable
     end
+    if not active() then return abort() end
     body_changed = true
-    if not active() or not set_appearance(target, body, true) then return abort() end
+    if not set_appearance(target, body, true) then return abort() end
     -- The native CP helper also recreates hidden offset carriers. They belong
     -- only to the target and are retired with its other visual entities.
     local particle_components = {}

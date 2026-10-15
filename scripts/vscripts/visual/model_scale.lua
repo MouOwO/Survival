@@ -8,6 +8,15 @@ local function monster_name(name)
         or name:match("^npc_survival_named_")) ~= nil
 end
 
+local function hero(entity)
+    if type(entity.survival_hero_id) == "string" and entity.survival_hero_id ~= "" then return true end
+    if type(entity.IsHero) == "function" then
+        local ok, value = pcall(entity.IsHero, entity)
+        if ok and value == true then return true end
+    end
+    return false
+end
+
 local function valid(entity)
     return entity and (not entity.IsNull or not entity:IsNull())
 end
@@ -27,12 +36,14 @@ function M.factor(entity, building_id)
     if original_size_ids[building_id] then return 1 end
     if valid(entity) then
         if original_size_ids[entity.survival_building_id] then return 1 end
+        if hero(entity) then return 1 end
         if entity.survival_is_wave_monster == true or entity.survival_is_challenge_monster == true
             or entity.survival_rebirth_scene_display == true then return 1 end
         if type(entity.GetUnitName) == "function" then
             local ok, name = pcall(entity.GetUnitName, entity)
             -- The spawn event precedes monster role flags and authored scale assignment.
-            if ok and (original_size_names[name] or monster_name(name)) then return 1 end
+            if ok and (original_size_names[name] or monster_name(name)
+                or type(name) == "string" and name:match("^npc_dota_hero_")) then return 1 end
         end
         -- Props and previews inherit their owner's exemption without an NPC name.
         if building_id == nil and entity.survival_visual_scale_exempt then return 1 end
