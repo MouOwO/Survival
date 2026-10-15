@@ -112,20 +112,21 @@
 
         <Panel id="DifficultySelectionOverlay" class="DifficultySelectionHidden" hittest="true">
             <Panel id="DifficultySelectionDialog" class="UIModal" hittest="true" hittestchildren="true">
+                <Panel id="DifficultySelectionArt" hittest="false" hittestchildren="false" />
                 <Panel id="DifficultySelectionHeader" class="UIModalHeader" hittest="false">
                     <Label id="DifficultySelectionTitle" class="UIFontTitle" text="难度选择" />
-                    <Label id="DifficultySelectionMode" text="模式已确认  ·  请选择难度" />
+                    <Label id="DifficultySelectionMode" text="" visible="false" />
                 </Panel>
                 <Panel id="DifficultySelectionBody">
-                    <Label id="DifficultySelectionHint" text="选中难度后点击确认，本局将无法更改" />
+                    <Label id="DifficultySelectionHint" text="" visible="false" />
                     <Panel id="MatchModeOptions" visible="false" hittest="true" />
                     <Panel id="DifficultySelectionButtons" hittest="true">
                         <Label id="DifficultySelectionLoading" text="正在读取难度配置……" />
                     </Panel>
-                    <Label id="DifficultySelectionError" text="" />
+                    <Label id="DifficultySelectionError" text="" visible="false" />
                     <Panel id="MatchSetupRetryHost" visible="false" />
                 </Panel>
-                <Panel id="DifficultySelectionFooter">
+                <Panel id="DifficultySelectionFooter" visible="false">
                     <Label id="DifficultySelectionCurrent" text="当前选择：尚未选择" />
                     <Panel id="DifficultySelectionConfirmHost" />
                 </Panel>

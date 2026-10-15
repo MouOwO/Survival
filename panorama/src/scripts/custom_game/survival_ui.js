@@ -36,7 +36,10 @@
 
     function setText(id, value) {
         var target = panel(id);
-        if (target) target.text = String(value);
+        if (target) {
+            target.text = String(value);
+            if (id === "DifficultySelectionError") target.visible = target.text !== "";
+        }
     }
 
     function numberValue(value) {
@@ -155,6 +158,7 @@
         setText("DifficultySelectionTitle", "模式选择");
         setText("DifficultySelectionMode", "选择模式  ·  选择难度");
         setText("DifficultySelectionHint", selector ? "请选择本局模式，确认后立即选择难度" : "等待房主统一选择本局模式");
+        panel("DifficultySelectionHint").visible = true;
         setText("DifficultySelectionCurrent", "当前选择：" + (selected ? selected.display_name || selected.mode_id : "尚未选择"));
         setText("DifficultySelectionError", modeError);
         ui.State.Set(difficultyConfirm, {enabled: selector && !!selected && !modePending, busy: modePending});
@@ -211,17 +215,17 @@
     function refreshDifficultyChoice() {
         var ui = GameUI.CustomUIConfig().SurvivalUI;
         var selected = selectedDifficulty();
-        if (!selected) difficultyChoice = "";
+        if (!selected || (!canConfirmDifficulty() && !difficultyRequestPending)) difficultyChoice = "";
         Object.keys(difficultyRows).forEach(function (id) {
             var row = difficultyRows[id];
             ui.State.Set(row.button, {selected: id === difficultyChoice,
-                enabled: difficultySelector() && difficultyUnlocked(row.option) && !difficultyRequestPending});
+                enabled: difficultyAvailable() && canConfirmDifficulty() && difficultySelector()
+                    && difficultyUnlocked(row.option) && !difficultyRequestPending});
             row.availability.text = !difficultyUnlocked(row.option) ? row.option.unlock_hint || "通关前一级难度解锁"
-                : (id === difficultyChoice ? "已选择" : "可选择");
+                : "";
+            row.availability.visible = !difficultyUnlocked(row.option);
         });
-        setText("DifficultySelectionCurrent", "当前选择：" + (selected ? selected.difficulty_id : "尚未选择"));
-        if (difficultyConfirm) ui.State.Set(difficultyConfirm, {enabled: difficultyAvailable()
-            && canConfirmDifficulty() && difficultySelector() && !!selected && !difficultyRequestPending, busy: difficultyRequestPending});
+        if (difficultyConfirm) ui.State.Set(difficultyConfirm, {enabled: false, busy: false});
     }
     function selectDifficulty() {
         var selected = selectedDifficulty();
@@ -286,36 +290,44 @@
         if (!difficultyModal) {
             difficultyModal = ui.ModalShell.Adopt({id: "survival_difficulty", panel: panel("DifficultySelectionDialog"),
                 header: panel("DifficultySelectionHeader"), titlePanel: panel("DifficultySelectionTitle"),
-                scrim: overlay, root: $.GetContextPanel(), width: 1100, height: 820, closePolicy: "mandatory",
+                scrim: overlay, root: $.GetContextPanel(), width: 275, height: 670,
+                fit: {reference: [1920, 1080]}, closePolicy: "mandatory",
                 onClose: hideDifficultySelection});
+            panel("DifficultySelectionDialog").style.backgroundColor = "#100d24";
+            panel("DifficultySelectionDialog").style.border = "1px solid #9d804b";
+            panel("DifficultySelectionHeader").style.backgroundColor = "transparent";
+            panel("DifficultySelectionHeader").style.borderBottom = "1px solid #9d804b";
+            panel("DifficultySelectionTitle").style.color = "#f3e4b0";
             difficultyConfirm = ui.ActionButton(panel("DifficultySelectionConfirmHost"), {
-                id: "DifficultySelectionConfirm", variant: "gold", label: "确认选择", enabled: false,
-                action: function () { if (needsMode()) confirmMode(); else selectDifficulty(); }});
+                id: "DifficultySelectionConfirm", variant: "gold", label: "确认模式", enabled: false,
+                action: confirmMode});
             difficultyResume = $.CreatePanel("Button", $.GetContextPanel(), "DifficultySelectionResume");
+            difficultyResume.AddClass("DifficultySelectionResume");
             difficultyResume.hittest = true; difficultyResume.hittestchildren = false;
-            difficultyResume.style.width = "200px"; difficultyResume.style.height = "44px";
-            difficultyResume.style.horizontalAlign = "right"; difficultyResume.style.verticalAlign = "center";
-            difficultyResume.style.marginRight = "28px"; difficultyResume.style.marginTop = "120px";
-            difficultyResume.style.backgroundColor = "#23414d"; difficultyResume.style.border = "1px solid #b59d69";
             var resumeText = $.CreatePanel("Label", difficultyResume, "");
             resumeText.text = choosingMode ? "继续选择模式" : "继续选择难度";
-            resumeText.hittest = false; resumeText.style.horizontalAlign = "center"; resumeText.style.verticalAlign = "center";
-            resumeText.style.fontSize = "20px"; resumeText.style.color = "#eee0b7";
+            resumeText.hittest = false;
             difficultyResume.__survivalResumeText = resumeText;
             difficultyResume.visible = false;
             difficultyResume.SetPanelEvent("onactivate", function () {
                 difficultyDismissed = false; renderDifficultySelection(difficultyWave);
             });
         }
+        panel("DifficultySelectionDialog").style.width = (choosingMode ? 620 : 275) + "px";
+        panel("DifficultySelectionDialog").style.height = (choosingMode ? 440 : 670) + "px";
         if (!difficultyDismissed && !difficultyModal.IsOpen()) difficultyModal.Open();
         var wasChoosingMode = panel("MatchModeOptions").visible;
         panel("MatchModeOptions").visible = choosingMode;
+        panel("DifficultySelectionFooter").visible = choosingMode;
+        panel("DifficultySelectionCurrent").visible = choosingMode;
+        panel("DifficultySelectionMode").visible = false;
         container.visible = !choosingMode;
         if (choosingMode) { panel("MatchSetupRetryHost").visible = false; renderModeChoice(ui); return; }
         setText("DifficultySelectionTitle", "难度选择");
-        setText("DifficultySelectionMode", (confirmedMode() === "pure" ? "纯净模式" : "常规模式") + "  ·  请选择难度");
-        setText("DifficultySelectionHint", !difficultySelector() ? "等待房主统一选择本局难度" :
-            (canConfirmDifficulty() ? "选中难度后点击确认，本局将无法更改" : "可以先选择难度，玩家档案准备完成后即可确认"));
+        var hint = !difficultySelector() ? "等待房主选择难度" :
+            (canConfirmDifficulty() ? "" : "正在读取玩家档案……");
+        setText("DifficultySelectionHint", hint);
+        panel("DifficultySelectionHint").visible = hint !== "";
         if (wasChoosingMode) setText("DifficultySelectionError", "");
         var options = difficultyOptions().filter(function (option) {
             return option && /^N(?:[1-9]|10)$/.test(String(option.difficulty_id));
@@ -336,9 +348,10 @@
             var availability = $.CreatePanel("Label", header, ""); availability.AddClass("DifficultyOptionAvailability"); availability.html = false;
             difficultyRows[option.difficulty_id] = {button: button, option: option, availability: availability};
             ui.State.Bind(button, function () {
-                if (!difficultyAvailable() || !difficultySelector() || difficultyRequestPending || !difficultyUnlocked(option)) return;
+                if (!difficultyAvailable() || !canConfirmDifficulty() || !difficultySelector()
+                    || difficultyRequestPending || !difficultyUnlocked(option)) return;
                 difficultyChoice = String(option.difficulty_id);
-                setText("DifficultySelectionError", ""); refreshDifficultyChoice();
+                setText("DifficultySelectionError", ""); selectDifficulty();
             });
             });
             if (options.length === 0) {

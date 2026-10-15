@@ -28,6 +28,7 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     ui.setStartup({...startup, setup: {...setup, mode_selected: true, mode_id: "pure"}});
     assert(modal.IsOpen(), "next setup phase remains usable");
     assert.equal(ui.nodes.DifficultySelectionTitle.text, "难度选择");
+    assert(!ui.nodes.DifficultySelectionFooter.visible && !ui.nodes.DifficultySelectionConfirm.enabled);
 }
 {
     const wave = {status: "selecting_difficulty", mode_selected: true, game_mode: "pure", selector_player_id: 0,
@@ -36,12 +37,15 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     ui.advance(0.11);
     const modal = ui.config.SurvivalUI.ModalManager.Get("survival_difficulty");
     click(rows(ui)[1]);
+    assert.equal(ui.requests.filter(request => request.name === "ui_difficulty_select_request").length, 1,
+        "difficulty click submits before Escape without a confirm step");
     ui.config.SurvivalUILayers.HandleEscape("survival_difficulty");
     assert(!modal.IsOpen()); assert(ui.nodes.DifficultySelectionResume.visible);
     ui.setState({sequence: 2, wave, resources: {gold: 100}}); ui.advance(0.5);
     assert(!modal.IsOpen());
     click(ui.nodes.DifficultySelectionResume);
     assert(modal.IsOpen()); assert(rows(ui)[1].BHasClass("UISelected"));
+    assert(!rows(ui)[1].enabled, "pending difficulty cannot be resubmitted after resume");
     click(ui.nodes.DifficultySelectionConfirm);
     const requests = ui.requests.filter(request => request.name === "ui_difficulty_select_request");
     assert.equal(requests.length, 1); assert.equal(requests[0].payload.difficulty_id, "N2");
@@ -71,4 +75,4 @@ const rows = ui => ui.nodes.DifficultySelectionButtons.children;
     assert.equal(ui.config.SurvivalUILayers.Top(),null,"completed match removes an orphaned mandatory layer");
     assert(!ui.requests.some(r=>r.name==="ui_difficulty_select_request"),"visibility recovery does not select a difficulty");
 }
-console.log("ESCAPE_SETUP_WINDOWS_PASS: mode/difficulty hide and resume preserve drafts, same-phase updates stay hidden, completed choices remove resume, new session reopens");
+console.log("ESCAPE_SETUP_WINDOWS_PASS: mode draft and pending direct difficulty survive hide/resume without extra requests; same-phase updates stay hidden, completed choices remove resume, new session reopens");
