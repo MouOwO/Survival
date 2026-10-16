@@ -13,8 +13,11 @@ end
 function M.preview_mode()
     return type(IsInToolsMode)=="function" and IsInToolsMode()
 end
+function M.preview_active(id)
+    return M.preview_mode() and preview[id] ~= nil
+end
 function M.rows(id, archive)
-    local testing = M.preview_mode()
+    local testing = M.preview_active(id)
     local rows = titles.rows(archive, testing and preview[id] or nil)
     if testing then
         local selected = preview[id] ~= nil and preview[id] or titles.selected(archive)

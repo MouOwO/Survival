@@ -249,15 +249,18 @@ class FullArchiveSyncTests(unittest.TestCase):
     def test_title_equip_is_saved_without_granting_pending_gameplay_rewards(self):
         self.stats["starjoy_points"] = 200
         self.archive["clear_counts"] = {"n1": 10}
+        self.archive["endless_best_wave"] = 1
         saved = copy.deepcopy(self.stats)
         self.send("title_equip", title_id="peak_perfection")
         self.assertEqual(self.archive["equipped_title"], "peak_perfection")
+        self.assertIs(self.archive["title_selection_manual"], True)
         self.assertEqual(self.stats, saved)
         denied = self.service.command(self.payload("title_equip", "offline-locked-title", title_id="jinghong"))
         self.assertFalse(denied["ok"])
         self.assertEqual(self.archive["equipped_title"], "peak_perfection")
         self.send("title_equip", "offline-remove-title", title_id="")
-        self.assertEqual(self.archive["equipped_title"], "")
+        self.assertEqual(self.archive["equipped_title"], "peak_perfection")
+        self.assertIs(self.archive["title_selection_manual"], False)
         self.assertEqual(self.stats, saved)
 
     def test_daily_claim_uses_database_date_and_persists_item_counts_once(self):

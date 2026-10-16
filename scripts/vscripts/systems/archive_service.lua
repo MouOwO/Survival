@@ -203,7 +203,7 @@ local function snapshot_profile(player_id, category_id, profile)
         categories = enabled_categories(), has_pass = has_pass(profile) and 1 or 0,
         rows = category_id == "titles" and require("systems/title_presentation_service").rows(player_id,saved(profile))
             or projector and projector(profile, saved(profile)) or {},
-        title_preview = category_id == "titles" and require("systems/title_presentation_service").preview_mode() and 1 or 0,
+        title_preview = category_id == "titles" and require("systems/title_presentation_service").preview_active(player_id) and 1 or 0,
         online = (category_id == "map_level" or category_id == "work")
             and require("systems/archive_online_rewards").info(saved(profile)) or nil,
         social = require("systems/archive_social_rewards").info(saved(profile), category_id),
@@ -751,7 +751,8 @@ function M.init()
             if profile and require("systems/archive_welfare_rewards").needs_reconcile(profile.save.archive) then
                 enqueue(id, {id=session_id..":welfare_reconcile", kind="welfare_reconcile"})
             end
-            if profile and require("systems/archive_endless_rewards").needs_reconcile(profile.save.archive) then
+            if profile and (require("systems/archive_endless_rewards").needs_reconcile(profile.save.archive)
+                or require("systems/archive_titles").needs_reconcile(profile.save.archive)) then
                 enqueue(id, {id=session_id..":endless_reconcile", kind="endless_reconcile"})
             end
             send(id)

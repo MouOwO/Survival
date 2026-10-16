@@ -292,7 +292,11 @@ local function validate_snapshot(snapshot, expected_account_id)
     return true
 end
 
-local function public_value(profile, row)
+local function public_value(profile, row, player_id)
+    if row.field_id == "title_id" then
+        local account = account_profiles_by_player[tonumber(player_id)] or profile
+        return require("systems/archive_titles").selected((account.save or {}).archive or {})
+    end
     local section = tostring(row.source_section or "")
     local key = tostring(row.source_key or "")
     local raw = nil
@@ -383,7 +387,7 @@ local function publish_public_profile(player_id, reason)
     }
     for _, row in ipairs(public_fields.rows or {}) do
         if row.enabled ~= false then
-            projection[tostring(row.field_id)] = public_value(profile, row)
+            projection[tostring(row.field_id)] = public_value(profile, row, player_id)
         end
     end
     CustomNetTables:SetTableValue(
@@ -951,7 +955,7 @@ function M.get_public_profile(player_id)
         revision = profile.revision, player_id = tonumber(player_id) }
     for _, row in ipairs(public_fields.rows or {}) do
         if row.enabled ~= false then
-            result[tostring(row.field_id)] = public_value(profile, row)
+            result[tostring(row.field_id)] = public_value(profile, row, player_id)
         end
     end
     return result

@@ -151,7 +151,7 @@
             effect.text=A.FormatEffects ? A.FormatEffects(description,category==="fragment" ? (item.level===undefined ? 0 : item.level) : undefined,item.id ? state : undefined) : description;
             var details=item.unlock_condition||item.condition_text||"";
             if (category==="work" || category==="building") details+=(details?"\n":"")+(Number(item.completed)===1 ? "已达到最高等级" : "点击"+(category==="building"?"升级":"激活")+" · 消耗 "+item.cost+(category==="building"?" 信仰值":" 软妹币"));
-            if (category==="titles") details+=(details?"\n":"")+(Number(item.equipped)===1 ? "当前已穿戴 · 点击卸下" : state ? "点击穿戴称号" : "达成条件后解锁称号");
+            if (category==="titles") details+=(details?"\n":"")+(Number(item.equipped)===1 ? "当前已穿戴 · 点击恢复最高档自动选择" : state ? "点击穿戴称号" : "达成条件后解锁称号");
             if (category==="fragment" && item.level!==undefined) details+=(details?"\n":"")+"神兵等级 LV"+item.level;
             var source=options.currencySourceText && options.currencySourceText(category,item);
             if (["building","work","starjoy_points"].indexOf(category)>=0 && source) details+=(details?"\n":"")+source;

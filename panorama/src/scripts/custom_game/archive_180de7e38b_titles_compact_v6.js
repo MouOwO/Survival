@@ -237,7 +237,7 @@
             card.SetPanelEvent("onmouseout",function(){if(voidView&&voidView.RequestTooltipHide)voidView.RequestTooltipHide();else hideTooltip();});
             if (current === "titles") {
                 var equipped=Number(item.equipped)===1;
-                var actionLabel=label(card,unlocked!==true?"未解锁":equipped?"已穿戴 · 卸下":Number(item.preview_only)===1?"点击试穿":"点击穿戴","ArchiveTitleAction");
+                var actionLabel=label(card,unlocked!==true?"未解锁":equipped?"已穿戴 · 恢复自动":Number(item.preview_only)===1?"点击试穿":"点击穿戴","ArchiveTitleAction");
                 card.SetPanelEvent("onactivate",function() {
                     if(!active()||!valid(card))return;
                     if (unlocked!==true || titleSubmitting) return;
@@ -377,10 +377,10 @@
         if (current === "titles") {
             var worn=rows.filter(function(item){return Number(item.equipped)===1;})[0];
             panel("ArchiveSummary").text="当前称号："+(worn?worn.name:"未穿戴");
-            panel("ArchiveHint").text="点击称号穿戴 · 再次点击卸下 · 同时显示一个称号";
+            panel("ArchiveHint").text="历史最高无尽每80层提升一档 · 默认最高称号 · 再次点击恢复自动";
             panel("ArchiveStatus").text=Number(data.title_preview)===1
-                ? "首发体验 · 本局试穿 · 英雄头顶即时显示"
-                : Number(data.pending)===1?"正在保存称号…":"穿戴后在英雄头顶显示 · 纯外观称号";
+                ? "工具试穿 · 不改变无尽层数和永久解锁"
+                : Number(data.pending)===1?"正在保存称号…":"第1–80层为第一档，81–160层为第二档 · 按历史最高层数解锁";
             panel("ArchiveEmpty").text="当前筛选下暂无称号";
         }
         if (current === "gift") {

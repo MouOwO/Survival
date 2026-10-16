@@ -57,6 +57,8 @@ local business = snapshot(10)
 business.mode, business.match_session_id, business.progression = nil, nil, nil
 business.save.gameplay_stats.initial_wood = 900
 business.save.archive.clear_counts = {n5=2,n6=1}
+business.save.archive.endless_best_wave = 161
+business.public.title_id = "peak_perfection"
 business.save.content_inventory = {old_permanent=1,new_permanent=1}
 business.entitlements = {vip={active=true}}
 local update = snapshot(10)
@@ -70,6 +72,8 @@ assert(profiles.get_profile(0).save.content_inventory.old_permanent == nil)
 assert(not entitlements[0].vip, "business VIP must never grant combat entitlement")
 assert(profiles.get_account_profile(0).save.gameplay_stats.initial_wood == 900)
 assert(profiles.get_account_profile(0).save.content_inventory.old_permanent == 1)
+assert(profiles.get_public_profile(0).title_id == "youlong",
+    "cosmetic title uses account history even when pure-mode combat archive is empty")
 local returned = profiles.get_account_profile(0)
 returned.save.content_inventory.old_permanent = 0
 assert(profiles.get_account_profile(0).save.content_inventory.old_permanent == 1, "business view is copied")
@@ -98,6 +102,7 @@ local next_snapshot = snapshot(10)
 respond(index, next_snapshot)
 assert(profiles.get_profile(0).save.gameplay_stats.initial_wood == 10)
 assert(profiles.get_account_profile(0).save.content_inventory.old_permanent == nil)
+assert(profiles.get_public_profile(0).title_id == "", "a new account snapshot cannot retain another saved title")
 mode = nil
 local before = #requests
 assert(profiles.load_player(0).error == "mode_not_selected")

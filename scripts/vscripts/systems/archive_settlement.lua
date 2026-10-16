@@ -98,6 +98,7 @@ function M.settle(profile, command, pass, context)
     else
         return { ok = false, error = "archive_command_invalid" }
     end
+    require("systems/archive_titles").sync(archive)
     require("systems/archive_welfare_rewards").reconcile(archive, stats, apply_effects)
     -- Online checkpoints are deduplicated by their cumulative session cursor, without one saved ID per minute.
     if command.kind ~= "online_checkpoint" then archive.processed[command.id] = true end
