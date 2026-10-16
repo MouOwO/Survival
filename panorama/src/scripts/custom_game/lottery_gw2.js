@@ -69,11 +69,11 @@
         var tooltip=make("Panel",detail,"LotteryGW2Tooltip","LotteryGW2Tooltip"); tooltip.hittest=false; tooltip.hittestchildren=false; tooltip.visible=false;
         skin(tooltip,"tooltip_background"); style(tooltip,{zIndex:"100",flowChildren:"none"});
         art(tooltip,"LotteryGW2TooltipFrame","tooltip_frame",0,0,366,340);
-        var tipName=label(tooltip,"LotteryGW2TooltipName","",22,20,322,54,23,"#f0dfb8");
-        var tipState=label(tooltip,"LotteryGW2TooltipState","",22,78,322,30,17,"#b5bfbb");
+        var tipName=label(tooltip,"LotteryGW2TooltipName","",22,24,322,54,23,"#f0dfb8");
+        var tipState=label(tooltip,"LotteryGW2TooltipState","",22,82,322,30,17,"#b5bfbb");
         var tipScroll=make("Panel",tooltip,"LotteryGW2TooltipScroll"); place(tipScroll,22,116,322,178); style(tipScroll,{flowChildren:"down",overflow:"squish scroll"});
         var tipDescription=label(tipScroll,"LotteryGW2TooltipDescription","",0,0,316,178,18,"#e0d6c5"); style(tipDescription,{height:"fit-children",ignoreParentFlow:"false",whiteSpace:"normal"});
-        var tipCount=label(tooltip,"LotteryGW2TooltipQuantity","",22,304,322,24,17,"#b5bfbb");
+        var tipCount=label(tooltip,"LotteryGW2TooltipQuantity","",22,294,322,24,17,"#b5bfbb");
         view={root:shell,header:header,sidebar:sidebarPanel,content:content,detailLayer:detail,tooltip:tooltip,tipName:tipName,tipState:tipState,tipDescription:tipDescription,tipCount:tipCount,tipScroll:tipScroll,tabs:[]};
         tipDismiss=cfg.SurvivalTooltipDismiss.Create({panel:tooltip,getRect:tooltipRect,hide:hideTooltip,isAlive:alive,isVisible:function(){return canAct()&&valid(tooltip)&&tooltip.visible;}});
         view.title=label(header,"LotteryGW2Title","抽奖",112,10,474,45,31,"#efdfbc");
@@ -216,7 +216,7 @@
         var h=Math.max(252,Math.min(530,178+Math.ceil(lines.join("").length/17)*25+lines.length*15));
         var cp=p("LotteryMainCanvas").GetPositionWithinWindow(),at=anchor.GetPositionWithinWindow(),sx=(p("LotteryMainCanvas").actualuiscale_x||1)*scale,sy=(p("LotteryMainCanvas").actualuiscale_y||1)*scale;
         var x=(at.x-cp.x)/sx+128,y=(at.y-cp.y)/sy;if(x+366>1508)x=(at.x-cp.x)/sx-378;x=Math.max(28,Math.min(1142,x));y=Math.max(25,Math.min(839-h,y));
-        place(view.tooltip,x,y,366,h);place(p("LotteryGW2TooltipFrame"),0,0,366,h);place(view.tipScroll,22,116,322,h-162);place(view.tipCount,22,h-36,322,24);view.tooltip.visible=true;tipDismiss.Shown(anchor);return true;
+        place(view.tooltip,x,y,366,h);place(p("LotteryGW2TooltipFrame"),0,0,366,h);place(view.tipScroll,22,116,322,h-162);place(view.tipCount,22,h-46,322,24);view.tooltip.visible=true;tipDismiss.Shown(anchor);return true;
     }
     var originalDialog=R&&R.LotteryDialog,originalReward=R&&R.RewardCard,presentation=cfg.SurvivalRewardPresentation,originalIcon=presentation&&presentation.CreateIcon;
     function iconWrapper(parent,item,className){var icon=originalIcon.call(presentation,parent,item,className);return alive()&&lotteryParent(parent)?existingRewardArt(icon,item):icon;}

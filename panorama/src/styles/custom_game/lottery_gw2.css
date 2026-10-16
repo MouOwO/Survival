@@ -59,3 +59,8 @@
 #LotteryMainCanvas.LotteryGW2 #LotteryCinematicSurface { position:0px 0px 0px; width:1113px; height:669px; }
 #LotteryMainCanvas.LotteryGW2 VerticalScrollBar { width:10px; margin:5px 3px; background-image:url("file://{images}/custom_game/lottery_gw2_v1/scroll_track.png"); background-size:100% 100%; }
 #LotteryMainCanvas.LotteryGW2 VerticalScrollBar .ScrollThumb { min-height:30px; background-color:#8c886e; background-image:url("file://{images}/custom_game/lottery_gw2_v1/scroll_thumb.png"); background-size:100% 100%; border:0px; }
+
+/* Keep prize artwork and rarity frames without quantity badges or dark plates. */
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot { background-image:none; background-color:transparent; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeFace > .LotteryGW2Art,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeOwned { visibility:collapse; }
