@@ -47,3 +47,5 @@ data/ui/collection_portraits_compact_v1.json text eol=lf
 data/ui/commerce_product_art_v1.json text eol=lf
 data/ui/commerce_generated_art_v1.json text eol=lf
 tools/art_sources/commerce_art_v1/prompts.json text eol=lf
+data/ui/shop_home_catalog_20261016.json text eol=lf
+data/ui/shop_home_video_review_20261016.json text eol=lf

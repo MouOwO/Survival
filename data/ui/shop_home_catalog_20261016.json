@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "video_frame",
+    "reference": "data/ui/shop_home_video_review_20261016.json",
+    "video_filename": "全部商城道具价格积分道具礼包英雄皮肤抽卡概率等.mp4",
+    "video_sha256": "24ce74f864aac59f288f547557b0785e56372f933ba196d92994d37635641b49",
+    "timestamps_seconds": [
+      380,
+      420,
+      438,
+      452
+    ],
+    "frames": [
+      "tmp/home_catalog_20261016/frames/t0380.jpg",
+      "tmp/home_catalog_20261016/frames/t0420.jpg",
+      "tmp/home_catalog_20261016/frames/t0438.jpg",
+      "tmp/home_catalog_20261016/frames/t0452.jpg"
+    ],
+    "video_count": 20,
+    "bottom_verified": true
+  },
+  "policy": "Only product entries join authoritative catalog objects. Unavailable entries are local read-only labels without SKU, price, rewards or checkout. Owned or delisted authoritative products remain hidden.",
+  "entries": [
+    {
+      "kind": "product",
+      "source_id": "P033",
+      "name": "伐木斧",
+      "sku": "video_p033"
+    },
+    {
+      "kind": "unavailable",
+      "source_id": "P008",
+      "name": "焚天曜轮"
+    },
+    {
+      "kind": "product",
+      "source_id": "P029",
+      "name": "工作效率",
+      "sku": "video_p029"
+    },
+    {
+      "kind": "product",
+      "source_id": "P012",
+      "name": "剑圣",
+      "sku": "video_p012"
+    },
+    {
+      "kind": "product",
+      "source_id": "P032",
+      "name": "快速建造",
+      "sku": "video_p032"
+    },
+    {
+      "kind": "product",
+      "source_id": "P005",
+      "name": "双倍通关卡",
+      "sku": "video_p005"
+    },
+    {
+      "kind": "product",
+      "source_id": "P018",
+      "name": "时间科技",
+      "sku": "video_p018"
+    },
+    {
+      "kind": "unavailable",
+      "source_id": "P006",
+      "name": "兔女郎城墙"
+    },
+    {
+      "kind": "unavailable",
+      "source_id": "P007",
+      "name": "昭穹羽君"
+    },
+    {
+      "kind": "product",
+      "source_id": "P004",
+      "name": "清暑符",
+      "sku": "video_p004"
+    },
+    {
+      "kind": "product",
+      "source_id": "P066",
+      "name": "陨落天矿",
+      "sku": "video_p066"
+    },
+    {
+      "kind": "product",
+      "source_id": "P067",
+      "name": "山海鲲鹏",
+      "sku": "video_p067"
+    },
+    {
+      "kind": "product",
+      "source_id": "P068",
+      "name": "轮回仙碑",
+      "sku": "video_p068"
+    },
+    {
+      "kind": "product",
+      "source_id": "P072",
+      "name": "苍松固城",
+      "sku": "video_p072"
+    },
+    {
+      "kind": "product",
+      "source_id": "P071",
+      "name": "斫木宗师",
+      "sku": "video_p071"
+    },
+    {
+      "kind": "product",
+      "source_id": "P070",
+      "name": "林铸千矢",
+      "sku": "video_p070"
+    },
+    {
+      "kind": "product",
+      "source_id": "P069",
+      "name": "翠木归元",
+      "sku": "video_p069"
+    },
+    {
+      "kind": "unavailable",
+      "source_id": "P073",
+      "name": "天道傀儡"
+    },
+    {
+      "kind": "unavailable",
+      "source_id": "P074",
+      "name": "封神榜"
+    },
+    {
+      "kind": "product",
+      "source_id": "P075",
+      "name": "诛仙剑阵",
+      "sku": "video_p075"
+    }
+  ]
+}

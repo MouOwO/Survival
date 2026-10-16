@@ -314,3 +314,52 @@
     J.Bundle=function(parent,item,props){return compactCard(parent,item,props,true);};
     cfg.SurvivalCommerceComponents=J;
 })();
+
+// BEGIN GENERATED SHOP HOME CATALOG 20261016
+// Source: data/ui/shop_home_catalog_20261016.json; SHA256 c5386377021231c0579ddfcf6f969fa8094e6126cb0c8ddd695a5ba781469cda
+(function(){
+    "use strict";
+    var cfg=GameUI.CustomUIConfig(),entries=[
+        {"kind":"product","source_id":"P033","name":"伐木斧","sku":"video_p033"},
+        {"kind":"unavailable","source_id":"P008","name":"焚天曜轮"},
+        {"kind":"product","source_id":"P029","name":"工作效率","sku":"video_p029"},
+        {"kind":"product","source_id":"P012","name":"剑圣","sku":"video_p012"},
+        {"kind":"product","source_id":"P032","name":"快速建造","sku":"video_p032"},
+        {"kind":"product","source_id":"P005","name":"双倍通关卡","sku":"video_p005"},
+        {"kind":"product","source_id":"P018","name":"时间科技","sku":"video_p018"},
+        {"kind":"unavailable","source_id":"P006","name":"兔女郎城墙"},
+        {"kind":"unavailable","source_id":"P007","name":"昭穹羽君"},
+        {"kind":"product","source_id":"P004","name":"清暑符","sku":"video_p004"},
+        {"kind":"product","source_id":"P066","name":"陨落天矿","sku":"video_p066"},
+        {"kind":"product","source_id":"P067","name":"山海鲲鹏","sku":"video_p067"},
+        {"kind":"product","source_id":"P068","name":"轮回仙碑","sku":"video_p068"},
+        {"kind":"product","source_id":"P072","name":"苍松固城","sku":"video_p072"},
+        {"kind":"product","source_id":"P071","name":"斫木宗师","sku":"video_p071"},
+        {"kind":"product","source_id":"P070","name":"林铸千矢","sku":"video_p070"},
+        {"kind":"product","source_id":"P069","name":"翠木归元","sku":"video_p069"},
+        {"kind":"unavailable","source_id":"P073","name":"天道傀儡"},
+        {"kind":"unavailable","source_id":"P074","name":"封神榜"},
+        {"kind":"product","source_id":"P075","name":"诛仙剑阵","sku":"video_p075"}
+    ];
+    function identity(entry){return entry.kind==="product"?entry.sku:"home_unavailable_"+entry.source_id;}
+    function compose(products,isListed){
+        var bySku=Object.create(null),result=[];
+        (Array.isArray(products)?products:[]).forEach(function(item){if(item&&typeof item.sku==="string"&&!bySku[item.sku])bySku[item.sku]=item;});
+        entries.forEach(function(entry){
+            if(entry.kind==="unavailable"){
+                var placeholder={home_unavailable:true,home_display_id:identity(entry),source_id:entry.source_id,title:entry.name,
+                    description:entry.name+"：暂未开放。",enabled:false};
+                if(Object.freeze)Object.freeze(placeholder);result.push(placeholder);
+            }else{
+                var item=bySku[entry.sku];if(item&&typeof isListed==="function"&&isListed(item))result.push(item);
+            }
+        });
+        return result;
+    }
+    cfg.SurvivalShopHomeCatalog={
+        sourceHash:"c5386377021231c0579ddfcf6f969fa8094e6126cb0c8ddd695a5ba781469cda",
+        List:function(){return entries.map(identity);},
+        Compose:compose
+    };
+})();
+// END GENERATED SHOP HOME CATALOG 20261016
