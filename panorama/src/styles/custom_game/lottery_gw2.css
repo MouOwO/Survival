@@ -33,6 +33,7 @@
 #LotteryMainCanvas.LotteryGW2 #LotteryGuaranteeRow Label { font-size:25px; color:#dfcca0; text-shadow:#000000 0px 1px 3px 1.0; }
 #LotteryMainCanvas.LotteryGW2 .LHGuaranteeLine { background-color:#738576; width:435px; height:1px; position:0px 52px 0px; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PreviewCard:hover { brightness:1.2; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PreviewCard .LotteryGW2Label { text-align:center; }
 #LotteryMainCanvas.LotteryGW2 .LotteryInfoGW2 { width:1113px; height:669px; background-image:none; background-color:transparent; padding:0px; margin:0px; flow-children:none; transform:none; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2Cell { transition-property:opacity,transform; transition-duration:.12s; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2Cell .LotteryGW2SelectedFrame { opacity:0; }
