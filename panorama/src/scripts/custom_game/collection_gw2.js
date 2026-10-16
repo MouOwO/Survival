@@ -81,12 +81,15 @@ function leaveTooltip(){if(tooltip)tooltip.QueueHide();}
 function showTooltip(card,item){if(alive()&&opened&&valid(card))tooltip.Show(item,current,card,false);}
 function rewardIcon(card,item){
  var host=make("Panel",card,"","CollectionGW2Portrait");rect(host,2,2,portraitSize,portraitSize);host.hittest=false;host.hittestchildren=false;
- // The formal social catalog is private to ArchiveHandoff.Icon. Preserve the
- // exact Image it resolves, including its head_v3 URI, without copying a catalog.
- A.Icon(host,item,current,{});
- var portrait=null;
+ // Dedicated, prefiltered thumbnails avoid loading large originals into the grid.
+ // Unknown catalogue entries keep the existing resolver and their original artwork.
+ var portrait=null,portraitId=String(item.id||"");
+ if(/^(ex|friend|wife|beast)_(0[1-9]|[1-3][0-9]|40)$/.test(portraitId)){
+  portrait=make("Image",host,"","");
+  portrait.SetImage("s2r://panorama/images/custom_game/collection_portraits_compact_v1/"+portraitId+".vtex");
+ }else A.Icon(host,item,current,{});
  function find(n){if(portrait)return;if(n.paneltype==="Image"){portrait=n;return;}array(n.Children()).forEach(find);}
- array(host.Children()).forEach(find);
+ if(!portrait)array(host.Children()).forEach(find);
  if(!portrait)return;
  portrait.SetParent(host);
  array(host.Children()).forEach(function(child){if(child!==portrait)child.DeleteAsync(0);});

@@ -1,0 +1,2747 @@
+{
+  "schema_version": 1,
+  "asset_set": "collection_portraits_compact_v1",
+  "usage": "collection_grid_only",
+  "dimensions": [
+    128,
+    128
+  ],
+  "pixel_format": "RGBA",
+  "resize": {
+    "algorithm": "Lanczos",
+    "alpha": "premultiplied",
+    "color_space": "srgb_encoded"
+  },
+  "texture": {
+    "output_format": "BGRA8888",
+    "no_lod": true,
+    "mip_algorithm": "Box",
+    "mip_levels": 8,
+    "payload_bytes_per_texture": 87380
+  },
+  "count": 160,
+  "legacy_payload_bytes": 141504160,
+  "target_payload_bytes": 13980800,
+  "items": [
+    {
+      "id": "ex_01",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_01.png",
+      "source_sha256": "c53091d12db6f3c579195da7dcf0681d16e62ea3f8687e1d8bbd6974b9cc9b7d",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_01.png",
+      "png_sha256": "6d4b3eb3cfbfb8860fd89e96385a0ffcdae43d0513f5c9e9f09e8831842f576b",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_01.vtex",
+      "texture_sha256": "1e1e0c73e883de03ca728c08cdd69beff8c0ba91d6e5539dc48ad4b61f52d893",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_01.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_01.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_02",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_02.png",
+      "source_sha256": "8bbb19f44e9b24c6ae5dc0c52618cbd611edabdcaa407176065434bb4fa9dae0",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_02.png",
+      "png_sha256": "c7b294dfc8ecd1c663816be1fe35a6ebd37a38e84b83e1aa9cc2cd2940d4fc7a",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_02.vtex",
+      "texture_sha256": "72c47c8428080249f3a44805fae6029d13cb038f4540539acede85b7c580e0bc",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_02.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_02.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_03",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_03.png",
+      "source_sha256": "25393c965dc7c643022f278600d55c38a5afb008d9108b0054909968857e3b23",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_03.png",
+      "png_sha256": "9a91cd0427bb0d20063d036e26536180c4ee5af0a49f840ce06f21a958a00997",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_03.vtex",
+      "texture_sha256": "5275f20cd0235653770f5b445c1bcde56bacc75fa2a930337851553fde595216",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_03.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_03.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_04",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_04.png",
+      "source_sha256": "6822b95da34396db765b4cb18227b6dc1c3d23934050031f73e02e07fe1cbbc8",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_04.png",
+      "png_sha256": "c76fc2aea6f0b3578573e9902b9b41e9fa5c4f0fb6cdca0c1a967362c49e03bd",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_04.vtex",
+      "texture_sha256": "d20da47f7eb0eb13454b968db11355311136e31b25bd789e36399b2ce6730954",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_04.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_04.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_05",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_05.png",
+      "source_sha256": "5d71148d1faff68d78ac6ec93a50f3e89cc83cbfa5085261754bf0167efee3a0",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_05.png",
+      "png_sha256": "e476111b9f13c3ee7b3980d770f89500eca4a2e762a4688f4d51e8e08b8689c1",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_05.vtex",
+      "texture_sha256": "0cd71d7138c9ec276375c4b62658facb6301c06ed5405fdbce4879ed7555fa34",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_05.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_05.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_06",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_06.png",
+      "source_sha256": "a6c6a4f283e780e951b411d357d9c04b77d6ea2be5e8faa82420e7abaa361034",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_06.png",
+      "png_sha256": "b4eed0291c9db77ca0ae9eeb9abe3a5163a718437a253cd7be94824894a99bdc",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_06.vtex",
+      "texture_sha256": "c07844c9ff59c91398db7407836d5a87acd27df878d24b22bb620b8af0eff8b3",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_06.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_06.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_07",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_07.png",
+      "source_sha256": "86dba50a9a3611d347e6ad8b73ff360e8310a5de5057f9d691564b812de4013c",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_07.png",
+      "png_sha256": "10f89c33fc798e061cdad16d7034c083349cf57130a505b16e0c7e512f76655f",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_07.vtex",
+      "texture_sha256": "33ed911e8678cdbda06dfff022fa56cd9a81cb2e7d55beb9ef9aab75cd8cd458",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_07.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_07.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_08",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_08.png",
+      "source_sha256": "6fbde22503c5080b8bd9044b0ff3501f24a7ca48543f98ae8f8f351795468247",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_08.png",
+      "png_sha256": "ac921460096e879108270d6f4678b91fb4b7bf43d88f4dc923143c0fe5e0703b",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_08.vtex",
+      "texture_sha256": "53e5c7e70af2a45ce3ad3bd005f8b2d19ca624f211ec75e9614fe2b22402c71c",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_08.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_08.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_09",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_09.png",
+      "source_sha256": "dfb2ad3c8d1e5c8fb8a1678e522cd574050f1dfdd7b85a7c30ecf76ee1de53ca",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_09.png",
+      "png_sha256": "fbd003006b08511f02fb3e1d4c0ac4ea00d840f1a834603e0407280b33befd3d",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_09.vtex",
+      "texture_sha256": "de8479b59267dfb2d6671078971b720a1e9e0cbe21b27ef52eb1771f52b58116",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_09.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_09.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_10",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_10.png",
+      "source_sha256": "8a8fcb35e146772c255a71b75537430331cb20b6d30fac0921d031b599e13acf",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_10.png",
+      "png_sha256": "8088d1655c5819446ee5ce31879dec70d33236ddcba1118813c65a97d41529c9",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_10.vtex",
+      "texture_sha256": "5d4d49da6c2ab7e298e8901e92c698ffc5e2abe6573797fcd4fc35a9b364da19",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_10.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_10.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_11",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_11.png",
+      "source_sha256": "7c9678eec7f23025270d490b5929b00f25350dbd45582691be2acae362175aa1",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_11.png",
+      "png_sha256": "f990790e99eb8edd3f2020989575a9bfdb6286d898edb316ccd1a78d0ecc712f",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_11.vtex",
+      "texture_sha256": "06b2cdbc2c8251492a8e4a75cbc72f59d302cbf82b89d2b5bed8b831cd8f103c",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_11.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_11.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_12",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_12.png",
+      "source_sha256": "602b4759a79435eeffa8618c3c659db65d5d815225606bd7af3675e6f5715ec0",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_12.png",
+      "png_sha256": "af36ab010e001089be5b961d49186132ec9a6ba0df81de42eb729329aca0bf31",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_12.vtex",
+      "texture_sha256": "d648342d5a0bd8c41092d0d6a5e60fb8e22f59b706b24dc3254dcd6ce9c70fc8",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_12.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_12.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_13",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_13.png",
+      "source_sha256": "05bcf5e3bfdc45f4a19aa8497ac4aca5b9b55b68ed4867810fff5b7b050be2f8",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_13.png",
+      "png_sha256": "190324e6521c85142fc9c0aaac61dd278202d651b5cedd04db73dd1522ecde10",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_13.vtex",
+      "texture_sha256": "aea276aafbab2a9819ad83c74a37433848fb2068dfad8226d6ecfc1a617d84cf",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_13.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_13.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_14",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_14.png",
+      "source_sha256": "12856168477916b35ea841e1790385a07fd5141eafa5b3bee32c665b93e78c6f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_14.png",
+      "png_sha256": "56bc6e6f11b9b34d66912e01a57ab5289241c4f47f939ca4d2609f56e71ad9e9",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_14.vtex",
+      "texture_sha256": "ccceaf6ab5fb4518672e398aafeb39901fcf48065652ba43fb846f84b0fe95f4",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_14.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_14.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_15",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_15.png",
+      "source_sha256": "066b9f3a96585bc9054aa67ca9c2cab3215b72f1d2cec908b39f634b4d2b5cef",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_15.png",
+      "png_sha256": "36b07b25e5f717414729e436427043d27048e07e17ef97a873dc56a5ca75b7d5",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_15.vtex",
+      "texture_sha256": "955806c2f68589034f3e7bdbb73ecc605c26a7d2341e7c3c90a76341791e33d0",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_15.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_15.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_16",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_16.png",
+      "source_sha256": "9ed4889dfac4bb6a9e31029149598340a6086e3b3c81b6555ee5ea285d8b2716",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_16.png",
+      "png_sha256": "02d7b9d882cd3a127fe6ca866f6e08576eca5bde80c7ae76c6fb9fb54657a4a9",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_16.vtex",
+      "texture_sha256": "36b0e384d5ccd1df7ed4094e1556066791cb8415c0059272b4c1d9c425752fca",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_16.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_16.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_17",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_17.png",
+      "source_sha256": "4cb4822fec50984730ccc4ea66d66273f07d7e28ec5a3942d305477666d357a0",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_17.png",
+      "png_sha256": "39d25c335608432fb88868582124eb2e03f16290929a0aed4d20d4ee8c808454",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_17.vtex",
+      "texture_sha256": "2415e3499c0b1ee7e73f26b2fc3d11b22ddbc18a9acab1b5359fa63f334d239b",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_17.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_17.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_18",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_18.png",
+      "source_sha256": "2921d3dc82476081e52c3592080d0acb7321d1f9c64f5b5c8ae3a98d6686b2ce",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_18.png",
+      "png_sha256": "2288b5aecbf39248e2af4877550afc64715cfcb0d4d4811ff62f8743c8bd1f31",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_18.vtex",
+      "texture_sha256": "c265535315d3360e78f07e2c6f149acee87424979833c13b902635bc5437014a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_18.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_18.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_19",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_19.png",
+      "source_sha256": "05a950245f3a26860db163d334d7d68e0afc8d33e560dcf276337487fafa4c4f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_19.png",
+      "png_sha256": "f197c4067459d7a4f3ec13e5d6a7bc31eb51c41838494f27a5a1f7055c5db252",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_19.vtex",
+      "texture_sha256": "db47411898b6d3db8f2eb7f62937e60bfca81e9f3f8c8a8e36f7c982b76ee888",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_19.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_19.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_20",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_20.png",
+      "source_sha256": "90e847e4b5d964ef42a2e2f801572200e01844b8a529acc4287690f72993d986",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_20.png",
+      "png_sha256": "74491cfa81861b6bfcb667ed97bc04fe0f1d771c75f852232f79685683e5a67b",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_20.vtex",
+      "texture_sha256": "d2d41ea584b7f924794541c79da447166f8e1fe928c750ab7542da45a0914225",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_20.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_20.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_21",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_21.png",
+      "source_sha256": "53cf8c2285b9c1f9ddeb24cdadf889bc0108b158901df08f9f245c21a83277db",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_21.png",
+      "png_sha256": "b83d076cb0cda0817e9ab8721cff9aa753a5f27dd5d2f3e2f8140d41d163faa9",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_21.vtex",
+      "texture_sha256": "a1413163f421234d6569bb68f74d1afe2b2de26ae5e31f17c725ff7b5d144ad9",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_21.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_21.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_22",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_22.png",
+      "source_sha256": "6921ef81b079a9f528ab700b93f452c43d02f57229dec75094c5d749b53af8be",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_22.png",
+      "png_sha256": "2bd7b155e31d681c2fdd1c0e92b7eddf5c155ba7c4194c92215c7c18879ad6be",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_22.vtex",
+      "texture_sha256": "48282ac6959cea876fa8995e46933875b160208efc1ce074f76e19abb53dfb10",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_22.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_22.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_23",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_23.png",
+      "source_sha256": "d3d87a391fb6271b88c401c18f108fd2d728705bfe6749352e927c1aa7859872",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_23.png",
+      "png_sha256": "f63a2822b51acb06071510d31e0dcae4eb25529c9f3e7f6dc4f6a8da2197793f",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_23.vtex",
+      "texture_sha256": "6bc92c5b0660157bb44ae6168267ad7f4356fdb59c89bdb3aa39b795448f3b7d",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_23.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_23.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_24",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_24.png",
+      "source_sha256": "80e1266f4719c70f43252c5511046e60fff983986ae6811d63882dc38bc6e66f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_24.png",
+      "png_sha256": "fe8ab7e1c6168202fabec7991d6ba25740a337f3f7a37ee04b2407786b40784b",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_24.vtex",
+      "texture_sha256": "e23e02c825d36dc652e828aa1f569a857194708090581cb53dbba06d3570d9c4",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_24.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_24.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_25",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_25.png",
+      "source_sha256": "4dfcd276ed9d687b0fc2d4627100bc411683637db4a5427774fb70925fa222d3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_25.png",
+      "png_sha256": "5eb6bd64b9964d1090e5444ccd6f7489fe31108c36b8252f3fa18606dbe5b9eb",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_25.vtex",
+      "texture_sha256": "1e4553cd7ad50a447e058497c0598beefe2bb87d7ae36cd629bc288bdf29ad5a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_25.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_25.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_26",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_26.png",
+      "source_sha256": "1845b541991078bad4dfcb0054556b8be645c9f3d366ce3cf4dc529b17473279",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_26.png",
+      "png_sha256": "eabc3b900765d559ec3a454850e2f908353ce277bda0650a3af0c7f2ba632f4d",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_26.vtex",
+      "texture_sha256": "45eadfe77c435be844a62b9a1d613fdfb80d91f33f4c5821993c93f1dab1b353",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_26.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_26.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_27",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_27.png",
+      "source_sha256": "6d8356f1aa0809e2d72e47758bd4fcc47523c9f25bff2b25c97330d634b03888",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_27.png",
+      "png_sha256": "0746eec35cc33bfc95f3484ddfd49bb00f4d1ec8a2f64b5312cc5e23e622dc9d",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_27.vtex",
+      "texture_sha256": "d877fa26bf2009e08f2a38f3e999d9174dc969d80b19bbf53925ce7c7cedb93c",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_27.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_27.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_28",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_28.png",
+      "source_sha256": "57843878908df8085027d8d07feab0e638c52f03a1216727a5c8d5a0e5f5a176",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_28.png",
+      "png_sha256": "cf3b885b791bfac0fcb4860fcf0e58fd9f755d6b49d13a9f54382c6eea0e3365",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_28.vtex",
+      "texture_sha256": "5f6683345bb598ad6c96f186ac0e5603da232967e3c91f758ee3ea35b8e6f173",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_28.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_28.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_29",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_29.png",
+      "source_sha256": "14ddeb09f9c545a8a826f43b775a913f8ad143689edbaf52771ddddebaaf3e24",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_29.png",
+      "png_sha256": "a92a9b5cceae6ed9731abc22df987bd1ae94824ea740f1bee51907c0aafa46d8",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_29.vtex",
+      "texture_sha256": "da667420d647a35d606ff39bd84fc6d8a482aebc81e123ef193982fd09169702",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_29.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_29.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_30",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_30.png",
+      "source_sha256": "61e298c40be917df5deafa91782d98d30896fde071065f806b60c83498a13f03",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_30.png",
+      "png_sha256": "663a9e5157ba3a2ecbfc898ace674eb1f8fdb7df8b67b9579df69d5d1351c5b1",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_30.vtex",
+      "texture_sha256": "288c1aba637221df1da8693cee05fee5ce6ad2f08b56586d5ab021be289cae0a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_30.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_30.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_31",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_31.png",
+      "source_sha256": "cc9fe263ae20e744e9b1b8385ea7dbeb4881db99b3566695aafa95bfca7055f3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_31.png",
+      "png_sha256": "1938cbdc2e5728676cc7159772b837658bc8a13fdcf5ca2eb91ee482c72aaf2d",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_31.vtex",
+      "texture_sha256": "fc7d9c0a991a9e2095a9da5b3a4dcdafdfaf90d90c8f6037e0d3b7c5cb616a00",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_31.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_31.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_32",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_32.png",
+      "source_sha256": "d60e872a0b1afc278f04ab8741ddda44c7a4d265bb21b3f3ed0dc6bff90f5131",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_32.png",
+      "png_sha256": "33c922d45c2bbb2ac6fce79540d2bf754c47a2f8368e5cc41d5a0800f00b3217",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_32.vtex",
+      "texture_sha256": "7cbe1a96bcd6c6ee1ccccc2dc8468bf6036ab56db8ed9fe77de9fc75e0d44a8c",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_32.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_32.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_33",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_33.png",
+      "source_sha256": "f1ca084bb3dcd064161ce207769158e177df47157a1df4917cd2f4bc1136edf5",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_33.png",
+      "png_sha256": "8021998ceb6725dbcbfe3906be20b8d730c73a25bc08697a75388f02d6fd8cd7",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_33.vtex",
+      "texture_sha256": "430bff6af4d867872b5bc2395b70e7152bc3a45683c1029107b2ee0ad9cef43b",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_33.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_33.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_34",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_34.png",
+      "source_sha256": "e4af5e027df34b9509b31afc590d44ecc7e7006a10d1efaabdcafde6fd86b5c1",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_34.png",
+      "png_sha256": "6572b2c3d9e844e2fdeea27016bcb0c53c25800466ac08a938a4db2137c8cdf8",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_34.vtex",
+      "texture_sha256": "e1a382a64c70971ca48d84a8e303adbbd263bddb35bf77e0d6ccb3c6daa34bee",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_34.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_34.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_35",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_35.png",
+      "source_sha256": "7bcbc1d06a7fc989706eced2ff5778347860ccc231a52ce0ce112f3e3c99e974",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_35.png",
+      "png_sha256": "fa6b919f607584c2f5986835a7f2829b08b0f22142edcd5e8c16e28fe6618851",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_35.vtex",
+      "texture_sha256": "1c89c1ddf438a421ca74fc45a0652ebe97f219f138be0d5f30018792383136d2",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_35.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_35.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_36",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_36.png",
+      "source_sha256": "adf6665ad24cea3d81adb94e950e01f0b9e431a13a317ef7d79ec1dafbff6bbd",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_36.png",
+      "png_sha256": "ca84169d885475b9793d60941933e3f15a4cb676adf43a1870d05be2f22cf897",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_36.vtex",
+      "texture_sha256": "67a5faf64d1f49d16ada63c2ccc6bc09d37bd80029b966d0b2bd60dbc164eece",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_36.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_36.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_37",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_37.png",
+      "source_sha256": "a2fcc9bf415529541da4a586b0493b0dc85f8d003c83218a3c270777e79536f3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_37.png",
+      "png_sha256": "2075baf7e161532af7c83c967d49713c7d1d86d581bdedd130006ff2b376b3fe",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_37.vtex",
+      "texture_sha256": "031db6dfc6ce9eefb29dff961e03b1baf79d3805de16a0447f2ecc03d04de2e3",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_37.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_37.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_38",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_38.png",
+      "source_sha256": "9d75b2c2fa48178049001561fb415770606d02258ec4e77f28bccab32576a195",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_38.png",
+      "png_sha256": "d1364786bfb98b8d045c3cda8fbf6410d50c0b13d7e9a7cede8d55d08c5d564a",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_38.vtex",
+      "texture_sha256": "639d3f5fe1f8ba06619ecaf08d87298f49d6a2d61e7dd6d28d0343f96bf06f44",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_38.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_38.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_39",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_39.png",
+      "source_sha256": "cdcd37bfbf216a47b39a918e23423b7ee8169812903c093d262c501b71cf1628",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_39.png",
+      "png_sha256": "7608dbcafc57174c4467698494248e158b44c8c5d07c940aea5dfcea0c288d29",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_39.vtex",
+      "texture_sha256": "3c437c5cd63c9c454fbfd9adf17dce485df3d81c68f92592f32206bbe7b7f879",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_39.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_39.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "ex_40",
+      "category_id": "ex",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/ex_40.png",
+      "source_sha256": "2818e8dee536d20fb71b35759c2ba653b4770dc2612957136a0a90dd556476b2",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_40.png",
+      "png_sha256": "3217c14c6c0c36e93983370c49b1e48b96ad73dbee9c704f9e0b20684d0f9ae8",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/ex_40.vtex",
+      "texture_sha256": "dcd78678254be8e6cfe536d1719fbc2c03a6fe7742f385b29c0b519f84903c40",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_40.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_40.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_01",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_01.png",
+      "source_sha256": "fb0763b37c83c24cf8e2863e4255108da45f9f30151142430bf811c92da91382",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_01.png",
+      "png_sha256": "c6f777fd4ed3090b5d9b0f6af7b9c063cb71c7cc46003754d0085931aaecdd96",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_01.vtex",
+      "texture_sha256": "12ab6a09e38e91d263b92e3a16fef656a984cc6d0af46ebe66f806a76ba96bd2",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_01.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_01.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_02",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_02.png",
+      "source_sha256": "7a8ae1cffc1013e88a7581749bcfa20d1c70ed3b991d11fc0c18a17c641e33e7",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_02.png",
+      "png_sha256": "e4564259a3ddb955bfcacc5ec663dc3bd94f2a578a9f72b35ba9991d4bd03286",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_02.vtex",
+      "texture_sha256": "c10b861a9c3c74dbee60bd7a0040c5ac0d2ebf39e3f2b00d9a7e17b557e9eb9e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_02.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_02.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_03",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_03.png",
+      "source_sha256": "d457db759b0330bdba28d0055bc91b63ca4e45d67c49a5a85dba81d6a53c1f4f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_03.png",
+      "png_sha256": "1c784d022bb1d5c67ff9655d177b28b59f4f374f573054575dbe121e3b7f3d11",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_03.vtex",
+      "texture_sha256": "b4dcca25d0512fce63a60656f9d3fc91b7ba72582c45083497aa69e702e5155e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_03.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_03.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_04",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_04.png",
+      "source_sha256": "3291824456def8f0ae9b66ef7b603a9754744618696ec8e45c868b5d2506e610",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_04.png",
+      "png_sha256": "3be8336a12a8368f70d1af13ad7db563a28c0dfb1975544576104e06296cf8de",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_04.vtex",
+      "texture_sha256": "2b82815364fdd7b898b7ddc63a38f0436ef578b50834553163fead5cf48e831e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_04.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_04.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_05",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_05.png",
+      "source_sha256": "c4f1b0064731da3105b69511d6375c69b01735daa0a856521fabb45dad44b4b6",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_05.png",
+      "png_sha256": "23b888edc19918bd961b241ae64ffb2c57fceaf9de59ace192bd860b3e7fa195",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_05.vtex",
+      "texture_sha256": "c7af776e4c1148339e9948df4130ee2156f400035a49a490b8de3b49c0c602a7",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_05.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_05.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_06",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_06.png",
+      "source_sha256": "8f79105a672862f235faceb8d9b5917d132cb79f73bf74b15e02ff8bbe45cd57",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_06.png",
+      "png_sha256": "493df4956bed6236bc0e51cf60c1583a1112c909b0060ec8f93f23ceb6e16833",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_06.vtex",
+      "texture_sha256": "234c4f556834f043162457c2ccc8360d16523160d29b1c2abf8e835a682201d6",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_06.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_06.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_07",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_07.png",
+      "source_sha256": "58f41883e8c525117f575433ad2d05b366cba9bb242ff3a372bee5fc386b5be3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_07.png",
+      "png_sha256": "7cadecd87e0a4777af391f7ad0837a5e17e4670b987d3c8b19792feaa91684ca",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_07.vtex",
+      "texture_sha256": "3cbbd790b67261c0d5db77e6e244278c5daa56c37df436984c125e5c8ffd7379",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_07.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_07.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_08",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_08.png",
+      "source_sha256": "ece65e6f86bdd1538a5092370532a9f2405c790c7972caf5b8f4f7c093ca38fe",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_08.png",
+      "png_sha256": "e3af18562a44b254fc924f13857d093a2053444e1e694d799aba191644256bfa",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_08.vtex",
+      "texture_sha256": "dbc05c147677bd6f227554404c4ba8fb946605fa0f1a21941d4340448ba0a8a1",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_08.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_08.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_09",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_09.png",
+      "source_sha256": "faee6ef8b2d852cb80d9b511c6cd95004a473fb543388e7f113db9f4c81cb65d",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_09.png",
+      "png_sha256": "6dfa1cbd874022d3fce1158b02e6fbd453c19381f6484542c89bc9726d1c4111",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_09.vtex",
+      "texture_sha256": "877e3a748224920c885f257b4108819f9aa53f136842a7ab1a0eba93c4974ad4",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_09.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_09.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_10",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_10.png",
+      "source_sha256": "8b6dc7559182277b687767b7f276b990b6fe84184451a1af609fa301e6edce67",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_10.png",
+      "png_sha256": "c48cd999317379002fe666e25efcfabf927cebfe3f9724a35e9123cbcfca14e3",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_10.vtex",
+      "texture_sha256": "f74e8fefe4c945dae763a365cb2596a0b4ec652ee0766e14004f3c2eba25da40",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_10.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_10.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_11",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_11.png",
+      "source_sha256": "9e9f7bc064c18d8a5ef60f6c0a461cc98ddfb78e587a9d7fd15556656f2c2e2f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_11.png",
+      "png_sha256": "732da754fe2784c254233a07ecb04126638b402149c19149926756a32f5c3fa8",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_11.vtex",
+      "texture_sha256": "0b97953854ca4a7e0e87be6a579d679b63efa470e795d6f9b93d1de7adae3895",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_11.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_11.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_12",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_12.png",
+      "source_sha256": "c06983fd81e5b6450e7d16104a1864c19b195794a67380d6fb0f26c2ea9f1920",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_12.png",
+      "png_sha256": "fdcef1b8440dfe26c4b08e1ff94a28d4ea660c91533d7cc8b5c42696b77ab2e8",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_12.vtex",
+      "texture_sha256": "d0fdb829f568857488bb63a566a3b542511145d1c0402dd7fc501b2aade31c06",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_12.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_12.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_13",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_13.png",
+      "source_sha256": "2cb92d048784d804d29d67a53a511853c7d245c21995811734a1ce4887f72e47",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_13.png",
+      "png_sha256": "2212c7b831bb5ecacdaa070b6c738c9add8e97fe73a2a0c190b4adfcb117ba0f",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_13.vtex",
+      "texture_sha256": "4bc92111e78f6bbbc6b26dcf268089085e2bd3c3a6fea5791294366bd9ef188f",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_13.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_13.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_14",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_14.png",
+      "source_sha256": "bf461605491f9b673ab5ed5ddd36ab62cd6d721817cf379b036a28e93092a1d8",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_14.png",
+      "png_sha256": "31abb82644c290824dfe6e67daed4f1ce56cc97a281bbee9f6352227b94cb310",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_14.vtex",
+      "texture_sha256": "aad22a79ce59b3c8dcc14cb9bf1788c73d2a7c8d23d0a84eed05a50cd9681f6e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_14.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_14.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_15",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_15.png",
+      "source_sha256": "fdd574da1f892ec7607945c48506b27f8ffde7f0429cd38604ec212299ee3fd9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_15.png",
+      "png_sha256": "15d6e71def624af13e081be989b866aad3b8f83e0d0b4f5727d3c5fde60d0dd5",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_15.vtex",
+      "texture_sha256": "b1232c9384132330fb90f6600728781a31e4796b659f97c03e1512ddd4e91124",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_15.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_15.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_16",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_16.png",
+      "source_sha256": "9e10b78e62d8b698babf898be2e0cbd3e3387ebbd0669f216a6a26ce36028524",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_16.png",
+      "png_sha256": "fc0c68d4ce58d7bc038290f39e038b940e164cfbfbe8c912371c1c0ef72b1f82",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_16.vtex",
+      "texture_sha256": "dbabf78efec631cb850a3c4f3df5e4b783e6f8f26f696b88e9dc4b3eab64915a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_16.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_16.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_17",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_17.png",
+      "source_sha256": "77eb717567ac0d2854d5b815a3765f27e0884507512fecd48ac4b4a65214d221",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_17.png",
+      "png_sha256": "93ea60cf439caa698c74c9e6a5780c99875922aee6f325b00b8af90fa4da0579",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_17.vtex",
+      "texture_sha256": "a37f04be39c4fa366b170388a749b045a407e9ae071c5b2d615b7cc80ab21cdd",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_17.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_17.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_18",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_18.png",
+      "source_sha256": "9523c431f3e85ca3d92659d63f92933f901ca63921bd13f42ce1bcbbd2fbecb9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_18.png",
+      "png_sha256": "3cfdb6ddf6a2051f7f34694ba2af6bb3cc0b33dccc5155305b60c89d89dfaca9",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_18.vtex",
+      "texture_sha256": "e738a1bfbf74ba9130c86994c4e3a37f1f9c30868f824d9b1c637016b7494ff3",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_18.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_18.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_19",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_19.png",
+      "source_sha256": "be228d52ac19b388ff6ea56d99b8add1a132c765bc526a097aca5101dc609a1f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_19.png",
+      "png_sha256": "af0ffce988eac9588a8a74f8614a789fce81808ef5ef81f2dea327e70bf7c203",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_19.vtex",
+      "texture_sha256": "751e510282bf7bb4a27923a436845ff4efca19d59247f28e2156d4dd7a2bfd6b",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_19.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_19.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_20",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_20.png",
+      "source_sha256": "439919776650a6d95af956423a6081adfb2edef7cc72a3ca26ceaeb54cd3bed6",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_20.png",
+      "png_sha256": "e302bf9cd7bc6dd8bae74c19160e0585756ca9284d4737d60cbc7fdea87ff572",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_20.vtex",
+      "texture_sha256": "b1490d287bfeb31a0b1ba9d406cc7c247c89062326035dfde6f01b613d2d4f0f",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_20.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_20.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_21",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_21.png",
+      "source_sha256": "0b032aa0ad84c8bda727406d019d78dbf3c8f2246ac223d4055b42532802f1d2",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_21.png",
+      "png_sha256": "eb28777357d281a3b98eedb1086d4a5cca7f6b4eda6fec5675ecb1fef870d444",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_21.vtex",
+      "texture_sha256": "ad9a7a3b061f9b68fa9dbcc92012d636df7f4a73338123c93b30c6a24dba3dfa",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_21.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_21.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_22",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_22.png",
+      "source_sha256": "d4326a7388ae7da32b3ac708d602606572d838ee27a35bd3758cf4807060516c",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_22.png",
+      "png_sha256": "a24600d36d6f9a50db101f925aede24d65e6b460f5fdd91a9ffb9d88c4494551",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_22.vtex",
+      "texture_sha256": "cc58a50836dc371b8a6d6a646da8ba56f88293b8a208dd40584c2d2703abf65a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_22.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_22.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_23",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_23.png",
+      "source_sha256": "f5f0bc6c123979ccacaae569a67f2e5f10a3a03b6d8d6c7cc346d32474085e3d",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_23.png",
+      "png_sha256": "357828ccef589246ec6119a1b3a07458366c69c96c3f9935a0141d2756228c22",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_23.vtex",
+      "texture_sha256": "be315a18f5e796bb87d0fdf53e1547403c383759e8cf8f8341e92cea8bbb7d51",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_23.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_23.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_24",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_24.png",
+      "source_sha256": "f9d20909fdea13cc0ee6c83fc4fbb68984e989d2828ecd3952852109d04fd8a1",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_24.png",
+      "png_sha256": "cddf7f4fa9a2eae93ede7ffc418701cf3dc1d5c42189de18852a4d8075d0706c",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_24.vtex",
+      "texture_sha256": "815583917dfc96e025ba7d687c3ab8c7e5362932fe6836e548bd1b31b4d35098",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_24.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_24.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_25",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_25.png",
+      "source_sha256": "5a620086828be49dd512373ab238ea96f9056eae1470180259765b85ea7f81e3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_25.png",
+      "png_sha256": "da9105c419f86b98e18b6c2ce748b568b7cc1352b3f01a68a1fae730b28c45b2",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_25.vtex",
+      "texture_sha256": "3ed634a787aef5b8575f963bcaa857a23b684ae65af03d9e52bcef6b3e448b25",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_25.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_25.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_26",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_26.png",
+      "source_sha256": "3d5fb6308a4f1388ec1e4ec6923b4691f4511e8143a02eaf321a500d1ba29da0",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_26.png",
+      "png_sha256": "df3c5ebf43e4c3b3a101543d351f64baf797345bf311d7f702aeb5595075f518",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_26.vtex",
+      "texture_sha256": "6c63bfa76736b8bb29a16f074fc7124544a6a40841d0581eb8ca8b450d0dfd1a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_26.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_26.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_27",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_27.png",
+      "source_sha256": "46bdef8d68114b17a2c1e1faa169a1cea84acf3f54c931452958dff1480301d9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_27.png",
+      "png_sha256": "cc6a68da876c8025643e59a99d035a76edbe024485a7b712489e73e12edd9f6b",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_27.vtex",
+      "texture_sha256": "dad4d6d393b773dbb80ca80f61fc3ca87b8267d42bcfa8501f7ce67cff97788b",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_27.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_27.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_28",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_28.png",
+      "source_sha256": "bb5cbc472369c17faac3f8b5a9dcbaa42570909be17037043da563f0ac503d48",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_28.png",
+      "png_sha256": "bbf66b426ccb63f55ce04999a899f4fd6105e390d7c8e58e13355e59e922e47d",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_28.vtex",
+      "texture_sha256": "0897b0ba48e2bd11a893664edfba99430fafe1ba4e0f7d09c3fb0cb1453bca80",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_28.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_28.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_29",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_29.png",
+      "source_sha256": "040f80b8e6b6a40aa3b61eedee57ebd432d0b166cf74ba4639514d2e8f33d163",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_29.png",
+      "png_sha256": "bd945a51e432153c3102c2d20aa770e023e1cdf59c5fb6f4e530da7ae8de5a00",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_29.vtex",
+      "texture_sha256": "52d33e16ba432d4dcf1c9c4ca114411636dd85626d5ebbec947b5c222f40104a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_29.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_29.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_30",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_30.png",
+      "source_sha256": "4186d8a1cb4576ee6ffa6c9441eaf77ebcc58d4be3ff8ae68a8b39d2d8051918",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_30.png",
+      "png_sha256": "f2496f411f559c9cc051304ec7ca9b3a6e66c40c63359654c9f177a530ae421a",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_30.vtex",
+      "texture_sha256": "94b4f5873d382f6589cea6aea16de799ef4135bcd02877e9a82bc1e780c5ecc6",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_30.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_30.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_31",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_31.png",
+      "source_sha256": "57ecd7300589da38d692a03117a9558cc3df8e3ed6fba47ac2c6e88dd38171a2",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_31.png",
+      "png_sha256": "f5bda6a031e5386e2462275ca73329e897c29447e43b310653935d1236996e0c",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_31.vtex",
+      "texture_sha256": "c07a065599a0866213aa1f55bcf99a2cc5fe24d970c2d75f1d861132632b1357",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_31.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_31.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_32",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_32.png",
+      "source_sha256": "2fa8a18b52683e5fabef29ac6df6776e02c43805889d071f67801217d3f4b771",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_32.png",
+      "png_sha256": "10c61271b17269aa215b969c68fbbf7af8bd6a0bdc9364102197937921d99fb2",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_32.vtex",
+      "texture_sha256": "3c98684f6736e96d6105620a89a72a5edf1b60baa467276f2989d6dab04494d8",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_32.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_32.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_33",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_33.png",
+      "source_sha256": "cb88eb061ec09be1a0cce467b724a5498e19dee413ae413e7657aee136490241",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_33.png",
+      "png_sha256": "cc85cbf86b691dcd4c19c83cd83d169d4098fb136172cf6a0a2c8856951e40ea",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_33.vtex",
+      "texture_sha256": "23eda216db9132e9af6d850b6534db062d0ddea457c5b723f3300dab7487e350",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_33.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_33.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_34",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_34.png",
+      "source_sha256": "c8fe3097a341795ac6dfc1cde72867ae8fe00a9368873fc466429a6795900d0a",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_34.png",
+      "png_sha256": "8423d420a923ac96f6e606953f4bb483bf3b4268cb708152a6ef24a82f62dae4",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_34.vtex",
+      "texture_sha256": "55c28be0fe5f7ebddeb421d3492fc97382ec662402619db40a4a222dff5972ad",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_34.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_34.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_35",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_35.png",
+      "source_sha256": "60068fd7bb5c92e2dcb3bbdeee9bba04797f4019b5664bd85168a40a7b7407d0",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_35.png",
+      "png_sha256": "9069db16fec7e499d65c76ddc849158a8217d3c6af80a156932ba3f5dbe7b9e4",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_35.vtex",
+      "texture_sha256": "f6651a95f9ebab4f2626eb989c597692a1ab3debf19e678e9b5f6c3fba39f7db",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_35.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_35.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_36",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_36.png",
+      "source_sha256": "0e656eddeff080274043e1a4609234fcea776ce54d99aef08482608fdde3ec95",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_36.png",
+      "png_sha256": "754ee8664afed30f98ce2c5d6229b9910c88879687711c14917601fbb725d1db",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_36.vtex",
+      "texture_sha256": "919e750e0fd6c7d6559cdb04eedb792f628fd16fe3392f89b075805cd57427fb",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_36.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_36.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_37",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_37.png",
+      "source_sha256": "b623129c570eb2ead46d4ac75e8ac23b50ff4392c73a4df8115820f62516b811",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_37.png",
+      "png_sha256": "a8dbbeef0be8e912b380008899b15588fa29f4f3ba4c0b6f6be9d7a2c85a7f3b",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_37.vtex",
+      "texture_sha256": "b697a9e483534a84e4b78ff7db5117c8cf5826c0553acd886f28130bb7bbff00",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_37.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_37.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_38",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_38.png",
+      "source_sha256": "8086865003591ea9cdc8b56c95b89aa56834d587a687b435ecb7e813ff553611",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_38.png",
+      "png_sha256": "db4ba1ddfcb18c43af3b46cbef1071e753ab4e85653b366149a013dc3f21bd7d",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_38.vtex",
+      "texture_sha256": "681bba85ad2d6827b1bc87de594f3c9e0c1ccf2662b98240c400ea3e7fcd737c",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_38.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_38.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_39",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_39.png",
+      "source_sha256": "4eae01718314d5f16e23750ad7226f27c7daff3c3fa2d3068847c3ebb98909bc",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_39.png",
+      "png_sha256": "c12c194032acd40710eae08f5463b6989b53d29bac449a65a2fa3695e029fd17",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_39.vtex",
+      "texture_sha256": "831f7b5b29c58c4005874e25ebdb90ef1396257d0c46386d95b1654977b5a260",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_39.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_39.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "friend_40",
+      "category_id": "friend",
+      "source": "panorama/src/images/custom_game/archive_portraits_v3/friend_40.png",
+      "source_sha256": "96978873406689ad52d8daeb6e68fd324c897487ea63f57ad3019a6dce5702c3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_40.png",
+      "png_sha256": "143f7e45e596b77aea9f5cc9c24de6a6c3f84512800be74f42250704cb2f3117",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/friend_40.vtex",
+      "texture_sha256": "4c817ea368a788868bfbc0c99c94c418125c00c6c0a90d0c4ac5fbdba527e2e2",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_40.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_40.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_01",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_01.png",
+      "source_sha256": "9a31189f5cdfbd16a704498a15469abe44a5860d2a5b322461a93240795b0a1f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_01.png",
+      "png_sha256": "6aecbc5ccf112c915b7e3da21d353054cf946431247b2eb222534168ccd1c378",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_01.vtex",
+      "texture_sha256": "d3ad65515e7edd183e2ccf49c4c06d1c334bb9b1945688ddeede6cb8967c9345",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_01.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_01.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_02",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_02.png",
+      "source_sha256": "60f76bc30669d671d05f437b79feaf277219452d8dc4003536bcc4aa3dacd6d5",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_02.png",
+      "png_sha256": "f1c674e1cfc5e05ce213bb153c40c9f46d72279a5de7243916849145123a11db",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_02.vtex",
+      "texture_sha256": "47d5b7a6e4958c4755076f4bc8821cda73b438bbb5a2aa294631fc94d270d369",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_02.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_02.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_03",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_03.png",
+      "source_sha256": "8595dc0c6a880dbba40b7de6992c7837ff97d0759ad3093d6f17bee4e3607cd3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_03.png",
+      "png_sha256": "ff20c4df0324b7d3906262fe45ea5ec54d8e51126e7c143e2c739ebb1e3dfe18",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_03.vtex",
+      "texture_sha256": "d153d5a095d60a702db75fceb6e85a2f671a2a5c23f2d605d50269dd36b73e76",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_03.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_03.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_04",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_04.png",
+      "source_sha256": "95b311ee152a348878ef2fedecb9b5c4de84e39ca635471b76fd447d147a7861",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_04.png",
+      "png_sha256": "084d760780ba5f70481ed954a5a34717c865ad53394b4a309ed33fd787086f81",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_04.vtex",
+      "texture_sha256": "017595cc3dec03df439919893fb46427f6eaa94eafc9f17a705e4a216b6e5d7d",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_04.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_04.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_05",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_05.png",
+      "source_sha256": "c49f71a71d77e3573d5bd722580f4362414dcd42f5b7b3f5070f55b3170a927d",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_05.png",
+      "png_sha256": "3176e1f3f592670f89c6aebc092acd3629052d01e8ecdbdecc1445933bdd97ab",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_05.vtex",
+      "texture_sha256": "21327adf4d28e26f8d8cd1c304ba21982c09fd53040f07b8c8bda7edfc0b3fba",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_05.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_05.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_06",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_06.png",
+      "source_sha256": "95d1426051c588ebc03455172a0eac56bb18eac6c1d1e7ff36baf11602e238ae",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_06.png",
+      "png_sha256": "25b4c60ee6ced7aa548400a4b4b6fbe6420917fc0547c1ec70d495b4244d392e",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_06.vtex",
+      "texture_sha256": "7f09a84ffbc30d8d7aba933075271f8b192d39eee34d90bffa4416a93752d6fb",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_06.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_06.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_07",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_07.png",
+      "source_sha256": "06e81f9dfb73cfcd0c913b55d6756ba67e332a2b6af61a1c57630010a0278d66",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_07.png",
+      "png_sha256": "6d25e504428ac1493c31cdf426d79ace017d8a9e82244dad88369239ffa9c9f6",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_07.vtex",
+      "texture_sha256": "b6fa3776dc2362490bfbdcd256aa31b7735908253b9f19f42a5cba9df4299e30",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_07.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_07.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_08",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_08.png",
+      "source_sha256": "5213d604b41f143a1c212d35ecdbf49c237be1fd44f3d024b2e544c57ffd3d42",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_08.png",
+      "png_sha256": "1ecf8a038d304b87133031e8a518c2b5c4dbdf0661468547039ec44c7a8d099a",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_08.vtex",
+      "texture_sha256": "f6998a9f2df5279fd59331e984dda96a251004d26949824eea7127681a165b74",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_08.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_08.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_09",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_09.png",
+      "source_sha256": "a590ae3e1a7c5fdb6f3287ce2465c92a85e7c602df1a2ba519ac4aeff4812681",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_09.png",
+      "png_sha256": "f915332087eed10e109e3b35cd6f676f286099731b487585e84ae79540cb5513",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_09.vtex",
+      "texture_sha256": "ded4eca1c866dc794dd39b0095ac8546da08ab94457437c391d9f06234470405",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_09.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_09.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_10",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_10.png",
+      "source_sha256": "59c7ed3fbadce6963e96a4cddbbe069b5eb444bc8f033a379bd8884e9538fa62",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_10.png",
+      "png_sha256": "d904cdb0283650525d55f7da6b9e86d374bed2b91dccc39c5f60c67764a6c908",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_10.vtex",
+      "texture_sha256": "3477e9cfb4f888f761298870dc183b87e6e6362284bef1be453aafe4423f879e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_10.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_10.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_11",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_11.png",
+      "source_sha256": "907c664feaafeb37941fdabaa3eda68ad2a5cff9d1747ab69dadc23c6b7cc3b3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_11.png",
+      "png_sha256": "d240a754bece5afb3ca959bd6db8b50ca1454cecec68ae8e68aa91c36b36ee49",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_11.vtex",
+      "texture_sha256": "6c71825af49fa86fa00721e6904d4ca17fee72ffba098a12859dc179bbb5a329",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_11.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_11.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_12",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_12.png",
+      "source_sha256": "72b64b540062d16f8975a3e989073ff2ac8d548eed42ad846db9e0d37311f6a9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_12.png",
+      "png_sha256": "d10153a159dcb72860676386691ecb63c8802bd5152c172e34221e7ae0d4e331",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_12.vtex",
+      "texture_sha256": "b8c8c0ae8583f68048ff7994024746be157c786108c65c7f5428c2a76a06b7e7",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_12.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_12.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_13",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_13.png",
+      "source_sha256": "930b01eb64e42d0674b624152aef3ba825f57079efb3d7738e252b32fa4c576e",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_13.png",
+      "png_sha256": "1df16afda3d8b460574ea6570b912a14a5dc0dbf3a89bb121e103f5a36fd5987",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_13.vtex",
+      "texture_sha256": "e27be87264f71e740473a1fc552e21ddf9224a699c97878441ccdd3ae9fe3e8f",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_13.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_13.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_14",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_14.png",
+      "source_sha256": "33779ff8520234ce8c8685e6e73e01d04af45f22cea0f9c9a87cf1e5531ade36",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_14.png",
+      "png_sha256": "777af7a12fd96ae79fc5678e8c01ec54e21d08416fd0619efab25f3946fbd634",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_14.vtex",
+      "texture_sha256": "ee1ae75c8656528a814f50d3c9a410f9bfb55e4e8e44b47c740e5f4e870e2d1e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_14.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_14.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_15",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_15.png",
+      "source_sha256": "526a478b3a3ed951e4a730723eeca570eec7f82fee30ab397361b43262e5c1fd",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_15.png",
+      "png_sha256": "00fc71af28456930e12a1f02ee3ef625aad985cb5044d63b17302f82905e1be3",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_15.vtex",
+      "texture_sha256": "62afd9ad270514663ba7bcc8834f9c9c206d20b755be0c46f3bdfcdf05ba4385",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_15.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_15.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_16",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_16.png",
+      "source_sha256": "ce9160e2549c448647d8418ed7635c28c809fe85c0bbf49710f9f9d94a43613e",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_16.png",
+      "png_sha256": "7d076179cbb956414c95e57d30c1a59a7d3d210115bd88efce8b6a3a14ddc5e0",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_16.vtex",
+      "texture_sha256": "c520fb3f61b40cce5405069a75b8a19f9e788a30583f5bbf74e9994614b3d23f",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_16.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_16.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_17",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_17.png",
+      "source_sha256": "f4583a3a3a6402cab95a5520f5ee0521203dc70a1c92417fbac73e10ef523ac1",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_17.png",
+      "png_sha256": "f263a94ffa1bde93b91c09af5126e10b3578a6735aceb04b55dca5b2f6ebfebc",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_17.vtex",
+      "texture_sha256": "31fc004ad8e48bfa46acc2e510ed7c3b7e769fa29ecfb39767284abf6a65e038",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_17.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_17.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_18",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_18.png",
+      "source_sha256": "3c77bcfbc9bd54fa7e5eb5efd0be6ae3688801382be541b8741ddd9d1de6be07",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_18.png",
+      "png_sha256": "209cbd225a2fa262c492a372a2dcc0365e0a43efc4aa4eb315b15a52899598e3",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_18.vtex",
+      "texture_sha256": "37c8b0847098c9c972429d6b08e5fe0a5bc80a343b5988df2a78686434404532",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_18.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_18.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_19",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_19.png",
+      "source_sha256": "6d8356f1aa0809e2d72e47758bd4fcc47523c9f25bff2b25c97330d634b03888",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_19.png",
+      "png_sha256": "0746eec35cc33bfc95f3484ddfd49bb00f4d1ec8a2f64b5312cc5e23e622dc9d",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_19.vtex",
+      "texture_sha256": "d46d2bfb04631b1e32870de6b5c3027456497b42c8f1da0a4acb302ff44a3333",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_19.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_19.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_20",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_20.png",
+      "source_sha256": "8e5842445279ea99e366257907262400b8a215759423813b332638cf02aa81d9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_20.png",
+      "png_sha256": "691048a5ffb64f7a377b052f7e02c85f0002e4a251e417fccf7ae532e7efa182",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_20.vtex",
+      "texture_sha256": "da4af151b71f6a04e7ff06000e16f13aecd031851f5ccfd29ab910486683a733",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_20.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_20.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_21",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_21.png",
+      "source_sha256": "2c1b7942f4898c763151cf8dd21af9271fec3a9cfdd1819b6f955f33c247d02b",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_21.png",
+      "png_sha256": "5f9c3264efad795fda954fd5b2e50fd394a7bd251cd141b427e1234d938d8ff6",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_21.vtex",
+      "texture_sha256": "8b38187d882d547f2b578ba95f9ea55e0291b6e7965ebb51078ecac26c345dfd",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_21.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_21.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_22",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_22.png",
+      "source_sha256": "4bfc6caccd140785eb334bb042e825b952c563dd4af54205a49b39cb1e436e15",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_22.png",
+      "png_sha256": "68afd8556f48976233ad701ae1d87027a7a164588350ca432cdd148d04c88462",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_22.vtex",
+      "texture_sha256": "5dec547f0e3671913db58b8209fc6825009730a9034f1047d08b2cfaf9880c0c",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_22.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_22.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_23",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_23.png",
+      "source_sha256": "fb36128b2d3e6c5c2a90925b4498bb6099c787117426a38142230e60375ac6f9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_23.png",
+      "png_sha256": "38cf18e20ed8b2858d524eb3307bf9d344ce0765299a60baeaf54012926c145e",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_23.vtex",
+      "texture_sha256": "b3479d3ea4611172c58e575735eb8a1d04b46c74fbaa62e07e946a1868696638",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_23.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_23.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_24",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_24.png",
+      "source_sha256": "35ba9e8d3e37d02dd4dad7d31df9c04820cf99283c12f03d8249f4c68ea6b0fc",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_24.png",
+      "png_sha256": "e9d1221f2a67cfca55fbec78e0c7d4bf83913dc3b4381302b23edc7fb77bf1fb",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_24.vtex",
+      "texture_sha256": "c2270a1fe7c48f4bb4776fbad8b670aa90d07f2c40453456bed73645657915fa",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_24.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_24.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_25",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_25.png",
+      "source_sha256": "55c077acfa07fe8d851919132f8c499850d711629353c443c63c960d27b93f24",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_25.png",
+      "png_sha256": "e878f2d3f5181ac73fa54343b50296b8ecd373c4b6ab13b9a80d1a501432a8e4",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_25.vtex",
+      "texture_sha256": "ff0d281b3cef8c5e702c2b12c23b424c423b66a455bcdc1d76ba2ac0a4a7d246",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_25.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_25.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_26",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_26.png",
+      "source_sha256": "cff6cd465ac4f233ffa9e897fef7ccee8bfe92b3a86f4fc6fe5cbee62f946ab7",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_26.png",
+      "png_sha256": "b20f97f8d5a878bf23a5ec292cc6a3f99dadb8d7d64cb23351de02c83499e8c1",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_26.vtex",
+      "texture_sha256": "8f72c62014f9f9e79013fc3a3527fa072354cdfeaa9d564d9fe50c57c0575c85",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_26.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_26.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_27",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_27.png",
+      "source_sha256": "8c131cb42b1647ca9c3ac30aea7f0a7f198fa8934c5fd4b57e61c7f52aa18141",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_27.png",
+      "png_sha256": "e0a7b25ca12494943dc1a85f09f4d3b7101e7fad271846d70e79f342c11fa95a",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_27.vtex",
+      "texture_sha256": "8c54962729af70d158081a206271bac21d0f2d4fdaa16956ec7c9e1ca12bbe04",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_27.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_27.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_28",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_28.png",
+      "source_sha256": "fee1c83dad4daa2ccc9e06f8d23dcf609eb38396ce8d7c8288fcd24ba74189b6",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_28.png",
+      "png_sha256": "746e766b724726d7ade4945260da847eff9330d1d42d8fd6eb3e40502a4cc8fc",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_28.vtex",
+      "texture_sha256": "7a2f4f5f14191c40f0ef0ee33fa226397ab2ba832de9aba0c7d7e38b231227f0",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_28.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_28.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_29",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_29.png",
+      "source_sha256": "0747090fb234a1a50c87a509d56a79f296d515f206fb3a9f90a2d674c669f7b9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_29.png",
+      "png_sha256": "304d931002fe1f917a4acb265bd6a69a2396ebfa9a415f9f31feb2fddcf3f24b",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_29.vtex",
+      "texture_sha256": "9a6faec5806c1b88560ab197117822054e1a95cb22ea91a21339f1950f0aec68",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_29.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_29.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_30",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_30.png",
+      "source_sha256": "09eaaca97fdc8e18e0d35d756d360b465c3661cf3c25cbde8da4dabb5a010644",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_30.png",
+      "png_sha256": "47a1d34080884c3d8ae3e5fcb508654b090d1ff93fadb46da89dc92ae767b1e6",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_30.vtex",
+      "texture_sha256": "484f3d8cbfad1ee6b9452f8f76cf2811d9b5258c6df8f590ab4aecce0d549e8e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_30.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_30.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_31",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_31.png",
+      "source_sha256": "9b5e56b5b6878815675c53fc61f50e176d6c61cb6ae7bef1364f480a8f9ca56b",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_31.png",
+      "png_sha256": "1eef17aa56123c9c01abf031d73a6607f769a0bb0b91f9f8769282beee7c1175",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_31.vtex",
+      "texture_sha256": "9cc5a9ee7b5803bc08836962283c674491b8d401b533817f871244ab4e912cb1",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_31.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_31.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_32",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_32.png",
+      "source_sha256": "d23f11e24a36fc44570cecc426d8351c0b2039354c5a993e67972a562432e8a5",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_32.png",
+      "png_sha256": "d70ab05acbe24094cf62f4a5fed7f74685d70a70eb899bb9a56357b8bc151ce5",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_32.vtex",
+      "texture_sha256": "da4ddbf3f03d3512d0888604f2b063456b4a7a6160a25cc400cc90012bb568c5",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_32.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_32.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_33",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_33.png",
+      "source_sha256": "dd7a16aaff57c27c165815905b26d58f5f8ba534cc8162ee7b527eefe79160a0",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_33.png",
+      "png_sha256": "a4dddedd5739e052b586018551df703dd9a2d249609a324b928d792b1c8dd41e",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_33.vtex",
+      "texture_sha256": "e20d64acc8e6c5c2597c8b415130d50f0f1c935ff4747d28ab5151cbd8dcaa77",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_33.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_33.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_34",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_34.png",
+      "source_sha256": "d80668c746313497d50970a502e166c2d04a417658c5ac2e1414873b93c63f36",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_34.png",
+      "png_sha256": "20def4f68e2a2bab70b8b36df6c068a7a02b628ccdd7a26f24020c0a515cc10b",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_34.vtex",
+      "texture_sha256": "81ff42d335c2aa6ffa6aad7f05eabfba2db8c6e27fa0b0b2d3cbf6d0cd3e6055",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_34.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_34.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_35",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_35.png",
+      "source_sha256": "eb53bfe39a4acc5fe6b2f75045c5facb681647747a3f315f06fa328b0efbb7b3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_35.png",
+      "png_sha256": "b7721671ce46317b2f4297598f72058b06be9bdaaacbc37ec1a8a71d2aeb2645",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_35.vtex",
+      "texture_sha256": "290c0519452b6fab671b60e186ec2605cc4739035d55c4266477a7b7d40e83eb",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_35.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_35.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_36",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_36.png",
+      "source_sha256": "cc5e65ab9cbce33e27e081339d0fddcb90a6167eef35abc84282048059b9d624",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_36.png",
+      "png_sha256": "298d51c8f2b7e76e6f15382824785571ad97272edae12691c0bb25795150c87e",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_36.vtex",
+      "texture_sha256": "b0f508f5acb91d2ff7685f8c81c878b2792db6a87ac7ff77d0daf061af9daca1",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_36.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_36.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_37",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_37.png",
+      "source_sha256": "b455bcc101404da174df8de945ae1dafadca302d2f9fa1da5375b4006333764c",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_37.png",
+      "png_sha256": "7f5dfbbc95b2820d4ec732ef3c1c3343a66d823dd9c1e864b36deb516a9dc8f5",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_37.vtex",
+      "texture_sha256": "818fe598d6b4b35d04d5926cf488f6cf464a87642a938c2565e7c43669ffe6b6",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_37.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_37.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_38",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_38.png",
+      "source_sha256": "a9d7e1bd708d8b524fa843983978859d104421b503b4fc9970998cecff85ef98",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_38.png",
+      "png_sha256": "f23303b6ca977e3dc9f0fa1e4ecf2ea9afe1a80bcda5ecff71f00e33b368276e",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_38.vtex",
+      "texture_sha256": "8770a14b521dee85416f395b60afef8d364370c47d50e4d3e92f3adf44645527",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_38.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_38.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_39",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_39.png",
+      "source_sha256": "97a4e2c161c41606acfd50e2cf9422161aefe4f30758e878c3df03a82bd5bc6b",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_39.png",
+      "png_sha256": "2bb48d869320c918d6350fb01ee1f8adbad9734564ef034a095d558feb8c89d8",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_39.vtex",
+      "texture_sha256": "5a35d6570dfb6457884e68324eac40f3d35641a6fbebd0efbfc82a46e9c99e19",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_39.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_39.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "wife_40",
+      "category_id": "wife",
+      "source": "panorama/src/images/custom_game/wife_portraits_v1/wife_40.png",
+      "source_sha256": "fa284df3312148bfb97a2ac1e0c05856d9e6ac2557dc6c04c4b4c2459ad0466c",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_40.png",
+      "png_sha256": "9c590962201dbb1f7cc24d32ce1ebc2a49f09200969f0f4e9baffcd2f0544838",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/wife_40.vtex",
+      "texture_sha256": "059e58d9c72bed24f3b4d9788db44b435ba68e7cc07e1bde7b6c7ad986e9951f",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/wife_40.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_40.vtex",
+      "legacy_payload_bytes": 1048576
+    },
+    {
+      "id": "beast_01",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_01.png",
+      "source_sha256": "a88c8b712ca1957fab450b262093071f6374cc12c09224e4d61b38f06ec3f146",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_01.png",
+      "png_sha256": "27b378ab63e0779765f341f57d14738c86003e5ae1452cae061cc98f1a4939f3",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_01.vtex",
+      "texture_sha256": "0911ae2a578d9b0bdf860e39896d86394f9d092729f12fec3c142141acbbabc5",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_01.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_01.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_02",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_02.png",
+      "source_sha256": "06043eb44ccdf4f4e0e0d0aa9ace8e7e32e3710afcf4605d47ec2a37d86234c3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_02.png",
+      "png_sha256": "e661f044ccf77c083a698911664e3a87271a79f7ce8e34a9c0007b391487bb8f",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_02.vtex",
+      "texture_sha256": "3aa272e051b30b21911fe16fc10b9e2c722a773a671c54a4149ac7f96f5018ef",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_02.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_02.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_03",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_03.png",
+      "source_sha256": "c5a38768511b30e351bd09d65fcccacf31fdb15eb8131f2d9c0681da081a3dc5",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_03.png",
+      "png_sha256": "756ca71079e099067912b708505ff6642ed351fa0f8ae3356d39e3759b2c682f",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_03.vtex",
+      "texture_sha256": "876561ad87ad1158178796703ba1f1c2abf664454c7b12a8454066d064950a8c",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_03.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_03.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_04",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_04.png",
+      "source_sha256": "aa108c87552afa6c4362f403d70675e0aa995287a2b4d3f7155804cd2deba725",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_04.png",
+      "png_sha256": "a89072c75a9c1ea1406aef19f78061b5601ae08c91a3b69d3dae756866c1121a",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_04.vtex",
+      "texture_sha256": "f1404334cb5f12754323d66560cd1516e2a93c600dddda30c8a60548f3d12593",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_04.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_04.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_05",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_05.png",
+      "source_sha256": "6c7aaa89c8abeab1f9329d0eeb809239492214c6a52dcea53c49b71afb26ba50",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_05.png",
+      "png_sha256": "904c39e1849ed64febbeb773a068f16d2255b62b8be4f6ae51a29115400b12d8",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_05.vtex",
+      "texture_sha256": "e9bf9e28e83bbedad7b66679b0878870213fa395272d440405b5e07dbc53163a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_05.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_05.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_06",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_06.png",
+      "source_sha256": "f0ed10252d928dfbb443f754d31e51213b66332e4b1a02c13bfb8babd58c6259",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_06.png",
+      "png_sha256": "a1a6224b7f51e85ecd475dbe6c605755b11de574f44bfbd406e1bf66b19cbbec",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_06.vtex",
+      "texture_sha256": "bbd5ec9f8940e8fe2957257798c79197b7144c45ee2de748baf2a4f936ff2939",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_06.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_06.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_07",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_07.png",
+      "source_sha256": "1e5321af2ea006c4ab7b66b652aa7d2f81b3d74c9e6ace9bb7e907a857a4ac7b",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_07.png",
+      "png_sha256": "13a947048ec53d84d73f9a65a12e0eac75970b6c43e8db05bb164c6658322402",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_07.vtex",
+      "texture_sha256": "6cb2bfa6012ce8d6af9618bbbf5d469881b285dde0c1a44814291a577f4a1d20",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_07.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_07.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_08",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_08.png",
+      "source_sha256": "14d781ee288336c1974029052fadf882ed4f9c6e7a3982019b337583fe7b876c",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_08.png",
+      "png_sha256": "961a4faa8f52671c57cdb851fd96ecc1314c9627bc6253f3894c6af208fe0e0c",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_08.vtex",
+      "texture_sha256": "c9ca5f43cf3b69f48a787ae28f5f8e73131973c5bbd76b39679a796fb8e21469",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_08.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_08.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_09",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_09.png",
+      "source_sha256": "b1ce81eacdeb6f75ec6c0ec71f6ac559a3d7f96e0dcc4547ae2dc8a4da332331",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_09.png",
+      "png_sha256": "bcffa32ac9869f28611a3663557ca7e452e2299ebe973aba25094315ec1c3087",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_09.vtex",
+      "texture_sha256": "fea87e351545a561b5e64f7ed6db347b75cae70522b1ad3af127c113788a2684",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_09.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_09.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_10",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_10.png",
+      "source_sha256": "0ce5e26c9247dbe059825664901c313e6183bb2455b69326c494eb80e10ab79c",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_10.png",
+      "png_sha256": "f9a3fc47269fb8967192f952990ca7cc192832e64b07538c042569c5f4e801b5",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_10.vtex",
+      "texture_sha256": "afd2201fa7e1b20cd096eb742f5561af32471cc8b7640a3b1677f6b1607a704f",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_10.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_10.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_11",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_11.png",
+      "source_sha256": "d7fabdb34be626e115ee493eaaa4ce4d68943015111c8c5aea9ae826e642ef60",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_11.png",
+      "png_sha256": "68d83bad297692ecd2379db8178d7484d0477dff90b799360c1f0f72d60a116e",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_11.vtex",
+      "texture_sha256": "5e81e8f619d3da16296d5364b9135b6cdf2884132a08d1ff5cb1c127c7dce5b7",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_11.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_11.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_12",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_12.png",
+      "source_sha256": "7c9221bb31613c933d7a74582d50a4354ff1c15ff5522191b8f56afb733dfdf6",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_12.png",
+      "png_sha256": "f7709f38e8d6acd5d87d018b122c6f51f6d1c7e0b406ebaaa6b2e3ada541a140",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_12.vtex",
+      "texture_sha256": "49bcf67874f68d6d33c1ee6d0a7a0b23949db36483070ec890d6860394ccd1a6",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_12.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_12.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_13",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_13.png",
+      "source_sha256": "2c74adca12114a854ab2fd0e0108a0d458864633de56f8ffdb6ce49eb6941678",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_13.png",
+      "png_sha256": "00f83be63e288e16ad42f957316ec5d89639d0c4068aaf64f27544b5ca590f4d",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_13.vtex",
+      "texture_sha256": "5d160c9bebebeeb3d17a3cff5483bb36bbb814552aee2526f0367d3108c0259e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_13.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_13.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_14",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_14.png",
+      "source_sha256": "150d67e27abe9f8e87eaea7b1472f4a953b2c9092f491d2c1a756d295bcc4d37",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_14.png",
+      "png_sha256": "34b2e46fd259abb8e51806ef3fe7d6cf4acee5a73cb125f14acea9d5941a1fbf",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_14.vtex",
+      "texture_sha256": "e89a78d04f3f500bb30a57567470f3edf0e1a40c8c4d48ab5b285276391ca02d",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_14.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_14.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_15",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_15.png",
+      "source_sha256": "dad8e1f9681b31865b1acb2b9a01ed93e2426ecc848f7c8112ef2672d093b08f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_15.png",
+      "png_sha256": "168e4b42eda5761c641c77525b6ee7d740c73b2174b25365823d8041bb812bfa",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_15.vtex",
+      "texture_sha256": "1ef90e4919205483a3ff651ad0d987940addc7d7ba4f015f0e09daeea8af673a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_15.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_15.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_16",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_16.png",
+      "source_sha256": "72862a620bdfd5e4ffcf82d4170b9619f8c2e11076b4c17ff1319996e251abee",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_16.png",
+      "png_sha256": "58d108f331b1746374e64803bff1ca2b9c3d486bf0ad4b9bfff5c8b56529ea75",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_16.vtex",
+      "texture_sha256": "f5045bd041b8c0e9c72abbb683a6342425a8d486f585adf8fcae85aa2bc79ab9",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_16.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_16.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_17",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_17.png",
+      "source_sha256": "c989097c8284998e973198781095402460852c7d78060c27cb8ce187a41a1a4a",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_17.png",
+      "png_sha256": "e998fcbb189a2b71552ec49729890fe77aa96a69b32ed012f64b860185318eb0",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_17.vtex",
+      "texture_sha256": "af56f418bf7f1af8ec8293fe52ad314febbe5a40ffa28a5244a986ce913c670a",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_17.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_17.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_18",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_18.png",
+      "source_sha256": "6ed6e802474861e4fbac7dc5188b9c7d50d4afc86e7af2369b3096de71cbd37c",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_18.png",
+      "png_sha256": "907e7dc03565f490920db92ec3850e42e4dfad08ee70f866bed3e8d634319b68",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_18.vtex",
+      "texture_sha256": "c276c6e08522f3082620135c75882173f31a0ec841a6ee1ef130c3a2c662ab0d",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_18.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_18.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_19",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_19.png",
+      "source_sha256": "94d54ac84d43bb1fb79fca3401703135386c17915da6c3b1be7c12d49fee2b61",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_19.png",
+      "png_sha256": "40c2d59afdd3d32dc5b0c5370d214f40f3b29f2fd1d97404fe3dbbda2f5b9972",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_19.vtex",
+      "texture_sha256": "584baede0d88fba0d5bb3809aebe62e7d4a8b4875b9a5a541d513907b17c572f",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_19.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_19.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_20",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_20.png",
+      "source_sha256": "9d7544ee2dac7b89b3e546df1b26de8331c69def2ade413b305d6d52fc2768c3",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_20.png",
+      "png_sha256": "3a4f700b80b12adc0b706a4fa721e87a4df36e828b621eb38a622a90c9ebec87",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_20.vtex",
+      "texture_sha256": "1f295099e609270f4b812681c768963e53c151701c5962a69e493db49d6b3d84",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_20.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_20.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_21",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_21.png",
+      "source_sha256": "0bc9444e4c78f7bcddba899756aee33a0ddeb1d55d70ba9ce086c8af71ce9bfc",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_21.png",
+      "png_sha256": "dbefd8d0c34e6d7902b881ec7df675387d29d17efd0eeee1f173c7bf58123fc0",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_21.vtex",
+      "texture_sha256": "c143036d73fc6207d785f484b55a8c094944d37ebf630b6fd1d60dacaa668eed",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_21.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_21.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_22",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_22.png",
+      "source_sha256": "c431321078a67371ff358d1a1f6c75ced68ad66cb862ffc4794275bf3dbba32f",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_22.png",
+      "png_sha256": "685ea80415b022a62b8654780942dcc4257f84419b0f88b4f50f9e31b746ed7a",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_22.vtex",
+      "texture_sha256": "1c42224b56aad0da7971924c9956e9827a9a4853d08f70a70f290dcec1631b00",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_22.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_22.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_23",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_23.png",
+      "source_sha256": "727ccbf8d709b0a35f548d2262b0f37e6bf6a217666f0152a0dd598210309af2",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_23.png",
+      "png_sha256": "68a497a5e963e32a8a786f8f13ec3681ff96d4c6fdf219f3db320df2bff522b1",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_23.vtex",
+      "texture_sha256": "03eee4617d08084520d032a075c3ab51ad1a56cdc31fdf872f4172ae21b36d5d",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_23.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_23.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_24",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_24.png",
+      "source_sha256": "952e33f7d4e205103478c6e55074725617b349239bd4a10c3d5bb1c01918a009",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_24.png",
+      "png_sha256": "80305973f2945992f3b8f2b888b3ce355a0ce2493f986e1e483361e3abd569e7",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_24.vtex",
+      "texture_sha256": "ed6146ab760926afb5345e4df6cc7ba97af98733d3b779702e30222b7b6e1d1b",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_24.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_24.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_25",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_25.png",
+      "source_sha256": "a9c4615117513a0f06ed648953c4430dce4686957428279fc49906c7fb88cc8d",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_25.png",
+      "png_sha256": "ca64385b4557529986de38a8a26f668a85ccc0be06fa5fc187de38e54676df95",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_25.vtex",
+      "texture_sha256": "ed29ccd3a5bb1c5d8506798072f27e51091a7f3b0f2a2b1906f1a1b9afaa4c52",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_25.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_25.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_26",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_26.png",
+      "source_sha256": "997a0bd8a139dc1705ce3e7987101ca3b8f43df4d2fd16ac55d3e93e88df026b",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_26.png",
+      "png_sha256": "66c9bad7851b9df2f472c66170687f4c2ab5199959fbc80b0976d6d36f95bc62",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_26.vtex",
+      "texture_sha256": "7a05839b88f572c2dce74689200a443b091554c15a7c09740ebb1a3bef413355",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_26.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_26.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_27",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_27.png",
+      "source_sha256": "cb5bafa0d9f5540a1361e3129c16b8b7e92077eb2aded66c40be0e42626f1fe9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_27.png",
+      "png_sha256": "9d93338cb6c8be61cfa3b9962ec93eadfdf5061274b8a62b529de6de445f36c2",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_27.vtex",
+      "texture_sha256": "1f2a299090b62309708a6c50896706381e1ad116e5883ff32bd808a8c2c238c4",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_27.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_27.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_28",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_28.png",
+      "source_sha256": "ac74ccfce55a1f814bb3e2da31afd883a22922081a0ff7841bafcde47ee13240",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_28.png",
+      "png_sha256": "81b85ac78a1fbf128339eaad4f175a9832525494e7a9d93d984b2adf3b0e4066",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_28.vtex",
+      "texture_sha256": "e624e9f56ff872e05b950981ae0cb2288b7a7c425a6dd4e6913385246e34d77b",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_28.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_28.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_29",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_29.png",
+      "source_sha256": "b6c87bd2585bccb98205828f571b1cfd6bf39bb82bca30959482af2625622d8d",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_29.png",
+      "png_sha256": "7f4ed0c94800679ee4f29d9378b1f86b311ad228695f4e4a068444b63c257da5",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_29.vtex",
+      "texture_sha256": "cc4d6ddca7ed4c0000e331b7c01b4ff14a609ed618cd7df696a00bf84dede802",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_29.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_29.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_30",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_30.png",
+      "source_sha256": "d6bfaab3653f45fd68661459db094e5e482b4bab91043342cf7ebde1aec60728",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_30.png",
+      "png_sha256": "23f97acf91fcc451529e8431eefd44b3fdc901db55d738fc7dbb3265d2c28993",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_30.vtex",
+      "texture_sha256": "4080e517f3477c4a8f812bf120e82f0697c3cbb42b80e9b06df5c7f4dbad9252",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_30.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_30.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_31",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_31.png",
+      "source_sha256": "831e50e355229134003225a7c0efc44827a79cc72b397c1131b7697a21fd1efc",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_31.png",
+      "png_sha256": "c1ff3facc89445ebf0a643d38c11040af76808c262248e1df5d5e9940f017787",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_31.vtex",
+      "texture_sha256": "e45498b7ee3121c096e6f1ea073b6a4437308f88b7f1b62f902de5c627618e9d",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_31.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_31.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_32",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_32.png",
+      "source_sha256": "d20e119835b07d0bf59c00dcd673f7aef19a0e203177c31fa1c980561e01a0ab",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_32.png",
+      "png_sha256": "76bdd249d251e4db2b793174d479095d4c7a840d403b78af257367159c0e3752",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_32.vtex",
+      "texture_sha256": "34fa97faf2f446ea0e4e8a2617304136b26de581a0df702c811c551b935d0c22",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_32.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_32.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_33",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_33.png",
+      "source_sha256": "44feade15e106d77914b5d20ade4b4626bc261ff8a1a189a25370b5f1b3e4516",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_33.png",
+      "png_sha256": "ab1cf67df048bbbf9acaf2d98811e7363552932c880b600e181e26ddbbba2fd3",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_33.vtex",
+      "texture_sha256": "18127624b3198ec3c1c11927fd2ec70e1e2c2b2806cfe3d39b749ed904fd5a67",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_33.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_33.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_34",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_34.png",
+      "source_sha256": "74f86519e89c07ea9eed49ba22f9591503d56bd42737b20f5289f1aef8c247f7",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_34.png",
+      "png_sha256": "1195f4f4f7e717639e888ce64adf2dae31152ce1ee9638f45655508e6342afbf",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_34.vtex",
+      "texture_sha256": "ff957ecb3d43c0aa985f835abde02b84b61a862f6d3edf15fc908e78f909d48e",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_34.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_34.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_35",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_35.png",
+      "source_sha256": "af6d0f90f2d795e62c4feb0f4da9b1fd013d23fb8b8f8b6db09a1454caf0c2a2",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_35.png",
+      "png_sha256": "3b1815af20cdc754d488900f02bfb39a084f425526ab3db2e2cd30758a2a5219",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_35.vtex",
+      "texture_sha256": "2e73f41d9bcf019242f0aad3c962991407143f02195e8cb6d5f18508a7da947d",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_35.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_35.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_36",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_36.png",
+      "source_sha256": "255c080d99b2a514f00e4b9ff0c53f56af6f37a19828d328195d17d8dd5bae4b",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_36.png",
+      "png_sha256": "7815c4bc056ed4e4de7764908a7b8e66987b98160c5af7c950b6feae7297497a",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_36.vtex",
+      "texture_sha256": "999dce8730fcdffe4ca5284b9b0b8c93ab8c0f1ef5bb3d3318fc14c9bd639969",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_36.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_36.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_37",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_37.png",
+      "source_sha256": "763d1edc328890e051162045571ec15d3ed89aa60cc081bdba48226974b2b80b",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_37.png",
+      "png_sha256": "e060d6d2aa39964c85b14c727c5664d7cf6dfd1cff218776bf4f8565c3c961f1",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_37.vtex",
+      "texture_sha256": "b193d2a3ebad0d973f9dfa8bd9cde12e02255839c07ddb6e589c2ce501088000",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_37.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_37.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_38",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_38.png",
+      "source_sha256": "1368f32aee512aaaf6feab3b31a69938273a75e16f22bab30006c1e996c6fb42",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_38.png",
+      "png_sha256": "d1fa3b340f88ca095976c35897b592368bc54eb99dbd02959eefa0943d44f339",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_38.vtex",
+      "texture_sha256": "e2459d0a2937921bf239beb8375bfdd717e4f203899e8966759a62acf33e31d7",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_38.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_38.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_39",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_39.png",
+      "source_sha256": "6025b698c471c812fb026ff5b4dfca7f1368c9310679e6aea6866e38aca84ab4",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_39.png",
+      "png_sha256": "92b9ab9f7e96a5c4300ec9bedc7dce3616cd24857b4d7e47a50d7e8a175ec232",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_39.vtex",
+      "texture_sha256": "ea3e258c27537a1d8ee82e22bcb97a6c57d89d3b572bf1a9e27871d9f41d367d",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_39.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_39.vtex",
+      "legacy_payload_bytes": 391876
+    },
+    {
+      "id": "beast_40",
+      "category_id": "beast",
+      "source": "panorama/src/images/custom_game/archive_items_v2/beast_40.png",
+      "source_sha256": "bc445d43553254385fdb8774877369054519b614973226d405d7b7fec851fccd",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "png": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_40.png",
+      "png_sha256": "03cbbbe47bbb4d0f0e90ed8fe55da7bfbf49d9e8c4835b167771910d61622752",
+      "texture": "panorama/src/images/custom_game/collection_portraits_compact_v1/beast_40.vtex",
+      "texture_sha256": "a2dfe12db4acaa245388baad3306f2d9c43b6c7b51b9b7a5811508f113975e12",
+      "runtime_uri": "s2r://panorama/images/custom_game/collection_portraits_compact_v1/beast_40.vtex",
+      "legacy_runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/beast_40.vtex",
+      "legacy_payload_bytes": 391876
+    }
+  ]
+}

@@ -30,7 +30,7 @@ assert.equal(nodes.CollectionGW2GridBody.style.height,nodes.CollectionGW2Grid.st
 assert(nodes.CollectionGW2Tickets.text.includes('福签：2'));assert(nodes.CollectionGW2Draw.enabled);
 for(const item of rows){
  const card=nodes['CollectionGW2Item_'+item.id],art=images(card);
- assert.equal(art.length,1);assert.equal(art[0].image,'s2r://panorama/images/custom_game/archive_gpu_regular/'+item.id+'.vtex');
+ assert.equal(art.length,1);assert.equal(art[0].image,'s2r://panorama/images/custom_game/collection_portraits_compact_v1/'+item.id+'.vtex');
  assert.equal(card.__collectionItem.target,item.target,'Each original reward keeps its own cap');
 }
 nodes.CollectionGW2Item_beast_01.events.onmouseover();
