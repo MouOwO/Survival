@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "asset_set": "commerce_art_v1",
+  "usage": "commerce_product_icons",
+  "source_base": "tools/art_sources/commerce_art_v1",
+  "prompts_source": "tools/art_sources/commerce_art_v1/prompts.json",
+  "prompts_sha256": "bb6d966f32123ae029f0bbc50d1ed1d427e9ef3a65acc107d37efa9c9cae312c",
+  "dimensions": [
+    128,
+    128
+  ],
+  "pixel_format": "RGBA",
+  "resize": {
+    "algorithm": "Lanczos",
+    "alpha": "premultiplied",
+    "color_space": "srgb_encoded",
+    "sharpen": false,
+    "quantize": false,
+    "pillow_version": "12.3.0"
+  },
+  "texture": {
+    "output_format": "BGRA8888",
+    "no_lod": true,
+    "mip_algorithm": "Box",
+    "mip_levels": 8,
+    "payload_bytes_per_texture": 87380
+  },
+  "count": 5,
+  "target_payload_bytes": 436900,
+  "items": [
+    {
+      "id": "spirit_katana",
+      "name": "斩魄刀",
+      "product_sku": "video_p151",
+      "generator": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset: a single premium fantasy game inventory icon for 斩魄刀 (spirit-cleaving katana), used at 48 by 48 pixels in a dark Dota-style shop. Subject: one distinct curved silver-blue spirit katana, diagonal lower-left to upper-right, broad readable polished blade, dark wrapped hilt and restrained icy soul aura around the edge. Painterly high-quality 3D fantasy item illustration, sharp high-contrast silhouette, coherent materials, simple chunky detail. Center the whole item with 10% transparent padding. Genuine transparent background, no square card, no frame, no lettering, no logo, no other items, no scene, no dense sparks. Not a red demonic katana. Square composition; object clearly identifiable at tiny icon size.",
+      "source": "tools/art_sources/commerce_art_v1/spirit_katana.png",
+      "source_sha256": "7f76b54071edde1af632aba4c9a658b85c8052aac407d1522569ef23df8e2398",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "source_mode": "RGBA",
+      "source_alpha_extrema": [
+        0,
+        255
+      ],
+      "png": "panorama/src/images/custom_game/commerce_art_v1/spirit_katana.png",
+      "png_sha256": "89ea03dd3af0cc6b158fde4c78730ff4ded20349adabb5a8b36e98183dcc66a9",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds_over_32": [
+        10,
+        8,
+        120,
+        121
+      ],
+      "texture": "panorama/src/images/custom_game/commerce_art_v1/spirit_katana.vtex",
+      "texture_sha256": "09059efe9833249798703d3f2a64887bedebf8abf79b9c1d5e676d58f4400662",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/spirit_katana.vtex"
+    },
+    {
+      "id": "titan_shield",
+      "name": "泰坦护盾",
+      "product_sku": "video_p016",
+      "generator": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset: single premium fantasy game inventory icon for 泰坦护盾 (Titan shield), used at 48 by 48 pixels on a dark Dota-style shop. Subject: one massive ancient titan shield, broad upright silhouette viewed in a slight three-quarter angle, warm bronze rim, heavy dark stone plates and one cool azure glowing center, robust monumental geometry. Painterly high-quality 3D fantasy item illustration, sharp high-contrast readable silhouette, simple chunky details, restrained glow. Center whole item with 10% transparent padding. Genuine transparent background, no square card, no frame, no letters, no logo, no character, no scene, no purple energy barrier. Square composition; unmistakably a physical shield at tiny size.",
+      "source": "tools/art_sources/commerce_art_v1/titan_shield.png",
+      "source_sha256": "0e84e6d46a58541aad62e9bc2eb7a42dee518d18e6d6dabc9ff92da126bdb023",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "source_mode": "RGBA",
+      "source_alpha_extrema": [
+        0,
+        255
+      ],
+      "png": "panorama/src/images/custom_game/commerce_art_v1/titan_shield.png",
+      "png_sha256": "84dd2aed22bcdd1cbd128801b210a768f7fa3d5e64dd57c6a91d227a99aed8a1",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds_over_32": [
+        19,
+        2,
+        111,
+        125
+      ],
+      "texture": "panorama/src/images/custom_game/commerce_art_v1/titan_shield.vtex",
+      "texture_sha256": "60b2b7c47f2549daaa7576b645d96e3552d880aa91df82af0a6bb478270c3283",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/titan_shield.vtex"
+    },
+    {
+      "id": "master_foreman",
+      "name": "熟练工头",
+      "product_sku": "video_p028",
+      "generator": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset: single premium fantasy game inventory icon for 熟练工头 (Master foreman), used at 48 by 48 pixels in a dark Dota-style shop. Subject: one sturdy medieval fantasy builder's copper work helmet with a compact carpenter's hammer resting diagonally behind it, visually one clear foreman tool emblem, warm brass/copper, worn leather strap, solid oak hammer handle, simple heavy forms. Painterly high-quality 3D fantasy item illustration, sharp readable high-contrast silhouette. Center emblem with 10% transparent padding. Genuine transparent background, no square card, no frame, no lettering, no logo, no character face, no plants or seeds, no scene, no particles. Square composition; helmet and hammer clearly recognizable at tiny size.",
+      "source": "tools/art_sources/commerce_art_v1/master_foreman.png",
+      "source_sha256": "476ee7f76a9feeb8de020a9bdb0d099faf029543354a13ab8fc2cf90a8d733b9",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "source_mode": "RGBA",
+      "source_alpha_extrema": [
+        0,
+        255
+      ],
+      "png": "panorama/src/images/custom_game/commerce_art_v1/master_foreman.png",
+      "png_sha256": "bc87a310f903519448f576c673cfbe992628e4a40120a856d7a514422f620f16",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds_over_32": [
+        6,
+        5,
+        123,
+        113
+      ],
+      "texture": "panorama/src/images/custom_game/commerce_art_v1/master_foreman.vtex",
+      "texture_sha256": "37f3df6b539982c64a1b50febf8fbd2efd3cc62f9b73f3ee0c3aa4bce5497d6d",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/master_foreman.vtex"
+    },
+    {
+      "id": "lament_seed",
+      "name": "悲叹之种",
+      "product_sku": "video_p147",
+      "generator": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset: single premium fantasy game inventory icon for 悲叹之种 (Seed of Lament), used at 48 by 48 pixels in a dark Dota-style shop. Subject: one large cursed teardrop-shaped dark seed, twisted charcoal thorn shell partially opening around a luminous violet tear-like core, two or three bold curled thorns, melancholic ominous magical atmosphere conveyed by the object alone. Painterly high-quality 3D fantasy item illustration, sharp high-contrast silhouette and chunky detail, subtle restrained purple aura. Center whole item with 10% transparent padding. Genuine transparent background, no square card, no frame, no letters, no logo, no faces, no background scene, no green plant seed cluster, no dense sparks. Square composition, clearly readable tiny icon.",
+      "source": "tools/art_sources/commerce_art_v1/lament_seed.png",
+      "source_sha256": "f88f768955814b90618af763ca7c3068464d638321f1a1733687077b6b88a575",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "source_mode": "RGBA",
+      "source_alpha_extrema": [
+        0,
+        255
+      ],
+      "png": "panorama/src/images/custom_game/commerce_art_v1/lament_seed.png",
+      "png_sha256": "e10579faf559581299c7215d0405bdfc51002487a8539590c57cd9a63a742530",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds_over_32": [
+        26,
+        7,
+        108,
+        122
+      ],
+      "texture": "panorama/src/images/custom_game/commerce_art_v1/lament_seed.vtex",
+      "texture_sha256": "ac7a784aad7876aad01cc0cb43282eb0e71a655367b24fccc82ee37c4a1d5551",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/lament_seed.vtex"
+    },
+    {
+      "id": "swift_winch",
+      "name": "快速绞盘",
+      "product_sku": "video_p110",
+      "generator": "built-in image_gen",
+      "prompt": "Use case: stylized-concept. Asset: single premium fantasy game inventory icon for 快速绞盘 (Swift Winch), used at 48 by 48 pixels in a dark Dota-style shop. Subject: one compact mechanical hand winch with a large bronze winding drum clearly wrapped in thick rope, sturdy dark iron support, a prominent crank handle and a short rope ending in a hook; three-quarter view showing the round spool and crank. Painterly high-quality 3D fantasy item illustration, simple chunky engineering forms, high contrast bright bronze and tan rope against dark iron, sharp silhouette. Center whole tool with 10% transparent padding. Genuine transparent background, no card, no border, no letters, no logo, no character, no scene, no boots or footwear. Square composition; recognizable at tiny size.",
+      "source": "tools/art_sources/commerce_art_v1/swift_winch.png",
+      "source_sha256": "ef5f173b46a17e77aee8e2f04a3747eb756c039d57960cee7aabd461c2081009",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "source_mode": "RGBA",
+      "source_alpha_extrema": [
+        0,
+        255
+      ],
+      "png": "panorama/src/images/custom_game/commerce_art_v1/swift_winch.png",
+      "png_sha256": "271ecfffc768cc58b94d2e94a0569201c146974417a0e37c970a97e4349b296b",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds_over_32": [
+        7,
+        13,
+        127,
+        116
+      ],
+      "texture": "panorama/src/images/custom_game/commerce_art_v1/swift_winch.vtex",
+      "texture_sha256": "bc69120dbdc394829a13952e6ac4e97b7ef3dbb65ede4d540c65bb619c290c95",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/swift_winch.vtex"
+    }
+  ]
+}

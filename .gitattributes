@@ -44,3 +44,6 @@ panorama/src/layout/custom_game/survival_hud.xml -text whitespace=blank-at-eol,b
 
 # Thumbnail manifest hashes compare exact generator bytes.
 data/ui/collection_portraits_compact_v1.json text eol=lf
+data/ui/commerce_product_art_v1.json text eol=lf
+data/ui/commerce_generated_art_v1.json text eol=lf
+tools/art_sources/commerce_art_v1/prompts.json text eol=lf

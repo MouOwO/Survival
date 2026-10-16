@@ -1,0 +1,1771 @@
+{
+  "schema_version": 1,
+  "scope": "Presentation only. SKU aliases never change price, reward, ownership, quantity or purchase eligibility. Unknown dedicated server artwork is preserved.",
+  "coverage": {
+    "commerce": 129,
+    "additional_cash": 8
+  },
+  "products": [
+    {
+      "sku": "archive_pass_monthly",
+      "name": "签到月卡（30天）",
+      "item_id": "daily_wealth_talisman",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_wealth_talisman.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/daily_wealth_talisman.png",
+      "classification": "pass_reward",
+      "catalog_source": "cash",
+      "legacy_icons": [
+        "custom_game/reward_art_v5/daily_wealth_talisman.png"
+      ]
+    },
+    {
+      "sku": "gold_100_test_50_v3",
+      "name": "初始金币 +100",
+      "item_id": "lottery_wealth_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_wealth_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_wealth_crystal.png",
+      "classification": "legacy_cash_reward",
+      "catalog_source": "cash",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_wealth_crystal.png",
+        "custom_game/reward_art_v5/lottery_wealth_crystal.png"
+      ]
+    },
+    {
+      "sku": "special_lottery_ticket_single",
+      "name": "特殊抽奖券 ×1",
+      "item_id": "special_lottery_ticket",
+      "runtime_uri": "s2r://panorama/images/custom_game/lottery_handoff_v1/ticket_illustrated_png.vtex",
+      "source": "panorama/src/images/custom_game/lottery_handoff_v1/ticket_illustrated.png",
+      "classification": "ticket",
+      "catalog_source": "cash",
+      "legacy_icons": [
+        "custom_game/lottery_handoff_v1/ticket_illustrated.png"
+      ]
+    },
+    {
+      "sku": "starter_bundle_v4",
+      "name": "启程礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "cash",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png"
+      ]
+    },
+    {
+      "sku": "tower_attack_100_test_50_v3",
+      "name": "箭塔固定攻击力 +100",
+      "item_id": "lottery_sharp_spirit",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sharp_spirit.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_sharp_spirit.png",
+      "classification": "legacy_cash_reward",
+      "catalog_source": "cash",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_sharp_spirit.png",
+        "custom_game/reward_art_v5/lottery_sharp_spirit.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_b001",
+      "name": "大佬礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_b002",
+      "name": "剑圣D闪礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_b003",
+      "name": "新手礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_b004",
+      "name": "新人礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_b005",
+      "name": "新皮肤礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_01",
+      "name": "V1专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_02",
+      "name": "V2专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_03",
+      "name": "V3专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_04",
+      "name": "V4专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_05",
+      "name": "V5专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_06",
+      "name": "V6专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_07",
+      "name": "V7专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_08",
+      "name": "V8专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_09",
+      "name": "V9专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_bundle_vip_10",
+      "name": "V10专属特惠礼包",
+      "item_id": "commerce_gift_bundle",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_jade_v1/gift_light_png.vtex",
+      "source": "panorama/src/images/custom_game/commerce_jade_v1/gift_light.png",
+      "classification": "shared_bundle",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/commerce_jade_v1/gift_light.png"
+      ]
+    },
+    {
+      "sku": "video_p001",
+      "name": "红色抽奖券",
+      "item_id": "special_lottery_ticket",
+      "runtime_uri": "s2r://panorama/images/custom_game/lottery_handoff_v1/ticket_illustrated_png.vtex",
+      "source": "panorama/src/images/custom_game/lottery_handoff_v1/ticket_illustrated.png",
+      "classification": "ticket",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/lottery_handoff_v1/ticket_illustrated.png"
+      ]
+    },
+    {
+      "sku": "video_p004",
+      "name": "清暑符·永久",
+      "item_id": "native_null_talisman",
+      "runtime_uri": "file://{images}/items/null_talisman.png",
+      "source": "valve:panorama/images/items/null_talisman_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/null_talisman.png"
+      ]
+    },
+    {
+      "sku": "video_p005",
+      "name": "双倍通关卡·永久",
+      "item_id": "native_tpscroll",
+      "runtime_uri": "file://{images}/items/tpscroll.png",
+      "source": "valve:panorama/images/items/tpscroll_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/tpscroll.png"
+      ]
+    },
+    {
+      "sku": "video_p011",
+      "name": "炫彩足球·永久",
+      "item_id": "native_orb_of_venom",
+      "runtime_uri": "file://{images}/items/orb_of_venom.png",
+      "source": "valve:panorama/images/items/orb_of_venom_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/orb_of_venom.png"
+      ]
+    },
+    {
+      "sku": "video_p012",
+      "name": "剑圣·永久",
+      "item_id": "native_juggernaut_blade_fury",
+      "runtime_uri": "file://{images}/spellicons/juggernaut_blade_fury.png",
+      "source": "valve:panorama/images/spellicons/juggernaut_blade_fury_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "spellicons/juggernaut_blade_fury.png"
+      ]
+    },
+    {
+      "sku": "video_p013",
+      "name": "精良工匠·永久",
+      "item_id": "native_meteor_hammer",
+      "runtime_uri": "file://{images}/items/meteor_hammer.png",
+      "source": "valve:panorama/images/items/meteor_hammer_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/meteor_hammer.png"
+      ]
+    },
+    {
+      "sku": "video_p014",
+      "name": "硬质涂层·永久",
+      "item_id": "native_platemail",
+      "runtime_uri": "file://{images}/items/platemail.png",
+      "source": "valve:panorama/images/items/platemail_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/platemail.png"
+      ]
+    },
+    {
+      "sku": "video_p015",
+      "name": "金斧头·永久",
+      "item_id": "native_bfury",
+      "runtime_uri": "file://{images}/items/bfury.png",
+      "source": "valve:panorama/images/items/bfury_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/bfury.png"
+      ]
+    },
+    {
+      "sku": "video_p016",
+      "name": "泰坦护盾·永久（功能版）",
+      "item_id": "commerce_titan_shield",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/titan_shield.vtex",
+      "source": "panorama/src/images/custom_game/commerce_art_v1/titan_shield.png",
+      "classification": "dedicated_commerce",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/reward_art_v5/lottery_dimensional_barrier.png",
+        "s2r://panorama/images/custom_game/reward_art_v5/lottery_dimensional_barrier.vtex"
+      ]
+    },
+    {
+      "sku": "video_p017",
+      "name": "铜斧头·永久",
+      "item_id": "native_ogre_axe",
+      "runtime_uri": "file://{images}/items/ogre_axe.png",
+      "source": "valve:panorama/images/items/ogre_axe_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/ogre_axe.png"
+      ]
+    },
+    {
+      "sku": "video_p018",
+      "name": "时间科技·永久",
+      "item_id": "native_faceless_void_time_lock",
+      "runtime_uri": "file://{images}/spellicons/faceless_void_time_lock.png",
+      "source": "valve:panorama/images/spellicons/faceless_void_time_lock_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "spellicons/faceless_void_time_lock.png"
+      ]
+    },
+    {
+      "sku": "video_p019",
+      "name": "淬火剂·永久",
+      "item_id": "native_bloodthorn",
+      "runtime_uri": "file://{images}/items/bloodthorn.png",
+      "source": "valve:panorama/images/items/bloodthorn_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/bloodthorn.png"
+      ]
+    },
+    {
+      "sku": "video_p020",
+      "name": "地精油锯·永久",
+      "item_id": "native_shredder_whirling_death",
+      "runtime_uri": "file://{images}/spellicons/shredder_whirling_death.png",
+      "source": "valve:panorama/images/spellicons/shredder_whirling_death_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "spellicons/shredder_whirling_death.png"
+      ]
+    },
+    {
+      "sku": "video_p021",
+      "name": "优质装备·永久",
+      "item_id": "native_armlet",
+      "runtime_uri": "file://{images}/items/armlet.png",
+      "source": "valve:panorama/images/items/armlet_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/armlet.png"
+      ]
+    },
+    {
+      "sku": "video_p022",
+      "name": "高级伐木场·永久",
+      "item_id": "native_shredder_timber_chain",
+      "runtime_uri": "file://{images}/spellicons/shredder_timber_chain.png",
+      "source": "valve:panorama/images/spellicons/shredder_timber_chain_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "spellicons/shredder_timber_chain.png"
+      ]
+    },
+    {
+      "sku": "video_p023",
+      "name": "古董收藏家·永久",
+      "item_id": "native_relic",
+      "runtime_uri": "file://{images}/items/relic.png",
+      "source": "valve:panorama/images/items/relic_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/relic.png"
+      ]
+    },
+    {
+      "sku": "video_p024",
+      "name": "建筑手册·永久",
+      "item_id": "native_recipe",
+      "runtime_uri": "file://{images}/items/recipe.png",
+      "source": "valve:panorama/images/items/recipe_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/recipe.png"
+      ]
+    },
+    {
+      "sku": "video_p025",
+      "name": "文玩收藏家·永久",
+      "item_id": "native_philosophers_stone",
+      "runtime_uri": "file://{images}/items/philosophers_stone.png",
+      "source": "valve:panorama/images/items/philosophers_stone_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/philosophers_stone.png"
+      ]
+    },
+    {
+      "sku": "video_p026",
+      "name": "侏儒传送器·永久",
+      "item_id": "native_blink",
+      "runtime_uri": "file://{images}/items/blink.png",
+      "source": "valve:panorama/images/items/blink_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/blink.png"
+      ]
+    },
+    {
+      "sku": "video_p027",
+      "name": "精英装备·永久",
+      "item_id": "native_assault",
+      "runtime_uri": "file://{images}/items/assault.png",
+      "source": "valve:panorama/images/items/assault_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/assault.png"
+      ]
+    },
+    {
+      "sku": "video_p028",
+      "name": "熟练工头·永久（功能版）",
+      "item_id": "commerce_master_foreman",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/master_foreman.vtex",
+      "source": "panorama/src/images/custom_game/commerce_art_v1/master_foreman.png",
+      "classification": "dedicated_commerce",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/reward_art_v5/lottery_seed_of_all_wood.png",
+        "s2r://panorama/images/custom_game/reward_art_v5/lottery_seed_of_all_wood.vtex"
+      ]
+    },
+    {
+      "sku": "video_p029",
+      "name": "工作效率·永久",
+      "item_id": "native_alchemist_goblins_greed",
+      "runtime_uri": "file://{images}/spellicons/alchemist_goblins_greed.png",
+      "source": "valve:panorama/images/spellicons/alchemist_goblins_greed_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "spellicons/alchemist_goblins_greed.png"
+      ]
+    },
+    {
+      "sku": "video_p030",
+      "name": "银斧头·永久",
+      "item_id": "native_iron_talon",
+      "runtime_uri": "file://{images}/items/iron_talon.png",
+      "source": "valve:panorama/images/items/iron_talon_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/iron_talon.png"
+      ]
+    },
+    {
+      "sku": "video_p031",
+      "name": "强化箭塔·永久",
+      "item_id": "native_windrunner_powershot",
+      "runtime_uri": "file://{images}/spellicons/windrunner_powershot.png",
+      "source": "valve:panorama/images/spellicons/windrunner_powershot_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "spellicons/windrunner_powershot.png"
+      ]
+    },
+    {
+      "sku": "video_p032",
+      "name": "快速建造·永久",
+      "item_id": "native_repair_kit",
+      "runtime_uri": "file://{images}/items/repair_kit.png",
+      "source": "valve:panorama/images/items/repair_kit_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/repair_kit.png"
+      ]
+    },
+    {
+      "sku": "video_p033",
+      "name": "伐木斧·永久",
+      "item_id": "native_quelling_blade",
+      "runtime_uri": "file://{images}/items/quelling_blade.png",
+      "source": "valve:panorama/images/items/quelling_blade_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/quelling_blade.png"
+      ]
+    },
+    {
+      "sku": "video_p037",
+      "name": "新手木材·永久",
+      "item_id": "native_branches",
+      "runtime_uri": "file://{images}/items/branches.png",
+      "source": "valve:panorama/images/items/branches_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/branches.png"
+      ]
+    },
+    {
+      "sku": "video_p038",
+      "name": "新手金币·永久",
+      "item_id": "native_hand_of_midas",
+      "runtime_uri": "file://{images}/items/hand_of_midas.png",
+      "source": "valve:panorama/images/items/hand_of_midas_png.vtex",
+      "classification": "native_technology",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "items/hand_of_midas.png"
+      ]
+    },
+    {
+      "sku": "video_p042",
+      "name": "妖刀村正·永久",
+      "item_id": "lottery_muramasa",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_muramasa.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "custom_game/reward_art_v5/lottery_muramasa.png"
+      ]
+    },
+    {
+      "sku": "video_p043",
+      "name": "王之财宝·永久",
+      "item_id": "lottery_kings_treasure",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_kings_treasure.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_kings_treasure.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "custom_game/reward_art_v5/lottery_kings_treasure.png"
+      ]
+    },
+    {
+      "sku": "video_p045",
+      "name": "渡鸦之眼·永久",
+      "item_id": "lottery_raven_eye",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_raven_eye.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "custom_game/reward_art_v5/lottery_raven_eye.png"
+      ]
+    },
+    {
+      "sku": "video_p046",
+      "name": "魔法书·永久",
+      "item_id": "lottery_magic_book",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_magic_book.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "custom_game/reward_art_v5/lottery_magic_book.png"
+      ]
+    },
+    {
+      "sku": "video_p048",
+      "name": "朗基努斯枪·永久",
+      "item_id": "lottery_spear_of_longinus",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_spear_of_longinus.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "custom_game/reward_art_v5/lottery_spear_of_longinus.png"
+      ]
+    },
+    {
+      "sku": "video_p049",
+      "name": "枯枝灯·永久",
+      "item_id": "lottery_withered_branch_lantern",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_withered_branch_lantern.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_withered_branch_lantern.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "custom_game/reward_art_v5/lottery_withered_branch_lantern.png"
+      ]
+    },
+    {
+      "sku": "video_p050",
+      "name": "回响罗盘·永久",
+      "item_id": "lottery_echo_compass",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_echo_compass.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_echo_compass.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "custom_game/reward_art_v5/lottery_echo_compass.png"
+      ]
+    },
+    {
+      "sku": "video_p051",
+      "name": "裂解插件·永久",
+      "item_id": "lottery_rift_implant",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_rift_implant.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_rift_implant.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_rift_implant.png",
+        "custom_game/reward_art_v5/lottery_rift_implant.png"
+      ]
+    },
+    {
+      "sku": "video_p052",
+      "name": "磁扰炮台·永久",
+      "item_id": "lottery_magnetic_disruption_turret",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magnetic_disruption_turret.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_magnetic_disruption_turret.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_magnetic_disruption_turret.png",
+        "custom_game/reward_art_v5/lottery_magnetic_disruption_turret.png"
+      ]
+    },
+    {
+      "sku": "video_p053",
+      "name": "脉冲传导炮台·永久",
+      "item_id": "lottery_pulse_conduction_turret",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_pulse_conduction_turret.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_pulse_conduction_turret.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_pulse_conduction_turret.png",
+        "custom_game/reward_art_v5/lottery_pulse_conduction_turret.png"
+      ]
+    },
+    {
+      "sku": "video_p054",
+      "name": "义体插件·永久",
+      "item_id": "lottery_cybernetic_implant",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_cybernetic_implant.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_cybernetic_implant.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_cybernetic_implant.png",
+        "custom_game/reward_art_v5/lottery_cybernetic_implant.png"
+      ]
+    },
+    {
+      "sku": "video_p055",
+      "name": "晶态护甲·永久",
+      "item_id": "lottery_crystalline_armor",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_crystalline_armor.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_crystalline_armor.png",
+        "custom_game/reward_art_v5/lottery_crystalline_armor.png"
+      ]
+    },
+    {
+      "sku": "video_p056",
+      "name": "信号枢元·永久",
+      "item_id": "lottery_signal_hub",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_signal_hub.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_signal_hub.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_signal_hub.png",
+        "custom_game/reward_art_v5/lottery_signal_hub.png"
+      ]
+    },
+    {
+      "sku": "video_p057",
+      "name": "数据单元·永久",
+      "item_id": "lottery_data_unit",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_data_unit.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_data_unit.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_data_unit.png",
+        "custom_game/reward_art_v5/lottery_data_unit.png"
+      ]
+    },
+    {
+      "sku": "video_p058",
+      "name": "氮化合金护墙·永久",
+      "item_id": "lottery_nitride_alloy_wall",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nitride_alloy_wall.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_nitride_alloy_wall.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_nitride_alloy_wall.png",
+        "custom_game/reward_art_v5/lottery_nitride_alloy_wall.png"
+      ]
+    },
+    {
+      "sku": "video_p061",
+      "name": "轨道炮核心·永久",
+      "item_id": "lottery_orbital_cannon_core",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_orbital_cannon_core.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_orbital_cannon_core.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_orbital_cannon_core.png",
+        "custom_game/reward_art_v5/lottery_orbital_cannon_core.png"
+      ]
+    },
+    {
+      "sku": "video_p063",
+      "name": "纳米集群·永久",
+      "item_id": "lottery_nano_cluster",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nano_cluster.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_nano_cluster.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_nano_cluster.png",
+        "custom_game/reward_art_v5/lottery_nano_cluster.png"
+      ]
+    },
+    {
+      "sku": "video_p065",
+      "name": "次元屏障·永久",
+      "item_id": "lottery_dimensional_barrier",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_dimensional_barrier.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_dimensional_barrier.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_dimensional_barrier.png",
+        "custom_game/reward_art_v5/lottery_dimensional_barrier.png"
+      ]
+    },
+    {
+      "sku": "video_p066",
+      "name": "陨落天矿·永久",
+      "item_id": "lottery_fallen_sky_mine",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_fallen_sky_mine.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_fallen_sky_mine.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_fallen_sky_mine.png",
+        "custom_game/reward_art_v5/lottery_fallen_sky_mine.png"
+      ]
+    },
+    {
+      "sku": "video_p067",
+      "name": "山海鲲鹏·永久",
+      "item_id": "lottery_mountain_sea_kunpeng",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_mountain_sea_kunpeng.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_mountain_sea_kunpeng.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_mountain_sea_kunpeng.png",
+        "custom_game/reward_art_v5/lottery_mountain_sea_kunpeng.png"
+      ]
+    },
+    {
+      "sku": "video_p068",
+      "name": "轮回仙碑·永久",
+      "item_id": "lottery_reincarnation_immortal_stele",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_reincarnation_immortal_stele.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_reincarnation_immortal_stele.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_reincarnation_immortal_stele.png",
+        "custom_game/reward_art_v5/lottery_reincarnation_immortal_stele.png"
+      ]
+    },
+    {
+      "sku": "video_p069",
+      "name": "翠木归元·永久",
+      "item_id": "lottery_emerald_wood_origin",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_emerald_wood_origin.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_emerald_wood_origin.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_emerald_wood_origin.png",
+        "custom_game/reward_art_v5/lottery_emerald_wood_origin.png"
+      ]
+    },
+    {
+      "sku": "video_p070",
+      "name": "林铸千矢·永久",
+      "item_id": "lottery_forestcast_thousand_bolts",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_forestcast_thousand_bolts.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_forestcast_thousand_bolts.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_forestcast_thousand_bolts.png",
+        "custom_game/reward_art_v5/lottery_forestcast_thousand_bolts.png"
+      ]
+    },
+    {
+      "sku": "video_p071",
+      "name": "斫木宗师·永久",
+      "item_id": "lottery_woodcraft_grandmaster",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_woodcraft_grandmaster.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_woodcraft_grandmaster.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_woodcraft_grandmaster.png",
+        "custom_game/reward_art_v5/lottery_woodcraft_grandmaster.png"
+      ]
+    },
+    {
+      "sku": "video_p072",
+      "name": "苍松固城·永久",
+      "item_id": "lottery_ancient_pine_fortification",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_ancient_pine_fortification.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_ancient_pine_fortification.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_ancient_pine_fortification.png",
+        "custom_game/reward_art_v5/lottery_ancient_pine_fortification.png"
+      ]
+    },
+    {
+      "sku": "video_p075",
+      "name": "诛仙剑阵·永久",
+      "item_id": "lottery_immortal_slaying_sword_array",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_immortal_slaying_sword_array.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_immortal_slaying_sword_array.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_immortal_slaying_sword_array.png",
+        "custom_game/reward_art_v5/lottery_immortal_slaying_sword_array.png"
+      ]
+    },
+    {
+      "sku": "video_p077",
+      "name": "焕天印·永久",
+      "item_id": "lottery_sky_turning_seal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sky_turning_seal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_sky_turning_seal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_sky_turning_seal.png",
+        "custom_game/reward_art_v5/lottery_sky_turning_seal.png"
+      ]
+    },
+    {
+      "sku": "video_p078",
+      "name": "不灭涅槃·永久",
+      "item_id": "lottery_immortal_nirvana",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_immortal_nirvana.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_immortal_nirvana.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_immortal_nirvana.png",
+        "custom_game/reward_art_v5/lottery_immortal_nirvana.png"
+      ]
+    },
+    {
+      "sku": "video_p079",
+      "name": "齐天大圣·永久",
+      "item_id": "lottery_monkey_king",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_monkey_king.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_monkey_king.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/reward_art_v5/lottery_monkey_king.png"
+      ]
+    },
+    {
+      "sku": "video_p082",
+      "name": "通天塔印·永久",
+      "item_id": "lottery_heaven_reaching_tower_seal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_heaven_reaching_tower_seal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_heaven_reaching_tower_seal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_heaven_reaching_tower_seal.png",
+        "custom_game/reward_art_v5/lottery_heaven_reaching_tower_seal.png"
+      ]
+    },
+    {
+      "sku": "video_p083",
+      "name": "君临天下·永久",
+      "item_id": "lottery_sovereign_under_heaven",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sovereign_under_heaven.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_sovereign_under_heaven.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_sovereign_under_heaven.png",
+        "custom_game/reward_art_v5/lottery_sovereign_under_heaven.png"
+      ]
+    },
+    {
+      "sku": "video_p084",
+      "name": "青林筑垣·永久",
+      "item_id": "lottery_greenwood_rampart",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_greenwood_rampart.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_greenwood_rampart.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_greenwood_rampart.png",
+        "custom_game/reward_art_v5/lottery_greenwood_rampart.png"
+      ]
+    },
+    {
+      "sku": "video_p086",
+      "name": "青林涅槃·永久",
+      "item_id": "lottery_greenwood_nirvana",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_greenwood_nirvana.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_greenwood_nirvana.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_greenwood_nirvana.png",
+        "custom_game/reward_art_v5/lottery_greenwood_nirvana.png"
+      ]
+    },
+    {
+      "sku": "video_p087",
+      "name": "木筑万锋·永久",
+      "item_id": "lottery_woodforged_thousand_arrows",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_woodforged_thousand_arrows.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_woodforged_thousand_arrows.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_woodforged_thousand_arrows.png",
+        "custom_game/reward_art_v5/lottery_woodforged_thousand_arrows.png"
+      ]
+    },
+    {
+      "sku": "video_p088",
+      "name": "伐木高手·永久",
+      "item_id": "lottery_lumber_expert",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_expert.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_lumber_expert.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_lumber_expert.png",
+        "custom_game/reward_art_v5/lottery_lumber_expert.png"
+      ]
+    },
+    {
+      "sku": "video_p089",
+      "name": "薪火余烬·100个",
+      "item_id": "lottery_ember_of_legacy",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_ember_of_legacy.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_ember_of_legacy.png",
+      "classification": "quantity_same_item",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_ember_of_legacy.png",
+        "custom_game/reward_art_v5/lottery_ember_of_legacy.png"
+      ]
+    },
+    {
+      "sku": "video_p090",
+      "name": "烈焰城墙·永久",
+      "item_id": "lottery_flame_wall",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_flame_wall.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_flame_wall.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_flame_wall.png",
+        "custom_game/reward_art_v5/lottery_flame_wall.png"
+      ]
+    },
+    {
+      "sku": "video_p092",
+      "name": "伐木仙人·永久",
+      "item_id": "lottery_lumber_immortal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_immortal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_lumber_immortal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_lumber_immortal.png",
+        "custom_game/reward_art_v5/lottery_lumber_immortal.png"
+      ]
+    },
+    {
+      "sku": "video_p094",
+      "name": "无尽年轮·永久",
+      "item_id": "lottery_endless_growth_ring",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_endless_growth_ring.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_endless_growth_ring.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_endless_growth_ring.png",
+        "custom_game/reward_art_v5/lottery_endless_growth_ring.png"
+      ]
+    },
+    {
+      "sku": "video_p095",
+      "name": "伐木之怒·永久",
+      "item_id": "lottery_lumber_fury",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_fury.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_lumber_fury.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_lumber_fury.png",
+        "custom_game/reward_art_v5/lottery_lumber_fury.png"
+      ]
+    },
+    {
+      "sku": "video_p096",
+      "name": "极品钓鱼杆·永久",
+      "item_id": "lottery_supreme_fishing_rod",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_supreme_fishing_rod.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_supreme_fishing_rod.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_supreme_fishing_rod.png",
+        "custom_game/reward_art_v5/lottery_supreme_fishing_rod.png"
+      ]
+    },
+    {
+      "sku": "video_p097",
+      "name": "英雄勋章·永久",
+      "item_id": "lottery_hero_medal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_hero_medal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_hero_medal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_hero_medal.png",
+        "custom_game/reward_art_v5/lottery_hero_medal.png"
+      ]
+    },
+    {
+      "sku": "video_p098",
+      "name": "锐木塔源·永久",
+      "item_id": "lottery_sharpwood_tower_core",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sharpwood_tower_core.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_sharpwood_tower_core.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_sharpwood_tower_core.png",
+        "custom_game/reward_art_v5/lottery_sharpwood_tower_core.png"
+      ]
+    },
+    {
+      "sku": "video_p099",
+      "name": "万木之种·永久",
+      "item_id": "lottery_seed_of_all_wood",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_seed_of_all_wood.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_seed_of_all_wood.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_seed_of_all_wood.png",
+        "custom_game/reward_art_v5/lottery_seed_of_all_wood.png"
+      ]
+    },
+    {
+      "sku": "video_p100",
+      "name": "橡木壁垒·永久",
+      "item_id": "lottery_oak_bulwark",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_oak_bulwark.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_oak_bulwark.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_oak_bulwark.png",
+        "custom_game/reward_art_v5/lottery_oak_bulwark.png"
+      ]
+    },
+    {
+      "sku": "video_p101",
+      "name": "泰坦巨盾·永久",
+      "item_id": "lottery_titan_shield",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_titan_shield.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_titan_shield.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_titan_shield.png",
+        "custom_game/reward_art_v5/lottery_titan_shield.png"
+      ]
+    },
+    {
+      "sku": "video_p102",
+      "name": "全知赐福·永久",
+      "item_id": "lottery_omniscience_blessing",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_omniscience_blessing.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_omniscience_blessing.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_omniscience_blessing.png",
+        "custom_game/reward_art_v5/lottery_omniscience_blessing.png"
+      ]
+    },
+    {
+      "sku": "video_p103",
+      "name": "薪火余烬·1个",
+      "item_id": "lottery_ember_of_legacy",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_ember_of_legacy.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_ember_of_legacy.png",
+      "classification": "quantity_same_item",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_ember_of_legacy.png",
+        "custom_game/reward_art_v5/lottery_ember_of_legacy.png"
+      ]
+    },
+    {
+      "sku": "video_p104",
+      "name": "噬魂灵剑·永久",
+      "item_id": "lottery_soul_devouring_blade",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_soul_devouring_blade.png",
+        "custom_game/reward_art_v5/lottery_soul_devouring_blade.png"
+      ]
+    },
+    {
+      "sku": "video_p105",
+      "name": "箭塔改造·永久",
+      "item_id": "lottery_tower_retrofit",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_tower_retrofit.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_tower_retrofit.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_tower_retrofit.png",
+        "custom_game/reward_art_v5/lottery_tower_retrofit.png"
+      ]
+    },
+    {
+      "sku": "video_p106",
+      "name": "钢铁城墙·永久",
+      "item_id": "lottery_steel_wall",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_steel_wall.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_steel_wall.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_steel_wall.png",
+        "custom_game/reward_art_v5/lottery_steel_wall.png"
+      ]
+    },
+    {
+      "sku": "video_p107",
+      "name": "采集秘典·永久",
+      "item_id": "lottery_gathering_grimoire",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_gathering_grimoire.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_gathering_grimoire.png",
+        "custom_game/reward_art_v5/lottery_gathering_grimoire.png"
+      ]
+    },
+    {
+      "sku": "video_p108",
+      "name": "时间宝珠·永久",
+      "item_id": "lottery_time_orb",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_time_orb.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_time_orb.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_time_orb.png",
+        "custom_game/reward_art_v5/lottery_time_orb.png"
+      ]
+    },
+    {
+      "sku": "video_p109",
+      "name": "速干水泥·永久",
+      "item_id": "lottery_quick_dry_cement",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_quick_dry_cement.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_quick_dry_cement.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_quick_dry_cement.png",
+        "custom_game/reward_art_v5/lottery_quick_dry_cement.png"
+      ]
+    },
+    {
+      "sku": "video_p110",
+      "name": "快速绞盘·永久",
+      "item_id": "commerce_swift_winch",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/swift_winch.vtex",
+      "source": "panorama/src/images/custom_game/commerce_art_v1/swift_winch.png",
+      "classification": "dedicated_commerce",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_swift_emblem.png",
+        "s2r://panorama/images/custom_game/reward_art_v5/lottery_swift_emblem.vtex",
+        "custom_game/reward_art_v5/lottery_swift_emblem.png"
+      ]
+    },
+    {
+      "sku": "video_p111",
+      "name": "疾风弓·永久",
+      "item_id": "lottery_gale_bow",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gale_bow.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_gale_bow.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_gale_bow.png",
+        "custom_game/reward_art_v5/lottery_gale_bow.png"
+      ]
+    },
+    {
+      "sku": "video_p112",
+      "name": "万能工具·永久",
+      "item_id": "lottery_universal_tool",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_universal_tool.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_universal_tool.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_universal_tool.png",
+        "custom_game/reward_art_v5/lottery_universal_tool.png"
+      ]
+    },
+    {
+      "sku": "video_p113",
+      "name": "生命精粹·永久",
+      "item_id": "lottery_life_spirit",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_life_spirit.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_life_spirit.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_life_spirit.png",
+        "custom_game/reward_art_v5/lottery_life_spirit.png"
+      ]
+    },
+    {
+      "sku": "video_p114",
+      "name": "锋锐精粹·永久",
+      "item_id": "lottery_sharp_spirit",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sharp_spirit.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_sharp_spirit.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_sharp_spirit.png",
+        "custom_game/reward_art_v5/lottery_sharp_spirit.png"
+      ]
+    },
+    {
+      "sku": "video_p116",
+      "name": "回复精粹·永久",
+      "item_id": "lottery_recovery_spirit",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_recovery_spirit.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_recovery_spirit.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_recovery_spirit.png",
+        "custom_game/reward_art_v5/lottery_recovery_spirit.png"
+      ]
+    },
+    {
+      "sku": "video_p117",
+      "name": "伐木结晶·永久",
+      "item_id": "lottery_lumber_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_lumber_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_lumber_crystal.png",
+        "custom_game/reward_art_v5/lottery_lumber_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p118",
+      "name": "财富结晶·永久",
+      "item_id": "lottery_wealth_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_wealth_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_wealth_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_wealth_crystal.png",
+        "custom_game/reward_art_v5/lottery_wealth_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p119",
+      "name": "射击结晶·永久",
+      "item_id": "lottery_shooting_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_shooting_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_shooting_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_shooting_crystal.png",
+        "custom_game/reward_art_v5/lottery_shooting_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p120",
+      "name": "自然结晶·永久",
+      "item_id": "lottery_nature_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nature_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_nature_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_nature_crystal.png",
+        "custom_game/reward_art_v5/lottery_nature_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p121",
+      "name": "炮击结晶·永久",
+      "item_id": "lottery_bombardment_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_bombardment_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_bombardment_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_bombardment_crystal.png",
+        "custom_game/reward_art_v5/lottery_bombardment_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p122",
+      "name": "抵抗结晶·永久",
+      "item_id": "lottery_resistance_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_resistance_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_resistance_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_resistance_crystal.png",
+        "custom_game/reward_art_v5/lottery_resistance_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p123",
+      "name": "膨胀结晶·永久",
+      "item_id": "lottery_expansion_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_expansion_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_expansion_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_expansion_crystal.png",
+        "custom_game/reward_art_v5/lottery_expansion_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p124",
+      "name": "防护结晶·永久",
+      "item_id": "lottery_protection_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_protection_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_protection_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_protection_crystal.png",
+        "custom_game/reward_art_v5/lottery_protection_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p125",
+      "name": "属性结晶·永久",
+      "item_id": "lottery_attribute_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_attribute_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_attribute_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_attribute_crystal.png",
+        "custom_game/reward_art_v5/lottery_attribute_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p126",
+      "name": "回复结晶·永久",
+      "item_id": "lottery_recovery_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_recovery_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_recovery_crystal.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_recovery_crystal.png",
+        "custom_game/reward_art_v5/lottery_recovery_crystal.png"
+      ]
+    },
+    {
+      "sku": "video_p127",
+      "name": "风速弓弦·永久",
+      "item_id": "lottery_windspeed_bowstring",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_windspeed_bowstring.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_windspeed_bowstring.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_windspeed_bowstring.png",
+        "custom_game/reward_art_v5/lottery_windspeed_bowstring.png"
+      ]
+    },
+    {
+      "sku": "video_p128",
+      "name": "玄铁城墙·永久",
+      "item_id": "lottery_darksteel_wall",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_darksteel_wall.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_darksteel_wall.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_darksteel_wall.png",
+        "custom_game/reward_art_v5/lottery_darksteel_wall.png"
+      ]
+    },
+    {
+      "sku": "video_p129",
+      "name": "亚伦巨炮·永久",
+      "item_id": "lottery_aaron_cannon",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_aaron_cannon.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_aaron_cannon.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_aaron_cannon.png",
+        "custom_game/reward_art_v5/lottery_aaron_cannon.png"
+      ]
+    },
+    {
+      "sku": "video_p130",
+      "name": "采集神典·永久",
+      "item_id": "lottery_gathering_divine_codex",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_gathering_divine_codex.png",
+        "custom_game/reward_art_v5/lottery_gathering_divine_codex.png"
+      ]
+    },
+    {
+      "sku": "video_p131",
+      "name": "角鹰魔攻·永久",
+      "item_id": "lottery_hippogryph_onslaught",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_hippogryph_onslaught.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_hippogryph_onslaught.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_hippogryph_onslaught.png",
+        "custom_game/reward_art_v5/lottery_hippogryph_onslaught.png"
+      ]
+    },
+    {
+      "sku": "video_p132",
+      "name": "伐木传承·永久",
+      "item_id": "lottery_lumber_legacy",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_legacy.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_lumber_legacy.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_lumber_legacy.png",
+        "custom_game/reward_art_v5/lottery_lumber_legacy.png"
+      ]
+    },
+    {
+      "sku": "video_p133",
+      "name": "神塔赐福·永久",
+      "item_id": "lottery_divine_tower_blessing",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_divine_tower_blessing.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_divine_tower_blessing.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_divine_tower_blessing.png",
+        "custom_game/reward_art_v5/lottery_divine_tower_blessing.png"
+      ]
+    },
+    {
+      "sku": "video_p134",
+      "name": "轮回宝珠·永久",
+      "item_id": "lottery_reincarnation_orb",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_reincarnation_orb.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_reincarnation_orb.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_reincarnation_orb.png",
+        "custom_game/reward_art_v5/lottery_reincarnation_orb.png"
+      ]
+    },
+    {
+      "sku": "video_p135",
+      "name": "不破要塞·永久",
+      "item_id": "lottery_unbreakable_fortress",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_unbreakable_fortress.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_unbreakable_fortress.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_unbreakable_fortress.png",
+        "custom_game/reward_art_v5/lottery_unbreakable_fortress.png"
+      ]
+    },
+    {
+      "sku": "video_p136",
+      "name": "丰饶赐福·永久",
+      "item_id": "lottery_abundance_blessing",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_abundance_blessing.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_abundance_blessing.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_abundance_blessing.png",
+        "custom_game/reward_art_v5/lottery_abundance_blessing.png"
+      ]
+    },
+    {
+      "sku": "video_p137",
+      "name": "主神赐福·永久",
+      "item_id": "lottery_chief_god_blessing",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_chief_god_blessing.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_chief_god_blessing.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_chief_god_blessing.png",
+        "custom_game/reward_art_v5/lottery_chief_god_blessing.png"
+      ]
+    },
+    {
+      "sku": "video_p138",
+      "name": "神选英雄·永久",
+      "item_id": "lottery_chosen_hero",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_chosen_hero.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_chosen_hero.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_chosen_hero.png",
+        "custom_game/reward_art_v5/lottery_chosen_hero.png"
+      ]
+    },
+    {
+      "sku": "video_p139",
+      "name": "奋斗日记·永久",
+      "item_id": "lottery_struggle_diary",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_struggle_diary.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_struggle_diary.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_struggle_diary.png",
+        "custom_game/reward_art_v5/lottery_struggle_diary.png"
+      ]
+    },
+    {
+      "sku": "video_p140",
+      "name": "自然精粹·永久",
+      "item_id": "lottery_nature_spirit",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nature_spirit.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_nature_spirit.png",
+      "classification": "canonical_reward",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/reward_art_v5/lottery_nature_spirit.png"
+      ]
+    },
+    {
+      "sku": "video_p147",
+      "name": "悲叹之种·永久",
+      "item_id": "commerce_lament_seed",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/lament_seed.vtex",
+      "source": "panorama/src/images/custom_game/commerce_art_v1/lament_seed.png",
+      "classification": "dedicated_commerce",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/reward_art_v5/lottery_seed_of_all_wood.png",
+        "s2r://panorama/images/custom_game/reward_art_v5/lottery_seed_of_all_wood.vtex"
+      ]
+    },
+    {
+      "sku": "video_p151",
+      "name": "斩魄刀·永久",
+      "item_id": "commerce_spirit_katana",
+      "runtime_uri": "s2r://panorama/images/custom_game/commerce_art_v1/spirit_katana.vtex",
+      "source": "panorama/src/images/custom_game/commerce_art_v1/spirit_katana.png",
+      "classification": "dedicated_commerce",
+      "catalog_source": "commerce",
+      "legacy_icons": [
+        "custom_game/reward_art_v5/lottery_muramasa.png",
+        "s2r://panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex"
+      ]
+    },
+    {
+      "sku": "wall_armor_100_test_50_v3",
+      "name": "城墙初始护甲 +100",
+      "item_id": "lottery_protection_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_protection_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_protection_crystal.png",
+      "classification": "legacy_cash_reward",
+      "catalog_source": "cash",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_protection_crystal.png",
+        "custom_game/reward_art_v5/lottery_protection_crystal.png"
+      ]
+    },
+    {
+      "sku": "wall_health_100_test_50_v3",
+      "name": "城墙初始血量 +100",
+      "item_id": "lottery_life_spirit",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_life_spirit.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_life_spirit.png",
+      "classification": "legacy_cash_reward",
+      "catalog_source": "cash",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_life_spirit.png",
+        "custom_game/reward_art_v5/lottery_life_spirit.png"
+      ]
+    },
+    {
+      "sku": "wood_100_test_50_v3",
+      "name": "初始木材 +100",
+      "item_id": "lottery_lumber_crystal",
+      "runtime_uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_lumber_crystal.vtex",
+      "source": "panorama/src/images/custom_game/reward_art_v5/lottery_lumber_crystal.png",
+      "classification": "legacy_cash_reward",
+      "catalog_source": "cash",
+      "legacy_icons": [
+        "custom_game/archive_items_v2/lottery_lumber_crystal.png",
+        "custom_game/reward_art_v5/lottery_lumber_crystal.png"
+      ]
+    }
+  ]
+}

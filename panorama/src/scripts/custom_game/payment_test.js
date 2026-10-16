@@ -177,9 +177,10 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         var shown=order && order.state!=="closed" ? order : p;
         $("#PaymentTitle").text = shown ? shown.title : "正在加载商品";
         $("#PaymentDescription").text = shown ? shown.description||"" : "请先完成对局登录";
-        var art=$("#PaymentProductArt"),icon=shown && (shown.icon || (p && p.icon));
-        if(art){var validIcon=typeof icon==="string" && /^custom_game\/[A-Za-z0-9_\/-]+\.png$/.test(icon) && icon.indexOf("..")<0;
-            art.style.visibility=validIcon?"visible":"collapse";if(validIcon && art.SetImage)art.SetImage("file://{images}/"+icon);}
+        var art=$("#PaymentProductArt"),artwork={sku:shown&&shown.sku||p&&p.sku,icon:shown&&(shown.icon||(p&&p.icon))};
+        var icons=cfg.SurvivalCommerceComponents,icon=icons&&icons.ProductIcon?icons.ProductIcon(artwork):artwork.icon;
+        var uri=icons&&icons.NormalizeIconURI?icons.NormalizeIconURI(icon):typeof icon==="string"&&/^custom_game\/[A-Za-z0-9_\/-]+\.png$/.test(icon)&&icon.indexOf("..")<0?"file://{images}/"+icon:"";
+        if(art){art.style.visibility=uri?"visible":"collapse";if(uri&&art.SetImage)art.SetImage(uri);}
         $("#PaymentPrice").text = priceText(shown,true);
         $("#PaymentValues").html=true;$("#PaymentValues").text = escapedLines(valuesText(shown,order));
         buy.enabled = !busy && !!p && enabled(p.enabled) && priceValid(p) && (!order || order.state === "closed" || order.state==="delivered");

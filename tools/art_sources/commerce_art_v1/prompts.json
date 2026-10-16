@@ -1,0 +1,27 @@
+{
+  "spirit_katana": {
+    "name": "斩魄刀",
+    "prompt": "Use case: stylized-concept. Asset: a single premium fantasy game inventory icon for 斩魄刀 (spirit-cleaving katana), used at 48 by 48 pixels in a dark Dota-style shop. Subject: one distinct curved silver-blue spirit katana, diagonal lower-left to upper-right, broad readable polished blade, dark wrapped hilt and restrained icy soul aura around the edge. Painterly high-quality 3D fantasy item illustration, sharp high-contrast silhouette, coherent materials, simple chunky detail. Center the whole item with 10% transparent padding. Genuine transparent background, no square card, no frame, no lettering, no logo, no other items, no scene, no dense sparks. Not a red demonic katana. Square composition; object clearly identifiable at tiny icon size.",
+    "generator": "built-in image_gen"
+  },
+  "titan_shield": {
+    "name": "泰坦护盾",
+    "prompt": "Use case: stylized-concept. Asset: single premium fantasy game inventory icon for 泰坦护盾 (Titan shield), used at 48 by 48 pixels on a dark Dota-style shop. Subject: one massive ancient titan shield, broad upright silhouette viewed in a slight three-quarter angle, warm bronze rim, heavy dark stone plates and one cool azure glowing center, robust monumental geometry. Painterly high-quality 3D fantasy item illustration, sharp high-contrast readable silhouette, simple chunky details, restrained glow. Center whole item with 10% transparent padding. Genuine transparent background, no square card, no frame, no letters, no logo, no character, no scene, no purple energy barrier. Square composition; unmistakably a physical shield at tiny size.",
+    "generator": "built-in image_gen"
+  },
+  "master_foreman": {
+    "name": "熟练工头",
+    "prompt": "Use case: stylized-concept. Asset: single premium fantasy game inventory icon for 熟练工头 (Master foreman), used at 48 by 48 pixels in a dark Dota-style shop. Subject: one sturdy medieval fantasy builder's copper work helmet with a compact carpenter's hammer resting diagonally behind it, visually one clear foreman tool emblem, warm brass/copper, worn leather strap, solid oak hammer handle, simple heavy forms. Painterly high-quality 3D fantasy item illustration, sharp readable high-contrast silhouette. Center emblem with 10% transparent padding. Genuine transparent background, no square card, no frame, no lettering, no logo, no character face, no plants or seeds, no scene, no particles. Square composition; helmet and hammer clearly recognizable at tiny size.",
+    "generator": "built-in image_gen"
+  },
+  "lament_seed": {
+    "name": "悲叹之种",
+    "prompt": "Use case: stylized-concept. Asset: single premium fantasy game inventory icon for 悲叹之种 (Seed of Lament), used at 48 by 48 pixels in a dark Dota-style shop. Subject: one large cursed teardrop-shaped dark seed, twisted charcoal thorn shell partially opening around a luminous violet tear-like core, two or three bold curled thorns, melancholic ominous magical atmosphere conveyed by the object alone. Painterly high-quality 3D fantasy item illustration, sharp high-contrast silhouette and chunky detail, subtle restrained purple aura. Center whole item with 10% transparent padding. Genuine transparent background, no square card, no frame, no letters, no logo, no faces, no background scene, no green plant seed cluster, no dense sparks. Square composition, clearly readable tiny icon.",
+    "generator": "built-in image_gen"
+  },
+  "swift_winch": {
+    "name": "快速绞盘",
+    "prompt": "Use case: stylized-concept. Asset: single premium fantasy game inventory icon for 快速绞盘 (Swift Winch), used at 48 by 48 pixels in a dark Dota-style shop. Subject: one compact mechanical hand winch with a large bronze winding drum clearly wrapped in thick rope, sturdy dark iron support, a prominent crank handle and a short rope ending in a hook; three-quarter view showing the round spool and crank. Painterly high-quality 3D fantasy item illustration, simple chunky engineering forms, high contrast bright bronze and tan rope against dark iron, sharp silhouette. Center whole tool with 10% transparent padding. Genuine transparent background, no card, no border, no letters, no logo, no character, no scene, no boots or footwear. Square composition; recognizable at tiny size.",
+    "generator": "built-in image_gen"
+  }
+}
