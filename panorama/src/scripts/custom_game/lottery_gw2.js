@@ -161,7 +161,7 @@
         style(view.content,{visibility:mode?"collapse":"visible"});
         place(p("LotterySceneBackground"),0,0,1113,669);style(p("LotterySceneBackground"),{opacity:"1",zIndex:"0",overflow:"clip"});
         if(cfg.LotterySceneTransition)cfg.LotterySceneTransition.Resize(1113,669);
-        place(p("LotterySceneShade"),0,0,1113,669);style(p("LotterySceneShade"),{zIndex:"1",backgroundColor:"gradient(linear,0% 0%,100% 0%,from(#14120c16),color-stop(.45,#121a2040),color-stop(.64,#14150ddc),to(#12100bf2))"});
+        place(p("LotterySceneShade"),0,0,1113,669);style(p("LotterySceneShade"),{zIndex:"1",backgroundColor:"gradient(linear,0% 0%,100% 0%,from(#14120c0a),color-stop(.45,#121a201a),color-stop(.64,#14150d4d),to(#12100b80))"});
         place(p("LotteryHeroCopy"),611,54,472,346);style(p("LotteryHeroCopy"),{flowChildren:"none",zIndex:"3",visibility:drawVisible?"visible":"collapse"});
         place(p("LotteryTitle"),0,0,466,86);style(p("LotteryTitle"),{visibility:"visible",fontSize:"43px",fontWeight:"normal",color:"#f3e4c0",whiteSpace:"normal",textShadow:"#000000 0px 2px 4px 2.0"});
         place(p("LotteryTaglineBounds"),2,100,461,106);place(p("LotteryTagline"),0,0,461,106);style(p("LotteryTagline"),{fontSize:"22px",minHeight:"0px",color:"#c1cfca",transform:"none",whiteSpace:"normal",textShadow:"#000000 0px 1px 3px 1.0"});
