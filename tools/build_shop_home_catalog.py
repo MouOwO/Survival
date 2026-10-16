@@ -5,6 +5,7 @@ rewards, the full product list and the older video presentation are never change
 The manifest must contain an explicit, reviewed list; there is no all-items fallback.
 --check and --print-block write nothing. --model-source/--model-output produce a
 separate narrow integration candidate for the untracked market model.
+The model integration keeps ordinary and VIP bundles exclusive to their own tabs.
 """
 from __future__ import annotations
 
@@ -34,11 +35,50 @@ MODEL_NEW = '''    function groupOrder(id){
         }
         var value=(presentation().groups||{})[id];return Array.isArray(value)?value:null;
     }'''
-MODEL_HOME = '''    function homeProducts(items){
+MODEL_HOME_OLD = '''    function homeProducts(items){
         var home=config&&config.SurvivalShopHomeCatalog;
         return home&&typeof home.Compose==="function"?home.Compose(rows(items),isListed):[];
     }
 '''
+MODEL_HOME = MODEL_HOME_OLD.replace('home.Compose(rows(items),isListed)',
+                                   'home.Compose(rows(items),function(item){return item.product_type!=="bundle"&&isListed(item);})')
+MODEL_VIP_OLD = '    function isVip(item){return number(item.required_vip_level)>0||listedInVideo(item,"vip")||item.category_id==="vip";}'
+MODEL_VIP = '    function isVip(item){return number(item.required_vip_level)>0||item.category_id==="vip";}'
+MODEL_GROUPS_OLD = '''    function inGroup(item,id){
+        if(!isListed(item))return false;
+        if(id==="all")return true;
+        if(listedInVideo(item,id))return true;
+        if(id==="home")return groupOrder("home")===null;
+        if(id==="vip")return isVip(item);
+        if(id==="bundles")return item.product_type==="bundle"&&!isVip(item);
+        if(id==="promotions")return discount(item);
+        return false;
+    }
+    function groupFor(item){
+        if(!item)return "all";
+        if(isVip(item))return "vip";
+        if(item.product_type==="bundle")return "bundles";
+        if(discount(item))return "promotions";
+        return listedInVideo(item,"home")?"home":"all";
+    }'''
+MODEL_GROUPS = '''    function inGroup(item,id){
+        if(!isListed(item))return false;
+        // Product type and VIP requirements come from the server catalog.
+        // Discounts and legacy display lists cannot move bundles to other tabs.
+        if(item.product_type==="bundle")return id===(isVip(item)?"vip":"bundles");
+        if(id==="vip"||id==="bundles")return false;
+        if(id==="all")return true;
+        if(listedInVideo(item,id))return true;
+        if(id==="home")return groupOrder("home")===null;
+        if(id==="promotions")return discount(item);
+        return false;
+    }
+    function groupFor(item){
+        if(!item)return "all";
+        if(item.product_type==="bundle")return isVip(item)?"vip":"bundles";
+        if(discount(item))return "promotions";
+        return listedInVideo(item,"home")?"home":"all";
+    }'''
 
 CONTROLLER_OLD = '''        var items=products.filter(function(p){return M?K.InGroup(p,category):p.category_id===category;});
         if(M)items=K.SortProducts(items,category);'''
@@ -173,12 +213,17 @@ def patch_model_source(original):
     if updated not in text:
         text = replace_once(text, MODEL_OLD, updated, "groupOrder")
     helper = MODEL_HOME.replace("\n", newline)
+    legacy_helper = MODEL_HOME_OLD.replace("\n", newline)
+    if legacy_helper in text:
+        text = replace_once(text, legacy_helper, helper, "home single-product filter")
     if helper not in text:
         text = replace_once(text, "    function groups(catalog){", helper + "    function groups(catalog){", "home composition")
     text = replace_once(text,
                         "count:products.filter(function(item){return inGroup(item,definition.id);}).length",
                         'count:definition.id==="home"?homeProducts(products).length:products.filter(function(item){return inGroup(item,definition.id);}).length', "home count")
     text = replace_once(text, "var model={Groups:groups,GroupFor:groupFor,", "var model={Groups:groups,HomeProducts:homeProducts,GroupFor:groupFor,", "home model API")
+    text = replace_once(text, MODEL_VIP_OLD, MODEL_VIP, "authoritative VIP classification")
+    text = replace_once(text, MODEL_GROUPS_OLD.replace("\n", newline), MODEL_GROUPS.replace("\n", newline), "exclusive bundle groups")
     return text.encode("utf-8")
 
 

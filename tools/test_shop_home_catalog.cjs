@@ -143,7 +143,7 @@ assert.equal(commerceSkus.length, 129);
 assert(presentation.groups.all.includes(first) && presentation.groups.all.includes(second), "The real old presentation contains both fixture SKUs");
 const products = commerceSkus.map(sku => product(sku)).reverse();
 const productsBefore = JSON.stringify(products), presentationBefore = JSON.stringify(presentation);
-const baseline = runtime({catalog:false, originalModel:true}), live = runtime();
+const live = runtime();
 const home = live.cfg.SurvivalShopHomeCatalog;
 assert.deepEqual(array(home.List()), [second, unavailableId, first]);
 assert.deepEqual(visible(live.model, products, "home"), [second, first], "Homepage membership and order come only from the independent list");
@@ -154,10 +154,40 @@ assert.equal(composed[2], products.find(row => row.sku === first));
 unavailable(composed[1], live.model, "P008", "焚天曜轮");
 assert.deepEqual(displayed(live.model.HomeProducts(products)), [second, unavailableId, first]);
 assert.equal(live.model.Groups({products}).find(row => row.id === "home").count, 3, "Home counts include its unavailable display rows");
-for (const group of ["bundles", "promotions", "vip", "all"]) {
-    assert.deepEqual(visible(live.model, products, group), visible(baseline.model, products, group), group + " preserves the original 129-product grouping and order");
-    assert.equal(live.model.Groups({products}).find(row => row.id === group).count,
-        baseline.model.Groups({products}).find(row => row.id === group).count, group + " preserves its count");
+const bundleSkus = presentation.groups.bundles, vipSkus = presentation.groups.vip;
+const singleSkus = presentation.groups.all.filter(sku => !bundleSkus.includes(sku) && !vipSkus.includes(sku));
+const expectedGroups = {bundles:bundleSkus, promotions:presentation.groups.promotions, vip:vipSkus, all:singleSkus};
+for (const [group, expected] of Object.entries(expectedGroups)) {
+    assert.deepEqual(visible(live.model, products, group), expected, group + " follows the reviewed order within its allowed product type");
+    assert.equal(live.model.Groups({products}).find(row => row.id === group).count, expected.length);
+}
+assert.deepEqual(Object.fromEntries(Object.entries(expectedGroups).map(([group, skus]) => [group, skus.length])),
+    {bundles:5, promotions:25, vip:10, all:114});
+
+// Discounted packs used to leak into Promotions and All. Legacy lists must not
+// override the authoritative product type, VIP level or category either.
+const pack = product("ordinary_pack", {product_type:"bundle", category_id:"bundles", original_u_coin_price:2000});
+const vipPack = product("vip_pack", {product_type:"bundle", category_id:"vip", required_vip_level:3, original_u_coin_price:2000});
+const vipSingle = product("vip_single", {required_vip_level:3, original_u_coin_price:2000});
+const changedHome = product(second, {product_type:"bundle", category_id:"bundles", original_u_coin_price:2000});
+const adversarial = [pack, vipPack, vipSingle, changedHome, product(first)];
+const grouped = runtime();
+grouped.model.SetPresentation({groups:Object.fromEntries(["home", "all", "promotions", "bundles", "vip"].map(group =>
+    [group, adversarial.map(row => row.sku)]))});
+for (const [row, onlyGroup] of [[pack,"bundles"], [vipPack,"vip"], [changedHome,"bundles"]]) {
+    for (const group of ["home", "all", "promotions", "bundles", "vip"])
+        assert.equal(grouped.model.InGroup(row, group), group === onlyGroup, row.sku + " is exclusive to " + onlyGroup);
+    assert.equal(grouped.model.GroupFor(row), onlyGroup);
+}
+assert.equal(grouped.model.InGroup(vipSingle, "vip"), false, "A VIP restriction does not turn a single product into a VIP bundle");
+assert.equal(grouped.model.InGroup(vipSingle, "bundles"), false);
+assert.equal(grouped.model.InGroup(vipSingle, "all"), true);
+assert.equal(grouped.model.InGroup(vipSingle, "promotions"), true);
+assert.equal(grouped.model.GroupFor(vipSingle), "promotions");
+assert.deepEqual(displayed(grouped.model.HomeProducts(adversarial)), [unavailableId, first], "A reviewed SKU retyped as a bundle cannot leak through Home composition");
+for (const row of [pack, vipPack]) {
+    for (const blocked of [{...row, owned:1}, {...row, enabled:false, disabled_reason:"product_unavailable"}])
+        assert.equal(grouped.model.InGroup(blocked, grouped.model.GroupFor(row)), false, "Bundle tabs retain ownership and availability filtering");
 }
 const extra = product("server_added_after_home_review", {sort_order:0});
 assert(visible(live.model, [...products, extra], "all").includes(extra.sku), "New formally listed products still enter All");
@@ -244,4 +274,4 @@ assert.equal(formalRuntime.model.Groups({products:allOwned}).find(row => row.id 
 if (productionManifestBefore) assert.deepEqual(fs.readFileSync(productionManifest), productionManifestBefore, "The formal homepage manifest remains untouched");
 else assert(!fs.existsSync(productionManifest), "The test never creates a formal homepage manifest");
 
-console.log("SHOP_HOME_CATALOG_PASS: twenty reviewed entries, fifteen real products, five non-purchasable display rows, references/copies, availability, strict empty fallback, unchanged other groups");
+console.log("SHOP_HOME_CATALOG_PASS: twenty reviewed home entries; 114 singles, 5 ordinary bundles, 25 promotions, 10 VIP bundles; exclusive tabs, references/copies, availability, strict empty fallback");
