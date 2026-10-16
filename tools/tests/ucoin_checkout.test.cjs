@@ -129,7 +129,7 @@ test('U币 SKU is deduplicated and cash eligibility overrides an empty wallet ba
     assert(!h.descendants(h.root).some(p => /充值暂未开放/.test(p.text || '')));
     h.buyCard(card);
     assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), false);
-    assert(h.menu('MenuV10Payment').IsOpen());
+    assert(h.cfg.SurvivalUI.ModalManager.Get('payment_shop').IsOpen());
     assert.equal(h.$('#PaymentPrice').text, '1200 U币 / ¥1.20，1元=1000U币');
     assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 1200 U币');
     assert.equal(h.$('#PaymentBuy').enabled, true);

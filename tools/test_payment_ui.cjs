@@ -9,10 +9,10 @@ $.Schedule=(delay,fn)=>{scheduled.push({delay,fn});return scheduled.length;};
 $.DispatchEvent=(name,url)=>urls.push(url);
 let topLayer=null;
 const config={SurvivalUI:{},RemainingHandoff:{},SurvivalUILayers:{Open:(id)=>topLayer=id,Close:()=>topLayer=null,Top:()=>topLayer}};
-// This fixture exercises payment state; the real V10 geometry is covered by the XML fixture.
-config.SurvivalMenuV10={Adopt(props){
- assert.equal(props.id,"payment_shop");assert.equal(props.navId,"commerce");assert.equal(props.panel,$("#PaymentDialog"));
- const menu={shell:{},canvas:panel(),content:panel(),actions:panel(),Move(){},SetSidebar(){},SetTitle(){},
+// This fixture exercises payment state; the real standalone geometry is covered by the XML fixture.
+config.SurvivalUI.ModalShell={Adopt(props){
+ assert.equal(props.id,"payment_shop");assert.equal(props.panel,$("#PaymentDialog"));
+ const menu={
   Open(){config.SurvivalUILayers.Open(props.id);},Close(){config.SurvivalUILayers.Close(props.id);},Dispose(){this.Close();}};
  return menu;
 }};

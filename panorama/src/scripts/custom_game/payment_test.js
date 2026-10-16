@@ -12,28 +12,61 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     var channel="wechat";
     var entry = $("#PaymentEntry"), dialog = $("#PaymentDialog"), status = $("#PaymentStatus"), buy = $("#PaymentBuy");
     var scrim=$("#PaymentScrim"), inputShield=$("#PaymentInputShield");
-    var shell=null, menuView=null, shellShield=null,root=$.GetContextPanel?$.GetContextPanel():null;
+    var shell=null, menuView=null, shellShield=null,shellProps=null,root=$.GetContextPanel?$.GetContextPanel():null;
     function valid(p){return p&&(!p.IsValid||p.IsValid());}
     function alive(){return !disposed&&(!root||valid(root))&&valid(dialog);}
     function escapedLines(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\r?\n/g,"<br>");}
     function paintActions(){if(!alive())return;["PaymentBack","PaymentBuy","PaymentRefresh","PaymentCancel","PaymentQuantityMinus","PaymentQuantityPlus","PaymentWeChat","PaymentAlipay"].forEach(function(id){var b=$("#"+id);if(!valid(b))return;var primary=id==="PaymentBuy"||b.BHasClass&&b.BHasClass("Selected"),disabled=b.enabled===false;b.style.backgroundImage="none";b.style.backgroundColor=disabled?"#21172f":primary?"gradient(linear,0% 0%,0% 100%,from(#734a9e),to(#382346))":"#281b3e";b.style.border="1px solid "+(disabled?"#594363":"#b18a50");function paint(n){if(n.paneltype==="Label")n.style.color=disabled?"#a795b8":"#ffdc87";if(n.Children)n.Children().forEach(paint);}if(b.Children)b.Children().forEach(paint);});}
     function setText(id,value){var panel=$("#"+id);if(panel)panel.text=value;}
-    function prepareShell(){
+    function firstClass(node,cls){if(!valid(node))return null;if(node.BHasClass&&node.BHasClass(cls))return node;var children=node.Children?node.Children():[];for(var i=0;i<children.length;i++){var hit=firstClass(children[i],cls);if(hit)return hit;}return null;}
+    function paint(node,values){if(valid(node))Object.keys(values).forEach(function(key){if(node.style[key]!==values[key])node.style[key]=values[key];});}
+    function rect(node,x,y,width,height){paint(node,{position:x+"px "+y+"px 0px",width:width+"px",height:height+"px",margin:"0px",padding:"0px",horizontalAlign:"left",verticalAlign:"top",flowChildren:"none"});}
+    function show(node,value){if(valid(node)){node.visible=value;paint(node,{visibility:value?"visible":"collapse"});}}
+    function copyHeight(value,width,font){return String(value||"").replace(/<br\s*\/?\s*>/gi,"\n").split(/\r?\n/).reduce(function(total,line){return total+Math.max(1,Math.ceil(line.length/Math.max(1,Math.floor(width/font))))*24;},0);}
+    function layoutCheckout(){
         if(!alive())return;
-        var U=cfg.SurvivalUI,R=cfg.RemainingHandoff,header=$("#PaymentHeader");
-        // Shared HUD helpers may load after the payment controller during live editing.
-        if(shell || !U || !R || !header || !cfg.SurvivalMenuV10)return;
-        dialog.AddClass("MenuV10Payment");
-        menuView=cfg.SurvivalMenuV10.Adopt({id:"payment_shop",navId:"commerce",root:root,panel:dialog,scrim:scrim,title:"订单确认",onClose:closeShop});
-        shell=menuView.shell;
+        var body=firstClass(dialog,"PaymentBody");if(!body)return;
+        var order=orders[selected],hasOrder=!!order&&order.state!=="closed",receipt=!!order&&(order.state==="delivered"||order.state==="paid_review");
+        var summary=firstClass(body,"PaymentSummary"),copy=firstClass(body,"PaymentRewardCopy"),quantityPanel=firstClass(body,"PaymentQuantity"),methods=firstClass(body,"PaymentMethods"),qr=firstClass(body,"PaymentQRStage"),footer=firstClass(body,"PaymentFooter");
+        var art=$("#PaymentProductArt"),open=$("#PaymentOpen"),hint=$("#PaymentHint"),unit=$("#PaymentUnitPrice");
+        [art,status,open].forEach(function(node){if(valid(node)&&node.GetParent&&node.GetParent()!==body)node.SetParent(body);});
+        show(hint,false);show(unit,false);show($("#PaymentDescription"),receipt);show($("#PaymentValues"),receipt);
+        var description=$("#PaymentDescription"),values=$("#PaymentValues"),details=(description&&description.text||"")+"\n"+(values&&values.text||"");
+        var hasDetails=receipt&&!!details.replace(/\s/g,"");
+        show(summary,hasDetails);show(copy,hasDetails);show(quantityPanel,!hasOrder);show(methods,!hasOrder);show(qr,hasOrder&&!receipt);
+        rect($("#PaymentHeader"),0,0,580,54);rect($("#PaymentHeading"),24,12,470,34);rect($("#PaymentClose"),528,10,32,32);
+        rect(art,0,4,64,64);rect($("#PaymentTitle"),84,0,448,32);rect($("#PaymentPrice"),84,36,448,30);
+        var y=84;
+        if(hasDetails){var detailHeight=Math.min(220,Math.max(72,copyHeight(details,492,16)));rect(summary,0,y,532,detailHeight+20);rect(copy,10,10,512,detailHeight);paint(copy,{flowChildren:"down",overflow:"squish scroll"});y+=detailHeight+36;}
+        if(!hasOrder){rect(quantityPanel,0,y,532,40);paint(quantityPanel,{flowChildren:"right"});y+=54;rect(methods,0,y,532,40);paint(methods,{flowChildren:"right"});y+=60;}
+        if(hasOrder&&!receipt){rect(qr,0,y,532,268);rect($("#PaymentQRChannel"),0,0,532,22);rect(firstClass(qr,"PaymentQRFrame"),144,24,244,244);y+=284;}
+        rect(footer,0,y,532,44);paint(footer,{flowChildren:"right"});y+=44;
+        var pending=hasOrder&&!receipt;
+        ["PaymentBack","PaymentBuy","PaymentRefresh","PaymentCancel"].forEach(function(id){var button=$("#"+id),visible=id==="PaymentBack"||id==="PaymentBuy"&&!pending||(id==="PaymentRefresh"||id==="PaymentCancel")&&pending;show(button,visible);paint(button,{width:(pending?168:id==="PaymentBuy"?370:148)+"px",height:"44px",position:"0px 0px 0px",margin:id==="PaymentBuy"||id==="PaymentCancel"?"0px":"0px 14px 0px 0px",padding:"0px"});});
+        var boilerplate=/^(?:直接购买此道具，)?付款后全部奖励一起到账，自动刷新。$/.test(status.text||"");
+        var hasStatus=!!String(status.text||"").replace(/\s/g,"")&&!boilerplate;
+        show(status,hasStatus);
+        if(hasStatus){var statusHeight=Math.min(132,Math.max(24,copyHeight(status.text,532,16)));y+=14;rect(status,0,y,532,statusHeight);paint(status,{overflow:"squish scroll"});y+=statusHeight;}
+        var canOpen=pending&&order.state==="pending"&&!order.expired&&priceValid(order)&&validURL(order.checkout_url);
+        show(open,canOpen);if(canOpen){y+=10;rect(open,0,y,532,24);y+=24;}
+        rect(body,24,70,532,y);
+        var height=70+y+22;paint(dialog,{width:"580px",height:height+"px"});
+        if(shellProps){shellProps.width=580;shellProps.height=height;var U=cfg.SurvivalUI;if(U&&U.Fit){var scale=U.Fit(dialog,root||$.GetContextPanel(),580,height,shellProps.fit);shellProps.onFit(scale);}}
+    }
+    function setStatus(value){status.text=value;layoutCheckout();}
+    function prepareShell(){
+        if(!alive()||shell)return;
+        var U=cfg.SurvivalUI,header=$("#PaymentHeader");if(!U||!U.ModalShell||!header)return;
+        if(dialog.RemoveClass){dialog.RemoveClass("MenuV10Payment");dialog.RemoveClass("MenuV10Page");dialog.RemoveClass("RCWindow");}
+        dialog.AddClass("CompactCheckout");dialog.AddClass("LeanCheckout");
+        shellProps={id:"payment_shop",root:root,panel:dialog,scrim:scrim,header:header,titlePanel:$("#PaymentHeading"),closeButton:$("#PaymentClose"),
+            width:580,height:334,fit:{widthFraction:.94,heightFraction:.9},onClose:closeShop,
+            onFit:function(scale){var fitted=Math.min(1,Number(scale)||1);dialog.style.transform="scale3d("+fitted+","+fitted+",1)";}};
+        shell=U.ModalShell.Adopt(shellProps);
+        paint(dialog,{backgroundImage:"none",backgroundColor:"gradient(linear,0% 0%,100% 100%,from(#2b203bf7),to(#15101ffa))",border:"1px solid #9b8057",boxShadow:"#00000099 0px 8px 24px 0px"});
+        paint(header,{backgroundColor:"#1a1428dd"});show(header,true);show(inputShield,true);
         shellShield=dialog.Children().filter(function(p){return valid(p) && p.BHasClass && p.BHasClass("UIModalInputShield");}).pop()||null;
-        function firstClass(n,cls){if(n.BHasClass(cls))return n;var children=n.Children();for(var i=0;i<children.length;i++){var hit=firstClass(children[i],cls);if(hit)return hit;}return null;}
-        var body=firstClass(dialog,"PaymentBody"),footer=firstClass(dialog,"PaymentFooter");
-        menuView.Move(body,menuView.content);menuView.Move(footer,menuView.actions);
-        menuView.Move($("#PaymentHint"),menuView.canvas);menuView.Move(status,menuView.content);
-        header.visible=false;inputShield.visible=false;
-        ["PaymentQuantityMinus","PaymentQuantityPlus"].forEach(function(id){var step=$("#"+id);if(step)step.enabled=false;});
-        menuView.SetSidebar([{id:"confirm",label:"订单确认"},{id:"back",label:"返回商城"}],"confirm",function(id){if(id==="back")openShop();});
+        menuView={Open:function(){shell.Open();},Close:function(){shell.Close();},Dispose:function(){shell.Dispose();},SetTitle:function(value){setText("PaymentHeading",value);}};
         if(opened)menuView.Open();else menuView.Close();
     }
     // A live JS reload can precede the updated XML resource in Workshop Tools.
@@ -114,7 +147,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         parent.style.visibility = "visible";
         if (lastMatrix === matrix) return true;
         lastMatrix = matrix; parent.RemoveAndDeleteChildren();
-        var cell = Math.max(4, Math.floor(260 / size));
+        var cell = Math.max(3, Math.floor(216 / size));
         parent.style.width = (size * cell) + "px"; parent.style.height = (size * cell) + "px";
         qr.forEach(function(bits) {
             var row = $.CreatePanel("Panel", parent, ""); row.AddClass("PaymentQRRow"); row.style.height = cell + "px";
@@ -186,6 +219,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
             }
         });
         paintActions();
+        layoutCheckout();
     }
     function request(action, sku) {
         if (!alive() || busy) return false;
@@ -198,7 +232,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         GameEvents.SendCustomGameEventToServer("survival_payment_request", body);
         $.Schedule(32, function() {
             if (alive() && ticket === generation && busy) {
-                busy=false;activeRequest=null;render();status.text="请求超时，请查询结果后重试。";
+                busy=false;activeRequest=null;render();setStatus("请求超时，请查询结果后重试。");
                 if(action==="catalog")catalogFailed("商品同步超时，稍后自动重试。");
             }
         });
@@ -281,10 +315,10 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         var p=current(), order=orders[selected];
         if (!p || !enabled(p.enabled) || !priceValid(p) || busy || (order && order.state!=="closed" && order.state!=="created" && order.state!=="delivered") || (order && order.state==="created" && !priceValid(order))) return;
         if(!channelAvailable(channel))return;
-        if (request("create",selected)) status.text="正在创建 " + priceText(p,false) + (channel==="alipay"?" 支付宝":" 微信")+"订单…";
+        if (request("create",selected)) setStatus("正在创建 " + priceText(p,false) + (channel==="alipay"?" 支付宝":" 微信")+"订单…");
     };
     PaymentChannel=function(value){if(!alive())return;var order=orders[selected];if(busy || (order && !terminal(order.state)))return;if((value==="wechat" || value==="alipay") && channelAvailable(value)){channel=value;render();}};
-    PaymentCancel=function(){var order=orders[selected];if(order && !terminal(order.state) && request("cancel",selected))status.text="正在核对并关闭订单，请稍候…";};
+    PaymentCancel=function(){var order=orders[selected];if(order && !terminal(order.state) && request("cancel",selected))setStatus("正在核对并关闭订单，请稍候…");};
     PaymentOpen=function(){if(!alive())return;var order=orders[selected];if(order && priceValid(order) && order.state==="pending" && !order.expired && validURL(order.checkout_url))$.DispatchEvent("ExternalBrowserGoToURL",order.checkout_url);};
     PaymentRefresh=function(){if(orders[selected])request("status",selected);else refreshCatalog(true);};
     var messages={test_account_required:"商城当前仅对指定测试账号开放。",already_owned:"你已经拥有此商品。",
@@ -307,7 +341,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         if(activeRequest && data.action===activeRequest.action){busy=false;activeRequest=null;generation++;}
         if (!data.ok) {
             render(); if(data.error==="test_account_required")entry.style.visibility="collapse";
-            status.text=messages[data.error]||"暂时无法完成请求，请稍后重试。";
+            setStatus(messages[data.error]||"暂时无法完成请求，请稍后重试。");
             if(data.action==="catalog"){
                 var failure=status.text;
                 // Access/session loss invalidates the snapshot. Transient busy/network errors do not.
@@ -318,7 +352,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
                     if(cfg.SurvivalCommerceView)cfg.SurvivalCommerceView.UpdateCatalog(catalog);
                     render();
                 }
-                status.text=failure;
+                setStatus(failure);
                 catalogFailed(failure,data.error!=="test_account_required" && data.error!=="unauthorized");
             }
             return;
@@ -327,7 +361,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         gameValues=data.game_values||gameValues; wallet=data.wallet||wallet; matchFrozen=!!data.match_frozen;
         gameEntitlements=data.game_entitlements||gameEntitlements;
         if (data.action==="reset") {
-            invalidateCatalog();orders={}; lastMatrix=""; render(); status.text="远端测试数据已清理，正在更新商品列表。";
+            invalidateCatalog();orders={}; lastMatrix=""; render(); setStatus("远端测试数据已清理，正在更新商品列表。");
             $.Schedule(1.1,refreshCatalog); return;
         }
         if (data.action==="catalog") { buildList(data); return; }
