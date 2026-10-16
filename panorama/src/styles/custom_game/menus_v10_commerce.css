@@ -53,6 +53,7 @@
 .MenuV10CommerceDetailBody Label { font-family:"Source Han Sans SC"; font-weight:normal; text-shadow:none; }
 .MenuV10CommerceDetailBody .RCPurpleDetailIcon { width:68px; height:68px; margin:0px 0px 8px; horizontal-align:left; }
 .MenuV10CommerceDetailBody .RCPurpleDetailTitle { width:276px; height:fit-children; margin-bottom:8px; font-size:22px; color:#f6d795; white-space:normal; }
+.MenuV10CommerceDetailBody .RCPurpleDetailQuality { width:100%; height:fit-children; margin-bottom:8px; font-size:16px; color:#b6a9c9; white-space:normal; }
 .MenuV10CommerceDetailBody .RCProductEffect { width:276px; height:fit-children; max-height:240px; margin-bottom:8px; padding-top:10px; border-top:1px solid #80644388; font-size:17px; color:#e4dcec; line-height:24px; white-space:normal; overflow:squish scroll; }
 .MenuV10CommerceDetailBody .CJPrice { position:0px 0px 0px; width:276px; height:36px; margin:4px 0px 6px; padding:0px; flow-children:none; background-image:none; background-color:transparent; border:0px; }
 .MenuV10CommerceDetailBody .CJPriceRow { width:276px; height:32px; flow-children:right; }

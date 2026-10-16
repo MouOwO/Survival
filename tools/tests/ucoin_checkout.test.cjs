@@ -97,7 +97,10 @@ function harness() {
     const menu = cls => cfg.SurvivalMenuV10.Entries().find(m => m.panel.BHasClass(cls));
     const store = () => menu('MenuV10Commerce');
     const cards = () => descendants(store().content, 'RCProduct');
-    const buyCard = card => descendants(card.__purpleDetail, 'CommercePurpleBuy')[0].events.onactivate();
+    const buyCard = card => {
+        const button = descendants(card, 'BLMarketBuy')[0];
+        return (button || card).events.onactivate();
+    };
     function category(id) { store().sidebar.Children().find(p => p.id.endsWith('Section_' + id)).events.onactivate(); }
     return {cfg, context, root, $, requests, timers, urls, emit, paidSnapshot, walletSnapshot, paymentReply, lastRequest, descendants, menu, store, cards, buyCard, category};
 }
@@ -117,15 +120,25 @@ function orderFrom(product, extra = {}) {
         checkout_url:'https://pay.xiaofengnet.com/checkout?order=WX'+'1'.repeat(30)+'&token='+'a'.repeat(64),
         qr_matrix:Array(29).fill('0'.repeat(29)).join('|'),...extra};
 }
+function simpleDetail(h, card, title = '测试道具') {
+    const nodes = h.descendants(card.__purpleDetail), labels = nodes.filter(p => p.paneltype === 'Label');
+    assert.equal(labels.length, 3, 'The tooltip contains only name, quality, and effect');
+    for (const cls of ['RCPurpleDetailTitle','RCPurpleDetailQuality','RCProductEffect'])
+        assert.equal(labels.filter(p => p.BHasClass(cls)).length, 1, cls);
+    assert.equal(labels.find(p => p.BHasClass('RCPurpleDetailTitle')).text, title);
+    assert.equal(labels.find(p => p.BHasClass('RCPurpleDetailQuality')).text, '品级：未配置');
+    assert.equal(labels.find(p => p.BHasClass('RCProductEffect')).text, '初始木材 ×200');
+    assert(!nodes.some(p => p.paneltype === 'Button' || p.BHasClass('CJPrice') || p.BHasClass('CommercePurpleBuy')),
+        'Price and purchase controls belong to the row or payment confirmation');
+    assert(!labels.some(p => /¥|U币|人民币金额|1元=|查看.*购买|已拥有.*查看/.test(p.text || '')));
+}
 
 test('U币 SKU is deduplicated and cash eligibility overrides an empty wallet balance', () => {
     const h = harness(); h.cfg.SurvivalCommerceView.Open();
     h.walletSnapshot([walletItem('u_coin')]); h.paidSnapshot([paidItem()]);
     assert.equal(h.cfg.SurvivalCommerceView.Inspect().productCount, 1);
-    const card = h.cards()[0], labels = h.descendants(card.__purpleDetail).map(p => p.text);
-    assert(labels.includes('1200 U币 / ¥1.20'));
-    assert(labels.includes('1元=1000U币 · 直接购买道具'));
-    assert(labels.includes('查看 / 购买'), 'The payment row overrides wallet insufficient funds and ownership');
+    const card = h.cards()[0];
+    simpleDetail(h, card);
     assert(!h.descendants(h.root).some(p => /充值暂未开放/.test(p.text || '')));
     h.buyCard(card);
     assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), false);
@@ -133,6 +146,8 @@ test('U币 SKU is deduplicated and cash eligibility overrides an empty wallet ba
     assert.equal(h.$('#PaymentPrice').text, '1200 U币 / ¥1.20，1元=1000U币');
     assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 1200 U币');
     assert.equal(h.$('#PaymentBuy').enabled, true);
+    assert.match(h.$('#PaymentStatus').text, /直接购买此道具/,
+        'The authenticated payment row overrides wallet insufficient funds and ownership');
     assert.equal(h.requests.filter(r => r.payload.action === 'create' || r.payload.action === 'purchase').length, 0);
     h.context.PaymentBuy(); h.context.PaymentBuy();
     const create = h.lastRequest('survival_payment_request');
@@ -145,16 +160,22 @@ test('U币 SKU is deduplicated and cash eligibility overrides an empty wallet ba
 test('U币 products need an authenticated enabled payment row and valid U币 metadata', () => {
     const h = harness(); h.cfg.SurvivalCommerceView.Open(); h.walletSnapshot([walletItem('u_coin')]);
     let card = h.cards()[0];
-    assert(h.descendants(card.__purpleDetail).some(p => p.text === '连接支付目录'));
-    assert(h.descendants(card.__purpleDetail).some(p => p.text === '1200 U币 / 人民币金额待同步'));
-    assert(!h.descendants(card.__purpleDetail).some(p => /¥/.test(p.text || '')), 'A wallet row cannot invent the payable RMB amount');
+    simpleDetail(h, card);
     h.buyCard(card); assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true);
+    assert(h.descendants(h.store().canvas).some(p => p.text === '人民币支付目录正在连接，请稍后重试。'));
+    h.cfg.SurvivalPayments.Checkout('u_item');
+    assert.equal(h.$('#PaymentPrice').text, '', 'A wallet row cannot invent a payable quote');
+    assert.equal(h.$('#PaymentBuy').enabled, false);
+    assert.match(h.$('#PaymentStatus').text, /商品支付目录尚未同步/);
     h.paidSnapshot([], {catalog_hash:'ready-empty'}); card = h.cards()[0];
-    assert(h.descendants(card.__purpleDetail).some(p => p.text === '人民币购买尚未开放'));
+    simpleDetail(h, card);
     h.buyCard(card); assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true);
+    assert(h.descendants(h.store().canvas).some(p => p.text === '此商品的人民币购买尚未开放，请稍后重试。'));
+    assert.equal(h.$('#PaymentBuy').enabled, false);
     h.paidSnapshot([paidItem({enabled:0,owned:1,disabled_reason:'already_owned'})]);
-    card = h.cards()[0]; assert(h.descendants(card.__purpleDetail).some(p => p.text === '已拥有 · 查看'));
-    h.buyCard(card); assert.equal(h.$('#PaymentBuy').enabled, false); h.context.PaymentBuy();
+    card = h.cards()[0]; simpleDetail(h, card);
+    h.buyCard(card); assert.equal(h.$('#PaymentBuy').enabled, false);
+    assert.equal(h.$('#PaymentStatus').text, '你已经拥有此商品。'); h.context.PaymentBuy();
     assert.equal(h.requests.filter(r => r.payload.action === 'create').length, 0);
     h.paidSnapshot([paidItem({enabled:'0',owned:0})]); assert.equal(h.$('#PaymentBuy').enabled, false);
     h.paidSnapshot([paidItem({u_coin_per_yuan:undefined})]); assert.equal(h.$('#PaymentBuy').enabled, false);
@@ -235,7 +256,7 @@ test('A consistent U币 price refresh rebuilds product details and unknown check
     const first = h.cards()[0];
     h.paidSnapshot([paidItem({u_coin_price:2400,amount_fen:240})]);
     assert.notEqual(h.cards()[0], first);
-    assert(h.descendants(h.cards()[0].__purpleDetail).some(p => p.text === '2400 U币 / ¥2.40'));
+    simpleDetail(h, h.cards()[0]);
     h.cfg.SurvivalPayments.Checkout('u_item');
     assert.equal(h.$('#PaymentPrice').text, '2400 U币 / ¥2.40，1元=1000U币');
     assert.equal(h.$('#PaymentBuy').enabled, true);
@@ -256,9 +277,9 @@ test('Inconsistent U币 metadata cannot quote a payable amount or create an orde
         if (mergedWallet) h.walletSnapshot([walletItem('u_coin')]);
         h.paidSnapshot([paidItem(metadata)]);
         const card = h.cards()[0];
-        assert(h.descendants(card.__purpleDetail).some(p => p.text === '人民币购买尚未开放'));
-        assert(!h.descendants(card.__purpleDetail).some(p => /¥/.test(p.text || '')), JSON.stringify(metadata));
+        simpleDetail(h, card);
         h.buyCard(card); assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true);
+        assert(h.descendants(h.store().canvas).some(p => p.text === '此商品的人民币购买尚未开放，请稍后重试。'));
         h.paidSnapshot([paidItem(metadata)]); // Finish the refresh requested by the disabled shop action.
         h.cfg.SurvivalPayments.Checkout('u_item');
         assert.equal(h.cfg.SurvivalPayments.Inspect().pending, '');
@@ -272,10 +293,13 @@ test('Inconsistent U币 metadata cannot quote a payable amount or create an orde
 test('Wallet metadata cannot complete an incomplete authoritative payment row', () => {
     const h = harness(); h.cfg.SurvivalCommerceView.Open();
     h.walletSnapshot([{...walletItem('u_coin'),amount_fen:120,u_coin_price:1200,u_coin_per_yuan:1000}]);
-    assert(h.descendants(h.cards()[0].__purpleDetail).some(p => p.text === '1200 U币 / 人民币金额待同步'));
+    simpleDetail(h, h.cards()[0]);
+    h.cfg.SurvivalPayments.Checkout('u_item');
+    assert.equal(h.$('#PaymentPrice').text, '');
+    assert.equal(h.$('#PaymentBuy').enabled, false);
     const incomplete = paidItem({currency:undefined,u_coin_price:undefined,u_coin_per_yuan:undefined});
     h.paidSnapshot([incomplete]);
-    assert(!h.descendants(h.cards()[0].__purpleDetail).some(p => /¥/.test(p.text || '')));
+    simpleDetail(h, h.cards()[0]);
     h.cfg.SurvivalPayments.Checkout('u_item');
     assert.equal(h.$('#PaymentPrice').text, 'U币价格及人民币金额待同步');
     assert.equal(h.$('#PaymentBuy').enabled, false); h.context.PaymentBuy();

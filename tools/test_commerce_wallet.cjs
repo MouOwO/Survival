@@ -25,6 +25,8 @@ function catalog(){cfg.SurvivalCommerceWallet.Refresh();respond({ok:1,part:'begi
  respond({ok:1,part:'product',index:1,product});respond({ok:1,part:'end'});}
 catalog();assert.equal(snapshot.products.length,1);assert.equal(snapshot.products[0].price,6800);
 assert(cfg.SurvivalCommerceWallet.Checkout(product.sku));
+assert(panels.some(p=>p.classes.has('CommerceConfirmCopy')&&p.text.includes('售价：6800 积分')),
+ 'the actual exchange confirmation retains the server-owned price');
 function buy(){return panels.filter(p=>p.classes.has('CommerceConfirmBuy') && !p.deleted).at(-1);}
 buy().events.onactivate();buy().events.onactivate();assert.equal(requests.filter(r=>r.action==='purchase').length,1);
 const first=requests.at(-1);assert(!('price' in first));assert(!('balance' in first));assert(!('provider' in first));
@@ -40,9 +42,15 @@ cfg.SurvivalPayments={GetCatalog:()=>({products:[{sku:'cash_sku',title:'现金�
 cfg.SurvivalCommerceWallet.Checkout=sku=>{walletCheckout=sku;return true;};
 vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/common/commerce_components.js','utf8'),env);
 vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js','utf8'),env);
-const prices=panels.filter(p=>p.classes.has('CJPriceValue'));assert(prices.some(p=>p.text==='6800 积分'));assert(prices.some(p=>p.text==='50.00 元'));
-const actions=panels.filter(p=>p.classes.has('RCProductBuy') && !p.deleted);
-actions.at(-2).events.onactivate();assert.equal(walletCheckout,product.sku);
+const descendants=p=>[p,...p.Children().flatMap(descendants)];
+const cards=()=>panels.filter(p=>p.classes.has('RCProduct')&&!p.deleted);
+const purchase=card=>(descendants(card).find(p=>p.classes.has('BLMarketBuy'))||card).events.onactivate();
+for(const card of cards()){
+ const body=descendants(card.__purpleDetail).find(p=>p.classes.has('MenuV10CommerceDetailBody'));
+ assert.deepEqual(body.Children().map(p=>[...p.classes][0]),['RCPurpleDetailTitle','RCPurpleDetailQuality','RCProductEffect']);
+ assert(body.Children().every(p=>p.type==='Label'),'fallback tooltip contains only three information labels');
+}
+purchase(cards().at(-2));assert.equal(walletCheckout,product.sku);
 cfg.SurvivalCommerceView.Open();
-panels.filter(p=>p.classes.has('RCProductBuy') && !p.deleted).at(-1).events.onactivate();assert.equal(cashCheckout,'cash_sku');
+purchase(cards().at(-1));assert.equal(cashCheckout,'cash_sku');
 console.log('COMMERCE_WALLET_UI_PASS: currency routing, chunk assembly, repeated clicks, uncertain retry and hot reload');

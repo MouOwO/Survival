@@ -59,32 +59,47 @@
         var uText=validU?uCoin+" U币 / ¥"+(fen/100).toFixed(2):(previewCoin!==null?previewCoin+" U币":"U币价格待同步")+" / 人民币金额待同步";
         label(row,isU?uText:amount+" "+currency,"CJPriceValue");p.hittest=false;p.hittestchildren=false;return p;
     };
+    function detailQuality(item, rewards) {
+        var art=cfg.SurvivalItemArt;
+        function quality(row){var value=String(row&&row.quality||"").toUpperCase();return /^(N|R|SR|SSR|UR)$/.test(value)?value:"";}
+        function lookup(value){return art&&art.Lookup?art.Lookup(value):null;}
+        var value=quality(item)||quality(lookup(item));
+        if(value)return value;
+        if(item.product_type==="bundle")return "";
+        var items=(rewards||[]).filter(function(row){return row.kind==="item";});
+        if(items.length===1){value=quality(lookup({item_id:items[0].id}));if(value)return value;}
+        var match=/^custom_game\/archive_items_v2\/(lottery_[a-z0-9_]+)\.png$/.exec(String(item.icon||""));
+        var row=match&&lookup({item_id:match[1]});
+        var name=String(item.title||"").replace(/\s*[·•]\s*永久\s*$/,"");
+        return row&&row.display_name===name?quality(row):"";
+    }
     function detail(card,item,props,bundle){
         var layer=valid(props.detailLayer)?props.detailLayer:card;
         var tip=panel("Panel",layer,"RCPurpleDetail MenuV10CommerceDetail");tip.hittest=false;tip.hittestchildren=false;
         var skin=cfg.SurvivalMenuV10.SkinTooltip(tip),body=panel("Panel",skin.surface,"MenuV10CommerceDetailBody");
         tip.__purpleSource=card;
         tip.style.position="202px 0px 0px";tip.style.width="312px";
-        original(body,J.ProductIcon(item),"RCPurpleDetailIcon");
         label(body,item.title,"RCPurpleDetailTitle");
-        var effect=label(body,bundle?(item.description||""):props.effect,"RCProductEffect");effect.visible=!!effect.text;effect.hittest=true;
-        if(bundle){
-            var contents=panel("Panel",body,"RCBundleContents");
-            (props.rewards||[]).forEach(function(r){
-                var row=panel("Panel",contents,"RCBundleItem");
-                original(row,r.icon||J.ProductIcon(item),"RCBundleArt");label(row,r.label,"RCBundleName");label(row,"×"+r.quantity,"RCBundleQuantity");
+        label(body,"品级："+(detailQuality(item,props.rewards)||"未配置"),"RCPurpleDetailQuality");
+        var summary=props.effect||item.description||"";
+        if(bundle&&(props.rewards||[]).length)summary=props.rewards.map(function(reward){
+            return reward.description?(reward.label?reward.label+"：":"")+reward.description
+                :String(reward.label||reward.id||"")+" ×"+String(reward.quantity===undefined?1:reward.quantity);
+        }).join("\n");
+        var effect=label(body,summary,"RCProductEffect");effect.visible=!!effect.text;
+        var positionJob=null,serial=0,disposed=false,dismiss=null;
+        function cancel(){serial++;if(positionJob!==null&&$.CancelScheduled)$.CancelScheduled(positionJob);positionJob=null;}
+        function hide(){cancel();if(dismiss)dismiss.Hidden();if(valid(tip)){tip.RemoveClass("Visible");tip.hittest=false;tip.hittestchildren=false;}if(valid(card)){card.RemoveClass("ShopSelected");card.style.zIndex="0";}if(activeDetail&&activeDetail.tip===tip)activeDetail=null;}
+        function dispose(){if(disposed)return;hide();disposed=true;if(dismiss)dismiss.Dispose();if(valid(tip))tip.DeleteAsync(0);}
+        function tooltipRect(node){var at=node.GetPositionWithinWindow(),scale=props.menu?props.menu.Scale():1;return {x:at.x,y:at.y,width:node.actuallayoutwidth*scale,height:node.actuallayoutheight*scale};}
+        function guard(){
+            if(!dismiss&&cfg.SurvivalTooltipDismiss)dismiss=cfg.SurvivalTooltipDismiss.Create({
+                panel:tip,surface:skin.surface,getRect:tooltipRect,hide:hide,
+                isAlive:function(){return !disposed&&valid(card)&&valid(tip)&&valid(layer);},
+                isVisible:function(){return tip.BHasClass("Visible");}
             });
+            return dismiss;
         }
-        var price=J.Price(body,item,0,0,276);price.style.position="0px 0px 0px";
-        price.style.ignoreParentFlow="false";
-        if(item.currency==="u_coin" || item.u_coin_price!==undefined || item.u_coin_per_yuan!==undefined)label(body,"1元=1000U币 · 直接购买道具","CommercePurpleState");
-        if(item.enabled!==true && item.enabled!==1)label(body,item.owned>0?"已拥有":item.disabled_reason==="payment_catalog_pending"?"人民币支付目录连接中":item.disabled_reason==="payment_product_unavailable" || item.disabled_reason==="payment_price_unavailable"?"人民币购买尚未开放":"暂不可购","CommercePurpleState");
-        var buy=J.Action(body,props.purchaseLabel,function(){if(!disposed&&valid(card)&&valid(tip)&&valid(layer)&&props.action)props.action();},bundle?"RCBundleBuy":"RCProductBuy");
-        buy.style.width="276px";buy.style.height="42px";
-        var pinned=false,hovered=false,job=null,serial=0,disposed=false;
-        function cancel(){serial++;if(job!==null&&$.CancelScheduled)$.CancelScheduled(job);job=null;}
-        function hide(){cancel();pinned=false;hovered=false;if(valid(tip)){tip.RemoveClass("Visible");tip.hittest=false;tip.hittestchildren=false;}if(valid(card)){card.RemoveClass("ShopSelected");card.style.zIndex="0";}if(activeDetail&&activeDetail.tip===tip)activeDetail=null;}
-        function dispose(){if(disposed)return;disposed=true;hide();if(valid(tip))tip.DeleteAsync(0);}
         function place(){
             if(disposed)return;
             if(!valid(card)||!valid(tip)||!valid(layer)){dispose();return;}
@@ -95,7 +110,7 @@
             var origin=layer.GetPositionWithinWindow(),menu=props.menu;
             var scale=Math.max(.001,(Number(layer.actualuiscale_x)||1)*(menu?menu.Scale():1));
             var nativeScale=Math.max(.001,Number(layer.actualuiscale_y)||1);
-            var logicalHeight=Math.min(704,Math.max(246,(Number(body.actuallayoutheight)||250*nativeScale)/nativeScale+88));
+            var logicalHeight=Math.min(704,Math.max(96,(Number(body.actuallayoutheight)||80*nativeScale)/nativeScale+88));
             skin.Resize(368,logicalHeight);tip.style.width="368px";tip.style.height=logicalHeight+"px";
             var sw=144*scale,tw=368*scale,th=logicalHeight*scale;
             // Native paints the owned layer inside its window despite overflow:noclip.
@@ -114,12 +129,22 @@
             if(!isFinite(x)||!isFinite(y)||!isFinite(origin.x)||!isFinite(origin.y))return;
             tip.style.position=Math.round((x-origin.x)/scale)+"px "+Math.round((y-origin.y)/scale)+"px 0px";
         }
-        function show(pin){if(disposed)return;if(!valid(card)||!valid(tip)||!valid(layer)){dispose();return;}if(activeDetail&&activeDetail.tip!==tip)activeDetail.hide();activeDetail={tip:tip,hide:hide};cancel();pinned=!!pin;tip.AddClass("Visible");card.AddClass("ShopSelected");card.style.zIndex="30";tip.hittest=true;tip.hittestchildren=true;place();[0,.05,.2,.4].forEach(function(delay){$.Schedule(delay,function(){if(!disposed&&valid(tip)&&activeDetail&&activeDetail.tip===tip&&tip.BHasClass("Visible"))place();});});}
-        function leave(){cancel();var generation=serial;job=$.Schedule(.18,function(){job=null;if(serial===generation&&!hovered&&!pinned)hide();});}
-        card.SetPanelEvent("onmouseover",function(){show(false);});card.SetPanelEvent("onmouseout",leave);
-        card.SetPanelEvent("onactivate",function(){show(true);return true;});
-        tip.SetPanelEvent("onmouseover",function(){hovered=true;cancel();});
-        tip.SetPanelEvent("onmouseout",function(){hovered=false;leave();});
+        function show(){
+            if(disposed)return;
+            if(!valid(card)||!valid(tip)||!valid(layer)){dispose();return;}
+            var policy=guard();if(policy&&!policy.CanShow(card))return;
+            if(activeDetail&&activeDetail.tip!==tip)activeDetail.hide();
+            cancel();activeDetail={tip:tip,hide:hide};
+            tip.AddClass("Visible");card.AddClass("ShopSelected");card.style.zIndex="30";
+            tip.hittest=false;tip.hittestchildren=false;skin.surface.hittest=false;skin.surface.hittestchildren=false;
+            place();if(policy)policy.Shown(card);
+            var epoch=serial;
+            positionJob=$.Schedule(0,function(){positionJob=null;if(epoch===serial&&!disposed&&valid(tip)&&activeDetail&&activeDetail.tip===tip&&tip.BHasClass("Visible"))place();});
+        }
+        function leave(){if(dismiss)dismiss.Dismiss();else hide();}
+        card.SetPanelEvent("onmouseover",show);card.SetPanelEvent("onmouseout",leave);
+        card.SetPanelEvent("onactivate",function(){show();if(!props.market&&props.action)props.action();return true;});
+        tip.SetPanelEvent("onmouseover",leave);
         card.__purpleDetail=tip;card.__purpleHide=hide;card.__purpleShow=show;
         card.__purpleDispose=dispose;tip.__purpleDispose=dispose;
         card.__purpleRebuildDetail=function(){if(disposed&&valid(card)&&valid(layer))return detail(card,item,props,bundle);return valid(tip)?tip:null;};
@@ -135,6 +160,7 @@
         card.__menuCell={iconPanel:well,namePanel:caption,countPanel:owned};
         detail(card,item,props,bundle);return card;
     }
+    J.BindDetail=detail;
     J.Product=function(parent,item,props){return compactCard(parent,item,props,false);};
     J.Bundle=function(parent,item,props){return compactCard(parent,item,props,true);};
     cfg.SurvivalCommerceComponents=J;
