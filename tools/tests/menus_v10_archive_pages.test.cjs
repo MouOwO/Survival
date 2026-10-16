@@ -1,17 +1,7 @@
 const assert=require('node:assert/strict');
 const {createHarness}=require('./fixtures/menus_v10_harness.cjs');
 function checkFrame(view){assert.equal(view.panel.style.width,'1672px');assert.equal(view.panel.style.height,'941px');assert.equal(view.content.style.position,'407px 213px 0px');assert.equal(view.sidebar.style.width,'258px');}
-function treasure(){
- const h=createHarness();h.load('treasure_history.js');const {cfg,nodes}=h,view=h.view('TreasureWindow');checkFrame(view);
- cfg.SurvivalTreasure.Open();assert.equal(nodes.TreasureCards.GetChildCount(),0);assert(nodes.TreasureEmpty.visible);assert(cfg.SurvivalTreasure.IsOpen());assert(!nodes.TreasureWindow.BHasClass('ArchiveHidden'));assert(!nodes.TreasureScrim.BHasClass('ArchiveHidden'));cfg.SurvivalTreasure.Open();
- const history={history:Array.from({length:27},(_,i)=>({name:'宝物'+i,description:'真实效果'+i,icon_name:i===0?'survival/native/frozen_wall':'lich_frost_shield',...(i===0?{quantity:3}:{})}))};
- h.net('survival_rogue_reward','1',history);assert.equal(nodes.TreasureCards.GetChildCount(),0,'another player cannot replace the local treasure history');h.setHistory(history);h.net('survival_rogue_reward','0',history);
- assert.equal(nodes.TreasureCards.GetChildCount(),20);assert.equal(nodes.TreasureCount.text,'20 / 20');assert(!nodes.TreasureEmpty.visible);const first=nodes.TreasureCards.children[0],second=nodes.TreasureCards.children[1];
- assert.equal(first.__menuV10Cell.count.text,'3');assert(!second.__menuV10Cell.countHost.visible,'a history record does not invent an inventory count');assert.equal(first.__menuV10Cell.stage.children[0].image,'file://{images}/spellicons/survival/native/frozen_wall.png');
- first.events.onmouseover();h.flushFinite();assert.equal(nodes.TreasureTooltipEffect.text,'真实效果0');assert.equal(view.detailLayer.children.find(p=>p.BHasClass('MenuV10Tooltip')).visible,true);const tooltip=view.detailLayer.children.find(p=>p.BHasClass('MenuV10Tooltip'));tooltip.Children().find(p=>p.BHasClass('MenuV10TooltipSurface')).events.onmouseover();assert.equal(tooltip.visible,false,'The shared menu surface dismisses on entry');first.events.onmouseover();h.flushFinite();assert.equal(tooltip.visible,false,'Source reentry and queued measurements cannot reopen a dismissed menu tooltip');cfg.SurvivalTreasure.Close();assert(!cfg.SurvivalTreasure.IsOpen());assert.equal(view.detailLayer.children.find(p=>p.BHasClass('MenuV10Tooltip')).visible,false);
- const old=cfg.SurvivalTreasure;h.load('treasure_history.js');assert.equal(h.cfg.SurvivalMenuV10.Entries().filter(x=>x.panel.id==='TreasureWindow').length,1);old.Open();assert(!old.IsOpen());cfg.SurvivalTreasure.Open();assert.equal(nodes.TreasureCards.GetChildCount(),20);assert.equal(nodes.TreasureContent.children.filter(x=>x.id==='TreasureEmpty').length,0,'existing empty label is moved, not duplicated on hot reload');h.assertCleanDispose(cfg.SurvivalTreasure);
- console.log('TREASURE_V10_PASS: real shared shell/cells/tooltip, local history, 20 cap, no fabricated quantity, reopen/reload and deleted subtree');
-}
+function treasure(){ return require('./treasure_compact.test.cjs').treasure(); }
 function vip(){
  const h=createHarness();h.load('vip_catalog.js');h.load('vip_window.js');const {cfg,nodes}=h,view=h.view('VIPWindow');checkFrame(view);assert.equal(cfg.VIPRewardCatalog.rewards.length,33);assert.equal(nodes.VIPGrid.GetChildCount(),0);assert.equal(cfg.SurvivalVIP.Open(),false);
  const closed={...h.counts};for(let i=0;i<1000;i++){h.setProfile({vip_badge:i===999?1:0,revision:i});h.net('survival_player_public_profiles','0');}assert.deepEqual(h.counts,closed,'1000 hidden public profile updates do not rewrite or traverse UI');
