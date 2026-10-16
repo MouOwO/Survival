@@ -1,6 +1,6 @@
 """Build and test a title-only immutable archive candidate, without activation.
 
-The parent is the reviewed eb49 shop release. Its other rules, compatibility
+The parent is the reviewed fbf16 collection-rarity release. Its other rules, compatibility
 aliases, purchases and prices remain byte-for-byte equivalent in bundle data.
 Existing local challenge-context changes are deliberately excluded from the
 candidate settlement. No network, database or running-pointer writes occur.
@@ -22,8 +22,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "server"))
 from archive_backend.bundle import Bundle, read_csv
 
-BASE = "eb49cbe03cd338757949a3d7449457005d9e79ddd0f51b9ec1d8becc9e66a261"
-DEFAULT_OUTPUT = ROOT / "output/endless_titles_80_20261016/release"
+BASE = "fbf16c3e996fa377f0d3cacd726c919f93958ecaf8be94a52b89ee08719f52e9"
+CANDIDATE = "60d6ce00a7d3257b6982492fdfdf68aa8deacdb4d46f837248ecfbef5ebdec94"
+DEFAULT_OUTPUT = ROOT / "output/endless_titles_80_20261016/release_fbf16"
 ORIGINAL = ROOT / "output/endless_titles_80_20261016/original"
 CSV = "data/csv/存档系统/archive_titles.csv"
 TITLE_SOURCE = "systems/archive_titles.lua"
@@ -222,16 +223,17 @@ def main():
     pointers = {name: (ROOT / name).read_bytes() for name in POINTERS if (ROOT / name).is_file()}
     absent = [name for name in POINTERS if name not in pointers]
     if POINTERS[0] in pointers:
-        assert json.loads(pointers[POINTERS[0]])["hash"] == BASE, "running_parent_pointer_changed"
+        assert json.loads(pointers[POINTERS[0]])["hash"] in {BASE, CANDIDATE}, "running_pointer_changed"
     if POINTERS[1] in pointers:
-        assert BASE.encode() in pointers[POINTERS[1]], "running_game_parent_pointer_changed"
+        assert any(digest.encode() in pointers[POINTERS[1]] for digest in (BASE, CANDIDATE)), "running_game_pointer_changed"
     try:
         report = build(output, args.lua, args.parent_bundle.resolve())
     finally:
         assert all((ROOT / name).read_bytes() == value for name, value in pointers.items()), "running_pointer_modified"
         assert all(not (ROOT / name).exists() for name in absent), "absent_running_pointer_created"
     report["runtime_pointer_evidence"] = {"present": sorted(pointers), "absent": absent,
-                                          "active_parent_confirmed": not absent}
+                                          "active_parent_confirmed": not absent and all(BASE.encode() in value for value in pointers.values()),
+                                          "active_candidate_confirmed": not absent and all(CANDIDATE.encode() in value for value in pointers.values())}
     print(json.dumps(report, ensure_ascii=False))
 
 

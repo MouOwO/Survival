@@ -1,0 +1,3 @@
+# Publication tools are pinned by their exact bytes in cloud phase reports.
+*.py text eol=lf
+*.md text eol=lf

@@ -1,2 +1,2 @@
--- Deployed archive sync bundle verified through the live service, 2026-10-09.
-return { protocol = 1, hash = "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4" }
+-- Verified endless title tiers every 80 waves; reopen the map.
+return { protocol = 1, hash = "60d6ce00a7d3257b6982492fdfdf68aa8deacdb4d46f837248ecfbef5ebdec94" }
