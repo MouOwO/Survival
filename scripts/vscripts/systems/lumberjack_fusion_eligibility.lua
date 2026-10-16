@@ -58,6 +58,9 @@ function M.runtime(name, state, resources, snapshot)
     local result = {available = 0, prerequisite_met = 0, can_afford = 1,
         resource_check_on_cast = 1, lumberjack_fusion = 1,
         cost_wood = row.wood_cost, cost_gold = row.gold_cost,
+        fusion_level = row.level, fusion_required_count = row.required_count,
+        fusion_required_city_level = row.required_city_level,
+        fusion_count = 0, fusion_city_level = 0, fusion_city_ready = 0,
         status_text = "当前伐木工不能合体"}
     if not caster or caster:IsNull() or not caster:IsAlive()
         or caster.survival_worker_type ~= "lumberjack"
@@ -70,11 +73,15 @@ function M.runtime(name, state, resources, snapshot)
     end
     snapshot = snapshot or M.snapshot(caster.survival_player_id, caster:GetTeamNumber())
     local count = snapshot.counts[tonumber(row.level)] or 0
+    -- The selected-worker queue needs the same recipe and city gate as casts.
+    result.fusion_count = count
+    result.fusion_city_level = tonumber(snapshot.city_level) or 0
+    result.fusion_city_ready = result.fusion_city_level >= (tonumber(row.required_city_level) or 0) and 1 or 0
     result.fields = {
         {label = "合体前置", value = "主城LV" .. tostring(row.required_city_level)},
         {label = "自己的普通同级伐木工", value = tostring(count) .. "/" .. tostring(row.required_count)},
     }
-    local error_code = M.prerequisite_error(row, snapshot.city_level, count)
+    local error_code = M.prerequisite_error(row, result.fusion_city_level, count)
     if error_code == "fusion_city_level_not_enough" then
         result.status_text = "主城达到LV" .. tostring(row.required_city_level) .. "后才能合体"
     elseif error_code == "fusion_material_not_enough" then
