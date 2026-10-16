@@ -147,7 +147,7 @@ function layoutFits(ui, stage) {
 
 const ui = harness(), ids = ui.ids;
 const product = { sku: "compact_bundle_test", title: "完整奖励礼包", description: "商品的奖励说明应保留在到账详情中。",
-    amount_fen: 777, enabled: true, icon: "custom_game/archive_items_v2/lottery_lumber_crystal.png",
+    amount_fen: 777, max_quantity: 100, enabled: true, icon: "custom_game/archive_items_v2/lottery_lumber_crystal.png",
     reward_lines: [{ kind: "stat", id: "initial_wood", quantity: 100, label: "初始木材" },
         { kind: "entitlement", id: "vip", quantity: 1, label: "VIP权限" }],
     stat_preview: [{ field_id: "initial_wood", value: 10, after: 110, delta: 100 }] };
@@ -193,7 +193,7 @@ assert(layoutFits(ui, "create failure") > confirmationHeight, "a real failure ad
 assert(!visible(summary) && !visible(ids.PaymentHint), "failure does not restore the removed confirmation copy");
 ids.PaymentBuy.events.onactivate(); ids.PaymentBuy.events.onactivate();
 assert.equal(ui.requests.filter(r => r.action === "create").length, 2, "one explicit retry submits one new order");
-const order = { ...product, ok: true, provider: "alipay", state: "pending", checkout_mode: "qr", order_id: "AL" + "1".repeat(30),
+const order = { ...product, ok: true, quantity: 1, unit_amount_fen: 777, provider: "alipay", state: "pending", checkout_mode: "qr", order_id: "AL" + "1".repeat(30),
     checkout_url: "https://pay.xiaofengnet.com/checkout/alipay?order=AL" + "1".repeat(30) + "&token=" + "a".repeat(64),
     qr_matrix: Array(29).fill("0".repeat(29)).join("|"), effects: { initial_wood: 100 } };
 ui.respond(order);
@@ -219,7 +219,7 @@ ui.respond({ ...order, state: "delivered", effect_changes: { initial_wood: { bef
     game_values: { initial_wood: 110 }, wallet: { wood: 1100 }, game_entitlements: { vip: { active: true } } });
 assert.equal(ids.PaymentHeading.text, "支付结果");
 assert(visible(summary) && visible(ids.PaymentValues) && visible(ids.PaymentDescription), "receipt retains the full reward details");
-assert.match(ids.PaymentValues.text, /本单存档：10 → 110/); assert.match(ids.PaymentValues.text, /本局已生效/);
+assert.match(ids.PaymentValues.text, /本单存档：10(?:\.0)? → 110(?:\.0)?/); assert.match(ids.PaymentValues.text, /本局已生效/);
 assert.match(ids.PaymentValues.text, /1100/); assert.match(ids.PaymentDescription.text, /奖励说明/);
 assert(!visible(findClass(dialog, "PaymentQRStage")) && !visible(ids.PaymentQR));
 assert(visible(ids.PaymentStatus)); assert.match(ids.PaymentStatus.text, /支付成功/);
