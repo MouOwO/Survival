@@ -1,2 +1,2 @@
-// VIP now uses the approved V10 components; entitlement, price, action and lifecycle coverage runs with the actual shared renderer.
+// VIP is a passive HUD status; exercise the real top entry and status controller.
 require('./menus_v10_archive_pages.test.cjs').vip();

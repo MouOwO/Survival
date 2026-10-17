@@ -1,2 +1,2 @@
-// The V10 integration regression includes 1000 hidden public/account snapshots and verifies no closed UI tree work.
+// Repeated membership snapshots reuse the badge without panel/style/timer writes.
 require('./menus_v10_archive_pages.test.cjs').vip();

@@ -229,10 +229,11 @@
     function notice(value) {var serial=++noticeSerial;text("HandoffNotice",value);nodes.HandoffNotice.visible=true;$.Schedule(4,function(){if(valid(host)&&serial===noticeSerial)nodes.HandoffNotice.visible=false;});}
     function blocked() {return cfg.SurvivalUILayers && cfg.SurvivalUILayers.Top();}
     function forward(id) {var p=native(id);if(!valid(p))return false;$.DispatchEvent("Activated",p,"mouse");return true;}
-    var actions={vip:["SurvivalVIP","Toggle"],survival_shop:["SurvivalShop","ToggleShop"],shop:["SurvivalPayments","Open"],treasure:["SurvivalTreasure","Toggle"],archive:["SurvivalArchive","Toggle"],equipment:["SurvivalEquipment","Toggle"],
+    var actions={survival_shop:["SurvivalShop","ToggleShop"],shop:["SurvivalPayments","Open"],treasure:["SurvivalTreasure","Toggle"],archive:["SurvivalArchive","Toggle"],equipment:["SurvivalEquipment","Toggle"],
         lottery:["SurvivalLottery","Open"],benefit:["SurvivalDaily","Open"],appearance:["SurvivalAppearance","Toggle"]};
-    function available(id) {if(id==="vip")return !!(cfg.SurvivalVIP&&cfg.SurvivalVIP.IsAvailable());if(id==="survival_shop"&&!(cfg.SurvivalShopUnlocks&&cfg.SurvivalShopUnlocks.shop))return false;if(id==="return")return valid(native("DashboardButton"));if(id==="settings")return valid(native("SettingsRebornButton"))||valid(native("SettingsButton"));if(id==="social")return true;var a=actions[id];return !!(a&&cfg[a[0]]&&typeof cfg[a[0]][a[1]]==="function");}
+    function available(id) {if(id==="vip")return false;if(id==="survival_shop"&&!(cfg.SurvivalShopUnlocks&&cfg.SurvivalShopUnlocks.shop))return false;if(id==="return")return valid(native("DashboardButton"));if(id==="settings")return valid(native("SettingsRebornButton"))||valid(native("SettingsButton"));if(id==="social")return true;var a=actions[id];return !!(a&&cfg[a[0]]&&typeof cfg[a[0]][a[1]]==="function");}
     function activate(id) {
+        if(id==="vip")return;
         if(blocked())return;
         // Native dota_hud_menu_buttons uses this engine event. Its hidden MenuButtons
         // ancestor prevents synthetic Activated from reaching the original button.
@@ -271,13 +272,12 @@
         b.__glow=halo;b.__underline=underline;
         b.SetPanelEvent("onactivate",function(){activate(a[0]);});
         if(a[0]==="vip"){
-            b.enabled=false;b.hittest=false;
-            icon.SetImage("file://{images}/custom_game/topnav_reference_v2/vip_locked.svg");
+            b.enabled=false;b.hittest=false;b.hittestchildren=false;
         }
         topButtons[a[0]]=b;
     });
     // One open window at a time, so the highlight is a single owner, not a list.
-    var navWindowIds={vip:"vip",treasure:"treasure",archive:"archive",lottery:"lottery",benefit:"benefit",
+    var navWindowIds={treasure:"treasure",archive:"archive",lottery:"lottery",benefit:"benefit",
         shop:"shop",survival_shop:"survival_shop"};
     var activeNavId;
     function markActiveNav(id) {
@@ -1314,13 +1314,8 @@
             if(changed){button.enabled=enabled;button.__handoffEnabled=enabled;}
             if(id==="survival_shop"&&(changed||repaint))style(button,{saturation:enabled?"1":"0",opacity:enabled?"1":"0.4"});
         });
-        var vipReady=availability.vip;
-        topButtons.vip.hittest=vipReady;
-        if(repaint||topButtons.vip.__vipReady!==vipReady)style(topButtons.vip,{opacity:vipReady?"1":"0.85"});
-        if(topButtons.vip.__vipReady!==vipReady){
-            nodes.HandoffNavIcon_vip.SetImage("file://{images}/custom_game/topnav_reference_v2/"+(vipReady?"vip":"vip_locked")+".svg");
-            topButtons.vip.__vipReady=vipReady;
-        }
+        if(cfg.SurvivalVIPStatus)cfg.SurvivalVIPStatus.Render(topButtons.vip,{
+            icon:nodes.HandoffNavIcon_vip,caption:nodes.HandoffNavCaption_vip,glow:nodes.HandoffNavGlow_vip});
         syncActiveNav();
         // Both daily and monthly-pass views are reachable inside the existing welfare window.
         if(availability.benefit&&(repaint||mirror.benefitReady!==availability.benefit))["DailyEntry","PassEntry"].forEach(function(id){style(findCached(root,id,true),{visibility:"collapse"});});
