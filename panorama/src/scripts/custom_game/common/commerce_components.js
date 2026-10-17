@@ -68,14 +68,14 @@
         var wallet=item.purchase_method==="wallet",currency=wallet?item.currency_name:"元",amount=wallet?item.price:(item.amount_fen/100).toFixed(2);
         var isU=item.currency==="u_coin" || item.u_coin_price!==undefined || item.u_coin_per_yuan!==undefined;
         var fen=item.amount_fen,uCoin=item.u_coin_price;
-        var validU=isU && item.disabled_reason!=="payment_price_unavailable" && typeof uCoin==="number" && uCoin>0 && uCoin%1===0 && item.u_coin_per_yuan===1000 && typeof fen==="number" && fen>0 && fen<=1000000 && fen%1===0 && uCoin===fen*10;
+        var validU=isU && item.disabled_reason!=="payment_price_unavailable" && typeof uCoin==="number" && uCoin>0 && uCoin%1===0 && item.u_coin_per_yuan===100 && typeof fen==="number" && fen>0 && fen<=1000000 && fen%1===0 && uCoin===fen;
         var paidMeta=item.u_coin_price!==undefined || item.u_coin_per_yuan!==undefined || fen!==undefined || item.disabled_reason==="payment_price_unavailable";
         var previewCoin=!paidMeta && typeof item.price==="number" && item.price>0 && item.price%1===0?item.price:null;
         if(wallet || isU){
             var uri=item.currency==="shop_points"?"custom_game/commerce_jade_v1/crystal.png":"custom_game/commerce_jade_v1/coin.png";
             original(row,uri,"CJPriceIcon");
         }else label(row,"¥","CJYuanIcon");
-        var uText=validU?uCoin+" U币 / ¥"+(fen/100).toFixed(2):(previewCoin!==null?previewCoin+" U币":"U币价格待同步")+" / 人民币金额待同步";
+        var uText=validU?uCoin+" U币":previewCoin!==null?previewCoin+" U币":"U币价格待同步";
         label(row,isU?uText:amount+" "+currency,"CJPriceValue");p.hittest=false;p.hittestchildren=false;return p;
     };
     function detailQuality(item, rewards) {

@@ -58,7 +58,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         var hasStatus=!!String(status.text||"").replace(/\s/g,"")&&!boilerplate;
         show(status,hasStatus);
         if(hasStatus){var statusHeight=Math.min(132,Math.max(24,copyHeight(status.text,532,16)));y+=14;rect(status,0,y,532,statusHeight);paint(status,{overflow:"squish scroll"});y+=statusHeight;}
-        var canOpen=pending&&order.state==="pending"&&!order.expired&&priceValid(order)&&validURL(order.checkout_url);
+        var canOpen=pending&&order.state==="pending"&&!order.expired&&priceValid(order,true)&&validURL(order.checkout_url);
         show(open,canOpen);if(canOpen){y+=10;rect(open,0,y,532,24);y+=24;}
         y+=14;rect(notice,0,y,532,24);paint(notice,{fontSize:"15px",color:"#bcaeca",textAlign:"center"});show(notice,true);y+=24;
         rect(body,24,70,532,y);
@@ -125,13 +125,23 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         var commerce=cfg.SurvivalCommerceWallet,snapshot=commerce && commerce.GetCatalog && commerce.GetCatalog();
         return !!snapshot && rows(snapshot.products).some(function(p){return p && p.sku===value.sku && p.currency==="u_coin";});
     }
-    function uPrice(value) { return value && !isRecharge(value) && !cashPass(value) && typeof value.u_coin_price==="number" && value.u_coin_price>0 && value.u_coin_price%1===0 && value.u_coin_per_yuan===1000 && typeof value.amount_fen==="number" && value.amount_fen>0 && value.amount_fen<=1000000 && value.amount_fen%1===0 && value.u_coin_price===value.amount_fen*10; }
-    function priceValid(value) { return isRecharge(value)?rechargeValid(value):cashPass(value)?typeof value.amount_fen==="number" && value.amount_fen>0 && value.amount_fen<=1000000 && value.amount_fen%1===0:!hasUPrice(value) || uPrice(value); }
-    function priceText(value,rate) {
+    function uPrice(value,storedQuote) {
+        if(!value||isRecharge(value)||cashPass(value))return false;
+        var stored=orders[value.sku],rate=value.u_coin_per_yuan;
+        // Only an authenticated order already received by this HUD may retain
+        // its historical quote. New catalog prices always use 100 U-coins/yuan.
+        var frozen=storedQuote&&stored&&typeof value.order_id==="string"&&value.order_id===stored.order_id;
+        return typeof value.u_coin_price==="number"&&value.u_coin_price>0&&value.u_coin_price%1===0
+            &&(rate===100||(frozen&&rate===1000))&&typeof value.amount_fen==="number"
+            &&value.amount_fen>0&&value.amount_fen<=1000000&&value.amount_fen%1===0
+            &&value.u_coin_price===value.amount_fen*rate/100;
+    }
+    function priceValid(value,storedQuote) { return isRecharge(value)?rechargeValid(value):cashPass(value)?typeof value.amount_fen==="number" && value.amount_fen>0 && value.amount_fen<=1000000 && value.amount_fen%1===0:!hasUPrice(value) || uPrice(value,storedQuote); }
+    function priceText(value,rate,storedQuote) {
         if(!value)return "";
-        if(!priceValid(value))return isRecharge(value)?"充值金额及到账数量待同步":"U币价格及人民币金额待同步";
+        if(!priceValid(value,storedQuote))return isRecharge(value)?"充值金额及到账数量待同步":"U币价格及人民币金额待同步";
         if(isRecharge(value))return money(value.amount_fen);
-        return uPrice(value)?Number(value.u_coin_price)+" U币 / "+money(value.amount_fen)+(rate?"，1元=1000U币":""):money(value.amount_fen);
+        return uPrice(value,storedQuote)?Number(value.u_coin_price)+" U币 / "+money(value.amount_fen)+(rate?"，1元="+value.u_coin_per_yuan+"U币":""):money(value.amount_fen);
     }
     function quantityMaximum(p){
         // A legacy catalogue without an authoritative bulk limit remains single-item.
@@ -246,7 +256,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         dialog.SetHasClass("HasOrder",hasOrder);dialog.SetHasClass("Receipt",receipt);
         setText("PaymentHeading",receipt?"支付结果":hasOrder?"扫码支付":"订单确认");
         if(menuView)menuView.SetTitle(receipt?"支付结果":hasOrder?"扫码支付":"订单确认");
-        setText("PaymentHint",receipt?"订单结果已保存 · 可返回商城继续查看":hasOrder?"订单有效期 30 分钟 · 付款后自动到账":isRecharge(p)?"数量可输入或用 + / − 调整 · 每份1元=100U币":"数量可输入或用 + / − 调整 · 1元=1000U币");
+        setText("PaymentHint",receipt?"订单结果已保存 · 可返回商城继续查看":hasOrder?"订单有效期 30 分钟 · 付款后自动到账":isRecharge(p)?"数量可输入或用 + / − 调整 · 每份1元=100U币":"数量可输入或用 + / − 调整 · 1元=100U币");
         ["wechat","alipay"].forEach(function(value){
             var button=$(value==="wechat"?"#PaymentWeChat":"#PaymentAlipay");
             button.enabled=!busy && !active && channelAvailable(value);
@@ -274,14 +284,14 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
             if(art.SetImage)art.SetImage(special?"":uri);
             if(!special&&cfg.SurvivalRewardPresentation&&cfg.SurvivalRewardPresentation.FillIcon)cfg.SurvivalRewardPresentation.FillIcon(art,artwork);
         }
-        $("#PaymentPrice").text = "合计 "+priceText(shown,false);
-        setText("PaymentUnitPrice",isRecharge(shown)?rechargeValid(shown)?"每份 1 元 = 100 U币\n到账 "+shown.recharge_u_coin_per_unit*quantity+" U币（"+quantity+" 份）":"充值金额及到账数量待同步":shown?"单价 "+priceText(unitQuote(shown,quantity),false)+" · "+quantity+" 件":"");
+        $("#PaymentPrice").text = "合计 "+priceText(shown,false,hasOrder);
+        setText("PaymentUnitPrice",isRecharge(shown)?rechargeValid(shown)?"每份 1 元 = 100 U币\n到账 "+shown.recharge_u_coin_per_unit*quantity+" U币（"+quantity+" 份）":"充值金额及到账数量待同步":shown?"单价 "+priceText(unitQuote(shown,quantity),false,hasOrder)+" · "+quantity+" 件":"");
         $("#PaymentValues").html=true;$("#PaymentValues").text = escapedLines(valuesText(shown,order));
         buy.enabled = !busy && !!p && enabled(p.enabled) && priceValid(p) && (!order || order.state === "closed" || order.state==="delivered");
         buy.enabled=buy.enabled && !catalogDirty && channelAvailable(shownChannel) && !quantityInputInvalid && quantity<=quantityMaximum(p);
         var buyPrice=active?order:quote(p,quantity);
-        $("#PaymentBuyLabel").text = p ? (shownChannel==="alipay"?"支付宝":"微信")+(isRecharge(buyPrice)?"充值 ":"购买 ")+(uPrice(buyPrice)?buyPrice.u_coin_price+" U币":priceText(buyPrice,false)) : "加载中";
-        var canOpen = order && priceValid(order) && order.state === "pending" && !order.expired && validURL(order.checkout_url);
+        $("#PaymentBuyLabel").text = p ? (shownChannel==="alipay"?"支付宝":"微信")+(isRecharge(buyPrice)?"充值 ":"购买 ")+(uPrice(buyPrice,active)?buyPrice.u_coin_price+" U币":priceText(buyPrice,false,active)) : "加载中";
+        var canOpen = order && priceValid(order,true) && order.state === "pending" && !order.expired && validURL(order.checkout_url);
         $("#PaymentOpen").style.visibility = canOpen ? "visible" : "collapse";
         $("#PaymentOpenLabel").text=shownChannel==="alipay" && order && order.checkout_mode!=="qr"?"打开支付宝收银台":"浏览器备用付款页";
         $("#PaymentCancel").style.visibility=active?"visible":"collapse";
@@ -304,8 +314,8 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
                 paid_review:"已收到付款，奖励暂未到账，请保留订单号联系处理，请勿重复付款。",
                 closed:"订单已关闭，可以重新购买。"};
             status.text = order.expired && !terminal(order.state) ? "付款码已过期，正在核对最终状态。" : labels[order.state] || "正在查询…";
-            if(active && !priceValid(order))status.text=isRecharge(order)?"充值金额及到账数量尚未同步，请查询付款结果核对。":"U币订单价格尚未同步，请查询付款结果核对。";
-            if (order.state === "created") buy.enabled = !busy && !!p && enabled(p.enabled) && priceValid(p) && priceValid(order) && channelAvailable(shownChannel);
+            if(active && !priceValid(order,true))status.text=isRecharge(order)?"充值金额及到账数量尚未同步，请查询付款结果核对。":"U币订单价格尚未同步，请查询付款结果核对。";
+            if (order.state === "created") buy.enabled = !busy && !!p && enabled(p.enabled) && priceValid(p) && priceValid(order,true) && channelAvailable(shownChannel);
         } else status.text = !p?"商品支付目录尚未同步，请刷新目录后重试。":!enabled(p.enabled) ? messages[p.disabled_reason] || "此商品暂不可购买。" : uPrice(p)?"直接购买此道具，付款后全部奖励一起到账，自动刷新。":"付款后全部奖励一起到账，自动刷新。";
         if(quantityInputInvalid&&!hasOrder){buy.enabled=false;status.text="请输入 1–"+quantityMaximum(p)+" 的整数数量。";}
         products.forEach(function(item) {
@@ -427,13 +437,13 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     PaymentBuy=function(){
         if(!alive())return;
         var p=current(), order=orders[selected];
-        if (!p || !enabled(p.enabled) || !priceValid(p) || quantityInputInvalid || quantity>quantityMaximum(p) || catalogDirty || busy || (order && order.state!=="closed" && order.state!=="created" && order.state!=="delivered") || (order && order.state==="created" && !priceValid(order))) return;
+        if (!p || !enabled(p.enabled) || !priceValid(p) || quantityInputInvalid || quantity>quantityMaximum(p) || catalogDirty || busy || (order && order.state!=="closed" && order.state!=="created" && order.state!=="delivered") || (order && order.state==="created" && !priceValid(order,true))) return;
         if(!channelAvailable(channel))return;
         if (request("create",selected)) setStatus("正在创建 "+quantity+(isRecharge(p)?" 份充值":" 件")+" · " + priceText(quote(p,quantity),false) + (channel==="alipay"?" 支付宝":" 微信")+"订单…");
     };
     PaymentChannel=function(value){if(!alive())return;var order=orders[selected];if(busy || (order && !terminal(order.state)))return;if((value==="wechat" || value==="alipay") && channelAvailable(value)){channel=value;render();}};
     PaymentCancel=function(){var order=orders[selected];if(order && !terminal(order.state) && request("cancel",selected))setStatus("正在核对并关闭订单，请稍候…");};
-    PaymentOpen=function(){if(!alive())return;var order=orders[selected];if(order && priceValid(order) && order.state==="pending" && !order.expired && validURL(order.checkout_url))$.DispatchEvent("ExternalBrowserGoToURL",order.checkout_url);};
+    PaymentOpen=function(){if(!alive())return;var order=orders[selected];if(order && priceValid(order,true) && order.state==="pending" && !order.expired && validURL(order.checkout_url))$.DispatchEvent("ExternalBrowserGoToURL",order.checkout_url);};
     PaymentRefresh=function(){if(orders[selected])request("status",selected);else refreshCatalog(true);};
     var messages={quantity_invalid:"请输入有效的整数数量。",quantity_limit_exceeded:"数量超过本商品当前可购买上限。",order_quantity_conflict:"已恢复此前未完成订单的数量，请先完成或取消原订单。",order_provider_conflict:"已恢复原订单的支付方式，请先完成或取消原订单。",vip_level_required:"VIP等级不足，暂不可购买此礼包。",test_account_required:"商城当前仅对指定测试账号开放。",already_owned:"你已经拥有此商品。",
         payment_price_unavailable:"U币商品价格尚未同步，请刷新支付目录后重试。",

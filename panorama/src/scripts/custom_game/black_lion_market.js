@@ -105,17 +105,17 @@
         icon.style.position="0px 0px 0px";icon.style.width="100%";icon.style.height="100%";icon.style.margin="0px";icon.style.padding="0px";
         var column=priceColumn(),n=layer(t.prefix+"_name"),nameWidth=column.x-(n.x-r.x)-20,names=centeredStack(row,n.x-r.x,nameWidth,r.height,"BLMarketNameColumn"),name=flowText(names,String(item.title||item.sku||"").replace(/\s*[·•]\s*永久\s*$/,""),"BLMarketName");
         var owned=flowText(names,Number(item.owned)>0?"已拥有 "+item.owned:"","BLMarketOwned");owned.visible=Number(item.owned)>0;owned.style.marginTop="2px";
-        var price=centeredStack(row,column.x,column.width,r.height,"BLMarketRowPrice"),primary="价格待同步",secondary="",cost=item.price;
+        var price=centeredStack(row,column.x,column.width,r.height,"BLMarketRowPrice"),primary="价格待同步",cost=item.price;
         var isU=item.currency==="u_coin"||item.u_coin_price!==undefined||item.u_coin_per_yuan!==undefined;
         if(item.purchase_method==="wallet"&&typeof cost==="number"&&isFinite(cost)&&cost>=0)primary=cost+" "+(item.currency_name||"");
-        else if(isU){var coin=item.u_coin_price,fen=item.amount_fen,validPrice=typeof coin==="number"&&coin>0&&coin%1===0&&item.u_coin_per_yuan===1000&&typeof fen==="number"&&fen>0&&fen<=1000000&&fen%1===0&&coin===fen*10;
-            if(validPrice){primary=coin+" U币";secondary="¥"+(fen/100).toFixed(2);}else secondary="直购价格待同步";
+        else if(isU){var coin=item.u_coin_price,fen=item.amount_fen,validPrice=typeof coin==="number"&&coin>0&&coin%1===0&&item.u_coin_per_yuan===100&&typeof fen==="number"&&fen>0&&fen<=1000000&&fen%1===0&&coin===fen;
+            if(validPrice)primary=coin+" U币";
         }else if(typeof item.amount_fen==="number"&&isFinite(item.amount_fen)&&item.amount_fen>0)primary="¥"+(item.amount_fen/100).toFixed(2);
         // Flow measures each complete line; no screenshot offsets on centered content.
         var priceLine=make("Panel",price,"","BLMarketPriceLine");priceLine.style.width="fit-children";priceLine.style.height="fit-children";priceLine.style.flowChildren="right";priceLine.style.horizontalAlign="center";
         currencyImage(priceLine,isU?"u_coin":item.currency,"BLMarketPriceCurrency",t.prefix);
         var amount=label(priceLine,primary,"BLMarketPriceMain");amount.style.width="fit-children";amount.style.height="fit-children";amount.style.verticalAlign="center";
-        var secondaryLabel=label(price,secondary,"BLMarketPriceSecondary");secondaryLabel.style.width="fit-children";secondaryLabel.style.maxWidth="100%";secondaryLabel.style.height="fit-children";secondaryLabel.style.horizontalAlign="center";secondaryLabel.style.textAlign="center";secondaryLabel.style.marginTop="2px";secondaryLabel.visible=!!secondary;
+
         var available=K.IsActionable?K.IsActionable(item):item.enabled===true||item.enabled===1,reason=K.DisabledMessage?K.DisabledMessage(item):String(item.disabled_message||"");
         if(item.purchase_method==="wallet"&&item.currency==="shop_points"&&(item.disabled_reason==="commerce_balance_insufficient"||item.disabled_reason==="insufficient_balance"))reason="";
         if(!available&&!reason)reason="未满足购买条件";row.SetHasClass("BLMarketHasReason",!!reason);

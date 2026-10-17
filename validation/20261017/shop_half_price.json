@@ -1,0 +1,72 @@
+{
+  "status": "DEPLOYMENT_VERIFIED",
+  "pricing": {
+    "basis": "current_actual_selling_price",
+    "multiplier": "0.5",
+    "commerce_rows": 129,
+    "cash_rows": 8,
+    "u_coin_per_yuan": 100,
+    "example": {
+      "before_u_coin": 100,
+      "after_u_coin": 50,
+      "cash_fen": 50
+    },
+    "recharge": {
+      "cash_fen": 100,
+      "grant_u_coin": 100
+    },
+    "monthly_pass_yuan": 10
+  },
+  "git_sync": {
+    "branch": "dev",
+    "head": "2405379e96bfa5f491bbe182af925411d76136e5",
+    "upstream": "origin/dev",
+    "stash_id": "9bdc0e193d8390d5a058c8363f6cee670a98f190",
+    "pull": "Already up to date.",
+    "restored": true
+  },
+  "server": {
+    "status": "DEPLOYMENT_VERIFIED",
+    "payment_release": "20261017-shop-half-rate100-v1",
+    "archive_release": "20261017-shop-half-v1",
+    "bundle": "76591e8be3ebdfa14a947d5fa7f9c51f01e73fed81fb607480b6b2ef08b6c6b8",
+    "catalog_hash": "f7213cff1e2896144bd007a67957ec3c282a71bd574fe25af9451c91779f683e",
+    "u_coin_per_yuan": 100,
+    "payment_catalog_products": 48,
+    "commerce_products": 129,
+    "historical_orders_readable": 15,
+    "recharge_fen": 100,
+    "recharge_u_coin": 100,
+    "monthly_pass_fen": 1000,
+    "health": {
+      "archive": true,
+      "payments": true
+    },
+    "read_only": true,
+    "orders_created": 0,
+    "gateway_requests": 0,
+    "player_commands": 0
+  },
+  "checks": {
+    "python_payment_unit_tests": 66,
+    "catalog_bundle_csv_tests": 28,
+    "archive_route_tests": 4,
+    "ui_live_checkout_v10_tests": 23,
+    "ui_live_commerce_tests": 3,
+    "postgres_trial": "PASS; all DDL, catalog changes and synthetic fixtures rolled back before publication",
+    "preserved_real_player_and_order_rows": true,
+    "older_ui_suite_failures": {
+      "count": 4,
+      "reproduced_before_change": true
+    },
+    "ui_isolated_commit_candidate_tests": 20
+  },
+  "screenshots": [
+    "design_refs/menus_v10/work/native/shop_half_price_20261017_final_ticket.png",
+    "design_refs/menus_v10/work/native/shop_half_price_20261017_final_points.png",
+    "design_refs/menus_v10/work/native/shop_half_price_20261017_final_recharge.png"
+  ],
+  "evidence_root": "output/shop_pricing_half_20261017",
+  "real_orders_created": 0,
+  "gateway_requests": 0
+}

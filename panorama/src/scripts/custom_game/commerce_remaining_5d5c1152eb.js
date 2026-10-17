@@ -135,7 +135,7 @@
         rows(walletCatalog.categories).forEach(function(c){if(!categories.some(function(v){return v.id===c.id;}))categories.push(c);});
         var paid=Object.create(null),seen=Object.create(null),products=[];
         function copy(value){var p={};Object.keys(value||{}).forEach(function(k){p[k]=value[k];});return p;}
-        function validUPrice(p){return p && typeof p.u_coin_price==="number" && p.u_coin_price>0 && p.u_coin_price%1===0 && p.u_coin_per_yuan===1000 && typeof p.amount_fen==="number" && p.amount_fen>0 && p.amount_fen<=1000000 && p.amount_fen%1===0 && p.u_coin_price===p.amount_fen*10;}
+        function validUPrice(p){return p && typeof p.u_coin_price==="number" && p.u_coin_price>0 && p.u_coin_price%1===0 && p.u_coin_per_yuan===100 && typeof p.amount_fen==="number" && p.amount_fen>0 && p.amount_fen<=1000000 && p.amount_fen%1===0 && p.u_coin_price===p.amount_fen;}
         rows(paidCatalog.products).forEach(function(p){if(p && typeof p.sku==="string")paid[p.sku]=p;});
         rows(walletCatalog.products).forEach(function(p){
             if(!p || typeof p.sku!=="string" || seen[p.sku])return;

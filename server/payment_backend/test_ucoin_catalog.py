@@ -51,25 +51,25 @@ class UcoinCatalogTests(unittest.TestCase):
         legacy={p['sku'] for p in compile_catalog(self.tables,self.reference)['products']}
         self.assertEqual(set(products),legacy|set(ucoin)|{ucoin_recharge.SKU})
         self.assertTrue(ucoin)
-        self.assertEqual(U_COIN_PER_YUAN, 1000)
-        self.assertEqual(catalog['u_coin_per_yuan'], 1000)
-        self.assertEqual(catalog['exchange_rate'], 1000)
+        self.assertEqual(U_COIN_PER_YUAN, 100)
+        self.assertEqual(catalog['u_coin_per_yuan'], 100)
+        self.assertEqual(catalog['exchange_rate'], 100)
         for sku, source in ucoin.items():
             with self.subTest(sku=sku):
                 product = products[sku]
-                self.assertEqual(product['amount'], int(source['price']) // 10)
+                self.assertEqual(product['amount'], int(source['price']))
                 self.assertIsInstance(product['amount'], int)
                 self.assertEqual(product['u_coin_price'], int(source['price']))
-                self.assertEqual(product['u_coin_per_yuan'], 1000)
-                self.assertEqual(product['exchange_rate'], 1000)
-                pricing={'u_coin_price':int(source['price']),'u_coin_per_yuan':1000}
+                self.assertEqual(product['u_coin_per_yuan'], 100)
+                self.assertEqual(product['exchange_rate'], 100)
+                pricing={'u_coin_price':int(source['price']),'u_coin_per_yuan':100}
                 if source['product_type']=='bundle':pricing['original_u_coin_price']=int(source['source_original_price'])
                 self.assertEqual(product['grants']['pricing'],pricing)
-        self.assertEqual(products['video_p033']['amount'], 10)
-        self.assertEqual(products['video_p029']['amount'], 60)
-        self.assertEqual(products['video_p001']['amount'], 120)
-        self.assertEqual(products['video_p004']['amount'], 680)
-        self.assertEqual(products['video_p012']['amount'], 2980)
+        self.assertEqual(products['video_p033']['amount'], 50)
+        self.assertEqual(products['video_p029']['amount'], 300)
+        self.assertEqual(products['video_p001']['amount'], 600)
+        self.assertEqual(products['video_p004']['amount'], 3400)
+        self.assertEqual(products['video_p012']['amount'], 14900)
 
     def test_legacy_cash_products_remain_unchanged(self):
         old = compile_catalog(self.tables, self.reference)
@@ -79,7 +79,7 @@ class UcoinCatalogTests(unittest.TestCase):
         cash_count=sum(p['currency']=='u_coin' for p in rows(self.commerce_tables['commerce_products']))
         self.assertEqual(len(merged), len(old['products']) + cash_count + 1)
         self.assertEqual(merged[ucoin_recharge.SKU],ucoin_recharge.product())
-        self.assertEqual(merged['special_lottery_ticket_single']['amount'], 5000)
+        self.assertEqual(merged['special_lottery_ticket_single']['amount'], 2500)
         self.assertFalse(merged['starter_bundle_v4']['enabled'])
 
     def test_other_wallet_currencies_are_not_cash_products(self):
@@ -122,7 +122,7 @@ class UcoinCatalogTests(unittest.TestCase):
         self.assertEqual(products['video_p001']['grants']['items'], {'special_lottery_ticket': 1})
 
     def test_invalid_prices_never_round_or_compile(self):
-        for price in ('0', '-10', '1', '9', '101', '1200.1', 'NaN', 'Infinity', '10000010'):
+        for price in ('0', '-10', '1200.1', 'NaN', 'Infinity', '1000001'):
             with self.subTest(price=price):
                 with self.assertRaises(ValueError):
                     ucoin_amount_fen(price)
@@ -132,12 +132,12 @@ class UcoinCatalogTests(unittest.TestCase):
                     self.compile()
 
     def test_reference_price_and_original_price_preference(self):
-        self.edit_product(price='6790')
+        self.edit_product(price='6790',price_policy='',price_baseline='')
         with self.assertRaisesRegex(ValueError, 'commerce_reference_price_mismatch'):
             self.compile()
         self.edit_product(price='6800', source_current_price='1', source_original_price='6800')
         product = next(row for row in self.compile()['products'] if row['sku'] == 'video_p004')
-        self.assertEqual(product['amount'], 680)
+        self.assertEqual(product['amount'], 6800)
         self.edit_product(source_original_price='6900')
         with self.assertRaisesRegex(ValueError, 'commerce_reference_price_mismatch'):
             self.compile()

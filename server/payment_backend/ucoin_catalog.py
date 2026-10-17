@@ -6,8 +6,8 @@ import io
 from .csv_catalog import compile_catalog, number
 from .commerce_bundles import MEMBER_TABLE, compile_commerce
 from . import ucoin_recharge
+from .ucoin_pricing import U_COIN_PER_YUAN
 
-U_COIN_PER_YUAN = 1000
 COMMERCE_TABLES = ('commerce_products', 'commerce_rewards', MEMBER_TABLE)
 COMMERCE_SOURCES = tuple('商城兑换系统/' + name + '.csv' for name in COMMERCE_TABLES)
 COMMERCE_CURRENCIES = {'u_coin', 'shop_points', 'shop_gold'}
@@ -17,7 +17,7 @@ REWARD_FIELDS = ('reward_id', 'sku', 'reward_type', 'target_id', 'amount', 'disp
 
 
 def ucoin_amount_fen(price):
-    """Reject rounding: 1 RMB fen buys exactly 10 U-coins."""
+    """Reject rounding: one RMB fen corresponds to exactly one U-coin."""
     price = number(price, True, 1, 100000000)
     return number(Decimal(price) * 100 / U_COIN_PER_YUAN, True, 1, 1000000)
 

@@ -32,7 +32,7 @@
         if(fen===null||fen<=0||fen%1!==0||fen>1000000)return false;
         if(item.currency==="u_coin"||item.u_coin_price!==undefined||item.u_coin_per_yuan!==undefined){
             var coins=number(item.u_coin_price);
-            return coins!==null&&coins>0&&coins%1===0&&item.u_coin_per_yuan===1000&&coins===fen*10;
+            return coins!==null&&coins>0&&coins%1===0&&item.u_coin_per_yuan===100&&coins===fen;
         }
         return true;
     }

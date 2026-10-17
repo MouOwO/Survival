@@ -11,7 +11,8 @@ PRODUCTS = (
     ('implant_test_50_v2', 'lottery_cybernetic_implant', '义体插件', '提升英雄属性成长、攻击加成和最终伤害。'),
 )
 DEFAULT_SKU = PRODUCTS[0][0]
-PRICE_FEN = 5000
+# Current actual price 50 yuan, reduced once by half on 2026-10-17.
+PRICE_FEN = 2500
 
 
 def definitions(bundle):

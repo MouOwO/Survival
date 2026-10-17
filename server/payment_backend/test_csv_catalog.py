@@ -2,6 +2,7 @@ import copy
 from pathlib import Path
 import unittest
 from .csv_catalog import build,compile_catalog,rows,SOURCES
+from .commerce_bundles import csv_text
 
 ROOT=Path(__file__).resolve().parents[2]
 class CatalogTests(unittest.TestCase):
@@ -9,9 +10,9 @@ class CatalogTests(unittest.TestCase):
         self.package=build(ROOT);self.tables=copy.deepcopy(self.package['tables'])
         self.reference={k:(ROOT/'data/csv'/k).read_text(encoding='utf-8-sig') for k in SOURCES}
     def compile(self):return compile_catalog(self.tables,self.reference)
-    def test_single_special_ticket_costs_50_yuan_and_is_repeatable(self):
+    def test_single_special_ticket_costs_25_yuan_and_is_repeatable(self):
         p=next(p for p in self.compile()['products'] if p['sku']=='special_lottery_ticket_single')
-        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],5000)
+        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],2500)
         self.assertEqual(p['purchase_limit'],0);self.assertEqual(p['product_type'],'single')
         self.assertEqual(p['effects'],{});self.assertEqual(p['grants']['entitlements'],[])
         self.assertEqual(p['grants']['items'],{'special_lottery_ticket':1})
@@ -29,13 +30,19 @@ class CatalogTests(unittest.TestCase):
             with self.assertRaises(ValueError): self.compile()
 
     def test_money_is_exact_fen(self):
-        self.tables['payment_products']=self.tables['payment_products'].replace('50.00','7.77')
+        # Exercise the general exact-fen compiler contract independently of the
+        # authority's separately tested one-time discount policy.
+        products=rows(self.tables['payment_products'])
+        for product in products:
+            product.pop('price_policy',None);product.pop('price_baseline_yuan',None)
+            if product['sku']!='archive_pass_monthly':product['price_yuan']='7.77'
+        self.tables['payment_products']=csv_text(products,list(products[0]))
         self.assertTrue(all(p['amount']==777 for p in self.compile()['products'] if p['sku']!='archive_pass_monthly'))
         self.tables['payment_products']=self.tables['payment_products'].replace('7.77','7.777')
         with self.assertRaises(ValueError):self.compile()
     def test_monthly_pass_price_duration_and_no_invented_rewards(self):
         p=next(p for p in self.package['catalog']['products'] if p['sku']=='archive_pass_monthly')
-        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],2000)
+        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],1000)
         self.assertEqual(p['purchase_limit'],0)
         self.assertEqual(p['effects'],{});self.assertEqual(p['grants']['items'],{})
         self.assertEqual(p['grants']['entitlements'],['archive_pass'])
@@ -58,7 +65,7 @@ class CatalogTests(unittest.TestCase):
         rule=rows((ROOT/'data/csv/存档系统/archive_daily_rules.csv').read_text(encoding='utf-8-sig'))[0]
         product=next(p for p in self.package['catalog']['products'] if p['sku']==rule['pass_sku'])
         self.assertEqual(rule['purchase_enabled'],'1')
-        self.assertEqual(rule['price_text'],'20元');self.assertEqual(product['amount'],2000)
+        self.assertEqual(rule['price_text'],'10元');self.assertEqual(product['amount'],1000)
         self.assertEqual(int(rule['duration_days']),product['grants']['entitlement_days'][rule['pass_entitlement_id']])
     def test_unknown_or_unimplemented_rewards_fail_whole_catalog(self):
         for old,new in [('stat,initial_wood','stat,imaginary_buff'),('entitlement,vip','entitlement,admin'),

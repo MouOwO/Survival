@@ -45,7 +45,7 @@ class RechargeTests(TestCase):
             with self.subTest(invalid=invalid),self.assertRaises(PaymentError):quantity(invalid,sku=recharge.SKU)
         with self.assertRaises(PaymentError):quantity(101,sku='video_p001')
         with self.assertRaises(PaymentError):ucoin_quote(99999900)
-        self.assertEqual(ucoin_quote(99999900,recharge=True)['u_coin_price'],999999000)
+        self.assertEqual(ucoin_quote(99999900,recharge=True)['u_coin_price'],99999900)
         forged=recharge_order(101);forged['sku']='video_p001'
         with self.assertRaises(PaymentError):self.app.public(forged)
 
@@ -82,10 +82,10 @@ class RechargeTests(TestCase):
         self.assertNotIn('但账号已拥有该奖励',JS)
         self.assertIn('请适度娱乐，理性消费',PAGE)
 
-    def test_formal_catalog_adds_one_fixed_product_without_changing_old_quotes(self):
+    def test_formal_catalog_adds_fixed_recharge_independent_of_item_discount(self):
         from pathlib import Path
         from .csv_catalog import build
         products=build(Path(__file__).resolve().parents[2])['catalog']['products']
         self.assertEqual([p for p in products if p.get('product_type')=='recharge'],[recharge.product()])
         ticket=next(p for p in products if p['sku']=='video_p001')
-        self.assertEqual((ticket['amount'],ticket['u_coin_price'],ticket['u_coin_per_yuan']),(120,1200,1000))
+        self.assertEqual((ticket['amount'],ticket['u_coin_price'],ticket['u_coin_per_yuan']),(600,600,100))

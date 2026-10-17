@@ -6,6 +6,9 @@ UPGRADE_COMMANDS = frozenset({
     'social_draw', 'promotion', 'daily_init', 'daily_claim',
     'work_upgrade', 'building_upgrade', 'starjoy_reconcile',
     'welfare_reconcile', 'vip_claim', 'vip_purchase', 'title_equip',
+    # Catalog reads already use the current bundle. Explicitly approved price
+    # publications must use that same catalog for uncommitted purchases too.
+    'commerce_purchase',
 })
 
 

@@ -1,6 +1,7 @@
 """Validate request counts and expose only immutable server order quotes."""
 from .wechat import PaymentError
 from . import ucoin_recharge
+from .ucoin_pricing import snapshot_rate
 
 MAX_ORDER_QUANTITY=100
 MAX_AMOUNT_FEN=1000000
@@ -24,11 +25,12 @@ def snapshot_units(order):
         raise PaymentError('payment_pricing_mismatch',500)
     return count,unit
 
-def pricing_original(pricing,expected_ucoin,maximum_original):
+def pricing_original(pricing,expected_ucoin,maximum_original,expected_rate=None):
     if pricing is None:return None
+    rate=snapshot_rate(pricing)
     if (not isinstance(pricing,dict) or set(pricing)-{'u_coin_price','u_coin_per_yuan','original_u_coin_price'}
         or type(pricing.get('u_coin_price')) is not int or pricing['u_coin_price']!=expected_ucoin
-        or type(pricing.get('u_coin_per_yuan')) is not int or pricing['u_coin_per_yuan']!=1000):
+        or (expected_rate is not None and rate!=expected_rate)):
         raise PaymentError('payment_pricing_mismatch',500)
     if 'original_u_coin_price' not in pricing:return None
     original=pricing['original_u_coin_price']

@@ -15,7 +15,7 @@ function makeFixture() {
             disabled_reason:'shop_gold_not_open'},
         {...points('points_bundle'), product_type:'bundle', category_id:'bundles'}];
     const paid = {catalog_hash:'filter-fixture-1', categories:[{id:'item', label:'道具'}], products:[
-        cash('legacy_cash'), cash('u_coin_cash', {currency:'u_coin', u_coin_price:2500, u_coin_per_yuan:1000}),
+        cash('legacy_cash'), cash('u_coin_cash', {currency:'u_coin', amount_fen:2500, u_coin_price:2500, u_coin_per_yuan:100}),
         cash('vip_bundle', {product_type:'bundle', category_id:'vip', required_vip_level:2,
             enabled:0, disabled_reason:'vip_level_insufficient'})]};
     const h = harness({paid, presentation:{groups:{

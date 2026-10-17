@@ -13,6 +13,7 @@ SOURCES=('商店系统/entitlement_definitions.csv','玩家档案系统/player_g
          '存档系统/archive_vip_rewards.csv','存档系统/archive_vip_levels.csv','商城兑换系统/commerce_import_status.csv')
 TABLES=('payment_categories','payment_products','payment_rewards')
 SUPPORTED_ENTITLEMENTS={'vip','archive_pass'}
+HALF_PRICE_POLICY='half_current_20261017'
 
 def rows(text):
     result=[]
@@ -32,6 +33,23 @@ def number(value, integer=False, minimum=0, maximum=100000000):
     except InvalidOperation:raise ValueError('数值格式不正确') from None
     if not n.is_finite() or not minimum<=n<=maximum or (integer and n!=n.to_integral()):raise ValueError('数值超出范围或需要整数')
     return int(n) if n==n.to_integral() else float(n)
+
+def validate_price_policy(product,value,baseline_field,*,scale=1,expected_baseline=None):
+    """Validate an already discounted authority value; never apply it again.
+
+    Historical source prices remain evidence. The recorded baseline is the
+    actual selling price before this one-time reduction, including bundle sales.
+    Old reference fixtures without a policy keep their existing validation.
+    """
+    policy=product.get('price_policy')
+    baseline=product.get(baseline_field)
+    if not policy and not baseline:return False
+    if policy!=HALF_PRICE_POLICY or not baseline:
+        raise ValueError('catalog_price_policy_invalid:'+product['sku'])
+    baseline=number(Decimal(str(baseline))*scale,True,2,200000000)
+    if Decimal(str(value))*2!=baseline or (expected_baseline is not None and baseline!=expected_baseline):
+        raise ValueError('catalog_half_price_mismatch:'+product['sku'])
+    return True
 
 def indexed(data,key):
     result={}
@@ -65,6 +83,7 @@ def compile_catalog(tables,reference, *, max_products=100):
         try:cents=Decimal(p['price_yuan'])*100
         except InvalidOperation:raise ValueError(sku+': 价格格式不正确') from None
         amount=number(cents,True,1,1000000)
+        validate_price_policy(p,amount,'price_baseline_yuan',scale=100)
         marker=p['ownership_id']
         if not ID.fullmatch(marker) or marker in markers:raise ValueError(sku+': 持有标记无效或重复')
         markers.add(marker)

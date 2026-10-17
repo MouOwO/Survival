@@ -1,5 +1,6 @@
 """Server-owned, repeatable wallet top-up. Ordinary item quotes stay unchanged."""
 from copy import deepcopy
+from .ucoin_pricing import U_COIN_PER_YUAN, snapshot_rate
 
 SKU = 'u_coin_recharge'
 ITEM_ID = 'u_coin_recharge_receipt'
@@ -11,8 +12,7 @@ MAX_WALLET_BALANCE = 9007199254740991
 
 
 def product():
-    # Internal pricing retains the existing payment quote format. It is never
-    # interpreted as the recharge reward; wallet credit has its own fixed field.
+    # Wallet credit is validated independently of display pricing.
     return dict(sku=SKU, item_id=ITEM_ID, title='U币充值',
         description='每份1元，到账100U币。请适度娱乐，理性消费。',
         amount=UNIT_AMOUNT_FEN, effects={}, enabled=True, sort_order=1000000,
@@ -21,7 +21,7 @@ def product():
         recharge_u_coin_per_unit=U_COIN_PER_UNIT, max_quantity=MAX_QUANTITY,
         grants=dict(items={}, item_limits={}, entitlements=[], effect_labels={},
             lines=[dict(kind='wallet', id='u_coin', quantity=U_COIN_PER_UNIT, label='U币')],
-            pricing=dict(u_coin_price=1000, u_coin_per_yuan=1000),
+            pricing=dict(u_coin_price=U_COIN_PER_YUAN, u_coin_per_yuan=U_COIN_PER_YUAN),
             recharge_u_coin_per_unit=U_COIN_PER_UNIT))
 
 
@@ -43,6 +43,9 @@ def validate_snapshot(order):
     grants = deepcopy(expected['grants'])
     if type(count) is not int or not 1 <= count <= MAX_QUANTITY:
         raise PaymentError('payment_quantity_invalid', 500)
+    rate = snapshot_rate(reward.get('unit_pricing'))
+    expected['grants']['pricing'] = dict(u_coin_price=rate, u_coin_per_yuan=rate)
+    grants['pricing'] = deepcopy(expected['grants']['pricing'])
     grants['lines'][0]['quantity'] *= count
     grants['pricing']['u_coin_price'] *= count
     if (reward.get('version') != 6 or reward.get('item_id') != ITEM_ID

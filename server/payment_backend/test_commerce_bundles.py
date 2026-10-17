@@ -17,6 +17,7 @@ class CompilerTests(unittest.TestCase):
   self.reference={name:(ROOT/'data/csv'/name).read_text(encoding='utf-8-sig') for name in SOURCES}
  def add_bundle(self,sku='test_bundle_sword',members=None,enabled='1',price='47680',original='59600'):
   records=rows(self.tables['commerce_products']);p=dict(records[0])
+  p.pop('price_policy',None);p.pop('price_baseline',None)
   p.update(sku=sku,display_name=sku,product_type='bundle',category_id='bundles',currency='u_coin',
    price=price,purchase_limit='1',enabled=enabled,sort_order='900',ownership_id=sku+'_owned',
    source_id='TEST',source_current_price=price,source_original_price=original,ownership_quantity='1')
@@ -38,7 +39,7 @@ class CompilerTests(unittest.TestCase):
   self.assertEqual([v['id'] for v in b['grants']['lines']],['video_p012','video_p026'])
   self.assertTrue(all(v['icon'] and v['description'] for v in b['grants']['lines']))
   paid={p['sku']:p for p in compile_payment_catalog(self.package['tables'],self.tables,self.reference)['products']}[sku]
-  self.assertEqual(paid['amount'],4768);self.assertEqual(paid['grants']['pricing']['original_u_coin_price'],59600)
+  self.assertEqual(paid['amount'],47680);self.assertEqual(paid['grants']['pricing']['original_u_coin_price'],59600)
  def test_nested_bundle_preserves_all_component_markers(self):
   inner=self.add_bundle();outer=self.add_bundle('test_bundle_outer',[('product',inner,1)])
   p=self.compile();self.assertEqual(p[outer]['effects'],p[inner]['effects'])
@@ -55,10 +56,11 @@ class CompilerTests(unittest.TestCase):
   self.assertEqual(p['effects'],total)
   self.assertEqual(float(source['vip_package_05']['effect_values'].split('|')[3]),8)
  def test_pending_preserves_all_members_but_grants_nothing(self):
-  sku=self.add_bundle('test_bundle_pending',[('product','video_p012',1),('unavailable','P028',1)],enabled='0')
+  pending=next(r['source_id'] for r in rows(self.reference['商城兑换系统/commerce_import_status.csv']) if r['status']!='ready')
+  sku=self.add_bundle('test_bundle_pending',[('product','video_p012',1),('unavailable',pending,1)],enabled='0')
   p=self.compile()[sku];self.assertFalse(p['enabled']);self.assertTrue(p['bundle_pending'])
   self.assertEqual(p['effects'],{});self.assertEqual(p['grants']['items'],{});self.assertEqual(len(p['grants']['lines']),2)
-  self.assertEqual(p['pending_members'],['P028'])
+  self.assertEqual(p['pending_members'],[pending])
  def test_enabled_cannot_sell_pending_or_skip_missing_members(self):
   self.add_bundle(members=[('unavailable','P028',1)])
   with self.assertRaisesRegex(ValueError,'commerce_bundle_unavailable_member'):self.compile()
@@ -74,7 +76,7 @@ class CompilerTests(unittest.TestCase):
  def test_single_price_rule_and_bundle_discount_cannot_be_bypassed(self):
   records=rows(self.tables['commerce_products']);p=next(p for p in records if p['sku']=='video_p012');p['price']='23840'
   self.tables['commerce_products']=csv_text(records,list(records[0]))
-  with self.assertRaisesRegex(ValueError,'commerce_reference_price_mismatch'):self.compile()
+  with self.assertRaisesRegex(ValueError,'catalog_half_price_mismatch'):self.compile()
   self.setUp();self.add_bundle(price='60000',original='59600')
   with self.assertRaisesRegex(ValueError,'commerce_bundle_discount_invalid'):self.compile()
 

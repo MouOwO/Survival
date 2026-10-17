@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {harness,walletItem}=require('./harness.cjs');
 const array=value=>JSON.parse(JSON.stringify(value));
 function cash(sku,overrides={}){return {sku,title:sku,category_id:'item',product_type:'single',enabled:true,owned:0,purchase_limit:0,
- amount_fen:100,currency:'u_coin',u_coin_price:1000,u_coin_per_yuan:1000,reward_lines:[],...overrides};}
+ amount_fen:1000,currency:'u_coin',u_coin_price:1000,u_coin_per_yuan:100,reward_lines:[],...overrides};}
 function setup(products=[],presentation={groups:{home:[]}}){return harness({paid:{catalog_hash:'OFFLINE_ONLY',categories:[],products},presentation});}
 function choose(h,id='all'){h.cfg.SurvivalCommerceView.Open();assert(h.cfg.SurvivalCommerceView.SelectCategory(id));}
 const rowBuy=(h,row)=>h.descendants(row,'BLMarketBuy')[0];
@@ -97,7 +97,7 @@ test('Changing only VIP reason/message/required level redraws the visible explan
 });
 
 test('U-coin cash price and eligibility come from payment rows, never a wallet balance or a metadata ghost',()=>{
- const real=cash('cash-authority',{amount_fen:680,u_coin_price:6800}),h=setup([real]);choose(h);
+ const real=cash('cash-authority',{amount_fen:6800,u_coin_price:6800}),h=setup([real]);choose(h);
  h.walletSnapshot([{...walletItem('unused'),sku:real.sku,currency:'u_coin',price:1,enabled:false,disabled_reason:'commerce_balance_insufficient'}],{u_coin:0,shop_points:0,shop_gold:0});
  let row=h.cardList()[0];assert.equal(rowBuy(h,row).enabled,true);assert.equal(h.descendants(row,'BLMarketPriceMain')[0].text,'6800 U币');
  rowBuy(h,row).events.onactivate();assert.deepEqual(h.paidCheckouts,[real.sku]);assert.equal(buyRequests(h).length,0,'The U-coin marker is a cash price, not wallet deduction');
@@ -106,7 +106,7 @@ test('U-coin cash price and eligibility come from payment rows, never a wallet b
 
 
 test('A purchase-owned wallet update hides the unique cash SKU while an older payment snapshot lags',()=>{
- const real=cash('owned-race',{purchase_limit:1,amount_fen:680,u_coin_price:6800}),h=setup([real]);choose(h);
+ const real=cash('owned-race',{purchase_limit:1,amount_fen:6800,u_coin_price:6800}),h=setup([real]);choose(h);
  const wallet={...walletItem('unused'),sku:real.sku,currency:'u_coin',price:1,purchase_limit:1,owned:0,enabled:false,disabled_reason:'commerce_balance_insufficient'};
  h.walletSnapshot([wallet],{u_coin:0,shop_points:0,shop_gold:0});
  assert.equal(rowBuy(h,h.cardList()[0]).enabled,true,'Wallet affordability cannot disable an authorized cash purchase');

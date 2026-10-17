@@ -22,6 +22,7 @@ import qrcode.image.svg
 from .wechat import APPID, MCHID, ORIGIN, SKU, TITLE, WeChat, PaymentError, decode_json, validate_success
 from .alipay import Alipay, is_qr_code
 from .ucoin_catalog import U_COIN_PER_YUAN
+from .ucoin_pricing import quote, snapshot_rate
 from .order_quantity import MAX_ORDER_QUANTITY,quantity,snapshot_units,pricing_original
 from . import ucoin_recharge
 
@@ -31,13 +32,10 @@ CALLS = {'catalog':2,'create_order':4,'get_order':1,'pending':0,'update_gateway'
     'begin_reset':4,'finish_reset':4,'create_order_channel':5,'create_order_quantity':6}
 
 
-def ucoin_quote(amount_fen, *, recharge=False):
+def ucoin_quote(amount_fen, *, recharge=False, rate=U_COIN_PER_YUAN):
     """Display the database-owned cash amount in U-coins, never client input."""
     maximum=ucoin_recharge.MAX_AMOUNT_FEN if recharge else 1000000
-    if type(amount_fen) is not int or not 1 <= amount_fen <= maximum:
-        raise PaymentError('payment_amount_invalid',500)
-    return {'u_coin_price':amount_fen * U_COIN_PER_YUAN // 100,
-            'u_coin_per_yuan':U_COIN_PER_YUAN}
+    return quote(amount_fen, rate=rate, maximum=maximum)
 
 
 @lru_cache(maxsize=128)
@@ -123,13 +121,14 @@ class Payments:
         result['checkout_mode']='qr' if native_qr(order) else 'page_pay' if order.get('code_url')=='alipay:page_pay' else 'preparing'
         # Existing orders retain their stored amount even after a catalog edit.
         recharge=ucoin_recharge.is_recharge(order)
-        result.update(ucoin_quote(order['amount'],recharge=recharge))
-        result.update(quantity=count,unit_amount_fen=unit_amount,unit_u_coin_price=ucoin_quote(unit_amount)['u_coin_price'])
         pricing=order['reward'].get('grants',{}).get('pricing')
-        original=pricing_original(pricing,result['u_coin_price'],100000000*count)
+        rate=snapshot_rate(pricing)
+        result.update(ucoin_quote(order['amount'],recharge=recharge,rate=rate))
+        result.update(quantity=count,unit_amount_fen=unit_amount,unit_u_coin_price=ucoin_quote(unit_amount,rate=rate)['u_coin_price'])
+        original=pricing_original(pricing,result['u_coin_price'],100000000*count,rate)
         if original is not None:result['original_u_coin_price']=original
         unit_pricing=order['reward'].get('unit_pricing')
-        unit_original=pricing_original(unit_pricing,result['unit_u_coin_price'],100000000)
+        unit_original=pricing_original(unit_pricing,result['unit_u_coin_price'],100000000,rate)
         if unit_pricing is not None and (original is None)!=(unit_original is None):
             raise PaymentError('payment_pricing_mismatch',500)
         if unit_original is not None:

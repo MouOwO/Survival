@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "reviewed local video OCR + manual frames, 2026-10-15",
-  "pricing": "1人民币=1000U币；折后价为实际下单价，原价仅展示",
+  "pricing": "1人民币=100U币；商品按2026-10-17改价前实际售价减半，原价仅展示，充值不打折",
   "products": [
     {
       "sku": "video_bundle_b001",
@@ -10,10 +10,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 47680,
-      "u_coin_price": 47680,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 4768,
+      "price": 23840,
+      "u_coin_price": 23840,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 23840,
       "original_price": 59600,
       "source_original_price": 59600,
       "purchase_limit": 1,
@@ -46,7 +46,9 @@
         }
       ],
       "source_time": 4,
-      "source_video": 1
+      "source_video": 1,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 47680
     },
     {
       "sku": "video_bundle_b002",
@@ -55,10 +57,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 47680,
-      "u_coin_price": 47680,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 4768,
+      "price": 23840,
+      "u_coin_price": 23840,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 23840,
       "original_price": 59600,
       "source_original_price": 59600,
       "purchase_limit": 1,
@@ -91,7 +93,9 @@
         }
       ],
       "source_time": 26,
-      "source_video": 1
+      "source_video": 1,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 47680
     },
     {
       "sku": "video_bundle_b003",
@@ -100,10 +104,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 46560,
-      "u_coin_price": 46560,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 4656,
+      "price": 23280,
+      "u_coin_price": 23280,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 23280,
       "original_price": 58200,
       "source_original_price": 58200,
       "purchase_limit": 1,
@@ -152,7 +156,9 @@
         }
       ],
       "source_time": 40,
-      "source_video": 1
+      "source_video": 1,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 46560
     },
     {
       "sku": "video_bundle_b004",
@@ -161,10 +167,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 22000,
-      "u_coin_price": 22000,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 2200,
+      "price": 11000,
+      "u_coin_price": 11000,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 11000,
       "original_price": 27500,
       "source_original_price": 27500,
       "purchase_limit": 1,
@@ -245,7 +251,9 @@
         }
       ],
       "source_time": 73,
-      "source_video": 1
+      "source_video": 1,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 22000
     },
     {
       "sku": "video_bundle_b005",
@@ -254,10 +262,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 81120,
-      "u_coin_price": 81120,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 8112,
+      "price": 40560,
+      "u_coin_price": 40560,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 40560,
       "original_price": 101400,
       "source_original_price": 101400,
       "purchase_limit": 1,
@@ -298,7 +306,9 @@
         }
       ],
       "source_time": 145,
-      "source_video": 1
+      "source_video": 1,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 81120
     },
     {
       "sku": "video_bundle_vip_01",
@@ -307,10 +317,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 1920,
-      "u_coin_price": 1920,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 192,
+      "price": 960,
+      "u_coin_price": 960,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 960,
       "original_price": 2400,
       "source_original_price": 2400,
       "purchase_limit": 1,
@@ -343,7 +353,9 @@
         }
       ],
       "source_time": 4,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 1920
     },
     {
       "sku": "video_bundle_vip_02",
@@ -352,10 +364,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 4480,
-      "u_coin_price": 4480,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 448,
+      "price": 2240,
+      "u_coin_price": 2240,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 2240,
       "original_price": 5600,
       "source_original_price": 5600,
       "purchase_limit": 1,
@@ -388,7 +400,9 @@
         }
       ],
       "source_time": 21,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 4480
     },
     {
       "sku": "video_bundle_vip_03",
@@ -397,10 +411,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 8480,
-      "u_coin_price": 8480,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 848,
+      "price": 4240,
+      "u_coin_price": 4240,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 4240,
       "original_price": 10600,
       "source_original_price": 10600,
       "purchase_limit": 1,
@@ -433,7 +447,9 @@
         }
       ],
       "source_time": 44,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 8480
     },
     {
       "sku": "video_bundle_vip_04",
@@ -442,10 +458,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 12480,
-      "u_coin_price": 12480,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 1248,
+      "price": 6240,
+      "u_coin_price": 6240,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 6240,
       "original_price": 15600,
       "source_original_price": 15600,
       "purchase_limit": 1,
@@ -478,7 +494,9 @@
         }
       ],
       "source_time": 58,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 12480
     },
     {
       "sku": "video_bundle_vip_05",
@@ -487,10 +505,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 17280,
-      "u_coin_price": 17280,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 1728,
+      "price": 8640,
+      "u_coin_price": 8640,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 8640,
       "original_price": 21600,
       "source_original_price": 21600,
       "purchase_limit": 1,
@@ -523,7 +541,9 @@
         }
       ],
       "source_time": 79,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 17280
     },
     {
       "sku": "video_bundle_vip_06",
@@ -532,10 +552,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 23680,
-      "u_coin_price": 23680,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 2368,
+      "price": 11840,
+      "u_coin_price": 11840,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 11840,
       "original_price": 29600,
       "source_original_price": 29600,
       "purchase_limit": 1,
@@ -568,7 +588,9 @@
         }
       ],
       "source_time": 100,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 23680
     },
     {
       "sku": "video_bundle_vip_07",
@@ -577,10 +599,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 26880,
-      "u_coin_price": 26880,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 2688,
+      "price": 13440,
+      "u_coin_price": 13440,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 13440,
       "original_price": 33600,
       "source_original_price": 33600,
       "purchase_limit": 1,
@@ -613,7 +635,9 @@
         }
       ],
       "source_time": 118,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 26880
     },
     {
       "sku": "video_bundle_vip_08",
@@ -622,10 +646,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 38080,
-      "u_coin_price": 38080,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 3808,
+      "price": 19040,
+      "u_coin_price": 19040,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 19040,
       "original_price": 47600,
       "source_original_price": 47600,
       "purchase_limit": 1,
@@ -658,7 +682,9 @@
         }
       ],
       "source_time": 141,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 38080
     },
     {
       "sku": "video_bundle_vip_09",
@@ -667,10 +693,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 42880,
-      "u_coin_price": 42880,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 4288,
+      "price": 21440,
+      "u_coin_price": 21440,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 21440,
       "original_price": 53600,
       "source_original_price": 53600,
       "purchase_limit": 1,
@@ -703,7 +729,9 @@
         }
       ],
       "source_time": 163,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 42880
     },
     {
       "sku": "video_bundle_vip_10",
@@ -712,10 +740,10 @@
       "product_type": "bundle",
       "currency": "u_coin",
       "currency_name": "U币",
-      "price": 47680,
-      "u_coin_price": 47680,
-      "u_coin_per_yuan": 1000,
-      "amount_fen": 4768,
+      "price": 23840,
+      "u_coin_price": 23840,
+      "u_coin_per_yuan": 100,
+      "amount_fen": 23840,
       "original_price": 59600,
       "source_original_price": 59600,
       "purchase_limit": 1,
@@ -748,7 +776,10 @@
         }
       ],
       "source_time": 186,
-      "source_video": 2
+      "source_video": 2,
+      "price_policy": "half_current_20261017",
+      "price_baseline": 47680
     }
-  ]
+  ],
+  "price_policy": "half_current_20261017"
 }

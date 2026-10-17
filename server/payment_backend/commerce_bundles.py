@@ -5,7 +5,7 @@ import csv
 from decimal import Decimal
 import io
 import re
-from .csv_catalog import ID, SOURCES, compile_catalog, flag, indexed, number, rows
+from .csv_catalog import ID, SOURCES, compile_catalog, flag, indexed, number, rows, validate_price_policy
 
 MEMBER_TABLE = 'commerce_bundle_members'
 EMPTY_MEMBERS = 'member_id,bundle_sku,member_type,target_id,quantity,sort_order,enabled\n'
@@ -22,7 +22,9 @@ def csv_text(records,fields):
 def price(product,bundle=False):
     value=number(product['price'],True,1,100000000)
     expected=(product.get('source_current_price') if bundle else product.get('source_original_price') or product.get('source_current_price'))
-    if value!=number(expected,True,1,100000000):
+    expected=number(expected,True,1,100000000)
+    discounted=validate_price_policy(product,value,'price_baseline',expected_baseline=expected)
+    if not discounted and value!=expected:
         raise ValueError('commerce_reference_price_mismatch:'+product['sku'])
     original=product.get('source_original_price')
     if bundle and original and number(original,True,1,100000000)<value:
@@ -32,8 +34,9 @@ def price(product,bundle=False):
 def compile_commerce(tables,reference,category_text,*,max_products=200):
     """Return complete flat rewards plus component/claim atomicity metadata.
 
-    Only explicit membership bundles use their reviewed current discount price.
-    Existing single products retain their original-price preference unchanged.
+    A recorded half-price policy validates the previous actual selling price
+    against the historical reference. The CSV price is final and is never
+    discounted while compiling. Unmarked historical fixtures keep their rule.
     """
     products=indexed(rows(tables['commerce_products']),'sku')
     reward_rows=rows(tables['commerce_rewards'])

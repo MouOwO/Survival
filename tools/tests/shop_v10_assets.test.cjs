@@ -23,7 +23,7 @@ function noCheckout(h) {
 function fixture() {
     const paid = {catalog_hash:'v10-live-1', categories:[{id:'item',label:'道具'}], products:[
         {sku:'v10_cash',title:'动态现金商品',category_id:'item',product_type:'single',enabled:1,
-            amount_fen:345,u_coin_price:3450,u_coin_per_yuan:1000,currency:'u_coin',
+            amount_fen:3450,u_coin_price:3450,u_coin_per_yuan:100,currency:'u_coin',
             icon:'items/rapier.png',reward_lines:[]},
         {sku:'v10_vip',title:'动态 VIP 礼包',category_id:'vip',product_type:'bundle',enabled:0,
             amount_fen:678,required_vip_level:4,disabled_reason:'vip_level_insufficient',
@@ -107,7 +107,7 @@ test('Catalog changes update V10 names, prices, balances, ownership, VIP state a
     const fresh = {...points,title:'服务端更新后的名称',price:73,owned:3};
     h.walletSnapshot([fresh], {u_coin:321,shop_points:7654,shop_gold:98});
     const nextPaid = {...paid,catalog_hash:'v10-live-2',products:paid.products.map(p => p.sku==='v10_cash'
-        ? {...p,title:'服务端现金新名称',amount_fen:901,u_coin_price:9010} : p)};
+        ? {...p,title:'服务端现金新名称',amount_fen:9010,u_coin_price:9010} : p)};
     h.updatePaid(nextPaid);
     const updated = labels(h.store().panel);
     for (const text of ['服务端更新后的名称','73 积分','已拥有 3','服务端现金新名称','9010 U币'])

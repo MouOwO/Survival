@@ -24,8 +24,8 @@ class UCoinServiceTests(unittest.TestCase):
         original=self.db.call
         self.db.call=lambda name,*args: {'ok':True,'products':products} if name=='catalog' else original(name,*args)
         result=self.app.game('catalog',self.identity)
-        self.assertEqual(result['u_coin_per_yuan'],1000)
-        self.assertEqual([p['u_coin_price'] for p in result['products']],[1200,6800])
+        self.assertEqual(result['u_coin_per_yuan'],100)
+        self.assertEqual([p['u_coin_price'] for p in result['products']],[120,680])
         self.assertFalse(result['products'][1]['enabled'])
         self.assertEqual(result['products'][1]['disabled_reason'],'already_owned')
         self.assertNotIn('u_coin_price',products[0], 'display must not mutate DB snapshots')
