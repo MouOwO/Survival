@@ -15,6 +15,23 @@ assert.equal(a.elements.Quantity.text,'2/60');assert.equal(b.elements.Quantity.t
 assert(a.Show({...item,id:'wife_01'},'wife',firstCard));assert(a.elements.State.text.includes('已拥有'),'Owned wife collections share the existing owned-item tooltip semantics');
 assert(a.Show({...item,id:'wife_31',description:'初始魔法卡+1',draw_enabled:0,availability_note:'待适配，暂不参与抽取，不消耗玫瑰'},'wife',firstCard));assert.equal(a.elements.Effect.text,'初始魔法卡+1');assert.equal(a.elements.Condition.text,'待适配，暂不参与抽取，不消耗玫瑰');assert(a.elements.Condition.visible);assert.equal(a.elements.State.text,'收藏 · 已拥有','Availability no longer replaces the real ownership state');
 assert(a.Show(item,'ex',firstCard));assert.equal(a.elements.Condition.text,'');assert.equal(a.elements.Condition.visible,false,'Switching to ordinary rows clears the adaptation-only note');
+const mapEffects='每升一级：城墙初始生命+100；城墙每秒回血+5\n本级奖励：伐木效率+1\n人口+1';
+const mapLevel=Object.freeze({id:'map_10',name:'地图等级10',description:'累计有效在线时长：90小时\n'+mapEffects,count:4657,target:5400,completed:0,__v10CurrentLevel:9,__v10TargetLevel:10});
+const mapSnapshot=JSON.stringify(mapLevel),formatted=[];
+cfg.ArchiveHandoff.FormatEffects=description=>{formatted.push(description);return description;};
+assert(a.Show(mapLevel,'map_level',firstCard));
+assert.equal(formatted.at(-1),mapEffects,'Effect formatting receives rewards without the online requirement');
+assert.equal(a.elements.Effect.text,mapEffects,'All map level bonuses remain intact');
+assert.equal(a.elements.Condition.text,'解锁条件：\n累计有效在线时长：90小时\n累计有效在线 4657 分钟','The required time appears below the effects separately from current progress');
+assert(a.elements.Condition.visible);assert.equal(a.elements.Quantity.text,'LV9/10');
+assert(a.Show(mapLevel,'map_level',firstCard));assert.equal(JSON.stringify(mapLevel),mapSnapshot,'Repeated hovers never mutate the shared server snapshot');
+assert(a.Show({...mapLevel,description:'累计有效在线时长:120小时\r\n'+mapEffects,target:7200},'map_level',firstCard));
+assert.equal(a.elements.Effect.text,mapEffects);assert.equal(a.elements.Condition.text,'解锁条件：\n累计有效在线时长:120小时\n累计有效在线 4657 分钟','Other requirements and CRLF snapshots retain the actual threshold');
+assert(a.Show({...mapLevel,description:mapEffects,unlock_condition:'累计有效在线时长：150小时'},'map_level',firstCard));
+assert.equal(a.elements.Effect.text,mapEffects);assert(a.elements.Condition.text.startsWith('解锁条件：\n累计有效在线时长：150小时'),'Structured conditions use the same lower section');
+delete cfg.ArchiveHandoff.FormatEffects;
+assert(a.Show({...item,description:'累计有效在线时长：90小时\n攻击力+5'},'ex',firstCard));assert.equal(a.elements.Effect.text,'累计有效在线时长：90小时\n攻击力+5','Only map level tooltips move the online requirement');assert.equal(a.elements.Condition.text,'');assert.equal(a.elements.Condition.visible,false,'Changing categories clears the map unlock section');
+assert(a.Show(item,'ex',firstCard));
 assert.notEqual(a.panel,b.panel);assert.notEqual(a.elements.Backing,b.elements.Backing);assert.equal(a.elements.Surface.hittest,true);assert.equal(a.panel.hittest,false,'Shadow bounds do not steal card input');
 function corners(tip){return ['Backing','Frame'].map(role=>tip.elements[role].Children().filter((_,index)=>[0,2,6,8].includes(index)).map(clip=>({width:clip.style.width,height:clip.style.height,artWidth:clip.Children()[0].style.width,artHeight:clip.Children()[0].style.height})));}
 const shortCorners=corners(a),shortHeight=a.Inspect().surfaceHeight;a.Show({...item,description:'长说明\n'.repeat(150)},'ex',firstCard);h.flushFinite();assert.deepEqual(corners(a),shortCorners,'Changing content height never stretches material corners');assert(a.Inspect().surfaceHeight>shortHeight,'Long content actually changes the material height');assert.equal(a.Inspect().nineSlices.Backing.count,9);assert.equal(a.Inspect().nineSlices.Frame.count,9);

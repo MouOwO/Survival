@@ -191,9 +191,17 @@
             }
             elements.EffectCaption.text="道具效果";
             var description=String(item.description||"服务端未提供效果说明"), effect=elements.Effect;
+            var details=item.unlock_condition||item.condition_text||"";
+            if (category==="map_level") {
+                var onlineRequirement=description.match(/^累计有效在线时长[：:][^\r\n]+(?:\r?\n|$)/);
+                if (onlineRequirement) {
+                    description=description.slice(onlineRequirement[0].length);
+                    if (!details) details=onlineRequirement[0].trim();
+                }
+                if (details) details="解锁条件：\n"+details;
+            }
             effect.html=!!A.FormatEffects;
             effect.text=A.FormatEffects ? A.FormatEffects(description,category==="fragment" ? (item.level===undefined ? 0 : item.level) : undefined,item.id ? state : undefined) : description;
-            var details=item.unlock_condition||item.condition_text||"";
             if(/^vip_privilege_/.test(String(item.id||"")))details=String(details).replace("手动免费领取一次","达标自动赠送一次");
             if (category==="work" || category==="building") details+=(details?"\n":"")+(Number(item.completed)===1 ? "已达到最高等级" : "点击"+(category==="building"?"升级":"激活")+" · 消耗 "+item.cost+(category==="building"?" 信仰值":" 软妹币"));
             if (category==="titles") details+=(details?"\n":"")+(Number(item.equipped)===1 ? "当前已穿戴 · 点击恢复最高档自动选择" : state ? "点击穿戴称号" : "达成条件后解锁称号");
