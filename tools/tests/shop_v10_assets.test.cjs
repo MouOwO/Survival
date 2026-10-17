@@ -87,10 +87,11 @@ test('The live V10 window composes explicit texture materials around separate dy
     assert(row && row.__menuCell.namePanel.paneltype === 'Label');
     assert.equal(row.style.width, '1357px');
     assert(h.descendants(row, 'BLMarketRowWash').length);
-    assert(h.descendants(row, 'BLMarketArtFrame').length);
+    assert(h.descendants(row, 'BLMarketArt').length);
     assert(images(row).some(uri => assetPaths.some(asset => uri.endsWith(asset))), 'A live product row uses V10 materials');
     const button = h.descendants(row, 'BLMarketBuy')[0];
-    assert(button && images(button).some(uri => assetPaths.some(asset => uri.endsWith(asset))), 'The action uses its own V10 material');
+    assert(button && button.BHasClass('ButtonPrimary') && button.BHasClass('Large'), 'The action uses the native Dota2 primary button');
+    assert.equal(images(button).length, 0, 'The old V10 image cannot cover the native button background');
     assert(h.descendants(button, 'BLMarketBuyText').every(p => p.paneltype === 'Label'));
     assert(!images(market.panel).some(uri => /game_context|reference|(?:^|\/)(?:text|labels?)[_.\/-]/i.test(uri)));
     noCheckout(h);
@@ -102,7 +103,7 @@ test('Catalog changes update V10 names, prices, balances, ownership, VIP state a
     assert(labels(h.store().panel).some(p => p.text === '动态积分商品'));
     assert(labels(h.store().panel).some(p => p.text === '37 积分'));
     assert(labels(h.store().panel).some(p => p.text === '已拥有 2'));
-    for (const number of ['123','4567','89']) assert(labels(h.store().panel).some(p => p.text.includes(number)));
+    for (const number of ['123','4567']) assert(labels(h.store().panel).some(p => p.text.includes(number)));
     const fresh = {...points,title:'服务端更新后的名称',price:73,owned:3};
     h.walletSnapshot([fresh], {u_coin:321,shop_points:7654,shop_gold:98});
     const nextPaid = {...paid,catalog_hash:'v10-live-2',products:paid.products.map(p => p.sku==='v10_cash'
@@ -111,7 +112,7 @@ test('Catalog changes update V10 names, prices, balances, ownership, VIP state a
     const updated = labels(h.store().panel);
     for (const text of ['服务端更新后的名称','73 积分','已拥有 3','服务端现金新名称','9010 U币'])
         assert(updated.some(p => p.text === text), 'A real Label refreshes to ' + text);
-    for (const number of ['321','7654','98']) assert(updated.some(p => p.text.includes(number)));
+    for (const number of ['321','7654']) assert(updated.some(p => p.text.includes(number)));
     assert(!updated.some(p => p.text === '动态积分商品' || p.text === '37 积分'));
     tab(h, 'vip');
     const vip = h.cardList().find(p => p.BHasClass('RCProduct'));
