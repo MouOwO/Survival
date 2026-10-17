@@ -153,11 +153,21 @@
 .BLMarketDetail VerticalScrollBar .ScrollThumb,
 .BLMarketDetail .VerticalScrollBar .ScrollThumb { background-image:none; background-color:#a99769b8; border:0px; border-radius:0px; }
 
-/* Hide only the product-list bar; the list still scrolls with the mouse wheel. */
+/* Overlay the native drag track at the right edge, outside the flowing rows. */
 .BLMarketWindow #BlackLionMarketList VerticalScrollBar,
 .BLMarketWindow #BlackLionMarketList .VerticalScrollBar {
-    width:0px; opacity:0; visibility:collapse;
+    width:12px; height:100%; horizontal-align:right; vertical-align:top;
+    ignore-parent-flow:true; layout-position:fixed; z-index:50; margin:0px; padding:0px;
+    background-image:none; background-color:#171a16dd; border:1px solid #82734c88;
+    opacity:1; visibility:visible;
 }
+.BLMarketWindow #BlackLionMarketList VerticalScrollBar .ScrollThumb,
+.BLMarketWindow #BlackLionMarketList .VerticalScrollBar .ScrollThumb {
+    width:100%; min-height:40px; margin:0px; padding:0px;
+    background-image:none; background-color:#c3ae78ee; border:1px solid #e0c992; border-radius:2px;
+}
+.BLMarketWindow #BlackLionMarketList VerticalScrollBar .ScrollThumb:hover,
+.BLMarketWindow #BlackLionMarketList .VerticalScrollBar .ScrollThumb:hover { brightness:1.18; }
 
 /* Reviewed video bundles: compact member list and one complete effect at a time. */
 .BLMarketDetail.VideoBundleDetail .RCPurpleDetailIcon { width:44px; height:44px; margin-bottom:4px; }
