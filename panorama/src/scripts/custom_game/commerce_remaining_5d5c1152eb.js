@@ -55,8 +55,7 @@
     function enabled(value){return value===true || value===1;}
     function purchaseLabel(item) { if(item.disabled_reason==="bundle_pending_assets")return "待开放 · 查看";return item.purchase_method==="wallet"?"查看 / 兑换":item.disabled_reason==="payment_catalog_pending"?"连接支付目录":item.disabled_reason==="payment_product_unavailable" || item.disabled_reason==="payment_price_unavailable"?"人民币购买尚未开放":enabled(item.enabled)?"查看 / 购买":item.owned>0?"已拥有 · 查看":"查看奖励"; }
     function noticeText(){
-        var b=walletCatalog.balances||{};
-        return (walletCatalog.error?walletCatalog.error+" · ":"")+"人民币直购 · 1元=1000U币 · 商城积分："+(b.shop_points===undefined||b.shop_points===null?"—":b.shop_points);
+        return walletCatalog.error||"";
     }
     function singleTicket() {
         // A bundle containing tickets is not a single-ticket purchase.

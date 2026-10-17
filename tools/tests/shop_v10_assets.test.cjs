@@ -65,7 +65,7 @@ test('V10 uses 48 explicit texture resources backed by component PNGs and exclud
 test('The live V10 window composes explicit texture materials around separate dynamic labels and controls', () => {
     const {h} = fixture(), market = h.store();
     assert.equal(market.panel.style.width, '1380px');
-    assert.equal(market.panel.style.height, '974px');
+    assert.equal(market.panel.style.height, '946px');
     assert.equal(market.layout, 'black_lion_list', 'The existing controller layout contract remains stable');
     assert.equal(market.skinVersion, 10, 'The assembled window identifies its V10 skin');
     assert.equal(market.listWidth, 1357);

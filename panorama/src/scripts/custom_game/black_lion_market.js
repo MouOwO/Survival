@@ -19,11 +19,12 @@
     function currencyAsset(currency,row){return currency==="shop_points"?"balance_point_icon":currency==="shop_gold"?"balance_shop_icon":row?row+"_coin":"balance_u_icon";}
     function template(index){var prefix="vip"+(4+(index%7)),wash=layer(prefix+"_row_wash");return {prefix:prefix,wash:wash};}
     function relativeArt(parent,id,wash,cls){var r=layer(id);return art(parent,id,cls,r.x-wash.x,r.y-wash.y);}
+    function windowHeight(){return layer("footer_base").y+52;}
     M.Window=function(root,onClose){
-        var d=design(),w=d.width,h=d.height,fittedScale=null;
+        var d=design(),w=d.width,h=windowHeight(),footerY=layer("footer_base").y,fittedScale=null;
         var scrim=make("Button",root,"","BLMarketBackdrop"),p=make("Panel",root,"BlackLionMarketWindow","BLMarketWindow BLMarketV10");
         var canvas=box(make("Panel",p,"","BLMarketCanvas"),0,0,w,h);canvas.hittestchildren=true;
-        art(canvas,"window_substrate","BLMarketTexture");art(canvas,"header_base","BLMarketHeaderTexture");art(canvas,"footer_base","BLMarketFooterTexture",undefined,undefined,undefined,undefined,5);
+        art(canvas,"window_substrate","BLMarketTexture",0,0,w,h);art(canvas,"header_base","BLMarketHeaderTexture");art(canvas,"footer_base","BLMarketFooterTexture",1,footerY,w-2,h-footerY,5);
         var title=layer("title");box(label(canvas,"商城","BLMarketTitle"),title.x,title.y,430,title.height);
         var balance=box(make("Panel",canvas,"","BLMarketBalance"),735,18,550,48),balanceLabels=[];
         ["U币","积分","商城金币"].forEach(function(name,i){
@@ -32,7 +33,7 @@
             balanceLabels.push(box(label(group,name+" —","BLMarketBalanceText"),42,2,i===2?162:113,43));
         });
         var c=layer("close_button"),close=box(make("Button",canvas,"","BLMarketClose"),c.x,c.y,c.width,c.height);close.hittestchildren=false;
-        var shell=U.ModalShell.Adopt({id:"commerce",panel:p,root:root,scrim:scrim,closeButton:close,width:w,height:h,fit:{widthFraction:.94,heightFraction:.90},onFit:function(scale){fittedScale=scale;var rw=(root.actuallayoutwidth||1672)/(root.actualuiscale_x||1),rh=(root.actuallayoutheight||941)/(root.actualuiscale_y||1);p.style.horizontalAlign="left";p.style.verticalAlign="top";p.style.transformOrigin="0% 0%";p.style.position=((rw-w*scale)/2).toFixed(3)+"px "+((rh-h*scale)/2).toFixed(3)+"px 0px";},onClose:onClose});
+        var shell=U.ModalShell.Adopt({id:"commerce",panel:p,root:root,scrim:scrim,closeButton:close,width:w,height:h,fit:{widthFraction:.94,heightFraction:.90*h/d.height},onFit:function(scale){fittedScale=scale;var rw=(root.actuallayoutwidth||1672)/(root.actualuiscale_x||1),rh=(root.actuallayoutheight||941)/(root.actualuiscale_y||1);p.style.horizontalAlign="left";p.style.verticalAlign="top";p.style.transformOrigin="0% 0%";p.style.position=((rw-w*scale)/2).toFixed(3)+"px "+((rh-h*scale)/2).toFixed(3)+"px 0px";},onClose:onClose});
         p.style.width=w+"px";p.style.height=h+"px";p.style.backgroundColor="#22201dff";p.style.border="0px";p.style.backgroundImage="none";scrim.style.backgroundColor="#00000035";
         close.Children().forEach(function(child){child.visible=false;});art(close,"close_button","",0,0,c.width,c.height);
         var tabs=box(make("Panel",canvas,"BlackLionMarketTabs","BLMarketTabs"),14,83,1357,60);
@@ -48,13 +49,13 @@
         typeOptions.forEach(function(option){var button=make("Button",typeMenu,"BLMarketPurchaseType_"+option.id,"BLMarketPurchaseTypeOption");button.hittestchildren=false;label(button,option.label,"");typeButtons[option.id]=button;button.SetPanelEvent("onactivate",function(){hideTypeMenu();if(typeCallback)typeCallback(option.id);});});
         typeButton.hittestchildren=false;typeButton.SetPanelEvent("onactivate",function(){typeLayer.visible=!typeLayer.visible;});dismiss.SetPanelEvent("onactivate",hideTypeMenu);
         var content=box(make("Panel",canvas,"BlackLionMarketList","BLMarketList"),14,207,1357,687);content.hittestchildren=true;
-        var actions=box(make("Panel",canvas,"","BLMarketFooter"),14,910,1357,48);
+        var actions=box(make("Panel",canvas,"","BLMarketFooter"),14,898,1357,44);
         var details=box(make("Panel",canvas,"","BLMarketDetailLayer"),0,0,w,h);details.style.overflow="noclip";details.style.zIndex="50";details.hittest=false;details.hittestchildren=true;
         art(canvas,"window_brush_edge","BLMarketFrameTexture",0,0,w,h,5);
         var menu={panel:p,shell:shell,canvas:canvas,content:content,actions:actions,detailLayer:details,sidebar:tabs,listWidth:1357,width:w,height:h,skinVersion:10,layout:"black_lion_list",
             Open:function(){shell.Open();},Close:function(){hideTypeMenu();shell.Close();},Dispose:function(){hideTypeMenu();shell.Dispose();},IsOpen:function(){return shell.IsOpen();},
             SetPurchaseType:function(value,select){typeCallback=select;typeOptions.forEach(function(option){var chosen=option.id===value;typeButtons[option.id].SetHasClass("UISelected",chosen);if(chosen)typeLabel.text=option.label;});},
-            Scale:function(){if(fittedScale!==null)return fittedScale;var rw=(root.actuallayoutwidth||1672)/(root.actualuiscale_x||1),rh=(root.actuallayoutheight||941)/(root.actualuiscale_y||1);return Math.min(rw*.94/w,rh*.90/h);},
+            Scale:function(){if(fittedScale!==null)return fittedScale;var rw=(root.actuallayoutwidth||1672)/(root.actualuiscale_x||1),rh=(root.actuallayoutheight||941)/(root.actualuiscale_y||1);return Math.min(rw*.94/w,rh*.90/d.height);},
             SetSidebar:function(groups,selected,select){tabs.RemoveAndDeleteChildren();groups.forEach(function(group,i){
                 var r=layer("tab_"+i+"_base"),b=box(make("Button",tabs,"BLMarketSection_"+group.id,"RCTab BLMarketTab"),r.x-14,0,r.width,r.height);b.hittestchildren=false;b.SetHasClass("UISelected",selected===group.id);
                 art(b,selected===group.id?"tab_3_base":i===3?"tab_1_base":"tab_"+i+"_base","BLMarketTabTexture",0,0,r.width,r.height);
@@ -94,7 +95,7 @@
         var buyText=label(buy,available?(item.purchase_method==="wallet"?"兑换":"购买"):"暂不可购","BLMarketBuyText");buyText.style.width="fit-children";buyText.style.maxWidth=(b.width-16)+"px";buyText.style.height="fit-children";buyText.style.position="0px 0px 0px";buyText.style.horizontalAlign="center";buyText.style.verticalAlign="center";buyText.style.margin="0px";buyText.style.padding="0px";buyText.style.textAlign="center";
         var cond=layer(t.prefix+"_condition"),reasonText=box(label(row,reason,"BLMarketDisabledReason"),cond.x-r.x,cond.y-r.y,176,32);reasonText.visible=!!reason;
         buy.enabled=available;buy.SetHasClass("UIDisabled",!available);buy.SetPanelEvent("onactivate",function(){if(valid(row)&&buy.enabled&&props.action){props.action();return true;}});
-        row.__menuCell={iconPanel:well,namePanel:name,countPanel:owned};props.market=true;props.sourcePanel=well;props.sourceWidth=f.width;props.windowWidth=design().width;props.windowHeight=design().height;
+        row.__menuCell={iconPanel:well,namePanel:name,countPanel:owned};props.market=true;props.sourcePanel=well;props.sourceWidth=f.width;props.windowWidth=design().width;props.windowHeight=windowHeight();
         J.BindDetail(row,item,props,item.product_type==="bundle");return row;
     };
     M.GetWindow=function(){return lastWindow;};cfg.SurvivalBlackLionMarket=M;

@@ -1,5 +1,5 @@
 /* Final approved V10: independent source layers, with live text and catalog data. */
-.BLMarketWindow { width:1380px; height:974px; flow-children:none; padding:0px; margin:0px; background-image:none; background-color:#22201d; border:0px; border-radius:0px; box-shadow:#00000055 0px 4px 15px 1px; overflow:noclip; }
+.BLMarketWindow { width:1380px; height:946px; flow-children:none; padding:0px; margin:0px; background-image:none; background-color:#22201d; border:0px; border-radius:0px; box-shadow:#00000055 0px 4px 15px 1px; overflow:noclip; }
 .BLMarketWindow Label { font-family:"Source Han Sans SC"; font-weight:normal; color:#f5f2e6; text-shadow:#00000088 0px 1px 2px 1.0; }
 .BLMarketCanvas { width:100%; height:100%; flow-children:none; margin:0px; padding:0px; overflow:noclip; }
 .BLMarketTexture,.BLMarketHeaderTexture,.BLMarketFooterTexture,.BLMarketFrameTexture,.BLMarketRowWash,.BLMarketTabTexture,.BLMarketButtonTexture { opacity:1; saturation:1; brightness:1; margin:0px; padding:0px; }
@@ -34,7 +34,7 @@
 .BLMarketWindow .BLMarketBuy.BLMarketPending { brightness:.85; }
 .BLMarketWindow .BLMarketRow .BLMarketBuy .BLMarketBuyText { font-size:27px; line-height:36px; color:#f1eee5; text-shadow:#00000088 0px 1px 1px 1.0; white-space:nowrap; text-overflow:shrink; horizontal-align:center; vertical-align:center; font-weight:normal; }
 .BLMarketWindow .BLMarketRow .BLMarketDisabledReason { margin:0px; padding:0px; font-size:20px; line-height:26px; color:#faf2c9; text-shadow:none; text-align:center; white-space:nowrap; text-overflow:shrink; }
-.BLMarketWindow .BLMarketNotice { position:29px 914px 0px; width:860px; height:40px; margin:0px; padding:0px; font-size:24px; line-height:32px; color:#fffbd8; white-space:nowrap; text-overflow:shrink; }
+.BLMarketWindow .BLMarketNotice { position:29px 900px 0px; width:860px; height:32px; margin:0px; padding:0px; font-size:24px; line-height:32px; color:#fffbd8; white-space:nowrap; text-overflow:shrink; }
 .BLMarketWindow .BLMarketFooter { flow-children:none; margin:0px; padding:0px; background-image:none; background-color:transparent; border:0px; }
 .BLMarketWindow .BLMarketFooter .CJPager { position:920px 0px 0px; width:424px; height:44px; margin:0px; padding:0px; flow-children:right; horizontal-align:left; vertical-align:top; }
 .BLMarketWindow .BLMarketFooter .CJPageAction { width:104px; height:42px; margin:0px; padding:0px; flow-children:none; background-image:url("s2r://panorama/images/custom_game/shop_v10_v1/vip4_button_base_v10.vtex"); background-size:100% 100%; background-color:transparent; border:0px; }
