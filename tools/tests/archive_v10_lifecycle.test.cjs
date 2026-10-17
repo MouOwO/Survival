@@ -131,7 +131,7 @@ api.Open(); api.SelectCategory('shadow'); advance(.1);
 assert.equal(canvases().length, 1, 'Exactly one archive shell is constructed');
 assert.equal(cfg.SurvivalMenuV10.Entries().length, 0, 'The independent archive never adopts the global menu or its resource strip');
 assert.equal(cfg.SurvivalArchiveV10.Inspect().categories.length, 15, 'Archive retains its categories while the social and blessing pools use the independent collection window');
-for (const category of ['ex', 'friend', 'beast']) {
+for (const category of ['ex', 'friend', 'wife', 'beast']) {
     assert(!nodes.has('ArchiveV10Category_' + category), 'Migrated collection pool is absent from the fixed archive sidebar: ' + category);
     assert(!nodes.has('ArchiveTab_' + category), 'Migrated collection pool is absent from legacy archive navigation: ' + category);
 }

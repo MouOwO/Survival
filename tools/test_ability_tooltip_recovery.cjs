@@ -646,6 +646,44 @@ test('real building upgrades retain their upgrade category, progress and fields'
     assert(h.fieldContainer().__fieldRows.some(row=>row.__right.text==='主城等级提高'));
 });
 
+test('all archive challenge tooltips hide upgrade metadata and show only unmet requirements',()=>{
+    const definitions=fs.readFileSync(path.join(__dirname,
+        '../scripts/vscripts/config/generated/archive_challenge_definitions.lua'),'utf8');
+    const names=Array.from(definitions.matchAll(/challenge_id\s*=\s*"([^"]+)"/g),
+        match=>'ability_archive_'+match[1]).concat(['ability_archive_endless','ability_archive_finish']);
+    assert(names.length>10,'Exercise the configured archive challenge family');
+    for(const name of names){
+        const h=createHarness({unitName:'npc_archive_challenge_1',abilityNames:[name],panelCount:1});
+        const runtime={owner_entindex:827,ability_entindex:828,archive_challenge:1,
+            available:0,prerequisite_met:0,status_text:'需要当前关卡 N10',
+            fields:[{label:'解锁条件',value:'当前关卡≥N10'},{label:'挑战说明',value:'每局仅一次'}]};
+        h.setTable('survival_ability_runtime',828,runtime);h.runUntil(1.2);hoverFirstAbility(h);
+        assert(h.tooltip.BHasClass('ArchiveChallenge'),name+' uses the compact challenge presentation');
+        for(const id of ['CustomAbilityExtensionLabel','CustomAbilityLevel','CustomAbilityType'])
+            assert.equal(h.tooltip.FindChildTraverse(id).text,'',name+' omits '+id);
+        assert.deepEqual(Array.from(h.fieldContainer().__fieldRows).filter(row=>row.visible)
+            .map(row=>row.__left.text),['挑战说明'],name+' omits the duplicate unlock row');
+        assert(h.tooltip.BHasClass('Unavailable'));
+        assert.equal(h.tooltip.FindChildTraverse('CustomAbilityStatus').text,'需要当前关卡 N10');
+        h.setTable('survival_ability_runtime',828,{...runtime,
+            available:1,prerequisite_met:1,status_text:'可以挑战'},true);
+        assert(!h.tooltip.BHasClass('Unavailable'));
+        assert.equal(h.tooltip.FindChildTraverse('CustomAbilityStatus').text,'',
+            name+' hides status immediately once all conditions are met');
+    }
+});
+
+test('reusing an archive tooltip for a normal upgrade restores its presentation',()=>{
+    const h=createHarness({abilityNames:['ability_archive_shadow_1'],panelCount:1});
+    h.runUntil(1.2);hoverFirstAbility(h);assert(h.tooltip.BHasClass('ArchiveChallenge'));
+    h.replaceFirstAbility(9001,'ability_upgrade_city');h.runUntil(2.5);hoverFirstAbility(h);
+    assert(!h.tooltip.BHasClass('ArchiveChallenge'));
+    assert.equal(h.tooltip.FindChildTraverse('CustomAbilityExtensionLabel').text,'SURVIVAL · UPGRADE');
+    assert.notEqual(h.tooltip.FindChildTraverse('CustomAbilityLevel').text,'');
+    assert.equal(h.tooltip.FindChildTraverse('CustomAbilityType').text,'');
+    assert.notEqual(h.tooltip.FindChildTraverse('CustomAbilityStatus').text,'');
+});
+
 function earthLineLevelFields() {
     // Use the actual skill's long LV1 and LV5 descriptions as runtime payloads.
     // The tests exercise the real renderer and its panel pool, not CSS pixels.

@@ -5,7 +5,7 @@ const options = Array.from({length: 8}, (_, i) => ({training_id: 'worker_' + (i 
 const initial = model.TrainingSlots(options);
 assert.deepEqual(initial, ['worker_1', 'worker_2', 'worker_3', 'worker_4']);
 options[0].queued_count = 3;
-assert.deepEqual(model.TrainingSlots(options), initial, 'reserved slots stay visible');
+assert.deepEqual(model.TrainingSlots(options), ['worker_2', 'worker_3', 'worker_4', 'worker_5'], 'fully reserved levels immediately leave the training entrance list');
 options[0].count = 3;
 const hidden = model.TrainingSlots(options);
 assert.deepEqual(hidden, ['worker_2', 'worker_3', 'worker_4', 'worker_5'], 'completed levels are replaced immediately in ascending order');
@@ -55,8 +55,10 @@ assert.equal(sent.at(-1).payload.source_entindex, 10); assert.equal(sent.at(-1).
 assert.match(sent.at(-1).payload.request_id, /^production_train_/);
 const reserved = freshOptions(); reserved[0].queued_count = 3; reserved[0].available = 0; reserved[0].reason = 'training_max_count_reached';
 snapshot({options: reserved, queued: []});
-const beforeDisabled = sent.length; nodes.ProductionTrainingSlot0.handlers.onactivate();
-assert.equal(sent.length, beforeDisabled, 'reserved capacity prevents extra UI requests');
+assert.deepEqual(Array.from(hud.Inspect().slots), ['worker_2', 'worker_3', 'worker_4', 'worker_5'], 'reserved capacity replaces the capped entrance before completion');
+const beforeReplacement = sent.length; nodes.ProductionTrainingSlot0.handlers.onactivate();
+assert.equal(sent.length, beforeReplacement + 1, 'the replacement training level can be queued');
+assert.equal(sent.at(-1).payload.training_id, 'worker_2', 'a replaced card never retains the previous training identity');
 assert.equal(nodes.ProductionTrainingSlot0.visible, true);
 reserved[0].count = 3;
 snapshot({options: reserved, queued: []}); refresh();
@@ -314,17 +316,22 @@ unit=11;refresh();
 const expensive=freshOptions();expensive[0].cost_wood=123456789;
 snapshot({options:expensive,queued:[],queue_capacity:7});
 const costLabel=nodes.ProductionTrainingSlot0.children.find(child=>child.classes.has('ProductionTrainingCost'));
-assert.equal(costLabel.text,'木 1.2亿','large prices use the shared compact number format instead of shrinking the cost font');
+assert.equal(costLabel.text,'1.2亿','large prices use the shared compact number format beside the wood Image');
+assert(nodes.ProductionTrainingSlot0.children.some(child=>child.type==='Image'&&/^file:\/\/\{images\}\/custom_game\/hud_resources_v2\/wood\.svg$/.test(child.image||'')),'wood is an Image rather than a Chinese prefix');
 nodes.ProductionTrainingSlot0.handlers.onmouseover();
 assert(dispatched.at(-1)[2].includes('123456789'),'full authoritative cost remains available in the training tooltip');
-assert(Number(costLabel.style.width.replace('px',''))>=120,'training prices retain enough width at the minimum panel size');
+const woodIcon=nodes.ProductionTrainingSlot0.children.find(child=>child.type==='Image'&&/^file:\/\/\{images\}\/custom_game\/hud_resources_v2\/wood\.svg$/.test(child.image||''));
+assert(parseFloat(woodIcon.style.position.split(' ')[0])+parseFloat(woodIcon.style.width)<=parseFloat(costLabel.style.position.split(' ')[0]),'the wood icon and cost label do not overlap');
+assert(parseFloat(costLabel.style.position.split(' ')[0])+parseFloat(costLabel.style.width)<=parseFloat(nodes.ProductionTrainingSlot0.style.width),'the compact cost row fits the card width');
 const card=nodes.ProductionTrainingSlot0;
-const textRows=['ProductionTrainingCount','ProductionTrainingCost','ProductionTrainingLock'].map(name=>card.children.find(child=>child.classes.has(name)));
+const textRows=['ProductionTrainingCount','ProductionTrainingCost'].map(name=>card.children.find(child=>child.classes.has(name)));
 for(let index=0;index<textRows.length-1;index++) {
     const bottom=parseFloat(textRows[index].style.position.split(' ')[1])+parseFloat(textRows[index].style.height);
     assert(bottom<=parseFloat(textRows[index+1].style.position.split(' ')[1]),'larger count/cost/action rows must not overlap');
 }
-assert(parseFloat(textRows[2].style.position.split(' ')[1])+parseFloat(textRows[2].style.height)<=parseFloat(card.style.height),'the last enlarged text row fits inside the card');
+assert(parseFloat(textRows[1].style.position.split(' ')[1])+parseFloat(textRows[1].style.height)<=parseFloat(card.style.height),'the last visible text row fits inside the compact card');
+assert.equal(card.children.find(child=>child.classes.has('ProductionTrainingLevel')).visible,false,'the annotated card LV caption is hidden');
+assert.equal(card.children.find(child=>child.classes.has('ProductionTrainingLock')).visible,false,'the annotated card action caption is hidden');
 console.log('PRODUCTION_HUD_PASS: queue routing and private snapshots, six waiting cells plus current task, ordinary/advanced parity, full long-name tooltip, readable compact costs, larger physical text and exact occlusion');
 unit=20; refresh();
 const beforeLockedQueue=sent.length;
@@ -429,11 +436,12 @@ for (const [index, code, label] of [[0, 'wood_not_enough', '木材不足'],
         queued: [{...waitingWorker, job_id: 11, level: 2}, {...waitingWorker, job_id: 12, level: 3}]},
         {refresh_sequence: 11000 + index}); refresh();
     assert.equal(nodes.ProductionMode.text, label);
-    assert.equal(nodes.ProductionFooter.text, label);
+    assert.equal(nodes.ProductionFooter.visible, false, 'the removed training footer is not rendered');
     assert.equal(nodes.ProductionRemaining.text, '等待');
     assert.equal(nodes.ProductionProgressTrack.visible, false, 'blocked training does not show a progress bar');
     assert.equal(nodes.ProductionProgressFill.style.width, '0%');
-    assert.equal(nodes.ProductionJobName.text, '等待训练：伐木工 LV1');
+    assert.equal(nodes.ProductionJobName.visible, false, 'the redundant training-name row is not rendered');
+    assert.equal(nodes.ProductionTrainingCurrentCell.job.job_id, waitingWorker.job_id, 'the blocked head occupies the current-task frame');
     assert.equal(nodes.ProductionQueue.text, '等待 2/6');
     assert.equal(nodes.ProductionQueueSlot0.level.text, 'LV2');
 }

@@ -74,7 +74,7 @@ function harness(filename, oldPlace = false) {
     const nodes = {};
     const navKeys=['return','treasure','archive','lottery','benefit','shop','survival_shop','vip'];
     for(const key of navKeys)for(const prefix of ['HandoffNavGlow_','HandoffNavIcon_','HandoffNavCaptionHost_','HandoffNavCaption_','HandoffNavUnderline_'])nodes[prefix+key]=panel(prefix+key);
-    for(const id of ['HandoffName','HandoffNameBounds','HandoffBuildingTitle','HandoffBuildingTitleBounds','HandoffBuildingLevel','HandoffBuildingSummary','HandoffBuildingBonus','HandoffBuildingHealthBonus','HandoffBuildingPercent','HandoffBuildingHealthPercent'])nodes[id]=panel(id);
+    for(const id of ['HandoffName','HandoffNameBounds','HandoffBuildingTitle','HandoffBuildingTitleBounds','HandoffBuildingLevel','HandoffBuildingSummary','HandoffBuildingBonus','HandoffBuildingHealthBonus','HandoffBuildingPercent','HandoffBuildingHealthPercent','HandoffBuildingStatIcon','HandoffBuildingSpeedIcon','HandoffBuildingSpeed'])nodes[id]=panel(id);
     for (const type of ['hp', 'mp']) {
         for (const suffix of ['track', 'fill', 'value', 'valueBounds']) {
             const id = 'Handoff_' + type + '_' + suffix;
@@ -111,6 +111,7 @@ function harness(filename, oldPlace = false) {
         center: panel('center'), inventory: panel('inventory-decoration'),
         natives: nativePanels, slotFrames: Array.from({length: 6}, (_, i) => panel('slot-frame-' + i)),
         ready: false, sequence: 1, geometry: null, lastSignature: '', missing: [],
+        layoutRevision:0,layoutRepairAt:0,layoutPanels:[],layoutNativeWrappers:[],
         presented: false, stableFrames: 0, bootSignature: '',
         currentEntries: [{ability: 101}, {ability: 102}, {ability: 103}],
         native: id => nativePanels[id] || null,
@@ -119,7 +120,7 @@ function harness(filename, oldPlace = false) {
         refreshInventoryPresentation() {}, square() {}, nine() {},layoutStats(){},
         stats: [], topButtons: Object.fromEntries(navKeys.map(key=>[key,panel(key)])), text() {}, available: () => false,syncActiveNav(){},
         buildingInlineIds:['HandoffBuildingSummary','HandoffBuildingBonus','HandoffBuildingPercent','HandoffBuildingHealthPercent'],buildingStatRow:panel('buildingStatRow'),slices:{},assets:{hp_fill:{file:'hp.png'}},
-        __mirrorCalled: () => { mirrorCalls++; }, mirrorKeys() {},
+        __mirrorCalled: () => { mirrorCalls++; }, mirrorKeys() {},recoverReadyHotkeyMirror(){},
         __navCalled:()=>{navCalls++;},__nativeCalled:()=>{nativeCalls++;},
         art(parent, id) { return (nodes[id] = panel(id, parent)); },
         centered() {},
@@ -135,6 +136,7 @@ function harness(filename, oldPlace = false) {
         source.includes('    function nativeAbilityWrappers(')?between(source,'    function nativeAbilityWrappers(',source.includes('    function findCached(')?'    function findCached(':'    function style('):'',
         helpers,
         source.includes('    function findCached(')?between(source,'    function findCached(','    function style('):'function findCached(p,id){return p.FindChildTraverse(id);}',
+        source.includes('    function actionOffset(')?between(source,'    function actionOffset(','    function fitNativeSkills('):'',
         source.includes('    function navBounds(')?between(source,'    function navBounds(','    // Navigation icons'): '',
         between(source, '    function canvas(', '    // Called synchronously'),
         between(source, '    function child(', '    function square('),
@@ -166,7 +168,7 @@ for (const filename of [loadedHud, 'handoff_hud.js']) {
     const old = harness(filename, true);
     for (let i = 0; i < 6; i++) old.refresh();
     assert.equal(old.warnings.length, 6, filename + ': original bug must reproduce on every refresh');
-    assert(old.warnings.every(message => message.includes('1.1368683772161603e-13px')));
+    assert(old.warnings.every(message => message.includes('1.1368683772161603e-13px')),JSON.stringify(old.warnings));
     assert.equal(old.context.presented, false);
     assert.equal(old.host.style.opacity, '0');
     assert(old.ctx.classes.has('HandoffBoot'));

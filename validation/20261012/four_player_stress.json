@@ -1,0 +1,625 @@
+{
+  "date": "2026-10-12",
+  "phase": "final",
+  "validation_mode": "real_production_modules_with_simulated_engine_and_transport",
+  "domain_execution": "same ten parameters; three isolated domain runs per case",
+  "four_network_clients": false,
+  "live_account_or_payment_writes": false,
+  "rounds": [
+    {
+      "case_id": "A1",
+      "scenario": "A",
+      "round": 1,
+      "seed": 12011,
+      "difficulty": "N1",
+      "map_levels": [
+        1,
+        9,
+        17,
+        24
+      ],
+      "sole_defender": null,
+      "domains": {
+        "technology": {
+          "checks": 3162,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 1428,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 165,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 4755,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "A2",
+      "scenario": "A",
+      "round": 2,
+      "seed": 12037,
+      "difficulty": "N3",
+      "map_levels": [
+        3,
+        12,
+        20,
+        30
+      ],
+      "sole_defender": null,
+      "domains": {
+        "technology": {
+          "checks": 3354,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 1427,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 166,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 4947,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "A3",
+      "scenario": "A",
+      "round": 3,
+      "seed": 12071,
+      "difficulty": "N6",
+      "map_levels": [
+        7,
+        16,
+        28,
+        34
+      ],
+      "sole_defender": null,
+      "domains": {
+        "technology": {
+          "checks": 3546,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 1426,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 166,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 5138,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "A4",
+      "scenario": "A",
+      "round": 4,
+      "seed": 12109,
+      "difficulty": "N9",
+      "map_levels": [
+        8,
+        18,
+        25,
+        32
+      ],
+      "sole_defender": null,
+      "domains": {
+        "technology": {
+          "checks": 3738,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 1428,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 171,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 5337,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "A5",
+      "scenario": "A",
+      "round": 5,
+      "seed": 12143,
+      "difficulty": "N10",
+      "map_levels": [
+        10,
+        19,
+        26,
+        33
+      ],
+      "sole_defender": null,
+      "domains": {
+        "technology": {
+          "checks": 3930,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 1427,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 169,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 5526,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "B1",
+      "scenario": "B",
+      "round": 1,
+      "seed": 13011,
+      "difficulty": "N1",
+      "map_levels": [
+        1,
+        9,
+        17,
+        24
+      ],
+      "sole_defender": 0,
+      "domains": {
+        "technology": {
+          "checks": 2403,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 2536,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 168,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 5107,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "B2",
+      "scenario": "B",
+      "round": 2,
+      "seed": 13037,
+      "difficulty": "N3",
+      "map_levels": [
+        3,
+        12,
+        20,
+        30
+      ],
+      "sole_defender": 1,
+      "domains": {
+        "technology": {
+          "checks": 2547,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 2535,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 169,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 5251,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "B3",
+      "scenario": "B",
+      "round": 3,
+      "seed": 13071,
+      "difficulty": "N6",
+      "map_levels": [
+        7,
+        16,
+        28,
+        34
+      ],
+      "sole_defender": 2,
+      "domains": {
+        "technology": {
+          "checks": 2691,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 2534,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 169,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 5394,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "B4",
+      "scenario": "B",
+      "round": 4,
+      "seed": 13109,
+      "difficulty": "N9",
+      "map_levels": [
+        8,
+        18,
+        25,
+        32
+      ],
+      "sole_defender": 3,
+      "domains": {
+        "technology": {
+          "checks": 2835,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 2533,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 174,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 5542,
+      "failures": 0,
+      "passed": true
+    },
+    {
+      "case_id": "B5",
+      "scenario": "B",
+      "round": 5,
+      "seed": 13143,
+      "difficulty": "N10",
+      "map_levels": [
+        10,
+        19,
+        26,
+        33
+      ],
+      "sole_defender": 0,
+      "domains": {
+        "technology": {
+          "checks": 2979,
+          "failures": 0,
+          "passed": true
+        },
+        "waves": {
+          "checks": 2533,
+          "failures": 0,
+          "passed": true
+        },
+        "rewards": {
+          "checks": 172,
+          "failures": 0,
+          "passed": true
+        }
+      },
+      "checks": 5684,
+      "failures": 0,
+      "passed": true
+    }
+  ],
+  "checks": 52681,
+  "failures": 0,
+  "passed_rounds": 10,
+  "processes": [],
+  "release_pending": true,
+  "current_runtime_archive_bundle": "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4",
+  "production_sha256": {
+    "scripts/vscripts/systems/building_upgrade_system.lua": "14d88840a3bc0158978c9f525bb2189c9821a56195285b1deb4c081664a890f7",
+    "scripts/vscripts/systems/hero_combat_stat_service.lua": "9dd7181679ac9c5b09b058062d26eca2c8ebb86e74e22b93130e6e5c3e6dcd64",
+    "scripts/vscripts/systems/building_health_projection.lua": "70c37a2aae2663f5351a8283735469437ccbbf246141cbd568298f538937335b",
+    "scripts/vscripts/systems/wave_system.lua": "b769d10037b664ccb064ce2a5b30300c832b98e7461a8f05142793f0b5dfe177",
+    "scripts/vscripts/systems/wall_target_service.lua": "b2e28984ad65e87c60b2f73f1eaa92088994371d27f00e7408e955510e843f0c",
+    "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua": "dd5866d73529b7cd4b7d64830c244965394eea501474d154b42d832c985a73a6"
+  },
+  "boundaries": [
+    "Movement, navigation queries, collisions and delayed phase application use a deterministic engine model.",
+    "No four-client synchronization, real Workshop obstacle routing or GPU/frame-time measurement was performed.",
+    "Reward transport is local stdin/stdout; the Lua settlement worker runs against a local database fixture.",
+    "A/B combat roles limit towers; auxiliary hero/worker property and growth probes are separate from battle participation.",
+    "The tested new reward source bundle is not the currently selected deployed bundle."
+  ],
+  "simulation_passed": true,
+  "baseline": {
+    "checks": 52491,
+    "failures": 1925,
+    "passed_rounds": 0,
+    "production_sha256": {
+      "scripts/vscripts/systems/building_upgrade_system.lua": "a9bc9ac4d2517afbff1b53334483eb272f1268fd2cb783dec262e3c878b61f56",
+      "scripts/vscripts/systems/hero_combat_stat_service.lua": "4da7f854e10e8e95ddc9891dab7074346080a7a5dfbe8853ca9145d732890e2b",
+      "scripts/vscripts/systems/building_health_projection.lua": "6c9ce906110c707ec0ce384ca0f0e81fa42413d566d5295ac286cfb4738e82a6",
+      "scripts/vscripts/systems/wave_system.lua": "a8a0e1930fcc20e5a8d594b4bc05090ebc0abd9a09b8d071ab6e666678a2e593",
+      "scripts/vscripts/systems/wall_target_service.lua": null,
+      "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua": "3502bb75b241527ea7032a297043f845f0d4cf086405d2fb8893d35a2abad973"
+    }
+  },
+  "release_preparation": {
+    "status": "LOCAL_CANDIDATE_PREPARED_NOT_DEPLOYED",
+    "candidate_hash": "ea7babc0603ee41418a1738279e98011ae17602017fcb7d1040869583b15e995",
+    "current_selected_hash": "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4",
+    "release_directory": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\four_player_stress_20261012\\pkg\\r-ea7babc0",
+    "archive_path": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\four_player_stress_20261012\\pkg\\r-ea7babc0.tar.gz",
+    "archive_sha256": "d5ccd1c77b619ca898e5c2e43ca3744152c09c8f7a82b378473ab3dbaf164559",
+    "release_manifest": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\four_player_stress_20261012\\pkg\\r-ea7babc0\\release_manifest.json",
+    "manifest_sha256": "17c450a27e008e255cf26c4d534e69da94582fed408f952c3b6cbd425c794e9a",
+    "manifest_verified": true,
+    "source_sha256": {
+      "scripts/vscripts/systems/archive_settlement.lua": "84c3f96034fec210e00d7327488267ef3403aca050a743f40bae62be0d182fb9",
+      "scripts/vscripts/systems/archive_challenge_rewards.lua": "e38f32a6b2688f84ba2fb1478075979a27eafa8c5f8bb1d9671ad79be52c2b43",
+      "scripts/vscripts/systems/archive_cooperative_reward_policy.lua": "b2d759526502e75ecb338ed1b668201684335972b3213e21026c8f9dbbc47e79",
+      "server/archive_backend/worker.lua": "147e51088c0c1725baafacbf84cc5fc2d9e594ffb67ebe94fba8eb1615ddcbe1"
+    },
+    "backend_source_sha256": {
+      "server/archive_backend/service.py": "58aca31fdf98bcd796cefb84594091cddd22363300055cd2a930cba9536a806e",
+      "server/archive_backend/bundle.py": "1f17436f5541a76880e70a0c460e37250afb7736316d4d758ad3cc60f910ad1f",
+      "server/archive_backend/config_compatibility.py": "85bb98467941a6d03fddddc0e88580756571e009e082c5d7f758dfa8cb541c22"
+    },
+    "changed_configs": [
+      "archive_cooperative_reward_rules"
+    ],
+    "changed_sources": [
+      "systems/archive_challenge_rewards.lua",
+      "systems/archive_cooperative_reward_policy.lua",
+      "systems/archive_settlement.lua",
+      "worker.lua"
+    ],
+    "all_other_configs_preserved": true,
+    "commerce_lottery_player_stat_schema_preserved": true,
+    "legacy_bundle_hashes_preserved": [
+      "03e3dae78d6737ca98b1e038df0d1741bad13429c36e8f1afae21603a0dbce53",
+      "288f724bcfd79880c4fbd7d4ac77040a8636e2f8f3ef96836632001340d3b2a7",
+      "2f4ee5dc4b4ff35378ef8b33eecd3d2ae150555c093ddf55f0bc0777058f5b8d",
+      "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4",
+      "4b28247fa0bbabf0d220b4f178a9d8379fc54d362792b031fbfcd5a71c8bf20d",
+      "52705dcb84a6c7cf141fbd69144931d4d2dd6fdd490ed1736706ae523d0dc7ca",
+      "78b3d33d78e5bc4adc10dc15ae0bfe5f969f377a4ac0d6f0eadcacbbb98adb56",
+      "a3dd289ca22b5418e4da558a032857f6dc8a35131afa4ce6b978e9604589f255",
+      "b77d08405249e44cd8df5eb0a4972f18cb5fe6a2dffcf9aec1e482775d3037d9",
+      "c9c0b2ba60ee0368f92f3c1d6b21038743edfd33cc6aa2eb2b5c356a55103ef5"
+    ],
+    "legacy_compatibility": {
+      "288f724bcfd79880c4fbd7d4ac77040a8636e2f8f3ef96836632001340d3b2a7": {
+        "commands": [
+          "boss_kill",
+          "building_upgrade",
+          "challenge",
+          "clear",
+          "commerce_catalog",
+          "commerce_purchase",
+          "daily_claim",
+          "daily_init",
+          "endless",
+          "endless_reconcile",
+          "lottery_draw",
+          "lottery_exchange",
+          "lottery_read",
+          "lottery_snapshot",
+          "promotion",
+          "social_draw",
+          "starjoy_reconcile",
+          "title_equip",
+          "vip_claim",
+          "vip_purchase",
+          "welfare_reconcile",
+          "work_upgrade"
+        ],
+        "upgrade_commands": [
+          "boss_kill",
+          "building_upgrade",
+          "challenge",
+          "clear",
+          "daily_claim",
+          "daily_init",
+          "endless",
+          "endless_reconcile",
+          "promotion",
+          "social_draw",
+          "starjoy_reconcile",
+          "title_equip",
+          "vip_claim",
+          "vip_purchase",
+          "welfare_reconcile",
+          "work_upgrade"
+        ]
+      },
+      "2f4ee5dc4b4ff35378ef8b33eecd3d2ae150555c093ddf55f0bc0777058f5b8d": {
+        "commands": [
+          "boss_kill",
+          "building_upgrade",
+          "challenge",
+          "clear",
+          "commerce_catalog",
+          "commerce_purchase",
+          "daily_claim",
+          "daily_init",
+          "endless",
+          "endless_reconcile",
+          "lottery_draw",
+          "lottery_exchange",
+          "lottery_read",
+          "lottery_snapshot",
+          "promotion",
+          "social_draw",
+          "starjoy_reconcile",
+          "title_equip",
+          "vip_claim",
+          "vip_purchase",
+          "welfare_reconcile",
+          "work_upgrade"
+        ],
+        "upgrade_commands": [
+          "boss_kill",
+          "building_upgrade",
+          "challenge",
+          "clear",
+          "daily_claim",
+          "daily_init",
+          "endless",
+          "endless_reconcile",
+          "promotion",
+          "social_draw",
+          "starjoy_reconcile",
+          "title_equip",
+          "vip_claim",
+          "vip_purchase",
+          "welfare_reconcile",
+          "work_upgrade"
+        ]
+      },
+      "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4": {
+        "commands": [
+          "boss_kill",
+          "building_upgrade",
+          "challenge",
+          "clear",
+          "commerce_catalog",
+          "commerce_purchase",
+          "daily_claim",
+          "daily_init",
+          "endless",
+          "endless_reconcile",
+          "lottery_draw",
+          "lottery_exchange",
+          "lottery_read",
+          "lottery_snapshot",
+          "promotion",
+          "social_draw",
+          "starjoy_reconcile",
+          "title_equip",
+          "vip_claim",
+          "vip_purchase",
+          "welfare_reconcile",
+          "work_upgrade"
+        ],
+        "upgrade_commands": []
+      }
+    },
+    "candidate_validation": {
+      "passed": true,
+      "checks": 19,
+      "check_labels": [
+        "candidate_command_account_0",
+        "candidate_replay_no_increment_account_0",
+        "candidate_command_account_1",
+        "candidate_replay_no_increment_account_1",
+        "candidate_command_account_2",
+        "candidate_replay_no_increment_account_2",
+        "candidate_command_account_3",
+        "candidate_replay_no_increment_account_3",
+        "base_same_for_plain_VIP_expired_pass",
+        "own_valid_monthly_pass_three_items",
+        "each_non_pass_account_gets_unsplit_two_items",
+        "monthly_receives_shared_base_plus_own_extra",
+        "legacy_prepare_retains_original_hash",
+        "current_deployment_hash_accepted_by_candidate",
+        "old_prepared_uses_original_worker_bundle",
+        "retry_never_rewrites_receipt_hash",
+        "old_committed_receipt_replay_once",
+        "old_recorded_policy_keeps_personal_seed",
+        "unknown_hash_rejected"
+      ],
+      "evidence": {
+        "new_event_counts": [
+          {
+            "shadow_20": 2,
+            "shadow_23": 1
+          },
+          {
+            "shadow_20": 2
+          },
+          {
+            "shadow_20": 2
+          },
+          {
+            "shadow_20": 2
+          }
+        ],
+        "legacy_worker_bundle": "310d3063f3e320b4d541b8715d3e2005b08a68aacfabdf471da9d1c85380fca4",
+        "legacy_seed": 55052907,
+        "legacy_counts": {
+          "shadow_20": 1,
+          "shadow_21": 1
+        }
+      },
+      "real_lua_worker": true,
+      "database": "local fixture",
+      "live_requests": 0
+    },
+    "production_pointers_unchanged": true,
+    "deployment_execution": false,
+    "online_access": false,
+    "integration_requirements": [
+      "Review candidate archive_sync_config allowlist-only SQL, validate against PostgreSQL rollback fixture before execution.",
+      "Merge this archive-only overlay into a newly copied, verified current backend release; regenerate its complete manifest before manage.py prepare/activate.",
+      "Preserve current fishing API/payment/login sources, credentials, DB records, all old bundles and receipt fingerprints.",
+      "Switch game hash only after backend activation/config verification, then start a new match."
+    ],
+    "final_matrix": {
+      "path": "output\\four_player_stress_20261012\\reward_final.json",
+      "passed": true,
+      "rounds": 10,
+      "checks": 1689,
+      "receipts": 1404,
+      "typed_profile_checks": 160,
+      "tested_bundle_hash": "72cec817b8c0c47b9969ce3a4600d3a67506b2f449d761dfa5462b9c3bdaa778"
+    },
+    "candidate_matrix_scope": "19 real-worker focused checks; full final10 uses isolated workspace bundle, not candidate economic configuration",
+    "candidate_postgresql_validation_executed": false,
+    "full_backend_release_materialized": false,
+    "integration_document": "output\\four_player_stress_20261012\\reward_release_ready.md",
+    "deployment_paths_source": [
+      "tools/build_aliyun_release.py",
+      "server/aliyun/deploy/manage.py",
+      "docs/ALIYUN_TEST_MIGRATION.md"
+    ]
+  }
+}

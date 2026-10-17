@@ -9,7 +9,8 @@ import re
 
 ID=re.compile(r'[a-z][a-z0-9_]{2,63}\Z')
 SOURCES=('商店系统/entitlement_definitions.csv','玩家档案系统/player_gameplay_stats.csv',
-         '玩家档案系统/map_level_effect_rules.csv','抽奖系统/lottery_item_definitions.csv','抽奖系统/lottery_currency_definitions.csv')
+         '玩家档案系统/map_level_effect_rules.csv','抽奖系统/lottery_item_definitions.csv','抽奖系统/lottery_currency_definitions.csv',
+         '存档系统/archive_vip_rewards.csv','存档系统/archive_vip_levels.csv','商城兑换系统/commerce_import_status.csv')
 TABLES=('payment_categories','payment_products','payment_rewards')
 SUPPORTED_ENTITLEMENTS={'vip','archive_pass'}
 
@@ -129,9 +130,11 @@ def compile_catalog(tables,reference, *, max_products=100):
 
 def build(root):
     from .ucoin_catalog import COMMERCE_TABLES,compile_payment_catalog
+    from .commerce_bundles import MEMBER_TABLE,EMPTY_MEMBERS
     base=Path(root)/'data/csv'
     tables={name:(base/'商城支付系统'/f'{name}.csv').read_text(encoding='utf-8-sig') for name in TABLES}
-    commerce_tables={name:(base/'商城兑换系统'/f'{name}.csv').read_text(encoding='utf-8-sig') for name in COMMERCE_TABLES}
+    commerce_tables={name:((base/'商城兑换系统'/f'{name}.csv').read_text(encoding='utf-8-sig')
+        if (base/'商城兑换系统'/f'{name}.csv').is_file() else EMPTY_MEMBERS if name==MEMBER_TABLE else '') for name in COMMERCE_TABLES}
     reference={name:(base/name).read_text(encoding='utf-8-sig') for name in SOURCES}
     data=compile_payment_catalog(tables,commerce_tables,reference)
     return dict(tables=tables,commerce_tables=commerce_tables,

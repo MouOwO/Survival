@@ -1,5 +1,18 @@
 # Hammer 重开后认证助手无法连接
 
+## 2026-10-11：单机启动器与常驻助手争用控制台
+
+本机运行 `launch_aliyun_test_game.cmd`，地图预检曾通过，但认证注入报 `tools_server_confirmation_missing`。实测常驻 Python/Node 助手持有 29000 控制台连接；没有 VConsole GUI 或 MCP relay，启动器另建直连超时。正常停止助手后，同一运行地图的 probe 和 inject 均成功，确认是本机连接争用。
+
+- 单机启动器在隧道成功后读取 `Status -AsJson`，只暂停实际存活助手或已安装、启用且 Running/Queued 的任务。成功与异常退出均恢复原助手；停用或未安装的助手不被意外开启。LAN 仍按既有流程暂停助手，测试后手动恢复。
+- `run_hammer_backend.ps1` 改用 `WaitForExit()` 等待 Python 本体。旧 `Start-Process -Wait` 会等待所有后代，SSH 隧道仍运行时即使 Python/Node 已安全退出，任务也持续 Running。
+- Stop 严格要求 Python 退出码 0 及 `ok=true/status=stopped/stop_confirmed=true`。该确认表示实例锁、认证临时文件清理和控制台子进程均已释放，不再用任务 Running 误判。Start/Install 对已确认停止但旧包装器仍 Running 的情况隐藏启动已核验的本仓库 runner，保留旧包装器、游戏和 SSH。
+- 认证 Lua 返回与本次 nonce 绑定的固定错误码，区分临时文件读取、格式、令牌设置、设置验证和原流程恢复失败；不输出异常原文或凭据，也不自动重放可能已执行的注入。
+
+本机实测完整 `launch_aliyun_test_game.ps1 -AttachOnly -WaitSeconds 20` 退出码 0，返回 `GAME_AUTH_READY` 及 `HAMMER_BACKEND_RESUMED`；随后 JSON 状态为 `task_enabled=true/helper_running=true/helper_status=connected`。原 Dota PID 63024 与 SSH PID 63172、启动时间保持，未重开地图或重载已有档案。另一台实体电脑本轮是否完整加入尚未验证，不能把主机认证恢复当作双机验收。
+
+认证、启动器、Setup、runner 共 57 项测试，助手/传输/LAN 共 40 项及 Node 控制台 38 项通过；其中 LAN Lua 夹具明确指定本机实际 Lua 5.1 补跑，未把解释器发现跳过计为通过。恢复路径覆盖认证失败、停止失败、恢复未确认、停用旧任务和独立手动助手，保留原错误及启用策略。
+
 ## 2026-10-07：反复提示 Setup，控制台已经打开仍不能入场
 
 本次实测游戏和 SSH 隧道均在运行，ECS 健康/就绪检查通过，但助手持续

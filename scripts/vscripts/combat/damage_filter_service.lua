@@ -3,6 +3,7 @@ local tree_damage_rules = require("systems/tree_damage_rules")
 local anti_air_rules = require("systems/anti_air_rules")
 local global_rules = require("config/generated/global_rules")
 local armor_balance = require("config/armor_balance")
+local titan_aura_armor = require("systems/commerce_titan_aura_values")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 local endless_projection = require("combat/endless_stat_projection")
 local event_bus = nil
@@ -51,6 +52,34 @@ local function add_damage_flag(flags, flag)
     local value = math.max(0, math.floor(tonumber(flag) or 0))
     if value == 0 or math.floor(current / value) % 2 == 1 then return current end
     return current + value
+end
+
+local MOVEMENT_SLOW_MODIFIERS = {"modifier_tower_frost_slow", "modifier_tower_blizzard_slow"}
+local SCRIPTED_TOWER_ATTACK_SOURCES = {
+    tower_machine_gun_attack = "script",
+    tower_laser_attack = "script",
+    tower_multi_arrow = "splash",
+}
+local function scripted_tower_attack(attacker, record)
+    if not record or not tree_damage_rules.is_arrow_tower(attacker) then return false end
+    for _, tag in ipairs(record.tags or {}) do
+        if SCRIPTED_TOWER_ATTACK_SOURCES[tag] == record.source_kind then return true end
+    end
+    return false
+end
+local function movement_slowed(victim)
+    for _, modifier in ipairs(victim:FindAllModifiersByName("modifier_survival_managed_buff") or {}) do
+        if modifier.definition and modifier.definition.effect_type == "move_speed_pct"
+            and (tonumber(modifier.value) or 0) < 0 then return true end
+    end
+    for _, name in ipairs(MOVEMENT_SLOW_MODIFIERS) do
+        local modifier = victim:FindModifierByName(name)
+        if modifier and modifier.GetModifierMoveSpeedBonus_Percentage
+            and (tonumber(modifier:GetModifierMoveSpeedBonus_Percentage()) or 0) < 0 then
+            return true
+        end
+    end
+    return false
 end
 
 local function filter(_, keys)
@@ -194,19 +223,18 @@ local function filter(_, keys)
             + gameplay_bonus
             - target_reduction)
         * boss_multiplier
+    -- EX remains separate from normal research/archive/essence percentages.
+    -- Hero and hero-clone projections own this cache; towers do not receive it.
+    multiplier = multiplier
+        * (tonumber(attacker.survival_commerce_hero_ex_damage_multiplier) or 1)
     if tostring(victim.survival_encounter_id or ''):match('^encounter_rebirth_')
         and attacker.survival_hero_id and require('systems/commerce_effects').owned(attacker.survival_player_id,'sky_seal') then multiplier=multiplier*1.5 end
     if rogue_effect_state.has_effect(attacker.survival_player_id,
         "slowed_target_damage_taken_pct")
         and (victim.survival_is_wave_monster == true
             or victim.survival_is_challenge_monster == true)
-        and victim:FindModifierByName("modifier_survival_managed_buff") then
-        local slowed = false
-        for _, modifier in ipairs(victim:FindAllModifiersByName("modifier_survival_managed_buff") or {}) do
-            if modifier.definition and modifier.definition.effect_type == "move_speed_pct"
-                and (tonumber(modifier.value) or 0) < 0 then slowed = true break end
-        end
-        if slowed then multiplier = multiplier * 1.5 end
+        and movement_slowed(victim) then
+        multiplier = multiplier * 1.5
     end
     if anti_air_rules.has_damage_taken_aura(victim) then
         multiplier = multiplier * 1.2
@@ -223,8 +251,11 @@ local function filter(_, keys)
     local effective_war3_armor = nil
     local pierced_war3_armor = nil
     local armor_ignore_pct = tonumber(record and record.physical_armor_ignore_pct) or 0
-    if damage_type == DAMAGE_TYPE_PHYSICAL and is_basic_attack
-        and (attacker.survival_building_id == "arrow_tower"
+    -- Replacement tower attacks already contain logical damage. Their trusted
+    -- tags grant attack armor piercing without enabling native scale recovery.
+    if damage_type == DAMAGE_TYPE_PHYSICAL
+        and (is_basic_attack or scripted_tower_attack(attacker, record))
+        and (tree_damage_rules.is_arrow_tower(attacker)
             or (attacker.IsRealHero and attacker:IsRealHero())) then
         armor_ignore_pct = armor_ignore_pct + rogue_effect_state.numeric(
             attacker.survival_player_id, "physical_armor_ignore_pct"
@@ -237,8 +268,7 @@ local function filter(_, keys)
         and tonumber(victim.survival_armor_mapping_version)
             == armor_balance.CUSTOM_WAR3_MAPPING_VERSION
     if custom_war3_armor then
-        effective_war3_armor = tonumber(victim.survival_effective_war3_armor)
-            or tonumber(victim.survival_war3_armor) or 0
+        effective_war3_armor = titan_aura_armor.custom_armor(victim)
         pierced_war3_armor = math.max(0, effective_war3_armor)
             * (1 - armor_ignore_pct / 100)
         armor_multiplier = armor_balance.war3_physical_damage_multiplier(
@@ -342,7 +372,13 @@ local function filter(_, keys)
         keys.damage = math.min(keys.damage, 1e30)
     end
     if tree_damage_rules.is_tree(victim) then
-        if attacker.survival_commerce_immortal then keys.damage=keys.damage*2 end
+        -- The entitlement grants double tree damage to every owned worker,
+        -- including the immortal itself. A persistent unit tag is not proof
+        -- of current ownership, and must never stack a second multiplier.
+        if tree_damage_rules.is_lumberjack(attacker)
+            and require('systems/commerce_effects').owned(attacker.survival_player_id,'immortal') then
+            keys.damage=keys.damage*2
+        end
         -- Resource trees advance at 1 HP; never pass a lethal/overflowing hit
         -- to native integer health, even if the protection modifier is missing.
         keys.damage = math.min(keys.damage, math.max(0, victim:GetHealth() - 1))

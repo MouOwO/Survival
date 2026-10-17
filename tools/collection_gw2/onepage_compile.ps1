@@ -236,7 +236,7 @@ foreach($item in $onepageSocial){
         Add-OnepageProtected $file 'formal v3 portrait original; read only'
     }
     $runtimeUri=$catalog[0].runtime_uri
-    if($runtimeUri -ne ('s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_'+$item.item_id+'.vtex')){throw "Unexpected formal GPU portrait URI: $($item.item_id)"}
+    if($runtimeUri -ne ('s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_'+$item.item_id+'.vtex')){throw "Unexpected formal GPU portrait URI: $($item.item_id)"}
     $portraitRuntime=Get-OnepageChildPath $onepageRuntime ($runtimeUri.Substring('s2r://panorama/'.Length)+'_c')
     if(-not(Test-Path -LiteralPath $portraitRuntime -PathType Leaf) -or (Get-Item -LiteralPath $portraitRuntime).Length -le 0){throw "Existing compiled portrait missing: $portraitRuntime"}
     Add-OnepageProtected $portraitRuntime 'formal GPU portrait; never rebuilt'

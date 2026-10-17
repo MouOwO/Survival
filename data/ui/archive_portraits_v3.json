@@ -2,7 +2,7 @@
   "ex_01": {
     "id": "ex_01",
     "icon_path": "custom_game/archive_portraits_v3/ex_01.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_01.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_01.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "c53091d12db6f3c579195da7dcf0681d16e62ea3f8687e1d8bbd6974b9cc9b7d",
@@ -13,7 +13,7 @@
   "ex_02": {
     "id": "ex_02",
     "icon_path": "custom_game/archive_portraits_v3/ex_02.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_02.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_02.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "8bbb19f44e9b24c6ae5dc0c52618cbd611edabdcaa407176065434bb4fa9dae0",
@@ -24,7 +24,7 @@
   "ex_03": {
     "id": "ex_03",
     "icon_path": "custom_game/archive_portraits_v3/ex_03.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_03.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_03.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "25393c965dc7c643022f278600d55c38a5afb008d9108b0054909968857e3b23",
@@ -35,7 +35,7 @@
   "ex_04": {
     "id": "ex_04",
     "icon_path": "custom_game/archive_portraits_v3/ex_04.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_04.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_04.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "6822b95da34396db765b4cb18227b6dc1c3d23934050031f73e02e07fe1cbbc8",
@@ -46,7 +46,7 @@
   "ex_05": {
     "id": "ex_05",
     "icon_path": "custom_game/archive_portraits_v3/ex_05.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_05.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_05.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "5d71148d1faff68d78ac6ec93a50f3e89cc83cbfa5085261754bf0167efee3a0",
@@ -57,7 +57,7 @@
   "ex_06": {
     "id": "ex_06",
     "icon_path": "custom_game/archive_portraits_v3/ex_06.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_06.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_06.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "a6c6a4f283e780e951b411d357d9c04b77d6ea2be5e8faa82420e7abaa361034",
@@ -68,7 +68,7 @@
   "ex_07": {
     "id": "ex_07",
     "icon_path": "custom_game/archive_portraits_v3/ex_07.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_07.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_07.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "86dba50a9a3611d347e6ad8b73ff360e8310a5de5057f9d691564b812de4013c",
@@ -79,7 +79,7 @@
   "ex_08": {
     "id": "ex_08",
     "icon_path": "custom_game/archive_portraits_v3/ex_08.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_08.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_08.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "6fbde22503c5080b8bd9044b0ff3501f24a7ca48543f98ae8f8f351795468247",
@@ -90,7 +90,7 @@
   "ex_09": {
     "id": "ex_09",
     "icon_path": "custom_game/archive_portraits_v3/ex_09.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_09.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_09.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "dfb2ad3c8d1e5c8fb8a1678e522cd574050f1dfdd7b85a7c30ecf76ee1de53ca",
@@ -101,7 +101,7 @@
   "ex_10": {
     "id": "ex_10",
     "icon_path": "custom_game/archive_portraits_v3/ex_10.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_10.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_10.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "8a8fcb35e146772c255a71b75537430331cb20b6d30fac0921d031b599e13acf",
@@ -112,7 +112,7 @@
   "ex_11": {
     "id": "ex_11",
     "icon_path": "custom_game/archive_portraits_v3/ex_11.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_11.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_11.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "7c9678eec7f23025270d490b5929b00f25350dbd45582691be2acae362175aa1",
@@ -123,7 +123,7 @@
   "ex_12": {
     "id": "ex_12",
     "icon_path": "custom_game/archive_portraits_v3/ex_12.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_12.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_12.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "602b4759a79435eeffa8618c3c659db65d5d815225606bd7af3675e6f5715ec0",
@@ -134,7 +134,7 @@
   "ex_13": {
     "id": "ex_13",
     "icon_path": "custom_game/archive_portraits_v3/ex_13.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_13.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_13.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "05bcf5e3bfdc45f4a19aa8497ac4aca5b9b55b68ed4867810fff5b7b050be2f8",
@@ -145,7 +145,7 @@
   "ex_14": {
     "id": "ex_14",
     "icon_path": "custom_game/archive_portraits_v3/ex_14.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_14.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_14.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "12856168477916b35ea841e1790385a07fd5141eafa5b3bee32c665b93e78c6f",
@@ -156,7 +156,7 @@
   "ex_15": {
     "id": "ex_15",
     "icon_path": "custom_game/archive_portraits_v3/ex_15.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_15.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_15.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "066b9f3a96585bc9054aa67ca9c2cab3215b72f1d2cec908b39f634b4d2b5cef",
@@ -167,7 +167,7 @@
   "ex_16": {
     "id": "ex_16",
     "icon_path": "custom_game/archive_portraits_v3/ex_16.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_16.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_16.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "9ed4889dfac4bb6a9e31029149598340a6086e3b3c81b6555ee5ea285d8b2716",
@@ -178,7 +178,7 @@
   "ex_17": {
     "id": "ex_17",
     "icon_path": "custom_game/archive_portraits_v3/ex_17.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_17.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_17.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "4cb4822fec50984730ccc4ea66d66273f07d7e28ec5a3942d305477666d357a0",
@@ -189,7 +189,7 @@
   "ex_18": {
     "id": "ex_18",
     "icon_path": "custom_game/archive_portraits_v3/ex_18.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_18.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_18.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "2921d3dc82476081e52c3592080d0acb7321d1f9c64f5b5c8ae3a98d6686b2ce",
@@ -200,7 +200,7 @@
   "ex_19": {
     "id": "ex_19",
     "icon_path": "custom_game/archive_portraits_v3/ex_19.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_19.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_19.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "05a950245f3a26860db163d334d7d68e0afc8d33e560dcf276337487fafa4c4f",
@@ -211,7 +211,7 @@
   "ex_20": {
     "id": "ex_20",
     "icon_path": "custom_game/archive_portraits_v3/ex_20.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_20.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_20.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "90e847e4b5d964ef42a2e2f801572200e01844b8a529acc4287690f72993d986",
@@ -222,7 +222,7 @@
   "ex_21": {
     "id": "ex_21",
     "icon_path": "custom_game/archive_portraits_v3/ex_21.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_21.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_21.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "53cf8c2285b9c1f9ddeb24cdadf889bc0108b158901df08f9f245c21a83277db",
@@ -233,7 +233,7 @@
   "ex_22": {
     "id": "ex_22",
     "icon_path": "custom_game/archive_portraits_v3/ex_22.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_22.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_22.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "6921ef81b079a9f528ab700b93f452c43d02f57229dec75094c5d749b53af8be",
@@ -244,7 +244,7 @@
   "ex_23": {
     "id": "ex_23",
     "icon_path": "custom_game/archive_portraits_v3/ex_23.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_23.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_23.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "d3d87a391fb6271b88c401c18f108fd2d728705bfe6749352e927c1aa7859872",
@@ -255,7 +255,7 @@
   "ex_24": {
     "id": "ex_24",
     "icon_path": "custom_game/archive_portraits_v3/ex_24.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_24.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_24.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "80e1266f4719c70f43252c5511046e60fff983986ae6811d63882dc38bc6e66f",
@@ -266,7 +266,7 @@
   "ex_25": {
     "id": "ex_25",
     "icon_path": "custom_game/archive_portraits_v3/ex_25.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_25.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_25.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "4dfcd276ed9d687b0fc2d4627100bc411683637db4a5427774fb70925fa222d3",
@@ -277,7 +277,7 @@
   "ex_26": {
     "id": "ex_26",
     "icon_path": "custom_game/archive_portraits_v3/ex_26.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_26.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_26.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "1845b541991078bad4dfcb0054556b8be645c9f3d366ce3cf4dc529b17473279",
@@ -288,7 +288,7 @@
   "ex_27": {
     "id": "ex_27",
     "icon_path": "custom_game/archive_portraits_v3/ex_27.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_27.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_27.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "6d8356f1aa0809e2d72e47758bd4fcc47523c9f25bff2b25c97330d634b03888",
@@ -299,7 +299,7 @@
   "ex_28": {
     "id": "ex_28",
     "icon_path": "custom_game/archive_portraits_v3/ex_28.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_28.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_28.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "57843878908df8085027d8d07feab0e638c52f03a1216727a5c8d5a0e5f5a176",
@@ -310,7 +310,7 @@
   "ex_29": {
     "id": "ex_29",
     "icon_path": "custom_game/archive_portraits_v3/ex_29.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_29.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_29.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "14ddeb09f9c545a8a826f43b775a913f8ad143689edbaf52771ddddebaaf3e24",
@@ -321,7 +321,7 @@
   "ex_30": {
     "id": "ex_30",
     "icon_path": "custom_game/archive_portraits_v3/ex_30.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_30.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_30.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "61e298c40be917df5deafa91782d98d30896fde071065f806b60c83498a13f03",
@@ -332,7 +332,7 @@
   "ex_31": {
     "id": "ex_31",
     "icon_path": "custom_game/archive_portraits_v3/ex_31.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_31.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_31.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "cc9fe263ae20e744e9b1b8385ea7dbeb4881db99b3566695aafa95bfca7055f3",
@@ -343,7 +343,7 @@
   "ex_32": {
     "id": "ex_32",
     "icon_path": "custom_game/archive_portraits_v3/ex_32.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_32.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_32.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "d60e872a0b1afc278f04ab8741ddda44c7a4d265bb21b3f3ed0dc6bff90f5131",
@@ -354,7 +354,7 @@
   "ex_33": {
     "id": "ex_33",
     "icon_path": "custom_game/archive_portraits_v3/ex_33.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_33.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_33.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "f1ca084bb3dcd064161ce207769158e177df47157a1df4917cd2f4bc1136edf5",
@@ -365,7 +365,7 @@
   "ex_34": {
     "id": "ex_34",
     "icon_path": "custom_game/archive_portraits_v3/ex_34.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_34.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_34.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "e4af5e027df34b9509b31afc590d44ecc7e7006a10d1efaabdcafde6fd86b5c1",
@@ -376,7 +376,7 @@
   "ex_35": {
     "id": "ex_35",
     "icon_path": "custom_game/archive_portraits_v3/ex_35.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_35.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_35.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "7bcbc1d06a7fc989706eced2ff5778347860ccc231a52ce0ce112f3e3c99e974",
@@ -387,7 +387,7 @@
   "ex_36": {
     "id": "ex_36",
     "icon_path": "custom_game/archive_portraits_v3/ex_36.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_36.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_36.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "adf6665ad24cea3d81adb94e950e01f0b9e431a13a317ef7d79ec1dafbff6bbd",
@@ -398,7 +398,7 @@
   "ex_37": {
     "id": "ex_37",
     "icon_path": "custom_game/archive_portraits_v3/ex_37.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_37.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_37.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "a2fcc9bf415529541da4a586b0493b0dc85f8d003c83218a3c270777e79536f3",
@@ -409,7 +409,7 @@
   "ex_38": {
     "id": "ex_38",
     "icon_path": "custom_game/archive_portraits_v3/ex_38.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_38.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_38.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "9d75b2c2fa48178049001561fb415770606d02258ec4e77f28bccab32576a195",
@@ -420,7 +420,7 @@
   "ex_39": {
     "id": "ex_39",
     "icon_path": "custom_game/archive_portraits_v3/ex_39.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_39.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_39.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "cdcd37bfbf216a47b39a918e23423b7ee8169812903c093d262c501b71cf1628",
@@ -431,7 +431,7 @@
   "ex_40": {
     "id": "ex_40",
     "icon_path": "custom_game/archive_portraits_v3/ex_40.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_ex_40.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_ex_40.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "2818e8dee536d20fb71b35759c2ba653b4770dc2612957136a0a90dd556476b2",
@@ -442,7 +442,7 @@
   "friend_01": {
     "id": "friend_01",
     "icon_path": "custom_game/archive_portraits_v3/friend_01.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_01.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_01.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "fb0763b37c83c24cf8e2863e4255108da45f9f30151142430bf811c92da91382",
@@ -453,7 +453,7 @@
   "friend_02": {
     "id": "friend_02",
     "icon_path": "custom_game/archive_portraits_v3/friend_02.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_02.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_02.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "7a8ae1cffc1013e88a7581749bcfa20d1c70ed3b991d11fc0c18a17c641e33e7",
@@ -464,7 +464,7 @@
   "friend_03": {
     "id": "friend_03",
     "icon_path": "custom_game/archive_portraits_v3/friend_03.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_03.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_03.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "d457db759b0330bdba28d0055bc91b63ca4e45d67c49a5a85dba81d6a53c1f4f",
@@ -475,7 +475,7 @@
   "friend_04": {
     "id": "friend_04",
     "icon_path": "custom_game/archive_portraits_v3/friend_04.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_04.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_04.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "3291824456def8f0ae9b66ef7b603a9754744618696ec8e45c868b5d2506e610",
@@ -486,7 +486,7 @@
   "friend_05": {
     "id": "friend_05",
     "icon_path": "custom_game/archive_portraits_v3/friend_05.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_05.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_05.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "c4f1b0064731da3105b69511d6375c69b01735daa0a856521fabb45dad44b4b6",
@@ -497,7 +497,7 @@
   "friend_06": {
     "id": "friend_06",
     "icon_path": "custom_game/archive_portraits_v3/friend_06.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_06.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_06.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "8f79105a672862f235faceb8d9b5917d132cb79f73bf74b15e02ff8bbe45cd57",
@@ -508,7 +508,7 @@
   "friend_07": {
     "id": "friend_07",
     "icon_path": "custom_game/archive_portraits_v3/friend_07.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_07.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_07.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "58f41883e8c525117f575433ad2d05b366cba9bb242ff3a372bee5fc386b5be3",
@@ -519,7 +519,7 @@
   "friend_08": {
     "id": "friend_08",
     "icon_path": "custom_game/archive_portraits_v3/friend_08.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_08.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_08.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "ece65e6f86bdd1538a5092370532a9f2405c790c7972caf5b8f4f7c093ca38fe",
@@ -530,7 +530,7 @@
   "friend_09": {
     "id": "friend_09",
     "icon_path": "custom_game/archive_portraits_v3/friend_09.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_09.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_09.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "faee6ef8b2d852cb80d9b511c6cd95004a473fb543388e7f113db9f4c81cb65d",
@@ -541,7 +541,7 @@
   "friend_10": {
     "id": "friend_10",
     "icon_path": "custom_game/archive_portraits_v3/friend_10.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_10.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_10.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "8b6dc7559182277b687767b7f276b990b6fe84184451a1af609fa301e6edce67",
@@ -552,7 +552,7 @@
   "friend_11": {
     "id": "friend_11",
     "icon_path": "custom_game/archive_portraits_v3/friend_11.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_11.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_11.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "9e9f7bc064c18d8a5ef60f6c0a461cc98ddfb78e587a9d7fd15556656f2c2e2f",
@@ -563,7 +563,7 @@
   "friend_12": {
     "id": "friend_12",
     "icon_path": "custom_game/archive_portraits_v3/friend_12.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_12.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_12.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "c06983fd81e5b6450e7d16104a1864c19b195794a67380d6fb0f26c2ea9f1920",
@@ -574,7 +574,7 @@
   "friend_13": {
     "id": "friend_13",
     "icon_path": "custom_game/archive_portraits_v3/friend_13.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_13.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_13.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "2cb92d048784d804d29d67a53a511853c7d245c21995811734a1ce4887f72e47",
@@ -585,7 +585,7 @@
   "friend_14": {
     "id": "friend_14",
     "icon_path": "custom_game/archive_portraits_v3/friend_14.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_14.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_14.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "bf461605491f9b673ab5ed5ddd36ab62cd6d721817cf379b036a28e93092a1d8",
@@ -596,7 +596,7 @@
   "friend_15": {
     "id": "friend_15",
     "icon_path": "custom_game/archive_portraits_v3/friend_15.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_15.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_15.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "fdd574da1f892ec7607945c48506b27f8ffde7f0429cd38604ec212299ee3fd9",
@@ -607,7 +607,7 @@
   "friend_16": {
     "id": "friend_16",
     "icon_path": "custom_game/archive_portraits_v3/friend_16.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_16.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_16.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "9e10b78e62d8b698babf898be2e0cbd3e3387ebbd0669f216a6a26ce36028524",
@@ -618,7 +618,7 @@
   "friend_17": {
     "id": "friend_17",
     "icon_path": "custom_game/archive_portraits_v3/friend_17.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_17.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_17.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "77eb717567ac0d2854d5b815a3765f27e0884507512fecd48ac4b4a65214d221",
@@ -629,7 +629,7 @@
   "friend_18": {
     "id": "friend_18",
     "icon_path": "custom_game/archive_portraits_v3/friend_18.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_18.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_18.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "9523c431f3e85ca3d92659d63f92933f901ca63921bd13f42ce1bcbbd2fbecb9",
@@ -640,7 +640,7 @@
   "friend_19": {
     "id": "friend_19",
     "icon_path": "custom_game/archive_portraits_v3/friend_19.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_19.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_19.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "be228d52ac19b388ff6ea56d99b8add1a132c765bc526a097aca5101dc609a1f",
@@ -651,7 +651,7 @@
   "friend_20": {
     "id": "friend_20",
     "icon_path": "custom_game/archive_portraits_v3/friend_20.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_20.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_20.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "439919776650a6d95af956423a6081adfb2edef7cc72a3ca26ceaeb54cd3bed6",
@@ -662,7 +662,7 @@
   "friend_21": {
     "id": "friend_21",
     "icon_path": "custom_game/archive_portraits_v3/friend_21.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_21.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_21.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "0b032aa0ad84c8bda727406d019d78dbf3c8f2246ac223d4055b42532802f1d2",
@@ -673,7 +673,7 @@
   "friend_22": {
     "id": "friend_22",
     "icon_path": "custom_game/archive_portraits_v3/friend_22.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_22.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_22.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "d4326a7388ae7da32b3ac708d602606572d838ee27a35bd3758cf4807060516c",
@@ -684,7 +684,7 @@
   "friend_23": {
     "id": "friend_23",
     "icon_path": "custom_game/archive_portraits_v3/friend_23.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_23.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_23.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "f5f0bc6c123979ccacaae569a67f2e5f10a3a03b6d8d6c7cc346d32474085e3d",
@@ -695,7 +695,7 @@
   "friend_24": {
     "id": "friend_24",
     "icon_path": "custom_game/archive_portraits_v3/friend_24.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_24.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_24.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "f9d20909fdea13cc0ee6c83fc4fbb68984e989d2828ecd3952852109d04fd8a1",
@@ -706,7 +706,7 @@
   "friend_25": {
     "id": "friend_25",
     "icon_path": "custom_game/archive_portraits_v3/friend_25.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_25.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_25.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "5a620086828be49dd512373ab238ea96f9056eae1470180259765b85ea7f81e3",
@@ -717,7 +717,7 @@
   "friend_26": {
     "id": "friend_26",
     "icon_path": "custom_game/archive_portraits_v3/friend_26.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_26.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_26.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "3d5fb6308a4f1388ec1e4ec6923b4691f4511e8143a02eaf321a500d1ba29da0",
@@ -728,7 +728,7 @@
   "friend_27": {
     "id": "friend_27",
     "icon_path": "custom_game/archive_portraits_v3/friend_27.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_27.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_27.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "46bdef8d68114b17a2c1e1faa169a1cea84acf3f54c931452958dff1480301d9",
@@ -739,7 +739,7 @@
   "friend_28": {
     "id": "friend_28",
     "icon_path": "custom_game/archive_portraits_v3/friend_28.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_28.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_28.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "bb5cbc472369c17faac3f8b5a9dcbaa42570909be17037043da563f0ac503d48",
@@ -750,7 +750,7 @@
   "friend_29": {
     "id": "friend_29",
     "icon_path": "custom_game/archive_portraits_v3/friend_29.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_29.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_29.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "040f80b8e6b6a40aa3b61eedee57ebd432d0b166cf74ba4639514d2e8f33d163",
@@ -761,7 +761,7 @@
   "friend_30": {
     "id": "friend_30",
     "icon_path": "custom_game/archive_portraits_v3/friend_30.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_30.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_30.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "4186d8a1cb4576ee6ffa6c9441eaf77ebcc58d4be3ff8ae68a8b39d2d8051918",
@@ -772,7 +772,7 @@
   "friend_31": {
     "id": "friend_31",
     "icon_path": "custom_game/archive_portraits_v3/friend_31.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_31.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_31.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "57ecd7300589da38d692a03117a9558cc3df8e3ed6fba47ac2c6e88dd38171a2",
@@ -783,7 +783,7 @@
   "friend_32": {
     "id": "friend_32",
     "icon_path": "custom_game/archive_portraits_v3/friend_32.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_32.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_32.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "2fa8a18b52683e5fabef29ac6df6776e02c43805889d071f67801217d3f4b771",
@@ -794,7 +794,7 @@
   "friend_33": {
     "id": "friend_33",
     "icon_path": "custom_game/archive_portraits_v3/friend_33.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_33.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_33.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "cb88eb061ec09be1a0cce467b724a5498e19dee413ae413e7657aee136490241",
@@ -805,7 +805,7 @@
   "friend_34": {
     "id": "friend_34",
     "icon_path": "custom_game/archive_portraits_v3/friend_34.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_34.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_34.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "c8fe3097a341795ac6dfc1cde72867ae8fe00a9368873fc466429a6795900d0a",
@@ -816,7 +816,7 @@
   "friend_35": {
     "id": "friend_35",
     "icon_path": "custom_game/archive_portraits_v3/friend_35.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_35.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_35.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "60068fd7bb5c92e2dcb3bbdeee9bba04797f4019b5664bd85168a40a7b7407d0",
@@ -827,7 +827,7 @@
   "friend_36": {
     "id": "friend_36",
     "icon_path": "custom_game/archive_portraits_v3/friend_36.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_36.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_36.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "0e656eddeff080274043e1a4609234fcea776ce54d99aef08482608fdde3ec95",
@@ -838,7 +838,7 @@
   "friend_37": {
     "id": "friend_37",
     "icon_path": "custom_game/archive_portraits_v3/friend_37.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_37.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_37.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "b623129c570eb2ead46d4ac75e8ac23b50ff4392c73a4df8115820f62516b811",
@@ -849,7 +849,7 @@
   "friend_38": {
     "id": "friend_38",
     "icon_path": "custom_game/archive_portraits_v3/friend_38.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_38.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_38.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "8086865003591ea9cdc8b56c95b89aa56834d587a687b435ecb7e813ff553611",
@@ -860,7 +860,7 @@
   "friend_39": {
     "id": "friend_39",
     "icon_path": "custom_game/archive_portraits_v3/friend_39.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_39.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_39.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "4eae01718314d5f16e23750ad7226f27c7daff3c3fa2d3068847c3ebb98909bc",
@@ -871,7 +871,7 @@
   "friend_40": {
     "id": "friend_40",
     "icon_path": "custom_game/archive_portraits_v3/friend_40.png",
-    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_friend_40.vtex",
+    "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_friend_40.vtex",
     "source_width": 1254,
     "source_height": 1254,
     "sha256": "96978873406689ad52d8daeb6e68fd324c897487ea63f57ad3019a6dce5702c3",

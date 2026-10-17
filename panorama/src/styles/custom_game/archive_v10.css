@@ -79,3 +79,14 @@
 .ArchiveParchmentPage .ArchivePromote { border:1px solid #9b7a3b; border-radius:0px; background-color:#45351e; background-image:none; }
 .ArchiveParchmentPage .ArchivePromote Label { align:center center; margin:0px; padding:0px; color:#ffe4a1; font-size:17px; }
 .ArchiveParchmentPage .ArchivePromote:disabled { saturation:.2; brightness:.65; }
+
+/* Goods reuse the archive shell and tooltip, with only icon/name cells. */
+.ArchiveRoot #ArchiveWindow.ArchiveV10Page .ArchiveCommerceIconBacking { background-color:#090d0ee8; border:1px solid #77613c; border-radius:1px; box-shadow:inset #000000b0 0px 0px 3px 1px; }
+.ArchiveCommerceIcon { brightness:1; saturation:1; opacity:1; }
+.ArchiveRoot #ArchiveWindow.ArchiveV10Page .ArchiveCommerceUnowned .ArchiveCommerceIcon { saturation:0; brightness:.38; opacity:.82; }
+.ArchiveRoot #ArchiveWindow.ArchiveV10Page .ArchiveCommerceUnknown .ArchiveCommerceIcon { saturation:.3; brightness:.62; opacity:.9; }
+.ArchiveRoot #ArchiveWindow.ArchiveV10Page .ArchiveCommerceOwned .ArchiveCommerceIconBacking { border-color:#c6a75d; box-shadow:#e1b14b22 0px 0px 5px 1px; }
+.ArchiveRoot #ArchiveWindow.ArchiveV10Page .ArchiveCommerceUnowned .ArchiveV10Name { color:#a5a396; }
+.ArchiveRoot #ArchiveWindow.ArchiveV10Page .ArchiveCommerceCell:hover .ArchiveCommerceIconBacking,
+.ArchiveRoot #ArchiveWindow.ArchiveV10Page .ArchiveCommerceCell.ArchiveHovered .ArchiveCommerceIconBacking { border-color:#ffe0a0; }
+.ArchiveCommerceQuantityBadge { background-color:#19170ff0; border:1px solid #8f7b4f; z-index:10; }

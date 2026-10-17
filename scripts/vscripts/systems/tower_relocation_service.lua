@@ -2,7 +2,7 @@
 -- building limits: an existing tower keeps its identity and occupied footprint.
 local bus = require("core/event_bus")
 local events = require("core/events")
-local M = { ABILITY = "ability_building_blink", RANGE = 1000 }
+local M = { ABILITY = "ability_building_blink", WALL_ABILITY = "ability_wall_blink", RANGE = 1000 }
 
 local function valid(entity)
     return entity and not entity:IsNull()
@@ -21,10 +21,12 @@ function M.resolve(player_id, entindex, ability_entindex, ignore_cooldown)
         ultimate = true
     end
     if not state or state.player_id ~= player_id then return nil, "tower_not_owned" end
-    if not ultimate and state.building_id ~= "arrow_tower" then return nil, "building_not_movable" end
+    local wall=state.building_id=="wall"
+    if not ultimate and not wall and state.building_id ~= "arrow_tower" then return nil, "building_not_movable" end
     local unit = state.unit
     if not valid(unit) or not unit:IsAlive() then return nil, "tower_unavailable" end
-    local ability = unit:FindAbilityByName(M.ABILITY)
+    local ability_name=wall and M.WALL_ABILITY or M.ABILITY
+    local ability = unit:FindAbilityByName(ability_name)
     if not valid(ability) or ability:GetCaster() ~= unit or ability:IsHidden()
         or not ability:IsActivated() or ability:GetLevel() <= 0 then
         return nil, "move_ability_unavailable"
@@ -35,7 +37,8 @@ function M.resolve(player_id, entindex, ability_entindex, ignore_cooldown)
     if not ignore_cooldown and ability.IsCooldownReady and not ability:IsCooldownReady() then
         return nil, "move_ability_cooldown"
     end
-    return {unit=unit, ability=ability, ultimate=ultimate,
+    return {unit=unit, ability=ability, ultimate=ultimate, ability_name=ability_name,
+        building_id=state.building_id,
         footprint=state.footprint or (state.definition and state.definition.footprint)}
 end
 

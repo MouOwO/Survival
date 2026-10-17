@@ -4,7 +4,8 @@ function checkFrame(view){assert.equal(view.panel.style.width,'1672px');assert.e
 function treasure(){ return require('./treasure_compact.test.cjs').treasure(); }
 function vip(){ return require('./vip_status.test.cjs').vip(); }
 function daily(){
- const h=createHarness();h.load('daily_gw2_data.js');h.load('daily_remaining_5d5c1152eb.js');const {cfg,nodes}=h,view=cfg.SurvivalDailyGW2;
+ const h=createHarness();for(const source of ['archive_theme_tokens.js','archive_parchment_data.js','archive_handoff_180de7e38b.js','archive_v10_semantics.js','common/archive_tooltip.js'])h.load(source);h.load('daily_gw2_data.js');h.load('daily_remaining_5d5c1152eb.js');const {cfg,nodes}=h,view=cfg.SurvivalDailyGW2;
+ const tooltipText=()=>nodes.DailyGW2TooltipEffect.text.replace(/<br\s*\/?\s*>/gi,'\n').replace(/<[^>]*>/g,'');
  assert(view&&view.canvas.id==='DailyGW2Canvas');assert.equal(h.view('DailyWindow'),undefined,'The login calendar does not adopt a global navigation shell');
  cfg.SurvivalDaily.Open(false);assert.equal(h.sent.at(-1).name,'survival_daily_request');assert.equal(nodes.DailyClaimText.text,'加载中…');assert(!nodes.DailyClaim.enabled);
  assert.equal(nodes.DailyCards.GetChildCount(),28,'The loading state reserves 28 empty reward frames without fabricating rewards');
@@ -22,8 +23,8 @@ function daily(){
  assert(nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'The pass column stays locked without authoritative entitlement');
  const premiumFrame=nodes.DailyGW2Special_milestone.Children().find(x=>x.BHasClass('DailyGW2SpecialFrame'));assert.equal(premiumFrame.style.width,'118px');assert.equal(premiumFrame.style.height,'119px','Monthly frame uses the accepted calendar slot dimensions');
  const fifth=nodes.DailyGW2Day_5;assert.equal(fifth.Children().filter(x=>x.BHasClass('DailyGW2Reward')).length,2,'Both formal rewards are rendered in a multi-reward day');
- fifth.events.onmouseover();h.flushFinite();assert(nodes.DailyGW2Tooltip.visible);assert(nodes.DailyTooltipEffect.text.includes('第二项真实效果'));assert(nodes.DailyTooltipEffect.text.includes('第二项奖励 ×3'));nodes.DailyGW2Tooltip.events.onmouseover();assert(!nodes.DailyGW2Tooltip.visible,'Daily tooltip dismisses on entry');fifth.events.onmouseover();h.flushFinite();assert(!nodes.DailyGW2Tooltip.visible,'Daily source cannot immediately reopen the dismissed tooltip');
- const item=nodes.DailyGW2Day_4.Children().find(x=>x.BHasClass('DailyGW2Reward'));item.events.onmouseover();h.flushFinite();assert(nodes.DailyTooltipEffect.text.includes('数量：13'));
+ fifth.events.onmouseover();h.flushFinite();assert(nodes.DailyGW2Tooltip.visible);assert(tooltipText().includes('第二项真实效果'));assert(tooltipText().includes('第二项奖励 ×3'));nodes.DailyGW2TooltipSurface.events.onmouseover();assert(!nodes.DailyGW2Tooltip.visible,'Daily tooltip dismisses on entry');fifth.events.onmouseover();h.flushFinite();assert(!nodes.DailyGW2Tooltip.visible,'Daily source cannot immediately reopen the dismissed tooltip');
+ const item=nodes.DailyGW2Day_4.Children().find(x=>x.BHasClass('DailyGW2Reward'));item.events.onmouseover();h.flushFinite();assert(tooltipText().includes('数量：13'));
  h.click(nodes.DailyClaim);assert.deepEqual(JSON.parse(JSON.stringify(h.sent.at(-1))),{name:'survival_daily_claim',payload:{target_day:25004}},'Claims use the real server date rather than calendar slot 4');
  assert(!nodes.DailyClaim.enabled);const claimCalls=h.sent.length;nodes.DailyClaim.events.onactivate();assert.equal(h.sent.length,claimCalls,'pending claim is guarded');
  h.emit('survival_daily_snapshot',{...snapshot,sequence:2,claim_result:{target_day:25004,ok:false,error:'保存失败'}});
@@ -36,7 +37,7 @@ function daily(){
  h.click(nodes.DailyMakeup);assert.equal(h.sent.at(-1).payload.target_day,25002,'Makeup retains the earliest real missed date');
  h.emit('survival_daily_snapshot',{...snapshot,sequence:4,count:5,ordinary_status:'claimed',has_pass:1,purchase_enabled:1,missed:[]});assert(!nodes.DailyMakeup.visible);
  cfg.SurvivalDaily.Open(true);assert(nodes.DailyGW2PassInfo.BHasClass('DailyGW2PassFocus'));assert.equal(nodes.DailyCards.GetChildCount(),28,'Opening the pass entry retains the free calendar alongside it');
- nodes.DailyGW2Special_milestone.events.onmouseover();h.flushFinite();assert(nodes.DailyTooltipEffect.text.includes('正式效果'));assert(nodes.DailyTooltipEffect.text.includes('累计签到7次'));
+ nodes.DailyGW2Special_milestone.events.onmouseover();h.flushFinite();assert(tooltipText().includes('正式效果'));assert(tooltipText().includes('累计签到7次'));
  h.emit('survival_daily_snapshot',{...snapshot,sequence:5,purchase_enabled:1,ordinary_status:'claimed'});
  assert(nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'));
  h.click(nodes.PassPurchase);assert.equal(h.sent.at(-1).name,'survival_pass_purchase');assert.deepEqual(Object.keys(h.sent.at(-1).payload),[]);assert(!nodes.PassPurchase.enabled);

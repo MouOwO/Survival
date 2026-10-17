@@ -1,8 +1,8 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const src=fs.readFileSync('panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js','utf8');
 const nodes={},dispatch=[];
-function make(type,parent,id,hit=false){const p={id,parent,style:{},hittest:hit,hittestchildren:hit,text:'',events:{},AddClass(){},GetParent(){return this.parent;},SetPanelEvent(n,f){this.events[n]=f;}};if(id)nodes[id]=p;return p;}
-const host=make('Panel',null,'host',true),snapshot={building_id:'arrow_tower',building_stat_details:{attack_technology_flat:40,attack_technology_pct:.5,attack_permanent_flat:20,attack_permanent_pct:0,attack_talent_pct:0}};
+function make(type,parent,id,hit=false){const p={id,parent,style:{},hittest:hit,hittestchildren:hit,text:'',events:{},AddClass(){},GetParent(){return this.parent;},SetImage(uri){this.image=uri;},SetScaling(value){this.scaling=value;},SetPanelEvent(n,f){this.events[n]=f;}};if(id)nodes[id]=p;return p;}
+const host=make('Panel',null,'host',true),snapshot={building_id:'arrow_tower',attack_speed:1.65,building_stat_details:{attack_technology_flat:40,attack_technology_pct:.5,attack_permanent_flat:20,attack_permanent_pct:0,attack_talent_pct:0}};
 const env={host,nodes,cfg:{HandoffCombat:{Snapshot:()=>snapshot}},create:make,art:(p,id)=>make('Image',p,id),label:(p,id)=>make('Label',p,id),centered:(p,id)=>make('Label',make('Panel',p,id+'Bounds'),id),style:(p,v)=>Object.assign(p.style,v),place(){},stats:[['attack','a'],['armor','b'],['attack_speed','c'],['strength','d'],['agility','e'],['intelligence','f']],selectedUnit:()=>1,compact:String,$:{DispatchEvent:(...v)=>dispatch.push(v)}};
 vm.createContext(env);
 vm.runInContext(src.slice(src.indexOf('    function tooltip('),src.indexOf('    function notice(')),env);
@@ -12,6 +12,23 @@ vm.runInContext(src.match(/bottom\.hittestchildren=(?:true|false);/)[0],env);
 for(const id of ['HandoffBuildingBonus','HandoffBuildingPercent','HandoffBuildingHealthBonus','HandoffBuildingHealthPercent','HandoffStatBonus_attack','HandoffStatPercent_attack']){
  const p=nodes[id];assert(p.hittest,id);for(let a=p.parent;a;a=a.parent)assert(a.hittestchildren,id+' ancestor '+a.id);
  p.events.onmouseover();assert.equal(dispatch.at(-1)[0],'DOTAShowTextTooltip');p.events.onmouseout();assert.equal(dispatch.at(-1)[0],'DOTAHideTextTooltip');
+}
+// Visible native icons and their values keep access to the real source tooltip,
+// even when the former red percentage labels are hidden by presentation.
+for(const [key,name] of [['attack','damage'],['armor','armor'],['attack_speed','attack_speed']]){
+ assert.equal(nodes['HandoffStatIcon_'+key].image,'s2r://panorama/images/hud/reborn/icon_'+name+'_psd.vtex');
+ const p=nodes['HandoffStatIcon_'+key];assert(p.hittest);
+ for(let ancestor=p.parent;ancestor;ancestor=ancestor.parent)assert(ancestor.hittestchildren,p.id+' ancestor '+ancestor.id);
+ p.events.onmouseover();assert.equal(dispatch.at(-1)[0],'DOTAShowTextTooltip');
+ assert(dispatch.at(-1)[2].length>0);p.events.onmouseout();assert.equal(dispatch.at(-1)[0],'DOTAHideTextTooltip');
+}
+assert.equal(nodes.HandoffBuildingSpeedIcon.image,'s2r://panorama/images/hud/reborn/icon_attack_speed_psd.vtex');
+for(const id of ['HandoffBuildingStatIcon','HandoffBuildingSummary','HandoffBuildingSpeedIcon','HandoffBuildingSpeed']){
+ const p=nodes[id];assert(p.hittest,id);
+ for(let ancestor=p.parent;ancestor;ancestor=ancestor.parent)assert(ancestor.hittestchildren,id+' ancestor '+ancestor.id);
+ p.events.onmouseover();assert.equal(dispatch.at(-1)[0],'DOTAShowTextTooltip');
+ assert(dispatch.at(-1)[2].includes(id.includes('Speed')?'1.7 刀/秒':'科技 / 挑战：40，0.5%'),id+' uses current snapshot and real formatting');
+ p.events.onmouseout();assert.equal(dispatch.at(-1)[0],'DOTAHideTextTooltip');
 }
 assert.equal(nodes.HandoffBuildingPercent.style.color,'#f08078');assert.equal(nodes.HandoffBuildingBonus.style.color,'#8fe080');
 assert(!env.buildingBonusHelp().includes('???'));assert(env.buildingBonusHelp().includes('40'));assert(env.buildingBonusHelp().includes('0.5%'));
@@ -24,4 +41,4 @@ vm.runInContext(src.slice(src.indexOf('    function layoutMinimap('),src.indexOf
 for(let i=0;i<3;i++){nodes.GlyphScanContainer.style.visibility='visible';env.layoutMinimap({minimapSize:220});assert.equal(nodes.GlyphScanContainer.style.visibility,'collapse');}
 assert.equal(live.hittest,true);assert.equal(live.hittestchildren,true);assert.equal(map.style.width,'226px');assert.equal(map.style.backgroundImage,'none');
 assert(!sideIds.includes('SurvivalMinimapShortcuts'));
-console.log('BONUS_HIT_PATH_AND_MINIMAP_PASS: both colored values hover through every parent; ornaments stay noninteractive; actual source text; live map input intact; native side decorations stay hidden');
+console.log('BONUS_HIT_PATH_AND_MINIMAP_PASS: native attack/armor/speed icons and building values retain source tooltips through every parent; colored source controls remain bound; ornaments stay noninteractive; live map input intact; native side decorations stay hidden');

@@ -1,0 +1,13 @@
+'use strict';
+const fs=require('fs'),path=require('path'),{spawnSync}=require('child_process'),{pathToFileURL}=require('url');
+const repo=path.resolve(__dirname,'../..'),out=path.join(repo,'design_refs/endless_leaderboard_20261016/ui/preview');
+const result=spawnSync(process.execPath,[path.join(repo,'tools/archive_parchment/preview.cjs'),'--out',out],{cwd:repo,encoding:'utf8',windowsHide:true});
+if(result.stdout)process.stdout.write(result.stdout);if(result.stderr)process.stderr.write(result.stderr);if(result.status)process.exit(result.status);
+const entry=path.join(out,'index.html');let html=fs.readFileSync(entry,'utf8');
+const adapter=pathToFileURL(path.join(repo,'tools/archive_v10/adapter.js')).href,state=pathToFileURL(path.join(repo,'tools/archive_v10/state.js')).href;
+const seam=pathToFileURL(path.join(__dirname,'preview_widgets.js')).href;
+html=html.replace('<script src="'+adapter+'"></script>','<script src="'+adapter+'"></script><script src="'+seam+'"></script>');
+html=html.replace('<script src="'+state+'"></script>','<script src="'+state+'"></script><script>window.leaderboardReady=window.previewReady.then(function(){return leaderboardPreviewStart();});</script>');
+html=html.replace(/(<div id="PreviewCaption">)[\s\S]*?(<\/div>)/,'$1无尽排行榜 · 正式 XML / JS / CSS · 本地模拟成绩与头像 · 未连接账号或游戏服务器$2');
+fs.writeFileSync(entry,html);
+console.log('ENDLESS_LEADERBOARD_PREVIEW '+path.relative(repo,entry));

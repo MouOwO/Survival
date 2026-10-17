@@ -10,6 +10,7 @@ end
 local function public_item(item,counts)
     local r={}
     for _,k in ipairs({'id','name','description','quality','item_type','duration_type','duration_text','icon','icon_type','effect_status','duplicate_points','exchange_points','exchange_enabled','max_owned'}) do r[k]=item[k] end
+    r.converted_currency='shop_points'
     r.owned_count=tonumber(counts[aliases.canonical(item.id)]) or 0
     r.owned=r.owned_count>0;r.at_max_owned=r.owned_count>=item.max_owned
     return r
@@ -37,6 +38,7 @@ function M.snapshots(profile)
         for _,item in ipairs(pool.items) do items[#items+1]=public_item(item,counts) end
         table.sort(items,function(a,b) if a.quality==b.quality then return a.id<b.id end return config.quality_rank[a.quality]>config.quality_rank[b.quality] end)
         local snapshot={version=config.version,reason='http',selected_pool_id=pool.id,selected_pool=selected,pools=pools,items=items,
+            shop_points=tonumber((((profile.save.archive or {}).commerce or {}).balances or {}).shop_points) or 0,
             starjoy_points=tonumber(stats.starjoy_points) or 0,map_level=tonumber(stats.map_level) or 0,draws=tonumber((state.pools[pool.id] or {}).draws) or 0}
         for _,k in ipairs({'ticket_content_id','ticket_name','tickets','single_cost','ten_cost','pity'}) do snapshot[k]=selected[k] end
         snapshots[#snapshots+1]=snapshot
@@ -57,10 +59,19 @@ local function add(stats,field,delta)
         end
     end
 end
-local function grant(item,counts,stats)
+local function grant(item,counts,stats,archive)
     local id=aliases.canonical(item.id);local owned=tonumber(counts[id]) or 0
     local result=public_item(item,counts);result.duplicate=owned>=item.max_owned;result.converted_points=0
-    if result.duplicate then result.converted_points=item.duplicate_points;add(stats,'starjoy_points',item.duplicate_points)
+    if result.duplicate then
+        -- Duplicate rewards fund the commerce wallet, never the separate loyalty score.
+        local commerce=archive.commerce or {};archive.commerce=commerce
+        local wallet=commerce.balances or {};commerce.balances=wallet
+        local old=wallet.shop_points or 0
+        local delta=item.duplicate_points
+        assert(type(old)=='number' and old>=0 and old==math.floor(old),'commerce_wallet_invalid')
+        assert(old+delta<=9007199254740991,'commerce_wallet_limit')
+        wallet.shop_points=old+delta
+        result.converted_points=delta;result.converted_currency='shop_points'
     else counts[id]=owned+1;for _,effect in ipairs(item.effects) do add(stats,effect.field_id,effect.value) end end
     return result
 end
@@ -98,7 +109,7 @@ function M.settle(profile,command)
         for _,rule in ipairs(pool.pity_rules) do if rule.trigger_mode=='batch_only' and rule.threshold==count and (not guarantee or config.quality_rank[rule.target_quality]>config.quality_rank[guarantee]) then guarantee=rule.target_quality end end
         for i=1,count do
             local item=roll(pool,i==count and not hit and guarantee or nil)
-            results[#results+1]=grant(item,counts,stats)
+            results[#results+1]=grant(item,counts,stats,archive)
             if guarantee and config.quality_rank[item.quality]>=config.quality_rank[guarantee] then hit=true end
         end
         current.draws=(tonumber(current.draws) or 0)+count
@@ -109,8 +120,9 @@ function M.settle(profile,command)
         if not item or item.exchange_enabled==false or item.exchange_points<=0 then return {ok=false,error='lottery_item_invalid'} end
         if (tonumber(counts[aliases.canonical(item.id)]) or 0)>=item.max_owned then return {ok=false,error='lottery_item_owned'} end
         if (tonumber(stats.starjoy_points) or 0)<item.exchange_points then return {ok=false,error='starjoy_points_insufficient'} end
-        add(stats,'starjoy_points',-item.exchange_points);response.item=grant(item,counts,stats);response.item.exchanged=true;response.cost=item.exchange_points
+        add(stats,'starjoy_points',-item.exchange_points);response.item=grant(item,counts,stats,archive);response.item.exchanged=true;response.cost=item.exchange_points
     else return {ok=false,error='lottery_command_invalid'} end
+    response.shop_points=tonumber(((archive.commerce or {}).balances or {}).shop_points) or 0
     return {ok=true,archive=archive,content_inventory=counts,gameplay_stats=stats,response=response}
 end
 return M

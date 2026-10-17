@@ -25,12 +25,68 @@ function building_system.validate(unit, position)
     return grid, nil
 end
 
+local function move_wall(unit,state,grid)
+    local navigation=require("systems/wall_navigation_service")
+    local origin=unit:GetAbsOrigin()
+    local old={position=Vector(origin.x,origin.y,origin.z),fixed=unit.survival_fixed_position,
+        x=state.grid_x,y=state.grid_y,unit_x=unit.survival_grid_x,unit_y=unit.survival_grid_y}
+    local position=grid.world_position
+    local function cells(event,x,y)
+        return event_bus.request(event,{grid_x=x,grid_y=y,
+            footprint=state.definition.footprint,entindex=unit:entindex()})
+    end
+    local ok,reason=pcall(function()
+        -- Release contacts at the OLD wall position, before restoring their
+        -- normal hulls. create() alone would keep this handle's old blockers.
+        navigation.clear(unit)
+        assert(cells(events.GRID_RELEASE_REQUEST,old.x,old.y)==true,"old_grid_release_failed")
+        unit:Stop()
+        unit.survival_fixed_position=Vector(position.x,position.y,position.z)
+        unit:SetAbsOrigin(unit.survival_fixed_position)
+        state.grid_x,state.grid_y=grid.grid_x,grid.grid_y
+        unit.survival_grid_x,unit.survival_grid_y=grid.grid_x,grid.grid_y
+        assert(cells(events.GRID_OCCUPY_REQUEST,grid.grid_x,grid.grid_y)==true,"new_grid_occupy_failed")
+        assert(#navigation.create(unit)>=4,"new_wall_navigation_missing")
+    end)
+    if not ok then
+        -- Nothing is published and no delayed teleport is started until the
+        -- new footprint and its navigation have both been installed.
+        local restored,restore_error=pcall(function()
+            navigation.clear(unit)
+            assert(cells(events.GRID_RELEASE_REQUEST,grid.grid_x,grid.grid_y)==true,"new_grid_release_failed")
+            unit.survival_fixed_position=old.fixed
+            unit:SetAbsOrigin(old.position)
+            state.grid_x,state.grid_y=old.x,old.y
+            unit.survival_grid_x,unit.survival_grid_y=old.unit_x,old.unit_y
+            assert(cells(events.GRID_OCCUPY_REQUEST,old.x,old.y)==true,"old_grid_restore_failed")
+            assert(#navigation.create(unit)>=4,"old_wall_navigation_missing")
+        end)
+        print("[BuildingBlink] wall move failed: "..tostring(reason)
+            ..(restored and " restored=1" or " restore_error="..tostring(restore_error)))
+        return false,restored and "wall_relocation_failed" or "wall_relocation_rollback_failed"
+    end
+    unit.survival_wall_relocation_revision=(tonumber(unit.survival_wall_relocation_revision) or 0)+1
+    unit:RemoveModifierByName("modifier_building_stationary")
+    unit:AddNewModifier(unit,nil,"modifier_building_blink_move",{
+        x=position.x,y=position.y,z=position.z,
+    })
+    event_bus.emit(events.BUILDING_CHANGED,building_system.public_state(state))
+    GameRules:GetGameModeEntity():SetContextThink(
+        "building_relocation_refresh_"..tostring(unit:entindex()),function()
+            if not unit or unit:IsNull() or not unit:IsAlive() then return nil end
+            unit:SetAbsOrigin(unit.survival_fixed_position)
+            return nil
+        end,0.06)
+    return true
+end
+
 function building_system.move(unit, position)
     if not unit or unit:IsNull() or not position then return false, "invalid_unit_or_position" end
     local state = building_system.get_state(unit:entindex())
     if not state then return false, "building_state_not_found" end
     local grid, reason = building_system.validate(unit, position)
     if not grid then return false, reason end
+    if state.building_id=="wall" then return move_wall(unit,state,grid) end
     position = grid.world_position
     event_bus.request(events.GRID_RELEASE_REQUEST, {
         grid_x = state.grid_x, grid_y = state.grid_y,

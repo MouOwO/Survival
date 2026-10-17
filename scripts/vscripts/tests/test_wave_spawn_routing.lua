@@ -74,4 +74,112 @@ assert(routing.position(active[0])==nil,"missing routing layout must not silentl
 local before=lookups
 for _=1,1000 do routing.position(active[1]) end
 assert(lookups==before,"individual spawning performs no marker discovery or route scan")
-print("WAVE_SPAWN_ROUTING_PASS: all quadrants, 1-4 parallel players, mixed sides, pending identity, shifted map center, native entrance width, missing marker safety")
+
+-- The released map has folded entrances: the east low road turns north into
+-- the northeast court. These positions come from the current Content VMAP,
+-- rather than the old straight-road layout used by the generic cases above.
+-- The high-ground wall examples are the four actual doorway centers. The
+-- builder positions independently identify which court each route serves.
+local original_get_map_name = GetMapName
+local generic_routing = routing
+local function load_map_routing(map_name)
+    GetMapName = function() return map_name end
+    package.loaded["systems/wave_spawn_routing"] = nil
+    return require("systems/wave_spawn_routing")
+end
+cx,cy=-1024,4096
+local map_positions={{112,0},{0,-112},{-112,0},{0,112}}
+for index,xy in ipairs(map_positions) do
+    portals["monsterborn_player"..index]=entity(xy[1],xy[2])
+end
+local courts={
+    {wall={128,6656},builder={-500,4600},side="east",marker=1},
+    {wall={1536,2944},builder={-500,3600},side="south",marker=2},
+    {wall={-2176,1536},builder={-1500,3600},side="west",marker=3},
+    {wall={-3584,5248},builder={-1500,4600},side="north",marker=4},
+}
+local function wall_at(id,position)
+    walls[id]=entity(position[1]-cx,position[2]-cy)
+end
+local actual_north_wall=Vector(128,6656,384)
+assert(generic_routing.side_for(actual_north_wall,Vector(cx,cy,0))=="north",
+    "regression fixture must expose the old north-wall choice of portal 4")
+routing=load_map_routing("template_map")
+assert(routing.side_for(actual_north_wall,Vector(cx,cy,0))=="east",
+    "folded north doorway must use portal 1, whose east road enters its northeast court")
+for _,court in ipairs(courts) do
+    local builder=Vector(court.builder[1],court.builder[2],0)
+    assert(routing.side_for(builder,Vector(cx,cy,0))==court.side,
+        "the doorway and its actual builder court must share the same portal")
+    for count=1,4 do
+        active,wall_ids=channels(),{}
+        for id=0,3 do
+            if id>=count then active[id]=nil
+            else wall_at(id+100,court.wall);wall_ids[id]=id+100 end
+        end
+        routing.refresh(active,wall_ids,1)
+        local previous_offset,total= nil,0
+        local base=portals["monsterborn_player"..court.marker]:GetAbsOrigin()
+        for id=0,count-1 do
+            local channel=active[id]
+            assert(channel.spawn_side==court.side)
+            assert(channel.marker==portals["monsterborn_player"..court.marker],
+                "all players in this court must use its physical portal")
+            local p=assert(routing.position(channel))
+            local offset
+            if court.marker==1 or court.marker==3 then
+                assert(p.x==base.x,"east/west physical portals must form a row along Y")
+                offset=p.y-base.y
+            else
+                assert(p.y==base.y,"north/south physical portals must form a row along X")
+                offset=p.x-base.x
+            end
+            assert(p.z==base.z and math.abs(offset)+32<=224)
+            if previous_offset then assert(offset-previous_offset==80) end
+            previous_offset,total=offset,total+offset
+        end
+        assert(total==0,"shared physical portal must retain a centered formation")
+    end
+end
+
+-- Moving a wall to the next court changes the route, while pending spawn
+-- callbacks keep the same channel object and receive its updated marker.
+active,wall_ids=channels(),{}
+for id=0,3 do wall_at(id+100,courts[id+1].wall);wall_ids[id]=id+100 end
+routing.refresh(active,wall_ids,1)
+local identities={}
+for id=0,3 do
+    identities[id]=active[id]
+    assert(active[id].marker==portals["monsterborn_player"..(id+1)])
+    assert(active[id].spawn_offset_x==0 and active[id].spawn_offset_y==0)
+end
+for id=0,3 do wall_at(id+100,courts[(id+1)%4+1].wall) end
+routing.refresh(active,wall_ids,1)
+for id=0,3 do
+    assert(active[id]==identities[id],"wall relocation must preserve pending channel identity")
+    assert(active[id].marker==portals["monsterborn_player"..((id+1)%4+1)],
+        "wall relocation must select the portal serving the new court")
+end
+wall_ids[0]=nil
+routing.refresh(active,wall_ids,1)
+assert(active[0].marker==portals.monsterborn_player1,
+    "an absent completed wall must still restore this player's configured fallback")
+local map_before=lookups
+for _=1,1000 do routing.position(active[1]) end
+assert(lookups==map_before,"map-specific routing must not discover markers for individual spawns")
+
+-- Do not rotate unrelated maps or a runtime without the engine map API.
+for _,map_name in ipairs({"survival_c6","unknown_routing_fixture"}) do
+    local other=load_map_routing(map_name)
+    for _,quadrant in ipairs(quadrants) do
+        assert(other.side_for(Vector(cx+quadrant[1],cy+quadrant[2],0),Vector(cx,cy,0))==quadrant[3],
+            "non-template maps must retain their established quadrant contract")
+    end
+end
+GetMapName=nil
+package.loaded["systems/wave_spawn_routing"]=nil
+local no_map_api=require("systems/wave_spawn_routing")
+assert(no_map_api.side_for(actual_north_wall,Vector(cx,cy,0))=="north")
+GetMapName=original_get_map_name
+package.loaded["systems/wave_spawn_routing"]=generic_routing
+print("WAVE_SPAWN_ROUTING_PASS: legacy quadrants, real folded-map doorways and builder courts, 1-4 parallel players, physical row axes, relocation identity, missing marker safety, no per-spawn discovery")

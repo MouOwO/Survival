@@ -4,6 +4,15 @@ local slots = require("config/generated/player_slots")
 local rules = require("config/global_rules")
 local M = {}
 local sides = {"east", "south", "west", "north"}
+local legacy_quadrant_sides = {
+    northeast = "north", southeast = "east",
+    southwest = "south", northwest = "west",
+}
+local quadrant_sides = legacy_quadrant_sides
+if GetMapName and GetMapName() == "template_map" then
+    quadrant_sides = require("config/map_layouts/template_map").wave_spawn_side_by_wall_quadrant
+        or legacy_quadrant_sides
+end
 
 local function origin(entity)
     if not entity then return nil end
@@ -34,10 +43,13 @@ local function layout()
 end
 
 function M.side_for(position, center)
+    local quadrant
     if position.x >= center.x then
-        return position.y >= center.y and "north" or "east"
+        quadrant = position.y >= center.y and "northeast" or "southeast"
+    else
+        quadrant = position.y >= center.y and "northwest" or "southwest"
     end
-    return position.y >= center.y and "west" or "south"
+    return quadrant_sides[quadrant]
 end
 
 function M.refresh(channels, wall_by_player, hull_multiplier)

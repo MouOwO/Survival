@@ -271,8 +271,11 @@ test('name, technology level and tooltip costs/effects update without discarding
     assert(h.card('attack') === original, 'the same dynamic changes work through delta snapshots');
     assert.equal(byClass('ShopTechnologyLevel').text, 'Lv.3');
     assert.equal(h.nodes.get('ShopTooltipDescription').text, '攻击力 +30');
-    h.nodes.get('ShopTooltipPurchase').events.onactivate();
-    assert.equal(purchaseRequests(h).at(-1).payload.entry_id, 'attack_4', 'the retained tooltip purchases the latest row');
+    assert.equal(h.nodes.has('ShopTooltipPurchase'), false, 'the tooltip has no purchase control');
+    assert.equal(h.nodes.has('ShopTooltipAutoPurchase'), false, 'the tooltip has no automatic-purchase control');
+    assert.equal(h.cfg.SurvivalShopTooltip.Inspect().actions, false);
+    original.events.oncontextmenu();
+    assert.equal(purchaseRequests(h).at(-1).payload.entry_id, 'attack_4', 'the retained card purchases the latest row');
 });
 
 test('visibility, added/removed rows and category changes are immediately reflected', () => {
@@ -452,7 +455,7 @@ test('repeated automatic book nettable messages do no DOM work, and closed chang
     assert(button); assert(!button.BHasClass('AutoBookEnabled'));
     h.setTable('survival_shop_config', 'auto_purchase_0', {shop_item_knowledge_book: 1});
     assert(button.BHasClass('AutoBookEnabled')); assert.equal(button.GetChild(0).text, '自动 ✓');
-    assert(h.nodes.get('ShopTooltipAutoPurchase').BHasClass('AutoBookEnabled'));
+    assert.equal(h.nodes.has('ShopTooltipAutoPurchase'), false, 'automatic buying stays outside the tooltip');
     h.reset();
     for (let index = 0; index < 1000; index++) h.setTable('survival_shop_config', 'auto_purchase_0', {shop_item_knowledge_book: 1});
     assertNoDOM(h, 'the same automatic-purchase state does not redraw either button or tooltip');
@@ -464,8 +467,10 @@ test('repeated automatic book nettable messages do no DOM work, and closed chang
     h.cfg.SurvivalShop.SelectOther();
     assert(h.card('shop_item_knowledge_book') === original); assert(!button.BHasClass('AutoBookEnabled'));
     assert.equal(button.GetChild(0).text, '自动');
-    original.events.onmouseover(); assert(!h.nodes.get('ShopTooltipAutoPurchase').BHasClass('AutoBookEnabled'));
-    h.nodes.get('ShopTooltipAutoPurchase').events.onactivate();
+    original.events.onmouseover();
+    assert.equal(h.nodes.has('ShopTooltipAutoPurchase'), false);
+    assert.equal(h.cfg.SurvivalShopTooltip.Inspect().actions, false);
+    h.cfg.SurvivalShop.ToggleAutoPurchaseEntry('shop_item_knowledge_book');
     assert.equal(h.requests.at(-1).name, 'ui_shop_auto_purchase_toggle_request');
     assert.equal(h.requests.at(-1).payload.entry_id, 'shop_item_knowledge_book');
 });

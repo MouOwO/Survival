@@ -1,4 +1,20 @@
-## 当前任务（2026-10-11）：同步提交并清理旧 UI 记录
+## 当前任务（2026-10-11）：候位第五只怪卡入城墙前排
+
+用户截图四怪攻墙，第五只候位怪挤在中间。真实service+AI运动模拟确认：stable waiting忽略inside变化的新退回goal、waiting MOVE取消无恢复；另后排普通碰撞可堵第五退路。没有第五攻击许可溢出，不能只改4-slot计数。
+
+仅修改wall_melee_contact和modifier_enemy_wall_ai：无claim且实际侵入前排、短段地面安全、无外部控制时进入禁攻击mode4向后暂时phase，不改自身Hull/攻击距离/四owner；延后一帧MOVE、0.5秒一次早期恢复、实际清出前排并与普通后排身体分离后恢复waiting。退出时局部检测后排占位，必要时延深安全目标；双侵入按entindex固定顺序退出，候选目标受496径向范围限制。保留选定rear goal；默认goal或短段受阻可选四列/center的完整安全段，失败2秒退避，退回中同周期复查。控制介入/目标释放/墙死/销毁回收，稳定后排零新增邻居查询。没有新timer、地图/模型资源、经济或伤害改动。
+
+新增独立真实运动回归test_wall_waiter_retreat：四face挤入与MOVE取消、6怪rear blocker真实间距75.256>=72、双同时侵入间距86.533>=72、初始和中途5类控制、中心fallback、低速斜向sticky goal、短段障碍/失败退避、死亡补位、10秒stable零新增指令/坐标/路径/后排查询。旧HEAD源码在同新fixture明确失败；新代码11套相关回归及3个Lua5.1语法全过，360怪四玩家/16独立front同时保持。证据output/wall_waiter_retreat_20261011/validation.json。未热替换当前对局或冒充实机验收；重新载入地图进入新Lua，无资源编译需求。本次未要求Git提交/推送，原有及并行脏改动保留。
+
+## 前次任务（2026-10-11）：主机启动器认证确认缺失
+
+用户确认报错发生在本主机运行 launch_aliyun_test_game.cmd，另一台电脑无法加入。实际证据：常驻 Hammer 助手 Python/Node占有29000，直接console超时；正常Stop确认实例锁及worker释放后，同一地图probe和inject成功。另旧runner的Start-Process -Wait仍等待保留的SSH后代，导致task Running，旧Setup误报停止超时。
+
+修复单机启动器暂停/恢复原活助手、JSON只读状态、Python本体WaitForExit、严格stop_confirmed清理证明与旧包装器兼容启动；LAN保留原暂停流程。停用或未安装助手无实际心跳时不意外启用，恢复失败保留原认证错误并返回非0。注入新增本次nonce固定分阶段错误，不暴露凭据/异常原文、不自动重放。复用现有工具和临时KV权限/清理，无玩法或后端契约变化。
+
+实机完整AttachOnly启动退出0，GAME_AUTH_READY/HAMMER_BACKEND_RESUMED均返回；后续task_enabled/helper_running均true、helper_status=connected。原Dota63024及SSH63172和启动时间保持；未终止游戏或重载已有档案。另一台电脑本轮完整入场仍待实测，不能把主机恢复当作双机成功。文档更新既有LAN/连接排查入口，公共工具包加入新runner回归；不另建重复Markdown。本次未请求commit/push，修改留在工作区。
+
+## 前次任务（2026-10-11）：同步提交并清理旧 UI 记录
 
 按用户固定顺序完成唯一 stash、当前 dev pull、精确 pop；远端无新提交且恢复无冲突。整理本轮现有玩法、联机奖励、无尽模型、V10 UI 与支付源码和配套运行资源，一起提交推送；不切换未部署的存档 bundle/hash。
 

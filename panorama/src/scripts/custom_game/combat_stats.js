@@ -151,6 +151,7 @@
         ability_survival_hero_ball_lightning: "D",
         ability_survival_builder_blink: "D",
         ability_building_blink: "D",
+        ability_wall_blink: "D",
         ability_survival_rogue_reward: "G",
         ability_destroy_arrow_tower: "G",
         ability_survival_pickup_materials: "F",
@@ -160,7 +161,8 @@
         D: [
             "ability_survival_hero_ball_lightning",
             "ability_survival_builder_blink",
-            "ability_building_blink"
+            "ability_building_blink",
+            "ability_wall_blink"
         ],
         F: ["ability_survival_pickup_materials"],
         G: ["ability_survival_rogue_reward", "ability_destroy_arrow_tower"]
@@ -169,6 +171,7 @@
         ability_survival_hero_ball_lightning: 10,
         ability_survival_builder_blink: 10,
         ability_building_blink: 10,
+        ability_wall_blink: 10,
         ability_destroy_arrow_tower: 20,
         ability_survival_return_home: 20,
         ability_survival_pickup_materials: 30
@@ -405,14 +408,24 @@
         }
         var overlay = towerPortraitOverlayPanel();
         if (!validPortraitPanel(overlay)) return null;
-        var candidate = overlay.FindChildTraverse("SurvivalBuilderIoPortraitScene");
+        // Version both the map and its native node. A live Tools reload may
+        // retain the old map beneath Valve's HUD after our layout is replaced.
+        ["SurvivalBuilderIoPortraitScene", "SurvivalBuilderIoPortraitSceneV2"].forEach(function (id) {
+            var legacy = overlay.FindChildTraverse(id);
+            if (validPortraitPanel(legacy)) {
+                legacy.style.visibility = "collapse";
+                legacy.DeleteAsync(0);
+            }
+        });
+        var candidate = overlay.FindChildTraverse("SurvivalBuilderIoPortraitSceneV2Alpha");
         if (!validPortraitPanel(candidate) && create) {
             // Io's light body is a particle effect. This isolated map includes
             // its companion model and attachments without account loadouts.
             try {
-                candidate = $.CreatePanel("DOTAScenePanel", overlay, "SurvivalBuilderIoPortraitScene", {
-                    map: "portraits/builder_io_companion_v1", camera: "builder_io_camera",
-                    particleonly: "false", antialias: "true", "animate-during-pause": "true"
+                candidate = $.CreatePanel("DOTAScenePanel", overlay, "SurvivalBuilderIoPortraitSceneV2Alpha", {
+                    map: "portraits/builder_io_companion_v2", camera: "builder_io_camera",
+                    particleonly: "false", antialias: "true", "animate-during-pause": "true",
+                    renderdeferred: "true", deferredalpha: "true"
                 });
             } catch (error) {
                 $.Warning("[SURVIVAL_PORTRAIT] BUILDER_MAP_FAILED reason=" + String(error && error.message || error));
@@ -423,6 +436,14 @@
             candidate.hittest = false;
             candidate.hittestchildren = false;
             candidate.style.visibility = "collapse";
+        }
+        if (validPortraitPanel(candidate)) {
+            // Created under Valve's HUD, this node does not inherit our XML
+            // stylesheet scope. Size it inline, including hot-reloaded nodes.
+            candidate.style.width = "100%";
+            candidate.style.height = "100%";
+            candidate.style.position = "0px 0px 0px";
+            candidate.style.overflow = "clip";
         }
         builderPortraitScene = validPortraitPanel(candidate) ? candidate : null;
         return builderPortraitScene;
@@ -654,10 +675,10 @@
         if (overlay.GetParent() !== host) overlay.SetParent(host);
         if (overlay.GetParent() !== host) return false;
         overlay.style.ignoreParentFlow = true;
-        // Native getters return decimal strings such as "0.0". The custom
-        // scene must paint above DOTAPortrait while mouse input passes through.
+        // Valve's #portraitHUD stylesheet uses z-index 3 even when the inline
+        // getter reports zero. Paint above that layer and any inline override.
         var nativeZIndex = Number(anchor.style.zIndex);
-        overlay.style.zIndex = String(isFinite(nativeZIndex) ? nativeZIndex + 1 : 1);
+        overlay.style.zIndex = String(Math.max(4, isFinite(nativeZIndex) ? nativeZIndex + 1 : 4));
         if (layerChanged && host.MoveChildAfter) host.MoveChildAfter(overlay, anchor);
         if (layerChanged) {
             towerPortraitLayerAnchor = anchor;
@@ -2647,12 +2668,14 @@
         var actionResources = GameUI.CustomUIConfig().SurvivalActionResources;
         if (actionResources && actionResources.Reject(abilityRuntime(abilityIndex))) return false;
         try { name = Abilities.GetAbilityName(abilityIndex) || ""; } catch (error) {}
-        if (name === "ability_building_blink" && Abilities.GetCooldownTimeRemaining(abilityIndex) > 0) {
+        if ((name === "ability_building_blink" || name === "ability_wall_blink")
+            && Abilities.GetCooldownTimeRemaining(abilityIndex) > 0) {
             var towerTools = GameUI.CustomUIConfig().SurvivalArrowTowerTools;
             if (towerTools && towerTools.RejectMoveCooldown) towerTools.RejectMoveCooldown(abilityIndex);
             else {
                 cancelPointTarget("move_ability_cooldown");
-                GameEvents.SendEventClientSide("dota_hud_error_message", {reason: 80, message: "移动防御塔CD中"});
+                GameEvents.SendEventClientSide("dota_hud_error_message", {reason: 80,
+                    message: name === "ability_wall_blink" ? "移动城墙CD中" : "移动防御塔CD中"});
             }
             return false;
         }
@@ -2777,7 +2800,8 @@
             return false;
         }
         // This dispatcher also owns native ability-button clicks after startup.
-        if (researchName === "ability_building_blink" || researchName === "ability_destroy_arrow_tower") {
+        if (researchName === "ability_building_blink" || researchName === "ability_wall_blink"
+            || researchName === "ability_destroy_arrow_tower") {
             var towerTools = GameUI.CustomUIConfig().SurvivalArrowTowerTools;
             return !!(towerTools && towerTools.TriggerAbility && towerTools.TriggerAbility(researchName, unit));
         }

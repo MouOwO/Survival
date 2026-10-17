@@ -2,12 +2,32 @@
 
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local player_context = require("systems/player_context_service")
 local diagnostic_rule = require("config/generated/global_rules").by_id.runtime_detailed_diagnostics
 local detailed_diagnostics = diagnostic_rule and diagnostic_rule.enabled ~= false
     and tonumber(diagnostic_rule.value) == 1
 
 modifier_weapon_stat_projection = _G.modifier_weapon_stat_projection or class({})
 _G.modifier_weapon_stat_projection = modifier_weapon_stat_projection
+
+local function decide_damage_route(self, phase)
+    if self == modifier_weapon_stat_projection or not self.GetParent
+        or not IsServer() or not IsInToolsMode or not IsInToolsMode()
+        or self.weapon_projection_damage_mode_decided then return end
+    self.weapon_projection_damage_mode_decided = true
+    self.shared_weapon_projection_damage_observer = false
+    self.weapon_projection_damage_route_reason = "legacy_or_probe_disabled"
+    if phase ~= "declare" or self.server_snapshot ~= nil or self.player_id ~= nil
+        or _G.SURVIVAL_SHARED_WEAPON_PROJECTION_DAMAGE_PROBE ~= true then return end
+    local ok, registration, reason = pcall(function()
+        return require("systems/weapon_projection_damage_observer").register_new(self:GetParent(), self)
+    end)
+    self.shared_weapon_projection_damage_observer = ok and type(registration) == "table"
+        and self.weapon_projection_damage_registration == registration and registration.modifier == self
+        and registration.token ~= nil and self.weapon_projection_damage_registration_token == registration.token
+    self.weapon_projection_damage_route_reason = self.shared_weapon_projection_damage_observer
+        and "shared_registered_at_first_declare" or (ok and (reason or "registration_commit_unconfirmed") or "registration_exception")
+end
 
 local critical_records = {}
 local displayed_damage_records = {}
@@ -49,6 +69,7 @@ function modifier_weapon_stat_projection:RemoveOnDeath() return false end
 
 function modifier_weapon_stat_projection:OnCreated(kv)
     if IsServer() then
+        decide_damage_route(self, "created")
         self.player_id = tonumber(kv.player_id)
             or self:GetParent():GetPlayerOwnerID()
         -- hero_combat_stat_service populates this with ForceRefresh after all
@@ -61,6 +82,7 @@ end
 
 function modifier_weapon_stat_projection:OnRefresh()
     if IsServer() then
+        decide_damage_route(self, "refresh")
         self.server_snapshot = combat_snapshot(self.player_id)
         if self.SendBuffRefreshToClients then
             self:SendBuffRefreshToClients()
@@ -69,14 +91,18 @@ function modifier_weapon_stat_projection:OnRefresh()
 end
 
 function modifier_weapon_stat_projection:DeclareFunctions()
-    return {
+    decide_damage_route(self, "declare")
+    local declarations = {
         MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
         MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT,
         MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
         MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE,
         MODIFIER_EVENT_ON_ATTACK_RECORD,
-        MODIFIER_EVENT_ON_TAKEDAMAGE,
     }
+    if not (IsServer() and self.shared_weapon_projection_damage_observer == true) then
+        declarations[#declarations + 1] = MODIFIER_EVENT_ON_TAKEDAMAGE
+    end
+    return declarations
 end
 
 local function snapshot(self)
@@ -278,7 +304,25 @@ function modifier_weapon_stat_projection:GetModifierPreAttack_BonusDamage()
             or tonumber(stats.engine_research_attack_bonus) or 0)
 end
 
-function modifier_weapon_stat_projection:OnTakeDamage(params)
+-- Only a confirmed current owner can prune the old same-team delivery.
+-- Unknown/conflicting ownership, missing receiver ids and failed native queries
+-- retain the legacy event, including existing debug/telemetry consumers.
+local function confirmed_damage_owner(attacker)
+    local ok, owner = pcall(player_context.owner_player_id, attacker)
+    owner = ok and tonumber(owner) or nil
+    if owner == nil or owner ~= owner or owner < 0 or owner == math.huge
+        or owner ~= math.floor(owner) then return nil end
+    if PlayerResource and type(PlayerResource.IsValidPlayerID) == "function" then
+        local valid_ok, valid = pcall(PlayerResource.IsValidPlayerID, PlayerResource, owner)
+        if not valid_ok or valid ~= true then return nil end
+    end
+    return owner
+end
+
+-- Shared routing must use precisely the same confirmed/unknown ownership rule.
+modifier_weapon_stat_projection.ResolveDamageOwner = confirmed_damage_owner
+
+function modifier_weapon_stat_projection:HandleTakeDamage(params)
     if not IsServer() then return end
     local attacker = params.attacker
     local victim = params.unit
@@ -286,6 +330,12 @@ function modifier_weapon_stat_projection:OnTakeDamage(params)
         or attacker:GetTeamNumber() ~= self:GetParent():GetTeamNumber()
         or victim:GetTeamNumber() == self:GetParent():GetTeamNumber()
         or (tonumber(params.damage) or 0) <= 0 then return end
+    local receiver = tonumber(self.player_id)
+    if receiver ~= nil and receiver == receiver and receiver >= 0
+        and receiver < math.huge and receiver == math.floor(receiver) then
+        local owner = confirmed_damage_owner(attacker)
+        if owner ~= nil and owner ~= receiver then return end
+    end
     if attacker == self:GetParent() then
         modifier_weapon_stat_projection.ShowFinalAttackDamage(
             self.player_id, attacker, victim, params
@@ -311,4 +361,16 @@ function modifier_weapon_stat_projection:OnTakeDamage(params)
         target = victim,
         damage_category = tonumber(params.damage_category),
     })
+end
+
+function modifier_weapon_stat_projection:OnTakeDamage(params)
+    if self.shared_weapon_projection_damage_observer == true then return end
+    return self:HandleTakeDamage(params)
+end
+
+function modifier_weapon_stat_projection:OnDestroy()
+    if not IsServer() or not self.weapon_projection_damage_registration then return end
+    self.weapon_projection_damage_destroyed = true
+    local observer = package.loaded["systems/weapon_projection_damage_observer"]
+    if observer and type(observer.unregister) == "function" then observer.unregister(self) end
 end

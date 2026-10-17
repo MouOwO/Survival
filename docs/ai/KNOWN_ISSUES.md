@@ -166,3 +166,35 @@ Last Reviewed: 2026-08-27
 ## 2026-10-11 提交检查补充
 
 相关 UI 测试已更新到当前 V10/native scene 入口，删除布局引用、构建 scope 依赖及旧 XML 尾空格已处理。无尽生成器的 Windows CRLF --check 误报已修复，严格内容校验保留。上述检查不替代实机 UI、怪物外观或联机验收；共享奖励云端配套发布状态仍是 CODE_READY_DEPLOYMENT_PENDING。
+
+## ISSUE-HOST-AUTH-CONSOLE-CONTENTION-20261011
+
+**Status:** HOST_FIXED_LAN_ACCEPTANCE_PENDING
+
+**Priority:** P1
+
+**Symptom:** 本主机运行launch_aliyun_test_game.cmd报tools_server_confirmation_missing，另一台电脑无法加入。
+
+**Known Cause:** 常驻Hammer助手持有29000，启动器另建直连未获回执；旧runner等待保留的SSH子进程还会导致task持续Running、Stop误报超时。safe Stop后的同图probe/inject成功验证前一原因。
+
+**Current Workaround:** 单机启动器已自动暂停并恢复原活助手；Setup严格确认实例锁释放并兼容旧包装器，原停用策略保持。实际AttachOnly流程通过，原游戏及SSH保存，助手恢复connected。
+
+**Next Action:** 加入者通过join_lan_game.cmd连接主机实际IPv4，新局房主等队员名单齐全后点击开始加载；本轮双机完整入场尚未验证，若仍失败区分客户端连接/资源或阶段，不重复重载当前局。
+
+**Last Verified:** 2026-10-11；主机完整启动及原助手恢复实测通过，原进程启动时间未变。见docs/HAMMER_BACKEND_RECONNECT.md及output/lan_auth_diagnosis_20261011。
+
+## ISSUE-WALL-WAITER-FRONT-INTRUSION-20261011
+
+**Status:** CODE_FIXED_WORKSHOP_PENDING
+
+**Priority:** P1
+
+**Symptom:** 四只怪持续攻击城墙，第五只候位怪卡在前排中间。
+
+**Known Cause:** 候位AI保持旧移动目标且不恢复取消的MOVE；后排普通单位碰撞可堵退路，前排phased允许它与前排重叠。四许可没有溢出。
+
+**Current Workaround:** 无许可前排侵入者经安全完整地面段及控制门禁，临时禁攻击phase退到前排外缘并与普通后排身体分离后恢复碰撞；退出检测发现占位则安全延深，双侵入按entindex退出避免重叠，目标不越接触范围。选定后方目标保持，有界安全备用路径与两秒退避；四个正常前排不受影响，稳定候位零新增邻居查询。
+
+**Next Action:** 重新载入地图确认截图场景只有四只同排攻击，第五只退到后方；实际障碍全部封死时保持禁攻击等待，不强行穿地形。不要把离线模拟当Dota物理验收。
+
+**Last Verified:** 2026-10-11；11套Lua5.1回归、3语法及旧HEAD负例通过，四face/360怪多人/死亡补位、六怪及双侵入退出真实body间距、稳定零额外订单/坐标/路径/后排查询完成；尚未实机画面验收。

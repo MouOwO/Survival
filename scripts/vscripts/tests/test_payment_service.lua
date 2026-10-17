@@ -2,6 +2,7 @@ package.path='scripts/vscripts/?.lua;'..package.path
 -- Commerce has its own scheduler/runtime tests; this fixture tests the
 -- authenticated payment transport without starting an unrelated game loop.
 package.loaded['systems/commerce_service']={init=function() end}
+package.loaded['core/scheduler']={after=function()end,cancel=function()end}
 local pass_provider
 package.loaded['systems/archive_service']={set_purchase_provider=function(value)pass_provider=value end}
 local handlers,sent,requests={},{},{}
@@ -11,7 +12,8 @@ local profile={save={content_inventory={},gameplay_stats={initial_wood=180}}}
 local provider={resolve_account_id=function(id)return id==0 and '123' or '456' end}
 package.loaded['systems/player_profile_service']={get_provider=function()return provider end,
  get_profile=function()return loaded and profile or nil end,
- load_player=function(id,reason,done)refreshed=refreshed+1;done();return {ok=true} end}
+ load_player=function()error("payment must use non-destructive refresh")end,
+ refresh_player=function(id,reason,done)refreshed=refreshed+1;done();return {ok=true} end}
 package.loaded['systems/match_setup_service']={get_session_id=function()return 'safe_session' end}
 PlayerResource={IsValidPlayerID=function(_,id)return id==0 or id==1 end,IsFakeClient=function()return false end,
  GetPlayer=function(_,id)return {id=id} end}
@@ -161,3 +163,73 @@ assert(not pass_provider.open_checkout(0,{sku=pass_rules.pass_sku}))
 Convars.GetStr=get_token
 assert(#requests==before_checkout,'invalid checkout entries cannot contact the gateway')
 print('MONTHLY_CHECKOUT_SERVICE_PASS: trusted SKU and player, profile/token validation, confirmation creates no order')
+
+-- Count is the only new client-owned order field. Identity/prices remain server-owned.
+local before_quantity=#requests
+handle(0,{PlayerID=0,action='create',sku='quantity_ticket',quantity=7,amount_fen=1,unit_amount_fen=1})
+assert(#requests==before_quantity+1)
+local quantity_body=require('core/json_decoder').decode(requests[#requests].body)
+assert(quantity_body.quantity==7 and quantity_body.amount_fen==nil and quantity_body.unit_amount_fen==nil)
+requests[#requests].done({StatusCode=200,Body='{"ok":true,"sku":"quantity_ticket","order_id":"WX333333333333333333333333333333","state":"pending","quantity":7,"unit_amount_fen":120,"amount_fen":840}'} )
+assert(sent[#sent].quantity==7 and sent[#sent].amount_fen==840)
+local before_invalid=#requests
+for _,bad in ipairs({0,-1,1.5,101,'5',true}) do
+ handle(0,{PlayerID=0,action='create',sku='quantity_invalid',quantity=bad})
+ assert(#requests==before_invalid and sent[#sent].error=='quantity_invalid')
+end
+print('PAYMENT_QUANTITY_BRIDGE_PASS: integer1..100, trusted totals, no client price forwarding')
+
+-- Recharge is the only large-quantity product. Cash totals and wallet credits
+-- are authenticated response fields, never a client-supplied exchange rate.
+clock=clock+3
+handle(0,{PlayerID=0,action='catalog',request_id='recharge_catalog'})
+requests[#requests].done({StatusCode=200,Body='{"ok":true,"products":[{"sku":"u_coin_recharge","product_type":"recharge","enabled":true,"amount_fen":100,"recharge_u_coin_per_unit":100,"max_quantity":999999}]}'})
+local recharge=sent[#sent].products[1]
+assert(recharge.sku=='u_coin_recharge' and recharge.product_type=='recharge'
+ and recharge.amount_fen==100 and recharge.recharge_u_coin_per_unit==100 and recharge.max_quantity==999999,
+ 'catalog must preserve authoritative recharge metadata')
+local recharge_order
+for _,selection in ipairs({{quantity=1,provider='wechat'},{quantity=999999,provider='alipay'}}) do
+ clock=clock+2
+ local before=#requests
+ handle(0,{PlayerID=0,action='create',sku='u_coin_recharge',quantity=selection.quantity,provider=selection.provider,
+  account_id='attacker',amount_fen=1,unit_amount_fen=1,recharge_u_coin_per_unit=999999,recharge_u_coin_total=999999999})
+ assert(#requests==before+1,'recharge quantity endpoints must reach the payment transport')
+ local sent_body=require('core/json_decoder').decode(requests[#requests].body)
+ assert(sent_body.sku=='u_coin_recharge' and sent_body.quantity==selection.quantity and sent_body.provider==selection.provider)
+ assert(sent_body.account_id=='123' and sent_body.amount_fen==nil and sent_body.unit_amount_fen==nil
+  and sent_body.recharge_u_coin_per_unit==nil and sent_body.recharge_u_coin_total==nil,
+  'client cannot choose the recharge price, grant or account')
+ recharge_order={ok=true,sku='u_coin_recharge',product_type='recharge',state='pending',
+  order_id='RC'..string.format('%030d',selection.quantity),quantity=selection.quantity,max_quantity=999999,
+  unit_amount_fen=100,amount_fen=100*selection.quantity,recharge_u_coin_per_unit=100,recharge_u_coin_total=100*selection.quantity}
+ requests[#requests].done({StatusCode=200,Body=require('core/json_encoder').encode(recharge_order)})
+ assert(sent[#sent].quantity==selection.quantity and sent[#sent].amount_fen==100*selection.quantity
+  and sent[#sent].max_quantity==999999 and sent[#sent].product_type=='recharge'
+  and sent[#sent].recharge_u_coin_total==100*selection.quantity)
+end
+local recharges_before=refreshed
+clock=clock+2
+handle(0,{PlayerID=0,action='status',sku='u_coin_recharge'})
+recharge_order.state='delivered'
+requests[#requests].done({StatusCode=200,Body=require('core/json_encoder').encode(recharge_order)})
+assert(refreshed==recharges_before+1 and sent[#sent].state=='delivered','recharge uses the existing authoritative refresh')
+clock=clock+2
+handle(0,{PlayerID=0,action='status',sku='u_coin_recharge'})
+requests[#requests].done({StatusCode=200,Body=require('core/json_encoder').encode(recharge_order)})
+assert(refreshed==recharges_before+1,'duplicate recharge receipt cannot refresh or grant twice')
+local recharge_invalid=#requests
+for _,bad in ipairs({0,-1,1.5,1000000,'999999',true,math.huge,-math.huge,0/0}) do
+ handle(0,{PlayerID=0,action='create',sku='u_coin_recharge',quantity=bad})
+ assert(#requests==recharge_invalid and sent[#sent].error=='quantity_invalid')
+end
+for _,sku in ipairs({'quantity_ticket','u_coin_recharge_extra'}) do
+ handle(0,{PlayerID=0,action='create',sku=sku,quantity=999999})
+ assert(#requests==recharge_invalid and sent[#sent].error=='quantity_invalid','recharge maximum must not extend to other products')
+end
+clock=clock+2
+handle(0,{PlayerID=0,action='create',sku='quantity_ticket',quantity=100})
+assert(#requests==recharge_invalid+1 and require('core/json_decoder').decode(requests[#requests].body).quantity==100,
+ 'ordinary products retain their inclusive quantity100 endpoint')
+requests[#requests].done({StatusCode=200,Body='{"ok":true,"sku":"quantity_ticket","state":"pending","quantity":100}'})
+print('PAYMENT_RECHARGE_BRIDGE_PASS: recharge-only integer1..999999, both channels, trusted cash/grant metadata, invalid quantities and duplicate refresh safe')

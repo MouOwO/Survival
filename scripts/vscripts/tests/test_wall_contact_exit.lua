@@ -48,6 +48,7 @@ local function entity(p,radius)
     function u:GetAbsOrigin() return self.p end
     function u:SetAbsOrigin(value) self.p=copy(value);self.position_writes=self.position_writes+1 end
     function u:GetHullRadius() return self.radius end
+    function u:GetPaddedCollisionRadius() return self.radius+10 end
     function u:SetHullRadius(value) self.radius=value;self.hull_writes=self.hull_writes+1 end
     function u:IsStunned() return self.stunned or false end
     function u:IsCommandRestricted() return self.restricted or false end
@@ -56,6 +57,11 @@ local function entity(p,radius)
     function u:IsCurrentlyVerticalMotionControlled() return self.vertical or false end
     return u
 end
+-- This fixture supplies the same fixed terrain cross-section that the real
+-- navigation registration caches. Narrow lanes must not inherit open-floor64.
+package.loaded['systems/wall_navigation_service']={contact_layout=function()
+    return {gate=true,axis=terrain.face<=2 and 1 or 2,min=-terrain.half,max=terrain.half,center=0}
+end}
 local contact=require('systems/wall_melee_contact')
 local function begin(width,face)
     contact.reset()
@@ -66,7 +72,8 @@ end
 local function admitted(wall,radius,lateral)
     local u=entity(point(400,lateral),radius)
     local plan=assert(contact.resolve(wall,u))
-    assert(plan.claimed and u:GetHullRadius()==math.min(radius,24),
+    local pitch=math.min(64,terrain.half*.5)
+    assert(plan.claimed and u:GetHullRadius()==math.min(radius,pitch*.5-12),
         'exit fixture did not receive a bounded front reservation')
     u.p=copy(plan.point)
     return u,plan.point
@@ -235,7 +242,11 @@ for _,blocked in ipairs({false,true}) do
     u.p=point(200,72)
     local before=copy(u.p)
     local others={}
-    for _,lateral in ipairs({-72,-24,24}) do others[#others+1]=admitted(wall,32,lateral) end
+    for _,lateral in ipairs({-72,-24,24}) do
+        local other,destination=admitted(wall,32,lateral)
+        assert(contact.settle(wall,other,destination),'stationary exit fixture must actually settle')
+        others[#others+1]=other
+    end
     if blocked then
         terrain.blocked=function(p)
             local normal,lateral=local_coordinates(p)

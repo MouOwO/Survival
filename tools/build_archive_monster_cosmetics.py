@@ -32,7 +32,7 @@ SPECS = {
     'hunt_10': ('legion_commander', '34333', ''),
     'hunt_11': ('clinkz', '21040', ''),
     'hunt_12': ('rubick', '29096', ''),
-    **{f'social_{key}': ('ogre_magi', '21256', '') for key in ('friend', 'ex', 'beast')},
+    **{f'social_{key}': ('ogre_magi', '21256', '') for key in ('friend', 'ex', 'beast', 'wife')},
 }
 # Explicit additions have priority over bundle components in the same slot.
 EXTRAS = {

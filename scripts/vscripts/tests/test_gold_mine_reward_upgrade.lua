@@ -14,6 +14,8 @@ local service=require("systems/gold_mine_system")
 local spent=0
 bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST,function(p) spent=spent+1;return {ok=true} end)
 service.init()
+local completion_reason
+bus.subscribe(events.BUILDING_CHANGED,function(payload) completion_reason=payload.reason end)
 local unit={}
 function unit:IsNull() return false end
 function unit:IsAlive() return self.dead~=true end
@@ -32,6 +34,7 @@ assert(upgrade({player_id=0,system_free_upgrade=true}).ok and begins==1 and spen
 assert(last_options.target_level==2)
 assert(not upgrade({player_id=0,system_free_upgrade=true}).ok and begins==1)
 active=false;last_options.on_complete();assert(unit.survival_level==2)
+assert(completion_reason=="gold_mine_upgraded","reward upgrade chains need a completion event")
 assert(upgrade({player_id=0}).ok and begins==2 and spent==1,"normal upgrades still pay")
 active=false;unit.dead=true;assert(not upgrade({player_id=0,system_free_upgrade=true}).ok)
 print("PASS gold mine reward upgrade: owner, free one level, busy/dead target, normal upgrade payment")

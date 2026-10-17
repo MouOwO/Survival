@@ -452,6 +452,32 @@ attack_snapshot("debug_override_no_double_equipment",1e11,1e11,1e11,1e11,0)
 attack_snapshot("equipment_after_debug_cleared",30,40,300,400,25)
 attack_snapshot("final_restore",30,40,300,400,0)
 
+-- The hero stat producer owns profile-change EX calculation; the clone must
+-- copy its resulting attributes verbatim and its independent damage cache.
+snapshots[0].strength=10.8;snapshots[0].agility=21.6;snapshots[0].intellect=32.4
+snapshots[0].commerce_ex_attribute_multiplier=1.08
+snapshots[0].commerce_ex_final_damage_multiplier=1.08
+bus.emit(events.HERO_COMBAT_STATS_CHANGED,{player_id=0,snapshot=snapshots[0]})
+near(clone.survival_commerce_hero_ex_damage_multiplier,1.08,"monkey clone inherits damage EX")
+near(other.survival_commerce_hero_ex_damage_multiplier,1,"other player stays unowned")
+near(clone.survival_strength,10.8,"already-projected strength may not receive EX again")
+near(clone.survival_agility,21.6);near(clone.survival_intellect,32.4)
+near(clone.modifiers.modifier_monkey_king_clone.snapshot.strength,10.8)
+real_hit(ordinary_target,clone.damage_max,DOTA_DAMAGE_CATEGORY_ATTACK,nil,clone.damage_max*1.08)
+real_hit(ordinary_target,35,DOTA_DAMAGE_CATEGORY_SPELL,555,35*1.08)
+stable_cost=native_cost(clone)
+for _=1,10 do tasks.monkey_clone_sync.callback() end
+unchanged_cost(clone,stable_cost,"unchanged EX ownership polls")
+near(clone.survival_commerce_hero_ex_damage_multiplier,1.08)
+-- PLAYER_PROFILE_CHANGED revocation produces this authoritative hero snapshot.
+snapshots[0].commerce_ex_final_damage_multiplier=1
+snapshots[0].commerce_ex_attribute_multiplier=1
+snapshots[0].strength=10;snapshots[0].agility=20;snapshots[0].intellect=30
+bus.emit(events.HERO_COMBAT_STATS_CHANGED,{player_id=0,snapshot=snapshots[0]})
+near(clone.survival_commerce_hero_ex_damage_multiplier,1,"loss of owner privilege clears cloned EX")
+real_hit(ordinary_target,35,DOTA_DAMAGE_CATEGORY_SPELL,555,35)
+original_print("MONKEY_CLONE_EX_PASS exact inherited attributes; native basic/ability damage EX once; player isolation, stable reuse and ownership revocation")
+
 clone.dead=true
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=clone})
 fixed(first,6)

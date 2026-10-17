@@ -2,6 +2,10 @@
     "use strict";
     // UI_REUSE_V1
     var cfg=GameUI.CustomUIConfig(), owner=$.GetContextPanel();
+    // A HUD rebuild loads this controller before its presentation. Release a
+    // dead previous skin before controller disposal can call its render hooks.
+    var previousPresentation=cfg.SurvivalPurpleLottery;
+    if(previousPresentation&&previousPresentation.IsAlive&&!previousPresentation.IsAlive()&&previousPresentation.Dispose)previousPresentation.Dispose();
     if(cfg.SurvivalLottery&&cfg.SurvivalLottery.Dispose)cfg.SurvivalLottery.Dispose();
     var lifetime=$.CreatePanel("Panel",owner,""),disposed=false,subscriptions=[];lifetime.visible=false;
     function alive(){return !disposed&&(!lifetime.IsValid||lifetime.IsValid());}
@@ -31,6 +35,7 @@
     var resultCards = [], lastDrawCount = 1, history = [], seenResults = {};
     var activeRequest = null, opened = false, switchingPool = false;
     var feedbackRequest = null, rewardReceipt = null, rewardFX = null, rewardFXRoot = null;
+    var walletRefreshes={};
     var motion = { single: {enter:650, flip:1250, ready:2000}, ten: {enter:800, enterStep:40, flip:1350, flipStep:110, ready:2800}, flipHalf:100 };
     var historyPoolId = "map", detailPoolId = null, detailState = null, detailRequestSerial = 0;
     var animationTimers = [], activeFeature = "", reopenDetails = false, knownPools = [], selectedRewardId = null, poolCards = [];
@@ -127,6 +132,27 @@
     function succeeded(value) {
         return value === true || Number(value) === 1;
     }
+    function duplicateCurrency(item) {
+        return item&&(item.converted_currency||item.duplicate_currency)==="shop_points"?"商城积分":"星悦积分";
+    }
+    function pointsBalance(value) {
+        if(value===undefined||value===null||value==="")return "—";
+        var number=Number(value);return isFinite(number)&&number>=0?String(number):"—";
+    }
+    function refreshRewardWallet(key) {
+        if(!key||walletRefreshes[key])return;
+        var job=walletRefreshes[key]={attempts:0},delays=[1.1,3,9];
+        function attempt(){
+            if(!alive()||walletRefreshes[key]!==job)return;
+            var wallet=cfg.SurvivalCommerceWallet;
+            if(wallet){
+                if(wallet.Invalidate&&wallet.Invalidate("lottery:"+key)!==false)return;
+                if(!wallet.Invalidate&&wallet.Refresh&&wallet.Refresh()!==false)return;
+            }
+            if(job.attempts<delays.length)$.Schedule(delays[job.attempts++],attempt);
+        }
+        $.Schedule(0,attempt);
+    }
     function requestId() {
         requestSerial += 1;
         return "lottery_" + Date.now() + "_" + requestSerial;
@@ -193,6 +219,11 @@
         var tooltip = panel("LotteryItemTooltip");
         if (tooltip) tooltip.AddClass("Hidden");
     }
+    function requestTooltipHide() {
+        var purple=cfg.SurvivalPurpleLottery;
+        if(purple&&purple.RequestTooltipHide&&purple.RequestTooltipHide())return;
+        hideTooltip();
+    }
 
     function showTooltip(item, sourcePanel, simple) {
         var tip=panel("LotteryItemTooltip");
@@ -216,7 +247,7 @@
                 if(item.duration_text)detailLines.push('期限：'+String(item.duration_text));
                 if(item.duplicate_points!==undefined&&item.duplicate_points!==null){
                     var points=Number(item.duplicate_points);
-                    if(isFinite(points)&&points>=0)detailLines.push('重复转化：'+points+'积分');
+                    if(isFinite(points)&&points>=0)detailLines.push('重复转化：'+points+' '+duplicateCurrency(item));
                 }
                 archiveTip.ShowEffectOnly({name:item.name||item.id||'未命名道具',description:detailLines.join('\n')},sourcePanel);
             }
@@ -284,14 +315,14 @@
             var duplicate = $.CreatePanel("Label", iconFrame, "");
             duplicate.AddClass("LotteryDuplicateBadge");
             duplicate.text = "已转化 "
-                + Number(item.converted_points || 0) + " 积分";
+                + Number(item.converted_points || 0) + " "+duplicateCurrency(item);
             duplicate.hittest = false;
         }
         card.SetPanelEvent("onmouseover", function () {
             if (card.BHasClass("LotteryCardCovered")) return;
             showTooltip(item, card);
         });
-        card.SetPanelEvent("onmouseout", hideTooltip);
+        card.SetPanelEvent("onmouseout", requestTooltipHide);
         card.SetPanelEvent("onactivate", function () { if (!card.BHasClass("LotteryCardCovered")) rewardDetails(item); });
         return card;
     }
@@ -570,11 +601,10 @@
         renderPoolTabs(snapshot.pools); updateDots();
         setText("LotteryTitle", LH.Name(selectedPoolId,selected.display_name || "星悦抽奖"));
         setText("LotterySubtitle", selected.description
-            || "重复物品自动兑换为星悦积分");
+            || "重复物品自动兑换为"+(snapshot.shop_points!==undefined?"商城积分":"星悦积分"));
         setText("LotteryTicketValue", String(selected.ticket_name || "抽奖券")
             + "  " + Number(selected.tickets || 0));
-        setText("LotteryPointValue", "星悦积分  "
-            + Number(snapshot.starjoy_points || 0));
+        setText("LotteryPointValue", "商城积分  "+pointsBalance(snapshot.shop_points));
         renderGuarantee(selected.pity || snapshot.pity); LH.Ready();
         setText("LotteryTierValue", selected.pool_group === "special"
             ? "特殊奖池" : "地图奖池");
@@ -642,6 +672,7 @@
             return;
         }
         if (payload.request_id) seenResults[payload.request_id] = true;
+        refreshRewardWallet(payload.request_id);
         clearRewardFeedback();
         finishReveal();
         visibleResults = rows(payload.results);
@@ -753,7 +784,7 @@
                 card.SetHasClass("RHFourth",index%4===3); card.hittestchildren=false;
                 createIconFrame(card,item,"LotteryDetailIcon"); RH.RewardCard(card,item);
                 card.SetPanelEvent("onmouseover",function(){showTooltip(item,card,true);});
-                card.SetPanelEvent("onmouseout",hideTooltip);
+                card.SetPanelEvent("onmouseout",requestTooltipHide);
             });
         } else if (name === "details") {
             if (selected) recordDetailsRead(selected);
@@ -768,14 +799,14 @@
                 poolCards.push({id:item.id, panel:row});
                 row.SetPanelEvent("onactivate", function () { selectReward(item); });
                 row.SetPanelEvent("onmouseover", function () { showTooltip(item, row, true); });
-                row.SetPanelEvent("onmouseout", hideTooltip);
+                row.SetPanelEvent("onmouseout", requestTooltipHide);
                 createIconFrame(row, item, "LotteryDetailIcon");
                 var copy = $.CreatePanel("Panel", row, ""); copy.AddClass("LotteryDetailCopy");
                 label(copy, qualityText(item.quality) + " · " + (item.name || item.id), "LotteryDetailName");
                 label(copy, item.description || "暂无效果说明", "LotteryDetailDescription");
                 RH.RewardCard(row,item);
                 var outline = $.CreatePanel("Panel",row,"");outline.AddClass("LotteryCardState");outline.hittest=false;
-                label(copy, (item.duration_text || "永久") + " · 重复转化 " + Number(item.duplicate_points || 0) + " 积分", "LotteryDetailMeta");
+                label(copy, (item.duration_text || "永久") + " · 重复转化 " + Number(item.duplicate_points || 0) + " "+duplicateCurrency(item), "LotteryDetailMeta");
             });
             selectReward(rewards.filter(function (item) { return item.id === selectedRewardId; })[0] || rewards[0] || null);
             // A failed prefetch can arrive before the dialog opens. Preserve its
@@ -787,7 +818,7 @@
             }
         } else if (name === "history") {
             var entries=history.filter(function(entry){return String(entry.pool)===historyPoolId;});
-            RH.History(host,entries,createRewardIcon,showTooltip,hideTooltip);
+            RH.History(host,entries,createRewardIcon,showTooltip,requestTooltipHide);
             setText("LotteryInfoNote", "仅本局最近30次抽取 · 跨局记录暂未接入");
             var total=0;entries.forEach(function(entry){total+=entry.items.length;});
             setText("LotteryInfoRules", "共 "+total+" 条奖励记录");
@@ -803,12 +834,12 @@
             }
             label(host, selected ? selected.description : "奖池数据尚未就绪", "LotteryAnnouncementBody");
             rows(selected && selected.pity).forEach(function (rule) { label(host, rule.label || "", "LotteryHistoryHeading"); });
-            label(host, "仅直接十连触发批量保底，连续十次单抽不触发。重复道具按配置转为星悦积分。", "LotteryAnnouncementBody");
+            label(host, "仅直接十连触发批量保底，连续十次单抽不触发。重复道具按配置转为"+(state&&state.shop_points!==undefined?"商城积分":"星悦积分")+"。", "LotteryAnnouncementBody");
         } else {
             label(host, "此入口暂未开放，后续补充。", "LotteryHistoryHeading");
             label(host, name === "privilege" ? "免费单抽权益尚未接入；当前单抽按页面显示的抽奖券数量消耗。" : "当前不会扣款、扣券或发放礼包。", "LotteryDetailDescription");
         }
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Info)cfg.SurvivalPurpleLottery.Info(name,infoOptions);
+        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Info)cfg.SurvivalPurpleLottery.Info(name,infoOptions,viewState);
     }
 
     close();

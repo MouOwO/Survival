@@ -51,7 +51,7 @@ bus.handle_request(events.WORKER_TRAIN_REQUEST,function(payload)
 end)
 bus.handle_request(events.WORKER_TRAINING_GET_REQUEST,function(payload)
     assert(payload.player_id==0 and payload.source_entindex==200 and payload.team==2)
-    return {active_job={finish_at=101},options={{training_id="train_lumberjack_01"}}}
+    return {queue_revision=7,active_job={finish_at=101},options={{training_id="train_lumberjack_01"}}}
 end)
 bus.handle_request(events.TECHNOLOGY_STATE_GET_REQUEST,function(payload)
     assert(payload.source_entindex==202 or payload.source_entindex==203)
@@ -79,6 +79,9 @@ assert(#requests==1 and requests[1].player_id==0 and requests[1].city==city0)
 assert(requests[1].training_id=="train_lumberjack_02")
 assert(requests[1].source=="main_city_training_ui" and requests[1].count==nil and requests[1].free==nil)
 assert(sent[1].player==handles[0] and sent[1].payload.success==1)
+assert(sent[1].payload.request_id=="test" and sent[1].payload.source_entindex==200
+    and sent[1].payload.training.queue_revision==7,
+    "training click receipt carries the authenticated city's authoritative revision")
 -- Same team does not authorize another player's city; client owner fields cannot spoof PlayerID.
 train(0,201)
 train(1,200)
@@ -88,6 +91,9 @@ train(0,200.5)
 train(0,999)
 city0.dead=true; train(0,200); city0.dead=nil
 assert(#requests==1)
+for index=2,#sent do
+    assert(sent[index].payload.training==nil, "invalid/foreign source receipts cannot disclose training state")
+end
 local packet_count=#sent
 admitted[0]=false; train(0,200); admitted[0]=true
 assert(#requests==1 and #sent==packet_count)
@@ -312,6 +318,10 @@ runtime_builder.build=original_build
 print("RESEARCH_DESCRIPTION_CACHE_PASS: 1000 resource changes/decorations reuse rows; completion refreshes")
 
 local resource_notices = {}
+bus.handle_request(events.WORKER_TRAINING_GET_REQUEST, function(payload)
+    assert(payload.player_id==0 and payload.source_entindex==200 and payload.team==2)
+    return {queue_revision=7,options={}}
+end)
 bus.handle_request(events.WORKER_TRAIN_REQUEST, function() return {ok=false,error=forced_worker_error} end)
 bus.handle_request(events.TECHNOLOGY_PURCHASE_NEXT_REQUEST, function()
     return {ok=false,error=forced_research_error,error_code=forced_research_code}
@@ -323,6 +333,9 @@ for _, case in ipairs({{"wood_not_enough", "木材不足"}, {"gold_not_enough", 
     train(0,200)
     local response=sent[#sent]
     assert(response.name=="ui_operation_result" and response.payload.success==0)
+    assert(response.payload.training.queue_revision==7
+        and response.payload.source_entindex==200 and response.payload.request_id=="test",
+        "a rejected click still acknowledges its own current city snapshot")
     assert(response.payload.error==case[2] and resource_notices[#resource_notices].message==case[2],
         "rejected training must expose a specific Chinese resource error: "
             .. tostring(response.payload.error) .. "/" .. tostring(resource_notices[#resource_notices].message))

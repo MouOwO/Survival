@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "status": "CHECKLIST_ONLY_NOT_A_DEPLOYMENT_RESULT",
+  "scope": "Archive leaderboard API, public identity directory, matching RPC allowlist; preserve all economy reducers and payment service",
+  "reviewed_base": {
+    "archive_release": "/opt/goufayu/releases/20261016-shop-catalog-v1",
+    "archive_bundle": "eb49cbe03cd338757949a3d7449457005d9e79ddd0f51b9ec1d8becc9e66a261",
+    "postgres_py_sha256": "a97b8f5e03a5211cd7cf0f270942525d7cb471ddb132b35186334fb9c5d29462",
+    "archive_service_py_sha256": "3f87fd4b219c20fedac5176c2ea7153f4e639dced48badc571781019755b6993",
+    "payment_release": "/opt/goufayu/payments/20261015-payment02",
+    "payment_catalog_hash": "b56e72aaf6b1cd512ada1f5fe460be98a2f871e7d5dc1b7131701fb4654f4cbe"
+  },
+  "ordered_steps": [
+    "Fetch and hash-pin live manifest, changed backend files, Nginx route and database function metadata immediately before staging.",
+    "Back up the database, current managed source and Nginx configuration outside the immutable release; verify successful backup before writes.",
+    "Clone the live release, apply only the new leaderboard module, exact handler patch and exact two-signature postgres.py patch; leave archive_backend/service.py, bundles, business CSVs and cash service unchanged.",
+    "Prepare rollback code from the old business release with the new PostgreSQL RPC allowlist retained; after SQL GRANT the unpatched old client will reject the extra executable functions.",
+    "Run rolled-back SQL fixtures and old-API privilege checks as the real application role. Check table RLS, no direct table privilege, explicit SECURITY DEFINER search_path, two new RPCs only and all old RPCs still callable.",
+    "Stage and validate the archive-only Nginx route addition, preserving authentication, IP restrictions, limits and payment routes.",
+    "Briefly stop the archive API before committing SQL grants: the old running RPC client must never serve after its allowlist becomes incompatible.",
+    "Commit only additive identity schema, seed and trigger, safe integer helper, read and bind functions; keep all existing account archives, revisions, rewards, orders and balances identical.",
+    "Atomically switch to the staged matching code, start the archive API, validate readiness and authenticated endpoint, then reload only the validated Nginx route configuration if needed.",
+    "On failure switch to the prepared old-business/new-allowlist rollback release. Preserve committed additive schema and identity rows; do not restore an old full database over real player activity.",
+    "Verify unchanged bundle hash and payment catalog, old profile/authentication endpoints, top 100 ordering, anonymous historical entries, own-row highlight metadata, unchanged-revision response and no real order or fixture row created."
+  ],
+  "acceptance_boundaries": [
+    "Ranking is permanent account archive data, including in pure matches; projected current-match deltas are not used.",
+    "Every response contains at most 100 public rows and no private HMAC, save, baseline, balances or purchase history.",
+    "Names and avatars resolve through native Steam panels; historical accounts without reversible identity remain anonymous until a trusted login binds identity.",
+    "Payment test/reset permission does not exclude a real player from rankings.",
+    "Top three are pinned visually but retain authoritative rank changes; no frozen permanent winners.",
+    "UI changes only when public row/rank data or the current player's listed status changes; request timestamps are not part of the revision."
+  ]
+}

@@ -121,6 +121,7 @@ local function refresh(payload)
         totals_by_player[player_id] = apply_map_level_effects(add_values(
             copy(save.permanent_effects), save.gameplay_stats
         ))
+        add_values(totals_by_player[player_id], require('systems/commerce_archive_source_bonus').project(save))
         add_values(totals_by_player[player_id], require('systems/commerce_effects').project(save, totals_by_player[player_id]))
         add_values(totals_by_player[player_id], lottery_dynamic_effects.project(save))
     end
@@ -558,7 +559,7 @@ local function get(payload)
     totals.hero_attack_bonus_pct = (totals.hero_attack_bonus_pct or 0) + (growth.hero or 0)
     totals.tower_attack_bonus_pct = (totals.tower_attack_bonus_pct or 0) + (growth.tower or 0)
     totals.hero_attribute_bonus_pct = (totals.hero_attribute_bonus_pct or 0) + (growth.attributes or 0)
-    totals.hero_attribute_bonus_pct=totals.hero_attribute_bonus_pct+(commerce_boss_bonus[player_id] or 0)
+    totals.hero_attack_bonus_pct=totals.hero_attack_bonus_pct+(commerce_boss_bonus[player_id] or 0)
     totals.wall_health_growth_flat = wall_tick_health_by_player[player_id] or 0
     totals.wall_armor_growth_flat = wall_tick_armor_by_player[player_id] or 0
     return {

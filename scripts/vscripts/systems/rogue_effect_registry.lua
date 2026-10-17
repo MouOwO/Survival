@@ -4,6 +4,9 @@ local effect_state = require("systems/rogue_effect_state_service")
 local builder_effects = require("systems/rogue_builder_start_effect_service")
 
 local worker_attack_cap = require("systems/worker_native_attack_cap")
+local tower_routes = require("config/tower_route_config")
+local armor_balance = require("config/armor_balance")
+local registered_lanes = require("systems/registered_wave_lane_view")
 
 local M = {}
 local handlers = {}
@@ -55,23 +58,24 @@ end
 local function refresh_attack_projection(instance, building)
     local unit = building and building.unit
     if not valid(unit) or building.building_id ~= "arrow_tower" then return end
-    local value = 0
-    if instance.effect.effect_type == "ballista_damage_bonus_pct"
-        and tostring(unit.survival_tower_stage_id or "") == "piercing_ballista" then
-        value = tonumber(instance.params.value) or 30
-    elseif instance.effect.effect_type == "max_tower_count_attack_bonus_pct" then
-        value = tonumber(instance.snapshot_bonus) or 0
+    if instance.effect.effect_type == "ballista_damage_bonus_pct" then
+        local stages = split_set(instance.params.target_stage_ids)
+        unit.survival_rogue_ballista_projection = stages[
+            tostring(unit.survival_tower_stage_id or "")
+        ] and (tonumber(instance.params.value) or 30) or 0
     end
-    effect_state.set_tower_projection(instance.player_id, instance.effect.effect_type, value)
-    value = effect_state.tower_projection(instance.player_id, "ballista_damage_bonus_pct")
+    -- Ballista eligibility belongs to this tower. Only the frozen network
+    -- snapshot is shared by every tower owned by the player.
+    local value = (tonumber(unit.survival_rogue_ballista_projection) or 0)
         + effect_state.tower_projection(instance.player_id, "max_tower_count_attack_bonus_pct")
     local modifier = unit:FindModifierByName("modifier_rogue_tower_attack_projection")
     if value > 0 then
-        if modifier then modifier:Destroy() end
-        unit:AddNewModifier(unit, nil, "modifier_rogue_tower_attack_projection", { value = value })
+        if not modifier or tonumber(modifier.value) ~= value then
+            unit:AddNewModifier(unit, nil, "modifier_rogue_tower_attack_projection", { value = value })
+        end
         unit.survival_rogue_tower_projection = value
-    elseif modifier then
-        modifier:Destroy()
+    else
+        if modifier then modifier:Destroy() end
         unit.survival_rogue_tower_projection = nil
     end
 end
@@ -89,8 +93,8 @@ local function owned_wall(instance)
 end
 
 local function all_units()
-    return Entities and Entities.FindAllByClassname
-        and Entities:FindAllByClassname("npc_dota_creature") or {}
+    return registered_lanes.append(Entities and Entities.FindAllByClassname
+        and Entities:FindAllByClassname("npc_dota_creature") or {})
 end
 
 local function builder_for(instance)
@@ -131,15 +135,40 @@ handlers.random_building_upgrade_count = {
     apply = function(instance)
         local count = math.max(0, math.floor(tonumber(instance.params.count) or 3))
         instance.upgrade_remaining = count
-        local function next_upgrade()
+        local function finish(reason)
+            instance.upgrade_remaining = 0
+            instance.upgrade_target_entindex = nil
+            instance.complete_on_apply = true
+            instance.complete_reason = reason
+            if instance.status == "active" then
+                instance.status = "completed"
+                instance.completed_reason = reason
+            end
+        end
+        local function request_upgrade(building)
+            local request = {
+                building = building.unit, entindex = building.entindex,
+                upgrade_mode = "one", player_id = instance.player_id,
+                reason = "rogue_reward:infrastructure_maniac",
+                system_free_upgrade = true, silent_notification = true,
+            }
+            local upgrade_event = building.building_id == "gold_mine"
+                and events.GOLD_MINE_LEVEL_UPGRADE_REQUEST or events.BUILDING_UPGRADE_FREE_REQUEST
+            return event_bus.request(upgrade_event, request)
+        end
+        local function next_upgrade(excluded_entindex)
             if instance.upgrade_remaining <= 0 then return end
             local eligible = {}
             for _, building in ipairs(building_list(instance.player_id)) do
-                if valid(building.unit) and building.unit:IsAlive()
+                if building.entindex ~= excluded_entindex
+                    and valid(building.unit) and building.unit:IsAlive()
                     and not building.unit.survival_upgrade_in_progress
                     and not building.unit:HasModifier("modifier_building_under_construction") then
-                    local quote = event_bus.request(events.BUILDING_UPGRADE_QUOTE_REQUEST, {
+                    local quote_event = building.building_id == "gold_mine"
+                        and events.GOLD_MINE_LEVEL_UPGRADE_QUOTE_REQUEST or events.BUILDING_UPGRADE_QUOTE_REQUEST
+                    local quote = event_bus.request(quote_event, {
                         building = building.unit,
+                        entindex = building.entindex,
                         upgrade_mode = "one",
                         player_id = instance.player_id,
                         reason = "rogue_reward:infrastructure_maniac",
@@ -149,12 +178,12 @@ handlers.random_building_upgrade_count = {
                     end
                 end
             end
-            if #eligible == 0 then instance.upgrade_remaining = 0 return end
+            -- Prefer another target after cancellation, but retain the reward
+            -- if the cancelled building is the only eligible candidate left.
+            if #eligible == 0 and excluded_entindex then return next_upgrade() end
+            if #eligible == 0 then finish("upgrade_candidates_exhausted") return end
             local target = eligible[RandomInt(1, #eligible)]
-            local result = event_bus.request(events.BUILDING_UPGRADE_FREE_REQUEST, {
-                building = target.unit, upgrade_mode = "one", player_id = instance.player_id,
-                reason = "rogue_reward:infrastructure_maniac",
-            })
+            local result = request_upgrade(target)
             if result and result.ok then
                 instance.upgrade_target_entindex = target.entindex
                 return
@@ -169,10 +198,7 @@ handlers.random_building_upgrade_count = {
             end
             while #eligible > 0 do
                 target = eligible[RandomInt(1, #eligible)]
-                result = event_bus.request(events.BUILDING_UPGRADE_FREE_REQUEST, {
-                    building = target.unit, upgrade_mode = "one", player_id = instance.player_id,
-                    reason = "rogue_reward:infrastructure_maniac",
-                })
+                result = request_upgrade(target)
                 if result and result.ok then
                     instance.upgrade_target_entindex = target.entindex
                     return
@@ -184,20 +210,32 @@ handlers.random_building_upgrade_count = {
                     end
                 end
             end
-            instance.upgrade_remaining = 0
+            finish("upgrade_candidates_exhausted")
         end
         instance.next_upgrade = next_upgrade
         next_upgrade()
         return true
     end,
     recompute = function(instance, payload)
-        if instance.next_upgrade and payload and payload.player_id == instance.player_id
-            and payload.entindex == instance.upgrade_target_entindex
-            and tostring(payload.reason or ""):match("upgraded") then
-            instance.upgrade_remaining = instance.upgrade_remaining - 1
-            instance.upgrade_target_entindex = nil
-            instance.next_upgrade()
+        if not instance.next_upgrade or not payload
+            or payload.player_id ~= instance.player_id
+            or payload.entindex ~= instance.upgrade_target_entindex then return end
+        local reason = tostring(payload.reason or "")
+        local completed = reason:match("upgraded") ~= nil
+        local cancelled = reason:match("^upgrade_cancelled_") ~= nil
+            or not valid(payload.unit) or not payload.unit:IsAlive()
+        if not completed and not cancelled then return end
+        if completed then instance.upgrade_remaining = instance.upgrade_remaining - 1 end
+        instance.upgrade_target_entindex = nil
+        if instance.upgrade_remaining <= 0 then
+            instance.status = "completed"
+            instance.completed_reason = "upgrades_completed"
+            return
         end
+        event_bus.after_dispatch("rogue_random_upgrade:" .. tostring(instance.effect_instance_id or instance), function()
+            if instance.status == "completed" then return end
+            instance.next_upgrade(cancelled and payload.entindex or nil)
+        end)
     end,
 }
 
@@ -234,17 +272,32 @@ handlers.max_tower_count_attack_bonus_pct = {
     apply = function(instance)
         local count = 0
         for _, building in ipairs(building_list(instance.player_id)) do
+            local route_state = {
+                level = tonumber(building.level),
+                tower_class = building.tower_class
+                    or (building.unit and building.unit.survival_tower_class),
+            }
             if building.building_id == "arrow_tower" and valid(building.unit)
-                and tonumber(building.level) >= tonumber(building.max_level or building.unit.survival_tower_max_level or 5)
-                and building.unit.survival_tower_class ~= nil then count = count + 1 end
+                and route_state.level and route_state.tower_class
+                and tower_routes.current(route_state)
+                and not tower_routes.row_at_level(route_state, route_state.level + 1) then
+                count = count + 1
+            end
         end
         instance.snapshot_bonus = math.min(tonumber(instance.params.max_value) or 50,
             count * (tonumber(instance.params.value_per_target) or 5))
+        effect_state.set_tower_projection(instance.player_id,
+            instance.effect.effect_type, instance.snapshot_bonus)
         effect_state.add_effect(instance.player_id, instance.effect.effect_type)
         for _, building in ipairs(building_list(instance.player_id)) do
             refresh_attack_projection(instance, building)
         end
         return true
+    end,
+    recompute = function(instance, payload)
+        if payload and payload.player_id == instance.player_id then
+            refresh_attack_projection(instance, payload)
+        end
     end,
 }
 
@@ -254,7 +307,10 @@ handlers.owned_target_attacker_armor_reduction = {
         for _, unit in ipairs(all_units()) do
             if valid(unit) and (unit.survival_is_wave_monster == true
                 or unit.survival_is_challenge_monster == true) then
-                unit:AddNewModifier(unit, nil, "modifier_rogue_corrosive_shield_attack", {})
+                unit:AddNewModifier(unit, nil, "modifier_rogue_corrosive_shield_attack", {
+                    armor_reduction_per_attack = armor_balance.from_war3_linear(
+                        math.abs(tonumber(instance.params.value) or -1)),
+                })
             end
         end
         return true
@@ -264,7 +320,10 @@ handlers.owned_target_attacker_armor_reduction = {
         if valid(unit) and (unit.survival_is_wave_monster == true
             or unit.survival_is_challenge_monster == true)
             and not unit:HasModifier("modifier_rogue_corrosive_shield_attack") then
-            unit:AddNewModifier(unit, nil, "modifier_rogue_corrosive_shield_attack", {})
+            unit:AddNewModifier(unit, nil, "modifier_rogue_corrosive_shield_attack", {
+                armor_reduction_per_attack = armor_balance.from_war3_linear(
+                    math.abs(tonumber(instance.params.value) or -1)),
+            })
         end
     end,
 }
@@ -283,11 +342,16 @@ handlers.next_boss_attack_pct = {
     end,
     on_event = function(instance, payload)
         if payload.monster_source ~= "wave"
+            or tonumber(payload.player_id) ~= instance.player_id
             or tonumber(payload.wave_number) ~= instance.target_wave_number
             or tostring(payload.member_role or "") ~= instance.target_member_role
             or not valid(payload.unit) then return false end
         payload.unit:AddNewModifier(payload.unit, nil, "modifier_rogue_weakening_attack", {
             value = tonumber(instance.params.value) or -50,
+        })
+        event_bus.emit(events.UNIT_COMBAT_STATS_CHANGED, {
+            unit = payload.unit, entindex = payload.unit:entindex(),
+            player_id = instance.player_id, reason = "rogue_weakening_orb",
         })
         return true
     end,
@@ -424,8 +488,7 @@ handlers.tower_attack_speed_bonus_pct = {
 
 handlers.wall_attacker_attack_speed_pct = {
     apply = function(instance)
-        local units = Entities and Entities.FindAllByClassname
-            and Entities:FindAllByClassname("npc_dota_creature") or {}
+        local units = all_units()
         for _, unit in ipairs(units) do
             apply_enemy_slow(instance, unit)
         end

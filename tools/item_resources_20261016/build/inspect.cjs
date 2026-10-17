@@ -1,0 +1,9 @@
+'use strict';
+const {browser}=require('../../shop_ui_12h/cdp.cjs');
+(async()=>{const b=await browser();try{
+ await b.go('design_refs/item_resources_20261016/build/preview/index.html',process.argv[2]||'?page=commerce&category=all');
+ console.log(await b.run('previewReady'));
+ console.log('RESOURCE_READY',await b.run('window.itemResourceReady||false'));
+ if(process.argv[2]&&process.argv[2].includes('lottery'))console.log('LOTTERY_VISIBILITY',JSON.stringify(await b.run(`nodes.LotteryInfoList.Children().filter(c=>c.__lotteryItem).map(c=>({id:c.__lotteryItem.id,name:c.__lotteryItem.name,visible:c.visible,bounds:c.el.getBoundingClientRect().toJSON(),classes:c.el.className,host:c.__lotteryPrizeFace?.host?.el.className,hostVisible:c.__lotteryPrizeFace?.host?.visible,hostRect:c.__lotteryPrizeFace?.host?.el.getBoundingClientRect().toJSON(),item:c.__lotteryItem.pool_id}))`)));
+ console.log(JSON.stringify(await b.run(`({errors:previewErrors,inspect:cfg.SurvivalCommerceView?.Inspect(),cards:(nodes.PreviewContext_survival_hud||root).FindChildrenWithClassTraverse('BLMarketRow').slice(0,3).map(x=>({keys:Object.keys(x),cell:x.__menuCell?Object.keys(x.__menuCell):null,text:x.el.textContent,images:[...x.el.querySelectorAll('img')].map(i=>({src:i.src,display:getComputedStyle(i).display}))})),lottery:nodes.LotteryInfoList?.Children().slice(0,3).map(x=>({keys:Object.keys(x),text:x.el.textContent,images:[...x.el.querySelectorAll('img')].map(i=>({src:i.src,display:getComputedStyle(i).display}))})),archive:cfg.SurvivalArchiveV10?.Inspect(),goods:nodes.ArchiveGrid?.Children().filter(x=>x.visible).slice(0,3).map(x=>({keys:Object.keys(x),text:x.el.textContent,images:[...x.el.querySelectorAll('img')].map(i=>({src:i.src,display:getComputedStyle(i).display}))}))})`)));
+}finally{b.close();}})().catch(e=>{console.error(e);process.exitCode=1});

@@ -2,6 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local cards = require("config/generated/rogue_reward_cards")
 local rules_config = require("config/generated/rogue_reward_rules")
+local effect_params = require("config/generated/rogue_reward_effect_params")
 local effects = require("systems/rogue_reward_effect_service")
 local effect_state = require("systems/rogue_effect_state_service")
 
@@ -72,11 +73,22 @@ local function publish(player_id, reason, reward_type_id, effects_changed)
         payload.source = offer.source
         payload.reward_type = offer.reward_type
         payload.cards = offer.cards
+        payload.pending_card_id = offer.pending_card_id
     end
     CustomNetTables:SetTableValue("survival_rogue_reward", tostring(player_id), payload)
     event_bus.emit(events.ROGUE_REWARD_CHANGED, {
         player_id = player_id, snapshot = payload, effects_changed = effects_changed,
     })
+end
+
+local function wish_count()
+    for _, row in ipairs(effect_params.rows or {}) do
+        if row.enabled ~= false and row.effect_id == "divine_wish_policy"
+            and row.param_name == "count" then
+            return math.max(1, math.floor(tonumber(row.number_value) or 3))
+        end
+    end
+    return 3
 end
 
 local function available(state, reward_type_id)
@@ -86,6 +98,12 @@ local function available(state, reward_type_id)
         if card.enabled ~= false and card.type == reward_type_id
             and not pool_state.claimed[card.card_id] then
             result[#result + 1] = card
+        end
+    end
+    -- A wish must be able to deliver all of its children before it is offered.
+    if #result - 1 < wish_count() then
+        for index = #result, 1, -1 do
+            if result[index].card_id == "divine_wish" then table.remove(result, index) end
         end
     end
     return result
@@ -165,6 +183,13 @@ local function grant_random_cards(payload)
             transaction.completed[index] = true
             pool_state.claimed[card.card_id] = true
             record_history(state, card, reward_type_id, child_grant_id, parent_card_id)
+            local offer = pool_state.offer
+            if offer and parent_grant_id == "reward:" .. tostring(offer.token)
+                .. ":" .. parent_card_id then
+                -- Completed children cannot be rolled back. Keep the same
+                -- parent grant and offer until every remaining child succeeds.
+                offer.pending_card_id = parent_card_id
+            end
         end
     end
     publish(player_id, "random_granted", nil, true)
@@ -371,6 +396,9 @@ local function select_card(payload)
         return failure
     end
     local card_id = tostring(payload.card_id or "")
+    if offer.pending_card_id and card_id ~= offer.pending_card_id then
+        return { ok = false, error = "random_grant_pending" }
+    end
     local offered = false
     for _, card in ipairs(offer.cards) do
         if card.card_id == card_id
@@ -414,6 +442,7 @@ end
 local function reroll(payload)
     local player_id, state, pool_state, offer, failure = valid_offer(payload)
     if failure then return failure end
+    if offer.pending_card_id then return { ok = false, error = "random_grant_pending" } end
     if offer.rerolls_remaining <= 0 then return { ok = false, error = "reroll_consumed" } end
     local source = offer.source
     local reward_type_id = offer.reward_type

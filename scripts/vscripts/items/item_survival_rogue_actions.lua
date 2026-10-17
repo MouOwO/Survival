@@ -1,12 +1,12 @@
 local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
+local registered_lanes = require("systems/registered_wave_lane_view")
 
 item_survival_rogue_nuclear_bomb = class({})
 local function is_protected_monster(unit)
     return unit.survival_is_boss == true
         or unit.survival_boss_role ~= nil
-        or unit.survival_monster_role == "wave_leader"
         or unit.survival_monster_role == "assault_boss"
         or unit.survival_monster_role == "boss"
         or unit:HasModifier("modifier_boss")
@@ -18,7 +18,8 @@ function item_survival_rogue_nuclear_bomb:OnSpellStart()
     if self.SetActivated then self:SetActivated(false) end
 
     local targets = {}
-    for _, unit in ipairs(Entities:FindAllByClassname("npc_dota_creature") or {}) do
+    for _, unit in ipairs(registered_lanes.append(
+        Entities:FindAllByClassname("npc_dota_creature") or {})) do
         if unit and not unit:IsNull() and unit:IsAlive()
             and unit:GetTeamNumber() == DOTA_TEAM_BADGUYS
             and (unit.survival_is_wave_monster == true

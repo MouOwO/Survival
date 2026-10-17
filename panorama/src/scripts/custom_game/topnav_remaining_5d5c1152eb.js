@@ -12,6 +12,7 @@
     var layoutRevision=0,layoutRepairAt=0,layoutPanels=[],layoutNativeWrappers=[];
     var presented=false, stableFrames=0, bootSignature="";
     var keyBindings={}, skillPanels=[], currentEntries=[], eventSerial=0;
+    var hotkeyMirrorRecovery={attempts:0,finished:false,nextAt:0,failures:0};
     var scopes = {center_with_stats:"lower_hud",center_block:"center_with_stats",PortraitGroup:"center_block",
         PortraitContainer:"PortraitGroup",portraitHUD:"PortraitGroup",portraitHUDOverlay:"PortraitGroup",
         AbilitiesAndStatBranch:"center_block",abilities:"AbilitiesAndStatBranch",inventory:"center_block",
@@ -195,27 +196,11 @@
             return beast;
         }
         /* survival unified icon art */var unified={"top_wave":"skill_morale","stat_attack":"broadsword","stat_armor":"platemail","stat_attack_speed":"gloves","stat_strength":"reaver","stat_agility":"swift_blink","stat_intelligence":"arcane_blink"};if(unified[key]){var refined=create("Image",parent,id,false);refined.SetImage("file://{images}/spellicons/survival/native/"+unified[key]+".png");return refined;}if(key==="top_shop_64"){var icon=create("Panel",parent,id,false),handle=create("Panel",icon,"",false),bag=create("Panel",icon,"",false);place(handle,26,18,12,15);style(handle,{border:"2px solid #e3ded0",borderRadius:"6px 6px 0px 0px"});place(bag,21,29,22,20);style(bag,{border:"2px solid #e3ded0",borderRadius:"2px"});return icon;}if(key==="slot_frame")return uniformSlotFrame(parent,id);if(key==="top_population"){var food=create("Image",parent,id,false);food.SetImage("file://{images}/custom_game/survival/food_population.png");return food;}if(key==="top_gold"||key==="top_wood"){
- var resource=create("Panel",parent,id,false);
- function part(x,y,w,h,values){var q=create("Panel",resource,"",false);place(q,x,y,w,h);style(q,values);return q;}
- if(key==="top_gold"){
- // Three warm gold coins, with a bright face and a darker milled edge.
- [[3,8],[17,5],[10,18]].forEach(function(coin){
-     part(coin[0],coin[1]+3,14,9,{border:"1px solid #9d570b",borderRadius:"50%",backgroundColor:"gradient(linear, 0% 0%, 0% 100%, from(#ffc72d), to(#b86c0c))"});
-     part(coin[0],coin[1],14,8,{border:"1px solid #ffeaa0",borderRadius:"50%",backgroundColor:"gradient(linear, 0% 0%, 0% 100%, from(#fff6ad), color-stop(0.45, #ffdb32), to(#efa70d))"});
-     part(coin[0]+4,coin[1]+2,6,2,{borderRadius:"50%",backgroundColor:"#fff5b8"});
- });
- }else{
- // A cut timber log: warm bark, a pale cut end and visible grain.
- var log=part(3,10,28,14,{transform:"rotateZ(32deg)",overflow:"noclip"});
- function grain(x,y,w,h,values){var p=create("Panel",log,"",false);place(p,x,y,w,h);style(p,values);}
- grain(0,0,24,14,{border:"1px solid #603518",borderRadius:"3px",backgroundColor:"gradient(linear, 0% 0%, 0% 100%, from(#e2b676), color-stop(0.3, #ba7c39), color-stop(0.65, #875025), to(#4f2b16))"});
- grain(3,3,17,2,{backgroundColor:"#ebbe79"});
- grain(2,9,18,2,{backgroundColor:"#673616"});
- grain(19,0,10,14,{border:"1px solid #f5d49b",borderRadius:"50%",backgroundColor:"gradient(linear, 0% 0%, 100% 100%, from(#ffe2a3), to(#c48943))"});
- grain(22,3,5,8,{border:"1px solid #9c672f",borderRadius:"50%"});
- grain(24,5,1,4,{backgroundColor:"#9c672f"});
- }
- return resource;}var p=create("Image",parent,id,false);p.SetImage(key==="top_shop_64"?"s2r://panorama/images/custom_game/shop_preview_v1/shop_png.vtex":"file://{images}/"+assets[key].file);return p;}
+        // Shared resource art: the same transparent coin pile/log used by costs and tooltips.
+        var resource=create("Image",parent,id,false);
+        resource.SetImage("file://{images}/custom_game/hud_resources_v2/"+(key==="top_gold"?"gold":"wood")+".svg");
+        if(resource.SetScaling)resource.SetScaling("stretch-to-fit-preserve-aspect");
+        return resource;}var p=create("Image",parent,id,false);p.SetImage(key==="top_shop_64"?"s2r://panorama/images/custom_game/shop_preview_v1/shop_png.vtex":"file://{images}/"+assets[key].file);return p;}
     function label(parent,id,cls) {var p=create("Label",parent,id,false);p.text="";if(cls)p.AddClass(cls);style(p,{fontFamily:'"Source Han Sans SC"',color:"#f3ebd4",fontSize:"23px",whiteSpace:"nowrap",textOverflow:"shrink",zIndex:"5"});return p;}
     function centered(parent,id,x,y,w,h,fontSize) {
         var bounds=nodes[id+"Bounds"];
@@ -265,13 +250,14 @@
     var nav=[["return","返回"],["treasure","宝物"],["archive","存档"],["lottery","抽奖"],["benefit","福利"],["shop","商城"],["survival_shop","生存商店"],["vip",""]];
     // Shared bounds keep initial creation and resolution refresh equally compact.
     function navBounds(key,index) {
-        return {x:key==="vip"?460:14+index*58,
-            width:key==="survival_shop"?96:key==="vip"?60:56};
+        if(key==="survival_shop")return {x:52,y:100,width:96};
+        return {x:key==="vip"?362:14+index*58,y:6,width:key==="vip"?60:56};
     }
+    var effectsNavX=424;
     // Navigation icons and captions sit directly over the game, without a solid plate.
     nav.forEach(function(a,i){
         var bounds=navBounds(a[0],i),buttonWidth=bounds.width;
-        var b=create("Button",top,"HandoffNav_"+a[0],true);b.AddClass("HandoffNav");b.AddClass("HandoffNavUnified");place(b,bounds.x,6,buttonWidth,86);
+        var b=create("Button",top,"HandoffNav_"+a[0],true);b.AddClass("HandoffNav");b.AddClass("HandoffNavUnified");place(b,bounds.x,bounds.y,buttonWidth,86);
         // Halo first so it paints under the icon; z-index:-1 keeps it inside the button.
         var halo=create("Panel",b,"HandoffNavGlow_"+a[0],false);halo.AddClass("HandoffNavGlow");place(halo,(buttonWidth-62)/2,0,62,62);
         var icon=create("Image",b,"HandoffNavIcon_"+a[0],false);icon.SetImage("file://{images}/custom_game/topnav_reference_v2/"+a[0]+((a[0]==="treasure"||a[0]==="benefit")?"_clean":"")+".svg");place(icon,(buttonWidth-44)/2,4,44,44);if(a[0]==="vip")place(icon,(buttonWidth-56)/2,-2,56,56);
@@ -293,7 +279,7 @@
     tooltip(topButtons.vip,function(){return cfg.SurvivalVIPStatus&&cfg.SurvivalVIPStatus.UnlockRules
         ?cfg.SurvivalVIPStatus.UnlockRules():"VIP 等级随累计实付充值提升，消费不降级。";});
     // One open window at a time, so the highlight is a single owner, not a list.
-    var navWindowIds={treasure:"treasure",archive:"archive",lottery:"lottery",benefit:"benefit",
+    var navWindowIds={treasure:"treasure",archive:"archive",lottery:"lottery",benefit:"daily_rewards",
         shop:"shop",survival_shop:"survival_shop"};
     var activeNavId;
     function markActiveNav(id) {
@@ -320,15 +306,17 @@
         // inside a 44px Label while its icon is centered in the row.
         style(value,{height:"fit-children",minHeight:"0px",verticalAlign:"center",transform:"none"});
     }
-    topButtons.survival_shop.enabled=available("survival_shop");
-    style(topButtons.survival_shop,{saturation:available("survival_shop")?"1":"0",opacity:available("survival_shop")?"1":"0.4"});
+    var shopEntryAvailable=available("survival_shop");
+    topButtons.survival_shop.enabled=shopEntryAvailable;
+    topButtons.survival_shop.visible=shopEntryAvailable;
+    style(topButtons.survival_shop,{visibility:shopEntryAvailable?"visible":"collapse",saturation:"1",opacity:"1"});
     var difficultyRow=create("Panel",topStatus,"HandoffDifficultyRow",false);place(difficultyRow,722,14,50,44);
     var difficultyLabel=label(difficultyRow,"HandoffDifficulty");place(difficultyLabel,0,0,50,44);
     style(difficultyLabel,{height:"fit-children",minHeight:"0px",verticalAlign:"center",textAlign:"center",color:"#f0d48a",textShadow:"none"});
     topMetric("HandoffWave","top_wave",780,822,346);
     [["gold",1194,1234],["wood",1339,1379],["population",1484,1524]].forEach(function(a){topMetric("HandoffResource_"+a[0],"top_"+a[0],a[1],a[2],105);});
     var fxButton=create("Button",top,"HandoffCombatEffects",true);
-    place(fxButton,522,6,96,86);
+    place(fxButton,effectsNavX,6,96,86);
     fxButton.AddClass("HandoffNavUnified");
     var fxHalo=create("Panel",fxButton,"HandoffEffectsGlow",false);fxHalo.AddClass("HandoffNavGlow");place(fxHalo,17,0,62,62);
     var fxIcon=create("Image",fxButton,"HandoffEffectsIcon",false);fxIcon.SetImage("file://{images}/custom_game/topnav_reference_v2/effects.svg");place(fxIcon,26,4,44,44);
@@ -460,7 +448,23 @@
     var buildingStatRow=create("Panel",center,"HandoffBuildingStatRow",false);
     buildingStatRow.hittestchildren=true;
     style(buildingStatRow,{flowChildren:"right",visibility:"collapse",overflow:"clip"});
-    var buildingInlineIds=["HandoffBuildingSummary","HandoffBuildingBonus","HandoffBuildingPercent","HandoffBuildingHealthPercent"];
+    ["HandoffBuildingStatIcon","HandoffBuildingSpeedIcon"].forEach(function(id){
+        var icon=create("Image",center,id,false);
+        if(icon.SetScaling)icon.SetScaling("stretch-to-fit-preserve-aspect");
+        icon.hittest=true;
+    });
+    nodes.HandoffBuildingSpeedIcon.SetImage("s2r://panorama/images/"+statIcons.attack_speed+".vtex");
+    label(center,"HandoffBuildingSpeed","HandoffNumber");
+    ["HandoffBuildingSpeedIcon","HandoffBuildingSpeed"].forEach(function(id){
+        nodes[id].hittest=true;tooltip(nodes[id],function(){
+            var snapshot=selectedSnapshot();
+            return "攻击速度："+attackFrequencyText(snapshot&&snapshot.attack_speed)+" 刀/秒";
+        });
+    });
+    ["HandoffBuildingStatIcon","HandoffBuildingSummary"].forEach(function(id){
+        nodes[id].hittest=true;tooltip(nodes[id],function(){return buildingBonusHelp();});
+    });
+    var buildingInlineIds=["HandoffBuildingStatIcon","HandoffBuildingSummary","HandoffBuildingBonus","HandoffBuildingSpeedIcon","HandoffBuildingSpeed"];
     function selectedSnapshot() {return cfg.HandoffCombat && cfg.HandoffCombat.Snapshot ? cfg.HandoffCombat.Snapshot(selectedUnit()) : null;}
     function buildingBonusHelp(stat) {
         var snapshot=selectedSnapshot(),d=snapshot && snapshot.building_stat_details || {};
@@ -469,8 +473,9 @@
         if(snapshot.building_id==="arrow_tower")return "攻击加成来源"+
             "<br>科技 / 挑战："+compact(d.attack_technology_flat||0)+"，"+compact(d.attack_technology_pct||0)+"%"+
             "<br>存档 / 宝物等固定奖励："+compact(d.attack_permanent_flat||0)+"，"+compact(d.attack_permanent_pct||0)+"%"+
-            "<br>固定天赋倍率："+compact(d.attack_talent_pct||0)+"%"+
-            "<br>绿色：固定加成合计；红色：百分比效果，已计入绿色合计。"+growth;
+            "<br>固定天赋攻击加成："+(Number(d.attack_talent_pct||0)>=0?"+":"")+compact(d.attack_talent_pct||0)+"%"+
+            (Number(d.attack_recruit_training_pct||0)>0?"<br>新兵作训：基础攻击×"+compact(1+Number(d.attack_recruit_training_pct)/100)+"（基础箭塔 LV1–4）":"")+
+            "<br>白色数值与绿色固定加成之和为当前攻击；百分比效果已计入绿色合计。"+growth;
         stat=stat||"armor";
         if(d[stat+"_permanent_pct"]===undefined)return "当前百分比："+compact(d[stat+"_pct"]||0)+"%<br>当前对局尚未同步分类来源明细，重新开局后可查看。";
 
@@ -478,7 +483,7 @@
             "<br>科技："+compact(d[stat+"_technology_flat"]||0)+"，"+compact(d[stat+"_technology_pct"]||0)+"%"+
             "<br>固定奖励："+compact(d[stat+"_permanent_flat"]||0)+"，"+compact(d[stat+"_permanent_pct"]||0)+"%"+
             "<br>天赋固定数值："+compact(d[stat+"_talent_flat"]||0)+
-            "<br>红色百分比已计入绿色加成，不需要再加一次。"+growth;
+            "<br>面板防御数值已包含以上固定加成与百分比效果。"+growth;
     }
     function statBonusHelp(stat) {
         var snapshot=selectedSnapshot(),key=stat==="intelligence"?"intellect":stat;
@@ -498,19 +503,28 @@
         group.parts.forEach(function(p,index){var c=index%3,r=Math.floor(index/3);place(p,xs[c],ys[r],widths[c],heights[r]);});return group;
     }
     function selectedUnit() {var resolver=cfg.SurvivalSelectionResolver;return resolver&&resolver.ResolveDisplayUnit?resolver.ResolveDisplayUnit():resolver&&resolver.Resolve?resolver.Resolve():Players.GetLocalPlayerPortraitUnit();}
-    function abilityEntries(){
+    function abilityEntries(readContext){
         var unit=selectedUnit();if(unit<0)return [];
-        if(cfg.HandoffCombat&&cfg.HandoffCombat.Entries)return cfg.HandoffCombat.Entries(unit);
+        var combat=cfg.HandoffCombat;
+        // Only this synchronous HUD refresh shares an enumeration. Runtime completion
+        // is read again; no ability/activation/level data survives into the next tick.
+        if(readContext&&combat&&typeof combat.NativeEntries==="function"
+            &&typeof combat.IsCompleted==="function"&&typeof combat.Entries==="function"){
+            return readContext.readNativeEntries(combat,unit).filter(function(entry){
+                return !combat.IsCompleted(entry.ability);
+            });
+        }
+        if(combat&&combat.Entries)return combat.Entries(unit);
         var result=[];for(var i=0;i<32;i++){var a=Entities.GetAbility(unit,i);if(a===undefined||a<0)continue;var name=Abilities.GetAbilityName(a)||"";if(name&&!Abilities.IsHidden(a)&&name.indexOf("special_bonus_")!==0)result.push({ability:a,name:name,slot:i});}return result;
     }
-    function abilityCount() {
-        currentEntries=abilityEntries();return currentEntries.length;
+    function abilityCount(readContext) {
+        currentEntries=abilityEntries(readContext);return currentEntries.length;
     }
     function actionOffset(g) {
         return g&&isFinite(Number(g.actionOffset))?Number(g.actionOffset):g.heroWidth+10;
     }
     function centerOffset(g) {return actionOffset(g)-10;}
-    function fitNativeSkills(g,force){
+    function fitNativeSkills(g,force,readContext){
         g=g||geometry;
         if(!g||!isFinite(Number(g.scale))||Number(g.scale)<=0)return;
         var list=native("abilities");if(!valid(list))return;
@@ -520,7 +534,7 @@
             if(p.__handoffOverflow||(p.visible!==false&&String(p.style.visibility)!=="collapse"))candidates.push(p);
         }
         var combat=cfg.HandoffCombat;
-        var allEntries=combat&&combat.NativeEntries?combat.NativeEntries(selectedUnit()):currentEntries;
+        var allEntries=combat&&combat.NativeEntries?(readContext?readContext.readNativeEntries(combat,selectedUnit()):combat.NativeEntries(selectedUnit())):currentEntries;
         skillPanels=[];
         candidates.forEach(function(p,index){
             var entry=allEntries[index];
@@ -551,6 +565,29 @@
         if(slot)keyBindings[slot.id]={text:String(p.text||""),unit:Number(unit),ability:Number(ability)};
     };
     cfg.HandoffClearHotkey=function(slot){if(slot)delete keyBindings[slot.id];};
+    function recoverReadyHotkeyMirror(){
+        if(hotkeyMirrorRecovery.finished||!ready||!currentEntries.length)return;
+        var unit=Number(selectedUnit());
+        function hasBinding(){
+            return skillPanels.some(function(slot,index){
+                var binding=slot&&keyBindings[slot.id],entry=currentEntries[index];
+                return binding&&entry&&binding.unit===unit&&binding.ability===Number(entry.ability);
+            });
+        }
+        if(hasBinding()){hotkeyMirrorRecovery.finished=true;return;}
+        var writer=cfg.SurvivalAbilityHotkeys;
+        if(!writer||typeof writer.Refresh!=="function")return;
+        var now=Date.now();
+        if(now<hotkeyMirrorRecovery.nextAt)return;
+        hotkeyMirrorRecovery.attempts++;
+        hotkeyMirrorRecovery.nextAt=now+[100,250,1000,1000][hotkeyMirrorRecovery.attempts-1];
+        // A topnav-only reload replaces this local mirror while combat keeps
+        // matching native labels/signature. Ask its existing authoritative
+        // writer to replay once; late native anchors get at most four retries.
+        // The writer alone decides passive/active keys and their unit ownership.
+        try{writer.Refresh();}catch(error){hotkeyMirrorRecovery.failures++;}
+        if(hasBinding()||hotkeyMirrorRecovery.attempts>=4)hotkeyMirrorRecovery.finished=true;
+    }
     function mirrorKeys(){
         var unit=Number(selectedUnit());
         if(!geometry)return;
@@ -818,8 +855,9 @@
                 style(maxLabel,{horizontalAlign:"right",verticalAlign:"bottom",margin:"0px 6px 6px 0px",fontSize:"26px",fontWeight:"bold",color:"#ffffff",textShadow:"0px 0px 2px 3 #000000",zIndex:"10"});
             }
             if(valid(maxLabel)){
-                maxLabel.visible=showMax||showLevel;
-                maxLabel.text=showLevel?"+"+upgradeLevel:"MAX";
+                if(maxLabel.visible!==(showMax||showLevel))maxLabel.visible=showMax||showLevel;
+                var labelText=showLevel?"+"+upgradeLevel:"MAX";
+                if(maxLabel.text!==labelText)maxLabel.text=labelText;
             }
             var imageHost=slot.FindChildTraverse("ItemImage");
             if(valid(imageHost)){
@@ -835,10 +873,12 @@
                     fitted=$.CreatePanel("Image",imageHost,"SurvivalInventoryFittedIcon");
                     fitted.hittest=false;fitted.hittestchildren=false;
                     style(fitted,{width:"100%",height:"100%",position:"0px 0px 0px",margin:"0px",padding:"0px",horizontalAlign:"center",verticalAlign:"center",zIndex:"1"});
-                    fitted.SetScaling("stretch-to-fit-preserve-aspect");
+                    var presentation=cfg.SurvivalRewardPresentation;
+                    if(presentation&&presentation.FillIcon)presentation.FillIcon(fitted,{content_id:identity&&identity.removed!==1?identity.content_id:name});
+                    else fitted.SetScaling("stretch-to-cover-preserve-aspect");
                 }
                 if(valid(fitted)){
-                    fitted.visible=!!resolved;
+                    if(fitted.visible!==!!resolved)fitted.visible=!!resolved;
                     if(resolved){
                         var uri=resolved.uri;
                         if(fitted.__survivalImageUri!==uri){fitted.SetImage(uri);fitted.__survivalImageUri=uri;}
@@ -873,7 +913,7 @@
             style(p,{visibility:"collapse",opacity:"0"});p.hittest=false;p.hittestchildren=false;
         });
     }
-    function nativeLayout(g) {
+    function nativeLayout(g,readContext) {
         var required=["lower_hud","center_with_stats","center_block","PortraitGroup","AbilitiesAndStatBranch","abilities","inventory","minimap"];
         missing=required.filter(function(id){return !valid(native(id));});if(missing.length)return false;
         var branch=native("AbilitiesAndStatBranch"),list=native("abilities");
@@ -894,7 +934,7 @@
         // Only OUR decoration host moves behind native content. Never reparent an engine panel.
         if(background.GetParent()!==block)background.SetParent(block);
         place(background,0,0,g.width,g.height);style(background,{zIndex:"-100"});
-        place(portrait,29,49,g.portraitSize,g.portraitSize);style(portrait,{overflow:"clip",transform:"none",transitionProperty:"none",animationName:"none"});
+        place(portrait,29,g.portraitY===undefined?49:g.portraitY,g.portraitSize,g.portraitHeight||g.portraitSize);style(portrait,{overflow:"clip",transform:"none",transitionProperty:"none",animationName:"none"});
         place(native("PortraitContainer"),0,0,g.portraitSize,g.portraitSize);
         // Establish the visible container baseline on HUD construction/reflow.
         // The multi-selection controller applies its temporary mask afterwards;
@@ -925,7 +965,7 @@
         place(list,0,0,g.centerWidth-20,116);style(list,{flowChildren:"right",minWidth:"0px",minHeight:"0px",overflow:"noclip",transform:"none"});
         // Slot-local geometry stays 116px when this outer canvas reflows.
         // New native children and actual resets already invalidate square().
-        fitNativeSkills(g);
+        fitNativeSkills(g,false,readContext);
         var inv=native("inventory");place(inv,g.inventoryX+15,55,358,242);style(inv,{overflow:"noclip",transform:"none",boxShadow:"none",backgroundImage:"none",backgroundColor:"transparent"});
         // Clear native inventory separators; the shared skin owns all framing.
         [inv,inv.FindChildTraverse("inventory_items"),inv.FindChildTraverse("inventory_list_container"),inv.FindChildTraverse("inventory_list"),inv.FindChildTraverse("inventory_list2")].forEach(function(p){
@@ -964,7 +1004,7 @@
         ["center_with_stats","center_block"].forEach(function(id){
             place(native(id),0,0,g.width,g.height,{transitionProperty:"none",animationName:"none",transform:"none",flowChildren:"none",overflow:"noclip"});
         });
-        place(native("PortraitGroup"),29,49,g.portraitSize,g.portraitSize,{overflow:"clip",transform:"none",transitionProperty:"none",animationName:"none"});
+        place(native("PortraitGroup"),29,g.portraitY===undefined?49:g.portraitY,g.portraitSize,g.portraitHeight||g.portraitSize,{overflow:"clip",transform:"none",transitionProperty:"none",animationName:"none"});
         place(native("PortraitContainer"),0,0,g.portraitSize,g.portraitSize);
         place(native("portraitHUD"),0,0,g.portraitSize,g.portraitSize,{transform:"none"});
         place(branch,actionOffset(g),61,g.centerWidth-20,116,{flowChildren:"none",minWidth:"0px",overflow:"noclip"});
@@ -1014,7 +1054,7 @@
         var textSize=px(22)+"px";
         nav.forEach(function(entry,index){
             var key=entry[0],bounds=navBounds(key,index),width=bounds.width;
-            box(topButtons[key],bounds.x,6,width,86);
+            box(topButtons[key],bounds.x,bounds.y,width,86);
             box(nodes["HandoffNavGlow_"+key],(width-62)/2,0,62,62);
             box(nodes["HandoffNavIcon_"+key],(width-44)/2,4,44,44);
             if(key==="vip")box(nodes["HandoffNavIcon_"+key],(width-56)/2,-2,56,56);
@@ -1022,13 +1062,14 @@
             style(nodes["HandoffNavCaption_"+key],{fontSize:textSize});
             box(nodes["HandoffNavUnderline_"+key],(width-34)/2,84,34,2);
         });
-        box(fxButton,522,6,96,86);
+        box(fxButton,effectsNavX,6,96,86);
         box(fxHalo,17,0,62,62);
         box(fxIcon,26,4,44,44);
         box(fxCaptionHost,0,52,96,32);
         style(fxText,{fontSize:textSize});
     }
     function layout() {
+        var readContext=arguments[0];
         var w=(ctx.actuallayoutwidth||1672)/(ctx.actualuiscale_x||1),h=(ctx.actuallayoutheight||941)/(ctx.actualuiscale_y||1);
         var topScale=Math.min((w-16)/1672,h/941),topX=8,topY=6;
         var navPixelScale=Number(ctx.actualuiscale_x)||1;
@@ -1036,10 +1077,11 @@
         topY=Math.round(topY*navPixelScale)/navPixelScale;
         var statusScale=Math.min(w/1672,h/941),statusX=(w-1672*statusScale)/2;
         var viewportSignature=[w,h,ctx.actualuiscale_x||1,ctx.actualuiscale_y||1].join(":");
+        var shopEntryShown=!!available("survival_shop"),navHeight=shopEntryShown?186:94;
         var unit=selectedUnit(),presentation=statVisibility(unit);
         presentation.multi=!!(cfg.SurvivalMultiSelectionPortraits&&cfg.SurvivalMultiSelectionPortraits.IsActive());
-        var count=presentation.tree?0:abilityCount(),g=cfg.HandoffGeometry(w,h,count,presentation.building,presentation.tree,presentation);
-        var signature=[viewportSignature,count,g.heroWidth,g.height,g.actionOffset,g.x,g.scale,g.attributeWidth,g.inventoryX,unit,presentation.multi?1:0,
+        var count=presentation.tree?0:abilityCount(readContext),g=cfg.HandoffGeometry(w,h,count,presentation.building,presentation.tree,presentation);
+        var signature=[viewportSignature,navHeight,count,g.heroWidth,g.height,g.actionOffset,g.x,g.scale,g.attributeWidth,g.inventoryX,unit,presentation.multi?1:0,
             currentEntries.map(function(e){return e.ability;}).join(",")].join(":");
         var panels=[native("abilities"),native("inventory"),native("PortraitGroup"),native("minimap_container"),native("minimap")];
         var changed=signature!==lastSignature||panels.some(function(panel,index){return panel!==layoutPanels[index];});
@@ -1052,16 +1094,17 @@
             layoutRepairAt=now;
             return false;
         }
-        if(top.__handoffViewport!==viewportSignature||repair){
-            place(top,topX,topY,630*topScale,94*topScale);style(top,{transform:"none"});
+        if(top.__handoffViewport!==viewportSignature||top.__handoffNavHeight!==navHeight||repair){
+            place(top,topX,topY,630*topScale,navHeight*topScale);style(top,{transform:"none"});
             layoutNavigation(topScale,navPixelScale);
             place(topStatus,statusX,0,1672,941);style(topStatus,{transform:"scale3d("+statusScale+","+statusScale+",1)"});
             // Both screen edges lie inside the texture; no Image aspect-fit gutters.
             place(topBackdrop,-24,0,w+48,941*topScale);
             top.__handoffViewport=viewportSignature;
+            top.__handoffNavHeight=navHeight;
         }
         // Keep the hero shortcut below the navigation at every viewport scale.
-        style(root.FindChildTraverse("SurvivalLocalHeroPortrait"),{position:topX+"px "+(topY+94*topScale+8)+"px 0px"});
+        style(root.FindChildTraverse("SurvivalLocalHeroPortrait"),{position:topX+"px "+(topY+navHeight*topScale+8)+"px 0px"});
         // Both screen edges lie inside the texture; no Image aspect-fit gutters.
         var counterY=h-g.minimapSize-56;
         place(enemyCounter,6,counterY,g.minimapSize+6,34);style(enemyCounter,{padding:"0px 8px"});
@@ -1076,9 +1119,13 @@
             rect(topX,topY,716*topScale,94*topScale),
             rect(statusX+646*statusScale,14*statusScale,983*statusScale,44*statusScale)
         ]:[];
+        if(ready&&shopEntryShown){
+            var shopEntryBounds=navBounds("survival_shop");
+            cfg.HandoffWorldOcclusion.push(rect(topX+shopEntryBounds.x*topScale,topY+shopEntryBounds.y*topScale,shopEntryBounds.width*topScale,86*topScale));
+        }
         // Reapply when the engine rebuilds its native HUD, even without a selection event.
         if(changed||repair||!ready) {
-            ready=nativeLayout(g);if(!ready){bottom.visible=false;return;}
+            ready=nativeLayout(g,readContext);if(!ready){bottom.visible=false;return;}
             lastSignature=signature;geometry=g;layoutPanels=panels;layoutRepairAt=now;layoutRevision++;
             canvas(bottom,g);bottom.hittestchildren=true;
             // Extend only the stat gutter; the portrait sprite/camera keep their dimensions.
@@ -1090,6 +1137,12 @@
             // Round only the compact outer plate. Portraits, title plaques and
             // native ability hit targets remain outside this clipping group.
             style(centerPlate,{borderRadius:g.heroWidth===0||g.worker?"14px 14px 0px 0px":"0px",overflow:g.heroWidth===0||g.worker?"clip":"noclip"});
+            // A filled plate shares the worker action panel's top and bottom.
+            // Keep the transparent ornamental portrait frame for other units.
+            if(g.lumberjack&&g.heroWidth>0){
+                var workerPlate=nine(background,"HandoffWorkerPortraitPlate","center_base",13,23,294,g.height-23,18,20);
+                style(workerPlate,{borderRadius:"14px 14px 0px 0px",overflow:"clip",backgroundColor:"#071f29",visibility:"visible"});
+            } else style(slices.HandoffWorkerPortraitPlate,{visibility:"collapse"});
             place(inventory,g.inventoryX,23,401,307);
             ["hp","mp"].forEach(function(type,index){var y=175+index*60;
                 place(nodes["Handoff_"+type+"_track"],20,y+4,g.barWidth-8,44);
@@ -1170,8 +1223,9 @@
             }
         }
         ["HandoffHeroBase","HandoffPortraitFrame","HandoffNamePlate","HandoffInventoryBase"].forEach(function(id){
-            presentationStyle(nodes[id],{visibility:(building && !(id==="HandoffPortraitFrame" && workerMulti)) || (shown.monster && id==="HandoffInventoryBase")?"collapse":"visible"});
+            presentationStyle(nodes[id],{visibility:building || (shown.monster && id==="HandoffInventoryBase")?"collapse":"visible"});
         });
+        presentationStyle(slices.HandoffWorkerPortraitPlate,{visibility:workerMulti?"visible":"collapse"});
         ["HandoffCombatPlate","HandoffAttributesPlate"].forEach(function(id){presentationStyle(slices[id],{visibility:building || (!shown.attributes && id==="HandoffAttributesPlate")?"collapse":"visible"});});
         slotFrames.forEach(function(p){presentationStyle(p,{visibility:building || shown.monster?"collapse":"visible"});});
         ["HandoffLevelPlate","HandoffLevelBounds"].forEach(function(id){if(valid(nodes[id]))nodes[id].visible=!multi&&!building&&!shown.monster;});
@@ -1179,7 +1233,7 @@
             var show=(!building && (!shown.monster || type==="hp")) || (type==="hp" && (shown.wall || shown.tree));
             ["_track","_fill","_valueBounds"].forEach(function(suffix){presentationStyle(nodes["Handoff_"+type+suffix],{visibility:show?"visible":"collapse"});});
         });
-        ["HandoffBuildingLevel","HandoffBuildingSummary","HandoffBuildingBonus","HandoffBuildingHealthBonus","HandoffBuildingPercent","HandoffBuildingHealthPercent"].forEach(function(id){presentationStyle(nodes[id],{visibility:"collapse"});});
+        ["HandoffBuildingLevel","HandoffBuildingSummary","HandoffBuildingBonus","HandoffBuildingHealthBonus","HandoffBuildingPercent","HandoffBuildingHealthPercent","HandoffBuildingStatIcon","HandoffBuildingSpeedIcon","HandoffBuildingSpeed"].forEach(function(id){presentationStyle(nodes[id],{visibility:"collapse"});});
         // Natural text widths keep fixed bonuses immediately after their base value.
         // Restore the original parent when switching to resource trees or other units.
         var inlineStats=shown.wall||shown.tower;
@@ -1249,33 +1303,32 @@
             });
         }
         var details=snapshot && snapshot.building_stat_details || {};
-        function signed(value){var n=Number(value);return isFinite(n)?(n>=0?"+":"")+compact(n):"\u2026";}
-        function bonusText(stat){
-            if(details[stat+"_bonus"]===undefined)return "\u2026";
-            return signed(details[stat+"_bonus"]);
-        }
-        function percentText(stat){var pct=Math.round(Number(details[stat+"_pct"]||0)*10)/10;return (pct>=0?"+":"")+pct+"%";}
         if(shown.wall || shown.tower) {
             var stat=shown.wall?"armor":"attack";
-            var total=snapshot && Number(shown.wall?snapshot.armor:snapshot.attack_max);
-            var base=snapshot && isFinite(total)?compact(total-Number(details[stat+"_bonus"]||0)):"\u2026";
-            text("HandoffBuildingSummary",(shown.wall?"\u9632\u5fa1 ":"\u653b\u51fb ")+base);
-            text("HandoffBuildingBonus",bonusText(stat));
-            text("HandoffBuildingPercent","（"+percentText(stat)+"）");
+            var rawTotal=snapshot && (shown.wall?snapshot.armor:snapshot.attack_max);
+            var total=rawTotal!==undefined&&rawTotal!==null?Number(rawTotal):NaN;
+            var rawBonus=Number(details.attack_bonus),bonus=isFinite(rawBonus)?rawBonus:0;
+            // Towers retain their existing white base + green fixed bonus sum.
+            // Walls show only final defense, including every source of armor.
+            text("HandoffBuildingSummary",isFinite(total)?compact(shown.wall?total:total-bonus):"\u2026");
+            text("HandoffBuildingBonus",isFinite(rawBonus)?(bonus>=0?"+":"")+compact(bonus):"");
+            text("HandoffBuildingSpeed",attackFrequencyText(snapshot&&snapshot.attack_speed));
+            var iconUri="s2r://panorama/images/"+statIcons[stat]+".vtex",icon=nodes.HandoffBuildingStatIcon;
+            if(icon.__handoffStatUri!==iconUri){icon.SetImage(iconUri);icon.__handoffStatUri=iconUri;}
             var rowWidth=g.centerWidth-40,y=shown.wall?259:239;
-            presentationPlace(buildingStatRow,20,y,rowWidth,44);
+            presentationPlace(buildingStatRow,20,y,rowWidth,48);
             presentationStyle(buildingStatRow,{visibility:multi?"collapse":"visible",flowChildren:"right"});
             buildingInlineIds.forEach(function(id,index){
+                var isIcon=id==="HandoffBuildingStatIcon"||id==="HandoffBuildingSpeedIcon";
+                var speed=id==="HandoffBuildingSpeedIcon"||id==="HandoffBuildingSpeed";
                 presentationStyle(nodes[id],{position:"0px 0px 0px",horizontalAlign:"left",verticalAlign:"center",
-                    width:"fit-children",minWidth:"0px",height:"fit-children",minHeight:"0px",
-                    margin:index===0?"0px":index===3?"0px 0px 0px 18px":"0px 0px 0px 8px",
-                    padding:"0px",textAlign:"left",textOverflow:"clip",
-                    visibility:multi||(index===3&&!shown.wall)?"collapse":"visible"});
+                    width:isIcon?"40px":"fit-children",minWidth:isIcon?"40px":"0px",height:isIcon?"40px":"fit-children",minHeight:"0px",
+                    margin:index===0?"0px":id==="HandoffBuildingSpeedIcon"?"0px 0px 0px 28px":"0px 0px 0px 8px",
+                    padding:"0px",fontSize:id==="HandoffBuildingBonus"?"32px":"36px",textAlign:"left",textOverflow:"clip",
+                    visibility:multi||(speed&&shown.wall)?"collapse":"visible"});
             });
-        }
-        if(shown.wall) {
-            text("HandoffBuildingHealthBonus","");
-            text("HandoffBuildingHealthPercent","生命加成（"+percentText("health")+"）");
+            // Bonus availability can change with a snapshot without a layout change.
+            style(nodes.HandoffBuildingBonus,{visibility:!multi&&shown.tower&&isFinite(total)&&bonus!==0?"visible":"collapse"});
         }
     }
     function mirror() {
@@ -1329,7 +1382,10 @@
             if(id==="vip")enabled=true; // Hover-only status; activation stays inert.
             var changed=button.__handoffEnabled!==enabled;
             if(changed){button.enabled=enabled;button.__handoffEnabled=enabled;}
-            if(id==="survival_shop"&&(changed||repaint))style(button,{saturation:enabled?"1":"0",opacity:enabled?"1":"0.4"});
+            if(id==="survival_shop"&&(changed||repaint)){
+                button.visible=enabled;
+                style(button,{visibility:enabled?"visible":"collapse",saturation:"1",opacity:"1"});
+            }
         });
         if(cfg.SurvivalVIPStatus)cfg.SurvivalVIPStatus.Render(topButtons.vip,{
             icon:nodes.HandoffNavIcon_vip,caption:nodes.HandoffNavCaption_vip,glow:nodes.HandoffNavGlow_vip});
@@ -1374,7 +1430,7 @@
         return "下一波次 "+(next===null?"—":String(next))+"  倒计时 "+time;
     }
     function data(next) {
-        if(!next)return;var incoming=Number(next.sequence);if(isFinite(incoming)&&incoming<=sequence)return;if(isFinite(incoming))sequence=incoming;
+        if(!valid(ctx)||cfg.HandoffGeneration!==generation||!next)return;var incoming=Number(next.sequence);if(isFinite(incoming)&&incoming<=sequence)return;if(isFinite(incoming))sequence=incoming;
         var r=next.resources||{},wave=next.wave||{},t=Math.max(0,Math.ceil(Number(wave.timer)||0));
         text("HandoffResource_gold",compact(r.gold));text("HandoffResource_wood",compact(r.wood));text("HandoffResource_population",compact(r.population)+" / "+compact(r.max_population));
         var fishing=fishingWave(wave),selected=!fishing&&(wave.difficulty_selected===true||Number(wave.difficulty_selected)===1);
@@ -1382,6 +1438,7 @@
         text("HandoffDifficulty",selected&&/^N[1-9][0-9]*$/.test(difficulty)?difficulty:"");
         countdownWave=wave;renderCountdowns();
         var alive=Math.max(0,Math.floor(Number(wave.alive)||0)),limit=Number(wave.alive_limit);
+        if(cfg.SurvivalEnemyPopulationWarning)cfg.SurvivalEnemyPopulationWarning.Render(wave);
         enemyCounter.visible=!fishing&&isFinite(limit)&&limit>0;
         var defeated=!fishing&&(wave.player_defeated===true||Number(wave.player_defeated)===1);
         text("HandoffEnemyTitle",fishing?"":defeated?"本局失败":"进攻怪物");
@@ -1394,14 +1451,26 @@
         text("HandoffEnemyCountdown",overflow?String(remaining(wave.overflow_deadline,wave.overflow_remaining)):"");
     }
     function refreshNow() {if(!valid(ctx)||cfg.HandoffGeneration!==generation)return;try{
-        if(cfg.SurvivalPortraitPresentation && cfg.SurvivalPortraitPresentation.RefreshLocalHeroPortrait)
-            cfg.SurvivalPortraitPresentation.RefreshLocalHeroPortrait(root);
-        layout();
-        if(ready&&cfg.SurvivalPortraitPresentation)cfg.SurvivalPortraitPresentation.Refresh(native("PortraitGroup"));
+        var readContext={hasNativeEntries:false,readNativeEntries:function(combat,unit){
+            var reader=combat.NativeEntries;
+            if(this.hasNativeEntries&&this.unit===unit&&this.combat===combat&&this.reader===reader)return this.nativeEntries;
+            var entries=reader.call(combat,unit);
+            this.unit=unit;this.combat=combat;this.reader=reader;
+            this.nativeEntries=entries;this.hasNativeEntries=true;
+            return entries;
+        }};
+        layout(readContext);
+        var portraitPresentation=cfg.SurvivalPortraitPresentation,portraitGroup=ready?native("PortraitGroup"):null;
+        // Refresh owns both the selected portrait and the corner shortcut. Avoid
+        // issuing the corner's identical lookup/style work twice on every tick.
+        if(portraitPresentation&&valid(portraitGroup)&&portraitPresentation.Refresh)
+            cfg.SurvivalPortraitPresentation.Refresh(portraitGroup);
+        else if(portraitPresentation&&portraitPresentation.RefreshLocalHeroPortrait)
+            portraitPresentation.RefreshLocalHeroPortrait(root);
         refreshInventoryPresentation();
-        if(ready&&cfg.SurvivalMultiSelectionPortraits)cfg.SurvivalMultiSelectionPortraits.Apply(native("PortraitGroup"),geometry.portraitSize);
+        if(ready&&cfg.SurvivalMultiSelectionPortraits)cfg.SurvivalMultiSelectionPortraits.Apply(native("PortraitGroup"),geometry.portraitSize,geometry.lumberjack&&geometry.heroWidth>0?geometry.portraitHeight:undefined);
         // Native images can be created one frame AFTER the slot parent. Reacquire them.
-        if(ready){fitNativeSkills(geometry);var inv=native("inventory");if(valid(inv))for(var j=0;j<6;j++){var item=inv.FindChildTraverse("inventory_slot_"+j);if(valid(item)){square(item);style(item,{marginRight:"5px"});}}}
+        if(ready){fitNativeSkills(geometry,false,readContext);var inv=native("inventory");if(valid(inv))for(var j=0;j<6;j++){var item=inv.FindChildTraverse("inventory_slot_"+j);if(valid(item)){square(item);style(item,{marginRight:"5px"});}}}
         if(cfg.SurvivalProductionHUD){
             var productionHeight=cfg.SurvivalProductionHUD.Refresh(geometry,selectedUnit(),ready,currentEntries);
             if(ready&&geometry){
@@ -1410,7 +1479,7 @@
             }
         }
         if(cfg.SurvivalMinimapShortcuts)cfg.SurvivalMinimapShortcuts.Refresh(geometry,ready);
-        mirror();mirrorKeys();revealWhenStable();}catch(e){$.Warning("[HANDOFF_HUD] "+e);}}
+        mirror();recoverReadyHotkeyMirror();mirrorKeys();revealWhenStable();}catch(e){$.Warning("[HANDOFF_HUD] "+e);}}
     function tick(){if(!valid(ctx)||cfg.HandoffGeneration!==generation)return;renderCountdowns();refreshNow();$.Schedule(.1,tick);}
     cfg.HandoffBoundValuesChanged=function(){if(cfg.HandoffGeneration===generation&&valid(ctx))mirror();};
     // HANDOFF_REFRESH_COALESCED: notifications are not geometry invalidations.
@@ -1433,6 +1502,8 @@
     });});
     GameEvents.Subscribe("survival_ui_private_snapshot",data);
     cfg.SurvivalMainHUD={Inspect:function(){return {nativeReady:ready,presented:presented,missing:missing,geometry:geometry,unit:selectedUnit(),abilities:currentEntries.map(function(e){return e.name;}),name:nodes.HandoffName.text,hp:nodes.Handoff_hp_value.text,keys:skillPanels.map(function(p,i){var b=nodes["HandoffKey_"+i+"Bounds"];return b&&b.visible?nodes["HandoffKey_"+i].text:"";}),version:"compact_workers_20260928",sequence:sequence};}};
+    cfg.SurvivalMainHUD.HotkeyMirrorInspect=function(){return {attempts:hotkeyMirrorRecovery.attempts,
+        finished:hotkeyMirrorRecovery.finished,failures:hotkeyMirrorRecovery.failures,limit:4};};
     cfg.SurvivalMainHUD.CacheInspect=inspectSquareCache;
     if(Game.IsInToolsMode && Game.IsInToolsMode() && cfg.SurvivalClientCallbackProbe && cfg.SurvivalClientCallbackProbe.RegisterModule) {
         cfg.SurvivalClientCallbackProbe.RegisterModule("topnav",[

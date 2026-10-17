@@ -165,6 +165,15 @@ class ArchiveService:
             return self.settle(profile, command, False)
         database_id=self.app._database_account_id(account)
         self.app._ensure_gameplay_stats(database_id)
+        if command['kind'] == 'starjoy_reconcile':
+            # Cash grants can cross several tiers during one match. Derive a
+            # stable receipt from saved progress, never a client-supplied score.
+            # profile() also resolves earlier pending operations before reading.
+            trusted = self.profile({'account_id': account})
+            stats = trusted.get('save', {}).get('gameplay_stats', {})
+            score = max(0, *(int(stats.get(key) or 0) for key in
+                            ('starjoy_points_earned', 'starjoy_points')))
+            command['id'] += ':earned:' + str(score)
         fingerprint=hashlib.sha256(json.dumps(command,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
         prepared=self.app.rpc_client.rpc("archive_prepare",{"p_account":database_id,"p_id":command["id"],
             "p_hash":requested_hash,"p_fingerprint":fingerprint,"p_command":command})
@@ -224,7 +233,12 @@ class ArchiveService:
                     shared_roll = self.shared_challenge_roll(recorded_bundle)
                 if not upgraded:
                     reducer=ArchiveService(self.app,recorded_bundle,self.lua)
-            if version == self.bundle.hash or command["kind"] != "challenge":
+            product = self.bundle.tables.get('commerce_catalog', {}).get(command.get('sku'), {})
+            if command['kind'] == 'commerce_purchase' and product.get('currency') == 'shop_gold':
+                # A currency pause applies to uncommitted older-client intents too.
+                # Completed receipts already returned above and remain immutable.
+                result = {'ok': False, 'error': 'shop_gold_not_open'}
+            elif version == self.bundle.hash or command["kind"] != "challenge":
                 result=reducer.settle(profile,command,prepared["has_pass"])
             else:
                 result=reducer.settle(profile,command,prepared["has_pass"],shared_roll)
@@ -271,7 +285,12 @@ class ArchiveService:
         if not accepts(self.bundle, requested_hash, "lottery_snapshot"):
             return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
         profile=self.profile({"account_id":payload.get("account_id")})
-        projected=self.settle(profile,{"id":"lottery_snapshot","kind":"lottery_snapshot"},False)
+        reducer=self
+        if requested_hash != self.bundle.hash:
+            # Advertise the same currency/rates that this client's recorded
+            # draw reducer uses, until the game joins the new bundle version.
+            reducer=ArchiveService(self.app,Bundle(self.bundle.directory.parent/requested_hash),self.lua)
+        projected=reducer.settle(profile,{"id":"lottery_snapshot","kind":"lottery_snapshot"},False)
         projected["config_hash"]=requested_hash
         return projected
 
@@ -280,4 +299,8 @@ def install(application,addon_root,lua):
     current=json.loads((root/"server/bundles/current.json").read_text(encoding="utf-8"))
     service=ArchiveService(application,Bundle(root/"server/bundles"/current["hash"]),lua)
     service.sync()
+    from .endless_leaderboard import install as install_endless_leaderboard
+    install_endless_leaderboard(service)
+    from .vip_progression import install as install_vip_progression
+    install_vip_progression(service)
     return service

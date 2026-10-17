@@ -11,8 +11,18 @@ create table if not exists payments.vip_recharge_levels (
 );
 insert into payments.vip_recharge_levels(level,required_fen) values
 -- BEGIN VIP LEVEL VALUES (generated from vip_recharge_levels.json)
- (1,5000),(2,10000),(3,25000),(4,50000),(5,100000),(6,150000),
- (7,250000),(8,400000),(9,600000),(10,750000),(11,1000000),(12,1250000)
+(1,5000),
+(2,10000),
+(3,25000),
+(4,50000),
+(5,100000),
+(6,150000),
+(7,250000),
+(8,400000),
+(9,600000),
+(10,750000),
+(11,1000000),
+(12,1250000)
 -- END VIP LEVEL VALUES
 on conflict(level) do nothing;
 do $levels$

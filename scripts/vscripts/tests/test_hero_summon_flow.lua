@@ -235,6 +235,8 @@ eq(ctx.selected.hidden, false)
 eq(ctx.selected.survival_hero_id, hero_id)
 eq(#ctx.summoned, 1)
 eq(ctx.summoned[1].unit, ctx.selected)
+eq(ctx.selected.survival_player_id, 0,
+    "replacement hero exposes addon ownership before combat effects attach")
 eq(ctx.unlocks[1].unlocked, 1)
 eq(ctx.client_events[1].name, "survival_select_unit")
 eq(success.snapshot.hero_summoned, 1)

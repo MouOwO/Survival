@@ -48,8 +48,5 @@
 #DailyWindow.DailyGW2Page #DailyCount,
 #DailyWindow.DailyGW2Page #PassValidity,
 #DailyWindow.DailyGW2Page #PassPrice { margin:0px; padding:0px; vertical-align:top; }
-#DailyWindow.DailyGW2Page #DailyGW2Tooltip { flow-children:none; overflow:noclip; z-index:150; }
-#DailyWindow.DailyGW2Page #DailyGW2TooltipViewport { flow-children:down; overflow:squish scroll; }
-#DailyWindow.DailyGW2Page #DailyGW2TooltipViewport Label { width:316px; height:fit-children; white-space:normal; text-overflow:clip; }
-#DailyWindow.DailyGW2Page VerticalScrollBar { width:7px; background-image:none; background-color:#151819; }
-#DailyWindow.DailyGW2Page VerticalScrollBar .ScrollThumb { background-image:none; background-color:#8b9ca5; border-radius:0px; }
+#DailyWindow.DailyGW2Page #DailyRulesText VerticalScrollBar { width:7px; background-image:none; background-color:#151819; }
+#DailyWindow.DailyGW2Page #DailyRulesText VerticalScrollBar .ScrollThumb { background-image:none; background-color:#8b9ca5; border-radius:0px; }

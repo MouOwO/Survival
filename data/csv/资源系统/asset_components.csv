@@ -572,3 +572,8 @@ monster_wave_dragon_black_red_small:head,monster_wave_dragon_black_red_small,hea
 monster_wave_dragon_black_red_small:back,monster_wave_dragon_black_red_small,back,models/items/winter_wyvern/crownfall_wyvern_back/crownfall_wyvern_back.vmdl,prop_dynamic,,bone_merge,,idle,1,0,,2,1,极光之棘 + 寒冬萧瑟之孤寂；官方ItemDef=29673
 monster_wave_flying_black_bone:head,monster_wave_flying_black_bone,head,models/items/winter_wyvern/winter_wyvern_ti7_immortal/winter_wyvern_immortal_ti7.vmdl,prop_dynamic,,bone_merge,,idle,1,0,,1,1,极光之棘 + 成厦疾冰 + 寒冬萧瑟之孤寂；官方ItemDef=8017
 monster_wave_flying_black_bone:back,monster_wave_flying_black_bone,back,models/items/winter_wyvern/crownfall_wyvern_back/crownfall_wyvern_back.vmdl,prop_dynamic,,bone_merge,,idle,1,0,,2,1,极光之棘 + 成厦疾冰 + 寒冬萧瑟之孤寂；官方ItemDef=29673
+monster_archive_social_wife:head,monster_archive_social_wife,head,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana_head.vmdl,prop_dynamic,,bone_merge,,idle,1,0,,1,1,金鹏之幸捆绑包；官方ItemDef=35553
+monster_archive_social_wife:weapon,monster_archive_social_wife,weapon,models/heroes/ogre_magi/ogre_magi_weapon.vmdl,prop_dynamic,,bone_merge,,idle,1,0,,2,1,金鹏之幸捆绑包；官方ItemDef=105
+monster_archive_social_wife:back,monster_archive_social_wife,back,models/heroes/ogre_magi/ogre_magi_cape.vmdl,prop_dynamic,,bone_merge,,idle,1,0,,3,1,金鹏之幸捆绑包；官方ItemDef=133
+monster_archive_social_wife:arms,monster_archive_social_wife,arms,models/heroes/ogre_magi/ogre_magi_bracers.vmdl,prop_dynamic,,bone_merge,,idle,1,0,,4,1,金鹏之幸捆绑包；官方ItemDef=134
+monster_archive_social_wife:belt,monster_archive_social_wife,belt,models/heroes/ogre_magi/ogre_magi_belt.vmdl,prop_dynamic,,bone_merge,,idle,1,0,,5,1,金鹏之幸捆绑包；官方ItemDef=136

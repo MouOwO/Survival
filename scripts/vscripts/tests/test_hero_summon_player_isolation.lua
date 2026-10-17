@@ -213,6 +213,9 @@ assert(snapshot(0).altar==ctx.altars[0] and request(0).ok)
 -- altars intact. Both players can continue independent summon transactions.
 fixture()
 assert(request(0).ok and request(1).ok)
+assert(ctx.selected[0].survival_player_id == 0)
+assert(ctx.selected[1].survival_player_id == 1,
+    "native hero replacements retain separate addon combat-effect owners")
 local other_hero = ctx.selected[1]
 local deletions = {}
 bus.subscribe(events.HERO_REMOVED, function(payload)

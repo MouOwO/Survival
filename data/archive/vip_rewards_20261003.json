@@ -453,7 +453,7 @@
     },
     {
       "reward_id": "vip_medal_01",
-      "display_name": "VIP1勋章",
+      "display_name": "孤城V1勋章",
       "group_id": "medals",
       "level": 1,
       "price": 0,
@@ -477,7 +477,7 @@
     },
     {
       "reward_id": "vip_medal_02",
-      "display_name": "VIP2勋章",
+      "display_name": "孤城V2勋章",
       "group_id": "medals",
       "level": 2,
       "price": 0,
@@ -501,7 +501,7 @@
     },
     {
       "reward_id": "vip_medal_03",
-      "display_name": "VIP3勋章",
+      "display_name": "孤城V3勋章",
       "group_id": "medals",
       "level": 3,
       "price": 0,
@@ -525,7 +525,7 @@
     },
     {
       "reward_id": "vip_medal_04",
-      "display_name": "VIP4勋章",
+      "display_name": "孤城V4勋章",
       "group_id": "medals",
       "level": 4,
       "price": 0,
@@ -549,7 +549,7 @@
     },
     {
       "reward_id": "vip_medal_05",
-      "display_name": "VIP5勋章",
+      "display_name": "孤城V5勋章",
       "group_id": "medals",
       "level": 5,
       "price": 0,
@@ -573,7 +573,7 @@
     },
     {
       "reward_id": "vip_medal_06",
-      "display_name": "VIP6勋章",
+      "display_name": "孤城V6勋章",
       "group_id": "medals",
       "level": 6,
       "price": 0,
@@ -597,7 +597,7 @@
     },
     {
       "reward_id": "vip_medal_07",
-      "display_name": "VIP7勋章",
+      "display_name": "孤城V7勋章",
       "group_id": "medals",
       "level": 7,
       "price": 0,
@@ -621,7 +621,7 @@
     },
     {
       "reward_id": "vip_medal_08",
-      "display_name": "VIP8勋章",
+      "display_name": "孤城V8勋章",
       "group_id": "medals",
       "level": 8,
       "price": 0,
@@ -645,7 +645,7 @@
     },
     {
       "reward_id": "vip_medal_09",
-      "display_name": "VIP9勋章",
+      "display_name": "孤城V9勋章",
       "group_id": "medals",
       "level": 9,
       "price": 0,
@@ -669,7 +669,7 @@
     },
     {
       "reward_id": "vip_medal_10",
-      "display_name": "VIP10勋章",
+      "display_name": "孤城V10勋章",
       "group_id": "medals",
       "level": 10,
       "price": 0,
@@ -697,7 +697,7 @@
       "group_id": "packages",
       "level": 1,
       "price": 10,
-      "condition": "VIP会员可购买一次；附送VIP1勋章",
+      "condition": "达到VIP1可购买一次；附送孤城V1勋章",
       "description": "开局木材+50；墙护甲+10；墙每秒生命+3；箭塔攻击速度+5%；英雄初始全属性+5000",
       "effect_ids": [
         "initial_wood",
@@ -722,7 +722,7 @@
       "group_id": "packages",
       "level": 2,
       "price": 19,
-      "condition": "VIP会员可购买一次；附送VIP2勋章",
+      "condition": "达到VIP2可购买一次；附送孤城V2勋章",
       "description": "每秒木材+1；箭塔攻击力+300；箭塔攻击速度+10%；金矿效率+5%",
       "effect_ids": [
         "wood_per_second",
@@ -745,7 +745,7 @@
       "group_id": "packages",
       "level": 3,
       "price": 39,
-      "condition": "VIP会员可购买一次；附送VIP3勋章",
+      "condition": "达到VIP3可购买一次；附送孤城V3勋章",
       "description": "伐木效率+1；金矿效率+5%；伐木工攻速+5%；伐木工攻击成长+2；箭塔每秒攻击+1",
       "effect_ids": [
         "lumberjack_efficiency",
@@ -770,7 +770,7 @@
       "group_id": "packages",
       "level": 4,
       "price": 59,
-      "condition": "VIP会员可购买一次；附送VIP4勋章",
+      "condition": "达到VIP4可购买一次；附送孤城V4勋章",
       "description": "墙每秒生命+10；墙生命加成+10%；墙护甲加成+10%；墙伤害减免+3%；墙护甲+10；人口+2",
       "effect_ids": [
         "wall_health_per_second",
@@ -797,8 +797,8 @@
       "group_id": "packages",
       "level": 5,
       "price": 79,
-      "condition": "VIP会员可购买一次；附送VIP5勋章",
-      "description": "箭塔每秒攻击+2；箭塔攻击加成+8%；箭塔攻击速度+8%；英雄全属性加成+12%；英雄造成伤害加攻击+5",
+      "condition": "达到VIP5可购买一次；附送孤城V5勋章",
+      "description": "箭塔每秒攻击+2；箭塔攻击加成+8%；箭塔攻击速度+8%；英雄全属性加成+8%；英雄造成伤害加攻击+5",
       "effect_ids": [
         "tower_attack_per_second",
         "tower_attack_bonus_pct",
@@ -810,7 +810,7 @@
         2,
         8,
         8,
-        12,
+        8,
         5
       ],
       "enabled": true,
@@ -822,7 +822,7 @@
       "group_id": "packages",
       "level": 6,
       "price": 119,
-      "condition": "VIP会员可购买一次；附送VIP6勋章",
+      "condition": "达到VIP6可购买一次；附送孤城V6勋章",
       "description": "英雄造成伤害加属性+3；英雄造成伤害加攻击+3；箭塔暴击几率+5%；英雄暴击几率+5%；英雄全属性加成+10%；英雄攻击减甲+5",
       "effect_ids": [
         "hero_attributes_per_damage",
@@ -849,7 +849,7 @@
       "group_id": "packages",
       "level": 7,
       "price": 129,
-      "condition": "VIP会员可购买一次；附送VIP7勋章",
+      "condition": "达到VIP7可购买一次；附送孤城V7勋章",
       "description": "箭塔最终伤害+15%；英雄最终伤害+15%；箭塔攻击减甲+0.1；英雄全属性加成+8%；英雄攻击减甲+5",
       "effect_ids": [
         "tower_final_damage_bonus_pct",
@@ -874,7 +874,7 @@
       "group_id": "packages",
       "level": 8,
       "price": 188,
-      "condition": "VIP会员可购买一次；附送VIP8勋章",
+      "condition": "达到VIP8可购买一次；附送孤城V8勋章",
       "description": "墙每秒护甲+0.1；金矿建造上限+1；英雄最终伤害+10%；箭塔攻击减甲+0.1；英雄全属性加成+10%；伐木效率+3；英雄每秒属性+100",
       "effect_ids": [
         "wall_armor_per_second",
@@ -903,7 +903,7 @@
       "group_id": "packages",
       "level": 9,
       "price": 199,
-      "condition": "VIP会员可购买一次；附送VIP9勋章",
+      "condition": "达到VIP9可购买一次；附送孤城V9勋章",
       "description": "英雄攻击属性效率+5%；伐木暴击几率+5%；伐木暴击收益+10%；箭塔攻击减甲+0.2；英雄攻击减甲+5",
       "effect_ids": [
         "hero_attack_attribute_efficiency_pct",
@@ -928,15 +928,15 @@
       "group_id": "packages",
       "level": 10,
       "price": 239,
-      "condition": "VIP会员可购买一次；附送VIP10勋章",
-      "description": "英雄攻击属性效率+10%；伐木暴击几率+5%；伐木暴击收益+10%；箭塔攻击减甲+0.2；英雄攻击减甲+10；英雄造成伤害加木材+10%；英雄全属性加成+10%；箭塔攻击加成+10%；英雄造成伤害加属性+10",
+      "condition": "达到VIP10可购买一次；附送孤城V10勋章",
+      "description": "英雄攻击属性效率+10%；伐木暴击几率+5%；伐木暴击收益+10%；箭塔攻击减甲+0.2；英雄攻击减甲+10；英雄造成伤害加木材+10；英雄全属性加成+10%；箭塔攻击加成+10%；英雄造成伤害加属性+10",
       "effect_ids": [
         "hero_attack_attribute_efficiency_pct",
         "lumberjack_critical_chance_pct",
         "lumberjack_critical_yield_bonus_pct",
         "tower_attack_armor_reduction",
         "hero_attack_armor_reduction",
-        "hero_damage_wood_bonus_pct",
+        "hero_damage_wood_flat",
         "hero_attribute_bonus_pct",
         "tower_attack_bonus_pct",
         "hero_attributes_per_damage"

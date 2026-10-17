@@ -12,9 +12,11 @@ const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 async function extra(state){
  const describe=id=>({id,bounds:nodes[id].el.getBoundingClientRect().toJSON()});
  const assets=await Promise.all(Object.entries(cfg.CollectionGW2Data.assets).map(async([key,value])=>{const image=new Image();image.src=cssValue(value.file);try{await image.decode();return {key,src:image.src,decoded:!!image.naturalWidth};}catch{return {key,src:image.src,decoded:false};}}));
- const tabs=['ex','friend','wife'].map(key=>{const tab=nodes['CollectionGW2Tab_'+key],descendants=[...tab.el.querySelectorAll('*')];return {...describe(tab.id),labels:descendants.filter(element=>element.classList.contains('label')).length,icons:descendants.filter(element=>getComputedStyle(element).backgroundImage.includes('/tab_'+key+'.png')).map(element=>element.getBoundingClientRect().toJSON())};});
+ const tabs=['ex','friend','wife','beast'].map(key=>{const tab=nodes['CollectionGW2Tab_'+key],descendants=[...tab.el.querySelectorAll('*')];return {...describe(tab.id),labels:descendants.filter(element=>element.classList.contains('label')).length,icons:descendants.filter(element=>{const background=getComputedStyle(element).backgroundImage;return key==='beast'?background.includes('/nav_beast.png'):background.includes('/tab_'+key+'.png');}).map(element=>element.getBoundingClientRect().toJSON())};});
  const grid=nodes.CollectionGW2Grid.el,portraitParents=nodes.CollectionGW2GridBody.Children().map(card=>{const image=card.el.querySelector('img');return {direct:!!image?.parentElement.classList.contains('CollectionGW2Portrait'),legacyWrapper:!!image?.closest('.ArchiveArt'),className:image?.className};});
  state.onePage={sidebar:describe('CollectionGW2Sidebar'),footer:describe('CollectionGW2Footer'),result:describe('CollectionGW2Result'),draw:describe('CollectionGW2Draw'),tabs,assets,portraitParents,scrollWidth:grid.scrollWidth,clientWidth:grid.clientWidth,category:nodes.CollectionGW2Category.text};
+ state.rarityCards=nodes.CollectionGW2GridBody.Children().map(card=>{const item=card.__collectionItem,frame=card.el.querySelector('.CollectionGW2SlotFrame'),badge=card.el.querySelector('.CollectionGW2RarityLabel'),css=frame&&getComputedStyle(frame);return {item:item?.id,quality:item?.quality,drawProbability:item?.draw_probability,initialDrawProbability:item?.initial_draw_probability,drawEnabled:item?.draw_enabled,badge:badge?.textContent,color:css?.borderTopColor,width:parseFloat(css?.borderTopWidth),badgeBounds:badge?.getBoundingClientRect().toJSON(),frameBounds:frame?.getBoundingClientRect().toJSON()};});
+ const rarity=nodes.CollectionGW2TooltipRarity;state.tooltip.rarity=rarity?{text:rarity.text,visible:rarity.visible,bounds:rarity.el.getBoundingClientRect().toJSON(),color:getComputedStyle(rarity.el).color}:null;state.tooltip.titleColor=getComputedStyle(nodes.CollectionGW2TooltipTitle.el).color;
  return state;
 }
 async function read(b){return b.run('('+extra.toString()+')(('+inspect.toString()+')())');}
@@ -36,22 +38,30 @@ function validateArt(state,category){
  assert.deepEqual(state.cards.map(card=>card.item),formal.pages[category].map(item=>item.id),'Formal CSV item order is retained');
  for(let index=0;index<state.cards.length;index++)assert(decodeURI(state.cards[index].image.src).endsWith(formal.pages[category][index].icon.replace('file://{images}/','')),'Original configured portrait URI is retained for '+state.cards[index].item);
  assert.deepEqual(state.collection.rows.map(item=>item.name),formal.pages[category].map(item=>item.name),'All formal character names remain unchanged');
+ const colors={N:'rgb(143, 196, 123)',R:'rgb(116, 200, 242)',SR:'rgb(182, 128, 238)',SSR:'rgb(245, 198, 94)',UR:'rgb(239, 83, 80)'};
+ assert.equal(state.rarityCards.length,formal.pages[category].length);
+ for(const [index,card]of state.rarityCards.entries()){const row=formal.pages[category][index];assert.equal(card.quality,row.quality);assert.equal(card.badge,row.quality,'Rarity badge matches server-style row');assert.equal(card.color,colors[row.quality],'Rarity frame keeps its quality color even when unowned');assert.equal(card.width,2,'Rarity border is two pixels');assert(card.badgeBounds.right<=card.frameBounds.right+1&&card.badgeBounds.top>=card.frameBounds.top-1,'Rarity badge remains within card');}
+ assert.deepEqual([...new Set(state.rarityCards.map(card=>card.quality))].sort(),['N','R','SR','SSR','UR'],'Every collection displays all five rarity grades');
 }
 async function cropPortrait(b,state,index,name){
  const image=state.cards[index].image,r=image.bounds,clip={x:Math.floor(r.x),y:Math.floor(r.y),width:Math.ceil(r.right)-Math.floor(r.x),height:Math.ceil(r.bottom)-Math.floor(r.y)},file=out+'/'+name;
  await shot(b,file,clip);const decoded=decodePng(fs.readFileSync(file));assert.equal(decoded.width,clip.width);assert.equal(decoded.height,clip.height);
  return {file,item:state.cards[index].item,source:image.src,clip,pixelSize:[decoded.width,decoded.height],method:'CDP screenshot clip at scale 1; no image recreation, resize, sharpening, or pixel editing'};
 }
-async function hoverCard(b,index,width,height){
+async function hoverCard(b,index,width,height,captureFile){
  await move(b,2,2);let state=await read(b);const card=state.cards[index],r=card.bounds,x=r.x+r.width/2,y=r.y+r.height/2;
  const hit=await b.run('document.elementFromPoint('+x+','+y+')?.closest(".CollectionGW2Slot")?.id');assert.equal(hit,card.id,'Actual mouse reaches card '+(index+1));
  await move(b,x,y);state=await read(b);assert(state.collection.tooltipVisible,'Card '+(index+1)+' opens its tooltip');assert.equal(state.tooltip.title,state.collection.rows[index].name);
+ const rarity=state.tooltip.rarity,item=state.rarityCards[index];assert(rarity?.visible,'Collection tooltip exposes its rarity row');assert(rarity.text.includes('品质 '+item.quality),'Tooltip grade follows the authoritative-shaped row');
+ if(item.drawEnabled===0){assert(rarity.text.includes('暂不参与抽取'));assert(!rarity.text.includes('当前抽取概率'),'Pending entries never advertise a live draw probability');}
+ else{assert(Number.isFinite(item.drawProbability),'Fixture passes the explicit current probability field');const percent=item.drawProbability*100,chance=percent>0&&percent<.01?'<0.01%':percent.toFixed(2)+'%';assert(rarity.text.includes('当前抽取概率 '+chance),'Real hover shows the current single-character probability field');}
  const c=state.canvas.bounds,t=state.tooltip.bounds,scale=c.width/900;
  assert(t.x>=c.x-.5&&t.y>=c.y-.5&&t.right<=c.x+c.width+.5&&t.bottom<=c.y+c.height+.5,'Tooltip is inside the collection canvas');assert(t.height/scale<=406.5,'Tooltip respects the shorter window cap');
+ if(captureFile){assert(await b.run('cfg.SurvivalCollection.Inspect().tooltipVisible&&nodes.CollectionGW2Tooltip.visible&&nodes.CollectionGW2TooltipRarity.visible'),'Probability screenshot captures a live tooltip before leaving its anchor');await shot(b,captureFile,{x:0,y:0,width,height});}
  const surface=await b.run('nodes.CollectionGW2TooltipSurface.el.getBoundingClientRect().toJSON()');
  await move(b,surface.right-2,surface.bottom-2);assert.equal((await read(b)).collection.tooltipVisible,false,'Moving inside the tooltip immediately hides it');
  await sleep(100);assert.equal((await read(b)).collection.tooltipVisible,false,'Tooltip does not immediately reappear over another portrait');await move(b,2,2);
- return {width,height,index:index+1,item:card.item,realPointerHit:true,title:state.tooltip.title,tooltipBounds:t,selfEntryDismissed:true};
+ return {width,height,index:index+1,item:card.item,quality:item.quality,currentProbability:item.drawProbability,initialProbability:item.initialDrawProbability,rarityText:rarity.text,titleColor:state.tooltip.titleColor,frameColor:item.color,realPointerHit:true,title:state.tooltip.title,tooltipBounds:t,selfEntryDismissed:true,...(captureFile?{captureFile,tooltipVisibleAtCapture:true}:{})};
 }
 async function search(b,text){
  await move(b,2,2);await click(b,'CollectionGW2Search');
@@ -70,21 +80,27 @@ async function main(){
   for(const [width,height]of sizes){
    await b.call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});await b.go(preview+'/index.html');assert(await b.run('previewReady'));await settle(b);
    let state=await read(b);validateNavigation(state,width,height);await click(b,'HandoffNav_collection');report.checks.push({width,height,entryActualPointer:true,inputHitCompatibility:await nativeInputHits(b)});
-   for(const category of ['ex','friend']){
+   for(const category of ['ex','friend','beast']){
     await move(b,2,2);await click(b,'CollectionGW2Tab_'+category);await b.run('entrySend('+JSON.stringify(category)+');true');await settle(b);state=await read(b);
     const geometry=validateOnePage(state,width,height);validateArt(state,category);assert.equal(state.collection.category,category);assert.equal(state.layer,'collection');
     await move(b,2,2);const file=out+'/'+category+'_'+width+'x'+height+'.png';await shot(b,file,{x:0,y:0,width,height});report.screens.push({file,category,...geometry,all40Decoded:true,originalUris:true,opaque:true,categoryHeading:state.onePage.category});
     report.portraits.push(await cropPortrait(b,state,0,category+'_portrait_1_'+width+'x'+height+'.png'));report.portraits.push(await cropPortrait(b,state,39,category+'_portrait_40_'+width+'x'+height+'.png'));
     if(width===1920&&category==='ex')report.opacityProof=await probeOpaque(b,out+'/opaque_1920x1080',width,height);
-    for(const index of [0,9,30,39])report.pointerChecks.push(await hoverCard(b,index,width,height));
+    const gradeIndices=['N','R','SR','SSR','UR'].map(quality=>formal.pages[category].findIndex(row=>row.quality===quality));
+    for(const index of [...new Set([0,9,30,39,...gradeIndices])])report.pointerChecks.push(await hoverCard(b,index,width,height));
+    if(width===1920){const index=formal.pages[category].findIndex(row=>row.quality==='UR');report.pointerChecks.push(await hoverCard(b,index,width,height,out+'/'+category+'_ur_probability_'+width+'x'+height+'.png'));}
    }
    if(width===1920){
+    await click(b,'CollectionGW2Tab_friend');await b.run('entrySend("friend");true');await settle(b);
     let filtered=await search(b,formal.pages.friend[0].name);assert.equal(filtered.cards.length,1);assert.equal(filtered.cards[0].item,formal.pages.friend[0].id);assert.equal(filtered.emptySlots,0);
     filtered=await search(b,'本地不存在的收藏检索词');assert.equal(filtered.cards.length,0);assert(filtered.empty.visible);assert.equal(filtered.emptySlots,0);
     filtered=await search(b,'');validateOnePage(filtered,width,height);report.checks.push({width,height,search:'Real pointer focus and CDP keyboard input match one item, empty result, and restore forty',noFillerSlots:true});
    }
-   const before=await b.run('previewCalls.length');await click(b,'CollectionGW2Tab_wife');state=await read(b);assert.equal(state.collection.category,'wife');assert.equal(state.cards.length,0);assert.equal(state.collection.slots,0);assert.equal(state.emptySlots,0);assert.equal(state.collection.drawEnabled,false);assert.equal(state.calls.slice(before).filter(call=>call.name==='survival_archive_request').length,0);
-   await shot(b,out+'/wife_'+width+'x'+height+'.png',{x:0,y:0,width,height});report.checks.push({width,height,wifeEmpty:true,drawDisabled:true,wifeRequests:0});
+   const before=await b.run('previewCalls.length');await click(b,'CollectionGW2Tab_wife');await b.run('entrySend("wife");true');await settle(b);state=await read(b);assert.equal(state.collection.category,'wife');validateOnePage(state,width,height,formal.pages.wife.length);validateArt(state,'wife');assert.equal(state.collection.drawEnabled,formal.social.wife.remaining>0);assert.equal(state.calls.slice(before).filter(call=>call.name==='survival_archive_request'&&call.payload.category_id==='wife').length,1);
+   const wifeFile=out+'/wife_'+width+'x'+height+'.png';await shot(b,wifeFile,{x:0,y:0,width,height});report.screens.push({file:wifeFile,category:'wife',width,height,items:formal.pages.wife.length,all40Decoded:true,originalUris:true,opaque:true,categoryHeading:state.onePage.category});report.checks.push({width,height,wifeConfigured:true,rows:formal.pages.wife.length,drawEnabled:state.collection.drawEnabled,wifeRequests:1});
+   const wifeHoverIndices=[0,...['N','R','SR','SSR','UR'].map(quality=>formal.pages.wife.findIndex(row=>row.quality===quality)),...formal.pages.wife.map((row,index)=>row.draw_enabled===0?index:-1).filter(index=>index>=0)];
+   for(const index of [...new Set(wifeHoverIndices)])if(index<formal.pages.wife.length){report.pointerChecks.push(await hoverCard(b,index,width,height));if(formal.pages.wife[index].draw_enabled===0){const row=formal.pages.wife[index];await move(b,2,2);const card=(await read(b)).cards[index].bounds;await move(b,card.x+card.width/2,card.y+card.height/2);const pending=await b.run('({state:nodes.CollectionGW2TooltipState.text,effect:nodes.CollectionGW2TooltipEffect.text,condition:nodes.CollectionGW2TooltipCondition.text,badge:nodes["CollectionGW2Unavailable_'+row.id+'"].text})');assert.equal(pending.badge,'待适配');assert(pending.state.includes('待适配'));assert.equal(pending.effect,row.description);assert(pending.condition.includes(row.availability_note));await shot(b,out+'/'+row.id+'_pending_tooltip_'+width+'x'+height+'.png',{x:0,y:0,width,height});report.checks.push({width,height,item:row.id,pendingAdaptationVisible:true,note:row.availability_note});await move(b,2,2);}}
+   if(width===1920){const index=formal.pages.wife.findIndex(row=>row.quality==='UR'&&row.draw_enabled!==0&&row.draw_probability>0);report.pointerChecks.push(await hoverCard(b,index,width,height,out+'/wife_ur_probability_'+width+'x'+height+'.png'));}
    if(width===1920){
     await click(b,'CollectionGW2Tab_ex');report.scrollbarMirror=await mirrorNativeScrollbar(b);
     await b.run('(()=>{const snapshot=entrySnapshot("ex"),original=snapshot.rows;snapshot.rows=Array.from({length:113},(_,index)=>({...original[index%original.length],id:"onepage_overflow_"+index,name:"本地扩容样例 "+(index+1),icon_type:"image"}));emit("survival_archive_snapshot",snapshot);syncLayout();return true;})()');await settle(b);state=await read(b);validateOnePage(state,width,height,113);
@@ -101,4 +117,4 @@ async function main(){
  console.log('COLLECTION_ONEPAGE_CAPTURE_PASS '+out+'/report.json');
 }
 if(require.main===module)main().catch(error=>{console.error(error.stack||error);process.exitCode=1;});
-module.exports={extra,validateArt};
+module.exports={extra,validateArt,read,settle,click,hoverCard,nativeInputHits};

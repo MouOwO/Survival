@@ -20,8 +20,8 @@ assert(endless.base_hull_radius==ordinary.base_hull_radius and endless.base_hull
     "endless must use ordinary wave hull instead of zero-sized challenge hull")
 assert(not endless.no_unit_collision,"endless rear units must retain physical collision")
 local boss=collision.profile({is_challenge_monster=true}, {movement_type="ground"})
-assert(boss.base_hull_radius==0 and boss.no_unit_collision,
-    "single-boss challenge collision policy must remain unchanged")
+assert(boss.base_hull_radius==32 and not boss.no_unit_collision,
+    "single-boss wall challenges must retain the same solid native body")
 assert(collision.profile({is_challenge_monster=true}, {}, true).base_hull_radius==32,
     "explicit wave policy must not be overwritten by challenge lifecycle metadata")
 
@@ -71,7 +71,7 @@ local dependencies={
     end},
     ["config/generated/archive_challenge_rules"]={by_id={default={}}},
 }
-for _,name in ipairs({"systems/monster_hull_scale","systems/monster_navigation_policy",
+for _,name in ipairs({"visual/model_scale","systems/monster_hull_scale","systems/monster_navigation_policy",
     "systems/wave_spawn_sequence","config/global_rules"}) do dependencies[name]=actual_require(name) end
 local env=setmetatable({require=function(name) return dependencies[name] or {rows={},by_id={}} end,
     CreateUnitByName=function(_,position)
@@ -79,9 +79,8 @@ local env=setmetatable({require=function(name) return dependencies[name] or {row
     end,
     FindClearSpaceForUnit=function(unit)
         local ai=assert(unit.modifiers.modifier_enemy_wall_ai,"AI must precede native placement")
-        local expected=unit.survival_is_boss and 0 or 32
-        assert(unit:GetHullRadius()==expected,"correct collision hull must precede native placement")
-        assert(ai.no_unit_collision==(unit.survival_is_boss and 1 or 0),
+        assert(unit:GetHullRadius()==32,"correct collision hull must precede native placement")
+        assert(ai.no_unit_collision==0,
             "native placement must already have the correct unit-collision state")
         if failure_mode=="placement" or failure_mode=="clear" then error("fixture placement failure") end
     end,
@@ -127,33 +126,33 @@ for player=0,3 do
             u=entity(100+player*10+lane,Vector(offset-400,0,0),ordinary.base_hull_radius)
             u.survival_is_wave_monster=true
         end
-        u.p=Vector(offset-400,(lane-2.5)*48,0)
-        local plan=assert(contact.resolve(wall,u))
-        assert(plan.claimed and plan.point.x==offset-184 and plan.point.y==(lane-2.5)*48 and u:GetHullRadius()==24,
-            "mixed formal/endless front must use four separate tactical contacts")
+        u.p=Vector(offset-400,(lane-2.5)*88,0)
+        local plan=assert(contact.resolve(wall,u,1))
+        assert(plan.claimed and plan.point.x==offset-184 and plan.point.y==(lane-2.5)*88 and u:GetHullRadius()==32,
+            "mixed formal/endless front must keep fixed bodies and padded native spacing")
         u.p=plan.point;front[#front+1]=u
     end
     local rear=assert(wave.spawn_challenge_monster({health=200,attack=2},definition,player))
     rear.p=Vector(offset-400,0,0)
-    assert(not contact.resolve(wall,rear).claimed,"fifth endless monster must wait behind mixed front")
+    assert(not contact.resolve(wall,rear,1).claimed,"fifth endless monster must wait behind mixed front")
     assert(rear:GetHullRadius()==32,"endless rear must retain its real Hull32 collision")
     local ordinary_rear=entity(150+player,Vector(offset-400,30,0),32)
-    assert(not contact.resolve(wall,ordinary_rear).claimed,"ordinary waves share the same four-contact cap")
+    assert(not contact.resolve(wall,ordinary_rear,1).claimed,"ordinary waves share the same four-contact cap")
     assert(ordinary_rear:GetHullRadius()==32,"ordinary rear must retain its real Hull32 collision")
     front[2].dead=true
-    local refill=assert(contact.resolve(wall,rear))
+    local refill=assert(contact.resolve(wall,rear,1))
     assert(refill.claimed,"endless waiter must replace a dead front owner without increasing contact count")
-    assert(front[2]:GetHullRadius()==32 and rear:GetHullRadius()==24,
-        "death replacement restores the previous owner and adjusts only the new contact")
+    assert(front[2]:GetHullRadius()==32 and rear:GetHullRadius()==32,
+        "death replacement must not change either physical body")
     rear.p=refill.point
-    assert(not contact.resolve(wall,ordinary_rear).claimed,"replacement must consume the single vacant contact")
+    assert(not contact.resolve(wall,ordinary_rear,1).claimed,"replacement must consume the single vacant contact")
     contact.clear(wall:entindex())
     for _,u in ipairs(front) do assert(u:GetHullRadius()==32,"mixed front cleanup must restore physical hulls") end
     assert(rear:GetHullRadius()==32,"replacement cleanup must restore its physical hull")
 end
 definition.endless=false
 local preserved=assert(wave.spawn_challenge_monster({health=200,attack=2},definition,0))
-assert(preserved:GetHullRadius()==0 and preserved.modifiers.modifier_enemy_wall_ai.no_unit_collision==1)
+assert(preserved:GetHullRadius()==32 and preserved.modifiers.modifier_enemy_wall_ai.no_unit_collision==0)
 definition.endless=true
 for _,mode in ipairs({"health","model","hull","ai","placement","clear"}) do
     failure_mode=mode
@@ -170,4 +169,4 @@ end
 failure_mode=nil
 assert(wave.spawn_challenge_monster({health=200,attack=2},definition,0),
     "later valid spawn must recover after setup failures")
-print("ENDLESS_WALL_CONTACT_PASS: four players; mixed tactical front capped at four; rear Hull32 and restoration; boss policy; six native setup/cleanup failures")
+print("ENDLESS_WALL_CONTACT_PASS: four players; mixed solid front capped per face; immutable Hull32; solid boss policy; six native setup/cleanup failures")

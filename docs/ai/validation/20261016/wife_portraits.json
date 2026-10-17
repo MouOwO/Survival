@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "at": "2026-10-16T15:33:43.249400+08:00",
+  "characters": 40,
+  "new_individual_builtin_imagegen_portraits": 39,
+  "existing_correct_character_reused": [
+    "wife_19 / 楪祈 / ex_27"
+  ],
+  "original_png": "1254x1254 RGBA, original generation bytes retained",
+  "compiled_textures": "40 independent 512x512 BGRA8888, single mip, NO_LOD",
+  "generator": "built-in image_gen",
+  "manifest": "data/ui/wife_portraits_v1.json",
+  "manifest_sha256": "fcb59e99a4f29f018fc97164df8c952e6a3a3f67589909c518ca2579eb6cd39b",
+  "master_folder": "panorama/src/images/custom_game/wife_portraits_v1",
+  "identity_contact_sheet": "output/wife_portraits_20261016/identity_preview/all_40.png",
+  "root_visual_review": "All forty IDs, canonical identities, names and distinguishing features manually checked in contact sheet and production collection browser preview",
+  "browser_status": "PASS_COLLECTION_ONEPAGE_40",
+  "browser_sizes": [
+    "1920x1080",
+    "815x528"
+  ],
+  "compile_report": "output/wife_portraits_20261016/compile_result.json",
+  "scope_report": "output/wife_portraits_20261016/final_scope.json",
+  "gameplay_changed_by_this_task": false,
+  "current_bundle": "eb49cbe03cd338757949a3d7449457005d9e79ddd0f51b9ec1d8becc9e66a261",
+  "concurrent_bundle_update_preserved": true,
+  "wife_collection_preserved": {
+    "visible": 40,
+    "drawable": 38,
+    "pending": 2
+  },
+  "new_native_game_session_started": false,
+  "requires_new_map_to_check_client": true,
+  "git_commit_or_push_performed": false
+}

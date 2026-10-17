@@ -241,19 +241,25 @@ function M.begin(unit, options)
     unit.survival_upgrade_target_model_asset_id = options.target_model_asset_id
     unit.survival_upgrade_target_model_name = options.target_model_name
 
-    start_particle(state)
+    -- A zero-duration upgrade completes in this transaction, so creating and
+    -- immediately destroying a construction shell would only flash/fill UI.
+    if state.duration > 0 then start_particle(state) end
     safe_callback(options.on_start)
     queue_target_visual(state)
 
-    state.task_id = scheduler.after(state.duration, function()
+    if state.duration == 0 then
         complete_state(state)
-    end, "building_upgrade_" .. tostring(entindex)
-        .. "_" .. tostring(next_generation))
+    else
+        state.task_id = scheduler.after(state.duration, function()
+            complete_state(state)
+        end, "building_upgrade_" .. tostring(entindex)
+            .. "_" .. tostring(next_generation))
+    end
     return {
         ok = true,
-        pending = true,
+        pending = not state.finished,
         entindex = entindex,
-        target_level = unit.survival_upgrade_target_level,
+        target_level = tonumber(options.target_level),
         duration = state.duration,
     }
 end

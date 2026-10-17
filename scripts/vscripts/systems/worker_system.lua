@@ -244,11 +244,12 @@ local function refresh_cheer_buffs(player_id)
     end
 end
 
-local function active_worker_count(team, training_id)
+local function active_worker_count(team, training_id, player_id)
     local count = 0
     for _, state in pairs(workers) do
         if state.team == team and state.training_id == training_id
-            and valid_entity(state.unit) then
+            and state.player_id == tonumber(player_id)
+            and valid_entity(state.unit) and state.unit:IsAlive() then
             count = count + 1
         end
     end
@@ -260,7 +261,7 @@ local function repairer_training_state(team, training_id, player_id)
     if not progress then return nil end
 
     progress.total_trained = progress.count
-    progress.count = active_worker_count(team, training_id)
+    progress.count = active_worker_count(team, training_id, player_id)
     progress.max_count = (tonumber(progress.max_count) or 0)
         + rogue_effect_state.numeric(
             player_id,
@@ -324,7 +325,7 @@ local function find_worker_spawn_position(city)
     -- The model origin may be above the terrain; compare against real ground.
     local city_height = worker_ground_height(origin, city)
     if city_height == nil then return nil end
-    local min_radius = config.spawn_radius_min or 420
+    local min_radius = config.spawn_radius_min or 210
     if city.GetHullRadius then
         min_radius = math.max(
             min_radius,
@@ -332,7 +333,7 @@ local function find_worker_spawn_position(city)
         )
     end
 
-    local max_radius = math.max(min_radius, config.spawn_radius_max or 640)
+    local max_radius = math.max(min_radius, config.spawn_radius_max or 320)
     local attempts = math.max(1, config.spawn_attempts or 24)
 
     for index = 1, attempts do
@@ -1156,23 +1157,21 @@ local function enqueue_lumberjack(payload)
     local training_id = tostring(payload.training_id or "train_lumberjack_auto")
     local allowed, next_training_id, slots = {}, nil, 0
     for _, progress in ipairs(lumberjack_training:get_all(player_id)) do
-        if progress.completed ~= 1 then
+        local reserved = training_queue:reserved(player_id, progress.training_id)
+        if progress.max_count < 0 or progress.count + reserved < progress.max_count then
             slots = slots + 1
             if slots <= 4 then allowed[progress.training_id] = true end
-            if not next_training_id and (progress.max_count < 0
-                or progress.count + training_queue:reserved(player_id, progress.training_id) < progress.max_count) then
-                next_training_id = progress.training_id
-            end
+            if not next_training_id then next_training_id = progress.training_id end
         end
     end
     if training_id == "train_lumberjack_auto" then training_id = next_training_id end
-    if not training_id or not allowed[training_id] then
-        return {ok = false, error = "training_not_available"}
-    end
-    local progress = lumberjack_training:get_for(player_id, training_id)
-    local reserved = training_queue:reserved(player_id, training_id)
-    if progress.max_count >= 0 and progress.count + reserved >= progress.max_count then
+    local progress = training_id and lumberjack_training:get_for(player_id, training_id)
+    local reserved = progress and training_queue:reserved(player_id, training_id) or 0
+    if progress and progress.max_count >= 0 and progress.count + reserved >= progress.max_count then
         return {ok = false, error = "training_max_count_reached"}
+    end
+    if not progress or not allowed[training_id] then
+        return {ok = false, error = "training_not_available"}
     end
     local row = training_definitions.by_id[training_id]
     return training_queue:enqueue({city = city, source_entindex = city:entindex(),
@@ -1208,7 +1207,8 @@ local function lumberjack_training_state(payload)
         option.train_duration = math.max(0.05, option.train_duration)
         option.available, option.reason = 1, ""
         option.can_afford, option.resource_check_on_cast = 1, 1
-        if option.completed ~= 1 then slots = slots + 1 end
+        local has_quota = option.max_count < 0 or option.count + option.queued_count < option.max_count
+        if has_quota then slots = slots + 1 end
         -- Queue capacity and currency are execution checks, not learning gates.
         -- Admission checks the current account without holding resources.
         -- The queue atomically pays and occupies population at actual start.
@@ -1445,12 +1445,30 @@ function M.commerce_fuse_immortal(player_id)
     for _,definition in ipairs(personality_definitions.rows) do
         if material:FindAbilityByName(definition.ability_name) or target:FindAbilityByName(definition.ability_name) then abilities[#abilities+1]=definition.ability_name end
     end
+    local target_state,material_state=workers[target:entindex()],workers[material:entindex()]
+    -- Registration removes the current technology flat attack and reapplies
+    -- the merged personalities once. Supply attack before each old percentage,
+    -- retaining its earned private growth and current technology contribution.
+    local function inherited_attack(unit,state)
+        local multiplier=math.max(.01,1+(tonumber(state.personality_attack_pct) or 0)/100)
+        return (tonumber(unit.survival_attack_min) or tonumber(unit.survival_base_attack) or 0)/multiplier
+    end
+    -- Preserve the faster intrinsic cadence (base rate plus fusion reduction).
+    -- Final survival_attack_speed already includes technology/permanent buffs;
+    -- passing it as a new base would apply those same buffs a second time.
+    local function intrinsic_interval(state)
+        return 1/math.max(.01,tonumber(state.base_attack_speed) or 2/3)
+            -(tonumber(state.fusion_interval_reduction) or 0)
+    end
+    local cadence_source=intrinsic_interval(material_state)<intrinsic_interval(target_state)
+        and material_state or target_state
     return M.commit_lumberjack_fusion({target,material},target,{commerce_immortal=true,player_id=player_id,team=target:GetTeamNumber(),
         level=math.max(target.survival_lumberjack_level or 1,material.survival_lumberjack_level or 1),
         fusion_count=(target.survival_lumberjack_fusion_count or 1)+(material.survival_lumberjack_fusion_count or 1),
-        base_attack=(target.survival_attack_min or target.survival_base_attack or 0)+(material.survival_attack_min or material.survival_base_attack or 0),
+        base_attack=inherited_attack(target,target_state)+inherited_attack(material,material_state),
         wood_per_hit=(target.survival_base_wood_per_hit or 0)+(material.survival_base_wood_per_hit or 0),
-        attack_speed=math.max(target.survival_attack_speed or .67,material.survival_attack_speed or .67),
+        attack_speed=tonumber(cadence_source.base_attack_speed) or 2/3,
+        fusion_interval_reduction=tonumber(cadence_source.fusion_interval_reduction) or 0,
         health=target:GetMaxHealth()+material:GetMaxHealth(),ability_names=abilities})
 end
 
@@ -1613,12 +1631,20 @@ local function on_player_disconnected(payload)
     disconnected_players[player_id] = true
     if training_queue then training_queue:cancel_player(player_id, "player_disconnected") end
     local targets = {}
-    for _, state in pairs(workers) do
-        if state.player_id == player_id and valid_entity(state.unit) then
-            targets[#targets + 1] = state.unit
+    for entindex, state in pairs(workers) do
+        if state.player_id == player_id then
+            targets[#targets + 1] = {unit = state.unit, entindex = entindex}
         end
     end
-    for _, worker in ipairs(targets) do
+    -- Native ForceKill queues entity_killed asynchronously. The multiplayer
+    -- cleanup can remove its victim before that event is delivered, so retire
+    -- every owned registration/population/quota synchronously first. Keep
+    -- unrelated account reservations and the ordinary death path unchanged.
+    for _, target in ipairs(targets) do
+        remove_worker(target.unit, target.entindex, "player_disconnected")
+    end
+    for _, target in ipairs(targets) do
+        local worker = target.unit
         if valid_entity(worker) and worker.ForceKill then worker:ForceKill(false) end
     end
     print(string.format(
@@ -1675,16 +1701,9 @@ function M.init()
                         payload.player_id
                     )
                 end
-                local progress = repairer_training:get(payload.team)
-                progress.max_count = (tonumber(progress.max_count) or 0)
-                    + rogue_effect_state.numeric(
-                        payload.player_id,
-                        "repairer_training_capacity_flat:"
-                            .. tostring(progress.training_id)
-                    )
-                progress.completed = progress.max_count > 0
-                    and progress.count >= progress.max_count and 1 or 0
-                return progress
+                local current = repairer_training:get(payload.team)
+                return repairer_training_state(payload.team,
+                    current.training_id, payload.player_id)
             end
             return lumberjack_training_state(payload)
         end

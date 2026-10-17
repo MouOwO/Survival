@@ -296,6 +296,46 @@ end)
 
 -- A permanent defender keeps its Q while its owner is dead; it cannot attack
 -- as a corpse or keep invoking Q after its owner entity has been replaced.
+-- New Q originates from live attributes rather than copying a prior hit: both
+-- the actual modifier proc and service damage must receive final EX once.
+snapshots[0].commerce_ex_attribute_multiplier=1.08
+snapshots[0].commerce_ex_final_damage_multiplier=1.08
+snapshots[0].strength=10.8;snapshots[0].agility=21.6;snapshots[0].intellect=32.4
+bus.emit(events.HERO_COMBAT_STATS_CHANGED,{player_id=0,snapshot=snapshots[0]})
+assert(math.abs(clone.survival_strength-10.8)<1e-8,"inherited attributes were EX-multiplied twice")
+assert(clone.survival_commerce_hero_ex_damage_multiplier==1.08)
+assert(other_clone.survival_commerce_hero_ex_damage_multiplier==1)
+local first_ex_deal=#deals
+attack(modifier,clone)
+for _,impact in pairs(service._test.impacts()) do
+    if impact.attacker==clone then
+        assert(math.abs(impact.attribute_damage-1944)<1e-8,"clone Q re-applied or divided attribute EX")
+    end
+end
+flush();assert(#deals==first_ex_deal+1)
+local ex_deal=deals[#deals]
+assert(ex_deal.attacker==clone and math.abs(ex_deal.base_damage-1944)<1e-8,
+    "Q starts at current projected attributes without normalizing a prior hit")
+local filter=require("combat/damage_filter_service")
+filter.init({event_bus=bus,events=combat_events,repository={consume_pending=function() return nil end},
+    config={global_post_bonus_pct=0,minimum_post_multiplier=0,boss_rules={enabled=false}}})
+local native_ids={[clone.id]=clone,[target.id]=target}
+EntIndexToHScript=function(id) return native_ids[id] end
+function clone:HasModifier(name) return self.modifiers[name]~=nil end
+function clone:IsRealHero() return false end
+function target:HasModifier() return false end
+local function ex_q_damage()
+    local keys={entindex_attacker_const=clone.id,entindex_victim_const=target.id,
+        damage=ex_deal.base_damage,damagetype_const=DAMAGE_TYPE_PURE,
+        damage_category_const=DOTA_DAMAGE_CATEGORY_SPELL}
+    assert(filter._filter_for_test(nil,keys));return keys.damage
+end
+assert(math.abs(ex_q_damage()-1944*1.08)<1e-7,"actual clone Q filter needs final EX exactly once")
+snapshots[0].commerce_ex_final_damage_multiplier=1
+bus.emit(events.HERO_COMBAT_STATS_CHANGED,{player_id=0,snapshot=snapshots[0]})
+assert(clone.survival_commerce_hero_ex_damage_multiplier==1)
+assert(math.abs(ex_q_damage()-1944)<1e-7,"revoked ownership must clear Q final EX")
+original_print("MONKEY_CLONE_Q_EX_PASS real modifier proc/service/filter; projected attributes unmodified, new Q damage EX once, revoke and player isolation")
 source.dead=true
 count=#rolls;attack(modifier,clone);assert(#rolls==count+1)
 source.dead=nil

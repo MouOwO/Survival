@@ -103,7 +103,10 @@
         anchors.forEach(function (entry) {
             if (!visible(entry.panel)) return;
             var box = bounds(entry.panel);
-            if (box) right = Math.max(right === null ? box.x+box.width : right, box.x+box.width);
+            // Only the first row determines the next first-row entry. An
+            // unlocked survival shop now sits below Treasure on its own row.
+            if (box && referenceBounds && Math.abs(box.y-referenceBounds.y) <= 1/screenScale)
+                right = Math.max(right === null ? box.x+box.width : right, box.x+box.width);
         });
         var ready = !!(topBounds && referenceBounds && right !== null);
         function px(value) { return Math.round(value * screenScale) / screenScale; }

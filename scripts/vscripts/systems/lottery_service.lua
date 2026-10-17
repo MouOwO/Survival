@@ -340,16 +340,58 @@ local function item_at_limit(counts, item)
         >= math.max(1, math.floor(tonumber(item.max_owned) or 1))
 end
 
+local MAX_COMMERCE_POINTS = 9007199254740991
+local function copy_table(value)
+    if type(value) ~= "table" then return value end
+    local result = {}
+    for key, child in pairs(value) do result[key] = copy_table(child) end
+    return result
+end
+
+local function shop_points(profile)
+    local save = profile and profile.save
+    if type(save) ~= "table" then return nil end
+    local archive = save.archive
+    if archive ~= nil and type(archive) ~= "table" then return nil end
+    local commerce = archive and archive.commerce
+    if commerce ~= nil and type(commerce) ~= "table" then return nil end
+    local balances = commerce and commerce.balances
+    if balances ~= nil and type(balances) ~= "table" then return nil end
+    local value = balances and balances.shop_points
+    if value == nil then return 0 end
+    if type(value) ~= "number" or value ~= value or value < 0
+        or value > MAX_COMMERCE_POINTS or value ~= math.floor(value) then return nil end
+    return value
+end
+
 local function convert_duplicate(player_id, item)
     local points = math.max(0, math.floor(tonumber(item.duplicate_points) or 0))
-    if points <= 0 then return { ok = true, duplicate = true, converted_points = 0 } end
-    local stats_order = require("systems/player_gameplay_stats_order_service")
-    local result = stats_order.order(player_id, config.starjoy_stat_id, points)
-    if not result or result.ok ~= true then
-        return { ok = false, error = "starjoy_points_persist_failed" }
+    if points <= 0 then return { ok = true, duplicate = true, converted_points = 0,
+        converted_currency = "shop_points" } end
+    local profile = profile_service.get_profile(player_id)
+    local current = shop_points(profile)
+    if current == nil or points ~= points or points > MAX_COMMERCE_POINTS
+        or current + points > MAX_COMMERCE_POINTS then
+        return { ok = false, error = "shop_points_balance_invalid" }
+    end
+    if type(profile_service.update_save_section) ~= "function" then
+        return { ok = false, error = "shop_points_persist_failed" }
+    end
+    -- Keep every archive sibling, and never mutate the live save before the
+    -- profile service validates and commits this local-only transaction.
+    -- HTTP rooms reject this API and use lottery_http_settlement instead.
+    local archive = copy_table(profile.save.archive or {})
+    archive.commerce = archive.commerce or {}
+    archive.commerce.balances = archive.commerce.balances or {}
+    local next_value = current + points
+    archive.commerce.balances.shop_points = next_value
+    local called, result = pcall(profile_service.update_save_section,
+        player_id, "archive", archive, "lottery_duplicate_shop_points")
+    if not called or not result or result.ok ~= true then
+        return { ok = false, error = "shop_points_persist_failed" }
     end
     return { ok = true, duplicate = true, converted_points = points,
-        starjoy_points = result.new_value }
+        converted_currency = "shop_points", shop_points = next_value }
 end
 
 local function grant_item(player_id, item, counts)
@@ -429,6 +471,7 @@ local function snapshot(player_id, reason, requested_pool_id)
             icon_type = item.icon_type,
             effect_status = item.effect_status,
             duplicate_points = item.duplicate_points,
+            converted_currency = "shop_points",
             exchange_points = item.exchange_points,
             exchange_enabled = item.exchange_enabled,
             max_owned = item.max_owned,
@@ -451,6 +494,7 @@ local function snapshot(player_id, reason, requested_pool_id)
         pools = pools,
         items = items,
         starjoy_points = tonumber(stats[config.starjoy_stat_id]) or 0,
+        shop_points = shop_points(profile),
         map_level = tonumber(stats.map_level) or 0,
         -- Compatibility fields for the existing Panorama while it transitions
         -- to the selected-pool object.
@@ -574,6 +618,7 @@ local function draw(payload)
             effect_status = item.effect_status,
             duplicate = grant.duplicate,
             converted_points = grant.converted_points or 0,
+            converted_currency = grant.converted_currency,
             gameplay_stat_changes = grant.gameplay_stat_changes or {},
         }
     end
@@ -586,6 +631,7 @@ local function draw(payload)
         guarantee_satisfied = guarantee == nil or guarantee_hit,
         snapshot = snapshot(player_id, "draw", pool.id),
     }
+    response.shop_points = response.snapshot.shop_points
     local result_qualities = {}
     for _, result in ipairs(results) do
         result_qualities[#result_qualities + 1] = tostring(result.quality)

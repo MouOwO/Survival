@@ -182,17 +182,22 @@ local function build_profiles()
             }
         end
     end
-    local tower = buildings.arrow_tower
-    if tower then
-        local footprint = tower.footprint or {x=2,y=2}
-        local subdivision = math.max(1, tonumber(grid_config.footprint_subdivision) or 1)
-        profiles_by_ability.ability_building_blink = {
-            ability_name="ability_building_blink", building_id="arrow_tower",
-            display_name="防御塔移动", placement_action="relocate", preview_model=1,
-            footprint_x=footprint.x, footprint_y=footprint.y,
-            grid_footprint_x=footprint.x*subdivision,
-            grid_footprint_y=footprint.y*subdivision,
-        }
+    for _,movement in ipairs({
+        {building_id="arrow_tower",ability_name="ability_building_blink",display_name="防御塔移动"},
+        {building_id="wall",ability_name="ability_wall_blink",display_name="城墙移动"},
+    }) do
+        local definition=buildings[movement.building_id]
+        if definition then
+            local footprint = definition.footprint or {x=2,y=2}
+            local subdivision = math.max(1, tonumber(grid_config.footprint_subdivision) or 1)
+            profiles_by_ability[movement.ability_name] = {
+                ability_name=movement.ability_name, building_id=movement.building_id,
+                display_name=movement.display_name, placement_action="relocate", preview_model=1,
+                footprint_x=footprint.x, footprint_y=footprint.y,
+                grid_footprint_x=footprint.x*subdivision,
+                grid_footprint_y=footprint.y*subdivision,
+            }
+        end
     end
 end
 
@@ -234,6 +239,7 @@ local function resolve_profile_caster(player_id, payload, profile, allow_fallbac
         local resolved, reason = require("systems/tower_relocation_service").resolve(
             player_id, entindex, ability_entindex)
         if not resolved then return nil, nil, reason end
+        if resolved.ability_name~=profile.ability_name then return nil, nil, "ability_profile_mismatch" end
         return resolved.unit, resolved.ability
     end
     local registered = event_bus.request(events.BUILDER_GET_REQUEST, {

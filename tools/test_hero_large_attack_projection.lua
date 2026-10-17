@@ -11,6 +11,7 @@ end
 package.loaded["core/logger"] = { info = function() end, warn = function() end }
 package.loaded["systems/tree_damage_rules"] = {
     is_tree = function() return false end,
+    is_arrow_tower = function() return false end,
     is_basic_attack_category = function(category) return tonumber(category) == 1 end,
     allows_damage = function() return true end,
     reset_pending_attacks = function() end,
@@ -152,7 +153,7 @@ print = function(message)
     if tostring(message):find("%[EventBus%] handler error")
         or tostring(message):find("%[Scheduler%] task failed") then error(message) end
 end
-local service = require("systems/hero_combat_stat_service")
+local service = dofile(arg[1] or "scripts/vscripts/systems/hero_combat_stat_service.lua")
 service.init()
 local function request_snapshot(event, source, key)
     bus.handle_request(event, function(payload)
@@ -408,5 +409,64 @@ for _, invalid in ipairs(invalid_numbers) do
 end
 invalid_filter(native, 0, victim.survival_endless_health_scale)
 invalid_filter(native, current.native_attack_scale, 0)
+owner_unchanged()
+-- Independent panel equations include intellect attack before percentage.
+-- Keep the real native modifiers/getters, integer setters and scale projection.
+local hero_config = require("config/generated/hero_definitions")
+local global_rules = require("config/global_rules")
+local monkey_config = require("config/generated/monkey_king_exclusive_runtime").by_id.monkey_king_exclusive
+local player_id = 2
+local conversion_rate = global_rules.hero_intellect_attack_per_point
+local native_probe = unit(302, player_id)
+equipment[player_id] = { main_hand_content_id = "weapon_growth_sword_01", main_hand_name = "Growth" }
+equipment_stats[player_id] = { attack_flat = 13.7, attack_speed_pct = 0 }
+growth[player_id] = { growth_attack = 29.3, growth_intellect = 7.125 }
+progression[player_id] = { attack_flat = 17.2, all_attributes = 0.375 }
+technology[player_id] = { attack_flat = 11.6, attack_bonus_pct = 23.75 }
+skills[player_id] = {}
+bus.emit(events.HERO_SUMMONED, { player_id = player_id, hero_id = "hero_monkey_king", unit = native_probe })
+local function independent_native(label, exclusive_multiplier)
+    local definition = hero_config.by_id.hero_monkey_king
+    local intellect = definition.base_intellect + growth[player_id].growth_intellect + progression[player_id].all_attributes
+    local attribute_attack = intellect * global_rules.hero_intellect_attack_per_point
+    local flat = equipment_stats[player_id].attack_flat + technology[player_id].attack_flat + progression[player_id].attack_flat
+    local weapon = growth[player_id].growth_attack
+    local pct = technology[player_id].attack_bonus_pct / 100
+    local expected = (definition.base_damage_min + attribute_attack + weapon + flat) * (1 + pct) * exclusive_multiplier
+    local current = stats(player_id)
+    near(current.attack_min, expected, label .. ": independent logical equation")
+    local native_expected = expected
+    if current.native_attack_scale == 1 then
+        local base = (definition.base_damage_min + attribute_attack) * exclusive_multiplier
+        native_expected = expected - (base - math.floor(base))
+    end
+    near(native_probe:GetAverageTrueAttackDamage() * current.native_attack_scale,
+        native_expected, label .. ": native intellect percentage is applied once")
+end
+independent_native("fractional intellect and equipment", 1)
+technology[player_id].attack_bonus_pct = 0
+bus.emit(events.TECHNOLOGY_STATS_CHANGED, { player_id = player_id, changed_section = "hero" })
+independent_native("zero attack percentage", 1)
+technology[player_id].attack_bonus_pct = 23.75
+global_rules.hero_intellect_attack_per_point = 0
+bus.emit(events.TECHNOLOGY_STATS_CHANGED, { player_id = player_id, changed_section = "hero" })
+independent_native("zero intellect conversion", 1)
+global_rules.hero_intellect_attack_per_point = conversion_rate
+skills[player_id] = { { skill_id = "skill_monkey_king_swiftness", level = 1, locked = 0 } }
+bus.emit(events.HERO_SKILL_CHANGED, { player_id = player_id })
+independent_native("exclusive attack multiplier", monkey_config.e_attack_multiplier)
+for _, override in ipairs({ 0, 173.25 }) do
+    local result = bus.request(events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST, { player_id = player_id, attack = override })
+    assert(result and result.ok)
+    near(stats(player_id).attack_min, override, "debug override keeps its exact logical attack")
+    near(native_probe:GetAverageTrueAttackDamage() * stats(player_id).native_attack_scale,
+        override, "debug override excludes intellect percentage and exclusive multiplier")
+end
+bus.request(events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST, { player_id = player_id, reset = true })
+technology[player_id].attack_flat = 9e12
+progression[player_id].all_attributes = 1.234e10 + 0.375
+bus.emit(events.TECHNOLOGY_STATS_CHANGED, { player_id = player_id, changed_section = "hero" })
+assert(stats(player_id).native_attack_scale > 1, "large intellect/flat attack must use bounded native components")
+independent_native("scaled intellect percentage and equipment", monkey_config.e_attack_multiplier)
 owner_unchanged()
 output("HERO_LARGE_ATTACK_PROJECTION_PASS production hero/modifiers/filter; ordinary/fractional, 1e12, 9e15, 20x, 512 War3 armor, all growth sources, replacement/reset, client values and missing HP")

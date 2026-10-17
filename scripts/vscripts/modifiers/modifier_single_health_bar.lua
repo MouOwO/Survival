@@ -42,7 +42,39 @@ function modifier_single_health_bar:OnCreated()
     self:publish_state()
     -- Keep the existing reaction time without subscribing every visible NPC
     -- to global damage/attack events. Stable samples produce no network writes.
+    if not self.health_bar_staging_paused then self:StartIntervalThink(0.1) end
+end
+
+-- Staged ten-sins experiments retain this modifier and its native-bar
+-- suppression. Only its server sampler and custom row are suspended.
+function modifier_single_health_bar:PauseForChallengeStaging()
+    if not IsServer() then return false end
+    local unit = self:GetParent()
+    if not unit or (unit.IsNull and unit:IsNull())
+        or unit.survival_challenge_staging_health_bar_paused ~= true then return false end
+    if not self.health_bar_staging_paused then self:StartIntervalThink(-1) end
+    self.health_bar_staging_paused = true
+    self.health_bar_staging_probe_sampled = true
+    self.health_bar_staging_probe_mode = unit.survival_challenge_staging_pause_mode
+    publish_removed(self, unit)
+    return true
+end
+
+function modifier_single_health_bar:ResumeAfterChallengeStaging()
+    if not IsServer() or not self.health_bar_staging_paused then return false end
+    local unit = self:GetParent()
+    if not unit or (unit.IsNull and unit:IsNull()) or unit.survival_challenge_teardown == true
+        or unit.survival_challenge_staging_health_bar_paused == true
+        or not unit.IsAlive or not unit:IsAlive()
+        or not GameRules or not GameRules.GetGameModeEntity
+        or self.health_bar_staging_probe_mode ~= GameRules:GetGameModeEntity() then
+        publish_removed(self, nil)
+        return false
+    end
+    self.health_bar_staging_paused = false
+    self:publish_state()
     self:StartIntervalThink(0.1)
+    return true
 end
 
 function modifier_single_health_bar:OnIntervalThink()
@@ -59,6 +91,15 @@ function modifier_single_health_bar:publish_state()
         or not unit.IsAlive
         or not unit.GetTeamNumber then
         publish_removed(self, nil)
+        return
+    end
+    if unit.survival_challenge_staging_health_bar_paused == true then
+        self:PauseForChallengeStaging()
+        return
+    end
+    if self.health_bar_staging_probe_sampled == true
+        and (self.health_bar_staging_paused or unit.survival_challenge_teardown == true) then
+        publish_removed(self, unit)
         return
     end
     if unit.survival_hide_custom_health_bar

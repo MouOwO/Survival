@@ -1,0 +1,42 @@
+{
+  "status": "PASS_EXCHANGE_BUTTON_FIX",
+  "behavior": {
+    "exchange_row_height": 64,
+    "button_y": 14,
+    "persistent_points_warning": false,
+    "native_error": "您的积分不足",
+    "native_event": "dota_hud_error_message",
+    "insufficient_click_opens_confirmation": false,
+    "insufficient_click_sends_purchase": false,
+    "existing_pending_token_preserved": true
+  },
+  "compiled": [
+    {
+      "name": "black_lion_market",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\black_lion_market.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\black_lion_market.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\black_lion_market.vjs_c",
+      "source_sha256": "4252ba810314a6ed4bf2990438f3f39d3f5fa844e29875506d06d474f2c7acaf",
+      "runtime_sha256": "af28be7d33d98e4f9c634085858804f3a692f9b338fdf46729c9f5aa8ce84e37"
+    },
+    {
+      "name": "commerce_wallet",
+      "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\scripts\\custom_game\\commerce_wallet.js",
+      "content": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\panorama\\scripts\\custom_game\\commerce_wallet.js",
+      "artifact": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\scripts\\custom_game\\commerce_wallet.vjs_c",
+      "source_sha256": "2b618d9900427bc0d45ee740e0d1414876519ebaf030ffeda24e79af9b5d1564",
+      "runtime_sha256": "ca48be00c9c692bf2f9cfd1536968a9b1e6d035f11ce3bbf0c4c78ea04617b78"
+    }
+  ],
+  "browser_report": "design_refs/shop_catalog_20261016/ui/exchange_button_fix/report.json",
+  "checks": [
+    "market 10/10",
+    "wallet native error, known/unknown/recovered balance and pending retry",
+    "wallet invalidation",
+    "6 browser geometry scenarios"
+  ],
+  "limitations": [
+    "Browser fixtures do not connect to accounts or validate native game rendering.",
+    "Unrelated legacy tooltip tests expecting an unconfigured-quality label are not part of the passing task scope."
+  ]
+}

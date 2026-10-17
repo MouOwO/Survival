@@ -2,7 +2,7 @@
 // Scope only this presentation's production sources and every manifest PNG.
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const repo=path.resolve(__dirname,'../..');
-const sources=['scripts/custom_game/daily_remaining_5d5c1152eb.js','scripts/custom_game/daily_gw2_data.js','styles/custom_game/daily_gw2.css','layout/custom_game/archive.xml','layout/custom_game/daily_gw2_assets.xml'];
+const sources=['scripts/custom_game/daily_remaining_5d5c1152eb.js','scripts/custom_game/daily_gw2_data.js','scripts/custom_game/topnav_remaining_5d5c1152eb.js','styles/custom_game/daily_gw2.css','layout/custom_game/archive.xml','layout/custom_game/daily_gw2_assets.xml'];
 function build(){
  const manifest=JSON.parse(fs.readFileSync(path.join(__dirname,'asset_manifest.json'),'utf8'));
  const images=Object.entries(manifest.assets).map(([key,asset])=>{

@@ -1,0 +1,21 @@
+{
+  "kind": "caf_dee_archive_sync_compat_only",
+  "caf_hash": "caf4493bb7ad373a43ca81c19f961d4fd288a47112866ba93df62013852f7a59",
+  "dee_hash": "dee53fe2e9fb8d1bc97ba6b822a86896e97e94b6bad84501fad5791920c3ca26",
+  "old_definition_sha256": "21995acdd16a62e7da56a4cf6641e8b693688bf4b00a041f6afbcee08dba4ff2",
+  "new_definition_sha256": "fa656dc096838c8cf8a6df00bee570acb56469d9d561fdc090cf15db6dbe529b",
+  "strict_full_definition_guard": true,
+  "outside_two_hunks_byte_identical": true,
+  "old_source_hashes_unchanged": true,
+  "old_upgrade_kinds_unchanged": true,
+  "old_six_field_schema_guard_unchanged": true,
+  "acl_statements_added": false,
+  "outer_commit": false,
+  "files": {
+    "upgrade_archive_points_compat.sql": "4807b93c89b8deb0395a9441cbc79e9dfe703622fa74a31018efba027f0cb0c2",
+    "test_archive_points_compat.py": "0d92088eb74620b2bcec818da4d05128309e7355c17eb06b923d70468d0e8f06"
+  },
+  "negative_test_cases": 8,
+  "exact_negative_sqlstate": "P0001",
+  "negative_checks_before_caf_registration": true
+}

@@ -275,6 +275,17 @@
         "AbilityManaCost" "0"
         "AbilityCooldown" "3"
     }
+    "ability_archive_social_wife"
+    {
+        "BaseClass" "ability_lua"
+        "ScriptFile" "abilities/archive_challenge_abilities"
+        "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+        "AbilityTextureName" "ogre_magi_multicast"
+        "MaxLevel" "1"
+        "AbilityCastPoint" "0"
+        "AbilityManaCost" "0"
+        "AbilityCooldown" "3"
+    }
     "ability_archive_finish" { "BaseClass" "ability_lua" "ScriptFile" "abilities/archive_challenge_abilities" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET" "AbilityTextureName" "chen_hand_of_god" "MaxLevel" "1" "AbilityCastPoint" "0" "AbilityCooldown" "0" "AbilityManaCost" "0" }
     "ability_archive_endless" { "BaseClass" "ability_lua" "ScriptFile" "abilities/archive_challenge_abilities" "AbilityBehavior" "DOTA_ABILITY_BEHAVIOR_NO_TARGET" "AbilityTextureName" "nevermore_requiem" "MaxLevel" "1" "AbilityCastPoint" "0" "AbilityCooldown" "0" "AbilityManaCost" "0" }
 }

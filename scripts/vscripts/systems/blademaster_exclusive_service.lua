@@ -15,6 +15,7 @@ local states = {}
 local sequence = 0
 local storms = {}
 local visual_casters = {}
+local visual_order_sequence = 0
 local wall_by_player = {}
 local create_clone
 
@@ -97,6 +98,7 @@ local function remove_visual_caster(unit)
     local visual = visual_casters[unit]
     visual_casters[unit] = nil
     if visual and visual.task then scheduler.cancel(visual.task) end
+    if visual and visual.cast_task then scheduler.cancel(visual.cast_task) end
     if not valid(unit) then return end
     unit.survival_blademaster_visual_caster = nil
     if type(UTIL_Remove) == "function" then
@@ -160,15 +162,47 @@ local function native_ability(unit, ability_name)
     return native
 end
 
-local function q_impact_visual(position, owner, player_id)
-    -- A point-target native ability must enter the engine order path. Calling
-    -- CastAbilityOnPosition on a non-controllable temporary hero can animate
-    -- without executing the native ability effect in Workshop Tools.
-    local caster = create_visual_caster(Q_VISUAL_UNIT, position, owner, false)
-    local native = native_ability(caster, Q_VISUAL_ABILITY)
-    if not native then
-        remove_visual_caster(caster)
-        return nil
+local function issue_q_visual_order(caster, native, position, player_id)
+    -- Current native Overwhelming Odds is NO_TARGET. Older native versions
+    -- used a point order; retain that path only when the ability asks for it.
+    local behavior = tonumber(read(native, "GetBehavior"))
+    local no_target = tonumber(DOTA_ABILITY_BEHAVIOR_NO_TARGET)
+    if behavior and no_target and no_target > 0
+        and math.floor(behavior / no_target) % 2 == 1 then
+        -- Native hero creation can discard same-frame orders. Submit on the
+        -- next scheduler tick, tied to this exact temporary caster or lease.
+        local visual = visual_casters[caster]
+        local pooled = caster.survival_blademaster_q_pool_entry
+        local lease = pooled and pooled.lease
+        local owner = pooled and pooled.owner or visual and visual.owner
+        local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, { player_id = player_id })
+        local canonical = summoned and summoned.unit
+        local mode = GameRules and GameRules:GetGameModeEntity()
+        local guard = _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION
+        local generation = event_bus.get_generation and event_bus.get_generation()
+        visual_order_sequence = visual_order_sequence + 1
+        return scheduler.after(0.03, function()
+            if not valid(caster) or not valid(native)
+                or not alive(owner) or GameRules:GetGameModeEntity() ~= mode
+                or _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION ~= guard
+                or event_bus.get_generation and event_bus.get_generation() ~= generation then return end
+            local current = event_bus.request(events.HERO_SUMMON_GET_REQUEST, { player_id = player_id })
+            if (current and current.unit) ~= canonical then return end
+            if pooled then
+                if caster.survival_blademaster_q_pool_entry ~= pooled
+                    or pooled.lease ~= lease or pooled.status ~= "busy" then return end
+            elseif not visual or visual_casters[caster] ~= visual then return end
+            if ExecuteOrderFromTable and DOTA_UNIT_ORDER_CAST_NO_TARGET then
+                ExecuteOrderFromTable({
+                    UnitIndex = caster:entindex(),
+                    OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
+                    AbilityIndex = native:entindex(),
+                    Queue = false,
+                })
+            else
+                caster:CastAbilityNoTarget(native, player_id)
+            end
+        end, "blademaster_q_cast:" .. tostring(visual_order_sequence))
     end
     if ExecuteOrderFromTable and DOTA_UNIT_ORDER_CAST_POSITION then
         ExecuteOrderFromTable({
@@ -181,6 +215,36 @@ local function q_impact_visual(position, owner, player_id)
     else
         caster:CastAbilityOnPosition(position, native, player_id)
     end
+end
+
+local function q_impact_visual(position, owner, player_id)
+    -- Candidate admission is lazy and default OFF; legacy casters never migrate.
+    if _G.SURVIVAL_BLADEMASTER_Q_CASTER_POOL_PROBE == true then
+        local ok, played, pooled = pcall(function()
+            local pool = require("systems/blademaster_q_caster_pool")
+            return pool.try_play(owner, position, player_id,
+                native_ability, hide_unit_and_wearables, issue_q_visual_order)
+        end)
+        if ok and played then return pooled end
+    end
+    -- Preserve the original native order path and lifetime on admission failure.
+    local caster = create_visual_caster(Q_VISUAL_UNIT, position, owner, false)
+    if not caster then return nil end
+    -- Visual-only heroes must not inherit the Player's autonomous orders or
+    -- acquire a combat target while the native Q order is settling.
+    local prepared = pcall(function()
+        if type(caster.SetOwner) == "function" then caster:SetOwner(owner) end
+        if type(caster.SetIdleAcquire) == "function" then caster:SetIdleAcquire(false) end
+        if type(caster.SetAcquisitionRange) == "function" then caster:SetAcquisitionRange(0) end
+        if type(caster.Stop) == "function" then caster:Stop() end
+    end)
+    if not prepared then remove_visual_caster(caster);return nil end
+    local native = native_ability(caster, Q_VISUAL_ABILITY)
+    if not native then
+        remove_visual_caster(caster)
+        return nil
+    end
+    visual_casters[caster].cast_task = issue_q_visual_order(caster, native, position, player_id)
     hide_unit_and_wearables(caster)
     visual_casters[caster].task = scheduler.after(math.max(1, native:GetCastPoint() + 1), function()
         remove_visual_caster(caster)
@@ -222,6 +286,11 @@ end
 local function replicate_q_damage(player_id, attacker, target, final_damage)
     local damage = math.max(0, tonumber(final_damage) or 0)
     if damage <= 0 then return false end
+    -- The primary confirmed hit already includes this EX multiplier. The
+    -- copied ability passes through the filter again, so submit its pre-EX
+    -- value and apply the independent multiplier exactly once to the copy.
+    damage = damage / math.max(1,
+        tonumber(attacker.survival_commerce_hero_ex_damage_multiplier) or 1)
     -- The confirmed critical hit may already have killed its primary target.
     -- Its still-valid corpse supplies the impact point; living nearby enemies
     -- receive the same Q copy as when the primary survives.
@@ -396,6 +465,8 @@ local function sync_clone_stats(player_id, current, snapshot, initial)
     clone.survival_strength = tonumber(snapshot.strength) or 0
     clone.survival_agility = tonumber(snapshot.agility) or 0
     clone.survival_intellect = tonumber(snapshot.intellect) or 0
+    clone.survival_commerce_hero_ex_damage_multiplier =
+        tonumber(snapshot.commerce_ex_final_damage_multiplier) or 1
     clone.survival_critical_chance_pct = math.max(0, tonumber(snapshot.critical_chance_pct) or 0)
     clone.survival_critical_damage_pct = math.max(100, tonumber(snapshot.critical_damage_pct) or 200)
         + math.max(0, tonumber(row().w_clone_critical_damage_bonus_pct) or 0)
@@ -666,10 +737,13 @@ local function on_hero_removed(payload)
 end
 
 function M.init()
+    local q_pool = package.loaded["systems/blademaster_q_caster_pool"]
+    if q_pool then q_pool.reset("blademaster_service_init") end
     remove_visual_casters_for_owner(nil)
     states = {}
     storms = {}
     visual_casters = {}
+    visual_order_sequence = 0
     wall_by_player = {}
     sequence = 0
     event_bus.handle_request(events.BLADEMASTER_BONUS_STATS_GET_REQUEST,

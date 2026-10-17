@@ -17,7 +17,12 @@
 .CollectionGW2Portrait .ArchiveArt { horizontal-align:left; vertical-align:top; margin:0px; padding:0px; }
 .CollectionGW2Unowned .CollectionGW2Portrait { saturation:.35; brightness:.68; }
 .CollectionGW2Unknown .CollectionGW2Portrait { saturation:.1; brightness:.5; }
-.CollectionGW2Slot:hover { brightness:1.12; }
+.CollectionGW2Unavailable .CollectionGW2Portrait { saturation:.1; brightness:.5; }
+.CollectionGW2SlotFrame { z-index:5; }
+.CollectionGW2SlotSelection { z-index:6; }
+.CollectionGW2RarityLabel, .CollectionGW2CardLabel { z-index:7; }
+.CollectionGW2Slot:hover .CollectionGW2PortraitImage { brightness:1.12; }
+.CollectionGW2Slot > .CollectionGW2Hover { z-index:6; }
 .CollectionGW2Hover { opacity:0; }
 .CollectionGW2Slot:hover .CollectionGW2Hover,
 .CollectionGW2Button:hover .CollectionGW2Hover { opacity:.65; }
@@ -27,5 +32,16 @@
 .CollectionGW2Button:active { brightness:.9; }
 .CollectionGW2Disabled { saturation:.2; brightness:.55; }
 .CollectionGW2Tooltip { flow-children:none; overflow:noclip; z-index:150; }
+.CollectionGW2Tooltip .ArchiveSharedTooltipViewport VerticalScrollBar,
+#CollectionWindow .CollectionGW2Tooltip .ArchiveSharedTooltipViewport VerticalScrollBar { width:8px; }
 #CollectionWindow VerticalScrollBar { width:8px; background-image:url("file://{images}/custom_game/collection_gw2_v2/scroll_track.png"); background-size:100% 100%; background-color:#12191d55; border:0px; }
 #CollectionWindow VerticalScrollBar .ScrollThumb { background-image:url("file://{images}/custom_game/collection_gw2_v2/scroll_thumb.png"); background-size:100% 100%; background-color:#718b9660; border:0px; border-radius:0px; }
+
+/* The shared glass pass stays inside the winning cell without altering its rim. */
+.CollectionGW2RewardGlow
+{
+    background-color: transparent;
+    border: 0px;
+    box-shadow: none;
+    z-index: 2;
+}

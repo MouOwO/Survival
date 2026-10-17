@@ -16,6 +16,7 @@ function M.calculate(a)
     local attr_multiplier = (1+n(p.hero_attribute_bonus_pct)/100)
         *(1+n(r.rebirth_level)*n(p.hero_rebirth_attribute_bonus_pct)/100)
         *(1+n(x.all_attributes_pct)/100)
+        *(tonumber(a.commerce_ex_attribute_multiplier) or 1)
     local static_intellect = 0
     for _,key in ipairs({"strength","agility","intellect"}) do
         local total = (n(b[key])+n(w["base_"..key])+attr_flat)*attr_multiplier

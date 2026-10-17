@@ -24,13 +24,13 @@ local function corridor(width,q)
         return math.abs(y)<width*.5
     end
 end
-local function expected_extent(width) return math.max(128,math.ceil(width/256)*128) end
-local function expected_count(width) return 4+math.max(0,(expected_extent(width)-128)/128)*4 end
+local function expected_extent(width) return width>256 and width<=384 and 256 or 128 end
+local function expected_count(width) return width>256 and width<=384 and 8 or 4 end
 
 for _,width in ipairs(widths) do for q=0,3 do
     check("seams "..width.." rotation "..q,function()
         local offsets,bounds,gate=geometry.seams(origin,corridor(width,q))
-        equal(gate,true,"terrain-enclosed gate, including body-only 256 opening")
+        equal(gate,width<=384,"only body and two bounded64 seams may close an opening")
         equal(#offsets,expected_count(width)-4,"extra native obstacle count")
         local extent=expected_extent(width)
         equal(bounds.min_x,-(q%2==0 and 128 or extent),"min x")
@@ -81,31 +81,23 @@ check("staggered banks cannot close a side branch",function()
     end)
     equal(#offsets,0,"different front and rear boundaries are rejected")
 end)
-check("off-center 640 gate seals unequal side gaps",function()
-    local offsets,bounds=geometry.seams(origin,function(p)
-        local y=p.y-origin.y
-        return y>-256 and y<384
+check("off-center 384 keeps its real side route",function()
+    local offsets,bounds,gate,axis,layout=geometry.seams(origin,function(p)
+        local y=p.y-origin.y;return y>-128 and y<256
     end)
-    equal(#offsets,6);equal(bounds.min_x,-128);equal(bounds.max_x,128)
-    equal(bounds.min_y,-256);equal(bounds.max_y,384)
+    equal(#offsets,0);equal(bounds.min_y,-128);equal(bounds.max_y,128)
+    assert(not gate and axis==1 and layout and not layout.gate)
 end)
-check("height bank between sample centers cannot leave a residual slit",function()
-    local opening=corridor(540,0)
-    local offsets,bounds=geometry.seams(origin,opening)
-    assert(#offsets>0)
-    for _,normal in ipairs({-96,-32,32,96}) do
-        assert(not opening(Vector(origin.x+normal,origin.y+bounds.min_y-.01,384)),"negative shoulder must reach static bank")
-        assert(not opening(Vector(origin.x+normal,origin.y+bounds.max_y+.01,384)),"positive shoulder must reach static bank")
+check("two narrow bank slits close within the64 limit",function()
+    for _,width in ipairs({280,380}) do
+        local offsets,bounds,gate=geometry.seams(origin,corridor(width,0))
+        equal(#offsets,4);equal(bounds.min_y,-256);equal(bounds.max_y,256)
+        equal(gate,true)
     end
 end)
-check("12-unit high-ground seams beside base body are sealed",function()
-    local opening=corridor(280,0)
-    local offsets,bounds=geometry.seams(origin,opening)
-    equal(#offsets,4);equal(bounds.min_y,-256);equal(bounds.max_y,256)
-    assert(not opening(Vector(origin.x,origin.y+bounds.max_y+.01,384)))
-end)
-check("bank beyond 384 maximum shoulder reach stays unmodified",function()
-    for _,width in ipairs({784,800,832,896}) do
+
+check("opening beyond 768 maximum width stays unmodified",function()
+    for _,width in ipairs({770,784,800,832,896,1024}) do
         local offsets,bounds=geometry.seams(origin,corridor(width,0))
         equal(#offsets,0,"over-limit continuous bank width "..width)
         equal(bounds.min_y,-128);equal(bounds.max_y,128)
@@ -183,8 +175,8 @@ local function reset(width,q,cliff)
     nav=require("systems/wall_navigation_service")
     return nav
 end
-local function wall(id)
-    local u={p=Vector(origin.x,origin.y,origin.z)}
+local function wall(id,p)
+    local u={p=p or Vector(origin.x,origin.y,origin.z)}
     function u:IsNull() return self.deleted or false end
     function u:entindex() return id end
     function u:GetAbsOrigin() return self.p end
@@ -224,14 +216,14 @@ for _,width in ipairs(widths) do for q=0,3 do
     check("native gate "..width.." rotation "..q,function()
         reset(width,q)
         local w=wall(10+q)
-        equal(#nav.create(w),expected_count(width),"body plus exact seam tiles")
+        equal(#nav.create(w),expected_count(width),"only the four physical body tiles")
         equal(#nav.create(w),expected_count(width),"creation is idempotent")
         local before=created
         nav.approach(w,{GetAbsOrigin=function() return Vector(origin.x+900,origin.y,384) end})
         nav.approach(w,{GetAbsOrigin=function() return Vector(origin.x-900,origin.y,384) end})
         equal(created,before,"first monster direction never changes geometry")
         for _,radius in ipairs(hulls) do
-            equal(path_around(width,q,radius),false,"no lateral route for hull "..radius)
+            equal(path_around(width,q,radius),width*.5-expected_extent(width)>=2*math.max(1,radius),"physical side route for hull "..radius)
         end
         local nx,ny=rotate(-192,0,q)
         assert(clear_point(origin.x+nx,origin.y+ny,32),"attack approach remains free")
@@ -241,28 +233,203 @@ for _,width in ipairs(widths) do for q=0,3 do
         equal(nav.original_nav(origin),nil,"terrain cache released")
     end)
 end end
+-- A tangent displacement leaves its physical gap. No unseen shoulder may
+-- widen the 256-square footprint, regardless of the incoming monster side.
+for _,width in ipairs({256,384,640}) do for q=0,3 do for _,offset in ipairs({0,-64,64,-128,128,-192,192}) do
+    check("physical width "..width.." offset "..offset.." rotation "..q,function()
+        reset(width,q)
+        local x,y=rotate(0,offset,q)
+        local w=wall(1000+q*10+offset/64,Vector(origin.x+x,origin.y+y,384))
+        local closes=width*.5+math.abs(offset)<=192
+        local left=math.max(0,width*.5+offset-128)
+        local right=math.max(0,width*.5-offset-128)
+        equal(#nav.create(w),closes and 4+(left>0 and 2 or 0)+(right>0 and 2 or 0) or 4)
+        local layout=nav.contact_layout(w)
+        if layout then
+            equal(layout.gate,width*.5+math.abs(offset)<=192)
+            equal(layout.axis,q%2==0 and 1 or 2)
+            local before=nav_queries
+            for _=1,100 do equal(nav.contact_layout(w),layout) end
+            equal(nav_queries,before,"cached layout must not query terrain")
+        end
+        if width<=384 and offset==0 then equal(path_around(width,q,32),false) end
+        if width>384 or (width>=384 and offset~=0) or math.abs(offset)>=128 then
+            assert(path_around(width,q,32),"physical side passage must stay available")
+        end
+        nav.clear(w);equal(nav.contact_layout(w),nil);equal(removed,created)
+    end)
+end end end
+
+
+-- Native maps have another floor beyond a finite bank. Its presence at the
+-- scan endpoint is not a branch in the doorway touching the wall footprint.
+for q=0,3 do for _,thickness in ipairs({128,256}) do
+    for _,offset in ipairs({-128,128,-192,192}) do
+        check("finite bank "..thickness.." offset "..offset.." rotation "..q,function()
+            reset(256,q)
+            terrain=function(p)
+                local _,lateral=unrotate(p.x-origin.x,p.y-origin.y,q)
+                return math.abs(lateral)<128 or math.abs(lateral)>128+thickness
+            end
+            local x,y=rotate(0,offset,q)
+            local w=wall(2000+q*10,Vector(origin.x+x,origin.y+y,384))
+            nav.create(w)
+            local layout=nav.contact_layout(w)
+            if math.abs(offset)==128 then
+                assert(layout and not layout.gate,"offset wall must preserve its finite-bank side passage")
+                equal(layout.center,layout.axis==1 and origin.y or origin.x)
+                equal(layout.min,layout.center-128);equal(layout.max,layout.center+128)
+                equal(path_around(256,q,32),true,"native blockers must preserve the actual side gap")
+            else
+                equal(layout,nil,"finite banks cannot authorize sealing a third-cell gap")
+                equal(path_around(256,q,32),true,"third-cell real passage must remain available")
+            end
+            nav.clear(w);equal(created,removed)
+        end)
+    end
+end end
+
+-- A thin bank can close a terrain cross-section but cannot safely receive a
+-- rounded 128 native tile if that tile would cover its far-side floor.
+for q=0,3 do for _,width in ipairs({280,384,640}) do
+    for _,thickness in ipairs({32,128}) do
+        check("native tile thin-bank guard "..thickness.." width "..width.." rotation "..q,function()
+            reset(width,q)
+            terrain=function(p)
+                local _,lateral=unrotate(p.x-origin.x,p.y-origin.y,q)
+                return math.abs(lateral)<width*.5 or math.abs(lateral)>width*.5+thickness
+            end
+            local w=wall(3000+q)
+            nav.create(w)
+            if thickness==32 then
+                equal(nav.contact_layout(w),nil,"native tile cannot bridge a thin bank onto another floor")
+                equal(#obstacles,4,"thin-bank rejection must retain only the actual wall footprint")
+            else
+                assert(nav.contact_layout(w),"a full-thickness bank remains eligible for sealing")
+                equal(path_around(width,q,32),width*.5-expected_extent(width)>=64)
+            end
+            nav.clear(w);equal(created,removed)
+        end)
+    end
+end end
+
+-- A real upper landing is open court behind the wall and a descending384
+-- stair in front. The final native64 stair cell meets the wall's front edge.
+-- Its raw bank midpoint may be32 below the canonical world64 grid center.
+for q=0,3 do for _,native_bias in ipairs({0,-32}) do
+    for _,offset in ipairs({0,-64,64,-128,128,-192,192}) do
+        check("stair mouth offset "..offset.." native bank bias "..native_bias.." rotation "..q,function()
+            reset()
+            local bias=native_bias*((q==0 or q==1) and 1 or -1)
+            terrain=function(p)
+                local n,l=unrotate(p.x-origin.x,p.y-origin.y,q)
+                return n>=0 or math.abs(l-bias)<192
+            end
+            height=function(p)
+                local n,l=unrotate(p.x-origin.x,p.y-origin.y,q)
+                if n>=0 then return 385.5 end
+                return math.abs(l-bias)<192 and 385.5+n*.5 or 0
+            end
+            local x,y=rotate(128,offset,q)
+            local w=wall(4000+q,Vector(origin.x+x,origin.y+y,385.5))
+            nav.create(w)
+            local layout=nav.contact_layout(w)
+            if math.abs(offset)<=128 then
+                assert(layout and layout.stair_mouth,"a real descending mouth must not be mistaken for a flat T")
+                equal(layout.center,layout.axis==1 and origin.y or origin.x,
+                    "stair midpoint must align to the real world64 entrance center")
+                equal(layout.bounds[layout.axis==1 and "min_x" or "min_y"],-128)
+                equal(layout.bounds[layout.axis==1 and "max_x" or "max_y"],128,
+                    "a touching bank must not invent a forward navigation row")
+                for _,o in ipairs(obstacles) do
+                    local n=select(1,unrotate(o.p.x-w.p.x,o.p.y-w.p.y,q))
+                    assert(math.abs(n)==64,"stair mouth may add only the original wall-depth shoulders")
+                end
+                for lane=1,4 do
+                    local along=layout.center+(lane-2.5)*64
+                    local px=layout.axis==1 and w.p.x-184 or along
+                    local py=layout.axis==1 and along or w.p.y-184
+                    -- Both normal signs are safe for navigation; inspect the
+                    -- actual rotated stair approach below instead of guessing.
+                    local nx,ny=rotate(-184,0,q)
+                    if layout.axis==1 then px=w.p.x+nx else py=w.p.y+ny end
+                    for _,h in ipairs({{0,0},{30,0},{-30,0},{0,30},{0,-30}}) do
+                        local p=Vector(px+h[1],py+h[2],385.5)
+                        assert(GridNav:IsTraversable(p) and not GridNav:IsBlocked(p),
+                            "all four native-padded front bodies must fit the real stair")
+                    end
+                end
+            else equal(layout,nil,"a third-cell stair offset must preserve its side passage") end
+            nav.clear(w);equal(created,removed)
+        end)
+    end
+end end
+for q=0,3 do for _,normal_shift in ipairs({-64,0,64}) do
+    check("stair normal shift "..normal_shift.." rotation "..q,function()
+        reset()
+        terrain=function(p)
+            local n,l=unrotate(p.x-origin.x,p.y-origin.y,q)
+            return n>=0 or math.abs(l)<192
+        end
+        height=function(p)
+            local n,l=unrotate(p.x-origin.x,p.y-origin.y,q)
+            if n>=0 then return 385.5 end
+            return math.abs(l)<192 and 385.5+n*.5 or 0
+        end
+        local x,y=rotate(128+normal_shift,0,q)
+        local w=wall(4500+q,Vector(origin.x+x,origin.y+y,385.5))
+        equal(#nav.create(w),8,"both64 seams should close at one-cell normal displacement")
+        local layout=assert(nav.contact_layout(w))
+        assert(layout.gate and layout.stair_mouth,"normal displacement must keep the proven stair mouth")
+        equal(layout.stair_lead,normal_shift==64 and 64 or 0)
+        for _,o in ipairs(obstacles) do
+            local n=select(1,unrotate(o.p.x-w.p.x,o.p.y-w.p.y,q))
+            equal(math.abs(n),64,"seam blockers must stay within original wall depth")
+        end
+        nav.clear(w);equal(created,removed)
+    end)
+end end
+for q=0,3 do for _,kind in ipairs({"flat_T","remote_wall","stair_side_branch"}) do
+    check("stair fallback rejects "..kind.." rotation "..q,function()
+        reset()
+        terrain=function(p)
+            local n,l=unrotate(p.x-origin.x,p.y-origin.y,q)
+            return n>=0 or math.abs(l)<192 or (kind=="stair_side_branch" and n< -64 and l>0)
+        end
+        height=function(p)
+            local n,l=unrotate(p.x-origin.x,p.y-origin.y,q)
+            if n>=0 or kind=="flat_T" then return 385.5 end
+            return (math.abs(l)<192 or (kind=="stair_side_branch" and l>0)) and 385.5+n*.5 or 0
+        end
+        local x,y=rotate(kind=="remote_wall" and 256 or 128,0,q)
+        local w=wall(5000+q,Vector(origin.x+x,origin.y+y,385.5))
+        nav.create(w);equal(nav.contact_layout(w),nil,"stair proof cannot close a flat T, remote mouth or true side branch")
+        equal(#obstacles,4,"rejected mouth must retain only the original square")
+        nav.clear(w);equal(created,removed)
+    end)
+end end
+
 check("height cliffs enclose otherwise traversable terrain",function()
-    reset(640,0,true)
-    local w=wall(40);equal(#nav.create(w),expected_count(640))
-    equal(path_around(640,0,32),false)
-    local outside=Vector(origin.x+32,origin.y+352,384)
-    equal(select(1,nav.original_nav(outside)),true,"cached native nav remains traversable")
-    equal(select(2,nav.original_nav(outside)),false,"height is separate from native block state")
+    reset(512,0,true)
+    local w=wall(40);equal(#nav.create(w),expected_count(512))
+    equal(path_around(512,0,32),true)
+    local outside=Vector(origin.x+32,origin.y+224,384)
+    equal(nav.original_nav(outside),nil,"terrain outside the physical wall is never masked")
     nav.clear(w);equal(removed,created)
 end)
 check("non-grid high-ground edges seal small hull navigation",function()
-    for _,width in ipairs({280,540}) do
+    for _,width in ipairs({280,380}) do
         reset(width,0,true)
         local w=wall(41);equal(#nav.create(w),expected_count(width))
-        for _,radius in ipairs({0,10,12,32}) do equal(path_around(width,0,radius),false,"height-bank slit hull "..radius) end
+        for _,radius in ipairs({0,10,12,32}) do equal(path_around(width,0,radius),width*.5-expected_extent(width)>=2*math.max(1,radius),"real height-bank slit hull "..radius) end
         nav.clear(w);equal(removed,created)
     end
 end)
 check("overlap preserves body and shoulder refs",function()
-    reset(640,0)
+    reset(512,0)
     local first,second=wall(51),wall(52)
-    equal(#nav.create(first),expected_count(640));equal(#nav.create(second),expected_count(640))
-    local shoulder=Vector(origin.x+32,origin.y+160,384)
+    equal(#nav.create(first),expected_count(512));equal(#nav.create(second),expected_count(512))
+    local shoulder=Vector(origin.x+32,origin.y+32,384)
     assert(GridNav:IsBlocked(shoulder))
     equal(select(1,nav.original_nav(shoulder)),true)
     equal(select(2,nav.original_nav(shoulder)),false,"second owner does not cache first owner's obstacle")
@@ -277,16 +444,16 @@ check("unrelated existing obstacle is retained",function()
     equal(nav.original_nav(unrelated.p),nil,"unrelated blocker is never masked")
     assert(GridNav:IsBlocked(unrelated.p))
 end)
-check("lost obstacle rebuild restores complete square and seams",function()
-    reset(640,0)
+check("lost obstacle rebuild restores only the physical square",function()
+    reset(512,0)
     local w=wall(61);local initial=nav.create(w)
-    UTIL_Remove(initial[5].entity)
+    UTIL_Remove(initial[3].entity)
     local recovered=nav.create(w)
-    equal(#recovered,expected_count(640));equal(path_around(640,0,0),false,"lost shoulder rebuilt")
+    equal(#recovered,expected_count(512));equal(path_around(512,0,0),true,"restored body must not fill real side passages")
     nav.clear(w);equal(removed,created,"stale cells released before rebuilding")
 end)
 check("VM reload cleanup retires owned orphan tiles",function()
-    reset(640,0)
+    reset(512,0)
     local w=wall(62);nav.create(w)
     package.loaded["systems/wall_navigation_service"]=nil
     nav=require("systems/wall_navigation_service")
@@ -294,31 +461,31 @@ check("VM reload cleanup retires owned orphan tiles",function()
     equal(nav.original_nav(origin),nil)
 end)
 check("late removal accepts wall with invalid native handle",function()
-    reset(640,0)
+    reset(512,0)
     local w=wall(63);nav.create(w);w.deleted=true
     function w:entindex() error("native wall already removed") end
     nav.clear(w);equal(removed,created);equal(nav.original_nav(origin),nil)
 end)
-for _,failed in ipairs({1,3,6,10}) do
+for _,failed in ipairs({1,2,3,4}) do
     check("nil spawn rollback at tile "..failed,function()
-        reset(640,0);fail_call=failed
+        reset(512,0);fail_call=failed
         local w=wall(70)
         equal(pcall(nav.create,w),false,"injected failed spawn must be reported")
         equal(removed,created,"previous tiles rolled back")
         equal(nav.original_nav(origin),nil)
         equal(nav.original_nav(Vector(origin.x+32,origin.y+160,384)),nil,"shoulder refs released")
-        fail_call=nil;equal(#nav.create(w),expected_count(640),"retry creates full geometry")
+        fail_call=nil;equal(#nav.create(w),expected_count(512),"retry creates full geometry")
         nav.clear(w);equal(removed,created)
     end)
 end
 check("native exception spawn rollback has no orphan refs",function()
-    reset(640,0);throw_call=6
+    reset(512,0);throw_call=3
     local w=wall(80);equal(pcall(nav.create,w),false)
     equal(removed,created)
     for x=-352,352,64 do for y=-352,352,64 do
         equal(nav.original_nav(Vector(origin.x+x,origin.y+y,384)),nil,"exception cannot leak cached refs")
     end end
-    throw_call=nil;equal(#nav.create(w),expected_count(640));nav.clear(w);equal(removed,created)
+    throw_call=nil;equal(#nav.create(w),expected_count(512));nav.clear(w);equal(removed,created)
 end)
 check("body guard corrections preserve legal units",function()
     reset(256,0);local w=wall(90);nav.create(w)
@@ -385,4 +552,4 @@ if #failures>0 then
     for _,message in ipairs(failures) do print("WALL_NAV_GEOMETRY_FAIL "..message) end
     error("wall navigation geometry failures="..#failures.." passed="..passed)
 end
-print("WALL_NAVIGATION_GEOMETRY_PASS cases="..passed.." 4 directions, 256-768 gates, hull0-128, corner crossings, legal routes, height cliffs, refs and spawn rollback")
+print("WALL_NAVIGATION_GEOMETRY_PASS cases="..passed.." 4 directions, physical256 body plus both seams<=64 only, tangent offsets keep real gaps, hull0-128, finite/thin banks, corner crossings, legal routes, height cliffs, refs and spawn rollback")

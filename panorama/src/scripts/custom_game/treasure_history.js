@@ -37,12 +37,17 @@
         $.DispatchEvent("DOTAShowTextTooltip",card,name+"\n"+effect+(qty!==""?"\n拥有数量："+qty:""));
     }
     function icon(parent,item){
+        var resources=cfg.SurvivalItemResources,presentation=cfg.SurvivalRewardPresentation;
+        if(resources&&resources.Lookup(item)&&presentation&&presentation.CreateRegisteredIcon){
+            var registered=presentation.CreateRegisteredIcon(parent,item,"TreasureCompactIcon");
+            if(registered){place(registered,1,1,CELL-2,CELL-2);return;}
+        }
         if(item.icon_name){
             var name=String(item.icon_name),texture=name.indexOf("/")>=0,isItem=name.indexOf("item_")===0;
             var art=$.CreatePanel(texture?"Image":isItem?"DOTAItemImage":"DOTAAbilityImage",parent,"");
             if(texture)art.SetImage("file://{images}/spellicons/"+name+".png");
             else if(isItem)art.itemname=name;else art.abilityname=name;
-            if(art.SetScaling)art.SetScaling("stretch-to-fit-preserve-aspect");
+            if(presentation&&presentation.FillIcon)presentation.FillIcon(art,item);
             art.AddClass("TreasureCompactIcon");place(art,1,1,CELL-2,CELL-2);art.hittest=false;return;
         }
         var glyph=$.CreatePanel("Label",parent,"");glyph.AddClass("TreasureCompactGlyph");

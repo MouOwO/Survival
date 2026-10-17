@@ -42,11 +42,11 @@ function nativeVisible(t) {
 }
 
 function builderVisible(t, entity) {
-    const scene = t.overlay.FindChildTraverse('SurvivalBuilderIoPortraitScene');
+    const scene = t.overlay.FindChildTraverse('SurvivalBuilderIoPortraitSceneV2Alpha');
     assert(scene, 'builder owns a separate lazy map Scene');customVisible(t, entity, scene);
     assert.equal(t.scene.values.visibility, 'collapse');
 }
-function builderCreations(t) {return t.metrics.created.filter(call => call.id === 'SurvivalBuilderIoPortraitScene').length;}
+function builderCreations(t) {return t.metrics.created.filter(call => call.id === 'SurvivalBuilderIoPortraitSceneV2Alpha').length;}
 
 function selectBuilder(t, entity, version) {
     t.select(entity, 'npc_survival_builder_proxy');

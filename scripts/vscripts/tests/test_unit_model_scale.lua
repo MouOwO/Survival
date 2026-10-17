@@ -28,7 +28,8 @@ assert(body.hull == 64 and body.attack_range == 500 and body.footprint.x == 4)
 body.scale = 2.4 -- Native respawn restored the authored model scale.
 assert(scale.ensure(body)); near(body.scale, 1.6)
 
-for _, name in ipairs({"building_arrow_tower", "npc_dota_unit_ultimate_tower", "building_wall"}) do
+for _, name in ipairs({"building_arrow_tower", "npc_dota_unit_ultimate_tower", "building_wall",
+    "npc_archive_challenge_1", "npc_archive_challenge_2", "npc_archive_challenge_3"}) do
     local tower = unit(name, 1.8)
     assert(scale.ensure(tower)); near(tower.scale, 1.8)
     assert(scale.apply(tower, 2.5)); near(tower.scale, 2.5)
@@ -40,6 +41,7 @@ local preview = unit("npc_survival_grid_preview_proxy")
 assert(scale.apply(preview, 1.9, "arrow_tower")); near(preview.scale, 1.9)
 assert(scale.copy_final(preview, 1.9, "arrow_tower")); near(preview.scale, 1.9)
 assert(scale.apply(preview, 2.2, "wall")); near(preview.scale, 2.2)
+assert(scale.apply(preview, 1, "archive_challenge")); near(preview.scale, 1)
 
 local archetypes = require("config/generated/monster_archetypes")
 local monster_count = 0
@@ -72,7 +74,7 @@ local custom_hero = unit("renamed_addon_hero", 1.3)
 custom_hero.survival_hero_id = "hero_drow_ranger"
 assert(scale.ensure(custom_hero)); near(custom_hero.scale, 1.3)
 for _, name in ipairs({"npc_survival_worker", "npc_survival_builder_proxy", "building_hero_altar",
-    "npc_archive_challenge_1", "asset_proxy_monster_undying_golem"}) do
+    "asset_proxy_monster_undying_golem"}) do
     local other = unit(name, 1.5)
     other.owner = native_hero
     other.model = "models/heroes/drow/drow_base.vmdl"
@@ -122,4 +124,4 @@ for _, name in ipairs({"npc_survival_grid_preview_proxy", "npc_survival_upgrade_
 end
 local thinker = unit("thinker"); thinker.classname = "npc_dota_thinker"
 assert(not service.apply(thinker)); assert(thinker.writes == 0)
-print("UNIT_MODEL_SCALE_PASS: " .. hero_count .. " heroes and " .. monster_count .. " monsters at original size, towers and walls exempt, workers/buildings at two-thirds, unchanged geometry and spawn idempotence")
+print("UNIT_MODEL_SCALE_PASS: " .. hero_count .. " heroes and " .. monster_count .. " monsters at original size, towers/walls/archive hubs exempt, workers/buildings at two-thirds, unchanged geometry and spawn idempotence")

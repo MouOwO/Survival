@@ -1,0 +1,31 @@
+-- Pure Lua self-test for the maintained Tools-only strict trajectory oracle.
+-- Does not start Dota, create entities, or authorize a native gameplay pass.
+local M=assert(loadfile('scripts/vscripts/tests/wall_trajectory_oracle.lua'))()
+local function row(id,x,y,hull,phased) return {id=id,x=x,y=y,hull=hull or 32,phased=phased or false} end
+local function sample(rows0,rows1,options)
+    local s=M.new(options);M.sample(s,0,rows0);M.sample(s,.1,rows1);return M.summary(s)
+end
+local r=sample({row(1,-80,0),row(2,0,0)},{row(1,80,0),row(2,0,0)},{max_speed=2000})
+assert(r.hard_overlap_frames==0 and r.swept_crossing_frames==1 and not r.passed,'between-frame crossing escaped')
+r=sample({row(1,-80,63),row(2,0,0)},{row(1,80,63),row(2,0,0)},{max_speed=2000})
+assert(r.passed,'outside raw hull plus two-unit native slack was rejected')
+r=sample({row(1,-80,61),row(2,0,0)},{row(1,80,61),row(2,0,0)},{max_speed=2000})
+assert(r.swept_crossing_frames==1,'near tangent physical penetration escaped')
+r=sample({row(1,-80,0),row(2,0,0)},{row(1,-80,0),row(2,0,0,32,true)})
+assert(r.phased_frames==1 and not r.passed,'phasing without overlap escaped')
+r=sample({row(1,-80,0),row(2,0,0)},{row(1,-80,0,20),row(2,0,0)})
+assert(r.hull_change_frames==1 and not r.passed,'contact hull shrinking escaped')
+r=sample({row(1,-80,0),row(2,0,0)},{row(1,0,0)},{max_speed=2000})
+assert(r.passed,'dead actor from previous frame kept a phantom collision hull')
+r=sample({row(1,0,0),row(2,64,0)},{row(1,25,0),row(2,89,0)})
+assert(r.passed,'parallel moving solid units were rejected')
+local rows={};for i=1,96 do rows[#rows+1]=row(i,math.floor((i-1)/12)*100,((i-1)%12)*100) end
+r=sample(rows,rows)
+assert(r.passed and r.pair_checks<96*95,'spatial diagnostic regressed to all-pairs every frame')
+r=sample({row(1,0,0)},{row(1,80,0)})
+assert(r.jump_frames==1 and not r.passed,'a teleport without any nearby body escaped')
+r=sample({row(1,0,0)},{row(1,0,0,32,true)},{max_errors=0})
+assert(#r.errors==0 and r.phased_frames==1 and not r.passed,'a zero diagnostic retention cap hid a physical acceptance failure')
+r=sample({},{})
+assert(not r.passed,'an empty test must not certify physical collision')
+print('WALL_SOLID_TRAJECTORY_ORACLE_PASS instant_crossing=detected all_phasing=fail fixed_hull=required death=removed bounded_hash=pass')

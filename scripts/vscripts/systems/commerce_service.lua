@@ -70,6 +70,7 @@ end
 function M.init()
     if initialized then return end;initialized=true
     require('systems/commerce_runtime').init()
+    require('systems/commerce_titan_aura_service').init()
     CustomGameEventManager:RegisterListener('survival_commerce_request',function(_,payload) M.handle(payload or {}) end)
 end
 return M

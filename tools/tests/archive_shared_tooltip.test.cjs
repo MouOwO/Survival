@@ -12,6 +12,9 @@ const a=cfg.SurvivalArchiveTooltip.Create(options(firstParent,'FirstTip')),b=cfg
 const item={id:'ex_01',name:'真实字段',description:'攻击力+5',count:2,count_known:1,target:60};
 assert(a.Show(item,'ex',firstCard));assert(b.Show({...item,count_known:0},'ex',secondCard));
 assert.equal(a.elements.Quantity.text,'2/60');assert.equal(b.elements.Quantity.text,'—/60');assert(b.elements.State.text.includes('状态待同步'));assert.equal(a.elements.Effect.text,item.description);
+assert(a.Show({...item,id:'wife_01'},'wife',firstCard));assert(a.elements.State.text.includes('已拥有'),'Owned wife collections share the existing owned-item tooltip semantics');
+assert(a.Show({...item,id:'wife_31',description:'初始魔法卡+1',draw_enabled:0,availability_note:'待适配，暂不参与抽取，不消耗玫瑰'},'wife',firstCard));assert.equal(a.elements.Effect.text,'初始魔法卡+1');assert.equal(a.elements.Condition.text,'待适配，暂不参与抽取，不消耗玫瑰');assert(a.elements.Condition.visible);assert.equal(a.elements.State.text,'收藏 · 已拥有','Availability no longer replaces the real ownership state');
+assert(a.Show(item,'ex',firstCard));assert.equal(a.elements.Condition.text,'');assert.equal(a.elements.Condition.visible,false,'Switching to ordinary rows clears the adaptation-only note');
 assert.notEqual(a.panel,b.panel);assert.notEqual(a.elements.Backing,b.elements.Backing);assert.equal(a.elements.Surface.hittest,true);assert.equal(a.panel.hittest,false,'Shadow bounds do not steal card input');
 function corners(tip){return ['Backing','Frame'].map(role=>tip.elements[role].Children().filter((_,index)=>[0,2,6,8].includes(index)).map(clip=>({width:clip.style.width,height:clip.style.height,artWidth:clip.Children()[0].style.width,artHeight:clip.Children()[0].style.height})));}
 const shortCorners=corners(a),shortHeight=a.Inspect().surfaceHeight;a.Show({...item,description:'长说明\n'.repeat(150)},'ex',firstCard);h.flushFinite();assert.deepEqual(corners(a),shortCorners,'Changing content height never stretches material corners');assert(a.Inspect().surfaceHeight>shortHeight,'Long content actually changes the material height');assert.equal(a.Inspect().nineSlices.Backing.count,9);assert.equal(a.Inspect().nineSlices.Frame.count,9);
@@ -21,4 +24,18 @@ a.QueueHide();h.flushFinite();assert(!a.IsVisible());assert(b.IsVisible(),'One o
 a.Show(item,'ex',firstCard);firstCard.style.position='101px 100px 0px';h.flushFinite();assert(!a.IsVisible(),'Moving the anchor invalidates the floating description');assert(b.IsVisible());
 const retiredSurface=a.elements.Surface,queued=h.scheduled.slice();a.Dispose();a.Dispose();assert(!a.panel.IsValid());assert.doesNotThrow(()=>{retiredSurface.events.onmouseover();retiredSurface.events.onmouseout();queued.filter(job=>!job.cancelled).forEach(job=>job.fn());});assert(!a.IsVisible());assert(b.IsVisible(),'Disposing one instance preserves its sibling');
 b.Hide();h.flushFinite();assert(!b.IsVisible());b.Dispose();assert.equal(h.sent.length,0,'Tooltip rendering never emits a game event');
+const scroll=cfg.SurvivalArchiveTooltip.Create(options(firstParent,'ScrollableTip'));
+// Model native fit-children measurement of the actual populated content body.
+Object.defineProperty(scroll.elements.Body,'actuallayoutheight',{get(){return this.Children().filter(c=>c.visible!==false).reduce((sum,c)=>sum+c.actuallayoutheight+(parseFloat(c.style.marginBottom)||0),0);}});
+h.setCursor(1000,900);assert(scroll.Show({...item,description:'完整长说明\n'.repeat(100)},'ex',firstCard));h.flushFinite();
+assert(scroll.elements.Body.actuallayoutheight>scroll.elements.Viewport.actuallayoutheight,'The real content exceeds the bounded scroll viewport');
+const scrollCreated=h.counts.created,scrollAt=scroll.elements.Surface.GetPositionWithinWindow();
+scroll.QueueHide();h.setCursor(scrollAt.x+10,scrollAt.y+10);scroll.elements.Surface.events.onmouseover();h.flushFinite();
+assert(scroll.IsVisible(),'A long tooltip remains open when crossing the card gap into its existing scroll viewport');
+assert.equal(h.counts.created,scrollCreated,'Hovering and scrolling never rebuilds content or material panels');
+scroll.elements.Surface.events.onmouseout();h.flushFinite();assert(scroll.IsVisible(),'A delayed child leave cannot hide while still inside the surface');
+h.setCursor(1000,900);scroll.elements.Surface.events.onmouseout();h.flushFinite();assert(!scroll.IsVisible(),'Leaving both card and scroll surface hides after the grace period');
+assert(scroll.Show(item,'ex',firstCard));h.flushFinite();assert(scroll.elements.Body.actuallayoutheight<=scroll.elements.Viewport.actuallayoutheight+1);
+const passiveAt=scroll.elements.Surface.GetPositionWithinWindow();h.setCursor(passiveAt.x+10,passiveAt.y+10);scroll.elements.Surface.events.onmouseover();assert(!scroll.IsVisible(),'Short tooltips retain passive immediate dismissal');
+scroll.Dispose();assert.equal(cfg.SurvivalTooltipDismiss.Inspect().owners,0);assert.equal(h.sent.length,0);
 console.log('ARCHIVE_SHARED_TOOLTIP_PASS: isolated owners, real quantity semantics, enter-dismiss, cross-tooltip reentry guard, anchored movement, stable material corners, disposal guards');

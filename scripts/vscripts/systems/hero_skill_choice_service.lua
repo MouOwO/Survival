@@ -4,6 +4,7 @@ local scheduler = require("core/scheduler")
 local choice_rules = require("config/generated/hero_skill_choice_rules")
 local exclusive = require("config/generated/hero_exclusive_skills")
 local heroes = require("config/generated/hero_definitions")
+local commerce_hero_privileges = require("systems/commerce_hero_privileges")
 
 local M = {}
 
@@ -12,6 +13,20 @@ local sequence = 0
 local rerolls_by_player = {}
 local reward_retry_by_player = {}
 local hero_by_player = {}
+local privilege_rerolls_granted_by_player = {}
+
+local function sync_privilege_rerolls(player_id)
+    player_id = tonumber(player_id)
+    if player_id == nil or player_id < 0
+        or privilege_rerolls_granted_by_player[player_id] then return false end
+    local amount = commerce_hero_privileges.for_player(player_id).skill_rerolls
+    if amount <= 0 then return false end
+    -- Reconnects, repeated snapshots, hero replacements and rebirths keep this
+    -- receipt for the lifetime of the match. A mid-match purchase grants once.
+    privilege_rerolls_granted_by_player[player_id] = true
+    rerolls_by_player[player_id] = (rerolls_by_player[player_id] or 0) + amount
+    return true
+end
 
 local function state(player_id)
     local result = event_bus.request(
@@ -50,6 +65,7 @@ local function project_pending(player_id)
             player_id = player_id,
             pending = 0,
             candidates = {},
+            rerolls = rerolls_by_player[player_id] or 0,
         }
     end
     return {
@@ -73,6 +89,7 @@ local function publish(player_id)
 end
 
 local function create_offer(player_id, source, trigger_level)
+    sync_privilege_rerolls(player_id)
     if pending_by_player[player_id] then
         return { ok = false, error = "skill_choice_already_pending" }
     end
@@ -320,6 +337,7 @@ local function select_request(payload)
 end
 
 local function get_request(payload)
+    sync_privilege_rerolls(tonumber(payload.player_id))
     return {
         ok = true,
         snapshot = project_pending(tonumber(payload.player_id)),
@@ -336,6 +354,11 @@ end
 
 function M.init()
     rerolls_by_player={}
+    privilege_rerolls_granted_by_player = {}
+    event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if sync_privilege_rerolls(player_id) then publish(player_id) end
+    end)
     event_bus.subscribe('commerce.skill_learned',function(payload)
         if require('systems/commerce_effects').owned(payload.player_id,'sky_seal') then
             rerolls_by_player[payload.player_id]=(rerolls_by_player[payload.player_id] or 0)+1
@@ -361,7 +384,10 @@ function M.init()
     event_bus.subscribe(events.HERO_SKILL_REWARD_REQUEST, on_skill_reward)
     event_bus.subscribe(events.HERO_SUMMONED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
-        if player_id ~= nil then hero_by_player[player_id] = payload.unit end
+        if player_id ~= nil then
+            hero_by_player[player_id] = payload.unit
+            if sync_privilege_rerolls(player_id) then publish(player_id) end
+        end
     end)
     event_bus.subscribe(events.HERO_REMOVED, function(payload)
         local player_id = tonumber(payload and payload.player_id)

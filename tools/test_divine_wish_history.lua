@@ -1,4 +1,4 @@
-﻿-- Exercise the production wish registry/runtime and reward history together.
+-- Exercise the production wish registry/runtime and reward history together.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 package.loaded["systems/player_context_service"] = {is_defeated=function() return false end}
 package.loaded["systems/rogue_builder_start_effect_service"] = {init=function() end}
@@ -75,3 +75,36 @@ cards.rows={cards.by_id.divine_wish,cards.by_id.tower_growth,cards.by_id.gunpowd
 p=offer(0); assert(not choose(p).ok)
 assert(#snapshots["0"].history==0 and #runtime.snapshot(0)==0)
 print("PASS divine wish: real effects, all child icons/descriptions, isolation, retries, deduplication and pool exhaustion")
+
+-- Partially granted wishes retain their token and cannot be abandoned for
+-- another offer or reroll. A retry applies only the unfinished child.
+reset()
+cards.rows={};for _,id in ipairs(ids) do cards.rows[#cards.rows+1]=cards.by_id[id] end
+cards.rows[#cards.rows+1]=cards.by_id.fiscal_subsidy
+PlayerResource.GetTeam=function() return 2 end
+bus.handle_request(events.RESOURCE_ADD_REQUEST,function() return {ok=true} end)
+assert(bus.request(events.ROGUE_REWARD_OPEN_REQUEST,{player_id=0}).ok)
+local pending_token=snapshots["0"].token
+handler.apply=function() return false,"injected_failure" end
+assert(not choose({player_id=0,token=pending_token,card_id="divine_wish"}).ok)
+assert(snapshots["0"].pending_card_id=="divine_wish" and #runtime.snapshot(0)==2)
+local alternate=choose({player_id=0,token=pending_token,card_id="tower_growth"})
+assert(not alternate.ok and alternate.error=="random_grant_pending")
+local rerolled=bus.request(events.ROGUE_REWARD_REROLL_REQUEST,{player_id=0,token=pending_token})
+assert(not rerolled.ok and rerolled.error=="random_grant_pending")
+assert(snapshots["0"].token==pending_token and #runtime.snapshot(0)==2)
+handler.apply=original
+assert(choose({player_id=0,token=pending_token,card_id="divine_wish"}).ok)
+validate(0)
+assert(not snapshots["0"].pending_card_id)
+
+-- A natural offer omits an unfulfillable wish without changing the weighted
+-- draw order for the remaining cards; debug-forced exhaustion remains safe.
+reset()
+cards.rows={cards.by_id.divine_wish,cards.by_id.tower_growth,cards.by_id.gunpowder_splash}
+assert(bus.request(events.ROGUE_REWARD_OPEN_REQUEST,{player_id=0}).ok)
+assert(#snapshots["0"].cards==2)
+assert(snapshots["0"].cards[1].card_id=="tower_growth"
+    and snapshots["0"].cards[2].card_id=="gunpowder_splash")
+assert(choose({player_id=0,token=snapshots["0"].token,card_id="tower_growth"}).ok)
+print("PASS divine wish recovery: partial grant locks, idempotent retry and insufficient-pool offer filtering")

@@ -8,6 +8,7 @@ local research_events = require("research/research_event_names")
 local combat_stat_projection = require("ui/combat_stat_projection")
 local hero_attack_cadence_projection = require("ui/hero_attack_cadence_projection")
 local armor_balance = require("config/armor_balance")
+local titan_aura_armor = require("systems/commerce_titan_aura_values")
 local hero_summon_projection = require("systems/hero_summon_projection")
 local building_batch_upgrade = require("systems/building_batch_upgrade_service")
 local gold_mine_batch_upgrade = require("systems/gold_mine_batch_upgrade_service")
@@ -52,13 +53,13 @@ local function effective_attack_speed(unit)
         return attacks_per_second
     end
     -- 兼容尚未提供 GetAttacksPerSecond 的旧引擎环境。
-    local seconds_per_attack = safe_number(unit, "GetSecondsPerAttack", nil)
+    local seconds_per_attack = safe_number(unit, "GetSecondsPerAttack", nil, false)
     if seconds_per_attack and seconds_per_attack > 0 then
         return 1 / seconds_per_attack
     end
     return project_speed and project_speed * (1 + (tonumber(unit.survival_cheer_attack_speed_pct) or 0)/100)
         or (1 / math.max(0.01,
-            safe_number(unit, "GetBaseAttackTime", 2)))
+            safe_number(unit, "GetBaseAttackTime", 2, false)))
 end
 
 local function base_damage_outgoing_pct(unit)
@@ -78,6 +79,46 @@ local function base_damage_outgoing_pct(unit)
         end
     end
     return total
+end
+
+local function native_attack_modifier_bonuses(unit)
+    local modifiers
+    if unit.FindAllModifiers then
+        local ok, result = pcall(unit.FindAllModifiers, unit)
+        if ok and type(result) == "table" then modifiers = result end
+    end
+    if not modifiers then
+        modifiers = {}
+        -- Compatibility for hosts without FindAllModifiers. Live entities
+        -- use the complete list, including any new native attack modifiers.
+        for _, name in ipairs({
+            "modifier_survival_managed_buff", "modifier_rogue_base_tower_attack",
+            "modifier_rogue_tower_attack_projection", "modifier_rogue_tower_growth",
+            "modifier_rogue_weakening_attack", "modifier_rogue_combat_bonus",
+            "modifier_rogue_training_attack", "modifier_rogue_sharp_volley_growth",
+        }) do
+            if unit.FindAllModifiersByName then
+                local ok, matches = pcall(unit.FindAllModifiersByName, unit, name)
+                if ok and type(matches) == "table" then
+                    for _, modifier in ipairs(matches) do modifiers[#modifiers + 1] = modifier end
+                end
+            elseif unit.FindModifierByName then
+                local ok, modifier = pcall(unit.FindModifierByName, unit, name)
+                if ok and modifier then modifiers[#modifiers + 1] = modifier end
+            end
+        end
+    end
+    local percentage, flat, seen = 0, 0, {}
+    for _, modifier in ipairs(modifiers) do
+        if modifier and not seen[modifier]
+            and (not modifier.IsNull or not modifier:IsNull()) then
+            seen[modifier] = true
+            percentage = percentage + (safe_number(modifier,
+                "GetModifierBaseDamageOutgoing_Percentage", 0) or 0)
+            flat = flat + (safe_number(modifier, "GetModifierPreAttack_BonusDamage", 0) or 0)
+        end
+    end
+    return percentage, flat
 end
 
 local portrait_metadata = require("ui/portrait_metadata")
@@ -111,10 +152,28 @@ local function unit_combat_snapshot(unit)
     -- BASEDAMAGEOUTGOING_PERCENTAGE changes attack resolution but is not
     -- guaranteed to be included in GetDamageMin/Max or project-owned caches.
     -- Apply it explicitly to the non-hero selected-unit display snapshot.
-    local outgoing_pct = base_damage_outgoing_pct(unit)
+    local outgoing_pct, modifier_attack_flat = 0, 0
+    if unit.survival_building_id == "arrow_tower"
+        and tonumber(unit.survival_attack_min) ~= nil
+        and tonumber(unit.survival_attack_max) ~= nil then
+        -- The tower cache is the precise base set by building_upgrade_system,
+        -- before native rogue modifiers. GetDamageMin/Max must not be used as
+        -- another multiplier source: engine builds expose different totals.
+        outgoing_pct, modifier_attack_flat = native_attack_modifier_bonuses(unit)
+    elseif unit.survival_is_wave_monster == true
+        or unit.survival_is_challenge_monster == true then
+        -- Monster getters can already include the weakening modifier. Start
+        -- from native base damage and apply native modifier properties once,
+        -- before restoring the logical endless-wave attack scale for the UI.
+        attack_min = safe_number(unit, "GetBaseDamageMin", attack_min)
+        attack_max = safe_number(unit, "GetBaseDamageMax", attack_max)
+        outgoing_pct, modifier_attack_flat = native_attack_modifier_bonuses(unit)
+    else
+        outgoing_pct = base_damage_outgoing_pct(unit)
+    end
     local outgoing_multiplier = math.max(0, 1 + outgoing_pct / 100)
-    attack_min = attack_min * outgoing_multiplier
-    attack_max = attack_max * outgoing_multiplier
+    attack_min = attack_min * outgoing_multiplier + modifier_attack_flat
+    attack_max = attack_max * outgoing_multiplier + modifier_attack_flat
     local internal_name = (unit.GetUnitName and unit:GetUnitName()) or ""
     local configured_name = (unit_display_names.by_id or {})[internal_name]
     local display_name = tower_routes.display_name_for_unit(unit)
@@ -132,10 +191,8 @@ local function unit_combat_snapshot(unit)
         or tonumber(unit.survival_armor)
         or safe_number(unit, "GetPhysicalArmorBaseValue", 0)
     local effective_war3_armor = custom_war3_armor
-        and (tonumber(unit.survival_effective_war3_armor)
-            or tonumber(unit.survival_armor)
-            or tonumber(unit.survival_base_war3_armor)
-            or 0)
+        and titan_aura_armor.custom_armor(unit,
+            tonumber(unit.survival_armor) or tonumber(unit.survival_base_war3_armor))
         or nil
     return apply_portrait_metadata(unit, {
         entindex = unit:entindex(),
@@ -170,11 +227,11 @@ local function unit_combat_snapshot(unit)
         -- 百分比攻速；非英雄单位必须包含光环等临时 Modifier。
         attack_speed = effective_attack_speed(unit),
         attack_cadence = unit.survival_attack_cadence or {
-            base_interval=safe_number(unit,"GetBaseAttackTime",nil),
-            reduced_interval=safe_number(unit,"GetBaseAttackTime",nil),
+            base_interval=safe_number(unit,"GetBaseAttackTime",nil,false),
+            reduced_interval=safe_number(unit,"GetBaseAttackTime",nil,false),
             percentage=safe_number(unit,"GetAttackSpeed",1,false)*100,
         },
-        attack_speed_stat = safe_number(unit, "GetAttackSpeed", 100),
+        attack_speed_stat = safe_number(unit, "GetAttackSpeed", 100, false),
         strength = strength,
         agility = agility,
         intellect = intellect,
@@ -277,6 +334,7 @@ local function hero_ui_snapshot(player_id, entindex, unit)
             or snapshot.display_name
     end
     snapshot = hero_attack_cadence_projection.for_ui(snapshot, unit)
+    snapshot = titan_aura_armor.for_ui(snapshot, unit)
     -- The hero combat snapshot is authoritative and internally consistent.
     -- Never replace one field with a transient engine-frame value here: doing
     -- so made request responses alternate between projected armor and zero
@@ -357,9 +415,7 @@ local function build_unit_combat_push(payload)
             -- zero. Their effective project-owned value is the one
             -- used by damage resolution and must remain authoritative.
             snapshot.runtime_armor = 0
-            snapshot.armor = tonumber(
-                unit.survival_effective_war3_armor
-            ) or tonumber(unit.survival_war3_armor) or 0
+            snapshot.armor = titan_aura_armor.custom_armor(unit)
             snapshot.effective_war3_armor = snapshot.armor
         else
             local runtime_armor = safe_number(

@@ -99,6 +99,7 @@ function modifier_rogue_sharp_volley_growth:DeclareFunctions()
 end
 function modifier_rogue_sharp_volley_growth:GetModifierPreAttack_BonusDamage()
     return self:GetStackCount()
+        / math.max(1, tonumber(self:GetParent().survival_endless_attack_scale) or 1)
 end
 
 modifier_rogue_lumberjack_attack_speed = class({})
@@ -121,19 +122,61 @@ modifier_rogue_corrosive_shield_attack = class({})
 function modifier_rogue_corrosive_shield_attack:IsHidden() return true end
 function modifier_rogue_corrosive_shield_attack:IsPurgable() return false end
 function modifier_rogue_corrosive_shield_attack:RemoveOnDeath() return true end
-function modifier_rogue_corrosive_shield_attack:OnCreated()
+local function choose_corrosive_declaration(self)
+    if self.corrosive_event_decl_sampled == true then return end
+    self.corrosive_event_decl_sampled = true
+    self.shared_corrosive_shield_observer = false
+    if _G.SURVIVAL_SHARED_CORROSIVE_SHIELD_PROBE ~= true then return end
+    local observer = require("systems/tower_damage_observer")
+    if type(observer.choose_corrosive_shield) ~= "function"
+        or type(observer.register_corrosive_shield) ~= "function" then return end
+    local ok, world = pcall(function() return observer.choose_corrosive_shield(self:GetParent()) end)
+    if not ok or not world then return end
+    self.shared_corrosive_shield_observer = true
+    self.corrosive_shield_declared_world = world
+end
+function modifier_rogue_corrosive_shield_attack:OnCreated(params)
+    choose_corrosive_declaration(self)
     self.seen_records = {}
+    self:OnRefresh(params)
+    if self.shared_corrosive_shield_observer == true then
+        self.corrosive_shield_registration_failed =
+            not require("systems/tower_damage_observer").register_corrosive_shield(
+                self:GetParent(), self, self.corrosive_shield_declared_world)
+    end
+end
+function modifier_rogue_corrosive_shield_attack:OnRefresh(params)
+    -- A refreshed legacy/native-cached instance cannot opt into a new route.
+    if not self.corrosive_event_decl_sampled then
+        self.corrosive_event_decl_sampled = true
+        self.shared_corrosive_shield_observer = false
+    end
+    self.armor_reduction_per_attack = tonumber(params and params.armor_reduction_per_attack)
+        or require("config/armor_balance").from_war3_linear(1)
 end
 function modifier_rogue_corrosive_shield_attack:DeclareFunctions()
+    if self ~= modifier_rogue_corrosive_shield_attack and self.GetParent then
+        choose_corrosive_declaration(self)
+        if self.shared_corrosive_shield_observer == true then return {} end
+    end
     return { MODIFIER_EVENT_ON_ATTACK }
 end
 function modifier_rogue_corrosive_shield_attack:OnAttack(params)
+    if self.shared_corrosive_shield_observer == true then return end
+    return self:HandleAttack(params)
+end
+function modifier_rogue_corrosive_shield_attack:HandleAttack(params)
     if not IsServer() or not params or params.attacker ~= self:GetParent() then return end
     local target = params.target
     if not target or target:IsNull() or target:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS then return end
     if target.survival_player_id == nil then return end
     local record = tonumber(params.record)
-    if record and self.seen_records[record] then return end
+    local registration = self.corrosive_shield_registration
+    local counters = registration and registration.state.counters
+    if record and self.seen_records[record] then
+        if counters then counters.duplicate_records = counters.duplicate_records + 1 end
+        return
+    end
     if record then self.seen_records[record] = true end
     local player_context = require("systems/player_context_service")
     local effect_state = require("systems/rogue_effect_state_service")
@@ -146,10 +189,19 @@ function modifier_rogue_corrosive_shield_attack:OnAttack(params)
                     "modifier_research_armor_reduction", {})
             end
             if armor and armor.AddArmorReduction then
-                armor:AddArmorReduction(1, record, "corrosive_shield")
+                if counters then counters.armor_reduction_calls = counters.armor_reduction_calls + 1 end
+                armor:AddArmorReduction(self.armor_reduction_per_attack, record, "corrosive_shield")
             end
             break
         end
+    end
+end
+
+function modifier_rogue_corrosive_shield_attack:OnDestroy()
+    if not IsServer() then return end
+    self.corrosive_shield_destroyed = true
+    if self.corrosive_shield_registration then
+        require("systems/tower_damage_observer").unregister_corrosive_shield(self)
     end
 end
 

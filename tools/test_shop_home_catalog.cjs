@@ -152,8 +152,8 @@ assert.deepEqual(displayed(composed), [second, unavailableId, first]);
 assert.equal(composed[0], products.find(row => row.sku === second), "Compose retains the exact authoritative product reference");
 assert.equal(composed[2], products.find(row => row.sku === first));
 unavailable(composed[1], live.model, "P008", "焚天曜轮");
-assert.deepEqual(displayed(live.model.HomeProducts(products)), [second, unavailableId, first]);
-assert.equal(live.model.Groups({products}).find(row => row.id === "home").count, 3, "Home counts include its unavailable display rows");
+assert.deepEqual(displayed(live.model.HomeProducts(products)), [second, first]);
+assert.equal(live.model.Groups({products}).find(row => row.id === "home").count, 2, "Live home counts exclude unavailable video display rows");
 const bundleSkus = presentation.groups.bundles, vipSkus = presentation.groups.vip;
 const singleSkus = presentation.groups.all.filter(sku => !bundleSkus.includes(sku) && !vipSkus.includes(sku));
 const expectedGroups = {bundles:bundleSkus, promotions:presentation.groups.promotions, vip:vipSkus, all:singleSkus};
@@ -184,7 +184,7 @@ assert.equal(grouped.model.InGroup(vipSingle, "bundles"), false);
 assert.equal(grouped.model.InGroup(vipSingle, "all"), true);
 assert.equal(grouped.model.InGroup(vipSingle, "promotions"), true);
 assert.equal(grouped.model.GroupFor(vipSingle), "promotions");
-assert.deepEqual(displayed(grouped.model.HomeProducts(adversarial)), [unavailableId, first], "A reviewed SKU retyped as a bundle cannot leak through Home composition");
+assert.deepEqual(displayed(grouped.model.HomeProducts(adversarial)), [first], "A reviewed SKU retyped as a bundle cannot leak through Home composition");
 for (const row of [pack, vipPack]) {
     for (const blocked of [{...row, owned:1}, {...row, enabled:false, disabled_reason:"product_unavailable"}])
         assert.equal(grouped.model.InGroup(blocked, grouped.model.GroupFor(row)), false, "Bundle tabs retain ownership and availability filtering");
@@ -192,7 +192,7 @@ for (const row of [pack, vipPack]) {
 const extra = product("server_added_after_home_review", {sort_order:0});
 assert(visible(live.model, [...products, extra], "all").includes(extra.sku), "New formally listed products still enter All");
 assert.deepEqual(visible(live.model, [...products, extra], "home"), [second, first], "Adding an All product cannot leak into Home");
-assert.deepEqual(displayed(live.model.HomeProducts([...products, extra])), [second, unavailableId, first]);
+assert.deepEqual(displayed(live.model.HomeProducts([...products, extra])), [second, first]);
 const mutatedList = home.List(); mutatedList.reverse(); mutatedList.push(extra.sku);
 assert.deepEqual(array(home.List()), [second, unavailableId, first], "List returns an independent copy");
 const mutatedCompose = home.Compose(products, live.model.IsListed); mutatedCompose.reverse(); mutatedCompose.pop();
@@ -206,12 +206,12 @@ unavailable(freshDisplay, live.model, "P008", "焚天曜轮");
 assert.deepEqual(visible(live.model, products, "home"), [second, first]);
 
 assert.deepEqual(visible(live.model, [product(first)], "home"), [first], "Metadata cannot create an absent formal product");
-assert.deepEqual(displayed(live.model.HomeProducts([product(first)])), [unavailableId, first], "An absent real SKU is omitted while the reviewed unavailable row remains");
+assert.deepEqual(displayed(live.model.HomeProducts([product(first)])), [first], "Only present, formally eligible products enter the live home");
 const blocked = [product(first, {owned:1}), product(second, {enabled:false, disabled_reason:"product_unavailable"})];
 assert.deepEqual(visible(live.model, blocked, "home"), [],
     "Owned and delisted products are filtered by existing authoritative availability rules");
-assert.deepEqual(displayed(live.model.HomeProducts(blocked)), [unavailableId]);
-assert.equal(live.model.Groups({products:blocked}).find(row => row.id === "home").count, 1);
+assert.deepEqual(displayed(live.model.HomeProducts(blocked)), []);
+assert.equal(live.model.Groups({products:blocked}).find(row => row.id === "home").count, 0);
 assert.deepEqual(displayed(home.Compose(products, () => false)), [unavailableId], "Compose honors the supplied authoritative listing predicate");
 assert.equal(live.model.InGroup(extra, "home"), false, "An unknown homepage SKU remains outside the list");
 const missing = runtime({catalog:false});
@@ -224,7 +224,7 @@ const late = runtime({catalog:false, lateCatalog:true});
 assert.deepEqual(visible(late.model, products, "home"), []);
 late.inject();
 assert.deepEqual(visible(late.model, products, "home"), [second, first], "Late component loading reads the real independent catalog without rebuilding the model");
-assert.deepEqual(displayed(late.model.HomeProducts(products)), [second, unavailableId, first]);
+assert.deepEqual(displayed(late.model.HomeProducts(products)), [second, first]);
 assert.equal(JSON.stringify(products), productsBefore, "Homepage grouping never rewrites price, grants, ownership or quantity");
 assert.equal(JSON.stringify(presentation), presentationBefore, "The original presentation data remains unchanged");
 
@@ -260,18 +260,19 @@ assert.equal(formal.entries.filter(row => row.kind === "unavailable").length, 5)
 assert.deepEqual(formal.entries.map(row => [row.source_id, row.name, row.sku || null]), expectedHome, "The formal homepage preserves all twenty reviewed entries and their exact video order");
 const formalBlock = api("generated_block", {manifest_blob:productionManifestBefore.toString("base64"), known_skus:knownSkus});
 const formalRuntime = runtime({catalogBlock:formalBlock}), formalRows = formalRuntime.model.HomeProducts(products);
-assert.deepEqual(displayed(formalRows), expectedHome.map(([id, , sku]) => sku || "home_unavailable_" + id));
-assert.equal(formalRuntime.model.Groups({products}).find(row => row.id === "home").count, 20);
-for (let i = 0; i < expectedHome.length; i++) {
-    const [sourceId, name, sku] = expectedHome[i];
-    if (sku) assert.equal(formalRows[i], products.find(row => row.sku === sku));
-    else unavailable(formalRows[i], formalRuntime.model, sourceId, name);
+const liveHome = expectedHome.filter(([, , sku]) => !!sku);
+assert.deepEqual(displayed(formalRows), liveHome.map(([, , sku]) => sku));
+assert.equal(formalRuntime.model.Groups({products}).find(row => row.id === "home").count, 15);
+for (let i = 0; i < liveHome.length; i++) assert.equal(formalRows[i], products.find(row => row.sku === liveHome[i][2]));
+for (const disabled_reason of ['commerce_balance_insufficient','insufficient_balance','vip_level_required','vip_level_insufficient']) {
+    const homeSku=liveHome[0][2], blockedOnlyByPlayer = product(homeSku, {enabled:false, disabled_reason, required_vip_level:3});
+    assert.deepEqual(displayed(formalRuntime.model.HomeProducts([blockedOnlyByPlayer])), [homeSku], 'Player-only restrictions remain visible: '+disabled_reason);
 }
 const allOwned = products.map(row => ({...row, owned:1}));
 const unavailableOnly = formalRuntime.model.HomeProducts(allOwned);
-assert.equal(unavailableOnly.length, 5, "All five reviewed display rows remain when actual products are owned");
-assert.equal(formalRuntime.model.Groups({products:allOwned}).find(row => row.id === "home").count, 5);
+assert.equal(unavailableOnly.length, 0, "Unopened display rows cannot fill an otherwise empty live home");
+assert.equal(formalRuntime.model.Groups({products:allOwned}).find(row => row.id === "home").count, 0);
 if (productionManifestBefore) assert.deepEqual(fs.readFileSync(productionManifest), productionManifestBefore, "The formal homepage manifest remains untouched");
 else assert(!fs.existsSync(productionManifest), "The test never creates a formal homepage manifest");
 
-console.log("SHOP_HOME_CATALOG_PASS: twenty reviewed home entries; 114 singles, 5 ordinary bundles, 25 promotions, 10 VIP bundles; exclusive tabs, references/copies, availability, strict empty fallback");
+console.log("SHOP_HOME_CATALOG_PASS: twenty reviewed entries, fifteen formal live home products; unopened placeholders hidden, player restrictions retained; exclusive tabs, references/copies and strict empty fallback");

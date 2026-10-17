@@ -42,7 +42,7 @@ assert.equal(snapshot.catalog_hash,"v1");assert.equal(snapshot.products[0].owned
 assert.equal($("#PaymentBuy").enabled,false);
 cfg.SurvivalPayments.RefreshCatalog(true);
 respond({...initial,catalog_hash:"v2",products:[{...product,title:"新礼包",amount_fen:6000}]});
-assert.equal($("#PaymentPrice").text,"¥60.00","server changes replace the cached price");
+assert.equal($("#PaymentPrice").text,"合计 ¥60.00","server changes replace the cached price");
 cfg.SurvivalPayments.Checkout(product.sku);scope.PaymentBuy();
 const create=requests.at(-1);assert.equal(create.action,"create");
 respond({ok:false,error:"payment_busy"},requests[0]);scope.PaymentBuy();

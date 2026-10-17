@@ -40,8 +40,16 @@ MODEL_HOME_OLD = '''    function homeProducts(items){
         return home&&typeof home.Compose==="function"?home.Compose(rows(items),isListed):[];
     }
 '''
-MODEL_HOME = MODEL_HOME_OLD.replace('home.Compose(rows(items),isListed)',
-                                   'home.Compose(rows(items),function(item){return item.product_type!=="bundle"&&isListed(item);})')
+MODEL_HOME_PREVIOUS = MODEL_HOME_OLD.replace('home.Compose(rows(items),isListed)',
+                                            'home.Compose(rows(items),function(item){return item.product_type!=="bundle"&&isListed(item);})')
+MODEL_HOME = '''    function homeProducts(items){
+        var home=config&&config.SurvivalShopHomeCatalog;
+        var composed=home&&typeof home.Compose==="function"?home.Compose(rows(items),function(item){return item.product_type!=="bundle"&&isListed(item);}):[];
+        // Reviewed video placeholders have no formal SKU or buying eligibility.
+        // Keep them in the source evidence, never in the live storefront.
+        return rows(composed).filter(function(item){return item.product_type!=="bundle"&&isListed(item);});
+    }
+'''
 MODEL_VIP_OLD = '    function isVip(item){return number(item.required_vip_level)>0||listedInVideo(item,"vip")||item.category_id==="vip";}'
 MODEL_VIP = '    function isVip(item){return number(item.required_vip_level)>0||item.category_id==="vip";}'
 MODEL_GROUPS_OLD = '''    function inGroup(item,id){
@@ -216,6 +224,9 @@ def patch_model_source(original):
     legacy_helper = MODEL_HOME_OLD.replace("\n", newline)
     if legacy_helper in text:
         text = replace_once(text, legacy_helper, helper, "home single-product filter")
+    previous_helper = MODEL_HOME_PREVIOUS.replace("\n", newline)
+    if previous_helper in text:
+        text = replace_once(text, previous_helper, helper, "home formal-product filter")
     if helper not in text:
         text = replace_once(text, "    function groups(catalog){", helper + "    function groups(catalog){", "home composition")
     text = replace_once(text,

@@ -1,11 +1,16 @@
--- Four exclusive contacts PER FACE. Front owners use a bounded navigation
--- hull and phased movement; rear bodies keep their configured collision hull.
+-- Four exclusive contacts per face. Native movement and fixed collision
+-- bodies remain active throughout approach, waiting, attack and replacement.
 local M = {}
 local states = {}
+local navigation = require('systems/wall_navigation_service')
 local HALF, COUNT, ENGAGE_DISTANCE = 128, 4, 512
-local FRONT_HULL, LANE_PITCH, CONTACT_NORMAL = 24, 48, 184
+-- Hull32 has padded radius42. Four centers fit a384 stair without shrinking
+-- any body; terrain may reject an outer contact on an offset placement.
+local LANE_PITCH, CONTACT_NORMAL = 88, 184
 local STALL_SECONDS, POSITION_CACHE_SECONDS = 3, 2
-local SETTLE_DISTANCE, WAIT_CLEARANCE, RETREAT_ALLOWANCE = 64, 8, 32
+local PATH_STEP_SECONDS, PATHS_PER_STEP = 0.5, 16
+local SETTLE_DISTANCE, WAIT_CLEARANCE, RETREAT_ALLOWANCE = 36, 8, 32
+local MAX_NATIVE_ROUTE = ENGAGE_DISTANCE*3
 local function alive(u) return u and not u:IsNull() and u:IsAlive() end
 local function distance(a,b)
     local x,y=a.x-b.x,a.y-b.y
@@ -13,38 +18,12 @@ local function distance(a,b)
 end
 local function now() return GameRules:GetGameTime() end
 local function hull(u) return math.max(1,u:GetHullRadius()) end
+local function body_radius(u)
+    local radius=hull(u)
+    return math.max(radius,u.GetPaddedCollisionRadius and u:GetPaddedCollisionRadius() or radius+10)
+end
 local function valid(u) return u and not u:IsNull() end
-local function valid_radius(value)
-    local radius=tonumber(value)
-    if radius and radius==radius and radius>=0 and radius<math.huge then return radius end
-end
--- Keep the collision policy separate from a contact's temporary native hull.
--- A debug hull-scale change during contact must survive release/cleanup.
-local function front_hull(claim)
-    local unit=claim.unit
-    local current=unit:GetHullRadius()
-    local policy=valid_radius(unit.survival_monster_hull_radius)
-    if policy and policy~=claim.policy_hull then
-        claim.original_hull=policy
-    elseif current~=claim.front_hull then
-        claim.original_hull=current
-    end
-    claim.policy_hull=policy
-    local radius=math.min(FRONT_HULL,claim.original_hull)
-    if current~=radius then
-        if not unit.SetHullRadius then return false end
-        local ok=pcall(unit.SetHullRadius,unit,radius)
-        local applied=unit:GetHullRadius()
-        if not ok or applied~=radius then
-            -- Do not reserve a slot on the assumption that a native mutation
-            -- worked. Even a failing setter must not leak a partial adjustment.
-            if applied~=current then pcall(unit.SetHullRadius,unit,current) end
-            return false
-        end
-    end
-    claim.front_hull=radius
-    return true
-end
+function M.recovery_radius(wall,unit) return hull(unit) end
 local retire_claim,clear_state
 local function interrupted(u)
     return (u.IsStunned and u:IsStunned())
@@ -55,15 +34,19 @@ local function moved(a,b)
     local x,y=a.x-b.x,a.y-b.y
     return x*x+y*y>=64
 end
--- Arrival is only an opportunity to settle, never permission to root at an
--- arbitrary offset. A little navigation slack is needed at narrow gate edges.
+-- Native MOVE can stop32 short. The old64 tolerance also admitted a second
+-- row behind a live blocker. Never teleport an entrant into its reserved slot.
 function M.arrived(wall,unit,point,retained)
     local p=unit:GetAbsOrigin()
-    return distance(p,point)<=(retained and 1 or SETTLE_DISTANCE)
+    return distance(p,point)<=(retained and 48 or SETTLE_DISTANCE)
         and math.abs(p.z-point.z)<=32
 end
-local function clear_point(wall,unit,point,check_radius)
-    if math.abs(GetGroundHeight(point,unit)-wall:GetAbsOrigin().z)>128 then return false end
+function M.entry_ready(wall,unit,point)
+    -- Legacy API: every route retains native unit and terrain collision.
+    return true
+end
+local function clear_point(wall,unit,point,check_radius,ground_move)
+    if not ground_move and math.abs(GetGroundHeight(point,unit)-wall:GetAbsOrigin().z)>128 then return false end
     -- Touching the terrain edge is valid; sample inside the hull instead of
     -- stepping exactly onto the next navigation cell at a narrow gate's edge.
     local radius=math.max(0,(check_radius or hull(unit))-1)
@@ -73,11 +56,11 @@ local function clear_point(wall,unit,point,check_radius)
     end
     return true
 end
-local function safe_segment(unit,p,point,radius)
+local function safe_segment(unit,p,point,radius,ground_move)
     local steps=math.max(1,math.ceil(distance(p,point)/16))
     radius=math.max(0,radius-1)
     for index,offset in ipairs({{0,0},{radius,0},{-radius,0},{0,radius},{0,-radius}}) do
-        local cleared=false
+        local cleared,previous_ground=false,nil
         for step=0,steps do
             local t=step/steps
             local sample=Vector(p.x+(point.x-p.x)*t+offset[1],
@@ -87,36 +70,17 @@ local function safe_segment(unit,p,point,radius)
             -- obstacle, reenter one, or align through an invalid center.
             if not clear and (index==1 or cleared or step==steps) then return false end
             cleared=cleared or clear
-            if index==1 and math.abs(GetGroundHeight(sample,unit)-point.z)>32 then return false end
+            if index==1 then
+                local ground=GetGroundHeight(sample,unit)
+                -- Native MOVE follows a continuous stair. Validate each
+                -- adjacent terrain sample rather than one flat-height chord.
+                local reference=ground_move and (previous_ground or p.z) or point.z
+                if math.abs(ground-reference)>32 then return false end
+                previous_ground=ground
+            end
         end
     end
     return true
-end
-local function exit_front(s,claim,radius)
-    local unit,wall=claim.unit,s.wall
-    if radius<=claim.front_hull or not alive(unit) or not valid(wall) or not unit.SetAbsOrigin
-        or (unit.IsStunned and unit:IsStunned())
-        or (unit.IsCommandRestricted and unit:IsCommandRestricted())
-        or (unit.IsCurrentlyHorizontalMotionControlled and unit:IsCurrentlyHorizontalMotionControlled())
-        or (unit.IsCurrentlyVerticalMotionControlled and unit:IsCurrentlyVerticalMotionControlled()) then return end
-    local p=unit:GetAbsOrigin()
-    if distance(p,claim.point)>SETTLE_DISTANCE or clear_point(wall,unit,p,radius) then return end
-    local origin=wall:GetAbsOrigin()
-    local x_axis=claim.face<=2
-    local sign=(claim.face==1 or claim.face==3) and -1 or 1
-    local normal=math.max(sign*(x_axis and p.x-origin.x or p.y-origin.y),HALF+radius+32)
-    local along=x_axis and p.y-origin.y or p.x-origin.x
-    -- This is one short collision correction on exit, not movement on a
-    -- timer. Restore larger bodies outside the wall and any narrow bank.
-    for step=0,8 do
-        local lateral=(along<0 and -1 or 1)*math.max(0,math.abs(along)-step*16)
-        local point=x_axis and Vector(origin.x+sign*normal,origin.y+lateral,p.z)
-            or Vector(origin.x+lateral,origin.y+sign*normal,p.z)
-        point.z=GetGroundHeight(point,unit)
-        if distance(p,point)<=128 and clear_point(wall,unit,point,radius)
-            and safe_segment(unit,p,point,radius) then unit:SetAbsOrigin(point);return end
-        if lateral==0 then return end
-    end
 end
 retire_claim=function(s,id)
     local claim=s.claims[id]
@@ -124,24 +88,45 @@ retire_claim=function(s,id)
     s.claims[id]=nil
     local face=s.faces[claim.face]
     face.claims[id]=nil;face.slots[claim.lane]=nil;face.count=face.count-1
-    local unit=claim.unit
-    -- Death still leaves a valid corpse entity; restore it too. Preserve an
-    -- external native hull change instead of replacing it with an old backup.
-    if valid(unit) and unit.SetHullRadius and unit:GetHullRadius()==claim.front_hull then
-        local policy=valid_radius(unit.survival_monster_hull_radius)
-        local radius=(policy and policy~=claim.policy_hull) and policy or claim.original_hull
-        if radius~=claim.front_hull then
-            exit_front(s,claim,radius)
-            pcall(unit.SetHullRadius,unit,radius)
-        end
-    end
+    face.replacement_priority=true;face.priority_dirty=true
+    face.priority_owner,face.priority_candidate=nil,nil
+    s.count=s.count-1;s.revision=s.revision+1
 end
 clear_state=function(s)
     for id in pairs(s.claims) do retire_claim(s,id) end
 end
--- A single bounded alignment on entry, not a per-frame movement controller.
--- Sample the short segment (including the hull) so alignment cannot cross a
--- cliff, newly built obstruction, or the wall itself. External control wins.
+-- Only admission checks real bodies, after native MOVE has actually reached
+-- a contact. Cache one local snapshot per wall/observation; a dense queue must
+-- not cause one neighbour query per waiting monster. No actor is phase-exempt.
+local function bodies_clear(wall,unit,point)
+    if type(FindUnitsInRadius)~='function' then return true end
+    local s=states[wall:entindex()]
+    local stamp=math.floor(now()/PATH_STEP_SECONDS)
+    local snapshot=s and s.bodies
+    if not snapshot or snapshot.stamp~=stamp then
+        local flags=(DOTA_UNIT_TARGET_FLAG_INVULNERABLE or 0)+(DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES or 0)
+        snapshot={stamp=stamp,units=FindUnitsInRadius(unit:GetTeamNumber(),wall:GetAbsOrigin(),nil,ENGAGE_DISTANCE,
+            DOTA_UNIT_TARGET_TEAM_BOTH,DOTA_UNIT_TARGET_BASIC+DOTA_UNIT_TARGET_HERO,flags,FIND_ANY_ORDER,false)}
+        if s then s.bodies=snapshot end
+    end
+    local radius=hull(unit)
+    for _,other in ipairs(snapshot.units) do
+        if other~=unit and other~=wall and alive(other) then
+            -- Native Hull0 builders/visual carriers occupy no physical body.
+            -- Positive monster hulls remain solid regardless of old AI flags.
+            local other_radius=other:GetHullRadius()
+            if other_radius>0 then
+                local limit=radius+other_radius
+                if distance(point,other:GetAbsOrigin())<limit-.5 then return false end
+            end
+        end
+    end
+    return true
+end
+-- Compatibility hook for existing observers. Contacts never mutate hulls,
+-- so release/death/cleanup has no temporary radius to restore.
+function M.restore_hull(unit,force) return false end
+
 function M.settle(wall,unit,point)
     if not M.arrived(wall,unit,point,false) or interrupted(unit)
         or (unit.IsCurrentlyHorizontalMotionControlled and unit:IsCurrentlyHorizontalMotionControlled())
@@ -149,32 +134,41 @@ function M.settle(wall,unit,point)
     local s=states[wall:entindex()]
     local claim=s and s.claims[unit:entindex()]
     if not claim or claim.unit~=unit or claim.point~=point then return false end
-    if not clear_point(wall,unit,point) then return false end
     local p=unit:GetAbsOrigin()
-    local length=distance(p,point)
-    if length>0.01 then
-        if not unit.SetAbsOrigin then return false end
-        if not safe_segment(unit,p,point,hull(unit)) then return false end
-        unit:SetAbsOrigin(Vector(point.x,point.y,point.z))
-    end
-    claim.arrived=M.arrived(wall,unit,point,true)
-    return claim.arrived
+    if not clear_point(wall,unit,p) or not clear_point(wall,unit,point)
+        or not safe_segment(unit,p,point,hull(unit))
+        or not bodies_clear(wall,unit,p) then return false end
+    claim.arrived=true;claim.settled=true
+    return true
 end
 
-local function contact_back_edge(origin,point,radius)
-    return math.max(math.abs(point.x-origin.x),math.abs(point.y-origin.y))+radius
+-- An intruding body may move back to its waiting goal, using ordinary native
+-- collision. If live rear bodies block that MOVE it waits or takes a real detour.
+function M.can_retreat(wall,unit,point)
+    if not point or interrupted(unit)
+        or (unit.IsCurrentlyHorizontalMotionControlled and unit:IsCurrentlyHorizontalMotionControlled())
+        or (unit.IsCurrentlyVerticalMotionControlled and unit:IsCurrentlyVerticalMotionControlled()) then return false end
+    return clear_point(wall,unit,point,nil,true)
+        and safe_segment(unit,unit:GetAbsOrigin(),point,hull(unit),true)
+end
+
+local function contact_back_edge(origin,point,radius,face)
+    local normal=face<=2 and point.x-origin.x or point.y-origin.y
+    if face==1 or face==3 then normal=-normal end
+    return normal+radius
 end
 local function waiting_point(wall,unit,source,front_edge)
     local point=source.point
     local origin=wall:GetAbsOrigin()
     local dx,dy=point.x-origin.x,point.y-origin.y
-    local x_axis=math.abs(dx)>math.abs(dy)
-    local sign=(x_axis and dx or dy)<0 and -1 or 1
+    local x_axis=source.face<=2
+    local sign=(source.face==1 or source.face==3) and -1 or 1
     local radius=hull(unit)
-    if front_edge<=0 then front_edge=contact_back_edge(origin,point,radius) end
+    local body=body_radius(unit)
+    if front_edge<=0 then front_edge=contact_back_edge(origin,point,body,source.face) end
     -- Leave one body diameter plus a small margin, not a fixed empty row.
     -- Use the whole front's rear edge so a larger adjacent contact is safe too.
-    local normal=front_edge+radius+WAIT_CLEARANCE
+    local normal=front_edge+body+WAIT_CLEARANCE
     local current=unit:GetAbsOrigin()
     local inside=sign*(x_axis and current.x-origin.x or current.y-origin.y)<normal
     -- A unit retreating out of the front can stop short of its MOVE goal.
@@ -189,20 +183,29 @@ local function waiting_point(wall,unit,source,front_edge)
     local key=inside and 2 or 1
     if points[key]~=nil then return points[key] end
     if inside then normal=normal+RETREAT_ALLOWANCE end
-    local p
     -- A larger waiter may not fit the small attacker's outer lane.
-    local lateral_limit=math.max(0,HALF-radius)
-    if x_axis then
-        p=Vector(origin.x+sign*normal,
-            origin.y+math.max(-lateral_limit,math.min(lateral_limit,dy)),point.z)
-    else
-        p=Vector(origin.x+math.max(-lateral_limit,math.min(lateral_limit,dx)),
-            origin.y+sign*normal,point.z)
+    local lateral_min=(source.lateral_min or -HALF)+radius
+    local lateral_max=(source.lateral_max or HALF)-radius
+    local function candidate(along)
+        if lateral_min>lateral_max then return false end
+        along=math.max(lateral_min,math.min(lateral_max,along))
+        local p=x_axis and Vector(origin.x+sign*normal,origin.y+along,point.z)
+            or Vector(origin.x+along,origin.y+sign*normal,point.z)
+        p.z=GetGroundHeight(p,unit)
+        return clear_point(wall,unit,p) and p or false
     end
-    p.z=GetGroundHeight(p,unit)
-    -- At bends the full setback may be outside the path. Keep the unit at its
-    -- current position rather than give it an unreachable/front-row wait goal.
-    points[key]=clear_point(wall,unit,p) and p or false
+    local p=candidate(x_axis and dy or dx)
+    -- A blocked nearest lane must not leave an intruding waiter in the front
+    -- while another rear lane is open. This bounded check shares the existing
+    -- size/face geometry cache; stable rear units still do no path searches.
+    if not p and inside then
+        for lane=1,COUNT do
+            p=candidate((source.lateral_center or 0)+(lane-(COUNT+1)*0.5)*(source.lane_pitch or LANE_PITCH))
+            if p then break end
+        end
+        if not p then p=candidate(source.lateral_center or 0) end
+    end
+    points[key]=p
     return points[key]
 end
 local function state_for(wall)
@@ -210,42 +213,200 @@ local function state_for(wall)
     local s=states[id]
     if not s or s.wall~=wall then
         if s then clear_state(s) end
-        s={wall=wall,claims={},faces={},positions={},retries={},failed={},retry_sweep=0}
+        s={wall=wall,claims={},waiters={},faces={},positions={},staging={},retries={},failed={},retry_sweep=0,
+            count=0,revision=0,layout=navigation.contact_layout and navigation.contact_layout(wall)}
+        s.lane_pitch=LANE_PITCH
         for side=1,4 do s.faces[side]={claims={},slots={},count=0} end
         states[id]=s
     end
     return s
 end
-local function positions(s,unit,stamp)
-    local radius=math.min(FRONT_HULL,hull(unit))
+local positions,face_for
+local function forget_waiter(s,id)
+    local record=s.waiters[id]
+    if not record then return end
+    s.waiters[id]=nil
+    local face=s.faces[record.face]
+    if face.priority_owner==record.unit then
+        face.priority_owner,face.priority_candidate=nil,nil;face.priority_dirty=true
+    end
+end
+local function observe_waiter(s,unit,side,stamp)
+    local id=unit:entindex()
+    local record=s.waiters[id]
+    if record and (record.unit~=unit or record.face~=side) then forget_waiter(s,id);record=nil end
+    if not record then
+        record={unit=unit,face=side};s.waiters[id]=record
+        local face=s.faces[side]
+        if not face.priority_owner then face.priority_dirty=true end
+    end
+    record.updated=stamp
+end
+local function eligible_waiter(s,record,side,stamp)
+    local u=record and record.unit
+    if not alive(u) or record.face~=side or s.claims[u:entindex()]
+        or stamp-record.updated>2 then return false end
+    local owner=u.survival_wall_contact_owner
+    if owner and owner.wall_entindex~=s.wall:entindex() then return false end
+    local p=u:GetAbsOrigin()
+    if distance(p,s.wall:GetAbsOrigin())>ENGAGE_DISTANCE or interrupted(u)
+        or (u.IsCurrentlyHorizontalMotionControlled and u:IsCurrentlyHorizontalMotionControlled())
+        or (u.IsCurrentlyVerticalMotionControlled and u:IsCurrentlyVerticalMotionControlled()) then return false end
+    local retry=s.retries[u:entindex()]
+    if retry and retry.unit==u and stamp<retry.until_time then return false end
+    local failed=s.failed[u:entindex()]
+    if failed and failed.unit==u and stamp<failed.until_time and not moved(p,failed.position) then return false end
+    return true,p
+end
+-- A nearby body may already hold an unfulfilled route around the wall. A
+-- real vacancy on its physical face may take precedence over that farther
+-- route; a settled attacker or a body already around the corner is untouched.
+local function eligible_route_owner(s,claim,side,stamp,point)
+    local u=claim and claim.unit
+    if not alive(u) or claim.settled or claim.face==side
+        or s.claims[u:entindex()]~=claim or stamp-claim.updated>2 then return false end
+    local owner=u.survival_wall_contact_owner
+    if owner and owner.wall_entindex~=s.wall:entindex() then return false end
+    local p=u:GetAbsOrigin()
+    if distance(p,s.wall:GetAbsOrigin())>ENGAGE_DISTANCE
+        or face_for(p,s.wall:GetAbsOrigin())~=side or interrupted(u)
+        or (u.IsCurrentlyHorizontalMotionControlled and u:IsCurrentlyHorizontalMotionControlled())
+        or (u.IsCurrentlyVerticalMotionControlled and u:IsCurrentlyVerticalMotionControlled()) then return false end
+    local retry=s.retries[u:entindex()]
+    if retry and retry.unit==u and retry.face==side and stamp<retry.until_time then return false end
+    local failed=s.failed[u:entindex()]
+    if failed and failed.unit==u and failed.face==side
+        and stamp<failed.until_time and not moved(p,failed.position) then return false end
+    if point and distance(p,point)+SETTLE_DISTANCE>=distance(p,claim.point) then return false end
+    return true,p
+end
+local function vacant_candidate(s,unit,candidate)
+    local face=s.faces[candidate.face]
+    if face.slots[candidate.lane] then return false end
+    for _,claim in pairs(s.claims) do
+        if claim.unit~=unit and distance(candidate.point,claim.point)<hull(unit)+hull(claim.unit)+4 then
+            return false
+        end
+    end
+    return true
+end
+-- Only a vacated contact enables replacement priority. Maintain observations
+-- in O(1); scan this wall's already observed local waiters once per vacancy,
+-- stalled owner or invalid nominee. Stable full queues never enter this code.
+local function replacement_owner(s,side,stamp)
+    local face=s.faces[side]
+    if not face.replacement_priority then return nil end
+    local owner=face.priority_owner
+    if owner then
+        local record=s.waiters[owner:entindex()]
+        if record and record.unit==owner and eligible_waiter(s,record,side,stamp) then return owner end
+        local claim=s.claims[owner:entindex()]
+        local candidate=face.priority_candidate
+        if claim and claim.unit==owner and candidate and vacant_candidate(s,owner,candidate)
+            and eligible_route_owner(s,claim,side,stamp,candidate.point) then return owner end
+        face.priority_owner,face.priority_candidate=nil,nil;face.priority_dirty=true
+    end
+    if not face.priority_dirty then return nil end
+    face.priority_dirty=false
+    local nearest,nearest_candidate,best_distance,best_id,by_radius
+    by_radius={}
+    local function consider(unit,p,claim)
+            local id=unit:entindex()
+            local radius=hull(unit)
+            local candidates=by_radius[radius]
+            if not candidates then
+                candidates={};by_radius[radius]=candidates
+                for _,candidate in ipairs(positions(s,unit,stamp)) do
+                    if candidate.face==side and not face.slots[candidate.lane] then
+                        local blocker
+                        for _,other in pairs(s.claims) do
+                            if distance(candidate.point,other.point)<radius+hull(other.unit)+4 then
+                                if blocker then blocker=true;break end
+                                blocker=other.unit
+                            end
+                        end
+                        -- Cache this geometry once per radius, not once per
+                        -- waiting monster. Only the sole displaced owner's
+                        -- own reservation may be released by its transfer.
+                        if blocker~=true then
+                            candidates[#candidates+1]={source=candidate,blocker=blocker}
+                        end
+                    end
+                end
+            end
+            for _,cached in ipairs(candidates) do
+                local candidate=cached.source
+                local point=candidate.point
+                local dx,dy=p.x-point.x,p.y-point.y
+                local d=dx*dx+dy*dy
+                local nearer=not claim or distance(p,point)+SETTLE_DISTANCE<distance(p,claim.point)
+                if nearer and (not cached.blocker or cached.blocker==unit)
+                    and (not best_distance or d<best_distance or (d==best_distance and id<best_id)) then
+                    nearest,nearest_candidate,best_distance,best_id=unit,candidate,d,id
+                end
+            end
+    end
+    for id,record in pairs(s.waiters) do
+        local eligible,p=eligible_waiter(s,record,side,stamp)
+        if eligible then consider(record.unit,p)
+        elseif not alive(record.unit) or stamp-record.updated>2
+            or distance(record.unit:GetAbsOrigin(),s.wall:GetAbsOrigin())>ENGAGE_DISTANCE then
+            forget_waiter(s,id)
+        end
+    end
+    -- At most sixteen registered claim owners, never a map/body search.
+    for _,claim in pairs(s.claims) do
+        local eligible,p=eligible_route_owner(s,claim,side,stamp)
+        if eligible then consider(claim.unit,p,claim) end
+    end
+    face.priority_owner,face.priority_candidate=nearest,nearest_candidate
+    return nearest
+end
+positions=function(s,unit,stamp)
+    local radius=hull(unit)
     local cached=s.positions[radius]
     if cached and stamp-cached.updated<POSITION_CACHE_SECONDS then return cached.points end
     local p=s.wall:GetAbsOrigin()
     local result={}
-    -- Fixed slots do not change with model size or hull debug multipliers.
-    -- Diameter 48, lanes +/-72 and +/-24 leave 32 units of lateral slack.
+    -- Fixed keys never move when a model changes. Full physical hulls filter
+    -- terrain, and neighbouring reservations must fit their padded bodies.
     for side=1,4 do
+        local layout=s.layout
+        local allowed=not layout or not layout.gate
+            or (layout.axis==1 and side<=2) or (layout.axis==2 and side>=3)
+        -- Slots belong to the actual wall face. Terrain may remove an outer
+        -- slot; it must not slide the row away from the wall to manufacture a
+        -- fourth attacker on an offset staircase.
+        local center,low,high=0,-(COUNT*s.lane_pitch)*.5,(COUNT*s.lane_pitch)*.5
         for lane=1,COUNT do
-            local along=(lane-(COUNT+1)*0.5)*LANE_PITCH
+            local along=center+(lane-(COUNT+1)*0.5)*s.lane_pitch
             -- Keep endpoints outside the engine's inflated navigation cell.
-            local normal=CONTACT_NORMAL
+            local normal=math.max(CONTACT_NORMAL,HALF+radius+24)
             local x,y
             if side<=2 then x=(side==1 and -normal or normal);y=along
             else x=along;y=(side==3 and -normal or normal) end
             local point=Vector(p.x+x,p.y+y,p.z)
             point.z=GetGroundHeight(point,unit)
-            if clear_point(s.wall,unit,point,radius) then
-                result[#result+1]={point=point,key=side..":"..lane,face=side,lane=lane}
+            if allowed and clear_point(s.wall,unit,point,radius) then
+                result[#result+1]={point=point,key=side..":"..lane,face=side,lane=lane,
+                    lateral_center=center,lateral_min=low,lateral_max=high,lane_pitch=s.lane_pitch}
             end
         end
     end
     s.positions[radius]={points=result,updated=stamp}
     return result
 end
+-- Shared read-only candidates for target reachability. This performs cached
+-- terrain filtering only: no reservation, hull mutation, path query or order.
+function M.approach_points(wall,unit)
+    if not alive(wall) or not alive(unit) then return {} end
+    return positions(state_for(wall),unit,now())
+end
 function M.release(wall_index,unit_index)
     local s=states[tonumber(wall_index)]
     if s then
         retire_claim(s,tonumber(unit_index))
+        forget_waiter(s,tonumber(unit_index))
         s.retries[tonumber(unit_index)]=nil
         s.failed[tonumber(unit_index)]=nil
     end
@@ -259,23 +420,86 @@ function M.reset()
     states={}
 end
 
-local function face_for(p,origin)
+face_for=function(p,origin)
     local dx,dy=p.x-origin.x,p.y-origin.y
     if math.abs(dx)>=math.abs(dy) then return dx<0 and 1 or 2 end
     return dy<0 and 3 or 4
+end
+local function path_budget(s,stamp)
+    local step=math.floor(stamp/PATH_STEP_SECONDS)
+    if s.path_step~=step then s.path_step=step;s.paths_left=PATHS_PER_STEP end
+    return s.paths_left
+end
+local function grant_claim(s,unit,source,p,stamp)
+    local id=unit:entindex()
+    local claim={unit=unit,point=source.point,key=source.key,face=source.face,lane=source.lane,updated=stamp,
+        lateral_center=source.lateral_center,lateral_min=source.lateral_min,
+        lateral_max=source.lateral_max,lane_pitch=s.lane_pitch,
+        progress_position=p,progress_time=stamp,nav_checked=stamp,arrived=false,
+        physical_face=face_for(p,s.wall:GetAbsOrigin())}
+    s.claims[id]=claim
+    forget_waiter(s,id)
+    local face=s.faces[source.face]
+    face.claims[id]=claim;face.slots[source.lane]=id;face.count=face.count+1
+    face.priority_owner,face.priority_candidate=nil,nil;face.priority_dirty=true
+    if claim.physical_face~=claim.face then
+        local physical=s.faces[claim.physical_face]
+        if physical.replacement_priority and not physical.priority_owner then physical.priority_dirty=true end
+    end
+    s.count=s.count+1;s.revision=s.revision+1
+    return claim
 end
 local function clean_face(s,side,origin,stamp)
     local face=s.faces[side]
     local front_edge=0
     for id,c in pairs(face.claims) do
-        if not alive(c.unit) or stamp-c.updated>2
-            or distance(c.unit:GetAbsOrigin(),origin)>ENGAGE_DISTANCE+64 then
-            retire_claim(s,id)
+        local p=alive(c.unit) and c.unit:GetAbsOrigin()
+        if not p or stamp-c.updated>2
+            or distance(p,origin)>ENGAGE_DISTANCE+64 then
+            retire_claim(s,id,p~=nil)
         else
-            front_edge=math.max(front_edge,contact_back_edge(origin,c.point,hull(c.unit)))
+            -- Native MOVE may stop short of its contact. Rear goals must
+            -- clear the settled physical body, not its former nominal goal.
+            front_edge=math.max(front_edge,contact_back_edge(origin,
+                c.settled and p or c.point,body_radius(c.unit),side))
         end
     end
     return front_edge
+end
+local function transfer_to_near_vacancy(s,unit,own,p,stamp)
+    if own.settled then return nil end
+    local side=face_for(p,s.wall:GetAbsOrigin())
+    local face=s.faces[side]
+    if own.physical_face~=side then
+        own.physical_face=side
+        if face.replacement_priority and not face.priority_owner then face.priority_dirty=true end
+    end
+    if side==own.face or not face.replacement_priority or face.count>=COUNT then return nil end
+    clean_face(s,side,s.wall:GetAbsOrigin(),stamp)
+    local vacant=false
+    for _,candidate in ipairs(positions(s,unit,stamp)) do
+        if candidate.face==side and not face.slots[candidate.lane] then vacant=true;break end
+    end
+    -- Three terrain-valid slots occupied is already a full partial face.
+    -- Do not rescan its waiters whenever another remote lease is renewed.
+    if not vacant then return nil end
+    if replacement_owner(s,side,stamp)~=unit then return nil end
+    local candidate=face.priority_candidate
+    if not candidate or not eligible_route_owner(s,own,side,stamp,candidate.point)
+        or not vacant_candidate(s,unit,candidate) or path_budget(s,stamp)<=0 then return nil end
+    s.paths_left=s.paths_left-1
+    local path=GridNav:FindPathLength(p,candidate.point)
+    if not clear_point(s.wall,unit,candidate.point) or not path or path<0 or path>MAX_NATIVE_ROUTE
+        or path+SETTLE_DISTANCE>=distance(p,own.point) then
+        -- A rejected shortcut must not destroy a valid in-flight reservation.
+        s.failed[unit:entindex()]={unit=unit,face=side,position=Vector(p.x,p.y,p.z),
+            until_time=stamp+POSITION_CACHE_SECONDS}
+        face.priority_owner,face.priority_candidate=nil,nil;face.priority_dirty=true
+        return nil
+    end
+    retire_claim(s,unit:entindex())
+    s.retries[unit:entindex()],s.failed[unit:entindex()]=nil,nil
+    return grant_claim(s,unit,candidate,p,stamp)
 end
 local function nearest_claim(face,p)
     local nearest,best_distance
@@ -285,16 +509,93 @@ local function nearest_claim(face,p)
     end
     return nearest
 end
-local function waiting_plan(unit,p,side,front_edge,point)
+local function waiting_plan(wall,unit,p,side,front_edge,point)
+    local origin=wall:GetAbsOrigin()
+    local normal=side<=2 and p.x-origin.x or p.y-origin.y
+    if side==1 or side==3 then normal=-normal end
+    local radius=hull(unit)
     return {point=point or p,claimed=false,wait_face=side,wait_envelope=front_edge,
-        wait_radius=hull(unit),waiting_blocked=not point}
+        wait_radius=radius,waiting_blocked=not point,
+        -- A missing rear endpoint does not authorize passing any live body.
+        wait_retreat=front_edge>0 and normal<front_edge+body_radius(unit)+WAIT_CLEARANCE-0.01 or false}
 end
 
-function M.resolve(wall,unit)
+-- A retreat is an ordinary native MOVE to a legal rear point. Do not search
+-- for a phase exit through a crowd, reserve artificial escape bodies, or keep
+-- extending it to force passage. A blocked rear is allowed to remain blocked.
+function M.retreat_point(wall,unit,plan,minimum_normal)
+    local point=plan.point
+    if point and clear_point(wall,unit,point,nil,true) then return point end
+end
+function M.rear_clear(wall,unit) return true end
+function M.extend_retreat(wall,unit,plan,goal) return nil,false end
+
+function M.resolve(wall,unit,preferred_face)
     if not alive(wall) or not alive(unit) then return nil end
     local p,origin=unit:GetAbsOrigin(),wall:GetAbsOrigin()
     local id=unit:entindex()
-    if distance(p,origin)>ENGAGE_DISTANCE then M.release(wall:entindex(),id);return nil end
+    if distance(p,origin)>ENGAGE_DISTANCE then
+        M.release(wall:entindex(),id)
+        local route=unit.survival_wall_route
+        if route and route.wall==wall and route.point
+            and route.revision==(tonumber(wall.survival_wall_relocation_revision) or 0) then
+            -- Formal target selection has already checked this real contact's
+            -- route. Keep ordinary collision while moving there; reservation
+            -- and final entry still happen only inside the local contact area.
+            return {point=route.point,claimed=false,wait_face=preferred_face or face_for(p,origin),
+                wait_envelope=0,wait_radius=hull(unit),waiting_blocked=false,wait_retreat=false}
+        end
+        local layout=navigation.contact_layout and navigation.contact_layout(wall)
+        -- A distant attack-target order may stop at a blocked square or plan
+        -- a whole-map detour around a full doorway. Stage outside the near
+        -- face using native MOVE, including open/partly exposed walls; actual
+        -- contact admission will choose a reachable face inside 512.
+        local side=preferred_face or face_for(p,origin)
+        local x_axis=side<=2
+        local lateral=x_axis and p.y or p.x
+        local center=x_axis and origin.y or origin.x
+        local radius=hull(unit)
+        local low,high=center-HALF+radius,center+HALF-radius
+        if layout and layout.gate then low,high=layout.min+radius,layout.max-radius end
+        lateral=math.max(low,math.min(high,lateral))
+        local sign=(side==1 or side==3) and -1 or 1
+        local state,stamp=state_for(wall),now()
+        if stamp>=(state.staging_sweep or 0) then
+            state.staging_sweep=stamp+POSITION_CACHE_SECONDS
+            for cached_radius,entries in pairs(state.staging) do
+                for cached_key,cached in pairs(entries) do
+                    if stamp-cached.updated>=POSITION_CACHE_SECONDS then entries[cached_key]=nil end
+                end
+                if not next(entries) then state.staging[cached_radius]=nil end
+            end
+        end
+        local stages=state.staging[radius]
+        if not stages then stages={};state.staging[radius]=stages end
+        local key=side..":"..string.format("%.17g",lateral)
+        local stage=stages[key]
+        if not stage or stamp-stage.updated>=POSITION_CACHE_SECONDS then
+            local point=x_axis and Vector(origin.x+sign*320,lateral,origin.z)
+                or Vector(lateral,origin.y+sign*320,origin.z)
+            point.z=GetGroundHeight(point,unit)
+            if not clear_point(wall,unit,point,radius,true) then
+                local best,best_distance
+                for _,candidate in ipairs(M.approach_points(wall,unit)) do
+                    local length=distance(p,candidate.point)
+                    if (not best_distance or length<best_distance)
+                        and clear_point(wall,unit,candidate.point,radius,true) then
+                        best,best_distance=candidate.point,length
+                    end
+                end
+                point=best
+            end
+            stage={point=point,updated=stamp};stages[key]=stage
+        end
+        -- Unknown/legacy callers may use native chase if every safe staging
+        -- point is blocked. Never park them forever at a bad MOVE.
+        if not stage.point then return nil end
+        return {point=stage.point,claimed=false,wait_face=side,wait_envelope=0,
+            wait_radius=radius,waiting_blocked=false,wait_retreat=false}
+    end
     local s=state_for(wall)
     local stamp=now()
     -- Sweep failed reservations once per wall, not once per waiting monster.
@@ -304,7 +605,11 @@ function M.resolve(wall,unit)
             if not alive(retry.unit) or stamp>=retry.until_time then s.retries[index]=nil end
         end
         for index,failed in pairs(s.failed) do
-            if not alive(failed.unit) or stamp>=failed.until_time then s.failed[index]=nil end
+            if not alive(failed.unit) or stamp>=failed.until_time then
+                local face=s.faces[failed.face]
+                if face and face.replacement_priority then face.priority_dirty=true end
+                s.failed[index]=nil
+            end
         end
         -- Orphan cleanup stays bounded by sixteen owners, regardless of the
         -- number of monsters waiting behind any face. No whole-map search.
@@ -312,7 +617,10 @@ function M.resolve(wall,unit)
     end
     local own=s.claims[id]
     if own and own.unit~=unit then retire_claim(s,id);own=nil end
-    local side=own and own.face or face_for(p,origin)
+    if preferred_face~=1 and preferred_face~=2 and preferred_face~=3 and preferred_face~=4 then
+        preferred_face=nil
+    end
+    local side=own and own.face or preferred_face or face_for(p,origin)
     local retry=s.retries[id]
     if retry and retry.unit==unit and stamp<retry.until_time then side=retry.face
     else s.retries[id]=nil;retry=nil end
@@ -321,11 +629,15 @@ function M.resolve(wall,unit)
     own=s.claims[id]
     if own then
         own.updated=stamp
-        own.arrived=M.arrived(wall,unit,own.point,true)
+        local transferred=transfer_to_near_vacancy(s,unit,own,p,stamp)
+        if transferred then return {point=transferred.point,claimed=true} end
+        -- Exact coordinates alone do not authorize a body-blocked contact.
+        -- Only successful settlement may renew a stationary attack lease.
+        own.arrived=own.settled and M.arrived(wall,unit,own.point,true) or false
         local progressed=own.arrived or interrupted(unit) or moved(p,own.progress_position)
         if progressed then own.progress_position=p;own.progress_time=stamp end
         -- Refresh navigation only on the bounded cache cadence, not every tick.
-        local clear=front_hull(own)
+        local clear=true
         if stamp-own.nav_checked>=POSITION_CACHE_SECONDS then
             own.nav_checked=stamp;clear=clear and clear_point(wall,unit,own.point)
         end
@@ -334,23 +646,33 @@ function M.resolve(wall,unit)
         end
         -- A stalled reservation must not renew forever. Keep this unit's face,
         -- and give this unit another point or let a waiting neighbour take over.
-        retire_claim(s,id)
+        retire_claim(s,id,true)
         front_edge=clean_face(s,side,origin,stamp)
         retry={unit=unit,key=own.key,face=side,until_time=stamp+STALL_SECONDS}
         s.retries[id]=retry
     end
-    -- Bounded hot path: inspect at most four claims; no sorting, path searches
-    -- or per-waiter queue scans. Wait geometry is checked once per cached size.
-    if face.count>=COUNT then
+    observe_waiter(s,unit,side,stamp)
+    -- A sealed gate owns only its approach end. On open ground, a full face
+    -- may route to another free face instead of holding every later arrival.
+    -- Once all sixteen contacts are held, the normal waiting path remains
+    -- constant work and does not search any routes or scan the waiting crowd.
+    if face.count>=COUNT and (preferred_face or retry or s.count>=COUNT*4) then
         local nearest=nearest_claim(face,p)
-        return waiting_plan(unit,p,side,front_edge,waiting_point(wall,unit,nearest,front_edge))
+        return waiting_plan(wall,unit,p,side,front_edge,waiting_point(wall,unit,nearest,front_edge))
     end
     local failed=s.failed[id]
     if failed and failed.unit==unit and failed.face==side
-        and failed.front_edge==front_edge and stamp<failed.until_time and not moved(p,failed.position) then
-        return waiting_plan(unit,p,side,front_edge,failed.point)
+        and failed.revision==s.revision and failed.front_edge==front_edge
+        and stamp<failed.until_time and not moved(p,failed.position) then
+        return waiting_plan(wall,unit,p,side,front_edge,failed.point)
     end
     s.failed[id]=nil
+    path_budget(s,stamp)
+    if s.paths_left<=0 then
+        local source=nearest_claim(face,p)
+        return waiting_plan(wall,unit,p,side,front_edge,
+            source and waiting_point(wall,unit,source,front_edge))
+    end
     local available=positions(s,unit,stamp)
     local function candidates_for(other_faces)
         local result={}
@@ -366,56 +688,64 @@ function M.resolve(wall,unit)
     end
     local candidates=candidates_for(false)
     local nearest=candidates[1]
-    -- No mid-move stealing: an admitted unit can traverse the crowd, so taking
-    -- its claim would briefly phase both the old and new owner of one contact.
+    -- Do not steal an active route. It retains real collision: a blocked
+    -- owner waits for a real path or relinquishes its stalled reservation.
     local function choose(list)
-        local best,best_path,path_tested
+        local best,best_path,path_tested,deferred
+        local nominees={}
         for _,c in ipairs(list) do
             if best_path and c.distance>best_path then break end
             local target_face=s.faces[c.face]
-            -- Each face has its own four stable keys. A full near face must
-            -- wait locally, never walk to the rear to become a fifth attacker.
-            if target_face.count<COUNT and not target_face.slots[c.lane] and not c.skip then
+            if target_face.count<COUNT and not target_face.slots[c.lane] and not c.skip
+                and nominees[c.face]==nil then
+                nominees[c.face]=replacement_owner(s,c.face,stamp) or false
+            end
+            local priority=nominees[c.face]
+            -- Each face has four exclusive keys, including units still on
+            -- their way around a corner. No fifth owner can use that face.
+            local separated=true
+            for _,other in pairs(s.claims) do
+                if distance(c.point,other.point)<hull(unit)+hull(other.unit)+4 then
+                    separated=false;break
+                end
+            end
+            if (not priority or priority==unit) and separated and target_face.count<COUNT
+                and not target_face.slots[c.lane] and not c.skip then
+                -- A burst of arrivals or unreachable routes must not turn
+                -- into a path search for every monster on the same frame.
+                if s.paths_left<=0 then deferred=true;break end
+                s.paths_left=s.paths_left-1
                 path_tested=true
                 local path=GridNav:FindPathLength(p,c.point)
-                if path and path>=0 and (not best_path or path<best_path) then best,best_path=c,path end
+                if path and path>=0 and path<=MAX_NATIVE_ROUTE and (not best_path or path<best_path) then
+                    best,best_path=c,path;c.native_path_length=path
+                end
             end
         end
-        return best,path_tested
+        return best,path_tested,deferred
     end
-    local best,path_tested=choose(candidates)
-    -- With no engaged local front, an entirely unreachable approach may use
-    -- another genuinely reachable face. Never override a local queue/cooldown.
-    if not best and face.count==0 and not retry and (path_tested or not nearest) then
+    local best,path_tested,deferred=choose(candidates)
+    -- Keep a valid in-flight claim stable, but allow new open-ground arrivals
+    -- to go around the square to any genuinely reachable vacant face.
+    if not best and not deferred and not retry and not preferred_face then
         local others=candidates_for(true)
         for other_side=1,4 do
             if other_side~=side then clean_face(s,other_side,origin,stamp) end
         end
         local tested
-        best,tested=choose(others);path_tested=path_tested or tested
+        best,tested,deferred=choose(others);path_tested=path_tested or tested
     end
     if not best then
         local source=nearest_claim(face,p) or (nearest and nearest.source)
         local wait_point=source and waiting_point(wall,unit,source,front_edge)
-        if path_tested then
-            s.failed[id]={unit=unit,face=side,front_edge=front_edge,position=Vector(p.x,p.y,p.z),point=wait_point,
+        if path_tested and not deferred then
+            s.failed[id]={unit=unit,face=side,revision=s.revision,front_edge=front_edge,
+                position=Vector(p.x,p.y,p.z),point=wait_point,
                 until_time=stamp+POSITION_CACHE_SECONDS}
         end
-        return waiting_plan(unit,p,side,front_edge,wait_point)
+        return waiting_plan(wall,unit,p,side,front_edge,wait_point)
     end
-    local claim={unit=unit,point=best.point,key=best.key,face=best.face,lane=best.lane,updated=stamp,
-        original_hull=unit:GetHullRadius(),
-        policy_hull=valid_radius(unit.survival_monster_hull_radius),
-        progress_position=p,progress_time=stamp,nav_checked=stamp,
-        arrived=M.arrived(wall,unit,best.point,true)}
-    if not front_hull(claim) then
-        s.failed[id]={unit=unit,face=side,front_edge=front_edge,position=Vector(p.x,p.y,p.z),
-            until_time=stamp+POSITION_CACHE_SECONDS}
-        return waiting_plan(unit,p,side,front_edge,nil)
-    end
-    s.claims[id]=claim
-    local target_face=s.faces[best.face]
-    target_face.claims[id]=claim;target_face.slots[best.lane]=id;target_face.count=target_face.count+1
+    grant_claim(s,unit,best.source,p,stamp)
     return {point=best.point,claimed=true}
 end
 

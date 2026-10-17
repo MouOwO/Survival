@@ -122,6 +122,7 @@ local function research_context(player_id)
     local profile = player_profile_service.get_profile(player_id)
     return { technology = technology_stat_manager.get(player_id).final,
         permanent = result and result.totals or {},
+        display_permanent = result and result.display_totals or {},
         profile_stats = profile and profile.save and profile.save.gameplay_stats or {} }
 end
 
@@ -147,7 +148,7 @@ local function apply_research_technology(state, reason, context)
         local bonus_pct = (tonumber(tower.attack_bonus_pct) or 0)
             + (tonumber(permanent.tower_attack_bonus_pct) or 0)
         unit.survival_hud_stat_bonuses = building_display_bonus.tower(base_damage, tower,
-            permanent_result and permanent_result.display_totals or {})
+            context.display_permanent)
         state.runtime_tower_attack_multiplier = 1 + bonus_pct / 100
         state.runtime_tower_technology_attack = tonumber(tower.attack_flat) or 0
         local damage = (base_damage + bonus) * (1 + bonus_pct / 100)
@@ -228,7 +229,7 @@ local function apply_research_technology(state, reason, context)
             + base_war3_armor
                 * (tonumber(permanent.wall_armor_bonus_pct) or 0) / 100
         unit.survival_hud_stat_bonuses = building_display_bonus.wall(base_health, base_war3_armor, wall,
-            permanent_result and permanent_result.display_totals or {}, rogue_effect_state.wall_health_flat(player_id))
+            context.display_permanent, rogue_effect_state.wall_health_flat(player_id))
         local old_max = math.max(1, unit:GetMaxHealth())
         local old_health = math.max(0, unit:GetHealth())
         local health_ratio = old_health / old_max
@@ -895,6 +896,7 @@ local function route_unit_data(state, row)
         base_attack_speed = row.base_attack_speed or 1,
         model_asset_id = row.model_asset_id,
         model_name = row.model_name,
+        model_yaw = tower_routes.initial_yaw,
         projectile_model = row.projectile_model,
         projectile_speed = tonumber(row.projectile_speed)
             or global_rules.tower_route_default_projectile_speed,

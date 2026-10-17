@@ -24,7 +24,10 @@ function fixture(s){
  if(s.includes('    function actionOffset('))vm.runInContext(between(s,'    function actionOffset(','    function fitNativeSkills('),env);
  const cached=s.includes('    function findCached(')?between(s,'    function findCached(','    function style('):'function findCached(p,id){return p.FindChildTraverse(id);}';
  const levelPips=s.includes('    function styleAbilityLevelPips(')?between(s,'    function styleAbilityLevelPips(','    function child('):'';
- vm.runInContext(cached+between(s,'    function style(','    function create(')+levelPips+between(s,'    function child(','    function refreshInventoryPresentation(')+between(s,'    function markActiveNav(','    function topMetric(')+between(s,'    function mirror()','    function compact('),env);
+ // Current mirror uses authoritative attacks/second. Load its production helper
+ // too; older saved performance baselines predate this helper and need no shim.
+ const frequency=s.includes('    function attackFrequencyText(')?between(s,'    function attackFrequencyText(','    ["HandoffStatName_attack_speed"'):'';
+ vm.runInContext(cached+between(s,'    function style(','    function create(')+levelPips+frequency+between(s,'    function child(','    function refreshInventoryPresentation(')+between(s,'    function markActiveNav(','    function topMetric(')+between(s,'    function mirror()','    function compact('),env);
  function reset(){for(const k of Object.keys(counters))counters[k]=0;trace.length=0;}
  return {env,counters,trace,Panel,reset};
 }
@@ -106,10 +109,13 @@ function mirrorCase(s){
  for(const id of ['vip','benefit','survival_shop'])e.topButtons[id]=new f.Panel(id,e.ctx);
  e.nodes.HandoffNavIcon_vip=new f.Panel('vipIcon',e.ctx);
  const windows={};for(const id of ['CustomShopWindow','TreasureWindow','ArchiveWindow','LotteryWindow','DailyWindow','DailyEntry','PassEntry','HeroCombatDebugPanel']){windows[id]=new f.Panel(id,e.ctx);windows[id].visible=false;}
- e.snapshot={attack_max:100,display_attack_bonus:30,display_attack_pct:5};e.cfg.HandoffCombat={Snapshot:unit=>unit===e.unit?e.snapshot:null};
+ e.snapshot={attack_max:100,display_attack_bonus:30,display_attack_pct:5,attack_speed:1.65};e.cfg.HandoffCombat={Snapshot:unit=>unit===e.unit?e.snapshot:null};
  e.mirror();f.reset();for(let i=0;i<20;i++)e.mirror();return {...f,windows,stable:{...f.counters}};
 }
 const mirrored=mirrorCase(source);
+assert.equal(mirrored.stable.writes,0,'unchanged final totals and visibility produce no style writes');
+assert.equal(mirrored.stable.classes,0,'unchanged active entry does not repeatedly write all classes');
+assert.equal(mirrored.env.nodes.HandoffStat_attack_speed.text,'1.7','real helper formats authoritative attacks per second');
 if(fs.existsSync(baselineFile)){
  const old=mirrorCase(fs.readFileSync(baselineFile,'utf8'));
  assert(mirrored.stable.queries<old.stable.queries/4,'stable mirror does not repeatedly traverse root or ctx');
@@ -117,7 +123,10 @@ if(fs.existsSync(baselineFile)){
  console.log('MIRROR_STABLE_COUNTS',JSON.stringify({before:old.stable,after:mirrored.stable}));
 }
 mirrored.env.snapshot.attack_max=220;mirrored.env.snapshot.display_attack_bonus=70;mirrored.env.unit=19;mirrored.env.mirror();
-assert.equal(mirrored.env.nodes.HandoffStat_attack.text,'150');assert.equal(mirrored.env.nodes.HandoffStatBonus_attack.text,'+70');
+assert.equal(mirrored.env.nodes.HandoffStat_attack.text,'220','hero final damage already includes fixed and percentage effects');
+assert.equal(mirrored.env.nodes.HandoffStatBonus_attack.style.visibility,'collapse');
+assert.equal(mirrored.env.nodes.HandoffStatPercent_attack.style.visibility,'collapse');
+mirrored.env.snapshot.attack_speed=1.85;mirrored.env.mirror();assert.equal(mirrored.env.nodes.HandoffStat_attack_speed.text,'1.9','live rate changes bypass layout caches');
 const heroName=mirrored.env.ctx.FindChildTraverse('SurvivalHeroName');heroName.text='new selected owner';mirrored.env.mirror();assert.equal(mirrored.env.nodes.HandoffName.text,'new selected owner');
 heroName.alive=false;heroName.parent.children=heroName.parent.children.filter(p=>p!==heroName);new mirrored.Panel('SurvivalHeroName',mirrored.env.ctx).text='rebuilt source';mirrored.env.mirror();assert.equal(mirrored.env.nodes.HandoffName.text,'rebuilt source');
 mirrored.windows.DailyWindow.visible=true;mirrored.env.syncActiveNav();assert.equal(mirrored.env.activeNavId,'benefit');
@@ -242,7 +251,9 @@ fastEnv.ctx.FindChildTraverse('SurvivalHeroHealthFill').style.width='27%';
 fastEnv.ctx.FindChildTraverse('CombatAttackValue').text='99';fastEnv.snapshot.attack_max=240;fastEnv.snapshot.display_attack_bonus=80;
 fastEnv.mirror();assert.equal(fastEnv.nodes.Handoff_hp_value.text,'123 / 456');
 assert.equal(fastEnv.nodes.Handoff_mp_value.text,'77 / 88');assert.equal(fastEnv.nodes.Handoff_hp_fill.style.clip,'rect(0%, 27%, 100%, 0%)');
-assert.equal(fastEnv.nodes.HandoffStat_attack.text,'160');assert.equal(fastEnv.nodes.HandoffStatBonus_attack.text,'+80');
+assert.equal(fastEnv.nodes.HandoffStat_attack.text,'240','authoritative final damage updates between layout repairs');
+assert.equal(fastEnv.nodes.HandoffStatBonus_attack.style.visibility,'collapse');
+assert.equal(fastEnv.nodes.HandoffStatPercent_attack.style.visibility,'collapse');
 fastEnv.nodes.HandoffStat_attack.style.visibility='collapse';fastEnv.now+=1000;fastEnv.mirror();
 assert.equal(fastEnv.nodes.HandoffStat_attack.style.visibility,'visible','engine visibility overwrite repairs within 1s');
 console.log('TOPNAV_FAST_MIRROR_PASS: live HP/mana/fill/stat deltas between structural repairs, stable zero style writes, bounded visibility repair');

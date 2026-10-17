@@ -1,0 +1,3073 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-16",
+  "generated_utc": "2026-10-15T18:49:22.585Z",
+  "status": "PASS",
+  "complete": true,
+  "task": "Native wall blocking, four physical attack contacts per reachable face, stable waiting and death replacement.",
+  "authority": {
+    "current_rules": "docs/wall_contact_and_placement.md",
+    "historical_sections_are_not_current_acceptance": true
+  },
+  "source_hashes": {
+    "accepted_production_sha256": {
+      "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua": "05254b196566a9e9ef5e6789df031d9d05787624b568ea8e8071f17334fd9085",
+      "scripts/vscripts/systems/wall_melee_contact.lua": "b9bc4356ed735aed04317d92849ec807cde33c656fc62a97a828d617b6f9e8a1",
+      "scripts/vscripts/systems/wall_navigation_geometry.lua": "40f82132d27664b916b3eb4110bcd3649dca55e22428c66778aeec688615d6c7",
+      "scripts/vscripts/systems/wall_navigation_service.lua": "b7c2723655626baf7f095b7bb4847329b6031372271027bda033b6404d9fb1db"
+    },
+    "accepted_native_probe_sha256": "b7c0e1a6eacfd6e0c0be68abcdac85002d838da12b6b052b057bda4c6e3bfa9b",
+    "all_30_native_cases_use_current_workspace_sources": true,
+    "native_manifest_artifact": "output/wall_native_redesign_20261015/source_hashes.json"
+  },
+  "geometry": {
+    "map": "maps/template_map.vpk",
+    "map_navigation_repainted": false,
+    "current_gnv_sha256": "bd49fd9e7c22423feed0aa919e95f4d499ff22328ba23d409da6e5e02c865f4f",
+    "static_audit_artifact": "output/wall_native_redesign_20261015/actual_stair_geometry.json",
+    "static_audit_role": "Candidate discovery; static buildability does not replace runtime placement validation.",
+    "actual_stair_gate_centers": [
+      {
+        "name": "north",
+        "wall_xy": [
+          128,
+          6656
+        ],
+        "rotation_quarters": 0,
+        "architectural_stair_bounds": [
+          -512,
+          6400,
+          0,
+          6912
+        ]
+      },
+      {
+        "name": "south",
+        "wall_xy": [
+          -2176,
+          1536
+        ],
+        "rotation_quarters": 2,
+        "architectural_stair_bounds": [
+          -2048,
+          1280,
+          -1536,
+          1792
+        ]
+      },
+      {
+        "name": "east",
+        "wall_xy": [
+          1536,
+          2944
+        ],
+        "rotation_quarters": 3,
+        "architectural_stair_bounds": [
+          1280,
+          3072,
+          1792,
+          3584
+        ]
+      },
+      {
+        "name": "west",
+        "wall_xy": [
+          -3584,
+          5248
+        ],
+        "rotation_quarters": 1,
+        "architectural_stair_bounds": [
+          -3840,
+          4608,
+          -3328,
+          5120
+        ]
+      }
+    ],
+    "obsolete_grass_coordinates": [
+      [
+        1408,
+        4928
+      ],
+      [
+        -192,
+        1664
+      ],
+      [
+        -3456,
+        3264
+      ],
+      [
+        -1856,
+        6528
+      ]
+    ],
+    "obsolete_coordinate_reason": "Historical sanctuary upper-landing candidates lie on broad courts rather than actual native ramp heads.",
+    "actual_native_bank_width": 384,
+    "normal_depth_unchanged": 256,
+    "stair_proof_sections": [
+      160,
+      224,
+      288,
+      352
+    ],
+    "front_join_section": 129,
+    "maximum_sealed_center_offset": 128,
+    "oversized_side_route_offset": 192
+  },
+  "native_sealed": {
+    "status": "PASS",
+    "artifact": "output/wall_native_redesign_20261015/native_sealed_final.json",
+    "accepted_cases": 20,
+    "regions": 4,
+    "offsets": [
+      0,
+      64,
+      -64,
+      128,
+      -128
+    ],
+    "native_actors_per_region": 12,
+    "native_actors_concurrent": 48,
+    "case_duration_seconds": 20,
+    "first_four_native_hits_seconds": {
+      "min": 2.2666015625,
+      "max": 2.4326171875
+    },
+    "replacement_hit_seconds": {
+      "min": 2.06640625,
+      "max": 2.2333984375
+    },
+    "all_pre_vacancy_four_actual_attackers": true,
+    "all_zero_sealed_crossings": true,
+    "all_exactly_one_death_replacement": true,
+    "stable_zero_orders_paths_position_writes_stops": true,
+    "cases": [
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3662109375,
+        "hit_faces": [
+          5,
+          0,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_north_offset0",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 256,
+            "min_x": -128,
+            "min_y": -256
+          },
+          "center": 6656,
+          "gate": true,
+          "lateral_max": 192,
+          "lateral_min": -192,
+          "max": 6848,
+          "min": 6464,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 0,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "locked": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2998046875,
+        "hit_faces": [
+          0,
+          5,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_south_offset0",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 256,
+            "min_x": -128,
+            "min_y": -256
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 192,
+          "lateral_min": -192,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 0,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "locked": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 2,
+        "replacement": 1,
+        "replacement_seconds": 2.099609375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2998046875,
+        "hit_faces": [
+          0,
+          0,
+          0,
+          5
+        ],
+        "invalid_hits": 0,
+        "label": "real_east_offset0",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 256,
+            "max_y": 128,
+            "min_x": -256,
+            "min_y": -128
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 192,
+          "lateral_min": -192,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 0,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "locked": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 3,
+        "replacement": 1,
+        "replacement_seconds": 2.099609375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2998046875,
+        "hit_faces": [
+          0,
+          0,
+          5,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_west_offset0",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 256,
+            "max_y": 128,
+            "min_x": -256,
+            "min_y": -128
+          },
+          "center": -3584,
+          "gate": true,
+          "lateral_max": 192,
+          "lateral_min": -192,
+          "max": -3392,
+          "min": -3776,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 0,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "locked": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 1,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3330078125,
+        "hit_faces": [
+          5,
+          0,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_north_offset64",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 128,
+            "min_x": -128,
+            "min_y": -256
+          },
+          "center": 6656,
+          "gate": true,
+          "lateral_max": 128,
+          "lateral_min": -256,
+          "max": 6848,
+          "min": 6464,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 64,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "locked": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 2.166015625,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2666015625,
+        "hit_faces": [
+          0,
+          5,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_south_offset64",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 256,
+            "min_x": -128,
+            "min_y": -128
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 256,
+          "lateral_min": -128,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 64,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "locked": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 2,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2998046875,
+        "hit_faces": [
+          0,
+          0,
+          0,
+          5
+        ],
+        "invalid_hits": 0,
+        "label": "real_east_offset64",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 128,
+            "min_x": -256,
+            "min_y": -128
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 128,
+          "lateral_min": -256,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 64,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "locked": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 3,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2666015625,
+        "hit_faces": [
+          0,
+          0,
+          5,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_west_offset64",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 256,
+            "max_y": 128,
+            "min_x": -128,
+            "min_y": -128
+          },
+          "center": -3584,
+          "gate": true,
+          "lateral_max": 256,
+          "lateral_min": -128,
+          "max": -3392,
+          "min": -3776,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 64,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "locked": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 1,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3662109375,
+        "hit_faces": [
+          5,
+          0,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_north_offset-64",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 256,
+            "min_x": -128,
+            "min_y": -128
+          },
+          "center": 6656,
+          "gate": true,
+          "lateral_max": 256,
+          "lateral_min": -128,
+          "max": 6848,
+          "min": 6464,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -64,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "locked": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3330078125,
+        "hit_faces": [
+          0,
+          5,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_south_offset-64",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 128,
+            "min_x": -128,
+            "min_y": -256
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 128,
+          "lateral_min": -256,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -64,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "locked": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 2,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3994140625,
+        "hit_faces": [
+          0,
+          0,
+          0,
+          5
+        ],
+        "invalid_hits": 0,
+        "label": "real_east_offset-64",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 256,
+            "max_y": 128,
+            "min_x": -128,
+            "min_y": -128
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 256,
+          "lateral_min": -128,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -64,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "locked": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 3,
+        "replacement": 1,
+        "replacement_seconds": 2.099609375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3662109375,
+        "hit_faces": [
+          0,
+          0,
+          5,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_west_offset-64",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 128,
+            "min_x": -256,
+            "min_y": -128
+          },
+          "center": -3584,
+          "gate": true,
+          "lateral_max": 128,
+          "lateral_min": -256,
+          "max": -3392,
+          "min": -3776,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -64,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "locked": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 1,
+        "replacement": 1,
+        "replacement_seconds": 2.06640625,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2666015625,
+        "hit_faces": [
+          5,
+          0,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_north_offset128",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 128,
+            "min_x": -128,
+            "min_y": -384
+          },
+          "center": 6656,
+          "gate": true,
+          "lateral_max": 64,
+          "lateral_min": -320,
+          "max": 6848,
+          "min": 6464,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 128,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "locked": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 2.2333984375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2998046875,
+        "hit_faces": [
+          0,
+          5,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_south_offset128",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 384,
+            "min_x": -128,
+            "min_y": -128
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 320,
+          "lateral_min": -64,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 128,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "locked": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 2,
+        "replacement": 1,
+        "replacement_seconds": 2.166015625,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.2998046875,
+        "hit_faces": [
+          0,
+          0,
+          0,
+          5
+        ],
+        "invalid_hits": 0,
+        "label": "real_east_offset128",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 128,
+            "min_x": -384,
+            "min_y": -128
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 64,
+          "lateral_min": -320,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 128,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "locked": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 3,
+        "replacement": 1,
+        "replacement_seconds": 2.2333984375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3330078125,
+        "hit_faces": [
+          0,
+          0,
+          5,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_west_offset128",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 384,
+            "max_y": 128,
+            "min_x": -128,
+            "min_y": -128
+          },
+          "center": -3584,
+          "gate": true,
+          "lateral_max": 320,
+          "lateral_min": -64,
+          "max": -3392,
+          "min": -3776,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 128,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "locked": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 1,
+        "replacement": 1,
+        "replacement_seconds": 2.2333984375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.4326171875,
+        "hit_faces": [
+          5,
+          0,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_north_offset-128",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 384,
+            "min_x": -128,
+            "min_y": -128
+          },
+          "center": 6656,
+          "gate": true,
+          "lateral_max": 320,
+          "lateral_min": -64,
+          "max": 6848,
+          "min": 6464,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          4,
+          0,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -128,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "locked": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 2.166015625,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3662109375,
+        "hit_faces": [
+          0,
+          5,
+          0,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_south_offset-128",
+        "layout": {
+          "axis": 1,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 128,
+            "min_x": -128,
+            "min_y": -384
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 64,
+          "lateral_min": -320,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          4,
+          0,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -128,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "locked": [
+            0,
+            4,
+            0,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 2,
+        "replacement": 1,
+        "replacement_seconds": 2.099609375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.3994140625,
+        "hit_faces": [
+          0,
+          0,
+          0,
+          5
+        ],
+        "invalid_hits": 0,
+        "label": "real_east_offset-128",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 384,
+            "max_y": 128,
+            "min_x": -128,
+            "min_y": -128
+          },
+          "center": 1536,
+          "gate": true,
+          "lateral_max": 320,
+          "lateral_min": -64,
+          "max": 1728,
+          "min": 1344,
+          "stair_mouth": true,
+          "stair_sign": 1
+        },
+        "locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          0,
+          4
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -128,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "locked": [
+            0,
+            0,
+            0,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 3,
+        "replacement": 1,
+        "replacement_seconds": 2.166015625,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 0,
+        "elapsed": 20,
+        "errors": [],
+        "first_four": 2.4326171875,
+        "hit_faces": [
+          0,
+          0,
+          5,
+          0
+        ],
+        "invalid_hits": 0,
+        "label": "real_west_offset-128",
+        "layout": {
+          "axis": 2,
+          "bounds": {
+            "max_x": 128,
+            "max_y": 128,
+            "min_x": -384,
+            "min_y": -128
+          },
+          "center": -3584,
+          "gate": true,
+          "lateral_max": 64,
+          "lateral_min": -320,
+          "max": -3392,
+          "min": -3776,
+          "stair_mouth": true,
+          "stair_sign": -1
+        },
+        "locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_locked": [
+          0,
+          0,
+          4,
+          0
+        ],
+        "maximum_path_bucket": 4,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -128,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 0,
+          "front_overflow": 0,
+          "hit_faces": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "locked": [
+            0,
+            0,
+            4,
+            0
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 4
+        },
+        "q": 1,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 120,
+          "nav_IsTraversable": 120,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 5
+      }
+    ]
+  },
+  "native_open": {
+    "status": "PASS",
+    "artifact": "output/wall_native_redesign_20261015/native_open_final.json",
+    "accepted_cases": 8,
+    "offsets": [
+      192,
+      -192
+    ],
+    "regions": 4,
+    "native_actors_per_region": 20,
+    "native_actors_concurrent": 80,
+    "case_duration_seconds": 54,
+    "all_real_bypasses_observed": true,
+    "replacement_hit_seconds": {
+      "min": 1.6328125,
+      "max": 2.7333984375
+    },
+    "all_exactly_one_same_face_death_replacement": true,
+    "stable_zero_orders_paths_position_writes_stops": true,
+    "reachable_contacts_follow_actual_stair_terrain": true,
+    "cases": [
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 54,
+        "errors": [],
+        "first_four": 3.3994140625,
+        "hit_faces": [
+          2,
+          4,
+          5,
+          4
+        ],
+        "invalid_hits": 0,
+        "label": "real_north_offset192",
+        "locked": [
+          2,
+          4,
+          4,
+          4
+        ],
+        "maximum_locked": [
+          2,
+          4,
+          4,
+          4
+        ],
+        "maximum_path_bucket": 15,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 192,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 4,
+          "front_overflow": 0,
+          "hit_faces": [
+            2,
+            4,
+            4,
+            4
+          ],
+          "locked": [
+            2,
+            4,
+            4,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 14
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 2.166015625,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 465,
+          "nav_IsTraversable": 471,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 15
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 3,
+        "elapsed": 54,
+        "errors": [],
+        "first_four": 3.3330078125,
+        "hit_faces": [
+          3,
+          2,
+          0,
+          5
+        ],
+        "invalid_hits": 0,
+        "label": "real_south_offset192",
+        "locked": [
+          3,
+          2,
+          0,
+          4
+        ],
+        "maximum_locked": [
+          3,
+          2,
+          0,
+          4
+        ],
+        "maximum_path_bucket": 5,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 192,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 3,
+          "front_overflow": 0,
+          "hit_faces": [
+            3,
+            2,
+            0,
+            4
+          ],
+          "locked": [
+            3,
+            2,
+            0,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 9
+        },
+        "q": 2,
+        "replacement": 1,
+        "replacement_seconds": 1.6328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 345,
+          "nav_IsTraversable": 366,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 10
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 54,
+        "errors": [],
+        "first_four": 3.3994140625,
+        "hit_faces": [
+          5,
+          0,
+          4,
+          2
+        ],
+        "invalid_hits": 0,
+        "label": "real_east_offset192",
+        "locked": [
+          4,
+          0,
+          4,
+          2
+        ],
+        "maximum_locked": [
+          4,
+          0,
+          4,
+          2
+        ],
+        "maximum_path_bucket": 7,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 192,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 4,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            0,
+            4,
+            2
+          ],
+          "locked": [
+            4,
+            0,
+            4,
+            2
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 10
+        },
+        "q": 3,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 357,
+          "nav_IsTraversable": 570,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 11
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 54,
+        "errors": [],
+        "first_four": 3.3662109375,
+        "hit_faces": [
+          4,
+          5,
+          2,
+          4
+        ],
+        "invalid_hits": 0,
+        "label": "real_west_offset192",
+        "locked": [
+          4,
+          4,
+          2,
+          4
+        ],
+        "maximum_locked": [
+          4,
+          4,
+          2,
+          4
+        ],
+        "maximum_path_bucket": 16,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 3,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 192,
+        "ok": true,
+        "padded_overlaps": 2,
+        "phased_count": 1,
+        "pre_vacancy": {
+          "crossings": 4,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            4,
+            2,
+            4
+          ],
+          "locked": [
+            4,
+            4,
+            2,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [
+            {
+              "a": 862,
+              "b": 860,
+              "distance": 60.967944413616,
+              "goal_a": {
+                "x": -3680,
+                "y": 5064
+              },
+              "goal_b": {
+                "x": -3680,
+                "y": 4952
+              },
+              "hard_overlap": false,
+              "idle_a": true,
+              "idle_b": false,
+              "padded": 72,
+              "padded_overlap": true,
+              "phased_a": false,
+              "phased_b": false,
+              "raw": 52,
+              "solid_overlap": false,
+              "state_a": "attack",
+              "state_b": "waiting"
+            },
+            {
+              "a": 975,
+              "b": 881,
+              "distance": 61.273659352722,
+              "goal_a": {
+                "x": -3744,
+                "y": 5064
+              },
+              "goal_b": {
+                "x": -3744,
+                "y": 4952
+              },
+              "hard_overlap": false,
+              "idle_a": true,
+              "idle_b": false,
+              "padded": 72,
+              "padded_overlap": true,
+              "phased_a": false,
+              "phased_b": false,
+              "raw": 52,
+              "solid_overlap": false,
+              "state_a": "attack",
+              "state_b": "waiting"
+            },
+            {
+              "a": 881,
+              "b": 950,
+              "distance": 72.992745038965,
+              "goal_a": {
+                "x": -3744,
+                "y": 4952
+              },
+              "goal_b": {
+                "x": -3680,
+                "y": 4984
+              },
+              "hard_overlap": false,
+              "idle_a": false,
+              "idle_b": true,
+              "padded": 84,
+              "padded_overlap": true,
+              "phased_a": false,
+              "phased_b": false,
+              "raw": 64,
+              "solid_overlap": false,
+              "state_a": "waiting",
+              "state_b": "waiting"
+            }
+          ],
+          "padded_overlaps": 3,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 14
+        },
+        "q": 1,
+        "replacement": 1,
+        "replacement_seconds": 2.099609375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 537,
+          "nav_IsTraversable": 906,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 15
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 54,
+        "errors": [],
+        "first_four": 2.8662109375,
+        "hit_faces": [
+          2,
+          4,
+          4,
+          5
+        ],
+        "invalid_hits": 0,
+        "label": "real_north_offset-192",
+        "locked": [
+          2,
+          4,
+          4,
+          4
+        ],
+        "maximum_locked": [
+          2,
+          4,
+          4,
+          4
+        ],
+        "maximum_path_bucket": 11,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -192,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 4,
+          "front_overflow": 0,
+          "hit_faces": [
+            2,
+            4,
+            4,
+            4
+          ],
+          "locked": [
+            2,
+            4,
+            4,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 14
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 2.666015625,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 465,
+          "nav_IsTraversable": 471,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 15
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 54,
+        "errors": [],
+        "first_four": 3.2998046875,
+        "hit_faces": [
+          4,
+          2,
+          5,
+          4
+        ],
+        "invalid_hits": 0,
+        "label": "real_south_offset-192",
+        "locked": [
+          4,
+          2,
+          4,
+          4
+        ],
+        "maximum_locked": [
+          4,
+          2,
+          4,
+          4
+        ],
+        "maximum_path_bucket": 16,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -192,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 4,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            2,
+            4,
+            4
+          ],
+          "locked": [
+            4,
+            2,
+            4,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 14
+        },
+        "q": 2,
+        "replacement": 1,
+        "replacement_seconds": 2.1328125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 450,
+          "nav_IsTraversable": 456,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 15
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 54,
+        "errors": [],
+        "first_four": 2.7998046875,
+        "hit_faces": [
+          4,
+          5,
+          4,
+          2
+        ],
+        "invalid_hits": 0,
+        "label": "real_east_offset-192",
+        "locked": [
+          4,
+          4,
+          4,
+          2
+        ],
+        "maximum_locked": [
+          4,
+          4,
+          4,
+          2
+        ],
+        "maximum_path_bucket": 11,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -192,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 4,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            4,
+            4,
+            2
+          ],
+          "locked": [
+            4,
+            4,
+            4,
+            2
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 14
+        },
+        "q": 3,
+        "replacement": 1,
+        "replacement_seconds": 2.7333984375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 450,
+          "nav_IsTraversable": 456,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 15
+      },
+      {
+        "bank_width": 384,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 54,
+        "errors": [],
+        "first_four": 2.8330078125,
+        "hit_faces": [
+          5,
+          4,
+          2,
+          4
+        ],
+        "invalid_hits": 0,
+        "label": "real_west_offset-192",
+        "locked": [
+          4,
+          4,
+          2,
+          4
+        ],
+        "maximum_locked": [
+          4,
+          4,
+          2,
+          4
+        ],
+        "maximum_path_bucket": 11,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": -192,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 4,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            4,
+            2,
+            4
+          ],
+          "locked": [
+            4,
+            4,
+            2,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 14
+        },
+        "q": 1,
+        "replacement": 1,
+        "replacement_seconds": 2.7333984375,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 471,
+          "nav_IsTraversable": 630,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 15
+      }
+    ]
+  },
+  "offline": {
+    "scope": "Production Lua modules with mocked Dota navigation and bodies, separate from native acceptance.",
+    "primary_artifact": "output/wall_native_redesign_20261015/offline_geometry_gradient_final.json",
+    "primary_passed": true,
+    "primary_suites": [
+      {
+        "name": "test_wall_navigation_geometry.lua",
+        "passed": true,
+        "exit_code": 0,
+        "summary": "WALL_NAVIGATION_GEOMETRY_PASS cases=284 4 directions, width192-768 center_offset128 seam384 bounds, hull0-128, finite/thin banks, corner crossings, legal routes, height cliffs, refs and spawn rollback"
+      },
+      {
+        "name": "test_wall_gate_contact_layout.lua",
+        "passed": true,
+        "exit_code": 0,
+        "summary": "WALL_GATE_CONTACT_LAYOUT_PASS cases=112 fronts=640 waiters=320 four_rotations widths=256,192,384,640 native_pad=10 pitch=64,48 front_hull=20,12 offsets=0,+/-64,+/-128,+/-192 native_obstruction_mock full_hulls corridor_center rear_axis clamp death_replacement cached_waiters stable_coordinate_writes=0 original_hull_cleanup_corrections=64"
+      },
+      {
+        "name": "test_wall_gate_contact_face.lua",
+        "passed": true,
+        "exit_code": 0,
+        "summary": "WALL_GATE_CONTACT_FACE_PASS offset64_four_rotations both_ends bodies=40 stable_nav_queries=0 open_floor unknown_axis index_reuse clear dead_handle"
+      },
+      {
+        "name": "test_wall_offset_waiter.lua",
+        "passed": true,
+        "exit_code": 0,
+        "summary": "OFFSET_STRAIGHT_CONTROLS_PASS cases=24\r\nOFFSET_GATE_FACE_PASS cases=8\r\nWALL_OFFSET_WAITER_PASS straight=24 offset64=8 turns=24 four_faces six_offsets native_acceptance32 full_hull turn_exit peripheral_overlap sealed_terrain cliff death_promotion stable_orders=0 stable_paths=0"
+      },
+      {
+        "name": "test_wall_contact_crowd.lua",
+        "passed": true,
+        "exit_code": 0,
+        "summary": "WALL_CONTACT_CROWD_PASS units=90 four_attackers_by=2.5s cancelled_moves=2 one_retry_same_claim nearest_waiter_distance=112.00 stable_orders=0 stable_position_writes=0 stable_paths=0 stable_nav=400 total_paths=22 total_nav=3682"
+      },
+      {
+        "name": "test_wall_navigation.lua",
+        "passed": true,
+        "exit_code": 0,
+        "summary": "WALL_NAVIGATION_PASS square body, no protruding shoulders, no duplicate creation, terrain separation, overlap release\r\nWALL_METAL_HIT_PASS official asset, face position, burst limit, particle release"
+      },
+      {
+        "name": "test_wall_relocation_lifecycle.lua",
+        "passed": true,
+        "exit_code": 0,
+        "summary": "[BuildingBlink] wall move failed: scripts/vscripts/systems/wall_navigation_service.lua:91: scripts/vscripts/systems/wall_navigation_service.lua:49: wall navigation obstruction could not be created: ...ts/vscripts/tests/test_wall_relocation_lifecycle.lua:34: injected wall obstruction creation failure restored=1\r\n[BuildingBlink] wall move failed: scripts/vscripts/systems/building_relocation.lua:48: new_grid_occupy_failed restored=1\r\nWALL_RELOCATION_LIFECYCLE_PASS real navigation/contact, identity and health, grid rejection, partial rebuild rollback, occupancy rollback, no stale delayed teleport"
+      }
+    ],
+    "geometry_cases": 284,
+    "contact_layout": {
+      "cases": 112,
+      "front_actors": 640,
+      "waiting_actors": 320,
+      "widths": [
+        192,
+        256,
+        384,
+        640
+      ],
+      "offsets": [
+        0,
+        -64,
+        64,
+        -128,
+        128,
+        -192,
+        192
+      ],
+      "native_padding": 10,
+      "front_hulls": [
+        12,
+        20
+      ],
+      "lane_pitches": [
+        48,
+        64
+      ]
+    },
+    "crowd": {
+      "actors": 90,
+      "front_attackers": 4,
+      "admission_deadline_seconds": 2.5,
+      "stable_new_orders": 0,
+      "stable_position_writes": 0,
+      "stable_path_queries": 0
+    },
+    "negative_stair_control": {
+      "mutation": "Disable only stair-mouth fallback in memory; keep the same final ordinary geometry and fixtures.",
+      "actual_failures": 40,
+      "expected_failures": 40,
+      "isolated_to_positive_stair_cases": true,
+      "thin_bank_and_side_branch_guards_still_pass": true,
+      "production_modified": false
+    },
+    "additional_artifact": "output/wall_native_redesign_20261015/offline_busy_retreat_final.json",
+    "additional_passed_suites": 18,
+    "additional_total_suites": 18,
+    "additional_native_engine_acceptance": false,
+    "exceptional_retreat_artifacts": [
+      "output/wall_native_redesign_20261015/offline_retreat_congestion_results.json",
+      "output/wall_native_redesign_20261015/offline_idle_retreat_results.json"
+    ],
+    "final_collision_and_ai_sources_match_native_runs": true
+  },
+  "isolation": {
+    "addon": "survival_wall_redesign_20261015",
+    "startup_artifact": "output/wall_native_redesign_20261015/isolated_dota_launch.json",
+    "real_map_terrain_used_for_sealed_matrix": true,
+    "temporary_wall_and_monster_entities": true,
+    "actual_native_movement_collision_OnAttackLanded": true,
+    "formal_survival_economy_archive_http_bootstrap_loaded": false,
+    "probe_module_cache": "Private table; formal production module entries and modifier classes are not overwritten.",
+    "dedicated_installed_names": [
+      "SURVIVAL_NATIVE_WALL_PROBE",
+      "modifier_wall_native_redesign_ai"
+    ],
+    "instrumentation": "Private wrappers count orders, paths, Stop and SetAbsOrigin; native methods are delegated, not globally replaced.",
+    "existing_navigation_cell_cache_and_reference_cleanup_preserved": true,
+    "no_new_full_map_monster_scan": true
+  },
+  "reproducibility": {
+    "artifact": "output/wall_native_redesign_20261015/probe_reproducibility_final.json",
+    "builder": "tools/build_wall_contact_native_probe.cjs",
+    "deterministic_payload_build": true,
+    "lua_payload_syntax_pass": true,
+    "current_source_snapshot": true
+  },
+  "limitations": [
+    "Native engine testing used a private addon on the current formal map VPK with the current production wall modules and real OnAttackLanded.",
+    "Four simultaneous regions on one Tools host; not four separately connected human clients.",
+    "No economy, profiles, HTTP, all technologies or full-game rendering workload was loaded; no full-game FPS improvement claim.",
+    "Movement/collision/real-hit acceptance is instrumented engine evidence; camera screenshots were not used for visual acceptance.",
+    "Stable zero repeated native orders/path queries/coordinate corrections is not zero total AI or cached terrain cost.",
+    "Historical exploratory failed fixtures and earlier source hashes are excluded from final acceptance."
+  ],
+  "session_restoration": {
+    "artifact": "output/wall_native_redesign_20261015/session_restoration_final.json",
+    "checked_utc": "2026-10-15T18:48:10.3515753Z",
+    "original_addon_running": true,
+    "original_addon": "survival",
+    "original_launch_arguments_reused": true,
+    "original_process_id": 29136,
+    "temporary_addon_removed": true,
+    "isolated_game_exited": true,
+    "helper_running": true,
+    "helper_status": "waiting_for_party",
+    "previous_in_memory_match_state_restored": false,
+    "note": "Restored original application/addon launch; a new map load, not a previous in-memory match.",
+    "formal_map_inspected": true,
+    "current_ui_state": "startup_party_waiting"
+  },
+  "outstanding": [],
+  "native_open_floor": {
+    "status": "PASS",
+    "artifact": "output/wall_native_redesign_20261015/native_floors_final.json",
+    "cases": [
+      {
+        "bank_width": 0,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 26,
+        "errors": [],
+        "first_four": 2.3671875,
+        "first_sixteen": 4.7333984375,
+        "hit_faces": [
+          5,
+          4,
+          4,
+          4
+        ],
+        "invalid_hits": 0,
+        "label": "open_floor_four_sources_final",
+        "locked": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "maximum_locked": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "maximum_path_bucket": 6,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 0,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 5,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            4,
+            4,
+            4
+          ],
+          "locked": [
+            4,
+            4,
+            4,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 16
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 4.3330078125,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 400,
+          "nav_IsTraversable": 400,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 17
+      },
+      {
+        "bank_width": 0,
+        "cleaned": true,
+        "crossings": 4,
+        "elapsed": 34,
+        "errors": [],
+        "first_four": 2.7998046875,
+        "first_sixteen": 9.033203125,
+        "hit_faces": [
+          5,
+          4,
+          4,
+          4
+        ],
+        "invalid_hits": 0,
+        "label": "open_floor_one_source_final",
+        "locked": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "maximum_locked": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "maximum_path_bucket": 7,
+        "maximum_stable_front_overflow": 0,
+        "maximum_stable_padded_overlaps": 0,
+        "maximum_stable_phased_count": 0,
+        "maximum_stable_phased_overlaps": 0,
+        "maximum_stable_solid_overlaps": 0,
+        "offset": 0,
+        "ok": true,
+        "padded_overlaps": 0,
+        "phased_count": 0,
+        "pre_vacancy": {
+          "crossings": 4,
+          "front_overflow": 0,
+          "hit_faces": [
+            4,
+            4,
+            4,
+            4
+          ],
+          "locked": [
+            4,
+            4,
+            4,
+            4
+          ],
+          "overlap_pairs": [],
+          "overlaps": 0,
+          "padded_overlap_pairs": [],
+          "padded_overlaps": 0,
+          "phased_count": 0,
+          "phased_overlaps": 0,
+          "solid_overlaps": 0,
+          "unique_hits": 16
+        },
+        "q": 0,
+        "replacement": 1,
+        "replacement_seconds": 2.1669921875,
+        "solid_overlaps": 0,
+        "stable_metrics": {
+          "move_orders": 0,
+          "nav_FindPathLength": 0,
+          "nav_IsBlocked": 300,
+          "nav_IsTraversable": 300,
+          "orders": 0,
+          "position_writes": 0,
+          "stops": 0
+        },
+        "unique_hits": 17
+      }
+    ],
+    "tested_single_source_and_four_sources": true,
+    "native_monsters_per_case": 20,
+    "all_four_faces_four_actual_attackers": true,
+    "first_sixteen_native_hits_seconds": {
+      "min": 4.7333984375,
+      "max": 9.033203125
+    },
+    "stable_zero_orders_paths_position_writes_stops": true
+  },
+  "native_common": {
+    "stable_solid_penetration_max": 0,
+    "stable_phased_actor_max": 0,
+    "fifth_body_in_full_contact_row_max": 0,
+    "invalid_native_attack_hits": 0,
+    "configured_path_budget_per_wall_half_second": 16,
+    "max_observed_path_queries_per_wall_half_second": 16,
+    "existing_cached_terrain_checks_still_run": true,
+    "maximum_replacement_hit_deadline_seconds": 8
+  },
+  "defects_fixed": [
+    "Real descending stair mouths misclassified as open courtyard; old generator coordinates were grass.",
+    "Claim slots positioned around displaced wall rather than actual entrance.",
+    "Both padded avoidance radii mistaken for physical overlap; body-blocked exact coordinates renewing forever.",
+    "Solid diagonal staging/short entry-distance dead zones prevent vacancy replacements.",
+    "Native walking on slopes rejected by teleport-plane height checks.",
+    "Busy-but-stationary retreat and stale progress/backoff keep an exceptional actor phased."
+  ],
+  "cleanup": {
+    "artifact": "output/wall_native_redesign_20261015/native_cleanup_final.json",
+    "active_probes": 0,
+    "navigation_obstructions": 0,
+    "temporary_monsters": 0,
+    "temporary_walls": 0,
+    "checked_utc": "2026-10-15T18:45:47.763Z"
+  },
+  "environment_maintenance": {
+    "reason": "C drive became full during native test; old temporary installers preserved reversibly on D.",
+    "preserved_directory": "output/wall_native_redesign_20261015/preserved_temp/",
+    "hash_verified_manifests": [
+      "output/wall_native_redesign_20261015/preserved_temp/relocation.json",
+      "output/wall_native_redesign_20261015/preserved_temp/qq_relocation.json"
+    ],
+    "installed_applications_removed": false,
+    "player_archives_modified": false
+  },
+  "map_snapshot": {
+    "artifact": "output/wall_native_redesign_20261015/map_storage_proof.json",
+    "production_and_isolated_vpk_identical": true,
+    "sha256": "1254BCB6D5FFB26B8AC9BDBCA84667B48823720B8EBD7DA8474E28ABE32B687D"
+  }
+}

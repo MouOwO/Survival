@@ -5,6 +5,7 @@ local stages = require("config/generated/builder_ability_stages")
 local training = require("config/generated/training_definitions")
 local building_count_limits = require("systems/building_count_limit_service")
 local player_tower_limits = require("systems/player_tower_limit_service")
+local match_setup = require("systems/match_setup_service")
 
 local M = {}
 local BUILDER_BLINK_ABILITY = "ability_survival_builder_blink"
@@ -456,6 +457,15 @@ local function configure_layout(state, stage_rows)
     local builder = state.builder
     if not valid_entity(builder) then return end
     local entries, reported_count = enumerate_abilities(builder)
+    if match_setup.get_mode() == "fishing" then
+        -- Fishing builders have no skill buttons, including native extras.
+        -- Skip normal layout/talent setup so later refreshes keep them hidden.
+        for _, entry in ipairs(entries) do
+            entry.ability:SetHidden(true)
+            entry.ability:SetActivated(false)
+        end
+        return
+    end
     local domain_start = management_domain_start(entries, reported_count)
     local desired = desired_layout(state, stage_rows, domain_start)
     local layout_valid = layout_is_valid(builder, desired, entries)
@@ -574,7 +584,8 @@ local function on_building_counts_changed(payload)
             if valid_entity(state.builder) and after >= maximum then
                 local ability = state.builder:FindAbilityByName(row.ability_name)
                 if ability then
-                    ability:SetHidden(row.building_id ~= "arrow_tower")
+                    ability:SetHidden(match_setup.get_mode() == "fishing"
+                        or row.building_id ~= "arrow_tower")
                     ability:SetActivated(false)
                 end
             end

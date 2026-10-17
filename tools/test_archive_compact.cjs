@@ -29,9 +29,11 @@ const card=env.rowCards['fragment:0'].panel,promote=card.children.find(p=>p.BHas
 assert.equal(card.children.find(p=>p.BHasClass('ArchiveItemName')).text,'破碎大剑');
 assert.equal(promote.style.backgroundImage,'none');assert.equal(promote.children[0].style.color,cfg.SurvivalArchiveColors.button_disabled_text);
 const native=JSON.parse(fs.readFileSync('data/ui/archive_native_icons.json','utf8'));
+vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/common/item_resources.js','utf8'),env);
 for(const filename of ['icons_remaining_5d5c1152eb.js','item_art_remaining_5d5c1152eb.js']){
  const s=fs.readFileSync('panorama/src/scripts/custom_game/'+filename,'utf8');
- for(const [id,row] of Object.entries(native)){assert(s.includes(row.runtime_uri));assert(s.includes(row.icon_path));}
+ assert(s.includes('SurvivalItemResources'),'legacy consumer delegates to the shared table');
+ for(const id of Object.keys(native))assert(cfg.SurvivalItemResources.Lookup(id),'historical native entry remains registered: '+id);
 }
 const css=fs.readFileSync('panorama/src/styles/custom_game/archive_comfort.css','utf8');
 assert(css.includes('width:112px; height:108px'));assert(css.includes('#ArchivePageHeader'));assert(css.includes('font-family:'+cfg.SurvivalArchiveColors.tooltip_font));
@@ -40,12 +42,13 @@ console.log('ARCHIVE_COMPACT_PASS: current renderer applies palette after cards,
 // Exercise the real icon wrapper: its old inline dimensions overrode compact CSS.
 Panel.prototype.SetImage=function(value){this.image=value;};
 Panel.prototype.SetScaling=function(value){this.scaling=value;};
-cfg.ArchiveHandoff={Icon(){},Init(){},Observe(){},Progress(){return '0 / 999';}};
+cfg.ArchiveHandoff={Icon(){},Init(){},Observe(){},CardProgress(){return '0 / 999';}};
+vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/reward_presentation.js','utf8'),env);
 vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/icons_remaining_5d5c1152eb.js','utf8'),env);
 const iconCard=new Panel('Panel');cfg.ArchiveHandoff.Icon(iconCard,{id:'fragment_01'},'fragment',{});
 const actualArt=iconCard.children.find(p=>p.BHasClass('ArchiveArt'));
 assert.equal(actualArt.style.width,'128px');assert.equal(actualArt.style.height,'112px');
-assert(actualArt.children[0].image.startsWith('s2r://panorama/images/econ/'));
+assert.equal(actualArt.children[0].image,cfg.SurvivalItemResources.Resolve('fragment_01'));
 const tip=new Panel('Panel','ArchiveTooltip'),frame=new Panel('Panel','ArchiveTooltipFrame');tip.children.push(frame);
 cfg.ArchiveTheme.Apply(tip);
 const abilitySurface=fs.readFileSync('panorama/src/styles/custom_game/ability_tooltip.css','utf8').match(/#CustomAbilityTooltip\s*\{([^}]+)\}/)[1];
@@ -87,9 +90,8 @@ for(const category of ['clear','endless','fragment','friend','map_level','work',
 }
 // Exercise tinted icons too: the production wrapper must not write rarity backgrounds.
 // Unknown IDs use fallback; derive a real tone-colored row from the generated catalog.
-const iconSource=fs.readFileSync('panorama/src/scripts/custom_game/icons_remaining_5d5c1152eb.js','utf8');
-const catalog=JSON.parse(iconSource.match(/entries=(\[.*\]);/)[1]);
-const toneRow=catalog.find(r=>r.tone_color);assert(toneRow);
+const catalog=JSON.parse(fs.readFileSync('data/ui/item_resources.json','utf8')).items.filter(r=>r.category_id==='clear'||r.category_id==='endless').map(r=>({...r,item_id:r.id}));
+const toneRow=catalog.find(r=>r.category_id==='clear');assert(toneRow);
 const toneCard=new Panel('Panel');cfg.ArchiveHandoff.Icon(toneCard,{id:toneRow.item_id},toneRow.category_id,{});
 const toneArt=toneCard.children.find(p=>p.BHasClass('ArchiveArt'));
 assert.equal(toneArt.style.backgroundColor,undefined);
@@ -98,11 +100,12 @@ assert.equal(toneArt.style.backgroundColor,cfg.SurvivalArchiveColors.icon_surfac
 assert.equal(toneArt.style.border,'1px solid '+cfg.SurvivalArchiveColors.icon_border);
 console.log('ARCHIVE_QUIET_CARDS_PASS: shared lock/check states, cached state transitions, neutral toned-icon frames');
 
-// All clear/endless tiers have one tint, independent of the generated tier color.
+// Achievement images retain their central artwork without per-window remaps.
 for(const row of catalog.filter(r=>r.category_id==='clear')) {
  const card=new Panel('Panel');cfg.ArchiveHandoff.Icon(card,{id:row.item_id},row.category_id,{});
  const art=card.children.find(p=>p.BHasClass('ArchiveArt'));
- assert.equal(art.children[0].style.washColor,cfg.SurvivalArchiveColors.achievement_tint);
+ assert.equal(art.children[0].image,cfg.SurvivalItemResources.Resolve(row.item_id));
+ assert.equal(art.children[0].style.washColor,undefined,'the icon resource owner does not add a conflicting item tint');
 }
 const handoffSource=fs.readFileSync('panorama/src/scripts/custom_game/archive_handoff_180de7e38b.js','utf8');
 env.cfg=cfg;

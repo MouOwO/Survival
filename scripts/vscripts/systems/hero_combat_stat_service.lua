@@ -19,6 +19,7 @@ local monkey_runtime = require("config/generated/monkey_king_exclusive_runtime")
 local blademaster_runtime = require("config/generated/blademaster_exclusive_runtime")
 local armor_balance = require("config/armor_balance")
 local endless_projection = require("combat/endless_stat_projection")
+local commerce_hero_privileges = require("systems/commerce_hero_privileges")
 
 local M = {}
 local state_by_player = {}
@@ -40,12 +41,12 @@ local function value(definition, key, fallback)
     return number ~= nil and number or fallback or 0
 end
 
-local function safe_get(unit, method_name, fallback)
+local function safe_get(unit, method_name, fallback, ...)
     local method = unit and unit[method_name]
     if type(method) ~= "function" then
         return fallback or 0
     end
-    local ok, result = pcall(method, unit)
+    local ok, result = pcall(method, unit, ...)
     return ok and tonumber(result) or fallback or 0
 end
 
@@ -321,6 +322,7 @@ local function recalculate(player_id, reason, growth_snapshot)
         { player_id = player_id }
     )
     local permanent = permanent_result and permanent_result.totals or {}
+    local commerce_privileges = commerce_hero_privileges.for_player(player_id)
     researcher_attack_pct = researcher_attack_pct
         + (tonumber(permanent.hero_attack_bonus_pct) or 0)
     researcher_armor_reduction = researcher_armor_reduction
@@ -363,21 +365,6 @@ local function recalculate(player_id, reason, growth_snapshot)
     local total_attack_pct = researcher_attack_pct + essence_attack_pct
     local flat_panel_attack = equipment_stats.attack_flat
         + researcher_attack_flat + progression_attack_flat
-    local engine_research_attack_bonus = debug_attack and 0 or (
-        ((state.engine_base_attack_min
-            + state.engine_base_attack_max
-            + weapon_attack_min + weapon_attack_max)
-            * 0.5) * total_attack_pct / 100
-            + flat_panel_attack * total_attack_pct / 100
-            + researcher_attack_flat
-            + progression_attack_flat
-    ) * exclusive_attack_multiplier
-    local engine_weapon_attack_bonus = (debug_attack
-        and (debug_attack - equipment_stats.attack_flat)
-        or ((weapon_attack_min + weapon_attack_max) * 0.5)
-            * exclusive_attack_multiplier)
-    local engine_bonus_attack = engine_research_attack_bonus
-        + engine_weapon_attack_bonus
     local raw_strength = state.base.strength + weapon_strength
         + progression_attributes
         + researcher_all_attributes
@@ -400,6 +387,7 @@ local function recalculate(player_id, reason, growth_snapshot)
         * (1 + rebirth_level
             * (tonumber(permanent.hero_rebirth_attribute_bonus_pct) or 0)
                 / 100)
+        * commerce_privileges.attribute_multiplier
     local unscaled_strength = raw_strength * gameplay_attribute_multiplier
     local unscaled_agility = raw_agility * gameplay_attribute_multiplier
     local unscaled_intellect = raw_intellect * gameplay_attribute_multiplier
@@ -426,6 +414,27 @@ local function recalculate(player_id, reason, growth_snapshot)
         final_intellect,
         global_rules.hero_intellect_attack_per_point
     )
+    -- Native base damage already contains intellect attack. Add only its
+    -- percentage contribution here, along with the other panel sources.
+    -- Equipment's separate modifier provides its unmultiplied flat value;
+    -- carry the exclusive multiplier's remainder in this projection.
+    local engine_research_attack_bonus = debug_attack and 0 or (
+        (((state.engine_base_attack_min
+            + state.engine_base_attack_max
+            + weapon_attack_min + weapon_attack_max) * 0.5)
+            + attribute_attack_bonus * state.damage_multiplier
+            + flat_panel_attack) * total_attack_pct / 100
+            + researcher_attack_flat
+            + progression_attack_flat
+    ) * exclusive_attack_multiplier
+        + (debug_attack and 0 or equipment_stats.attack_flat
+            * (exclusive_attack_multiplier - 1))
+    local engine_weapon_attack_bonus = (debug_attack
+        and (debug_attack - equipment_stats.attack_flat)
+        or ((weapon_attack_min + weapon_attack_max) * 0.5)
+            * exclusive_attack_multiplier)
+    local engine_bonus_attack = engine_research_attack_bonus
+        + engine_weapon_attack_bonus
     -- The adapter protects missing health itself, and skips unchanged health
     -- projections. A second guard here scheduled redundant work on every hit.
     local _, _, _, health_changed = hero_stat_adapter.apply_configured_health(
@@ -459,6 +468,15 @@ local function recalculate(player_id, reason, growth_snapshot)
         engine_base_min, engine_base_max, engine_weapon_attack_bonus,
         engine_research_attack_bonus, equipment_stats.attack_flat,
         math.max(1, critical_damage_pct / 100))
+    -- Equipment and technology use ATTACKSPEED_BONUS_CONSTANT, so their IAS
+    -- adds before the cheer aura's ATTACKSPEED_PERCENTAGE multiplier.
+    local cheer_attack_speed_pct = tonumber(state.unit.survival_cheer_attack_speed_pct) or 0
+    local attack_speed_percentage = math.max(1,
+        100 + equipment_stats.attack_speed_pct + researcher_attack_speed_pct)
+        * math.max(0.01, 1 + cheer_attack_speed_pct / 100)
+    local attack_interval = runtime_attack_interval
+        or (debug_attack_speed and 1 / debug_attack_speed)
+        or base_attack_time * 100 / attack_speed_percentage
     local next_snapshot = {
         player_id = player_id,
         hero_id = state.hero_id,
@@ -485,6 +503,8 @@ local function recalculate(player_id, reason, growth_snapshot)
         hero_attack_bonus_pct = tonumber(permanent.hero_attack_bonus_pct) or 0,
         hero_health_bonus_pct = tonumber(permanent.hero_health_bonus_pct) or 0,
         hero_armor_bonus_pct = tonumber(permanent.hero_armor_bonus_pct) or 0,
+        commerce_ex_attribute_multiplier = commerce_privileges.attribute_multiplier,
+        commerce_ex_final_damage_multiplier = commerce_privileges.final_damage_multiplier,
         health_regen_pct = health_regen_pct,
         health_regen_per_second = safe_get(state.unit, "GetMaxHealth", 0)
             * health_regen_pct / 100,
@@ -544,20 +564,12 @@ local function recalculate(player_id, reason, growth_snapshot)
         -- A fixed-rate modifier owns the real interval (including addspeed).
         -- Otherwise project config/equipment directly, without reading a stale
         -- engine frame during native stat recalculation.
-        attack_speed = runtime_attack_interval and 1 / runtime_attack_interval
-            or debug_attack_speed
-            or hero_combat_stat_math.attacks_per_second(
-                base_attack_time,
-                equipment_stats.attack_speed_pct
-            ) * math.max(0.01,1+researcher_attack_speed_pct/100)
-                * math.max(0.01,1+(tonumber(state.unit.survival_cheer_attack_speed_pct) or 0)/100),
+        attack_speed = 1 / attack_interval,
         attack_cadence = {base_interval=hero_combat_stat_math.configured_base_attack_time(
             state.definition, state.engine_base_attack_time), reduced_interval=base_attack_time,
-            percentage=(100+equipment_stats.attack_speed_pct)
-                * math.max(0.01,1+researcher_attack_speed_pct/100)
-                * math.max(0.01,1+(tonumber(state.unit.survival_cheer_attack_speed_pct) or 0)/100),
-            engine_interval=base_attack_time/math.max(0.01,1+researcher_attack_speed_pct/100),
-            cheer_bonus=tonumber(state.unit.survival_cheer_attack_speed_pct) or 0,
+            percentage=base_attack_time / attack_interval * 100,
+            engine_interval=attack_interval,
+            cheer_bonus=cheer_attack_speed_pct,
             interval_reductions={
                 {label="七宗罪",value=tonumber(essence.attack_interval_flat) or 0},
                 {label="科技与存档",value=researcher_attack_interval_flat},
@@ -565,8 +577,8 @@ local function recalculate(player_id, reason, growth_snapshot)
                     +(blademaster_r and (tonumber(blademaster_config.r_attack_interval_reduction) or 0) or 0)}},
             speed_bonuses={{label="装备",value=equipment_stats.attack_speed_pct},
                 {label="科技与存档",value=researcher_attack_speed_pct},
-                {label="欢呼光环",value=tonumber(state.unit.survival_cheer_attack_speed_pct) or 0}}},
-        attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100),
+                {label="欢呼光环",value=cheer_attack_speed_pct}}},
+        attack_speed_stat = safe_get(state.unit, "GetAttackSpeed", 100, false),
         strength = final_strength,
         agility = unscaled_agility + agility_bonus,
         intellect = final_intellect,
@@ -618,6 +630,7 @@ local function recalculate(player_id, reason, growth_snapshot)
         intellect_attack_per_point=global_rules.hero_intellect_attack_per_point,
         configured_attack_time=hero_combat_stat_math.configured_base_attack_time(
             state.definition,state.engine_base_attack_time), final_attack_time=base_attack_time,
+        commerce_ex_attribute_multiplier=commerce_privileges.attribute_multiplier,
         fixed_exclusive_multiplier=monkey_e and math.max(1,tonumber(monkey_config.e_attack_multiplier) or 1)
             or (blademaster_r and math.max(1,tonumber(blademaster_config.r_attack_multiplier) or 1) or 1),
         debug_attack=debug_attack, debug_attack_speed=debug_attack_speed,
@@ -650,6 +663,10 @@ local function recalculate(player_id, reason, growth_snapshot)
     state.unit.survival_gameplay_final_damage_pct =
         (tonumber(permanent.hero_final_damage_bonus_pct) or 0)
         + (tonumber(permanent.global_final_damage_bonus_pct) or 0)
+    -- Cache on the entity when its sources change; the damage hot path never
+    -- scans or copies a player profile for this independent multiplier.
+    state.unit.survival_commerce_hero_ex_damage_multiplier =
+        commerce_privileges.final_damage_multiplier
     state.unit.survival_gameplay_damage_bonus_flat =
         tonumber(permanent.hero_damage_bonus_flat) or 0
     state.unit.survival_gameplay_damage_reduction_pct = math.max(0,
@@ -792,7 +809,7 @@ local function on_hero_summoned(payload)
             base.attack_max,
             damage_multiplier
         ),
-        engine_base_attack_time = safe_get(payload.unit, "GetBaseAttackTime", 2),
+        engine_base_attack_time = safe_get(payload.unit, "GetBaseAttackTime", 2, false),
         refresh_version = 0,
         snapshot = nil,
     }
@@ -960,6 +977,15 @@ local function on_technology_stats_changed(payload)
     recalculate(player_id, "technology_stats_changed")
 end
 
+local function on_cheer_changed(payload)
+    if not payload or payload.reason ~= "lumberjack_cheer_changed" then return end
+    local player_id = tonumber(payload.player_id)
+    local state = player_id ~= nil and state_by_player[player_id] or nil
+    if state and state.unit == payload.unit then
+        recalculate(player_id, payload.reason)
+    end
+end
+
 local function on_hero_removed(payload)
     local player_id = tonumber(payload and payload.player_id)
     local state = player_id and state_by_player[player_id]
@@ -1004,9 +1030,20 @@ function M.init()
     -- this service can read the previous armor value and leave the HUD stale.
     event_bus.subscribe(events.EQUIPMENT_STATS_CHANGED, on_changed)
     event_bus.subscribe(events.TECHNOLOGY_STATS_CHANGED, on_technology_stats_changed)
+    event_bus.subscribe(events.UNIT_COMBAT_STATS_CHANGED, on_cheer_changed)
     event_bus.subscribe(events.SEVEN_SINS_ESSENCE_CHANGED, on_progression_changed)
     event_bus.subscribe(events.HERO_PROGRESSION_CHANGED, on_progression_changed)
     event_bus.subscribe(events.PERMANENT_REWARD_EFFECTS_CHANGED, on_progression_changed)
+    event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        local state = state_by_player[player_id]
+        if not state or not state.snapshot then return end
+        local privilege = commerce_hero_privileges.for_player(player_id)
+        if privilege.attribute_multiplier ~= state.snapshot.commerce_ex_attribute_multiplier
+            or privilege.final_damage_multiplier ~= state.snapshot.commerce_ex_final_damage_multiplier then
+            queue_recalculation(player_id, "commerce_hero_privileges_changed")
+        end
+    end)
     event_bus.subscribe(events.HERO_SKILL_CHANGED, on_progression_changed)
     event_bus.subscribe(events.MONKEY_KING_BONUS_STATS_CHANGED, on_progression_changed)
     event_bus.subscribe(events.BLADEMASTER_BONUS_STATS_CHANGED, on_progression_changed)

@@ -318,6 +318,10 @@ def main():
     inventory={'mode':'dota_native','nativeItems':len(native_item_ids),
         'mappings':textures,'icons':content,'ability_icons':ability_icons,'images':[]}
     write(MANIFEST,json.dumps(inventory,ensure_ascii=False,sort_keys=True,indent=2)+'\n')
+    # Native ability metadata remains generated above. Item UI resources always
+    # come from the maintained shared table, never the temporary legacy map.
+    import build_item_resources
+    build_item_resources.build(ROOT)
     print(f'NATIVE_UI_ICONS_RESTORED abilities={len(ability_icons)} inventory={len(textures)} shop_identities={len(content)} CSVs={len(changed)}')
 
 if __name__=='__main__':main()

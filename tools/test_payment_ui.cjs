@@ -2,20 +2,23 @@
 const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm");
 const panels={},requests=[],urls=[],scheduled=[],subscriptions={};
 function panel(){return {style:{},enabled:true,text:"",children:[],events:{},SetHasClass(name,value){this[name]=value;},
- RemoveAndDeleteChildren(){this.children=[];},AddClass(){},BHasClass(name){return !!this[name];},Children(){return this.children;},SetPanelEvent(name,fn){this.events[name]=fn;}};}
+ RemoveAndDeleteChildren(){this.children=[];},AddClass(name){this[name]=true;},RemoveClass(name){delete this[name];},BHasClass(name){return !!this[name];},Children(){return this.children;},IsValid(){return !this.deleted;},DeleteAsync(){this.deleted=true;if(this.parent)this.parent.children=this.parent.children.filter(p=>p!==this);},SetPanelEvent(name,fn){this.events[name]=fn;}};}
 function $(id){return panels[id]||(panels[id]=panel());}
-$.CreatePanel=(_,parent)=>{const child=panel();parent.children.push(child);return child;};
+$.CreatePanel=(_,parent,id)=>{const child=panel();child.parent=parent;if(id)panels['#'+id]=child;parent.children.push(child);return child;};
 $.Schedule=(delay,fn)=>{scheduled.push({delay,fn});return scheduled.length;};
 $.DispatchEvent=(name,url)=>urls.push(url);
+$.GetContextPanel=()=>$("#Root");$.CancelScheduled=()=>{};
 let topLayer=null;
 const config={SurvivalUI:{},RemainingHandoff:{},SurvivalUILayers:{Open:(id)=>topLayer=id,Close:()=>topLayer=null,Top:()=>topLayer}};
-// This fixture exercises payment state; the real standalone geometry is covered by the XML fixture.
-config.SurvivalUI.ModalShell={Adopt(props){
- assert.equal(props.id,"payment_shop");assert.equal(props.panel,$("#PaymentDialog"));
- const menu={
-  Open(){config.SurvivalUILayers.Open(props.id);},Close(){config.SurvivalUILayers.Close(props.id);},Dispose(){this.Close();}};
- return menu;
-}};
+// This fixture exercises payment state; actual shared-modal geometry is covered by the XML fixture.
+config.SurvivalUI={ModalShell:{Adopt(props){
+ assert.equal(props.id,"payment_shop");assert.equal(props.width,580);assert.equal(props.height,334);assert.equal(props.panel,$("#PaymentDialog"));
+ props.panel.style.width=props.width+'px';props.panel.style.height=props.height+'px';
+ const shield=$.CreatePanel('Button',props.panel,'');shield.AddClass('UIModalInputShield');shield.SetPanelEvent('onactivate',()=>true);
+ const modal={Open(){this.open=true;config.SurvivalUILayers.Open(props.id);},Close(){this.open=false;config.SurvivalUILayers.Close(props.id);},Dispose(){this.Close();},IsOpen(){return !!this.open;}};
+ props.closeButton.SetPanelEvent('onactivate',()=>props.onClose());return modal;
+}}};
+config.SurvivalMenuV10={Adopt(){throw Error('Compact checkout must not adopt the large menu');}};
 const scope={$,GameUI:{CustomUIConfig:()=>config},GameEvents:{SendCustomGameEventToServer:(name,data)=>requests.push(data),Subscribe:(name,fn)=>subscriptions[name]=fn,Unsubscribe:()=>{}}};
 vm.createContext(scope);vm.runInContext(fs.readFileSync("panorama/src/scripts/custom_game/payment_test.js","utf8"),scope);
 const handler=subscriptions.survival_payment_result;
@@ -26,11 +29,12 @@ assert.equal(topLayer,"payment_shop");assert.equal($("#PaymentScrim").Open,true)
 assert.match(fs.readFileSync("panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js","utf8"),/shop:\["SurvivalPayments","Open"\]/);
 handler({ok:true,action:"catalog",products:Object.fromEntries(products.map((p,i)=>[i+1,p])),game_values:{initial_wood:80},wallet:{wood:110000000}});
 assert.equal($("#PaymentProducts").children.length,5);
-assert.equal($("#PaymentPrice").text,"¥50.00");
-assert.match($("#PaymentValues").text,/80 → 180/);assert.match($("#PaymentValues").text,/110000000/);
+assert.equal($("#PaymentPrice").text,"合计 ¥50.00");
+assert.match($("#PaymentValues").text,/80\.0 → 180\.0/);assert.match($("#PaymentValues").text,/110000000\.0/);
 scope.PaymentBuy();scope.PaymentBuy();
 assert.equal(requests.filter(x=>x.action==="create").length,1);
-assert.deepEqual(Object.keys(requests[1]).sort(),["action","provider","request_id","sku"]);
+assert.deepEqual(Object.keys(requests[1]).sort(),["action","provider","quantity","request_id","sku"]);
+assert.equal(requests[1].quantity,1);
 assert.equal(requests[1].provider,"wechat");
 assert.equal(requests[1].sku,"wood_100_test_50_v3");
 const order={ok:true,action:"create",sku:"wood_100_test_50_v3",title:"初始木材 +100",amount_fen:5000,state:"pending",order_id:"WX"+"1".repeat(30),
@@ -39,12 +43,12 @@ handler({...order,qr_matrix:Array(29).fill("0".repeat(29)).join("|")});
 assert.equal($("#PaymentQR").style.visibility,"visible");assert.equal($("#PaymentBuy").enabled,false);
 assert.equal(urls.length,0);scope.PaymentOpen();assert.equal(urls.length,1);
 $("#PaymentProducts").children[1].events.onactivate();
-assert.equal($("#PaymentPrice").text,"¥50.00");assert.equal($("#PaymentQR").style.visibility,"collapse");
+assert.equal($("#PaymentPrice").text,"合计 ¥50.00");assert.equal($("#PaymentQR").style.visibility,"collapse");
 scope.PaymentBuy();assert.equal(requests.at(-1).sku,"gold_100_test_50_v3");
 handler({...order,sku:"gold_100_test_50_v3",checkout_url:"https://evil.example/"});scope.PaymentOpen();assert.equal(urls.length,1);
 $("#PaymentProducts").children[0].events.onactivate();
 handler({...order,action:"status",state:"delivered",effect_changes:{initial_wood:{before:80,after:180,delta:100}},game_values:{initial_wood:180},wallet:{wood:110000100}});
-assert.match($("#PaymentValues").text,/本单存档：80 → 180/);assert.match($("#PaymentValues").text,/110000100/);
+assert.match($("#PaymentValues").text,/本单存档：80\.0 → 180\.0/);assert.match($("#PaymentValues").text,/110000100\.0/);
 assert.equal($("#PaymentBuy").enabled,false);assert.equal($("#PaymentQR").style.visibility,"collapse");
 assert.match($("#PaymentStatus").text,/初始木材 \+100/);
 handler({ok:true,action:"reset",kind:"refreshmoney"});
@@ -58,16 +62,16 @@ const bundle={sku:"mixed_bundle",title:"完整礼包",description:"全部发放"
  stat_preview:[{field_id:"initial_wood",value:10,after:110,delta:100},{field_id:"wall_armor",value:0,after:100,delta:100}]};
 handler({ok:true,action:"catalog",products:[bundle]});
 config.SurvivalPayments.Checkout(bundle.sku);
-assert.equal($("#PaymentPrice").text,"¥7.77");assert.match($("#PaymentValues").text,/10 → 110/);assert.match($("#PaymentValues").text,/0 → 100/);assert.match($("#PaymentValues").text,/VIP权限/);
+assert.equal($("#PaymentPrice").text,"合计 ¥7.77");assert.match($("#PaymentValues").text,/10\.0 → 110\.0/);assert.match($("#PaymentValues").text,/0\.0 → 100\.0/);assert.match($("#PaymentValues").text,/VIP权限 \+1\.0/);
 scope.PaymentBuy();assert.equal(requests.at(-1).sku,"mixed_bundle");
 const bundleOrder={...order,...bundle,effects:{initial_wood:100,wall_armor:100}};
 handler(bundleOrder);
 handler({ok:true,action:"catalog",products:[{...bundle,amount_fen:999,title:"已修改的新商品",reward_lines:[]}]});
-assert.equal($("#PaymentPrice").text,"¥7.77","pending checkout must keep its original price");assert.equal($("#PaymentTitle").text,"完整礼包");assert.match($("#PaymentValues").text,/VIP权限/);
+assert.equal($("#PaymentPrice").text,"合计 ¥7.77","pending checkout must keep its original price");assert.equal($("#PaymentTitle").text,"完整礼包");assert.match($("#PaymentValues").text,/VIP权限/);
 handler({ok:true,action:"catalog",products:[]});
 assert.equal($("#PaymentProducts").children.length,1,"delisting cannot hide an existing checkout");
 handler({...bundleOrder,action:"status",state:"delivered",effect_changes:{initial_wood:{before:10,after:110,delta:100},wall_armor:{before:0,after:100,delta:100}},game_entitlements:{vip:{active:true}}});
-assert.match($("#PaymentValues").text,/本单存档：10 → 110/);assert.match($("#PaymentValues").text,/本单存档：0 → 100/);assert.match($("#PaymentValues").text,/本局已生效/);
+assert.match($("#PaymentValues").text,/本单存档：10\.0 → 110\.0/);assert.match($("#PaymentValues").text,/本单存档：0\.0 → 100\.0/);assert.match($("#PaymentValues").text,/本局已生效/);
 handler({ok:true,action:"catalog",products:[{...bundle,owned:1,enabled:true}]});
 assert.equal($("#PaymentBuy").enabled,true,"server may permit another purchase of a repeatable product");
 scope.PaymentBuy();assert.equal(requests.at(-1).sku,"mixed_bundle");

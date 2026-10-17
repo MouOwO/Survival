@@ -55,9 +55,18 @@ def apply(conn,package):
     from psycopg.types.json import Jsonb
     catalog=package['catalog'];conn.execute('SET ROLE goufayu_owner')
     conn.execute("SELECT pg_advisory_xact_lock(hashtext('payments.catalog.publish'))")
+    if any(p.get('product_type')=='recharge' for p in catalog['products']):
+        if not conn.execute("SELECT to_regprocedure('payments.recharge_wallet_balance(text)') IS NOT NULL").fetchone()[0]:
+            raise ValueError('U币充值尚未部署：先验证并应用 upgrade_ucoin_recharge.sql')
     if any(p['grants'].get('entitlement_days') for p in catalog['products']):
         if not conn.execute("SELECT to_regprocedure('payments.entitlement_days(jsonb,text)') IS NOT NULL").fetchone()[0]:
             raise ValueError('时限月卡尚未部署：先验证并应用 upgrade_monthly_pass.sql，禁止按永久权限发布')
+    bundles=[p for p in catalog['products'] if p['enabled'] and ('components' in p['grants'] or 'vip_claims' in p['grants'])]
+    if bundles:
+        if not conn.execute("SELECT to_regprocedure('payments.validate_commerce_bundle(jsonb,jsonb)') IS NOT NULL").fetchone()[0]:
+            raise ValueError('礼包原子发奖尚未部署：先验证并应用 upgrade_commerce_bundles.sql')
+        for product in bundles:
+            conn.execute('SELECT payments.validate_commerce_bundle(%s,%s)',(Jsonb(product['grants']),Jsonb(product['effects'])))
     conn.execute('UPDATE payments.products SET enabled=false')
     for p in catalog['products']:
         previous=conn.execute('SELECT item_id FROM payments.products WHERE sku=%s',(p['sku'],)).fetchone()

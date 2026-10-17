@@ -15,8 +15,13 @@ for (const [w,h] of [[842,441],[962,409],[800,600],[1024,768],[1280,720],[1672,9
             assert.equal(keys.x,original.x);
             assert(!shortcuts.Overlaps(keys,rect));
             assert(p.x>=keys.x+keys.width+13.99);
-            assert(p.scale >= anchor.productionQueueScale - .000001,
-                `${w}x${h}: retain the readable queue scale instead of crushing the left column`);
+            assert(p.scale >= anchor.productionQueueScale * (training ? .75 : 1) - .000001,
+                `${w}x${h}: training uses three-quarter size while research retains its readable scale`);
+            if (training) {
+                const research=production.PanelGeometry(anchor,false);
+                assert(Math.abs(rect.width-research.width*research.scale*.75)<.001,
+                    `${w}x${h}: the training panel occupies three quarters of the research panel width`);
+            }
             if (p.mode === 'above') {
                 assert(Math.abs(p.y+rect.height+14-(anchor.y-126*anchor.scale))<.001);
                 assert(!shortcuts.Overlaps(rect,{x:anchor.x,y:anchor.y,width:anchor.width*anchor.scale,height:anchor.height*anchor.scale}));

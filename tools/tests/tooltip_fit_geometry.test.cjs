@@ -1,7 +1,9 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const base='panorama/src/scripts/custom_game/',helper=fs.readFileSync(base+'common/tooltip_dismiss.js','utf8');
-const files=['common/archive_tooltip.js','common/menu_v10.js','daily_remaining_5d5c1152eb.js','lottery_gw2.js','archive_handoff_180de7e38b.js'];
+// Daily rewards now use the archive renderer directly; its former independent
+// geometry mapper no longer exists. The shared archive mapper remains covered.
+const files=['common/archive_tooltip.js','common/menu_v10.js','lottery_gw2.js','archive_handoff_180de7e38b.js'];
 function mapper(source,values){
  const start=source.indexOf('function tooltipRect('),brace=source.indexOf('{',start);assert(start>=0);let depth=1,end=brace+1;
  for(;depth;end++){if(source[end]==='{')depth++;else if(source[end]==='}')depth--;}
@@ -33,4 +35,4 @@ for(const file of files)for(const fit of [.5,1.4]){
   assert.equal(read(node('LotterySource',10,10,100,60,otherWindow)).width,100*fit,'Legacy tooltip reads the actual cross-layout source owner');
  }
 }
-console.log('TOOLTIP_FIT_GEOMETRY_PASS: five production mappers, Fit .5/1.4, native scale not duplicated, edge entry, tooltip/source lock union and root-level legacy ownership');
+console.log('TOOLTIP_FIT_GEOMETRY_PASS: four production mappers including the shared daily/archive renderer, Fit .5/1.4, native scale not duplicated, edge entry, tooltip/source lock union and root-level legacy ownership');

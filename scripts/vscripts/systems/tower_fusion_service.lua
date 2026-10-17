@@ -6,6 +6,7 @@ local skill_bindings = require("config/generated/ultimate_tower_skill_bindings")
 local tower_skills = require("systems/tower_skill_runtime")
 local tower_ability_sync = require("systems/tower_ability_sync")
 local tower_combat_rules = require("config/tower_combat_rules")
+local rogue_ultimate_effects = require("systems/rogue_ultimate_tower_effect_service")
 
 local M = {}
 
@@ -241,6 +242,7 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
     local attack_speed = math.max(0.01, tonumber(config().base_attack_speed) or 3)
     unit:SetBaseAttackTime(1 / attack_speed)
     unit.survival_attack_speed = attack_speed
+    rogue_ultimate_effects.initialize(unit, player_id, selected, attack_speed)
 
     local state = {
         player_id = player_id,
@@ -674,7 +676,8 @@ function M.commerce_build(player_id,caster,position)
     if (position-caster:GetAbsOrigin()):Length2D()>1200 then return {ok=false,error='建造位置超出1200范围'} end
     local selected,cost={}, {wood=0,gold=0}
     local building=require('config/buildings_config').arrow_tower
-    local health=tonumber(building.levels[1].health) or 1000
+    local initial_levels=building.levels or building.pre_class_levels or {}
+    local health=tonumber(initial_levels[1] and initial_levels[1].health) or 1000
     for _,class_id in ipairs(config().route_ids) do
         local row=final_row(class_id)
         for _,base in ipairs(require('config/generated/arrow_tower_base').rows) do
@@ -710,6 +713,7 @@ local function on_personal_growth(payload)
 end
 
 function M.init()
+    rogue_ultimate_effects.init()
     ultimate_by_player = {}
     state_by_entindex = {}
     wall_by_player = {}

@@ -1,0 +1,230 @@
+{
+  "kind": "exact_installed_dota_native_preview_only",
+  "records": [
+    {
+      "key": "rank_tier_icons/rank1_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank1_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank1_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank1_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "8affdc8d0801b5ca436d8c03e1565b1d92de83c0c816952ef8625d58bd2d51da"
+    },
+    {
+      "key": "rank_tier_icons/rank2_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank2_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank2_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank2_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "8b22fcefc0224385917a4ba56b34c43d9f86f17d5b5bc8b903cacb7b0f2bf00f"
+    },
+    {
+      "key": "rank_tier_icons/rank3_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank3_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank3_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank3_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "639005d98b8d055b5beaf2041daa765530412575ff4a3a9dcfb658b39ed889b0"
+    },
+    {
+      "key": "rank_tier_icons/rank4_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank4_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank4_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank4_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "fa982f34cc99f4d328cb612a5a941de9769e284a0c9c7bb09d1d85d4ad444822"
+    },
+    {
+      "key": "rank_tier_icons/rank5_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank5_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank5_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank5_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "31198eb8351ac335404305ee721bc6ee87a4fc216a17cee1bc4e747c9f51aaa9"
+    },
+    {
+      "key": "rank_tier_icons/rank6_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank6_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank6_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank6_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "89e93dd740b1114da8c9d79e27e519c437cdcfdd2236cac0ccae6a82977829bd"
+    },
+    {
+      "key": "rank_tier_icons/rank7_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank7_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank7_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank7_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "dff8fe94fa419a0c553ead2906a2dc651c5ec9ab7663f300a685adc48cb4e804"
+    },
+    {
+      "key": "rank_tier_icons/rank8_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank8_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank8_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank8_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "eb5dbccced6a42414b5a6ae45c5224584b7fcced4aef5af1f428ec0d8ab97b15"
+    },
+    {
+      "key": "rank_tier_icons/rank8a_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank8a_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank8a_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank8a_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "83364e68643f54fc1a8c28c8b033307ae9817e3fa18e021f80bdbfb5a5303089"
+    },
+    {
+      "key": "rank_tier_icons/rank8b_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/rank8b_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/rank8b_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_rank8b_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "efc8267f08172ca8d783990359aec72baaf8613662e4c6b7d1ca3a57082a08d6"
+    },
+    {
+      "key": "rank_tier_icons/pip1_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/pip1_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/pip1_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_pip1_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "a5207be9032d2a7784d775f7719f4e3bf129e545d651dcb65de99fc18d22e709"
+    },
+    {
+      "key": "rank_tier_icons/pip2_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/pip2_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/pip2_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_pip2_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "bd74fb6c8b5125eb740e6961689fd2ea5fa4bc7e63fbc9544743f13fb187cade"
+    },
+    {
+      "key": "rank_tier_icons/pip3_psd",
+      "uri": "s2r://panorama/images/rank_tier_icons/pip3_psd.vtex",
+      "resource": "panorama/images/rank_tier_icons/pip3_psd.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/rank_tier_icons_pip3_psd.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "e6dacc3075fbddd2cfc2a1419631119bcf0000cb1eb0bef87bf1ff643c804ff0"
+    },
+    {
+      "key": "econ/tools/treasure_chest_kunkka_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_kunkka_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_kunkka_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_kunkka_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "3e80c0afa9bbf9a263d8c0e7a2c92ddb002ad5c2b034bd52916d41d98de43e5b"
+    },
+    {
+      "key": "econ/tools/treasure_chest_morphling_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_morphling_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_morphling_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_morphling_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "51a190fdac592d4f1ee811ceb0033ffb9abd1ada345f34e562763444ef0d5de6"
+    },
+    {
+      "key": "econ/tools/treasure_chest_bloodseeker_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_bloodseeker_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_bloodseeker_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_bloodseeker_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "27421c6755979f8628d19ce2542d0db9413a27bbb0f5eadbba559a64529f8a6b"
+    },
+    {
+      "key": "econ/tools/treasure_chest_faceless_void_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_faceless_void_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_faceless_void_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_faceless_void_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "f9d4e92f3b6c47b74aa53d3df21def68be492d5c1651cab7a7242e08ddfc65e6"
+    },
+    {
+      "key": "econ/tools/treasure_chest_tidehunter_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_tidehunter_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_tidehunter_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_tidehunter_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "866b8d7bc32507bb2950e549d583a0346447e772a3e1918b496e3293bed94db2"
+    },
+    {
+      "key": "econ/tools/treasure_chest_drow_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_drow_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_drow_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_drow_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "71197cb9f208044ae70f847f8c21c8a944f88d5604ce91ea55ab1d82d9326ebf"
+    },
+    {
+      "key": "econ/tools/treasure_chest_invoker_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_invoker_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_invoker_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_invoker_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "d91a707e75e145bfbdfbf7e345c1640f482a6db6d1ed943bf077c9a8ee68d7fe"
+    },
+    {
+      "key": "econ/tools/treasure_chest_sven_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_sven_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_sven_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_sven_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "5f3f3b0ee2d5998fb01746d82ddf23214018b67141ac5684affc05f24a0cc361"
+    },
+    {
+      "key": "econ/tools/treasure_chest_witchdoctor_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_witchdoctor_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_witchdoctor_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_witchdoctor_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "1e3d9c476ffb87b0d29718ce8fb970b73e6d0e154cecbd5f9c689e577cff7c78"
+    },
+    {
+      "key": "econ/tools/treasure_chest_omniknight_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_omniknight_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_omniknight_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_omniknight_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "afa47c8be63aeb63c4d93c1f318b7935853fc1eabbe4613c8c63c1871b8a543f"
+    },
+    {
+      "key": "econ/tools/treasure_chest_dragon_knight_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_dragon_knight_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_dragon_knight_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_dragon_knight_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "c58f550a7b8bb1dd2de7453d92bbcf5e89085c224cf9f451a862d858f286ca5f"
+    },
+    {
+      "key": "econ/tools/treasure_chest_international_2013_png",
+      "uri": "s2r://panorama/images/econ/tools/treasure_chest_international_2013_png.vtex",
+      "resource": "panorama/images/econ/tools/treasure_chest_international_2013_png.vtex_c",
+      "previewPng": "design_refs/archive_reward_icons_20261017/native/econ_tools_treasure_chest_international_2013_png.png",
+      "width": 256,
+      "height": 170,
+      "sha256": "4eceb4b3c3eb6a275f7373be89e531eddc02d3a52ecba561b0600378c2ee8a04"
+    }
+  ]
+}

@@ -14,7 +14,7 @@ function nativeFixture(){
 }
 let entrySequence=200;
 window.entrySnapshot=category=>({ok:1,sequence:++entrySequence,chunk:1,chunks:1,category_id:category,categories:COLLECTION_GW2_FIXTURE.categories,rows:COLLECTION_GW2_FIXTURE.pages[category]||[],social:COLLECTION_GW2_FIXTURE.social[category],pending:0,upgrade_pending:0,currencies:{gold:2881,points:320,tickets:20}});
-window.entrySend=category=>{if(category==='wife')throw Error('Unconfigured wife is not a fixture pool');emit('survival_archive_snapshot',entrySnapshot(category));syncLayout();};
+window.entrySend=category=>{if(!COLLECTION_GW2_FIXTURE.social[category])throw Error('Unknown fixture pool: '+category);emit('survival_archive_snapshot',entrySnapshot(category));syncLayout();};
 window.entryExecute=relative=>{const previous=currentContext;currentContext=nodes.PreviewContext_survival_hud;try{window.eval(PREVIEW_SOURCES[relative]+'\n//# sourceURL='+relative);}finally{currentContext=previous;}syncLayout();};
 window.previewReady=(async()=>{
  nativeFixture();await previewLoad();

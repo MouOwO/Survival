@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([Parameter(Mandatory=$true)][string[]]$Ids, [ValidateSet('v3','v4')][string]$TextureVersion='v4', [switch]$CheckOnly)
+param([Parameter(Mandatory=$true)][string[]]$Ids, [ValidateSet('v3','v4','v5')][string]$TextureVersion='v5', [switch]$CheckOnly)
 $ErrorActionPreference='Stop'
 $portraitRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $portraitEngine=[IO.Path]::GetFullPath((Join-Path $portraitRepo '../../..'))
@@ -31,7 +31,15 @@ foreach($portraitId in $Ids){
     $portraitRecipeText=Get-Content -LiteralPath $portraitRecipe -Raw -Encoding UTF8
     if((Get-FileHash -LiteralPath $portraitImage -Algorithm SHA256).Hash.ToLowerInvariant() -ne $portraitReceipt.sha256){throw "Original portrait SHA differs: $portraitId"}
     if($portraitRecipeText -notmatch ('"m_fileName"\s+"string"\s+"panorama/images/custom_game/archive_portraits_v3/'+[regex]::Escape($portraitId)+'\.png"')){throw "Recipe image identity differs: $portraitId"}
-    if($portraitReceipt.runtime_uri -notin @("s2r://panorama/images/custom_game/archive_gpu_regular/head_v3_$portraitId.vtex","s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_$portraitId.vtex")){throw "Runtime portrait URI differs: $portraitId"}
+    if($portraitReceipt.runtime_uri -notin @("s2r://panorama/images/custom_game/archive_gpu_regular/head_v3_$portraitId.vtex","s2r://panorama/images/custom_game/archive_gpu_regular/head_v4_$portraitId.vtex","s2r://panorama/images/custom_game/archive_gpu_regular/head_v5_$portraitId.vtex")){throw "Runtime portrait URI differs: $portraitId"}
+    if($TextureVersion -eq 'v5'){
+        $portraitPng=[IO.File]::ReadAllBytes($portraitImage)
+        if($portraitPng.Length -lt 24 -or [BitConverter]::ToString($portraitPng,0,8) -ne '89-50-4E-47-0D-0A-1A-0A'){throw "Original portrait is not PNG: $portraitId"}
+        $portraitSourceWidth=([int]$portraitPng[16]*16777216)+([int]$portraitPng[17]*65536)+([int]$portraitPng[18]*256)+[int]$portraitPng[19]
+        $portraitSourceHeight=([int]$portraitPng[20]*16777216)+([int]$portraitPng[21]*65536)+([int]$portraitPng[22]*256)+[int]$portraitPng[23]
+        if($portraitSourceWidth -ne 1254 -or $portraitSourceHeight -ne 1254 -or $portraitReceipt.source_width -ne 1254 -or $portraitReceipt.source_height -ne 1254){throw "V5 must use the original 1254px portrait: $portraitId"}
+        if($portraitRecipeText -notmatch '"m_outputFormat"\s+"string"\s+"BGRA8888"' -or $portraitRecipeText -notmatch '"m_nOutputMaxDimension"\s+"int"\s+"512"' -or $portraitRecipeText -notmatch '"m_bNoLod"\s+"bool"\s+"1"' -or $portraitRecipeText -notmatch '"m_algorithm"\s+"string"\s+"ScaleToPowerOfTwo"' -or $portraitRecipeText -notmatch '"m_mipAlgorithm"\s+"CDmeImageProcessor"\s*\{\s*"m_algorithm"\s+"string"\s+""'){throw "V5 requires 512px BGRA8888 NO_LOD and no mip filter: $portraitId"}
+    }
     $portraitRecords+=[pscustomobject]@{id=$portraitId;image=$portraitImage;recipe=$portraitRecipe;imageContent=(Join-Path $portraitContent "archive_portraits_v3/$portraitId.png");recipeContent=(Join-Path $portraitContent "archive_gpu_regular/$portraitTextureName.vtex");runtime=(Join-Path $portraitRepo "panorama/images/custom_game/archive_gpu_regular/$portraitTextureName.vtex_c");imageHash=$portraitReceipt.sha256;recipeHash=(Get-FileHash -LiteralPath $portraitRecipe -Algorithm SHA256).Hash;runtimeHash=$null}
 }
 if($CheckOnly){[pscustomobject]@{success=$true;checkOnly=$true;ids=$Ids;textureVersion=$TextureVersion;textureCount=$portraitRecords.Count;formalMappingsChecked=80;otherResourcesToCompile=0}|ConvertTo-Json -Depth 4;return}

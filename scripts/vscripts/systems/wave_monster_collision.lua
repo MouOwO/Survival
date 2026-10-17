@@ -8,31 +8,28 @@ function M.profile(row, definition, is_wave)
         or definition.movement_type
         or "ground"
     local flying = movement_type == "flying"
-    -- Endless enemies keep challenge rewards/lifetime, but use the same
-    -- physical queue and four wall contacts as formal wave enemies.
-    local wave_collision = is_wave == true or definition.endless == true
+    -- Every caller that attaches wall AI must enter with the same solid body,
+    -- including single challenge bosses and visually flying monsters. Reward
+    -- and lifetime metadata must never make an attacker pass through a living
+    -- front row. Practice rooms and independent encounter NPCs keep their own
+    -- smaller, non-wall collision profiles.
+    local wall_attacker = is_wave == true or definition.endless == true
+        or row.is_challenge_monster == true
     local base_hull_radius = global_rules.wave_ground_monster_hull_radius
     local collision_profile = row.collision_profile
 
-    if flying and not wave_collision then
+    if flying and not wall_attacker then
         base_hull_radius = 10
     end
 
-    if collision_profile == "practice" then
+    if collision_profile == "practice" and not wall_attacker then
         base_hull_radius = global_rules.practice_monster_hull_radius
-    end
-
-    local challenge_monster = row.is_challenge_monster == true and not wave_collision
-    if challenge_monster then
-        base_hull_radius = global_rules.building_challenge_hull_radius
     end
 
     return {
         movement_type = movement_type,
         base_hull_radius = base_hull_radius,
-        -- Formal/endless waves need real unit collision so the wall approach
-        -- cannot collapse into a stack. Other challenges keep their policy.
-        no_unit_collision = challenge_monster,
+        no_unit_collision = false,
         apply_before_placement = collision_profile == "practice",
     }
 end

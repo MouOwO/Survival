@@ -24,7 +24,7 @@ assert.equal(hash(bundleFile), bundleHash, 'The formal SKU inventory comes from 
 const formal = json(bundleFile).configs.commerce_catalog.rows;
 assert.equal(formal.length, 129);
 assert.equal(reviewed.length, 20);
-const expectedIds = reviewed.map(item => item.project_sku || 'home_unavailable_' + item.source_id);
+const expectedIds = reviewed.filter(item => item.project_sku).map(item => item.project_sku);
 assert.equal(reviewed.filter(item => item.project_sku).length, 15);
 
 // Deliberately all-authorized server state, so all 129 actual identities are
@@ -128,9 +128,9 @@ h.walletSnapshot(products);
 select(h, 'home');
 assert.deepEqual(displayIds(h), expectedIds, 'The rendered home follows the reviewed video: left to right, top to bottom');
 assert.equal(h.cfg.SurvivalCommerceView.Inspect().catalogProductCount, 129, 'Preview rows never enter the authenticated catalog');
-assert.equal(h.cfg.SurvivalCommerceView.Inspect().groups.find(group => group.id === 'home').count, 20);
+assert.equal(h.cfg.SurvivalCommerceView.Inspect().groups.find(group => group.id === 'home').count, 15);
 const previewCards = cards(h).filter(card => card.__observedProduct.home_unavailable);
-assert.equal(previewCards.length, 5);
+assert.equal(previewCards.length, 0, 'Every unopened video placeholder is absent from the live storefront');
 for (const card of previewCards) {
     const item = card.__observedProduct;
     assert.equal(card.__menuCell.namePanel.text, reviewed.find(entry => entry.source_id === item.source_id).name,
@@ -185,7 +185,7 @@ const changedSku = expectedIds.find(id => singleSkus.has(id));
 const changedProducts = products.map(item => item.sku === changedSku ? {...item, product_type: 'bundle'} : item);
 const changed = makeHarness(); changed.walletSnapshot(changedProducts); select(changed, 'home');
 assert.deepEqual(displayIds(changed), expectedIds.filter(id => id !== changedSku));
-assert.equal(changed.cfg.SurvivalCommerceView.Inspect().groups.find(group => group.id === 'home').count, 19);
+assert.equal(changed.cfg.SurvivalCommerceView.Inspect().groups.find(group => group.id === 'home').count, 14);
 select(changed, 'all'); assert.deepEqual(allPages(changed).ids, expectedGroup('all', [changedSku]));
 select(changed, 'bundles'); assert.deepEqual(allPages(changed).ids, [...ordinaryBundles, changedSku]);
 
@@ -204,7 +204,7 @@ const restricted = products.map(item => item.sku === ownedSku ? {...item, owned:
     : item.sku === delistedSku ? {...item, enabled: false, disabled_reason: 'product_unavailable'} : item);
 h.walletSnapshot(restricted); select(h, 'home');
 assert.deepEqual(displayIds(h), expectedIds.filter(id => id !== ownedSku && id !== delistedSku));
-assert.equal(cards(h).filter(card => card.__observedProduct.home_unavailable).length, 5);
+assert.equal(cards(h).filter(card => card.__observedProduct.home_unavailable).length, 0);
 select(h, 'all'); assert.deepEqual(allPages(h).ids, expectedGroup('all', [ownedSku, delistedSku]));
 
 // Paging to a real product can only open its existing checkout. An order still
@@ -233,12 +233,12 @@ assert.equal(purchaseRequests(buyer).length, 1);
 assert.equal(purchaseRequests(buyer)[0].payload.sku, sku);
 assert.equal(buyer.paidCheckouts.length, 0);
 assert.equal(JSON.stringify(products), originalProducts);
-const report = {status: 'PASS', reviewedOrder: expectedIds, homeCount: 20, unavailableCount: 5,
+const report = {status: 'PASS', reviewedOrder: expectedIds, homeCount: 15, unavailableCount: 0,
     formalCatalogCount: 129, allSingleCount: 114, ordinaryBundleCount: 5, vipBundleCount: 10, promotionSingleCount: 25,
     allPageSizes: [40, 40, 34], exclusiveGroups: true, staleAliasesCannotOverrideType: true, homepageTypeChangeFiltered: true,
     existingRulesPreserved: true,
     legacyHomeOverwriteIgnored: true, missingConfigDoesNotShowAll: true, checkoutSku: sku, loaded};
 const output = option('--output', null);
 if (output) { fs.mkdirSync(path.dirname(path.resolve(output)), {recursive: true}); fs.writeFileSync(output, JSON.stringify(report, null, 2) + '\n'); }
-console.log('SHOP_HOME_RENDER_PASS ' + JSON.stringify({home: 20, preview: 5, allSingles: 114, bundles: 5, vip: 10, promotions: 25,
+console.log('SHOP_HOME_RENDER_PASS ' + JSON.stringify({home: 15, preview: 0, allSingles: 114, bundles: 5, vip: 10, promotions: 25,
     pages: report.allPageSizes, checkoutSku: sku}));

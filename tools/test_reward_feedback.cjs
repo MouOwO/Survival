@@ -80,7 +80,7 @@ function harness() {
         failLoad: value => { failLoad = value; }, failStart: value => { failStart = value; }};
 }
 
-const h = harness(), fx = h.config.SurvivalUI.RewardFX.Create(h.owner, {channel: 'daily'});
+const h = harness(), fx = h.config.SurvivalUI.RewardFX.Create(h.owner, {channel: 'lottery'});
 assert.equal(h.particles.length, 0, 'Creating an owner never creates a hidden idle particle scene');
 assert.equal(h.jobs.size, 0);
 assert.equal(fx.Play({key: 'one', title: '领取成功', text: '木材 +100'}), true);

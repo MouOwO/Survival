@@ -3,16 +3,16 @@ class Panel{constructor(){this.style={};this.children={};this.visible=true;}Find
 const inv=new Panel(),items=['item_survival_growth_sword_01','item_survival_attack_gloves_shell','item_survival_iron_armor_shell'];
 const slots=Array.from({length:9},(_,i)=>{const p=new Panel();p.children.ItemImage=new Panel();p.children.ItemCharges=new Panel();p.children.ItemAltCharges=new Panel();inv.children['inventory_slot_'+i]=p;return p;});
 const cfg={},identity={};const env={cfg,GameUI:{CustomUIConfig:()=>cfg},valid:p=>!!p,native:()=>inv,selectedUnit:()=>7,
- child:(p,id,s)=>{const c=p.FindChildTraverse(id);if(c)Object.assign(c.style,s);},
+ child:(p,id,s)=>{const c=p.FindChildTraverse(id);if(c)Object.assign(c.style,s);},findCached:(p,id)=>p.FindChildTraverse(id),
  Entities:{GetItemInSlot:(_,i)=>items[i]?i:-1},Abilities:{GetAbilityName:i=>items[i]},CustomNetTables:{GetTableValue:(_,id)=>identity[id]},style:(p,s)=>Object.assign(p.style,s),
  $:{CreatePanel:(type,parent,id)=>{assert(['Image','Label'].includes(type));assert(!parent.children[id]);return parent.children[id]=new Panel();}}};
-vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/item_art_remaining_5d5c1152eb.js','utf8'),env);
+for(const file of ['common/item_resources','native_ui_icons','item_art_remaining_5d5c1152eb'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);
 const source=fs.readFileSync('panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js','utf8');
 vm.runInNewContext(source.slice(source.indexOf('    function refreshInventoryPresentation()'),source.indexOf('    function nativeLayout(')),env);
 env.refreshInventoryPresentation();env.refreshInventoryPresentation();
 const fitted=i=>slots[i].children.ItemImage.children.SurvivalInventoryFittedIcon;
-assert(fitted(0).image.endsWith('swords_00.png'));assert(fitted(1).image.endsWith('shop_01.png'));
-for(let i=0;i<3;i++){assert.equal(fitted(i).scaling,'stretch-to-fit-preserve-aspect');assert.equal(fitted(i).style.width,'100%');assert.equal(fitted(i).style.height,'100%');assert.equal(fitted(i).hittest,false);assert.equal(fitted(i).hittestchildren,false);}
+assert.equal(fitted(0).image,cfg.SurvivalItemResources.Resolve(items[0]));assert.equal(fitted(1).image,cfg.SurvivalItemResources.Resolve(items[1]));
+for(let i=0;i<3;i++){assert.equal(fitted(i).scaling,'stretch-to-cover-preserve-aspect');assert.equal(fitted(i).style.width,'100%');assert.equal(fitted(i).style.height,'100%');assert.equal(fitted(i).hittest,false);assert.equal(fitted(i).hittestchildren,false);}
 for(const p of slots)for(const id of ['ItemCharges','ItemAltCharges'])assert.equal(p.children[id].style.fontSize,'26px');
 assert.equal(slots[0].children.ItemCharges.style.opacity,'1');
 assert.equal(slots[1].children.ItemCharges.style.opacity,'0');
@@ -36,16 +36,16 @@ for(const family of ['attack_gloves','burning_blade','iron_armor']){
  items[2]=null;env.refreshInventoryPresentation();assert.equal(armorMax.visible,false);
 }
 items[2]='item_survival_iron_armor_shell';
-items[0]='item_survival_growth_sword_max';env.refreshInventoryPresentation();assert(fitted(0).image.endsWith('swords_04.png'));
-items[6]=items[0];items[0]=null;env.refreshInventoryPresentation();assert(!fitted(0).visible);assert(fitted(6).visible&&fitted(6).image.endsWith('swords_04.png'));
+items[0]='item_survival_growth_sword_max';env.refreshInventoryPresentation();assert.equal(fitted(0).image,cfg.SurvivalItemResources.Resolve(items[0]));
+items[6]=items[0];items[0]=null;env.refreshInventoryPresentation();assert(!fitted(0).visible);assert(fitted(6).visible);assert.equal(fitted(6).image,cfg.SurvivalItemResources.Resolve(items[6]));
 items[1]='item_blink';env.refreshInventoryPresentation();assert(!fitted(1).visible,'native fallback must not retain the previous custom icon');
 assert.equal(slots[1].children.ItemCharges.style.opacity,'1','moving a different item into the slot restores its counter');
 items[1]='item_survival_burning_blade_shell';env.refreshInventoryPresentation();assert.equal(slots[1].children.ItemAltCharges.style.opacity,'0');
 const tooltipCode=fs.readFileSync('panorama/src/scripts/custom_game/inventory_tooltip.js','utf8');
 vm.runInNewContext(tooltipCode.slice(tooltipCode.indexOf('    function updateItemIcon('),tooltipCode.indexOf('    function render(')),env);
 const tipIcon=new Panel();env.updateItemIcon(tipIcon,'equipment_iron_armor_04','item_survival_iron_armor_shell');
-const tipImage=tipIcon.children.InventoryTooltipFittedIcon;assert(tipImage.image.endsWith('shop_03.png'));assert.equal(tipImage.scaling,'stretch-to-fit-preserve-aspect');assert.equal(tipImage.style.width,'100%');assert.equal(tipImage.style.height,'100%');
-env.updateItemIcon(tipIcon,'weapon_growth_sword_max','item_survival_growth_sword_max');assert.strictEqual(tipIcon.children.InventoryTooltipFittedIcon,tipImage);assert(tipImage.image.endsWith('swords_04.png'));
+const tipImage=tipIcon.children.InventoryTooltipFittedIcon;assert.equal(tipImage.image,cfg.SurvivalItemResources.Resolve('equipment_iron_armor_04'));assert.equal(tipImage.scaling,'stretch-to-cover-preserve-aspect');assert.equal(tipImage.style.width,'100%');assert.equal(tipImage.style.height,'100%');
+env.updateItemIcon(tipIcon,'weapon_growth_sword_max','item_survival_growth_sword_max');assert.strictEqual(tipIcon.children.InventoryTooltipFittedIcon,tipImage);assert.equal(tipImage.image,cfg.SurvivalItemResources.Resolve('weapon_growth_sword_max'));
 env.updateItemIcon(tipIcon,'item_blink','item_blink');assert.equal(tipImage.visible,false);
 for(const n of [1,2,3,4])assert.equal(env.equipmentLevelText('equipment_iron_armor_0'+n),'Lv.'+n);
 assert.equal(env.equipmentLevelText('equipment_iron_armor_max'),'MAX');

@@ -4,7 +4,7 @@ effect_id,card_id,effect_type,execution_mode,owner_scope,target_selector,stack_p
 frozen_wall_slow,frozen_wall,wall_attacker_attack_speed_pct,continuous_projection,player,matching_enemy,unique_card,active,1,永久投影至正式波次怪和建筑挑战怪。
 recruit_training_attack,recruit_training,base_tower_attack_bonus_pct,continuous_projection,player,owner_base_towers_under_level,unique_card,active,1,永久投影至CSV指定基础箭塔记录ID。
 ion_shield_cap,ion_shield,wall_hit_damage_cap_pct,continuous_projection,player,owner_wall,unique_card,active,1,共享伤害过滤器最终伤害上限。
-weakening_orb_boss,weakening_orb,next_boss_attack_pct,next_matching_event,player,next_wave_boss,unique_card,active,1,下一正式波次优先进攻Boss否则首个精英怪。
+weakening_orb_boss,weakening_orb,next_boss_attack_pct,next_matching_event,player,next_wave_boss,unique_card,active,1,后续首个特殊正式波次优先削弱Boss否则首个精英怪。
 divine_wish_policy,divine_wish,grant_random_cards,instant_transaction,player,card_pool,unique_card,active,1,立即无放回抽取并直接授予三张子卡效果。
 tower_growth_upgrade,tower_growth,tower_upgrade_attack_bonus_pct,event_reactive,player,owner_towers,unique_card,active,1,只响应领取后成功完成的防御塔升级。
 fortifications_attack_speed,fortifications,tower_attack_speed_bonus_pct,continuous_projection,player,owner_towers,unique_card,active,1,�������������ͶӰ��
@@ -16,7 +16,7 @@ infrastructure_maniac_upgrade,infrastructure_maniac,random_building_upgrade_coun
 gunpowder_splash_damage,gunpowder_splash,ballista_damage_bonus_pct,continuous_projection,player,owner_towers,unique_card,active,1,按CSV阶段ID识别穿透弩炮。
 radiant_sapling_wood,radiant_sapling,grant_current_wood_pct,instant_transaction,team_resource,team_resource_account,unique_card,active,1,����ȡʱ�Ŷ�ľ������ȡ����
 kick_when_down_damage,kick_when_down,slowed_target_damage_taken_pct,continuous_projection,player,matching_enemy,unique_card,active,1,伤害过滤器按来源玩家和移动减速状态结算。
-tower_network_attack,tower_network,max_tower_count_attack_bonus_pct,instant_transaction,player,owner_towers,unique_card,active,1,领取时统计最终满阶塔并保存固定攻击加成。
+tower_network_attack,tower_network,max_tower_count_attack_bonus_pct,continuous_projection,player,owner_towers,unique_card,active,1,领取时统计最终满阶塔并保存固定攻击加成；已有和后续防御塔共用固定快照。
 fiscal_subsidy_gold,fiscal_subsidy,grant_gold_flat,instant_transaction,team_resource,team_resource_account,unique_card,active,1,���������Ŷӽ�ҡ�
 corrosive_shield_armor,corrosive_shield,owned_target_attacker_armor_reduction,continuous_projection,player,matching_enemy,unique_card,active,1,怪物攻击持卡玩家单位时自损护甲。
 goblin_duplicator_action,goblin_duplicator,grant_tower_duplicator_action,granted_action,player,granted_action_target,unique_card,active,0,�ȴ�Ŀ��ѡ�����̡�

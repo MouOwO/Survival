@@ -23,6 +23,27 @@ local enqueue_research
 local run_research_queue
 local queue_research
 local push_snapshot
+-- Inert, default-off Workshop candidate. It only reuses a proven research
+-- projection; resource admission and the authoritative context still run.
+local wallet_probe
+local WALLET_PROOF_MAX_AGE = 1
+local function wallet_authority()
+    if not IsServer or not IsServer() or not IsInToolsMode or not IsInToolsMode()
+        or not GetMapName or GetMapName() ~= "template_map" then return nil end
+    local ok, mode = pcall(function() return GameRules:GetGameModeEntity() end)
+    local guard = _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION
+    if not ok or not mode or type(guard) ~= "table" or guard.mode ~= mode then return nil end
+    return mode, guard, event_bus.get_generation()
+end
+local function wallet_enabled()
+    if not wallet_probe then return false end
+    local mode, guard, generation = wallet_authority()
+    return mode == wallet_probe.mode and guard == wallet_probe.guard
+        and generation == wallet_probe.generation and state == wallet_probe.state
+end
+local function wallet_count(key)
+    if wallet_probe then wallet_probe.counts[key] = (wallet_probe.counts[key] or 0) + 1 end
+end
 
 local function game_time()
     return GameRules and GameRules.GetGameTime
@@ -42,6 +63,8 @@ local function reset_state()
         sequence_by_player = {},
         snapshot_cache_by_player = {},
         pending_push_reason = {},
+        pending_push_structural = {},
+        research_wallet_proofs = {},
         debug_all_unlocked = {},
         research_lanes = {},
         auto_research_next_at_by_player = {},
@@ -403,10 +426,8 @@ local function snapshot_context(player_id, reason, mode, source_entindex)
     }
 end
 local function build_snapshot(player_id, reason, mode)
-    return catalog.build_snapshot(
-        player_id,
-        snapshot_context(player_id, reason or "open", mode)
-    )
+    local context = snapshot_context(player_id, reason or "open", mode)
+    return catalog.build_snapshot(player_id, context), context
 end
 
 local function values_equal(left, right)
@@ -419,6 +440,192 @@ local function values_equal(left, right)
         if left[key] == nil then return false end
     end
     return true
+end
+
+-- Unknown configuration fields cannot silently acquire a wallet dependency.
+local function known_keys(words)
+    local result = {}; for key in words:gmatch("%S+") do result[key] = true end; return result
+end
+local WALLET_ROW_KEYS = known_keys("building_id display_name effect_type effect_value enabled gold_cost grant_type icon_name level max_level notes prerequisite_id purchase_limit required_city_level required_rebirth_level requires_hero_summoned requires_vip review_status shop_category_id shop_enabled shop_sort_order technology_group technology_id technology_phase technology_track unlock_required_level unlock_technology_group value_per_level war3_effect_value war3_value_per_level wood_cost")
+local WALLET_ENTRY_KEYS = known_keys("condition_text contentid contenttype definition description disabled_reason_text enabled encounter_id entryid fields goldcost grant_type icon icon_type min_city_level name order purchase_cooldown_seconds purchase_limit required_rebirth_level requires_building_id requires_content_id requires_hero_summoned requires_vip shopid stock_max stock_replenish_seconds technology_phase technology_track tooltip_id unlock_technology_group visible woodcost")
+local WALLET_GROUPS = known_keys("researcher_lumberjack_attack_growth researcher_lumberjack_armor_reduction researcher_super_wall_health researcher_super_wall_armor researcher_super_tower_attack researcher_super_tower_range researcher_super_tower_crit researcher_hero_final_damage researcher_hero_armor_reduction researcher_hero_attack")
+local WALLET_SNAPSHOT_KEYS = known_keys("categories config_version entries full player_id reason research research_scope research_source_entindex resources schema_version sequence technology_cooldown_remaining technology_cooldown_sequence technology_cooldown_source_entry technology_cooldown_source_group technology_cooldown_total technology_cooldown_until ui_mode")
+local WALLET_ITEM_KEYS = known_keys("auto_research_available auto_research_enabled can_afford challenge_active completed content_id content_type cost_timing_text description disabled_reason disabled_reason_code entry_id fields gold_cost grant_type icon icon_type level_text name next_technology_level owned_count prerequisite_current_level prerequisite_met prerequisite_rebirth_level prerequisite_required_level prerequisite_technology_group prerequisite_technology_id prerequisite_text progression_type purchasable purchase_condition_text purchase_cooldown_remaining purchase_cooldown_seconds purchase_entry_id purchase_limit resource_check_on_cast series_id shop_id sort_order stage stock stock_max stock_replenish_remaining stock_replenish_seconds technology_cooldown_remaining technology_cooldown_sequence technology_cooldown_source_entry technology_cooldown_source_group technology_cooldown_until technology_group technology_id technology_level technology_max_level technology_phase technology_track tooltip_id unlock_technology_group visible wood_cost")
+local function keys_known(value, allowed)
+    for key in pairs(value or {}) do if not allowed[key] then return false end end
+    return true
+end
+local function data_copy(value)
+    if type(value) ~= "table" then return value end
+    local result = {}; for key, item in pairs(value) do result[key] = data_copy(item) end
+    return result
+end
+local function wallet_context(context)
+    local result = {}
+    for key, value in pairs(context) do
+        if key ~= "sequence" and key ~= "reason" and key ~= "resources" then
+            result[key] = value
+        end
+    end
+    return result
+end
+local function wallet_source(player_id)
+    if state.opened_players[player_id] ~= "research"
+        or state.research_scope_by_player[player_id] ~= "advanced" then return nil end
+    local source = state.research_source_entindex_by_player[player_id]
+    local building = event_bus.request(events.BUILDING_QUERY_REQUEST, { entindex = source })
+    if not building or building.building_id ~= "building_advanced_research_lab"
+        or tonumber(building.entindex) ~= source
+        or not valid_player_id(tonumber(building.player_id))
+        or tonumber(building.team) ~= tonumber(player_team(player_id)) then return nil end
+    local unit = building.unit
+    local ok, valid = pcall(function()
+        return unit and not unit:IsNull() and unit:entindex() == source
+    end)
+    if not ok or not valid then return nil end
+    return { player_id = player_id, source = source, unit = unit,
+        owner = building.player_id, team = building.team }
+end
+local WALLET_SOURCE_KEYS = known_keys("player_id source unit owner team")
+local function wallet_source_same(source, previous)
+    if type(source) ~= "table" or type(previous) ~= "table"
+        or not keys_known(source, WALLET_SOURCE_KEYS)
+        or not keys_known(previous, WALLET_SOURCE_KEYS) then return false end
+    -- A native entity can be a Lua table with cyclic script-scope fields.
+    -- Its identity is the dependency; never recursively compare its contents.
+    return source.player_id == previous.player_id and source.source == previous.source
+        and source.owner == previous.owner and source.team == previous.team
+        and source.unit == previous.unit
+end
+local function wallet_idle(context)
+    local research = context.research or {}
+    return research.researching == 0 and research.queue_count == 0
+        and research.auto_enabled == 0 and research.finish_at == 0
+        and next(research.reserved_levels or {}) == nil
+        and next(research.queued or {}) == nil
+end
+local function wallet_discounts(player_id)
+    local response = event_bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,
+        { player_id = player_id })
+    local totals = response and response.totals or {}
+    return { technology_cost_refund_pct = totals.technology_cost_refund_pct,
+        technology_wood_cost_refund_pct = totals.technology_wood_cost_refund_pct,
+        technology_gold_cost_refund_pct = totals.technology_gold_cost_refund_pct }
+end
+local WALLET_DEFINITION_KEYS = known_keys("building_id display_name effects generated_rows legacy_group max_level prerequisite tech_id")
+local function wallet_definition(definition)
+    if not keys_known(definition, WALLET_DEFINITION_KEYS) then return nil end
+    local result = {}
+    -- Only the target generated row's gold/wood is read by cost_for_level.
+    -- All other projection dependencies, including every effect and prerequisite,
+    -- remain compared; target/source rows are separately guarded below.
+    for key, value in pairs(definition) do if key ~= "generated_rows" then result[key] = value end end
+    return result
+end
+local function wallet_configuration(current)
+    local all, selected = catalog.entries(), {}
+    for _, item in ipairs(current.entries) do
+        selected[item.entry_id] = true
+        selected[item.purchase_entry_id] = true
+    end
+    local proof = { list = all, references = {}, routes = {}, rows = {}, definitions = {}, costs = {},
+        build = catalog.build_snapshot, evaluate = catalog.evaluate,
+        allowed = catalog.allowed_in_mode, scope = catalog.allowed_in_research_scope,
+        cost = research_cost_service.for_player, cost_level = research_config.cost_for_level }
+    for index, entry in ipairs(all) do
+        proof.references[index] = entry
+        local row = entry.definition or {}
+        -- These fields decide which entries can affect this research shelf.
+        proof.routes[index] = { contenttype = entry.contenttype, building_id = row.building_id,
+            technology_group = row.technology_group, level = row.level }
+        if selected[entry.entryid] then
+            local definition = research_config.by_legacy_group[row.technology_group]
+            local projected = definition and wallet_definition(definition)
+            if not WALLET_GROUPS[row.technology_group] or not projected
+                or definition.building_id ~= "advanced_research_lab"
+                or not keys_known(entry, WALLET_ENTRY_KEYS)
+                or not keys_known(row, WALLET_ROW_KEYS)
+                or (tonumber(entry.purchase_cooldown_seconds) or 0) ~= 0
+                or (tonumber(entry.stock_max) or 0) ~= 0
+                or entry.encounter_id ~= "" then return nil end
+            proof.rows[index] = data_copy(entry)
+            proof.definitions[row.technology_group] = data_copy(projected)
+            local level = tonumber(row.level)
+            proof.costs[index] = research_config.cost_for_level(definition, level)
+        elseif catalog.allowed_in_mode(entry, "research")
+            and catalog.allowed_in_research_scope(entry, "advanced")
+            and not WALLET_GROUPS[row.technology_group] then return nil end
+    end
+    return next(proof.rows) and proof or nil
+end
+local function wallet_configuration_same(proof)
+    local all = catalog.entries()
+    if all ~= proof.list or #all ~= #proof.references
+        or catalog.build_snapshot ~= proof.build or catalog.evaluate ~= proof.evaluate
+        or catalog.allowed_in_mode ~= proof.allowed or catalog.allowed_in_research_scope ~= proof.scope
+        or research_cost_service.for_player ~= proof.cost
+        or research_config.cost_for_level ~= proof.cost_level then return false end
+    for index, entry in ipairs(all) do
+        local row, route = entry.definition or {}, proof.routes[index]
+        if entry ~= proof.references[index] or entry.contenttype ~= route.contenttype
+            or row.building_id ~= route.building_id or row.technology_group ~= route.technology_group
+            or row.level ~= route.level then return false end
+        if proof.rows[index] then
+            local definition = research_config.by_legacy_group[row.technology_group]
+            if not values_equal(entry, proof.rows[index])
+                or not values_equal(research_config.cost_for_level(definition, tonumber(row.level)), proof.costs[index]) then return false end
+        end
+    end
+    for group, definition in pairs(proof.definitions) do
+        local actual = research_config.by_legacy_group[group]
+        if not actual or not values_equal(wallet_definition(actual), definition) then return false end
+    end
+    return true
+end
+local function remember_wallet_proof(player_id, current, context)
+    state.research_wallet_proofs[player_id] = nil
+    if not wallet_enabled() then return end
+    wallet_count("full_builds")
+    local source = wallet_source(player_id)
+    if not source or not wallet_idle(context) or #current.entries == 0
+        or current.schema_version ~= 2 or current.config_version ~= 2
+        or not keys_known(current, WALLET_SNAPSHOT_KEYS) then return end
+    for _, entry in ipairs(current.entries) do
+        if not WALLET_GROUPS[entry.technology_group] or entry.resource_check_on_cast ~= 1
+            or not keys_known(entry, WALLET_ITEM_KEYS)
+            or entry.purchase_cooldown_remaining ~= 0 or entry.stock_max ~= 0 then return end
+    end
+    local configuration = wallet_configuration(current)
+    if not configuration then wallet_count("configuration_rejected"); return end
+    state.research_wallet_proofs[player_id] = { source = source,
+        context = data_copy(wallet_context(context)), configuration = configuration,
+        discounts = wallet_discounts(player_id), created_at = game_time(), current = current }
+end
+local function try_wallet_snapshot(player_id, reason, structural)
+    if not wallet_enabled() then return nil end
+    local proof = state.research_wallet_proofs[player_id]
+    local age = proof and game_time() - proof.created_at or -1
+    if structural or reason ~= "resource_changed" or not proof or age < 0
+        or age >= WALLET_PROOF_MAX_AGE then wallet_count("fallback"); return nil end
+    local source = wallet_source(player_id)
+    if not source or not wallet_source_same(source, proof.source)
+        or not wallet_configuration_same(proof.configuration) then
+        wallet_count("fallback"); return nil
+    end
+    -- Keep every original authoritative query. Only proven static catalog
+    -- projection is reused, so late owner/permission/technology changes repair
+    -- in this flush even if their event was absent or overwritten by resources.
+    local context = snapshot_context(player_id, reason, state.opened_players[player_id])
+    if not wallet_idle(context) or not values_equal(wallet_context(context), proof.context)
+        or not values_equal(wallet_discounts(player_id), proof.discounts) then
+        wallet_count("fallback"); return nil, context
+    end
+    local current = {}
+    for key, value in pairs(proof.current) do current[key] = value end
+    current.sequence, current.reason, current.resources = context.sequence, reason, context.resources
+    current.research = context.research
+    wallet_count("wallet_reuses")
+    return current, context
 end
 
 local function entries_by_id(entries)
@@ -493,15 +700,16 @@ local function build_patch(previous, current)
     return changed_any and patch or nil
 end
 
-local function publish_snapshot(player_id, reason)
+local function publish_snapshot(player_id, reason, structural)
     if not state.opened_players[player_id] then
         return
     end
-    local current = build_snapshot(
-        player_id,
-        reason,
-        state.opened_players[player_id]
-    )
+    local current, context = try_wallet_snapshot(player_id, reason, structural)
+    if not current then
+        if context then current = catalog.build_snapshot(player_id, context)
+        else current, context = build_snapshot(player_id, reason, state.opened_players[player_id]) end
+        remember_wallet_proof(player_id, current, context)
+    end
     local previous = state.snapshot_cache_by_player[player_id]
     local outgoing = previous and build_patch(previous, current) or current
     current.full = 1
@@ -517,13 +725,21 @@ push_snapshot = function(player_id, reason)
     if not state.opened_players[player_id] then return end
     local queued = state.pending_push_reason[player_id] ~= nil
     state.pending_push_reason[player_id] = reason or "changed"
+    if reason ~= "resource_changed" then
+        -- OR across the fixed batch: a later wallet event cannot erase a
+        -- prior structural invalidation while preserving the outgoing reason.
+        state.pending_push_structural[player_id] = true
+        state.research_wallet_proofs[player_id] = nil
+    end
     if queued then return end
     local current_state = state
     scheduler.after(0.05, function()
         if current_state ~= state then return end
         local pending_reason = state.pending_push_reason[player_id]
+        local structural = state.pending_push_structural[player_id] == true
         state.pending_push_reason[player_id] = nil
-        if pending_reason then publish_snapshot(player_id, pending_reason) end
+        state.pending_push_structural[player_id] = nil
+        if pending_reason then publish_snapshot(player_id, pending_reason, structural) end
     end, "shop_snapshot_push_" .. tostring(player_id))
 end
 local function push_team(team, reason)
@@ -604,7 +820,9 @@ local function open_shop(payload)
         state.research_source_entindex_by_player[player_id] = source_entindex
     end
     state.opened_players[player_id] = mode
-    local snapshot = build_snapshot(player_id, "opened", mode)
+    state.research_wallet_proofs[player_id] = nil
+    local snapshot, context = build_snapshot(player_id, "opened", mode)
+    remember_wallet_proof(player_id, snapshot, context)
     snapshot.full = 1
     state.snapshot_cache_by_player[player_id] = snapshot
     return {
@@ -616,6 +834,8 @@ local function close_shop(payload)
     state.opened_players[payload.player_id] = nil
     state.snapshot_cache_by_player[payload.player_id] = nil
     state.pending_push_reason[payload.player_id] = nil
+    state.pending_push_structural[payload.player_id] = nil
+    state.research_wallet_proofs[payload.player_id] = nil
     state.research_scope_by_player[payload.player_id] = nil
     state.research_source_entindex_by_player[payload.player_id] = nil
     scheduler.cancel("shop_snapshot_push_" .. tostring(payload.player_id))
@@ -1537,6 +1757,7 @@ local function on_research_level_changed(payload)
 end
 
 function M.init()
+    wallet_probe = nil
     for _, lane in pairs(state.research_lanes or {}) do
         cancel_research(lane, "research_session_reset")
     end
@@ -1606,6 +1827,22 @@ function M.init()
             end
         end, "shop_early_final_unlock")
     end)
+end
+-- Explicit per-world Workshop authority; never enabled by production init.
+function M.set_research_wallet_probe(enabled)
+    state.research_wallet_proofs = {}
+    if enabled ~= true then wallet_probe = nil; return true end
+    local mode, guard, generation = wallet_authority()
+    if not mode then return false, "requires isolated Workshop template_map server" end
+    wallet_probe = { mode = mode, guard = guard, generation = generation,
+        state = state, counts = {} }
+    return true
+end
+function M.inspect_research_wallet_probe()
+    local proofs = 0; for _ in pairs(state.research_wallet_proofs or {}) do proofs = proofs + 1 end
+    return { enabled = wallet_enabled(), proof_count = proofs,
+        max_age_seconds = WALLET_PROOF_MAX_AGE,
+        counts = data_copy(wallet_probe and wallet_probe.counts or {}) }
 end
 M._advanced_research_for_test = {
     open_shop = open_shop,

@@ -1,0 +1,2202 @@
+{
+  "schema_version": 1,
+  "review_kind": "local_video_ocr_and_manual_frame_review",
+  "reviewed_at": "2026-10-15",
+  "source": {
+    "video_number": 2,
+    "path": "D:/BaiduNetdiskDownload/bandicam 2026-10-15 12-42-43-408.mp4",
+    "sha256": "14e90318b9bdfca18c03d6b17d7e7411cc8ebe5bead1063ee89ab32e491834df",
+    "duration_seconds": 202.48,
+    "resolution": [
+      1152,
+      876
+    ],
+    "sample_step_seconds": 1,
+    "sample_count": 203,
+    "ocr_screen_count": 88,
+    "ocr_json": "output/video_shop_20261015/video2/ocr.json",
+    "transcript": "output/video_shop_20261015/video2/transcript.txt",
+    "processing": "RapidOCR / ONNX / OpenCV 本地离线；未上传视频",
+    "manual_review": "已实际查看下列全部 20 张商品详情帧，而非仅整理 OCR 文本。"
+  },
+  "scope": "仅记录第二段视频VIP页。非生产配置；不创建订单、不设置权益、不推断视频未展示的购买限制与叠加规则。",
+  "observed_rules": {
+    "pack_item_count": 2,
+    "each_item_quantity": 1,
+    "item_type": "特权",
+    "item_duration_text": "永久",
+    "activation_text": "购买后自动激活",
+    "vip_gate_format": "达到V{level}可购买",
+    "currency": "U币"
+  },
+  "global_uncertainties": [
+    "VIP等级对应的充值/累计消费门槛未展示，不能由礼包价格推导。",
+    "是否限购、是否可重复购买、不同VIP礼包或勋章是否叠加，以及权益作用于自己还是全体玩家，视频未展示。",
+    "视频商品名含“僵尸岛”品牌，作为原文证据保留；是否在本项目更名由接入任务决定。",
+    "各条效果数值均可从已查看帧直接辨认。以下疑点主要是业务含义不足，未擅自补全触发、时长或上限。",
+    "所有当前价/原价都是画面直接显示的U币整数；未换算成人民币，未将当前账号顶部124U币余额当成商品价格。"
+  ],
+  "semantic_uncertainties": [
+    {
+      "term": "墙每秒生命",
+      "levels": [
+        1,
+        4
+      ],
+      "question": "原文清楚，但未说明是每秒回复当前生命，还是每秒增加生命上限。保留原文，需与项目业务字段核对。"
+    },
+    {
+      "term": "伐木效率",
+      "levels": [
+        3,
+        8
+      ],
+      "question": "原文以固定数值表示，未说明每次伐木、每秒产出或基础效率的计量口径。"
+    },
+    {
+      "term": "伐木工攻击成长",
+      "levels": [
+        3
+      ],
+      "question": "未说明按等级、时间、攻击次数或其他事件成长。"
+    },
+    {
+      "term": "箭塔每秒攻击",
+      "levels": [
+        3,
+        5
+      ],
+      "question": "未说明每秒增加攻击力，还是每秒攻击次数；不能直接转成攻速。"
+    },
+    {
+      "term": "英雄造成伤害攻击",
+      "levels": [
+        5,
+        6
+      ],
+      "question": "未说明每次伤害触发增加攻击力的规则、普攻/技能范围、冷却或上限。"
+    },
+    {
+      "term": "英雄造成伤害三围",
+      "levels": [
+        6
+      ],
+      "question": "未说明触发来源、每项三围的增量、冷却或上限。"
+    },
+    {
+      "term": "箭塔攻击减甲/英雄攻击减甲",
+      "levels": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "question": "未说明每次命中叠加还是固定减甲、持续时间与上限。"
+    },
+    {
+      "term": "墙每秒护甲",
+      "levels": [
+        8
+      ],
+      "question": "数值可读，未说明累计护甲的持续范围与上限。"
+    },
+    {
+      "term": "英雄每秒属性",
+      "levels": [
+        8
+      ],
+      "question": "未说明力量/敏捷/智力分别增加，还是全属性合计或其他统计口径。"
+    },
+    {
+      "term": "英雄攻击属性效率",
+      "levels": [
+        9,
+        10
+      ],
+      "question": "未给出具体攻击/属性效率公式，不能自行替换成攻击力百分比。"
+    },
+    {
+      "term": "伐木暴击收益",
+      "levels": [
+        9,
+        10
+      ],
+      "question": "未说明暴击倍率增量的加算/乘算口径。"
+    },
+    {
+      "term": "英雄造成伤害加木",
+      "levels": [
+        10
+      ],
+      "question": "未说明每次伤害、单位时间或按伤害量获得木材的口径、冷却与上限。"
+    },
+    {
+      "term": "英雄造成伤害加属性",
+      "levels": [
+        10
+      ],
+      "question": "未说明每项属性的增量、触发来源、冷却与上限。"
+    }
+  ],
+  "packs": [
+    {
+      "review_key": "video2_vip_1",
+      "title": "V1专属特惠礼包",
+      "vip_min": 1,
+      "vip_gate_text": "达到V1可购买",
+      "price": {
+        "currency": "U币",
+        "current": 1920,
+        "original": 2400,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 4,
+          "timestamp": "00:04",
+          "frame": "output/video_shop_20261015/video2/frames/t004000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V1专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "木材+50",
+            "墙护甲+10",
+            "墙每秒生命+3",
+            "箭塔攻击速度+5%",
+            "英雄全属性+5000",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "木材+50\n墙护甲+10\n墙每秒生命+3\n箭塔攻击速度+5%\n英雄全属性+5000\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 4,
+            "timestamp": "00:04",
+            "frame": "output/video_shop_20261015/video2/frames/t004000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "墙每秒生命"
+          ]
+        },
+        {
+          "name": "僵尸岛V1勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+1%",
+            "箭塔最终伤害+1%",
+            "英雄最终伤害+1%",
+            "英雄暴击几率+1%",
+            "英雄三围加成+1%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+1%\n箭塔最终伤害+1%\n英雄最终伤害+1%\n英雄暴击几率+1%\n英雄三围加成+1%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 9,
+            "timestamp": "00:09",
+            "frame": "output/video_shop_20261015/video2/frames/t009000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_2",
+      "title": "V2专属特惠礼包",
+      "vip_min": 2,
+      "vip_gate_text": "达到V2可购买",
+      "price": {
+        "currency": "U币",
+        "current": 4480,
+        "original": 5600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 21,
+          "timestamp": "00:21",
+          "frame": "output/video_shop_20261015/video2/frames/t021000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V2专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "每秒木材+1",
+            "箭塔攻击力+300",
+            "箭塔攻速+10%",
+            "金矿效率+5%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "每秒木材+1\n箭塔攻击力+300\n箭塔攻速+10%\n金矿效率+5%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 21,
+            "timestamp": "00:21",
+            "frame": "output/video_shop_20261015/video2/frames/t021000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        },
+        {
+          "name": "僵尸岛V2勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+1.2%",
+            "箭塔最终伤害+1.2%",
+            "英雄最终伤害+1.2%",
+            "英雄暴击几率+1.2%",
+            "英雄三围加成+1.2%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+1.2%\n箭塔最终伤害+1.2%\n英雄最终伤害+1.2%\n英雄暴击几率+1.2%\n英雄三围加成+1.2%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 26,
+            "timestamp": "00:26",
+            "frame": "output/video_shop_20261015/video2/frames/t026000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_3",
+      "title": "V3专属特惠礼包",
+      "vip_min": 3,
+      "vip_gate_text": "达到V3可购买",
+      "price": {
+        "currency": "U币",
+        "current": 8480,
+        "original": 10600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 44,
+          "timestamp": "00:44",
+          "frame": "output/video_shop_20261015/video2/frames/t044000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V3专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "伐木效率+1",
+            "金矿效率+5%",
+            "伐木工攻速+5%",
+            "伐木工攻击成长+2",
+            "箭塔每秒攻击+1",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "伐木效率+1\n金矿效率+5%\n伐木工攻速+5%\n伐木工攻击成长+2\n箭塔每秒攻击+1\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 44,
+            "timestamp": "00:44",
+            "frame": "output/video_shop_20261015/video2/frames/t044000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "伐木效率",
+            "伐木工攻击成长",
+            "箭塔每秒攻击"
+          ]
+        },
+        {
+          "name": "僵尸岛V3勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+1.4%",
+            "箭塔最终伤害+1.4%",
+            "英雄最终伤害+1.4%",
+            "英雄暴击几率+1.4%",
+            "英雄三围加成+1.4%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+1.4%\n箭塔最终伤害+1.4%\n英雄最终伤害+1.4%\n英雄暴击几率+1.4%\n英雄三围加成+1.4%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 45,
+            "timestamp": "00:45",
+            "frame": "output/video_shop_20261015/video2/frames/t045000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_4",
+      "title": "V4专属特惠礼包",
+      "vip_min": 4,
+      "vip_gate_text": "达到V4可购买",
+      "price": {
+        "currency": "U币",
+        "current": 12480,
+        "original": 15600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 58,
+          "timestamp": "00:58",
+          "frame": "output/video_shop_20261015/video2/frames/t058000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V4专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "墙每秒生命+10",
+            "墙生命加成+10%",
+            "墙护甲加成+10%",
+            "墙伤害减免+3%",
+            "墙护甲+10",
+            "人口+2",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "墙每秒生命+10\n墙生命加成+10%\n墙护甲加成+10%\n墙伤害减免+3%\n墙护甲+10\n人口+2\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 58,
+            "timestamp": "00:58",
+            "frame": "output/video_shop_20261015/video2/frames/t058000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "墙每秒生命"
+          ]
+        },
+        {
+          "name": "僵尸岛V4勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+1.6%",
+            "箭塔最终伤害+1.6%",
+            "英雄最终伤害+1.6%",
+            "英雄暴击几率+1.6%",
+            "英雄三围加成+1.6%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+1.6%\n箭塔最终伤害+1.6%\n英雄最终伤害+1.6%\n英雄暴击几率+1.6%\n英雄三围加成+1.6%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 66,
+            "timestamp": "01:06",
+            "frame": "output/video_shop_20261015/video2/frames/t066000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_5",
+      "title": "V5专属特惠礼包",
+      "vip_min": 5,
+      "vip_gate_text": "达到V5可购买",
+      "price": {
+        "currency": "U币",
+        "current": 17280,
+        "original": 21600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 79,
+          "timestamp": "01:19",
+          "frame": "output/video_shop_20261015/video2/frames/t079000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V5专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔每秒攻击+2",
+            "箭塔攻击加成+8%",
+            "箭塔攻速+8%",
+            "英雄三围加成+8%",
+            "英雄造成伤害攻击+5",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔每秒攻击+2\n箭塔攻击加成+8%\n箭塔攻速+8%\n英雄三围加成+8%\n英雄造成伤害攻击+5\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 79,
+            "timestamp": "01:19",
+            "frame": "output/video_shop_20261015/video2/frames/t079000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "箭塔每秒攻击",
+            "英雄造成伤害攻击"
+          ]
+        },
+        {
+          "name": "僵尸岛V5勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+1.8%",
+            "箭塔最终伤害+1.8%",
+            "英雄最终伤害+1.8%",
+            "英雄暴击几率+1.8%",
+            "英雄三围加成+1.8%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+1.8%\n箭塔最终伤害+1.8%\n英雄最终伤害+1.8%\n英雄暴击几率+1.8%\n英雄三围加成+1.8%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 83,
+            "timestamp": "01:23",
+            "frame": "output/video_shop_20261015/video2/frames/t083000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_6",
+      "title": "V6专属特惠礼包",
+      "vip_min": 6,
+      "vip_gate_text": "达到V6可购买",
+      "price": {
+        "currency": "U币",
+        "current": 23680,
+        "original": 29600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 100,
+          "timestamp": "01:40",
+          "frame": "output/video_shop_20261015/video2/frames/t100000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V6专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "英雄造成伤害三围+3",
+            "英雄造成伤害攻击+3",
+            "箭塔暴击几率+5%",
+            "英雄暴击几率+5%",
+            "英雄全属性加成+10%",
+            "英雄攻击减甲+5",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "英雄造成伤害三围+3\n英雄造成伤害攻击+3\n箭塔暴击几率+5%\n英雄暴击几率+5%\n英雄全属性加成+10%\n英雄攻击减甲+5\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 100,
+            "timestamp": "01:40",
+            "frame": "output/video_shop_20261015/video2/frames/t100000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "英雄造成伤害攻击",
+            "英雄造成伤害三围",
+            "箭塔攻击减甲/英雄攻击减甲"
+          ]
+        },
+        {
+          "name": "僵尸岛V6勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+2%",
+            "箭塔最终伤害+2%",
+            "英雄最终伤害+2%",
+            "英雄暴击几率+2%",
+            "英雄三围加成+2%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+2%\n箭塔最终伤害+2%\n英雄最终伤害+2%\n英雄暴击几率+2%\n英雄三围加成+2%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 104,
+            "timestamp": "01:44",
+            "frame": "output/video_shop_20261015/video2/frames/t104000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_7",
+      "title": "V7专属特惠礼包",
+      "vip_min": 7,
+      "vip_gate_text": "达到V7可购买",
+      "price": {
+        "currency": "U币",
+        "current": 26880,
+        "original": 33600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 118,
+          "timestamp": "01:58",
+          "frame": "output/video_shop_20261015/video2/frames/t118000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V7专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔最终伤害+15%",
+            "英雄最终伤害+15%",
+            "箭塔攻击减甲+0.1",
+            "英雄全属性加成+8%",
+            "英雄攻击减甲+5",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔最终伤害+15%\n英雄最终伤害+15%\n箭塔攻击减甲+0.1\n英雄全属性加成+8%\n英雄攻击减甲+5\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 118,
+            "timestamp": "01:58",
+            "frame": "output/video_shop_20261015/video2/frames/t118000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "箭塔攻击减甲/英雄攻击减甲"
+          ]
+        },
+        {
+          "name": "僵尸岛V7勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+2.5%",
+            "箭塔最终伤害+2.5%",
+            "英雄最终伤害+2.5%",
+            "英雄暴击几率+2.5%",
+            "英雄三围加成+2.5%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+2.5%\n箭塔最终伤害+2.5%\n英雄最终伤害+2.5%\n英雄暴击几率+2.5%\n英雄三围加成+2.5%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 124,
+            "timestamp": "02:04",
+            "frame": "output/video_shop_20261015/video2/frames/t124000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_8",
+      "title": "V8专属特惠礼包",
+      "vip_min": 8,
+      "vip_gate_text": "达到V8可购买",
+      "price": {
+        "currency": "U币",
+        "current": 38080,
+        "original": 47600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 141,
+          "timestamp": "02:21",
+          "frame": "output/video_shop_20261015/video2/frames/t141000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V8专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "墙每秒护甲+0.1",
+            "金矿建造上限+1",
+            "英雄最终伤害+10%",
+            "箭塔攻击减甲+0.1",
+            "英雄全属性加成+10%",
+            "伐木效率+3",
+            "英雄每秒属性+100",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "墙每秒护甲+0.1\n金矿建造上限+1\n英雄最终伤害+10%\n箭塔攻击减甲+0.1\n英雄全属性加成+10%\n伐木效率+3\n英雄每秒属性+100\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 141,
+            "timestamp": "02:21",
+            "frame": "output/video_shop_20261015/video2/frames/t141000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "伐木效率",
+            "箭塔攻击减甲/英雄攻击减甲",
+            "墙每秒护甲",
+            "英雄每秒属性"
+          ]
+        },
+        {
+          "name": "僵尸岛V8勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+3%",
+            "箭塔最终伤害+3%",
+            "英雄最终伤害+3%",
+            "英雄暴击几率+3%",
+            "英雄三围加成+3%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+3%\n箭塔最终伤害+3%\n英雄最终伤害+3%\n英雄暴击几率+3%\n英雄三围加成+3%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 147,
+            "timestamp": "02:27",
+            "frame": "output/video_shop_20261015/video2/frames/t147000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_9",
+      "title": "V9专属特惠礼包",
+      "vip_min": 9,
+      "vip_gate_text": "达到V9可购买",
+      "price": {
+        "currency": "U币",
+        "current": 42880,
+        "original": 53600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 163,
+          "timestamp": "02:43",
+          "frame": "output/video_shop_20261015/video2/frames/t163000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V9专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "英雄攻击属性效率+5%",
+            "伐木暴击几率+5%",
+            "伐木暴击收益+10%",
+            "箭塔攻击减甲+0.2",
+            "英雄攻击减甲+5",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "英雄攻击属性效率+5%\n伐木暴击几率+5%\n伐木暴击收益+10%\n箭塔攻击减甲+0.2\n英雄攻击减甲+5\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 163,
+            "timestamp": "02:43",
+            "frame": "output/video_shop_20261015/video2/frames/t163000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "箭塔攻击减甲/英雄攻击减甲",
+            "英雄攻击属性效率",
+            "伐木暴击收益"
+          ]
+        },
+        {
+          "name": "僵尸岛V9勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+4%",
+            "箭塔最终伤害+4%",
+            "英雄最终伤害+4%",
+            "英雄暴击几率+4%",
+            "英雄三围加成+4%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+4%\n箭塔最终伤害+4%\n英雄最终伤害+4%\n英雄暴击几率+4%\n英雄三围加成+4%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 169,
+            "timestamp": "02:49",
+            "frame": "output/video_shop_20261015/video2/frames/t169000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    },
+    {
+      "review_key": "video2_vip_10",
+      "title": "V10专属特惠礼包",
+      "vip_min": 10,
+      "vip_gate_text": "达到V10可购买",
+      "price": {
+        "currency": "U币",
+        "current": 47680,
+        "original": 59600,
+        "source": "右侧礼包总价及划线原价；两件商品合计",
+        "evidence": {
+          "time_seconds": 186,
+          "timestamp": "03:06",
+          "frame": "output/video_shop_20261015/video2/frames/t186000.png",
+          "visual_reviewed": true
+        }
+      },
+      "items": [
+        {
+          "name": "V10专属特惠礼包*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "英雄攻击属性效率+10%",
+            "伐木暴击几率+5%",
+            "伐木暴击收益+10%",
+            "箭塔攻击减甲+0.2",
+            "英雄攻击减甲+10",
+            "英雄造成伤害加木+10",
+            "英雄全属性加成+10%",
+            "箭塔攻击加成+10%",
+            "英雄造成伤害加属性+10",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "英雄攻击属性效率+10%\n伐木暴击几率+5%\n伐木暴击收益+10%\n箭塔攻击减甲+0.2\n英雄攻击减甲+10\n英雄造成伤害加木+10\n英雄全属性加成+10%\n箭塔攻击加成+10%\n英雄造成伤害加属性+10\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 186,
+            "timestamp": "03:06",
+            "frame": "output/video_shop_20261015/video2/frames/t186000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": [
+            "箭塔攻击减甲/英雄攻击减甲",
+            "英雄攻击属性效率",
+            "伐木暴击收益",
+            "英雄造成伤害加木",
+            "英雄造成伤害加属性"
+          ]
+        },
+        {
+          "name": "僵尸岛V10勋章*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔暴击几率+5%",
+            "箭塔最终伤害+5%",
+            "英雄最终伤害+5%",
+            "英雄暴击几率+5%",
+            "英雄三围加成+5%",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔暴击几率+5%\n箭塔最终伤害+5%\n英雄最终伤害+5%\n英雄暴击几率+5%\n英雄三围加成+5%\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 195,
+            "timestamp": "03:15",
+            "frame": "output/video_shop_20261015/video2/frames/t195000.png",
+            "visual_reviewed": true
+          },
+          "semantic_uncertainty_terms": []
+        }
+      ],
+      "visual_readability": "标题、VIP门槛、价格、原价、数量及全部效果文字均已直接核对，无未辨认数字。"
+    }
+  ],
+  "project_comparison": {
+    "config": "data/archive/vip_rewards_20261003.json",
+    "config_sha256": "55b0ca5e252d6b42d595e53fc456a6f46aefecda8c505f098411998cff9b1839",
+    "scope": "逐条核对 vip_package_01..10 与 vip_medal_01..10；只审计，未改正式配置。",
+    "effect_count": 107,
+    "numeric_mismatches": [
+      {
+        "reward_id": "vip_package_05",
+        "video_text": "英雄三围加成+8%",
+        "effect_id": "hero_attribute_bonus_pct",
+        "video_value": 8,
+        "project_value": 12,
+        "numeric_match": false,
+        "video_unit": "percent",
+        "project_unit": "percent",
+        "unit_match": true
+      }
+    ],
+    "unit_mismatches": [
+      {
+        "reward_id": "vip_package_10",
+        "video_text": "英雄造成伤害加木+10",
+        "effect_id": "hero_damage_wood_bonus_pct",
+        "video_value": 10,
+        "project_value": 10,
+        "numeric_match": true,
+        "video_unit": "flat",
+        "project_unit": "percent",
+        "unit_match": false
+      }
+    ],
+    "observations": [
+      "10档勋章5项百分比全部与现有字段数值相同；视频“三围”在项目中以hero_attribute_bonus_pct/全属性加成表示。",
+      "V1初始木材和初始全属性的“初始”限定，视频简写未明说，沿用项目规则并在商城描述保留。",
+      "V5英雄全属性百分比存在确切数值差异：视频8%，现有配置12%。审计未自行决定覆盖。",
+      "V10造成伤害加木存在单位差异：视频固定写+10且无%，项目hero_damage_wood_bonus_pct=10。若沿用现有规则，商品描述必须保留“造成伤害木材收益+10%”且说明只放大已有基础木材收益，不能显示为固定+10木材。",
+      "V6–V10中其余每次伤害成长、暴击、减甲等数值与项目一致，不能把成长字段误写为攻速。"
+    ],
+    "current_project_runtime_rules": [
+      {
+        "fields": [
+          "tower_attack_per_second"
+        ],
+        "rule": "每秒累计增加本人防御塔攻击力；不是每秒攻击次数。",
+        "source": "scripts/vscripts/systems/permanent_reward_effect_service.lua:259"
+      },
+      {
+        "fields": [
+          "hero_damage_attack_growth",
+          "hero_attributes_per_damage"
+        ],
+        "rule": "英雄本体对敌人实际造成正伤害时，按COMBAT_DAMAGE_RESOLVED事件逐次累计攻击/全属性；包括该本体的普攻与技能伤害。该处理函数未添加额外冷却。召唤物作为attacker不满足本体相等条件。通关冻结后不继续成长。",
+        "source": "scripts/vscripts/systems/permanent_reward_effect_service.lua:327",
+        "damage_event_source": "scripts/vscripts/modifiers/modifier_weapon_stat_projection.lua:326"
+      },
+      {
+        "fields": [
+          "hero_damage_wood_bonus_pct"
+        ],
+        "rule": "每次本体伤害的木材=hero_damage_wood_flat×(1+百分比/100)。基础为10则+10%后11；基础为0则仍为0。",
+        "source": "scripts/vscripts/systems/permanent_reward_effect_service.lua:342",
+        "existing_test": "scripts/vscripts/tests/test_vip_effect_consumers.lua:11"
+      },
+      {
+        "fields": [
+          "hero_attack_attribute_efficiency_pct"
+        ],
+        "rule": "仅提高英雄主攻击事件的hero_attribute_growth增量：growth×(1+pct/100)；不直接提高攻击力，也不乘到hero_attributes_per_damage。",
+        "source": "scripts/vscripts/systems/permanent_reward_effect_service.lua:434"
+      },
+      {
+        "fields": [
+          "wall_health_per_second",
+          "wall_armor_per_second"
+        ],
+        "rule": "分别累计城墙生命成长和护甲成长；wall_health_per_second不是本文件的回血tick。",
+        "source": "scripts/vscripts/systems/permanent_reward_effect_service.lua:416"
+      },
+      {
+        "fields": [
+          "lumberjack_attack_growth"
+        ],
+        "rule": "伐木工每次有效击树后增加其个人攻击成长，按technology_multiplier缩放。",
+        "source": "scripts/vscripts/systems/worker_system.lua:632"
+      },
+      {
+        "fields": [
+          "lumberjack_efficiency"
+        ],
+        "rule": "加入伐木工每次命中产木效率。",
+        "source": "scripts/vscripts/systems/worker_system.lua:506"
+      },
+      {
+        "fields": [
+          "hero_attributes_per_second"
+        ],
+        "rule": "每秒将数值累计加入hero_all_attributes_flat，英雄存活且未通关冻结时执行。",
+        "source": "scripts/vscripts/systems/permanent_reward_effect_service.lua:236"
+      },
+      {
+        "fields": [
+          "tower_attack_armor_reduction",
+          "hero_attack_armor_reduction"
+        ],
+        "rule": "沿用每次攻击命中累加的减甲modifier，配置值按可见War3单位转为运行时Dota护甲；没有把视频0.1/0.2改成10%/20%。",
+        "source": "scripts/vscripts/systems/permanent_reward_effect_service.lua:470",
+        "hero_source": "scripts/vscripts/systems/research_armor_reduction_service.lua:100",
+        "modifier_source": "scripts/vscripts/modifiers/modifier_research_technology.lua:148"
+      }
+    ],
+    "eligibility_difference": {
+      "video": "达到对应Vn才能购买",
+      "current_code": "packages分支仅M.member(profile)，未要求M.level(profile)>=row.level；snapshot同样仅检查member。",
+      "source": "scripts/vscripts/systems/archive_vip_rewards.lua:38",
+      "action": "新购买路径需服务端校验对应VIP等级，不能只置灰UI。"
+    },
+    "records": [
+      {
+        "reward_id": "vip_package_01",
+        "video_item_name": "V1专属特惠礼包*永久",
+        "project_description": "开局木材+50；墙护甲+10；墙每秒生命+3；箭塔攻击速度+5%；英雄初始全属性+5000",
+        "project_legacy_price": 10,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "木材+50",
+            "effect_id": "initial_wood",
+            "video_value": 50,
+            "project_value": 50,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "墙护甲+10",
+            "effect_id": "wall_armor",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "墙每秒生命+3",
+            "effect_id": "wall_health_per_second",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻击速度+5%",
+            "effect_id": "tower_attack_speed_bonus_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄全属性+5000",
+            "effect_id": "hero_initial_attributes",
+            "video_value": 5000,
+            "project_value": 5000,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_01",
+        "video_item_name": "僵尸岛V1勋章*永久",
+        "project_description": "箭塔暴击几率+1%；箭塔最终伤害+1%；英雄最终伤害+1%；英雄暴击几率+1%；英雄全属性加成+1%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+1%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+1%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+1%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+1%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+1%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_02",
+        "video_item_name": "V2专属特惠礼包*永久",
+        "project_description": "每秒木材+1；箭塔攻击力+300；箭塔攻击速度+10%；金矿效率+5%",
+        "project_legacy_price": 19,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "每秒木材+1",
+            "effect_id": "wood_per_second",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻击力+300",
+            "effect_id": "tower_attack_flat",
+            "video_value": 300,
+            "project_value": 300,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻速+10%",
+            "effect_id": "tower_attack_speed_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "金矿效率+5%",
+            "effect_id": "gold_mine_efficiency_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_02",
+        "video_item_name": "僵尸岛V2勋章*永久",
+        "project_description": "箭塔暴击几率+1.2%；箭塔最终伤害+1.2%；英雄最终伤害+1.2%；英雄暴击几率+1.2%；英雄全属性加成+1.2%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+1.2%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 1.2,
+            "project_value": 1.2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+1.2%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 1.2,
+            "project_value": 1.2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+1.2%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 1.2,
+            "project_value": 1.2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+1.2%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 1.2,
+            "project_value": 1.2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+1.2%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 1.2,
+            "project_value": 1.2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_03",
+        "video_item_name": "V3专属特惠礼包*永久",
+        "project_description": "伐木效率+1；金矿效率+5%；伐木工攻速+5%；伐木工攻击成长+2；箭塔每秒攻击+1",
+        "project_legacy_price": 39,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "伐木效率+1",
+            "effect_id": "lumberjack_efficiency",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "金矿效率+5%",
+            "effect_id": "gold_mine_efficiency_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "伐木工攻速+5%",
+            "effect_id": "lumberjack_attack_speed_bonus_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "伐木工攻击成长+2",
+            "effect_id": "lumberjack_attack_growth",
+            "video_value": 2,
+            "project_value": 2,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔每秒攻击+1",
+            "effect_id": "tower_attack_per_second",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_03",
+        "video_item_name": "僵尸岛V3勋章*永久",
+        "project_description": "箭塔暴击几率+1.4%；箭塔最终伤害+1.4%；英雄最终伤害+1.4%；英雄暴击几率+1.4%；英雄全属性加成+1.4%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+1.4%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 1.4,
+            "project_value": 1.4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+1.4%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 1.4,
+            "project_value": 1.4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+1.4%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 1.4,
+            "project_value": 1.4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+1.4%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 1.4,
+            "project_value": 1.4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+1.4%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 1.4,
+            "project_value": 1.4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_04",
+        "video_item_name": "V4专属特惠礼包*永久",
+        "project_description": "墙每秒生命+10；墙生命加成+10%；墙护甲加成+10%；墙伤害减免+3%；墙护甲+10；人口+2",
+        "project_legacy_price": 59,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "墙每秒生命+10",
+            "effect_id": "wall_health_per_second",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "墙生命加成+10%",
+            "effect_id": "wall_health_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "墙护甲加成+10%",
+            "effect_id": "wall_armor_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "墙伤害减免+3%",
+            "effect_id": "wall_damage_reduction_pct",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "墙护甲+10",
+            "effect_id": "wall_armor",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "人口+2",
+            "effect_id": "initial_population_cap",
+            "video_value": 2,
+            "project_value": 2,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_04",
+        "video_item_name": "僵尸岛V4勋章*永久",
+        "project_description": "箭塔暴击几率+1.6%；箭塔最终伤害+1.6%；英雄最终伤害+1.6%；英雄暴击几率+1.6%；英雄全属性加成+1.6%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+1.6%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 1.6,
+            "project_value": 1.6,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+1.6%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 1.6,
+            "project_value": 1.6,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+1.6%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 1.6,
+            "project_value": 1.6,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+1.6%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 1.6,
+            "project_value": 1.6,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+1.6%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 1.6,
+            "project_value": 1.6,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_05",
+        "video_item_name": "V5专属特惠礼包*永久",
+        "project_description": "箭塔每秒攻击+2；箭塔攻击加成+8%；箭塔攻击速度+8%；英雄全属性加成+12%；英雄造成伤害加攻击+5",
+        "project_legacy_price": 79,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔每秒攻击+2",
+            "effect_id": "tower_attack_per_second",
+            "video_value": 2,
+            "project_value": 2,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻击加成+8%",
+            "effect_id": "tower_attack_bonus_pct",
+            "video_value": 8,
+            "project_value": 8,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻速+8%",
+            "effect_id": "tower_attack_speed_bonus_pct",
+            "video_value": 8,
+            "project_value": 8,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+8%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 8,
+            "project_value": 12,
+            "numeric_match": false,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄造成伤害攻击+5",
+            "effect_id": "hero_damage_attack_growth",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_05",
+        "video_item_name": "僵尸岛V5勋章*永久",
+        "project_description": "箭塔暴击几率+1.8%；箭塔最终伤害+1.8%；英雄最终伤害+1.8%；英雄暴击几率+1.8%；英雄全属性加成+1.8%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+1.8%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 1.8,
+            "project_value": 1.8,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+1.8%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 1.8,
+            "project_value": 1.8,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+1.8%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 1.8,
+            "project_value": 1.8,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+1.8%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 1.8,
+            "project_value": 1.8,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+1.8%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 1.8,
+            "project_value": 1.8,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_06",
+        "video_item_name": "V6专属特惠礼包*永久",
+        "project_description": "英雄造成伤害加属性+3；英雄造成伤害加攻击+3；箭塔暴击几率+5%；英雄暴击几率+5%；英雄全属性加成+10%；英雄攻击减甲+5",
+        "project_legacy_price": 119,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "英雄造成伤害三围+3",
+            "effect_id": "hero_attributes_per_damage",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄造成伤害攻击+3",
+            "effect_id": "hero_damage_attack_growth",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔暴击几率+5%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+5%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄全属性加成+10%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄攻击减甲+5",
+            "effect_id": "hero_attack_armor_reduction",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_06",
+        "video_item_name": "僵尸岛V6勋章*永久",
+        "project_description": "箭塔暴击几率+2%；箭塔最终伤害+2%；英雄最终伤害+2%；英雄暴击几率+2%；英雄全属性加成+2%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+2%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 2,
+            "project_value": 2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+2%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 2,
+            "project_value": 2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+2%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 2,
+            "project_value": 2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+2%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 2,
+            "project_value": 2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+2%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 2,
+            "project_value": 2,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_07",
+        "video_item_name": "V7专属特惠礼包*永久",
+        "project_description": "箭塔最终伤害+15%；英雄最终伤害+15%；箭塔攻击减甲+0.1；英雄全属性加成+8%；英雄攻击减甲+5",
+        "project_legacy_price": 129,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔最终伤害+15%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 15,
+            "project_value": 15,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+15%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 15,
+            "project_value": 15,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻击减甲+0.1",
+            "effect_id": "tower_attack_armor_reduction",
+            "video_value": 0.1,
+            "project_value": 0.1,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄全属性加成+8%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 8,
+            "project_value": 8,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄攻击减甲+5",
+            "effect_id": "hero_attack_armor_reduction",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_07",
+        "video_item_name": "僵尸岛V7勋章*永久",
+        "project_description": "箭塔暴击几率+2.5%；箭塔最终伤害+2.5%；英雄最终伤害+2.5%；英雄暴击几率+2.5%；英雄全属性加成+2.5%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+2.5%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 2.5,
+            "project_value": 2.5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+2.5%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 2.5,
+            "project_value": 2.5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+2.5%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 2.5,
+            "project_value": 2.5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+2.5%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 2.5,
+            "project_value": 2.5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+2.5%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 2.5,
+            "project_value": 2.5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_08",
+        "video_item_name": "V8专属特惠礼包*永久",
+        "project_description": "墙每秒护甲+0.1；金矿建造上限+1；英雄最终伤害+10%；箭塔攻击减甲+0.1；英雄全属性加成+10%；伐木效率+3；英雄每秒属性+100",
+        "project_legacy_price": 188,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "墙每秒护甲+0.1",
+            "effect_id": "wall_armor_per_second",
+            "video_value": 0.1,
+            "project_value": 0.1,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "金矿建造上限+1",
+            "effect_id": "gold_mine_build_cap",
+            "video_value": 1,
+            "project_value": 1,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+10%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻击减甲+0.1",
+            "effect_id": "tower_attack_armor_reduction",
+            "video_value": 0.1,
+            "project_value": 0.1,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄全属性加成+10%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "伐木效率+3",
+            "effect_id": "lumberjack_efficiency",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄每秒属性+100",
+            "effect_id": "hero_attributes_per_second",
+            "video_value": 100,
+            "project_value": 100,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_08",
+        "video_item_name": "僵尸岛V8勋章*永久",
+        "project_description": "箭塔暴击几率+3%；箭塔最终伤害+3%；英雄最终伤害+3%；英雄暴击几率+3%；英雄全属性加成+3%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+3%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+3%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+3%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+3%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+3%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 3,
+            "project_value": 3,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_09",
+        "video_item_name": "V9专属特惠礼包*永久",
+        "project_description": "英雄攻击属性效率+5%；伐木暴击几率+5%；伐木暴击收益+10%；箭塔攻击减甲+0.2；英雄攻击减甲+5",
+        "project_legacy_price": 199,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "英雄攻击属性效率+5%",
+            "effect_id": "hero_attack_attribute_efficiency_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "伐木暴击几率+5%",
+            "effect_id": "lumberjack_critical_chance_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "伐木暴击收益+10%",
+            "effect_id": "lumberjack_critical_yield_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻击减甲+0.2",
+            "effect_id": "tower_attack_armor_reduction",
+            "video_value": 0.2,
+            "project_value": 0.2,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄攻击减甲+5",
+            "effect_id": "hero_attack_armor_reduction",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_09",
+        "video_item_name": "僵尸岛V9勋章*永久",
+        "project_description": "箭塔暴击几率+4%；箭塔最终伤害+4%；英雄最终伤害+4%；英雄暴击几率+4%；英雄全属性加成+4%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+4%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 4,
+            "project_value": 4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+4%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 4,
+            "project_value": 4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+4%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 4,
+            "project_value": 4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+4%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 4,
+            "project_value": 4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+4%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 4,
+            "project_value": 4,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_package_10",
+        "video_item_name": "V10专属特惠礼包*永久",
+        "project_description": "英雄攻击属性效率+10%；伐木暴击几率+5%；伐木暴击收益+10%；箭塔攻击减甲+0.2；英雄攻击减甲+10；英雄造成伤害加木材+10%；英雄全属性加成+10%；箭塔攻击加成+10%；英雄造成伤害加属性+10",
+        "project_legacy_price": 239,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "英雄攻击属性效率+10%",
+            "effect_id": "hero_attack_attribute_efficiency_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "伐木暴击几率+5%",
+            "effect_id": "lumberjack_critical_chance_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "伐木暴击收益+10%",
+            "effect_id": "lumberjack_critical_yield_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻击减甲+0.2",
+            "effect_id": "tower_attack_armor_reduction",
+            "video_value": 0.2,
+            "project_value": 0.2,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄攻击减甲+10",
+            "effect_id": "hero_attack_armor_reduction",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄造成伤害加木+10",
+            "effect_id": "hero_damage_wood_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "percent",
+            "unit_match": false
+          },
+          {
+            "video_text": "英雄全属性加成+10%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔攻击加成+10%",
+            "effect_id": "tower_attack_bonus_pct",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄造成伤害加属性+10",
+            "effect_id": "hero_attributes_per_damage",
+            "video_value": 10,
+            "project_value": 10,
+            "numeric_match": true,
+            "video_unit": "flat",
+            "project_unit": "flat",
+            "unit_match": true
+          }
+        ]
+      },
+      {
+        "reward_id": "vip_medal_10",
+        "video_item_name": "僵尸岛V10勋章*永久",
+        "project_description": "箭塔暴击几率+5%；箭塔最终伤害+5%；英雄最终伤害+5%；英雄暴击几率+5%；英雄全属性加成+5%",
+        "project_legacy_price": 0,
+        "price_note": "旧奖励目录中的商城付费币价格；不等同于视频新U币整包总价，不据此重算效果。",
+        "effects": [
+          {
+            "video_text": "箭塔暴击几率+5%",
+            "effect_id": "tower_critical_chance_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "箭塔最终伤害+5%",
+            "effect_id": "tower_final_damage_bonus_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄最终伤害+5%",
+            "effect_id": "hero_final_damage_bonus_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄暴击几率+5%",
+            "effect_id": "hero_critical_chance_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          },
+          {
+            "video_text": "英雄三围加成+5%",
+            "effect_id": "hero_attribute_bonus_pct",
+            "video_value": 5,
+            "project_value": 5,
+            "numeric_match": true,
+            "video_unit": "percent",
+            "project_unit": "percent",
+            "unit_match": true
+          }
+        ]
+      }
+    ]
+  }
+}

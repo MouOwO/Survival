@@ -1,0 +1,64 @@
+{
+  "status": "PASS",
+  "at": "2026-10-16T14:23:41.354460+08:00",
+  "source_video_sha256": "a9c97ee011487e986dd2a8712838b0ac729f57be8f293c63df12bf2954e3d7fa",
+  "reference_json": "data/reference/wife_tooltips_20261016.json",
+  "reference_sha256": "eb215f6cd19907656ed7602ed0adf2826b7c7ec4a2c2f9c17f67f8a35acd2391",
+  "review_csv": "data/reference/wife_tooltips_20261016.csv",
+  "visible_characters": 40,
+  "drawable_characters": 38,
+  "pending_characters": [
+    {
+      "id": "wife_31",
+      "name": "凯尔希",
+      "original_tooltip": "初始魔法卡+1"
+    },
+    {
+      "id": "wife_39",
+      "name": "夜刀神十香",
+      "original_tooltip": "墙皮肤-夜刀神十香"
+    }
+  ],
+  "currency": {
+    "name": "玫瑰",
+    "draw_cost": 1,
+    "daily_challenge_limit": 10,
+    "challenge_once_per_match": true,
+    "cap_template": "ex同序号档位"
+  },
+  "tests": {
+    "reviewed_data_and_own_art": 4,
+    "packaged_lua_individual_rewards": 38,
+    "packaged_lua_duplicate_replays": 38,
+    "challenge_runtime_checks": 73,
+    "cooperative_reward_checks": 249,
+    "ui_browser": "PASS_COLLECTION_ONEPAGE_40",
+    "panorama_compiled_scripts": 5,
+    "native_gameplay_session_run": false
+  },
+  "server": {
+    "status": "VERIFIED",
+    "archive_bundle": "f44d6c2baaacb7a570dd5ebb2c03b01a8b1838fb1c8f102b8005cc09626669a4",
+    "health": {
+      "archive": {
+        "ok": true,
+        "service": "survival-fishing-api"
+      },
+      "payment": {
+        "ok": true,
+        "service": "payments"
+      }
+    },
+    "real_account_commands": 0,
+    "existing_social_items_preserved": 120
+  },
+  "evidence": {
+    "source_audit": "output/wife_video_20261016/independent_source_audit.json",
+    "deployment": "output/wife_video_20261016/release/f44d6c2baaacb7a570dd5ebb2c03b01a8b1838fb1c8f102b8005cc09626669a4/deployment/verify.json",
+    "compiled": "output/wife_video_20261016/ui_compile_final_verification.json",
+    "browser": "design_refs/collection_gw2_v2/work/onepage_final/report.json"
+  },
+  "requires_new_map": true,
+  "git_commit_or_push_performed": false,
+  "unrelated_changes_preserved": true
+}

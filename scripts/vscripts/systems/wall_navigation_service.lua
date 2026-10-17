@@ -1,4 +1,5 @@
--- Block the registered square and terrain-bounded gate seams. Combat lanes
+-- Block the registered square and, only when both bank seams are at most64,
+-- close those narrow seams. Combat lanes
 -- are movement destinations, never additional invisible collision units.
 local M = {}
 local geometry = require("systems/wall_navigation_geometry")
@@ -74,9 +75,11 @@ function M.create(wall)
     if walls[index] then M.clear(index) end
     local state={index=index,wall=wall,obstacles={},x=math.floor(p.x/SIZE+.5)*SIZE,
         y=math.floor(p.y/SIZE+.5)*SIZE,z=p.z}
-    local seams, bounds, gate = geometry.seams(Vector(state.x,state.y,state.z),terrain_open)
+    local seams, bounds, gate, gate_axis, layout = geometry.seams(Vector(state.x,state.y,state.z),terrain_open)
     state.bounds=bounds
     state.gate=gate
+    state.gate_axis=gate_axis
+    state.contact_layout=layout
     walls[index]=state
     local ok, message = pcall(function()
         for _,dx in ipairs({-64,64}) do for _,dy in ipairs({-64,64}) do
@@ -88,6 +91,32 @@ function M.create(wall)
     end)
     if not ok then M.clear(index); error(message) end
     return state.obstacles
+end
+
+-- Read-only construction snapshot shared with contact placement. A wider or
+-- offset opening remains open beside the actual square; contacts stay on the
+-- wall itself. Never probe corridor geometry for an individual monster.
+function M.contact_layout(wall)
+    if not valid(wall) then return nil end
+    local state=walls[wall:entindex()]
+    if not state or state.wall~=wall then return nil end
+    return state.contact_layout
+end
+
+-- Only terrain-proven gates constrain contact ownership to their two open
+-- ends. Reuse the navigation snapshot and snapped center, without querying
+-- terrain or paths for each monster. Unknown/open-floor walls keep four faces.
+function M.contact_face(wall,unit)
+    if not valid(wall) or not valid(unit) or not unit.GetAbsOrigin then return nil end
+    local state=walls[wall:entindex()]
+    if not state or state.wall~=wall or not state.gate
+        or (state.gate_axis~=1 and state.gate_axis~=2) then return nil end
+    local p=unit:GetAbsOrigin()
+    if not p or not p.z or math.abs(p.z-state.z)>192 then return nil end
+    local normal=state.gate_axis==1 and p.x-state.x or p.y-state.y
+    if normal~=normal or normal==0 or normal==math.huge or normal==-math.huge then return nil end
+    if state.gate_axis==1 then return normal<0 and 1 or 2 end
+    return normal<0 and 3 or 4
 end
 
 -- Piggyback the existing enemy AI observation; normal frames do no nav query,
@@ -105,6 +134,11 @@ function M.enforce_boundary(wall,unit,previous)
     -- every wall still rejects a real current hull/rectangle overlap.
     local safe=geometry.outside(state.bounds,relative,before,radius,state.gate)
     if not safe then return false end
+    local contact=package.loaded['systems/wall_melee_contact']
+    if contact and contact.recovery_radius then
+        radius=contact.recovery_radius(wall,unit)
+        safe=geometry.outside(state.bounds,relative,before,radius,state.gate) or safe
+    end
     local destination=Vector(state.x+safe.x,state.y+safe.y,p.z)
     if not GridNav:IsTraversable(destination) or GridNav:IsBlocked(destination) then
         if not before or geometry.outside(state.bounds,before,nil,radius)

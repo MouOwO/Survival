@@ -1,0 +1,901 @@
+{
+  "schema_version": 1,
+  "review_kind": "local_video_ocr_and_manual_frame_review",
+  "reviewed_at": "2026-10-15",
+  "source": {
+    "video_number": 1,
+    "path": "D:/BaiduNetdiskDownload/bandicam 2026-10-15 12-39-48-362.mp4",
+    "sha256": "6f12549bd976c4b538d8e65a8819527490422b450684108da74b2782bf381b6a",
+    "duration_seconds": 166.17,
+    "resolution": [
+      1152,
+      876
+    ],
+    "ocr_screen_count": 67,
+    "ocr_json": "output/video_shop_20261015/video1/ocr.json",
+    "transcript": "output/video_shop_20261015/video1/transcript.txt",
+    "processing": "现有RapidOCR / ONNX / OpenCV本地离线结果，未上传视频；对下列19件商品逐一实际view_image核对详情。"
+  },
+  "scope": "仅视频证据与正式SKU映射审阅，不是生产目录。保留原礼包完整组成、原U币总价和全部效果，不将缺资源商品替换成仅属性奖励。",
+  "catalog_snapshot": {
+    "products_path": "data/csv/商城兑换系统/commerce_products.csv",
+    "products_sha256": "77c7bfff3bb34102b0ea54a9e8311967bc8622c2b8a6821ceb172945e2f24994",
+    "status_path": "data/csv/商城兑换系统/commerce_import_status.csv",
+    "status_sha256": "99a41282352307f3dc78cb2a7bd8c5ea11dbf3e2dfaf42b489fc3ce06830903f"
+  },
+  "observed_rules": {
+    "item_quantity": 1,
+    "duration_text": "永久",
+    "activation_text": "购买后自动激活",
+    "price_currency": "U币",
+    "price_scope": "右侧价格为礼包内全部商品的总价；不是每件商品价格。"
+  },
+  "global_uncertainties": [
+    "视频未展示限购次数、重复购买处理、已有组件时能否购买/补差价等规则；不能从立即购买按钮推导。",
+    "礼包页没有显示VIP门槛；不据此推断后台不存在任何购买条件。",
+    "视频未展示复杂效果的触发冷却、地图通行条件、炸弹清场范围、UR/SSR按种类还是份数计数。已存在的本项目规则要保留并明确说明，不根据视频补造。",
+    "价格是直接可见的U币整数，不换算成人民币，不把顶部124U币余额当成礼包价格。",
+    "星悦积分是各商品原文效果的一部分，没有因其列在UR/SSR计数说明后就擅自改成按每个藏品重复发放。",
+    "焚天曜轮、昭穹羽君、兔女郎城墙、熟练工头均缺正式SKU和承诺的外观绑定；整件不可视为已完成，相关原礼包也不能冒充完整可交付。"
+  ],
+  "semantic_notes": [
+    {
+      "source_ids": [
+        "P025",
+        "P023"
+      ],
+      "issue": "视频按“每拥有一个”UR/SSR叠加，未明确重复份数；项目正式描述明确只按永久库存不同种类计数，保留这一规则。"
+    },
+    {
+      "source_ids": [
+        "P012",
+        "P026",
+        "P023"
+      ],
+      "issue": "造成伤害加攻击/三围/木材的触发频率未由视频实战证明，不能改成只普攻或按每秒；沿用现有字段消费者。"
+    },
+    {
+      "source_ids": [
+        "P026"
+      ],
+      "issue": "视频D闪未说明冷却与区域限制；项目已有可通行且已解锁位置、冷却10秒、失败不进冷却的说明，不删。"
+    },
+    {
+      "source_ids": [
+        "P017"
+      ],
+      "issue": "视频仅说开局瞬移到发育位置；项目已有每局一次到本人资源树附近、不可通行不扣次数的规则，不删。"
+    },
+    {
+      "source_ids": [
+        "P020"
+      ],
+      "issue": "视频仅说炸弹清理一次怪物；项目已有每局一次、本人1600范围普通进攻怪、排除BOSS/挑战怪/资源树的规则，不删。"
+    },
+    {
+      "source_ids": [
+        "P018"
+      ],
+      "issue": "“科技返还8%的费用”“立即完成科技升级”的适用费用币种和具体研究范围未在视频演示；需要沿用项目规则，不能由文字扩成所有消费。"
+    },
+    {
+      "source_ids": [
+        "P032"
+      ],
+      "issue": "“立即完成建筑建造和升级”未在视频展示资源扣除、预建造阶段等；不能当作免费建造。"
+    },
+    {
+      "source_ids": [
+        "P031",
+        "P013"
+      ],
+      "issue": "“箭塔每秒攻击”按项目现有规则是攻击力逐秒成长，不是攻速/每秒攻击次数。"
+    },
+    {
+      "source_ids": [
+        "P015"
+      ],
+      "issue": "视频“伐木工攻击间隔降低0.01”未写单位；保留原文与已有间隔字段，不能误成1%或攻速百分比。"
+    },
+    {
+      "source_ids": [
+        "P008"
+      ],
+      "issue": "5条地图等级增量包含3项0.45%与2项0.45固定值，已逐行区分，不能统一加百分号。外观尚未绑定，不将数值先上线就标该商品可用。"
+    },
+    {
+      "source_ids": [
+        "P006"
+      ],
+      "issue": "OCR把兔女郎误识为免女郎；已查看t156000图，人工按可见商品名和解锁文案复核为兔女郎。"
+    }
+  ],
+  "packs": [
+    {
+      "review_key": "video1_boss",
+      "title": "大佬礼包",
+      "subtitle": "大佬礼包",
+      "price": {
+        "currency": "U币",
+        "current": 47680,
+        "original": 59600,
+        "evidence": {
+          "time_seconds": 4,
+          "timestamp": "00:04",
+          "frame": "output/video_shop_20261015/video1/frames/t004000.png",
+          "visual_reviewed": true
+        }
+      },
+      "item_count": 2,
+      "items": [
+        {
+          "source_id": "P025",
+          "name": "文玩收藏家*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "每拥有一个UR道具都会叠加属性",
+            "英雄攻击加成+1%",
+            "英雄三围加成+1%",
+            "英雄最终伤害+1%",
+            "英雄生命加成+1%",
+            "英雄护甲加成+1%",
+            "星悦积分+298",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "每拥有一个UR道具都会叠加属性\n英雄攻击加成+1%\n英雄三围加成+1%\n英雄最终伤害+1%\n英雄生命加成+1%\n英雄护甲加成+1%\n星悦积分+298\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 4,
+            "timestamp": "00:04",
+            "frame": "output/video_shop_20261015/video1/frames/t004000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p025",
+            "ownership_id": "commerce_p025",
+            "project_display_name": "文玩收藏家·永久",
+            "project_enabled": true,
+            "project_description": "每拥有一个UR道具都会叠加属性\r\n英雄攻击加成+1%\r\n英雄三围加成+1%\r\n英雄最终伤害+1%\r\n英雄生命加成+1%\r\n英雄护甲加成+1%\r\n星悦积分+298\r\n购买后自动激活\r\n本项目规则：UR按永久库存中不同道具种类计数，重复份数不重复计数。",
+            "project_rules": "本项目规则：UR按永久库存中不同道具种类计数，重复份数不重复计数。",
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p025"
+        },
+        {
+          "source_id": "P023",
+          "name": "古董收藏家*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "每拥有一个SSR道具都会叠加属性：",
+            "墙生命加成+3%",
+            "墙护甲+10",
+            "英雄造成伤害攻击+1",
+            "英雄造成伤害三围+1",
+            "英雄攻击减甲+0.5",
+            "英雄三围加成+1%",
+            "星悦积分+298",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "每拥有一个SSR道具都会叠加属性：\n墙生命加成+3%\n墙护甲+10\n英雄造成伤害攻击+1\n英雄造成伤害三围+1\n英雄攻击减甲+0.5\n英雄三围加成+1%\n星悦积分+298\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 10,
+            "timestamp": "00:10",
+            "frame": "output/video_shop_20261015/video1/frames/t010000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p023",
+            "ownership_id": "commerce_p023",
+            "project_display_name": "古董收藏家·永久",
+            "project_enabled": true,
+            "project_description": "每拥有一个SSR道具都会叠加属性：\r\n墙生命加成+3%\r\n墙护甲+10\r\n英雄造成伤害攻击+1\r\n英雄造成伤害三围+1\r\n英雄攻击减甲+0.5\r\n英雄三围加成+1%\r\n星悦积分+298\r\n购买后自动激活\r\n本项目规则：SSR按永久库存中不同道具种类计数，重复份数不重复计数。",
+            "project_rules": "本项目规则：SSR按永久库存中不同道具种类计数，重复份数不重复计数。",
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p023"
+        }
+      ],
+      "complete_formal_sku_mapping": true,
+      "unavailable_source_ids": []
+    },
+    {
+      "review_key": "video1_juggernaut_blink",
+      "title": "剑圣D闪礼包",
+      "subtitle": "英雄剑圣加D闪",
+      "price": {
+        "currency": "U币",
+        "current": 47680,
+        "original": 59600,
+        "evidence": {
+          "time_seconds": 26,
+          "timestamp": "00:26",
+          "frame": "output/video_shop_20261015/video1/frames/t026000.png",
+          "visual_reviewed": true
+        }
+      },
+      "item_count": 2,
+      "items": [
+        {
+          "source_id": "P012",
+          "name": "剑圣*永久",
+          "quantity": 1,
+          "type": "英雄",
+          "duration_text": "永久",
+          "effect_lines": [
+            "英雄攻击范围+1000",
+            "英雄攻击速度+100%",
+            "英雄造成伤害攻击+5",
+            "英雄造成伤害木材+10",
+            "英雄攻击加成+20%",
+            "英雄三围加成+10%",
+            "英雄最终伤害+10%",
+            "英雄造成伤害三围+10",
+            "英雄攻击减甲+10",
+            "星悦积分+298",
+            "解锁英雄：剑圣",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "英雄攻击范围+1000\n英雄攻击速度+100%\n英雄造成伤害攻击+5\n英雄造成伤害木材+10\n英雄攻击加成+20%\n英雄三围加成+10%\n英雄最终伤害+10%\n英雄造成伤害三围+10\n英雄攻击减甲+10\n星悦积分+298\n解锁英雄：剑圣\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 26,
+            "timestamp": "00:26",
+            "frame": "output/video_shop_20261015/video1/frames/t026000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p012",
+            "ownership_id": "commerce_p012",
+            "project_display_name": "剑圣·永久",
+            "project_enabled": true,
+            "project_description": "英雄攻击范围+1000\r\n英雄攻击速度+100%\r\n英雄造成伤害攻击+5\r\n英雄造成伤害木材+10\r\n英雄攻击加成+20%\r\n英雄三围加成+10%\r\n英雄最终伤害+10%\r\n英雄造成伤害三围+10\r\n英雄攻击减甲+10\r\n星悦积分+298\r\n解锁英雄：剑圣\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p012"
+        },
+        {
+          "source_id": "P026",
+          "name": "侏儒传送器*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "英雄造成伤害加木材+10",
+            "英雄造成伤害加三围+5",
+            "英雄攻击加成+10%",
+            "英雄三围加成+10%",
+            "英雄拥有D闪功能，朝地图任意一点按D键立即传送，",
+            "星悦积分+298",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "英雄造成伤害加木材+10\n英雄造成伤害加三围+5\n英雄攻击加成+10%\n英雄三围加成+10%\n英雄拥有D闪功能，朝地图任意一点按D键立即传送，\n星悦积分+298\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 29,
+            "timestamp": "00:29",
+            "frame": "output/video_shop_20261015/video1/frames/t029000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p026",
+            "ownership_id": "commerce_p026",
+            "project_display_name": "侏儒传送器·永久",
+            "project_enabled": true,
+            "project_description": "英雄造成伤害加木材+10\r\n英雄造成伤害加三围+5\r\n英雄攻击加成+10%\r\n英雄三围加成+10%\r\n英雄拥有D闪功能，朝地图任意一点按D键立即传送，\r\n星悦积分+298\r\n购买后自动激活\r\n本项目规则：D键指向可通行且已解锁的地图位置，冷却10秒；传送失败不进入冷却。",
+            "project_rules": "本项目规则：D键指向可通行且已解锁的地图位置，冷却10秒；传送失败不进入冷却。",
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p026"
+        }
+      ],
+      "complete_formal_sku_mapping": true,
+      "unavailable_source_ids": []
+    },
+    {
+      "review_key": "video1_starter",
+      "title": "新手礼包",
+      "subtitle": "新手礼包",
+      "price": {
+        "currency": "U币",
+        "current": 46560,
+        "original": 58200,
+        "evidence": {
+          "time_seconds": 40,
+          "timestamp": "00:40",
+          "frame": "output/video_shop_20261015/video1/frames/t040000.png",
+          "visual_reviewed": true
+        }
+      },
+      "item_count": 4,
+      "items": [
+        {
+          "source_id": "P028",
+          "name": "熟练工头*永久",
+          "quantity": 1,
+          "type": "皮肤",
+          "duration_text": "永久",
+          "effect_lines": [
+            "伐木效率+2",
+            "每秒木材+3",
+            "每秒金币+2",
+            "金矿效率+10%",
+            "金矿建造上限+1",
+            "解锁：农民皮肤",
+            "星悦积分+238",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "伐木效率+2\n每秒木材+3\n每秒金币+2\n金矿效率+10%\n金矿建造上限+1\n解锁：农民皮肤\n星悦积分+238\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 40,
+            "timestamp": "00:40",
+            "frame": "output/video_shop_20261015/video1/frames/t040000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "unavailable",
+            "sku": null,
+            "ownership_id": null,
+            "import_status": "excluded_model",
+            "reason": "明确“解锁农民皮肤”，原版熟练工头外观未绑定；按用户排除外观条目的要求整件移出。"
+          },
+          "member_type": "unavailable",
+          "target_id": "P028"
+        },
+        {
+          "source_id": "P020",
+          "name": "地精油锯*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "开局木材+300",
+            "伐木工攻速+15%",
+            "增加5点人口",
+            "伐木工攻击成长+2",
+            "伐木工攻击减甲+1",
+            "拥有炸弹可以清理一次怪物",
+            "星悦积分+168",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "开局木材+300\n伐木工攻速+15%\n增加5点人口\n伐木工攻击成长+2\n伐木工攻击减甲+1\n拥有炸弹可以清理一次怪物\n星悦积分+168\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 47,
+            "timestamp": "00:47",
+            "frame": "output/video_shop_20261015/video1/frames/t047000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p020",
+            "ownership_id": "commerce_p020",
+            "project_display_name": "地精油锯·永久",
+            "project_enabled": true,
+            "project_description": "开局木材+300\r\n伐木工攻速+15%\r\n增加5点人口\r\n伐木工攻击成长+2\r\n伐木工攻击减甲+1\r\n拥有炸弹可以清理一次怪物\r\n星悦积分+168\r\n购买后自动激活\r\n本项目规则：清场按钮每局一次，清除自身1600范围内属于自己的普通进攻怪，不清除BOSS、挑战怪和资源树。",
+            "project_rules": "本项目规则：清场按钮每局一次，清除自身1600范围内属于自己的普通进攻怪，不清除BOSS、挑战怪和资源树。",
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p020"
+        },
+        {
+          "source_id": "P018",
+          "name": "时间科技*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "科技返还8%的费用",
+            "墙减伤+5%",
+            "墙每秒生命+20",
+            "能立即完成科技升级",
+            "星悦积分+128",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "科技返还8%的费用\n墙减伤+5%\n墙每秒生命+20\n能立即完成科技升级\n星悦积分+128\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 53,
+            "timestamp": "00:53",
+            "frame": "output/video_shop_20261015/video1/frames/t053000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p018",
+            "ownership_id": "commerce_p018",
+            "project_display_name": "时间科技·永久",
+            "project_enabled": true,
+            "project_description": "科技返还8%的费用\r\n墙减伤+5%\r\n墙每秒生命+20\r\n能立即完成科技升级\r\n星悦积分+128\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p018"
+        },
+        {
+          "source_id": "P032",
+          "name": "快速建造*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔攻击+1000",
+            "箭塔造成伤害攻击+3",
+            "箭塔攻速+30%",
+            "能立即完成建筑建造和升级",
+            "星悦积分+128",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔攻击+1000\n箭塔造成伤害攻击+3\n箭塔攻速+30%\n能立即完成建筑建造和升级\n星悦积分+128\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 61,
+            "timestamp": "01:01",
+            "frame": "output/video_shop_20261015/video1/frames/t061000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p032",
+            "ownership_id": "commerce_p032",
+            "project_display_name": "快速建造·永久",
+            "project_enabled": true,
+            "project_description": "箭塔攻击+1000\r\n箭塔造成伤害攻击+3\r\n箭塔攻速+30%\r\n能立即完成建筑建造和升级\r\n星悦积分+128\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p032"
+        }
+      ],
+      "complete_formal_sku_mapping": false,
+      "unavailable_source_ids": [
+        "P028"
+      ]
+    },
+    {
+      "review_key": "video1_newcomer",
+      "title": "新人礼包",
+      "subtitle": "新人礼包",
+      "price": {
+        "currency": "U币",
+        "current": 22000,
+        "original": 27500,
+        "evidence": {
+          "time_seconds": 73,
+          "timestamp": "01:13",
+          "frame": "output/video_shop_20261015/video1/frames/t073000.png",
+          "visual_reviewed": true
+        }
+      },
+      "item_count": 8,
+      "items": [
+        {
+          "source_id": "P031",
+          "name": "强化箭塔*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "箭塔每秒攻击+5",
+            "箭塔造成伤害攻击+2",
+            "箭塔攻速+30%",
+            "箭塔攻击加成+5%",
+            "星悦积分+88",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "箭塔每秒攻击+5\n箭塔造成伤害攻击+2\n箭塔攻速+30%\n箭塔攻击加成+5%\n星悦积分+88\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 73,
+            "timestamp": "01:13",
+            "frame": "output/video_shop_20261015/video1/frames/t073000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p031",
+            "ownership_id": "commerce_p031",
+            "project_display_name": "强化箭塔·永久",
+            "project_enabled": true,
+            "project_description": "箭塔每秒攻击+5\r\n箭塔造成伤害攻击+2\r\n箭塔攻速+30%\r\n箭塔攻击加成+5%\r\n星悦积分+88\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p031"
+        },
+        {
+          "source_id": "P017",
+          "name": "铜斧头*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "伐木效率+1",
+            "金矿效率+10%",
+            "伐木工攻速+10%",
+            "拥有闪烁匕首，开局可以瞬间移动到一个发育位置",
+            "星悦积分+68",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "伐木效率+1\n金矿效率+10%\n伐木工攻速+10%\n拥有闪烁匕首，开局可以瞬间移动到一个发育位置\n星悦积分+68\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 81,
+            "timestamp": "01:21",
+            "frame": "output/video_shop_20261015/video1/frames/t081000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p017",
+            "ownership_id": "commerce_p017",
+            "project_display_name": "铜斧头·永久",
+            "project_enabled": true,
+            "project_description": "伐木效率+1\r\n金矿效率+10%\r\n伐木工攻速+10%\r\n拥有闪烁匕首，开局可以瞬间移动到一个发育位置\r\n星悦积分+68\r\n购买后自动激活\r\n本项目规则：每局一次传送到自己的资源树附近，目标不可通行时不消耗次数。",
+            "project_rules": "本项目规则：每局一次传送到自己的资源树附近，目标不可通行时不消耗次数。",
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p017"
+        },
+        {
+          "source_id": "P013",
+          "name": "精良工匠*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "英雄每秒属性+10",
+            "英雄全属性加成+10%",
+            "箭塔每秒攻击+5",
+            "箭塔造成伤害攻击+2",
+            "星悦积分+38",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "英雄每秒属性+10\n英雄全属性加成+10%\n箭塔每秒攻击+5\n箭塔造成伤害攻击+2\n星悦积分+38\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 89,
+            "timestamp": "01:29",
+            "frame": "output/video_shop_20261015/video1/frames/t089000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p013",
+            "ownership_id": "commerce_p013",
+            "project_display_name": "精良工匠·永久",
+            "project_enabled": true,
+            "project_description": "英雄每秒属性+10\r\n英雄全属性加成+10%\r\n箭塔每秒攻击+5\r\n箭塔造成伤害攻击+2\r\n星悦积分+38\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p013"
+        },
+        {
+          "source_id": "P014",
+          "name": "硬质涂层*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "墙初始生命+3000",
+            "墙初始护甲+10",
+            "墙生命加成+5%",
+            "墙每秒生命+5",
+            "星悦积分+38",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "墙初始生命+3000\n墙初始护甲+10\n墙生命加成+5%\n墙每秒生命+5\n星悦积分+38\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 95,
+            "timestamp": "01:35",
+            "frame": "output/video_shop_20261015/video1/frames/t095000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p014",
+            "ownership_id": "commerce_p014",
+            "project_display_name": "硬质涂层·永久",
+            "project_enabled": true,
+            "project_description": "墙初始生命+3000\r\n墙初始护甲+10\r\n墙生命加成+5%\r\n墙每秒生命+5\r\n星悦积分+38\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p014"
+        },
+        {
+          "source_id": "P030",
+          "name": "银斧头*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "每秒木材+1",
+            "伐木工攻速+10%",
+            "伐木效率+1",
+            "星悦积分+18",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "每秒木材+1\n伐木工攻速+10%\n伐木效率+1\n星悦积分+18\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 102,
+            "timestamp": "01:42",
+            "frame": "output/video_shop_20261015/video1/frames/t102000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p030",
+            "ownership_id": "commerce_p030",
+            "project_display_name": "银斧头·永久",
+            "project_enabled": true,
+            "project_description": "每秒木材+1\r\n伐木工攻速+10%\r\n伐木效率+1\r\n星悦积分+18\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p030"
+        },
+        {
+          "source_id": "P015",
+          "name": "金斧头*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "每秒金币+1",
+            "伐木工攻击间隔降低0.01",
+            "星悦积分+18",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "每秒金币+1\n伐木工攻击间隔降低0.01\n星悦积分+18\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 110,
+            "timestamp": "01:50",
+            "frame": "output/video_shop_20261015/video1/frames/t110000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p015",
+            "ownership_id": "commerce_p015",
+            "project_display_name": "金斧头·永久",
+            "project_enabled": true,
+            "project_description": "每秒金币+1\r\n伐木工攻击间隔降低0.01\r\n星悦积分+18\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p015"
+        },
+        {
+          "source_id": "P029",
+          "name": "工作效率*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "每秒木材+1",
+            "金矿效率+5%",
+            "伐木效率+1",
+            "星悦积分+6",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "每秒木材+1\n金矿效率+5%\n伐木效率+1\n星悦积分+6\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 118,
+            "timestamp": "01:58",
+            "frame": "output/video_shop_20261015/video1/frames/t118000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p029",
+            "ownership_id": "commerce_p029",
+            "project_display_name": "工作效率·永久",
+            "project_enabled": true,
+            "project_description": "每秒木材+1\r\n金矿效率+5%\r\n伐木效率+1\r\n星悦积分+6\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p029"
+        },
+        {
+          "source_id": "P033",
+          "name": "伐木斧*永久",
+          "quantity": 1,
+          "type": "特权",
+          "duration_text": "永久",
+          "effect_lines": [
+            "每秒木材+1",
+            "星悦积分+1",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "每秒木材+1\n星悦积分+1\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 124,
+            "timestamp": "02:04",
+            "frame": "output/video_shop_20261015/video1/frames/t124000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "mapped",
+            "sku": "video_p033",
+            "ownership_id": "commerce_p033",
+            "project_display_name": "伐木斧·永久",
+            "project_enabled": true,
+            "project_description": "每秒木材+1\r\n星悦积分+1\r\n购买后自动激活",
+            "project_rules": null,
+            "video_effect_text_matches_project_before_rules": true
+          },
+          "member_type": "sku",
+          "target_id": "video_p033"
+        }
+      ],
+      "complete_formal_sku_mapping": true,
+      "unavailable_source_ids": []
+    },
+    {
+      "review_key": "video1_new_skins",
+      "title": "新皮肤礼包",
+      "subtitle": "新皮肤礼包",
+      "price": {
+        "currency": "U币",
+        "current": 81120,
+        "original": 101400,
+        "evidence": {
+          "time_seconds": 145,
+          "timestamp": "02:25",
+          "frame": "output/video_shop_20261015/video1/frames/t145000.png",
+          "visual_reviewed": true
+        }
+      },
+      "item_count": 3,
+      "items": [
+        {
+          "source_id": "P008",
+          "name": "焚天曜轮*永久",
+          "quantity": 1,
+          "type": "翅膀",
+          "duration_text": "永久",
+          "effect_lines": [
+            "英雄攻击加成+8%",
+            "英雄三围加成+8%",
+            "英雄攻击减甲+8",
+            "英雄攻击全属性+8",
+            "英雄最终伤害+8%",
+            "英雄三围加成+0.45%*地图等级",
+            "英雄最终伤害+0.45%*地图等级",
+            "英雄攻击加成+0.45%*地图等级",
+            "英雄攻击减甲+0.45*地图等级",
+            "英雄攻击全属性+0.45*地图等级",
+            "星悦积分+500",
+            "解锁英雄翅膀：焚天曜轮",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "英雄攻击加成+8%\n英雄三围加成+8%\n英雄攻击减甲+8\n英雄攻击全属性+8\n英雄最终伤害+8%\n英雄三围加成+0.45%*地图等级\n英雄最终伤害+0.45%*地图等级\n英雄攻击加成+0.45%*地图等级\n英雄攻击减甲+0.45*地图等级\n英雄攻击全属性+0.45*地图等级\n星悦积分+500\n解锁英雄翅膀：焚天曜轮\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 137,
+            "timestamp": "02:17",
+            "frame": "output/video_shop_20261015/video1/frames/t137000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "unavailable",
+            "sku": null,
+            "ownership_id": null,
+            "import_status": "excluded_model",
+            "reason": "焚天曜轮为英雄翅膀外观商品，需要新增或导入对应挂件资产；整件排除。"
+          },
+          "member_type": "unavailable",
+          "target_id": "P008"
+        },
+        {
+          "source_id": "P007",
+          "name": "昭穹羽君*永久",
+          "quantity": 1,
+          "type": "皮肤",
+          "duration_text": "永久",
+          "effect_lines": [
+            "英雄攻击加金币+15",
+            "英雄攻击加木材+15",
+            "英雄攻击加成+15%",
+            "英雄三围加成+15%",
+            "英雄最终伤害+15%",
+            "英雄造成伤害三围+15",
+            "英雄攻击减甲+15",
+            "星悦积分+298",
+            "解锁英雄皮肤:昭穹羽君",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "英雄攻击加金币+15\n英雄攻击加木材+15\n英雄攻击加成+15%\n英雄三围加成+15%\n英雄最终伤害+15%\n英雄造成伤害三围+15\n英雄攻击减甲+15\n星悦积分+298\n解锁英雄皮肤:昭穹羽君\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 145,
+            "timestamp": "02:25",
+            "frame": "output/video_shop_20261015/video1/frames/t145000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "unavailable",
+            "sku": null,
+            "ownership_id": null,
+            "import_status": "excluded_model",
+            "reason": "明确解锁昭穹羽君英雄皮肤；当前英雄外观表没有该角色皮肤，需要新增人物资产。"
+          },
+          "member_type": "unavailable",
+          "target_id": "P007"
+        },
+        {
+          "source_id": "P006",
+          "name": "兔女郎城墙*永久",
+          "quantity": 1,
+          "type": "皮肤",
+          "duration_text": "永久",
+          "effect_lines": [
+            "墙护甲+88",
+            "墙每秒护甲+0.08",
+            "墙每秒生命+50",
+            "城墙生命加成+10%",
+            "城墙护甲加成+10%",
+            "城墙减伤+5%",
+            "解锁城墙皮肤:兔女郎",
+            "购买后自动激活"
+          ],
+          "full_effect_text": "墙护甲+88\n墙每秒护甲+0.08\n墙每秒生命+50\n城墙生命加成+10%\n城墙护甲加成+10%\n城墙减伤+5%\n解锁城墙皮肤:兔女郎\n购买后自动激活",
+          "evidence": {
+            "time_seconds": 156,
+            "timestamp": "02:36",
+            "frame": "output/video_shop_20261015/video1/frames/t156000.png",
+            "visual_reviewed": true
+          },
+          "visual_readability": "商品名、类型、数量及全部效果行均从本条证据帧直接核对。",
+          "project_mapping": {
+            "status": "unavailable",
+            "sku": null,
+            "ownership_id": null,
+            "import_status": "excluded_model",
+            "reason": "明确承诺“解锁城墙皮肤兔女郎”；项目未发现对应外观绑定。整件排除，不能只加属性就称原版已完成。"
+          },
+          "member_type": "unavailable",
+          "target_id": "P006"
+        }
+      ],
+      "complete_formal_sku_mapping": false,
+      "unavailable_source_ids": [
+        "P008",
+        "P007",
+        "P006"
+      ]
+    }
+  ]
+}

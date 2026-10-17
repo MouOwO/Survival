@@ -22,16 +22,19 @@ import qrcode.image.svg
 from .wechat import APPID, MCHID, ORIGIN, SKU, TITLE, WeChat, PaymentError, decode_json, validate_success
 from .alipay import Alipay, is_qr_code
 from .ucoin_catalog import U_COIN_PER_YUAN
+from .order_quantity import MAX_ORDER_QUANTITY,quantity,snapshot_units,pricing_original
+from . import ucoin_recharge
 
 LOG = logging.getLogger('payments')
 ORDER = re.compile(r'(?:WX|AL)[0-9a-f]{30}\Z')
 CALLS = {'catalog':2,'create_order':4,'get_order':1,'pending':0,'update_gateway':3,'deliver':5,
-    'begin_reset':4,'finish_reset':4,'create_order_channel':5}
+    'begin_reset':4,'finish_reset':4,'create_order_channel':5,'create_order_quantity':6}
 
 
-def ucoin_quote(amount_fen):
+def ucoin_quote(amount_fen, *, recharge=False):
     """Display the database-owned cash amount in U-coins, never client input."""
-    if type(amount_fen) is not int or not 1 <= amount_fen <= 1000000:
+    maximum=ucoin_recharge.MAX_AMOUNT_FEN if recharge else 1000000
+    if type(amount_fen) is not int or not 1 <= amount_fen <= maximum:
         raise PaymentError('payment_amount_invalid',500)
     return {'u_coin_price':amount_fen * U_COIN_PER_YUAN // 100,
             'u_coin_per_yuan':U_COIN_PER_YUAN}
@@ -104,6 +107,7 @@ class Payments:
         return hmac.new(self.config['checkout_key'].encode(),('checkout:'+order_id).encode(),hashlib.sha256).hexdigest()
 
     def public(self, order):
+        count,unit_amount=snapshot_units(order)
         result = {'ok':True,'sku':order['sku'],'title':order['reward'].get('title',TITLE),
             'description':order['reward'].get('description',''),
             'reward_lines':order['reward'].get('grants',{}).get('lines',[]),
@@ -118,11 +122,20 @@ class Payments:
             result['checkout_url']=ORIGIN+'/checkout/alipay?order='+order['order_id']+'&token='+self.token(order['order_id'])
         result['checkout_mode']='qr' if native_qr(order) else 'page_pay' if order.get('code_url')=='alipay:page_pay' else 'preparing'
         # Existing orders retain their stored amount even after a catalog edit.
-        result.update(ucoin_quote(order['amount']))
+        recharge=ucoin_recharge.is_recharge(order)
+        result.update(ucoin_quote(order['amount'],recharge=recharge))
+        result.update(quantity=count,unit_amount_fen=unit_amount,unit_u_coin_price=ucoin_quote(unit_amount)['u_coin_price'])
         pricing=order['reward'].get('grants',{}).get('pricing')
-        if pricing is not None and pricing != {
-                'u_coin_price':result['u_coin_price'], 'u_coin_per_yuan':U_COIN_PER_YUAN}:
+        original=pricing_original(pricing,result['u_coin_price'],100000000*count)
+        if original is not None:result['original_u_coin_price']=original
+        unit_pricing=order['reward'].get('unit_pricing')
+        unit_original=pricing_original(unit_pricing,result['unit_u_coin_price'],100000000)
+        if unit_pricing is not None and (original is None)!=(unit_original is None):
             raise PaymentError('payment_pricing_mismatch',500)
+        if unit_original is not None:
+            if original!=unit_original*count:raise PaymentError('payment_pricing_mismatch',500)
+            result['unit_original_u_coin_price']=unit_original
+        if recharge:result.update(ucoin_recharge.public_fields(count))
         if native_qr(order) and order['state']=='pending' and not result['expired']:
             result['qr_matrix']=qr_matrix(order['code_url'])
         return result
@@ -229,12 +242,28 @@ class Payments:
         if path not in fields:raise PaymentError('route_not_found',404)
         allowed = {'account_id','match_session_id'} | fields[path]
         if path=='create' and 'provider' in body:allowed.add('provider')
+        if path=='create' and 'quantity' in body:allowed.add('quantity')
         if set(body)!=allowed:
             raise PaymentError('request_fields_invalid')
+        count=quantity(body.get('quantity',1),sku=body.get('sku')) if path=='create' else 1
         account,session,catalog = self.identity(body)
         if path=='catalog':
-            products=[{**product,**ucoin_quote(product['amount_fen'])}
-                      for product in catalog.get('products',[])]
+            products=[]
+            for product in catalog.get('products',[]):
+                quote=ucoin_quote(product['amount_fen']);maximum=product.get('max_quantity',1 if product.get('enabled') else 0)
+                recharge=product.get('sku')==ucoin_recharge.SKU
+                allowed_maximum=ucoin_recharge.MAX_QUANTITY if recharge else MAX_ORDER_QUANTITY
+                if recharge and (product.get('product_type')!='recharge' or product['amount_fen']!=100
+                    or type(product.get('recharge_u_coin_per_unit')) is not int or product['recharge_u_coin_per_unit']!=100):
+                    raise PaymentError('payment_pricing_mismatch',500)
+                if type(maximum) is not int or not 0<=maximum<=allowed_maximum:
+                    raise PaymentError('payment_quantity_limit_invalid',500)
+                unit=product.get('unit_amount_fen',product['amount_fen']);unit_u=product.get('unit_u_coin_price',quote['u_coin_price'])
+                if (type(unit) is not int or unit!=product['amount_fen']
+                    or type(unit_u) is not int or unit_u!=quote['u_coin_price']):
+                    raise PaymentError('payment_pricing_mismatch',500)
+                products.append({**product,**quote,'unit_amount_fen':product['amount_fen'],
+                    'unit_u_coin_price':quote['u_coin_price'],'max_quantity':maximum})
             return {**catalog,'products':products,'u_coin_per_yuan':U_COIN_PER_YUAN,
                     'wechat':True,'alipay':self.alipay is not None,'alipay_checkout_mode':self.alipay_mode}
         if path=='reset':
@@ -266,10 +295,19 @@ class Payments:
             raise PaymentError('product_unavailable')
         provider=body.get('provider','wechat')
         if provider not in ('wechat','alipay') or (provider=='alipay' and not self.alipay):raise PaymentError('payment_channel_unavailable',409)
-        if provider=='wechat':order=self.db.call('create_order',account,session,'WX'+secrets.token_hex(15),body['sku'])
+        if 'quantity' in body:
+            order=self.db.call('create_order_quantity',account,session,('WX' if provider=='wechat' else 'AL')+secrets.token_hex(15),body['sku'],provider,count)
+        elif provider=='wechat':order=self.db.call('create_order',account,session,'WX'+secrets.token_hex(15),body['sku'])
         else:order=self.db.call('create_order_channel',account,session,'AL'+secrets.token_hex(15),body['sku'],provider)
         with self.lock(order['order_id']):
+            warning=order.get('warning')
             order=self.db.call('get_order',order['order_id'])
+            if order.get('account_id')!=account or order.get('sku')!=body['sku']:
+                raise PaymentError('order_missing',404)
+            if snapshot_units(order)[0]!=count:warning='order_quantity_conflict'
+            elif order.get('provider','wechat')!=provider:warning='order_provider_conflict'
+            if warning in ('order_quantity_conflict','order_provider_conflict'):
+                return {**self.public(order),'warning':warning}
             if order['state']=='created' or expired(order):
                 order=self.reconcile(order)
             if order['state']=='created' and not expired(order):
@@ -306,9 +344,9 @@ class Payments:
 
 
 PAGE = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>商品商城 · 扫码支付</title>
-<link rel="stylesheet" href="/checkout.css"><main><p class="eyebrow">游戏测试商品</p><h1 id="title">正在加载商品</h1><p>请核对商品、金额及游戏内奖励明细</p><strong id="price" class="price">—</strong><p id="scan">请使用订单对应的支付应用扫码，付款后自动发到下单的游戏账号。</p><img id="qr" width="256" height="256" alt="正在加载付款码"><p id="status" role="status">正在查询订单…</p><p id="order" class="muted"></p><button id="refresh">刷新付款状态</button><p class="muted">到账确认可能需要数秒。请勿重复付款；可返回游戏查看存档。</p></main><script src="/checkout.js"></script></html>'''
+<link rel="stylesheet" href="/checkout.css"><main><p class="eyebrow">游戏测试商品</p><h1 id="title">正在加载商品</h1><p>请核对商品、金额及游戏内奖励明细</p><strong id="price" class="price">—</strong><p>请适度娱乐，理性消费</p><p id="scan">请使用订单对应的支付应用扫码，付款后自动发到下单的游戏账号。</p><img id="qr" width="256" height="256" alt="正在加载付款码"><p id="status" role="status">正在查询订单…</p><p id="order" class="muted"></p><button id="refresh">刷新付款状态</button><p class="muted">到账确认可能需要数秒。请勿重复付款；可返回游戏查看存档。</p></main><script src="/checkout.js"></script></html>'''
 CSS = '''body{margin:0;background:#101725;color:#e8edf6;font:16px system-ui,sans-serif;line-height:1.6}main{max-width:460px;margin:5vh auto;padding:32px;text-align:center;background:#1b263b;border-radius:20px}h1{font-size:32px;margin:8px}.eyebrow,.muted{color:#aab6cc;font-size:13px}.price{display:block;font-size:44px;color:#ffd68a}img{background:white;border-radius:10px;margin:10px auto;display:block}button{padding:10px 24px;border:0;border-radius:8px;background:#72d5ac;color:#102820;font:inherit;cursor:pointer}button:disabled{opacity:.5}#status{min-height:26px;color:#ffd68a}'''
-JS = '''(function(){"use strict";var query=location.search,qr=document.getElementById("qr"),status=document.getElementById("status"),busy=false,done=false;qr.src="/checkout/qr"+query;function poll(){if(busy)return;busy=true;fetch("/checkout/status"+query,{cache:"no-store"}).then(function(r){if(!r.ok)throw Error();return r.json();}).then(function(d){var channel=d.provider==="alipay"?"支付宝":"微信";document.getElementById("scan").textContent="使用手机"+channel+"扫描二维码，付款后自动发到下单的游戏账号。";qr.alt=channel+"付款码";document.getElementById("title").textContent=d.title;document.getElementById("price").textContent="¥"+(d.amount_fen/100).toFixed(2);document.getElementById("order").textContent="订单号："+d.order_id;var labels={created:"订单正在准备，请返回游戏重试。",pending:"等待"+channel+"付款…",delivered:"支付成功，"+d.title+" 的全部奖励已写入存档。返回游戏即可查看。",paid_review:"已收到付款，但账号已拥有该奖励。请保留订单号联系开发者处理退款，请勿重复付款。",closed:"订单已关闭，请返回游戏重新下单。"};status.textContent=labels[d.state]||"正在确认付款…";done=["delivered","paid_review","closed"].indexOf(d.state)>=0;if(done||d.expired){qr.style.display="none";if(!done)status.textContent="付款码已过期，正在确认最终状态。请勿重复付款。";}}).catch(function(){status.textContent="暂时无法查询，请稍后刷新；请勿重复付款。";}).finally(function(){busy=false;});}document.getElementById("refresh").onclick=poll;poll();setInterval(function(){if(!done)poll();},4000);}());'''
+JS = '''(function(){"use strict";var query=location.search,qr=document.getElementById("qr"),status=document.getElementById("status"),busy=false,done=false;qr.src="/checkout/qr"+query;function poll(){if(busy)return;busy=true;fetch("/checkout/status"+query,{cache:"no-store"}).then(function(r){if(!r.ok)throw Error();return r.json();}).then(function(d){var channel=d.provider==="alipay"?"支付宝":"微信";document.getElementById("scan").textContent="使用手机"+channel+"扫描二维码，付款后自动发到下单的游戏账号。";qr.alt=channel+"付款码";document.getElementById("title").textContent=d.title;document.getElementById("price").textContent="¥"+(d.amount_fen/100).toFixed(2);document.getElementById("order").textContent="订单号："+d.order_id;var labels={created:"订单正在准备，请返回游戏重试。",pending:"等待"+channel+"付款…",delivered:"支付成功，"+d.title+" 的全部奖励已写入存档。返回游戏即可查看。",paid_review:"已收到付款，奖励暂未到账，请保留订单号联系处理，请勿重复付款。",closed:"订单已关闭，请返回游戏重新下单。"};status.textContent=labels[d.state]||"正在确认付款…";done=["delivered","paid_review","closed"].indexOf(d.state)>=0;if(done||d.expired){qr.style.display="none";if(!done)status.textContent="付款码已过期，正在确认最终状态。请勿重复付款。";}}).catch(function(){status.textContent="暂时无法查询，请稍后刷新；请勿重复付款。";}).finally(function(){busy=false;});}document.getElementById("refresh").onclick=poll;poll();setInterval(function(){if(!done)poll();},4000);}());'''
 RETURN_PAGE = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>返回游戏确认到账</title><link rel="stylesheet" href="/checkout.css"><main><h1>请返回游戏查看订单</h1><p>服务器正在核对支付宝付款结果。确认到账后，奖励会自动写入下单账号的存档。</p><p>在游戏收银页点击“查询付款结果”即可查看。请勿重复付款。</p></main></html>'''
 
 

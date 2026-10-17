@@ -4,6 +4,7 @@ local calls,requests=0,{}
 local snapshots={{selected_pool_id='map',tickets=3,pools={},items={}}}
 package.loaded['core/event_bus']={handle_request=function(k,f)handlers[k]=f end,subscribe=function(k,f)subscribers[k]=f end,emit=function(k,p)packets[#packets+1]=p end}
 local events=require('core/events')
+package.loaded['systems/match_setup_service']={get_session_id=function()return 'safe_session' end,get_mode=function()return 'standard' end}
 local pending_http
 package.loaded['systems/player_profile_service']={get_provider=function()return {
     resolve_account_id=function()return '123' end,

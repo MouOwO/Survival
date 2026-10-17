@@ -48,6 +48,10 @@ EntIndexToHScript=function(index) return entities[index] end
 ExecuteOrderFromTable=function(order)
     local u=assert(entities[order.UnitIndex])
     u.orders=u.orders+1
+    if order.OrderType==DOTA_UNIT_ORDER_MOVE_TO_POSITION and u.ai:GetStackCount()==5 then
+        assert(not u.native_phased,'distant route must retain native unit collision')
+        u.route_move_orders=u.route_move_orders+1
+    end
     if order.OrderType==DOTA_UNIT_ORDER_MOVE_TO_POSITION and u.ai:GetStackCount()==3 then
         assert(u.native_phased,'approach MOVE was issued before native phase became active')
         u.contact_move_orders=u.contact_move_orders+1
@@ -75,7 +79,7 @@ end
 local function unit(id, x, y, radius)
     local u={p=Vector(x,y,384),radius=radius or 32,orders=0,stops=0,
         original_radius=radius or 32,hull_changes=0,
-        corrections=0,hits=0,next_attack=0,contact_move_orders=0}
+        corrections=0,hits=0,next_attack=0,contact_move_orders=0,route_move_orders=0}
     function u:entindex() return id end
     function u:GetAbsOrigin() return self.p end
     function u:SetAbsOrigin(p) self.p=copy(p);self.corrections=self.corrections+1 end
@@ -105,6 +109,9 @@ local function unit(id, x, y, radius)
 end
 
 local contact=require('systems/wall_melee_contact')
+-- This fixture is a sealed narrow west approach; navigation registration is
+-- covered separately. Supply the same proven gate direction to the real AI.
+package.loaded['systems/wall_navigation_service']={contact_face=function() return 1 end}
 local ai=require('modifiers/modifier_enemy_wall_ai')
 local wall=unit(1,0,0,128)
 local function controller(u, target)
@@ -146,8 +153,13 @@ local function move(u, goal, dt)
     if math.abs(next_p.y)>128-u.radius or next_p.x>-128-u.radius then return end
     if not phased(u) then
         for _,other in ipairs(monsters) do
-            if other~=u and other:IsAlive() and not phased(other)
-                and distance(next_p,other.p)<u.radius+other.radius-.01 then return end
+            if other~=u and other:IsAlive() and not phased(other) then
+                local separation=distance(next_p,other.p)
+                local body=u:GetPaddedCollisionRadius()+other:GetPaddedCollisionRadius()
+                -- Old spawn rows may already overlap native padded bodies.
+                -- They may move out of that overlap, never deeper into it.
+                if separation<body-.01 and separation<distance(u.p,other.p)-.01 then return end
+            end
         end
     end
     u.p=next_p
@@ -217,12 +229,15 @@ local function assert_front(label)
     for _,u in ipairs(actors) do
         assert(u.hits>0,label..': every contact must actually land attacks')
         assert(math.abs(u.p.x+184)<.01,label..': contact is not precisely aligned normal to wall')
-        assert(u.p.y==-72 or u.p.y==-24 or u.p.y==24 or u.p.y==72,
+        assert(u.p.y==-96 or u.p.y==-32 or u.p.y==32 or u.p.y==96,
             label..': contact is not precisely aligned to a lane')
-        assert(u:GetHullRadius()==24,label..': admitted front must use the tactical navigation hull')
+        assert(u:GetHullRadius()==20 and u:GetPaddedCollisionRadius()==30,
+            label..': front must include the native +10 padding in the 64-unit pitch')
+        assert(math.abs(u.p.y)+u:GetPaddedCollisionRadius()<=128,
+            label..': native padded front must fit the doorway')
         assert(not occupied[u.p.y],label..': two contacts occupy the same lane')
         occupied[u.p.y]=true
-        assert(phased(u),label..': crowd pressure must not move a locked contact')
+        assert(not phased(u) and u:IsRooted(),label..': locked attackers must retain collision')
     end
     local phase_count=0
     for _,u in ipairs(monsters) do
@@ -232,16 +247,25 @@ local function assert_front(label)
             assert(not phased(u),label..': overflow must retain normal collision')
             assert(u:GetHullRadius()==u.original_radius,label..': overflow inherited the tactical hull')
             local goal_gap=-u.ai.contact_move.x-184
-            local minimum_gap=u.original_radius+24+8
-            assert(goal_gap>=minimum_gap and goal_gap<=minimum_gap+32,
-                label..': overflow goal must be compact and outside the front hulls')
+            local minimum_gap=u:GetPaddedCollisionRadius()+30+8
+            if distance(u.p,wall.p)>512 then
+                assert(goal_gap==320-184 and u.ai.wait_envelope==0,
+                    label..': distant solid staging must target the near-face entrance without claiming a contact')
+            else
+                assert(goal_gap>=minimum_gap and goal_gap<=minimum_gap+32,
+                    label..': overflow goal must be compact and outside padded front hulls goal='..goal_gap..' minimum='..minimum_gap)
+            end
             for _,attacker in ipairs(actors) do
-                assert(distance(u.p,attacker.p)>=u.radius+attacker.radius-.01,
-                    label..': waiting unit overlaps a phased front attacker')
+                assert(distance(u.p,attacker.p)>=u:GetPaddedCollisionRadius()+attacker:GetPaddedCollisionRadius()-.01,
+                    label..': waiting unit overlaps a solid front attacker')
             end
         end
     end
     assert(phase_count<=4,label..': phase work must be bounded by four claims')
+    for i=1,#actors do for j=i+1,#actors do
+        assert(distance(actors[i].p,actors[j].p)>=actors[i]:GetPaddedCollisionRadius()+actors[j]:GetPaddedCollisionRadius()+4,
+            label..': native padded front bodies must leave an avoidance margin')
+    end end
     return actors
 end
 
@@ -253,7 +277,7 @@ controller(unit(10,-224,-42))
 controller(unit(11,-224,42))
 for i=1,88 do
     local row=math.floor((i-1)/4)
-    local lanes={-24,24,-72,72}
+    local lanes={-32,32,-96,96}
     local u=unit(11+i,-320-row*64,lanes[(i-1)%4+1])
     u.cancel_first_contact_move=true
     controller(u)
@@ -288,8 +312,8 @@ local closest_waiter=math.huge
 for _,u in ipairs(monsters) do
     if u.ai.ai_state=='waiting' then closest_waiter=math.min(closest_waiter,-u.p.x-184) end
 end
-assert(closest_waiter>=56 and closest_waiter<=100,
-    'MOVE stopping tolerance still leaves an empty row behind the four attackers')
+assert(closest_waiter>=30+42 and closest_waiter<=30+42+8+32,
+    'MOVE stopping tolerance still leaves an empty row behind the four attackers distance='..closest_waiter)
 local first_attackers={}
 for _,u in ipairs(initial_front) do first_attackers[u:entindex()]=true end
 for _,u in ipairs(monsters) do
@@ -364,22 +388,41 @@ contact.reset()
 -- Ordinary movement progresses during its first observation and must not get
 -- the new idle retry. A nil force-target getter also cannot suppress clearing
 -- the previously assigned force target before issuing this genuine MOVE.
+-- This is an independent single-unit case. Destroyed controllers from the
+-- previous 90-body crowd must not remain as live blocking fixture entities.
+monsters,controllers={},{}
 local progressing=unit(250,-480,-96)
 progressing.force=wall
 progressing.hide_force_target=true
 local progressing_ai=controller(progressing)
 observe()
 assert(progressing.contact_move_orders==0 and not phased(progressing),
-    'ordinary approach must also wait for the native phase frame')
+    'vacancy entry must still defer MOVE until the native phase frame')
+assert(progressing_ai.ai_state=='approach' and progressing.route_move_orders==0,
+    'a vacancy owner already outside its own face must enter within the allocator local range')
 run(.05)
 assert(progressing.force==nil,'a nil getter incorrectly suppressed clearing the old force target')
-assert(progressing.contact_move_orders==1 and progressing_ai.ai_state=='approach')
-run(.5)
-assert(progressing.p.x>-480 and progressing_ai.ai_state=='approach','native movement must be underway')
-assert(progressing.contact_move_orders==1,'normal moving approach received an unnecessary retry')
+assert(progressing.route_move_orders==0 and progressing.contact_move_orders==1
+    and progressing_ai.ai_state=='approach' and phased(progressing))
+run(.25)
+assert(progressing.p.x>-480 and progressing_ai.ai_state=='approach' and phased(progressing),
+    'own-face vacancy entry must advance without the arbitrary 256-unit dead zone')
+assert(progressing.contact_move_orders==1 and progressing.route_move_orders==0,
+    'progressing own-face entry received an unnecessary retry or corner stage')
+run(.4)
+assert(progressing_ai.ai_state=='approach' and phased(progressing)
+    and progressing.route_move_orders==0 and progressing.contact_move_orders==1,
+    'own-face progress must keep one live contact and one native MOVE')
+run(1.85)
+assert(progressing_ai.ai_state=='attack' and progressing.hits>0 and not phased(progressing)
+    and progressing.route_move_orders+progressing.contact_move_orders<=2,
+    'normal own-face entry must restore solid attack using at most two MOVE orders')
+local solo_orders,solo_positions,solo_paths=progressing.orders,progressing.corrections,paths
+local solo_hits=progressing.hits
 run(2)
-assert(progressing_ai.ai_state=='attack' and progressing.hits>0 and progressing.contact_move_orders==1,
-    'normal movement should reach contact using exactly one move order')
+assert(progressing.hits>solo_hits and progressing.orders==solo_orders
+    and progressing.corrections==solo_positions and paths==solo_paths,
+    'settled own-face entry must attack without repeated orders, coordinates or paths')
 progressing_ai:SetWallEntIndex(-1)
 progressing_ai:OnDestroy()
 contact.reset()

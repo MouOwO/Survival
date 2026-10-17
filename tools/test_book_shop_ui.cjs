@@ -21,9 +21,9 @@ assert(buttons[0].BHasClass('AutoBookEnabled'));assert(!buttons[1].BHasClass('Au
 events.ui_shop_snapshot({sequence:3,full:1,ui_mode:'shop',entries:books,categories:[],resources:{gold:2}});
 autoState={};tableListeners.survival_shop_config('', 'auto_purchase_0', autoState);
 assert(!buttons[0].BHasClass('AutoBookEnabled'),'same-layout refresh preserves live toggle bindings');
-vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/item_art_remaining_5d5c1152eb.js','utf8'),env);
+for(const file of ['common/item_resources','reward_presentation','item_art_remaining_5d5c1152eb'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);
 for(const suffix of ['01','02','03','04','max'])for(const prefix of ['weapon_','item_survival_']){
  const icon=cfg.SurvivalItemArt.Create(root,{content_id:prefix+'ice_blade_'+suffix},'icon');
- assert(icon.image.endsWith('/extreme_cold_blade_v2.png'));
+ assert.equal(icon.image,cfg.SurvivalItemResources.Resolve({content_id:prefix+'ice_blade_'+suffix}),'every blade level shares the formal resource');
 }
 console.log('BOOK_SHOP_UI_PASS: both toggles, live state, retained bindings, tab memory, all blade levels');

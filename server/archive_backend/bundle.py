@@ -45,7 +45,8 @@ def build(root: Path, destination: Path | None = None, update_game_config: bool 
     files = sorted(p for p in (root / "data/csv/存档系统").glob("*.csv") if p.name not in PRESENTATION_CSV)
     files += sorted((root / "data/csv/抽奖系统").glob("*.csv"))
     files += [root / 'data/csv/商城兑换系统' / (name + '.csv')
-              for name in ('commerce_products', 'commerce_rewards')]
+              for name in ('commerce_products', 'commerce_rewards', 'commerce_import_status', 'commerce_bundle_members')
+              if (root / 'data/csv/商城兑换系统' / (name + '.csv')).is_file()]
     files += [root / "data/csv/玩家档案系统" / (n+".csv") for n in ("player_gameplay_stats","map_level_effect_rules")]
     sources = {"systems/"+n+".lua": (root/"scripts/vscripts/systems"/(n+".lua")).read_text(encoding="utf-8-sig") for n in MODULES}
     for name in ("lottery_config", "content_id_aliases"):

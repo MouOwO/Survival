@@ -71,7 +71,9 @@ function dailyAccepted() {
     // production resolvers. Do not require an unrelated registry migration.
     const itemResources = 'common/item_resources.js';
     if (fs.existsSync(path.join(project, 'panorama/src/scripts/custom_game', itemResources))) h.load(itemResources);
-    for (const source of ['reward_presentation.js', 'item_art_remaining_5d5c1152eb.js',
+    for (const source of ['archive_theme_tokens.js', 'archive_parchment_data.js',
+        'archive_handoff_180de7e38b.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js',
+        'reward_presentation.js', 'item_art_remaining_5d5c1152eb.js',
         'daily_gw2_data.js', 'daily_remaining_5d5c1152eb.js']) h.load(source);
     auditAssets(cfg.DailyGW2Data);
     // A formal reward falling back to the old generic crystal fails immediately.
@@ -81,7 +83,7 @@ function dailyAccepted() {
     assert.deepEqual([parseFloat(canvas.style.width), parseFloat(canvas.style.height)], [1382, 784]);
     assert.equal(nodes.DailyGW2Title.text, '每日登录奖励');
     assert.deepEqual(Array.from({length: 7}, (_, index) => nodes['DailyGW2Weekday_' + index].text),
-        ['周一', '周二', '周三', '周四', '周五', '周六', '周日']);
+        ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', 'Ⅵ', 'Ⅶ']);
     assert.equal(nodes.DailyCards.GetChildCount(), 28);
     assert.equal(nodes.DailySpecials.GetChildCount(), 4);
     assert.equal(tagged(nodes.DailyCards, 'DailyGW2ItemArt').length, 0, 'Loading does not invent rewards');

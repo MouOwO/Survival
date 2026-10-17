@@ -516,3 +516,48 @@ for pool_index, skill_id in ipairs(fusion_row.super_skill_ids) do
     for i = 2, fusion_row.required_count do assert(spawned[i].killed) end
 end
 print("LUMBERJACK_FUSION_PERSONALITY_PASS: all 11 defaults retained, visible/learned, real training+fusion+registry and in-place unit names")
+
+-- The repairer cap and internship bonus belong to the city owner even when
+-- both cities and all their workers share the same Dota team.
+reset()
+local repairer_bonus={}
+local rogue_state=package.loaded["systems/rogue_effect_state_service"]
+rogue_state.numeric=function(player,key) return (repairer_bonus[player] or {})[key] or 0 end
+rogue_state.add_numeric=function(player,key,value)
+    repairer_bonus[player]=repairer_bonus[player] or {}
+    repairer_bonus[player][key]=((repairer_bonus[player] or {})[key] or 0)+value
+    return true
+end
+local function repairer_view(player,tier)
+    return bus.request(events.WORKER_TRAINING_GET_REQUEST,{player_id=player,team=2,
+        training_type="repairer",training_id=tier})
+end
+local function train_repairer(player)
+    local result,error_message=bus.request(events.WORKER_TRAIN_REQUEST,{city=cities[player],
+        player_id=player,training_id="train_repairer_01"})
+    assert(not error_message,error_message)
+    return result
+end
+for player=0,1 do
+    for i=1,5 do assert(train_repairer(player).ok) end
+    assert(repairer_view(player,"train_repairer_01").count==5)
+    assert(not train_repairer(player).ok)
+end
+local before_workers,before_wood,before_pop=#spawned,accounts[0].wood,accounts[0].population
+local registry=require("systems/rogue_effect_registry")
+assert(registry.get("training_capacity_flat").apply({player_id=0,
+    params={value=2,training_id="train_repairer_01"}}))
+assert(#spawned==before_workers and accounts[0].wood==before_wood and accounts[0].population==before_pop)
+assert(repairer_view(0,"train_repairer_01").max_count==7)
+assert(repairer_view(1,"train_repairer_01").max_count==5)
+assert(repairer_view(0,"train_repairer_02").max_count==2,"internship changes only the junior cap")
+for i=1,2 do assert(train_repairer(0).ok) end
+assert(not train_repairer(0).ok and not train_repairer(1).ok)
+assert(accounts[0].wood==before_wood-200 and accounts[0].population==before_pop+2,
+    "extra slots still cost normal currency and population")
+assert(repairer_view(0).count==7 and repairer_view(1).count==5)
+spawned[1]:ForceKill()
+bus.emit(events.ENGINE_ENTITY_KILLED,{victim_entindex=spawned[1]:entindex(),victim=spawned[1]})
+assert(repairer_view(0,"train_repairer_01").count==6)
+assert(repairer_view(1,"train_repairer_01").count==5 and train_repairer(0).ok)
+print("INTERNSHIP_OWNER_CAP_PASS: same-team isolation, junior-only +2, normal costs/population and replacement after death")

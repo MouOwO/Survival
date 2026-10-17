@@ -3,6 +3,7 @@ const base=fs.readFileSync('tools/test_archive_compact.cjs','utf8').split('const
 const checks=`
 Panel.prototype.SetScaling=function(v){this.scaling=v;};
 cfg.ArchiveHandoff={Icon(){},Init(){},Observe(){},CardProgress(){return '0 / 1';}};
+vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/common/item_resources.js','utf8'),env);
 vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/reward_presentation.js','utf8'),env);
 vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/icons_remaining_5d5c1152eb.js','utf8'),env);
 for(const q of ['n','r','sr','ssr','ur']){

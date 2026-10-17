@@ -168,6 +168,10 @@ local function initialize_replacement(player_id, team, altar, definition, positi
         unit:SetControllableByPlayer(player_id, true)
     end
 
+    -- Native replacement keeps the engine owner, but addon effects resolve
+    -- ownership through this identity before attaching hero modifiers.
+    unit.survival_player_id = player_id
+
     print(string.format(
         "[HERO_REPLACEMENT_OWNER] player=%s reported_owner=%s entindex=%s",
         tostring(player_id), tostring(unit:GetPlayerOwnerID()),

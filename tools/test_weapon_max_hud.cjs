@@ -10,7 +10,7 @@ const slots = Array.from({length: 9}, (_, i) => {
     return slot;
 });
 let created = 0;
-const env = {cfg: {}, valid: p => !!p, native: () => inventory, selectedUnit: () => 7,
+const env = {cfg: {}, valid: p => !!p, native: () => inventory, findCached: (p, id) => p.FindChildTraverse(id), selectedUnit: () => 7,
     Entities: {GetItemInSlot: (_, i) => items[i] ? i : -1}, Abilities: {GetAbilityName: i => items[i]},
     CustomNetTables: {GetTableValue: (_, id) => identities[id]},
     style: (p, values) => Object.assign(p.style, values),

@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const source=fs.readFileSync('panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js','utf8');
 const textValues={},counter={visible:false,classes:{},SetHasClass(k,v){this.classes[k]=v;}},countdown={visible:false};
-const env={cfg:{},sequence:-1,text:(k,v)=>textValues[k]=v,enemyCounter:counter,enemyCountdown:countdown};
+const env={cfg:{HandoffGeneration:1},generation:1,ctx:{},valid:p=>!!p,sequence:-1,text:(k,v)=>textValues[k]=v,enemyCounter:counter,enemyCountdown:countdown};
 const bootstrap=fs.readFileSync('panorama/src/scripts/custom_game/ui_bootstrap.js','utf8');
 env.GameUI={CustomUIConfig:()=>env.cfg};
 vm.createContext(env);

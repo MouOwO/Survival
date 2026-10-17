@@ -70,6 +70,10 @@ local modifiers = {
         path = "modifiers/modifier_tree_progression",
     },
     {
+        name = "modifier_tree_attack_observer",
+        path = "modifiers/modifier_tree_attack_observer",
+    },
+    {
         name = "modifier_repair_worker_ai",
         path = "modifiers/modifier_repair_worker_ai",
     },
@@ -165,6 +169,14 @@ local modifiers = {
     {
         name = "modifier_tower_auto_attack",
         path = "modifiers/modifier_tower_auto_attack",
+    },
+    {
+        name = "modifier_tower_projectile_speed",
+        path = "modifiers/modifier_tower_projectile_speed",
+    },
+    {
+        name = "modifier_tower_fixed_facing",
+        path = "modifiers/modifier_tower_fixed_facing",
     },
     {
         name = "modifier_tower_attack_effects",

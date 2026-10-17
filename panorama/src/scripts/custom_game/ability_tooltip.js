@@ -474,7 +474,7 @@
             "攻击提升": { type: "image", name: "file://{images}/items/broadsword.png" },
             "攻击速度": { type: "image", name: "file://{images}/items/gloves.png" },
             "人口上限": { type: "ability", name: "ability_train_population" },
-            "每秒金币": { type: "image", name: "file://{images}/items/hand_of_midas.png" },
+            "每秒金币": { type: "image", name: "file://{images}/custom_game/hud_resources_v2/gold.svg" },
             "效率": { type: "ability", name: "ability_upgrade_gold_mine_efficiency" },
             "暴击率": { type: "ability", name: "ability_upgrade_gold_mine_crit" },
             "暴击倍率": { type: "ability", name: "ability_upgrade_gold_mine_crit" }
@@ -540,7 +540,7 @@
         return localize(tokens[code] || "", fallback);
     }
 
-    function addField(container, label, value, levelState) {
+    function addField(container, label, value, levelState, numeric) {
         if (String(label || "").trim() === "解锁条件") return;
         if (value === undefined || value === null || value === "") return;
         var rows=container.__fieldRows||(container.__fieldRows=[]);
@@ -555,10 +555,14 @@
         row.visible=true;
         row.SetHasClass("AbilitySkillLevelRow", !!levelState);
         row.SetHasClass("AbilitySkillLevelCurrent", !!levelState && levelState.current);
+        row.SetHasClass("AbilityNumericFieldRow", !!numeric && !levelState);
         Object.keys(row.__icons).forEach(function(key){row.__icons[key].visible=false;});
         var iconDefinition = propertyIcon(label);
         row.SetHasClass("AbilityFieldTextRow", !iconDefinition);
-        row.__iconHost.visible=!!iconDefinition;
+        // Reserve the same icon gutter even for text-only fields. Collapsing
+        // it moved their value column 26 px to the left of health/armor rows.
+        row.__iconHost.visible=true;
+        row.__iconHost.style.opacity=iconDefinition ? "1" : "0";
         if (iconDefinition) {
             var panelType = iconDefinition.type === "item" ? "DOTAItemImage"
                 : (iconDefinition.type === "ability" ? "DOTAAbilityImage" : "Image");
@@ -596,6 +600,70 @@
         rows.forEach(function (row) { row.visible = false; });
     }
 
+    function tooltipNumber(value) {
+        var number = Number(value);
+        if (!isFinite(number)) return String(value);
+        var absolute = Math.abs(number), unit = "", divisor = 1;
+        var units = [[1e4,"w"],[1e8,"亿"],[1e12,"兆"],[1e16,"京"],
+            [1e20,"垓"],[1e24,"秭"],[1e28,"穰"],[1e32,"沟"],
+            [1e36,"涧"],[1e40,"正"],[1e44,"载"]];
+        for (var index=0; index<units.length && absolute>=units[index][0]; index+=1) {
+            divisor=units[index][0];unit=units[index][1];
+        }
+        if (!unit) return String(number);
+        // Keep one decimal in compact values, including 10.0w as requested.
+        var scaled = absolute/divisor;
+        if (Number(scaled.toFixed(1)) >= 10000 && index < units.length) {
+            divisor=units[index][0];unit=units[index][1];scaled=absolute/divisor;
+        }
+        return (number<0 ? "-" : "")+scaled.toFixed(1)+unit;
+    }
+
+    function tooltipNumericPart(value) {
+        var match = /^\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)([%％秒sx倍w万亿兆京垓秭穰沟涧正载]?)\s*$/i.exec(String(value));
+        if (!match) return null;
+        var number=Number(match[1]);
+        if (!isFinite(number)) return null;
+        var unit=match[2], multiplier={w:1e4,"万":1e4,"亿":1e8,"兆":1e12,"京":1e16,
+            "垓":1e20,"秭":1e24,"穰":1e28,"沟":1e32,"涧":1e36,"正":1e40,"载":1e44}[unit];
+        var semanticUnit = multiplier ? "" : unit.replace("％","%");
+        var amount = number*(multiplier || 1);
+        var text = semanticUnit ? String(number)+unit : tooltipNumber(amount);
+        if (match[1].charAt(0)==="+" && number>=0) text="+"+text;
+        return {amount:amount, unit:semanticUnit, text:text};
+    }
+
+    function presentRuntimeField(field, upgradeMode) {
+        var label=String(field.label || ""), value=field.value;
+        if (value===undefined || value===null || value==="") return null;
+        var text=String(value), pieces=text.split(/\s*→\s*/);
+        // Levels, route identities and state labels remain useful even when
+        // their numeric content is zero. Only actual numeric stats compare.
+        var metadata=/等级|升级目标|模型状态/.test(label) || /^LV[0-9]+/.test(label);
+        if (!metadata && pieces.length===2) {
+            var ending=/^(.*?)(?:\s*[（(]\s*([^（）()]+)\s*[）)])?\s*$/.exec(pieces[1]);
+            var before=tooltipNumericPart(pieces[0]);
+            var after=ending && tooltipNumericPart(ending[1]);
+            var delta=ending && ending[2]!==undefined ? tooltipNumericPart(ending[2]) : null;
+            if (before && after && before.unit===after.unit && (!ending[2] || delta)) {
+                // Compare the endpoints rather than the rounded (+0) copy:
+                // 1 → 1.001 (+0) still represents a real improvement.
+                if (upgradeMode && before.amount===after.amount) return null;
+                return {value:before.text+" → "+after.text+(delta ? " ("+delta.text+")" : ""), numeric:true};
+            }
+        }
+        if (upgradeMode && label==="人口消耗") {
+            var population=/^\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))(?:\s*[（(]当前占有[^）)]+[）)])?\s*$/.exec(text);
+            if (population && Number(population[1])===0) return null;
+        }
+        var part=tooltipNumericPart(text);
+        if (part && !metadata) {
+            if (upgradeMode && part.amount===0 && /提升|生命|护甲|攻击|效率|暴击|每秒金币|人口上限/.test(label)) return null;
+            return {value:part.text, numeric:true};
+        }
+        return {value:value, numeric:false};
+    }
+
     function render(abilityIndex, abilityName, sourcePanel) {
         var dismiss = dismissFor(byId("CustomAbilityTooltip"));
         if (dismiss && !dismiss.CanShow(sourcePanel)) { hideCustomTooltip(true); return false; }
@@ -628,9 +696,11 @@
         // Owning a project tooltip/input route does not make a skill an
         // upgrade. Aggregate passives and D/G tools keep their own presentation.
         var passiveMode = projectMode && isPassiveAbility(abilityIndex, runtime, behavior);
+        var archiveChallengeMode = Number(runtime.archive_challenge) === 1
+            || /^ability_archive_/.test(abilityName);
         var towerToolMode = projectMode && !passiveMode
             && (abilityName === "ability_building_blink" || abilityName === "ability_destroy_arrow_tower");
-        var upgradeMode = projectMode && !passiveMode && !towerToolMode;
+        var upgradeMode = projectMode && !passiveMode && !towerToolMode && !archiveChallengeMode;
 
         var tooltip = byId("CustomAbilityTooltip");
         var fields = byId("CustomAbilityFields");
@@ -640,7 +710,8 @@
         tooltip.RemoveClass("ExtensionOnly");
         tooltip.SetHasClass("RepairerTraining", repairerTrainingMode);
         tooltip.SetHasClass("BuildAbility", buildMode);
-        setText("CustomAbilityExtensionLabel", passiveMode ? "生存防守 · 被动技能"
+        tooltip.SetHasClass("ArchiveChallenge", archiveChallengeMode);
+        setText("CustomAbilityExtensionLabel", archiveChallengeMode ? "" : passiveMode ? "生存防守 · 被动技能"
             : towerToolMode ? "生存防守 · 防御塔技能" : upgradeMode
             ? localize("Survival_UpgradeTooltip_Category", "SURVIVAL · UPGRADE")
             : (heroMode ? "SURVIVAL · HERO" : "SURVIVAL · ABILITY"));
@@ -658,7 +729,7 @@
             ? runtime.current_level
             : upgradeMode && runtime.current_level !== undefined
             ? runtime.current_level : abilityLevel;
-        setText("CustomAbilityLevel", !buildMode && (researchMode || displayedLevel > 0)
+        setText("CustomAbilityLevel", !buildMode && (!archiveChallengeMode && (researchMode || displayedLevel > 0))
             ? localize("Survival_UpgradeField_Level", "Level")
                 + " " + displayedLevel : "");
         var description = abilityName === "ability_destroy_arrow_tower"
@@ -693,13 +764,15 @@
         if (woodCostBlock) woodCostBlock.SetHasClass("Hidden", !hasWoodCost);
         if (populationCostBlock) populationCostBlock.SetHasClass("Hidden", !hasPopulationCost);
         setText("CustomAbilityPopulationCost", populationCost);
-        setText("CustomAbilityGoldCost", goldCost);
-        setText("CustomAbilityWoodCost", woodCost);
+        setText("CustomAbilityGoldCost", tooltipNumber(goldCost));
+        setText("CustomAbilityWoodCost", tooltipNumber(woodCost));
 
         resetFieldRows(fields);
         if (researchMode) {
             asArray(runtime.fields).forEach(function (field) {
-                if (field) addField(fields, field.label, field.value);
+                if (!field) return;
+                var presentation=presentRuntimeField(field, upgradeMode);
+                if (presentation) addField(fields, field.label, presentation.value, null, presentation.numeric);
             });
             if (runtime.cost_timing_text) addField(fields, "扣费时机", runtime.cost_timing_text);
             if (runtime.auto_research_available === 1) {
@@ -712,16 +785,19 @@
                 if (!field) return;
                 if (repairerTrainingMode
                     && /^(当前数量|人口消耗|木材消耗|金币消耗|修理范围|修复范围|训练上限)$/.test(String(field.label || ""))) return;
+                if (archiveChallengeMode && field.label === "解锁条件") return;
+                var presentation=presentRuntimeField(field, upgradeMode);
+                if (!presentation) return;
                 var levelMatch = heroMode && /^LV([1-9][0-9]*)$/.exec(String(field.label || ""));
-                addField(fields, field.label, field.value, levelMatch
-                    ? { current: Number(levelMatch[1]) === Number(displayedLevel) } : null);
+                addField(fields, field.label, presentation.value, levelMatch
+                    ? { current: Number(levelMatch[1]) === Number(displayedLevel) } : null, presentation.numeric);
             });
         }
-        var unavailable = projectMode && (runtime.prerequisite_met !== undefined
+        var unavailable = (projectMode || archiveChallengeMode) && (runtime.prerequisite_met !== undefined
             ? Number(runtime.prerequisite_met) === 0 : runtime.available === 0);
         var lacksResources = projectMode && !passiveMode && !unavailable
             && runtime.resource_check_on_cast !== 1 && runtime.can_afford === 0;
-        setText("CustomAbilityType", passiveMode ? "被动" : towerToolMode ? "主动" : !upgradeMode ? ""
+        setText("CustomAbilityType", archiveChallengeMode ? "" : passiveMode ? "被动" : towerToolMode ? "主动" : !upgradeMode ? ""
             : runtime.upgrade_in_progress === 1
             ? localize("Survival_UpgradeTooltip_InProgress", "UPGRADING")
             : (unavailable ? localize("Survival_UpgradeTooltip_Unavailable", "UNAVAILABLE")
@@ -736,7 +812,9 @@
             : (lacksResources
                 ? localize("Survival_UpgradeTooltip_ResourceLowDetail", "Not enough resources · server validates the final cost")
                 : (projectMode ? runtime.status_text : ""));
-        setText("CustomAbilityStatus", passiveMode
+        setText("CustomAbilityStatus", archiveChallengeMode
+            ? (unavailable ? runtime.status_text || "前置条件未满足" : "")
+            : passiveMode
             ? (unavailable ? "尚未生效 · 前置条件未满足" : "自动生效 · 无需施放")
             : !projectMode ? "" : statusText
             || (unavailable ? "不可施法 · 前置条件未满足"

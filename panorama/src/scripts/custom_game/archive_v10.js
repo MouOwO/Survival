@@ -15,8 +15,8 @@
     var canvas=null,gridHost=null,sidebar=null,filterMenu=null,search=null,headerIcon=null,tip=null,tooltip=null,viewScale=1;
     var active=false,disposed=false,current="",rows=[],categoryRows=[],filters={},balances=[],moved=[],subscriptions=[],sidebarKey="",hover=null,displayKey="";
     var textSpecs={},sidebarButtons={},missingIcons={},fitOptions=null,lastReportedCategory="";
-    var searchValue="",order=["clear","shadow","map_level","work","gift","fragment","pet","boss","points","shop","endless","fishing","building","starjoy_points","titles"];
-    var names={clear:"通关存档",shadow:"虚空之影",map_level:"地图等级",work:"上班福利",gift:"福利礼包",fragment:"神兵碎片",pet:"秘法牢笼",boss:"BOSS存档",points:"积分道具",shop:"商城道具",endless:"无尽存档",fishing:"钓鱼存档",building:"存档神器",friend:"我的好基友",ex:"我的前女友",beast:"瑞兽赐福",starjoy_points:"星悦积分",titles:"称号"};
+    var searchValue="",order=["clear","shadow","map_level","work","gift","fragment","pet","boss","points","commerce_goods","shop","endless","fishing","building","starjoy_points","titles"];
+    var names={clear:"通关存档",shadow:"虚空之影",map_level:"地图等级",work:"上班福利",gift:"福利礼包",fragment:"神兵碎片",pet:"秘法牢笼",boss:"BOSS存档",points:"积分道具",commerce_goods:"商城道具",shop:"排行榜",endless:"无尽存档",fishing:"钓鱼存档",building:"存档神器",friend:"我的好基友",ex:"我的前女友",beast:"瑞兽赐福",starjoy_points:"星悦积分",titles:"称号"};
     var layers=D.layers;layers.forEach(function(layer){if(layer.kind==="text")textSpecs[layer.id]=layer;});
     var marker=$.CreatePanel("Panel",root,"");marker.visible=false;marker.hittest=false;
     function valid(p){return p&&(!p.IsValid||p.IsValid());}
@@ -34,6 +34,8 @@
     function component(parent,key,x,y,w,h,id){var node=make("Panel",parent,id,"ArchiveV10Image");node.hittest=false;node.hittestchildren=false;pos(node,x,y,w,h);skin(node,key);return node;}
     function serif(node){style(node,{fontFamily:'"SimSun"'});return node;}
     function categoryIcon(id){
+        if(id==="commerce_goods")return "file://{images}/custom_game/archive_polish_v1/nav/gift.svg";
+        if(id==="shop")return "file://{images}/custom_game/archive_polish_v1/nav/endless.svg";
         if(P.nav_icons&&P.nav_icons[id])return P.nav_icons[id];
         if(["clear","endless","map_level","work","fishing","building","boss","gift"].indexOf(id)>=0)return "file://{images}/custom_game/archive_polish_v1/nav/"+id+".svg";
         if(id==="shadow")return D.shadow_icons.shadow_01;
@@ -88,14 +90,50 @@
     }
     function renderSidebar(categories){
         var signature=JSON.stringify(categories||[]);if(signature!==sidebarKey){
-            sidebar.RemoveAndDeleteChildren();sidebarButtons={};var ids=order.slice();list(categories).forEach(function(row){if(row.id!=="ex"&&row.id!=="friend"&&row.id!=="beast"&&ids.indexOf(row.id)<0)ids.push(row.id);});
+            sidebar.RemoveAndDeleteChildren();sidebarButtons={};var ids=order.slice();list(categories).forEach(function(row){if(row.id!=="ex"&&row.id!=="friend"&&row.id!=="wife"&&row.id!=="beast"&&ids.indexOf(row.id)<0)ids.push(row.id);});
             ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32);var text=serif(label(button,categoryName(id),47,5,narrow(231),29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text};});sidebarKey=signature;
         }
         layoutSidebar();
     }
     function findClass(node,cls){if(node.BHasClass(cls))return node;var children=node.Children();for(var i=0;i<children.length;i++){var found=findClass(children[i],cls);if(found)return found;}return null;}
+    function fillItemIcon(node,item){var presentation=cfg.SurvivalRewardPresentation;if(presentation&&presentation.FillIcon)presentation.FillIcon(node,item);}
+    function decorateCommerce(card,item,slot){
+        var resource=cfg.SurvivalItemResources&&cfg.SurvivalItemResources.Lookup(item);
+        var key=JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style,resource&&resource.id,resource&&resource.uri]),cell=card.__v10;
+        if(!cell||!valid(cell.host)||cell.artKey!==key){
+            card.Children().forEach(function(child){child.visible=false;});if(cell&&valid(cell.host))cell.host.DeleteAsync(0);
+            var host=make("Panel",card,"ArchiveV10Goods_"+item.id,"ArchiveV10ItemVisual ArchiveCommerceItemVisual");pos(host,0,0,104,112);host.hittest=false;host.hittestchildren=false;
+            var backing=make("Panel",host,"","ArchiveCommerceIconBacking");pos(backing,12,5,80,80);backing.hittest=false;
+            var art=resource&&cfg.SurvivalRewardPresentation.CreateRegisteredIcon(backing,item,"ArchiveCommerceIcon");
+            if(!art)art=findClass(card,"ArchiveArt");
+            if(valid(art)){art.SetParent(backing);art.visible=true;art.AddClass("ArchiveCommerceIcon");style(art,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",overflow:"clip"});if(!art.__survivalVIPBadge)art.Children().forEach(function(child){if(child.SetImage){pos(child,0,0,78,78);style(child,{horizontalAlign:"left",verticalAlign:"top",margin:"0px",padding:"0px"});}});}
+            else art=cfg.SurvivalRewardPresentation.CreateIcon(backing,item,"ArchiveCommerceIcon");
+            pos(art,1,1,78,78);fillItemIcon(art,item);
+            var vipLevel=cfg.SurvivalVIPBadges&&cfg.SurvivalVIPBadges.Resolve(item);
+            if(vipLevel&&!resource){art.visible=false;art=make("Panel",backing,"","ArchiveCommerceIcon");pos(art,3,3,74,74);cfg.SurvivalVIPBadges.Render(art,vipLevel);}
+            var badge=make("Panel",host,"","ArchiveCommerceQuantityBadge");pos(badge,48,5,44,23);badge.hittest=false;
+            var count=label(badge,"",2,1,40,21,15,"#fff0cb","right");count.AddClass("ArchiveV10Count");
+            var name=label(host,"",1,89,102,22,16,"#f6edd4","center");name.AddClass("ArchiveV10Name");style(name,{textOverflow:"ellipsis"});
+            cell=card.__v10={host:host,artKey:key,sourceArtKey:JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style]),art:art,countHost:badge,count:count,name:name,normal:backing};
+        }
+        if(cell.host.GetParent()!==card)cell.host.SetParent(card);cell.host.visible=true;
+        card.Children().forEach(function(child){if(child!==cell.host)child.visible=false;});
+        card.AddClass("ArchiveV10Cell");card.AddClass("ArchiveCommerceCell");card.RemoveClass("ArchiveParchmentRowAlternate");
+        pos(card,Math.floor(slot%7)*106,Math.floor(slot/7)*116,104,112);style(card,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",flowChildren:"none",overflow:"noclip",transform:"none"});
+        var state=S.State(item,current),quantity=S.Quantity(item,current),known=state!==null;
+        card.SetHasClass("ArchiveCommerceOwned",state===true);card.SetHasClass("ArchiveCommerceUnowned",state===false);card.SetHasClass("ArchiveCommerceUnknown",!known);
+        style(cell.art,{brightness:state===false?".38":known?"1":".62",saturation:state===false?"0":known?"1":".3",opacity:state===false?".82":known?"1":".9"});
+        style(cell.name,{color:state===false?"#a5a396":"#f6edd4"});
+        // One-time entitlements need no repeated 0/1 label; real stacks/caps and
+        // pending quantities retain their independent authoritative text.
+        cell.countHost.visible=!known||Number(item.count)>1||Number(item.target)>1||Number(item.max_owned)>1;
+        var compactName=String(item.name||"").replace(/\s*[（(]功能版[）)]\s*$/,"").replace(/[·・]\s*永久\s*$/,"");
+        if(cell.count.text!==quantity)cell.count.text=quantity;if(cell.name.text!==compactName)cell.name.text=compactName;
+    }
     function decorate(card,item,slot){
-        var nativeIcon=cfg.ArchiveV10Icons&&cfg.ArchiveV10Icons.Resolve(item,current),cell=card.__v10,artKey=JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style,nativeIcon&&nativeIcon.iconKey]);
+        if(current==="commerce_goods"){decorateCommerce(card,item,slot);return;}
+        var resource=cfg.SurvivalItemResources&&cfg.SurvivalItemResources.Lookup(item);
+        var nativeIcon=cfg.ArchiveV10Icons&&cfg.ArchiveV10Icons.Resolve(item,current),cell=card.__v10,artKey=JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style,nativeIcon&&nativeIcon.iconKey,resource&&resource.id,resource&&resource.uri]);
         if(!cell||!valid(cell.host)||cell.artKey!==artKey){
             // The original Button and its gameplay callbacks survive every paint.
             card.Children().forEach(function(child){if(!child.BHasClass("ArchivePromote"))child.visible=false;});if(cell&&valid(cell.host))cell.host.DeleteAsync(0);
@@ -110,22 +148,25 @@
             var glint=component(track,"progress_glint",0,2,9,16);glint.visible=false;
             var state=label(host,"",284,43,306,29,18,"#bcb299","left");state.visible=false;
             var artStage=make("Panel",host,"","ArchiveParchmentIconStage");pos(artStage,663,8,62,62);artStage.hittest=false;artStage.hittestchildren=false;
-            var art;if(current==="shadow"&&D.shadow_icons[item.id])art=icon(artStage,D.shadow_icons[item.id],0,0,62,62);
+            var art=resource&&current!=="titles"&&cfg.SurvivalRewardPresentation.CreateRegisteredIcon(artStage,item,"ArchiveV10Icon");
+            if(art){}
+            else if(current==="shadow"&&D.shadow_icons[item.id])art=icon(artStage,D.shadow_icons[item.id],0,0,62,62);
             else if(nativeIcon)art=icon(artStage,nativeIcon.uri,0,0,62,62);
             else{
                 art=findClass(card,current==="titles"?"ArchiveTitleArt":"ArchiveArt");
                 if(valid(art)){art.SetParent(artStage);art.visible=true;art.AddClass("ArchiveV10Icon");}
                 else{art=make("Panel",artStage,"","ArchiveV10Icon");label(art,"?",0,9,62,40,28,"#b9aa8c","center");if(!missingIcons[current+":"+item.id]){$.Msg("ARCHIVE_V10_MISSING_ICON "+current+":"+item.id);missingIcons[current+":"+item.id]=true;}}
             }
-            pos(art,0,0,62,62);style(art,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",overflow:"noclip",brightness:"1",saturation:"1",opacity:"1",washColor:"none",transform:"none"});art.hittest=false;
+            pos(art,0,0,62,62);style(art,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",overflow:"noclip",brightness:"1",saturation:"1",opacity:"1",washColor:"none",transform:"none"});art.hittest=false;if(current!=="titles")fillItemIcon(art,item);
+            if(art.BHasClass("ArchiveEndlessEmblem")){pos(art,0,7,72,56);style(art,{transformOrigin:"0% 0%",transform:"scale3d(0.861111, 0.861111, 1)"});}
             if(current==="titles"){pos(art,0,18,62,62*55/128);if(art.SetScaling)art.SetScaling("stretch-to-fit-preserve-aspect");}
-            else if(current!=="shadow")art.Children().forEach(function(child){
+            else if(current!=="shadow"&&!art.__survivalVIPBadge)art.Children().forEach(function(child){
                 if(child.BHasClass("ArchiveRarityBadge")){child.visible=false;return;}
                 if(child.BHasClass("ArchiveEndlessEmblem")){pos(child,0,7,72,56);style(child,{transformOrigin:"0% 0%",transform:"scale3d(0.861111, 0.861111, 1)"});}
-                else if(child.SetImage||child.BHasClass("ArchiveRewardIcon")){pos(child,0,0,62,62);if(child.SetScaling)child.SetScaling("stretch-to-fit-preserve-aspect");style(child,{horizontalAlign:"left",verticalAlign:"top",margin:"0px",padding:"0px",brightness:"1",saturation:"1",opacity:"1",transform:"none"});}
+                else if(child.SetImage||child.BHasClass("ArchiveRewardIcon")){pos(child,0,0,62,62);fillItemIcon(child,item);style(child,{horizontalAlign:"left",verticalAlign:"top",margin:"0px",padding:"0px",brightness:"1",saturation:"1",opacity:"1",transform:"none"});}
             });
             var normal=component(host,"icon_ring",659,4,70,70);normal.AddClass("ArchiveParchmentIconRing");
-            cell=card.__v10={host:host,artKey:artKey,art:art,countHost:countHost,count:count,name:name,normal:normal,track:track,fill:fill,glint:glint,state:state};
+            cell=card.__v10={host:host,artKey:artKey,sourceArtKey:JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style]),art:art,countHost:countHost,count:count,name:name,normal:normal,track:track,fill:fill,glint:glint,state:state};
         }
         if(cell.host.GetParent()!==card)cell.host.SetParent(card);cell.host.visible=true;
         card.Children().forEach(function(child){if(child!==cell.host&&!child.BHasClass("ArchivePromote"))child.visible=false;});
@@ -144,7 +185,19 @@
         var signature=JSON.stringify([category,mode,data&&data.rows,data&&data.pending,data&&data.upgrade_pending,data&&data.social,data&&data.online,data&&data.buildings,data&&data.fishing,data&&data.starjoy,data&&data.has_pass,data&&data.last_draw,data&&data.unavailable,categories,cfg.SurvivalArchiveColors]);
         if(active&&signature===displayKey)return true;displayKey=signature;enter(options);renderSidebar(categories);
         p("ArchiveV10_page_title").text=categoryName(current);headerIcon.SetImage(headerEmblem(current));
-        var ownership=["shadow","pet","fishing","friend","ex","beast","points","shop"].indexOf(current)>=0;
+        var leaderboard=current==="shop",leaderboardView=cfg.SurvivalEndlessLeaderboard;
+        p("ArchiveV10FilterToggle").visible=!leaderboard;
+        if(leaderboard&&leaderboardView){
+            p("ArchiveGrid").visible=false;gridHost.visible=true;pos(gridHost,contentX(385),235,767,577);
+            p("ArchiveEmpty").AddClass("ArchiveHidden");p("ArchiveDrawBar").AddClass("ArchiveHidden");p("ArchiveDrawBar").style.visibility="collapse";
+            p("ArchiveFooter").visible=false;p("ArchiveContext").visible=false;
+            p("ArchiveV10SectionTitle").text="前100名 · 前三名置顶";
+            p("ArchiveV10Overview").text="无尽排行榜";
+            var rankingContext=p("ArchiveV10Context");rankingContext.text="最高通关层数 · 同层按无尽积分排序";rankingContext.visible=true;
+            leaderboardView.Show(gridHost);return true;
+        }
+        if(leaderboardView)leaderboardView.Hide();p("ArchiveGrid").visible=true;p("ArchiveV10SectionTitle").text="收集条目";
+        var ownership=["shadow","pet","fishing","friend","ex","wife","beast","points","commerce_goods","shop"].indexOf(current)>=0;
         filters.unlocked.text.text=ownership?"已拥有":"已解锁";filters.locked.text.text=ownership?"未拥有":"未解锁";
         p("ArchiveV10FilterText").text=mode==="unlocked"?filters.unlocked.text.text:mode==="locked"?filters.locked.text.text:"全部存档";
         Object.keys(filters).forEach(function(key){filters[key].panel.SetHasClass("ArchiveV10Selected",key===(mode||"all"));});
@@ -153,12 +206,14 @@
         if(!data){p("ArchiveGrid").Children().forEach(function(card){card.visible=false;});slot=0;}
         var known=rows.filter(function(item){return S.State(item,current)!==null;}).length,owned=rows.filter(function(item){return S.State(item,current)===true;}).length;
         p("ArchiveV10Overview").text=!data?"正在读取…":Number(data.unavailable)===1?"分类尚未启用":(ownership?"已拥有 ":"已解锁 ")+owned+" / "+rows.length+" 项"+(known<rows.length?" · 同步中":"");
-        var draw=["friend","ex","beast"].indexOf(current)>=0,context=p("ArchiveV10Context"),details="";
+        var draw=["friend","ex","wife","beast"].indexOf(current)>=0,context=p("ArchiveV10Context"),details="";
         if(current==="map_level"&&data&&data.online)details="当前地图等级 "+data.online.level;
         if(current==="work"&&data&&data.online)details="软妹币："+data.online.coins;
         if(current==="building"&&data&&data.buildings)details="信仰值："+data.buildings.faith;
         if(current==="fishing"&&data&&data.fishing&&data.fishing.faith!==undefined)details="信仰值："+data.fishing.faith;
         if(current==="starjoy_points"&&data&&data.starjoy)details="累计星悦积分 "+data.starjoy.earned+" · 可用余额 "+data.starjoy.balance;
+        if(current==="commerce_goods")details="购买或兑换后自动点亮 · 悬停查看效果与解锁条件";
+        if(current==="commerce_goods")p("ArchiveStatus").text="购买或兑换成功后点亮 · 效果沿用已有商品与存档记录";
         context.text=details;context.visible=!!details;
         var empty=p("ArchiveEmpty");pos(empty,contentX(399),280,731,50);style(empty,{fontSize:"21px",color:"#d0c4aa",textAlign:"center"});empty.SetHasClass("ArchiveHidden",slot>0);empty.text=data&&Number(data.unavailable)===1?"该分类尚未启用，暂无已获得条目":!data?"正在读取存档…":slot===0?(mode!=="all"?"当前筛选下暂无存档":"当前分类暂无存档"):"";
         var grid=p("ArchiveGrid");pos(grid,0,0,767,draw?511:577);style(grid,{flowChildren:"none"});pos(gridHost,contentX(385),235,767,draw?511:577);
@@ -186,8 +241,8 @@
     A.ShowEffectOnly=function(item,card){if(active)return showTooltip(item,current,card,true);return originalEffect(item,card);};
     A.Hide=function(){hideTooltip();return originalHide();};
     var api=cfg.SurvivalArchiveV10={
-        Render:render,Fit:fit,IsAlive:alive,RequestTooltipHide:queueTooltipHide,Leave:function(){hideTooltip();active=false;displayKey="";if(valid(filterMenu))filterMenu.visible=false;if(valid(canvas))canvas.visible=false;},
-        Inspect:function(){var win=p("ArchiveWindow"),cp=valid(canvas)?canvas.GetPositionWithinWindow():null,cards=valid(p("ArchiveGrid"))?p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}):[];return {active:active,category:current,categories:order.slice(),shellIdentity:canvas&&canvas.id,layout:"parchment_rows",search:searchValue,rows:rows.map(function(item){return {id:item.id,count:item.count,quantity:S.Quantity(item,current),unlocked:S.State(item,current),name:item.name};}),geometry:{canvas:cp,window:valid(win)?win.GetPositionWithinWindow():null,width:valid(win)?win.actuallayoutwidth:0,height:valid(win)?win.actuallayoutheight:0,firstCount:cards.length?{position:cards[0].__v10.count.GetPositionWithinWindow(),width:cards[0].__v10.count.actuallayoutwidth,textAlign:cards[0].__v10.count.style.textAlign,font:cards[0].__v10.count.style.fontFamily,weight:cards[0].__v10.count.style.fontWeight}:null},tooltipVisible:valid(tip)&&tip.visible,missingIcons:Object.keys(missingIcons)};},
+        Render:render,Fit:fit,IsAlive:alive,RequestTooltipHide:queueTooltipHide,Leave:function(){hideTooltip();active=false;displayKey="";if(cfg.SurvivalEndlessLeaderboard)cfg.SurvivalEndlessLeaderboard.Hide();if(valid(filterMenu))filterMenu.visible=false;if(valid(canvas))canvas.visible=false;},
+        Inspect:function(){var win=p("ArchiveWindow"),cp=valid(canvas)?canvas.GetPositionWithinWindow():null,cards=valid(p("ArchiveGrid"))?p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}):[];return {active:active,category:current,categories:order.slice(),shellIdentity:canvas&&canvas.id,layout:current==="commerce_goods"?"commerce_goods_grid":"parchment_rows",search:searchValue,rows:rows.map(function(item){return {id:item.id,count:item.count,quantity:S.Quantity(item,current),unlocked:S.State(item,current),name:item.name};}),geometry:{canvas:cp,window:valid(win)?win.GetPositionWithinWindow():null,width:valid(win)?win.actuallayoutwidth:0,height:valid(win)?win.actuallayoutheight:0,firstCount:cards.length?{position:cards[0].__v10.count.GetPositionWithinWindow(),width:cards[0].__v10.count.actuallayoutwidth,textAlign:cards[0].__v10.count.style.textAlign,font:cards[0].__v10.count.style.fontFamily,weight:cards[0].__v10.count.style.fontWeight}:null},tooltipVisible:valid(tip)&&tip.visible,missingIcons:Object.keys(missingIcons)};},
         Dispose:function(){if(disposed)return;hideTooltip();if(tooltip)tooltip.Dispose();tooltip=null;active=false;disposed=true;subscriptions.forEach(function(id){if(GameEvents.Unsubscribe)GameEvents.Unsubscribe(id);});subscriptions=[];moved.forEach(function(entry){if(valid(entry.node)&&valid(entry.parent))entry.node.SetParent(entry.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(marker))marker.DeleteAsync(0);canvas=null;balances=[];filters={};sidebarKey="";var win=p("ArchiveWindow");if(valid(win)){win.RemoveClass("ArchiveV10Page");win.RemoveClass("ArchiveParchmentPage");}}
     };
     return api;

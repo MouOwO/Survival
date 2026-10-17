@@ -11,7 +11,19 @@ local M = { runners = {} }
 M.sound_service = require("core/sound_service")
 local deal_group = nil
 local exclusive_summons = {}
-local shadow_raze_stacks = {}
+local target_history = require("core/target_history")
+local function new_shadow_raze_history()
+    return target_history.new({
+        task_prefix = "shadow_raze_history",
+        expired = function(layers, now)
+            for _, expires_at in ipairs(layers) do
+                if expires_at > now then return false end
+            end
+            return true
+        end,
+    })
+end
+local shadow_raze_history = new_shadow_raze_history()
 local summon_sync_task = nil
 local summon_corpses = {}
 local corpse_sync_task = nil
@@ -405,17 +417,18 @@ function M.runners.skill_drow_companion(context, definition)
 end
 
 local function live_raze_layers(target, duration, maximum)
-    local key = unit_key(target)
-    if not key then return nil end
+    if not valid(target) or not target.entindex then return nil end
+    local stacks = shadow_raze_history:bucket(1)
     local now = game_time()
-    local layers = shadow_raze_stacks[key] or {}
+    local layers = stacks[target] or {}
     local kept = {}
     for _, expires_at in ipairs(layers) do
         if expires_at > now then kept[#kept + 1] = expires_at end
     end
     kept[#kept + 1] = now + duration
     while #kept > maximum do table.remove(kept, 1) end
-    shadow_raze_stacks[key] = kept
+    stacks[target] = kept
+    shadow_raze_history:track(1, target)
     return kept
 end
 
@@ -428,7 +441,17 @@ local function particle_at(name, owner, position)
         owner
     )
     if not ok then return end
-    ParticleManager:SetParticleControl(particle, 0, position)
+    local control_ok, control_error = pcall(function()
+        ParticleManager:SetParticleControl(particle, 0, position)
+    end)
+    if not control_ok then
+        if type(particle) == "number" and particle >= 0
+            and particle < math.huge and particle == math.floor(particle) then
+            pcall(function() ParticleManager:DestroyParticle(particle, true) end)
+            pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+        end
+        error(control_error, 0)
+    end
     ParticleManager:ReleaseParticleIndex(particle)
 end
 
@@ -575,12 +598,13 @@ end
 
 function M.init(dependencies)
     assert(type(dependencies and dependencies.deal_group) == "function")
+    shadow_raze_history:reset()
     deal_group = dependencies.deal_group
     for key, state in pairs(exclusive_summons) do retire_summon(key, state, true) end
     for _, state in pairs(summon_corpses) do finish_corpse(state) end
     exclusive_summons = {}
     summon_corpses = {}
-    shadow_raze_stacks = {}
+    shadow_raze_history = new_shadow_raze_history()
     service_generation = service_generation + 1
     local generation = service_generation
     local function subscribe(event, handler)

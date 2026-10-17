@@ -26,3 +26,4 @@ cage_6,3,7,秘法牢笼-6,10,cage,cage_6,models/heroes/jakiro/jakiro.vmdl,1.5,vi
 social_friend,3,8,好基友挑战,1,social_ticket,friend,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3,1,召唤1只怪物，击杀获得1张义帖；本挑战每日最多获得10张，每局仅限一次。,monster_archive_social_friend
 social_ex,3,9,前女友挑战,1,social_ticket,ex,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3,1,召唤1只怪物，击杀获得1张邀请函；本挑战每日最多获得10张，每局仅限一次。,monster_archive_social_ex
 social_beast,3,10,瑞兽赐福挑战,1,social_ticket,beast,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3,1,召唤1只怪物，击杀获得1张福签；本挑战每日最多获得10张，每局仅限一次。,monster_archive_social_beast
+social_wife,3,11,老婆挑战,1,social_ticket,wife,models/items/ogre_magi/ogre_arcana/ogre_magi_arcana.vmdl,1.2,ogre_magi_multicast,3,1,召唤1只怪物，击杀获得1朵玫瑰；本挑战每日最多获得10朵，每局仅限一次。,monster_archive_social_wife

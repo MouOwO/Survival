@@ -869,18 +869,27 @@ local function start_building(payload)
     dev_wall_stats.apply(state)
     local maximum_health = unit:GetMaxHealth()
     local build_time = math.max(0.1, tonumber(check.definition.build_time) or 3)
-    if require('systems/commerce_effects').owned(check.player_id,'instant_build') then build_time=.01 end
+    local instant_build = require('systems/commerce_effects').owned(
+        check.player_id, 'instant_build')
+    if instant_build then build_time = 0 end
     local started_at = GameRules:GetGameTime()
-    unit:SetHealth(1)
-    local construction_visual_state = construction_visual.start(
-        unit,
-        check.definition
-    )
+    local construction_visual_state
+    -- Fast construction still passes the same placement/ownership/resource
+    -- transaction. Skip the temporary hidden model, 1-HP window and polling.
+    if not instant_build then
+        unit:SetHealth(1)
+        construction_visual_state = construction_visual.start(
+            unit,
+            check.definition
+        )
+    end
     if valid_entity(payload.caster) then
-        builder_presentation.construction_started(payload.caster, unit)
+        if not instant_build then
+            builder_presentation.construction_started(payload.caster, unit)
+        end
         clear_build_task(payload.caster, payload.build_task)
     end
-    scheduler.every(0.1, function()
+    local function advance_construction()
         if state.cleaned then
             builder_presentation.construction_finished(unit, state.entindex)
             construction_visual.cancel(construction_visual_state)
@@ -912,7 +921,7 @@ local function start_building(payload)
             end
             return false
         end
-        local progress = math.min(
+        local progress = instant_build and 1 or math.min(
             1,
             (GameRules:GetGameTime() - started_at) / build_time
         )
@@ -1010,14 +1019,20 @@ local function start_building(payload)
         building_sound.construction_completed(unit, state.team)
         notify(state.player_id, state.definition.display_name .. "已建造")
         return false
-    end, "construct_building_" .. tostring(unit:entindex()))
-    building_sound.construction_started(unit, check.team)
-    notify(check.player_id, check.definition.display_name .. "开始建造")
+    end
+    if instant_build then
+        advance_construction()
+    else
+        scheduler.every(0.1, advance_construction,
+            "construct_building_" .. tostring(unit:entindex()))
+        building_sound.construction_started(unit, check.team)
+        notify(check.player_id, check.definition.display_name .. "开始建造")
+    end
     return {
         ok = true,
         entindex = unit:entindex(),
-        constructing = true,
-        pending = true,
+        constructing = state.constructing,
+        pending = state.constructing,
         build_time = build_time,
     }
 end
@@ -1392,12 +1407,28 @@ on_entity_killed = function(payload)
         )
     elseif victim.survival_disconnect_cleanup ~= true
         and building_defeat_rules.should_trigger(defeat_triggered, state) then
-        defeat_triggered = true
-        require("systems/gameplay_phase_guard").freeze_for_settlement()
-        online_time_service.finish("wall_destroyed")
-        wall_destruction.after_burst(destruction_effect,function()
-            GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
-        end)
+        local multiplayer = require("systems/multiplayer_player_service")
+        local participants
+        if type(multiplayer.participating_player_ids) == "function" then
+            local ok, ids = pcall(multiplayer.participating_player_ids)
+            if ok then participants = ids end
+        end
+        local player_id = building_defeat_rules.player_for_completed_wall(state, participants)
+        if player_id ~= nil and type(multiplayer.defeat) == "function" then
+            -- State/grid retirement and the burst visual already happened.
+            -- The normal idempotent owner lifecycle handles reentrant cleanup;
+            -- the addon's PLAYER_DEFEATED listener settles only the final loss.
+            multiplayer.defeat(player_id, "wall_destroyed")
+        else
+            -- Recovered legacy buildings without a trustworthy registered
+            -- owner retain the former safe global defeat behavior.
+            defeat_triggered = true
+            require("systems/gameplay_phase_guard").freeze_for_settlement()
+            online_time_service.finish("wall_destroyed")
+            wall_destruction.after_burst(destruction_effect,function()
+                GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
+            end)
+        end
     end
 end
 
@@ -1486,10 +1517,11 @@ function M.relocate_for_player(player_id, entindex, position)
     if state.player_id ~= player_id then
         return false, "building_not_owned"
     end
-    if state.building_id ~= "arrow_tower" then
+    if state.building_id ~= "arrow_tower" and state.building_id ~= "wall" then
         return false, "building_not_movable"
     end
-    local ability = state.unit:FindAbilityByName("ability_building_blink")
+    local ability_name=state.building_id=="wall" and "ability_wall_blink" or "ability_building_blink"
+    local ability = state.unit:FindAbilityByName(ability_name)
     if not ability or ability:IsNull() or ability:IsHidden()
         or not ability:IsActivated() then
         return false, "move_ability_unavailable"

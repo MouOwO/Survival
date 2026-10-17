@@ -5,7 +5,97 @@
     var tableName = "survival_ui_state";
     var tableKey = "player_" + playerId;
     var lastSequence = -1;
-    var lastSnapshotAt = 0;
+    var hasSnapshot = false, lastSnapshotReceiptAt = 0;
+    var syncEpoch = 0, syncRequestSerial = 0, snapshotRequest = null;
+    var retryFailures = 0, nextRetryAt = 0, recoveryUntil = Date.now() / 1000 + 30;
+    var builderRecoveryUntil = recoveryUntil, builderRetryPending = false;
+    var recoveryTask = null, startupSignature = "";
+    var lifecycleConfig = GameUI.CustomUIConfig(), lifecycleContext = $.GetContextPanel();
+    var disposed = false, scheduledJobs = [], subscriptions = [];
+    var counters = {polls:0, startupReads:0, legacyReads:0, requests:0,
+        requestCoalesced:0, retryTimeouts:0, received:0, applied:0, builderSteps:0};
+    var previousSync = lifecycleConfig.SurvivalHUDSnapshotSync;
+    if (previousSync && previousSync.Dispose) previousSync.Dispose();
+    var syncAPI = {
+        Inspect:function(){return {epoch:syncEpoch, session:setupSession, hasSnapshot:hasSnapshot,
+            inFlight:!!snapshotRequest, retryFailures:retryFailures, recoveryScheduled:!!recoveryTask,
+            builderPending:builderRetryPending, builderFinished:initialBuilderSelectionFinished,
+            lastReceiptAt:lastSnapshotReceiptAt, disposed:disposed, counters:counters};},
+        Dispose:function(){
+            if (disposed) return;
+            disposed = true;
+            scheduledJobs.slice().forEach(cancelHUDJob);
+            recoveryTask = null; snapshotRequest = null; builderRetryPending = false;
+            subscriptions.forEach(function(item){
+                try {
+                    if (item.kind === "event" && GameEvents.Unsubscribe) GameEvents.Unsubscribe(item.id);
+                    else if (item.kind === "table" && CustomNetTables.UnsubscribeNetTableListener)
+                        CustomNetTables.UnsubscribeNetTableListener(item.id);
+                } catch (error) {}
+            });
+            subscriptions = [];
+            (notificationItems || []).forEach(function(item){
+                if (item && item.IsValid && item.IsValid() && item.DeleteAsync) item.DeleteAsync(0);
+            });
+        }
+    };
+    lifecycleConfig.SurvivalHUDSnapshotSync = syncAPI;
+    function syncActive() {
+        if (disposed || lifecycleConfig.SurvivalHUDSnapshotSync !== syncAPI) return false;
+        try { return !lifecycleContext.IsValid || lifecycleContext.IsValid(); }
+        catch (error) { return false; }
+    }
+    function cancelHUDJob(job) {
+        if (!job || job.cancelled) return;
+        job.cancelled = true;
+        var index = scheduledJobs.indexOf(job);
+        if (index >= 0) scheduledJobs.splice(index, 1);
+        if (job.handle !== undefined && $.CancelScheduled) {
+            try { $.CancelScheduled(job.handle); } catch (error) {}
+        }
+    }
+    function scheduleHUD(delay, callback) {
+        var job = {cancelled:false};
+        scheduledJobs.push(job);
+        job.handle = $.Schedule(delay, function(){
+            var index = scheduledJobs.indexOf(job);
+            if (index >= 0) scheduledJobs.splice(index, 1);
+            if (!job.cancelled && syncActive()) callback();
+        });
+        return job;
+    }
+    function subscribeHUD(kind, name, callback) {
+        var guarded = function(){
+            if (syncActive()) return callback.apply(null, arguments);
+        };
+        var id = kind === "event" ? GameEvents.Subscribe(name, guarded)
+            : CustomNetTables.SubscribeNetTableListener(name, guarded);
+        subscriptions.push({kind:kind, id:id});
+    }
+    function resetSnapshotRecovery(resetBuilder) {
+        syncEpoch++;
+        hasSnapshot = false; lastSequence = -1; snapshotRequest = null;
+        retryFailures = 0; nextRetryAt = 0; lastSnapshotReceiptAt = 0;
+        recoveryUntil = Date.now() / 1000 + 30;
+        builderRecoveryUntil = recoveryUntil;
+        initialBuilderSelectionSerial++;
+        builderRetryPending = false;
+        if (resetBuilder) {
+            initialBuilderSelectionFinished = false;
+        }
+    }
+    function scheduleRecovery(delay) {
+        if (!syncActive()) return;
+        if (recoveryTask) {
+            if (delay !== 0) return;
+            cancelHUDJob(recoveryTask);
+        }
+        var epoch = syncEpoch;
+        recoveryTask = scheduleHUD(delay, function(){
+            recoveryTask = null;
+            if (epoch === syncEpoch) pollSnapshot();
+        });
+    }
     var difficultyRequestPending = false;
     var difficultyOptionsSignature = "";
     var difficultyWave = null, difficultyChoice = "", difficultyRows = {};
@@ -96,24 +186,40 @@
     }
     function acceptStartup(next) {
         if (!next || typeof next.session_id !== "string" || !next.session_id) return;
+        if (!syncActive()) return;
+        var signature = JSON.stringify(next);
+        if (signature === startupSignature) return;
+        startupSignature = signature;
+        var previousAdmission = admissionComplete(), previousPhase = startupState && startupState.phase;
+        var previousProfilesReady = canConfirmDifficulty(), previousMode = confirmedMode();
         if (setupSession !== next.session_id) {
+            resetSnapshotRecovery(!!setupSession);
             setupSession = next.session_id; modeChoice = ""; modeAcknowledged = "";
             modePending = false; modeError = ""; modeRequestSerial++;
             difficultyChoice = ""; difficultyRequestPending = false; difficultyRequestSerial++;
             profileRetryPending = false; profileRetrySerial++;
         }
         startupState = next;
+        if (previousAdmission !== admissionComplete() || previousPhase !== next.phase
+            || previousProfilesReady !== canConfirmDifficulty() || previousMode !== confirmedMode())
+            recoveryUntil = Date.now() / 1000 + 30;
+        if (!previousAdmission && admissionComplete()) builderRecoveryUntil = recoveryUntil;
         renderDifficultySelection(difficultyWave);
+        if (!hasSnapshot || !initialBuilderSelectionFinished) scheduleRecovery(0);
     }
-    function readStartup() { acceptStartup(CustomNetTables.GetTableValue("survival_loading", "state")); }
+    function readStartup() {
+        counters.startupReads++;
+        acceptStartup(CustomNetTables.GetTableValue("survival_loading", "state"));
+    }
     function confirmMode() {
+        if (!syncActive()) return;
         if (!admissionComplete() || !needsMode() || !modeSelector() || modePending || !setupSession
             || !modeOptions().some(function (option) { return option.mode_id === modeChoice; })) return;
         modePending = true; modeError = "";
         var serial = ++modeRequestSerial, requestedSession = setupSession;
         GameEvents.SendCustomGameEventToServer("survival_loading_mode_select", {session_id: setupSession, mode_id: modeChoice});
         renderDifficultySelection(difficultyWave);
-        $.Schedule(12, function () {
+        scheduleHUD(12, function () {
             if (serial !== modeRequestSerial || requestedSession !== setupSession || !modePending || !needsMode()) return;
             modePending = false; modeError = "选择未完成，请检查连接后重试。";
             renderDifficultySelection(difficultyWave);
@@ -189,11 +295,12 @@
         profileErrorShown = !!text;
         if (!profileRetry && retryable) profileRetry = ui.ActionButton(panel("MatchSetupRetryHost"), {
             id: "MatchSetupRetry", label: "重试读取档案", enabled: true, action: function () {
+                if (!syncActive()) return;
                 if (profileRetryPending || !setupSession || !setup() || !setup().error || canConfirmDifficulty()) return;
                 profileRetryPending = true; var serial = ++profileRetrySerial;
                 GameEvents.SendCustomGameEventToServer("survival_loading_retry", {session_id: setupSession});
                 renderProfileError(ui);
-                $.Schedule(5, function () {
+                scheduleHUD(5, function () {
                     if (serial !== profileRetrySerial) return;
                     profileRetryPending = false; renderDifficultySelection(difficultyWave);
                 });
@@ -210,6 +317,7 @@
         return optionArray(source || difficultyWave && difficultyWave.difficulty_options);
     }
     function refreshDifficultyChoice() {
+        if (!syncActive()) return;
         var ui = GameUI.CustomUIConfig().SurvivalUI;
         var selected = selectedDifficulty();
         if (!selected || (!canConfirmDifficulty() && !difficultyRequestPending)) difficultyChoice = "";
@@ -224,6 +332,7 @@
         });
     }
     function selectDifficulty() {
+        if (!syncActive()) return;
         var selected = selectedDifficulty();
         if (!difficultyAvailable() || !canConfirmDifficulty() || !difficultySelector() || difficultyRequestPending || !selected) return;
         difficultyRequestPending = true;
@@ -235,7 +344,7 @@
             difficulty_id: String(selected.difficulty_id)
         });
         refreshDifficultyChoice();
-        $.Schedule(12, function () {
+        scheduleHUD(12, function () {
             if (serial !== difficultyRequestSerial || !difficultyRequestPending || !difficultyAvailable()) return;
             difficultyRequestPending = false;
             overlay.SetHasClass("DifficultyPending", false);
@@ -251,6 +360,7 @@
     }
 
     function renderDifficultySelection(wave) {
+        if (!syncActive()) return;
         var overlay = panel("DifficultySelectionOverlay");
         var container = panel("DifficultySelectionButtons");
         if (!overlay || !container) return;
@@ -358,14 +468,25 @@
         renderProfileError(ui);
     }
 
-    function update(snapshot) {
-        if (!snapshot) return;
+    function update(snapshot, receipt) {
+        if (!syncActive() || !snapshot) return;
+        if (snapshot.session_id && setupSession && snapshot.session_id !== setupSession) return;
+        if (snapshot.player_id !== undefined && playerId >= 0 && Number(snapshot.player_id) !== playerId) return;
+        if (receipt !== false) {
+            counters.received++;
+            lastSnapshotReceiptAt = Date.now() / 1000;
+            snapshotRequest = null; retryFailures = 0; nextRetryAt = 0;
+        }
         var sequence = sequenceOf(snapshot);
         // NetTable 轮询会反复读到同一快照；没有新 sequence 时不重写整套
         // HUD，也不重新安装 hover 回调，避免形成固定间隔的客户端卡顿。
         if (sequence >= 0 && sequence <= lastSequence) return;
         if (sequence >= 0) lastSequence = sequence;
-        lastSnapshotAt = Game.GetGameTime();
+        var firstSnapshot = !hasSnapshot;
+        hasSnapshot = true;
+        snapshotRequest = null; retryFailures = 0; nextRetryAt = 0;
+        counters.applied++;
+        if (firstSnapshot) scheduleRecovery(0);
 
         var resources = snapshot.resources || {};
         var actionResources = GameUI.CustomUIConfig().SurvivalActionResources;
@@ -446,23 +567,57 @@
     }
 
     function readSnapshot() {
-        update(CustomNetTables.GetTableValue(tableName, tableKey));
+        counters.legacyReads++;
+        update(CustomNetTables.GetTableValue(tableName, tableKey), false);
     }
 
-    function requestSnapshot() {
+    function expireSnapshotRequest(now) {
+        if (!snapshotRequest || now < snapshotRequest.deadline) return;
+        snapshotRequest = null;
+        retryFailures++;
+        counters.retryTimeouts++;
+        nextRetryAt = now + Math.min(5, 0.5 * Math.pow(2, Math.min(4, retryFailures - 1)));
+    }
+    function requestSnapshot(recovery) {
+        if (!syncActive()) return false;
+        var now = Date.now() / 1000;
+        expireSnapshotRequest(now);
+        if (snapshotRequest) { counters.requestCoalesced++; return false; }
+        if (recovery === true && now < nextRetryAt) return false;
+        if (Game.GetLocalPlayerID() < 0) return false;
+        var request = {epoch:syncEpoch, deadline:now + 3};
+        snapshotRequest = request;
+        counters.requests++;
         GameEvents.SendCustomGameEventToServer("ui_request_full_snapshot", {
-            request_id: "hud_" + String(Date.now())
+            request_id: "hud_" + syncEpoch + "_" + (++syncRequestSerial) + "_" + String(Date.now())
         });
+        return true;
     }
 
     function pollSnapshot() {
-        readStartup();
-        readSnapshot();
-        if (!initialBuilderSelectionFinished) {
-            recoverInitialBuilderSelection("hud_poll", 20, initialBuilderSelectionSerial);
+        if (!syncActive()) return;
+        counters.polls++;
+        var now = Date.now() / 1000, localId = Number(Game.GetLocalPlayerID());
+        if (isFinite(localId) && localId >= 0 && localId !== playerId) {
+            playerId = localId; tableKey = "player_" + playerId;
+            resetSnapshotRecovery(true);
         }
-        if (Game.GetGameTime() - lastSnapshotAt > 2.0) requestSnapshot();
-        $.Schedule(0.25, pollSnapshot);
+        // Stable HUDs receive private events. Absence of a new sequence is not
+        // a failed connection: the server has no periodic snapshot heartbeat.
+        // A sparse startup read only repairs missed session/phase notifications.
+        readStartup();
+        expireSnapshotRequest(now);
+        if (!hasSnapshot && now < recoveryUntil) {
+            readSnapshot();
+            if (!hasSnapshot) requestSnapshot(true);
+        }
+        if (!initialBuilderSelectionFinished && admissionComplete()
+            && now < builderRecoveryUntil && !builderRetryPending) {
+            recoverInitialBuilderSelection("hud_recovery", 20, initialBuilderSelectionSerial);
+        }
+        var recovering = (!hasSnapshot || !admissionComplete()) && now < recoveryUntil;
+        var seekingBuilder = !initialBuilderSelectionFinished && admissionComplete() && now < builderRecoveryUntil;
+        scheduleRecovery(recovering || seekingBuilder ? 0.5 : 5);
     }
 
     function showNotification(payload) {
@@ -530,7 +685,7 @@
             text(message);
         }
         notificationItems.push(item);
-        $.Schedule(broadcast ? 5.0 : 3.5, function () {
+        scheduleHUD(broadcast ? 5.0 : 3.5, function () {
             if (item && item.IsValid()) {
                 item.AddClass("NotificationDismissed");
                 item.DeleteAsync(0.25);
@@ -539,6 +694,7 @@
     }
 
     function sendClientDiagnostic(stage, payload) {
+        if (!syncActive()) return;
         var data = payload || {};
         data.stage = stage;
         GameEvents.SendCustomGameEventToServer("ui_client_diagnostic", data);
@@ -557,7 +713,7 @@
     }
 
     function focusHeroWithoutLock(payload) {
-        if (!payload) return;
+        if (!syncActive() || !payload) return;
         var entindex = Number(payload.entindex || payload.focus_hero_entindex || -1);
         if (entindex <= 0) return;
         var x = Number(payload.target_x !== undefined
@@ -609,14 +765,20 @@
     }
 
     function recoverInitialBuilderSelection(reason, attempt, serial) {
-        if (initialBuilderSelectionFinished || serial !== initialBuilderSelectionSerial) return;
+        if (!syncActive() || initialBuilderSelectionFinished || serial !== initialBuilderSelectionSerial
+            || !admissionComplete() || Date.now() / 1000 >= builderRecoveryUntil) return;
+        counters.builderSteps++;
         var identity = CustomNetTables.GetTableValue(
             "survival_builder_identity", "player_" + String(playerId)
         ) || {};
         var builder = Number(identity.entindex);
         if (!validUnit(builder)) {
-            if (attempt < 20) {
-                $.Schedule(0.10, function () {
+            if (attempt < 20 && !builderRetryPending) {
+                var epoch = syncEpoch;
+                builderRetryPending = true;
+                scheduleHUD(0.10, function () {
+                    if (epoch !== syncEpoch || serial !== initialBuilderSelectionSerial) return;
+                    builderRetryPending = false;
                     recoverInitialBuilderSelection(reason, attempt + 1, serial);
                 });
             }
@@ -658,32 +820,34 @@
     }
 
     function scheduleInitialBuilderSelection(reason) {
-        if (initialBuilderSelectionFinished) return;
+        if (!syncActive() || initialBuilderSelectionFinished || builderRetryPending) return;
+        builderRecoveryUntil = Date.now() / 1000 + 30;
         var serial = ++initialBuilderSelectionSerial;
         recoverInitialBuilderSelection(String(reason || "unknown"), 0, serial);
+        scheduleRecovery(0);
     }
 
-    CustomNetTables.SubscribeNetTableListener(tableName, function (name, key, value) {
+    subscribeHUD("table", tableName, function (name, key, value) {
         if (key === tableKey) update(value);
     });
-    CustomNetTables.SubscribeNetTableListener("survival_loading", function (name, key, value) {
+    subscribeHUD("table", "survival_loading", function (name, key, value) {
         if (key === "state") acceptStartup(value);
     });
-    CustomNetTables.SubscribeNetTableListener(
+    subscribeHUD("table",
         "survival_builder_identity", function (name, key) {
             if (key === "player_" + String(playerId)) {
                 scheduleInitialBuilderSelection("identity_update");
             }
         }
     );
-    GameEvents.Subscribe("survival_ui_private_snapshot", update);
-    GameEvents.Subscribe("ui_state_snapshot", update);
+    subscribeHUD("event", "survival_ui_private_snapshot", update);
+    subscribeHUD("event", "ui_state_snapshot", update);
 
-    GameEvents.Subscribe("ui_notification", showNotification);
-    GameEvents.Subscribe("ui_difficulty_select_result", handleDifficultyResult);
-    GameEvents.Subscribe("survival_loading_mode_result", handleModeResult);
-    GameEvents.Subscribe("ui_camera_follow_hero", focusHeroWithoutLock);
-    GameEvents.Subscribe("survival_select_unit", function (data) {
+    subscribeHUD("event", "ui_notification", showNotification);
+    subscribeHUD("event", "ui_difficulty_select_result", handleDifficultyResult);
+    subscribeHUD("event", "survival_loading_mode_result", handleModeResult);
+    subscribeHUD("event", "ui_camera_follow_hero", focusHeroWithoutLock);
+    subscribeHUD("event", "survival_select_unit", function (data) {
         if (data && data.reason === "builder_ready") {
             scheduleInitialBuilderSelection("builder_ready");
             return;
@@ -705,11 +869,67 @@
     });
 
     $.Msg("[SurvivalUI] realtime HUD listener ready.");
+    readStartup();
     scheduleInitialBuilderSelection("hud_ready");
-    $.Schedule(0.10, function () {
+    scheduleHUD(0.10, function () {
         readStartup();
         readSnapshot();
         requestSnapshot();
-        pollSnapshot();
+        scheduleRecovery(0);
     });
+    // Explicit Tools console bridge: no UI refresh, request or timer is started.
+    function registerReadOnlyIdleInspect() {
+        try {
+            if (typeof Game.IsInToolsMode !== "function" || !Game.IsInToolsMode()
+                || typeof Game.AddCommand !== "function") return;
+            var config = GameUI.CustomUIConfig();
+            var serial = Number(config.SurvivalHUDIdleInspectSerial || 0);
+            serial = isFinite(serial) && serial >= 0 ? Math.floor(serial) + 1 : 1;
+            config.SurvivalHUDIdleInspectSerial = serial;
+            var command = "survival_hud_idle_inspect_" + Date.now() + "_" + serial;
+            var result = Game.AddCommand(command, function(){
+                var args = Array.prototype.slice.call(arguments);
+                var nonce = args.length ? args[args.length - 1] : null;
+                var response = {api:"SurvivalHUDSnapshotSync.Inspect",command:command,readonly:true};
+                if ((args.length !== 1 && !(args.length === 2 && args[0] === command))
+                    || typeof nonce !== "string" || !/^[0-9a-f]{32}$/i.test(nonce)) {
+                    response.status = "invalid_nonce";
+                    $.Msg("[IDLE_HUD_INSPECT] " + JSON.stringify(response));
+                    return;
+                }
+                response.nonce = nonce;
+                var current = GameUI.CustomUIConfig().SurvivalHUDSnapshotSync;
+                if (!syncActive() || current !== syncAPI) {
+                    response.status = "inactive_context";
+                    $.Msg("[IDLE_HUD_INSPECT] " + JSON.stringify(response));
+                    return;
+                }
+                try {
+                    if (!current || typeof current.Inspect !== "function") throw new Error("inspect_unavailable");
+                    var state = current.Inspect() || {};
+                    response.status = "ok";
+                    ["hasSnapshot", "inFlight", "builderPending", "builderFinished", "recoveryScheduled", "disposed"].forEach(function(key){response[key] = typeof state[key] === "boolean" ? state[key] : null;});
+                    ["epoch", "retryFailures"].forEach(function(key){
+                        var value = state[key];
+                        response[key] = typeof value === "number" && isFinite(value) ? value : null;
+                    });
+                    response.counters = {};
+                    ["polls", "startupReads", "legacyReads", "requests", "requestCoalesced", "retryTimeouts", "received", "applied", "builderSteps"].forEach(function(key){
+                        var value = state.counters && state.counters[key];
+                        response.counters[key] = typeof value === "number" && isFinite(value) ? value : null;
+                    });
+                } catch (error) { response.status = "inspect_failed"; }
+                $.Msg("[IDLE_HUD_INSPECT] " + JSON.stringify(response));
+            }, "Tools read-only idle UI counters; requires one 32 hex nonce", 0);
+            if (result === false) {
+                $.Msg("[IDLE_UI_COMMAND] " + JSON.stringify({api:"SurvivalHUDSnapshotSync.Inspect",status:"registration_failed",readonly:true}));
+                return;
+            }
+            syncAPI.InspectCommand = command;
+            $.Msg("[IDLE_UI_COMMAND] " + JSON.stringify({api:"SurvivalHUDSnapshotSync.Inspect",command:command,nonce:"32hex",readonly:true}));
+        } catch (error) {
+            $.Msg("[IDLE_UI_COMMAND] " + JSON.stringify({api:"SurvivalHUDSnapshotSync.Inspect",status:"registration_failed",readonly:true}));
+        }
+    }
+    registerReadOnlyIdleInspect();
 })();

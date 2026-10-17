@@ -1,0 +1,123 @@
+{
+  "task": "rogue card effects and tower range",
+  "enabled_cards": 48,
+  "baseline_failure_comparison": "output/rogue_card_audit/runtime_regression_final_comparison.json",
+  "engine_validation": "offline production-module callbacks; game console did not respond",
+  "new_failure_paths": [],
+  "ui_compile": "output/prerequisite_shading_20261008/ui_build_20261011_112713/manifest.json",
+  "attack_bonus": 800,
+  "targeted_regressions": "output/rogue_card_audit/targeted_lua.json",
+  "full_regressions": "output/rogue_card_audit/runtime_regression_final.json",
+  "full_failed": 18,
+  "files": [
+    {
+      "sha256": "6F3F452005A7C7C1C7482A730A3A756A767212CA40789173C7986F85AB495598",
+      "file": "scripts/vscripts/combat/damage_filter_service.lua"
+    },
+    {
+      "sha256": "5E41A0838EFE77FA7109E56C0A3A761B5E9E94FB5974CD3584E1EE2AFD5D7772",
+      "file": "scripts/vscripts/config/generated/rogue_reward_cards.lua"
+    },
+    {
+      "sha256": "5AA4DEF10FDAA079141735C76BDB6FF60EA4BE2303D1A595AE212A5286CDF082",
+      "file": "scripts/vscripts/config/generated/rogue_reward_effect_lifecycle.lua"
+    },
+    {
+      "sha256": "D64017BDC71B1496D939F529620AA38D9165E9938EC615EDC823850997A75F2D",
+      "file": "scripts/vscripts/config/generated/rogue_reward_effects.lua"
+    },
+    {
+      "sha256": "AABFFD91387CA1957B36999FCE43BDE4438190964389C58C326312954DB24429",
+      "file": "scripts/vscripts/config/tower_combat_rules.lua"
+    },
+    {
+      "sha256": "8E3EC3B7F2BFBCFFC64678B51AEF277BCB918661B554D79D0B44B308863E0239",
+      "file": "scripts/vscripts/items/item_survival_rogue_actions.lua"
+    },
+    {
+      "sha256": "19400AFD11774DA086FD1609073BD3D290A71882697E1D072B95E47ED2707DB8",
+      "file": "scripts/vscripts/modifiers/modifier_equipment_effects.lua"
+    },
+    {
+      "sha256": "3E37F9212217944D6AE61CF0F374FC99EC8935C9602B69855BA6A559BDB0C9F3",
+      "file": "scripts/vscripts/modifiers/modifier_rogue_combat_effects.lua"
+    },
+    {
+      "sha256": "4213D0F2B2DB0D79DD729F04B968A034BE1B353B90198013FB75A190DA6DB85E",
+      "file": "scripts/vscripts/modifiers/modifier_rogue_reward_effects.lua"
+    },
+    {
+      "sha256": "2B6DCEA4771B212459FDB7532F0BA12FA4A2E1DAF7DD2F4EDAE21818FA06D628",
+      "file": "scripts/vscripts/modifiers/modifier_tower_attack_effects.lua"
+    },
+    {
+      "sha256": "3A7D915F16DD2A54A37F8F52C7FABAEAFCA667139F975B129375FC17D6FDE1D1",
+      "file": "scripts/vscripts/systems/gold_mine_system.lua"
+    },
+    {
+      "sha256": "4DA7F854E10E8E95DDC9891DAB7074346080A7A5DFBE8853CA9145D732890E2B",
+      "file": "scripts/vscripts/systems/hero_combat_stat_service.lua"
+    },
+    {
+      "sha256": "4582ECB1018CA6F5FA1796E89D8DB46B735DABC188EBFE2615AD1DEE8467AD4D",
+      "file": "scripts/vscripts/systems/rogue_effect_registry.lua"
+    },
+    {
+      "sha256": "0E0D01A0AE798CF0075711652006A9ABB90C6FAC947F0B833E72DD84CD3FAF9E",
+      "file": "scripts/vscripts/systems/rogue_reward_service.lua"
+    },
+    {
+      "sha256": "862B2A837B901CDBFAFE90C303D54A275F20B38FBB6E329313085798B5189905",
+      "file": "scripts/vscripts/systems/tower_fusion_service.lua"
+    },
+    {
+      "sha256": "6B6EB7CF2BC7BE3395A4FCBC1F913A9B31DE3DFD0B1448A10427F218146DAFF8",
+      "file": "scripts/vscripts/systems/worker_system.lua"
+    },
+    {
+      "sha256": "26E353AA205778F2D9498C3C73BEEEBA36E8511282A7ADF4A7E695FD6EFD9F8C",
+      "file": "scripts/vscripts/tests/test_gold_mine_reward_upgrade.lua"
+    },
+    {
+      "sha256": "A20CF046843014BE139C64D176D4A5E4C2D5F1EB745FD1A5508674A3AB43EA83",
+      "file": "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua"
+    },
+    {
+      "sha256": "9FFC79E9B9EC9C1A46600CFD75C588A51E61CC7349C7E4DB988763D3C798F8ED",
+      "file": "scripts/vscripts/tests/test_rogue_item_rewards.lua"
+    },
+    {
+      "sha256": "1D53FD0943931C7C3BD3142696C47D877105C7811C781460EB97EF655568A3C6",
+      "file": "scripts/vscripts/tests/test_tower_upgrade_targeting.lua"
+    },
+    {
+      "sha256": "70CC5CD314ADF82998B3E4D5D831160CF087F4FB9EE6AFB0AD8CF1361086E09E",
+      "file": "scripts/vscripts/combat/lifesteal_amount.lua"
+    },
+    {
+      "sha256": "B851CFFDD2A63CA9435ECB9D53961F18048347648F3DFC00560506865CE064E4",
+      "file": "scripts/vscripts/combat/rogue_hero_attack_projection.lua"
+    },
+    {
+      "sha256": "6F6A135B8E53923EDC3664FA329B0E0C9A9A5BE57C7FC8908790A461E55D0488",
+      "file": "scripts/vscripts/modifiers/modifier_rogue_ultimate_tower_effects.lua"
+    },
+    {
+      "sha256": "847C01D56CBED2A41FF19284FABC006F6264C265D039F1EB868415A67832CF5D",
+      "file": "scripts/vscripts/systems/rogue_ultimate_tower_effect_service.lua"
+    },
+    {
+      "sha256": "93891455C1BA7883FB5DAA5445E1A2BF02FD74D7030B404A15ECD159CEB07D2F",
+      "file": "scripts/vscripts/tests/test_infrastructure_maniac.lua"
+    },
+    {
+      "sha256": "FAD6B827A01122C5C6D7817609500132412B204A04439B26CDB3D5A70077CA3A",
+      "file": "scripts/vscripts/tests/test_ultimate_tower_rogue_effects.lua"
+    }
+  ],
+  "commit": null,
+  "push": false,
+  "full_passed": 183,
+  "range_bonus": 500,
+  "audit": "docs/validation/rogue_card_audit_20261011.md"
+}

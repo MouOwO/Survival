@@ -6,6 +6,7 @@ local technology_effects = require("config/technology_effect_config")
 local technology_stat_manager = require("systems/technology_stat_manager")
 local combat_stat_projection = require("ui/combat_stat_projection")
 local hero_attack_cadence_projection = require("ui/hero_attack_cadence_projection")
+local titan_aura_armor = require("systems/commerce_titan_aura_values")
 local portrait_metadata = require("ui/portrait_metadata")
 
 local portrait_metadata = require("ui/portrait_metadata")
@@ -252,7 +253,8 @@ local function publish(payload)
     -- a later temporary-buff event must not multiply a previous slowdown again.
     hero_authority[player_id] = unit and {snapshot = payload.snapshot, unit = unit} or nil
     local projected = combat_stat_projection.for_ui(
-        hero_attack_cadence_projection.for_ui(payload.snapshot, unit)
+        titan_aura_armor.for_ui(
+            hero_attack_cadence_projection.for_ui(payload.snapshot, unit), unit)
     )
     portrait_metadata.apply(unit, projected)
     CustomNetTables:SetTableValue(

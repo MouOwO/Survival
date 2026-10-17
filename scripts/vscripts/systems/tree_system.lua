@@ -6,8 +6,11 @@ local particle_manager = require("core/particle_manager")
 local rogue_effect_state = require("systems/rogue_effect_state_service")
 local tree_damage_rules = require("systems/tree_damage_rules")
 local harvest_feedback = require("systems/harvest_feedback_service")
+local registered_lanes = require("systems/registered_wave_lane_view")
+local grid_placement = require("systems/grid_placement_system")
 
 local M = {}
+local TREE_RESERVATION = "survival_tree_reserved"
 local trees_by_player = {}
 local trees_by_entity = {}
 local region_slots = {}
@@ -50,7 +53,8 @@ local function wall_is_under_attack(player_id)
     if not valid_entity(wall) or not Entities or not Entities.FindAllByClassname then return false end
     if attacked_targets then return attacked_targets[wall] == true end
     local targets = {}
-    for _, unit in ipairs(Entities:FindAllByClassname("npc_dota_creature") or {}) do
+    for _, unit in ipairs(registered_lanes.append(
+        Entities:FindAllByClassname("npc_dota_creature") or {})) do
         if valid_entity(unit) and unit:IsAlive()
             and (unit.survival_is_wave_monster == true
                 or unit.survival_is_challenge_monster == true)
@@ -147,7 +151,38 @@ local function reserve_tree_grid(point, entindex)
         grid_x = reserved_grid.grid_x,
         grid_y = reserved_grid.grid_y,
         footprint = reserved_grid.footprint,
-        entindex = entindex or "survival_tree_reserved",
+        entindex = entindex or TREE_RESERVATION,
+    })
+end
+
+local function socket_available(point, primary, released_entindex)
+    local reserved = tree_grid(point)
+    local size = tonumber(config.grid_cell_size) or 64
+    -- Only four cells per candidate. Empty backup sockets are normal building
+    -- ground, so check them before the unconditional GRID_OCCUPY operation.
+    for x = reserved.grid_x, reserved.grid_x + reserved.footprint.x - 1 do
+        for y = reserved.grid_y, reserved.grid_y + reserved.footprint.y - 1 do
+            local occupant = grid_placement.occupant_at_position(
+                Vector((x + 0.5) * size, (y + 0.5) * size, point.z)
+            )
+            if occupant ~= nil and occupant ~= released_entindex
+                and not (primary and occupant == TREE_RESERVATION) then
+                return false
+            end
+        end
+    end
+    return true
+end
+
+local function release_tree_grid(state)
+    if state.slot == 1 and socket_available(state.point, true, state.entindex) then
+        reserve_tree_grid(state.point)
+        return
+    end
+    local reserved = tree_grid(state.point)
+    event_bus.request(events.GRID_RELEASE_REQUEST, {
+        grid_x = reserved.grid_x, grid_y = reserved.grid_y,
+        footprint = reserved.footprint, entindex = state.entindex,
     })
 end
 
@@ -179,7 +214,9 @@ local function spawn_tree(payload)
     local slots = region_slots[region_id]
     local slot, point
     for index, candidate in ipairs(config.spawn_regions[region_id]) do
-        if slots[index] == nil then slot, point = index, candidate; break end
+        if slots[index] == nil and socket_available(candidate, index == 1) then
+            slot, point = index, candidate; break
+        end
     end
     if not point then
         print("[TreeSystem] no free tree socket in " .. region_id)
@@ -210,7 +247,7 @@ local function spawn_tree(payload)
     if not tree:HasModifier("modifier_tree_progression") then
         require("core/modifier_registry").ensure(tree, "modifier_tree_progression", {})
     end
-    local state = { unit = tree, player_id = player_id, level = 1,
+    local state = { unit = tree, entindex = tree:entindex(), player_id = player_id, level = 1,
         region_id = region_id, slot = slot, point = point }
     trees_by_player[player_id] = state
     trees_by_entity[tree] = state
@@ -352,7 +389,7 @@ local function on_player_disconnected(payload)
     trees_by_player[player_id] = nil
     trees_by_entity[state.unit] = nil
     region_slots[state.region_id][state.slot] = nil
-    reserve_tree_grid(state.point)
+    release_tree_grid(state)
     if valid_entity(state.unit) and UTIL_Remove then UTIL_Remove(state.unit) end
     event_bus.emit(events.TREE_DESTROYED, {
         player_id = player_id, entindex = -1, lumber_efficiency_buff = 0,
@@ -369,7 +406,9 @@ function M.init()
     attacked_targets = nil
     for region_id, points in pairs(config.spawn_regions) do
         region_slots[region_id] = {}
-        for _, point in ipairs(points) do reserve_tree_grid(point) end
+        -- One permanent tree patch per court. Other candidate sockets stay
+        -- buildable until an actual additional player's tree occupies them.
+        if points[1] then reserve_tree_grid(points[1]) end
     end
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.TREE_HIT, on_tree_hit)

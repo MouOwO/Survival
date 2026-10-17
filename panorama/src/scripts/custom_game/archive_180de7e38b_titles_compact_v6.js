@@ -35,7 +35,7 @@
         building_04: "item_claymore", building_05: "item_abyssal_blade", building_06: "item_platemail",
         building_07: "item_arcane_boots", building_08: "item_bfury", building_09: "item_mjollnir"
     };
-    function isDrawPage() { return current === "friend" || current === "ex" || current === "beast"; }
+    function isDrawPage() { return current === "friend" || current === "ex" || current === "wife" || current === "beast"; }
     function showDrawBar() {
         var visible = isDrawPage();
         panel("ArchiveContent").SetHasClass("ArchiveHasDraw", visible);
@@ -43,7 +43,7 @@
         var drawVisibility=visible?"visible":"collapse";
         if(panel("ArchiveDrawBar").style.visibility!==drawVisibility)panel("ArchiveDrawBar").style.visibility=drawVisibility;
         panel("ArchiveContent").SetHasClass("ArchiveBuildingPage", current === "building");
-        panel("ArchiveContent").SetHasClass("ArchiveCollectionPage",["friend","ex","beast","fishing"].indexOf(current)>=0);
+        panel("ArchiveContent").SetHasClass("ArchiveCollectionPage",["friend","ex","wife","beast","fishing"].indexOf(current)>=0);
         panel("ArchiveContent").SetHasClass("ArchiveWorkPage",current==="work");
         panel("ArchiveFaith").AddClass("ArchiveHidden");
         panel("ArchiveFaith").text = "";
@@ -107,17 +107,21 @@
                 crest.text="冠";crest.style.fontSize="23px";crest.style.color="#d6b574";crest.hittest=false;
             } else A.NavIcon(toggle, category.id, navIcons[category.id]);
             toggle.enabled = Number(category.disabled) !== 1 || !!cfg.SurvivalArchiveV10;
-            label(toggle, category.id === "building" ? "存档神器" : category.name, "ArchiveNavLabel");
+            label(toggle, category.id === "shop" ? "排行榜" : category.id === "building" ? "存档神器" : category.name, "ArchiveNavLabel");
             toggle.__archiveActivate = function () {
                 if(!active()||!valid(toggle))return;
                 if ((!cfg.SurvivalArchiveV10 && Number(category.disabled) === 1) || current === category.id) return;
                 current = category.id; filterMode="all"; lastData=pageCache[current]||null;
                 panel("ArchiveGrid").ScrollToTop();
                 hideTooltip();
+                if(cfg.SurvivalArchiveV10 && current === "shop"){
+                    render({ok:1,category_id:current,categories:categories,rows:[]});
+                    if(opened&&cfg.SurvivalEndlessLeaderboard)cfg.SurvivalEndlessLeaderboard.Open();return;
+                }
                 if (cfg.SurvivalArchiveV10 && Number(category.disabled) === 1) {
                     render({ok:1,category_id:current,categories:categories,rows:[],unavailable:1});return;
                 }
-                if(lastData){tabs();render(lastData);return;}
+                if(lastData){tabs();render(lastData);if(current==="commerce_goods")request();return;}
                 hideTooltip();
                 Object.keys(rowCards).forEach(function(key){rowCards[key].panel.visible=false;});
                 panel("ArchiveEmpty").RemoveClass("ArchiveHidden");
@@ -154,8 +158,8 @@
             data=Object.assign({},data,{rows:cfg.ArchiveV10Semantics.Normalize(data,current)});
         }
         lastData=data; A.Observe(data);
-        var order=["clear","shadow","points","starjoy_points","gift","fragment","pet","endless","friend","ex","beast"];
-        categories = array(data.categories).filter(function(category){return category.id!=="ex"&&category.id!=="friend"&&category.id!=="beast";}).sort(function(a,b){var ai=a.id==="titles"?1000:order.indexOf(a.id),bi=b.id==="titles"?1000:order.indexOf(b.id);return (ai<0?100:ai)-(bi<0?100:bi);});
+        var order=["clear","shadow","points","starjoy_points","gift","fragment","pet","endless","friend","ex","wife","beast"];
+        categories = array(data.categories).filter(function(category){return category.id!=="ex"&&category.id!=="friend"&&category.id!=="wife"&&category.id!=="beast";}).sort(function(a,b){var ai=a.id==="titles"?1000:order.indexOf(a.id),bi=b.id==="titles"?1000:order.indexOf(b.id);return (ai<0?100:ai)-(bi<0?100:bi);});
         var paletteDirty = tabs();
         if(!cfg.SurvivalArchiveV10 && renderVoid(data))return;
         if(!cfg.SurvivalArchiveV10)hideTooltip();
@@ -195,7 +199,7 @@
             card.__archiveCategory=current;
             card.SetHasClass("ArchiveContentLocked",unlocked!==true);
             // Collection/item artwork stays recognizable; text still reflects ownership.
-            card.SetHasClass("ArchiveArtAlwaysBright",["fragment","friend","ex","beast","fishing","shadow","points","pet","work","building"].indexOf(current)>=0);
+            card.SetHasClass("ArchiveArtAlwaysBright",["fragment","friend","ex","wife","beast","fishing","shadow","points","pet","work","building"].indexOf(current)>=0);
             // Cached rows still need current visual policy when artwork stays unchanged.
             if(cached&&cached.fingerprint===fingerprint)return;
             paletteDirty = true;
@@ -216,9 +220,9 @@
                     GameUI.CustomUIConfig().SurvivalTitleSeriesArt.Create(titleArt,item.id,false);
                 } else {
                     var titleArt=$.CreatePanel("Image",card,"");titleArt.AddClass("ArchiveTitleArt");
-                    titleArt.SetImage(item.icon);titleArt.hittest=false;
+                    titleArt.SetImage(cfg.SurvivalItemResources?cfg.SurvivalItemResources.Resolve(item,item.icon):item.icon);titleArt.hittest=false;
                 }
-            } else if(!retainedV10 || retainedV10.artKey!==JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style]))icon(card, item);
+            } else if(!retainedV10 || retainedV10.sourceArtKey!==JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style]))icon(card, item);
             var displayName = current === "fragment" ? String(item.name || "").replace(/^神兵[-－·]/, "") : item.name;
             // Tier requirements already have a progress badge; keep the full
             // configured name in the tooltip instead of repeating it on cards.
@@ -542,18 +546,19 @@
         Open: function () { if(active()&&!opened)this.Toggle(); },
         SelectCategory: function(id) {
             if(!active())return;
-            if(id==="ex"||id==="friend"||id==="beast"){
+            if(id==="ex"||id==="friend"||id==="wife"||id==="beast"){
                 if(cfg.SurvivalCollection&&cfg.SurvivalCollection.Open){close();cfg.SurvivalCollection.Open(id);}
                 return;
             }
             var tab=panel("ArchiveTab_"+id);
             if(tab && tab.enabled && tab.__archiveActivate){tab.__archiveActivate();return;}
-            // The server omits disabled categories from its navigation list.
-            // V10 still retains the confirmed shop toggle, with a local empty state.
+            // Keep the former shop category ID as a compatibility slot. Its
+            // leaderboard uses a separate public endpoint, never archive data.
             if(cfg.SurvivalArchiveV10 && id === "shop" && current !== id){
                 current=id;filterMode="all";lastData=null;hideTooltip();
                 panel("ArchiveGrid").ScrollToTop();
-                render({ok:1,category_id:id,categories:categories,rows:[],unavailable:1});
+                render({ok:1,category_id:id,categories:categories,rows:[]});
+                if(opened&&cfg.SurvivalEndlessLeaderboard)cfg.SurvivalEndlessLeaderboard.Open();
             }
         },
         Toggle: function () {
@@ -564,9 +569,10 @@
             archiveShell.Open();
             panel("ArchiveWindow").RemoveClass("ArchiveHidden");
             if(cfg.SurvivalArchiveV10 && current === "shop"){
-                render({ok:1,category_id:current,categories:categories,rows:[],unavailable:1});return;
+                render({ok:1,category_id:current,categories:categories,rows:[]});
+                if(cfg.SurvivalEndlessLeaderboard)cfg.SurvivalEndlessLeaderboard.Open();return;
             }
-            if(pageCache[current]){render(pageCache[current]);if(needsSync())request(true);}else {renderVoid(null);request(true);}
+            if(pageCache[current]){render(pageCache[current]);if(needsSync())request(true);else if(current==="commerce_goods")request();}else {renderVoid(null);request(true);}
         },
         Filter: function(mode){if(!active()||["all","unlocked","locked"].indexOf(mode)<0)return;filterMode=mode;if(lastData)render(lastData);else renderVoid(null);},
         Close: close,

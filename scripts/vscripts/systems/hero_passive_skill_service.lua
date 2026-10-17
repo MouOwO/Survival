@@ -1004,8 +1004,9 @@ local function on_poison_cloud_death(payload)
     local position = unit_position(victim)
     if not position then return end
     position = copy_position(position)
+    local particle
     local visual_ok, visual_error = pcall(function()
-        local particle = ParticleManager:CreateParticle(
+        particle = ParticleManager:CreateParticle(
             POISON_CLOUD_EXPLOSION_PARTICLE,
             PATTACH_WORLDORIGIN, cloud.context.attacker
         )
@@ -1013,9 +1014,16 @@ local function on_poison_cloud_death(payload)
         ParticleManager:SetParticleControl(
             particle, 1, Vector(cloud.death_explosion_radius, 0, 0)
         )
-        ParticleManager:ReleaseParticleIndex(particle)
+        local released = particle
+        particle = nil
+        ParticleManager:ReleaseParticleIndex(released)
     end)
     if not visual_ok then
+        if type(particle) == "number" and particle >= 0
+            and particle < math.huge and particle == math.floor(particle) then
+            pcall(function() ParticleManager:DestroyParticle(particle, true) end)
+            pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+        end
         print("[HeroPassiveSkill] poison death explosion visual failed: "
             .. tostring(visual_error))
     end
@@ -1205,16 +1213,25 @@ local function flame_random_landing_position(center, radius)
 end
 
 local function flame_explosion_visual(context, position)
+    local particle
     local visual_ok, visual_error = pcall(function()
-        local particle = ParticleManager:CreateParticle(
+        particle = ParticleManager:CreateParticle(
             FLAME_MAIN_EXPLOSION_PARTICLE,
             PATTACH_WORLDORIGIN,
             context.attacker
         )
         ParticleManager:SetParticleControl(particle, 0, position)
-        ParticleManager:ReleaseParticleIndex(particle)
+        -- Relinquish ownership before the fallible native release call.
+        local released = particle
+        particle = nil
+        ParticleManager:ReleaseParticleIndex(released)
     end)
     if not visual_ok then
+        if type(particle) == "number" and particle >= 0
+            and particle < math.huge and particle == math.floor(particle) then
+            pcall(function() ParticleManager:DestroyParticle(particle, true) end)
+            pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+        end
         print("[HeroPassiveSkill] flame explosion visual failed: "
             .. tostring(visual_error))
     end

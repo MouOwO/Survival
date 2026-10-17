@@ -10,7 +10,7 @@ $lotteryGW2Content=Join-Path $lotteryGW2Engine 'content/dota_addons/Survival/pan
 $lotteryGW2Runtime=Join-Path $lotteryGW2Repo 'panorama'
 $lotteryGW2Compiler=Join-Path $lotteryGW2Engine 'game/bin/win64/resourcecompiler.exe'
 $lotteryGW2Assets='layout/custom_game/lottery_gw2_assets.xml'
-$lotteryGW2Allowed='^(?:scripts/custom_game/(?:lottery_gw2|lottery_gw2_data)\.js|styles/custom_game/lottery_gw2\.css|layout/custom_game/(?:survival_hud|lottery_gw2_assets)\.xml|images/custom_game/lottery_gw2_v1/[a-z0-9_]+\.png)$'
+$lotteryGW2Allowed='^(?:scripts/custom_game/(?:lottery_gw2|lottery_gw2_data|lottery_ui_remaining_5d5c1152eb)\.js|styles/custom_game/lottery_gw2\.css|layout/custom_game/(?:survival_hud|lottery_gw2_assets)\.xml|images/custom_game/lottery_gw2_v1/[a-z0-9_]+\.png)$'
 function Get-WorkspacePath([string]$Relative) {
     $resolved=[IO.Path]::GetFullPath((Join-Path $lotteryGW2Repo $Relative))
     if(-not $resolved.StartsWith($lotteryGW2Repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw "Path outside the workspace: $Relative"}

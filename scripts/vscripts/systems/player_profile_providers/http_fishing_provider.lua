@@ -123,6 +123,10 @@ function M.archive_submit(payload, on_success, on_error)
     request("/v1/archive/command", payload, on_success, on_error)
 end
 
+function M.endless_leaderboard(payload, on_success, on_error)
+    request("/v1/archive/endless-leaderboard", payload, on_success, on_error)
+end
+
 function M.archive_submit_endless_batch(payload, on_success, on_error)
     local function send_batch()
         if endless_batch_capability then

@@ -1,7 +1,8 @@
 -- Preserve authored proportions and gameplay geometry; scale only model output.
 local M = { multiplier = 2 / 3 }
-local original_size_ids = { arrow_tower = true, building_arrow_tower = true, ultimate_tower = true, wall = true, building_wall = true }
-local original_size_names = { building_arrow_tower = true, npc_dota_unit_ultimate_tower = true, building_wall = true }
+local original_size_ids = { arrow_tower = true, building_arrow_tower = true, ultimate_tower = true, wall = true, building_wall = true, archive_challenge = true }
+local original_size_names = { building_arrow_tower = true, npc_dota_unit_ultimate_tower = true, building_wall = true,
+    npc_archive_challenge_1 = true, npc_archive_challenge_2 = true, npc_archive_challenge_3 = true }
 
 local function monster_name(name)
     return type(name) == "string" and (name:match("^npc_survival_wave_")

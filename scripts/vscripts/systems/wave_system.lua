@@ -8,6 +8,7 @@ local spawn_points = require("config/generated/monster_spawn_points")
 local monster_spawn_marker_service = require("systems/monster_spawn_marker")
 local armor_balance = require("config/armor_balance")
 local asset_preload = require("systems/asset_preload_service")
+local wave_native_range = require("systems/wave_native_attack_range")
 local difficulty_config = require("config/difficulty_config")
 local wave_difficulty_builder = require("systems/wave_difficulty_builder")
 local wave_timing_config = require("config/wave_timing_config")
@@ -23,6 +24,8 @@ local monster_corpse_lifecycle_service = require(
     "systems/monster_corpse_lifecycle_service"
 )
 local wave_spawn_sequence = require("systems/wave_spawn_sequence")
+local wave_spawn_routing = require("systems/wave_spawn_routing")
+local wall_targets = require("systems/wall_target_service")
 local wave_monster_collision = require("systems/wave_monster_collision")
 local wave_special_target = require("systems/wave_special_target")
 local global_rules = require("config/global_rules")
@@ -64,6 +67,57 @@ local wave_channels = {}
 local disconnected_players = {}
 local player_populations = {}
 local overflow_end_listener = nil
+-- Only an explicit isolated Tools single-birth entry supplies this ticket.
+local native_lane_case = nil
+local lane_view_scope = {}
+
+-- The current single-lane entry is the only authorized lane factory path.
+-- Read its exact private registry proof, not arbitrary unit/global self-tags.
+-- A later wave's spawn token does not revoke an earlier still-valid member.
+local function registered_lane_record()
+    local case = native_lane_case
+    if not case or case.class_name ~= "npc_dota_creep_lane" then return nil end
+    local ok, record = pcall(function()
+        local pilot = _G.SURVIVAL_FORMAL_LANE_PILOT
+        local meta = case.entindex and enemies[case.entindex]
+        if not case.committed or case.closed or case.world ~= lane_view_scope.world
+            or GameRules:GetGameModeEntity() ~= lane_view_scope.world
+            or package.loaded["core/event_bus"] ~= event_bus
+            or event_bus.get_generation() ~= lane_view_scope.bus_generation
+            or not pilot or pilot.ticket ~= case.ticket or pilot.world ~= case.world
+            or pilot.bus ~= event_bus or pilot.generation ~= lane_view_scope.bus_generation
+            or pilot.player_id ~= case.player_id or pilot.unit_name ~= case.unit_name
+            or pilot.class_name ~= case.class_name
+            or pilot.guard ~= _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION
+            or not pilot.guard or pilot.guard.mode ~= case.world
+            or pilot.fixture ~= _G.SURVIVAL_FOUR_PLAYER_LIVE_PERF
+            or not pilot.fixture or pilot.fixture.mode ~= case.world
+            or pilot.fixture.guard ~= pilot.guard or pilot.fixture.write_isolated ~= true
+            or not meta or meta ~= case.meta or meta.unit ~= case.unit
+            or meta.player_id ~= case.player_id or case.channel.player_id ~= case.player_id
+            or meta.wave_resource_session_id ~= case.session.session_id
+            or case.session.generation_token ~= case.generation then return nil end
+        return { unit = meta.unit, entindex = case.entindex, player_id = meta.player_id }
+    end)
+    return ok and record or nil
+end
+
+local function lane_view()
+    if not lane_view_scope.view then
+        lane_view_scope.view = require("systems/registered_wave_lane_view").new(registered_lane_record)
+    end
+    return lane_view_scope.view
+end
+
+function M._append_registered_lane_units(creatures)
+    -- Normal production has no lane case: no registry scan, allocation or task.
+    if not lane_view_scope.view and not registered_lane_record() then return creatures end
+    return lane_view():append(creatures)
+end
+
+function M._registered_lane_view_snapshot_for_test()
+    return lane_view_scope.view and lane_view_scope.view:snapshot() or { pending = 0 }
+end
 
 local function movement_type_for(row)
     local definition = archetypes.by_id[row.archetype_id] or {}
@@ -318,6 +372,12 @@ local function configured_wave_channel(player_id)
     return { player_id = player_id, marker = marker, marker_name = marker_name }
 end
 
+local function refresh_wave_routes()
+    if type(wave_spawn_routing.refresh) == "function" then
+        wave_spawn_routing.refresh(wave_channels, wall_by_player, monster_hull_multiplier)
+    end
+end
+
 local function rebuild_wave_channels()
     wave_channels = {}
     local player_ids = player_context.active_player_ids()
@@ -330,6 +390,7 @@ local function rebuild_wave_channels()
         local marker = monster_spawn_marker or find_monster_spawn_marker()
         if marker then wave_channels[-1] = { player_id = -1, marker = marker } end
     end
+    refresh_wave_routes()
     return wave_channels
 end
 
@@ -461,6 +522,14 @@ end
 local function unregister_enemy(entindex, reason)
     local meta = enemies[entindex]
     if not meta then return nil end
+    if reason == "all_monsters_finished" or reason == "invalid_enemy_removed" then
+        local record = registered_lane_record()
+        if record and record.entindex == entindex and record.unit == meta.unit then
+            -- Dead-valid bodies remain visible to the two legacy valid-only
+            -- rogue scans until native removal. Alive forced removals add none.
+            lane_view():retire(record)
+        end
+    end
     enemies[entindex] = nil
     state.alive = math.max(0, state.alive - 1)
     change_player_alive(meta.player_id, -1)
@@ -653,7 +722,10 @@ local function set_wall(enemy)
     local target_wall = meta and meta.player_id ~= nil
         and meta.player_id >= 0 and meta.wall_entindex or wall_entindex
     local modifier = enemy:FindModifierByName("modifier_enemy_wall_ai")
-    if modifier and modifier.SetWallEntIndex then modifier:SetWallEntIndex(target_wall or -1) end
+    if modifier and modifier.InvalidateWallTarget and modifier.wall_target_player_id ~= nil
+        and modifier.wall_target_player_id >= 0 then
+        modifier:InvalidateWallTarget()
+    elseif modifier and modifier.SetWallEntIndex then modifier:SetWallEntIndex(target_wall or -1) end
 end
 
 local function update_targets()
@@ -686,7 +758,7 @@ local function rebuild_waves()
     return true
 end
 
-local function apply_stats(unit, row, definition, defer_attack_cap)
+local function apply_stats(unit, row, definition, defer_attack_cap, formal_wave, native_range_ticket)
     unit.survival_movement_type = definition.movement_type or "ground"
     unit.survival_movement_type_override = row.movement_type_override
     unit:SetBaseMaxHealth(row.health)
@@ -718,7 +790,17 @@ local function apply_stats(unit, row, definition, defer_attack_cap)
     if not defer_attack_cap and not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
-    if unit.Script_SetAttackRange then unit:Script_SetAttackRange(definition.attack_range or 128)
+    -- Live npc_dota_creature exposes neither attack-range setter. The base
+    -- override already used by heroes/towers replicates to both engine VMs,
+    -- and leaves external range bonuses and melee contact compensation additive.
+    -- Only formal wave spawns opt in; challenge callers retain their contract.
+    if formal_wave then
+        if not native_range_ticket then
+            unit:AddNewModifier(unit, nil, "modifier_survival_hero_attack_range", {
+                attack_range = definition.attack_range or 128,
+            })
+        end
+    elseif unit.Script_SetAttackRange then unit:Script_SetAttackRange(definition.attack_range or 128)
     elseif unit.SetAttackRange then unit:SetAttackRange(definition.attack_range or 128) end
     if definition.attack_type == "ranged" then
         unit:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
@@ -734,6 +816,17 @@ local function apply_stats(unit, row, definition, defer_attack_cap)
         unit:SetAttackCapability(definition.attack_type == "ranged"
             and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK)
     end
+    -- Default path above is unchanged. Only an explicitly opted-in fresh
+    -- formal birth waits until capability/model setup for exact native proof.
+    if formal_wave and native_range_ticket then
+        local omitted = wave_native_range.can_omit_override(unit, definition, native_range_ticket)
+        unit.survival_wave_native_base_range = omitted
+        if not omitted then
+            unit:AddNewModifier(unit, nil, "modifier_survival_hero_attack_range", {
+                attack_range = definition.attack_range or 128,
+            })
+        end
+    end
     for _, ability_name in ipairs(definition.passive_skill_ids or {}) do
         if ability_name ~= "" and not unit:FindAbilityByName(ability_name) then
             unit:AddAbility(ability_name)
@@ -741,8 +834,14 @@ local function apply_stats(unit, row, definition, defer_attack_cap)
     end
 end
 
-local function spawn_one(row, token, wave_number, normal_instance_index, session, channel)
+local function spawn_one(row, token, wave_number, normal_instance_index, session, channel, class_ticket)
     if token ~= generation_token then return end
+    if class_ticket then
+        assert(native_lane_case and native_lane_case.ticket == class_ticket
+            and native_lane_case.row == row and native_lane_case.session == session
+            and native_lane_case.channel == channel
+            and require("tests/manual_formal_lane_pilot").authorize(class_ticket), "formal_lane_ticket_stale")
+    end
     state.pending = math.max(0, state.pending - 1)
     if session and not session.released then
         session.pending = math.max(0, session.pending - 1)
@@ -760,8 +859,9 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         check_final_victory()
         return
     end
-    local marker = channel and channel.marker
-        or monster_spawn_marker or find_monster_spawn_marker()
+    local marker
+    if channel then marker = channel.marker
+    else marker = monster_spawn_marker or find_monster_spawn_marker() end
     if not marker then
         state.failed_spawn = state.failed_spawn + 1
         publish("monster_spawn_marker_missing")
@@ -770,9 +870,36 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         return
     end
     monster_spawn_marker = marker
-    local position = marker:GetAbsOrigin()
+    local position
+    if channel and type(wave_spawn_routing.position) == "function" then
+        position = wave_spawn_routing.position(channel)
+    else position = marker:GetAbsOrigin() end
+    if not position then
+        state.failed_spawn = state.failed_spawn + 1
+        release_wave_model_resources(session, "spawn_route_missing")
+        check_final_victory()
+        return
+    end
     position.z = GetGroundHeight(position, nil) + 32
-    local unit = CreateUnitByName(definition.unit_name, position, false, nil, nil, DOTA_TEAM_BADGUYS)
+    local source_definition, native_range_ticket = definition, nil
+    if class_ticket then
+        definition = {}; for key, value in pairs(source_definition) do definition[key] = value end
+        definition.unit_name = native_lane_case.unit_name
+    elseif _G.SURVIVAL_FORMAL_WAVE_NATIVE_RANGE_PROBE == true then
+        definition, native_range_ticket = wave_native_range.select_for_formal_spawn(definition)
+    end
+    local unit
+    if native_range_ticket and native_range_ticket.alias then
+        local ok, created = pcall(CreateUnitByName, definition.unit_name, position, false, nil, nil, DOTA_TEAM_BADGUYS)
+        if ok and (type(created) == "table" or type(created) == "userdata") then unit = created end
+    else
+        unit = CreateUnitByName(definition.unit_name, position, false, nil, nil, DOTA_TEAM_BADGUYS)
+    end
+    if not valid(unit) and native_range_ticket and native_range_ticket.alias then
+        wave_native_range.alias_creation_failed(native_range_ticket)
+        definition, native_range_ticket = source_definition, nil
+        unit = CreateUnitByName(definition.unit_name, position, false, nil, nil, DOTA_TEAM_BADGUYS)
+    end
     if not valid(unit) then
         state.failed_spawn = state.failed_spawn + 1
         publish("unit_create_failed")
@@ -780,16 +907,27 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         check_final_victory()
         return
     end
+    if class_ticket then
+        native_lane_case.unit = unit
+        native_lane_case.entindex = unit:entindex()
+        unit.survival_formal_lane_pilot_token = class_ticket
+        assert(EntIndexToHScript(unit:entindex()) == unit and unit:GetUnitName() == definition.unit_name
+            and unit:GetClassname() == native_lane_case.class_name and unit:IsRealHero() == false
+            and unit:GetTeamNumber() == DOTA_TEAM_BADGUYS, "formal_lane_native_identity_changed")
+    end
+    if native_range_ticket and not wave_native_range.bind_birth(unit, native_range_ticket, true) then
+        native_range_ticket = nil
+    end
     monster_navigation.apply(unit)
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     monster_corpse_lifecycle_service.track(unit, "wave")
     local collision_profile = wave_monster_collision.profile(row, definition, true)
     -- Unknown/new archetypes and configured native skills keep the original
     -- cap installation point, before passive skill initialization.
-    local defer_attack_cap = definition.native_attack_speed_policy == "bat_only_v1"
+    local defer_attack_cap = not class_ticket and definition.native_attack_speed_policy == "bat_only_v1"
         and (definition.passive_skill_ids == nil
             or (type(definition.passive_skill_ids) == "table" and next(definition.passive_skill_ids) == nil))
-    apply_stats(unit, row, definition, defer_attack_cap)
+    apply_stats(unit, row, definition, defer_attack_cap, true, native_range_ticket)
     local resolved_visual = monster_visual_config.resolve(
         wave_number,
         row.member_role or "normal",
@@ -806,7 +944,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     })
     -- Decide after all native/passive/appearance skills are present. Default
     -- callers of apply_stats (including challenges) still install the old cap.
-    local omit_attack_cap = defer_attack_cap and wave_native_attack_cap.can_omit(unit, definition, true)
+    local omit_attack_cap = not class_ticket and defer_attack_cap and wave_native_attack_cap.can_omit(unit, definition, true)
     if not omit_attack_cap and not unit:HasModifier("modifier_debug_attack_cap") then
         unit:AddNewModifier(unit, nil, "modifier_debug_attack_cap", {})
     end
@@ -825,6 +963,18 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     unit.survival_is_wave_monster = true
     unit.survival_player_id = channel and channel.player_id or nil
     unit.survival_monster_role = row.member_role or "normal"
+    if native_range_ticket and native_range_ticket.birth_proven then
+        local finalized = wave_native_range.finalize(unit, definition, native_range_ticket)
+        unit.survival_wave_native_base_range = finalized
+        if not finalized then
+            unit:AddNewModifier(unit, nil, "modifier_survival_hero_attack_range", {
+                attack_range = definition.attack_range or 128,
+            })
+        end
+    end
+    if native_range_ticket then
+        unit.survival_wave_range_source_unit_name = source_definition.unit_name
+    end
     -- Native ranged attackers always chase and need no Lua contact bonus.
     -- Flying-labelled melee attackers still use ground-navigation contacts.
     -- Set this only after final stats/visuals and before modifier declaration.
@@ -833,6 +983,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         and attack_capability == DOTA_UNIT_CAP_RANGED_ATTACK
     unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
         wall_entindex = wall_for_channel(channel),
+        wall_target_player_id = channel and channel.player_id or nil,
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
     FindClearSpaceForUnit(unit, position, true)
@@ -851,6 +1002,7 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         wall_entindex = wall_for_channel(channel),
         wave_resource_session_id = session and session.session_id or nil,
     }
+    if class_ticket then native_lane_case.meta = enemies[unit:entindex()]; native_lane_case.committed = true end
     state.spawned = state.spawned + 1
     state.alive = state.alive + 1
     change_player_alive(channel and channel.player_id, 1)
@@ -1026,6 +1178,9 @@ local function on_killed(payload)
     local entindex = tonumber(payload.victim_entindex) or (valid(victim) and victim:entindex())
     local meta = entindex and enemies[entindex]
     if not meta or (victim and meta.unit ~= victim) then return end
+    if native_lane_case and native_lane_case.meta == meta and native_lane_case.unit == meta.unit then
+        native_lane_case.natural_deaths = native_lane_case.natural_deaths + 1
+    end
     if valid(meta.unit) then
         monster_hero_visual_service.on_death(meta.unit)
         monster_visual_service.on_death(meta.unit)
@@ -1399,6 +1554,260 @@ function M.debug_spawn_wave_for_players(number, player_ids)
     return M.debug_spawn_wave(number, player_ids)
 end
 
+-- Default-OFF single formal birth. This uses the normal private transaction;
+-- no outside raw NPC can be adopted into enemies/population/reward state.
+do
+    local PILOT_FIELDS={"current_wave","status","planned","pending","spawned","killed","failed_spawn","boss_alive","timer"}
+    local function lane_snapshot(case)
+        local unit,meta=case.unit,case.entindex and enemies[case.entindex]
+        local present=valid(unit)
+        local registered=present and EntIndexToHScript(case.entindex)==unit
+            and unit.survival_formal_lane_pilot_token==case.ticket and meta~=nil and meta==case.meta and meta.unit==unit
+            and meta.wave_resource_session_id==case.session.session_id
+        local populations={}
+        for id=0,3 do populations[#populations+1]={player_id=id,alive=(player_populations[id] or {}).alive or 0} end
+        local native={}
+        if present then
+            for key,getter in pairs({class_name="GetClassname",unit_name="GetUnitName",health="GetHealth",max_health="GetMaxHealth",
+                damage_min="GetBaseDamageMin",damage_max="GetBaseDamageMax",model="GetModelName",attack_capability="GetAttackCapability"}) do
+                if type(unit[getter])=="function" then
+                    local ok,value=pcall(unit[getter],unit)
+                    if ok and (type(value)=="string" or type(value)=="boolean"
+                        or type(value)=="number" and value==value and math.abs(value)~=math.huge) then native[key]=value end
+                end
+            end
+            native.attack_cap_legacy=unit:HasModifier("modifier_debug_attack_cap")
+            native.attack_range_legacy=unit:HasModifier("modifier_survival_hero_attack_range")
+            local ai=unit:FindModifierByName("modifier_enemy_wall_ai")
+            native.wall_AI=ai~=nil and not ai:IsNull() and ai:GetParent()==unit
+            if native.wall_AI then native.wall_entindex=ai.wall_entindex;native.wall_target_player_id=ai.wall_target_player_id end
+        end
+        return {ok=true,formal_registration=registered,committed=case.committed==true,unit_budget=1,variant=case.variant,
+            player_id=case.player_id,entindex=case.entindex,native=native,natural_deaths=case.natural_deaths,
+            closed=case.closed==true,unit_removed=case.cleanup_requested==true and not present,
+            cleanup_requested=case.cleanup_requested==true,cleanup_refused=case.cleanup_refused==true,
+            restored_baseline=case.restored==true,world_current=GameRules:GetGameModeEntity()==case.world,
+            population=populations,alive=state.alive,pending=state.pending,spawned=state.spawned,killed=state.killed,
+            failed_spawn=state.failed_spawn,current_wave=state.current_wave,status=state.status,
+            resource_session={id=case.session.session_id,alive=case.session.alive,pending=case.session.pending,
+                generation_completed=case.session.generation_completed,released=case.session.released},
+            error=case.error,persistent_write=false,native_AI_verified=false,DPS_verified=false,rewards_verified=false,FPS_gain_verified=false}
+    end
+    function M._tools_formal_lane_snapshot(ticket)
+        local case=native_lane_case
+        if not case or case.ticket~=ticket then return {ok=false,error="formal_lane_ticket_unknown"} end
+        return lane_snapshot(case)
+    end
+    function M._tools_stop_formal_lane(ticket)
+        local case=native_lane_case
+        if not case or case.ticket~=ticket then return {ok=false,error="formal_lane_ticket_unknown"} end
+        if not IsServer or not IsServer() or not IsInToolsMode or not IsInToolsMode()
+            or GameRules:GetGameModeEntity()~=case.world then return {ok=false,error="formal_lane_cleanup_world_changed"} end
+        local unit=case.unit
+        if valid(unit) then
+            local meta=case.entindex and enemies[case.entindex]
+            if EntIndexToHScript(case.entindex)~=unit or unit.survival_formal_lane_pilot_token~=ticket
+                or meta and (meta~=case.meta or meta.unit~=unit or meta.wave_resource_session_id~=case.session.session_id) then
+                case.cleanup_refused=true;return lane_snapshot(case)
+            end
+            if meta then unregister_enemy(case.entindex,"tools_single_lane_cleanup") end
+            if not case.cleanup_requested then
+                unit.survival_wave_cleanup=true
+                monster_hero_visual_service.clear(unit)
+                monster_visual_service.cleanup(unit)
+                UTIL_Remove(unit)
+                case.cleanup_requested=true
+            end
+        else
+            -- UTIL_Remove can invalidate the victim before its native death
+            -- event arrives. Retire only our exact formal record, no rewards.
+            local meta=case.entindex and enemies[case.entindex]
+            if meta and meta==case.meta and meta.unit==unit and meta.wave_resource_session_id==case.session.session_id then
+                unregister_enemy(case.entindex,"tools_single_lane_invalid_unit")
+            end
+            case.cleanup_requested=true
+        end
+        case.session.pending=0;case.session.generation_completed=true
+        release_wave_model_resources(case.session,"tools_single_lane_closed",false)
+        local clean=true;for _ in pairs(enemies) do clean=false;break end
+        if not case.closed and clean and state.alive==0 and state.pending==0
+            and case.session.released and generation_token==case.generation
+            and require("tests/manual_formal_lane_pilot").authorize(ticket) then
+            for _,key in ipairs(PILOT_FIELDS) do state[key]=case.before[key] end
+            memory_cleared_wave=case.before.memory_cleared_wave
+            case.restored=true
+        end
+        case.closed=true
+        local result=lane_snapshot(case)
+        if result.unit_removed then native_lane_case=nil end
+        return result
+    end
+    function M._tools_start_formal_lane(ticket)
+        local service=require("tests/manual_formal_lane_pilot")
+        if native_lane_case or not service.authorize(ticket) then return {ok=false,error="formal_lane_authority_required"} end
+        if dev_mode~=true or state.status~="dev_mode" or state.pending~=0 or state.alive~=0
+            or next(enemies)~=nil or next(wave_resource_sessions)~=nil or state.victory_settled
+            or state.defeat_settled or state.post_clear_frozen or state.final_wave_generation_completed
+            or difficulty_id~="N2" or state.total_waves<=1 then return {ok=false,error="formal_lane_empty_paused_N2_required"} end
+        local selection=service.selection(ticket)
+        if not selection or selection.archetype_id~="humanoid_white_melee" or selection.player_id<0
+            or selection.player_id>3 or selection.player_id~=math.floor(selection.player_id)
+            or selection.variant~="control" and selection.variant~="lane" then return {ok=false,error="formal_lane_selection_invalid"} end
+        local channels=debug_player_channels({selection.player_id},true)
+        local channel=channels and channels[1]
+        if not channel or not valid(channel.marker) or wall_for_channel(channel)<0 then return {ok=false,error="formal_lane_registered_channel_wall_required"} end
+        for id=0,3 do if (player_populations[id] or {}).alive~=nil and player_populations[id].alive~=0 then
+            return {ok=false,error="formal_lane_population_not_empty"} end end
+        local source
+        for _,row in ipairs((waves[1] or {}).batches or {}) do
+            if row.archetype_id=="humanoid_white_melee" and row.member_role=="normal" and not row.is_boss then source=row;break end
+        end
+        if not source then return {ok=false,error="formal_lane_source_row_missing"} end
+        local row={};for k,v in pairs(source) do row[k]=v end;row.monster_count=1
+        local before={memory_cleared_wave=memory_cleared_wave};for _,key in ipairs(PILOT_FIELDS) do before[key]=state[key] end
+        local session=acquire_wave_model_resources(1,{batches={row}},generation_token,true,1)
+        local case={ticket=ticket,row=row,session=session,channel=channel,before=before,generation=generation_token,
+            world=GameRules:GetGameModeEntity(),unit_name=selection.unit_name,class_name=selection.class_name,
+            player_id=selection.player_id,variant=selection.variant,natural_deaths=0}
+        native_lane_case=case
+        state.current_wave=1;state.status="dev_mode";state.planned=1;state.pending=1
+        state.spawned=0;state.killed=0;state.failed_spawn=0;state.boss_alive=false;state.timer=0
+        local ok=pcall(spawn_one,row,generation_token,1,1,session,channel,ticket)
+        session.generation_completed=true
+        release_wave_model_resources(session,"tools_single_lane_generation_completed",false)
+        if not ok or not case.committed then
+            case.error="formal_lane_birth_failed"
+            -- The transaction may throw before its pending decrement. This is
+            -- the only case scheduled here; never zero another wave's pending.
+            if generation_token==case.generation and state.pending==1 and session.pending==1 then
+                state.pending=0;session.pending=0
+            end
+            local result=M._tools_stop_formal_lane(ticket);result.ok=false;result.error=case.error;return result
+        end
+        return lane_snapshot(case)
+    end
+end
+
+-- Explicit, isolated warm-world A/B cleanup. Validate the entire production
+-- registry before invoking its existing lifecycle; never settle kills/rewards,
+-- reprepare the fixture, inspect profiles, or touch unregistered native units.
+do
+    local clearing_for_comparison = false
+    function M.debug_clear_wave_for_comparison()
+        if clearing_for_comparison then return {ok=false,error="comparison_clear_reentrant"} end
+        local function reject(reason) error({reason=reason},0) end
+        local checked, proof = pcall(function()
+            if not IsServer or IsServer() ~= true or not IsInToolsMode or IsInToolsMode() ~= true
+                or not GetMapName or GetMapName() ~= "template_map" then reject("tools_scope_required") end
+            if not GameRules or not GameRules.GetGameModeEntity or not GameRules.State_Get
+                or not DOTA_GAMERULES_STATE_GAME_IN_PROGRESS
+                or GameRules:State_Get() ~= DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then reject("running_match_required") end
+            local mode = GameRules:GetGameModeEntity()
+            local guard, fixture, scene = _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION,
+                _G.SURVIVAL_FOUR_PLAYER_LIVE_PERF, _G.SURVIVAL_REAL_GAME_STRESS
+            if not mode or type(guard) ~= "table" or guard.mode ~= mode
+                or type(fixture) ~= "table" or fixture.mode ~= mode or fixture.guard ~= guard
+                or fixture.status ~= "ready" or fixture.write_isolated ~= true
+                or type(scene) ~= "table" or fixture.defender_scene ~= scene
+                or scene.mode ~= mode or scene.status ~= "ready" then reject("current_four_fixture_required") end
+            local match = require("systems/match_setup_service")
+            if not match.get_mode or not match.get_session_id or fixture.match_mode ~= match.get_mode()
+                or fixture.session == nil or fixture.session ~= match.get_session_id() then reject("fixture_session_changed") end
+            if dev_mode ~= true or state.status ~= "dev_mode" or state.pending ~= 0
+                or state.defeat_settled or state.victory_settled or state.post_clear_frozen
+                or state.overflow_active then reject("steady_dev_wave_required") end
+            if type(fixture.ids) ~= "table" or #fixture.ids ~= 4 or type(scene.players) ~= "table"
+                or type(fixture.owners) ~= "table" or (fixture.scenario ~= "A" and fixture.scenario ~= "B")
+                or #scene.players ~= (fixture.scenario == "A" and 4 or 1) then reject("four_owner_context_required") end
+            local ids, contexts = {}, {}
+            for key, id in pairs(fixture.ids) do
+                if type(key) ~= "number" or key < 1 or key > 4 or key ~= math.floor(key)
+                    or type(id) ~= "number" or id ~= math.floor(id) or id < 0 or id > 3
+                    or ids[id] then reject("four_owner_context_required") end
+                ids[id] = true
+            end
+            for _, owner in ipairs(scene.players) do
+                if type(owner) ~= "table" or not ids[owner.id] or contexts[owner.id] then reject("four_owner_context_required") end
+                contexts[owner.id] = owner
+            end
+            local active, active_count = {}, 0
+            for _, id in ipairs(player_context.active_player_ids()) do active[id]=true;active_count=active_count+1 end
+            if active_count ~= 4 then reject("four_owner_context_required") end
+            for id in pairs(ids) do
+                local owner = contexts[id] or fixture.owners[id]
+                local wall = owner and (owner.units and owner.units.wall or owner.wall)
+                local channel = wave_channels[id]
+                local population = player_populations[id]
+                if not active[id] or disconnected_players[id] or type(owner) ~= "table" or owner.id ~= id
+                    or owner.phase ~= "ready" or not valid(owner.builder) or not valid(wall)
+                    or owner.builder:IsAlive() ~= true or wall:IsAlive() ~= true
+                    or not player_context.is_owned_by(id,owner.builder) or not player_context.is_owned_by(id,wall)
+                    or not channel or channel.player_id ~= id or not valid(channel.marker)
+                    or population and (population.player_defeated or population.overflow_active) then reject("four_owner_context_changed") end
+            end
+            if type(EntIndexToHScript) ~= "function" or type(UTIL_Remove) ~= "function" then reject("native_cleanup_api_required") end
+            local counts, session_counts, count, session_alive = {}, {}, 0, 0
+            for session_id, session in pairs(wave_resource_sessions) do
+                if type(session) ~= "table" or session.session_id ~= session_id
+                    or session.generation_token ~= generation_token or session.dev_mode ~= true
+                    or session.pending ~= 0 or session.generation_completed ~= true
+                    or session.released or session.wave_number ~= state.current_wave
+                    or type(session.alive) ~= "number" or session.alive < 1 or session.alive > 1024
+                    or session.alive ~= math.floor(session.alive) then reject("unsettled_resource_session") end
+                session_alive = session_alive + session.alive
+            end
+            for entindex, meta in pairs(enemies) do
+                count = count + 1
+                if count > 1024 or type(meta) ~= "table" or not ids[meta.player_id]
+                    or meta.wave_number ~= state.current_wave then reject("unknown_formal_registry_entry") end
+                local unit, session = meta.unit, wave_resource_sessions[meta.wave_resource_session_id]
+                if not valid(unit) or unit:IsAlive() ~= true or unit:entindex() ~= entindex
+                    or EntIndexToHScript(entindex) ~= unit or unit:GetClassname() ~= "npc_dota_creature"
+                    or unit:IsRealHero() ~= false or unit:GetTeamNumber() ~= DOTA_TEAM_BADGUYS
+                    or unit.survival_is_wave_monster ~= true or unit.survival_wave_cleanup == true
+                    or unit.survival_is_challenge_monster == true or unit.survival_visual_only == true
+                    or unit.survival_player_id ~= meta.player_id or not player_context.is_owned_by(meta.player_id,unit)
+                    or not session then reject("unknown_formal_registry_entry") end
+                local ai = unit:FindModifierByName("modifier_enemy_wall_ai")
+                if not ai or ai:IsNull() ~= false or ai:GetParent() ~= unit
+                    or ai.wall_target_player_id ~= meta.player_id then reject("unknown_formal_registry_entry") end
+                counts[meta.player_id]=(counts[meta.player_id] or 0)+1
+                session_counts[meta.wave_resource_session_id]=(session_counts[meta.wave_resource_session_id] or 0)+1
+            end
+            if count ~= state.alive or session_alive ~= count then reject("formal_population_mismatch") end
+            for session_id, session in pairs(wave_resource_sessions) do
+                if session_counts[session_id] ~= session.alive then reject("formal_resource_identity_mismatch") end
+            end
+            for id in pairs(ids) do
+                local population = player_populations[id]
+                if (population and population.alive or 0) ~= (counts[id] or 0) then reject("formal_population_mismatch") end
+            end
+            return {mode=mode,guard=guard,fixture=fixture,scene=scene,count=count,generation=generation_token}
+        end)
+        if not checked then return {ok=false,error="comparison_clear_preflight_failed",
+            reason=type(proof)=="table" and proof.reason or "native_preflight_failed"} end
+        local authority_read, unchanged = pcall(function()
+            return _G.SURVIVAL_REAL_GAME_STRESS_ISOLATION == proof.guard and _G.SURVIVAL_FOUR_PLAYER_LIVE_PERF == proof.fixture
+                and _G.SURVIVAL_REAL_GAME_STRESS == proof.scene and GameRules:GetGameModeEntity() == proof.mode
+                and GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS
+        end)
+        if not authority_read or unchanged ~= true then
+            return {ok=false,error="comparison_clear_authority_changed"}
+        end
+        if proof.count == 0 then return {ok=true,removed=0,alive=state.alive,pending=state.pending,
+            generation_before=proof.generation,generation_after=generation_token,resource_snapshot=M._resource_snapshot_for_test()} end
+        clearing_for_comparison=true
+        local cleared, removed = pcall(clear_normal_wave_enemies)
+        clearing_for_comparison=false
+        local resources = M._resource_snapshot_for_test()
+        local verified = cleared and removed == proof.count and next(enemies) == nil
+            and state.alive == 0 and state.pending == 0 and resources.session_count == 0
+        return {ok=verified,error=not verified and "comparison_clear_lifecycle_failed" or nil,
+            removed=cleared and removed or nil,alive=state.alive,pending=state.pending,
+            generation_before=proof.generation,generation_after=generation_token,resource_snapshot=resources}
+    end
+end
+
 function M.set_difficulty(id)
     if fishing_mode() then return false, "fishing_mode_no_difficulty" end
     if type(id) ~= "string" or id == "" then
@@ -1488,7 +1897,10 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     local channel = player_id and wave_channels[player_id] or nil
     local marker = channel and channel.marker or nil
     if not marker then return nil, "player_wave_spawn_marker_missing" end
-    local position = marker:GetAbsOrigin()
+    local position
+    if type(wave_spawn_routing.position) == "function" then position = wave_spawn_routing.position(channel)
+    else position = marker:GetAbsOrigin() end
+    if not position then return nil, "player_wave_spawn_route_missing" end
     position.z = GetGroundHeight(position, nil) + 32
     local unit = CreateUnitByName(
         definition.unit_name,
@@ -1542,6 +1954,7 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
         })
         unit:AddNewModifier(unit, nil, "modifier_enemy_wall_ai", {
             wall_entindex = wall_by_player[player_id] or -1,
+            wall_target_player_id = player_id,
             no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
         })
         FindClearSpaceForUnit(unit, position, true)
@@ -1569,6 +1982,7 @@ function M.set_monster_hull_scale(multiplier)
     )
     if not ok then return false, result_or_error end
     monster_hull_multiplier = result_or_error.multiplier
+    refresh_wave_routes()
     return true, result_or_error
 end
 
@@ -1616,8 +2030,15 @@ M._wave_channels_for_test = function()
 end
 
 function M.init()
+    if lane_view_scope.view then lane_view_scope.view:reset() end
+    lane_view_scope.view = nil
+    lane_view_scope.world = GameRules and GameRules.GetGameModeEntity
+        and GameRules:GetGameModeEntity() or GameRules or _G
+    lane_view_scope.bus_generation = event_bus.get_generation()
     -- Read static KV before wave spawning and reset its cache for a new map.
     wave_native_attack_cap.init()
+    native_lane_case=nil
+    if type(wall_targets.reset) == "function" then wall_targets.reset() end
     monster_spawn_marker = nil
     difficulty_id = difficulty_config.default_id
     difficulty_selected = false
@@ -1637,6 +2058,12 @@ function M.init()
     player_populations = {}
     reset(); enemies = {}; wall_entindex = -1; wall_by_player = {}
     wave_channels = {}; disconnected_players = {}
+    if type(wall_targets.set_change_listener) == "function" then
+        wall_targets.set_change_listener(function()
+            wall_by_player = wall_targets.wall_indices()
+            refresh_wave_routes()
+        end)
+    end
     generation_token = 0; dev_mode = false
     if overflow_end_listener and StopListeningToGameEvent then
         StopListeningToGameEvent(overflow_end_listener)
@@ -1674,30 +2101,50 @@ function M.init()
     end)
     event_bus.subscribe(events.WAVE_START_NEXT, start_next_wave)
     event_bus.subscribe(events.ENGINE_ENTITY_KILLED, on_killed)
-    event_bus.subscribe(events.BUILDING_CREATED, function(payload)
+    local function on_wall_changed(payload)
         if payload.building_id ~= "wall" then return end
         local player_id = tonumber(payload.player_id)
-        if player_id ~= nil then wall_by_player[player_id] = payload.entindex end
-        wall_entindex = payload.entindex
+        if type(wall_targets.register) == "function" then
+            if not wall_targets.register(payload) then return end
+            if player_id ~= nil then wall_by_player[player_id] = wall_targets.preferred_wall(player_id) end
+        elseif player_id ~= nil then wall_by_player[player_id] = payload.entindex end
+        wall_entindex = (player_id ~= nil and wall_by_player[player_id]) or -1
+        refresh_wave_routes()
         update_targets()
+    end
+    event_bus.subscribe(events.BUILDING_CREATED, function(payload)
+        if payload.building_id ~= "wall" and type(wall_targets.navigation_changed) == "function" then
+            wall_targets.navigation_changed()
+        end
+        on_wall_changed(payload)
     end)
+    event_bus.subscribe(events.BUILDING_CHANGED, on_wall_changed)
     event_bus.subscribe(events.BUILDING_DESTROYED, function(payload)
-        if payload.building_id ~= "wall" then return end
+        if payload.building_id ~= "wall" then
+            if type(wall_targets.navigation_changed) == "function" then wall_targets.navigation_changed() end
+            return
+        end
+        if type(wall_targets.remove) == "function" and not wall_targets.remove(payload.entindex) then return end
         local player_id = tonumber(payload.player_id)
         if player_id ~= nil and wall_by_player[player_id] == payload.entindex then
-            wall_by_player[player_id] = nil
+            wall_by_player[player_id] = type(wall_targets.preferred_wall) == "function"
+                and wall_targets.preferred_wall(player_id) or nil
         end
         if wall_entindex == payload.entindex then wall_entindex = -1 end
+        refresh_wave_routes()
         update_targets()
     end)
     event_bus.subscribe(events.PLAYER_DEFEATED, function(payload)
         local player_id = population_player_id(payload and payload.player_id)
         if player_id == nil then return end
+        if type(wall_targets.deactivate_player) == "function" then wall_targets.deactivate_player(player_id) end
+        wall_by_player[player_id] = nil
         local population = population_for(player_id, true)
         population.player_defeated = true
         population.defeat_reason = tostring(payload.reason or "unknown")
         clear_player_overflow(player_id, population)
         wave_channels[player_id] = nil
+        refresh_wave_routes()
         if require("systems/multiplayer_player_service").all_participants_defeated() then
             stop_defeated_match()
         end
@@ -1705,9 +2152,11 @@ function M.init()
     event_bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
         local player_id = tonumber(payload and payload.player_id)
         if player_id == nil then return end
+        if type(wall_targets.deactivate_player) == "function" then wall_targets.deactivate_player(player_id) end
         disconnected_players[player_id] = true
         wave_channels[player_id] = nil
         wall_by_player[player_id] = nil
+        refresh_wave_routes()
         local removed = 0
         for entindex, meta in pairs(enemies) do
             if meta.player_id == player_id then

@@ -24,7 +24,8 @@ package.loaded["debug/dev_wall_stats"] = {apply = noop, reset = noop}
 package.loaded["core/team_alignment"] = {enforce = noop}
 package.loaded["systems/rogue_effect_state_service"] = {numeric = function() return 0 end, wall_health_flat = function() return 0 end}
 local technology, permanent = {tower = {}}, {}
-package.loaded["systems/technology_stat_manager"] = {get = function() return {final = technology} end}
+local technology_service = {get = function() return {final = technology} end}
+package.loaded["systems/technology_stat_manager"] = technology_service
 package.loaded["systems/player_profile_service"] = {get_profile = function() return nil end}
 local pending
 package.loaded["systems/building_upgrade_process"] = {
@@ -39,6 +40,7 @@ class = function(value) return value end
 LinkLuaModifier = noop
 IsServer = function() return true end
 LUA_MODIFIER_MOTION_NONE, MODIFIER_ATTRIBUTE_PERMANENT, MODIFIER_EVENT_ON_ATTACK_START = 0, 1, 2
+MODIFIER_PROPERTY_ATTACK_RANGE_BASE_OVERRIDE = 13
 DOTA_UNIT_CAP_RANGED_ATTACK, DOTA_UNIT_CAP_MOVE_NONE, DOTA_TEAM_GOODGUYS = 2, 0, 2
 DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_BASIC = 1, 2, 4
 DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_CLOSEST, ACT_DOTA_ATTACK = 8, 1, 3
@@ -61,6 +63,9 @@ PlayerResource = {GetTeam = function() return 2 end}
 Entities = {FindAllByClassname = function() return units end}
 FindUnitsInRadius = function() return candidates end
 local modifier_class = require("modifiers/modifier_tower_auto_attack")
+local range_class = require("modifiers/modifier_survival_hero_attack_range")
+assert(range_class:DeclareFunctions()[1] == MODIFIER_PROPERTY_ATTACK_RANGE_BASE_OVERRIDE,
+    "the engine must actually invoke the registered range callback")
 local function create_unit(name, position, team)
     next_index = next_index + 1
     local u = {name = name, index = next_index, position = position, team = team or 2,
@@ -84,11 +89,13 @@ local function create_unit(name, position, team)
     function u:SetBaseDamageMin(value) self.base_damage = value end
     function u:GetPhysicalArmorBaseValue() return self.armor or 0 end
     function u:SetPhysicalArmorBaseValue(value) self.armor = value end
-    function u:Script_SetAttackRange(value) self.attack_range = value end
-    function u:Script_GetAttackRange() return self.attack_range end
-    -- Simulate a stale fallback getter: the script range remains authoritative
-    -- even when another getter returns a different value in this mock.
-    function u:GetAttackRange() return self.acquisition end
+    -- Live creatures do not expose either range setter. The actual registered
+    -- modifier callback must change the range, not a convenient mock setter.
+    function u:Script_GetAttackRange()
+        local modifier = self.modifiers.modifier_survival_hero_attack_range
+        return modifier and modifier:GetModifierAttackRangeOverride() or self.attack_range
+    end
+    function u:GetAttackRange() return self:Script_GetAttackRange() end
     function u:GetAcquisitionRange() return self.acquisition end
     function u:SetAcquisitionRange(value)
         self.acquisition = value; self.acquisition_writes[#self.acquisition_writes + 1] = value
@@ -101,9 +108,15 @@ local function create_unit(name, position, team)
     function u:HasModifier(name) return self.modifiers[name] ~= nil end
     function u:FindModifierByName(name) return self.modifiers[name] end
     function u:RemoveModifierByName(name) self.modifiers[name] = nil end
-    function u:AddNewModifier(_, _, name)
+    function u:AddNewModifier(_, _, name, params)
         local modifier = {}
-        if name == "modifier_tower_auto_attack" then
+        if name == "modifier_survival_hero_attack_range" then
+            modifier = setmetatable({
+                GetStackCount = function(m) return m.stack or 0 end,
+                SetStackCount = function(m, value) m.stack = value end,
+            }, {__index = range_class})
+            modifier:OnCreated(params or {})
+        elseif name == "modifier_tower_auto_attack" then
             modifier = setmetatable({GetParent = function() return self end,
                 GetStackCount = function(m) return m.stack or 0 end,
                 SetStackCount = function(m, value) m.stack = value end,
@@ -249,3 +262,63 @@ assert(tower:HasModifier("modifier_tower_attack_effects") and tower.acquisition 
 check_targeting(base_range + 350)
 for _, value in ipairs(tower.acquisition_writes) do assert(value == 0, "no construction/upgrade/technology/recovery path re-enables native acquisition even transiently") end
 print("TOWER_UPGRADE_TARGETING_PASS: actual construction, upgrade completion, technology/permanent range changes, technology-only and building recovery, zero native acquisition and ordinary-enemy targeting")
+
+-- Grant the real enabled card through its generated params and runtime. Keep
+-- the production building projection/targeting and native range callback real.
+package.loaded["systems/technology_stat_manager"] = nil
+package.loaded["systems/rogue_effect_state_service"] = nil
+package.loaded["systems/player_context_service"] = {
+    is_defeated = function() return false end,
+    owner_player_id = function(u) return u and u.survival_player_id end,
+}
+local real_technology = require("systems/technology_stat_manager")
+local rogue = require("systems/rogue_effect_runtime_service")
+-- building_upgrade_system captured this module reference when loaded above.
+technology_service.get = real_technology.get
+PlayerResource.GetPlayer = function() return {} end
+bus.reset(); real_technology.init(); building.init(); upgrade.init(); rogue.init()
+permanent = {}
+bus.handle_request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST, function() return {totals = permanent} end)
+-- Recover the existing tower and reset previous test-only technology bonuses.
+bus.emit(events.TECHNOLOGY_STATS_CHANGED, {player_id = 0, reason = "rogue_baseline"})
+assert(tower:GetAttackRange() == base_range)
+enemy.position = Vector(base_range + 450, 0, 0)
+local remote = create_unit("npc_survival_remote", Vector(base_range + 550, 0, 0), 3)
+candidates = {tree, enemy, remote}; auto = tower:FindModifierByName("modifier_tower_auto_attack")
+auto:ResetTarget(); auto:OnIntervalThink()
+assert(tower.target == nil, "target outside base range must be unreachable before the card")
+local before_attack = tower:GetBaseDamageMin()
+assert(rogue.grant(0, "long_range_volley", "range-card", "builder_start").ok)
+assert(real_technology.get(0).final.tower.attack_range_bonus == 500)
+assert(tower:GetAttackRange() == base_range + 500, "native modifier must project card range")
+assert(tower:GetBaseDamageMin() == before_attack + 800, "800 is the card attack bonus")
+assert(tower.survival_attack_range == base_range + 500)
+assert(require("systems/attack_range_display_service")._attack_range_for_test(tower) == base_range + 500)
+assert(require("systems/tower_targeting").valid(tower, enemy))
+assert(not require("systems/tower_targeting").valid(tower, remote))
+auto:OnIntervalThink()
+assert(tower.target == enemy, "the target in the new range must receive a real attack order")
+assert(tower:GetAcquisitionRange() == 0, "range bonuses must not re-enable attacks on resource trees")
+assert(rogue.grant(0, "long_range_volley", "range-card", "builder_start").idempotent)
+assert(tower:GetAttackRange() == base_range + 500, "retry must not double the bonus")
+local later_tower = create_unit("building_arrow_tower", Vector(0, 0, 0))
+later_tower.survival_building_id, later_tower.survival_is_building = "arrow_tower", true
+bus.emit(events.BUILDING_CREATED, {unit = later_tower, entindex = later_tower:entindex(),
+    player_id = 0, team = 2, building_id = "arrow_tower", definition = config.arrow_tower,
+    level = 1, base_attack_damage = 100})
+assert(later_tower:GetAttackRange() == base_range + 500, "new towers inherit the claimed card")
+assert(later_tower:GetBaseDamageMin() == 900)
+local other = create_unit("building_arrow_tower", Vector(0, 0, 0))
+other.survival_building_id, other.survival_player_id = "arrow_tower", 1
+bus.emit(events.BUILDING_CREATED, {unit = other, entindex = other:entindex(),
+    player_id = 1, team = 2, building_id = "arrow_tower", definition = config.arrow_tower,
+    level = 1, base_attack_damage = 100})
+assert(other:GetAttackRange() == base_range, "same-team players do not inherit another player's card")
+bus.handle_request(events.RESOURCE_TRY_SPEND_REQUEST, function() return {ok = true} end)
+local upgraded = bus.request(events.BUILDING_UPGRADE_REQUEST,
+    {building = tower, upgrade_mode = "one", silent_notification = true})
+assert(upgraded and upgraded.ok and pending, "upgrade must still be available after range grant")
+local granted_upgrade = pending; pending = nil; granted_upgrade.options.on_complete()
+assert(tower:GetAttackRange() == base_range + 500, "a later successful upgrade retains the bonus")
+assert(tower:GetAcquisitionRange() == 0)
+print("ROGUE_TOWER_RANGE_PASS: real grant, existing/new towers, native callback, extended target orders, display, ownership and idempotent retry")

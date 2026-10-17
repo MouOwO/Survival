@@ -3,6 +3,27 @@
     "Language" "schinese"
     "Tokens"
     {
+// BEGIN GENERATED FORMAL WAVE RANGE ALIASES
+        "npc_survival_range_armored_horned_large" "大型灰黑重甲角兽人"
+        "npc_survival_range_beast_green_large" "大型绿色恶魔/兽类近战怪"
+        "npc_survival_range_boss_blade_demon_wave_name_20" "波次20BOSS"
+        "npc_survival_range_boss_dreadlord_wave_name_10" "波次10BOSS"
+        "npc_survival_range_boss_dreadlord_wave_name_5" "波次5BOSS"
+        "npc_survival_range_boss_twinblade_demon_wave_name_15" "波次15BOSS"
+        "npc_survival_range_boss_twinblade_demon_wave_name_25" "波次25BOSS"
+        "npc_survival_range_boss_twinblade_demon_wave_name_30" "波次30BOSS"
+        "npc_survival_range_demon_purple_melee" "紫红色恶魔近战怪"
+        "npc_survival_range_dwarf_white_rifle" "白发矮人枪兵"
+        "npc_survival_range_golem_gray_large" "大型灰白岩石傀儡"
+        "npc_survival_range_orc_brown_large" "大型棕色獠牙兽人近战怪"
+        "npc_survival_range_orc_large_melee" "大型兽人/巨型近战怪"
+        "npc_survival_range_orc_longnose_large" "大型长鼻兽人近战怪"
+        "npc_survival_range_sea_beast_large" "大型绿色海兽持三叉戟怪"
+        "npc_survival_range_stitcher_large" "大型缝合屠夫怪"
+        "npc_survival_range_stitcher_small" "小型缝合屠夫怪"
+        "npc_survival_range_undead_red_mage_large" "大型红袍持盾亡灵法师"
+        "npc_survival_range_undead_red_mage_small" "小型红袍持盾亡灵法师"
+// END GENERATED FORMAL WAVE RANGE ALIASES
 
         "npc_dota_unit_building_research_lab" "研究所"
         "building_advanced_research_lab" "高级研究所"
@@ -99,7 +120,7 @@
 
 
 
-        "addon_game_name" "生存防守"
+        "addon_game_name" "孤城逐晓"
         "building_challenge" "挑战建筑"
         "DOTA_Tooltip_ability_ability_build_challenge" "建造挑战建筑"
         "DOTA_Tooltip_ability_ability_build_challenge_Description" "消耗100木材建造挑战建筑。需要先建成研究所，最多建造一座。"
@@ -347,6 +368,8 @@
         "DOTA_Tooltip_ability_ability_build_wall_Description" "在指定位置建造城墙。城墙整局只能建造一次，且可以被选中并继续升级。"
         "DOTA_Tooltip_ability_ability_building_blink" "移动建筑"
         "DOTA_Tooltip_ability_ability_building_blink_Description" "将选中的建筑移动到指定位置。"
+        "DOTA_Tooltip_ability_ability_wall_blink" "移动城墙"
+        "DOTA_Tooltip_ability_ability_wall_blink_Description" "将城墙移动到1000范围内的有效网格位置，保留当前等级和血量。冷却时间：120秒。"
         "DOTA_Tooltip_ability_ability_open_hero_altar" "召唤英雄"
         "DOTA_Tooltip_ability_ability_open_hero_altar_Description" "打开英雄选择界面。每位玩家只能召唤一个战斗英雄。"
         "DOTA_Tooltip_ability_ability_survival_agility_training" "敏捷训练"
@@ -733,6 +756,8 @@
         "DOTA_Tooltip_ability_ability_archive_social_ex_Description" "当前关卡≥N1。召唤1只怪物，击杀获得1张邀请函；本挑战每日最多获得10张，每局仅限一次。"
         "DOTA_Tooltip_ability_ability_archive_social_beast" "瑞兽赐福挑战"
         "DOTA_Tooltip_ability_ability_archive_social_beast_Description" "当前关卡≥N1。召唤1只怪物，击杀获得1张福签；本挑战每日最多获得10张，每局仅限一次。"
+        "DOTA_Tooltip_ability_ability_archive_social_wife" "老婆挑战"
+        "DOTA_Tooltip_ability_ability_archive_social_wife_Description" "当前关卡≥N1。召唤1只怪物，击杀获得1朵玫瑰；本挑战每日最多获得10朵，每局仅限一次。"
         "DOTA_Tooltip_ability_ability_archive_endless" "开启无尽模式"
         "DOTA_Tooltip_ability_ability_archive_endless_Description" "每波5只小怪，限时60秒，全部击杀立即进入下一波并获得积分。每10波为一档，每波积分为7n-6。每局仅能开启一次，超时结束本次无尽挑战。"
         "npc_archive_challenge_1" "存档挑战1"

@@ -236,7 +236,7 @@ function M.init(options)
         local building = city and event_bus.request(events.BUILDING_QUERY_REQUEST, {
             entindex = source,
         })
-        local result
+        local result, training
         if not building or building.building_id ~= "main_city"
             or tonumber(building.player_id) ~= player_id
             or not player_context.is_owned_by(player_id, city)
@@ -252,6 +252,13 @@ function M.init(options)
                 training_id = tostring(payload.training_id or ""),
                 source = "main_city_training_ui",
             }) or { ok = false, error = "训练请求未响应" }
+            -- Reconcile this accepted or rejected click against the same
+            -- authenticated city's current reservations. This is a per-click
+            -- receipt; ordinary HUD updates continue through refresh().
+            training = event_bus.request(events.WORKER_TRAINING_GET_REQUEST, {
+                player_id = player_id, team = building.team,
+                source_entindex = source,
+            })
         end
         options.send("ui_operation_result", player_id, {
             operation = "worker_train",
@@ -260,6 +267,7 @@ function M.init(options)
             success = result.ok and 1 or 0,
             queued = result.queued and 1 or 0,
             job_id = result.job_id,
+            training = training,
             error = result.ok and "" or operation_error(result.error, "训练失败"),
         })
         if result.ok then

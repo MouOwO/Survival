@@ -14,6 +14,7 @@ from unittest import mock
 
 from .csv_catalog import SOURCES, build, canonical, compile_catalog, rows
 from .ucoin_catalog import COMMERCE_SOURCES, U_COIN_PER_YUAN, compile_payment_catalog, ucoin_amount_fen
+from . import ucoin_recharge
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -47,7 +48,9 @@ class UcoinCatalogTests(unittest.TestCase):
         catalog = self.compile()
         products = {row['sku']: row for row in catalog['products']}
         ucoin = {row['sku']: row for row in rows(self.commerce_tables['commerce_products']) if row['currency'] == 'u_coin'}
-        self.assertEqual(len(ucoin), 24)
+        legacy={p['sku'] for p in compile_catalog(self.tables,self.reference)['products']}
+        self.assertEqual(set(products),legacy|set(ucoin)|{ucoin_recharge.SKU})
+        self.assertTrue(ucoin)
         self.assertEqual(U_COIN_PER_YUAN, 1000)
         self.assertEqual(catalog['u_coin_per_yuan'], 1000)
         self.assertEqual(catalog['exchange_rate'], 1000)
@@ -59,7 +62,9 @@ class UcoinCatalogTests(unittest.TestCase):
                 self.assertEqual(product['u_coin_price'], int(source['price']))
                 self.assertEqual(product['u_coin_per_yuan'], 1000)
                 self.assertEqual(product['exchange_rate'], 1000)
-                self.assertEqual(product['grants']['pricing'], {'u_coin_price': int(source['price']), 'u_coin_per_yuan': 1000})
+                pricing={'u_coin_price':int(source['price']),'u_coin_per_yuan':1000}
+                if source['product_type']=='bundle':pricing['original_u_coin_price']=int(source['source_original_price'])
+                self.assertEqual(product['grants']['pricing'],pricing)
         self.assertEqual(products['video_p033']['amount'], 10)
         self.assertEqual(products['video_p029']['amount'], 60)
         self.assertEqual(products['video_p001']['amount'], 120)
@@ -71,7 +76,9 @@ class UcoinCatalogTests(unittest.TestCase):
         merged = {row['sku']: row for row in self.compile()['products']}
         for product in old['products']:
             self.assertEqual(merged[product['sku']], product)
-        self.assertEqual(len(merged), len(old['products']) + 24)
+        cash_count=sum(p['currency']=='u_coin' for p in rows(self.commerce_tables['commerce_products']))
+        self.assertEqual(len(merged), len(old['products']) + cash_count + 1)
+        self.assertEqual(merged[ucoin_recharge.SKU],ucoin_recharge.product())
         self.assertEqual(merged['special_lottery_ticket_single']['amount'], 5000)
         self.assertFalse(merged['starter_bundle_v4']['enabled'])
 
@@ -83,7 +90,7 @@ class UcoinCatalogTests(unittest.TestCase):
         self.commerce_tables['commerce_products'] = replace_rows(
             self.commerce_tables['commerce_products'],
             lambda records: [row.update(currency='shop_points') for row in records if row['currency'] == 'u_coin'])
-        self.assertEqual(self.compile()['products'], compile_catalog(self.tables, self.reference)['products'])
+        self.assertEqual(self.compile()['products'], compile_catalog(self.tables, self.reference)['products']+[ucoin_recharge.product()])
 
     def test_original_ownership_limits_and_all_rewards_are_preserved(self):
         products = {row['sku']: row for row in self.compile()['products']}
@@ -94,6 +101,15 @@ class UcoinCatalogTests(unittest.TestCase):
             product = products[source['sku']]
             self.assertEqual(product['item_id'], source['ownership_id'])
             self.assertEqual(product['purchase_limit'], int(source['purchase_limit']))
+            if source['product_type']=='bundle':
+                expected=[row for row in rows(self.commerce_tables['commerce_bundle_members']) if row['bundle_sku']==source['sku'] and row['enabled']=='1']
+                self.assertEqual([(r['kind'],r['id'],r['quantity']) for r in product['grants']['lines']],
+                    [(r['member_type'],r['target_id'],int(r['quantity'])) for r in expected])
+                self.assertEqual(product['enabled'],source['enabled']=='1')
+                if not product['enabled']:
+                    self.assertEqual(product['effects'],{})
+                    self.assertEqual(product['grants']['items'],{})
+                continue
             expected = [row for row in rewards if row['sku'] == source['sku'] and row['enabled'] == '1']
             self.assertEqual(len(product['grants']['lines']), len(expected))
             for reward in expected:
@@ -198,7 +214,8 @@ class UcoinPackageTests(unittest.TestCase):
     def test_built_package_recompiles_to_the_same_catalog_and_hash(self):
         self.assertEqual(self.validate(), self.package)
         self.assertEqual(self.package['catalog_hash'], hashlib.sha256(canonical(self.package['catalog'])).hexdigest())
-        self.assertEqual(sum('u_coin_price' in row for row in self.package['catalog']['products']), 24)
+        expected={p['sku'] for p in rows(self.package['commerce_tables']['commerce_products']) if p['currency']=='u_coin'}
+        self.assertEqual({p['sku'] for p in self.package['catalog']['products'] if 'u_coin_price' in p},expected)
 
     def test_transfer_hash_catalog_tampering_and_catalog_hash_are_rejected(self):
         self.path.write_bytes(canonical(self.package))

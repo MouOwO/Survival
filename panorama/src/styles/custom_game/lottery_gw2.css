@@ -61,6 +61,90 @@
 #LotteryMainCanvas.LotteryGW2 VerticalScrollBar { width:10px; margin:5px 3px; background-image:url("file://{images}/custom_game/lottery_gw2_v1/scroll_track.png"); background-size:100% 100%; }
 #LotteryMainCanvas.LotteryGW2 VerticalScrollBar .ScrollThumb { min-height:30px; background-color:#8c886e; background-image:url("file://{images}/custom_game/lottery_gw2_v1/scroll_thumb.png"); background-size:100% 100%; border:0px; }
 
+/* Compact prize preview only. Draw scenes, results and history retain their layouts. */
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup {
+    width:1093px; height:fit-children; margin:0px 10px 12px; padding:0px;
+    flow-children:down; overflow:noclip; background-image:none;
+    background-color:#2d261d32; border:0px; box-shadow:none;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeBar {
+    width:1093px; height:32px; min-height:32px; margin:0px; padding:0px;
+    flow-children:none; overflow:clip; border:0px;
+    border-top:1px solid #b4a3833b; border-bottom:1px solid #211b1599;
+    background-image:none;
+    background-color:gradient(linear,0% 0%,0% 100%,from(#55493358),to(#2c241bcc));
+    box-shadow:none; transition-property:brightness; transition-duration:.1s;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeBar:hover { brightness:1.14; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeBar:active { brightness:.91; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeBar Label {
+    font-family:"Source Han Sans SC"; font-weight:normal; font-size:17px;
+    color:#dfd1ad; text-shadow:#00000070 0px 1px 2px 1.0;
+    white-space:nowrap; text-overflow:shrink; vertical-align:center;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeProbability { color:#b7b3a2; font-size:15px; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeTriangle,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeCollapseIcon {
+    width:18px; height:18px; horizontal-align:right; vertical-align:center;
+    margin-right:12px; background-color:transparent; border:0px;
+    color:#d8cca6; font-size:14px; text-align:center; transform-origin:50% 50%;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeBar.Collapsed .LotteryGW2PrizeTriangle,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeBar.Collapsed .LotteryGW2PrizeCollapseIcon { transform:rotateZ(-90deg); }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeGrid {
+    width:1014px; height:fit-children; margin:10px 0px 0px 14px; padding:0px;
+    flow-children:right-wrap; overflow:noclip;
+    background-image:none; background-color:transparent; border:0px;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot {
+    width:68px; height:68px; min-width:68px; min-height:68px;
+    margin:0px 8px 8px 0px; padding:0px; flow-children:none; overflow:noclip;
+    background-image:url("file://{images}/custom_game/lottery_gw2_v1/slot_background.png");
+    background-size:100% 100%; background-repeat:no-repeat; background-color:#30291f;
+    border:3px solid #756957c9; border-radius:0px; box-shadow:none;
+    transition-property:brightness,border; transition-duration:.1s;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot:hover { brightness:1.12; border-color:#d2bd8ad9; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot:active { brightness:.93; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.Selected { border-color:#e3cf95; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_N { border-color:#777469bd; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_R { border-color:#748176c9; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_SR { border-color:#7c8993c9; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_SSR { border-color:#a18f68ce; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_UR { border-color:#a08072ce; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_R:hover,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_SR:hover,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_SSR:hover,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_UR:hover { border-color:#d2bd8ad9; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot .LotteryRewardIcon,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot .LotteryGW2PrizeIcon {
+    position:2px 2px 0px; width:64px; height:64px;
+    margin:0px; padding:0px; background-image:none; background-color:transparent; border:0px;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeOwned {
+    position:0px 0px 0px; width:fit-children; min-width:20px; max-width:62px; height:18px;
+    horizontal-align:right; vertical-align:top; margin:1px 2px 0px 0px; padding:0px 2px;
+    font-family:"Source Han Sans SC"; font-weight:normal; font-size:12px;
+    text-align:right; color:#eee5cf; background-color:#151510a8;
+    white-space:nowrap; text-overflow:shrink; text-shadow:#000000 0px 1px 2px 1.0;
+    z-index:3;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSelected {
+    position:0px 0px 0px; width:68px; height:68px; margin:0px; padding:0px;
+    background-image:none; background-color:transparent; border:2px solid #f2dfaa;
+    box-shadow:none; opacity:0; z-index:2;
+    transition-property:opacity; transition-duration:.1s;
+}
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot:hover .LotteryGW2PrizeSelected,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.Selected .LotteryGW2PrizeSelected { opacity:1; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot .RHRewardName,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot .LotteryRewardName,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot .LotteryRewardQuality { visibility:collapse; }
+
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeFrame { border:2px solid #8b8066c9; background-color:transparent; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_SSR .LotteryGW2PrizeFrame { border-color:#b7a26bce; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot.LotteryQuality_UR .LotteryGW2PrizeFrame { border-color:#b0928fce; }
+
 /* Keep prize artwork and rarity frames without quantity badges or dark plates. */
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot { background-image:none; background-color:transparent; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeFace > .LotteryGW2Art,

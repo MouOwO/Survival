@@ -11,7 +11,13 @@
         var parent = options.parent, root = options.root || parent, prefix = options.idPrefix || "ArchiveSharedTooltip";
         var life = U.Lifecycle(), disposed = false, showEpoch = 0, hideEpoch = 0, anchor = null;
         var currentItem = null, currentCategory = "", elements = {}, pieces = {}, panel, dismiss;
-        var surfaceWidth = 320, bodyWidth = 276, padding = 24, measuredHeight = 198, fitScale = 1;
+        var compact = options.compact === true;
+        var rarityColors = {UR:"#ef5350",SSR:"#f5c65e",SR:"#b680ee",R:"#74c8f2",N:"#8fc47b"};
+        var surfaceWidth = compact ? 260 : 320, insetX = compact ? 8 : 22;
+        var insetTop = compact ? 6 : 19, verticalGutter = compact ? 12 : 41;
+        var bodyWidth = surfaceWidth - insetX * 2, padding = 24;
+        var minimumHeight = compact ? 180 : 198, measuredHeight = minimumHeight, fitScale = 1;
+        var hostWidth = surfaceWidth + padding * 2;
         function valid(node) { return node && (!node.IsValid || node.IsValid()); }
         function alive() { return !disposed && valid(parent) && valid(root) && valid(panel) && (!options.isAlive || options.isAlive()); }
         function active() { return alive() && (!options.isActive || options.isActive()); }
@@ -62,24 +68,35 @@
         }
         panel = $.CreatePanel("Panel", parent, prefix);
         panel.AddClass("ArchiveSharedTooltipHost"); panel.hittest=false; panel.hittestchildren=true; panel.visible=false;
-        rect(panel,0,0,368,246);
-        var shadow=make("Panel",panel,"Shadow","ArchiveSharedTooltipShadow"); rect(shadow,24,24,320,198);
-        var backing=nineFrame("Backing","tooltip_reference_clean",{file:"file://{images}/custom_game/gw2_tooltip_v1/background.png",size:[354,103],nine_slice_ltrb:[3,3,3,3]}); backing.AddClass("ArchiveSharedTooltipBacking"); backing.Resize(24,24,320,198);
-        var frame=nineFrame("Frame","tooltip_frame"); frame.AddClass("ArchiveSharedTooltipFrame"); frame.Resize(24,24,320,198);
-        var surface=make("Panel",panel,"Surface","ArchiveSharedTooltipSurface"); rect(surface,24,24,320,198);
+        rect(panel,0,0,hostWidth,measuredHeight+padding*2);
+        var shadow=make("Panel",panel,"Shadow","ArchiveSharedTooltipShadow"); rect(shadow,padding,padding,surfaceWidth,measuredHeight);
+        var backing=nineFrame("Backing","tooltip_reference_clean",{file:"file://{images}/custom_game/gw2_tooltip_v1/background.png",size:[354,103],nine_slice_ltrb:[3,3,3,3]}); backing.AddClass("ArchiveSharedTooltipBacking"); backing.Resize(padding,padding,surfaceWidth,measuredHeight);
+        var frame=nineFrame("Frame","tooltip_frame"); frame.AddClass("ArchiveSharedTooltipFrame"); frame.Resize(padding,padding,surfaceWidth,measuredHeight);
+        var surface=make("Panel",panel,"Surface","ArchiveSharedTooltipSurface"); rect(surface,padding,padding,surfaceWidth,measuredHeight);
         surface.hittest=true; surface.hittestchildren=true; style(surface,{flowChildren:"none",overflow:"clip"});
-        var viewport=make("Panel",surface,"Viewport","ArchiveSharedTooltipViewport"); rect(viewport,22,19,bodyWidth+16,157);
+        var viewport=make("Panel",surface,"Viewport","ArchiveSharedTooltipViewport"); rect(viewport,insetX,insetTop,bodyWidth+(compact?8:16),measuredHeight-verticalGutter);
         viewport.hittest=true; viewport.hittestchildren=true; style(viewport,{flowChildren:"none",overflow:"squish scroll"});
-        var body=make("Panel",viewport,"Body","ArchiveSharedTooltipBody"); rect(body,0,0,276,160);
+        var body=make("Panel",viewport,"Body","ArchiveSharedTooltipBody"); rect(body,0,0,bodyWidth,160);
         body.hittestchildren=true; style(body,{height:"fit-children",flowChildren:"down",overflow:"noclip"});
         ["Title","State","EffectCaption","Effect","Condition"].forEach(function (role) { text(body,role); });
-        var metric=make("Panel",body,"Metric","ArchiveSharedTooltipMetric"); rect(metric,0,0,276,27); style(metric,{flowChildren:"none",marginBottom:"4px"});
+        var metric=make("Panel",body,"Metric","ArchiveSharedTooltipMetric"); rect(metric,0,0,bodyWidth,27); style(metric,{flowChildren:"none",marginBottom:compact?"0px":"4px"});
         var caption=text(metric,"MetricCaption"), quantity=text(metric,"Quantity"), colors=D.tooltip.text_colors;
-        rect(caption,0,0,162,27); style(caption,{fontSize:"17px",color:colors.caption,textAlign:"left"});
-        rect(quantity,162,0,114,27); style(quantity,{position:"0px 0px 0px",width:"fit-children",maxWidth:"114px",horizontalAlign:"right",fontSize:"17px",color:colors.quantity,textAlign:"right"});
+        rect(caption,0,0,bodyWidth-114,27); style(caption,{fontSize:"17px",color:colors.caption,textAlign:"left"});
+        rect(quantity,bodyWidth-114,0,114,27); style(quantity,{position:"0px 0px 0px",width:"fit-children",maxWidth:"114px",horizontalAlign:"right",fontSize:"17px",color:colors.quantity,textAlign:"right"});
         var separator=make("Image",body,"Separator","ArchiveSharedTooltipSeparator");
-        separator.SetImage(D.assets.tooltip_separator.file); separator.SetScaling("stretch-to-fit"); rect(separator,0,0,276,4); style(separator,{marginBottom:"8px"});
+        separator.SetImage(D.assets.tooltip_separator.file); separator.SetScaling("stretch-to-fit"); rect(separator,0,0,bodyWidth,4); style(separator,{marginBottom:compact?"6px":"8px"});
         body.MoveChildBefore(separator,elements.EffectCaption);
+        // Collection authority is opt-in: other archive tooltip layouts and
+        // their unlock/progress semantics retain their existing content.
+        var rarityLine = options.collectionRarity === true ? text(body,"Rarity") : null;
+        if (rarityLine) { rarityLine.visible=false; body.MoveChildBefore(rarityLine,separator); }
+        function probabilityText(value) {
+            if (value===undefined || value===null || typeof value==="boolean" || String(value).trim()==="") return "";
+            var probability=Number(value);
+            if (!isFinite(probability) || probability<0 || probability>1) return "";
+            var percent=probability*100;
+            return percent>0 && percent<0.01 ? "<0.01%" : percent.toFixed(2)+"%";
+        }
 
         function hide() {
             showEpoch++; hideEpoch++; life.Cancel();
@@ -92,10 +109,21 @@
         function queueHide() {
             if (!active() || !panel.visible) return;
             var epoch=++hideEpoch;
-            life.Later(.15,function () { if (active() && epoch===hideEpoch) hide(); });
+            life.Later(.15,function () {
+                if (!active() || epoch!==hideEpoch) return;
+                if (tooltipOverflows() && (cursorInside(anchor) || cursorInside(surface))) return;
+                hide();
+            });
         }
         function tooltipRect(node) { var at=node.GetPositionWithinWindow(); return {x:at.x,y:at.y,width:node.actuallayoutwidth*fitScale,height:node.actuallayoutheight*fitScale}; }
-        dismiss=cfg.SurvivalTooltipDismiss.Create({panel:panel,surface:surface,getRect:tooltipRect,hide:hide,isAlive:alive,isVisible:function () { return active() && panel.visible; }});
+        function tooltipOverflows() { return alive() && body.actuallayoutheight>viewport.actuallayoutheight+1; }
+        function cursorInside(node) {
+            if (!valid(node) || !GameUI.GetCursorPosition) return false;
+            var at=GameUI.GetCursorPosition(), box=tooltipRect(node);
+            return at && at[0]>=box.x && at[0]<box.x+box.width && at[1]>=box.y && at[1]<box.y+box.height;
+        }
+        dismiss=cfg.SurvivalTooltipDismiss.Create({panel:panel,surface:surface,getRect:tooltipRect,hide:hide,isAlive:alive,allowTooltipHover:tooltipOverflows,isVisible:function () { return active() && panel.visible; }});
+        surface.SetPanelEvent("onmouseover",function () { if (tooltipOverflows()) hideEpoch++; else dismiss.Dismiss(); });
         surface.SetPanelEvent("onmouseout",queueHide);
         function getBounds() {
             var value=options.getBounds ? options.getBounds() : {width:1200,height:900};
@@ -114,10 +142,15 @@
             });
             var maximum=Number(typeof options.maxHeight==="function" ? options.maxHeight(bounds) : options.maxHeight) || 778;
             var maximumSurface=Math.max(1,maximum-padding*2);
-            measuredHeight=Math.max(Math.min(198,maximumSurface),Math.min(maximumSurface,Math.ceil(contentHeight)+41));
-            var info={anchor:{x:(at.x-cp.x)/sx,y:(at.y-cp.y)/sy,width:(anchor.actuallayoutwidth||0)/sx,height:(anchor.actuallayoutheight||0)/sy,panel:anchor},bounds:bounds,width:368,height:measuredHeight+48,surfaceWidth:surfaceWidth,surfaceHeight:measuredHeight,padding:padding};
+            measuredHeight=Math.max(Math.min(minimumHeight,maximumSurface),Math.min(maximumSurface,Math.ceil(contentHeight)+verticalGutter));
+            var info={anchor:{x:(at.x-cp.x)/sx,y:(at.y-cp.y)/sy,width:(anchor.actuallayoutwidth||0)/sx,height:(anchor.actuallayoutheight||0)/sy,panel:anchor},bounds:bounds,width:hostWidth,height:measuredHeight+padding*2,surfaceWidth:surfaceWidth,surfaceHeight:measuredHeight,padding:padding};
             var origin;
             if (options.position) origin=options.position(info);
+            else if (currentCategory==="commerce_goods") {
+                var goodsX=info.anchor.x+info.anchor.width+10;
+                if(goodsX+surfaceWidth>bounds.width-padding)goodsX=info.anchor.x-surfaceWidth-10;
+                origin={x:Math.max(0,Math.min(bounds.width-hostWidth,goodsX-padding)),y:Math.max(0,Math.min(bounds.height-measuredHeight-padding*2,info.anchor.y-padding))};
+            }
             else {
                 // Preserve the archive's existing row-relative placement.
                 var tx=info.anchor.x+Math.min(anchor.actuallayoutwidth||745,745)-340;
@@ -125,10 +158,10 @@
                 var ty=Math.max(80,Math.min(bounds.height-35-measuredHeight,info.anchor.y+72));
                 origin={x:tx-24,y:ty-24};
             }
-            rect(panel,origin.x,origin.y,368,measuredHeight+48);
-            backing.Resize(24,24,320,measuredHeight); frame.Resize(24,24,320,measuredHeight);
-            rect(surface,24,24,320,measuredHeight); rect(shadow,24,24,320,measuredHeight);
-            style(viewport,{height:Math.max(1,measuredHeight-41)+"px"});
+            rect(panel,origin.x,origin.y,hostWidth,measuredHeight+padding*2);
+            backing.Resize(padding,padding,surfaceWidth,measuredHeight); frame.Resize(padding,padding,surfaceWidth,measuredHeight);
+            rect(surface,padding,padding,surfaceWidth,measuredHeight); rect(shadow,padding,padding,surfaceWidth,measuredHeight);
+            style(viewport,{height:Math.max(1,measuredHeight-verticalGutter)+"px"});
         }
         function trackAnchor(epoch, origin) {
             if (!options.watchAnchor) return;
@@ -142,24 +175,39 @@
         function show(item, category, card, onlyEffect) {
             if (!active() || !valid(card) || !dismiss.CanShow(card)) return false;
             hide(); anchor=card; currentItem=item; currentCategory=category; card.AddClass("ArchiveHovered");
+            if (viewport.ScrollToTop) viewport.ScrollToTop();
             var state=S.State(item,category), name=options.categoryName ? options.categoryName(category) : category;
             elements.Title.text=String(item.name||"");
-            elements.State.text=onlyEffect ? "" : name+" · "+(state===null ? "状态待同步" : state ? (["shadow","pet","fishing","friend","ex","beast","points","shop"].indexOf(category)>=0 ? "已拥有" : "已解锁") : "未解锁");
+            elements.State.text=onlyEffect ? "" : name+" · "+(state===null ? "状态待同步" : state ? (["shadow","pet","fishing","friend","ex","wife","beast","points","commerce_goods","shop"].indexOf(category)>=0 ? "已拥有" : "已解锁") : "未解锁");
+            var rarityColor=colors.caption, titleColor=colors.title;
+            if (rarityLine) {
+                var rarityParts=[],quality=String(item.quality||"").trim().toUpperCase();
+                if (!onlyEffect && ["ex","friend","wife","beast"].indexOf(category)>=0) {
+                    if (Object.prototype.hasOwnProperty.call(rarityColors,quality)) { rarityParts.push("品质 "+quality); rarityColor=rarityColors[quality]; titleColor=rarityColor; }
+                    if (Number(item.draw_enabled)===0) rarityParts.push("暂不参与抽取");
+                    else { var chance=probabilityText(item.draw_probability); if (chance) rarityParts.push("当前抽取概率 "+chance); }
+                }
+                rarityLine.text=rarityParts.join(" · "); rarityLine.visible=rarityParts.length>0;
+            }
             elements.EffectCaption.text="道具效果";
             var description=String(item.description||"服务端未提供效果说明"), effect=elements.Effect;
             effect.html=!!A.FormatEffects;
             effect.text=A.FormatEffects ? A.FormatEffects(description,category==="fragment" ? (item.level===undefined ? 0 : item.level) : undefined,item.id ? state : undefined) : description;
             var details=item.unlock_condition||item.condition_text||"";
+            if(/^vip_privilege_/.test(String(item.id||"")))details=String(details).replace("手动免费领取一次","达标自动赠送一次");
             if (category==="work" || category==="building") details+=(details?"\n":"")+(Number(item.completed)===1 ? "已达到最高等级" : "点击"+(category==="building"?"升级":"激活")+" · 消耗 "+item.cost+(category==="building"?" 信仰值":" 软妹币"));
             if (category==="titles") details+=(details?"\n":"")+(Number(item.equipped)===1 ? "当前已穿戴 · 点击恢复最高档自动选择" : state ? "点击穿戴称号" : "达成条件后解锁称号");
             if (category==="fragment" && item.level!==undefined) details+=(details?"\n":"")+"神兵等级 LV"+item.level;
             var source=options.currencySourceText && options.currencySourceText(category,item);
             if (["building","work","starjoy_points"].indexOf(category)>=0 && source) details+=(details?"\n":"")+source;
             if (category==="map_level" && item.count!==undefined) details+=(details?"\n":"")+"累计有效在线 "+item.count+" 分钟";
+            if(item.availability_note)details+=(details?"\n":"")+String(item.availability_note);
             elements.Condition.text=details; elements.Condition.visible=!!details;
             metric.visible=!onlyEffect; caption.text=S.Metric(item,category); quantity.text=S.Quantity(item,category);
-            ["Title","State","EffectCaption","Effect","Condition"].forEach(function (role) {
-                style(elements[role],{width:bodyWidth+"px",height:"fit-children",ignoreParentFlow:"false",fontSize:(role==="Title"?22:role==="State"||role==="EffectCaption"?15:17)+"px",color:role==="Title"?colors.title:role==="Effect"?colors.body:role==="State"?colors.state:colors.caption,margin:"0px 0px "+(role==="Title"?6:role==="State"?8:role==="Effect"?8:4)+"px",whiteSpace:"normal",textOverflow:"clip"});
+            var textRoles=["Title","State","EffectCaption","Effect","Condition"]; if(rarityLine)textRoles.push("Rarity");
+            textRoles.forEach(function (role) {
+                var gap=compact ? (role==="State"||role==="Rarity"?6:role==="EffectCaption"?3:4) : (role==="Title"?6:role==="State"||role==="Rarity"?8:role==="Effect"?8:4);
+                style(elements[role],{width:bodyWidth+"px",height:"fit-children",ignoreParentFlow:"false",fontSize:(role==="Title"?22:role==="State"||role==="Rarity"||role==="EffectCaption"?15:17)+"px",color:role==="Title"?titleColor:role==="Effect"?colors.body:role==="State"?colors.state:role==="Rarity"?rarityColor:colors.caption,margin:"0px 0px "+gap+"px",whiteSpace:"normal",textOverflow:"clip"});
             });
             body.style.height="fit-children"; panel.visible=true;
             var epoch=showEpoch; position(epoch); dismiss.Shown(card);

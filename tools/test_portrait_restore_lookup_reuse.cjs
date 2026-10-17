@@ -14,7 +14,7 @@ function run(source){
       native:native?{...native.values}:null,group:group?{...group.values}:null,
       mode:state.mode,key:state.key,entity:state.entity,sceneActive:!!state.scene,
       setUnits:t.metrics.setUnit.length,econHeroes:t.metrics.econHero.length,econItems:t.metrics.econItem.length,
-      builderMaps:t.metrics.created.filter(call=>call.id==='SurvivalBuilderIoPortraitScene').length,
+      builderMaps:t.metrics.created.filter(call=>call.id==='SurvivalBuilderIoPortraitSceneV2Alpha').length,
       parent:t.overlay.GetParent()===t.context?'home':'native'});
   }
   const builder=version=>({entindex:7,refresh_version:version,model_asset_id:'builder_io_benevolent_companion',
@@ -29,7 +29,7 @@ function run(source){
   const stableCalls=[];
   for(let i=0;i<40;i++){t.api.portraitHide('stable_main_city');stableCalls.push(reads().filter(id=>id==='PortraitGroup').length);}
   assert.equal(t.native().values.opacity,'0.35');assert.equal(t.metrics.setUnit.length,0);assert.equal(t.metrics.econHero.length,0);assert.equal(t.metrics.econItem.length,0);
-  assert.equal(t.metrics.created.filter(call=>call.id==='SurvivalBuilderIoPortraitScene').length,1);
+  assert.equal(t.metrics.created.filter(call=>call.id==='SurvivalBuilderIoPortraitSceneV2Alpha').length,1);
   capture(t,'stable_city');
   t.native().values.opacity='0.01';t.api.portraitHide('external_legacy_leaf');
   assert.equal(t.native().values.opacity,'1');capture(t,'legacy_leaf_same_entity');
@@ -57,7 +57,7 @@ function run(source){
   next.actuallayoutwidth=128;t.api.portraitHide('layout_recovers_same_entity');
   assert.equal(next.values.opacity,'1');capture(t,'layout_recovers');
   t.select(7,'npc_survival_builder_proxy');t.api.updateSnapshot(builder(2));
-  assert.equal(t.metrics.created.filter(call=>call.id==='SurvivalBuilderIoPortraitScene').length,1,'Hide lookup reuse cannot recreate the independent map Scene');
+  assert.equal(t.metrics.created.filter(call=>call.id==='SurvivalBuilderIoPortraitSceneV2Alpha').length,1,'Hide lookup reuse cannot recreate the independent map Scene');
   assert.equal(t.metrics.econHero.length,0);assert.equal(t.metrics.econItem.length,0);assert.equal(t.metrics.setUnit.length,0);
   assert.equal(t.api.portraitState().entity,7);capture(t,'return_builder_no_reload');
   t.setMulti(true);t.api.cosmeticPortraitSentinel();assert.equal(t.overlay.values.visibility,'collapse');capture(t,'multi');

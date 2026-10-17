@@ -1,6 +1,6 @@
 /* Isolated lottery snapshots; every outbound event remains an in-memory record. */
 'use strict';
-const lotteryParams=new URLSearchParams(location.search),lotteryMode=lotteryParams.get('state')||'normal',lotteryStart=lotteryParams.get('pool')||'map';
+const lotteryParams=new URLSearchParams(location.search),lotteryMode=lotteryParams.get('state')||window.LOTTERY_GW2_DEFAULT_MODE||'normal',lotteryStart=lotteryParams.get('pool')||'map';
 window.previewState={page:'lottery',state:lotteryMode,pool:lotteryStart,ready:false,notGameCapture:true,fixtureNote:LOTTERY_GW2_FIXTURE.runtimeValues};
 let lotterySequence=100,lotteryRequestCursor=0;
 window.lotteryPreviewSnapshot=(poolId,scope='main',requestId)=>{

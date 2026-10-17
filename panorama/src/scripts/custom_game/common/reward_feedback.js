@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     var cfg = GameUI.CustomUIConfig(), ui = cfg.SurvivalUI || (cfg.SurvivalUI = {});
-    if (ui.RewardFX && ui.RewardFX.version === "1.0.0") return;
+    if (ui.RewardFX && ui.RewardFX.version === "1.2.1") return;
     var layout = "file://{resources}/layout/custom_game/common/reward_feedback.xml";
     var duration = 1.6, historyLimit = 64, nextId = 0;
 
@@ -40,8 +40,71 @@
         host.style.width = w + "px";
         host.style.height = h + "px";
     }
+    function createGlass(root, options) {
+        var host = null, sweep = null, anchor = null, job = null, serial = 0, dead = false, alternate = false;
+        var seen = Object.create(null), order = [], id = ++nextId;
+        function clear() {
+            serial++;
+            if (job !== null && $.CancelScheduled) $.CancelScheduled(job);
+            job = null;
+            if (valid(anchor)) anchor.RemoveClass("RewardGlassActive");
+            if (valid(host)) { host.visible = false; host.DeleteAsync(0); }
+            host = sweep = anchor = null;
+        }
+        return {
+            Play: function (event) {
+                if (dead || !valid(root)) { clear(); return false; }
+                event = event || {};
+                var key = event.key === undefined || event.key === null ? "" : String(event.key);
+                if (!key || key.length > 256 || seen[key] || !valid(event.anchor)) return false;
+                serial++;
+                if (job !== null && $.CancelScheduled) $.CancelScheduled(job);
+                job = null;
+                try {
+                    if (!valid(host) || !valid(sweep) || anchor !== event.anchor) {
+                        clear();
+                        anchor = event.anchor;
+                        // Daily render replaces the just-claimed card before
+                        // its first layout. Like the collection draw, attach
+                        // the glass to that card and let percentage sizing
+                        // follow layout, Fit, scrolling and UI scale natively.
+                        host = $.CreatePanel("Panel", anchor, "SurvivalRewardGlass" + id);
+                        host.AddClass("RewardGlassSurface");
+                        host.style.position = "0px 0px 0px";
+                        host.style.width = host.style.height = "100%";
+                        host.hittest = host.hittestchildren = false;
+                        sweep = $.CreatePanel("Panel", host, "");
+                        sweep.AddClass("RewardGlassSweep");
+                        sweep.hittest = sweep.hittestchildren = false;
+                    }
+                    var stamp = serial;
+                    alternate = !alternate;
+                    host.SetHasClass("RewardGlassPlayA", alternate);
+                    host.SetHasClass("RewardGlassPlayB", !alternate);
+                    anchor.AddClass("RewardGlassActive");
+                    host.visible = true;
+                    // One CSS reflection and one cleanup timer. There is no
+                    // zero-size layout race or per-frame geometry polling.
+                    job = $.Schedule(0.65, function () {
+                        if (stamp !== serial) return;
+                        job = null;
+                        clear();
+                    });
+                    seen[key] = true; order.push(key);
+                    if (order.length > historyLimit) delete seen[order.shift()];
+                    return true;
+                } catch (error) { clear(); return false; }
+            },
+            Clear: clear,
+            Dispose: function () {
+                if (dead) return;
+                dead = true; clear(); root = null; seen = Object.create(null); order = [];
+            }
+        };
+    }
     function create(root, options) {
         options = options || {};
+        if (options.channel === "daily") return createGlass(root, options);
         var host = null, particle = null, title = null, detail = null;
         var job = null, serial = 0, dead = false, alternate = false, pendingKey = null;
         var seen = Object.create(null), order = [], id = ++nextId;
@@ -141,5 +204,5 @@
             }
         };
     }
-    ui.RewardFX = { version: "1.0.0", Create: create };
+    ui.RewardFX = { version: "1.2.1", Create: create };
 })();

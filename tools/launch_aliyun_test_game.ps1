@@ -21,6 +21,71 @@ function Invoke-Check([string]$Script, [string]$Action) {
     return $result
 }
 
+function Get-HammerBackendStatus {
+    $lines = @(& (Join-Path $PSScriptRoot 'setup_hammer_backend.ps1') -Action Status -AsJson)
+    $status = ($lines -join "`n") | ConvertFrom-Json
+    if ($status.ok -ne $true -or $status.task_installed -isnot [bool] -or
+        $status.task_enabled -isnot [bool] -or $status.helper_running -isnot [bool] -or
+        $status.task_state -notin @('Unknown','Disabled','Queued','Ready','Running','not_installed')) {
+        throw 'hammer_backend_status_invalid'
+    }
+    return $status
+}
+
+function Restore-HammerBackend($Previous) {
+    if ($Previous.task_installed -and $Previous.task_enabled) {
+        $global:LASTEXITCODE = 0
+        & (Join-Path $PSScriptRoot 'setup_hammer_backend.ps1') -Action Start | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'hammer_backend_resume_failed' }
+    } else {
+        # Restore a previously live standalone helper without installing or
+        # enabling a task. Only remove this addon's validated graceful marker.
+        $runner = Join-Path $PSScriptRoot 'run_hammer_backend.ps1'
+        $powershell = Join-Path $env:SystemRoot 'System32/WindowsPowerShell/v1.0/powershell.exe'
+        if (-not (Test-Path -LiteralPath $runner -PathType Leaf) -or
+            -not (Test-Path -LiteralPath $powershell -PathType Leaf)) { throw 'hammer_backend_runner_missing' }
+        $stopFile = [IO.Path]::GetFullPath((Join-Path $repo 'output/hammer_backend/bridge.stop'))
+        $rootPrefix = [IO.Path]::GetFullPath($repo).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+        if (-not $stopFile.StartsWith($rootPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'hammer_backend_stop_path_invalid'
+        }
+        $cursor = $stopFile
+        while ($cursor) {
+            if (Test-Path -LiteralPath $cursor) {
+                $item = Get-Item -LiteralPath $cursor -Force
+                if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                    throw 'hammer_backend_stop_path_invalid'
+                }
+            }
+            $cursor = [IO.Path]::GetDirectoryName($cursor)
+        }
+        if (Test-Path -LiteralPath $stopFile) {
+            $marker = Get-Item -LiteralPath $stopFile -Force
+            if ($marker.PSIsContainer -or $marker.Length -gt 16 -or
+                (Get-Content -LiteralPath $stopFile -Raw).Trim() -ne 'stop') {
+                throw 'hammer_backend_stop_marker_invalid'
+            }
+            Remove-Item -LiteralPath $stopFile -Force
+        }
+        Start-Process -FilePath $powershell -WorkingDirectory $repo -WindowStyle Hidden -ArgumentList @(
+            '-NoLogo','-NoProfile','-NonInteractive','-WindowStyle','Hidden','-ExecutionPolicy','Bypass',
+            '-File', ('"' + $runner + '"')
+        ) | Out-Null
+    }
+    # Starting a task or process only confirms the request. Both paths must
+    # publish a fresh live helper heartbeat before restoration is confirmed.
+    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    do {
+        $restored = Get-HammerBackendStatus
+        if ($restored.helper_running) { break }
+        Start-Sleep -Milliseconds 250
+    } while ([DateTime]::UtcNow -lt $deadline)
+    if (-not $restored.helper_running) { throw 'hammer_backend_resume_unconfirmed' }
+    Write-Host 'HAMMER_BACKEND_RESUMED: the previous automatic helper was restored.'
+}
+
+$resumeHammer = $null
+$launchFailed = $false
 Push-Location $repo
 try {
     if ($ExpectedPlayers -gt 1) {
@@ -48,6 +113,24 @@ try {
         throw ('SSH connection: ' + $connectionError + $hint)
     }
     Write-Host 'ECS tunnel ready: 127.0.0.1:8765'
+    if ($ExpectedPlayers -eq 1) {
+        try { $hammer = Get-HammerBackendStatus }
+        catch { throw 'HAMMER_BACKEND_STATUS_FAILED: the local automatic helper could not be identified. Run tools/setup_hammer_backend.ps1 -Action Status before retrying; the current game was preserved.' }
+        if ($hammer.helper_running -or ($hammer.task_installed -and $hammer.task_enabled -and
+            $hammer.task_state -in @('Running','Queued'))) {
+            # Remember the owned helper's prior state before Stop, which can
+            # disable a task or write STOP even if draining later fails.
+            $resumeHammer = $hammer
+            try {
+                $global:LASTEXITCODE = 0
+                & (Join-Path $PSScriptRoot 'setup_hammer_backend.ps1') -Action Stop | Out-Null
+                if ($LASTEXITCODE -ne 0) { throw 'bridge_stop_failed' }
+            } catch {
+                throw 'HAMMER_BACKEND_PAUSE_FAILED: the automatic helper could not release the developer console. No game was started or credentials applied by this launcher. Resolve tools/setup_hammer_backend.ps1 -Action Stop before retrying.'
+            }
+            Write-Host 'HAMMER_BACKEND_PAUSED_FOR_AUTH: the automatic helper released the developer console for this launcher.'
+        }
+    }
     $games = @(Get-Process -Name dota2 -ErrorAction SilentlyContinue)
     $startedGame = $games.Count -eq 0
     if ($startedGame) {
@@ -147,6 +230,26 @@ try {
     Write-Host 'GAME_AUTH_READY: backend credential applied; existing profiles preserved.'
     Write-Host 'In the party waiting room, the host must click Start loading after everyone joins.'
     Write-Host 'No password is required. The SSH tunnel remains active after this window closes.'
+} catch {
+    $launchFailed = $true
+    throw
 } finally {
-    Pop-Location
+    try {
+        if ($resumeHammer) {
+            try { Restore-HammerBackend $resumeHammer }
+            catch {
+                $resumeHint = if ($resumeHammer.task_installed -and $resumeHammer.task_enabled) {
+                    'Run tools/setup_hammer_backend.ps1 -Action Start to restore it.'
+                } else {
+                    'Check this addon''s output/hammer_backend/bridge.stop first; do not clear an invalid marker blindly. Then run tools/run_hammer_backend.ps1 to restore the standalone helper; its scheduled task remains disabled or uninstalled.'
+                }
+                $message = 'HAMMER_BACKEND_RESUME_FAILED: the previous automatic helper could not be restored. The game, profiles and SSH tunnel were preserved. ' + $resumeHint
+                Write-Host $message
+                # A restore error must not replace the original launch/auth error.
+                if (-not $launchFailed) { throw $message }
+            }
+        }
+    } finally {
+        Pop-Location
+    }
 }

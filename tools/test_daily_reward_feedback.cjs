@@ -1,9 +1,11 @@
 const assert=require('node:assert/strict');
 const {createHarness}=require('./tests/fixtures/menus_v10_harness.cjs');
 
-function setup(overrides={}){
+function setup(overrides={},realFX=false){
  const h=createHarness(),plays=[];let cleared=0,disposed=0;
- h.cfg.SurvivalUI.RewardFX={Create(root,options){
+ for(const source of ['archive_theme_tokens.js','archive_parchment_data.js','archive_handoff_180de7e38b.js','archive_v10_semantics.js','common/archive_tooltip.js'])h.load(source);
+ if(realFX)h.load('common/reward_feedback.js');
+ else h.cfg.SurvivalUI.RewardFX={Create(root,options){
   assert.equal(root.id,'DailyGW2Canvas');assert.equal(options.channel,'daily');
   return {Play(value){assert(value.anchor.IsValid(),'feedback uses the newly rendered card');plays.push(value);},Clear(){cleared++;},Dispose(){disposed++;}};
  }};
@@ -62,4 +64,26 @@ function setup(overrides={}){
  const t=setup();t.claim();t.send({sequence:2,today:25005,period_id:'period-2',count:4});assert.equal(t.plays.length,0,'day rollover cannot confirm the previous request');
  t.h.assertCleanDispose(t.h.cfg.SurvivalDaily);assert(t.disposed>0);
 }
-console.log('DAILY_REWARD_FEEDBACK_PASS: authoritative success, failed/pending claims, premium-only claims, makeup, duplicates, rollover, hidden updates and disposal');
+// Exercise the actual production effect module together with the active daily
+// controller. A stubbed Play call previously passed while native layout could
+// discard the real shine on the newly replaced claimed card.
+{
+ const t=setup({},true),api=t.h.cfg.SurvivalDaily;
+ function effects(node=t.h.root){return node.Children().flatMap(child=>[...(child.BHasClass('RewardGlassSurface')?[child]:[]),...effects(child)]);}
+ assert.equal(effects().length,0);t.claim();assert.equal(effects().length,0);
+ t.send({sequence:2,pending:1,claim_result:{target_day:25004,ok:true,pending:true}});assert.equal(effects().length,0);
+ t.send({sequence:3,claim_result:{target_day:25004,ok:false,error:'保存失败'}});assert.equal(effects().length,0,'Rejected claims do not add even a hidden effect panel');
+ const oldCard=t.h.nodes.DailyGW2Day_4;t.claim();
+ t.send({sequence:4,count:4,ordinary_status:'claimed',calendar28:t.snapshot.calendar28.map((row,index)=>index===3?{...row,status:'claimed'}:row),claim_result:{target_day:25004,ok:1}});
+ const claimedCard=t.h.nodes.DailyGW2Day_4,glass=effects()[0];
+ assert.notEqual(claimedCard,oldCard,'The actual successful render replaces the pending calendar card');
+ assert(oldCard.deleted);assert.equal(effects().length,1);assert.equal(glass.GetParent(),claimedCard);
+ assert(claimedCard.BHasClass('DailyGW2Claimed'));assert(claimedCard.BHasClass('RewardGlassActive'),'Claim dimming cannot hide the success pass');
+ assert.equal(glass.style.width,'100%');assert.equal(glass.visible,true);assert.equal(glass.GetChildCount(),1);
+ t.send({sequence:5,count:4,ordinary_status:'claimed',calendar28:t.snapshot.calendar28.map((row,index)=>index===3?{...row,status:'claimed'}:row),claim_result:{target_day:25004,ok:1}});
+ assert.equal(effects().length,1);assert.equal(effects()[0],glass,'A repeated success ACK does not create or restart an effect');
+ api.Close();assert.equal(effects().length,0);assert(!claimedCard.BHasClass('RewardGlassActive'));
+ t.h.flushFinite();api.Open(false);assert.equal(effects().length,0,'Reopening does not replay an already consumed claim');
+ t.h.assertCleanDispose(api);
+}
+console.log('DAILY_REWARD_FEEDBACK_PASS: active controller plus real glass, authoritative success, rejection/retry, pending, card replacement, duplicates, hidden updates and disposal');

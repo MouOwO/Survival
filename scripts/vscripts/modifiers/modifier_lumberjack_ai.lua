@@ -177,6 +177,9 @@ local function is_idle(unit)
 end
 
 local function issue_tree_attack(unit, tree)
+    if _G.SURVIVAL_WORKER_ORDER_PROBE==true then
+        require("systems/worker_order_probe").observe_internal_order(unit,tree)
+    end
     unit.survival_lumberjack_internal_order = true
     ExecuteOrderFromTable({
         UnitIndex = unit:entindex(),
@@ -200,7 +203,11 @@ function M:OnIntervalThink()
         and not parent:CanEntityBeSeenByMyTeam(tree) then
         return
     end
-    if parent:GetAttackTarget() == tree then
+    local native_target=parent:GetAttackTarget()
+    if _G.SURVIVAL_WORKER_ORDER_PROBE==true then
+        require("systems/worker_order_probe").observe_getter(self,parent,tree,native_target)
+    end
+    if native_target == tree then
         self.manual_control = false
         self.manual_idle_since = nil
         return
@@ -276,6 +283,10 @@ function M:OnHarvestLanded(keys)
     -- the worker becomes idle. Automatic harvesting still uses its own tree.
     self.manual_control = target:entindex() ~= self.tree_entindex
     self.manual_idle_since = nil
+    if _G.SURVIVAL_WORKER_ORDER_PROBE==true then
+        require("systems/worker_order_probe").observe_landed(self,parent,target,
+            self.manual_control==false,keys.record)
+    end
     if target:GetHealth() <= 1 then
         event_bus.emit(events.TREE_DEPLETED, {
             attacker = parent,

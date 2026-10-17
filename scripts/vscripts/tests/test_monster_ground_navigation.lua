@@ -57,7 +57,14 @@ local function unit_mock()
         self.scale = scale
     end
     function unit:HasModifier(name) return self.modifiers[name] ~= nil end
-    function unit:AddNewModifier(_, _, name, params) self.modifiers[name] = params end
+    function unit:AddNewModifier(_, _, name, params)
+        self.modifiers[name] = params
+        -- Formal waves now use the native base-range property rather than a
+        -- missing engine setter. Reflect that property in this spawn fixture.
+        if name == "modifier_survival_hero_attack_range" then
+            self.attack_range = params.attack_range
+        end
+    end
     function unit:FindAbilityByName() return nil end
     for _, method in ipairs({ "SetBaseMaxHealth", "SetMaxHealth", "SetHealth",
         "SetBaseDamageMin", "SetBaseDamageMax", "SetPhysicalArmorBaseValue",
@@ -92,9 +99,8 @@ local env = setmetatable({
             "first placement must already use ground navigation")
         assert(unit.survival_navigation_type == "ground")
         if unit.survival_is_wave_monster or unit.survival_is_challenge_monster then
-            assert(unit.modifiers.modifier_enemy_wall_ai.no_unit_collision
-                == (unit.survival_is_challenge_monster and 1 or 0),
-                "formal waves must collide; challenge monsters keep their policy")
+            assert(unit.modifiers.modifier_enemy_wall_ai.no_unit_collision == 0,
+                "every wall attacker must retain native unit collision")
             assert(unit.hull == unit.survival_monster_hull_radius,
                 "the final hull must be applied before placement")
         end
@@ -106,6 +112,7 @@ local env = setmetatable({
 
 local definitions, encounters, spawn_points = { by_id = {} }, { by_id = {} }, { by_id = {} }
 local deps = {
+    ["combat/endless_stat_projection"] = require("combat/endless_stat_projection"),
     ["visual/model_scale"] = require("visual/model_scale"),
     ["core/scheduler"] = { cancel = no_op },
     ["systems/player_context_service"] = { is_defeated = function() return false end },
@@ -135,6 +142,7 @@ local deps = {
     end },
     ["systems/challenge_monster_visual_service"] = { apply = no_op },
     ["systems/challenge_session_service"] = { handles = function() return false end },
+    ["systems/rebirth_scene_display_service"] = { hide = no_op },
     ["systems/player_room_locations"] = {
         resolve = function() return { home_target_name = "test_spawn" } end,
         marker_name = function(name) return name end,
@@ -271,10 +279,8 @@ for _, row in ipairs(real_waves.rows) do
         assert(unit.attack_range == (definition.attack_range or 128),row.wave_id)
         assert(unit.attack_capability == (definition.attack_type == "ranged"
             and DOTA_UNIT_CAP_RANGED_ATTACK or DOTA_UNIT_CAP_MELEE_ATTACK),row.wave_id)
-        if definition.projectile_model and definition.projectile_model ~= "" then
-            assert(unit.projectile == definition.projectile_model
-                and unit.projectile_speed == (definition.projectile_speed or 700),row.wave_id)
-        end
+        -- Projectile configuration is authored in native NPC KV now; this
+        -- navigation fixture does not pretend Lua setter calls still own it.
         assert(unit.unit_name == definition.unit_name
             and unit.survival_monster_role == row.member_role
             and unit.survival_is_boss == (row.member_role == "assault_boss"), row.wave_id)
@@ -323,8 +329,39 @@ for _, kind in ipairs({ "ground", "flying" }) do
     local definition = archetype(kind, 3)
     local unit = assert(wave.spawn_challenge_monster({ health = 200, attack = 2 }, definition, 0))
     check(unit, definition, nil, "boss.vmdl")
-    assert(unit.hull == 0 and unit.survival_wave_no_unit_collision == true)
-    assert(unit.modifiers.modifier_enemy_wall_ai.no_unit_collision == 1)
+    assert(unit.hull == 32 and unit.survival_wave_no_unit_collision == false)
+    assert(unit.modifiers.modifier_enemy_wall_ai.no_unit_collision == 0)
+end
+
+-- Cover every shipped wall-challenge factory input as well as formal waves.
+-- Archive and endless services construct these ground/melee definitions from
+-- their actual appearance rows; different reward metadata keeps a solid body.
+local configured_challenge_spawn_count = 0
+local function check_wall_challenge(definition, label)
+    local unit = assert(wave.spawn_challenge_monster({ health = 200, attack = 2 }, definition, 0))
+    assert(unit.hull == 32 and unit.placement_hull == 32
+        and unit.survival_wave_no_unit_collision == false, label)
+    assert(unit.modifiers.modifier_enemy_wall_ai.no_unit_collision == 0, label)
+    assert(unit.capability == DOTA_UNIT_CAP_MOVE_GROUND and unit.placements == 1, label)
+    assert(unit.model == definition.model_path, label)
+    configured_challenge_spawn_count = configured_challenge_spawn_count + 1
+end
+for _, definition in ipairs(require("config/generated/building_challenge_definitions").rows) do
+    if definition.enabled ~= false then check_wall_challenge(definition, definition.challenge_id) end
+end
+for _, definition in ipairs(require("config/generated/archive_challenge_definitions").rows) do
+    if definition.enabled ~= false then
+        check_wall_challenge({ unit_name = "npc_survival_wave_monster", model_path = definition.model_path,
+            model_scale = definition.model_scale, movement_type = "ground", attack_type = "melee" },
+            definition.challenge_id)
+    end
+end
+for _, visual in ipairs(require("config/generated/archive_endless_visuals").rows) do
+    if visual.enabled ~= false then
+        check_wall_challenge({ unit_name = "npc_survival_wave_monster", model_path = visual.model_path,
+            model_scale = visual.base_scale, movement_type = "ground", attack_type = "melee", endless = true },
+            visual.visual_id)
+    end
 end
 
 local session_service = load_service("challenge_session_service")
@@ -365,7 +402,8 @@ for index, kind in ipairs({ "ground", "flying" }) do
         "rebirth encounter collision policy changed")
 end
 
-assert(#created == 13 + configured_spawn_count, "all production spawn paths must be exercised")
+assert(#created == 13 + configured_spawn_count + configured_challenge_spawn_count,
+    "all production spawn paths must be exercised")
 for _, unit in ipairs(created) do
     local options = appearance_options_by_unit[unit]
     assert(options and options.fresh_unit == true,
@@ -373,6 +411,7 @@ for _, unit in ipairs(created) do
 end
 print(string.format("MONSTER_GROUND_NAVIGATION_PASS: 13 policy scenarios + %d actual wave batches"
     .. " (normal=%d, wave_leader=%d, assault_boss=%d, flying=%d, visual_swaps=%d);"
-    .. " shared radius32 after model swaps; challenge/practice policies preserved",
+    .. " %d actual wall-challenge appearances; shared radius32 after model swaps;"
+    .. " independent challenge/practice policies preserved",
     configured_spawn_count, role_counts.normal, role_counts.wave_leader,
-    role_counts.assault_boss, flying_spawn_count, visual_swap_count))
+    role_counts.assault_boss, flying_spawn_count, visual_swap_count, configured_challenge_spawn_count))

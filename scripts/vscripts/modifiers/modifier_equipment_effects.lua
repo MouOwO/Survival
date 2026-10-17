@@ -7,6 +7,27 @@ local M = {}
 modifier_equipment_effects = _G.modifier_equipment_effects or class({})
 _G.modifier_equipment_effects = modifier_equipment_effects
 
+local function decide_damage_route(self, phase)
+    -- Production/client/class queries leave the original five declarations and
+    -- add no experiment fields. Tools legacy instances never migrate on refresh.
+    if self == modifier_equipment_effects or not self.GetParent
+        or not IsServer() or not IsInToolsMode or not IsInToolsMode()
+        or self.equipment_damage_mode_decided then return end
+    self.equipment_damage_mode_decided = true
+    self.shared_equipment_damage_observer = false
+    self.equipment_damage_route_reason = "legacy_or_probe_disabled"
+    if phase ~= "declare" or self.server_values ~= nil or self.player_id ~= nil
+        or _G.SURVIVAL_SHARED_HERO_EQUIPMENT_DAMAGE_PROBE ~= true then return end
+    local ok, registration, reason = pcall(function()
+        return require("systems/hero_equipment_damage_observer").register_new(self:GetParent(), self)
+    end)
+    self.shared_equipment_damage_observer = ok and type(registration) == "table"
+        and self.equipment_damage_registration == registration and registration.modifier == self
+        and registration.token ~= nil and self.equipment_damage_registration_token == registration.token
+    self.equipment_damage_route_reason = self.shared_equipment_damage_observer
+        and "shared_registered_at_first_declare" or (ok and (reason or "registration_commit_unconfirmed") or "registration_exception")
+end
+
 local function equipment_values(player_id)
     local response = event_bus.request(events.EQUIPMENT_STATS_GET_REQUEST,
         { player_id = player_id })
@@ -27,6 +48,7 @@ function modifier_equipment_effects:RemoveOnDeath() return false end
 
 function modifier_equipment_effects:OnCreated(kv)
     if IsServer() then
+        decide_damage_route(self, "created")
         self.player_id = tonumber(kv.player_id) or self:GetParent():GetPlayerOwnerID()
         self.aura_ready = {}
         self.server_values = equipment_values(self.player_id)
@@ -40,6 +62,7 @@ end
 
 function modifier_equipment_effects:OnRefresh()
     if IsServer() then
+        decide_damage_route(self, "refresh")
         self.server_values = equipment_values(self.player_id)
         if self.SendBuffRefreshToClients then
             self:SendBuffRefreshToClients()
@@ -103,13 +126,17 @@ function modifier_equipment_effects:OnIntervalThink()
 end
 
 function modifier_equipment_effects:DeclareFunctions()
-    return {
+    decide_damage_route(self, "declare")
+    local declarations = {
         MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
         MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT,
         MODIFIER_PROPERTY_HEALTH_BONUS,
         MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
-        MODIFIER_EVENT_ON_TAKEDAMAGE,
     }
+    if not (IsServer() and self.shared_equipment_damage_observer == true) then
+        declarations[#declarations + 1] = MODIFIER_EVENT_ON_TAKEDAMAGE
+    end
+    return declarations
 end
 
 local function values(self)
@@ -151,7 +178,7 @@ end
 function modifier_equipment_effects:GetModifierPhysicalArmorBonus()
     return armor_balance.from_war3(values(self).armor_flat)
 end
-function modifier_equipment_effects:OnTakeDamage(params)
+function modifier_equipment_effects:HandleTakeDamage(params)
     if not IsServer() or params.attacker ~= self:GetParent() then return end
     local victim = params.unit
     if not victim or victim:IsNull() or victim:GetTeamNumber() == params.attacker:GetTeamNumber() then return end
@@ -162,7 +189,8 @@ function modifier_equipment_effects:OnTakeDamage(params)
     if tonumber(params.damage_category) ~= DOTA_DAMAGE_CATEGORY_ATTACK then return end
     local percent = tonumber(values(self).lifesteal_pct) or 0
     -- OnTakeDamage.damage is post-mitigation basic-attack damage here.
-    local amount = math.max(0, tonumber(params.damage) or 0) * percent / 100
+    local amount = require("combat/lifesteal_amount").calculate(
+        params.attacker, victim, params.damage, percent)
     if amount > 0 and self:GetParent().Heal then
         -- Invalidate deferred CalculateStatBonus health rollbacks before this
         -- legitimate heal. Otherwise a full lifesteal heal can be mistaken for
@@ -170,6 +198,18 @@ function modifier_equipment_effects:OnTakeDamage(params)
         hero_health_guard.allow_healing(self:GetParent())
         self:GetParent():Heal(amount, nil)
     end
+end
+
+function modifier_equipment_effects:OnTakeDamage(params)
+    if self.shared_equipment_damage_observer == true then return end
+    return self:HandleTakeDamage(params)
+end
+
+function modifier_equipment_effects:OnDestroy()
+    if not IsServer() or not self.equipment_damage_registration then return end
+    self.equipment_damage_destroyed = true
+    local observer = package.loaded["systems/hero_equipment_damage_observer"]
+    if observer and type(observer.unregister) == "function" then observer.unregister(self) end
 end
 
 return M

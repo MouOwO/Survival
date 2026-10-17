@@ -35,11 +35,15 @@ function M.apply(command,profile,archive,stats,apply_effects)
     if (command.kind=="vip_claim" and row.group_id~="privileges")
         or (command.kind=="vip_purchase" and row.group_id~="packages") then return false,"VIP领取方式无效" end
     archive.vip_claimed=archive.vip_claimed or {}
-    if archive.vip_claimed[row.reward_id]==true then return true end
+    local inventory=profile.save and profile.save.content_inventory or {}
+    if archive.vip_claimed[row.reward_id]==true or (tonumber(inventory[row.reward_id]) or 0)>0 then
+        archive.vip_claimed[row.reward_id]=true
+        return true
+    end
     if row.group_id=="privileges" then
         if M.level(profile)<row.level then return false,"VIP等级不足" end
     else
-        if row.level>0 and not M.member(profile) then return false,"需要先开通VIP" end
+        if M.level(profile)<row.level then return false,"VIP等级不足" end
         local balance=M.balance(profile)
         if balance<row.price then return false,"商城付费币不足" end
         stats.shop_paid_currency=balance-row.price
@@ -49,10 +53,10 @@ function M.apply(command,profile,archive,stats,apply_effects)
     archive.vip_claimed[row.reward_id]=true
     if row.medal_id then
         local medal=assert(catalog.by_id[row.medal_id],"vip_medal_missing")
-        if not archive.vip_claimed[medal.reward_id] then
+        if not archive.vip_claimed[medal.reward_id] and (tonumber(inventory[medal.reward_id]) or 0)<=0 then
             apply_effects(stats,medal)
-            archive.vip_claimed[medal.reward_id]=true
         end
+        archive.vip_claimed[medal.reward_id]=true
     end
     return true
 end
@@ -60,13 +64,14 @@ function M.snapshot(profile)
     if not profile then return {ok=false,error="档案尚未载入"} end
     local archive=profile.save and profile.save.archive or {}
     local claimed=archive.vip_claimed or {}
+    local inventory=profile.save and profile.save.content_inventory or {}
     local level,member,balance=M.level(profile),M.member(profile),M.balance(profile)
     local rows={}
     for _,row in ipairs(catalog.rows) do
         if row.enabled then
-            local owned=claimed[row.reward_id]==true
+            local owned=claimed[row.reward_id]==true or (tonumber(inventory[row.reward_id]) or 0)>0
             local eligible=row.group_id=="privileges" and level>=row.level
-                or row.group_id=="packages" and (row.level==0 or member)
+                or row.group_id=="packages" and level>=row.level
             rows[#rows+1]={id=row.reward_id,owned=owned and 1 or 0,eligible=eligible and 1 or 0,
                 affordable=balance>=row.price and 1 or 0}
         end

@@ -71,7 +71,7 @@ function harness(options = {}) {
         loaded[relative] = {file, sha256: sha(file)};
         vm.runInContext(read(file), env, {filename: file});
     }
-    if (!options.independentPayment) ['common/ui_registry.js', 'common/ui_components.js', 'common/tooltip_dismiss.js', 'ui_layers.js',
+    if (!options.independentPayment) ['common/item_resources.js', 'common/vip_badges.js', 'reward_presentation.js', 'common/ui_registry.js', 'common/ui_components.js', 'common/tooltip_dismiss.js', 'ui_layers.js',
         'archive_v10_data.js', 'shop_v10_assets.js', 'common/menu_v10.js', 'item_art_remaining_5d5c1152eb.js',
         'common/commerce_components.js', 'black_lion_market_model.js', 'black_lion_market.js'].forEach(load);
     function payment() {
@@ -103,10 +103,11 @@ function harness(options = {}) {
 }
 const descendants = panel => [panel, ...panel.Children().flatMap(descendants)];
 const classNode = (panel, cls) => descendants(panel).find(p => p.BHasClass(cls));
-const manifest = json(path.join(root, 'data/ui/commerce_product_art_v1.json'));
-assert.equal(manifest.schema_version, 1);
-const mappings = new Map(manifest.products.map(row => [row.sku, row]));
-assert.equal(mappings.size, manifest.products.length, 'Every SKU has one unambiguous visual mapping');
+// Historical art receipts remain useful for pixel/quantity regressions. Runtime
+// artwork selection and all expected URIs come only from the shared registry.
+const receiptsManifest = json(path.join(root, 'data/ui/commerce_product_art_v1.json'));
+const resourcesManifest = json(path.join(root, 'data/ui/item_resources.json'));
+assert.equal(resourcesManifest.schema_version, 1);
 const bundleHash = json(path.join(dataRoot, 'server/bundles/current.json')).hash;
 const bundleFile = path.join(dataRoot, 'server/bundles', bundleHash, 'bundle.json');
 assert.equal(sha(bundleFile), bundleHash, 'Use the actual published bundle');
@@ -121,10 +122,32 @@ const paymentProducts = cash.map(item => ({...item, amount_fen: item.amount_fen 
     reward_lines: item.reward_lines || item.grants && item.grants.lines || []}));
 assert.equal(wallet.length, 129, 'The complete reviewed commerce catalog is exercised');
 assert.equal(unique.size, 137, 'The eight additional payment SKUs are included');
-assert.deepEqual([...mappings.keys()].sort(), [...unique.keys()].sort(), 'No product is silently omitted from the art catalog');
 const originalData = JSON.stringify({wallet, cash});
 const h = harness(), J = h.cfg.SurvivalCommerceComponents;
+const resources = h.cfg.SurvivalItemResources;
+const mappings = new Map([...unique.values()].map(item => {
+    const row = resources.Lookup(item);
+    assert(row, item.sku + ' exists in the shared resource table');
+    const receipt = receiptsManifest.products.find(entry => entry.sku === item.sku) || {};
+    return [item.sku, {...receipt, sku: item.sku, item_id: row.id, runtime_uri: row.uri, kind: row.kind, vip_level: row.vip_level}];
+}));
+const manifest = {products: [...mappings.values()]};
+assert.deepEqual([...mappings.keys()].sort(), [...unique.keys()].sort(), 'No product is silently omitted from the shared art table');
 assert.equal(typeof J.NormalizeIconURI, 'function');
+function assertRenderedIcon(icon, row, message) {
+    if (row.kind === 'vip') {
+        assert(icon.__survivalVIPBadge, message + ' includes the composed VIP badge');
+        assert.equal(icon.__survivalVIPBadge.image.image, row.runtime_uri, message + ' uses the table artwork');
+        assert.equal(icon.__survivalVIPBadge.number.text, String(row.vip_level), message + ' displays its VIP number');
+    } else assert.deepEqual(icon.images, [row.runtime_uri], message);
+}
+function assertPaymentIcon(state, item, message) {
+    const row = mappings.get(item.sku), art = state.ids.PaymentProductArt;
+    if (row.kind === 'vip') {
+        assert.equal(art.image, '', message + ' clears the incomplete base glyph');
+        assertRenderedIcon(art.__paymentResourceIcon, row, message);
+    } else assert.equal(art.image, row.runtime_uri, message);
+}
 const rendered = [];
 for (const item of unique.values()) {
     const expected = J.NormalizeIconURI(mappings.get(item.sku).runtime_uri);
@@ -133,13 +156,21 @@ for (const item of unique.values()) {
     const rewards = item.reward_lines || item.grants && item.grants.lines || [];
     const props = {index: 0, catalog: {categories: []}, rewards, action() { throw new Error('Rendering must not order'); }};
     const row = h.cfg.SurvivalBlackLionMarket.Row(h.panel, item, props);
-    const image = classNode(row, item.product_type === 'bundle' ? 'BLMarketGiftIcon' : 'BLMarketItemIcon');
-    assert(image, item.sku + ' retains its icon beside the separate decorative frame');
-    const marketExpected = item.product_type === 'bundle'
-        ? J.NormalizeIconURI(h.cfg.SurvivalShopV10.layers.vip4_gift.path) : expected;
-    assert.deepEqual(image.images, [marketExpected], item.sku + ' market loads exactly its declared icon');
+    if (item.product_type === 'bundle') {
+        // The current externally supplied market skin composes its bundle gift
+        // glyph from the reviewed asset manifest. Shared bundle cards and all
+        // checkout artwork still retain the authoritative product registry.
+        const image = classNode(row, 'BLMarketGiftIcon');
+        assert(image, item.sku + ' market bundle retains the declared gift artwork');
+        assert.deepEqual(image.images, [J.NormalizeIconURI(h.cfg.SurvivalShopV10.layers.vip4_gift.path)],
+            item.sku + ' market bundle uses the exact first-row manifest gift');
+    } else {
+        const image = classNode(row, 'BLMarketItemIcon');
+        assert(image, item.sku + ' market single retains its real product icon beside its decorative frame');
+        assertRenderedIcon(image, mappings.get(item.sku), item.sku + ' market loads exactly the selected icon');
+    }
     const card = J[item.product_type === 'bundle' ? 'Bundle' : 'Product'](h.panel, item, {rewards});
-    assert.deepEqual(classNode(card, 'RCProductArt').images, [expected], item.sku + ' shared card uses the same art');
+    assertRenderedIcon(classNode(card, 'RCProductArt'), mappings.get(item.sku), item.sku + ' shared card uses the same art');
     if (item.product_type === 'bundle') {
         const effect = classNode(card.__purpleDetail, 'RCProductEffect').text;
         for (const reward of rewards) assert(effect.includes(reward.label || reward.id), item.sku + ' retains every bundle reward label');
@@ -162,7 +193,7 @@ const dedicatedRows = manifest.products.filter(row => /\/commerce_art_v1\//.test
 assert.deepEqual(dedicatedRows.map(row => path.posix.basename(row.runtime_uri, '.vtex')).sort(), dedicatedNames.slice().sort());
 const custom = 'custom_game/reward_art_v5/lottery_muramasa.png';
 assert.equal(J.NormalizeIconURI(J.ProductIcon({sku: 'future_unknown_product', icon: custom})), 'file://{images}/' + custom);
-assert.equal(J.NormalizeIconURI(J.ProductIcon({sku: 'video_p043', icon: custom})), 'file://{images}/' + custom, 'An explicit new dedicated icon is not overwritten by an older alias');
+assert.equal(J.NormalizeIconURI(J.ProductIcon({sku: 'video_p043', icon: custom})), resources.Resolve('video_p043'), 'A registered item cannot be redirected by a stale or dedicated server icon');
 for (const bad of ['https://example.invalid/x.png', 'custom_game/../items/x.png', 'custom_game//x.png', 'custom_game/%2e%2e/x.png',
     'custom_game\\x.png', 'file://{images}/custom_game/./x.png', 's2r://panorama/images/custom_game/../x.vtex',
     's2r://panorama/images/custom_game//x.vtex', 's2r://panorama/images/custom_game/x.vtex?x=1',
@@ -194,7 +225,7 @@ let checkoutCount = 0;
 for (const item of paymentProducts) {
     if (!(item.amount_fen > 0 && item.amount_fen <= 1000000 && item.amount_fen % 1 === 0)) continue;
     h.cfg.SurvivalPayments.Checkout(item.sku);
-    assert.equal(h.ids.PaymentProductArt.image, J.NormalizeIconURI(J.ProductIcon(item)), item.sku + ' checkout matches market');
+    assertPaymentIcon(h, item, item.sku + ' checkout matches market');
     const quantity = classNode(h.ids.PaymentDialog, 'PaymentQuantityValue');
     if (quantity) assert.equal(quantity.text, '1', 'Changing the visual source preserves checkout quantity');
     checkoutCount++;
@@ -210,7 +241,7 @@ cold.respond({ok: true, products: paymentProducts, categories: [], wechat: 1, al
 for (const item of paymentProducts) {
     if (!(item.amount_fen > 0 && item.amount_fen <= 1000000 && item.amount_fen % 1 === 0)) continue;
     cold.cfg.SurvivalPayments.Checkout(item.sku);
-    assert.equal(cold.ids.PaymentProductArt.image, J.NormalizeIconURI(J.ProductIcon(item)), item.sku + ' XML-only cold checkout matches market');
+    assertPaymentIcon(cold, item, item.sku + ' XML-only cold checkout matches market');
 }
 assert.equal(cold.requests.filter(r => r.action === 'create').length, 0);
 const quantityRows = manifest.products.filter(row => row.classification === 'quantity_same_item');

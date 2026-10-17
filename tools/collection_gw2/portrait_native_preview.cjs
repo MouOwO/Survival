@@ -1,0 +1,14 @@
+'use strict';
+// Preview the exact native portrait texels inside the real collection components.
+const fs=require('fs'),path=require('path'),crypto=require('crypto'),assert=require('node:assert/strict'),{spawnSync}=require('child_process'),{pathToFileURL}=require('url');
+const {decode}=require('./portrait_quality_preview.cjs');
+const repo=path.resolve(__dirname,'../..'),arg=process.argv.indexOf('--out'),out=path.resolve(repo,arg<0?'design_refs/collection_hd_v5/final/preview':process.argv[arg+1]);
+if(!out.startsWith(repo+path.sep))throw Error('Output must be inside workspace');process.chdir(repo);
+const result=spawnSync(process.execPath,[path.join(__dirname,'preview.cjs'),'--out',out],{cwd:repo,encoding:'utf8',windowsHide:true});if(result.status!==0)throw Error(result.stderr||result.stdout);if(result.stdout)process.stdout.write(result.stdout);
+const text=fs.readFileSync('panorama/src/scripts/custom_game/icons_remaining_5d5c1152eb.js','utf8'),match=text.match(/entries=(\[[^\r\n]+\]);/);assert(match);
+const rows=JSON.parse(match[1]).filter(r=>['ex','friend'].includes(r.category_id)&&r.art_status==='generated_portrait_v3');assert.equal(rows.length,80);
+fs.mkdirSync(path.join(out,'native_pixels'),{recursive:true});const aliases={},records=[],hash=b=>crypto.createHash('sha256').update(b).digest('hex');
+for(const row of rows){const compiled=row.runtime_uri.replace('s2r://','')+'_c',data=decode(compiled),file=path.join(out,'native_pixels','head_v5_'+row.item_id+'.png');assert.equal(data.width,512);assert.equal(data.height,512);fs.writeFileSync(file,data.png);aliases[row.runtime_uri]=pathToFileURL(file).href;records.push({id:row.item_id,runtime:row.runtime_uri,compiled,compiled_sha256:hash(fs.readFileSync(compiled)),preview:path.relative(repo,file).replaceAll('\\','/'),decoded_size:[data.width,data.height],source_sha256:row.sha256});}
+const entry=path.join(out,'index.html');let html=fs.readFileSync(entry,'utf8');const hook=/<script src="[^"]+\/adapter\.js"><\/script>/;assert(hook.test(html),'Actual adapter entry');html=html.replace(hook,tag=>'<script>Object.assign(window.PREVIEW_ASSET_PATHS,'+JSON.stringify(aliases).replaceAll('</script','<\\/script')+');</script>'+tag);
+html=html.replace(/(<div id="PreviewCaption">)[\s\S]*?(<\/div>)/,'$1收藏 · 真实组件 + 实际512px游戏纹理解码 · 余额/数量样例 · 尚未游戏内验收$2');fs.writeFileSync(entry,html);
+const assemblyPath=path.join(out,'assembly.json'),assembly=JSON.parse(fs.readFileSync(assemblyPath,'utf8'));assembly.nativePortraitPixels={kind:'decoded_actual_BGRA8888_mip0',count:records.length,records};assembly.limitations.push('Portrait pixels are decoded from the actual compiled 512px single-mip BGRA8888 vtex_c. Browser rasterization does not emulate native Source2 texture sampling, gamma or motion.');fs.writeFileSync(assemblyPath,JSON.stringify(assembly,null,2));console.log('COLLECTION_NATIVE_PORTRAIT_PREVIEW_PASS: 80 decoded 512px textures, actual component source graph');

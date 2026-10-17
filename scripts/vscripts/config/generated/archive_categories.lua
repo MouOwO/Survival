@@ -20,6 +20,8 @@ M.rows = {
     { category_id = "building", display_name = "存档神器", renderer = "upgrades", sort_order = 65, enabled = true },
     { category_id = "starjoy_points", display_name = "星悦积分", renderer = "achievements", sort_order = 31, enabled = true },
     { category_id = "titles", display_name = "称号", renderer = "titles", sort_order = 33, enabled = true },
+    { category_id = "wife", display_name = "我的老婆", renderer = "collection", sort_order = 66, enabled = true },
+    { category_id = "commerce_goods", display_name = "商城道具", renderer = "commerce_goods", sort_order = 99, enabled = true },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

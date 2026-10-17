@@ -1,7 +1,7 @@
 (function () {
     "use strict";
-    var cfg = GameUI.CustomUIConfig();
-    if (cfg.SurvivalTooltipDismiss && cfg.SurvivalTooltipDismiss.version === "1.0.0") return;
+    var cfg = GameUI.CustomUIConfig(), version = "1.0.1";
+    if (cfg.SurvivalTooltipDismiss && cfg.SurvivalTooltipDismiss.version === version) return;
     var owners = [], blocked = null, job = null, epoch = 0;
     function valid(panel) { return panel && (!panel.IsValid || panel.IsValid()); }
     function cursor() {
@@ -47,7 +47,7 @@
             release(at);
             owners.slice().forEach(function (owner) {
                 if (!owner.alive()) { owner.Dispose(); return; }
-                if (owner.shown && owner.visible() && inside(at,rect(owner.surface,owner.readRect))) owner.Dismiss();
+                if (owner.shown && owner.visible() && !owner.allowTooltipHover() && inside(at,rect(owner.surface,owner.readRect))) owner.Dismiss();
             });
             if (blocked || owners.some(function (owner) { return owner.shown && owner.alive() && owner.visible(); })) watch();
             else cancelIdle();
@@ -58,6 +58,7 @@
         var owner={panel:panel,surface:surface,shown:false,readRect:options.getRect};
         owner.alive=function () { return !dead && valid(panel) && valid(surface) && (!options.isAlive || options.isAlive()); };
         owner.visible=function () { return owner.alive() && (options.isVisible ? options.isVisible() : panel.visible!==false); };
+        owner.allowTooltipHover=function () { return !!(options.allowTooltipHover && options.allowTooltipHover()); };
         owner.CanShow=function (source) {
             if (!owner.alive()) return false;
             var at=cursor();
@@ -72,6 +73,9 @@
             blocked={owner:owner,anchor:anchor,anchorBox:rect(anchor,owner.readRect),box:rect(surface,owner.readRect)};
             owner.shown=false;anchor=null;
             options.hide();
+            // A source leave may return before the next geometry watch. Drop
+            // its old region immediately when the cursor already left both.
+            release(cursor());
             watch();
         };
         owner.Dispose=function () {
@@ -85,9 +89,9 @@
         // Multiple renderers may share a surface (native and takeover ability
         // tooltips). Dispatch only to the visible renderer's current owner.
         surface.SetPanelEvent("onmouseover",function () {
-            owners.slice().forEach(function (entry) { if (entry.surface===surface) entry.Dismiss(); });
+            owners.slice().forEach(function (entry) { if (entry.surface===surface && !entry.allowTooltipHover()) entry.Dismiss(); });
         });
         return owner;
     }
-    cfg.SurvivalTooltipDismiss={version:"1.0.0",Create:create,Inspect:function () { return {owners:owners.length,watching:job!==null,blocked:!!blocked}; }};
+    cfg.SurvivalTooltipDismiss={version:version,Create:create,Inspect:function () { return {version:version,owners:owners.length,watching:job!==null,blocked:!!blocked}; }};
 })();

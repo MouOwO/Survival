@@ -11,6 +11,8 @@ local inventory_by_player = {}
 local hydrated_by_player = {}
 local normalize_map
 local match_inventory_by_player = {}
+local profile_refresh_by_player = {}
+local mutation_depth_by_player = {}
 
 local function match_item(id)
     return weapon_definitions.by_id[id] ~= nil or item_definitions.by_id[id] ~= nil
@@ -118,6 +120,10 @@ local function snapshot(player_id)
 end
 
 local function publish(player_id, reason, changes)
+    -- This publication already contains the latest authoritative permanent
+    -- bucket. A synchronous profile event from our own write must not publish
+    -- the same inventory again after the mutation completes.
+    profile_refresh_by_player[player_id] = nil
     event_bus.emit(events.CONTENT_INVENTORY_CHANGED, {
         player_id = player_id,
         reason = reason or "changed",
@@ -288,6 +294,71 @@ local function transaction(payload)
     return { ok = true, snapshot = snapshot(player_id), changes = changes }
 end
 
+local function publish_profile_refresh(player_id)
+    if (mutation_depth_by_player[player_id] or 0) > 0 then return end
+    local refresh = profile_refresh_by_player[player_id]
+    if not refresh then return end
+    profile_refresh_by_player[player_id] = nil
+    local counts = bucket(player_id)
+    local changes = {}
+    for content_id, count in pairs(counts) do
+        local change = count - (refresh.before[content_id] or 0)
+        if change ~= 0 then changes[content_id] = change end
+    end
+    for content_id, count in pairs(refresh.before) do
+        if counts[content_id] == nil and count ~= 0 then
+            changes[content_id] = -count
+        end
+    end
+    if next(changes) then
+        -- A profile refresh is a read-only projection, never a local grant or
+        -- a write back to the HTTP-authoritative archive.
+        publish(player_id, refresh.reason, changes)
+    end
+end
+
+local function queue_profile_refresh(player_id)
+    event_bus.after_dispatch("content_inventory_profile_" .. tostring(player_id),
+        function() publish_profile_refresh(player_id) end)
+end
+
+local function with_inventory_mutation(handler)
+    return function(payload)
+        local player_id = tonumber(payload and payload.player_id)
+        if not valid_player_id(player_id) then return handler(payload) end
+        mutation_depth_by_player[player_id] =
+            (mutation_depth_by_player[player_id] or 0) + 1
+        local ok, result = pcall(handler, payload)
+        local remaining = mutation_depth_by_player[player_id] - 1
+        mutation_depth_by_player[player_id] = remaining > 0 and remaining or nil
+        -- On success our existing publish consumed the pending projection.
+        -- Rejected or throwing writers still release the guard and report any
+        -- actual profile change, rather than silencing later purchases.
+        if remaining == 0 and profile_refresh_by_player[player_id] then
+            queue_profile_refresh(player_id)
+        end
+        if not ok then error(result, 0) end
+        return result
+    end
+end
+
+local function on_profile_changed(payload)
+    local player_id = tonumber(payload and payload.player_id)
+    if player_id == nil or not valid_player_id(player_id) then return end
+    if not profile_refresh_by_player[player_id] then
+        profile_refresh_by_player[player_id] = {
+            before = copy_map(inventory_by_player[player_id]),
+            reason = "profile:" .. tostring(payload.reason or "changed"),
+        }
+    end
+    -- Other subscribers may read inventory in the same profile dispatch.
+    -- Hydrate now, but notify downstream consumers only after all profile
+    -- projections finish; nested updates coalesce against the original counts.
+    hydrated_by_player[player_id] = false
+    bucket(player_id)
+    queue_profile_refresh(player_id)
+end
+
 local function get_inventory(payload)
     local player_id = tonumber(payload.player_id)
     if not valid_player_id(player_id) then
@@ -300,18 +371,15 @@ function M.init()
     inventory_by_player = {}
     hydrated_by_player = {}
     match_inventory_by_player = {}
-    event_bus.handle_request(events.CONTENT_INVENTORY_GRANT_REQUEST, grant)
+    profile_refresh_by_player = {}
+    mutation_depth_by_player = {}
+    event_bus.handle_request(events.CONTENT_INVENTORY_GRANT_REQUEST, with_inventory_mutation(grant))
     event_bus.handle_request(
         events.CONTENT_INVENTORY_TRANSACTION_REQUEST,
-        transaction
+        with_inventory_mutation(transaction)
     )
     event_bus.handle_request(events.CONTENT_INVENTORY_GET_REQUEST, get_inventory)
-    event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, function(payload)
-        local player_id = tonumber(payload and payload.player_id)
-        if player_id == nil then return end
-        hydrated_by_player[player_id] = false
-        bucket(player_id)
-    end)
+    event_bus.subscribe(events.PLAYER_PROFILE_CHANGED, on_profile_changed)
 end
 
 return M

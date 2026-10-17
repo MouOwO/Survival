@@ -17,7 +17,7 @@ labels={
 'tower_attack_armor_reduction':'箭塔攻击减甲','wall_armor_per_second':'墙每秒护甲',
 'gold_mine_build_cap':'金矿建造上限','hero_attributes_per_second':'英雄每秒属性',
 'hero_attack_attribute_efficiency_pct':'英雄攻击属性效率','lumberjack_critical_chance_pct':'伐木暴击几率',
-'lumberjack_critical_yield_bonus_pct':'伐木暴击收益','hero_damage_wood_bonus_pct':'英雄造成伤害加木材',
+'lumberjack_critical_yield_bonus_pct':'伐木暴击收益','hero_damage_wood_bonus_pct':'英雄造成伤害木材百分比','hero_damage_wood_flat':'英雄造成伤害加木材',
 'starjoy_points':'星悦积分'}
 levels=json.loads((root/'data/archive/vip_recharge_levels.json').read_text(encoding='utf-8'))['levels']
 assert [r['level'] for r in levels]==list(range(1,13))
@@ -33,20 +33,20 @@ for n,value in enumerate([1,1.5,2,2.5,3,3.5,4,5,7,10,10,10],1):
     add(f'vip_privilege_{n:02}',f'V{n}特权礼包','privileges',n,0,dict.fromkeys(fields,value),f"累计充值{levels[n-1]['required_recharge_yuan']}元达到VIP{n}；手动免费领取一次，各级累计")
 medal_fields=['tower_critical_chance_pct','tower_final_damage_bonus_pct','hero_final_damage_bonus_pct','hero_critical_chance_pct','hero_attribute_bonus_pct']
 for n,value in enumerate([1,1.2,1.4,1.6,1.8,2,2.5,3,4,5],1):
-    add(f'vip_medal_{n:02}',f'VIP{n}勋章','medals',n,0,dict.fromkeys(medal_fields,value),f'购买VIP{n}专属礼包后免费附送，自动生效；每枚仅获得一次')
+    add(f'vip_medal_{n:02}',f'孤城V{n}勋章','medals',n,0,dict.fromkeys(medal_fields,value),f'购买VIP{n}专属礼包后免费附送，自动生效；每枚仅获得一次')
 gifts=[
 (10,{'initial_wood':50,'wall_armor':10,'wall_health_per_second':3,'tower_attack_speed_bonus_pct':5,'hero_initial_attributes':5000}),
 (19,{'wood_per_second':1,'tower_attack_flat':300,'tower_attack_speed_bonus_pct':10,'gold_mine_efficiency_pct':5}),
 (39,{'lumberjack_efficiency':1,'gold_mine_efficiency_pct':5,'lumberjack_attack_speed_bonus_pct':5,'lumberjack_attack_growth':2,'tower_attack_per_second':1}),
 (59,{'wall_health_per_second':10,'wall_health_bonus_pct':10,'wall_armor_bonus_pct':10,'wall_damage_reduction_pct':3,'wall_armor':10,'initial_population_cap':2}),
-(79,{'tower_attack_per_second':2,'tower_attack_bonus_pct':8,'tower_attack_speed_bonus_pct':8,'hero_attribute_bonus_pct':12,'hero_damage_attack_growth':5}),
+(79,{'tower_attack_per_second':2,'tower_attack_bonus_pct':8,'tower_attack_speed_bonus_pct':8,'hero_attribute_bonus_pct':8,'hero_damage_attack_growth':5}),
 (119,{'hero_attributes_per_damage':3,'hero_damage_attack_growth':3,'tower_critical_chance_pct':5,'hero_critical_chance_pct':5,'hero_attribute_bonus_pct':10,'hero_attack_armor_reduction':5}),
 (129,{'tower_final_damage_bonus_pct':15,'hero_final_damage_bonus_pct':15,'tower_attack_armor_reduction':0.1,'hero_attribute_bonus_pct':8,'hero_attack_armor_reduction':5}),
 (188,{'wall_armor_per_second':0.1,'gold_mine_build_cap':1,'hero_final_damage_bonus_pct':10,'tower_attack_armor_reduction':0.1,'hero_attribute_bonus_pct':10,'lumberjack_efficiency':3,'hero_attributes_per_second':100}),
 (199,{'hero_attack_attribute_efficiency_pct':5,'lumberjack_critical_chance_pct':5,'lumberjack_critical_yield_bonus_pct':10,'tower_attack_armor_reduction':0.2,'hero_attack_armor_reduction':5}),
-(239,{'hero_attack_attribute_efficiency_pct':10,'lumberjack_critical_chance_pct':5,'lumberjack_critical_yield_bonus_pct':10,'tower_attack_armor_reduction':0.2,'hero_attack_armor_reduction':10,'hero_damage_wood_bonus_pct':10,'hero_attribute_bonus_pct':10,'tower_attack_bonus_pct':10,'hero_attributes_per_damage':10})]
+(239,{'hero_attack_attribute_efficiency_pct':10,'lumberjack_critical_chance_pct':5,'lumberjack_critical_yield_bonus_pct':10,'tower_attack_armor_reduction':0.2,'hero_attack_armor_reduction':10,'hero_damage_wood_flat':10,'hero_attribute_bonus_pct':10,'tower_attack_bonus_pct':10,'hero_attributes_per_damage':10})]
 for n,(price,effects) in enumerate(gifts,1):
-    add(f'vip_package_{n:02}',f'VIP{n}专属礼包','packages',n,price,effects,f'VIP会员可购买一次；附送VIP{n}勋章',medal_id=f'vip_medal_{n:02}')
+    add(f'vip_package_{n:02}',f'VIP{n}专属礼包','packages',n,price,effects,f'达到VIP{n}可购买一次；附送孤城V{n}勋章',medal_id=f'vip_medal_{n:02}')
 add('vip_little_jacket','小棉袄','packages',0,19,{'initial_wood':200,'lumberjack_efficiency':1,'gold_mine_efficiency_pct':6,'lumberjack_attack_speed_bonus_pct':6,'hero_attribute_bonus_pct':6,'tower_attack_bonus_pct':6,'initial_population_cap':3,'starjoy_points':68},'使用商城付费币购买一次')
 source={'version':1,'currency':'shop_paid_currency','currency_name':'商城付费币','recharge_thresholds_pending':False,'recharge_levels':levels,'recharge_exchange_rate_pending':True,'rewards':rows}
 p=root/'data/archive/vip_rewards_20261003.json';p.parent.mkdir(exist_ok=True,parents=True);p.write_text(json.dumps(source,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

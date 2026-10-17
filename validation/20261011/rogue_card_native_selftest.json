@@ -1,0 +1,1599 @@
+{
+  "report_version": 1,
+  "task": "All enabled rogue cards offline and real Dota native self-test",
+  "date": "2026-10-11",
+  "updated_at": "2026-10-11T22:11:36",
+  "authoritative_catalog": {
+    "path": "data/csv/肉鸽奖励系统/rogue_reward_cards.csv",
+    "sha256": "259c3206df14da80650f2a79a1e986e98a0c6cd9c35fcc35def8539bed61a919"
+  },
+  "summary": {
+    "enabled": 48,
+    "builder_start": 21,
+    "boss_combat": 17,
+    "boss_actions_resources": 10,
+    "offline_core_pass": 48,
+    "native_core_pass": 48,
+    "disabled_skipped": 4,
+    "unresolved_core_failures": 0
+  },
+  "engine_validation": {
+    "mode": "real_single_player_Dota_Tools",
+    "native_operator": "root_agent",
+    "card_selection": "production_offer_then_ROGUE_REWARD_SELECT_or_real_same_parent_divine_wish_child",
+    "pass_meaning": "core_effect_consumer_or_native_projection_quantified; not all edge combinations",
+    "real_online_archive_or_payment_mutation_requested_by_probes": false,
+    "helpers_connected_to_normal_init": false
+  },
+  "environment_restoration": {
+    "map": "template_map",
+    "stage": "party_waiting",
+    "rogue_instances": 0,
+    "test_scene_loaded": false,
+    "test_fusion_loaded": false,
+    "wave_dev_mode": false,
+    "native_evidence": "output/rogue_full_selftest_20261011/final_clean_map_check_console.txt",
+    "helper_running": true,
+    "helper_task_enabled": true,
+    "helper_status": "waiting_for_party",
+    "helper_status_verified": "tools/setup_hammer_backend.ps1 -Action Status -AsJson"
+  },
+  "unresolved_production_failures": [],
+  "remaining_validation_boundaries": [
+    {
+      "id": "multiplayer_isolation",
+      "status": "offline_covered_not_multiplayer_native_sampled",
+      "description": "实机为单人Dota Tools；多人归属与隔离已有离线生产消费者覆盖，未在四人房逐项复测。"
+    },
+    {
+      "id": "probability_distribution",
+      "cards": [
+        "heavy_hand",
+        "divine_wish"
+      ],
+      "status": "consumer_verified_distribution_not_long_sampled",
+      "description": "夯大力触发、神许愿真实无放回三子均已实际生效；短样本及受控随机数不能证明长期概率分布。"
+    },
+    {
+      "id": "late_workers_original_timer",
+      "cards": [
+        "boss_promise"
+      ],
+      "status": "offline_only_boundary",
+      "description": "已有工人真实攻速翻倍及原截止时间退场已验证；120秒窗口内后新增工人的剩余时间与同步退场未实机量化。"
+    },
+    {
+      "id": "network_snapshot_after_destruction",
+      "cards": [
+        "tower_network"
+      ],
+      "status": "offline_only_boundary",
+      "description": "实机非零快照5%及真实伤害已验证；领取后满阶塔死亡不改变快照未另行实机采样。50%保护上限仅离线覆盖，正式7塔规则下最大35%。"
+    },
+    {
+      "id": "morale_first_post_fusion_grant",
+      "cards": [
+        "high_morale"
+      ],
+      "status": "offline_only_boundary",
+      "description": "真正七材料融合已验证预拥有30%斗志不会重复添加；融合后首次新领取斗志的增量未独立实机采样。"
+    },
+    {
+      "id": "scripted_armor_piercing",
+      "cards": [
+        "iron_fist_policy"
+      ],
+      "status": "offline_only_boundary",
+      "description": "英雄原生物理攻击护甲忽略已量化；终极融合、激光和机枪脚本交付的穿透仍主要由离线生产消费者覆盖。"
+    },
+    {
+      "id": "native_animation_and_exact_boundary_sampling",
+      "status": "partially_sampled",
+      "description": "部分卡仅量化原生IAS/BAT/getter及消费者，未逐项采集连续普攻时间戳；训练靶子精确30秒逐帧退场、射程边缘摆位、全部Tooltip同状态截图未逐项采样。"
+    },
+    {
+      "id": "secondary_resource_and_condition_combinations",
+      "status": "offline_only_boundary",
+      "description": "取消/失败退款、后合体工人独立收益、金矿高等级暴击并发、安居切换目标与不同击杀单位组合等次要条件，已离线覆盖但未全部重复实机量化。"
+    },
+    {
+      "id": "bounty_building_registration",
+      "cards": [
+        "bounty_order",
+        "divine_wish"
+      ],
+      "status": "explicit_test_fixture_boundary",
+      "description": "临时原生挑战建筑注册使用明确事件注入；后续正式召唤、原生死亡、五类各双奖及第六次正常奖励实际执行，配额5→0。"
+    }
+  ],
+  "ultimate_tower": {
+    "assembly": "seven_real_terminal_routes_built_upgraded_and_consumed_by_production_fusion",
+    "status": "consumer_pass",
+    "assertion_count": 23,
+    "evidence": {
+      "file": "output/rogue_full_selftest_20261011/ultimate_verified_console.txt",
+      "line": 4,
+      "marker": "[ROGUE_BOSS_NATIVE_ULTIMATE_RESULT]"
+    },
+    "assertions": [
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "inherited_unbaked_percentage_only",
+        "status": "pass"
+      },
+      {
+        "actual": 2633.7,
+        "expected": 2633.7,
+        "name": "inherited_unbaked_hero_and_technology_flat_only",
+        "status": "pass"
+      },
+      {
+        "actual": 168093732,
+        "expected": 168093740.1,
+        "name": "inherited_native_average_consistent_with_baseline",
+        "status": "pass"
+      },
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "formal_range_technology_attack_increment",
+        "status": "pass"
+      },
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "formal_range_technology_range_increment",
+        "status": "pass"
+      },
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "actual_ultimate_native_range_increment",
+        "status": "pass"
+      },
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "actual_ultimate_native_attack_800_increment",
+        "status": "pass"
+      },
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "post_range_unbaked_percentage_only",
+        "status": "pass"
+      },
+      {
+        "actual": 2633.7,
+        "expected": 2633.7,
+        "name": "post_range_unbaked_hero_and_technology_flat_only",
+        "status": "pass"
+      },
+      {
+        "actual": 168093732,
+        "expected": 168093740.1,
+        "name": "post_range_native_average_consistent_with_baseline",
+        "status": "pass"
+      },
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "formal_sharp_technology_speed_increment",
+        "status": "pass"
+      },
+      {
+        "actual": 3.5999999046326,
+        "expected": 3.5999999046326,
+        "name": "actual_ultimate_native_frequency_increment",
+        "status": "pass"
+      },
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "post_sharp_unbaked_percentage_only",
+        "status": "pass"
+      },
+      {
+        "actual": 2633.8,
+        "expected": 2633.8,
+        "name": "post_sharp_unbaked_hero_and_technology_flat_only",
+        "status": "pass"
+      },
+      {
+        "actual": 168093732,
+        "expected": 168093740.2,
+        "name": "post_sharp_native_average_consistent_with_baseline",
+        "status": "pass"
+      },
+      {
+        "actual": 0,
+        "expected": 0,
+        "name": "dynamic_unbaked_percentage_only",
+        "status": "pass"
+      },
+      {
+        "actual": 2307.7,
+        "expected": 2307.7,
+        "name": "dynamic_unbaked_hero_and_technology_flat_only",
+        "status": "pass"
+      },
+      {
+        "actual": 168093406,
+        "expected": 168093414.1,
+        "name": "dynamic_native_average_consistent_with_baseline",
+        "status": "pass"
+      },
+      {
+        "actual": 1,
+        "expected": 1,
+        "name": "actual_hero_projection_changed",
+        "status": "pass"
+      },
+      {
+        "actual": -326.1,
+        "expected": -326.1,
+        "name": "actual_ultimate_dynamic_flat_delta",
+        "status": "pass"
+      },
+      {
+        "actual": 1,
+        "expected": 1,
+        "name": "actual_native_primary_attack_exists",
+        "status": "pass"
+      },
+      {
+        "actual": 168093520,
+        "expected": 168093406,
+        "name": "actual_native_primary_filter_matches_attack",
+        "status": "pass"
+      },
+      {
+        "actual": 168094000,
+        "expected": 168093520,
+        "name": "actual_native_primary_logical_health_loss",
+        "status": "pass"
+      }
+    ],
+    "first_grant_observed_deltas": {
+      "file": "output/rogue_full_selftest_20261011/ultimate_retest_final_run_console.txt",
+      "line": 785,
+      "checks": [
+        {
+          "name": "actual_ultimate_native_attack_800_increment",
+          "actual": 800,
+          "expected": 800,
+          "status": "pass",
+          "verification": "observed_delta_against_formal_card_parameter"
+        },
+        {
+          "name": "actual_ultimate_native_range_increment",
+          "actual": 500,
+          "expected": 500,
+          "status": "pass",
+          "verification": "observed_delta_against_formal_card_parameter"
+        },
+        {
+          "name": "formal_sharp_technology_speed_increment",
+          "actual": 20,
+          "expected": 20,
+          "status": "pass",
+          "verification": "observed_delta_against_formal_card_parameter"
+        },
+        {
+          "name": "native_frequency_after_sharp_volley",
+          "actual": 3.5999999046326,
+          "expected": 3.6,
+          "status": "pass"
+        }
+      ]
+    },
+    "fortifications_post_fusion_native": [
+      {
+        "file": "output/rogue_full_selftest_20261011/final_native_full_map_console.txt",
+        "line": 3487,
+        "marker": "[ROGUE_LIVE:ultimate:fortifications_verified]",
+        "status": "consumer_pass",
+        "assertion_count": 5,
+        "before_native_frequency": 3.5999999046326,
+        "after_native_frequency": 3.7799999713898,
+        "selection": {
+          "card_id": "fortifications",
+          "grant_id": "reward:0:debug:7:fortifications",
+          "offer_token": "0:debug:7",
+          "ok": true,
+          "via": "debug_offer_then_ROGUE_REWARD_SELECT"
+        },
+        "assertions": [
+          {
+            "actual": 6,
+            "expected": 6,
+            "name": "production_technology_speed_increment",
+            "status": "pass"
+          },
+          {
+            "actual": 3.7799999713898,
+            "expected": 3.7799998998642,
+            "name": "actual_native_tower_frequency",
+            "status": "pass"
+          },
+          {
+            "actual": 1,
+            "expected": 1,
+            "name": "fortified_tower_native_primary_present",
+            "status": "pass"
+          },
+          {
+            "actual": 168095584,
+            "expected": 168095372,
+            "name": "fortified_tower_native_filter_matches_attack",
+            "status": "pass"
+          },
+          {
+            "actual": 168096000,
+            "expected": 168095584,
+            "name": "fortified_tower_actual_logical_damage",
+            "status": "pass"
+          }
+        ]
+      }
+    ]
+  },
+  "audit_sources": [
+    "output/rogue_full_selftest_20261011/builder_audit.json",
+    "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+    "output/rogue_full_selftest_20261011/boss_actions_audit.json"
+  ],
+  "screenshots": [
+    {
+      "file": "output/rogue_full_selftest_20261011/tower_cards_game_only.png",
+      "source": "actual_Dota_game_window_capture",
+      "sha256": "894b7c33337dafc379fc18a4c1a8d9de27181b68f974b5303cc5820982615431"
+    },
+    {
+      "file": "output/rogue_full_selftest_20261011/ultimate_cards_game_only.png",
+      "source": "actual_Dota_game_window_capture",
+      "sha256": "1d1188699a33db65f53e81ce5c5a6d256f6810f4bd6ea05b54f0e7971c4f6812"
+    }
+  ],
+  "cards": [
+    {
+      "card_id": "frozen_wall",
+      "name": "冰封城墙",
+      "type": "boss",
+      "formal_description": "所有波次怪和建筑挑战怪的攻击速度永久降低15%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "tools/test_wave_native_attack_cap_sources.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 20,
+          "kind": "controlled_native_modifier_and_actual_health_loss"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 36,
+          "kind": "native_attack_order_timestamps"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/mine_wave_console.txt",
+          "line": 2,
+          "kind": "actual_formal_wave_native_modifier_projection"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "recruit_training",
+      "name": "新兵作训",
+      "type": "boss",
+      "formal_description": "基础箭塔LV1至LV4的攻击力永久翻倍。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "tools/test_recruit_training_display.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 20,
+          "kind": "controlled_native_modifier_and_actual_health_loss"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_consumers1_console.txt",
+          "line": 14,
+          "kind": "formal_grant_actual_registered_unit_same_frame_getter"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "ion_shield",
+      "name": "离子护盾",
+      "type": "boss",
+      "formal_description": "城墙单次受到的伤害不会超过其最大生命值的20%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/wall_fusion_result_console.txt",
+          "line": 8,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "weakening_orb",
+      "name": "虚弱宝珠",
+      "type": "boss",
+      "formal_description": "后续首个含Boss或精英的正式波次中，优先令Boss攻击力降低50%；若无Boss则作用于第一个精英怪。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "tools/test_weakening_orb_display.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 20,
+          "kind": "controlled_native_modifier_and_actual_health_loss"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/mine_wave_console.txt",
+          "line": 2,
+          "kind": "actual_next_special_wave_role_native_attack_and_exclusion"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "divine_wish",
+      "name": "神许愿",
+      "type": "boss",
+      "formal_description": "立即从卡牌池随机获得3张卡牌的全部效果。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_divine_wish_history.lua",
+        "tools/test_rogue_reward_ui.js",
+        "tools/tests/escape_choice_windows.test.cjs"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/fresh_wish_console.txt",
+          "reference": "ROGUE_LIVE:divine_wish:formal_select"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/fresh_wish_console.txt",
+          "reference": "ROGUE_LIVE:divine_wish:actual_children"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/fresh_wish_console.txt",
+          "reference": "ROGUE_BOSS_ACTIONS_PROBE divine_wish select原始前后钱包"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/fresh_fusion_console.txt",
+          "reference": "ROGUE_LIVE:in_step:wish_child_final"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/wish_bounty_result_console.txt",
+          "reference": "ROGUE_LIVE:bounty_order:wish_all_categories_final"
+        }
+      ],
+      "remaining_boundary_ids": [
+        "probability_distribution",
+        "bounty_building_registration"
+      ]
+    },
+    {
+      "card_id": "tower_growth",
+      "name": "炮塔成长",
+      "type": "boss",
+      "formal_description": "所有防御塔每次升级后永久提高10%攻击力。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 20,
+          "kind": "controlled_native_modifier_and_actual_health_loss"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/combat_final2_console.txt",
+          "line": 25,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "fortifications",
+      "name": "防御工事",
+      "type": "boss",
+      "formal_description": "所有防御塔攻击速度提高6%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "scripts/vscripts/tests/test_ultimate_tower_rogue_effects.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_consumers1_console.txt",
+          "line": 12,
+          "kind": "formal_grant_actual_registered_unit_same_frame_getter"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/ultimate_fortifications_console.txt",
+          "line": 4,
+          "kind": "formal_grant_and_actual_production_consumer"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/final_native_full_map_console.txt",
+          "line": 3487,
+          "marker": "[ROGUE_LIVE:ultimate:fortifications_verified]",
+          "status": "consumer_pass",
+          "assertion_count": 5,
+          "before_native_frequency": 3.5999999046326,
+          "after_native_frequency": 3.7799999713898,
+          "selection": {
+            "card_id": "fortifications",
+            "grant_id": "reward:0:debug:7:fortifications",
+            "offer_token": "0:debug:7",
+            "ok": true,
+            "via": "debug_offer_then_ROGUE_REWARD_SELECT"
+          },
+          "assertions": [
+            {
+              "actual": 6,
+              "expected": 6,
+              "name": "production_technology_speed_increment",
+              "status": "pass"
+            },
+            {
+              "actual": 3.7799999713898,
+              "expected": 3.7799998998642,
+              "name": "actual_native_tower_frequency",
+              "status": "pass"
+            },
+            {
+              "actual": 1,
+              "expected": 1,
+              "name": "fortified_tower_native_primary_present",
+              "status": "pass"
+            },
+            {
+              "actual": 168095584,
+              "expected": 168095372,
+              "name": "fortified_tower_native_filter_matches_attack",
+              "status": "pass"
+            },
+            {
+              "actual": 168096000,
+              "expected": 168095584,
+              "name": "fortified_tower_actual_logical_damage",
+              "status": "pass"
+            }
+          ]
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "feast",
+      "name": "盛宴",
+      "type": "boss",
+      "formal_description": "当前城墙的最大生命值和当前生命值立即翻倍。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/combat_formal_console.txt",
+          "line": 26,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "boss_promise",
+      "name": "老板的大饼",
+      "type": "boss",
+      "formal_description": "所有伐木工攻击速度翻倍，持续120秒。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 20,
+          "kind": "controlled_native_modifier_and_actual_health_loss"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 36,
+          "kind": "native_attack_order_timestamps"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_consumers1_console.txt",
+          "line": 10,
+          "kind": "formal_grant_actual_registered_unit_same_frame_getter"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/endstage_verify_console.txt",
+          "line": 39,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": [
+        "late_workers_original_timer"
+      ]
+    },
+    {
+      "card_id": "command_change",
+      "name": "命令更换",
+      "type": "boss",
+      "formal_description": "下一次肉鸽卡牌选择额外获得1次刷新机会。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_actions_full.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/actions_trials_console.txt",
+          "reference": "ROGUE_LIVE:command_change_trial"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "infrastructure_maniac",
+      "name": "基建狂魔",
+      "type": "boss",
+      "formal_description": "立即免费随机升级可升级建筑3次。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "scripts/vscripts/tests/test_infrastructure_maniac.lua",
+        "scripts/vscripts/tests/test_gold_mine_reward_upgrade.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/endless_class_console.txt",
+          "reference": "ROGUE_LIVE:bounty_current"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "gunpowder_splash",
+      "name": "火药溅射",
+      "type": "boss",
+      "formal_description": "所有穿透弩炮伤害永久提高30%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 20,
+          "kind": "controlled_native_modifier_and_actual_health_loss"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/gunpowder_confirmed_console.txt",
+          "line": 6,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "radiant_sapling",
+      "name": "璀璨树苗",
+      "type": "boss",
+      "formal_description": "立即获得当前木材数量20%的额外木材。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_actions_full.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/endless_class_console.txt",
+          "reference": "ROGUE_LIVE:bounty_current"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "kick_when_down",
+      "name": "落井下石",
+      "type": "boss",
+      "formal_description": "你对处于移动减速状态的波次怪和建筑挑战怪造成的伤害提高50%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/combat_formal_console.txt",
+          "line": 10,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "tower_network",
+      "name": "炮塔串联",
+      "type": "boss",
+      "formal_description": "领取时每有1座最终满阶防御塔，所有防御塔永久提高5%攻击，最多提高50%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 20,
+          "kind": "controlled_native_modifier_and_actual_health_loss"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/fresh_network_console.txt",
+          "line": 4,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": [
+        "network_snapshot_after_destruction"
+      ]
+    },
+    {
+      "card_id": "fiscal_subsidy",
+      "name": "财政补贴",
+      "type": "boss",
+      "formal_description": "立即获得10000金币。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_actions_full.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/endless_class_console.txt",
+          "reference": "ROGUE_LIVE:bounty_current"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "corrosive_shield",
+      "name": "腐蚀护盾",
+      "type": "boss",
+      "formal_description": "波次怪和建筑挑战怪每次对你的单位发动普通攻击时，自身永久降低1点护甲，可叠加。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "scripts/vscripts/tests/test_custom_monster_armor.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/fusion_corrosive_console.txt",
+          "line": 8,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "nuclear_bomb",
+      "name": "核弹",
+      "type": "boss",
+      "formal_description": "建造者获得核弹道具；使用后杀死场上当前存活的所有非Boss敌方怪物。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "scripts/vscripts/tests/test_rogue_item_rewards.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/verify_wave6_console.txt",
+          "reference": "ROGUE_LIVE:nuclear_verify"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "bounty_order",
+      "name": "赏金密令",
+      "type": "boss",
+      "formal_description": "接下来5次挑战建筑怪物挑战成功时，额外获得一份相同奖励。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_actions_full.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/wish_bounty_result_console.txt",
+          "reference": "ROGUE_LIVE:bounty_order:wish_all_categories_final"
+        }
+      ],
+      "remaining_boundary_ids": [
+        "bounty_building_registration"
+      ]
+    },
+    {
+      "card_id": "high_morale",
+      "name": "斗志昂扬",
+      "type": "boss",
+      "formal_description": "我方英雄和防御塔的攻击加成提高30%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "tools/test_hero_rogue_projection.lua",
+        "scripts/vscripts/tests/test_ultimate_tower_rogue_effects.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/final_combat_valid_console.txt",
+          "line": 4,
+          "kind": "formal_grant_and_actual_production_consumer"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/fresh_fusion_console.txt",
+          "line": 4,
+          "kind": "formal_grant_and_actual_production_consumer"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/ultimate_verified_console.txt",
+          "line": 4,
+          "marker": "[ROGUE_BOSS_NATIVE_ULTIMATE_RESULT]"
+        }
+      ],
+      "remaining_boundary_ids": [
+        "morale_first_post_fusion_grant"
+      ]
+    },
+    {
+      "card_id": "in_step",
+      "name": "步调一致",
+      "type": "boss",
+      "formal_description": "所有防御塔增加相当于关联英雄当前攻击力10%的攻击力。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "tools/test_hero_rogue_projection.lua",
+        "scripts/vscripts/tests/test_ultimate_tower_rogue_effects.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/combat_formal_console.txt",
+          "line": 19,
+          "kind": "formal_grant_and_actual_production_consumer"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/fresh_fusion_console.txt",
+          "line": 8,
+          "kind": "formal_grant_and_actual_production_consumer"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/ultimate_verified_console.txt",
+          "line": 4,
+          "marker": "[ROGUE_BOSS_NATIVE_ULTIMATE_RESULT]"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "construction_order",
+      "name": "建造密令",
+      "type": "boss",
+      "formal_description": "建造者获得一个可令任意可升级建筑免费提升1级的道具。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "scripts/vscripts/tests/test_rogue_item_rewards.lua",
+        "scripts/vscripts/tests/test_gold_mine_reward_upgrade.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/fresh_wish_console.txt",
+          "reference": "ROGUE_LIVE:construction_order:clean_final"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "internship_certificate",
+      "name": "实习证明",
+      "type": "boss",
+      "formal_description": "初级修理工的训练上限永久增加2。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "scripts/vscripts/tests/test_lumberjack_training_queue_integration.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/gunpowder_confirmed_console.txt",
+          "reference": "ROGUE_LIVE:internship_capacity:final"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/endstage_verify_console.txt",
+          "reference": "ROGUE_LIVE:internship_capacity"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/verify_wave6_console.txt",
+          "reference": "后续正式状态观察"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "bloodthirst_potion",
+      "name": "渴血药剂",
+      "type": "boss",
+      "formal_description": "英雄立即获得100%吸血持续60秒，随后永久获得20%吸血。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "tools/test_hero_rogue_projection.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/combat_final2_console.txt",
+          "line": 8,
+          "kind": "formal_grant_and_actual_production_consumer"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/final_combat_valid_console.txt",
+          "line": 10,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "infrastructure_outsourcing",
+      "name": "基建外包",
+      "type": "boss",
+      "formal_description": "立即获得建筑数×当前难度×100金币。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_actions_full.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_actions_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/endless_class_console.txt",
+          "reference": "ROGUE_LIVE:bounty_current"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "iron_fist_policy",
+      "name": "铁腕政策",
+      "type": "boss",
+      "formal_description": "防御塔和英雄攻击无视目标40%护甲。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "tools/test_projected_attack_damage_category.lua",
+        "scripts/vscripts/tests/test_tower_skill_tree_exclusion.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/wish_bounty_result_console.txt",
+          "line": 6,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": [
+        "scripted_armor_piercing"
+      ]
+    },
+    {
+      "card_id": "training_dummy",
+      "name": "训练靶子",
+      "type": "boss",
+      "formal_description": "放置持续30秒的靶子；我方单位每次攻击它永久获得100攻击力。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/boss_combat_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/native_verified_console.txt",
+          "line": 20,
+          "kind": "controlled_native_modifier_and_actual_health_loss"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/combat_final2_console.txt",
+          "line": 13,
+          "kind": "formal_grant_and_actual_production_consumer"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "wall_recovery",
+      "name": "壁垒续航",
+      "type": "builder_start",
+      "formal_description": "城墙每秒恢复20生命，每60秒增加1点护甲值。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/wall_fusion_result_console.txt",
+          "line": 3,
+          "marker": "[ROGUE_LIVE:wall_recovery_final]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "wealthy_start",
+      "name": "富甲天下",
+      "type": "builder_start",
+      "formal_description": "每波获得30乘波数的金币。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/resources_upper_console.txt",
+          "line": 1,
+          "marker": "[ROGUE_LIVE:wealthy_start:final]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "sharp_volley",
+      "name": "锐利速射",
+      "type": "builder_start",
+      "formal_description": "你的防御塔攻击速度提高20%；每次攻击命中后攻击力加1，连续射击和穿透命中分别计数。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_rogue_boss_combat.lua",
+        "scripts/vscripts/tests/test_ultimate_tower_rogue_effects.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_consumers1_console.txt",
+          "line": 3,
+          "marker": "[ROGUE_LIVE:sharp_volley]",
+          "console_json_complete": true
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/gunpowder_confirmed_console.txt",
+          "line": 2,
+          "marker": "[ROGUE_LIVE:sharp_volley_hits]",
+          "console_json_complete": true
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/ultimate_verified_console.txt",
+          "line": 4,
+          "marker": "[ROGUE_BOSS_NATIVE_ULTIMATE_RESULT]"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/ultimate_retest_final_run_console.txt",
+          "line": 785
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "lumberjack_assault",
+      "name": "伐木狂袭",
+      "type": "builder_start",
+      "formal_description": "伐木工攻击速度提高25%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_worker_consumers.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_consumers1_console.txt",
+          "line": 4,
+          "marker": "[ROGUE_LIVE:lumberjack_assault]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "fortified_defense",
+      "name": "坚甲固守",
+      "type": "builder_start",
+      "formal_description": "城墙获得5000生命、5点护甲和10%伤害减免。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_building_consumers.lua",
+        "output/rogue_full_selftest_20261011/builder_combat_consumers.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/remaining_console.txt",
+          "line": 3,
+          "marker": "[ROGUE_LIVE:fortified_defense:final]",
+          "console_json_complete": true
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_initial2_console.txt",
+          "line": 4,
+          "marker": "[ROGUE_LIVE:fortified_defense]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "infrastructure_maniac_start",
+      "name": "基建狂魔",
+      "type": "builder_start",
+      "formal_description": "基地升级的所有木材消耗后返还。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_building_consumers.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/actions_wave_console.txt",
+          "line": 5,
+          "marker": "[ROGUE_LIVE:consumer_result:5]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "precision_lumber",
+      "name": "精研伐木",
+      "type": "builder_start",
+      "formal_description": "伐木效率提高1。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_worker_consumers.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_consumers1_console.txt",
+          "line": 5,
+          "marker": "[ROGUE_LIVE:precision_lumber]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "peaceful_labor",
+      "name": "安居乐业",
+      "type": "builder_start",
+      "formal_description": "城墙没有被攻击时，伐木效率提高2。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_consumers1_console.txt",
+          "line": 6,
+          "marker": "[ROGUE_LIVE:peaceful_labor]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "woodcutting_bounty",
+      "name": "伐骨积薪",
+      "type": "builder_start",
+      "formal_description": "击杀怪物获得5乘当前波数的木材。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/endstage_verify_console.txt",
+          "line": 1,
+          "marker": "[ROGUE_LIVE:woodcutting_bounty:final]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "instant_wood",
+      "name": "瞬采木料",
+      "type": "builder_start",
+      "formal_description": "立即获得100乘难度的木材。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua",
+        "output/rogue_full_selftest_20261011/builder_native_probe_test.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_initial2_console.txt",
+          "line": 1,
+          "marker": "[ROGUE_LIVE:instant_wood]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "gold_mining_secret",
+      "name": "淘金秘法",
+      "type": "builder_start",
+      "formal_description": "采矿效率提高10%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_gold_consumers.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/ownership_actions_console.txt",
+          "line": 7,
+          "marker": "[ROGUE_LIVE:gold_mining_final]",
+          "console_json_complete": false,
+          "extraction": "complete leading assertions/income_samples values; trailing event log interrupted"
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "hero_descent",
+      "name": "英雄降临",
+      "type": "builder_start",
+      "formal_description": "开局即可免费建造英雄祭坛。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_free_altar_runtime.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/final_scene_console.txt",
+          "line": 49,
+          "marker": "[ROGUE_FINAL_SCENE] formal_hero_descent_selection",
+          "console_json_complete": true
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/final_scene_console.txt",
+          "line": 62,
+          "marker": "[ROGUE_FINAL_SCENE] build_requested",
+          "console_json_complete": true
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/final_scene_console.txt",
+          "line": 115,
+          "marker": "[ROGUE_FINAL_SCENE] build_completed",
+          "console_json_complete": true
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/final_scene_console.txt",
+          "line": 212,
+          "marker": "[ROGUE_FINAL_SCENE] native_hero_owner",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "population_expansion",
+      "name": "聚拢扩容",
+      "type": "builder_start",
+      "formal_description": "立刻获得人口上限5。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua",
+        "output/rogue_full_selftest_20261011/builder_native_probe_test.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_initial2_console.txt",
+          "line": 2,
+          "marker": "[ROGUE_LIVE:population_expansion]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "natures_gift",
+      "name": "自然馈赠",
+      "type": "builder_start",
+      "formal_description": "每秒木材增加3。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/actions_wave_console.txt",
+          "line": 4,
+          "marker": "[ROGUE_LIVE:consumer_result:4]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "emergency_reinforcement",
+      "name": "紧急加固",
+      "type": "builder_start",
+      "formal_description": "城墙生命值低于等于30%时，受到伤害降低20%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_combat_consumers.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/remaining_console.txt",
+          "line": 4,
+          "marker": "[ROGUE_LIVE:emergency_reinforcement:final]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "wind_strategy",
+      "name": "疾风战法",
+      "type": "builder_start",
+      "formal_description": "英雄攻击速度提高400%，攻击间隔减少0.03秒。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_hero_rogue_projection.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_initial2_console.txt",
+          "line": 6,
+          "marker": "[ROGUE_LIVE:wind_strategy]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "allround_tempering",
+      "name": "全能淬炼",
+      "type": "builder_start",
+      "formal_description": "英雄攻击速度提高100%，全属性提高3。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "tools/test_hero_rogue_projection.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_initial2_console.txt",
+          "line": 8,
+          "marker": "[ROGUE_LIVE:allround_tempering]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "heavy_hand",
+      "name": "夯大力",
+      "type": "builder_start",
+      "formal_description": "合体伐木工采木暴击率提高5个百分点，暴击基础收益为双倍木材。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/fused_rebirth_console.txt",
+          "line": 1,
+          "marker": "[ROGUE_LIVE:heavy_hand]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": [
+        "probability_distribution"
+      ]
+    },
+    {
+      "card_id": "first_to_strike",
+      "name": "身先士卒",
+      "type": "builder_start",
+      "formal_description": "英雄攻击大树获得的木材提高100%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_resource_runtime.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/ownership_actions_console.txt",
+          "line": 11,
+          "marker": "[ROGUE_LIVE:first_to_strike_retest]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "endless_rebirth",
+      "name": "无限轮回",
+      "type": "builder_start",
+      "formal_description": "英雄对转生Boss的伤害提高50%。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "output/rogue_full_selftest_20261011/builder_combat_consumers.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/remaining_console.txt",
+          "line": 2,
+          "marker": "[ROGUE_LIVE:endless_rebirth:final]",
+          "console_json_complete": true
+        }
+      ],
+      "remaining_boundary_ids": []
+    },
+    {
+      "card_id": "long_range_volley",
+      "name": "远距齐射",
+      "type": "builder_start",
+      "formal_description": "箭塔攻击距离提高500，攻击力提高800。",
+      "offline_status": "pass",
+      "native_core_status": "pass",
+      "offline_test_sources": [
+        "scripts/vscripts/tests/test_tower_upgrade_targeting.lua"
+      ],
+      "audit": "output/rogue_full_selftest_20261011/builder_audit.json",
+      "native_evidence": [
+        {
+          "file": "output/rogue_full_selftest_20261011/builder_consumers1_console.txt",
+          "line": 2,
+          "marker": "[ROGUE_LIVE:long_range_volley]",
+          "console_json_complete": true
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/ultimate_verified_console.txt",
+          "line": 4,
+          "marker": "[ROGUE_BOSS_NATIVE_ULTIMATE_RESULT]"
+        },
+        {
+          "file": "output/rogue_full_selftest_20261011/ultimate_retest_final_run_console.txt",
+          "line": 785
+        }
+      ],
+      "remaining_boundary_ids": []
+    }
+  ],
+  "disabled": [
+    {
+      "card_id": "far_sighted",
+      "name": "深谋远虑",
+      "status": "skipped_disabled",
+      "reason": "需要定义与已领取排除及效果失败的原子事务"
+    },
+    {
+      "card_id": "goblin_duplicator",
+      "name": "地精复制器",
+      "status": "skipped_disabled",
+      "reason": "项目没有地精复制器道具与目标选择流程"
+    },
+    {
+      "card_id": "lucky_watch",
+      "name": "幸运怀表",
+      "status": "skipped_disabled",
+      "reason": "原文未明确哪些技能属于相关技能"
+    },
+    {
+      "card_id": "burst_potion",
+      "name": "爆发药剂",
+      "status": "skipped_disabled",
+      "reason": "兴奋剂效果未在来源中定义"
+    }
+  ]
+}

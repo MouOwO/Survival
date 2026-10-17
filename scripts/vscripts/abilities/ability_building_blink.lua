@@ -3,6 +3,10 @@
 ability_building_blink = class({})
 local M = ability_building_blink
 _G.ability_building_blink = M
+-- Separate KV keeps the wall's 120-second cooldown native on both clients
+-- and server, while using the same authoritative movement implementation.
+ability_wall_blink = M
+_G.ability_wall_blink = M
 print("[BuildingBlink] ability class loaded name=ability_building_blink")
 
 local relocation = require("systems/tower_relocation_service")
@@ -35,7 +39,9 @@ end
 
 function M:GetCustomCastErrorLocation()
     if self.cast_error == "relocation_out_of_range" then return "移动距离不能超过1000" end
-    if self.cast_error == "move_ability_cooldown" then return "移动防御塔CD中" end
+    if self.cast_error == "move_ability_cooldown" then
+        return self:GetAbilityName()=="ability_wall_blink" and "移动城墙CD中" or "移动防御塔CD中"
+    end
     return "请选择网格内可放置的位置"
 end
 

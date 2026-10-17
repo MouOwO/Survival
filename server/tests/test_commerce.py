@@ -25,7 +25,11 @@ class CommerceTests(unittest.TestCase):
     def test_reviewed_selection_and_original_prices(self):
         catalog=build_catalog(ROOT)
         products={p['sku']:p for p in catalog['products']}
-        self.assertEqual(len(products),108)
+        self.assertEqual(len(products),108+15)
+        self.assertEqual(sum(p['product_type']=='bundle' for p in products.values()),15)
+        self.assertEqual({p['sku'] for p in products.values() if not p['enabled']},{'video_p037','video_p038','video_bundle_b003','video_bundle_b005'})
+        self.assertEqual(products['video_p037']['effects'],{'initial_wood':50})
+        self.assertEqual(products['video_p038']['effects'],{'initial_gold':10})
         self.assertEqual(products['video_p033']['price'],100)
         self.assertEqual(products['video_p029']['price'],600)
         self.assertEqual(products['video_p037']['currency'],'shop_gold')
@@ -38,7 +42,7 @@ class CommerceTests(unittest.TestCase):
     def test_empty_wallet_catalog_is_read_only(self):
         before=copy.deepcopy(self.profile)
         result=self.send('commerce_catalog')
-        self.assertEqual(len(result['products']),108)
+        self.assertEqual(len(result['products']),119)
         self.assertEqual(result['balances'],dict(u_coin=0,shop_points=0,shop_gold=0))
         self.assertTrue(all(not p['enabled'] for p in result['products']))
         self.assertEqual(self.profile,before)
@@ -49,11 +53,40 @@ class CommerceTests(unittest.TestCase):
             with self.subTest(sku=product['sku']):
                 self.setUp()
                 self.fund(u_coin=1000000,shop_points=1000000,shop_gold=1000000)
+                if not product['enabled']:
+                    before=copy.deepcopy(self.profile)
+                    self.assertEqual(self.purchase(product['sku'])['error'],'shop_gold_not_open' if product['currency']=='shop_gold' else 'product_unavailable')
+                    self.assertEqual(self.profile,before)
+                    if product['currency']!='shop_gold':
+                        self.assertFalse(product['effects']);self.assertFalse(product['grants']['items'])
+                    else:
+                        self.assertEqual(product['effects'],{'initial_wood':50} if product['sku']=='video_p037' else {'initial_gold':10})
+                    continue
+                required=product['grants'].get('required_vip_level',0)
+                if required:
+                    tier=next(r for r in self.bundle.configs['archive_vip_levels']['rows'] if r['level']==required)
+                    self.profile['save']['gameplay_stats']['vip_recharge_total_fen']=tier['required_recharge_fen']
                 before=copy.deepcopy(self.profile)
                 self.assertTrue(self.purchase(product['sku'])['ok'])
-                for field, amount in product['effects'].items():
-                    self.assertAlmostEqual(self.profile['save']['gameplay_stats'][field],before['save']['gameplay_stats'][field]+amount)
+                # Direct gifts of starjoy points also award every newly crossed
+                # formal tier in the same purchase transaction. Assert all direct
+                # and tier fields, so extra progression is never silently ignored.
+                prior=before['save']['gameplay_stats'];actual=self.profile['save']['gameplay_stats']
+                expected=dict(product['effects']);tiers=[]
+                if expected.get('starjoy_points',0)>0:
+                    score=max(prior.get('starjoy_points_earned',0),prior.get('starjoy_points',0))+expected['starjoy_points']
+                    tiers=[r for r in self.bundle.configs['archive_starjoy_levels']['rows'] if r.get('enabled') and r['level']>prior.get('starjoy_reward_level',0) and score>=r['required_points']]
+                    for tier in tiers:
+                        for field,amount in zip(tier['effect_ids'],tier['effect_values']):expected[field]=expected.get(field,0)+float(amount)
+                    self.assertEqual(actual['starjoy_points_earned'],score)
+                    self.assertEqual(actual['starjoy_reward_level'],max([prior.get('starjoy_reward_level',0)]+[r['level'] for r in tiers]))
+                for field, amount in expected.items():
+                    self.assertAlmostEqual(actual[field],prior.get(field,0)+amount,field)
                 self.assertEqual(self.profile['save']['content_inventory'][product['item_id']],product.get('ownership_quantity',1))
+                for item,count in product['grants']['items'].items():
+                    self.assertEqual(self.profile['save']['content_inventory'][item],count)
+                for claim in product['grants'].get('vip_claims',[]):
+                    self.assertTrue(self.profile['save']['archive']['vip_claimed'][claim])
                 self.assertEqual(self.profile['save']['archive']['commerce']['balances'][product['currency']],1000000-product['price'])
 
     def test_insufficient_and_client_tampering(self):
@@ -107,12 +140,14 @@ class CommerceTests(unittest.TestCase):
         self.fund(u_coin=0,shop_points=100000,shop_gold=1000)
         self.profile['save']['gameplay_stats']['starjoy_points']=8000
         self.profile['save']['gameplay_stats']['initial_gold']=500
-        self.assertTrue(self.purchase('video_p038')['ok'])
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_gold'],0)
-        self.assertEqual(self.profile['save']['gameplay_stats']['initial_gold'],510)
-        self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],8000)
+        before=copy.deepcopy(self.profile)
+        self.assertEqual(self.purchase('video_p038')['error'],'shop_gold_not_open')
+        self.assertEqual(self.profile,before,'Closed gold channel must neither debit nor grant')
         self.assertTrue(self.purchase('video_p113','points_0001')['ok'])
         self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],99412)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_gold'],1000)
+        self.assertEqual(self.profile['save']['gameplay_stats']['initial_gold'],500)
+        self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],8000)
 
     def test_ticket_repeatable_and_stat_overflow_does_not_charge(self):
         self.fund(u_coin=100000)

@@ -16,9 +16,18 @@ function M.play(wall, attacker)
     -- Place the strike on the visible square face, not at the unit's center
     -- or the outside of its navigation shoulders.
     local point=Vector(origin.x+dx/length*124,origin.y+dy/length*124,origin.z+64)
-    local index=ParticleManager:CreateParticle(M.particle,PATTACH_WORLDORIGIN,wall)
-    ParticleManager:SetParticleControl(index,0,point)
-    ParticleManager:ReleaseParticleIndex(index)
+    local manager=ParticleManager
+    local index=manager:CreateParticle(M.particle,PATTACH_WORLDORIGIN,wall)
+    local ok,err=pcall(function() manager:SetParticleControl(index,0,point) end)
+    if not ok then
+        if type(index)=="number" and index>=0
+            and index<math.huge and index==math.floor(index) then
+            pcall(function() manager:DestroyParticle(index,true) end)
+            pcall(function() manager:ReleaseParticleIndex(index) end)
+        end
+        error(err,0)
+    end
+    manager:ReleaseParticleIndex(index)
 end
 
 return M

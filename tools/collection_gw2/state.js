@@ -5,8 +5,8 @@ window.previewState={page:'collection',category:collectionStart,state:collection
 window.collectionPreviewPages=JSON.parse(JSON.stringify(COLLECTION_GW2_FIXTURE.pages));
 let collectionSequence=100;
 window.collectionPreviewSnapshot=category=>({ok:1,sequence:++collectionSequence,chunk:1,chunks:1,category_id:category,categories:COLLECTION_GW2_FIXTURE.categories,rows:collectionPreviewPages[category]||[],social:COLLECTION_GW2_FIXTURE.social[category],pending:0,upgrade_pending:0,currencies:{gold:2881,points:320,tickets:20}});
-window.collectionPreviewSend=category=>{if(category==='wife')throw Error('The unconfigured wife tab must never receive a fabricated pool.');emit('survival_archive_snapshot',collectionPreviewSnapshot(category));syncLayout();};
-window.collectionPreviewSelect=async category=>{nodes['CollectionGW2Tab_'+category].events.onactivate();if(category!=='wife')collectionPreviewSend(category);previewState.category=category;await new Promise(resolve=>setTimeout(resolve,160));syncLayout();return cfg.SurvivalCollection.Inspect();};
+window.collectionPreviewSend=category=>{if(!COLLECTION_GW2_FIXTURE.social[category])throw Error('Unknown fixture pool: '+category);emit('survival_archive_snapshot',collectionPreviewSnapshot(category));syncLayout();};
+window.collectionPreviewSelect=async category=>{nodes['CollectionGW2Tab_'+category].events.onactivate();collectionPreviewSend(category);previewState.category=category;await new Promise(resolve=>setTimeout(resolve,160));syncLayout();return cfg.SurvivalCollection.Inspect();};
 window.collectionPreviewSearch=value=>{nodes.CollectionGW2Search.el.value=value;nodes.CollectionGW2Search.el.dispatchEvent(new Event('input',{bubbles:true}));syncLayout();return cfg.SurvivalCollection.Inspect();};
 function collectionNavFixture(){
  const owner=new Panel('Panel',root,'PreviewContext_collection_nav');owner.AddClass('PreviewContext');
@@ -25,8 +25,8 @@ window.previewReady=(async()=>{
  for(const name of ['SurvivalArchive','SurvivalTreasure','SurvivalDaily','SurvivalVIP'])if(cfg[name]&&cfg[name].Close)cfg[name].Close();
  if(collectionMode==='empty')collectionPreviewPages[collectionStart]=[];
  if(collectionMode==='unknown')for(const rows of Object.values(collectionPreviewPages))for(const row of rows){delete row.count;row.count_known=0;}
- if(collectionMode==='long')for(const rows of Object.values(collectionPreviewPages)){rows[0].name+='·本地超长名称边界样例';rows[0].description=(rows[0].description+'\n').repeat(50);}
- collectionNavFixture();cfg.SurvivalCollection.Open(collectionStart);if(collectionStart!=='wife')collectionPreviewSend(collectionStart);
+ if(collectionMode==='long')for(const rows of Object.values(collectionPreviewPages)){if(!rows.length)continue;rows[0].name+='·本地超长名称边界样例';rows[0].description=(rows[0].description+'\n').repeat(50);}
+ collectionNavFixture();cfg.SurvivalCollection.Open(collectionStart);collectionPreviewSend(collectionStart);
  cfg.SurvivalCollectionNav.Refresh();syncLayout();await new Promise(resolve=>setTimeout(resolve,260));syncLayout();
  await document.fonts.ready;await Promise.all([...document.images].map(image=>image.decode().catch(()=>false)));
  previewState.ready=true;return true;

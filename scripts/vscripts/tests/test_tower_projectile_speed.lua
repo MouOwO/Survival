@@ -93,6 +93,7 @@ end
 local route_data = production_function(
     "scripts/vscripts/systems/building_upgrade_system.lua", "route_unit_data", {
         global_rules = global_rules,
+        tower_routes = require("config/tower_route_config"),
     })
 local apply_tower_level_data = production_function(
     "scripts/vscripts/systems/building_upgrade_system.lua", "apply_tower", {

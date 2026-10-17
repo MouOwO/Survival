@@ -18,7 +18,7 @@
                 g.y=baseY+49*(baseScale-g.scale);
             } else {
                 g.x=actionX-(g.heroWidth+10)*g.scale;
-                g.y=height-g.height*g.scale-6;
+                g.y=height-g.height*g.scale-(g.lumberjack?0:6);
             }
             g.actionX=actionX;
             g.actionOffset=(actionX-g.x)/g.scale;
@@ -41,9 +41,11 @@
         var minimapSize=Math.min(reserve-24,220*height/941);
         if(presentation && presentation.worker) {
             var workerWidth=Math.max(680,count*120+40),workerMulti=!!(presentation.lumberjack&&presentation.multi);
-            var portraitWidth=workerMulti?320:0,workerHeight=workerMulti?330:presentation.lumberjack?260:205;
+            // Selection size must not move the worker's abilities or stat row.
+            var portraitWidth=workerMulti?320:0,workerHeight=presentation.lumberjack?260:205;
             return anchored({count:count,slot:116,step:120,height:workerHeight,
                 heroWidth:portraitWidth,portraitSize:264,centerWidth:workerWidth,
+                portraitY:workerMulti?23:49,portraitHeight:workerMulti?237:264,
                 attributeWidth:240,barWidth:workerWidth-30,minimapSize:minimapSize,
                 worker:true,lumberjack:!!presentation.lumberjack},false,false);
         }

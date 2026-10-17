@@ -6,18 +6,21 @@ IsServer = function() return true end
 DOTA_UNIT_CAP_MELEE_ATTACK, DOTA_UNIT_CAP_RANGED_ATTACK = 1, 2
 DOTA_UNIT_CAP_MOVE_GROUND, DOTA_TEAM_BADGUYS = 1, 3
 MODIFIER_EVENT_ON_DEATH, MODIFIER_PROPERTY_ATTACK_RANGE_BONUS = 3, 4
+MODIFIER_PROPERTY_ATTACK_RANGE_BASE_OVERRIDE = 5
 local noop = function() end
 package.loaded["systems/enemy_attack_observer"] = { is_ready = function() return true end }
 package.loaded["core/team_alignment"] = { enforce = noop }
 package.loaded["systems/wall_navigation_service"] = {}
 local ai = require("modifiers/modifier_enemy_wall_ai")
+local range_modifier = require("modifiers/modifier_survival_hero_attack_range")
+assert(range_modifier:DeclareFunctions()[1] == MODIFIER_PROPERTY_ATTACK_RANGE_BASE_OVERRIDE)
 local rows = require("config/generated/wave_definitions").rows
 local definitions = require("config/generated/monster_archetypes")
 local marker = { GetAbsOrigin = function() return { x = 0, y = 0, z = 0 } end }
 local units, sequence = {}, 0
 local suppress_capability_getter, capability_override
 local function unit()
-    local u = { index = #units + 1, modifiers = {}, attack_capability = 2 }
+    local u = { index = #units + 1, modifiers = {}, attack_capability = 2, range_bonus = 0 }
     function u:IsNull() return false end
     function u:entindex() return self.index end
     function u:GetAttackCapability() return capability_override or self.attack_capability end
@@ -29,12 +32,32 @@ local function unit()
         self.attack_capability, self.capability_sequence = value, sequence
     end
     function u:HasModifier(name) return self.modifiers[name] ~= nil end
+    function u:Script_GetAttackRange()
+        local m = self.modifiers.modifier_survival_hero_attack_range
+        local contact = self.modifiers.modifier_enemy_wall_ai
+        return (m and m:GetModifierAttackRangeOverride() or 128) + self.range_bonus
+            + (contact and contact:GetModifierAttackRangeBonus() or 0)
+    end
     function u:FindAbilityByName() return nil end
     function u:AddNewModifier(_, _, name, params)
+        if name == "modifier_survival_hero_attack_range" then
+            assert(not self.modifiers.modifier_enemy_wall_ai, "native range must precede wall AI declaration")
+            local m = self.modifiers[name]
+            if m then m:OnRefresh(params); return m end
+            m = setmetatable({ GetStackCount = function(self) return self.stack end,
+                SetStackCount = function(self,value) self.stack=value end }, { __index=range_modifier })
+            self.modifiers[name]=m
+            m:OnCreated(params)
+            return m
+        end
         if name ~= "modifier_enemy_wall_ai" then self.modifiers[name] = {}; return end
         assert(self.capability_sequence and self.hero_visual_complete,
             "opt-out cannot be captured before final capability/appearance")
         assert(self.survival_wave_movement_type ~= nil)
+        if self.survival_is_wave_monster then
+            assert(self.modifiers.modifier_survival_hero_attack_range,
+                "formal native range was lost before AI declaration")
+        end
         local m = setmetatable({ GetParent = function() return self end,
             StartIntervalThink = noop, SetHasCustomTransmitterData = noop }, { __index = ai })
         -- Match the earliest possible native declaration order.
@@ -45,7 +68,7 @@ local function unit()
     end
     for _, name in ipairs({ "SetBaseMaxHealth", "SetMaxHealth", "SetHealth",
         "SetBaseDamageMin", "SetBaseDamageMax", "SetPhysicalArmorBaseValue",
-        "SetBaseMoveSpeed", "SetBaseAttackTime", "Script_SetAttackRange",
+        "SetBaseMoveSpeed", "SetBaseAttackTime",
         "SetModelScale", "SetModel", "SetOriginalModel", "SetMoveCapability", "AddAbility" }) do
         u[name] = noop
     end
@@ -53,6 +76,7 @@ local function unit()
     return u
 end
 local dependencies = {
+    ["visual/model_scale"] = require("visual/model_scale"),
     ["core/event_bus"] = { emit = noop },
     ["core/events"] = { MONSTER_SPAWNED = "spawned" },
     ["core/team_alignment"] = { enforce = noop },
@@ -122,6 +146,9 @@ for _, row in ipairs(rows) do
         local u = units[#units]
         local expected = definition.attack_type == "ranged"
         local m = u.modifiers.modifier_enemy_wall_ai
+        assert(u.Script_SetAttackRange == nil and u.SetAttackRange == nil,
+            "fixture must match the real missing-setter API")
+        assert(u:Script_GetAttackRange() == (definition.attack_range or 128), row.wave_id .. " native range")
         assert(u.survival_wave_skip_contact_range_bonus == expected, row.wave_id)
         assert(m.contact_range_property_enabled == not expected, row.wave_id)
         assert(#m.declarations == (expected and 1 or 2), row.wave_id)
@@ -134,6 +161,32 @@ for _, row in ipairs(rows) do
         batches = batches + 1
     end
 end
+-- The native base property is readable in the client VM without server fields.
+local configured = units[1].modifiers.modifier_survival_hero_attack_range
+local server_check = IsServer
+IsServer = function() return false end
+assert(configured:GetModifierAttackRangeOverride() == configured:GetStackCount())
+IsServer = server_check
+
+-- Native base override and independent range buffs/contact bonus remain additive.
+local contact_unit
+for _,u in ipairs(units) do
+    if u:GetAttackCapability() == DOTA_UNIT_CAP_MELEE_ATTACK then contact_unit=u;break end
+end
+assert(contact_unit)
+local base=contact_unit:Script_GetAttackRange()
+contact_unit.range_bonus=50
+contact_unit.modifiers.modifier_enemy_wall_ai.contact_range_delta=80
+assert(contact_unit:Script_GetAttackRange()==base+130)
+contact_unit.range_bonus=0
+contact_unit.modifiers.modifier_enemy_wall_ai.contact_range_delta=0
+-- Reapplying the base updates the same modifier, retaining external bonuses.
+local retained_modifier=contact_unit.modifiers.modifier_survival_hero_attack_range
+contact_unit.range_bonus=25
+retained_modifier:OnRefresh({attack_range=600})
+assert(contact_unit:Script_GetAttackRange()==625)
+retained_modifier:OnRefresh({attack_range=base})
+contact_unit.range_bonus=0
 assert(batches > 100 and retained > 0 and wave15 == 61 and wave15_melee > 0,
     "wave15 flying melee must keep contact reach compensation")
 
@@ -168,8 +221,10 @@ for _, movement in ipairs({ "ground", "flying" }) do
         }, 0))
         assert(u.survival_wave_skip_contact_range_bonus == nil)
         assert(u.modifiers.modifier_enemy_wall_ai.contact_range_property_enabled)
+        assert(not u.modifiers.modifier_survival_hero_attack_range,
+            "challenge path must not opt into the formal-wave range change")
     end
 end
 print("ENEMY_RANGE_SPAWN_POLICY_PASS batches=" .. batches .. " retained=" .. retained
     .. " wave15_units=" .. wave15 .. " wave15_melee=" .. wave15_melee
-    .. " final stats/visuals precede declaration; challenge fallback")
+    .. " missing setters: formal native base override, client property, additive buffs/contact; final stats/visuals precede declaration; challenge fallback")

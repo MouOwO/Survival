@@ -1341,7 +1341,7 @@ local function deal_laser_tick(self, caster, target, laser, effect, tick_time)
     local hit_position = effect.target_surface == true
         and laser_visual.head_position(caster, target, effect) or nil
     local health_before = target.GetHealth and target:GetHealth()
-    local result = deal(caster, target, amount)
+    local result = deal(caster, target, amount, "script", {"tower_laser_attack"})
     laser_health.record(self, target, health_before, multiplier,
         tower_laser_damage.multiplier(base_multiplier, increment, maximum,
             (self.laser_ticks or 0) + 1, interval), interval)

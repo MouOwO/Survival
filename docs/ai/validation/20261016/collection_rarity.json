@@ -1,0 +1,43 @@
+{
+  "status": "PASS_COLLECTION_RARITY",
+  "bundle": "fbf16c3e996fa377f0d3cacd726c919f93958ecaf8be94a52b89ee08719f52e9",
+  "baseline": "eb49cbe03cd338757949a3d7449457005d9e79ddd0f51b9ec1d8becc9e66a261",
+  "pools": [
+    "ex",
+    "friend",
+    "wife",
+    "beast"
+  ],
+  "visible_items": 160,
+  "drawable_items": 158,
+  "pending_ids": [
+    "wife_31",
+    "wife_39"
+  ],
+  "tier_probabilities_when_all_available": {
+    "N": 0.6,
+    "R": 0.25,
+    "SR": 0.1,
+    "SSR": 0.045,
+    "UR": 0.005
+  },
+  "colors": {
+    "N": "#8fc47b",
+    "R": "#74c8f2",
+    "SR": "#b680ee",
+    "SSR": "#f5c65e",
+    "UR": "#ef5350"
+  },
+  "probability_rules": "Quality weights first; remaining copies within quality; full/pending excluded; empty qualities renormalized.",
+  "existing_inventory_caps_effects_tickets_preserved": true,
+  "cache_migration_preserves_pending_intent": true,
+  "ui_compile": "output/collection_rarity_20261016/ui_compile.json",
+  "ui_resources_compiled": 3,
+  "unrelated_resources_changed_during_compile": [],
+  "browser_report": "design_refs/collection_gw2_v2/work/onepage_final/report.json",
+  "visible_probability_report": "design_refs/collection_gw2_v2/work/onepage_final/rarity_probability_proof.json",
+  "browser_pointer_checks": 63,
+  "browser_capture_is_game_capture": false,
+  "remote_verification": "output/collection_rarity_20261016/release/fbf16c3e996fa377f0d3cacd726c919f93958ecaf8be94a52b89ee08719f52e9/deployment/verify.json",
+  "real_player_transactions_used_for_testing": 0
+}

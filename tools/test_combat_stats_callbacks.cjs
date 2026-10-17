@@ -27,16 +27,26 @@ const instrumented=source.replace(seam,`    __test({applyAbilityRuntime:applyAbi
 function setup(options={}){
  const cfg=options.config||{},jobs=new Map(),messages=[],subscriptions=new Map();let serial=0,api,time=0,selected=options.portrait?7:-1,multi=false;
  const runtime={},unitNames=new Map([[7,'npc_dota_hero_doom_bringer']]);
- const metrics={setUnit:[],econHero:[],econItem:[],sceneCalls:[],created:[],parents:0,order:0,geometryWrites:0,visibilityTransitions:0,nativeWashWrites:0};
+ const metrics={setUnit:[],econHero:[],econItem:[],sceneCalls:[],created:[],parents:0,order:0,geometryWrites:0,visibilityTransitions:0,nativeWashWrites:0,builderInlineLayoutWrites:0};
  class Panel{
   constructor(id,parent,type='Panel'){
    this.id=id;this.parent=parent;this.paneltype=type;this.children=[];this.alive=true;this.visible=true;
    this.hittest=true;this.hittestchildren=true;this.values={};this.actualuiscale_x=this.actualuiscale_y=1;
    this.actuallayoutwidth=this.actuallayoutheight=128;this.point={x:0,y:0};
+   // Native-parent dynamic panels do not inherit the custom layout stylesheet.
+   // Unlike authored native fixtures, a map Scene has no intrinsic dimensions.
+   if(id==='SurvivalBuilderIoPortraitSceneV2Alpha')for(const [axis,metric] of [['width','actuallayoutwidth'],['height','actuallayoutheight']]){
+    Object.defineProperty(this,metric,{configurable:true,get:()=>{
+     const inline=String(this.values[axis]||''),percent=inline.match(/^(\d+(?:\.\d+)?)%$/),pixels=inline.match(/^(\d+(?:\.\d+)?)px$/);
+     if(percent&&this.parent)return Number(this.parent[metric]||0)*Number(percent[1])/100;
+     return pixels?Number(pixels[1]):0;
+    }});
+   }
    if(parent)parent.children.push(this);
    this.style=new Proxy(this.values,{set:(o,k,v)=>{
     if(this.alive!==true)throw Error('native panel destroyed');
     if(v===null||v===undefined||/NaN|Infinity/.test(String(v)))throw Error('native style rejected '+k+'='+v);
+    if(this.id==='SurvivalBuilderIoPortraitSceneV2Alpha'&&['width','height','position','overflow'].includes(k))metrics.builderInlineLayoutWrites++;
     if(k==='washColor'&&this.id==='portraitHUD'){
      if(!/^(?:#[\da-f]{6}(?:[\da-f]{2})?|rgba?\([\d.,\s]+\))$/i.test(String(v)))throw Error('native washColor requires a color');
      metrics.nativeWashWrites++;
@@ -46,7 +56,7 @@ function setup(options={}){
      assert(numbers.every(n=>Number.isFinite(Number(n))&&Math.abs(Number(n))<1e6),'invalid portrait layout must not reach native setter');
      metrics.geometryWrites++;
     }
-    if(k==='visibility'&&o[k]!==v&&['SurvivalTowerPortraitOverlay','SurvivalTowerPortraitScene','SurvivalBuilderIoPortraitScene'].includes(this.id))metrics.visibilityTransitions++;
+    if(k==='visibility'&&o[k]!==v&&['SurvivalTowerPortraitOverlay','SurvivalTowerPortraitScene','SurvivalBuilderIoPortraitSceneV2Alpha'].includes(this.id))metrics.visibilityTransitions++;
     o[k]=v;return true;
    }});
   }
@@ -78,6 +88,8 @@ function setup(options={}){
   nativeHost=new Panel('PortraitContainer',new Panel('PortraitGroup',root));
   nativeHost.point={x:100,y:800};nativeScene=new Panel('portraitHUD',nativeHost,'DOTAScenePanel');
   nativeScene.point={x:120,y:820};nativeScene.values.opacity='0.35';
+  // Valve's stylesheet paints this panel at 3 even when its inline getter is 0.
+  nativeScene.computedZIndex=3;nativeScene.values.zIndex='0.0';
   return nativeScene;
  }
  if(options.portrait)mountNative();
@@ -340,7 +352,7 @@ console.log('PORTRAIT_FLICKER_CLIENT_PASS: real metadata updates/sentinel, 300 s
   assert.equal(native.values.opacity,'1','Valve portrait must remain in the native input tree');
   assert.equal(native.values.washColor,expectedWash,'the opaque sibling hides native pixels without changing native tint');
   assert.equal(t.metrics.nativeWashWrites,0,'normal portrait ownership never writes native tint');
-  assert.equal(Number(t.overlay.values.zIndex),1);
+  assert.equal(Number(t.overlay.values.zIndex),4);assert(Number(t.overlay.values.zIndex)>native.computedZIndex);
   assert.equal(t.overlay.hittest,false);assert.equal(t.overlay.hittestchildren,false);assert.equal(t.scene.hittest,false);
   for(const saved of originalInput){assert.equal(saved.panel.hittest,saved.hittest);assert.equal(saved.panel.hittestchildren,saved.hittestchildren)}
   for(const phase of phases)assert.strictEqual(native.engineInputHandlers[phase],handlers[phase]);

@@ -1,0 +1,1777 @@
+{
+  "version": 1,
+  "art_status": "generated_wife_portrait_v1",
+  "items": {
+    "wife_01": {
+      "id": "wife_01",
+      "display_name": "约尔福杰",
+      "canonical_name": "约尔·福杰",
+      "series": "间谍过家家",
+      "latin_name": "Yor Forger",
+      "icon_path": "custom_game/wife_portraits_v1/wife_01.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_01.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_01.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "9a31189f5cdfbd16a704498a15469abe44a5860d2a5b322461a93240795b0a1f",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Yor Forger from SPY x FAMILY, specifically Yor, not another dark-haired woman. Adult woman with straight black hair, long front sidelocks and pinned-up rear hair, distinct deep crimson red eyes. Her iconic golden rose headband and long thin gold hair ornaments on both sides, small gold drop earrings, black Thorn Princess high collar visible. Recognizable elegant Yor facial design, gentle composed smile.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-d449914e-b84f-4aab-8921-1c8829765107.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_01",
+        "name": "约尔福杰",
+        "source_path": "C:/Users/Administrator/.codex/generated_images/01a14374-f279-7872-82e3-98489a3799c7/exec-d449914e-b84f-4aab-8921-1c8829765107.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_01.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Yor Forger from SPY x FAMILY, specifically Yor, not another dark-haired woman. Adult woman with straight black hair, long front sidelocks and pinned-up rear hair, distinct deep crimson red eyes. Her iconic golden rose headband and long thin gold hair ornaments on both sides, small gold drop earrings, black Thorn Princess high collar visible. Recognizable elegant Yor facial design, gentle composed smile.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-d449914e-b84f-4aab-8921-1c8829765107.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "Yor身份明确：黑色长边发、深红眼、双金玫瑰发饰、黑色荆棘公主领口。",
+          "透明大头构图、2D清晰线条通过。"
+        ],
+        "sha256": "9a31189f5cdfbd16a704498a15469abe44a5860d2a5b322461a93240795b0a1f",
+        "source_sha256": "9a31189f5cdfbd16a704498a15469abe44a5860d2a5b322461a93240795b0a1f",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_02": {
+      "id": "wife_02",
+      "display_name": "星野爱",
+      "canonical_name": "星野爱",
+      "series": "我推的孩子",
+      "latin_name": "Ai Hoshino",
+      "icon_path": "custom_game/wife_portraits_v1/wife_02.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_02.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_02.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "60f76bc30669d671d05f437b79feaf277219452d8dc4003536bcc4aa3dacd6d5",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Ai Hoshino from Oshi no Ko (推しの子), unmistakable idol Ai. Long flowing deep purple hair, pink-violet gradient eyes with prominent white six-pointed star pupils in BOTH eyes. Her distinctive pink rabbit hair clip with round eye and star on side of head, pink/purple idol dress shoulder collar, soft lively confident smile. Keep exact recognizable Ai hairstyle, eyes and rabbit clip, not generic purple-haired girl.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-7b9d682c-9bde-4ba8-a0bd-0492c75e862a.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_02",
+        "name": "星野爱",
+        "source_path": "C:/Users/Administrator/.codex/generated_images/01a14374-f279-7872-82e3-98489a3799c7/exec-7b9d682c-9bde-4ba8-a0bd-0492c75e862a.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_02.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Ai Hoshino from Oshi no Ko (推しの子), unmistakable idol Ai. Long flowing deep purple hair, pink-violet gradient eyes with prominent white six-pointed star pupils in BOTH eyes. Her distinctive pink rabbit hair clip with round eye and star on side of head, pink/purple idol dress shoulder collar, soft lively confident smile. Keep exact recognizable Ai hairstyle, eyes and rabbit clip, not generic purple-haired girl.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-7b9d682c-9bde-4ba8-a0bd-0492c75e862a.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "Ai身份明确：紫色长发、双眼白色六芒星、粉色兔形头饰、粉紫偶像衣领。",
+          "透明大头构图、2D清晰线条通过。"
+        ],
+        "sha256": "60f76bc30669d671d05f437b79feaf277219452d8dc4003536bcc4aa3dacd6d5",
+        "source_sha256": "60f76bc30669d671d05f437b79feaf277219452d8dc4003536bcc4aa3dacd6d5",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_03": {
+      "id": "wife_03",
+      "display_name": "波雅汉库克",
+      "canonical_name": "波雅·汉库克",
+      "series": "海贼王",
+      "latin_name": "Boa Hancock",
+      "icon_path": "custom_game/wife_portraits_v1/wife_03.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_03.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_03.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "8595dc0c6a880dbba40b7de6992c7837ff97d0759ad3093d6f17bee4e3607cd3",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Boa Hancock from One Piece. Adult Pirate Empress with distinctly recognizable One Piece face, long straight glossy black hair with center part and long side locks, narrow gray-blue eyes, elegant arched eyebrows, iconic large golden coiled-snake earrings with small red snake tongues. A modest red high collar with subtle gold snake motif visible at bottom, shoulders covered. Proud but calm soft smile, not sneering. Preserve her famous face and serpent jewelry.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-15aadf6a-4a22-406a-be5f-8145f9637cf8.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_03",
+        "name": "波雅汉库克",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-15aadf6a-4a22-406a-be5f-8145f9637cf8.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_03.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Boa Hancock from One Piece. Adult Pirate Empress with distinctly recognizable One Piece face, long straight glossy black hair with center part and long side locks, narrow gray-blue eyes, elegant arched eyebrows, iconic large golden coiled-snake earrings with small red snake tongues. A modest red high collar with subtle gold snake motif visible at bottom, shoulders covered. Proud but calm soft smile, not sneering. Preserve her famous face and serpent jewelry.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-15aadf6a-4a22-406a-be5f-8145f9637cf8.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "Boa Hancock身份明确：中分黑长直、灰蓝狭长眼、大号金蛇耳饰。",
+          "透明大头构图、2D清晰线条通过。"
+        ],
+        "sha256": "8595dc0c6a880dbba40b7de6992c7837ff97d0759ad3093d6f17bee4e3607cd3",
+        "source_sha256": "8595dc0c6a880dbba40b7de6992c7837ff97d0759ad3093d6f17bee4e3607cd3",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_04": {
+      "id": "wife_04",
+      "display_name": "艾达王",
+      "canonical_name": "艾达·王",
+      "series": "生化危机",
+      "latin_name": "Ada Wong",
+      "icon_path": "custom_game/wife_portraits_v1/wife_04.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_04.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_04.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "95b311ee152a348878ef2fedecb9b5c4de84e39ca635471b76fd447d147a7861",
+      "prompt": "Use case: style-transfer. Edit target is Image 1 (Ada Wong), style reference is Image 2 (a different anime woman); do NOT copy Image 2 character identity. Redraw Image 1 as a pure hand-drawn 2D Japanese anime illustration matching Image 2's detailed black lineart, large clear cel-shaded eyes, simple nose, crisp two-tone face shadows and soft blush. Absolutely no realistic skin texture, pores, photographic face, 3D render or realistic painted look. Keep subject identity: adult Ada Wong from Resident Evil, short asymmetric jet-black bob with diagonal side-swept bangs, brown eyes, red high turtleneck and black harness straps. Same face composition and transparent square cutout framing. Tight head and shoulders portrait for74px icon. Background fully transparent alpha. No border, text, watermark, scenery or extra character.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-b1117167-b1c5-4066-8abe-b55e4691bcd7.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_04",
+        "name": "艾达王",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-b1117167-b1c5-4066-8abe-b55e4691bcd7.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_04.png",
+        "prompt": "Use case: style-transfer. Edit target is Image 1 (Ada Wong), style reference is Image 2 (a different anime woman); do NOT copy Image 2 character identity. Redraw Image 1 as a pure hand-drawn 2D Japanese anime illustration matching Image 2's detailed black lineart, large clear cel-shaded eyes, simple nose, crisp two-tone face shadows and soft blush. Absolutely no realistic skin texture, pores, photographic face, 3D render or realistic painted look. Keep subject identity: adult Ada Wong from Resident Evil, short asymmetric jet-black bob with diagonal side-swept bangs, brown eyes, red high turtleneck and black harness straps. Same face composition and transparent square cutout framing. Tight head and shoulders portrait for74px icon. Background fully transparent alpha. No border, text, watermark, scenery or extra character.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-b1117167-b1c5-4066-8abe-b55e4691bcd7.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "Ada身份明确：不对称黑短发、棕眼、红色高领及黑肩带；已定向去除首稿过于写实的皮肤风格。",
+          "最终2D cel shading、透明背景与旧收藏统一。"
+        ],
+        "discarded_attempt": {
+          "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Ada Wong from Resident Evil, specifically her recognizable Resident Evil 4 remake look adapted into this polished anime portrait language. Adult East Asian woman with sleek short jet-black asymmetric chin-length bob, long side-swept bangs, warm dark brown almond eyes, composed enigmatic expression, small subtle stud earrings. Canonical red knitted high turtleneck neckline and black shoulder harness just visible, fully covered modest outfit. Do not replace her with a generic long-haired anime girl. No gun or extra objects.",
+          "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-75174e6e-0004-4a92-83e9-22757bd4d8c9.png",
+          "reason": "风格过于写实，与收藏原头像2D画风不一致。"
+        },
+        "sha256": "95b311ee152a348878ef2fedecb9b5c4de84e39ca635471b76fd447d147a7861",
+        "source_sha256": "95b311ee152a348878ef2fedecb9b5c4de84e39ca635471b76fd447d147a7861",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_05": {
+      "id": "wife_05",
+      "display_name": "御坂美琴",
+      "canonical_name": "御坂美琴",
+      "series": "某科学的超电磁炮",
+      "latin_name": "Mikoto Misaka",
+      "icon_path": "custom_game/wife_portraits_v1/wife_05.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_05.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_05.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        18,
+        0,
+        1247,
+        1254
+      ],
+      "sha256": "c49f71a71d77e3573d5bd722580f4362414dcd42f5b7b3f5070f55b3170a927d",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Mikoto Misaka from A Certain Scientific Railgun, preserve original teenage appearance and modest school uniform. Short straight chestnut-brown hair to nape, side-swept bangs, small plain white hair clips on her left side, warm brown eyes, confident friendly expression. Canonical Tokiwadai school uniform: white short-sleeved shirt collar beneath beige sweater vest with tiny school emblem, no hats or jewelry. Specifically Mikoto Misaka; not Shirai Kuroko, no twin tails. No electricity effects or scenery.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-7d18854b-d0bc-4441-976e-8a540ec730f3.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_05",
+        "name": "御坂美琴",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-7d18854b-d0bc-4441-976e-8a540ec730f3.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_05.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Mikoto Misaka from A Certain Scientific Railgun, preserve original teenage appearance and modest school uniform. Short straight chestnut-brown hair to nape, side-swept bangs, small plain white hair clips on her left side, warm brown eyes, confident friendly expression. Canonical Tokiwadai school uniform: white short-sleeved shirt collar beneath beige sweater vest with tiny school emblem, no hats or jewelry. Specifically Mikoto Misaka; not Shirai Kuroko, no twin tails. No electricity effects or scenery.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-7d18854b-d0bc-4441-976e-8a540ec730f3.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "御坂美琴身份明确：栗色短发、棕眼、白发夹、常盘台白衬衫米色马甲。",
+          "维持原作年龄，非成人化，清晰2D透明头像。"
+        ],
+        "sha256": "c49f71a71d77e3573d5bd722580f4362414dcd42f5b7b3f5070f55b3170a927d",
+        "source_sha256": "c49f71a71d77e3573d5bd722580f4362414dcd42f5b7b3f5070f55b3170a927d",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_06": {
+      "id": "wife_06",
+      "display_name": "博丽灵梦",
+      "canonical_name": "博丽灵梦",
+      "series": "东方Project",
+      "latin_name": "Reimu Hakurei",
+      "icon_path": "custom_game/wife_portraits_v1/wife_06.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_06.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_06.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "95d1426051c588ebc03455172a0eac56bb18eac6c1d1e7ff36baf11602e238ae",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Reimu Hakurei from Touhou Project, preserve canonical appearance. Very long dark brown-black hair with blunt-ish bangs and side locks wrapped in red and white tube ribbons. Her huge iconic red bow with white frilled trim sits centered on top-back of head. Warm brown eyes, red-and-white shrine maiden costume neckline: red main fabric, white broad frilled collar and yellow neck ribbon. Calm gentle smile. Close face portrait, red bow partially cropped at very top if necessary so face remains large. No shrine, staff, cards or floating effects.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-672f0682-8515-43b6-bdfa-74b3134f9754.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_06",
+        "name": "博丽灵梦",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-672f0682-8515-43b6-bdfa-74b3134f9754.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_06.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Reimu Hakurei from Touhou Project, preserve canonical appearance. Very long dark brown-black hair with blunt-ish bangs and side locks wrapped in red and white tube ribbons. Her huge iconic red bow with white frilled trim sits centered on top-back of head. Warm brown eyes, red-and-white shrine maiden costume neckline: red main fabric, white broad frilled collar and yellow neck ribbon. Calm gentle smile. Close face portrait, red bow partially cropped at very top if necessary so face remains large. No shrine, staff, cards or floating effects.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-672f0682-8515-43b6-bdfa-74b3134f9754.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "博丽灵梦身份明确：红白巨蝴蝶结、两侧红白筒状发带、深色长发、黄领结红白巫女服。",
+          "清晰2D透明头像，脸部占比适合小图标。"
+        ],
+        "sha256": "95d1426051c588ebc03455172a0eac56bb18eac6c1d1e7ff36baf11602e238ae",
+        "source_sha256": "95d1426051c588ebc03455172a0eac56bb18eac6c1d1e7ff36baf11602e238ae",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_07": {
+      "id": "wife_07",
+      "display_name": "樱岛麻衣",
+      "canonical_name": "樱岛麻衣",
+      "series": "青春猪头少年系列",
+      "latin_name": "Mai Sakurajima",
+      "icon_path": "custom_game/wife_portraits_v1/wife_07.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_07.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_07.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "06e81f9dfb73cfcd0c913b55d6756ba67e332a2b6af61a1c57630010a0278d66",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Mai Sakurajima from Rascal Does Not Dream of Bunny Girl Senpai, unmistakable original teenage school version. Long straight charcoal-black hair with a subtle gray-violet sheen, straight side-parted bangs and two longer front locks, blue eyes, her small white bunny-shaped hair clip on her left side near temple. Calm slightly reserved gentle expression. Modest canonical school uniform neckline: white shirt and muted brown school blazer, red/pink slim necktie visible. Absolutely no bunny suit, no animal ears, no cleavage. Keep her long dark hair, recognizable eye shape and small rabbit clip.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-af7a8e39-70f8-42c5-aece-034336d92116.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_07",
+        "name": "樱岛麻衣",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-af7a8e39-70f8-42c5-aece-034336d92116.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_07.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Mai Sakurajima from Rascal Does Not Dream of Bunny Girl Senpai, unmistakable original teenage school version. Long straight charcoal-black hair with a subtle gray-violet sheen, straight side-parted bangs and two longer front locks, blue eyes, her small white bunny-shaped hair clip on her left side near temple. Calm slightly reserved gentle expression. Modest canonical school uniform neckline: white shirt and muted brown school blazer, red/pink slim necktie visible. Absolutely no bunny suit, no animal ears, no cleavage. Keep her long dark hair, recognizable eye shape and small rabbit clip.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-af7a8e39-70f8-42c5-aece-034336d92116.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "樱岛麻衣身份明确：黑灰长直发、蓝眼、白兔发夹、棕色校服红领带；未使用兔女郎服。",
+          "维持原作年龄，2D透明头像。"
+        ],
+        "sha256": "06e81f9dfb73cfcd0c913b55d6756ba67e332a2b6af61a1c57630010a0278d66",
+        "source_sha256": "06e81f9dfb73cfcd0c913b55d6756ba67e332a2b6af61a1c57630010a0278d66",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_08": {
+      "id": "wife_08",
+      "display_name": "芙莉莲",
+      "canonical_name": "芙莉莲",
+      "series": "葬送的芙莉莲",
+      "latin_name": "Frieren",
+      "icon_path": "custom_game/wife_portraits_v1/wife_08.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_08.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_08.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        4,
+        1254,
+        1254
+      ],
+      "sha256": "5213d604b41f143a1c212d35ecdbf49c237be1fd44f3d024b2e544c57ffd3d42",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Frieren from Frieren: Beyond Journey's End, exact recognizable elven mage. Silver-white hair parted bangs and tied in two low pigtails behind pointed ears, calm half-lidded emerald green eyes, long sharply pointed elf ears clearly visible on BOTH sides, red oval gemstone drop earrings with gold setting. White cloak with gold trim over black high-neck inner collar, blue oval brooch at collar only if visible. Serene small closed-mouth smile. No hat, staff, magic, aura or background. Face large and centered, not chibi.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-03f25ee0-44e9-4ec7-a3c2-a38eeaf6d10c.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_08",
+        "name": "芙莉莲",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-03f25ee0-44e9-4ec7-a3c2-a38eeaf6d10c.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_08.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Frieren from Frieren: Beyond Journey's End, exact recognizable elven mage. Silver-white hair parted bangs and tied in two low pigtails behind pointed ears, calm half-lidded emerald green eyes, long sharply pointed elf ears clearly visible on BOTH sides, red oval gemstone drop earrings with gold setting. White cloak with gold trim over black high-neck inner collar, blue oval brooch at collar only if visible. Serene small closed-mouth smile. No hat, staff, magic, aura or background. Face large and centered, not chibi.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-03f25ee0-44e9-4ec7-a3c2-a38eeaf6d10c.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "芙莉莲身份明确：银白双马尾、绿瞳、双侧精灵长耳、红宝石耳坠、白金披肩蓝宝石领扣。",
+          "2D透明大头头像，耳与领口标志清楚。"
+        ],
+        "sha256": "5213d604b41f143a1c212d35ecdbf49c237be1fd44f3d024b2e544c57ffd3d42",
+        "source_sha256": "5213d604b41f143a1c212d35ecdbf49c237be1fd44f3d024b2e544c57ffd3d42",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_09": {
+      "id": "wife_09",
+      "display_name": "零二",
+      "canonical_name": "零二",
+      "series": "DARLING in the FRANXX",
+      "latin_name": "Zero Two / Code:002",
+      "icon_path": "custom_game/wife_portraits_v1/wife_09.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_09.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_09.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "a590ae3e1a7c5fdb6f3287ce2465c92a85e7c602df1a2ba519ac4aeff4812681",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Zero Two (Code 002) from Darling in the Franxx, exact canonical teenage character design with dignified modest outfit. Very long straight pastel-pink hair, blunt fringe bangs, brilliant teal-green eyes, red-pink eyeliner along outer edges, her TWO small smooth red horns emerging above forehead, and her white headband with red horn bases. Canonical red military pilot uniform high collar with white vertical trim and black accents, fully clothed shoulders, calm playful small smile. No extra horns, no animal ears, no hat, no plugsuit body shot, no weapons.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-0dcfaa5c-4d45-40f3-aa92-26a4fe7d6380.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_09",
+        "name": "零二",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-0dcfaa5c-4d45-40f3-aa92-26a4fe7d6380.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_09.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Zero Two (Code 002) from Darling in the Franxx, exact canonical teenage character design with dignified modest outfit. Very long straight pastel-pink hair, blunt fringe bangs, brilliant teal-green eyes, red-pink eyeliner along outer edges, her TWO small smooth red horns emerging above forehead, and her white headband with red horn bases. Canonical red military pilot uniform high collar with white vertical trim and black accents, fully clothed shoulders, calm playful small smile. No extra horns, no animal ears, no hat, no plugsuit body shot, no weapons.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-0dcfaa5c-4d45-40f3-aa92-26a4fe7d6380.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "零二身份明确：粉色齐刘海长发、青绿眼、红色双小角与白红发箍、红白军服高领。",
+          "维持原作年龄，2D透明头像。"
+        ],
+        "sha256": "a590ae3e1a7c5fdb6f3287ce2465c92a85e7c602df1a2ba519ac4aeff4812681",
+        "source_sha256": "a590ae3e1a7c5fdb6f3287ce2465c92a85e7c602df1a2ba519ac4aeff4812681",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_10": {
+      "id": "wife_10",
+      "display_name": "赤瞳",
+      "canonical_name": "赤瞳",
+      "series": "斩！赤红之瞳",
+      "latin_name": "Akame",
+      "icon_path": "custom_game/wife_portraits_v1/wife_10.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_10.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_10.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "59c7ed3fbadce6963e96a4cddbbe069b5eb444bc8f033a379bd8884e9538fa62",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Akame from Akame ga Kill!, original teenage assassin character design. Long straight jet-black hair and clear straight bangs, two long front locks, vivid crimson red eyes, serious calm closed-mouth expression. Canonical sleeveless black high-neck dress collar, white shirt triangular collar and distinct red necktie visible near lower edge; modest head-and-shoulders framing. Preserve Akame's red eyes, black hair and red tie. No hair rose, headband, bunny clip, horns or fantasy ear ornaments. No sword or blood.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-73b117ec-d569-47a8-a48d-2eeabc8124ee.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_10",
+        "name": "赤瞳",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-73b117ec-d569-47a8-a48d-2eeabc8124ee.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_10.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Akame from Akame ga Kill!, original teenage assassin character design. Long straight jet-black hair and clear straight bangs, two long front locks, vivid crimson red eyes, serious calm closed-mouth expression. Canonical sleeveless black high-neck dress collar, white shirt triangular collar and distinct red necktie visible near lower edge; modest head-and-shoulders framing. Preserve Akame's red eyes, black hair and red tie. No hair rose, headband, bunny clip, horns or fantasy ear ornaments. No sword or blood.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-73b117ec-d569-47a8-a48d-2eeabc8124ee.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "赤瞳身份明确：黑长发红眼、冷静表情、黑衣白领红领结；没有混入约尔的玫瑰发饰。",
+          "2D透明头像，人物区分明确。"
+        ],
+        "sha256": "59c7ed3fbadce6963e96a4cddbbe069b5eb444bc8f033a379bd8884e9538fa62",
+        "source_sha256": "59c7ed3fbadce6963e96a4cddbbe069b5eb444bc8f033a379bd8884e9538fa62",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_11": {
+      "id": "wife_11",
+      "display_name": "伊蕾娜",
+      "canonical_name": "伊蕾娜",
+      "series": "魔女之旅",
+      "latin_name": "Elaina",
+      "icon_path": "custom_game/wife_portraits_v1/wife_11.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_11.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_11.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "907c664feaafeb37941fdabaa3eda68ad2a5cff9d1747ab69dadc23c6b7cc3b3",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Elaina from Wandering Witch: The Journey of Elaina (魔女の旅々), exact canonical young witch. Long ash-silver hair with slightly wavy ends and straight parted bangs, vivid violet-purple eyes, iconic broad black pointed witch hat with deep-purple inner brim and purple ribbon bow. Black witch robe over white high frilled blouse and dark red ribbon, gold star-shaped witch brooch visible at chest. Confident small knowing smile. Frame tightly around head and shoulders; hat tip can crop above square so face remains large. Modest original costume, no cleavage, no broom, no magic or scenery.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-abee5d0a-cc13-46f2-9085-34a4038fe2f8.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_11",
+        "name": "伊蕾娜",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-abee5d0a-cc13-46f2-9085-34a4038fe2f8.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_11.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Elaina from Wandering Witch: The Journey of Elaina (魔女の旅々), exact canonical young witch. Long ash-silver hair with slightly wavy ends and straight parted bangs, vivid violet-purple eyes, iconic broad black pointed witch hat with deep-purple inner brim and purple ribbon bow. Black witch robe over white high frilled blouse and dark red ribbon, gold star-shaped witch brooch visible at chest. Confident small knowing smile. Frame tightly around head and shoulders; hat tip can crop above square so face remains large. Modest original costume, no cleavage, no broom, no magic or scenery.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-abee5d0a-cc13-46f2-9085-34a4038fe2f8.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "伊蕾娜身份明确：灰银长发紫眼、黑紫大巫师帽、白衬衣红系带金星胸针。",
+          "2D透明头像，帽檐不会遮眼。"
+        ],
+        "sha256": "907c664feaafeb37941fdabaa3eda68ad2a5cff9d1747ab69dadc23c6b7cc3b3",
+        "source_sha256": "907c664feaafeb37941fdabaa3eda68ad2a5cff9d1747ab69dadc23c6b7cc3b3",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_12": {
+      "id": "wife_12",
+      "display_name": "赫萝",
+      "canonical_name": "赫萝",
+      "series": "狼与香辛料",
+      "latin_name": "Holo",
+      "icon_path": "custom_game/wife_portraits_v1/wife_12.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_12.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_12.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "72b64b540062d16f8975a3e989073ff2ac8d548eed42ad846db9e0d37311f6a9",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Holo the Wise Wolf from Spice and Wolf, recognizable canonical Holo. Long warm reddish-chestnut brown hair, straight forehead bangs with slight center opening, TWO tall brown wolf ears with paler beige inner fur on top of her head, deep reddish-brown amber eyes, gentle clever smile, one tiny canine visible at most. Warm brown medieval cloak over fully covered cream blouse collar, small wheat pouch string at neck if visible. Preserve her wolf ears and chestnut hair, no fox extra ears, no tail needed, no hat, no flowers. Tight polished 2D anime head portrait, no exposed torso.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-d69f4aaf-b9ad-4bc3-9af8-267880b5a888.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_12",
+        "name": "赫萝",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-d69f4aaf-b9ad-4bc3-9af8-267880b5a888.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_12.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Holo the Wise Wolf from Spice and Wolf, recognizable canonical Holo. Long warm reddish-chestnut brown hair, straight forehead bangs with slight center opening, TWO tall brown wolf ears with paler beige inner fur on top of her head, deep reddish-brown amber eyes, gentle clever smile, one tiny canine visible at most. Warm brown medieval cloak over fully covered cream blouse collar, small wheat pouch string at neck if visible. Preserve her wolf ears and chestnut hair, no fox extra ears, no tail needed, no hat, no flowers. Tight polished 2D anime head portrait, no exposed torso.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-d69f4aaf-b9ad-4bc3-9af8-267880b5a888.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "赫萝身份明确：长栗发、红棕眼、成对毛绒狼耳、小犬牙与中世纪披肩麦袋。",
+          "2D透明头像，服装端庄。"
+        ],
+        "sha256": "72b64b540062d16f8975a3e989073ff2ac8d548eed42ad846db9e0d37311f6a9",
+        "source_sha256": "72b64b540062d16f8975a3e989073ff2ac8d548eed42ad846db9e0d37311f6a9",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_13": {
+      "id": "wife_13",
+      "display_name": "桔梗",
+      "canonical_name": "桔梗",
+      "series": "犬夜叉",
+      "latin_name": "Kikyo",
+      "icon_path": "custom_game/wife_portraits_v1/wife_13.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_13.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_13.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "930b01eb64e42d0674b624152aef3ba825f57079efb3d7738e252b32fa4c576e",
+      "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Kikyo from Inuyasha (犬夜叉 桔梗), NOT Kagome Higurashi. Recognizable serene priestess with long straight jet-black hair, sharply cut straight bangs above eyes, long smooth side locks, dark warm brown almond-shaped eyes with subtle black upper eyeliner, calm dignified closed-mouth expression. Original red-and-white miko attire with plain WHITE overlapping kimono collar and red hakama only hinted at lower edge. Simple white hair tie at back, no giant red bow, no school uniform, no head ornaments or earrings. Classic Kikyo face translated into polished detailed cel-shaded anime cutout style. No bow, arrow, souls, glow, background or other characters. Face large, tight head-and-shoulders square icon.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-bfe0df86-ad90-45d4-a1c0-3cfc6c8d4668.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_01_13.json",
+      "receipt_sha256": "b6f203360447199523e70dc01aa768495d066fb1969dd8a6601c1910ea2d8e25",
+      "built_in_receipt": {
+        "id": "wife_13",
+        "name": "桔梗",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-bfe0df86-ad90-45d4-a1c0-3cfc6c8d4668.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_13.png",
+        "prompt": "Use case: stylized-concept. Asset type: single square transparent game collectible portrait, elegant polished Japanese anime illustration. One character only, accurate canonical identity and original age. Tight head-and-shoulders close-up, face occupies most of square, eyes clearly readable at 74px, centered face, top of hairstyle nearly touching top, shoulders fill lower edge. Crisp detailed dark lineart, sophisticated cel shading with soft gradients, luminous expressive eyes, clean hair strands, like high quality anime character cutout. Fully transparent background with real alpha; no background color, scene, panel, border, letters, watermark, scenery, aura or glow. Modest canonical costume collar, neutral to gentle expression, no chibi, no adult reinterpretation, no body emphasis. Subject: Kikyo from Inuyasha (犬夜叉 桔梗), NOT Kagome Higurashi. Recognizable serene priestess with long straight jet-black hair, sharply cut straight bangs above eyes, long smooth side locks, dark warm brown almond-shaped eyes with subtle black upper eyeliner, calm dignified closed-mouth expression. Original red-and-white miko attire with plain WHITE overlapping kimono collar and red hakama only hinted at lower edge. Simple white hair tie at back, no giant red bow, no school uniform, no head ornaments or earrings. Classic Kikyo face translated into polished detailed cel-shaded anime cutout style. No bow, arrow, souls, glow, background or other characters. Face large, tight head-and-shoulders square icon.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7 as C:\\Users\\Administrator\\.codex\\generated_images\\01a14374-f279-7872-82e3-98489a3799c7\\exec-bfe0df86-ad90-45d4-a1c0-3cfc6c8d4668.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": [
+          "桔梗身份明确：黑色姬发齐刘海、棕眼、白色后系发带、红白巫女服；没有误用日暮戈薇校服或灵梦红蝴蝶结。",
+          "2D透明大头头像，沉静表情接近原作。"
+        ],
+        "sha256": "930b01eb64e42d0674b624152aef3ba825f57079efb3d7738e252b32fa4c576e",
+        "source_sha256": "930b01eb64e42d0674b624152aef3ba825f57079efb3d7738e252b32fa4c576e",
+        "width": 1254,
+        "height": 1254,
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_14": {
+      "id": "wife_14",
+      "display_name": "托尔",
+      "canonical_name": "托尔",
+      "series": "小林家的龙女仆",
+      "latin_name": "Tohru",
+      "icon_path": "custom_game/wife_portraits_v1/wife_14.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_14.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_14.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "33779ff8520234ce8c8685e6e73e01d04af45f22cea0f9c9a87cf1e5531ade36",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Tohru (トール), the dragon maid from Miss Kobayashi's Dragon Maid. Her unmistakable blonde long hair with orange gradient tips, two curved pale dragon horns, red-orange slit-pupil eyes, white maid frill headdress, black and white high-collared maid outfit with dark purple necktie. Friendly energetic smile, adult young woman's canonical face. Do not confuse with Kanna, Thor or a blonde generic elf.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-19f32987-27f7-4e94-a556-e8e0ed0aa151.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 14,
+        "name": "托尔",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Tohru (トール), the dragon maid from Miss Kobayashi's Dragon Maid. Her unmistakable blonde long hair with orange gradient tips, two curved pale dragon horns, red-orange slit-pupil eyes, white maid frill headdress, black and white high-collared maid outfit with dark purple necktie. Friendly energetic smile, adult young woman's canonical face. Do not confuse with Kanna, Thor or a blonde generic elf.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-19f32987-27f7-4e94-a556-e8e0ed0aa151.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-19f32987-27f7-4e94-a556-e8e0ed0aa151.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "金发橙红发梢、双龙角、红橙竖瞳、白女仆发饰，角色托尔一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_14.png",
+        "sha256": "33779ff8520234ce8c8685e6e73e01d04af45f22cea0f9c9a87cf1e5531ade36",
+        "source_sha256": "33779ff8520234ce8c8685e6e73e01d04af45f22cea0f9c9a87cf1e5531ade36",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_15": {
+      "id": "wife_15",
+      "display_name": "康娜",
+      "canonical_name": "康娜·卡姆依",
+      "series": "小林家的龙女仆",
+      "latin_name": "Kanna Kamui",
+      "icon_path": "custom_game/wife_portraits_v1/wife_15.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_15.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_15.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        30,
+        0,
+        1216,
+        1254
+      ],
+      "sha256": "526a478b3a3ed951e4a730723eeca570eec7f82fee30ab397361b43262e5c1fd",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Kanna Kamui (カンナカムイ) from Miss Kobayashi's Dragon Maid. Her canonical cute CHILD face and small proportions, not an adult. White hair with very pale lavender/pink tips, short low twin tails, straight bangs, large blue eyes, small horns and white feather-like side hair ornaments, pink and white modest high-collared outfit. Gentle neutral expression, round cheeks. Only her head, shoulders and closed collar visible. Do not confuse with Tohru; no blonde hair, maid headband or adult proportions.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-3faa1d2c-9fd9-47b2-9740-c48dbe20a93f.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 15,
+        "name": "康娜",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Kanna Kamui (カンナカムイ) from Miss Kobayashi's Dragon Maid. Her canonical cute CHILD face and small proportions, not an adult. White hair with very pale lavender/pink tips, short low twin tails, straight bangs, large blue eyes, small horns and white feather-like side hair ornaments, pink and white modest high-collared outfit. Gentle neutral expression, round cheeks. Only her head, shoulders and closed collar visible. Do not confuse with Tohru; no blonde hair, maid headband or adult proportions.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-3faa1d2c-9fd9-47b2-9740-c48dbe20a93f.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-3faa1d2c-9fd9-47b2-9740-c48dbe20a93f.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "白发淡粉紫梢、蓝色竖瞳、角、双侧发束与粉白闭领，保留康娜儿童脸。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_15.png",
+        "sha256": "526a478b3a3ed951e4a730723eeca570eec7f82fee30ab397361b43262e5c1fd",
+        "source_sha256": "526a478b3a3ed951e4a730723eeca570eec7f82fee30ab397361b43262e5c1fd",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_16": {
+      "id": "wife_16",
+      "display_name": "远坂凛",
+      "canonical_name": "远坂凛",
+      "series": "Fate/stay night",
+      "latin_name": "Rin Tohsaka",
+      "icon_path": "custom_game/wife_portraits_v1/wife_16.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_16.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_16.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "ce9160e2549c448647d8418ed7635c28c809fe85c0bbf49710f9f9d94a43613e",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Rin Tohsaka (遠坂凛) from Fate/stay night, accurate classic canonical design: long dark brown nearly black hair in twin tails tied high with black ribbon bows, teal blue eyes, straight fringed bangs and long face-framing locks. Her iconic red high-collared sweater with small white cross at upper chest. Confident subtle smile and elegant teen face, fully clothed and modest. No saber armor, silver hair, pointed ears, generic redhead or other Fate character.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-7a05878c-5824-459e-8e2c-fd9ad68b77fe.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 16,
+        "name": "远坂凛",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Rin Tohsaka (遠坂凛) from Fate/stay night, accurate classic canonical design: long dark brown nearly black hair in twin tails tied high with black ribbon bows, teal blue eyes, straight fringed bangs and long face-framing locks. Her iconic red high-collared sweater with small white cross at upper chest. Confident subtle smile and elegant teen face, fully clothed and modest. No saber armor, silver hair, pointed ears, generic redhead or other Fate character.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-7a05878c-5824-459e-8e2c-fd9ad68b77fe.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-7a05878c-5824-459e-8e2c-fd9ad68b77fe.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "黑棕双马尾黑蝴蝶结、蓝绿眼、红高领白十字，远坂凛一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_16.png",
+        "sha256": "ce9160e2549c448647d8418ed7635c28c809fe85c0bbf49710f9f9d94a43613e",
+        "source_sha256": "ce9160e2549c448647d8418ed7635c28c809fe85c0bbf49710f9f9d94a43613e",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_17": {
+      "id": "wife_17",
+      "display_name": "斯卡哈",
+      "canonical_name": "斯卡哈",
+      "series": "Fate/Grand Order / Fate/EXTELLA LINK",
+      "latin_name": "Scathach (Lancer)",
+      "icon_path": "custom_game/wife_portraits_v1/wife_17.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_17.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_17.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "f4583a3a3a6402cab95a5520f5ee0521203dc70a1c92417fbac73e10ef523ac1",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Scathach (スカサハ), Lancer from Fate/Grand Order, accurate canonical adult face. Very long deep burgundy / wine-red hair with straight bangs and long side locks, crimson eyes, calm commanding expression. Her dark purple high collar and burgundy-purple metallic Celtic-style trim at the neckline. Dark purple ornamental headpiece visible against wine-red hair. Focus on her unmistakable mature face and hair, modest closed neckline. No glasses, pointed ears, blonde hair, red coat or different Fate heroine.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ceb22175-d492-4c9c-a295-9de46891f9c1.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 17,
+        "name": "斯卡哈",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Scathach (スカサハ), Lancer from Fate/Grand Order, accurate canonical adult face. Very long deep burgundy / wine-red hair with straight bangs and long side locks, crimson eyes, calm commanding expression. Her dark purple high collar and burgundy-purple metallic Celtic-style trim at the neckline. Dark purple ornamental headpiece visible against wine-red hair. Focus on her unmistakable mature face and hair, modest closed neckline. No glasses, pointed ears, blonde hair, red coat or different Fate heroine.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ceb22175-d492-4c9c-a295-9de46891f9c1.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ceb22175-d492-4c9c-a295-9de46891f9c1.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "酒红长发红眼，深紫衣领和紫红金属头饰，斯卡哈一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_17.png",
+        "sha256": "f4583a3a3a6402cab95a5520f5ee0521203dc70a1c92417fbac73e10ef523ac1",
+        "source_sha256": "f4583a3a3a6402cab95a5520f5ee0521203dc70a1c92417fbac73e10ef523ac1",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_18": {
+      "id": "wife_18",
+      "display_name": "艾露莎",
+      "canonical_name": "艾露莎·舒卡勒托",
+      "series": "妖精的尾巴",
+      "latin_name": "Erza Scarlet",
+      "icon_path": "custom_game/wife_portraits_v1/wife_18.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_18.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_18.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "3c77bcfbc9bd54fa7e5eb5efd0be6ae3688801382be541b8741ddd9d1de6be07",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Erza Scarlet (エルザ・スカーレット) from Fairy Tail, authentic adult anime character. Long straight vivid scarlet red hair with a swept front fringe crossing diagonally toward one eye, brown eyes, strong calm confident face. Her iconic silver polished plate armor at shoulders and neck with a small blue detail. Head-and-shoulders only; modest armored neckline. No dragon horns, pink hair, school uniform or different red-haired heroine.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-83b5598e-523f-457a-b771-5c0dcb29c633.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 18,
+        "name": "艾露莎",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Erza Scarlet (エルザ・スカーレット) from Fairy Tail, authentic adult anime character. Long straight vivid scarlet red hair with a swept front fringe crossing diagonally toward one eye, brown eyes, strong calm confident face. Her iconic silver polished plate armor at shoulders and neck with a small blue detail. Head-and-shoulders only; modest armored neckline. No dragon horns, pink hair, school uniform or different red-haired heroine.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-83b5598e-523f-457a-b771-5c0dcb29c633.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-83b5598e-523f-457a-b771-5c0dcb29c633.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "绯红长发斜刘海、棕眼、银色铠甲，艾露莎一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_18.png",
+        "sha256": "3c77bcfbc9bd54fa7e5eb5efd0be6ae3688801382be541b8741ddd9d1de6be07",
+        "source_sha256": "3c77bcfbc9bd54fa7e5eb5efd0be6ae3688801382be541b8741ddd9d1de6be07",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_19": {
+      "id": "wife_19",
+      "display_name": "祈",
+      "canonical_name": "楪祈",
+      "series": "罪恶王冠",
+      "latin_name": "Inori Yuzuriha",
+      "icon_path": "custom_game/wife_portraits_v1/wife_19.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_19.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_19.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "6d8356f1aa0809e2d72e47758bd4fcc47523c9f25bff2b25c97330d634b03888",
+      "prompt": "Use case: stylized-concept. Asset: one individual game collection character portrait icon, square canvas. Subject: Inori Yuzuriha, Guilty Crown: long pale pink hair with red-orange hair ornaments, red eyes, red-black collar detail, quiet expression. Faithfully recognizable source-character identity is essential. Clean polished 2D anime/donghua illustration with source-accurate adult facial proportions except canon child characters; NOT chibi, NOT baby-faced, NOT a generic cute avatar. Head and shoulders close-up only, large face, iconic hair/headwear fully inside safe margins, signature collar visible. Strong readable silhouette, simple cel shading and deliberate high-contrast colors at 90px display size. Opaque face and clothing, transparent alpha background, no scene, no halo, no text, no watermark, no border. This is the uniquely named ex_27 replacement icon; one character only.",
+      "generator": "built-in image_gen",
+      "generation_kind": "reused_correct_character",
+      "reused_from": "ex_27",
+      "original_file": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\src\\images\\custom_game\\archive_portraits_v3\\ex_27.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_19.json",
+      "receipt_sha256": "f81c8eee3dc88815088d4eee1f19752363a49d7552f66209943711fc8893944f",
+      "built_in_receipt": {
+        "id": "wife_19",
+        "name": "祈",
+        "canonical_name": "楪祈 / Inori Yuzuriha",
+        "source_path": "panorama/src/images/custom_game/archive_portraits_v3/ex_27.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_19.png",
+        "generator": "built-in image_gen (existing correct-character original)",
+        "reused_correct_character": "ex_27",
+        "prompt": "Use case: stylized-concept. Asset: one individual game collection character portrait icon, square canvas. Subject: Inori Yuzuriha, Guilty Crown: long pale pink hair with red-orange hair ornaments, red eyes, red-black collar detail, quiet expression. Faithfully recognizable source-character identity is essential. Clean polished 2D anime/donghua illustration with source-accurate adult facial proportions except canon child characters; NOT chibi, NOT baby-faced, NOT a generic cute avatar. Head and shoulders close-up only, large face, iconic hair/headwear fully inside safe margins, signature collar visible. Strong readable silhouette, simple cel shading and deliberate high-contrast colors at 90px display size. Opaque face and clothing, transparent alpha background, no scene, no halo, no text, no watermark, no border. This is the uniquely named ex_27 replacement icon; one character only.",
+        "review": "PASS: same character Inori Yuzuriha from Guilty Crown; pink hair, red eyes, red clips and original red-black collar.",
+        "sha256": "6d8356f1aa0809e2d72e47758bd4fcc47523c9f25bff2b25c97330d634b03888",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_20": {
+      "id": "wife_20",
+      "display_name": "宫水三叶",
+      "canonical_name": "宫水三叶",
+      "series": "你的名字。",
+      "latin_name": "Mitsuha Miyamizu",
+      "icon_path": "custom_game/wife_portraits_v1/wife_20.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_20.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_20.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "8e5842445279ea99e366257907262400b8a215759423813b332638cf02aa81d9",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Mitsuha Miyamizu (宮水三葉) from the anime film Your Name (Kimi no Na wa). Canonical teenager, dark brown-black hair in her distinctive gathered braided hairstyle, long red traditional kumihimo braided cord tied through her hair with visible red bow and cord ends, amber-brown eyes and soft natural face, school uniform white shirt collar and red ribbon bow at neck beneath grey/dark jacket. Faithful short layered face-framing locks, cheerful gentle smile. No glasses, fantasy headpiece, pink hair, bunny ears or generic twin tails.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-5f6746aa-8e7c-4dd2-ba3d-5a3ffb109da2.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 20,
+        "name": "宫水三叶",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Mitsuha Miyamizu (宮水三葉) from the anime film Your Name (Kimi no Na wa). Canonical teenager, dark brown-black hair in her distinctive gathered braided hairstyle, long red traditional kumihimo braided cord tied through her hair with visible red bow and cord ends, amber-brown eyes and soft natural face, school uniform white shirt collar and red ribbon bow at neck beneath grey/dark jacket. Faithful short layered face-framing locks, cheerful gentle smile. No glasses, fantasy headpiece, pink hair, bunny ears or generic twin tails.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-5f6746aa-8e7c-4dd2-ba3d-5a3ffb109da2.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-5f6746aa-8e7c-4dd2-ba3d-5a3ffb109da2.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "黑色盘辫、红结绳、棕眼、校服红蝴蝶结，宫水三叶一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_20.png",
+        "sha256": "8e5842445279ea99e366257907262400b8a215759423813b332638cf02aa81d9",
+        "source_sha256": "8e5842445279ea99e366257907262400b8a215759423813b332638cf02aa81d9",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_21": {
+      "id": "wife_21",
+      "display_name": "佩罗娜",
+      "canonical_name": "佩罗娜",
+      "series": "海贼王",
+      "latin_name": "Perona",
+      "icon_path": "custom_game/wife_portraits_v1/wife_21.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_21.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_21.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "2c1b7942f4898c763151cf8dd21af9271fec3a9cfdd1819b6f955f33c247d02b",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Perona (ペローナ), the Ghost Princess from One Piece, recognizable canonical young adult character. Pink long twin-tailed hair, her characteristic large round black eyes with small dark pupils and conspicuous black circular eye outlines, long fluttery lower eyelashes, very light skin and a playful tiny smile. Classic Thriller Bark design with a little red-and-gold mini crown on top and red-black Gothic high-collared outfit. Preserve the distinctive One Piece face rather than generic blue anime eyes; refined lineart and cel shaded finish while faithful to her identity. No ghosts or umbrella required, no extra figures.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-14c712ce-8303-422c-b302-0c16a1ebc5c8.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 21,
+        "name": "佩罗娜",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Perona (ペローナ), the Ghost Princess from One Piece, recognizable canonical young adult character. Pink long twin-tailed hair, her characteristic large round black eyes with small dark pupils and conspicuous black circular eye outlines, long fluttery lower eyelashes, very light skin and a playful tiny smile. Classic Thriller Bark design with a little red-and-gold mini crown on top and red-black Gothic high-collared outfit. Preserve the distinctive One Piece face rather than generic blue anime eyes; refined lineart and cel shaded finish while faithful to her identity. No ghosts or umbrella required, no extra figures.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-14c712ce-8303-422c-b302-0c16a1ebc5c8.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-14c712ce-8303-422c-b302-0c16a1ebc5c8.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "粉双马尾、圆黑眼睫圈、红金王冠、哥特衣领，佩罗娜一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_21.png",
+        "sha256": "2c1b7942f4898c763151cf8dd21af9271fec3a9cfdd1819b6f955f33c247d02b",
+        "source_sha256": "2c1b7942f4898c763151cf8dd21af9271fec3a9cfdd1819b6f955f33c247d02b",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_22": {
+      "id": "wife_22",
+      "display_name": "蜜璃",
+      "canonical_name": "甘露寺蜜璃",
+      "series": "鬼灭之刃",
+      "latin_name": "Mitsuri Kanroji",
+      "icon_path": "custom_game/wife_portraits_v1/wife_22.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_22.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_22.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "4bfc6caccd140785eb334bb042e825b952c563dd4af54205a49b39cb1e436e15",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Mitsuri Kanroji (甘露寺蜜璃), the Love Hashira from Demon Slayer / Kimetsu no Yaiba. Authentic canonical young adult face. Long pink hair fading to lime-green tips, distinctive thick braids (two long side braids plus rear braid), heavy pink/green bangs, large pale green eyes, and one small beauty mark directly beneath EACH eye. White haori over a dark Demon Slayer uniform; CLOSED and modest high collar, head and shoulders crop only, do not show an open chest. Sweet warm smile and slightly blushing cheeks. Preserve the two under-eye marks and green hair tips; no butterfly hairclip or different Demon Slayer heroine.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-620ef1a0-bba1-4541-ba8d-718b7ff0c789.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 22,
+        "name": "蜜璃",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Mitsuri Kanroji (甘露寺蜜璃), the Love Hashira from Demon Slayer / Kimetsu no Yaiba. Authentic canonical young adult face. Long pink hair fading to lime-green tips, distinctive thick braids (two long side braids plus rear braid), heavy pink/green bangs, large pale green eyes, and one small beauty mark directly beneath EACH eye. White haori over a dark Demon Slayer uniform; CLOSED and modest high collar, head and shoulders crop only, do not show an open chest. Sweet warm smile and slightly blushing cheeks. Preserve the two under-eye marks and green hair tips; no butterfly hairclip or different Demon Slayer heroine.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-620ef1a0-bba1-4541-ba8d-718b7ff0c789.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-620ef1a0-bba1-4541-ba8d-718b7ff0c789.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "粉发绿梢粗辫、浅绿眼、双眼下痣、白羽织，蜜璃一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_22.png",
+        "sha256": "4bfc6caccd140785eb334bb042e825b952c563dd4af54205a49b39cb1e436e15",
+        "source_sha256": "4bfc6caccd140785eb334bb042e825b952c563dd4af54205a49b39cb1e436e15",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_23": {
+      "id": "wife_23",
+      "display_name": "香奈乎",
+      "canonical_name": "栗花落香奈乎",
+      "series": "鬼灭之刃",
+      "latin_name": "Kanao Tsuyuri",
+      "icon_path": "custom_game/wife_portraits_v1/wife_23.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_23.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_23.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "fb36128b2d3e6c5c2a90925b4498bb6099c787117426a38142230e60375ac6f9",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Kanao Tsuyuri (栗花落カナヲ) from Demon Slayer / Kimetsu no Yaiba, faithful canonical TEEN face, not adultified. Straight dark black-purple hair, straight blunt bangs, single side ponytail held with her distinctive pale pink and green butterfly hairclip. Large lavender purple eyes with softly reflective gradients, calm gentle small smile. White cape over dark fully buttoned high-collared Demon Slayer uniform, modest and fully clothed. No pink hair, green hair tips, adult cleavage, Shinobu hairstyle, or wrong butterfly hair color.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-cf72e6ac-d337-4c46-9df1-9ecd7fd8e960.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 23,
+        "name": "香奈乎",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Kanao Tsuyuri (栗花落カナヲ) from Demon Slayer / Kimetsu no Yaiba, faithful canonical TEEN face, not adultified. Straight dark black-purple hair, straight blunt bangs, single side ponytail held with her distinctive pale pink and green butterfly hairclip. Large lavender purple eyes with softly reflective gradients, calm gentle small smile. White cape over dark fully buttoned high-collared Demon Slayer uniform, modest and fully clothed. No pink hair, green hair tips, adult cleavage, Shinobu hairstyle, or wrong butterfly hair color.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-cf72e6ac-d337-4c46-9df1-9ecd7fd8e960.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-cf72e6ac-d337-4c46-9df1-9ecd7fd8e960.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "黑紫侧马尾、粉绿蝴蝶发夹、紫眼、白斗篷，香奈乎一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_23.png",
+        "sha256": "fb36128b2d3e6c5c2a90925b4498bb6099c787117426a38142230e60375ac6f9",
+        "source_sha256": "fb36128b2d3e6c5c2a90925b4498bb6099c787117426a38142230e60375ac6f9",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_24": {
+      "id": "wife_24",
+      "display_name": "堕姬",
+      "canonical_name": "堕姬",
+      "series": "鬼灭之刃",
+      "latin_name": "Daki",
+      "icon_path": "custom_game/wife_portraits_v1/wife_24.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_24.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_24.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "35ba9e8d3e37d02dd4dad7d31df9c04820cf99283c12f03d8249f4c68ea6b0fc",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Daki (堕姫), Upper Rank Six demon from Demon Slayer / Kimetsu no Yaiba, her recognizable transformed WHITE-HAIRED canonical form. Long white hair with lime-green gradient ends, raised hairstyle with long trailing locks, gold kanzashi hairpins, sharp pale green eyes, and conspicuous bright pink flower-petal/vine markings on her LEFT cheek and forehead. Confident cool adult expression. Tight head-and-shoulders crop only; closed high black collar with subtle magenta floral cloth, no cleavage or exposed torso. Identity priority: white hair green tips and pink facial markings, not black-haired oiran version, not Mitsuri, not Kanao.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-3ae7c677-7951-4264-abfa-23339ab2e523.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 24,
+        "name": "堕姬",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Daki (堕姫), Upper Rank Six demon from Demon Slayer / Kimetsu no Yaiba, her recognizable transformed WHITE-HAIRED canonical form. Long white hair with lime-green gradient ends, raised hairstyle with long trailing locks, gold kanzashi hairpins, sharp pale green eyes, and conspicuous bright pink flower-petal/vine markings on her LEFT cheek and forehead. Confident cool adult expression. Tight head-and-shoulders crop only; closed high black collar with subtle magenta floral cloth, no cleavage or exposed torso. Identity priority: white hair green tips and pink facial markings, not black-haired oiran version, not Mitsuri, not Kanao.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-3ae7c677-7951-4264-abfa-23339ab2e523.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-3ae7c677-7951-4264-abfa-23339ab2e523.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "白发绿梢、浅绿鬼瞳、金簪和粉红花纹，堕姬变身形态一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_24.png",
+        "sha256": "35ba9e8d3e37d02dd4dad7d31df9c04820cf99283c12f03d8249f4c68ea6b0fc",
+        "source_sha256": "35ba9e8d3e37d02dd4dad7d31df9c04820cf99283c12f03d8249f4c68ea6b0fc",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_25": {
+      "id": "wife_25",
+      "display_name": "五河琴里",
+      "canonical_name": "五河琴里",
+      "series": "约会大作战",
+      "latin_name": "Kotori Itsuka",
+      "icon_path": "custom_game/wife_portraits_v1/wife_25.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_25.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_25.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "55c077acfa07fe8d851919132f8c499850d711629353c443c63c960d27b93f24",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Kotori Itsuka (五河琴里) from Date A Live, canonical young TEEN face. Her Commander / black-ribbon mode: very long bright crimson-red twin tails tied with broad BLACK ribbons, red eyes, straight bangs, petite face, assertive but gentle expression. Modest fully closed black high collar with a white and red command-uniform jacket collar and gold-trimmed shoulder details at bottom of bust crop. Black hair ribbons are essential; no white hair ribbons, horns, pink hair, adult body, or different Date A Live heroine.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-345c447e-fb99-4cdc-92c2-13c0bed6f529.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 25,
+        "name": "五河琴里",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Kotori Itsuka (五河琴里) from Date A Live, canonical young TEEN face. Her Commander / black-ribbon mode: very long bright crimson-red twin tails tied with broad BLACK ribbons, red eyes, straight bangs, petite face, assertive but gentle expression. Modest fully closed black high collar with a white and red command-uniform jacket collar and gold-trimmed shoulder details at bottom of bust crop. Black hair ribbons are essential; no white hair ribbons, horns, pink hair, adult body, or different Date A Live heroine.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-345c447e-fb99-4cdc-92c2-13c0bed6f529.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-345c447e-fb99-4cdc-92c2-13c0bed6f529.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "红双马尾黑缎带、红瞳、黑高领白红制服，五河琴里司令官形态一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_25.png",
+        "sha256": "55c077acfa07fe8d851919132f8c499850d711629353c443c63c960d27b93f24",
+        "source_sha256": "55c077acfa07fe8d851919132f8c499850d711629353c443c63c960d27b93f24",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_26": {
+      "id": "wife_26",
+      "display_name": "鸢一折纸",
+      "canonical_name": "鸢一折纸",
+      "series": "约会大作战",
+      "latin_name": "Origami Tobiichi",
+      "icon_path": "custom_game/wife_portraits_v1/wife_26.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_26.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_26.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        81,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "cff6cd465ac4f233ffa9e897fef7ccee8bfe92b3a86f4fc6fe5cbee62f946ab7",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Origami Tobiichi (鳶一折紙) from Date A Live in her canonical school-uniform design, faithful young TEEN face. Smooth short silver-white bob haircut that reaches her chin, blunt slightly parted bangs, cool clear blue eyes, three small distinct parallel hairpins on HER LEFT side near her temple, calm reserved small closed-mouth expression. Dark navy school blazer, white collar and modest neck ribbon. Hair must be a SHORT BOB, no long hair, no twin tails, no rabbit hood, no mature age change, no white hair generic elf.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-d644ae50-9cbc-4145-a9f8-055179ea85b3.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_14_26.json",
+      "receipt_sha256": "7056c4a286e3eca00b375f04902ff27925498b9714881deda8859a4d351218c2",
+      "built_in_receipt": {
+        "index": 26,
+        "name": "鸢一折纸",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Origami Tobiichi (鳶一折紙) from Date A Live in her canonical school-uniform design, faithful young TEEN face. Smooth short silver-white bob haircut that reaches her chin, blunt slightly parted bangs, cool clear blue eyes, three small distinct parallel hairpins on HER LEFT side near her temple, calm reserved small closed-mouth expression. Dark navy school blazer, white collar and modest neck ribbon. Hair must be a SHORT BOB, no long hair, no twin tails, no rabbit hood, no mature age change, no white hair generic elf.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-d644ae50-9cbc-4145-a9f8-055179ea85b3.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-d644ae50-9cbc-4145-a9f8-055179ea85b3.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verified": "银白短bob、蓝眼、本人左侧三枚发夹、校服，鸢一折纸一致。",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_26.png",
+        "sha256": "cff6cd465ac4f233ffa9e897fef7ccee8bfe92b3a86f4fc6fe5cbee62f946ab7",
+        "source_sha256": "cff6cd465ac4f233ffa9e897fef7ccee8bfe92b3a86f4fc6fe5cbee62f946ab7",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_27": {
+      "id": "wife_27",
+      "display_name": "四糸乃",
+      "canonical_name": "四糸乃",
+      "series": "约会大作战",
+      "latin_name": "Yoshino",
+      "icon_path": "custom_game/wife_portraits_v1/wife_27.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_27.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_27.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        12,
+        1254,
+        1254
+      ],
+      "sha256": "8c131cb42b1647ca9c3ac30aea7f0a7f198fa8934c5fd4b57e61c7f52aa18141",
+      "prompt": "Use case: stylized-concept. Asset: one individual game collection character portrait icon for wife_27, 四糸乃 Yoshino from Date A Live. Square canvas, genuine transparent background. Subject identity must be unmistakably Yoshino: small timid girl with pale blue wavy shoulder-length hair, large clear blue eyes, iconic green rabbit-ear hood with long floppy ears and pale pink bow detail, white frilled collar. Faithful original character age and face proportions, modest original costume. Clean polished 2D anime illustration matching a premium game transparent head-and-shoulders icon set: precise clean dark outlines, smooth cel shading with soft subtle gradients, luminous expressive eyes, high contrast at 74px display. Large centered face, near-frontal three-quarter view, show head and upper shoulders only; hair, hood and rabbit ears remain inside the canvas with small safe margin. Actual transparent alpha around the silhouette, face and clothing opaque. No scene, no halo, no background plate, no frame, no text, no watermark, no extra characters. Not chibi, not photorealistic. Produce only this single character.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-a552b2c8-f1c3-4bbd-86dc-da81dc1e649e.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_27.json",
+      "receipt_sha256": "622837d8db0f4aa251599093d59e77ddb24cb9f767a7881b52f49fa7f322990b",
+      "built_in_receipt": {
+        "id": "wife_27",
+        "name": "四糸乃",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-a552b2c8-f1c3-4bbd-86dc-da81dc1e649e.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_27.png",
+        "prompt": "Use case: stylized-concept. Asset: one individual game collection character portrait icon for wife_27, 四糸乃 Yoshino from Date A Live. Square canvas, genuine transparent background. Subject identity must be unmistakably Yoshino: small timid girl with pale blue wavy shoulder-length hair, large clear blue eyes, iconic green rabbit-ear hood with long floppy ears and pale pink bow detail, white frilled collar. Faithful original character age and face proportions, modest original costume. Clean polished 2D anime illustration matching a premium game transparent head-and-shoulders icon set: precise clean dark outlines, smooth cel shading with soft subtle gradients, luminous expressive eyes, high contrast at 74px display. Large centered face, near-frontal three-quarter view, show head and upper shoulders only; hair, hood and rabbit ears remain inside the canvas with small safe margin. Actual transparent alpha around the silhouette, face and clothing opaque. No scene, no halo, no background plate, no frame, no text, no watermark, no extra characters. Not chibi, not photorealistic. Produce only this single character.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-a552b2c8-f1c3-4bbd-86dc-da81dc1e649e.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: blue wavy hair, blue eyes, green rabbit-ear hood, pink bow, white frill, canonical shy youthful face; one transparent portrait.",
+        "sha256": "8c131cb42b1647ca9c3ac30aea7f0a7f198fa8934c5fd4b57e61c7f52aa18141",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_28": {
+      "id": "wife_28",
+      "display_name": "涂山苏苏",
+      "canonical_name": "涂山苏苏",
+      "series": "狐妖小红娘",
+      "latin_name": "Tushan Susu",
+      "icon_path": "custom_game/wife_portraits_v1/wife_28.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_28.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_28.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        4,
+        0,
+        1249,
+        1254
+      ],
+      "sha256": "fee1c83dad4daa2ccc9e06f8d23dcf609eb38396ce8d7c8288fcd24ba74189b6",
+      "prompt": "Use case: stylized-concept. Asset: one single game collection character portrait, square canvas with genuine transparent alpha background. Clean polished 2D anime/donghua illustration for a premium consistent icon set: precise dark outlines, clear cel shading with gentle smooth gradients, expressive source-accurate eyes. Head and upper shoulders close-up only, large centered face, near-frontal three-quarter view, hair/headwear readable at 74px display, small safe margins. Keep each source character's canonical age and proportions, modest original clothing. No chibi deformation, no scene, no halo, no background plate, no frame, no text, no watermark, no second character; face and clothes fully opaque. Subject: Tushan Susu 涂山苏苏 from Fox Spirit Matchmaker 狐妖小红娘, unmistakably her original youthful fox spirit design: long warm golden-blonde hair, clear bright green eyes, upright golden fox ears with pale pink inner fur, small red ornamental markings/accessories matching the original, pink-and-white traditional Chinese collar with red knot details, innocent gentle smile. Childlike original face, fully clothed head-and-shoulders, not Tushan Honghong and not Tushan Yaya. Only Susu.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-5398fc49-321f-4127-9d30-88089e5f14bb.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_28.json",
+      "receipt_sha256": "1269ee3cc9233593ce19c3348361e00539b9b3f1108b515daa3402a226d5e68a",
+      "built_in_receipt": {
+        "id": "wife_28",
+        "name": "涂山苏苏",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-5398fc49-321f-4127-9d30-88089e5f14bb.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_28.png",
+        "prompt": "Use case: stylized-concept. Asset: one single game collection character portrait, square canvas with genuine transparent alpha background. Clean polished 2D anime/donghua illustration for a premium consistent icon set: precise dark outlines, clear cel shading with gentle smooth gradients, expressive source-accurate eyes. Head and upper shoulders close-up only, large centered face, near-frontal three-quarter view, hair/headwear readable at 74px display, small safe margins. Keep each source character's canonical age and proportions, modest original clothing. No chibi deformation, no scene, no halo, no background plate, no frame, no text, no watermark, no second character; face and clothes fully opaque. Subject: Tushan Susu 涂山苏苏 from Fox Spirit Matchmaker 狐妖小红娘, unmistakably her original youthful fox spirit design: long warm golden-blonde hair, clear bright green eyes, upright golden fox ears with pale pink inner fur, small red ornamental markings/accessories matching the original, pink-and-white traditional Chinese collar with red knot details, innocent gentle smile. Childlike original face, fully clothed head-and-shoulders, not Tushan Honghong and not Tushan Yaya. Only Susu.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-5398fc49-321f-4127-9d30-88089e5f14bb.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: blonde hair, green eyes, large fox ears, pink/white Chinese collar; original youthful fox spirit, not Yaya/Honghong.",
+        "sha256": "fee1c83dad4daa2ccc9e06f8d23dcf609eb38396ce8d7c8288fcd24ba74189b6",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_29": {
+      "id": "wife_29",
+      "display_name": "夏禾",
+      "canonical_name": "夏禾",
+      "series": "一人之下",
+      "latin_name": "Xia He",
+      "icon_path": "custom_game/wife_portraits_v1/wife_29.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_29.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_29.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "0747090fb234a1a50c87a509d56a79f296d515f206fb3a9f90a2d674c669f7b9",
+      "prompt": "Use case: stylized-concept. Asset: one single game collection character portrait, square canvas with genuine transparent alpha background. Clean polished 2D anime/donghua illustration for a premium consistent icon set: precise dark outlines, clear cel shading with gentle smooth gradients, expressive source-accurate eyes. Head and upper shoulders close-up only, large centered face, near-frontal three-quarter view, hair/headwear readable at 74px display, small safe margins. Keep each source character's canonical age and proportions, modest original clothing. No chibi deformation, no scene, no halo, no background plate, no frame, no text, no watermark, no second character; face and clothes fully opaque. Subject: Xia He 夏禾 from The Outcast / Hitori no Shita 一人之下. Faithful adult woman with long flowing pastel pink hair, side part and long side strands framing her face, lavender-violet eyes, relaxed knowing small smile, pale skin, original simple light-colored Chinese-style high collar visible at shoulders. Accurate elegant adult facial proportions. Confident but restrained portrait, no erotic pose or cleavage; only her face and upper shoulders. Do not substitute Yae Miko, Inori or another pink-haired anime character.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-cc3d06ba-7959-4a14-8819-de7f200ca415.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_29.json",
+      "receipt_sha256": "faa2324b015a917d3df9a4989367bf65d8eca30c51acb554277482e73d67999f",
+      "built_in_receipt": {
+        "id": "wife_29",
+        "name": "夏禾",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-cc3d06ba-7959-4a14-8819-de7f200ca415.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_29.png",
+        "prompt": "Use case: stylized-concept. Asset: one single game collection character portrait, square canvas with genuine transparent alpha background. Clean polished 2D anime/donghua illustration for a premium consistent icon set: precise dark outlines, clear cel shading with gentle smooth gradients, expressive source-accurate eyes. Head and upper shoulders close-up only, large centered face, near-frontal three-quarter view, hair/headwear readable at 74px display, small safe margins. Keep each source character's canonical age and proportions, modest original clothing. No chibi deformation, no scene, no halo, no background plate, no frame, no text, no watermark, no second character; face and clothes fully opaque. Subject: Xia He 夏禾 from The Outcast / Hitori no Shita 一人之下. Faithful adult woman with long flowing pastel pink hair, side part and long side strands framing her face, lavender-violet eyes, relaxed knowing small smile, pale skin, original simple light-colored Chinese-style high collar visible at shoulders. Accurate elegant adult facial proportions. Confident but restrained portrait, no erotic pose or cleavage; only her face and upper shoulders. Do not substitute Yae Miko, Inori or another pink-haired anime character.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-cc3d06ba-7959-4a14-8819-de7f200ca415.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: long pastel pink hair, violet eyes, adult face, pale Chinese collar; restrained original character portrait.",
+        "sha256": "0747090fb234a1a50c87a509d56a79f296d515f206fb3a9f90a2d674c669f7b9",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_30": {
+      "id": "wife_30",
+      "display_name": "拉普兰德",
+      "canonical_name": "拉普兰德",
+      "series": "明日方舟",
+      "latin_name": "Lappland",
+      "icon_path": "custom_game/wife_portraits_v1/wife_30.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_30.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_30.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "09eaaca97fdc8e18e0d35d756d360b465c3661cf3c25cbde8da4dabb5a010644",
+      "prompt": "Use case: stylized-concept. Asset: one individual game collection character portrait, square canvas, genuine transparent alpha background. Match polished transparent anime game head icons: precise dark linework, clean cel shading, soft subtle gradients, expressive eyes, crisp silhouette at 74px size. Head and upper shoulders only, face large and centered, close frontal three-quarter composition. Canonical original character facial proportions and modest original upper costume; no chibi. Keep hair, animal ears and iconic ornaments readable within safe margins. No background, no scene, no frame, no halo, no text/watermark, no extra character. Opaque face and clothes with transparent surrounding pixels. Character: Lappland 拉普兰德 from Arknights 明日方舟, the original five-star operator's base design, NOT Lappland the Decadenza. Long tousled silver-white hair, distinct upright gray-white wolf ears, sharp pale gray eyes, the signature visible vertical scar at her right eye, slightly wild toothy confident grin, black choker and black/white high-collared Rhodes Island/Siracusa outfit. The scar and wolf ears are vital identity features. Faithful original operator, no generic wolf girl, no Texas.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-1dd2e75c-8fe3-4864-89b4-c7aadf525b5f.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_30.json",
+      "receipt_sha256": "82cad16bec1c25fc568088d60b64f5cddf0a0c667086cbc5631dd82ec4c1f03a",
+      "built_in_receipt": {
+        "id": "wife_30",
+        "name": "拉普兰德",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-1dd2e75c-8fe3-4864-89b4-c7aadf525b5f.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_30.png",
+        "prompt": "Use case: stylized-concept. Asset: one individual game collection character portrait, square canvas, genuine transparent alpha background. Match polished transparent anime game head icons: precise dark linework, clean cel shading, soft subtle gradients, expressive eyes, crisp silhouette at 74px size. Head and upper shoulders only, face large and centered, close frontal three-quarter composition. Canonical original character facial proportions and modest original upper costume; no chibi. Keep hair, animal ears and iconic ornaments readable within safe margins. No background, no scene, no frame, no halo, no text/watermark, no extra character. Opaque face and clothes with transparent surrounding pixels. Character: Lappland 拉普兰德 from Arknights 明日方舟, the original five-star operator's base design, NOT Lappland the Decadenza. Long tousled silver-white hair, distinct upright gray-white wolf ears, sharp pale gray eyes, the signature visible vertical scar at her right eye, slightly wild toothy confident grin, black choker and black/white high-collared Rhodes Island/Siracusa outfit. The scar and wolf ears are vital identity features. Faithful original operator, no generic wolf girl, no Texas.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-1dd2e75c-8fe3-4864-89b4-c7aadf525b5f.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: original five-star Lappland, white wolf ears, tousled silver hair, gray eyes, anatomical-right eye scar and black choker; not Texas or alter.",
+        "sha256": "09eaaca97fdc8e18e0d35d756d360b465c3661cf3c25cbde8da4dabb5a010644",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_31": {
+      "id": "wife_31",
+      "display_name": "凯尔希",
+      "canonical_name": "凯尔希",
+      "series": "明日方舟",
+      "latin_name": "Kal'tsit",
+      "icon_path": "custom_game/wife_portraits_v1/wife_31.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_31.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_31.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        12,
+        0,
+        1197,
+        1254
+      ],
+      "sha256": "9b5e56b5b6878815675c53fc61f50e176d6c61cb6ae7bef1364f480a8f9ca56b",
+      "prompt": "Use case: stylized-concept. Asset: one individual game collection character portrait, square canvas, genuine transparent alpha background. Match polished transparent anime game head icons: precise dark linework, clean cel shading, soft subtle gradients, expressive eyes, crisp silhouette at 74px size. Head and upper shoulders only, face large and centered, close frontal three-quarter composition. Canonical original character facial proportions and modest original upper costume; no chibi. Keep hair, animal ears and iconic ornaments readable within safe margins. No background, no scene, no frame, no halo, no text/watermark, no extra character. Opaque face and clothes with transparent surrounding pixels. Character: Kal'tsit 凯尔希 from Arknights 明日方舟. Accurate silver-white short straight bob with asymmetric long side strands, clear cool green eyes, distinctive white feline ears with darker greenish inner accents, calm slightly stern medical doctor's expression, black high collar under original white medical coat with dark green trim. Mature slender face, controlled direct gaze. NOT a generic catgirl, no wolf ears, not Lappland, no medical mask covering face.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-0b50941c-9703-4222-b154-e9f59413741e.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_31.json",
+      "receipt_sha256": "42b40966afd3973f34bed3d7ea0d4c77b4d92682ba5c87e88369dda743345a97",
+      "built_in_receipt": {
+        "id": "wife_31",
+        "name": "凯尔希",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-0b50941c-9703-4222-b154-e9f59413741e.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_31.png",
+        "prompt": "Use case: stylized-concept. Asset: one individual game collection character portrait, square canvas, genuine transparent alpha background. Match polished transparent anime game head icons: precise dark linework, clean cel shading, soft subtle gradients, expressive eyes, crisp silhouette at 74px size. Head and upper shoulders only, face large and centered, close frontal three-quarter composition. Canonical original character facial proportions and modest original upper costume; no chibi. Keep hair, animal ears and iconic ornaments readable within safe margins. No background, no scene, no frame, no halo, no text/watermark, no extra character. Opaque face and clothes with transparent surrounding pixels. Character: Kal'tsit 凯尔希 from Arknights 明日方舟. Accurate silver-white short straight bob with asymmetric long side strands, clear cool green eyes, distinctive white feline ears with darker greenish inner accents, calm slightly stern medical doctor's expression, black high collar under original white medical coat with dark green trim. Mature slender face, controlled direct gaze. NOT a generic catgirl, no wolf ears, not Lappland, no medical mask covering face.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-0b50941c-9703-4222-b154-e9f59413741e.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: silver bob, green eyes, feline ears, white-green doctor coat and black high collar; not Lappland.",
+        "sha256": "9b5e56b5b6878815675c53fc61f50e176d6c61cb6ae7bef1364f480a8f9ca56b",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_32": {
+      "id": "wife_32",
+      "display_name": "春野樱",
+      "canonical_name": "春野樱",
+      "series": "火影忍者",
+      "latin_name": "Sakura Haruno",
+      "icon_path": "custom_game/wife_portraits_v1/wife_32.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_32.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_32.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        11,
+        4,
+        1166,
+        1254
+      ],
+      "sha256": "d23f11e24a36fc44570cecc426d8351c0b2039354c5a993e67972a562432e8a5",
+      "prompt": "Use case: stylized-concept. Asset: a single game collection head-and-shoulders character portrait icon, square, actual transparent alpha background. Premium polished 2D anime drawing matching clean collectible portrait icons: precise dark outlines, crisp cel shading with soft subtle gradients and clear expressive eyes. Face large centered and instantly readable at 74px, near-frontal slight three-quarter view. Only head and upper shoulders, iconic hair and ornaments within safe margins, face and clothes opaque. Source-accurate facial proportions and age, modest original costume. No chibi, no photorealism, no background, no scene, no glow/halo, no frame, no text/watermark, no extra characters. Character: Sakura Haruno 春野樱 from Naruto Shippuden. Accurate short light pink hair, vivid green eyes, narrow red ninja headband with metal Hidden Leaf forehead protector, part in front bangs forming the characteristic open forehead, small violet diamond Byakugo forehead seal, red high-collared sleeveless ninja upper garment with pale trim visible only at shoulders. Confident friendly adult/late-Shippuden Sakura expression. Preserve Sakura's recognizable face and original outfit, not a generic pink-haired girl.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-42dde739-e35e-4ab1-a9de-33bc7f86bdb7.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_32.json",
+      "receipt_sha256": "925cacaa9bdd188643afa37c5b9baec2a98a257c255af4719a142b7c1495781b",
+      "built_in_receipt": {
+        "id": "wife_32",
+        "name": "春野樱",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-42dde739-e35e-4ab1-a9de-33bc7f86bdb7.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_32.png",
+        "prompt": "Use case: stylized-concept. Asset: a single game collection head-and-shoulders character portrait icon, square, actual transparent alpha background. Premium polished 2D anime drawing matching clean collectible portrait icons: precise dark outlines, crisp cel shading with soft subtle gradients and clear expressive eyes. Face large centered and instantly readable at 74px, near-frontal slight three-quarter view. Only head and upper shoulders, iconic hair and ornaments within safe margins, face and clothes opaque. Source-accurate facial proportions and age, modest original costume. No chibi, no photorealism, no background, no scene, no glow/halo, no frame, no text/watermark, no extra characters. Character: Sakura Haruno 春野樱 from Naruto Shippuden. Accurate short light pink hair, vivid green eyes, narrow red ninja headband with metal Hidden Leaf forehead protector, part in front bangs forming the characteristic open forehead, small violet diamond Byakugo forehead seal, red high-collared sleeveless ninja upper garment with pale trim visible only at shoulders. Confident friendly adult/late-Shippuden Sakura expression. Preserve Sakura's recognizable face and original outfit, not a generic pink-haired girl.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-42dde739-e35e-4ab1-a9de-33bc7f86bdb7.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: Sakura pink bob, green eyes, red Leaf headband, violet Byakugo diamond, red high-collared original outfit.",
+        "sha256": "d23f11e24a36fc44570cecc426d8351c0b2039354c5a993e67972a562432e8a5",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_33": {
+      "id": "wife_33",
+      "display_name": "黑雪姬",
+      "canonical_name": "黑雪姬",
+      "series": "加速世界",
+      "latin_name": "Kuroyukihime",
+      "icon_path": "custom_game/wife_portraits_v1/wife_33.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_33.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_33.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "dd7a16aaff57c27c165815905b26d58f5f8ba534cc8162ee7b527eefe79160a0",
+      "prompt": "Use case: stylized-concept. Asset: a single game collection head-and-shoulders character portrait icon, square, actual transparent alpha background. Premium polished 2D anime drawing matching clean collectible portrait icons: precise dark outlines, crisp cel shading with soft subtle gradients and clear expressive eyes. Face large centered and instantly readable at 74px, near-frontal slight three-quarter view. Only head and upper shoulders, iconic hair and ornaments within safe margins, face and clothes opaque. Source-accurate facial proportions and age, modest original costume. No chibi, no photorealism, no background, no scene, no glow/halo, no frame, no text/watermark, no extra characters. Character: Kuroyukihime 黑雪姬 from Accel World, HUMAN schoolgirl form, not Black Lotus armor. Long straight glossy jet-black hair with blunt full bangs and characteristic long side locks, deep violet eyes, elegant composed slight smile, black butterfly hair ornaments near the sides, original dark dress with modest neckline and dark ribbon collar. Keep original teenage character facial proportions and nonsexual head-and-shoulders framing. Her long black hair, purple eyes and black butterfly motif must be distinctive.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-82ef011d-da42-4e52-991e-431b95d01e4d.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_33.json",
+      "receipt_sha256": "c1c3f5b7edae1e58b113f60e562a6b115cbbf6a49bee6d75ac51f1ff500c5d15",
+      "built_in_receipt": {
+        "id": "wife_33",
+        "name": "黑雪姬",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-82ef011d-da42-4e52-991e-431b95d01e4d.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_33.png",
+        "prompt": "Use case: stylized-concept. Asset: a single game collection head-and-shoulders character portrait icon, square, actual transparent alpha background. Premium polished 2D anime drawing matching clean collectible portrait icons: precise dark outlines, crisp cel shading with soft subtle gradients and clear expressive eyes. Face large centered and instantly readable at 74px, near-frontal slight three-quarter view. Only head and upper shoulders, iconic hair and ornaments within safe margins, face and clothes opaque. Source-accurate facial proportions and age, modest original costume. No chibi, no photorealism, no background, no scene, no glow/halo, no frame, no text/watermark, no extra characters. Character: Kuroyukihime 黑雪姬 from Accel World, HUMAN schoolgirl form, not Black Lotus armor. Long straight glossy jet-black hair with blunt full bangs and characteristic long side locks, deep violet eyes, elegant composed slight smile, black butterfly hair ornaments near the sides, original dark dress with modest neckline and dark ribbon collar. Keep original teenage character facial proportions and nonsexual head-and-shoulders framing. Her long black hair, purple eyes and black butterfly motif must be distinctive.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-82ef011d-da42-4e52-991e-431b95d01e4d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: human Kuroyukihime, long black hair, blunt bangs, violet eyes, black butterfly hair ornaments and dark ribbon collar; not armored avatar.",
+        "sha256": "dd7a16aaff57c27c165815905b26d58f5f8ba534cc8162ee7b527eefe79160a0",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_34": {
+      "id": "wife_34",
+      "display_name": "莉伍德",
+      "canonical_name": "优克莉伍德·海尔赛兹",
+      "series": "这样算是僵尸吗？",
+      "latin_name": "Eucliwood Hellscythe",
+      "icon_path": "custom_game/wife_portraits_v1/wife_34.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_34.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_34.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "d80668c746313497d50970a502e166c2d04a417658c5ac2e1414873b93c63f36",
+      "prompt": "Use case: stylized-concept. Asset: a single game collection head-and-shoulders character portrait icon, square, actual transparent alpha background. Premium polished 2D anime drawing matching clean collectible portrait icons: precise dark outlines, crisp cel shading with soft subtle gradients and clear expressive eyes. Face large centered and instantly readable at 74px, near-frontal slight three-quarter view. Only head and upper shoulders, iconic hair and ornaments within safe margins, face and clothes opaque. Source-accurate facial proportions and age, modest original costume. No chibi, no photorealism, no background, no scene, no glow/halo, no frame, no text/watermark, no extra characters. Character: Eucliwood Hellscythe 优克莉伍德·海尔赛兹 from Is This a Zombie? / Kore wa Zombie Desu ka? (video label 莉伍德). Faithful original silver-blue long straight hair, unmistakable bright blue eyes, small expressionless reserved mouth, signature ornate SILVER ARMOR HEADBAND/forehead plate resting over the bangs, matching silver shoulder armor and deep purple high-collared cloth under armor. Preserve the original youthful face, fully clothed. This exact armored silver-haired necromancer girl; NOT Rem, NOT Rimuru, NOT a maid and NOT a generic blue-haired elf.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-972afc5e-5fc5-437a-b552-e8845caa05d1.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_34.json",
+      "receipt_sha256": "63c04e9b6cfc469733b59253d18dd107eb524d83c31ed48abf1070d5620244bc",
+      "built_in_receipt": {
+        "id": "wife_34",
+        "name": "莉伍德",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-972afc5e-5fc5-437a-b552-e8845caa05d1.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_34.png",
+        "prompt": "Use case: stylized-concept. Asset: a single game collection head-and-shoulders character portrait icon, square, actual transparent alpha background. Premium polished 2D anime drawing matching clean collectible portrait icons: precise dark outlines, crisp cel shading with soft subtle gradients and clear expressive eyes. Face large centered and instantly readable at 74px, near-frontal slight three-quarter view. Only head and upper shoulders, iconic hair and ornaments within safe margins, face and clothes opaque. Source-accurate facial proportions and age, modest original costume. No chibi, no photorealism, no background, no scene, no glow/halo, no frame, no text/watermark, no extra characters. Character: Eucliwood Hellscythe 优克莉伍德·海尔赛兹 from Is This a Zombie? / Kore wa Zombie Desu ka? (video label 莉伍德). Faithful original silver-blue long straight hair, unmistakable bright blue eyes, small expressionless reserved mouth, signature ornate SILVER ARMOR HEADBAND/forehead plate resting over the bangs, matching silver shoulder armor and deep purple high-collared cloth under armor. Preserve the original youthful face, fully clothed. This exact armored silver-haired necromancer girl; NOT Rem, NOT Rimuru, NOT a maid and NOT a generic blue-haired elf.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-972afc5e-5fc5-437a-b552-e8845caa05d1.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: Eucliwood Hellscythe, silver-blue hair, blue eyes, distinctive silver forehead armor plate, purple undercloth and silver armor; original video identity resolved.",
+        "sha256": "d80668c746313497d50970a502e166c2d04a417658c5ac2e1414873b93c63f36",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_35": {
+      "id": "wife_35",
+      "display_name": "白井黑子",
+      "canonical_name": "白井黑子",
+      "series": "某科学的超电磁炮",
+      "latin_name": "Kuroko Shirai",
+      "icon_path": "custom_game/wife_portraits_v1/wife_35.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_35.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_35.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        6,
+        0,
+        1251,
+        1254
+      ],
+      "sha256": "eb53bfe39a4acc5fe6b2f75045c5facb681647747a3f315f06fa328b0efbb7b3",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Kuroko Shirai (白井黒子) from A Certain Scientific Railgun / Toaru Kagaku no Railgun. Faithful canonical young TEEN face and small youthful proportions. Pale brown / pinkish-brown hair in two distinctive long curled TWIN TAILS tied with RED ribbon bows at both sides, amber brown eyes and straight bangs. Tokiwadai school uniform: white short-sleeved shirt and beige knitted sweater vest with a little dark crest, modest closed collar. Alert confident slightly cheeky expression. Identity priority: clearly visible TWO TWIN TAILS and red ribbons. Do not draw Mikoto Misaka's short brown bob or generic brown-haired girl, no adultification.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-277c184a-dcdc-4afc-a1e4-8dede130cad0.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_35_37.json",
+      "receipt_sha256": "d95db3087dd8cf15415a78ce19c4f2ce9f1e00bd8a90a8a54c2570dc144f6c21",
+      "built_in_receipt": {
+        "index": 35,
+        "name": "白井黑子",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Kuroko Shirai (白井黒子) from A Certain Scientific Railgun / Toaru Kagaku no Railgun. Faithful canonical young TEEN face and small youthful proportions. Pale brown / pinkish-brown hair in two distinctive long curled TWIN TAILS tied with RED ribbon bows at both sides, amber brown eyes and straight bangs. Tokiwadai school uniform: white short-sleeved shirt and beige knitted sweater vest with a little dark crest, modest closed collar. Alert confident slightly cheeky expression. Identity priority: clearly visible TWO TWIN TAILS and red ribbons. Do not draw Mikoto Misaka's short brown bob or generic brown-haired girl, no adultification.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-277c184a-dcdc-4afc-a1e4-8dede130cad0.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-277c184a-dcdc-4afc-a1e4-8dede130cad0.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_35.png",
+        "verified": "粉棕卷双马尾、红缎带、棕眼、常盘台白衬衫米色背心，区别于御坂短发，白井黑子一致。",
+        "sha256": "eb53bfe39a4acc5fe6b2f75045c5facb681647747a3f315f06fa328b0efbb7b3",
+        "source_sha256": "eb53bfe39a4acc5fe6b2f75045c5facb681647747a3f315f06fa328b0efbb7b3",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_36": {
+      "id": "wife_36",
+      "display_name": "千反田爱",
+      "canonical_name": "千反田爱瑠",
+      "series": "冰菓",
+      "latin_name": "Eru Chitanda",
+      "icon_path": "custom_game/wife_portraits_v1/wife_36.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_36.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_36.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "cc5e65ab9cbce33e27e081339d0fddcb90a6167eef35abc84282048059b9d624",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Eru Chitanda (千反田える / 千反田愛瑠) from Hyouka, authentic canonical teenager. Long straight dark black hair with subtle violet sheen, blunt straight bangs, extraordinarily bright large VIOLET eyes with expressive curious highlights, gentle naturally rounded face and a warm inquisitive expression. Kamiyama High School summer sailor uniform: WHITE fabric, NAVY BLUE sailor collar and NAVY BLUE ribbon necktie; no red ribbon, no black blazer. Faithful Eru Chitanda face; do not confuse with Yukino Yukinoshita, Kaguya, or generic blue-eyed anime heroine.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ad7bb618-8a3b-41da-a8bc-37c4ca832903.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_35_37.json",
+      "receipt_sha256": "d95db3087dd8cf15415a78ce19c4f2ce9f1e00bd8a90a8a54c2570dc144f6c21",
+      "built_in_receipt": {
+        "index": 36,
+        "name": "千反田爱",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Eru Chitanda (千反田える / 千反田愛瑠) from Hyouka, authentic canonical teenager. Long straight dark black hair with subtle violet sheen, blunt straight bangs, extraordinarily bright large VIOLET eyes with expressive curious highlights, gentle naturally rounded face and a warm inquisitive expression. Kamiyama High School summer sailor uniform: WHITE fabric, NAVY BLUE sailor collar and NAVY BLUE ribbon necktie; no red ribbon, no black blazer. Faithful Eru Chitanda face; do not confuse with Yukino Yukinoshita, Kaguya, or generic blue-eyed anime heroine.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ad7bb618-8a3b-41da-a8bc-37c4ca832903.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ad7bb618-8a3b-41da-a8bc-37c4ca832903.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_36.png",
+        "verified": "黑紫长直齐刘海、明亮紫瞳、神山高中白蓝水手服蓝结，好奇表情，千反田爱瑠一致。",
+        "sha256": "cc5e65ab9cbce33e27e081339d0fddcb90a6167eef35abc84282048059b9d624",
+        "source_sha256": "cc5e65ab9cbce33e27e081339d0fddcb90a6167eef35abc84282048059b9d624",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_37": {
+      "id": "wife_37",
+      "display_name": "菲伦",
+      "canonical_name": "菲伦",
+      "series": "葬送的芙莉莲",
+      "latin_name": "Fern",
+      "icon_path": "custom_game/wife_portraits_v1/wife_37.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_37.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_37.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "b455bcc101404da174df8de945ae1dafadca302d2f9fa1da5375b4006333764c",
+      "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Fern (フェルン) from Frieren: Beyond Journey's End / Sousou no Frieren, her canonical late-teen mage design. Very long smooth DEEP PURPLE hair, blunt bangs and distinctive half-up hair gathered behind her head, violet-purple eyes, calm serious slightly rounded youthful face. WHITE HIGH-COLLARED dress under a BLACK mage outer coat with small GOLD clasps near the collar. Human ears, no elf ears. Modest fully closed neckline and head/shoulders crop only. Preserve Fern's dark purple hair and quiet face; do not draw Frieren's white twin tails, pointed elf ears, staff, broad hat or different character.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ab8e1a9f-f16f-461f-a24a-1359283d800d.png",
+      "receipt_file": "output/wife_portraits_20261016/receipts_35_37.json",
+      "receipt_sha256": "d95db3087dd8cf15415a78ce19c4f2ce9f1e00bd8a90a8a54c2570dc144f6c21",
+      "built_in_receipt": {
+        "index": 37,
+        "name": "菲伦",
+        "prompt": "Use case: stylized-concept. Asset type: square transparent character portrait icon for a game collection. Create ONE named canonical anime character only. Crisp refined Japanese anime line art, clean cel shading plus soft color gradients and bright detailed eyes, like polished anime game bust portraits. Extreme close head-and-shoulders portrait, large head and face centered and readable at a 74px icon size; crop near upper chest, portrait fills the square while retaining character-defining hair/accessories. Authentic canonical age, face and outfit details, no age changes. Truly transparent background and clean alpha edges. No frame, scenery, text, logos, glow halo, colored backdrop, watermark or extra people. Wholesome and fully clothed. Subject: Fern (フェルン) from Frieren: Beyond Journey's End / Sousou no Frieren, her canonical late-teen mage design. Very long smooth DEEP PURPLE hair, blunt bangs and distinctive half-up hair gathered behind her head, violet-purple eyes, calm serious slightly rounded youthful face. WHITE HIGH-COLLARED dress under a BLACK mage outer coat with small GOLD clasps near the collar. Human ears, no elf ears. Modest fully closed neckline and head/shoulders crop only. Preserve Fern's dark purple hair and quiet face; do not draw Frieren's white twin tails, pointed elf ears, staff, broad hat or different character.",
+        "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ab8e1a9f-f16f-461f-a24a-1359283d800d.png",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb as C:\\Users\\Administrator\\.codex\\generated_images\\01a14375-6d41-7f53-b80a-1255014ff6bb\\exec-ab8e1a9f-f16f-461f-a24a-1359283d800d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "destination": "panorama/src/images/custom_game/wife_portraits_v1/wife_37.png",
+        "verified": "深紫长直半束发、紫眼、沉静脸、白高领黑外套金扣、人类耳，菲伦一致，未混成芙莉莲。",
+        "sha256": "b455bcc101404da174df8de945ae1dafadca302d2f9fa1da5375b4006333764c",
+        "source_sha256": "b455bcc101404da174df8de945ae1dafadca302d2f9fa1da5375b4006333764c",
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "alpha_extrema": [
+          0,
+          255
+        ]
+      }
+    },
+    "wife_38": {
+      "id": "wife_38",
+      "display_name": "纱雾",
+      "canonical_name": "和泉纱雾",
+      "series": "埃罗芒阿老师",
+      "latin_name": "Sagiri Izumi",
+      "icon_path": "custom_game/wife_portraits_v1/wife_38.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_38.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_38.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        36,
+        0,
+        1253,
+        1254
+      ],
+      "sha256": "a9d7e1bd708d8b524fa843983978859d104421b503b4fc9970998cecff85ef98",
+      "prompt": "Use case: stylized-concept. Asset: one individual transparent game collection portrait icon. Square canvas with genuine transparent alpha; premium clean 2D anime line art, crisp cel shading with gentle smooth gradients, expressive eyes, matching polished head portrait collectibles. Head and upper shoulders only, face large centered, close near-frontal three-quarter view, iconic hair and ornaments stay recognizable at 74px. Preserve original character age, face and modest original clothing. No chibi, no realism, no background, no halo, no frame, no text/watermark, no other characters. Opaque face and clothing, clean transparent silhouette. Subject: Sagiri Izumi 和泉纱雾 from Eromanga Sensei, accurate original design: long silvery-white hair with blunt fringe and side locks, clear light-blue eyes, characteristic small red/pink hair ribbons, shy reserved childlike expression. Original pastel pink-and-white pajama-style jacket with modest closed upper collar. Faithful original young character face, entirely nonsexual head-and-shoulders portrait. Not Elf Yamada, not Emilia, not Inori.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-cbfaef94-8ef4-4ee1-b916-0e3d613cb85d.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_38.json",
+      "receipt_sha256": "d4b1ce1ae8c1ca31665764d06345096dcefe69dc63387bec51e3a5faab10f383",
+      "built_in_receipt": {
+        "id": "wife_38",
+        "name": "纱雾",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-cbfaef94-8ef4-4ee1-b916-0e3d613cb85d.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_38.png",
+        "prompt": "Use case: stylized-concept. Asset: one individual transparent game collection portrait icon. Square canvas with genuine transparent alpha; premium clean 2D anime line art, crisp cel shading with gentle smooth gradients, expressive eyes, matching polished head portrait collectibles. Head and upper shoulders only, face large centered, close near-frontal three-quarter view, iconic hair and ornaments stay recognizable at 74px. Preserve original character age, face and modest original clothing. No chibi, no realism, no background, no halo, no frame, no text/watermark, no other characters. Opaque face and clothing, clean transparent silhouette. Subject: Sagiri Izumi 和泉纱雾 from Eromanga Sensei, accurate original design: long silvery-white hair with blunt fringe and side locks, clear light-blue eyes, characteristic small red/pink hair ribbons, shy reserved childlike expression. Original pastel pink-and-white pajama-style jacket with modest closed upper collar. Faithful original young character face, entirely nonsexual head-and-shoulders portrait. Not Elf Yamada, not Emilia, not Inori.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-cbfaef94-8ef4-4ee1-b916-0e3d613cb85d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: Sagiri Izumi silver hair, light-blue eyes, small pink-red ribbons, shy original youthful face and modest pink/white pajama collar.",
+        "sha256": "a9d7e1bd708d8b524fa843983978859d104421b503b4fc9970998cecff85ef98",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_39": {
+      "id": "wife_39",
+      "display_name": "夜刀神十香",
+      "canonical_name": "夜刀神十香",
+      "series": "约会大作战",
+      "latin_name": "Tohka Yatogami",
+      "icon_path": "custom_game/wife_portraits_v1/wife_39.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_39.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_39.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "97a4e2c161c41606acfd50e2cf9422161aefe4f30758e878c3df03a82bd5bc6b",
+      "prompt": "Use case: stylized-concept. Asset: one individual transparent game collection portrait icon. Square canvas with genuine transparent alpha; premium clean 2D anime line art, crisp cel shading with gentle smooth gradients, expressive eyes, matching polished head portrait collectibles. Head and upper shoulders only, face large centered, close near-frontal three-quarter view, iconic hair and ornaments stay recognizable at 74px. Preserve original character age, face and modest original clothing. No chibi, no realism, no background, no halo, no frame, no text/watermark, no other characters. Opaque face and clothing, clean transparent silhouette. Subject: Tohka Yatogami 夜刀神十香 from Date A Live, original PURPLE spirit-form Tohka, not inverse Tenka. Long dark purple hair with straight bangs and characteristic long side locks, large violet-magenta eyes, iconic dark purple/black ribbon hair ornament behind the side of her head, confident kind expression. Original Astral Dress Adonai Melekh head/shoulder design with purple, black, white and restrained gold armor trim, modest high chest coverage in this head-and-shoulders crop. Do not use white hair or red-and-black inverse form. Unmistakably Tohka.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-1d8ec5c6-e8a5-408d-94d7-10dc4a633d61.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_39.json",
+      "receipt_sha256": "32a99b1caf1edbfea09f30537e5958c2229a50ef8846d0b4f71ef9f9260b1ab6",
+      "built_in_receipt": {
+        "id": "wife_39",
+        "name": "夜刀神十香",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-1d8ec5c6-e8a5-408d-94d7-10dc4a633d61.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_39.png",
+        "prompt": "Use case: stylized-concept. Asset: one individual transparent game collection portrait icon. Square canvas with genuine transparent alpha; premium clean 2D anime line art, crisp cel shading with gentle smooth gradients, expressive eyes, matching polished head portrait collectibles. Head and upper shoulders only, face large centered, close near-frontal three-quarter view, iconic hair and ornaments stay recognizable at 74px. Preserve original character age, face and modest original clothing. No chibi, no realism, no background, no halo, no frame, no text/watermark, no other characters. Opaque face and clothing, clean transparent silhouette. Subject: Tohka Yatogami 夜刀神十香 from Date A Live, original PURPLE spirit-form Tohka, not inverse Tenka. Long dark purple hair with straight bangs and characteristic long side locks, large violet-magenta eyes, iconic dark purple/black ribbon hair ornament behind the side of her head, confident kind expression. Original Astral Dress Adonai Melekh head/shoulder design with purple, black, white and restrained gold armor trim, modest high chest coverage in this head-and-shoulders crop. Do not use white hair or red-and-black inverse form. Unmistakably Tohka.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-1d8ec5c6-e8a5-408d-94d7-10dc4a633d61.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: original Tohka dark-purple long hair, violet eyes, purple/black/gold ribbon headdress and Adonai Melekh Astral Dress; not inverse Tenka.",
+        "sha256": "97a4e2c161c41606acfd50e2cf9422161aefe4f30758e878c3df03a82bd5bc6b",
+        "width": 1254,
+        "height": 1254
+      }
+    },
+    "wife_40": {
+      "id": "wife_40",
+      "display_name": "亚丝娜",
+      "canonical_name": "结城明日奈（亚丝娜）",
+      "series": "刀剑神域",
+      "latin_name": "Asuna Yuuki",
+      "icon_path": "custom_game/wife_portraits_v1/wife_40.png",
+      "runtime_uri": "s2r://panorama/images/custom_game/archive_gpu_regular/wife_v1_40.vtex",
+      "recipe_path": "panorama/src/images/custom_game/archive_gpu_regular/wife_v1_40.vtex",
+      "source_width": 1254,
+      "source_height": 1254,
+      "alpha_bounds": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "sha256": "fa284df3312148bfb97a2ac1e0c05856d9e6ac2557dc6c04c4b4c2459ad0466c",
+      "prompt": "Use case: stylized-concept. Asset: one individual transparent game collection portrait icon. Square canvas with genuine transparent alpha; premium clean 2D anime line art, crisp cel shading with gentle smooth gradients, expressive eyes, matching polished head portrait collectibles. Head and upper shoulders only, face large centered, close near-frontal three-quarter view, iconic hair and ornaments stay recognizable at 74px. Preserve original character age, face and modest original clothing. No chibi, no realism, no background, no halo, no frame, no text/watermark, no other characters. Opaque face and clothing, clean transparent silhouette. Subject: Asuna Yuuki 结城明日奈 / 亚丝娜 from Sword Art Online, iconic AINCRAD Knights of the Blood Oath design: long chestnut light-brown hair with signature small side braids swept behind the head, warm amber-brown eyes, original white-and-red high collar and white armored shoulder trim, tiny red cross insignia only if naturally part of collar. Confident gentle smile, faithful original face. Human rounded ears, NO ALfheim elf ears, no blue hair, no school uniform. Only classic Aincrad Asuna.",
+      "generator": "built-in image_gen",
+      "generation_kind": "new_generation",
+      "reused_from": null,
+      "original_file": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-2bd4de70-048b-4a7e-a1fc-958578f93baf.png",
+      "receipt_file": "output/wife_portraits_20261016/receipt_wife_40.json",
+      "receipt_sha256": "81806c97fa3b9c838100db447d1ea78b30de504ba5634047fb070b9b1da0d765",
+      "built_in_receipt": {
+        "id": "wife_40",
+        "name": "亚丝娜",
+        "source_path": "C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-2bd4de70-048b-4a7e-a1fc-958578f93baf.png",
+        "target_path": "panorama/src/images/custom_game/wife_portraits_v1/wife_40.png",
+        "prompt": "Use case: stylized-concept. Asset: one individual transparent game collection portrait icon. Square canvas with genuine transparent alpha; premium clean 2D anime line art, crisp cel shading with gentle smooth gradients, expressive eyes, matching polished head portrait collectibles. Head and upper shoulders only, face large centered, close near-frontal three-quarter view, iconic hair and ornaments stay recognizable at 74px. Preserve original character age, face and modest original clothing. No chibi, no realism, no background, no halo, no frame, no text/watermark, no other characters. Opaque face and clothing, clean transparent silhouette. Subject: Asuna Yuuki 结城明日奈 / 亚丝娜 from Sword Art Online, iconic AINCRAD Knights of the Blood Oath design: long chestnut light-brown hair with signature small side braids swept behind the head, warm amber-brown eyes, original white-and-red high collar and white armored shoulder trim, tiny red cross insignia only if naturally part of collar. Confident gentle smile, faithful original face. Human rounded ears, NO ALfheim elf ears, no blue hair, no school uniform. Only classic Aincrad Asuna.",
+        "output_hint": "Generated images are saved to C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501 as C:\\Users\\Administrator\\.codex\\generated_images\\01a0f542-0a08-7363-ba57-42ae66e0e501\\exec-2bd4de70-048b-4a7e-a1fc-958578f93baf.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "review": "PASS: classic Aincrad Asuna chestnut long hair, side braid, amber eyes and white/red Knights of Blood Oath collar/armor; no elf ears.",
+        "sha256": "fa284df3312148bfb97a2ac1e0c05856d9e6ac2557dc6c04c4b4c2459ad0466c",
+        "width": 1254,
+        "height": 1254
+      }
+    }
+  },
+  "gpu": {
+    "format": "BGRA8888",
+    "maximum_dimension": 512,
+    "mips": 1,
+    "no_lod": true,
+    "source_pixels_modified": false
+  }
+}

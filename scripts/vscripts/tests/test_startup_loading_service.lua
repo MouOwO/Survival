@@ -540,42 +540,161 @@ assert_admitted(service)
 
 print("STARTUP_LOADING_SERVICE_PASS: independent admission, all-player auth, mode-profile gameplay gate, monotonic completion, identity, retries, reconnect, session isolation")
 
--- Tools party room: no timer, stale UI event, or joining client may start it.
-local dispatched = 0
-local party = fixture(3, { wait_for_party = true,
-    on_load_start = function() dispatched = dispatched + 1 end })
-assert(party.is_party_waiting() and party.snapshot().party_count == 3)
+-- Native team selection owns its host start/countdown. Neither a loading
+-- handshake, spoofed custom start event nor elapsed time may begin admission.
+local dispatched, native_admitted, native_playable = 0, 0, 0
+local native = fixture(3, { native_team_setup = true, tools_backend_wait = true,
+    on_load_start = function() dispatched = dispatched + 1 end,
+    on_ready = function() native_admitted = native_admitted + 1 end })
+native.gameplay_gate(function() native_playable = native_playable + 1 end)
+assert(native.is_native_team_setup() and native.is_party_waiting(),
+    'Tools authentication bridges must still wait for the native host start')
+assert(native.snapshot().phase == 'team_setup' and native.snapshot().native_team_setup == true)
+assert(listeners.survival_party_start == nil, 'the removed custom party event cannot launch the match')
+local sid = native.snapshot().session_id
+ui(native, 0) ui(native, 1) ui(native, 2)
 time = 1000
-party.tick()
-assert(#requests == 0 and dispatched == 0 and not party.is_ready())
-ui(party, 0)
-local sid = party.snapshot().session_id
-listeners.survival_party_start(201, {session_id=sid, PlayerID=0})
-listeners.survival_party_start(200, {session_id='stale-session'})
-assert(party.is_party_waiting() and dispatched == 0)
-humans[2].state = 3
-disconnected[2] = true
-party.tick()
-assert(party.snapshot().party_count == 2)
+native.tick()
+assert(#requests == 0 and dispatched == 0 and not native.is_ready())
+listeners.survival_loading_retry(200, {session_id=sid})
+select_mode(native, 'standard')
+assert(#requests == 0 and asset_retry_calls == 0 and not native.snapshot().setup,
+    'native team setup cannot start assets/authentication or select a mode')
+GameRules.State_Get = nil
+native.tick()
+assert(native.is_native_team_setup() and dispatched == 0, 'missing native state fails closed')
+GameRules.State_Get = function() return engine_state end
+humans[2].state, disconnected[2] = 3, true
+native.tick()
+assert(not native.snapshot().players[3].client_ready, 'disconnect invalidates the earlier loading handshake')
+-- Valve SetRemainingSetupTime's countdown remains in state 2 until complete.
+engine_state = 2
+native.tick()
+assert(dispatched == 0 and #requests == 0)
 Convars = { GetStr = function() return '' end }
-listeners.survival_party_start(200, {session_id=sid})
-assert(not party.is_party_waiting() and dispatched == 1 and #requests == 0)
-assert(party.snapshot().phase == 'connecting_backend' and #party.snapshot().players == 2)
+engine_state = 3
+native.tick()
+assert(not native.is_native_team_setup() and not native.is_party_waiting() and dispatched == 1 and #requests == 0)
+assert(native.snapshot().phase == 'connecting_backend' and not native.snapshot().native_team_setup)
+assert(#native.snapshot().players == 3, 'native start never drops an unready participant')
 time = time + 60
-party.tick()
-assert(party.snapshot().error == 'backend_connection_pending' and #requests == 0)
+native.tick()
+assert(native.snapshot().error == 'backend_connection_pending' and #requests == 0)
 Convars = { GetStr = function() return 'test-credential-present' end }
-party.tick()
+native.tick()
 assert(#requests == 2 and dispatched == 1)
-listeners.survival_party_start(200, {session_id=sid})
-assert(#requests == 2 and dispatched == 1, 'double click cannot repeat loading')
 for _, request in ipairs(requests) do success(request) end
-ui(party, 1)
 assets_done()
-party.tick()
-assert_admitted(party)
+native.tick()
+assert(not native.is_ready() and native_admitted == 0 and native_playable == 0,
+    'entering the native game cannot bypass a disconnected participant')
+humans[2].state, disconnected[2] = 2, nil
+native.tick()
+assert(#requests == 3 and #profile_requests == 0)
+success(requests[3]) native.tick()
+assert(not native.is_ready(), 'reconnected player must acknowledge the loading UI again')
+ui(native, 2)
+assert_admitted(native)
+assert(native_admitted == 1 and not native.is_gameplay_ready() and native_playable == 0)
+select_mode(native, 'pure', 1)
+assert(not native.snapshot().setup.mode_selected)
+select_mode(native, 'pure')
+assert(#profile_requests == 3 and #requests == 3 and dispatched == 1)
+profile_success(profile_requests[1]) profile_success(profile_requests[2]) native.tick()
+assert(not native.is_gameplay_ready() and native_playable == 0,
+    'all mode profiles remain mandatory after official start')
+profile_success(profile_requests[3]) native.tick()
+assert(native.is_gameplay_ready() and native_playable == 1)
+native.tick()
+assert(native_admitted == 1 and native_playable == 1 and dispatched == 1)
+for id = 0, 2 do assert(native.is_player_ready(id)) end
 Convars = nil
-local solo_dispatch = 0
-local solo = fixture(1, { on_load_start = function() solo_dispatch = solo_dispatch + 1 end })
-assert(not solo.is_party_waiting() and solo_dispatch == 1 and #requests == 1)
-print('STARTUP_PARTY_ROOM_PASS: host authority, no early auth, disconnect cleanup, backend wait, once-only dispatch')
+
+-- A late service initialization after native setup still starts its loading
+-- callback exactly once and keeps both admission and gameplay checks closed.
+local late = fixture(1, false)
+engine_state = 6
+local late_dispatch = 0
+late.init({ native_team_setup = true, on_load_start = function() late_dispatch = late_dispatch + 1 end })
+assert(late_dispatch == 1 and #requests == 1 and not late.is_native_team_setup())
+assert(not late.is_ready() and not late.is_gameplay_ready() and not late.is_player_ready(0))
+late.tick()
+assert(late_dispatch == 1 and #requests == 1)
+print('STARTUP_NATIVE_TEAM_SETUP_PASS: Valve lifecycle, no custom party event, all-player auth/assets/UI/profile gates, disconnect/reconnect, host mode, once-only startup')
+
+-- Exercise the actual addon lifecycle callback against the real loading
+-- service. Native GAME_IN_PROGRESS must not emit gameplay start early.
+local addon_file = assert(io.open('scripts/vscripts/addon_game_mode.lua', 'rb'))
+local addon_source = addon_file:read('*a')
+addon_file:close()
+local lifecycle_body = assert(addon_source:match('local function on_game_state_changed%(%)\r?\n(.-)\r?\nend'))
+assert(not lifecycle_body:find('FinishCustomGameSetup', 1, true),
+    'the addon must not override Valve host start/countdown')
+local emitted, event_native = 0, fixture(2, {native_team_setup=true})
+local lifecycle_env = setmetatable({
+    GameRules = GameRules,
+    DOTA_GAMERULES_STATE_GAME_IN_PROGRESS = 7,
+    DOTA_GAMERULES_STATE_POST_GAME = 8,
+    game_started_emitted = false,
+    events = { GAME_STARTED = 'fixture_game_started' },
+    event_bus = { emit = function(name)
+        assert(name == 'fixture_game_started')
+        emitted = emitted + 1
+    end },
+}, {__index=_G})
+local lifecycle_chunk = assert(loadstring('return function()\n' .. lifecycle_body .. '\nend'))
+setfenv(lifecycle_chunk, lifecycle_env)
+local lifecycle = lifecycle_chunk()
+engine_state = 7
+lifecycle() lifecycle()
+assert(emitted == 0 and not event_native.is_gameplay_ready())
+event_native.tick()
+for _, request in ipairs(requests) do success(request) end
+assets_done() ui(event_native, 0) ui(event_native, 1)
+assert_admitted(event_native)
+lifecycle()
+assert(emitted == 0, 'admission alone must not start waves or builder/game timers')
+select_mode(event_native, 'standard')
+profile_success(profile_requests[1]) event_native.tick()
+assert(emitted == 0, 'a single mode profile cannot release GAME_STARTED')
+profile_success(profile_requests[2]) event_native.tick()
+assert(emitted == 1 and event_native.is_gameplay_ready())
+lifecycle()
+assert(emitted == 1, 'repeated native state/admission callbacks start gameplay once')
+print('STARTUP_NATIVE_GAMEPLAY_LIFECYCLE_PASS: actual addon callback, native phase cannot bypass profiles, once-only GAME_STARTED')
+
+-- Native setup deliberately has no timeout/auto-start. Its real Valve panel
+-- must be mounted, otherwise a correctly closed server gate deadlocks on a
+-- start button that does not exist (blank logo/chat-only setup screen).
+local manifest_file = assert(io.open('panorama/src/layout/custom_game/custom_ui_manifest.xml', 'rb'))
+local manifest = manifest_file:read('*a')
+manifest_file:close()
+local native_team_views, handshake_views = 0, 0
+for element in manifest:gmatch('<CustomUIElement%s+.-/>') do
+    if element:match('type="GameSetup"') then
+        local layout = element:match('layoutfile="([^"]+)"')
+        if layout == 'file://{resources}/layout/custom_game/native_team_setup.xml' then
+            native_team_views = native_team_views + 1
+        elseif layout == 'file://{resources}/layout/custom_game/startup_loading.xml' then
+            handshake_views = handshake_views + 1
+        end
+    end
+end
+assert(native_team_views == 1,
+    'an infinite native setup phase needs exactly one registered official team-select wrapper')
+assert(handshake_views == 1,
+    'keep the separate loading handshake context alongside the visible official setup')
+local native_layout_file = assert(io.open('panorama/src/layout/custom_game/native_team_setup.xml', 'rb'))
+local native_layout = native_layout_file:read('*a')
+native_layout_file:close()
+assert(native_layout:find('file://{resources}/scripts/custom_game/native_team_setup.js', 1, true),
+    'the registered native setup wrapper must include its real loader script')
+assert(not native_layout:find('layout/custom_game/team_select.xml', 1, true),
+    'keep native XML out of static compile dependencies: Valve only ships its compiled CSS tree')
+local native_script_file = assert(io.open('panorama/src/scripts/custom_game/native_team_setup.js', 'rb'))
+local native_script = native_script_file:read('*a')
+native_script_file:close()
+assert(native_script:find('file://{resources}/layout/custom_game/team_select.xml', 1, true)
+    and native_script:find('BLoadLayout', 1, true),
+    'the real setup loader must mount Valve team_select.xml at runtime')
+print('STARTUP_NATIVE_SETUP_MANIFEST_PASS: official host start view and loading handshake are both mounted')

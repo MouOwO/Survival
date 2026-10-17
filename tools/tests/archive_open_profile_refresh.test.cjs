@@ -9,7 +9,7 @@ const {csv} = require('../shop_ui_12h/catalog.cjs');
 const project = path.resolve(__dirname, '../..');
 const scriptDirectory = path.join(project, 'panorama/src/scripts/custom_game');
 const manifest = fs.readFileSync(path.join(project, 'panorama/src/layout/custom_game/archive.xml'), 'utf8');
-const scripts = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/tooltip_dismiss.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'archive_v10.js',
+const scripts = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/tooltip_dismiss.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'endless_leaderboard.js', 'archive_v10.js',
     'archive_180de7e38b_titles_compact_v6.js'];
 for (const name of scripts) assert(manifest.includes('/' + name + '"'), 'test the active manifest source: ' + name);
 
@@ -355,14 +355,14 @@ assert.equal(descendant(visibleCards()[0], 'ArchiveV10Name').style.color, approv
 assert.equal(visibleCards()[0].__v10.normal.style.backgroundImage, approvedFrame, 'A legacy theme change cannot swap the approved original frame asset');
 
 const collectionCalls=[];cfg.SurvivalCollection={Open:id=>collectionCalls.push(id)};
-for (const category of ['friend', 'ex', 'beast']) {
+for (const category of ['friend', 'ex', 'wife', 'beast']) {
     api.Open();
     const beforeForward = requests.length;
     api.SelectCategory(category);
     assert(!api.IsOpen(), 'Forwarding a collection link closes the archive: ' + category);
     assert.equal(requests.length, beforeForward, 'The retired archive entry delegates its request to the collection controller: ' + category);
 }
-assert.deepEqual(collectionCalls,['friend','ex','beast'],'Legacy social and blessing links open their matching independent collection');
+assert.deepEqual(collectionCalls,['friend','ex','wife','beast'],'Legacy social and blessing links open their matching independent collection');
 resend('beast', {pending: 1});
 assert(!api.IsOpen(), 'A background blessing snapshot cannot reopen its retired archive page');
 api.Open();
@@ -420,34 +420,41 @@ assert(nodes.get('ArchiveSummary').text.includes('已完成 1 / 1'), 'generic pa
 api.SelectCategory('shadow');
 assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430', 'switching back uses the latest shadow cache');
 
-// archive_service.enabled_categories() omits disabled CSV categories entirely.
-// A complete screenshot fixture that includes `shop, disabled:1` would conceal
-// the missing native ArchiveTab_shop that occurs with a real server snapshot.
+// The disabled shop slot now hosts the independent public leaderboard. The
+// archive config remains unchanged and never receives a shop snapshot request.
 const serverEnabledCategories = categories.filter(category => Number(category.disabled) !== 1);
-assert(!serverEnabledCategories.some(category => category.id === 'shop'), 'The real server category list excludes the disabled shop');
+assert(!serverEnabledCategories.some(category => category.id === 'shop'));
 resend('shadow', {categories: serverEnabledCategories});
-assert.equal(nodes.get('ArchiveTab_shop'), undefined, 'The test exercises absence of a legacy native shop tab');
-assert(nodes.get('ArchiveV10Category_shop'), 'The approved fixed V10 sidebar still exposes the shop category');
-const shellBeforeUnavailableShop = nodes.get('ArchiveV10Canvas');
-const shopRequestCount = requests.length;
+assert.equal(nodes.get('ArchiveTab_shop'), undefined);
+const fixedShell = nodes.get('ArchiveV10Canvas'), beforeLeaderboardRequests = requests.length;
 activate(nodes.get('ArchiveV10Category_shop'));
-assert.equal(view.Inspect().category, 'shop', 'An omitted disabled shop still switches the fixed shell to its local category view');
-assert.equal(nodes.get('ArchiveV10_page_title').text, '商城道具');
-assert(nodes.get('ArchiveEmpty').text.includes('未启用'), 'Disabled shop presents the explicit unavailable empty state');
-assert.equal(visibleCards().length, 0, 'The local disabled shop view has no stale cards from another category');
-assert.equal(requests.length, shopRequestCount, 'Selecting an omitted disabled shop submits no invalid server request');
-assert.equal(nodes.get('ArchiveV10Canvas'), shellBeforeUnavailableShop, 'The unavailable category retains the same shell');
+assert.equal(view.Inspect().category, 'shop');
+assert.equal(nodes.get('ArchiveV10_page_title').text, '排行榜');
+assert.equal(nodes.get('ArchiveGrid').visible, false, 'Legacy reward cards are hidden under the ranking content');
+assert.equal(nodes.get('EndlessLeaderboardHost').visible, true);
+assert.equal(requests.length, beforeLeaderboardRequests + 1);
+assert.equal(requests.at(-1).name, 'survival_leaderboard_request');
+assert.equal(nodes.get('ArchiveV10Canvas'), fixedShell);
+const leaderboardRequest = requests.at(-1).payload.request_id;
+emit('survival_leaderboard_result', {request_id:leaderboardRequest,phase:'begin',revision:'r1',total:0,self_steam_id:'76561198000000042'});
+emit('survival_leaderboard_result', {request_id:leaderboardRequest,phase:'end',revision:'r1',total:0,self_steam_id:'76561198000000042'});
+assert.equal(nodes.get('EndlessLeaderboardFooter').text, '您未上榜');
+const rankingHost=nodes.get('EndlessLeaderboardHost');
 api.Close(); api.Open(); immediate();
-assert.equal(walletRefreshes, 0, 'Reopening a disabled local category does not request commerce data');
-assert.equal(view.Inspect().category, 'shop', 'Reopening a locally unavailable category restores its empty directory');
-assert(nodes.get('ArchiveEmpty').text.includes('未启用'), 'Reopening retains the explicit unavailable state');
-assert.equal(requests.length, shopRequestCount, 'Reopening the local disabled directory cannot start an invalid snapshot request or retry');
+assert.equal(walletRefreshes, 0);
+assert.equal(requests.length, beforeLeaderboardRequests + 2, 'Each explicit reopen requests one revision check');
+assert.equal(requests.at(-1).name, 'survival_leaderboard_request');
+assert.equal(requests.at(-1).payload.known_revision, 'r1');
+assert.equal(nodes.get('EndlessLeaderboardHost'), rankingHost, 'Reopen retains the ranking tree');
+const unchangedRequest=requests.at(-1).payload.request_id;
+emit('survival_leaderboard_result', {request_id:unchangedRequest,phase:'unchanged',revision:'r1',total:0,self_steam_id:'76561198000000042'});
 api.Refresh(true); immediate();
-assert.equal(walletRefreshes, 0, 'An explicit archive refresh is independent of commerce catalog refresh');
-assert.equal(requests.length, shopRequestCount, 'Explicit refresh of the disabled local directory does not request server data');
-assert.equal(nodes.get('ArchiveV10Canvas'), shellBeforeUnavailableShop, 'Reopening the local directory reuses the fixed shell');
+assert.equal(requests.length, beforeLeaderboardRequests + 2, 'Archive refresh never calls the ranking endpoint');
+assert.equal(nodes.get('ArchiveV10Canvas'), fixedShell);
 activate(nodes.get('ArchiveV10Category_shadow'));
-assert.equal(view.Inspect().category, 'shadow', 'The player can return from the local empty directory');
-assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430', 'Returning restores the unchanged authoritative shadow cache');
+assert.equal(view.Inspect().category, 'shadow');
+assert.equal(nodes.get('ArchiveGrid').visible, true);
+assert.equal(nodes.get('EndlessLeaderboardHost').visible, false);
+assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430');
 
 console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, native card/sidebar reuse, live counts/ownership/pass/tooltips, independent archive without commerce resource requests, upgrade rejection and pending guards, social/blessing collection routing, promotion duplicate guard, theme, filters, tabs and 100 closed updates');

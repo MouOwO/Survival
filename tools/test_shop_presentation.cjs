@@ -6,7 +6,7 @@ suite=suite.replace('assert.equal(jobs.size,0);', 'for(const [id,fn] of [...jobs
 suite=suite.replace('const U=cfg.SurvivalUI', 'env.CustomNetTables={GetTableValue:()=>({})};env.Game.GetLocalPlayerID=()=>0;const U=cfg.SurvivalUI');
 suite+=`\nconst parent=new Panel('Panel');U.PriceLabel(parent,{prices:[{amount:12,currencyName:'U币'},{amount:20,currencyName:'积分'}]});function find(p,c){let out=p.classes.has(c)?[p]:[];for(const x of p.children)out=out.concat(find(x,c));return out;}assert.equal(find(parent,'UIPriceCurrencyIcon').length,1);assert.deepEqual(find(parent,'UIPrice').map(p=>p.text),['12','20 积分']);assert(nodes.CustomShopWindow.BHasClass('RHSurvivalShop'));console.log('SHOP_PRESENTATION_PASS: accepted helper + actual shop controller, currency icon/text distinction');`;
 suite+=`
-assert.equal(nodes.CustomShopWindow.style.width,'680px');assert.equal(nodes.CustomShopWindow.style.height,'600px');
+assert.equal(nodes.CustomShopWindow.style.width,'464px');assert.equal(nodes.CustomShopWindow.style.height,'432px');
 assert(!nodes.ShopModeLottery && !nodes.ShopRefreshButton);
 shop.SetUnlocks({shop:false});assert.equal(cfg.SurvivalShopUnlocks.shop,false);
 // The shared fixture finishes in research after remembering challenge mode.
@@ -15,19 +15,22 @@ shop.SetUnlocks({shop:true});assert.equal(cfg.SurvivalShopUnlocks.shop,true);sho
 const compact={...good,stock:0,stock_max:0,purchase_limit:5,owned_count:2,gold_cost:200,wood_cost:0};
 events.ui_shop_snapshot({sequence:2,full:1,ui_mode:'shop',entries:[compact],categories:[],resources:{wood:1000,gold:1000}});
 const tile=cards()[0];assert.equal(tile.__survivalStockLabel.text,'3/5');assert.equal(tile.__survivalStockLabel.visible,false,'native stock label stays hidden, internal remaining stock remains correct');
+assert(Math.abs(parseFloat(tile.style.width)-136*2/3)<.00001);assert.equal(tile.style.height,'88px');
+const rowWidth=432-6,tilePitch=parseFloat(tile.style.width)+12;
+assert(4*tilePitch<=rowWidth && 5*tilePitch>rowWidth,'the resized list fits exactly four tiles, including a native scrollbar');
 assert.equal(find(tile,'RHShopPrices').length,0);assert.equal(tile.__rhPrices,undefined);
 assert.equal(find(tile,'RHShopHover').length,0);assert.equal(find(tile,'RHShopName').length,0);
 tile.events.oncontextmenu();assert.equal(requests.at(-1).n,'ui_shop_purchase_request');
 assert.equal(nodes.CustomShopWindow.style.horizontalAlign,'left');
-assert.equal(nodes.CustomShopWindow.style.position,'16px 240px 0px');
+assert.equal(nodes.CustomShopWindow.style.position,'16px 324px 0px');
 shop.Close();assert.equal(nodes.CustomShopWindow.hittestchildren,false);assert(nodes.CustomShopWindow.style.position.startsWith('-'));
 assert.equal(nodes.CustomShopWindow.visible,true,'remain visible while sliding out');
 const oldClose=[...jobs.values()];shop.Open();for(const fn of oldClose)fn();assert.equal(nodes.CustomShopWindow.visible,true,'old close callback cannot hide reopened drawer');
-root.actuallayoutwidth=1280;root.actuallayoutheight=720;nodes.CustomShopWindow.actuallayoutwidth=680*(2/3);shop.Close();assert(parseFloat(nodes.CustomShopWindow.style.position)+680*(2/3)<=-12,'fixed 680px reference window exits fully after actual 720p Fit scale');
+root.actuallayoutwidth=1280;root.actuallayoutheight=720;nodes.CustomShopWindow.actuallayoutwidth=464*(2/3);shop.Close();assert(parseFloat(nodes.CustomShopWindow.style.position)+464*(2/3)<=-12,'compact reference window exits fully after actual 720p Fit scale');
 for(const [id,fn] of [...jobs]){jobs.delete(id);fn();}assert.equal(nodes.CustomShopWindow.visible,false,'hide full panel after exit animation');
 assert.equal(jobs.size,0);shop.Close();assert.equal(nodes.CustomShopWindow.visible,false);assert.equal(jobs.size,0);
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;
-vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/native_ui_icons.js','utf8'),env);
+for(const file of ['common/item_resources','reward_presentation','native_ui_icons'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/item_art_remaining_5d5c1152eb.js','utf8'),env);
 const sword=cfg.SurvivalItemArt.Create(parent,{content_id:'weapon_growth_sword_01',icon:'item_broadsword'},'icon');assert.equal(sword.image,'file://{images}/items/broadsword.png');
 const red=cfg.SurvivalItemArt.Create(parent,{content_id:'item_knowledge_book'},'icon'),blue=cfg.SurvivalItemArt.Create(parent,{content_id:'item_super_knowledge_book'},'icon');

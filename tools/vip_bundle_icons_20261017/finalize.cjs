@@ -1,0 +1,11 @@
+'use strict';
+const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict'),path=require('node:path');
+process.chdir(path.resolve(__dirname,'../..'));
+const out='design_refs/vip_bundle_icons_20261017',hash=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+const visual=JSON.parse(fs.readFileSync(out+'/visual_report.json','utf8')),assemblyFile=out+'/preview/assembly.json',assembly=JSON.parse(fs.readFileSync(assemblyFile,'utf8')),selected=JSON.parse(fs.readFileSync(out+'/selected_assets.json','utf8'));
+assert.equal(visual.status,'PASS');assert.equal(hash(assemblyFile),visual.assemblySha256);
+const production=assembly.frozenSourceFiles.map(row=>({...row,actualSha256:hash(row.path),match:hash(row.path)===row.sha256}));assert(production.every(r=>r.match));
+const screens=visual.screens.map(row=>({...row,actualSha256:hash(row.path),match:hash(row.path)===row.sha256}));assert(screens.every(r=>r.match));
+const art=selected.records.map(row=>({id:row.id,uri:row.uri,path:row.previewPng,expectedSha256:row.previewPngSha256,actualSha256:hash(row.previewPng),match:hash(row.previewPng)===row.previewPngSha256}));assert(art.every(r=>r.match));
+const report={status:'PASS',notGameCapture:true,masterResourceHash:hash('data/ui/item_resources.json'),visualReportSha256:hash(out+'/visual_report.json'),assemblySha256:hash(assemblyFile),frozenSourceCount:production.length,screenshotCount:screens.length,nativePNGCount:art.length,production,screens,art,noGameAccountOrServerMutations:true};
+assert.equal(report.masterResourceHash,visual.masterResourceHash);fs.writeFileSync(out+'/source_verification.json',JSON.stringify(report,null,2)+'\n');console.log('VIP_BUNDLE_FINAL_PASS sources='+production.length+' screens='+screens.length+' nativePNGs='+art.length);

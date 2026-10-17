@@ -16,7 +16,7 @@ for (const useRuntime of [false, true]) {
         localizedAbilityDescription: () => 'STALE DESCRIPTION',
         readTooltipTable: table => table === 'survival_tooltips' ? {name, desc}
             : table === 'survival_ability_runtime' && useRuntime ? {display_name: name, upgrade_description: desc} : {},
-        byId: () => ({RemoveClass() {}}), setText: (id, value) => texts[id] = value,
+        byId: () => ({RemoveClass() {},SetHasClass() {}}), setText: (id, value) => texts[id] = value,
         GameUI: {CustomUIConfig: () => ({})},
         Abilities: {GetLevel: () => 1, GetBehavior: () => 4}
     };

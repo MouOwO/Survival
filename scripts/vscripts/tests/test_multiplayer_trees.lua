@@ -9,6 +9,18 @@ GameRules = {GetGameTime = function() return 0 end}
 PlayerResource = {GetPlayer = function(_, id) return {id=id} end}
 local events = require("core/events")
 local handlers, requests, grids, awards, created = {}, {}, {}, {}, {}
+local occupied, releases, occupancy_reads = {}, {}, 0
+local fail_next_create = false
+local function update_occupancy(payload, release)
+    for x=payload.grid_x,payload.grid_x+payload.footprint.x-1 do
+        for y=payload.grid_y,payload.grid_y+payload.footprint.y-1 do
+            local key=x..":"..y
+            if not release or occupied[key]==payload.entindex then
+                occupied[key]=not release and payload.entindex or nil
+            end
+        end
+    end
+end
 local bus = {
     subscribe = function(name, fn)
         handlers[name] = handlers[name] or {}
@@ -22,6 +34,13 @@ local bus = {
         if requests[name] then return requests[name](payload) end
         if name == events.GRID_OCCUPY_REQUEST then
             grids[#grids+1] = payload
+            update_occupancy(payload)
+            return true
+        elseif name == events.GRID_RELEASE_REQUEST then
+            assert(type(payload.entindex)=="number", "tree release must preserve other owners' occupancy")
+            releases[#releases+1] = payload
+            update_occupancy(payload,true)
+            return true
         elseif name == events.RESOURCE_ADD_REQUEST then
             awards[#awards+1] = payload
             return {ok=true}
@@ -35,6 +54,10 @@ package.loaded["core/modifier_registry"] = {ensure = function() end}
 package.loaded["systems/rogue_effect_state_service"] = {numeric = function() return 0 end}
 package.loaded["systems/technology_stat_manager"] = {get = function() return {final={lumberjack={}}} end}
 package.loaded["systems/player_profile_service"] = {get_profile = function() return nil end}
+package.loaded["systems/grid_placement_system"] = {occupant_at_position=function(point)
+    occupancy_reads=occupancy_reads+1
+    return occupied[math.floor(point.x/64)..":"..math.floor(point.y/64)]
+end}
 local function unit(name, id)
     local u = {name=name, id=id}
     function u:IsNull() return self.removed == true end
@@ -55,6 +78,7 @@ local function unit(name, id)
     return u
 end
 CreateUnitByName = function(name, position)
+    if fail_next_create then fail_next_create=false; return nil end
     local u = unit(name, #created+100)
     u.position=position
     created[#created+1]=u
@@ -68,6 +92,8 @@ local config = require("config/tree_config")
 local bonus = config.lumber_efficiency_buff_per_level
 local function reset()
     handlers, requests, grids, awards, created = {}, {}, {}, {}, {}
+    occupied, releases, occupancy_reads = {}, {}, 0
+    fail_next_create=false
     trees.init()
     workers.init()
 end
@@ -94,14 +120,14 @@ local function worker_state(player_id, tree, fusion)
 end
 
 reset()
-assert(#grids == 16, "all four sockets in each court are reserved before building")
-local occupied = {}
+assert(#grids == 4, "only the primary tree socket in each court is reserved before building")
+local reserved_cells = {}
 for _, grid in ipairs(grids) do
     for x=grid.grid_x,grid.grid_x+grid.footprint.x-1 do
         for y=grid.grid_y,grid.grid_y+grid.footprint.y-1 do
             local key=x..":"..y
-            assert(not occupied[key], "reserved tree footprints must not overlap")
-            occupied[key]=true
+            assert(not reserved_cells[key], "reserved tree footprints must not overlap")
+            reserved_cells[key]=true
         end
     end
 end
@@ -172,8 +198,77 @@ end
 local removed = created[3]
 bus.emit(events.PLAYER_DISCONNECTED, {player_id=2})
 assert(removed.removed)
+assert(#releases==1 and releases[1].entindex==removed:entindex(),
+    "a backup tree releases its own footprint instead of reserving unused ground")
+local released_grid=trees._tree_grid_for_test(removed.position)
+for x=released_grid.grid_x,released_grid.grid_x+1 do
+    for y=released_grid.grid_y,released_grid.grid_y+1 do
+        assert(occupied[x..":"..y]==nil,"backup tree ground is buildable after disconnect")
+    end
+end
+local previous_grids,previous_releases=#grids,#releases
+bus.emit(events.PLAYER_DISCONNECTED, {player_id=2})
+assert(#grids==previous_grids and #releases==previous_releases,
+    "a duplicate disconnect must not touch another asset's cells")
 build(2,600,5500)
 assert(#created == 5)
 assert(created[5].position.x == removed.position.x and created[5].position.y == removed.position.y)
 assert(created[5].survival_tree_level == 1)
-print("MULTIPLAYER_TREES_PASS: four regions, reserved sockets, shared-region independent trees, cross-player harvest, fused-worker UI/targets, target-only upgrades and cleanup")
+bus.emit(events.PLAYER_DISCONNECTED, {player_id=0})
+local primary=trees._tree_grid_for_test(config.spawn_regions.northeast[1])
+for x=primary.grid_x,primary.grid_x+1 do
+    for y=primary.grid_y,primary.grid_y+1 do
+        assert(occupied[x..":"..y]=="survival_tree_reserved",
+            "the one primary patch remains reserved after its owner leaves")
+    end
+end
+
+-- Backup points are normal building ground. A later city must skip any
+-- footprint occupied by a real building, including partial cell overlaps.
+reset()
+build(0,600,5500)
+local points=config.spawn_regions.northeast
+local function building_at(slot,index,partial)
+    local cells=trees._tree_grid_for_test(points[slot])
+    bus.request(events.GRID_OCCUPY_REQUEST,{grid_x=cells.grid_x,grid_y=cells.grid_y,
+        footprint=partial and {x=1,y=1} or cells.footprint,entindex=index})
+end
+building_at(2,900,true)
+local before_reads=occupancy_reads
+build(1,600,5500)
+assert(#created==2 and created[2].position.x==points[3].x
+    and created[2].position.y==points[3].y,"a blocked backup is skipped for the next clear one")
+assert(occupancy_reads-before_reads<=16,"socket validation performs at most four fixed four-cell lookups")
+local blocked=trees._tree_grid_for_test(points[2])
+assert(occupied[blocked.grid_x..":"..blocked.grid_y]==900,"tree admission must not overwrite a building")
+building_at(4,901)
+previous_grids=#grids
+build(2,600,5500)
+assert(#created==2 and #grids==previous_grids,"full or built-over sockets never create an overlapping tree")
+assert(occupied[blocked.grid_x..":"..blocked.grid_y]==900)
+
+-- Precise owner release cannot erase an unrelated later reservation.
+local backup=trees._tree_grid_for_test(points[3])
+building_at(3,902)
+bus.emit(events.PLAYER_DISCONNECTED,{player_id=1})
+assert(occupied[backup.grid_x..":"..backup.grid_y]==902,
+    "disconnect only releases cells still owned by the removed tree")
+previous_releases=#releases
+bus.emit(events.PLAYER_DISCONNECTED,{player_id=1})
+assert(#releases==previous_releases and occupied[backup.grid_x..":"..backup.grid_y]==902)
+
+-- Failed native creation cannot leak a socket claim or block a retry.
+bus.request(events.GRID_RELEASE_REQUEST,{grid_x=blocked.grid_x,grid_y=blocked.grid_y,
+    footprint=blocked.footprint,entindex=900})
+fail_next_create=true
+previous_grids=#grids
+build(2,600,5500)
+assert(#created==2 and #grids==previous_grids,"failed creation must not occupy or claim the candidate")
+build(2,600,5500)
+assert(#created==3 and created[3].position.x==points[2].x and created[3].position.y==points[2].y)
+building_at(1,903)
+bus.emit(events.PLAYER_DISCONNECTED,{player_id=0})
+local primary_grid=trees._tree_grid_for_test(points[1])
+assert(occupied[primary_grid.grid_x..":"..primary_grid.grid_y]==903,
+    "restoring a primary marker must not overwrite a newer foreign occupant")
+print("MULTIPLAYER_TREES_PASS: four primary patches, independent shared-region trees, per-player harvest, built-over backup rejection and precise cleanup")

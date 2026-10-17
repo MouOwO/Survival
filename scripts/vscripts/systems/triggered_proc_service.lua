@@ -43,15 +43,24 @@ local function play_flame_burst(attacker, position)
     if ParticleManager and ParticleManager.CreateParticle
         and ParticleManager.SetParticleControl
         and ParticleManager.ReleaseParticleIndex then
+        local particle
         pcall(function()
-            local particle = ParticleManager:CreateParticle(
+            particle = ParticleManager:CreateParticle(
                 FLAME_BURST_PARTICLE,
                 PATTACH_WORLDORIGIN,
                 attacker
             )
             ParticleManager:SetParticleControl(particle, 0, position)
-            ParticleManager:ReleaseParticleIndex(particle)
+            -- Release may hand off the finite tail before throwing; never retry.
+            local released = particle
+            particle = nil
+            ParticleManager:ReleaseParticleIndex(released)
         end)
+        if type(particle) == "number" and particle >= 0
+            and particle < math.huge and particle == math.floor(particle) then
+            pcall(function() ParticleManager:DestroyParticle(particle, true) end)
+            pcall(function() ParticleManager:ReleaseParticleIndex(particle) end)
+        end
     end
     if attacker.EmitSound then
         pcall(attacker.EmitSound, attacker, FLAME_BURST_SOUND)

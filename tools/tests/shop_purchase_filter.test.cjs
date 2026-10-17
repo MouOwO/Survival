@@ -2,8 +2,8 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 const {harness, walletItem} = require('../shop_catalog_20261016/harness.cjs');
 
-const types = ['shop_points', 'u_coin', 'shop_gold', 'all'];
-const captions = ['积分兑换', 'U币购买', '金币购买', '全部'];
+const types = ['u_coin', 'shop_points', 'all'];
+const captions = ['U币', '积分', '全部'];
 
 function makeFixture() {
     const points = sku => ({...walletItem(sku), sku, title:sku});
@@ -28,21 +28,10 @@ function makeFixture() {
 
 function find(h, id) { return h.store().panel.FindChildTraverse(id); }
 function allNodes(panel) { return [panel, ...panel.Children().flatMap(allNodes)]; }
-function popupOpen(h) {
-    const p = find(h, 'BLMarketPurchaseTypeMenu');
-    if (!p || !p.IsValid()) return false;
-    const layer = p.GetParent();
-    assert(layer.BHasClass('BLMarketPurchaseTypeLayer'));
-    return layer.visible !== false && layer.style.visibility !== 'collapse';
-}
-function openPopup(h) {
-    if (!popupOpen(h)) find(h, 'BLMarketPurchaseType').events.onactivate();
-    assert(popupOpen(h), 'The actual filter control opens its options');
-}
 function choose(h, id) {
-    openPopup(h);
     find(h, 'BLMarketPurchaseType_' + id).events.onactivate();
-    assert(!popupOpen(h), 'Selecting a type closes the options');
+    const selected = find(h, 'BLMarketPurchaseType').Children().filter(p => p.BHasClass('UISelected'));
+    assert.deepEqual(selected.map(p => p.id), ['BLMarketPurchaseType_' + id], 'Exactly one type is selected');
 }
 function tab(h, id) { find(h, 'BLMarketSection_' + id).events.onactivate(); }
 function cardNames(h) {
@@ -62,19 +51,20 @@ function buyRow(h, sku) {
     button.events.onactivate();
 }
 
-test('The four-option control defaults to all and filters actual rows without changing their order', () => {
+test('The three-option control defaults to all and filters actual rows without changing their order', () => {
     const {h, view, wallet, paid} = makeFixture();
     const original = JSON.stringify({wallet, paid});
     assert.equal(view.Inspect().purchaseType, 'all');
     const control = find(h, 'BLMarketPurchaseType');
-    assert(control && control.paneltype === 'Button');
+    assert(control && control.paneltype === 'Panel');
     assert(allNodes(control).some(p => p.paneltype === 'Label' && p.text === '全部'));
-    openPopup(h);
-    const options = allNodes(find(h, 'BLMarketPurchaseTypeMenu')).filter(p => p.paneltype === 'Button');
+    const options = control.Children().filter(p => p.paneltype === 'Button');
     assert.deepEqual(options.map(p => p.id), types.map(id => 'BLMarketPurchaseType_' + id));
     assert.deepEqual(options.map(p => allNodes(p).find(n => n.paneltype === 'Label').text), captions);
-    find(h, 'BLMarketPurchaseType_all').events.onactivate();
-    assert(!popupOpen(h));
+    assert.equal(find(h, 'BLMarketPurchaseTypeMenu'), undefined);
+    const balances = h.descendants(h.store().panel, 'BLMarketBalance')[0];
+    assert.deepEqual(h.descendants(balances, 'BLMarketBalanceText').map(p => p.text), ['U币 12', '积分 500']);
+    choose(h, 'all');
     tab(h, 'all');
     assert.deepEqual(cardNames(h), ['points_b', 'u_coin_cash', 'points_a', 'legacy_cash']);
     choose(h, 'shop_points');
@@ -83,13 +73,9 @@ test('The four-option control defaults to all and filters actual rows without ch
     assert.deepEqual(visibleSkus(view), ['points_b', 'points_a']);
     choose(h, 'u_coin');
     assert.deepEqual(cardNames(h), ['u_coin_cash', 'legacy_cash'], 'Legacy RMB cash uses the cash/U-coin filter');
-    choose(h, 'shop_gold');
-    assert.deepEqual(cardNames(h), []);
-    assert.deepEqual(visibleSkus(view), []);
-    assert(h.descendants(h.store().content, 'CJEmpty').length, 'Unopened gold purchasing stays unavailable');
     choose(h, 'all');
     assert.deepEqual(cardNames(h), ['points_b', 'u_coin_cash', 'points_a', 'legacy_cash']);
-    for (const bad of ['', 'cash', '__proto__', null, {}]) {
+    for (const bad of ['', 'cash', 'shop_gold', '__proto__', null, {}]) {
         assert.equal(view.SelectPurchaseType(bad), false);
         assert.equal(view.Inspect().purchaseType, 'all');
     }
@@ -152,24 +138,19 @@ test('Purchase type survives independent tabs, authenticated catalog refreshes a
     assertNoPurchase(h);
 });
 
-test('The options close on toggle, selection, window exit and disposal', () => {
+test('Inline selection survives reopening and disposed controls cannot change the view', () => {
     const {h, view} = makeFixture();
-    openPopup(h);
-    find(h, 'BLMarketPurchaseType').events.onactivate();
-    assert(!popupOpen(h));
     choose(h, 'shop_points');
-    assert(allNodes(find(h, 'BLMarketPurchaseType')).some(p => p.text === '积分兑换'));
-    openPopup(h);
+    assert(allNodes(find(h, 'BLMarketPurchaseType')).some(p => p.text === '积分'));
     view.Close();
-    assert(!popupOpen(h), 'Closing the shop closes its options');
     view.Open();
-    assert(!popupOpen(h), 'Reopening does not resurrect an open options menu');
     assert.equal(view.Inspect().purchaseType, 'shop_points');
-    openPopup(h);
-    const popup = find(h, 'BLMarketPurchaseTypeMenu');
+    const control = find(h, 'BLMarketPurchaseType');
+    const lateSelection = find(h, 'BLMarketPurchaseType_u_coin').events.onactivate;
     view.Dispose();
-    assert(!popup.IsValid());
-    assert.equal(h.root.FindChildTraverse('BLMarketPurchaseTypeMenu'), undefined);
+    assert(!control.IsValid());
+    assert.equal(h.root.FindChildTraverse('BLMarketPurchaseType'), undefined);
+    assert.doesNotThrow(lateSelection);
     assertNoPurchase(h);
 });
 

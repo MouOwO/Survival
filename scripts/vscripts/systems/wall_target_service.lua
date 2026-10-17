@@ -3,6 +3,7 @@
 -- movement/eligibility changes, and stable enemies retain their current goal.
 local grid_config = require("config/grid_placement_config")
 local player_context = require("systems/player_context_service")
+local contact = require("systems/wall_melee_contact")
 local M = {}
 local registry, preferred, inactive, route_cache = {}, {}, {}, {}
 local generation, next_order, checked_at, cache_count = 0, 0, -math.huge, 0
@@ -115,13 +116,17 @@ local function route(unit,r)
     -- stable AI goals already avoid subsequent route calls while moving.
     local key=string.format("%d:%.17g:%.17g:%.17g:%.17g",r.unit:entindex(),p.x,p.y,p.z,radius)
     local cached=route_cache[key]
-    if cached and now()-cached.time<4 then metrics.route_cache_hits=metrics.route_cache_hits+1;return cached.reachable end
-    local points={};local normal=128+radius+64
-    for _,offset in ipairs({{-normal,0},{normal,0},{0,-normal},{0,normal}}) do
-        points[#points+1]=Vector(r.p.x+offset[1],r.p.y+offset[2],r.p.z)
+    if cached and now()-cached.time<4 then metrics.route_cache_hits=metrics.route_cache_hits+1;return cached.reachable,cached.point end
+    -- A sealed wall's centre is intentionally unreachable. Its four face
+    -- centres can also be blocked while an outer contact remains legal.
+    -- Check the same terrain-filtered slots used by the real attack allocator.
+    -- Copy the list before sorting; the allocator owns its shared cache.
+    local points={}
+    for _,candidate in ipairs(contact.approach_points(r.unit,unit)) do
+        points[#points+1]=candidate.point
     end
     table.sort(points,function(a,b) return (a.x-p.x)^2+(a.y-p.y)^2<(b.x-p.x)^2+(b.y-p.y)^2 end)
-    local reachable=false
+    local reachable,selected_point=false,nil
     for _,point in ipairs(points) do
         local open=not GridNav or ((not GridNav.IsTraversable or GridNav:IsTraversable(point))
             and (not GridNav.IsBlocked or not GridNav:IsBlocked(point)))
@@ -133,11 +138,12 @@ local function route(unit,r)
                 metrics.path_queries=metrics.path_queries+1
                 local ok,length=pcall(GridNav.FindPathLength,GridNav,p,point);reachable=ok and type(length)=="number" and length>=0
             else reachable=true end
-            if reachable then break end
+            if reachable then selected_point=point;break end
         end
     end
     if cache_count>=512 then route_cache={};cache_count=0 end
-    route_cache[key]={reachable=reachable,time=now()};cache_count=cache_count+1;return reachable
+    route_cache[key]={reachable=reachable,point=selected_point,time=now()};cache_count=cache_count+1
+    return reachable,selected_point
 end
 function M.resolve(unit,player_id,current,cache,retry)
     observe(retry==true);cache=cache or {};metrics.resolves=metrics.resolves+1
@@ -147,10 +153,15 @@ function M.resolve(unit,player_id,current,cache,retry)
     -- bounded no-route retry is explicitly requested by the AI.
     if not retry and cache.generation==generation and current==-1 then return -1,cache end
     local own=registry[preferred[tonumber(player_id)]]
-    local selected
-    if own and own.eligible and route(unit,own) then selected=own.unit:entindex()
-    elseif active and active.eligible and route(unit,active) then selected=current
-    else
+    local selected,waypoint,selected_wall
+    local function choose(record)
+        if not record or not record.eligible then return false end
+        local reachable,point=route(unit,record)
+        if not reachable then return false end
+        selected,waypoint,selected_wall=record.unit:entindex(),point,record.unit
+        return true
+    end
+    if not choose(own) and not choose(active) then
         local p=position(unit);local candidates={}
         for _,r in pairs(registry) do if r.eligible then candidates[#candidates+1]=r end end
         table.sort(candidates,function(a,b)
@@ -158,8 +169,11 @@ function M.resolve(unit,player_id,current,cache,retry)
             local db=p and (b.p.x-p.x)^2+(b.p.y-p.y)^2 or 0
             return da==db and a.unit:entindex()<b.unit:entindex() or da<db
         end)
-        for _,r in ipairs(candidates) do if route(unit,r) then selected=r.unit:entindex();break end end
+        for _,r in ipairs(candidates) do if choose(r) then break end end
     end
+    unit.survival_wall_route=selected_wall and {wall=selected_wall,
+        revision=tonumber(selected_wall.survival_wall_relocation_revision) or 0,
+        point=Vector(waypoint.x,waypoint.y,waypoint.z)} or nil
     cache.generation=generation;return selected or -1,cache
 end
 function M._snapshot_for_test()

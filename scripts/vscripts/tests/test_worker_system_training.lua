@@ -34,10 +34,16 @@ local city = {
     IsNull = function() return false end,
     entindex = function() return 10 end,
     GetAbsOrigin = function() return Vector(1000, 2000, city_origin_height) end,
-    GetHullRadius = function() return 128 end,
+    GetHullRadius = function() return 48 end,
     GetTeamNumber = function() return 2 end,
     GetPlayerOwnerID = function() return 0 end,
 }
+local spawn_config = require("config/workers_config")
+local spawn_min = math.max(spawn_config.spawn_radius_min,
+    city:GetHullRadius() + spawn_config.spawn_clearance)
+local spawn_max = math.max(spawn_min, spawn_config.spawn_radius_max)
+local near_spawn_x = 1000 + spawn_min - 64
+local middle_spawn_x = 1000 + (spawn_min + spawn_max) / 2
 
 local function reset()
     checks, attempts, calls, notifications, created, cleared, units = 0, 0, {}, {}, {}, {}, {}
@@ -134,7 +140,7 @@ reset(); blocked = "error"; assert_no_land()
 -- Traversable water is still rejected by height relative to the city's ground.
 reset()
 GetGroundHeight = function(position)
-    return position.x > 1300 and 4 or 128
+    return position.x > near_spawn_x and 4 or 128
 end
 assert_no_land()
 assert(checks == 0, "underwater candidates fail before navigation or occupancy")
@@ -154,10 +160,10 @@ reset()
 GetGroundHeight = function(position) return position.y ~= 2000 and 96 or 128 end
 assert(train().ok and #created == 1)
 reset()
-GetGroundHeight = function(position) return position.x > 1300 and 192 or 128 end
+GetGroundHeight = function(position) return position.x > near_spawn_x and 192 or 128 end
 assert(train().ok and created[1].position.z == 192)
 reset()
-GetGroundHeight = function(position) return position.x > 1300 and 193 or 128 end
+GetGroundHeight = function(position) return position.x > near_spawn_x and 193 or 128 end
 assert_no_land()
 
 -- Use actual terrain height beneath an elevated building model, not model Z.
@@ -180,10 +186,10 @@ assert(calls[1].payload.wood == 100 and calls[1].payload.gold == 20 and calls[1]
 assert(result.training.total_trained == 1 and result.training.count == 1)
 
 -- Reject obstructed candidates, retaining the first valid grounded destination.
-reset(); traversable = function(position) return position.x > 1450 end
+reset(); traversable = function(position) return position.x > middle_spawn_x end
 result = train()
-assert(result.ok and checks > 1 and checks < 24)
-assert(created[1].position.x > 1450 and created[1].position.z == 128)
+assert(result.ok and attempts > 1 and attempts < spawn_config.spawn_attempts)
+assert(created[1].position.x > middle_spawn_x and created[1].position.z == 128)
 assert(cleared[1] == created[1].position and #calls == 1)
 
 -- Existing spending failure and engine creation refund behavior stay intact.

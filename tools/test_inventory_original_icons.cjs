@@ -7,17 +7,20 @@ const cfg={}, panels=[];
 const $={CreatePanel:(type,parent,id)=>{const p={type,parent,id,style:{},AddClass(c){this.className=c;},SetImage(uri){this.uri=uri;},SetScaling(v){this.scaling=v;}};panels.push(p);return p;},Schedule(){throw Error('Icons must not schedule work');}};
 const env={$,GameUI:{CustomUIConfig:()=>cfg}};
 const load=name=>vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
-load('native_ui_icons');load('reward_presentation');load('item_art_remaining_5d5c1152eb');
+load('common/item_resources');load('native_ui_icons');load('reward_presentation');load('item_art_remaining_5d5c1152eb');
 const original=cfg.SurvivalRewardPresentation.OriginalCreateIcon;
 load('item_art_remaining_5d5c1152eb');assert.strictEqual(cfg.SurvivalRewardPresentation.OriginalCreateIcon,original,'reload cannot nest wrappers');
 for(const[id,value]of Object.entries(manifest.icons)){
  const resource='panorama/images/'+(value.type==='item'?'items/':'spellicons/')+value.name+'_png.vtex_c';
  assert(vpk.entries.has(resource),'Missing official texture '+id+' '+resource);
  assert.equal(cfg.SurvivalNativeIcons.Resolve(id).uri,value.uri,id);
- for(const entry of [{content_id:id},{contentid:id},{icon:value.type==='item'?'item_'+value.name:value.name,icon_type:value.type}]){
+ for(const entry of [{content_id:id},{contentid:id}]){
   const icon=cfg.SurvivalItemArt.Create({},entry,'Icon');
   assert.equal(icon.uri,value.uri,id);assert.equal(icon.hittest,false);assert.equal(icon.hittestchildren,false);
  }
+ const originalFallback=cfg.SurvivalRewardPresentation.CreateIcon({}, {id:'unregistered_native_fallback',icon:value.type==='item'?'item_'+value.name:value.name,icon_type:value.type},'Icon');
+ assert.equal(originalFallback.type,value.type==='item'?'DOTAItemImage':'DOTAAbilityImage','unknown identity preserves the native control');
+ assert.equal(originalFallback[value.type==='item'?'itemname':'abilityname'],value.type==='item'?'item_'+value.name:value.name);
 }
 const lua=fs.readFileSync('scripts/vscripts/config/inventory_original_icons.lua','utf8');
 for(const[id,texture]of Object.entries(manifest.mappings))assert(lua.includes('["'+id+'"] = "'+texture+'"'),id);

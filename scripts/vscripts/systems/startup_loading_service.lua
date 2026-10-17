@@ -8,8 +8,7 @@ local match_setup = require("systems/match_setup_service")
 local M = {}
 local generation, session_id, started_at = 0, "", 0
 local initialized, released, gameplay_released = false, false, false
-local party_waiting, load_start = false, nil
-local party_departed = {}
+local load_started, load_start = false, nil
 local entries, callbacks, gameplay_callbacks, listeners = {}, {}, {}, {}
 local asset_retry_error = nil
 local options, latest = {}, { started = false, all_ready = false, phase = "loading", progress = 0, players = {} }
@@ -86,12 +85,30 @@ local function discover()
         if id then found[id] = true end
     end
     for id in pairs(found) do
-        if not entries[id] and human(id) and (not party_departed[id] or connected(id)) then
+        if not entries[id] and human(id) then
             entries[id] = { player_id = id, authenticated = false, client_ready = false,
                 connected = false, ready = false, status = "connecting", next_retry = 0, attempt = 0 }
         end
     end
     -- Never remove a known human from the roster on disconnect/invalid slot.
+end
+
+local function native_setup_pending()
+    if not options.native_team_setup or load_started then return false end
+    local minimum = tonumber(DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP)
+    local ok, state = false, nil
+    if GameRules and type(GameRules.State_Get) == "function" then
+        ok, state = pcall(GameRules.State_Get, GameRules)
+    end
+    -- The native host start/countdown owns this transition. Missing state
+    -- information must never manufacture a completed team-selection phase.
+    return not minimum or not ok or not tonumber(state) or tonumber(state) <= minimum
+end
+
+local function begin_loading()
+    if load_started then return end
+    load_started, started_at = true, now()
+    if load_start then load_start() end
 end
 
 local function actor(source)
@@ -298,26 +315,24 @@ function M.tick()
     if gameplay_released then return nil end
     if released then return tick_profiles() end
     discover()
-    if party_waiting then
-        local public, count, accounts = {}, 0, {}
+    if native_setup_pending() then
+        local public = {}
         for id, entry in pairs(entries) do
-            local account = tonumber(resource("GetSteamAccountID", id))
-            local online = human(id) and connected(id) and account and account > 0
-            if online and not accounts[account] then
-                accounts[account] = true
-                count = count + 1
-                public[#public + 1] = { player_id = id, authenticated = false,
-                    client_ready = entry.client_ready, ready = false, status = "party_waiting" }
-            end
+            local online = human(id) and connected(id)
+            if entry.connected and not online then entry.client_ready = false end
+            entry.connected = online
+            entry.ever_connected = entry.ever_connected or online
+            public[#public + 1] = { player_id = id, authenticated = false,
+                client_ready = entry.client_ready, ready = false, status = "team_setup" }
         end
         table.sort(public, function(a, b) return a.player_id < b.player_id end)
-        publish({ session_id = session_id, started = true, phase = "party_waiting",
-            progress = 0, players = public, party_count = count,
-            selector_player_id = match_setup.selector_player_id(),
+        publish({ session_id = session_id, started = true, phase = "team_setup", native_team_setup = true,
+            progress = 0, players = public,
             all_ready = false, admission_complete = false, profiles_ready = false })
         return options.tick_seconds
     end
-    if options.tools_party and Convars and type(Convars.GetStr) == "function"
+    begin_loading()
+    if options.tools_backend_wait and Convars and type(Convars.GetStr) == "function"
         and Convars:GetStr("survival_fishing_api_token") == "" then
         local public = {}
         for id, entry in pairs(entries) do
@@ -374,7 +389,11 @@ function M.tick()
 end
 
 function M.is_ready() return initialized and released end
-function M.is_party_waiting() return initialized and party_waiting end
+-- The existing Tools authentication/LAN bridges use this query to withhold
+-- credentials until host start. Keep it mapped to Valve's native setup; there
+-- is no addon party-start button or event to submit.
+function M.is_party_waiting() return M.is_native_team_setup() end
+function M.is_native_team_setup() return initialized and native_setup_pending() end
 function M.is_gameplay_ready() return initialized and gameplay_released end
 function M.is_player_ready(value)
     if not M.is_gameplay_ready() then return false end
@@ -412,13 +431,13 @@ function M.init(settings)
         for _, listener in ipairs(listeners) do pcall(CustomGameEventManager.UnregisterListener, CustomGameEventManager, listener) end
     end
     entries, callbacks, gameplay_callbacks, listeners = {}, {}, {}, {}
-    party_departed = {}
     asset_retry_error = nil
     options = { minimum_wait_seconds = math.max(0, tonumber(settings.minimum_wait_seconds) or 0),
         retry_seconds = math.max(1, tonumber(settings.retry_seconds) or 5),
         request_timeout_seconds = math.max(30, tonumber(settings.request_timeout_seconds) or 45),
-        tick_seconds = 0.25, tools_party = settings.wait_for_party == true }
-    party_waiting = settings.wait_for_party == true
+        tick_seconds = 0.25, native_team_setup = settings.native_team_setup == true,
+        tools_backend_wait = settings.tools_backend_wait == true }
+    load_started = false
     load_start = settings.on_load_start
     session_id = new_session_id()
     match_setup.init(session_id)
@@ -439,21 +458,6 @@ function M.init(settings)
         end
     end
     listen("survival_loading_client_ready", function(entry) entry.client_ready = true end)
-    listen("survival_party_start", function(entry)
-        if not party_waiting or not match_setup.is_selector(entry.player_id)
-            or not lobby_roster_available() then return end
-        -- Freeze only the current connected roster. A player who left the
-        -- waiting room must not hold the subsequent admission barrier forever.
-        for id in pairs(entries) do
-            local account = tonumber(resource("GetSteamAccountID", id))
-            if not human(id) or not connected(id) or not account or account <= 0 then
-                entries[id], party_departed[id] = nil, true
-            end
-        end
-        party_waiting = false
-        started_at = now()
-        if load_start then load_start() end
-    end)
     listen("survival_loading_mode_select", function(entry, payload)
         local steam = tonumber(resource("GetSteamAccountID", entry.player_id))
         local admitted = released and steam and steam > 0
@@ -474,7 +478,7 @@ function M.init(settings)
         end
     end, true)
     listen("survival_loading_retry", function(entry)
-        if party_waiting then return end
+        if native_setup_pending() then return end
         local current = now()
         if current < (entry.last_manual_retry or -math.huge) + options.retry_seconds then return end
         if released then
@@ -508,7 +512,6 @@ function M.init(settings)
         if epoch ~= generation then return nil end
         return M.tick()
     end, options.tick_seconds)
-    if not party_waiting and load_start then load_start() end
     M.tick()
     return M.snapshot()
 end

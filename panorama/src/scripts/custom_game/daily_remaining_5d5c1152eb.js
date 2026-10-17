@@ -8,16 +8,16 @@ var cellWidth=layout.cellWidth,cellHeight=layout.cellHeight,cellPadding=layout.c
 var gridWidth=columns[6]-columns[0]+cellWidth,gridHeight=rows[3]-rows[0]+cellHeight;
 var fitOptions={widthFraction:.94,heightFraction:.9};
 var data=null,waiting=null,errorText="",buying=false,sequence=0,active=true,life=U.Lifecycle(),viewLife=U.Lifecycle(),fetching=false,fetchSerial=0;
-var dailyRoot=$.GetContextPanel(),view=null,shell=null,canvas=null,tipPanel=null,tipShadow=null,tipBacking=null,tipFrame=null,tipBody=null,tipTitle=null,tipViewport=null,tipAnchor=null,tipEpoch=0,tipHideJob=null,tipDismiss=null,moved=[];
+var dailyRoot=$.GetContextPanel(),view=null,shell=null,canvas=null,dailyTooltip=null,moved=[];
 var cardSignature="",specialSignature="",statusText="",scale=1;
 var rewardFX=null;
-var weekdayNames=["周一","周二","周三","周四","周五","周六","周日"];
+var columnLabels=["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ","Ⅵ","Ⅶ"];
 function valid(node){return node&&(!node.IsValid||node.IsValid());}
 function p(id){return valid(dailyRoot)?dailyRoot.FindChildTraverse(id):null;}
 function viewValid(){return valid(p("DailyWindow"));}
 if(!viewValid()){active=false;return;}
 if(cfg.SurvivalDaily&&cfg.SurvivalDaily.Dispose)cfg.SurvivalDaily.Dispose();
-function stopIfInvalid(){if(!active)return true;if(viewValid())return false;active=false;if(rewardFX)rewardFX.Dispose();life.Dispose();viewLife.Dispose();if(view)view.Dispose();return true;}
+function stopIfInvalid(){if(!active)return true;if(viewValid())return false;active=false;if(rewardFX)rewardFX.Dispose();if(dailyTooltip)dailyTooltip.Dispose();life.Dispose();viewLife.Dispose();if(view)view.Dispose();return true;}
 function array(v){return Array.isArray(v)?v:Object.keys(v||{}).sort(function(a,b){return Number(a)-Number(b);}).map(function(k){return v[k];});}
 function style(node,values){Object.keys(values).forEach(function(key){if(node.style[key]!==values[key])node.style[key]=values[key];});}
 function rect(node,x,y,w,h){style(node,{position:x+"px "+y+"px 0px",width:w+"px",height:h+"px",margin:"0px",padding:"0px",horizontalAlign:"left",verticalAlign:"top"});}
@@ -29,35 +29,17 @@ function label(parent,text,x,y,w,h,font,color,id){var node=make("Label",parent,i
 function move(id,parent){var node=p(id);if(!valid(node))return null;moved.push({node:node,parent:node.GetParent()});node.SetParent(parent);node.style.visibility="visible";return node;}
 function escapedLines(value){return String(value||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\r?\n/g,"<br>");}
 function effectLines(value){return String(value||"").replace(/\r\n?/g,"\n").replace(/[；;][ \t]*/g,"\n");}
-function cancelTooltipHide(){tipEpoch++;if(tipHideJob!==null&&$.CancelScheduled)$.CancelScheduled(tipHideJob);tipHideJob=null;}
-function tooltipRect(node){var at=node.GetPositionWithinWindow();return {x:at.x,y:at.y,width:node.actuallayoutwidth*scale,height:node.actuallayoutheight*scale};}
-function hideTooltip(){cancelTooltipHide();tipAnchor=null;if(valid(tipPanel))tipPanel.visible=false;if(tipDismiss)tipDismiss.Hidden();if(valid(p("DailyTooltip")))p("DailyTooltip").AddClass("ArchiveHidden");}
-function tooltipOverflows(){return valid(tipTitle)&&valid(tipBody)&&valid(tipViewport)&&tipTitle.actuallayoutheight+tipBody.actuallayoutheight+10*(Number(tipTitle.actualuiscale_y)||1)>tipViewport.actuallayoutheight+1;}
-function cursorInsideTooltipRegion(node){if(!valid(node)||!GameUI.GetCursorPosition)return false;var at=GameUI.GetCursorPosition(),box=tooltipRect(node);return at&&at[0]>=box.x&&at[0]<box.x+box.width&&at[1]>=box.y&&at[1]<box.y+box.height;}
-function leaveTooltip(){cancelTooltipHide();var epoch=tipEpoch;tipHideJob=$.Schedule(.18,function(){if(epoch!==tipEpoch)return;tipHideJob=null;if(tooltipOverflows()&&(cursorInsideTooltipRegion(tipAnchor)||cursorInsideTooltipRegion(tipPanel)))return;hideTooltip();});}
-function fitTooltip(epoch){
- if(!active||epoch!==tipEpoch||!valid(tipAnchor)||!valid(tipPanel)||!shell.IsOpen())return;
- var origin=canvas.GetPositionWithinWindow(),at=tipAnchor.GetPositionWithinWindow(),sx=(canvas.actualuiscale_x||1)*scale,sy=(canvas.actualuiscale_y||1)*scale;
- // Native layout measurements include UI scale, while rect() uses the canvas'
- // authored units. Normalize each label before sizing the scroll viewport.
- function labelHeight(node,fallback){var h=Number(node.actuallayoutheight);return h>0?h/(Number(node.actualuiscale_y)||1):fallback;}
- var measured=labelHeight(tipTitle,32)+labelHeight(tipBody,100),height=Math.max(150,Math.min(570,size[1]-40,measured+42));
- var anchorX=(at.x-origin.x)/sx,x=anchorX+cellWidth+12,y=(at.y-origin.y)/sy;
- if(x+350>size[0]-20)x=anchorX-362;x=Math.max(20,Math.min(size[0]-370,x));y=Math.max(20,Math.min(size[1]-20-height,y));
- rect(tipPanel,x,y,350,height);rect(tipShadow,0,0,350,height);rect(tipBacking,0,0,350,height);rect(tipFrame,0,0,350,height);rect(tipViewport,17,16,316,height-32);
-}
+function hideTooltip(){if(dailyTooltip)dailyTooltip.Hide();if(valid(p("DailyTooltip")))p("DailyTooltip").AddClass("ArchiveHidden");}
 function tip(anchor,title,body){
  if(/^DailyGW2Weekday_[0-6]$/.test(anchor.id||"")){anchor.hittest=false;return;}
  body=effectLines(body);
  anchor.__dailyGW2Tooltip={title:String(title||"奖励说明"),body:String(body||"奖励说明待同步")};
  anchor.hittest=true;anchor.SetPanelEvent("onmouseover",function(){
   if(!active||!viewValid()||!shell.IsOpen()||!p("DailyRulesText").BHasClass("ArchiveHidden")){hideTooltip();return;}
-  if(!tipDismiss.CanShow(anchor))return;
-  hideTooltip();tipAnchor=anchor;tipTitle.text=String(title||"奖励说明");tipBody.text=String(body||"奖励说明待同步");
-  if(tipViewport.ScrollToTop)tipViewport.ScrollToTop();
-  p("DailyTooltipName").text=tipTitle.text;p("DailyTooltipEffect").text=tipBody.text;tipPanel.visible=true;
-  var epoch=tipEpoch;fitTooltip(epoch);tipDismiss.Shown(anchor);[0,.05,.15,.35].forEach(function(delay){viewLife.Later(delay,function(){fitTooltip(epoch);});});
- });anchor.SetPanelEvent("onmouseout",leaveTooltip);
+  if(dailyTooltip.Show({name:String(title||"奖励说明"),description:String(body||"奖励说明待同步")},"daily",anchor,true)){
+   p("DailyTooltipName").text=String(title||"奖励说明");p("DailyTooltipEffect").text=String(body||"奖励说明待同步");
+  }
+ });anchor.SetPanelEvent("onmouseout",function(){if(dailyTooltip)dailyTooltip.QueueHide();});
 }
 function close(){
  if(rewardFX)rewardFX.Clear();if(waiting)waiting.present=false;
@@ -66,8 +48,9 @@ function close(){
  if(valid(p("DailyRulesText"))){p("DailyRulesText").AddClass("ArchiveHidden");p("DailyRulesText").visible=false;}$.DispatchEvent("DOTAHideTextTooltip");
 }
 function fitWindow(value){
- scale=Math.min(1,Number(value)||1);if(valid(p("DailyWindow")))p("DailyWindow").style.transform="scale3d("+scale+","+scale+",1)";
- if(valid(tipAnchor)&&valid(tipPanel)&&shell&&shell.IsOpen())fitTooltip(tipEpoch);
+ var nextScale=Math.min(1,Number(value)||1),changed=Math.abs(scale-nextScale)>.0001;scale=nextScale;
+ if(valid(p("DailyWindow")))p("DailyWindow").style.transform="scale3d("+scale+","+scale+",1)";
+ if(changed)hideTooltip();
 }
 function build(){
  var win=p("DailyWindow");win.AddClass("DailyGW2Page");win.RemoveClass("DailyV10Page");win.RemoveClass("DailyPurple");
@@ -84,7 +67,7 @@ function build(){
  closeButton.hittestchildren=false;
  closeButton.SetPanelEvent("onactivate",function(){if(active&&valid(closeButton)){if(shell.RequestClose)shell.RequestClose("button");else close();}});
  component(canvas,"divider",1113,112,7,665,"DailyGW2Divider");
- weekdayNames.forEach(function(name,i){var header=label(canvas,name,columns[i],108,cellWidth,36,27,"#efece3","DailyGW2Weekday_"+i);style(header,{textAlign:"center"});});
+ columnLabels.forEach(function(name,i){var header=label(canvas,name,columns[i],108,cellWidth,36,27,"#efece3","DailyGW2Weekday_"+i);style(header,{textAlign:"center"});});
  var monthHeader=label(canvas,"月卡奖励",layout.monthlyX-20,108,cellWidth+40,36,27,"#efece3","DailyGW2MonthHeader");style(monthHeader,{textAlign:"center"});
  ["DailyFrame","DailyHeader","DailyClaimPage","DailyPassPage","DailyRuleLine","DailyBack","DailyTooltip"].forEach(function(id){p(id).visible=false;});
  ["DailyCards","DailySubtitle","DailyCount","DailyPassStatus","DailySpecials","PassValidity","PassPrice","PassPurchase","DailyRules","DailyMakeup","DailyClaim","DailyNotice","DailyRulesText"].forEach(function(id){move(id,canvas);});
@@ -102,17 +85,13 @@ function build(){
  rect(p("DailyNotice"),columns[0],765,gridWidth,18);style(p("DailyNotice"),{fontSize:"16px",color:"#eed6a8",textAlign:"center",marginTop:"0px",whiteSpace:"nowrap",textOverflow:"ellipsis"});
  var rulesWidth=620,rulesHeight=Math.min(570,size[1]-80),rules=p("DailyRulesText");rect(rules,(size[0]-rulesWidth)/2,(size[1]-rulesHeight)/2,rulesWidth,rulesHeight);style(rules,{flowChildren:"down",overflow:"squish scroll",backgroundColor:"#181610fc",backgroundImage:"none",border:"1px solid #a7926b",padding:"24px",zIndex:"120"});rules.hittest=true;rules.hittestchildren=true;rules.AddClass("ArchiveHidden");rules.visible=false;
  style(p("DailyRulesBody"),{width:(rulesWidth-60)+"px",height:"fit-children",fontSize:"20px",color:"#eee6d2",whiteSpace:"normal",textOverflow:"clip",lineHeight:"28px"});p("DailyRulesBody").html=true;
- tipPanel=make("Panel",canvas,"DailyGW2Tooltip","DailyGW2Tooltip");tipPanel.AddClass("MenuTooltipHost");tipPanel.visible=false;tipPanel.hittest=true;tipPanel.hittestchildren=true;
- tipDismiss=cfg.SurvivalTooltipDismiss.Create({panel:tipPanel,getRect:tooltipRect,hide:hideTooltip,allowTooltipHover:tooltipOverflows,isAlive:function(){return active&&viewValid();},isVisible:function(){return valid(tipPanel)&&tipPanel.visible&&shell.IsOpen();}});tipPanel.SetPanelEvent("onmouseover",function(){if(tooltipOverflows())cancelTooltipHide();else tipDismiss.Dismiss();});tipPanel.SetPanelEvent("onmouseout",leaveTooltip);
- // Only the backing is feathered; labels and the scroll viewport stay crisp.
- tipShadow=make("Panel",tipPanel,"DailyGW2TooltipSoftShadow","MenuTooltipSoftShadow");rect(tipShadow,0,0,350,180);tipShadow.hittest=false;tipShadow.hittestchildren=false;
- tipBacking=component(tipPanel,"tooltip_background",0,0,350,180,"DailyGW2TooltipBacking");tipBacking.AddClass("MenuTooltipBacking");
- if(!(P.assets&&P.assets.tooltip_background))style(tipBacking,{backgroundColor:"#111416fa"});
- tipFrame=component(tipPanel,"tooltip_frame",0,0,350,180,"DailyGW2TooltipFrame");
- tipViewport=make("Panel",tipPanel,"DailyGW2TooltipViewport","DailyGW2TooltipViewport");rect(tipViewport,17,16,316,230);
- tipTitle=label(tipViewport,"",0,0,316,32,23,"#f0d899","DailyGW2TooltipTitle");style(tipTitle,{height:"fit-children",whiteSpace:"normal",marginBottom:"10px"});
- tipBody=label(tipViewport,"",0,0,316,180,18,"#e1dfd7","DailyGW2TooltipBody");style(tipBody,{height:"fit-children",whiteSpace:"normal",textOverflow:"clip"});
- view=cfg.SurvivalDailyGW2={canvas:canvas,shell:shell,Open:function(){shell.Open();canvas.visible=true;fitWindow(U.Fit(win,dailyRoot,size[0],size[1],fitOptions));},Close:function(){shell.Close();if(valid(canvas))canvas.visible=false;},IsOpen:function(){return shell.IsOpen();},Dispose:function(){if(tipDismiss)tipDismiss.Dispose();shell.Dispose();moved.forEach(function(e){if(valid(e.node)&&valid(e.parent))e.node.SetParent(e.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(win))win.RemoveClass("DailyGW2Page");}};
+ // Reuse the archive renderer, materials and hover lifecycle for every daily reward.
+ dailyTooltip=cfg.SurvivalArchiveTooltip.Create({parent:canvas,root:dailyRoot,idPrefix:"DailyGW2Tooltip",
+  getBounds:function(){return size;},getScale:function(){return scale;},maxHeight:function(bounds){return Math.min(570,bounds.height-40);},watchAnchor:true,
+  isAlive:function(){return active&&viewValid();},isActive:function(){return shell.IsOpen()&&p("DailyRulesText").BHasClass("ArchiveHidden");},
+  position:function(info){var x=info.anchor.x+cellWidth+12-info.padding;if(x+info.width>info.bounds.width)x=info.anchor.x-info.surfaceWidth-12-info.padding;return {x:Math.max(0,Math.min(info.bounds.width-info.width,x)),y:Math.max(0,Math.min(info.bounds.height-info.height,info.anchor.y-info.padding))};}
+ });
+ view=cfg.SurvivalDailyGW2={canvas:canvas,shell:shell,Open:function(){shell.Open();canvas.visible=true;fitWindow(U.Fit(win,dailyRoot,size[0],size[1],fitOptions));},Close:function(){shell.Close();if(valid(canvas))canvas.visible=false;},IsOpen:function(){return shell.IsOpen();},Dispose:function(){dailyTooltip.Dispose();shell.Dispose();moved.forEach(function(e){if(valid(e.node)&&valid(e.parent))e.node.SetParent(e.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(win))win.RemoveClass("DailyGW2Page");}};
 }
 build();
 if(U.RewardFX)rewardFX=U.RewardFX.Create(canvas,{channel:"daily",getScale:function(){return scale;}});
@@ -168,11 +147,11 @@ function renderCards(){
   if(items.length>2)label(card,"+"+(items.length-2),cellPadding,cellPadding,28,22,16,"#eedbab");
   if(status==="claimed")mark(card,"check");
   var summary=items.map(function(item){return item.name+(item.count!==undefined?" ×"+item.count:"")+"\n"+(item.description||"");}).join("\n\n");
-  tip(card,weekdayNames[i%7]+" · 第"+(day.day||i+1)+"天 · "+stateText(status),summary||"正在读取该日奖励");
+  tip(card,columnLabels[i%7]+" · 第"+(day.day||i+1)+"天 · "+stateText(status),summary||"正在读取该日奖励");
  });
 }
 function renderSpecials(){
- var specials=array(data&&data.specials),signature=JSON.stringify([specials,data&&data.has_pass,data&&data.count]);if(signature===specialSignature&&p("DailySpecials").GetChildCount()===4)return;specialSignature=signature;p("DailySpecials").RemoveAndDeleteChildren();
+ var specials=array(data&&data.specials),signature=JSON.stringify([specials,data&&data.has_pass,data&&data.count]);if(signature===specialSignature&&p("DailySpecials").GetChildCount()===4)return;specialSignature=signature;hideTooltip();p("DailySpecials").RemoveAndDeleteChildren();
  for(var i=0;i<4;i++){
   var item=i<3?specials[i]:null,card=make("Panel",p("DailySpecials"),item?"DailyGW2Special_"+item.id:"DailyGW2SpecialEmpty_"+(i+1),"DailyGW2Special");rect(card,0,rows[i]-rows[0],cellWidth,cellHeight);
   var frame=component(card,"premium_frame",0,0,cellWidth,cellHeight);frame.AddClass("DailyGW2SpecialFrame");

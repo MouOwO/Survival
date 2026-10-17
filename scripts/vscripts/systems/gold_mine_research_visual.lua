@@ -15,13 +15,24 @@ function M.play(unit, group)
     local path = M.particles[group]
     if not path or not unit or unit:IsNull() or not unit:IsAlive()
         or not ParticleManager then return false end
-    local particle = ParticleManager:CreateParticle(path, PATTACH_ABSORIGIN_FOLLOW, unit)
-    ParticleManager:SetParticleControl(particle, 0, unit:GetAbsOrigin())
-    if group == "gold_mine_efficiency" then
-        ParticleManager:SetParticleControl(particle, 1, Vector(150, 150, 150))
+    local manager = ParticleManager
+    local particle = manager:CreateParticle(path, PATTACH_ABSORIGIN_FOLLOW, unit)
+    local ok, err = pcall(function()
+        manager:SetParticleControl(particle, 0, unit:GetAbsOrigin())
+        if group == "gold_mine_efficiency" then
+            manager:SetParticleControl(particle, 1, Vector(150, 150, 150))
+        end
+    end)
+    if not ok then
+        if type(particle) == "number" and particle >= 0
+            and particle < math.huge and particle == math.floor(particle) then
+            pcall(function() manager:DestroyParticle(particle, true) end)
+            pcall(function() manager:ReleaseParticleIndex(particle) end)
+        end
+        error(err, 0)
     end
     -- These native impact effects are one-shots; leave their natural fade-out.
-    ParticleManager:ReleaseParticleIndex(particle)
+    manager:ReleaseParticleIndex(particle)
     return true
 end
 

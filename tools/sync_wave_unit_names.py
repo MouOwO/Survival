@@ -2,12 +2,17 @@
 import csv
 import io
 import re
+import math
+import json
+import argparse
 from pathlib import Path
 import build_configs
 
 ROOT = Path(__file__).resolve().parents[1]
 BEGIN = '// BEGIN GENERATED WAVE UNIT NAMES'
 END = '// END GENERATED WAVE UNIT NAMES'
+RANGE_BEGIN = '// BEGIN GENERATED FORMAL WAVE RANGE ALIASES'
+RANGE_END = '// END GENERATED FORMAL WAVE RANGE ALIASES'
 
 # Model activities are selected with these tags, not just ACT_DOTA_RUN.
 # Match Valve's npc_dota_hero_abyssal_underlord movement thresholds. Without
@@ -59,6 +64,110 @@ def serialize(fields, row):
 
 def replace_block(text, block):
     return re.sub(re.escape(BEGIN) + r'[\s\S]*?' + re.escape(END), lambda m: block, text)
+
+
+def sync_native_range_aliases():
+    """Add isolated formal aliases; never rewrite shared archetype CSV names.
+
+    Native units are exact copies of the generated named bodies except their
+    base range. Existing names remain the practice/challenge authority.
+    """
+    from build_wave_monster_cosmetics import parse_kv
+    archetypes = read_table('monster_archetypes')[3]
+    waves = read_table('wave_definitions')[3]
+    formal = {row['archetype_id'] for row in waves if row.get('enabled') == '1'}
+    names = {}
+    for row in archetypes:
+        names.setdefault(row.get('unit_name'), []).append(row)
+    npc_path = ROOT / 'scripts/npc/npc_units_custom.txt'
+    original = npc_path.read_bytes()
+    text = original.decode('utf-8-sig')
+    npc = parse_kv(text)['DOTAUnits']
+    aliases, contracts = [], []
+    for row in archetypes:
+        if row['archetype_id'] not in formal or row.get('enabled') != '1':
+            continue
+        source_name = row.get('unit_name', '')
+        if len(names.get(source_name, [])) != 1:
+            continue  # never guess a shared-name combat contract
+        try:
+            reach = float(row.get('attack_range') or 128)
+            if not math.isfinite(reach) or reach <= 0:
+                continue
+            reach = max(0, math.floor(reach))
+            source = npc[source_name]
+            matches = float(source.get('AttackRange', 'nan')) == reach
+        except (ValueError, KeyError, TypeError):
+            continue
+        if matches:
+            contracts.append((row['archetype_id'], source_name, source_name, reach, False))
+            continue
+        if not re.fullmatch(r'[a-z0-9_]+', row['archetype_id']):
+            raise ValueError('invalid formal alias archetype ID')
+        # Brace-depth scanning preserves nested native locomotion tags exactly.
+        match = re.search(r'"' + re.escape(source_name) + r'"\s*\{', text)
+        if not match:
+            raise ValueError('formal source native body missing: ' + source_name)
+        start, depth, end = match.end() - 1, 0, None
+        for index in range(start, len(text)):
+            if text[index] == '{': depth += 1
+            elif text[index] == '}':
+                depth -= 1
+                if depth == 0:
+                    end = index + 1
+                    break
+        if end is None:
+            raise ValueError('unclosed formal source body: ' + source_name)
+        body, count = re.subn(r'("AttackRange"\s*)"[^"]*"',
+                             lambda m: m[1] + '"' + str(reach) + '"', text[start:end])
+        if count != 1:
+            raise ValueError('nonunique native base range: ' + source_name)
+        alias = 'npc_survival_range_' + row['archetype_id']
+        unmanaged = re.sub(re.escape(RANGE_BEGIN) + r'[\s\S]*?' + re.escape(RANGE_END), '', text)
+        if re.search(r'"' + re.escape(alias) + r'"\s*\{', unmanaged):
+            raise ValueError('formal alias collides with unmanaged unit: ' + alias)
+        parsed = parse_kv('"DOTAUnits" { "' + alias + '" ' + body + ' }')['DOTAUnits'][alias]
+        expected = dict(source, AttackRange=str(reach))
+        if parsed != expected:
+            raise ValueError('alias changed fields beyond AttackRange: ' + alias)
+        aliases.append((row['archetype_id'], source_name, alias, reach,
+                        row['display_name'], body))
+        contracts.append((row['archetype_id'], source_name, alias, reach, True))
+    aliases.sort()
+    def update(path, block, tokens=False):
+        raw = path.read_bytes()
+        value = raw.decode('utf-8-sig')
+        pattern = re.escape(RANGE_BEGIN) + r'[\s\S]*?' + re.escape(RANGE_END)
+        if RANGE_BEGIN in value:
+            value = re.sub(pattern, lambda m: block, value)
+        elif tokens:
+            value = re.sub(r'("Tokens"\s*\{)', lambda m: m[0] + '\n' + block, value, count=1)
+        else:
+            close = value.rfind('}')
+            value = value[:close] + '\n' + block + '\n' + value[close:]
+        data = value.encode('utf-8')
+        if raw.startswith(b'\xef\xbb\xbf'): data = b'\xef\xbb\xbf' + data
+        if data != raw: path.write_bytes(data)
+    block = '\n'.join([RANGE_BEGIN] + [f'    "{alias}"\n    {body}'
+        for _, _, alias, _, _, body in aliases] + [RANGE_END])
+    update(npc_path, block)
+    for relative in ('resource/addon_schinese.txt', 'resource/localization/addon_schinese.txt'):
+        tokens = [f'        "{alias}" {json.dumps(name, ensure_ascii=False)}'
+                  for _, _, alias, _, name, _ in aliases]
+        update(ROOT / relative, '\n'.join([RANGE_BEGIN] + tokens + [RANGE_END]), True)
+    lines = ['-- Generated formal-only native base-range aliases; original CSV names stay authoritative.',
+             f'return {{ schema = "formal_native_range_v1", roster_count = {len(contracts)}, alias_count = {len(aliases)}, by_id = {{']
+    for identity, source_name, alias, reach, is_alias in sorted(contracts):
+        lines.append('    [' + json.dumps(identity) + '] = { source_unit_name = '
+            + json.dumps(source_name) + ', unit_name = ' + json.dumps(alias)
+            + ', attack_range = ' + str(reach) + ', alias = ' + str(is_alias).lower() + ' },')
+    lines.append('} }\n')
+    manifest = ROOT / 'scripts/vscripts/config/generated/wave_native_range_aliases.lua'
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    content = '\n'.join(lines).encode('utf-8')
+    if not manifest.exists() or manifest.read_bytes() != content: manifest.write_bytes(content)
+    print(f'FORMAL_NATIVE_RANGE_ALIASES_SYNCED aliases={len(aliases)} original_names_unchanged=1')
+    return len(aliases)
 
 
 def main():
@@ -135,7 +244,15 @@ def main():
             text = re.sub(r'("Tokens"\s*\{)', lambda m: m[0] + '\n' + block + '\n', text, count=1)
         path.write_text(text, encoding='utf-8')
     print(f'WAVE_NAMES_SYNCED units={len(units)}')
+    sync_native_range_aliases()
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--native-range-aliases-only', action='store_true',
+                        help='Update only additive formal range aliases/manifest/locales; leave original CSV and named KV untouched')
+    options = parser.parse_args()
+    if options.native_range_aliases_only:
+        sync_native_range_aliases()
+    else:
+        main()

@@ -34,7 +34,7 @@ GridNav={
         nav_queries=nav_queries+1
         local area=assert(area_for(p))
         local _,y=relative(p,area)
-        return not area.narrow or math.abs(y)<96
+        return not area.narrow or math.abs(y)<192
     end,
     IsBlocked=function(_,p)
         nav_queries=nav_queries+1
@@ -47,7 +47,7 @@ GridNav={
         local area=assert(area_for(a))
         local x1,y1=relative(a,area)
         local x2,y2=relative(b,area)
-        if area.narrow and (x1*x2<0 or math.abs(y2)>=96) then return -1 end
+        if area.narrow and (x1*x2<0 or math.abs(y2)>=192) then return -1 end
         return distance(a,b)
     end,
 }
@@ -63,17 +63,28 @@ MODIFIER_STATE_ROOTED=4
 MODIFIER_STATE_DISARMED=5
 MODIFIER_STATE_NO_UNIT_COLLISION=6
 MODIFIER_ATTRIBUTE_PERMANENT=7
+DOTA_UNIT_TARGET_TEAM_BOTH=3
+DOTA_UNIT_TARGET_BASIC=1;DOTA_UNIT_TARGET_HERO=2
+DOTA_UNIT_TARGET_FLAG_INVULNERABLE=1;DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES=2
+FIND_ANY_ORDER=0
 package.loaded['core/team_alignment']={
     are_enemies=function() return true end,
     enforce=function() error('unexpected team correction') end,
 }
 EntIndexToHScript=function(index) return entities[index] end
+FindUnitsInRadius=function(_,point,_,radius)
+    assert(radius==512,'settlement must use a bounded local body snapshot')
+    local result={}
+    for _,u in pairs(entities) do
+        if u:IsAlive() and distance(point,u.p)<=radius then result[#result+1]=u end
+    end
+    return result
+end
 ExecuteOrderFromTable=function(order)
     local u=assert(entities[order.UnitIndex])
     u.orders=u.orders+1
-    if order.OrderType==DOTA_UNIT_ORDER_MOVE_TO_POSITION and u.ai:GetStackCount()==3 then
-        assert(u.native_phased,'contact MOVE preceded native phase application')
-    end
+    assert(not u.ai:CheckState()[MODIFIER_STATE_NO_UNIT_COLLISION],
+        'a reserved contact must never phase through a living monster')
     u.order={OrderType=order.OrderType,TargetIndex=order.TargetIndex,
         Position=order.Position and copy(order.Position)}
 end
@@ -111,6 +122,13 @@ local function unit(id,p,radius,area)
     entities[id]=u
     return u
 end
+-- Open areas keep four faces. The narrow fixtures have proven west/east
+-- banks, whose cached direction is exercised separately by navigation tests.
+package.loaded['systems/wall_navigation_service']={contact_face=function(w,u)
+    if u.area.narrow then return u.p.x<w.p.x and 1 or 2 end
+end,contact_layout=function(w)
+    if w.area.narrow then return {gate=true,axis=1,min=w.area.y-192,max=w.area.y+192,center=w.area.y} end
+end}
 local contact=require('systems/wall_melee_contact')
 local ai=require('modifiers/modifier_enemy_wall_ai')
 local function reset()
@@ -134,11 +152,13 @@ local function assert_contact(w,u,plan,face,lateral,label)
     assert(plan and plan.claimed,label..': contact was not admitted')
     local expected=coordinates(face,184,lateral,u.area)
     assert(distance(plan.point,expected)<.01,label..': wrong face or lane')
-    assert(u:GetHullRadius()==24,label..': admitted unit did not receive its navigation hull')
+    assert(u:GetHullRadius()==u.nominal and #u.hull_writes==0,
+        label..': contact admission changed the configured native collision hull')
     assert(u.survival_monster_hull_radius==u.nominal,
         label..': tactical contact must not overwrite nominal collision policy')
 end
-local lanes={-72,-24,24,72}
+local lanes={-132,-44,44,132}
+local narrow_lanes=lanes
 
 -- All faces are occupied concurrently on one wall. A full face must not cap
 -- another face, and vacancies must be consumed by their local waiting front.
@@ -147,7 +167,7 @@ local w,area=wall(1,0,0,false)
 local fronts,waiters={},{}
 for lane,lateral in ipairs(lanes) do
     for face=1,4 do
-        local radius=lane%2==0 and 64 or 32
+        local radius=32
         local u=actor(100+face*10+lane,area,face,400,lateral,radius)
         u.nominal=radius
         local plan=contact.resolve(w,u)
@@ -157,22 +177,23 @@ for lane,lateral in ipairs(lanes) do
     end
 end
 for face=1,4 do
-    local radius=face%2==0 and 64 or 32
+    local radius=32
     local u=actor(200+face,area,face,400,0,radius)
     local plan=assert(contact.resolve(w,u))
     assert(not plan.claimed,'fifth unit on a full face must wait')
     assert(u:GetHullRadius()==radius,'waiting units must retain their real collision hull')
     local x,y=relative(plan.point,area)
     local normal=face<=2 and math.abs(x) or math.abs(y)
-    assert(normal>=184+24+radius+8,'local waiter overlaps the actual front envelope')
+    assert(normal>=184+42+(radius+10)+8,'local waiter overlaps the actual front envelope')
     waiters[face]=u
 end
 local released=fronts[1][2]
 contact.release(w:entindex(),released:entindex())
-assert(released:GetHullRadius()==64,'explicit release must restore a large original hull')
+assert(released:GetHullRadius()==32,'explicit release must preserve the fixed native hull')
+clock=clock+.5 -- New admissions share one bounded path budget per wall/observation.
 waiters[1].nominal=32
 local refill=contact.resolve(w,waiters[1])
-assert_contact(w,waiters[1],refill,1,-24,'same-face explicit-release replacement')
+assert_contact(w,waiters[1],refill,1,-44,'same-face explicit-release replacement')
 waiters[1].p=copy(refill.point)
 for face=2,4 do
     assert(not contact.resolve(w,waiters[face]).claimed,
@@ -182,29 +203,31 @@ local victim=fronts[3][4]
 victim.dead=true
 waiters[3].nominal=32
 refill=contact.resolve(w,waiters[3])
-assert_contact(w,waiters[3],refill,3,72,'same-face dead-owner replacement')
-assert(victim:GetHullRadius()==64,'dead-owner cleanup must release the temporary hull')
+assert_contact(w,waiters[3],refill,3,132,'same-face dead-owner replacement')
+assert(victim:GetHullRadius()==32,'dead-owner cleanup must not rewrite the native hull')
 waiters[3].p=copy(refill.point)
 contact.clear(w:entindex())
 for face=1,4 do
     for _,u in ipairs(fronts[face]) do
         assert(u:GetHullRadius()==u.nominal,'wall clear must restore every remaining owner')
     end
-    assert(waiters[face]:GetHullRadius()==(face%2==0 and 64 or 32),
-        'wall clear must restore admitted replacements and preserve waiting hulls')
+    assert(waiters[face]:GetHullRadius()==32 and #waiters[face].hull_writes==0,
+        'wall clear must preserve admitted and waiting native hulls')
 end
 
--- A real 192-wide terrain corridor admits four bodies of diameter 48.
--- Large model/native bodies must use the same front capacity, then recover
--- their normal hull when leaving the front. Failed reservations also recover.
+-- A real384 stair fits four88-pitch lanes with fixed Hull32 and padding10.
+-- Failed reservations release their key without changing a native body.
 reset()
 w,area=wall(2,0,0,true)
 local narrow_front={}
-for lane,lateral in ipairs(lanes) do
-    local u=actor(300+lane,area,1,400,lateral,64);u.nominal=64
+for lane,lateral in ipairs(narrow_lanes) do
+    local u=actor(300+lane,area,1,400,lateral,32);u.nominal=32
     local plan=contact.resolve(w,u)
-    assert_contact(w,u,plan,1,lateral,'192-wide gate with large native bodies')
-    if lane~=1 then u.p=copy(plan.point) end
+    assert_contact(w,u,plan,1,lateral,'384-wide gate with solid native bodies')
+    if lane~=1 then
+        u.p=copy(plan.point)
+        assert(contact.settle(w,u,plan.point),'stationary narrow-front fixture must actually settle')
+    end
     narrow_front[lane]=u
 end
 for pass=1,7 do
@@ -213,27 +236,30 @@ for pass=1,7 do
     local plan=contact.resolve(w,narrow_front[1])
     if pass==7 then
         assert(not plan.claimed,'a stalled owner must release its unavailable front position')
-        assert(narrow_front[1]:GetHullRadius()==64,'stall release must restore the real hull')
+        assert(narrow_front[1]:GetHullRadius()==32 and #narrow_front[1].hull_writes==0,
+            'stall release must preserve the real hull without a setter')
     end
 end
 contact.reset()
-for _,u in ipairs(narrow_front) do assert(u:GetHullRadius()==64,'reset must restore temporary hulls') end
+for _,u in ipairs(narrow_front) do assert(u:GetHullRadius()==32 and #u.hull_writes==0,
+    'reset must preserve fixed native hulls') end
 
--- While admitted, nominal policy may be changed by the existing collision
--- control. Release restores the latest policy, rather than a stale first hull.
+-- Metadata-only policy changes do not authorize contact code to resize an
+-- actor. The policy controller owns its native setter, including on release.
 reset()
 w,area=wall(3,0,0,false)
-local resized=actor(320,area,1,400,-24,32);resized.nominal=32
-assert_contact(w,resized,contact.resolve(w,resized),1,-24,'external hull-policy change fixture')
+local resized=actor(320,area,1,400,-44,32);resized.nominal=32
+assert_contact(w,resized,contact.resolve(w,resized),1,-44,'external hull-policy change fixture')
 resized.survival_monster_hull_radius=64
 contact.release(w:entindex(),resized:entindex())
-assert(resized:GetHullRadius()==64,'release must honor the most recent nominal hull policy')
+assert(resized:GetHullRadius()==32 and resized.survival_monster_hull_radius==64
+    and #resized.hull_writes==0,'release must leave native resizing to its actual policy owner')
 
--- Small and intentionally zero-sized challenge bodies must never be enlarged
--- to the tactical hull. Their original collision exemption is preserved.
+-- Legacy externally created small bodies are never resized by contact code.
+-- Production wall-spawn policy is separately covered at the fixed Hull32.
 reset()
 w,area=wall(330,0,0,false)
-for lane,radius in ipairs({0,8,16,24}) do
+for lane,radius in ipairs({0,8,16,20}) do
     local u=actor(330+lane,area,1,400,lanes[lane],radius)
     local plan=assert(contact.resolve(w,u))
     assert(plan.claimed,'small native bodies still receive one exclusive slot')
@@ -252,15 +278,16 @@ end
 -- owner release must not remove the replacement wall's new reservation.
 reset()
 local old_wall,old_area=wall(340,0,0,false)
-local old_owner=actor(341,old_area,1,400,-72,64);old_owner.nominal=64
-assert_contact(old_wall,old_owner,contact.resolve(old_wall,old_owner),1,-72,'wall-index reuse old owner')
+local old_owner=actor(341,old_area,1,400,-132,32);old_owner.nominal=32
+assert_contact(old_wall,old_owner,contact.resolve(old_wall,old_owner),1,-132,'wall-index reuse old owner')
 local new_wall,new_area=wall(340,1000,0,false)
-local new_owner=actor(342,new_area,1,400,72,32);new_owner.nominal=32
+local new_owner=actor(342,new_area,1,400,132,32);new_owner.nominal=32
 local new_plan=contact.resolve(new_wall,new_owner)
-assert_contact(new_wall,new_owner,new_plan,1,72,'wall-index reuse replacement owner')
-assert(old_owner:GetHullRadius()==64,'wall-handle replacement must restore valid old owners')
+assert_contact(new_wall,new_owner,new_plan,1,132,'wall-index reuse replacement owner')
+assert(old_owner:GetHullRadius()==32 and #old_owner.hull_writes==0,
+    'wall-handle replacement must preserve valid old owners')
 contact.release(old_wall:entindex(),old_owner:entindex())
-assert(contact.resolve(new_wall,new_owner).point==new_plan.point and new_owner:GetHullRadius()==24,
+assert(contact.resolve(new_wall,new_owner).point==new_plan.point and new_owner:GetHullRadius()==32,
     'a late old-wall owner release removed the replacement wall reservation')
 contact.clear(new_wall:entindex())
 assert(new_owner:GetHullRadius()==32,'replacement wall clear must restore its own owner')
@@ -269,26 +296,26 @@ assert(new_owner:GetHullRadius()==32,'replacement wall clear must restore its ow
 -- retained in the allocator. Cleanup must act on that old handle exactly once.
 reset()
 w,area=wall(350,0,0,false)
-old_owner=actor(351,area,1,400,-72,64);old_owner.nominal=64
-assert_contact(w,old_owner,contact.resolve(w,old_owner),1,-72,'enemy-index reuse old owner')
-new_owner=actor(351,area,1,400,72,32);new_owner.nominal=32
-assert_contact(w,new_owner,contact.resolve(w,new_owner),1,72,'enemy-index reuse replacement owner')
-assert(old_owner:GetHullRadius()==64,'enemy-handle replacement must restore the old valid owner')
+old_owner=actor(351,area,1,400,-132,32);old_owner.nominal=32
+assert_contact(w,old_owner,contact.resolve(w,old_owner),1,-132,'enemy-index reuse old owner')
+new_owner=actor(351,area,1,400,132,32);new_owner.nominal=32
+assert_contact(w,new_owner,contact.resolve(w,new_owner),1,132,'enemy-index reuse replacement owner')
+assert(old_owner:GetHullRadius()==32 and #old_owner.hull_writes==0,
+    'enemy-handle replacement must preserve the old valid owner')
 contact.reset()
 assert(new_owner:GetHullRadius()==32,'reset must restore the reused enemy handle')
 
--- Existing hull controls write the native radius and policy together. While
--- admitted, the next observation retains the same reservation and reapplies
--- the bounded front hull; release then restores the newly configured radius.
+-- An external controller may deliberately resize a body. Observing or clearing
+-- that contact must never shrink it back down to make an attack slot fit.
 reset()
 w,area=wall(360,0,0,false)
-resized=actor(361,area,1,400,-24,32);resized.nominal=32
+resized=actor(361,area,1,400,-44,32);resized.nominal=32
 local resize_plan=contact.resolve(w,resized)
-assert_contact(w,resized,resize_plan,1,-24,'retained native-plus-policy resize fixture')
+assert_contact(w,resized,resize_plan,1,-44,'retained native-plus-policy resize fixture')
 resized:SetHullRadius(64);resized.survival_monster_hull_radius=64;resized.nominal=64
 local retained=contact.resolve(w,resized)
-assert(retained.claimed and retained.point==resize_plan.point and resized:GetHullRadius()==24,
-    'native-plus-policy resize must retain its slot and reapply the tactical hull')
+assert(retained.claimed and retained.point==resize_plan.point and resized:GetHullRadius()==64
+    and #resized.hull_writes==1,'contact observation overwrote an external native resize')
 contact.release(w:entindex(),resized:entindex())
 assert(resized:GetHullRadius()==64,'retained native-plus-policy resize must restore the latest radius')
 
@@ -296,59 +323,64 @@ assert(resized:GetHullRadius()==64,'retained native-plus-policy resize must rest
 -- Its value must survive both immediate release and a retained observation.
 for _,observe_first in ipairs({false,true}) do
     reset();w,area=wall(370,0,0,false)
-    resized=actor(371,area,1,400,24,32);resized.nominal=32
+    resized=actor(371,area,1,400,44,32);resized.nominal=32
     resize_plan=contact.resolve(w,resized)
-    assert_contact(w,resized,resize_plan,1,24,'external native-only resize fixture')
+    assert_contact(w,resized,resize_plan,1,44,'external native-only resize fixture')
     resized:SetHullRadius(48)
     if observe_first then
         for pass=1,3 do
             clock=pass*.5
             retained=contact.resolve(w,resized)
-            assert(retained.claimed and retained.point==resize_plan.point and resized:GetHullRadius()==24,
-                'native-only resize must retain its slot and bounded navigation hull across observations')
+            assert(retained.claimed and retained.point==resize_plan.point and resized:GetHullRadius()==48
+                and #resized.hull_writes==1,
+                'native-only resize must survive every contact observation without a rewrite')
         end
     end
     contact.release(w:entindex(),resized:entindex())
     assert(resized:GetHullRadius()==48,'release overwrote the most recent external native radius')
 end
 
--- Initial and retained writes can fail, or a read-only native setter can
--- accept a call without changing its getter. No failed write may fabricate an
--- admission or consume one of the four slots; subsequent valid owners refill.
+-- Contact admission no longer needs a native hull setter at all. Missing,
+-- read-only, failing or misleading setters cannot prevent a solid Hull32 owner
+-- from taking a legal contact, and none may ever be invoked by this allocator.
 for _,failure in ipairs({'throw','partial_throw','missing','noop'}) do
     reset();w,area=wall(380,0,0,false)
-    local rejected=actor(381,area,1,400,-72,64)
-    if failure=='throw' then rejected.SetHullRadius=function() error('native hull is read-only') end
-    elseif failure=='partial_throw' then
-        rejected.SetHullRadius=function(self,value) self.radius=value;error('native setter failed after applying') end
-    elseif failure=='missing' then rejected.SetHullRadius=nil
-    else rejected.SetHullRadius=function() end end
-    local denied=contact.resolve(w,rejected)
-    assert(denied and not denied.claimed and rejected:GetHullRadius()==64,
-        failure..': failed native hull write must not fake a new claimed contact')
+    local writes=0
     for lane,lateral in ipairs(lanes) do
-        local admitted=actor(381+lane,area,1,400,lateral,64);admitted.nominal=64
+        local admitted=actor(381+lane,area,1,400,lateral,32);admitted.nominal=32
+        if failure=='missing' then admitted.SetHullRadius=nil
+        else admitted.SetHullRadius=function(self,value)
+            writes=writes+1
+            if failure=='partial_throw' then self.radius=value end
+            if failure~='noop' then error('native hull setter must not be called') end
+        end end
         assert_contact(w,admitted,contact.resolve(w,admitted),1,lateral,
-            failure..': valid owner after failed native hull write')
+            failure..': legal owner with unavailable native hull setter')
+        local point=contact.resolve(w,admitted).point
+        admitted.p=copy(point)
+        assert(contact.settle(w,admitted,point))
     end
+    contact.reset()
+    assert(writes==0,failure..': admission/cleanup attempted a native hull write')
 end
 for _,failure in ipairs({'throw','partial_throw','noop'}) do
     reset();w,area=wall(390,0,0,false)
-    local rejected=actor(391,area,1,400,-72,64);rejected.nominal=64
-    assert_contact(w,rejected,contact.resolve(w,rejected),1,-72,'retained hull-write failure fixture')
-    rejected:SetHullRadius(64)
-    if failure=='throw' then rejected.SetHullRadius=function() error('native hull became read-only') end
-    elseif failure=='partial_throw' then
-        rejected.SetHullRadius=function(self,value) self.radius=value;error('native setter failed after applying') end
-    else rejected.SetHullRadius=function() end end
-    local denied=contact.resolve(w,rejected)
-    assert(denied and not denied.claimed and rejected:GetHullRadius()==64,
-        failure..': failed retained hull write must release the obsolete reservation')
-    for lane,lateral in ipairs(lanes) do
-        local admitted=actor(391+lane,area,1,400,lateral,64);admitted.nominal=64
-        assert_contact(w,admitted,contact.resolve(w,admitted),1,lateral,
-            failure..': valid owner after failed retained hull write')
+    local admitted=actor(391,area,1,400,-132,32);admitted.nominal=32
+    local original=contact.resolve(w,admitted)
+    assert_contact(w,admitted,original,1,-132,'retained read-only hull fixture')
+    admitted.p=copy(original.point);assert(contact.settle(w,admitted,original.point))
+    local writes=0
+    admitted.SetHullRadius=function(self,value)
+        writes=writes+1
+        if failure=='partial_throw' then self.radius=value end
+        if failure~='noop' then error('retained native hull setter must not be called') end
     end
+    clock=.5
+    local retained=contact.resolve(w,admitted)
+    assert(retained.claimed and retained.point==original.point and admitted.radius==32,
+        failure..': retaining a solid body must not depend on native setter availability')
+    contact.release(w:entindex(),admitted:entindex())
+    assert(writes==0,failure..': retention/release attempted a native hull write')
 end
 
 local function controller(u,target)
@@ -380,7 +412,7 @@ local function move(u,goal,dt)
     local next_p=Vector(u.p.x+(goal.x-u.p.x)*step/remaining,
         u.p.y+(goal.y-u.p.y)*step/remaining,384)
     local x,y=relative(next_p,u.area)
-    if u.area.narrow and (math.abs(y)>96-u.radius or x>-128-u.radius) then return end
+    if u.area.narrow and (math.abs(y)>192-u.radius or x>-128-u.radius) then return end
     if not u.area.narrow then
         local dx=x-math.max(-128,math.min(128,x))
         local dy=y-math.max(-128,math.min(128,y))
@@ -389,7 +421,7 @@ local function move(u,goal,dt)
     if not u.native_phased then
         for _,other in ipairs(monsters) do
             if other~=u and other:IsAlive() and not other.native_phased
-                and distance(next_p,other.p)<u.radius+other.radius-.01 then return end
+                and distance(next_p,other.p)<u:GetPaddedCollisionRadius()+other:GetPaddedCollisionRadius()-.01 then return end
         end
     end
     u.p=next_p
@@ -453,8 +485,8 @@ reset()
 w,area=wall(350,0,0,false)
 for face=1,4 do
     for lane,lateral in ipairs(lanes) do
-        local u=actor(350+face*10+lane,area,face,400,lateral,64)
-        u.nominal=64
+        local u=actor(350+face*10+lane,area,face,400,lateral,32)
+        u.nominal=32
         u.survival_is_wave_monster=true
         u.survival_wave_movement_type='flying'
         u.survival_navigation_type='ground'
@@ -467,7 +499,8 @@ local simultaneous=attacking(w)
 assert(#simultaneous==16,'flying melee owners must actually attack concurrently on all four faces')
 local face_counts={0,0,0,0}
 for _,u in ipairs(simultaneous) do
-    assert(u.hits>0 and u:GetHullRadius()==24,'a concurrent front owner did not land its native attacks')
+    assert(u.hits>0 and u:GetHullRadius()==32 and #u.hull_writes==0,
+        'a concurrent front owner did not land attacks with its unchanged native body')
     assert(u.ai.contact_range_property_enabled and u.ai:GetModifierAttackRangeBonus()>0,
         'flying melee contact requires the native contact-range property and bonus')
     face_counts[u.face]=face_counts[u.face]+1
@@ -478,10 +511,11 @@ run(5)
 assert(total('orders')==simultaneous_orders and total('corrections')==simultaneous_positions
     and paths==simultaneous_paths,'stable sixteen-front attacks restarted movement, positioning or paths')
 for _,m in ipairs(controllers) do m:SetWallEntIndex(-1);m:OnDestroy() end
-for _,u in ipairs(monsters) do assert(u:GetHullRadius()==64,'all-face AI cleanup failed to restore native hulls') end
+for _,u in ipairs(monsters) do assert(u:GetHullRadius()==32 and #u.hull_writes==0
+    and u.corrections==0,'all-face AI cleanup changed a fixed body or wrote coordinates') end
 
--- Four players each have ninety enemies on a narrow approach. Model scale
--- and original native hull do not reduce their four actual attacking contacts.
+-- Four players each have ninety enemies on a384 approach. Every unit retains
+-- a real Hull32 body, both at the attack front and while waiting behind it.
 -- Rear bodies keep physical collision; no actor is placed at its claim here.
 reset()
 local player_walls={}
@@ -489,10 +523,10 @@ for player=0,3 do
     local target,player_area=wall(400+player,player*5000,0,true)
     player_walls[#player_walls+1]=target
     for index=1,90 do
-        local row=math.floor((index-1)/3)
-        local lateral=({-64,0,64})[(index-1)%3+1]
-        local normal=index<=4 and 288+(index-1)*16 or 420+row*64
-        local radius=index<=4 and (index%2==0 and 64 or 32) or 32
+        local row=math.floor((index-1)/4)
+        local lateral=lanes[(index-1)%4+1]
+        local normal=400+row*88
+        local radius=32
         local u=actor(1000+player*100+index,player_area,1,normal,lateral,radius)
         u.nominal=radius
         -- Formal and endless owners use the same real allocator and AI.
@@ -504,16 +538,16 @@ run(9)
 local initial={}
 for _,target in ipairs(player_walls) do
     local front=attacking(target)
-    assert(#front==4,'each player must have four actually attacking contacts in the 192-wide gate')
+    assert(#front==4,'each player must have four actually attacking contacts in the384 stair')
     local occupied={}
     for _,u in ipairs(front) do
         local x,y=relative(u.p,u.area)
-        assert(math.abs(x+184)<.01 and (y==-72 or y==-24 or y==24 or y==72),
-            'native crowd did not align all four front lanes')
+        assert(x<=-184 and x>=-220 and (y==-132 or y==-44 or y==44 or y==132),
+            'native MOVE acceptance must reach each lane without snapping coordinates')
         assert(not occupied[y],'native crowd put two owners in the same lane')
         occupied[y]=true
-        assert(u.hits>0 and u:GetHullRadius()==24 and u.native_phased,
-            'front owner must land attacks with its bounded navigation hull')
+        assert(u.hits>0 and u:GetHullRadius()==32 and not u.native_phased and #u.hull_writes==0,
+            'front owner must keep its full native body while landing attacks')
         initial[u:entindex()]=true
     end
 end
@@ -529,13 +563,20 @@ run(10)
 assert(total('orders')==orders_before,'stable crowd reissued native orders')
 assert(total('corrections')==positions_before,'stable crowd kept writing front coordinates')
 assert(paths==paths_before,'stable full fronts repeated path queries')
-assert(nav_queries-nav_before<2000,'navigation work grew with all 360 waiting/attacking units')
+-- Each wall has four front owners. Every two-second cache window costs at
+-- most one five-point hull check per owner plus two waiter variants per lane;
+-- IsTraversable/IsBlocked each contribute one query per sample. Rear count
+-- does not multiply this bound, even with ninety enemies behind each wall.
+local nav_budget=4*4*math.ceil(10/2)*5*2*(1+2)
+assert(nav_queries-nav_before<=nav_budget,'navigation work exceeded the fixed front/cache budget: '
+    ..(nav_queries-nav_before)..' > '..nav_budget)
 for _,target in ipairs(player_walls) do
     local front=attacking(target)
     assert(#front==4,'stable four-player fronts lost an attacking contact')
     local victim=front[2]
     victim.dead=true;victim.ai:OnDeath({unit=victim})
-    assert(victim:GetHullRadius()==victim.nominal,'death callback must restore the original hull')
+    assert(victim:GetHullRadius()==victim.nominal and #victim.hull_writes==0,
+        'death callback must preserve the original hull without a setter')
 end
 run(6)
 local replacements=0
@@ -553,6 +594,8 @@ end
 for _,m in ipairs(controllers) do m:SetWallEntIndex(-1);m:OnDestroy() end
 for _,u in ipairs(monsters) do
     assert(u:GetHullRadius()==u.nominal,'retarget/destroy must restore each original hull')
+    assert(#u.hull_writes==0 and u.corrections==0,
+        'retarget/destroy must never resize or reposition a native crowd body')
     assert(not u.ai.contact_locked and u.force==nil,'retarget/destroy must release native contact state')
 end
 print('WALL_FOUR_FACES_PASS concurrent_contacts=16 players=4 crowd_units=360 local_death_replacements='..replacements

@@ -18,7 +18,7 @@ root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;
 // Retain the production controller's existing inline-info feature detection,
 // and reject any accidental use of the old shared navigation shell.
 config.SurvivalMenuV10={Adopt(){throw new Error('independent lottery must not adopt shared menus')}};
-for(const name of ['common/tooltip_dismiss','native_ui_icons','item_art_remaining_5d5c1152eb'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
+for(const name of ['common/item_resources','reward_presentation','common/tooltip_dismiss','native_ui_icons','item_art_remaining_5d5c1152eb'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','utf8'),env);
 const current=config.SurvivalLottery;
 const originalDialog=config.RemainingHandoff.LotteryDialog,originalReward=config.RemainingHandoff.RewardCard;
@@ -32,12 +32,12 @@ const source=fs.readFileSync('panorama/src/scripts/custom_game/lottery_gw2.js','
 vm.runInNewContext(source,env);
 let presentation=config.SurvivalPurpleLottery;
 const realReward={id:'lottery_hippogryph_onslaught',item_id:'lottery_hippogryph_onslaught',name:'角鹰魔攻',description:'英雄初始攻击+10',quality:'ssr',icon:'item_greater_crit',count:1};
-const realArt=config.SurvivalItemArt.Lookup(realReward);assert(realArt&&realArt.icon_path.startsWith('custom_game/reward_art_v5/'));
-const outside=config.SurvivalRewardPresentation.CreateIcon(root,realReward,'OtherWindowIcon');assert.equal(outside.image,'file://{images}/items/greater_crit.png','other menus retain the exact original factory');
-const oldTipIcon=config.SurvivalRewardPresentation.CreateIcon(nodes.LotteryTooltipIconHost,realReward,'LotteryRewardIcon');assert.equal(oldTipIcon.image,'file://{images}/items/greater_crit.png','an old external tooltip anchor is outside the exact lottery window subtree');
+const realArt=config.SurvivalItemArt.Lookup(realReward);assert(realArt&&realArt.runtime_uri.includes('custom_game/reward_art_v5/'));
+const outside=config.SurvivalRewardPresentation.CreateIcon(root,realReward,'OtherWindowIcon');assert.equal(outside.image,realArt.runtime_uri,'every menu uses the same item resource');
+const oldTipIcon=config.SurvivalRewardPresentation.CreateIcon(nodes.LotteryTooltipIconHost,realReward,'LotteryRewardIcon');assert.equal(oldTipIcon.image,realArt.runtime_uri,'an external tooltip also shares the canonical item icon');
 const inside=config.SurvivalRewardPresentation.CreateIcon(nodes.LotteryInfoList,realReward,'LotteryRewardIcon');assert.equal(inside.image,realArt.runtime_uri,'lottery uses the existing named reward art');
-const unknown=config.SurvivalRewardPresentation.CreateIcon(nodes.LotteryInfoList,{id:'not_a_known_reward',icon:'item_blink'},'LotteryRewardIcon');assert.equal(unknown.image,'file://{images}/items/blink.png','unknown mapping retains the original fallback');
-const notLottery=config.SurvivalRewardPresentation.CreateIcon(nodes.LotteryInfoList,{id:'shadow_01',icon:'item_branches'},'LotteryRewardIcon');assert.equal(notLottery.image,'file://{images}/items/branches.png','unrelated catalog categories cannot opt into lottery overrides');
+const unknown=config.SurvivalRewardPresentation.CreateIcon(nodes.LotteryInfoList,{id:'not_a_known_reward',icon:'item_blink'},'LotteryRewardIcon');assert.equal(unknown.type,'DOTAItemImage','unknown mapping retains the native item control');assert.equal(unknown.itemname,'item_blink');
+const notLottery=config.SurvivalRewardPresentation.CreateIcon(nodes.LotteryInfoList,{id:'shadow_01',icon:'item_branches'},'LotteryRewardIcon');assert.equal(notLottery.image,config.SurvivalItemResources.Resolve('shadow_01'),'a known shadow item retains its canonical resource in every UI');
 nodes.LotteryInfoList.RemoveAndDeleteChildren();
 assert.equal(nodes.LotteryMainCanvas.style.width,'1536px');assert.equal(nodes.LotteryMainCanvas.style.height,'864px');
 assert.equal(nodes.LotteryMainCanvas.style.transformOrigin,'50% 50%');
@@ -49,9 +49,10 @@ assert.equal(nodes.LotteryCelestialHeader.style.visibility,'collapse');assert.eq
 assert.strictEqual(nodes.LotterySingleButton,nativeSingle);assert.strictEqual(nativeSingle.events.onactivate,singleEvent);assert.strictEqual(nativeTen.events.onactivate,tenEvent);
 assert.equal(config.SurvivalUILayers.Top(),null,'presentation registration does not open a modal');
 current.Open();assert(presentation.Inspect().open);assert.equal(config.SurvivalUILayers.Top(),'lottery');
-function data(pool='map',tickets=20){const d=snapshot(pool,tickets);d.pools=['map','cultivation','dragon_knight','summer'].map(id=>({id,display_name:id,ticket_name:id==='map'||id==='cultivation'?'普通抽奖券':'金色抽奖券'}));d.items=Array.from({length:17},(_,i)=>({id:'r'+i,name:'正式奖励'+i,quality:i%2?'sr':'n',icon:'item_blink',description:'效果'+i,owned_count:i===0?undefined:i===1?0:2,max_owned:i===2?5:undefined}));return d;}
+function data(pool='map',tickets=20){const d=snapshot(pool,tickets);d.shop_points=825;d.pools=['map','cultivation','dragon_knight','summer'].map(id=>({id,display_name:id,ticket_name:id==='map'||id==='cultivation'?'普通抽奖券':'金色抽奖券'}));d.items=Array.from({length:17},(_,i)=>({id:'r'+i,name:'正式奖励'+i,quality:i%2?'sr':'n',icon:'item_blink',description:'效果'+i,owned_count:i===0?undefined:i===1?0:2,max_owned:i===2?5:undefined}));return d;}
 events.ui_lottery_snapshot(data());
-assert.equal(nodes.LotteryGW2Title.text,'抽奖');assert(nodes.LotteryGW2TicketBalance.text.includes('20'));assert(nodes.LotteryGW2Points.text.includes('10'));
+assert.equal(nodes.LotteryGW2Title.text,'抽奖');assert(nodes.LotteryGW2TicketBalance.text.includes('20'));assert.equal(nodes.LotteryGW2Points.text,'商城积分  825');assert.equal(nodes.LotteryGW2StarjoyPoints.text,'星悦积分  10');
+const absent=data();delete absent.shop_points;events.ui_lottery_snapshot(absent);assert.equal(nodes.LotteryGW2Points.text,'商城积分  —');events.ui_lottery_snapshot({...data(),shop_points:0});assert.equal(nodes.LotteryGW2Points.text,'商城积分  0');events.ui_lottery_snapshot(data());
 assert.equal(presentation.Inspect().pools,4);assert.equal(nodes.LotteryGW2Sidebar.children.length,4);
 assert.equal(nodes.LotteryGW2PreviewItems.children.length,4);assert.equal(nodes.LotterySceneBackground.style.opacity,'1','retain the existing pool illustration');
 const otherModal=new Panel('Panel',root,'UnrelatedModal');config.SurvivalUILayers.Open('unrelated_modal',otherModal,()=>{});
@@ -71,6 +72,25 @@ presentation.Fit();const steady=presentation.Inspect();
 for(let i=0;i<30;i++){current.Feature('details');presentation.Fit();assert(presentation.Inspect().trackedOwned<=steady.trackedOwned,'deleted reward visuals cannot accumulate');assert(presentation.Inspect().trackedMoved<=steady.trackedMoved,'deleted native icons cannot accumulate');}
 const first=nodes.LotteryInfoList.children.find(c=>c.BHasClass('LotteryDetailRow')),before=requests.length;first.events.onmouseover();assert.equal(requests.length,before,'hover is read-only');
 assert(nodes.LotteryGW2Tooltip.visible);assert(nodes.LotteryGW2TooltipDescription.text.includes('效果'));nodes.LotteryGW2Tooltip.events.onmouseover();assert(!nodes.LotteryGW2Tooltip.visible,'Entering the tooltip dismisses it immediately');first.events.onmouseover();assert(!nodes.LotteryGW2Tooltip.visible,'The dismissed source cannot immediately reopen its tooltip');assert(nodes.LotteryItemTooltip.BHasClass('Hidden'),'A consumed tooltip request cannot fall through to the old XML tooltip');first.events.onmouseout();assert(!nodes.LotteryGW2Tooltip.visible);
+let tooltipCursor=[1800,1000];env.GameUI.GetCursorPosition=()=>tooltipCursor;
+const scrollTip=nodes.LotteryGW2Tooltip,scrollDescription=nodes.LotteryGW2TooltipDescription,scrollViewport=nodes.LotteryGW2TooltipScroll;
+Object.defineProperty(scrollDescription,'actuallayoutheight',{get(){return Math.max(24,Math.ceil(String(this.text||'').length/17)*23);}});
+Object.defineProperty(scrollViewport,'actuallayoutheight',{get(){return parseFloat(this.style.height)||0;}});
+Object.defineProperty(scrollTip,'actuallayoutwidth',{get(){return parseFloat(this.style.width)||366;}});
+Object.defineProperty(scrollTip,'actuallayoutheight',{get(){return parseFloat(this.style.height)||0;}});
+const longReward={id:'long-tooltip-readonly',name:'完整奖励',description:'完整的长奖励说明'.repeat(150)};
+presentation.Tooltip(longReward,first);assert(scrollDescription.actuallayoutheight>scrollViewport.actuallayoutheight);
+const longTipIcon=nodes.LotteryGW2TooltipIconStage.children[0],longAt=scrollTip.GetPositionWithinWindow(),longRequests=requests.length;
+first.events.onmouseout();assert(scrollTip.visible,'The controller source leave delegates a grace period for long tooltips');
+tooltipCursor=[longAt.x+30,longAt.y+130];scrollTip.events.onmouseover();advance(.2);
+assert(scrollTip.visible,'Entering the scroll surface cancels source leave and survives shared geometry checks');
+assert.strictEqual(nodes.LotteryGW2TooltipIconStage.children[0],longTipIcon,'Scrolling reuses the existing tooltip content and icon');
+scrollTip.events.onmouseout();advance(.2);assert(scrollTip.visible,'Child leave events cannot hide while still in the long tooltip');
+tooltipCursor=[1800,1000];scrollTip.events.onmouseout();advance(.2);assert(!scrollTip.visible,'Leaving the source and scroll surface hides after grace');
+presentation.Tooltip(longReward,first);first.events.onmouseout();first.events.onmouseover();advance(.2);assert(scrollTip.visible,'A new source hover invalidates a previous long-tooltip leave callback');
+assert(!requests.slice(longRequests).some(r=>/draw|purchase|checkout|claim/.test(r.n)),'Long-tooltip input cannot submit a transactional request');
+scrollTip.events.onmouseover();assert(!scrollTip.visible,'Returning to short content retains immediate passive surface dismissal');
+delete env.GameUI.GetCursorPosition;
 const retiredModal=config.SurvivalUI.ModalManager.Get('lottery_info');assert(!retiredModal||!retiredModal.IsOpen(),'no second details modal');
 const mainTitle=nodes.LotteryTitle.text,mainTickets=nodes.LotteryGW2TicketBalance.text;
 nodes.LotteryGW2Pool_summer.events.onactivate();
@@ -106,6 +126,35 @@ assert.strictEqual(config.RemainingHandoff.LotteryDialog,originalDialog);assert.
 assert.strictEqual(config.SurvivalRewardPresentation.CreateIcon,originalIcon,'dispose restores the icon factory rather than nesting wrappers');
 assert.strictEqual(nativeSingle.events.onactivate,singleEvent);assert.strictEqual(nativeTen.events.onactivate,tenEvent);
 vm.runInNewContext(source,env);presentation=config.SurvivalPurpleLottery;current.Open();events.ui_lottery_snapshot(data());current.Feature('details');assert.equal(nodes.LotteryInfoList.children.length,17,'presentation reload still uses authoritative controller');current.CloseInfo();current.Close();presentation.Dispose();
+// Source 2 retains CustomUIConfig while replacing layout children. The XML loads
+// the controller before the presentation, so that old presentation is observable
+// while the next controller runs its initial close/update calls.
+function loadPresentation(){const before=new Set(root.Children());vm.runInNewContext(source,env);const marker=root.Children().find(n=>!before.has(n));assert(marker,'production renderer owns a layout lifetime marker');return {api:config.SurvivalPurpleLottery,marker};}
+function verifyReopenedController(previous){
+ const replacement=config.SurvivalLottery;
+ assert.notStrictEqual(replacement,previous,'controller initialization replaces the disposed API');
+ assert(replacement.IsAlive());assert(!previous.IsAlive());
+ const renderer=loadPresentation();const before=requests.length;
+ replacement.Open();assert(requests.slice(before).some(r=>r.n==='ui_lottery_snapshot_request'),'a real entry click requests the uncached snapshot');
+ assert(nodes.LotteryWindow.BHasClass('LotteryOpen'));assert(!nodes.LotteryWindow.BHasClass('LotteryClosed'));assert.equal(config.SurvivalUILayers.Top(),'lottery');
+ events.ui_lottery_snapshot(data());assert(renderer.api.Inspect().open);assert(nodes.LotteryGW2Root.visible);
+ replacement.Feature('details');assert.equal(nodes.LotteryInfoList.children.length,17);assert.equal(nodes.LotteryGW2Title.text,'奖池详情');assert.equal(config.SurvivalUILayers.Top(),'lottery_info');
+ replacement.CloseInfo();replacement.Close();assert(!renderer.api.Inspect().open);assert(nodes.LotteryWindow.BHasClass('LotteryClosed'));assert.equal(config.SurvivalUILayers.Top(),null);
+ return {controller:replacement,renderer};
+}
+const staleProduction=loadPresentation();current.Dispose();staleProduction.marker.deleted=true;
+assert(!staleProduction.api.IsAlive(),'the prior layout is dead while its API remains in CustomUIConfig');
+assert.doesNotThrow(()=>vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','utf8'),env),'controller-first reload must survive the dead production presentation');
+const renewed=verifyReopenedController(current);
+// A client may still execute the previous, unfixed compiled renderer. Fail at
+// that dependency boundary if initialization calls any rendering method before
+// disposing it; no renderer implementation is duplicated in this fixture.
+renewed.renderer.marker.deleted=true;let legacyDisposed=false;
+const legacyApi={};for(const key of Object.keys(renewed.renderer.api))if(typeof renewed.renderer.api[key]==='function')legacyApi[key]=function(){assert(legacyDisposed,'dead legacy presentation must be disposed before rendering: '+key);};
+legacyApi.IsAlive=()=>false;legacyApi.Dispose=function(){legacyDisposed=true;renewed.renderer.api.Dispose();};config.SurvivalPurpleLottery=legacyApi;
+assert.doesNotThrow(()=>vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','utf8'),env),'controller upgrade releases the previous compiled presentation before closing the old controller');
+assert(legacyDisposed);const upgraded=verifyReopenedController(renewed.controller);upgraded.controller.Dispose();upgraded.renderer.api.Dispose();
+console.log('LOTTERY_LAYOUT_RELOAD_PASS: dead production lifetime, controller-first XML order, disposed API replacement, fresh snapshot request, real shell/details/close and previous compiled renderer transition');
 console.log('LOTTERY_GW2_PASS: independent shell, native controls, four authoritative pools, scoped actual art/fallback/details, zero/unknown counts, ten results, pending/foreign-modal guards, 30 rebuilds without stale refs, five fits, 12 opens, restored parents/factories and renderer reload');
 `;
 vm.runInNewContext(loader+'suite+='+JSON.stringify(setup)+';vm.runInNewContext(suite,{require:require("node:module").createRequire(require("path").resolve("tools/test_lottery_ui.js")),console});',{require:require('node:module').createRequire(path.resolve('tools/tests/lottery_gw2.test.cjs')),console});

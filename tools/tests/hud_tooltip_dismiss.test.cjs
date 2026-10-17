@@ -28,10 +28,12 @@ function harness(){
  const api=h.cfg.SurvivalShopTooltip,tip=h.nodes.ShopEntryTooltip,card=h.make('card'),entry={entry_id:'local_sample',name:'样例商品',purchasable:1};
  card.position={x:100,y:500};tip.position={x:90,y:480};tip.actuallayoutwidth=350;tip.actuallayoutheight=240;
  h.setCursor([110,510]);api.Show(entry,card,true);assert(api.Inspect().pinned);
- const stalePurchase=h.nodes.ShopTooltipPurchase.events.onactivate;
+ assert.equal(h.nodes.ShopTooltipPurchase,undefined,'Shop tooltip has no purchase control');
+ assert.equal(h.nodes.ShopTooltipAutoPurchase,undefined,'Shop tooltip has no automatic-purchase control');
+ assert.equal(api.Inspect().actions,false,'Shop tooltip is informational');
  tip.events.onmouseover();assert(tip.BHasClass('Hidden'),'Pinned tooltip dismisses immediately');
  assert.equal(api.Inspect().entry,null);assert.equal(api.Inspect().pinned,false);
- stalePurchase();assert.equal(purchases,0,'Dismissed purchase callback cannot transact');
+ api.UpdateAutoPurchaseState();assert.equal(purchases,0,'Dismissed informational tooltip cannot transact');
  api.Show(entry,card);api.UpdateEntry(entry);h.advance(.5);
  assert(tip.BHasClass('Hidden'),'Hover and authoritative entry updates cannot revive a dismissed tooltip');
  h.setCursor([1800,900]);h.advance(.04);tip.position={x:300,y:100};h.setCursor([110,510]);api.Show(entry,card);
@@ -62,4 +64,4 @@ function harness(){
  tip.__survivalTooltipOwner='full_takeover';tip.events.onmouseover();assert(tip.BHasClass('Hidden'));
  assert.equal(h.requests.length,0);
 }
-console.log('HUD_TOOLTIP_DISMISS_PASS: pinned shop and full takeover, immediate dismissal, blocked hover/refresh, physical exit, stale purchase, reload and foreign-owner protection');
+console.log('HUD_TOOLTIP_DISMISS_PASS: informational pinned shop and full takeover, immediate dismissal, blocked hover/refresh, physical exit, reload and foreign-owner protection');

@@ -217,6 +217,9 @@ local function destroy_session_monsters(session)
     for entindex, unit in pairs(all_monsters) do
         monster_meta[entindex] = nil
         if valid(unit) then
+            -- Native modifier destruction can run while UTIL_Remove still
+            -- reports an alive parent. Never resume a staged-bar experiment.
+            unit.survival_challenge_teardown = true
             monster_visual.clear(unit)
             monster_hero_visual_service.clear(unit)
         end
@@ -375,6 +378,8 @@ local function spawn_member(session, member)
     end
     monster_navigation.apply(unit)
     if session.challenge.challenge_id == "challenge_11" then
+        unit.survival_challenge_11_staged = true
+        unit.survival_challenge_11_staged_owner = session.player_id
         unit:AddNewModifier(unit, nil, challenge_11_staging, {})
     end
     if collision_profile.apply_before_placement then
@@ -463,6 +468,7 @@ end
 
 local function release_challenge_11_unit(unit)
     if not valid(unit) then return end
+    unit.survival_challenge_11_staged = nil
     unit:RemoveModifierByName(challenge_11_staging)
     local ai = unit.FindModifierByName and unit:FindModifierByName("modifier_practice_monster_ai")
     if ai and not ai:IsNull() and type(ai.Resume) == "function" then

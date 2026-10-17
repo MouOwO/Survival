@@ -1137,6 +1137,8 @@
         var tooltip = byId("CustomAbilityTooltip");
         var fields = byId("CustomAbilityFields");
         if (!tooltip || !fields) return;
+        var archiveChallengeMode = Number(runtime.archive_challenge) === 1
+            || /^ability_archive_/.test(entry.name);
         var previousOwner = String(tooltip.__survivalTooltipOwner || "none");
         tooltip.__survivalTooltipOwner = takeoverTooltipOwner;
         tooltip.__survivalTakeoverForeignOwnerDiagnostic = "";
@@ -1147,14 +1149,15 @@
         var behavior = 0;
         try { behavior = Number(Abilities.GetBehavior(entry.ability) || 0); } catch (error) {}
         if (isPassiveAbility(entry.ability, runtime, behavior)) behavior |= 2;
-        setText("CustomAbilityExtensionLabel", "生存防守 · 自定义技能详情");
+        tooltip.SetHasClass("ArchiveChallenge", archiveChallengeMode);
+        setText("CustomAbilityExtensionLabel", archiveChallengeMode ? "" : "生存防守 · 自定义技能详情");
         setText("CustomAbilityTitle", runtime.display_name || tooltipDefinition.name
             || definition.abilityname || localizedName(entry.name));
         var buildMode = /^ability_build_/.test(entry.name);
         tooltip.SetHasClass("BuildAbility", buildMode);
         var currentLevel = runtime.current_level;
         if (currentLevel === undefined) currentLevel = abilityLevel(entry.ability);
-        setText("CustomAbilityLevel", !buildMode && Number(currentLevel || 0) > 0
+        setText("CustomAbilityLevel", !buildMode && !archiveChallengeMode && Number(currentLevel || 0) > 0
             ? "【等级】 " + String(currentLevel) : "");
         var description = runtime.upgrade_description || tooltipDefinition.desc
             || definition.abilitydesc || localizedDescription(entry.name)
@@ -1170,22 +1173,24 @@
         setText("CustomAbilityGoldCost", goldCost);
         setText("CustomAbilityWoodCost", woodCost);
         fields.RemoveAndDeleteChildren();
-        addField(fields, "施法类型", behaviorText(behavior));
+        if (!archiveChallengeMode) addField(fields, "施法类型", behaviorText(behavior));
         var mana = manaCost(entry.ability);
         if (mana > 0) addField(fields, "魔法消耗", Math.round(mana));
         var cooldown = cooldownLength(entry.ability);
         if (cooldown > 0) addField(fields, "冷却时间", cooldown + " 秒");
         asArray(runtime.fields).forEach(function (field) {
-            if (field) addField(fields, field.label, field.value);
+            if (field && !(archiveChallengeMode && field.label === "解锁条件")) addField(fields, field.label, field.value);
         });
         var unavailable = runtime.removed === 1 || (runtime.prerequisite_met !== undefined
             ? Number(runtime.prerequisite_met) === 0 : runtime.available === 0);
         var lacksResources = !unavailable && runtime.resource_check_on_cast !== 1 && runtime.can_afford === 0;
         var passive = (behavior & 2) !== 0;
-        setText("CustomAbilityType", unavailable ? "不可施法技能"
+        setText("CustomAbilityType", archiveChallengeMode ? "" : unavailable ? "不可施法技能"
             : (passive ? "被动技能"
                 : (lacksResources ? "可点击技能（资源不足）" : behaviorText(behavior))));
-        setText("CustomAbilityStatus", runtime.status_text
+        setText("CustomAbilityStatus", archiveChallengeMode
+            ? (unavailable ? runtime.status_text || "前置条件未满足" : "")
+            : runtime.status_text
             || (unavailable ? "不可施法 · 前置条件未满足"
                 : (passive ? "被动生效"
                     : (lacksResources ? "当前资源不足 · 由服务器最终校验" : "可施法"))));

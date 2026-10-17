@@ -43,6 +43,7 @@ M.rows = {
     { modifier_key = "tower_frost_crystal_maiden_winter_raven:ti8", asset_id = "tower_frost_crystal_maiden_winter_raven", modifier_name = "ti8", sort_order = 1, enabled = true, notes = "所选饰品原生活动修饰" },
     { modifier_key = "tower_frost_ancient_apparition:ti8", asset_id = "tower_frost_ancient_apparition", modifier_name = "ti8", sort_order = 1, enabled = true, notes = "所选饰品原生活动修饰" },
     { modifier_key = "tower_anti_air_skywrath_empyrean:techies_arcana", asset_id = "tower_anti_air_skywrath_empyrean", modifier_name = "techies_arcana", sort_order = 3, enabled = true, notes = "所选饰品原生活动修饰" },
+    { modifier_key = "monster_archive_social_wife:arcana", asset_id = "monster_archive_social_wife", modifier_name = "arcana", sort_order = 1, enabled = true, notes = "金鹏之幸捆绑包官方动作修饰" },
 }
 M.by_id = {}
 for _, row in ipairs(M.rows) do

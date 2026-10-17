@@ -104,7 +104,9 @@ local challenge=monster(2,{survival_is_challenge_monster=true})
 local boss=monster(3,{survival_is_wave_monster=true,survival_is_boss=true})
 local friend=monster(4,{survival_is_wave_monster=true,team=2})
 local unrelated=monster(5)
-Entities={FindAllByClassname=function() return {wave,challenge,boss,friend,unrelated} end}
+local elite=monster(6,{survival_is_wave_monster=true,survival_is_boss=false,survival_monster_role="wave_leader"})
+local role_boss=monster(7,{survival_is_wave_monster=true,survival_monster_role="assault_boss"})
+Entities={FindAllByClassname=function() return {wave,challenge,boss,friend,unrelated,elite,role_boss} end}
 require("items/item_survival_rogue_actions")
 reset();assert(grant("grant_nuclear_bomb_action"))
 local bomb=items[1]
@@ -112,7 +114,8 @@ setmetatable(bomb,{__index=item_survival_rogue_nuclear_bomb})
 function bomb:IsNull() return false end
 bomb:OnSpellStart();assert(scheduled and #killed==0 and #removed==0)
 assert(scheduled()==0.05 and #killed==1)
-assert(scheduled()==false and #killed==2 and #removed==1)
-assert(not boss.dead and not friend.dead and not unrelated.dead)
-bomb:OnSpellStart();assert(#killed==2 and #removed==1)
+assert(scheduled()==0.05 and #killed==2 and #removed==0)
+assert(scheduled()==false and #killed==3 and #removed==1)
+assert(elite.dead and not boss.dead and not role_boss.dead and not friend.dead and not unrelated.dead)
+bomb:OnSpellStart();assert(#killed==3 and #removed==1)
 print("PASS nuclear bomb effect: bounded batches, wave/challenge kills, Boss/friendly exclusion, single consumption")

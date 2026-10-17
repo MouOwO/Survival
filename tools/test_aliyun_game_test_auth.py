@@ -17,6 +17,21 @@ import aliyun_game_test_auth as auth
 TOKEN = "unit-test-token-never-print-0123456789"
 
 
+def lua_executable():
+    configured = os.environ.get("LUA_EXECUTABLE")
+    if configured:
+        return configured
+    for name in ("lua.exe", "lua", "lua5.1.exe", "lua5.1", "luajit.exe", "luajit"):
+        executable = shutil.which(name)
+        if executable:
+            return executable
+    installed = Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "lua/bin/lua5.1.exe"
+    if installed.is_file():
+        return str(installed)
+    packages = Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft/WinGet/Packages"
+    return next((str(path) for path in packages.glob("DEVCOM.Lua_*/bin/lua.exe")), None)
+
+
 class AuthTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -70,7 +85,7 @@ class AuthTests(unittest.TestCase):
                 auth.probe(self.root / "state")
 
     def test_empty_tools_launch_preserves_active_maps_and_non_tools_clients(self):
-        lua = shutil.which('lua') or shutil.which('lua.exe')
+        lua = lua_executable()
         if not lua:
             self.skipTest('Lua interpreter is unavailable')
         fixture = """
@@ -125,6 +140,7 @@ assert(notices[#notices] == 'confirmed')
             self.assertIn("LoadKeyValues", code)
             self.assertIn("Convars:SetStr", code)
             self.assertIn(auth.recovery_lua(), code)
+            self.assertEqual(code, auth.injection_lua(captured[0].relative_to(self.root).as_posix(), nonce))
         self.setup_injection(send)
         self.stack.enter_context(patch.object(auth, "private_acl", side_effect=protected))
         result = auth.inject(self.root / "state", self.environment())
@@ -132,11 +148,13 @@ assert(notices[#notices] == 'confirmed')
         self.assertFalse(captured[0].exists())
 
     def test_console_failure_always_removes_temporary_credential(self):
-        self.setup_injection(Mock(side_effect=auth.AuthError("tools_server_confirmation_missing")))
+        errors = ("tools_server_confirmation_missing", *auth.INJECTION_ERRORS)
+        self.setup_injection(Mock(side_effect=[auth.AuthError(error) for error in errors]))
         self.stack.enter_context(patch.object(auth, "private_acl"))
-        with self.assertRaisesRegex(auth.AuthError, "tools_server_confirmation_missing"):
-            auth.inject(self.root / "state", self.environment())
-        self.assertEqual(list(self.generated.glob("*.kv")), [])
+        for error in errors:
+            with self.subTest(error=error), self.assertRaisesRegex(auth.AuthError, "^" + error + "$"):
+                auth.inject(self.root / "state", self.environment())
+            self.assertEqual(list(self.generated.glob("*.kv")), [])
 
     def test_acl_failure_happens_before_secret_write_and_cleans_empty_file(self):
         sender = Mock()
@@ -354,6 +372,125 @@ try { [IO.File]::SetAccessControl($path,$legacy) } catch {
             with self.assertRaisesRegex(auth.AuthError, "tools_server_confirmation_missing"):
                 auth.send_lua(command, nonce, self.output / "request2.json")
 
+    def test_console_accepts_only_current_exact_fixed_stage_failures(self):
+        nonce = "CURRENT_NONSECRET_CONFIRMATION"
+        with patch.object(auth, "ignored"), patch.object(auth.shutil, "which", return_value="node.exe"), \
+             patch.object(auth.subprocess, "run") as runner:
+            for error in auth.INJECTION_ERRORS:
+                with self.subTest(error=error):
+                    marker = nonce + "_ERROR_" + error
+                    runner.return_value = Mock(returncode=1, stdout=("unrelated " + TOKEN + "\n" + marker + "\n").encode())
+                    with self.assertRaisesRegex(auth.AuthError, "^" + error + "$"):
+                        auth.send_lua("unused", nonce, self.output / "failure.json")
+                    self.assertFalse((self.output / "failure.json").exists())
+            marker = nonce + "_ERROR_" + auth.INJECTION_ERRORS[0]
+            for output in ("echo " + marker, marker + " trailing", "OLD_" + marker,
+                           nonce + "_ERROR_unrecognized " + TOKEN):
+                with self.subTest(output=output):
+                    runner.return_value = Mock(returncode=1, stdout=(output + "\n").encode())
+                    with self.assertRaisesRegex(auth.AuthError, "^tools_server_confirmation_missing$"):
+                        auth.send_lua("unused", nonce, self.output / "unconfirmed.json")
+            runner.return_value = Mock(returncode=0, stdout=("OLD_" + marker + "\n" + nonce + "\n").encode())
+            auth.send_lua("unused", nonce, self.output / "confirmed.json")
+
+    def test_console_failed_transport_rejects_even_an_exact_success_nonce(self):
+        nonce = "CURRENT_NONSECRET_CONFIRMATION"
+        with patch.object(auth, "ignored"), patch.object(auth.shutil, "which", return_value="node.exe"), \
+             patch.object(auth.subprocess, "run", return_value=Mock(returncode=1, stdout=(nonce + "\n").encode())):
+            with self.assertRaisesRegex(auth.AuthError, "^tools_server_confirmation_missing$"):
+                auth.send_lua("unused", nonce, self.output / "disconnected.json")
+        self.assertFalse((self.output / "disconnected.json").exists())
+
+    def test_complete_injection_lua_confirms_verification_and_recovery_or_fixed_failure(self):
+        lua = lua_executable()
+        if not lua:
+            self.skipTest("Lua interpreter is required for generated injection behavior tests")
+        nonce = "CURRENT_NONSECRET_CONFIRMATION"
+        relative = "scripts/vscripts/tests/c6_console_generated/synthetic.kv"
+        fixture = r"""
+local mode, notices, stored, load_calls, set_calls, tick_calls, value
+local token = 'synthetic-unit-token-0123456789'
+local function synthetic_error() error('raw-exception-with-' .. token) end
+print = function(message) notices[#notices+1] = message end
+IsServer = function() return mode ~= 'client_vm' end
+IsInToolsMode = function() return mode ~= 'ordinary_client' end
+GetMapName = function() return mode == 'other_map' and 'dota' or 'template_map' end
+LoadKeyValues = function(path)
+  assert(path == 'scripts/vscripts/tests/c6_console_generated/synthetic.kv')
+  load_calls = load_calls + 1
+  if mode == 'read_throws' then synthetic_error() end
+  if mode == 'missing_file' then return nil end
+  if mode == 'wrong_file_type' then return 'unparsed' end
+  if mode == 'invalid_file' then return {token='short'} end
+  if mode == 'wrong_token_type' then return {token={}} end
+  value = {token=token}
+  return value
+end
+Convars = {
+  GetFloat = function() return 1 end,
+  GetStr = function()
+    if mode == 'verify_throws' and set_calls > 0 then synthetic_error() end
+    return stored
+  end,
+  SetStr = function(_, key, input)
+    assert(key == 'survival_fishing_api_token')
+    set_calls = set_calls + 1
+    if mode == 'apply_throws' then synthetic_error() end
+    if mode ~= 'verify_mismatch' then stored = input end
+  end,
+}
+DOTA_MAX_TEAM_PLAYERS = 1
+PlayerResource = { IsValidPlayerID = function() return false end }
+package.loaded['systems/player_profile_service'] = {}
+package.loaded['systems/match_setup_service'] = {}
+package.loaded['systems/startup_loading_service'] = {
+  tick = function()
+    tick_calls = tick_calls + 1
+    if mode == 'recovery_throws' then synthetic_error() end
+  end,
+}
+local run = function()
+""" + auth.injection_lua(relative, nonce) + r"""
+end
+local function check(scenario, expected, credential_set, expected_loads, expected_sets, expected_ticks)
+  mode, notices, stored, load_calls, set_calls, tick_calls, value = scenario, {}, '', 0, 0, 0, nil
+  run()
+  assert((stored == token) == credential_set, scenario .. ': unexpected credential state')
+  assert(load_calls == expected_loads and set_calls == expected_sets and tick_calls == expected_ticks,
+    scenario .. ': incorrect phase executed')
+  assert(#notices == (expected and 1 or 0), scenario .. ': unexpected reply count')
+  if expected then assert(notices[1] == expected, scenario .. ': incorrect reply') end
+  for _, message in ipairs(notices) do
+    assert(not string.find(message, token, 1, true), 'credential must never enter replies')
+    assert(not string.find(message, 'raw-exception', 1, true), 'exception must never enter replies')
+  end
+  if scenario == 'success' or scenario == 'verify_mismatch' or scenario == 'recovery_throws' then
+    assert(value.token == nil, 'verified credential source must be cleared before recovery')
+  end
+end
+local nonce = 'CURRENT_NONSECRET_CONFIRMATION'
+local function failure(code) return nonce .. '_ERROR_' .. code end
+check('success', nonce, true, 1, 1, 1)
+check('missing_file', failure('tools_auth_file_load_failed'), false, 1, 0, 0)
+check('wrong_file_type', failure('tools_auth_file_load_failed'), false, 1, 0, 0)
+check('invalid_file', failure('tools_auth_file_invalid'), false, 1, 0, 0)
+check('wrong_token_type', failure('tools_auth_file_invalid'), false, 1, 0, 0)
+check('read_throws', failure('tools_auth_file_load_failed'), false, 1, 0, 0)
+check('apply_throws', failure('tools_auth_apply_failed'), false, 1, 1, 0)
+check('verify_mismatch', failure('tools_auth_verify_failed'), false, 1, 1, 0)
+check('verify_throws', failure('tools_auth_verify_failed'), true, 1, 1, 0)
+check('recovery_throws', failure('tools_auth_recovery_loading_tick_failed'), true, 1, 1, 1)
+check('ordinary_client', nil, false, 0, 0, 0)
+check('client_vm', nil, false, 0, 0, 0)
+check('other_map', nil, false, 0, 0, 0)
+io.write('AUTH_INJECTION_LUA_PASS\n')
+"""
+        script = self.root / "injection.lua"
+        script.write_text(fixture, encoding="utf-8")
+        result = subprocess.run([lua, str(script)], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(result.stdout.strip(), "AUTH_INJECTION_LUA_PASS")
+
     def test_symlink_path_is_rejected_before_token_read(self):
         with patch.object(Path, "exists", return_value=True), \
              patch.object(Path, "lstat", return_value=Mock(st_mode=0o120777, st_file_attributes=0)), \
@@ -362,11 +499,75 @@ try { [IO.File]::SetAccessControl($path,$legacy) } catch {
                 auth.read_api_token(self.root / ".env")
             opener.assert_not_called()
 
-    def test_recovery_lua_preserves_pending_loaded_and_pure_mode_state(self):
-        lua = shutil.which("lua.exe") or shutil.which("lua")
+    def test_recovery_phase_failures_use_fixed_codes_for_missing_or_throwing_apis(self):
+        lua = lua_executable()
         if not lua:
-            packages = Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft/WinGet/Packages"
-            lua = next((str(path) for path in packages.glob("DEVCOM.Lua_*/bin/lua.exe")), None)
+            self.skipTest("Lua interpreter is required for recovery diagnostics")
+        nonce = "RECOVERY_FIXED_STAGE_TEST"
+        relative = "scripts/vscripts/tests/c6_console_generated/synthetic.kv"
+        fixture = r"""
+local scenario, notices, stored, authenticated, loaded, value
+local secret='synthetic-unit-token-0123456789'
+local function fail() error('raw-sensitive-exception-'..secret) end
+IsServer=function() return true end
+IsInToolsMode=function() return true end
+GetMapName=function() return 'template_map' end
+DOTA_MAX_TEAM_PLAYERS=1
+print=function(message) notices[#notices+1]=message end
+Convars={GetFloat=function() return 1 end,GetStr=function() return stored end,
+    SetStr=function(_,key,input) stored=input end}
+LoadKeyValues=function() value={token=secret};return value end
+local function reset(fault)
+    scenario,notices,stored,authenticated,loaded=fault,{},'',false,nil
+    PlayerResource={IsValidPlayerID=function() return true end,IsFakeClient=function() return false end,
+        GetTeam=function() return 2 end,GetPlayer=function() return {} end,GetSteamAccountID=function() return 9001 end}
+    local profiles={is_authenticated_for_account=function() return authenticated end,
+        is_authenticating=function() return false end,
+        authenticate_player=function() authenticated=true end,
+        get_profile=function() return loaded end,is_loading=function() return false end,
+        load_player=function() loaded={ok=true} end}
+    local setup={is_mode_selected=function() return true end}
+    local loading={is_party_waiting=function() return false end,tick=function() end}
+    package.loaded['systems/player_profile_service']=profiles
+    package.loaded['systems/match_setup_service']=setup
+    package.loaded['systems/startup_loading_service']=loading
+    if fault=='profiles_require' or fault=='setup_require' then
+        local key=fault=='profiles_require' and 'systems/player_profile_service' or 'systems/match_setup_service'
+        package.loaded[key]=nil;package.preload[key]=fail
+    elseif fault=='party_wait' then loading.is_party_waiting=fail
+    elseif fault=='player_api' then PlayerResource.GetPlayer=nil
+    elseif fault=='player_state' then PlayerResource.IsFakeClient=fail
+    elseif fault=='account_id' then PlayerResource.GetSteamAccountID=fail
+    elseif fault=='auth_state' then profiles.is_authenticated_for_account=nil
+    elseif fault=='authenticate' then profiles.authenticate_player=fail
+    elseif fault=='mode_state' then setup.is_mode_selected=nil
+    elseif fault=='profile_state' then profiles.is_loading=nil
+    elseif fault=='profile_load' then profiles.load_player=fail
+    elseif fault=='loading_tick' then loading.tick=fail end
+end
+local run=function()
+""" + auth.injection_lua(relative, nonce) + r"""
+end
+for _,phase in ipairs({'profiles_require','setup_require','party_wait','player_api','player_state',
+    'account_id','auth_state','authenticate','mode_state','profile_state','profile_load','loading_tick'}) do
+    reset(phase);run()
+    assert(#notices==1 and notices[1]=='RECOVERY_FIXED_STAGE_TEST_ERROR_tools_auth_recovery_'..phase..'_failed',
+        'incorrect fixed diagnosis for '..phase)
+    assert(value.token==nil and stored==secret,'credential source is cleared before recovery regardless of its failure')
+    assert(not notices[1]:find(secret,1,true) and not notices[1]:find('raw-sensitive',1,true))
+end
+reset('success');run()
+assert(#notices==1 and notices[1]=='RECOVERY_FIXED_STAGE_TEST' and loaded and authenticated)
+io.write('AUTH_RECOVERY_FIXED_STAGES_PASS\n')
+"""
+        script = self.root / "recovery-fixed-stages.lua"
+        script.write_text(fixture, encoding="utf-8")
+        result = subprocess.run([lua, str(script)], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(result.stdout.strip(), "AUTH_RECOVERY_FIXED_STAGES_PASS")
+
+    def test_recovery_lua_preserves_pending_loaded_and_pure_mode_state(self):
+        lua = lua_executable()
         if not lua:
             self.skipTest("Lua interpreter is required for the generated recovery behavior test")
         fixture = r"""

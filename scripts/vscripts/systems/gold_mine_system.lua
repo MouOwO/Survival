@@ -380,6 +380,7 @@ upgrade_mine = function(payload)
                 unit = state.unit, entindex = state.unit:entindex(),
                 player_id = state.player_id, team = state.team,
                 building_id = "gold_mine", level = target_level,
+                reason = "gold_mine_upgraded",
             })
             if payload.silent_notification ~= true then
                 event_bus.emit(events.UI_NOTIFICATION, {

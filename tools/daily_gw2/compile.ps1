@@ -10,7 +10,7 @@ $dailyGW2Content=Join-Path $dailyGW2Engine 'content/dota_addons/Survival/panoram
 $dailyGW2Runtime=Join-Path $dailyGW2Repo 'panorama'
 $dailyGW2Compiler=Join-Path $dailyGW2Engine 'game/bin/win64/resourcecompiler.exe'
 $dailyGW2Assets='layout/custom_game/daily_gw2_assets.xml'
-$dailyGW2Allowed='^(?:scripts/custom_game/(?:daily_remaining_5d5c1152eb|daily_gw2_data)\.js|styles/custom_game/daily_gw2\.css|layout/custom_game/(?:archive|daily_gw2_assets)\.xml|images/custom_game/daily_gw2_v1/[a-z0-9_]+\.png)$'
+$dailyGW2Allowed='^(?:scripts/custom_game/(?:daily_remaining_5d5c1152eb|daily_gw2_data|topnav_remaining_5d5c1152eb)\.js|styles/custom_game/daily_gw2\.css|layout/custom_game/(?:archive|daily_gw2_assets)\.xml|images/custom_game/daily_gw2_v1/[a-z0-9_]+\.png)$'
 function Get-WorkspacePath([string]$Relative) {
     $resolved=[IO.Path]::GetFullPath((Join-Path $dailyGW2Repo $Relative))
     if(-not $resolved.StartsWith($dailyGW2Repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw "Path outside the workspace: $Relative"}

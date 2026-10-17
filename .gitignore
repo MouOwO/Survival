@@ -88,12 +88,44 @@
 /tatus --short --untracked-files=no  grep -E 'ability_tooltipcontent_catalogchallenge_definitionsshop_entriestooltip_definitions'  head -40
 /total 148
 /scripts/vscripts/tests/*
+!/scripts/vscripts/tests/test_infrastructure_maniac.lua
+!/scripts/vscripts/tests/test_ultimate_tower_rogue_effects.lua
 !/scripts/vscripts/tests/test_wall_navigation_geometry.lua
 !/scripts/vscripts/tests/test_wall_contact_deadlock.lua
 !/scripts/vscripts/tests/test_wall_contact_crowd.lua
+!/scripts/vscripts/tests/test_wall_waiter_retreat.lua
+!/scripts/vscripts/tests/test_wall_offset_waiter.lua
+!/scripts/vscripts/tests/test_wall_gate_contact_face.lua
+!/scripts/vscripts/tests/test_wall_open_face_routing.lua
+!/scripts/vscripts/tests/test_wall_open_face_ai.lua
+!/scripts/vscripts/tests/test_wall_gate_contact_layout.lua
+!/scripts/vscripts/tests/wall_native_redesign_probe.lua
+!/scripts/vscripts/tests/wall_native_redesign_ai.lua
+!/scripts/vscripts/tests/test_wall_contact_solid.lua
+!/scripts/vscripts/tests/test_wall_move_grid.lua
+!/scripts/vscripts/tests/test_wall_relocation_lifecycle.lua
+!/scripts/vscripts/tests/test_wall_relocation_ai.lua
+!/scripts/vscripts/tests/test_worker_training_queue_presentation.lua
 !/scripts/vscripts/tests/test_wall_contact_alignment.lua
 !/scripts/vscripts/tests/test_wall_four_faces.lua
 !/scripts/vscripts/tests/test_wall_contact_exit.lua
+!/scripts/vscripts/tests/test_wall_deferred_hull.lua
+!/scripts/vscripts/tests/test_wall_native_route_entry.lua
+!/scripts/vscripts/tests/test_wall_solid_replacement.lua
+!/scripts/vscripts/tests/test_wall_native_route_budget.lua
+!/scripts/vscripts/tests/test_wall_replacement_priority.lua
+!/scripts/vscripts/tests/wall_trajectory_oracle.lua
+!/scripts/vscripts/tests/test_wall_trajectory_oracle.lua
+!/scripts/vscripts/tests/test_wall_front_row_oracle.lua
+!/scripts/vscripts/tests/wall_native_attack_record_lifecycle.lua
+!/scripts/vscripts/tests/modifier_wall_native_attack_record_audit.lua
+!/scripts/vscripts/tests/test_wall_native_attack_record_lifecycle.lua
+!/scripts/vscripts/tests/wall_native_attack_record_stress.lua
+!/scripts/vscripts/tests/test_wall_native_attack_record_stress.lua
+!/scripts/vscripts/tests/test_wall_native_partial_vacancy.lua
+!/scripts/vscripts/tests/test_wall_partial_face_replacement.lua
+!/scripts/vscripts/tests/test_wave_collision_policy.lua
+!/scripts/vscripts/tests/test_enemy_ranged_stationary.lua
 !/scripts/vscripts/tests/test_enemy_range_spawn_policy.lua
 !/scripts/vscripts/tests/test_enemy_range_declaration.lua
 !/scripts/vscripts/tests/manual_wall_crowd_contacts.lua
@@ -386,6 +418,7 @@ __pycache__/
 !/scripts/vscripts/tests/test_debug_spawn_positions.lua
 !/scripts/vscripts/tests/test_tree_hit_scan_coalescing.lua
 !/scripts/vscripts/tests/test_multiplayer_trees.lua
+!/scripts/vscripts/tests/test_tree_socket_buildability.lua
 !/scripts/vscripts/tests/test_stair_build_regions.lua
 !/scripts/vscripts/tests/test_build_ground_height.lua
 !/scripts/vscripts/tests/test_wave_four_lane_collision.lua
@@ -511,6 +544,15 @@ __pycache__/
 /design_refs/archive_v10/work/
 /design_refs/menus_v10/work/
 
+# Opt-in rogue card probes; no gameplay bootstrap or private credentials.
+!/scripts/vscripts/tests/game_rogue_builder_probe.lua
+!/scripts/vscripts/tests/game_rogue_builder_consumers.lua
+!/scripts/vscripts/tests/game_rogue_boss_combat_probe.lua
+!/scripts/vscripts/tests/game_rogue_boss_actions_probe.lua
+!/scripts/vscripts/tests/game_rogue_full_runner.lua
+!/scripts/vscripts/tests/game_rogue_final_scene.lua
+!/scripts/vscripts/tests/game_rogue_fusion_scene.lua
+
 # Keep reusable native masks and final UI references; omit generated iterations.
 /design_refs/daily_gw2_v2/work/*
 !/design_refs/daily_gw2_v2/work/native_masks/
@@ -526,3 +568,15 @@ __pycache__/
 /design_refs/hud_stats_20261014/before/
 /design_refs/hud_stats_20261014/compile.json
 /design_refs/hud_stats_20261014/verification.json
+
+# Regenerated browser previews and local deployment packages are not source assets.
+/design_refs/**/browser/
+/design_refs/**/preview/
+/design_refs/**/screens/
+/design_refs/**/release/
+/design_refs/**/release_v2/
+/design_refs/**/deployment/
+/design_refs/**/deployment_v2/
+
+# Native wall contact and collision-oracle regression fixtures.
+!/scripts/vscripts/tests/test_wall_native_probe_oracle.lua

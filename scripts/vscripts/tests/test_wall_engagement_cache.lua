@@ -1,5 +1,107 @@
 -- Run with tools/map_c6/prepare-ai-check.cjs and the generated Tools-only script.
 -- Each module is loaded in a separate sandbox; no live entities/globals change.
+-- Direct Lua execution must also exercise the current contact allocator. The
+-- historical Tools function below compares the retired FIFO implementation;
+-- merely returning that function used to make a standalone run falsely green.
+if type(IsInToolsMode) ~= 'function' then
+    local clock,paths,nav_queries,body_queries=0,0,0,0
+    local function vector(x,y,z) return {x=x,y=y,z=z or 384} end
+    local function distance(a,b) return math.sqrt((a.x-b.x)^2+(a.y-b.y)^2) end
+    local actors={}
+    local function entity(id,face,normal,lateral,radius)
+        local p=face==1 and vector(-normal,lateral) or face==2 and vector(normal,lateral)
+            or face==3 and vector(lateral,-normal) or vector(lateral,normal)
+        local u={p=p,radius=radius or 32}
+        function u:entindex() return id end
+        function u:IsNull() return self.removed==true end
+        function u:IsAlive() return not self.dead end
+        function u:GetAbsOrigin() return self.p end
+        function u:GetHullRadius() return self.radius end
+        function u:GetPaddedCollisionRadius() return self.radius+10 end
+        function u:GetTeamNumber() return 3 end
+        function u:SetHullRadius() error('cache observation must never resize a body') end
+        function u:SetAbsOrigin() error('cache observation must never move a body') end
+        actors[#actors+1]=u
+        return u
+    end
+    local env=setmetatable({Vector=vector,GameRules={GetGameTime=function() return clock end},
+        GetGroundHeight=function() return 384 end,
+        DOTA_UNIT_TARGET_TEAM_BOTH=3,DOTA_UNIT_TARGET_BASIC=1,DOTA_UNIT_TARGET_HERO=2,
+        DOTA_UNIT_TARGET_FLAG_INVULNERABLE=1,DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES=2,FIND_ANY_ORDER=0,
+        require=function(name)
+            assert(name=='systems/wall_navigation_service','unexpected contact dependency')
+            return {}
+        end,
+        GridNav={IsTraversable=function() nav_queries=nav_queries+1;return true end,
+            IsBlocked=function() nav_queries=nav_queries+1;return false end,
+            FindPathLength=function(_,a,b) paths=paths+1;return distance(a,b) end},
+        FindUnitsInRadius=function(_,point,_,radius)
+            assert(radius==512,'body cache must remain local to this wall')
+            body_queries=body_queries+1
+            local result={}
+            for _,u in ipairs(actors) do
+                if u:IsAlive() and distance(u.p,point)<=radius then result[#result+1]=u end
+            end
+            return result
+        end},{__index=_G})
+    local chunk=assert(loadfile('scripts/vscripts/systems/wall_melee_contact.lua'))
+    setfenv(chunk,env)
+    local contact=chunk()
+    local wall=entity(1,1,0,0,128)
+    local fronts,lanes={}, {-132,-44,44,132}
+    for face=1,4 do for lane=1,4 do
+        local u=entity(face*10+lane,face,400,lanes[lane])
+        local plan=assert(contact.resolve(wall,u,face))
+        assert(plan.claimed and u.radius==32)
+        u.p=plan.point;assert(contact.settle(wall,u,plan.point))
+        fronts[#fronts+1]=u
+    end end
+    local waiters,goals={},{}
+    -- These actors are query clients for cache complexity, not a simulated
+    -- birth/physics crowd. Full native movement is covered by four-face/live tests.
+    for index=1,400 do
+        local face=(index-1)%4+1
+        local lane=math.floor((index-1)/4)%4+1
+        local u=entity(1000+index,face,400,lanes[lane]);u.face=face
+        local plan=assert(contact.resolve(wall,u,face))
+        assert(not plan.claimed and u.radius==32)
+        waiters[index],goals[index]=u,plan.point
+    end
+    local before_paths,before_nav,before_bodies=paths,nav_queries,body_queries
+    for pass=1,30 do
+        clock=pass*.05
+        for index,u in ipairs(waiters) do
+            local plan=assert(contact.resolve(wall,u,u.face))
+            assert(not plan.claimed and plan.point==goals[index] and u.radius==32)
+        end
+    end
+    assert(paths==before_paths and nav_queries==before_nav and body_queries==before_bodies,
+        'unchanged full contacts must not run paths, terrain or body queries per waiter')
+    for _,u in ipairs(fronts) do assert(contact.resolve(wall,u).claimed) end
+    clock=2.1
+    for _,u in ipairs(fronts) do assert(contact.resolve(wall,u).claimed) end
+    before_paths,before_nav,before_bodies=paths,nav_queries,body_queries
+    for _,u in ipairs(waiters) do assert(not contact.resolve(wall,u,u.face).claimed) end
+    assert(paths==before_paths and body_queries==before_bodies,
+        'expired wait geometry must refresh terrain only, without paths or body scans')
+    assert(nav_queries>before_nav and nav_queries-before_nav<=16*5*2,
+        'terrain expiry must refresh at most sixteen lane goals, not four hundred waiters')
+    local dead=fronts[2];dead.dead=true
+    clock=2.2
+    local replacement=waiters[5] -- Nearest already-observed waiter on face1/lane2.
+    local refill=assert(contact.resolve(wall,replacement,1))
+    assert(refill.claimed and refill.point.y==-44 and replacement.radius==32,
+        'death must invalidate a cached full face immediately and admit one replacement')
+    contact.clear(wall:entindex())
+    local new_owner=entity(2001,1,400,-44)
+    assert(contact.resolve(wall,new_owner,1).claimed,'clear must discard all cached reservations')
+    contact.reset()
+    local new_wall=entity(1,1,0,0,128)
+    assert(contact.resolve(new_wall,entity(2002,1,400,-44),1).claimed,
+        'reset and wall-handle reuse must start a fresh cache lifecycle')
+    print('WALL_ENGAGEMENT_CACHE_PASS current_allocator faces=4 contacts=16 waiters=400 updates=30'
+        ..' stable_paths=0 stable_nav=0 stable_body_queries=0 bounded_ttl_refresh death_refill clear reset')
+end
 return function(sources)
     local function sandbox(source)
         local now, resolves, sorts = 0, 0, 0

@@ -4,6 +4,7 @@ local encoder = require("core/json_encoder")
 local decoder = require("core/json_decoder")
 local bus = require("core/event_bus")
 local events = require("core/events")
+local scheduler = require("core/scheduler")
 local M = {}
 local busy, last, orders, refreshed, resets = {}, {}, {}, {}, {}
 local catalogs = {}
@@ -45,7 +46,7 @@ local function notify(id, message, level)
     bus.emit(events.UI_NOTIFICATION, {player_id=id, message=message, level=level or "info"})
 end
 local function session_id() return require("systems/match_setup_service").get_session_id() end
-local function request(id, action, sku, kind, channel, request_id)
+local function request(id, action, sku, kind, channel, request_id, quantity)
     if not id or id ~= math.floor(id) or not PlayerResource:IsValidPlayerID(id)
         or PlayerResource:IsFakeClient(id) then return false, "player_id_invalid" end
     local function reply(result, correlation)
@@ -82,6 +83,7 @@ local function request(id, action, sku, kind, channel, request_id)
     local body = {account_id=account,match_session_id=session}
     if action=="create" then
         body.sku=sku
+        if quantity~=nil then body.quantity=quantity end
         if channel then body.provider=channel end
     end
     if action=="status" or action=="cancel" then
@@ -135,16 +137,37 @@ local function request(id, action, sku, kind, channel, request_id)
         local needs_refresh = action=="reset" or (result.state=="delivered" and not refreshed[result.order_id])
         if needs_refresh then
             local reason=action=="reset" and "payment_test_reset" or "payment_delivered"
-            local loading=profiles.load_player(id,reason,function()
+            -- Keep the operation busy until the authoritative profile commits.
+            -- Repeated status polls cannot supersede its load generation.
+            busy[id]=job
+            local settled=false
+            local timeout_key="payment_profile_refresh:"..tostring(id)
+            local function finish_refresh(ok)
+                if settled then return end
+                settled=true
+                if busy[id]~=job then return end
+                busy[id]=nil
+                scheduler.cancel(timeout_key)
+                if provider.resolve_account_id(id)~=account or session_id()~=session then return end
+                catalogs[id]=nil
+                if not ok then
+                    reply({ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku})
+                    return
+                end
                 if action=="reset" then
                     orders[id]={}; resets[id]=nil
                     notify(id,kind=="refreshdata" and "测试存档已恢复新号初始状态，远端已更新。已生成的本局单位需重开对局。"
                         or "购买内容及对应属性已清理，远端已更新，可以重新购买。")
                 else refreshed[result.order_id]=true end
-                catalogs[id]=nil
-                if provider.resolve_account_id(id)==account and session_id()==session then reply(result) end
-            end,function() reply({ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku}) end)
-            if not loading.ok then reply({ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku}) end
+                reply(result)
+            end
+            -- Another authoritative load may supersede this generation. Its
+            -- discarded callback must not pin payment busy forever; retry the
+            -- existing immutable order without acknowledging stale rewards.
+            scheduler.after(35,function() finish_refresh(false) end,timeout_key)
+            local loading=profiles.refresh_player(id,reason,
+                function() finish_refresh(true) end,function() finish_refresh(false) end)
+            if not loading or not loading.ok then finish_refresh(false) end
             return
         end
         reply(result)
@@ -165,7 +188,17 @@ function M.handle(payload)
     if action=="create" and channel~=nil and channel~="wechat" and channel~="alipay" then
         send(tonumber(payload.PlayerID),{ok=false,action=action,error="payment_channel_unavailable",request_id=request_id});return
     end
-    return request(tonumber(payload.PlayerID),action,sku,nil,channel,request_id)
+    local quantity=payload.quantity
+    if action=="create" then
+        if quantity==nil then quantity=1 end
+        -- Only the dedicated recharge SKU accepts large quantities. The
+        -- authenticated payment server still owns its price and U-coin grant.
+        local maximum=sku=="u_coin_recharge" and 999999 or 100
+        if type(quantity)~="number" or quantity~=math.floor(quantity) or quantity<1 or quantity>maximum then
+            send(tonumber(payload.PlayerID),{ok=false,action=action,error="quantity_invalid",request_id=request_id});return
+        end
+    end
+    return request(tonumber(payload.PlayerID),action,sku,nil,channel,request_id,quantity)
 end
 function M.reset_player(context, kind)
     -- TODO(PAYMENT_TEST_ONLY): remove chat reset entry points before public release.

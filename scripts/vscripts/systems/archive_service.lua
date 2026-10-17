@@ -115,6 +115,7 @@ local function enabled_categories()
 end
 
 local renderers, custom_renderers = {}, {}
+renderers.commerce_goods = function(profile) return require("systems/archive_commerce_goods").project(profile) end
 renderers.titles = function(_, archive) return require("systems/archive_titles").rows(archive) end
 renderers.gift = function(_, archive) return require("systems/archive_welfare_rewards").rows(archive) end
 renderers.starjoy_points = function(profile) return require("systems/archive_starjoy_rewards").project(profile) end
@@ -124,6 +125,7 @@ renderers.building = function(_, archive) return require("systems/archive_buildi
 renderers.work = function(_, archive) return require("systems/archive_online_rewards").rows(archive, "work") end
 renderers.friend = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "friend") end
 renderers.ex = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "ex") end
+renderers.wife = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "wife") end
 renderers.beast = function(_, archive) return require("systems/archive_social_rewards").rows(archive, "beast") end
 renderers.boss = function(profile) return (require("systems/archive_boss_rewards").project(profile)) end
 renderers.endless = function(_, archive)
@@ -655,7 +657,7 @@ function M.yitie(context)
     local amount = tonumber(context.args[1])
     local pool = context.args[2] or "friend"
     if #context.args < 1 or #context.args > 2 or not integer(amount) or amount > 1000000
-        or not require("config/generated/archive_social_rules").by_id[pool] then return false, "usage: yitie <0..1000000> [friend|ex|beast]" end
+        or not require("config/generated/archive_social_rules").by_id[pool] then return false, "usage: yitie <0..1000000> [friend|ex|wife|beast]" end
     serial = (serial or 0) + 1
     local result = enqueue(context.player_id, {id=session_id..":yitie:"..serial, kind="social_ticket_cheat", amount=amount, pool_id=pool})
     return result.ok, result.error

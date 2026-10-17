@@ -1,0 +1,24 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {createHarness}=require('./fixtures/menus_v10_harness.cjs');
+const h=createHarness(),{cfg,nodes}=h;
+cfg.ArchiveHandoff={Icon(){},Init(){},Observe(){}};
+const pending={pool_id:'wife',request_id:'original_collection_purchase_41',counts:{wife_01:0}},outcome={pool_id:'ex',ok:false,error:'原有失败提示'};
+const shared=cfg.SurvivalCollectionState={pages:{ex:{rows:[{id:'ex_01',quality:'N'}]},wife:{rows:[{id:'wife_01',quality:'N'}]}},versions:{ex:9999,wife:8888},pending,serial:41,outcome};
+for(const script of ['ui_snapshot_cache.js','archive_parchment_data.js','archive_v10_semantics.js','common/archive_tooltip.js','collection_gw2_data.js','collection_gw2.js'])h.load(script);
+let api=cfg.SurvivalCollection;
+assert.equal(cfg.SurvivalCollectionState,shared);assert.equal(shared.raritySchema,1);assert.deepEqual(Object.keys(shared.pages),[],'Old cards without rarity/probability authority are discarded');assert.deepEqual(Object.keys(shared.versions),[],'An old high sequence cannot block the restarted catalog service');
+assert.equal(shared.pending,pending,'Migration preserves the unresolved purchase object');assert.equal(shared.outcome,outcome);assert.equal(shared.serial,41);
+api.Open('wife');assert.equal(h.sent.at(-1).name,'survival_archive_request');assert.equal(h.sent.at(-1).payload.prefetch,1,'Old schema forces a full authoritative page');assert.equal(api.Inspect().slots,0);assert.equal(api.Inspect().pending.request_id,pending.request_id);assert.equal(nodes.CollectionGW2Draw.enabled,false);
+h.flushFinite();const replays=h.sent.filter(row=>row.name==='survival_archive_social_draw');assert.equal(replays.length,1);assert.equal(replays[0].payload.request_id,pending.request_id,'Recovery keeps the already-paid intent rather than generating another purchase');
+function send(sequence,count,extra={}){h.emit('survival_archive_snapshot',{ok:1,category_id:'wife',sequence,chunk:1,chunks:1,pending:0,rows:[{id:'wife_01',name:'正确新目录角色',quality:'UR',draw_probability:0.005,count,target:10,count_known:1,description:'原有效果'}],social:{tickets:10,draw_cost:1,remaining:9,total:count},...extra});}
+send(1,0);assert.equal(api.Inspect().slots,1,'Fresh authority can begin at sequence 1 after migration');assert.equal(api.Inspect().rows[0].count,0);assert.equal(shared.pages.wife.rows[0].quality,'UR');assert(api.Inspect().pending,'An unrelated low-sequence snapshot cannot settle the original purchase');
+const firstCard=nodes.CollectionGW2Item_wife_01,pages=shared.pages,versions=shared.versions;
+h.load('collection_gw2.js');api=cfg.SurvivalCollection;assert.equal(shared.pages,pages);assert.equal(shared.versions,versions,'The schema migration runs once, not on every hot reload');assert.equal(shared.pending,pending);api.Open('wife');assert.equal(api.Inspect().slots,1);assert.equal(shared.versions.wife,1);assert(!firstCard.IsValid());
+send(0,9);assert.equal(api.Inspect().rows[0].count,0,'A migrated client still rejects stale authority');
+h.emit('survival_archive_social_result',{pool_id:'wife',request_id:pending.request_id,ok:true,terminal:true,revision:42});assert(api.Inspect().pending,'Old pending ACK retains the original revision barrier');
+send(2,1,{revision:41,last_draw:{id:'match:social_draw:'+pending.request_id,pool_id:'wife',name:'正确新目录角色'}});assert(api.Inspect().pending,'Matching nonce cannot bypass its acknowledged revision');
+send(3,1,{revision:42,last_draw:{id:'match:social_draw:'+pending.request_id,pool_id:'wife',name:'正确新目录角色'}});assert.equal(api.Inspect().pending,null);assert.equal(api.Inspect().rows[0].count,1);
+h.click(nodes.CollectionGW2Draw);const next=api.Inspect().pending;assert(next.request_id.endsWith('_42'),'New requests continue the original serial after settling the preserved purchase');assert.notEqual(next.request_id,pending.request_id);
+const drawsBefore=h.sent.filter(row=>row.name==='survival_archive_social_draw').length;api.Dispose();assert.equal(h.sent.filter(row=>row.name==='survival_archive_social_draw').length,drawsBefore);h.assertCleanDispose(api);
+console.log('COLLECTION_RARITY_CACHE_MIGRATION_PASS: one-time cache/schema reset, low-sequence authority recovery, preserved pending nonce/serial/outcome/revision gate, normal reload and stale protection');

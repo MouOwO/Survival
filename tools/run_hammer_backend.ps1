@@ -9,5 +9,9 @@ $bridge = Join-Path $PSScriptRoot 'hammer_backend_bridge.py'
 # Blender's bundled Python can create a venv pythonw.exe launcher without a
 # base pythonw.exe. Use the tested console interpreter in a hidden child.
 $process = Start-Process -FilePath $python -ArgumentList @('-B', ('"' + $bridge + '"'), 'run') `
-    -WorkingDirectory $repo -WindowStyle Hidden -PassThru -Wait
+    -WorkingDirectory $repo -WindowStyle Hidden -PassThru
+# Start-Process -Wait also waits for descendants such as the preserved SSH
+# tunnel. The scheduled task owns only this helper; wait for that process alone.
+$process.WaitForExit()
+$process.Refresh()
 exit $process.ExitCode

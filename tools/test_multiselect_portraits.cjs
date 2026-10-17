@@ -145,6 +145,180 @@ for (const [count, columns] of [[9, 3], [12, 4], [25, 4]]) {
     for (const page of a.native.pages.children) assert.equal(page.style.visibility, undefined);
 }
 
+// Workers own a compact, fixed outer viewport. Native content fits its actual
+// rows within that rectangle; two selected workers do not reserve another row
+// or display disproportionately large portraits. The root background stays
+// transparent so the full custom backplate is visible in unused space.
+// Canvas/frame sizes, native selection classes, health bars and input remain
+// Valve-owned throughout this optional mode.
+const worker = setup();
+const workerOriginalMulti = {...worker.native.multi.style};
+const workerOriginalCanvas = {...worker.native.canvas.style};
+const workerOriginalFrames = worker.native.slots.map(slot => ({
+    style: {...slot.style}, classes: [...slot.classes], activate: slot.nativeActivate,
+    bars: ['HealthBar', 'ManaBar', 'ActiveGroupFrame'].map(id => ({
+        panel: slot.FindChildTraverse(id), style: {...slot.FindChildTraverse(id).style},
+    })),
+}));
+const workerPageHandlers = worker.native.pages.children.map(button => button.nativeActivate);
+function assertWorkerFit(layout, origin = {x: 200, y: 200}, ratio = {x: 1, y: 1}) {
+    const width = 264 * ratio.x, height = 237 * ratio.y;
+    const padding = Math.min(width, height) * 0.025;
+    const cap = (layout.columns === 2 ? 1.25 : layout.columns === 3 ? 1.5 : 1.6) * width / 264;
+    assert.equal(layout.width, width, 'selection count must not resize the outer viewport');
+    assert.equal(layout.height, height, 'selection count must not raise the outer viewport');
+    assert(layout.fit <= cap + 1e-9, 'native large-column portraits respect their scale cap');
+    assert(layout.nativeWidth * layout.fit <= width - padding * 2 + 1e-9);
+    assert(layout.nativeHeight * layout.fit <= height - padding * 2 + 1e-9,
+        'rows and any visible page controls remain inside the padded viewport');
+    assert(Math.abs(layout.x + layout.nativeWidth * layout.fit / 2 - (origin.x + width / 2)) < 1e-9,
+        'native content is horizontally centered in the fixed outer viewport');
+    assert(Math.abs(layout.y + layout.nativeHeight * layout.fit / 2 - (origin.y + height / 2)) < 1e-9,
+        'actual rows, without empty row reservations, are vertically centered');
+}
+let twoWorkerLayout;
+for (const [count, columns] of [[2, 2], [3, 2], [4, 2], [5, 3], [6, 3], [9, 3], [12, 4], [13, 4], [25, 4]]) {
+    worker.select(Array.from({length: count}, (_, index) => index + 1));
+    worker.native.multi.classes.delete('TwoColumns');
+    worker.native.multi.classes.delete('ThreeColumns');
+    if (columns === 2) worker.native.multi.classes.add('TwoColumns');
+    if (columns === 3) worker.native.multi.classes.add('ThreeColumns');
+    worker.native.pages.children[0].classes.delete('ShowButton');
+    if (count > 12) worker.native.pages.children[0].classes.add('ShowButton');
+    const nativeClasses = [...worker.native.multi.classes];
+    assert.equal(worker.api.Apply(worker.group, 264, 237), true);
+    const layout = worker.api.Inspect().layout;
+    assert.equal(layout.columns, columns);
+    assert.equal(layout.rows, Math.ceil(Math.min(12, count) / columns));
+    assert.equal(layout.paged, count > 12);
+    assert.equal(layout.nativeWidth, 159);
+    const cellHeight = columns === 2 ? 93 : columns === 3 ? 59 : 41;
+    assert.equal(layout.nativeHeight, layout.rows * cellHeight + (columns < 4 ? 3 : 0) + (count > 12 ? 25 : 0),
+        'only actual native rows and paging contribute to content height');
+    assertWorkerFit(layout);
+    assert.equal(worker.native.multi.style.backgroundColor, '#00000000');
+    if (count === 2) {
+        twoWorkerLayout = layout;
+        assert.equal(layout.nativeHeight, 96, 'two workers have one native row, with no second-row reservation');
+        assert.equal(layout.fit, 1.25, 'the two-column mode does not expand portraits to fill the full panel width');
+    }
+    assert.deepEqual(worker.native.canvas.style, workerOriginalCanvas);
+    assert.deepEqual([...worker.native.multi.classes], nativeClasses);
+    assert.equal(worker.native.multi.parent, worker.block);
+    worker.native.slots.forEach((slot, index) => {
+        const before = workerOriginalFrames[index];
+        assert.deepEqual(slot.style, before.style);
+        assert.deepEqual([...slot.classes], before.classes);
+        assert.equal(slot.nativeActivate, before.activate);
+        before.bars.forEach(bar => {
+            assert.equal(slot.FindChildTraverse(bar.panel.id), bar.panel);
+            assert.deepEqual(bar.panel.style, bar.style);
+        });
+    });
+    worker.native.pages.children.forEach((button, index) => {
+        assert.equal(button.nativeActivate, workerPageHandlers[index]);
+        assert.equal(button.style.visibility, undefined);
+    });
+}
+
+// Selection notifications can precede Valve's column-class update. Preserve
+// every native row during that transition; the outer viewport stays fixed while
+// native fitting catches up, instead of clipping rows or moving the bottom HUD.
+worker.select(Array.from({length: 12}, (_, index) => index + 1));
+worker.native.multi.classes.add('TwoColumns');
+worker.native.pages.children[0].classes.delete('ShowButton');
+assert.equal(worker.api.Apply(worker.group, 264, 237), true);
+let delayedColumns = worker.api.Inspect().layout;
+assert.equal(delayedColumns.columns, 2);
+assert.equal(delayedColumns.rows, 6);
+assert.equal(delayedColumns.nativeHeight, 6 * 93 + 3);
+assertWorkerFit(delayedColumns);
+assert.deepEqual(worker.native.canvas.style, workerOriginalCanvas);
+worker.native.multi.classes.delete('TwoColumns');
+assert.equal(worker.api.Apply(worker.group, 264, 237), true);
+delayedColumns = worker.api.Inspect().layout;
+assert.equal(delayedColumns.nativeHeight, 123);
+assertWorkerFit(delayedColumns);
+worker.native.slots[2].nativeActivate();
+worker.native.pages.children[1].nativeActivate();
+assert.deepEqual(worker.nativeClicks, [2, 'page:1']);
+
+// Parent and portrait coordinate scales can differ after HUD rebuilds. Scale
+// the cap with the actual viewport width while retaining the native pixel grid.
+worker.group.actualuiscale_x = 0.75;
+worker.group.actualuiscale_y = 0.6;
+worker.select([1, 2]);
+worker.native.multi.classes.add('TwoColumns');
+assert.equal(worker.api.Apply(worker.group, 264, 237), true);
+assertWorkerFit(worker.api.Inspect().layout, {x: 200, y: 200}, {x: 1.5, y: 1.2});
+assert.equal(worker.api.Inspect().layout.fit, twoWorkerLayout.fit * 1.5,
+    'two-column scale cap follows the portrait-to-parent coordinate scale');
+assert.deepEqual(worker.native.canvas.style, workerOriginalCanvas);
+worker.group.actualuiscale_x = worker.group.actualuiscale_y = 0.5;
+
+// Leaving worker presentation must immediately use the original square and
+// content-dependent fitting again; the optional rectangle must not leak into
+// hero/other-unit portraits or survive a subsequent single selection.
+worker.select([1, 2, 3, 4]);
+worker.native.multi.classes.add('TwoColumns');
+worker.native.pages.children[0].classes.delete('ShowButton');
+assert.equal(worker.api.Apply(worker.group, 264), true);
+let ordinaryLayout = worker.api.Inspect().layout;
+assert.equal(ordinaryLayout.width, 264);
+assert.equal(ordinaryLayout.height, 264);
+assert.equal(ordinaryLayout.nativeHeight, 189);
+assert(ordinaryLayout.fit > 1.25, 'ordinary square does not retain the compact worker scale cap');
+function nativeBackground(value) { return String(value).replace(/\s+/g, ''); }
+const defaultNativeBackground = 'gradient( linear, 0% 0%, 0% 100%, from( #222629 ), to( #0e1011 ) )';
+assert.equal(nativeBackground(worker.native.multi.style.backgroundColor), nativeBackground(defaultNativeBackground),
+    'ordinary portraits regain the original native background immediately');
+worker.select([1, 2]);
+assert.equal(worker.api.Apply(worker.group, 264), true);
+ordinaryLayout = worker.api.Inspect().layout;
+assert.equal(ordinaryLayout.nativeHeight, 96, 'ordinary mode remains content adaptive');
+assert.equal(worker.api.Apply(worker.group, 264, 237), true);
+worker.select([1]);
+assert.equal(worker.api.Apply(worker.group, 264, 237), false);
+assert.equal(worker.api.Inspect().mounted, false);
+assert.equal(worker.container.style.opacity, '0.8');
+assert.equal(worker.container.hittest, true);
+assert.equal(worker.container.hittestchildren, false);
+for (const key of Object.keys(workerOriginalMulti)) {
+    assert.equal(worker.native.multi.style[key], workerOriginalMulti[key]);
+}
+assert.equal(worker.native.multi.style.position, '');
+assert.equal(worker.native.pages.style.marginBottom, '-8px');
+assert.equal(nativeBackground(worker.native.multi.style.backgroundColor), nativeBackground(defaultNativeBackground));
+assert.deepEqual(worker.native.canvas.style, workerOriginalCanvas);
+
+// Restore custom backgrounds exactly for both ordinary multi-selection and a
+// later single selection. Empty background resets are rejected by Panorama, so
+// the CSS default is an explicit gradient rather than an empty inline value.
+for (const original of [undefined, '#12345688', 'gradient( linear, 0% 0%, 100% 0%, from( #112233 ), to( #445566 ) )']) {
+    const t = setup();
+    if (original !== undefined) t.native.multi.style.backgroundColor = original;
+    let invalidBackgroundWrites = 0;
+    t.native.multi.style = new Proxy(t.native.multi.style, {set(target, property, value) {
+        if (property === 'backgroundColor' && (value === '' || value === null || value === undefined)) {
+            invalidBackgroundWrites++;
+            throw Error('native background requires an explicit color or gradient');
+        }
+        target[property] = value;
+        return true;
+    }});
+    t.select([1, 2]);
+    assert.equal(t.api.Apply(t.group, 264, 237), true);
+    assert.equal(t.native.multi.style.backgroundColor, '#00000000');
+    assert.equal(t.api.Apply(t.group, 264), true);
+    assert.equal(nativeBackground(t.native.multi.style.backgroundColor), nativeBackground(original || defaultNativeBackground));
+    assert.equal(t.api.Apply(t.group, 264, 237), true);
+    t.select([1]);
+    assert.equal(t.api.Apply(t.group, 264, 237), false);
+    assert.equal(nativeBackground(t.native.multi.style.backgroundColor), nativeBackground(original || defaultNativeBackground));
+    assert.equal(invalidBackgroundWrites, 0);
+    assert.equal(t.api.Inspect().lastRestore.failed.length, 0);
+}
+
 // Going back to one unit restores all original inline styling and interaction,
 // including nondefault values. No stale multi-grid survives portrait selection.
 a.select([1]);
@@ -312,4 +486,4 @@ assert.equal(c.messages.length, beforeDebug + 1);
 c.commands.survival_multiselect_inspect();
 assert(c.messages[c.messages.length - 1].includes('replacement_context'));
 
-console.log('MULTISELECT_PORTRAITS_PASS: native 2/3/4-column grid, shared canvas, paging/click preservation, restoration, HUD rebuild and diagnostic');
+console.log('MULTISELECT_PORTRAITS_PASS: native 2/3/4-column grid; compact 264x237 worker viewport for 2/3/4/5/6/9/12/13/25 selections; centered content, scale caps, transparent background restoration, shared canvas, paging/click preservation, HUD rebuild and diagnostic');

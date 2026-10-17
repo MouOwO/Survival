@@ -4,6 +4,34 @@ local scheduler=require('core/scheduler')
 local effects=require('systems/commerce_effects')
 local M={}
 local players,trees,walls={}, {}, {}
+local initialized_world,subscriptions,action_listener,listener_manager,listener_registered
+local epoch=0
+local function world() return GameRules and GameRules.GetGameModeEntity and GameRules:GetGameModeEntity() or nil end
+local function cancel(key) if scheduler.cancel then scheduler.cancel(key) end end
+local function clear_aura(s)
+    local particle=s and s.aura
+    if not s then return end
+    s.aura,s.aura_hero=nil,nil
+    if particle~=nil and s.world==world() then
+        -- Revoke ownership first; a failed Destroy must not skip Release.
+        pcall(ParticleManager.DestroyParticle,ParticleManager,particle,true)
+        pcall(ParticleManager.ReleaseParticleIndex,ParticleManager,particle)
+    end
+end
+local function clear_cannon(s)
+    local cannon=s and s.cannon
+    if not s then return end
+    s.cannon,s.cannon_wall=nil,nil
+    if cannon and s.world==world() then
+        pcall(function() if not cannon:IsNull() then cannon:RemoveSelf() end end)
+    end
+end
+local function clear_owner(id)
+    local s=players[id]
+    players[id],trees[id],walls[id]=nil,nil,nil
+    cancel('commerce_orbital_'..id)
+    clear_aura(s);clear_cannon(s)
+end
 local function alive(u) return u and not u:IsNull() and u:IsAlive() end
 local function hero(id)
     local r=bus.request(events.HERO_SUMMON_GET_REQUEST,{player_id=id})
@@ -19,7 +47,7 @@ local function enemies(unit,radius)
     end
     return result
 end
-local function state(id) players[id]=players[id] or {research={},used={},cooldown=0};return players[id] end
+local function state(id) players[id]=players[id] or {research={},used={},cooldown=0,world=initialized_world};return players[id] end
 local function publish(id)
     local s=state(id)
     CustomNetTables:SetTableValue('survival_commerce_actions','player_'..id,{
@@ -36,9 +64,10 @@ function M.orbital(id,key)
     local s=state(id);local wall=walls[id];local unit=hero(id);local now=GameRules:GetGameTime()
     if s.wave==key or now<(s.orbital_ready or 0) or not effects.owned(id,'orbital') or not alive(wall) or not alive(unit) then return end
     s.wave=key;s.orbital_ready=now+10
-    local ticks=0
+    s.orbital_hero=unit
+    local ticks,started_epoch=0,epoch
     scheduler.every(.5,function()
-        if not alive(wall) or not alive(unit) then return false end
+        if started_epoch~=epoch or players[id]~=s or walls[id]~=wall or not alive(wall) or not alive(unit) then return false end
         ticks=ticks+1
         local damage=(unit:GetStrength()+unit:GetAgility()+unit:GetIntellect())*10
         local projected=bus.request(events.PERMANENT_REWARD_EFFECTS_GET_REQUEST,{player_id=id})
@@ -58,10 +87,16 @@ function M.action(payload)
     local id=tonumber(payload.PlayerID)
     if not id or not PlayerResource:IsValidPlayerID(id) or require('systems/player_context_service').is_defeated(id) then return end
     local action=tostring(payload.action or '');local s=state(id);local unit=hero(id)
-    if not alive(unit) then
+    -- The teleporter belongs to the summoned hero. Falling back to the
+    -- unconstrained builder here would also bypass hero-region validation.
+    -- Copper and the other early-game actions still support the builder.
+    if not alive(unit) and action~='blink' then
         local r=bus.request(events.BUILDER_GET_REQUEST,{player_id=id});unit=r and (r.unit or r.builder)
     end
-    if not alive(unit) then return end
+    if not alive(unit) then
+        if action=='blink' then bus.emit(events.UI_NOTIFICATION,{player_id=id,message='英雄尚未在场',level='error'}) end
+        return
+    end
     local ok,reason=false,'商城权益不可用'
     if action=='blink' and effects.owned(id,'teleporter') and GameRules:GetGameTime()>=s.cooldown then
         local x,y=tonumber(payload.x),tonumber(payload.y)
@@ -122,27 +157,29 @@ local function tick()
         end
         local wall=walls[id]
         local h=hero(id)
-        if s.aura_hero~=h or not alive(h) then
-            if s.aura then ParticleManager:DestroyParticle(s.aura,true);ParticleManager:ReleaseParticleIndex(s.aura);s.aura=nil end
+        local aura_owned=effects.owned(id,'lottery_immortal_slaying_sword_array')
+        if s.aura_hero~=h or not alive(h) or not aura_owned then
+            clear_aura(s)
             s.aura_hero=h
         end
-        if alive(h) and effects.owned(id,'lottery_immortal_slaying_sword_array') and not s.aura then
+        if alive(h) and aura_owned and not s.aura then
             s.aura=ParticleManager:CreateParticle('particles/survival/weapons/weapon_glow.vpcf',PATTACH_ABSORIGIN_FOLLOW,h)
         end
         if alive(h) and effects.owned(id,'sovereign') and not h.survival_commerce_title then
             h.survival_commerce_title=true;h.survival_display_name='【君临天下】'..tostring(h.survival_display_name or '')
         end
-        if s.cannon and (s.cannon:IsNull() or not alive(wall)) then
-            if not s.cannon:IsNull() then s.cannon:RemoveSelf() end;s.cannon=nil
+        local cannon_owned=effects.owned(id,'orbital')
+        if s.cannon and (s.cannon:IsNull() or s.cannon_wall~=wall or not alive(wall) or not cannon_owned) then
+            clear_cannon(s)
         end
-        if alive(wall) and effects.owned(id,'orbital') and not s.cannon then
+        if alive(wall) and cannon_owned and not s.cannon then
             local definition=require('config/buildings_config').arrow_tower
             local cannon=CreateUnitByName(definition.unit_name,wall:GetAbsOrigin(),true,wall,wall,wall:GetTeamNumber())
             if cannon then
                 cannon.survival_visual_only=true;cannon:SetHullRadius(0);cannon:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
                 cannon:AddNewModifier(cannon,nil,'modifier_invulnerable',{})
                 cannon:AddNewModifier(cannon,nil,'modifier_phased',{})
-                cannon.survival_display_name='轨道炮';s.cannon=cannon
+                cannon.survival_display_name='轨道炮';s.cannon=cannon;s.cannon_wall=wall
             end
         end
         if alive(wall) and effects.owned(id,'flame_wall') and not require('systems/gameplay_phase_guard').post_clear_frozen() then
@@ -155,19 +192,55 @@ local function tick()
     return true
 end
 function M.init()
+    epoch=epoch+1
+    cancel('commerce_runtime')
+    local ids={};for id in pairs(players) do ids[#ids+1]=id end
+    for _,id in ipairs(ids) do clear_owner(id) end
+    for _,subscription in ipairs(subscriptions or {}) do bus.unsubscribe(subscription) end
+    subscriptions={};initialized_world=world()
     players,trees,walls={},{},{}
-    bus.subscribe(events.PLAYER_PROFILE_CHANGED,function(p) if tonumber(p.player_id) then effects.invalidate(p.player_id) end end)
-    bus.subscribe(events.TREE_CHANGED,function(p) if p.entindex then trees[tonumber(p.player_id)]=EntIndexToHScript(p.entindex) end end)
-    bus.subscribe(events.BUILDING_CREATED,function(p)
+    local subscribed_epoch,subscribed_generation=epoch,bus.get_generation()
+    local function subscribe(name,callback)
+        subscriptions[#subscriptions+1]=bus.subscribe(name,function(p)
+            if epoch==subscribed_epoch and bus.get_generation()==subscribed_generation then callback(p) end
+        end)
+    end
+    subscribe(events.PLAYER_PROFILE_CHANGED,function(p) if tonumber(p.player_id) then effects.invalidate(p.player_id) end end)
+    subscribe(events.TREE_CHANGED,function(p) if p.entindex then trees[tonumber(p.player_id)]=EntIndexToHScript(p.entindex) end end)
+    subscribe(events.BUILDING_CREATED,function(p)
         if p.building_id=='wall' then walls[tonumber(p.player_id)]=p.unit or EntIndexToHScript(p.entindex) end
     end)
-    bus.subscribe(events.WAVE_CHANGED,function(p)
+    subscribe(events.PLAYER_DEFEATED,function(p)
+        local id=tonumber(p.player_id);if id then clear_owner(id) end
+    end)
+    subscribe(events.HERO_REMOVED,function(p)
+        local id=tonumber(p.player_id);local s=id and players[id]
+        if s and (p.unit==nil or s.aura_hero==p.unit) then clear_aura(s) end
+        if s and (p.unit==nil or s.orbital_hero==p.unit) then cancel('commerce_orbital_'..id) end
+    end)
+    subscribe(events.BUILDING_DESTROYED,function(p)
+        local id=tonumber(p.player_id);local wall=id and walls[id]
+        if p.building_id~='wall' or not wall then return end
+        local matches=p.unit==wall or (p.unit==nil and p.entindex~=nil and not wall:IsNull() and wall:entindex()==p.entindex)
+        if matches then walls[id]=nil;clear_cannon(players[id]);cancel('commerce_orbital_'..id) end
+    end)
+    subscribe(events.WAVE_CHANGED,function(p)
         if tostring(p.reason or ''):find('wave_started',1,true) then
             for _,id in ipairs(require('systems/player_context_service').active_player_ids()) do M.orbital(id,'wave:'..tostring(p.current_wave)) end
         end
     end)
-    bus.subscribe('commerce.endless_wave',function(p) M.orbital(p.player_id,'endless:'..tostring(p.wave)) end)
-    CustomGameEventManager:RegisterListener('survival_commerce_action',function(_,p) M.action(p or {}) end)
-    scheduler.every(1,tick,'commerce_runtime')
+    subscribe('commerce.endless_wave',function(p) M.orbital(p.player_id,'endless:'..tostring(p.wave)) end)
+    if action_listener~=nil and listener_manager and listener_manager.UnregisterListener then
+        local removed,result=pcall(listener_manager.UnregisterListener,listener_manager,action_listener)
+        if removed and result~=false then action_listener=nil;listener_registered=false end
+    end
+    -- Native managers without UnregisterListener keep their one delegating listener.
+    if not listener_registered or listener_manager~=CustomGameEventManager then
+        listener_manager=CustomGameEventManager
+        action_listener=listener_manager:RegisterListener('survival_commerce_action',function(_,p) M.action(p or {}) end)
+        listener_registered=true
+    end
+    local started_epoch=epoch
+    scheduler.every(1,function() if started_epoch~=epoch then return false end;return tick() end,'commerce_runtime')
 end
 return M

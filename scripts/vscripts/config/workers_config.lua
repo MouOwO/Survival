@@ -14,8 +14,8 @@ local M = {
 
     -- Spawn on a ring outside the main-city collision hull. The main city keeps
     -- its normal collision; no undocumented KV collision flag is required.
-    spawn_radius_min = 420,
-    spawn_radius_max = 640,
+    spawn_radius_min = 210,
+    spawn_radius_max = 320,
     spawn_attempts = 24,
     spawn_clearance = 160,
     nearby_unit_clearance = 128,

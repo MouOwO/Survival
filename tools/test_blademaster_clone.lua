@@ -26,6 +26,7 @@ local bus = {emit = function(event, payload) emitted[#emitted + 1] = {event, pay
 package.loaded["core/event_bus"] = bus
 package.loaded["systems/tree_damage_rules"] = {
     is_tree = function() return false end, allows_damage = function() return true end,
+    is_arrow_tower = function() return false end,
     is_basic_attack_category = function(category) return tonumber(category) == DOTA_DAMAGE_CATEGORY_ATTACK end,
     reset_pending_attacks = function() end,
 }

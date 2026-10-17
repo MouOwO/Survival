@@ -1,0 +1,1696 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "generated_at": "2026-10-12T04:13:53.1052647Z",
+  "scope": "one_rendered_client_four_engine_owners",
+  "network_clients_verified": false,
+  "independent_rendered_clients_measured": 1,
+  "native_engine_owners": 4,
+  "native_humans": 1,
+  "native_bots": 3,
+  "pid": 54100,
+  "hardware": {
+    "cpu": {
+      "Name": "Intel(R) Core(TM) i5-14600KF",
+      "NumberOfCores": 14,
+      "NumberOfLogicalProcessors": 20
+    },
+    "physical_gpu": {
+      "Name": "NVIDIA GeForce GTX 1050 Ti",
+      "DriverVersion": "32.0.15.8180",
+      "AdapterRAM": 4293918720
+    },
+    "all_display_adapters": [
+      {
+        "Name": "GameViewer Virtual Display Adapter",
+        "DriverVersion": "15.6.5.199",
+        "AdapterRAM": null
+      },
+      {
+        "Name": "Todesk Virtual Display Adapter",
+        "DriverVersion": "16.44.2.509",
+        "AdapterRAM": null
+      },
+      {
+        "Name": "NVIDIA GeForce GTX 1050 Ti",
+        "DriverVersion": "32.0.15.8180",
+        "AdapterRAM": 4293918720
+      }
+    ],
+    "client_window": {
+      "width": 1600,
+      "height": 900,
+      "source": "Win32_GetClientRect"
+    },
+    "physical_display_mode_claimed": false,
+    "render_scale_verified": false,
+    "gpu_render_duration_measured": false,
+    "source": {
+      "path": "output/four_client_perf_20261012/hardware.json",
+      "sha256": "26819b3f646645b09c1395bcb93613eb91ff1e96604e4a279f4562705d0e6c6e",
+      "bytes": 1226
+    }
+  },
+  "game": {
+    "map": "template_map",
+    "difficulty": "N2",
+    "mode": "standard",
+    "host_timescale": 1,
+    "fps_max_requested": 120,
+    "identical_camera_across_scenarios_claimed": false
+  },
+  "method": {
+    "collector": "PresentMon native Windows ETW presents",
+    "metric": "Present cadence, not GPU render duration, server tick time or monitor displayed-frame cadence.",
+    "one_percent_low_definition": "1000 / arithmetic mean of the slowest ceil(interval_count * 0.01) native present intervals; not 1000/P99.",
+    "percentile_definition": "Linear interpolation at (N-1)*fraction.",
+    "cross_sample_fps_aggregation_performed": false,
+    "foreground_validation": "Win32 foreground/minimization observation approximately every second; not continuous proof or modal-occlusion measurement.",
+    "raw_csv_stats_independently_recalculated_by_root": true,
+    "source_csv_sha_checked": true
+  },
+  "samples": [
+    {
+      "id": "a_live_front",
+      "included_in_conclusions": true,
+      "scenario": "A",
+      "pid": 54100,
+      "capture_mode": "steady",
+      "baseline_only": true,
+      "scope": "one_rendered_client_four_engine_owners",
+      "network_clients_verified": false,
+      "started_at": "2026-10-12T03:35:37.363Z",
+      "finished_at": "2026-10-12T03:36:19.117Z",
+      "requested_seconds": 30,
+      "etw_span_seconds": 29.913386,
+      "capture_wall_envelope_seconds": 41.754124299999994,
+      "presentmon_delay_seconds": 8,
+      "before": {
+        "scenario": "A",
+        "fixture_status": "ready",
+        "game_state": 10,
+        "paused": false,
+        "game_time": 2402.5668945313,
+        "engine_time": 2402.5668945313,
+        "owners": [
+          {
+            "player_id": 0,
+            "fake_engine_client": false,
+            "map_level": 1,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 1,
+            "fake_engine_client": true,
+            "map_level": 9,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 2,
+            "fake_engine_client": true,
+            "map_level": 17,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 3,
+            "fake_engine_client": true,
+            "map_level": 24,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          }
+        ],
+        "total_towers": 28.0,
+        "total_walls": 4.0,
+        "alive": 0,
+        "wave": {
+          "difficulty_id": "N2",
+          "current_wave": 15,
+          "alive": 0,
+          "alive_limit": 90,
+          "status": "dev_mode",
+          "game_started": true,
+          "player_defeated": false,
+          "overflow_active": false,
+          "post_clear_frozen": false
+        }
+      },
+      "after": {
+        "scenario": "A",
+        "fixture_status": "ready",
+        "game_state": 10,
+        "paused": false,
+        "game_time": 2456.4333496094,
+        "engine_time": 2456.4333496094,
+        "owners": [
+          {
+            "player_id": 0,
+            "fake_engine_client": false,
+            "map_level": 1,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 1,
+            "fake_engine_client": true,
+            "map_level": 9,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 2,
+            "fake_engine_client": true,
+            "map_level": 17,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 3,
+            "fake_engine_client": true,
+            "map_level": 24,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          }
+        ],
+        "total_towers": 28.0,
+        "total_walls": 4.0,
+        "alive": 0,
+        "wave": {
+          "difficulty_id": "N2",
+          "current_wave": 15,
+          "alive": 0,
+          "alive_limit": 90,
+          "status": "dev_mode",
+          "game_started": true,
+          "player_defeated": false,
+          "overflow_active": false,
+          "post_clear_frozen": false
+        }
+      },
+      "native_counts_stable_at_endpoints": true,
+      "focus": {
+        "sampling_target_hz": 1,
+        "sample_count": 30,
+        "first_sample_seconds": 0.0,
+        "last_sample_seconds": 29.014,
+        "all_observed_game_foreground": true,
+        "observed_minimized_samples": 0,
+        "continuous_focus_between_samples_verified": false
+      },
+      "etw": {
+        "accepted_interval_count": 1778,
+        "accepted_interval_sum_seconds": 29.913387,
+        "applications": [
+          "dota2.exe"
+        ],
+        "discarded_invalid_reasons": {},
+        "discarded_invalid_rows": 0,
+        "dropped_metric_note": "Dropped presents remain in present-cadence intervals; mean FPS does not assert displayed FPS.",
+        "dropped_present_rows": 0,
+        "dropped_status_unknown_rows": 0,
+        "excluded_first_present_rows": 1,
+        "first_timestamp_seconds": 8.0176572,
+        "interval_sum_minus_timestamp_span_seconds": 0.0,
+        "intervals_at_least_ms": {
+          "100": 0,
+          "33.33": 9,
+          "50": 0
+        },
+        "last_timestamp_seconds": 37.9310437,
+        "mean_fps_definition": "accepted_interval_count / sum(accepted MsBetweenPresents in seconds). With no invalid rows this equals (observed_present_rows - 1) / sum.",
+        "mean_present_fps": 59.438272,
+        "observed_present_rows": 1779,
+        "present_interval_ms": {
+          "max": 48.1181,
+          "mean": 16.824177,
+          "p50": 16.66105,
+          "p95": 24.276125,
+          "p99": 29.97842
+        },
+        "process_id": 54100,
+        "slowest_1_percent_fps": {
+          "definition": "1000 divided by the arithmetic mean of the slowest ceil(accepted_interval_count * 0.01) present intervals; not the reciprocal of P99.",
+          "fps": 28.574758,
+          "fraction_of_accepted_intervals": 0.010123734533183352,
+          "interval_count": 18,
+          "mean_interval_ms": 34.995922
+        },
+        "swapchain_address": "0x000001b37d97d310",
+        "timestamp_span_seconds": 29.913386,
+        "warnings": []
+      },
+      "selection": {
+        "group_count": 1,
+        "note": "Automatic selection is a recorded heuristic, not proof of the main game window. Every process/swapchain is reported independently; no groups are pooled.",
+        "requested_process_id": 54100,
+        "requested_swapchain_address": null,
+        "selected_process_id": 54100,
+        "selected_swapchain_address": "0x000001b37d97d310",
+        "strategy": "most_accepted_intervals_then_longest_interval_sum_then_lexical_address",
+        "usable_group_count": 1
+      },
+      "visual_limits": {
+        "post_capture_rogue_popup_observed": true,
+        "unobstructed_world_during_etw_verified": false,
+        "unobstructed_maximum_particle_load_verified": false,
+        "note": "Post-capture screenshots contain a rogue-reward popup; foreground telemetry does not measure modal occlusion."
+      },
+      "sources": {
+        "analysis.json": {
+          "path": "output/four_client_perf_20261012/a_live_front/analysis.json",
+          "sha256": "a1464aa355ec6c57ca80c86150f8efb1d3c2703d3c240b5bac3b369f1e4be647",
+          "bytes": 5385
+        },
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/a_live_front/capture.json",
+          "sha256": "41228c82b83a3e3908ecb1fa4902629a999c9f64ff3c718fdb1fe5b49e518e24",
+          "bytes": 574
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/a_live_front/before.log",
+          "sha256": "3f8b953181a7d130f1e3358f0c0ca576a0fbd9b442bbb0a5cc3cf1c22085fc20",
+          "bytes": 3667
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/a_live_front/after.log",
+          "sha256": "989a8eb03744d91518e7da555c2e3c90989d8a57762ced50f88291360bcc76aa",
+          "bytes": 3665
+        },
+        "focus.json": {
+          "path": "output/four_client_perf_20261012/a_live_front/focus.json",
+          "sha256": "3b4ca98de5875087392855af35a2715557606522776bf1cef5beb9d55f6e6b02",
+          "bytes": 2272
+        },
+        "presents.csv": {
+          "path": "output/four_client_perf_20261012/a_live_front/presents.csv",
+          "sha256": "8588756b8248016c2081ed75cd64fa753fb19f11f1d0e4171b246333834b1d42",
+          "bytes": 453318
+        },
+        "settings.log": {
+          "path": "output/four_client_perf_20261012/a_live_front/settings.log",
+          "sha256": "7c8b394355af992193a6be3b45e9d7c567e577ed73169c82b7fdbbe77c316055",
+          "bytes": 2938
+        },
+        "begin.log": {
+          "path": "output/four_client_perf_20261012/a_live_front/begin.log",
+          "sha256": "4e7c0200b15559ea698f65f9fd58e2221ddc28e05d39bf87ff11377b14fc40f6",
+          "bytes": 28
+        },
+        "native_fps.log": {
+          "path": "output/four_client_perf_20261012/a_live_front/native_fps.log",
+          "sha256": "9c5ad1c9f45e6364e7595fadc08123e4280cd6f2b96e9073459be8910472b07c",
+          "bytes": 257
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/a_live_front/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    },
+    {
+      "id": "a_final_peak",
+      "included_in_conclusions": true,
+      "scenario": "A",
+      "pid": 54100,
+      "capture_mode": "release",
+      "baseline_only": false,
+      "scope": "one_rendered_client_four_engine_owners",
+      "network_clients_verified": false,
+      "started_at": "2026-10-12T03:41:38.765Z",
+      "finished_at": "2026-10-12T03:42:50.515Z",
+      "requested_seconds": 60,
+      "etw_span_seconds": 59.683289,
+      "capture_wall_envelope_seconds": 71.74919990000001,
+      "presentmon_delay_seconds": 8,
+      "before": {
+        "scenario": "A",
+        "fixture_status": "ready",
+        "game_state": 10,
+        "paused": false,
+        "game_time": 2762.0334472656,
+        "engine_time": 2762.0334472656,
+        "owners": [
+          {
+            "player_id": 0,
+            "fake_engine_client": false,
+            "map_level": 1,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 1,
+            "fake_engine_client": true,
+            "map_level": 9,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 2,
+            "fake_engine_client": true,
+            "map_level": 17,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 3,
+            "fake_engine_client": true,
+            "map_level": 24,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          }
+        ],
+        "total_towers": 28.0,
+        "total_walls": 4.0,
+        "alive": 188,
+        "wave": {
+          "difficulty_id": "N2",
+          "current_wave": 15,
+          "alive": 188,
+          "alive_limit": 90,
+          "status": "dev_spawn",
+          "game_started": true,
+          "player_defeated": false,
+          "overflow_active": false,
+          "post_clear_frozen": false
+        }
+      },
+      "after": {
+        "scenario": "A",
+        "fixture_status": "ready",
+        "game_state": 10,
+        "paused": false,
+        "game_time": 2818.2001953125,
+        "engine_time": 2818.2001953125,
+        "owners": [
+          {
+            "player_id": 0,
+            "fake_engine_client": false,
+            "map_level": 1,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 1,
+            "fake_engine_client": true,
+            "map_level": 9,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 2,
+            "fake_engine_client": true,
+            "map_level": 17,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 3,
+            "fake_engine_client": true,
+            "map_level": 24,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          }
+        ],
+        "total_towers": 28.0,
+        "total_walls": 4.0,
+        "alive": 83,
+        "wave": {
+          "difficulty_id": "N2",
+          "current_wave": 15,
+          "alive": 83,
+          "alive_limit": 90,
+          "status": "dev_mode",
+          "game_started": true,
+          "player_defeated": false,
+          "overflow_active": false,
+          "post_clear_frozen": false
+        }
+      },
+      "native_counts_stable_at_endpoints": true,
+      "focus": {
+        "sampling_target_hz": 1,
+        "sample_count": 60,
+        "first_sample_seconds": 0.0,
+        "last_sample_seconds": 59.031,
+        "all_observed_game_foreground": true,
+        "observed_minimized_samples": 0,
+        "continuous_focus_between_samples_verified": false
+      },
+      "etw": {
+        "accepted_interval_count": 379,
+        "accepted_interval_sum_seconds": 59.683289,
+        "applications": [
+          "dota2.exe"
+        ],
+        "discarded_invalid_reasons": {},
+        "discarded_invalid_rows": 0,
+        "dropped_metric_note": "Dropped presents remain in present-cadence intervals; mean FPS does not assert displayed FPS.",
+        "dropped_present_rows": 0,
+        "dropped_status_unknown_rows": 0,
+        "excluded_first_present_rows": 1,
+        "first_timestamp_seconds": 8.1589077,
+        "interval_sum_minus_timestamp_span_seconds": 0.0,
+        "intervals_at_least_ms": {
+          "100": 373,
+          "33.33": 379,
+          "50": 379
+        },
+        "last_timestamp_seconds": 67.8421967,
+        "mean_fps_definition": "accepted_interval_count / sum(accepted MsBetweenPresents in seconds). With no invalid rows this equals (observed_present_rows - 1) / sum.",
+        "mean_present_fps": 6.350186,
+        "observed_present_rows": 380,
+        "present_interval_ms": {
+          "max": 266.2665,
+          "mean": 157.475697,
+          "p50": 154.1161,
+          "p95": 207.34261,
+          "p99": 226.947406
+        },
+        "process_id": 54100,
+        "slowest_1_percent_fps": {
+          "definition": "1000 divided by the arithmetic mean of the slowest ceil(accepted_interval_count * 0.01) present intervals; not the reciprocal of P99.",
+          "fps": 4.144245,
+          "fraction_of_accepted_intervals": 0.010554089709762533,
+          "interval_count": 4,
+          "mean_interval_ms": 241.29845
+        },
+        "swapchain_address": "0x000001b37d97d310",
+        "timestamp_span_seconds": 59.683289,
+        "warnings": []
+      },
+      "selection": {
+        "group_count": 1,
+        "note": "Automatic selection is a recorded heuristic, not proof of the main game window. Every process/swapchain is reported independently; no groups are pooled.",
+        "requested_process_id": 54100,
+        "requested_swapchain_address": null,
+        "selected_process_id": 54100,
+        "selected_swapchain_address": "0x000001b37d97d310",
+        "strategy": "most_accepted_intervals_then_longest_interval_sum_then_lexical_address",
+        "usable_group_count": 1
+      },
+      "visual_limits": {
+        "post_capture_rogue_popup_observed": true,
+        "unobstructed_world_during_etw_verified": false,
+        "unobstructed_maximum_particle_load_verified": false,
+        "note": "Post-capture screenshots contain a rogue-reward popup; foreground telemetry does not measure modal occlusion."
+      },
+      "sources": {
+        "analysis.json": {
+          "path": "output/four_client_perf_20261012/a_final_peak/analysis.json",
+          "sha256": "8039ed5f4b2fd45ff7e7eb1bf58a34a7b11094893993b2f34815041de4725280",
+          "bytes": 5394
+        },
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/a_final_peak/capture.json",
+          "sha256": "4f55d73b375d4ed6720ca25f02a9ec252f786e25171528f4c210c15f2b760ee3",
+          "bytes": 574
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/a_final_peak/before.log",
+          "sha256": "bae239c64206f42b0e9df577fded833076925a8514c7b998d5c0880bf95b4349",
+          "bytes": 3670
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/a_final_peak/after.log",
+          "sha256": "11ccd2073cb06b77d5c691fafba98d1dd42f99bb8b164b2ac0cef090b7a44d3c",
+          "bytes": 3666
+        },
+        "focus.json": {
+          "path": "output/four_client_perf_20261012/a_final_peak/focus.json",
+          "sha256": "d983566ede22f1b11b1ec504a1f858d44e1d75bd33307d007dcb3e10656ac36b",
+          "bytes": 4488
+        },
+        "presents.csv": {
+          "path": "output/four_client_perf_20261012/a_final_peak/presents.csv",
+          "sha256": "870e80507fbbd9bd45b43594b1c339823c81f5795e3ed8e47ec8ebd308a2e26d",
+          "bytes": 97531
+        },
+        "settings.log": {
+          "path": "output/four_client_perf_20261012/a_final_peak/settings.log",
+          "sha256": "90cdf44785ffc760cc30ee75b9dc9bcf7f7ebed5047379310358958878b26d68",
+          "bytes": 3718
+        },
+        "begin.log": {
+          "path": "output/four_client_perf_20261012/a_final_peak/begin.log",
+          "sha256": "1374ae9f86a0184d1317319dadcf414959f3e174e8cdc7714aa07fb48ef58a6f",
+          "bytes": 81
+        },
+        "native_fps.log": {
+          "path": "output/four_client_perf_20261012/a_final_peak/native_fps.log",
+          "sha256": "0cebbc92a2ac4e00e8f8293e4150391d0aa1bc1c1a288c11d1a88718250e05aa",
+          "bytes": 261
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/a_final_peak/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    },
+    {
+      "id": "b_final_wave",
+      "included_in_conclusions": true,
+      "scenario": "B",
+      "pid": 54100,
+      "capture_mode": "wave",
+      "baseline_only": false,
+      "scope": "one_rendered_client_four_engine_owners",
+      "network_clients_verified": false,
+      "started_at": "2026-10-12T03:51:27.386Z",
+      "finished_at": "2026-10-12T03:52:39.149Z",
+      "requested_seconds": 60,
+      "etw_span_seconds": 59.92908,
+      "capture_wall_envelope_seconds": 71.76162579999999,
+      "presentmon_delay_seconds": 8,
+      "before": {
+        "scenario": "B",
+        "fixture_status": "ready",
+        "game_state": 10,
+        "paused": false,
+        "game_time": 882.00006103516,
+        "engine_time": 882.00006103516,
+        "owners": [
+          {
+            "player_id": 0,
+            "fake_engine_client": false,
+            "map_level": 1,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 1,
+            "fake_engine_client": true,
+            "map_level": 9,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          },
+          {
+            "player_id": 2,
+            "fake_engine_client": true,
+            "map_level": 17,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          },
+          {
+            "player_id": 3,
+            "fake_engine_client": true,
+            "map_level": 24,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          }
+        ],
+        "total_towers": 7.0,
+        "total_walls": 4.0,
+        "alive": 0,
+        "wave": {
+          "difficulty_id": "N2",
+          "current_wave": 0,
+          "alive": 0,
+          "alive_limit": 90,
+          "status": "dev_mode",
+          "game_started": true,
+          "player_defeated": false,
+          "overflow_active": false,
+          "post_clear_frozen": false
+        }
+      },
+      "after": {
+        "scenario": "B",
+        "fixture_status": "ready",
+        "game_state": 10,
+        "paused": false,
+        "game_time": 948.40002441406,
+        "engine_time": 948.40002441406,
+        "owners": [
+          {
+            "player_id": 0,
+            "fake_engine_client": false,
+            "map_level": 1,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 1,
+            "fake_engine_client": true,
+            "map_level": 9,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          },
+          {
+            "player_id": 2,
+            "fake_engine_client": true,
+            "map_level": 17,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          },
+          {
+            "player_id": 3,
+            "fake_engine_client": true,
+            "map_level": 24,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          }
+        ],
+        "total_towers": 7.0,
+        "total_walls": 4.0,
+        "alive": 199,
+        "wave": {
+          "difficulty_id": "N2",
+          "current_wave": 15,
+          "alive": 199,
+          "alive_limit": 90,
+          "status": "dev_spawn",
+          "game_started": true,
+          "player_defeated": false,
+          "overflow_active": false,
+          "post_clear_frozen": false
+        }
+      },
+      "native_counts_stable_at_endpoints": true,
+      "focus": {
+        "sampling_target_hz": 1,
+        "sample_count": 60,
+        "first_sample_seconds": 0.0,
+        "last_sample_seconds": 59.03,
+        "all_observed_game_foreground": true,
+        "observed_minimized_samples": 0,
+        "continuous_focus_between_samples_verified": false
+      },
+      "etw": {
+        "accepted_interval_count": 824,
+        "accepted_interval_sum_seconds": 59.92908,
+        "applications": [
+          "dota2.exe"
+        ],
+        "discarded_invalid_reasons": {},
+        "discarded_invalid_rows": 0,
+        "dropped_metric_note": "Dropped presents remain in present-cadence intervals; mean FPS does not assert displayed FPS.",
+        "dropped_present_rows": 0,
+        "dropped_status_unknown_rows": 0,
+        "excluded_first_present_rows": 1,
+        "first_timestamp_seconds": 8.0162063,
+        "interval_sum_minus_timestamp_span_seconds": 0.0,
+        "intervals_at_least_ms": {
+          "100": 277,
+          "33.33": 447,
+          "50": 341
+        },
+        "last_timestamp_seconds": 67.945286,
+        "mean_fps_definition": "accepted_interval_count / sum(accepted MsBetweenPresents in seconds). With no invalid rows this equals (observed_present_rows - 1) / sum.",
+        "mean_present_fps": 13.749585,
+        "observed_present_rows": 825,
+        "present_interval_ms": {
+          "max": 251.3941,
+          "mean": 72.729466,
+          "p50": 37.14365,
+          "p95": 190.64456,
+          "p99": 213.139577
+        },
+        "process_id": 54100,
+        "slowest_1_percent_fps": {
+          "definition": "1000 divided by the arithmetic mean of the slowest ceil(accepted_interval_count * 0.01) present intervals; not the reciprocal of P99.",
+          "fps": 4.417201,
+          "fraction_of_accepted_intervals": 0.010922330097087379,
+          "interval_count": 9,
+          "mean_interval_ms": 226.387711
+        },
+        "swapchain_address": "0x000001b37d97d310",
+        "timestamp_span_seconds": 59.92908,
+        "warnings": []
+      },
+      "selection": {
+        "group_count": 1,
+        "note": "Automatic selection is a recorded heuristic, not proof of the main game window. Every process/swapchain is reported independently; no groups are pooled.",
+        "requested_process_id": 54100,
+        "requested_swapchain_address": null,
+        "selected_process_id": 54100,
+        "selected_swapchain_address": "0x000001b37d97d310",
+        "strategy": "most_accepted_intervals_then_longest_interval_sum_then_lexical_address",
+        "usable_group_count": 1
+      },
+      "visual_limits": {
+        "post_capture_rogue_popup_observed": true,
+        "unobstructed_world_during_etw_verified": false,
+        "unobstructed_maximum_particle_load_verified": false,
+        "note": "Post-capture screenshots contain a rogue-reward popup; foreground telemetry does not measure modal occlusion."
+      },
+      "sources": {
+        "analysis.json": {
+          "path": "output/four_client_perf_20261012/b_final_wave/analysis.json",
+          "sha256": "a36fdad943d02bcc4fa524a1534b2c001b4f09f6bdcc22fb18143a3b846c575b",
+          "bytes": 5390
+        },
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/b_final_wave/capture.json",
+          "sha256": "5245d119239362cd654bf0853c4ea1ef538cf81c56917091fac8902b740f13fc",
+          "bytes": 571
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/b_final_wave/before.log",
+          "sha256": "91dc5ab027221e2f2c9b8dff5d7c25cd7faf1ae25a75830dcf0d040009866152",
+          "bytes": 3124
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/b_final_wave/after.log",
+          "sha256": "12e0082ad6677b6bb70bf7fc12778de6c7abdbe307f4caa10c393a2cc1f17cec",
+          "bytes": 3128
+        },
+        "focus.json": {
+          "path": "output/four_client_perf_20261012/b_final_wave/focus.json",
+          "sha256": "06aaf009a90209e7df98caf76844c1796d1e67d3412d88705e52671e37a33bb2",
+          "bytes": 4487
+        },
+        "presents.csv": {
+          "path": "output/four_client_perf_20261012/b_final_wave/presents.csv",
+          "sha256": "0572fdc858e47d3c8f6dc22c40316dc4b681b2b9448cbb1e7c135250204d81e1",
+          "bytes": 210273
+        },
+        "settings.log": {
+          "path": "output/four_client_perf_20261012/b_final_wave/settings.log",
+          "sha256": "2a7fcf6db3fb808b0b963acc0d67e87c5e01dd4ac8dc7d9bfe38e39d714d17f3",
+          "bytes": 2819
+        },
+        "begin.log": {
+          "path": "output/four_client_perf_20261012/b_final_wave/begin.log",
+          "sha256": "fe705afdaa27f992f6d3c449b5cbc45f93c9796c0601b990b16f749cb09edd97",
+          "bytes": 654
+        },
+        "native_fps.log": {
+          "path": "output/four_client_perf_20261012/b_final_wave/native_fps.log",
+          "sha256": "7d5dcb97512df5108e209ec1a60e791def409bfdb2fc9ad489161146dd63bd34",
+          "bytes": 262
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/b_final_wave/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    },
+    {
+      "id": "b_after_clear",
+      "included_in_conclusions": true,
+      "scenario": "B",
+      "pid": 54100,
+      "capture_mode": "steady",
+      "baseline_only": true,
+      "scope": "one_rendered_client_four_engine_owners",
+      "network_clients_verified": false,
+      "started_at": "2026-10-12T03:58:25.583Z",
+      "finished_at": "2026-10-12T03:59:07.3Z",
+      "requested_seconds": 30,
+      "etw_span_seconds": 29.916626,
+      "capture_wall_envelope_seconds": 41.7160549,
+      "presentmon_delay_seconds": 8,
+      "before": {
+        "scenario": "B",
+        "fixture_status": "ready",
+        "game_state": 10,
+        "paused": false,
+        "game_time": 1247.9333496094,
+        "engine_time": 1247.9333496094,
+        "owners": [
+          {
+            "player_id": 0,
+            "fake_engine_client": false,
+            "map_level": 1,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 1,
+            "fake_engine_client": true,
+            "map_level": 9,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          },
+          {
+            "player_id": 2,
+            "fake_engine_client": true,
+            "map_level": 17,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          },
+          {
+            "player_id": 3,
+            "fake_engine_client": true,
+            "map_level": 24,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          }
+        ],
+        "total_towers": 7.0,
+        "total_walls": 4.0,
+        "alive": 0,
+        "wave": {
+          "difficulty_id": "N2",
+          "current_wave": 15,
+          "alive": 0,
+          "alive_limit": 90,
+          "status": "dev_mode",
+          "game_started": true,
+          "player_defeated": false,
+          "overflow_active": false,
+          "post_clear_frozen": false
+        }
+      },
+      "after": {
+        "scenario": "B",
+        "fixture_status": "ready",
+        "game_state": 10,
+        "paused": false,
+        "game_time": 1301.7667236328,
+        "engine_time": 1301.7667236328,
+        "owners": [
+          {
+            "player_id": 0,
+            "fake_engine_client": false,
+            "map_level": 1,
+            "counts": {
+              "arrow_tower": 7,
+              "building_advanced_research_lab": 1,
+              "building_farm": 1,
+              "building_research_lab": 1,
+              "main_city": 1,
+              "wall": 1
+            },
+            "research_levels": {
+              "ARS-01": 1,
+              "ARS-02": 1,
+              "RS-01": 1,
+              "RS-03": 1,
+              "RS-04": 1,
+              "RS-06": 1,
+              "RS-08": 1
+            }
+          },
+          {
+            "player_id": 1,
+            "fake_engine_client": true,
+            "map_level": 9,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          },
+          {
+            "player_id": 2,
+            "fake_engine_client": true,
+            "map_level": 17,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          },
+          {
+            "player_id": 3,
+            "fake_engine_client": true,
+            "map_level": 24,
+            "counts": {
+              "wall": 1
+            },
+            "research_levels": []
+          }
+        ],
+        "total_towers": 7.0,
+        "total_walls": 4.0,
+        "alive": 0,
+        "wave": {
+          "difficulty_id": "N2",
+          "current_wave": 15,
+          "alive": 0,
+          "alive_limit": 90,
+          "status": "dev_mode",
+          "game_started": true,
+          "player_defeated": false,
+          "overflow_active": false,
+          "post_clear_frozen": false
+        }
+      },
+      "native_counts_stable_at_endpoints": true,
+      "focus": {
+        "sampling_target_hz": 1,
+        "sample_count": 30,
+        "first_sample_seconds": 0.0,
+        "last_sample_seconds": 29.014,
+        "all_observed_game_foreground": true,
+        "observed_minimized_samples": 0,
+        "continuous_focus_between_samples_verified": false
+      },
+      "etw": {
+        "accepted_interval_count": 1795,
+        "accepted_interval_sum_seconds": 29.916626,
+        "applications": [
+          "dota2.exe"
+        ],
+        "discarded_invalid_reasons": {},
+        "discarded_invalid_rows": 0,
+        "dropped_metric_note": "Dropped presents remain in present-cadence intervals; mean FPS does not assert displayed FPS.",
+        "dropped_present_rows": 0,
+        "dropped_status_unknown_rows": 0,
+        "excluded_first_present_rows": 1,
+        "first_timestamp_seconds": 8.0141331,
+        "interval_sum_minus_timestamp_span_seconds": 0.0,
+        "intervals_at_least_ms": {
+          "100": 0,
+          "33.33": 0,
+          "50": 0
+        },
+        "last_timestamp_seconds": 37.930759,
+        "mean_fps_definition": "accepted_interval_count / sum(accepted MsBetweenPresents in seconds). With no invalid rows this equals (observed_present_rows - 1) / sum.",
+        "mean_present_fps": 60.000082,
+        "observed_present_rows": 1796,
+        "present_interval_ms": {
+          "max": 22.4345,
+          "mean": 16.666644,
+          "p50": 16.6654,
+          "p95": 16.92152,
+          "p99": 18.713918
+        },
+        "process_id": 54100,
+        "slowest_1_percent_fps": {
+          "definition": "1000 divided by the arithmetic mean of the slowest ceil(accepted_interval_count * 0.01) present intervals; not the reciprocal of P99.",
+          "fps": 50.064876,
+          "fraction_of_accepted_intervals": 0.010027855153203343,
+          "interval_count": 18,
+          "mean_interval_ms": 19.974083
+        },
+        "swapchain_address": "0x000001b37d97d310",
+        "timestamp_span_seconds": 29.916626,
+        "warnings": []
+      },
+      "selection": {
+        "group_count": 1,
+        "note": "Automatic selection is a recorded heuristic, not proof of the main game window. Every process/swapchain is reported independently; no groups are pooled.",
+        "requested_process_id": 54100,
+        "requested_swapchain_address": null,
+        "selected_process_id": 54100,
+        "selected_swapchain_address": "0x000001b37d97d310",
+        "strategy": "most_accepted_intervals_then_longest_interval_sum_then_lexical_address",
+        "usable_group_count": 1
+      },
+      "visual_limits": {
+        "post_capture_rogue_popup_observed": true,
+        "unobstructed_world_during_etw_verified": false,
+        "unobstructed_maximum_particle_load_verified": false,
+        "note": "Post-capture screenshots contain a rogue-reward popup; foreground telemetry does not measure modal occlusion."
+      },
+      "sources": {
+        "analysis.json": {
+          "path": "output/four_client_perf_20261012/b_after_clear/analysis.json",
+          "sha256": "c650e9ddfed3524f17af8173fc79a6b407ccaf2adb0e847fc7eb8a9935548375",
+          "bytes": 5382
+        },
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/b_after_clear/capture.json",
+          "sha256": "eb920c1e7488088b6bb25e4b48e9a0558c079b0e9820a463e9b245d072c6bdf0",
+          "bytes": 567
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/b_after_clear/before.log",
+          "sha256": "3400c91db2747175776fd1309a2868f2d36d5cc52a3d407571963d338780afe6",
+          "bytes": 3127
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/b_after_clear/after.log",
+          "sha256": "ac37a32adbcec6e7d6126be93c10ba65f2994e291121b5396233fbb378ee5683",
+          "bytes": 3125
+        },
+        "focus.json": {
+          "path": "output/four_client_perf_20261012/b_after_clear/focus.json",
+          "sha256": "143b2e897304c2bfc3f35a9eb7144162cba2507b246cea117c34913bedddf17f",
+          "bytes": 2271
+        },
+        "presents.csv": {
+          "path": "output/four_client_perf_20261012/b_after_clear/presents.csv",
+          "sha256": "1fa6b71e25aa338e24c6ea9ae93622bfff01f232b0437dd20cf2103ce15264a8",
+          "bytes": 458134
+        },
+        "settings.log": {
+          "path": "output/four_client_perf_20261012/b_after_clear/settings.log",
+          "sha256": "e5a8491de473e183c6e88cc590214338346e64ad63a1c899e99db29d569e8655",
+          "bytes": 2948
+        },
+        "begin.log": {
+          "path": "output/four_client_perf_20261012/b_after_clear/begin.log",
+          "sha256": "ae4be7373bbca2d30f39627e0c6be6cb39346d1b55d7c54ad7876ccd04a3c2fe",
+          "bytes": 28
+        },
+        "native_fps.log": {
+          "path": "output/four_client_perf_20261012/b_after_clear/native_fps.log",
+          "sha256": "d1fccd3b1a7c1f893fb97c28206c20adc997999b0db6d8193bc1ea7d7c54bf74",
+          "bytes": 257
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/b_after_clear/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    }
+  ],
+  "excluded_historical_samples": [
+    {
+      "id": "prepare_fourowners",
+      "included_in_conclusions": false,
+      "fps_statistics_intentionally_omitted": true,
+      "reasons": [
+        "PresentMon exited unsuccessfully.",
+        "No timed foreground/minimization telemetry.",
+        "Published raw ETW CSV is missing.",
+        "Fixture was still in preparation."
+      ],
+      "sources": {
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/prepare_fourowners/capture.json",
+          "sha256": "4fc4a03f989993809cce82d95768628b007ae13d4bbf5d2fe8db4209eb6816b7",
+          "bytes": 512
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/prepare_fourowners/before.log",
+          "sha256": "0e5e2feb9c9bce6db357066a0fb41ea610a8c78d45543986d7d5273b2067fe41",
+          "bytes": 148
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/prepare_fourowners/after.log",
+          "sha256": "bafff11e8067678f4394c1284b36d1780054f0e5df15aedaa08d7a8ebb8d992e",
+          "bytes": 146
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/prepare_fourowners/presentmon.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    },
+    {
+      "id": "a_idle",
+      "included_in_conclusions": false,
+      "fps_statistics_intentionally_omitted": true,
+      "reasons": [
+        "No timed foreground/minimization telemetry."
+      ],
+      "sources": {
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/a_idle/capture.json",
+          "sha256": "21b40a1cd4f97c14a8fa6d6057d640e4d8229f86a3ba04dc3366a8c3dbade192",
+          "bytes": 507
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/a_idle/before.log",
+          "sha256": "1e4dab8e6826194756bfe09e03062631cdd0c3d1e53c6719a36a371671bfbb77",
+          "bytes": 4031
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/a_idle/after.log",
+          "sha256": "e8220dd49518269701066ae6db0d5a4565bc71f60e5467861106b7e9b5715b32",
+          "bytes": 3663
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/a_idle/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    },
+    {
+      "id": "a_wave15",
+      "included_in_conclusions": false,
+      "fps_statistics_intentionally_omitted": true,
+      "reasons": [
+        "No timed foreground/minimization telemetry.",
+        "Towers changed 28 to 25, preceding native projectile-speed/facing modifier registration repairs."
+      ],
+      "sources": {
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/a_wave15/capture.json",
+          "sha256": "22faef566464446bad108f215db45afe470fcf4236ebce3ee8a46a9d00e1b53d",
+          "bytes": 500
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/a_wave15/before.log",
+          "sha256": "7e45a44804aea089bc455b217cd08011c3eee1e22f404c5032c16486d58856bb",
+          "bytes": 3665
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/a_wave15/after.log",
+          "sha256": "e73d6ff811974e77e6f3f8e12dcc241f73fe6230abbfe0ff1123d00ac7d9178f",
+          "bytes": 3666
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/a_wave15/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    },
+    {
+      "id": "a_fixed_wave15",
+      "included_in_conclusions": false,
+      "fps_statistics_intentionally_omitted": true,
+      "reasons": [
+        "No timed foreground/minimization telemetry."
+      ],
+      "sources": {
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/a_fixed_wave15/capture.json",
+          "sha256": "987564eb1336892a6c1a09360ad5049c9d1444ddb4f7751ea9e0a933094e8d1b",
+          "bytes": 513
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_wave15/before.log",
+          "sha256": "205bba9bf81f5dfdafee8cfbfcc833f9a6af4c40aaf6a8743873631f7d97255c",
+          "bytes": 3664
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_wave15/after.log",
+          "sha256": "e894108fb82f29feab4d92a85ecfd250a9c266e1828b4472730a20a8ae2c5264",
+          "bytes": 3666
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_wave15/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    },
+    {
+      "id": "a_fixed_backlog_release",
+      "included_in_conclusions": false,
+      "fps_statistics_intentionally_omitted": true,
+      "reasons": [
+        "No timed foreground/minimization telemetry.",
+        "Published raw ETW CSV is missing."
+      ],
+      "sources": {
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/a_fixed_backlog_release/capture.json",
+          "sha256": "3fb73e9cd11e8a8226ed00eedaf84196418f9a73d7a8307e3c10fd5587c07908",
+          "bytes": 518
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_backlog_release/before.log",
+          "sha256": "008148c4324ee2120f77ecf1181862913fcc02cd412a2fcba161a7b7da847e99",
+          "bytes": 3669
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_backlog_release/after.log",
+          "sha256": "26c78af2799aa9266220c9ddf9572f6a26bdc23cc90ee16ce90858b312623e86",
+          "bytes": 3666
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_backlog_release/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    },
+    {
+      "id": "a_fixed_peak_verified",
+      "included_in_conclusions": false,
+      "fps_statistics_intentionally_omitted": true,
+      "reasons": [
+        "Game was not foreground in timed focus samples.",
+        "Published raw ETW CSV is missing."
+      ],
+      "sources": {
+        "capture.json": {
+          "path": "output/four_client_perf_20261012/a_fixed_peak_verified/capture.json",
+          "sha256": "a82e6f55c4939166a7060efe1c2a5d82da30919b984615bf0e6f8024ce356f0a",
+          "bytes": 516
+        },
+        "before.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_peak_verified/before.log",
+          "sha256": "5f9518a7251cb703d24cae406367c1a0a2017cd0d5e117b7a77a208e6015aa9a",
+          "bytes": 3667
+        },
+        "after.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_peak_verified/after.log",
+          "sha256": "9d21555388b3369cd87d1314abc3396abba1222f2e6d6dc4a43ce9c704802756",
+          "bytes": 3666
+        },
+        "focus.json": {
+          "path": "output/four_client_perf_20261012/a_fixed_peak_verified/focus.json",
+          "sha256": "db60ef34113d02b970034c005ee49a1f84fc476ce5ba378857403728c1cd5772",
+          "bytes": 4486
+        },
+        "presentmon.log": {
+          "path": "output/four_client_perf_20261012/a_fixed_peak_verified/presentmon.log",
+          "sha256": "cbf5730be32edae5d0ad1618e2375f3c4c472da75350c4971980e20d98aca0e6",
+          "bytes": 40
+        }
+      }
+    }
+  ],
+  "profile_contract": {
+    "storage": "Match-only in-memory overlay; actual account saves are not replaced.",
+    "map_levels_by_engine_id": {
+      "0": 1,
+      "1": 9,
+      "2": 17,
+      "3": 24
+    },
+    "all_archive_inventory_and_all_effect_fields_verified_in_etw_snapshots": false,
+    "read_hooks": [
+      "get_profile",
+      "get_account_profile",
+      "get_progression",
+      "get_content_inventory_count"
+    ],
+    "research_and_counts_observed_in_each_before_after_snapshot": true,
+    "empty_research_map_source_representation": "Lua empty maps may encode as []; preserved from the native snapshots."
+  },
+  "benchmark_adjustments": {
+    "tower_min_health_floor": 1,
+    "tower_scope": "Selected normal fixture route towers only: A=28, B=7.",
+    "wall_armor_override": 100000,
+    "wall_min_health_floor": 1,
+    "survival_protection_is_simulation": true,
+    "hp_armor_damage_attack_speed_written_by_tower_floor": false,
+    "native_attacks_hits_particles_retained": true,
+    "real_archive_payment_writes_isolated": true,
+    "normal_build_upgrade_training_research_timers_used": true,
+    "note": "Repeatable peak fixture; not unmodified player survival."
+  },
+  "correctness_repairs_this_turn": {
+    "modifiers_registered": [
+      "modifier_tower_projectile_speed",
+      "modifier_tower_fixed_facing"
+    ],
+    "registry": "scripts/vscripts/core/modifier_registry.lua",
+    "classification": "Missing modifier registration correctness fixes",
+    "claimed_fps_optimization": false,
+    "matched_before_after_optimization_comparison_performed": false
+  },
+  "network_limit": {
+    "four_independent_client_sync_test_completed": false,
+    "second_independent_client_connected": false,
+    "reason": "No game window or additional host connection after local tools multi-instance launch",
+    "source": {
+      "path": "output/four_client_perf_20261012/multiclient_limit.json",
+      "sha256": "bbcb0e93c56859f0114a95ed5471382f906f9b93c8c43922c49ff25af28f6f41",
+      "bytes": 234
+    }
+  },
+  "cleanup": {
+    "fresh_map_verified": true,
+    "current_fixture_count": 0,
+    "current_write_guard_count": 0,
+    "source": {
+      "path": "output/four_client_perf_20261012/cleanup.log",
+      "sha256": "8c8fc046c33dd905e23c089785da1de24c58ef3a2e946640b075a047dea8d1cc",
+      "bytes": 347
+    }
+  },
+  "current_source_hashes": {
+    "timing": "Computed after captures; not claimed to be capture-time immutable build provenance.",
+    "files": [
+      {
+        "path": "tools/run_four_player_live_perf.cjs",
+        "sha256": "63766a8ea9ee364efbcb4ac83c91f398fcea80b74a6662f60f69a5d91314d8a3",
+        "bytes": 12314
+      },
+      {
+        "path": "tools/analyze_presentmon_capture.py",
+        "sha256": "657182198b5138d5e24cea9f933326a4ce2930920e3a60ecd0d718f89f270851",
+        "bytes": 13025
+      },
+      {
+        "path": "tools/observe_live_perf_focus.py",
+        "sha256": "6a0078cf024bce2ba35f6faa8131e7360e9aafd1a77cf5b0eb7fb770d5deebc1",
+        "bytes": 1240
+      },
+      {
+        "path": "tools/focus_live_perf_window.ps1",
+        "sha256": "560f890778941346a6efa3935ee71b08e4e765bd510e5f31ed20c76b1bbdd33d",
+        "bytes": 2263
+      },
+      {
+        "path": "scripts/vscripts/tests/manual_four_player_live_perf.lua",
+        "sha256": "23f5f5b1a8bb26fbe0883286ce35730ac22d0562e47d66daa7c2688f4078c2ca",
+        "bytes": 32818
+      },
+      {
+        "path": "scripts/vscripts/tests/manual_real_game_stress.lua",
+        "sha256": "3cbfcded06f261af27036858dc0299760d56c68a2694bb8f6514c04468177b07",
+        "bytes": 61230
+      },
+      {
+        "path": "scripts/vscripts/tests/modifier_manual_four_player_live_perf_tower.lua",
+        "sha256": "aa0ba454d00079e7716bdcb85b5e494cdc1af02ec8460d330896d4d0e7f58cf2",
+        "bytes": 1544
+      },
+      {
+        "path": "scripts/vscripts/tests/modifier_manual_real_game_stress_wall.lua",
+        "sha256": "9c23e89e3f8bc6c4b04e2c4f04e8b0606a6b229ff455e544df395fa11460c23f",
+        "bytes": 1582
+      },
+      {
+        "path": "scripts/vscripts/core/modifier_registry.lua",
+        "sha256": "fc377f84a2df35abeb90b91bdb9f1fcfc25d4612e5249e54a84fa15378232b76",
+        "bytes": 11825
+      }
+    ]
+  },
+  "validation_checks": [
+    {
+      "sample": "a_live_front",
+      "csv_sha_matches_analysis": true,
+      "native_pid_scope_counts_profiles_focus_checks_passed": true
+    },
+    {
+      "sample": "a_final_peak",
+      "csv_sha_matches_analysis": true,
+      "native_pid_scope_counts_profiles_focus_checks_passed": true
+    },
+    {
+      "sample": "b_final_wave",
+      "csv_sha_matches_analysis": true,
+      "native_pid_scope_counts_profiles_focus_checks_passed": true
+    },
+    {
+      "sample": "b_after_clear",
+      "csv_sha_matches_analysis": true,
+      "native_pid_scope_counts_profiles_focus_checks_passed": true
+    }
+  ],
+  "conclusions": {
+    "valid_capture_count": 4,
+    "high_load_no_stutter_requirement_met": false,
+    "high_load_capture_ids": [
+      "a_final_peak",
+      "b_final_wave"
+    ],
+    "calm_baseline_ids": [
+      "a_live_front",
+      "b_after_clear"
+    ],
+    "note": "Only these four foreground-observed captures contribute FPS conclusions. Heavy samples have long present intervals. Four network clients and an unobstructed maximum-particle test remain unverified."
+  }
+}

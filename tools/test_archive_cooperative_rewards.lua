@@ -202,5 +202,46 @@ tick(1)
 check(not cooperative.has_pending() and profiles[1].save.archive.social_tickets.invitation == 1,
     "retry successfully hands off the missing account with the same event")
 check(delivered == 5, "each shared receipt plus the unrelated ticket occurs once during retry")
+-- A wife challenge is a new team event and owns an independent daily currency.
+fresh({0, 1, 2, 3})
+local wife_rule=assert(require("config/generated/archive_social_rules").by_id.wife,
+    "wife challenge needs its own configured social pool")
+check(wife_rule.daily_limit==10 and wife_rule.currency_id~="invitation"
+    and wife_rule.currency_id~="yitie" and wife_rule.currency_id~="blessing_ticket",
+    "wife tickets have an independent ten-per-day limit")
+profiles[0].entitlements.archive_pass={active=true,expires_at=1700000600}
+profiles[1].entitlements.vip={active=true,level=12}
+for index,id in ipairs({"social_ex","social_friend","social_beast","social_wife"}) do
+    check(cooperative.record_challenge(0,id,index,"N10").recipients==4,
+        "all four participants receive the complete independent "..id.." reward")
+end
+for id=0,3 do
+    local tickets=profiles[id].save.archive.social_tickets
+    check(tickets[wife_rule.currency_id]==1 and tickets.invitation==1 and tickets.yitie==1
+        and tickets.blessing_ticket==1,"wife reward preserves all other currencies for account "..id)
+end
+check(cooperative.record_challenge(2,"social_wife",99,"N10").duplicate and delivered==16,
+    "a second summoner cannot multiply the shared wife reward; VIP/pass do not lend bonus identity")
+local saved=profile()
+saved.save.archive={social_tickets={invitation=7,yitie=8,blessing_ticket=9}}
+for index=1,wife_rule.daily_limit+2 do
+    local command={id="wife_daily:"..index,kind="challenge",challenge_id="social_wife",
+        difficulty_id="N10",kill_sequence=index,day_key="20410"}
+    local result=reducer.settle(saved,command,false)
+    check(result.ok,"wife daily settlement accepts a trusted challenge event")
+    saved.save.archive,saved.save.gameplay_stats=result.archive,result.gameplay_stats
+    local replay=reducer.settle(saved,command,false)
+    check(replay.ok and replay.duplicate
+        and replay.archive.social_tickets[wife_rule.currency_id]==result.archive.social_tickets[wife_rule.currency_id],
+        "wife settlement replay cannot add another ticket")
+end
+check(saved.save.archive.social_tickets[wife_rule.currency_id]==10
+    and saved.save.archive.daily["20410"].social_wife==10,"wife daily limit clamps repeated matches at ten")
+check(saved.save.archive.social_tickets.invitation==7 and saved.save.archive.social_tickets.yitie==8
+    and saved.save.archive.social_tickets.blessing_ticket==9,"wife daily quota never consumes another pool's currency")
+local tomorrow=reducer.settle(saved,{id="wife_daily:tomorrow",kind="challenge",challenge_id="social_wife",
+    difficulty_id="N10",kill_sequence=1,day_key="20411"},false)
+check(tomorrow.ok and tomorrow.archive.social_tickets[wife_rule.currency_id]==11
+    and tomorrow.archive.daily["20411"].social_wife==1,"wife quota resets for the next trusted day bucket")
 check(#errors == 0, table.concat(errors, "\n"))
-report("ARCHIVE_COOPERATIVE_REWARDS_PASS " .. checks .. " checks: roster, source authority, account isolation, monthly perks, delayed profile, disconnect, failure retries, highest team floor, bounded transport and terminal flush")
+report("ARCHIVE_COOPERATIVE_REWARDS_PASS " .. checks .. " checks: roster, source authority, account isolation, monthly perks, delayed profile, disconnect, failure retries, highest team floor, bounded transport, terminal flush and independent wife daily rewards")

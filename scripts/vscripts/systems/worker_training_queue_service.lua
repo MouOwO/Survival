@@ -3,9 +3,10 @@ local M = {}
 -- A city owns one serial production queue. Waiting jobs reserve training
 -- quotas, while their currency and population are charged only at the head.
 function M.create(deps)
-    local queues, sequence = {}, 0
+    local queues, revisions, sequence = {}, {}, 0
     local service = {}
     local function publish(queue)
+        revisions[queue.source_entindex] = (revisions[queue.source_entindex] or 0) + 1
         deps.changed(queue.player_id, queue.team, queue.source_entindex)
     end
     local function public_job(job)
@@ -37,7 +38,7 @@ function M.create(deps)
             queue.cancel_reason = "queue_reset"
             deps.cancel(queue.task_id)
         end
-        queues, sequence = {}, 0
+        queues, revisions, sequence = {}, {}, 0
     end
     function service:reserved(player_id, training_id)
         local count = 0
@@ -51,9 +52,11 @@ function M.create(deps)
         return count
     end
     function service:snapshot(source_entindex, player_id)
-        local queue = queues[tonumber(source_entindex)]
+        local source = tonumber(source_entindex)
+        local queue = queues[source]
         local snapshot = {active_job = {}, blocked_head = {}, blocked_reason = "",
             queued = {}, queue_count = 0, queue_capacity = deps.capacity or 7,
+            queue_revision = revisions[source] or 0,
             cost_timing_text = "开始训练时扣费，排队未扣费"}
         if not queue or queue.player_id ~= player_id then return snapshot end
         snapshot.queue_count = #queue.jobs

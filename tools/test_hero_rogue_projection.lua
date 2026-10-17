@@ -21,6 +21,7 @@ function IsServer() return server end
 function class(base) base.__index = base; return base end
 MODIFIER_PROPERTY_BASE_ATTACK_TIME_CONSTANT = 1
 MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT = 2
+MODIFIER_PROPERTY_ATTACKSPEED_PERCENTAGE = 7
 MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE = 3
 MODIFIER_PROPERTY_DAMAGEOUTGOING_PERCENTAGE = 4
 MODIFIER_EVENT_ON_ATTACK_RECORD = 5
@@ -45,6 +46,7 @@ end
 assert(declares_speed, "the engine must invoke the declared attack-speed callback")
 require("modifiers/modifier_equipment_effects")
 require("modifiers/modifier_rogue_combat_effects")
+require("modifiers/modifier_lumberjack_cheer")
 local heroes = require("config/generated/hero_definitions")
 local equipment, permanent, active = {}, {}, {}
 local function near(a, b, label)
@@ -79,6 +81,8 @@ local function unit(id, hero_id)
         function m:SetHasCustomTransmitterData() end
         function m:SendBuffRefreshToClients() self.transmitted = self:AddCustomTransmitterData() end
         function m:StartIntervalThink() end
+        function m:SetStackCount(value) self.stacks = value end
+        function m:GetStackCount() return self.stacks or 0 end
         function m:ForceRefresh() u.refreshes = u.refreshes + 1; if self.OnRefresh then self:OnRefresh() end end
         self.modifiers[name] = m
         if m.OnCreated then m:OnCreated(params or {}) end
@@ -87,9 +91,13 @@ local function unit(id, hero_id)
     function u:CalculateStatBonus() end
     function u:GetAttackSpeed()
         local hero, gear = self.modifiers.modifier_weapon_stat_projection, self.modifiers.modifier_equipment_effects
-        return 1 + ((hero and hero.GetModifierAttackSpeedBonus_Constant
+        local cheer = self.modifiers.modifier_lumberjack_cheer
+        -- These production callbacks have different native semantics: flat IAS
+        -- adds, then ATTACKSPEED_PERCENTAGE multiplies the aggregate rate.
+        return (1 + ((hero and hero.GetModifierAttackSpeedBonus_Constant
             and hero:GetModifierAttackSpeedBonus_Constant() or 0)
-            + (gear and gear:GetModifierAttackSpeedBonus_Constant() or 0)) / 100
+            + (gear and gear:GetModifierAttackSpeedBonus_Constant() or 0)) / 100)
+            * (1 + (cheer and cheer:GetModifierAttackSpeedPercentage() or 0) / 100)
     end
     function u:attack_rate()
         local m = self.modifiers.modifier_weapon_stat_projection
@@ -120,9 +128,13 @@ local function grant(id, card, kind)
     assert(result.ok, result.error); return result
 end
 local function synchronized(u, expected)
-    near(stats(u.id).attack_speed, expected, "panel attack rate")
+    local current = stats(u.id)
+    near(current.attack_speed, expected, "panel attack rate")
     near(u:attack_rate(), expected, "native modifier attack rate")
     near(u.survival_attack_speed, expected, "entity cached rate")
+    near(current.attack_cadence.engine_interval, 1 / u:attack_rate(), "native cadence interval")
+    near(current.attack_cadence.percentage,
+        current.attack_cadence.reduced_interval * u:attack_rate() * 100, "native cadence percentage")
     local source = u.modifiers.modifier_weapon_stat_projection
     local client = setmetatable({}, {__index = projection})
     client:HandleCustomTransmitterData(source:AddCustomTransmitterData())
@@ -157,6 +169,17 @@ bus.emit(events.EQUIPMENT_STATS_CHANGED, {player_id = 0})
 synchronized(first, 7 / (base - 0.03)) -- Additive 500 + 100, not multiplicative.
 permanent[0] = {hero_attack_speed_bonus_pct = 25, hero_attack_interval_reduction = 0.02}
 bus.emit(events.PERMANENT_REWARD_EFFECTS_CHANGED, {player_id = 0})
+synchronized(first, 7.25 / (base - 0.05))
+local cheer = first:AddNewModifier(first, nil, "modifier_lumberjack_cheer", {})
+cheer:SetStackCount(50)
+first.survival_cheer_attack_speed_pct = 50
+bus.emit(events.UNIT_COMBAT_STATS_CHANGED,
+    {player_id = 0, unit = first, reason = "lumberjack_cheer_changed"})
+synchronized(first, 7.25 * 1.5 / (base - 0.05))
+cheer:SetStackCount(0)
+first.survival_cheer_attack_speed_pct = 0
+bus.emit(events.UNIT_COMBAT_STATS_CHANGED,
+    {player_id = 0, unit = first, reason = "lumberjack_cheer_changed"})
 synchronized(first, 7.25 / (base - 0.05))
 bus.emit(events.HERO_REMOVED, {player_id = 0, unit = first})
 local replacement = summon(0, "hero_blademaster")
@@ -204,4 +227,4 @@ for i=1,200 do
 end
 assert(attack_time_writes == 0, "tower growth never rewrites the hero attack timer")
 print = original_print
-print("HERO_ROGUE_PROJECTION_PASS early/late summon; 6 heroes; additive equipment/permanent; client callbacks; replacement; idempotence; stable refresh; morale/lifesteal lifecycle; linked tower growth")
+print("HERO_ROGUE_PROJECTION_PASS early/late summon; 6 heroes; additive equipment/permanent; multiplicative cheer; native cadence; client callbacks; replacement; idempotence; stable refresh; morale/lifesteal lifecycle; linked tower growth")

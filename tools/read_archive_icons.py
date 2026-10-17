@@ -12,11 +12,14 @@ def rows(path):
     with path.open(encoding='utf-8-sig', newline='') as stream:
         return [row for row in csv.DictReader(stream) if not next(iter(row.values()), '').startswith('#')]
 
-def read_icons():
+def read_icons(category=None):
     result, seen = [], set()
+    wife_receipts = None
     presentation_file = TABLES / 'archive_icon_presentation.csv'
     presentation = {(r['category_id'],r['item_id']):r for r in rows(presentation_file)} if presentation_file.exists() else {}
     for row in rows(TABLES / 'archive_item_icons.csv'):
+        if category is not None and row['category_id'] != category:
+            continue
         if row['enabled'] != '1':
             continue
         key = (row['category_id'], row['item_id'])
@@ -55,7 +58,7 @@ def read_icons():
         with Image.open(file) as im:
             alpha = im.getchannel('A').getextrema() if im.mode == 'RGBA' else None
             # Preserve generated masters byte-for-byte; 254/255 alpha is visually opaque.
-            minimum_subject_alpha = 250 if row.get('art_status') in ('generated_portrait_v3','generated_collection_v4','generated_reward_v5') else 255
+            minimum_subject_alpha = 250 if row.get('art_status') in ('generated_portrait_v3','reused_portrait_v3','generated_collection_v4','generated_reward_v5','generated_wife_portrait_v1') else 255
             if not alpha or alpha[0] != 0 or alpha[1] < minimum_subject_alpha:
                 raise ValueError(f'Icon requires real alpha and an opaque subject: {file}')
             if im.width != im.height:
@@ -83,6 +86,29 @@ def read_icons():
         if row.get('art_status') == 'generated_portrait_v3':
             receipt = json.loads((ROOT/'data/ui/archive_portraits_v3.json').read_text(encoding='utf8'))[row['item_id']]
             if row['icon_path'] != receipt['icon_path']: raise ValueError('Portrait identity differs from generated receipt')
+            row.update(runtime_uri=receipt['runtime_uri'],small_runtime_uri=receipt['runtime_uri'])
+        if row.get('art_status') == 'reused_portrait_v3':
+            # A new collection can reuse our existing art without claiming a
+            # new character portrait was generated or copying reference art.
+            receipts = json.loads((ROOT/'data/ui/archive_portraits_v3.json').read_text(encoding='utf8'))
+            source_id = Path(row['icon_path']).stem
+            receipt = receipts[source_id]
+            if row['icon_path'] != receipt['icon_path']:
+                raise ValueError('Reused portrait must match an existing master')
+            if row['sha256'] != receipt['sha256']:
+                raise ValueError('Reused portrait master changed')
+            row.update(runtime_uri=receipt['runtime_uri'],small_runtime_uri=receipt['runtime_uri'],reused_from=source_id)
+        if row.get('art_status') == 'generated_wife_portrait_v1':
+            if wife_receipts is None:
+                manifest = json.loads((ROOT/'data/ui/wife_portraits_v1.json').read_text(encoding='utf8'))
+                if manifest['art_status'] != 'generated_wife_portrait_v1':
+                    raise ValueError('Unsupported wife portrait manifest')
+                wife_receipts = manifest['items']
+            receipt = wife_receipts[row['item_id']]
+            if row['category_id'] != 'wife' or row['display_name'] != receipt['display_name'] or row['icon_path'] != receipt['icon_path']:
+                raise ValueError('Wife portrait identity differs from the reviewed manifest')
+            if row['sha256'] != receipt['sha256']:
+                raise ValueError('Wife portrait original differs from its generation receipt')
             row.update(runtime_uri=receipt['runtime_uri'],small_runtime_uri=receipt['runtime_uri'])
         if row.get('art_status') == 'generated_collection_v4':
             manifest = json.loads((ROOT/'data/ui/archive_collection_v4.json').read_text(encoding='utf8'))

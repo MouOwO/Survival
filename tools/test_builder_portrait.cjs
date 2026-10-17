@@ -3,18 +3,25 @@ const {setup} = require('./test_combat_stats_callbacks.cjs');
 const snapshot = version => ({entindex:7,refresh_version:version,
  model_asset_id:'builder_io_benevolent_companion',portrait_unit_name:'npc_dota_hero_wisp',
  portrait_item_def:'9235',attack_min:1,health:1000,max_health:1000});
+function inlineBounds(t,scene){
+ assert.equal(scene.values.width,'100%');assert.equal(scene.values.height,'100%');
+ assert.equal(scene.values.position,'0px 0px 0px');assert.equal(scene.values.overflow,'clip');
+ assert.equal(scene.actuallayoutwidth,t.overlay.actuallayoutwidth);assert.equal(scene.actuallayoutheight,t.overlay.actuallayoutheight);
+ assert(t.api.portraitRect(scene),'a map without inherited CSS needs explicit nonzero inline bounds');
+}
 function mapLoads(t,count,setUnits=0){
  assert.equal(t.metrics.setUnit.length,setUnits,'builder must use its self-contained map instead of bare SetUnit');
  assert.equal(t.metrics.econHero.length,0);assert.equal(t.metrics.econItem.length,0,'builder must not depend on an account econ loadout');
- const creations=t.metrics.created.filter(call=>call.id==='SurvivalBuilderIoPortraitScene');assert.equal(creations.length,count);
+ const creations=t.metrics.created.filter(call=>call.id==='SurvivalBuilderIoPortraitSceneV2Alpha');assert.equal(creations.length,count);
  for(const call of creations){
   assert.equal(call.type,'DOTAScenePanel');assert.strictEqual(call.parent,t.overlay);
-  assert.deepStrictEqual(call.attributes,{map:'portraits/builder_io_companion_v1',camera:'builder_io_camera',particleonly:'false',antialias:'true','animate-during-pause':'true'});
+  assert.deepStrictEqual(call.attributes,{map:'portraits/builder_io_companion_v2',camera:'builder_io_camera',particleonly:'false',antialias:'true','animate-during-pause':'true',renderdeferred:'true',deferredalpha:'true'});
   assert(call.panel.classNames.has('SurvivalTowerPortraitScene'),'the lazy map receives the real shared Scene sizing class');
   assert.equal(call.panel.hittest,false);assert.equal(call.panel.hittestchildren,false);
+  if(call.panel.alive===true&&call.panel.values.visibility==='visible')inlineBounds(t,call.panel);
  }
 }
-function builderScene(t){return t.overlay.FindChildTraverse('SurvivalBuilderIoPortraitScene')}
+function builderScene(t){return t.overlay.FindChildTraverse('SurvivalBuilderIoPortraitSceneV2Alpha')}
 {
  const t=setup({portrait:true});t.select(7,'npc_survival_builder_proxy');
  t.api.portraitTransition('builder_selected');
@@ -24,13 +31,13 @@ function builderScene(t){return t.overlay.FindChildTraverse('SurvivalBuilderIoPo
  mapLoads(t,1);assert.strictEqual(t.api.portraitState().scene,builderScene(t));assert.equal(t.scene.values.visibility,'collapse');
  assert.equal(t.overlay.values.visibility,'visible');assert.equal(t.overlay.GetParent(),t.nativeHost());
  t.api.cosmeticPortraitSentinel();
- const initial={parents:t.metrics.parents,order:t.metrics.order,geometry:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions};
+ const initial={parents:t.metrics.parents,order:t.metrics.order,geometry:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions,inline:t.metrics.builderInlineLayoutWrites};
  for(let i=0;i<64;i++){
   t.api.updateSnapshot(snapshot(i+2));t.run([...t.jobs.keys()][0]);
   assert.equal(t.jobs.size,1);assert.equal(t.overlay.values.visibility,'visible');
  }
  mapLoads(t,1);
- assert.deepStrictEqual({parents:t.metrics.parents,order:t.metrics.order,geometry:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions},initial);
+ assert.deepStrictEqual({parents:t.metrics.parents,order:t.metrics.order,geometry:t.metrics.geometryWrites,visibility:t.metrics.visibilityTransitions,inline:t.metrics.builderInlineLayoutWrites},initial);
  t.api.updateSnapshot({...snapshot(999),entindex:8});mapLoads(t,1);
  t.setMulti(true);t.run([...t.jobs.keys()][0]);
  assert.equal(t.overlay.values.visibility,'collapse');assert.equal(t.native().values.opacity,'0.35');
@@ -39,6 +46,29 @@ function builderScene(t){return t.overlay.FindChildTraverse('SurvivalBuilderIoPo
  t.select(8,'npc_dota_hero_axe');t.api.portraitTransition('hero_selected');
  assert.equal(t.overlay.values.visibility,'collapse');assert.equal(t.native().values.opacity,'0.35');
  t.api.shutdown('done');assert.equal(t.jobs.size,0);assert.equal(builderScene(t).values.visibility,'collapse');assert.equal(t.scene.values.visibility,'collapse');
+}
+// A previous context can leave a correctly classed map in the native subtree
+// with zero extent because that subtree does not own the custom stylesheet.
+{
+ const t=setup({portrait:true});t.select(7,'npc_survival_builder_proxy');
+ const existing=new t.Panel('SurvivalBuilderIoPortraitSceneV2Alpha',t.overlay,'DOTAScenePanel');
+ existing.AddClass('SurvivalTowerPortraitScene');existing.hittest=false;existing.hittestchildren=false;
+ assert.equal(existing.actuallayoutwidth,0);assert.equal(existing.actuallayoutheight,0);assert.equal(t.api.portraitRect(existing),null);
+ t.api.updateSnapshot(snapshot(1));assert.strictEqual(builderScene(t),existing);assert.strictEqual(t.api.portraitState().scene,existing);
+ inlineBounds(t,existing);mapLoads(t,0);const writes=t.metrics.builderInlineLayoutWrites;
+ t.api.cosmeticPortraitSentinel();for(let tick=0;tick<64;tick++)t.run([...t.jobs.keys()][0]);
+ assert.strictEqual(builderScene(t),existing);assert.equal(t.metrics.builderInlineLayoutWrites,writes,'reused valid nodes do not rewrite static inline geometry each tick');
+ inlineBounds(t,existing);mapLoads(t,0);t.api.shutdown('legacy_map_bounds');
+}
+// A Tools reload must retire the old map once instead of reusing its bad idle.
+{
+ const t=setup({portrait:true});t.select(7,'npc_survival_builder_proxy');
+ const legacy=new t.Panel('SurvivalBuilderIoPortraitScene',t.overlay,'DOTAScenePanel');let retired=0;
+ legacy.DeleteAsync=delay=>{assert.equal(delay,0);retired++;legacy.alive=false;legacy.parent.children=legacy.parent.children.filter(child=>child!==legacy);};
+ t.api.updateSnapshot(snapshot(1));assert.equal(retired,1);assert.equal(legacy.values.visibility,'collapse');
+ assert.notStrictEqual(builderScene(t),legacy);mapLoads(t,1);
+ for(let version=2;version<66;version++)t.api.updateSnapshot(snapshot(version));
+ assert.equal(retired,1);mapLoads(t,1);t.api.shutdown('old_map_upgrade');
 }
 for(const patch of [{model_asset_id:'builder_io_wrong'},{portrait_unit_name:'npc_dota_hero_ogre_magi'},
  {portrait_item_def:''},{portrait_item_def:'9236'},{portrait_item_def:null},{portrait_item_def:undefined}]){
@@ -75,7 +105,7 @@ for(const failure of ['throw','null','invalid']){
  t.api.cosmeticPortraitSentinel();const old=builderScene(t);old.alive=false;
  const create=t.panorama.CreatePanel;let failedAttempts=0;
  t.panorama.CreatePanel=(type,parent,id,attributes)=>{
-  if(id==='SurvivalBuilderIoPortraitScene'&&failedAttempts===0){
+  if(id==='SurvivalBuilderIoPortraitSceneV2Alpha'&&failedAttempts===0){
    failedAttempts++;
    if(failure==='throw')throw Error('native map creation unavailable');
    if(failure==='null')return null;
@@ -108,13 +138,14 @@ for(const failure of ['throw','null','invalid']){
 }
 // Native style getters return decimal z-index strings, not just integer text.
 // Keep the Io scene above the native proxy while all native input stays intact.
-for(const [nativeZ,overlayZ] of [['0.0',1],['4.0',5],['2.5',3.5],['-2.5',-1.5],['invalid',1],['Infinity',1],[undefined,1]]){
+for(const [nativeZ,overlayZ] of [['0.0',4],['4.0',5],['2.5',4],['-2.5',4],['invalid',4],['Infinity',4],[undefined,4]]){
  const t=setup({portrait:true});t.select(7,'npc_survival_builder_proxy');const native=t.native();
  native.values.zIndex=nativeZ;native.values.washColor='#345678cc';
  native.SetPanelEvent=()=>{throw Error('builder portrait must not replace native input handlers')};
  const input={hittest:native.hittest,hittestchildren:native.hittestchildren};
  function visible(z){
   assert.equal(Number(t.overlay.values.zIndex),z);assert.equal(native.values.zIndex,nativeZ);
+  assert(Number(t.overlay.values.zIndex)>native.computedZIndex,'paint above Valve stylesheet z-index 3 even when its inline getter is zero');
   if(Number.isFinite(Number(nativeZ)))assert(Number(t.overlay.values.zIndex)>Number(nativeZ),'the custom Io scene must paint above DOTAPortrait');
   assert.equal(native.values.opacity,'1');assert.equal(native.values.washColor,'#345678cc');assert.equal(t.metrics.nativeWashWrites,0);
   assert.equal(native.hittest,input.hittest);assert.equal(native.hittestchildren,input.hittestchildren);
@@ -129,4 +160,4 @@ for(const [nativeZ,overlayZ] of [['0.0',1],['4.0',5],['2.5',3.5],['-2.5',-1.5],[
  mapLoads(t,1);assert.equal(builderScene(t).values.visibility,'visible');
  t.api.shutdown('builder_layer_complete');assert.equal(native.values.opacity,'0.35');assert.equal(native.values.washColor,'#345678cc');
 }
-console.log('BUILDER_PORTRAIT_PASS: actual lazy map node and creation attributes, no SetUnit/econ calls, strict role/asset/item, 64 stable ticks, Scene/anchor replacement, timer-safe throw/null/invalid creation retry, two-Scene selection/multi/shutdown visibility and native input/tint preservation; rendered pixels not simulated');
+console.log('BUILDER_PORTRAIT_PASS: actual lazy map node and creation attributes, zero-size/no-stylesheet inline bounds and old-node repair, no SetUnit/econ calls, strict role/asset/item, 64 stable ticks, Scene/anchor replacement, timer-safe throw/null/invalid creation retry, two-Scene selection/multi/shutdown visibility and native input/tint preservation; rendered pixels not simulated');

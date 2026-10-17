@@ -355,6 +355,7 @@ local function invalidate_player(player_id, reason)
         player_by_account[previous.account_id] = nil
     end
     profiles_by_player[player_id] = nil
+    account_profiles_by_player[player_id] = nil
     entitlement_service.replace_all(
         player_id,
         {},
@@ -616,28 +617,58 @@ function M.get_authenticated_progression(player_id)
     return nil
 end
 
-function M.load_player(player_id, reason, on_success, on_error)
+local function fetch_player(player_id, reason, on_success, on_error, preserve_loaded)
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
     end
-    local mode, _, match_error = selected_match()
-    if not mode then return { ok = false, error = match_error } end
-    invalidate_player(player_id, "loading")
+    local mode, session, match_error = selected_match()
+    local previous = profiles_by_player[player_id]
+    local function previous_binding_valid()
+        return previous and profiles_by_player[player_id] == previous
+            and previous.account_id == current_account_id(player_id)
+            and matches_current_match(previous)
+    end
+    if not mode then
+        if preserve_loaded and previous and not previous_binding_valid() then
+            invalidate_player(player_id, "refresh_binding_changed")
+        end
+        return { ok = false, error = match_error }
+    end
+    -- An online purchase must not publish a temporary empty save, entitlement
+    -- set or stat projection. Ordinary initial/rebind loads retain invalidation.
+    if not preserve_loaded then invalidate_player(player_id, "loading") end
     local provider_ok, provider_error = ensure_provider()
     if not provider_ok then
+        if preserve_loaded and previous and not previous_binding_valid() then
+            invalidate_player(player_id, "refresh_binding_changed")
+        end
         logger.warn("PlayerProfile", tostring(provider_error))
         return { ok = false, error = tostring(provider_error) }
     end
     local resolve_ok, account_id = pcall(provider.resolve_account_id, player_id)
-    if not resolve_ok then
-        return {
-            ok = false,
-            error = "account_resolve_failed:" .. tostring(account_id),
-        }
+    if not resolve_ok or type(account_id) ~= "string" or account_id == "" then
+        if preserve_loaded and previous then invalidate_player(player_id, "refresh_binding_changed") end
+        return { ok = false, error = resolve_ok and "account_id_unavailable" or "account_resolve_failed" }
     end
-    if type(account_id) ~= "string" or account_id == "" then
-        return { ok = false, error = "account_id_unavailable" }
+    if preserve_loaded and not previous_binding_valid() then
+        invalidate_player(player_id, "refresh_binding_changed")
+    end
+    local function binding_current()
+        local next_mode, next_session = selected_match()
+        return current_account_id(player_id) == account_id
+            and next_mode == mode and next_session == session
+    end
+    local function reject_changed_binding()
+        if binding_current() then return false end
+        -- A newer generation owns its own callbacks; this function is called
+        -- only after that guard. Never clear a profile committed for a new slot.
+        local loaded = profiles_by_player[player_id]
+        if loaded and (loaded.account_id ~= current_account_id(player_id)
+                or not matches_current_match(loaded)) then
+            invalidate_player(player_id, "refresh_binding_changed")
+        end
+        return true
     end
     local generation = (load_generation_by_player[player_id] or 0) + 1
     load_generation_by_player[player_id] = generation
@@ -653,6 +684,11 @@ function M.load_player(player_id, reason, on_success, on_error)
         end
         completed = true
         pending_load_generation_by_player[player_id] = nil
+        if reject_changed_binding() then
+            result = { ok = false, pending = false, error = "profile_binding_changed" }
+            if type(on_error) == "function" then on_error(result.error) end
+            return
+        end
         if tostring(snapshot and snapshot.account_id or "") ~= tostring(account_id) then
             result = { ok = false, pending = false, error = "account_id_mismatch" }
             logger.warn("PlayerProfile", result.error)
@@ -677,8 +713,9 @@ function M.load_player(player_id, reason, on_success, on_error)
         end
         completed = true
         pending_load_generation_by_player[player_id] = nil
-        result = { ok = false, pending = false, error = tostring(fetch_error_message) }
-        logger.warn("PlayerProfile", tostring(fetch_error_message))
+        local changed = reject_changed_binding()
+        result = { ok = false, pending = false, error = changed and "profile_binding_changed" or tostring(fetch_error_message) }
+        logger.warn("PlayerProfile", result.error)
         if type(on_error) == "function" then on_error(result.error) end
     end)
     if not fetch_ok and load_generation_by_player[player_id] == generation
@@ -697,6 +734,16 @@ function M.load_player(player_id, reason, on_success, on_error)
         return result
     end
     return result
+end
+
+function M.load_player(player_id, reason, on_success, on_error)
+    return fetch_player(player_id, reason, on_success, on_error, false)
+end
+
+-- Refresh the same live account/match atomically. Failure keeps its previously
+-- validated snapshot; a changed account/session uses the normal invalidation.
+function M.refresh_player(player_id, reason, on_success, on_error)
+    return fetch_player(player_id, reason, on_success, on_error, true)
 end
 
 function M.apply_incremental(update)

@@ -16,7 +16,8 @@ local function configure_survival_launch_rules()
     -- During module loading the GameModeEntity can still be unavailable; an
     -- early return before these calls would leave the default All Pick phase
     -- active whenever a later gameplay require is slow or fails.
-    -- Only the authenticated, all-player loading barrier may end setup.
+    -- Keep Valve's team selection open until its host Start button finishes
+    -- the native countdown. The addon loading barrier gates gameplay after it.
     GameRules:SetCustomGameSetupTimeout(-1)
     GameRules:SetHeroSelectionTime(0)
     GameRules:SetShowcaseTime(0)
@@ -457,11 +458,7 @@ end
 
 local function on_game_state_changed()
     local state = GameRules:State_Get()
-    if state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
-        if require("systems/startup_loading_service").is_ready() then
-            GameRules:FinishCustomGameSetup()
-        end
-    elseif state == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+    if state == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
         require("systems/startup_loading_service").gameplay_gate(function()
             if not game_started_emitted
                 and GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
@@ -1013,6 +1010,7 @@ local function initialize_services()
     inventory_transaction_service.init()
     lottery_service.init()
     require("systems/archive_service").init()
+    require("systems/endless_leaderboard_service").init()
     require("systems/archive_challenge_service").init()
     polar_crystal_progression_service.init()
     challenge_upgrade_material_service.init()
@@ -1111,18 +1109,20 @@ function M.activate()
     ListenToGameEvent("npc_spawned", on_npc_spawned, nil)
     ListenToGameEvent("entity_killed", on_entity_killed, nil)
     ListenToGameEvent("dota_item_picked_up", on_item_picked_up, nil)
-    -- Authentication and asset preparation run before hero/gameplay start.
-    -- Unlike gameplay timers, this barrier progresses while game time is stopped.
+    -- Valve's team-selection controls own the native setup/countdown. Once
+    -- the host starts, authentication, assets and mode profiles must still all
+    -- complete before heroes/builders or GAME_STARTED are released.
     multiplayer_player_service.assign_connected_players("before_finish_setup")
     require("systems/startup_loading_service").init({
         minimum_wait_seconds = 0,
-        wait_for_party = type(IsInToolsMode) == "function" and IsInToolsMode(),
+        native_team_setup = true,
+        tools_backend_wait = type(IsInToolsMode) == "function" and IsInToolsMode(),
         on_load_start = function() require("systems/startup_asset_preload_service").init() end,
         on_ready = function()
             require("systems/rebirth_scene_display_service").start()
             multiplayer_player_service.assign_connected_players("loading_barrier_ready")
             on_game_state_changed()
-            print("[MULTIPLAYER_SESSION] setup_finished authentication_and_assets_ready=true")
+            print("[MULTIPLAYER_SESSION] admission_finished authentication_and_assets_ready=true")
         end,
     })
     logger.info(

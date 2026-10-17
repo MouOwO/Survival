@@ -89,7 +89,7 @@ for(let row=0;row<3;row++){
 }
 for(const key of ['attack','armor','attack_speed'])assert.equal(nodes['HandoffStat_'+key].style.position,'0px 0px 0px');
 const cornerStart=source.indexOf('            var centerPlate=nine(');
-const cornerEnd=source.indexOf('            place(inventory,',cornerStart);
+const cornerEnd=source.indexOf('            // A filled plate',cornerStart);
 assert(cornerStart>=0&&cornerEnd>cornerStart);
 const plate={style:{}};
 const corners={g:null,background:{},nine:()=>plate,centerOffset:g=>g.centerX,style:(p,v)=>{assert.equal(p,plate,'only background plate receives corner clipping');Object.assign(p.style,v);}};
@@ -121,4 +121,17 @@ for(const [width,height] of [[1280,720],[1920,1080],[2560,1440]])for(const uiSca
 }
 env.ctx.actualuiscale_y=1;
 assert.equal(created,12,'layout reuses its six main/bonus groups across selection changes');
+// Changing the size of a worker selection must not move its action/stats plate.
+// The portrait group can reserve the full height without resizing native scenes.
+for(const [w,h] of [[640,480],[960,720],[1280,720],[1600,900],[1920,1080],[2560,1440],[3440,1440]])for(const count of [1,4,8]){
+ const single=geometry(w,h,count,false,false,{worker:true,lumberjack:true});
+ const multi=geometry(w,h,count,false,false,{worker:true,lumberjack:true,multi:true});
+ assert.equal(single.height,260);assert.equal(multi.height,single.height);
+ assert.equal(single.scale,multi.scale);assert.equal(single.y,multi.y);
+ assert.equal(single.actionX,multi.actionX,'native action row never moves when adding worker portraits');
+ assert(Math.abs(multi.y+multi.height*multi.scale-h)<.001,'worker plate is flush with the viewport bottom');
+ assert.equal(multi.portraitY,23);assert.equal(multi.portraitHeight,237);
+ assert.equal(multi.portraitY+multi.portraitHeight,multi.height,'portrait area reaches the same bottom as the action plate');
+ assert(multi.x>=0 && multi.x+multi.width*multi.scale<=w,'both worker plates remain within the viewport');
+}
 console.log('HUD_COMPACT_GEOMETRY_PASS: 640/1280/1920/2560px; four/seven/32 native abilities; six items; centered whole HUD; fixed left icon/value columns; matching row heights; compact padding; long values; worker/tree/building transitions; isolated compact top-corner clipping');

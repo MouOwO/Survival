@@ -72,8 +72,8 @@ local before_writes = writes
 emit(0,"friend","local_success")
 assert(final("local_success",true).duplicate == true)
 assert(writes == before_writes and profiles[0].save.archive.social_tickets.yitie == 29, "same request never charges twice")
-emit(0,"wife","invalid_pool")
-final("invalid_pool",false,"wife")
+emit(0,"bad_pool","invalid_pool")
+final("invalid_pool",false,"bad_pool")
 assert(#acks("invalid_pool") == 1 and not archive.has_pending(0), "invalid intent rejected immediately")
 emit(0,"friend","bad request")
 final("bad request",false)
@@ -145,6 +145,30 @@ archive.set_provider({submit=function(_, _, done) done({ok=true}) end})
 emit(0,"friend","remote_sync")
 final("remote_sync",true)
 assert(#acks("remote_sync") == 2, "a synchronous provider cannot emit pending after final ACK")
+
+-- A configured wife collection uses the same authoritative snapshot and
+-- request identity as the existing pools, including after a lost UI reply.
+archive.set_provider(nil)
+local wife_rule = assert(require("config/generated/archive_social_rules").by_id.wife, "wife pool configured")
+profiles[0].save.archive.social_tickets[wife_rule.currency_id] = wife_rule.draw_cost * 2
+local wife_page = archive.snapshot(0,"wife")
+assert(wife_page.ok and wife_page.social and #wife_page.rows > 0, "wife page contains authoritative rows")
+assert(wife_page.social.tickets == wife_rule.draw_cost * 2)
+local wife_counts = copy(profiles[0].save.archive.social_counts or {})
+local wife_before_writes = writes
+emit(0,"wife","wife_success")
+local wife_ack = final("wife_success",true,"wife")
+assert(#acks("wife_success") == 2 and writes == wife_before_writes + 1)
+assert(profiles[0].save.archive.social_tickets[wife_rule.currency_id] == wife_rule.draw_cost)
+wife_page = archive.snapshot(0,"wife")
+assert(wife_page.revision == wife_ack.revision and wife_page.social.total == 1)
+local wife_increment = 0
+for _, row in ipairs(wife_page.rows) do wife_increment = wife_increment + row.count - (wife_counts[row.id] or 0) end
+assert(wife_increment == 1, "successful wife draw grants exactly one configured item")
+emit(0,"wife","wife_success")
+assert(final("wife_success",true,"wife").duplicate == true)
+assert(writes == wife_before_writes + 1 and profiles[0].save.archive.social_tickets[wife_rule.currency_id] == wife_rule.draw_cost,
+    "replayed wife intent never double-spends or grants")
 archive.begin_finalization()
 emit(0,"friend","finalizing")
 final("finalizing",false)

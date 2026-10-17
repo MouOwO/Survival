@@ -1,0 +1,537 @@
+{
+  "schema": "wall-solid-collision-native-validation-v1",
+  "status": "complete",
+  "date": "2026-10-17",
+  "task": "保留攻墙怪真实碰撞；偏移城墙死亡补位不穿过存活怪；检查四方入口及四玩家同出生口拥堵",
+  "production_hashes": {
+    "scripts/vscripts/systems/wall_melee_contact.lua": "287b78f89a84869f5009e3c7993704cc0e6430c83ccd690b7140c7948afa002e",
+    "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua": "35dc0c5952473b48971870bc60a6e3582e680326498e8034db6112004bbb30a5",
+    "scripts/vscripts/systems/wave_monster_collision.lua": "43308a722ed75baad7bf7b12d584b77ad29afa12eed8b3511ee7f672900e7730"
+  },
+  "strict_trajectory_oracle": {
+    "file": "scripts/vscripts/tests/wall_trajectory_oracle.lua",
+    "sha256": "878e6bee2b2d4fdac1cfe59a92528d2a6068569255841ac099763731c73fbf2e",
+    "raw_and_swept_tolerance_units": 2,
+    "checks": [
+      "phased",
+      "hull_change",
+      "hard_body_overlap",
+      "swept_body_crossing",
+      "position_jump"
+    ]
+  },
+  "behavior": {
+    "wall_attacker_hull": 32,
+    "phase_during_contact": false,
+    "contact_teleports_or_hull_changes": false,
+    "contacts_per_face_maximum": 4,
+    "contact_pitch": 88,
+    "contact_normal": 184,
+    "first_arrival_tolerance": 36,
+    "retained_arrival_tolerance": 48,
+    "terrain_may_reduce_capacity": true,
+    "ranged": "保留原生远程攻击能力及配置射程，不将远程伪装成近战",
+    "replacement": "有真实通路才自然补位；活体堵路时等待，不取消碰撞或搬动怪物",
+    "partial_face_transfer": "本面空槽可从最多16个未落位预约中选近者；原生路径加36仍短于旧目标直线下界后原子换预约，失败保留原预约并退避",
+    "waiting_rear_edge": "已落位者使用实际身体位置；未落位者使用预约目标；复用原有位置读取"
+  },
+  "cost_contract": {
+    "ai_observation_seconds_per_actor": 0.5,
+    "admission_body_snapshot": "每墙每0.5秒时间桶至多一次512范围FindUnitsInRadius；真实入位仍遍历该局部名单并读实时位置",
+    "find_path_length_budget_per_wall_per_half_second": 16,
+    "path_budget_scope": "仅本接触分配及近槽转移，不包含其他模块或引擎原生移动寻路",
+    "registered_claims_per_wall_maximum": 16,
+    "waiter_registration": "O(1)；相关状态变化触发重选时才遍历本墙已登记waiters及最多16个未落位owner，并缓存候选",
+    "stable_full_queue": "不新增MOVE、Stop、FindPathLength、坐标或Hull写入，不重扫waiters或做入位身体查询",
+    "remaining_work": "保留每怪0.5秒状态和位置读取、最多4个同面预约检查、已有2秒地形有效性和缓存刷新、每墙2秒局部失败表清理；不宣称零CPU或零导航工作"
+  },
+  "offline": {
+    "passed": true,
+    "suites": 26,
+    "explicit_return_function_order_cache_harness": true,
+    "evidence": "output/wall_solid_native_20261016/offline_287b_final.json"
+  },
+  "native_final": {
+    "status": "passed",
+    "profile_matrix": {
+      "status": "passed",
+      "generated_at": "2026-10-17T01:26:41.974Z",
+      "cases": 496,
+      "expected_cases": 496,
+      "profiles": 124,
+      "native_unit_names": 50,
+      "final_models": 95,
+      "case_types": {
+        "melee": 436,
+        "ranged": 60
+      },
+      "trajectory": {
+        "frames": 237644,
+        "samples": 1666744,
+        "pair_checks": 2062058
+      },
+      "births": 3968,
+      "attack_records": {
+        "cases": 496,
+        "created": 29675,
+        "destroyed": 29675
+      },
+      "validation_errors": [],
+      "evidence": "output/wall_solid_native_20261016/durable_profile_coverage.json",
+      "only_case_input": [
+        "output/wall_solid_native_20261016/post_partial_fix/profile_cases.jsonl"
+      ],
+      "replacement_seconds": {
+        "min": 1.89990234375,
+        "max": 2.03369140625
+      },
+      "engine_sessions": 2,
+      "original_session_cases": 448,
+      "recovery_session_cases": 48,
+      "original448_canonical_json_sha256": "11fb8c118eb66686a8e64174cdc5cf19e3de68f421aa9f1488399d81bea2bbb7",
+      "recovery48_native_memory_comparison": "48/48 exact normalized records matched; original448 not recreated in new VM"
+    },
+    "partial_face_cases": {
+      "status": "passed_conditional_collision_and_refill_contract",
+      "single_median_front_death_cases": 8,
+      "direct_refill_passes": 4,
+      "blocked_without_refill_after_22_seconds": 4,
+      "continuous_frames": 9592,
+      "strict_collision_errors": 0,
+      "original_front_survivors_alive_in_all_cases": true,
+      "direct_refill_seconds": [
+        1.533447265625,
+        1.86669921875,
+        2.06689453125,
+        2.06689453125
+      ],
+      "evidence": "output/wall_solid_native_20261016/post_partial_fix/partial_287b_single_death_observations.json",
+      "note": "原单死亡4个未补位记录保持false；条件验收区分4次初次自然补、2次同布局重放自然补、2次明确后排正常死亡后补。后两次分别额外死亡2和1个rear，不能表述为8次均只杀1怪立刻补位。",
+      "conditional_evidence": "output/wall_solid_native_20261016/post_partial_fix/partial_conditional_final.json",
+      "conditional_cases": [
+        {
+          "label": "north_partial_tangent_minus64",
+          "classification": "natural_refill_on_identical_layout_repeat",
+          "initial_single_death_passed": false,
+          "normal_deaths": 1,
+          "replacement": 1,
+          "replacement_seconds_since_original_front_death": 1.93359375,
+          "refill_seconds_after_last_rear_death": null,
+          "original_front_survivors_preserved": true
+        },
+        {
+          "label": "south_partial_tangent_minus64",
+          "classification": "natural_refill_on_identical_layout_repeat",
+          "initial_single_death_passed": false,
+          "normal_deaths": 1,
+          "replacement": 1,
+          "replacement_seconds_since_original_front_death": 1.800048828125,
+          "refill_seconds_after_last_rear_death": null,
+          "original_front_survivors_preserved": true
+        },
+        {
+          "label": "east_partial_tangent_minus64",
+          "classification": "immediate_natural_refill",
+          "initial_single_death_passed": true,
+          "normal_deaths": 1,
+          "replacement": 1,
+          "replacement_seconds_since_original_front_death": 1.533447265625,
+          "refill_seconds_after_last_rear_death": null,
+          "original_front_survivors_preserved": true
+        },
+        {
+          "label": "west_partial_tangent_minus64",
+          "classification": "living_bodies_blocked_then_normal_rear_deaths_opened_native_refill",
+          "initial_single_death_passed": false,
+          "normal_deaths": 2,
+          "replacement": 1,
+          "replacement_seconds_since_original_front_death": 15.13330078125,
+          "refill_seconds_after_last_rear_death": 7.1334228515625,
+          "original_front_survivors_preserved": true
+        },
+        {
+          "label": "north_partial_tangent_plus64",
+          "classification": "living_bodies_blocked_then_normal_rear_deaths_opened_native_refill",
+          "initial_single_death_passed": false,
+          "normal_deaths": 3,
+          "replacement": 1,
+          "replacement_seconds_since_original_front_death": 19.000244140625,
+          "refill_seconds_after_last_rear_death": 2.8665771484375,
+          "original_front_survivors_preserved": true
+        },
+        {
+          "label": "south_partial_tangent_plus64",
+          "classification": "immediate_natural_refill",
+          "initial_single_death_passed": true,
+          "normal_deaths": 1,
+          "replacement": 1,
+          "replacement_seconds_since_original_front_death": 1.86669921875,
+          "refill_seconds_after_last_rear_death": null,
+          "original_front_survivors_preserved": true
+        },
+        {
+          "label": "east_partial_tangent_plus64",
+          "classification": "immediate_natural_refill",
+          "initial_single_death_passed": true,
+          "normal_deaths": 1,
+          "replacement": 1,
+          "replacement_seconds_since_original_front_death": 2.06689453125,
+          "refill_seconds_after_last_rear_death": null,
+          "original_front_survivors_preserved": true
+        },
+        {
+          "label": "west_partial_tangent_plus64",
+          "classification": "immediate_natural_refill",
+          "initial_single_death_passed": true,
+          "normal_deaths": 1,
+          "replacement": 1,
+          "replacement_seconds_since_original_front_death": 2.06689453125,
+          "refill_seconds_after_last_rear_death": null,
+          "original_front_survivors_preserved": true
+        }
+      ],
+      "conditional_trajectory_totals": {
+        "frames": 8468,
+        "samples": 92221,
+        "pair_checks": 178863
+      }
+    },
+    "placement_cases": {
+      "status": "passed",
+      "passed_28": true,
+      "evidence_28": "output/wall_solid_native_20261016/post_partial_fix/placement_final.json",
+      "cases_28": 28,
+      "closed_front4_and_refill_cases": 12,
+      "open_side_route_cases": 16,
+      "trajectory_28": {
+        "frames": 33572,
+        "samples": 374196,
+        "pair_checks": 631782
+      },
+      "sealed_refill_seconds": [
+        2.0333557128906,
+        1.9666748046875,
+        1.9666748046875,
+        2,
+        1.9666748046875,
+        2.0333251953125,
+        2.0333251953125,
+        2.066650390625,
+        1.9666748046875,
+        1.9666748046875,
+        2.0333251953125,
+        2
+      ],
+      "strict_collision_errors": 0,
+      "continuous_stable_front_overflow": 0,
+      "note": "Open side-route placements verify native hits and solid trajectories; their crossings can represent legal travel through real side gaps. Only sealed placements require crossings0 and one death refill. Median-front death on +/-64 has separate conditional causal evidence.",
+      "passed_36": true,
+      "cases": 36,
+      "extra_cases": 8,
+      "evidence_extra8": "output/wall_solid_native_20261016/post_partial_fix/extra_normal128_final.json",
+      "closed_gate_cases": 16,
+      "open_route_cases": 20,
+      "trajectory_all36": {
+        "frames": 43164,
+        "samples": 479412,
+        "pair_checks": 778397
+      },
+      "maximum_contact_path_bucket": 16,
+      "attack_records_all36": {
+        "created": 6883,
+        "destroyed": 6883,
+        "pending": 0
+      }
+    },
+    "shared_spawn": {
+      "status": "passed_spawn_body_collision_and_refill_contract",
+      "evidence_observed": "output/wall_solid_native_20261016/post_partial_fix/shared360_observed_final.json",
+      "evidence_initial": "output/wall_solid_native_20261016/post_partial_fix/shared360_final.json",
+      "simulated_owners": 4,
+      "real_network_clients": 1,
+      "births": 360,
+      "owners": {
+        "0": 90,
+        "1": 90,
+        "2": 90,
+        "3": 90
+      },
+      "minimum_birth_center_distance": 84.233556325817,
+      "overlap_births": 0,
+      "maximum_native_birth_displacement": 185.0000297144,
+      "births_displaced_over128": 6,
+      "births_displaced_over256": 0,
+      "native_front_contacts": [
+        4,
+        0,
+        0,
+        0
+      ],
+      "native_attackers": [
+        4,
+        0,
+        0,
+        0
+      ],
+      "replacement": 1,
+      "replacement_seconds": 2.6666259765625,
+      "trajectory": {
+        "duration": 129.93334960938,
+        "errors": [],
+        "frames": 3899,
+        "hard_overlap_frames": 0,
+        "hull_change_frames": 0,
+        "jump_frames": 0,
+        "maximum_jump": 13.379151680498,
+        "pair_checks": 3132628,
+        "passed": true,
+        "phased_frames": 0,
+        "samples": 917280,
+        "swept_crossing_frames": 0
+      },
+      "attack_records": {
+        "created": 485,
+        "destroyed": 485,
+        "pending": 0
+      },
+      "maximum_contact_path_bucket": 5,
+      "zero_hull_builder": [
+        {
+          "builder_phase": true,
+          "hull": 0,
+          "id": 1363,
+          "phased": true,
+          "unit_name": "npc_survival_builder_proxy"
+        }
+      ],
+      "cleaned": true,
+      "registry_after_cleanup": {
+        "generation": 48,
+        "observations": 1706,
+        "path_queries": 656,
+        "registered": 0,
+        "resolves": 135174,
+        "route_cache_hits": 329
+      },
+      "plane_diagnostic": {
+        "definition": "current local x>160 at any tangent distance; not a physical crossing event",
+        "count": 15,
+        "candidate_evidence": "output/wall_solid_native_20261016/post_partial_fix/shared360_plane_candidates_observed.json",
+        "all_candidates_outside_finite_gate_lateral_band": true,
+        "final_candidates_distance_to_wall": {
+          "min": 2284.107620056463,
+          "max": 2452.8834664533088
+        },
+        "actual_gate_world_y": [
+          6464,
+          6848
+        ],
+        "candidate_world_y": [
+          4236.5,
+          4383.9
+        ],
+        "retained_diagnostic_frames": 64,
+        "interpretation": "All15 repeat-run candidates are waiting far from the wall; their Hull32 does not touch the finite gate band. Original first-run15 cannot be individually reconstructed because its RAW was not saved."
+      },
+      "limits": "Only latest64 diagnostic frames retained. Entire130s strict body collision counters were retained, but this is not a full-duration finite-wall-plane-crossing event trace. Native spawn placement can move newborns to nearby free positions; it is not FIFO spawn admission."
+    },
+    "four_faces": {
+      "status": "passed",
+      "evidence": "output/wall_solid_native_20261016/post_partial_fix/open_four_faces_final.json",
+      "births": 32,
+      "simultaneous_native_attackers": 16,
+      "locked_per_face": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "native_attackers_per_face": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "replacement": 1,
+      "replacement_seconds": 1.86669921875,
+      "trajectory": {
+        "duration": 25.933349609375,
+        "errors": [],
+        "frames": 779,
+        "hard_overlap_frames": 0,
+        "hull_change_frames": 0,
+        "jump_frames": 0,
+        "maximum_jump": 10.034284233792,
+        "pair_checks": 18750,
+        "passed": true,
+        "phased_frames": 0,
+        "samples": 21112,
+        "swept_crossing_frames": 0
+      },
+      "attack_records": {
+        "created": 375,
+        "destroyed": 375,
+        "pending": 0
+      },
+      "maximum_contact_path_bucket": 9,
+      "stable_metrics": {
+        "move_orders": 0,
+        "nav_CanFindPath": 0,
+        "nav_FindPathLength": 0,
+        "nav_IsBlocked": 480,
+        "nav_IsTraversable": 480,
+        "orders": 0,
+        "stops": 0
+      },
+      "cleaned": true,
+      "note": "Open-floor diagnostic x>160 count8 is an infinite-plane position count, not a physical wall crossing counter."
+    },
+    "screenshots": {
+      "valid_wall_scene": "output/wall_solid_native_20261016/final287b_west_live_refill.png",
+      "scope": "Illustrative real west-offset scene; continuous collision proof comes from native oracle and events, not a single still",
+      "rejected_images": "Earlier sea/loading and late empty open16 captures are not evidence"
+    },
+    "cleanup": {
+      "status": "passed",
+      "evidence": "output/wall_solid_native_20261016/post_partial_fix/cleanup_final.json",
+      "actors": 0,
+      "wall_ai_modifiers": 0,
+      "audit_modifiers": 0,
+      "navigation_obstructions": 0,
+      "ornament_props": 0,
+      "scheduler_tasks": 0,
+      "contexts_cancelled": 45,
+      "globals_released": 42,
+      "all_owned_fow_removed": true,
+      "camera_hero_present": false,
+      "visual_registry": {
+        "appearance_after": 0,
+        "appearance_before": 0,
+        "errors": [],
+        "invalid_owners": 0,
+        "owners": 0,
+        "passed": true,
+        "tracked_props_before": 0,
+        "tracked_props_still_valid": 0,
+        "wave_visual_after": 0,
+        "wave_visual_before": 0
+      },
+      "lua_kib_after_release": 6743.4072265625,
+      "original_production_runtime_restored": false,
+      "production_account_bootstrap": false,
+      "end_control": {
+        "normal_disconnect": true,
+        "isolated_map_unloaded": true,
+        "tools_background_map": "<empty>",
+        "host_timescale": 1,
+        "test_pause_released": true,
+        "formal_account_map_started": false,
+        "evidence": "output/wall_solid_native_20261016/post_partial_fix/control_state_final.json"
+      },
+      "final_resource_evidence": "output/wall_solid_native_20261016/post_partial_fix/resource_state_final.json",
+      "test_socket_closed": true,
+      "test_owned_processes_remaining": 0,
+      "original_helper": {
+        "running": true,
+        "status": "waiting_for_workshop",
+        "console_connected": false,
+        "note": "Expected idle state after map unload, not an active-map connection."
+      },
+      "isolated_addon_and_junctions_preserved": true
+    },
+    "passed": true
+  },
+  "historical_controls": {
+    "pre_fix_native": "旧版实测会将Hull32缩至20并临时穿单位，连续轨迹捕获存活身体穿越；证据 output/wall_solid_native_20261016/baseline_summary.json",
+    "d917": "此前496项及36种摆放属于旧接触源码，只作历史对照，不拼入最终287B覆盖率",
+    "d917_partial_face": "8次真实中间前排死亡后22秒未补位，原两前排存活；远面预约排除在近槽候选之外。证据 isolated_20261017/partial_vacancy_d917_negative.json",
+    "c957": "证明原生身体确能堵住路径；后排堵路怪正常死亡后4.8秒自然补原槽。该旧hash因果案例不代替最终287B验收"
+  },
+  "test_attack_record_lifecycle": {
+    "scope": "独立测试工具的安全停止与引擎攻击记录排空，非生产攻墙性能基准",
+    "actors_per_batch": 64,
+    "batches": 20,
+    "created": 30014,
+    "destroyed": 30014,
+    "pending": 0,
+    "all_batches_stop_with_ranged_records_in_flight": true,
+    "elapsed_seconds": 221.30029296875,
+    "passed": true,
+    "evidence": "output/wall_solid_native_20261016/post_partial_fix/attack_record_30000_final.json",
+    "cleaned": true,
+    "active": false,
+    "cleanup_blocked": false,
+    "source_hashes": {
+      "scripts/vscripts/systems/wall_melee_contact.lua": "287b78f89a84869f5009e3c7993704cc0e6430c83ccd690b7140c7948afa002e",
+      "scripts/vscripts/modifiers/modifier_enemy_wall_ai.lua": "35dc0c5952473b48971870bc60a6e3582e680326498e8034db6112004bbb30a5",
+      "scripts/vscripts/systems/wave_monster_collision.lua": "43308a722ed75baad7bf7b12d584b77ad29afa12eed8b3511ee7f672900e7730"
+    },
+    "recovered_engine_additional_run": {
+      "evidence": "output/wall_solid_native_20261016/post_partial_fix/attack_record_30000_recovered_final.json",
+      "created": 30015,
+      "destroyed": 30015,
+      "pending": 0,
+      "batches": 20,
+      "elapsed_seconds": 221.56663513184,
+      "passed": true,
+      "cleaned": true
+    }
+  },
+  "limits": [
+    "四玩家压力测试为单个Dota客户端中的四个归属，不是四客户端网络联机验收",
+    "轨迹检查有2码数值容差，不宣称数学意义的零压缩",
+    "每项验证实际远程capability及真实命中并保留配置射程；未逐项导出原生射程getter",
+    "只验证本轮碰撞和接触调度，不宣称已解决所有游戏卡顿或保证所有场景帧率"
+  ],
+  "original_match_incident": {
+    "error": "CDOTA_AttackRecordManager::AddNewAttackRecord: m_unNextFreeIndex < DOTA_PROJECTILES_ATTACK_RECORD_MAX, attack_records.cpp:131",
+    "impact": "原用户对局在确认已有致命引擎错误后自行退出，无法恢复；并非已保留或恢复原局",
+    "continuation": "后续改在不加载账号、HTTP、经济引导的独立测试插件中验证",
+    "root_cause_limit": "原始C++记录池耗尽根因未证明；后续测试改为等待真实OnAttackRecordDestroy再移除实体，不宣称已修复生产引擎记录池",
+    "original_gameplay_impact": "最初测试曾正常击杀一个原局波次怪；不宣称最初对局零影响或零存档写入"
+  },
+  "git": {
+    "committed_this_task": false,
+    "pushed_this_task": false,
+    "reason": "当前请求为修复及实机验证；工作区存在大量其他任务未提交改动"
+  },
+  "test_trace_memory_incident": {
+    "observed_error": "WARNING: Lua allocation of 1048576 failed",
+    "last_completed_profile": "native_profile_112",
+    "completed_cases_before_exit": 448,
+    "incomplete_profile_not_counted": "native_profile_113",
+    "cause": "Test runner accumulated unbounded per-frame RAW arrays; isolated test Dota exited after Lua allocation failure",
+    "production_code_changed_for_incident": false,
+    "continuation": "Native owner bounds test RAW retention, restarts same isolated addon, and runs only missing profiles113..124 before remaining placement and shared-spawn tests",
+    "evidence_limit": "448 completed native summaries remain durable and independently validated; their full per-sample RAW arrays were not all exported before process exit",
+    "evidence": "output/wall_solid_native_20261016/post_partial_fix/oom_native_tail.txt",
+    "recovery_guard": {
+      "file": "output/wall_solid_native_20261016/post_partial_fix/native_trace_memory_guard.lua",
+      "sha256": "284b478f52b9e6279656cc3428ed0fcdc50c91c2e8d16da45b403eb9a46f75ef",
+      "diagnostic_trace_rows_maximum": 64,
+      "runner": "output/wall_solid_native_20261016/post_partial_fix/profile_matrix_recovery48.lua",
+      "runner_sha256": "5123ce2b6f16502df63cd328e37f0bb967b8d4250cff5b55aceee96fba7ae295",
+      "retained_raw_cases_maximum": 8,
+      "independent_read_only_review_passed": true,
+      "review": "Only diagnostic containers trimmed; rows, strict oracle previous-frame state/counters/errors and physical AI unchanged. Recovery plan exactly original profiles113..124.",
+      "prior_448_canonical_json_sha256": "11fb8c118eb66686a8e64174cdc5cf19e3de68f421aa9f1488399d81bea2bbb7",
+      "measured_peak_lua_kib": 78464.1875,
+      "pruned_trace_frames": 14420,
+      "lua_kib_after_release": 6743.4072265625
+    },
+    "continuation_completed": true
+  },
+  "test_instrumented_timing_warnings": {
+    "evidence": "output/wall_solid_native_20261016/post_partial_fix/native_timing_warnings.json",
+    "production_fps_benchmark": false,
+    "scope": "360 native collision test includes continuous body oracle and diagnostic sampling; cached Time() does not isolate CPU cost",
+    "lines": [
+      "SERVER: dota_base_game_mode([552]) thinking for 11.92 ms!",
+      "SERVER: dota_base_game_mode([552]) thinking for 13.16 ms!",
+      "SERVER: npc_dota_creature(npc_dota_creature[1377], model: models/heroes/undying/undying.vmdl) thinking for 12.91 ms!"
+    ]
+  },
+  "completed_at": "2026-10-17T01:56:16.292Z",
+  "passed": true,
+  "independent_read_only_evidence_audit": "All functional native evidence, source hashes, original448 integrity, recovery48 exact native-memory match, and cleanup0 verified; final idle resource state read directly from native owner artifact."
+}

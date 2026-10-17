@@ -260,6 +260,9 @@ near(converted.strength, 114)
 near(converted.intellect, 436)
 near(converted.attribute_health_bonus, 228)
 near(converted.attribute_attack_bonus, 1308)
+near((converted.engine_attack_min + converted.engine_attack_max) * 0.5,
+    (converted.attack_min + converted.attack_max) * 0.5,
+    "intellect attack receives the same percentage in native and logical averages")
 near(first.maximum, 1228)
 near(first.maximum - first.health, missing, "health conversion must preserve damage already taken")
 assert(delta(first, before, "health_bonus") == 1 and delta(first, before, "damage_min") == 1

@@ -9,7 +9,7 @@
     var currentMode = "shop";
     var lastShopMode = "shop";
     var shopCategory = "equipment";
-    var shopLayoutHeight = 600;
+    var shopLayoutWidth = 464, shopLayoutHeight = 432;
     var drawerOpened = false, drawerGeneration = 0;
     var researchSourceEntindex = -1;
     var unlocks = { shop: false, research: false };
@@ -189,26 +189,26 @@
         var rootHeight = (root.actuallayoutheight || 1080) / (root.actualuiscale_y || 1);
         var scale = Math.min(rootWidth / 1920, rootHeight / 1080);
         var top = Math.max(12, (rootHeight - shopLayoutHeight * scale) / 2);
-        windowPanel.style.width = "680px";
+        windowPanel.style.width = shopLayoutWidth + "px";
         windowPanel.style.height = shopLayoutHeight + "px";
         windowPanel.style.horizontalAlign = "left";
         windowPanel.style.verticalAlign = "top";
         windowPanel.style.transformOrigin = "0% 0%";
         windowPanel.style.margin = "0px";
         // Fit owns scale; position owns the drawer transition. They never overwrite each other.
-        windowPanel.style.position = Math.round(drawerOpened ? 16 : -700 * scale) + "px " + Math.round(top) + "px 0px";
+        windowPanel.style.position = Math.round(drawerOpened ? 16 : -(shopLayoutWidth + 20) * scale) + "px " + Math.round(top) + "px 0px";
         if (byId("ShopHeader")) {
             byId("ShopHeader").style.borderBottom = "0px";
             byId("ShopHeader").style.backgroundColor = "gradient(linear,0% 0%,0% 100%,from(#282035),to(#191325))";
         }
         if (byId("ShopBackdrop")) byId("ShopBackdrop").style.backgroundColor = "transparent";
-        if (byId("ShopBody")) byId("ShopBody").style.height = "426px";
-        if (byId("ShopFooter")) byId("ShopFooter").style.position = "24px 548px 0px";
+        if (byId("ShopBody")) byId("ShopBody").style.height = "280px";
+        if (byId("ShopFooter")) byId("ShopFooter").style.position = "16px 404px 0px";
     }
 
     function updateShopLayout(entries) {
         // The reference keeps a stable three-row viewport, including sparse categories.
-        shopLayoutHeight = 600;
+        shopLayoutHeight = 432;
         applyShopLayout();
     }
 
@@ -337,7 +337,9 @@
     }
 
     function createEntryIcon(parent, entry, className) {
-        var art=GameUI.CustomUIConfig().SurvivalItemArt; if(art&&art.Create(parent,entry,className))return;
+        var ui=GameUI.CustomUIConfig(),art=ui.SurvivalItemArt,presentation=ui.SurvivalRewardPresentation;
+        var rendered=art&&art.Create(parent,entry,className);
+        if(rendered){if(presentation&&presentation.FillIcon)presentation.FillIcon(rendered,entry);return rendered;}
         var panel;
         if (entry.icon_type === "ability") {
             panel = $.CreatePanel("DOTAAbilityImage", parent, "");
@@ -349,6 +351,8 @@
         panel.AddClass(className);
         panel.hittest = false;
         panel.hittestchildren = false;
+        if(presentation&&presentation.FillIcon)presentation.FillIcon(panel,entry);
+        return panel;
     }
 
     function usesTechnologyPrerequisites(entry) {
@@ -762,8 +766,8 @@
                     return true;
                 });
             }
-            card.style.width = "136px"; card.style.height = "132px";
-            card.style.margin = "0px 20px 10px 0px"; card.style.padding = "0px";
+            card.style.width = (136 * 2 / 3) + "px"; card.style.height = "88px";
+            card.style.margin = "0px 12px 6.666667px 0px"; card.style.padding = "0px";
             updateEntryCard(card, entry);
         });
         updateAutoBookButtons();
@@ -1013,7 +1017,7 @@
     if (purple && purple.Detach) purple.Detach(shopWindow);
     else if (shopWindow.__purpleShell) { shopWindow.__purpleShell.Dispose(); shopWindow.RemoveClass("PurpleShell"); }
     shopWindow.AddClass("ShopPurple"); shopWindow.AddClass("ShopStandalone"); shopWindow.AddClass("RHSurvivalShop");
-    var shopShell=U.ModalShell.Adopt({id:"shop",panel:byId("CustomShopWindow"),root:$.GetContextPanel(),header:byId("ShopHeader"),titlePanel:byId("ShopTitle"),scrim:byId("ShopBackdrop"),scrimButton:byId("ShopBackdropClick"),closeButton:byId("ShopCloseButton"),width:680,height:600,fit:{reference:[1920,1080]},onClose:close});
+    var shopShell=U.ModalShell.Adopt({id:"shop",panel:byId("CustomShopWindow"),root:$.GetContextPanel(),header:byId("ShopHeader"),titlePanel:byId("ShopTitle"),scrim:byId("ShopBackdrop"),scrimButton:byId("ShopBackdropClick"),closeButton:byId("ShopCloseButton"),width:shopLayoutWidth,height:shopLayoutHeight,fit:{reference:[1920,1080]},onClose:close});
     var categoryHost = byId("ShopModeToggles");
     if (categoryHost && !byId("ShopModeOther")) {
         var other = $.CreatePanel("Button", categoryHost, "ShopModeOther");

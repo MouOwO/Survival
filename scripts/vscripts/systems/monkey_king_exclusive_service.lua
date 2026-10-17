@@ -24,7 +24,11 @@ local STAFF_DROP_HEIGHT = 1000
 local STAFF_DROP_DURATION = 0.28
 local STAFF_DROP_INITIAL_SPEED = 350
 
-local q_health_hits_by_player = {}
+local target_history = require("core/target_history")
+local function new_q_health_history()
+    return target_history.new({ task_prefix = "monkey_q_history" })
+end
+local q_health_history = new_q_health_history()
 local q_impacts = {}
 local q_impact_sequence = 0
 local state_by_player = {}
@@ -235,8 +239,9 @@ local function play_staff_drop(attacker, origin, direction, length)
 end
 
 local function health_hit_count(player_id, target)
-    q_health_hits_by_player[player_id] = q_health_hits_by_player[player_id] or {}
-    return q_health_hits_by_player[player_id], tostring(target:entindex())
+    local counts = q_health_history:bucket(player_id)
+    q_health_history:track(player_id, target)
+    return counts, target
 end
 
 local function resolve_q_impact(impact_id)
@@ -498,6 +503,11 @@ local function sync_clone(current, hero, snapshot)
     clone.survival_strength = tonumber(stats.strength) or 0
     clone.survival_agility = tonumber(stats.agility) or 0
     clone.survival_intellect = tonumber(stats.intellect) or 0
+    -- Attributes already include the owner's EX projection. Only inherit the
+    -- separate final-damage cache; both ordinary attacks and the clone's own
+    -- attribute-based Q pass through DamageFilter once.
+    clone.survival_commerce_hero_ex_damage_multiplier =
+        tonumber(stats.commerce_ex_final_damage_multiplier) or 1
     clone.survival_combat_refresh_version = tonumber(stats.refresh_version) or 0
     clone.survival_critical_chance_pct = math.max(0,
         tonumber(stats.critical_chance_pct) or 0)
@@ -701,7 +711,7 @@ local function on_hero_removed(payload)
     scheduler.cancel("monkey_growth:" .. tostring(player_id))
     scheduler.cancel("monkey_clone_respawn:" .. tostring(player_id))
     clear_q_impacts(player_id)
-    q_health_hits_by_player[player_id] = nil
+    q_health_history:clear_scope(player_id)
     for clone, entindex in pairs(current and current.owned_clones or {}) do
         event_bus.emit(events.HERO_CLONE_REMOVED, {
             unit = clone, entindex = entindex, player_id = player_id,
@@ -719,8 +729,9 @@ local function on_hero_removed(payload)
 end
 
 function M.init()
+    q_health_history:reset()
     clear_q_impacts()
-    q_health_hits_by_player = {}
+    q_health_history = new_q_health_history()
     q_impacts = {}
     q_impact_sequence = 0
     state_by_player = {}
@@ -765,7 +776,7 @@ M._test = {
     play_staff_drop = play_staff_drop,
     resolve_q_impact = resolve_q_impact,
     trigger_q = trigger_q,
-    health_hits = function() return q_health_hits_by_player end,
+    health_hits = function() return q_health_history:all_values() end,
     trigger_e = trigger_e,
     on_final_critical_attack_damage = on_final_critical_attack_damage,
     impacts = function() return q_impacts end,

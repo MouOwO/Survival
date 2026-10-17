@@ -11,6 +11,7 @@ package.loaded["systems/tree_damage_rules"] = {
     is_tree = function(unit) return unit and unit.test_tree == true end,
     is_allowed_tree_attacker = function() return true end,
     is_arrow_tower = function() return false end,
+    is_lumberjack = function() return false end,
     is_basic_attack_category = function() return false end,
     consume_basic_attack = function() return false end,
     allows_damage = function() return true end,

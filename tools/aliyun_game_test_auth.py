@@ -29,6 +29,17 @@ ROOT = Path(__file__).resolve().parents[1]
 GENERATED = ROOT / "scripts/vscripts/tests/c6_console_generated"
 OUTPUT = ROOT / "output/ecs_backend_work"
 HIDDEN = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+INJECTION_ERRORS = (
+    "tools_auth_file_load_failed",
+    "tools_auth_file_invalid",
+    "tools_auth_apply_failed",
+    "tools_auth_verify_failed",
+    "tools_auth_recovery_failed",
+) + tuple("tools_auth_recovery_" + step + "_failed" for step in (
+    "profiles_require", "setup_require", "party_wait", "player_api", "player_state",
+    "account_id", "auth_state", "authenticate", "mode_state", "profile_state",
+    "profile_load", "loading_tick",
+))
 
 
 class AuthError(RuntimeError):
@@ -197,36 +208,73 @@ if not IsServer or not IsServer() or not IsInToolsMode or not IsInToolsMode()
 def recovery_lua() -> str:
     """Resume the existing admission/profile flow without resetting game state."""
     return """
+    -- Fixed phase codes only. Do not retain/print pcall exception values,
+    -- current account IDs, credential strings or loaded profile contents.
+    local function recovery_api(owner, name)
+      if not owner or type(owner[name]) ~= 'function' then error('recovery_api_missing') end
+    end
+    stage = 'tools_auth_recovery_profiles_require_failed'
     local profiles = require('systems/player_profile_service')
+    if type(profiles) ~= 'table' then error('recovery_module_invalid') end
+    stage = 'tools_auth_recovery_setup_require_failed'
     local setup = require('systems/match_setup_service')
+    if type(setup) ~= 'table' then error('recovery_module_invalid') end
     local loading = package.loaded['systems/startup_loading_service']
+    stage = 'tools_auth_recovery_party_wait_failed'
     local party_waiting = loading and type(loading.is_party_waiting) == 'function' and loading.is_party_waiting()
     if not party_waiting then
+    stage = 'tools_auth_recovery_player_api_failed'
+    recovery_api(PlayerResource, 'IsValidPlayerID')
     for id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do
-      if PlayerResource:IsValidPlayerID(id)
-        and not PlayerResource:IsFakeClient(id)
+      stage = 'tools_auth_recovery_player_state_failed'
+      if PlayerResource:IsValidPlayerID(id) then
+        stage = 'tools_auth_recovery_player_api_failed'
+        recovery_api(PlayerResource, 'IsFakeClient')
+        recovery_api(PlayerResource, 'GetTeam')
+        recovery_api(PlayerResource, 'GetPlayer')
+        stage = 'tools_auth_recovery_player_state_failed'
+        if not PlayerResource:IsFakeClient(id)
         and PlayerResource:GetTeam(id) ~= (DOTA_TEAM_SPECTATOR or 1)
         and PlayerResource:GetPlayer(id) ~= nil then
+        stage = 'tools_auth_recovery_account_id_failed'
+        recovery_api(PlayerResource, 'GetSteamAccountID')
         local steam = tonumber(PlayerResource:GetSteamAccountID(id) or 0)
         if steam and steam > 0 then
           local account = string.format('%.0f', steam)
           -- Entry authentication is independent of mode selection. Do not
           -- supersede an in-flight request on every watcher/launcher attempt.
+          stage = 'tools_auth_recovery_auth_state_failed'
+          recovery_api(profiles, 'is_authenticated_for_account')
+          recovery_api(profiles, 'is_authenticating')
           if not profiles.is_authenticated_for_account(id, account)
             and not profiles.is_authenticating(id) then
+            stage = 'tools_auth_recovery_authenticate_failed'
+            recovery_api(profiles, 'authenticate_player')
             profiles.authenticate_player(id, 'ecs_test_auth_ready')
           end
           -- Pure mode must keep its existing baseline, and neither mode may
           -- reload a loaded profile or replace an already pending load.
-          if setup.is_mode_selected()
-            and profiles.is_authenticated_for_account(id, account)
-            and not profiles.get_profile(id) and not profiles.is_loading(id) then
-            profiles.load_player(id, 'ecs_test_auth_ready')
+          stage = 'tools_auth_recovery_mode_state_failed'
+          recovery_api(setup, 'is_mode_selected')
+          if setup.is_mode_selected() then
+            stage = 'tools_auth_recovery_auth_state_failed'
+            if profiles.is_authenticated_for_account(id, account) then
+              stage = 'tools_auth_recovery_profile_state_failed'
+              recovery_api(profiles, 'get_profile')
+              recovery_api(profiles, 'is_loading')
+              if not profiles.get_profile(id) and not profiles.is_loading(id) then
+                stage = 'tools_auth_recovery_profile_load_failed'
+                recovery_api(profiles, 'load_player')
+                profiles.load_player(id, 'ecs_test_auth_ready')
+              end
+            end
           end
+        end
         end
       end
     end
     end
+    stage = 'tools_auth_recovery_loading_tick_failed'
     if loading and type(loading.tick) == 'function' then loading.tick() end
 """
 
@@ -246,8 +294,13 @@ def send_lua(code: str, nonce: str, request_path: Path) -> None:
         result = subprocess.run([node, str(ROOT / "tools/map_c6/console.cjs"), "--file", str(request_path),
                                  "--timeout-ms", "5000", "--expect", nonce], capture_output=True,
                                 timeout=25, creationflags=HIDDEN)
-        lines = result.stdout.decode("utf-8", errors="replace").splitlines()
-        if result.returncode != 0 or nonce not in [line.strip() for line in lines]:
+        lines = [line.strip() for line in result.stdout.decode("utf-8", errors="replace").splitlines()]
+        # A guarded Lua failure has a fixed code tied to this request. Never
+        # expose arbitrary console text or Lua exception/credential values.
+        for error in INJECTION_ERRORS:
+            if nonce + "_ERROR_" + error in lines:
+                raise AuthError(error)
+        if result.returncode != 0 or nonce not in lines:
             raise AuthError("tools_server_confirmation_missing")
     finally:
         request_path.unlink(missing_ok=True)
@@ -287,6 +340,33 @@ def start_empty(state: Path) -> dict:
     return {"ok": True, "status": "empty_tools_launch_checked"}
 
 
+def injection_lua(relative: str, nonce: str) -> str:
+    """Confirm both credential verification and recovery, with fixed failures."""
+    return capabilities() + f"""
+local stage = 'tools_auth_file_load_failed'
+local ok = pcall(function()
+  local value = LoadKeyValues('{relative}')
+  if type(value) ~= 'table' then return end
+  stage = 'tools_auth_file_invalid'
+  if type(value.token) ~= 'string' or #value.token < 24 then return end
+  stage = 'tools_auth_apply_failed'
+  Convars:SetStr('survival_fishing_api_token', value.token)
+  stage = 'tools_auth_verify_failed'
+  local applied = Convars:GetStr('survival_fishing_api_token') == value.token
+  value.token = nil
+  if not applied then return end
+  stage = 'tools_auth_recovery_failed'
+{recovery_lua()}
+  stage = nil
+end)
+if ok and stage == nil then
+  print('{nonce}')
+else
+  print('{nonce}_ERROR_' .. stage)
+end
+"""
+
+
 def inject(state: Path, environment: Path) -> dict:
     probe(state)
     token = read_api_token(environment)
@@ -309,19 +389,7 @@ def inject(state: Path, environment: Path) -> dict:
         with temporary.open("w", encoding="utf-8", newline="\n") as target:
             target.write('"goufayu_test_auth"\n{\n "token" ' + json.dumps(token, ensure_ascii=False) + "\n}\n")
         token = None
-        code = capabilities() + f"""
-local ok = pcall(function()
-  local value = LoadKeyValues('{relative}')
-  if type(value) ~= 'table' or type(value.token) ~= 'string' or #value.token < 24 then return end
-  Convars:SetStr('survival_fishing_api_token', value.token)
-  local applied = Convars:GetStr('survival_fishing_api_token') == value.token
-  value.token = nil
-  if applied then
-{recovery_lua()}
-    print('{nonce}')
-  end
-end)
-"""
+        code = injection_lua(relative, nonce)
         send_lua(code, nonce, OUTPUT / (nonce + ".json"))
         return {"ok": True, "status": "tools_test_auth_applied", "temporary_credential_removed": True}
     finally:

@@ -151,7 +151,7 @@ M.wall = {
     footprint = { x = 4, y = 4 }, hull_radius = 128,
     max_count = 1, build_once = true,
     show_health_bar = true, selectable = true,
-    abilities = { "ability_upgrade_wall", "ability_upgrade_wall_9_1" }, levels = wall_levels,
+    abilities = { "ability_upgrade_wall", "ability_upgrade_wall_9_1", "ability_wall_blink" }, levels = wall_levels,
     quick_upgrade_target_level = 25, -- CSV level 25 is 城墙_9_1.
 }
 
@@ -239,6 +239,7 @@ for _, row in ipairs(arrow_tower_base.rows or {}) do
     if row.enabled ~= false and level then
         level.model_name = row.model_name
         level.model_asset_id = row.model_asset_id
+        level.model_yaw = tower_routes.initial_yaw
     end
 end
 

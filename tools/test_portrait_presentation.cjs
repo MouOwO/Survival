@@ -91,6 +91,50 @@ cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:778,model_asset_id:'',por
 assert.equal(cfg.SurvivalPortraitPresentation.InspectBackdrop().color,'#29424b','explicit clear returns to fallback');
 console.log('PORTRAIT_HERO_PALETTE_PASS: hero colors, cosmetic identity, stale selection rejection, native/custom fills match');
 
+// The builder's map owns Io and its particles, while both possible HUD hosts
+// supply the original coolinterior image underneath. Ordinary Io heroes must
+// retain their existing palette, and stale builder snapshots must not leak.
+selected=779;unitName='npc_survival_builder_proxy';
+const builderBackdrop=fixture();
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:779,
+ model_asset_id:'builder_io_benevolent_companion',portrait_unit_name:'npc_dota_hero_wisp'});
+const builderImage='url("file://{images}/custom_game/portrait_builder_io/coolinterior.png")';
+for(let tick=0;tick<64;tick++)cfg.SurvivalPortraitPresentation.Refresh(builderBackdrop.group);
+for(const parent of [builderBackdrop.container,builderBackdrop.custom]){
+ assert.equal(parent.style.backgroundImage,builderImage);
+ assert.equal(parent.style.backgroundColor,'#071321');
+ assert.equal(parent.style.backgroundSize,'100% 100%');
+ assert.equal(parent.style.backgroundPosition,'50% 50%');
+ assert.equal(parent.style.backgroundRepeat,'no-repeat');
+ assert.equal(parent.style.brightness,undefined,'background cannot tint the model subtree');
+ assert.equal(parent.style.washColor,undefined,'background cannot tint Io or its particles');
+}
+assert.equal(builderBackdrop.scene.style.backgroundImage,undefined,'image remains behind the 3D scene');
+assert.equal(builderBackdrop.scene.style.brightness,undefined);
+selected=780;unitName='npc_dota_hero_wisp';
+cfg.SurvivalPortraitPresentation.Refresh(builderBackdrop.group);
+for(const parent of [builderBackdrop.container,builderBackdrop.custom]){
+ assert.equal(parent.style.backgroundImage,'none','new selection clears a stale builder image');
+ assert(parent.style.backgroundColor.includes('#477e9a'),'ordinary Io retains its existing palette');
+}
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:780,
+ model_asset_id:'builder_io_benevolent_companion',portrait_unit_name:'npc_dota_hero_wisp'});
+cfg.SurvivalPortraitPresentation.Refresh(builderBackdrop.group);
+cfg.SurvivalPortraitPresentation.SetSnapshot({entindex:780,
+ model_asset_id:'tower_lightning_razor',portrait_unit_name:'npc_dota_hero_razor'});
+cfg.SurvivalPortraitPresentation.Refresh(builderBackdrop.group);
+for(const parent of [builderBackdrop.container,builderBackdrop.custom]){
+ assert.equal(parent.style.backgroundImage,'none','changing same-entity identity restores a tower gradient');
+ assert(parent.style.backgroundColor.includes('#364199'));
+}
+cfg.SurvivalPortraitPresentation.SetSnapshot(null);
+selected=-1;unitName='';cfg.SurvivalPortraitPresentation.Refresh(builderBackdrop.group);
+assert.equal(builderBackdrop.container.style.backgroundImage,'none','cleared selection removes the builder image');
+const ioBackgroundPng=fs.readFileSync('panorama/src/images/custom_game/portrait_builder_io/coolinterior.png');
+assert.equal(ioBackgroundPng.subarray(1,4).toString(),'PNG');
+assert.equal(ioBackgroundPng.readUInt32BE(16),128);assert.equal(ioBackgroundPng.readUInt32BE(20),128);
+console.log('BUILDER_PORTRAIT_BACKDROP_PASS: native coolinterior image only for the selected builder, both hosts covered, palette restoration on selection/identity/clear, no model brightness or tint');
+
 // Use the production scene controller with separate state so the native HUD
 // assertions above remain independent of the corner shortcut's live identity.
 const shortcutState={player:0,hero:101,selected:901,alive:true,canSelect:true,

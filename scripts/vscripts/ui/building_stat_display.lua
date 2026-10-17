@@ -34,13 +34,19 @@ function M.apply(unit, snapshot)
         -- These are fixed talent modifiers. The separate kill/wave and hit
         -- growth modifiers are deliberately absent from the allowlist.
         local fixed_pct = 0
+        stats.attack_recruit_training_pct = 0
         if unit.FindModifierByName then
             for _, name in ipairs({"modifier_rogue_base_tower_attack", "modifier_rogue_tower_attack_projection",
                 "modifier_rogue_weakening_attack"}) do
                 local modifier = unit:FindModifierByName(name)
                 if modifier and modifier.GetModifierBaseDamageOutgoing_Percentage then
                     local ok, value = pcall(modifier.GetModifierBaseDamageOutgoing_Percentage, modifier)
-                    if ok then fixed_pct = fixed_pct + (tonumber(value) or 0) end
+                    if ok then
+                        fixed_pct = fixed_pct + (tonumber(value) or 0)
+                        if name == "modifier_rogue_base_tower_attack" then
+                            stats.attack_recruit_training_pct = tonumber(value) or 0
+                        end
+                    end
                 end
             end
         end

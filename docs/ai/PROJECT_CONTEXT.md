@@ -127,3 +127,11 @@ archive_cooperative_reward_service 在通关时冻结真人获胜队伍，挑战
 ## 当前 UI 文档与构建入口（2026-10-11）
 
 菜单维护从 [当前 UI 指南](../UI_GUIDE.md) 与 design_refs/menus_v10/DELIVERY.md 进入。旧哥特、月光、C19/C25 和历史主题过程记录已清理；业务契约和原始素材包保留。V10 scope 位于 tools/archive_v10/compile_scope.json 与 tools/menus_v10/compile_scope.json，work 仅本地产物；源 PNG 可用 tools/archive_v10/import.cjs 从原包重建，游戏编译资源随仓库提交。本地 apps/comfy-dashboard 是独立应用，保留但不纳入游戏提交。
+
+## 主机工具控制台协调（2026-10-11）
+
+常驻Hammer助手与单机启动器共享同一Source2控制台，单机启动器先正常暂停实际活助手，结束后恢复原运行状态；LAN入口保留暂停及手动恢复规则。是否存活由受控JSON状态及心跳确认，不只看任务Running。Stop以Python实例锁及worker清理后的stop_confirmed为证，runner只等待Python本体，保留SSH后代；Start兼容仍等SSH的旧包装器。认证注入只接受本次nonce成功回执或固定分阶段错误，不重放已发送命令。参见[连接排查](../HAMMER_BACKEND_RECONNECT.md)，双机验收状态见CURRENT_TASK/KNOWN_ISSUES。
+
+## 城墙候位侵入恢复（2026-10-11）
+
+wall_melee_contact每墙面4个独立近战许可；无许可候位怪侵入前排时，完整安全地面短段及控制门禁通过后，用禁攻击mode4暂时穿单位退回。自身Hull与攻击距离保持，实际清出前排且与普通后排身体分离才恢复碰撞；后排占位可有界延深安全目标，双侵入按entindex固定退出次序，候选不得越过接触范围。安全rear目标保持，异常入口有界四列/中心替代，失败两秒退避；稳定候位不查询邻居。复用既有0.5秒AI及一帧首次MOVE，不持续写坐标、重发稳定攻击或新增计时器。验证状态及历史记录见[城墙接触](../wall_contact_and_placement.md)与CURRENT_TASK。

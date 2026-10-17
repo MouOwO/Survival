@@ -59,7 +59,8 @@ M.region_center = {
     y = bounds and (bounds.min_y + bounds.max_y) / 2 or 0,
 }
 -- Rotate the existing northeast tree location with the four island courts.
--- Reserve four separate fixed sockets per court for players sharing a base.
+-- Only the first socket is reserved. The three backups stay buildable while
+-- empty and can host independent trees when players share a court.
 M.spawn_regions = {}
 local region_ids = { "northeast", "southeast", "southwest", "northwest" }
 local offsets = { {0, 0}, {-192, 0}, {0, -192}, {-192, -192} }

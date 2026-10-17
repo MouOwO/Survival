@@ -1,6 +1,14 @@
 # 新电脑复制与局域网联调
 
-更新：2026-10-07。适用于 Windows 上的 `survival/template_map` Workshop Tools 测试，后端为现有阿里云测试环境。
+更新：2026-10-11。适用于 Windows 上的 `survival/template_map` Workshop Tools 测试，后端为现有阿里云测试环境。
+
+## 主机启动器认证确认缺失（2026-10-11）
+
+本机运行 `launch_aliyun_test_game.cmd` 报 `tools_server_confirmation_missing`，已确认是常驻 Hammer 助手占用 29000 控制台，启动器另建连接无法取得回执。单机启动器现在在认证前确认助手状态、正常暂停实际运行的助手，结束后恢复原状态；原已停用或未安装的助手不会自行启动。LAN 启动器仍保持助手暂停，测试结束后手动恢复。
+
+旧任务包装器还会因 `Start-Process -Wait` 等待保留的 SSH 子进程而一直显示 Running。新版只等待 Python 助手；Stop 以实例锁及连接清理完成的 `stop_confirmed=true` 为依据，Start 可兼容仍等待 SSH 的旧包装器，不终止游戏或隧道。详细记录见 [Hammer 连接排查](HAMMER_BACKEND_RECONNECT.md)。
+
+本机已在原游戏中通过完整 `-AttachOnly` 启动流程，确认 `GAME_AUTH_READY` 和 `HAMMER_BACKEND_RESUMED`。这证明主机认证已恢复，不等于另一台电脑已经入场。加入者使用 `join_lan_game.cmd` 输入主机当前局域网 IPv4；本轮核验地址为 `192.168.1.134`、游戏 UDP 端口为 `27015`，地址可能随网络变化。新局等名单齐全后再由房主点击“队友到齐，开始加载”。
 
 ## 当前推荐：直接从 Hammer 开组队房
 
@@ -506,10 +514,13 @@ connect 192.168.1.134:27015
 | `temporary_auth_acl_failed` | 旧实现重设文件所有者，部分复制目录拒绝此操作 | 更新本次工具，执行 `Check`；不授予 Everyone 权限 |
 | 空文件子目录测试成功，直接目录失败 | 两个测试位置的继承权限不相同 | 使用工具真实凭据目录的 `check-acl` 结果 |
 | `tools_console_unavailable` | 游戏关闭、Tools 控制台未就绪 | 保持正常 Tools 游戏开启，再运行启动器 |
-| `tools_server_confirmation_missing` | 未取得指定地图的服务端回显，或中途关闭了游戏 | 保持 `survival/template_map` 开启，检查控制台占用 |
+| `tools_server_confirmation_missing` | 未取得指定地图的服务端回显，可能是控制台连接争用或中途关闭游戏 | 更新主机协调脚本，保持 `survival/template_map` 开启并检查助手状态 |
+| `tools_auth_file_load_failed` / `tools_auth_file_invalid` | 游戏读取临时认证文件失败或格式不符 | 核查本机凭据目录和 ACL；错误不会输出凭据内容 |
+| `tools_auth_apply_failed` / `tools_auth_verify_failed` / `tools_auth_recovery_failed` | 游戏设置、验证凭据或恢复既有加载流程失败 | 按阶段检查游戏及助手状态，注入不会自动重放 |
+| `HAMMER_BACKEND_RESUME_FAILED` | 启动器结束后未确认原助手恢复存活 | 按提示恢复原助手；原认证错误会保留，游戏及 SSH 不会被终止 |
 | `authenticated_backend_not_ready` | 本机 API token、隧道或远端服务/数据库就绪检查未通过 | 先执行 `OnlineCheck`，不用空档案替代云端档案 |
 | `assignment_window_closed` | 新玩家在本局活动槽位分配结束后才加入 | 所有人在放行前加入，重新开局验证 |
-| `GAME_AUTH_READY` | 本机认证传入与缺失档案请求通过 | 继续验收游戏读写与多人同步 |
+| `GAME_AUTH_READY` | 本机凭据传入已确认，原加载流程恢复检查通过 | 组队等待仍需房主开始；继续核查全部玩家认证和档案加载 |
 | `api_environment_missing` | 本机还未配置 API 凭据 | 执行 `Credential` 或通过 Setup 指定现有 `-EnvironmentFile` |
 | `ssh_key_not_loaded_in_current_user_agent` | agent 中没有当前配置对应的密钥 | 在运行游戏的同一 Windows 用户下加载该密钥 |
 | `compiled_template_map_missing` | 游戏目录没有编译后的主地图 | 同步正确的 `.vpk`，不能只复制 `.vmap` |

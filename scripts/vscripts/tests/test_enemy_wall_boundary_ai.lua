@@ -39,6 +39,7 @@ local function unit(id,x,y,radius,capability)
     function u:IsNull() return false end
     function u:IsAlive() return true end
     function u:GetHullRadius() return self.radius end
+    function u:GetPaddedCollisionRadius() return self.radius+10 end
     function u:SetHullRadius(radius) self.radius=radius end
     function u:GetAttackCapability() return self.capability end
     function u:GetMoveCapability() return 1 end
@@ -66,7 +67,7 @@ local cases={
     {name='ground_melee',radius=32,x=-192,y=32},
     {name='ground_ranged',radius=32,x=-220,y=0,capability=2},
     {name='flying_combat_with_ground_navigation',radius=32,x=-220,y=0,movement='flying'},
-    {name='challenge_without_unit_collision',radius=0,x=-200,y=0,no_collision=1},
+    {name='legacy_challenge_collision_parameter',radius=32,x=-200,y=0,no_collision=1},
     {name='large_hull_melee',radius=128,x=-288,y=0},
 }
 for i,case in ipairs(cases) do
@@ -83,27 +84,22 @@ for i,case in ipairs(cases) do
             'flying combat labels must use native melee contacts')
     end
     local initial_corrections=u.corrections
-    if case.no_collision then assert(m:CheckState()[MODIFIER_STATE_NO_UNIT_COLLISION]) end
+    assert(not m:CheckState()[MODIFIER_STATE_NO_UNIT_COLLISION],
+        case.name..' must retain unit collision, including legacy challenge parameters')
+    assert(u.radius==case.radius,'contact admission must preserve the configured hull')
     local before_orders,before_stops=u.orders,u.stops
     local before_state=m.ai_state
     local before_nav=nav_queries
     -- Movement across the entire wall can finish outside its far edge in one
     -- observation. This must still return to the previously observed front.
     u.p=Vector(-case.x,case.y,384);clock=.5;m:OnIntervalThink()
-    assert(u.p.x<0 and u.corrections>=initial_corrections+1
-        and u.corrections<=initial_corrections+2,
-        case.name..' crosses the square only through boundary correction and at most one precise settlement')
+    assert(u.p.x<0 and u.corrections==initial_corrections+1,
+        case.name..' requires one exceptional boundary recovery and no contact teleport')
     assert(m.boundary_position.x==u.p.x,'snapshot uses the corrected position')
-    local displaced_contact=m.ai_state=='approach'
-    local settled_cross=before_state=='approach' and m.ai_state=='attack'
-    assert(u.orders==before_orders+(settled_cross and 1 or 0)
-        and u.stops==before_stops+(settled_cross and 1 or 0),
-        'only a newly settled contact starts an attack; displaced contacts wait for native phase')
-    if displaced_contact then
-        assert(m.phase_order_frame,'displaced contact must schedule its phase frame')
-        clock=clock+1/30;m:OnIntervalThink()
-        assert(not m.phase_order_frame,'the deferred phase frame must return to the normal cadence')
-    end
+    assert(m.ai_state=='idle' and not m.contact_locked and not m.phase_order_frame,
+        'real penetration must release its old goal and root before replanning')
+    assert(u.orders==before_orders and u.stops==before_stops+1,
+        'real penetration cancels the old MOVE once and replans on the next observation')
     if case.capability==2 then assert(u:Script_GetAttackRange()==550,'ranged reach unchanged') end
     local boundary_nav=nav_queries
     local stable_corrections,stable_orders,stable_stops
@@ -111,10 +107,11 @@ for i,case in ipairs(cases) do
         clock=.5+pass*.25
         if m.ai_state=='attack' then m:OnAttackStart({attacker=u,target=wall}) end
         m:OnIntervalThink()
+        if m.phase_order_frame then clock=clock+1/30;m:OnIntervalThink() end
         if pass==1 then
-            assert(u.corrections<=initial_corrections+2
+            assert(u.corrections==initial_corrections+1
                 and u.orders<=before_orders+1 and u.stops<=before_stops+1,
-                'a displaced precise contact aligns at most once and resumes its attack')
+                'replanning must retain the full hull without another position correction')
             stable_corrections,stable_orders,stable_stops=u.corrections,u.orders,u.stops
             boundary_nav=nav_queries
         else
@@ -135,7 +132,7 @@ local m=setmetatable({GetParent=function() return u end,StartIntervalThink=funct
 u.ai=m;m:OnCreated({wall_entindex=1});m:OnIntervalThink()
 m:SetWallEntIndex(2);assert(m.boundary_position==nil)
 local previous_corrections=u.corrections
-u.p=Vector(1184,24,384);clock=.5;m:OnIntervalThink()
+u.p=Vector(1184,32,384);clock=.5;m:OnIntervalThink()
 assert(u.corrections==previous_corrections and u.p.x==1184,
     'first observation at a new wall does not use old crossing history')
 navigation.clear(wall);navigation.clear(other_wall)

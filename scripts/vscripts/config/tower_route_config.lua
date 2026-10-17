@@ -12,6 +12,9 @@ local modules = {
 }
 
 local M = {}
+-- Source world south is -Y (yaw 270). Share the initial orientation between
+-- construction and route/model changes, including deferred visual loading.
+M.initial_yaw = 270
 -- CSV rarity matches the visible rank. Route positions remain the authority
 -- for upgrade limits so renaming a rarity never changes an upgrade/cost.
 local presentation_level_by_id = {}

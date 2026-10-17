@@ -496,4 +496,22 @@ assert(not service.trigger_clone_q(0, recovered, primary, 88))
 assert(not service._test.q_replicate({player_id = 0, attacker = replacement, target = primary,
     critical = true, is_main_attack = true, final_damage = 88}), "main and clone both reject friendly targets")
 assert(ordinary_events == 0)
+-- An owned EX privilege follows source snapshots onto the actual defender.
+-- Q copies start with confirmed post-filter damage and must not apply EX twice.
+primary.team = 3
+snapshots[0].commerce_ex_final_damage_multiplier = 1.08
+bus.emit(events.HERO_COMBAT_STATS_CHANGED, {player_id = 0, snapshot = snapshots[0]})
+near(recovered.survival_commerce_hero_ex_damage_multiplier, 1.08, "defender inherits live EX damage")
+near(clone1.survival_commerce_hero_ex_damage_multiplier, 1, "other player's defender does not inherit EX")
+assert(service.trigger_clone_q(0, recovered, primary, 108))
+near(copies[#copies].base_damage, 100, "clone Q normalizes the already-applied EX")
+near(copies[#copies].base_damage * recovered.survival_commerce_hero_ex_damage_multiplier,
+    108, "clone Q final EX damage is identical to the confirmed primary hit")
+replacement.survival_commerce_hero_ex_damage_multiplier = 1.08
+assert(service._test.q_replicate({player_id = 0, attacker = replacement, target = primary,
+    critical = true, is_main_attack = true, final_damage = 108}))
+near(copies[#copies].base_damage, 100, "main hero Q also applies EX only once")
+snapshots[0].commerce_ex_final_damage_multiplier = 1
+bus.emit(events.HERO_COMBAT_STATS_CHANGED, {player_id = 0, snapshot = snapshots[0]})
+near(recovered.survival_commerce_hero_ex_damage_multiplier, 1, "defender clears EX when source ownership changes")
 print("BLADEMASTER_ATTACK_RATE_PASS fixed cadence/BAT, safe full stats, guard lifecycle; actual clone modifier/source crit parity, once-only Q, lethal-hit pure-area copy and no secondary recursion")

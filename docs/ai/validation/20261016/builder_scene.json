@@ -1,0 +1,42 @@
+{
+  "status": "PASS_BUILDER_SCENE_NATIVE",
+  "native_game_process_id": 24672,
+  "current_match_restarted": false,
+  "invalid_previous_sequence": "idle",
+  "correct_sequence": "ti7_io_idle",
+  "native_sequence_seconds": 15.333333333333334,
+  "native_root_z_range": [
+    136.49417,
+    139.37286
+  ],
+  "scene_map": "portraits/builder_io_companion_v2",
+  "scene_node": "SurvivalBuilderIoPortraitSceneV2Alpha",
+  "scene_transparency": {
+    "renderdeferred": true,
+    "deferredalpha": true
+  },
+  "native_background": "materials/vgui/hud/heroportraits/portraitbackground_coolinterior.vmat",
+  "background_pixels_edited": false,
+  "native_background_visible_in_game": true,
+  "native_model_and_particles_visible_in_game": true,
+  "residual_motion": "Native gentle idle floating/rotation; not frozen.",
+  "full_idle_recording": "output/builder_scene_20261016/final_alpha/capture.json",
+  "recorded_frames": 128,
+  "native_observation_started": "2026-10-16T17:24:28.671968+08:00",
+  "native_observation_ended": "2026-10-16T17:24:44.532371+08:00",
+  "repeated_scene_set_during_recording": 0,
+  "native_screenshot": "design_refs/menus_v10/work/native/builder_scene_final_20261016_a.png",
+  "ui_build": "output/builder_scene_20261016/compile_20261016_172131_943/result.json",
+  "map_build": "output/builder_portrait_map/build_20261016_171113_621_b6299fa0/result.json",
+  "old_map_preserved": true,
+  "verification": [
+    "builder Scene cache/strict identity/old-node release/64 stable updates",
+    "selection round trips, stale snapshots, context teardown, native input",
+    "builder-only background and restoration of other heroes/towers",
+    "native runtime input contract and compiled map sequence contract"
+  ],
+  "limitations": [
+    "Initial before recording was partially covered by a menu and is excluded from quantitative before/after comparisons.",
+    "Bright particle centroid changes shape; it is not a measurement of the skeletal root."
+  ]
+}

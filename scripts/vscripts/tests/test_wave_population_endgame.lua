@@ -10,15 +10,17 @@ local scheduled, winners, finalized, created, granted, archive_clears
 local active_players, markers_ready, reward_pending, last_projection, defeated, personal_finalized
 local match_mode, preload_calls, scheduled_count = "standard", 0, 0
 local cooperative_payloads, fake_players = {}, {}
+local visual_deaths, hero_visual_deaths, visual_cleanups, boss_rewards
+local death_metadata
 local function active_player(id)
-    for _, value in ipairs(active_players or {}) do if value == id then return true end end
+    for _, value in ipairs(active_players or {}) do if value==id then return true end end
     return false
 end
 PlayerResource = {
-    IsFakeClient = function(_, id) return fake_players[id] == true end,
-    IsValidPlayerID = function(_, id) return active_player(id) end,
-    GetTeam = function() return DOTA_TEAM_GOODGUYS end,
-    GetPlayer = function(_, id) return active_player(id) and id or nil end,
+    IsFakeClient=function(_,id) return fake_players[id]==true end,
+    IsValidPlayerID=function(_,id) return active_player(id) end,
+    GetTeam=function() return DOTA_TEAM_GOODGUYS end,
+    GetPlayer=function(_,id) return active_player(id) and id or nil end,
 }
 local serial, state_listener = 0, nil
 local noop = function() end
@@ -104,8 +106,26 @@ package.loaded["systems/monster_hull_scale"] = { apply = function() return true 
 package.loaded["systems/wave_monster_collision"] = { profile = function()
     return { base_hull_radius = 32, movement_type = "ground", no_unit_collision = false }
 end }
-package.loaded["systems/monster_visual_service"] = { on_death = noop, cleanup = noop }
-package.loaded["systems/monster_hero_visual_service"] = { on_death = noop, clear = noop }
+local function record_death(records, value)
+    assert(not value:IsAlive() and not value:IsNull(), "death visuals retain the native corpse")
+    local meta = death_metadata(value)
+    records[value] = records[value] or {}
+    local row = {entindex=value:entindex(), owner=value.owner, wave=false}
+    if meta then
+        row.wave, row.player_id, row.wave_number = true, meta.player_id, meta.wave_number
+        row.member_role, row.is_boss, row.is_final_boss = meta.member_role, meta.is_boss, meta.is_final_boss
+    end
+    records[value][#records[value]+1] = row
+end
+package.loaded["systems/monster_visual_service"] = {
+    on_death=function(value) record_death(visual_deaths, value) end,
+    -- Forced despawn has a distinct immediate cleanup API. Do not use it to
+    -- satisfy on_death: that would mask losing the corpse's death appearance.
+    cleanup=function(value) visual_cleanups[value]=(visual_cleanups[value] or 0)+1 end,
+}
+package.loaded["systems/monster_hero_visual_service"] = {
+    on_death=function(value) record_death(hero_visual_deaths, value) end, clear=noop,
+}
 package.loaded["systems/monster_spawn_marker"] = { find = function()
     return markers_ready and marker(0) or nil
 end }
@@ -140,7 +160,7 @@ package.loaded["systems/archive_service"] = {
     record_challenge = function(id, challenge, sequence, difficulty)
         granted[#granted + 1] = { id = id, challenge = challenge, difficulty = difficulty }
         reward_pending[id] = true
-        return { ok = true }
+        return {ok=true}
     end,
 }
 local multiplayer = require("systems/multiplayer_player_service")
@@ -173,6 +193,7 @@ local function restart(difficulty, without_archive, players, mode)
     match_mode, preload_calls, scheduled_count = mode or "standard", 0, 0
     cooperative_payloads, fake_players = {}, {}
     scheduled, winners, finalized, created, granted, archive_clears = {}, {}, {}, {}, {}, {}
+    visual_deaths, hero_visual_deaths, visual_cleanups, boss_rewards = {}, {}, {}, {}
     active_players, markers_ready, reward_pending = players or {0, 1}, true, {}
     defeated, last_projection, personal_finalized = {}, nil, {}
     multiplayer._reset_for_test()
@@ -189,6 +210,7 @@ local function restart(difficulty, without_archive, players, mode)
     wave.init()
     if not without_archive then archive.init() end
     bus.subscribe(events.WAVE_CHANGED, function(payload) last_projection = payload end)
+    bus.subscribe("archive.wave_boss_killed", function(payload) boss_rewards[#boss_rewards+1]=payload end)
     bus.subscribe("archive.final_wave_cleared", function(payload)
         archive_clears[#archive_clears + 1] = payload.player_id
         cooperative_payloads[payload.player_id] = payload.cooperative_win
@@ -196,6 +218,7 @@ local function restart(difficulty, without_archive, players, mode)
     if difficulty ~= false then assert(wave.set_difficulty(difficulty or "N1")) end
     return upvalue("state"), upvalue("enemies")
 end
+death_metadata=function(value) return upvalue("enemies")[value:entindex()] end
 local publish, final_check = upvalue("publish"), upvalue("check_final_victory")
 local function snapshot(player)
     local payload = player ~= nil and { player_id = player } or {}
@@ -225,11 +248,38 @@ local function spawn_lane(player, count, boss)
     return result
 end
 local function kill(value)
+    local meta, state = death_metadata(value), upvalue("state")
+    local before_alive, before_killed, before_rewards = state.alive, state.killed, #boss_rewards
+    local before_visual = #(visual_deaths[value] or {})
+    local before_hero_visual = #(hero_visual_deaths[value] or {})
+    local before_cleanup = visual_cleanups[value] or 0
     value.alive = false
     bus.emit(events.ENGINE_ENTITY_KILLED, { victim = value, victim_entindex = value:entindex() })
+    if meta then
+        local rows = visual_deaths[value] or {}
+        assert(#rows==before_visual+1 and #(hero_visual_deaths[value] or {})==before_hero_visual+1,
+            "a registered wave death invokes each formal on_death exactly once")
+        local row=rows[#rows]
+        assert(row.wave and row.entindex==value:entindex() and row.player_id==meta.player_id
+            and row.wave_number==meta.wave_number and row.member_role==meta.member_role and row.is_boss==meta.is_boss
+            and row.is_final_boss==meta.is_final_boss, "visual death sees original wave metadata before retirement")
+        assert((visual_cleanups[value] or 0)==before_cleanup and not value.removed,
+            "normal death preserves the native corpse rather than immediate visual cleanup")
+        assert(state.alive==before_alive-1 and state.killed==before_killed+1)
+        assert(#boss_rewards==before_rewards+(meta.is_boss and 1 or 0), "boss reward publishes once for its owner")
+    elseif before_visual>0 then
+        assert(#(visual_deaths[value] or {})==before_visual
+            and #(hero_visual_deaths[value] or {})==before_hero_visual
+            and (visual_cleanups[value] or 0)==before_cleanup,
+            "duplicate wave death cannot repeat appearance retirement or immediate cleanup")
+        assert(state.alive==before_alive and state.killed==before_killed and #boss_rewards==before_rewards,
+            "duplicate wave death cannot reduce counts or duplicate boss rewards")
+    end
 end
 local function final_ready(state)
-    if next(upvalue("wave_channels")) == nil then prepare_lanes() end
+    -- A real final wave has prepared its lanes. The current hub contract
+    -- anchors to those formal portals, not the former independent map marker.
+    if next(upvalue("wave_channels"))==nil then prepare_lanes() end
     state.current_wave = state.total_waves
     state.pending, state.failed_spawn = 0, 0
     state.final_wave_generation_completed = true
@@ -244,11 +294,15 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     state.final_wave_generation_completed, state.pending = false, 1
     kill(boss)
     assert(state.alive == 1 and not state.victory_settled and #created == 2)
+    assert(#boss_rewards==1 and boss_rewards[1].player_id==0)
+    kill(boss)
+    assert(state.alive==1 and state.killed==1 and #boss_rewards==1)
     state.pending, state.final_wave_generation_completed = 0, true
     final_check()
     assert(not state.victory_settled, "all lanes and surviving earlier-wave units must clear")
     kill(tail)
     assert(state.victory_settled and state.status == "archive_challenges")
+    kill(tail)
     assert(#winners == 0 and #created == 8 and #archive_clears == 2)
     assert(cooperative_payloads[0] == 1 and cooperative_payloads[1] == 1, "both winning human teammates count")
     final_check()
@@ -268,9 +322,11 @@ for _, difficulty in ipairs({"N1", "N2", "N3"}) do
     local challenge_boss = players[1].active_boss
     kill(challenge_boss)
     kill(challenge_boss)
-    assert(#granted == 2 and granted[1].id == 0 and granted[2].id == 1
-        and granted[1].challenge == "social_beast" and granted[2].challenge == "social_beast",
+    assert(#granted == 2 and granted[1].id==0 and granted[2].id==1
+        and granted[1].challenge=="social_beast" and granted[2].challenge=="social_beast",
         "one challenge death awards each eligible human account once")
+    assert(#(hero_visual_deaths[challenge_boss] or {})==1 and visual_deaths[challenge_boss]==nil,
+        "archive boss death has one hero appearance tail and one challenge reward")
     assert(not archive.finish(hero_hub) and #winners == 0, "pending rewards delay final exit")
     reward_pending[0], reward_pending[1] = false, false
     assert(archive.finish(hero_hub) and #winners == 1 and winners[1] == DOTA_TEAM_GOODGUYS)
@@ -342,7 +398,9 @@ final_check()
 assert(state.status == "archive_challenges_pending" and #winners == 0)
 archive.init()
 assert(scheduled.archive_challenge_begin_retry() == false)
-assert(state.status == "archive_challenges" and #created == 6 and #archive_clears == 2)
+assert(state.status == "archive_challenges" and #created == 6 and #archive_clears == 2,
+    "late archive handler must complete the pending handoff: " .. tostring(state.status)
+        .. " created=" .. #created .. " clears=" .. #archive_clears)
 state = restart("N1")
 markers_ready = false
 final_ready(state)
@@ -538,6 +596,12 @@ assert(snapshot(1).alive == 91 and snapshot(1).overflow_active)
 assert(snapshot().alive == 181)
 assert(upvalue("clear_normal_wave_enemies")() == 181)
 assert(snapshot().alive == 0 and #defeated == 0 and #archive_clears == 0)
+local cleaned=orphaned[2]
+assert(visual_cleanups[cleaned]==1 and visual_deaths[cleaned]==nil and hero_visual_deaths[cleaned]==nil,
+    "forced removal uses immediate cleanup, never normal corpse on_death")
+kill(cleaned); kill(cleaned)
+assert(visual_cleanups[cleaned]==1 and visual_deaths[cleaned]==nil and hero_visual_deaths[cleaned]==nil,
+    "late deaths after forced removal cannot clean or reward a retired enemy twice")
 for id = 0, 1 do
     assert(snapshot(id).alive == 0 and not snapshot(id).overflow_active)
     assert(scheduled["wave_monster_overflow:" .. id] == nil)
@@ -576,6 +640,7 @@ for _, case in ipairs({
     local count=#archive_clears;final_check();assert(#archive_clears==count)
 end
 print("PASS cooperative winner roster: solo, two humans, four humans, bots, defeated/disconnected teammate, duplicate victory")
+print("PASS wave death visuals: separate corpse-preserving on_death, original metadata, one native retirement and reward, duplicate wave/archive death guards")
 
 -- Fishing is a separate playable mode, not an empty difficulty that can clear
 -- wave zero. Use the real event handlers with a selected mode and ready host.

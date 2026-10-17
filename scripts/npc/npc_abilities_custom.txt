@@ -1844,6 +1844,20 @@
         "AbilityManaCost"    "0"
     }
 
+    "ability_wall_blink"
+    {
+        "BaseClass"          "ability_lua"
+        "ScriptFile"         "abilities/ability_building_blink"
+        "AbilityBehavior"    "DOTA_ABILITY_BEHAVIOR_POINT"
+        "AbilityTextureName" "antimage_blink"
+        "AbilityCastRange"   "99999"
+        "AbilityCastRangeBuffer" "0"
+        "MaxLevel"           "1"
+        "AbilityCastPoint"   "0.0"
+        "AbilityCooldown"    "120.0"
+        "AbilityManaCost"    "0"
+    }
+
     "ability_destroy_arrow_tower"
     {
         "BaseClass"          "ability_lua"
