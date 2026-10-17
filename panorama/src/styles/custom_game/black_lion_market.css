@@ -1,0 +1,264 @@
+/* Standalone marketplace. Shared wallet and payment dialogs keep their own styles. */
+.BLMarketWindow {
+    width:1120px; height:790px; flow-children:none; padding:0px; margin:0px;
+    background-image:none; background-color:#18201acf;
+    border:1px solid #74654438; border-radius:0px;
+    box-shadow:#00000070 0px 5px 18px 1px; overflow:noclip;
+}
+.BLMarketWindow Label {
+    font-family:"Source Han Sans SC"; font-weight:normal; color:#e5dfcc;
+    text-shadow:#00000088 0px 1px 2px 1.0;
+}
+.BLMarketCanvas { width:100%; height:100%; flow-children:none; padding:0px; overflow:noclip; }
+.BLMarketWindow .BLMarketTexture {
+    position:0px 0px 0px; width:1120px; height:790px;
+    background-image:url("file://{images}/custom_game/lottery_gw2_v1/window_background.png");
+    background-size:100% 100%; background-repeat:no-repeat;
+    background-color:transparent; opacity:.54; saturation:.4; brightness:.95;
+    opacity-mask:url("s2r://panorama/images/masks/softedge_box_png.vtex");
+}
+.BLMarketWindow .BLMarketHeader {
+    position:0px 0px 0px; width:1120px; height:68px; flow-children:none;
+    background-color:gradient(linear,0% 0%,100% 0%,from(#080b0dd9),color-stop(.60,#0d1011b8),to(#12151540));
+    border-bottom:1px solid #a5956359;
+}
+.BLMarketWindow .BLMarketTitle {
+    position:26px 16px 0px; width:430px; height:38px; margin:0px; padding:0px;
+    font-size:29px; color:#ead9a6; white-space:nowrap; text-overflow:shrink;
+}
+.BLMarketWindow .BLMarketBalance {
+    position:500px 19px 0px; width:550px; height:32px; flow-children:right;
+    horizontal-align:left; vertical-align:top; background-image:none; background-color:transparent;
+}
+.BLMarketWindow .BLMarketBalanceItem { width:164px; height:32px; flow-children:right; margin-right:26px; }
+.BLMarketWindow .BLMarketBalance Label { width:132px; height:32px; font-size:18px; color:#e8d7a6; vertical-align:center; margin:0px; padding:4px 0px 0px; white-space:nowrap; text-overflow:shrink; }
+.BLMarketWindow .BLMarketBalance Image { width:24px; height:24px; vertical-align:center; margin-right:8px; }
+.BLMarketWindow .BLMarketTabs {
+    position:24px 74px 0px; width:1072px; height:46px; flow-children:right;
+    margin:0px; padding:0px; overflow:noclip; background-image:none; background-color:transparent;
+}
+.BLMarketWindow .BLMarketTabs .BLMarketTab {
+    width:214.4px; height:46px; min-width:214.4px; margin:0px; padding:0px; flow-children:none;
+    background-image:none; background-color:#0c0f101f;
+    border:0px; border-bottom:2px solid #84754c34;
+    box-shadow:none; border-radius:0px;
+    transition-property:background-color,brightness; transition-duration:.12s;
+}
+.BLMarketWindow .BLMarketTabs .BLMarketTab:hover { background-color:#60523224; brightness:1.1; }
+.BLMarketWindow .BLMarketTabs .BLMarketTab.UISelected {
+    background-image:none;
+    background-color:gradient(linear,0% 0%,0% 100%,from(#514a3209),color-stop(.64,#6b57251a),to(#9b753b52));
+    border-bottom:2px solid #d7be76;
+}
+.BLMarketWindow .BLMarketTabs .BLMarketTab .RCTabText {
+    width:fit-children; max-width:100%; height:fit-children; horizontal-align:center; vertical-align:center; margin:0px; padding:0px;
+    font-size:22px; text-align:center; color:#c5ba98; white-space:nowrap; text-overflow:shrink;
+}
+.BLMarketWindow .BLMarketTabs .UISelected .RCTabText { color:#f0db9f; }
+.BLMarketWindow .BLMarketColumnHead {
+    position:24px 129px 0px; width:1072px; height:34px; flow-children:none;
+    background-color:#15181770; border-bottom:1px solid #c0ab6a55;
+}
+.BLMarketWindow .BLMarketColumnHead Label {
+    height:28px; margin:0px; padding:4px 0px 0px;
+    font-size:16px; color:#cbbb84; white-space:nowrap; text-overflow:shrink;
+}
+.BLMarketWindow .BLMarketList {
+    position:24px 164px 0px; width:1072px; height:564px;
+    flow-children:down; overflow:squish scroll; margin:0px; padding:0px;
+    background-image:none; background-color:#13171628; border:0px;
+}
+.BLMarketWindow .BLMarketRows {
+    width:1072px; height:fit-children; flow-children:down;
+    margin:0px; padding:0px; overflow:noclip; background-image:none; background-color:transparent;
+}
+.BLMarketWindow .BLMarketRow {
+    width:1072px; height:76px; min-height:76px; flow-children:none;
+    margin:0px; padding:0px; background-image:none; background-color:#0c100e27;
+    border:0px; border-bottom:1px solid #b9ac7620; border-radius:0px; box-shadow:none;
+    transition-property:background-color; transition-duration:.1s;
+}
+.BLMarketWindow .BLMarketRow.BLMarketOdd,
+.BLMarketWindow .BLMarketRow.BLMarketRowOdd { background-color:#77715f14; }
+.BLMarketWindow .BLMarketRow:hover { background-color:#89754728; }
+.BLMarketWindow .BLMarketArt {
+    width:56px; height:56px; margin:0px; padding:0px;
+    background-color:#0b101268; border:1px solid #a39b6b59;
+}
+.BLMarketWindow .BLMarketArt Image { width:100%; height:100%; margin:0px; padding:0px; }
+.BLMarketWindow .BLMarketName {
+    height:29px; margin:0px; padding:0px; font-size:20px; color:#e5dfcc;
+    white-space:nowrap; text-overflow:ellipsis;
+}
+.BLMarketWindow .BLMarketOwned {
+    height:21px; margin:0px; padding:0px; font-size:14px; color:#9fa695;
+    white-space:nowrap; text-overflow:ellipsis;
+}
+.BLMarketWindow .BLMarketType,
+.BLMarketWindow .BLMarketChannel {
+    height:44px; max-height:44px; margin:0px; padding:0px;
+    font-size:17px; line-height:22px; color:#c1bfae;
+    white-space:normal; text-overflow:clip;
+}
+.BLMarketWindow .BLMarketChannel { color:#b9b19a; }
+.BLMarketWindow .BLMarketRowPrice,
+.BLMarketWindow .BLMarketRow .CJPrice {
+    margin:0px; padding:0px; flow-children:none; background-image:none;
+    background-color:transparent; border:0px; box-shadow:none;
+}
+.BLMarketWindow .BLMarketRowPrice .CJPriceRow,
+.BLMarketWindow .BLMarketRow .CJPriceRow {
+    width:100%; height:32px; flow-children:right; horizontal-align:left; vertical-align:center;
+}
+.BLMarketWindow .BLMarketRow .CJPriceIcon { width:23px; height:23px; vertical-align:center; margin-right:6px; }
+.BLMarketWindow .BLMarketRow .CJPriceValue,
+.BLMarketWindow .BLMarketRow .CJYuanIcon { font-size:20px; color:#e5ce87; vertical-align:center; white-space:nowrap; text-overflow:shrink; }
+.BLMarketWindow .BLMarketPriceMain {
+    height:30px; margin:0px; padding:0px; font-size:20px; line-height:26px;
+    color:#e5ce87; white-space:nowrap; text-overflow:shrink;
+}
+.BLMarketWindow .BLMarketPriceSecondary {
+    height:20px; margin:0px; padding:0px; font-size:13px; line-height:18px;
+    color:#a4a999; white-space:nowrap; text-overflow:ellipsis;
+}
+.BLMarketWindow .BLMarketBuy {
+    height:32px; padding:0px; margin:0px; flow-children:none;
+    background-image:none;
+    background-color:gradient(linear,0% 0%,0% 100%,from(#d5cdb6),to(#b0a58b));
+    border:1px solid #171a17cc; border-radius:0px; box-shadow:none;
+    transition-property:brightness; transition-duration:.1s;
+}
+.BLMarketWindow .BLMarketBuy:hover { background-image:none; brightness:1.12; }
+.BLMarketWindow .BLMarketBuy:active { background-image:none; brightness:.9; }
+.BLMarketWindow .BLMarketBuy:disabled,
+.BLMarketWindow .BLMarketBuy.UIDisabled { background-image:none; background-color:#55534970; saturation:.4; }
+.BLMarketWindow .BLMarketBuy.BLMarketPending { background-image:none; background-color:#8a85736b; saturation:.45; brightness:.85; }
+.BLMarketWindow .BLMarketRow .BLMarketBuy .BLMarketBuyText {
+    width:fit-children; max-width:100%; height:fit-children; horizontal-align:center; vertical-align:center; margin:0px; padding:0px;
+    font-size:18px; text-align:center; color:#282518; text-shadow:none;
+    white-space:nowrap; text-overflow:shrink;
+}
+.BLMarketWindow .BLMarketRow .BLMarketBuy:disabled .BLMarketBuyText,
+.BLMarketWindow .BLMarketRow .BLMarketBuy.UIDisabled .BLMarketBuyText { color:#c4c7ba; }
+.BLMarketWindow .BLMarketRow .BLMarketDisabledReason {
+    width:132px; height:32px; max-height:32px; margin:0px; padding:0px;
+    font-size:12px; line-height:15px; color:#d8b887; text-shadow:none;
+    text-align:center; white-space:normal; text-overflow:clip;
+}
+.BLMarketWindow .BLMarketBuy.BLMarketPending Label { color:#d0cbb4; }
+.BLMarketWindow .BLMarketNotice {
+    position:24px 742px 0px; width:734px; height:32px;
+    margin:0px; padding:0px; color:#c7b78c; font-size:15px;
+    white-space:normal; text-overflow:clip;
+}
+.BLMarketWindow .BLMarketFooter {
+    position:24px 741px 0px; width:1072px; height:34px; flow-children:none;
+    background-image:none; background-color:transparent; border:0px;
+}
+.BLMarketWindow .BLMarketFooter .CJPager { position:752px 0px 0px; width:320px; height:34px; margin:0px; padding:0px; flow-children:right; horizontal-align:left; vertical-align:top; }
+.BLMarketWindow .BLMarketFooter .CJPageAction {
+    width:82px; height:32px; margin:0px; padding:0px; flow-children:none;
+    background-image:none; background-color:gradient(linear,0% 0%,0% 100%,from(#cfc6af),to(#b3a991)); border:1px solid #171a17aa;
+}
+.BLMarketWindow .BLMarketFooter .CJPageAction:hover { brightness:1.1; }
+.BLMarketWindow .BLMarketFooter .CJPageAction:disabled,
+.BLMarketWindow .BLMarketFooter .CJPageAction.UIDisabled { background-color:#55534970; saturation:.4; }
+.BLMarketWindow .BLMarketFooter .CJPageAction Label { width:100%; height:fit-children; align:center center; margin:0px; padding:0px; font-size:15px; text-align:center; color:#282518; text-shadow:none; }
+.BLMarketWindow .BLMarketFooter .CJPageAction:disabled Label,
+.BLMarketWindow .BLMarketFooter .CJPageAction.UIDisabled Label { color:#9b9e90; }
+.BLMarketWindow .BLMarketFooter .CJPageLabel { width:156px; height:32px; font-size:15px; text-align:center; vertical-align:center; color:#bcb69e; }
+.BLMarketWindow .CJEmpty,
+.BLMarketWindow .BLMarketEmpty { width:100%; height:70px; margin-top:34px; color:#b8b4a1; font-size:20px; text-align:center; }
+
+/* A detached hover panel has its own explicit scope, without touching checkout. */
+.BLMarketDetail {
+    width:368px; height:fit-children; max-height:736px; padding:0px; margin:0px;
+    flow-children:none; overflow:noclip; background-image:none;
+    background-color:transparent; border:0px; box-shadow:none;
+}
+.BLMarketDetail .BLMarketDetailSurface,
+.BLMarketDetailSurface {
+    width:368px; height:100%; min-height:120px; padding:0px; margin:0px; flow-children:none;
+    background-image:none;
+    background-color:gradient(linear,0% 0%,100% 100%,from(#222522fa),to(#111716fa));
+    border:1px solid #ab905a99; border-radius:0px;
+    box-shadow:#00000099 0px 3px 10px 1px;
+}
+.BLMarketDetail .MenuV10CommerceDetailBody {
+    position:20px 18px 0px; width:328px; height:fit-children;
+    padding:0px; margin:0px; flow-children:none; overflow:squish scroll;
+}
+.BLMarketDetail .MenuV10CommerceDetailContent { width:100%; height:fit-children; padding:0px 8px 0px 0px; margin:0px; flow-children:down; overflow:noclip; }
+.BLMarketDetail .MenuV10CommerceDetailBody Label { font-family:"Source Han Sans SC"; font-weight:normal; text-shadow:none; }
+.BLMarketDetail .RCPurpleDetailIcon { width:64px; height:64px; margin:0px 0px 9px; horizontal-align:left; }
+.BLMarketDetail .RCPurpleDetailTitle { width:100%; height:fit-children; margin:0px 0px 8px; font-size:22px; color:#e9d59b; white-space:normal; text-overflow:clip; }
+.BLMarketDetail .RCProductEffect {
+    position:0px 0px 0px; width:100%; height:fit-children;
+    margin:0px 0px 8px; padding:9px 0px 0px; border-top:1px solid #9f8f6059;
+    font-size:17px; line-height:24px; color:#d7d9cb;
+    white-space:normal; text-overflow:clip; text-align:left; overflow:noclip;
+}
+.BLMarketDetail .CJPrice { position:0px 0px 0px; width:328px; height:36px; margin:4px 0px 6px; padding:0px; flow-children:none; background-image:none; background-color:transparent; border:0px; }
+.BLMarketDetail .CJPriceRow { width:328px; height:32px; flow-children:right; horizontal-align:left; }
+.BLMarketDetail .CJPriceIcon { width:24px; height:24px; margin-right:6px; vertical-align:center; }
+.BLMarketDetail .CJPriceValue,
+.BLMarketDetail .CJYuanIcon { font-size:20px; color:#e5ce87; vertical-align:center; }
+.BLMarketDetail .CJBuy,
+.BLMarketDetail .CommercePurpleBuy {
+    width:328px; height:36px; margin-top:9px; padding:0px; flow-children:none;
+    background-image:none; background-color:gradient(linear,0% 0%,0% 100%,from(#d5cdb6),to(#b0a58b));
+    border:1px solid #171a17cc; border-radius:0px;
+}
+.BLMarketDetail .CJBuy:hover,
+.BLMarketDetail .CommercePurpleBuy:hover { background-image:none; brightness:1.1; }
+.BLMarketDetail .CJBuy:disabled,
+.BLMarketDetail .CommercePurpleBuy:disabled { background-image:none; background-color:#55534970; saturation:.4; }
+.BLMarketDetail .CJBuy Label,
+.BLMarketDetail .CommercePurpleBuy Label { width:100%; height:fit-children; align:center center; margin:0px; padding:0px; font-size:17px; color:#252a22; text-align:center; text-shadow:none; }
+.BLMarketDetail .CommercePurpleState { width:328px; height:fit-children; margin-top:6px; color:#aeb59f; font-size:15px; white-space:normal; }
+.BLMarketDetail .RCBundleContents { width:100%; height:fit-children; flow-children:down; overflow:noclip; }
+.BLMarketDetail .RCBundleItem { width:100%; height:44px; flow-children:right; margin-bottom:5px; }
+.BLMarketDetail .RCBundleArt { width:36px; height:36px; margin-right:8px; }
+.BLMarketDetail .RCBundleName { width:232px; height:36px; font-size:16px; color:#d7d9cb; text-overflow:ellipsis; }
+.BLMarketDetail .RCBundleQuantity { width:52px; height:36px; font-size:16px; color:#e5ce87; text-align:right; }
+.BLMarketWindow VerticalScrollBar,
+.BLMarketWindow .VerticalScrollBar,
+.BLMarketDetail VerticalScrollBar,
+.BLMarketDetail .VerticalScrollBar { width:6px; background-image:none; background-color:#1820189c; }
+.BLMarketWindow VerticalScrollBar .ScrollThumb,
+.BLMarketWindow .VerticalScrollBar .ScrollThumb,
+.BLMarketDetail VerticalScrollBar .ScrollThumb,
+.BLMarketDetail .VerticalScrollBar .ScrollThumb { background-image:none; background-color:#a99769b8; border:0px; border-radius:0px; }
+
+/* Reviewed video bundles: compact member list and one complete effect at a time. */
+.BLMarketDetail.VideoBundleDetail .RCPurpleDetailIcon { width:44px; height:44px; margin-bottom:4px; }
+.BLMarketDetail.VideoBundleDetail .RCProductEffect { font-size:15px; line-height:21px; }
+.BLMarketDetail.VideoBundleDetail .RCBundleItem { height:40px; margin-bottom:2px; }
+.BLMarketDetail.VideoBundleDetail .RCBundleItem:hover,
+.BLMarketDetail.VideoBundleDetail .RCBundleItem.UISelected { background-color:#a9976929; }
+.BLMarketDetail.VideoBundleDetail .RCBundleName { width:220px; }
+.BLMarketDetail.VideoBundleDetail .RCBundleQuantity { width:44px; }
+.BLMarketDetail.VideoBundleDetail .RCBundleMemberEffect { width:100%; height:fit-children; margin-top:7px; padding-top:7px; border-top:1px solid #9f8f6059; font-size:15px; line-height:21px; white-space:normal; color:#d7d9cb; overflow:noclip; text-overflow:clip; }
+
+/* Starter pack: all four names stay visible; inspect one complete effect list. */
+.BLMarketDetail.BLMarketBundleDetail .RCProductEffect { font-size:14px; line-height:20px; margin-bottom:8px; }
+.BLMarketDetail.BLMarketBundleDetail .BLMarketBundleMembers { width:100%; height:fit-children; margin:0px; padding:0px; flow-children:down; overflow:noclip; }
+.BLMarketDetail.BLMarketBundleDetail .BLMarketBundleMember { width:100%; height:32px; min-height:32px; margin:0px 0px 2px; padding:0px 8px; flow-children:none; background-color:#171d1ad9; border:1px solid #96815542; }
+.BLMarketDetail.BLMarketBundleDetail .BLMarketBundleMember:hover,
+.BLMarketDetail.BLMarketBundleDetail .BLMarketBundleMember.UISelected { background-color:#62543166; border-color:#c1a368ad; }
+.BLMarketDetail.BLMarketBundleDetail .BLMarketBundleMemberName { width:fit-children; max-width:100%; height:fit-children; align:left center; margin:0px; padding:0px; font-size:15px; color:#d7d6c7; white-space:nowrap; text-overflow:shrink; }
+.BLMarketDetail.BLMarketBundleDetail .UISelected .BLMarketBundleMemberName { color:#f0d79c; }
+.BLMarketDetail.BLMarketBundleDetail .RCBundleMemberEffect { width:100%; height:fit-children; margin:9px 0px 0px; padding:9px 0px 0px; border-top:1px solid #9f8f6059; font-size:15px; line-height:22px; color:#d7d9cb; white-space:normal; text-overflow:clip; overflow:noclip; }
+
+/* Purchase-type filtering occupies the former metadata columns. */
+.BLMarketWindow .BLMarketPurchaseType { flow-children:none; margin:0px; padding:0px; background-image:none; background-color:#111714c9; border:1px solid #85764e80; border-radius:0px; }
+.BLMarketWindow .BLMarketPurchaseType:hover { brightness:1.2; }
+.BLMarketWindow .BLMarketPurchaseType .BLMarketPurchaseTypeText { width:142px; height:28px; margin:0px; padding:3px 10px 0px; font-size:16px; color:#e1d3ad; text-align:left; }
+.BLMarketWindow .BLMarketPurchaseType .BLMarketPurchaseTypeArrow { width:22px; height:28px; horizontal-align:right; margin-right:5px; padding-top:3px; font-size:16px; text-align:center; }
+.BLMarketWindow .BLMarketPurchaseTypeLayer { flow-children:none; overflow:noclip; z-index:60; }
+.BLMarketWindow .BLMarketPurchaseTypeDismiss { margin:0px; padding:0px; background-image:none; background-color:transparent; border:0px; box-shadow:none; }
+.BLMarketWindow .BLMarketPurchaseTypeMenu { flow-children:down; padding:0px; background-color:#171d19ff; border:1px solid #a18b59b0; box-shadow:#00000099 0px 3px 8px 1px; z-index:1; }
+.BLMarketWindow .BLMarketPurchaseTypeOption { width:100%; height:31.5px; margin:0px; padding:0px; background-image:none; background-color:transparent; border:0px; }
+.BLMarketWindow .BLMarketPurchaseTypeOption:hover { background-color:#6c5a304d; }
+.BLMarketWindow .BLMarketPurchaseTypeOption.UISelected { background-color:#7c65344d; }
+.BLMarketWindow .BLMarketPurchaseTypeOption Label { width:100%; height:30px; margin:0px; padding:5px 10px 0px; font-size:16px; color:#e1d3ad; text-align:left; }

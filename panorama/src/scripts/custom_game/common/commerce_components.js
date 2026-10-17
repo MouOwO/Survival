@@ -178,7 +178,9 @@
         return row.runtime_uri;
     };
     J.Art=function(parent,file,cls){return original(parent,"custom_game/commerce_jade_v1/"+file+".png",cls);};
+    J.ItemIcon=function(parent,item,className){return original(parent,J.ProductIcon(item),className);};
     J.Window=function(root,onClose){
+        if(cfg.SurvivalBlackLionMarket)return cfg.SurvivalBlackLionMarket.Window(root,onClose);
         var scrim=panel("Button",root,"RCBackdrop"),p=panel("Panel",root,"RCWindow MenuV10Commerce");
         var menu=cfg.SurvivalMenuV10.Adopt({id:"commerce",navId:"commerce",root:root,panel:p,scrim:scrim,title:"商城",onClose:onClose});
         menu.Close();return {panel:p,scrim:scrim,shell:menu.shell,menu:menu,canvas:menu.canvas,content:menu.content,actions:menu.actions,detailLayer:menu.detailLayer};
@@ -225,7 +227,7 @@
     function detail(card,item,props,bundle){
         var layer=valid(props.detailLayer)?props.detailLayer:card;
         var tip=panel("Panel",layer,"RCPurpleDetail MenuV10CommerceDetail");tip.hittest=false;tip.hittestchildren=false;
-        var skin=cfg.SurvivalMenuV10.SkinTooltip(tip),body=panel("Panel",skin.surface,"MenuV10CommerceDetailBody");
+        var skin=props.market&&cfg.SurvivalBlackLionMarket?cfg.SurvivalBlackLionMarket.SkinTooltip(tip):cfg.SurvivalMenuV10.SkinTooltip(tip),body=panel("Panel",skin.surface,"MenuV10CommerceDetailBody");
         tip.__purpleSource=card;
         tip.style.position="202px 0px 0px";tip.style.width="312px";
         label(body,item.title,"RCPurpleDetailTitle");
@@ -261,13 +263,13 @@
             var nativeScale=Math.max(.001,Number(layer.actualuiscale_y)||1);
             var logicalHeight=Math.min(704,Math.max(96,(Number(body.actuallayoutheight)||80*nativeScale)/nativeScale+88));
             skin.Resize(368,logicalHeight);tip.style.width="368px";tip.style.height=logicalHeight+"px";
-            var sw=144*scale,tw=368*scale,th=logicalHeight*scale;
+            var sw=(props.sourceWidth||144)*scale,tw=368*scale,th=logicalHeight*scale;
             // Native paints the owned layer inside its window despite overflow:noclip.
             // Keep the complete detail in both that clip and the viewport safety area.
             var pad=12*scale,leftEdge=pad,rightEdge=width-pad,topEdge=pad,bottomEdge=height-pad;
             var clip=valid(props.detailLayer)&&layer.GetParent?layer.GetParent():null;
             if(valid(clip)){
-                var clipOrigin=clip.GetPositionWithinWindow(),cw=1672*scale,ch=941*scale;
+                var clipOrigin=clip.GetPositionWithinWindow(),cw=(props.windowWidth||1672)*scale,ch=(props.windowHeight||941)*scale;
                 leftEdge=Math.max(leftEdge,clipOrigin.x+pad);rightEdge=Math.min(rightEdge,clipOrigin.x+cw-pad);
                 topEdge=Math.max(topEdge,clipOrigin.y+pad);bottomEdge=Math.min(bottomEdge,clipOrigin.y+ch-pad);
             }
