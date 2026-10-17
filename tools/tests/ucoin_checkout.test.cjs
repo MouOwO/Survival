@@ -497,3 +497,34 @@ test('A copied historical order id cannot make a stale 1000-U catalog row buyabl
     assert.equal(h.$('#PaymentBuy').enabled,false,'Catalog validation never opts into frozen order compatibility');
     h.context.PaymentBuy();assert.equal(h.requests.filter(r=>r.payload.action==='create').length,1);
 });
+
+
+test('Monthly pass lists 5800 U-coins, confirms RMB 58, and freezes older RMB 10/20 order quotes', () => {
+    const product=paidItem({sku:'archive_pass_monthly',title:'签到月卡（30天）',category_id:'legacy',
+        amount_fen:5800,u_coin_price:5800,price:5800,max_quantity:1,
+        reward_lines:[{kind:'entitlement',id:'archive_pass',duration_days:30,quantity:1,label:'签到月卡'}]});
+    const open=()=>{
+        const h=harness();h.cfg.SurvivalCommerceView.Open();h.paidSnapshot([product]);
+        h.cfg.SurvivalCommerceView.SelectCategory('legacy');return h;
+    };
+    const h=open(),card=h.cards()[0];assert(card,'The real catalog includes the monthly pass');
+    const quote=h.cfg.SurvivalPayments.GetCatalog().products.find(item=>item.sku===product.sku);
+    assert.equal(quote.u_coin_price,5800);assert.equal(quote.u_coin_per_yuan,100);assert.equal(quote.amount_fen,5800);
+    // The fallback harness keeps prices out of its grid cards. Exercise the
+    // production price formatter separately with that authenticated quote.
+    const price=h.cfg.SurvivalCommerceComponents.Price(h.root,{...quote,purchase_method:'cash',currency:'u_coin'},0,0,272);
+    assert(h.descendants(price).some(panel=>panel.text==='5800 U币'),'The catalog quote remains the row token price');
+    h.buyCard(card);
+    assert.equal(h.$('#PaymentPrice').text,'合计 ¥58.00');
+    assert.equal(h.$('#PaymentBuyLabel').text,'微信购买 ¥58.00');
+    assert.equal(h.$('#PaymentBuy').enabled,true);
+    assert.equal(h.requests.filter(request=>request.payload.action==='create').length,0,'Opening confirmation creates no order');
+    for(const yuan of [10,20])for(const rate of [100,1000])for(const state of ['pending','delivered']){
+        const old=open();old.buyCard(old.cards()[0]);old.context.PaymentBuy();
+        old.paymentReply(orderFrom({...product,amount_fen:yuan*100,u_coin_price:yuan*rate,u_coin_per_yuan:rate},{state}));
+        old.paidSnapshot([product]);
+        assert.equal(old.$('#PaymentPrice').text,'合计 ¥'+yuan.toFixed(2),'A changed catalog cannot reprice the stored pass order');
+        assert.equal(old.$('#PaymentQR').style.visibility,state==='pending'?'visible':'collapse');
+        assert.equal(old.requests.filter(request=>request.payload.action==='create').length,1,'Catalog refresh never replaces an existing order');
+    }
+});

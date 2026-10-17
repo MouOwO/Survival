@@ -8,4 +8,4 @@ wall_health_100_test_50_v3,城墙初始血量 +100,technology,single,25.00,1,1,4
 tower_attack_100_test_50_v3,箭塔固定攻击力 +100,technology,single,25.00,1,1,50,custom_game/archive_items_v2/lottery_sharp_spirit.png,永久增加箭塔固定攻击力 100。最终攻击面板还会叠加已有科技及百分比加成。,payment_test_tower_attack_100,half_current_20261017,50.00
 starter_bundle_v4,启程礼包,bundles,bundle,25.00,1,0,60,custom_game/archive_items_v2/lottery_attribute_crystal.png,礼包样例：五项初始属性各+100、VIP召唤权限、特殊抽奖券10张。确认配置后将启用改为1。,pay_starter_bundle_v4,half_current_20261017,50.00
 special_lottery_ticket_single,特殊抽奖券 ×1,item,single,25.00,0,1,70,custom_game/lottery_handoff_v1/ticket_illustrated.png,每次购买获得1张特殊抽奖券，可用于特殊奖池。25元一张，可重复购买；付款成功后自动到账。,pay_special_lottery_ticket_single,half_current_20261017,50.00
-archive_pass_monthly,签到月卡（30天）,technology,single,10.00,0,1,80,custom_game/reward_art_v5/daily_wealth_talisman.png,10元开通30天签到月卡，付款到账后解锁月卡签到权益。有效期内续费增加30天，保留剩余天数；签到奖励按现有规则领取。,pay_archive_pass_monthly,half_current_20261017,20.00
+archive_pass_monthly,签到月卡（30天）,technology,single,58.00,0,1,80,custom_game/reward_art_v5/daily_wealth_talisman.png,58元开通30天签到月卡，付款到账后解锁月卡签到权益。有效期内续费增加30天，保留剩余天数；签到奖励按现有规则领取。,pay_archive_pass_monthly,monthly_fixed_58_20261017,20.00

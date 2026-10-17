@@ -19,6 +19,12 @@ if(!viewValid()){active=false;return;}
 if(cfg.SurvivalDaily&&cfg.SurvivalDaily.Dispose)cfg.SurvivalDaily.Dispose();
 function stopIfInvalid(){if(!active)return true;if(viewValid())return false;active=false;if(rewardFX)rewardFX.Dispose();if(dailyTooltip)dailyTooltip.Dispose();life.Dispose();viewLife.Dispose();if(view)view.Dispose();return true;}
 function array(v){return Array.isArray(v)?v:Object.keys(v||{}).sort(function(a,b){return Number(a)-Number(b);}).map(function(k){return v[k];});}
+function passPriceText(){
+ var payments=cfg.SurvivalPayments,catalog=payments&&payments.GetCatalog&&payments.GetCatalog();
+ var item=array(catalog&&catalog.products).filter(function(product){return product&&product.sku==="archive_pass_monthly";})[0],fen=item&&item.amount_fen;
+ if(item&&typeof fen==="number"&&fen>0&&fen<=1000000&&fen%1===0&&item.u_coin_per_yuan===100&&typeof item.u_coin_price==="number"&&item.u_coin_price===fen)return (fen/100).toFixed(fen%100===0?0:2)+"元";
+ return data&&data.price||"价格待配置";
+}
 function style(node,values){Object.keys(values).forEach(function(key){if(node.style[key]!==values[key])node.style[key]=values[key];});}
 function rect(node,x,y,w,h){style(node,{position:x+"px "+y+"px 0px",width:w+"px",height:h+"px",margin:"0px",padding:"0px",horizontalAlign:"left",verticalAlign:"top"});}
 function make(type,parent,id,cls){var node=$.CreatePanel(type,parent,id||"");if(cls)node.AddClass(cls);return node;}
@@ -179,7 +185,7 @@ function render(){
  p("DailyClaimText").text=busy?"领取中…":errorText&&ready.enabled?"重试":ready.enabled?"领取":data.ordinary_status==="claimed"?"已领取":"尚未开放";U.State.Set(p("DailyClaim"),{enabled:ready.enabled&&!busy,busy:busy});
  U.State.Set(p("DailyMakeup"),{enabled:pass&&array(data.missed).length>0&&!busy});p("DailyMakeup").visible=pass&&array(data.missed).length>0;
  p("PassValidity").text=pass?"月卡已解锁":"开通月卡后解锁";
- var expiry=Number(data.expires_at),until=expiry>0?new Date((expiry+8*3600)*1000):null;p("PassPrice").text=(data.duration_days?data.duration_days+"天 · ":"")+(data.price||"价格待配置")+(pass?(until?" · 有效至 "+until.getUTCFullYear()+"/"+(until.getUTCMonth()+1)+"/"+until.getUTCDate():" · 权益已生效"):"");
+ var expiry=Number(data.expires_at),until=expiry>0?new Date((expiry+8*3600)*1000):null;p("PassPrice").text=(data.duration_days?data.duration_days+"天 · ":"")+passPriceText()+(pass?(until?" · 有效至 "+until.getUTCFullYear()+"/"+(until.getUTCMonth()+1)+"/"+until.getUTCDate():" · 权益已生效"):"");
  p("PassPurchaseText").text=(pass?"续费":"开通")+"月卡";U.State.Set(p("PassPurchase"),{enabled:Number(data.purchase_enabled)===1&&!busy});
  tip(p("PassPurchase"),"月卡",p("PassValidity").text+"\n"+p("PassPrice").text+(Number(data.purchase_enabled)===1?"":"\n开通月卡暂未开放。")+"\n月卡奖励随签到自动发放。");
  tip(p("DailyGW2MonthHeader"),"月卡奖励","月卡有效时，按累计签到次数自动发放。具体条件请悬停奖励查看。");

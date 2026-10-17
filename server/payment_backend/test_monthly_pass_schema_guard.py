@@ -58,7 +58,7 @@ class MonthlySchemaGuardTests(unittest.TestCase):
         self.sync.apply(connection, self.package)
         rows = [params for sql, params in connection.queries if sql.startswith('INSERT INTO payments.products')]
         self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0][4], 2000)
+        self.assertEqual(rows[0][4], 5800)
         self.assertEqual(rows[0][8]['entitlement_days'], {'archive_pass': 30})
 
 

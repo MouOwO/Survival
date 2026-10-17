@@ -1,2 +1,2 @@
--- AUTO-GENERATED half-price commerce overlay
-return { protocol = 1, hash = "76591e8be3ebdfa14a947d5fa7f9c51f01e73fed81fb607480b6b2ef08b6c6b8" }
+-- AUTO-GENERATED monthly-pass fixed price overlay
+return { protocol = 1, hash = "9d27f6174b24e922d831837ec7a971c3726dc7a95b894c536b191ad5227406fb" }

@@ -34,15 +34,15 @@ class CatalogTests(unittest.TestCase):
         # authority's separately tested one-time discount policy.
         products=rows(self.tables['payment_products'])
         for product in products:
-            product.pop('price_policy',None);product.pop('price_baseline_yuan',None)
-            if product['sku']!='archive_pass_monthly':product['price_yuan']='7.77'
+            if product['sku']!='archive_pass_monthly':
+                product['price_policy']='';product['price_baseline_yuan']='';product['price_yuan']='7.77'
         self.tables['payment_products']=csv_text(products,list(products[0]))
         self.assertTrue(all(p['amount']==777 for p in self.compile()['products'] if p['sku']!='archive_pass_monthly'))
         self.tables['payment_products']=self.tables['payment_products'].replace('7.77','7.777')
         with self.assertRaises(ValueError):self.compile()
     def test_monthly_pass_price_duration_and_no_invented_rewards(self):
         p=next(p for p in self.package['catalog']['products'] if p['sku']=='archive_pass_monthly')
-        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],1000)
+        self.assertTrue(p['enabled']);self.assertEqual(p['amount'],5800)
         self.assertEqual(p['purchase_limit'],0)
         self.assertEqual(p['effects'],{});self.assertEqual(p['grants']['items'],{})
         self.assertEqual(p['grants']['entitlements'],['archive_pass'])
@@ -65,7 +65,7 @@ class CatalogTests(unittest.TestCase):
         rule=rows((ROOT/'data/csv/存档系统/archive_daily_rules.csv').read_text(encoding='utf-8-sig'))[0]
         product=next(p for p in self.package['catalog']['products'] if p['sku']==rule['pass_sku'])
         self.assertEqual(rule['purchase_enabled'],'1')
-        self.assertEqual(rule['price_text'],'10元');self.assertEqual(product['amount'],1000)
+        self.assertEqual(rule['price_text'],'58元');self.assertEqual(product['amount'],5800)
         self.assertEqual(int(rule['duration_days']),product['grants']['entitlement_days'][rule['pass_entitlement_id']])
     def test_unknown_or_unimplemented_rewards_fail_whole_catalog(self):
         for old,new in [('stat,initial_wood','stat,imaginary_buff'),('entitlement,vip','entitlement,admin'),

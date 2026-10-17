@@ -4,10 +4,11 @@ from decimal import Decimal
 import importlib.util
 import json
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
-from .csv_catalog import build,compile_catalog,rows,SOURCES,HALF_PRICE_POLICY
+from .csv_catalog import build,compile_catalog,rows,SOURCES,HALF_PRICE_POLICY,MONTHLY_FIXED_PRICE_POLICY
 from .commerce_bundles import compile_commerce,csv_text
 from . import ucoin_recharge
 
@@ -37,14 +38,19 @@ class HalfPriceTests(unittest.TestCase):
         again=compile_commerce(self.package['commerce_tables'],self.reference,self.package['tables']['payment_categories'])
         self.assertEqual(catalog,again,'Compiling final authority prices must never discount again')
 
-    def test_all_eight_cash_prices_and_recharge_are_independent(self):
+    def test_seven_cash_discounts_fixed_monthly_price_and_recharge_are_independent(self):
         records=rows(self.package['tables']['payment_products']);self.assertEqual(len(records),8)
         products={p['sku']:p for p in compile_catalog(self.package['tables'],self.reference)['products']}
         for p in records:
-            self.assertEqual(p['price_policy'],HALF_PRICE_POLICY)
-            self.assertEqual(Decimal(p['price_yuan'])*2,Decimal(p['price_baseline_yuan']))
+            if p['sku']=='archive_pass_monthly':
+                self.assertEqual(p['price_policy'],MONTHLY_FIXED_PRICE_POLICY)
+                self.assertEqual(Decimal(p['price_yuan']),58)
+                self.assertEqual(Decimal(p['price_baseline_yuan']),20)
+            else:
+                self.assertEqual(p['price_policy'],HALF_PRICE_POLICY)
+                self.assertEqual(Decimal(p['price_yuan'])*2,Decimal(p['price_baseline_yuan']))
             self.assertEqual(products[p['sku']]['amount'],Decimal(p['price_yuan'])*100)
-        self.assertEqual(products['archive_pass_monthly']['amount'],1000)
+        self.assertEqual(products['archive_pass_monthly']['amount'],5800)
         recharge=ucoin_recharge.product()
         self.assertEqual(recharge['amount'],100)
         self.assertEqual(recharge['grants']['lines'][0]['quantity'],100)
@@ -54,6 +60,20 @@ class HalfPriceTests(unittest.TestCase):
             if p['currency']=='u_coin':
                 self.assertEqual(payment[p['sku']]['amount'],int(p['price']))
                 self.assertEqual(payment[p['sku']]['u_coin_per_yuan'],100)
+
+    def test_monthly_fixed_price_cannot_regress_discount_or_fabricate_its_baseline(self):
+        for mutation in ('old_half','missing_policy','fake_baseline','wrong_price','other_sku'):
+            with self.subTest(mutation=mutation):
+                tables=copy.deepcopy(self.package['tables']);records=rows(tables['payment_products'])
+                monthly=next(p for p in records if p['sku']=='archive_pass_monthly')
+                if mutation=='old_half':monthly.update(price_policy=HALF_PRICE_POLICY,price_yuan='10.00')
+                elif mutation=='missing_policy':monthly['price_policy']=''
+                elif mutation=='fake_baseline':monthly['price_baseline_yuan']='116.00'
+                elif mutation=='wrong_price':monthly['price_yuan']='29.00'
+                else:records[0].update(price_policy=MONTHLY_FIXED_PRICE_POLICY,price_yuan='58.00',price_baseline_yuan='20.00')
+                tables['payment_products']=csv_text(records,list(records[0]))
+                with self.assertRaisesRegex(ValueError,'catalog_monthly_fixed_price_invalid'):
+                    compile_catalog(tables,self.reference)
 
     def test_policy_cannot_be_missing_unknown_or_quartered(self):
         for mutation in ('missing','unknown','quarter','source_drift'):
@@ -80,6 +100,41 @@ class HalfPriceTests(unittest.TestCase):
                     tool.update_prices(relative,field,basis,count);once=path.read_bytes()
                     tool.update_prices(relative,field,basis,count)
                     self.assertEqual(before,once);self.assertEqual(once,path.read_bytes())
+
+    def test_half_price_tool_reapply_promotes_only_monthly_to_fixed_price_once(self):
+        spec=importlib.util.spec_from_file_location('half_price_tool',ROOT/'tools/shop_pricing_half_20261017/catalog_prices.py')
+        tool=importlib.util.module_from_spec(spec);spec.loader.exec_module(tool)
+        self.assertEqual(tool.MONTHLY_FIXED_POLICY,MONTHLY_FIXED_PRICE_POLICY)
+        with tempfile.TemporaryDirectory() as directory:
+            temporary=Path(directory);path=temporary/tool.PAYMENT;path.parent.mkdir(parents=True,exist_ok=True)
+            current=(ROOT/tool.PAYMENT).read_bytes()
+            old=current.replace(b'single,58.00,0,1,80,',b'single,10.00,0,1,80,')
+            old=old.replace('58元开通'.encode(),'10元开通'.encode()).replace(MONTHLY_FIXED_PRICE_POLICY.encode(),HALF_PRICE_POLICY.encode())
+            self.assertNotEqual(old,current);path.write_bytes(old)
+            with patch.object(tool,'ROOT',temporary),patch.object(tool,'OUT',temporary/'audit'):
+                changes=tool.update_prices(tool.PAYMENT,'price_yuan','price_baseline_yuan',8)
+                self.assertEqual(path.read_bytes(),current)
+                self.assertEqual(sum(p['price_policy']==tool.MONTHLY_FIXED_POLICY for p in changes),1)
+                tool.update_prices(tool.PAYMENT,'price_yuan','price_baseline_yuan',8)
+                self.assertEqual(path.read_bytes(),current)
+
+    def test_daily_price_regeneration_uses_fixed_authority_price_and_is_idempotent(self):
+        spec=importlib.util.spec_from_file_location('half_price_tool',ROOT/'tools/shop_pricing_half_20261017/catalog_prices.py')
+        tool=importlib.util.module_from_spec(spec);spec.loader.exec_module(tool)
+        builder_spec=importlib.util.spec_from_file_location('build_configs',ROOT/'tools/build_configs.py')
+        builder=importlib.util.module_from_spec(builder_spec);builder_spec.loader.exec_module(builder)
+        rule='data/csv/存档系统/archive_daily_rules.csv'
+        generated='scripts/vscripts/config/generated/archive_daily_rules.lua'
+        with tempfile.TemporaryDirectory() as directory:
+            temporary=Path(directory)
+            for relative in (tool.PAYMENT,rule,generated):
+                path=temporary/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((ROOT/relative).read_bytes())
+            expected=(temporary/rule).read_bytes()
+            (temporary/rule).write_bytes(expected.replace('58元'.encode(),'10元'.encode()))
+            with patch.object(tool,'ROOT',temporary),patch.object(tool,'OUT',temporary/'audit'),patch.dict(sys.modules,{'build_configs':builder}):
+                tool.monthly_rule();self.assertEqual((temporary/rule).read_bytes(),expected)
+                self.assertEqual((temporary/generated).read_bytes(),(ROOT/generated).read_bytes())
+                tool.monthly_rule();self.assertEqual((temporary/rule).read_bytes(),expected)
 
     def test_bundle_previews_match_final_authority_and_preserve_original_reference(self):
         data=json.loads((ROOT/'data/ui/video_shop_bundles_20261015.json').read_bytes())

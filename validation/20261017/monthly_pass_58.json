@@ -1,0 +1,36 @@
+{
+  "status": "DEPLOYMENT_VERIFIED",
+  "monthly_price_yuan": 58,
+  "monthly_u_coin_price": 5800,
+  "duration_days": 30,
+  "price_policy": "monthly_fixed_58_20261017",
+  "other_goods_unchanged": true,
+  "old_orders_preserved": true,
+  "server": {
+    "status": "DEPLOYMENT_VERIFIED",
+    "payment_release": "20261017-monthly-58-v1",
+    "archive_release": "20261017-monthly-58-v1",
+    "bundle": "9d27f6174b24e922d831837ec7a971c3726dc7a95b894c536b191ad5227406fb",
+    "catalog_hash": "01347d6170c4d9b08dbe3582c9ed57c33211d2b6ed0083b5e2553a85099b7e9c",
+    "monthly_amount_fen": 5800,
+    "monthly_u_coin_price": 5800,
+    "duration_days": 30,
+    "historical_orders_readable": 16,
+    "health": {
+      "archive": true,
+      "payments": true
+    },
+    "read_only": true,
+    "orders_created": 0,
+    "gateway_requests": 0
+  },
+  "checks": {
+    "python_tests_passed": 44,
+    "isolated_ui_tests_passed": 19,
+    "postgres": "PASS; synthetic delivery/renewal and DDL changes fully rolled back before publication",
+    "native_daily_script": "PASS"
+  },
+  "evidence_root": "output/monthly_pass_58_20261017",
+  "real_orders_created": 0,
+  "gateway_requests": 0
+}

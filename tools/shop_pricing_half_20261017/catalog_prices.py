@@ -2,6 +2,7 @@
 
 No network, activation, order edits or account writes. Re-running is idempotent:
 the authority CSV stores the final price and its immutable previous-price basis.
+The monthly pass has a later fixed 58-yuan policy and never receives a discount.
 """
 from __future__ import annotations
 import argparse
@@ -16,6 +17,8 @@ import sys
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'output/shop_pricing_half_20261017/catalog'
 POLICY='half_current_20261017'
+MONTHLY_FIXED_POLICY='monthly_fixed_58_20261017'
+MONTHLY_FIXED_YUAN=Decimal('58.00')
 RATE=100
 COMMERCE='data/csv/商城兑换系统/commerce_products.csv'
 PAYMENT='data/csv/商城支付系统/payment_products.csv'
@@ -45,7 +48,17 @@ def update_prices(relative,field,basis_field,expected_count):
                 record[key]=kind if record['sku'].startswith('#types:') else '折扣规则' if key=='price_policy' else '折扣前实际售价'
             continue
         current=Decimal(record[field]);policy=record.get('price_policy','')
-        if policy:
+        if relative==PAYMENT and record['sku']=='archive_pass_monthly':
+            assert field=='price_yuan' and basis_field=='price_baseline_yuan'
+            basis=Decimal(record[basis_field]) if policy else current
+            assert basis==20,record['sku']+':historical_baseline_changed'
+            assert ((policy==MONTHLY_FIXED_POLICY and current==MONTHLY_FIXED_YUAN)
+                    or (policy==POLICY and current*2==basis)
+                    or (not policy and current==basis)),record['sku']+':invalid_existing_policy'
+            current=MONTHLY_FIXED_YUAN
+            record.update(price_policy=MONTHLY_FIXED_POLICY,price_yuan=format(current,'.2f'),price_baseline_yuan=format(basis,'.2f'))
+            record['description']=record['description'].replace('20元开通','58元开通').replace('10元开通','58元开通')
+        elif policy:
             assert policy==POLICY and current*2==Decimal(record[basis_field]),record['sku']+':invalid_existing_policy'
             basis=Decimal(record[basis_field])
         else:
@@ -54,8 +67,7 @@ def update_prices(relative,field,basis_field,expected_count):
             record['price_policy']=POLICY;record[basis_field]=record[field]
             record[field]=str(int(current)) if field=='price' else format(current,'.2f')
         if record['sku']=='special_lottery_ticket_single':record['description']=record['description'].replace('50元一张','25元一张')
-        if record['sku']=='archive_pass_monthly':record['description']=record['description'].replace('20元开通','10元开通')
-        changes.append(dict(sku=record['sku'],currency=record.get('currency','CNY'),before=str(basis),after=str(current),enabled=record['enabled']))
+        changes.append(dict(sku=record['sku'],currency=record.get('currency','CNY'),before=str(basis),after=str(current),enabled=record['enabled'],price_policy=record['price_policy']))
     assert len(changes)==expected_count,(relative,len(changes),expected_count)
     newline='\r\n' if original.count(b'\r\n') else '\n'
     stream=io.StringIO(newline='');writer=csv.DictWriter(stream,fieldnames=fields,lineterminator=newline)
@@ -91,11 +103,16 @@ def display():
     return len(data['products'])
 
 def monthly_rule():
+    _,products=read(ROOT/PAYMENT)
+    monthly=next(p for p in products if p['sku']=='archive_pass_monthly')
+    assert monthly['price_policy']==MONTHLY_FIXED_POLICY and Decimal(monthly['price_yuan'])==MONTHLY_FIXED_YUAN
+    price_text=format(Decimal(monthly['price_yuan']).normalize(),'f')+'元'
     relative='data/csv/存档系统/archive_daily_rules.csv';path=ROOT/relative;raw=path.read_bytes()
-    before='30,20元,1'.encode();after='30,10元,1'.encode()
-    assert raw.count(before)+raw.count(after)==1
+    _,records=read(path);entry=next(p for p in records if p.get('pass_sku')=='archive_pass_monthly')
+    old=entry['price_text'];assert old in ('20元','10元',price_text)
+    assert raw.count((','+old+',').encode())==1
     backup(relative)
-    path.write_bytes(raw.replace(before,after))
+    path.write_bytes(raw.replace((','+old+',').encode(),(','+price_text+',').encode()))
     sys.path.insert(0,str(ROOT/'tools'))
     from build_configs import build
     target=ROOT/'scripts/vscripts/config/generated/archive_daily_rules.lua'
@@ -106,7 +123,8 @@ def apply():
     commerce=update_prices(COMMERCE,'price','price_baseline',129)
     payment=update_prices(PAYMENT,'price_yuan','price_baseline_yuan',8)
     previews=display();monthly_rule()
-    report=dict(status='PASS',policy=POLICY,discounted_commerce_count=len(commerce),discounted_payment_count=len(payment),
+    report=dict(status='PASS',policy=POLICY,discounted_commerce_count=len(commerce),discounted_payment_count=sum(p['price_policy']==POLICY for p in payment),
+                fixed_price_payment_count=sum(p['price_policy']==MONTHLY_FIXED_POLICY for p in payment),
                 preview_count=previews,recharge_discounted=False,new_u_coin_per_yuan=RATE,commerce=commerce,payment=payment)
     (OUT/'price_changes.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({k:v for k,v in report.items() if k not in ('commerce','payment')},ensure_ascii=False))
