@@ -23,7 +23,8 @@
 #DailyWindow.DailyGW2Page .DailyGW2Lock { z-index:5; }
 #DailyWindow.DailyGW2Page .DailyGW2Reward,
 #DailyWindow.DailyGW2Page .DailyGW2PassReward { flow-children:none; background-image:none; background-color:transparent; padding:0px; margin:0px; overflow:clip; }
-#DailyWindow.DailyGW2Page .DailyGW2ItemArt { flow-children:none; margin:0px; padding:0px; vertical-align:top; horizontal-align:left; }
+/* Native item paintings: muted warm tones on the grey-brown reward board. */
+#DailyWindow.DailyGW2Page .DailyGW2ItemArt { flow-children:none; margin:0px; padding:0px; vertical-align:top; horizontal-align:left; saturation:.65; wash-color:#f2e6cc; }
 #DailyWindow.DailyGW2Page .DailyGW2Special { flow-children:none; background-color:transparent; border:0px; padding:0px; margin:0px; overflow:clip; }
 #DailyWindow.DailyGW2Page .DailyGW2SpecialFrame,
 #DailyWindow.DailyGW2Page #DailyGW2PassInfo { flow-children:none; background-color:transparent; border:0px; padding:0px; margin:0px; overflow:clip; }
