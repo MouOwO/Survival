@@ -9,7 +9,7 @@ function daily(){
  assert(view&&view.canvas.id==='DailyGW2Canvas');assert.equal(h.view('DailyWindow'),undefined,'The login calendar does not adopt a global navigation shell');
  cfg.SurvivalDaily.Open(false);assert.equal(h.sent.at(-1).name,'survival_daily_request');assert.equal(nodes.DailyClaimText.text,'加载中…');assert(!nodes.DailyClaim.enabled);
  assert.equal(nodes.DailyCards.GetChildCount(),28,'The loading state reserves 28 empty reward frames without fabricating rewards');
- assert.equal(nodes.DailySpecials.GetChildCount(),4,'Loading reserves the four visual monthly slots without granting rewards');
+ assert.equal(nodes.DailySpecials.GetChildCount(),0,'Loading draws no unconfigured monthly reward frames');
  const noSubtitle=()=>{assert(!nodes.DailySubtitle.visible);assert.equal(nodes.DailySubtitle.style.visibility,'collapse');assert.equal(nodes.DailySubtitle.text,'');assert.equal(nodes.DailySubtitle.style.height,'0px','Removed subtitle has no reserved space');};noSubtitle();
  const calendar28=Array.from({length:28},(_,i)=>({day:i+1,absolute_count:i+1,is_today:i===3?1:0,status:i<3?'claimed':i===3?'claimable':'not_open',rewards:[{id:'reward-'+i,name:'木材',count:10+i,description:'服务端效果'}]}));
  calendar28[4].rewards.push({id:'second',name:'第二项奖励',count:3,description:'第二项真实效果'});
@@ -17,7 +17,7 @@ function daily(){
  specials:[{id:'milestone',day:7,name:'正式奖励',description:'正式效果',owned:0},{id:'second-milestone',day:14,name:'第二里程碑',description:'真实十四次效果',owned:0},{id:'third-milestone',day:21,name:'第三里程碑',description:'真实二十一次效果',owned:0}],
  premium:{status:'unconfigured'},cycle:calendar28.slice(0,7)};
  h.emit('survival_daily_snapshot',snapshot);
- assert.equal(nodes.DailyCards.GetChildCount(),28);assert.equal(nodes.DailySpecials.GetChildCount(),4,'Three formal milestones and one inert fourth visual slot');
+ assert.equal(nodes.DailyCards.GetChildCount(),28);assert.equal(nodes.DailySpecials.GetChildCount(),3,'Only the three configured monthly milestones produce frames');
  assert.equal(cfg.SurvivalDaily.Inspect().layout,'daily_gw2');assert.equal(cfg.SurvivalDaily.Inspect().days,28);
  assert(nodes.DailyClaim.enabled);assert(!nodes.DailyMakeup.visible);assert(!nodes.PassPurchase.enabled,'An unconfigured server purchase remains disabled');
  assert(nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'The pass column stays locked without authoritative entitlement');
@@ -54,7 +54,7 @@ function daily(){
  assert.equal(nodes.DailyCards.GetChildCount(),28);assert.equal(cfg.SurvivalMenuV10.Entries().length,0,'Reload cannot leak a shared menu or resource strip');
  const callsBeforeRetired=h.sent.length;oldClaim();oldRules();old.Open(true);assert.equal(h.sent.length,callsBeforeRetired,'Retired callbacks cannot submit or reopen the replacement controller');
  h.click(nodes.DailyGW2Close);assert(!cfg.SurvivalDaily.Inspect().open);cfg.SurvivalDaily.Open(false);h.assertCleanDispose(cfg.SurvivalDaily);
- console.log('DAILY_GW2_PASS: renderer VM, server calendar28, three real monthly rewards plus one inert slot, real claim/makeup dates, rejection/busy guards, entitlement authority, no subtitle, closure and reload');
+ console.log('DAILY_GW2_PASS: renderer VM, server calendar28, exactly three configured monthly rewards, real claim/makeup dates, rejection/busy guards, entitlement authority, no subtitle, closure and reload');
 }
 
 module.exports={treasure,vip,daily};if(require.main===module){treasure();vip();daily();}

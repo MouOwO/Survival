@@ -26,6 +26,7 @@ function setup() {
     h.load('daily_gw2_data.js');
     h.load('daily_remaining_5d5c1152eb.js');
     cfg.SurvivalDaily.Open(false);
+    assert.equal(nodes.DailySpecials.GetChildCount(), 0, 'Unloaded monthly rewards do not draw empty frames');
     const official = fixture();
     let sequence = 0;
     let current = {
@@ -99,6 +100,42 @@ test('All ordinary rewards, multiple items and known amounts survive the rendere
         }
     }
     assert.equal(t.nodes.DailyTooltip.visible, false, 'The retired native tooltip stays hidden');
+    t.noTransactions();
+    t.cfg.SurvivalDaily.Dispose();
+});
+
+test('Monthly frames follow configured items and a server fourth item keeps its icon, tooltip and removal lifecycle', () => {
+    const t = setup(), formal = t.current.specials.slice();
+    assert.equal(t.nodes.DailySpecials.GetChildCount(), 3);
+    assert.equal(t.nodes.DailyGW2SpecialEmpty_4, undefined);
+    const initial = t.nodes.DailySpecials.Children().slice();
+    t.send();
+    assert.deepEqual(t.nodes.DailySpecials.Children(), initial, 'Identical formal snapshots preserve card identity');
+    // Isolated server-payload branch uses an existing formal resource. This
+    // does not add a reward to the production CSV or grant any entitlement.
+    const fourth = {...t.current.calendar28[0].rewards[0], day: 28, owned: 0};
+    t.send({specials: formal.concat(fourth)});
+    assert.equal(t.nodes.DailySpecials.GetChildCount(), 4);
+    const card = t.nodes['DailyGW2Special_' + fourth.id];
+    assert(card.IsValid());
+    assert.equal(card.Children().filter(n => n.BHasClass('DailyGW2SpecialFrame')).length, 1);
+    const slot = card.Children().find(n => n.BHasClass('DailyGW2PassReward'));
+    assert(slot.Children().some(n => n.BHasClass('DailyGW2ItemArt') && n.image), 'The fourth item has a real icon child');
+    assert(t.hover(card).includes(fourth.description));
+    assert.equal(t.tip.elements.Title.text, fourth.name);
+    assert(t.hover(slot).includes('累计签到28次'));
+    assert(card.BHasClass('DailyGW2Locked'));
+    t.send();
+    assert.equal(t.nodes['DailyGW2Special_' + fourth.id], card);
+    assert(t.tip.IsVisible(), 'Unchanged data does not retire the hovered fourth item');
+    t.send({specials: formal});
+    assert.equal(t.nodes.DailySpecials.GetChildCount(), 3);
+    assert(!card.IsValid());
+    assert(!t.tip.IsVisible(), 'Removing the hovered fourth source hides its tooltip');
+    const restored = t.nodes.DailySpecials.Children().slice();
+    t.send();
+    assert.deepEqual(t.nodes.DailySpecials.Children(), restored);
+    assert.equal(t.nodes.DailyGW2SpecialEmpty_4, undefined);
     t.noTransactions();
     t.cfg.SurvivalDaily.Dispose();
 });

@@ -85,23 +85,13 @@ function dailyAccepted() {
     assert.deepEqual(Array.from({length: 7}, (_, index) => nodes['DailyGW2Weekday_' + index].text),
         ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', 'Ⅵ', 'Ⅶ']);
     assert.equal(nodes.DailyCards.GetChildCount(), 28);
-    assert.equal(nodes.DailySpecials.GetChildCount(), 4);
+    assert.equal(nodes.DailySpecials.GetChildCount(), 0, 'Loading does not draw unconfigured monthly reward frames');
     assert.equal(tagged(nodes.DailyCards, 'DailyGW2ItemArt').length, 0, 'Loading does not invent rewards');
 
-    function emptySlot() {
-        const empty = nodes.DailyGW2SpecialEmpty_4;
-        assert(empty, 'The fourth monthly slot remains present');
-        assert.equal(empty.hittest, false);
-        assert.equal(empty.hittestchildren, false);
-        for (const child of [empty, ...descendants(empty)]) {
-            assert.equal(child.events.onactivate, undefined, 'Placeholder cannot send a reward or purchase request');
-            assert(!child.image, 'Placeholder has no fictitious item icon');
-            assert(!child.BHasClass('DailyGW2Quantity'));
-            assert(!child.BHasClass('DailyGW2Check'));
-            assert(!child.BHasClass('DailyGW2Lock'));
-            assert(!child.BHasClass('DailyGW2Locked'));
-            assert(!child.BHasClass('DailyGW2Owned'));
-        }
+    function noEmptyMonthlySlots() {
+        assert(!nodes.DailyGW2SpecialEmpty_4, 'No fourth empty frame is generated');
+        assert.equal(tagged(nodes.DailySpecials, 'DailyGW2SpecialEmpty').length, 0,
+            'Every visible monthly frame represents a configured reward');
     }
     function geometry() {
         const columns = [62, 207, 355, 505, 652, 802, 952], rows = [152, 293, 437, 582];
@@ -124,7 +114,7 @@ function dailyAccepted() {
             assert.equal(frame.style.backgroundImage, 'url("' + cfg.DailyGW2Data.assets.reward_frame.file + '")');
         });
         const purchase = box(nodes.PassPurchase, canvas);
-        assert(purchase[1] >= rows[3] + 119, 'Purchase button follows the fourth slot');
+        assert(purchase[1] >= rows[3] + 119, 'Purchase button stays below the monthly reward area');
         assert(purchase[1] + purchase[3] <= 784, 'Purchase button remains inside the canvas');
         assert.equal(nodes.DailySubtitle.visible, false);
         assert.equal(nodes.DailySubtitle.style.visibility, 'collapse');
@@ -132,7 +122,7 @@ function dailyAccepted() {
         assert.equal(nodes.DailySubtitle.style.height, '0px');
         assert(!nodes.DailyWindow.style.opacity || Number(nodes.DailyWindow.style.opacity) === 1,
             'Background transparency cannot fade all text, icons and states');
-        emptySlot();
+        noEmptyMonthlySlots();
     }
     geometry();
 
@@ -142,6 +132,8 @@ function dailyAccepted() {
         h.emit('survival_daily_snapshot', current);
     }
     send();
+    assert.equal(nodes.DailySpecials.GetChildCount(), 3, 'The formal three milestones produce exactly three frames');
+    assert.equal(cfg.SurvivalDaily.Inspect().monthlySlots, 3);
     geometry();
     function realIcon(parent, id) {
         const expected = cfg.SurvivalItemResources ? cfg.SurvivalItemResources.Lookup({id}) : cfg.SurvivalItemArt.Lookup({id});
@@ -162,6 +154,39 @@ function dailyAccepted() {
         assert.equal(tagged(card, 'DailyGW2Lock').length, 1);
     });
     assert.equal(tagged(nodes.DailyCards, 'DailyGW2Check').length, 3);
+
+    const formalSpecials = current.specials.slice(), unchangedMonthlyCards = nodes.DailySpecials.Children().slice();
+    send();
+    assert.deepEqual(nodes.DailySpecials.Children(), unchangedMonthlyCards, 'Unchanged three-reward snapshots reuse monthly cards');
+    // Branch fixture only: a future server may schedule this existing formal
+    // daily resource as a fourth milestone. No CSV or production reward changes.
+    const fourth = {...current.calendar28[0].rewards[0], day: 28, owned: 0};
+    send({specials: formalSpecials.concat(fourth)});
+    assert.equal(nodes.DailySpecials.GetChildCount(), 4, 'A real fourth server item appears instead of being discarded');
+    assert.equal(cfg.SurvivalDaily.Inspect().monthlySlots, 4);
+    const fourthCard = nodes['DailyGW2Special_' + fourth.id];
+    realIcon(fourthCard, fourth.id);
+    assert(fourthCard.BHasClass('DailyGW2Locked'));
+    fourthCard.events.onmouseover();
+    h.flushFinite();
+    assert(nodes.DailyGW2Tooltip.visible);
+    assert.equal(nodes.DailyGW2TooltipTitle.text, fourth.name);
+    const fourthText = nodes.DailyGW2TooltipEffect.text.replace(/<br\s*\/?\s*>/gi, '\n').replace(/<[^>]*>/g, '');
+    assert(fourthText.includes(fourth.description));
+    assert(fourthText.includes('累计签到28次'));
+    geometry();
+    send();
+    assert.equal(nodes['DailyGW2Special_' + fourth.id], fourthCard, 'Unchanged four-reward snapshots reuse the fourth card');
+    send({specials: formalSpecials});
+    assert.equal(nodes.DailySpecials.GetChildCount(), 3, 'Removing the fourth server item removes its frame');
+    assert(!fourthCard.IsValid());
+    assert(!nodes.DailyGW2Tooltip.visible, 'Removing a hovered fourth item retires its description');
+    assert.equal(cfg.SurvivalDaily.Inspect().monthlySlots, 3);
+    const restoredMonthlyCards = nodes.DailySpecials.Children().slice();
+    send();
+    assert.deepEqual(nodes.DailySpecials.Children(), restoredMonthlyCards, 'The restored three-reward state remains cached');
+    assert(restoredMonthlyCards.every(card => card.BHasClass('DailyGW2Locked')));
+    geometry();
 
     const changedDays = current.calendar28.map(day => ({...day, rewards: day.rewards.map(item => ({...item}))}));
     changedDays[0].rewards[0].count = 17;
@@ -222,7 +247,7 @@ function dailyAccepted() {
     assert.equal(cfg.SurvivalDaily.Inspect().open, false, 'Real shared outside-click path still closes');
     assert(!h.sent.some(row => /claim|purchase|payment/.test(row.name)), 'This visual regression sends only view requests');
     cfg.SurvivalDaily.Dispose();
-    console.log('DAILY_ACCEPTED_LAYOUT_PASS: real JS/shared UI in simulated Panorama, 28+4 aligned slots, true reward IDs, dynamic counts/states, inert placeholder, resize and reopen; native rendering unverified');
+    console.log('DAILY_ACCEPTED_LAYOUT_PASS: real JS/shared UI in simulated Panorama, 28 daily slots, configured 0/3/4 monthly frames, real fourth-item icon/tooltip, 4-to-3 retirement/cache, dynamic counts/states, resize and reopen; native rendering unverified');
 }
 
 module.exports = {dailyAccepted};

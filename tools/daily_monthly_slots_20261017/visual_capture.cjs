@@ -1,0 +1,26 @@
+'use strict';
+// Actual production daily slots with current formal CSV rewards and an explicit
+// local fourth-entry fixture. No production reward configuration is modified.
+const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');
+const {browser,sleep}=require('../shop_ui_12h/cdp.cjs');
+const base='output/daily_monthly_slots_20261017',assembly=JSON.parse(fs.readFileSync(base+'/visual_preview/assembly.json','utf8'));
+const frozen=assembly.sourceGraph.filter(r=>/(daily_remaining_5d5c1152eb\.js|daily_gw2\.css)$/.test(r.path)),sha=v=>crypto.createHash('sha256').update(v).digest('hex');
+const config='data/csv/存档系统/archive_daily_rules.csv',configSha=sha(fs.readFileSync(config));
+const verify=()=>{frozen.forEach(r=>assert.equal(sha(fs.readFileSync('panorama/src/'+r.path,'utf8').replace(/^\uFEFF/,'')),r.sha256));assert.equal(sha(fs.readFileSync(config)),configSha);};
+function inspect(){
+ const box=n=>n.el.getBoundingClientRect().toJSON();return {api:cfg.SurvivalDaily.Inspect(),errors:previewErrors,header:box(nodes.DailyGW2MonthHeader),column:box(nodes.DailySpecials),slots:nodes.DailySpecials.Children().map(n=>({id:n.id,classes:n.GetClasses(),bounds:box(n),tooltip:n.__dailyGW2Tooltip,images:[...n.el.querySelectorAll('img')].map(i=>({src:i.src,decoded:i.complete&&i.naturalWidth>0,naturalWidth:i.naturalWidth,naturalHeight:i.naturalHeight}))})),emptyPlaceholders:nodes.DailySpecials.FindChildrenWithClassTraverse('DailyGW2SpecialEmpty').length,tooltip:{visible:nodes.DailyGW2Tooltip.visible,title:nodes.DailyGW2TooltipTitle.text,effect:nodes.DailyGW2TooltipEffect.text,surface:box(nodes.DailyGW2TooltipSurface)},transactionalCalls:previewCalls.filter(c=>/claim|purchase|checkout|draw/.test(c.name))};
+}
+async function main(){
+ verify();const b=await browser(),report={kind:'actual_daily_monthly_slot_browser_preview',notGameCapture:true,fixtureOnly:true,frozen,config,configSha,fixtures:{current:'Three formal 7/14/21-day rewards',fourth:'Browser-only fourth slot uses existing formal daily_growth_gem art/effect and day28; production CSV unchanged'},screens:[]};
+ async function capture(name,width,height,state,tooltip=false){const left=tooltip?Math.min(state.tooltip.surface.x,state.header.x):state.header.x,right=Math.max(state.header.right,state.column.right),top=Math.min(state.header.y,tooltip?state.tooltip.surface.y:state.header.y),bottom=Math.max(state.column.bottom,tooltip?state.tooltip.surface.bottom:state.column.bottom);const clip={x:Math.floor(left-14),y:Math.floor(top-12),width:Math.ceil(right-left+28),height:Math.ceil(bottom-top+24)},file=base+'/visual_'+name+'_'+width+'x'+height+'.png';await b.shot(file,clip);report.screens.push({name,width,height,file,clip,state});}
+ try{for(const [width,height]of[[1920,1080],[1280,720]]){
+  await b.call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});await b.go(base+'/visual_preview/index.html');assert(await b.run('previewReady'));
+  let state=await b.run('('+inspect.toString()+')()');assert.deepEqual(state.errors,[]);assert.equal(state.api.monthlySlots,3);assert.equal(state.slots.length,3);assert.equal(state.emptyPlaceholders,0);assert(state.slots.every(n=>n.images.length&&n.images.every(i=>i.decoded)),'All three current item images decode');assert.deepEqual(state.transactionalCalls,[]);await capture('current_three',width,height,state);
+  await b.run(`(()=>{const existing=DAILY_GW2_FIXTURE.rewards.flatMap(r=>r.rewards).find(i=>i.id==='daily_growth_gem');if(!existing)throw Error('Formal existing daily fixture item missing');window.visualFourth={...structuredClone(existing),day:28,owned:0};dailyPreviewSend({has_pass:1,count:20,specials:[...structuredClone(DAILY_GW2_FIXTURE.specials),visualFourth]});syncLayout();return true;})()`);await b.run('Promise.all([...document.images].map(i=>i.decode().catch(()=>false))).then(()=>true)');await sleep(150);
+  state=await b.run('('+inspect.toString()+')()');assert.deepEqual(state.errors,[]);assert.equal(state.api.monthlySlots,4);assert.equal(state.slots.length,4);assert.equal(state.emptyPlaceholders,0);assert(state.slots.every(n=>n.images.length&&n.images.every(i=>i.decoded)),'All four configured item images decode');assert(state.slots[3].tooltip.body.includes('累计签到28次'));await capture('fixture_four',width,height,state);
+  await b.run('nodes.DailySpecials.Children()[3].events.onmouseover();syncLayout();true');await sleep(900);await b.run('syncLayout();true');state=await b.run('('+inspect.toString()+')()');assert.deepEqual(state.errors,[]);assert(state.tooltip.visible);assert.equal(state.tooltip.title,'成长宝石');assert(state.tooltip.effect.includes('英雄每秒攻击+1'));assert(state.tooltip.effect.includes('累计签到28次'));assert.deepEqual(state.transactionalCalls,[]);await capture('fixture_four_tooltip',width,height,state,true);
+ }
+ verify();report.status='PASS_CURRENT_THREE_AND_CONFIGURED_FOUR_MONTHLY_SLOTS';fs.writeFileSync(base+'/visual_report.json',JSON.stringify(report,null,2)+'\n');console.log(report.status+' '+base+'/visual_report.json');
+ }finally{b.close();}
+}
+let settled=false;process.on('beforeExit',()=>{if(!settled){console.error('MONTHLY_SLOT_CAPTURE_INCOMPLETE');process.exitCode=1;}});main().then(()=>{settled=true;},e=>{settled=true;console.error(e.stack||e);process.exitCode=1;});
