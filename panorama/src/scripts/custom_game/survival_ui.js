@@ -628,6 +628,12 @@
         // Rejected resource/queue actions use the same native feedback as a
         // failed ability cast. Queue waiting states remain in the queue panel.
         if (payload.level === "error" && payload.audience !== "all") {
+            if (message.trim() === "信仰值不足") {
+                var nativeError = lifecycleConfig.SurvivalTooltipPosition;
+                if (nativeError && nativeError.ShowNativeError) nativeError.ShowNativeError(lifecycleContext, "信仰值不足");
+                else GameEvents.SendEventClientSide("dota_hud_error_message", {reason:80, message:"信仰值不足"});
+                return;
+            }
             var actionErrors = {
                 wood_not_enough: "木材不足", not_enough_wood: "木材不足", insufficient_wood: "木材不足",
                 gold_not_enough: "金币不足", not_enough_gold: "金币不足", insufficient_gold: "金币不足",

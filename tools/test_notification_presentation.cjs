@@ -11,6 +11,8 @@ function create(type, parent) {
     parent.children.push(entry); return entry;
 }
 const context = {playerId: 1, notificationItems: [], panel: () => container,
+    lifecycleConfig: {}, lifecycleContext: {id: 'HUDContext'},
+    scheduleHUD: (delay, callback) => scheduled.push({delay, callback}),
     GameEvents: {SendEventClientSide: (event, payload) => nativeErrors.push({event, payload})},
     $: {CreatePanel: create, Schedule: (delay, callback) => scheduled.push({delay, callback})}};
 vm.runInNewContext(source.slice(source.indexOf('    function showNotification('),
@@ -22,7 +24,7 @@ assert.equal(container.children.length, 0, 'foreign private/empty notices do not
 
 assert.equal(nativeErrors.length, 0, 'foreign/empty notices cannot send native errors');
 const actionCases = [
-    ['木材不足', '木材不足'], ['金币不足', '金币不足'], ['人口不足', '人口不足'],
+    ['木材不足', '木材不足'], ['金币不足', '金币不足'], ['人口不足', '人口不足'], ['信仰值不足', '信仰值不足'],
     ['wood_not_enough', '木材不足'], ['not_enough_wood', '木材不足'], ['insufficient_wood', '木材不足'],
     ['gold_not_enough', '金币不足'], ['not_enough_gold', '金币不足'], ['insufficient_gold', '金币不足'],
     ['population_not_enough', '人口不足'], ['not_enough_population', '人口不足'], ['insufficient_population', '人口不足'],
@@ -43,6 +45,17 @@ for (const [message, expected] of actionCases) {
     assert.equal(container.children.length, priorItems, 'native action error creates no custom card');
     assert.equal(scheduled.length, priorTimers, 'native action error needs no custom fade timer');
 }
+const helperCalls = [], priorFaithNative = nativeErrors.length, priorFaithItems = container.children.length;
+context.lifecycleConfig.SurvivalTooltipPosition = {ShowNativeError(owner, message) {helperCalls.push({owner, message});}};
+show({audience: 'player', player_id: 1, message: '信仰值不足', level: 'error'});
+assert.equal(helperCalls.length, 1, 'Server faith rejection uses the shared native layer helper');
+assert.equal(helperCalls[0].owner, context.lifecycleContext);
+assert.equal(helperCalls[0].message, '信仰值不足');
+assert.equal(nativeErrors.length, priorFaithNative, 'The helper path cannot duplicate its native event');
+assert.equal(container.children.length, priorFaithItems, 'Faith rejection cannot create a custom toast');
+show({audience: 'player', player_id: 0, message: '信仰值不足', level: 'error'});
+assert.equal(helperCalls.length, 1, 'Other players faith errors stay private');
+delete context.lifecycleConfig.SurvivalTooltipPosition;
 const privateNativeCount = nativeErrors.length;
 show({audience: 'player', player_id: 0, message: '木材不足', level: 'error'});
 show({audience: 'player', player_id: 0, message: '研究队列已满', level: 'error'});

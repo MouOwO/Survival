@@ -15,7 +15,7 @@ for (const name of scripts) assert(manifest.includes('/' + name + '"'), 'test th
 
 const metrics = {created: 0, deleted: 0, style: 0, classes: 0, tree: 0,
     text: 0, images: 0, fits: 0, palettes: 0, hiddenTooltips: 0};
-const nodes = new Map(), subscriptions = new Map(), requests = [], scheduled = [];
+const nodes = new Map(), subscriptions = new Map(), requests = [], scheduled = [], clientEvents = [];
 class Panel {
     constructor(type, parent, id = '') {
         this.paneltype = type; this.parent = parent; this.id = id;
@@ -147,7 +147,8 @@ const context = vm.createContext({
             listeners.push(listener); subscriptions.set(name, listeners); return listener;
         },
         Unsubscribe(listener) { listener.cancelled = true; },
-        SendCustomGameEventToServer(name, payload) { requests.push({name, payload}); }
+        SendCustomGameEventToServer(name, payload) { requests.push({name, payload}); },
+        SendEventClientSide(name, payload) { clientEvents.push({name, payload}); }
     }
 });
 for (const name of scripts) vm.runInContext(fs.readFileSync(path.join(scriptDirectory, name), 'utf8'), context, {filename: name});
@@ -322,8 +323,9 @@ assert.equal(tooltipText('MetricCaption'), '建筑等级');
 const beforeUpgrade = requests.length;
 activate(building); activate(building);
 assert.equal(requests.length, beforeUpgrade + 1, 'double clicks submit one manual reward upgrade');
-assert.equal(requests.at(-1).name, 'survival_archive_building_upgrade');
-assert.equal(requests.at(-1).payload.expected_level, 0);
+assert.deepEqual(JSON.parse(JSON.stringify(requests.at(-1))), {
+    name: 'survival_archive_building_upgrade', payload: {item_id: 'building_01', expected_level: 0}
+}, 'Sufficient faith retains the original upgrade event and exact parameters');
 resend('building');
 building = visibleCards()[0]; activate(building);
 assert.equal(requests.length, beforeUpgrade + 2, 'an unchanged authoritative rejection re-enables the manual action');
@@ -342,6 +344,38 @@ const lockedRequests = requests.length;
 activate(visibleCards()[0]);
 assert.equal(requests.length, lockedRequests, 'pending saves block manual actions even if rows stay the same');
 assert(nodes.get('ArchiveStatus').text.includes('保存'));
+const previousPosition = cfg.SurvivalTooltipPosition, nativeErrors = [];
+cfg.SurvivalTooltipPosition = {...previousPosition, ShowNativeError(owner, message) { nativeErrors.push({owner, message}); }};
+snapshot('building', [{...upgraded, can_upgrade: 0}], {upgrade_pending: 0,
+    buildings: {faith: 3, earned_today: 2, daily_cap: 10, per_clear: 1}});
+const insufficientRequests = requests.length, oldStatus = nodes.get('ArchiveStatus').text;
+activate(visibleCards()[0]);
+assert.equal(requests.length, insufficientRequests, 'Insufficient faith cannot submit an upgrade');
+assert.equal(nativeErrors.length, 1, 'Use the shared native error helper once');
+assert.equal(nativeErrors[0].owner === root, true, 'The native error helper receives the real archive root');
+assert.equal(nativeErrors[0].message, '信仰值不足');
+assert.equal(clientEvents.length, 0, 'The helper path does not also dispatch a duplicate fallback error');
+assert.equal(nodes.get('ArchiveStatus').text, oldStatus, 'Insufficient faith leaves the archive footer status unchanged');
+cfg.SurvivalTooltipPosition = {...previousPosition};
+activate(visibleCards()[0]);
+assert.equal(requests.length, insufficientRequests);
+assert.equal(nativeErrors.length, 1);
+assert.deepEqual(JSON.parse(JSON.stringify(clientEvents)), [{name: 'dota_hud_error_message',
+    payload: {reason: 80, message: '信仰值不足'}}], 'Missing helper uses the exact original native HUD error event');
+assert.equal(nodes.get('ArchiveStatus').text, oldStatus);
+cfg.SurvivalTooltipPosition = {...previousPosition, ShowNativeError(owner, message) { nativeErrors.push({owner, message}); }};
+resend('building', {upgrade_pending: 1});
+activate(visibleCards()[0]);
+assert(nodes.get('ArchiveStatus').text.includes('保存'), 'Pending upgrades keep their existing save status');
+snapshot('building', [{...upgraded, level: 5, can_upgrade: 0, completed: 1}], {upgrade_pending: 0});
+activate(visibleCards()[0]);
+assert.equal(nodes.get('ArchiveStatus').text, '该神器已满级');
+assert.equal(nativeErrors.length, 1, 'Pending and completed cards never report insufficient faith');
+assert.equal(clientEvents.length, 1);
+assert.equal(requests.length, insufficientRequests, 'Pending and completed cards never submit upgrades');
+cfg.SurvivalTooltipPosition = previousPosition;
+snapshot('building', [upgraded], {upgrade_pending: 0,
+    buildings: {faith: 60, earned_today: 2, daily_cap: 10, per_clear: 1}});
 const themeBefore = metrics.palettes;
 const approvedCountColor = descendant(visibleCards()[0], 'ArchiveV10Count').style.color;
 const approvedNameColor = descendant(visibleCards()[0], 'ArchiveV10Name').style.color;
@@ -368,13 +402,21 @@ assert(!api.IsOpen(), 'A background blessing snapshot cannot reopen its retired 
 api.Open();
 
 api.SelectCategory('fragment');
-let fragment = visibleCards()[0], promotion = descendant(fragment, 'ArchivePromote');
-hover(promotion);
-assert(tooltipText('Effect').includes('高阶'), 'promotion help still resolves the actual target name');
-activate(promotion);
-const promotionRequests = requests.length; activate(promotion);
-assert.equal(requests.length, promotionRequests, 'promotion requests retain their local duplicate guard');
-assert.equal(requests.at(-1).name, 'survival_archive_promote');
+function assertNoFragmentPromotion() {
+    assert.equal(descendant(nodes.get('ArchiveGrid'), 'ArchivePromote'), null,
+        'Server promotion_target/can_promote metadata cannot create the removed promotion button');
+    const before = requests.length;
+    function tryCallbacks(panel) {
+        if (panel.events.onactivate) panel.events.onactivate();
+        panel.children.forEach(tryCallbacks);
+    }
+    visibleCards().forEach(tryCallbacks);
+    assert.equal(requests.length, before, 'Fragment cards and their descendants have no transactional action');
+    assert(!requests.some(row => row.name === 'survival_archive_promote'));
+}
+assertNoFragmentPromotion();
+resend('fragment');
+assertNoFragmentPromotion();
 
 api.SelectCategory('work');
 const workCard = visibleCards()[0], beforeWork = requests.length;
@@ -402,7 +444,7 @@ assert.equal(visibleCards()[0].__v10.track.visible, false, 'Titles do not invent
 activate(visibleCards()[0]);
 assert.equal(requests.at(-1).payload.title_id, '', 'Clicking the equipped title still unequips it');
 
-assert.equal(walletRefreshes, 0, 'Upgrade, draw, promotion, filter and category updates use their existing archive snapshots');
+assert.equal(walletRefreshes, 0, 'Upgrade, fragment, filter and category updates use their existing archive snapshots');
 api.SelectCategory('shadow'); api.Close();
 const closed = {...metrics};
 for (let revision = 101; revision <= 200; revision++) {
@@ -457,4 +499,4 @@ assert.equal(nodes.get('ArchiveGrid').visible, true);
 assert.equal(nodes.get('EndlessLeaderboardHost').visible, false);
 assert.equal(descendant(itemCard('shadow_01'), 'ArchiveV10Count').text, '200/430');
 
-console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, native card/sidebar reuse, live counts/ownership/pass/tooltips, independent archive without commerce resource requests, upgrade rejection and pending guards, social/blessing collection routing, promotion duplicate guard, theme, filters, tabs and 100 closed updates');
+console.log('ARCHIVE_OPEN_PROFILE_REFRESH_PASS: manifest full-source controllers, 1000 stable revisions, delta baseline, card/sidebar reuse, live counts/ownership/pass/tooltips, independent archive, native faith error helper/fallback, upgrade rejection and pending guards, no fragment promotion action, collection routing, theme, filters, tabs and 100 closed updates');
