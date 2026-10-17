@@ -6,8 +6,8 @@ function overlaps(a, b) { return a.x < b.x+b.width && a.x+a.width > b.x && a.y <
 function assertFirstRowOrder(f) {
     const top=f.rect(f.currentTop()), collection=f.rect(f.collection());
     const ordered=['return','treasure','archive','lottery','benefit','shop'].map(id=>({id,...f.rect(f.entry(id))}));
-    ordered.push({id:'effects',...f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'))},
-        {id:'collection',...collection,x:collection.x-top.x,y:collection.y-top.y},
+    ordered.push({id:'collection',...collection,x:collection.x-top.x,y:collection.y-top.y},
+        {id:'effects',...f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'))},
         {id:'vip',...f.rect(f.entry('vip'))});
     for(let i=1;i<ordered.length;i++)assert(ordered[i].x>=ordered[i-1].x+ordered[i-1].width-1.1,
         ordered[i].id+' follows '+ordered[i-1].id+' without overlap');
@@ -50,11 +50,11 @@ test('locked entrance is absent; activation and relocking preserve the top row a
     assert.deepEqual(f.warnings, []);
 });
 
-test('collection follows only visible first-row buttons, independent of the lower shop', () => {
+test('collection follows the first-row market, independent of Effects, VIP and the lower shop', () => {
     const f = makeFixture(), top = f.rect(f.currentTop()), before = f.rect(f.collection());
-    const effects = f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'));
+    const market = f.rect(f.entry('shop'));
     assertFirstRowOrder(f);
-    close(before.x, top.x+effects.x+effects.width+2*top.width/630, 'collection follows compacted effects');
+    close(before.x, top.x+market.x+market.width+2*top.width/630, 'collection follows market');
     f.unlock(true); f.refreshCollection(); assert.deepEqual(f.rect(f.collection()), before);
     // A wide second-row entry must never push collection out of the first row.
     f.entry('survival_shop').style.position = '800px 140px 0px';
@@ -82,14 +82,37 @@ test('viewport changes and bounded repair keep the moved shop and compacted top 
         const scale=Math.min((width/pixelScale-16)/1672,height/pixelScale/941);
         close(vip.x,Math.round(518*scale*pixelScale)/pixelScale,'VIP remains at the right end of the navigation');
         const effectBounds=f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'));
-        assert(effectBounds.x>=market.x+market.width-1&&effectBounds.x-(market.x+market.width)<4,'Effects fills the removed VIP space');
+        close(effectBounds.x,Math.round(420*scale*pixelScale)/pixelScale,'Effects remains between collection and VIP');
         assertFirstRowOrder(f);
         const saved={...shop}; f.advance(1600); assert.deepEqual(f.rect(f.entry('survival_shop')),saved,'periodic repair retains second row');assertFirstRowOrder(f);
-        const collection=f.rect(f.collection()), effects=f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'));
-        close(collection.x,top.x+effects.x+effects.width+2*top.width/630,'collection stays next to effects after resize');
+        const collection=f.rect(f.collection());
+        close(collection.x,top.x+market.x+market.width+2*top.width/630,'collection stays next to market after resize');
         assert(f.visible(f.entry('survival_shop')));
     }
     assert.deepEqual(f.warnings, []);
+});
+
+test('same-host reload ignores valid older navigation layers while native deletion is pending', () => {
+    const f=makeFixture(),host=f.ctx.FindChildTraverse('HandoffHUD'),oldTop=f.currentTop();
+    const oldLayers=host.children.filter(panel=>['HandoffTop','HandoffTopBackdrop','HandoffTopStatus'].includes(panel.id));
+    const delayed=[];for(const panel of oldLayers)panel.DeleteAsync=function(){delayed.push(panel);};
+    // The old generation remains valid and is the first DFS match, with a
+    // deliberately obsolete store position that must never anchor collection.
+    oldTop.FindChildTraverse('HandoffNav_shop').style.position='900px 6px 0px';
+    f.load();f.advance(1200);f.refreshCollection();
+    const current=f.currentTop();assert.notEqual(current,oldTop);
+    assert.equal(host.FindChildTraverse('HandoffTop'),oldTop,'Deferred native deletion leaves the old DFS match valid');
+    assert.equal(f.cfg.SurvivalTopNavigation.top,current,'The complete HUD publishes its current navigation');
+    assert.equal(f.cfg.SurvivalTopNavigation.host,host);assert.equal(f.cfg.SurvivalTopNavigation.generation,f.cfg.HandoffGeneration);
+    assert(delayed.includes(oldTop),'Old navigation is scheduled for deletion');assert.equal(oldTop.IsValid(),true);
+    assert.equal(f.visible(oldTop),false,'Old navigation is immediately hidden while deletion is pending');
+    assert.equal(oldTop.hittest,false);assert.equal(oldTop.hittestchildren,false);
+    assertFirstRowOrder(f);
+    f.unlock(true);f.refreshCollection();assertFirstRowOrder(f);
+    f.unlock(false);f.refreshCollection();assertFirstRowOrder(f);
+    f.loadCode(read('collection_nav.js'));f.refreshCollection();assertFirstRowOrder(f);
+    assert.equal(host.children.filter(panel=>panel.id==='HandoffNav_collection'&&panel.IsValid()).length,1);
+    assert.deepEqual(f.warnings,[]);
 });
 
 test('HUD replacement retains unlock state and collection reattaches without duplicate entries', () => {

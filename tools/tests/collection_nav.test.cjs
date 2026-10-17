@@ -8,8 +8,8 @@ function fixture(options={}){
  function view(id){return {Open(){opened.push(id);stack.push(id);},Close(){assert.equal(stack.at(-1),id);closed.push(stack.pop());},IsOpen:()=>stack.includes(id)};}
  h.cfg.SurvivalCollection=view('collection');h.cfg.SurvivalArchive=view('archive');h.cfg.SurvivalDaily=view('daily_rewards');h.cfg.SurvivalVIP=view('vip');
  h.load('common/purple_shell.js');
- function makeHUD(scale=1,x=8,y=6){
-  const host=new Panel('Panel',h.root,'HandoffHUD'),top=new Panel('Panel',host,'HandoffTop'),entries={},parts={};
+ function makeHUD(scale=1,x=8,y=6,existingHost=null){
+  const host=existingHost||new Panel('Panel',h.root,'HandoffHUD'),top=new Panel('Panel',host,'HandoffTop'),entries={},parts={};
   const keys=['return','treasure','archive','lottery','benefit','shop','survival_shop','vip'];
   for(const key of keys){
    const entry=entries[key]=new Panel('Button',top,'HandoffNav_'+key);entry.AddClass('HandoffNav HandoffNavUnified');
@@ -25,9 +25,9 @@ function fixture(options={}){
    function box(node,bx,by,w,ht){node.style.position=`${px(bx)}px ${px(by)}px 0px`;node.style.width=px(w)+'px';node.style.height=px(ht)+'px';}
    top.style.width=630*value+'px';top.style.height=94*value+'px';top.style.position=`${left}px ${up}px 0px`;
    keys.forEach((key,index)=>{const width=key==='survival_shop'?96:key==='vip'?60:56;box(entries[key],key==='survival_shop'?52:key==='vip'?518:14+index*58,key==='survival_shop'?100:6,width,86);box(parts[key].Glow,(width-62)/2,0,62,62);box(parts[key].Icon,(width-44)/2,4,44,44);box(parts[key].CaptionHost,0,52,width,32);parts[key].Caption.style.fontSize=px(22)+'px';box(parts[key].Underline,(width-34)/2,84,34,2);});
-   if(effects)box(effects,362,6,96,86);
+   if(effects)box(effects,420,6,96,86);
   }
-  layout();return {host,top,effects,entries,parts,layout};
+  layout();h.cfg.SurvivalTopNavigation={owner:h.root,host,top,generation:h.cfg.HandoffGeneration};return {host,top,effects,entries,parts,layout};
  }
  const hud=makeHUD();h.load('collection_nav.js');
  return Object.assign(h,{stack,opened,closed,hud,makeHUD,entry:()=>h.nodes.HandoffNav_collection,refresh:()=>h.cfg.SurvivalCollectionNav.Refresh(),timers:()=>h.scheduled.filter(t=>!t.cancelled)});
@@ -49,7 +49,7 @@ test('collection opens through real menu routing and never bypasses a purchase m
 });
 test('new entry follows existing HUD geometry without changing Effects or rescanning a stable HUD',()=>{
  const h=fixture(),effectStyle={...h.hud.effects.style},event=h.hud.effects.events.onactivate;
- assert.equal(h.entry().GetParent(),h.hud.host);assert.equal(h.entry().style.position,'468px 12px 0px');assert.equal(h.entry().style.width,'56px');assert.equal(h.entry().style.height,'86px');
+ assert.equal(h.entry().GetParent(),h.hud.host);assert.equal(h.entry().style.position,'370px 12px 0px');assert.equal(h.entry().style.width,'56px');assert.equal(h.entry().style.height,'86px');
  assert.equal(h.nodes.HandoffCollectionCaption.text,'收藏');assert.equal(h.nodes.HandoffCollectionIcon.image,'file://{images}/custom_game/topnav_reference_v2/collection.svg');
  for(const cls of ['HandoffNav','HandoffNavUnified','HandoffCanvas'])assert(h.entry().BHasClass(cls));
  assert(h.nodes.HandoffCollectionGlow.BHasClass('HandoffNavGlow'));assert(h.nodes.HandoffCollectionCaption.BHasClass('HandoffNavCaption'));
@@ -59,7 +59,7 @@ test('new entry follows existing HUD geometry without changing Effects or rescan
  assert.equal(h.counts.tree,tree,'steady refresh uses cached panels');assert.equal(h.counts.style,writes,'stable geometry does not rewrite styles');assert.equal(h.timers().length,1);
  assert.deepEqual({...h.hud.effects.style},effectStyle);assert.equal(h.hud.effects.events.onactivate,event);
  h.hud.layout(.5);const resizedEffects={...h.hud.effects.style};h.refresh();
- assert.equal(h.entry().style.position,'238px 9px 0px');assert.equal(h.entry().style.width,'28px');assert.equal(h.nodes.HandoffCollectionCaption.style.fontSize,'11px');
+ assert.equal(h.entry().style.position,'189px 9px 0px');assert.equal(h.entry().style.width,'28px');assert.equal(h.nodes.HandoffCollectionCaption.style.fontSize,'11px');
  assert.deepEqual({...h.hud.effects.style},resizedEffects);assert.equal(h.hud.effects.events.onactivate,event);
  h.hud.top.visible=false;h.refresh();assert.equal(h.entry().visible,false);
  h.hud.top.visible=true;h.refresh();assert.equal(h.entry().visible,true);
@@ -70,7 +70,7 @@ test('module and HUD reload leave one button and one lifecycle timer; stale call
  h.load('collection_nav.js');assert.equal(old.IsAlive(),false);assert.equal(entry.IsValid(),false);assert.equal(h.timers().length,1);
  const fresh=h.entry();stale();assert.equal(h.entry(),fresh);assert.equal(h.timers().length,1);
  h.hud.host.DeleteAsync();h.cfg.HandoffGeneration++;h.hud=h.makeHUD(.75,12,4);h.refresh();
- assert.equal(h.entry().GetParent(),h.hud.host);assert.equal(h.entry().style.position,'358px 9px 0px');assert.equal(h.entry().style.width,'42px');
+ assert.equal(h.entry().GetParent(),h.hud.host);assert.equal(h.entry().style.position,'284px 9px 0px');assert.equal(h.entry().style.width,'42px');
  assert.equal(h.hud.host.children.filter(p=>p.id==='HandoffNav_collection').length,1);
  const api=h.cfg.SurvivalCollectionNav,queued=h.timers()[0].fn;h.root.DeleteAsync();
  assert.doesNotThrow(()=>{h.flushFinite();queued();api.Dispose();api.Dispose();});assert.equal(api.IsAlive(),false);assert.equal(h.timers().length,0);
@@ -86,7 +86,7 @@ test('missing HUD waits locally and missing collection API cannot open a partial
  h.cfg.SurvivalCollectionNav.Dispose();
 });
 
-test('missing, hidden, collapsed or removed Effects never hides collection and visible neighbors set its right edge',()=>{
+test('missing, hidden, collapsed or removed Effects never moves collection away from market',()=>{
  const h=fixture({noEffects:true});assert.equal(h.entry().visible,true);assert.equal(h.entry().style.position,'370px 12px 0px');
  h.hud.entries.vip.visible=false;h.refresh();assert.equal(h.entry().style.position,'370px 12px 0px','VIP visibility never moves collection after the final status badge');
  h.hud.entries.survival_shop.style.visibility='collapse';h.refresh();assert.equal(h.entry().style.position,'370px 12px 0px');
@@ -97,19 +97,35 @@ test('missing, hidden, collapsed or removed Effects never hides collection and v
  const scanned=other.counts.tree;other.refresh();assert.equal(other.counts.tree,scanned,'An invalidated optional anchor is reacquired once');other.cfg.SurvivalCollectionNav.Dispose();
 });
 
-test('neighbor movement and pixel scale changes stay aligned without a fixed-size minimum or original-event changes',()=>{
+test('market movement and pixel scale changes stay aligned without a fixed-size minimum or original-event changes',()=>{
  const h=fixture(),events=Object.fromEntries(Object.entries(h.hud.entries).map(([key,panel])=>[key,panel.events.onactivate]));
- h.hud.effects.style.position='574px 6px 0px';h.hud.effects.style.width='106px';h.refresh();assert.equal(h.entry().style.position,'690px 12px 0px');
+ h.hud.effects.style.position='900px 6px 0px';h.hud.effects.style.width='106px';h.hud.entries.vip.style.position='1200px 6px 0px';h.refresh();assert.equal(h.entry().style.position,'370px 12px 0px','Effects and VIP never anchor collection');
+ h.hud.entries.shop.style.position='320px 6px 0px';h.hud.entries.shop.style.width='60px';h.refresh();assert.equal(h.entry().style.position,'390px 12px 0px','Collection tracks the actual market right edge');
  h.hud.parts.archive.Caption.style.fontSize='21px';h.refresh();assert.equal(h.nodes.HandoffCollectionCaption.style.fontSize,'21px');
  for(const [width,height,pixelScale]of [[960,720,1],[1280,720,1],[1920,1080,1],[2560,1440,1.25],[3440,1440,1]]){
   h.hud.top.actualuiscale_x=pixelScale;const scale=Math.min((width-16)/1672,height/941);h.hud.layout(scale);const styles=Object.fromEntries(Object.entries(h.hud.entries).map(([key,panel])=>[key,{...panel.style}]));h.refresh();
   assert.equal(h.entry().style.width,h.hud.entries.archive.style.width);assert.equal(h.entry().style.height,h.hud.entries.archive.style.height);
   assert.equal(h.nodes.HandoffCollectionIcon.style.width,h.hud.parts.archive.Icon.style.width);assert.equal(h.nodes.HandoffCollectionCaption.style.fontSize,h.hud.parts.archive.Caption.style.fontSize);
   const [x]=h.entry().style.position.split(' ').map(parseFloat),right=x+parseFloat(h.entry().style.width),statusScale=Math.min(width/1672,height/941),statusLeft=(width-1672*statusScale)/2+722*statusScale;
-  const topLeft=parseFloat(h.hud.top.style.position),vipLeft=topLeft+parseFloat(h.hud.entries.vip.style.position);assert(right<=vipLeft+1,'Collection stays before VIP across viewport and DPI changes');
+  const topLeft=parseFloat(h.hud.top.style.position),vipLeft=topLeft+parseFloat(h.hud.entries.vip.style.position),effectsLeft=topLeft+parseFloat(h.hud.effects.style.position);assert(right<=effectsLeft+1,'Collection stays before Effects across viewport and DPI changes');assert(effectsLeft+parseFloat(h.hud.effects.style.width)<=vipLeft+1,'VIP stays after Effects');
   assert(right<statusLeft,'The added regular entry stays before the existing status row');assert(right<width,'The entry remains within the viewport');
   for(const [key,panel]of Object.entries(h.hud.entries)){assert.deepEqual({...panel.style},styles[key]);assert.equal(panel.events.onactivate,events[key]);}
  }
+ h.cfg.SurvivalCollectionNav.Dispose();
+});
+
+test('explicit current navigation wins over a still-valid older top in the same host',()=>{
+ const h=fixture(),legacy=h.hud,originalEntry=h.entry();
+ legacy.entries.shop.style.position='900px 6px 0px';legacy.top.visible=false;
+ h.cfg.HandoffGeneration++;h.hud=h.makeHUD(.75,12,4,legacy.host);
+ assert.equal(legacy.host.FindChildTraverse('HandoffTop'),legacy.top,'A stale first DFS match remains valid');
+ assert.equal(legacy.top.IsValid(),true);h.refresh();
+ assert.equal(h.entry(),originalEntry,'Same-host refresh reuses the single collection button');
+ assert.equal(h.entry().GetParent(),h.hud.host);assert.equal(h.entry().style.position,'284px 9px 0px');assert.equal(h.entry().visible,true);
+ assert.equal(h.cfg.SurvivalTopNavigation.top,h.hud.top);
+ const nextEntry=h.entry();h.load('collection_nav.js');h.refresh();assert.equal(nextEntry.IsValid(),false);
+ assert.equal(h.entry().style.position,'284px 9px 0px');assert.equal(h.entry().visible,true);
+ assert.equal(h.hud.host.children.filter(panel=>panel.id==='HandoffNav_collection'&&panel.IsValid()).length,1);
  h.cfg.SurvivalCollectionNav.Dispose();
 });
 

@@ -13,9 +13,11 @@ async function main(){
   for(const state of ['locked','active']){
    await b.go(path.join(out,'preview.html'),'?state='+state);
    assert.equal(await b.run('previewReady'),true);assert.deepEqual(await b.run('previewErrors'),[]);
-   const info=await b.run(`(()=>{const rect=id=>document.getElementById(id).getBoundingClientRect().toJSON(),shop=document.getElementById('HandoffNav_survival_shop');return{shopVisible:!shop.hidden&&getComputedStyle(shop).display!=='none',shop:rect(shop.id),treasure:rect('HandoffNav_treasure'),vip:rect('HandoffNav_vip'),effects:rect('HandoffCombatEffects'),collection:rect('HandoffNav_collection'),hero:rect('SurvivalLocalHeroPortrait'),images:[...document.images].filter(i=>{const r=i.getBoundingClientRect();return r.width>0&&r.height>0;}).map(i=>({id:i.id,decoded:i.complete&&i.naturalWidth>0,source:i.src}))};})()`);
+   const info=await b.run(`(()=>{const rect=id=>document.getElementById(id).getBoundingClientRect().toJSON(),shop=document.getElementById('HandoffNav_survival_shop');return{shopVisible:!shop.hidden&&getComputedStyle(shop).display!=='none',shop:rect(shop.id),market:rect('HandoffNav_shop'),treasure:rect('HandoffNav_treasure'),vip:rect('HandoffNav_vip'),effects:rect('HandoffCombatEffects'),collection:rect('HandoffNav_collection'),hero:rect('SurvivalLocalHeroPortrait'),images:[...document.images].filter(i=>{const r=i.getBoundingClientRect();return r.width>0&&r.height>0;}).map(i=>({id:i.id,decoded:i.complete&&i.naturalWidth>0,source:i.src}))};})()`);
    assert.equal(info.shopVisible,state==='active');assert(info.images.every(i=>i.decoded),'every visible original SVG decodes');
-   assert(Math.abs(info.collection.x-(info.effects.x+info.effects.width))<4,'collection follows compacted first row');
+   assert(Math.abs(info.collection.x-(info.market.x+info.market.width))<4,'collection follows market');
+   assert(info.effects.x>=info.collection.x+info.collection.width-1,'Effects follows collection without overlap');
+   assert(info.vip.x>=info.effects.x+info.effects.width-1,'VIP remains the rightmost navigation entry');
    if(state==='active'){
     assert(Math.abs(info.shop.x+info.shop.width/2-info.treasure.x-info.treasure.width/2)<1.1,'shop centered under treasure');
     assert(info.shop.y>=info.treasure.y+info.treasure.height-1,'shop is below first row');
