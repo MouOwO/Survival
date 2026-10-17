@@ -80,12 +80,6 @@
         var fill = $.CreatePanel("Panel", bar, "");
         fill.AddClass("SurvivalHeroWorldHealthFill");
         fill.hittest = false;
-        for (var index = 1; index < 10; index++) {
-            var divider = $.CreatePanel("Panel", bar, "");
-            divider.AddClass("SurvivalHeroWorldHealthTick");
-            divider.AddClass("SurvivalHeroWorldHealthTick" + (index * 10));
-            divider.hittest = false;
-        }
         bar.__fill = fill;
         panels[key] = bar;
         return bar;
