@@ -3,6 +3,15 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {makeFixture,read}=require('./fixture.cjs');
 function close(actual, expected, message) { assert(Math.abs(actual - expected) <= 1.1, message + ` (${actual} vs ${expected})`); }
 function overlaps(a, b) { return a.x < b.x+b.width && a.x+a.width > b.x && a.y < b.y+b.height && a.y+a.height > b.y; }
+function assertFirstRowOrder(f) {
+    const top=f.rect(f.currentTop()), collection=f.rect(f.collection());
+    const ordered=['return','treasure','archive','lottery','benefit','shop'].map(id=>({id,...f.rect(f.entry(id))}));
+    ordered.push({id:'effects',...f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'))},
+        {id:'collection',...collection,x:collection.x-top.x,y:collection.y-top.y},
+        {id:'vip',...f.rect(f.entry('vip'))});
+    for(let i=1;i<ordered.length;i++)assert(ordered[i].x>=ordered[i-1].x+ordered[i-1].width-1.1,
+        ordered[i].id+' follows '+ordered[i-1].id+' without overlap');
+}
 
 test('locked entrance is absent; activation and relocking preserve the top row and original actions', () => {
     const f = makeFixture(), shop = f.entry('survival_shop');
@@ -11,7 +20,9 @@ test('locked entrance is absent; activation and relocking preserve the top row a
     const lockedPortrait = {...f.rect(f.portrait)};
     const original = Object.fromEntries(firstRow.map(id => [id, {...f.rect(f.entry(id))}]));
     const effects = f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'));
+    assertFirstRowOrder(f);
     f.unlock(true); assert.equal(f.visible(shop), true); assert.equal(shop.enabled, true);
+    assertFirstRowOrder(f);
     f.click(shop); assert.deepEqual(f.actions, ['survival_shop']);
     for (const id of ['treasure','archive','lottery','benefit','shop']) f.click(f.entry(id));
     assert.deepEqual(f.actions, ['survival_shop','treasure','archive','lottery','benefit','shop']);
@@ -32,6 +43,7 @@ test('locked entrance is absent; activation and relocking preserve the top row a
     for (const id of firstRow) assert.deepEqual(f.rect(f.entry(id)), original[id]);
     assert.deepEqual(f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects')), effects);
     f.unlock(false); assert.equal(f.visible(shop), false); assert.equal(shop.enabled, false);
+    assertFirstRowOrder(f);
     assert.deepEqual(f.rect(f.portrait),lockedPortrait,'relocking returns the hero shortcut to its original row');
     assert.equal(f.cfg.HandoffWorldOcclusion.length,4,'hidden shop leaves no second-row world-label exclusion');
     for (const id of firstRow) assert.deepEqual(f.rect(f.entry(id)), original[id]);
@@ -41,6 +53,7 @@ test('locked entrance is absent; activation and relocking preserve the top row a
 test('collection follows only visible first-row buttons, independent of the lower shop', () => {
     const f = makeFixture(), top = f.rect(f.currentTop()), before = f.rect(f.collection());
     const effects = f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'));
+    assertFirstRowOrder(f);
     close(before.x, top.x+effects.x+effects.width+2*top.width/630, 'collection follows compacted effects');
     f.unlock(true); f.refreshCollection(); assert.deepEqual(f.rect(f.collection()), before);
     // A wide second-row entry must never push collection out of the first row.
@@ -67,9 +80,11 @@ test('viewport changes and bounded repair keep the moved shop and compacted top 
         assert.equal(overlaps({...shop,x:shop.x+top.x,y:shop.y+top.y},f.rect(f.portrait)),false,'hero shortcut never overlaps the lower shop');
         const vip=f.rect(f.entry('vip')), market=f.rect(f.entry('shop'));
         const scale=Math.min((width/pixelScale-16)/1672,height/pixelScale/941);
-        close(vip.x,Math.round(362*scale*pixelScale)/pixelScale,'VIP fills removed shop space');
-        assert(vip.x>=market.x+market.width-1&&vip.x-(market.x+market.width)<4,'first-row spacing stays compact');
-        const saved={...shop}; f.advance(1600); assert.deepEqual(f.rect(f.entry('survival_shop')),saved,'periodic repair retains second row');
+        close(vip.x,Math.round(518*scale*pixelScale)/pixelScale,'VIP remains at the right end of the navigation');
+        const effectBounds=f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'));
+        assert(effectBounds.x>=market.x+market.width-1&&effectBounds.x-(market.x+market.width)<4,'Effects fills the removed VIP space');
+        assertFirstRowOrder(f);
+        const saved={...shop}; f.advance(1600); assert.deepEqual(f.rect(f.entry('survival_shop')),saved,'periodic repair retains second row');assertFirstRowOrder(f);
         const collection=f.rect(f.collection()), effects=f.rect(f.currentTop().FindChildTraverse('HandoffCombatEffects'));
         close(collection.x,top.x+effects.x+effects.width+2*top.width/630,'collection stays next to effects after resize');
         assert(f.visible(f.entry('survival_shop')));
@@ -86,6 +101,7 @@ test('HUD replacement retains unlock state and collection reattaches without dup
     assert.equal(f.visible(f.entry('survival_shop')),true,'already-active shop is shown on HUD reload');
     assert.equal(f.collection().GetParent(),nextHost);
     assert.equal(nextHost.children.filter(p=>p.id==='HandoffNav_collection'&&p.IsValid()).length,1);
+    assertFirstRowOrder(f);
     f.click(f.entry('survival_shop')); assert.equal(f.actions.at(-1),'survival_shop');
     f.unlock(false);assert.equal(f.visible(f.entry('survival_shop')),false);
     assert.deepEqual(f.warnings, []);

@@ -260,9 +260,9 @@
     // Shared bounds keep initial creation and resolution refresh equally compact.
     function navBounds(key,index) {
         if(key==="survival_shop")return {x:52,y:100,width:96};
-        return {x:key==="vip"?362:14+index*58,y:6,width:key==="vip"?60:56};
+        return {x:key==="vip"?518:14+index*58,y:6,width:key==="vip"?60:56};
     }
-    var effectsNavX=424;
+    var effectsNavX=362;
     // Navigation icons and captions sit directly over the game, without a solid plate.
     nav.forEach(function(a,i){
         var bounds=navBounds(a[0],i),buttonWidth=bounds.width;
