@@ -58,10 +58,17 @@ function resolved(panel, property) {
 }
 function node(h, id) { const panel = h.tooltip.FindChildTraverse(id); assert(panel, id + ' exists'); return panel; }
 function rows(h) { return Array.from(h.fieldContainer().__fieldRows).filter(row => row.visible); }
+function noUnlockRows(h) { assert(rows(h).every(row => row.__left.text.trim() !== '解锁条件'), 'all selective-owner paths omit the standalone unlock row'); }
+function statusPreserved(tooltip, text, locked) {
+    const status = tooltip.FindChildTraverse('CustomAbilityStatus');
+    assert.equal(status.text, text); assert.equal(tooltip.BHasClass('Unavailable'), locked);
+    assert.notEqual(resolved(status, 'visibility'), 'collapse');
+    assert.equal(resolved(status, 'color'), locked ? '#d28f8f' : '#8fd28f', 'the bottom status keeps its actual red/green presentation');
+}
 function hover(h) {
     const binding = h.inspect().bindings[0]; assert(binding, 'the real managed ability has a hover binding');
     const xy = binding.proxy.GetPositionWithinWindow(); h.setCursor([xy.x + 10, xy.y + 10]);
-    binding.proxy.events.onmouseover(); assert(!h.tooltip.BHasClass('Hidden'));
+    binding.proxy.events.onmouseover(); assert(!h.tooltip.BHasClass('Hidden')); noUnlockRows(h);
 }
 function leftAligned(h, row) {
     assert.equal(resolved(node(h, 'CustomAbilityCostRow'), 'horizontal-align'), 'left');
@@ -87,15 +94,19 @@ assert.equal(node(h, 'CustomAbilityType').text, '', 'the normal ready state does
 assert.equal(node(h, 'CustomAbilityWoodCost').text, '100');
 assert(node(h, 'CustomAbilityGoldCostBlock').BHasClass('Hidden'), 'zero gold stays absent');
 const originalRows = rows(h);
-for (const row of originalRows.slice(0, 2)) {
+assert.equal(originalRows.length, 2, 'the independent unlock field is removed without deleting wood or health');
+for (const row of originalRows.slice(0, 1)) {
     assert(row.BHasClass('AbilityFieldTextRow')); assert.equal(resolved(row.__iconHost, 'visibility'), 'collapse', 'text-only construction requirements have no 26px placeholder gutter');
     leftAligned(h, row);
 }
-assert.equal(originalRows[1].__right.text, '主城等级≥2', 'alignment does not remove the actual unlock requirement');
-assert(!originalRows[2].BHasClass('AbilityFieldTextRow'));
-assert.notEqual(resolved(originalRows[2].__iconHost, 'visibility'), 'collapse');
-assert.equal(originalRows[2].__iconHost.visible, true, 'real construction property artwork remains visible');
-assert.notEqual(originalRows[2].__iconHost.style.opacity, '0');
+assert(!originalRows[1].BHasClass('AbilityFieldTextRow'));
+assert.notEqual(resolved(originalRows[1].__iconHost, 'visibility'), 'collapse');
+assert.equal(originalRows[1].__iconHost.visible, true, 'real construction property artwork remains visible');
+assert.notEqual(originalRows[1].__iconHost.style.opacity, '0');
+for (const [locked, text] of [[true, '需要主城等级2'], [false, '可建造'], [true, '需要先建造主城']]) {
+    h.setTable('survival_ability_runtime', 828, {...base, available: locked ? 0 : 1, prerequisite_met: locked ? 0 : 1, status_text: text}, true);
+    statusPreserved(h.tooltip, text, locked); noUnlockRows(h); assert.equal(rows(h).length, 2);
+}
 
 // NetTable refreshes reuse each pooled row, including when a former text-only
 // row acquires real artwork and when that artwork is replaced by text again.
@@ -103,7 +114,7 @@ const reordered = [fields[2], fields[1], fields[0]];
 h.setTable('survival_ability_runtime', 828, {...base, fields: reordered}, true);
 assert.strictEqual(rows(h)[0], originalRows[0]); assert(!rows(h)[0].BHasClass('AbilityFieldTextRow'));
 assert.notEqual(resolved(rows(h)[0].__iconHost, 'visibility'), 'collapse');
-assert(rows(h)[2].BHasClass('AbilityFieldTextRow')); assert.equal(resolved(rows(h)[2].__iconHost, 'visibility'), 'collapse');
+assert(rows(h)[1].BHasClass('AbilityFieldTextRow')); assert.equal(resolved(rows(h)[1].__iconHost, 'visibility'), 'collapse'); noUnlockRows(h);
 const allocated = h.counters.created;
 for (let i = 0; i < 20; i++) h.setTable('survival_ability_runtime', 828, {...base, fields: reordered}, true);
 assert.equal(h.counters.created, allocated, 'compact presentation does not recreate field panels during stable hover');
@@ -136,7 +147,7 @@ assert(!h.tooltip.BHasClass('BuildAbility')); assert(node(h, 'CustomAbilityLevel
 assert.notEqual(resolved(node(h, 'CustomAbilityLevel'), 'visibility'), 'collapse'); assert.equal(node(h, 'CustomAbilityType').text, '');
 nativeLevel = 3;
 h.setTable('survival_ability_runtime', 901, {owner_entindex: 900, ability_entindex: 901, available: 1,
-    fields: [{label: 'LV1', value: '初级效果'}, {label: 'LV3', value: '当前效果'}]});
+    fields: [{label: 'LV1', value: '初级效果'}, {label: ' \t解锁条件 ', value: '英雄达到3级'}, {label: 'LV3', value: '当前效果'}]});
 h.select(900); h.runUntil(h.now() + 1.3); hover(h);
 assert(!h.tooltip.BHasClass('BuildAbility')); assert(node(h, 'CustomAbilityLevel').text.endsWith(' 3'));
 assert.equal(rows(h).filter(row => row.BHasClass('AbilitySkillLevelCurrent')).length, 1, 'real hero levels retain their current-grade highlighting');
@@ -175,15 +186,16 @@ function showTakeover(name, extra = {}) {
     api.Show({ability: 10, name}, card); assert(!tip.BHasClass('Hidden'));
     assert.equal(tip.__survivalTooltipOwner, 'full_takeover');
     assert.notEqual(t.nodes.CustomAbilityType.text, '可升级');
+    assert(t.nodes.CustomAbilityFields.children.every(row => row.children[0].text.trim() !== '解锁条件'), name + ' omits the independent unlock field in full takeover');
 }
 showTakeover('ability_build_main_city');
 assert(tip.BHasClass('BuildAbility')); assert.equal(t.nodes.CustomAbilityLevel.text, '');
 assert.equal(resolved(t.nodes.CustomAbilityLevel, 'visibility'), 'collapse');
 assert.equal(t.nodes.CustomAbilityWoodCost.text, '100'); assert.equal(resolved(t.nodes.CustomAbilityCostRow, 'horizontal-align'), 'left');
-let requirement = t.nodes.CustomAbilityFields.children.find(row => row.children[0].text === '解锁条件');
-assert(requirement); assert.equal(requirement.children[1].text, '主城等级≥2');
-assert.equal(requirement.children.length, 2, 'full takeover has no invented icon gutter');
-requirement.children.forEach(p => assert.equal(resolved(p, 'text-align'), 'left'));
+const woodRow = t.nodes.CustomAbilityFields.children.find(row => row.children[0].text === '木材消耗');
+assert(woodRow); assert.equal(woodRow.children[1].text, '100');
+assert.equal(woodRow.children.length, 2, 'full takeover has no invented icon gutter');
+woodRow.children.forEach(p => assert.equal(resolved(p, 'text-align'), 'left'));
 for (const [name, level] of [['ability_upgrade_city', 3], ['ability_research_lumberjack_speed', 2], ['ability_survival_earth_line', 4], ['ability_building_blink', 1]]) {
     takeoverLevel = level; showTakeover(name, {current_level: level});
     assert(!tip.BHasClass('BuildAbility'), name + ' clears stale construction styling');
@@ -191,7 +203,11 @@ for (const [name, level] of [['ability_upgrade_city', 3], ['ability_research_lum
 }
 showTakeover('ability_build_gold_mine', {available: 0, prerequisite_met: 0, status_text: '需要主城等级2'});
 assert(tip.BHasClass('BuildAbility')); assert.equal(t.nodes.CustomAbilityLevel.text, '');
-assert.equal(t.nodes.CustomAbilityStatus.text, '需要主城等级2', 'compact construction keeps the actual lock reason');
+statusPreserved(tip, '需要主城等级2', true);
+showTakeover('ability_build_gold_mine', {available: 1, prerequisite_met: 1, status_text: '可建造', fields: [fields[0], {...fields[1], label: ' 解锁条件\t'}, fields[2]]});
+statusPreserved(tip, '可建造', false);
+showTakeover('ability_build_gold_mine', {available: 0, prerequisite_met: 0, status_text: '需要先建造主城'});
+statusPreserved(tip, '需要先建造主城', true);
 assert.equal(t.requests.length, 0, 'presentation tests never cast or buy');
 
-console.log('ABILITY_TOOLTIP_COMPACT_PASS: both real owners; no generic ready badge; construction-only level/gutter suppression; retained icons and costs; upgrade/hero/research reuse; meaningful upgrade states; pooled refresh; scoped left alignment (no pixel simulation).');
+console.log('ABILITY_TOOLTIP_COMPACT_PASS: both real owners; no standalone unlock rows; red/green status preserved; no generic ready badge; construction-only level/gutter suppression; retained icons/costs; upgrade/hero/research reuse; pooled refresh; scoped left alignment (no pixel simulation).');

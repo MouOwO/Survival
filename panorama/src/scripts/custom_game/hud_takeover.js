@@ -285,6 +285,7 @@
     }
 
     function addField(container, label, value) {
+        if (String(label || "").trim() === "解锁条件") return;
         if (!container || value === undefined || value === null || value === "") return;
         var row = $.CreatePanel("Panel", container, "");
         row.AddClass("AbilityFieldRow");

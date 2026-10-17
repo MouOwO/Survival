@@ -541,6 +541,7 @@
     }
 
     function addField(container, label, value, levelState) {
+        if (String(label || "").trim() === "解锁条件") return;
         if (value === undefined || value === null || value === "") return;
         var rows=container.__fieldRows||(container.__fieldRows=[]);
         var index=container.__fieldCursor||0;container.__fieldCursor=index+1;
