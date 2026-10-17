@@ -1149,9 +1149,11 @@
         setText("CustomAbilityExtensionLabel", "生存防守 · 自定义技能详情");
         setText("CustomAbilityTitle", runtime.display_name || tooltipDefinition.name
             || definition.abilityname || localizedName(entry.name));
+        var buildMode = /^ability_build_/.test(entry.name);
+        tooltip.SetHasClass("BuildAbility", buildMode);
         var currentLevel = runtime.current_level;
         if (currentLevel === undefined) currentLevel = abilityLevel(entry.ability);
-        setText("CustomAbilityLevel", Number(currentLevel || 0) > 0
+        setText("CustomAbilityLevel", !buildMode && Number(currentLevel || 0) > 0
             ? "【等级】 " + String(currentLevel) : "");
         var description = runtime.upgrade_description || tooltipDefinition.desc
             || definition.abilitydesc || localizedDescription(entry.name)

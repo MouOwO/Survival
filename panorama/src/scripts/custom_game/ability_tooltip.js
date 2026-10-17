@@ -556,6 +556,7 @@
         row.SetHasClass("AbilitySkillLevelCurrent", !!levelState && levelState.current);
         Object.keys(row.__icons).forEach(function(key){row.__icons[key].visible=false;});
         var iconDefinition = propertyIcon(label);
+        row.SetHasClass("AbilityFieldTextRow", !iconDefinition);
         row.__iconHost.visible=!!iconDefinition;
         if (iconDefinition) {
             var panelType = iconDefinition.type === "item" ? "DOTAItemImage"
@@ -598,6 +599,7 @@
         var dismiss = dismissFor(byId("CustomAbilityTooltip"));
         if (dismiss && !dismiss.CanShow(sourcePanel)) { hideCustomTooltip(true); return false; }
         var projectMode = managedProjectAbility(abilityIndex, abilityName);
+        var buildMode = /^ability_build_/.test(abilityName);
         var repairerTrainingMode = abilityName === "ability_train_repairer"
             || abilityName === "ability_train_advanced_repairer";
         var heroMode = isSelectedCombatHero()
@@ -636,6 +638,7 @@
         tooltip.RemoveClass("ItemOnly");
         tooltip.RemoveClass("ExtensionOnly");
         tooltip.SetHasClass("RepairerTraining", repairerTrainingMode);
+        tooltip.SetHasClass("BuildAbility", buildMode);
         setText("CustomAbilityExtensionLabel", passiveMode ? "生存防守 · 被动技能"
             : towerToolMode ? "生存防守 · 防御塔技能" : upgradeMode
             ? localize("Survival_UpgradeTooltip_Category", "SURVIVAL · UPGRADE")
@@ -654,7 +657,7 @@
             ? runtime.current_level
             : upgradeMode && runtime.current_level !== undefined
             ? runtime.current_level : abilityLevel;
-        setText("CustomAbilityLevel", researchMode || displayedLevel > 0
+        setText("CustomAbilityLevel", !buildMode && (researchMode || displayedLevel > 0)
             ? localize("Survival_UpgradeField_Level", "Level")
                 + " " + displayedLevel : "");
         var description = abilityName === "ability_destroy_arrow_tower"
@@ -723,7 +726,7 @@
             : (unavailable ? localize("Survival_UpgradeTooltip_Unavailable", "UNAVAILABLE")
                 : (lacksResources
                     ? localize("Survival_UpgradeTooltip_ResourceLow", "RESOURCE LOW")
-                    : localize("Survival_UpgradeTooltip_Available", "AVAILABLE"))));
+                    : "")));
         var statusText = researchMode && lacksResources
             ? "资源不足，暂不能研究"
             : researchMode ? researchStatus(runtime)
