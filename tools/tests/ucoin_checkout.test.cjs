@@ -127,7 +127,7 @@ function simpleDetail(h, card, title = '测试道具') {
         assert.equal(labels.filter(p => p.BHasClass(cls)).length, 1, cls);
     assert.equal(labels.find(p => p.BHasClass('RCPurpleDetailTitle')).text, title);
     assert.equal(labels.find(p => p.BHasClass('RCPurpleDetailQuality')).text, '品级：未配置');
-    assert.equal(labels.find(p => p.BHasClass('RCProductEffect')).text, '初始木材 ×200');
+    assert.equal(labels.find(p => p.BHasClass('RCProductEffect')).text, walletItem('u_coin').description);
     assert(!nodes.some(p => p.paneltype === 'Button' || p.BHasClass('CJPrice') || p.BHasClass('CommercePurpleBuy')),
         'Price and purchase controls belong to the row or payment confirmation');
     assert(!labels.some(p => /¥|U币|人民币金额|1元=|查看.*购买|已拥有.*查看/.test(p.text || '')));

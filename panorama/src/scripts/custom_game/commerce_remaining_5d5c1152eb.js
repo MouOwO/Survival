@@ -33,7 +33,7 @@
     }
     var store=modal(), tabs=panel("Panel",store.panel,"RCTabs"), grid=panel("Panel",store.content,"RCGrid");
     tabs.visible=false;
-    if(M){grid.AddClass("BLMarketRows");grid.style.position="0px 0px 0px";grid.style.width="1072px";grid.style.height="fit-children";grid.style.flowChildren="down";grid.style.padding="0px";grid.style.margin="0px";grid.style.overflow="noclip";grid.hittestchildren=true;}
+    if(M){grid.AddClass("BLMarketRows");grid.style.position="0px 0px 0px";grid.style.width=(store.menu.listWidth||1072)+"px";grid.style.height="fit-children";grid.style.flowChildren="down";grid.style.padding="0px";grid.style.margin="0px";grid.style.overflow="noclip";grid.hittestchildren=true;}
     var notice=text(store.canvas,"正在加载商品…","RCNotice"),pager=panel("Panel",store.actions,"CJPager");
     if(M)notice.AddClass("BLMarketNotice");
     function checkout(item) {
@@ -196,7 +196,7 @@
         },
         Inspect:function(){var path=[],p=store&&store.panel,hasPanel=valid(p);while(valid(p) && path.length<10){path.push({id:p.id,classes:p.GetClasses?p.GetClasses():[],visible:p.visible,width:p.actuallayoutwidth,height:p.actuallayoutheight,visibility:p.style.visibility,opacity:p.style.opacity,z:p.style.zIndex,clip:p.style.clip});p=p.GetParent();}
             return {category:category,purchaseType:purchaseType,page:page,opened:opened,valid:hasPanel,visible:hasPanel?store.panel.visible:false,
-            layout:M?"black_lion_list":"archive_v10",groups:M?K.Groups(catalog):[],width:hasPanel?store.panel.actuallayoutwidth:0,height:hasPanel?store.panel.actuallayoutheight:0,
+            layout:M?"black_lion_list":"archive_v10",skinVersion:store.menu.skinVersion||0,referenceWidth:store.menu.width,referenceHeight:store.menu.height,groups:M?K.Groups(catalog):[],width:hasPanel?store.panel.actuallayoutwidth:0,height:hasPanel?store.panel.actuallayoutheight:0,
             productCount:rows(catalog.products).filter(function(item){return !M||K.IsListed(item);}).length,catalogProductCount:rows(catalog.products).length,
             visibleSkus:M?(category==="home"?(K.HomeProducts?K.HomeProducts(rows(catalog.products)):[]):K.SortProducts(rows(catalog.products).filter(function(item){return K.InGroup(item,category);}),category)).filter(matchesPurchaseType).map(function(item){return item.home_display_id||item.sku;}):[],path:path};},
         Dispose:function(){if(disposed)return;disposed=true;opened=false;ticketRequest=false;hideDetails();if(store&&store.menu)store.menu.Dispose();if(store)[store.panel,store.scrim].forEach(function(p){if(valid(p))p.DeleteAsync(0);});}

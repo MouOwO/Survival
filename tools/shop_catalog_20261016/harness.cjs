@@ -56,7 +56,7 @@ function harness(options = {}) {
         CustomNetTables: {GetTableValue: () => null}});
     const load = file => vm.runInContext(fs.readFileSync(path.join(scripts, file), 'utf8'), context, {filename: file});
     ['common/ui_registry.js', 'common/ui_components.js', 'ui_layers.js', 'remaining_5d5c1152eb.js',
-        'archive_v10_data.js', 'common/menu_v10.js', 'black_lion_market_model.js', 'black_lion_market.js',
+        'archive_v10_data.js', 'common/menu_v10.js', 'shop_v10_assets.js', 'black_lion_market_model.js', 'black_lion_market.js',
         'common/commerce_components.js', 'commerce_wallet.js'].forEach(load);
     let paid = options.paid || {products: [{sku:'paid_1',title:'真实商品',category_id:'technology',product_type:'single',icon:'items/rapier.png',
         enabled:true,amount_fen:900,reward_lines:[{id:'initial_gold',kind:'stat',label:'初始金币',quantity:10}]}],

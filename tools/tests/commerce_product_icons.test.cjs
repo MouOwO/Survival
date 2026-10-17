@@ -72,7 +72,7 @@ function harness(options = {}) {
         vm.runInContext(read(file), env, {filename: file});
     }
     if (!options.independentPayment) ['common/ui_registry.js', 'common/ui_components.js', 'common/tooltip_dismiss.js', 'ui_layers.js',
-        'archive_v10_data.js', 'common/menu_v10.js', 'item_art_remaining_5d5c1152eb.js',
+        'archive_v10_data.js', 'shop_v10_assets.js', 'common/menu_v10.js', 'item_art_remaining_5d5c1152eb.js',
         'common/commerce_components.js', 'black_lion_market_model.js', 'black_lion_market.js'].forEach(load);
     function payment() {
         const xml = read(source('panorama/src/layout/custom_game/payment_test.xml')), stack = [panel];
@@ -133,8 +133,11 @@ for (const item of unique.values()) {
     const rewards = item.reward_lines || item.grants && item.grants.lines || [];
     const props = {index: 0, catalog: {categories: []}, rewards, action() { throw new Error('Rendering must not order'); }};
     const row = h.cfg.SurvivalBlackLionMarket.Row(h.panel, item, props);
-    const image = row.__menuCell.iconPanel.Children()[0];
-    assert.deepEqual(image.images, [expected], item.sku + ' market loads exactly the selected image');
+    const image = classNode(row, item.product_type === 'bundle' ? 'BLMarketGiftIcon' : 'BLMarketItemIcon');
+    assert(image, item.sku + ' retains its icon beside the separate decorative frame');
+    const marketExpected = item.product_type === 'bundle'
+        ? J.NormalizeIconURI(h.cfg.SurvivalShopV10.layers.vip4_gift.path) : expected;
+    assert.deepEqual(image.images, [marketExpected], item.sku + ' market loads exactly its declared icon');
     const card = J[item.product_type === 'bundle' ? 'Bundle' : 'Product'](h.panel, item, {rewards});
     assert.deepEqual(classNode(card, 'RCProductArt').images, [expected], item.sku + ' shared card uses the same art');
     if (item.product_type === 'bundle') {
