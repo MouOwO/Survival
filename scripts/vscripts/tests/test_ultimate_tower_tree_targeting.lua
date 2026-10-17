@@ -22,6 +22,7 @@ DOTA_UNIT_ORDER_MOVE_TO_POSITION, DOTA_UNIT_ORDER_ATTACK_MOVE, DOTA_UNIT_ORDER_A
 local vector_mt = {}
 Vector = function(x, y, z) return setmetatable({x = x, y = y, z = z or 0}, vector_mt) end
 vector_mt.__sub = function(a, b) return Vector(a.x - b.x, a.y - b.y, a.z - b.z) end
+vector_mt.__add = function(a, b) return Vector(a.x + b.x, a.y + b.y, a.z + b.z) end
 vector_mt.__index = {Length2D = function(v) return math.sqrt(v.x * v.x + v.y * v.y) end}
 local auto_attack = require("modifiers/modifier_tower_auto_attack")
 local entities, created, candidate_units, consumed, fail_modifier = {}, nil, {}, 0, false
@@ -92,6 +93,7 @@ local function initialize()
     bus.reset(); fusion.init(); consumed = 0
     bus.handle_request(events.BUILDING_LIST_REQUEST, function() return {buildings = material} end)
     bus.handle_request(events.GRID_CAN_PLACE_REQUEST, function(payload)
+        assert(payload.player_id==0,"fusion creation/movement/teleport uses its registered owner")
         return {ok = true, grid_x = 0, grid_y = 0, world_position = payload.position}
     end)
     bus.handle_request(events.GRID_OCCUPY_REQUEST, function() return {ok = true} end)
@@ -162,6 +164,12 @@ result = bus.request(events.TOWER_FUSION_MOVE_REQUEST,
     {player_id = 1, entindex = tower:entindex(), position = Vector(400,160,384)})
 assert(result and not result.ok and move_events == 1,
     "rejected relocation must leave particles and position unchanged")
+local wall=unit("building_wall",303,2,Vector(512,256,384))
+bus.emit(events.BUILDING_CREATED,{unit=wall,building_id="wall",player_id=0})
+destination=wall:GetAbsOrigin()
+result=fusion.teleport_for_player(0,tower)
+assert(result.ok and move_events==2,"group teleport also validates the registered owner in grid")
+assert(not fusion.teleport_for_player(1,tower).ok,"another player cannot teleport this ultimate")
 
 local grown=created
 local before=fusion._test.player_ultimates(0)[1].base_attack

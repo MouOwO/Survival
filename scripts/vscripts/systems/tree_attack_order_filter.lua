@@ -38,6 +38,7 @@ local function filter(_, keys)
             if owner == nil or owner ~= issuer then return false end
         end
     end
+    if not require("systems/rich_region_service").validate_order(keys, units) then return false end
     lumberjack_order_service.process(keys)
     if repair_order_service.process(keys) then return false end
     local order_type = tonumber(keys.order_type)

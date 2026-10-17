@@ -8,7 +8,7 @@ const loadingXml = fs.readFileSync("panorama/src/layout/custom_game/custom_loadi
 assert(!/<Panel\b[^>]*\bid=/.test(xml.match(/<Panel\b[^>]*>/)[0]), "Panorama layout root must not declare an id");
 
 function harness(options = {}) {
-    const nodes = {}, requests = [], scheduled = [], handlers = {}, subscriptions = [], messages = [], visibilityWrites = [], eventHandlers = {};
+    const nodes = {}, requests = [], scheduled = [], handlers = {}, subscriptions = [], messages = [], visibilityWrites = [], eventHandlers = {}, dispatched = [];
     const nativeRuleCalls = [], nativePlayerInfoCalls = [];
     const config = options.sharedConfig || {};
     let now = 0, state = options.state, startupState = options.startupState, localId = options.localId === undefined ? 0 : options.localId;
@@ -84,6 +84,7 @@ function harness(options = {}) {
     function $(id) { return nodes[id.slice(1)]; }
     $.GetContextPanel = () => root;
     $.Msg = text => messages.push(text);
+    $.DispatchEvent = (...args) => dispatched.push(args);
     $.CreatePanel = (type, parent, id) => new Panel(type, parent, id);
     $.Schedule = (delay, fn) => scheduled.push({at: now + delay, fn});
     $.CancelScheduled = () => {};
@@ -126,7 +127,7 @@ function harness(options = {}) {
     }
     vm.runInContext(options.hud ? fs.readFileSync("panorama/src/scripts/custom_game/survival_ui.js", "utf8") : script, context);
     return {
-        nodes, root, authoredRoot, requests, messages, config, nativeRuleCalls, nativePlayerInfoCalls,
+        nodes, root, authoredRoot, requests, messages, config, nativeRuleCalls, nativePlayerInfoCalls, dispatched,
         subscriptionCount: () => subscriptions.filter(Boolean).length,
         emit: (name, payload) => { if (eventHandlers[name]) eventHandlers[name](payload); },
         visibilityWrites: () => visibilityWrites.slice(initialVisibilityWriteCount),

@@ -54,6 +54,7 @@ relocation.bind(function(index)
 end, function(s) return {unit=s.unit, entindex=s.unit:entindex(), player_id=0,
     building_id=s.building_id, level=s.level, tower_class=s.tower_class} end)
 bus.handle_request(events.GRID_CAN_PLACE_REQUEST, function(p)
+    assert(p.player_id==0,"building relocation uses the registered owner")
     return {ok=not blocked, error="occupied", grid_x=1, grid_y=2, world_position=p.position}
 end)
 bus.handle_request(events.GRID_RELEASE_REQUEST, function() return {ok=true} end)
@@ -79,7 +80,7 @@ local cases, moves = 0, 0
 local function check(class_id, level)
     cases=cases+1
     local u = unit(cases)
-    state={unit=u, building_id="arrow_tower", level=level, tower_class=class_id,
+    state={unit=u, player_id=0, building_id="arrow_tower", level=level, tower_class=class_id,
         grid_x=0, grid_y=0, team=2, definition={footprint={x=2,y=2}}}
     assert(visual.apply(state))
     local count=live_count()

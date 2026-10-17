@@ -14,9 +14,15 @@ local TREE_RESERVATION = "survival_tree_reserved"
 local trees_by_player = {}
 local trees_by_entity = {}
 local region_slots = {}
+local ordinary_reservations = false
 local wall_attack_frame = nil
 local walls_by_player = {}
 local attacked_targets = nil
+
+local function rich_mode()
+    local setup = package.loaded["systems/match_setup_service"]
+    return setup and setup.get_mode and setup.get_mode() == "rich"
+end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -175,7 +181,7 @@ local function socket_available(point, primary, released_entindex)
 end
 
 local function release_tree_grid(state)
-    if state.slot == 1 and socket_available(state.point, true, state.entindex) then
+    if not state.rich and state.slot == 1 and socket_available(state.point, true, state.entindex) then
         reserve_tree_grid(state.point)
         return
     end
@@ -184,6 +190,68 @@ local function release_tree_grid(state)
         grid_x = reserved.grid_x, grid_y = reserved.grid_y,
         footprint = reserved.footprint, entindex = state.entindex,
     })
+end
+
+local function release_ordinary_reservations()
+    if not ordinary_reservations then return end
+    for _, points in pairs(config.spawn_regions) do
+        if points[1] and socket_available(points[1], true) then
+            local reserved = tree_grid(points[1])
+            -- Named reservations have no numeric entity handle. Only clear
+            -- their complete footprint while every cell is still ours/empty.
+            event_bus.request(events.GRID_RELEASE_REQUEST, {
+                grid_x = reserved.grid_x, grid_y = reserved.grid_y,
+                footprint = reserved.footprint,
+            })
+        end
+    end
+    ordinary_reservations = false
+end
+
+local function rich_socket(player_id, city, origin)
+    local regions = require("systems/rich_region_service")
+    local region, reason = regions.region(player_id)
+    if not region then return nil, nil, nil, reason end
+    release_ordinary_reservations()
+    local region_id = "rich:" .. region.id
+    region_slots[region_id] = region_slots[region_id] or {}
+    local slots, candidates = region_slots[region_id], {}
+    local size = tonumber(config.grid_cell_size) or 64
+    for _, cell in ipairs(region.cells) do
+        local point = { x = (cell[1] + math.floor(config.footprint.x / 2)) * size,
+            y = (cell[2] + math.floor(config.footprint.y / 2)) * size, z = origin.z }
+        local distance = (point.x - origin.x) ^ 2 + (point.y - origin.y) ^ 2
+        if distance >= (size * 4) ^ 2 then
+            candidates[#candidates + 1] = { point = point, distance = distance }
+        end
+    end
+    table.sort(candidates, function(left, right)
+        if left.distance ~= right.distance then return left.distance < right.distance end
+        if left.point.x ~= right.point.x then return left.point.x < right.point.x end
+        return left.point.y < right.point.y
+    end)
+    for index, candidate in ipairs(candidates) do
+        local point = candidate.point
+        local reserved = tree_grid(point)
+        if slots[index] == nil and regions.validate_building_footprint(player_id,
+            reserved.grid_x * size, reserved.grid_y * size,
+            (reserved.grid_x + reserved.footprint.x) * size,
+            (reserved.grid_y + reserved.footprint.y) * size)
+            and socket_available(point, false) then
+            -- Reuse building terrain, occupancy and live hull checks. Searching
+            -- once at city creation never moves an existing resource tree.
+            local placement = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
+                player_id = player_id, position = Vector(point.x, point.y, point.z),
+                footprint = config.footprint,
+                team = city.GetTeamNumber and city:GetTeamNumber() or DOTA_TEAM_GOODGUYS,
+                compact = true,
+            })
+            if placement and placement.ok == true then
+                return region_id, index, placement.world_position or point
+            end
+        end
+    end
+    return region_id, nil, nil, "rich_tree_socket_unavailable"
 end
 
 local function upgrade_tree(tree)
@@ -208,20 +276,25 @@ local function spawn_tree(payload)
     if player_id == nil or player_id < 0 then return end
     if trees_by_player[player_id] then return end
     local origin = city:GetAbsOrigin()
-    local center = config.region_center
-    local region_id = (origin.y >= center.y and "north" or "south")
-        .. (origin.x >= center.x and "east" or "west")
-    local slots = region_slots[region_id]
-    local slot, point
-    for index, candidate in ipairs(config.spawn_regions[region_id]) do
-        if slots[index] == nil and socket_available(candidate, index == 1) then
-            slot, point = index, candidate; break
+    local is_rich = rich_mode()
+    local region_id, slot, point, reason
+    if is_rich then
+        region_id, slot, point, reason = rich_socket(player_id, city, origin)
+    else
+        local center = config.region_center
+        region_id = (origin.y >= center.y and "north" or "south")
+            .. (origin.x >= center.x and "east" or "west")
+        for index, candidate in ipairs(config.spawn_regions[region_id]) do
+            if region_slots[region_id][index] == nil and socket_available(candidate, index == 1) then
+                slot, point = index, candidate; break
+            end
         end
     end
     if not point then
-        print("[TreeSystem] no free tree socket in " .. region_id)
+        print("[TreeSystem] no free tree socket in " .. tostring(region_id) .. ":" .. tostring(reason or "occupied"))
         return
     end
+    local slots = region_slots[region_id]
     local position = Vector(point.x, point.y, point.z)
     local tree = CreateUnitByName(
         config.unit_name,
@@ -248,7 +321,7 @@ local function spawn_tree(payload)
         require("core/modifier_registry").ensure(tree, "modifier_tree_progression", {})
     end
     local state = { unit = tree, entindex = tree:entindex(), player_id = player_id, level = 1,
-        region_id = region_id, slot = slot, point = point }
+        region_id = region_id, slot = slot, point = point, rich = is_rich }
     trees_by_player[player_id] = state
     trees_by_entity[tree] = state
     slots[slot] = player_id
@@ -401,6 +474,7 @@ function M.init()
     trees_by_player = {}
     trees_by_entity = {}
     region_slots = {}
+    ordinary_reservations = false
     wall_attack_frame = nil
     walls_by_player = {}
     attacked_targets = nil
@@ -408,7 +482,10 @@ function M.init()
         region_slots[region_id] = {}
         -- One permanent tree patch per court. Other candidate sockets stay
         -- buildable until an actual additional player's tree occupies them.
-        if points[1] then reserve_tree_grid(points[1]) end
+        if points[1] and not rich_mode() then
+            reserve_tree_grid(points[1])
+            ordinary_reservations = true
+        end
     end
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)
     event_bus.subscribe(events.TREE_HIT, on_tree_hit)

@@ -28,6 +28,12 @@ function M.settle(profile, command, pass, context)
     archive.version = 1
     for _,key in ipairs({"clear_counts","completed","shadow_counts","processed"}) do archive[key]=archive[key] or {} end
     if archive.processed[command.id] then return {ok=true,duplicate=true,archive=archive,gameplay_stats=stats} end
+    if (command.kind == "clear" or command.kind == "standard_clear" or command.kind == "rich_clear")
+        and archive.standard_clear_counts == nil then
+        -- Preserve pre-mode historical clears once. Later pure/rich wins cannot
+        -- keep extending this compatibility baseline.
+        archive.standard_clear_counts = copy(archive.clear_counts)
+    end
     -- Equipping cosmetics must not reconcile or award unrelated gameplay bonuses.
     if command.kind == "title_equip" then
         local ok, reason = require("systems/archive_titles").apply(command, archive)
@@ -54,7 +60,7 @@ function M.settle(profile, command, pass, context)
     elseif command.kind == "building_upgrade" or command.kind == "faith_cheat" then
         local ok, reason = require("systems/archive_building_rewards").apply(command, archive, stats, apply_effects)
         if not ok then return {ok=false,terminal=true,error=reason} end
-    elseif command.kind == "clear" then
+    elseif command.kind == "clear" or command.kind == "standard_clear" or command.kind == "rich_clear" then
         if require('systems/commerce_effects').has(profile.save,'double_clear') then
             command=copy(command);command.count=command.count*2
         end
@@ -64,10 +70,16 @@ function M.settle(profile, command, pass, context)
             archive.cooperative_clear_count = require("systems/archive_welfare_rewards").cooperative_wins(archive) + 1
         end
         local difficulty = command.difficulty_id
-        archive.clear_counts[difficulty] = (archive.clear_counts[difficulty] or 0) + command.count
+        local key = command.kind == "rich_clear" and "rich_clear_counts" or "clear_counts"
+        archive[key] = archive[key] or {}
+        archive[key][difficulty] = (archive[key][difficulty] or 0) + command.count
+        if command.kind == "standard_clear" then
+            archive.standard_clear_counts = archive.standard_clear_counts or {}
+            archive.standard_clear_counts[difficulty] = (archive.standard_clear_counts[difficulty] or 0) + command.count
+        end
         for _, item in ipairs(achievements.rows) do
             if item.enabled and item.difficulty_id == difficulty
-                and archive.clear_counts[difficulty] >= item.required_count
+                and archive[key][difficulty] >= item.required_count
                 and not archive.completed[item.achievement_id] then
                 apply_effects(stats, item)
                 archive.completed[item.achievement_id] = true

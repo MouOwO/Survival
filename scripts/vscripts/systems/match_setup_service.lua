@@ -9,6 +9,8 @@ local mode_options = {
         description = "继承已有存档与永久加成；本局奖励正常获得并保存。" },
     { mode_id = "fishing", display_name = "摸鱼模式",
         description = "不选择难度、不生成波次，自动挂机；沿用常规档案并正常保存奖励。" },
+    { mode_id = "rich", display_name = "丰饶模式",
+        description = "沿用常规档案，丰饶模式难度通关进度独立保存。" },
 }
 
 local function resource(method, id)
@@ -33,9 +35,27 @@ end
 
 function M.get_session_id() return session_id end
 function M.get_mode() return mode_id end
-function M.get_profile_mode() return mode_id == "fishing" and "standard" or mode_id end
+function M.get_profile_mode() return (mode_id == "fishing" or mode_id == "rich") and "standard" or mode_id end
 function M.is_fishing_mode() return mode_id == "fishing" end
+function M.is_rich_mode() return mode_id == "rich" end
 function M.is_mode_selected() return mode_id ~= nil end
+
+local function rich_permission(id)
+    -- Entry authentication precedes profile loading. Never accept a client
+    -- unlock flag, a combat projection, or a previous account/session's save.
+    local ok, profiles = pcall(require, "systems/player_profile_service")
+    if not ok or type(profiles.get_authenticated_progression) ~= "function" then return false, true end
+    local valid, progress = pcall(profiles.get_authenticated_progression, id)
+    if not valid or type(progress) ~= "table" or progress.loaded ~= true then return false, true end
+    if type(progress.rich_clear_counts) ~= "table" then
+        return false, true, "丰饶模式服务尚未就绪"
+    end
+    local counts = progress.standard_clear_counts
+    if counts == nil then counts = progress.clear_counts end -- Existing authoritative historical progression.
+    local count = type(counts) == "table" and counts.n10 or nil
+    return type(count) == "number" and count > 0 and count < math.huge
+        and count == math.floor(count), false
+end
 
 function M.selector_player_id()
     local first = nil
@@ -66,12 +86,16 @@ function M.select_mode(id, requested, request_session)
         return { ok = false, error = "match_session_mismatch" }
     end
     if not M.is_selector(id) then return { ok = false, error = "selection_not_host" } end
-    if requested ~= "pure" and requested ~= "standard" and requested ~= "fishing" then
+    if requested ~= "pure" and requested ~= "standard" and requested ~= "fishing" and requested ~= "rich" then
         return { ok = false, error = "mode_not_found" }
     end
     if mode_id ~= nil then
         return { ok = requested == mode_id, mode_id = mode_id,
             error = requested ~= mode_id and "mode_locked" or nil }
+    end
+    if requested == "rich" then
+        local unlocked, pending = rich_permission(tonumber(id))
+        if not unlocked then return { ok = false, error = pending and "rich_progression_pending" or "rich_mode_locked" } end
     end
     mode_id, selected_by = requested, tonumber(id)
     return { ok = true, mode_id = mode_id }
@@ -82,6 +106,12 @@ function M.snapshot()
     for _, row in ipairs(mode_options) do
         options[#options + 1] = { mode_id = row.mode_id, display_name = row.display_name,
             description = row.description }
+        if row.mode_id == "rich" then
+            local unlocked, pending, hint = rich_permission(M.selector_player_id())
+            options[#options].unlocked = unlocked and 1 or 0
+            options[#options].pending = pending and 1 or 0
+            options[#options].unlock_hint = hint or "常规模式N10通关后解锁"
+        end
     end
     return { mode_selected = M.is_mode_selected(), mode_id = mode_id or "",
         selector_player_id = M.selector_player_id(), mode_options = options }

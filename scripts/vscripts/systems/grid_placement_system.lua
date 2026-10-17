@@ -37,6 +37,18 @@ end
 
 local geometry = require("core/building_grid_geometry")
 local normalized_footprint = geometry.footprint
+local function rich_mode()
+    local setup = package.loaded["systems/match_setup_service"]
+    return setup and setup.get_mode and setup.get_mode() == "rich"
+end
+
+local function placement_policy(player_id, min_x, min_y, max_x, max_y)
+    if rich_mode() then
+        return require("systems/rich_region_service").validate_building_footprint(
+            player_id, min_x, min_y, max_x, max_y)
+    end
+    return region_service.validate_building_footprint(min_x, min_y, max_x, max_y)
+end
 
 local function cell_center(grid_x, grid_y, z)
     local size = number(config.cell_size, 128)
@@ -56,7 +68,11 @@ local function ground_height(position)
     return height
 end
 
-local function within_bounds(center)
+local function within_bounds(center, player_id)
+    if rich_mode() then
+        local half = number(config.cell_size, 64) * 0.5
+        return placement_policy(player_id, center.x-half, center.y-half, center.x+half, center.y+half)
+    end
     local bounds = config.build_bounds or {}
     local half = number(config.cell_size, 128) * 0.5
     return center.x - half >= number(bounds.min_x, -999999)
@@ -129,7 +145,7 @@ local function terrain_clear(center)
             or not blocked_ok or blocked ~= false then return false, "terrain_blocked" end
         local height = ground_height(sample)
         local build_height = number(config.build_ground_height, nil)
-        if build_height and math.abs(height - build_height)
+        if not rich_mode() and build_height and math.abs(height - build_height)
             > number(config.build_ground_height_tolerance, 0) then
             return false, "terrain_not_build_level"
         end
@@ -286,7 +302,7 @@ local function validate_cell(grid_x, grid_y, payload)
         reason = "",
     }
     if not payload.compact then result.corners = cell_corners(grid_x, grid_y) end
-    if not within_bounds(center) then
+    if not within_bounds(center, payload.player_id) then
         result.ok, result.reason = false, "build_out_of_bounds"
         return result
     end
@@ -329,7 +345,7 @@ local function can_place(payload)
     local world_position = Vector(world_x, world_y, 0)
     world_position.z = ground_height(world_position)
     local size = number(config.cell_size, 128)
-    local policy_ok, policy_error = region_service.validate_building_footprint(
+    local policy_ok, policy_error = placement_policy(payload.player_id,
         grid_x * size,
         grid_y * size,
         (grid_x + footprint.x) * size,
@@ -488,6 +504,9 @@ end
 -- Map terrain only. Run once at startup; never include units or occupancy.
 -- This job is independent of mouse movement and preview cancellation.
 function M.static_preview(payload)
+    -- The ordinary island cache is built before mode selection. Rich courts
+    -- use each player's local incremental scan at their own ground height.
+    if rich_mode() then return "" end
     local b=config.build_bounds
     if not b then return "" end
     local size=number(config.cell_size,64)
@@ -527,7 +546,8 @@ function M.preview_area(payload)
     local display_size = size * stride
     -- A single construction plane avoids overlapping projected tiles on cliffs.
     -- Terrain validation below still uses each underlying cell's actual height.
-    local display_height = math.floor(number(config.build_ground_height, ground_height(position)))
+    local display_height = math.floor(rich_mode() and ground_height(position)
+        or number(config.build_ground_height, ground_height(position)))
     reconcile_occupied()
     local clock = type(Time) == "function" and Time or os.clock
     local now = GameRules and GameRules:GetGameTime() or 0
@@ -599,7 +619,7 @@ function M.preview_area(payload)
                 local entry = static_terrain[key] or cache[key]
                 -- Outside the legal construction rectangle is permanently red;
                 -- no terrain scan or TTL refresh is needed, including ocean.
-                if not within_bounds(cell_center(x*stride,y*stride,0)) then
+                if not within_bounds(cell_center(x*stride,y*stride,0), payload.player_id) then
                     entry = {clear=false,static=true,time=0}
                 end
                 if entry then states[index] = entry.clear and dynamic_clear(x,y) and 2 or 1 end
@@ -613,13 +633,13 @@ function M.preview_area(payload)
     local batch_start, batch_count = clock(), 0
     for wi, tile in ipairs(work) do
         local x,y = tile.x,tile.y
-        local clear = region_service.validate_building_footprint(
+        local clear = placement_policy(payload.player_id,
             x*display_size,y*display_size,(x+1)*display_size,(y+1)*display_size)
         for sx = 0,stride-1 do
             if not clear then break end
             for sy = 0,stride-1 do
                 local center = cell_center(x*stride+sx,y*stride+sy,0)
-                if not within_bounds(center) or forbidden_marker(center)
+                if not within_bounds(center, payload.player_id) or forbidden_marker(center)
                     or not terrain_clear(center) or has_tree(center) then clear = false; break end
             end
         end

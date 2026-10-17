@@ -284,6 +284,7 @@ local function initialize_ultimate(unit, player_id, team_number, selected, posit
     end
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = position,
+        player_id = state.player_id,
         footprint = state.footprint,
         ignore_entindexes = ignored_entindexes,
         ignore_entindex = replaced_entindex,
@@ -410,6 +411,7 @@ local function move_for_player(payload)
     end
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = position,
+        player_id = state.player_id,
         footprint = state.footprint,
         ignore_entindex = state.unit:entindex(),
         team = state.unit:GetTeamNumber(),
@@ -609,6 +611,7 @@ function M.teleport_for_player(player_id, hero)
         function(state, destination)
         local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
             position = destination,
+            player_id = state.player_id,
             footprint = state.footprint,
             ignore_entindex = valid(anchor) and anchor:entindex()
                 or state.unit:entindex(),

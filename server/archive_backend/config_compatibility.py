@@ -2,7 +2,7 @@
 import re
 
 UPGRADE_COMMANDS = frozenset({
-    'clear', 'boss_kill', 'endless', 'endless_reconcile', 'challenge',
+    'clear', 'standard_clear', 'rich_clear', 'boss_kill', 'endless', 'endless_reconcile', 'challenge',
     'social_draw', 'promotion', 'daily_init', 'daily_claim',
     'work_upgrade', 'building_upgrade', 'starjoy_reconcile',
     'welfare_reconcile', 'vip_claim', 'vip_purchase', 'title_equip',

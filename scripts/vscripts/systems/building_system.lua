@@ -719,6 +719,7 @@ local function can_place(payload, require_clear_builder)
     end
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = payload.position,
+        player_id = builder.player_id,
         footprint = definition.footprint,
         team = team,
         -- Preview/approach may overlap this authenticated builder only. At
@@ -1531,6 +1532,7 @@ function M.relocate_for_player(player_id, entindex, position)
     )
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = position,
+        player_id = state.player_id,
         footprint = state.definition.footprint,
         ignore_entindex = state.unit:entindex(),
     })

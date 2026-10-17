@@ -123,10 +123,16 @@ local function validate_progression(progression)
         or type(progression.clear_counts) ~= "table" or progression.clear_counts == json_decoder.null then
         return false
     end
-    for key, count in pairs(progression.clear_counts) do
-        local difficulty = tonumber(tostring(key):match("^n(%d+)$"))
-        if not difficulty or difficulty < 1 or difficulty > 20 or not integer(count)
-            or count == math.huge then return false end
+    for _, field in ipairs({"clear_counts", "standard_clear_counts", "rich_clear_counts"}) do
+        local counts = progression[field]
+        if counts ~= nil then
+            if type(counts) ~= "table" or counts == json_decoder.null then return false end
+            for key, count in pairs(counts) do
+                local difficulty = tonumber(tostring(key):match("^n(%d+)$"))
+                if not difficulty or difficulty < 1 or difficulty > 20 or not integer(count)
+                    or count == math.huge then return false end
+            end
+        end
     end
     return true
 end
@@ -617,6 +623,13 @@ function M.get_authenticated_progression(player_id)
     return nil
 end
 
+function M.supports_rich_mode(player_id)
+    -- Capability comes from the authenticated server receipt, scoped to the
+    -- current player/account/session. Old backends omit this map entirely.
+    local progression = M.get_authenticated_progression(player_id)
+    return progression ~= nil and type(progression.rich_clear_counts) == "table"
+end
+
 local function fetch_player(player_id, reason, on_success, on_error, preserve_loaded)
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then
@@ -914,12 +927,19 @@ end
 
 function M.get_progression(player_id)
     local profile = M.get_profile(player_id)
-    if not profile then return M.get_authenticated_progression(player_id) end
-    if profile.progression then return copy(profile.progression) end
-    if injected_provider then
-        return { loaded = true, clear_counts = copy(profile.save.archive and profile.save.archive.clear_counts or {}) }
+    local result = not profile and M.get_authenticated_progression(player_id)
+        or profile and profile.progression and copy(profile.progression) or nil
+    if not result and profile and injected_provider then
+        local archive = profile.save.archive or {}
+        result = { loaded = true, clear_counts = copy(archive.clear_counts or {}),
+            standard_clear_counts = copy(archive.standard_clear_counts or {}),
+            rich_clear_counts = copy(archive.rich_clear_counts or {}) }
     end
-    return nil
+    local setup = require("systems/match_setup_service")
+    if result and setup.get_mode() == "rich" then
+        result.clear_counts = copy(result.rich_clear_counts or {})
+    end
+    return result
 end
 
 -- Readiness checks run on player orders; avoid copying the private save for a

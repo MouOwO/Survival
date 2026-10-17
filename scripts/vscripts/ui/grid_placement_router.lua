@@ -47,7 +47,7 @@ local function preview_area(player_id, caster, position, profile, session_id)
     local started, batches, max_batch_ms = perf_clock(), 0, 0
     state.job = coroutine.create(function()
         return require("systems/grid_placement_system").preview_area({
-            position = position, team = team, ignore_entindex = caster_index, yield_after = 128,
+            position = position, player_id = player_id, team = team, ignore_entindex = caster_index, yield_after = 128,
             time_budget = 0.002, terrain_cache = preview_terrain_caches[player_id],
         })
     end)
@@ -312,6 +312,7 @@ local function validate_preview(player_id, payload, profile, position)
     }) or { ok = false, error = "build_validation_failed" }
     local geometry = business.grid or (business.world_position and business)
         or event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
+        player_id = player_id,
         position = position,
         footprint = {
             x = profile.footprint_x,
@@ -326,24 +327,34 @@ local function validate_preview(player_id, payload, profile, position)
     return caster, business, geometry
 end
 
+local function send_profiles(player_id)
+    local bounds, height = grid_config.build_bounds, tonumber(grid_config.build_ground_height) or 0
+    local setup = package.loaded["systems/match_setup_service"]
+    local rich = setup and setup.get_mode and setup.get_mode() == "rich"
+    if rich then
+        local region = require("systems/rich_region_service").region(player_id)
+        if region then
+            bounds = {min_x=region.min_x*64,min_y=region.min_y*64,
+                max_x=(region.max_x+1)*64,max_y=(region.max_y+1)*64}
+            height = region.position.z
+        end
+    end
+    send(player_id, "ui_grid_placement_profiles", {
+        profiles = profile_list(), cell_size = tonumber(grid_config.cell_size) or 64,
+        preview_visual = grid_config.preview_visual or {},
+        static_grid = {bounds=grid_config.grid_display_bounds or bounds,
+            build_bounds=bounds,height=height}, version = "GridPlacement_V3_StaticWhiteGrid",
+    })
+    if not rich and static_area~="" then send(player_id,"ui_grid_placement_static_area",{area=static_area}) end
+end
+
 local function register_profile_request()
     CustomGameEventManager:RegisterListener(
         "ui_grid_placement_profiles_request",
         function(_, payload)
             local player_id = source_player_id(payload)
             if player_id~=nil then static_area_players[player_id]=true end
-            send(player_id, "ui_grid_placement_profiles", {
-                profiles = profile_list(),
-                cell_size = tonumber(grid_config.cell_size) or 64,
-                preview_visual = grid_config.preview_visual or {},
-                -- Fixed white geometry; independent of cursor scans and
-                -- advisory red/green occupancy packets.
-                static_grid = {bounds=grid_config.grid_display_bounds or grid_config.build_bounds,
-                    build_bounds=grid_config.build_bounds,
-                    height=tonumber(grid_config.build_ground_height) or 0},
-                version = "GridPlacement_V3_StaticWhiteGrid",
-            })
-            if static_area~="" then send(player_id,"ui_grid_placement_static_area",{area=static_area}) end
+            send_profiles(player_id)
         end
     )
 end
@@ -615,6 +626,14 @@ function M.init()
         destroy_preview(tonumber(payload.player_id))
     end)
     build_profiles()
+    event_bus.subscribe(events.BUILDER_READY, function(payload)
+        local setup = package.loaded["systems/match_setup_service"]
+        if setup and setup.get_mode and setup.get_mode() == "rich" then
+            scheduler.cancel("grid_static_terrain")
+            static_area = ""
+            send_profiles(tonumber(payload.player_id))
+        end
+    end)
     register_profile_request()
     register_preview_pose()
     register_validation_request()

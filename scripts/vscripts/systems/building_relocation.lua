@@ -15,6 +15,7 @@ function building_system.validate(unit, position)
     if not state then return nil, "building_state_not_found" end
     local grid = event_bus.request(events.GRID_CAN_PLACE_REQUEST, {
         position = position,
+        player_id = state.player_id,
         footprint = state.definition.footprint,
         ignore_entindex = unit:entindex(),
         team = state.team,

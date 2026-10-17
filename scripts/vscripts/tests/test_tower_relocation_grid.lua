@@ -32,6 +32,7 @@ end)
 bus.handle_request(events.TOWER_FUSION_MOVE_REQUEST,function(p) moved[#moved+1]=p; return {ok=true} end)
 bus.handle_request(events.GRID_CAN_PLACE_REQUEST,function(p)
     grid_calls=grid_calls+1
+    assert(p.player_id==0,"relocation grid inherits the authenticated owner after resolve")
     assert(p.ignore_entindex==10 or p.ignore_entindex==12)
     assert(p.ignore_entindexes==nil and p.team==2 and p.footprint.x==2)
     return {ok=not blocked,error=blocked and "build_cell_occupied" or nil,

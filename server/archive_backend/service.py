@@ -18,6 +18,8 @@ FIELDS = {
     "commerce_catalog": set(),
     "commerce_purchase": {"sku", "request_id"},
     "clear": {"difficulty_id","count","day_key","cooperative_win"}, "boss_kill": set(),
+    "standard_clear": {"difficulty_id","count","day_key","cooperative_win"},
+    "rich_clear": {"difficulty_id","count","day_key","cooperative_win"},
     "endless": {"wave","difficulty"}, "endless_reconcile": set(), "starjoy_reconcile": set(), "welfare_reconcile": set(),
     "challenge": {"challenge_id","kill_sequence","difficulty_id","day_key"},
     "social_draw": {"pool_id"}, "promotion": {"fragment_id","day_key"},
@@ -72,8 +74,9 @@ class ArchiveService:
             v=c.get(key)
             if isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or int(v)!=v or not lo<=v<=hi: raise ArchiveError("archive_number_invalid:"+key)
             c[key]=int(v)
-        if kind=="clear":
-            if c.get("count")!=1 or not re.fullmatch(r"n(?:[1-9]|1[0-9]|20)",str(c.get("difficulty_id"))): raise ArchiveError("archive_clear_invalid")
+        if kind in {"clear", "standard_clear", "rich_clear"}:
+            if type(c.get("count")) is not int or c["count"]!=1 or not re.fullmatch(r"n(?:[1-9]|1[0-9]|20)",str(c.get("difficulty_id"))): raise ArchiveError("archive_clear_invalid")
+            if kind == "rich_clear" and int(c["difficulty_id"][1:]) > 10: raise ArchiveError("archive_clear_invalid")
             if "cooperative_win" in c: integer("cooperative_win",0,1)
         if kind=="endless":
             integer("wave",1,1000);integer("difficulty",1,20)
@@ -160,6 +163,8 @@ class ArchiveService:
         kind = raw_command.get("kind") if isinstance(raw_command, dict) else None
         if not accepts(self.bundle, requested_hash, kind): return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
         command=self.validate(payload.get("command"))
+        from .match_modes import scope_clear
+        command=scope_clear(self,payload,command)
         if command['kind'] == 'commerce_catalog':
             profile = self.profile({'account_id': account})
             return self.settle(profile, command, False)
@@ -295,6 +300,8 @@ class ArchiveService:
         return projected
 
 def install(application,addon_root,lua):
+    from .match_modes import install as install_match_modes
+    install_match_modes()
     root=Path(addon_root)
     current=json.loads((root/"server/bundles/current.json").read_text(encoding="utf-8"))
     service=ArchiveService(application,Bundle(root/"server/bundles"/current["hash"]),lua)

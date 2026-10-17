@@ -31,7 +31,7 @@ assert(setup.select_mode(2, "pure", "match-one").error == "selection_not_host")
 local snapshot = setup.snapshot()
 snapshot.mode_options[1].display_name = "tampered"
 assert(setup.snapshot().mode_options[1].display_name == "纯净模式")
-assert(#setup.snapshot().mode_options == 3)
+assert(#setup.snapshot().mode_options == 4)
 assert(setup.snapshot().mode_options[3].mode_id == "fishing"
     and setup.snapshot().mode_options[3].display_name == "摸鱼模式")
 setup.init("fishing-match")
@@ -47,6 +47,35 @@ assert(setup.select_mode(1, "standard", "fishing-match").error == "mode_locked")
 setup.init("standard-match")
 assert(setup.select_mode(1, "standard", "standard-match").ok)
 assert(setup.get_profile_mode() == "standard" and not setup.is_fishing_mode())
+local progress
+package.loaded["systems/player_profile_service"] = {
+    get_authenticated_progression = function(id) assert(id == 1); return progress end,
+}
+setup.init("rich-match")
+assert(setup.snapshot().mode_options[4].mode_id == "rich")
+assert(setup.snapshot().mode_options[4].pending == 1)
+assert(setup.select_mode(1, "rich", "rich-match").error == "rich_progression_pending")
+progress = {loaded=true,clear_counts={n10=99}}
+assert(setup.snapshot().mode_options[4].pending == 1)
+assert(setup.snapshot().mode_options[4].unlock_hint:find("服务尚未就绪",1,true))
+assert(setup.select_mode(1,"rich","rich-match").error=="rich_progression_pending",
+    "old backend capability cannot be inferred from a standard N10 alone")
+progress = {loaded=true,clear_counts={n10=99},standard_clear_counts={},rich_clear_counts={}}
+assert(setup.snapshot().mode_options[4].unlocked == 0)
+assert(setup.select_mode(1, "rich", "rich-match").error == "rich_mode_locked",
+    "an explicit empty provenance map prevents historical mixed-counter fallback")
+for _, invalid in ipairs({true,"1",-1,0,0.5,math.huge}) do
+    progress.standard_clear_counts.n10 = invalid
+    assert(setup.select_mode(1, "rich", "rich-match").error == "rich_mode_locked")
+end
+progress = {loaded=true,clear_counts={n10=1},rich_clear_counts={}}
+assert(setup.snapshot().mode_options[4].unlocked == 1,
+    "existing authoritative pre-mode history remains eligible")
+assert(setup.select_mode(1, "rich", "rich-match").ok)
+assert(setup.is_rich_mode() and setup.get_mode() == "rich" and setup.get_profile_mode() == "standard")
+assert(setup.select_mode(1, "rich", "rich-match").ok)
+assert(setup.select_mode(1, "standard", "rich-match").error == "mode_locked")
+package.loaded["systems/player_profile_service"] = nil
 setup.init("match-two")
 assert(not setup.is_mode_selected() and setup.get_session_id() == "match-two")
 assert(setup.get_profile_mode() == nil and not setup.is_fishing_mode(), "new sessions clear both gameplay and profile modes")

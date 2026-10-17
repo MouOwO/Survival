@@ -25,12 +25,12 @@ local function publish_selection(player_id, unit, spawn)
             entindex = unit:entindex(),
             reason = "builder_ready",
         })
-        if spawn and spawn.mode == "fishing" then
+        if spawn and (spawn.mode == "fishing" or spawn.mode == "rich") then
             -- One existing, non-locking camera jump to the visible builder;
             -- the native hero remains an isolated engine placeholder.
             local position = unit:GetAbsOrigin()
             CustomGameEventManager:Send_ServerToPlayer(player, "ui_camera_follow_hero", {
-                entindex = unit:entindex(), reason = "fishing_ready",
+                entindex = unit:entindex(), reason = spawn.mode .. "_ready",
                 target_x = position.x, target_y = position.y, target_z = position.z,
             })
         end
@@ -109,7 +109,7 @@ local function create_builder(payload)
         error("failed to register builder owner: " .. tostring(register_error))
     end
     presentation.apply(builder, config)
-    if spawn.mode == "fishing" then
+    if spawn.mode == "fishing" or spawn.mode == "rich" then
         -- The landing was already grounded and checked in its own player
         -- patch. This hull-free builder need not be displaced by clear-space.
         builder:SetAbsOrigin(position)
@@ -119,6 +119,17 @@ local function create_builder(payload)
     end
 
     builder_by_player[player_id] = builder
+    if spawn.mode == "rich" then
+        local attached, boundary_error = require("systems/rich_region_service").attach_builder(
+            player_id, builder, spawn.slot_id)
+        if not attached then
+            builder_by_player[player_id], initialized_player[player_id] = nil, nil
+            player_context.unregister_unit(builder)
+            if UTIL_Remove then UTIL_Remove(builder) end
+            print("[BUILDER_READY] rejected rich boundary=" .. tostring(boundary_error))
+            return
+        end
+    end
     publish_identity(player_id, builder)
 
     local ready = {
@@ -194,6 +205,7 @@ local function on_player_disconnected(payload)
     if player_id == nil then return end
     builder_by_player[player_id] = nil
     initialized_player[player_id] = nil
+    require("systems/rich_region_service").detach_builder(player_id, builder)
     if valid_entity(builder) then
         presentation.clear(builder)
         player_context.unregister_unit(builder)

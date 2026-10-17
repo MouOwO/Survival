@@ -91,6 +91,7 @@
 .MatchModeOption:hover, .MatchModeOption.UISelected { border-color: #edcd8a; brightness: 1.12; }
 .MatchModeOptionName { width: 100%; vertical-align: center; text-align: center; font-size: 22px; color: #f2d59b; margin: 0px; }
 .MatchModeOption:disabled, .MatchModeOption.UIDisabled { opacity: 0.42; brightness: 1; }
+.MatchModeOption.MatchModeOptionLocked { saturation: 0; border-color: #776b80; }
 .MatchModeOption.UISelected.UIBusy
 {
     opacity: 1; brightness: 1; border-color: #f0ce85;

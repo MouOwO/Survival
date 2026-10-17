@@ -10,7 +10,7 @@ end
 package.loaded["core/event_bus"] = {request = function() return {ok = true} end}
 package.loaded["core/events"] = {GRID_CAN_PLACE_REQUEST = "can_place"}
 local placement = require("systems/archive_hub_placement")
-local markers, walls, marker_lookups, portal_lookups, nav_queries
+local markers, walls, marker_lookups, portal_lookups, nav_queries, grid_owners
 local rule = {building_anchor = "player_wall", building_spacing = 240, building_offset_y = 360}
 local context = {slot = function(id) return {builder_spawn_marker = "player_" .. id .. "_builder_spawn"} end}
 local wave = {get_player_spawn_marker = function(id)
@@ -19,9 +19,14 @@ local wave = {get_player_spawn_marker = function(id)
 end}
 local function reset()
     markers, walls, marker_lookups = {}, {}, {}
+    grid_owners = {}
     portal_lookups, nav_queries = 0, 0
     rule.building_anchor = "player_wall"
-    package.loaded["core/event_bus"].request = function() return {ok = true} end
+    package.loaded["core/event_bus"].request = function(_,payload)
+        assert(type(payload.player_id)=="number","hub checks retain their actual player context")
+        grid_owners[#grid_owners+1]=payload.player_id
+        return {ok = true}
+    end
     package.loaded["systems/building_system"] = {wall_for_player = function(id) return walls[id] end}
     Entities = {FindByName = function(_, _, name)
         marker_lookups[#marker_lookups + 1] = name
@@ -49,6 +54,8 @@ for id = 0, 3 do
     end
 end
 assert(portal_lookups == 0 and #marker_lookups == 0)
+assert(#grid_owners==12)
+for index,id in ipairs(grid_owners) do assert(id==math.floor((index-1)/3),"hub grid must not borrow another player's area") end
 
 -- A removed, unbuilt, or missing wall can use only this player's builder
 -- lawn. No other player's marker can become a fallback.

@@ -156,7 +156,10 @@ city.survival_grid_x, city.survival_grid_y = 16, 16
 city.survival_grid_footprint = config.main_city.footprint
 building.init(); upgrade.init()
 bus.handle_request(events.BUILDER_GET_REQUEST, function() return {ok = true, builder = builder, player_id = 0} end)
+local grid_owner_queries = 0
 bus.handle_request(events.GRID_CAN_PLACE_REQUEST, function(payload)
+    assert(payload.player_id==0,"construction/relocation grid receives the validated owner")
+    grid_owner_queries = grid_owner_queries + 1
     return {ok = true, grid_x = 0, grid_y = 0, world_position = payload.position}
 end)
 bus.handle_request(events.GRID_OCCUPY_REQUEST, function() return {ok = true} end)
@@ -322,3 +325,20 @@ local granted_upgrade = pending; pending = nil; granted_upgrade.options.on_compl
 assert(tower:GetAttackRange() == base_range + 500, "a later successful upgrade retains the bonus")
 assert(tower:GetAcquisitionRange() == 0)
 print("ROGUE_TOWER_RANGE_PASS: real grant, existing/new towers, native callback, extended target orders, display, ownership and idempotent retry")
+-- Exercise the actual building entry point; unrelated movement is covered by
+-- test_tower_visual_relocation. A rejected owner must never reach grid checks.
+local original_relocate, moves = building.relocate_building, 0
+building.relocate_building=function(unit) assert(unit==tower);moves=moves+1;return true end
+bus.handle_request(events.GRID_CAN_PLACE_REQUEST,function(payload)
+    assert(payload.player_id==0,"building move keeps its registered owner")
+    grid_owner_queries=grid_owner_queries+1
+    return {ok=true,grid_x=1,grid_y=1,world_position=payload.position}
+end)
+tower.abilities.ability_building_blink={IsNull=function() return false end,
+    IsHidden=function() return false end,IsActivated=function() return true end}
+assert(building.relocate_for_player(0,tower:entindex(),Vector(64,64,0)))
+local queries_after_move=grid_owner_queries
+assert(not building.relocate_for_player(1,tower:entindex(),Vector(128,128,0)))
+assert(grid_owner_queries==queries_after_move and moves==1)
+building.relocate_building=original_relocate
+print("BUILDING_GRID_OWNER_PASS: registered builder and building owner, cross-owner request stops before grid")

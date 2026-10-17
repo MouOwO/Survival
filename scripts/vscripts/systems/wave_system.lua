@@ -360,6 +360,15 @@ end
 local function configured_wave_channel(player_id)
     local slot = player_context.slot(player_id)
     local marker_name = tostring(slot and slot.wave_spawn_marker or "")
+    local setup = package.loaded["systems/match_setup_service"]
+    if setup and setup.get_mode and setup.get_mode() == "rich" then
+        marker_name = "rich_start"
+        local position, reason = require("systems/rich_region_service").wave_spawn(player_id)
+        if not position then
+            print("[MonsterSpawnMarker] rich player=" .. tostring(player_id) .. " error=" .. tostring(reason))
+            return nil
+        end
+    end
     if marker_name == "" or not Entities or not Entities.FindByName then return nil end
     local ok, marker = pcall(Entities.FindByName, Entities, nil, marker_name)
     if not ok or not valid(marker) then

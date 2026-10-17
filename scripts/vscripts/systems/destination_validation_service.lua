@@ -2,6 +2,11 @@ local regions = require("systems/forbidden_region_service")
 
 local M = {}
 
+local function rich_mode()
+    local setup = package.loaded["systems/match_setup_service"]
+    return setup and setup.get_mode and setup.get_mode() == "rich"
+end
+
 local function constrained_hero(unit)
     return unit and not unit:IsNull() and unit.survival_hero_id ~= nil
 end
@@ -27,7 +32,7 @@ end
 function M.validate(position, unit)
     local valid, reason = navigation_valid(position)
     if not valid then return false, reason end
-    if constrained_hero(unit) then
+    if constrained_hero(unit) and not rich_mode() then
         return regions.validate_hero_position(position)
     end
     return true, nil
@@ -36,6 +41,7 @@ end
 function M.validate_hero_position(position)
     local valid, reason = navigation_valid(position)
     if not valid then return false, reason end
+    if rich_mode() then return true, nil end
     return regions.validate_hero_position(position)
 end
 

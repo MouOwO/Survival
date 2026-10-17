@@ -52,6 +52,7 @@ function M.validate(player_id, entindex, position, ability_entindex, ignore_cool
         end
     end
     local grid = bus.request(events.GRID_CAN_PLACE_REQUEST, {
+        player_id=tonumber(player_id),
         position=position, footprint=resolved.footprint,
         ignore_entindex=resolved.unit:entindex(), team=resolved.unit:GetTeamNumber(),
     }) or {ok=false, error="grid_validation_failed", cells={}}

@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "mode": {
+    "id": "rich",
+    "name": "丰饶模式",
+    "unlock": "authenticated standard N10 clear; historical authoritative clears retained",
+    "difficulties": "N1-N10; N1-N5 available; N6-N10 require previous rich difficulty clear",
+    "profile": "standard permanent bonuses; separate rich_clear_counts"
+  },
+  "map": {
+    "source_commit": "29bdd3f45f6037e2020f44f0517b646aa0fbcd67",
+    "source_sha256": "9989d6dbc2f4f3f00bd7c9afb494d3d41ae939e2600cfc2056099fccd7477d5f",
+    "anchor": "rich_start",
+    "players": [
+      "east",
+      "south",
+      "west",
+      "north"
+    ],
+    "native_usable_cells": [
+      1198,
+      1118,
+      1212,
+      1125
+    ],
+    "native_compile": {
+      "compiled": 301,
+      "failed": 0,
+      "package_crc_entries": 306
+    },
+    "minimap": "2048x2048 native generation"
+  },
+  "gameplay": {
+    "builder_guard_seconds": 0.1,
+    "regions": "native navigation components cached once; exact footprint membership",
+    "monsters": "existing standard difficulty wave counts and attributes; own inner court entrances",
+    "trees": "one ordinary progression resource tree per player court",
+    "heroes": "preserve live navigation; rich cities do not inherit the ordinary island whitelist"
+  },
+  "verification": {
+    "native_four_court_spawn": true,
+    "native_monster_path_to_court": true,
+    "native_4x4_placement": true,
+    "native_cross_region_build_rejected": true,
+    "native_cross_region_move_rejected": true,
+    "native_teleport_rollback": true,
+    "native_probe_account_writes": false
+  },
+  "backend": {
+    "deployed": false,
+    "migration": "server/aliyun/database/target/202610170001_rich_match_mode.sql",
+    "blocker": "current deployment SSH identity unavailable; no remote changes performed",
+    "old_server_behavior": "standard continues old clear protocol; rich remains disabled with service-not-ready hint",
+    "new_server_behavior": "capability from authenticated rich_clear_counts; durable rich session and scoped rich_clear",
+    "required_before_enable": "review current online release, apply migration and publish compatible backend/reducer bundle"
+  }
+}

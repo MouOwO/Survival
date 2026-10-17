@@ -525,7 +525,12 @@ end
 
 function M.record_clear(player_id, difficulty_id, cooperative_win)
     local difficulty = string.lower(tostring(difficulty_id or ""))
-    return enqueue(player_id, { id = session_id .. ":clear", kind = "clear",
+    local ok, setup = pcall(require, "systems/match_setup_service")
+    local mode = ok and type(setup.get_mode) == "function" and setup.get_mode() or nil
+    local rich_capability = type(profiles.supports_rich_mode) == "function" and profiles.supports_rich_mode(player_id)
+    local kind = mode == "rich" and "rich_clear"
+        or mode == "standard" and rich_capability and "standard_clear" or "clear"
+    return enqueue(player_id, { id = session_id .. ":" .. kind, kind = kind,
         difficulty_id = difficulty, count = 1, cooperative_win = cooperative_win == 1 and 1 or 0,
         day_key = tostring(require("systems/archive_calendar").day()) })
 end

@@ -21,12 +21,16 @@ local accounts = { [0] = "fixture-a", [1] = "fixture-b" }
 local database = { [accounts[0]] = empty_profile(accounts[0]), [accounts[1]] = empty_profile(accounts[1]) }
 local received, commits, tasks, cached = {}, 0, {}, {}
 local down, lose_next_response = false, false
+local mode, rich_capability = "pure", false
+package.loaded["systems/match_setup_service"] = {get_mode=function() return mode end}
 local provider = {
     archive_enabled = function() return true end,
     resolve_account_id = function(id) return accounts[id] end,
     archive_submit = function(payload, success, failure)
         received[#received + 1] = copy(payload)
-        assert(payload.command.kind == "clear" and payload.command.count == 1)
+        local expected = mode == "rich" and "rich_clear"
+            or mode == "standard" and rich_capability and "standard_clear" or "clear"
+        assert(payload.command.kind == expected and payload.command.count == 1)
         assert(type(payload.config_hash) == "string" and #payload.config_hash > 0)
         if down then failure("backend_unavailable", 503); return end
         local stored = assert(database[payload.account_id])
@@ -41,6 +45,7 @@ local provider = {
     end,
 }
 local profile_service = {
+    supports_rich_mode = function() return rich_capability end,
     get_provider = function() return provider end,
     get_account_profile = function(id) return copy(cached[id]) end,
     -- Pure mode has no previous-match archive bonuses in its gameplay view.
@@ -112,4 +117,23 @@ assert(database[accounts[0]].save.archive.clear_counts.n5 == 1)
 assert(database[accounts[0]].save.archive.clear_counts.n6 == 1)
 restart_match()
 assert(unlocked(0, "N7"), "second reload retains the acknowledged higher unlock")
+-- The game can ship before the backend: ordinary clears retain their exact
+-- old wire kind until an authenticated server capability is available.
+mode, rich_capability = "standard", false
+restart_match()
+bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N10"})
+assert(received[#received].command.kind=="clear")
+assert(database[accounts[0]].save.archive.clear_counts.n10==1,"old backend standard clear still persists")
+mode, rich_capability = "standard", true
+restart_match()
+bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N10"})
+assert(received[#received].command.kind=="standard_clear")
+assert(database[accounts[0]].save.archive.standard_clear_counts.n10==1)
+local ordinary_n5=database[accounts[0]].save.archive.clear_counts.n5
+mode="rich"
+restart_match()
+bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N5"})
+assert(received[#received].command.kind=="rich_clear")
+assert(database[accounts[0]].save.archive.rich_clear_counts.n5==1)
+assert(database[accounts[0]].save.archive.clear_counts.n5==ordinary_n5)
 print("PASS test_archive_difficulty_progression: offline HTTP adapter/reducer boundary")

@@ -30,7 +30,11 @@ local function request(path, payload, on_success, on_error)
     local body = {}
     for key, value in pairs(payload) do body[key] = value end
     body.match_session_id = session
-    if path == "/v1/session/login" then body.mode = profile_mode(setup) end
+    if path == "/v1/session/login" then
+        -- The durable session keeps the gameplay identity even though rich
+        -- combat/account projections use the ordinary standard profile.
+        body.mode = setup.get_mode() == "rich" and "rich" or profile_mode(setup)
+    end
     local token = convar("survival_fishing_api_token")
     if token == "" then on_error("fishing_api_token_missing") return end
     local http = CreateHTTPRequestScriptVM(
@@ -90,6 +94,9 @@ function M.fetch_snapshot(account_id, on_success, on_error)
     request(path, { account_id = tostring(account_id) }, function(snapshot)
         if snapshot.account_id ~= tostring(account_id) or snapshot.match_session_id ~= session
             or snapshot.mode ~= mode or setup.get_session_id() ~= session or profile_mode(setup) ~= mode then
+            on_error("match_profile_mismatch") return
+        end
+        if setup.get_mode() == "rich" and snapshot.game_mode ~= "rich" then
             on_error("match_profile_mismatch") return
         end
         logged_in[tostring(account_id)] = session

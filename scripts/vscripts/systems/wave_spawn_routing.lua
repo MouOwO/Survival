@@ -53,6 +53,23 @@ function M.side_for(position, center)
 end
 
 function M.refresh(channels, wall_by_player, hull_multiplier)
+    local setup = package.loaded["systems/match_setup_service"]
+    if setup and setup.get_mode and setup.get_mode() == "rich" then
+        local rich_regions = require("systems/rich_region_service")
+        for player_id, channel in pairs(channels) do
+            local position, reason = rich_regions.wave_spawn(player_id)
+            local center = origin(channel.marker)
+            channel.spawn_offset_x, channel.spawn_offset_y = 0, 0
+            if position and center then
+                channel.spawn_offset_x = position.x - center.x
+                channel.spawn_offset_y = position.y - center.y
+                channel.route_error = nil
+            else
+                channel.marker, channel.route_error = nil, reason or "rich_wave_spawn_missing"
+            end
+        end
+        return
+    end
     local portals, center = layout()
     local groups = {}
     for player_id, channel in pairs(channels) do
