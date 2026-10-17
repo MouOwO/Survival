@@ -67,7 +67,7 @@
     opacity:1; saturation:1; brightness:1;
 }
 #HandoffNav_vip .VIPStatusBadge {
-    position:0px 0px 0px; width:60px; height:52px;
+    position:0px 0px 0px; width:60px; height:60px;
     margin:0px; padding:0px; flow-children:none; overflow:noclip;
     background-color:transparent; background-image:none; border:0px; box-shadow:none;
 }
@@ -85,10 +85,11 @@
     text-overflow:shrink; text-shadow:#000000 0px 1px 2px 2.0; z-index:2;
 }
 #HandoffNav_vip .VIPStatusWord {
-    position:0px 12px 0px; width:40px; height:30px; font-size:23px; text-align:left;
+    position:2px -2px 0px; width:56px; height:56px;
+    wash-color:#999999;
 }
 #HandoffNav_vip .VIPStatusLevel {
-    position:40px 13px 0px; width:20px; height:28px; font-size:20px; text-align:left;
+    position:35px 37px 0px; width:25px; height:23px; font-size:20px; text-align:right;
 }
 #HandoffNav_vip .VIPStatusMote {
     width:2px; height:2px; margin:0px; padding:0px; border:0px; border-radius:50%;
@@ -100,10 +101,9 @@
 #HandoffNav_vip .VIPStatusMoteA { animation-name:VIPStatusDriftA; }
 #HandoffNav_vip .VIPStatusMoteB { animation-name:VIPStatusDriftB; }
 #HandoffNav_vip .VIPStatusMoteC { animation-name:VIPStatusDriftC; }
-#HandoffNav_vip .VIPStatusBadge.VIPStatusUnknown .VIPStatusWord,
-#HandoffNav_vip .VIPStatusBadge.VIPStatusUnknown .VIPStatusLevel { color:#929991; }
-#HandoffNav_vip .VIPStatusBadge.VIPStatusUnknown .VIPStatusAura,
-#HandoffNav_vip .VIPStatusBadge.VIPStatusUnknown .VIPStatusMote { visibility:collapse; animation-name:none; }
+#HandoffNav_vip .VIPStatusBadge.VIPStatusLocked .VIPStatusLevel { visibility:collapse; }
+#HandoffNav_vip .VIPStatusBadge.VIPStatusLocked .VIPStatusAura,
+#HandoffNav_vip .VIPStatusBadge.VIPStatusLocked .VIPStatusMote { visibility:collapse; animation-name:none; }
 /* Preserve each particle's server-level opacity; only its position animates. */
 @keyframes 'VIPStatusDriftA' {
     0% { transform:translate3d(0px,0px,0px); }

@@ -16,11 +16,25 @@
     function hex(value){var text=Math.round(value).toString(16);return text.length===1?"0"+text:text;}
     function appearance(value){
         var n=level(value)||0;
-        if(!n)return {level:0,color:"#9aabb0",particleCount:0,intensity:0,duration:5};
+        if(!n)return {level:0,color:"#999999",particleCount:0,intensity:0,duration:5};
         // Equal steps in hue keep intermediate ranks bright yellow and orange.
         var hue=120*(12-n)/11,x=150*(1-Math.abs(hue/60%2-1)),t=(n-1)/11;
         return {level:n,color:"#"+hex(90+(hue>=60?x:150))+hex(90+(hue>=60?150:x))+hex(90),
             particleCount:n+2,intensity:0.35+0.65*t,duration:5-2.4*t};
+    }
+    function unlockRules(){
+        var catalog=cfg.VIPRewardCatalog,rows=catalog&&catalog.recharge_levels||[];
+        var desired=known&&current>0?current+1:1,threshold=null;
+        rows.some(function(row){
+            var fen=Number(row&&row.required_recharge_fen);
+            if(Number(row&&row.level)!==desired||!isFinite(fen)||fen<=0)return false;
+            threshold=fen/100;return true;
+        });
+        var lines=["VIP 解锁规则"];
+        if(known&&current>0)lines.push("当前 VIP"+current+(current===12?"，已达最高等级。":"。"));
+        if(threshold!==null)lines.push("累计实付充值满 "+threshold+" 元"+(desired===1?"即可解锁 ":"可提升至 ")+"VIP"+desired+"。");
+        lines.push("VIP 等级随累计实付充值提升，消费不降级。");
+        return lines.join("<br>");
     }
     function hideWindow(){
         if(!valid(context))return;
@@ -46,11 +60,13 @@
         }
         var badge=button.__survivalVIPStatus;
         if(!badge||!valid(badge.host)){
-            button.enabled=false;button.hittest=false;button.hittestchildren=false;
+            button.enabled=true;button.hittest=true;button.hittestchildren=false;
             button.SetPanelEvent("onactivate",function(){});button.RemoveClass("HandoffNavActive");
             var host=make("Panel",button,"HandoffVIPStatus","VIPStatusBadge");
             var aura=make("Panel",host,"HandoffVIPAura","VIPStatusAura");
-            var word=make("Label",host,"HandoffVIPWord","VIPStatusWord");word.text="VIP";
+            var word=make("Image",host,"HandoffVIPWord","VIPStatusWord");
+            word.SetImage("file://{images}/custom_game/topnav_reference_v2/vip_status.svg");
+            if(word.SetScaling)word.SetScaling("stretch-to-fit-preserve-aspect");
             var numeral=make("Label",host,"HandoffVIPLevel","VIPStatusLevel");
             var motes=[];
             positions.forEach(function(at,index){
@@ -71,16 +87,18 @@
             function box(panel,x,y,w,h){panel.style.position=pixels(x)+" "+pixels(y)+" 0px";panel.style.width=pixels(w);panel.style.height=pixels(h);}
             // Match the navigation's native pixel layout, keeping text crisp at
             // small resolutions instead of shrinking an already-rasterized label.
-            box(badge.host,0,0,60,52);box(badge.aura,-3,5,66,42);
-            box(badge.word,0,12,40,30);box(badge.number,40,13,20,28);
-            badge.word.style.fontSize=pixels(23);badge.number.style.fontSize=pixels(20);
+            box(badge.host,0,0,60,60);box(badge.aura,-3,5,66,42);
+            box(badge.word,2,-2,56,56);box(badge.number,35,37,25,23);
+            badge.number.style.fontSize=pixels(20);
             badge.motes.forEach(function(mote,index){mote.style.position=pixels(positions[index][0])+" "+pixels(positions[index][1])+" 0px";});
             badge.scale=scaleText;
         }
         [parts.icon,parts.caption,parts.glow].forEach(function(panel){if(valid(panel))panel.visible=false;});
-        badge.word.style.color=badge.number.style.color=view.color;
-        badge.number.text=known?String(current):"—";
+        badge.word.style.washColor=badge.number.style.color=view.color;
+        badge.number.text=known&&current>0?String(current):"";
+        badge.number.visible=known&&current>0;
         badge.host.SetHasClass("VIPStatusKnown",known);
+        badge.host.SetHasClass("VIPStatusLocked",!known||current===0);
         badge.aura.visible=view.level>0;
         badge.aura.style.backgroundColor="gradient(radial, 50% 50%, 0% 0%, 50% 50%, from("+view.color+"55), to("+view.color+"00))";
         badge.aura.style.opacity=(view.intensity*0.75).toFixed(3);
@@ -113,7 +131,7 @@
         });
         subscription=null;hosts=[];
     }
-    cfg.SurvivalVIPStatus={Render:render,Appearance:appearance,
+    cfg.SurvivalVIPStatus={Render:render,Appearance:appearance,UnlockRules:unlockRules,
         Inspect:function(){var view=appearance(known?current:0);return {known:known,level:known?current:null,
             color:view.color,particleCount:view.particleCount,intensity:view.intensity};},Dispose:dispose};
     // Retired window callers and old Tools shortcuts cannot reopen the page.

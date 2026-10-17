@@ -225,7 +225,20 @@
         return nodes[id];
     }
     function text(id,value) {var p=nodes[id];if(p&&p.text!==String(value))p.text=String(value);}
-    function tooltip(p,value) {p.SetPanelEvent("onmouseover",function(){var content=typeof value==="function"?value():value;cfg.HandoffLastTooltip={id:p.id,text:content};$.DispatchEvent("DOTAShowTextTooltip",p,content);});p.SetPanelEvent("onmouseout",function(){$.DispatchEvent("DOTAHideTextTooltip");});}
+    function tooltip(p,value) {
+        p.SetPanelEvent("onmouseover",function(){
+            var content=typeof value==="function"?value():value;
+            cfg.HandoffLastTooltip={id:p.id,text:content};
+            var position=cfg.SurvivalTooltipPosition;
+            if(position&&position.ShowText)position.ShowText(p,content);
+            else $.DispatchEvent("DOTAShowTextTooltip",p,content);
+        });
+        p.SetPanelEvent("onmouseout",function(){
+            var position=cfg.SurvivalTooltipPosition;
+            if(position&&position.HideText)position.HideText(p);
+            else $.DispatchEvent("DOTAHideTextTooltip");
+        });
+    }
     function notice(value) {var serial=++noticeSerial;text("HandoffNotice",value);nodes.HandoffNotice.visible=true;$.Schedule(4,function(){if(valid(host)&&serial===noticeSerial)nodes.HandoffNotice.visible=false;});}
     function blocked() {return cfg.SurvivalUILayers && cfg.SurvivalUILayers.Top();}
     function forward(id) {var p=native(id);if(!valid(p))return false;$.DispatchEvent("Activated",p,"mouse");return true;}
@@ -272,10 +285,13 @@
         b.__glow=halo;b.__underline=underline;
         b.SetPanelEvent("onactivate",function(){activate(a[0]);});
         if(a[0]==="vip"){
-            b.enabled=false;b.hittest=false;b.hittestchildren=false;
+            b.enabled=true;b.hittest=true;b.hittestchildren=false;
+            icon.SetImage("file://{images}/custom_game/topnav_reference_v2/vip_locked.svg");
         }
         topButtons[a[0]]=b;
     });
+    tooltip(topButtons.vip,function(){return cfg.SurvivalVIPStatus&&cfg.SurvivalVIPStatus.UnlockRules
+        ?cfg.SurvivalVIPStatus.UnlockRules():"VIP 等级随累计实付充值提升，消费不降级。";});
     // One open window at a time, so the highlight is a single owner, not a list.
     var navWindowIds={treasure:"treasure",archive:"archive",lottery:"lottery",benefit:"benefit",
         shop:"shop",survival_shop:"survival_shop"};
@@ -1310,6 +1326,7 @@
         var availability={};
         Object.keys(topButtons).forEach(function(id){
             var button=topButtons[id],enabled=availability[id]=!!available(id);
+            if(id==="vip")enabled=true; // Hover-only status; activation stays inert.
             var changed=button.__handoffEnabled!==enabled;
             if(changed){button.enabled=enabled;button.__handoffEnabled=enabled;}
             if(id==="survival_shop"&&(changed||repaint))style(button,{saturation:enabled?"1":"0",opacity:enabled?"1":"0.4"});

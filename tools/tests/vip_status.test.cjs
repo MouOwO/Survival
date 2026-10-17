@@ -97,7 +97,7 @@ function harness() {
             CancelScheduled(id) { timers.delete(id); }, RegisterEventHandler() {}, Msg() {},
             Warning(message) { warnings.push(String(message)); }, DispatchEvent(...args) { dispatched.push(args); }, Localize: value => value}
     });
-    function load(name) { vm.runInContext(fs.readFileSync(path.join(scripts, name), 'utf8'), env, {filename: name}); }
+    function load(name, sourcePath) { vm.runInContext(fs.readFileSync(sourcePath || path.join(scripts, name), 'utf8'), env, {filename: sourcePath || name}); }
     function advance(ms) {
         const until = now + ms; let work = 0;
         while (true) {
@@ -133,6 +133,10 @@ function descendants(panel) { return panel.children.flatMap(child => [child, ...
 function statusLabels(button) { return descendants(button).filter(p => p.paneltype === 'Label').map(p => p.text); }
 function vipRequests(h) { return h.sent.filter(event => event.name === 'survival_vip_request'); }
 function assertReadOnly(h) { assert(vipRequests(h).every(event => event.payload.action === 'view'), 'VIP status can only request a read-only snapshot'); }
+function hoverable(button) {
+    assert.equal(button.enabled, true); assert.equal(button.hittest, true); assert.equal(button.hittestchildren, false);
+    assert.equal(typeof button.events.onmouseover, 'function'); assert.equal(typeof button.events.onmouseout, 'function');
+}
 function actualBadge(button) {
     const children = descendants(button), hosts = children.filter(p => p.BHasClass('VIPStatusBadge'));
     assert.equal(hosts.length, 1, 'each navigation entry has exactly one actual badge');
@@ -140,12 +144,20 @@ function actualBadge(button) {
     assert.equal(motes.length, 14, 'one bounded particle allocation serves all twelve grades');
     return {host, motes, number: host.FindChildTraverse('HandoffVIPLevel'), word: host.FindChildTraverse('HandoffVIPWord'), aura: host.FindChildTraverse('HandoffVIPAura')};
 }
+function lockedBadge(button) {
+    const badge = actualBadge(button);
+    assert.equal(badge.number.text, ''); assert.equal(badge.number.visible, false);
+    assert(!statusLabels(button).includes('—')); assert(!statusLabels(button).includes('0'));
+    assert.equal(badge.word.paneltype, 'Image'); assert.equal(badge.word.style.washColor, '#999999');
+    assert.equal(badge.aura.visible, false); assert.equal(badge.motes.filter(mote => mote.visible).length, 0);
+}
 
 function vip() {
     const h = harness();
+    h.load('vip_catalog.js');
     h.load('vip_window.js');
     const status = h.cfg.SurvivalVIPStatus;
-    assert(status && status.Appearance && status.Inspect && status.Render, 'production status API is available without a menu shell');
+    assert(status && status.Appearance && status.Inspect && status.Render && status.UnlockRules, 'production status API is available without a menu shell');
     assert.equal(vipRequests(h).length, 1, 'cold startup subscribes once even before any VIP window was opened');
     assert.equal(vipRequests(h)[0].payload.action, 'view');
     assert.equal(status.Inspect().known, false);
@@ -154,11 +166,48 @@ function vip() {
     assert.equal(vipRequests(h).length, 1, 'compatibility entry points never send claim/purchase/view requests');
     assert.equal(h.node('VIPGrid').GetChildCount(), 0);
 
+    // Optional override reads a real helper from the integration worktree when
+    // testing an older isolated baseline; it never replaces helper functions.
+    h.load('tooltip_position.js', process.env.SURVIVAL_VIP_TOOLTIP_POSITION_SOURCE);
+    const position = h.cfg.SurvivalTooltipPosition, sharedCalls = [];
+    const realShared = ['ShowText', 'HideText'].every(name => typeof position[name] === 'function');
+    if (process.env.SURVIVAL_VIP_TOOLTIP_POSITION_SOURCE) assert(realShared, 'an explicit helper override must contain the complete shared implementation');
+    for (const name of ['ShowText', 'HideText']) {
+        // Older committed positioners lack these optional methods. A no-op spy
+        // still proves actual nav callbacks use the shared interface; native
+        // fallback is exercised independently below, never simulated here.
+        const original = realShared ? position[name] : function () {};
+        position[name] = function (...args) { sharedCalls.push({name, args}); return original.apply(this, args); };
+    }
+    h.make('TextTooltip', h.make('Tooltips'));
     h.load('topnav_remaining_5d5c1152eb.js'); h.advance(1500);
     assert.deepEqual(h.warnings, [], 'complete HUD starts without swallowed native errors');
     let button = h.node('HandoffNav_vip');
-    assert(statusLabels(button).includes('—'), 'unknown membership is visibly unknown, not fabricated VIP1');
-    assert.equal(button.enabled, false); assert.equal(button.hittest, false); assert.equal(button.hittestchildren, false);
+    lockedBadge(button); hoverable(button);
+    for (let i = 0; i < 10; i++) { h.advance(100); hoverable(button); }
+    const fxButton = h.node('HandoffCombatEffects');
+    fxButton.events.onmouseover(); assert.equal(sharedCalls.at(-1).name, 'ShowText'); assert.strictEqual(sharedCalls.at(-1).args[0], fxButton);
+    fxButton.events.onmouseout(); assert.equal(sharedCalls.at(-1).name, 'HideText'); assert.strictEqual(sharedCalls.at(-1).args[0], fxButton);
+    function rulesHover() {
+        button.events.onmouseover();
+        const call = sharedCalls.at(-1); assert.equal(call.name, 'ShowText'); assert.strictEqual(call.args[0], button);
+        assert.equal(call.args[1], status.UnlockRules());
+        if (realShared) assert.deepEqual(h.dispatched.at(-1), ['DOTAShowTextTooltip', button, call.args[1]], 'VIP uses the same native tooltip dispatch as complete effects');
+        return call.args[1];
+    }
+    assert.match(rulesHover(), /累计实付充值满\s*50\s*元.*VIP1/);
+    fxButton.events.onmouseover(); const showingOther = h.dispatched.length;
+    button.events.onmouseout(); assert.equal(sharedCalls.at(-1).name, 'HideText'); assert.strictEqual(sharedCalls.at(-1).args[0], button);
+    if (realShared) assert.equal(h.dispatched.length, showingOther, 'VIP mouseout cannot dismiss another anchor through the shared owner guard');
+    fxButton.events.onmouseout();
+    const catalog = h.cfg.VIPRewardCatalog;
+    h.cfg.VIPRewardCatalog = {recharge_levels: [{level: 1, required_recharge_fen: 12345, required_recharge_yuan: 123.45}, {level: 2, required_recharge_fen: 43210, required_recharge_yuan: 432.1}]};
+    assert.match(rulesHover(), /123\.45\s*元/, 'rules are read from the current catalog on each hover');
+    h.emit('survival_vip_snapshot', {ok: true, level: 1});
+    const nextRules = rulesHover(); assert(nextRules.includes('VIP1')); assert.match(nextRules, /432\.1\s*元/); assert(nextRules.includes('VIP2'));
+    delete h.cfg.VIPRewardCatalog;
+    const genericRules = rulesHover(); assert(genericRules.includes('累计实付充值')); assert(!/\d+(?:\.\d+)?\s*元/.test(genericRules), 'missing configuration cannot invent an unlock price');
+    h.cfg.VIPRewardCatalog = catalog; button.events.onmouseout(); h.advance(0);
     const click = button.events.onactivate;
     const calls = h.sent.length;
     if (click) click();
@@ -181,13 +230,22 @@ function vip() {
     const gradeZero = rgb(status.Appearance(0).color); assert(Math.max(...gradeZero) - Math.min(...gradeZero) <= 32, 'non-member styling is a muted gray');
     const panelCount = h.counts.created;
     const badge = actualBadge(button);
+    assert.equal(badge.word.paneltype, 'Image'); assert.equal(badge.word.image, 'file://{images}/custom_game/topnav_reference_v2/vip_status.svg');
+    const svg = fs.readFileSync(path.join(project, 'panorama/src/images/custom_game/topnav_reference_v2/vip_status.svg'), 'utf8');
+    const originalSvgPath = 'panorama/src/images/custom_game/topnav_reference_v2/vip.svg';
+    const originalSvg = fs.existsSync(path.join(project, originalSvgPath)) ? fs.readFileSync(path.join(project, originalSvgPath), 'utf8')
+        : require('node:child_process').execFileSync('git', ['show', 'HEAD:' + originalSvgPath], {cwd: project, encoding: 'utf8'}); // Read-only sparse checkout fallback.
+    assert(/\bwidth="56"/.test(svg) && /\bheight="56"/.test(svg), 'the vector keeps the original 56 by 56 dimensions');
+    assert.deepEqual(Array.from(svg.matchAll(/\bd="([^"]+)"/g), match => match[1]), Array.from(originalSvg.matchAll(/\bd="([^"]+)"/g), match => match[1]), 'restored VIP art retains the original vector geometry');
+    assert(Array.from(svg.matchAll(/\bfill="([^"]+)"/g)).every(match => /^(?:#fff(?:fff)?|white)$/i.test(match[1])), 'white vector artwork allows precise membership tinting');
     let lastOpacity = 0;
     for (let level = 0; level <= 12; level++) {
         h.emit('survival_vip_snapshot', {ok: true, level});
         const inspected = status.Inspect(); assert.equal(inspected.known, true); assert.equal(inspected.level, level);
         assert.equal(inspected.color, status.Appearance(level).color); assert.equal(inspected.particleCount, level ? level + 2 : 0);
-        assert(statusLabels(button).includes(String(level)), 'the actual top badge displays authoritative VIP' + level);
-        assert.equal(badge.number.style.color, inspected.color); assert.equal(badge.word.style.color, inspected.color);
+        if (level) { assert.equal(badge.number.text, String(level)); assert.equal(badge.number.visible, true); }
+        else lockedBadge(button);
+        assert.equal(badge.number.style.color, inspected.color); assert.equal(badge.word.style.washColor, inspected.color);
         assert.equal(badge.motes.filter(mote => mote.visible).length, inspected.particleCount, 'the actual rendered particle count follows membership');
         assert.equal(badge.aura.visible, level > 0);
         for (const mote of badge.motes.filter(mote => mote.visible)) {
@@ -203,12 +261,18 @@ function vip() {
     for(const width of [36,60,90]){
         button.style.width=width+'px';status.Render(button);
         assert.equal(parseFloat(badge.host.style.width),width,'the status canvas follows the real navigation width');
+        assert.equal(parseFloat(badge.host.style.height),width);
+        assert.equal(parseFloat(badge.word.style.width),Math.round(56*width/60));
+        assert.equal(parseFloat(badge.word.style.height),Math.round(56*width/60),'the original square artwork scales uniformly');
+        if(width===60){assert.equal(badge.word.style.position,'2.000px -2.000px 0px');assert.equal(badge.number.style.position,'35.000px 37.000px 0px');}
         const numberX=parseFloat(badge.number.style.position),numberWidth=parseFloat(badge.number.style.width);
-        assert(numberX+numberWidth<=width,'two-digit membership remains inside the scaled button');
+        assert(numberX+numberWidth<=width+1,'independently snapped number position/width stay within one native pixel of the scaled button');
         assert.equal(parseFloat(badge.number.style.fontSize),Math.round(20*width/60),'text is laid out at native pixel size');
         assert.equal(h.counts.created,panelCount,'resolution changes reuse the same particles');
     }
     button.style.width=originalWidth;status.Render(button);
+    const maxRules = rulesHover(); assert(maxRules.includes('VIP12')); assert(maxRules.includes('最高')); assert(!maxRules.includes('VIP13'));
+    button.events.onmouseout(); h.advance(0);
     const same = {...h.counts}, sameTimers = h.timers.size;
     for (let i = 0; i < 1000; i++) {
         h.emit('survival_vip_snapshot', {ok: true, level: 12, balance: i, rows: {}});
@@ -222,6 +286,7 @@ function vip() {
     h.emit('survival_vip_snapshot', {ok: false, level: 1}); assert.equal(status.Inspect().level, 12);
     h.emit('survival_vip_snapshot', {ok: true, level: '1'}); assert.equal(status.Inspect().level, 1); assert(statusLabels(button).includes('1'));
     h.emit('survival_vip_snapshot', {ok: true, level: 0}); assert.equal(status.Inspect().particleCount, 0);
+    lockedBadge(button);
     assert.equal(badge.motes.filter(mote => mote.visible).length, 0); assert.equal(badge.aura.visible, false, 'membership reset removes every active light');
 
     const retired = h.callbacks('survival_vip_snapshot').slice(), oldStatus = status, oldVIP = h.cfg.SurvivalVIP;
@@ -238,7 +303,7 @@ function vip() {
     assert.equal(previousBadgeHost.IsValid(),false,'HUD reload removes the retired particle layer');
     assert.equal(h.panels.filter(panel=>panel.IsValid()&&panel.BHasClass('VIPStatusMote')).length,14,'reload retains one bounded particle layer');
     assert(statusLabels(button).includes('7'), 'HUD reload renders cached membership without opening a menu');
-    assert.equal(button.enabled, false); assert.equal(button.hittest, false); assert.equal(button.hittestchildren, false);
+    hoverable(button);
     if (button.events.onactivate) button.events.onactivate();
     assertReadOnly(h); assert.deepEqual(h.warnings, []);
     // The top entry must remain inert even before the new status module loads,
@@ -247,15 +312,23 @@ function vip() {
     late.cfg.SurvivalVIP = {IsAvailable: () => true, Toggle() { legacyOpened++; }, Open() { legacyOpened++; }};
     late.load('topnav_remaining_5d5c1152eb.js'); late.advance(1000);
     const lateButton = late.node('HandoffNav_vip'), lateCounts = {...late.counts}, lateSent = late.sent.length;
-    assert.equal(lateButton.enabled, false); assert.equal(lateButton.hittest, false);
+    hoverable(lateButton);
     if (lateButton.events.onactivate) lateButton.events.onactivate();
     assert.equal(legacyOpened, 0); assert.equal(late.sent.length, lateSent);
-    assert.deepEqual(late.counts, lateCounts, 'a disabled VIP callback does not display unavailable notices or schedule work');
+    assert.deepEqual(late.counts, lateCounts, 'the inert VIP callback does not display unavailable notices or schedule work');
+    const lateEffects = late.node('HandoffCombatEffects'); lateEffects.events.onmouseover();
+    assert.equal(late.dispatched.at(-1)[0], 'DOTAShowTextTooltip'); assert.strictEqual(late.dispatched.at(-1)[1], lateEffects);
+    lateEffects.events.onmouseout(); assert.equal(late.dispatched.at(-1)[0], 'DOTAHideTextTooltip');
+    lateButton.events.onmouseover();
+    assert.equal(late.dispatched.at(-1)[0], 'DOTAShowTextTooltip'); assert.strictEqual(late.dispatched.at(-1)[1], lateButton);
+    assert(late.dispatched.at(-1)[2].includes('累计实付充值')); assert(!/\d+(?:\.\d+)?\s*元/.test(late.dispatched.at(-1)[2]));
+    lateButton.events.onmouseout(); assert.equal(late.dispatched.at(-1)[0], 'DOTAHideTextTooltip', 'missing shared helper retains native hover fallback');
     late.load('vip_window.js'); late.emit('survival_vip_snapshot', {ok: true, level: 4}); late.advance(200);
     assert.equal(actualBadge(lateButton).number.text, '4', 'a late status module attaches through the real HUD refresh');
+    hoverable(lateButton); lateButton.events.onmouseover(); assert.equal(late.dispatched.at(-1)[2], late.cfg.SurvivalVIPStatus.UnlockRules()); lateButton.events.onmouseout();
     assert.equal(vipRequests(late).length, 1); assertReadOnly(late); assert.deepEqual(late.warnings, []);
-    console.log('VIP_STATUS_PASS: full HUD cold boot; passive entry; 12 equal hue steps; increasing bounded particles; cached updates; no purchase/claim; reload retirement; neighboring navigation.');
-    return {levels: 12, viewRequests: vipRequests(h).length, particlePanels: 14};
+    console.log('VIP_STATUS_PASS: full HUD hover-only entry; gray locked vector without zero/dash; original 56px geometry; shared/native tooltip paths; dynamic rules; 12 hue steps; bounded particles; cached updates; no purchase/claim; reload retirement; realShared=' + realShared + '.');
+    return {levels: 12, viewRequests: vipRequests(h).length, particlePanels: 14, realShared};
 }
 
 module.exports = {vip};
