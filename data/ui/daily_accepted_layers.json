@@ -1,0 +1,172 @@
+{
+  "source_manifest_sha256": "e5adf1296704ad08632bf277a777afb0588a83ae92b8b45ada706debaeb0bc1f",
+  "source_canvas": {
+    "width": 1477,
+    "height": 1065
+  },
+  "ui_bounds": {
+    "left": 46,
+    "top": 146,
+    "width": 1382,
+    "height": 784
+  },
+  "assets": [
+    {
+      "id": "window_edge",
+      "origin": "assets/window_brush_edge.png",
+      "source_layer": "window_brush_edge",
+      "width": 1382,
+      "height": 784,
+      "sha256": "fbdc97f740c8a9ee777f8f0162065973c8bfc412c3b636bbb8f8918a12839c4b",
+      "recipe_sha256": "f528ca071c93c5c9ae96f4ccddd7b64699ca7bdff635d66b8b56b2fdfe02bf74",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/window_edge.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/window_edge_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/window_edge_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/window_edge_v10.vtex"
+    },
+    {
+      "id": "header_rule",
+      "origin": "assets/header_rule.png",
+      "source_layer": "header_rule",
+      "width": 1321,
+      "height": 5,
+      "sha256": "f97735ea95276987128bd097b6976b9c3b9703fcee58a5c4b92ed1a153e20a1b",
+      "recipe_sha256": "f467f4e1d15944b594e4a454d06669f13f3f670b0805ec0afd0e15bad69369fd",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/header_rule.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/header_rule_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/header_rule_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/header_rule_v10.vtex"
+    },
+    {
+      "id": "divider",
+      "origin": "assets/monthly_divider.png",
+      "source_layer": "monthly_divider",
+      "width": 7,
+      "height": 665,
+      "sha256": "a46b378de20b14ffbf94cf74141096a2fe20e8932a325002c0384005a1fa106e",
+      "recipe_sha256": "7b382a0f0639da5fd94a1a942a92c8916377b5f239b2295c2d0b0e7a1f0a69a6",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/divider.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/divider_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/divider_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/divider_v10.vtex"
+    },
+    {
+      "id": "reward_frame",
+      "origin": "assets/week_r1_c1_frame.png",
+      "source_layer": "week_r1_c1_frame",
+      "width": 114,
+      "height": 118,
+      "sha256": "72a7ae15fd46b63ea5aa5bf6a760ddd263e310689033965dd92b508ccf60a74c",
+      "recipe_sha256": "26572670fea77093b61895976724595958be185ac141371869d1b613e031d3a0",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/reward_frame.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/reward_frame_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/reward_frame_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/reward_frame_v10.vtex"
+    },
+    {
+      "id": "button",
+      "origin": "assets/monthly_button_base.png",
+      "source_layer": "monthly_button_base",
+      "width": 194,
+      "height": 61,
+      "sha256": "e24ab2e865d2d85afd9298c79b443205293cb44dfc5f56c5538c0325c858e25b",
+      "recipe_sha256": "9e07f95b001e40dac5bb387400daba03775f5c33fde965ee6cc7f374cf1bffc9",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/button.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/button_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/button_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/button_v10.vtex"
+    },
+    {
+      "id": "close_base",
+      "origin": "assets/close_base.png",
+      "source_layer": "close_base",
+      "width": 44,
+      "height": 47,
+      "sha256": "2a4c2d943e6ce6043c6529a248723c3c352820ec3925a797ecb92542c19c1526",
+      "recipe_sha256": "dfaa50fabb4c0a6629d43244d2515c5dda48d5efe8b7359a320b7b246a62c011",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/close_base.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/close_base_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/close_base_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/close_base_v10.vtex"
+    },
+    {
+      "id": "close",
+      "origin": "assets/close_cross.png",
+      "source_layer": "close_cross",
+      "width": 29,
+      "height": 29,
+      "sha256": "aa7896ba411d7f8b87468e1b36ea29ddc29b52688f8467c5029c0945da325ae1",
+      "recipe_sha256": "db0af923d06ac5435a11d78a889ca1c1bcb39955cab5c5ad4de3dd703960e671",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/close.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/close_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/close_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/close_v10.vtex"
+    },
+    {
+      "id": "lock",
+      "origin": "assets/monthly_1_lock.png",
+      "source_layer": "monthly_1_lock",
+      "width": 33,
+      "height": 38,
+      "sha256": "34cb3892b4e458595e9ecb3e43418ef20c8d6405710c511af28b95c16589c907",
+      "recipe_sha256": "2c2e3bce8621b9e24577b00cb50eed9bebdc5a7346485aeff2b183ce1e0d8ad7",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/lock.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/lock_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/lock_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/lock_v10.vtex"
+    },
+    {
+      "id": "check",
+      "origin": "assets/week_r1_c1_claimed.png",
+      "source_layer": "week_r1_c1_claimed",
+      "width": 33,
+      "height": 29,
+      "sha256": "efebd6f5443483750a044b1429c8feb0d5709dfbcf910a700e708e325303ebb5",
+      "recipe_sha256": "22b82e4df0025ad48615386eb73efcfc18b933d3aeab6867a0d51e4cffe68a60",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/check.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/check_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/check_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/check_v10.vtex"
+    },
+    {
+      "id": "window_background",
+      "origin": "panorama/src/images/custom_game/daily_gw2_v1/window_background.png",
+      "source_layer": null,
+      "width": 1164,
+      "height": 703,
+      "sha256": "f673cd0ecfafc7493ebafbf602ba74291f268026b56ecef9dc9452f15d92178a",
+      "recipe_sha256": "fba9b4c030d252039eec0a662e0b27478b2323e12646a62dfd394f760e848b68",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/window_background.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/window_background_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/window_background_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/window_background_v10.vtex"
+    },
+    {
+      "id": "tooltip_background",
+      "origin": "panorama/src/images/custom_game/daily_gw2_v1/tooltip_background.png",
+      "source_layer": null,
+      "width": 350,
+      "height": 240,
+      "sha256": "4026a94e1702a599438a29c275935c4698c1f9b42fd4429fc5ee1aa89059a3f4",
+      "recipe_sha256": "951700c22951f3cd4d58b250c0c9bc0890838480fdcb6a15191788232f8a8490",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/tooltip_background.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/tooltip_background_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/tooltip_background_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/tooltip_background_v10.vtex"
+    },
+    {
+      "id": "tooltip_frame",
+      "origin": "panorama/src/images/custom_game/daily_gw2_v1/tooltip_frame.png",
+      "source_layer": null,
+      "width": 350,
+      "height": 240,
+      "sha256": "5dff5a07f07abcacf530bb0859422ba9668f038bd05214dbaf7975b2df02650f",
+      "recipe_sha256": "805868cb33281a3d72ab7d8c88f312a5b540c93fec0cb695e5d3fab770a9f462",
+      "destination": "panorama/src/images/custom_game/daily_accepted_v1/tooltip_frame.png",
+      "recipe": "panorama/src/images/custom_game/daily_accepted_v1/tooltip_frame_v10.vtex",
+      "runtime": "panorama/images/custom_game/daily_accepted_v1/tooltip_frame_v10.vtex_c",
+      "runtime_uri": "s2r://panorama/images/custom_game/daily_accepted_v1/tooltip_frame_v10.vtex"
+    }
+  ],
+  "excluded": "All raster text, concept icons, quantities, composites and damaged inpainted bases."
+}

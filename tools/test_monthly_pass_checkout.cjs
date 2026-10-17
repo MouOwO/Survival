@@ -37,14 +37,15 @@ reply({ok:false,error:"payment_busy"},first);
 assert.equal($("#PaymentBuy").enabled,false,"an old callback cannot release a newer renewal request");
 reply({ok:false,error:"payment_unavailable"});
 cfg.SurvivalPayments.Dispose();
-// Price is visible in the compact daily button even when PassPrice is hidden
-// by the existing art layout. This entry still carries no client price or SKU.
+// The daily entry keeps the accepted short label; its tooltip retains the
+// authoritative price. The request still carries no client price or SKU.
 const daily=require("./tests/fixtures/menus_v10_harness.cjs").createHarness();
 daily.load("daily_remaining_5d5c1152eb.js");daily.cfg.SurvivalDaily.Open(false);
 const snapshot={ok:true,sequence:1,today:25004,count:0,pending:0,has_pass:0,purchase_enabled:1,price:"20元",duration_days:30,ordinary_status:"claimable",calendar28:[],cycle:[],specials:[],missed:[]};
 daily.emit("survival_daily_snapshot",snapshot);
-assert.equal(daily.nodes.PassPurchaseText.text,"开通20元");assert.equal(daily.nodes.PassPurchase.enabled,true);
+assert.equal(daily.nodes.PassPurchaseText.text,"开通月卡");assert.equal(daily.nodes.PassPurchase.enabled,true);
+assert.match(daily.nodes.PassPrice.text,/20元/);
 daily.click(daily.nodes.PassPurchase);assert.equal(daily.sent.at(-1).name,"survival_pass_purchase");assert.deepEqual(Object.keys(daily.sent.at(-1).payload),[]);
 daily.emit("survival_daily_snapshot",{...snapshot,sequence:2,has_pass:1,expires_at:2000000000});
-assert.equal(daily.nodes.PassPurchaseText.text,"续费20元");
+assert.equal(daily.nodes.PassPurchaseText.text,"续费月卡");
 console.log("MONTHLY_CHECKOUT_UI_PASS: correct SKU, authoritative ¥20, 30 days, no implicit orders, immutable pending quote, renewal and request correlation");

@@ -1,23 +1,16 @@
 <root>
   <Panel hittest="false" hittestchildren="false">
-    <Image id="DailyGW2Preload_crown" src="file://{images}/custom_game/daily_gw2_v1/crown.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_title_brush" src="file://{images}/custom_game/daily_gw2_v1/title_brush.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_window_background" src="file://{images}/custom_game/daily_gw2_v1/window_background.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_reward_frame" src="file://{images}/custom_game/daily_gw2_v1/reward_frame.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_reward_frame_hover" src="file://{images}/custom_game/daily_gw2_v1/reward_frame_hover.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_reward_frame_today" src="file://{images}/custom_game/daily_gw2_v1/reward_frame_today.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_reward_frame_claimed" src="file://{images}/custom_game/daily_gw2_v1/reward_frame_claimed.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_premium_frame" src="file://{images}/custom_game/daily_gw2_v1/premium_frame.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_premium_frame_locked" src="file://{images}/custom_game/daily_gw2_v1/premium_frame_locked.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_selection_glow" src="file://{images}/custom_game/daily_gw2_v1/selection_glow.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_divider" src="file://{images}/custom_game/daily_gw2_v1/divider.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_button" src="file://{images}/custom_game/daily_gw2_v1/button.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_button_hover" src="file://{images}/custom_game/daily_gw2_v1/button_hover.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_close" src="file://{images}/custom_game/daily_gw2_v1/close.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_lock" src="file://{images}/custom_game/daily_gw2_v1/lock.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_check" src="file://{images}/custom_game/daily_gw2_v1/check.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_tooltip_background" src="file://{images}/custom_game/daily_gw2_v1/tooltip_background.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_tooltip_frame" src="file://{images}/custom_game/daily_gw2_v1/tooltip_frame.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
-    <Image id="DailyGW2Preload_premium_emblem" src="file://{images}/custom_game/daily_gw2_v1/premium_emblem.png" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_window_edge" src="s2r://panorama/images/custom_game/daily_accepted_v1/window_edge_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_header_rule" src="s2r://panorama/images/custom_game/daily_accepted_v1/header_rule_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_divider" src="s2r://panorama/images/custom_game/daily_accepted_v1/divider_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_reward_frame" src="s2r://panorama/images/custom_game/daily_accepted_v1/reward_frame_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_button" src="s2r://panorama/images/custom_game/daily_accepted_v1/button_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_close_base" src="s2r://panorama/images/custom_game/daily_accepted_v1/close_base_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_close" src="s2r://panorama/images/custom_game/daily_accepted_v1/close_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_lock" src="s2r://panorama/images/custom_game/daily_accepted_v1/lock_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_check" src="s2r://panorama/images/custom_game/daily_accepted_v1/check_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_window_background" src="s2r://panorama/images/custom_game/daily_accepted_v1/window_background_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_tooltip_background" src="s2r://panorama/images/custom_game/daily_accepted_v1/tooltip_background_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
+    <Image id="DailyGW2Preload_tooltip_frame" src="s2r://panorama/images/custom_game/daily_accepted_v1/tooltip_frame_v10.vtex" visible="false" hittest="false" style="visibility:collapse; width:0px; height:0px;" />
   </Panel>
 </root>
