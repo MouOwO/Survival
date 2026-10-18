@@ -137,10 +137,10 @@ function simpleDetail(h, card, title = '测试道具') {
     assert.equal(labels.find(p => p.BHasClass('RCProductEffect')).text, walletItem('u_coin').description);
     assert(!nodes.some(p => p.paneltype === 'Button' || p.BHasClass('CJPrice') || p.BHasClass('CommercePurpleBuy')),
         'Price and purchase controls belong to the row or payment confirmation');
-    assert(!labels.some(p => /¥|U币|人民币金额|1元=|查看.*购买|已拥有.*查看/.test(p.text || '')));
+    assert(!labels.some(p => /¥|G币|人民币金额|1元=|查看.*购买|已拥有.*查看/.test(p.text || '')));
 }
 
-test('U币 SKU is deduplicated and cash eligibility overrides an empty wallet balance', () => {
+test('G币 SKU is deduplicated and cash eligibility overrides an empty wallet balance', () => {
     const h = harness(); h.cfg.SurvivalCommerceView.Open();
     h.walletSnapshot([walletItem('u_coin')]); h.paidSnapshot([paidItem()]);
     assert.equal(h.cfg.SurvivalCommerceView.Inspect().productCount, 1);
@@ -150,8 +150,8 @@ test('U币 SKU is deduplicated and cash eligibility overrides an empty wallet ba
     h.buyCard(card);
     assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), false);
     assert(h.cfg.SurvivalUI.ModalManager.Get('payment_shop').IsOpen());
-    assert.equal(h.$('#PaymentPrice').text, '合计 1200 U币 / ¥12.00');
-    assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 1200 U币');
+    assert.equal(h.$('#PaymentPrice').text, '合计 1200 G币 / ¥12.00');
+    assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 1200 G币');
     assert.equal(h.$('#PaymentBuy').enabled, true);
     assert.match(h.$('#PaymentStatus').text, /直接购买此道具/,
         'The authenticated payment row overrides wallet insufficient funds and ownership');
@@ -164,7 +164,7 @@ test('U币 SKU is deduplicated and cash eligibility overrides an empty wallet ba
     assert.equal(h.requests.filter(r => r.payload.action === 'create').length, 1);
 });
 
-test('U币 products need an authenticated enabled payment row and valid U币 metadata', () => {
+test('G币 products need an authenticated enabled payment row and valid G币 metadata', () => {
     const h = harness(); h.cfg.SurvivalCommerceView.Open(); h.walletSnapshot([walletItem('u_coin')]);
     let card = h.cards()[0];
     simpleDetail(h, card);
@@ -214,16 +214,16 @@ test('积分 and 商城金币 retain wallet confirmation while legacy cash retai
     assert.equal(h.lastRequest('survival_payment_request').payload.sku, 'legacy_cash');
 });
 
-test('订单 retains authoritative U币 and RMB snapshot through catalog edits, delisting, cancellation, and delivery', () => {
+test('订单 retains authoritative G币 and RMB snapshot through catalog edits, delisting, cancellation, and delivery', () => {
     const h = harness(); h.cfg.SurvivalCommerceView.Open(); h.paidSnapshot([paidItem()]);
     h.buyCard(h.cards()[0]); h.context.PaymentBuy(); h.paymentReply(orderFrom(paidItem()));
     assert.equal(h.$('#PaymentQR').style.visibility, 'visible');
     h.paidSnapshot([paidItem({u_coin_price:2400,amount_fen:2400,title:'新道具标题'})]);
-    assert.equal(h.$('#PaymentPrice').text, '合计 1200 U币 / ¥12.00');
-    assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 1200 U币');
+    assert.equal(h.$('#PaymentPrice').text, '合计 1200 G币 / ¥12.00');
+    assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 1200 G币');
     assert.equal(h.$('#PaymentTitle').text, '测试道具');
     h.paidSnapshot([]); assert.equal(h.$('#PaymentProducts').Children().length, 1);
-    assert.equal(h.$('#PaymentPrice').text, '合计 1200 U币 / ¥12.00');
+    assert.equal(h.$('#PaymentPrice').text, '合计 1200 G币 / ¥12.00');
     h.context.PaymentCancel(); assert.equal(h.lastRequest('survival_payment_request').payload.action, 'cancel');
     h.paymentReply(orderFrom(paidItem(), {state:'closed'}));
     h.paidSnapshot([paidItem({u_coin_price:2400,amount_fen:2400})]);
@@ -231,48 +231,48 @@ test('订单 retains authoritative U币 and RMB snapshot through catalog edits, 
     assert.equal(h.lastRequest('survival_payment_request').payload.provider, 'alipay');
     assert.deepEqual(Object.keys(h.lastRequest('survival_payment_request').payload).sort(), ['action','provider','quantity','request_id','sku']);
     h.paymentReply(orderFrom(paidItem({u_coin_price:2400,amount_fen:2400}), {provider:'alipay',state:'delivered'}));
-    assert.equal(h.$('#PaymentPrice').text, '合计 2400 U币 / ¥24.00');
+    assert.equal(h.$('#PaymentPrice').text, '合计 2400 G币 / ¥24.00');
     assert.match(h.$('#PaymentStatus').text, /支付成功/); assert.equal(h.$('#PaymentQR').style.visibility, 'collapse');
     assert.equal(h.cfg.SurvivalPayments.Inspect().dirty, true, 'Delivery refreshes catalog ownership through the original cache');
 });
 
-test('U币 purchase buttons stay short for both channels while the full RMB price remains above', () => {
+test('G币 purchase buttons stay short for both channels while the full RMB price remains above', () => {
     for (const [coin,fen,rmb] of [[1200,1200,'12.00'],[29800,29800,'298.00']]) {
         const h = harness(), product = paidItem({u_coin_price:coin,amount_fen:fen});
         h.cfg.SurvivalCommerceView.Open(); h.paidSnapshot([product]); h.buyCard(h.cards()[0]);
         for (const [provider,label] of [['wechat','微信'],['alipay','支付宝']]) {
             h.context.PaymentChannel(provider);
-            assert.equal(h.$('#PaymentBuyLabel').text, label+'购买 '+coin+' U币');
+            assert.equal(h.$('#PaymentBuyLabel').text, label+'购买 '+coin+' G币');
             assert(!/¥|1元=|\//.test(h.$('#PaymentBuyLabel').text));
-            assert.equal(h.$('#PaymentPrice').text, '合计 '+coin+' U币 / ¥'+rmb);
+            assert.equal(h.$('#PaymentPrice').text, '合计 '+coin+' G币 / ¥'+rmb);
             assert.equal(h.$('#PaymentBuy').enabled, true);
         }
         h.context.PaymentBuy(); h.paymentReply(orderFrom(product,{provider:'alipay'}));
         h.paidSnapshot([paidItem({u_coin_price:56000,amount_fen:56000})]);
-        assert.equal(h.$('#PaymentBuyLabel').text, '支付宝购买 '+coin+' U币', 'A pending order retains its provider and U币 snapshot');
-        assert.equal(h.$('#PaymentPrice').text, '合计 '+coin+' U币 / ¥'+rmb);
+        assert.equal(h.$('#PaymentBuyLabel').text, '支付宝购买 '+coin+' G币', 'A pending order retains its provider and G币 snapshot');
+        assert.equal(h.$('#PaymentPrice').text, '合计 '+coin+' G币 / ¥'+rmb);
         h.context.PaymentCancel(); h.paymentReply(orderFrom(product,{provider:'alipay',state:'closed'}));
         h.context.PaymentChannel('wechat');
-        assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 56000 U币');
-        assert.equal(h.$('#PaymentPrice').text, '合计 56000 U币 / ¥560.00');
+        assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 56000 G币');
+        assert.equal(h.$('#PaymentPrice').text, '合计 56000 G币 / ¥560.00');
     }
 });
 
-test('A consistent U币 price refresh rebuilds product details and unknown checkout never selects another SKU', () => {
+test('A consistent G币 price refresh rebuilds product details and unknown checkout never selects another SKU', () => {
     const h = harness(); h.cfg.SurvivalCommerceView.Open(); h.paidSnapshot([paidItem()]);
     const first = h.cards()[0];
     h.paidSnapshot([paidItem({u_coin_price:2400,amount_fen:2400})]);
     assert.notEqual(h.cards()[0], first);
     simpleDetail(h, h.cards()[0]);
     h.cfg.SurvivalPayments.Checkout('u_item');
-    assert.equal(h.$('#PaymentPrice').text, '合计 2400 U币 / ¥24.00');
+    assert.equal(h.$('#PaymentPrice').text, '合计 2400 G币 / ¥24.00');
     assert.equal(h.$('#PaymentBuy').enabled, true);
     h.cfg.SurvivalPayments.Checkout('missing_sku'); h.paidSnapshot([paidItem()]);
     assert.equal(h.$('#PaymentBuy').enabled, false); h.context.PaymentBuy();
     assert.equal(h.requests.filter(r => r.payload.action === 'create').length, 0);
 });
 
-test('Inconsistent U币 metadata cannot quote a payable amount or create an order', () => {
+test('Inconsistent G币 metadata cannot quote a payable amount or create an order', () => {
     const invalid = [
         {u_coin_price:2400}, {u_coin_per_yuan:2000}, {u_coin_per_yuan:undefined},
         {u_coin_price:0}, {u_coin_price:-1200}, {u_coin_price:1200.5}, {u_coin_price:'1200'},
@@ -308,18 +308,18 @@ test('Wallet metadata cannot complete an incomplete authoritative payment row', 
     h.paidSnapshot([incomplete]);
     simpleDetail(h, h.cards()[0]);
     h.cfg.SurvivalPayments.Checkout('u_item');
-    assert.equal(h.$('#PaymentPrice').text, '合计 U币价格及人民币金额待同步');
+    assert.equal(h.$('#PaymentPrice').text, '合计 G币价格及人民币金额待同步');
     assert.equal(h.$('#PaymentBuy').enabled, false); h.context.PaymentBuy();
     assert.equal(h.requests.filter(r => r.payload.action === 'create').length, 0);
 });
 
-test('Malformed U币 orders retain status polling and cancellation while payment entry points await valid metadata', () => {
+test('Malformed G币 orders retain status polling and cancellation while payment entry points await valid metadata', () => {
     for (const state of ['created','pending']) {
         const h = harness(); h.cfg.SurvivalCommerceView.Open(); h.paidSnapshot([paidItem()]);
         h.buyCard(h.cards()[0]); h.context.PaymentBuy();
         const badOrder = orderFrom(paidItem({u_coin_price:2400}), {state});
         h.paymentReply(badOrder);
-        assert.equal(h.$('#PaymentPrice').text, '合计 U币价格及人民币金额待同步');
+        assert.equal(h.$('#PaymentPrice').text, '合计 G币价格及人民币金额待同步');
         assert.match(h.$('#PaymentBuyLabel').text, /待同步/);
         assert(!/¥/.test(h.$('#PaymentBuyLabel').text)); assert.equal(h.$('#PaymentBuy').enabled, false);
         assert.equal(h.$('#PaymentQR').style.visibility, 'collapse');
@@ -331,14 +331,14 @@ test('Malformed U币 orders retain status polling and cancellation while payment
         h.paymentReply(badOrder);
         h.context.PaymentRefresh(); assert.equal(h.lastRequest('survival_payment_request').payload.action, 'status');
         h.paymentReply(orderFrom(paidItem()));
-        assert.equal(h.$('#PaymentPrice').text, '合计 1200 U币 / ¥12.00');
+        assert.equal(h.$('#PaymentPrice').text, '合计 1200 G币 / ¥12.00');
         assert.equal(h.$('#PaymentQR').style.visibility, 'visible');
         h.context.PaymentOpen(); assert.equal(h.urls.length, 1);
         h.context.PaymentCancel(); assert.equal(h.lastRequest('survival_payment_request').payload.action, 'cancel');
         h.paymentReply(orderFrom(paidItem(), {state:'closed'}));
         h.context.PaymentBuy(); assert.equal(h.requests.filter(r => r.payload.action === 'create').length, 2);
         h.paymentReply(orderFrom(paidItem({u_coin_price:2400}), {state:'delivered'}));
-        assert.equal(h.$('#PaymentPrice').text, '合计 U币价格及人民币金额待同步');
+        assert.equal(h.$('#PaymentPrice').text, '合计 G币价格及人民币金额待同步');
         assert.match(h.$('#PaymentStatus').text, /支付成功/);
     }
 });
@@ -355,7 +355,7 @@ test('Recharge uses RMB payment with 1–999999 editable units and the ordinary 
     assert.equal(h.$('#PaymentQuantityPlus').enabled, true);
     assert.equal(h.$('#PaymentPrice').text, '合计 ¥1.00');
     assert.equal(h.$('#PaymentBuyLabel').text, '微信充值 ¥1.00');
-    assert.match(h.$('#PaymentUnitPrice').text, /每份 1 元 = 100 U币\n到账 100 U币（1 份）/);
+    assert.match(h.$('#PaymentUnitPrice').text, /每份 1 元 = 100 G币\n到账 100 G币（1 份）/);
     assert.equal(h.$('#PaymentUnitPrice').visible, true);
     h.context.PaymentQuantityChange(-1); assert.equal(h.$('#PaymentQuantityInput').text, '1');
     h.context.PaymentQuantityChange(1); assert.equal(h.$('#PaymentQuantityInput').text, '2');
@@ -363,7 +363,7 @@ test('Recharge uses RMB payment with 1–999999 editable units and the ordinary 
     assert.equal(h.cfg.SurvivalPayments.Inspect().quantity, 999999);
     assert.equal(h.$('#PaymentQuantityPlus').enabled, false);
     assert.equal(h.$('#PaymentPrice').text, '合计 ¥999999.00');
-    assert.match(h.$('#PaymentUnitPrice').text, /到账 99999900 U币（999999 份）/);
+    assert.match(h.$('#PaymentUnitPrice').text, /到账 99999900 G币（999999 份）/);
     for (const [provider,label] of [['wechat','微信'],['alipay','支付宝']]) {
         h.context.PaymentChannel(provider);
         assert.equal(h.$('#PaymentBuyLabel').text, label+'充值 ¥999999.00');
@@ -384,7 +384,7 @@ test('Recharge uses RMB payment with 1–999999 editable units and the ordinary 
     assert.equal(h.$('#PaymentUnitPrice').visible, false);
     assert.equal(h.$('#PaymentQuantityInput').style.width, '84px');
     assert.equal(h.$('#PaymentQuantityHint').style.width, '180px');
-    assert.equal(h.$('#PaymentBuyLabel').text, '支付宝购买 1200 U币');
+    assert.equal(h.$('#PaymentBuyLabel').text, '支付宝购买 1200 G币');
 });
 
 test('Recharge rejects mismatched rate, price, identity and reward snapshots instead of treating them as legacy cash', () => {
@@ -418,7 +418,7 @@ test('The consumption notice survives old XML and remains visible in confirmatio
     };
     checkNotice();h.context.PaymentBuy();h.paymentReply(orderFrom(product));checkNotice();
     h.context.PaymentRefresh();h.paymentReply(orderFrom(product,{state:'delivered'}));checkNotice();
-    assert.match(h.$('#PaymentStatus').text,/充值成功：100 U币已到账/);
+    assert.match(h.$('#PaymentStatus').text,/充值成功：100 G币已到账/);
     h.context.PaymentRefresh();h.paymentReply(orderFrom(product,{state:'paid_review'}));checkNotice();
     assert.equal(h.$('#PaymentStatus').text,'已收到付款，奖励暂未到账，请保留订单号联系处理，请勿重复付款。');
 });
@@ -456,8 +456,8 @@ test('New catalog quotes use 100 U-coins/yuan and remain buyable without a secon
     const card=h.cards()[0];assert(card);
     // This integration harness uses the existing fallback card controls. The
     // V10 shell's native price geometry is exercised by its own asset suite.
-    h.buyCard(card);assert.equal(h.$('#PaymentPrice').text,'合计 100 U币 / ¥1.00');
-    assert.match(h.$('#PaymentHint').text,/1元=100U币/);assert.equal(h.$('#PaymentBuy').enabled,true);
+    h.buyCard(card);assert.equal(h.$('#PaymentPrice').text,'合计 100 G币 / ¥1.00');
+    assert.match(h.$('#PaymentHint').text,/1元=100G币/);assert.equal(h.$('#PaymentBuy').enabled,true);
     h.context.PaymentBuy();const payload=h.lastRequest('survival_payment_request').payload;
     assert.deepEqual(Object.keys(payload).sort(),['action','provider','quantity','request_id','sku']);
     assert.equal(product.u_coin_price,100,'The browser cannot halve a server-owned price a second time');
@@ -479,10 +479,10 @@ test('Historical created, pending and delivered orders retain their frozen 1000-
         h.paidSnapshot([product]);h.cfg.SurvivalPayments.Checkout(product.sku);h.context.PaymentBuy();
         const legacy=orderFrom(paidItem({u_coin_price:1000,amount_fen:100,u_coin_per_yuan:1000}),{state});
         h.paymentReply(legacy);
-        assert.equal(h.$('#PaymentPrice').text,'合计 1000 U币 / ¥1.00');
+        assert.equal(h.$('#PaymentPrice').text,'合计 1000 G币 / ¥1.00');
         assert.equal(h.$('#PaymentQR').style.visibility,state==='pending'?'visible':'collapse');
         h.paidSnapshot([paidItem({u_coin_price:250,amount_fen:250})]);
-        assert.equal(h.$('#PaymentPrice').text,'合计 1000 U币 / ¥1.00');
+        assert.equal(h.$('#PaymentPrice').text,'合计 1000 G币 / ¥1.00');
         assert(!/待同步/.test(h.$('#PaymentPrice').text));
         assert.equal(h.requests.filter(r=>r.payload.action==='create').length,1);
     }
@@ -493,7 +493,7 @@ test('A copied historical order id cannot make a stale 1000-U catalog row buyabl
     h.paidSnapshot([product]);h.cfg.SurvivalPayments.Checkout(product.sku);h.context.PaymentBuy();
     const old=orderFrom(paidItem({u_coin_price:1000,amount_fen:100,u_coin_per_yuan:1000}),{state:'delivered'});
     h.paymentReply(old);h.paidSnapshot([{...old,enabled:1}]);
-    assert.equal(h.$('#PaymentPrice').text,'合计 1000 U币 / ¥1.00','The receipt is still readable');
+    assert.equal(h.$('#PaymentPrice').text,'合计 1000 G币 / ¥1.00','The receipt is still readable');
     assert.equal(h.$('#PaymentBuy').enabled,false,'Catalog validation never opts into frozen order compatibility');
     h.context.PaymentBuy();assert.equal(h.requests.filter(r=>r.payload.action==='create').length,1);
 });
@@ -513,7 +513,7 @@ test('Monthly pass lists 5800 U-coins, confirms RMB 58, and freezes older RMB 10
     // The fallback harness keeps prices out of its grid cards. Exercise the
     // production price formatter separately with that authenticated quote.
     const price=h.cfg.SurvivalCommerceComponents.Price(h.root,{...quote,purchase_method:'cash',currency:'u_coin'},0,0,272);
-    assert(h.descendants(price).some(panel=>panel.text==='5800 U币'),'The catalog quote remains the row token price');
+    assert(h.descendants(price).some(panel=>panel.text==='5800 G币'),'The catalog quote remains the row token price');
     h.buyCard(card);
     assert.equal(h.$('#PaymentPrice').text,'合计 ¥58.00');
     assert.equal(h.$('#PaymentBuyLabel').text,'微信购买 ¥58.00');
@@ -527,4 +527,25 @@ test('Monthly pass lists 5800 U-coins, confirms RMB 58, and freezes older RMB 10
         assert.equal(old.$('#PaymentQR').style.visibility,state==='pending'?'visible':'collapse');
         assert.equal(old.requests.filter(request=>request.payload.action==='create').length,1,'Catalog refresh never replaces an existing order');
     }
+});
+
+
+test('Legacy U-coin recharge text renders G-coins without mutating catalog, receipts, or protocol fields', () => {
+    const h=harness(),product=rechargeItem({title:'U币充值',description:'每份1元=100U币；奖励U币。',
+        reward_lines:[{kind:'wallet',id:'u_coin',label:'U币',quantity:100}]}),original=JSON.stringify(product);
+    h.paidSnapshot([product]);h.cfg.SurvivalPayments.Checkout(product.sku);
+    assert.equal(h.$('#PaymentTitle').text,'G币充值');
+    assert.match(h.$('#PaymentDescription').text,/100G币/);
+    assert.match(h.$('#PaymentUnitPrice').text,/100 G币/);
+    assert(![h.$('#PaymentTitle'),h.$('#PaymentDescription'),h.$('#PaymentUnitPrice'),h.$('#PaymentValues')]
+        .some(panel=>/U币/.test(panel.text)));
+    assert.equal(h.cfg.SurvivalPayments.GetCatalog().products[0].title,'U币充值','Display normalization cannot rewrite the server snapshot');
+    assert.equal(JSON.stringify(product),original);
+    h.context.PaymentBuy();const payload=h.lastRequest('survival_payment_request').payload;
+    assert.equal(payload.sku,'u_coin_recharge');
+    assert.deepEqual(Object.keys(payload).sort(),['action','provider','quantity','request_id','sku']);
+    h.paymentReply(orderFrom(product,{state:'delivered'}));
+    assert.equal(h.$('#PaymentTitle').text,'G币充值');
+    assert.match(h.$('#PaymentStatus').text,/充值成功：100 G币已到账/);
+    assert.equal(JSON.stringify(product),original,'A legacy receipt remains immutable after delivery');
 });

@@ -96,10 +96,10 @@ test('Changing only VIP reason/message/required level redraws the visible explan
  h.updatePaid({catalog_hash:'OFFLINE_ONLY',products:[{...item,required_vip_level:8,disabled_message:'VIP资格正在同步'}],categories:[]});assert.equal(rowReason(h,h.cardList()[0]).text,'VIP资格正在同步');
 });
 
-test('U-coin cash price and eligibility come from payment rows, never a wallet balance or a metadata ghost',()=>{
+test('G-coin UI cash price and eligibility come from payment rows, never a wallet balance or a metadata ghost',()=>{
  const real=cash('cash-authority',{amount_fen:6800,u_coin_price:6800}),h=setup([real]);choose(h);
  h.walletSnapshot([{...walletItem('unused'),sku:real.sku,currency:'u_coin',price:1,enabled:false,disabled_reason:'commerce_balance_insufficient'}],{u_coin:0,shop_points:0,shop_gold:0});
- let row=h.cardList()[0];assert.equal(rowBuy(h,row).enabled,true);assert.equal(h.descendants(row,'BLMarketPriceMain')[0].text,'6800 U币');
+ let row=h.cardList()[0];assert.equal(rowBuy(h,row).enabled,true);assert.equal(h.descendants(row,'BLMarketPriceMain')[0].text,'6800 G币');
  rowBuy(h,row).events.onactivate();assert.deepEqual(h.paidCheckouts,[real.sku]);assert.equal(buyRequests(h).length,0,'The U-coin marker is a cash price, not wallet deduction');
  h.updatePaid({catalog_hash:'PRICE_CHANGED',products:[{...real,u_coin_price:6801}],categories:[]});assert.equal(h.cfg.SurvivalCommerceView.Inspect().productCount,0,'A mismatched fen / U-coin pair cannot expose a purchase button');
 });
@@ -110,7 +110,7 @@ test('A purchase-owned wallet update hides the unique cash SKU while an older pa
  const wallet={...walletItem('unused'),sku:real.sku,currency:'u_coin',price:1,purchase_limit:1,owned:0,enabled:false,disabled_reason:'commerce_balance_insufficient'};
  h.walletSnapshot([wallet],{u_coin:0,shop_points:0,shop_gold:0});
  assert.equal(rowBuy(h,h.cardList()[0]).enabled,true,'Wallet affordability cannot disable an authorized cash purchase');
- assert.equal(h.descendants(h.cardList()[0],'BLMarketPriceMain')[0].text,'6800 U币','The cash price remains authoritative');
+ assert.equal(h.descendants(h.cardList()[0],'BLMarketPriceMain')[0].text,'6800 G币','The cash price remains authoritative');
  h.walletSnapshot([{...wallet,owned:1,disabled_reason:'already_owned'}]);
  assert.equal(h.cfg.SurvivalCommerceView.Inspect().productCount,0,'The older cash owned=0 snapshot must not resurrect a just-owned unique item');
  assert.equal(h.paid.products[0].owned,0,'The merge must not overwrite the raw payment catalog');

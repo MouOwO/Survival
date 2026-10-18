@@ -5,7 +5,7 @@
     function valid(p){return p&&(!p.IsValid||p.IsValid());}
     function panel(type,parent,cls){var p=$.CreatePanel(type,parent,"");if(cls)cls.split(/\s+/).forEach(function(c){p.AddClass(c);});return p;}
     function box(p,x,y,w,h){p.style.position=x+"px "+y+"px 0px";p.style.width=w+"px";p.style.height=h+"px";return p;}
-    function label(parent,value,cls){var p=panel("Label",parent,cls);p.text=String(value===undefined?"":value);p.hittest=false;return p;}
+    function label(parent,value,cls){var p=panel("Label",parent,cls);p.text=J.RewardNameText(value);p.hittest=false;return p;}
     function original(parent,uri,cls){
         var p=panel("Image",parent,cls);
         var resolved=J.NormalizeIconURI(uri);if(resolved)p.SetImage(resolved);
@@ -15,7 +15,7 @@
     // Older catalog snapshots and saved receipts retain the original medal names.
     // Normalize display text only; stable reward IDs and settlement data stay intact.
     J.RewardNameText=function(value){
-        return String(value===undefined||value===null?"":value).replace(/(?:僵尸岛V|VIP)(10|[1-9])勋章/g,"孤城V$1勋章");
+        return String(value===undefined||value===null?"":value).replace(/(?:僵尸岛V|VIP)(10|[1-9])勋章/g,"孤城V$1勋章").replace(/U币/g,"G币");
     };
     J.RewardAmount=function(value){
         var amount=Number(value);
@@ -75,7 +75,7 @@
             var uri=item.currency==="shop_points"?"custom_game/commerce_jade_v1/crystal.png":"custom_game/commerce_jade_v1/coin.png";
             original(row,uri,"CJPriceIcon");
         }else label(row,"¥","CJYuanIcon");
-        var uText=validU?uCoin+" U币":previewCoin!==null?previewCoin+" U币":"U币价格待同步";
+        var uText=validU?uCoin+" G币":previewCoin!==null?previewCoin+" G币":"G币价格待同步";
         label(row,isU?uText:amount+" "+currency,"CJPriceValue");p.hittest=false;p.hittestchildren=false;return p;
     };
     function detailQuality(item, rewards) {
@@ -123,7 +123,7 @@
             if(index===selectedMember)return;
             selectedMember=index;
             memberButtons.forEach(function(button,i){button.SetHasClass("UISelected",i===index);});
-            memberEffect.text=String(props.rewards[index].description).replace(/\r\n?/g,"\n").replace(/[；;][ \t]*/g,"\n");
+            memberEffect.text=J.RewardNameText(props.rewards[index].description).replace(/\r\n?/g,"\n").replace(/[；;][ \t]*/g,"\n");
             if(tip.BHasClass("Visible")){cancel();place();followPlace();}
         }
         if(inspectBundle){

@@ -4,6 +4,8 @@ from datetime import datetime, timezone, timedelta
 from email.message import Message
 import json
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import time
 import unittest
@@ -14,7 +16,7 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from .catalog import DEFAULT_SKU
-from .service import Payments, qr_matrix
+from .service import JS, Payments, qr_matrix
 from .wechat import APPID,MCHID,PUBLIC_ID,PaymentError,WeChat,decode_json,validate_success
 
 ID='WX'+'a'*30
@@ -190,6 +192,38 @@ class ServiceTests(unittest.TestCase):
         result=self.app.public(row)
         self.assertEqual(result['effect_changes'],row['effect_changes'])
         self.assertNotIn('account_id',result)
+
+    @unittest.skipUnless(shutil.which('node'), 'Node is needed for the isolated hosted-page JavaScript test')
+    def test_hosted_checkout_renames_only_visible_currency_title(self):
+        from .test_ucoin_recharge import recharge_order
+        stored=recharge_order();stored['state']='delivered'
+        before=deepcopy(stored);response=self.app.public(stored);public_before=deepcopy(response)
+        runner=r'''const fs=require("node:fs"),vm=require("node:vm");
+const input=JSON.parse(fs.readFileSync(0,"utf8")),response=input.response,nodes={};
+function freeze(value){if(value&&typeof value==="object"){Object.values(value).forEach(freeze);Object.freeze(value);}}
+freeze(response);const before=JSON.stringify(response);
+function element(id){return nodes[id]||(nodes[id]={textContent:"",style:{}});}
+vm.runInNewContext(input.script,{location:{search:"?synthetic=test"},
+ document:{getElementById:element},setInterval:()=>0,
+ fetch:()=>Promise.resolve({ok:true,json:()=>Promise.resolve(response)})});
+setImmediate(()=>process.stdout.write(JSON.stringify({title:element("title").textContent,
+ status:element("status").textContent,price:element("price").textContent,
+ responseUnchanged:JSON.stringify(response)===before})));'''
+        result=subprocess.run([shutil.which('node'),'-e',runner],
+            input=json.dumps(dict(script=JS,response=response),ensure_ascii=False),
+            text=True,encoding='utf-8',capture_output=True,timeout=10,check=True)
+        page=json.loads(result.stdout)
+        self.assertEqual(page['title'],'G币充值')
+        self.assertIn('G币充值',page['status'])
+        self.assertNotIn('U币',page['title']+page['status'])
+        self.assertEqual(page['price'],'¥1.00')
+        self.assertTrue(page['responseUnchanged'])
+        self.assertEqual(response['title'],'U币充值')
+        self.assertEqual(response['reward_lines'][0]['label'],'U币')
+        self.assertEqual(response,public_before)
+        self.assertEqual(stored,before)
+        self.assertEqual(self.db.deliveries,0)
+        self.wx.create.assert_not_called()
 
 
 if __name__=='__main__':unittest.main()

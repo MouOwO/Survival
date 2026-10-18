@@ -3,7 +3,7 @@ local catalog=require('config/generated/commerce_catalog')
 local definitions=require('config/generated/player_gameplay_stats')
 local vip=require('systems/archive_vip_rewards')
 local M={}
-local currencies={u_coin='U币',shop_points='积分',shop_gold='金币'}
+local currencies={u_coin='G币',shop_points='积分',shop_gold='金币'}
 local function copy(value)
     if type(value)~='table' then return value end
     local result={};for k,v in pairs(value) do result[k]=copy(v) end;return result

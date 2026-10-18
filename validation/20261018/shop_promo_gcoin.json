@@ -1,0 +1,98 @@
+{
+  "at": "2026-10-18T10:07:34.709168+08:00",
+  "status": "PASS_TASK_CHECKS_GAME_CAPTURE_PENDING",
+  "baseHead": "450c381da8ae142e80f29c69f6b8b645901eb2f2",
+  "scope": {
+    "referencePriceMultiplier": 1.5,
+    "promotionMembershipUnchanged": true,
+    "currencyDisplayName": "G币",
+    "protocolKey": "u_coin",
+    "actualPricesAndRateUnchanged": true,
+    "historyAndOrderSnapshotsUnchanged": true
+  },
+  "validation": {
+    "taskCandidateTests": 8,
+    "localPaymentRegressions": 45,
+    "isolatedProductionPaymentCoreTests": 32,
+    "candidateHostedCheckoutChecks": 2,
+    "compiled": [
+      {
+        "stage": "candidate",
+        "files": 12,
+        "compilerFailures": 0
+      },
+      {
+        "stage": "full",
+        "files": 12,
+        "compilerFailures": 0
+      }
+    ],
+    "visual": {
+      "resolutions": [
+        "1920x1080",
+        "1280x720"
+      ],
+      "report": "output/shop_promo_gcoin_20261018/visual_validation.json",
+      "notGameCapture": true
+    },
+    "knownBaselineFailures": [
+      "3 old market layout/event assumptions also fail against the before snapshot",
+      "1 old purchase-filter close-state assumption also fails against the before snapshot"
+    ]
+  },
+  "gameVerification": {
+    "captured": false,
+    "reason": "No stable foreground Dota 2 window was available; no map/game restart performed by this task."
+  },
+  "deployment": [
+    {
+      "status": "VERIFIED_CHECKOUT_GCOIN",
+      "payment_release": "20261018-checkout-gcoin-v1",
+      "manifest_sha256": "754926e3e7ef11603e3070eb5304cb778f55a5c8b7dfcc370d8f2612dfda4303",
+      "service_sha256": "5cd4f0f3d6915dc1d343af4ee24a12678660b01ca306ea7d4462e0054c6f8b1a",
+      "health": {
+        "payments": true,
+        "archive": true
+      },
+      "public_script_sha256": "461d8ddc7d0194bbe95bedf5d6079a53fcd0d3e57961cf9778e051d698b77ef1",
+      "payment_pid": 918317,
+      "archive": {
+        "release": "20261017-monthly-58-v1",
+        "manifest_sha256": "5ce7bf588f8d7912e391a350a124e72f9c0371bac276a26ad7e8da1dec69612c",
+        "bundle": "9d27f6174b24e922d831837ec7a971c3726dc7a95b894c536b191ad5227406fb",
+        "pid": 896141
+      },
+      "archive_unchanged": true,
+      "database_accessed": false,
+      "orders_created": 0,
+      "gateway_requests": 0
+    }
+  ],
+  "modifiedSourceFiles": [
+    "data/ui/item_resources.json",
+    "data/ui/video_shop_bundles_20261015.json",
+    "panorama/src/scripts/custom_game/video_shop_bundles.js",
+    "panorama/src/scripts/custom_game/archive_void_v1.js",
+    "panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js",
+    "panorama/src/scripts/custom_game/commerce_wallet.js",
+    "panorama/src/scripts/custom_game/common/commerce_components.js",
+    "panorama/src/scripts/custom_game/common/menu_v10.js",
+    "panorama/src/scripts/custom_game/common/ui_components.js",
+    "panorama/src/scripts/custom_game/payment_test.js",
+    "tools/tests/shop_purchase_filter.test.cjs",
+    "tools/tests/shop_v10_assets.test.cjs",
+    "tools/tests/ucoin_checkout.test.cjs",
+    "panorama/src/scripts/custom_game/black_lion_market.js",
+    "panorama/src/scripts/custom_game/black_lion_market_model.js",
+    "panorama/src/styles/custom_game/black_lion_market.css",
+    "tools/shop_catalog_20261016/test_market.cjs",
+    "tools/tests/shop_promotion_reference_price.test.cjs",
+    "scripts/vscripts/systems/commerce_settlement.lua",
+    "tools/shop_pricing_half_20261017/catalog_prices.py",
+    "tools/video_shop_20261015/import_bundles.py",
+    "server/payment_backend/service.py",
+    "server/payment_backend/test_payments.py",
+    "panorama/src/scripts/custom_game/common/item_resources.js",
+    "scripts/vscripts/config/generated/item_resources.lua"
+  ]
+}

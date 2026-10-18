@@ -3,7 +3,7 @@ const test = require('node:test');
 const {harness, walletItem} = require('../shop_catalog_20261016/harness.cjs');
 
 const types = ['u_coin', 'shop_points', 'all'];
-const captions = ['U币', '积分', '全部'];
+const captions = ['G币', '积分', '全部'];
 
 function makeFixture() {
     const points = sku => ({...walletItem(sku), sku, title:sku});
@@ -63,7 +63,7 @@ test('The three-option control defaults to all and filters actual rows without c
     assert.deepEqual(options.map(p => allNodes(p).find(n => n.paneltype === 'Label').text), captions);
     assert.equal(find(h, 'BLMarketPurchaseTypeMenu'), undefined);
     const balances = h.descendants(h.store().panel, 'BLMarketBalance')[0];
-    assert.deepEqual(h.descendants(balances, 'BLMarketBalanceText').map(p => p.text), ['U币 12', '积分 500']);
+    assert.deepEqual(h.descendants(balances, 'BLMarketBalanceText').map(p => p.text), ['G币 12', '积分 500']);
     choose(h, 'all');
     tab(h, 'all');
     assert.deepEqual(cardNames(h), ['points_b', 'u_coin_cash', 'points_a', 'legacy_cash']);

@@ -85,10 +85,10 @@ def display():
     for p in data['products']:
         authority=lookup[p['sku']];price=int(authority['price'])
         assert authority['currency']=='u_coin' and authority['price_policy']==POLICY
-        p.update(price=price,u_coin_price=price,u_coin_per_yuan=RATE,amount_fen=price,
+        p.update(currency_name='G币',price=price,u_coin_price=price,u_coin_per_yuan=RATE,amount_fen=price,
                  price_policy=POLICY,price_baseline=int(authority['price_baseline']))
         assert p['original_price']==int(authority['source_original_price'])
-    data['pricing']='1人民币=100U币；商品按2026-10-17改价前实际售价减半，原价仅展示，充值不打折'
+    data['pricing']='1人民币=100G币；商品按2026-10-17改价前实际售价减半，原价仅展示，充值不打折'
     data['price_policy']=POLICY
     backup(DISPLAY);path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
     path=ROOT/JS;raw=path.read_bytes().decode('utf-8')

@@ -110,7 +110,7 @@ test('Catalog changes update V10 names, prices, balances, ownership, VIP state a
         ? {...p,title:'服务端现金新名称',amount_fen:9010,u_coin_price:9010} : p)};
     h.updatePaid(nextPaid);
     const updated = labels(h.store().panel);
-    for (const text of ['服务端更新后的名称','73 积分','已拥有 3','服务端现金新名称','9010 U币'])
+    for (const text of ['服务端更新后的名称','73 积分','已拥有 3','服务端现金新名称','9010 G币'])
         assert(updated.some(p => p.text === text), 'A real Label refreshes to ' + text);
     for (const number of ['321','7654']) assert(updated.some(p => p.text.includes(number)));
     assert(!updated.some(p => p.text === '动态积分商品' || p.text === '37 积分'));
