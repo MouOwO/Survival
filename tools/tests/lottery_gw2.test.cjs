@@ -18,7 +18,7 @@ root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;
 // Retain the production controller's existing inline-info feature detection,
 // and reject any accidental use of the old shared navigation shell.
 config.SurvivalMenuV10={Adopt(){throw new Error('independent lottery must not adopt shared menus')}};
-for(const name of ['common/item_resources','reward_presentation','common/tooltip_dismiss','native_ui_icons','item_art_remaining_5d5c1152eb'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
+for(const name of ['common/item_resources','reward_presentation','common/tooltip_dismiss','native_ui_icons','item_art_remaining_5d5c1152eb','black_lion_market'])vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+name+'.js','utf8'),env);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js','utf8'),env);
 const current=config.SurvivalLottery;
 const originalDialog=config.RemainingHandoff.LotteryDialog,originalReward=config.RemainingHandoff.RewardCard;
@@ -72,6 +72,21 @@ presentation.Fit();const steady=presentation.Inspect();
 for(let i=0;i<30;i++){current.Feature('details');presentation.Fit();assert(presentation.Inspect().trackedOwned<=steady.trackedOwned,'deleted reward visuals cannot accumulate');assert(presentation.Inspect().trackedMoved<=steady.trackedMoved,'deleted native icons cannot accumulate');}
 const first=nodes.LotteryInfoList.children.find(c=>c.BHasClass('LotteryDetailRow')),before=requests.length;first.events.onmouseover();assert.equal(requests.length,before,'hover is read-only');
 assert(nodes.LotteryGW2Tooltip.visible);assert(nodes.LotteryGW2TooltipDescription.text.includes('效果'));nodes.LotteryGW2Tooltip.events.onmouseover();assert(!nodes.LotteryGW2Tooltip.visible,'Entering the tooltip dismisses it immediately');first.events.onmouseover();assert(!nodes.LotteryGW2Tooltip.visible,'The dismissed source cannot immediately reopen its tooltip');assert(nodes.LotteryItemTooltip.BHasClass('Hidden'),'A consumed tooltip request cannot fall through to the old XML tooltip');first.events.onmouseout();assert(!nodes.LotteryGW2Tooltip.visible);
+assert(nodes.LotteryGW2Tooltip.BHasClass('BLMarketDetail'),'Lottery uses the actual market tooltip skin');
+assert(nodes.LotteryGW2Tooltip.children.some(child=>child.BHasClass('BLMarketDetailSurface')));
+assert(!nodes.LotteryGW2TooltipFrame&&!nodes.LotteryGW2TooltipBacking,'No independent blue frame or backing remains');
+env.GameUI.GetCursorPosition=()=>[1800,1000];
+for(const [description,expected]of [
+ ['攻击+1,000；护甲+5 | 生命+20%（每秒恢复+1；持续10秒）',['攻击+1,000','护甲+5','生命+20%（每秒恢复+1；持续10秒）']],
+ ['伐木工攻速+20% 箭塔攻击成长+1 墙减伤+5% 每1级地图等级，墙生命加成+1% 墙每秒生命+5 星悦积分+200',['伐木工攻速+20%','箭塔攻击成长+1','墙减伤+5%','每1级地图等级，墙生命加成+1%','墙每秒生命+5','星悦积分+200']],
+ ['英雄最终伤害+25%英雄攻击减甲+25英雄全属性加成+25%星悦积分+200获得英雄翅膀:赛博主宰（后续再做皮肤） 购买后自动激活',['英雄最终伤害+25%','英雄攻击减甲+25','英雄全属性加成+25%','星悦积分+200','获得英雄翅膀:赛博主宰（后续再做皮肤）','购买后自动激活']],
+ ['解锁英雄：魔法少女 星悦积分+200 英雄全属性加成+30%，攻击减甲+20 减少0.1攻击间隔 开局自带1转技能',['解锁英雄：魔法少女','星悦积分+200','英雄全属性加成+30%','攻击减甲+20','减少0.1攻击间隔','开局自带1转技能']],
+ ['每持有一种UR道具额外增加4%英雄最终伤害（包含自身，重复分解不计）',['每持有一种UR道具额外增加4%英雄最终伤害（包含自身，重复分解不计）']]
+]){
+ presentation.Tooltip({name:'分行检查',description},first);
+ assert.deepEqual(nodes.LotteryGW2TooltipDescription.text.split(String.fromCharCode(10)),expected);
+ assert.equal(nodes.LotteryGW2Tooltip.hittest,false,'Short market-style tooltip is passive');
+}
 let tooltipCursor=[1800,1000];env.GameUI.GetCursorPosition=()=>tooltipCursor;
 const scrollTip=nodes.LotteryGW2Tooltip,scrollDescription=nodes.LotteryGW2TooltipDescription,scrollViewport=nodes.LotteryGW2TooltipScroll;
 Object.defineProperty(scrollDescription,'actuallayoutheight',{get(){return Math.max(24,Math.ceil(String(this.text||'').length/17)*23);}});
