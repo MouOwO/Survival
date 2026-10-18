@@ -324,7 +324,8 @@ local function spawn_member(session, member)
     end
     local combat_profile, profile_error = combat_profiles.resolve(
         member.member_id,
-        session.difficulty_id
+        session.difficulty_id,
+        session.game_mode
     )
     if profile_error then return nil, profile_error end
 
@@ -405,6 +406,12 @@ local function spawn_member(session, member)
     if unit.Script_SetAttackRange and combat_archetype.attack_range then
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
+    if session.game_mode == "rich"
+        and (session.difficulty_id == "N2" or session.difficulty_id == "N3") and combat_profile
+        and ((tonumber(combat_profile.health) or 0) > 100000000
+            or (tonumber(combat_profile.attack) or 0) > 100000000) then
+        combat_profile = require("combat/endless_stat_projection").prepare(unit, combat_profile)
+    end
     apply_combat_stats(unit, combat_archetype, combat_profile)
     monster_visual.apply(unit, archetype, {fresh_unit = true})
     local visual_call_ok, visual_ok, visual_detail = pcall(
@@ -476,7 +483,7 @@ local function release_challenge_11_unit(unit)
     elseif unit.SetForceAttackTarget then unit:SetForceAttackTarget(nil) end
 end
 
-local function prepare_challenge_11(player_id, team, difficulty_id)
+local function prepare_challenge_11(player_id, team, difficulty_id, mode_id)
     if challenge_11_prepared_by_player[player_id] then return true end
     local encounter = encounters.by_id.encounter_challenge_11
     local challenge = challenge_for_encounter("encounter_challenge_11")
@@ -489,6 +496,7 @@ local function prepare_challenge_11(player_id, team, difficulty_id)
         encounter = encounter,
         encounter_id = "encounter_challenge_11",
         difficulty_id = difficulty_id,
+        game_mode = mode_id,
         members = list,
         monsters = {},
         monster_count = 0,
@@ -610,7 +618,8 @@ local function validate_session_combat_profiles(session)
     for _, member in ipairs(session.members) do
         local _, profile_error = combat_profiles.resolve(
             member.member_id,
-            session.difficulty_id
+            session.difficulty_id,
+            session.game_mode
         )
         if profile_error then return false, profile_error end
     end
@@ -871,6 +880,7 @@ function M.start(payload)
     if difficulty_id == "" then
         return { ok = false, error = "challenge_difficulty_unavailable" }
     end
+    local mode_id = wave_state and wave_state.game_mode
 
     if challenge.challenge_id == "challenge_10" then
         local abyss_stage, inventory_error = owned_series_stage(player_id, "legend_abyss")
@@ -949,6 +959,7 @@ function M.start(payload)
         encounter = encounter,
         encounter_id = encounter_id,
         difficulty_id = difficulty_id,
+        game_mode = mode_id,
         members = list,
         stage = 1,
         display_stage = display_stage,
@@ -1429,7 +1440,8 @@ local function prepare_after_hero_summoned(payload)
     prepare_challenge_11(
         player_id,
         tonumber(payload.team) or PlayerResource:GetTeam(player_id),
-        difficulty_id
+        difficulty_id,
+        wave_state and wave_state.game_mode
     )
 end
 

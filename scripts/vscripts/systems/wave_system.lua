@@ -1129,7 +1129,11 @@ local function start_wave(number, reason)
     end
     local next_delay, last_delay = 0, 0
     local normal_instance_index = 0
+    local batch_ordinals = {}
+    local stat_variants = require("systems/rich_stat_variant_row")
     for _, row in ipairs(spawn_sequence(wave.batches)) do
+        batch_ordinals[row] = (batch_ordinals[row] or 0) + 1
+        local spawn_row = stat_variants.resolve(row, batch_ordinals[row])
         local visual_instance_index = nil
         if wave_spawn_sequence.is_normal(row) then
             normal_instance_index = normal_instance_index + 1
@@ -1139,7 +1143,7 @@ local function start_wave(number, reason)
         last_delay = delay
         for _, channel in ipairs(channels) do
             scheduler.after(delay, spawn_callback(
-                row,
+                spawn_row,
                 token,
                 number,
                 visual_instance_index,
@@ -1426,7 +1430,11 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason, playe
     )
     local next_delay, last_delay = 0, 0
     local normal_instance_index = 0
+    local batch_ordinals = {}
+    local stat_variants = require("systems/rich_stat_variant_row")
     for _, row in ipairs(spawn_sequence(wave.batches)) do
+        batch_ordinals[row] = (batch_ordinals[row] or 0) + 1
+        local spawn_row = stat_variants.resolve(row, batch_ordinals[row])
         local visual_instance_index = nil
         if wave_spawn_sequence.is_normal(row) then
             normal_instance_index = normal_instance_index + 1
@@ -1436,7 +1444,7 @@ local function begin_debug_wave_spawn(number, wave, token, preload_reason, playe
         last_delay = delay
         for _, selected_channel in ipairs(channels) do
             scheduler.after(delay, spawn_callback(
-                row,
+                spawn_row,
                 token,
                 number,
                 visual_instance_index,

@@ -8,6 +8,7 @@ GameRules = { GetGameTime = function() return 0 end }
 RandomFloat = function() return 1 end
 package.loaded["systems/tree_damage_rules"] = {
     is_tree = function() return false end,
+    is_arrow_tower = function() return false end,
     is_basic_attack_category = function(category) return category == 1 end,
     allows_damage = function() return true end,
     reset_pending_attacks = function() end,

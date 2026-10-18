@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "status": "PASS_OFFLINE",
+  "date": "2026-10-18",
+  "mode_id": "rich",
+  "difficulties": [
+    "N2",
+    "N3"
+  ],
+  "source_videos": [
+    {
+      "difficulty_id": "N2",
+      "file_name": "丰饶模式N2 .mp4",
+      "path": "C:\\Users\\Administrator\\Videos\\丰饶模式N2 .mp4",
+      "bytes": 2613053096,
+      "sha256": "82eb58d18bcf3013f2a1b15f44dced5a8b3b1d2af2c193138283583af74ab0a5"
+    },
+    {
+      "difficulty_id": "N3",
+      "file_name": "丰饶模式N3.mp4",
+      "path": "C:\\Users\\Administrator\\Videos\\丰饶模式N3.mp4",
+      "bytes": 2377300143,
+      "sha256": "8b7b68b7963723e75e572160dcb01a5b1b384b99d5e2e7449c164100e51f987b"
+    }
+  ],
+  "observations": {
+    "N2": 94,
+    "N3": 74,
+    "N1": 48
+  },
+  "all_new_observations_consumed": true,
+  "versioned_evidence_pngs": 168,
+  "wave_profiles": 178,
+  "encounter_profiles": 60,
+  "variant_subprofiles_added": 2,
+  "coverage_rows": 1493,
+  "inherited_independent_system_rows": 1253,
+  "per_difficulty_summary": {
+    "N2": {
+      "waves": 30,
+      "batches": 89,
+      "wave_value_sources": {
+        "video": 82,
+        "estimated": 7
+      },
+      "encounter_value_sources": {
+        "video": 30
+      }
+    },
+    "N3": {
+      "waves": 30,
+      "batches": 89,
+      "wave_value_sources": {
+        "estimated": 9,
+        "video": 80
+      },
+      "encounter_value_sources": {
+        "estimated": 20,
+        "video": 10
+      }
+    }
+  },
+  "native_engine_started": false,
+  "native_engine_combat_verified": false,
+  "validation_kind": "offline execution of production Lua paths with engine fixtures, plus dataset/evidence/generator checks",
+  "data_sha256": "4814bd1686dc2cd5157676f2370fb5579da4eff521bb9e99ace48ef3b4aa532e",
+  "tests": [
+    {
+      "test": "scripts/vscripts/tests/test_rich_monster_profiles.lua",
+      "passed": true,
+      "seconds": 0.168,
+      "last_lines": [
+        "RICH_N3_REBIRTH10_REAL_BOUNDARY_PASS logical_health=2941400000 native_health=100000000 scale=29.414000000000001",
+        "RICH_MONSTER_SPAWNING_PASS: 455 production births, public entries/staging, native large-stat boundaries, reward/kill idempotence and original-profile respawn",
+        "RICH_MONSTER_PROFILES_PASS: all 30 members across N2/N3, other modes/difficulties, immutable provenance"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_rich_monster_catalog.lua",
+      "passed": true,
+      "seconds": 1.096,
+      "last_lines": [
+        "RICH_MONSTER_CATALOG_PASS: real generated 178 wave batches and 60 encounters, final stats once, provenance, counts, immutable sources and alternating modes"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_rich_wave_stat_variants.lua",
+      "passed": true,
+      "seconds": 0.173,
+      "last_lines": [
+        "[WaveSystem] dev wave preload finished wave=6 reason=ready_after_buffer pending=0 failed=false elapsed=100.00",
+        "[WaveSystem] dev wave spawn started wave=6 preload=ready_after_buffer",
+        "RICH_WAVE_STAT_VARIANTS_PASS: 654 real births, N2/N3 observed W6 variants, formal/debug two-owner slots, 30/29 split, independent batch ordinals, reversed callbacks and other-mode isolation"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_rich_n2_n3_video_fixtures.lua",
+      "passed": true,
+      "seconds": 0.023,
+      "last_lines": [
+        "RICH_N2_N3_VIDEO_FIXTURES_PASS: independent panels, mixed units, all bosses, W6 variants, nonwave and explicit missing-data estimates"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_rich_wave_data.lua",
+      "passed": true,
+      "seconds": 0.072,
+      "last_lines": [
+        "RICH_WAVE_DATA_PASS: OCR variants and bosses, estimate provenance, 60 per owner, immutable models/source, difficulty ratios and W25 tail extension, mixed-mode isolation"
+      ]
+    },
+    {
+      "test": "tools/test_endless_large_damage_cost.lua",
+      "passed": true,
+      "seconds": 0.022,
+      "last_lines": [
+        "LARGE_ATTACK_COST amount=1e+30 instructions=86400 native_attack=1e+08",
+        "LARGE_ATTACK_COST amount=1e+100 instructions=86400 native_attack=1e+08",
+        "ENDLESS_LARGE_DAMAGE_COST_PASS fixed native call/event counts and bounded Lua instructions; native pre-filter ability input reported separately"
+      ]
+    },
+    {
+      "test": "tools/rich_n2_n3_20261018/test_profiles.py",
+      "passed": true,
+      "seconds": 1.528,
+      "last_lines": [
+        "Ran 7 tests in 1.432s",
+        "",
+        "OK"
+      ]
+    },
+    {
+      "test": "tools/rich_n2_n3_20261018/build_profiles.py",
+      "passed": true,
+      "seconds": 0.233,
+      "last_lines": [
+        "RICH_N2_N3_PROFILES_CHECK_PASS: 60 waves and complete encounter matrix"
+      ]
+    },
+    {
+      "test": "tools/rich_waves_20261018/build_profiles.py",
+      "passed": true,
+      "seconds": 0.077,
+      "last_lines": [
+        "RICH_WAVE_PROFILE_GENERATION_CHECK_PASS"
+      ]
+    }
+  ],
+  "lua_syntax_files": 13,
+  "python_syntax_files": 3,
+  "native_health_fixture": {
+    "member_id": "encounter_rebirth_10",
+    "difficulty_id": "N3",
+    "logical_health": 2941400000,
+    "native_health": 100000000,
+    "scale": 29.414,
+    "logical_health_clamped": false
+  },
+  "variant_mix": {
+    "wave": 6,
+    "ordinary_count": 59,
+    "design_ratio": "1:1, rounded to30/29; not observed video counts",
+    "special_count": 1,
+    "total_per_owner": 60
+  },
+  "preserved": [
+    "ordinary-mode CSVs",
+    "N1 and N4-N10 mode balance",
+    "archetypes/models",
+    "roles, counts, spawn timing and rewards",
+    "independent building/archive/endless unlocks and balance"
+  ],
+  "limitations": [
+    "N3 20 nonwave members inferred across existing families from N2 panels and matched ten-sin difficulty relationships; explicitly marked estimates.",
+    "Missing N2/N3 wave variants estimated from calibrated existing N1 variants or matching other-difficulty video.",
+    "Large-number HP retains displayed 万/亿 resolution; not claimed to be more precise engine values.",
+    "No Dota native-engine or multiplayer validation was performed."
+  ]
+}

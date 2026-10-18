@@ -820,6 +820,17 @@ def build_index(files: list[Path], output: Path) -> None:
     output.write_text("\n".join(index), encoding="utf-8", newline="\n")
 
 
+def build_mode_balance_configs() -> set[str]:
+    """Regenerate non-CSV balance modules before removing stale outputs."""
+    builders = {
+        "rich_wave_profiles.lua": "tools/rich_waves_20261018/build_profiles.py",
+        "rich_monster_profiles.lua": "tools/rich_n2_n3_20261018/build_profiles.py",
+    }
+    for script in builders.values():
+        subprocess.run([sys.executable, str(ROOT / script)], cwd=ROOT, check=True)
+    return set(builders)
+
+
 def main() -> int:
     files = sorted(CSV_ROOT.rglob("*.csv"))
     if not files:
@@ -851,6 +862,7 @@ def main() -> int:
     names = sorted(source.stem for source in files)
     expected_outputs = {f"{name}.lua" for name in names}
     expected_outputs.add("index.lua")
+    expected_outputs.update(build_mode_balance_configs())
     # Asset builders own these modules; a CSV rebuild must keep their mappings.
     expected_outputs.update({"building_white_shells.lua", "wall_destruction_models.lua"})
     for old in OUT_ROOT.glob("*.lua"):

@@ -162,7 +162,7 @@ local function current_difficulty_id()
         difficulty_id = difficulty_config.default_id
     end
     if difficulty_id == "" then return nil, "monster_difficulty_unavailable" end
-    return difficulty_id, nil
+    return difficulty_id, nil, wave_state and wave_state.game_mode
 end
 
 local function start_encounter(payload)
@@ -193,11 +193,12 @@ local function start_encounter(payload)
     if not archetype or archetype.enabled == false then
         return { ok = false, error = "archetype_not_found" }
     end
-    local difficulty_id, difficulty_error = current_difficulty_id()
+    local difficulty_id, difficulty_error, mode_id = current_difficulty_id()
     if not difficulty_id then return { ok = false, error = difficulty_error } end
     local combat_profile, profile_error = combat_profiles.resolve(
         encounter.encounter_id,
-        difficulty_id
+        difficulty_id,
+        mode_id
     )
     if profile_error then return { ok = false, error = profile_error } end
 
@@ -247,6 +248,11 @@ local function start_encounter(payload)
     end
     FindClearSpaceForUnit(unit, origin, true)
     local profile = combat_profile or archetype
+    if mode_id == "rich" and (difficulty_id == "N2" or difficulty_id == "N3") and combat_profile
+        and ((tonumber(profile.health) or 0) > 100000000
+            or (tonumber(profile.attack) or 0) > 100000000) then
+        profile = require("combat/endless_stat_projection").prepare(unit, profile)
+    end
     local collision_profile = wave_monster_collision.profile(encounter, archetype)
     monster_hull_scale.apply(unit, 1, collision_profile.base_hull_radius)
     unit.survival_movement_type = archetype.movement_type or "ground"
@@ -325,6 +331,7 @@ local function start_encounter(payload)
         reward_profile_id = encounter.reward_profile_id,
         spawn_point_id = encounter.spawn_point_id,
         difficulty_id = difficulty_id,
+        game_mode = mode_id,
         projection = project_encounter(encounter),
     }
 
@@ -422,7 +429,9 @@ local function reenter_encounter(payload)
         resumed = true,
         encounter_id = encounter_id,
         entindex = meta.unit:entindex(),
-        boss_health = meta.unit:GetHealth(),
+        boss_health = require("combat/endless_stat_projection").for_ui(
+            meta.unit, meta.unit:GetHealth(), "health"
+        ),
         camera_target = { x = origin.x, y = origin.y, z = origin.z },
     }
 end

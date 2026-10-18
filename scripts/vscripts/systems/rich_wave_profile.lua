@@ -1,4 +1,5 @@
 local config = require("config/generated/rich_wave_profiles")
+local recorded_config = require("config/generated/rich_monster_profiles")
 local M = {}
 local FIELDS = { "health", "attack", "war3_armor" }
 
@@ -93,6 +94,39 @@ local function redistribute(batches)
 end
 
 function M.apply(built, source_rows)
+    local difficulty_id = built.difficulty.difficulty_id
+    local recorded = (recorded_config.difficulties or {})[difficulty_id]
+    if recorded then
+        -- These are final N2/N3 values, including explicitly marked estimates.
+        -- Applying the old N1 difficulty ratio here would scale them twice.
+        local result = { difficulty = built.difficulty, total_waves = built.total_waves,
+            rows = {}, waves = {}, mode_id = config.mode_id }
+        for wave_number = 1, built.total_waves do
+            local profile = assert(recorded.waves[wave_number], "rich_recorded_wave_missing")
+            local batches = {}
+            for _, template in ipairs(built.waves[wave_number]) do
+                local stats = assert(profile.batches[template.batch_id], "rich_recorded_batch_missing")
+                local row = clone(template)
+                for _, field in ipairs(FIELDS) do
+                    assert(type(stats[field]) == "number", "rich_recorded_stat_missing:" .. field)
+                    row[field] = stats[field]
+                end
+                row.rich_reference_wave = wave_number
+                row.rich_difficulty_scaled = false
+                row.rich_stats_source = stats.stats_source
+                row.rich_stats_estimated = stats.estimated == true
+                row.rich_estimation_method = stats.estimation_method
+                row.rich_source_record_id = stats.source_record_id
+                row.rich_field_sources = clone(stats.field_sources)
+                row.rich_stat_variants = clone(stats.variants)
+                batches[#batches + 1] = row
+                result.rows[#result.rows + 1] = row
+            end
+            redistribute(batches)
+            result.waves[wave_number] = batches
+        end
+        return result
+    end
     local n1 = {}
     for _, row in ipairs(source_rows) do
         if row.enabled ~= false and row.difficulty_id == config.source_difficulty_id then

@@ -145,10 +145,10 @@ for number, expected in pairs(bosses) do
     end
 end
 
--- Higher difficulties retain their original per-batch relation to N1. The
+-- Unrecorded higher difficulties retain their original per-batch relation to N1. The
 -- comparison uses source difficulty data, not a multiplier supplied by overlay.
 local fields = {"attack", "health", "war3_armor"}
-for _, id in ipairs({"N2", "N5", "N10"}) do
+for _, id in ipairs({"N5", "N10"}) do
     for number = 1, 25 do
         local n1_old = index_batches(legacy.N1.waves[number])
         local n1_new = index_batches(rich.N1.waves[number])
