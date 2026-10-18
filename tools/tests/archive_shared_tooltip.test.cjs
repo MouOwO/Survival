@@ -15,6 +15,29 @@ assert.equal(a.elements.Quantity.text,'2/60');assert.equal(b.elements.Quantity.t
 assert(a.Show({...item,id:'wife_01'},'wife',firstCard));assert(a.elements.State.text.includes('已拥有'),'Owned wife collections share the existing owned-item tooltip semantics');
 assert(a.Show({...item,id:'wife_31',description:'初始魔法卡+1',draw_enabled:0,availability_note:'待适配，暂不参与抽取，不消耗玫瑰'},'wife',firstCard));assert.equal(a.elements.Effect.text,'初始魔法卡+1');assert.equal(a.elements.Condition.text,'待适配，暂不参与抽取，不消耗玫瑰');assert(a.elements.Condition.visible);assert.equal(a.elements.State.text,'收藏 · 已拥有','Availability no longer replaces the real ownership state');
 assert(a.Show(item,'ex',firstCard));assert.equal(a.elements.Condition.text,'');assert.equal(a.elements.Condition.visible,false,'Switching to ordinary rows clears the adaptation-only note');
+const uniquePoints=Object.freeze({id:'lottery_attribute_crystal',name:'属性结晶',description:'英雄全属性+50',count:1,count_known:1,max_owned:1,target:1,duplicate_points:100,duplicate_currency:'shop_points'});
+const uniquePointsBefore=JSON.stringify(uniquePoints);
+assert(a.Show(uniquePoints,'points',firstCard));
+assert(a.elements.State.text.endsWith(' · 已解锁'),'Unique points items use unlock wording at the top');
+assert.equal(a.elements.MetricCaption.text,'解锁状态');assert.equal(a.elements.Quantity.text,'已解锁');
+assert(a.elements.Condition.text.includes('唯一持有 · 重复获得转化为 100 商城积分'),'Duplicate conversion uses the configured amount and currency');
+assert.equal(a.elements.Effect.text,uniquePoints.description);assert.equal(JSON.stringify(uniquePoints),uniquePointsBefore);
+for(const [changes,stateText]of[[{count:0},'未解锁'],[{count:7},'已解锁'],[{count:7,count_known:0,unlocked:1},'状态待同步']]){
+ const row=Object.freeze({...uniquePoints,...changes}),before=JSON.stringify(row);assert(a.Show(row,'points',firstCard));
+ assert(a.elements.State.text.endsWith(' · '+stateText));assert.equal(a.elements.Quantity.text,stateText);assert.equal(a.elements.MetricCaption.text,'解锁状态');
+ assert.equal(JSON.stringify(row),before,'Repeated hover leaves historical excess and unknown counts untouched');
+}
+assert(a.Show({id:'daily_health_gem',name:'生命宝石',description:'墙生命+50',count:3,target:999999},'points',firstCard));
+assert(a.elements.State.text.endsWith(' · 已拥有'));assert.equal(a.elements.MetricCaption.text,'拥有数量');assert.equal(a.elements.Quantity.text,'3/999999');
+assert(!a.elements.Condition.text.includes('重复获得转化'),'Daily stacks never inherit a previous unique-item conversion note');
+assert(a.Show({id:'daily_wealth_talisman',name:'聚财古符',description:'开局木材+50',count:1,target:1},'points',firstCard));
+assert(a.elements.State.text.endsWith(' · 已解锁'));assert.equal(a.elements.Quantity.text,'已解锁');
+assert(!a.elements.Condition.text.includes('重复获得转化'),'A one-time monthly reward has no invented duplicate payout');
+assert(a.Show({...uniquePoints,id:'no_currency',duplicate_currency:undefined},'points',firstCard));
+assert(!a.elements.Condition.text.includes('重复获得转化'),'An amount without a declared currency is not a payout promise');
+assert(a.Show({...uniquePoints,id:'not_points'},'ex',firstCard));
+assert(a.elements.State.text.endsWith(' · 已拥有'));assert.equal(a.elements.MetricCaption.text,'拥有数量');assert.equal(a.elements.Quantity.text,'1/1');
+assert(!a.elements.Condition.text.includes('重复获得转化'),'Other archive categories keep their existing quantity semantics');
 const mapEffects='每升一级：城墙初始生命+100；城墙每秒回血+5\n本级奖励：伐木效率+1\n人口+1';
 const mapLevel=Object.freeze({id:'map_10',name:'地图等级10',description:'累计有效在线时长：90小时\n'+mapEffects,count:4657,target:5400,completed:0,__v10CurrentLevel:9,__v10TargetLevel:10});
 const mapSnapshot=JSON.stringify(mapLevel),formatted=[];

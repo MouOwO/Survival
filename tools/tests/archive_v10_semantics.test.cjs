@@ -91,6 +91,50 @@ for (const category of ['shadow', 'pet', 'points', 'shop', 'friend', 'ex', 'beas
     assert.equal(S.Quantity({count: 4, count_known: 0}, category), '—');
     assert.equal(S.State({count: 4, count_known: 0, unlocked: 0}, category), null);
 }
+// The points page mixes unique lottery items and stackable daily rewards.
+assert.equal(typeof S.IsUnlockItem, 'function');
+for (const [item, expected] of [
+    [{max_owned: 1}, true], [{target: '1'}, true],
+    [{max_owned: '1', target: 999999}, true],
+    [{max_owned: 999999, target: 1}, false],
+    [{max_owned: null, target: 1}, false], [{max_owned: 0, target: 1}, false],
+    [{target: 999999}, false], [{count: 1}, false], [{}, false]
+]) assert.equal(S.IsUnlockItem(item, 'points'), expected, 'Only the authoritative holding cap identifies a unique points item');
+for (const category of ['shadow', 'pet', 'fragment', 'commerce_goods', 'titles']) {
+    assert.equal(S.IsUnlockItem({max_owned: 1, target: 1}, category), false, 'Other categories retain their existing semantics');
+}
+for (const [item, expectedState, expectedText] of [
+    [{count: 0, target: 1}, false, '未解锁'],
+    [{count: 1, max_owned: 1}, true, '已解锁'],
+    [{count: 7, target: 1}, true, '已解锁'],
+    [{count: 7, max_owned: 1, unlocked: 0}, false, '未解锁'],
+    [{count: 0, max_owned: 1, unlocked: 1}, true, '已解锁'],
+    [{count: 7, max_owned: 1, count_known: 0, unlocked: 1}, null, '状态待同步'],
+    [{count: 7, target: 1, quantity_unknown: 1}, null, '状态待同步'],
+    [{max_owned: 1}, null, '状态待同步']
+]) {
+    const row = Object.freeze({...item}), original = JSON.stringify(row);
+    assert.equal(S.IsUnlockItem(row, 'points'), true);
+    assert.equal(S.State(row, 'points'), expectedState, 'Known quantity and existing explicit unlock state remain authoritative');
+    assert.equal(S.Quantity(row, 'points'), expectedText);
+    assert.equal(S.Metric(row, 'points'), '解锁状态');
+    assert.deepEqual(plain(S.Progress(row, 'points')), {
+        known: expectedState !== null, ratio: null, current: null, target: null, text: expectedText
+    }, 'A unique item has an unlock state, never a quantity progress bar');
+    assert.equal(JSON.stringify(row), original, 'Legacy excess counts are presented without changing the snapshot');
+}
+const dailyPoints = Object.freeze({id: 'daily_health_gem', count: 3, target: 999999});
+assert.equal(S.Quantity(dailyPoints, 'points'), '3/999999');
+assert.equal(S.Metric(dailyPoints, 'points'), '拥有数量');
+assert.deepEqual(plain(S.Progress(dailyPoints, 'points')), {
+    known: true, ratio: 3 / 999999, current: 3, target: 999999, text: '3/999999'
+}, 'Daily gem stacks keep their real quantity and progress');
+assert.equal(S.Quantity({count: 4}, 'points'), '4', 'Legacy rows with no cap are not assumed unique');
+assert.equal(S.Quantity({count: 4, max_owned: 30, target: 1}, 'points'), '4/30', 'Explicit max_owned overrides a stale target');
+const mixedPoints = {ok: 1, rows: [{id: 'lottery_attribute_crystal', count: 7, target: 1}, {...dailyPoints}]};
+const mixedPointsBefore = JSON.stringify(mixedPoints);
+assert.deepEqual(plain(S.Normalize(mixedPoints, 'points')), mixedPoints.rows);
+assert.equal(JSON.stringify(mixedPoints), mixedPointsBefore, 'Normalization never migrates or clamps server inventory in the client');
 assert.equal(S.Quantity({unlocked: 1, count: 1}, 'titles'), '');
 assert.equal(S.State({unlocked: 1}, 'titles'), true);
 assert.equal(S.State({unlocked: 0}, 'titles'), false);

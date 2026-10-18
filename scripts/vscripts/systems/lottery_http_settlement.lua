@@ -7,11 +7,28 @@ local function copy(v)
     if type(v)~='table' then return v end
     local r={};for k,x in pairs(v) do r[k]=copy(x) end;return r
 end
+local function inventory_count(value)
+    value=tonumber(value)
+    if not value or value~=value or value<0 or value==math.huge
+        or value~=math.floor(value) then return 0 end
+    return value
+end
+local function owned_count(counts,item_id)
+    local id=aliases.canonical(item_id);local total=0
+    -- Historical keys may coexist with their current names. Aggregate only
+    -- for ownership reads; a snapshot/draw must not migrate those saved keys.
+    for raw_id,value in pairs(counts or {}) do
+        if aliases.canonical(raw_id)==id then
+            total=math.min(9007199254740991,total+inventory_count(value))
+        end
+    end
+    return total
+end
 local function public_item(item,counts)
     local r={}
     for _,k in ipairs({'id','name','description','quality','item_type','duration_type','duration_text','icon','icon_type','effect_status','duplicate_points','exchange_points','exchange_enabled','max_owned'}) do r[k]=item[k] end
     r.converted_currency='shop_points'
-    r.owned_count=tonumber(counts[aliases.canonical(item.id)]) or 0
+    r.owned_count=owned_count(counts,item.id)
     r.owned=r.owned_count>0;r.at_max_owned=r.owned_count>=item.max_owned
     return r
 end
@@ -60,7 +77,7 @@ local function add(stats,field,delta)
     end
 end
 local function grant(item,counts,stats,archive)
-    local id=aliases.canonical(item.id);local owned=tonumber(counts[id]) or 0
+    local id=aliases.canonical(item.id);local owned=owned_count(counts,id)
     local result=public_item(item,counts);result.duplicate=owned>=item.max_owned;result.converted_points=0
     if result.duplicate then
         -- Duplicate rewards fund the commerce wallet, never the separate loyalty score.
@@ -72,7 +89,7 @@ local function grant(item,counts,stats,archive)
         assert(old+delta<=9007199254740991,'commerce_wallet_limit')
         wallet.shop_points=old+delta
         result.converted_points=delta;result.converted_currency='shop_points'
-    else counts[id]=owned+1;for _,effect in ipairs(item.effects) do add(stats,effect.field_id,effect.value) end end
+    else counts[id]=inventory_count(counts[id])+1;for _,effect in ipairs(item.effects) do add(stats,effect.field_id,effect.value) end end
     return result
 end
 local function roll(pool,forced)
@@ -118,7 +135,7 @@ function M.settle(profile,command)
     elseif command.kind=='lottery_exchange' then
         local item=pool.by_id[command.item_id]
         if not item or item.exchange_enabled==false or item.exchange_points<=0 then return {ok=false,error='lottery_item_invalid'} end
-        if (tonumber(counts[aliases.canonical(item.id)]) or 0)>=item.max_owned then return {ok=false,error='lottery_item_owned'} end
+        if owned_count(counts,item.id)>=item.max_owned then return {ok=false,error='lottery_item_owned'} end
         if (tonumber(stats.starjoy_points) or 0)<item.exchange_points then return {ok=false,error='starjoy_points_insufficient'} end
         add(stats,'starjoy_points',-item.exchange_points);response.item=grant(item,counts,stats,archive);response.item.exchanged=true;response.cost=item.exchange_points
     else return {ok=false,error='lottery_command_invalid'} end

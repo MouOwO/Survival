@@ -42,6 +42,30 @@ for(const category of ['shadow','points','pet','friend','ex','beast','fishing'])
 }
 assert.equal(ctx.unlocked({count:10,count_known:0},'fishing'),null);
 assert.equal(ctx.unlocked({count:99,unlocked:0},'friend'),false);
+// The real handoff loads before semantics; controller callbacks run afterwards.
+const archiveLayout=fs.readFileSync(path.join(root,'panorama/src/layout/custom_game/archive.xml'),'utf8');
+const helperPath='/archive_handoff_180de7e38b.js',semanticsPath='/archive_v10_semantics.js',controllerPath='/archive_180de7e38b_titles_compact_v6.js';
+for(const name of[helperPath,semanticsPath,controllerPath])assert(archiveLayout.includes(name));
+assert(archiveLayout.indexOf(helperPath)<archiveLayout.indexOf(semanticsPath));
+assert(archiveLayout.indexOf(semanticsPath)<archiveLayout.indexOf(controllerPath));
+assert.equal(ctx.cfg.ArchiveV10Semantics,undefined);
+assert.equal(ctx.unlocked({count:1,target:1},'points'),true,'The early-loaded helper keeps its pre-semantics fallback');
+ctx.GameUI={CustomUIConfig:()=>ctx.cfg};
+vm.runInContext(fs.readFileSync(path.join(root,'panorama/src/scripts/custom_game/archive_v10_semantics.js'),'utf8'),ctx);
+for(const [item,expected]of[
+ [{count:0,target:1},false],[{count:1,max_owned:1},true],[{count:7,target:1},true],
+ [{count:7,count_known:0,max_owned:1},null],
+ [{count:7,count_known:0,max_owned:1,unlocked:1},null],
+ [{count:7,quantity_unknown:1,target:1},null],[{max_owned:1},null],
+ [{count:3,target:999999},true],[{count:3,count_known:0,target:999999},null],
+ [{count:7,unlocked:0,target:1},false]
+]){
+ const row=Object.freeze({...item}),before=JSON.stringify(row);
+ assert.equal(ctx.cfg.ArchiveV10Semantics.State(row,'points'),expected);
+ assert.equal(ctx.unlocked(row,'points'),expected,'The actual handoff filter agrees with current points semantics');
+ assert.equal(JSON.stringify(row),before,'Filtering never edits legacy excess or unknown server counts');
+}
+console.log('PASS: actual handoff points filtering resolves live semantics after load; unknown rows enter neither unlocked nor locked.');
 assert.equal(ctx.effectMarkup('攻击+10',undefined,false),'<font color="#788b93">攻击+10</font>');
 assert.equal(ctx.effectMarkup('攻击+10',undefined,null),'<font color="#788b93">攻击+10</font>');
 assert.ok(ctx.effectMarkup('攻击+10',undefined,true).includes('#f0d48a'));
@@ -83,6 +107,10 @@ console.log('PASS: actual tooltip show path keeps locked effects dim after palet
 
 vm.runInContext(source.slice(source.indexOf('    function progress('),source.indexOf('    function isAchievement(')),ctx);
 assert.equal(ctx.cardProgress({count:3,target:999999},'points'),'拥有 ×3');
+for(const [item,text]of[[{count:1,target:1},'已解锁'],[{count:0,max_owned:1},'未解锁'],[{count:7,count_known:0,unlocked:1,target:1},'状态待同步'],[{count:7,target:1},'已解锁']]){
+ const row=Object.freeze({...item}),before=JSON.stringify(row);assert.equal(ctx.cardProgress(row,'points'),text);
+ assert.equal(JSON.stringify(row),before,'Fallback captions never clamp historical inventory');
+}
 assert.equal(ctx.cardProgress({count:0,target:65},'friend'),'拥有 ×0');
 assert.equal(ctx.cardProgress({count:4,count_known:0},'fishing'),'拥有 ×—');
 assert.equal(ctx.cardProgress({count:20,level:1},'fragment'),'碎片 ×20');
@@ -91,11 +119,32 @@ assert.equal(ctx.cardProgress({count:3,target:5},'clear'),'3 / 5');
 console.log('PASS: collection ownership, unknown inventory, fragment stock and artifact level captions.');
 
 const controller=fs.readFileSync(path.join(root,'panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js'),'utf8');
-const promotionStart=controller.indexOf('                    promote.SetPanelEvent("onmouseover", function () {');
-const promotionEnd=controller.indexOf('\n                    });',promotionStart)+24;
-let help;
-const promotionCtx={active:()=>true,valid:p=>!!p,rows:[{id:'fragment_05',name:'神兵-狂战斧'}],item:{promotion_target:'fragment_05',promotion_cost:10},promote:{SetPanelEvent(name,fn){this.hover=fn;}},A:{ShowEffectOnly(item){help=item;}}};
-vm.runInNewContext(controller.slice(promotionStart,promotionEnd),promotionCtx);promotionCtx.promote.hover();
-assert(help.description.includes('兑换狂战斧碎片×1'));assert(!help.description.includes('fragment_05'),'internal ids must not appear in player help');
-promotionCtx.rows=[];promotionCtx.promote.hover();assert(help.description.includes('下一阶神兵'));
-console.log('PASS: promotion help resolves real configured target names and never exposes internal ids.');
+const promotionMatch=controller.match(/^([ \t]*)promote\.SetPanelEvent\(\s*"onmouseover"\s*,\s*function\s*\(\s*\)\s*\{/m);
+if(promotionMatch){
+ const endToken='\n'+promotionMatch[1]+'});',end=controller.indexOf(endToken,promotionMatch.index);
+ assert(end>promotionMatch.index,'A retained promotion callback must have a complete source body');
+ let help;
+ const promotionCtx={active:()=>true,valid:p=>!!p,rows:[{id:'fragment_05',name:'神兵-狂战斧'}],item:{promotion_target:'fragment_05',promotion_cost:10},promote:{SetPanelEvent(name,fn){this.hover=fn;}},A:{ShowEffectOnly(item){help=item;}}};
+ vm.runInNewContext(controller.slice(promotionMatch.index,end+endToken.length),promotionCtx);promotionCtx.promote.hover();
+ assert(help.description.includes('兑换狂战斧碎片×1'));assert(!help.description.includes('fragment_05'),'internal ids must not appear in player help');
+ promotionCtx.rows=[];promotionCtx.promote.hover();assert(help.description.includes('下一阶神兵'));
+ console.log('PASS: retained promotion help resolves configured names and hides internal ids.');
+}else{
+ // Promotion controls were retired; exercise the current real fragment-card
+ // event and its actual tooltip guard instead of slicing a missing callback.
+ const hoverSource=controller.match(/card\.SetPanelEvent\(\s*"onmouseover"\s*,\s*function\s*\(\s*\)\s*\{[^\n]+\}\);/);
+ const tooltipSource=controller.match(/function tooltip\(item,\s*card\)\s*\{[^\n]+\}/);
+ assert(hoverSource&&tooltipSource,'Current fragment cards retain a real tooltip event');
+ const fragmentItem=Object.freeze({id:'fragment_05',name:'神兵-狂战斧',level:1,description:'Lv1 攻击+5%',promotion_target:'fragment_06',promotion_cost:10});
+ const calls=[],fragmentCard={AddClass(){},GetParent(){return null;},SetPanelEvent(name,fn){assert.equal(name,'onmouseover');this.hover=fn;}};
+ let fragmentActive=true;
+ const fragmentCtx={active:()=>fragmentActive,valid:p=>!!p,current:'fragment',item:fragmentItem,card:fragmentCard,A:{Show(item,category,anchor){calls.push({item,category,anchor});ctx.show(item,category,anchor,false);}}};
+ vm.createContext(fragmentCtx);vm.runInContext(tooltipSource[0],fragmentCtx);vm.runInContext(hoverSource[0],fragmentCtx);fragmentCard.hover();
+ assert.equal(calls.length,1);assert.equal(calls[0].item,fragmentItem);assert.equal(calls[0].category,'fragment');assert.equal(calls[0].anchor,fragmentCard);
+ assert.equal(panels.ArchiveTooltipName.text,fragmentItem.name);assert(panels.ArchiveTooltipEffect.text.includes('攻击'));
+ assert(panels.ArchiveTooltipCondition.text.includes('神兽狩猎'),'Current card hover retains actual earning and daily-limit rules');
+ const displayed=[panels.ArchiveTooltipName.text,panels.ArchiveTooltipEffect.text,panels.ArchiveTooltipCondition.text].join('\n');
+ assert(!displayed.includes('fragment_05')&&!displayed.includes('fragment_06'),'Current fragment help never substitutes internal ids for player text');
+ fragmentActive=false;fragmentCard.hover();assert.equal(calls.length,1,'Retired card hover cannot reopen the tooltip');
+ console.log('PASS: current real fragment-card hover preserves configured name/effects/rules, omits internal ids and obeys its active guard.');
+}

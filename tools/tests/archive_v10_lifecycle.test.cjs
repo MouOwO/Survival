@@ -271,6 +271,36 @@ load(); cfg.SurvivalArchive.Open(); snapshot('clear', 40, [{id: 'replacement', n
 assert.equal(cards().length, 1, 'Replacing children and reloading the active graph restores real data');
 assert.equal(canvases().length, 1);
 selectedCategory('clear'); compactSidebar();
+const pointsRows = [
+    {id: 'points_unique_owned', name: '唯一已解锁', count: 1, max_owned: 1},
+    {id: 'points_unique_locked', name: '唯一未解锁', count: 0, target: 1},
+    {id: 'points_unique_unknown', name: '唯一待同步', count: 7, count_known: 0, max_owned: 1},
+    {id: 'points_unique_legacy', name: '历史重复', count: 7, target: 1},
+    {id: 'daily_health_gem', name: '生命宝石', count: 3, target: 999999},
+    {id: 'points_uncapped', name: '旧版无上限', count: 4}
+].map(row => Object.freeze(row));
+const pointsBefore = JSON.stringify(pointsRows), pointsApi = cfg.SurvivalArchive;
+pointsApi.SelectCategory('points'); snapshot('points', 41, pointsRows);
+selectedCategory('points');
+assert(nodes.get('ArchiveV10Overview').text.startsWith('已解锁 4 / 6 项'), 'Mixed points overview uses unlock wording without losing stack ownership');
+for (const [id, text] of [['points_unique_owned', '已解锁'], ['points_unique_locked', '未解锁'], ['points_unique_unknown', '状态待同步'], ['points_unique_legacy', '已解锁']]) {
+    const row = cards().find(card => card.__archiveItem.id === id);
+    assert.equal(row.__v10.count.text, text);
+    assert.equal(row.__v10.track.visible, false, 'Unique points rows never show a numeric completion track');
+    assert.equal(row.__v10.fill.visible, false);
+}
+const dailyPointsCard = cards().find(card => card.__archiveItem.id === 'daily_health_gem');
+assert.equal(dailyPointsCard.__v10.count.text, '3/999999');
+assert.equal(dailyPointsCard.__v10.track.visible, true, 'Daily gems retain quantity progress on the same points page');
+assert.equal(cards().find(card => card.__archiveItem.id === 'points_uncapped').__v10.count.text, '4');
+pointsApi.Filter('unlocked');
+assert.equal(nodes.get('ArchiveV10FilterText').text, '已解锁');
+assert.deepEqual(cards().map(card => card.__archiveItem.id), ['points_unique_owned', 'points_unique_legacy', 'daily_health_gem', 'points_uncapped']);
+pointsApi.Filter('locked');
+assert.equal(nodes.get('ArchiveV10FilterText').text, '未解锁');
+assert.deepEqual(cards().map(card => card.__archiveItem.id), ['points_unique_locked'], 'Unknown unique inventory never appears as locked');
+pointsApi.Filter('all');
+assert.equal(JSON.stringify(pointsRows), pointsBefore, 'Rendering and filtering never clamp historical counts or alter authoritative rows');
 const rootApi = cfg.SurvivalArchive; root.DeleteAsync();
 assert.doesNotThrow(() => { rootApi.Close(); rootApi.Dispose(); rootApi.Dispose(); advance(5); });
 cfg.SurvivalMenuV10.Dispose(); assert.equal(liveSubscriptions().length, 0);

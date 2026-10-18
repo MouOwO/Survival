@@ -13,6 +13,7 @@ local categories = require("config/generated/archive_categories")
 local drop_rules = require("config/generated/archive_drop_rules")
 local stats_config = require("config/generated/player_gameplay_stats")
 local lottery = require("config/lottery_config")
+local content_aliases = require("config/content_id_aliases")
 local challenge_rewards = require("systems/archive_challenge_rewards")
 local challenge_rules = require("config/generated/archive_challenge_rules").by_id.default
 local M = {}
@@ -159,13 +160,22 @@ renderers.shadow = function(profile, archive)
 end
 renderers.points = function(profile)
     local rows = require("systems/archive_daily_rewards").points(profile)
-    local counts = profile.save.content_inventory or {}
+    local counts = {}
+    for raw_id, value in pairs(profile.save.content_inventory or {}) do
+        local amount = tonumber(value)
+        if amount and amount == amount and amount > 0 and amount < math.huge then
+            local id = content_aliases.canonical(raw_id)
+            counts[id] = (counts[id] or 0) + math.floor(amount)
+        end
+    end
     for _, item in ipairs(lottery.items) do
-        local count = tonumber(counts[item.id]) or 0
-        if count > 0 and item.item_type == "积分道具" then
+        if item.item_type == "积分道具" then
+            local count = math.min(counts[content_aliases.canonical(item.id)] or 0, item.max_owned)
             rows[#rows + 1] = { id = item.id, name = item.name,
                 description = item.description, icon_style = "seal", icon = item.icon, icon_type = item.icon_type,
-                quality = item.quality, count = count, target = item.max_owned }
+                quality = item.quality, count = count, target = item.max_owned, max_owned = item.max_owned,
+                item_type = item.item_type, source_kind = "lottery", unlocked = count > 0 and 1 or 0, count_known = 1,
+                duplicate_points = item.duplicate_points, duplicate_currency = "shop_points", converted_currency = "shop_points" }
         end
     end
     return rows

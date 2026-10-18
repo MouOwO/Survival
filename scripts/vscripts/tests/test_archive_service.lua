@@ -99,7 +99,40 @@ assert(#welfare_page.rows==36 and welfare_page.rows[14].completed==1 and welfare
 local snapshot = archive.snapshot(0, "clear")
 assert(snapshot.rows[1].completed == 1 and snapshot.rows[4].completed == 0)
 assert(snapshot.gameplay_stats == nil and snapshot.entitlements == nil)
-assert(#archive.snapshot(0, "points").rows == 0)
+local lottery_points = require("config/lottery_config")
+local function point_rows(id)
+    local result, list = {}, archive.snapshot(id, "points").rows
+    for _, row in ipairs(list) do
+        assert(not result[row.id], "points cards must have unique canonical identities")
+        result[row.id] = row
+    end
+    return result, #list
+end
+local point_definitions, point_definition_count = {}, 0
+for _, item in ipairs(lottery_points.items) do
+    if item.item_type == "积分道具" then
+        point_definitions[item.id] = item
+        point_definition_count = point_definition_count + 1
+    end
+end
+local empty_points, empty_point_count = point_rows(0)
+assert(empty_point_count == point_definition_count,
+    "new profiles see every enabled unique lottery point item, including locked cards")
+for id, item in pairs(point_definitions) do
+    local row = assert(empty_points[id], "enabled point item missing: " .. id)
+    assert(row.count == 0 and row.unlocked == 0 and row.count_known == 1,
+        "absent inventory is a known locked unique item")
+    assert(row.max_owned == 1 and row.target == 1,
+        "lottery point cards show one permanent unlock")
+    assert(row.item_type == "积分道具" and row.source_kind == "lottery",
+        "unique point cards must remain distinguishable from daily stack rewards")
+    assert(row.duplicate_points == item.duplicate_points
+        and row.duplicate_currency == "shop_points" and row.converted_currency == "shop_points",
+        "duplicate conversion metadata must follow the item definition and commerce wallet")
+end
+for _, item in ipairs(require("config/generated/lottery_item_definitions").rows) do
+    if item.enabled == false then assert(not empty_points[item.item_id], "disabled point rewards stay hidden") end
+end
 local fishing_pending=archive.snapshot(0,"fishing")
 assert(#fishing_pending.rows==26 and fishing_pending.fishing.ready==0,"missing inventory is unknown, not an empty bag")
 profiles[0].save.fishing_inventory={star_blessing_001=3,star_blessing_002=301,star_blessing_automation_9001=999}
@@ -116,7 +149,43 @@ assert(archive.snapshot(1,"fishing").fishing.ready==1 and archive.snapshot(1,"fi
 profiles[0].save.fishing_inventory.star_blessing_001=4
 assert(archive.snapshot(0,"fishing").rows[1].count==4,"authoritative profile refresh updates counts")
 profiles[0].save.content_inventory.lottery_attribute_crystal = 1
-assert(#archive.snapshot(0, "points").rows == 1)
+local owned_points, owned_point_count = point_rows(0)
+assert(owned_point_count == point_definition_count,
+    "unlocking an item changes its state without hiding other locked cards")
+assert(owned_points.lottery_attribute_crystal.count == 1
+    and owned_points.lottery_attribute_crystal.unlocked == 1)
+do
+    local original_inventory = copy(profiles[0].save.content_inventory)
+    profiles[0].save.content_inventory = {
+        lottery_attribute_crystal = 7,
+        lottery_flame_crystal = 2,
+        lottery_nature_crystal = 0,
+        lottery_burst_crystal = 4,
+    }
+    local before_writes = writes
+    local aliased = point_rows(0)
+    assert(aliased.lottery_nature_crystal.count == 1 and aliased.lottery_nature_crystal.unlocked == 1,
+        "the historical flame alias must unlock the canonical nature card even beside a zero canonical count")
+    assert(aliased.lottery_bombardment_crystal.count == 1 and aliased.lottery_bombardment_crystal.unlocked == 1,
+        "an alias-only historical burst inventory must unlock the canonical bombardment card")
+    assert(not aliased.lottery_flame_crystal and not aliased.lottery_burst_crystal,
+        "historical aliases cannot create duplicate archive cards")
+    assert(aliased.lottery_attribute_crystal.count == 1 and aliased.lottery_attribute_crystal.unlocked == 1,
+        "legacy counts above one are displayed as a single unlock")
+    profiles[0].save.content_inventory.lottery_nature_crystal = 3
+    local aggregated = point_rows(0)
+    assert(aggregated.lottery_nature_crystal.count == 1 and aggregated.lottery_nature_crystal.unlocked == 1,
+        "canonical and historical alias ownership combine into one unlocked card")
+    assert(writes == before_writes
+        and profiles[0].save.content_inventory.lottery_attribute_crystal == 7
+        and profiles[0].save.content_inventory.lottery_flame_crystal == 2
+        and profiles[0].save.content_inventory.lottery_nature_crystal == 3
+        and profiles[0].save.content_inventory.lottery_burst_crystal == 4,
+        "archive viewing cannot cap, migrate, convert or persist historical inventory")
+    assert(point_rows(1).lottery_nature_crystal.unlocked == 0,
+        "one player's legacy alias cannot unlock another player's card")
+    profiles[0].save.content_inventory = original_inventory
+end
 assert(#archive.snapshot(0, "shadow").rows == 0, "clear cheat grants no shadow items")
 bus.emit("archive.final_boss_killed", { player_id = 0, difficulty_id = "N1" })
 bus.emit("archive.final_wave_cleared", { player_id = 0, difficulty_id = "N1" })
@@ -322,7 +391,13 @@ assert(archive.snapshot(7,"friend").social.tickets == 10)
 assert(archive.record_challenge(7,"social_beast",2002,"N5").ok)
 assert(archive.snapshot(7,"beast").social.tickets == 1)
 for _, item in ipairs(require("config/generated/archive_social_items").rows) do
-    assert(stats.by_id[item.effect_ids[1]] and item.max_owned > 0)
+    if item.draw_enabled == false then
+        assert(item.max_owned > 0 and type(item.availability_note) == "string"
+            and item.availability_note ~= "",
+            "unadapted collection entries must explain why they cannot be drawn")
+    else
+        assert(stats.by_id[item.effect_ids[1]] and item.max_owned > 0)
+    end
 end
 print("ARCHIVE_SERVICE_PASS: atomic grants, retries, social draws, caps, 100 unlock, daily limits")
 profiles[8]=new_profile()
@@ -361,6 +436,12 @@ assert(daily.item_counts.daily_growth_gem==9 and daily.item_counts.daily_gold_ge
 assert(profiles[8].save.gameplay_stats.hero_attack_per_second==9)
 local count=0;for _,row in ipairs(archive.snapshot(8,"points").rows) do if row.id:match('^daily_') then count=count+1 end end
 assert(count==12)
+local daily_point_cards = point_rows(8)
+assert(daily_point_cards.daily_growth_gem.count == 9 and daily_point_cards.daily_gold_gem.count == 9,
+    "daily gems remain stacked quantities beside unique lottery unlock cards")
+assert(daily_point_cards.daily_growth_gem.target == 999999
+    and daily_point_cards.daily_gold_gem.target == 999999,
+    "the point page cannot impose the lottery unique cap on daily rewards")
 for _,row in ipairs(require("config/lottery_config").items) do assert(not row.id:match('^daily_'),"daily exclusives cannot be rolled") end
 assert(#archive.snapshot(8,"boss").rows==34)
 print("ARCHIVE_BOSS_DAILY_PASS: pass expiry, dedup, day boundaries, makeup, 21-day rewards, point inventory")
