@@ -3,7 +3,7 @@ const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const loader=fs.readFileSync('tools/test_lottery_updates.cjs','utf8').split('suite+=')[0];
 const checks=String.raw`
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;root.actualuiscale_y=1;
-config.SurvivalPurpleLottery={Apply(){},Snapshot(){},Fit(){return true;}};
+config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply(){},Snapshot(){},Fit(){return true;}};
 const walletReads=[];
 config.SurvivalCommerceWallet={Invalidate:key=>{walletReads.push(key);return true;},Refresh:()=>{throw Error('Invalidate-capable wallet must use queued API');}};
 function data(){return {...snapshot('map',99),shop_points:825,starjoy_points:17};}

@@ -16,7 +16,7 @@ root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;
 // Production films occupy the fixed V10 right-content region. Window fitting
 // scales that entire region uniformly; the movie's logical size stays stable.
 nodes.LotteryMainCanvas.AddClass('LotteryV10');
-config.SurvivalPurpleLottery={Apply:function(){},Content:()=>nodes.LotteryMainCanvas,Fit:function(){config.SurvivalUI.Fit(nodes.LotteryMainCanvas,root,1672,941,{reference:[1672,941]});config.LotteryCinematic.Resize(1113,669);return true;}};
+config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply:function(){},Content:()=>nodes.LotteryMainCanvas,Fit:function(){config.SurvivalUI.Fit(nodes.LotteryMainCanvas,root,1672,941,{reference:[1672,941]});config.LotteryCinematic.Resize(1113,669);return true;}};
 ui.Open();events.ui_lottery_snapshot(snapshot('map',20));
 const n=requests.length;
 events.ui_lottery_result({ok:1,request_id:'film1',pool_id:'map',count:10,results:results(10)});

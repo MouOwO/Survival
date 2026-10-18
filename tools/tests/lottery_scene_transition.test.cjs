@@ -6,7 +6,7 @@ vm.runInNewContext(fs.readFileSync('tools/test_lottery_updates.cjs', 'utf8').spl
     '\nglobalThis.setup = suite;', builder);
 let suite = builder.setup;
 // The V10 renderer fits the shell and keeps the background's logical region fixed.
-suite += `config.SurvivalPurpleLottery={Apply:function(){},Fit:function(){config.SurvivalUI.Fit(nodes.LotteryMainCanvas,root,1672,941,{reference:[1672,941]});config.LotterySceneTransition.Resize(1113,488);return true;}};`;
+suite += `config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply:function(){},Fit:function(){config.SurvivalUI.Fit(nodes.LotteryMainCanvas,root,1672,941,{reference:[1672,941]});config.LotterySceneTransition.Resize(1113,488);return true;}};`;
 suite += String.raw`
 const pools=['map','cultivation','dragon_knight','summer'];
 root.actuallayoutwidth=1600;root.actuallayoutheight=900;

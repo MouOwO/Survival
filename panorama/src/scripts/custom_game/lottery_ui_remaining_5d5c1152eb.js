@@ -10,6 +10,14 @@
     var lifetime=$.CreatePanel("Panel",owner,""),disposed=false,subscriptions=[];lifetime.visible=false;
     function alive(){return !disposed&&(!lifetime.IsValid||lifetime.IsValid());}
     function active(fn){return function(){if(alive())return fn.apply(null,arguments);};}
+    var presentationVersion="lottery_current_20261018",openRequested=false,activePresenter=null,openIntentSerial=0;
+    var prefetchPending=true,prefetchDue=false;
+    function currentPresentation(){
+        var view=cfg.SurvivalPurpleLottery;
+        return view&&view.Version===presentationVersion&&typeof view.IsAlive==="function"&&view.IsAlive()
+            &&typeof view.Owns==="function"&&view.Owns(owner)===true
+            &&typeof view.IsReady==="function"&&view.IsReady()===true?view:null;
+    }
     var U=cfg.SurvivalUI, LH=cfg.LotteryHandoff, RH=cfg.RemainingHandoff, panelRefs={};
     (function remember(n){if(!n||n.IsValid&&!n.IsValid())return;if(n.id)panelRefs[n.id]=n;n.Children().forEach(remember);})(owner);
 
@@ -17,20 +25,17 @@
     var infoOptions={id:"lottery_info",panel:$("#LotteryInfoDialog"),root:$.GetContextPanel(),scrim:$("#LotteryInfoOverlay"),header:$("#LotteryInfoHeader"),titlePanel:$("#LotteryInfoTitle"),closeButton:$("#LotteryInfoClose"),width:840,height:610,fit:{reference:[1672,941]},onClose:closeInfo};
     // Details are a right-content view inside the one lottery shell. Keep the
     // business anchors but never create another scaled window above it.
-    var inlineInfo=!!cfg.SurvivalMenuV10;
-    var infoShell=inlineInfo?{Open:function(){var n=panel("LotteryInfoOverlay"),layers=cfg.SurvivalUILayers;if(n)n.RemoveClass("LotteryInfoHidden");if(n&&layers)layers.Open("lottery_info",n,closeInfo);},Close:function(){var n=panel("LotteryInfoOverlay"),layers=cfg.SurvivalUILayers;if(layers)layers.Close("lottery_info");if(n)n.AddClass("LotteryInfoHidden");},Dispose:function(){if(cfg.SurvivalUILayers)cfg.SurvivalUILayers.Close("lottery_info");}}:U.ModalShell.Adopt(infoOptions);
-    if(!inlineInfo)RH.Window(infoOptions.panel,infoOptions.header,infoOptions.closeButton);
+    var infoShell={Open:function(){if(!currentPresentation())return;var n=panel("LotteryInfoOverlay"),layers=cfg.SurvivalUILayers;if(n){n.visible=true;n.RemoveClass("LotteryInfoHidden");}if(n&&layers)layers.Open("lottery_info",n,closeInfo);},Close:function(){var n=panel("LotteryInfoOverlay"),layers=cfg.SurvivalUILayers;if(layers)layers.Close("lottery_info");if(n){n.visible=false;n.AddClass("LotteryInfoHidden");}},Dispose:function(){if(cfg.SurvivalUILayers)cfg.SurvivalUILayers.Close("lottery_info");}};
     // Scene fills the viewport; LotteryHandoff owns responsive control placement.
     $("#LotteryWindow").RemoveClass("UIFullscreen");
     ["LotterySingleButton","LotteryTenButton","LotteryAgain","LotteryConfirm","LotteryInfoConfirm"].forEach(function(id){U.ActionButton.Adopt($("#"+id),{variant:id==="LotteryTenButton"||id==="LotteryAgain"?"gold":"ivory"});});
-    RH.LotteryActions();LH.Actions();U.Checkbox.Adopt($("#LotterySkipAnimation")); LH.CloseButton($("#LotteryCloseButton"),close);
+    LH.Actions();U.Checkbox.Adopt($("#LotterySkipAnimation")); LH.CloseButton($("#LotteryCloseButton"),close);
     var state = null;
     var poolCache={}, poolVersions={}, poolAssemblies={}, poolErrors={};
     var pending = false;
     var requestSerial = 0;
     var selectedPoolId = "map";
     var visibleResults = [];
-    var activeTooltipItem = null, archiveEffectTooltipActive = false, tooltipDismiss = null;
     var animating = false, animationSerial = 0, skipAnimation = !!$("#LotterySkipAnimation").checked;
     var resultCards = [], lastDrawCount = 1, history = [], seenResults = {};
     var activeRequest = null, opened = false, switchingPool = false;
@@ -52,7 +57,7 @@
         return node;
     }
     function rootClass(name, on) { var root = panel("LotteryWindow"); if (root) root.SetHasClass(name, on); }
-    function closeInfo() { if(!alive())return;detailRequestSerial++; activeFeature = ""; infoShell.Close(); var info = panel("LotteryInfoOverlay"); if (info) info.AddClass("LotteryInfoHidden"); hideTooltip(); reopenDetails = false; updateButtons(); if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.CloseInfo)cfg.SurvivalPurpleLottery.CloseInfo(); if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Pools)cfg.SurvivalPurpleLottery.Pools(rows(knownPools),selectedPoolId); }
+    function closeInfo() { if(!alive())return;detailRequestSerial++; activeFeature = ""; infoShell.Close(); var info = panel("LotteryInfoOverlay"); if (info) info.AddClass("LotteryInfoHidden"); hideTooltip(); reopenDetails = false; updateButtons(); var presenter=currentPresentation();if(presenter&&presenter.CloseInfo)presenter.CloseInfo();if(presenter&&presenter.Pools)presenter.Pools(rows(knownPools),selectedPoolId); }
     function updateButtons() {
         var selected = state && (state.selected_pool || state);
         var locked = pending || animating || switchingPool || !selected || selected.unlocked===false || !!activeFeature;
@@ -69,7 +74,7 @@
         rootClass("LotteryWaiting", pending);
         setText("LotterySingleText", pending && lastDrawCount === 1 ? "请求中…" : (selected && drawCost(selected,1) === 0 ? "免费单抽" : "单抽"));
         setText("LotteryTenText", pending && lastDrawCount === 10 ? "请求中…" : "10连");
-        LH.Buttons(selected, pending && lastDrawCount === 10);
+        if(currentPresentation())LH.Buttons(selected, pending && lastDrawCount === 10);
     }
     function finishReveal() {
         cancelAnimation();
@@ -83,7 +88,7 @@
     function playRewardFeedback() {
         var receipt = rewardReceipt; rewardReceipt = null;
         if (!receipt || !alive() || !opened || receipt.pool !== selectedPoolId || !U.RewardFX) return;
-        var view = cfg.SurvivalPurpleLottery;
+        var view = currentPresentation();
         var host = view && view.Content ? view.Content() : null;
         if (!host || host.IsValid && !host.IsValid()) host = panel("LotteryMainCanvas") || panel("LotteryWindow");
         if (!host) return;
@@ -212,73 +217,21 @@
     }
 
     function hideTooltip() {
-        if(tooltipDismiss)tooltipDismiss.Hidden();
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.HideTooltip)cfg.SurvivalPurpleLottery.HideTooltip();
-        if(archiveEffectTooltipActive){var archiveTip=GameUI.CustomUIConfig().ArchiveHandoff;if(archiveTip)archiveTip.Hide();archiveEffectTooltipActive=false;}
-        activeTooltipItem = null;
+        var presenter=currentPresentation();
+        if(presenter&&presenter.HideTooltip)presenter.HideTooltip();
         var tooltip = panel("LotteryItemTooltip");
         if (tooltip) tooltip.AddClass("Hidden");
     }
     function requestTooltipHide() {
-        var purple=cfg.SurvivalPurpleLottery;
+        var purple=currentPresentation();
         if(purple&&purple.RequestTooltipHide&&purple.RequestTooltipHide())return;
         hideTooltip();
     }
 
     function showTooltip(item, sourcePanel, simple) {
-        var tip=panel("LotteryItemTooltip");
-        if(tip&&!tooltipDismiss)tooltipDismiss=cfg.SurvivalTooltipDismiss.Create({panel:tip,hide:hideTooltip,isAlive:alive,isVisible:function(){return !!activeTooltipItem&&!tip.BHasClass("Hidden");}});
-        if(tooltipDismiss&&!tooltipDismiss.CanShow(sourcePanel))return;
         hideTooltip();
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Tooltip&&item&&sourcePanel&&cfg.SurvivalPurpleLottery.Tooltip(item,sourcePanel))return;
-        if(simple){
-            var archiveTip=GameUI.CustomUIConfig().ArchiveHandoff;
-            if(archiveTip&&archiveTip.ShowEffectOnly&&item&&sourcePanel){
-                archiveEffectTooltipActive=true;
-                // Compact pool cells replace the old selected-reward summary.
-                // Keep its real metadata in the shared tooltip; absent values
-                // must not imply permanence, ownership or a conversion reward.
-                var detailLines=[item.description||'暂无效果说明'];
-                if(item.quality)detailLines.push('品质：'+qualityText(item.quality));
-                if(item.owned_count!==undefined&&item.owned_count!==null){
-                    var owned=Number(item.owned_count),maximum=Number(item.max_owned);
-                    if(isFinite(owned)&&owned>=0)detailLines.push('已拥有：'+owned+(isFinite(maximum)&&maximum>0?' / '+maximum:''));
-                }
-                if(item.duration_text)detailLines.push('期限：'+String(item.duration_text));
-                if(item.duplicate_points!==undefined&&item.duplicate_points!==null){
-                    var points=Number(item.duplicate_points);
-                    if(isFinite(points)&&points>=0)detailLines.push('重复转化：'+points+' '+duplicateCurrency(item));
-                }
-                archiveTip.ShowEffectOnly({name:item.name||item.id||'未命名道具',description:detailLines.join('\n')},sourcePanel);
-            }
-            return;
-        }
-        var tooltip = panel("LotteryItemTooltip");
-        var iconHost = panel("LotteryTooltipIconHost");
-        if (!tooltip || !iconHost || !item || !sourcePanel) return;
-        activeTooltipItem = item;
-        tooltip.SetHasClass("LotterySimpleTooltip", !!simple);
-        tooltip.style.zIndex = "100010";
-        iconHost.RemoveAndDeleteChildren();
-        if (!simple) createIconFrame(iconHost, item, "LotteryTooltipIconFrame");
-        setText("LotteryTooltipName", item.name || item.id || "未命名道具");
-        panel("LotteryTooltipName").style.color = GameUI.CustomUIConfig().SurvivalRewardPresentation.NameColor(item.quality);
-        setText("LotteryTooltipType", "类型：" + String(item.item_type || "积分道具"));
-        setText("LotteryTooltipDuration", "期限：" + String(item.duration_text || "永久"));
-        setText("LotteryTooltipDescription", simple ? String(item.description || "暂无属性说明") : "简介：" + String(item.description || "暂无简介"));
-        ["N", "R", "SR", "SSR", "UR"].forEach(function (quality) {
-            tooltip.SetHasClass("LotteryQuality_" + quality, false);
-        });
-        tooltip.AddClass(qualityClass(item.quality));
-        tooltip.RemoveClass("Hidden");
-        $.Schedule(0.0, function () {
-            if (activeTooltipItem !== item) return;
-            var positioner = GameUI.CustomUIConfig().SurvivalTooltipPosition;
-            if (positioner && positioner.PlaceRight) {
-                positioner.PlaceRight(tooltip, sourcePanel, 340, 210);
-            }
-            if(tooltipDismiss)tooltipDismiss.Shown(sourcePanel);
-        });
+        var presenter=currentPresentation();
+        if(presenter&&presenter.Tooltip&&item&&sourcePanel)presenter.Tooltip(item,sourcePanel);
     }
 
     function renderChest() {
@@ -350,8 +303,9 @@
             }
             return card;
         });
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Compact)cfg.SurvivalPurpleLottery.Compact(list);
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Apply)cfg.SurvivalPurpleLottery.Apply();
+        var presenter=currentPresentation();
+        if(presenter&&presenter.Compact)presenter.Compact(list);
+        if(presenter&&presenter.Apply)presenter.Apply();
     }
 
     function renderDrawStage() {
@@ -410,6 +364,7 @@
         dot.visible = knownPools.some(function(p){return String(p.id) === selectedPoolId && detailsUnread(p);});
     }
     function requestSnapshot(visit) {
+        prefetchPending=false;
         GameEvents.SendCustomGameEventToServer("ui_lottery_snapshot_request", {
             pool_id: selectedPoolId, read_action: visit ? "visit" : ""
         });
@@ -428,28 +383,72 @@
         if(!alive())return;
         var root = panel("LotteryWindow");
         if (!root) return;
+        var presenter=currentPresentation();
+        if(!presenter){openRequested=true;hideUnreadyWindow();return false;}
+        openRequested=false;
+        if(opened){
+            if(activePresenter!==presenter)showPresentation(presenter);
+            return true;
+        }
         opened = true;
-        LH.Prepare();
-        LH.Background(selectedPoolId);
-        var layers = GameUI.CustomUIConfig().SurvivalUILayers;
-        if (layers) layers.Open("lottery", root, close);
-        root.SetHasClass("LotteryOpen", true);
-        root.SetHasClass("LotteryClosed", false); LH.Open();
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Open)cfg.SurvivalPurpleLottery.Open();
+        showPresentation(presenter);
         renderDrawStage();
         updateButtons();
         if(poolCache[selectedPoolId])render(poolCache[selectedPoolId]);else requestSnapshot(true);
         markRead(state&&state.selected_pool,"visit");
+        return true;
+    }
+
+    function hideUnreadyWindow(){
+        var root=panel("LotteryWindow"),canvas=panel("LotteryMainCanvas"),info=panel("LotteryInfoOverlay");
+        if(root){root.visible=false;root.SetHasClass("LotteryOpen",false);root.SetHasClass("LotteryClosed",true);}
+        if(canvas)canvas.style.opacity="0";
+        if(info){info.visible=false;info.AddClass("LotteryInfoHidden");}
+        var tooltip=panel("LotteryItemTooltip");if(tooltip)tooltip.AddClass("Hidden");
+        var layers=cfg.SurvivalUILayers;if(layers){layers.Close("lottery_info");layers.Close("lottery");}
+    }
+
+    function showPresentation(presenter){
+        activePresenter=presenter;
+        LH.Prepare();
+        LH.Background(selectedPoolId);
+        presenter.Open();
+        if(presenter.Pools)presenter.Pools(rows(knownPools),selectedPoolId);
+        if(state&&presenter.Snapshot)presenter.Snapshot(state);
+        if(presenter.Compact)presenter.Compact(panel("LotteryItemList"));
+        var root=panel("LotteryWindow");root.visible=true;
+        var layers = GameUI.CustomUIConfig().SurvivalUILayers;
+        if (layers) layers.Open("lottery", root, close);
+        root.SetHasClass("LotteryOpen", true);
+        root.SetHasClass("LotteryClosed", false); LH.Open();
+        updateButtons();
+        if(activeFeature&&presenter.Info){presenter.Info(activeFeature,infoOptions,activeFeature==="details"?detailState:state);infoShell.Open();}
+    }
+
+    function prefetchIfReady(){
+        if(!prefetchPending||!prefetchDue||!currentPresentation())return;
+        prefetchPending=false;
+        GameEvents.SendCustomGameEventToServer("ui_lottery_snapshot_request",{prefetch:1,pool_id:selectedPoolId});
+    }
+
+    function presentationReady(presenter){
+        if(!alive()||presenter!==currentPresentation())return false;
+        if(openRequested)return open();
+        if(opened){if(activePresenter!==presenter)showPresentation(presenter);return true;}
+        prefetchIfReady();
+        return true;
     }
 
     function openFromShop() {
         var shop = GameUI.CustomUIConfig().SurvivalShop;
         if (shop && shop.Close) shop.Close();
-        $.Schedule(0.01, open);
+        var serial=++openIntentSerial;
+        $.Schedule(0.01, function(){if(alive()&&serial===openIntentSerial)open();});
     }
 
     function close() {
         if(!alive())return;
+        openRequested=false;activePresenter=null;prefetchPending=false;openIntentSerial++;
         opened = false;
         feedbackRequest = null; clearRewardFeedback();
         var layers = GameUI.CustomUIConfig().SurvivalUILayers; if (layers) layers.Close("lottery");
@@ -458,8 +457,8 @@
         var root = panel("LotteryWindow");
         if (!root) return;
         root.SetHasClass("LotteryOpen", false);
-        root.SetHasClass("LotteryClosed", true); LH.Close();
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Close)cfg.SurvivalPurpleLottery.Close();
+        root.SetHasClass("LotteryClosed", true);root.visible=false; LH.Close();
+        var presenter=currentPresentation();if(presenter&&presenter.Close)presenter.Close();
     }
 
     function toggle() {
@@ -521,8 +520,9 @@
             });
         });
         if(hostId === "LotteryInfoTabs") RH.TabSelection(host,activeFeature === "history");
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.StyleTabs)cfg.SurvivalPurpleLottery.StyleTabs();
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Pools)cfg.SurvivalPurpleLottery.Pools(rows(pools),hostId==="LotteryInfoTabs"?(activeFeature==="history"?historyPoolId:detailPoolId):selectedPoolId);
+        var presenter=currentPresentation();
+        if(presenter&&presenter.StyleTabs)presenter.StyleTabs();
+        if(presenter&&presenter.Pools)presenter.Pools(rows(pools),hostId==="LotteryInfoTabs"?(activeFeature==="history"?historyPoolId:detailPoolId):selectedPoolId);
     }
 
     function renderGuarantee(pity) {
@@ -605,7 +605,7 @@
         setText("LotteryTicketValue", String(selected.ticket_name || "抽奖券")
             + "  " + Number(selected.tickets || 0));
         setText("LotteryPointValue", "商城积分  "+pointsBalance(snapshot.shop_points));
-        renderGuarantee(selected.pity || snapshot.pity); LH.Ready();
+        renderGuarantee(selected.pity || snapshot.pity); if(currentPresentation())LH.Ready();
         setText("LotteryTierValue", selected.pool_group === "special"
             ? "特殊奖池" : "地图奖池");
         var ten = panel("LotteryTenButton");
@@ -623,11 +623,11 @@
         updateButtons();
         if (activeFeature === "details") { reopenDetails = false; feature("details"); }
         else if (activeFeature === "announcement") { feature("announcement"); }
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Snapshot)cfg.SurvivalPurpleLottery.Snapshot(snapshot);
+        var presenter=currentPresentation();if(presenter&&presenter.Snapshot)presenter.Snapshot(snapshot);
     }
 
     function draw(count) {
-        if (pending || animating || switchingPool || !state || activeFeature) return;
+        if (!opened || !currentPresentation() || pending || animating || switchingPool || !state || activeFeature) return;
         if (count !== 1 && count !== 10) return;
         var selected = state.selected_pool || state;
         if(selected.unlocked===false){setText("LotteryStatus","地图宝箱累计开启 "+Number(selected.unlock_progress||0)+" / "+Number(selected.unlock_required||100)+" 次后解锁");return;}
@@ -717,7 +717,7 @@
         var host = panel("LotteryInfoList"); host.RemoveAndDeleteChildren();
         createIconFrame(host, item, "LotteryDetailIcon");
         label(host, item.description || "暂无效果说明", "LotteryDetailDescription");
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Info)cfg.SurvivalPurpleLottery.Info("reward",infoOptions);
+        var presenter=currentPresentation();if(presenter&&presenter.Info)presenter.Info("reward",infoOptions);
     }
 
     function selectReward(item) {
@@ -740,7 +740,8 @@
     }
 
     function feature(name) {
-        if (pending || animating) return;
+        var presenter=currentPresentation();
+        if (!presenter || pending || animating) return;
         if (name === "purchase") {
             var selectedTicketPool = state && (state.selected_pool || state);
             var commerce = GameUI.CustomUIConfig().SurvivalCommerceView;
@@ -764,7 +765,7 @@
         // Shared shell owns frame and the only modal scale.
         var headerIcon = panel("LotteryInfoIcon");
         if (headerIcon) setHeaderIcon(headerIcon, U.Asset(({details:"icon.pool_details",history:"icon.history",purchase:"icon.add",announcement:"icon.nav.social",firstgift:"icon.nav.benefit",privilege:"icon.nav.benefit"}[name]||"icon.pool_details")));
-        RH.LotteryDialog(name,infoOptions); infoShell.Open();
+        if(presenter.Info)presenter.Info(name,infoOptions);infoShell.Open();
         var tabs = panel("LotteryInfoTabs"); if (tabs) tabs.visible = name === "details" || name === "history";
         if (name === "details" || name === "history") renderPoolTabs(knownPools, "LotteryInfoTabs");
         var viewState = name === "details" ? detailState : state;
@@ -774,7 +775,6 @@
         setText("LotteryInfoNote", "");
         setText("LotteryInfoRules", "");
         if (name === "update") {
-            if (!cfg.SurvivalPurpleLottery || !cfg.SurvivalPurpleLottery.IsAlive()) panel("LotteryInfoNote").style.position = "40px 96px 0px";
             var notice = selected && selected.update_notice || {};
             setText("LotteryInfoTitle", notice.title || ((selected && selected.display_name || "宝箱") + "奖励更新公告"));
             setText("LotteryInfoNote", notice.effective_date ? "更新生效日期：" + notice.effective_date : "奖池配置已更新");
@@ -839,17 +839,18 @@
             label(host, "此入口暂未开放，后续补充。", "LotteryHistoryHeading");
             label(host, name === "privilege" ? "免费单抽权益尚未接入；当前单抽按页面显示的抽奖券数量消耗。" : "当前不会扣款、扣券或发放礼包。", "LotteryDetailDescription");
         }
-        if(cfg.SurvivalPurpleLottery&&cfg.SurvivalPurpleLottery.Info)cfg.SurvivalPurpleLottery.Info(name,infoOptions,viewState);
+        if(presenter.Info)presenter.Info(name,infoOptions,viewState);
     }
 
     close();
     subscriptions.push(GameEvents.Subscribe("ui_lottery_snapshot", active(render)));
     subscriptions.push(GameEvents.Subscribe("ui_lottery_result", active(renderResult)));
     subscriptions.push(GameEvents.Subscribe("ui_lottery_exchange_result", active(renderExchangeResult)));
-    $.Schedule(0.3,active(function(){GameEvents.SendCustomGameEventToServer("ui_lottery_snapshot_request",{prefetch:1,pool_id:selectedPoolId});}));
+    $.Schedule(0.3,active(function(){prefetchDue=true;prefetchIfReady();}));
     var api={
         SkipCinematic: completeReveal,
         Open: open,
+        PresentationReady: presentationReady,
         OpenFromShop: openFromShop,
         Close: close,
         CloseResult: resetDrawStage,
@@ -870,7 +871,7 @@
     api.Dispose=function(){
         if(disposed)return;
         if(alive())close();
-        if(tooltipDismiss)tooltipDismiss.Dispose();
+        openRequested=false;activePresenter=null;
         feedbackRequest = null; rewardReceipt = null;
         if(rewardFX)rewardFX.Dispose();rewardFX=null;rewardFXRoot=null;
         disposed=true;animationSerial++;detailRequestSerial++;

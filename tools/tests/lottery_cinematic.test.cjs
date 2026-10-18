@@ -33,7 +33,8 @@ assert(!fs.readFileSync('panorama/src/scripts/custom_game/lottery_cinematic_v1.j
 c.Dispose();failPlayback=false;
 nodes.LotteryMainCanvas.AddClass('LotteryV10');
 const content=new Panel('Panel',nodes.LotteryMainCanvas,'V10LotteryContent');
-cfg.SurvivalPurpleLottery={Content:()=>content};
+const root=nodes.LotteryWindow;
+cfg.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Content:()=>content};
 assert.equal(c.Play('map',[],()=>done++),true);
 assert.equal(nodes.LotteryCinematicSurface.parent,content,'V10 film stays inside the shared right-content area');
 assert.equal(nodes.LotteryCinematicSurface.style.width,'1113px');assert.equal(nodes.LotteryCinematicSurface.style.height,'669px');

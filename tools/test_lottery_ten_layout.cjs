@@ -2,6 +2,7 @@
 // Reuse the live-script Panorama fixture, including its shared UI dependencies.
 const setup = fs.readFileSync('tools/test_lottery_updates.cjs', 'utf8').split('suite+=`')[0];
 const checks = String.raw`
+config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply(){},Fit(){return true;}};
 ui.Open(); events.ui_lottery_snapshot(snapshot());
 nodes.LotterySkipAnimation.checked=true; ui.SetSkipAnimation();
 ui.DrawTen();

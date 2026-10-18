@@ -2,6 +2,7 @@
 const loader=fs.readFileSync('tools/tests/lottery_cinematic_flow.test.cjs','utf8').split('suite+=')[0];
 const checks=`
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;root.actualuiscale_y=1;
+config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply(){},Fit(){return true;}};
 ui.Open();
 function rules(pool,progress,tickets){const s=snapshot(pool,tickets);Object.assign(s.selected_pool,{ticket_content_id:['map','cultivation'].includes(pool)?'lottery_ticket':'special_lottery_ticket',unlocked:pool!=='cultivation'||progress>=100,unlock_progress:progress,unlock_required:pool==='cultivation'?100:0});s.pools=[s.selected_pool];return s;}
 ui.SelectPool('cultivation');events.ui_lottery_snapshot(rules('cultivation',99,200));

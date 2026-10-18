@@ -25,7 +25,7 @@ root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;
 nodes.LotteryMainCanvas.AddClass('LotteryV10');
 const content=new Panel('Panel',nodes.LotteryMainCanvas,'RewardTestGW2Content');
 content.style.width='1113px';content.style.height='669px';
-config.SurvivalPurpleLottery={Apply(){},Content:()=>content,Fit(){config.SurvivalUI.Fit(nodes.LotteryMainCanvas,root,1536,864,{reference:[1536,864]});return true;}};
+config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply(){},Content:()=>content,Fit(){config.SurvivalUI.Fit(nodes.LotteryMainCanvas,root,1536,864,{reference:[1536,864]});return true;}};
 ui.Open();events.ui_lottery_snapshot(snapshot('map',99));assert.equal(effects.length,0);
 function begin(count=1){if(count===10)ui.DrawTen();else ui.DrawSingle();return requests.filter(row=>row.n==='ui_lottery_draw_request').at(-1).p;}
 function answer(request,extra={}){events.ui_lottery_result({ok:1,request_id:request.request_id,pool_id:'map',count:request.count,results:results(request.count),snapshot:snapshot('map',99),...extra});}

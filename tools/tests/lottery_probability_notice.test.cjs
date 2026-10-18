@@ -2,6 +2,7 @@ const fs=require('fs'),vm=require('vm'),path=require('path');
 const loader=fs.readFileSync('tools/test_lottery_updates.cjs','utf8').split('suite+=')[0];
 const checks=`
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1;root.actualuiscale_y=1;
+config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply(){},Fit(){return true;}};
 const probability='SSR：1.5%　 SR：4%　 R：25%　 N：69.5%';
 function notice(pool,odds){const x=snapshot(pool);x.selected_pool.update_notice={single_draw_probabilities:odds};return x;}
 function textInNotice(){return nodes.LotteryInfoList.children.map(p=>p.text||'').join(' ');}

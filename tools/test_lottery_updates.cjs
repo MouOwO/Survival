@@ -9,7 +9,7 @@ Panel.prototype.FindChildTraverse=function(id){return nodes[id]||null;};
 ['reference_windows','ui_snapshot_cache','lottery_scene_transition','lottery_handoff_bb9968eef7','remaining_5d5c1152eb','lottery_ui_remaining_5d5c1152eb'].forEach(function(file){vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);});`);
 // These are isolated business tests. Their presentation stub delegates to the
 // actual shared fit primitive; the production V10 renderer has its own suite.
-suite+=`config.SurvivalPurpleLottery={Apply:function(){},Fit:function(){
+suite+=`config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply:function(){},Fit:function(){
 const viewport=config.LotteryHandoff.Viewport(),canvas=nodes.LotteryMainCanvas;
 if(!viewport){canvas.style.opacity='0';return false;}
 config.SurvivalUI.Fit(canvas,root,1672,941,{reference:[1672,941]});canvas.style.backgroundImage='none';canvas.style.opacity='1';return true;
