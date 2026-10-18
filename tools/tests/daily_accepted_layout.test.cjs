@@ -159,6 +159,7 @@ function dailyAccepted() {
     for (let index = 0; index < 28; index++) {
         const day = nodes['DailyGW2Day_' + (index + 1)];
         assert.equal(tagged(day, 'DailyGW2Reward').length, current.calendar28[index].rewards.length);
+        assert.equal(tagged(day, 'DailyGW2RewardKinds').length, 0, 'Reward-kind badges never cover the reward art');
         current.calendar28[index].rewards.forEach(reward => realIcon(day, reward.id));
     }
     current.specials.forEach(item => {
