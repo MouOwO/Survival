@@ -126,6 +126,7 @@
                 card.SetPanelEvent("onmouseout",function(){if(hoveredCard===card)hoveredCard=null;cfg.ArchiveHandoff.Hide();var icon=p("ArchiveTooltipStateIcon");if(icon)icon.visible=true;});
             }
             card.__voidItem=item;if(card.visible!==true)card.visible=true;
+            fillIcon(cached.art,item);
             var moved=cached.geometryKey!==geometryKey;
             if(moved){pos(card,x-415,y-226,width,height);pos(cached.art,b[0]-x,b[1]-y,b[2]-b[0],b[3]-b[1]);pos(cached.name,n[0]-x,n[1]-y,n[2]-n[0],n[3]-n[1]);cached.geometryKey=geometryKey;}
             var value=quantity(item),plateWidth=Math.max(q[2]-q[0],Math.min(width,Math.ceil(value.length*10.6+12))),right=q[2]-x;

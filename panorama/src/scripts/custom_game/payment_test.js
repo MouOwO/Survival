@@ -266,12 +266,19 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         $("#PaymentTitle").text = shown ? rewardNameText(shown.title) : "正在加载商品";
         $("#PaymentDescription").text = shown ? rewardNameText(shown.description) : "请先完成对局登录";
         var art=$("#PaymentProductArt"),artwork={sku:shown&&shown.sku||p&&p.sku,icon:shown&&(shown.icon||(p&&p.icon))};
+        var gradeSource=shown&&(shown.quality!==undefined||shown.rarity!==undefined)?shown:p;
+        ["quality","rarity"].forEach(function(field){if(gradeSource&&gradeSource[field]!==undefined)artwork[field]=gradeSource[field];});
+        ["reward_lines","product_type"].forEach(function(field){
+            if(shown&&shown[field]!==undefined)artwork[field]=shown[field];
+            else if(p&&p[field]!==undefined)artwork[field]=p[field];
+        });
         var icons=cfg.SurvivalCommerceComponents,icon=icons&&icons.ProductIcon?icons.ProductIcon(artwork):artwork.icon;
         var uri=icons&&icons.NormalizeIconURI?icons.NormalizeIconURI(icon):typeof icon==="string"&&/^custom_game\/[A-Za-z0-9_\/-]+\.png$/.test(icon)&&icon.indexOf("..")<0?"file://{images}/"+icon:"";
         if(art){
             art.style.visibility=uri?"visible":"collapse";
             var resource=cfg.SurvivalItemResources&&cfg.SurvivalItemResources.Lookup(artwork);
-            var special=resource&&(resource.kind==="vip"||resource.kind==="hero"),key=special?[resource.id,resource.kind,resource.uri,resource.vip_level].join(":"):"";
+            var grade=cfg.SurvivalItemResources&&cfg.SurvivalItemResources.Grade?cfg.SurvivalItemResources.Grade(artwork):"";
+            var special=resource&&(resource.kind==="vip"||resource.kind==="hero"),key=special?[resource.id,resource.kind,resource.uri,resource.vip_level,grade].join(":"):"";
             if(art.__paymentResourceKey!==key){
                 if(art.__paymentResourceIcon&&art.__paymentResourceIcon.IsValid())art.__paymentResourceIcon.DeleteAsync(0);
                 art.__paymentResourceIcon=null;art.__paymentResourceKey=key;
@@ -282,7 +289,7 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
                 }
             }
             if(art.SetImage)art.SetImage(special?"":uri);
-            if(!special&&cfg.SurvivalRewardPresentation&&cfg.SurvivalRewardPresentation.FillIcon)cfg.SurvivalRewardPresentation.FillIcon(art,artwork);
+            if(cfg.SurvivalRewardPresentation&&cfg.SurvivalRewardPresentation.FillIcon)cfg.SurvivalRewardPresentation.FillIcon(special?art.__paymentResourceIcon:art,artwork);
         }
         $("#PaymentPrice").text = "合计 "+priceText(shown,false,hasOrder);
         setText("PaymentUnitPrice",isRecharge(shown)?rechargeValid(shown)?"每份 1 元 = 100 G币\n到账 "+shown.recharge_u_coin_per_unit*quantity+" G币（"+quantity+" 份）":"充值金额及到账数量待同步":shown?"单价 "+priceText(unitQuote(shown,quantity),false,hasOrder)+" · "+quantity+" 件":"");

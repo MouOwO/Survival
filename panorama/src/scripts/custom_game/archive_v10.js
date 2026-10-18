@@ -117,6 +117,7 @@
             cell=card.__v10={host:host,artKey:key,sourceArtKey:JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style]),art:art,countHost:badge,count:count,name:name,normal:backing};
         }
         if(cell.host.GetParent()!==card)cell.host.SetParent(card);cell.host.visible=true;
+        fillItemIcon(cell.art,item);
         card.Children().forEach(function(child){if(child!==cell.host)child.visible=false;});
         card.AddClass("ArchiveV10Cell");card.AddClass("ArchiveCommerceCell");card.RemoveClass("ArchiveParchmentRowAlternate");
         pos(card,Math.floor(slot%7)*106,Math.floor(slot/7)*116,104,112);style(card,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",flowChildren:"none",overflow:"noclip",transform:"none"});
@@ -169,6 +170,7 @@
             cell=card.__v10={host:host,artKey:artKey,sourceArtKey:JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style]),art:art,countHost:countHost,count:count,name:name,normal:normal,track:track,fill:fill,glint:glint,state:state};
         }
         if(cell.host.GetParent()!==card)cell.host.SetParent(card);cell.host.visible=true;
+        if(current!=="titles")fillItemIcon(cell.art,item);
         card.Children().forEach(function(child){if(child!==cell.host&&!child.BHasClass("ArchivePromote"))child.visible=false;});
         card.AddClass("ArchiveV10Cell");card.SetHasClass("ArchiveParchmentRowAlternate",slot%2===1);pos(card,0,slot*82,745,80);style(card,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",overflow:"noclip",flowChildren:"none",transform:"none"});
         var progress=S.Progress(item,current),countText=progress.text,nameText=String(item.name||"");

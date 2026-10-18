@@ -1,0 +1,431 @@
+{
+  "status": "PASS_COMPONENTS_AND_NATIVE_COMPILE",
+  "default_background": "file://{images}/econ/tools/ti10_seasonal_item_background.png",
+  "grade_colors": {
+    "N": "green",
+    "R": "blue",
+    "SR": "purple",
+    "SSR": "gold",
+    "UR": "red"
+  },
+  "counts": {
+    "resources": 1471,
+    "recognized_grade_items": 296,
+    "neutral_white_items": 4,
+    "existing_transparent_references_updated": 28
+  },
+  "gameplay_data_unchanged": true,
+  "asset_reference_changes": [
+    {
+      "id": "daily_ancient_tree",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_ancient_tree.vtex"
+    },
+    {
+      "id": "daily_attack_shard",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_attack_shard.vtex"
+    },
+    {
+      "id": "daily_attribute_gem",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_attribute_gem.vtex"
+    },
+    {
+      "id": "daily_attribute_shard",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_attribute_shard.vtex"
+    },
+    {
+      "id": "daily_block_shard",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_block_shard.vtex"
+    },
+    {
+      "id": "daily_forest_origin",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_forest_origin.vtex"
+    },
+    {
+      "id": "daily_gold_gem",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_gold_gem.vtex"
+    },
+    {
+      "id": "daily_growth_gem",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_growth_gem.vtex"
+    },
+    {
+      "id": "daily_health_gem",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_health_gem.vtex"
+    },
+    {
+      "id": "daily_regen_shard",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_regen_shard.vtex"
+    },
+    {
+      "id": "daily_wealth_talisman",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_wealth_talisman.vtex"
+    },
+    {
+      "id": "daily_wood_gem",
+      "fields": [
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_wood_gem.vtex"
+    },
+    {
+      "id": "lottery_crystalline_armor",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex"
+    },
+    {
+      "id": "lottery_gale_bow",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gale_bow.vtex"
+    },
+    {
+      "id": "lottery_gathering_divine_codex",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex"
+    },
+    {
+      "id": "lottery_gathering_grimoire",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex"
+    },
+    {
+      "id": "lottery_hero_medal",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_hero_medal.vtex"
+    },
+    {
+      "id": "lottery_magic_book",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex"
+    },
+    {
+      "id": "lottery_muramasa",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex"
+    },
+    {
+      "id": "lottery_raven_eye",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex"
+    },
+    {
+      "id": "lottery_soul_devouring_blade",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex"
+    },
+    {
+      "id": "lottery_spear_of_longinus",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex"
+    },
+    {
+      "id": "lottery_sword_of_promise",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sword_of_promise.vtex"
+    },
+    {
+      "id": "lottery_titan_shield",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_titan_shield.vtex"
+    },
+    {
+      "id": "shadow_01",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shadow_01.vtex"
+    },
+    {
+      "id": "shadow_02",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shadow_02.vtex"
+    },
+    {
+      "id": "shadow_03",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shadow_03.vtex"
+    },
+    {
+      "id": "shadow_04",
+      "fields": [
+        "fit",
+        "source_size",
+        "uri"
+      ],
+      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shadow_04.vtex"
+    }
+  ],
+  "candidate": {
+    "item_table_sha256": "e33d28c3ebc5cca4c46e16f91375bef85a886a9b85abb38f980a83e2ba96e316",
+    "generated_js_sha256": "2a318ea718a8d0d270dfdbf78c3615465bb38ddd9991ee82530c9c869612925b",
+    "generated_lua_sha256": "834493cb9a4863d0f25f763045ff04a46bd681c349a318a012de19598e20da20"
+  },
+  "native_compile": [
+    {
+      "source": "panorama/src/scripts/custom_game/common/item_resources.js",
+      "source_sha256": "2a318ea718a8d0d270dfdbf78c3615465bb38ddd9991ee82530c9c869612925b",
+      "artifact": "panorama/scripts/custom_game/common/item_resources.vjs_c",
+      "artifact_sha256": "02f916f6d1cc0136c4dfb79392389d75ca717f33372d4a3f80790dcef0758ad6"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/common/commerce_components.js",
+      "source_sha256": "6153b5c5c4324c582f8655b376bc97bd16993fe2a1e27b33482fdc601c73c48a",
+      "artifact": "panorama/scripts/custom_game/common/commerce_components.vjs_c",
+      "artifact_sha256": "f5e2eb69e9f8e8f158ec156358ea45a89bd8139a5be8ba8f99327344a4a45581"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/payment_test.js",
+      "source_sha256": "f2835eb4558d5679eec8dda3136b468a535de2d3c6cce4dc5791ffb9036f4da9",
+      "artifact": "panorama/scripts/custom_game/payment_test.vjs_c",
+      "artifact_sha256": "fef26ffef6f5d896e536f4bf83345b6af74fef6eb4f13ac3470ceafec795753d"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/archive_v10.js",
+      "source_sha256": "e67883afc7383dc8f190677d77b7df88ee83bb23db435ff077dfa418287d6265",
+      "artifact": "panorama/scripts/custom_game/archive_v10.vjs_c",
+      "artifact_sha256": "a1e8b414d4dec205d56b6ee7f2c5406786980675bd2e4f66fa3c9dd6d1f08c99"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/archive_void_v1.js",
+      "source_sha256": "11d662779ed1f6da1cba611a1d98c084994b6fa1cda23291f564ea693117732a",
+      "artifact": "panorama/scripts/custom_game/archive_void_v1.vjs_c",
+      "artifact_sha256": "132d5b3daa6b302a3003707476d0649bf99be16709a5d59f7154099f69aa028e"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/inventory_tooltip.js",
+      "source_sha256": "1e9f16ab5614ee5b2575d41b3f1e28a3b27aa473ea0c470729e737014fbf8e9f",
+      "artifact": "panorama/scripts/custom_game/inventory_tooltip.vjs_c",
+      "artifact_sha256": "1d901d34544daa1b0d9971264f9cf7e8c26bad8cac9cf4568d74afaa42459405"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+      "source_sha256": "979819e4e1e810fab0951d273320fe2db93d56f0faa6832ef248c50ea5f548a6",
+      "artifact": "panorama/scripts/custom_game/topnav_remaining_5d5c1152eb.vjs_c",
+      "artifact_sha256": "53bb3f585308d632e78960fdd175ac40f41c2a6474423f98beb05f9ec47d2df3"
+    }
+  ],
+  "live_native_compile": [
+    {
+      "source": "panorama/src/scripts/custom_game/common/item_resources.js",
+      "source_sha256": "5ce696d9bf27842160cf0eb70d63632ee54a725105fda7bad1e3ef67453195b7",
+      "artifact": "panorama/scripts/custom_game/common/item_resources.vjs_c",
+      "artifact_sha256": "75b92cd694d83f0d22594a1d4cd32873acabed4b2e927751b6eaed6d10b85aef"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/common/commerce_components.js",
+      "source_sha256": "6153b5c5c4324c582f8655b376bc97bd16993fe2a1e27b33482fdc601c73c48a",
+      "artifact": "panorama/scripts/custom_game/common/commerce_components.vjs_c",
+      "artifact_sha256": "f5e2eb69e9f8e8f158ec156358ea45a89bd8139a5be8ba8f99327344a4a45581"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/payment_test.js",
+      "source_sha256": "939f9ebe271bcda92e951b54be5236d183544586e7d57947cba89aff781e2e47",
+      "artifact": "panorama/scripts/custom_game/payment_test.vjs_c",
+      "artifact_sha256": "a620129d33b420fb1da0dfca63913c66782ae42c24b96fcb58dcc9123a84845f"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/archive_v10.js",
+      "source_sha256": "92be439b6b1d40cef8ba1be35881d96499deddd3eaa7799f3d9d95f68207a7c5",
+      "artifact": "panorama/scripts/custom_game/archive_v10.vjs_c",
+      "artifact_sha256": "e8eb975cf81a8ee41534be56c46da0c4367e51bb30599d52f692e2967c7dd0d1"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/archive_void_v1.js",
+      "source_sha256": "02a3d17cfbb688509684690ae6a7a970d3372322123620e9e288a625926bbb02",
+      "artifact": "panorama/scripts/custom_game/archive_void_v1.vjs_c",
+      "artifact_sha256": "1f9fd844ddd698eefad413e317621debd5293e37b627c87c2656937dba91ad4c"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/inventory_tooltip.js",
+      "source_sha256": "9f4f968a7c5bef9b098d105f8723987c1155f3ac755e03d149f8f09447d6ab41",
+      "artifact": "panorama/scripts/custom_game/inventory_tooltip.vjs_c",
+      "artifact_sha256": "5c827f50ab888434cbf26e6b325c64dcf168bb0b286aed3207442ff5821bf0e3"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js",
+      "source_sha256": "85078397ed80fcfa578b93aeeb61de9bf5c4dea63144407de862a939f23eb6af",
+      "artifact": "panorama/scripts/custom_game/topnav_remaining_5d5c1152eb.vjs_c",
+      "artifact_sha256": "f9cadd07bcccade329b342aa6261a70c2954d2d6f1ef55c97fc271b891516a37"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Shared grade, all aliases, live overrides, single rewards, neutral fallback, reused panels and API cache upgrade",
+      "passed": true,
+      "tests": 5
+    },
+    {
+      "name": "Commerce, payment, inventory, native inventory slot, archive and void consumers",
+      "passed": true,
+      "tests": 6
+    },
+    {
+      "name": "Existing commerce tooltip layout and lifecycle regressions",
+      "passed": true,
+      "tests": 17
+    },
+    {
+      "name": "Fit contract",
+      "passed": true,
+      "tests": 3
+    },
+    {
+      "name": "Generator compatibility",
+      "passed": true,
+      "groups": 8
+    },
+    {
+      "name": "Existing collection frames, user ticket icons and shop rendering",
+      "passed": true
+    },
+    {
+      "name": "Candidate executes 28 shared/consumer/tooltip tests against HEAD dependencies",
+      "passed": true,
+      "tests": 28
+    },
+    {
+      "name": "Live and candidate resource generation are current",
+      "passed": true
+    },
+    {
+      "name": "Native compilation of all seven JS scripts",
+      "passed": true,
+      "sources": 7
+    }
+  ],
+  "preview": {
+    "path": "docs/evidence/item_grade_backgrounds_20261018/components.png",
+    "sha256": "3ea5b5b358f98ce790df709b63131d6d51ffd7753eba1acd202051509e42e1c1",
+    "not_game_capture": true,
+    "foreground_filtering": false,
+    "full_300_contact_sheet_passed": true,
+    "scope": "Actual shared factory; browser approximates native compositing; includes existing working UI assets.",
+    "sources": [
+      {
+        "path": "data/ui/item_resources.json",
+        "sha256": "227f46e6325dd45191f3c3ef22b5bbe12ae41077991baa4fb01ef8fc6bdb2464"
+      },
+      {
+        "path": "panorama/src/scripts/custom_game/common/item_resources.js",
+        "sha256": "5ce696d9bf27842160cf0eb70d63632ee54a725105fda7bad1e3ef67453195b7"
+      },
+      {
+        "path": "panorama/src/scripts/custom_game/reward_presentation.js",
+        "sha256": "6d194fa4e74d7496ab34ed649e8848e545b32d862719cecace45de96ae1b2f88"
+      }
+    ]
+  },
+  "pre_existing_test_failures": [
+    {
+      "path": "tools/tests/commerce_product_icons.test.cjs",
+      "reason": "Obsolete market gift class and old VIP labels; task baseline reproduces both failures. In-memory expected-label update passes remaining 137 goods/49 checkout/88 lottery checks."
+    }
+  ],
+  "live_dota_verified": false,
+  "limitations": [
+    "Existing ungraded official foregrounds with baked backgrounds retain their original artwork pixels; the gray backdrop is shared behind them.",
+    "Browser component screenshots do not establish native in-game font/layout/compositing or multiplayer behavior."
+  ]
+}

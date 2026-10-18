@@ -39,7 +39,12 @@
         var resources=cfg.SurvivalItemResources;
         return resources?resources.Resolve(item,item.icon):item.icon;
     };
+    function iconItem(item,rewards){
+        if(!item||typeof item!=="object"||item.reward_lines!==undefined||!Array.isArray(rewards)||!rewards.length)return item;
+        var display={};Object.keys(item).forEach(function(key){display[key]=item[key];});display.reward_lines=rewards;return display;
+    }
     J.ItemIcon=function(parent,item,className,options){
+        item=iconItem(item,options&&options.rewards);
         var presentation=cfg.SurvivalRewardPresentation;
         var registered=presentation&&presentation.CreateRegisteredIcon&&presentation.CreateRegisteredIcon(parent,item,className,options);
         var icon=registered||original(parent,J.ProductIcon(item)||"items/recipe.png",className);
@@ -79,15 +84,8 @@
         label(row,isU?uText:amount+" "+currency,"CJPriceValue");p.hittest=false;p.hittestchildren=false;return p;
     };
     function detailQuality(item, rewards) {
-        var art=cfg.SurvivalItemArt;
-        function quality(row){var value=String(row&&row.quality||"").toUpperCase();return /^(N|R|SR|SSR|UR)$/.test(value)?value:"";}
-        function lookup(value){return art&&art.Lookup?art.Lookup(value):null;}
-        var value=quality(item)||quality(lookup(item));
-        if(value)return value;
-        if(item.product_type==="bundle")return "";
-        var items=(rewards||[]).filter(function(row){return row.kind==="item";});
-        if(items.length===1){value=quality(lookup({item_id:items[0].id}));if(value)return value;}
-        return "";
+        var resources=cfg.SurvivalItemResources;
+        return resources&&resources.Grade?resources.Grade(iconItem(item,rewards)):"";
     }
     function detail(card,item,props,bundle){
         // Keep ownership on the complete card so close/reopen and incremental
@@ -258,7 +256,7 @@
         props=props||{};var card=U.CardShell(parent,{bodyVariant:"product"});
         card.AddClass("RCProduct");card.AddClass(bundle?"CJBundle":"CJProduct");card.AddClass("CommercePurpleProduct");
         var well=box(panel("Panel",card,"CommercePurpleArtWell"),12,9,120,120);
-        box(J.ItemIcon(well,item,"RCProductArt",{width:120,height:120}),0,0,120,120);
+        box(J.ItemIcon(well,item,"RCProductArt",{width:120,height:120,rewards:props.rewards}),0,0,120,120);
         var caption=box(label(card,String(item.title||item.sku||"").replace(/\s*[·•]\s*永久\s*$/,""),"RCProductName"),7,134,130,35);
         var owned=Number(item.owned)>0?label(card,String(item.owned),"RCStockState"):null;
         card.__menuCell={iconPanel:well,namePanel:caption,countPanel:owned};

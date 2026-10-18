@@ -3557,15 +3557,15 @@
       "id": "daily_ancient_tree",
       "name": "古树眷顾",
       "kind": "image",
-      "uri": "file://{images}/items/tango.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_ancient_tree.vtex",
       "aliases": [],
       "quality": "SSR",
       "category_id": "points",
       "native_type": "item",
       "native_name": "tango",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3573,15 +3573,15 @@
       "id": "daily_attack_shard",
       "name": "攻击碎片",
       "kind": "image",
-      "uri": "file://{images}/items/javelin.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_attack_shard.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "javelin",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3589,15 +3589,15 @@
       "id": "daily_attribute_gem",
       "name": "攻击宝石",
       "kind": "image",
-      "uri": "file://{images}/items/ultimate_orb.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_attribute_gem.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "ultimate_orb",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3605,15 +3605,15 @@
       "id": "daily_attribute_shard",
       "name": "属性碎片",
       "kind": "image",
-      "uri": "file://{images}/items/circlet.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_attribute_shard.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "circlet",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3621,15 +3621,15 @@
       "id": "daily_block_shard",
       "name": "格挡碎片",
       "kind": "image",
-      "uri": "file://{images}/items/stout_shield.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_block_shard.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "stout_shield",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3637,15 +3637,15 @@
       "id": "daily_forest_origin",
       "name": "森罗本源",
       "kind": "image",
-      "uri": "file://{images}/items/refresher.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_forest_origin.vtex",
       "aliases": [],
       "quality": "SSR",
       "category_id": "points",
       "native_type": "item",
       "native_name": "refresher",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3653,15 +3653,15 @@
       "id": "daily_gold_gem",
       "name": "金币宝石",
       "kind": "image",
-      "uri": "file://{images}/items/furion_gold_bag.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_gold_gem.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "furion_gold_bag",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3669,15 +3669,15 @@
       "id": "daily_growth_gem",
       "name": "成长宝石",
       "kind": "image",
-      "uri": "file://{images}/items/lesser_crit.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_growth_gem.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "lesser_crit",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3685,15 +3685,15 @@
       "id": "daily_health_gem",
       "name": "生命宝石",
       "kind": "image",
-      "uri": "file://{images}/items/vitality_booster.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_health_gem.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "vitality_booster",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3701,15 +3701,15 @@
       "id": "daily_regen_shard",
       "name": "回血碎片",
       "kind": "image",
-      "uri": "file://{images}/items/ring_of_health.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_regen_shard.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "ring_of_health",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3717,15 +3717,15 @@
       "id": "daily_wealth_talisman",
       "name": "聚财古符",
       "kind": "image",
-      "uri": "file://{images}/items/hand_of_midas.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_wealth_talisman.vtex",
       "aliases": [],
       "quality": "SSR",
       "category_id": "points",
       "native_type": "item",
       "native_name": "hand_of_midas",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -3733,15 +3733,15 @@
       "id": "daily_wood_gem",
       "name": "木材宝石",
       "kind": "image",
-      "uri": "file://{images}/items/quelling_blade.png",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/daily_wood_gem.vtex",
       "aliases": [],
       "quality": "R",
       "category_id": "points",
       "native_type": "item",
       "native_name": "quelling_blade",
       "source_size": [
-        88,
-        64
+        313,
+        313
       ],
       "fit": "contain"
     },
@@ -7001,7 +7001,7 @@
       "id": "lottery_crystalline_armor",
       "name": "晶态护甲·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/shivas_guard_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex",
       "aliases": [
         "P055",
         "video_p055"
@@ -7010,7 +7010,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "shivas_guard",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_cyber_overlord",
@@ -7211,7 +7215,7 @@
       "id": "lottery_gale_bow",
       "name": "疾风弓·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/grove_bow_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gale_bow.vtex",
       "aliases": [
         "P111",
         "video_p111"
@@ -7220,13 +7224,17 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "grove_bow",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_gathering_divine_codex",
       "name": "采集神典·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/necronomicon_3_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex",
       "aliases": [
         "P130",
         "video_p130"
@@ -7235,13 +7243,17 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "necronomicon_3",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_gathering_grimoire",
       "name": "采集秘典·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/tome_of_knowledge_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex",
       "aliases": [
         "P107",
         "video_p107"
@@ -7250,7 +7262,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "tome_of_knowledge",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_greenwood_nirvana",
@@ -7310,7 +7326,7 @@
       "id": "lottery_hero_medal",
       "name": "英雄勋章·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/medallion_of_courage_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_hero_medal.vtex",
       "aliases": [
         "P097",
         "video_p097"
@@ -7319,7 +7335,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "medallion_of_courage",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_hippogryph_onslaught",
@@ -7477,7 +7497,7 @@
       "id": "lottery_magic_book",
       "name": "魔法书·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/book_of_shadows_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex",
       "aliases": [
         "P046",
         "commerce_p046",
@@ -7487,7 +7507,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "book_of_shadows",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_magical_girl_juggernaut",
@@ -7538,7 +7562,7 @@
       "id": "lottery_muramasa",
       "name": "妖刀村正·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/yasha_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex",
       "aliases": [
         "P042",
         "commerce_p042",
@@ -7548,7 +7572,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "yasha",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_nano_cluster",
@@ -7686,7 +7714,7 @@
       "id": "lottery_raven_eye",
       "name": "渡鸦之眼·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/eye_of_the_vizier_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex",
       "aliases": [
         "P045",
         "commerce_p045",
@@ -7696,7 +7724,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "eye_of_the_vizier",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_recovery_crystal",
@@ -7848,7 +7880,7 @@
       "id": "lottery_soul_devouring_blade",
       "name": "噬魂灵剑·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/diffusal_blade_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex",
       "aliases": [
         "P104",
         "video_p104"
@@ -7857,7 +7889,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "diffusal_blade",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_soul_lock_box",
@@ -7884,7 +7920,7 @@
       "id": "lottery_spear_of_longinus",
       "name": "朗基努斯枪·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/dragon_lance_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex",
       "aliases": [
         "P048",
         "commerce_p048",
@@ -7894,7 +7930,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "dragon_lance",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_steel_wall",
@@ -7949,13 +7989,17 @@
       "id": "lottery_sword_of_promise",
       "name": "誓约之剑",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/rapier_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sword_of_promise.vtex",
       "aliases": [],
       "quality": "ur",
       "category_id": "points",
       "native_type": "item",
       "native_name": "rapier",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_ticket",
@@ -7986,7 +8030,7 @@
       "id": "lottery_titan_shield",
       "name": "泰坦巨盾·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/items/vanguard_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_titan_shield.vtex",
       "aliases": [
         "P101",
         "video_p101"
@@ -7995,7 +8039,11 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "vanguard",
-      "fit": "cover"
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "lottery_tower_retrofit",
@@ -12030,37 +12078,57 @@
       "id": "shadow_01",
       "name": "幻象树枝",
       "kind": "image",
-      "uri": "file://{images}/custom_game/archive_v10/items/virtual_01.png",
+      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shadow_01.vtex",
       "aliases": [],
       "quality": "white",
-      "category_id": "shadow"
+      "category_id": "shadow",
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "shadow_02",
       "name": "贪婪金币",
       "kind": "image",
-      "uri": "file://{images}/custom_game/archive_v10/items/virtual_02.png",
+      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shadow_02.vtex",
       "aliases": [],
       "quality": "white",
-      "category_id": "shadow"
+      "category_id": "shadow",
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "shadow_03",
       "name": "虚无模块",
       "kind": "image",
-      "uri": "file://{images}/custom_game/archive_v10/items/virtual_03.png",
+      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shadow_03.vtex",
       "aliases": [],
       "quality": "white",
-      "category_id": "shadow"
+      "category_id": "shadow",
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "shadow_04",
       "name": "粘稠之泥",
       "kind": "image",
-      "uri": "file://{images}/custom_game/archive_v10/items/virtual_04.png",
+      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/shadow_04.vtex",
       "aliases": [],
       "quality": "white",
-      "category_id": "shadow"
+      "category_id": "shadow",
+      "fit": "contain",
+      "source_size": [
+        313,
+        313
+      ]
     },
     {
       "id": "shadow_05",
