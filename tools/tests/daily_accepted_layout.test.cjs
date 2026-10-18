@@ -102,8 +102,9 @@ function dailyAccepted() {
             assert.equal(frame.style.backgroundImage, 'url("' + cfg.DailyGW2Data.assets.reward_frame.file + '")');
             for (const reward of tagged(day, 'DailyGW2Reward')) {
                 const slot = box(reward, day);
-                assert(slot[0] >= 5 && slot[1] >= 5, 'Reward content retains the common inset');
-                assert(slot[0] + slot[2] <= 113 && slot[1] + slot[3] <= 114, 'Reward content stays within the common inset');
+                assert.equal(slot[1], 2, 'Reward art starts immediately inside the border');
+                assert.equal(slot[1] + slot[3], 117, 'Reward art fills the frame height');
+                assert(slot[0] >= 2 && slot[0] + slot[2] <= 116, 'Reward art stays inside the border');
             }
         }
         nodes.DailySpecials.Children().forEach((special, index) => {
@@ -123,6 +124,19 @@ function dailyAccepted() {
         assert(!nodes.DailyWindow.style.opacity || Number(nodes.DailyWindow.style.opacity) === 1,
             'Background transparency cannot fade all text, icons and states');
         noEmptyMonthlySlots();
+        for (const card of [...nodes.DailyCards.Children(), ...nodes.DailySpecials.Children()]) {
+            const slots = [...tagged(card, 'DailyGW2Reward'), ...tagged(card, 'DailyGW2PassReward')];
+            if (!slots.length) continue;
+            const bounds = slots.map(slot => box(slot, card));
+            assert.equal(bounds[0][0], 2);
+            assert.equal(bounds.at(-1)[0] + bounds.at(-1)[2], 116);
+            for (let i = 0; i < slots.length; i++) {
+                if (i) assert.equal(bounds[i - 1][0] + bounds[i - 1][2], bounds[i][0], 'Two rewards leave no unpainted gap');
+                const icon = tagged(slots[i], 'DailyGW2ItemArt')[0];
+                assert.deepEqual(box(icon, slots[i]), [0, 0, bounds[i][2], bounds[i][3]], 'Icon fills the complete slot, including tall paired rewards');
+                assert.equal(icon.scaling, 'stretch-to-cover-preserve-aspect', 'Daily art overrides catalog contain without distorting the image');
+            }
+        }
     }
     geometry();
 
