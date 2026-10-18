@@ -93,6 +93,39 @@ Object.defineProperty(scrollDescription,'actuallayoutheight',{get(){return Math.
 Object.defineProperty(scrollViewport,'actuallayoutheight',{get(){return parseFloat(this.style.height)||0;}});
 Object.defineProperty(scrollTip,'actuallayoutwidth',{get(){return parseFloat(this.style.width)||366;}});
 Object.defineProperty(scrollTip,'actuallayoutheight',{get(){return parseFloat(this.style.height)||0;}});
+const scrollSurface=scrollTip.children.find(node=>node.BHasClass('BLMarketDetailSurface'));
+Object.defineProperty(scrollSurface,'actuallayoutwidth',{get(){return parseFloat(this.style.width)||368;}});
+Object.defineProperty(scrollSurface,'actuallayoutheight',{get(){return parseFloat(this.style.height)||0;}});
+// No timer/frame is advanced between the physical exit and the next hover.
+const fastRoot=[root.actuallayoutwidth,root.actuallayoutheight],fastCanvas=presentation.Inspect().canvas;
+root.actuallayoutwidth=fastCanvas[0];root.actuallayoutheight=fastCanvas[1];presentation.Fit();
+const fastA=new Panel('Panel',root,''),fastB=new Panel('Panel',root,'');
+for(const node of [fastA,fastB]){node.actuallayoutwidth=72;node.actuallayoutheight=72;}
+fastA.style.position='120px 160px 0px';fastB.style.position='240px 160px 0px';
+const fastItem={id:'fast-hover',name:'快速悬停',description:'攻击+1'},fastRequests=requests.length;
+function sourceExit(){if(!presentation.RequestTooltipHide())presentation.HideTooltip();}
+function insideFast(node){const at=node.GetPositionWithinWindow();tooltipCursor=[at.x+2,at.y+2];}
+tooltipCursor=[1800,1000];presentation.HideTooltip();insideFast(fastA);presentation.Tooltip(fastItem,fastA);
+assert(scrollTip.visible);insideFast(scrollTip);scrollTip.events.onmouseover();assert(!scrollTip.visible);
+// A dismissed popup remains suppressed until a real source exit.
+insideFast(fastA);presentation.Tooltip(fastItem,fastA);assert(!scrollTip.visible);
+tooltipCursor=[1800,1000];sourceExit();insideFast(fastA);presentation.Tooltip(fastItem,fastA);
+assert(scrollTip.visible,'Fast source exit/re-entry must reopen before the 30ms watcher tick');
+let lastFast=fastA;const fastOwners=config.SurvivalTooltipDismiss.Inspect().owners;
+for(let i=0;i<50;i++){
+ const oldAt=scrollTip.GetPositionWithinWindow();insideFast(scrollTip);scrollTip.events.onmouseover();assert(!scrollTip.visible);
+ tooltipCursor=[1800,1000];sourceExit();
+ const next=i%2?fastA:fastB;next.style.position=(oldAt.x+12)+'px '+(oldAt.y+12)+'px 0px';insideFast(next);
+ presentation.Tooltip({...fastItem,name:'切换 '+i},next);
+ assert(scrollTip.visible,'A new icon inside the old popup footprint must show without a frame');
+ assert.equal(nodes.LotteryGW2TooltipName.text,'切换 '+i);
+ lastFast.events.onmouseout();assert(scrollTip.visible,'A late leave from the old icon cannot close the newly shown tooltip');lastFast=next;
+}
+advance(.4);assert(scrollTip.visible,'The latest hover survives finite layout callbacks and the passive watcher');
+assert.equal(config.SurvivalTooltipDismiss.Inspect().owners,fastOwners,'Rapid switches do not retain dismissed owners');
+tooltipCursor=[1800,1000];sourceExit();fastA.DeleteAsync();fastB.DeleteAsync();
+root.actuallayoutwidth=fastRoot[0];root.actuallayoutheight=fastRoot[1];presentation.Fit();
+assert(!requests.slice(fastRequests).some(r=>/draw|purchase|checkout|claim/.test(r.n)),'Rapid hover remains read-only');
 const longReward={id:'long-tooltip-readonly',name:'完整奖励',description:'完整的长奖励说明'.repeat(150)};
 presentation.Tooltip(longReward,first);assert(scrollDescription.actuallayoutheight>scrollViewport.actuallayoutheight);
 const longTipIcon=nodes.LotteryGW2TooltipIconStage.children[0],longAt=scrollTip.GetPositionWithinWindow(),longRequests=requests.length;
