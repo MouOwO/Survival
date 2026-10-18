@@ -55,6 +55,18 @@ assert.equal(nodes.LotteryGW2Title.text,'抽奖');assert(nodes.LotteryGW2TicketB
 const absent=data();delete absent.shop_points;events.ui_lottery_snapshot(absent);assert.equal(nodes.LotteryGW2Points.text,'商城积分  —');events.ui_lottery_snapshot({...data(),shop_points:0});assert.equal(nodes.LotteryGW2Points.text,'商城积分  0');events.ui_lottery_snapshot(data());
 assert.equal(presentation.Inspect().pools,4);assert.equal(nodes.LotteryGW2Sidebar.children.length,4);
 assert.equal(nodes.LotteryGW2PreviewItems.children.length,4);assert.equal(nodes.LotterySceneBackground.style.opacity,'1','retain the existing pool illustration');
+function previewAlignment(){
+ const cards=nodes.LotteryGW2PreviewItems.children,w=parseFloat(nodes.LotteryGW2PreviewItems.style.width),last=cards.at(-1);
+ assert.equal((parseFloat(cards[0].style.position)+parseFloat(last.style.position)+parseFloat(last.style.width))/2,w/2,'The preview row is centered for the actual item count');
+ for(const card of cards){
+  const host=card.children.find(n=>n.BHasClass('LotteryGW2PreviewNameHost')),caption=host.children[0],icon=card.children.find(n=>n.BHasClass('LotteryGW2PreviewIcon'));
+  assert.equal(parseFloat(String(icon.style.position).split(' ')[0])+parseFloat(icon.style.width)/2,parseFloat(host.style.width)/2,'Caption host and icon share one center axis');
+  assert.equal(caption.style.width,'fit-children');assert.equal(caption.style.height,'fit-children');assert.equal(caption.style.horizontalAlign,'center');assert.equal(caption.style.verticalAlign,'center');
+ }
+}
+previewAlignment();
+for(const count of [1,2,3]){const sample=data();sample.items=sample.items.slice(0,count);events.ui_lottery_snapshot(sample);previewAlignment();}
+events.ui_lottery_snapshot(data());
 const otherModal=new Panel('Panel',root,'UnrelatedModal');config.SurvivalUILayers.Open('unrelated_modal',otherModal,()=>{});
 const beforeForeign=requests.length;nodes.LotteryGW2Back.events.onactivate();nodes.LotteryGW2Pool_summer.events.onactivate();nodes.LotteryGW2Preview_0.events.onactivate();nodes.LotteryGW2Preview_0.events.onmouseover();
 assert.equal(requests.length,beforeForeign,'new controls cannot act through an unrelated modal');assert.equal(config.SurvivalUILayers.Top(),'unrelated_modal');assert.equal(presentation.Inspect().selected,'map');assert(!nodes.LotteryGW2Tooltip.visible);assert(presentation.Inspect().open);
@@ -71,6 +83,15 @@ assert(cells.some(c=>c.__lotteryGW2Cell.count.text==='2/5'),'only actual maximum
 presentation.Fit();const steady=presentation.Inspect();
 for(let i=0;i<30;i++){current.Feature('details');presentation.Fit();assert(presentation.Inspect().trackedOwned<=steady.trackedOwned,'deleted reward visuals cannot accumulate');assert(presentation.Inspect().trackedMoved<=steady.trackedMoved,'deleted native icons cannot accumulate');}
 const first=nodes.LotteryInfoList.children.find(c=>c.BHasClass('LotteryDetailRow')),before=requests.length;first.events.onmouseover();assert.equal(requests.length,before,'hover is read-only');
+// Reapplying the real modal stack raises the details ancestry after Info().
+const layerProbe=new Panel('Panel',root,'LotteryTooltipLayerProbe');
+config.SurvivalUILayers.Open('tooltip_layer_probe',layerProbe,()=>{});config.SurvivalUILayers.Close('tooltip_layer_probe');
+first.events.onmouseover();
+assert(Number(nodes.LotteryGW2Tooltip.style.zIndex)>Number(nodes.LotteryInfoOverlay.style.zIndex),'Tooltip must stay above details after modal layers are reapplied');
+const oldContentZ=String(Number(nodes.LotteryGW2Content.style.zIndex)||0);nodes.LotteryGW2Content.style.zIndex='100010';
+first.events.onmouseover();assert(Number(nodes.LotteryGW2DetailLayer.style.zIndex)>100010,'The tooltip ancestry must also clear raised preview content');nodes.LotteryGW2Content.style.zIndex=oldContentZ;
+assert.equal(nodes.LotteryGW2TooltipName.GetParent(),nodes.LotteryGW2TooltipTitleRow);assert.equal(nodes.LotteryGW2TooltipName.style.verticalAlign,'center');
+layerProbe.DeleteAsync();
 assert(nodes.LotteryGW2Tooltip.visible);assert(nodes.LotteryGW2TooltipDescription.text.includes('效果'));nodes.LotteryGW2Tooltip.events.onmouseover();assert(!nodes.LotteryGW2Tooltip.visible,'Entering the tooltip dismisses it immediately');first.events.onmouseover();assert(!nodes.LotteryGW2Tooltip.visible,'The dismissed source cannot immediately reopen its tooltip');assert(nodes.LotteryItemTooltip.BHasClass('Hidden'),'A consumed tooltip request cannot fall through to the old XML tooltip');first.events.onmouseout();assert(!nodes.LotteryGW2Tooltip.visible);
 assert(nodes.LotteryGW2Tooltip.BHasClass('BLMarketDetail'),'Lottery uses the actual market tooltip skin');
 assert(nodes.LotteryGW2Tooltip.children.some(child=>child.BHasClass('BLMarketDetailSurface')));
