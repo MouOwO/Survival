@@ -748,9 +748,12 @@ end
 
 local function rebuild_waves()
     waves = {}
+    local setup = package.loaded["systems/match_setup_service"]
+    local selected_mode = setup and type(setup.get_mode) == "function" and setup.get_mode() or nil
     local built, build_error = wave_difficulty_builder.build(
         wave_rows.rows,
-        difficulty_id
+        difficulty_id,
+        selected_mode
     )
     if not built then
         state.total_waves = 0

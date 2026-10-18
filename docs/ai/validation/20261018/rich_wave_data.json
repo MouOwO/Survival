@@ -1,0 +1,203 @@
+{
+  "date": "2026-10-18",
+  "mode": "rich",
+  "source": {
+    "file_name": "2026-10-17 21-00-57.mp4",
+    "sha256": "7fd2a81f5edae00581acbbf70ff36b023880629770a266579e18f013b11186d2",
+    "extraction_sha256": "d01994a26711b9bbd794b6ffd1a7d0bb80e1e21b7904823181111020a07c7eb0"
+  },
+  "stat_basis": "recorded N1 panel values",
+  "total_per_wave_per_player": 60,
+  "special_members_included": true,
+  "difficulty_policy": {
+    "N1": "25 recorded waves",
+    "N2_N10": "preserve existing 30 waves and per-batch difficulty relationship",
+    "waves_26_30": "preserve their templates and extend recorded wave25 enrichment",
+    "missing_N1_leader_template": "scale recorded leader once by ordinary difficulty ratio"
+  },
+  "bosses": {
+    "5": {
+      "attack": 4552,
+      "estimated": false,
+      "health": 70030,
+      "war3_armor": 294
+    },
+    "10": {
+      "attack": 54777,
+      "estimated": true,
+      "health": 560035,
+      "war3_armor": 1644
+    },
+    "15": {
+      "attack": 105002,
+      "estimated": false,
+      "health": 1050040,
+      "war3_armor": 2994
+    },
+    "20": {
+      "attack": 402502,
+      "estimated": true,
+      "health": 11025035,
+      "war3_armor": 2994
+    },
+    "25": {
+      "attack": 700002,
+      "estimated": false,
+      "health": 21000030,
+      "war3_armor": 2994
+    }
+  },
+  "preserved": [
+    "standard/pure/fishing data",
+    "model archetypes and visual mapping",
+    "roles and special-member counts",
+    "movement type and scale",
+    "attack speed and spawn timing",
+    "rich private-player routing"
+  ],
+  "tests": [
+    {
+      "test": "scripts/vscripts/tests/test_rich_wave_data.lua",
+      "passed": true,
+      "seconds": 0.07,
+      "error": null,
+      "last_output": [
+        "RICH_WAVE_DATA_PASS: OCR variants and bosses, estimate provenance, 60 per owner, immutable models/source, difficulty ratios and W25 tail extension, mixed-mode isolation"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_difficulty_unlocks.lua",
+      "passed": true,
+      "seconds": 0.038,
+      "error": null,
+      "last_output": [
+        "PASS test_difficulty_unlocks"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_wave_population_endgame.lua",
+      "passed": true,
+      "seconds": 0.337,
+      "error": null,
+      "last_output": [
+        "[WaveSystem] formal wave assets queued target_wave=2 phase=countdown_start remaining=90.0 resources=1 queued=1 failed=0 status=ready ok=true",
+        "[SURVIVAL_MEMORY][LUA] phase=wave_started wave=1 game_time=150.0 lua_kib=6004.5 alive=0 pending=14 enemies=0 scheduler=0 visuals=-1",
+        "PASS fishing wave isolation: no difficulty/countdown/preload/spawn/challenge/clear; direct, event and debug requests denied; two-hour lifecycle stays playable; standard/pure still start real waves"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_tools_multi_wave.lua",
+      "passed": true,
+      "seconds": 0.062,
+      "error": null,
+      "last_output": [
+        "[MonsterSpawnMarker] missing player=3 map=unknown expected=player_3 source=player_slots.csv",
+        "[WaveSystem] dev wave preload finished wave=15 reason=failed_open_after_buffer pending=0 failed=true elapsed=100.00",
+        "TOOLS_MULTI_WAVE_PASS: unchanged monster15, four real channels, late joins, deduplication, counters/leases, invalid input and disconnect rejection"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_startup_asset_preload_service.lua",
+      "passed": true,
+      "seconds": 0.3,
+      "error": null,
+      "last_output": [
+        "test_startup_asset_preload_service: PASS resources=576 async_requests=48"
+      ]
+    },
+    {
+      "test": "tools/test_rich_wave_routes.lua",
+      "passed": true,
+      "seconds": 0.006,
+      "error": null,
+      "last_output": [
+        "RICH_WAVE_ROUTES_PASS: four private entrances, unchanged ownership, cached spawn offsets, no ordinary portal fallback"
+      ]
+    },
+    {
+      "test": "scripts/vscripts/tests/test_rich_wave_spawning.lua",
+      "passed": true,
+      "seconds": 0.104,
+      "last_output": [
+        "[WaveSystem] dev wave spawn started wave=24 preload=ready_after_buffer",
+        "[WaveSystem] dev wave preload finished wave=25 reason=ready_after_buffer pending=0 failed=false elapsed=100.00",
+        "[WaveSystem] dev wave spawn started wave=25 preload=ready_after_buffer",
+        "RICH_WAVE_SPAWNING_PASS: 5 isolated production waves, 1200 births, 60 per owner, rich routes, estimated bosses, W24 groups, preserved models/roles and custom armor"
+      ]
+    }
+  ],
+  "native": {
+    "status": "PASS",
+    "validation": "native data construction only; no real combat spawn assertion",
+    "unit_spawns": 0,
+    "account_writes": 0,
+    "mode_preserved": true,
+    "difficulties": {
+      "N1": {
+        "monsters_per_player": 1500,
+        "waves": 25
+      },
+      "N10": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      },
+      "N2": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      },
+      "N3": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      },
+      "N4": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      },
+      "N5": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      },
+      "N6": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      },
+      "N7": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      },
+      "N8": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      },
+      "N9": {
+        "monsters_per_player": 1800,
+        "waves": 30
+      }
+    }
+  },
+  "four_owner_spawn_test": {
+    "scope": "Lua5.1 simulated engine using production wave init/selection/preload/spawn_one",
+    "waves": [
+      1,
+      10,
+      20,
+      24,
+      25
+    ],
+    "total_spawned": 1200,
+    "each_player_each_wave": 60,
+    "failed_spawns": 0,
+    "custom_war3_armor_verified": true
+  },
+  "source_hashes": {
+    "data/balance/rich_n1_wave_stats.json": "f9cb03c28cdb5bbfd1dc6eabe8100ecb62357961d1d4259bf37b863f7b45be21",
+    "scripts/vscripts/config/generated/rich_wave_profiles.lua": "1172ca12bd3c397fcc534f325e75c5157c5758db5a6ef182ff9492023e4d9f66",
+    "scripts/vscripts/systems/rich_wave_profile.lua": "567aeadd8790616b3177ffea9daffe545b5042823028ce9a3dd796787d85f4ea",
+    "scripts/vscripts/systems/wave_difficulty_builder.lua": "901d78f14c99c433561cdc35502c7e58173f3bf5a606750fd0bacd2f06288773",
+    "scripts/vscripts/systems/wave_system.lua": "afec3db106317b91bb80c967ddd54635e582cf1fc7993f30f6a5662d213d3181",
+    "scripts/vscripts/tests/test_rich_wave_data.lua": "fb1482b788e3ea17c56c7c95d63a3fcf7a689372cc748fe6408f646e0990b539",
+    "scripts/vscripts/tests/test_rich_wave_spawning.lua": "d4afea52728b78cfef001553793c16012b807fd2fa1c478be063371da301dff5",
+    "tools/rich_waves_20261018/build_profiles.py": "484df74db01791f3fa31056b16ab8dd98c0da5541be9d184bf8e733b7a5f0bd7",
+    "tools/rich_waves_20261018/native_readonly_probe.lua": "4570ff7701634c5ff5afea6c077e9ce1186b970f1ff544f7f7864eadd361edf7"
+  }
+}

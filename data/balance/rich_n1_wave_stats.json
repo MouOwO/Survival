@@ -1,0 +1,875 @@
+{
+  "schema_version": 1,
+  "mode_id": "rich",
+  "source_difficulty_id": "N1",
+  "total_count_per_wave": 60,
+  "stats_basis": "video_display",
+  "source": {
+    "file_name": "2026-10-17 21-00-57.mp4",
+    "sha256": "7fd2a81f5edae00581acbbf70ff36b023880629770a266579e18f013b11186d2",
+    "extraction_sha256": "d01994a26711b9bbd794b6ffd1a7d0bb80e1e21b7904823181111020a07c7eb0"
+  },
+  "policies": {
+    "count": "all_roles_included_per_player",
+    "higher_difficulties": "existing_per_batch_ratios",
+    "waves_after_25": "extend_wave_25_gain_over_existing_difficulty_rows",
+    "unobserved_leaders": "preserve_existing_leader_to_normal_stat_ratios",
+    "models": "preserve_existing_archetype_role_movement_scale_and_attack_speed"
+  },
+  "observations": [
+    {
+      "record_id": "N1-W01-01",
+      "wave": 1,
+      "name": "LV1",
+      "model_description": "紫肤长耳头像",
+      "attack": 7,
+      "health": 700,
+      "war3_armor": 6,
+      "attack_raw": "7",
+      "health_raw": "700",
+      "armor_raw": "6",
+      "video_time": "02:42",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W02-01",
+      "wave": 2,
+      "name": "LV2",
+      "model_description": "持盾步兵头像",
+      "attack": 16,
+      "health": 1050,
+      "war3_armor": 9,
+      "attack_raw": "16",
+      "health_raw": "1050",
+      "armor_raw": "9",
+      "video_time": "04:22",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W03-01",
+      "wave": 3,
+      "name": "LV3",
+      "model_description": "骷髅头像",
+      "attack": 58,
+      "health": 2100,
+      "war3_armor": 12,
+      "attack_raw": "58",
+      "health_raw": "2100",
+      "armor_raw": "12",
+      "video_time": "07:21",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W04-01",
+      "wave": 4,
+      "name": "LV4",
+      "model_description": "绿皮兽人头像",
+      "attack": 212,
+      "health": 3500,
+      "war3_armor": 24,
+      "attack_raw": "212",
+      "health_raw": "3500",
+      "armor_raw": "24",
+      "video_time": "07:22",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W04-02",
+      "wave": 4,
+      "name": "LV4",
+      "model_description": "绿皮兽人头像",
+      "attack": 842,
+      "health": 35000,
+      "war3_armor": 48,
+      "attack_raw": "842",
+      "health_raw": "3.500万",
+      "armor_raw": "48",
+      "video_time": "07:20",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W05-01",
+      "wave": 5,
+      "name": "LV5",
+      "model_description": "触须面孔头像",
+      "attack": 702,
+      "health": 7000,
+      "war3_armor": 24,
+      "attack_raw": "702",
+      "health_raw": "7000",
+      "armor_raw": "24",
+      "video_time": "08:42",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W05-02",
+      "wave": 5,
+      "name": "首领",
+      "model_description": "黑发兽人头像；等级1 首领01",
+      "attack": 4552,
+      "health": 70030,
+      "war3_armor": 294,
+      "attack_raw": "4552",
+      "health_raw": "7.003万",
+      "armor_raw": "294",
+      "video_time": "08:40",
+      "is_boss": true
+    },
+    {
+      "record_id": "N1-W06-01",
+      "wave": 6,
+      "name": "LV6",
+      "model_description": "头盔步兵头像",
+      "attack": 1542,
+      "health": 14000,
+      "war3_armor": 30,
+      "attack_raw": "1542",
+      "health_raw": "1.400万",
+      "armor_raw": "30",
+      "video_time": "10:15",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W06-02",
+      "wave": 6,
+      "name": "LV6",
+      "model_description": "胖怪头像",
+      "attack": 1542,
+      "health": 14000,
+      "war3_armor": 45,
+      "attack_raw": "1542",
+      "health_raw": "1.400万",
+      "armor_raw": "45",
+      "video_time": "10:13",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W07-01",
+      "wave": 7,
+      "name": "LV7",
+      "model_description": "胖怪头像",
+      "attack": 2802,
+      "health": 21000,
+      "war3_armor": 60,
+      "attack_raw": "2802",
+      "health_raw": "2.100万",
+      "armor_raw": "60",
+      "video_time": "12:06",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W07-02",
+      "wave": 7,
+      "name": "LV7",
+      "model_description": "胖怪头像",
+      "attack": 11202,
+      "health": 210000,
+      "war3_armor": 120,
+      "attack_raw": "11202",
+      "health_raw": "21.000万",
+      "armor_raw": "120",
+      "video_time": "12:05",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W08-01",
+      "wave": 8,
+      "name": "LV8",
+      "model_description": "紫狼头像",
+      "attack": 3152,
+      "health": 28000,
+      "war3_armor": 75,
+      "attack_raw": "3152",
+      "health_raw": "2.800万",
+      "armor_raw": "75",
+      "video_time": "13:44",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W08-02",
+      "wave": 8,
+      "name": "LV8",
+      "model_description": "黑发胡须男性头像",
+      "attack": 3152,
+      "health": 28000,
+      "war3_armor": 90,
+      "attack_raw": "3152",
+      "health_raw": "2.800万",
+      "armor_raw": "90",
+      "video_time": "13:42",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W09-01",
+      "wave": 9,
+      "name": "LV9",
+      "model_description": "白胡须男性头像",
+      "attack": 4202,
+      "health": 35000,
+      "war3_armor": 90,
+      "attack_raw": "4202",
+      "health_raw": "3.500万",
+      "armor_raw": "90",
+      "video_time": "15:30",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W10-01",
+      "wave": 10,
+      "name": "LV10",
+      "model_description": "白色鸟类头像",
+      "attack": 5602,
+      "health": 49000,
+      "war3_armor": 105,
+      "attack_raw": "5602",
+      "health_raw": "4.900万",
+      "armor_raw": "105",
+      "video_time": "16:36",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W11-01",
+      "wave": 11,
+      "name": "LV11",
+      "model_description": "紫眼骷髅头像",
+      "attack": 3502,
+      "health": 70000,
+      "war3_armor": 120,
+      "attack_raw": "3502",
+      "health_raw": "7.000万",
+      "armor_raw": "120",
+      "video_time": "18:21.5",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W11-02",
+      "wave": 11,
+      "name": "LV11",
+      "model_description": "绿光长袍骷髅头像",
+      "attack": 7002,
+      "health": 70000,
+      "war3_armor": 120,
+      "attack_raw": "7002",
+      "health_raw": "7.000万",
+      "armor_raw": "120",
+      "video_time": "18:22.5",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W11-03",
+      "wave": 11,
+      "name": "LV11",
+      "model_description": "绿光长袍骷髅头像",
+      "attack": 28002,
+      "health": 700000,
+      "war3_armor": 240,
+      "attack_raw": "28002",
+      "health_raw": "70.000万",
+      "armor_raw": "240",
+      "video_time": "17:56",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W12-01",
+      "wave": 12,
+      "name": "LV12",
+      "model_description": "紫眼骷髅飞行单位头像",
+      "attack": 4202,
+      "health": 84000,
+      "war3_armor": 135,
+      "attack_raw": "4202",
+      "health_raw": "8.400万",
+      "armor_raw": "135",
+      "video_time": "19:11",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W12-02",
+      "wave": 12,
+      "name": "LV12",
+      "model_description": "紫眼骷髅飞行单位头像",
+      "attack": 16802,
+      "health": 840000,
+      "war3_armor": 270,
+      "attack_raw": "16802",
+      "health_raw": "84.000万",
+      "armor_raw": "270",
+      "video_time": "19:09.5",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W13-01",
+      "wave": 13,
+      "name": "LV13",
+      "model_description": "绿色兽人头像",
+      "attack": 7002,
+      "health": 105000,
+      "war3_armor": 180,
+      "attack_raw": "7002",
+      "health_raw": "10.500万",
+      "armor_raw": "180",
+      "video_time": "20:43",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W13-02",
+      "wave": 13,
+      "name": "LV13",
+      "model_description": "棕色牛头头像",
+      "attack": 9802,
+      "health": 210000,
+      "war3_armor": 180,
+      "attack_raw": "9802",
+      "health_raw": "21.000万",
+      "armor_raw": "180",
+      "video_time": "20:41",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W13-03",
+      "wave": 13,
+      "name": "LV13",
+      "model_description": "棕色牛头头像",
+      "attack": 39202,
+      "health": 2100000,
+      "war3_armor": 360,
+      "attack_raw": "39202",
+      "health_raw": "210.000万",
+      "armor_raw": "360",
+      "video_time": "20:35.5",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W14-01",
+      "wave": 14,
+      "name": "LV14",
+      "model_description": "白色骨龙头像",
+      "attack": 3502,
+      "health": 140000,
+      "war3_armor": 210,
+      "attack_raw": "3502",
+      "health_raw": "14.000万",
+      "armor_raw": "210",
+      "video_time": "22:13.2",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W14-02",
+      "wave": 14,
+      "name": "LV14",
+      "model_description": "白色骨龙头像",
+      "attack": 14002,
+      "health": 1400000,
+      "war3_armor": 420,
+      "attack_raw": "14002",
+      "health_raw": "140.000万",
+      "armor_raw": "420",
+      "video_time": "22:12.6",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W15-01",
+      "wave": 15,
+      "name": "LV15",
+      "model_description": "灰色骷髅戴帽头像",
+      "attack": 21002,
+      "health": 280000,
+      "war3_armor": 240,
+      "attack_raw": "21002",
+      "health_raw": "28.000万",
+      "armor_raw": "240",
+      "video_time": "23:40.5",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W15-02",
+      "wave": 15,
+      "name": "首领（等级1 首领03）",
+      "model_description": "苍白人形头像",
+      "attack": 105002,
+      "health": 1050040,
+      "war3_armor": 2994,
+      "attack_raw": "105002",
+      "health_raw": "105.004万",
+      "armor_raw": "2994",
+      "video_time": "23:38.5",
+      "is_boss": true
+    },
+    {
+      "record_id": "N1-W16-01",
+      "wave": 16,
+      "name": "LV16",
+      "model_description": "红色法师头像",
+      "attack": 24502,
+      "health": 350000,
+      "war3_armor": 270,
+      "attack_raw": "24502",
+      "health_raw": "35.000万",
+      "armor_raw": "270",
+      "video_time": "26:17.5",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W16-02",
+      "wave": 16,
+      "name": "LV16",
+      "model_description": "浅色长鼻头像",
+      "attack": 28002,
+      "health": 350000,
+      "war3_armor": 300,
+      "attack_raw": "28002",
+      "health_raw": "35.000万",
+      "armor_raw": "300",
+      "video_time": "25:54.5",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W17-01",
+      "wave": 17,
+      "name": "LV17",
+      "model_description": "红色法师头像",
+      "attack": 35002,
+      "health": 420000,
+      "war3_armor": 330,
+      "attack_raw": "35002",
+      "health_raw": "42.000万",
+      "armor_raw": "330",
+      "video_time": "26:42.5",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W17-02",
+      "wave": 17,
+      "name": "LV17",
+      "model_description": "红色法师头像",
+      "attack": 140002,
+      "health": 4200000,
+      "war3_armor": 660,
+      "attack_raw": "140002",
+      "health_raw": "420.000万",
+      "armor_raw": "660",
+      "video_time": "26:41.9",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W18-01",
+      "wave": 18,
+      "name": "LV18",
+      "model_description": "灰色石头巨人头像",
+      "attack": 52502,
+      "health": 490000,
+      "war3_armor": 360,
+      "attack_raw": "52502",
+      "health_raw": "49.000万",
+      "armor_raw": "360",
+      "video_time": "28:40",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W18-02",
+      "wave": 18,
+      "name": "LV18",
+      "model_description": "蓝色发光眼、长角头冠头像（巫妖样式）",
+      "attack": 52502,
+      "health": 490000,
+      "war3_armor": 360,
+      "attack_raw": "52502",
+      "health_raw": "49.000万",
+      "armor_raw": "360",
+      "video_time": "28:46",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W18-03",
+      "wave": 18,
+      "name": "LV18",
+      "model_description": "蓝色发光眼、长角头冠头像（巫妖样式）",
+      "attack": 210002,
+      "health": 4900000,
+      "war3_armor": 720,
+      "attack_raw": "210002",
+      "health_raw": "490.000万",
+      "armor_raw": "720",
+      "video_time": "28:20",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W19-01",
+      "wave": 19,
+      "name": "LV19",
+      "model_description": "灰色石头巨人头像",
+      "attack": 70002,
+      "health": 700000,
+      "war3_armor": 390,
+      "attack_raw": "70002",
+      "health_raw": "70.000万",
+      "armor_raw": "390",
+      "video_time": "30:10",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W20-01",
+      "wave": 20,
+      "name": "LV20",
+      "model_description": "红色大眼、长嘴兽类头像",
+      "attack": 77002,
+      "health": 770000,
+      "war3_armor": 390,
+      "attack_raw": "77002",
+      "health_raw": "77.000万",
+      "armor_raw": "390",
+      "video_time": "31:30",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W21-01",
+      "wave": 21,
+      "name": "LV21",
+      "model_description": "绿色鳞片、红色背鳍、长嘴头像",
+      "attack": 91002,
+      "health": 1050000,
+      "war3_armor": 390,
+      "attack_raw": "91002",
+      "health_raw": "105.000万",
+      "armor_raw": "390",
+      "video_time": "32:50",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W21-02",
+      "wave": 21,
+      "name": "LV21",
+      "model_description": "绿色鳞片、红色背鳍、长嘴头像",
+      "attack": 364002,
+      "health": 10500000,
+      "war3_armor": 780,
+      "attack_raw": "364002",
+      "health_raw": "1050.000万",
+      "armor_raw": "780",
+      "video_time": "32:42",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W22-01",
+      "wave": 22,
+      "name": "LV22",
+      "model_description": "灰色全覆式头盔、金色描边头像",
+      "attack": 105002,
+      "health": 1400000,
+      "war3_armor": 405,
+      "attack_raw": "105002",
+      "health_raw": "140.000万",
+      "armor_raw": "405",
+      "video_time": "34:20",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W22-02",
+      "wave": 22,
+      "name": "LV22",
+      "model_description": "灰色全覆式头盔、金色描边头像",
+      "attack": 420002,
+      "health": 14000000,
+      "war3_armor": 810,
+      "attack_raw": "420002",
+      "health_raw": "1400.000万",
+      "armor_raw": "810",
+      "video_time": "34:08",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W23-01",
+      "wave": 23,
+      "name": "LV23",
+      "model_description": "紫黑色双头龙头像",
+      "attack": 126002,
+      "health": 1750000,
+      "war3_armor": 420,
+      "attack_raw": "126002",
+      "health_raw": "175.000万",
+      "armor_raw": "420",
+      "video_time": "35:50",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W23-02",
+      "wave": 23,
+      "name": "LV23",
+      "model_description": "紫黑色双头龙头像",
+      "attack": 504002,
+      "health": 17500000,
+      "war3_armor": 840,
+      "attack_raw": "504002",
+      "health_raw": "1750.000万",
+      "armor_raw": "840",
+      "video_time": "35:44",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W24-01",
+      "wave": 24,
+      "name": "LV24",
+      "model_description": "黑色骨面、紫色发光眼、尖角头像（黑曜毁灭者样式）",
+      "attack": 63002,
+      "health": 2450000,
+      "war3_armor": 435,
+      "attack_raw": "63002",
+      "health_raw": "245.000万",
+      "armor_raw": "435",
+      "video_time": "37:34",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W24-02",
+      "wave": 24,
+      "name": "LV24",
+      "model_description": "缝合怪脸、红色围布头像（憎恶样式）",
+      "attack": 140002,
+      "health": 2100000,
+      "war3_armor": 450,
+      "attack_raw": "140002",
+      "health_raw": "210.000万",
+      "armor_raw": "450",
+      "video_time": "37:30",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W24-03",
+      "wave": 24,
+      "name": "LV24",
+      "model_description": "红色胸甲、黑金长角头盔头像",
+      "attack": 161002,
+      "health": 2100000,
+      "war3_armor": 465,
+      "attack_raw": "161002",
+      "health_raw": "210.000万",
+      "armor_raw": "465",
+      "video_time": "37:42",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W24-04",
+      "wave": 24,
+      "name": "LV24",
+      "model_description": "缝合怪脸、红色围布头像（憎恶样式）",
+      "attack": 560002,
+      "health": 21000000,
+      "war3_armor": 900,
+      "attack_raw": "560002",
+      "health_raw": "2100.000万",
+      "armor_raw": "900",
+      "video_time": "37:41",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W25-01",
+      "wave": 25,
+      "name": "LV25",
+      "model_description": "绿色火焰包裹岩石头像（地狱火样式）",
+      "attack": 182002,
+      "health": 3500000,
+      "war3_armor": 480,
+      "attack_raw": "182002",
+      "health_raw": "350.000万",
+      "armor_raw": "480",
+      "video_time": "38:50",
+      "is_boss": false
+    },
+    {
+      "record_id": "N1-W25-02",
+      "wave": 25,
+      "name": "首领",
+      "model_description": "紫肤、白色胡须与獠牙头像（深渊领主样式）",
+      "attack": 700002,
+      "health": 21000030,
+      "war3_armor": 2994,
+      "attack_raw": "700002",
+      "health_raw": "2100.003万",
+      "armor_raw": "2994",
+      "video_time": "38:44",
+      "is_boss": true
+    }
+  ],
+  "wave_profiles": {
+    "1": {
+      "normal": "N1-W01-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "2": {
+      "normal": "N1-W02-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "3": {
+      "normal": "N1-W03-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "4": {
+      "normal": "N1-W04-01",
+      "leader": "N1-W04-02",
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "5": {
+      "normal": "N1-W05-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {},
+      "boss": "N1-W05-02"
+    },
+    "6": {
+      "normal": "N1-W06-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "7": {
+      "normal": "N1-W07-01",
+      "leader": "N1-W07-02",
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "8": {
+      "normal": "N1-W08-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {
+        "8N2": "N1-W08-02"
+      }
+    },
+    "9": {
+      "normal": "N1-W09-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "10": {
+      "normal": "N1-W10-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {},
+      "boss_interpolation_source_waves": [
+        5,
+        15
+      ]
+    },
+    "11": {
+      "normal": "N1-W11-02",
+      "leader": "N1-W11-03",
+      "archetype_overrides": {
+        "flying_red_gargoyle": "N1-W11-01"
+      },
+      "batch_overrides": {}
+    },
+    "12": {
+      "normal": "N1-W12-01",
+      "leader": "N1-W12-02",
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "13": {
+      "normal": "N1-W13-02",
+      "leader": "N1-W13-03",
+      "archetype_overrides": {
+        "flying_green_head": "N1-W13-01"
+      },
+      "batch_overrides": {}
+    },
+    "14": {
+      "normal": "N1-W14-01",
+      "leader": "N1-W14-02",
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "15": {
+      "normal": "N1-W15-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {},
+      "boss": "N1-W15-02"
+    },
+    "16": {
+      "normal": "N1-W16-02",
+      "leader": null,
+      "archetype_overrides": {
+        "flying_carpet_mage": "N1-W16-01"
+      },
+      "batch_overrides": {}
+    },
+    "17": {
+      "normal": "N1-W17-01",
+      "leader": "N1-W17-02",
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "18": {
+      "normal": "N1-W18-01",
+      "leader": "N1-W18-03",
+      "archetype_overrides": {
+        "golem_gray_small": "N1-W18-01"
+      },
+      "batch_overrides": {}
+    },
+    "19": {
+      "normal": "N1-W19-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "20": {
+      "normal": "N1-W20-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {},
+      "boss_interpolation_source_waves": [
+        15,
+        25
+      ]
+    },
+    "21": {
+      "normal": "N1-W21-01",
+      "leader": "N1-W21-02",
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "22": {
+      "normal": "N1-W22-01",
+      "leader": "N1-W22-02",
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "23": {
+      "normal": "N1-W23-01",
+      "leader": "N1-W23-02",
+      "archetype_overrides": {},
+      "batch_overrides": {}
+    },
+    "24": {
+      "normal": "N1-W24-02",
+      "leader": "N1-W24-04",
+      "archetype_overrides": {
+        "humanoid_red_sword": "N1-W24-03",
+        "flying_black_bone": "N1-W24-01"
+      },
+      "batch_overrides": {}
+    },
+    "25": {
+      "normal": "N1-W25-01",
+      "leader": null,
+      "archetype_overrides": {},
+      "batch_overrides": {},
+      "boss": "N1-W25-02"
+    }
+  },
+  "notes": [
+    "录像战斗时面板显示值，非经回推的原始配置值。",
+    "高数值组按项目现有wave_leader角色使用，录像未标注其正式分类。",
+    "缺失首领10/20按前后观察首领逐字段线性插值；不是OCR读取结果。",
+    "原模型、角色、移动类型、攻击速度与视觉映射保持不变；普通数量按已有批次比例分配。"
+  ]
+}

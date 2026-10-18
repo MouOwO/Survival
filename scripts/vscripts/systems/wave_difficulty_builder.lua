@@ -52,7 +52,7 @@ local function scaled_row(template, definition, wave_number, multiplier)
     return row
 end
 
-function M.build(rows, difficulty_id)
+function M.build(rows, difficulty_id, mode_id)
     local definition = difficulty_config.get(difficulty_id)
     if not definition then return nil, "difficulty_not_found" end
 
@@ -71,12 +71,14 @@ function M.build(rows, difficulty_id)
                 flattened[#flattened + 1] = clone(row)
             end
         end
-        return {
+        local built = {
             difficulty = definition,
             total_waves = definition.total_waves,
             rows = flattened,
             waves = direct,
         }
+        if mode_id == "rich" then return require("systems/rich_wave_profile").apply(built, rows) end
+        return built
     end
 
     local base = source_waves(rows, definition.source_difficulty_id)
@@ -113,12 +115,14 @@ function M.build(rows, difficulty_id)
         waves[wave_number] = batches
     end
 
-    return {
+    local built = {
         difficulty = definition,
         total_waves = definition.total_waves,
         rows = flattened,
         waves = waves,
     }
+    if mode_id == "rich" then return require("systems/rich_wave_profile").apply(built, rows) end
+    return built
 end
 
 return M
