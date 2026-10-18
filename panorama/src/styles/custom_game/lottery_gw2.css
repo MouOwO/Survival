@@ -149,3 +149,15 @@
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup .LotteryGW2PrizeSlot { background-image:none; background-color:transparent; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeFace > .LotteryGW2Art,
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeOwned { visibility:collapse; }
+
+/* Native inventory background, with the market's single thin gold border. */
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2ItemWell { flow-children:none; padding:0px; margin:0px; border-radius:0px; box-shadow:none; overflow:clip; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PreviewCard,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeFace { overflow:clip; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PreviewIcon,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2TooltipIcon,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2CellStage .LotteryRewardIcon { overflow:clip; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PreviewCard:hover .LotteryGW2ItemWell,
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeSlot:hover .LotteryGW2ItemWell { border-color:#d8c48c; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2NativeButton:hover { brightness:1.16; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2NativeButton:active { brightness:.85; }

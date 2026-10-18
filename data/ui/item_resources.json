@@ -6999,13 +6999,16 @@
       "id": "lottery_crystalline_armor",
       "name": "晶态护甲·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex",
+      "uri": "s2r://panorama/images/items/shivas_guard_png.vtex",
       "aliases": [
         "P055",
         "video_p055"
       ],
       "quality": "ssr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "shivas_guard",
+      "fit": "contain"
     },
     {
       "id": "lottery_cyber_overlord",
@@ -7206,37 +7209,46 @@
       "id": "lottery_gale_bow",
       "name": "疾风弓·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gale_bow.vtex",
+      "uri": "s2r://panorama/images/items/grove_bow_png.vtex",
       "aliases": [
         "P111",
         "video_p111"
       ],
       "quality": "sr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "grove_bow",
+      "fit": "contain"
     },
     {
       "id": "lottery_gathering_divine_codex",
       "name": "采集神典·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex",
+      "uri": "s2r://panorama/images/items/necronomicon_3_png.vtex",
       "aliases": [
         "P130",
         "video_p130"
       ],
       "quality": "ssr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "necronomicon_3",
+      "fit": "contain"
     },
     {
       "id": "lottery_gathering_grimoire",
       "name": "采集秘典·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex",
+      "uri": "s2r://panorama/images/items/tome_of_knowledge_png.vtex",
       "aliases": [
         "P107",
         "video_p107"
       ],
       "quality": "ssr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "tome_of_knowledge",
+      "fit": "contain"
     },
     {
       "id": "lottery_greenwood_nirvana",
@@ -7296,13 +7308,16 @@
       "id": "lottery_hero_medal",
       "name": "英雄勋章·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_hero_medal.vtex",
+      "uri": "s2r://panorama/images/items/medallion_of_courage_png.vtex",
       "aliases": [
         "P097",
         "video_p097"
       ],
       "quality": "ssr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "medallion_of_courage",
+      "fit": "contain"
     },
     {
       "id": "lottery_hippogryph_onslaught",
@@ -7460,14 +7475,17 @@
       "id": "lottery_magic_book",
       "name": "魔法书·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex",
+      "uri": "s2r://panorama/images/items/book_of_shadows_png.vtex",
       "aliases": [
         "P046",
         "commerce_p046",
         "video_p046"
       ],
       "quality": "ssr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "book_of_shadows",
+      "fit": "contain"
     },
     {
       "id": "lottery_magical_girl_juggernaut",
@@ -7518,14 +7536,17 @@
       "id": "lottery_muramasa",
       "name": "妖刀村正·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex",
+      "uri": "s2r://panorama/images/items/yasha_png.vtex",
       "aliases": [
         "P042",
         "commerce_p042",
         "video_p042"
       ],
       "quality": "ur",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "yasha",
+      "fit": "contain"
     },
     {
       "id": "lottery_nano_cluster",
@@ -7663,14 +7684,17 @@
       "id": "lottery_raven_eye",
       "name": "渡鸦之眼·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex",
+      "uri": "s2r://panorama/images/items/eye_of_the_vizier_png.vtex",
       "aliases": [
         "P045",
         "commerce_p045",
         "video_p045"
       ],
       "quality": "ssr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "eye_of_the_vizier",
+      "fit": "contain"
     },
     {
       "id": "lottery_recovery_crystal",
@@ -7822,13 +7846,16 @@
       "id": "lottery_soul_devouring_blade",
       "name": "噬魂灵剑·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex",
+      "uri": "s2r://panorama/images/items/diffusal_blade_png.vtex",
       "aliases": [
         "P104",
         "video_p104"
       ],
       "quality": "ssr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "diffusal_blade",
+      "fit": "contain"
     },
     {
       "id": "lottery_soul_lock_box",
@@ -7855,14 +7882,17 @@
       "id": "lottery_spear_of_longinus",
       "name": "朗基努斯枪·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex",
+      "uri": "s2r://panorama/images/items/dragon_lance_png.vtex",
       "aliases": [
         "P048",
         "commerce_p048",
         "video_p048"
       ],
       "quality": "ur",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "dragon_lance",
+      "fit": "contain"
     },
     {
       "id": "lottery_steel_wall",
@@ -7917,10 +7947,13 @@
       "id": "lottery_sword_of_promise",
       "name": "誓约之剑",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sword_of_promise.vtex",
+      "uri": "s2r://panorama/images/items/rapier_png.vtex",
       "aliases": [],
       "quality": "ur",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "rapier",
+      "fit": "contain"
     },
     {
       "id": "lottery_ticket",
@@ -7946,13 +7979,16 @@
       "id": "lottery_titan_shield",
       "name": "泰坦巨盾·永久",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_titan_shield.vtex",
+      "uri": "s2r://panorama/images/items/vanguard_png.vtex",
       "aliases": [
         "P101",
         "video_p101"
       ],
       "quality": "ssr",
-      "category_id": "points"
+      "category_id": "points",
+      "native_type": "item",
+      "native_name": "vanguard",
+      "fit": "contain"
     },
     {
       "id": "lottery_tower_retrofit",
@@ -13667,7 +13703,7 @@
     },
     {
       "id": "u_coin_recharge",
-      "name": "U币充值",
+      "name": "G币充值",
       "kind": "image",
       "uri": "file://{images}/econ/tools/compendium_2015_charm_coins_750.png",
       "aliases": [],

@@ -17,7 +17,7 @@ function $(id){return root.FindChildTraverse(String(id).replace(/^#/,''));}
 $.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.GetContextPanel=()=>root;$.Schedule=(delay,fn)=>{timers.push({delay,fn});return ++serial;};$.CancelScheduled=()=>{};$.Msg=$.DispatchEvent=$.RegisterEventHandler=$.RegisterForUnhandledEvent=()=>{};
 const env=vm.createContext({$,GameUI:{CustomUIConfig:()=>cfg},Game:{GetLocalPlayerID:()=>0,GetGameTime:()=>0,IsInToolsMode:()=>false},GameEvents:{Subscribe:(name,fn)=>{events.push({name,fn});return ++serial;},Unsubscribe(){},SendCustomGameEventToServer(){throw Error('Visual tests must not order or mutate saves');}},CustomNetTables:{GetTableValue:()=>null,SubscribeNetTableListener:()=>++serial,UnsubscribeNetTableListener(){}}});
 function load(relative){const file=path.join(base,relative);vm.runInContext(fs.readFileSync(file,'utf8'),env,{filename:file});loaded.push({relative,sha256:hash(file)});}
-['common/item_resources.js','common/ui_registry.js','common/ui_components.js','common/tooltip_dismiss.js','ui_layers.js','archive_v10_data.js','common/menu_v10.js','common/vip_badges.js','reward_presentation.js','native_ui_icons.js','item_art_remaining_5d5c1152eb.js','common/commerce_components.js','black_lion_market_model.js','black_lion_market.js'].forEach(load);
+['common/item_resources.js','common/ui_registry.js','common/ui_components.js','common/tooltip_dismiss.js','ui_layers.js','archive_v10_data.js','common/menu_v10.js','common/vip_badges.js','reward_presentation.js','native_ui_icons.js','item_art_remaining_5d5c1152eb.js','common/commerce_components.js','shop_v10_assets.js','black_lion_market_model.js','black_lion_market.js'].forEach(load);
 const all=n=>[n,...n.Children().flatMap(all)],has=(n,c)=>all(n).find(v=>v.BHasClass(c));
 const resource=cfg.SurvivalItemResources,presentation=cfg.SurvivalRewardPresentation,J=cfg.SurvivalCommerceComponents;
 const current=json('server/bundles/current.json').hash,bundle=json('server/bundles/'+current+'/bundle.json');
@@ -47,7 +47,9 @@ for(const product of products.values()){
  results.push({sku:product.sku,id:row.id,uri:row.uri});
 }
 const muramasa=[{sku:'video_p042'},{item_id:'lottery_muramasa'},{id:'lottery_muramasa'},{ownership_id:'commerce_p042'},'video_p042'];
-const expected=resource.Resolve('lottery_muramasa');assert(expected&&expected.includes('lottery_muramasa'));
+const canonicalMuramasa=resource.Lookup('lottery_muramasa');
+assert(canonicalMuramasa&&canonicalMuramasa.id==='lottery_muramasa'&&canonicalMuramasa.uri);
+const expected=canonicalMuramasa.uri;
 muramasa.forEach(item=>assert.equal(resource.Resolve(item),expected,'Muramasa identity resolves consistently'));
 const backing=new Panel('Panel',root);
 for(const item of muramasa.filter(v=>typeof v==='object')){
