@@ -7008,7 +7008,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "shivas_guard",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_cyber_overlord",
@@ -7218,7 +7218,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "grove_bow",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_gathering_divine_codex",
@@ -7233,7 +7233,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "necronomicon_3",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_gathering_grimoire",
@@ -7248,7 +7248,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "tome_of_knowledge",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_greenwood_nirvana",
@@ -7317,7 +7317,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "medallion_of_courage",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_hippogryph_onslaught",
@@ -7485,7 +7485,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "book_of_shadows",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_magical_girl_juggernaut",
@@ -7546,7 +7546,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "yasha",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_nano_cluster",
@@ -7694,7 +7694,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "eye_of_the_vizier",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_recovery_crystal",
@@ -7855,7 +7855,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "diffusal_blade",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_soul_lock_box",
@@ -7892,7 +7892,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "dragon_lance",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_steel_wall",
@@ -7953,7 +7953,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "rapier",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_ticket",
@@ -7988,7 +7988,7 @@
       "category_id": "points",
       "native_type": "item",
       "native_name": "vanguard",
-      "fit": "contain"
+      "fit": "cover"
     },
     {
       "id": "lottery_tower_retrofit",

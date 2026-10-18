@@ -15,7 +15,7 @@
     function p(id) { if (!alive()) return null; if (valid(nodes[id])) return nodes[id]; var n = root.FindChildTraverse(id); if (!valid(n)) return null; nodes[id] = n; return n; }
     function style(n, values) { if (valid(n)) Object.keys(values).forEach(function (k) { n.style[k] = values[k]; }); }
     function place(n, x, y, w, h) { style(n, {position:x + "px " + y + "px 0px", width:w + "px", height:h + "px", margin:"0px", padding:"0px", horizontalAlign:"left", verticalAlign:"top", ignoreParentFlow:"true"}); }
-    function fillItemIcon(icon,item){var presentation=cfg.SurvivalRewardPresentation;if(presentation&&presentation.FillIcon)presentation.FillIcon(icon,item);if(valid(icon)&&icon.SetScaling)icon.SetScaling("stretch-to-fit-preserve-aspect");}
+    function fillItemIcon(icon,item){var presentation=cfg.SurvivalRewardPresentation;if(presentation&&presentation.FillIcon)presentation.FillIcon(icon,item);if(valid(icon)&&icon.SetScaling)icon.SetScaling("stretch-to-cover-preserve-aspect");}
     function bindTooltipIcon(card,source,item){
         for(var owner=source.GetParent();valid(owner);owner=owner.GetParent()){owner.hittestchildren=true;if(owner===card)break;}
         card.SetPanelEvent("onmouseover",function(){});card.SetPanelEvent("onmouseout",function(){});
@@ -142,7 +142,7 @@
         if(signature===previewKey)return;previewKey=signature;view.previewItems.RemoveAndDeleteChildren();prune();view.preview.visible=items.length>0;
         items.forEach(function(item,index){
             var b=make("Button",view.previewItems,"LotteryGW2Preview_"+index,"LotteryGW2PreviewCard");place(b,index*128,0,118,106);b.hittestchildren=false;
-            itemWell(b,21,0,76,76);var icon=cfg.SurvivalRewardPresentation&&cfg.SurvivalRewardPresentation.CreateIcon(b,item,"LotteryGW2PreviewIcon");if(icon){place(icon,23,2,72,72);fillItemIcon(icon,item);}
+            itemWell(b,21,0,76,76);var icon=cfg.SurvivalRewardPresentation&&cfg.SurvivalRewardPresentation.CreateIcon(b,item,"LotteryGW2PreviewIcon");if(icon){place(icon,22,1,74,74);fillItemIcon(icon,item);}
             var itemName=label(b,"",String(item.name||item.id||""),0,79,118,26,16,"#dbd3c2");style(itemName,{textShadow:"#000000 0px 1px 2px 1.0"});
             if(icon){var hover=make("Panel",b,"","LotteryGW2PreviewHover"),at=String(icon.style.position).split(" ");place(hover,parseFloat(at[0]),parseFloat(at[1]),parseFloat(icon.style.width),parseFloat(icon.style.height));bindTooltipIcon(b,hover,item);}
             b.SetPanelEvent("onactivate",function(){hideTooltip();invoke("Feature","details");});
@@ -167,9 +167,9 @@
             existingRewardArt(icon,item);
             if(!cell||!valid(cell.host)){
                 var hostVisual=make("Panel",card,"","LotteryGW2CellVisual");place(hostVisual,0,0,134,168);hostVisual.hittest=false;hostVisual.hittestchildren=false;
-                var well=itemWell(hostVisual,9,3,116,116),stage=make("Panel",well,"","LotteryGW2CellStage");place(stage,1,1,112,112);style(stage,{overflow:"clip"});
+                var well=itemWell(hostVisual,9,3,116,116),stage=make("Panel",well,"","LotteryGW2CellStage");place(stage,0,0,114,114);style(stage,{overflow:"clip"});
                 var selectedFrame=make("Panel",hostVisual,"","LotteryGW2SelectedFrame");place(selectedFrame,9,3,116,116);style(selectedFrame,{border:"1px solid #e3cf95",backgroundColor:"transparent"});selectedFrame.hittest=false;
-                if(icon){moveNode(icon,stage);place(icon,0,0,112,112);icon.visible=true;fillItemIcon(icon,item);}
+                if(icon){moveNode(icon,stage);place(icon,0,0,114,114);icon.visible=true;fillItemIcon(icon,item);}
                 if(name)moveNode(name,hostVisual);else name=label(hostVisual,"","",0,123,134,39,17);
                 place(name,0,123,134,39);style(name,{fontSize:"17px",fontWeight:"normal",fontFamily:'"Source Han Sans SC"',color:"#e0d6c3",textAlign:"center",whiteSpace:"normal",textOverflow:"ellipsis",textShadow:"none"});name.visible=true;
                 var count=label(hostVisual,"","",13,88,106,24,16,"#f1e9d8");style(count,{textAlign:"right",textShadow:"#000000 0px 1px 3px 2.0"});
@@ -241,7 +241,7 @@
                     var icon=null;walk(card,function(node){if(node.BHasClass("LotteryRewardIcon"))icon=node;});
                     var visual=make("Panel",card,"","LotteryGW2PrizeFace");place(visual,0,0,72,72);visual.hittest=false;visual.hittestchildren=false;
                     itemWell(visual,0,0,72,72);
-                    if(icon){moveNode(icon,visual);place(icon,2,2,68,68);icon.visible=true;fillItemIcon(icon,item);}
+                    if(icon){moveNode(icon,visual);place(icon,1,1,70,70);icon.visible=true;fillItemIcon(icon,item);}
                     var glow=make("Panel",visual,"","LotteryGW2PrizeSelected");place(glow,0,0,72,72);
                     var count=label(visual,"",model.Quantity(item),19,1,51,24,15,"#f3e9d3");count.AddClass("LotteryGW2PrizeOwned");style(count,{textAlign:"right"});
                     face=card.__lotteryPrizeFace={host:visual,count:count};
@@ -279,7 +279,7 @@
         hidden("LotteryInfoConfirm");hidden("RHHistoryColumns");hidden("LotteryCelestialFooter");compactCards(p("LotteryInfoList"));
         if(name==="details")prizePreview(p("LotteryInfoList"),data);
         if(name==="history")p("LotteryInfoList").Children().forEach(function(row){if(row.BHasClass("RHHistoryRow"))style(row,{backgroundImage:"none",border:"0px",borderBottom:"1px solid #504d3e"});});
-        if(name==="reward")p("LotteryInfoList").Children().forEach(function(child){if(child.BHasClass("LotteryDetailIcon")){place(child,20,0,120,120);wellStyle(child);walk(child,function(n){if(n.BHasClass("LotteryRewardIcon")){place(n,1,1,116,116);fillItemIcon(n,n.__lotteryItem);}});}else if(child.BHasClass("LotteryDetailDescription"))place(child,20,136,1060,bodyHeight-136);});
+        if(name==="reward")p("LotteryInfoList").Children().forEach(function(child){if(child.BHasClass("LotteryDetailIcon")){place(child,20,0,120,120);wellStyle(child);walk(child,function(n){if(n.BHasClass("LotteryRewardIcon")){place(n,0,0,118,118);fillItemIcon(n,n.__lotteryItem);}});}else if(child.BHasClass("LotteryDetailDescription"))place(child,20,136,1060,bodyHeight-136);});
         var names={details:"奖池详情",history:"抽奖记录",announcement:"开奖公告",update:"奖励更新公告",reward:p("LotteryInfoTitle")&&p("LotteryInfoTitle").text||"奖励详情",firstgift:"首充礼包",privilege:"礼包特权"};view.title.text=names[name]||"功能提示";sidebar();
     }
     function tooltipRect(node) {var at=node.GetPositionWithinWindow();return {x:at.x,y:at.y,width:node.actuallayoutwidth*scale,height:node.actuallayoutheight*scale};}
@@ -340,7 +340,7 @@
         var lines=[effectLines(item.description||"暂无效果说明")];if(item.duration_text)lines.push("期限："+item.duration_text);if(item.duplicate_points!==undefined&&item.duplicate_points!==null)lines.push("重复转化："+item.duplicate_points+" "+((item.converted_currency||item.duplicate_currency)==="shop_points"?"商城积分":"星悦积分"));
         if(item.count!==undefined||item.quantity!==undefined)lines.push("本次获得："+number(item.count===undefined?item.quantity:item.count));
         if(item.duplicate===true||Number(item.duplicate)===1)lines.push("本次已转化 "+number(item.converted_points)+" "+((item.converted_currency||item.duplicate_currency)==="shop_points"?"商城积分":"星悦积分"));
-        view.tipIconStage.RemoveAndDeleteChildren();var tipIcon=cfg.SurvivalRewardPresentation.CreateIcon(view.tipIconStage,item,"LotteryGW2TooltipIcon");if(tipIcon){place(tipIcon,1,1,44,44);fillItemIcon(tipIcon,item);}prune();
+        view.tipIconStage.RemoveAndDeleteChildren();var tipIcon=cfg.SurvivalRewardPresentation.CreateIcon(view.tipIconStage,item,"LotteryGW2TooltipIcon");if(tipIcon){place(tipIcon,0,0,46,46);fillItemIcon(tipIcon,item);}prune();
         view.tipName.text=String(item.name||item.id||"道具");view.tipState.text=String(item.quality||"").toUpperCase()+(item.duration_text?" · "+item.duration_text:"");
         style(view.tipName,{color:cfg.SurvivalRewardPresentation.NameColor(item.quality)});view.tipDescription.text=lines.join("\n");view.tipCount.text="拥有 "+quantity(item);
         var lineCount=0;lines.join("\n").split("\n").forEach(function(line){lineCount+=Math.max(1,Math.ceil(line.length/17));});
