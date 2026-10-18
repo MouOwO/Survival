@@ -3086,16 +3086,18 @@
       "id": "commerce_p001",
       "name": "红色抽奖券",
       "kind": "image",
-      "uri": "file://{images}/econ/tools/redemptiontoken.png",
+      "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/special_png.vtex",
       "aliases": [
         "P001",
         "special_lottery_ticket",
         "video_p001"
       ],
       "source_size": [
-        256,
-        171
-      ]
+        1536,
+        1024
+      ],
+      "fit": "contain",
+      "source": "art/ui/sources/custom_game/lottery_ticket_user_v1/special.png"
     },
     {
       "id": "commerce_p004",
@@ -7959,9 +7961,14 @@
       "id": "lottery_ticket",
       "name": "普通抽奖券",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/lottery_handoff_v1/ticket_illustrated_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/normal_png.vtex",
       "aliases": [],
-      "source": "lottery_handoff_bb9968eef7.css current LHTicket and LHDrawTicket"
+      "source": "art/ui/sources/custom_game/lottery_ticket_user_v1/normal.png",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "fit": "contain"
     },
     {
       "id": "lottery_time_orb",
@@ -8934,14 +8941,16 @@
       "id": "pay_special_lottery_ticket_single",
       "name": "特殊抽奖券 ×1",
       "kind": "image",
-      "uri": "s2r://panorama/images/custom_game/shop_icons_hd_v1/special_lottery_ticket.vtex",
+      "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/special_png.vtex",
       "aliases": [
         "special_lottery_ticket_single"
       ],
       "source_size": [
-        256,
-        256
-      ]
+        1536,
+        1024
+      ],
+      "fit": "contain",
+      "source": "art/ui/sources/custom_game/lottery_ticket_user_v1/special.png"
     },
     {
       "id": "pay_starter_bundle_v4",

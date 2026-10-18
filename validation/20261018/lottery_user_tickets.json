@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 1,
+  "task": "lottery_user_tickets_20261018",
+  "at": "2026-10-18T14:46:26.309855+08:00",
+  "status": "PASS_ARTWORK_NATIVE_TESTS_OFFLINE_VISUAL",
+  "baseHead": "892703eadc30522629f60fb3820c031b108e93b4",
+  "scope": {
+    "kind": "client_ticket_artwork_only",
+    "resourceAuthority": "data/ui/item_resources.json",
+    "registryIdentitiesChanged": 3,
+    "originalPngBytesPreserved": true,
+    "contain": true,
+    "legacyTintRemoved": true,
+    "legacyOpacityMaskRemoved": true,
+    "ticketBalancesUnchanged": true,
+    "unlockAndDrawRulesUnchanged": true,
+    "pricesUnchanged": true,
+    "rewardsUnchanged": true,
+    "paymentFlowUnchanged": true,
+    "serverAndInterfacesUnchanged": true
+  },
+  "assets": [
+    {
+      "id": "normal",
+      "appearance": "silver",
+      "userFilename": "普通抽奖券.png",
+      "source": "art/ui/sources/custom_game/lottery_ticket_user_v1/normal.png",
+      "panoramaDependency": "panorama/src/images/custom_game/lottery_ticket_user_v1/normal.png",
+      "recipe": "panorama/src/images/custom_game/lottery_ticket_user_v1/normal_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/normal_png.vtex",
+      "originalSha256": "b7b9e059ad52bae51af4b5ca1a5924fb2089f3f0ea99510b10560a2045743d45",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceMode": "RGBA",
+      "sourceBitDepth": 8,
+      "desktopBytesPreserved": true,
+      "dependencyBytesPreserved": true,
+      "pixelsModified": false,
+      "native": {
+        "runtime": "panorama/images/custom_game/lottery_ticket_user_v1/normal_png.vtex_c",
+        "sha256": "959bee8ae7e3f3c662ab5d4638029025182dc3e914bd6791a215a70e5fb78a83",
+        "bytes": 700624,
+        "maximumDimension": 512,
+        "format": "BGRA8888",
+        "info": {
+          "flags": 8,
+          "width": 512,
+          "height": 341,
+          "depth": 1,
+          "format": 28,
+          "mipLevels": 1,
+          "payloadBytes": 698368,
+          "expectedPayloadBytes": 698368,
+          "alphaMin": 0,
+          "alphaMax": 254,
+          "transparentTexels": 118218
+        },
+        "candidateAndFullMatch": true
+      }
+    },
+    {
+      "id": "special",
+      "appearance": "gold",
+      "userFilename": "特殊抽奖券.png",
+      "source": "art/ui/sources/custom_game/lottery_ticket_user_v1/special.png",
+      "panoramaDependency": "panorama/src/images/custom_game/lottery_ticket_user_v1/special.png",
+      "recipe": "panorama/src/images/custom_game/lottery_ticket_user_v1/special_png.vtex",
+      "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/special_png.vtex",
+      "originalSha256": "11c0551a0f0ef5dfe52fcd95388f45bf2d7cc9f876db0b5c01cf807c3082e10b",
+      "sourceSize": [
+        1536,
+        1024
+      ],
+      "sourceMode": "RGBA",
+      "sourceBitDepth": 8,
+      "desktopBytesPreserved": true,
+      "dependencyBytesPreserved": true,
+      "pixelsModified": false,
+      "native": {
+        "runtime": "panorama/images/custom_game/lottery_ticket_user_v1/special_png.vtex_c",
+        "sha256": "170cb9bb4f3af73549d9c1498ac1b34496a11d4f21afea6174dcb67123c351a0",
+        "bytes": 700624,
+        "maximumDimension": 512,
+        "format": "BGRA8888",
+        "info": {
+          "flags": 8,
+          "width": 512,
+          "height": 341,
+          "depth": 1,
+          "format": 28,
+          "mipLevels": 1,
+          "payloadBytes": 698368,
+          "expectedPayloadBytes": 698368,
+          "alphaMin": 0,
+          "alphaMax": 254,
+          "transparentTexels": 100742
+        },
+        "candidateAndFullMatch": true
+      }
+    }
+  ],
+  "registry": [
+    {
+      "id": "commerce_p001",
+      "aliases": [
+        "P001",
+        "special_lottery_ticket",
+        "video_p001"
+      ],
+      "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/special_png.vtex",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "fit": "contain"
+    },
+    {
+      "id": "lottery_ticket",
+      "aliases": [],
+      "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/normal_png.vtex",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "fit": "contain"
+    },
+    {
+      "id": "pay_special_lottery_ticket_single",
+      "aliases": [
+        "special_lottery_ticket_single"
+      ],
+      "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/special_png.vtex",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "fit": "contain"
+    }
+  ],
+  "validation": {
+    "tests": [
+      {
+        "command": "node --test tools/tests/lottery_user_ticket_icons.test.cjs tools/tests/lottery_ticket_rules.test.cjs",
+        "pass": 5,
+        "fail": 0,
+        "newIconRegressions": 4,
+        "existingTicketRules": 1
+      }
+    ],
+    "syntaxChecks": [
+      {
+        "file": "panorama/src/scripts/custom_game/lottery_gw2.js",
+        "status": "PASS"
+      },
+      {
+        "file": "panorama/src/scripts/custom_game/lottery_handoff_bb9968eef7.js",
+        "status": "PASS"
+      }
+    ],
+    "compiled": [
+      {
+        "stage": "candidate",
+        "status": "PASS",
+        "textures": 2,
+        "scripts": 3,
+        "otherResourcesCompiled": 0,
+        "pngDependenciesByteIdentical": true,
+        "sourcePixelsModified": false,
+        "originalAspectPreserved": true,
+        "report": "output/lottery_user_tickets_20261018/compile_candidate.json"
+      },
+      {
+        "stage": "full",
+        "status": "PASS",
+        "textures": 2,
+        "scripts": 3,
+        "otherResourcesCompiled": 0,
+        "pngDependenciesByteIdentical": true,
+        "sourcePixelsModified": false,
+        "originalAspectPreserved": true,
+        "report": "output/lottery_user_tickets_20261018/compile_full.json"
+      }
+    ],
+    "runtimeMatchesFullSources": true,
+    "candidateSnapshotsRetained": true,
+    "workspaceConcurrency": {
+      "separateTaskCandidate": true,
+      "unrelatedDirtyFilesPreserved": true,
+      "fullRuntimeComparedAtCompileTime": true,
+      "actualSourceDriftAtFinalCompile": [],
+      "refreshedAfterConcurrentCommit": "892703eadc30522629f60fb3820c031b108e93b4"
+    }
+  },
+  "visual": {
+    "status": "PASS_OFFLINE_BROWSER",
+    "offlinePreviewOnly": true,
+    "notGameCapture": true,
+    "ticketPixels": "Exact original user PNG; installed Source2Viewer cannot decode new RED2 compiled resource metadata. Native texture dimensions and alpha verified independently.",
+    "screenshots": [
+      {
+        "name": "sizes",
+        "file": "output/lottery_user_tickets_20261018/sizes.png",
+        "sha256": "7216ecfd3bc4bee0d3b4ef0569b30cd9660c7fa99cb5dd826edaab4b70669e9b",
+        "backgroundImages": [],
+        "rows": []
+      },
+      {
+        "name": "map",
+        "file": "output/lottery_user_tickets_20261018/lottery_map.png",
+        "sha256": "5ecad26a6020059ff7975f853828b4556e39e9bce81172cf2ac2317d81e7e581",
+        "backgroundImages": [
+          {
+            "id": "LotteryGW2TicketIcon",
+            "url": "file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_ticket_user_v1/normal.png",
+            "decoded": true,
+            "width": 1536,
+            "height": 1024,
+            "bounds": {
+              "x": 711.0048217773438,
+              "y": 158.181884765625,
+              "width": 34.44976806640625,
+              "height": 27.751190185546875,
+              "top": 158.181884765625,
+              "right": 745.45458984375,
+              "bottom": 185.93307495117188,
+              "left": 711.0048217773438
+            },
+            "mask": "none"
+          },
+          {
+            "id": "panel LHDrawTicket",
+            "url": "file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_ticket_user_v1/normal.png",
+            "decoded": true,
+            "width": 1536,
+            "height": 1024,
+            "bounds": {
+              "x": 1097.607666015625,
+              "y": 794.0670166015625,
+              "width": 30.6219482421875,
+              "height": 34.44970703125,
+              "top": 794.0670166015625,
+              "right": 1128.2296142578125,
+              "bottom": 828.5167236328125,
+              "left": 1097.607666015625
+            },
+            "mask": "none"
+          },
+          {
+            "id": "panel LHDrawTicket",
+            "url": "file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_ticket_user_v1/normal.png",
+            "decoded": true,
+            "width": 1536,
+            "height": 1024,
+            "bounds": {
+              "x": 1374.64111328125,
+              "y": 794.0670166015625,
+              "width": 30.6219482421875,
+              "height": 34.44970703125,
+              "top": 794.0670166015625,
+              "right": 1405.2630615234375,
+              "bottom": 828.5167236328125,
+              "left": 1374.64111328125
+            },
+            "mask": "none"
+          }
+        ],
+        "rows": []
+      },
+      {
+        "name": "dragon_knight",
+        "file": "output/lottery_user_tickets_20261018/lottery_dragon_knight.png",
+        "sha256": "71ceb1cd69d21781b447ec1c69c67f0009d07c072ca4345f862fa57058e5185a",
+        "backgroundImages": [
+          {
+            "id": "LotteryGW2TicketIcon",
+            "url": "file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_ticket_user_v1/special.png",
+            "decoded": true,
+            "width": 1536,
+            "height": 1024,
+            "bounds": {
+              "x": 711.0048217773438,
+              "y": 158.181884765625,
+              "width": 34.44976806640625,
+              "height": 27.751190185546875,
+              "top": 158.181884765625,
+              "right": 745.45458984375,
+              "bottom": 185.93307495117188,
+              "left": 711.0048217773438
+            },
+            "mask": "none"
+          },
+          {
+            "id": "panel LHDrawTicket",
+            "url": "file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_ticket_user_v1/special.png",
+            "decoded": true,
+            "width": 1536,
+            "height": 1024,
+            "bounds": {
+              "x": 1097.607666015625,
+              "y": 794.0670166015625,
+              "width": 30.6219482421875,
+              "height": 34.44970703125,
+              "top": 794.0670166015625,
+              "right": 1128.2296142578125,
+              "bottom": 828.5167236328125,
+              "left": 1097.607666015625
+            },
+            "mask": "none"
+          },
+          {
+            "id": "panel LHDrawTicket",
+            "url": "file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_ticket_user_v1/special.png",
+            "decoded": true,
+            "width": 1536,
+            "height": 1024,
+            "bounds": {
+              "x": 1374.64111328125,
+              "y": 794.0670166015625,
+              "width": 30.6219482421875,
+              "height": 34.44970703125,
+              "top": 794.0670166015625,
+              "right": 1405.2630615234375,
+              "bottom": 828.5167236328125,
+              "left": 1374.64111328125
+            },
+            "mask": "none"
+          }
+        ],
+        "rows": []
+      },
+      {
+        "name": "market",
+        "file": "output/lottery_user_tickets_20261018/market_tickets.png",
+        "sha256": "e2155e8650d8e116cb0ab346d3f05a878c294bd4484b1ec8e4faa5b65ba00466",
+        "backgroundImages": [],
+        "rows": [
+          {
+            "name": "红色抽奖券",
+            "icons": [
+              {
+                "src": "file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_ticket_user_v1/special.png",
+                "width": 1536,
+                "height": 1024,
+                "decoded": true,
+                "fit": "contain"
+              }
+            ]
+          },
+          {
+            "name": "特殊抽奖券 ×1",
+            "icons": [
+              {
+                "src": "file:///D:/SteamLibrary/steamapps/common/dota%202%20beta/game/dota_addons/survival/panorama/src/images/custom_game/lottery_ticket_user_v1/special.png",
+                "width": 1536,
+                "height": 1024,
+                "decoded": true,
+                "fit": "contain"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "report": "output/lottery_user_tickets_20261018/report.json",
+    "otherNativeShopIconsNotMirroredInBrowser": true
+  },
+  "gameVerification": {
+    "status": "not_run",
+    "gameStartedByTask": false,
+    "captured": false,
+    "reason": "本次未启动游戏，仅离线检查及隔离浏览器预览；实机显示尚未验证。"
+  },
+  "evidence": {
+    "assetManifest": "output/lottery_user_tickets_20261018/asset_manifest.json",
+    "clientSnapshots": "output/lottery_user_tickets_20261018/client_snapshots.json",
+    "postCompileValidation": "output/lottery_user_tickets_20261018/post_compile_validation.json",
+    "candidate": "output/lottery_user_tickets_20261018/candidate.json"
+  },
+  "documentation": "docs/ui/lottery_user_tickets_20261018.md"
+}
