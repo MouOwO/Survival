@@ -55,6 +55,9 @@ end
 function M.build(rows, difficulty_id, mode_id)
     local definition = difficulty_config.get(difficulty_id)
     if not definition then return nil, "difficulty_not_found" end
+    if mode_id == "rich" then
+        return require("systems/rich_wave_profile").build(definition)
+    end
 
     local direct = source_waves(rows, difficulty_id)
     local has_complete_direct = true
@@ -77,7 +80,6 @@ function M.build(rows, difficulty_id, mode_id)
             rows = flattened,
             waves = direct,
         }
-        if mode_id == "rich" then return require("systems/rich_wave_profile").apply(built, rows) end
         return built
     end
 
@@ -121,7 +123,6 @@ function M.build(rows, difficulty_id, mode_id)
         rows = flattened,
         waves = waves,
     }
-    if mode_id == "rich" then return require("systems/rich_wave_profile").apply(built, rows) end
     return built
 end
 

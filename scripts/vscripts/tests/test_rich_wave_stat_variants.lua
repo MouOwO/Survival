@@ -30,15 +30,20 @@ local function equal(a, b)
     for key in pairs(b) do if a[key] == nil then return false end end
     return true
 end
-local recorded = require("config/generated/rich_monster_profiles")
+local recorded = require("config/generated/rich_wave_stat_variants")
 local source = require("config/generated/wave_definitions").rows
 local original_recorded, original_source = copy(recorded), copy(source)
 local variant_rows = require("systems/rich_stat_variant_row")
 local plain = {health = 10, attack = 2, war3_armor = 3, member_role = "normal"}
 assert(variant_rows.resolve(plain) == plain and plain.rich_variant_index == nil,
     "ordinary rows must retain their identity and gain no variant metadata")
+local built = assert(require("systems/wave_difficulty_builder").build(nil, "N2", "rich"))
+local variants
+for _, row in ipairs(built.waves[6]) do
+    if row.batch_id == "6N1" then variants = row.rich_stat_variants end
+end
 local input = {health = 10, attack = 2, war3_armor = 3, member_role = "normal",
-    rich_stat_variants = copy(recorded.difficulties.N2.waves[6].batches["6N1"].variants)}
+    rich_stat_variants = copy(assert(variants))}
 local before_input = copy(input)
 local selected = variant_rows.resolve(input, 2)
 assert(selected.health == 32000 and selected.attack == 3522 and selected.war3_armor == 75)

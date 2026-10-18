@@ -1,0 +1,133 @@
+{
+  "status": "PASS_OFFLINE",
+  "task": "rich CSV authority migration",
+  "authoritative_tables": {
+    "data/csv/怪物与波次系统/rich_wave_definitions.csv": "310dde1d783dca6170e58ebb6e15cdc65ac821ceef573c3bb1bbb07347aded3f",
+    "data/csv/挑战与奖励系统/rich_challenge_combat_profiles.csv": "500768186d5bc089c241344975b5931fc0c0eebb77df8b8abe47917eb3b0da65",
+    "data/csv/怪物与波次系统/rich_wave_stat_variants.csv": "ff64d373b4c2f3b8a9a7fb99f133bea1b53191b76e6add23688e8874bf35b199"
+  },
+  "generated_modules": {
+    "scripts/vscripts/config/generated/rich_wave_definitions.lua": "cf2507d248b16d065e58ea5f72d8591ef5083f6f4bce357d60bba684b449fb68",
+    "scripts/vscripts/config/generated/rich_challenge_combat_profiles.lua": "ddb106460aa083aba21a6f717d7a3e1157ba0523c0c10f72956a69eadb701771",
+    "scripts/vscripts/config/generated/rich_wave_stat_variants.lua": "156a7c18fbf5a515631dd9229512ef4254e7b2f35c4c0b27567ecebeb1f59cd2"
+  },
+  "counts": {
+    "wave_batches": 873,
+    "encounter_profiles": 300,
+    "stat_variants": 4,
+    "difficulties": 10
+  },
+  "runtime_comparison": {
+    "passed": true,
+    "rich_wave_rows": 873,
+    "ordinary_wave_rows": 873,
+    "encounter_profiles": 300,
+    "original_values_and_provenance_unchanged": true,
+    "allowed_identity_change_count": 454,
+    "allowed_identity_change_fields": {
+      "profile_id": 304,
+      "difficulty_id": 150
+    },
+    "allowed_identity_change_notes": [
+      "All 300 encounter profile IDs now use the independent rich CSV namespace.",
+      "N6-N10 profiles now report their explicit difficulty IDs rather than the former inherited N5 ID.",
+      "Four W6 nested legacy profile IDs are replaced by independent variant table identity."
+    ],
+    "unexpected_changes": []
+  },
+  "checks": [
+    {
+      "name": "rich_csv_check",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "Rich CSV check passed: 3 tables\r\n"
+    },
+    {
+      "name": "csv_pipeline_and_evidence_tests",
+      "exit_code": 0,
+      "passed": true,
+      "summary": " (__main__.Profiles.test_duplicate_csv_identities_are_rejected) ... ok\r\ntest_enabled_flags_and_nonfinite_timings_cannot_bypass_validation (__main__.Profiles.test_enabled_flags_and_nonfinite_timings_cannot_bypass_validation) ... ok\r\ntest_estimate_cannot_be_claimed_as_observation (__main__.Profiles.test_estimate_cannot_be_claimed_as_observation) ... ok\r\ntest_estimate_operands_must_match_the_result (__main__.Profiles.test_estimate_operands_must_match_the_result) ... ok\r\ntest_evidence_bytes_cannot_change_silently (__main__.Profiles.test_evidence_bytes_cannot_change_silently) ... ok\r\ntest_json_null_and_nonfinite_values_are_rejected_without_partial_writes (__main__.Profiles.test_json_null_and_nonfinite_values_are_rejected_without_partial_writes) ... ok\r\ntest_json_provenance_preserves_strings_without_executing_them (__main__.Profiles.test_json_provenance_preserves_strings_without_executing_them) ... ok\r\ntest_large_health_display_units_are_checked (__main__.Profiles.test_large_health_display_units_are_checked) ... ok\r\ntest_missing_wave_batch_is_rejected (__main__.Profiles.test_missing_wave_batch_is_rejected) ... ok\r\ntest_observed_value_cannot_be_rewritten (__main__.Profiles.test_observed_value_cannot_be_rewritten) ... ok\r\ntest_real_outputs_and_managed_regeneration (__main__.Profiles.test_real_outputs_and_managed_regeneration) ... ok\r\ntest_truncated_csv_rows_are_rejected_without_partial_writes (__main__.Profiles.test_truncated_csv_rows_are_rejected_without_partial_writes) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 12 tests in 5.033s\r\n\r\nOK\r\n"
+    },
+    {
+      "name": "legacy_n1_entry_check",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "RICH_WAVE_CSV_COMPAT_CHECK_PASS\r\n"
+    },
+    {
+      "name": "legacy_n2_n3_entry_check",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "RICH_N2_N3_CSV_COMPAT_CHECK_PASS\r\n"
+    },
+    {
+      "name": "test_rich_wave_data",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "RICH_WAVE_DATA_PASS: N1-N10 independent CSV rows, OCR variants and bosses, 60 per owner, immutable models/source, migration ratios, table authority and mixed-mode isolation\r\n"
+    },
+    {
+      "name": "test_rich_wave_stat_variants",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "ing=120 enemies=0 scheduler=0 visuals=-1\r\n[WaveSystem] formal wave assets queued target_wave=7 phase=countdown_start remaining=90.0 resources=1 queued=1 failed=0 status=ready ok=true\r\n[SURVIVAL_MEMORY][LUA] phase=wave_started wave=6 game_time=0.0 lua_kib=13200.8 alive=0 pending=30 enemies=0 scheduler=0 visuals=-1\r\n[WaveSystem] dev wave preload finished wave=6 reason=ready_after_buffer pending=0 failed=false elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=6 preload=ready_after_buffer\r\n[WaveSystem] dev wave preload finished wave=6 reason=ready_after_buffer pending=0 failed=false elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=6 preload=ready_after_buffer\r\n[WaveSystem] formal wave assets queued target_wave=7 phase=countdown_start remaining=90.0 resources=1 queued=1 failed=0 status=ready ok=true\r\n[SURVIVAL_MEMORY][LUA] phase=wave_started wave=6 game_time=0.0 lua_kib=9459.7 alive=0 pending=30 enemies=0 scheduler=0 visuals=-1\r\n[WaveSystem] formal wave assets queued target_wave=7 phase=countdown_start remaining=90.0 resources=1 queued=1 failed=0 status=ready ok=true\r\n[SURVIVAL_MEMORY][LUA] phase=wave_started wave=6 game_time=0.0 lua_kib=10193.2 alive=0 pending=12 enemies=0 scheduler=0 visuals=-1\r\n[WaveSystem] dev wave preload finished wave=6 reason=ready_after_buffer pending=0 failed=false elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=6 preload=ready_after_buffer\r\nRICH_WAVE_STAT_VARIANTS_PASS: 654 real births, N2/N3 observed W6 variants, formal/debug two-owner slots, 30/29 split, independent batch ordinals, reversed callbacks and other-mode isolation\r\n"
+    },
+    {
+      "name": "test_rich_monster_profiles",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "RICH_N3_REBIRTH10_REAL_BOUNDARY_PASS logical_health=2941400000 native_health=100000000 scale=29.414000000000001\r\nRICH_MONSTER_SPAWNING_PASS: 455 production births, public entries/staging, native large-stat boundaries, reward/kill idempotence and original-profile respawn\r\nRICH_MONSTER_PROFILES_PASS: all 30 members across independent N1-N10 CSV rows, other modes, immutable provenance\r\n"
+    },
+    {
+      "name": "test_rich_monster_catalog",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "RICH_MONSTER_CATALOG_PASS: all N1-N10 CSV wave batches and 300 encounters, final values/provenance, explicit difficulty rows, immutable sources and alternating modes\r\n"
+    },
+    {
+      "name": "test_rich_n2_n3_video_fixtures",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "RICH_N2_N3_VIDEO_FIXTURES_PASS: independent panels, mixed units, all bosses, W6 variants, nonwave and explicit missing-data estimates\r\n"
+    },
+    {
+      "name": "test_rich_wave_spawning",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "[WaveSystem] dev wave preload finished wave=1 reason=ready_after_buffer pending=0 failed=false elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=1 preload=ready_after_buffer\r\n[WaveSystem] dev wave preload finished wave=10 reason=ready_after_buffer pending=0 failed=false elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=10 preload=ready_after_buffer\r\n[WaveSystem] dev wave preload finished wave=20 reason=ready_after_buffer pending=0 failed=false elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=20 preload=ready_after_buffer\r\n[WaveSystem] dev wave preload finished wave=24 reason=ready_after_buffer pending=0 failed=false elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=24 preload=ready_after_buffer\r\n[WaveSystem] dev wave preload finished wave=25 reason=ready_after_buffer pending=0 failed=false elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=25 preload=ready_after_buffer\r\nRICH_WAVE_SPAWNING_PASS: 5 isolated production waves, 1200 births, 60 per owner, rich routes, estimated bosses, W24 groups, preserved models/roles and custom armor\r\n"
+    },
+    {
+      "name": "test_practice_difficulty_profiles",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "PRACTICE_DIFFICULTY_PROFILES_PASS: all four rooms across N1-N10, declared N5 inheritance, unknown difficulty rejected\r\n"
+    },
+    {
+      "name": "test_tools_multi_wave",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "[WaveSystem] dev wave preload finished wave=15 reason=failed_open_after_buffer pending=0 failed=true elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=15 preload=failed_open_after_buffer\r\n[WaveSystem] dev wave preload finished wave=15 reason=failed_open_after_buffer pending=0 failed=true elapsed=100.00\r\n[WaveSystem] dev wave spawn started wave=15 preload=failed_open_after_buffer\r\n[MonsterSpawnMarker] missing player=0 map=unknown expected=player_0 source=player_slots.csv\r\n[MonsterSpawnMarker] missing player=1 map=unknown expected=player_1 source=player_slots.csv\r\n[MonsterSpawnMarker] missing player=2 map=unknown expected=player_2 source=player_slots.csv\r\n[MonsterSpawnMarker] missing player=3 map=unknown expected=player_3 source=player_slots.csv\r\n[WaveSystem] dev wave preload finished wave=15 reason=failed_open_after_buffer pending=0 failed=true elapsed=100.00\r\nTOOLS_MULTI_WAVE_PASS: unchanged monster15, four real channels, late joins, deduplication, counters/leases, invalid input and disconnect rejection\r\n"
+    },
+    {
+      "name": "test_wave_population_endgame",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "hub_created player=0 slot=1 source=wave_portal entindex=1 position=table: 0000029e63142980\r\n[ArchiveChallenge] hub_creating player=0 slot=2 source=wave_portal position=table: 0000029e62d8dac0\r\n[ArchiveChallenge] hub_created player=0 slot=2 source=wave_portal entindex=2 position=table: 0000029e62d8dac0\r\n[ArchiveChallenge] hub_creating player=0 slot=3 source=wave_portal position=table: 0000029e62d8d0c0\r\n[ArchiveChallenge] hub_created player=0 slot=3 source=wave_portal entindex=3 position=table: 0000029e62d8d0c0\r\nPASS cooperative winner roster: solo, two humans, four humans, bots, defeated/disconnected teammate, duplicate victory\r\nPASS wave death visuals: separate corpse-preserving on_death, original metadata, one native retirement and reward, duplicate wave/archive death guards\r\n[PLAYER_WAVE_CHANNEL] player=1 active=false monsters_removed=0\r\n[WaveSystem] formal wave assets queued target_wave=2 phase=countdown_start remaining=90.0 resources=1 queued=1 failed=0 status=ready ok=true\r\n[SURVIVAL_MEMORY][LUA] phase=wave_started wave=1 game_time=150.0 lua_kib=5775.7 alive=0 pending=14 enemies=0 scheduler=0 visuals=-1\r\n[WaveSystem] formal wave assets queued target_wave=2 phase=countdown_start remaining=90.0 resources=1 queued=1 failed=0 status=ready ok=true\r\n[SURVIVAL_MEMORY][LUA] phase=wave_started wave=1 game_time=150.0 lua_kib=6155.5 alive=0 pending=14 enemies=0 scheduler=0 visuals=-1\r\nPASS fishing wave isolation: no difficulty/countdown/preload/spawn/challenge/clear; direct, event and debug requests denied; two-hour lifecycle stays playable; standard/pure still start real waves\r\n"
+    },
+    {
+      "name": "generated_registry",
+      "exit_code": 0,
+      "passed": true,
+      "summary": "Registered rich CSV modules load successfully\r\n"
+    }
+  ],
+  "full_project_csv_shape_preflight": {
+    "passed": false,
+    "pre_existing": true,
+    "reason": "CSV column count mismatch: D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\data\\csv\\挑战与奖励系统\\building_challenge_definitions.csv (line 4 has 19 columns; expected 20)\nrow: ['challenge_monster_01', '山岭巨人', 'ability_challenge_monster_01', 'npc_survival_named_challenge_monster_01', 'models/heroes/tiny/tiny_04/tiny_04.vmdl', '1.3', 'boss', 'ground', 'melee', '216', '1', '100', '1', '20', '0', 'reward_building_challenge_mountain_giant', '1', '1', '挑战进度独立于正式波次。']"
+  },
+  "live_dota_verified": false,
+  "limitations": [
+    "Offline production Lua paths use native engine fixtures; no live Dota combat or multiplayer verification."
+  ]
+}

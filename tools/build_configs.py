@@ -1,6 +1,9 @@
 """Build generated Lua config modules from categorized CSV files."""
 from __future__ import annotations
 import csv
+import importlib.util
+import json
+import math
 import re
 import subprocess
 import sys
@@ -27,6 +30,9 @@ STRICT_CSV_SHAPE_FILES = {
     "asset_components.csv",
     "building_challenge_definitions.csv",
     "monster_archetypes.csv",
+    "rich_wave_definitions.csv",
+    "rich_challenge_combat_profiles.csv",
+    "rich_wave_stat_variants.csv",
 }
 
 # These CSVs preserve values extracted from the original War3 map. Generated
@@ -140,7 +146,32 @@ def value(raw: str, kind: str) -> str:
     if kind == "list":
         separator = "," if "," in raw and "|" not in raw else "|"
         return "{" + ", ".join(f'"{lua_escape(x.strip())}"' for x in raw.split(separator) if x.strip()) + "}"
+    if kind == "json":
+        return json_lua(json.loads(raw))
     return f'"{lua_escape(raw)}"'
+
+
+def json_lua(item) -> str:
+    """Keep structured provenance in CSV cells without interpreting it as code."""
+    if item is None:
+        raise ValueError("CSV JSON provenance cannot contain null")
+    if isinstance(item, bool):
+        return "true" if item else "false"
+    if isinstance(item, (int, float)):
+        if not math.isfinite(item):
+            raise ValueError("CSV JSON number must be finite")
+        return repr(item)
+    if isinstance(item, str):
+        escaped = re.sub(r"[\x00-\x1f]", lambda match: "\\%03d" % ord(match[0]), lua_escape(item))
+        return '"' + escaped + '"'
+    if isinstance(item, list):
+        return "{" + ", ".join(json_lua(child) for child in item) + "}"
+    if isinstance(item, dict):
+        return "{" + ", ".join(
+            "[" + json_lua(key) + "] = " + json_lua(child)
+            for key, child in sorted(item.items())
+        ) + "}"
+    raise ValueError(f"unsupported CSV JSON value: {item!r}")
 
 
 def csv_dict_rows(source: Path) -> list[tuple[int, dict[str, str]]]:
@@ -820,17 +851,6 @@ def build_index(files: list[Path], output: Path) -> None:
     output.write_text("\n".join(index), encoding="utf-8", newline="\n")
 
 
-def build_mode_balance_configs() -> set[str]:
-    """Regenerate non-CSV balance modules before removing stale outputs."""
-    builders = {
-        "rich_wave_profiles.lua": "tools/rich_waves_20261018/build_profiles.py",
-        "rich_monster_profiles.lua": "tools/rich_n2_n3_20261018/build_profiles.py",
-    }
-    for script in builders.values():
-        subprocess.run([sys.executable, str(ROOT / script)], cwd=ROOT, check=True)
-    return set(builders)
-
-
 def main() -> int:
     files = sorted(CSV_ROOT.rglob("*.csv"))
     if not files:
@@ -841,6 +861,12 @@ def main() -> int:
     validate_monster_visual_definitions(files)
     validate_monster_default_wearables(files)
     validate_rogue_reward_definitions(files)
+    # Rich balance uses the same CSV pipeline, with cross-table completeness
+    # checks before any generated config is changed.
+    spec = importlib.util.spec_from_file_location("rich_csv_validation", ROOT / "tools/build_rich_configs.py")
+    rich_builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rich_builder)
+    rich_builder.validate_tables(ROOT)
 
     tooltip_builder = ROOT / "tools" / "build_tooltip_definitions.py"
     tooltip_built_separately = False
@@ -862,7 +888,6 @@ def main() -> int:
     names = sorted(source.stem for source in files)
     expected_outputs = {f"{name}.lua" for name in names}
     expected_outputs.add("index.lua")
-    expected_outputs.update(build_mode_balance_configs())
     # Asset builders own these modules; a CSV rebuild must keep their mappings.
     expected_outputs.update({"building_white_shells.lua", "wall_destruction_models.lua"})
     for old in OUT_ROOT.glob("*.lua"):

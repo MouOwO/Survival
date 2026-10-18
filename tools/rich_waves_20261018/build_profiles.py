@@ -1,11 +1,11 @@
-"""Generate the isolated rich-mode profile from reviewed recording observations."""
+"""Compatibility entry point for rich CSV configs and historical N1 audit."""
 import argparse
+import importlib.util
 import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "data/balance/rich_n1_wave_stats.json"
-OUTPUT = ROOT / "scripts/vscripts/config/generated/rich_wave_profiles.lua"
 
 
 def lua(value, depth=0):
@@ -27,8 +27,9 @@ def lua(value, depth=0):
     ) + "\n" + "    " * depth + "}"
 
 
-def generate():
-    source = json.loads(SOURCE.read_text(encoding="utf-8"))
+def generate(root=ROOT):
+    """Render the archived N1 observations in memory for historical audit only."""
+    source = json.loads((root / SOURCE.relative_to(ROOT)).read_text(encoding="utf-8"))
     observed = {row["record_id"]: row for row in source["observations"]}
 
     def stats(record_id):
@@ -76,17 +77,23 @@ def generate():
     )
 
 
+def build(root=ROOT, check=False):
+    if check:
+        generate(root)
+    spec = importlib.util.spec_from_file_location(
+        "rich_csv_configs", root / "tools/build_rich_configs.py"
+    )
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    return builder.build(root=root, check=check)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    rendered = generate()
-    if args.check:
-        assert OUTPUT.read_text(encoding="utf-8") == rendered, "Generated rich profiles are stale"
-        print("RICH_WAVE_PROFILE_GENERATION_CHECK_PASS")
-    else:
-        OUTPUT.write_text(rendered, encoding="utf-8")
-        print("RICH_WAVE_PROFILE_GENERATION_PASS: 25 waves, 60 total per player, 2 interpolated bosses")
+    build(check=args.check)
+    print("RICH_WAVE_CSV_COMPAT_" + ("CHECK_" if args.check else "") + "PASS")
 
 
 if __name__ == "__main__":

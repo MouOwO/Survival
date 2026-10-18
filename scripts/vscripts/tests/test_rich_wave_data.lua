@@ -1,6 +1,9 @@
--- Exercise the real difficulty builder and immutable production source table.
+-- Exercise the real difficulty builder and independent immutable CSV tables.
 -- Numeric fixtures are independent OCR observations, including mixed-wave types.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+for _, name in ipairs({"config/generated/rich_wave_profiles", "config/generated/rich_monster_profiles"}) do
+    package.preload[name] = function() error("legacy JSON module reached at runtime: " .. name) end
+end
 local builder = require("systems/wave_difficulty_builder")
 local source = require("config/generated/wave_definitions").rows
 
@@ -48,10 +51,18 @@ local function stats(row, attack, health, armor, label)
     assert(row.war3_armor == armor, label .. " War3 armor: " .. tostring(row.war3_armor))
 end
 
-local difficulties = {"N1", "N2", "N5", "N10"}
+local difficulties = {}
+for number = 1, 10 do difficulties[#difficulties + 1] = "N" .. number end
 local legacy, rich = {}, {}
 for _, id in ipairs(difficulties) do legacy[id] = copy(build(id)) end
 for _, id in ipairs(difficulties) do rich[id] = build(id, "rich") end
+for _, id in ipairs(difficulties) do
+    assert(equal(assert(builder.build(nil, id, "rich")), rich[id]),
+        "rich rows must be complete without any ordinary wave input: " .. id)
+    assert(equal(assert(builder.build({{difficulty_id = id, wave_number = 1,
+        health = -999, attack = -999, war3_armor = -999}}, id, "rich")), rich[id]),
+        "ordinary wave values must not drive rich mode: " .. id)
+end
 assert(rich.N1.total_waves == 25 and rich.N1.waves[26] == nil,
     "recorded rich N1 ends at wave 25")
 
@@ -232,4 +243,21 @@ changed.attack, changed.monster_count = -999, 999
 stats(one(build("N1", "rich"), 1, "normal"), 7, 700, 6, "fresh rich build after caller mutation")
 assert(equal(build("N1"), legacy.N1), "mutating a returned rich table contaminated the legacy builder")
 assert(equal(source, original_source), "caller mutation escaped into the generated source")
-print("RICH_WAVE_DATA_PASS: OCR variants and bosses, estimate provenance, 60 per owner, immutable models/source, difficulty ratios and W25 tail extension, mixed-mode isolation")
+local rich_source = require("config/generated/rich_wave_definitions").rows
+local first = assert(rich_source[1])
+local original_health = first.health
+local original_rich_plan = build(first.difficulty_id, "rich")
+first.health = original_health + 123
+local affected = build(first.difficulty_id, "rich")
+local found = false
+for _, row in ipairs(affected.rows) do
+    if row.wave_id == first.wave_id then
+        assert(row.health == first.health, "authored rich CSV values must reach the runtime unchanged")
+        found = true
+    end
+end
+assert(found and equal(build(first.difficulty_id, "standard"), legacy[first.difficulty_id]),
+    "changing an independent rich row must preserve the ordinary plan")
+first.health = original_health
+assert(equal(build(first.difficulty_id, "rich"), original_rich_plan))
+print("RICH_WAVE_DATA_PASS: N1-N10 independent CSV rows, OCR variants and bosses, 60 per owner, immutable models/source, migration ratios, table authority and mixed-mode isolation")

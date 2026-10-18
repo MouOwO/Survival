@@ -1,13 +1,15 @@
-"""Build reviewed rich N2/N3 monster profiles and the complete coverage ledger.
+"""Compatibility entry point for rich CSV configs and historical evidence audit.
 
-All selected values and per-field derivations live in the balance JSON. This
-builder never invents a multiplier or modifies the ordinary-mode CSVs.
+CSV tables are the runtime authority. The archived JSON remains available to
+generate() for evidence/provenance checks and the historical coverage ledger;
+it never generates operational Lua modules.
 """
 from __future__ import annotations
 
 import argparse
 import csv
 import hashlib
+import importlib.util
 import io
 import json
 import math
@@ -17,25 +19,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = "data/balance/rich_n2_n3_monsters.json"
-OUTPUT = "scripts/vscripts/config/generated/rich_monster_profiles.lua"
 LEDGER = "docs/balance/rich_n2_n3_monster_coverage.csv"
 FIELDS = ("health", "attack", "war3_armor")
-
-
-def lua(value, depth=0):
-    if value is None:
-        return "nil"
-    if isinstance(value, bool):
-        return str(value).lower()
-    if isinstance(value, (int, float)):
-        assert math.isfinite(value)
-        return str(value)
-    if isinstance(value, str):
-        return json.dumps(value, ensure_ascii=False)
-    entries = value.items() if isinstance(value, dict) else enumerate(value, 1)
-    parts = ["    " * (depth + 1) + "[" + lua(key) + "] = " + lua(child, depth + 1) + ","
-             for key, child in entries]
-    return "{\n" + "\n".join(parts) + "\n" + "    " * depth + "}" if parts else "{}"
 
 
 def read_csv(root, relative):
@@ -76,6 +61,7 @@ def validate_profile(profile, observations):
 
 
 def generate(root=ROOT):
+    """Validate archived observations and render only the historical ledger."""
     raw = (root / SOURCE).read_bytes()
     source = json.loads(raw)
     assert source["mode_id"] == "rich" and source["schema_version"] == 1
@@ -98,8 +84,6 @@ def generate(root=ROOT):
         assert abs(scaled - row["stats"]["health"]) < 0.5, "Maximum-health unit conversion: " + row["record_id"]
     waves = read_csv(root, "data/csv/怪物与波次系统/wave_definitions.csv")
     encounters = read_csv(root, "data/csv/挑战与奖励系统/challenge_combat_profiles.csv")
-    payload = {"schema_version": 1, "mode_id": "rich", "stats_basis": "video_display_and_explicit_estimates",
-               "source_sha256": hashlib.sha256(raw).hexdigest(), "difficulties": {}}
     assert set(source["difficulties"]) == {"N2", "N3"}
     for difficulty_id in ("N2", "N3"):
         selected = source["difficulties"][difficulty_id]
@@ -124,15 +108,6 @@ def generate(root=ROOT):
                     validate_profile(variant, observations)
         for profile in selected["encounters"].values():
             validate_profile(profile, observations)
-        def runtime_profile(profile):
-            return {key: value for key, value in profile.items() if key != "preserved_fields"}
-        payload["difficulties"][difficulty_id] = {
-            "waves": {int(number): {"batches": {batch: runtime_profile(profile)
-                for batch, profile in wave["batches"].items()}}
-                for number, wave in selected["waves"].items()},
-            "encounters": {member: runtime_profile(profile)
-                for member, profile in selected["encounters"].items()},
-        }
     all_profiles = {}
     for difficulty in source["difficulties"].values():
         profiles = [p for wave in difficulty["waves"].values() for p in wave["batches"].values()]
@@ -146,10 +121,6 @@ def generate(root=ROOT):
         assert targets and all(target in all_profiles for target in targets), "Unrepresented observation: " + ref
         assert all(all(all_profiles[target][field] == observations[ref]["stats"][field]
                        for field in FIELDS) for target in targets), "Observation mapping mismatch: " + ref
-    text = ("-- AUTO-GENERATED. DO NOT EDIT DIRECTLY.\n"
-            "-- Source: " + SOURCE + "\n"
-            "-- Video display readings and explicit estimates; final values, no difficulty multiplier.\n"
-            "return " + lua(payload) + "\n")
     stream = io.StringIO(newline="")
     headers = ["difficulty_id", "category", "profile_id", "name", "wave_number", "batch_id", "member_role",
                "archetype_id", "health", "attack", "war3_armor", "attack_speed", "attack_range", "move_speed",
@@ -158,19 +129,18 @@ def generate(root=ROOT):
     writer.writeheader()
     for row in source["coverage"]:
         writer.writerow(row)
-    return {OUTPUT: text, LEDGER: stream.getvalue()}
+    return {LEDGER: stream.getvalue()}
 
 
 def build(root=ROOT, check=False):
-    rendered = generate(root)
-    for relative, text in rendered.items():
-        path = root / relative
-        if check:
-            assert path.read_text(encoding="utf-8") == text, "Stale output: " + relative
-        else:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text, encoding="utf-8", newline="\n")
-    return rendered
+    if check:
+        generate(root)
+    spec = importlib.util.spec_from_file_location(
+        "rich_csv_configs", root / "tools/build_rich_configs.py"
+    )
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    return builder.build(root=root, check=check)
 
 
 def main():
@@ -178,7 +148,7 @@ def main():
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     build(check=args.check)
-    print("RICH_N2_N3_PROFILES_" + ("CHECK_" if args.check else "") + "PASS: 60 waves and complete encounter matrix")
+    print("RICH_N2_N3_CSV_COMPAT_" + ("CHECK_" if args.check else "") + "PASS")
 
 
 if __name__ == "__main__":

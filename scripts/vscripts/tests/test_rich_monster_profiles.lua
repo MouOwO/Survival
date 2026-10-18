@@ -1,6 +1,6 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local profiles = require("config/challenge_combat_profile_config")
-local generated = require("config/generated/rich_monster_profiles")
+local generated = require("config/generated/rich_challenge_combat_profiles")
 local ordinary = require("config/generated/challenge_combat_profiles")
 local members = require("config/generated/encounter_members").rows
 local encounters = require("config/generated/monster_encounters").rows
@@ -25,10 +25,16 @@ for _, encounter in ipairs(encounters) do
     if encounter.encounter_type == "rebirth_boss" then ids[#ids + 1] = encounter.encounter_id end
 end
 assert(#ids == 30, "the existing four rooms and all wilderness members must be covered")
-for _, difficulty in ipairs({"N2", "N3"}) do
+local indexed = {}
+for _, row in ipairs(generated.rows) do
+    indexed[row.difficulty_id] = indexed[row.difficulty_id] or {}
+    indexed[row.difficulty_id][row.member_id] = row
+end
+for number = 1, 10 do
+    local difficulty = "N" .. number
     for _, id in ipairs(ids) do
         local legacy = assert(profiles.resolve(id, difficulty))
-        local expected = assert(generated.difficulties[difficulty].encounters[id])
+        local expected = assert(indexed[difficulty][id])
         local rich, reason = profiles.resolve(id, difficulty, "rich")
         assert(rich and not reason, tostring(reason))
         for _, field in ipairs({"health", "attack", "war3_armor"}) do
@@ -45,8 +51,12 @@ for _, difficulty in ipairs({"N2", "N3"}) do
     end
 end
 for _, difficulty in ipairs({"N1", "N4", "N5", "N6", "N10"}) do
-    assert(profiles.resolve("practice_wood", difficulty, "rich")
-        == profiles.resolve("practice_wood", difficulty), "other rich difficulties must retain their profiles")
+    local rich = assert(profiles.resolve("practice_wood", difficulty, "rich"))
+    local legacy = assert(profiles.resolve("practice_wood", difficulty))
+    assert(rich ~= legacy, "every rich difficulty must return an independent row")
+    for _, field in ipairs({"health", "attack", "war3_armor"}) do
+        assert(rich[field] == legacy[field], "migration must retain existing unrecorded difficulty values")
+    end
 end
 local missing, reason = profiles.resolve("practice_wood", "N999", "rich")
 assert(not missing and reason == "challenge_combat_profile_missing:practice_wood:N999")
@@ -218,11 +228,12 @@ assert(count == 452, "all member, public room, rebirth and staged births must re
 -- Force values above the native signed-integer limit through both real birth
 -- paths. The existing shared projection owns damage/UI recovery and keeps
 -- source data, kill bookkeeping and configured rewards unchanged.
-local rich_source = require("config/generated/rich_monster_profiles").difficulties.N3.encounters
-local original_rebirth, original_practice = rich_source.encounter_rebirth_10, rich_source.practice_greater_attribute
+local rich_source = profiles.rich_by_member
+local original_rebirth = rich_source.encounter_rebirth_10.N3
+local original_practice = rich_source.practice_greater_attribute.N3
 local huge = {health = 3000000001, attack = 1000000007, war3_armor = 1234,
     estimated = true, estimation_method = "large_native_boundary_fixture"}
-rich_source.encounter_rebirth_10, rich_source.practice_greater_attribute = huge, huge
+rich_source.encounter_rebirth_10.N3, rich_source.practice_greater_attribute.N3 = huge, huge
 selected_mode, selected_difficulty = "rich", "N3"
 local wilderness = load_service("monster_spawn_service")
 local result = find_function(wilderness, "start_encounter")({encounter_id = "encounter_rebirth_10", player_id = 0})
@@ -278,7 +289,7 @@ pending()
 check(created[#created], member.member_id, "N3", "rich")
 assert(session.monster_count == 1 and session.respawn_count == 0,
     "projected respawn must keep the original rich selection and consume its own death ticket")
-rich_source.encounter_rebirth_10, rich_source.practice_greater_attribute = original_rebirth, original_practice
+rich_source.encounter_rebirth_10.N3, rich_source.practice_greater_attribute.N3 = original_rebirth, original_practice
 assert(real_n3_rebirth10 and real_n3_rebirth10.logical > 2147483647
     and real_n3_rebirth10.native <= 100000000.000001,
     "the real generated N3 final rebirth profile must safely cross the native integer health boundary")
@@ -287,4 +298,4 @@ print(string.format("RICH_N3_REBIRTH10_REAL_BOUNDARY_PASS logical_health=%.0f na
 print("RICH_MONSTER_SPAWNING_PASS: 455 production births, public entries/staging, native large-stat boundaries, reward/kill idempotence and original-profile respawn")
 ]=]
 assert(loadstring(fixture:sub(1, boundary - 1) .. cases, "test_rich_monster_spawn"))()
-print("RICH_MONSTER_PROFILES_PASS: all 30 members across N2/N3, other modes/difficulties, immutable provenance")
+print("RICH_MONSTER_PROFILES_PASS: all 30 members across independent N1-N10 CSV rows, other modes, immutable provenance")

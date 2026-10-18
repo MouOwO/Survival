@@ -3,6 +3,7 @@ local difficulties = require("config/difficulty_config")
 
 local M = {
     by_member = {},
+    rich_by_member = {},
 }
 
 for _, row in ipairs(generated.rows or {}) do
@@ -16,6 +17,23 @@ for _, row in ipairs(generated.rows or {}) do
     end
 end
 
+local function rich_profiles()
+    if M.rich_loaded then return M.rich_by_member end
+    local rich = require("config/generated/rich_challenge_combat_profiles")
+    for _, row in ipairs(rich.rows or {}) do
+        if row.enabled ~= false then
+            local member_id = tostring(row.member_id or "")
+            local difficulty_id = tostring(row.difficulty_id or "")
+            if member_id ~= "" and difficulty_id ~= "" then
+                M.rich_by_member[member_id] = M.rich_by_member[member_id] or {}
+                M.rich_by_member[member_id][difficulty_id] = row
+            end
+        end
+    end
+    M.rich_loaded = true
+    return M.rich_by_member
+end
+
 local function clone(value)
     if type(value) ~= "table" then return value end
     local result = {}
@@ -24,20 +42,22 @@ local function clone(value)
 end
 
 function M.resolve(member_id, difficulty_id, mode_id)
-    local profiles = M.by_member[tostring(member_id or "")]
-    if not profiles then return nil, nil end
-    if mode_id == "rich" and (difficulty_id == "N2" or difficulty_id == "N3") then
-        local rich = require("config/generated/rich_monster_profiles")
-        local difficulty = rich.difficulties[difficulty_id]
-        local profile = difficulty and difficulty.encounters[tostring(member_id)]
+    if mode_id == "rich" then
+        local rich = rich_profiles()[tostring(member_id or "")]
+        if not rich and not M.by_member[tostring(member_id or "")] then return nil, nil end
+        local profile = rich and rich[tostring(difficulty_id or "")]
         if not profile then
-            return nil, "rich_monster_profile_missing:"
+            return nil, "challenge_combat_profile_missing:"
                 .. tostring(member_id) .. ":" .. tostring(difficulty_id)
         end
-        -- Rich profiles contain final panel values, including any explicit
-        -- estimate. They never pass through the ordinary difficulty ratios.
-        return clone(profile), nil
+        local result = {}
+        for key, value in pairs(profile) do
+            if value ~= "" then result[key] = clone(value) end
+        end
+        return result, nil
     end
+    local profiles = M.by_member[tostring(member_id or "")]
+    if not profiles then return nil, nil end
     local profile = profiles[tostring(difficulty_id or "")]
     if not profile then
         -- N6-N10 explicitly reuse N5 balance while testing unlocks. Resolve
