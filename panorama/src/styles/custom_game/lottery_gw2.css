@@ -36,8 +36,8 @@
 #LotteryMainCanvas.LotteryGW2Reborn #LHDetails Label { font-size:18px; }
 #LotteryMainCanvas.LotteryGW2Reborn #LHHistory Label,
 #LotteryMainCanvas.LotteryGW2Reborn #LotteryAnnouncement Label { font-size:19px; }
-/* Valve's Dark Carnival GoldBorder, with straight corners over the backing. */
-#LotteryMainCanvas.LotteryGW2 .LotteryGW2OfficialFrame { border:2px solid white; border-brush:gradient(linear,0% 0%,0% 100%,from(#EFD4AC),color-stop(.5,#DCB25E),to(#977628)); }
+/* R5 uses separate subtle rules rather than a continuous metal frame. */
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2OfficialFrame { border:0px; }
 /* Native Crownfall material: restrained dark panels against the pool artwork. */
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PoolSkin { brightness:1; transition-property:brightness; transition-duration:.12s; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool.Selected .LotteryGW2PoolSkin { brightness:1.65; }
@@ -236,8 +236,7 @@
 
 /* Reborn's main window uses rectangular iron panels and silver navigation. */
 #LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2OfficialFrame {
-    border:1px solid white;
-    border-brush:gradient(linear,0% 0%,0% 100%,from(#9caaae),color-stop(.5,#52646d),to(#28363e));
+    border:0px;
 }
 #LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2PoolSkin { brightness:1; }
 #LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2Pool.Selected .LotteryGW2PoolSkin { brightness:1; }
@@ -271,8 +270,7 @@
 /* Selected Forest Emerald skin. Only decorative surfaces react to brightness;
    captions, the canonical ticket artwork and controller-enabled state stay intact. */
 #LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas.LotteryGW2 .LotteryGW2OfficialFrame {
-    border:1px solid white;
-    border-brush:gradient(linear,0% 0%,0% 100%,from(#c4c68f),color-stop(.5,#6b8c61),to(#3f5d42));
+    border:0px;
 }
 #LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton,
 #LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:hover,

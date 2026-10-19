@@ -126,7 +126,7 @@ function inspectProduction() {
         if (!panel) return null;
         const rect = panel.el.getBoundingClientRect(), s = getComputedStyle(panel.el);
         const images = [...(panel.el.tagName === 'IMG' ? [panel.el] : []), ...panel.el.querySelectorAll('img')].map(image => ({ src: image.currentSrc || image.src, decoded: image.complete && image.naturalWidth > 0, box: box(image.getBoundingClientRect()) }));
-        return { id: panel.id, type: panel.paneltype, classes: panel.GetClasses(), text: String(panel.text || panel.el.textContent || '').replace(/\s+/g, ' ').trim(), box: box(rect), screenBox: rect.toJSON(), visible: visible(panel), enabled: panel.enabled, images, style: { fontSize: s.fontSize, fontFamily: s.fontFamily, fontWeight: s.fontWeight, lineHeight: s.lineHeight, letterSpacing: s.letterSpacing, color: s.color, background: s.backgroundColor, backgroundImage: s.backgroundImage, borderColor: s.borderTopColor, borderWidth: s.borderTopWidth, boxShadow: s.boxShadow, filter: s.filter, opacity: s.opacity, zIndex: s.zIndex, opacityMaskInput: panel.style.opacityMask || null, maskImage: s.maskImage, maskSize: s.maskSize, textAlign: s.textAlign, textDecoration: s.textDecorationLine, textOverflow: panel.style.textOverflow || s.textOverflow, transform: s.transform } };
+        return { id: panel.id, type: panel.paneltype, classes: panel.GetClasses(), text: String(panel.text || panel.el.textContent || '').replace(/\s+/g, ' ').trim(), box: box(rect), screenBox: rect.toJSON(), visible: visible(panel), enabled: panel.enabled, images, style: { fontSize: s.fontSize, fontFamily: s.fontFamily, fontWeight: s.fontWeight, lineHeight: s.lineHeight, letterSpacing: s.letterSpacing, color: s.color, background: s.backgroundColor, backgroundImage: s.backgroundImage, borderColor: s.borderTopColor, borderWidth: s.borderTopWidth, borderWidths: { top:s.borderTopWidth,right:s.borderRightWidth,bottom:s.borderBottomWidth,left:s.borderLeftWidth }, boxShadow: s.boxShadow, filter: s.filter, opacity: s.opacity, zIndex: s.zIndex, opacityMaskInput: panel.style.opacityMask || null, maskImage: s.maskImage, maskSize: s.maskSize, textAlign: s.textAlign, textDecoration: s.textDecorationLine, textOverflow: panel.style.textOverflow || s.textOverflow, transform: s.transform } };
     }
     function find(panel, cls) { if (!panel) return null; if (panel.BHasClass(cls)) return panel; for (const child of panel.Children()) { const found = find(child, cls); if (found) return found; } return null; }
     const nav = ['map', 'cultivation', 'dragon_knight', 'summer'].map(id => {
@@ -144,9 +144,11 @@ function inspectProduction() {
         const sharedBackground = getComputedStyle(expected.el).backgroundImage; expected.DeleteAsync(0);
         return { card: record(card), item: card.__lotteryItem, frame: record(find(card, 'LotteryGW2PreviewWell')), icon: record(find(card, 'LotteryGW2PreviewIcon')), name: record(name), caption: record(name?.Children().find(child => child.paneltype === 'Label')), rarity: record(find(card, 'LotteryGW2PreviewRarity')), sharedBackground };
     });
-    const ids = ['LotteryGW2HeaderSkin', 'LotteryGW2SidebarSkin', 'LotteryGW2SidebarTexture', 'LotteryGW2SidebarHeading', 'LotteryGW2SidebarNote', 'LotteryGW2SidebarEmblem', 'LotteryGW2FooterSkin', 'LotteryGW2Content', 'LotteryTitle', 'LotteryTagline', 'LotteryGuaranteeValue', 'LHGuaranteeQuality', 'LotteryGW2ForestDivider', 'LotteryGW2Preview', 'LotteryGW2PreviewItems', 'LotteryGW2PreviewCaption', 'LotteryDrawPity', 'LotteryDrawPityCaption', 'LotterySkipAnimation', 'LotteryGW2TicketCurrency', 'LotteryGW2TicketIcon', 'LotteryGW2TicketBalance', 'LotteryTicketPurchase', 'LotteryGW2PurchasePlus', 'LotteryCloseButton', 'LotteryGW2CloseIcon', 'LotteryGW2SceneWash', 'LotteryGW2FloorWash'];
+    const ids = ['LotteryGW2OfficialFrame', 'LotteryGW2Header', 'LotteryGW2HeaderSkin', 'LotteryGW2HeaderShade', 'LotteryGW2HeaderTopRule', 'LotteryGW2HeaderRule', 'LotteryGW2MainTopRule', 'LotteryGW2SidebarRule', 'LotteryGW2FooterRule', 'LotteryGW2SidebarSkin', 'LotteryGW2SidebarTexture', 'LotteryGW2SidebarHeading', 'LotteryGW2SidebarNote', 'LotteryGW2SidebarEmblem', 'LotteryGW2FooterSkin', 'LotteryGW2Content', 'LotteryTitle', 'LotteryTagline', 'LotteryGuaranteeValue', 'LHGuaranteeQuality', 'LotteryGW2ForestDivider', 'LotteryGW2Preview', 'LotteryGW2PreviewItems', 'LotteryGW2PreviewCaption', 'LotteryDrawPity', 'LotteryDrawPityCaption', 'LotterySkipAnimation', 'LotteryGW2TicketCurrency', 'LotteryGW2TicketIcon', 'LotteryGW2TicketBalance', 'LotteryTicketPurchase', 'LotteryGW2PurchasePlus', 'LotteryCloseButton', 'LotteryGW2CloseIcon', 'LotteryGW2SceneWash', 'LotteryGW2FloorWash'];
+    const headerLayers = ['LotteryGW2HeaderSkin','LotteryGW2HeaderShade','LotteryGW2Header'].map(id=>nodes[id]);
+    const headerLayering = { sameParent: headerLayers.every(panel=>panel&&panel.GetParent()===headerLayers[0]?.GetParent()), order: headerLayers.map(panel=>panel?{id:panel.id,index:panel.GetParent()?.Children().indexOf(panel),z:Number(getComputedStyle(panel.el).zIndex)||0}:null) };
     const active = nodes['LotteryScenePage_' + cfg.SurvivalPurpleLottery.Inspect().selected];
-    return { errors: previewErrors, scriptFailures: previewScriptResults.filter(row => !row.ok), api: cfg.SurvivalPurpleLottery.Inspect(), canvas: { screenBox: origin.toJSON(), scale }, nodes: Object.fromEntries(ids.map(id => [id, record(nodes[id])])), sceneLayers: { extension: record(find(active, 'LotteryGW2SceneExtension')), subject: record(find(active, 'LotteryGW2SceneSubject')) }, legacyGuaranteeLine: record(find(nodes.LotteryGuaranteeRow, 'LHGuaranteeLine')), navigation: nav, preview, draw: { single: draw('Single'), ten: draw('Ten') }, footerActions: ['LHDetails', 'LHHistory', 'LotteryAnnouncement'].map(id => ({ button: record(nodes[id]), captions: nodes[id].Children().filter(p => p.paneltype === 'Label').map(record) })), calls: previewCalls, t10: !!nodes.LotteryGW2Chest };
+    return { errors: previewErrors, scriptFailures: previewScriptResults.filter(row => !row.ok), api: cfg.SurvivalPurpleLottery.Inspect(), canvas: { screenBox: origin.toJSON(), scale }, nodes: Object.fromEntries(ids.map(id => [id, record(nodes[id])])), headerLayering, sceneLayers: { extension: record(find(active, 'LotteryGW2SceneExtension')), subject: record(find(active, 'LotteryGW2SceneSubject')) }, legacyGuaranteeLine: record(find(nodes.LotteryGuaranteeRow, 'LHGuaranteeLine')), navigation: nav, preview, draw: { single: draw('Single'), ten: draw('Ten') }, footerActions: ['LHDetails', 'LHHistory', 'LotteryAnnouncement'].map(id => ({ button: record(nodes[id]), captions: nodes[id].Children().filter(p => p.paneltype === 'Label').map(record) })), calls: previewCalls, t10: !!nodes.LotteryGW2Chest };
 }
 
 function inspectResult() {
@@ -160,12 +162,34 @@ function inspectResult() {
 const near = (got, want, label, tolerance = 0.8) => assert(Math.abs(got - want) <= tolerance, label + ': measured ' + got + ', reference ' + want);
 function rectangle(actual, expected, label, tolerance) { assert(actual, label + ' exists'); for (const key of ['x', 'y', 'width', 'height']) near(actual[key], expected[key], label + '.' + key, tolerance); }
 function frameStyle(got, reference, label) { assert(got, label + ' exists'); assert.equal(got.style.fontSize, reference.style.fontSize, label + ' measured font size'); }
+function colorNear(actual, expected, label) {
+    const parse=value=>{const match=/^rgba?\(([^)]+)\)$/.exec(value);assert(match,label+' has a computed RGB color: '+value);const parts=match[1].trim().split(/[,\s/]+/).map(Number);return [parts[0],parts[1],parts[2],parts[3]??1];};
+    const got=parse(actual),want=parse(expected);for(let i=0;i<3;i++)near(got[i],want[i],label+' channel '+i,0.001);near(got[3],want[3],label+' alpha',0.002);
+}
+function checkBoundaries(actual, reference) {
+    const n=actual.nodes,ref=reference.components,header=ref.header.box,sidebar=ref.sidebar.box,footer=ref.footer.box;
+    const anchor=n.LotteryGW2OfficialFrame;assert(anchor,'The non-drawing frame anchor remains available');rectangle(anchor.box,{x:35,y:45,width:1608,height:824},'Non-drawing frame anchor');
+    for(const [side,width]of Object.entries(anchor.style.borderWidths))assert.equal(width,'0px','No visible '+side+' outer stroke remains');assert.equal(anchor.style.backgroundImage,'none','The frame anchor does not retain decorative artwork');
+    const rules=[
+        ['LotteryGW2HeaderTopRule',{x:header.x,y:header.y,width:header.width,height:1},ref.header.style.borderTopColor,1],
+        ['LotteryGW2HeaderRule',{x:header.x,y:header.bottom-1,width:header.width,height:1},ref.header.style.borderBottomColor,1],
+        ['LotteryGW2HeaderShade',ref.headerShade.box,ref.headerShade.style.backgroundColor,1],
+        ['LotteryGW2MainTopRule',ref.mainTopLine.box,ref.mainTopLine.style.backgroundColor,Number(ref.mainTopLine.style.opacity)],
+        ['LotteryGW2SidebarRule',{x:sidebar.right-1,y:sidebar.y,width:1,height:sidebar.height},ref.sidebar.style.borderRightColor,1],
+        ['LotteryGW2FooterRule',{x:footer.x,y:footer.y,width:footer.width,height:1},ref.footer.style.borderTopColor,1]
+    ];
+    for(const [id,box,color,opacity]of rules){const panel=n[id];assert(panel?.visible,id+' is rendered');rectangle(panel.box,box,id,0.2);colorNear(panel.style.background,color,id+' color');near(Number(panel.style.opacity),opacity,id+' opacity',0.001);assert.equal(panel.style.backgroundImage,'none',id+' uses its explicit reference color');}
+    const layers=actual.headerLayering;assert(layers?.sameParent,'Header skin, shade and foreground share one directly comparable paint ancestry');const [skin,shade,text]=layers.order;
+    const paintsBefore=(a,b)=>a.z<b.z||(a.z===b.z&&a.index<b.index);assert(paintsBefore(skin,shade),'Header shade paints after the material skin');assert(paintsBefore(shade,text),'Header shade paints below the header text and controls');
+    near(n.LotteryGW2HeaderSkin.box.bottom,119,'Measured header lower boundary');near(n.LotteryGW2Content.box.y-n.LotteryGW2HeaderSkin.box.bottom,4,'Measured gap below the header remains four pixels');
+}
 function checkMain(actual, reference, pool, zero = false) {
     assert.deepEqual(actual.errors, []); assert.deepEqual(actual.scriptFailures, []); assert.equal(actual.api.selected, pool); assert(!actual.t10);
     near(actual.canvas.screenBox.height, actual.canvas.scale * 941, 'Main canvas scales uniformly');
     rectangle(actual.nodes.LotteryGW2HeaderSkin.box, reference.components.header.box, 'header');
     rectangle(actual.nodes.LotteryGW2SidebarSkin.box, reference.components.sidebar.box, 'sidebar');
     rectangle(actual.nodes.LotteryGW2FooterSkin.box, reference.components.footer.box, 'footer');
+    checkBoundaries(actual,reference);
     assert.equal(actual.nodes.LotteryGW2FooterSkin.style.background,'rgb(17, 31, 24)','The actual footer material is opaque over the pool scene');near(Number(actual.nodes.LotteryGW2FooterSkin.style.opacity),1,'Footer material opacity',0.001);
     for (const id of ['LotteryGW2SidebarHeading', 'LotteryGW2SidebarNote', 'LotteryGW2SidebarEmblem']) { assert(actual.nodes[id]?.visible, id + ' is visible'); assert(Number(actual.nodes[id].style.zIndex) >= 4, id + ' paints above the sidebar backing'); }
     near(Number(actual.nodes.LotteryGW2SidebarTexture.style.opacity), 0.25, 'Sidebar texture opacity', 0.001);
