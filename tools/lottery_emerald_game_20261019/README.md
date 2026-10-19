@@ -8,6 +8,8 @@
 
 `gameVerified:false` 表明全部截图属于离线组件预览，不能作为原生实机截图。旧 XML 样例移除两个 ZX 展示容器，并加入旧 footer 缩放祖先；它必须在补回容器后保持付费/免费居中、重复 Apply 不增节点，才算通过。
 
+浏览器适配器没有模拟彩票 Label 的原生 `text-overflow:shrink` 缩字号行为；此前离线通过仍在原生暴露了菜单/底栏字体过小。主线程原生 A/B 确认改用 `clip` 可恢复字号，按钮标题还需 `fit-children` 自然宽度及居中。修复后的原生主界面证据单独记录为 `nativeMainTextEvidence`，与本脚本的浏览器结果测试区分；截图为 `design_refs/menus_v10/work/native/emerald_native_labels_fixed_20261019.png`。基础 adapter 没有修改，也未用浏览器差异迫使生产源码回退。
+
 本轮正式接入要求：移除右侧 T10 装饰，各奖池保留原背景及原过场电影，结果页采用 R5 设计。备用背景只存入项目；`node tools/lottery_emerald_game_20261019/assets.cjs --check` 检查 JPEG 内容准确且没有运行引用。
 
 部署由主线程按顺序执行：

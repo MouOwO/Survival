@@ -198,7 +198,7 @@
                 var id=String(pool.id),b=make("Button",view.sidebar,"LotteryGW2Pool_"+id,"LotteryGW2Pool"); place(b,box[0],box[1],box[2],box[3]); b.hittestchildren=false;
                 var frame=make("Panel",b,"","LotteryGW2PoolSkin");place(frame,0,0,parseFloat(b.style.width),parseFloat(b.style.height));frame.hittest=false;frame.hittestchildren=false;
                 style(frame,{padding:"0px",minWidth:"0px",minHeight:"0px",backgroundImage:"none",backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",backgroundColor:"#142c22a8",border:"1px solid #a7c9a333",overflow:"clip"});
-                var width=box[2],height=box[3],name=label(b,"",String(pool.display_name||id),52,(height-44)/2,width-68,44,24,"#dbe2cf");name.AddClass("LotteryGW2PoolTitle");style(name,{textAlign:"left",lineHeight:"44px",whiteSpace:"nowrap",textOverflow:"shrink"});
+                var width=box[2],height=box[3],name=label(b,"",String(pool.display_name||id),52,(height-44)/2,width-68,44,24,"#dbe2cf");name.AddClass("LotteryGW2PoolTitle");style(name,{textAlign:"left",lineHeight:"44px",whiteSpace:"nowrap",textOverflow:"clip"});
                 nativeArt(b,"",forest.emblem,14,(height-28)/2,28,28);
                 var state=label(b,"","",15,height-29,width-30,20,15,"#b5c2c5");state.AddClass("LotteryGW2PoolLock");style(state,{textAlign:"center",whiteSpace:"nowrap",textOverflow:"shrink"});
                 var mark=surface(b,"",[0,18,3,height-36],"#b1c891");mark.AddClass("LotteryGW2PoolSelectionMark");var marks=[mark];
@@ -276,8 +276,10 @@
             place(parts.content,12,(height-contentHeight)/2,contentWidth,contentHeight);style(parts.content,{flowChildren:"none",transform:"none",visibility:"visible"});
             place(parts.cost,(contentWidth-costWidth)/2,34,costWidth,36);style(parts.cost,{flowChildren:"none",transform:"none",visibility:free?"collapse":"visible"});
             place(parts.ticket,0,0,52,36);style(parts.ticket,{transform:"none"});
-            place(cost,58,5,digits,26);style(cost,{fontSize:"18px",lineHeight:"26px",textAlign:"left",whiteSpace:"nowrap",textOverflow:"shrink",minWidth:"0px",minHeight:"0px",transform:"none"});
-            place(text,0,0,contentWidth,32);style(text,{fontSize:"28px",lineHeight:"32px",textAlign:"center",whiteSpace:"nowrap",textOverflow:"shrink",minWidth:"0px",minHeight:"0px",transform:"none"});
+            place(cost,58,5,digits,26);style(cost,{fontSize:"18px",lineHeight:"26px",textAlign:"left",whiteSpace:"nowrap",textOverflow:"clip",minWidth:"0px",minHeight:"0px",transform:"none"});
+            // Native Labels shrink glyphs against their line box differently
+            // from browsers. Center the natural text box inside the fixed row.
+            place(text,0,0,contentWidth,32);style(text,{width:"fit-children",height:"32px",horizontalAlign:"center",fontSize:"28px",lineHeight:"32px",textAlign:"center",whiteSpace:"nowrap",textOverflow:"clip",minWidth:"0px",minHeight:"0px",transform:"none"});
         }
     }
     function footerAction(id,x,y,width,uri) {
@@ -288,7 +290,7 @@
         }
         place(icon,0,11,22,22);style(icon,{visibility:"visible",backgroundImage:'url("'+uri+'")',backgroundSize:"contain",backgroundPosition:"center",backgroundRepeat:"no-repeat",washColor:"#b6cbb3"});icon.hittest=false;icon.hittestchildren=false;
         var captions=[];walk(b,function(n){if(n.paneltype==="Label")captions.push(n);});
-        captions.forEach(function(n){moveNode(n,b);place(n,30,0,width-30,44);style(n,{width:(width-30)+"px",height:"44px",minWidth:"0px",minHeight:"0px",horizontalAlign:"left",verticalAlign:"top",fontSize:"16px",lineHeight:"44px",textAlign:"left",transform:"none",color:"#c1cfbe",whiteSpace:"nowrap",textOverflow:"shrink",textShadow:"#000000 0px 1px 2px 2.0"});});
+        captions.forEach(function(n){moveNode(n,b);place(n,30,0,width-30,44);style(n,{width:(width-30)+"px",height:"44px",minWidth:"0px",minHeight:"0px",horizontalAlign:"left",verticalAlign:"top",fontSize:"16px",lineHeight:"44px",textAlign:"left",transform:"none",color:"#c1cfbe",whiteSpace:"nowrap",textOverflow:"clip",textShadow:"#000000 0px 1px 2px 2.0"});});
     }
     function compactCards(host,single) {
         if(!valid(host)||!ensure())return;
