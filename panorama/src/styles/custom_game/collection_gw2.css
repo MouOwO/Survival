@@ -58,3 +58,12 @@
 .CollectionGW2Button:active { brightness:.88; }
 #CollectionGW2DrawText { font-weight:semi-bold; letter-spacing:2px; }
 .CollectionGW2Tooltip .ArchiveSharedTooltipNineFrame { wash-color:#d8c394; }
+
+/* Native dropdown colors, without resampling the large gold button bevel. */
+#CollectionGW2OwnershipFilter { background-image:none; background-color:gradient(linear,0% 0%,0% 100%,from(#292e2e),to(#191e1e)); border:1px solid #81734e; box-shadow:none; }
+#CollectionGW2OwnershipFilter:hover, #CollectionGW2OwnershipFilter.CollectionGW2FilterExpanded { border:1px solid #c0a56b; }
+.CollectionGW2FilterDismiss { flow-children:none; background-image:none; background-color:transparent; border:0px; padding:0px; margin:0px; box-shadow:none; }
+.CollectionGW2FilterMenu { flow-children:none; overflow:clip; background-color:#171c19; border:0px; padding:0px; margin:0px; }
+.CollectionGoldFilterFrame { flow-children:none; overflow:clip; }
+.CollectionGW2FilterOption.CollectionGW2FilterSelected { background-color:#b69a5033; }
+.CollectionGW2FilterOption:hover { background-color:#bda66725; }
