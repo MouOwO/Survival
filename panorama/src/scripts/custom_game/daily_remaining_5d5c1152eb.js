@@ -175,6 +175,8 @@ function renderCards(){
   var card=make("Panel",p("DailyCards"),"DailyGW2Day_"+(i+1),"DailyGW2Day");rect(card,columns[i%7]-columns[0],rows[Math.floor(i/7)]-rows[0],cellWidth,cellHeight);card.hittest=true;card.hittestchildren=true;
   var status=day.status||"not_open",today=Number(day.is_today)===1;card.SetHasClass("DailyGW2Today",today);card.SetHasClass("DailyGW2Claimed",status==="claimed");card.SetHasClass("DailyGW2Future",status==="not_open");
   var frame=component(card,"reward_frame",0,0,cellWidth,cellHeight);frame.AddClass("DailyGW2RewardFrame");
+  // Use a clean rim: the inset reward backing obscures the decorative corner art.
+  style(frame,{backgroundImage:"none",border:"1px solid #76643e"});
   var items=array(day.rewards),gap=0,width=items.length>1?(cellWidth-iconInset*2-gap)/2:cellWidth-iconInset*2,sharedQuantity=items.length>1?rewardQuantity(items[0]):null;
   if(sharedQuantity!==null&&!items.every(function(item){return rewardQuantity(item)!==null&&Number(item.count)===Number(sharedQuantity);}))sharedQuantity=null;
   items.slice(0,2).forEach(function(item,j){reward(card,item,iconInset+j*(width+gap),iconInset,width,cellHeight-iconInset*2,undefined,sharedQuantity!==null);});

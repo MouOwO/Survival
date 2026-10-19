@@ -99,7 +99,8 @@ function dailyAccepted() {
             const day = nodes['DailyGW2Day_' + (index + 1)];
             assert.deepEqual(box(day, canvas), [columns[index % 7], rows[Math.floor(index / 7)], 118, 119]);
             const frame = tagged(day, 'DailyGW2RewardFrame')[0];
-            assert.equal(frame.style.backgroundImage, 'url("' + cfg.DailyGW2Data.assets.reward_frame.file + '")');
+            assert.equal(frame.style.backgroundImage, 'none', 'Ordinary daily frames have no clipped corner artwork');
+            assert.equal(frame.style.border, '1px solid #76643e', 'Ordinary daily frames keep a continuous thin gold line');
             for (const reward of tagged(day, 'DailyGW2Reward')) {
                 const slot = box(reward, day);
                 assert.equal(slot[1], 2, 'Reward art starts immediately inside the border');
