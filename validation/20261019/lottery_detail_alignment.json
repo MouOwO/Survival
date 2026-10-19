@@ -1,0 +1,467 @@
+{
+  "status": "PASS_COMPONENTS_AND_NATIVE_COMPILE",
+  "task": "Lottery header alignment, corner cleanup and pool selection",
+  "changes": [
+    "Replace the concave frame with Valve Dark Carnival straight GoldBorder so all four edges meet the window backing.",
+    "Place the ticket image, live numeric balance and original purchase control immediately left of Close; bound long counts and center controls vertically.",
+    "Center the four pool titles, remove ticket-name subtitles, and retain actual locked-pool requirements.",
+    "Show gold side markers and a brighter native Crownfall frame only for the selected pool."
+  ],
+  "native_border": {
+    "kind": "exact_installed_valve_gold_border_rule_read_only_evidence",
+    "sourceVpk": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota\\pak01_dir.vpk",
+    "resource": "panorama/styles/events/dark_carnival/dark_carnival_shared.vcss_c",
+    "resourceSha256": "8f357b8415cccdec4124d82a6cd385c2927e7d833ec7926e6b4667897a652518",
+    "selector": ".GoldBorder",
+    "compiledByteOffset": 10879,
+    "ruleLengthBytes": 249,
+    "originalRule": ".GoldBorder{border: 2px solid rgb(255, 255, 255);border-brush: gradient( linear, 0% 0%, 0% 100%, from( gold1 ), color-stop( 0.5, gold2 ), to( gold3 ) );background-color: gradient( linear, 0% 0%, 0% 100%, from( charcoalLight ), to( charcoalDark ) );}",
+    "defines": {
+      "gold1": "#EFD4AC",
+      "gold2": "#DCB25E",
+      "gold3": "#977628",
+      "charcoalLight": "#253242",
+      "charcoalDark": "#0B111A"
+    },
+    "resolvedRule": ".GoldBorder{border: 2px solid rgb(255, 255, 255);border-brush: gradient( linear, 0% 0%, 0% 100%, from( #EFD4AC ), color-stop( 0.5, #DCB25E ), to( #977628 ) );background-color: gradient( linear, 0% 0%, 0% 100%, from( #253242 ), to( #0B111A ) );}",
+    "extractedText": "output/lottery_detail_alignment_20261019/dark_carnival_shared_native_rule.txt",
+    "implementationScope": "Use official border and border-brush only for LotteryGW2OfficialFrame; omit its background-color so existing artwork stays visible.",
+    "proposedFrameDeclarations": {
+      "backgroundImage": "none",
+      "backgroundColor": "transparent",
+      "borderImageSource": "none",
+      "border": "2px solid #ffffff",
+      "borderBrush": "gradient(linear, 0% 0%, 0% 100%, from(#EFD4AC), color-stop(0.5, #DCB25E), to(#977628))"
+    },
+    "browserTransport": "Map native borderBrush gradient to a CSS border-image linear-gradient with slice 1 only in offline adapter. Keep production source graph unchanged."
+  },
+  "native_compile": [
+    {
+      "source": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "source_sha256": "71fd4ecebd842f89186bb3d719f2d62f211930b12d5c77a71f5b561800a8a7e1",
+      "artifact": "panorama/scripts/custom_game/lottery_gw2.vjs_c",
+      "artifact_sha256": "27b6180abf17d4a50705c03a250ff138caf2e80f9336c261daf02ecdf2f7ba90"
+    },
+    {
+      "source": "panorama/src/styles/custom_game/lottery_gw2.css",
+      "source_sha256": "bd51881b57d98dfa00f01b0fbcff1c1f4c1a9f298e0bbc7dd35cae397041ed0b",
+      "artifact": "panorama/styles/custom_game/lottery_gw2.vcss_c",
+      "artifact_sha256": "0707ea410dea6aa83468cfc2c3f4ffe9d05167f16d21300c75c78e72c2dc0d63"
+    }
+  ],
+  "live_native_compile": [
+    {
+      "source": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "source_sha256": "ec6be8ddce57688bd457605ba2a7f432d8523cfbafec5f59641e32666e757ce7",
+      "artifact": "panorama/scripts/custom_game/lottery_gw2.vjs_c",
+      "artifact_sha256": "900ba9bc2cd01d59c3e192744b2870500cc0bc09466774b5fb6230251b10609f"
+    },
+    {
+      "source": "panorama/src/styles/custom_game/lottery_gw2.css",
+      "source_sha256": "e65e5f1608687a0638aff84ce4a3979f3d80282fa913f23c8872b1d095a9c6f0",
+      "artifact": "panorama/styles/custom_game/lottery_gw2.vcss_c",
+      "artifact_sha256": "18b20eb0096fca6bd54603f605cb74fdad1e09fdfd9c04acbcdeb6bf1d3ea45e"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Production lifecycle, four pool tabs, long counts, selected markers, locked pool requirements, original purchase callbacks, scrolling and modal guards",
+      "passed": true
+    },
+    {
+      "name": "Ticket icons, probability notice, ticket rules, cinematic playback, scene transitions and result flow",
+      "passed": true,
+      "tests": 10,
+      "files": 7
+    },
+    {
+      "name": "Isolated committed candidate executes the production lifecycle regression",
+      "passed": true
+    },
+    {
+      "name": "Offline candidate component preview: four pools at two resolutions, visible selected state, label centering, ticket bounds, corner pixels and upper-left Back",
+      "passed": true,
+      "screens": [
+        {
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "pool": "map",
+          "corner_pixels": {
+            "topLeft": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "topRight": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "bottomLeft": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            },
+            "bottomRight": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            }
+          }
+        },
+        {
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "pool": "cultivation",
+          "corner_pixels": {
+            "topLeft": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "topRight": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "bottomLeft": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            },
+            "bottomRight": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            }
+          }
+        },
+        {
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "pool": "dragon_knight",
+          "corner_pixels": {
+            "topLeft": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "topRight": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "bottomLeft": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            },
+            "bottomRight": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            }
+          }
+        },
+        {
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "pool": "summer",
+          "corner_pixels": {
+            "topLeft": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "topRight": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "bottomLeft": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            },
+            "bottomRight": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            }
+          }
+        },
+        {
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "pool": "map",
+          "corner_pixels": {
+            "topLeft": {
+              "rgb": [
+                231,
+                205,
+                167,
+                255
+              ],
+              "gold": true
+            },
+            "topRight": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "bottomLeft": {
+              "rgb": [
+                140,
+                109,
+                37,
+                255
+              ],
+              "gold": true
+            },
+            "bottomRight": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            }
+          }
+        },
+        {
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "pool": "cultivation",
+          "corner_pixels": {
+            "topLeft": {
+              "rgb": [
+                231,
+                205,
+                167,
+                255
+              ],
+              "gold": true
+            },
+            "topRight": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "bottomLeft": {
+              "rgb": [
+                146,
+                116,
+                46,
+                255
+              ],
+              "gold": true
+            },
+            "bottomRight": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            }
+          }
+        },
+        {
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "pool": "dragon_knight",
+          "corner_pixels": {
+            "topLeft": {
+              "rgb": [
+                231,
+                205,
+                167,
+                255
+              ],
+              "gold": true
+            },
+            "topRight": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "bottomLeft": {
+              "rgb": [
+                140,
+                108,
+                39,
+                255
+              ],
+              "gold": true
+            },
+            "bottomRight": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            }
+          }
+        },
+        {
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "pool": "summer",
+          "corner_pixels": {
+            "topLeft": {
+              "rgb": [
+                231,
+                205,
+                167,
+                255
+              ],
+              "gold": true
+            },
+            "topRight": {
+              "rgb": [
+                239,
+                212,
+                172,
+                255
+              ],
+              "gold": true
+            },
+            "bottomLeft": {
+              "rgb": [
+                138,
+                110,
+                40,
+                255
+              ],
+              "gold": true
+            },
+            "bottomRight": {
+              "rgb": [
+                151,
+                118,
+                40,
+                255
+              ],
+              "gold": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Native Panorama JS and CSS compilation",
+      "passed": true,
+      "sources_per_view": 2,
+      "views": [
+        "candidate",
+        "live"
+      ]
+    }
+  ],
+  "preview": {
+    "path": "docs/evidence/lottery_detail_alignment_20261019/dragon_knight_details.png",
+    "sha256": "276d4632156dbf5a43fb7fb187510fdb6c00ea9d13e07be951b3c209940f38b2",
+    "not_game_capture": true
+  },
+  "live_dota_verified": false,
+  "limitations": [
+    "Component previews execute candidate production XML/JS/CSS with local fixture balances; no running Dota game was available for visual verification.",
+    "Unrelated pending fullscreen/result/shadow edits remain in the shared working view and its separately compiled runtime resources."
+  ]
+}

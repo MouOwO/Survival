@@ -90,14 +90,18 @@
         art(shell,"","final_header_rule",35,118,1608,6);
         art(shell,"","final_sidebar_rule",332,123,5,746);
         art(shell,"LotteryGW2FooterRule","final_footer_rule",334,802,1309,5);
-        // Valve's sliced border keeps the corners crisp at the full window size.
+        // Valve's straight GoldBorder meets the rectangular backing at all four
+        // corners; an inward-cut border exposes dark blocks outside its curve.
         var officialFrame=make("Panel",shell,"LotteryGW2OfficialFrame","LotteryGW2OfficialFrame");place(officialFrame,35,45,1608,824);
-        style(officialFrame,{backgroundImage:"none",backgroundColor:"transparent",borderImageSource:'url("s2r://panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex")',borderWidth:"10px",borderImageSlice:"20px",zIndex:"20"});
+        style(officialFrame,{backgroundImage:"none",backgroundColor:"transparent",zIndex:"20"});
         officialFrame.hittest=false;officialFrame.hittestchildren=false;
         var header=make("Panel",shell,"LotteryGW2Header"); place(header,35,45,1608,74);style(header,{zIndex:"4"});
         var sidebarPanel=make("Panel",shell,"LotteryGW2Sidebar"); place(sidebarPanel,35,123,299,746);style(sidebarPanel,{zIndex:"4"});
         var content=make("Panel",shell,"LotteryGW2Content"); place(content,334,123,1309,681); style(content,{overflow:"clip",flowChildren:"none",zIndex:"2"});
         var detail=make("Panel",shell,"LotteryGW2DetailLayer"); place(detail,0,0,1672,941); detail.hittest=false;style(detail,{zIndex:"8"});
+        // The modal manager raises this ancestry. Keep the outer frame in the
+        // same layer so the details backing cannot paint over its bottom edge.
+        officialFrame.SetParent(detail);
         // UILayers raises the details ancestry. Keep its tooltip in that same
         // layer so the authoritative details panel cannot cover the tooltip.
         var tooltip=make("Panel",detail,"LotteryGW2Tooltip","LotteryGW2Tooltip"); tooltip.hittest=false; tooltip.hittestchildren=false; tooltip.visible=false;
@@ -123,15 +127,14 @@
         place(view.back.Children()[0],24,0,54,46);style(view.back.Children()[0],{horizontalAlign:"left",verticalAlign:"top",fontSize:"26px"});art(view.back,"","final_back_arrow",4,6,17,31);
         view.ticket=label(header,"LotteryGW2TicketBalance","抽奖券 —",708,21,340,34,25,"#e6dfd0");
         style(view.ticket,{whiteSpace:"nowrap",textOverflow:"shrink"});
-        var ticketAt=String(view.ticket.style.position).split(" "),ticketWidth=parseFloat(view.ticket.style.width),ticketHeight=parseFloat(view.ticket.style.height);
-        view.ticketHost=make("Panel",header,"LotteryGW2TicketCurrency");place(view.ticketHost,parseFloat(ticketAt[0]),parseFloat(ticketAt[1]),ticketWidth,ticketHeight);style(view.ticketHost,{width:"fit-children",height:"40px",flowChildren:"right"});view.ticketHost.hittest=false;view.ticketHost.hittestchildren=true;
-        view.ticket.SetParent(view.ticketHost);place(view.ticket,0,0,ticketWidth-88,ticketHeight);style(view.ticket,{width:"fit-children",maxWidth:(ticketWidth-88)+"px",height:"fit-children",verticalAlign:"center",ignoreParentFlow:"false"});view.ticket.text="—";
-        view.ticketIcon=make("Panel",view.ticketHost,"LotteryGW2TicketIcon");place(view.ticketIcon,0,0,36,29);style(view.ticketIcon,{verticalAlign:"center",ignoreParentFlow:"false",marginRight:"8px"});view.ticketIcon.hittest=false;view.ticketIcon.hittestchildren=false;
+        view.ticketHost=make("Panel",header,"LotteryGW2TicketCurrency");place(view.ticketHost,1142,8,372,58);style(view.ticketHost,{flowChildren:"none",overflow:"clip"});view.ticketHost.hittest=false;view.ticketHost.hittestchildren=true;
+        view.ticket.SetParent(view.ticketHost);place(view.ticket,298,12,34,34);style(view.ticket,{lineHeight:"34px",textAlign:"center"});view.ticket.text="—";
+        view.ticketIcon=make("Panel",view.ticketHost,"LotteryGW2TicketIcon");place(view.ticketIcon,218,0,72,58);view.ticketIcon.hittest=false;view.ticketIcon.hittestchildren=false;
         if(view.ticketHost.MoveChildBefore)view.ticketHost.MoveChildBefore(view.ticketIcon,view.ticket);
         // Keep the controller's original purchase callback and current-pool
         // routing; only replace its presentation with the shop's recharge affordance.
-        var purchase=move("LotteryTicketPurchase",view.ticketHost);place(purchase,0,0,32,32);purchase.AddClass("LotteryGW2Recharge");purchase.hittestchildren=false;
-        style(purchase,{verticalAlign:"center",ignoreParentFlow:"false",marginLeft:"8px"});purchase.Children().forEach(function(c){c.visible=false;});
+        var purchase=move("LotteryTicketPurchase",view.ticketHost);place(purchase,340,13,32,32);purchase.AddClass("LotteryGW2Recharge");purchase.hittestchildren=false;
+        purchase.Children().forEach(function(c){c.visible=false;});
         var plus=make("Image",purchase,"LotteryGW2PurchasePlus","LotteryGW2RechargeIcon");plus.SetImage("file://{images}/control_icons/24px/plus.svg");plus.hittest=false;
         move("LotteryCloseButton",header); place(p("LotteryCloseButton"),1538,11,51,53);style(p("LotteryCloseButton"),{backgroundImage:"none",backgroundColor:"#51483a",border:"0px"});p("LotteryCloseButton").Children().forEach(function(c){c.visible=false;});
         art(p("LotteryCloseButton"),"","final_close_frame",0,0,51,53);art(p("LotteryCloseButton"),"","final_close_cross",8,8,37,37);
@@ -158,14 +161,16 @@
                 var id=String(pool.id),b=make("Button",view.sidebar,"LotteryGW2Pool_"+id,"LotteryGW2Pool"); place(b,box[0],box[1],box[2],box[3]); b.hittestchildren=false;
                 var frame=make("Panel",b,"","LotteryGW2PoolSkin");place(frame,0,0,parseFloat(b.style.width),parseFloat(b.style.height));frame.hittest=false;frame.hittestchildren=false;
                 style(frame,{padding:"0px",minWidth:"0px",minHeight:"0px",backgroundImage:'url("s2r://panorama/images/events/crownfall/buttons/tabs_background_png.vtex")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",backgroundColor:"transparent",border:"0px",overflow:"clip"});
-                var name=label(b,"",String(pool.display_name||id),index?18:22,[27,26,27,30][index]||26,232,44,31,"#e4d6bc");
-                var state=label(b,"","",index?20:25,[68,75,76,78][index]||75,228,40,22,"#d0d0c5");
+                var width=box[2],height=box[3],name=label(b,"",String(pool.display_name||id),36,(height-44)/2,width-72,44,31,"#e4d6bc");name.AddClass("LotteryGW2PoolTitle");style(name,{textAlign:"center",lineHeight:"44px",whiteSpace:"nowrap",textOverflow:"shrink"});
+                var state=label(b,"","",15,height-31,width-30,22,16,"#d0d0c5");state.AddClass("LotteryGW2PoolLock");style(state,{textAlign:"center",whiteSpace:"nowrap",textOverflow:"shrink"});
+                var marks=[label(b,"","◆",14,(height-28)/2,22,28,20,"#ffe69e"),label(b,"","◆",width-36,(height-28)/2,22,28,20,"#ffe69e")];marks.forEach(function(mark){mark.AddClass("LotteryGW2PoolSelectionMark");style(mark,{textAlign:"center",lineHeight:"28px"});});
                 b.SetPanelEvent("onactivate",function(){if(!canAct())return;hideTooltip();if(mode==="history")invoke("SelectHistoryPool",id);else invoke("SelectPool",id);});
-                view.tabs.push({id:id,button:b,frame:frame,name:name,state:state});
+                view.tabs.push({id:id,button:b,frame:frame,name:name,state:state,marks:marks});
             });
         }
         view.tabs.forEach(function(tab,index){var pool=pools[index]||{},on=tab.id===selected;tab.button.SetHasClass("Selected",on);style(tab.button,{backgroundImage:"none",backgroundColor:"transparent"});
-            tab.state.text=pool.unlocked===false?"未解锁  "+number(pool.unlock_progress)+" / "+number(pool.unlock_required):String(pool.ticket_name||((pool.ticket_content_id==="special_lottery_ticket")?"金色抽奖券":""));
+            var locked=pool.unlocked===false;tab.state.text=locked?"未解锁  "+number(pool.unlock_progress)+" / "+number(pool.unlock_required):"";style(tab.state,{visibility:locked?"visible":"collapse"});
+            tab.marks.forEach(function(mark){style(mark,{visibility:on?"visible":"collapse"});});
             style(tab.name,{color:on?"#ffdf94":"#e7ddc8",textShadow:"#000000aa 0px 1px 2px 1.0"});style(tab.state,{color:on?"#e6c990":"#b9ae96",textShadow:"#00000088 0px 1px 2px 1.0"});
         });
     }
@@ -274,7 +279,8 @@
         var film=p("LotteryCinematicSurface");if(valid(film)){moveNode(film,view.content);place(film,98,6,1113,669);}
         view.preview.style.visibility=drawVisible?"visible":"collapse";
         if(!mode)view.title.text="抽奖";
-        view.ticket.text=number(pool&&pool.tickets);ticketIcon(view.ticketIcon,pool);
+        var ticketText=number(pool&&pool.tickets),ticketWidth=Math.min(252,Math.max(34,ticketText.length*16)),ticketX=332-ticketWidth;
+        view.ticket.text=ticketText;place(view.ticket,ticketX,12,ticketWidth,34);place(view.ticketIcon,ticketX-80,0,72,58);ticketIcon(view.ticketIcon,pool);
         fit();
     }
     // Preview is presentation only: cards retain the controller's click/hover bindings.
