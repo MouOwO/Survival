@@ -1,0 +1,137 @@
+{
+  "themes": [
+    {
+      "id": "01",
+      "name": "经典灰蓝 · 兵器库",
+      "palette": [
+        "#121b21",
+        "#25313a",
+        "#a9b8c5",
+        "#dfdfd5"
+      ],
+      "assets": {
+        "window": "UI04795",
+        "header": "UI04813",
+        "content": "UI01932",
+        "sidebar": "UI02971",
+        "detail": "UI02975",
+        "button": "C01"
+      },
+      "notes": "最接近默认Dota工具型界面。顶部灰蓝拉丝条，左侧深色纵向导航，中间浅一点的灰石纹，右侧官方tooltip底板。",
+      "title": "经典灰蓝",
+      "family": "兵器库",
+      "summary": "冷灰石板 · 灰蓝拉丝 · 清晰分区"
+    },
+    {
+      "id": "02",
+      "name": "金色史册 · 倾天之战",
+      "palette": [
+        "#1a1b22",
+        "#4c3c29",
+        "#bd9b59",
+        "#eee2bd"
+      ],
+      "assets": {
+        "window": "UI01838",
+        "header": "UI01854",
+        "ornament": "UI01797",
+        "content": "UI01932",
+        "frame": "UI01805",
+        "button": "UI01790",
+        "button_outline": "UI01794",
+        "tab": "UI01799"
+      },
+      "notes": "Crownfall官方金色几何装饰，蓝黑顶栏配棕色画板主底，左边金色细边标签。徽记只作横向细线，避免整窗大金框。",
+      "title": "倾天史册",
+      "family": "倾天之战",
+      "summary": "棕金画板 · 几何金饰 · 藏品档案"
+    },
+    {
+      "id": "03",
+      "name": "黑金圣殿 · Dota Plus",
+      "palette": [
+        "#171614",
+        "#323029",
+        "#d4ae61",
+        "#f0e2b8"
+      ],
+      "assets": {
+        "window": "UI01575",
+        "header": "UI01577",
+        "content": "UI01932",
+        "detail": "UI01576",
+        "button": "UI01594",
+        "official_button_style": "C05",
+        "ornament": "UI01578",
+        "frame": "UI02028"
+      },
+      "notes": "高分辨率黑色斜纹石板，左上官方金光，金色选中按钮与金色进度条。不要使用巨大的Dota Plus品牌Logo冒充游戏存档标识，Logo可省略。",
+      "title": "黑金珍藏",
+      "family": "Dota Plus",
+      "summary": "深色石纹 · 暖金横光 · 精致细边"
+    },
+    {
+      "id": "04",
+      "name": "冰蓝银辉 · 霜冻之境",
+      "palette": [
+        "#132331",
+        "#254353",
+        "#94c8dd",
+        "#dce9ed"
+      ],
+      "assets": {
+        "window": "UI01774",
+        "header": "UI01835",
+        "content": "UI01932",
+        "frame": "UI02171",
+        "thin_frame": "UI01805",
+        "horizontal_rule": "UI02155",
+        "button": "C01",
+        "ornament": "UI01437"
+      },
+      "notes": "雪山背景仅露出顶部与侧面，正文深灰半透明衬底保证可读性。官方冰霜边框保留四角自然细节、禁止拉宽使边缘粗细失真。",
+      "title": "冰蓝银辉",
+      "family": "霜冻之境",
+      "summary": "雪山横幅 · 冰霜银边 · 冷蓝层次"
+    },
+    {
+      "id": "05",
+      "name": "暮紫典藏 · 铜饰木板",
+      "palette": [
+        "#191722",
+        "#352538",
+        "#a98a62",
+        "#ded5d0"
+      ],
+      "assets": {
+        "window": "UI02067",
+        "header": "UI01991",
+        "sidebar": "UI02079",
+        "content": "UI01992",
+        "frame": "UI02081",
+        "button_frame": "UI01989",
+        "button": "C04",
+        "row_frame": "UI02028"
+      },
+      "notes": "官方Dark Carnival紫色木板与铜铆钉框，主内容仍用深灰文字区，移除小丑/手掌/马戏品牌角色装饰。纹理与边框形成可见材质差异。",
+      "title": "暮紫典藏",
+      "family": "暗黑狂欢节",
+      "summary": "紫色木纹 · 铜色饰边 · 沉静藏品"
+    }
+  ],
+  "navigationIcons": {
+    "overview": "UI01234",
+    "collection": "UI01313",
+    "achievement": "UI01212",
+    "profile": "UI01276",
+    "challenge": "UI01296",
+    "effects": "UI01316",
+    "search": "UI01286",
+    "locked": "UI01246",
+    "unlocked": "UI01175",
+    "close": "UI01325",
+    "list": "UI01548",
+    "stats": "UI01542",
+    "favorite": "UI01303"
+  }
+}

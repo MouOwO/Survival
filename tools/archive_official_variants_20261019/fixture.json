@@ -1,0 +1,807 @@
+{
+  "notice": "本文件仅为界面方案对比样例。道具名称与效果来自真实静态配置；解锁状态、通关计数均为预览样例，不代表任何玩家账号存档。",
+  "page": "points",
+  "statePresentation": "唯一积分道具仅显示已解锁/未解锁；不用拥有数量、0/1角标或数量进度条。",
+  "categories": [
+    {
+      "id": "clear",
+      "name": "通关存档",
+      "renderer": "achievements"
+    },
+    {
+      "id": "shadow",
+      "name": "虚空之影",
+      "renderer": "inventory"
+    },
+    {
+      "id": "points",
+      "name": "积分道具",
+      "renderer": "inventory"
+    },
+    {
+      "id": "starjoy_points",
+      "name": "星悦积分",
+      "renderer": "achievements"
+    },
+    {
+      "id": "gift",
+      "name": "福利礼包",
+      "renderer": "achievements"
+    },
+    {
+      "id": "titles",
+      "name": "称号",
+      "renderer": "titles"
+    },
+    {
+      "id": "fragment",
+      "name": "神兵碎片",
+      "renderer": "inventory"
+    },
+    {
+      "id": "map_level",
+      "name": "地图等级",
+      "renderer": "achievements"
+    },
+    {
+      "id": "pet",
+      "name": "秘法牢笼",
+      "renderer": "inventory"
+    },
+    {
+      "id": "work",
+      "name": "上班福利",
+      "renderer": "upgrades"
+    },
+    {
+      "id": "endless",
+      "name": "无尽存档",
+      "renderer": "achievements"
+    },
+    {
+      "id": "fishing",
+      "name": "钓鱼存档",
+      "renderer": "inventory"
+    },
+    {
+      "id": "building",
+      "name": "存档神器",
+      "renderer": "upgrades"
+    },
+    {
+      "id": "boss",
+      "name": "boss存档",
+      "renderer": "achievements"
+    },
+    {
+      "id": "commerce_goods",
+      "name": "商城道具",
+      "renderer": "commerce_goods"
+    }
+  ],
+  "allCategories": [
+    {
+      "id": "endless",
+      "name": "无尽存档"
+    },
+    {
+      "id": "clear",
+      "name": "通关存档"
+    },
+    {
+      "id": "shadow",
+      "name": "虚空之影"
+    },
+    {
+      "id": "points",
+      "name": "积分道具"
+    },
+    {
+      "id": "map_level",
+      "name": "地图等级"
+    },
+    {
+      "id": "work",
+      "name": "上班福利"
+    },
+    {
+      "id": "gift",
+      "name": "福利礼包"
+    },
+    {
+      "id": "fragment",
+      "name": "神兵碎片"
+    },
+    {
+      "id": "pet",
+      "name": "秘法牢笼"
+    },
+    {
+      "id": "boss",
+      "name": "boss存档"
+    },
+    {
+      "id": "friend",
+      "name": "我的好基友"
+    },
+    {
+      "id": "ex",
+      "name": "我的前女友"
+    },
+    {
+      "id": "beast",
+      "name": "瑞兽赐福"
+    },
+    {
+      "id": "fishing",
+      "name": "钓鱼存档"
+    },
+    {
+      "id": "building",
+      "name": "存档神器"
+    },
+    {
+      "id": "starjoy_points",
+      "name": "星悦积分"
+    },
+    {
+      "id": "titles",
+      "name": "称号"
+    },
+    {
+      "id": "wife",
+      "name": "我的老婆"
+    },
+    {
+      "id": "commerce_goods",
+      "name": "商城道具"
+    }
+  ],
+  "points": [
+    {
+      "id": "lottery_gale_bow",
+      "name": "疾风弓",
+      "description": "英雄攻速+5% 最终伤害+5% 星悦积分+10",
+      "effects": [
+        "英雄攻速+5%",
+        "最终伤害+5%",
+        "星悦积分+10"
+      ],
+      "quality": "SR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 100,
+      "exchangePoints": 1288,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gale_bow.vtex",
+      "officialIconUri": "file://{images}/items/grove_bow.png",
+      "nativeName": "grove_bow",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_soul_devouring_blade",
+      "name": "噬魂灵剑",
+      "description": "英雄造成伤害加攻击+2 英雄造成伤害加三围+1 星悦积分+20",
+      "effects": [
+        "英雄造成伤害加攻击+2",
+        "英雄造成伤害加三围+1",
+        "星悦积分+20"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": 2388,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_soul_devouring_blade.vtex",
+      "officialIconUri": "file://{images}/items/diffusal_blade.png",
+      "nativeName": "diffusal_blade",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_crystalline_armor",
+      "name": "晶态护甲",
+      "description": "墙护甲+30墙每秒护甲+0.1生命加成+10%墙护甲加成+10%墙每秒生命+10英雄全属性加成+8%星悦积分+88购买后自动激活",
+      "effects": [
+        "墙护甲+30墙每秒护甲+0.1生命加成+10%墙护甲加成+10%墙每秒生命+10英雄全属性加成+8%星悦积分+88购买后自动激活"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": 2388,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_crystalline_armor.vtex",
+      "officialIconUri": "file://{images}/items/shivas_guard.png",
+      "nativeName": "shivas_guard",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": false,
+      "sampleState": "未解锁"
+    },
+    {
+      "id": "lottery_gathering_divine_codex",
+      "name": "采集神典",
+      "description": "每秒金币+2 伐木效率+2 伐木工攻击间隔-0.02 墙每秒生命+30 墙伤害减免+3%星悦积分+30",
+      "effects": [
+        "每秒金币+2",
+        "伐木效率+2",
+        "伐木工攻击间隔-0.02",
+        "墙每秒生命+30",
+        "墙伤害减免+3%星悦积分+30"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": 2388,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_divine_codex.vtex",
+      "officialIconUri": "file://{images}/items/necronomicon_3.png",
+      "nativeName": "necronomicon_3",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_gathering_grimoire",
+      "name": "采集秘典",
+      "description": "伐木效率+1 人口+1 伐木工攻速+5% 星悦积分+20",
+      "effects": [
+        "伐木效率+1",
+        "人口+1",
+        "伐木工攻速+5%",
+        "星悦积分+20"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": 2388,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_gathering_grimoire.vtex",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "nativeName": "tome_of_knowledge",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_hero_medal",
+      "name": "英雄勋章",
+      "description": "英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88",
+      "effects": [
+        "英雄攻击全属性+5",
+        "英雄全属性加成+8%",
+        "英雄攻击减甲+4",
+        "英雄攻击速度加成+10%",
+        "英雄最终伤害+10%",
+        "星悦积分+88"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": 2388,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_hero_medal.vtex",
+      "officialIconUri": "file://{images}/items/medallion_of_courage.png",
+      "nativeName": "medallion_of_courage",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": false,
+      "sampleState": "未解锁"
+    },
+    {
+      "id": "lottery_magic_book",
+      "name": "魔法书",
+      "description": "墙护甲+30；墙每秒护甲+0.1；墙生命加成+10%；墙护甲加成+10%；墙每秒生命+10；英雄全属性加成+8%；星悦积分+88；获得后自动激活",
+      "effects": [
+        "墙护甲+30；墙每秒护甲+0.1；墙生命加成+10%；墙护甲加成+10%；墙每秒生命+10；英雄全属性加成+8%；星悦积分+88；获得后自动激活"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": null,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_magic_book.vtex",
+      "officialIconUri": "file://{images}/items/book_of_shadows.png",
+      "nativeName": "book_of_shadows",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_muramasa",
+      "name": "妖刀村正",
+      "description": "箭塔攻击减甲+1.5；箭塔最终伤害+40%；箭塔攻击加成+40%；英雄全属性加成+30%；英雄最终伤害+30%；英雄造成伤害加攻击+50；英雄攻击全属性+30；星悦积分+200；获得后自动激活；每持有一种UR道具额外增加4%英雄最终伤害（包含自身，重复分解不计）",
+      "effects": [
+        "箭塔攻击减甲+1.5；箭塔最终伤害+40%；箭塔攻击加成+40%；英雄全属性加成+30%；英雄最终伤害+30%；英雄造成伤害加攻击+50；英雄攻击全属性+30；星悦积分+200；获得后自动激活；每持有一种UR道具额外增加4%英雄最终伤害（包含自身，重复分解不计）"
+      ],
+      "quality": "UR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 1000,
+      "exchangePoints": null,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_muramasa.vtex",
+      "officialIconUri": "file://{images}/items/yasha.png",
+      "nativeName": "yasha",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_raven_eye",
+      "name": "渡鸦之眼",
+      "description": "金矿效率+10%；伐木效率+2；每秒金币+10；每秒木材+10；伐木工攻速+10%；英雄全属性加成+8%；星悦积分+88；获得后自动激活",
+      "effects": [
+        "金矿效率+10%；伐木效率+2；每秒金币+10；每秒木材+10；伐木工攻速+10%；英雄全属性加成+8%；星悦积分+88；获得后自动激活"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": null,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_raven_eye.vtex",
+      "officialIconUri": "file://{images}/items/eye_of_the_vizier.png",
+      "nativeName": "eye_of_the_vizier",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": false,
+      "sampleState": "未解锁"
+    },
+    {
+      "id": "lottery_spear_of_longinus",
+      "name": "朗基努斯枪",
+      "description": "每秒金币+80；每秒木材+80；伐木效率+15；金矿效率+25%；英雄全属性加成+25%；英雄最终伤害+32%（原25%加额外7%）；英雄每秒属性+3000；英雄攻击加成+25%；星悦积分+200；获得后自动激活",
+      "effects": [
+        "每秒金币+80；每秒木材+80；伐木效率+15；金矿效率+25%；英雄全属性加成+25%；英雄最终伤害+32%（原25%加额外7%）；英雄每秒属性+3000；英雄攻击加成+25%；星悦积分+200；获得后自动激活"
+      ],
+      "quality": "UR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 1000,
+      "exchangePoints": null,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_spear_of_longinus.vtex",
+      "officialIconUri": "file://{images}/items/dragon_lance.png",
+      "nativeName": "dragon_lance",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_titan_shield",
+      "name": "泰坦巨盾",
+      "description": "英雄生命值+50000 英雄全属性+3000 英雄护甲+100 星悦积分+30",
+      "effects": [
+        "英雄生命值+50000",
+        "英雄全属性+3000",
+        "英雄护甲+100",
+        "星悦积分+30"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": 2388,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_titan_shield.vtex",
+      "officialIconUri": "file://{images}/items/vanguard.png",
+      "nativeName": "vanguard",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_sword_of_promise",
+      "name": "誓约之剑",
+      "description": "英雄初始属性+30万；英雄造成伤害加攻击+50；英雄暴击伤害+200%；英雄攻击减甲+25；英雄攻击全属性+25；英雄全属性加成+25%；英雄最终伤害+25%；星悦积分+200；获得后自动激活",
+      "effects": [
+        "英雄初始属性+30万；英雄造成伤害加攻击+50；英雄暴击伤害+200%；英雄攻击减甲+25；英雄攻击全属性+25；英雄全属性加成+25%；英雄最终伤害+25%；星悦积分+200；获得后自动激活"
+      ],
+      "quality": "UR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 1000,
+      "exchangePoints": null,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_sword_of_promise.vtex",
+      "officialIconUri": "file://{images}/items/rapier.png",
+      "nativeName": "rapier",
+      "officialMappingSource": "item_resources.native_name",
+      "sampleUnlocked": false,
+      "sampleState": "未解锁"
+    },
+    {
+      "id": "lottery_attribute_crystal",
+      "name": "属性结晶",
+      "description": "英雄全属性+50",
+      "effects": [
+        "英雄全属性+50"
+      ],
+      "quality": "N",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 5,
+      "exchangePoints": 188,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_attribute_crystal.vtex",
+      "officialIconUri": "file://{images}/items/greater_crit.png",
+      "nativeName": "greater_crit",
+      "officialMappingSource": "lottery_item_definitions.icon (configured generic item icon)",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_protection_crystal",
+      "name": "防护结晶",
+      "description": "墙护甲+2",
+      "effects": [
+        "墙护甲+2"
+      ],
+      "quality": "N",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 5,
+      "exchangePoints": 188,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_protection_crystal.vtex",
+      "officialIconUri": "file://{images}/items/crimson_guard.png",
+      "nativeName": "crimson_guard",
+      "officialMappingSource": "lottery_item_definitions.icon (configured generic item icon)",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_nature_crystal",
+      "name": "自然结晶",
+      "description": "伐木速度+2%",
+      "effects": [
+        "伐木速度+2%"
+      ],
+      "quality": "N",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 5,
+      "exchangePoints": 188,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_nature_crystal.vtex",
+      "officialIconUri": "file://{images}/items/ogre_axe.png",
+      "nativeName": "ogre_axe",
+      "officialMappingSource": "lottery_item_definitions.icon (configured generic item icon)",
+      "sampleUnlocked": false,
+      "sampleState": "未解锁"
+    },
+    {
+      "id": "lottery_life_spirit",
+      "name": "生命精粹",
+      "description": "墙生命值+1000",
+      "effects": [
+        "墙生命值+1000"
+      ],
+      "quality": "R",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 25,
+      "exchangePoints": 588,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_life_spirit.vtex",
+      "officialIconUri": "file://{images}/items/crimson_guard.png",
+      "nativeName": "crimson_guard",
+      "officialMappingSource": "lottery_item_definitions.icon (configured generic item icon)",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_tower_retrofit",
+      "name": "箭塔改造",
+      "description": "箭塔攻速+20% 箭塔每秒攻击+2 箭塔攻击加成+5% 星悦 积分+20",
+      "effects": [
+        "箭塔攻速+20%",
+        "箭塔每秒攻击+2",
+        "箭塔攻击加成+5%",
+        "星悦",
+        "积分+20"
+      ],
+      "quality": "SSR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 400,
+      "exchangePoints": 2388,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_tower_retrofit.vtex",
+      "officialIconUri": "file://{images}/items/mjollnir.png",
+      "nativeName": "mjollnir",
+      "officialMappingSource": "lottery_item_definitions.icon (configured generic item icon)",
+      "sampleUnlocked": true,
+      "sampleState": "已解锁"
+    },
+    {
+      "id": "lottery_universal_tool",
+      "name": "万能工具",
+      "description": "伐木工攻速+3% 金矿效率+3% 星悦积分+10",
+      "effects": [
+        "伐木工攻速+3%",
+        "金矿效率+3%",
+        "星悦积分+10"
+      ],
+      "quality": "SR",
+      "duration": "永久",
+      "maxOwned": 1,
+      "duplicatePoints": 100,
+      "exchangePoints": 1288,
+      "iconUri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_universal_tool.vtex",
+      "officialIconUri": "file://{images}/items/ogre_axe.png",
+      "nativeName": "ogre_axe",
+      "officialMappingSource": "lottery_item_definitions.icon (configured generic item icon)",
+      "sampleUnlocked": false,
+      "sampleState": "未解锁"
+    }
+  ],
+  "clear": [
+    {
+      "id": "clear_n1_1",
+      "name": "N1（1次）",
+      "description": "木材+50",
+      "effects": [
+        "木材+50"
+      ],
+      "difficulty": "N1",
+      "target": 1,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 1,
+      "sampleUnlocked": true
+    },
+    {
+      "id": "clear_n1_3",
+      "name": "N1（3次）",
+      "description": "木材+80",
+      "effects": [
+        "木材+80"
+      ],
+      "difficulty": "N1",
+      "target": 3,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 3,
+      "sampleUnlocked": true
+    },
+    {
+      "id": "clear_n1_5",
+      "name": "N1（5次）",
+      "description": "木材+100",
+      "effects": [
+        "木材+100"
+      ],
+      "difficulty": "N1",
+      "target": 5,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 5,
+      "sampleUnlocked": true
+    },
+    {
+      "id": "clear_n2_1",
+      "name": "N2（1次）",
+      "description": "木材+100",
+      "effects": [
+        "木材+100"
+      ],
+      "difficulty": "N2",
+      "target": 1,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 1,
+      "sampleUnlocked": true
+    },
+    {
+      "id": "clear_n2_3",
+      "name": "N2（3次）",
+      "description": "木材+120",
+      "effects": [
+        "木材+120"
+      ],
+      "difficulty": "N2",
+      "target": 3,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 3,
+      "sampleUnlocked": true
+    },
+    {
+      "id": "clear_n2_5",
+      "name": "N2（5次）",
+      "description": "墙伤害抵挡+50",
+      "effects": [
+        "墙伤害抵挡+50"
+      ],
+      "difficulty": "N2",
+      "target": 5,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 5,
+      "sampleUnlocked": true
+    },
+    {
+      "id": "clear_n2_10",
+      "name": "N2（10次）",
+      "description": "墙减伤+0.5%",
+      "effects": [
+        "墙减伤+0.5%"
+      ],
+      "difficulty": "N2",
+      "target": 10,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 10,
+      "sampleUnlocked": true
+    },
+    {
+      "id": "clear_n3_1",
+      "name": "N3（1次）",
+      "description": "木材+120",
+      "effects": [
+        "木材+120"
+      ],
+      "difficulty": "N3",
+      "target": 1,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n3_3",
+      "name": "N3（3次）",
+      "description": "木材+120",
+      "effects": [
+        "木材+120"
+      ],
+      "difficulty": "N3",
+      "target": 3,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n3_5",
+      "name": "N3（5次）",
+      "description": "每秒木材+1",
+      "effects": [
+        "每秒木材+1"
+      ],
+      "difficulty": "N3",
+      "target": 5,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n3_10",
+      "name": "N3（10次）",
+      "description": "人口+1",
+      "effects": [
+        "人口+1"
+      ],
+      "difficulty": "N3",
+      "target": 10,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n3_20",
+      "name": "N3（20次）",
+      "description": "伐木数量+2",
+      "effects": [
+        "伐木数量+2"
+      ],
+      "difficulty": "N3",
+      "target": 20,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n4_1",
+      "name": "N4（1次）",
+      "description": "金币+140",
+      "effects": [
+        "金币+140"
+      ],
+      "difficulty": "N4",
+      "target": 1,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n4_3",
+      "name": "N4（3次）",
+      "description": "木材+160",
+      "effects": [
+        "木材+160"
+      ],
+      "difficulty": "N4",
+      "target": 3,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n4_5",
+      "name": "N4（5次）",
+      "description": "防御塔攻击+2%",
+      "effects": [
+        "防御塔攻击+2%"
+      ],
+      "difficulty": "N4",
+      "target": 5,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n4_10",
+      "name": "N4（10次）",
+      "description": "英雄攻击+5%",
+      "effects": [
+        "英雄攻击+5%"
+      ],
+      "difficulty": "N4",
+      "target": 10,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n4_20",
+      "name": "N4（20次）",
+      "description": "英雄造成伤害攻击+1",
+      "effects": [
+        "英雄造成伤害攻击+1"
+      ],
+      "difficulty": "N4",
+      "target": 20,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    },
+    {
+      "id": "clear_n5_1",
+      "name": "N5（1次）",
+      "description": "木材+160",
+      "effects": [
+        "木材+160"
+      ],
+      "difficulty": "N5",
+      "target": 1,
+      "iconStyle": "scroll",
+      "officialIconUri": "file://{images}/items/tome_of_knowledge.png",
+      "officialMappingSource": "preview-only Valve scroll substitution for configured scroll style; no production mapping change",
+      "sampleCount": 0,
+      "sampleUnlocked": false
+    }
+  ],
+  "sourceFiles": [
+    "data/csv/存档系统/archive_categories.csv",
+    "data/csv/存档系统/archive_achievements.csv",
+    "data/csv/抽奖系统/lottery_item_definitions.csv",
+    "panorama/src/scripts/custom_game/common/item_resources.js"
+  ]
+}
