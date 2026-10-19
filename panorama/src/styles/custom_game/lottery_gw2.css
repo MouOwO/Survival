@@ -359,3 +359,13 @@
 }
 #LotteryWindow #LotteryMainCanvas #LotteryGW2Back { brightness:1; }
 #LotteryWindow #LotteryMainCanvas #LotteryGW2Back:hover Label { color:#ffffff; }
+
+/* Single draw uses the same footprint as ten draws, without an outer frame. */
+#LotteryWindow.LotteryGW2ForestTheme #LotterySingleButton .LotteryGW2ButtonSurface,
+#LotteryWindow.LotteryGW2ForestTheme #LotterySingleButton:hover .LotteryGW2ButtonSurface,
+#LotteryWindow.LotteryGW2ForestTheme #LotterySingleButton:active .LotteryGW2ButtonSurface,
+#LotteryWindow.LotteryGW2ForestTheme #LotterySingleButton:disabled .LotteryGW2ButtonSurface {
+    border:0px;
+    box-shadow:none;
+}
+#LotteryWindow.LotteryGW2ForestTheme #LotterySingleButton .LotteryGW2DrawFocus { visibility:collapse; }

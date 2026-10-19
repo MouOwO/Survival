@@ -71,7 +71,7 @@ assert(!nodes.LotteryGW2PurchaseLabel,'the acquisition text is replaced by an ic
 assert.equal(nodes.LotteryCelestialFooter.style.position,'334px 123px 0px');assert.equal(nodes.LotteryCelestialFooter.style.width,'1309px');assert.equal(nodes.LotteryCelestialFooter.style.height,'746px');
 assert.strictEqual(nodes.LHDetails.parent,nodes.LotteryCelestialFooter,'the selected Emerald layout places the original details action in its footer');
 assert.equal(nodes.LotteryHeroCopy.style.position,'54px 51px 0px','the pool copy uses the accepted R5 upper-left content region');assert.equal(nodes.LotteryTitle.style.fontSize,'51px');assert.equal(nodes.LotteryTitle.style.position,'0px 31px 0px');
-assert.equal(nodes.LotterySingleButton.style.position,'781px 560px 0px');assert.equal(nodes.LotteryTenButton.style.position,'1021px 560px 0px');assert.equal(nodes.LotterySingleButton.style.width,'220px');assert.equal(nodes.LotteryTenButton.style.width,'244px');assert.equal(nodes.LotterySingleButton.style.height,'84px');assert.equal(nodes.LotteryTenButton.style.height,'84px');assert.equal(nodes.LotteryGW2Preview.style.position,'58px 467px 0px','the four-item showcase uses the accepted lower-left preview region');assert.equal(nodes.LotteryDrawPity.style.position,'1021px 529px 0px','the true pity caption is above the draw buttons');assert.equal(nodes.LotteryDrawPity.style.height,'20px');
+assert.equal(nodes.LotterySingleButton.style.position,'757px 560px 0px');assert.equal(nodes.LotteryTenButton.style.position,'1021px 560px 0px');assert.equal(nodes.LotterySingleButton.style.width,'244px');assert.equal(nodes.LotteryTenButton.style.width,'244px');assert.equal(nodes.LotterySingleButton.style.height,'84px');assert.equal(nodes.LotteryTenButton.style.height,'84px');assert.equal(nodes.LotteryGW2Preview.style.position,'58px 467px 0px','the four-item showcase uses the accepted lower-left preview region');assert.equal(nodes.LotteryDrawPity.style.position,'1021px 529px 0px','the true pity caption is above the draw buttons');assert.equal(nodes.LotteryDrawPity.style.height,'20px');
 for(const [id,x,w]of [['LHDetails',42,142],['LHHistory',201,142],['LotteryAnnouncement',360,104],['LotterySkipAnimation',476,112]]){assert.equal(nodes[id].style.position,x+'px 692px 0px','the original action remains in the accepted 65px footer');assert.equal(nodes[id].style.width,w+'px');assert.equal(nodes[id].style.height,'44px');}
 assert.equal(nodes.LotterySceneBackground.parent,nodes.LotteryGW2Root);assert.equal(nodes.LotterySceneBackground.style.position,'35px 123px 0px');assert.equal(nodes.LotterySceneBackground.style.width,'1608px');assert.equal(nodes.LotterySceneBackground.style.height,'746px');
 assert.equal(nodes.LotteryGW2Tooltip.parent,nodes.LotteryGW2DetailLayer,'tooltip shares the layer raised by details instead of sitting behind its ancestry');
@@ -97,6 +97,11 @@ function ticketAlignment(){
  assert.equal(icon.style.width,'62px');assert.equal(icon.style.height,'47px');assert.equal(count.style.width,Math.min(180,Math.max(28,String(count.text).length*16))+'px');assert.equal(count.style.height,'38px');assert.equal(count.style.whiteSpace,'nowrap');assert.equal(count.style.textOverflow,'clip');
  assert.strictEqual(plus.events.onactivate,ticketEvent,'layout preserves the controller purchase callback');
 }
+function ticketPurchasePolicy(expected){
+ assert.equal(nativeTicketPurchase.visible,expected,'only a special-ticket pool exposes the purchase affordance');
+ assert.equal(nativeTicketPurchase.enabled,expected);assert.equal(nativeTicketPurchase.hittest,expected);
+ assert.strictEqual(nativeTicketPurchase.events.onactivate,ticketEvent,'changing ticket eligibility never replaces its real purchase callback');
+}
 function drawAlignment(id){
  const button=nodes[id],content=button.children.find(child=>child.BHasClass('ZXDrawContent')),cost=content.children.find(child=>child.BHasClass('ZXDrawCost')),title=nodes[id==='LotterySingleButton'?'LotterySingleText':'LotteryTenText'];
  assert(content&&cost,'the controller-owned caption and cost group remain present');
@@ -107,6 +112,11 @@ function drawAlignment(id){
  assert.strictEqual(price.parent,cost);assert.equal(price.style.textOverflow,'clip','live prices retain their full native glyph size');assert.equal(price.style.fontSize,'18px');assert.equal(price.style.lineHeight,'26px');assert.equal(content.style.height,button.BHasClass('ZXFreeDraw')?'32px':'70px','a free title occupies the centered single-line row');
  if(button.BHasClass('ZXFreeDraw'))assert.equal(cost.style.visibility,'collapse','free single draws omit a misleading ticket cost');
  else{assert.equal(cost.style.visibility,'visible');assert.equal(parseFloat(title.style.position.split(' ')[1])+parseFloat(title.style.height)+2,parseFloat(cost.style.position.split(' ')[1]),'the title and live price occupy separate rows with a two-pixel gap');assert.equal(parseFloat(cost.style.position)+parseFloat(cost.style.width)/2,parseFloat(content.style.width)/2,'the live cost is centered below its caption');assert.equal(cost.style.height,'36px');assert.equal(cost.children.find(child=>child.BHasClass('LHDrawTicket')).style.width,'52px');}
+ if(id==='LotterySingleButton'){
+  assert.equal(button.style.border,'0px');
+  const focus=button.children.find(child=>child.BHasClass('LotteryGW2DrawFocus'));
+  assert(!focus||focus.visible===false,'single draw suppresses its outer focus frame');
+ }
 }
 function poolNavigation(active){
  assert.equal(nodes.LotteryGW2Fullscreen.style.backgroundImage,'url("file://{images}/custom_game/lottery_cinematic_v1/'+active+'.png")','fullscreen results reuse the active real pool scene');
@@ -146,11 +156,13 @@ const lockCaption=nodes.LotteryGW2Pool_cultivation.children.find(child=>child.BH
 events.ui_lottery_snapshot(data());assert.equal(lockCaption.style.visibility,'visible');assert.equal(lockCaption.text,'普通抽奖券','unlock updates restore the live ticket subtitle');assert.strictEqual(nodes.LotteryGW2Pool_cultivation.events.onactivate,cultivationAction,'unlock updates keep the actual tab callback');
 const absent=data();delete absent.shop_points;events.ui_lottery_snapshot(absent);events.ui_lottery_snapshot({...data(),shop_points:0});assert(!nodes.LotteryGW2Points&&!nodes.LotteryGW2StarjoyPoints,'balance snapshots do not recreate removed header balances');events.ui_lottery_snapshot(data());
 const ticketPurchases=[];config.SurvivalCommerceView={OpenTicketPurchase:pool=>{ticketPurchases.push(pool);return true;}};
-for(const id of ['map','summer']){
- current.SelectPool(id);const ticketData=data(id);ticketData.selected_pool.ticket_content_id=id==='map'?'lottery_ticket':'special_lottery_ticket';events.ui_lottery_snapshot(ticketData);
+for(const id of ['map','cultivation','dragon_knight','summer']){
+ current.SelectPool(id);const ticketData=data(id),special=id==='dragon_knight'||id==='summer';ticketData.selected_pool.ticket_content_id=special?'special_lottery_ticket':'lottery_ticket';events.ui_lottery_snapshot(ticketData);
  ticketAlignment();poolNavigation(id);
- nativeTicketPurchase.events.onactivate();const purchase=ticketPurchases.at(-1);assert.equal(purchase.id,id,'the plus button routes the selected pool');assert.equal(purchase.ticket_content_id,ticketData.selected_pool.ticket_content_id,'the correct ticket type reaches the existing purchase flow');
+ ticketPurchasePolicy(special);
+ if(special){nativeTicketPurchase.events.onactivate();const purchase=ticketPurchases.at(-1);assert.equal(purchase.id,id,'the plus button routes the selected pool');assert.equal(purchase.ticket_content_id,ticketData.selected_pool.ticket_content_id,'the correct ticket type reaches the existing purchase flow');}
 }
+assert.equal(ticketPurchases.length,2,'only the two special-ticket pools expose native purchase actions');
 delete config.SurvivalCommerceView;current.SelectPool('map');events.ui_lottery_snapshot(data());
 assert.equal(presentation.Inspect().pools,4);assert.equal(nodes.LotteryGW2Sidebar.children.length,4);
 assert.equal(nodes.LotteryGW2PreviewItems.children.length,4);assert.equal(nodes.LotterySceneBackground.style.opacity,'1','retain the existing pool illustration');
@@ -160,16 +172,22 @@ function previewAlignment(){
  for(const [index,card]of cards.entries()){
   const host=card.children.find(n=>n.BHasClass('LotteryGW2PreviewNameHost')),caption=host.children[0],icon=card.children.find(n=>n.BHasClass('LotteryGW2PreviewIcon'));
   assert.equal(card.style.position,(index*148)+'px 0px 0px','sparse showcases retain the accepted left-to-right R5 slots');assert.equal(card.style.width,'132px');assert(parseFloat(card.style.position)+parseFloat(card.style.width)<=w,'each actual preview remains inside the showcase');
-  const well=card.children.find(n=>n.BHasClass('LotteryGW2PreviewWell'));assert.equal(well.style.width,'111px');assert.equal(well.style.height,'111px');assert.equal(icon.style.width,'91px');assert.equal(icon.style.height,'91px');assert.equal(caption.style.fontSize,'13px');
+  const well=card.children.find(n=>n.BHasClass('LotteryGW2PreviewWell'));assert.equal(well.style.width,'111px');assert.equal(well.style.height,'111px');assert.equal(icon.style.width,'91px');assert.equal(icon.style.height,'91px');assert.equal(caption.style.fontSize,'19.5px');assert.equal(host.style.height,'30px');
+  const shared=new Panel('Panel',null,'');config.SurvivalItemResources.ApplyBackground(shared,card.__lotteryItem);
+  for(const property of ['backgroundImage','backgroundColor','backgroundImgOpacity'])assert.equal(well.style[property],shared.style[property],'preview quality plate comes from the shared item factory');
+  assert.equal(well.style.border,'0px');assert.equal(well.style.boxShadow,'none');assert.equal(icon.style.border,'0px');assert.equal(icon.style.boxShadow,'none');assert.equal(icon.style.backgroundImage,'none','canonical item art stays transparent over its shared well');
+  assert(!card.children.some(child=>child.BHasClass('LotteryGW2PreviewRarity')),'main preview omits quality-letter badges');
+  assert(!card.children.some(child=>child.BHasClass('LotteryGW2Surface')&&child.style.height==='1px'),'main preview omits the decorative name underline');
   assert.equal(parseFloat(String(icon.style.position).split(' ')[0])+parseFloat(icon.style.width)/2,parseFloat(host.style.width)/2,'Caption host and icon share one center axis');
   assert.equal(caption.style.width,'fit-children');assert.equal(caption.style.height,'fit-children');assert.equal(caption.style.horizontalAlign,'center');assert.equal(caption.style.verticalAlign,'center');
  }
 }
+assert.equal(nodes.LotteryGW2PreviewCaption.style.fontSize,'18px','the preview heading is 1.5 times its original size');
 previewAlignment();
 const varied=data();varied.items=['ur','ssr','sr','r'].flatMap(quality=>Array.from({length:3},(_,i)=>({id:quality+i,name:quality+' 实际奖励 '+i,quality,icon:'item_blink'})));events.ui_lottery_snapshot(varied);
 const previewCards=nodes.LotteryGW2PreviewItems.children;assert.equal(previewCards.length,4);assert(previewCards.every(card=>varied.items.includes(card.__lotteryItem)),'preview cards use only rewards supplied by the current snapshot');
 assert.deepEqual(previewCards.map(card=>card.__lotteryItem.id),['ur0','ur1','ur2','ssr0'],'the four-item showcase selects the highest-rarity authoritative rewards');
-for(const card of previewCards){const well=card.children.find(child=>child.BHasClass('LotteryGW2PreviewWell'));assert.equal(well.style.borderColor,config.SurvivalRewardPresentation.NameColor(card.__lotteryItem.quality),'rarity color comes from the shared factory');}
+for(const card of previewCards){const well=card.children.find(child=>child.BHasClass('LotteryGW2PreviewWell'));assert.equal(well.__survivalItemGrade,config.SurvivalItemResources.Grade(card.__lotteryItem),'the actual snapshot rarity reaches the shared quality factory');}
 previewAlignment();
 for(const count of [0,1,2,3]){const sample=data();sample.items=sample.items.slice(0,count);events.ui_lottery_snapshot(sample);if(count)previewAlignment();else assert.equal(nodes.LotteryGW2Preview.visible,false,'empty snapshots do not display placeholder prizes');}
 events.ui_lottery_snapshot(data());

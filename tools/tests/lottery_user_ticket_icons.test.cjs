@@ -75,8 +75,64 @@ test('Every pool switch binds header, legacy header and both draw costs to the s
   h.config.LotteryHandoff.Ticket(data.selected_pool);presentation.Pools(data.pools,id);presentation.Snapshot(data);
   for(const icon of [...h.icons(),h.nodes.LotteryGW2TicketIcon])assertOriginalArt(icon,uri);
   assert.equal(h.nodes.LotteryGW2TicketBalance.text,'23');assert.equal(JSON.stringify(data),unchanged);
+  const special=data.selected_pool.ticket_content_id==='special_lottery_ticket',purchase=h.nodes.LotteryTicketPurchase;
+  assert.equal(purchase.visible,special);
+  assert.equal(purchase.enabled,special);assert.equal(purchase.hittest,special);
  }
  assert.equal(h.requests.length,0,'Presenting ticket artwork never sends a draw or purchase');
+});
+
+test('Purchase visibility follows the explicit ticket identity before pool fallback and preserves its native callback',()=>{
+ const h=fixture(),presentation=h.config.SurvivalPurpleLottery,purchase=h.nodes.LotteryTicketPurchase;
+ const activated=[],callback=()=>activated.push('purchase');purchase.SetPanelEvent('onactivate',callback);
+ presentation.Open();
+ for(const [id,ticket,expected]of [
+  ['map','lottery_ticket',false],['cultivation','lottery_ticket',false],
+  ['dragon_knight','special_lottery_ticket',true],['summer','special_lottery_ticket',true],
+  ['summer','lottery_ticket',false],['map','special_lottery_ticket',true],
+  ['summer','unknown_ticket',false],['dragon_knight',undefined,true],['map',undefined,false],
+  ['summer','',true],['cultivation','',false]
+ ]){
+  const data=snapshot(id);if(ticket===undefined)delete data.selected_pool.ticket_content_id;else data.selected_pool.ticket_content_id=ticket;
+  const untouched=JSON.stringify(data);presentation.Pools(data.pools,id);presentation.Snapshot(data);
+  assert.equal(purchase.visible,expected,id+' / '+String(ticket)+' purchase visibility');
+  assert.equal(purchase.enabled,expected);assert.equal(purchase.hittest,expected);
+  assert.strictEqual(purchase.events.onactivate,callback,'pool repaint never replaces the existing purchase callback');
+  assert.equal(JSON.stringify(data),untouched,'purchase policy does not rewrite the authoritative ticket identity');
+ }
+ assert.deepEqual(activated,[],'presentation alone never opens a purchase');
+ assert.equal(h.requests.length,0);
+});
+
+test('Main preview uses only the shared quality plate, transparent canonical art and larger names',()=>{
+ const h=fixture(),presentation=h.config.SurvivalPurpleLottery,resources=h.config.SurvivalItemResources;
+ const items=['r','sr','ssr','ur'].map(quality=>({id:'preview_'+quality,name:'实际 '+quality+' 奖励',quality,icon:'item_blink'}));
+ presentation.Open();presentation.Pools(snapshot('map').pools,'map');presentation.Snapshot(snapshot('map',items));
+ const cards=h.nodes.LotteryGW2PreviewItems.Children();assert.equal(cards.length,4);
+ for(const card of cards){
+  const well=h.collect(card,'LotteryGW2PreviewWell')[0],icon=h.collect(card,'LotteryGW2PreviewIcon')[0];
+  const item=card.__lotteryItem,reference={style:{}};resources.ApplyBackground(reference,item);
+  assert(items.includes(item),'each preview retains the actual snapshot reward identity');
+  assert.equal(well.__survivalItemGrade,resources.Grade(item));
+  for(const property of ['backgroundImage','backgroundColor','backgroundImgOpacity'])assert.equal(well.style[property],reference.style[property]);
+  assert.equal(well.style.width,'111px');assert.equal(well.style.height,'111px');assert.equal(well.style.border,'0px');assert.equal(well.style.boxShadow,'none');
+  assert.equal(icon.style.width,'91px');assert.equal(icon.style.height,'91px');assert.equal(icon.style.backgroundImage,'none');assert.equal(icon.style.backgroundColor,'transparent');assert.equal(icon.style.border,'0px');assert.equal(icon.style.boxShadow,'none');
+  assert.equal(h.collect(card,'LotteryGW2PreviewRarity').length,0,'quality letter badges are absent from the featured preview');
+  assert(!card.Children().some(child=>child.BHasClass('LotteryGW2Surface')&&child.style.height==='1px'),'the reward name has no decorative underline');
+  const nameHost=h.collect(card,'LotteryGW2PreviewNameHost')[0],name=nameHost.Children()[0];
+  assert.equal(nameHost.style.height,'30px');assert.equal(name.style.fontSize,'19.5px');assert.equal(name.text,item.name);
+ }
+ for(const [quality,expected]of [['n','N'],[undefined,''],['invalid_grade','']]){
+  const item={id:'preview_grade_'+String(quality),name:'品质边界样例',icon:'item_blink'};
+  if(quality!==undefined)item.quality=quality;
+  presentation.Snapshot(snapshot('map',[item]));
+  const well=h.collect(h.nodes.LotteryGW2PreviewItems,'LotteryGW2PreviewWell')[0],shared={style:{}};
+  resources.ApplyBackground(shared,item);
+  assert.equal(well.__survivalItemGrade,expected,'missing or invalid grade remains ungraded rather than defaulting to N');
+  for(const property of ['backgroundImage','backgroundColor','backgroundImgOpacity'])assert.equal(well.style[property],shared.style[property],'N and ungraded previews retain the shared gray-background policy');
+  assert.equal(well.style.border,'0px');assert.equal(well.style.boxShadow,'none');
+ }
+ assert.equal(h.nodes.LotteryGW2PreviewCaption.style.fontSize,'18px');assert.equal(h.requests.length,0);
 });
 
 test('Actual reward previews and tooltip retain the shared contain fit instead of forcing the new wide ticket artwork to cover',()=>{

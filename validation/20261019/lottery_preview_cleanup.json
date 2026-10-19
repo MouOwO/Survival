@@ -1,0 +1,61 @@
+{
+  "status": "PASS_REGRESSION_NATIVE_COMPILE_OFFLINE_VISUAL",
+  "request": "Restore shared rarity backgrounds without borders or rarity badges, enlarge showcase text, match single/ten footprints, hide normal-ticket purchase control.",
+  "changes": [
+    "Official shared 111px quality plate and transparent 91px item art; no preview rarity frames, badges or underline.",
+    "Preview item names 13px to 19.5px; collection heading 12px to 18px; text remains centered in natural label boxes.",
+    "Single draw is 244x84 at x757 with no extra surface/focus frame, matching ten draw size with 20px gap.",
+    "Ticket purchase control is visible, enabled and hit-testable only for special_lottery_ticket; real callback preserved."
+  ],
+  "sourceFiles": {
+    "panorama/src/scripts/custom_game/lottery_gw2.js": "5701b03120189977fbe40eda78ce03309787bfee8391aa981e0f67b08e1ed68b",
+    "panorama/src/styles/custom_game/lottery_gw2.css": "0613be34b26edd92b31950f137d92dcc6bedd38a441785ee862dd8743b032c52",
+    "tools/tests/lottery_gw2.test.cjs": "c4edf091ff25862e3705547d9a8013b4ef52a890236f5493495f9a596499cfee",
+    "tools/tests/lottery_user_ticket_icons.test.cjs": "36556b556cfeb1a42c1a04a61cff7d71b2742dfb241799aef672ec4d90dc98bd",
+    "tools/lottery_r5_parity_20261019/verify.cjs": "42bd40fb2c1b2de948a622c5f87003cef647dc31b163b8fdbac10335bee44c1d"
+  },
+  "regression": {
+    "command": "node --test tools/tests/lottery_gw2.test.cjs tools/tests/lottery_user_ticket_icons.test.cjs tools/tests/lottery_probability_notice.test.cjs tools/tests/lottery_ticket_rules.test.cjs tools/tests/lottery_cinematic_flow.test.cjs tools/tests/lottery_cinematic.test.cjs tools/tests/lottery_scene_transition.test.cjs",
+    "passed": 12,
+    "failed": 0,
+    "isolatedHead": "4e1a788fa1d4be5a1bc7a8c9219539a1046a8328",
+    "coverage": [
+      "All five rarities and neutral missing/invalid grade",
+      "Real snapshot identities, pool switching, explicit ticket ID before fallback",
+      "Existing purchase callback and normal-ticket input suppression",
+      "Paid/free/locked/pending draws and result identity",
+      "Close, reopen, renderer reload, cancellation, tooltip and resolution adaptation"
+    ]
+  },
+  "nativeCompile": {
+    "candidate": true,
+    "live": true,
+    "compiler": "Dota 2 resourcecompiler.exe",
+    "sources": 2,
+    "candidateReport": "output/lottery_preview_cleanup_20261019/compile_candidate.json",
+    "liveReport": "output/lottery_preview_cleanup_20261019/compile_live.json"
+  },
+  "visual": {
+    "actualProductionXmlJsCss": true,
+    "sizes": [
+      "1920x1080",
+      "1280x720"
+    ],
+    "pools": [
+      "map",
+      "dragon_knight"
+    ],
+    "screenshot": "output/lottery_preview_cleanup_20261019/captures/1920_dragon_knight_main.png",
+    "report": "output/lottery_preview_cleanup_20261019/capture_report.json",
+    "sharedParity": {
+      "command": "node tools/lottery_r5_parity_20261019/verify.cjs --run",
+      "mainViews": 8,
+      "hoverAndZeroBalanceViews": 4,
+      "resultFlows": 2,
+      "report": "output/lottery_r5_parity_20261019/report.json"
+    },
+    "gameVerified": false,
+    "limitation": "The running Dota 2 process has no visible game window. Screenshots are offline code-rendered previews, not in-game captures."
+  },
+  "preserved": "Unrelated working-tree changes, existing stashes and original business interfaces retained; isolated commit excludes pre-existing edge-shading edits."
+}

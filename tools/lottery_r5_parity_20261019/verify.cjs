@@ -126,7 +126,7 @@ function inspectProduction() {
         if (!panel) return null;
         const rect = panel.el.getBoundingClientRect(), s = getComputedStyle(panel.el);
         const images = [...(panel.el.tagName === 'IMG' ? [panel.el] : []), ...panel.el.querySelectorAll('img')].map(image => ({ src: image.currentSrc || image.src, decoded: image.complete && image.naturalWidth > 0, box: box(image.getBoundingClientRect()) }));
-        return { id: panel.id, type: panel.paneltype, classes: panel.GetClasses(), text: String(panel.text || panel.el.textContent || '').replace(/\s+/g, ' ').trim(), box: box(rect), screenBox: rect.toJSON(), visible: visible(panel), enabled: panel.enabled, images, style: { fontSize: s.fontSize, fontFamily: s.fontFamily, fontWeight: s.fontWeight, lineHeight: s.lineHeight, letterSpacing: s.letterSpacing, color: s.color, background: s.backgroundColor, backgroundImage: s.backgroundImage, borderColor: s.borderTopColor, borderWidth: s.borderTopWidth, boxShadow: s.boxShadow, filter: s.filter, opacity: s.opacity, zIndex: s.zIndex, opacityMaskInput: panel.style.opacityMask || null, maskImage: s.maskImage, maskSize: s.maskSize, textAlign: s.textAlign, textOverflow: panel.style.textOverflow || s.textOverflow, transform: s.transform } };
+        return { id: panel.id, type: panel.paneltype, classes: panel.GetClasses(), text: String(panel.text || panel.el.textContent || '').replace(/\s+/g, ' ').trim(), box: box(rect), screenBox: rect.toJSON(), visible: visible(panel), enabled: panel.enabled, images, style: { fontSize: s.fontSize, fontFamily: s.fontFamily, fontWeight: s.fontWeight, lineHeight: s.lineHeight, letterSpacing: s.letterSpacing, color: s.color, background: s.backgroundColor, backgroundImage: s.backgroundImage, borderColor: s.borderTopColor, borderWidth: s.borderTopWidth, boxShadow: s.boxShadow, filter: s.filter, opacity: s.opacity, zIndex: s.zIndex, opacityMaskInput: panel.style.opacityMask || null, maskImage: s.maskImage, maskSize: s.maskSize, textAlign: s.textAlign, textDecoration: s.textDecorationLine, textOverflow: panel.style.textOverflow || s.textOverflow, transform: s.transform } };
     }
     function find(panel, cls) { if (!panel) return null; if (panel.BHasClass(cls)) return panel; for (const child of panel.Children()) { const found = find(child, cls); if (found) return found; } return null; }
     const nav = ['map', 'cultivation', 'dragon_knight', 'summer'].map(id => {
@@ -136,10 +136,15 @@ function inspectProduction() {
     });
     function draw(kind) {
         const button = nodes['Lottery' + kind + 'Button'];
-        return { button: record(button), title: record(nodes['Lottery' + kind + 'Text']), cost: record(nodes['Lottery' + kind + 'Cost']), ticket: record(find(button, 'LHDrawTicket')), content: record(find(button, 'ZXDrawContent')), costRow: record(find(button, 'ZXDrawCost')), surface: record(find(button, 'LotteryGW2ButtonSurface')) };
+        return { button: record(button), title: record(nodes['Lottery' + kind + 'Text']), cost: record(nodes['Lottery' + kind + 'Cost']), ticket: record(find(button, 'LHDrawTicket')), content: record(find(button, 'ZXDrawContent')), costRow: record(find(button, 'ZXDrawCost')), surface: record(find(button, 'LotteryGW2ButtonSurface')), focus: record(find(button, 'LotteryGW2DrawFocus')) };
     }
-    const preview = nodes.LotteryGW2PreviewItems.Children().map(card => ({ card: record(card), item: card.__lotteryItem, frame: record(find(card, 'LotteryGW2PreviewWell')), icon: record(find(card, 'LotteryGW2PreviewIcon')), name: record(find(card, 'LotteryGW2PreviewNameHost')) }));
-    const ids = ['LotteryGW2HeaderSkin', 'LotteryGW2SidebarSkin', 'LotteryGW2SidebarTexture', 'LotteryGW2SidebarHeading', 'LotteryGW2SidebarNote', 'LotteryGW2SidebarEmblem', 'LotteryGW2FooterSkin', 'LotteryGW2Content', 'LotteryTitle', 'LotteryTagline', 'LotteryGuaranteeValue', 'LHGuaranteeQuality', 'LotteryGW2ForestDivider', 'LotteryGW2Preview', 'LotteryGW2PreviewItems', 'LotteryDrawPity', 'LotteryDrawPityCaption', 'LotterySkipAnimation', 'LotteryGW2TicketCurrency', 'LotteryGW2TicketIcon', 'LotteryGW2TicketBalance', 'LotteryTicketPurchase', 'LotteryGW2PurchasePlus', 'LotteryCloseButton', 'LotteryGW2CloseIcon', 'LotteryGW2SceneWash', 'LotteryGW2FloorWash'];
+    const preview = nodes.LotteryGW2PreviewItems.Children().map(card => {
+        const name = find(card, 'LotteryGW2PreviewNameHost'), expected = $.CreatePanel('Panel', nodes.LotteryGW2Root, '');
+        cfg.SurvivalItemResources.ApplyBackground(expected, card.__lotteryItem);
+        const sharedBackground = getComputedStyle(expected.el).backgroundImage; expected.DeleteAsync(0);
+        return { card: record(card), item: card.__lotteryItem, frame: record(find(card, 'LotteryGW2PreviewWell')), icon: record(find(card, 'LotteryGW2PreviewIcon')), name: record(name), caption: record(name?.Children().find(child => child.paneltype === 'Label')), rarity: record(find(card, 'LotteryGW2PreviewRarity')), sharedBackground };
+    });
+    const ids = ['LotteryGW2HeaderSkin', 'LotteryGW2SidebarSkin', 'LotteryGW2SidebarTexture', 'LotteryGW2SidebarHeading', 'LotteryGW2SidebarNote', 'LotteryGW2SidebarEmblem', 'LotteryGW2FooterSkin', 'LotteryGW2Content', 'LotteryTitle', 'LotteryTagline', 'LotteryGuaranteeValue', 'LHGuaranteeQuality', 'LotteryGW2ForestDivider', 'LotteryGW2Preview', 'LotteryGW2PreviewItems', 'LotteryGW2PreviewCaption', 'LotteryDrawPity', 'LotteryDrawPityCaption', 'LotterySkipAnimation', 'LotteryGW2TicketCurrency', 'LotteryGW2TicketIcon', 'LotteryGW2TicketBalance', 'LotteryTicketPurchase', 'LotteryGW2PurchasePlus', 'LotteryCloseButton', 'LotteryGW2CloseIcon', 'LotteryGW2SceneWash', 'LotteryGW2FloorWash'];
     const active = nodes['LotteryScenePage_' + cfg.SurvivalPurpleLottery.Inspect().selected];
     return { errors: previewErrors, scriptFailures: previewScriptResults.filter(row => !row.ok), api: cfg.SurvivalPurpleLottery.Inspect(), canvas: { screenBox: origin.toJSON(), scale }, nodes: Object.fromEntries(ids.map(id => [id, record(nodes[id])])), sceneLayers: { extension: record(find(active, 'LotteryGW2SceneExtension')), subject: record(find(active, 'LotteryGW2SceneSubject')) }, legacyGuaranteeLine: record(find(nodes.LotteryGuaranteeRow, 'LHGuaranteeLine')), navigation: nav, preview, draw: { single: draw('Single'), ten: draw('Ten') }, footerActions: ['LHDetails', 'LHHistory', 'LotteryAnnouncement'].map(id => ({ button: record(nodes[id]), captions: nodes[id].Children().filter(p => p.paneltype === 'Label').map(record) })), calls: previewCalls, t10: !!nodes.LotteryGW2Chest };
 }
@@ -198,18 +203,31 @@ function checkMain(actual, reference, pool, zero = false) {
     assert(!actual.nodes.LHGuaranteeQuality?.visible, 'Retired large guarantee quality does not duplicate the single-line R5 metadata');
     assert(!actual.legacyGuaranteeLine?.visible, 'Retired guarantee underline does not remain below the R5 metadata');
     assert.equal(actual.preview.length, 4, 'Four featured previews retain the approved row');
+    assert.equal(actual.nodes.LotteryGW2PreviewCaption.style.fontSize, '18px', 'The requested preview heading is 18px');
     actual.preview.forEach((card, i) => {
         const target = reference.preview[i];
-        rectangle(card.card.box, target.card.box, 'preview card ' + i);
-        rectangle(card.frame?.box, target.frame.box, 'preview frame ' + i);
-        rectangle(card.icon?.box, target.icon.box, 'preview icon ' + i);
+        // The approved row moved up 2px to give the larger natural captions
+        // room. The historical HTML reference itself remains unchanged.
+        rectangle(card.card.box, { ...target.card.box, y: target.card.box.y - 2, height: 150 }, 'preview card ' + i);
+        rectangle(card.frame?.box, { ...target.frame.box, y: target.frame.box.y - 2 }, 'preview quality plate ' + i);
+        rectangle(card.icon?.box, { ...target.icon.box, y: target.icon.box.y - 2 }, 'preview icon ' + i);
         assert(card.item && card.item.id, 'Preview retains an authoritative reward identity');
         assert(card.icon.images.length && card.icon.images.every(image => image.decoded), 'Real preview art decodes');
-        assert.equal(card.icon.style.backgroundImage, target.icon.style.backgroundImage, 'R5 preview art stays transparent over its independent dark frame');
-        assert.equal(card.icon.style.borderWidth, target.icon.style.borderTopWidth, 'The image has no duplicate inner quality frame');
+        assert.equal(card.frame.style.backgroundImage, card.sharedBackground, 'The independent plate uses the shared authoritative quality background');
+        assert.equal(card.frame.style.borderWidth, '0px', 'The quality plate adds no decorative frame');
+        assert.equal(card.frame.style.boxShadow, 'none', 'The quality plate adds no shadow border');
+        assert.equal(card.icon.style.backgroundImage, 'none', 'Preview art stays transparent over its independent quality plate');
+        assert.equal(card.icon.style.borderWidth, '0px', 'The image has no duplicate inner quality frame');
+        assert(!card.rarity?.visible, 'The main showcase has no rarity corner badge');
+        assert.equal(card.caption.style.fontSize, '19.5px', 'The requested natural item name is 19.5px');
+        assert.equal(card.caption.style.textDecoration, 'none', 'The item name has no underline');
+        near(card.name.box.height, 30, 'Preview caption row height ' + i);
+        near(card.caption.box.x + card.caption.box.width / 2, card.frame.box.x + card.frame.box.width / 2, 'Preview caption center ' + i);
+        assert(card.caption.box.x >= card.card.box.x - .8 && card.caption.box.right <= card.card.box.right + .8, 'The larger natural caption remains inside its card');
     });
     for (const [kind, action] of Object.entries(actual.draw)) {
-        const target = reference.draw[kind]; rectangle(action.button.box, target.button.box, kind + ' button');
+        const target = reference.draw[kind], buttonBox = kind === 'single' ? { x: 1091, y: 683, width: 244, height: 84 } : target.button.box;
+        rectangle(action.button.box, buttonBox, kind + ' button');
         assert.equal(action.button.enabled, !zero, kind + ' uses real fixture balance');
         frameStyle(action.title, target.label, kind + ' title'); frameStyle(action.cost, target.cost, kind + ' cost');
         near(action.title.box.x + action.title.box.width / 2, action.button.box.x + action.button.box.width / 2, kind + ' title horizontal center');
@@ -219,11 +237,20 @@ function checkMain(actual, reference, pool, zero = false) {
         assert.match(action.cost.text, /×\s*\d/, kind + ' price displays a multiplication prefix');
         assert.equal(action.title.style.textOverflow, 'clip'); assert.equal(action.cost.style.textOverflow, 'clip');
         assert(action.surface.style.backgroundImage.includes(kind === 'ten' ? 'relic_agi_button' : 'buyback_button'), 'Correct installed official button artwork');
+        if (kind === 'single') {
+            assert.equal(action.button.style.borderWidth, '0px', 'Single draw adds no independent outer frame');
+            assert.equal(action.surface.style.borderWidth, '0px', 'Single draw native texture adds no authored border');
+            assert.equal(action.surface.style.boxShadow, 'none', 'Single draw has no extra frame shadow');
+            assert(!action.focus?.visible, 'Single draw has no focus frame');
+        }
     }
     const pity = actual.nodes.LotteryDrawPityCaption;
     assert(pity.visible && pity.box.bottom <= actual.draw.ten.button.box.y - 9, 'Measured pity clears the button above it');
     rectangle(actual.nodes.LotterySkipAnimation.box, reference.components.skip.box, 'skip control');
-    near(actual.nodes.LotteryTicketPurchase.box.width, 44, 'wallet plus hit width'); near(actual.nodes.LotteryTicketPurchase.box.height, 44, 'wallet plus hit height');
+    const specialTicket = pool === 'dragon_knight' || pool === 'summer';
+    assert.equal(actual.nodes.LotteryTicketPurchase.visible, specialTicket, 'Only special tickets expose the purchase action');
+    assert.equal(actual.nodes.LotteryGW2PurchasePlus.visible, specialTicket, 'Normal ticket balance has no purchase plus');
+    if (specialTicket) { near(actual.nodes.LotteryTicketPurchase.box.width, 44, 'wallet plus hit width'); near(actual.nodes.LotteryTicketPurchase.box.height, 44, 'wallet plus hit height'); }
     near(actual.nodes.LotteryCloseButton.box.width, 44, 'close hit width'); near(actual.nodes.LotteryCloseButton.box.height, 44, 'close hit height');
     near(actual.nodes.LotteryGW2CloseIcon.box.width, 32, 'close glyph width'); near(actual.nodes.LotteryGW2CloseIcon.box.height, 32, 'close glyph height');
     actual.footerActions.forEach((row, i) => { near(row.button.box.height, 44, 'footer action height'); assert(row.captions.length); for (const label of row.captions) { assert.equal(label.style.fontSize, reference.footerActions[i].button.style.fontSize); assert.equal(label.style.textOverflow, 'clip'); } });

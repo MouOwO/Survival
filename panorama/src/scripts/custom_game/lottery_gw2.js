@@ -198,9 +198,9 @@
         move("LotteryInfoOverlay",detail); move("LotteryAnnouncement",p("LotteryCelestialFooter"));
         ["LotteryCelestialHeader","LotteryPoolTabs","LotteryReadingMask"].forEach(hidden);
         view.preview=make("Panel",content,"LotteryGW2Preview"); place(view.preview,58,467,576,177); style(view.preview,{zIndex:"3"});
-        surface(view.preview,"LotteryGW2PreviewHeadingRule",[0,8,26,1],"#a7c9a3");
-        view.previewCaption=label(view.preview,"LotteryGW2PreviewCaption","奖池珍藏",37,0,530,20,12,"#d9d4bd");
-        view.previewItems=make("Panel",view.preview,"LotteryGW2PreviewItems"); place(view.previewItems,0,28,576,149);
+        surface(view.preview,"LotteryGW2PreviewHeadingRule",[0,11,26,1],"#a7c9a3");
+        view.previewCaption=label(view.preview,"LotteryGW2PreviewCaption","奖池珍藏",37,0,530,24,18,"#d9d4bd");
+        view.previewItems=make("Panel",view.preview,"LotteryGW2PreviewItems"); place(view.previewItems,0,26,576,150);
         view.resultPool=label(resultCanvas,"LotteryGW2ResultPool","",1290,75,300,28,14,"#c4d0c9");style(view.resultPool,{textAlign:"right"});
         move("LHDetails",p("LotteryCelestialFooter"));
         var skip=p("LotterySkipAnimation");skip.Children().forEach(function(c){if(c.paneltype==="Label"){c.AddClass("LotteryGW2SkipLabel");place(c,38,0,74,44);style(c,{fontSize:"16px",lineHeight:"44px",color:"#c1cfbe",textOverflow:"clip"});}else c.visible=false;});
@@ -235,10 +235,12 @@
         });
     }
     function number(raw) { if(raw===undefined||raw===null||raw==="")return "—";var n=Number(raw);return isFinite(n)&&n>=0?String(n):"—"; }
-    function ticketIcon(node,pool) {
+    function ticketContentId(pool) {
         var id=String(pool&&pool.ticket_content_id||""),poolId=String(pool&&pool.id||selected);
-        if(!id)id=poolId==="dragon_knight"||poolId==="summer"?"special_lottery_ticket":"lottery_ticket";
-        var resources=cfg.SurvivalItemResources,uri=resources&&resources.Resolve(id);
+        return id||(poolId==="dragon_knight"||poolId==="summer"?"special_lottery_ticket":"lottery_ticket");
+    }
+    function ticketIcon(node,pool) {
+        var resources=cfg.SurvivalItemResources,uri=resources&&resources.Resolve(ticketContentId(pool));
         style(node,{backgroundImage:uri?'url("'+uri+'")':"none",backgroundSize:"contain",backgroundPosition:"center",backgroundRepeat:"no-repeat",backgroundColor:"transparent",opacityMask:"none",washColor:"none",saturation:"1",brightness:"1",opacity:"1"});
     }
     function quantity(item) {var current=number(item&&item.owned_count),max=Number(item&&item.max_owned);return current+(current!=="—"&&isFinite(max)&&max>0?"/"+max:"");}
@@ -252,12 +254,15 @@
         var signature=String(snapshot&&snapshot.selected_pool_id)+":"+JSON.stringify(items);
         if(signature===previewKey)return;previewKey=signature;view.previewItems.RemoveAndDeleteChildren();prune();view.preview.visible=items.length>0;
         items.forEach(function(item,index){
-            var tileWidth=111,b=make("Button",view.previewItems,"LotteryGW2Preview_"+index,"LotteryGW2PreviewCard"),quality=String(item.quality||"n").toLowerCase(),presentation=cfg.SurvivalRewardPresentation,color=presentation&&presentation.NameColor?presentation.NameColor(quality):"#c4d0d0";place(b,index*148,0,132,149);b.hittestchildren=false;b.__lotteryItem=item;b.AddClass("LotteryQuality_"+quality.toUpperCase());
-            var well=itemWell(b,10.5,0,tileWidth,111);well.AddClass("LotteryGW2PreviewWell");style(well,{backgroundImage:"none",borderColor:color,backgroundColor:"#061119a6",boxShadow:"inset #030911ab 0px 0px 0px 3px"});var icon=presentation&&presentation.CreateIcon(b,item,"LotteryGW2PreviewIcon");if(icon){place(icon,20.5,10,91,91);fillItemIcon(icon,item);}
-            var rarity=label(b,"",quality.toUpperCase(),81,3,35,16,10,color);rarity.AddClass("LotteryGW2PreviewRarity");style(rarity,{textAlign:"right",textOverflow:"clip"});
-            var itemName=label(b,"",String(item.name||item.id||""),0,120,132,22,13,"#dddccf");style(itemName,{whiteSpace:"nowrap",textOverflow:"clip",textShadow:"#000000 0px 0px 2px 2.0"});
-            surface(b,"",[51,148,30,1],color).style.opacity="0.6";
-            var cardWidth=132,cardHeight=149;
+            var tileWidth=111,b=make("Button",view.previewItems,"LotteryGW2Preview_"+index,"LotteryGW2PreviewCard"),quality=String(item.quality||"").toLowerCase(),presentation=cfg.SurvivalRewardPresentation;place(b,index*148,0,132,150);b.hittestchildren=false;b.__lotteryItem=item;b.AddClass("LotteryQuality_"+quality.toUpperCase());
+            var well=itemWell(b,10.5,0,tileWidth,111);well.AddClass("LotteryGW2PreviewWell");
+            // Keep the shared official rarity plate underneath the transparent
+            // item art. The showcase has no rarity frame, badge or underline.
+            var resources=cfg.SurvivalItemResources;if(resources&&resources.ApplyBackground)resources.ApplyBackground(well,item);
+            style(well,{border:"0px",boxShadow:"none"});
+            var icon=presentation&&presentation.CreateIcon(b,item,"LotteryGW2PreviewIcon");if(icon){place(icon,20.5,10,91,91);fillItemIcon(icon,item);}
+            var itemName=label(b,"",String(item.name||item.id||""),0,120,132,30,19.5,"#dddccf");style(itemName,{whiteSpace:"nowrap",textOverflow:"ellipsis",textShadow:"#000000 0px 0px 2px 2.0"});
+            var cardWidth=132;
             var nameAt=String(itemName.style.position).split(" "),nameHeight=parseFloat(itemName.style.height),nameHost=make("Panel",b,"","LotteryGW2PreviewNameHost");
             place(nameHost,0,parseFloat(nameAt[1]),cardWidth,nameHeight);nameHost.hittest=false;nameHost.hittestchildren=false;
             itemName.SetParent(nameHost);place(itemName,0,0,cardWidth,nameHeight);
@@ -291,6 +296,7 @@
         var focusNodes=view.actionFocus||(view.actionFocus={}),focus=focusNodes[id];
         if(!valid(focus)){focus=focusNodes[id]=make("Panel",b,"","LotteryGW2DrawFocus");focus.hittest=false;focus.hittestchildren=false;style(focus,{border:"2px solid #d0ebba",backgroundColor:"transparent",zIndex:"3"});}
         place(focus,-3,-3,(draw?(parseFloat(b.style.width)||220):(primary?244:220))+6,90);
+        focus.visible=id!=="LotterySingleButton";
         if(draw){
             b.AddClass("LotteryGW2RebornDraw");
             var width=parseFloat(b.style.width)||220,height=parseFloat(b.style.height)||84,text=p(id==="LotterySingleButton"?"LotterySingleText":"LotteryTenText"),cost=p(id==="LotterySingleButton"?"LotterySingleCost":"LotteryTenCost"),free=b.BHasClass("ZXFreeDraw");
@@ -388,7 +394,7 @@
         if(pool){var pityCaption=String(p("LotteryDrawPityCaption").text||"");p("LotteryGuaranteeValue").text=(pityCaption||"奖池保底以详情为准")+"  /  奖励永久保留";}
         place(p("LotteryUnlockNotice"),60,354,650,42);style(p("LotteryUnlockNotice"),{fontSize:"16px",color:"#cfbfa0",whiteSpace:"normal",textShadow:"none",zIndex:"3",visibility:drawVisible?"visible":"collapse"});
         place(p("LotteryCelestialFooter"),334,123,1309,746);style(p("LotteryCelestialFooter"),{backgroundImage:"none",backgroundColor:"transparent",border:"0px",flowChildren:"none",zIndex:"4",visibility:drawVisible?"visible":"collapse",overflow:"noclip"});p("LotteryCelestialFooter").hittest=false;
-        place(p("LotterySingleButton"),781,560,220,84);place(p("LotteryTenButton"),1021,560,244,84);
+        place(p("LotterySingleButton"),757,560,244,84);place(p("LotteryTenButton"),1021,560,244,84);
         place(p("LotteryDrawPity"),1021,529,244,20);place(p("LotteryDrawPityCaptionBounds"),0,0,244,20);place(p("LotteryDrawPityCaption"),0,0,244,20);style(p("LotteryDrawPityCaption"),{fontSize:"14px",lineHeight:"20px",minHeight:"0px",textAlign:"right",transform:"none",color:"#a7c9a3",textShadow:"none"});
         footerAction("LHDetails",42,692,142,"s2r://panorama/images/control_icons/icon_info_png.vtex");footerAction("LHHistory",201,692,142,"s2r://panorama/images/control_icons/history_png.vtex");footerAction("LotteryAnnouncement",360,692,104,"");style(p("LotteryAnnouncement"),{visibility:"visible"});place(p("LotterySkipAnimation"),476,692,112,44);
         place(p("LotteryStatus"),60,402,650,44);style(p("LotteryStatus"),{fontSize:"16px",color:"#e4d8bb",whiteSpace:"normal",textShadow:"none",zIndex:"8"});
@@ -414,6 +420,8 @@
         if(!mode)view.title.text="抽奖";
         var ticketText=number(pool&&pool.tickets),ticketWidth=Math.min(180,Math.max(28,ticketText.length*16)),ticketX=278-ticketWidth;
         view.ticket.text=ticketText;place(view.ticket,ticketX,12,ticketWidth,38);style(view.ticket,{fontSize:"27px",textOverflow:"clip"});place(view.ticketIcon,ticketX-74,6,62,47);ticketIcon(view.ticketIcon,pool);
+        var purchase=p("LotteryTicketPurchase"),canPurchase=ticketContentId(pool)==="special_lottery_ticket";
+        purchase.visible=canPurchase;purchase.enabled=canPurchase;purchase.hittest=canPurchase;
         fit();
     }
     // Preview is presentation only: cards retain the controller's click/hover bindings.
