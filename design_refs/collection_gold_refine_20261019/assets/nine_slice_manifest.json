@@ -1,0 +1,350 @@
+[
+  {
+    "key": "window",
+    "source": "panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex_c",
+    "sourcePng": "assets/panorama/images/events/dark_carnival/overworld/inner_panel_border_png.png",
+    "localSourcePng": "assets/native_sources/window.png",
+    "dimensions": [
+      400,
+      400
+    ],
+    "sourceSha256": "2bc5679067fd08e57183538c0c586a29a76d83ec45356dea62ff9dfcffab7ad2",
+    "cutLTRB": [
+      20,
+      20,
+      20,
+      20
+    ],
+    "targetLTRB": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fillCenter": false,
+    "parts": [
+      {
+        "row": 0,
+        "column": 0,
+        "file": "assets/slices/window_00.png",
+        "size": [
+          20,
+          20
+        ],
+        "paint": true
+      },
+      {
+        "row": 0,
+        "column": 1,
+        "file": "assets/slices/window_01.png",
+        "size": [
+          360,
+          20
+        ],
+        "paint": true
+      },
+      {
+        "row": 0,
+        "column": 2,
+        "file": "assets/slices/window_02.png",
+        "size": [
+          20,
+          20
+        ],
+        "paint": true
+      },
+      {
+        "row": 1,
+        "column": 0,
+        "file": "assets/slices/window_10.png",
+        "size": [
+          20,
+          360
+        ],
+        "paint": true
+      },
+      {
+        "row": 1,
+        "column": 1,
+        "file": "assets/slices/window_11.png",
+        "size": [
+          360,
+          360
+        ],
+        "paint": false
+      },
+      {
+        "row": 1,
+        "column": 2,
+        "file": "assets/slices/window_12.png",
+        "size": [
+          20,
+          360
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 0,
+        "file": "assets/slices/window_20.png",
+        "size": [
+          20,
+          20
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 1,
+        "file": "assets/slices/window_21.png",
+        "size": [
+          360,
+          20
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 2,
+        "file": "assets/slices/window_22.png",
+        "size": [
+          20,
+          20
+        ],
+        "paint": true
+      }
+    ]
+  },
+  {
+    "key": "button",
+    "source": "panorama/images/dota_plus/relic_rare_button_psd.vtex_c",
+    "sourcePng": "assets/panorama/images/dota_plus/relic_rare_button_psd.png",
+    "localSourcePng": "assets/native_sources/button.png",
+    "dimensions": [
+      290,
+      100
+    ],
+    "sourceSha256": "686f7f3809c2ad3e47510a5f352e8f642c7b32b28fda2e43cbed22ffabf98a53",
+    "cutLTRB": [
+      16,
+      12,
+      16,
+      12
+    ],
+    "targetLTRB": [
+      8,
+      6,
+      8,
+      6
+    ],
+    "fillCenter": true,
+    "parts": [
+      {
+        "row": 0,
+        "column": 0,
+        "file": "assets/slices/button_00.png",
+        "size": [
+          16,
+          12
+        ],
+        "paint": true
+      },
+      {
+        "row": 0,
+        "column": 1,
+        "file": "assets/slices/button_01.png",
+        "size": [
+          258,
+          12
+        ],
+        "paint": true
+      },
+      {
+        "row": 0,
+        "column": 2,
+        "file": "assets/slices/button_02.png",
+        "size": [
+          16,
+          12
+        ],
+        "paint": true
+      },
+      {
+        "row": 1,
+        "column": 0,
+        "file": "assets/slices/button_10.png",
+        "size": [
+          16,
+          76
+        ],
+        "paint": true
+      },
+      {
+        "row": 1,
+        "column": 1,
+        "file": "assets/slices/button_11.png",
+        "size": [
+          258,
+          76
+        ],
+        "paint": true
+      },
+      {
+        "row": 1,
+        "column": 2,
+        "file": "assets/slices/button_12.png",
+        "size": [
+          16,
+          76
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 0,
+        "file": "assets/slices/button_20.png",
+        "size": [
+          16,
+          12
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 1,
+        "file": "assets/slices/button_21.png",
+        "size": [
+          258,
+          12
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 2,
+        "file": "assets/slices/button_22.png",
+        "size": [
+          16,
+          12
+        ],
+        "paint": true
+      }
+    ]
+  },
+  {
+    "key": "slot",
+    "source": "panorama/images/hud/passive_ability_border_png.vtex_c",
+    "sourcePng": "assets/panorama/images/hud/passive_ability_border_png.png",
+    "localSourcePng": "assets/native_sources/slot.png",
+    "dimensions": [
+      105,
+      105
+    ],
+    "sourceSha256": "0b4e943230ec59769247f4ee8c64a6d570c0987db2a90349521fb9a616053733",
+    "cutLTRB": [
+      8,
+      8,
+      8,
+      8
+    ],
+    "targetLTRB": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "fillCenter": false,
+    "parts": [
+      {
+        "row": 0,
+        "column": 0,
+        "file": "assets/slices/slot_00.png",
+        "size": [
+          8,
+          8
+        ],
+        "paint": true
+      },
+      {
+        "row": 0,
+        "column": 1,
+        "file": "assets/slices/slot_01.png",
+        "size": [
+          89,
+          8
+        ],
+        "paint": true
+      },
+      {
+        "row": 0,
+        "column": 2,
+        "file": "assets/slices/slot_02.png",
+        "size": [
+          8,
+          8
+        ],
+        "paint": true
+      },
+      {
+        "row": 1,
+        "column": 0,
+        "file": "assets/slices/slot_10.png",
+        "size": [
+          8,
+          89
+        ],
+        "paint": true
+      },
+      {
+        "row": 1,
+        "column": 1,
+        "file": "assets/slices/slot_11.png",
+        "size": [
+          89,
+          89
+        ],
+        "paint": false
+      },
+      {
+        "row": 1,
+        "column": 2,
+        "file": "assets/slices/slot_12.png",
+        "size": [
+          8,
+          89
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 0,
+        "file": "assets/slices/slot_20.png",
+        "size": [
+          8,
+          8
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 1,
+        "file": "assets/slices/slot_21.png",
+        "size": [
+          89,
+          8
+        ],
+        "paint": true
+      },
+      {
+        "row": 2,
+        "column": 2,
+        "file": "assets/slices/slot_22.png",
+        "size": [
+          8,
+          8
+        ],
+        "paint": true
+      }
+    ]
+  }
+]

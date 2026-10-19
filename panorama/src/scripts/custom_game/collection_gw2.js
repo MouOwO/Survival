@@ -3,7 +3,7 @@
 var cfg=GameUI.CustomUIConfig(),U=cfg.SurvivalUI,A=cfg.ArchiveHandoff,root=$.GetContextPanel();
 if(!U||!A)return;
 if(cfg.SurvivalCollection&&cfg.SurvivalCollection.Dispose)cfg.SurvivalCollection.Dispose();
-var P=cfg.CollectionGW2Data||{},size=P.canvas||[900,478],fitReference=[1200,778],life=U.Lifecycle(),viewLife=U.Lifecycle(),highlightLife=U.Lifecycle();
+var P=cfg.CollectionGW2Data||{},size=[960,548],fitReference=[1200,778],life=U.Lifecycle(),viewLife=U.Lifecycle(),highlightLife=U.Lifecycle();
 var columns=10,slotSize=78,portraitSize=76,pitch=84,rowsPerPage=4;
 var gridWidth=(columns-1)*pitch+slotSize,gridHeight=(rowsPerPage-1)*pitch+slotSize;
 // Intent and authoritative caches outlive an individual layout/script instance.
@@ -26,6 +26,24 @@ function style(n,values){Object.keys(values).forEach(function(k){if(n.style[k]!=
 function rect(n,x,y,w,h){style(n,{position:x+"px "+y+"px 0px",width:w+"px",height:h+"px",margin:"0px",padding:"0px",horizontalAlign:"left",verticalAlign:"top"});}
 function skin(n,key){var a=P.assets&&P.assets[key];if(a)style(n,{backgroundImage:'url("'+a.file+'")',backgroundColor:"transparent",backgroundSize:"100% 100%",backgroundRepeat:"no-repeat"});}
 function art(parent,key,x,y,w,h,id){var n=make("Panel",parent,id,"CollectionGW2Art");rect(n,x,y,w,h);n.hittest=false;n.hittestchildren=false;skin(n,key);return n;}
+// Source pixels are cropped into nine UV regions. Fixed corners never follow
+// the host's aspect ratio; only the center and straight edges expand.
+var goldArt={
+ frame:{uri:"s2r://panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex",size:[400,400],cut:[20,20,20,20],edge:[10,10,10,10],fill:false},
+ button:{uri:"s2r://panorama/images/dota_plus/relic_rare_button_psd.vtex",size:[290,100],cut:[16,12,16,12],edge:[8,6,8,6],fill:true},
+ slot:{uri:"s2r://panorama/images/hud/passive_ability_border_png.vtex",size:[105,105],cut:[8,8,8,8],edge:[2,2,2,2],fill:false}
+};
+function nine(parent,key,x,y,w,h,cls){
+ var a=goldArt[key],n=make("Panel",parent,"",cls||"CollectionGoldNine");rect(n,x,y,w,h);n.hittest=false;n.hittestchildren=false;
+ n.__collectionNine={key:key,cut:a.cut.slice(),edge:a.edge.slice(),pieces:[]};
+ var sx=[0,a.cut[0],a.size[0]-a.cut[2],a.size[0]],sy=[0,a.cut[1],a.size[1]-a.cut[3],a.size[1]],dx=[0,a.edge[0],w-a.edge[2],w],dy=[0,a.edge[1],h-a.edge[3],h];
+ for(var r=0;r<3;r++)for(var c=0;c<3;c++){
+  var piece=make("Panel",n,"","CollectionGoldNinePiece"),sw=sx[c+1]-sx[c],sh=sy[r+1]-sy[r];rect(piece,dx[c],dy[r],dx[c+1]-dx[c],dy[r+1]-dy[r]);piece.hittest=false;piece.hittestchildren=false;
+  var px=a.size[0]===sw?0:sx[c]/(a.size[0]-sw)*100,py=a.size[1]===sh?0:sy[r]/(a.size[1]-sh)*100;
+  style(piece,{backgroundImage:!a.fill&&r===1&&c===1?"none":'url("'+a.uri+'")',backgroundSize:(a.size[0]/sw*100)+"% "+(a.size[1]/sh*100)+"%",backgroundPosition:px+"% "+py+"%",backgroundRepeat:"no-repeat",backgroundColor:"transparent",overflow:"clip"});n.__collectionNine.pieces.push(piece);
+ }
+ return n;
+}
 function label(parent,text,x,y,w,h,font,color,id){var n=make("Label",parent,id,"CollectionGW2Text");rect(n,x,y,w,h);n.text=String(text===undefined?"":text);n.hittest=false;style(n,{fontSize:font+"px",color:color||"#dfdfd6",fontFamily:'"Source Han Sans SC"',fontWeight:"normal",fontStyle:"normal",textShadow:"none",whiteSpace:"nowrap",textOverflow:"ellipsis"});return n;}
 function array(v){return Array.isArray(v)?v:Object.keys(v||{}).sort(function(a,b){return Number(a)-Number(b);}).map(function(k){return v[k];});}
 function copy(v){return JSON.parse(JSON.stringify(v));}
@@ -41,38 +59,42 @@ var shell=U.ModalShell.Adopt({id:"collection",panel:win,root:root,scrim:scrim,wi
 style(scrim,{backgroundColor:"#00000022"});
 // ModalShell establishes input/layer ownership and writes its generic fallback.
 // The opaque surface also covers the source texture's partially transparent pixels.
-style(win,{width:size[0]+"px",height:size[1]+"px",horizontalAlign:"center",verticalAlign:"center",flowChildren:"none",backgroundColor:"#171e24",backgroundImage:"none",border:"0px",boxShadow:"none",padding:"0px",margin:"0px",overflow:"noclip",transformOrigin:"50% 50%"});
+style(win,{width:size[0]+"px",height:size[1]+"px",horizontalAlign:"center",verticalAlign:"center",flowChildren:"none",backgroundColor:"#111413",backgroundImage:"none",border:"0px",boxShadow:"none",padding:"0px",margin:"0px",overflow:"noclip",transformOrigin:"50% 50%"});
 canvas=make("Panel",win,"CollectionGW2Canvas","CollectionGW2Canvas");rect(canvas,0,0,size[0],size[1]);canvas.hittest=false;canvas.hittestchildren=true;
 
-var background=make("Panel",canvas,"CollectionGW2Background","CollectionGW2Art");rect(background,0,0,size[0],size[1]);background.hittest=false;background.hittestchildren=false;style(background,{backgroundImage:'url("s2r://panorama/images/custom_game/collection_user_skin_v1/background.vtex")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",opacity:"1",backgroundColor:"#171e24"});
+var background=make("Panel",canvas,"CollectionGW2Background","CollectionGW2Art");rect(background,0,0,size[0],size[1]);background.hittest=false;background.hittestchildren=false;style(background,{backgroundImage:'url("s2r://panorama/images/dota_plus/dota_plus_background_texture_large_png.vtex")',backgroundSize:"cover",backgroundRepeat:"no-repeat",opacity:"1",backgroundColor:"#111413"});
 // Flat regional tints sit over the opaque texture without raised plates.
-var header=make("Panel",canvas,"CollectionGW2Header","CollectionGW2FlatRegion");rect(header,0,0,size[0],34);style(header,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});header.hittest=false;
-var sidebar=make("Panel",canvas,"CollectionGW2Sidebar","CollectionGW2FlatRegion");rect(sidebar,0,34,42,size[1]-82);style(sidebar,{backgroundImage:"none",backgroundColor:"#080c10d8",border:"0px"});sidebar.hittest=false;
-var footer=make("Panel",canvas,"CollectionGW2Footer","CollectionGW2FlatRegion");rect(footer,0,size[1]-48,size[0],48);style(footer,{backgroundImage:"none",backgroundColor:"#090b0d80",border:"0px"});footer.hittest=false;
-label(canvas,"收藏",12,4,size[0]-72,26,18,"#f0eee2","CollectionGW2Title");
-var closeButton=make("Button",canvas,"CollectionGW2Close","CollectionGW2Button");rect(closeButton,size[0]-40,3,28,28);style(closeButton,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});
-var closeIcon=make("Image",closeButton,"CollectionGW2CloseIcon");rect(closeIcon,4,4,20,20);closeIcon.SetImage(P.assets&&P.assets.close?P.assets.close.file:"file://{images}/custom_game/collection_gw2_v2/close.png");closeIcon.hittest=false;closeIcon.hittestchildren=false;
+var header=make("Panel",canvas,"CollectionGW2Header","CollectionGW2FlatRegion");rect(header,0,0,size[0],52);style(header,{backgroundImage:'url("s2r://panorama/images/dota_plus/dota_plus_horizontal_banner_background_png.vtex")',backgroundSize:"cover",backgroundColor:"#111414e8",borderBottom:"1px solid #92764288"});header.hittest=false;
+var sidebar=make("Panel",canvas,"CollectionGW2Sidebar","CollectionGW2FlatRegion");rect(sidebar,0,52,60,size[1]-120);style(sidebar,{backgroundImage:"none",backgroundColor:"#111414e8",borderRight:"1px solid #92764255"});sidebar.hittest=false;
+var footer=make("Panel",canvas,"CollectionGW2Footer","CollectionGW2FlatRegion");rect(footer,0,size[1]-68,size[0],68);style(footer,{backgroundImage:"none",backgroundColor:"#0c0e0ee8",borderTop:"1px solid #92764255"});footer.hittest=false;
+var windowFrame=nine(canvas,"frame",0,0,size[0],size[1],"CollectionGoldWindowFrame");
+label(canvas,"收藏",20,12,size[0]-84,30,22,"#f0e5c9","CollectionGW2Title");
+var closeButton=make("Button",canvas,"CollectionGW2Close","CollectionGW2Button");rect(closeButton,size[0]-42,12,28,28);style(closeButton,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});
+var closeIcon=make("Image",closeButton,"CollectionGW2CloseIcon");rect(closeIcon,5,5,18,18);closeIcon.SetImage("file://{images}/control_icons/24px/x_close.svg");closeIcon.hittest=false;closeIcon.hittestchildren=false;
 closeButton.hittestchildren=false;closeButton.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("button");});
 scrim.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("scrim");});
 Object.keys(names).forEach(function(id,i){
- var tab=make("Button",canvas,"CollectionGW2Tab_"+id,"CollectionGW2Tab");rect(tab,4,44+i*44,34,34);style(tab,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});tab.hittestchildren=false;
- var selectedArt=make("Panel",tab,"","CollectionGW2TabSelected");rect(selectedArt,2,2,30,30);style(selectedArt,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid #afc4c54a"});selectedArt.hittest=false;
- var icon=art(tab,"tab_"+id,3.5,3.5,27,27);style(icon,{saturation:"0.5",brightness:"0.8",opacity:"0.76"});
+ var tab=make("Button",canvas,"CollectionGW2Tab_"+id,"CollectionGW2Tab");rect(tab,8,68+i*52,44,44);style(tab,{backgroundImage:"none",backgroundColor:"#121614a0",border:"0px"});tab.hittestchildren=false;
+ nine(tab,"slot",0,0,44,44,"CollectionGoldTabFrame");
+ var selectedArt=nine(tab,"frame",0,0,44,44,"CollectionGW2TabSelected");selectedArt.hittest=false;
+ var icon=make("Image",tab,"");rect(icon,8,8,28,28);icon.SetImage("file://{images}/control_icons/"+({ex:"24px/star.svg",friend:"friends.png",wife:"24px/rewards.svg",beast:"24px/trophy.svg"}[id]));style(icon,{opacity:"0.72"});icon.hittest=false;
  tab.SetPanelEvent("onactivate",function(){if(alive())select(id);});
  tab.SetPanelEvent("onmouseover",function(){if(alive()&&opened)$.DispatchEvent("DOTAShowTextTooltip",tab,names[id]);});tab.SetPanelEvent("onmouseout",function(){$.DispatchEvent("DOTAHideTextTooltip");});tabs[id]=tab;
 });
-label(canvas,"",54,36,220,24,16,"#dfdfd5","CollectionGW2Category");
-grid=make("Panel",canvas,"CollectionGW2Grid","CollectionGW2Grid");rect(grid,54,72,gridWidth,gridHeight);
+label(canvas,"",80,66,220,26,18,"#eadbb9","CollectionGW2Category");
+grid=make("Panel",canvas,"CollectionGW2Grid","CollectionGW2Grid");rect(grid,80,108,gridWidth,gridHeight);
 gridBody=make("Panel",grid,"CollectionGW2GridBody","CollectionGW2GridBody");rect(gridBody,0,0,gridWidth,gridHeight);
-empty=label(canvas,"",54,210,gridWidth,54,19,"#c4c7c6","CollectionGW2Empty");style(empty,{whiteSpace:"normal",textAlign:"center"});empty.visible=false;
-summary=label(canvas,"",282,36,size[0]-294,24,14,"#c0c6be","CollectionGW2Summary");
-tickets=label(canvas,"",54,size[1]-44,size[0]-218,20,14,"#cad1cb","CollectionGW2Tickets");
-result=label(canvas,"",54,size[1]-22,size[0]-218,18,13,"#bdbdaf","CollectionGW2Result");
-draw=make("Button",canvas,"CollectionGW2Draw","CollectionGW2Button CollectionGW2Draw");rect(draw,size[0]-144,size[1]-38,132,28);skin(draw,"draw_button");style(draw,{backgroundColor:"#63665a30",border:"1px solid #a7a99970",boxShadow:"none"});draw.hittestchildren=false;
-var drawHover=art(draw,"draw_button_hover",0,0,132,28);style(drawHover,{border:"0px"});drawHover.AddClass("CollectionGW2Hover");
-drawText=label(draw,"抽取",0,0,132,28,16,"#e6e3ce","CollectionGW2DrawText");style(drawText,{width:"100%",height:"fit-children",horizontalAlign:"center",verticalAlign:"center",textAlign:"center"});
+empty=label(canvas,"",80,210,gridWidth,54,19,"#c4c7c6","CollectionGW2Empty");style(empty,{whiteSpace:"normal",textAlign:"center"});empty.visible=false;
+summary=label(canvas,"",310,68,size[0]-356,22,14,"#c6b589","CollectionGW2Summary");style(summary,{textAlign:"right"});
+tickets=label(canvas,"",80,size[1]-58,size[0]-310,22,15,"#e1cca0","CollectionGW2Tickets");
+result=label(canvas,"",80,size[1]-31,size[0]-310,18,12,"#a5987c","CollectionGW2Result");
+draw=make("Button",canvas,"CollectionGW2Draw","CollectionGW2Button CollectionGW2Draw");rect(draw,size[0]-216,size[1]-57,176,40);style(draw,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none"});draw.hittestchildren=false;
+nine(draw,"button",0,0,176,40,"CollectionGoldPrimary");
+var drawHover=make("Panel",draw,"","CollectionGW2Hover");rect(drawHover,0,0,176,40);style(drawHover,{backgroundColor:"#fff1bf0c",border:"1px solid #e8ce8555"});drawHover.hittest=false;
+drawText=label(draw,"抽取",0,0,176,40,18,"#fff0ca","CollectionGW2DrawText");style(drawText,{width:"100%",height:"fit-children",horizontalAlign:"center",verticalAlign:"center",textAlign:"center",textShadow:"0px 1px 2px #1a1208"});
 draw.SetPanelEvent("onactivate",drawOne);
 tooltip=cfg.SurvivalArchiveTooltip.Create({parent:canvas,root:root,idPrefix:"CollectionGW2Tooltip",compact:true,collectionRarity:true,isAlive:alive,isActive:function(){return opened;},
+ skin:{backing:{file:"s2r://panorama/images/hud/reborn/bg_tooltip_psd.vtex",size:[500,452],nine_slice_ltrb:[12,12,12,12],edge_ltrb:[6,6,6,6]},frame:{file:goldArt.frame.uri,size:goldArt.frame.size,nine_slice_ltrb:goldArt.frame.cut,edge_ltrb:[8,8,8,8],fill:false}},
  getScale:function(){scale=Number(U.Fit(win,root,size[0],size[1],{reference:fitReference.slice()}))||1;return scale;},
  getBounds:function(){return {width:size[0],height:size[1]};},categoryName:function(id){return names[id]||id;},maxHeight:size[1]-72,watchAnchor:true,
  position:function(info){var x=info.anchor.x+slotSize+8;if(x+info.width>info.bounds.width-8)x=info.anchor.x-info.width-8;return {x:Math.max(8,Math.min(info.bounds.width-info.width-8,x)),y:Math.max(48,Math.min(info.bounds.height-info.height-8,info.anchor.y))};}
@@ -123,17 +145,17 @@ function highlightReward(itemId){
 function renderCards(rows){
  var signature=JSON.stringify([current,rows]);if(signature===cardsKey)return;cardsKey=signature;hideTooltip();gridBody.RemoveAndDeleteChildren();slots=[];
  visibleRows=rows.slice();
- var count=visibleRows.length,rowCount=Math.ceil(count/columns);rect(grid,54,72,gridWidth+(rowCount>rowsPerPage?8:0),gridHeight);rect(gridBody,0,0,gridWidth,Math.max(gridHeight,rowCount?(rowCount-1)*pitch+slotSize:0));
+ var count=visibleRows.length,rowCount=Math.ceil(count/columns);rect(grid,80,108,gridWidth+(rowCount>rowsPerPage?8:0),gridHeight);rect(gridBody,0,0,gridWidth,Math.max(gridHeight,rowCount?(rowCount-1)*pitch+slotSize:0));
  for(var i=0;i<count;i++){
   var item=visibleRows[i],grade=rarity(item),card=make("Button",gridBody,"CollectionGW2Item_"+item.id,"CollectionGW2Slot");rect(card,(i%columns)*pitch,Math.floor(i/columns)*pitch,slotSize,slotSize);style(card,{backgroundImage:"none",border:"0px",backgroundColor:"transparent",boxShadow:"none"});card.hittest=true;card.hittestchildren=false;card.__collectionItem=item;
   if(grade.quality)card.AddClass("CollectionGW2Quality"+grade.quality);
-  var backing=art(card,"slot_background",0,0,slotSize,slotSize);style(backing,{opacity:"0.45"});
+  var backing=make("Panel",card,"","CollectionGoldSlotBacking");rect(backing,0,0,slotSize,slotSize);style(backing,{backgroundColor:"#090d0d"});backing.hittest=false;
   rewardIcon(card,item);card.SetHasClass("CollectionGW2Unowned",countKnown(item)&&Number(item.count)===0);card.SetHasClass("CollectionGW2Unknown",!countKnown(item));
   card.SetHasClass("CollectionGW2Unavailable",Number(item.draw_enabled)===0);
-  var frame=make("Panel",card,"","CollectionGW2SlotFrame");rect(frame,0,0,slotSize,slotSize);style(frame,{backgroundImage:"none",backgroundColor:"transparent",border:"2px solid "+grade.color});frame.hittest=false;frame.hittestchildren=false;
+  var frame=nine(card,"slot",0,0,slotSize,slotSize,"CollectionGW2SlotFrame");style(frame,{border:"1px solid "+grade.color});frame.hittest=false;frame.hittestchildren=false;
   var hover=make("Panel",card,"","CollectionGW2Hover");rect(hover,3,3,slotSize-6,slotSize-6);style(hover,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid "+grade.color});hover.hittest=false;hover.hittestchildren=false;
   if(grade.quality){var gradeWidth=grade.quality.length===3?30:grade.quality.length===2?24:17,gradeLabel=label(card,grade.quality,slotSize-gradeWidth-3,3,gradeWidth,16,11,grade.color);gradeLabel.AddClass("CollectionGW2RarityLabel");style(gradeLabel,{textAlign:"center",fontWeight:"bold",backgroundColor:"#111820db"});}
-  var quantity=label(card,countKnown(item)?number(item.count):"—",4,slotSize-19,slotSize-8,18,12,"#f0eee0");quantity.AddClass("CollectionGW2CardLabel");style(quantity,{textAlign:"right"});bindCard(card,item);
+  var quantity=label(card,countKnown(item)?number(item.count):"—",4,slotSize-19,slotSize-8,18,12,"#f0eee0");quantity.AddClass("CollectionGW2CardLabel");quantity.visible=!countKnown(item)||Number(item.count)>0;style(quantity,{textAlign:"right"});bindCard(card,item);
   var glow=make("Panel",card,"","CollectionGW2RewardGlow");glow.AddClass("RewardGlassSurface");rect(glow,2,2,slotSize-4,slotSize-4);glow.hittest=false;glow.hittestchildren=false;
   card.__collectionRewardGlow=glow;
   setRewardHighlight(card,!!rewardHighlight&&rewardHighlight.pool_id===current&&rewardHighlight.item_id===item.id);

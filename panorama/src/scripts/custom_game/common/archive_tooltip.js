@@ -44,6 +44,7 @@
             var asset = assetOverride || P.assets && P.assets[key] || D.assets[key];
             var spec = D.tooltip.assets[key.replace(/^tooltip_/, "")] || {};
             var insets = asset.nine_slice_ltrb || spec.nine_slice_ltrb || [10,10,10,10];
+            var edges = asset.edge_ltrb || insets;
             var host = make("Panel", panel, role, "ArchiveSharedTooltipNineFrame"), cells = [];
             host.__v10Slice = {asset:key, insets:insets.slice()};
             for (var r=0; r<3; r++) for (var c=0; c<3; c++) {
@@ -51,13 +52,14 @@
                 var art = make("Panel", clip, "", "ArchiveSharedTooltipArt");
                 style(clip, {flowChildren:"none", overflow:"clip"});
                 style(art, {backgroundImage:'url("'+asset.file+'")', backgroundSize:"100% 100%", backgroundPosition:"0px 0px", backgroundRepeat:"no-repeat", flowChildren:"none"});
+                if (asset.fill === false && r === 1 && c === 1) { art.visible=false; style(art,{backgroundImage:"none"}); }
                 cells.push({clip:clip, art:art, col:c, row:r});
             }
             pieces[role] = cells;
             host.Resize = function (x, y, width, height) {
-                var left=insets[0], top=insets[1], right=insets[2], bottom=insets[3];
+                var left=edges[0], top=edges[1], right=edges[2], bottom=edges[3];
                 width=Math.max(width,left+right); height=Math.max(height,top+bottom); rect(host,x,y,width,height);
-                var xs=[0,left,asset.size[0]-right,asset.size[0]], ys=[0,top,asset.size[1]-bottom,asset.size[1]];
+                var xs=[0,insets[0],asset.size[0]-insets[2],asset.size[0]], ys=[0,insets[1],asset.size[1]-insets[3],asset.size[1]];
                 var dx=[0,left,width-right,width], dy=[0,top,height-bottom,height];
                 cells.forEach(function (cell) {
                     var c=cell.col, r=cell.row, sw=xs[c+1]-xs[c], sh=ys[r+1]-ys[r], dw=dx[c+1]-dx[c], dh=dy[r+1]-dy[r], sx=dw/sw, sy=dh/sh;
@@ -70,8 +72,10 @@
         panel.AddClass("ArchiveSharedTooltipHost"); panel.hittest=false; panel.hittestchildren=true; panel.visible=false;
         rect(panel,0,0,hostWidth,measuredHeight+padding*2);
         var shadow=make("Panel",panel,"Shadow","ArchiveSharedTooltipShadow"); rect(shadow,padding,padding,surfaceWidth,measuredHeight);
-        var backing=nineFrame("Backing","tooltip_reference_clean",{file:"file://{images}/custom_game/gw2_tooltip_v1/background.png",size:[354,103],nine_slice_ltrb:[3,3,3,3]}); backing.AddClass("ArchiveSharedTooltipBacking"); backing.Resize(padding,padding,surfaceWidth,measuredHeight);
-        var frame=nineFrame("Frame","tooltip_frame"); frame.AddClass("ArchiveSharedTooltipFrame"); frame.Resize(padding,padding,surfaceWidth,measuredHeight);
+        var tooltipSkin=options.skin || {};
+        var backing=nineFrame("Backing","tooltip_reference_clean",tooltipSkin.backing || {file:"file://{images}/custom_game/gw2_tooltip_v1/background.png",size:[354,103],nine_slice_ltrb:[3,3,3,3]}); backing.AddClass("ArchiveSharedTooltipBacking"); backing.Resize(padding,padding,surfaceWidth,measuredHeight);
+        var frame=nineFrame("Frame","tooltip_frame",tooltipSkin.frame); frame.AddClass("ArchiveSharedTooltipFrame"); frame.Resize(padding,padding,surfaceWidth,measuredHeight);
+        if (tooltipSkin.frame) style(frame,{visibility:"visible"});
         var surface=make("Panel",panel,"Surface","ArchiveSharedTooltipSurface"); rect(surface,padding,padding,surfaceWidth,measuredHeight);
         surface.hittest=true; surface.hittestchildren=true; style(surface,{flowChildren:"none",overflow:"clip"});
         var viewport=make("Panel",surface,"Viewport","ArchiveSharedTooltipViewport"); rect(viewport,insetX,insetTop,bodyWidth+(compact?8:16),measuredHeight-verticalGutter);

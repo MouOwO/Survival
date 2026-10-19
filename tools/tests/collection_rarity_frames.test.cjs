@@ -13,7 +13,9 @@ function card(row){return nodes['CollectionGW2Item_'+row.id];}
 function part(panel,cls){const matches=panel.Children().filter(child=>child.BHasClass(cls));assert.equal(matches.length,1,cls+' is unique');return matches[0];}
 function grade(row,quality=row.quality){
  const panel=card(row),color=colors[quality]||'#88939b';
- assert.equal(part(panel,'CollectionGW2SlotFrame').style.border,'2px solid '+color,'The persistent rim identifies '+quality+' in '+api.Inspect().category);
+ const frame=part(panel,'CollectionGW2SlotFrame');
+ assert.equal(frame.style.border,'1px solid '+color,'The persistent rim identifies '+quality+' in '+api.Inspect().category);
+ assert.equal(frame.__collectionNine.key,'slot');assert.equal(frame.__collectionNine.pieces.length,9,'Native slot artwork retains independent corners');assert.equal(frame.__collectionNine.pieces[4].style.backgroundImage,'none','The rarity rim leaves its portrait uncovered');
  assert.equal(part(panel,'CollectionGW2Hover').style.border,'1px solid '+color,'Hover retains '+quality+' rather than a generic highlight');
  const labels=panel.Children().filter(child=>child.BHasClass('CollectionGW2RarityLabel'));
  assert.equal(labels.length,colors[quality]?1:0,'Only recognized grades receive a rarity label');

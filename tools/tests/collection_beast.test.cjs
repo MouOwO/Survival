@@ -17,7 +17,7 @@ function draws(){return h.sent.filter(r=>r.name==='survival_archive_social_draw'
 function images(n){return (n.paneltype==='Image'?[n]:[]).concat(n.Children().flatMap(images));}
 assert.equal(rows.length,40,'Use all forty existing formal rewards');
 assert.equal(rule.currency_name,'福签');
-assert.equal(nodes.CollectionGW2Tab_beast.Children().filter(n=>n.BHasClass('CollectionGW2Art')).length,1);
+const tabArt=images(nodes.CollectionGW2Tab_beast);assert.equal(tabArt.length,1);assert.equal(tabArt[0].image,'file://{images}/control_icons/24px/trophy.svg','The blessing tab uses a native trophy icon');
 api.Open('beast');
 assert.equal(h.sent.at(-1).payload.category_id,'beast');
 assert.equal(api.Inspect().slots,0,'No placeholder rewards before authority arrives');
@@ -37,9 +37,8 @@ nodes.CollectionGW2Item_beast_01.events.onmouseover();
 assert.equal(nodes.CollectionGW2TooltipTitle.text,rows[0].name);
 assert.equal(nodes.CollectionGW2TooltipQuantity.text,'2/'+rows[0].target);
 assert(nodes.CollectionGW2TooltipEffect.text.includes(rows[0].description));
-nodes.CollectionGW2Search.text=rows[0].name;nodes.CollectionGW2Search.events.ontextentrychange();
-assert.equal(api.Inspect().slots,1);assert.equal(api.Inspect().rows[0].id,rows[0].id);
-nodes.CollectionGW2Search.text='';nodes.CollectionGW2Search.events.ontextentrychange();
+assert.equal(nodes.CollectionGW2Search,undefined,'The refined collection does not create a search field');
+assert.equal(api.Inspect().slots,40,'Every blessing reward stays visible without filtering');
 emit({ok:1,category_id:'ex',sequence:1,chunk:1,chunks:1,pending:0,rows:[{id:'ex_01',name:'胡桃',count:1,target:60}],social:{tickets:3,draw_cost:1,remaining:59,total:1}});
 h.click(nodes.CollectionGW2Draw);const intent=api.Inspect().pending;
 assert.equal(intent.pool_id,'beast');assert.equal(draws().length,1);
@@ -64,4 +63,4 @@ const full=rows.map(r=>({...r,count:r.target}));emit(packet(14,full));
 assert(!nodes.CollectionGW2Draw.enabled);assert.equal(nodes.CollectionGW2DrawText.text,'已全部集满');
 api.Open('wife');assert.equal(h.sent.at(-1).payload.category_id,'wife');assert.equal(api.Inspect().slots,0);assert(!nodes.CollectionGW2Draw.enabled,'Wife awaits its authoritative snapshot');
 h.assertCleanDispose(api);
-console.log('COLLECTION_BEAST_PASS: forty formal rewards, original caps/art/currency, one-page grid, search/tooltip, chunk/delta/stale authority, shared pending gate, reload and committed draw');
+console.log('COLLECTION_BEAST_PASS: forty formal rewards, original caps/art/currency, native trophy tab, unfiltered one-page grid/tooltip, chunk/delta/stale authority, shared pending gate, reload and committed draw');

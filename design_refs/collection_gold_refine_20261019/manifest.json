@@ -1,0 +1,559 @@
+{
+  "kind": "collection_gold_five_continuous_refinements",
+  "notGameCapture": true,
+  "productionChanged": false,
+  "base": "05_gold",
+  "layout": "GW2 vertical icon rail, 10×4 uninterrupted grid, bottom currency/action",
+  "finalSize": [
+    960,
+    548
+  ],
+  "search": false,
+  "persistentItemSelection": false,
+  "continuousAnimation": false,
+  "rounds": [
+    {
+      "id": 1,
+      "name": "九宫格窗体",
+      "finding": "大窗体直接拉伸会改变边角的厚度，金边在宽屏上显得发虚。",
+      "change": "将窗体、内面板替换为九个真实裁片；四角固定10像素，空心中心不盖住官方底图。",
+      "size": [
+        1120,
+        656
+      ]
+    },
+    {
+      "id": 2,
+      "name": "原生组件组装",
+      "finding": "分类、筛选和抽取按钮仍属于不同控件体系，层级不够一致。",
+      "change": "主按钮、分类、筛选与关闭按钮统一采用官方Dota Plus按钮九宫格，保留明确的悬停和按下反馈。",
+      "size": [
+        1120,
+        656
+      ]
+    },
+    {
+      "id": 3,
+      "name": "品质与头像清晰",
+      "finding": "统一金色厚边削弱了品质区别，头像四周留白也减少了有效画面。",
+      "change": "头像满铺；装备框改为官方空心九宫格并固定2像素边角；品质色覆盖四边，未拥有头像降低饱和度但保留辨识度。",
+      "size": [
+        1120,
+        656
+      ]
+    },
+    {
+      "id": 4,
+      "name": "信息与提示框",
+      "finding": "上方数量与底部进度重复，提示框外观没有跟随黑金主题。",
+      "change": "只保留顶部收集数量；底部只放票券、抽取结果和主操作；提示框改为黑金空心九宫格，名称、品质和拥有状态左对齐。",
+      "size": [
+        1120,
+        624
+      ]
+    },
+    {
+      "id": 5,
+      "name": "紧凑定稿",
+      "finding": "大窗口的装饰留白占用了视野，分类轨和底栏仍可收紧。",
+      "change": "压缩为960×548，分类按钮44像素，头像78像素并保持10×4；删除多余说明与常驻动效，完成960p到1920p视口适配。",
+      "size": [
+        960,
+        548
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "key": "gold",
+      "source": "panorama/images/dota_plus/dota_plus_background_texture_large_png.vtex_c",
+      "file": "assets/gold.png",
+      "dimensions": [
+        3484,
+        1992
+      ],
+      "sha256": "655cf7b17dc7206f07a87ff9f15202639272f6a74c47ee5efa80c49abfaa3834"
+    },
+    {
+      "key": "goldHeader",
+      "source": "panorama/images/dota_plus/dota_plus_horizontal_banner_background_png.vtex_c",
+      "file": "assets/goldHeader.png",
+      "dimensions": [
+        2280,
+        529
+      ],
+      "sha256": "3b6bcb4f3a07990b914c8e3b4f9360c93482e45502f71c8b057f53d3244e9d92"
+    },
+    {
+      "key": "goldButton",
+      "source": "panorama/images/dota_plus/relic_rare_button_psd.vtex_c",
+      "file": "assets/goldButton.png",
+      "dimensions": [
+        290,
+        100
+      ],
+      "sha256": "686f7f3809c2ad3e47510a5f352e8f642c7b32b28fda2e43cbed22ffabf98a53"
+    },
+    {
+      "key": "squareFrame",
+      "source": "panorama/images/hud/passive_ability_border_png.vtex_c",
+      "file": "assets/squareFrame.png",
+      "dimensions": [
+        105,
+        105
+      ],
+      "sha256": "0b4e943230ec59769247f4ee8c64a6d570c0987db2a90349521fb9a616053733"
+    },
+    {
+      "key": "tooltip",
+      "source": "panorama/images/hud/reborn/bg_tooltip_psd.vtex_c",
+      "file": "assets/tooltip.png",
+      "dimensions": [
+        500,
+        452
+      ],
+      "sha256": "fc223245ed5ef0a21c528b887af2a4df4e470edf79ee5a35a009f28d08ca2ff1"
+    },
+    {
+      "key": "rail",
+      "source": "panorama/images/hud/reborn/bg_shop_guide_psd.vtex_c",
+      "file": "assets/rail.png",
+      "dimensions": [
+        210,
+        828
+      ],
+      "sha256": "833d53760a69e001306a79233e58addeff987ce42c2f3a7e67b5e67cd9d7abd0"
+    },
+    {
+      "key": "close",
+      "source": "panorama/images/control_icons/24px/x_close.vsvg_c",
+      "file": "assets/close.svg",
+      "dimensions": [
+        24,
+        24
+      ],
+      "sha256": "cd624b9e94d3728fd872bad68b4ef4338856c7bb14ba6b4106098acab85a78e2"
+    },
+    {
+      "key": "treasure",
+      "source": "panorama/images/control_icons/24px/treasure.vsvg_c",
+      "file": "assets/treasure.svg",
+      "dimensions": [
+        24,
+        24
+      ],
+      "sha256": "8a95fce0bd57866ddf3e4e3042ce25903d54168a1d670650951f86a18f594375"
+    },
+    {
+      "key": "friends",
+      "source": "panorama/images/control_icons/friends_png.vtex_c",
+      "file": "assets/friends.png",
+      "dimensions": [
+        40,
+        40
+      ],
+      "sha256": "b3f6873605823d20523ea4bee029039469c7ff72f6bc8eb530c87fe4bf0dc4ca"
+    },
+    {
+      "key": "star",
+      "source": "panorama/images/control_icons/24px/star.vsvg_c",
+      "file": "assets/star.svg",
+      "dimensions": [
+        25,
+        24
+      ],
+      "sha256": "2a4ee31567e43fbd35203c3fba5d10f0c1cd00838d5c600bbe5dd2c1facf3efb"
+    },
+    {
+      "key": "rewards",
+      "source": "panorama/images/control_icons/24px/rewards.vsvg_c",
+      "file": "assets/rewards.svg",
+      "dimensions": [
+        24,
+        24
+      ],
+      "sha256": "641db617493b612e020e73fcde70b22d2409c2395ba506fa7177e0692b2e5f38"
+    },
+    {
+      "key": "trophy",
+      "source": "panorama/images/control_icons/24px/trophy.vsvg_c",
+      "file": "assets/trophy.svg",
+      "dimensions": [
+        24,
+        24
+      ],
+      "sha256": "6c07d278b7c3c8442e092df46cb6f4902446eabeb17de2330a82e4f3f3853c39"
+    },
+    {
+      "key": "ticket",
+      "source": "panorama/images/icon_ticket_png.vtex_c",
+      "file": "assets/ticket.png",
+      "dimensions": [
+        43,
+        34
+      ],
+      "sha256": "de89e17c257eeccb6193e0d45c67bd2e046fa5e760c00d84938d3ca9687af3bd"
+    }
+  ],
+  "slices": [
+    {
+      "key": "window",
+      "source": "panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex_c",
+      "sourcePng": "assets/panorama/images/events/dark_carnival/overworld/inner_panel_border_png.png",
+      "localSourcePng": "assets/native_sources/window.png",
+      "dimensions": [
+        400,
+        400
+      ],
+      "sourceSha256": "2bc5679067fd08e57183538c0c586a29a76d83ec45356dea62ff9dfcffab7ad2",
+      "cutLTRB": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "targetLTRB": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "fillCenter": false,
+      "parts": [
+        {
+          "row": 0,
+          "column": 0,
+          "file": "assets/slices/window_00.png",
+          "size": [
+            20,
+            20
+          ],
+          "paint": true
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "file": "assets/slices/window_01.png",
+          "size": [
+            360,
+            20
+          ],
+          "paint": true
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "file": "assets/slices/window_02.png",
+          "size": [
+            20,
+            20
+          ],
+          "paint": true
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "file": "assets/slices/window_10.png",
+          "size": [
+            20,
+            360
+          ],
+          "paint": true
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "file": "assets/slices/window_11.png",
+          "size": [
+            360,
+            360
+          ],
+          "paint": false
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "file": "assets/slices/window_12.png",
+          "size": [
+            20,
+            360
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "file": "assets/slices/window_20.png",
+          "size": [
+            20,
+            20
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "file": "assets/slices/window_21.png",
+          "size": [
+            360,
+            20
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "file": "assets/slices/window_22.png",
+          "size": [
+            20,
+            20
+          ],
+          "paint": true
+        }
+      ]
+    },
+    {
+      "key": "button",
+      "source": "panorama/images/dota_plus/relic_rare_button_psd.vtex_c",
+      "sourcePng": "assets/panorama/images/dota_plus/relic_rare_button_psd.png",
+      "localSourcePng": "assets/native_sources/button.png",
+      "dimensions": [
+        290,
+        100
+      ],
+      "sourceSha256": "686f7f3809c2ad3e47510a5f352e8f642c7b32b28fda2e43cbed22ffabf98a53",
+      "cutLTRB": [
+        16,
+        12,
+        16,
+        12
+      ],
+      "targetLTRB": [
+        8,
+        6,
+        8,
+        6
+      ],
+      "fillCenter": true,
+      "parts": [
+        {
+          "row": 0,
+          "column": 0,
+          "file": "assets/slices/button_00.png",
+          "size": [
+            16,
+            12
+          ],
+          "paint": true
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "file": "assets/slices/button_01.png",
+          "size": [
+            258,
+            12
+          ],
+          "paint": true
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "file": "assets/slices/button_02.png",
+          "size": [
+            16,
+            12
+          ],
+          "paint": true
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "file": "assets/slices/button_10.png",
+          "size": [
+            16,
+            76
+          ],
+          "paint": true
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "file": "assets/slices/button_11.png",
+          "size": [
+            258,
+            76
+          ],
+          "paint": true
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "file": "assets/slices/button_12.png",
+          "size": [
+            16,
+            76
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "file": "assets/slices/button_20.png",
+          "size": [
+            16,
+            12
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "file": "assets/slices/button_21.png",
+          "size": [
+            258,
+            12
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "file": "assets/slices/button_22.png",
+          "size": [
+            16,
+            12
+          ],
+          "paint": true
+        }
+      ]
+    },
+    {
+      "key": "slot",
+      "source": "panorama/images/hud/passive_ability_border_png.vtex_c",
+      "sourcePng": "assets/panorama/images/hud/passive_ability_border_png.png",
+      "localSourcePng": "assets/native_sources/slot.png",
+      "dimensions": [
+        105,
+        105
+      ],
+      "sourceSha256": "0b4e943230ec59769247f4ee8c64a6d570c0987db2a90349521fb9a616053733",
+      "cutLTRB": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "targetLTRB": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "fillCenter": false,
+      "parts": [
+        {
+          "row": 0,
+          "column": 0,
+          "file": "assets/slices/slot_00.png",
+          "size": [
+            8,
+            8
+          ],
+          "paint": true
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "file": "assets/slices/slot_01.png",
+          "size": [
+            89,
+            8
+          ],
+          "paint": true
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "file": "assets/slices/slot_02.png",
+          "size": [
+            8,
+            8
+          ],
+          "paint": true
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "file": "assets/slices/slot_10.png",
+          "size": [
+            8,
+            89
+          ],
+          "paint": true
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "file": "assets/slices/slot_11.png",
+          "size": [
+            89,
+            89
+          ],
+          "paint": false
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "file": "assets/slices/slot_12.png",
+          "size": [
+            8,
+            89
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "file": "assets/slices/slot_20.png",
+          "size": [
+            8,
+            8
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "file": "assets/slices/slot_21.png",
+          "size": [
+            89,
+            8
+          ],
+          "paint": true
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "file": "assets/slices/slot_22.png",
+          "size": [
+            8,
+            8
+          ],
+          "paint": true
+        }
+      ]
+    }
+  ],
+  "fixture": [
+    "data/csv/存档系统/archive_social_items.csv",
+    "data/csv/存档系统/archive_social_rules.csv",
+    "data/csv/存档系统/archive_item_icons.csv",
+    "data/csv/存档系统/archive_categories.csv"
+  ],
+  "syntheticProgress": true,
+  "build": [
+    "python tools/collection_gold_refine_20261019/slice.py",
+    "node tools/collection_gold_refine_20261019/build.cjs"
+  ]
+}

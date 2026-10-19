@@ -17,17 +17,34 @@ function draws(){return h.sent.filter(r=>r.name==='survival_archive_social_draw'
 function images(node){return (node.paneltype==='Image'?[node]:[]).concat(node.Children().flatMap(images));}
 let api=cfg.SurvivalCollection;
 assert.equal(nodes.CollectionScrim.style.backgroundColor,'#00000022','The flat inventory overrides the generic modal dark scrim after adoption');
-assert.equal(nodes.CollectionGW2Background.style.opacity,'1','The collection texture is not faded');assert.equal(nodes.CollectionGW2Background.style.backgroundColor,'#171e24','Opaque backing covers the source texture alpha');assert.equal(nodes.CollectionWindow.style.backgroundColor,'#171e24');
+assert.equal(nodes.CollectionGW2Background.style.opacity,'1','The collection texture is not faded');assert.equal(nodes.CollectionGW2Background.style.backgroundColor,'#111413','Opaque black and gold backing covers the source texture alpha');assert.equal(nodes.CollectionWindow.style.backgroundColor,'#111413');
 assert.equal(nodes.CollectionGW2CloseIcon.paneltype,'Image');assert(!nodes.CollectionGW2Close.Children().some(child=>child.paneltype==='Label'),'Close uses the fixed image instead of a font glyph');
 assert.equal(nodes.CollectionGW2Sidebar.style.backgroundColor,nodes.CollectionGW2Header.style.backgroundColor,'Header and sidebar share one flat tint');
 function bounds(node){const [x,y]=node.style.position.split(' ').map(parseFloat);return {x,y,right:x+parseFloat(node.style.width),bottom:y+parseFloat(node.style.height)};}
-assert.deepEqual(Array.from(api.Inspect().canvas),[900,478],'One-page canvas matches the approved presentation metadata');
-assert.equal(parseFloat(nodes.CollectionGW2Header.style.height),34,'The title band stays thin');
-assert.equal(parseFloat(nodes.CollectionGW2Title.style.fontSize),18,'The title uses the smaller approved size');
+assert.deepEqual(Array.from(api.Inspect().canvas),[960,548],'One-page canvas matches the refined black and gold presentation');
+assert.equal(parseFloat(nodes.CollectionGW2Header.style.height),52,'The title band gives the fixed corner artwork enough clearance');
+assert.equal(parseFloat(nodes.CollectionGW2Title.style.fontSize),22,'The title keeps its refined readable size');
 assert(bounds(nodes.CollectionGW2Title).bottom<=bounds(nodes.CollectionGW2Header).bottom,'The smaller title is contained in its band');
 assert.equal(bounds(nodes.CollectionGW2Header).bottom,bounds(nodes.CollectionGW2Sidebar).y,'The left rail joins the header without a gap');
 assert.equal(bounds(nodes.CollectionGW2Sidebar).bottom,bounds(nodes.CollectionGW2Footer).y,'The left rail joins the full-width footer');
 function descendants(node){return node.Children().flatMap(child=>[child,...descendants(child)]);}
+function assertNine(node,key,edge,fill){
+ assert(node&&node.__collectionNine,'A native border is assembled from real cropped panels');
+ const nine=node.__collectionNine,pieces=nine.pieces;
+ assert.equal(nine.key,key);assert.equal(pieces.length,9,'Nine cropped regions retain independent geometry');
+ assert(pieces.every(piece=>piece.paneltype==='Panel'&&!piece.hittest&&!piece.hittestchildren),'Border pieces never steal card or button input');
+ const [left,top,right,bottom]=edge;
+ assert.equal(parseFloat(pieces[0].style.width),left);assert.equal(parseFloat(pieces[0].style.height),top);
+ assert.equal(parseFloat(pieces[2].style.width),right);assert.equal(parseFloat(pieces[2].style.height),top);
+ assert.equal(parseFloat(pieces[6].style.width),left);assert.equal(parseFloat(pieces[6].style.height),bottom);
+ assert.equal(parseFloat(pieces[8].style.width),right);assert.equal(parseFloat(pieces[8].style.height),bottom);
+ if(fill)assert.notEqual(pieces[4].style.backgroundImage,'none','The primary button retains its native gold center');
+ else assert.equal(pieces[4].style.backgroundImage,'none','Open border centers do not obscure portraits or the collection backdrop');
+ assert.equal(pieces[4].style.backgroundColor,'transparent');
+}
+assertNine(descendants(nodes.CollectionGW2Canvas).find(node=>node.BHasClass('CollectionGoldWindowFrame')),'frame',[10,10,10,10],false);
+assert.equal(parseFloat(nodes.CollectionGW2Draw.style.width),176);assert.equal(parseFloat(nodes.CollectionGW2Draw.style.height),40);
+assertNine(descendants(nodes.CollectionGW2Draw).find(node=>node.BHasClass('CollectionGoldPrimary')),'button',[8,6,8,6],true);
 function assertOnePage(category){
  const cards=nodes.CollectionGW2GridBody.Children(),grid=nodes.CollectionGW2Grid,body=nodes.CollectionGW2GridBody;
  assert.equal(cards.length,40,category+' renders all forty actual entries');
@@ -44,16 +61,20 @@ function assertOnePage(category){
   assert(b.x>=0&&b.y>=0&&b.right<=parseFloat(grid.style.width)&&b.bottom<=parseFloat(grid.style.height),'Card '+index+' is entirely inside the visible grid');
   const portraits=images(card);assert.equal(portraits.length,1,'One formal portrait per real item');
   assert.equal(parseFloat(portraits[0].style.width),76);assert.equal(parseFloat(portraits[0].style.height),76);
+  assertNine(descendants(card).find(node=>node.BHasClass('CollectionGW2SlotFrame')),'slot',[2,2,2,2],false);
+  const quantity=descendants(card).find(node=>node.BHasClass('CollectionGW2CardLabel'));
+  assert.equal(quantity.visible,Number(card.__collectionItem.count)>0,'Zero ownership labels stay hidden while positive counts remain readable');
+  if(Number(card.__collectionItem.count)>0)assert.equal(quantity.text,String(card.__collectionItem.count));
  });
 }
 ['ex','friend','wife'].forEach((id,i)=>{
- const tab=nodes['CollectionGW2Tab_'+id],children=descendants(tab),frame=children.find(n=>n.BHasClass('CollectionGW2TabSelected')),icon=children.find(n=>n.BHasClass('CollectionGW2Art'));
- assert.equal(parseFloat(tab.style.width),34);assert.equal(parseFloat(tab.style.height),34);
- assert.equal(parseFloat(icon.style.width),27);assert.equal(parseFloat(icon.style.height),27);
+ const tab=nodes['CollectionGW2Tab_'+id],children=descendants(tab),frame=children.find(n=>n.BHasClass('CollectionGW2TabSelected')),icon=children.find(n=>n.paneltype==='Image');
+ assert.equal(parseFloat(tab.style.width),44);assert.equal(parseFloat(tab.style.height),44);
+ assert.equal(parseFloat(icon.style.width),28);assert.equal(parseFloat(icon.style.height),28);
  assert(!children.some(n=>n.paneltype==='Label'),'Category rail is icons only');
- assert.equal(frame.style.backgroundColor,'transparent');assert.equal(frame.style.border,'1px solid #afc4c54a');assert.equal(frame.style.borderLeft,undefined,'No protruding left selection edge');
+ assertNine(frame,'frame',[10,10,10,10],false);assert.equal(frame.style.borderLeft,undefined,'No protruding left selection edge');
  assert(bounds(tab).x>=bounds(nodes.CollectionGW2Sidebar).x&&bounds(tab).right<=bounds(nodes.CollectionGW2Sidebar).right,'Icon buttons stay inside the rail');
- assert(bounds(frame).x>0&&bounds(frame).y>0&&bounds(frame).right<parseFloat(tab.style.width)&&bounds(frame).bottom<parseFloat(tab.style.height),'The selection outline stays inset');
+ assert(bounds(frame).x>=0&&bounds(frame).y>=0&&bounds(frame).right<=parseFloat(tab.style.width)&&bounds(frame).bottom<=parseFloat(tab.style.height),'The selected border stays within the icon button');
  assert.equal(typeof tab.events.onmouseover,'function');assert.equal(typeof tab.events.onmouseout,'function');
 });
 nodes.CollectionGW2Result.text='服务端返回的完整长错误说明'.repeat(50);assert(bounds(nodes.CollectionGW2Result).right<=bounds(nodes.CollectionGW2Draw).x,'Even a long response is contained before the draw button');assert.equal(nodes.CollectionGW2Result.style.textOverflow,'ellipsis');
@@ -134,4 +155,4 @@ const formal=require('../collection_gw2/fixture.cjs').fixture(),formalWife=forma
 assert.equal(formalWife.length,40,'The formal wife fixture retains every video entry');assert.deepEqual(formalWife.map(row=>row.id),Array.from({length:40},(_,i)=>'wife_'+String(i+1).padStart(2,'0')),'Wife cards follow the video positions even when CSV additions are appended');
 assert.deepEqual(formalWife.filter(row=>row.draw_enabled===0).map(row=>row.id),['wife_31','wife_39']);assert.equal(formalWife.filter(row=>row.draw_enabled!==0).length,38);
 assert.equal(formal.social.wife.remaining,formalWife.filter(row=>row.draw_enabled!==0).reduce((sum,row)=>sum+row.target-row.count,0),'Preview draw weight excludes pending adaptation capacities');assert(formalWife.filter(row=>row.draw_enabled===0).every(row=>row.count===0&&!row.description.includes(row.availability_note)&&row.availability_note.includes('不消耗玫瑰')),'Pending entries preserve their separate notice and original description without synthetic ownership');
-console.log('COLLECTION_GW2_PASS: independent inventory, real item cards only, compact 128px portrait textures, search, configured wife pool, wife chunk/delta/stale recovery, cross-tab pending and retry-safe hot reload, request/ACK authority and closure');
+console.log('COLLECTION_GW2_PASS: native black and gold nine-piece borders, hidden zero counts, independent inventory, real compact portrait cards, configured wife pool, wife chunk/delta/stale recovery, cross-tab pending and retry-safe hot reload, request/ACK authority and closure');

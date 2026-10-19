@@ -4,12 +4,10 @@
 .CollectionGW2Art { background-size:100% 100%; background-repeat:no-repeat; border:0px; box-shadow:none; }
 .CollectionGW2FlatRegion { flow-children:none; background-image:none; border:0px; box-shadow:none; }
 .CollectionGW2Text { font-family:"Source Han Sans SC"; font-weight:normal; font-style:normal; padding:0px; margin:0px; text-shadow:none; }
-#CollectionGW2Background { background-color:#171e24; opacity:1; border:0px; box-shadow:none; }
+#CollectionGW2Background { background-color:#111413; opacity:1; border:0px; box-shadow:none; }
 .CollectionGW2Tab { flow-children:none; background-color:transparent; border:0px; box-shadow:none; }
 .CollectionGW2TabSelected { opacity:0; }
-.CollectionGW2Selected { brightness:1.1; }
 .CollectionGW2Selected .CollectionGW2TabSelected { opacity:1; }
-.CollectionGW2Tab:hover { brightness:1.2; }
 .CollectionGW2Grid { flow-children:none; overflow:squish scroll; }
 .CollectionGW2GridBody { flow-children:none; overflow:noclip; }
 .CollectionGW2Slot { flow-children:none; background-color:transparent; border:0px; margin:0px; padding:0px; overflow:clip; box-shadow:none; }
@@ -28,7 +26,6 @@
 .CollectionGW2Button:hover .CollectionGW2Hover { opacity:.65; }
 .CollectionGW2Button { flow-children:none; background-color:transparent; border:0px; padding:0px; margin:0px; box-shadow:none; }
 .CollectionGW2Button:hover { brightness:1.12; }
-.CollectionGW2Button:active { brightness:.9; }
 .CollectionGW2Disabled { saturation:.2; brightness:.55; }
 .CollectionGW2Tooltip { flow-children:none; overflow:noclip; z-index:150; }
 .CollectionGW2Tooltip .ArchiveSharedTooltipViewport VerticalScrollBar,
@@ -44,3 +41,17 @@
     box-shadow: none;
     z-index: 2;
 }
+
+/* Official black/gold parts: fixed corners and stretchable edges. */
+.CollectionGoldNine, .CollectionGoldWindowFrame, .CollectionGoldTabFrame, .CollectionGoldPrimary, .CollectionGoldNinePiece { flow-children:none; overflow:clip; }
+.CollectionGoldWindowFrame { z-index:90; }
+.CollectionGoldTabFrame { opacity:.55; }
+.CollectionGW2TabSelected { brightness:1.8; }
+.CollectionGW2Selected .CollectionGoldTabFrame { brightness:1.35; opacity:1; }
+.CollectionGW2Selected { brightness:1; }
+.CollectionGW2Tab:hover { brightness:1.12; }
+.CollectionGW2SlotFrame .CollectionGoldNinePiece { opacity:.8; }
+.CollectionGW2Button:hover { brightness:1.12; }
+.CollectionGW2Button:active { brightness:.88; }
+#CollectionGW2DrawText { font-weight:semi-bold; letter-spacing:1px; }
+.CollectionGW2Tooltip .ArchiveSharedTooltipNineFrame { wash-color:#d8c394; }

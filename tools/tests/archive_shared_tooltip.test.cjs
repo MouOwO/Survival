@@ -56,6 +56,7 @@ delete cfg.ArchiveHandoff.FormatEffects;
 assert(a.Show({...item,description:'累计有效在线时长：90小时\n攻击力+5'},'ex',firstCard));assert.equal(a.elements.Effect.text,'累计有效在线时长：90小时\n攻击力+5','Only map level tooltips move the online requirement');assert.equal(a.elements.Condition.text,'');assert.equal(a.elements.Condition.visible,false,'Changing categories clears the map unlock section');
 assert(a.Show(item,'ex',firstCard));
 assert.notEqual(a.panel,b.panel);assert.notEqual(a.elements.Backing,b.elements.Backing);assert.equal(a.elements.Surface.hittest,true);assert.equal(a.panel.hittest,false,'Shadow bounds do not steal card input');
+assert.equal(a.elements.Frame.style.visibility,undefined,'Unskinned callers keep the default CSS frame visibility');assert.equal(a.elements.Backing.Children()[0].Children()[0].style.backgroundImage,'url("file://{images}/custom_game/gw2_tooltip_v1/background.png")','Unskinned callers keep their existing background artwork');
 function corners(tip){return ['Backing','Frame'].map(role=>tip.elements[role].Children().filter((_,index)=>[0,2,6,8].includes(index)).map(clip=>({width:clip.style.width,height:clip.style.height,artWidth:clip.Children()[0].style.width,artHeight:clip.Children()[0].style.height})));}
 const shortCorners=corners(a),shortHeight=a.Inspect().surfaceHeight;a.Show({...item,description:'长说明\n'.repeat(150)},'ex',firstCard);h.flushFinite();assert.deepEqual(corners(a),shortCorners,'Changing content height never stretches material corners');assert(a.Inspect().surfaceHeight>shortHeight,'Long content actually changes the material height');assert.equal(a.Inspect().nineSlices.Backing.count,9);assert.equal(a.Inspect().nineSlices.Frame.count,9);
 a.QueueHide();const surfaceAt=a.elements.Surface.GetPositionWithinWindow();h.setCursor(surfaceAt.x+10,surfaceAt.y+10);a.elements.Surface.events.onmouseover();h.flushFinite();assert(!a.IsVisible(),'Entering the surface hides immediately instead of cancelling card leave');assert(b.IsVisible());
@@ -78,4 +79,24 @@ h.setCursor(1000,900);scroll.elements.Surface.events.onmouseout();h.flushFinite(
 assert(scroll.Show(item,'ex',firstCard));h.flushFinite();assert(scroll.elements.Body.actuallayoutheight<=scroll.elements.Viewport.actuallayoutheight+1);
 const passiveAt=scroll.elements.Surface.GetPositionWithinWindow();h.setCursor(passiveAt.x+10,passiveAt.y+10);scroll.elements.Surface.events.onmouseover();assert(!scroll.IsVisible(),'Short tooltips retain passive immediate dismissal');
 scroll.Dispose();assert.equal(cfg.SurvivalTooltipDismiss.Inspect().owners,0);assert.equal(h.sent.length,0);
-console.log('ARCHIVE_SHARED_TOOLTIP_PASS: isolated owners, real quantity semantics, enter-dismiss, cross-tooltip reentry guard, anchored movement, stable material corners, disposal guards');
+const nativeSkin=Object.freeze({
+ backing:Object.freeze({file:'s2r://panorama/images/hud/reborn/bg_tooltip_psd.vtex',size:Object.freeze([500,452]),nine_slice_ltrb:Object.freeze([12,12,12,12]),edge_ltrb:Object.freeze([6,6,6,6]),fill:true}),
+ frame:Object.freeze({file:'s2r://panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex',size:Object.freeze([400,400]),nine_slice_ltrb:Object.freeze([20,20,20,20]),edge_ltrb:Object.freeze([8,8,8,8]),fill:false})
+});
+const nativeSkinBefore=JSON.stringify(nativeSkin),native=cfg.SurvivalArchiveTooltip.Create({...options(firstParent,'NativeSkinTip'),compact:true,skin:nativeSkin});
+h.setCursor(1000,900);assert(native.Show(item,'ex',firstCard));
+assert.equal(native.elements.Frame.style.visibility,'visible','An explicit frame skin overrides the default collapsed frame');
+for(const [role,asset] of [['Backing',nativeSkin.backing],['Frame',nativeSkin.frame]]){
+ const clips=native.elements[role].Children();assert.equal(clips.length,9);assert.equal(native.Inspect().nineSlices[role].count,9);
+ for(const corner of [0,2,6,8]){assert.equal(clips[corner].style.width,asset.edge_ltrb[0]+'px');assert.equal(clips[corner].style.height,asset.edge_ltrb[1]+'px');}
+ assert.equal(clips[0].Children()[0].style.backgroundImage,'url("'+asset.file+'")','The caller supplies the native material without changing source assets');
+ assert.equal(parseFloat(clips[0].Children()[0].style.width),asset.size[0]*asset.edge_ltrb[0]/asset.nine_slice_ltrb[0],'Source cuts and fixed display corner sizes remain independent');
+ const center=clips[4].Children()[0];
+ if(asset.fill===false){assert.equal(center.visible,false);assert.equal(center.style.backgroundImage,'none','A border-only frame cannot cover the underlying tooltip background');}
+ else assert.notEqual(center.style.backgroundImage,'none','A solid backing retains its center artwork');
+}
+const nativeCorners=corners(native),nativeHeight=native.Inspect().surfaceHeight;
+assert(native.Show({...item,description:'原生材质长说明\n'.repeat(150)},'ex',firstCard));h.flushFinite();
+assert(native.Inspect().surfaceHeight>nativeHeight);assert.deepEqual(corners(native),nativeCorners,'Fixed native corners survive tooltip height changes');assert.equal(JSON.stringify(nativeSkin),nativeSkinBefore,'Tooltip rendering leaves caller-owned skin definitions untouched');
+native.Dispose();assert.equal(cfg.SurvivalTooltipDismiss.Inspect().owners,0);assert.equal(h.sent.length,0);
+console.log('ARCHIVE_SHARED_TOOLTIP_PASS: isolated owners, real quantity semantics, enter-dismiss, cross-tooltip reentry guard, anchored movement, stable material corners, optional native nine-slice skins with transparent frame centers, disposal guards');

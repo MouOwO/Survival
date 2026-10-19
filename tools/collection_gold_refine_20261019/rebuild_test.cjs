@@ -1,0 +1,10 @@
+'use strict';
+// Explicitly make the optional, untracked full catalog unavailable without touching it.
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict'),{spawnSync}=require('node:child_process');
+const repo=path.resolve(__dirname,'../..'),out=path.join(repo,'design_refs/collection_gold_refine_20261019'),qa=path.join(repo,'output/collection_gold_refine_20261019/qa_preview');
+fs.mkdirSync(qa,{recursive:true});const absent=path.join(qa,'catalog_must_not_exist');assert(!fs.existsSync(absent));
+function hashes(dir,result={}){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,entry.name);if(entry.isDirectory())hashes(p,result);else if(/\.(png|jpg)$/.test(entry.name))result[path.relative(out,p).replaceAll('\\','/')]=crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');}return result;}
+const before=hashes(out),commands=[['C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe',[path.join(__dirname,'slice.py')]],[process.execPath,[path.join(__dirname,'build.cjs')]],['C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe',[path.join(__dirname,'audit.py')]]],steps=[];
+for(const[command,args]of commands){const r=spawnSync(command,args,{cwd:repo,env:{...process.env,COLLECTION_UI_CATALOG:absent},encoding:'utf8',windowsHide:true});assert.equal(r.status,0,r.stderr||r.stdout);steps.push({script:path.basename(args[0]),exitCode:r.status,output:r.stdout.trim()});}
+assert.deepEqual(hashes(out),before,'Offline rebuild must preserve every rendered image and native asset byte');
+const report={result:'PASS',optionalCatalogAvailable:false,optionalCatalogPath:absent,localNativeSources:3,unchangedImages:Object.keys(before).length,steps};fs.writeFileSync(path.join(qa,'offline_rebuild_report.json'),JSON.stringify(report,null,2));console.log('COLLECTION_GOLD_OFFLINE_REBUILD_PASS: slice/build/audit with absent catalog; '+report.unchangedImages+' images unchanged');
