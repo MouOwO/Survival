@@ -33,6 +33,11 @@
 .LotteryGW2Surface { background-image:none; border:0px; box-shadow:none; }
 .LotteryGW2SceneSubject { background-size:cover; background-position:center; background-repeat:no-repeat; }
 .LotteryGW2Label { font-family:"Source Han Sans SC"; font-weight:normal; text-shadow:none; white-space:normal; text-overflow:ellipsis; }
+/* Native Crownfall material: restrained dark panels against the pool artwork. */
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2PoolSkin { brightness:1; transition-property:brightness; transition-duration:.12s; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool.Selected .LotteryGW2PoolSkin { brightness:1.25; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool:hover .LotteryGW2PoolSkin { brightness:1.4; }
+#LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool:active .LotteryGW2PoolSkin { brightness:.88; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2Recharge { width:32px; height:32px; margin:0px 0px 0px 8px; padding:0px; border-radius:50%; background-image:none; background-color:gradient(linear,0% 0%,0% 100%,from(#51452c),to(#28251f)); border:1px solid #bda36b88; box-shadow:#00000044 0px 1px 3px 0px; transition-property:brightness,border; transition-duration:0.12s; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2RechargeIcon { width:18px; height:18px; align:center center; wash-color:#f0dca3; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2Recharge:hover { brightness:1.3; border-color:#f0dca3; }

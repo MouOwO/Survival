@@ -99,20 +99,47 @@ const otherModal=new Panel('Panel',root,'UnrelatedModal');config.SurvivalUILayer
 const beforeForeign=requests.length;nodes.LotteryGW2Back.events.onactivate();nodes.LotteryGW2Pool_summer.events.onactivate();nodes.LotteryGW2Preview_0.events.onactivate();nodes.LotteryGW2Preview_0.events.onmouseover();
 assert.equal(requests.length,beforeForeign,'new controls cannot act through an unrelated modal');assert.equal(config.SurvivalUILayers.Top(),'unrelated_modal');assert.equal(presentation.Inspect().selected,'map');assert(!nodes.LotteryGW2Tooltip.visible);assert(presentation.Inspect().open);
 config.SurvivalUILayers.Close('unrelated_modal');
-function infoBounds(bodyTop){
- const expected={LotteryInfoOverlay:[334,123,1309,746],LotteryInfoDialog:[0,0,1309,746],LotteryInfoBody:[0,bodyTop,1309,658-bodyTop],LotteryInfoList:[0,0,1309,658-bodyTop],LotteryInfoFooter:[0,658,1309,88],LotteryInfoRules:[18,0,1072,84],LotteryGW2InfoBack:[1112,25,178,46]};
+function infoBounds(bodyTop,details=false){
+ const footerTop=details?746:658,footerHeight=details?0:88;
+ const expected={LotteryInfoOverlay:[334,123,1309,746],LotteryInfoDialog:[0,0,1309,746],LotteryInfoBody:[0,bodyTop,1309,footerTop-bodyTop],LotteryInfoList:[0,0,1309,footerTop-bodyTop],LotteryInfoFooter:[0,footerTop,1309,footerHeight],LotteryInfoRules:[18,0,1072,84]};
  for(const [id,[x,y,w,h]]of Object.entries(expected)){
   const n=nodes[id];assert(n,id+' exists');assert.equal(n.style.position,x+'px '+y+'px 0px',id+' fills the right-side layout');assert.equal(n.style.width,w+'px',id+' width');assert.equal(n.style.height,h+'px',id+' height');
  }
  assert.equal(nodes.LotteryInfoNote.style.width,'1273px','the note uses the full right-side width');
  assert.equal(parseFloat(nodes.LotteryInfoOverlay.style.position)+parseFloat(nodes.LotteryInfoOverlay.style.width),1643,'details meet the same right edge as the accepted content');
- assert.equal(parseFloat(nodes.LotteryInfoBody.style.position.split(' ')[1])+parseFloat(nodes.LotteryInfoBody.style.height),658,'the list meets the footer without an unused bottom gap');
- assert.equal(parseFloat(nodes.LotteryGW2InfoBack.style.position)+parseFloat(nodes.LotteryGW2InfoBack.style.width),1290,'the return control stays inside the full-width footer');
+ assert.equal(parseFloat(nodes.LotteryInfoBody.style.position.split(' ')[1])+parseFloat(nodes.LotteryInfoBody.style.height),footerTop,'the list uses all space above the current footer');
+ assert.equal(nodes.LotteryInfoFooter.style.visibility,details?'collapse':'visible','only details remove the footer and its explanatory text');
+ for(const id of ['LotteryGW2FooterSkin','LotteryGW2FooterRule'])assert.equal(nodes[id].style.visibility,details?'collapse':'visible','the removed details footer leaves no blank backing or divider');
+ assert.equal(nodes.LotteryPoolGuarantee.style.visibility,'collapse');
+ assert.equal(nodes.LotteryInfoList.style.overflow,'squish scroll','the taller list retains vertical scrolling');
+ assert(!nodes.LotteryGW2InfoBack,'the duplicate bottom return button is never created');
 }
-current.Feature('details');infoBounds(18);
+current.Feature('details');infoBounds(18,true);
 assert.equal(config.SurvivalUILayers.Top(),'lottery_info','Escape closes the details layer owned by the controller');
 assert.equal(nodes.LotteryInfoDialog.style.width,'1309px');assert.equal(nodes.LotteryInfoDialog.style.transform,'none');
 assert.equal(nodes.LotteryCelestialFooter.style.visibility,'collapse');
+const detailMainTitle=nodes.LotteryTitle.text,detailMainTickets=nodes.LotteryGW2TicketBalance.text,detailSwitchStart=requests.length;
+for(const id of ['map','cultivation','dragon_knight','summer']){
+ const start=requests.length;nodes['LotteryGW2Pool_'+id].events.onactivate();
+ const read=requests.slice(start).find(r=>r.n==='ui_lottery_snapshot_request'&&r.p.snapshot_scope==='details');
+ if(read){
+  assert.equal(read.p.pool_id,id,'each uncached detail tab requests its own pool');
+  const sample=data(id);if(id==='cultivation')sample.items=Array.from({length:80},(_,i)=>({...sample.items[i%17],id:'scroll_reward_'+i}));
+  events.ui_lottery_snapshot({...sample,snapshot_scope:'details',snapshot_request_id:read.p.snapshot_request_id});
+ }
+ assert.equal(presentation.Inspect().selected,id,'each of the four detail tabs selects its authoritative pool');infoBounds(18,true);
+ if(id==='cultivation'){
+  const scrollCards=nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow'));
+  assert.equal(scrollCards.length,80,'a long prize list retains all controller-owned rewards');
+  const last=scrollCards.at(-1);assert(parseFloat(last.style.position.split(' ')[1])+parseFloat(last.style.height)>parseFloat(nodes.LotteryInfoList.style.height),'the scroll content extends past the enlarged viewport');
+ }
+ assert.equal(nodes.LotteryTitle.text,detailMainTitle);assert.equal(nodes.LotteryGW2TicketBalance.text,detailMainTickets,'detail pool switches preserve the main draw balance');
+}
+assert(!requests.slice(detailSwitchStart).some(r=>/draw|purchase|checkout|claim/.test(r.n)),'detail tabs remain read-only');
+nodes.LotteryGW2Back.events.onactivate();assert.equal(config.SurvivalUILayers.Top(),'lottery','the upper-left return closes only the details layer');
+assert.equal(presentation.Inspect().mode,'');assert.equal(nodes.LotteryGW2Title.text,'抽奖');assert.equal(presentation.Inspect().selected,'map');
+assert.equal(nodes.LotteryGW2FooterSkin.style.visibility,'visible','upper-left return restores the main draw footer');
+current.Feature('details');infoBounds(18,true);
 const cells=nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow'));
 assert.equal(cells.length,17);assert(cells.every(c=>c.__lotteryGW2Cell),'decorate every existing reward');
 assert.equal(cells[0].__lotteryGW2Cell.count.text,'0','quality sorting keeps real zero');
@@ -221,7 +248,8 @@ for(const row of fullHistory){
  assert.equal(quality.style.position,'978px 0px 0px');assert.equal(quantity.style.position,'1134px 0px 0px');
  assert(parseFloat(quantity.style.position)+94<=parseFloat(row.style.width),'the final history column stays inside the row');
 }
-current.CloseInfo();current.CloseResult();current.Feature('announcement');assert.equal(nodes.LotteryGW2Title.text,'开奖公告');
+current.CloseInfo();current.CloseResult();current.Feature('announcement');assert.equal(nodes.LotteryGW2Title.text,'开奖公告');infoBounds(64);
+assert.equal(nodes.LotteryInfoNote.text,'当前奖池规则','the shared announcement note remains visible');
 current.CloseInfo();const requestCount=requests.length;current.Feature('privilege');assert.equal(requests.length,requestCount,'unavailable privilege cannot transact');
 current.CloseInfo();
 const artSnapshot=data();artSnapshot.items=[realReward];events.ui_lottery_snapshot(artSnapshot);

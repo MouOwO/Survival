@@ -1,0 +1,108 @@
+{
+  "status": "PASS_COMPONENTS_AND_NATIVE_COMPILE",
+  "task": "lottery pool detail cleanup and native skin",
+  "changes": [
+    "Remove the duplicate bottom return button; retain the controller-owned upper-left return.",
+    "Hide detail-only explanatory footer and guarantee; reclaim 88 logical pixels for the scrolling reward list.",
+    "Hide the draw footer backing/divider in details and restore them when returning.",
+    "Use the installed Dark Carnival sliced copper frame and Crownfall dark/gold pool buttons."
+  ],
+  "native_resources": [
+    {
+      "resource": "panorama/images/events/crownfall/buttons/tabs_background_png.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/buttons/tabs_background_png.vtex",
+      "previewPng": "output/lottery_detail_polish_20261019/native_skin_audit/events__crownfall__buttons__tabs_background_png.png",
+      "width": 280,
+      "height": 112,
+      "sha256": "42333a35bf7970f6c6e07e1c78fd70728651f5e9e5756fa309d66db80dc46f25"
+    },
+    {
+      "resource": "panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex",
+      "previewPng": "output/lottery_detail_polish_20261019/native_skin_audit/events__dark_carnival__overworld__inner_panel_border_png.png",
+      "width": 400,
+      "height": 400,
+      "sha256": "184ef134e237bf41e5160399df731eaa4e0ff28cea4231bce21c7d98990918b4"
+    }
+  ],
+  "native_compile": [
+    {
+      "source": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "source_sha256": "b459a9e95dd16619043f89512c90e42ee332a7c34cab045f2bcd4bbaa6ab47c7",
+      "artifact": "panorama/scripts/custom_game/lottery_gw2.vjs_c",
+      "artifact_sha256": "a9cc0bcfdec79d3367ffd59f5a7b0252dfd687fe2103ea2ca6560476c07831dc"
+    },
+    {
+      "source": "panorama/src/styles/custom_game/lottery_gw2.css",
+      "source_sha256": "cc8a901cd51c3ea823709c3284441d13d8677a2a38338955f328f31cf2576125",
+      "artifact": "panorama/styles/custom_game/lottery_gw2.vcss_c",
+      "artifact_sha256": "83913b9fa4ef569f124922000f28b4ecc1feb7e29d9cdd5e8f803f3df01d201d"
+    }
+  ],
+  "live_native_compile": [
+    {
+      "source": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "source_sha256": "2b83fdad3ae32abe487e62b97265839b0b43e22b3cf0321fd55ca2b7e93f3793",
+      "artifact": "panorama/scripts/custom_game/lottery_gw2.vjs_c",
+      "artifact_sha256": "edb27ab9ce0d388b97b0440d4872d14f30d141a01b9069d2043727399360abfb"
+    },
+    {
+      "source": "panorama/src/styles/custom_game/lottery_gw2.css",
+      "source_sha256": "881413b95ef2df424d65ebf31160e14d9657fa5af8aeb8f7e11e388d2722d103",
+      "artifact": "panorama/styles/custom_game/lottery_gw2.vcss_c",
+      "artifact_sha256": "0bdf13f2b35c16262a0eb004c65eb9b5ea50becb0b37c26848ca22fe6f4b50f6"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Production lottery UI lifecycle, four detail pools, 80-item scrolling, upper-left return, footer restoration, tooltip and transaction isolation",
+      "passed": true
+    },
+    {
+      "name": "Current ticket icons and unavailable resource fallback",
+      "passed": true,
+      "tests": 4
+    },
+    {
+      "name": "Probability notice",
+      "passed": true
+    },
+    {
+      "name": "Movie playback and scene/flow/ticket rules regressions",
+      "passed": true,
+      "suites": 4
+    },
+    {
+      "name": "Offline production component preview",
+      "passed": true,
+      "detail_screens": 8,
+      "hover_screens": 2,
+      "viewports": [
+        [
+          1920,
+          1080
+        ],
+        [
+          1280,
+          720
+        ]
+      ],
+      "source_hashes_verified": 91
+    },
+    {
+      "name": "Native Panorama compilation",
+      "passed": true,
+      "sources": 2
+    }
+  ],
+  "preview": {
+    "path": "docs/evidence/lottery_detail_polish_20261019/dragon_knight_details.png",
+    "sha256": "c2eb47f247dab5b59b6d662defd0b764cb1359231f902643ac45f2cc5251e15f",
+    "not_game_capture": true
+  },
+  "live_dota_verified": false,
+  "limitations": [
+    "Browser previews execute the isolated candidate XML/JS/CSS with local fixture balances; native in-game rendering has not been visually verified.",
+    "Concurrent pre-existing fullscreen and text-shadow edits are preserved only in the live working view and its separately compiled artifacts."
+  ]
+}
