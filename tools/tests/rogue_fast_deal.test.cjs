@@ -136,6 +136,25 @@ function createHarness(initial = {}, viewport = [1920, 1080]) {
 function descendants(p) { return p.Children().flatMap(child => [child, ...descendants(child)]); }
 function tagged(p, cls) { return descendants(p).filter(child => child.BHasClass(cls)); }
 function buttons(h) { return tagged(h.nodes.RogueRewardCards, 'RoguePick'); }
+function assertInputBoundary(h) {
+    for (const slot of tagged(h.nodes.RogueRewardCards, 'RogueSlot')) {
+        assert.equal(slot.hittest, false, 'transparent card margins cannot intercept a neighbour');
+        assert.equal(slot.hittestchildren, true, 'the visible face and its actual button remain interactive');
+        const pick = tagged(slot, 'RoguePick')[0], tilt = tagged(slot, 'RogueTilt')[0];
+        assert(pick && tilt); assert.equal(pick.GetParent(), slot); assert.equal(tilt.GetParent(), slot);
+        assert.equal(tilt.hittest, false, 'the paint container cannot intercept input itself');
+        assert.equal(tilt.hittestchildren, true);
+    }
+}
+function activateDescription(h, index) {
+    const front = tagged(h.nodes.RogueRewardCards, 'RogueFront')[index];
+    const description = tagged(front, 'RogueCardDescription')[0];
+    assert.equal(description.hittest, true, 'description keeps native scrolling and pointer input');
+    let receiver = description;
+    while (receiver && !receiver.events.onactivate) receiver = receiver.GetParent();
+    assert.equal(receiver, front, 'description activation bubbles to its own front, never a neighbouring slot');
+    h.event(receiver, 'onactivate');
+}
 function offer(token = 'deal_1') {
     return {active: 1, token, rerolls_remaining: 1, cards: [
         {card_id: 'frozen_wall', display_name: '冻结之墙', description: '城墙护甲提高10点。'},
@@ -165,11 +184,10 @@ function catalogCoverage() {
         assert(resolved, 'configured card has a matching illustration: ' + card.card_id);
         assert.match(resolved.uri, /^s2r:\/\/panorama\/images\/loadingscreens\/.+\.vtex$/,
             'illustration uses native large-format artwork: ' + card.card_id);
-        assert.equal(resolved.abilityUri, 's2r://panorama/images/spellicons/' + card.icon_name + '_png.vtex',
-            'small skill icon follows the authoritative card CSV: ' + card.card_id);
         h.update({active: 1, token: 'catalog_' + card.card_id, cards: [card]});
         const front = tagged(h.nodes.RogueRewardCards, 'RogueFront')[0];
         assert(front && front.visible && buttons(h)[0].enabled);
+        assertInputBoundary(h);
         assert.match(front.style.backgroundImage, /^url\("s2r:\/\/panorama\/images\/hud\/.+\.vtex"\)$/,
             'native HUD material supplies the card background');
         const artwork = tagged(front, 'RogueOptionIllustration');
@@ -177,7 +195,7 @@ function catalogCoverage() {
         assert.equal(artwork[0].style.backgroundImage, 'url("' + resolved.uri + '")');
         assert.equal(artwork[0].style.backgroundSize, 'cover');
         const icons = tagged(front, 'RogueAbilityIcon');
-        assert.equal(icons.length, 1); assert.equal(icons[0].image, resolved.abilityUri);
+        assert.equal(icons.length, 0, 'the compact title has no upper-left skill icon: ' + card.card_id);
         assert.equal(tagged(front, 'RogueCardName')[0].text, card.display_name, 'art refresh preserves the real card name');
         const description = tagged(front, 'RogueCardDescription')[0].text;
         assert.deepEqual(description.split(/[\n；;]/).map(line => line.trim()), card.description.split(/[\n；;]/).map(line => line.trim()),
@@ -192,8 +210,10 @@ function run() {
     const h = createHarness(), ui = h.cfg.SurvivalRogueReward, data = offer();
     h.update(data, '1'); assert(!ui.IsOpen(), 'another player cannot open our offer');
     h.update(data); assert(ui.IsOpen()); assert.equal(buttons(h).length, 3);
+    assertInputBoundary(h);
     assert.equal(h.cfg.SurvivalUILayers.Top(), 'rogue_choice');
     const first = buttons(h)[0]; h.event(first, 'onactivate');
+    activateDescription(h, 0);
     assert.equal(h.sent.length, 0, 'dealing cards cannot submit an accidental selection');
     for (let i = 0; i < 20; i++) {
         h.advance(.05); assertNoFlip(h);
@@ -204,15 +224,21 @@ function run() {
     assert.equal(h.sent.length, 0, 'animation and input tracking do not send transactions');
 
     // Compare observed direction, without copying the production tilt formula.
-    const transforms = () => tagged(h.nodes.RogueRewardCards, 'RogueTilt').map(p => String(p.style.transform || '')).join('|');
+    const transforms = () => tagged(h.nodes.RogueRewardCards, 'RogueTilt').map(p => String(p.style.transform || ''));
     assert.equal(tagged(h.nodes.RogueRewardCards, 'RogueTilt').length, 3, 'each face has its own pointer orientation surface');
-    h.event(first, 'onmouseover'); h.setCursor(0, 0); h.advance(.2); const upperLeft = transforms();
+    h.setCursor(0, 0); h.advance(.2); const upperLeft = transforms();
     h.setCursor(1919, 1079); h.advance(.2); const lowerRight = transforms();
-    assert.notEqual(lowerRight, upperLeft, 'moving the mouse changes the dealt card orientation');
+    assert(lowerRight.every((value, index) => value !== upperLeft[index]), 'moving across the interface changes all three cards without hovering any card');
+    const rightEdge = h.root.actuallayoutwidth;
+    h.setCursor(rightEdge - 70, 540); h.advance(.1); const nearRight = transforms();
+    h.setCursor(rightEdge - 20, 540); h.advance(.1);
+    assert(transforms().every((value, index) => value !== nearRight[index]), 'small horizontal movement near the right screen edge still changes all three orientations');
+    assert.equal(h.jobs.size, 2, 'one shared pointer timer and one layout timer serve the whole visible choice');
     assertNoFlip(h);
-    h.event(first, 'onmouseout'); h.advance(.2); const neutral = transforms();
-    h.setCursor(0, 1079); h.advance(.2);
-    assert.equal(transforms(), neutral, 'unhovered cards do not continue following the cursor');
+    h.event(first, 'onmouseover'); h.advance(.1);
+    h.event(first, 'onmouseout'); h.setCursor(0, 0); h.advance(.2); const afterLeaving = transforms();
+    h.setCursor(1919, 1079); h.advance(.2);
+    assert(transforms().every((value, index) => value !== afterLeaving[index]), 'leaving a card preserves pointer tracking for all three cards');
 
     // Native rollover ordering may enter the next card before leaving the old.
     const picks = buttons(h), tiltSurfaces = tagged(h.nodes.RogueRewardCards, 'RogueTilt');
@@ -221,15 +247,18 @@ function run() {
         h.event(picks[i % 3], 'onmouseover'); h.event(picks[(i - 1) % 3], 'onmouseout');
     }
     h.advance(.1);
-    const current = tiltSurfaces[0], historyStart = h.mutations.length;
-    h.setCursor(1919, 1079); h.advance(.1);
+    const historyStart = h.mutations.length;
+    h.setCursor(0, 0); h.advance(.1);
     const moved = h.mutations.slice(historyStart).filter(m => tiltSurfaces.includes(m.panel) && m.key === 'transform');
-    assert(moved.length > 0); assert(moved.every(m => m.panel === current), 'only the last hovered card follows subsequent cursor movement');
-    assert(tiltSurfaces.slice(1).every(p => p.style.transform === 'none'), 'previous cards return to neutral');
-    assert(h.jobs.size <= 2, 'rapid rollover leaves one cursor loop and one layout loop');
+    assert.deepEqual(new Set(moved.map(m => m.panel)), new Set(tiltSurfaces), 'one pointer loop updates every card after rapid rollover');
+    assert.equal(h.jobs.size, 2, 'rapid rollover cannot duplicate the shared pointer loop');
     h.event(picks[0], 'onmouseout'); h.advance(.1);
+    const afterRapidLeave = transforms(); h.setCursor(1919, 1079); h.advance(.1);
+    assert(transforms().every((value, index) => value !== afterRapidLeave[index]), 'all faces continue following when no card is hovered');
 
+    activateDescription(h, 1);
     h.event(buttons(h)[1], 'onactivate'); h.event(buttons(h)[1], 'onactivate');
+    activateDescription(h, 2);
     h.event(h.nodes.RogueRewardReroll, 'onactivate');
     assert.equal(h.sent.length, 1, 'selection and reroll are mutually locked while pending');
     assert.equal(h.sent[0].name, 'ui_rogue_reward_select');
@@ -240,8 +269,18 @@ function run() {
     ui.Open(); assert(buttons(h).every(p => !p.enabled), 'reopen preserves an in-flight request');
     h.emit('ui_rogue_reward_result', {token: data.token, ok: 0, error: 'retry'});
     assert(buttons(h).every(p => p.enabled), 'a matching failure permits a retry');
+    h.setCursor(0, 0); h.advance(.1); const afterRetry = transforms();
+    h.setCursor(1919, 1079); h.advance(.1);
+    assert(transforms().every((value, index) => value !== afterRetry[index]), 'reopening an in-flight offer and receiving its failure resumes global pointer tracking');
+    assert.equal(h.jobs.size, 2, 'retry recovery leaves exactly one shared orientation loop');
     h.event(h.nodes.RogueRewardReroll, 'onactivate'); h.event(h.nodes.RogueRewardReroll, 'onactivate');
     assert.equal(h.sent.length, 2); assert.equal(h.sent[1].name, 'ui_rogue_reward_reroll');
+    h.advance(.1); assert.equal(h.jobs.size, 1, 'pending reroll pauses pointer tracking while retaining layout fitting');
+    h.emit('ui_rogue_reward_result', {token: data.token, ok: 0, error: 'reroll_retry'});
+    h.setCursor(0, 0); h.advance(.1); const afterRerollRetry = transforms();
+    h.setCursor(1919, 1079); h.advance(.1);
+    assert(transforms().every((value, index) => value !== afterRerollRetry[index]), 'failed reroll resumes every card orientation');
+    assert.equal(h.jobs.size, 2, 'failed reroll restores exactly one shared pointer loop');
 
     const wish = {...offer('wish'), cards: [{card_id: 'divine_wish'}, {card_id: 'tower_growth'}, {card_id: 'fiscal_subsidy'}]};
     h.update(wish); h.advance(1); h.event(buttons(h)[0], 'onactivate');
@@ -274,14 +313,34 @@ function run() {
     const motion = createHarness(); motion.cfg.SurvivalRogueReward.SetReducedMotion(true); motion.update(offer('motion'));
     assert(buttons(motion).every(p => p.enabled), 'reduced motion is immediately selectable');
     const motionTilts = tagged(motion.nodes.RogueRewardCards, 'RogueTilt');
-    motion.event(buttons(motion)[0], 'onmouseover'); motion.setCursor(0, 0); motion.advance(.2);
+    motion.setCursor(0, 0); motion.advance(.2);
     const reducedTransforms = motionTilts.map(p => p.style.transform);
     motion.setCursor(1919, 1079); motion.advance(.2);
-    assert.deepEqual(motionTilts.map(p => p.style.transform), reducedTransforms, 'reduced motion never tilts cards in response to the cursor');
+    assert.deepEqual(motionTilts.map(p => p.style.transform), reducedTransforms, 'reduced motion freezes orientation while outside all cards');
+    motion.event(buttons(motion)[0], 'onmouseover'); motion.advance(.1);
+    const reducedHover = motionTilts.map(p => p.style.transform);
+    motion.setCursor(0, 0); motion.advance(.2);
+    assert.deepEqual(motionTilts.map(p => p.style.transform), reducedHover, 'reduced motion freezes orientation while hovering a card');
     assert(!motion.mutations.some(m => motionTilts.includes(m.panel) && m.key === 'transform' && /rotate[XY]\(/.test(m.value)));
     assertNoFlip(motion); motion.cfg.SurvivalRogueReward.Dispose(); assert.equal(motion.jobs.size, 0);
+    const changedMotion = createHarness(); changedMotion.update(offer('change_motion')); changedMotion.advance(1.1);
+    changedMotion.cfg.SurvivalRogueReward.SetReducedMotion(true); changedMotion.advance(.1);
+    assert.equal(changedMotion.jobs.size, 1, 'enabling reduced motion stops shared pointer tracking and keeps only layout fitting');
+    const changedTilts = tagged(changedMotion.nodes.RogueRewardCards, 'RogueTilt');
+    const changedTransforms = changedTilts.map(p => p.style.transform);
+    changedMotion.setCursor(0, 0); changedMotion.advance(.1);
+    changedMotion.setCursor(1919, 1079); changedMotion.advance(.1);
+    assert.deepEqual(changedTilts.map(p => p.style.transform), changedTransforms, 'live motion setting also freezes every card orientation');
+    const changedUI = changedMotion.cfg.SurvivalRogueReward;
+    for (let i = 0; i < 4; i++) { changedUI.SetReducedMotion(false); changedUI.SetReducedMotion(true); }
+    changedUI.SetReducedMotion(false); changedMotion.advance(.1);
+    assert.equal(changedMotion.jobs.size, 2, 'rapid motion toggles do not duplicate the shared loop');
+    changedMotion.setCursor(0, 0); changedMotion.advance(.1); const resumedTransforms = changedTilts.map(p => p.style.transform);
+    changedMotion.setCursor(1919, 1079); changedMotion.advance(.1);
+    assert(changedTilts.every((p, index) => p.style.transform !== resumedTransforms[index]), 'disabling reduced motion restores all three orientations');
+    changedMotion.cfg.SurvivalRogueReward.Dispose(); assert.equal(changedMotion.jobs.size, 0);
     catalogCoverage();
-    console.log('ROGUE_FAST_DEAL_PASS: actual XML/includes, front-only deal within 1s, 52 CSV cards/native art/effects, cursor tilt and rapid rollover, pending/wish locks, cancellation, resume, reduced motion and disposal');
+    console.log('ROGUE_FAST_DEAL_PASS: actual XML/includes, front-only deal within 1s, 52 CSV cards/native art/effects/no title icons, shared global cursor tilt and rapid rollover, pending/wish locks, cancellation, resume, reduced motion and disposal');
 }
 
 module.exports = {createHarness, offer, descendants, tagged, buttons, assertNoFlip, run};
