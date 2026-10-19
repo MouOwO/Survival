@@ -57,33 +57,38 @@ for(const [id,x,y,w,h]of [['LotteryGW2HeaderSkin',35,45,1608,74],['LotteryGW2Sid
  assert.equal(node.parent,nodes.LotteryGW2Root,'each material is an independent decorative layer');assert(node.style.opacity===undefined||node.style.opacity==='1','alpha belongs to the background material only');
  for(const textId of ['LotteryGW2Title','LotteryGW2TicketBalance','LotteryTitle','LotterySingleText','LotteryTenText'])for(let ancestor=nodes[textId];ancestor;ancestor=ancestor.parent)assert.notStrictEqual(ancestor,node,'background opacity must never include dynamic text');
 }
-assert.equal(nodes.LotteryGW2SidebarSkin.style.backgroundColor,'#0000004d','only the sidebar backing is 70% transparent');
-assert.equal(nodes.LotteryGW2FooterSkin.style.backgroundColor,'#10191d','the footer backing is fully opaque');
+assert.equal(nodes.LotteryGW2SidebarSkin.style.backgroundColor,'#10231bea','the selected Emerald skin has an independent dark-green sidebar backing');assert.equal(nodes.LotteryGW2SidebarTexture.style.opacity,'0.25','only the official sidebar texture has quarter opacity');
+assert.equal(nodes.LotteryGW2FooterSkin.style.backgroundColor,'#111f18f5','the Emerald footer uses the accepted dark-green backing');
 assert(!nodes.LotteryGW2Points&&!nodes.LotteryGW2StarjoyPoints,'neither points balance is built in the lottery header');
 assert.strictEqual(nodes.LotteryTicketPurchase,nativeTicketPurchase,'reuse the controller-owned ticket purchase button');
 assert.strictEqual(nativeTicketPurchase.events.onactivate,ticketEvent,'restyling retains the ticket purchase callback');
 assert.strictEqual(nativeTicketPurchase.parent,nodes.LotteryGW2TicketCurrency);
 assert.equal(nodes.LotteryGW2TicketCurrency.hittestchildren,true,'the balance container admits clicks on its purchase button');
-assert.equal(nativeTicketPurchase.style.width,'32px');assert.equal(nativeTicketPurchase.style.height,'32px');
+assert.equal(nativeTicketPurchase.style.width,'44px');assert.equal(nativeTicketPurchase.style.height,'44px');assert.equal(nodes.LotteryGW2PurchaseSurface.style.width,'32px');assert.equal(nodes.LotteryGW2PurchaseSurface.style.height,'32px');
 assert.equal(nodes.LotteryGW2PurchasePlus.type,'Image');
 assert.equal(nodes.LotteryGW2PurchasePlus.image,'file://{images}/control_icons/24px/plus.svg');
 assert(!nodes.LotteryGW2PurchaseLabel,'the acquisition text is replaced by an icon');
 assert.equal(nodes.LotteryCelestialFooter.style.position,'334px 123px 0px');assert.equal(nodes.LotteryCelestialFooter.style.width,'1309px');assert.equal(nodes.LotteryCelestialFooter.style.height,'746px');
-assert.strictEqual(nodes.LHDetails.parent,nodes.LotteryGW2Preview,'the existing details action follows the preview heading');
+assert.strictEqual(nodes.LHDetails.parent,nodes.LotteryCelestialFooter,'the selected Emerald layout places the original details action in its footer');
 assert.equal(nodes.LotteryHeroCopy.style.position,'44px 30px 0px','the pool copy uses the upper-left content region');
-assert.equal(nodes.LotterySingleButton.style.position,'773px 638px 0px');assert.equal(nodes.LotteryTenButton.style.position,'1027px 638px 0px');
+assert.equal(nodes.LotterySingleButton.style.position,'781px 560px 0px');assert.equal(nodes.LotteryTenButton.style.position,'1021px 560px 0px');assert.equal(nodes.LotterySingleButton.style.width,'220px');assert.equal(nodes.LotteryTenButton.style.width,'244px');assert.equal(nodes.LotterySingleButton.style.height,'84px');assert.equal(nodes.LotteryTenButton.style.height,'84px');assert.equal(nodes.LotteryGW2Preview.style.position,'44px 390px 0px','all eight true previews clear the accepted lower button row');assert.equal(nodes.LotteryDrawPity.style.position,'1021px 650px 0px','the true pity caption clears all eight reward names and the draw buttons');assert.equal(nodes.LotteryDrawPity.style.height,'20px');
 assert.equal(nodes.LotterySceneBackground.parent,nodes.LotteryGW2Root);assert.equal(nodes.LotterySceneBackground.style.position,'35px 123px 0px');assert.equal(nodes.LotterySceneBackground.style.width,'1608px');assert.equal(nodes.LotterySceneBackground.style.height,'746px');
 assert.equal(nodes.LotteryGW2Tooltip.parent,nodes.LotteryGW2DetailLayer,'tooltip shares the layer raised by details instead of sitting behind its ancestry');
 assert.equal(root.FindChildTraverse('LotteryHeroCopy'),null,'native-style traversal cannot find moved controls');
 assert.equal(nodes.LotteryCelestialHeader.style.visibility,'collapse');assert.equal(nodes.LotteryPoolTabs.style.visibility,'collapse');
 assert.strictEqual(nodes.LotterySingleButton,nativeSingle);assert.strictEqual(nativeSingle.events.onactivate,singleEvent);assert.strictEqual(nativeTen.events.onactivate,tenEvent);
 assert.equal(config.SurvivalUILayers.Top(),null,'presentation registration does not open a modal');
+const coldOpenStart=requests.length;
 current.Open();assert(presentation.Inspect().open);assert.equal(config.SurvivalUILayers.Top(),'lottery');
+function snapshotRequestsSince(index){return requests.slice(index).filter(request=>request.n==='ui_lottery_snapshot_request');}
+function assertColdSnapshot(index,poolId,context){const sent=snapshotRequestsSince(index);assert.equal(sent.filter(request=>request.p.read_action==='visit'&&!request.p.revision).length,0,context+' must not visit an unknown revision');const reads=sent.filter(request=>request.p.pool_id===poolId&&!request.p.snapshot_scope&&!request.p.prefetch);assert.equal(reads.length,1,context+' sends exactly one plain snapshot request');assert.equal(reads[0].p.read_action,'',context+' fetches a snapshot without a visit side effect');}
+function assertVisitedRevision(index,poolId,revision,context){const visits=snapshotRequestsSince(index).filter(request=>request.p.pool_id===poolId&&request.p.read_action==='visit');assert.equal(visits.length,1,context+' marks this revision visited exactly once');assert.equal(visits[0].p.snapshot_scope,'read',context+' uses the dedicated read acknowledgement');assert.equal(visits[0].p.revision,revision,context+' acknowledges only the server-supplied revision');}
+assertColdSnapshot(coldOpenStart,'map','cold Open');
 function data(pool='map',tickets=20){const d=snapshot(pool,tickets);d.shop_points=825;d.pools=['map','cultivation','dragon_knight','summer'].map(id=>({id,display_name:id,ticket_name:id==='map'||id==='cultivation'?'普通抽奖券':'金色抽奖券'}));d.items=Array.from({length:17},(_,i)=>({id:'r'+i,name:'正式奖励'+i,quality:i%2?'sr':'n',icon:'item_blink',description:'效果'+i,owned_count:i===0?undefined:i===1?0:2,max_owned:i===2?5:undefined}));return d;}
 function ticketAlignment(){
  const host=nodes.LotteryGW2TicketCurrency,icon=nodes.LotteryGW2TicketIcon,count=nodes.LotteryGW2TicketBalance,plus=nativeTicketPurchase,close=nodes.LotteryCloseButton;
  const x=node=>parseFloat(node.style.position),y=node=>parseFloat(node.style.position.split(' ')[1]),w=node=>parseFloat(node.style.width),h=node=>parseFloat(node.style.height);
- assert.equal(host.style.position,'1142px 8px 0px');assert.equal(host.style.width,'372px');assert.equal(host.style.height,'58px');assert.equal(host.style.flowChildren,'none','the currency uses explicit coordinates');
+ assert.equal(host.style.position,'1139px 8px 0px');assert.equal(host.style.width,'384px');assert.equal(host.style.height,'58px');assert.equal(host.style.flowChildren,'none','the currency uses explicit coordinates');
  assert.equal(x(close)-(x(host)+w(host)),24,'the currency group sits directly left of the close button');
  for(const node of [icon,count,plus]){assert.strictEqual(node.parent,host);assert(x(node)>=0&&x(node)+w(node)<=w(host),'each currency control stays inside its bounded header group');assert.equal(y(node)+h(node)/2,h(host)/2,'the icon, count and plus share the header center');}
  assert.equal(x(count)-(x(icon)+w(icon)),8);assert.equal(x(plus)-(x(count)+w(count)),8,'large balances cannot overlap the plus');assert.equal(x(plus)+w(plus),w(host),'the plus stays next to the close button for every count');
@@ -94,24 +99,30 @@ function drawAlignment(id){
  const button=nodes[id],content=button.children.find(child=>child.BHasClass('ZXDrawContent')),cost=content.children.find(child=>child.BHasClass('ZXDrawCost')),title=nodes[id==='LotterySingleButton'?'LotterySingleText':'LotteryTenText'];
  assert(content&&cost,'the controller-owned caption and cost group remain present');
  assert.equal(parseFloat(content.style.position)+parseFloat(content.style.width)/2,parseFloat(button.style.width)/2,'the complete caption/cost group is centered');
- assert.equal(content.style.position.split(' ')[1],'4px','the 72px ticket fits vertically inside the 80px action');
+ assert.equal(content.style.position.split(' ')[1],button.BHasClass('ZXFreeDraw')?'26px':'7px','the two-line 70px group or free caption is vertically centered in the 84px action');
  if(button.BHasClass('ZXFreeDraw'))assert.equal(cost.style.visibility,'collapse','free single draws omit a misleading ticket cost');
- else{assert.equal(cost.style.visibility,'visible');assert(parseFloat(title.style.width)<=parseFloat(cost.style.position),'the title and live price have separate regions');assert.equal(parseFloat(cost.style.position)+parseFloat(cost.style.width),parseFloat(content.style.width),'the live cost ends at the complete group edge');}
+ else{assert.equal(cost.style.visibility,'visible');assert.equal(parseFloat(title.style.position.split(' ')[1])+parseFloat(title.style.height)+2,parseFloat(cost.style.position.split(' ')[1]),'the title and live price occupy separate rows with a two-pixel gap');assert.equal(parseFloat(cost.style.position)+parseFloat(cost.style.width)/2,parseFloat(content.style.width)/2,'the live cost is centered below its caption');assert.equal(cost.style.height,'36px');assert.equal(cost.children.find(child=>child.BHasClass('LHDrawTicket')).style.width,'52px');}
 }
 function poolNavigation(active){
+ assert.equal(nodes.LotteryGW2Fullscreen.style.backgroundImage,'url("file://{images}/custom_game/lottery_cinematic_v1/'+active+'.png")','fullscreen results reuse the active real pool scene');
  assert.strictEqual(nodes.LotteryGW2OfficialFrame.parent,nodes.LotteryGW2DetailLayer,'the outer border shares the raised details ancestry');assert.equal(nodes.LotteryGW2OfficialFrame.hittest,false,'the border never intercepts navigation');
  const buttons=nodes.LotteryGW2Sidebar.children,selectedButtons=buttons.filter(button=>button.BHasClass('Selected'));assert.equal(selectedButtons.length,1);assert.equal(selectedButtons[0].id,'LotteryGW2Pool_'+active);
  for(const button of buttons){
   const title=button.children.find(child=>child.BHasClass('LotteryGW2PoolTitle')),state=button.children.find(child=>child.BHasClass('LotteryGW2PoolLock')),marks=button.children.filter(child=>child.BHasClass('LotteryGW2PoolSelectionMark'));
   const width=parseFloat(button.style.width),height=parseFloat(button.style.height),at=title.style.position.split(' ');
-  assert.equal(parseFloat(at[0])+parseFloat(title.style.width)/2,width/2,'every pool title is horizontally centered');assert.equal(parseFloat(at[1])+parseFloat(title.style.height)/2,height/2-(state.style.visibility==='visible'?12:0),'a real lock condition receives its own second line');assert.equal(title.style.textAlign,'center');assert.equal(title.style.whiteSpace,'nowrap');assert.equal(title.style.textOverflow,'shrink');
-  assert.equal(marks.length,1,'the selected rectangular tab has one left indicator');for(const mark of marks){assert.equal(mark.style.backgroundColor,'#d3dddd');assert.equal(mark.style.visibility,button.BHasClass('Selected')?'visible':'collapse','the silver bar follows the selected pool');}
-  const skin=button.children.find(child=>child.BHasClass('LotteryGW2PoolSkin'));assert(skin.style.backgroundImage.includes(button.BHasClass('Selected')?'gray_button_on_png':'gray_button_off_png'),'navigation uses the corresponding original on/off material');
+  assert.equal(parseFloat(at[0]),52,'each true pool title follows the decorative official chest icon');assert.equal(parseFloat(at[0])+parseFloat(title.style.width),width-16,'the title keeps a sixteen-pixel trailing inset');assert.equal(parseFloat(at[1])+parseFloat(title.style.height)/2,height/2-(state.style.visibility==='visible'?12:0),'a real lock condition receives its own second line');assert.equal(title.style.textAlign,'left');assert.equal(title.style.whiteSpace,'nowrap');assert.equal(title.style.textOverflow,'shrink');
+  assert.equal(marks.length,1,'the selected rectangular tab has one left indicator');for(const mark of marks){assert.equal(mark.style.backgroundColor,'#b1c891');assert.equal(mark.style.visibility,button.BHasClass('Selected')?'visible':'collapse','the Emerald bar follows the selected pool');}
+  const skin=button.children.find(child=>child.BHasClass('LotteryGW2PoolSkin'));assert.equal(skin.style.backgroundImage,button.BHasClass('Selected')?'url("s2r://panorama/images/textures/glassbutton_teal_psd.vtex")':'none','the active pool uses the official selected teal surface');
   assert(!button.children.some(child=>/普通抽奖券|金色抽奖券/.test(String(child.text||''))),'pool buttons omit ticket subtitles');
   if(state.style.visibility==='collapse')assert.equal(state.text,'','unlocked pools have no subtitle');
  }
 }
-events.ui_lottery_snapshot(data());
+const coldOpenData=data();coldOpenData.selected_pool.revision='gw2-cold-map-r1';events.ui_lottery_snapshot(coldOpenData);assertVisitedRevision(coldOpenStart,'map','gw2-cold-map-r1','cold Open reply');
+events.ui_lottery_snapshot(coldOpenData);assertVisitedRevision(coldOpenStart,'map','gw2-cold-map-r1','repeated Open reply');
+const coldSwitchStart=requests.length;current.SelectPool('cultivation');assertColdSnapshot(coldSwitchStart,'cultivation','cold pool switch');
+const coldSwitchData=data('cultivation');coldSwitchData.selected_pool.revision='gw2-cold-cultivation-r2';events.ui_lottery_snapshot(coldSwitchData);assertVisitedRevision(coldSwitchStart,'cultivation','gw2-cold-cultivation-r2','cold switch reply');
+events.ui_lottery_snapshot(coldSwitchData);assertVisitedRevision(coldSwitchStart,'cultivation','gw2-cold-cultivation-r2','repeated switch reply');
+current.SelectPool('map');events.ui_lottery_snapshot(data());
 assert.equal(nodes.LotteryGW2Title.text,'抽奖');assert(nodes.LotteryGW2TicketBalance.text.includes('20'));
 for(const tickets of [0,20,Number.MAX_SAFE_INTEGER,Number.MAX_VALUE]){events.ui_lottery_snapshot(data('map',tickets));ticketAlignment();assert.equal(nodes.LotteryGW2TicketBalance.text,String(tickets),'the full count remains available while its rectangle stays bounded');}
 for(const tickets of [0,1,9,10]){events.ui_lottery_snapshot(data('map',tickets));assert.equal(nativeSingle.enabled,tickets>=1,'single availability follows the live balance');assert.equal(nativeTen.enabled,tickets>=10,'ten-draw availability follows the live balance');drawAlignment('LotterySingleButton');drawAlignment('LotteryTenButton');}
@@ -135,7 +146,7 @@ for(const id of ['map','summer']){
 delete config.SurvivalCommerceView;current.SelectPool('map');events.ui_lottery_snapshot(data());
 assert.equal(presentation.Inspect().pools,4);assert.equal(nodes.LotteryGW2Sidebar.children.length,4);
 assert.equal(nodes.LotteryGW2PreviewItems.children.length,8);assert.equal(nodes.LotterySceneBackground.style.opacity,'1','retain the existing pool illustration');
-assert(nodes.LotteryGW2Chest.style.backgroundImage.includes('reward_treasure_large_png.vtex'));assert.equal(nodes.LotteryGW2Chest.hittest,false,'the native chest illustration cannot intercept draw controls');
+assert.equal(nodes.LotteryGW2Chest,undefined,'the removed right-side decoration is never created');assert(!source.includes('fall_2020_treasure_large_png.vtex'),'the retired decoration has no active resource reference');assert(!source.includes('loadout_bg_forest_003_jpg.vtex'),'the parked Emerald background is not activated by the current renderer');
 function previewAlignment(){
  const cards=nodes.LotteryGW2PreviewItems.children,w=parseFloat(nodes.LotteryGW2PreviewItems.style.width),last=cards.at(-1);
  assert.equal((parseFloat(cards[0].style.position)+parseFloat(last.style.position)+parseFloat(last.style.width))/2,w/2,'The preview row is centered for the actual item count');
@@ -173,7 +184,7 @@ function infoBounds(bodyTop,details=false){
  assert(!nodes.LotteryGW2InfoBack,'the duplicate bottom return button is never created');
 }
 current.Feature('details');infoBounds(18,true);
-assert.equal(nodes.LotteryGW2Chest.visible,false,'details hide the main treasure illustration');
+assert.equal(nodes.LotteryGW2Chest,undefined,'opening details does not recreate the removed decoration');
 assert.equal(config.SurvivalUILayers.Top(),'lottery_info','Escape closes the details layer owned by the controller');
 assert.equal(nodes.LotteryInfoDialog.style.width,'1309px');assert.equal(nodes.LotteryInfoDialog.style.transform,'none');
 assert.equal(nodes.LotteryCelestialFooter.style.visibility,'collapse');
@@ -335,6 +346,32 @@ assert.strictEqual(config.RemainingHandoff.LotteryDialog,originalDialog);assert.
 assert.strictEqual(config.SurvivalRewardPresentation.CreateIcon,originalIcon,'dispose restores the icon factory rather than nesting wrappers');
 assert.strictEqual(nativeSingle.events.onactivate,singleEvent);assert.strictEqual(nativeTen.events.onactivate,tenEvent);
 vm.runInNewContext(source,env);presentation=config.SurvivalPurpleLottery;current.Open();events.ui_lottery_snapshot(data());current.Feature('details');assert.equal(nodes.LotteryInfoList.children.length,17,'presentation reload still uses authoritative controller');current.CloseInfo();current.Close();presentation.Dispose();
+// A live map may keep the pre-ZX XML while loading the current renderer.
+// Unwrap both display hosts without replacing the original business controls.
+const legacyDrawOrigins=new Map(),legacyDrawNodes=[];
+for(const kind of ['Single','Ten']){
+ const button=nodes['Lottery'+kind+'Button'],content=button.Children().find(n=>n.BHasClass('ZXDrawContent')),costHost=content.Children().find(n=>n.BHasClass('ZXDrawCost')),ticket=costHost.Children().find(n=>n.BHasClass('LHDrawTicket'));
+ for(const node of [nodes['Lottery'+kind+'Text'],nodes['Lottery'+kind+'Cost'],ticket]){node.SetParent(button);legacyDrawOrigins.set(node,button);legacyDrawNodes.push(node);}content.DeleteAsync(0);
+}
+const legacyFooterOrigins=new Map(),legacyFooterEvents=new Map();
+for(const [id,text,feature]of [['LHDetails','奖池详情','details'],['LHHistory','抽奖记录','history'],['LotteryAnnouncement','规则','announcement']]){
+ const button=nodes[id],oldShell=new Panel('Panel',button,''),caption=new Panel('Label',oldShell,'');oldShell.style.transform='scale3d(1.4,1.4,1)';caption.text=text;caption.style.transform='scale3d(.35,.35,1)';caption.style.minHeight='86px';caption.style.minWidth='1000px';legacyFooterOrigins.set(caption,oldShell);button.SetPanelEvent('onactivate',()=>config.SurvivalLottery.Feature(feature));legacyFooterEvents.set(button,button.events.onactivate);
+}
+for(let reload=0;reload<2;reload++){
+ vm.runInNewContext(source,env);const compatible=config.SurvivalPurpleLottery;current.Open();events.ui_lottery_snapshot(data());
+ assert.strictEqual(nativeSingle.events.onactivate,singleEvent);assert.strictEqual(nativeTen.events.onactivate,tenEvent);
+ for(const kind of ['Single','Ten']){const button=nodes['Lottery'+kind+'Button'],content=button.Children().filter(n=>n.BHasClass('ZXDrawContent'));assert.equal(content.length,1,'the old button receives exactly one caption host');assert.equal(content[0].Children().filter(n=>n.BHasClass('ZXDrawCost')).length,1,'the old caption receives exactly one price host');assert.strictEqual(nodes['Lottery'+kind+'Text'].parent,content[0]);assert.strictEqual(nodes['Lottery'+kind+'Cost'].parent,content[0].Children().find(n=>n.BHasClass('ZXDrawCost')));drawAlignment('Lottery'+kind+'Button');}
+ for(const [caption,oldShell]of legacyFooterOrigins){assert.strictEqual(caption.parent,oldShell.parent,'footer text leaves its scaled ancestor');assert.equal(caption.style.transform,'none');assert.equal(caption.style.minHeight,'0px');assert.equal(caption.style.minWidth,'0px');assert.equal(caption.style.fontSize,'16px');assert.equal(caption.style.position,'30px 0px 0px');assert.equal(oldShell.style.transform,'scale3d(1.4,1.4,1)','the unrelated old container is preserved');}
+ const stable=compatible.Inspect(),nodeCount=allPanels(root).length,requestsBefore=requests.length;for(let repeat=0;repeat<6;repeat++)compatible.Apply();assert.equal(compatible.Inspect().trackedOwned,stable.trackedOwned,'repeated Apply does not allocate display hosts');assert.equal(compatible.Inspect().trackedMoved,stable.trackedMoved,'movement is tracked once');assert.equal(allPanels(root).length,nodeCount,'repeated Apply does not grow the old tree');assert.equal(requests.length,requestsBefore,'layout repair never sends a request');
+ const freeLegacy=data();freeLegacy.selected_pool.single_cost=0;events.ui_lottery_snapshot(freeLegacy);drawAlignment('LotterySingleButton');assert.equal(nodes.LotterySingleText.text,'免费单抽');const freeRow=nativeSingle.Children().find(n=>n.BHasClass('ZXDrawContent')).Children().find(n=>n.BHasClass('ZXDrawCost'));assert.equal(freeRow.style.visibility,'collapse','the repaired free action has no misleading price');
+ events.ui_lottery_snapshot(data('map',0));assert.equal(nativeSingle.enabled,false);assert.equal(nativeTen.enabled,false);drawAlignment('LotterySingleButton');drawAlignment('LotteryTenButton');
+ for(const [button,callback]of legacyFooterEvents)assert.strictEqual(button.events.onactivate,callback,'display repair preserves the feature callback');
+ const displayHosts=[...allPanels(nativeSingle),...allPanels(nativeTen)].filter(n=>n.BHasClass('ZXDrawContent')||n.BHasClass('ZXDrawCost'));current.Close();compatible.Dispose();
+ for(const [node,parent]of legacyDrawOrigins){assert(node.IsValid(),'dispose preserves each old business node');assert.strictEqual(node.parent,parent,'draw nodes return to their original ancestor');}
+ for(const [caption,parent]of legacyFooterOrigins){assert(caption.IsValid());assert.strictEqual(caption.parent,parent,'footer captions return to their original ancestor');}
+ for(const host of displayHosts)assert.equal(host.IsValid(),false,'only the inserted display hosts are destroyed');assert(legacyDrawNodes.every(node=>node.IsValid()));
+}
+console.log('LOTTERY_LEGACY_DISPLAY_HOST_PASS: old XML ancestry, paid/free/zero balance, callbacks, six stable applies, safe dispose and two reloads');
 // Source 2 retains CustomUIConfig while replacing layout children. The XML loads
 // the controller before the presentation, so that old presentation is observable
 // while the next controller runs its initial close/update calls.

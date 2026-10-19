@@ -1,0 +1,7 @@
+{
+  "taskBaseline": "26349a8 (canonical LF hashes supplied by root)",
+  "cinematic": {
+    "scripts/custom_game/lottery_cinematic_v1.js": "f5d36fbfc2855d0a46094ad14c4830d15b1ed0abbbaf1aebd2c41aaac22944f7",
+    "styles/custom_game/lottery_cinematic_v1.css": "f5b73e7d3072f6eb369f2c0c1c65f85591bb35e62c555274a6193ed739219525"
+  }
+}

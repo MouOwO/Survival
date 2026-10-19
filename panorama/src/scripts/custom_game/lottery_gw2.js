@@ -8,6 +8,12 @@
     var tipAnchor = null, tipHideJob = null, tipEpoch = 0;
     // Coordinates are local to the accepted 1672 x 941 canvas, never screen pixels.
     var layout={canvas:[1672,941],header:[35,45,1608,74],sidebar:[35,123,299,746],footer:[334,731,1309,138],content:[334,123,1309,681],info:[334,123,1309,746]};
+    // The selected Emerald controls use installed Valve artwork only. This
+    // release keeps the original per-pool scenes and cinematic movies.
+    // These are decorative resources; rewards, tickets and requests stay owned
+    // by the existing controller and shared item-resource registry.
+    var forest={primary:"s2r://panorama/images/dota_plus/relic_agi_button_psd.vtex",secondary:"s2r://panorama/images/hud/reborn/buyback_button_psd.vtex",selected:"s2r://panorama/images/textures/glassbutton_teal_psd.vtex",sidebar:"s2r://panorama/images/dota_plus/dota_plus_background_texture_large_png.vtex",divider:"s2r://panorama/images/events/crownfall/buttons/emblem_1_png.vtex",emblem:"s2r://panorama/images/events/aghanim/reward_type_treasure_icon_png.vtex"};
+    function poolBackground(id){var key=["map","cultivation","dragon_knight","summer"].indexOf(id)>=0?id:"map";return "file://{images}/custom_game/lottery_cinematic_v1/"+key+".png";}
     life.visible = false;
     function valid(n) { return n && (!n.IsValid || n.IsValid()); }
     function alive() { return !disposed && valid(root) && valid(life); }
@@ -27,7 +33,7 @@
     }
     function walk(n, fn) { if (!valid(n)) return; fn(n); n.Children().forEach(function (c) { walk(c, fn); }); }
     function make(type, parent, id, cls) { var n = $.CreatePanel(type, parent, id || ""); if (id) nodes[id] = n; if (cls) n.AddClass(cls); owned.push(n); return n; }
-    function label(parent, id, text, x, y, w, h, size, color) { var n = make("Label", parent, id, "LotteryGW2Label"); n.text = text; n.hittest = false; place(n,x,y,w,h); style(n,{fontSize:size + "px",color:color || "#eaddc4"}); return n; }
+    function label(parent, id, text, x, y, w, h, size, color) { var n = make("Label", parent, id, "LotteryGW2Label"); n.text = text; n.hittest = false; place(n,x,y,w,h); style(n,{fontSize:size + "px",color:color || "#eaddc4",textShadow:"#000000 0px 0px 2px 4.0"}); return n; }
     function asset(key) { var data=cfg.LotteryGW2Data,row=data&&data.assets&&data.assets[key];return row&&row.file||""; }
     function skin(n,key) { style(n,{backgroundImage:'url("' + asset(key) + '")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",backgroundColor:"transparent",border:"0px"}); }
     function art(parent,id,key,x,y,w,h) { var n=make("Panel",parent,id,"LotteryGW2Art"); n.hittest=false; n.hittestchildren=false; place(n,x,y,w,h); skin(n,key); return n; }
@@ -63,9 +69,13 @@
     function fit() {
         if (!ensure()) return false;prune();
         var viewport=cfg.LotteryHandoff && cfg.LotteryHandoff.Viewport && cfg.LotteryHandoff.Viewport();
-        if (!viewport) { style(p("LotteryMainCanvas"),{opacity:"0"}); return false; }
+        if (!viewport) { style(p("LotteryMainCanvas"),{opacity:"0"});style(view.resultCanvas,{opacity:"0"});return false; }
         scale=Number(U.Fit(p("LotteryMainCanvas"),root,layout.canvas[0],layout.canvas[1],{reference:[1920,1080]})) || 1;
-        style(p("LotteryMainCanvas"),{opacity:"1",transformOrigin:"50% 50%"}); return true;
+        U.Fit(view.resultCanvas,root,layout.canvas[0],layout.canvas[1],{reference:layout.canvas.slice()});
+        style(p("LotteryMainCanvas"),{opacity:"1",transformOrigin:"50% 50%"});
+        style(view.resultCanvas,{opacity:"1",transformOrigin:"50% 50%"});
+        if(cfg.LotteryCinematic&&cfg.LotteryCinematic.Resize)cfg.LotteryCinematic.Resize(viewport.width,viewport.height);
+        return true;
     }
     function ensure() {
         // A cached view belongs to its original HUD lifetime. Controller reload
@@ -74,26 +84,32 @@
         var canvas=p("LotteryMainCanvas"),window=p("LotteryWindow"); if(!valid(canvas)||!valid(window)||!U) return null;
         if (view) return valid(view.root)?view:null;
         canvas.RemoveClass("LotteryPurple"); canvas.RemoveClass("MenuV10Page"); canvas.AddClass("LotteryV10"); canvas.AddClass("LotteryGW2");canvas.AddClass("LotteryGW2Reborn");
-        window.RemoveClass("LotteryV10Root"); window.AddClass("LotteryGW2Root");window.AddClass("LotteryCurrentVersion");
+        window.RemoveClass("LotteryV10Root"); window.AddClass("LotteryGW2Root");window.AddClass("LotteryCurrentVersion");window.AddClass("LotteryGW2ForestTheme");
         style(canvas,{width:"1672px",height:"941px",position:"0px 0px 0px",horizontalAlign:"center",verticalAlign:"center",transformOrigin:"50% 50%",margin:"0px",padding:"0px",backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none",flowChildren:"none",overflow:"noclip"});
         var shell=make("Panel",canvas,"LotteryGW2Root","LotteryGW2Shell"); place(shell,0,0,1672,941);
-        surface(shell,"LotteryGW2Background",[35,45,1608,824],"#0e181c");
+        surface(shell,"LotteryGW2Background",[35,45,1608,824],"#10231b");
         // The original carousel paints under both the sidebar and footer. No
         // composite reference screenshot or patched RGB surface is used here.
         move("LotterySceneBackground",shell);move("LotterySceneShade",shell);
         // Keep the original scene's subject anchored to the right content area.
         // Its own left edge blends into an extension of that same original
         // resource under the sidebar. Shared textures are not copied/repainted.
-        ["map","cultivation","dragon_knight","summer"].forEach(function(id){var page=p("LotteryScenePage_"+id);if(!valid(page))return;var subject=make("Panel",page,"","LotteryGW2SceneSubject");place(subject,299,0,1309,746);style(subject,{backgroundImage:'url("file://{images}/custom_game/lottery_cinematic_v1/'+id+'.png")',backgroundSize:"cover",backgroundPosition:"center",backgroundRepeat:"no-repeat",opacityMask:'url("file://{images}/custom_game/lottery_final_v1/scene_blend.svg")'});subject.hittest=false;subject.hittestchildren=false;});
-        surface(shell,"LotteryGW2SidebarSkin",layout.sidebar,"#0000004d");
-        surface(shell,"LotteryGW2FooterSkin",layout.footer,"#10191d");
-        surface(shell,"LotteryGW2HeaderSkin",layout.header,"#0e181c");
-        style(p("LotteryGW2Background"),{backgroundImage:'url("s2r://panorama/images/hud/reborn/bg_scoreboard_psd.vtex")',backgroundSize:"100% 100%"});
-        style(p("LotteryGW2SidebarSkin"),{backgroundImage:'url("s2r://panorama/images/hud/reborn/quickbuy_bg_psd.vtex")',backgroundSize:"100% 100%"});
-        style(p("LotteryGW2HeaderSkin"),{backgroundImage:'url("s2r://panorama/images/hud/reborn/inventory_panel_png.vtex")',backgroundSize:"100% 100%"});
-        surface(shell,"LotteryGW2HeaderRule",[35,118,1608,1],"#8d9b9e44");
-        surface(shell,"LotteryGW2SidebarRule",[332,123,1,746],"#8d9b9e44");
-        surface(shell,"LotteryGW2FooterRule",[378,731,1221,1],"#8d9b9e44");
+        ["map","cultivation","dragon_knight","summer"].forEach(function(id){
+            var page=p("LotteryScenePage_"+id);if(!valid(page))return;
+            var uri='url("'+poolBackground(id)+'")';
+            // Alpha applies to the scene extension, independently of all controls.
+            style(page,{backgroundImage:"none"});
+            var extension=make("Panel",page,"","LotteryGW2SceneExtension");place(extension,0,0,1608,746);
+            style(extension,{backgroundImage:uri,backgroundSize:"cover",backgroundPosition:"center",backgroundRepeat:"no-repeat",opacity:"0.25"});extension.hittest=false;extension.hittestchildren=false;
+            var subject=make("Panel",page,"","LotteryGW2SceneSubject");place(subject,299,0,1309,746);style(subject,{backgroundImage:uri,backgroundSize:"cover",backgroundPosition:"center",backgroundRepeat:"no-repeat",opacityMask:'url("file://{images}/custom_game/lottery_final_v1/scene_blend.svg")'});subject.hittest=false;subject.hittestchildren=false;
+        });
+        surface(shell,"LotteryGW2SidebarSkin",layout.sidebar,"#10231bea");
+        var sideTexture=nativeArt(shell,"LotteryGW2SidebarTexture",forest.sidebar,35,123,299,746);style(sideTexture,{backgroundSize:"cover",backgroundPosition:"center",opacity:"0.25"});
+        surface(shell,"LotteryGW2FooterSkin",layout.footer,"#111f18f5");
+        surface(shell,"LotteryGW2HeaderSkin",layout.header,"#101d18ee");
+        surface(shell,"LotteryGW2HeaderRule",[35,118,1608,1],"#a7c9a34d");
+        surface(shell,"LotteryGW2SidebarRule",[332,123,1,746],"#a7c9a340");
+        surface(shell,"LotteryGW2FooterRule",[378,731,1221,1],"#a7c9a333");
         // Valve's straight GoldBorder meets the rectangular backing at all four
         // corners; an inward-cut border exposes dark blocks outside its curve.
         var officialFrame=make("Panel",shell,"LotteryGW2OfficialFrame","LotteryGW2OfficialFrame");place(officialFrame,35,45,1608,824);
@@ -102,6 +118,15 @@
         var header=make("Panel",shell,"LotteryGW2Header"); place(header,35,45,1608,74);style(header,{zIndex:"4"});
         var sidebarPanel=make("Panel",shell,"LotteryGW2Sidebar"); place(sidebarPanel,35,123,299,746);style(sidebarPanel,{zIndex:"4"});
         var content=make("Panel",shell,"LotteryGW2Content"); place(content,334,123,1309,681); style(content,{overflow:"clip",flowChildren:"none",zIndex:"2"});
+        // Result and reveal surfaces belong to the viewport, outside the fitted
+        // menu. Their artwork fills every aspect ratio; controls retain one fit.
+        var fullscreen=make("Panel",window,"LotteryGW2Fullscreen","LotteryGW2Fullscreen");
+        style(fullscreen,{position:"0px 0px 0px",width:"100%",height:"100%",margin:"0px",padding:"0px",horizontalAlign:"left",verticalAlign:"top",flowChildren:"none",overflow:"clip",zIndex:"20",backgroundSize:"cover",backgroundPosition:"center",backgroundRepeat:"no-repeat"});
+        fullscreen.hittest=true;fullscreen.visible=false;
+        var resultShade=make("Panel",fullscreen,"LotteryGW2ResultShade");
+        style(resultShade,{width:"100%",height:"100%",backgroundColor:"#030710a8"});resultShade.hittest=false;resultShade.hittestchildren=false;
+        var resultCanvas=make("Panel",fullscreen,"LotteryGW2ResultCanvas","LotteryGW2ResultCanvas");
+        style(resultCanvas,{width:"1672px",height:"941px",position:"0px 0px 0px",horizontalAlign:"center",verticalAlign:"center",transformOrigin:"50% 50%",margin:"0px",padding:"0px",flowChildren:"none",overflow:"noclip"});
         var detail=make("Panel",shell,"LotteryGW2DetailLayer"); place(detail,0,0,1672,941); detail.hittest=false;style(detail,{zIndex:"8"});
         // The modal manager raises this ancestry. Keep the outer frame in the
         // same layer so the details backing cannot paint over its bottom edge.
@@ -121,44 +146,47 @@
         var tipCount=label(tooltip,"LotteryGW2TooltipQuantity","",22,294,322,24,17,"#b5bfbb");
         [tipName,tipState,tipDescription,tipCount].forEach(function(node){style(node,{textShadow:"none"});});
         style(tipDescription,{fontSize:"17px",lineHeight:"24px",color:"#d7d9cb",textOverflow:"clip"});
-        view={root:shell,header:header,sidebar:sidebarPanel,content:content,detailLayer:detail,tooltip:tooltip,tipSkin:tipSkin,tipName:tipName,tipState:tipState,tipDescription:tipDescription,tipCount:tipCount,tipScroll:tipScroll,tipIconStage:tipIconStage,tabs:[]};
-        view.sceneWash=surface(content,"LotteryGW2SceneWash",[0,0,1309,681],"#10191da6");style(view.sceneWash,{zIndex:"0"});
-        view.chest=nativeArt(content,"LotteryGW2Chest","s2r://panorama/images/events/dark_carnival/overworld/rewards/reward_treasure_large_png.vtex",470,100,360,315);
-        style(view.chest,{backgroundSize:"contain",backgroundPosition:"center",zIndex:"2"});
-        view.eyebrow=label(p("LotteryHeroCopy"),"LotteryGW2Eyebrow","珍 藏 宝 箱",0,0,360,22,14,"#a5bac3");
-        view.sidebarHeading=label(shell,"LotteryGW2SidebarHeading","珍 藏 宝 箱",59,147,251,28,16,"#a5b3b6");
-        view.sidebarNote=label(shell,"LotteryGW2SidebarNote","珍 藏  ·  永 久",59,817,251,28,16,"#8e9fa4");style(view.sidebarNote,{textAlign:"center"});
+        view={root:shell,header:header,sidebar:sidebarPanel,content:content,fullscreen:fullscreen,resultCanvas:resultCanvas,detailLayer:detail,tooltip:tooltip,tipSkin:tipSkin,tipName:tipName,tipState:tipState,tipDescription:tipDescription,tipCount:tipCount,tipScroll:tipScroll,tipIconStage:tipIconStage,tabs:[]};
+        view.sceneWash=surface(content,"LotteryGW2SceneWash",[0,0,1309,681],"gradient(linear, 0% 0%, 100% 0%, from(#0d211dc7), color-stop(.6,#0b211a33), to(#0c1f1810))");style(view.sceneWash,{zIndex:"0"});
+        nativeArt(content,"LotteryGW2ForestDivider",forest.divider,44,112,660,26);
+        view.eyebrow=label(p("LotteryHeroCopy"),"LotteryGW2Eyebrow","珍 藏 宝 箱",0,0,360,22,14,"#a7c9a3");
+        view.sidebarHeading=label(shell,"LotteryGW2SidebarHeading","珍 藏 宝 箱",59,147,251,28,16,"#a7c9a3");
+        view.sidebarNote=label(shell,"LotteryGW2SidebarNote","珍 藏  ·  永 久",59,817,251,28,16,"#a0b5a4");style(view.sidebarNote,{textAlign:"center"});
         tooltipGuard();
         tooltip.SetPanelEvent("onmouseover",function(){if(tooltipOverflows())cancelTooltipHide();else if(tipDismiss)tipDismiss.Dismiss();});
         tooltip.SetPanelEvent("onmouseout",function(){if(!requestTooltipHide(false))hideTooltip();});
-        surface(header,"LotteryGW2HeaderDivider",[110,20,1,34],"#8d9b9e44");
-        view.title=label(header,"LotteryGW2Title","抽奖",129,10,560,51,34,"#e4e8e5");
+        surface(header,"LotteryGW2HeaderDivider",[110,20,1,34],"#a7c9a344");
+        view.title=label(header,"LotteryGW2Title","抽奖",129,10,560,51,34,"#f1eadb");
         view.back=button(header,"LotteryGW2Back","返回",function(){if(mode)invoke("CloseInfo");else invoke("Close");}); place(view.back,22,16,82,46);
         place(view.back.Children()[0],24,0,54,46);style(view.back.Children()[0],{horizontalAlign:"left",verticalAlign:"top",fontSize:"22px"});nativeArt(view.back,"LotteryGW2BackIcon","s2r://panorama/images/control_icons/arrow_solid_left_png.vtex",4,13,12,20);
         view.ticket=label(header,"LotteryGW2TicketBalance","抽奖券 —",708,21,340,34,25,"#e6dfd0");
         style(view.ticket,{whiteSpace:"nowrap",textOverflow:"shrink"});
-        view.ticketHost=make("Panel",header,"LotteryGW2TicketCurrency");place(view.ticketHost,1142,8,372,58);style(view.ticketHost,{flowChildren:"none",overflow:"clip"});view.ticketHost.hittest=false;view.ticketHost.hittestchildren=true;
+        view.ticketHost=make("Panel",header,"LotteryGW2TicketCurrency");place(view.ticketHost,1139,8,384,58);style(view.ticketHost,{flowChildren:"none",overflow:"clip"});view.ticketHost.hittest=false;view.ticketHost.hittestchildren=true;
         view.ticket.SetParent(view.ticketHost);place(view.ticket,298,12,34,34);style(view.ticket,{lineHeight:"34px",textAlign:"center"});view.ticket.text="—";
         view.ticketIcon=make("Panel",view.ticketHost,"LotteryGW2TicketIcon");place(view.ticketIcon,218,0,72,58);view.ticketIcon.hittest=false;view.ticketIcon.hittestchildren=false;
         if(view.ticketHost.MoveChildBefore)view.ticketHost.MoveChildBefore(view.ticketIcon,view.ticket);
         // Keep the controller's original purchase callback and current-pool
         // routing; only replace its presentation with the shop's recharge affordance.
-        var purchase=move("LotteryTicketPurchase",view.ticketHost);place(purchase,340,13,32,32);purchase.AddClass("LotteryGW2Recharge");purchase.hittestchildren=false;
+        var purchase=move("LotteryTicketPurchase",view.ticketHost);place(purchase,340,7,44,44);purchase.AddClass("LotteryGW2Recharge");purchase.AddClass("LotteryGW2ForestUtility");purchase.hittestchildren=false;style(purchase,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none"});
         purchase.Children().forEach(function(c){c.visible=false;});
+        var purchaseSurface=surface(purchase,"LotteryGW2PurchaseSurface",[6,6,32,32],"#193528");purchaseSurface.AddClass("LotteryGW2UtilitySurface");style(purchaseSurface,{border:"1px solid #b9b47d88",borderRadius:"50%"});
         var plus=make("Image",purchase,"LotteryGW2PurchasePlus","LotteryGW2RechargeIcon");plus.SetImage("file://{images}/control_icons/24px/plus.svg");plus.hittest=false;
-        move("LotteryCloseButton",header); place(p("LotteryCloseButton"),1538,11,51,53);style(p("LotteryCloseButton"),{backgroundImage:"none",backgroundColor:"#0b131ccc",border:"1px solid #83919966"});p("LotteryCloseButton").Children().forEach(function(c){c.visible=false;});
-        nativeArt(p("LotteryCloseButton"),"LotteryGW2CloseIcon","s2r://panorama/images/control_icons/x_close_png.vtex",13,14,23,23);
-        ["LotteryHeroCopy","LotteryUnlockNotice","LotteryResultStage","LotteryRevealStage","LotterySkipReveal","LotteryStatus"].forEach(function(id){move(id,content);});
+        place(plus,13,13,18,18);
+        move("LotteryCloseButton",header); place(p("LotteryCloseButton"),1547,15,44,44);p("LotteryCloseButton").AddClass("LotteryGW2ForestUtility");style(p("LotteryCloseButton"),{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});p("LotteryCloseButton").Children().forEach(function(c){c.visible=false;});
+        var closeSurface=surface(p("LotteryCloseButton"),"LotteryGW2CloseSurface",[6,6,32,32],"#193528");closeSurface.AddClass("LotteryGW2UtilitySurface");style(closeSurface,{border:"1px solid #b9b47d88"});
+        nativeArt(p("LotteryCloseButton"),"LotteryGW2CloseIcon","s2r://panorama/images/control_icons/x_close_png.vtex",12,12,20,20);
+        ["LotteryHeroCopy","LotteryUnlockNotice","LotteryStatus"].forEach(function(id){move(id,content);});
+        ["LotteryResultStage","LotteryRevealStage","LotterySkipReveal"].forEach(function(id){move(id,resultCanvas);});
         move("LotteryCelestialFooter",shell);style(p("LotteryCelestialFooter"),{zIndex:"4"});
         move("LotteryInfoOverlay",detail); move("LotteryAnnouncement",p("LotteryCelestialFooter"));
         ["LotteryCelestialHeader","LotteryPoolTabs","LotteryReadingMask"].forEach(hidden);
-        view.preview=make("Panel",content,"LotteryGW2Preview"); place(view.preview,44,430,1221,158); style(view.preview,{zIndex:"3"});
-        view.previewCaption=label(view.preview,"LotteryGW2PreviewCaption","奖池珍藏",0,0,530,28,20,"#bdcbd0");
+        view.preview=make("Panel",content,"LotteryGW2Preview"); place(view.preview,44,390,1221,158); style(view.preview,{zIndex:"3"});
+        view.previewCaption=label(view.preview,"LotteryGW2PreviewCaption","奖池珍藏",0,0,530,28,20,"#c5d1bc");
         view.previewItems=make("Panel",view.preview,"LotteryGW2PreviewItems"); place(view.previewItems,0,42,1221,116);
-        move("LHDetails",view.preview);place(p("LHDetails"),1101,0,120,28);
-        var skip=p("LotterySkipAnimation");skip.Children().forEach(function(c){if(c.paneltype==="Label"){c.AddClass("LotteryGW2SkipLabel");place(c,30,0,150,38);}else c.visible=false;});
-        var checkBox=surface(skip,"LotteryGW2SkipBox",[0,9,20,20],"#0b141bcc");style(checkBox,{border:"1px solid #8c9ca477"});
-        nativeArt(skip,"LotteryGW2SkipCheck","s2r://panorama/images/control_icons/checkbox_check_psd.vtex",2,11,16,16).AddClass("LotteryGW2SkipCheck");
+        move("LHDetails",p("LotteryCelestialFooter"));
+        var skip=p("LotterySkipAnimation");skip.Children().forEach(function(c){if(c.paneltype==="Label"){c.AddClass("LotteryGW2SkipLabel");place(c,30,0,175,44);style(c,{fontSize:"16px",lineHeight:"44px",color:"#c1cfbe"});}else c.visible=false;});
+        var checkBox=surface(skip,"LotteryGW2SkipBox",[0,12,20,20],"#11281ecc");style(checkBox,{border:"1px solid #a7c9a377"});
+        nativeArt(skip,"LotteryGW2SkipCheck","s2r://panorama/images/control_icons/checkbox_check_psd.vtex",2,14,16,16).AddClass("LotteryGW2SkipCheck");
         sidebar(); return view;
     }
     function sidebar() {
@@ -169,20 +197,21 @@
                 var box=[24,78+index*108,251,96];
                 var id=String(pool.id),b=make("Button",view.sidebar,"LotteryGW2Pool_"+id,"LotteryGW2Pool"); place(b,box[0],box[1],box[2],box[3]); b.hittestchildren=false;
                 var frame=make("Panel",b,"","LotteryGW2PoolSkin");place(frame,0,0,parseFloat(b.style.width),parseFloat(b.style.height));frame.hittest=false;frame.hittestchildren=false;
-                style(frame,{padding:"0px",minWidth:"0px",minHeight:"0px",backgroundImage:'url("s2r://panorama/images/gray_button_off_png.vtex")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",backgroundColor:"transparent",border:"1px solid #87949b44",overflow:"clip"});
-                var width=box[2],height=box[3],name=label(b,"",String(pool.display_name||id),24,(height-44)/2,width-48,44,27,"#dbe2df");name.AddClass("LotteryGW2PoolTitle");style(name,{textAlign:"center",lineHeight:"44px",whiteSpace:"nowrap",textOverflow:"shrink"});
+                style(frame,{padding:"0px",minWidth:"0px",minHeight:"0px",backgroundImage:"none",backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",backgroundColor:"#142c22a8",border:"1px solid #a7c9a333",overflow:"clip"});
+                var width=box[2],height=box[3],name=label(b,"",String(pool.display_name||id),52,(height-44)/2,width-68,44,24,"#dbe2cf");name.AddClass("LotteryGW2PoolTitle");style(name,{textAlign:"left",lineHeight:"44px",whiteSpace:"nowrap",textOverflow:"shrink"});
+                nativeArt(b,"",forest.emblem,14,(height-28)/2,28,28);
                 var state=label(b,"","",15,height-29,width-30,20,15,"#b5c2c5");state.AddClass("LotteryGW2PoolLock");style(state,{textAlign:"center",whiteSpace:"nowrap",textOverflow:"shrink"});
-                var mark=surface(b,"",[0,18,3,height-36],"#d3dddd");mark.AddClass("LotteryGW2PoolSelectionMark");var marks=[mark];
+                var mark=surface(b,"",[0,18,3,height-36],"#b1c891");mark.AddClass("LotteryGW2PoolSelectionMark");var marks=[mark];
                 b.SetPanelEvent("onactivate",function(){if(!canAct())return;hideTooltip();if(mode==="history")invoke("SelectHistoryPool",id);else invoke("SelectPool",id);});
                 view.tabs.push({id:id,button:b,frame:frame,name:name,state:state,marks:marks});
             });
         }
         view.tabs.forEach(function(tab,index){var pool=pools[index]||{},on=tab.id===selected;tab.button.SetHasClass("Selected",on);style(tab.button,{backgroundImage:"none",backgroundColor:"transparent"});
             var locked=pool.unlocked===false;tab.state.text=locked?"未解锁  "+number(pool.unlock_progress)+" / "+number(pool.unlock_required):"";style(tab.state,{visibility:locked?"visible":"collapse"});
-            place(tab.name,24,(parseFloat(tab.button.style.height)-44)/2-(locked?12:0),parseFloat(tab.button.style.width)-48,44);
-            style(tab.frame,{backgroundImage:'url("s2r://panorama/images/gray_button_'+(on?"on":"off")+'_png.vtex")',borderColor:on?"#bccbd2aa":"#87949b44"});
+            place(tab.name,52,(parseFloat(tab.button.style.height)-44)/2-(locked?12:0),parseFloat(tab.button.style.width)-68,44);
+            style(tab.frame,{backgroundImage:on?'url("'+forest.selected+'")':"none",backgroundColor:on?"#143526":"#142c22a8",borderColor:on?"#b9bc86aa":"#a7c9a333"});
             tab.marks.forEach(function(mark){style(mark,{visibility:on?"visible":"collapse"});});
-            style(tab.name,{color:on?"#f0f3eb":"#c8d2d2",textShadow:"#000000aa 0px 1px 2px 1.0"});style(tab.state,{color:on?"#d1dbd9":"#9fafb5",textShadow:"#00000088 0px 1px 2px 1.0"});
+            style(tab.name,{color:on?"#f1eadb":"#c1cfc0",textShadow:"#000000aa 0px 1px 2px 1.0"});style(tab.state,{color:on?"#d1dbc9":"#9fb5a3",textShadow:"#00000088 0px 1px 2px 1.0"});
         });
     }
     function number(raw) { if(raw===undefined||raw===null||raw==="")return "—";var n=Number(raw);return isFinite(n)&&n>=0?String(n):"—"; }
@@ -205,7 +234,7 @@
             var tileWidth=88,b=make("Button",view.previewItems,"LotteryGW2Preview_"+index,"LotteryGW2PreviewCard"),quality=String(item.quality||"n").toLowerCase(),presentation=cfg.SurvivalRewardPresentation,color=presentation&&presentation.NameColor?presentation.NameColor(quality):"#c4d0d0";place(b,0,0,133,116);b.hittestchildren=false;b.__lotteryItem=item;b.AddClass("LotteryQuality_"+quality.toUpperCase());
             var well=itemWell(b,22.5,0,tileWidth,88);well.AddClass("LotteryGW2PreviewWell");style(well,{borderColor:color,backgroundColor:"gradient(linear, 0% 0%, 0% 100%, from("+color+"44), to(#0b1219))"});var icon=presentation&&presentation.CreateIcon(b,item,"LotteryGW2PreviewIcon");if(icon){place(icon,23.5,1,tileWidth-2,86);fillItemIcon(icon,item);}
             var rarity=label(b,"",quality.toUpperCase(),70,68,36,18,12,"#e7ede8");rarity.AddClass("LotteryGW2PreviewRarity");style(rarity,{textAlign:"right"});
-            var itemName=label(b,"",String(item.name||item.id||""),0,88,133,28,20,"#e4dcc9");style(itemName,{whiteSpace:"nowrap",textOverflow:"shrink",textShadow:"#000000 0px 1px 2px 1.0"});
+            var itemName=label(b,"",String(item.name||item.id||""),0,88,133,28,20,"#e4dcc9");style(itemName,{whiteSpace:"nowrap",textOverflow:"shrink",textShadow:"#000000 0px 0px 2px 4.0"});
             var cardWidth=parseFloat(b.style.width),cardHeight=parseFloat(b.style.height),rowWidth=parseFloat(view.previewItems.style.width),gap=16;
             place(b,(rowWidth-(cardWidth*items.length+gap*(items.length-1)))/2+index*(cardWidth+gap),0,cardWidth,cardHeight);
             var nameAt=String(itemName.style.position).split(" "),nameHeight=parseFloat(itemName.style.height),nameHost=make("Panel",b,"","LotteryGW2PreviewNameHost");
@@ -216,24 +245,50 @@
             b.SetPanelEvent("onactivate",function(){hideTooltip();invoke("Feature","details");});
         });
     }
+    function drawStructure(b,text,cost) {
+        var content=null,costHost=null,ticket=null;
+        walk(b,function(n){if(!content&&n.BHasClass("ZXDrawContent"))content=n;if(!costHost&&n.BHasClass("ZXDrawCost"))costHost=n;if(!ticket&&n.BHasClass("LHDrawTicket"))ticket=n;});
+        // A running map can retain the older XML while loading this renderer.
+        // Reuse its business nodes and add only the missing presentation hosts.
+        if(!valid(content))content=make("Panel",b,"","ZXDrawContent");else moveNode(content,b);
+        if(!valid(costHost))costHost=make("Panel",content,"","ZXDrawCost");else moveNode(costHost,content);
+        content.hittest=false;content.hittestchildren=false;costHost.hittest=false;costHost.hittestchildren=false;
+        moveNode(text,content);moveNode(cost,costHost);moveNode(ticket,costHost);
+        return {content:content,cost:costHost,ticket:ticket};
+    }
     function action(id,primary) {
-        var b=p(id);if(!valid(b))return;b.AddClass("LotteryGW2Action");b.AddClass("LotteryGW2NativeButton");b.SetHasClass("LotteryGW2Primary",!!primary);style(b,{backgroundImage:"none",backgroundColor:"transparent",boxShadow:"none",flowChildren:"none",borderRadius:"0px",border:"0px",overflow:"clip"});
+        var b=p(id);if(!valid(b))return;b.AddClass("LotteryGW2Action");b.AddClass("LotteryGW2NativeButton");b.SetHasClass("LotteryGW2Primary",!!primary);style(b,{backgroundImage:"none",backgroundColor:"transparent",boxShadow:"none",flowChildren:"none",borderRadius:"0px",border:"0px",overflow:"noclip"});
+        b.AddClass("LotteryGW2ForestButton");
+        var busy=!!(p("LotteryWindow")&&p("LotteryWindow").BHasClass("LotteryWaiting"));b.SetHasClass("LotteryGW2ForestBusy",busy);
         var draw=id==="LotterySingleButton"||id==="LotteryTenButton";
         var skins=view.actionSkins||(view.actionSkins={}),surface=skins[id];
         if(!valid(surface)){surface=skins[id]=make("Panel",b,"","LotteryGW2ButtonSurface");surface.hittest=false;surface.hittestchildren=false;var first=b.Children()[0];if(first!==surface&&b.MoveChildBefore)b.MoveChildBefore(surface,first);}
-        place(surface,0,0,0,0);style(surface,{width:"100%",height:"100%",zIndex:"0",backgroundImage:"none",backgroundColor:primary?"gradient(linear, 0% 0%, 0% 100%, from(#ffe8ae), to(#c59c50))":"gradient(linear, 0% 0%, 0% 100%, from(#eee5cc), to(#b6aa8d))",border:"2px solid #d7bd83",borderTopColor:"#fff0c8",borderLeftColor:"#f4dfab",borderRightColor:"#9c804a",borderBottomColor:"#866b3d",boxShadow:"inset #fff7d740 0px 0px 2px 1px"});
-        walk(b,function(n){if(n.paneltype==="Label")style(n,{color:b.enabled===false?"#89989e":draw?"#e5ece8":"#30291b",textShadow:draw?"#000000 0px 0px 2px 4.0":"none"});if(n.BHasClass("ZXActionSkin")||n.BHasClass("LHDrawVisual"))n.visible=false;});
+        place(surface,0,0,0,0);style(surface,{width:"100%",height:"100%",zIndex:"0",backgroundImage:'url("'+(primary?forest.primary:forest.secondary)+'")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",backgroundColor:primary?"#173d29":"#23312a",border:"1px solid #b8b47d88",borderTopColor:"#d2d6a48c",borderLeftColor:"#aabd8a80",borderRightColor:"#65724899",borderBottomColor:"#526242aa",boxShadow:"inset #d4e8bd12 0px 1px 1px 0px"});
+        walk(b,function(n){if(n.paneltype==="Label")style(n,{color:busy?"#d6e4d2":b.enabled===false?"#b2beb2":"#f1eadb",fontSize:"28px",lineHeight:"32px",textShadow:"#000000 0px 1px 2px 2.0"});if(n.BHasClass("ZXActionSkin")||n.BHasClass("LHDrawVisual"))n.visible=false;});
+        var focusNodes=view.actionFocus||(view.actionFocus={}),focus=focusNodes[id];
+        if(!valid(focus)){focus=focusNodes[id]=make("Panel",b,"","LotteryGW2DrawFocus");focus.hittest=false;focus.hittestchildren=false;style(focus,{border:"2px solid #d0ebba",backgroundColor:"transparent",zIndex:"3"});}
+        place(focus,-3,-3,(draw?(parseFloat(b.style.width)||220):(primary?244:220))+6,90);
         if(draw){
             b.AddClass("LotteryGW2RebornDraw");
-            style(surface,{backgroundImage:"none",backgroundColor:"#121c23",border:"4px solid white",borderImageSource:'url("s2r://panorama/images/'+(primary?"hud/reborn/item_purchase_bg_psd":"gray_button_off_png")+'.vtex")',borderImageSlice:"4px fill",boxShadow:"none"});
-            var focusNodes=view.actionFocus||(view.actionFocus={}),focus=focusNodes[id];
-            if(!valid(focus)){focus=focusNodes[id]=make("Panel",b,"","LotteryGW2DrawFocus");focus.hittest=false;focus.hittestchildren=false;style(focus,{width:"100%",height:"100%",border:"2px solid #c4d6df",backgroundColor:"transparent",zIndex:"3"});}
-            walk(b,function(n){if(n.BHasClass("LHDrawTicket"))ticketIcon(n,snapshot&&(snapshot.selected_pool||snapshot));});
-            var width=parseFloat(b.style.width)||238,height=parseFloat(b.style.height)||80,text=p(id==="LotterySingleButton"?"LotterySingleText":"LotteryTenText"),cost=p(id==="LotterySingleButton"?"LotterySingleCost":"LotteryTenCost"),free=b.BHasClass("ZXFreeDraw");
-            var digits=Math.min(52,Math.max(30,String(cost&&cost.text||"").length*14)),costWidth=free?0:68+digits,gap=free?0:10,titleWidth=Math.min(free?width-24:96,Math.max(52,String(text&&text.text||"").length*24)),contentWidth=Math.min(width-24,titleWidth+gap+costWidth);titleWidth=contentWidth-gap-costWidth;
-            walk(b,function(n){if(n.BHasClass("ZXDrawContent")){place(n,(width-contentWidth)/2,(height-72)/2,contentWidth,72);style(n,{flowChildren:"none"});}if(n.BHasClass("ZXDrawCost")){place(n,titleWidth+gap,0,costWidth,72);style(n,{flowChildren:"none",visibility:free?"collapse":"visible"});}if(n.BHasClass("LHDrawTicket"))place(n,0,0,64,72);if(n.BHasClass("LHCost")){place(n,68,20,digits,32);style(n,{fontSize:"23px",lineHeight:"32px",textAlign:"left",whiteSpace:"nowrap",textOverflow:"shrink"});}});
-            place(text,0,20,titleWidth,32);style(text,{fontSize:"24px",lineHeight:"32px",textAlign:"center",whiteSpace:"nowrap",textOverflow:"shrink"});
+            var width=parseFloat(b.style.width)||220,height=parseFloat(b.style.height)||84,text=p(id==="LotterySingleButton"?"LotterySingleText":"LotteryTenText"),cost=p(id==="LotterySingleButton"?"LotterySingleCost":"LotteryTenCost"),free=b.BHasClass("ZXFreeDraw");
+            var parts=drawStructure(b,text,cost);ticketIcon(parts.ticket,snapshot&&(snapshot.selected_pool||snapshot));
+            var digits=Math.min(72,Math.max(20,String(cost&&cost.text||"").length*10)),costWidth=free?0:58+digits,contentWidth=width-24,contentHeight=free?32:70;
+            place(parts.content,12,(height-contentHeight)/2,contentWidth,contentHeight);style(parts.content,{flowChildren:"none",transform:"none",visibility:"visible"});
+            place(parts.cost,(contentWidth-costWidth)/2,34,costWidth,36);style(parts.cost,{flowChildren:"none",transform:"none",visibility:free?"collapse":"visible"});
+            place(parts.ticket,0,0,52,36);style(parts.ticket,{transform:"none"});
+            place(cost,58,5,digits,26);style(cost,{fontSize:"18px",lineHeight:"26px",textAlign:"left",whiteSpace:"nowrap",textOverflow:"shrink",minWidth:"0px",minHeight:"0px",transform:"none"});
+            place(text,0,0,contentWidth,32);style(text,{fontSize:"28px",lineHeight:"32px",textAlign:"center",whiteSpace:"nowrap",textOverflow:"shrink",minWidth:"0px",minHeight:"0px",transform:"none"});
         }
+    }
+    function footerAction(id,x,y,width,uri) {
+        var b=p(id);if(!valid(b))return;b.AddClass("LotteryGW2ForestFooterAction");place(b,x,y,width,44);b.hittestchildren=false;
+        var icon=b.__lotteryForestIcon;if(!valid(icon)){
+            icon=b.Children().filter(function(n){return n.BHasClass("LHDetailsIcon")||n.BHasClass("LHHistoryIcon");})[0];
+            if(!valid(icon))icon=nativeArt(b,"",uri,0,11,22,22);b.__lotteryForestIcon=icon;
+        }
+        place(icon,0,11,22,22);style(icon,{visibility:"visible",backgroundImage:'url("'+uri+'")',backgroundSize:"contain",backgroundPosition:"center",backgroundRepeat:"no-repeat",washColor:"#b6cbb3"});icon.hittest=false;icon.hittestchildren=false;
+        var captions=[];walk(b,function(n){if(n.paneltype==="Label")captions.push(n);});
+        captions.forEach(function(n){moveNode(n,b);place(n,30,0,width-30,44);style(n,{width:(width-30)+"px",height:"44px",minWidth:"0px",minHeight:"0px",horizontalAlign:"left",verticalAlign:"top",fontSize:"16px",lineHeight:"44px",textAlign:"left",transform:"none",color:"#c1cfbe",whiteSpace:"nowrap",textOverflow:"shrink",textShadow:"#000000 0px 1px 2px 2.0"});});
     }
     function compactCards(host,single) {
         if(!valid(host)||!ensure())return;
@@ -251,14 +306,20 @@
                 if(name)moveNode(name,hostVisual);else name=label(hostVisual,"","",0,123,134,39,17);
                 place(name,0,123,134,39);style(name,{fontSize:"17px",fontWeight:"normal",fontFamily:'"Source Han Sans SC"',color:"#e0d6c3",textAlign:"center",whiteSpace:"normal",textOverflow:"ellipsis",textShadow:"none"});name.visible=true;
                 var count=label(hostVisual,"","",13,88,106,24,16,"#f1e9d8");style(count,{textAlign:"right",textShadow:"#000000 0px 1px 3px 2.0"});
-                cell=card.__lotteryGW2Cell={host:hostVisual,name:name,count:count,stage:stage};
+                cell=card.__lotteryGW2Cell={host:hostVisual,name:name,count:count,stage:stage,well:well,selectedFrame:selectedFrame,icon:icon};
             }
             card.Children().forEach(function(c){if(c!==cell.host&&c!==cover)c.visible=false;});card.AddClass("LotteryGW2Cell");
-            place(card,result?(host.Children().length===1?488:52+(index%5)*212):5+(index%8)*137,result?10+Math.floor(index/5)*190:8+Math.floor(index/8)*178,134,168);
+            var one=result&&host.Children().length===1,cardWidth=result?(one?328:236):134,cardHeight=result?(one?396:286):168,iconSize=result?(one?280:196):116;
+            var iconLeft=(cardWidth-iconSize)/2;
+            place(card,result?(one?(1536-cardWidth)/2:78+(index%5)*286):5+(index%8)*137,result?(one?46:8+Math.floor(index/5)*300):8+Math.floor(index/8)*178,cardWidth,cardHeight);
+            place(cell.host,0,0,cardWidth,cardHeight);place(cell.well,iconLeft,3,iconSize,iconSize);place(cell.selectedFrame,iconLeft,3,iconSize,iconSize);
+            place(cell.stage,0,0,iconSize-2,iconSize-2);place(cell.icon,0,0,iconSize-2,iconSize-2);
+            place(cell.name,0,result?iconSize+9:123,cardWidth,result?(one?80:66):39);style(cell.name,{fontSize:result?(one?30:24)+"px":"17px",textShadow:result?"#000000 0px 0px 2px 4.0":"none"});
+            place(cell.count,iconLeft+4,result?iconSize-31:88,iconSize-8,result?28:24);style(cell.count,{fontSize:result?"23px":"16px"});
             style(card,{flowChildren:"none",backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none",overflow:"noclip",transform:"none"});
             cell.name.text=String(item.name||item.id||cell.name.text||"道具");cell.count.text=result?"×"+number(item.count===undefined?(item.quantity===undefined?1:item.quantity):item.count):quantity(item);
             if(result)bindTooltipIcon(card,cell.stage,item);
-            if(cover){place(cover,0,0,134,168);wellStyle(cover);style(cover,{zIndex:"20"});}
+            if(cover){place(cover,0,0,cardWidth,cardHeight);wellStyle(cover);style(cover,{zIndex:"20"});}
         });
     }
     function updateFooterSkin() {
@@ -276,29 +337,31 @@
         if(cfg.LotterySceneTransition)cfg.LotterySceneTransition.Resize(1608,746);
         place(p("LotterySceneShade"),35,123,1608,746);style(p("LotterySceneShade"),{zIndex:"1",backgroundColor:"transparent"});
         place(p("LotteryHeroCopy"),44,30,800,220);style(p("LotteryHeroCopy"),{flowChildren:"none",zIndex:"3",visibility:drawVisible?"visible":"collapse"});
-        place(p("LotteryTitle"),0,20,720,66);style(p("LotteryTitle"),{visibility:"visible",fontSize:"44px",fontWeight:"normal",color:"#e5ece9",whiteSpace:"nowrap",textOverflow:"shrink",textShadow:"#00000080 0px 1px 2px 1.0"});
-        place(p("LotteryTaglineBounds"),0,98,700,66);place(p("LotteryTagline"),0,0,700,66);style(p("LotteryTagline"),{fontSize:"19px",minHeight:"0px",color:"#b5c4c8",transform:"none",whiteSpace:"normal",textShadow:"#00000080 0px 1px 2px 1.0"});
+        place(p("LotteryTitle"),0,20,720,66);style(p("LotteryTitle"),{visibility:"visible",fontSize:"44px",fontWeight:"normal",color:"#f1eadb",whiteSpace:"nowrap",textOverflow:"shrink",textShadow:"#00000080 0px 1px 2px 1.0"});
+        place(p("LotteryTaglineBounds"),0,98,700,66);place(p("LotteryTagline"),0,0,700,66);style(p("LotteryTagline"),{fontSize:"19px",minHeight:"0px",color:"#bfcdbb",transform:"none",whiteSpace:"normal",textShadow:"#00000080 0px 1px 2px 1.0"});
         var pool=snapshot&&(snapshot.selected_pool||snapshot);if(pool&&pool.display_name&&String(p("LotteryTitle").text).indexOf("正在读取")!==0)p("LotteryTitle").text=String(pool.display_name);if(pool&&pool.description)p("LotteryTagline").text=String(pool.description).replace(/^(普通|金色|红色|特殊)抽奖券\s*·\s*/,"");
-        view.chest.visible=drawVisible&&!!pool;
         place(p("LotteryGuaranteeRow"),2,230,458,62);style(p("LotteryGuaranteeRow"),{flowChildren:"none",backgroundColor:"transparent",visibility:"collapse"});
         place(p("LotteryUnlockNotice"),44,205,650,56);style(p("LotteryUnlockNotice"),{fontSize:"19px",color:"#cfbfa0",whiteSpace:"normal",textShadow:"none",zIndex:"3",visibility:drawVisible?"visible":"collapse"});
         place(p("LotteryCelestialFooter"),334,123,1309,746);style(p("LotteryCelestialFooter"),{backgroundImage:"none",backgroundColor:"transparent",border:"0px",flowChildren:"none",zIndex:"4",visibility:drawVisible?"visible":"collapse",overflow:"noclip"});p("LotteryCelestialFooter").hittest=false;
-        place(p("LotterySingleButton"),773,638,238,80);place(p("LotteryTenButton"),1027,638,238,80);
-        place(p("LotteryDrawPity"),773,602,492,30);place(p("LotteryDrawPityCaptionBounds"),0,0,492,30);place(p("LotteryDrawPityCaption"),0,0,492,30);style(p("LotteryDrawPityCaption"),{fontSize:"19px",minHeight:"0px",textAlign:"right",transform:"none",color:"#e1d6bc",textShadow:"none"});
-        place(p("LHDetails"),1101,0,120,28);place(p("LHHistory"),44,644,120,32);place(p("LotteryAnnouncement"),190,644,90,32);style(p("LotteryAnnouncement"),{visibility:"visible"});place(p("LotterySkipAnimation"),44,691,190,38);
+        place(p("LotterySingleButton"),781,560,220,84);place(p("LotteryTenButton"),1021,560,244,84);
+        place(p("LotteryDrawPity"),1021,650,244,20);place(p("LotteryDrawPityCaptionBounds"),0,0,244,20);place(p("LotteryDrawPityCaption"),0,0,244,20);style(p("LotteryDrawPityCaption"),{fontSize:"14px",lineHeight:"20px",minHeight:"0px",textAlign:"center",transform:"none",color:"#cdd8bd",textShadow:"none"});
+        footerAction("LHDetails",44,674,138,"s2r://panorama/images/control_icons/icon_info_png.vtex");footerAction("LHHistory",198,674,138,"s2r://panorama/images/control_icons/history_png.vtex");footerAction("LotteryAnnouncement",352,674,104,"s2r://panorama/images/control_icons/question_mark_circle_psd.vtex");style(p("LotteryAnnouncement"),{visibility:"visible"});place(p("LotterySkipAnimation"),1060,674,205,44);
         place(p("LotteryStatus"),44,593,650,44);style(p("LotteryStatus"),{fontSize:"19px",color:"#e4d8bb",whiteSpace:"normal",textShadow:"none",zIndex:"8"});
         ["LotteryTitle","LotteryTagline","LotteryUnlockNotice","LotteryDrawPityCaption","LotteryStatus"].forEach(function(id){style(p(id),{textShadow:"#000000 0px 0px 2px 4.0"});});
         ["LotteryTaglineBounds","LotteryDrawPityCaptionBounds"].forEach(function(id){style(p(id),{overflow:"noclip"});});
         ["LotterySingleButton","LotteryTenButton","LotteryAgain","LotteryConfirm"].forEach(function(id){action(id,id==="LotteryTenButton"||id==="LotteryAgain");});
         ["LotterySingleCost","LotteryTenCost"].forEach(function(id){style(p(id),{visibility:"visible"});});
         ["LHDetails","LHHistory","LotteryAnnouncement","LotteryGW2Back"].forEach(function(id){var b=p(id);if(valid(b))b.AddClass("LotteryGW2Action");});
-        ["LHDetails","LHHistory","LotteryAnnouncement"].forEach(function(id){walk(p(id),function(node){if(node.paneltype==="Label"){if(id==="LotteryAnnouncement")node.text="规则";style(node,{fontSize:id==="LHDetails"?"18px":"19px",color:"#b6c7ce",textShadow:"#000000 0px 0px 2px 4.0"});}});});
-        place(p("LotteryResultStage"),98,6,1113,669);style(p("LotteryResultStage"),{backgroundImage:"none",backgroundColor:"#161711f8",zIndex:"6",flowChildren:"none",border:"0px"});
-        place(p("LotteryResultHeading"),18,13,1076,48);style(p("LotteryResultHeading"),{fontSize:"28px",color:"#efdbb2",textShadow:"none"});
-        place(p("LotteryItemList"),8,75,1097,449);style(p("LotteryItemList"),{flowChildren:"none",overflow:"squish scroll"});
-        place(p("LotteryResultActions"),0,573,1113,70);style(p("LotteryResultActions"),{flowChildren:"none"});place(p("LotteryConfirm"),292,0,240,55);place(p("LotteryAgain"),568,0,240,55);
-        place(p("LotteryRevealStage"),98,6,1113,669);place(p("LotterySkipReveal"),1037,21,155,42);compactCards(p("LotteryItemList"));
-        var film=p("LotteryCinematicSurface");if(valid(film)){moveNode(film,view.content);place(film,98,6,1113,669);}
+        ["LHDetails","LHHistory","LotteryAnnouncement"].forEach(function(id){walk(p(id),function(node){if(node.paneltype==="Label"&&id==="LotteryAnnouncement")node.text="规则";});});
+        view.fullscreen.visible=results&&!mode;
+        style(view.fullscreen,{backgroundImage:'url("'+poolBackground(selected)+'")'});
+        place(p("LotteryResultStage"),0,0,1672,941);style(p("LotteryResultStage"),{backgroundImage:"none",backgroundColor:"transparent",zIndex:"6",flowChildren:"none",border:"0px"});
+        place(p("LotteryResultHeading"),40,26,1560,58);style(p("LotteryResultHeading"),{fontSize:"36px",color:"#efdbb2",textShadow:"#000000 0px 0px 2px 4.0"});
+        place(p("LotteryItemList"),68,110,1536,620);style(p("LotteryItemList"),{flowChildren:"none",overflow:"clip"});
+        place(p("LotteryResultActions"),0,806,1672,84);style(p("LotteryResultActions"),{flowChildren:"none",overflow:"noclip"});place(p("LotteryConfirm"),594,0,220,84);place(p("LotteryAgain"),834,0,244,84);
+        place(p("LotteryRevealStage"),0,0,1672,941);place(p("LotterySkipReveal"),1477,30,155,48);compactCards(p("LotteryItemList"));
+        if(results&&!mode){move("LotteryStatus",view.resultCanvas);place(p("LotteryStatus"),40,750,1592,48);style(p("LotteryStatus"),{fontSize:"28px",textAlign:"center",textShadow:"#000000 0px 0px 2px 4.0",zIndex:"8"});}
+        else move("LotteryStatus",view.content);
         view.preview.style.visibility=drawVisible?"visible":"collapse";
         if(!mode)view.title.text="抽奖";
         var ticketText=number(pool&&pool.tickets),ticketWidth=Math.min(252,Math.max(34,ticketText.length*16)),ticketX=332-ticketWidth;
@@ -352,10 +415,10 @@
     }
     function info(name,options,data) {
         if(!ensure())return;hideTooltip();mode=name;updateFooterSkin();
-        if(valid(view.chest))view.chest.visible=false;
+        view.fullscreen.visible=false;
         p("LotteryInfoList").SetHasClass("LotteryGW2PrizeGroup",name==="details");var win=options.panel;win.RemoveClass("LotteryInfoPurple");win.AddClass("LotteryInfoGW2");
         var bounds=layout.info,width=bounds[2],height=bounds[3],footerHeight=name==="details"?0:88,footerTop=height-footerHeight;
-        place(p("LotteryInfoOverlay"),bounds[0],bounds[1],width,height);style(p("LotteryInfoOverlay"),{backgroundImage:"none",backgroundColor:name==="details"?"#111c24f0":"#111921f8",border:"0px",zIndex:"12",flowChildren:"none"});
+        place(p("LotteryInfoOverlay"),bounds[0],bounds[1],width,height);style(p("LotteryInfoOverlay"),{backgroundImage:"none",backgroundColor:name==="details"?"#10231bf0":"#101f19f8",border:"0px",zIndex:"12",flowChildren:"none"});
         style(view.content,{visibility:"collapse"});place(win,0,0,width,height);style(win,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none",transform:"none",flowChildren:"none",overflow:"clip"});
         ["LotteryInfoHeader","LotteryInfoTabs","LotteryPoolSelection","LotteryPoolGuarantee"].forEach(hidden);
         var hasNote=!!String(p("LotteryInfoNote")&&p("LotteryInfoNote").text||""),bodyTop=hasNote?64:18,bodyHeight=footerTop-bodyTop;
@@ -382,7 +445,7 @@
     }
     function tooltipRect(node) {var at=node.GetPositionWithinWindow(),fitted=canvasScale(node);return {x:at.x,y:at.y,width:node.actuallayoutwidth*fitted,height:node.actuallayoutheight*fitted};}
     function raiseTooltip(){
-        var canvas=p("LotteryMainCanvas");if(!valid(canvas))return;
+        var canvas=view.tooltip.GetParent()===view.resultCanvas?view.resultCanvas:p("LotteryMainCanvas");if(!valid(canvas))return;
         for(var branch=view.tooltip;valid(branch)&&branch!==canvas;branch=branch.GetParent()){
             var parent=branch.GetParent();if(!valid(parent))break;
             var above=0;parent.Children().forEach(function(sibling){if(sibling!==branch)above=Math.max(above,Number(sibling.style.zIndex)||0);});
@@ -440,6 +503,9 @@
     }
     function tooltip(item,anchor) {
         if(!ensure()||!valid(anchor))return false;if(!canAct()){hideTooltip();return true;}
+        var resultTip=false;for(var ancestor=anchor;valid(ancestor);ancestor=ancestor.GetParent())if(ancestor===view.resultCanvas){resultTip=true;break;}
+        var tooltipCanvas=resultTip?view.resultCanvas:p("LotteryMainCanvas"),tooltipParent=resultTip?view.resultCanvas:view.detailLayer;
+        if(view.tooltip.GetParent()!==tooltipParent){hideTooltip();view.tooltip.SetParent(tooltipParent);}
         if(tipAnchor&&tipAnchor!==anchor&&tipDismiss){tipDismiss.Dispose();tipDismiss=null;}
         if(!tooltipGuard().CanShow(anchor))return true;item=item||{};
         anchor.SetPanelEvent("onmouseout",function(){if(!requestTooltipHide(anchor))hideTooltip();});
@@ -452,8 +518,8 @@
         style(view.tipName,{color:cfg.SurvivalRewardPresentation.NameColor(item.quality)});view.tipDescription.text=lines.join("\n");view.tipCount.text="拥有 "+quantity(item);
         var lineCount=0;lines.join("\n").split("\n").forEach(function(line){lineCount+=Math.max(1,Math.ceil(line.length/17));});
         var h=Math.max(176,Math.min(704,145+lineCount*24));
-        var cp=p("LotteryMainCanvas").GetPositionWithinWindow(),at=anchor.GetPositionWithinWindow(),sx=(p("LotteryMainCanvas").actualuiscale_x||1)*canvasScale(p("LotteryMainCanvas")),sy=(p("LotteryMainCanvas").actualuiscale_y||1)*canvasScale(p("LotteryMainCanvas"));
-        var headerAt=String(view.header.style.position).split(" "),sidebarAt=String(view.sidebar.style.position).split(" "),left=parseFloat(headerAt[0]),right=left+parseFloat(view.header.style.width),top=parseFloat(headerAt[1]),bottom=parseFloat(sidebarAt[1])+parseFloat(view.sidebar.style.height);
+        var cp=tooltipCanvas.GetPositionWithinWindow(),at=anchor.GetPositionWithinWindow(),fitted=canvasScale(tooltipCanvas),sx=(tooltipCanvas.actualuiscale_x||1)*fitted,sy=(tooltipCanvas.actualuiscale_y||1)*fitted;
+        var headerAt=String(view.header.style.position).split(" "),sidebarAt=String(view.sidebar.style.position).split(" "),left=resultTip?20:parseFloat(headerAt[0]),right=resultTip?1652:left+parseFloat(view.header.style.width),top=resultTip?20:parseFloat(headerAt[1]),bottom=resultTip?921:parseFloat(sidebarAt[1])+parseFloat(view.sidebar.style.height);
         var x=(at.x-cp.x)/sx+(anchor.actuallayoutwidth||72)+12,y=(at.y-cp.y)/sy;if(x+368>right)x=(at.x-cp.x)/sx-380;x=Math.max(left,Math.min(right-368,x));y=Math.max(top,Math.min(bottom-h,y));
         var cursor=GameUI.GetCursorPosition&&GameUI.GetCursorPosition();
         if(cursor&&cursorInsideTooltipRegion(anchor)){
@@ -485,7 +551,7 @@
         Open:function(){if(!alive())return;opened=true;mode="";apply();if(view&&valid(view.root))view.root.visible=true;},
         Close:function(){if(!alive())return;opened=false;mode="";hideTooltip();if(view&&valid(view.root))view.root.visible=false;},
         CloseInfo:function(){if(!alive())return;mode="";hideTooltip();apply();},
-        Content:function(){return ensure()?view.content:null;},Fit:fit,Tooltip:tooltip,HideTooltip:hideTooltip,RequestTooltipHide:requestTooltipHide,
+        Content:function(){return ensure()?(view.fullscreen.visible?view.resultCanvas:view.content):null;},Fit:fit,Tooltip:tooltip,HideTooltip:hideTooltip,RequestTooltipHide:requestTooltipHide,
         Dispose:function(){
             if(disposed)return;hideTooltip();if(tipDismiss)tipDismiss.Dispose();
             // A replacement skin must finish assembling before this window can
@@ -497,7 +563,7 @@
             // Restore original business nodes before deleting any presentation hosts.
             moved.forEach(function(e){if(valid(e.node)&&valid(e.parent)){e.node.SetParent(e.parent);if(valid(e.next)&&e.next.GetParent()===e.parent&&e.parent.MoveChildBefore)e.parent.MoveChildBefore(e.node,e.next);}});moved=[];
             owned.slice().reverse().forEach(function(n){if(valid(n))n.DeleteAsync(0);});owned=[];
-            if(valid(p("LotteryMainCanvas"))){p("LotteryMainCanvas").RemoveClass("LotteryGW2");p("LotteryMainCanvas").RemoveClass("LotteryGW2Reborn");}if(valid(p("LotteryWindow")))p("LotteryWindow").RemoveClass("LotteryGW2Root");view=null;disposed=true;if(valid(life))life.DeleteAsync(0);
+            if(valid(p("LotteryMainCanvas"))){p("LotteryMainCanvas").RemoveClass("LotteryGW2");p("LotteryMainCanvas").RemoveClass("LotteryGW2Reborn");}if(valid(p("LotteryWindow"))){p("LotteryWindow").RemoveClass("LotteryGW2Root");p("LotteryWindow").RemoveClass("LotteryGW2ForestTheme");}view=null;disposed=true;if(valid(life))life.DeleteAsync(0);
         },
         Inspect:function(){return {alive:alive(),view:!!view,open:opened,mode:mode,pools:pools.length,poolIds:pools.map(function(pool){return String(pool.id);}),selected:selected,hasSnapshot:!!snapshot,canvas:layout.canvas.slice(),content:layout.content.slice(),movedCount:moved.filter(function(e){return valid(e.node);}).length,trackedOwned:owned.length,trackedMoved:moved.length,prizeGroups:prizeGroups.filter(function(g){return valid(g.bar);}).map(function(g){return {id:g.id,count:g.cards.length,percent:g.percent,collapsed:!!prizeFolded[g.key]};}),scale:scale};}
     };

@@ -179,6 +179,7 @@
     function errorText(code) {
         var messages = {
             archive_config_mismatch: "游戏与服务器配置版本不一致，请同步配置后重新进入游戏",
+            lottery_config_refresh_required: "抽奖规则已更新，请重新进入游戏后再试",
             mode_not_selected: "请先选择游戏模式，再打开抽奖",
             http_profile_required: "服务器存档尚未连接，请稍后重新打开抽奖",
             lottery_ticket_insufficient: "抽奖券不足",
@@ -245,6 +246,9 @@
         list.SetHasClass("LotteryTenResults", false);
         list.SetHasClass("LotteryChestMode", true);
         // The main scene already contains the illustrated chest; no stock icon overlay.
+        // Reparented fullscreen results keep presentation-only visibility and
+        // status placement. Refresh after clearing the result class as well.
+        var presenter=currentPresentation();if(presenter&&presenter.Apply)presenter.Apply();
     }
 
     function createResultCard(parent, item) {
@@ -363,10 +367,12 @@
         if (!dot) { dot = $.CreatePanel("Panel",button,"LotteryUpdateDot"); dot.AddClass("LotteryUpdateDot"); dot.hittest=false; }
         dot.visible = knownPools.some(function(p){return String(p.id) === selectedPoolId && detailsUnread(p);});
     }
-    function requestSnapshot(visit) {
+    function requestSnapshot() {
         prefetchPending=false;
+        // A cold open has no authoritative pool revision yet. Load the snapshot
+        // first; render() marks it visited only after receiving that revision.
         GameEvents.SendCustomGameEventToServer("ui_lottery_snapshot_request", {
-            pool_id: selectedPoolId, read_action: visit ? "visit" : ""
+            pool_id: selectedPoolId, read_action: ""
         });
     }
 
@@ -394,7 +400,7 @@
         showPresentation(presenter);
         renderDrawStage();
         updateButtons();
-        if(poolCache[selectedPoolId])render(poolCache[selectedPoolId]);else requestSnapshot(true);
+        if(poolCache[selectedPoolId])render(poolCache[selectedPoolId]);else requestSnapshot();
         markRead(state&&state.selected_pool,"visit");
         return true;
     }
@@ -492,7 +498,7 @@
         visibleResults = [];
         renderChest();
         setText("LotteryStatus", "正在切换奖池……");
-        requestSnapshot(true);
+        requestSnapshot();
         updateButtons();
     }
 

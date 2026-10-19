@@ -32,7 +32,7 @@
 .LotteryGW2Art { background-size:100% 100%; background-repeat:no-repeat; }
 .LotteryGW2Surface { background-image:none; border:0px; box-shadow:none; }
 .LotteryGW2SceneSubject { background-size:cover; background-position:center; background-repeat:no-repeat; }
-.LotteryGW2Label { font-family:"Source Han Sans SC"; font-weight:normal; text-shadow:none; white-space:normal; text-overflow:ellipsis; }
+.LotteryGW2Label { font-family:"Source Han Sans SC"; font-weight:normal; text-shadow:#000000 0px 0px 2px 4.0; white-space:normal; text-overflow:ellipsis; }
 #LotteryMainCanvas.LotteryGW2Reborn #LHDetails Label { font-size:18px; }
 #LotteryMainCanvas.LotteryGW2Reborn #LHHistory Label,
 #LotteryMainCanvas.LotteryGW2Reborn #LotteryAnnouncement Label { font-size:19px; }
@@ -61,10 +61,10 @@
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool:hover { brightness:1.18; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool:active { brightness:.88; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool.Selected { brightness:1; border:0px; }
-#LotteryMainCanvas.LotteryGW2 .ZXDrawContent { align:center center; height:40px; margin:0px; flow-children:right; }
+#LotteryMainCanvas.LotteryGW2 .ZXDrawContent { align:center center; height:72px; margin:0px; flow-children:right; }
 #LotteryMainCanvas.LotteryGW2 .ZXDrawContent Label { width:fit-children; font-size:23px; }
-#LotteryMainCanvas.LotteryGW2 .ZXDrawCost { height:36px; margin-left:13px; flow-children:right; }
-#LotteryMainCanvas.LotteryGW2 .LHDrawTicket { position:0px 0px 0px; width:27px; height:32px; margin:0px; align:left center; }
+#LotteryMainCanvas.LotteryGW2 .ZXDrawCost { height:72px; margin-left:13px; flow-children:right; }
+#LotteryMainCanvas.LotteryGW2 .LHDrawTicket { position:0px 0px 0px; width:64px; height:72px; margin:0px; align:left center; }
 #LotteryMainCanvas.LotteryGW2 .LHCost { position:0px 0px 0px; margin:0px; align:left center; font-size:22px; text-shadow:none; color:#f2e4c8; }
 #LotteryMainCanvas.LotteryGW2 #LHDetails Label,
 #LotteryMainCanvas.LotteryGW2 #LHHistory Label,
@@ -111,7 +111,7 @@
 
 /* Compact prize preview only. Draw scenes, results and history retain their layouts. */
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeGroup {
-    width:1309px; height:fit-children; margin:0px; padding:0px;
+    width:1309px; height:100%; margin:0px; padding:0px;
     flow-children:down; overflow:noclip; background-image:none;
     background-color:#2d261d32; border:0px; box-shadow:none;
 }
@@ -210,6 +210,30 @@
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2NativeButton:hover { brightness:1.16; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2NativeButton:active { brightness:.85; }
 
+/* Fullscreen results have their own fitted controls, independent of the menu. */
+#LotteryWindow .LotteryGW2Fullscreen { flow-children:none; overflow:clip; }
+#LotteryWindow .LotteryGW2ResultCanvas { flow-children:none; overflow:noclip; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell { transition-property:opacity,transform; transition-duration:.12s; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell .LotteryGW2SelectedFrame { opacity:0; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell.Selected .LotteryGW2SelectedFrame,
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell:hover .LotteryGW2SelectedFrame { opacity:1; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell.LotteryCardCovered .LotteryGW2CellVisual { opacity:0; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell.LotteryCardCovered .LotteryCardBack { opacity:1; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell .LotteryCardBack { opacity:0; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell.LotteryCardNarrow { transform:scale3d(.04,1,1); }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Cell.LotteryCardEntering { opacity:0; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2ItemWell,
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2CellStage,
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryRewardIcon { overflow:clip; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Action Label {
+    align:center center; width:100%; height:fit-children; margin:0px; padding:0px;
+    font-family:"Source Han Sans SC"; font-size:30px; text-align:center;
+}
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2NativeButton:hover { brightness:1.16; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2NativeButton:active { brightness:.85; }
+#LotteryWindow .LotteryGW2ResultCanvas .LotteryGW2Action:disabled { brightness:.9; saturation:.35; }
+#LotteryWindow .LotteryGW2ResultCanvas .ZXActionSkin { visibility:collapse; }
+
 /* Reborn's main window uses rectangular iron panels and silver navigation. */
 #LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2OfficialFrame {
     border:1px solid white;
@@ -233,7 +257,6 @@
 #LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PreviewCard .LotteryGW2PreviewWell { border-width:1px; }
 #LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PreviewCard:hover .LotteryGW2PreviewWell { brightness:1.2; }
 #LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PreviewRarity { font-size:12px; font-weight:bold; }
-#LotteryMainCanvas.LotteryGW2Reborn #LotteryGW2Chest,
 #LotteryMainCanvas.LotteryGW2Reborn #LotteryGW2SceneWash { transition-property:opacity; transition-duration:.12s; }
 #LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PrizeGroup { background-color:#15212c55; }
 #LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PrizeGroup .LotteryGW2PrizeBar {
@@ -244,3 +267,65 @@
 #LotteryMainCanvas.LotteryGW2Reborn #LHDetails Label { font-size:18px; color:#b6c7ce; }
 #LotteryMainCanvas.LotteryGW2Reborn #LHHistory Label,
 #LotteryMainCanvas.LotteryGW2Reborn #LotteryAnnouncement Label { font-size:19px; color:#b6c7ce; }
+
+/* Selected Forest Emerald skin. Only decorative surfaces react to brightness;
+   captions, the canonical ticket artwork and controller-enabled state stay intact. */
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas.LotteryGW2 .LotteryGW2OfficialFrame {
+    border:1px solid white;
+    border-brush:gradient(linear,0% 0%,0% 100%,from(#c4c68f),color-stop(.5,#6b8c61),to(#3f5d42));
+}
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:hover,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:active,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:disabled {
+    brightness:1; saturation:1; opacity:1; transform:none;
+}
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton .LotteryGW2ButtonSurface {
+    brightness:.88; saturation:.75;
+    transition-property:brightness,transform,saturation;
+    transition-duration:.1s;
+    transition-timing-function:ease-in-out;
+}
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton.LotteryGW2Primary .LotteryGW2ButtonSurface {
+    brightness:.92; saturation:1;
+}
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:hover .LotteryGW2ButtonSurface { brightness:.933; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton.LotteryGW2Primary:hover .LotteryGW2ButtonSurface { brightness:.975; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:active .LotteryGW2ButtonSurface { brightness:.827; transform:translateY(1px); }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton.LotteryGW2Primary:active .LotteryGW2ButtonSurface { brightness:.865; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:disabled .LotteryGW2ButtonSurface,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton.LotteryGW2Primary:disabled .LotteryGW2ButtonSurface { brightness:.62; saturation:.2; transform:none; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton.LotteryGW2ForestBusy .LotteryGW2ButtonSurface,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton.LotteryGW2Primary.LotteryGW2ForestBusy .LotteryGW2ButtonSurface { brightness:.76; saturation:.4; transform:none; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton .LotteryGW2DrawFocus { opacity:0; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:focus .LotteryGW2DrawFocus { opacity:1; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:disabled .LotteryGW2DrawFocus { opacity:0; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2Pool,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2Pool:hover,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2Pool:active { brightness:1; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas.LotteryGW2 .LotteryGW2PoolSkin { brightness:1; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool:hover .LotteryGW2PoolSkin { brightness:1.06; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas.LotteryGW2 .LotteryGW2Pool:active .LotteryGW2PoolSkin { brightness:.94; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2Pool:focus .LotteryGW2PoolSelectionMark { visibility:visible; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestUtility,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestUtility:hover,
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestUtility:active,
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas #LotteryCloseButton:hover,
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas #LotteryCloseButton:active { brightness:1; transform:none; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestUtility .LotteryGW2UtilitySurface { transition-property:brightness,transform; transition-duration:.1s; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestUtility:hover .LotteryGW2UtilitySurface { brightness:1.06; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestUtility:active .LotteryGW2UtilitySurface { brightness:.94; transform:translateY(1px); }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestUtility:focus .LotteryGW2UtilitySurface { box-shadow:#d0ebba99 0px 0px 0px 2px; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2RechargeIcon { wash-color:#d4ddb5; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2ForestFooterAction { flow-children:none; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2ForestFooterAction:hover { brightness:1.06; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2ForestFooterAction:active { brightness:.94; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2ForestFooterAction Label { font-size:16px; color:#c1cfbe; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas #LotterySkipAnimation .LotteryGW2SkipLabel { font-size:16px; color:#c1cfbe; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2PrizeGroup { background-color:#16302355; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2PrizeGroup .LotteryGW2PrizeBar {
+    border-top-color:#a7c9a33b; border-bottom-color:#0a180f99;
+    background-color:gradient(linear,0% 0%,0% 100%,from(#3d593999),to(#173124cc));
+}
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas VerticalScrollBar { background-color:#10231b; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas VerticalScrollBar .ScrollThumb { background-color:#7d9771; }
