@@ -43,7 +43,8 @@ function fixture(){
  const icons=()=>[...collect(nodes.LotteryWindow,'LHTicket'),...collect(nodes.LotteryWindow,'LHDrawTicket')];
  for(const icon of icons())Object.assign(icon.style,{backgroundImage:'url("legacy_ticket.png")',opacityMask:'url("legacy_silhouette.svg")',washColor:'#f1cc72'});
  run('lottery_gw2');
- return{config,nodes,requests,collect,icons};
+ const createPanel=(type,parent,cls)=>{const panel=new Panel(type,parent,'');if(cls)panel.AddClass(cls);return panel;};
+ return{config,nodes,requests,collect,icons,createPanel};
 }
 function pool(id){return{id,ticket_content_id:['map','cultivation'].includes(id)?'lottery_ticket':'special_lottery_ticket',tickets:23,unlocked:true};}
 function snapshot(id,items=[]){return{selected_pool_id:id,selected_pool:pool(id),pools:['map','cultivation','dragon_knight','summer'].map(pool),items};}
@@ -161,4 +162,96 @@ test('An unavailable registry clears previous ticket art without falling back to
   assert.equal(icon.style.backgroundImage,'none');assert.equal(icon.style.opacityMask,'none');assert.equal(icon.style.washColor,'none');
  }
  h.config.SurvivalItemResources=resources;assert.equal(h.requests.length,0);
+});
+
+function qualitySamples(resources){
+ const rows=resources.Rows();
+ const items=['n','r','sr','ssr','ur'].map(quality=>{
+  const row=rows.find(entry=>entry.id.startsWith('lottery_')&&entry.quality===quality&&entry.kind==='image');
+  assert(row,'The maintained catalog supplies a real '+quality+' lottery reward');
+  return{id:row.id,name:row.name,quality,description:'生命+100；护甲+1',owned_count:1,max_owned:1};
+ });
+ items.push({id:'unpublished_quality_fixture',name:'未公布品质的真实图像样例',quality:'unpublished',icon_type:'image',icon:resources.Resolve(items[0]),description:'生命+100',owned_count:0});
+ return items;
+}
+function assertQualityPlate(resources,well,item){
+ assert(well&&well.IsValid(),'A visible item well exists');
+ const reference={style:{}};resources.ApplyBackground(reference,item);
+ assert.equal(well.__survivalItemGrade,resources.Grade(item),'The current reward determines its quality plate');
+ for(const property of ['backgroundImage','backgroundColor','backgroundImgOpacity','backgroundSize','backgroundRepeat'])
+  assert.equal(well.style[property],reference.style[property],property+' comes from the shared quality factory');
+ assert.notEqual(well.style.backgroundImage,'none','The official plate remains under the item artwork');
+}
+function assertTransparentItemArt(icon){
+ assert(icon&&icon.IsValid());assert.equal(icon.style.backgroundImage,'none');
+ assert.equal(icon.style.backgroundColor,'transparent');assert.equal(icon.style.border,'0px');
+ assert.equal(icon.style.boxShadow,'none','The original artwork has no second plate, border or shadow');
+}
+function rewardCard(h,parent,item,cls){
+ const card=h.createPanel('Button',parent,cls),frame=h.createPanel('Panel',card,'LotteryDetailIcon');
+ card.__lotteryItem=item;
+ const icon=h.config.SurvivalRewardPresentation.CreateIcon(frame,item,'LotteryRewardIcon');
+ return{card,icon};
+}
+
+test('Grouped prize details use quality plates for every grade and repaint the same card when quality changes',()=>{
+ const h=fixture(),presentation=h.config.SurvivalPurpleLottery,resources=h.config.SurvivalItemResources;
+ const items=qualitySamples(resources),data=snapshot('map',items),unchanged=JSON.stringify(data);
+ presentation.Open();presentation.Pools(data.pools,'map');presentation.Snapshot(data);
+ const entries=items.map(item=>rewardCard(h,h.nodes.LotteryInfoList,item,'LotteryDetailRow'));
+ const activate=()=>{},hover=()=>{};
+ for(const {card}of entries){card.SetPanelEvent('onactivate',activate);card.SetPanelEvent('onmouseover',hover);}
+ const render=()=>presentation.Info('details',{panel:h.nodes.LotteryInfoDialog},data);
+ render();
+ assert.equal(presentation.Inspect().prizeGroups.length,6,'N/R/SR/SSR/UR and an unknown grade each have a real group');
+ for(let index=0;index<entries.length;index++){
+  const {card,icon}=entries[index],face=card.__lotteryPrizeFace;
+  assertQualityPlate(resources,face.well,items[index]);assertTransparentItemArt(icon);
+  assert.strictEqual(icon.GetParent(),face.host,'The original icon is displayed on the quality plate');
+  assert.strictEqual(card.events.onactivate,activate);assert.strictEqual(card.events.onmouseover,hover);
+  assert.equal(card.style.width,'72px');assert.equal(card.style.height,'72px');
+ }
+ assert.equal(JSON.stringify(data),unchanged,'Presentation preserves the authoritative snapshot');
+ const {card,icon}=entries[0],face=card.__lotteryPrizeFace,well=face.well,uri=icon.image;
+ for(const quality of ['ur','r','unpublished','n']){
+  card.__lotteryItem={...items[0],quality};render();
+  assert.strictEqual(card.__lotteryPrizeFace,face,'Repainting preserves the existing face');
+  assert.strictEqual(face.well,well,'Repainting updates the existing quality plate');
+  assertQualityPlate(resources,well,card.__lotteryItem);assertTransparentItemArt(icon);
+  assert.equal(icon.image,uri,'A changed quality leaves the catalog artwork unchanged');
+ }
+ assert.equal(JSON.stringify(data),unchanged);assert.equal(h.requests.length,0);
+});
+
+test('Result cards, reward details and tooltip icons retain one shared quality plate without changing ticket controls',()=>{
+ const h=fixture(),presentation=h.config.SurvivalPurpleLottery,resources=h.config.SurvivalItemResources;
+ const items=qualitySamples(resources),data=snapshot('map',items);
+ presentation.Open();presentation.Pools(data.pools,'map');presentation.Snapshot(data);h.config.LotteryHandoff.Ticket(data.selected_pool);
+ const entries=items.map(item=>rewardCard(h,h.nodes.LotteryItemList,item,'LotteryRewardCard'));
+ presentation.Compact(h.nodes.LotteryItemList);
+ for(let index=0;index<entries.length;index++){
+  const {card,icon}=entries[index],cell=card.__lotteryGW2Cell;
+  assertQualityPlate(resources,cell.well,items[index]);assertTransparentItemArt(icon);
+ }
+ const result=entries[0],well=result.card.__lotteryGW2Cell.well;
+ for(const quality of ['ur','unpublished','n']){
+  result.card.__lotteryItem={...items[0],quality};presentation.Compact(h.nodes.LotteryItemList,result.card);
+  assert.strictEqual(result.card.__lotteryGW2Cell.well,well);assertQualityPlate(resources,well,result.card.__lotteryItem);
+  assertTransparentItemArt(result.icon);
+ }
+ for(const item of items){
+  h.nodes.LotteryInfoList.RemoveAndDeleteChildren();
+  const frame=h.createPanel('Panel',h.nodes.LotteryInfoList,'LotteryDetailIcon');
+  const icon=h.config.SurvivalRewardPresentation.CreateIcon(frame,item,'LotteryRewardIcon');
+  presentation.Info('reward',{panel:h.nodes.LotteryInfoDialog},data);
+  assertQualityPlate(resources,frame,item);assertTransparentItemArt(icon);
+  presentation.Tooltip(item,icon);
+  assertQualityPlate(resources,h.nodes.LotteryGW2TooltipIconStage,item);
+  const tipIcon=h.collect(h.nodes.LotteryGW2TooltipIconStage,'LotteryGW2TooltipIcon')[0];
+  assertTransparentItemArt(tipIcon);
+  assert.equal(tipIcon.image,icon.image,'The tooltip retains the same catalog artwork');
+ }
+ const ticketURI=resources.Resolve('lottery_ticket');
+ for(const icon of [...h.icons(),h.nodes.LotteryGW2TicketIcon])assertOriginalArt(icon,ticketURI);
+ assert.equal(h.requests.length,0,'All quality repaints are presentation only');
 });

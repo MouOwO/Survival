@@ -45,6 +45,7 @@
     function nativeArt(parent,id,uri,x,y,w,h){var n=make("Panel",parent,id,"LotteryGW2NativeArt");place(n,x,y,w,h);style(n,{backgroundImage:'url("'+uri+'")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat"});n.hittest=false;n.hittestchildren=false;return n;}
     function wellStyle(n){n.AddClass("LotteryGW2ItemWell");style(n,{backgroundImage:'url("s2r://panorama/images/hud/reborn/inventory_item_well_psd.vtex")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",backgroundColor:"#171b18",border:"1px solid #9b8c62",overflow:"clip"});return n;}
     function itemWell(parent,x,y,w,h,id){var n=make("Panel",parent,id||"","");place(n,x,y,w,h);n.hittest=false;n.hittestchildren=false;return wellStyle(n);}
+    function qualityWell(well,item){var resources=cfg.SurvivalItemResources;if(valid(well)&&resources&&resources.ApplyBackground)resources.ApplyBackground(well,item);return well;}
     function moveNode(n,parent) {
         if (!valid(n) || !valid(parent) || n.GetParent() === parent) return n;
         if (!moved.some(function (e) { return e.node === n; })) { var old=n.GetParent(),siblings=valid(old)?old.Children():[]; moved.push({node:n,parent:old,next:siblings[siblings.indexOf(n)+1]}); }
@@ -367,6 +368,7 @@
                 if(!valid(cell.rarity))cell.rarity=label(cell.host,"","",0,0,40,16,10,color);
                 place(cell.rarity,iconLeft+iconSize-45,6,40,16);cell.rarity.text=quality.toUpperCase();style(cell.rarity,{color:color,textAlign:"right",textOverflow:"clip"});
             }
+            qualityWell(cell.well,item);
             style(card,{flowChildren:"none",backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none",overflow:"noclip",transform:"none"});
             cell.name.text=String(item.name||item.id||cell.name.text||"道具");cell.count.text=result?"×"+number(item.count===undefined?(item.quantity===undefined?1:item.quantity):item.count):quantity(item);
             if(result)bindTooltipIcon(card,cell.stage,item);
@@ -449,12 +451,14 @@
                 if(!face||!valid(face.host)){
                     var icon=null;walk(card,function(node){if(node.BHasClass("LotteryRewardIcon"))icon=node;});
                     var visual=make("Panel",card,"","LotteryGW2PrizeFace");place(visual,0,0,72,72);visual.hittest=false;visual.hittestchildren=false;
-                    itemWell(visual,0,0,72,72);
+                    var well=itemWell(visual,0,0,72,72);
                     if(icon){moveNode(icon,visual);place(icon,1,1,70,70);icon.visible=true;fillItemIcon(icon,item);}
                     var glow=make("Panel",visual,"","LotteryGW2PrizeSelected");place(glow,0,0,72,72);
                     var count=label(visual,"",model.Quantity(item),19,1,51,24,15,"#f3e9d3");count.AddClass("LotteryGW2PrizeOwned");style(count,{textAlign:"right"});
-                    face=card.__lotteryPrizeFace={host:visual,count:count};
+                    face=card.__lotteryPrizeFace={host:visual,well:well,count:count};
                 }
+                if(!valid(face.well))face.well=face.host.Children().filter(function(child){return child.BHasClass("LotteryGW2ItemWell");})[0];
+                qualityWell(face.well,item);
                 card.Children().forEach(function(child){child.visible=child===face.host;});face.count.text=model.Quantity(item);card.AddClass("LotteryGW2PrizeSlot");card.AddClass("LotteryQuality_"+String(item.quality||"n").toUpperCase());card.SetHasClass("LotteryGW2PrizeUnowned",model.Quantity(item).split("/")[0]==="0");
                 style(card,{flowChildren:"none",backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none",overflow:"noclip",transform:"none"});entries.push(card);
             });
@@ -494,7 +498,7 @@
             style(row,{width:(width-23)+"px",backgroundImage:"none",border:"0px",borderBottom:"1px solid #504d3e"});
             row.Children().forEach(function(child){if(child.BHasClass("RHHistoryName"))style(child,{width:(width-653)+"px"});else if(child.BHasClass("RHHistoryQuality"))style(child,{position:(width-331)+"px 0px 0px"});else if(child.BHasClass("RHHistoryQuantity"))style(child,{position:(width-175)+"px 0px 0px"});});
         }});
-        if(name==="reward")p("LotteryInfoList").Children().forEach(function(child){if(child.BHasClass("LotteryDetailIcon")){place(child,20,0,120,120);wellStyle(child);walk(child,function(n){if(n.BHasClass("LotteryRewardIcon")){place(n,0,0,118,118);fillItemIcon(n,n.__lotteryItem);}});}else if(child.BHasClass("LotteryDetailDescription"))place(child,20,136,width-40,bodyHeight-136);});
+        if(name==="reward")p("LotteryInfoList").Children().forEach(function(child){if(child.BHasClass("LotteryDetailIcon")){place(child,20,0,120,120);wellStyle(child);walk(child,function(n){if(n.BHasClass("LotteryRewardIcon")){place(n,0,0,118,118);fillItemIcon(n,n.__lotteryItem);qualityWell(child,n.__lotteryItem);}});}else if(child.BHasClass("LotteryDetailDescription"))place(child,20,136,width-40,bodyHeight-136);});
         var names={details:"奖池详情",history:"抽奖记录",announcement:"开奖公告",update:"奖励更新公告",reward:p("LotteryInfoTitle")&&p("LotteryInfoTitle").text||"奖励详情",firstgift:"首充礼包",privilege:"礼包特权"};view.title.text=names[name]||"功能提示";sidebar();
     }
     function canvasScale(node){
@@ -573,6 +577,7 @@
         var lines=[effectLines(item.description||"暂无效果说明")];if(item.duration_text)lines.push("期限："+item.duration_text);if(item.duplicate_points!==undefined&&item.duplicate_points!==null)lines.push("重复转化："+item.duplicate_points+" "+((item.converted_currency||item.duplicate_currency)==="shop_points"?"商城积分":"星悦积分"));
         if(item.count!==undefined||item.quantity!==undefined)lines.push("本次获得："+number(item.count===undefined?item.quantity:item.count));
         if(item.duplicate===true||Number(item.duplicate)===1)lines.push("本次已转化 "+number(item.converted_points)+" "+((item.converted_currency||item.duplicate_currency)==="shop_points"?"商城积分":"星悦积分"));
+        qualityWell(view.tipIconStage,item);
         view.tipIconStage.RemoveAndDeleteChildren();var tipIcon=cfg.SurvivalRewardPresentation.CreateIcon(view.tipIconStage,item,"LotteryGW2TooltipIcon");if(tipIcon){place(tipIcon,0,0,46,46);fillItemIcon(tipIcon,item);}prune();
         view.tipName.text=String(item.name||item.id||"道具");view.tipState.text=String(item.quality||"").toUpperCase()+(item.duration_text?" · "+item.duration_text:"");
         style(view.tipName,{color:cfg.SurvivalRewardPresentation.NameColor(item.quality)});view.tipDescription.text=lines.join("\n");view.tipCount.text="拥有 "+quantity(item);
@@ -596,7 +601,7 @@
         tipDismiss.Shown(anchor);return true;
     }
     var originalDialog=R&&R.LotteryDialog,originalReward=R&&R.RewardCard,presentation=cfg.SurvivalRewardPresentation,originalIcon=presentation&&presentation.CreateIcon;
-    function iconWrapper(parent,item,className){var icon=originalIcon.call(presentation,parent,item,className);return alive()&&lotteryParent(parent)?existingRewardArt(icon,item):icon;}
+    function iconWrapper(parent,item,className){var icon=originalIcon.call(presentation,parent,item,className);if(alive()&&lotteryParent(parent)){if(valid(icon))icon.__lotteryItem=item;return existingRewardArt(icon,item);}return icon;}
     function dialogWrapper(name,options){info(name,options);}
     function rewardWrapper(card,item){card.__lotteryItem=item;if(originalReward)originalReward(card,item);compactCards(card.GetParent(),card);}
     if(R){R.LotteryDialog=dialogWrapper;R.RewardCard=rewardWrapper;}
