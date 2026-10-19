@@ -1,0 +1,41 @@
+{
+  "purpose": "Reviewable task-only changes. They are already applied in the tested workspace. Do not apply again. Production files had user changes before this task and remain unstaged.",
+  "baseStash": "1161e4ac470cde1a5c9b914adf576131b0a75196",
+  "files": [
+    {
+      "path": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "prerequisiteSha256": "1e61779162403de200e6fab61606edf1f245645978ccc72af9c7cdf9acf51a2f",
+      "taskPatchTargetSha256": "9782db9036b964622ff599d99d4817abeda04fa74296ab7851e921a0c3d4790a",
+      "testedWorkspaceSha256": "b6b85cc628c0234c77204d87ac130956f710932de64b90306ee7b0a44943ab20",
+      "taskPatchTargetTextSha256": "06074d2eb671e202a92726afe3aaa72db2160e25deb7f873379da1f82467e6e9"
+    },
+    {
+      "path": "panorama/src/styles/custom_game/lottery_gw2.css",
+      "prerequisiteSha256": "a49f33b1dfada1173038329d5c7c1feb61ea85b5487b947de297c01ea5383825",
+      "taskPatchTargetSha256": "978558f803aa7ae15e85e78a1e6aef21e295ff070894bf11efe9729193c1636a",
+      "testedWorkspaceSha256": "978558f803aa7ae15e85e78a1e6aef21e295ff070894bf11efe9729193c1636a",
+      "taskPatchTargetTextSha256": "12eb13fdc827e486fab96d16d1ec29feffe33773fc04fbb0eb6045cbbbd2a997"
+    },
+    {
+      "path": "tools/tests/lottery_gw2.test.cjs",
+      "prerequisiteSha256": "9c9f7de74ac4b68de5a1f085889d911498af2ce71e19e6d23fcd2b1ffce7e8bb",
+      "taskPatchTargetSha256": "55f1f82fe4c886f6a70c155f2bf849858bb581624bd4355a2f095731b23248df",
+      "testedWorkspaceSha256": "55f1f82fe4c886f6a70c155f2bf849858bb581624bd4355a2f095731b23248df",
+      "taskPatchTargetTextSha256": "1322f85ed3393c7ea29b33acc5e6fc84af838c67476c3fcfc317f21ae436c729"
+    }
+  ],
+  "patchSha256": "758a8c5377fa48977c2c573c178450ee509cc61a0675a2ff88af5c2c3f94e105",
+  "excludedConcurrentChanges": [
+    "Main canvas Fit reference [1920,1080]",
+    "Independent result/main tooltip canvasScale changes"
+  ],
+  "verification": {
+    "preview": "output/lottery_emerald_buttons_20261019/qa/report.json",
+    "productionAdapter": "output/lottery_emerald_buttons_20261019/native/report.json",
+    "compile": "output/lottery_emerald_buttons_20261019/compile.json",
+    "liveScreenshot": "design_refs/menus_v10/work/native/emerald_lottery_fast_20261019.png",
+    "liveLimitation": "Native client opened the theme but authoritative data rejected with lottery_revision_invalid. Native reward rendering and draw success were not verified."
+  },
+  "lineEndings": "Task replay text is compared after CRLF to LF normalization; tested workspace hashes refer to exact bytes.",
+  "liveContextLimitation": "The running native HUD predates the current compiled XML. The full fresh-context button structure was verified through the production-source adapter; native success/fresh-context rendering was not verified."
+}
