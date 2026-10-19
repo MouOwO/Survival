@@ -93,14 +93,17 @@ function compactSidebar() {
     const shell = nodes.get('ArchiveV10Shell_Sidebar');
     near(parseFloat(shell.style.width), 326 * 2 / 3, 'Stone sidebar is two thirds of its former width');
     for (const [id, originalWidth] of [['ArchiveV10OverviewTitle', 285], ['ArchiveV10Overview', 292],
-        ['ArchiveV10FilterToggle', 290], ['ArchiveV10Search', 290], ['ArchiveV10SidebarStrip', 310],
-        ['ArchiveV10Sidebar', 302], ['ArchiveV10SearchEmpty', 280], ['ArchiveV10FilterMenu', 290]]) {
+        ['ArchiveV10FilterToggle', 290], ['ArchiveV10SidebarStrip', 310],
+        ['ArchiveV10Sidebar', 302], ['ArchiveV10FilterMenu', 290]]) {
         const panel = nodes.get(id);
         near(parseFloat(panel.style.width), originalWidth - sidebarDelta, id + ' uses the compact width');
         contains(shell, panel);
     }
     contains(nodes.get('ArchiveV10FilterToggle'), nodes.get('ArchiveV10FilterText'));
-    contains(nodes.get('ArchiveV10Search'), nodes.get('ArchiveV10SearchHint'));
+    for (const id of ['ArchiveV10Search', 'ArchiveV10SearchHint', 'ArchiveV10SearchEmpty']) assert(!nodes.has(id), 'Removed category search never creates a panel');
+    assert.equal(bounds(nodes.get('ArchiveV10SidebarStrip')).y, 234, 'Category heading takes the former search position');
+    assert.equal(bounds(nodes.get('ArchiveV10Sidebar')).y, 270, 'Category list moves up with its heading');
+    assert.equal(bounds(nodes.get('ArchiveV10Sidebar')).bottom, 845, 'The taller category list keeps its bottom edge');
     for (const mode of ['all', 'unlocked', 'locked']) {
         const option = nodes.get('ArchiveV10Filter_' + mode);
         near(parseFloat(option.style.width), 288 - sidebarDelta, 'Dropdown option width');
@@ -130,7 +133,7 @@ snapshot('shadow', 2, shadowRows);
 api.Open(); api.SelectCategory('shadow'); advance(.1);
 assert.equal(canvases().length, 1, 'Exactly one archive shell is constructed');
 assert.equal(cfg.SurvivalMenuV10.Entries().length, 0, 'The independent archive never adopts the global menu or its resource strip');
-assert.equal(cfg.SurvivalArchiveV10.Inspect().categories.length, 15, 'Archive retains its categories while the social and blessing pools use the independent collection window');
+assert.equal(cfg.SurvivalArchiveV10.Inspect().categories.length, 16, 'Archive retains its categories while the social and blessing pools use the independent collection window');
 for (const category of ['ex', 'friend', 'wife', 'beast']) {
     assert(!nodes.has('ArchiveV10Category_' + category), 'Migrated collection pool is absent from the fixed archive sidebar: ' + category);
     assert(!nodes.has('ArchiveTab_' + category), 'Migrated collection pool is absent from legacy archive navigation: ' + category);
@@ -149,15 +152,7 @@ assert.equal(nodes.get('ArchiveV10FilterMenu').visible, true);
 nodes.get('ArchiveV10Filter_all').events.onactivate();
 assert.equal(nodes.get('ArchiveV10FilterMenu').visible, false);
 selectedCategory('shadow');
-const categorySearch = nodes.get('ArchiveV10Search');
-categorySearch.text = '星悦'; categorySearch.events.ontextentrychange();
-assert.deepEqual(nodes.get('ArchiveV10Sidebar').Children().filter(node => node.visible).map(node => node.id), ['ArchiveV10Category_starjoy_points']);
-assert.equal(nodes.get('ArchiveV10Category_shadow').visible, false);
-selectedCategory('shadow');
-categorySearch.text = '不存在的分类'; categorySearch.events.ontextentrychange();
-assert.equal(nodes.get('ArchiveV10SearchEmpty').visible, true, 'Search provides a truthful empty state');
-categorySearch.text = ''; categorySearch.events.ontextentrychange();
-assert.equal(nodes.get('ArchiveV10Sidebar').Children().filter(node => node.visible).length, 15);
+assert.equal(nodes.get('ArchiveV10Sidebar').Children().filter(node => node.visible).length, 16, 'Every category remains available without search');
 selectedCategory('shadow'); compactSidebar();
 assert.equal(cards()[0].style.width, '745px', 'The controller cards are complete horizontal rows');
 assert.equal(cards()[1].style.position, '0px 82px 0px', 'Rows occupy a single vertical column');

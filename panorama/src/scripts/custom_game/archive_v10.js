@@ -12,10 +12,10 @@
     size[0]-=sidebarReduction;
     function narrow(width){return width-sidebarReduction;}
     function contentX(x){return x-sidebarReduction;}
-    var canvas=null,gridHost=null,sidebar=null,filterMenu=null,search=null,headerIcon=null,tip=null,tooltip=null,viewScale=1;
+    var canvas=null,gridHost=null,sidebar=null,filterMenu=null,headerIcon=null,tip=null,tooltip=null,viewScale=1;
     var active=false,disposed=false,current="",rows=[],categoryRows=[],filters={},balances=[],moved=[],subscriptions=[],sidebarKey="",hover=null,displayKey="";
     var textSpecs={},sidebarButtons={},missingIcons={},fitOptions=null,lastReportedCategory="";
-    var searchValue="",order=["clear","shadow","map_level","work","gift","fragment","pet","boss","points","commerce_goods","shop","endless","fishing","building","starjoy_points","titles"];
+    var order=["clear","shadow","map_level","work","gift","fragment","pet","boss","points","commerce_goods","shop","endless","fishing","building","starjoy_points","titles"];
     var names={clear:"通关存档",shadow:"虚空之影",map_level:"地图等级",work:"上班福利",gift:"福利礼包",fragment:"神兵碎片",pet:"秘法牢笼",boss:"BOSS存档",points:"积分道具",commerce_goods:"商城道具",shop:"排行榜",endless:"无尽存档",fishing:"钓鱼存档",building:"存档神器",friend:"我的好基友",ex:"我的前女友",beast:"瑞兽赐福",starjoy_points:"星悦积分",titles:"称号"};
     var layers=D.layers;layers.forEach(function(layer){if(layer.kind==="text")textSpecs[layer.id]=layer;});
     var marker=$.CreatePanel("Panel",root,"");marker.visible=false;marker.hittest=false;
@@ -64,12 +64,8 @@
         var filter=make("Button",canvas,"ArchiveV10FilterToggle","ArchiveV10Button ArchiveParchmentInput");pos(filter,48,191,narrow(290),34);
         label(filter,"全部存档",10,3,narrow(240),29,21,"#f4edda","left","ArchiveV10FilterText");label(filter,"▾",narrow(258),2,22,28,20,"#ddcfb0","center");
         filter.SetPanelEvent("onactivate",function(){if(alive()){hideTooltip();filterMenu.visible=!filterMenu.visible;}});
-        search=make("TextEntry",canvas,"ArchiveV10Search","ArchiveParchmentSearch");pos(search,48,234,narrow(290),34);search.text="";
-        var searchHint=label(canvas,"搜索分类…",59,237,narrow(258),30,20,"#a7a393","left","ArchiveV10SearchHint");
-        search.SetPanelEvent("ontextentrychange",function(){if(!alive())return;searchValue=String(search.text||"").replace(/^\s+|\s+$/g,"");searchHint.visible=!searchValue;filterMenu.visible=false;hideTooltip();layoutSidebar();sidebar.ScrollToTop();});
-        component(canvas,"section_strip",36,278,narrow(310),34,"ArchiveV10SidebarStrip");serif(label(canvas,"分类",54,281,narrow(260),29,23,"#f4eeda"));
-        sidebar=make("Panel",canvas,"ArchiveV10Sidebar","ArchiveV10Sidebar");pos(sidebar,42,314,narrow(302),531);sidebar.hittest=false;sidebar.hittestchildren=true;
-        label(canvas,"未找到匹配分类",52,333,narrow(280),29,19,"#b5ac98","left","ArchiveV10SearchEmpty").visible=false;
+        component(canvas,"section_strip",36,234,narrow(310),34,"ArchiveV10SidebarStrip");serif(label(canvas,"分类",54,237,narrow(260),29,23,"#f4eeda"));
+        sidebar=make("Panel",canvas,"ArchiveV10Sidebar","ArchiveV10Sidebar");pos(sidebar,42,270,narrow(302),575);sidebar.hittest=false;sidebar.hittestchildren=true;
         headerIcon=icon(canvas,categoryIcon("clear"),contentX(394),95,68,68,"ArchiveV10CategoryIcon");component(canvas,"icon_ring",contentX(392),93,72,72);
         serif(label(canvas,"存档",contentX(480),103,650,54,42,"#fff5df","left","ArchiveV10_page_title"));
         component(canvas,"section_strip",contentX(375),195,780,35,"ArchiveV10SectionStrip");serif(label(canvas,"收集条目",contentX(392),198,700,28,23,"#fff1d6","left","ArchiveV10SectionTitle"));
@@ -84,9 +80,8 @@
     function enter(options){var opening=!active;fitOptions=options||fitOptions;if(fitOptions)fitOptions.reference=size.slice();if(!valid(canvas))build();active=true;canvas.visible=true;var win=p("ArchiveWindow");if(opening)win.__v10Style={};win.AddClass("ArchiveV10Page");win.AddClass("ArchiveParchmentPage");style(win,{width:size[0]+"px",height:size[1]+"px",padding:"0px",margin:"0px",flowChildren:"none",backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderTop:"0px",borderBottom:"0px",borderRadius:"0px",boxShadow:"none",overflow:"noclip"});fit();}
     function categoryName(id){var row=categoryRows.filter(function(x){return x.id===id;})[0];return names[id]||row&&row.name||id;}
     function layoutSidebar(){
-        if(!valid(sidebar))return;var index=0,needle=searchValue.toLowerCase();
-        Object.keys(sidebarButtons).forEach(function(id){var cell=sidebarButtons[id],show=!needle||categoryName(id).toLowerCase().indexOf(needle)>=0;cell.panel.visible=show;cell.panel.SetHasClass("ArchiveV10Selected",id===current);cell.text.style.color=id===current?"#ffe6a6":"#f0eadb";if(show)pos(cell.panel,0,(index++)*35,narrow(285),35);});
-        p("ArchiveV10SearchEmpty").visible=index===0;
+        if(!valid(sidebar))return;var index=0;
+        Object.keys(sidebarButtons).forEach(function(id){var cell=sidebarButtons[id];cell.panel.visible=true;cell.panel.SetHasClass("ArchiveV10Selected",id===current);cell.text.style.color=id===current?"#ffe6a6":"#f0eadb";pos(cell.panel,0,(index++)*35,narrow(285),35);});
     }
     function renderSidebar(categories){
         var signature=JSON.stringify(categories||[]);if(signature!==sidebarKey){
@@ -244,7 +239,7 @@
     A.Hide=function(){hideTooltip();return originalHide();};
     var api=cfg.SurvivalArchiveV10={
         Render:render,Fit:fit,IsAlive:alive,RequestTooltipHide:queueTooltipHide,Leave:function(){hideTooltip();active=false;displayKey="";if(cfg.SurvivalEndlessLeaderboard)cfg.SurvivalEndlessLeaderboard.Hide();if(valid(filterMenu))filterMenu.visible=false;if(valid(canvas))canvas.visible=false;},
-        Inspect:function(){var win=p("ArchiveWindow"),cp=valid(canvas)?canvas.GetPositionWithinWindow():null,cards=valid(p("ArchiveGrid"))?p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}):[];return {active:active,category:current,categories:order.slice(),shellIdentity:canvas&&canvas.id,layout:current==="commerce_goods"?"commerce_goods_grid":"parchment_rows",search:searchValue,rows:rows.map(function(item){return {id:item.id,count:item.count,quantity:S.Quantity(item,current),unlocked:S.State(item,current),name:item.name};}),geometry:{canvas:cp,window:valid(win)?win.GetPositionWithinWindow():null,width:valid(win)?win.actuallayoutwidth:0,height:valid(win)?win.actuallayoutheight:0,firstCount:cards.length?{position:cards[0].__v10.count.GetPositionWithinWindow(),width:cards[0].__v10.count.actuallayoutwidth,textAlign:cards[0].__v10.count.style.textAlign,font:cards[0].__v10.count.style.fontFamily,weight:cards[0].__v10.count.style.fontWeight}:null},tooltipVisible:valid(tip)&&tip.visible,missingIcons:Object.keys(missingIcons)};},
+        Inspect:function(){var win=p("ArchiveWindow"),cp=valid(canvas)?canvas.GetPositionWithinWindow():null,cards=valid(p("ArchiveGrid"))?p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}):[];return {active:active,category:current,categories:order.slice(),shellIdentity:canvas&&canvas.id,layout:current==="commerce_goods"?"commerce_goods_grid":"parchment_rows",rows:rows.map(function(item){return {id:item.id,count:item.count,quantity:S.Quantity(item,current),unlocked:S.State(item,current),name:item.name};}),geometry:{canvas:cp,window:valid(win)?win.GetPositionWithinWindow():null,width:valid(win)?win.actuallayoutwidth:0,height:valid(win)?win.actuallayoutheight:0,firstCount:cards.length?{position:cards[0].__v10.count.GetPositionWithinWindow(),width:cards[0].__v10.count.actuallayoutwidth,textAlign:cards[0].__v10.count.style.textAlign,font:cards[0].__v10.count.style.fontFamily,weight:cards[0].__v10.count.style.fontWeight}:null},tooltipVisible:valid(tip)&&tip.visible,missingIcons:Object.keys(missingIcons)};},
         Dispose:function(){if(disposed)return;hideTooltip();if(tooltip)tooltip.Dispose();tooltip=null;active=false;disposed=true;subscriptions.forEach(function(id){if(GameEvents.Unsubscribe)GameEvents.Unsubscribe(id);});subscriptions=[];moved.forEach(function(entry){if(valid(entry.node)&&valid(entry.parent))entry.node.SetParent(entry.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(marker))marker.DeleteAsync(0);canvas=null;balances=[];filters={};sidebarKey="";var win=p("ArchiveWindow");if(valid(win)){win.RemoveClass("ArchiveV10Page");win.RemoveClass("ArchiveParchmentPage");}}
     };
     return api;
