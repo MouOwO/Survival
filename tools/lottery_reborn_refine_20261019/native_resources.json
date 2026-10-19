@@ -1,0 +1,179 @@
+{
+  "kind": "official_reborn_compatible_components_for_five_sequential_refinement_rounds",
+  "productionModified": true,
+  "sourceVpk": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota\\pak01_dir.vpk",
+  "records": [
+    {
+      "resource": "panorama/images/gray_button_off_png.vtex_c",
+      "uri": "s2r://panorama/images/gray_button_off_png.vtex",
+      "width": 269,
+      "height": 33,
+      "sha256": "1d033e91038a5e7f12b34f3667ee1f7ab75a2704e70351c9d3cc8d8558444e4d",
+      "pngSha256": "0813920d8f9a737a6a2fb82039cab4b3be05d7f8a6bf55ab85f4970c02ffdd4e",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/gray_button_on_png.vtex_c",
+      "uri": "s2r://panorama/images/gray_button_on_png.vtex",
+      "width": 269,
+      "height": 33,
+      "sha256": "21a3fac918aed7f42501e3bc4a372cb29e66c9b59252a789288c656fa1b88dd6",
+      "pngSha256": "262087130d712d0e70f999a49acc3ffc783b85e0a85445dd2e939449220b5e10",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/shop_launcher_button_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/shop_launcher_button_psd.vtex",
+      "width": 144,
+      "height": 44,
+      "sha256": "c6b440535a89229c9fcc27e0cc188de473dac39728c48e4dfe8a504e905171e8",
+      "pngSha256": "b6e9b329f355d1d0fa7c1bfdef3fff72d7159ed4d91bd70cee6c91105268f9c1",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/shop_launcher_button_hover_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/shop_launcher_button_hover_psd.vtex",
+      "width": 144,
+      "height": 44,
+      "sha256": "d29a10fae22affe22239328df2300e7c07fedc69e7e4e9888bb59a8e9d808f8c",
+      "pngSha256": "befdad1365d4b02c9f89c6b1ad656a845199475137858c93c51591b8a3713d20",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/bg_tooltip_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_tooltip_psd.vtex",
+      "width": 500,
+      "height": 452,
+      "sha256": "09451cdaf0523567eb092820d13eb4dfcdf8ca0bcd8584006befffcee9b3a9cc",
+      "pngSha256": "fc223245ed5ef0a21c528b887af2a4df4e470edf79ee5a35a009f28d08ca2ff1",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/bg_tooltip_no_bevel_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_tooltip_no_bevel_psd.vtex",
+      "width": 500,
+      "height": 452,
+      "sha256": "5b2fdc2c2a8ad59ffea4a47d5ceb695376500a3217bd9125d25c92c4b1845da7",
+      "pngSha256": "366ab371e61f6d6642b0e87181e9ed797a3de1b253289dd5e75348daab1a6fd6",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/bg_scoreboard_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_scoreboard_psd.vtex",
+      "width": 826,
+      "height": 906,
+      "sha256": "b596748ed8d7ca52b9c4f1d4b204fd16fab7d4d6dabccbd205b44b4ebd378b08",
+      "pngSha256": "718bb487e7e31e597d9410897c9be709c2b461ebde4748fa3ff67830e7f14e64",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/bg_item_breakdown_recessed_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_item_breakdown_recessed_psd.vtex",
+      "width": 300,
+      "height": 140,
+      "sha256": "71fc12689ae4102e4412daab9283f011d8615f60c5029c2e34c690d0baa35475",
+      "pngSha256": "74197d01ba2c194cbdb51bf9da1d39eedca9dbeffc01769418f5279172a1909a",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/inventory_panel_png.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/inventory_panel_png.vtex",
+      "width": 206,
+      "height": 112,
+      "sha256": "659cb47ef1450411e9df217944bbf87d2df9fb6598c71a60089993a8130ceab2",
+      "pngSha256": "3234cfc5ebcc5e5936fe67d6eda2f6f10877ea37c75300decdaf5bf8b1184814",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/inventory_item_well_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/inventory_item_well_psd.vtex",
+      "width": 76,
+      "height": 57,
+      "sha256": "174433c8b9b6e55188e3f0a6ee9467a6ae616997b5508bf9a9055826fbc46f82",
+      "pngSha256": "1ec7150fc783d67d8028bd35040ce6920254b6c90dc69f7bb308e57c5f6b0185",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/quickbuy_bg_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/quickbuy_bg_psd.vtex",
+      "width": 600,
+      "height": 194,
+      "sha256": "bd6083e2de117ec312ef0296ed07543091f132eb5aecb507195213c6f126c35e",
+      "pngSha256": "334bb3f31986c4ff9ed54d067a791054e590363f6c8ccd537282ed9f48e7a948",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/control_icons/x_close_png.vtex_c",
+      "uri": "s2r://panorama/images/control_icons/x_close_png.vtex",
+      "width": 37,
+      "height": 37,
+      "sha256": "73d2af0e50da785ca59f34439ebd811c480fd3d2246e3bd60616fecc0b27e184",
+      "pngSha256": "ded11e5fe1e76413ab372dfbea6a6f8b242d95bc76207bc1b4d93c26823f8dbe",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/control_icons/arrow_solid_left_png.vtex_c",
+      "uri": "s2r://panorama/images/control_icons/arrow_solid_left_png.vtex",
+      "width": 30,
+      "height": 50,
+      "sha256": "2cf21ddecf39db51ca0ce814e4a0538773166f8220c6bd5b10434944fa5d882d",
+      "pngSha256": "71fa377cf97fae8b9228eef2bef14ab3053d1bc65a318f19847b20111daa6cee",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/control_icons/chevron-sharp-left_png.vtex_c",
+      "uri": "s2r://panorama/images/control_icons/chevron-sharp-left_png.vtex",
+      "width": 80,
+      "height": 80,
+      "sha256": "711c7597d573c4243b64ac13c4ed4e6e5018fac79a6966ae11c6ccdddd9bd226",
+      "pngSha256": "1446a1c0d8183f6cb2f63ad4a4141d8cb9b415c746267101d6e49c0a2344feb6",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/control_icons/checkbox_check_psd.vtex_c",
+      "uri": "s2r://panorama/images/control_icons/checkbox_check_psd.vtex",
+      "width": 40,
+      "height": 40,
+      "sha256": "5f8a9e502f5fe044061767ba19658d483de977cdc443fd7d707e34a9f5edb1d8",
+      "pngSha256": "e70b0b91ae3b88a8e69ce388357adefb489a0acedd38ef2e0cf15ff2d769e29d",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/button_square_brushed-1_png.vtex_c",
+      "uri": "s2r://panorama/images/hud/button_square_brushed-1_png.vtex",
+      "width": 264,
+      "height": 33,
+      "sha256": "6e54cb221f62545948e90a9f30e06ca0ae9b3c5842e37d5eb1825c5a206a9fe1",
+      "pngSha256": "5b81cdff976e6a7ed9207e1cb0494b3b06f99d6260af270c6c95e6f27a4109d3",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/bg_hud_inspect_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_hud_inspect_psd.vtex",
+      "width": 1040,
+      "height": 660,
+      "sha256": "7e8e090f792c0e0c394093b767c95b88ebb8dac65563f969973e373967111c83",
+      "pngSha256": "27c9202294d4affa17bc596d5ec78004fad226576cbfe4d1648079ce68a13263",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/bg_shop_guide2_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_shop_guide2_psd.vtex",
+      "width": 210,
+      "height": 828,
+      "sha256": "9eafb61d9e058500b0caed4fb5ead9c3af084adffc179fab8eb62c79a68bd802",
+      "pngSha256": "a5b371fdb9de4efdd068fe7f53dae5b54495dd94ab1c1976d0abb30582995684",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/item_purchase_bg_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/item_purchase_bg_psd.vtex",
+      "width": 344,
+      "height": 84,
+      "sha256": "08e1dbbee941eb5cc760ca49bf643241d94d6143046e3d45352466da519049df",
+      "pngSha256": "0a8f58ae09369cfbc67fa06db16315f94a9cade249710e26ed50b3350f82384f",
+      "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits"
+    }
+  ],
+  "missing": []
+}

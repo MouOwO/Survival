@@ -1,0 +1,481 @@
+{
+  "status": "PASS_NATIVE_COMPILE_AND_OFFLINE_UI",
+  "gameVerified": false,
+  "selectedConcept": "01_reborn",
+  "rounds": [
+    {
+      "round": 1,
+      "sourceHashes": [
+        {
+          "path": "scripts/custom_game/lottery_gw2.js",
+          "sha256": "d5be9d8995137908f722f247909420252b5d17ecd73311157bb180fedb35d4b2",
+          "embeddedSha256": "d5be9d8995137908f722f247909420252b5d17ecd73311157bb180fedb35d4b2",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_1/panorama/src/scripts/custom_game/lottery_gw2.js"
+        },
+        {
+          "path": "styles/custom_game/lottery_gw2.css",
+          "sha256": "1acc5ac74fb5cea69d8ec9966afbb6545ee5ceabde2f31cc2fbd9fa0a21450a7",
+          "embeddedSha256": "1acc5ac74fb5cea69d8ec9966afbb6545ee5ceabde2f31cc2fbd9fa0a21450a7",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_1/panorama/src/styles/custom_game/lottery_gw2.css"
+        }
+      ],
+      "screenshot": "docs/design/lottery_reborn_refine_20261019/round_1.png",
+      "screenshotSha256": "3caa7da1047d8fbc985caf8a3507178b639940e193c5a22a62f67034ecddbfbe",
+      "pass_": true
+    },
+    {
+      "round": 2,
+      "sourceHashes": [
+        {
+          "path": "scripts/custom_game/lottery_gw2.js",
+          "sha256": "dedc02f2c3b91f79ea17343647806386e809cedaaa5605e075a5bc06b169c64b",
+          "embeddedSha256": "dedc02f2c3b91f79ea17343647806386e809cedaaa5605e075a5bc06b169c64b",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_2/panorama/src/scripts/custom_game/lottery_gw2.js"
+        },
+        {
+          "path": "styles/custom_game/lottery_gw2.css",
+          "sha256": "fbd23cf9b290af1625c45f982df7294e2120b69993662dbb76141549ef2d0f0b",
+          "embeddedSha256": "fbd23cf9b290af1625c45f982df7294e2120b69993662dbb76141549ef2d0f0b",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_2/panorama/src/styles/custom_game/lottery_gw2.css"
+        }
+      ],
+      "screenshot": "docs/design/lottery_reborn_refine_20261019/round_2.png",
+      "screenshotSha256": "39a52682a5d79a990f3c412511ebe2d14741bc258f6988308fa7263fc7d161df",
+      "pass_": true
+    },
+    {
+      "round": 3,
+      "sourceHashes": [
+        {
+          "path": "scripts/custom_game/lottery_gw2.js",
+          "sha256": "b2fb213ba177c00642b90a7aa8c22ab2944fb7dfcace7029ff9d3a6d6d17f696",
+          "embeddedSha256": "b2fb213ba177c00642b90a7aa8c22ab2944fb7dfcace7029ff9d3a6d6d17f696",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_3/panorama/src/scripts/custom_game/lottery_gw2.js"
+        },
+        {
+          "path": "styles/custom_game/lottery_gw2.css",
+          "sha256": "932dc76d98ed6e4964e602cf40954b2456f8ced5b20c65d54c74cead33e090f0",
+          "embeddedSha256": "932dc76d98ed6e4964e602cf40954b2456f8ced5b20c65d54c74cead33e090f0",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_3/panorama/src/styles/custom_game/lottery_gw2.css"
+        }
+      ],
+      "screenshot": "docs/design/lottery_reborn_refine_20261019/round_3.png",
+      "screenshotSha256": "5a2ef5a5910d1f62c1085611496ad8750216734b370c654f9e292d08185be8dc",
+      "pass_": true
+    },
+    {
+      "round": 4,
+      "sourceHashes": [
+        {
+          "path": "scripts/custom_game/lottery_gw2.js",
+          "sha256": "a48d3ec2e10b3f37a74d61ebef5933bb94bd90705cfcdd7d336cf48add55a7eb",
+          "embeddedSha256": "a48d3ec2e10b3f37a74d61ebef5933bb94bd90705cfcdd7d336cf48add55a7eb",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_4/panorama/src/scripts/custom_game/lottery_gw2.js"
+        },
+        {
+          "path": "styles/custom_game/lottery_gw2.css",
+          "sha256": "1692cebc5fb79dbc61b5272fe7e8dfc2b8a53204e5c6d963cad993163c1474b5",
+          "embeddedSha256": "1692cebc5fb79dbc61b5272fe7e8dfc2b8a53204e5c6d963cad993163c1474b5",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_4/panorama/src/styles/custom_game/lottery_gw2.css"
+        }
+      ],
+      "screenshot": "docs/design/lottery_reborn_refine_20261019/round_4.png",
+      "screenshotSha256": "3028f266c54852787b78c7190d38a412443f95464fa11ba4396ded1693ee09ff",
+      "pass_": true
+    },
+    {
+      "round": 5,
+      "sourceHashes": [
+        {
+          "path": "scripts/custom_game/lottery_gw2.js",
+          "sha256": "97b37ebd9b3819e8bc5184f4c66163cbb762f4f5fb638fda251549c2aa71d071",
+          "embeddedSha256": "97b37ebd9b3819e8bc5184f4c66163cbb762f4f5fb638fda251549c2aa71d071",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_5/panorama/src/scripts/custom_game/lottery_gw2.js"
+        },
+        {
+          "path": "styles/custom_game/lottery_gw2.css",
+          "sha256": "5cde876a8edcd07a52db67618789e37c9f86c98baed37e2d21ba2cdeb6494ffb",
+          "embeddedSha256": "5cde876a8edcd07a52db67618789e37c9f86c98baed37e2d21ba2cdeb6494ffb",
+          "snapshot": "output/lottery_reborn_refine_20261019/round_5/panorama/src/styles/custom_game/lottery_gw2.css"
+        }
+      ],
+      "screenshot": "docs/design/lottery_reborn_refine_20261019/round_5.png",
+      "screenshotSha256": "c690034a89774e2d90886bd8b234c76494fac288601ffacd120dd3e3335e9c36",
+      "pass_": true
+    }
+  ],
+  "uiStates": [
+    {
+      "name": "map_balance_0",
+      "pass_": true
+    },
+    {
+      "name": "map_balance_1",
+      "pass_": true
+    },
+    {
+      "name": "map_balance_9",
+      "pass_": true
+    },
+    {
+      "name": "map_balance_10",
+      "pass_": true
+    },
+    {
+      "name": "map_balance_999999999",
+      "pass_": true
+    },
+    {
+      "name": "cultivation_balance_0",
+      "pass_": true
+    },
+    {
+      "name": "cultivation_balance_1",
+      "pass_": true
+    },
+    {
+      "name": "cultivation_balance_9",
+      "pass_": true
+    },
+    {
+      "name": "cultivation_balance_10",
+      "pass_": true
+    },
+    {
+      "name": "cultivation_balance_999999999",
+      "pass_": true
+    },
+    {
+      "name": "dragon_knight_balance_0",
+      "pass_": true
+    },
+    {
+      "name": "dragon_knight_balance_1",
+      "pass_": true
+    },
+    {
+      "name": "dragon_knight_balance_9",
+      "pass_": true
+    },
+    {
+      "name": "dragon_knight_balance_10",
+      "pass_": true
+    },
+    {
+      "name": "dragon_knight_balance_999999999",
+      "pass_": true
+    },
+    {
+      "name": "summer_balance_0",
+      "pass_": true
+    },
+    {
+      "name": "summer_balance_1",
+      "pass_": true
+    },
+    {
+      "name": "summer_balance_9",
+      "pass_": true
+    },
+    {
+      "name": "summer_balance_10",
+      "pass_": true
+    },
+    {
+      "name": "summer_balance_999999999",
+      "pass_": true
+    },
+    {
+      "name": "actual_four_pool_button_callbacks",
+      "pass_": true
+    },
+    {
+      "name": "locked_pool",
+      "pass_": true
+    },
+    {
+      "name": "pending_draw",
+      "pass_": true
+    },
+    {
+      "name": "failure_recovery",
+      "pass_": true
+    },
+    {
+      "name": "details",
+      "pass_": true
+    },
+    {
+      "name": "details_back",
+      "pass_": true
+    },
+    {
+      "name": "reward_tooltip",
+      "pass_": true
+    },
+    {
+      "name": "final_1280x720",
+      "pass_": true
+    }
+  ],
+  "candidateCapture": {
+    "pass": true,
+    "sourceEvidence": [
+      {
+        "path": "panorama/src/scripts/custom_game/lottery_gw2.js",
+        "sha256": "65a00cd86f74fcb90b630aa007eeee481f6c5a0b4c67827984a9f331e651923c"
+      },
+      {
+        "path": "panorama/src/styles/custom_game/lottery_gw2.css",
+        "sha256": "567984d9ebdc57c85fb7d7fb1d25470851b92998352f96125a8f2c5c43a7ee5f"
+      }
+    ],
+    "records": [
+      {
+        "width": 1920,
+        "height": 1080,
+        "screenshot": "docs/design/lottery_reborn_refine_20261019/final.png",
+        "sha256": "c2f70d3f5fa4c26dd14096aafbad83ad78bb8bf462b781579468dc6437ca1439",
+        "ready": {},
+        "errors": [],
+        "theme": true,
+        "inspect": {
+          "alive": true,
+          "view": true,
+          "open": true,
+          "mode": "",
+          "pools": 4,
+          "poolIds": [
+            "map",
+            "cultivation",
+            "dragon_knight",
+            "summer"
+          ],
+          "selected": "dragon_knight",
+          "hasSnapshot": true,
+          "canvas": [
+            1672,
+            941
+          ],
+          "content": [
+            334,
+            123,
+            1309,
+            681
+          ],
+          "movedCount": 14,
+          "trackedOwned": 119,
+          "trackedMoved": 14,
+          "prizeGroups": [],
+          "scale": 1
+        },
+        "frame": {
+          "x": 159,
+          "y": 114.5,
+          "w": 1608,
+          "h": 824
+        },
+        "single": {
+          "x": 1231,
+          "y": 830.5,
+          "w": 238,
+          "h": 80
+        },
+        "ten": {
+          "x": 1485,
+          "y": 830.5,
+          "w": 238,
+          "h": 80
+        },
+        "rewardCount": 8
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "screenshot": "docs/design/lottery_reborn_refine_20261019/final_candidate_720.png",
+        "sha256": "6a979970f2fff580be3b0947755080ab1df4b146c547b814e2c9f6efbbbe6c0d",
+        "ready": {},
+        "errors": [],
+        "theme": true,
+        "inspect": {
+          "alive": true,
+          "view": true,
+          "open": true,
+          "mode": "",
+          "pools": 4,
+          "poolIds": [
+            "map",
+            "cultivation",
+            "dragon_knight",
+            "summer"
+          ],
+          "selected": "dragon_knight",
+          "hasSnapshot": true,
+          "canvas": [
+            1672,
+            941
+          ],
+          "content": [
+            334,
+            123,
+            1309,
+            681
+          ],
+          "movedCount": 14,
+          "trackedOwned": 119,
+          "trackedMoved": 14,
+          "prizeGroups": [],
+          "scale": 1
+        },
+        "frame": {
+          "x": 105.99999237060547,
+          "y": 76.33332824707031,
+          "w": 1071.9998779296875,
+          "h": 549.3333129882812
+        },
+        "single": {
+          "x": 820.6666259765625,
+          "y": 553.6666259765625,
+          "w": 158.6666259765625,
+          "h": 53.33331298828125
+        },
+        "ten": {
+          "x": 989.9999389648438,
+          "y": 553.6666259765625,
+          "w": 158.66668701171875,
+          "h": 53.33331298828125
+        },
+        "rewardCount": 8
+      }
+    ],
+    "gameVerified": false
+  },
+  "nativeCompilation": [
+    {
+      "source": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "sourceHash": "65A00CD86F74FCB90B630AA007EEEE481F6C5A0B4C67827984A9F331E651923C",
+      "runtime": "panorama/scripts/custom_game/lottery_gw2.vjs_c",
+      "runtimeHash": "83932EC538523214575BEEB1A352D15B4BFD2B3D01C7F20C1DE7C214E7F72522",
+      "contentRestored": true,
+      "runtimeRestored": true
+    },
+    {
+      "source": "panorama/src/styles/custom_game/lottery_gw2.css",
+      "sourceHash": "567984D9EBDC57C85FB7D7FB1D25470851B92998352F96125A8F2C5C43A7EE5F",
+      "runtime": "panorama/styles/custom_game/lottery_gw2.vcss_c",
+      "runtimeHash": "5A7116F690DFB3C104B32B81BD3C97B2BA113FC00DEFBB5BEAE16A6A4A839F12",
+      "contentRestored": true,
+      "runtimeRestored": true
+    }
+  ],
+  "testReport": {
+    "pass_": true,
+    "exitCode": 0,
+    "tests": [
+      "lottery_gw2",
+      "lottery_user_ticket_icons",
+      "lottery_probability_notice",
+      "lottery_ticket_rules",
+      "lottery_cinematic_flow",
+      "lottery_cinematic",
+      "lottery_scene_transition"
+    ],
+    "command": [
+      "node",
+      "--require",
+      "./output\\lottery_reborn_refine_20261019\\candidate_overlay.cjs",
+      "--test",
+      "output\\lottery_reborn_refine_20261019\\candidate\\tools\\tests\\lottery_gw2.test.cjs",
+      "output\\lottery_reborn_refine_20261019\\candidate\\tools\\tests\\lottery_user_ticket_icons.test.cjs",
+      "output\\lottery_reborn_refine_20261019\\candidate\\tools\\tests\\lottery_probability_notice.test.cjs",
+      "output\\lottery_reborn_refine_20261019\\candidate\\tools\\tests\\lottery_ticket_rules.test.cjs",
+      "output\\lottery_reborn_refine_20261019\\candidate\\tools\\tests\\lottery_cinematic_flow.test.cjs",
+      "output\\lottery_reborn_refine_20261019\\candidate\\tools\\tests\\lottery_cinematic.test.cjs",
+      "output\\lottery_reborn_refine_20261019\\candidate\\tools\\tests\\lottery_scene_transition.test.cjs"
+    ],
+    "log": "output\\lottery_reborn_refine_20261019\\tests_final.log"
+  },
+  "testLogSha256": "1cae02421dfb1b67a5af0422d22f766ab1a4abd6100999414d4a217e6a590358",
+  "aestheticReview": {
+    "kind": "independent_native_material_visual_review",
+    "at": "2026-10-19T03:18:49.637Z",
+    "scope": "Current five cumulative Reborn production-component browser screenshots and 1280x720 final screenshot",
+    "gameVerified": false,
+    "pass": true,
+    "mustFix": [],
+    "images": [
+      {
+        "round": 1,
+        "path": "docs/design/lottery_reborn_refine_20261019/round_1.png",
+        "sha256": "3caa7da1047d8fbc985caf8a3507178b639940e193c5a22a62f67034ecddbfbe",
+        "matchesCapture": true,
+        "sourceMatches": true,
+        "review": "pass"
+      },
+      {
+        "round": 2,
+        "path": "docs/design/lottery_reborn_refine_20261019/round_2.png",
+        "sha256": "39a52682a5d79a990f3c412511ebe2d14741bc258f6988308fa7263fc7d161df",
+        "matchesCapture": true,
+        "sourceMatches": true,
+        "review": "pass"
+      },
+      {
+        "round": 3,
+        "path": "docs/design/lottery_reborn_refine_20261019/round_3.png",
+        "sha256": "5a2ef5a5910d1f62c1085611496ad8750216734b370c654f9e292d08185be8dc",
+        "matchesCapture": true,
+        "sourceMatches": true,
+        "review": "pass"
+      },
+      {
+        "round": 4,
+        "path": "docs/design/lottery_reborn_refine_20261019/round_4.png",
+        "sha256": "3028f266c54852787b78c7190d38a412443f95464fa11ba4396ded1693ee09ff",
+        "matchesCapture": true,
+        "sourceMatches": true,
+        "review": "pass"
+      },
+      {
+        "round": 5,
+        "path": "docs/design/lottery_reborn_refine_20261019/round_5.png",
+        "sha256": "c690034a89774e2d90886bd8b234c76494fac288601ffacd120dd3e3335e9c36",
+        "matchesCapture": true,
+        "sourceMatches": true,
+        "review": "pass"
+      }
+    ],
+    "compact": {
+      "path": "docs/design/lottery_reborn_refine_20261019/final_720.png",
+      "sha256": "542020285c29ad756bbbfe52a78d935508bfecae92b6134b0c5ab6fbdb5188c7",
+      "review": "pass"
+    },
+    "observations": [
+      "All five rounds preserve the iron-gray Reborn window and fixed GW2 structure.",
+      "The selected sidebar control has a clear silver stripe and all four labels stay centered.",
+      "Round 4 improves treasure hierarchy using the shared official chest and a darker content background; round 5 adds comfortable window margins.",
+      "Reward names and rarity labels are readable within their individual slots, including the 1280x720 view; no visible clipping or overlap.",
+      "Ticket icon, balance 20, purchase plus, and close control remain grouped at the upper right with visible gaps.",
+      "Draw button labels, native ticket images and costs are centered and complete. Primary emphasis remains deliberately restrained within the cold-gray family."
+    ],
+    "captureSummary": {
+      "rounds": 5,
+      "states": 28,
+      "allPassed": true
+    },
+    "limitations": [
+      "This review covers actual production component snapshots translated to a browser. Source 2 native rendering in a live game is not established by these images."
+    ]
+  },
+  "concurrentWork": {
+    "theme": "Forest Emerald",
+    "preserved": true,
+    "workingTreeSourceIsDifferent": true,
+    "activeRuntimeReplaced": false
+  },
+  "limitations": [
+    "Offline browser captures use actual production components and CSV rewards, with explicit sample balances/unlocks.",
+    "Dota 2 native rendering, font rasterization and in-game clicking have not been visually verified for this skin.",
+    "Unrelated fullscreen results and concurrent Forest Emerald skin changes remain uncommitted in the shared working tree."
+  ]
+}

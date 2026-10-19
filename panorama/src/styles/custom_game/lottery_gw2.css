@@ -33,6 +33,9 @@
 .LotteryGW2Surface { background-image:none; border:0px; box-shadow:none; }
 .LotteryGW2SceneSubject { background-size:cover; background-position:center; background-repeat:no-repeat; }
 .LotteryGW2Label { font-family:"Source Han Sans SC"; font-weight:normal; text-shadow:none; white-space:normal; text-overflow:ellipsis; }
+#LotteryMainCanvas.LotteryGW2Reborn #LHDetails Label { font-size:18px; }
+#LotteryMainCanvas.LotteryGW2Reborn #LHHistory Label,
+#LotteryMainCanvas.LotteryGW2Reborn #LotteryAnnouncement Label { font-size:19px; }
 /* Valve's Dark Carnival GoldBorder, with straight corners over the backing. */
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2OfficialFrame { border:2px solid white; border-brush:gradient(linear,0% 0%,0% 100%,from(#EFD4AC),color-stop(.5,#DCB25E),to(#977628)); }
 /* Native Crownfall material: restrained dark panels against the pool artwork. */
@@ -206,3 +209,38 @@
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2PrizeSlot:hover .LotteryGW2ItemWell { border-color:#d8c48c; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2NativeButton:hover { brightness:1.16; }
 #LotteryMainCanvas.LotteryGW2 .LotteryGW2NativeButton:active { brightness:.85; }
+
+/* Reborn's main window uses rectangular iron panels and silver navigation. */
+#LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2OfficialFrame {
+    border:1px solid white;
+    border-brush:gradient(linear,0% 0%,0% 100%,from(#9caaae),color-stop(.5,#52646d),to(#28363e));
+}
+#LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2PoolSkin { brightness:1; }
+#LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2Pool.Selected .LotteryGW2PoolSkin { brightness:1; }
+#LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2Pool:hover .LotteryGW2PoolSkin { brightness:1.16; }
+#LotteryMainCanvas.LotteryGW2.LotteryGW2Reborn .LotteryGW2Pool:active .LotteryGW2PoolSkin { brightness:.9; }
+#LotteryMainCanvas.LotteryGW2Reborn #LotteryGW2Back Label { color:#c7d5da; font-size:22px; }
+#LotteryMainCanvas.LotteryGW2Reborn #LotteryCloseButton:hover { brightness:1.3; border-color:#bccdd3; }
+#LotteryMainCanvas.LotteryGW2Reborn #LotteryCloseButton:active { brightness:.85; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2Recharge { background-color:#14222d; border-color:#96a7ac88; }
+#LotteryMainCanvas.LotteryGW2Reborn #LotterySkipAnimation .LotteryGW2SkipLabel { font-size:19px; color:#aabcc4; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2RebornDraw .LotteryGW2DrawFocus { opacity:0; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2RebornDraw:focus .LotteryGW2DrawFocus { opacity:1; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2RebornDraw:hover { brightness:1.14; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2RebornDraw:active { brightness:.86; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2RebornDraw:disabled { brightness:.62; saturation:0; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2RebornDraw:disabled .LotteryGW2DrawFocus { opacity:0; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PreviewCard .LotteryGW2PreviewWell { border-width:1px; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PreviewCard:hover .LotteryGW2PreviewWell { brightness:1.2; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PreviewRarity { font-size:12px; font-weight:bold; }
+#LotteryMainCanvas.LotteryGW2Reborn #LotteryGW2Chest,
+#LotteryMainCanvas.LotteryGW2Reborn #LotteryGW2SceneWash { transition-property:opacity; transition-duration:.12s; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PrizeGroup { background-color:#15212c55; }
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PrizeGroup .LotteryGW2PrizeBar {
+    border-top-color:#a2b1b73b; border-bottom-color:#080f1599;
+    background-color:gradient(linear,0% 0%,0% 100%,from(#30414d99),to(#17232ccc));
+}
+#LotteryMainCanvas.LotteryGW2Reborn .LotteryGW2PrizeGroup .LotteryGW2PrizeBar Label { color:#ccd8dd; }
+#LotteryMainCanvas.LotteryGW2Reborn #LHDetails Label { font-size:18px; color:#b6c7ce; }
+#LotteryMainCanvas.LotteryGW2Reborn #LHHistory Label,
+#LotteryMainCanvas.LotteryGW2Reborn #LotteryAnnouncement Label { font-size:19px; color:#b6c7ce; }
