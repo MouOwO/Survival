@@ -1,4 +1,6 @@
-真实组件离线验收：`node tools/lottery_emerald_game_20261019/verify.cjs --run`。
+R5 视觉对照验收入口：`node tools/lottery_r5_parity_20261019/verify.cjs --run`。该工具冻结批准的 `round_5.html`，按 1672×941 逻辑坐标对照真实生产组件的渲染几何、0 券禁用状态及并排截图，报告位于 `output/lottery_r5_parity_20261019/report.json`。原奖池背景和移除 T10 是允许差异。
+
+本目录保留业务流程与组件边界回归入口：`node tools/lottery_emerald_game_20261019/verify.cjs --run`。当前断言采用 R5 的四件精选、111/91 预览图框、65px 底栏、保底位于按钮上方，以及单抽 232/198、十连 154/129 图框和 920px 结果网格。
 
 脚本只写入 `output/lottery_emerald_game_20261019/qa`；Chrome profile、TEMP/TMP 均使用 D 盘项目目录。它装配实际 Panorama XML/JS/CSS，导出已安装的官方 VPK 纹理供浏览器显示，所有抽奖事件和回执仅在内存夹具中流转。不会操作游戏、账号、付款或存档，也不调用 Git 或编译器。
 
@@ -6,9 +8,9 @@
 
 覆盖两种分辨率、四个原始奖池背景、移除 T10、原电影源码基线及原流程回归、冷打开/冷切池 revision、单抽和十连服务端格式结果、确认/再次、全屏结果、tooltip、未就绪/未知余额/免费单抽/失败回执，以及旧 XML 缺少 ZXDrawContent 的单独兼容样例。
 
-`gameVerified:false` 表明全部截图属于离线组件预览，不能作为原生实机截图。旧 XML 样例移除两个 ZX 展示容器，并加入旧 footer 缩放祖先；它必须在补回容器后保持付费/免费居中、重复 Apply 不增节点，才算通过。
+两套工具的 `gameVerified:false` 表明全部截图属于离线组件预览，不能作为原生实机截图。浏览器 PASS 不能替代当前生产版本的原生字号、层级、遮罩、合成及可见效果验收。旧 XML 样例移除两个 ZX 展示容器，并加入旧 footer 缩放祖先；它必须在补回容器后保持付费/免费居中、重复 Apply 不增节点，才算通过。
 
-浏览器适配器没有模拟彩票 Label 的原生 `text-overflow:shrink` 缩字号行为；此前离线通过仍在原生暴露了菜单/底栏字体过小。主线程原生 A/B 确认改用 `clip` 可恢复字号，按钮标题还需 `fit-children` 自然宽度及居中。修复后的原生主界面证据单独记录为 `nativeMainTextEvidence`，与本脚本的浏览器结果测试区分；截图为 `design_refs/menus_v10/work/native/emerald_native_labels_fixed_20261019.png`。基础 adapter 没有修改，也未用浏览器差异迫使生产源码回退。
+浏览器适配器没有模拟彩票 Label 的原生 `text-overflow:shrink` 缩字号行为；此前离线通过仍在原生暴露了菜单/底栏字体过小。主线程原生 A/B 确认改用 `clip` 可恢复字号，按钮标题还需 `fit-children` 自然宽度及居中。`nativeMainTextEvidence` 仅保留 R5 还原前的历史文字修复记录：`design_refs/menus_v10/work/native/emerald_native_labels_fixed_20261019.png`，不表示当前生产 R5 版本已经通过原生验收。基础 adapter 没有修改，也未用浏览器差异迫使生产源码回退。
 
 本轮正式接入要求：移除右侧 T10 装饰，各奖池保留原背景及原过场电影，结果页采用 R5 设计。备用背景只存入项目；`node tools/lottery_emerald_game_20261019/assets.cjs --check` 检查 JPEG 内容准确且没有运行引用。
 

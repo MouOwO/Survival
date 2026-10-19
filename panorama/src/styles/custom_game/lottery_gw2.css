@@ -330,6 +330,27 @@
 #LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas VerticalScrollBar { background-color:#10231b; }
 #LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas VerticalScrollBar .ScrollThumb { background-color:#7d9771; }
 
+/* R5 visual contract: restrained plates, four framed prizes, and one footer. */
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton .LotteryGW2ButtonSurface { border:1px solid #6a8276; box-shadow:#00000088 0px 4px 10px 0px; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton.LotteryGW2Primary .LotteryGW2ButtonSurface { border-color:#719978; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2PoolChevron { opacity:0; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2Pool.Selected .LotteryGW2PoolChevron { opacity:1; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:hover .LotteryGW2ButtonSurface { border-color:#b8d3ab; box-shadow:#00000099 0px 4px 12px 0px; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:active .LotteryGW2ButtonSurface { border-color:#8ab58f; box-shadow:#000000aa 0px 1px 3px 0px; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:disabled .LotteryGW2ButtonSurface { border-color:#4d6359; box-shadow:#00000077 0px 2px 5px 0px; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas .LotteryGW2ForestFooterAction:hover { background-color:#c4e0bb12; border:1px solid #9dbf9844; }
+#LotteryWindow.LotteryGW2ForestTheme #LotteryCloseButton:hover .LotteryGW2UtilitySurface { border-color:#a7c9a344; background-color:#d8f2c515; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2Cell .LotteryGW2Label { font-family:"Source Han Sans SC"; font-weight:normal; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2PreviewRarity { font-size:10px; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ButtonShine { opacity:0; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:hover .LotteryGW2ButtonShine { animation-name:LotteryR5GlassPass; animation-duration:.42s; animation-timing-function:ease-out; animation-iteration-count:1; }
+#LotteryWindow.LotteryGW2ForestTheme .LotteryGW2ForestButton:disabled .LotteryGW2ButtonShine { animation-name:none; }
+@keyframes 'LotteryR5GlassPass' {
+    0% { opacity:0; transform:translateX(0px) rotateZ(27deg); }
+    15% { opacity:1; }
+    100% { opacity:0; transform:translateX(450px) rotateZ(27deg); }
+}
+
 /* Keep header glyphs at their authored size on opaque native surfaces. */
 #LotteryWindow #LotteryMainCanvas #LotteryGW2Header .LotteryGW2Label {
     font-family:"Source Han Sans SC";

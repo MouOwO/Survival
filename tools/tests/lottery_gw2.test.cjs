@@ -52,26 +52,27 @@ assert.equal(nodes.LotteryMainCanvas.style.width,'1672px');assert.equal(nodes.Lo
 assert.equal(nodes.LotteryMainCanvas.style.transformOrigin,'50% 50%');
 assert.equal(nodes.LotteryGW2Content.style.position,'334px 123px 0px');assert.equal(nodes.LotteryGW2Content.style.width,'1309px');assert.equal(nodes.LotteryGW2Content.style.height,'681px');
 assert.equal(nodes.LotteryInfoOverlay.parent,nodes.LotteryGW2DetailLayer);assert.equal(nodes.LotteryCelestialFooter.parent,nodes.LotteryGW2Root);
-for(const [id,x,y,w,h]of [['LotteryGW2HeaderSkin',35,45,1608,74],['LotteryGW2SidebarSkin',35,123,299,746],['LotteryGW2FooterSkin',334,731,1309,138]]){
+for(const [id,x,y,w,h]of [['LotteryGW2HeaderSkin',35,45,1608,74],['LotteryGW2SidebarSkin',35,123,299,746],['LotteryGW2FooterSkin',334,804,1309,65]]){
  const node=nodes[id];assert.equal(node.style.position,x+'px '+y+'px 0px',id+' shares the accepted boundary');assert.equal(node.style.width,w+'px');assert.equal(node.style.height,h+'px');
  assert.equal(node.parent,nodes.LotteryGW2Root,'each material is an independent decorative layer');assert(node.style.opacity===undefined||node.style.opacity==='1','alpha belongs to the background material only');
  for(const textId of ['LotteryGW2Title','LotteryGW2TicketBalance','LotteryTitle','LotterySingleText','LotteryTenText'])for(let ancestor=nodes[textId];ancestor;ancestor=ancestor.parent)assert.notStrictEqual(ancestor,node,'background opacity must never include dynamic text');
 }
-assert.equal(nodes.LotteryGW2SidebarSkin.style.backgroundColor,'#10231bea','the selected Emerald skin has an independent dark-green sidebar backing');assert.equal(nodes.LotteryGW2SidebarTexture.style.opacity,'0.25','only the official sidebar texture has quarter opacity');
+assert.equal(nodes.LotteryGW2SidebarSkin.style.backgroundColor,'#091217f5','the accepted R5 skin has an independent dark sidebar backing');assert.equal(nodes.LotteryGW2SidebarTexture.style.opacity,'0.25','only the official sidebar texture has quarter opacity');
 assert.equal(nodes.LotteryGW2FooterSkin.style.backgroundColor,'#111f18f5','the Emerald footer uses the accepted dark-green backing');
 assert(!nodes.LotteryGW2Points&&!nodes.LotteryGW2StarjoyPoints,'neither points balance is built in the lottery header');
 assert.strictEqual(nodes.LotteryTicketPurchase,nativeTicketPurchase,'reuse the controller-owned ticket purchase button');
 assert.strictEqual(nativeTicketPurchase.events.onactivate,ticketEvent,'restyling retains the ticket purchase callback');
 assert.strictEqual(nativeTicketPurchase.parent,nodes.LotteryGW2TicketCurrency);
 assert.equal(nodes.LotteryGW2TicketCurrency.hittestchildren,true,'the balance container admits clicks on its purchase button');
-assert.equal(nativeTicketPurchase.style.width,'44px');assert.equal(nativeTicketPurchase.style.height,'44px');assert.equal(nodes.LotteryGW2PurchaseSurface.style.width,'32px');assert.equal(nodes.LotteryGW2PurchaseSurface.style.height,'32px');
+assert.equal(nativeTicketPurchase.style.width,'44px');assert.equal(nativeTicketPurchase.style.height,'44px');assert.equal(nodes.LotteryGW2PurchaseSurface.style.width,'44px');assert.equal(nodes.LotteryGW2PurchaseSurface.style.height,'44px');assert.equal(nodes.LotteryGW2CloseIcon.style.width,'32px');assert.equal(nodes.LotteryGW2CloseIcon.style.height,'32px');
 assert.equal(nodes.LotteryGW2PurchasePlus.type,'Image');
 assert.equal(nodes.LotteryGW2PurchasePlus.image,'file://{images}/control_icons/24px/plus.svg');
 assert(!nodes.LotteryGW2PurchaseLabel,'the acquisition text is replaced by an icon');
 assert.equal(nodes.LotteryCelestialFooter.style.position,'334px 123px 0px');assert.equal(nodes.LotteryCelestialFooter.style.width,'1309px');assert.equal(nodes.LotteryCelestialFooter.style.height,'746px');
 assert.strictEqual(nodes.LHDetails.parent,nodes.LotteryCelestialFooter,'the selected Emerald layout places the original details action in its footer');
-assert.equal(nodes.LotteryHeroCopy.style.position,'44px 30px 0px','the pool copy uses the upper-left content region');
-assert.equal(nodes.LotterySingleButton.style.position,'781px 560px 0px');assert.equal(nodes.LotteryTenButton.style.position,'1021px 560px 0px');assert.equal(nodes.LotterySingleButton.style.width,'220px');assert.equal(nodes.LotteryTenButton.style.width,'244px');assert.equal(nodes.LotterySingleButton.style.height,'84px');assert.equal(nodes.LotteryTenButton.style.height,'84px');assert.equal(nodes.LotteryGW2Preview.style.position,'44px 390px 0px','all eight true previews clear the accepted lower button row');assert.equal(nodes.LotteryDrawPity.style.position,'1021px 650px 0px','the true pity caption clears all eight reward names and the draw buttons');assert.equal(nodes.LotteryDrawPity.style.height,'20px');
+assert.equal(nodes.LotteryHeroCopy.style.position,'54px 51px 0px','the pool copy uses the accepted R5 upper-left content region');assert.equal(nodes.LotteryTitle.style.fontSize,'51px');assert.equal(nodes.LotteryTitle.style.position,'0px 31px 0px');
+assert.equal(nodes.LotterySingleButton.style.position,'781px 560px 0px');assert.equal(nodes.LotteryTenButton.style.position,'1021px 560px 0px');assert.equal(nodes.LotterySingleButton.style.width,'220px');assert.equal(nodes.LotteryTenButton.style.width,'244px');assert.equal(nodes.LotterySingleButton.style.height,'84px');assert.equal(nodes.LotteryTenButton.style.height,'84px');assert.equal(nodes.LotteryGW2Preview.style.position,'58px 467px 0px','the four-item showcase uses the accepted lower-left preview region');assert.equal(nodes.LotteryDrawPity.style.position,'1021px 529px 0px','the true pity caption is above the draw buttons');assert.equal(nodes.LotteryDrawPity.style.height,'20px');
+for(const [id,x,w]of [['LHDetails',42,142],['LHHistory',201,142],['LotteryAnnouncement',360,104],['LotterySkipAnimation',476,112]]){assert.equal(nodes[id].style.position,x+'px 692px 0px','the original action remains in the accepted 65px footer');assert.equal(nodes[id].style.width,w+'px');assert.equal(nodes[id].style.height,'44px');}
 assert.equal(nodes.LotterySceneBackground.parent,nodes.LotteryGW2Root);assert.equal(nodes.LotterySceneBackground.style.position,'35px 123px 0px');assert.equal(nodes.LotterySceneBackground.style.width,'1608px');assert.equal(nodes.LotterySceneBackground.style.height,'746px');
 assert.equal(nodes.LotteryGW2Tooltip.parent,nodes.LotteryGW2DetailLayer,'tooltip shares the layer raised by details instead of sitting behind its ancestry');
 assert.equal(root.FindChildTraverse('LotteryHeroCopy'),null,'native-style traversal cannot find moved controls');
@@ -88,11 +89,12 @@ function data(pool='map',tickets=20){const d=snapshot(pool,tickets);d.shop_point
 function ticketAlignment(){
  const host=nodes.LotteryGW2TicketCurrency,icon=nodes.LotteryGW2TicketIcon,count=nodes.LotteryGW2TicketBalance,plus=nativeTicketPurchase,close=nodes.LotteryCloseButton;
  const x=node=>parseFloat(node.style.position),y=node=>parseFloat(node.style.position.split(' ')[1]),w=node=>parseFloat(node.style.width),h=node=>parseFloat(node.style.height);
- assert.equal(host.style.position,'1139px 8px 0px');assert.equal(host.style.width,'384px');assert.equal(host.style.height,'58px');assert.equal(host.style.flowChildren,'none','the currency uses explicit coordinates');
- assert.equal(x(close)-(x(host)+w(host)),24,'the currency group sits directly left of the close button');
- for(const node of [icon,count,plus]){assert.strictEqual(node.parent,host);assert(x(node)>=0&&x(node)+w(node)<=w(host),'each currency control stays inside its bounded header group');assert.equal(y(node)+h(node)/2,h(host)/2,'the icon, count and plus share the header center');}
- assert.equal(x(count)-(x(icon)+w(icon)),8);assert.equal(x(plus)-(x(count)+w(count)),8,'large balances cannot overlap the plus');assert.equal(x(plus)+w(plus),w(host),'the plus stays next to the close button for every count');
- assert.equal(icon.style.width,'72px');assert.equal(icon.style.height,'58px');assert.equal(count.style.whiteSpace,'nowrap');assert.equal(count.style.textOverflow,'shrink');
+ assert.equal(host.style.position,'1135px 8px 0px');assert.equal(host.style.width,'384px');assert.equal(host.style.height,'58px');assert.equal(host.style.flowChildren,'none','the currency uses explicit coordinates');
+ assert.equal(x(close)-(x(host)+w(host)),28,'the currency group sits directly left of the close button');
+ for(const node of [icon,count,plus]){assert.strictEqual(node.parent,host);assert(x(node)>=0&&x(node)+w(node)<=w(host),'each currency control stays inside its bounded header group');}
+ assert.equal(y(plus)+h(plus)/2,h(host)/2,'the purchase affordance is centered in its header group');assert.equal(y(icon),6);assert.equal(y(count),12);
+ assert.equal(x(count)-(x(icon)+w(icon)),12);assert.equal(x(plus)-(x(count)+w(count)),62,'large balances cannot overlap the ticket kind or plus');assert.equal(x(plus)+w(plus),w(host),'the plus stays next to the close button for every count');
+ assert.equal(icon.style.width,'62px');assert.equal(icon.style.height,'47px');assert.equal(count.style.width,Math.min(180,Math.max(28,String(count.text).length*16))+'px');assert.equal(count.style.height,'38px');assert.equal(count.style.whiteSpace,'nowrap');assert.equal(count.style.textOverflow,'clip');
  assert.strictEqual(plus.events.onactivate,ticketEvent,'layout preserves the controller purchase callback');
 }
 function drawAlignment(id){
@@ -110,15 +112,18 @@ function poolNavigation(active){
  assert.equal(nodes.LotteryGW2Fullscreen.style.backgroundImage,'url("file://{images}/custom_game/lottery_cinematic_v1/'+active+'.png")','fullscreen results reuse the active real pool scene');
  assert.strictEqual(nodes.LotteryGW2OfficialFrame.parent,nodes.LotteryGW2DetailLayer,'the outer border shares the raised details ancestry');assert.equal(nodes.LotteryGW2OfficialFrame.hittest,false,'the border never intercepts navigation');
  const buttons=nodes.LotteryGW2Sidebar.children,selectedButtons=buttons.filter(button=>button.BHasClass('Selected'));assert.equal(selectedButtons.length,1);assert.equal(selectedButtons[0].id,'LotteryGW2Pool_'+active);
- for(const button of buttons){
+ const poolIcons=[];
+ for(const [index,button]of buttons.entries()){
   const title=button.children.find(child=>child.BHasClass('LotteryGW2PoolTitle')),state=button.children.find(child=>child.BHasClass('LotteryGW2PoolLock')),marks=button.children.filter(child=>child.BHasClass('LotteryGW2PoolSelectionMark'));
   const width=parseFloat(button.style.width),height=parseFloat(button.style.height),at=title.style.position.split(' ');
-  assert.equal(parseFloat(at[0]),52,'each true pool title follows the decorative official chest icon');assert.equal(parseFloat(at[0])+parseFloat(title.style.width),width-16,'the title keeps a sixteen-pixel trailing inset');assert.equal(parseFloat(at[1])+parseFloat(title.style.height)/2,height/2-(state.style.visibility==='visible'?12:0),'a real lock condition receives its own second line');assert.equal(title.style.textAlign,'left');assert.equal(title.style.whiteSpace,'nowrap');assert.equal(title.style.textOverflow,'clip','native navigation never shrinks its glyphs against the fixed line box');assert.equal(title.style.fontSize,'24px');assert.equal(title.style.lineHeight,'44px');
+  assert.equal(width,270);assert.equal(height,116);assert.equal(button.style.position,'14px '+(77+index*133)+'px 0px','the four authoritative pools keep their R5 navigation slots');
+  assert.equal(parseFloat(at[0]),98,'each true pool title follows its own 66px pool artwork');assert.equal(parseFloat(at[0])+parseFloat(title.style.width),width-12,'the title keeps its accepted trailing inset');assert.equal(at[1],'33px');assert.equal(title.style.height,'30px');assert.equal(title.style.textAlign,'left');assert.equal(title.style.whiteSpace,'nowrap');assert.equal(title.style.textOverflow,'clip','native navigation never shrinks its glyphs against the fixed line box');assert.equal(title.style.fontSize,'22px');assert.equal(title.style.lineHeight,'30px');
+  const icon=button.children.find(child=>child.BHasClass('LotteryGW2PoolIcon'));assert(icon);assert.equal(icon.style.position,'18px 25px 0px');assert.equal(icon.style.width,'66px');assert.equal(icon.style.height,'66px');poolIcons.push(icon.style.backgroundImage);
   assert.equal(marks.length,1,'the selected rectangular tab has one left indicator');for(const mark of marks){assert.equal(mark.style.backgroundColor,'#b1c891');assert.equal(mark.style.visibility,button.BHasClass('Selected')?'visible':'collapse','the Emerald bar follows the selected pool');}
   const skin=button.children.find(child=>child.BHasClass('LotteryGW2PoolSkin'));assert.equal(skin.style.backgroundImage,button.BHasClass('Selected')?'url("s2r://panorama/images/textures/glassbutton_teal_psd.vtex")':'none','the active pool uses the official selected teal surface');
-  assert(!button.children.some(child=>/普通抽奖券|金色抽奖券/.test(String(child.text||''))),'pool buttons omit ticket subtitles');
-  if(state.style.visibility==='collapse')assert.equal(state.text,'','unlocked pools have no subtitle');
+  assert.equal(state.style.position,'98px 68px 0px');assert.equal(state.style.visibility,'visible','the second line retains the ticket type or real unlock requirement');assert(state.text,'pool subtitles are never empty');
  }
+ assert.equal(new Set(poolIcons).size,4,'each pool has a distinct official artwork');
 }
 const coldOpenData=data();coldOpenData.selected_pool.revision='gw2-cold-map-r1';events.ui_lottery_snapshot(coldOpenData);assertVisitedRevision(coldOpenStart,'map','gw2-cold-map-r1','cold Open reply');
 events.ui_lottery_snapshot(coldOpenData);assertVisitedRevision(coldOpenStart,'map','gw2-cold-map-r1','repeated Open reply');
@@ -134,11 +139,11 @@ assert.equal(nativeSingle.enabled,false);assert.equal(nativeTen.enabled,false);a
 const lockedRequests=requests.filter(request=>request.n==='ui_lottery_draw_request').length;nativeSingle.events.onactivate();nativeTen.events.onactivate();assert.equal(requests.filter(request=>request.n==='ui_lottery_draw_request').length,lockedRequests,'locked visuals retain the authoritative draw guard');
 events.ui_lottery_snapshot(data());poolNavigation('map');
 const costSample=data('map',100);costSample.selected_pool.single_cost=7;costSample.selected_pool.ten_cost=70;events.ui_lottery_snapshot(costSample);
-assert.equal(nodes.LotterySingleCost.text,'7');assert.equal(nodes.LotteryTenCost.text,'70','both labels use the live server prices');drawAlignment('LotterySingleButton');drawAlignment('LotteryTenButton');
+assert.equal(nodes.LotterySingleCost.text,'× 7');assert.equal(nodes.LotteryTenCost.text,'× 70','both labels use the live server prices with the R5 multiplication prefix');drawAlignment('LotterySingleButton');drawAlignment('LotteryTenButton');
 costSample.selected_pool.single_cost=0;events.ui_lottery_snapshot(costSample);assert.equal(nodes.LotterySingleText.text,'免费单抽');drawAlignment('LotterySingleButton');events.ui_lottery_snapshot(data());
 const lockData=data(),cultivationAction=nodes.LotteryGW2Pool_cultivation.events.onactivate;Object.assign(lockData.pools[1],{unlocked:false,unlock_progress:3,unlock_required:10});events.ui_lottery_snapshot(lockData);poolNavigation('map');
 const lockCaption=nodes.LotteryGW2Pool_cultivation.children.find(child=>child.BHasClass('LotteryGW2PoolLock'));assert.equal(lockCaption.text,'未解锁  3 / 10');assert.equal(lockCaption.style.visibility,'visible','real unlock requirements remain available');
-events.ui_lottery_snapshot(data());assert.equal(lockCaption.style.visibility,'collapse');assert.strictEqual(nodes.LotteryGW2Pool_cultivation.events.onactivate,cultivationAction,'unlock updates keep the actual tab callback');
+events.ui_lottery_snapshot(data());assert.equal(lockCaption.style.visibility,'visible');assert.equal(lockCaption.text,'普通抽奖券','unlock updates restore the live ticket subtitle');assert.strictEqual(nodes.LotteryGW2Pool_cultivation.events.onactivate,cultivationAction,'unlock updates keep the actual tab callback');
 const absent=data();delete absent.shop_points;events.ui_lottery_snapshot(absent);events.ui_lottery_snapshot({...data(),shop_points:0});assert(!nodes.LotteryGW2Points&&!nodes.LotteryGW2StarjoyPoints,'balance snapshots do not recreate removed header balances');events.ui_lottery_snapshot(data());
 const ticketPurchases=[];config.SurvivalCommerceView={OpenTicketPurchase:pool=>{ticketPurchases.push(pool);return true;}};
 for(const id of ['map','summer']){
@@ -148,21 +153,22 @@ for(const id of ['map','summer']){
 }
 delete config.SurvivalCommerceView;current.SelectPool('map');events.ui_lottery_snapshot(data());
 assert.equal(presentation.Inspect().pools,4);assert.equal(nodes.LotteryGW2Sidebar.children.length,4);
-assert.equal(nodes.LotteryGW2PreviewItems.children.length,8);assert.equal(nodes.LotterySceneBackground.style.opacity,'1','retain the existing pool illustration');
-assert.equal(nodes.LotteryGW2Chest,undefined,'the removed right-side decoration is never created');assert(!source.includes('fall_2020_treasure_large_png.vtex'),'the retired decoration has no active resource reference');assert(!source.includes('loadout_bg_forest_003_jpg.vtex'),'the parked Emerald background is not activated by the current renderer');
+assert.equal(nodes.LotteryGW2PreviewItems.children.length,4);assert.equal(nodes.LotterySceneBackground.style.opacity,'1','retain the existing pool illustration');
+assert.equal(nodes.LotteryGW2Chest,undefined,'the removed right-side decoration is never created');assert(!source.includes('LotteryGW2Chest'),'the retired large decoration has no active node reference');assert(!source.includes('loadout_bg_forest_003_jpg.vtex'),'the parked Emerald background is not activated by the current renderer');
 function previewAlignment(){
- const cards=nodes.LotteryGW2PreviewItems.children,w=parseFloat(nodes.LotteryGW2PreviewItems.style.width),last=cards.at(-1);
- assert.equal((parseFloat(cards[0].style.position)+parseFloat(last.style.position)+parseFloat(last.style.width))/2,w/2,'The preview row is centered for the actual item count');
- for(const card of cards){
+ const cards=nodes.LotteryGW2PreviewItems.children,w=parseFloat(nodes.LotteryGW2PreviewItems.style.width);assert.equal(w,576);
+ for(const [index,card]of cards.entries()){
   const host=card.children.find(n=>n.BHasClass('LotteryGW2PreviewNameHost')),caption=host.children[0],icon=card.children.find(n=>n.BHasClass('LotteryGW2PreviewIcon'));
+  assert.equal(card.style.position,(index*148)+'px 0px 0px','sparse showcases retain the accepted left-to-right R5 slots');assert.equal(card.style.width,'132px');assert(parseFloat(card.style.position)+parseFloat(card.style.width)<=w,'each actual preview remains inside the showcase');
+  const well=card.children.find(n=>n.BHasClass('LotteryGW2PreviewWell'));assert.equal(well.style.width,'111px');assert.equal(well.style.height,'111px');assert.equal(icon.style.width,'91px');assert.equal(icon.style.height,'91px');assert.equal(caption.style.fontSize,'13px');
   assert.equal(parseFloat(String(icon.style.position).split(' ')[0])+parseFloat(icon.style.width)/2,parseFloat(host.style.width)/2,'Caption host and icon share one center axis');
   assert.equal(caption.style.width,'fit-children');assert.equal(caption.style.height,'fit-children');assert.equal(caption.style.horizontalAlign,'center');assert.equal(caption.style.verticalAlign,'center');
  }
 }
 previewAlignment();
 const varied=data();varied.items=['ur','ssr','sr','r'].flatMap(quality=>Array.from({length:3},(_,i)=>({id:quality+i,name:quality+' 实际奖励 '+i,quality,icon:'item_blink'})));events.ui_lottery_snapshot(varied);
-const previewCards=nodes.LotteryGW2PreviewItems.children;assert.equal(previewCards.length,8);assert(previewCards.every(card=>varied.items.includes(card.__lotteryItem)),'preview cards use only rewards supplied by the current snapshot');
-for(const quality of ['ur','ssr','sr','r'])assert.equal(previewCards.filter(card=>card.__lotteryItem.quality===quality).length,2,'the preview represents every available prize tier');
+const previewCards=nodes.LotteryGW2PreviewItems.children;assert.equal(previewCards.length,4);assert(previewCards.every(card=>varied.items.includes(card.__lotteryItem)),'preview cards use only rewards supplied by the current snapshot');
+assert.deepEqual(previewCards.map(card=>card.__lotteryItem.id),['ur0','ur1','ur2','ssr0'],'the four-item showcase selects the highest-rarity authoritative rewards');
 for(const card of previewCards){const well=card.children.find(child=>child.BHasClass('LotteryGW2PreviewWell'));assert.equal(well.style.borderColor,config.SurvivalRewardPresentation.NameColor(card.__lotteryItem.quality),'rarity color comes from the shared factory');}
 previewAlignment();
 for(const count of [0,1,2,3]){const sample=data();sample.items=sample.items.slice(0,count);events.ui_lottery_snapshot(sample);if(count)previewAlignment();else assert.equal(nodes.LotteryGW2Preview.visible,false,'empty snapshots do not display placeholder prizes');}
@@ -312,6 +318,20 @@ current.Close();current.Open();nativeTen.events.onactivate();assert.equal(reques
 events.ui_lottery_result({ok:1,request_id:drawReq.p.request_id,pool_id:'map',count:10,results:results(10),snapshot:data('map',10)});
 const rewards=nodes.LotteryItemList.children;assert.equal(rewards.length,10);assert(rewards.every(c=>c.__lotteryGW2Cell));
 assert.equal(new Set(rewards.map(c=>c.style.position)).size,10,'all ten server results retain distinct slots');
+function resultGeometry(count){
+ const single=count===1,cards=nodes.LotteryItemList.children;assert.equal(cards.length,count);
+ assert.equal(nodes.LotteryResultHeading.style.position,'75px 55px 0px');assert.equal(nodes.LotteryResultHeading.style.fontSize,'33px');
+ assert.equal(nodes.LotteryItemList.style.width,(single?242:920)+'px');assert.equal(nodes.LotteryItemList.style.position,single?'715px 270.44px 0px':'376px 231.86px 0px','the result grid is centered in its independent 1672px canvas');
+ assert.equal(nodes.LotteryResultActions.style.position,'0px 770px 0px');assert.equal(nodes.LotteryResultActions.style.height,'84px');
+ for(const [id,x,w]of [['LotteryConfirm',594,220],['LotteryAgain',834,244]]){assert.equal(nodes[id].style.position,x+'px 0px 0px');assert.equal(nodes[id].style.width,w+'px');assert.equal(nodes[id].style.height,'84px');}
+ for(const [index,card]of cards.entries()){
+  const cell=card.__lotteryGW2Cell;assert(cell);assert.equal(card.style.width,(single?242:164)+'px');assert.equal(card.style.position,single?'0px 0px 0px':(index%5*189)+'px '+(Math.floor(index/5)*214)+'px 0px');
+  for(const frame of [cell.well,cell.selectedFrame]){assert.equal(frame.style.width,(single?232:154)+'px');assert.equal(frame.style.height,(single?232:154)+'px');}
+  for(const art of [cell.stage,cell.icon]){assert.equal(art.style.width,(single?198:129)+'px');assert.equal(art.style.height,(single?198:129)+'px');}
+  assert.equal(cell.name.style.fontSize,(single?22:15)+'px');
+ }
+}
+resultGeometry(10);
 assert.equal(nodes.LotteryCelestialFooter.style.visibility,'collapse');
 current.Feature('history');assert.equal(nodes.LotteryGW2Title.text,'抽奖记录');infoBounds(64);
 const fullHistory=nodes.LotteryInfoList.children.filter(c=>c.BHasClass('RHHistoryRow'));assert.equal(fullHistory.length,10,'the offline result flow supplies real controller-owned history rows');
@@ -330,6 +350,7 @@ const artSnapshot=data();artSnapshot.items=[realReward];events.ui_lottery_snapsh
 assert.equal(nodes.LotteryGW2Preview_0.children.find(n=>n.BHasClass('LotteryGW2PreviewIcon')).image,realArt.runtime_uri,'main preview uses the actual catalog');
 events.ui_lottery_result({ok:1,request_id:'isolated_art_result',pool_id:'map',count:1,results:[realReward],snapshot:artSnapshot});
 const artCard=nodes.LotteryItemList.children[0];assert.equal(artCard.__lotteryGW2Cell.stage.children[0].image,realArt.runtime_uri,'result retains original Image with approved source');
+resultGeometry(1);
 if(nodes.LotteryGW2ResultCanvas){
  const canvas=nodes.LotteryGW2ResultCanvas,stage=artCard.__lotteryGW2Cell.stage,resultScale=Number(canvas.style.transform.split('(')[1].split(',')[0]),oldCanvasPosition=canvas.GetPositionWithinWindow,oldStagePosition=stage.GetPositionWithinWindow;
  canvas.GetPositionWithinWindow=()=>({x:0,y:0});stage.GetPositionWithinWindow=()=>({x:1000*resultScale,y:200*resultScale});stage.actuallayoutwidth=114;stage.actuallayoutheight=114;
@@ -364,7 +385,7 @@ for(let reload=0;reload<2;reload++){
  vm.runInNewContext(source,env);const compatible=config.SurvivalPurpleLottery;current.Open();events.ui_lottery_snapshot(data());
  assert.strictEqual(nativeSingle.events.onactivate,singleEvent);assert.strictEqual(nativeTen.events.onactivate,tenEvent);
  for(const kind of ['Single','Ten']){const button=nodes['Lottery'+kind+'Button'],content=button.Children().filter(n=>n.BHasClass('ZXDrawContent'));assert.equal(content.length,1,'the old button receives exactly one caption host');assert.equal(content[0].Children().filter(n=>n.BHasClass('ZXDrawCost')).length,1,'the old caption receives exactly one price host');assert.strictEqual(nodes['Lottery'+kind+'Text'].parent,content[0]);assert.strictEqual(nodes['Lottery'+kind+'Cost'].parent,content[0].Children().find(n=>n.BHasClass('ZXDrawCost')));drawAlignment('Lottery'+kind+'Button');}
- for(const [caption,oldShell]of legacyFooterOrigins){assert.strictEqual(caption.parent,oldShell.parent,'footer text leaves its scaled ancestor');assert.equal(caption.style.transform,'none');assert.equal(caption.style.minHeight,'0px');assert.equal(caption.style.minWidth,'0px');assert.equal(caption.style.fontSize,'16px');assert.equal(caption.style.lineHeight,'44px');assert.equal(caption.style.textOverflow,'clip','native footer captions cannot shrink to an unreadable glyph size');assert.equal(caption.style.position,'30px 0px 0px');assert.equal(oldShell.style.transform,'scale3d(1.4,1.4,1)','the unrelated old container is preserved');}
+ for(const [caption,oldShell]of legacyFooterOrigins){assert.strictEqual(caption.parent,oldShell.parent,'footer text leaves its scaled ancestor');assert.equal(caption.style.transform,'none');assert.equal(caption.style.minHeight,'0px');assert.equal(caption.style.minWidth,'0px');assert.equal(caption.style.fontSize,'16px');assert.equal(caption.style.lineHeight,'44px');assert.equal(caption.style.textOverflow,'clip','native footer captions cannot shrink to an unreadable glyph size');assert.equal(caption.style.position,caption.parent.id==='LotteryAnnouncement'?'0px 0px 0px':'30px 0px 0px');assert.equal(oldShell.style.transform,'scale3d(1.4,1.4,1)','the unrelated old container is preserved');}
  const stable=compatible.Inspect(),nodeCount=allPanels(root).length,requestsBefore=requests.length;for(let repeat=0;repeat<6;repeat++)compatible.Apply();assert.equal(compatible.Inspect().trackedOwned,stable.trackedOwned,'repeated Apply does not allocate display hosts');assert.equal(compatible.Inspect().trackedMoved,stable.trackedMoved,'movement is tracked once');assert.equal(allPanels(root).length,nodeCount,'repeated Apply does not grow the old tree');assert.equal(requests.length,requestsBefore,'layout repair never sends a request');
  const freeLegacy=data();freeLegacy.selected_pool.single_cost=0;events.ui_lottery_snapshot(freeLegacy);drawAlignment('LotterySingleButton');assert.equal(nodes.LotterySingleText.text,'免费单抽');const freeRow=nativeSingle.Children().find(n=>n.BHasClass('ZXDrawContent')).Children().find(n=>n.BHasClass('ZXDrawCost'));assert.equal(freeRow.style.visibility,'collapse','the repaired free action has no misleading price');
  events.ui_lottery_snapshot(data('map',0));assert.equal(nativeSingle.enabled,false);assert.equal(nativeTen.enabled,false);drawAlignment('LotterySingleButton');drawAlignment('LotteryTenButton');
@@ -478,7 +499,7 @@ assert.equal(config.SurvivalUILayers.Top(),'lottery_info','renderer-only reload 
 assert.equal(nodes.LotteryInfoList.children.filter(n=>n.BHasClass('RHHistoryRow')).length,10);
 assert.equal(mainReadsSince(preservedStart).length,1,'restoring an inline view does not issue another page snapshot');
 preserved.Close();preserved.Dispose();historyPresentation.api.Dispose();
-console.log('LOTTERY_REBORN_REFINE_PASS: 8 authoritative preview items, shared rarity colors, native iron navigation, live prices/free draw, 0/1/9/10 balances, lock/pending guards, centered currency/actions and independent menu/result tooltip scales');
+console.log('LOTTERY_REBORN_REFINE_PASS: 4 authoritative showcase items, shared rarity colors, distinct native pool artwork, R5 hero/navigation/footer/result geometry, live × prices/free draw, 0/1/9/10 balances, lock/pending guards, bounded currency/actions and independent menu/result tooltip scales');
 console.log('LOTTERY_CURRENT_RENDERER_GATE_PASS: live retired/foreign/unready rejection, one deferred open, close/dispose/reload cancellation, no legacy modal and pending draw/result identity through renderer-only replacement');
 console.log('LOTTERY_LAYOUT_RELOAD_PASS: dead production lifetime, controller-first XML order, disposed API replacement, fresh snapshot request, real shell/details/close and previous compiled renderer transition');
 console.log('LOTTERY_GW2_PASS: independent shell, native controls, four authoritative pools, scoped actual art/fallback/details, zero/unknown counts, ten results, pending/foreign-modal guards, 30 rebuilds without stale refs, seven fits, 12 opens, restored parents/factories and renderer reload');
