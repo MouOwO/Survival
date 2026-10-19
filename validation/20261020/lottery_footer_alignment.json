@@ -1,0 +1,62 @@
+{
+  "status": "PASS_NATIVE_COMPILE_AND_FOOTER_ALIGNMENT",
+  "changes": [
+    "Natural-height, vertically centered 16px captions with 20px line height for details, history, announcements and skip animation.",
+    "Announcement refresh retains natural caption alignment; original 44px button hit areas, icons and checkbox positions remain unchanged.",
+    "Hover outline uses an inset shadow so its one-pixel stroke cannot move the icons or expand the text layout."
+  ],
+  "sourceFiles": {
+    "panorama/src/scripts/custom_game/lottery_gw2.js": "1f21a1aa71bd38c3db1fc3ae178f98cb00c383b52f0755e7a0f96113365c7a3f",
+    "panorama/src/styles/custom_game/lottery_gw2.css": "1eade144b3c4f47dc413e67cf81b0202d4651141dd77e558c8842afbd036a12f",
+    "tools/tests/lottery_gw2.test.cjs": "c1fc8128ff2e1bf13f4de02798bab95137ddbd9b623dacfa6a774d7b1036048e"
+  },
+  "nativeCompile": {
+    "passed": true,
+    "reports": [
+      {
+        "candidate": "output/lottery_footer_align_20261019/compile_candidate.json",
+        "live": "output/lottery_footer_align_20261019/compile_live.json"
+      },
+      {
+        "candidate": "output/lottery_footer_align_20261019/compile_css_candidate.json",
+        "live": "output/lottery_footer_align_20261019/compile_css_live.json"
+      }
+    ],
+    "notes": "An initial live JavaScript compiler process ran out of memory during engine initialization; it restored the previous resources. The later live retry passed."
+  },
+  "regression": {
+    "command": "node --test tools/tests/lottery_gw2.test.cjs",
+    "passed": true,
+    "isolatedHead": "7601c454bf775a03460e7160f7c0ec1656a3ba6d",
+    "retained": [
+      "Original footer feature callbacks and three destination screens",
+      "Legacy scaled ancestors, repeated apply, renderer reload and parent restoration"
+    ]
+  },
+  "visual": {
+    "command": "node output/lottery_footer_align_20261019/verify.cjs",
+    "sizes": [
+      "1920x1080",
+      "1280x720"
+    ],
+    "cases": 8,
+    "states": [
+      "normal",
+      "hover_details",
+      "skip_checked",
+      "returned_from_announcement"
+    ],
+    "maximumCaptionCenterOffset": 0,
+    "featureClicks": 6,
+    "unexpectedDrawCalls": 0,
+    "report": "output/lottery_footer_align_20261019/report.json",
+    "screenshot": "output/lottery_footer_align_20261019/captures/1920_footer_normal.png",
+    "gameVerified": false,
+    "limitations": [
+      "Browser-only actual production XML/JS/CSS and original event callbacks; native game rendering is not verified.",
+      "Browser adapter does not perform native ToggleButton automatic checked updates. Checked fixture is set first, then the original authored onactivate calls the original SetSkipAnimation controller.",
+      "All account balances and events are local fixtures; no outbound game/server operations."
+    ]
+  },
+  "preserved": "Unrelated working-tree changes and historical stashes retained. The commit contains only this task delta and its isolated compiled resources."
+}

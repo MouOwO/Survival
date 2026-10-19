@@ -203,7 +203,7 @@
         view.previewItems=make("Panel",view.preview,"LotteryGW2PreviewItems"); place(view.previewItems,0,26,576,150);
         view.resultPool=label(resultCanvas,"LotteryGW2ResultPool","",1290,75,300,28,14,"#c4d0c9");style(view.resultPool,{textAlign:"right"});
         move("LHDetails",p("LotteryCelestialFooter"));
-        var skip=p("LotterySkipAnimation");skip.Children().forEach(function(c){if(c.paneltype==="Label"){c.AddClass("LotteryGW2SkipLabel");place(c,38,0,74,44);style(c,{fontSize:"16px",lineHeight:"44px",color:"#c1cfbe",textOverflow:"clip"});}else c.visible=false;});
+        var skip=p("LotterySkipAnimation");skip.Children().forEach(function(c){if(c.paneltype==="Label"){c.AddClass("LotteryGW2SkipLabel");footerCaption(c,38,74);}else c.visible=false;});
         var checkBox=surface(skip,"LotteryGW2SkipBox",[6,11,22,22],"#0c1d14");style(checkBox,{border:"1px solid #829e7e"});
         nativeArt(skip,"LotteryGW2SkipCheck","s2r://panorama/images/control_icons/checkbox_check_psd.vtex",9,14,16,16).AddClass("LotteryGW2SkipCheck");
         sidebar(); return view;
@@ -314,6 +314,10 @@
             place(text,0,0,contentWidth,32);style(text,{width:"fit-children",height:"32px",horizontalAlign:"center",fontSize:"28px",lineHeight:"32px",letterSpacing:"2px",textAlign:"center",whiteSpace:"nowrap",textOverflow:"clip",minWidth:"0px",minHeight:"0px",transform:"none"});
         }
     }
+    function footerCaption(n,x,width) {
+        // Center the natural glyph box against the 22px icons in a 44px row.
+        place(n,x,0,width,44);style(n,{height:"fit-children",minWidth:"0px",minHeight:"0px",verticalAlign:"center",fontSize:"16px",lineHeight:"20px",textAlign:"left",transform:"none",color:"#c1cfbe",whiteSpace:"nowrap",textOverflow:"clip",textShadow:"none"});
+    }
     function footerAction(id,x,y,width,uri) {
         var b=p(id);if(!valid(b))return;b.AddClass("LotteryGW2ForestFooterAction");place(b,x,y,width,44);b.hittestchildren=false;
         var icon=b.__lotteryForestIcon;if(!valid(icon)){
@@ -323,7 +327,7 @@
         place(icon,0,11,22,22);style(icon,{visibility:"visible",backgroundImage:'url("'+uri+'")',backgroundSize:"contain",backgroundPosition:"center",backgroundRepeat:"no-repeat",washColor:"#b6cbb3"});icon.hittest=false;icon.hittestchildren=false;
         icon.AddClass("LotteryGW2FooterIcon");if(!uri)style(icon,{visibility:"collapse",backgroundImage:"none"});
         var captions=[];walk(b,function(n){if(n.paneltype==="Label")captions.push(n);});
-        captions.forEach(function(n){moveNode(n,b);place(n,30,0,width-30,44);style(n,{width:(width-30)+"px",height:"44px",minWidth:"0px",minHeight:"0px",horizontalAlign:"left",verticalAlign:"top",fontSize:"16px",lineHeight:"44px",textAlign:"left",transform:"none",color:"#c1cfbe",whiteSpace:"nowrap",textOverflow:"clip",textShadow:"#000000 0px 1px 2px 2.0"});});
+        captions.forEach(function(n){moveNode(n,b);footerCaption(n,uri?30:0,width-(uri?30:0));});
     }
     function compactCards(host,single) {
         if(!valid(host)||!ensure())return;
@@ -403,7 +407,7 @@
         ["LotterySingleButton","LotteryTenButton","LotteryAgain","LotteryConfirm"].forEach(function(id){action(id,id==="LotteryTenButton"||id==="LotteryAgain");});
         ["LotterySingleCost","LotteryTenCost"].forEach(function(id){style(p(id),{visibility:"visible"});});
         ["LHDetails","LHHistory","LotteryAnnouncement","LotteryGW2Back"].forEach(function(id){var b=p(id);if(valid(b))b.AddClass("LotteryGW2Action");});
-        ["LHDetails","LHHistory","LotteryAnnouncement"].forEach(function(id){walk(p(id),function(node){if(node.paneltype==="Label"&&id==="LotteryAnnouncement"){node.text="活动公告";place(node,0,0,104,44);}if(id==="LotteryAnnouncement"&&node.BHasClass("LotteryGW2FooterIcon"))style(node,{visibility:"collapse"});});});
+        ["LHDetails","LHHistory","LotteryAnnouncement"].forEach(function(id){walk(p(id),function(node){if(node.paneltype==="Label"&&id==="LotteryAnnouncement")node.text="活动公告";if(id==="LotteryAnnouncement"&&node.BHasClass("LotteryGW2FooterIcon"))style(node,{visibility:"collapse"});});});
         style(view.back,{visibility:mode?"visible":"collapse"});style(p("LotteryGW2HeaderDivider"),{visibility:mode?"visible":"collapse"});style(view.headerSubtitle,{visibility:mode?"collapse":"visible"});
         place(view.title,mode?129:27,0,560,74);style(view.title,{height:"fit-children",verticalAlign:"center",fontSize:"32px"});
         view.fullscreen.visible=results&&!mode;
