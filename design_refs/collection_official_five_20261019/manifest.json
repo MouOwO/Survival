@@ -1,0 +1,358 @@
+{
+  "kind": "five_official_collection_design_candidates",
+  "productionChanged": false,
+  "notGameCapture": true,
+  "layoutReference": "design_refs/collection_gw2_v2/reference_inventory.png",
+  "layout": {
+    "categories": "Left vertical icon rail",
+    "grid": "10 columns × 4 rows, all 40 collection entries",
+    "footer": "Currency and one-ticket draw action",
+    "search": false,
+    "persistentItemSelection": false
+  },
+  "themes": [
+    {
+      "id": "classic",
+      "number": "01",
+      "name": "经典深灰",
+      "subtitle": "原生 HUD 面板 · 直角钢边 · 绿色斜面按钮",
+      "accent": "#9fc6ab"
+    },
+    {
+      "id": "armory",
+      "number": "02",
+      "name": "英雄军械库",
+      "subtitle": "军械库底图 · 银色金属框 · 蓝色按钮",
+      "accent": "#a5cce9"
+    },
+    {
+      "id": "crownfall",
+      "number": "03",
+      "name": "倾天之战",
+      "subtitle": "深蓝卷册 · 切角金边 · 原生六角按钮",
+      "accent": "#e1c37a"
+    },
+    {
+      "id": "paper",
+      "number": "04",
+      "name": "典藏卷册",
+      "subtitle": "官方羊皮纸 · 铜色书框 · 角色名称",
+      "accent": "#d7bc86"
+    },
+    {
+      "id": "gold",
+      "number": "05",
+      "name": "黑金典藏",
+      "subtitle": "Dota Plus 纹理 · 细金框 · 鎏金按钮",
+      "accent": "#e4c87d"
+    }
+  ],
+  "assets": [
+    {
+      "key": "classic",
+      "id": "UI04795",
+      "file": "assets/classic.png",
+      "source": "panorama/images/textures/dashboard_bg_base_psd.vtex_c",
+      "uri": "s2r://panorama/images/textures/dashboard_bg_base_psd.vtex",
+      "width": 960,
+      "height": 540,
+      "sha256": "5268760872466e45427dbac5b8d538b832f690a19a41365e7b4572b1163318de",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "header",
+      "id": "UI04813",
+      "file": "assets/header.png",
+      "source": "panorama/images/textures/header_texture_png.vtex_c",
+      "uri": "s2r://panorama/images/textures/header_texture_png.vtex",
+      "width": 1333,
+      "height": 110,
+      "sha256": "b41961c029fb764e197aac8c6e8efa778f3b5c43aab4aed7bd61e890e295b893",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "tooltip",
+      "id": "UI02975",
+      "file": "assets/tooltip.png",
+      "source": "panorama/images/hud/reborn/bg_tooltip_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_tooltip_psd.vtex",
+      "width": 500,
+      "height": 452,
+      "sha256": "fc223245ed5ef0a21c528b887af2a4df4e470edf79ee5a35a009f28d08ca2ff1",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "rail",
+      "id": "UI02971",
+      "file": "assets/rail.png",
+      "source": "panorama/images/hud/reborn/bg_shop_guide_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_shop_guide_psd.vtex",
+      "width": 210,
+      "height": 828,
+      "sha256": "833d53760a69e001306a79233e58addeff987ce42c2f3a7e67b5e67cd9d7abd0",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "armory",
+      "id": "UI00013",
+      "file": "assets/armory.png",
+      "source": "panorama/images/backgrounds/dashboard_background_armory_update_psd.vtex_c",
+      "uri": "s2r://panorama/images/backgrounds/dashboard_background_armory_update_psd.vtex",
+      "width": 960,
+      "height": 540,
+      "sha256": "cb4a1a160ca7304e5c14b49ad6fb2c4e41ba4e923006747283bf24a04f19f394",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "steelFrame",
+      "id": "UI01955",
+      "file": "assets/steelFrame.png",
+      "source": "panorama/images/events/crownfall/techiemen/mapbackground_frame_psd.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/techiemen/mapbackground_frame_psd.vtex",
+      "width": 680,
+      "height": 488,
+      "sha256": "20dfe46f26f81805218a24dc1b1e2b3bcdacc3910e935ba2688a1e49831fe685",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "blueButton",
+      "id": "UI01593",
+      "file": "assets/blueButton.png",
+      "source": "panorama/images/dota_plus/relic_int_button_psd.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/relic_int_button_psd.vtex",
+      "width": 290,
+      "height": 100,
+      "sha256": "122aecf18b7ee810e74cb6d80a685c58eff4e67e6a54f080d1fe51df76e3fced",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "crownfall",
+      "id": "UI01818",
+      "file": "assets/crownfall.png",
+      "source": "panorama/images/events/crownfall/fight/hud/timer_background_image_png.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/fight/hud/timer_background_image_png.vtex",
+      "width": 560,
+      "height": 360,
+      "sha256": "81999df3117802121c0680d871b4981764cc37040ea5556752e7d6f4bacc8447",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "crownfallHeader",
+      "id": "UI01854",
+      "file": "assets/crownfallHeader.png",
+      "source": "panorama/images/events/crownfall/overworld/header_bg_fill_png.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/overworld/header_bg_fill_png.vtex",
+      "width": 80,
+      "height": 132,
+      "sha256": "4359093ced9f2b7902d0879a7314a7a4b4d3a1f22a94178b2cd4c0a9181dc690",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "crownfallTab",
+      "id": "UI01799",
+      "file": "assets/crownfallTab.png",
+      "source": "panorama/images/events/crownfall/buttons/tab_background_png.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/buttons/tab_background_png.vtex",
+      "width": 441,
+      "height": 84,
+      "sha256": "51e944ed724c45b3ac54cb7b3bab6a6a0a24295fe86f0c8b1b7dee0b71cc0c1f",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "paper",
+      "id": "UI02693",
+      "file": "assets/paper.png",
+      "source": "panorama/images/hud/bounty_hunter/paper_texture_png.vtex_c",
+      "uri": "s2r://panorama/images/hud/bounty_hunter/paper_texture_png.vtex",
+      "width": 600,
+      "height": 300,
+      "sha256": "f34a25c3d8d33304c3426349c3241f9287e3cd69b858b40674ec7629224ef7b5",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "paperHeader",
+      "id": "UI02035",
+      "file": "assets/paperHeader.png",
+      "source": "panorama/images/events/dark_carnival/overworld/panel_title_container_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/overworld/panel_title_container_png.vtex",
+      "width": 560,
+      "height": 64,
+      "sha256": "258e350db5b8c7be869769c95b8c5c6e8c4d91a6ad79778e4ef433d2669b120e",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "paperFrame",
+      "id": "UI02081",
+      "file": "assets/paperFrame.png",
+      "source": "panorama/images/events/dark_carnival/splash/popup_border_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/splash/popup_border_png.vtex",
+      "width": 800,
+      "height": 800,
+      "sha256": "fce2b32ff59dfc04c5b4ada9c65c7a01e449607a3173d2458b575220ad16c378",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "paperButton",
+      "id": "UI02688",
+      "file": "assets/paperButton.png",
+      "source": "panorama/images/hud/bounty_hunter/button_background_png.vtex_c",
+      "uri": "s2r://panorama/images/hud/bounty_hunter/button_background_png.vtex",
+      "width": 240,
+      "height": 56,
+      "sha256": "dc242b3c728c142a0d6df333a6376b54946ea5458c18ea753af8b3ee6f600ee9",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "paperButtonBorder",
+      "id": "UI02689",
+      "file": "assets/paperButtonBorder.png",
+      "source": "panorama/images/hud/bounty_hunter/button_border_png.vtex_c",
+      "uri": "s2r://panorama/images/hud/bounty_hunter/button_border_png.vtex",
+      "width": 240,
+      "height": 56,
+      "sha256": "bcad59ef9230d79e6b6c01f199816828d0b8e7206948a732390333acc4cbc1a4",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "gold",
+      "id": "UI01575",
+      "file": "assets/gold.png",
+      "source": "panorama/images/dota_plus/dota_plus_background_texture_large_png.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/dota_plus_background_texture_large_png.vtex",
+      "width": 3484,
+      "height": 1992,
+      "sha256": "655cf7b17dc7206f07a87ff9f15202639272f6a74c47ee5efa80c49abfaa3834",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "goldHeader",
+      "id": "UI01577",
+      "file": "assets/goldHeader.png",
+      "source": "panorama/images/dota_plus/dota_plus_horizontal_banner_background_png.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/dota_plus_horizontal_banner_background_png.vtex",
+      "width": 2280,
+      "height": 529,
+      "sha256": "3b6bcb4f3a07990b914c8e3b4f9360c93482e45502f71c8b057f53d3244e9d92",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "goldButton",
+      "id": "UI01594",
+      "file": "assets/goldButton.png",
+      "source": "panorama/images/dota_plus/relic_rare_button_psd.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/relic_rare_button_psd.vtex",
+      "width": 290,
+      "height": 100,
+      "sha256": "686f7f3809c2ad3e47510a5f352e8f642c7b32b28fda2e43cbed22ffabf98a53",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "close",
+      "id": "UI01325",
+      "file": "assets/close.svg",
+      "source": "panorama/images/control_icons/24px/x_close.vsvg_c",
+      "uri": "file://{images}/control_icons/24px/x_close.svg",
+      "width": 24,
+      "height": 24,
+      "sha256": "cd624b9e94d3728fd872bad68b4ef4338856c7bb14ba6b4106098acab85a78e2",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "treasure",
+      "id": "UI01313",
+      "file": "assets/treasure.svg",
+      "source": "panorama/images/control_icons/24px/treasure.vsvg_c",
+      "uri": "file://{images}/control_icons/24px/treasure.svg",
+      "width": 24,
+      "height": 24,
+      "sha256": "8a95fce0bd57866ddf3e4e3042ce25903d54168a1d670650951f86a18f594375",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "friends",
+      "id": "UI01434",
+      "file": "assets/friends.png",
+      "source": "panorama/images/control_icons/friends_png.vtex_c",
+      "uri": "s2r://panorama/images/control_icons/friends_png.vtex",
+      "width": 40,
+      "height": 40,
+      "sha256": "b3f6873605823d20523ea4bee029039469c7ff72f6bc8eb530c87fe4bf0dc4ca",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "star",
+      "id": "UI01303",
+      "file": "assets/star.svg",
+      "source": "panorama/images/control_icons/24px/star.vsvg_c",
+      "uri": "file://{images}/control_icons/24px/star.svg",
+      "width": 25,
+      "height": 24,
+      "sha256": "2a4ee31567e43fbd35203c3fba5d10f0c1cd00838d5c600bbe5dd2c1facf3efb",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "rewards",
+      "id": "UI01283",
+      "file": "assets/rewards.svg",
+      "source": "panorama/images/control_icons/24px/rewards.vsvg_c",
+      "uri": "file://{images}/control_icons/24px/rewards.svg",
+      "width": 24,
+      "height": 24,
+      "sha256": "641db617493b612e020e73fcde70b22d2409c2395ba506fa7177e0692b2e5f38",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "trophy",
+      "id": "UI01314",
+      "file": "assets/trophy.svg",
+      "source": "panorama/images/control_icons/24px/trophy.vsvg_c",
+      "uri": "file://{images}/control_icons/24px/trophy.svg",
+      "width": 24,
+      "height": 24,
+      "sha256": "6c07d278b7c3c8442e092df46cb6f4902446eabeb17de2330a82e4f3f3853c39",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "ticket",
+      "id": "UI03386",
+      "file": "assets/ticket.png",
+      "source": "panorama/images/icon_ticket_png.vtex_c",
+      "uri": "s2r://panorama/images/icon_ticket_png.vtex",
+      "width": 43,
+      "height": 34,
+      "sha256": "de89e17c257eeccb6193e0d45c67bd2e046fa5e760c00d84938d3ca9687af3bd",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "squareFrame",
+      "id": "UI02894",
+      "file": "assets/squareFrame.png",
+      "source": "panorama/images/hud/passive_ability_border_png.vtex_c",
+      "uri": "s2r://panorama/images/hud/passive_ability_border_png.vtex",
+      "width": 105,
+      "height": 105,
+      "sha256": "0b4e943230ec59769247f4ee8c64a6d570c0987db2a90349521fb9a616053733",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    },
+    {
+      "key": "coolFrame",
+      "id": "UI00516",
+      "file": "assets/coolFrame.png",
+      "source": "panorama/images/compendium/international2017/avatarborder_default_psd.vtex_c",
+      "uri": "s2r://panorama/images/compendium/international2017/avatarborder_default_psd.vtex",
+      "width": 64,
+      "height": 64,
+      "sha256": "301b7b499b46a9422068629f37818a6ae287850d63cc10d974c9090a733f4f85",
+      "treatment": "Exact official decoded bytes; CSS layout and tintable control masks"
+    }
+  ],
+  "fixture": [
+    "data/csv/存档系统/archive_social_items.csv",
+    "data/csv/存档系统/archive_social_rules.csv",
+    "data/csv/存档系统/archive_item_icons.csv",
+    "data/csv/存档系统/archive_categories.csv"
+  ],
+  "fixtureValues": "Synthetic ownership and currency; no game/account/reward connection",
+  "nativeCssReference": "design_refs/official_ui_catalog_20261019/reference/panorama/styles/dotastyles.css",
+  "build": "node tools/collection_official_five_20261019/build.cjs"
+}
