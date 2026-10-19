@@ -19,14 +19,14 @@ let api=cfg.SurvivalCollection;
 assert.equal(nodes.CollectionScrim.style.backgroundColor,'#00000022','The flat inventory overrides the generic modal dark scrim after adoption');
 assert.equal(nodes.CollectionGW2Background.style.opacity,'1','The collection texture is not faded');assert.equal(nodes.CollectionGW2Background.style.backgroundColor,'#111413','Opaque black and gold backing covers the source texture alpha');assert.equal(nodes.CollectionWindow.style.backgroundColor,'#111413');
 assert.equal(nodes.CollectionGW2CloseIcon.paneltype,'Image');assert(!nodes.CollectionGW2Close.Children().some(child=>child.paneltype==='Label'),'Close uses the fixed image instead of a font glyph');
-assert.equal(nodes.CollectionGW2Sidebar.style.backgroundColor,nodes.CollectionGW2Header.style.backgroundColor,'Header and sidebar share one flat tint');
+assert.equal(nodes.CollectionGW2Sidebar.style.backgroundColor,'#191b19d9','The framed rail keeps the selected dark neutral tint');assert.equal(nodes.CollectionGW2Header.style.backgroundColor,'#111414e8','The native header retains its black and gold backing');
 function bounds(node){const [x,y]=node.style.position.split(' ').map(parseFloat);return {x,y,right:x+parseFloat(node.style.width),bottom:y+parseFloat(node.style.height)};}
 assert.deepEqual(Array.from(api.Inspect().canvas),[960,548],'One-page canvas matches the refined black and gold presentation');
-assert.equal(parseFloat(nodes.CollectionGW2Header.style.height),52,'The title band gives the fixed corner artwork enough clearance');
-assert.equal(parseFloat(nodes.CollectionGW2Title.style.fontSize),22,'The title keeps its refined readable size');
+assert.equal(parseFloat(nodes.CollectionGW2Header.style.height),44,'The title band matches the selected fifth refinement');
+assert.equal(parseFloat(nodes.CollectionGW2Title.style.fontSize),25,'The title keeps its refined readable size');
 assert(bounds(nodes.CollectionGW2Title).bottom<=bounds(nodes.CollectionGW2Header).bottom,'The smaller title is contained in its band');
-assert.equal(bounds(nodes.CollectionGW2Header).bottom,bounds(nodes.CollectionGW2Sidebar).y,'The left rail joins the header without a gap');
-assert.equal(bounds(nodes.CollectionGW2Sidebar).bottom,bounds(nodes.CollectionGW2Footer).y,'The left rail joins the full-width footer');
+assert(bounds(nodes.CollectionGW2Header).bottom<bounds(nodes.CollectionGW2Sidebar).y,'The framed rail has clearance beneath the header');
+assert(bounds(nodes.CollectionGW2Sidebar).bottom>bounds(nodes.CollectionGW2Footer).y,'The rail continues beside the action footer');
 function descendants(node){return node.Children().flatMap(child=>[child,...descendants(child)]);}
 function assertNine(node,key,edge,fill){
  assert(node&&node.__collectionNine,'A native border is assembled from real cropped panels');
@@ -68,13 +68,13 @@ function assertOnePage(category){
  });
 }
 ['ex','friend','wife'].forEach((id,i)=>{
- const tab=nodes['CollectionGW2Tab_'+id],children=descendants(tab),frame=children.find(n=>n.BHasClass('CollectionGW2TabSelected')),icon=children.find(n=>n.paneltype==='Image');
+ const tab=nodes['CollectionGW2Tab_'+id],children=descendants(tab),frame=children.find(n=>n.BHasClass('CollectionGW2TabSelected')),icon=children.find(n=>n.paneltype==='Image'),name=children.find(n=>n.paneltype==='Label');
  assert.equal(parseFloat(tab.style.width),44);assert.equal(parseFloat(tab.style.height),44);
- assert.equal(parseFloat(icon.style.width),28);assert.equal(parseFloat(icon.style.height),28);
- assert(!children.some(n=>n.paneltype==='Label'),'Category rail is icons only');
- assertNine(frame,'frame',[10,10,10,10],false);assert.equal(frame.style.borderLeft,undefined,'No protruding left selection edge');
+ assert.equal(parseFloat(icon.style.width),21);assert.equal(parseFloat(icon.style.height),21);
+ assert.equal(name.text,['前女友','前男友','老婆'][i]);assert.equal(name.style.fontSize,'9px');assert.equal(name.style.textAlign,'center');
+ assertNine(children.find(n=>n.BHasClass('CollectionGoldTabSkin')),'button',[8,6,8,6],true);
  assert(bounds(tab).x>=bounds(nodes.CollectionGW2Sidebar).x&&bounds(tab).right<=bounds(nodes.CollectionGW2Sidebar).right,'Icon buttons stay inside the rail');
- assert(bounds(frame).x>=0&&bounds(frame).y>=0&&bounds(frame).right<=parseFloat(tab.style.width)&&bounds(frame).bottom<=parseFloat(tab.style.height),'The selected border stays within the icon button');
+ assert(bounds(tab).x+bounds(frame).x>=bounds(nodes.CollectionGW2Sidebar).x,'The narrow selected accent stays within the framed rail');
  assert.equal(typeof tab.events.onmouseover,'function');assert.equal(typeof tab.events.onmouseout,'function');
 });
 nodes.CollectionGW2Result.text='服务端返回的完整长错误说明'.repeat(50);assert(bounds(nodes.CollectionGW2Result).right<=bounds(nodes.CollectionGW2Draw).x,'Even a long response is contained before the draw button');assert.equal(nodes.CollectionGW2Result.style.textOverflow,'ellipsis');
@@ -82,12 +82,12 @@ api.Open('wife');assert.equal(h.sent.at(-1).payload.category_id,'wife','Wife req
 assert.equal(nodes.CollectionGW2GridBody.Children().length,0,'Wife never invents ownership while the server response is incomplete');
 h.click(nodes.CollectionGW2Draw);assert.equal(draws().length,0);
 emit({...packet('wife',10,wifeRows.slice(20)),chunk:2,chunks:2});assert.equal(api.Inspect().slots,0,'An out-of-order wife fragment cannot display a partial collection');
-emit({...packet('wife',10,wifeRows.slice(0,20)),chunk:1,chunks:2});assertOnePage('wife');assert(nodes.CollectionGW2Draw.enabled);assert.equal(nodes.CollectionGW2Category.text,'我的老婆');assert(nodes.CollectionGW2Tickets.text.includes('姻缘签'));
+emit({...packet('wife',10,wifeRows.slice(0,20)),chunk:1,chunks:2});assertOnePage('wife');assert(nodes.CollectionGW2Draw.enabled);assert.equal(nodes.CollectionGW2Category.text,'我的老婆');assert.equal(nodes.CollectionGW2CurrencyName.text,'姻缘签');assert.equal(nodes.CollectionGW2Tickets.text,'3');assert.equal(nodes.CollectionGW2DrawCostText.text,'1');
 nodes.CollectionGW2Item_wife_01.events.onmouseover();assert.equal(nodes.CollectionGW2TooltipQuantity.text,'2/60');assert(nodes.CollectionGW2TooltipEffect.text.includes('真实奖励效果0'));
 snapshot('wife',11,wifeRows.map((row,i)=>i===39?{...row,draw_enabled:0,availability_note:'待适配，暂不参与抽取，不消耗玫瑰',description:'原文特殊效果'}:row));
 assert.equal(api.Inspect().slots,40,'A pending adaptation remains visible beside the live draw pool');assert(nodes.CollectionGW2Item_wife_40.BHasClass('CollectionGW2Unavailable'));assert.equal(nodes.CollectionGW2Unavailable_wife_40,undefined,'Unavailable cards do not create an adaptation label');assert.equal(nodes.CollectionGW2Item_wife_40.__collectionItem.draw_enabled,0,'Removing the label preserves draw availability');
 nodes.CollectionGW2Item_wife_40.events.onmouseover();assert(nodes.CollectionGW2TooltipState.text.includes('未解锁'));assert(!nodes.CollectionGW2TooltipState.text.includes('待适配'));assert.equal(nodes.CollectionGW2TooltipEffect.text,'原文特殊效果');assert(nodes.CollectionGW2TooltipCondition.text.includes('不消耗玫瑰'));assert(nodes.CollectionGW2TooltipCondition.visible);assert(nodes.CollectionGW2Draw.enabled,'Pending adaptation rows do not disable the remaining configured pool');
-snapshot('wife',12,wifeRows);
+snapshot('wife',12,wifeRows,{social:{tickets:3,currency_name:'姻缘签',draw_cost:2,remaining:999,total:2}});assert.equal(nodes.CollectionGW2DrawCostText.text,'2','The draw button shows the authoritative configured ticket cost');
 snapshot('unconfigured_pool',900,wifeRows);assert.equal(api.Inspect().rows[0].id,'wife_01','Unknown categories cannot replace the current authoritative pool');
 api.Select('ex');assert.equal(h.sent.at(-1).payload.category_id,'ex');assert.equal(h.sent.at(-1).payload.prefetch,1);assert.equal(api.Inspect().slots,api.Inspect().rows.length);
 const pieces=[rows.slice(0,12),rows.slice(12,24),rows.slice(24,36),rows.slice(36)];
@@ -98,6 +98,11 @@ assert.equal(api.Inspect().rows.length,40);assert.equal(api.Inspect().slots,api.
 assertOnePage('ex');
 assert.equal(images(nodes.CollectionGW2Item_ex_01)[0].image,'s2r://panorama/images/custom_game/collection_portraits_compact_v1/ex_01.vtex','The collection uses its dedicated 128px portrait resource');
 assert.equal(nodes.CollectionGW2GridBody.Children().length,rows.length);assert(nodes.CollectionGW2GridBody.Children().every(card=>card.__collectionItem),'No empty placeholder cells are created');
+const beforeFilterRequests=h.sent.length;
+h.click(nodes.CollectionGW2OwnershipFilter);assert.equal(api.Inspect().ownershipFilter,'owned');assert.equal(nodes.CollectionGW2FilterText.text,'已拥有');assert.equal(api.Inspect().slots,1);assert.equal(api.Inspect().rows[0].id,'ex_01');assert.equal(nodes.CollectionGW2Summary.text,'1 / 40 已收集','Filtering keeps the complete authoritative catalogue summary');assert(nodes.CollectionGW2Draw.enabled);
+h.click(nodes.CollectionGW2OwnershipFilter);assert.equal(api.Inspect().ownershipFilter,'unowned');assert.equal(nodes.CollectionGW2FilterText.text,'未拥有');assert.equal(api.Inspect().slots,39);assert(api.Inspect().rows.every(row=>row.id!=='ex_01'));assert.equal(nodes.CollectionGW2Summary.text,'1 / 40 已收集');assert(nodes.CollectionGW2Draw.enabled,'Ownership filtering never changes ticket eligibility');
+h.click(nodes.CollectionGW2OwnershipFilter);assert.equal(api.Inspect().ownershipFilter,'all');assert.equal(api.Inspect().slots,40);assert.equal(h.sent.length,beforeFilterRequests,'Local ownership filters send neither fetch nor purchase requests');
+h.click(nodes.CollectionGW2OwnershipFilter);api.Select('wife');assert.equal(api.Inspect().ownershipFilter,'all','Changing pools resets a prior local ownership filter');assert.equal(api.Inspect().slots,40);api.Select('ex');assert.equal(api.Inspect().slots,40);
 const cells=nodes.CollectionGW2GridBody.Children().slice(),created=h.counts.created;
 for(let i=11;i<41;i++)snapshot('ex',i,rows);
 assert.equal(h.counts.created,created,'Equal snapshots do not rebuild the actual item cards');assert.deepEqual(nodes.CollectionGW2GridBody.Children(),cells);
@@ -108,7 +113,7 @@ assert.equal(nodes.CollectionGW2Title.style.textShadow,'none','Collection labels
 assert.equal(api.Inspect().rows.length,40,'All collection entries remain visible without search');
 snapshot('friend',42,friendRows);api.Select('friend');assert.equal(api.Inspect().rows.length,40);assert.equal(nodes.CollectionGW2Category.text,'我的前男友');assert.equal(images(nodes.CollectionGW2Item_friend_01)[0].image,'s2r://panorama/images/custom_game/collection_portraits_compact_v1/friend_01.vtex');
 assertOnePage('friend');
-api.Select('ex');h.click(nodes.CollectionGW2Draw);const first=api.Inspect().pending;assert(first&&first.pool_id==='ex');assert.equal(draws().length,1);nodes.CollectionGW2Draw.events.onactivate();assert.equal(draws().length,1,'Double clicks share one draw intent');
+api.Select('ex');h.click(nodes.CollectionGW2Draw);const first=api.Inspect().pending;assert(first&&first.pool_id==='ex');assert.equal(draws().length,1);assert.equal(nodes.CollectionGW2DrawCost.visible,false,'Pending state hides the normal ticket cost');nodes.CollectionGW2Draw.events.onactivate();assert.equal(draws().length,1,'Double clicks share one draw intent');
 api.Select('friend');assert(!nodes.CollectionGW2Draw.enabled,'The pending intent also guards the other pool');api.Close();api.Open('friend');assert(!nodes.CollectionGW2Draw.enabled,'Reopening cannot spend again while a draw is unresolved');
 const old=api,oldDraw=nodes.CollectionGW2Draw.events.onactivate;
 h.load('collection_gw2.js');api=cfg.SurvivalCollection;api.Open('ex');assert.equal(api.Inspect().pending.request_id,first.request_id,'Pending state survives hot reload');oldDraw();old.Open();assert.equal(draws().length,1);
@@ -121,7 +126,8 @@ h.click(nodes.CollectionGW2Draw);const rejected=api.Inspect().pending;ack(reject
 h.click(nodes.CollectionGW2Draw);const concurrent=api.Inspect().pending;ack(concurrent,{ok:true,revision:80});assert(api.Inspect().pending,'A success cannot unlock before its authoritative profile revision');
 const acquired=rows.map((r,i)=>({...r,count:i?0:3}));snapshot('ex',55,acquired,{revision:79,last_draw:{id:'match:social_draw:'+concurrent.request_id,pool_id:'ex',name:'胡桃'}});assert(api.Inspect().pending,'A matching draw name cannot bypass the newer acknowledged profile version');
 snapshot('ex',56,acquired,{revision:80,last_draw:{id:'later-beast-draw',pool_id:'beast',name:'散魂钟'}});assert.equal(api.Inspect().pending,null,'A later blessing draw may replace last_draw without trapping the completed collection intent');
-snapshot('ex',57,[{...acquired[0],count_known:0},...acquired.slice(1)]);assert(nodes.CollectionGW2Item_ex_01.BHasClass('CollectionGW2Unknown'));nodes.CollectionGW2Item_ex_01.events.onmouseover();assert.equal(nodes.CollectionGW2TooltipQuantity.text,'—/60');assert(nodes.CollectionGW2TooltipState.text.includes('状态待同步'));assert(nodes.CollectionGW2Summary.text.includes('已收藏 0 / 40'),'Unknown ownership is not counted as owned');snapshot('ex',58,acquired);
+snapshot('ex',57,[{...acquired[0],count_known:0},...acquired.slice(1)]);assert(nodes.CollectionGW2Item_ex_01.BHasClass('CollectionGW2Unknown'));nodes.CollectionGW2Item_ex_01.events.onmouseover();assert.equal(nodes.CollectionGW2TooltipQuantity.text,'—/60');assert(nodes.CollectionGW2TooltipState.text.includes('状态待同步'));assert.equal(nodes.CollectionGW2Summary.text,'— / 40 已收集','An incomplete ownership total remains explicitly unknown');
+h.click(nodes.CollectionGW2OwnershipFilter);assert.equal(api.Inspect().slots,0,'Unknown counts cannot be presented as owned');assert.equal(nodes.CollectionGW2Empty.text,'暂无已拥有的收藏');assert(nodes.CollectionGW2Draw.enabled,'An empty owned view does not disable an eligible draw');h.click(nodes.CollectionGW2OwnershipFilter);assert.equal(api.Inspect().slots,39,'Unknown counts cannot be presented as unowned');assert(api.Inspect().rows.every(row=>row.id!=='ex_01'));h.click(nodes.CollectionGW2OwnershipFilter);assert.equal(api.Inspect().slots,40);snapshot('ex',58,acquired);
 const requestsBeforeGap=h.sent.length;emit(packet('ex',60,[{path:['rows',1,'count'],value:99}],{delta:1,base_sequence:999}));assert.equal(api.Inspect().rows[0].count,3);h.flushFinite();assert(h.sent.length>requestsBeforeGap);assert.equal(h.sent.at(-1).payload.prefetch,1,'Missing delta baselines request a full authoritative page');
 const many=Array.from({length:113},(_,i)=>({...rows[i%40],id:rows[i%40].id}));snapshot('ex',61,many);assert.equal(api.Inspect().slots,many.length);assert(parseFloat(nodes.CollectionGW2GridBody.style.height)>parseFloat(nodes.CollectionGW2Grid.style.height),'Additional real entries extend the scrolling inventory');
 assert.equal(parseFloat(nodes.CollectionGW2Grid.style.width),842,'Future overflow adds an eight-pixel scrollbar gutter');assert.equal(parseFloat(nodes.CollectionGW2GridBody.style.width),834,'Overflow preserves the ten-column body width');

@@ -6,7 +6,7 @@ const result=spawnSync(process.execPath,[path.join(root,'tools/collection_gw2/pr
 if(result.stdout)process.stdout.write(result.stdout);if(result.stderr)process.stderr.write(result.stderr);assert.equal(result.status,0);
 const manifest=JSON.parse(fs.readFileSync(path.join(pack,'manifest.json'))),aliases={};
 for(const a of manifest.assets){if(a.source.endsWith('.vtex_c'))aliases['s2r://'+a.source.slice(0,-2)]=pathToFileURL(path.join(pack,a.file)).href;}
-const iconNames={close:'24px/x_close.svg',friends:'friends.png',star:'24px/star.svg',rewards:'24px/rewards.svg',trophy:'24px/trophy.svg'};
+const iconNames={close:'24px/x_close.svg',treasure:'24px/treasure.svg',friends:'friends.png',star:'24px/star.svg',rewards:'24px/rewards.svg',trophy:'24px/trophy.svg'};
 for(const [key,file]of Object.entries(iconNames)){const a=manifest.assets.find(a=>a.key===key);assert(a,key);aliases['control_icons/'+file]=pathToFileURL(path.join(pack,a.file)).href;}
 aliases['s2r://panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex']=pathToFileURL(path.join(pack,'assets/native_sources/window.png')).href;
 const file=path.join(out,'index.html'),tag=/<script src="[^"]*tools\/archive_v10\/adapter\.js"><\/script>/;

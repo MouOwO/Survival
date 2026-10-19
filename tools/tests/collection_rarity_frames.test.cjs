@@ -14,13 +14,13 @@ function part(panel,cls){const matches=panel.Children().filter(child=>child.BHas
 function grade(row,quality=row.quality){
  const panel=card(row),color=colors[quality]||'#88939b';
  const frame=part(panel,'CollectionGW2SlotFrame');
- assert.equal(frame.style.border,'1px solid '+color,'The persistent rim identifies '+quality+' in '+api.Inspect().category);
+ assert.equal(frame.style.border,undefined,'Native nine-slice corners are not clipped by an extra border');assert.equal(part(panel,'CollectionGoldQualityRim').style.border,'2px solid '+color,'The independent persistent rim identifies '+quality+' in '+api.Inspect().category);
  assert.equal(frame.__collectionNine.key,'slot');assert.equal(frame.__collectionNine.pieces.length,9,'Native slot artwork retains independent corners');assert.equal(frame.__collectionNine.pieces[4].style.backgroundImage,'none','The rarity rim leaves its portrait uncovered');
  assert.equal(part(panel,'CollectionGW2Hover').style.border,'1px solid '+color,'Hover retains '+quality+' rather than a generic highlight');
  const labels=panel.Children().filter(child=>child.BHasClass('CollectionGW2RarityLabel'));
  assert.equal(labels.length,colors[quality]?1:0,'Only recognized grades receive a rarity label');
  if(colors[quality]){assert.equal(labels[0].text,quality);assert.equal(labels[0].style.color,color);assert(panel.BHasClass('CollectionGW2Quality'+quality));}
- for(const cls of ['CollectionGW2SlotFrame','CollectionGW2Hover']){assert.equal(part(panel,cls).hittest,false);assert.equal(part(panel,cls).hittestchildren,false);}
+ for(const cls of ['CollectionGW2SlotFrame','CollectionGoldQualityRim','CollectionGW2Hover']){assert.equal(part(panel,cls).hittest,false);assert.equal(part(panel,cls).hittestchildren,false);}
  const glow=part(panel,'CollectionGW2RewardGlow');assert.equal(glow.style.position,'2px 2px 0px');assert.equal(glow.style.width,'74px');assert.equal(glow.style.height,'74px','Glass reflection cannot paint the two-pixel rim');
  assert.equal(panel.style.saturation,undefined,'Ownership never grays the rarity rim');assert.equal(panel.style.brightness,undefined);
  return panel;
@@ -28,8 +28,8 @@ function grade(row,quality=row.quality){
 for(const pool of pools){
  api.Open(pool);send(pool);
  for(const row of rows[pool]){
-  const panel=grade(row),rim=part(panel,'CollectionGW2SlotFrame').style.border;
-  panel.events.onmouseover();if(panel.events.onactivate)h.click(panel);assert.equal(part(panel,'CollectionGW2SlotFrame').style.border,rim);assert(!panel.Children().some(child=>child.BHasClass('CollectionGW2SlotSelection')),'Clicking a card cannot leave a selection overlay');
+  const panel=grade(row),rim=part(panel,'CollectionGoldQualityRim').style.border;
+  panel.events.onmouseover();if(panel.events.onactivate)h.click(panel);assert.equal(part(panel,'CollectionGoldQualityRim').style.border,rim);assert(!panel.Children().some(child=>child.BHasClass('CollectionGW2SlotSelection')),'Clicking a card cannot leave a selection overlay');
   assert.equal(panel.BHasClass('CollectionGW2Unowned'),row.count===0);
   assert.equal(panel.BHasClass('CollectionGW2Unavailable'),row.draw_enabled===0);
   if(row.draw_enabled===0){assert.equal(nodes['CollectionGW2Unavailable_'+row.id],undefined,'Unavailable cards retain their rarity label without an adaptation notice');assert(!panel.Children().some(child=>child.text==='待适配'));}
@@ -49,8 +49,9 @@ const css=fs.readFileSync('panorama/src/styles/custom_game/collection_gw2.css','
 for(const state of ['Unowned','Unknown','Unavailable'])assert(new RegExp('\\.CollectionGW2'+state+' \\.CollectionGW2Portrait\\s*\\{[^}]*saturation:').test(css),state+' gray treatment applies solely to the portrait');
 assert(!/\.CollectionGW2(?:Unowned|Unknown|Unavailable)\s*\{/.test(css),'Ownership and availability cannot desaturate the whole card');
 assert(!/\.CollectionGW2Slot:hover\s*\{/.test(css),'Hover does not recolor the rarity rim through card-wide brightness');
-const layer=cls=>Number(css.match(new RegExp('\\.'+cls+'\\s*\\{[^}]*z-index:\\s*(\\d+)'))?.[1]);
+const layer=cls=>Number(css.match(new RegExp('\\.'+cls+'(?:\\s*,[^{}]+)?\\s*\\{[^}]*z-index:\\s*(\\d+)'))?.[1]);
 assert(layer('CollectionGW2SlotFrame')>layer('CollectionGW2RewardGlow'),'The permanent rim stays above the glass surface');
+assert(layer('CollectionGoldQualityRim')>layer('CollectionGW2RewardGlow'),'The independent authoritative quality color stays above the glass surface');
 assert(!/\.CollectionGW2RewardHighlight[^{}]*\{[^}]*(?:border|saturation|brightness)\s*:/.test(css),'Acquisition feedback cannot replace rarity color');
 h.assertCleanDispose(api);
 console.log('COLLECTION_RARITY_FRAMES_PASS: five grades and neutral fallback in all four pools; preserved hover/unowned/pending/unknown/glass states without click selection; server grade refresh, equal-snapshot reuse and reload/disposal');

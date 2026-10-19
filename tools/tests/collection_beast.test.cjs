@@ -27,7 +27,7 @@ emit({...packet(10,rows.slice(0,20)),chunk:1,chunks:2});
 assert.equal(api.Inspect().category,'beast');assert.equal(nodes.CollectionGW2Category.text,'瑞兽赐福');
 assert.equal(api.Inspect().slots,40);assert.equal(nodes.CollectionGW2GridBody.GetChildCount(),40);
 assert.equal(nodes.CollectionGW2GridBody.style.height,nodes.CollectionGW2Grid.style.height,'All forty fit on one page');
-assert(nodes.CollectionGW2Tickets.text.includes('福签：2'));assert(nodes.CollectionGW2Draw.enabled);
+assert.equal(nodes.CollectionGW2CurrencyName.text,'福签');assert.equal(nodes.CollectionGW2Tickets.text,'2');assert.equal(nodes.CollectionGW2DrawCostText.text,String(rule.draw_cost));assert(nodes.CollectionGW2Draw.enabled);
 for(const item of rows){
  const card=nodes['CollectionGW2Item_'+item.id],art=images(card);
  assert.equal(art.length,1);assert.equal(art[0].image,'s2r://panorama/images/custom_game/collection_portraits_compact_v1/'+item.id+'.vtex');
@@ -53,14 +53,14 @@ const last_draw={id:'proof:social_draw:'+intent.request_id,pool_id:'beast',name:
 emit(packet(11,acquired,{revision:20,last_draw}));assert(api.Inspect().pending,'Older inventory cannot satisfy the ACK revision');
 const committed=packet(12,acquired,{revision:21,last_draw});committed.social.tickets=1;emit(committed);
 assert.equal(api.Inspect().pending,null);assert.equal(api.Inspect().rows[0].count,3);
-assert.equal(nodes.CollectionGW2Result.text,'','A committed blessing uses its item highlight rather than a success announcement');assert(nodes['CollectionGW2Item_'+rows[0].id].BHasClass('CollectionGW2RewardHighlight'));assert(nodes.CollectionGW2Tickets.text.includes('福签：1'));
+assert.equal(nodes.CollectionGW2Result.text,'','A committed blessing uses its item highlight rather than a success announcement');assert(nodes['CollectionGW2Item_'+rows[0].id].BHasClass('CollectionGW2RewardHighlight'));assert.equal(nodes.CollectionGW2Tickets.text,'1');
 api.Select('ex');assert.equal(api.Inspect().rows[0].count,1,'A blessing draw does not alter another pool');api.Select('beast');
 emit(packet(11));assert.equal(api.Inspect().rows[0].count,3,'Stale packets cannot undo the acquired reward');
 emit(packet(13,[{path:['rows',1,'count'],value:4},{path:['social','tickets'],value:0}],{delta:1,base_sequence:12}));
 assert.equal(api.Inspect().rows[0].count,4);assert(!nodes.CollectionGW2Draw.enabled,'No tickets disables drawing');
 const before=draws().length;nodes.CollectionGW2Draw.events.onactivate();assert.equal(draws().length,before);
 const full=rows.map(r=>({...r,count:r.target}));emit(packet(14,full));
-assert(!nodes.CollectionGW2Draw.enabled);assert.equal(nodes.CollectionGW2DrawText.text,'已全部集满');
+assert(!nodes.CollectionGW2Draw.enabled);assert.equal(nodes.CollectionGW2DrawText.text,'已全部集满');assert.equal(nodes.CollectionGW2DrawCost.visible,false,'A completed pool shows no spendable ticket cost');
 api.Open('wife');assert.equal(h.sent.at(-1).payload.category_id,'wife');assert.equal(api.Inspect().slots,0);assert(!nodes.CollectionGW2Draw.enabled,'Wife awaits its authoritative snapshot');
 h.assertCleanDispose(api);
 console.log('COLLECTION_BEAST_PASS: forty formal rewards, original caps/art/currency, native trophy tab, unfiltered one-page grid/tooltip, chunk/delta/stale authority, shared pending gate, reload and committed draw');
