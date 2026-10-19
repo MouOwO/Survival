@@ -23,7 +23,7 @@ assert.equal(nodes.CollectionGW2Sidebar.style.backgroundColor,'#191b19d9','The f
 function bounds(node){const [x,y]=node.style.position.split(' ').map(parseFloat);return {x,y,right:x+parseFloat(node.style.width),bottom:y+parseFloat(node.style.height)};}
 assert.deepEqual(Array.from(api.Inspect().canvas),[960,548],'One-page canvas matches the refined black and gold presentation');
 assert.equal(parseFloat(nodes.CollectionGW2Header.style.height),44,'The title band matches the selected fifth refinement');
-assert.equal(parseFloat(nodes.CollectionGW2Title.style.fontSize),25,'The title keeps its refined readable size');
+assert.equal(parseFloat(nodes.CollectionGW2Title.style.fontSize),24,'The title keeps its authored readable size');assert.equal(nodes.CollectionGW2Title.style.fontFamily,'"Source Han Sans SC"','The title uses the bundled UI font instead of a system serif fallback');
 assert(bounds(nodes.CollectionGW2Title).bottom<=bounds(nodes.CollectionGW2Header).bottom,'The smaller title is contained in its band');
 assert(bounds(nodes.CollectionGW2Header).bottom<bounds(nodes.CollectionGW2Sidebar).y,'The framed rail has clearance beneath the header');
 assert(bounds(nodes.CollectionGW2Sidebar).bottom>bounds(nodes.CollectionGW2Footer).y,'The rail continues beside the action footer');
@@ -70,13 +70,14 @@ function assertOnePage(category){
 ['ex','friend','wife'].forEach((id,i)=>{
  const tab=nodes['CollectionGW2Tab_'+id],children=descendants(tab),frame=children.find(n=>n.BHasClass('CollectionGW2TabSelected')),icon=children.find(n=>n.paneltype==='Image'),name=children.find(n=>n.paneltype==='Label');
  assert.equal(parseFloat(tab.style.width),44);assert.equal(parseFloat(tab.style.height),44);
- assert.equal(parseFloat(icon.style.width),21);assert.equal(parseFloat(icon.style.height),21);
- assert.equal(name.text,['前女友','前男友','老婆'][i]);assert.equal(name.style.fontSize,'9px');assert.equal(name.style.textAlign,'center');
+ assert.equal(parseFloat(icon.style.width),id==='ex'?25:24);assert.equal(parseFloat(icon.style.height),24,'Category vectors retain their original 24px artwork height');assert.equal(icon.image,'file://{images}/control_icons/24px/'+({ex:'star.svg',friend:'profile.svg',wife:'rewards.svg'}[id]),'Categories use native vector icons');
+ assert.equal(name.text,['前女友','前男友','老婆'][i]);assert.equal(name.style.fontSize,'12px');assert.equal(name.style.textAlign,'center');
  assertNine(children.find(n=>n.BHasClass('CollectionGoldTabSkin')),'button',[8,6,8,6],true);
  assert(bounds(tab).x>=bounds(nodes.CollectionGW2Sidebar).x&&bounds(tab).right<=bounds(nodes.CollectionGW2Sidebar).right,'Icon buttons stay inside the rail');
  assert(bounds(tab).x+bounds(frame).x>=bounds(nodes.CollectionGW2Sidebar).x,'The narrow selected accent stays within the framed rail');
  assert.equal(typeof tab.events.onmouseover,'function');assert.equal(typeof tab.events.onmouseout,'function');
 });
+for(const [id,font] of [['CollectionGW2FilterText',13],['CollectionGW2Summary',15],['CollectionGW2CurrencyName',15],['CollectionGW2Result',14]]){assert.equal(nodes[id].style.fontSize,font+'px');assert.equal(nodes[id].style.textShadow,'none','Informational labels remain sharp without a diffuse shadow');}
 nodes.CollectionGW2Result.text='服务端返回的完整长错误说明'.repeat(50);assert(bounds(nodes.CollectionGW2Result).right<=bounds(nodes.CollectionGW2Draw).x,'Even a long response is contained before the draw button');assert.equal(nodes.CollectionGW2Result.style.textOverflow,'ellipsis');
 api.Open('wife');assert.equal(h.sent.at(-1).payload.category_id,'wife','Wife requests the authoritative configured pool');assert.equal(h.sent.at(-1).payload.prefetch,1);assert.equal(api.Inspect().slots,0);assert(!nodes.CollectionGW2Draw.enabled);assert.equal(nodes.CollectionGW2Empty.text,'正在读取收藏…');
 assert.equal(nodes.CollectionGW2GridBody.Children().length,0,'Wife never invents ownership while the server response is incomplete');
@@ -157,8 +158,32 @@ emit({...packet('wife',13,wifeAcquired.slice(0,20),{revision:120,last_draw:{id:'
 emit(packet('wife',14,[{path:['rows',1,'count'],value:4}],{delta:1,base_sequence:13}));assert.equal(api.Inspect().rows[0].count,4,'Wife uses the shared authoritative delta cache');snapshot('wife',10,wifeRows);assert.equal(api.Inspect().rows[0].count,4,'Old wife snapshots cannot rewind ownership');
 const wifeGapRequests=h.sent.length;emit(packet('wife',15,[{path:['rows',1,'count'],value:99}],{delta:1,base_sequence:777}));h.flushFinite();assert.equal(api.Inspect().rows[0].count,4);assert(h.sent.length>wifeGapRequests);assert.equal(h.sent.at(-1).payload.category_id,'wife');assert.equal(h.sent.at(-1).payload.prefetch,1,'A wife delta gap requests its full authoritative collection');
 h.assertCleanDispose(api);
+// Exercise the actual shared Fit/ModalShell instead of the lightweight business
+// fixture's Fit stub: Open, tooltip positioning and periodic resizing each fit.
+const fitted=createHarness(),fittedCfg=fitted.cfg,fittedNodes=fitted.nodes,fitCalls=[],adopted=[];
+for(const script of ['common/ui_registry.js','common/ui_components.js','ui_layers.js'])fitted.load(script);
+const realFit=fittedCfg.SurvivalUI.Fit,realAdopt=fittedCfg.SurvivalUI.ModalShell.Adopt;
+fittedCfg.SurvivalUI.Fit=function(panel,root,width,height,options){fitCalls.push({panel,root,width,height,options});return realFit(panel,root,width,height,options);};
+fittedCfg.SurvivalUI.ModalShell.Adopt=function(props){adopted.push(props);return realAdopt(props);};
+fittedCfg.ArchiveHandoff={Icon(){assert.fail('Formal portrait uses its existing resource');},Init(){},Observe(){}};
+for(const script of ['ui_snapshot_cache.js','archive_parchment_data.js','archive_v10_semantics.js','common/archive_tooltip.js','collection_gw2_data.js','collection_gw2.js'])fitted.load(script);
+const fittedApi=fittedCfg.SurvivalCollection;assert.equal(adopted.length,1);const options=adopted[0].fit;
+assert.deepEqual(JSON.parse(JSON.stringify(options)),{widthFraction:.95,heightFraction:.9,maxScale:1});
+let fittedSequence=0;
+for(const [w,height,native] of [[1920,1080,1],[1366,768,1],[2560,1440,4/3],[3840,2160,2],[640,360,1]]){
+ fittedApi.Close();fitted.root.style.width=w+'px';fitted.root.style.height=height+'px';fitted.root.actualuiscale_x=fitted.root.actualuiscale_y=native;fitted.setCursor(0,0);
+ const expected=Math.min(1,w/native*.95/960,height/native*.9/548),expectedTransform='scale3d('+expected+','+expected+',1)';
+ const beforeOpen=fitCalls.length;fittedApi.Open('ex');assert(fitCalls.length>beforeOpen);assert.equal(fittedNodes.CollectionWindow.style.transform,expectedTransform,'Opening preserves original size whenever the real viewport has room');
+ fitted.emit('survival_archive_snapshot',packet('ex',++fittedSequence,[{...rows[0],quality:'SSR'}]));
+ const card=fittedNodes.CollectionGW2Item_ex_01,portrait=images(card)[0],grade=descendants(card).find(node=>node.BHasClass('CollectionGW2RarityLabel'));
+ assert.equal(card.style.width,'78px');assert.equal(card.style.height,'78px');assert.equal(portrait.style.width,'76px');assert.equal(portrait.style.height,'76px');assert.equal(grade.style.fontSize,'11px');assert.equal(grade.style.textShadow,'none','Small rarity text has no resampled shadow');
+ const beforeTooltip=fitCalls.length;card.events.onmouseover();assert(fittedApi.Inspect().tooltipVisible);assert(fitCalls.length>beforeTooltip,'Real tooltip positioning uses the shared Fit');assert.equal(fittedNodes.CollectionWindow.style.transform,expectedTransform,'Tooltip placement cannot restore the old reference magnification');
+ const timerIndex=fitted.scheduled.findIndex(job=>!job.cancelled&&job.delay===.25);assert(timerIndex>=0,'The actual modal maintains its periodic resize fit');const timer=fitted.scheduled.splice(timerIndex,1)[0],beforeTimer=fitCalls.length;timer.fn();assert.equal(fitCalls.length,beforeTimer+1);assert.equal(fittedNodes.CollectionWindow.style.transform,expectedTransform,'Periodic modal fitting cannot restore the old reference magnification');
+}
+assert(fitCalls.every(call=>call.panel===fittedNodes.CollectionWindow&&call.width===960&&call.height===548&&call.options===options),'Shell, Open and tooltip share one capped size-fit policy');
+assert.equal(fitted.sent.filter(event=>event.name==='survival_archive_social_draw').length,0,'Layout and resize checks never request a reward');fitted.assertCleanDispose(fittedApi);
 const formal=require('../collection_gw2/fixture.cjs').fixture(),formalWife=formal.pages.wife;
 assert.equal(formalWife.length,40,'The formal wife fixture retains every video entry');assert.deepEqual(formalWife.map(row=>row.id),Array.from({length:40},(_,i)=>'wife_'+String(i+1).padStart(2,'0')),'Wife cards follow the video positions even when CSV additions are appended');
 assert.deepEqual(formalWife.filter(row=>row.draw_enabled===0).map(row=>row.id),['wife_31','wife_39']);assert.equal(formalWife.filter(row=>row.draw_enabled!==0).length,38);
 assert.equal(formal.social.wife.remaining,formalWife.filter(row=>row.draw_enabled!==0).reduce((sum,row)=>sum+row.target-row.count,0),'Preview draw weight excludes pending adaptation capacities');assert(formalWife.filter(row=>row.draw_enabled===0).every(row=>row.count===0&&!row.description.includes(row.availability_note)&&row.availability_note.includes('不消耗玫瑰')),'Pending entries preserve their separate notice and original description without synthetic ownership');
-console.log('COLLECTION_GW2_PASS: native black and gold nine-piece borders, hidden zero counts, independent inventory, real compact portrait cards, configured wife pool, wife chunk/delta/stale recovery, cross-tab pending and retry-safe hot reload, request/ACK authority and closure');
+console.log('COLLECTION_GW2_PASS: native black and gold nine-piece borders, original-size vectors and portraits, real capped Fit across Open/tooltip/modal resize, hidden zero counts, independent inventory, configured wife pool, chunk/delta/stale recovery, cross-tab pending and retry-safe hot reload, request/ACK authority and closure');

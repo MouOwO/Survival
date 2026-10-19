@@ -8,6 +8,8 @@ const manifest=JSON.parse(fs.readFileSync(path.join(pack,'manifest.json'))),alia
 for(const a of manifest.assets){if(a.source.endsWith('.vtex_c'))aliases['s2r://'+a.source.slice(0,-2)]=pathToFileURL(path.join(pack,a.file)).href;}
 const iconNames={close:'24px/x_close.svg',treasure:'24px/treasure.svg',friends:'friends.png',star:'24px/star.svg',rewards:'24px/rewards.svg',trophy:'24px/trophy.svg'};
 for(const [key,file]of Object.entries(iconNames)){const a=manifest.assets.find(a=>a.key===key);assert(a,key);aliases['control_icons/'+file]=pathToFileURL(path.join(pack,a.file)).href;}
+// Exact official 24px profile.svg; the game uses the built-in vector directly.
+aliases['control_icons/24px/profile.svg']=pathToFileURL(path.join(pack,'assets/profile.svg')).href;
 aliases['s2r://panorama/images/events/dark_carnival/overworld/inner_panel_border_png.vtex']=pathToFileURL(path.join(pack,'assets/native_sources/window.png')).href;
 const file=path.join(out,'index.html'),tag=/<script src="[^"]*tools\/archive_v10\/adapter\.js"><\/script>/;
 let html=fs.readFileSync(file,'utf8');assert(tag.test(html));

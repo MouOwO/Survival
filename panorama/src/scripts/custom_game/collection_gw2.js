@@ -3,7 +3,7 @@
 var cfg=GameUI.CustomUIConfig(),U=cfg.SurvivalUI,A=cfg.ArchiveHandoff,root=$.GetContextPanel();
 if(!U||!A)return;
 if(cfg.SurvivalCollection&&cfg.SurvivalCollection.Dispose)cfg.SurvivalCollection.Dispose();
-var size=[960,548],fitReference=[1200,778],life=U.Lifecycle(),viewLife=U.Lifecycle(),highlightLife=U.Lifecycle();
+var size=[960,548],fitOptions={widthFraction:.95,heightFraction:.9,maxScale:1},life=U.Lifecycle(),viewLife=U.Lifecycle(),highlightLife=U.Lifecycle();
 var columns=10,slotSize=78,portraitSize=76,pitch=84,rowsPerPage=4;
 var gridWidth=(columns-1)*pitch+slotSize,gridHeight=(rowsPerPage-1)*pitch+slotSize;
 // Intent and authoritative caches outlive an individual layout/script instance.
@@ -55,7 +55,7 @@ var win=p("CollectionWindow"),scrim=p("CollectionScrim");
 if(!valid(scrim)){scrim=make("Button",root,"CollectionScrim","ArchiveHidden");createdRoots.push(scrim);}
 if(!valid(win)){win=make("Panel",root,"CollectionWindow","ArchiveHidden");createdRoots.push(win);}
 win.AddClass("CollectionGW2Page");
-var shell=U.ModalShell.Adopt({id:"collection",panel:win,root:root,scrim:scrim,width:size[0],height:size[1],fit:{reference:fitReference.slice()},onClose:close});
+var shell=U.ModalShell.Adopt({id:"collection",panel:win,root:root,scrim:scrim,width:size[0],height:size[1],fit:fitOptions,onClose:close});
 style(scrim,{backgroundColor:"#00000022"});
 // ModalShell establishes input/layer ownership and writes its generic fallback.
 // The opaque surface also covers the source texture's partially transparent pixels.
@@ -68,47 +68,47 @@ var sidebar=make("Panel",canvas,"CollectionGW2Sidebar","CollectionGW2FlatRegion"
 nine(sidebar,"frame",0,0,54,size[1]-68,"CollectionGoldRailFrame");
 var footer=make("Panel",canvas,"CollectionGW2Footer","CollectionGW2FlatRegion");rect(footer,80,size[1]-68,size[0]-120,68);style(footer,{backgroundImage:"none",backgroundColor:"transparent",borderTop:"1px solid #92764255"});footer.hittest=false;
 var windowFrame=nine(canvas,"frame",0,0,size[0],size[1],"CollectionGoldWindowFrame");
-image(canvas,"file://{images}/control_icons/24px/treasure.svg",21,18,23,23,"CollectionGW2Mark");
-var title=label(canvas,"收藏",54,14,70,30,25,"#f0e5c9","CollectionGW2Title");style(title,{fontFamily:'"SimSun"',letterSpacing:"3px",fontWeight:"semi-bold"});
+image(canvas,"file://{images}/control_icons/24px/treasure.svg",21,17,24,24,"CollectionGW2Mark");
+var title=label(canvas,"收藏",54,14,70,30,24,"#f0e5c9","CollectionGW2Title");style(title,{letterSpacing:"2px",fontWeight:"semi-bold"});
 var divider=make("Panel",canvas,"CollectionGW2HeaderDivider");rect(divider,139,20,1,18);style(divider,{backgroundColor:"#ac8e4d49"});divider.hittest=false;
-label(canvas,"",157,19,300,22,15,"#b8aa88","CollectionGW2Category");
+label(canvas,"",157,18,300,24,16,"#b8aa88","CollectionGW2Category");
 var closeButton=make("Button",canvas,"CollectionGW2Close","CollectionGW2Button");rect(closeButton,size[0]-39,14,28,28);style(closeButton,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});
 nine(closeButton,"button",0,0,28,28,"CollectionGoldQuietControl");
-image(closeButton,"file://{images}/control_icons/24px/x_close.svg",6,6,16,16,"CollectionGW2CloseIcon");
+image(closeButton,"file://{images}/control_icons/24px/x_close.svg",2,2,24,24,"CollectionGW2CloseIcon");
 closeButton.hittestchildren=false;closeButton.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("button");});
 scrim.SetPanelEvent("onactivate",function(){if(alive())shell.RequestClose("scrim");});
 Object.keys(names).forEach(function(id,i){
  var tab=make("Button",canvas,"CollectionGW2Tab_"+id,"CollectionGW2Tab");rect(tab,13,68+i*54,44,44);style(tab,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});tab.hittestchildren=false;
  nine(tab,"button",0,0,44,44,"CollectionGoldTabSkin");
  var selectedArt=make("Panel",tab,"","CollectionGW2TabSelected");rect(selectedArt,-4,10,2,24);style(selectedArt,{backgroundColor:"#debc6f"});selectedArt.hittest=false;
- image(tab,"file://{images}/control_icons/"+({ex:"24px/star.svg",friend:"friends.png",wife:"24px/rewards.svg",beast:"24px/trophy.svg"}[id]),11,4,21,21,"","CollectionGoldTabIcon");
- tab.__collectionName=label(tab,shortNames[id],0,28,44,13,9,"#9f957c");style(tab.__collectionName,{textAlign:"center"});
+ image(tab,"file://{images}/control_icons/24px/"+({ex:"star.svg",friend:"profile.svg",wife:"rewards.svg",beast:"trophy.svg"}[id]),10,3,id==="ex"?25:24,24,"","CollectionGoldTabIcon");
+ tab.__collectionName=label(tab,shortNames[id],0,28,44,16,12,"#9f957c");style(tab.__collectionName,{textAlign:"center"});
  tab.SetPanelEvent("onactivate",function(){if(alive())select(id);});
  tab.SetPanelEvent("onmouseover",function(){if(alive()&&opened)$.DispatchEvent("DOTAShowTextTooltip",tab,names[id]);});tab.SetPanelEvent("onmouseout",function(){$.DispatchEvent("DOTAHideTextTooltip");});tabs[id]=tab;
 });
 var filter=make("Button",canvas,"CollectionGW2OwnershipFilter","CollectionGW2Button");rect(filter,789,65,125,27);filter.hittestchildren=false;
 nine(filter,"button",0,0,125,27,"CollectionGoldQuietControl");
-label(filter,filterNames[0],11,5,91,18,11,"#eee5ce","CollectionGW2FilterText");label(filter,"▾",104,5,12,18,11,"#c8b88d");
+label(filter,filterNames[0],11,4,91,20,13,"#eee5ce","CollectionGW2FilterText");label(filter,"▾",104,4,12,20,13,"#c8b88d");
 filter.SetPanelEvent("onactivate",function(){if(!alive()||!opened)return;ownershipFilter=(ownershipFilter+1)%filterNames.length;clearRewardHighlight();grid.ScrollToTop();hideTooltip();render();});
 grid=make("Panel",canvas,"CollectionGW2Grid","CollectionGW2Grid");rect(grid,80,108,gridWidth,gridHeight);
 gridBody=make("Panel",grid,"CollectionGW2GridBody","CollectionGW2GridBody");rect(gridBody,0,0,gridWidth,gridHeight);
 empty=label(canvas,"",80,210,gridWidth,54,19,"#c4c7c6","CollectionGW2Empty");style(empty,{whiteSpace:"normal",textAlign:"center"});empty.visible=false;
-summary=label(canvas,"",80,70,600,22,13,"#debc6f","CollectionGW2Summary");
+summary=label(canvas,"",80,68,600,24,15,"#debc6f","CollectionGW2Summary");
 image(canvas,"s2r://panorama/images/icon_ticket_png.vtex",80,size[1]-44,24,20,"CollectionGW2TicketIcon");
-currencyName=label(canvas,"",111,size[1]-44,72,22,13,"#aa9c7e","CollectionGW2CurrencyName");
+currencyName=label(canvas,"",111,size[1]-45,72,24,15,"#aa9c7e","CollectionGW2CurrencyName");
 tickets=label(canvas,"",188,size[1]-49,100,30,18,"#debc6f","CollectionGW2Tickets");
-result=label(canvas,"",300,size[1]-43,420,26,12,"#a5987c","CollectionGW2Result");
+result=label(canvas,"",300,size[1]-44,420,26,14,"#a5987c","CollectionGW2Result");
 draw=make("Button",canvas,"CollectionGW2Draw","CollectionGW2Button CollectionGW2Draw");rect(draw,size[0]-216,size[1]-54,176,40);style(draw,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none"});draw.hittestchildren=false;
 nine(draw,"button",0,0,176,40,"CollectionGoldPrimary");
 var drawHover=make("Panel",draw,"","CollectionGW2Hover");rect(drawHover,0,0,176,40);style(drawHover,{backgroundColor:"#fff1bf0c",border:"1px solid #e8ce8555"});drawHover.hittest=false;
 drawText=label(draw,"抽取",24,9,64,24,17,"#fff0ca","CollectionGW2DrawText");style(drawText,{textAlign:"center",textShadow:"0px 1px 2px #1a1208"});
 drawCost=make("Panel",draw,"CollectionGW2DrawCost");rect(drawCost,104,10,52,22);drawCost.hittest=false;drawCost.hittestchildren=false;
 image(drawCost,"s2r://panorama/images/icon_ticket_png.vtex",0,1,21,18,"CollectionGW2DrawTicketIcon");
-label(drawCost,"—",27,0,25,22,14,"#fff0ca","CollectionGW2DrawCostText");
+label(drawCost,"—",27,0,25,22,15,"#fff0ca","CollectionGW2DrawCostText");
 draw.SetPanelEvent("onactivate",drawOne);
 tooltip=cfg.SurvivalArchiveTooltip.Create({parent:canvas,root:root,idPrefix:"CollectionGW2Tooltip",compact:true,collectionRarity:true,isAlive:alive,isActive:function(){return opened;},
  skin:{backing:{file:"s2r://panorama/images/hud/reborn/bg_tooltip_psd.vtex",size:[500,452],nine_slice_ltrb:[12,12,12,12],edge_ltrb:[6,6,6,6]},frame:{file:goldArt.frame.uri,size:goldArt.frame.size,nine_slice_ltrb:goldArt.frame.cut,edge_ltrb:[8,8,8,8],fill:false}},
- getScale:function(){scale=Number(U.Fit(win,root,size[0],size[1],{reference:fitReference.slice()}))||1;return scale;},
+ getScale:function(){scale=Number(U.Fit(win,root,size[0],size[1],fitOptions))||1;return scale;},
  getBounds:function(){return {width:size[0],height:size[1]};},categoryName:function(id){return names[id]||id;},maxHeight:size[1]-72,watchAnchor:true,
  position:function(info){var x=info.anchor.x+slotSize+8;if(x+info.width>info.bounds.width-8)x=info.anchor.x-info.width-8;return {x:Math.max(8,Math.min(info.bounds.width-info.width-8,x)),y:Math.max(48,Math.min(info.bounds.height-info.height-8,info.anchor.y))};}
 });
@@ -168,7 +168,7 @@ function renderCards(rows){
   nine(card,"slot",0,0,slotSize,slotSize,"CollectionGW2SlotFrame");
   var rim=make("Panel",card,"","CollectionGoldQualityRim");rect(rim,0,0,slotSize,slotSize);style(rim,{border:"2px solid "+grade.color});rim.hittest=false;rim.hittestchildren=false;
   var hover=make("Panel",card,"","CollectionGW2Hover");rect(hover,3,3,slotSize-6,slotSize-6);style(hover,{backgroundImage:"none",backgroundColor:"transparent",border:"1px solid "+grade.color});hover.hittest=false;hover.hittestchildren=false;
-  if(grade.quality){var gradeWidth=grade.quality.length===3?30:grade.quality.length===2?24:17,gradeLabel=label(card,grade.quality,slotSize-gradeWidth-3,2,gradeWidth,15,10,grade.color);gradeLabel.AddClass("CollectionGW2RarityLabel");style(gradeLabel,{textAlign:"center",fontWeight:"bold",backgroundColor:"transparent",textShadow:"0px 1px 2px #000000"});}
+  if(grade.quality){var gradeWidth=grade.quality.length===3?30:grade.quality.length===2?24:17,gradeLabel=label(card,grade.quality,slotSize-gradeWidth-3,2,gradeWidth,16,11,grade.color);gradeLabel.AddClass("CollectionGW2RarityLabel");style(gradeLabel,{textAlign:"center",fontWeight:"bold",backgroundColor:"transparent",textShadow:"none"});}
   var quantity=label(card,countKnown(item)?number(item.count):"—",4,slotSize-19,slotSize-8,18,12,"#f0eee0");quantity.AddClass("CollectionGW2CardLabel");quantity.visible=!countKnown(item)||Number(item.count)>0;style(quantity,{textAlign:"right"});bindCard(card,item);
   var glow=make("Panel",card,"","CollectionGW2RewardGlow");glow.AddClass("RewardGlassSurface");rect(glow,2,2,slotSize-4,slotSize-4);glow.hittest=false;glow.hittestchildren=false;
   card.__collectionRewardGlow=glow;
@@ -250,7 +250,7 @@ function recoverIntent(){
  });
 }
 function select(id){if(!alive()||!names[id])return;clearRewardHighlight();current=id;ownershipFilter=0;grid.ScrollToTop();hideTooltip();render();if(opened&&!shared.pages[id])request(true);}
-function open(id){if(!alive())return;var wasOpen=opened;if(id&&names[id]&&id!==current){clearRewardHighlight();current=id;ownershipFilter=0;grid.ScrollToTop();}if(cfg.SurvivalArchive&&cfg.SurvivalArchive.IsOpen&&cfg.SurvivalArchive.IsOpen())cfg.SurvivalArchive.Close();opened=true;win.RemoveClass("ArchiveHidden");scrim.RemoveClass("ArchiveHidden");shell.Open();scale=Number(U.Fit(win,root,size[0],size[1],{reference:fitReference.slice()}))||1;render();request(!shared.pages[current]||Object.keys(resync).length>0);if(!wasOpen)recoverIntent();}
+function open(id){if(!alive())return;var wasOpen=opened;if(id&&names[id]&&id!==current){clearRewardHighlight();current=id;ownershipFilter=0;grid.ScrollToTop();}if(cfg.SurvivalArchive&&cfg.SurvivalArchive.IsOpen&&cfg.SurvivalArchive.IsOpen())cfg.SurvivalArchive.Close();opened=true;win.RemoveClass("ArchiveHidden");scrim.RemoveClass("ArchiveHidden");shell.Open();scale=Number(U.Fit(win,root,size[0],size[1],fitOptions))||1;render();request(!shared.pages[current]||Object.keys(resync).length>0);if(!wasOpen)recoverIntent();}
 function close(){if(!active)return;opened=false;clearRewardHighlight();hideTooltip();viewLife.Cancel();if(valid(win)){shell.Close();win.AddClass("ArchiveHidden");}if(valid(scrim))scrim.AddClass("ArchiveHidden");$.DispatchEvent("DOTAHideTextTooltip");}
 function dispose(){if(!active)return;close();active=false;highlightLife.Dispose();life.Dispose();viewLife.Dispose();shell.Dispose();if(tooltip)tooltip.Dispose();if(valid(canvas))canvas.DeleteAsync(0);createdRoots.forEach(function(n){if(valid(n))n.DeleteAsync(0);});if(valid(win))win.RemoveClass("CollectionGW2Page");}
 api=cfg.SurvivalCollection={Open:open,Close:close,Toggle:function(){if(alive()){if(opened)close();else open();}},Select:select,IsOpen:function(){return alive()&&opened;},Dispose:dispose,Inspect:function(){return {open:opened,layout:"collection_gw2",canvas:size.slice(),columns:columns,portraitSize:portraitSize,category:current,search:"",ownershipFilter:["all","owned","unowned"][ownershipFilter],rows:visibleRows.map(function(item){return {id:item.id,name:item.name,count:item.count,target:item.target};}),slots:slots.length,drawEnabled:!!draw.enabled,pending:shared.pending?copy(shared.pending):null,versions:copy(shared.versions),tooltipVisible:tooltip&&tooltip.IsVisible()};}};
