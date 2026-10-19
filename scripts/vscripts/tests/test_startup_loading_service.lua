@@ -59,10 +59,11 @@ local function fixture(count, settings)
     }
     modules.profiles = {
         get_profile = function(id) return profiles[id] end,
-        get_progression = function(id)
+        get_progression = function(id, selected_mode)
             local record = authenticated[id]
             if record and modules.profiles.is_authenticated_for_account(id, tostring(humans[id].account)) then
-                return record.progression
+                return { loaded = true, clear_counts = selected_mode == "rich"
+                    and record.progression.rich_clear_counts or record.progression.clear_counts }
             end
         end,
         is_authenticated_for_account = function(id, account)
@@ -122,10 +123,11 @@ local function fixture(count, settings)
     if settings ~= false then service.init(settings or {}) end
     return service
 end
-local function success(request, counts)
+local function success(request, counts, rich_counts)
     local response = { ok = true, authenticated = true, account_id = request.account,
         match_session_id = request.session,
-        progression = { loaded = true, clear_counts = counts or {}, highest_difficulty = 0 } }
+        progression = { loaded = true, clear_counts = counts or {},
+            rich_clear_counts = rich_counts or {}, highest_difficulty = 0 } }
     authenticated[request.id] = response
     pending[request.id] = false
     request.callback(response)
@@ -159,19 +161,33 @@ local admitted, playable = 0, 0
 local choosing = fixture(2, { on_ready = function() admitted = admitted + 1 end })
 choosing.gameplay_gate(function() playable = playable + 1 end)
 assert(#requests == 2 and #profile_requests == 0 and not choosing.snapshot().setup.mode_selected)
+assert(not choosing.snapshot().setup.difficulty_data_ready)
 select_mode(choosing, "pure")
 assert(not choosing.snapshot().setup.mode_selected and #profile_requests == 0,
     "even the host cannot choose a mode before admission")
 assert(responses[#responses].payload.error == "admission_not_complete")
 assets_done() ui(choosing, 0) ui(choosing, 1)
 assert(not choosing.is_ready(), "UI flags never replace backend authentication")
-success(requests[1], { n5 = 1 }) success(requests[2], { n6 = 1 }) choosing.tick()
+success(requests[1], { n5 = 1, n6 = 1 }) choosing.tick()
+assert(not choosing.snapshot().setup.difficulty_data_ready,
+    "the host's loaded progression never substitutes for an unknown teammate")
+success(requests[2], { n5 = 1 }) choosing.tick()
 assert_admitted(choosing)
 assert(admitted == 1 and playable == 0 and not choosing.is_gameplay_ready())
 assert(not choosing.snapshot().profiles_ready and not choosing.is_player_ready(0) and #profile_requests == 0)
 local options = choosing.snapshot().setup.difficulty_options
 assert(options[6].unlocked == 1 and options[7].unlocked == 0,
-    "difficulty choices use authenticated host progression before mode-profile loading")
+    "difficulty choices use the lowest teammate before mode-profile loading")
+local preloaded = choosing.snapshot().setup
+assert(preloaded.difficulty_data_ready and preloaded.max_difficulty_id == "N6")
+assert(not preloaded.can_confirm_difficulty, "mode is still required before difficulty confirmation")
+assert(preloaded.difficulty_limit_player_ids[1] == 1)
+assert(preloaded.difficulty_options_by_mode.standard[6].unlocked == 1
+    and preloaded.difficulty_options_by_mode.pure[6].unlocked == 1
+    and preloaded.difficulty_options_by_mode.rich[6].unlocked == 0,
+    "all mode previews are loaded before the first mode click, including independent rich progress")
+assert(#profile_requests == 0 and #requests == 2 and profiles[0] == nil and profiles[1] == nil,
+    "difficulty preload neither repeats HTTP nor applies a gameplay profile")
 local selection_session = choosing.snapshot().session_id
 select_mode(choosing, "pure", 1)
 assert(not choosing.snapshot().setup.mode_selected and responses[#responses].payload.error == "selection_not_host")
@@ -179,6 +195,9 @@ select_mode(choosing, "pure", 0, "old-session")
 assert(not choosing.snapshot().setup.mode_selected and #profile_requests == 0)
 select_mode(choosing, "pure")
 assert(choosing.snapshot().setup.mode_id == "pure" and #profile_requests == 2)
+assert(choosing.snapshot().setup.can_confirm_difficulty and choosing.is_difficulty_selection_ready(0))
+assert(not choosing.is_player_ready(0) and not choosing.is_gameplay_ready(),
+    "difficulty is immediately confirmable while login still gates every gameplay action")
 assert(choosing.snapshot().session_id == selection_session and admitted == 1 and #requests == 2)
 select_mode(choosing, "standard")
 assert(choosing.snapshot().setup.mode_id == "pure" and responses[#responses].payload.error == "mode_locked")
@@ -197,6 +216,31 @@ choosing.init({})
 assert(not choosing.snapshot().setup.mode_selected and not choosing.is_ready() and not choosing.is_gameplay_ready())
 assert(profiles[0] == saved_profile, "new session does not reset the profile service")
 assert(not choosing.is_player_ready(0), "old match profiles cannot satisfy a new session")
+
+-- The lowest non-host teammate stays in the permission roster after admission.
+-- Neither disconnect/invalid engine slot nor missing trusted authentication can
+-- turn that player into a higher unlocked cap for the remaining host.
+local frozen = fixture(2)
+success(requests[1], { n5 = 1, n9 = 1 }) success(requests[2], { n5 = 1 })
+assets_done() ui(frozen, 0) ui(frozen, 1)
+assert_admitted(frozen)
+assert(frozen.snapshot().setup.max_difficulty_id == "N6"
+    and frozen.snapshot().setup.difficulty_limit_player_ids[1] == 1)
+local roster = frozen.selection_player_ids()
+roster[2] = nil
+assert(#frozen.selection_player_ids() == 2, "callers cannot mutate the frozen roster")
+disconnected[1], humans[1].valid = true, false
+frozen.tick()
+assert(#frozen.selection_player_ids() == 2 and frozen.snapshot().setup.difficulty_data_ready)
+assert(frozen.snapshot().setup.max_difficulty_id == "N6"
+    and frozen.snapshot().setup.difficulty_options[10].unlocked == 0)
+authenticated[1] = nil
+frozen.tick()
+assert(not frozen.snapshot().setup.difficulty_data_ready
+    and frozen.snapshot().setup.max_difficulty_id == ""
+    and frozen.snapshot().setup.difficulty_options[10].unlocked == 0,
+    "unknown teammate progression fails closed instead of falling back to the host")
+assert(#requests == 2 and #profile_requests == 0)
 
 -- A loading-screen handshake can arrive before the engine has assigned every
 -- lobby human a PlayerResource slot. Do not latch the first client's roster.
@@ -267,10 +311,12 @@ assert(not service.is_player_ready(2) and not service.is_player_ready(0.5))
 local reconnect_profile = profiles[1]
 disconnected[1] = true
 assert(not service.is_player_ready(1) and service.is_ready(), "a disconnected actor cannot use the released global gate")
+assert(not service.is_difficulty_selection_ready(1), "disconnect also revokes the setup-only gate")
 disconnected[1] = false
 assert(service.is_player_ready(1), "same-account reconnect keeps its authenticated save")
 humans[1].account, profiles[1] = 9000, { account_id = "9000", revision = 1 }
 assert(not service.is_player_ready(1), "a new account cannot inherit an admitted player slot")
+assert(not service.is_difficulty_selection_ready(1), "setup permissions are still bound to the authenticated account")
 humans[1].account = 1001
 assert(not service.is_player_ready(1), "the live profile must still match the locked account")
 profiles[1] = nil
@@ -655,6 +701,9 @@ assert_admitted(event_native)
 lifecycle()
 assert(emitted == 0, 'admission alone must not start waves or builder/game timers')
 select_mode(event_native, 'standard')
+assert(event_native.is_difficulty_selection_ready(0) and not event_native.is_gameplay_ready())
+lifecycle()
+assert(emitted == 0, 'opening the setup-only difficulty gate never releases GAME_STARTED')
 profile_success(profile_requests[1]) event_native.tick()
 assert(emitted == 0, 'a single mode profile cannot release GAME_STARTED')
 profile_success(profile_requests[2]) event_native.tick()

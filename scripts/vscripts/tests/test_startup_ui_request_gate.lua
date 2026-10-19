@@ -3,6 +3,7 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 
 local listeners, packets, admitted = {}, {}, {}
+local selection_ready = {}
 local defeated = {}
 package.loaded["systems/multiplayer_player_service"] = {
     is_defeated = function(id) return defeated[id] == true end,
@@ -20,6 +21,7 @@ CustomGameEventManager = {
 }
 package.loaded["systems/startup_loading_service"] = {
     is_player_ready = function(id) return admitted[id] == true end,
+    is_difficulty_selection_ready = function(id) return selection_ready[id] == true or admitted[id] == true end,
 }
 for _, name in ipairs({ "systems/building_system", "ui/weapon_synthesis_snapshot_service",
     "ui/combat_stat_projection", "config/asset_catalog", "systems/hero_summon_projection",
@@ -102,6 +104,21 @@ end
 -- A valid connected engine player is not sufficient during loading.
 invoke_all(0)
 no_effects()
+
+-- The authenticated mode/difficulty setup gate can open before mode login.
+-- It permits exactly the setup request and its reply; private full snapshots,
+-- construction and ticket/inventory mutations still wait for gameplay readiness.
+selection_ready[0] = true
+invoke_all(0)
+assert(calls.difficulty == 1 and calls.place == 0 and calls.build == 0
+    and calls.draw == 0 and calls.exchange == 0)
+assert(tickets == 5 and permanent_items == 0 and wood == 100 and cooldown == 0)
+assert(#packets == 1 and packets[1].name == "ui_difficulty_select_result" and packets[1].payload.success == 1,
+    "the early successful selection must be acknowledged without exposing gameplay packets")
+listeners.ui_request_full_snapshot(nil, { PlayerID = 0, request_id = "too-early" })
+assert(#packets == 1, "setup admission does not open the private gameplay snapshot")
+-- Start the full-gameplay phase with fresh observation counters.
+calls.difficulty, packets, selection_ready[0] = 0, {}, nil
 
 -- The established player is admitted; an engine-valid late entrant is still
 -- outside this match's authenticated frozen roster and cannot act through UI.

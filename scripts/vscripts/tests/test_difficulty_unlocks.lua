@@ -46,6 +46,7 @@ package.loaded["systems/player_context_service"] = {
 }
 local mode, selector, loaded_profile = nil, 0, {}
 local admitted = { [0] = true, [1] = true }
+local gameplay_ready = true
 local setup = {
     get_mode = function() return mode end,
     get_session_id = function() return "test-match" end,
@@ -55,7 +56,9 @@ local setup = {
 }
 package.loaded["systems/match_setup_service"] = setup
 package.loaded["systems/startup_loading_service"] = {
-    is_player_ready = function(id) return admitted[id] == true end,
+    is_player_ready = function(id) return gameplay_ready and admitted[id] == true end,
+    is_difficulty_selection_ready = function(id) return admitted[id] == true end,
+    selection_player_ids = function() return { 0, 1 } end,
 }
 package.loaded["systems/player_profile_service"] = {
     get_progression = function(id) return loaded_profile[id] end,
@@ -70,12 +73,12 @@ local function request(id, player_id, extra)
     return assert(bus.request(events.WAVE_DIFFICULTY_SET_REQUEST, payload))
 end
 local function snapshot() return assert(bus.request(events.WAVE_STATE_GET_REQUEST, {})) end
-local function restart()
+local function restart(before_gameplay)
     bus.reset()
     scheduled, published = {}, nil
     wave.init()
     bus.subscribe(events.WAVE_CHANGED, function(data) published = data end)
-    bus.emit(events.GAME_STARTED, {})
+    if not before_gameplay then bus.emit(events.GAME_STARTED, {}) end
 end
 
 loaded_profile[0], loaded_profile[1] = fresh, progression({ n5 = 1, n9 = 1 })
@@ -99,6 +102,10 @@ admitted[0] = true
 loaded_profile[0] = nil
 assert(request("N1", 0).error == "profile_not_loaded", "unknown save is never an empty successful save")
 loaded_profile[0] = fresh
+loaded_profile[1] = nil
+assert(request("N1", 0).error == "profile_not_loaded", "a missing non-host save also fails closed")
+assert(not snapshot().difficulty_data_ready and snapshot().max_difficulty_id == "")
+loaded_profile[1] = progression({ n5 = 1, n9 = 1 })
 assert(request("N5", 0).ok)
 assert(snapshot().difficulty_id == "N5" and snapshot().status == "countdown")
 local countdown = scheduled.wave_countdown
@@ -120,13 +127,49 @@ assert(request("N6", 0).ok and snapshot().game_mode == "pure",
 restart()
 assert(snapshot().difficulty_options[6].unlocked == 1 and request("N6", 0).ok)
 
--- Permissions follow the server's chosen player, not the first loaded or most
--- advanced profile. Internal Tools callers retain their explicit debug API.
+-- Changing the host never lets a veteran bypass the least advanced teammate.
+-- Even a temporarily missing active-player slot remains in the frozen roster.
 selector = 1
 restart()
-assert(published.selector_player_id == 1 and published.difficulty_options[10].unlocked == 1)
+assert(published.selector_player_id == 1 and published.difficulty_options[10].unlocked == 0)
+assert(published.max_difficulty_id == "N6" and published.difficulty_limit_player_ids[1] == 0)
 assert(request("N10", 0).error == "difficulty_selector_required")
-assert(request("N10", 1).ok)
+assert(request("N10", 1).error == "difficulty_not_unlocked")
+package.loaded["systems/player_context_service"].active_player_ids = function() return { 1 } end
+admitted[0] = false
+wave.refresh_selection("teammate_disconnected")
+assert(snapshot().difficulty_options[10].unlocked == 0,
+    "disconnected low-progress teammate cannot disappear from the permission roster")
+assert(request("N10", 1, { player_ids = { 1 }, progression = loaded_profile[1] }).error == "difficulty_not_unlocked")
+loaded_profile[0] = nil
+assert(request("N6", 1).error == "profile_not_loaded", "unknown teammate cannot raise the cap")
+loaded_profile[0], admitted[0] = progression({ n5 = 1 }), true
+assert(request("N6", 1).ok)
+
+-- Every teammate can eventually unlock a higher option through real progress.
+restart()
+loaded_profile[0] = progression({ n5 = 1, n9 = 1 })
+bus.emit(events.PLAYER_PROFILE_CHANGED, { player_id = 0 })
+assert(published.difficulty_options[10].unlocked == 1 and request("N10", 1).ok)
+
+-- Authentication is enough to record difficulty while full mode login waits.
+-- The real wave controller cannot start countdown until GAME_STARTED arrives.
+gameplay_ready = false
+restart(true)
+assert(snapshot().can_confirm_difficulty and not snapshot().game_started)
+assert(request("N6", 1).ok)
+assert(snapshot().difficulty_selected and snapshot().difficulty_id == "N6")
+assert(wave.selection_snapshot().difficulty_selected and wave.selection_snapshot().difficulty_id == "N6",
+    "loading can publish the confirmed setup without exposing a gameplay snapshot")
+assert(not snapshot().game_started and snapshot().status ~= "countdown" and scheduled.wave_countdown == nil,
+    "early difficulty confirmation must not start waves before the gameplay gate")
+assert(request("N6", 1).ok and scheduled.wave_countdown == nil,
+    "retries cannot manufacture an early gameplay start")
+gameplay_ready = true
+bus.emit(events.GAME_STARTED, {})
+assert(snapshot().status == "countdown" and scheduled.wave_countdown ~= nil,
+    "the held gameplay event starts the previously chosen difficulty exactly once")
+-- Internal Tools callers retain their explicit debug API.
 mode, loaded_profile[0] = nil, nil
 restart()
 assert(wave.set_difficulty("N10"), "existing internal Tools selection remains available")

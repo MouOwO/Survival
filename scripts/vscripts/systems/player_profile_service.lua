@@ -925,8 +925,10 @@ function M.get_account_profile(player_id)
     return copy(account_profiles_by_player[tonumber(player_id)] or profile)
 end
 
-function M.get_progression(player_id)
-    local profile = M.get_profile(player_id)
+function M.get_progression(player_id, mode)
+    -- Startup publishes every mode preview each tick. Read only the permission
+    -- subsection rather than copying the entire private gameplay save for each.
+    local profile = loaded_profile(player_id)
     local result = not profile and M.get_authenticated_progression(player_id)
         or profile and profile.progression and copy(profile.progression) or nil
     if not result and profile and injected_provider then
@@ -936,7 +938,7 @@ function M.get_progression(player_id)
             rich_clear_counts = copy(archive.rich_clear_counts or {}) }
     end
     local setup = require("systems/match_setup_service")
-    if result and setup.get_mode() == "rich" then
+    if result and (mode or setup.get_mode()) == "rich" then
         result.clear_counts = copy(result.rich_clear_counts or {})
     end
     return result

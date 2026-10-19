@@ -156,9 +156,14 @@
         tooltip.SetPanelEvent("onmouseover",function(){if(tooltipOverflows())cancelTooltipHide();else if(tipDismiss)tipDismiss.Dismiss();});
         tooltip.SetPanelEvent("onmouseout",function(){if(!requestTooltipHide(false))hideTooltip();});
         surface(header,"LotteryGW2HeaderDivider",[110,20,1,34],"#a7c9a344");
-        view.title=label(header,"LotteryGW2Title","抽奖",129,10,560,51,34,"#f1eadb");
-        view.back=button(header,"LotteryGW2Back","返回",function(){if(mode)invoke("CloseInfo");else invoke("Close");}); place(view.back,22,16,82,46);
-        place(view.back.Children()[0],24,0,54,46);style(view.back.Children()[0],{horizontalAlign:"left",verticalAlign:"top",fontSize:"22px"});nativeArt(view.back,"LotteryGW2BackIcon","s2r://panorama/images/control_icons/arrow_solid_left_png.vtex",4,13,12,20);
+        // Natural glyph boxes share the header's 37px center line. Fixed label
+        // heights and native shrink make the arrow/caption appear misaligned.
+        view.title=label(header,"LotteryGW2Title","抽奖",129,0,560,74,34,"#f1eadb");
+        style(view.title,{height:"fit-children",verticalAlign:"center",fontWeight:"medium",whiteSpace:"nowrap",textOverflow:"clip",textShadow:"none",transform:"none"});
+        view.back=button(header,"LotteryGW2Back","返回",function(){if(mode)invoke("CloseInfo");else invoke("Close");});place(view.back,22,15,82,44);
+        var backCaption=view.back.Children()[0];place(backCaption,24,0,54,44);
+        style(backCaption,{height:"fit-children",horizontalAlign:"left",verticalAlign:"center",fontSize:"22px",fontWeight:"medium",whiteSpace:"nowrap",textOverflow:"clip",textShadow:"none",transform:"none"});
+        var backIcon=nativeArt(view.back,"LotteryGW2BackIcon","s2r://panorama/images/control_icons/arrow_solid_left_png.vtex",4,12,12,20);style(backIcon,{backgroundSize:"contain",backgroundPosition:"center"});
         view.ticket=label(header,"LotteryGW2TicketBalance","抽奖券 —",708,21,340,34,25,"#e6dfd0");
         style(view.ticket,{whiteSpace:"nowrap",textOverflow:"shrink"});
         view.ticketHost=make("Panel",header,"LotteryGW2TicketCurrency");place(view.ticketHost,1139,8,384,58);style(view.ticketHost,{flowChildren:"none",overflow:"clip"});view.ticketHost.hittest=false;view.ticketHost.hittestchildren=true;

@@ -228,11 +228,33 @@ local function publish(value)
     end
 end
 
+function M.selection_player_ids()
+    local ids = {}
+    for id in pairs(entries) do ids[#ids + 1] = id end
+    table.sort(ids)
+    return ids
+end
+
 local function setup_snapshot()
-    local value = match_setup.snapshot()
-    local progression = type(profiles.get_progression) == "function"
-        and profiles.get_progression(value.selector_player_id) or nil
-    value.difficulty_options = require("config/difficulty_config").client_options(progression)
+    local value, by_mode = match_setup.snapshot(), {}
+    local difficulty = require("systems/team_difficulty_service")
+    local ids = M.selection_player_ids()
+    -- Authentication already fetched all progression maps before mode choice.
+    -- Publish every preview now; choosing a mode never needs a progression HTTP
+    -- request or a combat profile in order to show the team's difficulty limit.
+    for _, mode in ipairs({ "standard", "pure", "rich" }) do by_mode[mode] = difficulty.snapshot(ids, mode) end
+    local current = by_mode[value.mode_id] or by_mode.standard
+    value.difficulty_options_by_mode = { standard = by_mode.standard.options,
+        pure = by_mode.pure.options, rich = by_mode.rich.options }
+    value.difficulty_options = current.options
+    value.difficulty_data_ready = current.ready
+    value.max_difficulty_id = current.max_difficulty_id
+    value.difficulty_limit_player_ids = current.limit_player_ids
+    value.can_confirm_difficulty = M.is_difficulty_selection_ready(value.selector_player_id)
+    local waves = package.loaded["systems/wave_system"]
+    local selection = waves and type(waves.selection_snapshot) == "function" and waves.selection_snapshot() or {}
+    value.difficulty_selected = selection.difficulty_selected == true
+    value.difficulty_id = value.difficulty_selected and selection.difficulty_id or ""
     return value
 end
 
@@ -395,13 +417,26 @@ function M.is_ready() return initialized and released end
 function M.is_party_waiting() return M.is_native_team_setup() end
 function M.is_native_team_setup() return initialized and native_setup_pending() end
 function M.is_gameplay_ready() return initialized and gameplay_released end
-function M.is_player_ready(value)
-    if not M.is_gameplay_ready() then return false end
+local function admitted_entry(value)
+    if not M.is_ready() then return nil end
     local id = player_id(value)
     local entry = id ~= nil and entries[id] or nil
-    if not entry or not entry.ready or not entry.account or not human(id) or not connected(id) then return false end
+    if not entry or not entry.ready or not entry.account or not human(id) or not connected(id) then return nil end
     local steam = tonumber(resource("GetSteamAccountID", id))
-    if not steam or steam <= 0 or string.format("%.0f", steam) ~= entry.account then return false end
+    if not steam or steam <= 0 or string.format("%.0f", steam) ~= entry.account then return nil end
+    return id, entry
+end
+function M.is_difficulty_selection_ready(value)
+    local id, entry = admitted_entry(value)
+    if not entry or not match_setup.is_mode_selected() or match_setup.get_mode() == "fishing" then return false end
+    if type(profiles.is_authenticated_for_account) ~= "function"
+        or not profiles.is_authenticated_for_account(id, entry.account) then return false end
+    return require("systems/team_difficulty_service").current(match_setup.get_mode()).ready
+end
+function M.is_player_ready(value)
+    if not M.is_gameplay_ready() then return false end
+    local id, entry = admitted_entry(value)
+    if not entry then return false end
     if not match_setup.is_mode_selected() then return false end
     if type(profiles.is_loaded_for_account) == "function" then
         return profiles.is_loaded_for_account(id, entry.account)

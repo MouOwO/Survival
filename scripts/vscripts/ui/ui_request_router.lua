@@ -239,15 +239,21 @@ local function unit_combat_snapshot(unit)
     })
 end
 
-local function valid_player_id(player_id, allow_defeated)
+local function valid_player_id(player_id, allow_defeated, difficulty_selection)
     if player_id == nil or player_id < 0 or not PlayerResource:IsValidPlayerID(player_id) then
         return false
     end
     if not allow_defeated and require("systems/player_context_service").is_defeated(player_id) then return false end
     -- Custom events bypass engine unit-order filters. Hold all gameplay UI
-    -- requests (difficulty, building, rewards, etc.) behind the same barrier.
+    -- requests (building, rewards, etc.) behind the same barrier. Choosing a
+    -- difficulty only records match setup and has its own authenticated gate;
+    -- GAME_STARTED remains withheld until every gameplay profile is loaded.
     -- Loading handshakes/retries have their own listener outside this router.
     local loading = package.loaded["systems/startup_loading_service"]
+    if loading and difficulty_selection then
+        return type(loading.is_difficulty_selection_ready) == "function"
+            and loading.is_difficulty_selection_ready(player_id) == true
+    end
     return not loading or loading.is_player_ready(player_id)
 end
 
@@ -257,8 +263,8 @@ local function source_player_id(payload)
     return tonumber(payload and payload.PlayerID)
 end
 
-local function send_to_player(event_name, player_id, payload)
-    if not valid_player_id(player_id, true) then return end
+local function send_to_player(event_name, player_id, payload, difficulty_selection)
+    if not valid_player_id(player_id, true, difficulty_selection) then return end
     local player = PlayerResource:GetPlayer(player_id)
     if player then
         CustomGameEventManager:Send_ServerToPlayer(player, event_name, payload)
@@ -546,7 +552,7 @@ local function register_difficulty_select_request()
         "ui_difficulty_select_request",
         function(_, payload)
             local player_id = source_player_id(payload)
-            if not valid_player_id(player_id) then return end
+            if not valid_player_id(player_id, false, true) then return end
             local result, request_error = event_bus.request(
                 events.WAVE_DIFFICULTY_SET_REQUEST,
                 {
@@ -561,7 +567,7 @@ local function register_difficulty_select_request()
                 difficulty_id = result and result.difficulty_id or "",
                 total_waves = result and result.total_waves or 0,
                 error = result and result.error or request_error or "",
-            })
+            }, true)
         end
     )
 end

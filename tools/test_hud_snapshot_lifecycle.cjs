@@ -118,18 +118,17 @@ function create({hasSnapshot=true,builder=true,admitted=true,tools=false,registe
  const h=harness({hud:true,loadSharedUI:true,state:{sequence:1,resources:{},wave},
   startupState:ready({admission_complete:true,profiles_ready:true,setup:mode})});
  h.advance(.11);
- h.nodes.MatchModeOptions.children[0].events.onactivate();
- const oldConfirm=h.nodes.DifficultySelectionConfirm.events.onactivate;
- oldConfirm();oldConfirm();
+ const oldModeAction=h.nodes.MatchModeOptions.children[0].events.onactivate;
+ oldModeAction();oldModeAction();oldModeAction();
  assert.equal(h.requests.filter(r=>r.name==="survival_loading_mode_select").length,1,"mode confirmation still sends one original business request");
  h.emit("survival_loading_mode_result",{success:1,mode_id:"pure"});
  const difficulty=h.nodes.DifficultySelectionButtons.children.find(p=>p.BHasClass("DifficultyOptionButton"));
- difficulty.events.onactivate();h.nodes.DifficultySelectionConfirm.events.onactivate();
+ difficulty.events.onactivate();difficulty.events.onactivate();
  assert.equal(h.requests.filter(r=>r.name==="ui_difficulty_select_request").length,1,"difficulty action keeps its original endpoint");
  h.emit("survival_ui_private_snapshot",{sequence:3,resources:{},wave:{...wave,mode_selected:true,difficulty_selected:true,difficulty_id:"N1"}});
  assert(h.nodes.DifficultySelectionOverlay.BHasClass("DifficultySelectionHidden"),"confirmed authoritative difficulty closes the same modal");
  vm.runInContext(production,h.context);const requests=h.requests.length;
- oldConfirm();assert.equal(h.requests.length,requests,"retired confirmation action cannot send into the replacement context");
+ oldModeAction();assert.equal(h.requests.length,requests,"retired mode action cannot send into the replacement context");
 }
 {
  const h=create();assert.equal(h.commandAttempts.length,0,"non-Tools HUD registers no diagnostic command");

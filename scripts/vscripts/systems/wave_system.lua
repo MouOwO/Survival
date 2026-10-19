@@ -425,19 +425,15 @@ local function selection_context()
     if not ok or type(setup) ~= "table" then return nil, nil, nil end
     local selector = type(setup.selector_player_id) == "function"
         and setup.selector_player_id() or nil
-    local progression
-    local loaded, profiles = pcall(require, "systems/player_profile_service")
-    if loaded and type(profiles.get_progression) == "function" and selector ~= nil then
-        progression = profiles.get_progression(selector)
-    end
-    return setup, selector, progression
+    local permission = require("systems/team_difficulty_service").current(setup.get_mode())
+    return setup, selector, permission
 end
 
 local function refresh_selection_state()
     -- Selection is immutable once combat can start. Enemy spawn/death publishes
     -- must not repeatedly deep-copy a private account profile for UI permissions.
     if difficulty_selected and state.mode_selected ~= nil then return end
-    local setup, selector, progression = selection_context()
+    local setup, selector, permission = selection_context()
     state.mode_selected = setup ~= nil and type(setup.is_mode_selected) == "function"
         and setup.is_mode_selected() == true
     state.game_mode = state.mode_selected and setup.get_mode() or ""
@@ -449,9 +445,12 @@ local function refresh_selection_state()
         return
     end
     local startup = package.loaded["systems/startup_loading_service"]
-    state.can_confirm_difficulty = startup ~= nil and type(startup.is_gameplay_ready) == "function"
-        and startup.is_gameplay_ready() == true
-    state.difficulty_options = difficulty_config.client_options(progression)
+    state.can_confirm_difficulty = startup ~= nil and type(startup.is_difficulty_selection_ready) == "function"
+        and startup.is_difficulty_selection_ready(selector) == true and permission ~= nil and permission.ready == true
+    state.difficulty_options = permission and permission.options or difficulty_config.client_options()
+    state.difficulty_data_ready = permission ~= nil and permission.ready == true
+    state.max_difficulty_id = permission and permission.max_difficulty_id or ""
+    state.difficulty_limit_player_ids = permission and permission.limit_player_ids or {}
     if game_started and not difficulty_selected then
         state.status = state.mode_selected and "selecting_difficulty" or "selecting_mode"
         state.timer = 0
@@ -1269,6 +1268,9 @@ local function get_wave_state(payload)
         selector_player_id = state.selector_player_id,
         can_confirm_difficulty = state.can_confirm_difficulty,
         difficulty_options = state.difficulty_options,
+        difficulty_data_ready = state.difficulty_data_ready,
+        max_difficulty_id = state.max_difficulty_id,
+        difficulty_limit_player_ids = state.difficulty_limit_player_ids,
         current_wave = state.current_wave,
         total_waves = state.total_waves,
         player_id = player_id,
@@ -1861,7 +1863,7 @@ end
 local function set_difficulty_request(payload)
     local id = tostring(payload and payload.difficulty_id or "")
     local player_id = tonumber(payload and payload.player_id)
-    local setup = selection_context()
+    local setup, _, permission = selection_context()
     if not setup or type(setup.is_mode_selected) ~= "function"
         or setup.is_mode_selected() ~= true then
         return { ok = false, error = "mode_not_selected" }
@@ -1871,20 +1873,21 @@ local function set_difficulty_request(payload)
         return { ok = false, error = "difficulty_selector_required" }
     end
     local loaded, startup = pcall(require, "systems/startup_loading_service")
-    if not loaded or type(startup.is_player_ready) ~= "function"
-        or startup.is_player_ready(player_id) ~= true then
+    if not loaded or type(startup.is_difficulty_selection_ready) ~= "function"
+        or startup.is_difficulty_selection_ready(player_id) ~= true then
         return { ok = false, error = "player_not_ready" }
     end
-    local profile_ok, profiles = pcall(require, "systems/player_profile_service")
-    local progression = profile_ok and type(profiles.get_progression) == "function"
-        and profiles.get_progression(player_id) or nil
-    if type(progression) ~= "table" or progression.loaded ~= true then
+    if not permission or not permission.ready then
         return { ok = false, error = "profile_not_loaded" }
     end
     if not difficulty_config.get(id) then
         return { ok = false, error = "difficulty_not_found" }
     end
-    if not difficulty_config.is_unlocked(id, progression) then
+    local unlocked = false
+    for _, option in ipairs(permission.options) do
+        if option.difficulty_id == id and option.unlocked == 1 then unlocked = true break end
+    end
+    if not unlocked then
         return { ok = false, error = "difficulty_not_unlocked" }
     end
     local ok, error_code = M.set_difficulty(id)
@@ -1899,6 +1902,10 @@ function M.refresh_selection(reason)
 end
 
 function M.get_difficulty() return difficulty_id end
+function M.selection_snapshot()
+    return { difficulty_selected = difficulty_selected,
+        difficulty_id = difficulty_selected and difficulty_id or "" }
+end
 function M.current_wave_number() return tonumber(state.current_wave) or 0 end
 
 function M.get_player_spawn_marker(player_id)

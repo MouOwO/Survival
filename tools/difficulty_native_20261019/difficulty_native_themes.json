@@ -1,0 +1,365 @@
+{
+  "kind": "read_only_five_native_difficulty_skin_combinations",
+  "at": "2026-10-19T07:21:37.619Z",
+  "productionModified": false,
+  "gameVerified": false,
+  "sharedGeometry": {
+    "dialog": [
+      275,
+      670
+    ],
+    "sidePadding": 16,
+    "rowHeight": 46,
+    "rowGap": 6,
+    "textShadow": "none on opaque control labels",
+    "fontFamily": "Source Han Sans SC",
+    "fontWeight": "medium",
+    "layout": "Real existing single-column ten-difficulty list; do not change event or unlock logic"
+  },
+  "themes": [
+    {
+      "id": "reborn",
+      "name": "Reborn 铁灰",
+      "panel": {
+        "resource": "panorama/images/hud/reborn/bg_hud_inspect_psd.vtex_c",
+        "uri": "s2r://panorama/images/hud/reborn/bg_hud_inspect_psd.vtex",
+        "path": "output/lottery_reborn_refine_20261019/assets/hud__reborn__bg_hud_inspect_psd.png",
+        "filename": "hud__reborn__bg_hud_inspect_psd.png",
+        "width": 1040,
+        "height": 660,
+        "sha256": "7e8e090f792c0e0c394093b767c95b88ebb8dac65563f969973e373967111c83",
+        "pngSha256": "27c9202294d4affa17bc596d5ec78004fad226576cbfe4d1648079ce68a13263",
+        "method": "Exact installed Valve texture decoded by Source2Viewer, no repaint or color edits",
+        "usage": {
+          "kind": "background",
+          "size": "cover"
+        }
+      },
+      "normal": {
+        "resource": "panorama/images/gray_button_off_png.vtex_c",
+        "uri": "s2r://panorama/images/gray_button_off_png.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/gray_button_off_png.png",
+        "filename": "gray_button_off_png.png",
+        "width": 269,
+        "height": 33,
+        "sha256": "1d033e91038a5e7f12b34f3667ee1f7ab75a2704e70351c9d3cc8d8558444e4d",
+        "pngSha256": "0813920d8f9a737a6a2fb82039cab4b3be05d7f8a6bf55ab85f4970c02ffdd4e",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "nine-slice",
+          "slice": 5,
+          "width": 5,
+          "fill": true,
+          "suggested": true
+        }
+      },
+      "selected": {
+        "resource": "panorama/images/gray_button_on_png.vtex_c",
+        "uri": "s2r://panorama/images/gray_button_on_png.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/gray_button_on_png.png",
+        "filename": "gray_button_on_png.png",
+        "width": 269,
+        "height": 33,
+        "sha256": "21a3fac918aed7f42501e3bc4a372cb29e66c9b59252a789288c656fa1b88dd6",
+        "pngSha256": "262087130d712d0e70f999a49acc3ffc783b85e0a85445dd2e939449220b5e10",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "nine-slice",
+          "slice": 5,
+          "width": 5,
+          "fill": true,
+          "suggested": true
+        }
+      },
+      "hover": {
+        "brightness": 1.12
+      },
+      "selection": {
+        "leftStripe": "2px #bacbd3",
+        "text": "#f1f4f5"
+      },
+      "note": "Default. Native dark metallic rectangular rows; restrained thin silver edge."
+    },
+    {
+      "id": "dota_plus",
+      "name": "Dota Plus 铸金",
+      "panel": {
+        "resource": "panorama/images/dota_plus/dota_plus_bg_psd.vtex_c",
+        "uri": "s2r://panorama/images/dota_plus/dota_plus_bg_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/dota_plus__dota_plus_bg_psd.png",
+        "filename": "dota_plus__dota_plus_bg_psd.png",
+        "width": 1206,
+        "height": 842,
+        "sha256": "060c29819d8586b6e2e4dfaa5b3232ba34e7e2724a9d5cbc2737bf3f4755858d",
+        "pngSha256": "7ee4292770cdea812ab8a2516d6c57d54f214fe1738ceaf727edb54f635b24df",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "background",
+          "size": "cover",
+          "position": "center"
+        }
+      },
+      "normal": {
+        "resource": "panorama/images/gray_button_off_png.vtex_c",
+        "uri": "s2r://panorama/images/gray_button_off_png.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/gray_button_off_png.png",
+        "filename": "gray_button_off_png.png",
+        "width": 269,
+        "height": 33,
+        "sha256": "1d033e91038a5e7f12b34f3667ee1f7ab75a2704e70351c9d3cc8d8558444e4d",
+        "pngSha256": "0813920d8f9a737a6a2fb82039cab4b3be05d7f8a6bf55ab85f4970c02ffdd4e",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "nine-slice",
+          "slice": 5,
+          "width": 5,
+          "fill": true,
+          "suggested": true
+        }
+      },
+      "selected": {
+        "resource": "panorama/images/dota_plus/weekly_reward_button_psd.vtex_c",
+        "uri": "s2r://panorama/images/dota_plus/weekly_reward_button_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/dota_plus__weekly_reward_button_psd.png",
+        "filename": "dota_plus__weekly_reward_button_psd.png",
+        "width": 488,
+        "height": 56,
+        "sha256": "226f32dc9a27eec61e295512b92478e22cb2ca239d223c4d2b307e91b6a82f2e",
+        "pngSha256": "50e7f90d7f93b5146edda8679c683b592d759685996e45ae06083098ee5a65a2",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "nine-slice",
+          "slice": 8,
+          "width": 8,
+          "fill": true,
+          "suggested": true
+        }
+      },
+      "hover": {
+        "brightness": 1.1
+      },
+      "selection": {
+        "leftStripe": "2px #cfb973",
+        "text": "#f5e7ba"
+      },
+      "note": "Native engraved stone backdrop and gold long-bar selected control. Do not use column_button: it contains a large white plus."
+    },
+    {
+      "id": "crownfall",
+      "name": "Crownfall 深靛金",
+      "panel": {
+        "resource": "panorama/images/hud/reborn/bg_tooltip_no_bevel_psd.vtex_c",
+        "uri": "s2r://panorama/images/hud/reborn/bg_tooltip_no_bevel_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/hud__reborn__bg_tooltip_no_bevel_psd.png",
+        "filename": "hud__reborn__bg_tooltip_no_bevel_psd.png",
+        "width": 500,
+        "height": 452,
+        "sha256": "5b2fdc2c2a8ad59ffea4a47d5ceb695376500a3217bd9125d25c92c4b1845da7",
+        "pngSha256": "366ab371e61f6d6642b0e87181e9ed797a3de1b253289dd5e75348daab1a6fd6",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "background",
+          "size": "100% 100%"
+        }
+      },
+      "normal": {
+        "resource": "panorama/images/events/crownfall/buttons/tab_background_png.vtex_c",
+        "uri": "s2r://panorama/images/events/crownfall/buttons/tab_background_png.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/events__crownfall__buttons__tab_background_png.png",
+        "filename": "events__crownfall__buttons__tab_background_png.png",
+        "width": 441,
+        "height": 84,
+        "sha256": "a933958978ebcce09ef534523b7bb6f944d4c6966817ed4799395f26237adf86",
+        "pngSha256": "51e944ed724c45b3ac54cb7b3bab6a6a0a24295fe86f0c8b1b7dee0b71cc0c1f",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "background",
+          "size": "100% 100%",
+          "target": [
+            243,
+            46
+          ],
+          "aspectRatioErrorPercent": 0.7
+        }
+      },
+      "selected": {
+        "resource": "panorama/images/events/crownfall/buttons/tab_background_png.vtex_c",
+        "uri": "s2r://panorama/images/events/crownfall/buttons/tab_background_png.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/events__crownfall__buttons__tab_background_png.png",
+        "filename": "events__crownfall__buttons__tab_background_png.png",
+        "width": 441,
+        "height": 84,
+        "sha256": "a933958978ebcce09ef534523b7bb6f944d4c6966817ed4799395f26237adf86",
+        "pngSha256": "51e944ed724c45b3ac54cb7b3bab6a6a0a24295fe86f0c8b1b7dee0b71cc0c1f",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "background",
+          "size": "100% 100%",
+          "target": [
+            243,
+            46
+          ],
+          "brightness": 1.3
+        }
+      },
+      "hover": {
+        "brightness": 1.16
+      },
+      "selection": {
+        "leftStripe": "none",
+        "text": "#fff1c4"
+      },
+      "note": "441x84 long hexagonal tab is nearly uniform scale at243x46. Do not use the much taller280x112 tabs_background here. Existing resources support navy/gold, not a paper theme."
+    },
+    {
+      "id": "international",
+      "name": "TI 乌木晶体",
+      "panel": {
+        "resource": "panorama/images/hud/reborn/bg_scoreboard_psd.vtex_c",
+        "uri": "s2r://panorama/images/hud/reborn/bg_scoreboard_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/hud__reborn__bg_scoreboard_psd.png",
+        "filename": "hud__reborn__bg_scoreboard_psd.png",
+        "width": 826,
+        "height": 906,
+        "sha256": "b596748ed8d7ca52b9c4f1d4b204fd16fab7d4d6dabccbd205b44b4ebd378b08",
+        "pngSha256": "718bb487e7e31e597d9410897c9be709c2b461ebde4748fa3ff67830e7f14e64",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "background",
+          "size": "cover"
+        }
+      },
+      "normal": {
+        "resource": "panorama/images/hud/reborn/hud_custom_ti12/shop_launcher_button_psd.vtex_c",
+        "uri": "s2r://panorama/images/hud/reborn/hud_custom_ti12/shop_launcher_button_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/hud__reborn__hud_custom_ti12__shop_launcher_button_psd.png",
+        "filename": "hud__reborn__hud_custom_ti12__shop_launcher_button_psd.png",
+        "width": 144,
+        "height": 44,
+        "sha256": "f0e30a1ae9447d7f21ec9526f79f7570afc116a35050258a84b9c40300bbb825",
+        "pngSha256": "94f7f33d8485f0d76d8fe0d08d4def9b88c05082d2d19e58940c18c78501ce4d",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "nine-slice",
+          "slice": 6,
+          "width": 6,
+          "fill": true,
+          "suggested": true
+        }
+      },
+      "selected": {
+        "resource": "panorama/images/hud/reborn/hud_custom_ti12/shop_launcher_button_psd.vtex_c",
+        "uri": "s2r://panorama/images/hud/reborn/hud_custom_ti12/shop_launcher_button_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/hud__reborn__hud_custom_ti12__shop_launcher_button_psd.png",
+        "filename": "hud__reborn__hud_custom_ti12__shop_launcher_button_psd.png",
+        "width": 144,
+        "height": 44,
+        "sha256": "f0e30a1ae9447d7f21ec9526f79f7570afc116a35050258a84b9c40300bbb825",
+        "pngSha256": "94f7f33d8485f0d76d8fe0d08d4def9b88c05082d2d19e58940c18c78501ce4d",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "nine-slice",
+          "slice": 6,
+          "width": 6,
+          "fill": true,
+          "suggested": true,
+          "brightness": 1.5
+        }
+      },
+      "accent": {
+        "resource": "panorama/images/compendium/international2023/rewardpage_outerborder_psd.vtex_c",
+        "uri": "s2r://panorama/images/compendium/international2023/rewardpage_outerborder_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/compendium__international2023__rewardpage_outerborder_psd.png",
+        "filename": "compendium__international2023__rewardpage_outerborder_psd.png",
+        "width": 582,
+        "height": 438,
+        "sha256": "184fbfb080d9633509ac2a55cff1db9fa6076678c5fe84b27df9b3ade13ebec9",
+        "pngSha256": "76e7a182e56529fa6ecd775ccf453855a1ed979187de01eb12181a540a609671",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "nine-slice-frame",
+          "slice": 32,
+          "width": 6,
+          "fill": false,
+          "suggested": true,
+          "scope": "Only small selected-control accent or header; avoid thick full-height window frame."
+        }
+      },
+      "hover": {
+        "brightness": 1.15
+      },
+      "selection": {
+        "leftStripe": "2px #86c9dc",
+        "text": "#d5f6ff"
+      },
+      "note": "The TI12 button is ebony. The actual TI2023 crystal outer border is cyan/blue, and inner border is magenta; neither is silver/gold. Keep these original pixels and label the look accurately."
+    },
+    {
+      "id": "darkmoon",
+      "name": "Dark Moon 暮紫玻璃",
+      "panel": {
+        "resource": "panorama/images/hud/reborn/bg_tooltip_psd.vtex_c",
+        "uri": "s2r://panorama/images/hud/reborn/bg_tooltip_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/hud__reborn__bg_tooltip_psd.png",
+        "filename": "hud__reborn__bg_tooltip_psd.png",
+        "width": 500,
+        "height": 452,
+        "sha256": "09451cdaf0523567eb092820d13eb4dfcdf8ca0bcd8584006befffcee9b3a9cc",
+        "pngSha256": "fc223245ed5ef0a21c528b887af2a4df4e470edf79ee5a35a009f28d08ca2ff1",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "background",
+          "size": "100% 100%"
+        }
+      },
+      "normal": {
+        "resource": "panorama/images/textures/glassbutton_darkmoon_psd.vtex_c",
+        "uri": "s2r://panorama/images/textures/glassbutton_darkmoon_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/textures__glassbutton_darkmoon_psd.png",
+        "filename": "textures__glassbutton_darkmoon_psd.png",
+        "width": 290,
+        "height": 59,
+        "sha256": "1ccea13b423767f88f0a027914ce1008f7b3727ef8b70d43b5a980e70383a77a",
+        "pngSha256": "a026effc78f164d05b26fcd2f6f0c9ee52888632e90738fef437642b8fa4d987",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "background",
+          "size": "100% 100%",
+          "target": [
+            243,
+            48
+          ]
+        }
+      },
+      "selected": {
+        "resource": "panorama/images/textures/glassbutton_darkmoon_hover_psd.vtex_c",
+        "uri": "s2r://panorama/images/textures/glassbutton_darkmoon_hover_psd.vtex",
+        "path": "output/lottery_native_concepts_20261019/assets/textures__glassbutton_darkmoon_hover_psd.png",
+        "filename": "textures__glassbutton_darkmoon_hover_psd.png",
+        "width": 290,
+        "height": 59,
+        "sha256": "cf8d39d2b3cb5d9e08b873d040c2e7089e3306693145ce9643ec1f2cbb211f1f",
+        "pngSha256": "6a9f7eb0a5be049f9aee5399eb8e637d20b18faef73154ca1cc5d92a38b89b2e",
+        "method": "Exact installed Valve VPK texture decoded by Source2Viewer; no crop, repaint or color alteration",
+        "usage": {
+          "kind": "background",
+          "size": "100% 100%",
+          "target": [
+            243,
+            48
+          ]
+        }
+      },
+      "hover": {
+        "brightness": 1.12
+      },
+      "selection": {
+        "leftStripe": "2px #b9a6df",
+        "text": "#f0e9ff"
+      },
+      "note": "This exact native texture is purple/black glass, not blue-gray. Its alpha shadow has a lower tail, so inspect label optical centering in the full row."
+    }
+  ],
+  "sliceNotice": "All numeric slice suggestions in this file are material-adaptation recommendations, not claimed official Valve declarations. HTML border-image-slice must be unitless. Panorama slices may use px.",
+  "validation": "Each referenced PNG SHA256 was compared against the exact installed Valve texture export manifest. No images were recolored, redrawn or newly generated."
+}

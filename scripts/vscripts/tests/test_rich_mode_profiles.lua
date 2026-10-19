@@ -51,6 +51,12 @@ assert(setup.select_mode(0,"rich",setup.get_session_id()).error=="rich_mode_lock
 -- A fresh session cannot reuse the previously authenticated account binding.
 setup.init("rich-profile-session-two")
 auth({loaded=true,clear_counts={n10=1,n5=12},standard_clear_counts={n10=1},rich_clear_counts={}})
+local auth_requests = #requests
+assert(difficulty.is_unlocked("N6", profiles.get_progression(0, "standard")))
+assert(difficulty.is_unlocked("N6", profiles.get_progression(0, "pure")))
+assert(not difficulty.is_unlocked("N6", profiles.get_progression(0, "rich")))
+assert(#requests == auth_requests and profiles.get_profile(0) == nil,
+    "all difficulty previews use startup authentication before mode/login, without applying bonuses")
 local external=profiles.get_authenticated_progression(0);external.standard_clear_counts.n10=0
 assert(setup.snapshot().mode_options[4].unlocked==1,"returned permissions are copied")
 account=9000000456
@@ -70,6 +76,9 @@ assert(profiles.get_profile(0).save.gameplay_stats.initial_wood==777,"rich inher
 assert(profiles.get_profile(0).save.content_inventory.old_item==2)
 assert(difficulty.is_unlocked("N6",profiles.get_progression(0)))
 assert(not difficulty.is_unlocked("N7",profiles.get_progression(0)))
+assert(profiles.get_progression(0, "standard").clear_counts.n5 == 12
+    and profiles.get_progression(0, "rich").clear_counts.n5 == 1,
+    "explicit previews retain independent maps after the rich profile loads")
 setup.init("rich-profile-session-three")
 assert(not profiles.supports_rich_mode(0),"capability cannot transfer to a different match session")
 auth({loaded=true,clear_counts={},standard_clear_counts={n10="1"},rich_clear_counts={}})

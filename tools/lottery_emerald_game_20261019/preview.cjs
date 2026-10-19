@@ -32,7 +32,7 @@ replaceObject('window.PREVIEW_ASSET_PATHS=',';window.PREVIEW_BASELINE=',assets=>
 // these exact registered s2r backgrounds; the production scripts stay intact.
 const adapterTag='<script src="'+pathToFileURL(path.join(repo,'tools/archive_v10/adapter.js')).href+'"></script>';
 if(!html.includes(adapterTag))throw Error('Reusable browser adapter entry unavailable');
-html=html.replace(adapterTag,adapterTag+'<script>const lotteryNativeCSSValue=cssValue;cssValue=function(value){return lotteryNativeCSSValue(typeof value==="string"?value.replace(/s2r:\\/\\/panorama\\/images\\/[^"\')\\s]+/g,uri=>PREVIEW_ASSET_PATHS[uri]||uri):value);};</script>');
+html=html.replace(adapterTag,adapterTag+'<script>const lotteryNativeCSSValue=cssValue;cssValue=function(value){if(value==="medium")return "500";return lotteryNativeCSSValue(typeof value==="string"?value.replace(/s2r:\\/\\/panorama\\/images\\/[^"\')\\s]+/g,uri=>PREVIEW_ASSET_PATHS[uri]||uri):value);};</script>');
 const stateUrl=pathToFileURL(path.join(repo,'tools/menus_v10/state.js')).href,newState=pathToFileURL(path.join(__dirname,'state.js')).href;
 if(!html.includes('<script src="'+stateUrl+'"></script>'))throw Error('Reusable state entry unavailable');
 html=html.replace('<script src="'+stateUrl+'"></script>','<script src="'+newState+'"></script>').replace(/<title>[^<]*<\/title>/,'<title>最终抽奖 · 生产组件离线预览</title>').replace(/(<div id="PreviewCaption">)[\s\S]*?(<\/div>)/,'$1最终抽奖 · 实际 XML / JS / CSS · CSV 奖池 · 余额/资格为离线样例 · 无游戏或账户连接$2');
@@ -44,10 +44,15 @@ const maskPath='art/ui/sources/custom_game/lottery_final_v1/scene_blend.svg',mas
 if(maskBytes)html=html.replace('window.PREVIEW_BASELINE=','window.LOTTERY_PREVIEW_MASK_URI='+JSON.stringify('data:image/svg+xml;base64,'+maskBytes.toString('base64'))+';window.PREVIEW_BASELINE=');
 // The production font registry has both faces. Load the existing medium font in
 // this browser adapter too; this does not alter the game's font configuration.
-const medium=path.join(repo,'panorama/fonts/SourceHanSansSC-Medium.otf');
+const medium=path.join(repo,'panorama/fonts/Radiance-Survival-SourceHanSansSC-Medium.otf');
+const regular=path.join(repo,'panorama/fonts/Radiance-Survival-SourceHanSansSC-Regular.otf');
+if(!fs.existsSync(regular)||!fs.existsSync(medium))throw Error('Registered game font faces are required for text verification');
+html=html.replace(pathToFileURL(path.join(repo,'design_refs/archive_v10/package/archive_ui_final_v1/fonts/SourceHanSansSC-Regular.otf')).href,pathToFileURL(regular).href);
 if(fs.existsSync(medium))html=html.replace('</style>','@font-face{font-family:"Source Han Sans SC";font-weight:500;src:url("'+pathToFileURL(medium).href+'")}\n</style>');
 fs.writeFileSync(entry,html);
 const file=path.join(out,'assembly.json'),assembly=JSON.parse(fs.readFileSync(file,'utf8'));
+assembly.fontWeightTransport='Native medium maps to browser font-weight 500; original source remains unchanged';
+assembly.fontFaces=[regular,medium].map(file=>({path:path.relative(repo,file).replaceAll('\\','/'),sha256:crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')}));
 assembly.kind='lottery_fullscreen_production_component_browser_preview';assembly.gameVerified=false;assembly.activeScripts=activeScripts;assembly.excludedScripts=excluded;assembly.sourceGraph=assembly.sourceGraph.filter(x=>!x.path.endsWith('.js')||allow.has(x.path));
 // Only the actual lottery and its shared rendering dependencies execute here.
 // Discard unrelated hidden HUD styles so concurrent daily/shop edits cannot

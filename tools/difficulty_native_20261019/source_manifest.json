@@ -1,0 +1,130 @@
+{
+  "kind": "difficulty_native_five_material_variants",
+  "gameVerified": false,
+  "defaultTheme": "reborn",
+  "sourceHashes": [
+    {
+      "path": "styles/custom_game/archive_difficulty.css",
+      "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+    },
+    {
+      "path": "scripts/custom_game/survival_ui.js",
+      "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+    }
+  ],
+  "fixture": "Same startup-mode/team cap N6; actual local pending N4 request; full profiles remain pending.",
+  "checks": {
+    "themes": 5,
+    "allPassed": true,
+    "compact1280x720": true,
+    "headerAndRowCenters": true,
+    "lockedTextUnclipped": true,
+    "teamProgressPreload": true
+  },
+  "captureReport": {
+    "file": "output/ui_native_finish_20261019/difficulty_capture_report.json",
+    "sha256": "f065ac23a1bd74431bfa65b7c35220577c815b23240d2702d2a08fec934b26f3"
+  },
+  "helperArchive": [
+    {
+      "file": "tools/difficulty_native_20261019/browser.cjs",
+      "sha256": "f767ed17c07c0d8a2a7d3eb63b007c04e5c429c8ed6811b3f7e6bba6b056936b",
+      "verifiedOriginal": "output/ui_native_finish_20261019/browser.cjs",
+      "formattingOnlyAfterCapture": "Removed extra blank EOF line; no executable behavior changed."
+    },
+    {
+      "file": "tools/difficulty_native_20261019/build_difficulty.cjs",
+      "sha256": "e6e511b55c3234fb07be04cd810d31bb6ef8ea520a71b5317439053008cef958",
+      "verifiedOriginal": "output/ui_native_finish_20261019/build_difficulty.cjs"
+    },
+    {
+      "file": "tools/difficulty_native_20261019/capture_difficulty.cjs",
+      "sha256": "0e6fd601eee0b3055c6899fd73792522de774309aad167ffb747f3ea4bba7f2e",
+      "verifiedOriginal": "output/ui_native_finish_20261019/capture_difficulty.cjs"
+    },
+    {
+      "file": "tools/difficulty_native_20261019/difficulty_native_themes.json",
+      "sha256": "4d1435b4a184c0d1ca1da1c89deb87fe479b940cc52f284190be373ef1db4c43",
+      "verifiedOriginal": "output/ui_native_finish_20261019/difficulty_native_themes.json"
+    },
+    {
+      "file": "tools/difficulty_native_20261019/difficulty_state.js",
+      "sha256": "5fbd8618e29c167cd837e5a44c3c563f09aac411086b68972b14c016029c1d28",
+      "verifiedOriginal": "output/ui_native_finish_20261019/difficulty_state.js"
+    },
+    {
+      "file": "tools/difficulty_native_20261019/preview_overlay.cjs",
+      "sha256": "5ef6ac3df89dcadb9749d64663145367d5d5e147114e94ae8943e344ba9f3ef7",
+      "verifiedOriginal": "output/ui_native_finish_20261019/preview_overlay.cjs"
+    },
+    {
+      "file": "tools/difficulty_native_20261019/README.txt",
+      "sha256": "353c1f9dd8c5a276ed77baf96acf62740cce4c65ad3964d728c1346cb94c1e9d",
+      "verifiedOriginal": null
+    },
+    {
+      "file": "tools/difficulty_native_20261019/run.cjs",
+      "sha256": "98e060f3bc132eb3226e6e3c0a3c076b99c705b8b9b690c140bded38e6cc0e0b",
+      "verifiedOriginal": null
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "docs/design/difficulty_native_20261019/01_reborn.png",
+      "sha256": "d72b1a50b5f761165c2073aa7b5d50a06f7d62c5fd80090b83491a79841fa8c3"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/01_reborn_720.png",
+      "sha256": "42ef702f08e155503bef356baddfd0b0b2955ceed7eea792b6fe1be8cab8b200"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/01_reborn_detail.png",
+      "sha256": "eaf65218bb002acfc885e8a1e70e105a4da1e4223771ce3de0b554368d35ed0f"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/02_dota_plus.png",
+      "sha256": "2758a6bb5f3369dfd51e29557b02d5961ac30de3d061fc22cb9c4000fdb322ba"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/02_dota_plus_detail.png",
+      "sha256": "dec0c817e980069afcee9f234384ea23c09247644ac2ce84621e312373891114"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/03_crownfall.png",
+      "sha256": "156dac4582de0c1cfaf85b5fc6090f7fa127f699b2274b42f53c3fc0ed8da5c2"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/03_crownfall_detail.png",
+      "sha256": "cedb84bbb0e12f365c2f38d9417ef9e0dd6de5094a519c81e75be432ac84ba2a"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/04_international.png",
+      "sha256": "bcda7d9c62d46dfe6860c1d82a2a0b206356f5a34d735c2d9b41e4826515e3bd"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/04_international_detail.png",
+      "sha256": "ba9bc23a8daf76df6bb654bb775fde29c9bcf4beefd26fcd0878b807c95ef486"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/05_darkmoon.png",
+      "sha256": "990a229a502bb2f52dba5859127c3a587a54deebe602531ba3f3ff09372e47fe"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/05_darkmoon_detail.png",
+      "sha256": "8066013c9c73ae633cb62ae55d024ba556956bce69ae84989e88e3ad13814cd2"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/index.html",
+      "sha256": "6f8bb5c3105c5c3c16d54be4404ffcc7d0966d862bb86283fe7ae6c6e7adc749"
+    },
+    {
+      "file": "docs/design/difficulty_native_20261019/overview.png",
+      "sha256": "6b7890728861e919e0d8d5618bf2ba6cee93ab6f90b1f2e48aef99a27225af92"
+    }
+  ],
+  "limitations": [
+    "Browser-only actual production component assembly. Registered fonts are rerasterized at device scale 2 for dialog clips. No PNG upscale or image edits.",
+    "Exact official Valve textures retain source/PNG hashes in difficulty_native_themes.json. Only material overrides differ; production events and dynamic text remain real.",
+    "The game client native rendering has not been visually verified."
+  ]
+}

@@ -1,0 +1,857 @@
+{
+  "status": "PASS_NATIVE_COMPILE_AND_COMPONENT_CHECKS",
+  "gameVerified": false,
+  "summary": [
+    "Startup authentication preloads difficulty permissions for standard, pure and rich before selecting a mode.",
+    "Team permissions use the admitted roster intersection; host changes, disconnects and client counters cannot raise the cap.",
+    "Difficulty setup can confirm before combat-profile login; GAME_STARTED and gameplay actions retain the original full-profile barrier.",
+    "The default production difficulty window uses installed Reborn materials; five actual-component material variants are supplied for comparison.",
+    "Lottery header arrow, return caption and title share one center line and use unshrunk natural text boxes without blurry header shadows."
+  ],
+  "sourceRecords": [
+    {
+      "path": "scripts/vscripts/systems/startup_loading_service.lua",
+      "candidateSha256": "19f4eaf5e368e75e9e1780283252045529bbd2be2dd10a841e4495b0b31b4488",
+      "fullSha256": "3ebe31c00b0bf84578a4d1cdbb4056026170d44cfae2dbaaefc03801135e426f"
+    },
+    {
+      "path": "scripts/vscripts/systems/wave_system.lua",
+      "candidateSha256": "8e6db7b33515dbe89e336eab824292a1df61ee680465384711dcba026a6ceb19",
+      "fullSha256": "7e281f1b9b826b9d05986546244e7a559f259712fdfb889b1a0caece78895a16"
+    },
+    {
+      "path": "scripts/vscripts/systems/player_profile_service.lua",
+      "candidateSha256": "0dda1c716fab3c835b093f638537dcfae92fe2bdbc0efd875f00a1b406ec5afa",
+      "fullSha256": "0b5d96f046c6b1b822c878d8604c0dcad6ed69e8a338279d22cee940f62e043d"
+    },
+    {
+      "path": "scripts/vscripts/systems/team_difficulty_service.lua",
+      "candidateSha256": "40da5d1ba9c728817a6ec5282c97e87734227e6ac03ab1f4b22876fd65ea274b",
+      "fullSha256": "b86478c00a302a77df5aa0bfa528f49e48067bd1ddcd1c786f248d72bf06258d"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_difficulty_unlocks.lua",
+      "candidateSha256": "c0b667186d9e8c413ce9cd1e7c962927fa42aafe9efbaa0c22177a493c905243",
+      "fullSha256": "998a96193c53aaba0f6e407ad923732391c88ba3734628d9b77e26f354e47459"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_startup_loading_service.lua",
+      "candidateSha256": "713002a416e89efab1584d573157393d1ed6432ed97dc425b7ee58a11cc29e64",
+      "fullSha256": "294f262d4fd293c548701c748fcf3690c7f994114e39268c785a23419a3d2a21"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_rich_mode_profiles.lua",
+      "candidateSha256": "563208db63ebb40a0267ef1dc8f65a0b25c678c21d25a02fcff2b01df53c5c6c",
+      "fullSha256": "4681427da8f2a578e1b227c6079f44da536d0b5b33071d75106cd29accf452de"
+    },
+    {
+      "path": "scripts/vscripts/ui/ui_request_router.lua",
+      "candidateSha256": "3358aab51a3f55f5619f4319be3f9213d771511e8aec8496102841c665c4061d",
+      "fullSha256": "c7caf999450bbb817382069c489c08a81205ab70c63ba1d93b6eade447721019"
+    },
+    {
+      "path": "scripts/vscripts/tests/test_startup_ui_request_gate.lua",
+      "candidateSha256": "a957d930a00653027a157bf7dca87aa31eb6507e7d7804d45a2023718ab45e8e",
+      "fullSha256": "c199e697009d214d4778ba6bb62d89ea7b8eb6d0aab737a8ebf9bb53fab19b66"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "candidateSha256": "53706b69e759a2fd97b94404e3c87607d715aec7c1378977baa5ead6f2cf02f3",
+      "fullSha256": "bf46cb1a3505f5ea6730a7f786b63a4958cfc5e5fc37bc27b92f9ecaf932c9ef"
+    },
+    {
+      "path": "panorama/src/styles/custom_game/lottery_gw2.css",
+      "candidateSha256": "3f82dabf53d2aee26c00a5067d42549e94cf328def447f4794637ccad68aa888",
+      "fullSha256": "7d1467254bfacea2f97c89cd5182d9ad19067dc47c1478543ed64979db817fca"
+    },
+    {
+      "path": "tools/lottery_emerald_game_20261019/preview.cjs",
+      "candidateSha256": "ae387373986f9c4f50de1ebcf299bae0d0891b1f99e29d9306cfdeb75a26d7d2",
+      "fullSha256": "216162d0516a426478fbba08e31202cb18bfba9d5f69bb3ccbeaa321031fe85a"
+    },
+    {
+      "path": "tools/test_hud_snapshot_lifecycle.cjs",
+      "candidateSha256": "aae3fae8ae95918f66978279bc6d005f13b2af5b385314e708ddf1d91a25b74c",
+      "fullSha256": "d013f319e9e81f1a8bcf65c579de2a9170a5d476824833361a860a3fc6d75943"
+    },
+    {
+      "path": "tools/test_startup_loading_ui.js",
+      "candidateSha256": "5085a09ddf91618a75acd67899eab29f00f085342d41c1f7f3ae772dfeda05bb",
+      "fullSha256": "cee0e7b06d605fef6038777c64785c65738e95fc265a8939c8510ac6741ec7d5"
+    },
+    {
+      "path": "panorama/src/scripts/custom_game/survival_ui.js",
+      "candidateSha256": "a9896b858dec9ebefacbafe539f5401dee684dc51da09b9d8a6806b2884e46ed",
+      "fullSha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+    },
+    {
+      "path": "panorama/src/styles/custom_game/archive_difficulty.css",
+      "candidateSha256": "34a8c15384c6c66a37f669c7b2cf9268dde283870723047d496c2f9f9539a898",
+      "fullSha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+    },
+    {
+      "path": "tools/tests/difficulty_startup_selection.test.cjs",
+      "candidateSha256": "3c3bd3f53129a55b608c9473906354447753e374486a03a669978be3ed77767d",
+      "fullSha256": "81cbf61fbfe15b54690e4f6382320060914e327f773d622de0b7dc0e4eb96f8a"
+    }
+  ],
+  "nativeCompiledSources": [
+    {
+      "source": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "sourceSha256": "53706B69E759A2FD97B94404E3C87607D715AEC7C1378977BAA5EAD6F2CF02F3",
+      "runtime": "panorama/scripts/custom_game/lottery_gw2.vjs_c",
+      "runtimeSha256": "353A81F73F0A3273A545E601BBC68E2DDA071CD9E98328570D9842B2789BB06A"
+    },
+    {
+      "source": "panorama/src/styles/custom_game/lottery_gw2.css",
+      "sourceSha256": "3F82DABF53D2AEE26C00A5067D42549E94CF328DEF447F4794637CCAD68AA888",
+      "runtime": "panorama/styles/custom_game/lottery_gw2.vcss_c",
+      "runtimeSha256": "87660A0861C6347C152B51B1E2B995650CACF4A59C4EE7ACC909D1239580A2A3"
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/survival_ui.js",
+      "sourceSha256": "A9896B858DEC9EBEFACBAFE539F5401DEE684DC51DA09B9D8A6806B2884E46ED",
+      "runtime": "panorama/scripts/custom_game/survival_ui.vjs_c",
+      "runtimeSha256": "DB3E02DA4D4A01BF9B0D08771BF7CCA521BF664301A0089BD33E4821F31E35F5"
+    },
+    {
+      "source": "panorama/src/styles/custom_game/archive_difficulty.css",
+      "sourceSha256": "34A8C15384C6C66A37F669C7B2CF9268DDE283870723047D496C2F9F9539A898",
+      "runtime": "panorama/styles/custom_game/archive_difficulty.vcss_c",
+      "runtimeSha256": "338A3278DC9B24112B80F1A462E709768F45AA83F1D033B6572A2D4A5B5A63E3"
+    }
+  ],
+  "liveIntegration": {
+    "success": true,
+    "compiledSnapshotsVerified": true,
+    "difficultyCurrentSourceContentRuntimeVerified": true,
+    "concurrentPresentationChangesPreserved": [
+      "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "panorama/src/styles/custom_game/lottery_gw2.css"
+    ],
+    "unrelatedWorkingChangesPreserved": true,
+    "files": [
+      "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "panorama/src/styles/custom_game/lottery_gw2.css",
+      "panorama/src/scripts/custom_game/survival_ui.js",
+      "panorama/src/styles/custom_game/archive_difficulty.css"
+    ]
+  },
+  "backendTests": {
+    "pass_": true,
+    "head": "c8f179aa345d58f764f9e593a84816095f39733f",
+    "runtime": "lupa.lua51",
+    "records": [
+      {
+        "file": "test_difficulty_unlocks.lua",
+        "pass_": true,
+        "log": [
+          "PASS test_difficulty_unlocks"
+        ]
+      },
+      {
+        "file": "test_startup_loading_service.lua",
+        "pass_": true,
+        "log": [
+          "STARTUP_LOADING_SERVICE_PASS: independent admission, all-player auth, mode-profile gameplay gate, monotonic completion, identity, retries, reconnect, session isolation",
+          "STARTUP_NATIVE_TEAM_SETUP_PASS: Valve lifecycle, no custom party event, all-player auth/assets/UI/profile gates, disconnect/reconnect, host mode, once-only startup",
+          "STARTUP_NATIVE_GAMEPLAY_LIFECYCLE_PASS: actual addon callback, native phase cannot bypass profiles, once-only GAME_STARTED",
+          "STARTUP_NATIVE_SETUP_MANIFEST_PASS: official host start view and loading handshake are both mounted"
+        ]
+      },
+      {
+        "file": "test_player_entry_authentication.lua",
+        "pass_": true,
+        "log": [
+          "PLAYER_ENTRY_AUTHENTICATION_PASS: auth-only gate, no profile/entitlement effects, mode-login separation, progression, retry/session/account isolation"
+        ]
+      },
+      {
+        "file": "test_player_profile_modes.lua",
+        "pass_": true,
+        "log": [
+          "PLAYER_PROFILE_MODES_PASS: mode-before-HTTP, pure defaults, real progression, separate account view, session isolation, all transports scoped"
+        ]
+      },
+      {
+        "file": "test_rich_mode_profiles.lua",
+        "pass_": true,
+        "log": [
+          "RICH_MODE_PROFILES_PASS: authenticated entry, account/session isolation, standard bonuses and separate difficulty unlocks"
+        ]
+      },
+      {
+        "file": "test_startup_ui_request_gate.lua",
+        "pass_": true,
+        "log": [
+          "[SURVIVAL_CAST][SERVER] listener registered v20260720_2252",
+          "[SURVIVAL_CAST][SERVER] point listener registered v20260720_2325",
+          "[SURVIVAL_CAST][SERVER] POINT_RECV player=0 unit=400 ability=401 pos=(128,256,0)",
+          "[SURVIVAL_CAST][SERVER] POINT_REJECT invalid_player",
+          "[SURVIVAL_CAST][SERVER] POINT_RECV player=0 unit=400 ability=401 pos=(128,256,0)",
+          "[SURVIVAL_CAST][SERVER] POINT_REJECT invalid_player",
+          "[SURVIVAL_CAST][SERVER] POINT_RECV player=1 unit=400 ability=401 pos=(128,256,0)",
+          "[SURVIVAL_CAST][SERVER] POINT_REJECT invalid_player",
+          "[SURVIVAL_CAST][SERVER] POINT_RECV player=0 unit=400 ability=401 pos=(128,256,0)",
+          "[SURVIVAL_CAST][SERVER] POINT_CHECK name=ability_build_wall building=wall unit_valid=true ability_valid=true caster_matches=true owner=0 point=true",
+          "[SURVIVAL_CAST][SERVER] POINT_VALIDATE ok=true error=",
+          "[SURVIVAL_CAST][SERVER] POINT_BUILD_REQUESTED building=wall",
+          "[SURVIVAL_CAST][SERVER] POINT_RECV player=0 unit=400 ability=401 pos=(128,256,0)",
+          "[SURVIVAL_CAST][SERVER] POINT_REJECT invalid_player",
+          "[SURVIVAL_CAST][SERVER] POINT_RECV player=0 unit=400 ability=401 pos=(128,256,0)",
+          "[SURVIVAL_CAST][SERVER] POINT_REJECT invalid_player",
+          "STARTUP_UI_REQUEST_GATE_PASS: real router blocks loading/late/revoked actors; ready difficulty/build/lottery paths preserved"
+        ]
+      },
+      {
+        "file": "test_match_setup_service.lua",
+        "pass_": true,
+        "log": [
+          "MATCH_SETUP_SERVICE_PASS: host authority, immutable mode, session reset, spectator/bot and Tools handling"
+        ]
+      },
+      {
+        "file": "test_practice_difficulty_profiles.lua",
+        "pass_": true,
+        "log": [
+          "PRACTICE_DIFFICULTY_PROFILES_PASS: all four rooms across N1-N10, declared N5 inheritance, unknown difficulty rejected"
+        ]
+      },
+      {
+        "file": "test_archive_difficulty_progression.lua",
+        "pass_": true,
+        "log": [
+          "PASS test_archive_difficulty_progression: offline HTTP adapter/reducer boundary"
+        ]
+      },
+      {
+        "file": "test_startup_order_gate.lua",
+        "pass_": true,
+        "log": [
+          "STARTUP_ORDER_GATE_PASS: engine registration, pre-ready side-effect prevention, frozen roster, ownership, destinations, repair and AI"
+        ]
+      }
+    ]
+  },
+  "frontendTests": {
+    "pass_": true,
+    "command": [
+      "node",
+      "--require",
+      "./output\\ui_native_finish_20261019\\candidate_overlay.cjs",
+      "--test",
+      "tools/tests/difficulty_startup_selection.test.cjs",
+      "tools/tests/rich_mode_selection.test.cjs",
+      "tools/test_fishing_mode_ui.cjs",
+      "tools/tests/escape_setup_windows.test.cjs",
+      "tools/test_startup_loading_ui.js",
+      "tools/test_startup_loading_idle.cjs",
+      "tools/test_hud_snapshot_lifecycle.cjs"
+    ],
+    "exitCode": 0
+  },
+  "lotteryRegression": {
+    "pass_": true,
+    "files": [
+      "lottery_gw2.test.cjs",
+      "lottery_user_ticket_icons.test.cjs",
+      "lottery_probability_notice.test.cjs",
+      "lottery_ticket_rules.test.cjs",
+      "lottery_cinematic_flow.test.cjs",
+      "lottery_cinematic.test.cjs",
+      "lottery_scene_transition.test.cjs"
+    ]
+  },
+  "fontFaces": {
+    "kind": "isolated_engine_font_libraries_check",
+    "nativeGameCapture": false,
+    "osFontInstallation": false,
+    "stockFontChanges": false,
+    "fontConfig": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\core\\panorama\\fonts\\fonts.conf",
+    "sample": "返回抽奖奖池详情难度选择模式普通困难修罗无限0123456789ⅠⅡⅢⅣⅤⅥⅦ+%/×",
+    "faces": [
+      {
+        "family": "Source Han Sans SC",
+        "weight": 400,
+        "file": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSansSC-Regular.otf",
+        "fontconfigSelected": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSansSC-Regular.otf",
+        "sha256": "f1d8611151880c6c336aabeac4640ef434fa13cbfbf1ffe82d0a71b2a5637256",
+        "missingSampleCharacters": [],
+        "freetypeRasterizationPx": [
+          12,
+          14,
+          16,
+          18,
+          20,
+          24,
+          36,
+          40
+        ]
+      },
+      {
+        "family": "Source Han Sans SC",
+        "weight": 500,
+        "file": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSansSC-Medium.otf",
+        "fontconfigSelected": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSansSC-Medium.otf",
+        "sha256": "1df61d31687d04fd2f928a3bb6ca6cd61f0e988cc267cf317f32406edbb49f70",
+        "missingSampleCharacters": [],
+        "freetypeRasterizationPx": [
+          12,
+          14,
+          16,
+          18,
+          20,
+          24,
+          36,
+          40
+        ]
+      },
+      {
+        "family": "Source Han Serif SC",
+        "weight": 700,
+        "file": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSerifSC-Bold.otf",
+        "fontconfigSelected": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\panorama\\fonts\\Radiance-Survival-SourceHanSerifSC-Bold.otf",
+        "sha256": "706b8c0de2deff6cbc0c87e2cdedfd33a78b7ffd76cebb4549012f197ba611fe",
+        "missingSampleCharacters": [],
+        "freetypeRasterizationPx": [
+          12,
+          14,
+          16,
+          18,
+          20,
+          24,
+          36,
+          40
+        ]
+      }
+    ]
+  },
+  "headerLayout": {
+    "pass": true,
+    "gameVerified": false,
+    "records": [
+      {
+        "width": 1920,
+        "height": 1080,
+        "header": {
+          "id": "LotteryGW2Header",
+          "x": 159,
+          "y": 114.5,
+          "w": 1608,
+          "h": 74,
+          "cy": 151.5,
+          "font": "\"Source Han Sans SC\", sans-serif",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "shadow": "none",
+          "text": "抽奖返回20×"
+        },
+        "title": {
+          "id": "LotteryGW2Title",
+          "x": 288,
+          "y": 130.25,
+          "w": 560,
+          "h": 42.5,
+          "cy": 151.5,
+          "font": "\"Source Han Sans SC\"",
+          "fontSize": "34px",
+          "fontWeight": "500",
+          "shadow": "none",
+          "text": "抽奖"
+        },
+        "arrow": {
+          "id": "LotteryGW2BackIcon",
+          "x": 185,
+          "y": 141.5,
+          "w": 12,
+          "h": 20,
+          "cy": 151.5,
+          "font": "\"Source Han Sans SC\", sans-serif",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "shadow": "none",
+          "text": ""
+        },
+        "text": {
+          "id": "",
+          "x": 205,
+          "y": 137.75,
+          "w": 54,
+          "h": 27.5,
+          "cy": 151.5,
+          "font": "\"Source Han Sans SC\"",
+          "fontSize": "22px",
+          "fontWeight": "500",
+          "shadow": "none",
+          "text": "返回"
+        },
+        "pass": true
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "header": {
+          "id": "LotteryGW2Header",
+          "x": 105.99999237060547,
+          "y": 76.33332824707031,
+          "w": 1071.9998779296875,
+          "h": 49.33332824707031,
+          "cy": 100.99999237060547,
+          "font": "\"Source Han Sans SC\", sans-serif",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "shadow": "none",
+          "text": "抽奖返回20×"
+        },
+        "title": {
+          "id": "LotteryGW2Title",
+          "x": 191.99998474121094,
+          "y": 86.83332824707031,
+          "w": 373.33331298828125,
+          "h": 28.333328247070312,
+          "cy": 100.99999237060547,
+          "font": "\"Source Han Sans SC\"",
+          "fontSize": "34px",
+          "fontWeight": "500",
+          "shadow": "none",
+          "text": "抽奖"
+        },
+        "arrow": {
+          "id": "LotteryGW2BackIcon",
+          "x": 123.33332824707031,
+          "y": 94.33332824707031,
+          "w": 8,
+          "h": 13.333328247070312,
+          "cy": 100.99999237060547,
+          "font": "\"Source Han Sans SC\", sans-serif",
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "shadow": "none",
+          "text": ""
+        },
+        "text": {
+          "id": "",
+          "x": 136.66665649414062,
+          "y": 91.83332824707031,
+          "w": 36,
+          "h": 18.333328247070312,
+          "cy": 100.99999237060547,
+          "font": "\"Source Han Sans SC\"",
+          "fontSize": "22px",
+          "fontWeight": "500",
+          "shadow": "none",
+          "text": "返回"
+        },
+        "pass": true
+      }
+    ]
+  },
+  "difficultyPreviews": {
+    "kind": "five_actual_difficulty_component_native_material_concepts",
+    "gameVerified": false,
+    "pass": true,
+    "at": "2026-10-19T07:41:28.970Z",
+    "fullReportSha256": "f065ac23a1bd74431bfa65b7c35220577c815b23240d2702d2a08fec934b26f3",
+    "reproduce": "node tools/difficulty_native_20261019/run.cjs",
+    "checksPerformed": [
+      "actual scripts execute without errors",
+      "dialog inside viewport",
+      "natural header text centered",
+      "ten actual difficulty rows",
+      "rows remain inside scrolling viewport horizontally",
+      "row text vertically centered",
+      "locked code and condition do not overlap",
+      "locked text is not clipped",
+      "preloaded team cap shown",
+      "only one genuine confirm request in local log"
+    ],
+    "themes": [
+      {
+        "id": "reborn",
+        "name": "Reborn 铁灰",
+        "number": 1,
+        "pass": true,
+        "screenshot": "docs/design/difficulty_native_20261019/01_reborn.png",
+        "screenshotSha256": "d72b1a50b5f761165c2073aa7b5d50a06f7d62c5fd80090b83491a79841fa8c3",
+        "detailScreenshot": "docs/design/difficulty_native_20261019/01_reborn_detail.png",
+        "detailSha256": "eaf65218bb002acfc885e8a1e70e105a4da1e4223771ce3de0b554368d35ed0f",
+        "detailDeviceScaleFactor": 2,
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ]
+      },
+      {
+        "id": "dota_plus",
+        "name": "Dota Plus 铸金",
+        "number": 2,
+        "pass": true,
+        "screenshot": "docs/design/difficulty_native_20261019/02_dota_plus.png",
+        "screenshotSha256": "2758a6bb5f3369dfd51e29557b02d5961ac30de3d061fc22cb9c4000fdb322ba",
+        "detailScreenshot": "docs/design/difficulty_native_20261019/02_dota_plus_detail.png",
+        "detailSha256": "dec0c817e980069afcee9f234384ea23c09247644ac2ce84621e312373891114",
+        "detailDeviceScaleFactor": 2,
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ]
+      },
+      {
+        "id": "crownfall",
+        "name": "Crownfall 深靛金",
+        "number": 3,
+        "pass": true,
+        "screenshot": "docs/design/difficulty_native_20261019/03_crownfall.png",
+        "screenshotSha256": "156dac4582de0c1cfaf85b5fc6090f7fa127f699b2274b42f53c3fc0ed8da5c2",
+        "detailScreenshot": "docs/design/difficulty_native_20261019/03_crownfall_detail.png",
+        "detailSha256": "cedb84bbb0e12f365c2f38d9417ef9e0dd6de5094a519c81e75be432ac84ba2a",
+        "detailDeviceScaleFactor": 2,
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ]
+      },
+      {
+        "id": "international",
+        "name": "TI 乌木晶体",
+        "number": 4,
+        "pass": true,
+        "screenshot": "docs/design/difficulty_native_20261019/04_international.png",
+        "screenshotSha256": "bcda7d9c62d46dfe6860c1d82a2a0b206356f5a34d735c2d9b41e4826515e3bd",
+        "detailScreenshot": "docs/design/difficulty_native_20261019/04_international_detail.png",
+        "detailSha256": "ba9bc23a8daf76df6bb654bb775fde29c9bcf4beefd26fcd0878b807c95ef486",
+        "detailDeviceScaleFactor": 2,
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ]
+      },
+      {
+        "id": "darkmoon",
+        "name": "Dark Moon 暮紫玻璃",
+        "number": 5,
+        "pass": true,
+        "screenshot": "docs/design/difficulty_native_20261019/05_darkmoon.png",
+        "screenshotSha256": "990a229a502bb2f52dba5859127c3a587a54deebe602531ba3f3ff09372e47fe",
+        "detailScreenshot": "docs/design/difficulty_native_20261019/05_darkmoon_detail.png",
+        "detailSha256": "8066013c9c73ae633cb62ae55d024ba556956bce69ae84989e88e3ad13814cd2",
+        "detailDeviceScaleFactor": 2,
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ]
+      }
+    ],
+    "compact1280x720": true
+  },
+  "aestheticReview": {
+    "kind": "independent_final_visual_review",
+    "at": "2026-10-19T07:44:26.368Z",
+    "productionModified": false,
+    "gameVerified": false,
+    "pass": true,
+    "mustFix": [],
+    "captureReport": {
+      "path": "output/ui_native_finish_20261019/difficulty_capture_report.json",
+      "sha256": "f065ac23a1bd74431bfa65b7c35220577c815b23240d2702d2a08fec934b26f3",
+      "at": "2026-10-19T07:41:28.970Z",
+      "pass": true
+    },
+    "themes": [
+      {
+        "id": "reborn",
+        "name": "Reborn 铁灰",
+        "pass": true,
+        "mustFix": [],
+        "screenshot": {
+          "path": "docs/design/difficulty_native_20261019/01_reborn.png",
+          "sha256": "d72b1a50b5f761165c2073aa7b5d50a06f7d62c5fd80090b83491a79841fa8c3",
+          "dimensions": [
+            1920,
+            1080
+          ]
+        },
+        "detail": {
+          "path": "docs/design/difficulty_native_20261019/01_reborn_detail.png",
+          "sha256": "eaf65218bb002acfc885e8a1e70e105a4da1e4223771ce3de0b554368d35ed0f",
+          "dimensions": [
+            590,
+            1380
+          ],
+          "deviceScaleFactor": 2,
+          "clip": {
+            "x": 812,
+            "y": 195,
+            "width": 295,
+            "height": 690,
+            "scale": 1
+          }
+        },
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ],
+        "sourceCurrentlyMatches": true,
+        "checksPassed": true
+      },
+      {
+        "id": "dota_plus",
+        "name": "Dota Plus 铸金",
+        "pass": true,
+        "mustFix": [],
+        "screenshot": {
+          "path": "docs/design/difficulty_native_20261019/02_dota_plus.png",
+          "sha256": "2758a6bb5f3369dfd51e29557b02d5961ac30de3d061fc22cb9c4000fdb322ba",
+          "dimensions": [
+            1920,
+            1080
+          ]
+        },
+        "detail": {
+          "path": "docs/design/difficulty_native_20261019/02_dota_plus_detail.png",
+          "sha256": "dec0c817e980069afcee9f234384ea23c09247644ac2ce84621e312373891114",
+          "dimensions": [
+            590,
+            1380
+          ],
+          "deviceScaleFactor": 2,
+          "clip": {
+            "x": 812,
+            "y": 195,
+            "width": 295,
+            "height": 690,
+            "scale": 1
+          }
+        },
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ],
+        "sourceCurrentlyMatches": true,
+        "checksPassed": true
+      },
+      {
+        "id": "crownfall",
+        "name": "Crownfall 深靛金",
+        "pass": true,
+        "mustFix": [],
+        "screenshot": {
+          "path": "docs/design/difficulty_native_20261019/03_crownfall.png",
+          "sha256": "156dac4582de0c1cfaf85b5fc6090f7fa127f699b2274b42f53c3fc0ed8da5c2",
+          "dimensions": [
+            1920,
+            1080
+          ]
+        },
+        "detail": {
+          "path": "docs/design/difficulty_native_20261019/03_crownfall_detail.png",
+          "sha256": "cedb84bbb0e12f365c2f38d9417ef9e0dd6de5094a519c81e75be432ac84ba2a",
+          "dimensions": [
+            590,
+            1380
+          ],
+          "deviceScaleFactor": 2,
+          "clip": {
+            "x": 812,
+            "y": 195,
+            "width": 295,
+            "height": 690,
+            "scale": 1
+          }
+        },
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ],
+        "sourceCurrentlyMatches": true,
+        "checksPassed": true
+      },
+      {
+        "id": "international",
+        "name": "TI 乌木晶体",
+        "pass": true,
+        "mustFix": [],
+        "screenshot": {
+          "path": "docs/design/difficulty_native_20261019/04_international.png",
+          "sha256": "bcda7d9c62d46dfe6860c1d82a2a0b206356f5a34d735c2d9b41e4826515e3bd",
+          "dimensions": [
+            1920,
+            1080
+          ]
+        },
+        "detail": {
+          "path": "docs/design/difficulty_native_20261019/04_international_detail.png",
+          "sha256": "ba9bc23a8daf76df6bb654bb775fde29c9bcf4beefd26fcd0878b807c95ef486",
+          "dimensions": [
+            590,
+            1380
+          ],
+          "deviceScaleFactor": 2,
+          "clip": {
+            "x": 812,
+            "y": 195,
+            "width": 295,
+            "height": 690,
+            "scale": 1
+          }
+        },
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ],
+        "sourceCurrentlyMatches": true,
+        "checksPassed": true
+      },
+      {
+        "id": "darkmoon",
+        "name": "Dark Moon 暮紫玻璃",
+        "pass": true,
+        "mustFix": [],
+        "screenshot": {
+          "path": "docs/design/difficulty_native_20261019/05_darkmoon.png",
+          "sha256": "990a229a502bb2f52dba5859127c3a587a54deebe602531ba3f3ff09372e47fe",
+          "dimensions": [
+            1920,
+            1080
+          ]
+        },
+        "detail": {
+          "path": "docs/design/difficulty_native_20261019/05_darkmoon_detail.png",
+          "sha256": "8066013c9c73ae633cb62ae55d024ba556956bce69ae84989e88e3ad13814cd2",
+          "dimensions": [
+            590,
+            1380
+          ],
+          "deviceScaleFactor": 2,
+          "clip": {
+            "x": 812,
+            "y": 195,
+            "width": 295,
+            "height": 690,
+            "scale": 1
+          }
+        },
+        "sourceHashes": [
+          {
+            "path": "styles/custom_game/archive_difficulty.css",
+            "sha256": "1907773da5f6bc95635bc4788be308e73637ecb7dc52a3ecc210ad512b881efe"
+          },
+          {
+            "path": "scripts/custom_game/survival_ui.js",
+            "sha256": "f7d1c9419953d5bccc4979df36ecd0a642e0a84556a4abdcfc5df93780ec52e5"
+          }
+        ],
+        "sourceCurrentlyMatches": true,
+        "checksPassed": true
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "docs/design/difficulty_native_20261019/overview.png",
+        "sha256": "6b7890728861e919e0d8d5618bf2ba6cee93ab6f90b1f2e48aef99a27225af92",
+        "dimensions": [
+          1920,
+          983
+        ]
+      },
+      {
+        "path": "docs/design/difficulty_native_20261019/01_reborn_720.png",
+        "sha256": "42ef702f08e155503bef356baddfd0b0b2955ceed7eea792b6fe1be8cab8b200",
+        "dimensions": [
+          1280,
+          720
+        ]
+      },
+      {
+        "path": "docs/design/ui_native_finish_20261019/lottery_header.png",
+        "sha256": "a7bcd256e20dbb23d36f6cc6251caad182b141772e064fa0bc3e669234745149",
+        "dimensions": [
+          390,
+          74
+        ]
+      }
+    ],
+    "observations": [
+      "Viewed all five 2x-device-density dialog detail captures directly. Header title and normal difficulty codes are centered; locked codes and requirement labels occupy separate columns without overlap.",
+      "N10 and its requirement 全员通关 N9 解锁 are complete and readable in all five detail views.",
+      "Final Crownfall capture has the corrected inner text insets. N7-N10 labels and unlock conditions stay inside the gold beveled skin with visible breathing room.",
+      "Text edges are clean in the 2x rendered detail captures; there is no broad blur shadow around the row labels. All five designs have sufficient visible foreground/background contrast.",
+      "Viewed the final overview: all five columns and complete dialogs are visible, the lower empty region is removed, and the source/preview description remains visible.",
+      "Viewed the Reborn 1280x720 screenshot: the full dialog and N10 row remain inside the viewport. Helper text is small at this scale but complete, with no clipping or overlap.",
+      "Viewed the updated lottery_header.png: the arrow, 返回 caption and 抽奖 title share a consistent visual center. The title and caption render cleanly without the previous shadow halo."
+    ],
+    "resolvedFindings": [
+      {
+        "theme": "crownfall",
+        "issue": "Locked row text approached the hexagonal gold bevel.",
+        "resolution": "Preview-only inner left and right text insets increased by8px; independently re-viewed final03_crownfall_detail.png.",
+        "status": "resolved"
+      }
+    ],
+    "limitations": [
+      "All reviewed artifacts are offline browser renders of actual project components with local fixture progress; they do not establish live Source2 pixel rendering or native gameplay behavior.",
+      "The browser uses a generic scrollbar transport; the purple scrollbar color is not treated as evidence of the native Source2 scrollbar material.",
+      "The2x detail images are rendered at deviceScaleFactor2 using the actual dialog clip, according to the capture report; they are not claimed to be native game captures."
+    ]
+  },
+  "limitations": [
+    "All supplied UI captures are offline assemblies of actual project components with sample team progress.",
+    "Dota 2 native rendering and clicking in a fresh lobby have not been verified in this turn; no capturable game window was available.",
+    "Server progression preload and admitted-team permissions take effect in a new match session.",
+    "A separate active session revised lottery artwork after this compilation; its working edits are preserved and retain this task header alignment changes."
+  ]
+}

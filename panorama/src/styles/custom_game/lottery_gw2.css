@@ -329,3 +329,12 @@
 }
 #LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas VerticalScrollBar { background-color:#10231b; }
 #LotteryWindow.LotteryGW2ForestTheme #LotteryMainCanvas VerticalScrollBar .ScrollThumb { background-color:#7d9771; }
+
+/* Keep header glyphs at their authored size on opaque native surfaces. */
+#LotteryWindow #LotteryMainCanvas #LotteryGW2Header .LotteryGW2Label {
+    font-family:"Source Han Sans SC";
+    text-shadow:none;
+    text-overflow:clip;
+}
+#LotteryWindow #LotteryMainCanvas #LotteryGW2Back { brightness:1; }
+#LotteryWindow #LotteryMainCanvas #LotteryGW2Back:hover Label { color:#ffffff; }

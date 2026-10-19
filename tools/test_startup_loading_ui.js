@@ -28,6 +28,11 @@ function harness(options = {}) {
             if (parent) parent.children.push(this); if (id) nodes[id] = this;
         }
         IsValid() { return this.valid; }
+        DeleteAsync() {
+            this.valid = false;
+            for (const child of [...this.children]) child.DeleteAsync();
+            if (this.parent) this.parent.children = this.parent.children.filter(child => child !== this);
+        }
         AddClass(value) { this.classes.add(value); }
         RemoveClass(value) { this.classes.delete(value); }
         SetHasClass(value, enabled) { enabled ? this.classes.add(value) : this.classes.delete(value); }
