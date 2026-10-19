@@ -10,6 +10,8 @@ R5 视觉对照验收入口：`node tools/lottery_r5_parity_20261019/verify.cjs 
 
 两套工具的 `gameVerified:false` 表明全部截图属于离线组件预览，不能作为原生实机截图。浏览器 PASS 不能替代当前生产版本的原生字号、层级、遮罩、合成及可见效果验收。旧 XML 样例移除两个 ZX 展示容器，并加入旧 footer 缩放祖先；它必须在补回容器后保持付费/免费居中、重复 Apply 不增节点，才算通过。
 
+结果名称以原控制器 Label 的自然宽度在固定名称行内居中；本入口检查实际名称矩形、名称行中心及直接父对象身份。生产针对原生画面偏亮使用额外 SceneWash / FloorWash / ResultShade 压暗补偿，底栏改用不透明 `#111f18ff` 防止奖池金色圆盘透出；这些数值由新 R5 工具显式记录，不要求与历史 HTML alpha 相同。浏览器无法验收这些 alpha 在 Source 2 中的最终颜色和明暗，仍须同版本原生截图。
+
 浏览器适配器没有模拟彩票 Label 的原生 `text-overflow:shrink` 缩字号行为；此前离线通过仍在原生暴露了菜单/底栏字体过小。主线程原生 A/B 确认改用 `clip` 可恢复字号，按钮标题还需 `fit-children` 自然宽度及居中。`nativeMainTextEvidence` 仅保留 R5 还原前的历史文字修复记录：`design_refs/menus_v10/work/native/emerald_native_labels_fixed_20261019.png`，不表示当前生产 R5 版本已经通过原生验收。基础 adapter 没有修改，也未用浏览器差异迫使生产源码回退。
 
 本轮正式接入要求：移除右侧 T10 装饰，各奖池保留原背景及原过场电影，结果页采用 R5 设计。备用背景只存入项目；`node tools/lottery_emerald_game_20261019/assets.cjs --check` 检查 JPEG 内容准确且没有运行引用。

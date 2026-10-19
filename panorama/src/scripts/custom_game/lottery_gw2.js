@@ -109,7 +109,7 @@
         });
         surface(shell,"LotteryGW2SidebarSkin",layout.sidebar,"#091217f5");
         var sideTexture=nativeArt(shell,"LotteryGW2SidebarTexture",forest.sidebar,35,123,299,746);style(sideTexture,{backgroundSize:"cover",backgroundPosition:"center",opacity:"0.25"});
-        surface(shell,"LotteryGW2FooterSkin",layout.footer,"#111f18f5");
+        surface(shell,"LotteryGW2FooterSkin",layout.footer,"#111f18ff");
         surface(shell,"LotteryGW2HeaderSkin",layout.header,"#101d18ee");
         surface(shell,"LotteryGW2HeaderRule",[35,118,1608,1],"#a7c9a34d");
         surface(shell,"LotteryGW2SidebarRule",[332,123,1,746],"#a7c9a340");
@@ -129,7 +129,9 @@
         style(fullscreen,{position:"0px 0px 0px",width:"100%",height:"100%",margin:"0px",padding:"0px",horizontalAlign:"left",verticalAlign:"top",flowChildren:"none",overflow:"clip",zIndex:"20",backgroundSize:"cover",backgroundPosition:"center",backgroundRepeat:"no-repeat"});
         fullscreen.hittest=true;fullscreen.visible=false;
         var resultShade=make("Panel",fullscreen,"LotteryGW2ResultShade");
-        style(resultShade,{width:"100%",height:"100%",backgroundColor:"#020806",opacity:"0.92",zIndex:"1"});resultShade.hittest=false;resultShade.hittestchildren=false;
+        // Native Panorama composites these scenes brighter than the HTML
+        // preview. Use the native-reviewed opacity, independently of controls.
+        style(resultShade,{width:"100%",height:"100%",backgroundColor:"#020806",opacity:"0.995",zIndex:"1"});resultShade.hittest=false;resultShade.hittestchildren=false;
         var resultCanvas=make("Panel",fullscreen,"LotteryGW2ResultCanvas","LotteryGW2ResultCanvas");
         style(resultCanvas,{width:"1672px",height:"941px",position:"0px 0px 0px",horizontalAlign:"center",verticalAlign:"center",transformOrigin:"50% 50%",margin:"0px",padding:"0px",flowChildren:"none",overflow:"noclip",zIndex:"2"});
         var detail=make("Panel",shell,"LotteryGW2DetailLayer"); place(detail,0,0,1672,941); detail.hittest=false;style(detail,{zIndex:"8"});
@@ -152,8 +154,8 @@
         [tipName,tipState,tipDescription,tipCount].forEach(function(node){style(node,{textShadow:"none"});});
         style(tipDescription,{fontSize:"17px",lineHeight:"24px",color:"#d7d9cb",textOverflow:"clip"});
         view={root:shell,header:header,sidebar:sidebarPanel,content:content,fullscreen:fullscreen,resultCanvas:resultCanvas,detailLayer:detail,tooltip:tooltip,tipSkin:tipSkin,tipName:tipName,tipState:tipState,tipDescription:tipDescription,tipCount:tipCount,tipScroll:tipScroll,tipIconStage:tipIconStage,tabs:[]};
-        view.sceneWash=surface(content,"LotteryGW2SceneWash",[0,0,1309,681],"gradient(linear, 0% 0%, 100% 0%, from(#101119c9), color-stop(.65,#12131b10), to(#12131b10))");style(view.sceneWash,{zIndex:"1"});
-        var floorWash=surface(content,"LotteryGW2FloorWash",[0,0,1309,681],"gradient(linear, 0% 0%, 0% 100%, from(rgba(12,18,24,0)), color-stop(0.4,rgba(12,18,24,0)), color-stop(0.82,rgba(12,18,24,0.66)), to(rgba(12,18,24,0.98)))");style(floorWash,{zIndex:"1"});
+        view.sceneWash=surface(content,"LotteryGW2SceneWash",[0,0,1309,681],"gradient(linear, 0% 0%, 100% 0%, from(#101119f7), color-stop(.65,#12131b21), to(#12131b21))");style(view.sceneWash,{zIndex:"1"});
+        var floorWash=surface(content,"LotteryGW2FloorWash",[0,0,1309,681],"gradient(linear, 0% 0%, 0% 100%, from(rgba(12,18,24,0)), color-stop(0.4,rgba(12,18,24,0)), color-stop(0.82,rgba(12,18,24,0.94)), to(rgba(12,18,24,0.999)))");style(floorWash,{zIndex:"1"});
         nativeArt(content,"LotteryGW2ForestDivider",forest.divider,58,164,340,24);
         view.eyebrow=label(p("LotteryHeroCopy"),"LotteryGW2Eyebrow","常驻珍藏 · LUCKY COLLECTION",4,0,500,22,13,"#a7c9a3");style(view.eyebrow,{letterSpacing:"3px",textOverflow:"clip"});
         view.sidebarHeading=label(shell,"LotteryGW2SidebarHeading","珍 藏 奖 池",65,152,251,22,12,"#9aa6a9");
@@ -330,10 +332,11 @@
                 var well=itemWell(hostVisual,9,3,116,116),stage=make("Panel",well,"","LotteryGW2CellStage");place(stage,0,0,114,114);style(stage,{overflow:"clip"});
                 var selectedFrame=make("Panel",hostVisual,"","LotteryGW2SelectedFrame");place(selectedFrame,9,3,116,116);style(selectedFrame,{border:"1px solid #e3cf95",backgroundColor:"transparent"});selectedFrame.hittest=false;
                 if(icon){moveNode(icon,stage);place(icon,0,0,114,114);icon.visible=true;fillItemIcon(icon,item);}
-                if(name)moveNode(name,hostVisual);else name=label(hostVisual,"","",0,123,134,39,17);
-                place(name,0,123,134,39);style(name,{fontSize:"17px",fontWeight:"normal",fontFamily:'"Source Han Sans SC"',color:"#e0d6c3",textAlign:"center",whiteSpace:"normal",textOverflow:"ellipsis",textShadow:"none"});name.visible=true;
+                var nameRow=make("Panel",hostVisual,"","LotteryGW2CellNameRow");nameRow.hittest=false;nameRow.hittestchildren=false;
+                if(name)moveNode(name,nameRow);else name=label(nameRow,"","",0,0,134,39,17);
+                style(name,{fontSize:"17px",fontWeight:"normal",fontFamily:'"Source Han Sans SC"',color:"#e0d6c3",textAlign:"center",whiteSpace:"normal",textOverflow:"ellipsis",textShadow:"none"});name.visible=true;
                 var count=label(hostVisual,"","",13,88,106,24,16,"#f1e9d8");style(count,{textAlign:"right",textShadow:"#000000 0px 1px 3px 2.0"});
-                cell=card.__lotteryGW2Cell={host:hostVisual,name:name,count:count,stage:stage,well:well,selectedFrame:selectedFrame,icon:icon};
+                cell=card.__lotteryGW2Cell={host:hostVisual,nameRow:nameRow,name:name,count:count,stage:stage,well:well,selectedFrame:selectedFrame,icon:icon};
             }
             card.Children().forEach(function(c){if(c!==cell.host&&c!==cover)c.visible=false;});card.AddClass("LotteryGW2Cell");
             var one=result&&host.Children().length===1,cardWidth=result?(one?242:164):134,cardHeight=result?(one?287.2:188):168,iconSize=result?(one?232:154):116;
@@ -342,7 +345,11 @@
             place(cell.host,0,0,cardWidth,cardHeight);place(cell.well,iconLeft,3,iconSize,iconSize);place(cell.selectedFrame,iconLeft,3,iconSize,iconSize);
             var innerSize=result?(one?198:129):iconSize-2,innerOffset=(iconSize-innerSize)/2;
             place(cell.stage,innerOffset,innerOffset,innerSize,innerSize);place(cell.icon,0,0,innerSize,innerSize);
-            place(cell.name,0,result?iconSize+(one?20:10):123,cardWidth,result?(one?35.2:24):39);style(cell.name,{fontSize:result?(one?22:15)+"px":"17px",lineHeight:result?(one?35.2:24)+"px":"26px",textOverflow:"clip",whiteSpace:"nowrap",textShadow:result?"#000000 0px 0px 2px 2.0":"none"});
+            var nameHeight=result?(one?35.2:24):39;
+            place(cell.nameRow,0,result?iconSize+(one?20:10):123,cardWidth,nameHeight);style(cell.nameRow,{overflow:"clip"});
+            // Native fixed-width Labels align the glyph run differently from
+            // browsers. Center its natural box inside a fixed, clipped row.
+            place(cell.name,0,0,cardWidth,nameHeight);style(cell.name,{width:"fit-children",maxWidth:cardWidth+"px",horizontalAlign:"center",fontSize:result?(one?22:15)+"px":"17px",lineHeight:result?(one?35.2:24)+"px":"26px",textOverflow:"clip",whiteSpace:"nowrap",textShadow:result?"#000000 0px 0px 2px 2.0":"none"});
             place(cell.count,iconLeft+4,result?iconSize-21:88,iconSize-12,result?22:24);style(cell.count,{fontSize:result?"14px":"16px"});
             if(result){
                 var quality=String(item.quality||"n").toLowerCase(),presentation=cfg.SurvivalRewardPresentation,color=presentation&&presentation.NameColor?presentation.NameColor(quality):"#a7c9a3";

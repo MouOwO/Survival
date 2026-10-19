@@ -58,7 +58,7 @@ for(const [id,x,y,w,h]of [['LotteryGW2HeaderSkin',35,45,1608,74],['LotteryGW2Sid
  for(const textId of ['LotteryGW2Title','LotteryGW2TicketBalance','LotteryTitle','LotterySingleText','LotteryTenText'])for(let ancestor=nodes[textId];ancestor;ancestor=ancestor.parent)assert.notStrictEqual(ancestor,node,'background opacity must never include dynamic text');
 }
 assert.equal(nodes.LotteryGW2SidebarSkin.style.backgroundColor,'#091217f5','the accepted R5 skin has an independent dark sidebar backing');assert.equal(nodes.LotteryGW2SidebarTexture.style.opacity,'0.25','only the official sidebar texture has quarter opacity');
-assert.equal(nodes.LotteryGW2FooterSkin.style.backgroundColor,'#111f18f5','the Emerald footer uses the accepted dark-green backing');
+assert.equal(nodes.LotteryGW2FooterSkin.style.backgroundColor,'#111f18ff','the R5 footer stays opaque above the original pool artwork');
 assert(!nodes.LotteryGW2Points&&!nodes.LotteryGW2StarjoyPoints,'neither points balance is built in the lottery header');
 assert.strictEqual(nodes.LotteryTicketPurchase,nativeTicketPurchase,'reuse the controller-owned ticket purchase button');
 assert.strictEqual(nativeTicketPurchase.events.onactivate,ticketEvent,'restyling retains the ticket purchase callback');
@@ -221,6 +221,12 @@ assert.equal(nodes.LotteryGW2FooterSkin.style.visibility,'visible','upper-left r
 current.Feature('details');infoBounds(18,true);
 const cells=nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow'));
 assert.equal(cells.length,17);assert(cells.every(c=>c.__lotteryGW2Cell),'decorate every existing reward');
+function centeredNameContract(card){
+ const cell=card.__lotteryGW2Cell;assert(cell&&cell.nameRow,'the original caption has a fixed display row');
+ assert(cell.nameRow.BHasClass('LotteryGW2CellNameRow'));assert.strictEqual(cell.name.parent,cell.nameRow);assert.strictEqual(cell.nameRow.parent,cell.host);
+ assert.equal(cell.nameRow.style.width,card.style.width);assert.equal(cell.nameRow.style.overflow,'clip');assert.equal(cell.name.style.position,'0px 0px 0px');assert.equal(cell.name.style.width,'fit-children');assert.equal(cell.name.style.maxWidth,card.style.width);assert.equal(cell.name.style.horizontalAlign,'center');assert.equal(cell.name.style.textOverflow,'clip');assert.equal(cell.nameRow.hittest,false);assert.equal(cell.nameRow.hittestchildren,false);
+}
+cells.forEach(centeredNameContract);
 assert.equal(cells[0].__lotteryGW2Cell.count.text,'0','quality sorting keeps real zero');
 assert(cells.some(c=>c.__lotteryGW2Cell.count.text==='—'),'unknown quantity is not zero');
 assert(cells.some(c=>c.__lotteryGW2Cell.count.text==='2/5'),'only actual maximum is shown');
@@ -329,6 +335,7 @@ function resultGeometry(count){
   for(const frame of [cell.well,cell.selectedFrame]){assert.equal(frame.style.width,(single?232:154)+'px');assert.equal(frame.style.height,(single?232:154)+'px');}
   for(const art of [cell.stage,cell.icon]){assert.equal(art.style.width,(single?198:129)+'px');assert.equal(art.style.height,(single?198:129)+'px');}
   assert.equal(cell.name.style.fontSize,(single?22:15)+'px');
+  centeredNameContract(card);
  }
 }
 resultGeometry(10);
@@ -364,8 +371,18 @@ for(let i=0;i<12;i++){current.Close();current.Open();assert.strictEqual(nodes.Lo
 for(const [w,h,s] of [[1280,720,1],[1920,1080,1],[2560,1440,1.5],[3440,1440,1],[1366,768,1],[1920,1200,1],[2560,1080,1]]){root.actuallayoutwidth=w;root.actuallayoutheight=h;root.actualuiscale_x=s;root.actualuiscale_y=s;presentation.Fit();const menuScale=Math.min(w/s/1920,h/s/1080);assert.equal(nodes.LotteryMainCanvas.style.transform,'scale3d('+menuScale+','+menuScale+',1)','the compact main menu follows the 1920x1080 reference');if(nodes.LotteryGW2ResultCanvas){const resultScale=Math.min(w/s/1672,h/s/941);assert.equal(nodes.LotteryGW2ResultCanvas.style.transform,'scale3d('+resultScale+','+resultScale+',1)','full-screen result controls keep their existing independent fit');}}
 root.actuallayoutwidth=0;root.actuallayoutheight=0;presentation.Fit();assert.equal(nodes.LotteryMainCanvas.style.opacity,'0','unmeasured root cannot flash full-size');
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;presentation.Fit();
+// Keep controller-style labels alive across Compact and Dispose, independently
+// of lists that the controller is allowed to clear and rebuild.
+const captionLifetimes=[];
+for(const result of [false,true]){
+ const host=new Panel('Panel',root,''),card=new Panel('Button',host,''),caption=new Panel('Label',card,'');card.AddClass(result?'LotteryRewardCard':'LotteryDetailRow');caption.AddClass(result?'LotteryRewardName':'RHRewardName');caption.text='原始控制器名称';
+ presentation.Compact(host);centeredNameContract(card);assert.strictEqual(card.__lotteryGW2Cell.name,caption,'presentation reparents the original controller label rather than copying it');
+ const row=card.__lotteryGW2Cell.nameRow,owned=presentation.Inspect().trackedOwned;for(let i=0;i<4;i++)presentation.Compact(host);
+ assert.strictEqual(card.__lotteryGW2Cell.name,caption);assert.strictEqual(card.__lotteryGW2Cell.nameRow,row);assert.equal(presentation.Inspect().trackedOwned,owned,'repeated Compact does not allocate caption rows');captionLifetimes.push({host,card,caption,row});
+}
 current.Close();assert(!presentation.Inspect().open);assert.equal(config.SurvivalUILayers.Top(),null);
 presentation.Dispose();for(const [node,parent]of originalParents){assert.strictEqual(node.parent,parent,'restore business anchor '+node.id);assert(node.IsValid());}
+for(const {host,card,caption,row}of captionLifetimes){assert(caption.IsValid(),'Dispose preserves the original native reward label');assert.strictEqual(caption.parent,card,'Dispose restores the native label to its original card');assert.equal(row.IsValid(),false,'Dispose only removes its inserted caption display row');host.DeleteAsync(0);}
 assert.strictEqual(config.RemainingHandoff.LotteryDialog,originalDialog);assert.strictEqual(config.RemainingHandoff.RewardCard,originalReward);
 assert.strictEqual(config.SurvivalRewardPresentation.CreateIcon,originalIcon,'dispose restores the icon factory rather than nesting wrappers');
 assert.strictEqual(nativeSingle.events.onactivate,singleEvent);assert.strictEqual(nativeTen.events.onactivate,tenEvent);
