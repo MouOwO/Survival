@@ -154,7 +154,10 @@ class Bridge:
             with tunnel.state_lock(self.state):
                 connected = tunnel.connect(self.state, self.key, self.known_hosts)
             if not connected.get("ok"):
-                raise tunnel.TunnelError("ssh_tunnel_or_backend_unavailable")
+                reason = connected.get("error") or connected.get("status")
+                if reason not in ("backend_unavailable", "tunnel_not_started"):
+                    reason = "ssh_tunnel_or_backend_unavailable"
+                raise tunnel.TunnelError(reason)
             self.next_health = current + 20
         if needs_auth:
             # Credential injection retains its original guarded, one-shot

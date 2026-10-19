@@ -16,6 +16,7 @@ import http.client
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import socket
 import subprocess
@@ -103,6 +104,34 @@ def agent_failure_code() -> str:
     if result.returncode == 1:
         return "ssh_key_not_loaded_in_current_user_agent"
     return "ssh_public_key_authentication_failed"
+
+
+def classify_ssh_failure(detail: str) -> str:
+    """Return fixed diagnostics only; never expose SSH stderr or its paths."""
+    text = detail.casefold()
+    if "permission denied" in text:
+        return agent_failure_code()
+    if "host key verification failed" in text:
+        return "ssh_host_key_verification_failed"
+    if "address already in use" in text or "cannot listen to port" in text:
+        return "local_port_8765_in_use"
+    # A forwarding channel has already crossed SSH. Its target connection
+    # failure belongs to the remote backend, not the public SSH port.
+    if re.search(r"\bchannel\s+\d+:\s+open failed:\s+connect failed:", text):
+        return "backend_unavailable"
+    # Windows OpenSSH also emits "Connection to HOST port 22 timed out"
+    # when TCP connected but the SSH banner exchange never completed.
+    if "timed out" in text:
+        return "ssh_connection_timeout"
+    if re.search(r"\bssh:\s+connect to host [^\r\n]+ port 22:\s+connection refused\b", text):
+        return "ssh_connection_refused"
+    if "network is unreachable" in text or "no route to host" in text:
+        return "ssh_network_unreachable"
+    if "connection reset" in text:
+        return "ssh_connection_reset"
+    if "connection closed" in text or re.search(r"\bconnection to [^\r\n]+ port 22 closed\b", text):
+        return "ssh_connection_closed"
+    return "ssh_tunnel_or_backend_unavailable"
 
 
 def port_free() -> bool:
@@ -390,13 +419,7 @@ def connect(path: Path, key: Path, known_hosts: Path) -> dict:
             if process.poll() is not None or not health():
                 errors.seek(0)
                 detail = errors.read(8192).decode("utf-8", errors="replace")
-                if "Permission denied" in detail:
-                    raise TunnelError(agent_failure_code())
-                if "Host key verification failed" in detail:
-                    raise TunnelError("ssh_host_key_verification_failed")
-                if "Address already in use" in detail or "cannot listen to port" in detail:
-                    raise TunnelError("local_port_8765_in_use")
-                raise TunnelError("ssh_tunnel_or_backend_unavailable")
+                raise TunnelError(classify_ssh_failure(detail))
             with ProcessHandle(process.pid) as handle:
                 state = {"version": 1, "pid": process.pid, **handle.identity(),
                          "command_digest": command_digest(subprocess.list2cmdline(command))}

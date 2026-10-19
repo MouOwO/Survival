@@ -4,8 +4,9 @@ import base64
 import ctypes
 import socket
 import struct
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack, contextmanager, redirect_stderr, redirect_stdout
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -140,6 +141,91 @@ class TunnelTests(unittest.TestCase):
                     run.return_value.returncode = code
                     run.return_value.stderr = b""
                     self.assertEqual(tunnel.agent_failure_code(), expected)
+
+    def test_new_connection_reports_fixed_network_and_backend_failure_codes(self):
+        cases = (
+            ("ssh: connect to host 192.0.2.1 port 22: Connection timed out", "ssh_connection_timeout"),
+            ("ssh: connect to host 192.0.2.1 port 22: Operation timed out", "ssh_connection_timeout"),
+            ("Connection to 192.0.2.1 port 22 timed out", "ssh_connection_timeout"),
+            ("Connection timed out during banner exchange", "ssh_connection_timeout"),
+            ("ssh: connect to host 192.0.2.1 port 22: Connection refused", "ssh_connection_refused"),
+            ("ssh: connect to host 192.0.2.1 port 22: Network is unreachable", "ssh_network_unreachable"),
+            ("ssh: connect to host 192.0.2.1 port 22: No route to host", "ssh_network_unreachable"),
+            ("kex_exchange_identification: read: Connection reset by peer", "ssh_connection_reset"),
+            ("channel 2: open failed: connect failed: Connection refused", "backend_unavailable"),
+            ("channel 2: open failed: connect failed: Connection timed out", "backend_unavailable"),
+            ("channel 2: open failed: connect failed: Operation timed out", "backend_unavailable"),
+            ("channel 2: open failed: connect failed: Network is unreachable", "backend_unavailable"),
+            ("channel 2: open failed: connect failed: No route to host", "backend_unavailable"),
+            ("kex_exchange_identification: Connection closed by remote host", "ssh_connection_closed"),
+            ("Connection to 192.0.2.1 port 22 closed", "ssh_connection_closed"),
+            ("unexpected diagnostic: Connection refused", "ssh_tunnel_or_backend_unavailable"),
+            ("unexpected SSH diagnostic", "ssh_tunnel_or_backend_unavailable"),
+        )
+        for detail, expected in cases:
+            with self.subTest(expected=expected), self.connect_fixture() as fixture:
+                def failed_launch(*args, **kwargs):
+                    kwargs["stderr"].write((detail + "\nprivate-fixture-never-print\n").encode())
+                    kwargs["stderr"].flush()
+                    return fixture["child"]
+
+                fixture["launch"].side_effect = failed_launch
+                fixture["child"].poll.return_value = 255
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with redirect_stdout(stdout), redirect_stderr(stderr), self.assertRaises(tunnel.TunnelError) as raised:
+                    tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+                self.assertEqual(str(raised.exception), expected)
+                self.assertIsNone(raised.exception.__cause__)
+                self.assertEqual(stdout.getvalue(), "")
+                self.assertEqual(stderr.getvalue(), "")
+                self.assertNotIn(detail, str(raised.exception))
+                self.assertNotIn("private-fixture", str(raised.exception))
+                fixture["launch"].assert_called_once()
+                fixture["child"].terminate.assert_not_called()
+                fixture["factory"].assert_not_called()
+                self.assertFalse(self.state.exists())
+                self.assertFalse(self.state.with_suffix(".stderr").exists())
+
+    def test_new_connection_preserves_authentication_host_and_port_diagnostic_priority(self):
+        cases = (
+            ("Permission denied (publickey).\nConnection timed out", "ssh_key_not_loaded_in_current_user_agent"),
+            ("Host key verification failed.\nConnection reset by peer", "ssh_host_key_verification_failed"),
+            ("bind: Address already in use\nssh: connect to host 192.0.2.1 port 22: Connection refused", "local_port_8765_in_use"),
+            ("cannot listen to port: 8765\nConnection timed out", "local_port_8765_in_use"),
+        )
+        for detail, expected in cases:
+            with self.subTest(expected=expected), self.connect_fixture() as fixture, \
+                 patch.object(tunnel, "agent_failure_code", return_value="ssh_key_not_loaded_in_current_user_agent"):
+                def failed_launch(*args, **kwargs):
+                    kwargs["stderr"].write(detail.encode())
+                    kwargs["stderr"].flush()
+                    return fixture["child"]
+
+                fixture["launch"].side_effect = failed_launch
+                fixture["child"].poll.return_value = 255
+                with self.assertRaises(tunnel.TunnelError) as raised:
+                    tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+                self.assertEqual(str(raised.exception), expected)
+                fixture["child"].terminate.assert_not_called()
+                self.assertFalse(self.state.exists())
+
+    def test_new_live_tunnel_backend_failure_keeps_original_launch_cleanup(self):
+        with self.connect_fixture() as fixture, \
+             patch.object(tunnel, "health", return_value=False), \
+             patch.object(tunnel.time, "monotonic", side_effect=[0, 16]):
+            def failed_backend(*args, **kwargs):
+                kwargs["stderr"].write(b"channel 2: open failed: connect failed: Connection refused\n")
+                kwargs["stderr"].flush()
+                return fixture["child"]
+
+            fixture["launch"].side_effect = failed_backend
+            with self.assertRaisesRegex(tunnel.TunnelError, "^backend_unavailable$"):
+                tunnel.connect(self.state, fixture["key"], fixture["hosts"])
+            fixture["child"].terminate.assert_called_once_with()
+            fixture["child"].wait.assert_called_once_with(timeout=5)
+            fixture["factory"].assert_not_called()
+            self.assertFalse(self.state.exists(), "Diagnostics do not change fresh-tunnel persistence policy")
+            self.assertFalse(self.state.with_suffix(".stderr").exists())
 
     def test_busy_port_does_not_launch_or_stop_any_process(self):
         key = self.root / "key"

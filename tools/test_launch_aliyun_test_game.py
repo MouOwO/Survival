@@ -386,6 +386,23 @@ class LaunchTests(unittest.TestCase):
                 self.assertIn('existing tunnel and game were preserved', output)
                 self.assertNotIn('GAME_AUTH_READY', output)
 
+    def test_ssh_network_failure_reports_next_check_before_starting_game(self):
+        hints = {
+            'ssh_connection_timeout': 'SSH port 22 did not respond',
+            'ssh_connection_refused': 'SSH port 22 refused',
+            'ssh_network_unreachable': 'No network route',
+            'ssh_connection_reset': 'SSH connection was reset',
+            'ssh_connection_closed': 'SSH connection was closed',
+        }
+        for error, hint in hints.items():
+            with self.subTest(error=error):
+                code, output, events = self.run_launcher(expected=1, tunnel={'ok': False, 'error': error})
+                self.assertEqual(code, 31, output)
+                self.assertEqual(events, ['tunnel:connect'])
+                self.assertIn('SSH connection: ' + error, output)
+                self.assertIn(hint, output)
+                self.assertNotIn('GAME_AUTH_READY', output)
+
     def test_missing_connection_reason_has_nonempty_fallback(self):
         code, output, events = self.run_launcher(expected=1, tunnel={'ok': False})
         self.assertEqual(code, 31, output)

@@ -75,6 +75,20 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(bridge.safe_step(self.worker)['status'], 'retrying')
         self.inject.assert_not_called()
 
+    def test_backend_failure_reason_survives_bridge_without_exposing_arbitrary_text(self):
+        for result, expected in (
+            ({'ok': False, 'error': 'backend_unavailable'}, 'backend_unavailable'),
+            ({'ok': False, 'status': 'backend_unavailable'}, 'backend_unavailable'),
+            ({'ok': False, 'error': 'private-fixture-output'}, 'ssh_tunnel_or_backend_unavailable'),
+        ):
+            with self.subTest(result=result):
+                self.connect.return_value = result
+                status = bridge.safe_step(self.worker)
+                self.assertEqual(status['error'], expected)
+                self.assertEqual(status['status'], 'retrying')
+                self.assertNotIn('private-fixture-output', json.dumps(status))
+                self.inject.assert_not_called()
+
     def test_failed_injection_is_not_cached_and_is_retried(self):
         self.inject.side_effect = bridge.auth.AuthError('tools_server_confirmation_missing')
         self.assertFalse(bridge.safe_step(self.worker)['ok'])

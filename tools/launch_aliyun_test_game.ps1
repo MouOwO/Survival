@@ -107,9 +107,27 @@ try {
         $connectionError = [string]$connected.error
         if ([string]::IsNullOrWhiteSpace($connectionError)) { $connectionError = [string]$connected.status }
         if ([string]::IsNullOrWhiteSpace($connectionError)) { $connectionError = 'ssh_tunnel_or_backend_unavailable' }
-        $hint = if ($connectionError -eq 'backend_unavailable') {
-            ' The SSH tunnel is running, but the game backend did not answer its health check after retries. Wait briefly and run this launcher again; the existing tunnel and game were preserved.'
-        } else { '' }
+        $hint = switch ($connectionError) {
+            'backend_unavailable' {
+                ' The SSH connection reached the server, but the game backend is unavailable. Check the backend service on ECS and retry; any existing tunnel and game were preserved.'
+            }
+            'ssh_connection_timeout' {
+                ' ECS SSH port 22 did not respond. Check the instance status, security-group allowlist and network/VPN route, then retry.'
+            }
+            'ssh_connection_refused' {
+                ' ECS SSH port 22 refused the connection. Check that the instance is running and its SSH service is listening.'
+            }
+            'ssh_network_unreachable' {
+                ' No network route to ECS SSH port 22 is available. Check the local network and VPN routing.'
+            }
+            'ssh_connection_reset' {
+                ' The ECS SSH connection was reset before the tunnel was ready. Check network/VPN routing and the server SSH service.'
+            }
+            'ssh_connection_closed' {
+                ' The ECS SSH connection was closed before the tunnel was ready. Check network/VPN routing and the server SSH service.'
+            }
+            default { '' }
+        }
         throw ('SSH connection: ' + $connectionError + $hint)
     }
     Write-Host 'ECS tunnel ready: 127.0.0.1:8765'
