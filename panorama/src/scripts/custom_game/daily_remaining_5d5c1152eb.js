@@ -97,9 +97,8 @@ function build(){
  // The crest sits above the panel, with its lower edge meeting the background.
  titleOrnament=celebrationArt(win,"DailyGW2CelebrationTitleOrnament","fantasy_craft/player_card_ornament_png",592,0,198,20,{opacity:"1",brightness:"1.15"});
  var heading=label(canvas,"每日登录奖励",190,17,size[0]-380,58,40,"#f4f0e5","DailyGW2Title");style(heading,{textAlign:"center",fontWeight:"normal"});
- var closeButton=make("Button",canvas,"DailyGW2Close","DailyGW2CloseButton");rect(closeButton,1319,20,44,47);
- component(closeButton,"close_base",0,0,44,47);component(closeButton,"close",10,10,24,27);
- if(!(P.assets&&P.assets.close))label(closeButton,"×",0,1,44,44,36,"#171410");
+ var closeButton=make("Button",canvas,"DailyGW2Close","DailyGW2CloseButton");rect(closeButton,1319,20,30,30);style(closeButton,{backgroundColor:"gradient(linear,0% 0%,0% 100%,from(#737373),to(#444444))",border:"1px solid #8c8c8c"});
+ var closeIcon=component(closeButton,null,5,5,20,20);style(closeIcon,{backgroundImage:'url("s2r://panorama/images/control_icons/close_png.vtex")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",opacity:"1"});
  closeButton.hittestchildren=false;
  closeButton.SetPanelEvent("onactivate",function(){if(active&&valid(closeButton)){if(shell.RequestClose)shell.RequestClose("button");else close();}});
  component(canvas,"divider",1113,112,7,665,"DailyGW2Divider");
@@ -175,8 +174,8 @@ function renderCards(){
   var card=make("Panel",p("DailyCards"),"DailyGW2Day_"+(i+1),"DailyGW2Day");rect(card,columns[i%7]-columns[0],rows[Math.floor(i/7)]-rows[0],cellWidth,cellHeight);card.hittest=true;card.hittestchildren=true;
   var status=day.status||"not_open",today=Number(day.is_today)===1;card.SetHasClass("DailyGW2Today",today);card.SetHasClass("DailyGW2Claimed",status==="claimed");card.SetHasClass("DailyGW2Future",status==="not_open");
   var frame=component(card,"reward_frame",0,0,cellWidth,cellHeight);frame.AddClass("DailyGW2RewardFrame");
-  // Use a clean rim: the inset reward backing obscures the decorative corner art.
-  style(frame,{backgroundImage:"none",border:"1px solid #76643e"});
+  // The reward backing supplies the tile without an extra outer outline.
+  style(frame,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none"});
   var items=array(day.rewards),gap=0,width=items.length>1?(cellWidth-iconInset*2-gap)/2:cellWidth-iconInset*2,sharedQuantity=items.length>1?rewardQuantity(items[0]):null;
   if(sharedQuantity!==null&&!items.every(function(item){return rewardQuantity(item)!==null&&Number(item.count)===Number(sharedQuantity);}))sharedQuantity=null;
   items.slice(0,2).forEach(function(item,j){reward(card,item,iconInset+j*(width+gap),iconInset,width,cellHeight-iconInset*2,undefined,sharedQuantity!==null);});

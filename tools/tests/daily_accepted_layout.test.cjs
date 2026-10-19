@@ -80,6 +80,16 @@ function dailyAccepted() {
     cfg.RemainingHandoff.DailyImage = () => assert.fail('A real daily reward must use the existing item art resolver');
     cfg.SurvivalDaily.Open(false);
     const canvas = nodes.DailyGW2Canvas;
+    const dailyClose = nodes.DailyGW2Close;
+    assert.deepEqual(box(dailyClose, canvas).slice(2), [30, 30], 'The close button keeps its compact square footprint');
+    assert.equal(dailyClose.style.border, '1px solid #8c8c8c');
+    assert.match(dailyClose.style.backgroundColor, /#737373.*#444444/, 'The close button uses its grey square backing');
+    const dailyCloseIcon = dailyClose.Children().find(node => node.BHasClass('DailyGW2Art'));
+    assert(dailyCloseIcon, 'The close button contains its official white cross');
+    assert.equal(dailyCloseIcon.style.backgroundImage, 'url("s2r://panorama/images/control_icons/close_png.vtex")');
+    assert.deepEqual(box(dailyCloseIcon, dailyClose), [5, 5, 20, 20], 'The cross is centered inside the square button');
+    assert.equal(Number(dailyCloseIcon.style.opacity), 1, 'The close cross stays fully opaque');
+    assert.equal(dailyClose.hittestchildren, false, 'The cross cannot intercept close-button activation');
     assert.deepEqual([parseFloat(canvas.style.width), parseFloat(canvas.style.height)], [1382, 784]);
     assert.equal(nodes.DailyGW2Title.text, '每日登录奖励');
     assert.deepEqual(Array.from({length: 7}, (_, index) => nodes['DailyGW2Weekday_' + index].text),
@@ -100,7 +110,9 @@ function dailyAccepted() {
             assert.deepEqual(box(day, canvas), [columns[index % 7], rows[Math.floor(index / 7)], 118, 119]);
             const frame = tagged(day, 'DailyGW2RewardFrame')[0];
             assert.equal(frame.style.backgroundImage, 'none', 'Ordinary daily frames have no clipped corner artwork');
-            assert.equal(frame.style.border, '1px solid #76643e', 'Ordinary daily frames keep a continuous thin gold line');
+            assert.equal(frame.style.border, '0px', 'Ordinary daily frames have no extra outer outline');
+            assert.equal(frame.style.backgroundColor, 'transparent', 'Ordinary daily frames do not add a backing plate');
+            assert.equal(frame.style.boxShadow, 'none', 'Ordinary daily frames have no outer shadow');
             for (const reward of tagged(day, 'DailyGW2Reward')) {
                 const slot = box(reward, day);
                 assert.equal(slot[1], 2, 'Reward art starts immediately inside the border');
