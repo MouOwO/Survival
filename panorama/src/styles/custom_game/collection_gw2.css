@@ -3,7 +3,7 @@
 .CollectionGW2Canvas { flow-children:none; overflow:noclip; }
 .CollectionGW2Art { background-size:100% 100%; background-repeat:no-repeat; border:0px; box-shadow:none; }
 .CollectionGW2FlatRegion { flow-children:none; background-image:none; border:0px; box-shadow:none; }
-.CollectionGW2Text { font-family:"Source Han Sans SC"; font-weight:normal; padding:0px; margin:0px; text-shadow:#00000088 0px 1px 1px 1.0; }
+.CollectionGW2Text { font-family:"Source Han Sans SC"; font-weight:normal; font-style:normal; padding:0px; margin:0px; text-shadow:none; }
 #CollectionGW2Background { background-color:#171e24; opacity:1; border:0px; box-shadow:none; }
 .CollectionGW2Tab { flow-children:none; background-color:transparent; border:0px; box-shadow:none; }
 .CollectionGW2TabSelected { opacity:0; }
@@ -26,7 +26,6 @@
 .CollectionGW2Hover { opacity:0; }
 .CollectionGW2Slot:hover .CollectionGW2Hover,
 .CollectionGW2Button:hover .CollectionGW2Hover { opacity:.65; }
-.CollectionGW2Search { font-size:16px; color:#d8ddd6; background-color:transparent; border:0px; padding:0px; box-shadow:none; }
 .CollectionGW2Button { flow-children:none; background-color:transparent; border:0px; padding:0px; margin:0px; box-shadow:none; }
 .CollectionGW2Button:hover { brightness:1.12; }
 .CollectionGW2Button:active { brightness:.9; }
