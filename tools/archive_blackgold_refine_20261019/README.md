@@ -22,3 +22,5 @@ node tools/archive_blackgold_refine_20261019/verify.cjs
 预览复用项目的真实 XML、JS、CSS 及既有离线存档样例，不连接玩家账号、支付或奖励。需要项目已有的官方素材图册与 archive_v10 预览资产。输出入口为 `design_refs/archive_blackgold_refine_20261019/index.html`，五轮原图和总览位于相同目录；实际组件页面和检查记录在 `output/archive_blackgold_refine_20261019/`。
 
 检查对照未覆皮的真实组件，验证两种分辨率下的控件与图标几何、存档名称、状态和数量语义相同，并检查原有 tooltip 显示/消失及绘制不发业务事件。浏览器截图不等同于 Panorama 原生渲染；原生资源另行编译验证。
+
+2026-10-19 实机清晰度修正：侧栏与标题统一使用官方分类图标。原生 Image 创建时明确请求 48px / 112px 的矢量纹理，分别显示为 18px / 48px；统计图使用官方 96px 原图，均不放大低分辨率纹理。标题和侧栏旧徽记及圆环隐藏，保持原控件范围、商品图和 tooltip。大底板改用官方 `dotastyles.css` 的 `dotaPlusBgGradient`（展开 `dotaPlusBrown=#433620`），顶部官方金色横幅保留；条目底图改为引擎渐变，取消 300px 图片拉至 745px 的做法。浏览器预览将原生 `.vsvg` URI 映射到同一官方矢量导出。实机记录位于 `output/archive_native_review_20261019/`，临时观察器不属于正式脚本。
