@@ -17,7 +17,7 @@ var canvas,grid,gridBody,empty,draw,drawText,drawCost,tickets,currencyName,summa
 var rewardHighlight=null;
 var scale=1,cardsKey="",visibleRows=[],slots=[],tabs={},nodes={},api,createdRoots=[];
 var names={ex:"我的前女友",friend:"我的前男友",wife:"我的老婆",beast:"瑞兽赐福"};
-var shortNames={ex:"前女友",friend:"前男友",wife:"老婆",beast:"瑞兽"},filterNames=["全部收藏","已拥有","未拥有"];
+var filterNames=["全部收藏","已拥有","未拥有"];
 var rarityColors={UR:"#ef5350",SSR:"#f5c65e",SR:"#b680ee",R:"#74c8f2",N:"#8fc47b"};
 function rarity(item){var quality=String(item.quality||"").trim().toUpperCase(),recognized=Object.prototype.hasOwnProperty.call(rarityColors,quality);return {quality:recognized?quality:"",color:recognized?rarityColors[quality]:"#88939b"};}
 function valid(n){return n&&(!n.IsValid||n.IsValid());}
@@ -81,8 +81,7 @@ Object.keys(names).forEach(function(id,i){
  var tab=make("Button",canvas,"CollectionGW2Tab_"+id,"CollectionGW2Tab");rect(tab,13,68+i*54,44,44);style(tab,{backgroundImage:"none",backgroundColor:"transparent",border:"0px"});tab.hittestchildren=false;
  nine(tab,"button",0,0,44,44,"CollectionGoldTabSkin");
  var selectedArt=make("Panel",tab,"","CollectionGW2TabSelected");rect(selectedArt,-4,10,2,24);style(selectedArt,{backgroundColor:"#debc6f"});selectedArt.hittest=false;
- image(tab,"file://{images}/control_icons/24px/"+({ex:"star.svg",friend:"profile.svg",wife:"rewards.svg",beast:"trophy.svg"}[id]),10,3,id==="ex"?25:24,24,"","CollectionGoldTabIcon");
- tab.__collectionName=label(tab,shortNames[id],0,28,44,16,12,"#9f957c");style(tab.__collectionName,{textAlign:"center"});
+ image(tab,"file://{images}/control_icons/24px/"+({ex:"star.svg",friend:"profile.svg",wife:"rewards.svg",beast:"trophy.svg"}[id]),10,10,id==="ex"?25:24,24,"","CollectionGoldTabIcon");
  tab.SetPanelEvent("onactivate",function(){if(alive())select(id);});
  tab.SetPanelEvent("onmouseover",function(){if(alive()&&opened)$.DispatchEvent("DOTAShowTextTooltip",tab,names[id]);});tab.SetPanelEvent("onmouseout",function(){$.DispatchEvent("DOTAHideTextTooltip");});tabs[id]=tab;
 });
@@ -180,7 +179,7 @@ function bindCard(card,item){card.SetPanelEvent("onmouseover",function(){showToo
 function canDraw(){var data=shared.pages[current],s=data&&data.social;return opened&&!shared.pending&&s&&Number(data.pending)!==1&&known(s.tickets)&&known(s.draw_cost)&&Number(s.draw_cost)>0&&Number(s.tickets)>=Number(s.draw_cost)&&known(s.remaining)&&Number(s.remaining)>0;}
 function render(){
  if(!alive()||!opened)return;var data=shared.pages[current],s=data&&data.social,rows=array(data&&data.rows);
- Object.keys(tabs).forEach(function(id){tabs[id].SetHasClass("CollectionGW2Selected",id===current);style(tabs[id].__collectionName,{color:id===current?"#ffe2a0":"#9f957c"});});nodes.CollectionGW2Category.text=names[current];nodes.CollectionGW2FilterText.text=filterNames[ownershipFilter];
+ Object.keys(tabs).forEach(function(id){tabs[id].SetHasClass("CollectionGW2Selected",id===current);});nodes.CollectionGW2Category.text=names[current];nodes.CollectionGW2FilterText.text=filterNames[ownershipFilter];
  renderCards(rows);empty.visible=!data||!visibleRows.length;
  empty.text=!data?"正在读取收藏…":ownershipFilter===1?"暂无已拥有的收藏":ownershipFilter===2?"暂无未拥有的收藏":"暂无收藏";
  summary.text=data?(rows.every(countKnown)?rows.filter(function(item){return Number(item.count)>0;}).length:"—")+" / "+rows.length+" 已收集":"等待服务端同步";

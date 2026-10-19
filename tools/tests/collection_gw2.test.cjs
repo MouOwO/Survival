@@ -67,11 +67,11 @@ function assertOnePage(category){
   if(Number(card.__collectionItem.count)>0)assert.equal(quantity.text,String(card.__collectionItem.count));
  });
 }
-['ex','friend','wife'].forEach((id,i)=>{
- const tab=nodes['CollectionGW2Tab_'+id],children=descendants(tab),frame=children.find(n=>n.BHasClass('CollectionGW2TabSelected')),icon=children.find(n=>n.paneltype==='Image'),name=children.find(n=>n.paneltype==='Label');
+['ex','friend','wife','beast'].forEach(id=>{
+ const tab=nodes['CollectionGW2Tab_'+id],children=descendants(tab),frame=children.find(n=>n.BHasClass('CollectionGW2TabSelected')),icon=children.find(n=>n.paneltype==='Image');
  assert.equal(parseFloat(tab.style.width),44);assert.equal(parseFloat(tab.style.height),44);
- assert.equal(parseFloat(icon.style.width),id==='ex'?25:24);assert.equal(parseFloat(icon.style.height),24,'Category vectors retain their original 24px artwork height');assert.equal(icon.image,'file://{images}/control_icons/24px/'+({ex:'star.svg',friend:'profile.svg',wife:'rewards.svg'}[id]),'Categories use native vector icons');
- assert.equal(name.text,['前女友','前男友','老婆'][i]);assert.equal(name.style.fontSize,'12px');assert.equal(name.style.textAlign,'center');
+ assert.equal(parseFloat(icon.style.width),id==='ex'?25:24);assert.equal(parseFloat(icon.style.height),24,'Category vectors retain their original 24px artwork height');assert.equal(icon.image,'file://{images}/control_icons/24px/'+({ex:'star.svg',friend:'profile.svg',wife:'rewards.svg',beast:'trophy.svg'}[id]),'Categories use native vector icons');
+ assert(!children.some(n=>n.paneltype==='Label'),'Category buttons show only their icons');assert.equal(bounds(icon).y+parseFloat(icon.style.height)/2,22);assert(Math.abs(bounds(icon).x+parseFloat(icon.style.width)/2-22)<=.5,'Original vector sizes stay centered on integer pixels');
  assertNine(children.find(n=>n.BHasClass('CollectionGoldTabSkin')),'button',[8,6,8,6],true);
  assert(bounds(tab).x>=bounds(nodes.CollectionGW2Sidebar).x&&bounds(tab).right<=bounds(nodes.CollectionGW2Sidebar).right,'Icon buttons stay inside the rail');
  assert(bounds(tab).x+bounds(frame).x>=bounds(nodes.CollectionGW2Sidebar).x,'The narrow selected accent stays within the framed rail');
