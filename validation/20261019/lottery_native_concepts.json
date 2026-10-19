@@ -1,0 +1,606 @@
+{
+  "status": "PASS_OFFLINE_CONCEPTS",
+  "task": "Five native Dota 2 lottery concept previews",
+  "gameVerified": false,
+  "productionModified": false,
+  "themes": [
+    {
+      "id": "reborn",
+      "number": "01",
+      "name": "经典军械库",
+      "description": "原生铁灰石板 · 紧凑矩形导航 · 锻铁按钮",
+      "components": {
+        "panel": "panorama/images/hud/reborn/bg_scoreboard_psd.vtex_c",
+        "side": "panorama/images/hud/reborn/quickbuy_bg_psd.vtex_c",
+        "header": "panorama/images/hud/reborn/inventory_panel_png.vtex_c",
+        "nav": "panorama/images/gray_button_off_png.vtex_c",
+        "navOn": "panorama/images/gray_button_on_png.vtex_c",
+        "button": "panorama/images/gray_button_off_png.vtex_c",
+        "primary": "panorama/images/gray_button_on_png.vtex_c",
+        "well": "panorama/images/hud/reborn/inventory_item_well_psd.vtex_c"
+      }
+    },
+    {
+      "id": "crownfall",
+      "number": "02",
+      "name": "皇冠远征",
+      "description": "深靛铜金 · 斜切导航 · 官方六角按钮",
+      "components": {
+        "panel": "panorama/images/events/crownfall/visual_novel/vn_background_act4_png.vtex_c",
+        "side": "panorama/images/events/crownfall/buttons/tabs_background_png.vtex_c",
+        "header": "panorama/images/events/crownfall/buttons/tab_background_png.vtex_c",
+        "nav": "panorama/images/events/crownfall/buttons/tabs_background_png.vtex_c",
+        "navOn": "panorama/images/events/crownfall/buttons/tabs_background_png.vtex_c",
+        "button": "panorama/images/events/crownfall/buttons/button_secondary_bg_psd.vtex_c",
+        "primary": "panorama/images/events/crownfall/buttons/button_primary_bg_psd.vtex_c",
+        "well": "panorama/images/hud/reborn/inventory_item_well_psd.vtex_c",
+        "buttonOutline": "panorama/images/events/crownfall/buttons/button_secondary_outline_psd.vtex_c",
+        "primaryOutline": "panorama/images/events/crownfall/buttons/button_primary_outline_psd.vtex_c"
+      }
+    },
+    {
+      "id": "carnival",
+      "number": "03",
+      "name": "暗金秘库",
+      "description": "暗棕木纹 · 铜金铆钉 · 机械包边按钮",
+      "components": {
+        "panel": "panorama/images/events/dark_carnival/splash/panel_background_png.vtex_c",
+        "side": "panorama/images/events/dark_carnival/textures/texture_fabric_png.vtex_c",
+        "header": "panorama/images/events/dark_carnival/overworld/panel_title_container_png.vtex_c",
+        "nav": "panorama/images/events/dark_carnival/buttons/button_border_png.vtex_c",
+        "navOn": "panorama/images/events/dark_carnival/buttons/button_border_png.vtex_c",
+        "button": "panorama/images/events/dark_carnival/buttons/button_border_png.vtex_c",
+        "primary": "panorama/images/events/dark_carnival/buttons/button_border_png.vtex_c",
+        "well": "panorama/images/hud/reborn/inventory_item_well_psd.vtex_c",
+        "frame": "panorama/images/events/dark_carnival/splash/popup_border_png.vtex_c",
+        "screw": "panorama/images/events/dark_carnival/textures/screw_png.vtex_c"
+      }
+    },
+    {
+      "id": "plus",
+      "number": "04",
+      "name": "鎏金典藏",
+      "description": "深青石纹 · 柔金奖励按钮 · 规整双列珍藏",
+      "components": {
+        "panel": "panorama/images/dota_plus/dota_plus_bg_psd.vtex_c",
+        "side": "panorama/images/dota_plus/dota_plus_horizontal_banner_background_png.vtex_c",
+        "header": "panorama/images/dota_plus/shop_button_bg_psd.vtex_c",
+        "nav": "panorama/images/dota_plus/relic_agi_button_psd.vtex_c",
+        "navOn": "panorama/images/dota_plus/relic_rare_button_psd.vtex_c",
+        "button": "panorama/images/dota_plus/relic_agi_button_psd.vtex_c",
+        "primary": "panorama/images/dota_plus/relic_rare_button_psd.vtex_c",
+        "well": "panorama/images/hud/reborn/inventory_item_well_psd.vtex_c"
+      }
+    },
+    {
+      "id": "international",
+      "number": "05",
+      "name": "国际邀请赛",
+      "description": "乌木织纹 · 冷金导航 · 水晶奖励边框",
+      "components": {
+        "panel": "panorama/images/compendium/international2024/dashboard/points_bg_texture_png.vtex_c",
+        "side": "panorama/images/compendium/international2024/sidenav_background_png.vtex_c",
+        "header": "panorama/images/compendium/international2024/flag_texture_png.vtex_c",
+        "nav": "panorama/images/gray_button_off_png.vtex_c",
+        "navOn": "panorama/images/compendium/international2024/dashboard/selected_nav_bg_png.vtex_c",
+        "button": "panorama/images/gray_button_off_png.vtex_c",
+        "primary": "panorama/images/hud/reborn/the_international_2024/shop_launcher_button_inrange_psd.vtex_c",
+        "well": "panorama/images/hud/reborn/inventory_item_well_psd.vtex_c",
+        "rewardFrame": "panorama/images/compendium/international2023/rewardpage_outerborder_psd.vtex_c"
+      }
+    }
+  ],
+  "content": {
+    "poolId": "dragon_knight",
+    "balance": 20,
+    "allRewardsFromActualPool": true,
+    "rewards": [
+      {
+        "id": "lottery_dimensional_barrier",
+        "name": "次元屏障",
+        "quality": "UR",
+        "source": {
+          "definition": "data/csv/抽奖系统/lottery_item_definitions.csv",
+          "membership": "data/csv/抽奖系统/lottery_pool_items.csv",
+          "resourceTable": "scripts/custom_game/common/item_resources.js frozen in output/lottery_detail_alignment_20261019/preview/index.html"
+        },
+        "iconSha256": "3bbace194940bb29f87d58b334124fd18527e3a89e6580a6eaa31879ad8f9b15"
+      },
+      {
+        "id": "lottery_cyber_overlord",
+        "name": "赛博主宰",
+        "quality": "UR",
+        "source": {
+          "definition": "data/csv/抽奖系统/lottery_item_definitions.csv",
+          "membership": "data/csv/抽奖系统/lottery_pool_items.csv",
+          "resourceTable": "scripts/custom_game/common/item_resources.js frozen in output/lottery_detail_alignment_20261019/preview/index.html"
+        },
+        "iconSha256": "2a587c448714802a5dddc93996291416c056646b0648cc18f55520178fb427ae"
+      },
+      {
+        "id": "lottery_titan_shield",
+        "name": "泰坦巨盾",
+        "quality": "SSR",
+        "source": {
+          "definition": "data/csv/抽奖系统/lottery_item_definitions.csv",
+          "membership": "data/csv/抽奖系统/lottery_pool_items.csv",
+          "resourceTable": "scripts/custom_game/common/item_resources.js frozen in output/lottery_detail_alignment_20261019/preview/index.html"
+        },
+        "iconSha256": "e2892f34a48f941cdca1f79d3fe36936d7f05669e7029d92903d0908a5eecc33"
+      },
+      {
+        "id": "lottery_hero_medal",
+        "name": "英雄勋章",
+        "quality": "SSR",
+        "source": {
+          "definition": "data/csv/抽奖系统/lottery_item_definitions.csv",
+          "membership": "data/csv/抽奖系统/lottery_pool_items.csv",
+          "resourceTable": "scripts/custom_game/common/item_resources.js frozen in output/lottery_detail_alignment_20261019/preview/index.html"
+        },
+        "iconSha256": "adce2e1f8c88b55c9444046c3054c0ebd34af14fac8997c9692d9229474de7a5"
+      },
+      {
+        "id": "lottery_gale_bow",
+        "name": "疾风弓",
+        "quality": "SR",
+        "source": {
+          "definition": "data/csv/抽奖系统/lottery_item_definitions.csv",
+          "membership": "data/csv/抽奖系统/lottery_pool_items.csv",
+          "resourceTable": "scripts/custom_game/common/item_resources.js frozen in output/lottery_detail_alignment_20261019/preview/index.html"
+        },
+        "iconSha256": "477b26f9b288671b8ffd101ef4e65b705884ea9b32e388cbfe64a8c097d7e8f2"
+      },
+      {
+        "id": "lottery_windspeed_bowstring",
+        "name": "风速弓弦",
+        "quality": "SR",
+        "source": {
+          "definition": "data/csv/抽奖系统/lottery_item_definitions.csv",
+          "membership": "data/csv/抽奖系统/lottery_pool_items.csv",
+          "resourceTable": "scripts/custom_game/common/item_resources.js frozen in output/lottery_detail_alignment_20261019/preview/index.html"
+        },
+        "iconSha256": "73adb8a219cf12f58018d58772292394432c577eb9d6a7531ae4df65a76a68d0"
+      },
+      {
+        "id": "lottery_divine_spirit",
+        "name": "神赐精粹",
+        "quality": "R",
+        "source": {
+          "definition": "data/csv/抽奖系统/lottery_item_definitions.csv",
+          "membership": "data/csv/抽奖系统/lottery_pool_items.csv",
+          "resourceTable": "scripts/custom_game/common/item_resources.js frozen in output/lottery_detail_alignment_20261019/preview/index.html"
+        },
+        "iconSha256": "5507ccd7b66a2f615053498ca15256c8811394e9ffd18b0347270a3abd483769"
+      },
+      {
+        "id": "lottery_life_spirit",
+        "name": "生命精粹",
+        "quality": "R",
+        "source": {
+          "definition": "data/csv/抽奖系统/lottery_item_definitions.csv",
+          "membership": "data/csv/抽奖系统/lottery_pool_items.csv",
+          "resourceTable": "scripts/custom_game/common/item_resources.js frozen in output/lottery_detail_alignment_20261019/preview/index.html"
+        },
+        "iconSha256": "b59780fd1a9dbfcd2a5e3b1080352a9d22bba7030924fa361b114957e2b07bf1"
+      }
+    ],
+    "treasureIllustration": "panorama/images/events/dark_carnival/overworld/rewards/reward_treasure_large_png.vtex_c",
+    "ticketArt": "art/ui/sources/custom_game/lottery_ticket_user_v1/special.png"
+  },
+  "officialResources": [
+    {
+      "resource": "panorama/images/hud/reborn/bg_scoreboard_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/bg_scoreboard_psd.vtex",
+      "width": 826,
+      "height": 906,
+      "compiledSha256": "b596748ed8d7ca52b9c4f1d4b204fd16fab7d4d6dabccbd205b44b4ebd378b08",
+      "decodedPngSha256": "718bb487e7e31e597d9410897c9be709c2b461ebde4748fa3ff67830e7f14e64"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/quickbuy_bg_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/quickbuy_bg_psd.vtex",
+      "width": 600,
+      "height": 194,
+      "compiledSha256": "bd6083e2de117ec312ef0296ed07543091f132eb5aecb507195213c6f126c35e",
+      "decodedPngSha256": "334bb3f31986c4ff9ed54d067a791054e590363f6c8ccd537282ed9f48e7a948"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/inventory_panel_png.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/inventory_panel_png.vtex",
+      "width": 206,
+      "height": 112,
+      "compiledSha256": "659cb47ef1450411e9df217944bbf87d2df9fb6598c71a60089993a8130ceab2",
+      "decodedPngSha256": "3234cfc5ebcc5e5936fe67d6eda2f6f10877ea37c75300decdaf5bf8b1184814"
+    },
+    {
+      "resource": "panorama/images/gray_button_off_png.vtex_c",
+      "uri": "s2r://panorama/images/gray_button_off_png.vtex",
+      "width": 269,
+      "height": 33,
+      "compiledSha256": "1d033e91038a5e7f12b34f3667ee1f7ab75a2704e70351c9d3cc8d8558444e4d",
+      "decodedPngSha256": "0813920d8f9a737a6a2fb82039cab4b3be05d7f8a6bf55ab85f4970c02ffdd4e"
+    },
+    {
+      "resource": "panorama/images/gray_button_on_png.vtex_c",
+      "uri": "s2r://panorama/images/gray_button_on_png.vtex",
+      "width": 269,
+      "height": 33,
+      "compiledSha256": "21a3fac918aed7f42501e3bc4a372cb29e66c9b59252a789288c656fa1b88dd6",
+      "decodedPngSha256": "262087130d712d0e70f999a49acc3ffc783b85e0a85445dd2e939449220b5e10"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/inventory_item_well_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/inventory_item_well_psd.vtex",
+      "width": 76,
+      "height": 57,
+      "compiledSha256": "174433c8b9b6e55188e3f0a6ee9467a6ae616997b5508bf9a9055826fbc46f82",
+      "decodedPngSha256": "1ec7150fc783d67d8028bd35040ce6920254b6c90dc69f7bb308e57c5f6b0185"
+    },
+    {
+      "resource": "panorama/images/events/crownfall/visual_novel/vn_background_act4_png.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/visual_novel/vn_background_act4_png.vtex",
+      "width": 2880,
+      "height": 1620,
+      "compiledSha256": "0d20d4678df09043c0a7bccc0231bc167ec0d8e0a3ab04982d18de208237d32c",
+      "decodedPngSha256": "c162c55c3fccf6beec35adac55d24d6f2b016bc7fc9e588dd718e663f227818e"
+    },
+    {
+      "resource": "panorama/images/events/crownfall/buttons/tabs_background_png.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/buttons/tabs_background_png.vtex",
+      "width": 280,
+      "height": 112,
+      "compiledSha256": "42333a35bf7970f6c6e07e1c78fd70728651f5e9e5756fa309d66db80dc46f25",
+      "decodedPngSha256": "87d59690344ace13836d5e22e12b22c9b59670c082a36f4ba4a90e390217734e"
+    },
+    {
+      "resource": "panorama/images/events/crownfall/buttons/tab_background_png.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/buttons/tab_background_png.vtex",
+      "width": 441,
+      "height": 84,
+      "compiledSha256": "a933958978ebcce09ef534523b7bb6f944d4c6966817ed4799395f26237adf86",
+      "decodedPngSha256": "51e944ed724c45b3ac54cb7b3bab6a6a0a24295fe86f0c8b1b7dee0b71cc0c1f"
+    },
+    {
+      "resource": "panorama/images/events/crownfall/buttons/button_secondary_bg_psd.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/buttons/button_secondary_bg_psd.vtex",
+      "width": 176,
+      "height": 112,
+      "compiledSha256": "e795227f071ada58fefc0da2e311d5c405a0ac0e0296e451c20065450e15071a",
+      "decodedPngSha256": "ee35f76254a045950dff431effef151e5e94b3f8b5f37a33a1e7d85e334de876"
+    },
+    {
+      "resource": "panorama/images/events/crownfall/buttons/button_primary_bg_psd.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/buttons/button_primary_bg_psd.vtex",
+      "width": 272,
+      "height": 176,
+      "compiledSha256": "4d718ee34c68119d6b9a27fb455f935e4bf7f8f9898e9e99476fc7dd95a8dd99",
+      "decodedPngSha256": "7e149f23e164ae5da9e70436693a596a6eb6cc068e336f9295c4183ab24f1ed8"
+    },
+    {
+      "resource": "panorama/images/events/crownfall/buttons/button_secondary_outline_psd.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/buttons/button_secondary_outline_psd.vtex",
+      "width": 176,
+      "height": 112,
+      "compiledSha256": "5c10bf31804f46966e768ce36ed4aab831f95fcee7599ed5e1be002e74d72a2d",
+      "decodedPngSha256": "c50c9562a05a32b5621b8c05a89fdd2d66a1c9d515dd83e8cfca0d69e81bd525"
+    },
+    {
+      "resource": "panorama/images/events/crownfall/buttons/button_primary_outline_psd.vtex_c",
+      "uri": "s2r://panorama/images/events/crownfall/buttons/button_primary_outline_psd.vtex",
+      "width": 272,
+      "height": 176,
+      "compiledSha256": "4b657d784a851bbb7b4da9209231d398af9e9fba3ccdac19d1456c3d971b826c",
+      "decodedPngSha256": "570f851456b6495f2c5464073996510d705bd5af28ea1d401c0508a616219bea"
+    },
+    {
+      "resource": "panorama/images/events/dark_carnival/splash/panel_background_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/splash/panel_background_png.vtex",
+      "width": 800,
+      "height": 1128,
+      "compiledSha256": "a7d1c11586de2b8e3a8f479b10301eacae270478ba117221f0a6595b5085baa3",
+      "decodedPngSha256": "91ab102aa7180001dd10d65f4f53cc7de21995c1e266a7fe5e293151ba51738b"
+    },
+    {
+      "resource": "panorama/images/events/dark_carnival/textures/texture_fabric_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/textures/texture_fabric_png.vtex",
+      "width": 400,
+      "height": 400,
+      "compiledSha256": "d28b0bd2f888c29d6370ee4df9036d829ba75ebf28c5c3afaad246616507ce7b",
+      "decodedPngSha256": "8d3b388a26d18dd9e4b6eaf93b42582fc6384de1aff47ec625639df38850e1a1"
+    },
+    {
+      "resource": "panorama/images/events/dark_carnival/overworld/panel_title_container_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/overworld/panel_title_container_png.vtex",
+      "width": 560,
+      "height": 64,
+      "compiledSha256": "466db58c4bb62338c63313af3667497c69eb2f4e7a361bbf7f1fc55a4533fb76",
+      "decodedPngSha256": "258e350db5b8c7be869769c95b8c5c6e8c4d91a6ad79778e4ef433d2669b120e"
+    },
+    {
+      "resource": "panorama/images/events/dark_carnival/buttons/button_border_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/buttons/button_border_png.vtex",
+      "width": 392,
+      "height": 100,
+      "compiledSha256": "43936832413d9075bca219c849ad4c935cd92ae6e35309370f0df61aed503c9a",
+      "decodedPngSha256": "9d632199a205243ea3fe2f48b37acff8fad1969adb5749ba880eb386c41ac14d"
+    },
+    {
+      "resource": "panorama/images/events/dark_carnival/splash/popup_border_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/splash/popup_border_png.vtex",
+      "width": 800,
+      "height": 800,
+      "compiledSha256": "3fd13a91c512be92d95e63ae32c40fb49a6cad04aff0b511032ab38885625046",
+      "decodedPngSha256": "fce2b32ff59dfc04c5b4ada9c65c7a01e449607a3173d2458b575220ad16c378"
+    },
+    {
+      "resource": "panorama/images/events/dark_carnival/textures/screw_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/textures/screw_png.vtex",
+      "width": 24,
+      "height": 24,
+      "compiledSha256": "656081d3ede66642475a11a879c66ed303be9cb28dca6778e9c41097029da253",
+      "decodedPngSha256": "8ad8e626847628abd9299d182585b0cc6fdeff959111e78dd062bc4ddcd37553"
+    },
+    {
+      "resource": "panorama/images/dota_plus/dota_plus_bg_psd.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/dota_plus_bg_psd.vtex",
+      "width": 1206,
+      "height": 842,
+      "compiledSha256": "060c29819d8586b6e2e4dfaa5b3232ba34e7e2724a9d5cbc2737bf3f4755858d",
+      "decodedPngSha256": "7ee4292770cdea812ab8a2516d6c57d54f214fe1738ceaf727edb54f635b24df"
+    },
+    {
+      "resource": "panorama/images/dota_plus/dota_plus_horizontal_banner_background_png.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/dota_plus_horizontal_banner_background_png.vtex",
+      "width": 2280,
+      "height": 529,
+      "compiledSha256": "a01c1b32e72ec60b647f9e907dc5551a10e27364379948e66477ee0028ef4914",
+      "decodedPngSha256": "3b6bcb4f3a07990b914c8e3b4f9360c93482e45502f71c8b057f53d3244e9d92"
+    },
+    {
+      "resource": "panorama/images/dota_plus/shop_button_bg_psd.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/shop_button_bg_psd.vtex",
+      "width": 334,
+      "height": 133,
+      "compiledSha256": "8a296b9d3f8498cf45c713473162fe123835c0caaab61e998365adfe1802d8ba",
+      "decodedPngSha256": "ef4429bb8ca02228edf4ee9c3d9556b25fb0d6457abbc7bb04f62a94108e7a3f"
+    },
+    {
+      "resource": "panorama/images/dota_plus/relic_agi_button_psd.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/relic_agi_button_psd.vtex",
+      "width": 290,
+      "height": 100,
+      "compiledSha256": "115a33ac8c82d4f318ca43e25147d6e2a47a726eaa61383d11837012b469934f",
+      "decodedPngSha256": "1f2f9c33a4f322920c23077d826aed87a0371e8fb884ed7c26380d37de7eb053"
+    },
+    {
+      "resource": "panorama/images/dota_plus/relic_rare_button_psd.vtex_c",
+      "uri": "s2r://panorama/images/dota_plus/relic_rare_button_psd.vtex",
+      "width": 290,
+      "height": 100,
+      "compiledSha256": "55a8540fb03ccde68a8e4d43609a020a418e6d659b24ac66c0c73937e13d6bb7",
+      "decodedPngSha256": "686f7f3809c2ad3e47510a5f352e8f642c7b32b28fda2e43cbed22ffabf98a53"
+    },
+    {
+      "resource": "panorama/images/compendium/international2024/dashboard/points_bg_texture_png.vtex_c",
+      "uri": "s2r://panorama/images/compendium/international2024/dashboard/points_bg_texture_png.vtex",
+      "width": 2000,
+      "height": 240,
+      "compiledSha256": "b184e0cd1744016a082ee7344366440322d811084621bbb6ba00f2385c07b1bb",
+      "decodedPngSha256": "a534cc66585ca8ee6ad5eae9de1473cf4be636007e500d677a28d47270f723ee"
+    },
+    {
+      "resource": "panorama/images/compendium/international2024/sidenav_background_png.vtex_c",
+      "uri": "s2r://panorama/images/compendium/international2024/sidenav_background_png.vtex",
+      "width": 800,
+      "height": 2038,
+      "compiledSha256": "eb9dd71a71dded25a7b8f755383e378cd37d71f64bf599e35991231766690b5a",
+      "decodedPngSha256": "0894065b51732fab44e6cff21f353201bbcfe315a163d755c2454af6924b65c0"
+    },
+    {
+      "resource": "panorama/images/compendium/international2024/flag_texture_png.vtex_c",
+      "uri": "s2r://panorama/images/compendium/international2024/flag_texture_png.vtex",
+      "width": 1002,
+      "height": 558,
+      "compiledSha256": "fb11c32cbc9b2508caf53438179ee1ed1e9eeccd639077398b009fe07bed6139",
+      "decodedPngSha256": "9a1e674031fd50e0996e345271cc7a497eb40b2350bcac862b8dba76b0572065"
+    },
+    {
+      "resource": "panorama/images/compendium/international2024/dashboard/selected_nav_bg_png.vtex_c",
+      "uri": "s2r://panorama/images/compendium/international2024/dashboard/selected_nav_bg_png.vtex",
+      "width": 504,
+      "height": 55,
+      "compiledSha256": "9f5cde2bc733fd36f783e6b2dd6c5de49731cbda8a061110790f1451de8aeece",
+      "decodedPngSha256": "eb160cc7e3b80299c146ce5453d1b9962922098ef35f3ef39ce188f659501286"
+    },
+    {
+      "resource": "panorama/images/hud/reborn/the_international_2024/shop_launcher_button_inrange_psd.vtex_c",
+      "uri": "s2r://panorama/images/hud/reborn/the_international_2024/shop_launcher_button_inrange_psd.vtex",
+      "width": 144,
+      "height": 44,
+      "compiledSha256": "474d63046412c6c0ebba13ab209e384d5970859d10585e1beec7e6d7446b6a5a",
+      "decodedPngSha256": "b3183cd5827d105d5ee21ecbe379dd7ae2c6075a04f70868475d1e8528116ef0"
+    },
+    {
+      "resource": "panorama/images/compendium/international2023/rewardpage_outerborder_psd.vtex_c",
+      "uri": "s2r://panorama/images/compendium/international2023/rewardpage_outerborder_psd.vtex",
+      "width": 582,
+      "height": 438,
+      "compiledSha256": "184fbfb080d9633509ac2a55cff1db9fa6076678c5fe84b27df9b3ade13ebec9",
+      "decodedPngSha256": "76e7a182e56529fa6ecd775ccf453855a1ed979187de01eb12181a540a609671"
+    },
+    {
+      "resource": "panorama/images/control_icons/x_close_png.vtex_c",
+      "uri": "s2r://panorama/images/control_icons/x_close_png.vtex",
+      "width": 37,
+      "height": 37,
+      "compiledSha256": "73d2af0e50da785ca59f34439ebd811c480fd3d2246e3bd60616fecc0b27e184",
+      "decodedPngSha256": "ded11e5fe1e76413ab372dfbea6a6f8b242d95bc76207bc1b4d93c26823f8dbe"
+    },
+    {
+      "resource": "panorama/images/control_icons/arrow_solid_left_png.vtex_c",
+      "uri": "s2r://panorama/images/control_icons/arrow_solid_left_png.vtex",
+      "width": 30,
+      "height": 50,
+      "compiledSha256": "2cf21ddecf39db51ca0ce814e4a0538773166f8220c6bd5b10434944fa5d882d",
+      "decodedPngSha256": "71fa377cf97fae8b9228eef2bef14ab3053d1bc65a318f19847b20111daa6cee"
+    },
+    {
+      "resource": "panorama/images/events/dark_carnival/overworld/rewards/reward_treasure_large_png.vtex_c",
+      "uri": "s2r://panorama/images/events/dark_carnival/overworld/rewards/reward_treasure_large_png.vtex",
+      "width": 384,
+      "height": 384,
+      "compiledSha256": "b1b5933b878a1dd01137c5622dd9f75b9243db312fa9727cfe6378c4973c5e26",
+      "decodedPngSha256": "9d7027566ddfcb980123bb16b40575033d642d1555b17820bb344a2cc8c57cdf"
+    }
+  ],
+  "commonControls": {
+    "plus": "panorama/images/control_icons/24px/plus.svg",
+    "plusSvgSha256": "236dde349057415387c553f1337f16c21f301bf1ec49457334e225316ae63347"
+  },
+  "screenshots": [
+    {
+      "theme": "reborn",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "path": "docs/design/lottery_native_concepts_20261019/01_reborn.png",
+      "sha256": "3e27143582264ca5988138d4e47a55ea142a02a4620a4f8c3160fee62cb9287c"
+    },
+    {
+      "theme": "crownfall",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "path": "docs/design/lottery_native_concepts_20261019/02_crownfall.png",
+      "sha256": "666c2e504c0b56b60946599aea1c8551c0c85e3120713fcdb7d9726a7809ffe8"
+    },
+    {
+      "theme": "carnival",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "path": "docs/design/lottery_native_concepts_20261019/03_carnival.png",
+      "sha256": "8b3d02563863f1b24f600596097aa5abc29ff0dd2f81d61e7e3d229c91e9ed2e"
+    },
+    {
+      "theme": "plus",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "path": "docs/design/lottery_native_concepts_20261019/04_plus.png",
+      "sha256": "92ba42e0f6ec340b9d583bb95f45af0a0dd2f8ec98ef76ecb376dc0ddffe5e35"
+    },
+    {
+      "theme": "international",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "path": "docs/design/lottery_native_concepts_20261019/05_international.png",
+      "sha256": "951b8a8d1ee7b8a6f941c16f5afcb448493ad909544322e8e97c3e9f8b472193"
+    }
+  ],
+  "overview": {
+    "path": "docs/design/lottery_native_concepts_20261019/overview.png",
+    "sha256": "c34d01ad7b021969e5ea34f3fad3438b8fb358eef6627d9be0c500704768bb62"
+  },
+  "checks": [
+    "Five different native component families, same configured pool, balance and eight rewards",
+    "Every texture/illustration resolves locally; source hashes verified during assembly",
+    "1920x1080 and 1280x720: no component clips, balance/Close overlap, draw-button overlap or prize/chest overlap",
+    "Explicit preview only: no game controller, network, purchase or draw event is loaded",
+    "Independent visual review: full native Crownfall silhouettes and BG/outline, correctly proportioned Carnival brass, no stray Plus upgrade plus signs"
+  ],
+  "compactViewports": [
+    {
+      "theme": "reborn",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "passed": true
+    },
+    {
+      "theme": "crownfall",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "passed": true
+    },
+    {
+      "theme": "carnival",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "passed": true
+    },
+    {
+      "theme": "plus",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "passed": true
+    },
+    {
+      "theme": "international",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "passed": true
+    }
+  ],
+  "layoutReferences": [
+    "https://wiki.guildwars2.com/wiki/Black_Lion_Chest/historical_7",
+    "https://wiki.guildwars2.com/wiki/File:Black_Lion_Trading_Company_interface.jpg"
+  ],
+  "sourceFiles": [
+    {
+      "path": "tools/lottery_native_concepts_20261019/browser.cjs",
+      "sha256": "fd82a43d0394d257e990ada90a4b10e91c66c88563f3b29d3b09045b57a8f2a3"
+    },
+    {
+      "path": "tools/lottery_native_concepts_20261019/build.cjs",
+      "sha256": "41941c2197ed24dfab558ee22c5fc8d54415dde52baeed27eb1db1180338f01f"
+    },
+    {
+      "path": "tools/lottery_native_concepts_20261019/capture.cjs",
+      "sha256": "4ca38177f22a5c6c887920ad58ddbdc595190d85660a3fe904ccdd1200612d41"
+    },
+    {
+      "path": "tools/lottery_native_concepts_20261019/concepts.css",
+      "sha256": "cd147824b4fdb722bda7461f753cce769aedbde168989b5555a3d7437bc3081c"
+    },
+    {
+      "path": "tools/lottery_native_concepts_20261019/content.json",
+      "sha256": "0852c8ecb6ead3588ad18f8d29a193ce0aa254375b19e26cde27fe5b5219f2dd"
+    },
+    {
+      "path": "tools/lottery_native_concepts_20261019/native_assets.json",
+      "sha256": "0ba44434433e5084abed9d35d6d32a61349fe9a27c5d5048937f0cac365e8092"
+    },
+    {
+      "path": "tools/lottery_native_concepts_20261019/plus.svg",
+      "sha256": "236dde349057415387c553f1337f16c21f301bf1ec49457334e225316ae63347"
+    },
+    {
+      "path": "tools/lottery_native_concepts_20261019/export.cjs",
+      "sha256": "c0acba79c93a9c967b5482776ba2158e61de1d544a4050c8b679fd9705f8142c"
+    },
+    {
+      "path": "tools/lottery_native_concepts_20261019/README.txt",
+      "sha256": "937357eb47a447823846c9294cd0f6fcebfa9d233c9eb95e942c1759b86f41e1"
+    }
+  ],
+  "limitations": [
+    "Static design concepts are browser-rendered; these are not native in-game screenshots.",
+    "The native treasure chest is preview art. Existing addon scene, reward and user ticket illustrations remain game content."
+  ]
+}
