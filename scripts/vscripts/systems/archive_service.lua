@@ -455,7 +455,9 @@ function M.equip_title(player_id, title_id)
     local profile = account_profile(player_id)
     if not profile then return {ok=false,error="玩家档案尚未加载"} end
     local presentation = require("systems/title_presentation_service")
-    if presentation.preview_mode() then return presentation.preview(player_id,title_id) end
+    -- Ordinary Tools clicks obey account gates too. Only an explicitly started
+    -- cosmetic preview may keep using the preview overlay for later choices.
+    if presentation.preview_active(player_id) then return presentation.preview(player_id,title_id) end
     if type(title_id)~="string" or title_id~="" and not require("systems/archive_titles").unlocked(saved(profile),title_id) then
         return {ok=false,error="称号未解锁或不存在"}
     end

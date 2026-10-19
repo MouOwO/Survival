@@ -231,4 +231,6 @@ class TitleBackendTest(unittest.TestCase):
 if __name__ == '__main__':
     LuaRuntime(unpack_returned_tuples=True).execute(
         (ROOT / 'scripts/vscripts/tests/test_titles.lua').read_text(encoding='utf-8'))
+    LuaRuntime(unpack_returned_tuples=True).execute(
+        (ROOT / 'scripts/vscripts/tests/test_title_equip_eligibility.lua').read_text(encoding='utf-8'))
     unittest.main(verbosity=2)
