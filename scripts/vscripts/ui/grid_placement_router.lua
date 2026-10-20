@@ -18,6 +18,29 @@ local preview_terrain_caches = {}
 local last_area_perf_log = -100
 local static_area=""
 local static_area_players={}
+local scopes_by_player = {}
+
+local function current_mode()
+    local setup = package.loaded["systems/match_setup_service"]
+    return setup and type(setup.get_mode) == "function" and setup.get_mode() or nil
+end
+
+local function advanced_mode()
+    local mode = current_mode()
+    return mode == "rich" or mode == "cold" or mode == "scourge"
+end
+
+local function current_scope(player_id)
+    local setup = package.loaded["systems/match_setup_service"]
+    local session = setup and type(setup.get_session_id) == "function" and setup.get_session_id() or "local"
+    local scope = tostring(session) .. ":" .. tostring(current_mode() or "unselected") .. ":" .. tostring(player_id)
+    local previous = scopes_by_player[player_id]
+    if not previous or previous.id ~= scope then
+        previous = {id=scope, version=(previous and previous.version or 0) + 1}
+        scopes_by_player[player_id] = previous
+    end
+    return scope, previous.version
+end
 
 local function valid_entity(entity)
     return entity and not entity:IsNull()
@@ -32,12 +55,18 @@ end
 local function preview_area(player_id, caster, position, profile, session_id)
     local now = GameRules and GameRules:GetGameTime() or 0
     local cached = preview_areas[player_id]
+    local scope = current_scope(player_id)
+    if cached and cached.scope ~= scope then
+        scheduler.cancel("grid_preview_area:" .. tostring(player_id))
+        cached = nil
+        preview_terrain_caches[player_id] = nil
+    end
     local interval = tonumber((grid_config.preview_visual or {}).area_refresh_interval) or 0.30
     if cached and cached.caster == caster:entindex() and (cached.job or now - cached.time < interval)
         and (position.x - cached.x)^2 + (position.y - cached.y)^2 < 256^2 then
         return cached.complete_area or cached.area, cached.complete_area and 1 or 0
     end
-    local state = {time = now, x = position.x, y = position.y,
+    local state = {time = now, x = position.x, y = position.y, scope = scope,
         caster = caster:entindex(), area = cached and cached.area or "",
         complete_area = cached and cached.complete_area or nil}
     preview_areas[player_id] = state
@@ -52,7 +81,8 @@ local function preview_area(player_id, caster, position, profile, session_id)
         })
     end)
     local function step()
-        if preview_areas[player_id] ~= state or preview_sessions[player_id] ~= session_id then return end
+        if preview_areas[player_id] ~= state or preview_sessions[player_id] ~= session_id
+            or current_scope(player_id) ~= scope then return end
         local batch_start = perf_clock()
         local ok, result = coroutine.resume(state.job)
         batches = batches+1
@@ -68,7 +98,7 @@ local function preview_area(player_id, caster, position, profile, session_id)
             -- The inline batch travels with the exact validation response.
             if batches > 1 and (complete or not state.complete_area) then send(player_id, "ui_grid_placement_area", {
                 session_id = session_id, ability_name = profile.ability_name, area = result,
-                complete = complete and 1 or 0,
+                complete = complete and 1 or 0, grid_scope = scope,
             }) end
         end
         if not complete then return 0.05 end
@@ -145,6 +175,9 @@ end
 
 send = function(player_id, event_name, payload)
     if not valid_player_id(player_id) then return end
+    local scope, version = current_scope(player_id)
+    if payload.grid_scope and payload.grid_scope ~= scope then return end
+    payload.grid_scope, payload.grid_scope_version = scope, version
     local player = PlayerResource:GetPlayer(player_id)
     if player then
         CustomGameEventManager:Send_ServerToPlayer(player, event_name, payload)
@@ -327,26 +360,39 @@ local function validate_preview(player_id, payload, profile, position)
     return caster, business, geometry
 end
 
+local function send_static_area(player_id)
+    -- This shared atlas describes the ordinary island only. A completed scan
+    -- must not repaint a separate arena after the player's mode has changed.
+    if not advanced_mode() and static_area ~= "" then
+        send(player_id, "ui_grid_placement_static_area", {area=static_area})
+    end
+end
+
 local function send_profiles(player_id)
+    if not valid_player_id(player_id) then return end
     local bounds, height = grid_config.build_bounds, tonumber(grid_config.build_ground_height) or 0
-    local setup = package.loaded["systems/match_setup_service"]
-    local mode = setup and setup.get_mode and setup.get_mode()
-    local rich = mode == "rich" or mode == "cold" or mode == "scourge"
+    local rich = advanced_mode()
     if rich then
-        local region = require("systems/rich_region_service").region(player_id)
-        if region then
-            bounds = {min_x=region.min_x*64,min_y=region.min_y*64,
-                max_x=(region.max_x+1)*64,max_y=(region.max_y+1)*64}
-            height = region.position.z
+        local region, reason = require("systems/rich_region_service").region(player_id)
+        if not region then
+            send(player_id, "ui_grid_placement_profiles", {
+                profiles={}, layout_ready=0, error=reason or "mode_build_region_pending",
+                cell_size=tonumber(grid_config.cell_size) or 64,
+            })
+            return
         end
+        bounds = {min_x=region.min_x*64,min_y=region.min_y*64,
+            max_x=(region.max_x+1)*64,max_y=(region.max_y+1)*64}
+        height = region.position.z
     end
     send(player_id, "ui_grid_placement_profiles", {
         profiles = profile_list(), cell_size = tonumber(grid_config.cell_size) or 64,
+        layout_ready = 1,
         preview_visual = grid_config.preview_visual or {},
         static_grid = {bounds=grid_config.grid_display_bounds or bounds,
             build_bounds=bounds,height=height}, version = "GridPlacement_V3_StaticWhiteGrid",
     })
-    if not rich and static_area~="" then send(player_id,"ui_grid_placement_static_area",{area=static_area}) end
+    send_static_area(player_id)
 end
 
 local function register_profile_request()
@@ -605,7 +651,7 @@ function M.init()
     preview_request_ids = {}
     preview_pose_ids = {}
     require("systems/grid_preview_model_service").clear_all()
-    static_area="";static_area_players={}
+    static_area="";static_area_players={};scopes_by_player={}
     scheduler.cancel("grid_static_terrain")
     local grid=require("systems/grid_placement_system")
     if grid.static_preview then
@@ -613,12 +659,13 @@ function M.init()
             return grid.static_preview({yield_after=128,time_budget=0.002})
         end)
         scheduler.after(0.05,function()
+            if advanced_mode() then return end
             local ok,result=coroutine.resume(job)
             if not ok then print("[GridPlacement] static terrain failed: "..tostring(result));return end
             if coroutine.status(job)~="dead" then return 0.05 end
             static_area=type(result)=="string" and result or ""
             for player_id in pairs(static_area_players) do
-                send(player_id,"ui_grid_placement_static_area",{area=static_area})
+                send_static_area(player_id)
             end
             print("[GridPlacement] static terrain ready bytes="..#static_area)
         end,"grid_static_terrain")
@@ -628,12 +675,17 @@ function M.init()
     end)
     build_profiles()
     event_bus.subscribe(events.BUILDER_READY, function(payload)
-        local setup = package.loaded["systems/match_setup_service"]
-        if setup and setup.get_mode and setup.get_mode() == "rich" then
+        local player_id = tonumber(payload.player_id)
+        if not valid_player_id(player_id) then return end
+        if advanced_mode() then
             scheduler.cancel("grid_static_terrain")
             static_area = ""
-            send_profiles(tonumber(payload.player_id))
+            destroy_preview(player_id)
+            preview_terrain_caches[player_id] = nil
         end
+        -- Profiles are preloaded before mode choice. Every arena must replace
+        -- that provisional ordinary boundary and construction plane.
+        send_profiles(player_id)
     end)
     register_profile_request()
     register_preview_pose()

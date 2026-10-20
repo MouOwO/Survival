@@ -1,0 +1,39 @@
+{
+  "status": "FIX_VERIFIED",
+  "cause": [
+    "Cold and scourge did not replace the ordinary construction profiles when their builder became ready",
+    "The old ordinary terrain atlas and its Z384 plane survived arena layout changes"
+  ],
+  "fix": [
+    "Refresh each player's construction bounds and ground plane for all three advanced modes",
+    "Clear atlas, dynamic terrain, validation and projection state on layout changes",
+    "Reject late packets from an earlier match/mode/player layout scope",
+    "Wait for a real arena region instead of falling back to ordinary construction bounds"
+  ],
+  "rules_preserved": "Authoritative court ownership, complete footprint, terrain, trees, units, occupied cells and corridor exclusion",
+  "regressions": {
+    "tools/test_grid_mode_scope.cjs": "PASS",
+    "scripts/vscripts/tests/test_grid_mode_scope.lua": "PASS",
+    "tools/test_grid_dynamic_cache.cjs": "PASS",
+    "scripts/vscripts/tests/test_grid_builder_preview.lua": "PASS"
+  },
+  "native_feature_observation": {
+    "mode": "rich",
+    "player_id": 0,
+    "unit": "building_main_city",
+    "position": [320, -9984, 256],
+    "green_cells_before": 16,
+    "created_via_real_build_request": true,
+    "occupied_red_cells_after": 16,
+    "clear_cells_after_native_death": 16,
+    "full_probe_result": "Cleanup bookkeeping failed because the first probe revision required a Lua flag on its held entity handle; the scene subsequently changed before the corrected cleanup helper could be retried",
+    "other_modes_native_creation": "Not completed; all three mode transitions and stale-cache handling passed the integration regressions"
+  },
+  "compiled_data_matches_source": {
+    "survival_grid_state": "9192b366b0724339297c9e423ea5d7141f1656375c5147051d3f64016a595040",
+    "survival_grid_placement": "be801b4738a38b88f23c23536ac9d2c429d8ac3d778554ece721ee741fe4cf38"
+  },
+  "backend_deployment_required": false,
+  "hammer_nav_edits_required": false,
+  "background_connection_helper_restored": true
+}

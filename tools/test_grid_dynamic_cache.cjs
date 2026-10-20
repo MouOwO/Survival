@@ -42,7 +42,11 @@ assert.equal(state.stats.dynamic_builds,3,'late static atlas rebuilds even when 
 assert(!panels.some(p=>p.host===dynamic&&p.visible),'static red is not duplicated in the dynamic overlay');
 state.configureLayout({bounds:{min_x:-512,min_y:-512,max_x:512,max_y:512},
  build_bounds:{min_x:0,min_y:0,max_x:256,max_y:256},height:384});
-assert.equal(state.stats.dynamic_builds,4,'changed build bounds invalidate the cached overlay');
+assert(!state.ready() && !panels.some(p=>p.host===dynamic&&p.visible),
+ 'changed region discards its prior static and dynamic permission maps');
+update();
+assert.equal(tiles().filter(p=>p.classes.has('Unknown')).length,1,
+ 'the new region is unknown until fresh data arrives; old red cannot become its permission');
 state.ingestDynamic(changed);update();
-assert.equal(state.stats.dynamic_builds,4,'delivery after static changes uses the rebuilt overlay');
+assert.equal(state.stats.dynamic_builds,4,'delivery after a region change rebuilds only from the fresh overlay');
 console.log('GRID_DYNAMIC_CACHE_PASS duplicate delivery, freshness/expiry, changed blockers, late atlas and bounds');
