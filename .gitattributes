@@ -51,3 +51,7 @@ data/ui/shop_home_catalog_20261016.json text eol=lf
 data/ui/shop_home_video_review_20261016.json text eol=lf
 # The item registry embeds the SHA256 of its maintained source bytes.
 data/ui/item_resources.json text eol=lf
+# Archive migration ledger digests require the reviewed LF bytes on Windows too.
+server/aliyun/database/target/202610170001_rich_match_mode.sql text eol=lf
+server/aliyun/database/target/202610200002_archive_match_modes.sql text eol=lf
+server/aliyun/database/target/202610200003_archive_daily_limits.sql text eol=lf

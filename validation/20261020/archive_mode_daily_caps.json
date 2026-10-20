@@ -1,0 +1,66 @@
+{
+  "status": "PASS",
+  "date": "2026-10-20",
+  "implementation_commit": "ecc27a7a4dc6cd9ff49a565f0095eba03129cfb5",
+  "archive": {
+    "video_sha256": "b23a5db14ca852324aec21f75249190d9dcabeb397d97ed06f114ea971f51f76",
+    "verified_video_rewards": 199,
+    "configured_entries": 253,
+    "visible_difficulty_range": "N1-N10",
+    "rich_declared_difficulties": 30,
+    "higher_rewards_retained": true,
+    "legacy_standard_progress_preserved": true,
+    "mode_counts_independent": true
+  },
+  "daily_caps": {
+    "shared_clear": 20,
+    "rich": 20,
+    "cold": 10,
+    "scourge": 10,
+    "shadow": 80,
+    "coins": 8000,
+    "boss": 300,
+    "cage": 60,
+    "each_fragment": 20,
+    "each_social_ticket": 10,
+    "endless_score": 50000,
+    "fishing": 80,
+    "faith": 3000,
+    "timezone": "Asia/Shanghai",
+    "vip_or_pass_increases_cap": false,
+    "reserved_unimplemented_sources": true
+  },
+  "checks": {
+    "isolated_backend_tests": 88,
+    "lua_and_panorama_regressions": "PASS",
+    "native_scripts_DATA_match_live_sources": true,
+    "postgres_atomic_quota_tests": 12,
+    "full_migration_chain": "PASS",
+    "operator_unit_tests": 8,
+    "actual_sync_function_postgres_checks": 9,
+    "sealed_candidate_cases": 24
+  },
+  "deployment": {
+    "ok": true,
+    "phase": "POST_DEPLOY_VERIFIED",
+    "release": "20261020-archive-caps-v1",
+    "bundle": "ecf55dd6ba24d0b391a1640f7e25c06c50d79ec1eb37f0bfcdb86c28afde22f7",
+    "ledger_entries": 29,
+    "quota_limits": {
+      "clear": 20,
+      "cage": 60,
+      "fragment_01": 20,
+      "fishing": 80,
+      "coins": 8000,
+      "endless": 50000,
+      "faith": 3000
+    },
+    "payment_untouched": true,
+    "private_backup_verified": true,
+    "player_profiles_read": 0,
+    "player_updates": 0
+  },
+  "release_plan_sha256": "bcbf144c3a5c6f797e93e51260f1c6aa114e1e76f6cdd00968336be42b2c3819",
+  "server_backup_downloaded": false,
+  "primary_worktree_preexisting_edits_preserved": true
+}

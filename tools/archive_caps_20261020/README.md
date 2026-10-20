@@ -1,0 +1,32 @@
+# 模式通关存档与每日获取上限
+
+2026-10-20 测试服发布：`20261020-archive-caps-v1`。
+结算包：`ecf55dd6ba24d0b391a1640f7e25c06c50d79ec1eb37f0bfcdb86c28afde22f7`。
+
+录像逐项核对的 199 条奖励见
+`data/references/archive_clear_rewards_20261020.json`；
+`tools/import_archive_clear_video.py` 保留旧常规成就 ID，并生成分模式配置。
+当前已接入模式的存档显示 N1–N10。丰饶完整范围预留到 N30；
+录像没有展示丰饶 N23–N30 的奖励数值，没有推测这些数值。
+更高难度的已知奖励保留在配置中，尚未接入的模式整页条目不提前显示。
+存档显示范围不会补造战斗波次；发奖仍校验真实模式与可用难度。
+
+每日额度统一由 `archive_daily_limits.csv` 定义，VIP 和月卡均不提高最终上限。
+所有战斗模式共享每日通关 20 次，特殊模式另受自己的额度限制；北京时间零点重置。
+只有实际获得的奖励占用额度，消费不恢复额度。未实现的来源只预留定义。
+
+## 发布工具
+
+- `prepare_release.py`：以固定的实际线上快照和本次输入构建最小覆盖包。
+- `verify_release.py`：真实 Lua worker、旧回执、抽奖兼容与模式转换器检查。
+- `seal_release.py`：确定性封包，逐文件 SHA256 校验。
+- `deploy_remote.py`：测试服务器端 operator，默认仅检查；备份后按事务迁移并切换。
+- `remote_driver.py`：固定 SSH 主机记录；显式执行 upload/check/prepare/activate/verify。
+
+构建输入、原始 OCR、下载的无凭据线上源码及密封包保留在忽略目录
+`tmp/archive_caps_20261020/`。这套发布记录已完成，禁止修改已部署 SQL 的内容或摘要；
+未来调整使用新迁移。三条迁移在 `.gitattributes` 中固定 LF，保证 Windows 检出字节与迁移账本一致。
+新增发布应重新采集只读基线并生成新的发布名称、摘要和验证记录。
+
+部署保持旧抽奖、积分唯一性、排行榜及所有历史结算包。私有数据库与源码备份保留在服务器，未下载玩家数据。
+详细结果见 `validation/20261020/archive_mode_daily_caps.json`。
