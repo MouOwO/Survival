@@ -257,6 +257,19 @@ local function lottery_cheat_allowed()
     return false
 end
 
+local function unlock_test_modes(context)
+    if #context.args ~= 0 then return false, "usage: 0" end
+    local ok, error_code = require("debug/mode_unlock_test").enable(context.player_id)
+    if not ok then return false, error_code end
+    local startup = package.loaded["systems/startup_loading_service"]
+    if startup and type(startup.tick) == "function" then startup.tick() end
+    if type(wave_system.refresh_selection) == "function" then
+        wave_system.refresh_selection("mode_unlock_test")
+    end
+    notify(context, "本局测试已解锁全部模式及 N1–N10；测试进度不保存")
+    return true
+end
+
 local function grant_lottery_tickets(context)
     if not lottery_cheat_allowed() then
         return false, "tools_mode_or_cheats_required"
@@ -1240,6 +1253,7 @@ local function on_scale_selection_changed(_, payload)
 end
 
 local COMMANDS = {
+    ["0"] = unlock_test_modes,
     dev = enable_dev,
     shopshow = show_shop,
     addgold = add_gold,
@@ -1347,7 +1361,7 @@ function M.init()
     )
     logger.info(
         "CheatCommand",
-        "ready: wudi, xinyang <amount>, choujiang <amount>, addhero/addhero1 (monkey king), addhero2 (blademaster), deletehero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
+        "ready: 0 (unlock test modes), wudi, xinyang <amount>, choujiang <amount>, addhero/addhero1 (monkey king), addhero2 (blademaster), deletehero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"
     )
 end
 

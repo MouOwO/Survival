@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "command": "0",
+  "usage": "Host enters 0 in chat before selecting a mode in Tools or a cheat-enabled match",
+  "scope": "Current match; cleared by match setup initialization",
+  "unlock": "All six modes and N1-N10 for the five combat modes",
+  "authentication": "Real account authentication remains required",
+  "gameplay": "Selected mode still owns its original waves and Hammer spawn markers",
+  "progress": "Test clears are skipped before entering the settlement queue; provider and local save writes are blocked",
+  "isolation": "Remains latched if cheats are turned off during the test match",
+  "test": "scripts/vscripts/tests/test_mode_unlock_zero.lua",
+  "verification": "Real chat/profile/selection modules with mocked native engine and HTTP APIs",
+  "regressions": [
+    "test_match_setup_service.lua",
+    "test_team_mode_difficulty_service.lua",
+    "test_difficulty_unlocks.lua",
+    "test_player_entry_authentication.lua",
+    "test_player_profile_modes.lua",
+    "test_rich_mode_profiles.lua",
+    "test_rich_mode_settlement.lua"
+  ],
+  "native_game_test_performed": false,
+  "additional_regression": {
+    "test_archive_service.lua": "Existing '44 regular milestones' assertion fails in both the worktree and the unchanged HEAD test before archive_service is loaded"
+  },
+  "backend_deployment_required": false
+}

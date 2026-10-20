@@ -1,11 +1,18 @@
 local json_decoder = require("core/json_decoder")
 local json_encoder = require("core/json_encoder")
 local rules = require("config/generated/fishing_system_rules")
+local mode_test = require("debug/mode_unlock_test")
 
 local M = {}
 local active_rule = nil
 local logged_in = {}
 local endless_batch_capability
+local test_read_paths = {
+    ["/v1/session/authenticate"] = true, ["/v1/session/login"] = true,
+    ["/v1/profile"] = true, ["/v1/lottery/catalog"] = true,
+    ["/v1/lottery/snapshot"] = true, ["/v1/archive/config"] = true,
+    ["/v1/archive/endless-leaderboard"] = true,
+}
 
 local function profile_mode(setup)
     return type(setup.get_profile_mode) == "function"
@@ -21,6 +28,9 @@ end
 
 local function request(path, payload, on_success, on_error)
     if not active_rule then on_error("fishing_rule_missing") return end
+    if mode_test.is_enabled() and not test_read_paths[path] then
+        on_error("mode_unlock_test_read_only") return
+    end
     local setup = require("systems/match_setup_service")
     if path ~= "/v1/session/authenticate" and path ~= "/v1/lottery/catalog" and not setup.is_mode_selected() then
         on_error("mode_not_selected") return
@@ -36,6 +46,9 @@ local function request(path, payload, on_success, on_error)
         local game_mode = setup.get_mode()
         body.mode = (game_mode == "rich" or game_mode == "cold" or game_mode == "scourge")
             and game_mode or profile_mode(setup)
+        -- Test arenas borrow only the ordinary combat view. They never create
+        -- an advanced durable session or submit test clears to the backend.
+        if mode_test.is_enabled() then body.mode = profile_mode(setup) end
     end
     local token = convar("survival_fishing_api_token")
     if token == "" then on_error("fishing_api_token_missing") return end
@@ -99,6 +112,9 @@ function M.fetch_snapshot(account_id, on_success, on_error)
             on_error("match_profile_mismatch") return
         end
         local game_mode = setup.get_mode()
+        if mode_test.is_enabled() then
+            snapshot.game_mode, snapshot.debug_mode_unlock = game_mode, 1
+        end
         if (game_mode == "rich" or game_mode == "cold" or game_mode == "scourge")
             and snapshot.game_mode ~= game_mode then
             on_error("match_profile_mismatch") return

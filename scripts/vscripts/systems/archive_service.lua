@@ -440,6 +440,9 @@ flush = function(player_id)
 end
 
 local function enqueue(player_id, command)
+    if require("debug/mode_unlock_test").is_enabled() then
+        return {ok=true, skipped=true, test_only=true}
+    end
     if finalizing then return {ok=false,error="正在保存本局奖励，请等待结算"} end
     local adapter = require("systems/archive_http_adapter")
     if adapter.enabled() then remote_provider = adapter end

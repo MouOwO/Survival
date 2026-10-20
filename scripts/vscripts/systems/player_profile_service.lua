@@ -480,6 +480,7 @@ local function commit_snapshot(player_id, snapshot, reason)
         public = copy(snapshot.public),
         mode = snapshot.mode,
         game_mode = snapshot.game_mode,
+        debug_mode_unlock = snapshot.debug_mode_unlock,
         match_session_id = snapshot.match_session_id,
         progression = copy(snapshot.progression),
         processed_update_ids = {},
@@ -1025,6 +1026,10 @@ end
 -- ownership and a lottery item's gameplay-stat deltas cannot split across
 -- two revisions.
 function M.update_save_sections(player_id, replacements, reason)
+    local mode_test = package.loaded["debug/mode_unlock_test"]
+    if mode_test and mode_test.is_enabled() then
+        return { ok = false, error = "mode_unlock_test_read_only" }
+    end
     -- HTTP-authoritative rooms must never acknowledge a local-only permanent write.
     if provider and provider.archive_enabled and provider.archive_enabled() then
         return { ok = false, error = "remote_save_requires_server_transaction" }

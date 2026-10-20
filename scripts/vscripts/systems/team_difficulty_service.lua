@@ -3,6 +3,7 @@
 -- lobby host changes. No client counters participate in these permissions.
 local config = require("config/difficulty_config")
 local progression_rules = require("config/mode_progression")
+local mode_test = require("debug/mode_unlock_test")
 local M = {}
 
 function M.snapshot(player_ids, mode)
@@ -15,7 +16,7 @@ function M.snapshot(player_ids, mode)
             local ok, value = pcall(profiles.get_progression, id, mode)
             progression[id] = ok and value or nil
             if type(progression[id]) ~= "table" or progression[id].loaded ~= true then ready = false end
-            if progression_rules.parent_mode(mode) and (not progression_rules.counts(mode, progression[id])
+            if not mode_test.is_enabled() and progression_rules.parent_mode(mode) and (not progression_rules.counts(mode, progression[id])
                 or not progression_rules.counts(progression_rules.parent_mode(mode), progression[id])) then ready = false end
         end
     end

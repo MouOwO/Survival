@@ -2,6 +2,7 @@
 -- Requests reach select_mode only after startup resolves the engine event actor.
 local M = {}
 local progression_rules = require("config/mode_progression")
+local mode_test = require("debug/mode_unlock_test")
 local session_id, mode_id, selected_by = "", nil, nil
 local mode_options = {
     { mode_id = "standard", display_name = "常规模式",
@@ -36,6 +37,7 @@ end
 function M.init(id)
     assert(type(id) == "string" and id ~= "", "match session required")
     session_id, mode_id, selected_by = id, nil, nil
+    mode_test.reset(id)
 end
 
 function M.get_session_id() return session_id end
@@ -55,6 +57,7 @@ local function mode_permission(id, requested)
     if not ok or type(profiles.get_authenticated_progression) ~= "function" then return false, true end
     local valid, progress = pcall(profiles.get_authenticated_progression, id)
     if not valid or type(progress) ~= "table" or progress.loaded ~= true then return false, true end
+    if mode_test.is_enabled() then return true, false end
     if type(progress[progression_rules.clear_field(requested)]) ~= "table" then
         local name = ({rich="丰饶模式", cold="极寒模式", scourge="天灾模式"})[requested]
         return false, true, name .. "服务尚未就绪"
@@ -72,6 +75,7 @@ local function daily_capped(quota)
         or tonumber(quota.remaining) == 0) or false
 end
 local function mode_daily_quota(id, requested)
+    if mode_test.is_enabled() then return nil end
     local key = mode_daily_keys[requested]
     if not key then return nil end
     local ok, profiles = pcall(require, "systems/player_profile_service")
