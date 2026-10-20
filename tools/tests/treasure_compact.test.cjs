@@ -118,7 +118,7 @@ function harness(beforeController) {
         if (String(key) === '0') history = value;
         for (const listener of [...listeners.values()]) if (listener.name === 'survival_rogue_reward') listener.fn('survival_rogue_reward', key, value);
     }
-    if (beforeController) beforeController({cfg, nodes, root, Panel});
+    if (beforeController) beforeController({cfg, nodes, root, Panel, load});
     load('treasure_history.js');
     return {cfg, nodes, root, hud, anchor, counts, timers, listeners, dispatched, sent, adopted, load, advance, net};
 }
@@ -204,6 +204,10 @@ function treasure() {
     for (const icon_name of iconNames) {
         h.net('0', {history: [{name: '真实奖励图标', icon_name}]});
         const art = slotIcon(cards()[0]);
+        assert.equal(art.style.position, '0px 0px 0px', 'Treasure artwork has no inset');
+        assert.equal(art.style.width, '100%'); assert.equal(art.style.height, '100%');
+        assert.equal(art.scaling, 'stretch-to-cover-preserve-aspect', 'Every native reward fills the square without letterboxing');
+        assert.equal(art.style.border, '0px', 'The icon does not add another inset border');
         if (icon_name.includes('/')) {
             assert(fs.existsSync(path.join(project, 'panorama/src/images/spellicons', icon_name + '.png')), icon_name + ' has its real resource');
             assert.equal(art.image, 'file://{images}/spellicons/' + icon_name + '.png');
@@ -214,6 +218,18 @@ function treasure() {
     h.root.DeleteAsync();
     assert.doesNotThrow(() => {h.advance(1); ui.Close(); ui.Dispose(); ui.Dispose(); old.Dispose();});
     assert.equal(h.listeners.size, 0); assert.equal(h.timers.size, 0);
+
+    const registered = harness(({load}) => {
+        load('common/item_resources.js'); load('reward_presentation.js');
+    });
+    registered.net('0', {history: [{item_id:'daily_ancient_tree', name:'古树眷顾'}]});
+    registered.cfg.SurvivalTreasure.Open();
+    const registeredArt = slotIcon(registered.nodes.TreasureCards.Children()[0]);
+    assert(registeredArt, 'The real shared registry creates the treasure icon');
+    assert.equal(registeredArt.style.position, '0px 0px 0px');
+    assert.equal(registeredArt.style.width, '100%'); assert.equal(registeredArt.style.height, '100%');
+    assert.equal(registeredArt.scaling, 'stretch-to-cover-preserve-aspect', 'Treasure locally fills an icon whose shared registry defaults to contain');
+    registered.cfg.SurvivalTreasure.Dispose();
 
     const migrated = harness(({cfg, nodes, root, Panel}) => {
         // Reproduce the old controller's real V10 adoption and moved XML controls.
