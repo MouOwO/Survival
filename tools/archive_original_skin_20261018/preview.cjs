@@ -1,0 +1,25 @@
+'use strict';
+// Snapshot the delivered production textures and assemble the existing offline archive harness.
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict'),{spawnSync}=require('node:child_process');
+const repo=path.resolve(__dirname,'../..'),out='output/archive_original_skin_20261018',preview=out+'/preview';
+process.chdir(repo);
+const sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+const baseline=JSON.parse(fs.readFileSync(out+'/layout_baseline.json','utf8'));
+for(const row of baseline.files)assert.equal(sha(row.path),row.sha256,'Layout/code unchanged before final assembly: '+row.path);
+const provenance=JSON.parse(fs.readFileSync(out+'/source_audit/source_report.json','utf8'));
+const names=['window_background','header_strip','sidebar_background','content_background'];
+const assets=names.map(name=>{const mirrors=['art/ui/sources/custom_game/archive_parchment_v1/'+name+'.png','panorama/src/images/custom_game/archive_parchment_v1/'+name+'.png'],hash=sha(mirrors[0]);for(const file of mirrors)assert.equal(sha(file),hash,'Art/source PNG mirrors are identical');return {name,mirrors,sha256:hash};});
+const originals=provenance.assets.filter(row=>['155985.png','titlebar-inactive.png','window-topright.png'].includes(row.name)).map(row=>{const file=out+'/source_audit/'+row.name;assert.equal(sha(file),row.sha256,'Original source PNG stays intact');return {file,url:row.url,sha256:row.sha256};});
+assert.equal(originals.length,3,'Documented raw source set is complete');
+fs.writeFileSync(out+'/asset_freeze.json',JSON.stringify({at:new Date().toISOString(),assets,originals},null,2));
+const child=spawnSync(process.execPath,['tools/archive_parchment/preview.cjs','--out',preview],{cwd:repo,encoding:'utf8',windowsHide:true});
+if(child.stdout)process.stdout.write(child.stdout);if(child.stderr)process.stderr.write(child.stderr);assert.equal(child.status,0,'Existing production preview builds successfully');
+const entry=preview+'/index.html';let html=fs.readFileSync(entry,'utf8');
+html=html.replace('<title>羊皮纸存档 · 实际组件隔离预览</title>','<title>真实 GW2 原始纹理 · 存档离线预览</title>');
+html=html.replace(/(<div id="PreviewCaption">)[\s\S]*?(<\/div>)/,'$1真实 GW2 原始纹理 · 生产 XML / JS / CSS · 离线样例 · 未连接游戏、账号或奖励$2');
+fs.writeFileSync(entry,html);
+const manifestPath=preview+'/assembly.json',assembly=JSON.parse(fs.readFileSync(manifestPath,'utf8'));
+assembly.kind='original_gw2_dat_textures_production_archive_offline_preview';assembly.assetFreeze=out+'/asset_freeze.json';assembly.sourceProvenance=out+'/source_audit/source_report.json';assembly.layoutBaseline=out+'/layout_baseline.json';assembly.notGameCapture=true;
+assembly.limitations.push('Background 155985 is the original GW2 dat texture served by a community asset CDN; this is not asserted to be an ArenaNet CDN. Embedded titlebar aliases are documented by Blish HUD source.');
+fs.writeFileSync(manifestPath,JSON.stringify(assembly,null,2));
+console.log('ARCHIVE_ORIGINAL_GW2_SKIN_PREVIEW_BUILT '+preview);

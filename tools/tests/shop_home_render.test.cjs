@@ -84,16 +84,11 @@ const cards = h => Array.from(h.cardList()).filter(panel => panel.__observedProd
 const displayIds = h => cards(h).map(panel => identity(panel.__observedProduct));
 const purchaseRequests = h => h.requests.filter(row => row.payload.action === 'purchase');
 const allDescendants = panel => [panel, ...panel.Children().flatMap(allDescendants)];
-function allPages(h) {
-    const result = [], sizes = []; let iterations = 0;
-    while (true) {
-        assert(++iterations < 20, 'Pagination terminates');
-        result.push(...displayIds(h)); sizes.push(cards(h).length);
-        const next = h.descendants(h.store().actions, 'CJPageAction')[1];
-        if (!next || !next.enabled) break;
-        next.events.onactivate();
-    }
-    return {ids: result, sizes};
+function allRows(h) {
+    assert.equal(h.descendants(h.store().actions, 'CJPageAction').length, 0, 'Every market category is a single scrolling list');
+    assert.equal(h.descendants(h.store().actions, 'CJPageLabel').length, 0);
+    h.loadAllBatches();
+    return {ids: displayIds(h), count: cards(h).length};
 }
 // Expectations come from the reviewed identities and presentation order, never
 // from the previous model whose broad All/discount aliases admitted packages.
@@ -114,11 +109,11 @@ assert.equal(expectedGroups.all.length, 114); assert.equal(expectedGroups.promot
 function expectedGroup(id, excluded = []) { return expectedGroups[id].filter(sku => !excluded.includes(sku)); }
 function assertExclusiveGroups(h, message) {
     for (const group of ['all', 'bundles', 'promotions', 'vip']) {
-        select(h, group); const actual = allPages(h);
+        select(h, group); const actual = allRows(h);
         assert.deepEqual(actual.ids, expectedGroups[group], message + ': ' + group + ' has exactly its reviewed membership and order');
         assert.equal(h.cfg.SurvivalCommerceView.Inspect().groups.find(entry => entry.id === group).count, expectedGroups[group].length,
             message + ': ' + group + ' count matches its own rows');
-        if (group === 'all') assert.deepEqual(actual.sizes, [40, 40, 34]);
+        assert.equal(actual.count, expectedGroups[group].length, 'Every category can load through its final batch');
     }
     assert.equal(h.cfg.SurvivalCommerceView.Inspect().catalogProductCount, 129, 'Tab separation never changes the formal catalog');
 }
@@ -186,14 +181,14 @@ const changedProducts = products.map(item => item.sku === changedSku ? {...item,
 const changed = makeHarness(); changed.walletSnapshot(changedProducts); select(changed, 'home');
 assert.deepEqual(displayIds(changed), expectedIds.filter(id => id !== changedSku));
 assert.equal(changed.cfg.SurvivalCommerceView.Inspect().groups.find(group => group.id === 'home').count, 14);
-select(changed, 'all'); assert.deepEqual(allPages(changed).ids, expectedGroup('all', [changedSku]));
-select(changed, 'bundles'); assert.deepEqual(allPages(changed).ids, [...ordinaryBundles, changedSku]);
+select(changed, 'all'); assert.deepEqual(allRows(changed).ids, expectedGroup('all', [changedSku]));
+select(changed, 'bundles'); assert.deepEqual(allRows(changed).ids, [...ordinaryBundles, changedSku]);
 
 // A missing independent configuration must stay empty, never fall back to All.
 const missing = makeHarness({missingHome: true}); missing.walletSnapshot(products); select(missing, 'home');
 assert.deepEqual(displayIds(missing), []);
 assert.equal(missing.cfg.SurvivalCommerceView.Inspect().groups.find(group => group.id === 'home').count, 0);
-select(missing, 'all'); assert.equal(allPages(missing).ids.length, 114);
+select(missing, 'all'); assert.equal(allRows(missing).ids.length, 114);
 missing.cfg.SurvivalShopHomeCatalog = {List: () => products.map(item => item.sku)};
 select(missing, 'home'); assert.deepEqual(displayIds(missing), [], 'An incomplete old List-only config also fails closed');
 
@@ -205,9 +200,9 @@ const restricted = products.map(item => item.sku === ownedSku ? {...item, owned:
 h.walletSnapshot(restricted); select(h, 'home');
 assert.deepEqual(displayIds(h), expectedIds.filter(id => id !== ownedSku && id !== delistedSku));
 assert.equal(cards(h).filter(card => card.__observedProduct.home_unavailable).length, 0);
-select(h, 'all'); assert.deepEqual(allPages(h).ids, expectedGroup('all', [ownedSku, delistedSku]));
+select(h, 'all'); assert.deepEqual(allRows(h).ids, expectedGroup('all', [ownedSku, delistedSku]));
 
-// Paging to a real product can only open its existing checkout. An order still
+// The last real product in the full list can only open its existing checkout. An order still
 // requires the explicit confirmation button and must carry that exact SKU.
 const buyer = makeHarness();
 buyer.walletSnapshot(products, {u_coin: 0, shop_points: Math.max(...products.map(item => item.price)) + 1, shop_gold: 0});
@@ -221,8 +216,9 @@ select(buyer, 'all');
 // Reopening the market legitimately refreshes ownership; finish that real
 // catalog request before exercising the confirmation's purchase action.
 buyer.walletSnapshot(products, {u_coin: 0, shop_points: Math.max(...products.map(item => item.price)) + 1, shop_gold: 0});
-buyer.descendants(buyer.store().actions, 'CJPageAction')[1].events.onactivate();
-const target = cards(buyer)[0], sku = target.__observedProduct.sku;
+assert.equal(allRows(buyer).count, 114);
+const target = cards(buyer).at(-1), sku = target.__observedProduct.sku;
+assert.equal(sku, expectedGroups.all.at(-1), 'The final formal SKU is available beyond the old page boundary');
 assert(products.some(item => item.sku === sku));
 buyer.descendants(target, 'BLMarketBuy')[0].events.onactivate();
 assert.equal(purchaseRequests(buyer).length, 0);
@@ -235,10 +231,10 @@ assert.equal(buyer.paidCheckouts.length, 0);
 assert.equal(JSON.stringify(products), originalProducts);
 const report = {status: 'PASS', reviewedOrder: expectedIds, homeCount: 15, unavailableCount: 0,
     formalCatalogCount: 129, allSingleCount: 114, ordinaryBundleCount: 5, vipBundleCount: 10, promotionSingleCount: 25,
-    allPageSizes: [40, 40, 34], exclusiveGroups: true, staleAliasesCannotOverrideType: true, homepageTypeChangeFiltered: true,
+    allRenderedRows: 114, paginated: false, batchSize: 20, exclusiveGroups: true, staleAliasesCannotOverrideType: true, homepageTypeChangeFiltered: true,
     existingRulesPreserved: true,
     legacyHomeOverwriteIgnored: true, missingConfigDoesNotShowAll: true, checkoutSku: sku, loaded};
 const output = option('--output', null);
 if (output) { fs.mkdirSync(path.dirname(path.resolve(output)), {recursive: true}); fs.writeFileSync(output, JSON.stringify(report, null, 2) + '\n'); }
 console.log('SHOP_HOME_RENDER_PASS ' + JSON.stringify({home: 15, preview: 0, allSingles: 114, bundles: 5, vip: 10, promotions: 25,
-    pages: report.allPageSizes, checkoutSku: sku}));
+    allRenderedRows: report.allRenderedRows, batchSize: report.batchSize, paginated: report.paginated, checkoutSku: sku}));

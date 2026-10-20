@@ -379,14 +379,14 @@ snapshot('building', [upgraded], {upgrade_pending: 0,
 const themeBefore = metrics.palettes;
 const approvedCountColor = descendant(visibleCards()[0], 'ArchiveV10Count').style.color;
 const approvedNameColor = descendant(visibleCards()[0], 'ArchiveV10Name').style.color;
-const approvedFrame = visibleCards()[0].__v10.normal.style.backgroundImage;
-assert(approvedFrame.includes('archive_parchment_v1'), 'The row frame is the actual approved parchment component');
+const approvedFrame = visibleCards()[0].__v10.normal.image;
+assert(approvedFrame.includes('archive_polish_v2/icon_ring.svg'), 'The row uses the independent antialiased vector frame');
 cfg.SurvivalArchiveColors.number = '#abcdef';
 resend('building', {upgrade_pending: 0});
 assert.equal(metrics.palettes, themeBefore, 'Legacy palette changes cannot repaint the confirmed V10 components');
 assert.equal(descendant(visibleCards()[0], 'ArchiveV10Count').style.color, approvedCountColor, 'Independent V10 quantity text retains its confirmed color');
 assert.equal(descendant(visibleCards()[0], 'ArchiveV10Name').style.color, approvedNameColor, 'Independent V10 name text retains its confirmed color');
-assert.equal(visibleCards()[0].__v10.normal.style.backgroundImage, approvedFrame, 'A legacy theme change cannot swap the approved original frame asset');
+assert.equal(visibleCards()[0].__v10.normal.image, approvedFrame, 'A legacy theme change cannot swap the independent vector frame');
 
 const collectionCalls=[];cfg.SurvivalCollection={Open:id=>collectionCalls.push(id)};
 for (const category of ['friend', 'ex', 'wife', 'beast']) {
@@ -430,6 +430,38 @@ assert.equal(requests.at(-1).payload.item_id, 'work_01');
 assert.equal(nodes.get('ArchiveFooter').visible, true, 'The save acknowledgement is visible in the independent shell');
 resend('work'); activate(visibleCards()[0]);
 assert.equal(requests.length, beforeWork + 2, 'A rejected welfare activation can be retried from the same row');
+
+const welfareRow = {...dataByCategory.work.rows[0]}, welfareErrors = [];
+const welfarePosition = cfg.SurvivalTooltipPosition;
+cfg.SurvivalTooltipPosition = {...welfarePosition, ShowNativeError(owner, message) { welfareErrors.push({owner, message}); }};
+snapshot('work', [{...welfareRow, can_upgrade: 0}], {upgrade_pending: 0, online: {coins: 3}});
+const welfareRequests = requests.length, welfareStatus = nodes.get('ArchiveStatus').text;
+const welfareClientEvents = clientEvents.length;
+activate(visibleCards()[0]);
+assert.equal(requests.length, welfareRequests, 'Insufficient welfare currency cannot submit an activation');
+assert.equal(welfareErrors.length, 1, 'Insufficient welfare currency uses the shared native helper once');
+assert.equal(welfareErrors[0].owner, root, 'Welfare errors use the actual archive root for the native layer');
+assert.equal(welfareErrors[0].message, '软妹币不足');
+assert.equal(clientEvents.length, welfareClientEvents, 'The welfare helper path cannot also dispatch its fallback');
+assert.equal(nodes.get('ArchiveStatus').text, welfareStatus, 'Insufficient welfare currency leaves the footer unchanged');
+cfg.SurvivalTooltipPosition = {...welfarePosition};
+activate(visibleCards()[0]);
+assert.equal(requests.length, welfareRequests);
+assert.equal(welfareErrors.length, 1);
+assert.deepEqual(JSON.parse(JSON.stringify(clientEvents.slice(welfareClientEvents))), [{name: 'dota_hud_error_message',
+    payload: {reason: 80, message: '软妹币不足'}}], 'Welfare errors fall back to exactly one original native HUD event');
+assert.equal(nodes.get('ArchiveStatus').text, welfareStatus, 'Fallback welfare errors cannot add inline footer text');
+cfg.SurvivalTooltipPosition = {...welfarePosition, ShowNativeError(owner, message) { welfareErrors.push({owner, message}); }};
+snapshot('work', [{...welfareRow, can_upgrade: 0}], {upgrade_pending: 1, online: {coins: 3}});
+activate(visibleCards()[0]);
+assert(nodes.get('ArchiveStatus').text.includes('保存'), 'Pending welfare activation retains its save status');
+snapshot('work', [{...welfareRow, count: 1, level: 1, can_upgrade: 0, completed: 1}], {upgrade_pending: 0});
+activate(visibleCards()[0]);
+assert.equal(nodes.get('ArchiveStatus').text, '该福利已激活', 'Activated welfare retains its completion status');
+assert.equal(welfareErrors.length, 1, 'Pending and activated welfare never report insufficient currency');
+assert.equal(clientEvents.length, welfareClientEvents + 1);
+assert.equal(requests.length, welfareRequests, 'Pending and activated welfare never submit activation requests');
+cfg.SurvivalTooltipPosition = welfarePosition;
 
 api.SelectCategory('titles');
 const beforeTitle = requests.length;

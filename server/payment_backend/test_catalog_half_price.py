@@ -133,8 +133,9 @@ class HalfPriceTests(unittest.TestCase):
             (temporary/rule).write_bytes(expected.replace('58元'.encode(),'10元'.encode()))
             with patch.object(tool,'ROOT',temporary),patch.object(tool,'OUT',temporary/'audit'),patch.dict(sys.modules,{'build_configs':builder}):
                 tool.monthly_rule();self.assertEqual((temporary/rule).read_bytes(),expected)
-                self.assertEqual((temporary/generated).read_bytes(),(ROOT/generated).read_bytes())
+                self.assertEqual((temporary/generated).read_text('utf-8'),(ROOT/generated).read_text('utf-8'))
                 tool.monthly_rule();self.assertEqual((temporary/rule).read_bytes(),expected)
+                self.assertEqual((temporary/generated).read_text('utf-8'),(ROOT/generated).read_text('utf-8'))
 
     def test_bundle_previews_match_final_authority_and_preserve_original_reference(self):
         data=json.loads((ROOT/'data/ui/video_shop_bundles_20261015.json').read_bytes())

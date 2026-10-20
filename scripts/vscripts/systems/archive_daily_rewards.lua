@@ -2,6 +2,43 @@ local rules=require("config/generated/archive_daily_rules").by_id.default
 local schedule=require("config/generated/archive_daily_schedule")
 local items=require("config/generated/archive_daily_items")
 local M={}
+local MAX_INTEGER=9007199254740991
+local function duplicate_rate(item)
+    -- One formal source for the commerce duplicate wallet; daily rewards use
+    -- the same quality rates as permanent lottery point items.
+    local rate=nil
+    for _,row in ipairs(require("config/lottery_config").items) do
+        if row.item_type=="积分道具" and string.lower(row.quality)==string.lower(item.quality) then
+            assert(rate==nil or rate==row.duplicate_points,"daily_duplicate_rate_conflict")
+            rate=row.duplicate_points
+        end
+    end
+    assert(type(rate)=="number" and rate>0 and rate==math.floor(rate),"daily_duplicate_rate_missing")
+    return rate
+end
+local function credit_duplicates(save,item,count)
+    if count<=0 then return end
+    local rate=duplicate_rate(item)
+    save.commerce=save.commerce or {};save.commerce.balances=save.commerce.balances or {}
+    local wallet=save.commerce.balances;local before=wallet.shop_points or 0
+    assert(type(before)=="number" and before==before and before>=0
+        and before<=MAX_INTEGER and before==math.floor(before),"commerce_wallet_invalid")
+    assert(count<=math.floor((MAX_INTEGER-before)/rate),"commerce_wallet_limit")
+    wallet.shop_points=before+count*rate
+end
+local function unique_state(daily)
+    if type(daily.item_counts)~="table" then return false,"daily_unique_migration_required" end
+    for _,item in ipairs(items.rows) do if item.enabled~=false then
+        local count=daily.item_counts[item.item_id] or 0
+        -- Historical quantities and their already-applied effects require
+        -- the backed-up repair, not a silent clamp during an ordinary claim.
+        if type(count)~="number" or count~=count or count<0 or count>1 or count~=math.floor(count) then
+            return false,"daily_unique_migration_required"
+        end
+        assert(item.max_owned==1,"daily_unique_limit_invalid")
+    end end
+    return true
+end
 local function state(save, day)
     save.daily_rewards=save.daily_rewards or {first_day=day, claimed={}, count=0, item_counts={}}
     return save.daily_rewards
@@ -9,6 +46,8 @@ end
 function M.apply(command,save,stats,pass,apply)
     local day=command.today
     local daily=state(save,day)
+    local valid,reason=unique_state(daily)
+    if not valid then return false,reason end
     if command.kind=="daily_init" then return true end
     local target=tonumber(command.target_day)
     if not target or target~=math.floor(target) or target>day or target<daily.first_day then return false,"签到日期无效" end
@@ -17,15 +56,20 @@ function M.apply(command,save,stats,pass,apply)
     if daily.claimed[key] then return false,"该日期已领取" end
     local function grant(id,count)
         local item=assert(items.by_id[id],id)
-        local accepted=math.max(0,math.min(count,item.max_owned-(daily.item_counts[id] or 0)))
+        assert(type(count)=="number" and count>=0 and count==math.floor(count),"daily_reward_count_invalid")
+        local accepted=math.max(0,math.min(count,1-(daily.item_counts[id] or 0)))
         for _=1,accepted do apply(stats,item) end
         daily.item_counts[id]=(daily.item_counts[id] or 0)+accepted
+        credit_duplicates(save,item,count-accepted)
     end
     daily.count=daily.count+1
     local row=schedule.by_id[(daily.count-1)%7+1]
     for i,id in ipairs(row.item_ids) do grant(id,tonumber(row.item_counts[i])) end
     if pass then for i,n in ipairs(rules.pass_milestones) do
-        if daily.count>=tonumber(n) then grant(rules.pass_item_ids[i],1) end
+        local id=rules.pass_item_ids[i]
+        -- A milestone is a one-time entitlement. Rechecking eligibility on
+        -- later claims must not invent a fresh SSR duplicate every day.
+        if daily.count>=tonumber(n) and (daily.item_counts[id] or 0)==0 then grant(id,1) end
     end end
     daily.claimed[key]=true
     return true
@@ -40,7 +84,9 @@ function M.snapshot(profile,day,pass)
         local rewards={}
         for i,id in ipairs(row.item_ids) do
             local item=items.by_id[id]
-            rewards[#rewards+1]={id=id,name=item.display_name,count=tonumber(row.item_counts[i]),description=item.description,quality=item.quality}
+            rewards[#rewards+1]={id=id,name=item.display_name,count=tonumber(row.item_counts[i]),description=item.description,quality=item.quality,
+                max_owned=1,owned_count=(tonumber(daily.item_counts[id]) or 0)>0 and 1 or 0,
+                duplicate_points=duplicate_rate(item),duplicate_currency="shop_points",converted_currency="shop_points"}
         end
         return rewards
     end
@@ -70,7 +116,9 @@ function M.snapshot(profile,day,pass)
     local specials={}
     for i,id in ipairs(rules.pass_item_ids) do
         local item=items.by_id[id]
-        specials[#specials+1]={id=id,day=tonumber(rules.pass_milestones[i]),name=item.display_name,description=item.description,owned=daily.item_counts[id] or 0}
+        local owned=(tonumber(daily.item_counts[id]) or 0)>0 and 1 or 0
+        specials[#specials+1]={id=id,day=tonumber(rules.pass_milestones[i]),name=item.display_name,description=item.description,owned=owned,
+            max_owned=1,owned_count=owned,duplicate_points=duplicate_rate(item),duplicate_currency="shop_points"}
     end
     local entitlement=(profile.entitlements or {})[rules.pass_entitlement_id] or {}
     return {today=day,claimed=daily.claimed[tostring(day)] and 1 or 0,count=daily.count,
@@ -89,9 +137,12 @@ function M.points(profile)
     local rows={}
     -- A collection catalogue includes unowned definitions; account ownership
     -- changes the state, never the capacity of the page. Read-only projection.
-    for _,item in ipairs(items.rows) do if item.enabled ~= false then
+    for _,item in ipairs(items.rows) do if item.enabled~=false then
+        local count=(tonumber(counts[item.item_id]) or 0)>0 and 1 or 0
         rows[#rows+1]={id=item.item_id,name=item.display_name,description=item.description,quality=item.quality,
-            icon_type="custom",icon_style="seal",rune="签",count=counts[item.item_id] or 0,count_known=1,target=item.max_owned,source_kind="daily"}
+            icon_type="custom",icon_style="seal",rune="签",count=count,target=1,max_owned=1,
+            count_known=1,unlocked=count,item_type="积分道具",source_kind="daily",
+            duplicate_points=duplicate_rate(item),duplicate_currency="shop_points",converted_currency="shop_points"}
     end end
     return rows
 end

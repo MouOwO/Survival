@@ -106,7 +106,7 @@ assert.equal(panels.ArchiveTooltip.__archiveEffectOnly,true);
 console.log('PASS: actual tooltip show path keeps locked effects dim after palette refresh and restores unlocked effects.');
 
 vm.runInContext(source.slice(source.indexOf('    function progress('),source.indexOf('    function isAchievement(')),ctx);
-assert.equal(ctx.cardProgress({count:3,target:999999},'points'),'拥有 ×3');
+assert.equal(ctx.cardProgress({id:'daily_growth_gem',count:3,target:999999},'points'),'已解锁','The retained handoff also treats the legacy daily stack as one unlock');
 for(const [item,text]of[[{count:1,target:1},'已解锁'],[{count:0,max_owned:1},'未解锁'],[{count:7,count_known:0,unlocked:1,target:1},'状态待同步'],[{count:7,target:1},'已解锁']]){
  const row=Object.freeze({...item}),before=JSON.stringify(row);assert.equal(ctx.cardProgress(row,'points'),text);
  assert.equal(JSON.stringify(row),before,'Fallback captions never clamp historical inventory');

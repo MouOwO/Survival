@@ -213,7 +213,7 @@ inventory_item:lottery_data_unit,inventory_item,lottery_data_unit,数据单元,0
 inventory_item:lottery_dimensional_barrier,inventory_item,lottery_dimensional_barrier,次元屏障,0,0,地图等级+1 墙减伤+10% 墙护甲+500 墙每秒护甲+012 英雄最终伤害+15% 英雄全属性加成+15% 英雄攻击全属性+15 英雄攻击减甲+15 英雄造成伤害攻击+15 墙获得屏障 效果是吸收等值血量的伤害 刷新间隔40秒 持续10秒,item_crimson_guard,lottery_dimensional_barrier
 inventory_item:lottery_divine_spirit,inventory_item,lottery_divine_spirit,神赐精神,0,0,金矿收益+3（不叠加任何加成）,item_ogre_axe,lottery_divine_spirit
 inventory_item:lottery_divine_tower_blessing,inventory_item,lottery_divine_tower_blessing,神塔赐福,0,0,每秒木材+30 箭塔攻击加成+30% 箭塔攻击成长+3 箭塔木材攻击减甲+0.2 箭塔暴击几率+5% 箭塔暴击伤害+20% 星悦积分+200,item_mjollnir,lottery_divine_tower_blessing
-inventory_item:lottery_ember_of_legacy,inventory_item,lottery_ember_of_legacy,薪火余烬,0,0,英雄攻击攻击+0.1 数量大于10：英雄每秒属性+100 数量大于50：英雄攻击全属性+100 数量大于100：最终伤害+10% 数量大于200：英雄攻击加成加成+30% 数量大于300：英雄全属性加成+30% 数量大于400：英雄攻击减甲+30 数量大于600：英雄攻击全属性+40 数量大于800：英雄最终伤害+120% 数量大于1000：英雄攻击减甲+50 数量大于1500：英雄攻击全属性+60,item_greater_crit,lottery_ember_of_legacy
+inventory_item:lottery_ember_of_legacy,inventory_item,lottery_ember_of_legacy,薪火余烬,0,0,英雄普攻成长+0.1；永久道具，每人只能拥有1个；重复抽取转化为1000商城积分,item_greater_crit,lottery_ember_of_legacy
 inventory_item:lottery_emerald_wood_origin,inventory_item,lottery_emerald_wood_origin,翠木归元,0,0,英雄攻击全属性+5 英雄全属性加成+8% 英雄攻击减甲+4 英雄攻击速度加成+10% 英雄最终伤害+10% 星悦积分+88,item_greater_crit,lottery_emerald_wood_origin
 inventory_item:lottery_endless_growth_ring,inventory_item,lottery_endless_growth_ring,无尽年轮,0,0,无尽年轮练功房消耗金币降低25% 英雄攻击获得属性提高10% 英雄最终伤害+10% 英雄攻击减甲+10 武器成长速度加倍 星悦积分+200,item_ogre_axe,lottery_endless_growth_ring
 inventory_item:lottery_expansion_crystal,inventory_item,lottery_expansion_crystal,膨胀结晶,0,0,墙每秒生命+1,item_crimson_guard,lottery_expansion_crystal

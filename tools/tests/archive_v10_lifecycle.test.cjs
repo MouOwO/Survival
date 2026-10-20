@@ -112,12 +112,17 @@ function compactSidebar() {
     }
     for (const button of nodes.get('ArchiveV10Sidebar').Children()) {
         near(parseFloat(button.style.width), 285 - sidebarDelta, 'Category button width');
-        contains(nodes.get('ArchiveV10Sidebar'), button);
+        // The complete category list scrolls vertically after purchased goods
+        // was added; each row still stays within the compact horizontal rail.
+        const rail = bounds(nodes.get('ArchiveV10Sidebar')), row = bounds(button);
+        assert(row.x >= rail.x - .51 && row.right <= rail.right + .51, 'Category stays within sidebar width');
         const name = button.Children().find(child => child.paneltype === 'Label');
-        const icon = button.Children().find(child => child.paneltype === 'Image');
+        const badge = button.Children().find(child => child.BHasClass('ArchiveParchmentCategoryBadge'));
+        const icon = badge.Children().find(child => child.BHasClass('ArchiveV10Icon'));
         near(parseFloat(name.style.width), 231 - sidebarDelta, 'Category name shrinks without changing its font');
         assert.equal(name.style.fontSize, '21px');
         assert.equal(icon.style.width, '28px'); assert.equal(icon.style.height, '28px');
+        badge.Children().forEach(child => contains(badge, child));
         button.Children().forEach(child => contains(button, child));
     }
     near(bounds(nodes.get('ArchiveV10Shell_Content')).x, 356 - sidebarDelta, 'Content follows the compact sidebar', .51);
@@ -133,7 +138,7 @@ snapshot('shadow', 2, shadowRows);
 api.Open(); api.SelectCategory('shadow'); advance(.1);
 assert.equal(canvases().length, 1, 'Exactly one archive shell is constructed');
 assert.equal(cfg.SurvivalMenuV10.Entries().length, 0, 'The independent archive never adopts the global menu or its resource strip');
-assert.equal(cfg.SurvivalArchiveV10.Inspect().categories.length, 16, 'Archive retains its categories while the social and blessing pools use the independent collection window');
+assert.equal(cfg.SurvivalArchiveV10.Inspect().categories.length, 16, 'Archive retains its categories including purchased goods while social and blessing pools use the independent collection window');
 for (const category of ['ex', 'friend', 'wife', 'beast']) {
     assert(!nodes.has('ArchiveV10Category_' + category), 'Migrated collection pool is absent from the fixed archive sidebar: ' + category);
     assert(!nodes.has('ArchiveTab_' + category), 'Migrated collection pool is absent from legacy archive navigation: ' + category);
@@ -141,7 +146,7 @@ for (const category of ['ex', 'friend', 'wife', 'beast']) {
 compactSidebar(); selectedCategory('shadow');
 assert.equal(nodes.get('ArchiveWindow').style.height, '900px');
 assert.equal(nodes.get('ArchiveV10Shell_Background').style.backgroundColor, 'transparent', 'PNG edge alpha is never flattened by a CSS backing rectangle');
-assert.equal(nodes.get('ArchiveV10CategoryIcon').image, cfg.ArchiveParchmentData.assets.archive_emblem.file, 'The large shadow header uses the full-resolution emblem');
+assert.equal(nodes.get('ArchiveV10CategoryIcon').image, 'file://{images}/custom_game/archive_polish_v2/nav/shadow.svg', 'Header uses the centered vector also used by its category');
 assert.equal(nodes.get('ArchiveFooter').visible, true, 'Gameplay save/rejection feedback remains visible');
 assert.equal(nodes.get('ArchiveStatus').style.marginTop, '0px', 'The retained status label cannot inherit the old 12px top margin');
 near(bounds(nodes.get('ArchiveFooter')).x, 390 - sidebarDelta, 'Footer shifts with the unchanged content', .51);
@@ -267,37 +272,104 @@ assert.equal(cards().length, 1, 'Replacing children and reloading the active gra
 assert.equal(canvases().length, 1);
 selectedCategory('clear'); compactSidebar();
 const pointsRows = [
-    {id: 'points_unique_owned', name: '唯一已解锁', count: 1, max_owned: 1},
+    {id: 'points_unique_owned', name: '唯一已解锁', count: 1, max_owned: 1, duplicate_points: 400, duplicate_currency: 'shop_points'},
     {id: 'points_unique_locked', name: '唯一未解锁', count: 0, target: 1},
     {id: 'points_unique_unknown', name: '唯一待同步', count: 7, count_known: 0, max_owned: 1},
     {id: 'points_unique_legacy', name: '历史重复', count: 7, target: 1},
-    {id: 'daily_health_gem', name: '生命宝石', count: 3, target: 999999},
-    {id: 'points_uncapped', name: '旧版无上限', count: 4}
+    {id: 'daily_growth_gem', name: '成长宝石', description: '英雄每秒攻击+1', count: 3, target: 999999, duplicate_points: 25, duplicate_currency: 'shop_points'},
+    {id: 'points_uncapped', name: '旧版无上限', count: 4},
+    {id: 'daily_health_gem', name: '生命宝石', count: 0, target: 999999},
+    {id: 'daily_regen_shard', name: '回血碎片', count: 9, target: 999999, count_known: 0}
 ].map(row => Object.freeze(row));
 const pointsBefore = JSON.stringify(pointsRows), pointsApi = cfg.SurvivalArchive;
 pointsApi.SelectCategory('points'); snapshot('points', 41, pointsRows);
 selectedCategory('points');
-assert(nodes.get('ArchiveV10Overview').text.startsWith('已解锁 4 / 6 项'), 'Mixed points overview uses unlock wording without losing stack ownership');
-for (const [id, text] of [['points_unique_owned', '已解锁'], ['points_unique_locked', '未解锁'], ['points_unique_unknown', '状态待同步'], ['points_unique_legacy', '已解锁']]) {
-    const row = cards().find(card => card.__archiveItem.id === id);
-    assert.equal(row.__v10.count.text, text);
-    assert.equal(row.__v10.track, undefined, 'Points use compact icons instead of completion tracks');
-    assert.equal(row.__v10.countHost.visible, id === 'points_unique_unknown' || id === 'points_unique_legacy');
-}
-const dailyPointsCard = cards().find(card => card.__archiveItem.id === 'daily_health_gem');
-assert.equal(dailyPointsCard.__v10.count.text, '3/999999');
-assert.equal(dailyPointsCard.__v10.track, undefined, 'Daily gems share the platform icon grid');
-assert.equal(dailyPointsCard.__v10.countHost.visible, true);
+assert(nodes.get('ArchiveV10Overview').text.startsWith('已解锁 4 / 8 项'), 'All points entries count unique unlocks while unknown data remains pending');
 assert.equal(cfg.SurvivalArchiveV10.Inspect().layout, 'points_grid');
-assert.equal(cards()[1].style.position, '106px 0px 0px');
-assert.equal(cards().find(card => card.__archiveItem.id === 'points_uncapped').__v10.count.text, '4');
+for (const id of pointsRows.map(row => row.id)) {
+    const row = cards().find(card => card.__archiveItem.id === id);
+    assert.equal(row.__v10.count.text, '');
+    assert.equal(row.__v10.track, undefined, 'Unique points use the goods grid without a completion track');
+    assert.equal(row.__v10.countHost.visible, false, 'Points show no ownership text or quantity badge');
+    assert.equal(row.__v10.name.style.textAlign, 'center');
+    assert(row.BHasClass('ArchiveCommerceCell'), 'Points reuse the commerce icon/name renderer');
+    assert.equal(row.style.width, '104px'); assert.equal(row.style.height, '112px');
+    assert.equal(row.__v10.normal.style.width, '80px'); assert.equal(row.__v10.normal.style.height, '80px');
+    contains(row, row.__v10.countHost); contains(row.__v10.countHost, row.__v10.count);
+}
+assert.equal(cards().find(card => card.__archiveItem.id === 'points_unique_legacy').__archiveItem.count, 1, 'A legacy excess count is represented by one entitlement in the view');
+assert.equal(cards().find(card => card.__archiveItem.id === 'points_unique_unknown').__archiveItem.count, undefined, 'An unknown inventory never becomes a known one or zero');
+const dailyPointsCard = cards().find(card => card.__archiveItem.id === 'daily_growth_gem');
+assert.equal(dailyPointsCard.__v10.count.text, '', 'The legacy daily_growth_gem 3/999999 shows no quantity or status text');
+assert.equal(dailyPointsCard.__archiveItem.count, 1);
+assert.equal(dailyPointsCard.__archiveItem.max_owned, 1);
+assert.equal(dailyPointsCard.__archiveItem.target, 1);
+assert.equal(dailyPointsCard.__v10.countHost.visible, false, 'Daily points use icon brightness alone');
+assert.equal(cards().find(card => card.__archiveItem.id === 'points_uncapped').__v10.count.text, '');
+const pointCard = cards().find(card => card.__archiveItem.id === 'points_unique_owned');
+cfg.ArchiveHandoff.Show(pointCard.__archiveItem, 'points', pointCard); advance(0);
+assert.equal(nodes.get('ArchiveV10TooltipState').text, '积分道具');
+assert.equal(nodes.get('ArchiveV10TooltipMetricCaption').text, '');
+assert.equal(nodes.get('ArchiveV10TooltipQuantity').text, '');
+assert.equal(nodes.get('ArchiveV10TooltipMetric').visible, false);
+assert(nodes.get('ArchiveV10TooltipCondition').text.includes('唯一持有 · 重复获得转化为 400 商城积分'));
+cfg.ArchiveHandoff.Show(dailyPointsCard.__archiveItem, 'points', dailyPointsCard); advance(0);
+assert.equal(nodes.get('ArchiveV10TooltipTitle').text, '成长宝石');
+assert.equal(nodes.get('ArchiveV10TooltipState').text, '积分道具');
+assert.equal(nodes.get('ArchiveV10TooltipMetricCaption').text, '');
+assert.equal(nodes.get('ArchiveV10TooltipQuantity').text, '');
+assert.equal(nodes.get('ArchiveV10TooltipMetric').visible, false);
+assert.equal(nodes.get('ArchiveV10TooltipEffect').text, '英雄每秒攻击+1');
+assert(nodes.get('ArchiveV10TooltipCondition').text.includes('唯一持有 · 重复获得转化为 25 商城积分'));
+assert(!['State','Quantity','Condition'].map(role => nodes.get('ArchiveV10Tooltip'+role).text).join('\n').includes('999999'), 'Legacy holding caps never leak into the daily item tooltip');
 pointsApi.Filter('unlocked');
 assert.equal(nodes.get('ArchiveV10FilterText').text, '已解锁');
-assert.deepEqual(cards().map(card => card.__archiveItem.id), ['points_unique_owned', 'points_unique_legacy', 'daily_health_gem', 'points_uncapped']);
+assert.deepEqual(cards().map(card => card.__archiveItem.id), ['points_unique_owned', 'points_unique_legacy', 'daily_growth_gem', 'points_uncapped']);
 pointsApi.Filter('locked');
 assert.equal(nodes.get('ArchiveV10FilterText').text, '未解锁');
-assert.deepEqual(cards().map(card => card.__archiveItem.id), ['points_unique_locked'], 'Unknown unique inventory never appears as locked');
+assert.deepEqual(cards().map(card => card.__archiveItem.id), ['points_unique_locked','daily_health_gem'], 'Unknown points and daily inventory never appear as locked');
+assert.equal(JSON.stringify(pointsRows), pointsBefore, 'Rendering and filtering only normalize a view copy, leaving authoritative rows intact');
+const lockedBeforeUpdate = cards().find(card => card.__archiveItem.id === 'points_unique_locked');
+const dailyLockedBeforeUpdate = cards().find(card => card.__archiveItem.id === 'daily_health_gem');
+snapshot('points', 42, pointsRows.map(row => ['points_unique_locked','daily_health_gem'].includes(row.id) ? {...row, count: 1, unlocked: 1} : row.id === 'daily_growth_gem' ? {...row, count: 9} : row));
+assert.equal(cards().length, 0, 'A receipt removes both newly unlocked item types from the active locked filter immediately');
+pointsApi.Filter('unlocked');
+const unlockedAfterUpdate = cards().find(card => card.__archiveItem.id === 'points_unique_locked');
+assert.equal(unlockedAfterUpdate, lockedBeforeUpdate, 'Unlocking updates the retained native item card');
+assert.equal(unlockedAfterUpdate.__v10.count.text, '', 'A successful update lights the icon without restoring a status label');
+assert.equal(unlockedAfterUpdate.__v10.countHost.visible, false);
+assert(unlockedAfterUpdate.BHasClass('ArchiveCommerceOwned'));
+assert.equal(unlockedAfterUpdate.__v10.art.style.brightness, '1');
+const dailyUnlockedAfterUpdate = cards().find(card => card.__archiveItem.id === 'daily_health_gem');
+assert.equal(dailyUnlockedAfterUpdate, dailyLockedBeforeUpdate, 'A daily receipt reuses the retained native item card');
+assert.equal(dailyUnlockedAfterUpdate.__v10.count.text, '');
+assert.equal(dailyUnlockedAfterUpdate.__v10.countHost.visible, false);
+assert.equal(dailyUnlockedAfterUpdate.__archiveItem.count, 1);
+assert(dailyUnlockedAfterUpdate.BHasClass('ArchiveCommerceOwned'));
+assert.equal(cards().find(card => card.__archiveItem.id === 'daily_growth_gem'), dailyPointsCard, 'Repeated daily receipt data does not replace the card');
+assert.equal(dailyPointsCard.__archiveItem.count, 1, 'A legacy duplicate count remains one visual item after refresh');
+assert.equal(dailyPointsCard.__v10.count.text, '');
 pointsApi.Filter('all');
+const pointsCatalog = csv(path.join(repo, 'data/csv/抽奖系统/lottery_item_definitions.csv'))
+    .filter(row => row.enabled === '1' && row.item_type === '积分道具')
+    .map((row, index) => ({id: row.item_id, name: row.display_name, icon: row.icon, icon_type: row.icon_type,
+        count: index === 0 ? 1 : 0, max_owned: Number(row.max_owned)}));
+snapshot('points', 43, pointsCatalog);
+assert.equal(cards().length, pointsCatalog.length, 'The entire configured points catalog remains scrollable');
+assert(pointsCatalog.length > 90, 'Exercise the complete production catalog rather than a preview-size fixture');
+cards().forEach((card, index) => {
+    assert.equal(card.style.position, `${index % 7 * 106}px ${Math.floor(index / 7) * 116}px 0px`, 'Points reuse the compact goods grid after removing the status line');
+    contains(card, card.__v10.normal); contains(card, card.__v10.name); contains(card, card.__v10.countHost);
+});
+assert(parseFloat(cards().at(-1).style.position.split(' ')[1]) > parseFloat(nodes.get('ArchiveGrid').style.height), 'Configured items continue below the visible viewport');
+// Switching away keeps the existing purchased-goods geometry and labels.
+pointsApi.SelectCategory('commerce_goods'); snapshot('commerce_goods', 44, [
+    {id: 'goods_unique', name: '商城唯一商品', count: 1, max_owned: 1},
+    {id: 'goods_locked', name: '商城未拥有', count: 0, max_owned: 1}
+]);
+assert.equal(cfg.SurvivalArchiveV10.Inspect().layout, 'commerce_goods_grid');
+assert.equal(cards()[0].style.height, '112px'); assert.equal(cards()[1].style.position, '106px 0px 0px');
+assert.equal(cards()[0].__v10.countHost.visible, false, 'Purchased unique goods keep their existing uncluttered cell');
 assert.equal(JSON.stringify(pointsRows), pointsBefore, 'Rendering and filtering never clamp historical counts or alter authoritative rows');
 // Monthly copy is applied after authoritative business rendering, on every refresh.
 for (const [category, note] of Object.entries({shadow:'月卡玩家掉落+1',map_level:'月卡玩家双倍在线时长',work:'月卡玩家双倍效果',fragment:'每日上限20个，月卡玩家40个',pet:'每日上限30个，月卡玩家90个'})) {

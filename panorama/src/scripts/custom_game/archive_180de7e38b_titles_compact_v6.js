@@ -270,15 +270,15 @@
                     if(!active()||!valid(card))return;
                     if (submitted) return;
                     if (!canUpgrade) {
-                        if (cardCategory === "building" && !upgradePending && Number(item.completed) !== 1) {
-                            var nativeError = cfg.SurvivalTooltipPosition;
-                            if (nativeError && nativeError.ShowNativeError) nativeError.ShowNativeError(root, "信仰值不足");
-                            else GameEvents.SendEventClientSide("dota_hud_error_message", {reason:80, message:"信仰值不足"});
+                        if (!upgradePending && Number(item.completed) !== 1) {
+                            var nativeError = cfg.SurvivalTooltipPosition,
+                                resourceError = cardCategory === "building" ? "信仰值不足" : "软妹币不足";
+                            if (nativeError && nativeError.ShowNativeError) nativeError.ShowNativeError(root, resourceError);
+                            else GameEvents.SendEventClientSide("dota_hud_error_message", {reason:80, message:resourceError});
                             return;
                         }
                         panel("ArchiveStatus").text = upgradePending ? "正在保存进度，请稍候…"
-                            : Number(item.completed) === 1 ? (cardCategory === "building" ? "该神器已满级" : "该福利已激活")
-                            : "软妹币不足";
+                            : cardCategory === "building" ? "该神器已满级" : "该福利已激活";
                         return;
                     }
                     submitted = true;

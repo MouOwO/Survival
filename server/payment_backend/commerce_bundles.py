@@ -64,12 +64,20 @@ def compile_commerce(tables,reference,category_text,*,max_products=200):
         if p['currency'] not in ('u_coin','shop_points','shop_gold'):
             raise ValueError('unsupported_commerce_currency:'+sku)
         price(p,sku in by_bundle)
+    unique_points={r['item_id'] for r in rows(reference[SOURCES[3]])
+                   if flag(r['enabled']) and r['item_type']=='积分道具'}
+    for sku,p in products.items():
+        # Disabled historical offers retain their exact price and reward data.
+        # A live offer may never reintroduce stacked permanent lottery goods.
+        if flag(p['enabled']) and p['ownership_id'] in unique_points:
+            if number(p.get('ownership_quantity') or 1,True,1,100)!=1 or number(p['purchase_limit'],True)!=1:
+                raise ValueError('commerce_unique_points_ownership_invalid:'+sku)
     leaves=[p for sku,p in products.items() if sku not in by_bundle]
     converted=[]
     for p in leaves:
         product={key:p[key] for key in PRODUCT_FIELDS if key!='price_yuan'};product['price_yuan']='1.00'
         if p.get('source_id')=='P103':
-            if p['ownership_id']!='lottery_ember_of_legacy' or number(p['purchase_limit'],True)!=0:
+            if p['ownership_id']!='lottery_ember_of_legacy' or number(p['purchase_limit'],True)!=1:
                 raise ValueError('commerce_ember_ownership_invalid')
             product['ownership_id']+='_single'
         converted.append(product)

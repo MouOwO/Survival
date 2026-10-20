@@ -2,6 +2,13 @@
 local catalog=require('config/generated/commerce_catalog')
 local definitions=require('config/generated/player_gameplay_stats')
 local vip=require('systems/archive_vip_rewards')
+local content_aliases=require('config/content_id_aliases')
+local unique_points={}
+for _,item in ipairs(require('config/generated/lottery_item_definitions').rows) do
+    if item.enabled and item.item_type=='积分道具' then
+        unique_points[content_aliases.canonical(item.item_id)]=true
+    end
+end
 local M={}
 local currencies={u_coin='G币',shop_points='积分',shop_gold='金币'}
 local function copy(value)
@@ -12,6 +19,14 @@ local function balance(state,key)
     local value=(state.balances or {})[key] or 0
     assert(type(value)=='number' and value>=0 and value<=9007199254740991 and value==math.floor(value),'commerce_wallet_invalid')
     return value
+end
+local function owned_points(inventory,id)
+    id=content_aliases.canonical(id)
+    if not unique_points[id] then return nil end
+    for raw_id,value in pairs(inventory) do
+        if content_aliases.canonical(raw_id)==id and (tonumber(value) or 0)>0 then return 1 end
+    end
+    return 0
 end
 local function effective_effects(p,archive,inventory)
     local effects=copy(p.effects);local claimed=archive.vip_claimed or {}
@@ -29,9 +44,18 @@ end
 local function blocked(p,inventory,stats,state,archive,profile)
     if p and p.currency=='shop_gold' then return 'shop_gold_not_open' end
     if not p or not p.enabled then return 'product_unavailable' end
+    -- Every route shares the lottery's permanent identity. Old aliases and
+    -- legacy quantities must not permit a second paid grant or its effects.
+    local permanent_owned=owned_points(inventory,p.item_id)
+    if permanent_owned~=nil then
+        if permanent_owned>0 then return 'already_owned' end
+        if (p.ownership_quantity or 1)~=1 then return 'ownership_limit_reached' end
+    end
     if p.purchase_limit>0 and (tonumber(inventory[p.item_id]) or 0)>=p.purchase_limit then return 'already_owned' end
     if (tonumber(inventory[p.item_id]) or 0)+(p.ownership_quantity or 1)>100000000 then return 'ownership_limit_reached' end
     for id,n in pairs(p.grants.items) do
+        local owned=owned_points(inventory,id)
+        if owned~=nil and (owned>0 or n~=1) then return 'component_already_owned' end
         if (tonumber(inventory[id]) or 0)+n>p.grants.item_limits[id] then return 'component_already_owned' end
     end
     if vip.level(profile)<(p.grants.required_vip_level or 0) then return 'vip_level_insufficient' end
@@ -59,7 +83,7 @@ function M.snapshot(profile)
             local reason=blocked(p,inventory,stats,state,save.archive or {},profile)
             products[#products+1]={sku=p.sku,title=p.title,description=p.description,category_id=p.category_id,
                 product_type=p.product_type,icon=p.icon,price=p.price,currency=p.currency,currency_name=p.currency_name,
-                purchase_method='wallet',purchase_limit=p.purchase_limit,owned=tonumber(inventory[p.item_id]) or 0,
+                purchase_method='wallet',purchase_limit=p.purchase_limit,owned=owned_points(inventory,p.item_id) or tonumber(inventory[p.item_id]) or 0,
                 enabled=reason=='',disabled_reason=reason,reward_lines=copy(p.grants.lines),source_id=p.source_id,
                 original_price=p.original_price,required_vip_level=p.grants.required_vip_level}
         end

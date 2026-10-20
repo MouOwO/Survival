@@ -1,0 +1,23 @@
+'use strict';
+// Read-only audit of exact native assets and bundled font faces for R5 integration.
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const {open}=require('../vpk_inspect.cjs');
+const repo=path.resolve(__dirname,'../..'),out=path.join(repo,'design_refs/daily_stargold_integration_20261019');
+const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+const base=JSON.parse(fs.readFileSync(path.join(repo,'design_refs/daily_stargold_polish_20261019/baseline/native_assets.json'),'utf8'));
+const controls=JSON.parse(fs.readFileSync(path.join(repo,'design_refs/daily_stargold_polish_20261019/provenance.json'),'utf8'));
+const selected=['ti2026_galaxy','ti2026_texture','ti2026_header','ti2026_slot','shared_close','shared_check','shared_lock','gold_hud_secondary','gold_bounty_border','gold_bounty_fill','gold_crown_divider','gold_relic_rare'];
+const records=selected.map(key=>{const r=[...base.records,...controls.records].find(x=>x.key===key);if(!r)throw Error('Missing '+key);return r;});
+const vpk=open(base.sourceArchive);
+const assets=records.map(r=>{const resource=r.original||r.sourcePath,e=vpk.entries.find(x=>x.path===resource);if(!e)throw Error('Missing installed original '+resource);const sourceHash=sha(vpk.read(e));if(sourceHash!==r.hash.source)throw Error('Changed installed original '+r.key);return {key:r.key,uri:r.vpkURI,dimensions:r.dimensions,sourceSha256:sourceHash,verifiedInstalledVPK:true,newTextureCompilationRequired:false};});
+const manifest=JSON.parse(fs.readFileSync(path.join(repo,'panorama/src/ui/font_manifest.json'),'utf8'));
+const fonts=manifest.files.filter(r=>r.runtime.endsWith('.otf')).map(r=>{const bytes=fs.readFileSync(path.join(repo,r.runtime)),hash=sha(bytes);if(hash!==r.sha256)throw Error('Bundled font bytes differ '+r.runtime);return {path:r.runtime,family:r.typographic_family||r.family,declaredFamily:r.family,weight:r.weight,sha256:hash,modified:false};});
+const engineConfig=path.resolve(repo,'../../core/panorama/fonts/fonts.conf'),conf=fs.readFileSync(engineConfig,'utf8');
+const report={kind:'read_only_local_R5_assets_and_fonts_audit',at:new Date().toISOString(),productionFilesChanged:false,stockFontChanges:false,osFontInstallation:false,networkRequests:false,assets,fonts,fontRegistration:{config:engineConfig,radianceFilenamePattern:conf.includes('<fontpattern>Radiance</fontpattern>'),bundledFilenamePrefix:'Radiance-Survival-'},observedRisks:[
+ {source:'panorama/src/scripts/custom_game/daily_remaining_5d5c1152eb.js',lines:[58,81,82],finding:'label() sets inline Source Han Sans SC on every label; title must override it explicitly. The whole window uses scale3d(), which can resample rendered text at fractional display sizes.'},
+ {source:'panorama/src/styles/custom_game/daily_gw2.css',lines:[5,7],finding:'All DailyGW2Text labels have a 2px blurred shadow, title has 3px blurred shadow. Inspect sharpness with text-shadow:none or a sharp 1px dark offset before blaming source font.'},
+ {source:'design_refs/daily_stargold_polish_20261019/R5.css',finding:'Preview uses Source Han Serif SC at weight 500, but bundled serif face is true Bold 700. Use explicit bold to avoid synthesized/mismatched title weight. Preview fallback font was not a native game proof.'},
+ {source:'design_refs/daily_stargold_polish_20261019/R5.css',finding:'Preview day labels 12px, monthly notes 10–11px and footer11px may be too small at some game scales. Prefer16px authored minimum for meaningful Chinese labels and verify actual screen pixels.'}
+],recommendations:{title:{family:'Source Han Serif SC',weight:'bold',shadow:'none',authoredSizePx:36},body:{family:'Source Han Sans SC',weight:'normal',shadow:'none'},buttonsAndSections:{family:'Source Han Sans SC',weight:'medium',shadow:'none'},geometry:'Preserve 1360×844 authored R5 composition, use integer positions and avoid unnecessary parent scaling. If fitting is required, inspect at actual client viewport and assess a 1:1 crop before changing font family.',tooltip:'Shared archive_tooltip already sets real Source Han Sans SC normal with text-shadow:none; limit black/gold styling to daily instance.',verification:'Capture actual Dota Panorama, compare window at equal pixel scale against R5, inspect title/date/button/tooltip crops. Fontconfig library selection is evidence of file availability, not proof of current game font mount.'},nativeGameVerified:false};
+fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'assets_fonts_audit.json'),JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({status:'PASS',assets:assets.length,fonts:fonts.length,allNativeAssetHashesMatch:true,output:path.relative(repo,path.join(out,'assets_fonts_audit.json'))}));

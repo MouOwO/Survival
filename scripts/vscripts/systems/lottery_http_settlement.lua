@@ -3,6 +3,9 @@ local config=require('config/lottery_config')
 local definitions=require('config/generated/player_gameplay_stats')
 local aliases=require('config/content_id_aliases')
 local M={}
+local MAX_SAFE_INTEGER=9007199254740991
+local function unique_points(item) return item.item_type=='积分道具' end
+local function ownership_limit(item) return unique_points(item) and 1 or item.max_owned end
 local function copy(v)
     if type(v)~='table' then return v end
     local r={};for k,x in pairs(v) do r[k]=copy(x) end;return r
@@ -28,8 +31,10 @@ local function public_item(item,counts)
     local r={}
     for _,k in ipairs({'id','name','description','quality','item_type','duration_type','duration_text','icon','icon_type','effect_status','duplicate_points','exchange_points','exchange_enabled','max_owned'}) do r[k]=item[k] end
     r.converted_currency='shop_points'
+    r.max_owned=ownership_limit(item)
     r.owned_count=owned_count(counts,item.id)
-    r.owned=r.owned_count>0;r.at_max_owned=r.owned_count>=item.max_owned
+    if unique_points(item) then r.owned_count=math.min(r.owned_count,r.max_owned) end
+    r.owned=r.owned_count>0;r.at_max_owned=r.owned_count>=r.max_owned
     return r
 end
 local function pool_public(pool,counts,state)
@@ -76,18 +81,47 @@ local function add(stats,field,delta)
         end
     end
 end
+local function credit_shop_points(archive,delta)
+    local commerce=archive.commerce or {};archive.commerce=commerce
+    local wallet=commerce.balances or {};commerce.balances=wallet
+    local old=wallet.shop_points or 0
+    assert(type(old)=='number' and old==old and old>=0 and old==math.floor(old)
+        and old<=MAX_SAFE_INTEGER,'commerce_wallet_invalid')
+    assert(delta>=0 and delta==math.floor(delta) and delta<=MAX_SAFE_INTEGER-old,'commerce_wallet_limit')
+    wallet.shop_points=old+delta
+end
+local function reconcile_unique_points(counts,archive)
+    local converted=0;local changed=0
+    for _,item in ipairs(config.items) do if unique_points(item) then
+        local id=aliases.canonical(item.id);local total=0;local keys={}
+        for raw_id,raw in pairs(counts) do if aliases.canonical(raw_id)==id then
+            local n=tonumber(raw)
+            assert(n and n==n and n>=0 and n<=MAX_SAFE_INTEGER and n==math.floor(n),'lottery_unique_inventory_invalid')
+            assert(n<=MAX_SAFE_INTEGER-total,'lottery_unique_inventory_limit')
+            total=total+n;keys[#keys+1]=raw_id
+        end end
+        if #keys>0 then
+            local count=total>0 and 1 or 0
+            if #keys~=1 or keys[1]~=id or counts[id]~=count then
+                for _,key in ipairs(keys) do counts[key]=nil end
+                counts[id]=count;changed=changed+1
+            end
+            local duplicates=math.max(0,total-1)
+            assert(item.duplicate_points<=MAX_SAFE_INTEGER and duplicates<=math.floor((MAX_SAFE_INTEGER-converted)/math.max(1,item.duplicate_points)),
+                'commerce_wallet_limit')
+            converted=converted+duplicates*item.duplicate_points
+        end
+    end end
+    if converted>0 then credit_shop_points(archive,converted) end
+    return {changed_items=changed,converted_points=converted,converted_currency='shop_points'}
+end
 local function grant(item,counts,stats,archive)
     local id=aliases.canonical(item.id);local owned=owned_count(counts,id)
-    local result=public_item(item,counts);result.duplicate=owned>=item.max_owned;result.converted_points=0
+    local result=public_item(item,counts);result.duplicate=owned>=ownership_limit(item);result.converted_points=0
     if result.duplicate then
         -- Duplicate rewards fund the commerce wallet, never the separate loyalty score.
-        local commerce=archive.commerce or {};archive.commerce=commerce
-        local wallet=commerce.balances or {};commerce.balances=wallet
-        local old=wallet.shop_points or 0
         local delta=item.duplicate_points
-        assert(type(old)=='number' and old>=0 and old==math.floor(old),'commerce_wallet_invalid')
-        assert(old+delta<=9007199254740991,'commerce_wallet_limit')
-        wallet.shop_points=old+delta
+        credit_shop_points(archive,delta)
         result.converted_points=delta;result.converted_currency='shop_points'
     else counts[id]=inventory_count(counts[id])+1;for _,effect in ipairs(item.effects) do add(stats,effect.field_id,effect.value) end end
     return result
@@ -121,6 +155,7 @@ function M.settle(profile,command)
         if not config.unlock_status(pool,state).unlocked then return {ok=false,error='lottery_pool_locked'} end
         local cost=count==10 and pool.ten_cost or pool.single_cost
         if (tonumber(counts[pool.ticket_content_id]) or 0)<cost then return {ok=false,error='lottery_ticket_insufficient'} end
+        response.unique_points_reconciliation=reconcile_unique_points(counts,archive)
         counts[pool.ticket_content_id]=counts[pool.ticket_content_id]-cost
         local guarantee=nil;local hit=false;local results={}
         for _,rule in ipairs(pool.pity_rules) do if rule.trigger_mode=='batch_only' and rule.threshold==count and (not guarantee or config.quality_rank[rule.target_quality]>config.quality_rank[guarantee]) then guarantee=rule.target_quality end end
@@ -135,8 +170,9 @@ function M.settle(profile,command)
     elseif command.kind=='lottery_exchange' then
         local item=pool.by_id[command.item_id]
         if not item or item.exchange_enabled==false or item.exchange_points<=0 then return {ok=false,error='lottery_item_invalid'} end
-        if owned_count(counts,item.id)>=item.max_owned then return {ok=false,error='lottery_item_owned'} end
+        if owned_count(counts,item.id)>=ownership_limit(item) then return {ok=false,error='lottery_item_owned'} end
         if (tonumber(stats.starjoy_points) or 0)<item.exchange_points then return {ok=false,error='starjoy_points_insufficient'} end
+        response.unique_points_reconciliation=reconcile_unique_points(counts,archive)
         add(stats,'starjoy_points',-item.exchange_points);response.item=grant(item,counts,stats,archive);response.item.exchanged=true;response.cost=item.exchange_points
     else return {ok=false,error='lottery_command_invalid'} end
     response.shop_points=tonumber(((archive.commerce or {}).balances or {}).shop_points) or 0

@@ -1892,7 +1892,7 @@
         "AbilityCastRangeBuffer" "0"
         "MaxLevel"           "1"
         "AbilityCastPoint"   "0.0"
-        "AbilityCooldown"    "0.0"
+        "AbilityCooldown"    "2.0"
         "AbilityManaCost"    "0"
     }
 

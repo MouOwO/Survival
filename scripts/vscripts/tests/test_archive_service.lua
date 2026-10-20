@@ -6,14 +6,30 @@ end
 local stats = require("config/generated/player_gameplay_stats")
 local achievements = require("config/generated/archive_achievements")
 local shadow = require("config/generated/archive_shadow_items")
-assert(#achievements.rows == 44, "44 regular milestones")
-assert(#shadow.rows == 23, "23 shadow items")
+local function assert_formal_ids(name, definitions, key)
+    local ids, count = {}, 0
+    for id, row in pairs(definitions.by_id) do
+        assert(row[key] == id, "formal index identity mismatch: " .. tostring(id))
+        ids[id], count = true, count + 1
+    end
+    assert(count > 0 and #definitions.rows == count, name .. " matches the complete formal catalogue")
+    for _, row in ipairs(definitions.rows) do
+        assert(ids[row[key]], "unexpected generated definition: " .. tostring(row[key]))
+        ids[row[key]] = nil
+    end
+    assert(next(ids) == nil, "each formal identity appears exactly once")
+end
+assert_formal_ids("archive_achievements", achievements, "achievement_id")
+assert_formal_ids("archive_shadow_items", shadow, "item_id")
 for _, list in ipairs({ achievements.rows, shadow.rows }) do
     for _, row in ipairs(list) do
-        assert(#row.effect_ids == #row.effect_values and #row.effect_ids > 0)
-        for i, field in ipairs(row.effect_ids) do
+        local fields, values = row.effect_ids or {}, row.effect_values or {}
+        assert(#fields == #values)
+        assert(row.reward_mode == "counter" and #fields == 0 or row.reward_mode ~= "counter" and #fields > 0,
+            "counter-only milestones have no invented reward; every reward has configured effects")
+        for i, field in ipairs(fields) do
             assert(stats.by_id[field], field)
-            assert(tonumber(row.effect_values[i]) > 0)
+            assert(tonumber(values[i]) > 0)
         end
     end
 end
@@ -71,7 +87,8 @@ assert(profiles[0].save.archive.clear_counts.n1 == 20)
 assert(profiles[0].save.gameplay_stats.initial_wood == 10 + 50 + 80 + 100 + 560, "clear milestones plus all victory bundles")
 assert(profiles[1].save.gameplay_stats.initial_wood == 10, "player isolation")
 assert(cheat(0, "clear_n1_1", 20))
-assert(profiles[0].save.archive.clear_counts.n1 == 40)
+assert(profiles[0].save.archive.clear_counts.n1 == 20,
+    "achievement-ID cheats still obey the shared daily twenty-clear cap")
 assert(profiles[0].save.gameplay_stats.initial_wood == 800, "clear and victory milestones granted only once")
 tools_mode = false
 assert(not cheat(0, "n1", 1), "production cheat denied")
@@ -99,6 +116,23 @@ assert(#welfare_page.rows==36 and welfare_page.rows[14].completed==1 and welfare
 local snapshot = archive.snapshot(0, "clear")
 assert(snapshot.rows[1].completed == 1 and snapshot.rows[4].completed == 0)
 assert(snapshot.gameplay_stats == nil and snapshot.entitlements == nil)
+local clear_config = require("systems/archive_clear_progress")
+local expected_clear = {}
+for _, item in ipairs(achievements.rows) do
+    local mode = item.mode_id or "standard"
+    local difficulty = tonumber(item.difficulty_id:match("^[nN]([1-9]%d*)$"))
+    if item.enabled and clear_config.is_mode(mode) and difficulty
+        and difficulty <= math.max(10, clear_config.max_available(mode)) then
+        expected_clear[item.achievement_id] = item
+    end
+end
+for _, row in ipairs(snapshot.rows) do
+    local item = assert(expected_clear[row.id], "unexpected or duplicate clear card: " .. tostring(row.id))
+    assert(row.name == item.display_name and row.target == item.required_count)
+    assert(row.difficulty_id == item.difficulty_id and row.mode_id == (item.mode_id or "standard"))
+    expected_clear[row.id] = nil
+end
+assert(next(expected_clear) == nil, "every available configured clear achievement appears once")
 local lottery_points = require("config/lottery_config")
 local function point_rows(id)
     local result, list = {}, archive.snapshot(id, "points").rows
@@ -116,8 +150,8 @@ for _, item in ipairs(lottery_points.items) do
     end
 end
 local empty_points, empty_point_count = point_rows(0)
-assert(empty_point_count == point_definition_count,
-    "new profiles see every enabled unique lottery point item, including locked cards")
+assert(empty_point_count == point_definition_count+12,
+    "new profiles see every daily and lottery point item, including locked cards")
 for id, item in pairs(point_definitions) do
     local row = assert(empty_points[id], "enabled point item missing: " .. id)
     assert(row.count == 0 and row.unlocked == 0 and row.count_known == 1,
@@ -125,7 +159,7 @@ for id, item in pairs(point_definitions) do
     assert(row.max_owned == 1 and row.target == 1,
         "lottery point cards show one permanent unlock")
     assert(row.item_type == "积分道具" and row.source_kind == "lottery",
-        "unique point cards must remain distinguishable from daily stack rewards")
+        "point cards retain their formal acquisition source")
     assert(row.duplicate_points == item.duplicate_points
         and row.duplicate_currency == "shop_points" and row.converted_currency == "shop_points",
         "duplicate conversion metadata must follow the item definition and commerce wallet")
@@ -150,7 +184,7 @@ profiles[0].save.fishing_inventory.star_blessing_001=4
 assert(archive.snapshot(0,"fishing").rows[1].count==4,"authoritative profile refresh updates counts")
 profiles[0].save.content_inventory.lottery_attribute_crystal = 1
 local owned_points, owned_point_count = point_rows(0)
-assert(owned_point_count == point_definition_count,
+assert(owned_point_count == point_definition_count+12,
     "unlocking an item changes its state without hiding other locked cards")
 assert(owned_points.lottery_attribute_crystal.count == 1
     and owned_points.lottery_attribute_crystal.unlocked == 1)
@@ -225,7 +259,8 @@ packets = {}; time = 5
 listeners.survival_archive_request(nil, { PlayerID = 1, player_id = 0, category_id = "clear", prefetch = 1 })
 local clear_chunks=0
 for _,packet in ipairs(packets) do if packet.data.category_id=="clear" then clear_chunks=clear_chunks+1 end end
-assert(clear_chunks == 4, "44 rows paginated into private chunks during all-page prefetch")
+assert(clear_chunks == math.ceil(#archive.snapshot(1, "clear").rows / 12),
+    "the complete formal clear catalogue is paginated into private chunks during all-page prefetch")
 for _, packet in ipairs(packets) do assert(packet.id == 1 and #packet.data.rows <= 12) end
 local n = #packets
 listeners.survival_archive_request(nil, { PlayerID = 1, category_id = "shadow" })
@@ -432,16 +467,17 @@ for i=3,20 do timestamp=(day+i)*86400;assert(archive.daily_claim(8,day+i).ok) en
 local daily=profiles[8].save.archive.daily_rewards
 assert(daily.count==21)
 assert(daily.item_counts.daily_wealth_talisman==1 and daily.item_counts.daily_ancient_tree==1 and daily.item_counts.daily_forest_origin==1)
-assert(daily.item_counts.daily_growth_gem==9 and daily.item_counts.daily_gold_gem==9)
-assert(profiles[8].save.gameplay_stats.hero_attack_per_second==9)
+assert(daily.item_counts.daily_growth_gem==1 and daily.item_counts.daily_gold_gem==1)
+assert(profiles[8].save.gameplay_stats.hero_attack_per_second==1)
+assert(profiles[8].save.archive.commerce.balances.shop_points==72*25,
+    "21 daily claims grant 9 unique R unlocks and convert their 72 actual duplicates")
 local count=0;for _,row in ipairs(archive.snapshot(8,"points").rows) do if row.id:match('^daily_') then count=count+1 end end
 assert(count==12)
 local daily_point_cards = point_rows(8)
-assert(daily_point_cards.daily_growth_gem.count == 9 and daily_point_cards.daily_gold_gem.count == 9,
-    "daily gems remain stacked quantities beside unique lottery unlock cards")
-assert(daily_point_cards.daily_growth_gem.target == 999999
-    and daily_point_cards.daily_gold_gem.target == 999999,
-    "the point page cannot impose the lottery unique cap on daily rewards")
+assert(daily_point_cards.daily_growth_gem.count == 1 and daily_point_cards.daily_gold_gem.count == 1,
+    "daily gems are permanent unique unlocks like the rest of the point page")
+assert(daily_point_cards.daily_growth_gem.target == 1 and daily_point_cards.daily_gold_gem.target == 1,
+    "daily and lottery point cards share the one-item ownership boundary")
 for _,row in ipairs(require("config/lottery_config").items) do assert(not row.id:match('^daily_'),"daily exclusives cannot be rolled") end
 assert(#archive.snapshot(8,"boss").rows==34)
 print("ARCHIVE_BOSS_DAILY_PASS: pass expiry, dedup, day boundaries, makeup, 21-day rewards, point inventory")

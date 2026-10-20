@@ -10,6 +10,7 @@ sys.path.insert(0,str(ROOT/'server'))
 from tests import test_archive_backend as archive_tests
 from archive_backend.service import ArchiveError
 from archive_backend.commerce_catalog import build_catalog
+from payment_backend.csv_catalog import rows
 
 class CommerceTests(unittest.TestCase):
     setUpClass = classmethod(archive_tests.ArchiveTests.setUpClass.__func__)
@@ -25,16 +26,24 @@ class CommerceTests(unittest.TestCase):
     def test_reviewed_selection_and_original_prices(self):
         catalog=build_catalog(ROOT)
         products={p['sku']:p for p in catalog['products']}
-        self.assertEqual(len(products),108+15)
+        source=rows((ROOT/'data/csv/商城兑换系统/commerce_products.csv').read_text('utf-8-sig'))
+        self.assertEqual(len(products),114+15)
+        self.assertEqual(set(products),{row['sku'] for row in source})
+        for row in source:
+            with self.subTest(sku=row['sku']):
+                self.assertEqual(row['price_policy'],'half_current_20261017')
+                self.assertEqual(products[row['sku']]['price']*2,int(row['price_baseline']))
         self.assertEqual(sum(p['product_type']=='bundle' for p in products.values()),15)
-        self.assertEqual({p['sku'] for p in products.values() if not p['enabled']},{'video_p037','video_p038','video_bundle_b003','video_bundle_b005'})
+        self.assertEqual({p['sku'] for p in products.values() if not p['enabled']},{'video_p037','video_p038','video_p089','video_bundle_b005'})
         self.assertEqual(products['video_p037']['effects'],{'initial_wood':50})
         self.assertEqual(products['video_p038']['effects'],{'initial_gold':10})
-        self.assertEqual(products['video_p033']['price'],100)
-        self.assertEqual(products['video_p029']['price'],600)
+        self.assertEqual(products['video_p033']['price'],50)
+        self.assertEqual(products['video_p029']['price'],300)
         self.assertEqual(products['video_p037']['currency'],'shop_gold')
-        self.assertEqual(products['video_p116']['price'],588)
-        self.assertNotIn('video_p140',products)
+        self.assertEqual(products['video_p116']['price'],294)
+        self.assertEqual(products['video_p140']['item_id'],'lottery_nature_spirit')
+        self.assertEqual(products['video_p140']['effects'],{'wood_per_second':1})
+        self.assertTrue(products['video_p140']['enabled'])
         self.assertEqual(products['video_p135']['effects']['hero_health_bonus_pct'],30)
         self.assertEqual(products['video_p069']['effects']['hero_attack_bonus_pct'],10)
         self.assertNotIn('hero_attack_speed_bonus_pct',products['video_p069']['effects'])
@@ -42,7 +51,9 @@ class CommerceTests(unittest.TestCase):
     def test_empty_wallet_catalog_is_read_only(self):
         before=copy.deepcopy(self.profile)
         result=self.send('commerce_catalog')
-        self.assertEqual(len(result['products']),119)
+        expected={p['sku'] for p in self.bundle.tables['commerce_catalog'].values() if p['enabled']}
+        self.assertEqual({p['sku'] for p in result['products']},expected)
+        self.assertNotIn('video_p089',expected)
         self.assertEqual(result['balances'],dict(u_coin=0,shop_points=0,shop_gold=0))
         self.assertTrue(all(not p['enabled'] for p in result['products']))
         self.assertEqual(self.profile,before)
@@ -57,7 +68,12 @@ class CommerceTests(unittest.TestCase):
                     before=copy.deepcopy(self.profile)
                     self.assertEqual(self.purchase(product['sku'])['error'],'shop_gold_not_open' if product['currency']=='shop_gold' else 'product_unavailable')
                     self.assertEqual(self.profile,before)
-                    if product['currency']!='shop_gold':
+                    if product['sku']=='video_p089':
+                        # Preserve paused historical pack metadata; it cannot
+                        # grant a second permanent item under the unique rule.
+                        self.assertEqual(product['ownership_quantity'],100)
+                        self.assertEqual(product['effects'],{'hero_basic_attack_growth':10})
+                    elif product['currency']!='shop_gold':
                         self.assertFalse(product['effects']);self.assertFalse(product['grants']['items'])
                     else:
                         self.assertEqual(product['effects'],{'initial_wood':50} if product['sku']=='video_p037' else {'initial_gold':10})
@@ -144,7 +160,7 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(self.purchase('video_p038')['error'],'shop_gold_not_open')
         self.assertEqual(self.profile,before,'Closed gold channel must neither debit nor grant')
         self.assertTrue(self.purchase('video_p113','points_0001')['ok'])
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],99412)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],99706)
         self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_gold'],1000)
         self.assertEqual(self.profile['save']['gameplay_stats']['initial_gold'],500)
         self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],8000)
@@ -154,21 +170,25 @@ class CommerceTests(unittest.TestCase):
         self.assertTrue(self.purchase('video_p001','ticket_001')['ok'])
         self.assertTrue(self.purchase('video_p001','ticket_002')['ok'])
         self.assertEqual(self.profile['save']['content_inventory']['special_lottery_ticket'],2)
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['u_coin'],97600)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['u_coin'],98800)
         self.profile['save']['gameplay_stats']['gold_mine_efficiency_pct']=10000
         before=copy.deepcopy(self.profile)
         self.assertEqual(self.purchase()['error'],'attribute_limit_reached')
         self.assertEqual(self.profile,before)
 
-    def test_ember_bundles_share_quantity_and_duplicate_request_is_safe(self):
+    def test_ember_is_unique_and_the_old_hundred_pack_is_paused(self):
         self.fund(shop_points=100000)
-        self.assertTrue(self.purchase('video_p089','ember_100')['ok'])
-        self.assertTrue(self.purchase('video_p103','ember_001')['ok'])
-        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'],101)
         before=copy.deepcopy(self.profile)
-        self.assertTrue(self.purchase('video_p089','ember_100')['ok'])
+        self.assertEqual(self.purchase('video_p089','ember_100')['error'],'product_unavailable')
         self.assertEqual(self.profile,before)
-        self.assertAlmostEqual(self.profile['save']['gameplay_stats']['hero_basic_attack_growth'],10.1)
+        self.assertTrue(self.purchase('video_p103','ember_001')['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'],1)
+        before=copy.deepcopy(self.profile)
+        self.assertTrue(self.purchase('video_p103','ember_001')['ok'])
+        self.assertEqual(self.profile,before)
+        self.assertEqual(self.purchase('video_p103','ember_002')['error'],'already_owned')
+        self.assertEqual(self.profile,before)
+        self.assertAlmostEqual(self.profile['save']['gameplay_stats']['hero_basic_attack_growth'],.1)
 
     def test_conditional_products_do_not_pregrant_collection_bonuses(self):
         for sku in ('video_p023','video_p025'):

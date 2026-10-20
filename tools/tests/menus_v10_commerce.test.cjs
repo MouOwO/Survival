@@ -18,12 +18,12 @@ test('Balance-side recharge opens the existing checkout without creating a payme
     assert.equal(button.Children()[0].image,'file://{images}/control_icons/24px/plus.svg');
     button.events.onactivate();
     assert.deepEqual(h.paidCheckouts,['u_coin_recharge']);
-    assert.equal(h.cfg.SurvivalCommerceView.IsOpen(),false);
+    assert.equal(h.cfg.SurvivalCommerceView.IsOpen(),true,'Recharge leaves the storefront underneath');
     assert.equal(h.requests.filter(r=>r.name==='survival_payment_request'&&r.payload.action==='create').length,0,
         'Opening recharge must still require confirmation before an order is created');
 });
 
-test('Real catalogs use the independent five-tab market, paginate 40 rows, and retain both purchase routes', () => {
+test('Real catalogs append twenty rows at a time without pages and retain both purchase routes through the last row', () => {
     const h = harness();
     h.cfg.SurvivalCommerceView.Open();
     assert.equal(h.cfg.SurvivalCommerceView.Inspect().productCount, 1);
@@ -32,7 +32,7 @@ test('Real catalogs use the independent five-tab market, paginate 40 rows, and r
     h.walletSnapshot(products);
     const store = h.store();
     assert.equal(store.panel.style.width, h.cfg.SurvivalShopV10.width + 'px');
-    assert.equal(store.panel.style.height, h.cfg.SurvivalShopV10.height + 'px');
+    assert.equal(store.panel.style.height, store.height + 'px', 'The window uses its cropped live shell height');
     assert.equal(store.layout, 'black_lion_list');
     assert(!store.panel.BHasClass('MenuV10Page'));
     assert(!h.descendants(store.panel, 'MenuV10Sidebar').length, 'The independent market has no archive sidebar');
@@ -43,13 +43,27 @@ test('Real catalogs use the independent five-tab market, paginate 40 rows, and r
     const walletTab = store.panel.FindChildTraverse('BLMarketSection_all');
     walletTab.events.onactivate();
     const firstCards = h.cardList();
-    assert.equal(firstCards.length, 40);
+    assert.equal(firstCards.length, 20, 'The first batch contains twenty products');
+    assert.equal(h.cfg.SurvivalCommerceView.Inspect().filteredProductCount, 51);
+    assert.equal(h.cfg.SurvivalCommerceView.Inspect().loadedProductCount, 20);
+    assert.equal(h.cfg.SurvivalCommerceView.Inspect().batchSize, 20);
     assert.equal(store.content.Children()[0].style.flowChildren, 'down', 'Goods are a scrolling vertical list');
     assert(firstCards.every(p => p.BHasClass('BLMarketRow')), 'Each displayed product uses the actual market row');
     assert.equal(firstCards[0].__menuCell.namePanel.text, '积分装备 0');
-    const next = h.descendants(store.actions, 'CJPageAction')[1]; next.events.onactivate();
-    assert.equal(h.cardList().length, 11, 'All goods includes the paid SKU after the fifty wallet products'); assert.equal(h.cardList()[0].__menuCell.namePanel.text, '积分装备 40');
-    const card = h.cardList()[0]; card.events.onmouseover();
+    assert.equal(h.descendants(store.actions, 'CJPageAction').length, 0, 'The market needs no next/previous controls');
+    assert.equal(h.descendants(store.actions, 'CJPageLabel').length, 0);
+    const firstRow = firstCards[0];
+    h.advanceTimers();
+    assert.equal(h.cardList().length, 20, 'Polling above the bottom cannot load more products');
+    assert.equal(h.loadNextBatch(), 40);
+    assert.equal(h.cardList()[0], firstRow, 'Appending a batch preserves existing row identity');
+    assert.equal(h.loadNextBatch(), 51);
+    assert.equal(h.loadNextBatch(), 51, 'Repeated bottom checks cannot duplicate the last batch');
+    assert.equal(h.cfg.SurvivalCommerceView.Inspect().hasMoreProducts, false);
+    assert.equal(h.pendingTimers().length, 0, 'A completed list stops polling');
+    assert.equal(h.cardList()[49].__menuCell.namePanel.text, '积分装备 49');
+    assert.equal(h.cardList()[50].__menuCell.namePanel.text, '真实商品', 'The last paid SKU is present after all wallet goods');
+    const card = h.cardList()[49]; card.__menuCell.iconPanel.events.onmouseover();
     const tip = card.__purpleDetail; assert(tip.BHasClass('Visible'));
     const detailBody = h.descendants(tip, 'MenuV10CommerceDetailBody')[0];
     assert.deepEqual(detailBody.Children().map(p => [...p.classes][0]), ['MenuV10CommerceDetailContent'],
@@ -58,7 +72,7 @@ test('Real catalogs use the independent five-tab market, paginate 40 rows, and r
     assert.deepEqual(detailContent.Children().map(p => [...p.classes][0]),
         ['RCPurpleDetailTitle','RCPurpleDetailQuality','RCProductEffect']);
     assert(detailContent.Children().every(p => p.paneltype === 'Label'), 'The content contains only the three information labels');
-    assert.equal(detailContent.Children()[0].text, '积分装备 40');
+    assert.equal(detailContent.Children()[0].text, '积分装备 49');
     assert.equal(detailContent.Children()[1].text, '');
     assert.equal(detailContent.Children()[1].visible, false, 'An unknown grade is omitted');
     assert.equal(detailContent.Children()[2].text, '攻击力 +10');
@@ -66,14 +80,14 @@ test('Real catalogs use the independent five-tab market, paginate 40 rows, and r
     assert.equal(h.descendants(card, 'BLMarketPriceMain')[0].text, '10 积分', 'The actual product row retains its authoritative price');
     const purchaseControl = h.descendants(card, 'BLMarketBuy')[0] || card;
     purchaseControl.events.onactivate();
-    assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), false);
+    assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true,'Confirmation leaves the storefront underneath');
     assert.equal(h.requests.filter(r => r.payload.action === 'purchase').length, 0, 'Inspecting the item only opens existing confirmation');
     const confirm = h.menus().find(m => m.panel.BHasClass('MenuV10Exchange'));
     assert(confirm && confirm.IsOpen(), 'Wallet checkout is inside the same V10 geometry');
-    assert.match(h.descendants(confirm.content, 'CommerceConfirmCopy')[0].text, /售价：10 商城积分/);
+    assert.match(h.descendants(confirm.content, 'CommerceConfirmCopy')[0].text, /售价：10 (?:商城)?积分/);
     h.descendants(confirm.actions, 'CommerceConfirmBuy')[0].events.onactivate();
     const buy = h.requests.findLast(r => r.payload.action === 'purchase');
-    assert.equal(buy.payload.sku, 'wallet_40');
+    assert.equal(buy.payload.sku, 'wallet_49');
     h.cfg.SurvivalCommerceView.Open();
     store.panel.FindChildTraverse('BLMarketSection_home').events.onactivate();
     const paidCard = h.cardList()[0];
@@ -88,4 +102,25 @@ test('Real catalogs use the independent five-tab market, paginate 40 rows, and r
     assert.doesNotThrow(stalePurchase, 'A captured deleted product purchase callback is inert');
     for (const timer of h.timers.slice()) if (!timer.cancelled) assert.doesNotThrow(timer.fn);
     assert.deepEqual(h.paidCheckouts, ['paid_1'], 'Late callbacks cannot create another checkout');
+});
+
+test('The legacy archive fallback retains its existing 24-item pagination when the independent market is absent', () => {
+    const h = harness();
+    delete h.cfg.SurvivalBlackLionMarket;
+    h.load('commerce_remaining_5d5c1152eb.js');
+    h.cfg.SurvivalCommerceView.Open();
+    h.walletSnapshot(Array.from({length:50}, (_, i) => walletItem(i)));
+    assert.equal(h.cfg.SurvivalCommerceView.SelectCategory('item'), true);
+    assert.equal(h.cfg.SurvivalCommerceView.Inspect().layout, 'archive_v10');
+    const fallback = h.menus().find(menu => menu.panel.BHasClass('MenuV10Commerce'));
+    const rows = () => fallback.content.Children()[0].Children();
+    assert.equal(rows().length, 24);
+    h.descendants(fallback.actions, 'CJPageAction')[1].events.onactivate();
+    assert.equal(rows().length, 24);
+    assert.equal(h.cfg.SurvivalCommerceView.Inspect().page, 1);
+    h.descendants(fallback.actions, 'CJPageAction')[1].events.onactivate();
+    assert.equal(rows().length, 2);
+    assert.equal(h.descendants(fallback.actions, 'CJPageAction')[1].enabled, false);
+    assert.equal(h.requests.filter(request => request.payload.action === 'purchase').length, 0);
+    assert.deepEqual(h.paidCheckouts, []);
 });

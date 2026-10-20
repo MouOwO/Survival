@@ -170,6 +170,55 @@ test('Archive cached commerce and ordinary rows refresh grade without rebuilding
     }
 });
 
+test('Archive points and goods remain borderless through the real shared icon repaint', () => {
+    const h = environment({valid: node => node && node.IsValid()});
+    // Use the complete production presentation path, including FillIcon's
+    // repeated border/texture writes, rather than the grade-observer mock.
+    h.run(script('reward_presentation.js'));
+    // The native archive style helper caches its own writes. Loading it verbatim
+    // also catches a border removal skipped after FillIcon changes inline style.
+    h.run(productionPart('archive_v10.js', '    function style(', '    function specText('));
+    Object.assign(h.context, {cfg: h.cfg, current: 'points',
+        S: {State: item => item.count_known === 0 ? null : Number(item.count) > 0,
+            Quantity: item => String(item.count)}});
+    h.run(productionPart('archive_v10.js', '    function findClass(', '    function render(data,'));
+    const item = Object.freeze({id: noGradeID, name: '样例', quality: 'UR', count: 1, max_owned: 1});
+    const resource = h.resources.Lookup(item), resourceBefore = JSON.stringify(resource), itemBefore = JSON.stringify(item);
+    assert(resource && resource.uri, 'exercise a real registered item URI');
+    const reference = new Panel('Image');
+    h.resources.FillIcon(reference, item);
+    assert.match(reference.style.border, /^1px solid /, 'the shared API still frames other consumers');
+    assert.notEqual(reference.style.backgroundImage, 'none', 'the shared texture remains available outside this archive grid');
+    const sharedStyleBefore = JSON.stringify(reference.style);
+    for (const category of ['points', 'commerce_goods']) {
+        h.context.current = category;
+        const card = new Panel();
+        let host, art;
+        for (const data of [item, {...item, count: 0, quality: 'SSR'}, {...item, count_known: 0, quality: 'R'}, item]) {
+            const expected = new Panel('Image'); h.resources.FillIcon(expected, data);
+            h.context.decorate(card, data, 0);
+            const cell = card.__v10;
+            if (!host) { host = cell.host; art = cell.art; }
+            assert.equal(cell.host, host, category + ' receipt refresh retains its host');
+            assert.equal(cell.art, art, category + ' receipt refresh retains its artwork');
+            assert.equal(art.uri, resource.uri, category + ' retains the shared registered resource');
+            assert.equal(art.style.border, '0px', category + ' does not restore a quality outline during repaint');
+            assert.equal(art.style.backgroundImage, 'none', category + ' does not restore the texture bevel during repaint');
+            assert.equal(art.style.backgroundColor, expected.style.backgroundColor, category + ' retains the current quality color');
+            assert.equal(art.__survivalItemGrade, h.resources.Grade(data));
+            assert.equal(art.scaling, expected.scaling, category + ' retains shared icon fitting');
+            assert.equal(art.style.brightness, data.count_known === 0 ? '.62' : data.count > 0 ? '1' : '.38', category + ' still conveys ownership by brightness');
+            assert.equal(card.BHasClass('ArchiveCommerceOwned'), data.count_known !== 0 && data.count > 0);
+        }
+    }
+    assert.equal(JSON.stringify(item), itemBefore, 'archive presentation leaves authoritative item data unchanged');
+    assert.equal(JSON.stringify(resource), resourceBefore, 'archive presentation does not alter the shared registry');
+    assert.equal(JSON.stringify(reference.style), sharedStyleBefore, 'archive repaint does not change another consumer panel');
+    const after = new Panel('Image'); h.resources.FillIcon(after, item);
+    assert.equal(after.style.border, reference.style.border, 'archive repaint does not alter shared border policy');
+    assert.equal(after.style.backgroundImage, reference.style.backgroundImage, 'archive repaint does not alter shared texture policy');
+});
+
 test('Void archive keeps geometry cache while changing recognized and missing grades', () => {
     const h = environment({valid: node => node && node.IsValid(), pos() {}, p: () => null,
         numberKnown: () => true, quantity: item => String(item.count), displayText: value => value});

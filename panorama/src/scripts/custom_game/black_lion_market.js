@@ -20,7 +20,11 @@
     function currencyAsset(currency,row){return currency==="shop_points"?"balance_point_icon":currency==="shop_gold"?"balance_shop_icon":row?row+"_coin":"balance_u_icon";}
     function currencyImage(parent,currency,cls,row){return image(parent,currency==="u_coin"?"s2r://panorama/images/hud/reborn/gold_large_png.vtex":layer(currencyAsset(currency,row)).path,cls);}
     function template(index){var level=4+(index%7),prefix="vip"+level,wash=layer(prefix+"_row_wash");return {prefix:prefix,wash:wash,bright:level%2===0};}
-    function priceColumn(){return {x:layer("vip4_coin").x-layer("vip4_row_wash").x-100,width:235};}
+    function priceColumn(){
+        // Anchor every complete price line to the original price heading center.
+        var heading=layer("column_price"),width=235;
+        return {x:heading.x-layer("vip4_row_wash").x+(heading.width-width)/2,width:width};
+    }
     function centeredStack(parent,x,width,height,cls){
         var column=box(make("Panel",parent,"",cls),x,0,width,height);column.style.flowChildren="none";
         var stack=make("Panel",column,"",cls+"Stack");stack.style.width="100%";stack.style.height="fit-children";stack.style.flowChildren="down";stack.style.verticalAlign="center";

@@ -84,22 +84,22 @@ assert.equal(S.Quantity({count: 500, level: 2, target: 5}, 'building'), 'LV2/5')
 assert.equal(S.Quantity({level: 0, target: 1}, 'work'), '0/1', 'One-time work activation keeps its actual single target');
 assert.equal(S.Quantity({level: 2, target: 10, activated: 1}, 'work'), 'LV2/10');
 assert.equal(S.Quantity({count: 19, level: 4, target: 999}, 'fragment'), '19/999', 'Current fragment count is not derived from level');
-for (const category of ['shadow', 'pet', 'points', 'shop', 'friend', 'ex', 'beast', 'fishing']) {
+for (const category of ['shadow', 'pet', 'shop', 'friend', 'ex', 'beast', 'fishing']) {
     assert.equal(S.Quantity({count: 4}, category), '4');
     assert.equal(S.Quantity({count: 4, target: 0}, category), '4');
     assert.equal(S.Quantity({count: 4, target: 30}, category), '4/30');
     assert.equal(S.Quantity({count: 4, count_known: 0}, category), '—');
     assert.equal(S.State({count: 4, count_known: 0, unlocked: 0}, category), null);
 }
-// The points page mixes unique lottery items and stackable daily rewards.
+// Every points entry uses unique ownership, including legacy daily stacks.
 assert.equal(typeof S.IsUnlockItem, 'function');
 for (const [item, expected] of [
     [{max_owned: 1}, true], [{target: '1'}, true],
     [{max_owned: '1', target: 999999}, true],
-    [{max_owned: 999999, target: 1}, false],
-    [{max_owned: null, target: 1}, false], [{max_owned: 0, target: 1}, false],
-    [{target: 999999}, false], [{count: 1}, false], [{}, false]
-]) assert.equal(S.IsUnlockItem(item, 'points'), expected, 'Only the authoritative holding cap identifies a unique points item');
+    [{max_owned: 999999, target: 1}, true],
+    [{max_owned: null, target: 1}, true], [{max_owned: 0, target: 1}, true],
+    [{target: 999999}, true], [{count: 1}, true], [{}, true]
+]) assert.equal(S.IsUnlockItem(item, 'points'), expected, 'The points category is unique even when an old snapshot carries a stack cap');
 for (const category of ['shadow', 'pet', 'fragment', 'commerce_goods', 'titles']) {
     assert.equal(S.IsUnlockItem({max_owned: 1, target: 1}, category), false, 'Other categories retain their existing semantics');
 }
@@ -111,7 +111,10 @@ for (const [item, expectedState, expectedText] of [
     [{count: 0, max_owned: 1, unlocked: 1}, true, '已解锁'],
     [{count: 7, max_owned: 1, count_known: 0, unlocked: 1}, null, '状态待同步'],
     [{count: 7, target: 1, quantity_unknown: 1}, null, '状态待同步'],
-    [{max_owned: 1}, null, '状态待同步']
+    [{max_owned: 1}, null, '状态待同步'],
+    [{id: 'daily_growth_gem', count: 3, target: 999999}, true, '已解锁'],
+    [{id: 'daily_growth_gem', count: 0, target: 999999}, false, '未解锁'],
+    [{id: 'daily_growth_gem', count: 3, target: 999999, count_known: 0}, null, '状态待同步']
 ]) {
     const row = Object.freeze({...item}), original = JSON.stringify(row);
     assert.equal(S.IsUnlockItem(row, 'points'), true);
@@ -123,18 +126,50 @@ for (const [item, expectedState, expectedText] of [
     }, 'A unique item has an unlock state, never a quantity progress bar');
     assert.equal(JSON.stringify(row), original, 'Legacy excess counts are presented without changing the snapshot');
 }
-const dailyPoints = Object.freeze({id: 'daily_health_gem', count: 3, target: 999999});
-assert.equal(S.Quantity(dailyPoints, 'points'), '3/999999');
-assert.equal(S.Metric(dailyPoints, 'points'), '拥有数量');
+const dailyPoints = Object.freeze({id: 'daily_growth_gem', count: 3, target: 999999});
+assert.equal(S.Quantity(dailyPoints, 'points'), '已解锁');
+assert.equal(S.Metric(dailyPoints, 'points'), '解锁状态');
 assert.deepEqual(plain(S.Progress(dailyPoints, 'points')), {
-    known: true, ratio: 3 / 999999, current: 3, target: 999999, text: '3/999999'
-}, 'Daily gem stacks keep their real quantity and progress');
-assert.equal(S.Quantity({count: 4}, 'points'), '4', 'Legacy rows with no cap are not assumed unique');
-assert.equal(S.Quantity({count: 4, max_owned: 30, target: 1}, 'points'), '4/30', 'Explicit max_owned overrides a stale target');
-const mixedPoints = {ok: 1, rows: [{id: 'lottery_attribute_crystal', count: 7, target: 1}, {...dailyPoints}]};
+    known: true, ratio: null, current: null, target: null, text: '已解锁'
+}, 'A legacy daily stack has an unlock state without numeric progress');
+assert.equal(S.Quantity({count: 4}, 'points'), '已解锁', 'Legacy rows without a cap are unique on the points page');
+assert.equal(S.Quantity({count: 4, max_owned: 30, target: 1}, 'points'), '已解锁', 'Old cap fields cannot restore stack presentation');
+const mixedPoints = {ok: 1, rows: [
+    {id: 'lottery_attribute_crystal', count: 7, target: 1},
+    {id: 'explicitly_locked', count: 7, max_owned: 1, unlocked: 0},
+    {id: 'explicitly_unlocked', count: 0, max_owned: 1, unlocked: 1},
+    {id: 'unknown_with_old_count', count: 7, max_owned: 1, count_known: 0, unlocked: 1},
+    {id: 'missing_count', target: 1},
+    {...dailyPoints}
+]};
 const mixedPointsBefore = JSON.stringify(mixedPoints);
-assert.deepEqual(plain(S.Normalize(mixedPoints, 'points')), mixedPoints.rows);
-assert.equal(JSON.stringify(mixedPoints), mixedPointsBefore, 'Normalization never migrates or clamps server inventory in the client');
+const normalizedPoints = plain(S.Normalize(mixedPoints, 'points'));
+assert.deepEqual(normalizedPoints.slice(0, 3).map(row => [row.count, row.count_known, row.unlocked, row.max_owned, row.target]), [
+    [1, 1, 1, 1, 1], [0, 1, 0, 1, 1], [1, 1, 1, 1, 1]
+], 'The view contains one entitlement and follows explicit server unlock state');
+for (const row of normalizedPoints.slice(3, 5)) {
+    assert.equal(row.count_known, 0);
+    assert.equal(row.count, undefined, 'An unknown entitlement cannot keep a stale visual count');
+    assert.equal(row.unlocked, undefined, 'An unknown entitlement cannot inherit a stale unlock flag');
+    assert.equal(S.State(row, 'points'), null);
+    assert.equal(S.Quantity(row, 'points'), '状态待同步');
+}
+assert.deepEqual(normalizedPoints[5], {id: 'daily_growth_gem', count: 1, target: 1, max_owned: 1, count_known: 1, unlocked: 1}, 'The screenshot daily_growth_gem 3/999999 becomes one unlocked entitlement');
+assert.equal(JSON.stringify(mixedPoints), mixedPointsBefore, 'Normalizing the view never modifies the original server snapshot');
+assert.deepEqual(plain(S.Normalize({rows: normalizedPoints}, 'points')), normalizedPoints, 'View normalization is idempotent');
+const dailyCatalog = csv(path.join(repo, 'data/csv/存档系统/archive_daily_items.csv')).filter(row => row.enabled === '1');
+assert.equal(dailyCatalog.length, 12, 'Exercise every formal daily item on the points page');
+const oldDailyRows = dailyCatalog.map((row, index) => Object.freeze({id: row.item_id, name: row.display_name,
+    count: index % 3 === 0 ? 0 : 3, target: 999999, max_owned: 999999}));
+const oldDailyBefore = JSON.stringify(oldDailyRows);
+const dailyViews = S.Normalize({ok: 1, rows: oldDailyRows}, 'points');
+dailyViews.forEach((row, index) => {
+    assert.equal(row.count, index % 3 === 0 ? 0 : 1);
+    assert.equal(row.target, 1); assert.equal(row.max_owned, 1);
+    assert.equal(S.Quantity(row, 'points'), index % 3 === 0 ? '未解锁' : '已解锁');
+    assert.equal(S.Progress(row, 'points').ratio, null);
+});
+assert.equal(JSON.stringify(oldDailyRows), oldDailyBefore, 'All twelve legacy daily snapshots remain unmodified');
 assert.equal(S.Quantity({unlocked: 1, count: 1}, 'titles'), '');
 assert.equal(S.State({unlocked: 1}, 'titles'), true);
 assert.equal(S.State({unlocked: 0}, 'titles'), false);

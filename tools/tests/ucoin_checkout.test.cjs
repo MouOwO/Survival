@@ -6,7 +6,7 @@ const test = require('node:test');
 
 const addon = path.resolve(__dirname, '../..');
 const scripts = path.join(addon, 'panorama/src/scripts/custom_game');
-function harness({legacyXML = false} = {}) {
+function harness({legacyXML = false, market = false} = {}) {
     const requests = [], subscriptions = new Map(), timers = [], urls = [];
     class Panel {
         constructor(type, parent, id = '') {
@@ -72,7 +72,9 @@ function harness({legacyXML = false} = {}) {
     const load = file => vm.runInContext(fs.readFileSync(path.join(scripts, file), 'utf8'), context, {filename: file});
     ['common/item_resources.js', 'common/vip_badges.js', 'reward_presentation.js', 'common/ui_registry.js', 'common/ui_components.js', 'ui_layers.js', 'remaining_5d5c1152eb.js',
         'archive_v10_data.js', 'common/menu_v10.js', 'common/commerce_components.js',
-        'commerce_wallet.js', 'payment_test.js', 'commerce_remaining_5d5c1152eb.js'].forEach(load);
+        'commerce_wallet.js', 'payment_test.js'].forEach(load);
+    if(market)['shop_v10_assets.js','black_lion_market_model.js','black_lion_market.js'].forEach(load);
+    load('commerce_remaining_5d5c1152eb.js');
     function emit(name, data) { for (const fn of subscriptions.get(name) || []) fn(JSON.parse(JSON.stringify(data))); }
     const lastRequest = name => requests.findLast(r => r.name === name);
     function paymentReply(data, request = lastRequest('survival_payment_request')) {
@@ -96,7 +98,7 @@ function harness({legacyXML = false} = {}) {
     }
     const descendants = (p, cls) => [p, ...p.Children().flatMap(c => descendants(c, cls))].filter(n => !cls || n.BHasClass(cls));
     const menu = cls => cfg.SurvivalMenuV10.Entries().find(m => m.panel.BHasClass(cls));
-    const store = () => menu('MenuV10Commerce');
+    const store = () => market ? cfg.SurvivalBlackLionMarket.GetWindow() : menu('MenuV10Commerce');
     const cards = () => descendants(store().content, 'RCProduct');
     const buyCard = card => {
         const button = descendants(card, 'BLMarketBuy')[0];
@@ -148,7 +150,7 @@ test('G币 SKU is deduplicated and cash eligibility overrides an empty wallet ba
     simpleDetail(h, card);
     assert(!h.descendants(h.root).some(p => /充值暂未开放/.test(p.text || '')));
     h.buyCard(card);
-    assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), false);
+    assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true,'The store stays behind purchase confirmation');
     assert(h.cfg.SurvivalUI.ModalManager.Get('payment_shop').IsOpen());
     assert.equal(h.$('#PaymentPrice').text, '合计 1200 G币 / ¥12.00');
     assert.equal(h.$('#PaymentBuyLabel').text, '微信购买 1200 G币');
@@ -162,6 +164,53 @@ test('G币 SKU is deduplicated and cash eligibility overrides an empty wallet ba
     assert.deepEqual(Object.keys(create.payload).sort(), ['action','provider','quantity','request_id','sku']);
     assert.equal(h.requests.filter(r => r.payload.action === 'purchase').length, 0);
     assert.equal(h.requests.filter(r => r.payload.action === 'create').length, 1);
+});
+
+test('Purchase dismissal reveals the same loaded market list without reopening, refreshing, or destroying tooltips', () => {
+    for(const dismissal of ['back','close','scrim','escape']){
+        const h=harness({market:true});
+        h.paidSnapshot(Array.from({length:45},(_,i)=>paidItem({sku:'overlay_'+i,title:'商品 '+i})));
+        h.cfg.SurvivalCommerceView.Open();
+        h.cfg.SurvivalCommerceView.SelectCategory('all');h.cfg.SurvivalCommerceView.SelectPurchaseType('u_coin');
+        const store=h.store();store.content.actuallayoutheight=500;store.content.contentheight=1000;store.content.scrolloffset_y=500;
+        h.timers.findLast(t=>t.delay===.2&&!t.cancelled).fn();store.content.scrolloffset_y=600;
+        const view=h.cfg.SurvivalCommerceView,card=h.cards()[20],tip=card.__purpleDetail,before=view.Inspect();
+        assert.equal(before.loadedProductCount,40);card.__purpleShow();assert(tip.BHasClass('Visible'));
+        h.buyCard(card);
+        assert(view.IsOpen());assert(store.panel.visible);assert(!tip.BHasClass('Visible'));assert(tip.IsValid());
+        assert.equal(h.cfg.SurvivalUILayers.Top(),'payment_shop');
+        let reopen=0;const open=view.Open;view.Open=function(){reopen++;return open.apply(view,arguments);};
+        const reads=h.requests.length;
+        if(dismissal==='escape')h.cfg.SurvivalUILayers.CloseTop();
+        else h.$('#'+({back:'PaymentBack',close:'PaymentClose',scrim:'PaymentScrim'}[dismissal])).events.onactivate();
+        assert(!h.cfg.SurvivalUI.ModalManager.Get('payment_shop').IsOpen());
+        assert.equal(h.cfg.SurvivalUILayers.Top(),'commerce');assert(view.IsOpen());assert(store.panel.visible);
+        assert.equal(reopen,0,'Returning only removes the top popup');assert.equal(h.requests.length,reads,'Returning submits no catalog or order request');
+        const after=view.Inspect();for(const key of ['page','category','purchaseType','loadedProductCount'])assert.equal(after[key],before[key]);
+        assert.equal(store.content.scrolloffset_y,600);assert.equal(h.cards()[20],card);assert.equal(card.__purpleDetail,tip);card.__purpleShow();assert(tip.BHasClass('Visible'),'Hover continues working after return');
+    }
+});
+
+test('Returning from a standalone checkout still opens the market when no store was underneath',()=>{
+    const h=harness({market:true});h.paidSnapshot([paidItem()]);
+    assert(!h.cfg.SurvivalCommerceView.IsOpen());h.cfg.SurvivalPayments.Checkout('u_item');
+    h.$('#PaymentBack').events.onactivate();
+    assert(h.cfg.SurvivalCommerceView.IsOpen());assert.equal(h.cfg.SurvivalUILayers.Top(),'commerce');
+    assert(!h.cfg.SurvivalPayments.Inspect().opened);assert.equal(h.requests.filter(r=>r.payload.action==='create'||r.payload.action==='purchase').length,0);
+});
+
+test('Both wallet return controls leave the existing market intact, and a rejected checkout keeps it visible',()=>{
+    const h=harness({market:true}),product={...walletItem('shop_points','overlay_points'),enabled:1,owned:0,price:10,disabled_reason:''};
+    h.paidSnapshot([]);h.walletSnapshot([product]);h.cfg.SurvivalCommerceView.Open();h.cfg.SurvivalCommerceView.SelectCategory('all');h.cfg.SurvivalCommerceView.SelectPurchaseType('shop_points');
+    const view=h.cfg.SurvivalCommerceView,card=h.cards()[0];let reopen=0;const open=view.Open;view.Open=function(){reopen++;return open.apply(view,arguments);};
+    for(const action of ['footer','sidebar']){
+        h.buyCard(card);const exchange=h.menu('MenuV10Exchange');assert(exchange.IsOpen());assert(view.IsOpen());
+        const reads=h.requests.length;
+        if(action==='footer')h.descendants(exchange.actions,'CommerceConfirmBack')[0].events.onactivate();
+        else exchange.sidebar.Children().find(p=>p.id.endsWith('Section_back')).events.onactivate();
+        assert(!exchange.IsOpen());assert.equal(h.cfg.SurvivalUILayers.Top(),'commerce');assert.equal(reopen,0);assert.equal(h.requests.length,reads);assert.equal(h.cards()[0],card);
+    }
+    h.cfg.SurvivalCommerceWallet.Checkout=()=>false;h.buyCard(card);assert(view.IsOpen());assert.equal(h.cards()[0],card);
 });
 
 test('G币 products need an authenticated enabled payment row and valid G币 metadata', () => {

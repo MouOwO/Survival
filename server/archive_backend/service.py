@@ -256,11 +256,14 @@ class ArchiveService:
                 command = bound_command(command, clear_mode)
             reducer=self
             version=prepared.get("config_hash",self.bundle.hash)
+            from .unique_points import legacy_lottery_error
+            legacy_error=legacy_lottery_error(self.bundle.hash,version,command.get('kind'))
             shared_roll = self.shared_challenge_roll(self.bundle)
             # Preserve the recorded hash and fingerprint for old-match replays.
             # Only explicitly approved archive updates use the current reducer.
-            # Commerce and lottery operations keep their recorded rules.
-            if version!=self.bundle.hash:
+            # Old lottery mutations require a refreshed unique-ownership
+            # catalog; completed receipts were returned above unchanged.
+            if version!=self.bundle.hash and not legacy_error:
                 if not re.fullmatch(r"[0-9a-f]{64}",version): raise ArchiveError("archive_config_invalid")
                 upgraded = upgrades(self.bundle, version, command.get("kind"))
                 # Outstanding reward intents must observe account quotas too.
@@ -280,10 +283,18 @@ class ArchiveService:
                 if not upgraded:
                     reducer=ArchiveService(self.app,recorded_bundle,self.lua)
             product = self.bundle.tables.get('commerce_catalog', {}).get(command.get('sku'), {})
-            if command['kind'] == 'commerce_purchase' and product.get('currency') == 'shop_gold':
+            if legacy_error:
+                result={'ok':False,'error':legacy_error}
+            elif command['kind'] == 'commerce_purchase' and product.get('currency') == 'shop_gold':
                 # A currency pause applies to uncommitted older-client intents too.
                 # Completed receipts already returned above and remain immutable.
                 result = {'ok': False, 'error': 'shop_gold_not_open'}
+            elif (command['kind'] == 'commerce_purchase' and reducer is not self
+                  and (unique_block := self.commerce_unique_block(profile, product))):
+                # An unfinished historical intent cannot bypass today's shared
+                # permanent ownership rule. Its recorded price/effects remain
+                # intact, and completed receipts returned before this branch.
+                result = {'ok': False, 'error': unique_block}
             elif version == self.bundle.hash or command["kind"] != "challenge":
                 result=reducer.settle(profile,command,prepared["has_pass"])
             else:
@@ -304,6 +315,35 @@ class ArchiveService:
             if committed.get("error")!="archive_revision_conflict": return committed
             prepared=self.app.rpc_client.rpc("archive_resume",{"p_account":account,"p_id":operation_id})
         return {"ok":False,"error":"archive_busy_retry"}
+
+    def commerce_unique_block(self, profile, product):
+        """Current permanent-ownership guard for an older uncommitted reducer."""
+        from .unique_points import catalog, integer
+        unique, aliases = catalog(self.bundle)
+        canonical = lambda identity: aliases.get(identity, identity)
+        marker = canonical(product.get('item_id'))
+        components = product.get('grants', {}).get('items', {})
+        relevant = marker in unique or any(canonical(identity) in unique for identity in components)
+        if not relevant:
+            return ''
+        if not product.get('enabled'):
+            return 'product_unavailable'
+        inventory = profile.get('save', {}).get('content_inventory', {})
+
+        def owned(identity):
+            return any(canonical(key) == identity and integer(value) > 0
+                       for key, value in inventory.items())
+
+        if marker in unique:
+            if owned(marker):
+                return 'already_owned'
+            if product.get('ownership_quantity', 1) != 1:
+                return 'ownership_limit_reached'
+        for identity, quantity in components.items():
+            identity = canonical(identity)
+            if identity in unique and (owned(identity) or quantity != 1):
+                return 'component_already_owned'
+        return ''
 
     def drain_online(self,database_account):
         # Persistent checkpoint outbox survives a Python crash between fishing and archive settlement.
@@ -337,6 +377,8 @@ class ArchiveService:
             # draw reducer uses, until the game joins the new bundle version.
             reducer=ArchiveService(self.app,Bundle(self.bundle.directory.parent/requested_hash),self.lua)
         projected=reducer.settle(profile,{"id":"lottery_snapshot","kind":"lottery_snapshot"},False)
+        from .unique_points import limit_snapshot_ownership
+        projected=limit_snapshot_ownership(projected,self.bundle)
         projected["config_hash"]=requested_hash
         return projected
 

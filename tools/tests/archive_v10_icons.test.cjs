@@ -13,7 +13,7 @@ const seen=new Set();for(const row of data.bindings){
  const key=row.category+':'+row.id;assert(!seen.has(key),'No ambiguous binding: '+key);seen.add(key);
  const item={id:row.id,name:row.name,count:7,level:3,description:'正式属性保持'},before=JSON.stringify(item),resolved=api.Resolve(item,row.category);
  const canonical=cfg.SurvivalItemResources.Lookup(item);assert(canonical,'historical formal entry remains registered');
- assert.equal(JSON.stringify(item),before,'Resolving cannot modify authoritative data');assert.equal(resolved.uri,canonical.uri);assert.equal(resolved.fit,canonical.kind==='image'||canonical.kind==='hero'?'cover':'contain');assert.equal(resolved.iconKey,canonical.id+':'+canonical.uri);assert.deepEqual(Array.from(resolved.sourceSize),Array.from(canonical.source_size||[84,84]));
+ assert.equal(JSON.stringify(item),before,'Resolving cannot modify authoritative data');assert.equal(resolved.uri,canonical.uri);assert.equal(resolved.fit,canonical.fit||(canonical.kind==='image'||canonical.kind==='hero'?'cover':'contain'));assert.equal(resolved.iconKey,canonical.id+':'+canonical.uri);assert.deepEqual(Array.from(resolved.sourceSize),Array.from(canonical.source_size||[84,84]));
  assert(row.evidence.formal_file.startsWith('data/csv/'));assert(row.evidence.formal_name===row.name);assert(row.evidence.resource_sha256.length===64);assert(row.source_size.every(n=>n>0));
  resolved.sourceSize[0]=1;assert.equal(api.Resolve(item,row.category).sourceSize[0],(canonical.source_size||[84,84])[0],'Returned size arrays cannot corrupt future resolutions');
 }

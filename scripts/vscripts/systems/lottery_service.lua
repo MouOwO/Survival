@@ -476,7 +476,9 @@ local function snapshot(player_id, reason, requested_pool_id)
             exchange_enabled = item.exchange_enabled,
             max_owned = item.max_owned,
             owned = item_owned(inventory.counts or {}, item),
-            owned_count = item_owned_count(inventory.counts or {}, item),
+            owned_count = item.item_type == "积分道具" and tonumber(item.max_owned) == 1
+                and math.min(1, item_owned_count(inventory.counts or {}, item))
+                or item_owned_count(inventory.counts or {}, item),
             at_max_owned = item_at_limit(inventory.counts or {}, item),
         }
     end

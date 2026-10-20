@@ -1,0 +1,478 @@
+{
+  "version": 1,
+  "source_package": "lottery_all.zip/lottery_layered",
+  "source_manifest_sha256": "107a1a83bd9741185a9a9128e37b1cc6f305c05f256fc4a273b52b85f7c32ca3",
+  "canvas": [
+    1672,
+    941
+  ],
+  "ui_bounds": {
+    "left": 28,
+    "top": 39,
+    "width": 1620,
+    "height": 838
+  },
+  "geometry": {
+    "sidebar": [
+      35,
+      123,
+      334,
+      869
+    ],
+    "footer": [
+      334,
+      804,
+      1643,
+      869
+    ],
+    "header": [
+      35,
+      45,
+      1643,
+      119
+    ],
+    "sidebar_right": 334,
+    "footer_left": 334
+  },
+  "policy": "Original PNG bytes only. Native labels, native RGBA surfaces and existing four pool backgrounds remain separate.",
+  "excluded": "RGB repaired bases, backplates, scene/game reference, raster text, concept prize icons, composite artwork, and unused repeated frames.",
+  "assets": [
+    {
+      "id": "window_frame",
+      "source": "assets/window_frame.png",
+      "source_kind": "frame",
+      "usage": "窗口金属细框与外缘｜中间镂空",
+      "size": [
+        1620,
+        838
+      ],
+      "bounds": [
+        28,
+        39,
+        1620,
+        838
+      ],
+      "z": 8,
+      "sha256": "268d9f52bf74ebbfb002aa38231de5ff91d692dbaf5594ffce6313f726370784",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/window_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/window_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/window_frame.png"
+    },
+    {
+      "id": "header_rule",
+      "source": "assets/header_rule.png",
+      "source_kind": "frame",
+      "usage": "顶栏底边细线",
+      "size": [
+        1608,
+        6
+      ],
+      "bounds": [
+        35,
+        118,
+        1608,
+        6
+      ],
+      "z": 5,
+      "sha256": "451809e38c23616614e2db862248d924668a25e4bc6895b69f9674e05beeeea9",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/header_rule.png",
+        "panorama/src/images/custom_game/lottery_final_v1/header_rule.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/header_rule.png"
+    },
+    {
+      "id": "sidebar_rule",
+      "source": "assets/sidebar_rule.png",
+      "source_kind": "frame",
+      "usage": "左栏右边界｜贯通到底",
+      "size": [
+        5,
+        746
+      ],
+      "bounds": [
+        332,
+        123,
+        5,
+        746
+      ],
+      "z": 6,
+      "sha256": "0670e4b3b8805f9720962d9104d5fa5618912f98f9a9009db10b4804d59d5928",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/sidebar_rule.png",
+        "panorama/src/images/custom_game/lottery_final_v1/sidebar_rule.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/sidebar_rule.png"
+    },
+    {
+      "id": "footer_rule",
+      "source": "assets/footer_rule.png",
+      "source_kind": "frame",
+      "usage": "底横条顶线｜从左栏右界开始",
+      "size": [
+        1309,
+        5
+      ],
+      "bounds": [
+        334,
+        802,
+        1309,
+        5
+      ],
+      "z": 7,
+      "sha256": "fc36cb15fc2f83ea4b53481d2c47ee4d9055e8f28bb1dea7523c08350d0c11aa",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/footer_rule.png",
+        "panorama/src/images/custom_game/lottery_final_v1/footer_rule.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/footer_rule.png"
+    },
+    {
+      "id": "header_back_divider",
+      "source": "assets/header_back_divider.png",
+      "source_kind": "frame",
+      "usage": "返回后竖线",
+      "size": [
+        5,
+        46
+      ],
+      "bounds": [
+        145,
+        61,
+        5,
+        46
+      ],
+      "z": 9,
+      "sha256": "c6810aee78688f5cba111900dc6d9b426f9c3d3a86c5732ef42c95c287305300",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/header_back_divider.png",
+        "panorama/src/images/custom_game/lottery_final_v1/header_back_divider.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/header_back_divider.png"
+    },
+    {
+      "id": "back_arrow",
+      "source": "assets/back_arrow.png",
+      "source_kind": "icon",
+      "usage": "返回箭头",
+      "size": [
+        17,
+        31
+      ],
+      "bounds": [
+        61,
+        67,
+        17,
+        31
+      ],
+      "z": 10,
+      "sha256": "b44636fb76848f4119f3380636188d0cde74db47830bf1f5b09fe3806c6c9913",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/back_arrow.png",
+        "panorama/src/images/custom_game/lottery_final_v1/back_arrow.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/back_arrow.png"
+    },
+    {
+      "id": "close_frame",
+      "source": "assets/close_frame.png",
+      "source_kind": "frame",
+      "usage": "关闭按钮｜独立透明中空细框",
+      "size": [
+        51,
+        53
+      ],
+      "bounds": [
+        1573,
+        56,
+        51,
+        53
+      ],
+      "z": 21,
+      "sha256": "8f201dd845a28d8009efc528ff75b7295b7374fb431b87f359d50aac8f61c1ed",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/close_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/close_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/close_frame.png"
+    },
+    {
+      "id": "close_cross",
+      "source": "assets/close_cross.png",
+      "source_kind": "icon",
+      "usage": "关闭×｜独立符号",
+      "size": [
+        37,
+        37
+      ],
+      "bounds": [
+        1581,
+        64,
+        37,
+        37
+      ],
+      "z": 22,
+      "sha256": "6b0bfeaffcb243156da849b82110fe1a19fefb7b33bba68db39465f59a430af9",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/close_cross.png",
+        "panorama/src/images/custom_game/lottery_final_v1/close_cross.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/close_cross.png"
+    },
+    {
+      "id": "pool_1_frame",
+      "source": "assets/pool_1_frame.png",
+      "source_kind": "frame",
+      "usage": "地图抽奖｜独立透明中空细框",
+      "size": [
+        270,
+        120
+      ],
+      "bounds": [
+        54,
+        148,
+        270,
+        120
+      ],
+      "z": 24,
+      "sha256": "d8f2e5ba4d8ada70e7fe45cb51d846b893b774e4a0b5d1543ace2eb5cac798f1",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/pool_1_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/pool_1_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/pool_1_frame.png"
+    },
+    {
+      "id": "pool_2_frame",
+      "source": "assets/pool_2_frame.png",
+      "source_kind": "frame",
+      "usage": "修仙宝箱｜独立透明中空细框",
+      "size": [
+        266,
+        126
+      ],
+      "bounds": [
+        58,
+        287,
+        266,
+        126
+      ],
+      "z": 28,
+      "sha256": "68d1a313877546e9fd8396d9c778ae2b91f4139c003bc1dce03dc458cb3dad97",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/pool_2_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/pool_2_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/pool_2_frame.png"
+    },
+    {
+      "id": "treasure_1_frame",
+      "source": "assets/treasure_1_frame.png",
+      "source_kind": "frame",
+      "usage": "采集秘典｜独立透明中空细框",
+      "size": [
+        88,
+        88
+      ],
+      "bounds": [
+        409,
+        659,
+        88,
+        88
+      ],
+      "z": 43,
+      "sha256": "5a2586083f26302a73b5a79407a9447332d4b2ff997226a832df3093320aab87",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/treasure_1_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/treasure_1_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/treasure_1_frame.png"
+    },
+    {
+      "id": "treasure_2_frame",
+      "source": "assets/treasure_2_frame.png",
+      "source_kind": "frame",
+      "usage": "英雄勋章｜独立透明中空细框",
+      "size": [
+        88,
+        88
+      ],
+      "bounds": [
+        545,
+        659,
+        88,
+        88
+      ],
+      "z": 47,
+      "sha256": "90f1003975f706a2db048c5f67c7bad18dec126992e14dbe58e6c8947335ba32",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/treasure_2_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/treasure_2_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/treasure_2_frame.png"
+    },
+    {
+      "id": "treasure_3_frame",
+      "source": "assets/treasure_3_frame.png",
+      "source_kind": "frame",
+      "usage": "第3件珍藏｜独立透明中空细框",
+      "size": [
+        89,
+        88
+      ],
+      "bounds": [
+        682,
+        659,
+        89,
+        88
+      ],
+      "z": 51,
+      "sha256": "ea9c70f6cbc7fb32117fde6e7b222431ba8947565c5c68d96280bf1656ce9b4a",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/treasure_3_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/treasure_3_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/treasure_3_frame.png"
+    },
+    {
+      "id": "treasure_4_frame",
+      "source": "assets/treasure_4_frame.png",
+      "source_kind": "frame",
+      "usage": "第4件珍藏｜独立透明中空细框",
+      "size": [
+        90,
+        88
+      ],
+      "bounds": [
+        819,
+        659,
+        90,
+        88
+      ],
+      "z": 55,
+      "sha256": "2260c3200dfbcacad4a53831ea0d63cc9d2f43ab7492aaed6a77a1d00470114c",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/treasure_4_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/treasure_4_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/treasure_4_frame.png"
+    },
+    {
+      "id": "draw_one_frame",
+      "source": "assets/draw_one_frame.png",
+      "source_kind": "frame",
+      "usage": "单抽｜独立透明中空细框",
+      "size": [
+        274,
+        80
+      ],
+      "bounds": [
+        1005,
+        714,
+        274,
+        80
+      ],
+      "z": 60,
+      "sha256": "1be5c41f4eb9b73c551e708989d54b43798bb5a4ae0661080a5de49f0dfb8bdf",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/draw_one_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/draw_one_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/draw_one_frame.png"
+    },
+    {
+      "id": "draw_ten_frame",
+      "source": "assets/draw_ten_frame.png",
+      "source_kind": "frame",
+      "usage": "10连｜独立透明中空细框",
+      "size": [
+        275,
+        80
+      ],
+      "bounds": [
+        1294,
+        714,
+        275,
+        80
+      ],
+      "z": 65,
+      "sha256": "7134188ea7e86af74b696066e8f7e570762640b57c588388de6f5dc572a40fd9",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/draw_ten_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/draw_ten_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/draw_ten_frame.png"
+    },
+    {
+      "id": "footer_divider_1",
+      "source": "assets/footer_divider_1.png",
+      "source_kind": "frame",
+      "usage": "底部第1分隔线",
+      "size": [
+        10,
+        27
+      ],
+      "bounds": [
+        538,
+        821,
+        10,
+        27
+      ],
+      "z": 69,
+      "sha256": "b9ec6f2a2bf897135c4a48a1b7d5ebb1c92bf937724bc93728b0248c4198c685",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/footer_divider_1.png",
+        "panorama/src/images/custom_game/lottery_final_v1/footer_divider_1.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/footer_divider_1.png"
+    },
+    {
+      "id": "footer_divider_2",
+      "source": "assets/footer_divider_2.png",
+      "source_kind": "frame",
+      "usage": "底部第2分隔线",
+      "size": [
+        11,
+        27
+      ],
+      "bounds": [
+        700,
+        821,
+        11,
+        27
+      ],
+      "z": 70,
+      "sha256": "ee5feb0378ecb6275a6dd59694f7e6c537e129c38fcad5ee081c619caf17fe66",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/footer_divider_2.png",
+        "panorama/src/images/custom_game/lottery_final_v1/footer_divider_2.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/footer_divider_2.png"
+    },
+    {
+      "id": "skip_checkbox_frame",
+      "source": "assets/skip_checkbox_frame.png",
+      "source_kind": "frame",
+      "usage": "跳过动画未选框｜独立透明中空细框",
+      "size": [
+        38,
+        38
+      ],
+      "bounds": [
+        880,
+        815,
+        38,
+        38
+      ],
+      "z": 72,
+      "sha256": "15ada00a4734bb0aaa469984b8d80b30bef30da9eb109a78dfcd3f9bbffd0893",
+      "destinations": [
+        "art/ui/sources/custom_game/lottery_final_v1/skip_checkbox_frame.png",
+        "panorama/src/images/custom_game/lottery_final_v1/skip_checkbox_frame.png"
+      ],
+      "runtime_uri": "file://{images}/custom_game/lottery_final_v1/skip_checkbox_frame.png"
+    }
+  ]
+}

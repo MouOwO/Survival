@@ -466,7 +466,7 @@ class ArchiveTests(unittest.TestCase):
             'archive':{'unrelated':{'keep':True},'commerce':{
                 'balances':{'u_coin':19,'shop_points':7,'shop_gold':29}}},
             'gameplay_stats':stats,
-            'content_inventory':{ticket:100,'daily_growth_gem':9,'lottery_ember_of_legacy':41},
+            'content_inventory':{ticket:100,'daily_growth_gem':9,'material_synthesis_gem':41},
         }
         return copy.deepcopy(stats)
 
@@ -478,7 +478,7 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(self.profile['save']['gameplay_stats'][field],stats[field],field)
         inventory=self.profile['save']['content_inventory']
         self.assertEqual(inventory['daily_growth_gem'],9)
-        self.assertEqual(inventory['lottery_ember_of_legacy'],41,
+        self.assertEqual(inventory['material_synthesis_gem'],41,
                          'Existing daily and separately purchased stackable materials are not normalized')
 
     def test_lottery_points_catalog_has_unique_permanent_ownership(self):
@@ -568,7 +568,7 @@ class ArchiveTests(unittest.TestCase):
                 initial_stats=self._seed_points_draw_profile(ticket)
                 inventory=self.profile['save']['content_inventory']
                 inventory['lottery_flame_crystal']=2
-                inventory['lottery_ember_of_legacy']=101
+                inventory['material_synthesis_gem']=101
                 if canonical_count:
                     inventory[item['item_id']]=canonical_count
                 before_inventory=copy.deepcopy(inventory)
@@ -578,7 +578,7 @@ class ArchiveTests(unittest.TestCase):
                     public=next(row for row in selected['items'] if row['id']==item['item_id'])
                     self.assertTrue(public['owned'] and public['at_max_owned'],
                                     'Public ownership recognizes aliases before a draw')
-                    self.assertEqual(public['owned_count'],2+canonical_count)
+                    self.assertEqual(public['owned_count'],1)
                     self.assertEqual(self.profile['save']['content_inventory'],before_inventory,
                                      'Reading aggregate ownership must not migrate raw inventory')
                     payload=self.command('lottery_draw',pool_id=pool,count=1,
@@ -592,15 +592,143 @@ class ArchiveTests(unittest.TestCase):
                     self.assertEqual(reward['converted_points'],item['duplicate_points'])
                     expected_inventory=copy.deepcopy(before_inventory)
                     expected_inventory[ticket]-=1
+                    expected_inventory.pop('lottery_flame_crystal')
+                    expected_inventory[item['item_id']]=1
                     self.assertEqual(self.profile['save']['content_inventory'],expected_inventory,
-                                     'Alias detection does not rewrite, clamp or migrate existing inventory')
+                                     'Successful settlement canonicalizes historical copies exactly once')
                     self.assertEqual(self.profile['save']['gameplay_stats'],initial_stats,
                                      'An alias-owned duplicate cannot reapply permanent effects')
                     balances=self.profile['save']['archive']['commerce']['balances']
-                    self.assertEqual(balances,{'u_coin':19,'shop_points':7+item['duplicate_points'],'shop_gold':29})
+                    self.assertEqual(balances,{'u_coin':19,'shop_points':7+(2+canonical_count)*item['duplicate_points'],'shop_gold':29})
+                    self.assertEqual(result['response']['unique_points_reconciliation'],{
+                        'changed_items':1,'converted_points':(1+canonical_count)*item['duplicate_points'],
+                        'converted_currency':'shop_points'})
                     after=copy.deepcopy(self.profile)
                     self.assertEqual(self.service.command(payload)['response'],result['response'])
                     self.assertEqual(self.profile,after)
+
+    def test_lottery_points_reconciles_all_97_historical_items_without_reapplying_stats(self):
+        from archive_backend.unique_points import catalog,preview
+        item,pool,ticket,weights=self._points_draw_fixture('ssr')
+        initial_stats=self._seed_points_draw_profile(ticket)
+        rows=[r for r in self.bundle.configs['lottery_item_definitions']['rows']
+              if r.get('enabled') is not False and r.get('item_type')=='积分道具']
+        inventory=self.profile['save']['content_inventory']
+        for row in rows:inventory[row['item_id']]=3
+        inventory['lottery_flame_crystal']=2
+        inventory['lottery_burst_crystal']=1
+        inventory['daily_growth_gem']=999
+        inventory['special_lottery_ticket']=23
+        before=copy.deepcopy(self.profile)
+        expected=preview(inventory,self.profile['save']['archive'],*catalog(self.bundle))
+        with weights:
+            payload=self.command('lottery_draw',pool_id=pool,count=1,request_id='points_reconcile_all')
+            self.db.lose_reply=True
+            with self.assertRaises(TimeoutError):self.service.command(payload)
+            committed=copy.deepcopy(self.profile)
+            result=self.service.command(payload)
+            self.assertTrue(result['ok'],result)
+            self.assertEqual(self.profile,committed,'Lost replies replay the same compensation and draw receipt')
+            normalized=copy.deepcopy(expected['content_inventory']);normalized[ticket]-=1
+            self.assertEqual(self.profile['save']['content_inventory'],normalized)
+            self.assertEqual(self.profile['save']['gameplay_stats'],initial_stats)
+            self.assertEqual(result['response']['unique_points_reconciliation'],{
+                'changed_items':97,'converted_points':expected['converted_points'],'converted_currency':'shop_points'})
+            self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],
+                             7+expected['converted_points']+item['duplicate_points'])
+            second=self.send('lottery_draw',pool_id=pool,count=1,request_id='points_reconcile_again')
+            self.assertEqual(second['response']['unique_points_reconciliation']['converted_points'],0)
+            self.assertEqual(second['response']['unique_points_reconciliation']['changed_items'],0)
+            self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],
+                             7+expected['converted_points']+2*item['duplicate_points'])
+            self.assertEqual(self.profile['save']['gameplay_stats'],before['save']['gameplay_stats'])
+
+    def test_lottery_points_exchange_reconciles_other_legacy_items_only_after_validation(self):
+        item,pool,ticket,weights=self._points_draw_fixture('ssr')
+        self._seed_points_draw_profile(ticket)
+        inventory=self.profile['save']['content_inventory']
+        inventory['lottery_flame_crystal']=3
+        before=copy.deepcopy(self.profile)
+        with weights:
+            failed=self.send('lottery_exchange',pool_id=pool,item_id=item['item_id'],request_id='reconcile_exchange_poor')
+            self.assertFalse(failed['ok']);self.assertEqual(failed['error'],'starjoy_points_insufficient')
+            self.assertEqual(self.profile,before,'Rejected transactions cannot compensate or normalize a save')
+            self.profile['save']['gameplay_stats']['starjoy_points']=item['exchange_points']+17
+            payload=self.command('lottery_exchange',pool_id=pool,item_id=item['item_id'],request_id='reconcile_exchange_ok')
+            result=self.service.command(payload)
+            self.assertTrue(result['ok'],result)
+            inventory=self.profile['save']['content_inventory']
+            self.assertNotIn('lottery_flame_crystal',inventory)
+            self.assertEqual(inventory['lottery_nature_crystal'],1)
+            self.assertEqual(inventory[item['item_id']],1)
+            self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],17)
+            self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],17)
+            after=copy.deepcopy(self.profile)
+            self.assertEqual(self.service.command(payload)['response'],result['response'])
+            self.assertEqual(self.profile,after)
+
+    def test_lottery_points_reconciliation_overflow_preserves_the_whole_account(self):
+        item,pool,ticket,weights=self._points_draw_fixture('n')
+        self._seed_points_draw_profile(ticket)
+        self.profile['save']['content_inventory'][item['item_id']]=3
+        self.profile['save']['archive']['commerce']['balances']['shop_points']=9007199254740990
+        before=copy.deepcopy(self.profile)
+        with weights:
+            result=self.send('lottery_draw',pool_id=pool,count=1,request_id='reconcile_overflow')
+            self.assertFalse(result['ok']);self.assertEqual(result['error'],'settlement_failed')
+        self.assertEqual(self.profile,before,'A failed repair cannot debit tickets, add stats or lose historical copies')
+
+    def test_unique_lottery_unfinished_old_intents_require_refresh_without_loading_old_reducer(self):
+        item,pool,ticket,weights=self._points_draw_fixture('n')
+        self._seed_points_draw_profile(ticket)
+        self.profile['save']['content_inventory'][item['item_id']]=3
+        self.profile['save']['gameplay_stats']['starjoy_points']=item['exchange_points']+17
+        before=copy.deepcopy(self.profile)
+        old_hash='a'*64
+        for kind in ('lottery_draw','lottery_exchange'):
+            command=self.command(kind,pool_id=pool,request_id='old_unique_'+kind,
+                                 **({'count':1} if kind=='lottery_draw' else {'item_id':item['item_id']}))['command']
+            prepared=self.db.rpc('archive_prepare',{'p_account':self.account,'p_id':command['id'],
+                'p_command':command,'p_hash':old_hash,'p_fingerprint':kind})
+            with patch('archive_backend.service.Bundle',side_effect=AssertionError('An old lottery reducer cannot run')):
+                result=self.service.finish_prepared(self.account,command['id'],prepared)
+            self.assertFalse(result['ok']);self.assertTrue(result['terminal'])
+            self.assertEqual(result['error'],'lottery_config_refresh_required')
+            self.assertEqual(self.profile,before,'A refresh rejection cannot normalize or award historical copies')
+            again=self.service.finish_prepared(self.account,command['id'],self.db.resume(self.account,command['id']))
+            self.assertEqual(again,result)
+
+    def test_unique_lottery_completed_old_receipts_are_immutable(self):
+        item,pool,ticket,weights=self._points_draw_fixture('n')
+        self._seed_points_draw_profile(ticket)
+        command=self.command('lottery_draw',pool_id=pool,count=1,request_id='old_completed_unique')['command']
+        self.db.rpc('archive_prepare',{'p_account':self.account,'p_id':command['id'],
+            'p_command':command,'p_hash':'a'*64,'p_fingerprint':'completed-old'})
+        op=self.db.ops[(self.account,command['id'])]
+        op.update(done=True,response={'ok':True,'results':[{'id':item['item_id'],'owned_count':44}],
+                                      'shop_points':123,'legacy_recorded_rule':'keep'})
+        before=copy.deepcopy(self.profile);receipt=self.db.resume(self.account,command['id'])
+        self.assertEqual(self.service.finish_prepared(self.account,command['id'],receipt),receipt)
+        self.assertEqual(self.profile,before)
+
+    def test_unique_lottery_old_snapshot_clamps_only_current_unique_item_projection(self):
+        self.profile['save']['content_inventory']={'lottery_flame_crystal':3,'material_synthesis_gem':91}
+        before=copy.deepcopy(self.profile)
+        old_hash='a'*64
+        projected={'ok':True,'snapshots':[{'selected_pool_id':'map','items':[
+            {'id':'lottery_flame_crystal','owned_count':3,'max_owned':9,'owned':True,'at_max_owned':False},
+            {'id':'lottery_nature_crystal','owned_count':0,'max_owned':9,'owned':False,'at_max_owned':False},
+            {'id':'material_synthesis_gem','owned_count':91,'max_owned':999999}]}]}
+        with patch.object(self.bundle,'compatible_config_hashes',{old_hash:{'commands':{'lottery_snapshot'},'upgrade_commands':set()}}), \
+                patch('archive_backend.service.Bundle',return_value=self.bundle), \
+                patch.object(ArchiveService,'settle',return_value=copy.deepcopy(projected)):
+            result=self.service.lottery_snapshot({'account_id':'100','config_hash':old_hash})
+        items=result['snapshots'][0]['items']
+        self.assertEqual(items[0],{'id':'lottery_flame_crystal','owned_count':1,'max_owned':1,'owned':True,'at_max_owned':True})
+        self.assertEqual(items[1],{'id':'lottery_nature_crystal','owned_count':0,'max_owned':1,'owned':False,'at_max_owned':False})
+        self.assertEqual(items[2],projected['snapshots'][0]['items'][2])
+        self.assertEqual(self.profile,before)
+        self.assertEqual(result['config_hash'],old_hash)
 
     def test_lottery_points_legacy_alias_exchange_rejects_without_debit_or_grant(self):
         item,pool,ticket,weights=self._points_draw_fixture('n','lottery_nature_crystal')

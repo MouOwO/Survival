@@ -5,9 +5,9 @@
     900
   ],
   "reference": "design_refs/archive_parchment_v1/approved.png",
-  "material_source": "design_refs/archive_parchment_v1/clean_plate.png",
-  "material_reference": "design_refs/archive_parchment_v1/original_reference.jfif",
-  "source_policy": "Approved controls + imagegen text-free plate revised against the original reference for subdued smoky texture; dynamic labels, values and progress remain separate.",
+  "material_source": "art/ui/references/gw2_original_v1/155985.png",
+  "material_reference": "art/ui/references/gw2_original_v1/source_report.json",
+  "source_policy": "Original GW2 window material cropped mechanically from asset 155985; titlebar uses documented BlishHUD embedded original UI aliases (dat IDs not independently established). Original alpha retained, no generated repaint/color grading/sharpening. Sidebar/content overlays are transparent. Existing approved controls/icons and all dynamic data remain unchanged.",
   "assets": {
     "window_background": {
       "file": "art/ui/sources/custom_game/archive_parchment_v1/window_background.png",
@@ -15,15 +15,15 @@
         1164,
         860
       ],
-      "sha256": "dfcb308153ef8770855ac1ab54d2f311caeba0d1d884d1259e93ab0ed19e2f75",
-      "source": "clean_plate.png",
+      "sha256": "458ac070574901a321c8e3202370f361bd23a5d06703676e5defd3ba3ad202d0",
+      "source": "art/ui/references/gw2_original_v1/155985.png",
       "crop": [
-        32,
-        20,
-        1435,
-        1075
+        40,
+        26,
+        953,
+        717
       ],
-      "usage": "Text-free window substrate; no scenery or interface text."
+      "usage": "Original GW2 standard window material; mechanical WindowRegion crop and Lanczos resize; original alpha retained."
     },
     "header_strip": {
       "file": "art/ui/sources/custom_game/archive_parchment_v1/header_strip.png",
@@ -31,15 +31,43 @@
         1164,
         56
       ],
-      "sha256": "1be5f9d3876c31aac49610e30251d4ef1186d3ccd0a87b41d4c389401e149551",
-      "source": "clean_plate.png / normalized plate",
+      "sha256": "b3fc820299d4eb02f2c74886fae1616111b188b56bffc1dbf4c81a9b389d8c58",
+      "source": "art/ui/references/gw2_original_v1/titlebar-inactive.png + art/ui/references/gw2_original_v1/window-topright.png",
       "crop": [
         0,
         0,
-        1164,
-        56
+        1024,
+        64
       ],
-      "usage": "Independent parchment title band."
+      "usage": "Original text-free titlebar with independent 112x56 right cap; original alpha retained.",
+      "assembly": {
+        "mainSourceBox": [
+          0,
+          0,
+          1024,
+          64
+        ],
+        "mainTargetBox": [
+          0,
+          0,
+          1052,
+          56
+        ],
+        "capSourceBox": [
+          0,
+          0,
+          128,
+          64
+        ],
+        "capTargetBox": [
+          1052,
+          0,
+          1164,
+          56
+        ],
+        "filter": "Lanczos",
+        "alpha": "preserved; no flattening"
+      }
     },
     "sidebar_background": {
       "file": "art/ui/sources/custom_game/archive_parchment_v1/sidebar_background.png",
@@ -47,15 +75,10 @@
         326,
         782
       ],
-      "sha256": "3b8b438a7170c1808d573c9434be0c31622722bb2f3838f3d4a1b463c21a6554",
-      "source": "clean_plate.png / normalized plate",
-      "crop": [
-        12,
-        62,
-        338,
-        844
-      ],
-      "usage": "Second-level category surface."
+      "sha256": "a171dca20cc64a9cb8d682ee9ae9a7d0df521efbd9677a7f073a100473381c9a",
+      "source": "transparent overlay; original material supplied once by window_background",
+      "crop": null,
+      "usage": "Transparent retained sidebar component; prevents duplicate material printing."
     },
     "content_background": {
       "file": "art/ui/sources/custom_game/archive_parchment_v1/content_background.png",
@@ -63,15 +86,10 @@
         790,
         782
       ],
-      "sha256": "55524476eddaffd9ffdf772436a39492d88ed182ce42c8a2040c545a305f5149",
-      "source": "clean_plate.png / normalized plate",
-      "crop": [
-        356,
-        62,
-        1146,
-        844
-      ],
-      "usage": "Third-level content surface."
+      "sha256": "dbcb5d94a36210d43aff72fa2ca22c9a4a0c8b63e72c1dbc793080eddfb5aea0",
+      "source": "transparent overlay; original material supplied once by window_background",
+      "crop": null,
+      "usage": "Transparent retained content component; prevents duplicate material printing."
     },
     "section_strip": {
       "file": "art/ui/sources/custom_game/archive_parchment_v1/section_strip.png",

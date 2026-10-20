@@ -11,6 +11,7 @@ function harness(options = {}) {
             this.paneltype = type; this.id = id; this.parent = null; this.children = [];
             this.style = {}; this.events = {}; this.classes = new Set(); this.attrs = {};
             this.visible = true; this.enabled = true; this.actualuiscale_x = this.actualuiscale_y = 1;
+            this.scrolloffset_y = 0;
             this.SetParent(parent);
         }
         IsValid() { return !this.deleted; }
@@ -35,6 +36,19 @@ function harness(options = {}) {
         SetAttributeString(k, v) { this.attrs[k] = v; }
         GetAttributeString(k, fallback) { return this.attrs[k] === undefined ? fallback : this.attrs[k]; }
         GetPositionWithinWindow() { return {x: 450, y: 240}; }
+        get actuallayoutheight() {
+            if (this._layoutHeight !== undefined) return this._layoutHeight;
+            const explicit = parseFloat(this.style.height);
+            return Number.isFinite(explicit) ? explicit : this.contentheight;
+        }
+        set actuallayoutheight(value) { this._layoutHeight = value; }
+        get contentheight() {
+            const heights = this.children.filter(child => !child.deleted && child.visible !== false)
+                .map(child => child.actuallayoutheight);
+            return this.style.flowChildren === 'none' ? Math.max(0, ...heights) : heights.reduce((sum, height) => sum + height, 0);
+        }
+        ScrollToTop() { this.scrolloffset_y = 0; }
+        ScrollToBottom() { this.scrolloffset_y = Math.max(0, this.contentheight - this.actuallayoutheight); }
         RemoveAndDeleteChildren() { this.children.slice().forEach(c => c.DeleteAsync()); }
         DeleteAsync() { this.children.slice().forEach(c => c.DeleteAsync()); this.deleted = true; this.SetParent(null); }
     }
@@ -89,7 +103,20 @@ function harness(options = {}) {
     const store = () => cfg.SurvivalBlackLionMarket.GetWindow();
     const cardList = () => store().content.Children()[0].Children();
     const descendants = (p, cls) => [p, ...p.Children().flatMap(c => descendants(c, cls))].filter(n => n.BHasClass(cls));
-    return {cfg,root,requests,clientEvents,paidCheckouts,walletSnapshot,menus,store,cardList,descendants,timers,emit,load,
+    const pendingTimers = (delay = .2) => timers.filter(timer => !timer.cancelled && !timer.ran && timer.delay === delay);
+    function advanceTimers(delay = .2) {
+        const pending = pendingTimers(delay).slice();
+        for (const timer of pending) { timer.ran = true; if (!timer.cancelled) timer.fn(); }
+        return pending.length;
+    }
+    function loadNextBatch() { store().content.ScrollToBottom(); advanceTimers(); return cardList().length; }
+    function loadAllBatches() {
+        for (let attempt = 0; cfg.SurvivalCommerceView.Inspect().hasMoreProducts; attempt++) {
+            assert(attempt < 100, 'Incremental loading terminates'); loadNextBatch();
+        }
+        return cardList();
+    }
+    return {cfg,root,requests,clientEvents,paidCheckouts,walletSnapshot,menus,store,cardList,descendants,timers,emit,load,pendingTimers,advanceTimers,loadNextBatch,loadAllBatches,
         get paid(){return paid;},updatePaid(data){paid=data;cfg.SurvivalCommerceView.UpdateCatalog(paid);}};
 }
 function walletItem(i) {

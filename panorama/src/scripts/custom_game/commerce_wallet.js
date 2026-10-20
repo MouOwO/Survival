@@ -38,6 +38,7 @@
     function publish(){if(cfg.SurvivalCommerceView && cfg.SurvivalCommerceView.UpdateWalletCatalog)cfg.SurvivalCommerceView.UpdateWalletCatalog(catalog);if(cfg.SurvivalMenuV10&&cfg.SurvivalMenuV10.Refresh)cfg.SurvivalMenuV10.Refresh();}
     function text(parent,value,cls){var p=$.CreatePanel("Label",parent,"");p.text=value;p.AddClass(cls);return p;}
     function close(){if(menuView)menuView.Close();}
+    function backToStore(){close();var view=cfg.SurvivalCommerceView;if(view&&(!view.IsOpen||!view.IsOpen()))view.Open();}
     function prepare(){
         if(disposed||!valid(root))return false;
         if(shell)return valid(dialog);
@@ -46,11 +47,11 @@
         dialog=$.CreatePanel("Panel",root,"");dialog.AddClass("RCWindow");dialog.AddClass("MenuV10Exchange");
         menuView=cfg.SurvivalMenuV10.Adopt({id:"commerce_exchange",navId:"commerce",root:root,panel:dialog,scrim:scrim,title:"商品兑换",onClose:close});
         shell=menuView.shell;
-        menuView.SetSidebar([{id:"confirm",label:"商品兑换"},{id:"back",label:"返回商城"}],"confirm",function(id){if(id==="back"){close();if(cfg.SurvivalCommerceView)cfg.SurvivalCommerceView.Open();}});
+        menuView.SetSidebar([{id:"confirm",label:"商品兑换"},{id:"back",label:"返回商城"}],"confirm",function(id){if(id==="back")backToStore();});
         copy=text(menuView.content,"","CommerceConfirmCopy");status=text(menuView.content,"","CommerceConfirmStatus");
         copy.html=true;
         buy=U.ActionButton(menuView.actions,{label:"确认兑换",action:purchase});buy.AddClass("CommerceConfirmBuy");
-        var back=U.ActionButton(menuView.actions,{label:"返回商城",action:function(){close();if(cfg.SurvivalCommerceView)cfg.SurvivalCommerceView.Open();}});
+        var back=U.ActionButton(menuView.actions,{label:"返回商城",action:backToStore});
         back.AddClass("CommerceConfirmBack");paint(back,false);return true;
     }
     function render(message){

@@ -1,0 +1,18 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),{spawnSync}=require('node:child_process');
+const root=path.resolve(__dirname,'../..');
+const rows=fs.readFileSync(path.resolve(root,'../../dota/console.log'),'utf8').split(/\r?\n/);
+const line=rows.filter(row=>row.includes('[COMMERCE_JADE_COMMANDS]')).at(-1);
+if(!line)throw Error('No live commerce command generation');
+const commands=JSON.parse(line.slice(line.indexOf('{')));
+const select=process.argv.includes('--select-all');
+const command=(select?commands.all+'\n':'')+commands.open;
+if(!command.split('\n').every(value=>/^survival_commerce_(all|open)_\d+$/.test(value)))throw Error('Unexpected native inspection command');
+const result=spawnSync(process.execPath,[path.join(root,'tools/map_c6/console.cjs'),command,'--timeout-ms','1200'],{encoding:'utf8',windowsHide:true,timeout:15000,cwd:root});
+const safe=(result.stdout||'').split(/\r?\n/).filter(row=>row.includes('[COMMERCE_JADE]'));
+const state=safe.map(row=>JSON.parse(row.slice(row.indexOf('{')))).at(-1);
+if(result.status!==0||!state)throw Error('Live commerce inspection failed');
+const record={at:new Date().toISOString(),selectAll:select,...state};
+const out=path.join(root,'design_refs/shop_infinite_scroll_20261017/live');
+fs.writeFileSync(path.join(out,'state_'+Date.now()+'.json'),JSON.stringify(record,null,2));
+console.log(JSON.stringify({category:state.category,batchSize:state.batchSize,loaded:state.loadedProductCount,total:state.filteredProductCount,more:state.hasMoreProducts,scroll:state.scroll}));

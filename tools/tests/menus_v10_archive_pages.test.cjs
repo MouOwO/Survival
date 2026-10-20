@@ -21,8 +21,13 @@ function daily(){
  assert.equal(cfg.SurvivalDaily.Inspect().layout,'daily_gw2');assert.equal(cfg.SurvivalDaily.Inspect().days,28);
  assert(nodes.DailyClaim.enabled);assert(!nodes.DailyMakeup.visible);assert(!nodes.PassPurchase.enabled,'An unconfigured server purchase remains disabled');
  assert(nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'The pass column stays locked without authoritative entitlement');
- const premiumFrame=nodes.DailyGW2Special_milestone.Children().find(x=>x.BHasClass('DailyGW2SpecialFrame'));assert.equal(premiumFrame.style.width,'118px');assert.equal(premiumFrame.style.height,'119px','Monthly frame uses the accepted calendar slot dimensions');
- const fifth=nodes.DailyGW2Day_5;assert.equal(fifth.Children().filter(x=>x.BHasClass('DailyGW2Reward')).length,2,'Both formal rewards are rendered in a multi-reward day');
+ const monthlyCard=nodes.DailyGW2Special_milestone;
+ assert.equal(monthlyCard.Children().filter(x=>x.BHasClass('DailyGW2SpecialFrame')).length,0,'The monthly text card has no stretched decorative frame');
+ const monthlyIcon=monthlyCard.Children().find(x=>x.BHasClass('DailyGW2MonthlyIconFrame'));assert(monthlyIcon,'Monthly artwork has its own centered image container');
+ assert.equal(monthlyCard.style.width,'222px');assert.equal(monthlyCard.style.height,'169px');assert.equal(monthlyIcon.style.width,'99px');assert.equal(monthlyIcon.style.height,'99px');assert.equal(monthlyIcon.style.position,'62px 35px 0px','The icon is centered inside the 222px monthly card while reserving space for its text');
+ const premiumFrame=monthlyIcon.Children().find(x=>x.BHasClass('DailyGW2SpecialFrame'));assert(premiumFrame,'Decorative corners remain on the item icon');
+ assert.equal(premiumFrame.GetParent(),monthlyIcon);assert.equal(premiumFrame.style.position,'0px 0px 0px');assert.equal(premiumFrame.style.width,monthlyIcon.style.width);assert.equal(premiumFrame.style.height,monthlyIcon.style.height,'The decorative frame follows the image dimensions rather than the text card');
+ const fifth=nodes.DailyGW2Day_5;assert.equal(fifth.Children().filter(x=>x.BHasClass('DailyGW2Reward')).length,1,'A multi-reward day uses one complete representative icon');assert.equal(fifth.Children().filter(x=>x.BHasClass('DailyGW2RewardKinds')).length,0,'Reward-kind badges leave the representative artwork unobstructed; all rewards remain in its tooltip');
  fifth.events.onmouseover();h.flushFinite();assert(nodes.DailyGW2Tooltip.visible);assert(tooltipText().includes('第二项真实效果'));assert(tooltipText().includes('第二项奖励 ×3'));nodes.DailyGW2TooltipSurface.events.onmouseover();assert(!nodes.DailyGW2Tooltip.visible,'Daily tooltip dismisses on entry');fifth.events.onmouseover();h.flushFinite();assert(!nodes.DailyGW2Tooltip.visible,'Daily source cannot immediately reopen the dismissed tooltip');
  const item=nodes.DailyGW2Day_4.Children().find(x=>x.BHasClass('DailyGW2Reward'));item.events.onmouseover();h.flushFinite();assert(tooltipText().includes('数量：13'));
  h.click(nodes.DailyClaim);assert.deepEqual(JSON.parse(JSON.stringify(h.sent.at(-1))),{name:'survival_daily_claim',payload:{target_day:25004}},'Claims use the real server date rather than calendar slot 4');
@@ -31,7 +36,7 @@ function daily(){
  assert.equal(nodes.DailyClaimText.text,'重试');assert(nodes.DailyClaim.enabled,'An explicit rejected save can be retried');noSubtitle();
  h.click(nodes.DailyClaim);
  h.emit('survival_daily_snapshot',{...snapshot,sequence:3,count:4,ordinary_status:'claimed',has_pass:1,purchase_enabled:1,expires_at:'2000000000'});
- assert.equal(nodes.DailyClaimText.text,'已领取');assert(!nodes.DailyClaim.enabled);assert(nodes.DailyMakeup.visible);noSubtitle();
+ assert.equal(nodes.DailyClaimText.text,'今日已领取');assert(!nodes.DailyClaim.enabled);assert(nodes.DailyMakeup.visible);noSubtitle();
  assert(!nodes.DailyGW2Special_milestone.BHasClass('DailyGW2Locked'),'Only a server entitlement unlocks the pass column');
  assert(nodes.PassPrice.text.includes('有效至'),'The pass information uses the actual server expiration');
  h.click(nodes.DailyMakeup);assert.equal(h.sent.at(-1).payload.target_day,25002,'Makeup retains the earliest real missed date');

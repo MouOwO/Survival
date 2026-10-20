@@ -25,6 +25,7 @@ assert.equal(container.children.length, 0, 'foreign private/empty notices do not
 assert.equal(nativeErrors.length, 0, 'foreign/empty notices cannot send native errors');
 const actionCases = [
     ['木材不足', '木材不足'], ['金币不足', '金币不足'], ['人口不足', '人口不足'], ['信仰值不足', '信仰值不足'],
+    ['软妹币不足', '软妹币不足'],
     ['wood_not_enough', '木材不足'], ['not_enough_wood', '木材不足'], ['insufficient_wood', '木材不足'],
     ['gold_not_enough', '金币不足'], ['not_enough_gold', '金币不足'], ['insufficient_gold', '金币不足'],
     ['population_not_enough', '人口不足'], ['not_enough_population', '人口不足'], ['insufficient_population', '人口不足'],
@@ -53,12 +54,23 @@ assert.equal(helperCalls[0].owner, context.lifecycleContext);
 assert.equal(helperCalls[0].message, '信仰值不足');
 assert.equal(nativeErrors.length, priorFaithNative, 'The helper path cannot duplicate its native event');
 assert.equal(container.children.length, priorFaithItems, 'Faith rejection cannot create a custom toast');
+const priorWelfareTimers = scheduled.length;
+show({audience: 'player', player_id: 1, message: '软妹币不足', level: 'error'});
+assert.equal(helperCalls.length, 2, 'Server welfare rejection uses the shared native layer helper exactly once');
+assert.equal(helperCalls[1].owner, context.lifecycleContext);
+assert.equal(helperCalls[1].message, '软妹币不足');
+assert.equal(nativeErrors.length, priorFaithNative, 'The welfare helper path cannot duplicate its native event');
+assert.equal(container.children.length, priorFaithItems, 'Welfare rejection cannot create a custom toast');
+assert.equal(scheduled.length, priorWelfareTimers, 'Welfare rejection cannot schedule a custom fade timer');
 show({audience: 'player', player_id: 0, message: '信仰值不足', level: 'error'});
-assert.equal(helperCalls.length, 1, 'Other players faith errors stay private');
+show({audience: 'player', player_id: 0, message: '软妹币不足', level: 'error'});
+assert.equal(helperCalls.length, 2, 'Other players faith and welfare errors stay private');
+assert.equal(container.children.length, priorFaithItems, 'Other players welfare errors cannot create a custom toast');
 delete context.lifecycleConfig.SurvivalTooltipPosition;
 const privateNativeCount = nativeErrors.length;
 show({audience: 'player', player_id: 0, message: '木材不足', level: 'error'});
 show({audience: 'player', player_id: 0, message: '研究队列已满', level: 'error'});
+show({audience: 'player', player_id: 0, message: '软妹币不足', level: 'error'});
 assert.equal(nativeErrors.length, privateNativeCount, 'another player resource failure stays private');
 const priorPanelLookup = context.panel;
 context.panel = () => null;

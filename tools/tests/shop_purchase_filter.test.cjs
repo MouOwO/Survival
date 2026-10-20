@@ -83,7 +83,7 @@ test('The three-option control defaults to all and filters actual rows without c
     assertNoPurchase(h);
 });
 
-test('Filtering resets pagination before slicing the existing catalog', () => {
+test('Filtering resets incremental loading and appends every matching product in order without pagination', () => {
     const products = Array.from({length:45}, (_, i) => ({...walletItem(i), sort_order:i * 2 + 1}));
     const paid = {categories:[], products:Array.from({length:5}, (_, i) => ({
         sku:'cash_' + i, title:'cash_' + i, category_id:'item', product_type:'single',
@@ -91,17 +91,69 @@ test('Filtering resets pagination before slicing the existing catalog', () => {
     const h = harness({paid});
     const view = h.cfg.SurvivalCommerceView;
     view.Open(); h.walletSnapshot(products); tab(h, 'all');
-    const next = h.descendants(h.store().actions, 'CJPageAction')[1];
-    assert(next && next.enabled); next.events.onactivate();
-    assert.equal(view.Inspect().page, 1);
-    assert.equal(cardNames(h).length, 10);
+    const expectedAll = [...products, ...paid.products].sort((a, b) => a.sort_order - b.sort_order);
+    assert.deepEqual(cardNames(h), expectedAll.slice(0, 20).map(p => p.title));
+    assert.equal(h.loadNextBatch(), 40);
+    assert.equal(h.loadNextBatch(), 50);
+    assert.deepEqual(cardNames(h), expectedAll.map(p => p.title));
+    assert.equal(cardNames(h).length, 50, 'Mixed catalogs are fully reachable after the old forty-row boundary');
+    assert.equal(h.descendants(h.store().actions, 'CJPageAction').length, 0);
+    assert.equal(h.descendants(h.store().actions, 'CJPageLabel').length, 0);
     choose(h, 'shop_points');
     assert.equal(view.Inspect().page, 0);
-    assert.deepEqual(cardNames(h), products.slice(0, 40).map(p => p.title));
+    assert.equal(cardNames(h).length, 20, 'Changing the type resets the loaded batch');
+    assert.deepEqual(visibleSkus(view), products.map(p => p.sku), 'Semantic filtering includes products not yet rendered');
+    assert.equal(h.loadNextBatch(), 40);
+    assert.equal(h.loadNextBatch(), 45);
+    assert.deepEqual(cardNames(h), products.map(p => p.title));
     assert.deepEqual(visibleSkus(view), products.map(p => p.sku));
     choose(h, 'u_coin');
     assert.equal(view.Inspect().page, 0);
     assert.deepEqual(cardNames(h), paid.products.map(p => p.title));
+    assert.equal(h.descendants(h.store().actions, 'CJPageAction').length, 0);
+    assertNoPurchase(h);
+});
+
+test('Incremental scroll polling runs only while open and stale callbacks cannot append after category, filter or disposal changes', () => {
+    const products = Array.from({length:55}, (_, i) => ({...walletItem(i), sort_order:i}));
+    const h = harness({paid:{categories:[], products:[]}}), view = h.cfg.SurvivalCommerceView;
+    h.walletSnapshot(products);
+    assert.equal(h.pendingTimers().length, 0, 'An unopened market never starts a scroll poll');
+    view.Open(); tab(h, 'all');
+    assert.equal(cardNames(h).length, 20);
+    assert.equal(h.pendingTimers().length, 1);
+    const first = h.cardList()[0];
+    h.advanceTimers();
+    assert.equal(h.cardList().length, 20, 'A normal top-of-list poll does not load a batch');
+    assert.equal(h.cardList()[0], first);
+    const beforeClose = h.pendingTimers()[0].fn;
+    view.Close();
+    assert.equal(h.pendingTimers().length, 0, 'Closing cancels the scroll timer');
+    assert.doesNotThrow(beforeClose);
+    assert.equal(h.cardList().length, 20);
+    view.Open();
+    const beforeFilter = h.pendingTimers()[0].fn;
+    choose(h, 'u_coin');
+    assert.equal(cardNames(h).length, 0);
+    assert.doesNotThrow(beforeFilter);
+    assert.equal(cardNames(h).length, 0, 'A stale callback cannot append into a different purchase type');
+    choose(h, 'shop_points');
+    const beforeCategory = h.pendingTimers()[0].fn;
+    tab(h, 'bundles');
+    assert.equal(cardNames(h).length, 0);
+    assert.doesNotThrow(beforeCategory);
+    assert.equal(cardNames(h).length, 0, 'A stale callback cannot append into a different category');
+    tab(h, 'all');
+    const beforeRefresh = h.pendingTimers()[0].fn;
+    h.walletSnapshot(products.slice(0, 12));
+    assert.equal(cardNames(h).length, 12);
+    assert.doesNotThrow(beforeRefresh);
+    assert.equal(cardNames(h).length, 12, 'A stale callback cannot restore items removed by an authoritative refresh');
+    h.walletSnapshot(products);
+    const beforeDispose = h.pendingTimers()[0].fn;
+    view.Dispose();
+    assert.equal(h.pendingTimers().length, 0);
+    assert.doesNotThrow(beforeDispose);
     assertNoPurchase(h);
 });
 
@@ -154,12 +206,16 @@ test('Inline selection survives reopening and disposed controls cannot change th
     assertNoPurchase(h);
 });
 
-test('Filtered product buttons retain wallet confirmation and both original cash checkout callbacks', () => {
+test('Filtered product buttons keep the loaded market open through wallet confirmation and both original cash checkout callbacks', () => {
     const {h, view} = makeFixture();
     tab(h, 'all'); choose(h, 'shop_points');
     assertNoPurchase(h);
+    const pointsRows = h.cardList().slice();
     buyRow(h, 'points_b');
-    assert.equal(view.IsOpen(), false);
+    assert.equal(view.IsOpen(), true, 'Wallet confirmation keeps the market underneath open');
+    assert.equal(view.Inspect().purchaseType, 'shop_points');
+    assert.equal(h.cardList().length, pointsRows.length);
+    pointsRows.forEach((row, index) => assert.equal(h.cardList()[index], row, 'Confirmation retains the loaded filtered rows'));
     assertNoPurchase(h);
     const confirm = h.menus().find(menu => menu.panel.BHasClass('MenuV10Exchange'));
     assert(confirm && confirm.IsOpen());
@@ -170,13 +226,17 @@ test('Filtered product buttons retain wallet confirmation and both original cash
     assert.equal(purchases.length, 1);
     assert.equal(purchases[0].payload.sku, 'points_b');
     for (const key of ['price', 'balance', 'provider']) assert(!(key in purchases[0].payload));
-    view.Open(); choose(h, 'u_coin');
+    choose(h, 'u_coin');
+    const cashRows = h.cardList().slice();
     buyRow(h, 'u_coin_cash');
     assert.deepEqual(h.paidCheckouts, ['u_coin_cash']);
-    assert.equal(view.IsOpen(), false);
-    view.Open();
+    assert.equal(view.IsOpen(), true, 'G-coin checkout keeps the market underneath open');
+    assert.equal(h.cardList().length, cashRows.length);
+    cashRows.forEach((row, index) => assert.equal(h.cardList()[index], row, 'Cash checkout retains the loaded filtered rows'));
     assert.equal(view.Inspect().purchaseType, 'u_coin');
     buyRow(h, 'legacy_cash');
     assert.deepEqual(h.paidCheckouts, ['u_coin_cash', 'legacy_cash']);
+    assert.equal(view.IsOpen(), true, 'Legacy cash checkout also preserves the underlying market');
+    cashRows.forEach((row, index) => assert.equal(h.cardList()[index], row));
     assert.equal(h.requests.filter(r => r.payload.action === 'purchase').length, 1);
 });

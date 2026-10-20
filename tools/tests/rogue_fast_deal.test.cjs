@@ -220,7 +220,72 @@ function assertMotionStopped(h, message) {
     assert(motionStates(h).every(state => !state.running), message);
 }
 
+function assertAxisAlignedCardMotion() {
+    const xml = fs.readFileSync(path.join(resourceRoot, 'layout/custom_game/rogue_reward_ui.xml'), 'utf8');
+    const styles = (xml.match(/<styles>([\s\S]*?)<\/styles>/) || [])[1] || '';
+    const includes = [...styles.matchAll(/src="file:\/\/\{resources\}\/([^"]+\.css)"/g)].map(match => match[1]);
+    const active = 'styles/custom_game/rogue_readability_v1.css';
+    assert.equal(includes.at(-1), active, 'axis-aligned face styles must be the final live XML override');
+    const css = fs.readFileSync(path.join(resourceRoot, active), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    function blocks(source) {
+        const result = []; let start = 0, depth = 0, header = '', bodyStart = 0;
+        for (let i = 0; i < source.length; i++) {
+            if (source[i] === '{') {
+                if (depth++ === 0) { header = source.slice(start, i).trim(); bodyStart = i + 1; }
+            } else if (source[i] === '}' && --depth === 0) {
+                result.push({header, body: source.slice(bodyStart, i)}); start = i + 1;
+            }
+            assert(depth >= 0, 'balanced card CSS blocks');
+        }
+        assert.equal(depth, 0, 'complete card CSS blocks'); return result;
+    }
+    function declarations(body, name) {
+        return [...body.matchAll(new RegExp('(?:^|;)\\s*' + name + '\\s*:\\s*([^;{}]+)', 'g'))].map(match => match[1].trim());
+    }
+    function planarTransform(value, context, keyframe) {
+        if (value === 'none') return;
+        let functions = 0;
+        const remainder = value.replace(/([a-zA-Z][a-zA-Z0-9]*)\(\s*([^()]*)\)/g, (_, name, args) => {
+            functions++;
+            if (/^(?:translate(?:3d|X|Y|Z)?|scale(?:3d|X|Y|Z)?)$/i.test(name)) return '';
+            // A neutral legacy reset is safe outside keyframes. Animated faces
+            // may only translate/scale: even a one-degree tilt stair-steps a
+            // high-contrast native Panel border.
+            const zeroRotation = /^(?:rotate(?:X|Y|Z)?|skew(?:X|Y)?)$/i.test(name)
+                && args.split(',').every(arg => /^[-+]?0+(?:\.0+)?(?:deg|rad|turn)?$/.test(arg.trim()));
+            assert(!keyframe && zeroRotation, context + ' must keep the card face axis aligned: ' + value);
+            return '';
+        });
+        assert(functions && !remainder.trim(), context + ' uses explicit planar transforms: ' + value);
+    }
+    const rules = blocks(css), animations = new Set(); let checkedTransforms = 0;
+    for (const rule of rules.filter(rule => !rule.header.startsWith('@')
+        && /\.Rogue(?:Tilt|Pick|Slot|Front)\b/.test(rule.header))) {
+        for (const value of declarations(rule.body, 'transform')) {
+            planarTransform(value, rule.header, false); checkedTransforms++;
+        }
+        for (const value of declarations(rule.body, 'animation-name')) {
+            for (const name of value.split(',').map(name => name.trim().replace(/^['"]|['"]$/g, ''))) {
+                if (name !== 'none') animations.add(name);
+            }
+        }
+    }
+    assert(checkedTransforms > 0, 'inspect the actual idle and hover card transforms');
+    assert(animations.size > 0, 'idle feedback remains an active native CSS animation');
+    for (const name of animations) {
+        const frame = rules.find(rule => /^@keyframes\s+/.test(rule.header)
+            && rule.header.replace(/^@keyframes\s+/, '').replace(/^['"]|['"]$/g, '') === name);
+        assert(frame, 'live card animation has actual keyframes: ' + name);
+        const steps = blocks(frame.body); let animatedTransforms = 0;
+        for (const step of steps) for (const value of declarations(step.body, 'transform')) {
+            planarTransform(value, name + ' ' + step.header, true); animatedTransforms++;
+        }
+        assert(animatedTransforms > 0, 'inspect every active card animation without fixing its name or amplitude');
+    }
+}
+
 function run() {
+    assertAxisAlignedCardMotion();
     const h = createHarness(), ui = h.cfg.SurvivalRogueReward, data = offer();
     h.update(data, '1'); assert(!ui.IsOpen(), 'another player cannot open our offer');
     h.update(data); assert(ui.IsOpen()); assert.equal(buttons(h).length, 3);
@@ -332,7 +397,7 @@ function run() {
     changedMotion.advance(.1); assert.equal(changedMotion.jobs.size, 1, 'rapid motion toggles never create a JavaScript direction loop');
     changedUI.Dispose(); assert.equal(changedMotion.jobs.size, 0);
     catalogCoverage();
-    console.log('ROGUE_FAST_DEAL_PASS: actual XML/includes, front-only deal within 1s, 52 CSV cards/native art/effects/no title icons, reference CSS idle/hover motion without cursor polling, input and pending/wish guards, lifecycle, retry and reduced motion');
+    console.log('ROGUE_FAST_DEAL_PASS: actual XML/includes, front-only deal within 1s, 52 CSV cards/native art/effects/no title icons, axis-aligned native CSS idle/hover motion without cursor polling, input and pending/wish guards, lifecycle, retry and reduced motion');
 }
 
 module.exports = {createHarness, offer, descendants, tagged, buttons, assertNoFlip, motionStates, run};

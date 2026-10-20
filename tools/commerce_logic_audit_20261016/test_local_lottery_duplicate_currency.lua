@@ -11,7 +11,7 @@ local amounts={n=5,r=25,sr=100,ssr=400,ur=1000}
 local function fixture(options)
  options=options or {};bus.reset()
  local quality=options.quality or 'n'
- local item={id='local_lottery_fixture',name='Explicit local fixture',quality=quality,item_weight=1,
+ local item={id='local_lottery_fixture',name='Explicit local fixture',quality=quality,item_weight=1,item_type='积分道具',
   max_owned=options.max_owned or 1,duplicate_points=amounts[quality],exchange_points=100,exchange_enabled=true,
   effects={{field_id='tower_attack_flat',value=2}},ownership_ids={},description='fixture'}
  local pool={id='map',items={item},by_id={[item.id]=item},by_quality={},quality_weights={},pity_rules=options.guarantee and {{id='fixture_sr',threshold=10,target_quality='sr',trigger_mode='batch_only'}} or {},
@@ -108,6 +108,18 @@ check('stackable_item_still_uses_its_configured_max_owned',function()
  assert(f.profile().save.content_inventory.local_lottery_fixture==3 and f.profile().save.archive.commerce.balances.shop_points==7)
  local second=f.draw('stackable-two');assert(second.ok and second.results[1].duplicate)
  assert(f.profile().save.archive.commerce.balances.shop_points==12)
+end)
+check('legacy_unique_points_public_count_is_one_without_read_side_effects',function()
+ local f=fixture({quality='ssr',owned_count=3});local before=copy(f.profile());local snapshot=f.snapshot()
+ assert(snapshot.items[1].owned_count==1 and snapshot.items[1].owned and snapshot.items[1].at_max_owned)
+ assert(f.profile().save.content_inventory.local_lottery_fixture==3,'read does not silently migrate offline saves')
+ assert(f.profile().save.archive.commerce.balances.shop_points==before.save.archive.commerce.balances.shop_points)
+ local r=f.draw('legacy-unique');assert(r.ok and r.results[1].duplicate and r.snapshot.items[1].owned_count==1)
+ assert(f.profile().save.archive.commerce.balances.shop_points==407 and f.profile().save.gameplay_stats.tower_attack_flat==11)
+end)
+check('stackable_public_count_is_not_clamped_to_one',function()
+ local f=fixture({owned_count=2,max_owned=3});local snapshot=f.snapshot()
+ assert(snapshot.items[1].owned_count==2 and snapshot.items[1].owned and not snapshot.items[1].at_max_owned)
 end)
 check('new_item_grant_failure_cannot_create_points',function()
  local f=fixture({owned=false,fail_grant=true});local r=f.draw('grant-failed');assert(not r.ok)

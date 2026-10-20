@@ -32,17 +32,25 @@
     function asset(key){return P.assets&&P.assets[key];}
     function skin(node,key){var value=asset(key);if(value)style(node,{backgroundImage:'url("'+(typeof value==="string"?value:value.file)+'")',backgroundColor:"transparent",backgroundSize:"100% 100%",backgroundRepeat:"no-repeat"});}
     function component(parent,key,x,y,w,h,id){var node=make("Panel",parent,id,"ArchiveV10Image");node.hittest=false;node.hittestchildren=false;pos(node,x,y,w,h);skin(node,key);return node;}
+    // One antialiased, concentric vector avoids native border insets and jaggies.
+    function iconRing(parent,x,y,size){
+        var ring=make("Image",parent,"","ArchiveParchmentIconRing");pos(ring,x,y,size,size);ring.hittest=false;ring.hittestchildren=false;
+        ring.SetImage("file://{images}/custom_game/archive_polish_v2/icon_ring.svg");ring.SetScaling("stretch-to-fit");
+        return ring;
+    }
+    function categoryBadge(parent,id,x,y,size,glyphSize,glyphId){
+        var badge=make("Panel",parent,"","ArchiveParchmentCategoryBadge");pos(badge,x,y,size,size);badge.hittest=false;badge.hittestchildren=false;
+        iconRing(badge,0,0,size);
+        var inset=(size-glyphSize)/2;
+        return icon(badge,categoryIcon(id),inset,inset,glyphSize,glyphSize,glyphId);
+    }
     function serif(node){style(node,{fontFamily:'"Source Han Sans SC"',fontWeight:"bold",textShadow:"none",letterSpacing:"0px"});return node;}
     function categoryIcon(id){
-        if(id==="commerce_goods")return "file://{images}/custom_game/archive_polish_v1/nav/gift.svg";
-        if(id==="shop")return "file://{images}/custom_game/archive_polish_v1/nav/endless.svg";
-        if(P.nav_icons&&P.nav_icons[id])return P.nav_icons[id];
-        if(["clear","endless","map_level","work","fishing","building","boss","gift"].indexOf(id)>=0)return "file://{images}/custom_game/archive_polish_v1/nav/"+id+".svg";
-        if(id==="shadow")return D.shadow_icons.shadow_01;
-        var keys={points:"points",fragment:"weapon",pet:"spell",friend:"friends",ex:"ex",beast:"blessing",shop:"points",titles:"clear",starjoy_points:"points"};
-        return (cfg.ArchiveHandoffAssets||{})["archive_ui_kit_v1_"+(keys[id]||"clear")+"_normal.png"]||D.assets.archive_icon.file;
+        var key={commerce_goods:"gift",shop:"endless",wife:"ex"}[id]||id;
+        if(["clear","shadow","endless","map_level","work","fishing","building","boss","gift","points","fragment","pet","friend","ex","beast","titles","starjoy_points"].indexOf(key)<0)key="clear";
+        return "file://{images}/custom_game/archive_polish_v2/nav/"+key+".svg";
     }
-    function headerEmblem(id){return id==="shadow"&&asset("archive_emblem")?asset("archive_emblem").file:categoryIcon(id);}
+    function headerEmblem(id){return categoryIcon(id);}
     function icon(parent,uri,x,y,w,h,id){var node=make("Image",parent,id,"ArchiveV10Icon");node.SetImage(uri);node.SetScaling("stretch-to-fit-preserve-aspect");node.hittest=false;pos(node,x,y,w,h);return node;}
     function move(id,parent){var node=p(id);if(!valid(node))return null;if(!moved.some(function(x){return x.node===node;}))moved.push({node:node,parent:node.GetParent()});
         // Legacy initialization styles these retained panels between view reloads.
@@ -51,11 +59,14 @@
     function fit(){if(!active||!alive())return;viewScale=Number(cfg.SurvivalUI.Fit(p("ArchiveWindow"),root,size[0],size[1],{reference:size.slice()}))||1;}
     function build(){
         canvas=make("Panel",p("ArchiveWindow"),"ArchiveV10Canvas","ArchiveParchmentCanvas");pos(canvas,0,0,size[0],size[1]);canvas.hittest=false;canvas.hittestchildren=true;
-        component(canvas,"window_background",18,20,narrow(1164),860,"ArchiveV10Shell_Background");
-        component(canvas,"sidebar_background",30,76,sidebarWidth,788,"ArchiveV10Shell_Sidebar");
-        component(canvas,"content_background",contentX(356),76,808,788,"ArchiveV10Shell_Content");
-        component(canvas,"header_strip",18,20,narrow(1164),56,"ArchiveV10Shell_Header");
-        serif(label(canvas,"存档",53,30,330,44,34,"#fff5d9","left","ArchiveV10WindowTitle"));
+        var background=make("Panel",canvas,"ArchiveV10Shell_Background","ArchiveV10Image");pos(background,18,20,narrow(1164),860);background.hittest=false;background.hittestchildren=false;
+        style(background,{backgroundImage:'url("s2r://panorama/images/custom_game/archive_user_skin_v1/background.vtex")',backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",backgroundColor:"transparent",opacityMask:'url("file://{images}/custom_game/archive_user_skin_v1/background_fade.svg")'});
+        var sidebarBackground=make("Panel",canvas,"ArchiveV10Shell_Sidebar","ArchiveV10Image");pos(sidebarBackground,30,76,sidebarWidth,788);sidebarBackground.hittest=false;sidebarBackground.hittestchildren=false;style(sidebarBackground,{backgroundImage:"none",backgroundColor:"transparent"});
+        var contentBackground=make("Panel",canvas,"ArchiveV10Shell_Content","ArchiveV10Image");pos(contentBackground,contentX(356),76,808,788);contentBackground.hittest=false;contentBackground.hittestchildren=false;style(contentBackground,{backgroundImage:"none",backgroundColor:"transparent"});
+        var header=make("Panel",canvas,"ArchiveV10Shell_Header","ArchiveV10Image");pos(header,18,20,narrow(1164),72);header.hittest=false;header.hittestchildren=false;
+        // Back the whole title line, with 14px above and below the live text.
+        style(header,{backgroundImage:"none",backgroundColor:"#090c0ff5",opacityMask:'url("file://{images}/custom_game/archive_user_skin_v1/right_fade.svg")'});
+        serif(label(canvas,"存档",53,34,330,44,34,"#fff5d9","left","ArchiveV10WindowTitle"));
         var close=make("Button",canvas,"ArchiveV10Close","ArchiveV10Button ArchiveParchmentClose");pos(close,contentX(1123),33,31,31);skin(close,"close");
         if(!asset("close"))label(close,"×",0,-3,31,35,30,"#17150f","center");
         close.SetPanelEvent("onactivate",function(){if(alive())cfg.SurvivalArchive.Close();});
@@ -66,7 +77,7 @@
         filter.SetPanelEvent("onactivate",function(){if(alive()){hideTooltip();filterMenu.visible=!filterMenu.visible;}});
         component(canvas,"section_strip",36,234,narrow(310),34,"ArchiveV10SidebarStrip");serif(label(canvas,"分类",54,237,narrow(260),29,23,"#f4eeda"));
         sidebar=make("Panel",canvas,"ArchiveV10Sidebar","ArchiveV10Sidebar");pos(sidebar,42,270,narrow(302),575);sidebar.hittest=false;sidebar.hittestchildren=true;
-        headerIcon=icon(canvas,categoryIcon("clear"),contentX(394),95,68,68,"ArchiveV10CategoryIcon");component(canvas,"icon_ring",contentX(392),93,72,72).AddClass("ArchiveParchmentIconRing");
+        headerIcon=categoryBadge(canvas,"clear",contentX(392),93,72,56,"ArchiveV10CategoryIcon");
         serif(label(canvas,"存档",contentX(480),103,650,54,42,"#fff5df","left","ArchiveV10_page_title"));
         component(canvas,"section_strip",contentX(375),195,780,35,"ArchiveV10SectionStrip");serif(label(canvas,"收集条目",contentX(392),198,700,28,23,"#fff1d6","left","ArchiveV10SectionTitle"));
         gridHost=make("Panel",canvas,"ArchiveV10GridHost","ArchiveV10GridHost");pos(gridHost,contentX(385),235,767,577);gridHost.hittest=false;gridHost.hittestchildren=true;
@@ -86,18 +97,19 @@
     function renderSidebar(categories){
         var signature=JSON.stringify(categories||[]);if(signature!==sidebarKey){
             sidebar.RemoveAndDeleteChildren();sidebarButtons={};var ids=order.slice();list(categories).forEach(function(row){if(row.id!=="ex"&&row.id!=="friend"&&row.id!=="wife"&&row.id!=="beast"&&ids.indexOf(row.id)<0)ids.push(row.id);});
-            ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32).AddClass("ArchiveParchmentIconRing");var text=serif(label(button,categoryName(id),47,5,narrow(231),29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text};});sidebarKey=signature;
+            ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;categoryBadge(button,id,4,1,32,28);var text=serif(label(button,categoryName(id),47,5,narrow(231),29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text};});sidebarKey=signature;
         }
         layoutSidebar();
     }
     function findClass(node,cls){if(node.BHasClass(cls))return node;var children=node.Children();for(var i=0;i<children.length;i++){var found=findClass(children[i],cls);if(found)return found;}return null;}
     function fillItemIcon(node,item){var presentation=cfg.SurvivalRewardPresentation;if(presentation&&presentation.FillIcon)presentation.FillIcon(node,item);}
     function decorateCommerce(card,item,slot){
+        var points=current==="points",height=112,pitch=116;
         var resource=cfg.SurvivalItemResources&&cfg.SurvivalItemResources.Lookup(item);
         var key=JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style,resource&&resource.id,resource&&resource.uri]),cell=card.__v10;
         if(!cell||!valid(cell.host)||cell.artKey!==key){
             card.Children().forEach(function(child){child.visible=false;});if(cell&&valid(cell.host))cell.host.DeleteAsync(0);
-            var host=make("Panel",card,"ArchiveV10Goods_"+item.id,"ArchiveV10ItemVisual ArchiveCommerceItemVisual");pos(host,0,0,104,112);host.hittest=false;host.hittestchildren=false;
+            var host=make("Panel",card,"ArchiveV10Goods_"+item.id,"ArchiveV10ItemVisual ArchiveCommerceItemVisual");pos(host,0,0,104,height);host.hittest=false;host.hittestchildren=false;
             var backing=make("Panel",host,"","ArchiveCommerceIconBacking");pos(backing,12,5,80,80);backing.hittest=false;
             var art=resource&&cfg.SurvivalRewardPresentation.CreateRegisteredIcon(backing,item,"ArchiveCommerceIcon");
             if(!art)art=findClass(card,"ArchiveArt");
@@ -106,23 +118,25 @@
             pos(art,1,1,78,78);fillItemIcon(art,item);
             var vipLevel=cfg.SurvivalVIPBadges&&cfg.SurvivalVIPBadges.Resolve(item);
             if(vipLevel&&!resource){art.visible=false;art=make("Panel",backing,"","ArchiveCommerceIcon");pos(art,3,3,74,74);cfg.SurvivalVIPBadges.Render(art,vipLevel);}
-            var badge=make("Panel",host,"","ArchiveCommerceQuantityBadge");pos(badge,48,5,44,23);badge.hittest=false;
+            var badge=make("Panel",host,"",points?"ArchivePointsState":"ArchiveCommerceQuantityBadge");pos(badge,48,5,44,23);badge.hittest=false;
             var count=label(badge,"",2,1,40,21,15,"#fff0cb","right");count.AddClass("ArchiveV10Count");
             var name=label(host,"",1,89,102,22,16,"#f6edd4","center");name.AddClass("ArchiveV10Name");style(name,{textOverflow:"ellipsis"});
             cell=card.__v10={host:host,artKey:key,sourceArtKey:JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style]),art:art,countHost:badge,count:count,name:name,normal:backing};
         }
         if(cell.host.GetParent()!==card)cell.host.SetParent(card);cell.host.visible=true;
         fillItemIcon(cell.art,item);
+        // Shared icon fills restore their frame each refresh. These two archive
+        // grids keep the quality color without its border or beveled texture.
+        cell.art.style.border="0px";cell.art.style.backgroundImage="none";
         card.Children().forEach(function(child){if(child!==cell.host)child.visible=false;});
         card.AddClass("ArchiveV10Cell");card.AddClass("ArchiveCommerceCell");card.RemoveClass("ArchiveParchmentRowAlternate");
-        pos(card,Math.floor(slot%7)*106,Math.floor(slot/7)*116,104,112);style(card,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",flowChildren:"none",overflow:"noclip",transform:"none"});
-        var state=S.State(item,current),quantity=S.Quantity(item,current),known=state!==null;
+        pos(card,Math.floor(slot%7)*106,Math.floor(slot/7)*pitch,104,height);style(card,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",flowChildren:"none",overflow:"clip",transform:"none"});
+        var state=S.State(item,current),quantity=points?"":S.Quantity(item,current),known=state!==null;
         card.SetHasClass("ArchiveCommerceOwned",state===true);card.SetHasClass("ArchiveCommerceUnowned",state===false);card.SetHasClass("ArchiveCommerceUnknown",!known);
         style(cell.art,{brightness:state===false?".38":known?"1":".62",saturation:state===false?"0":known?"1":".3",opacity:state===false?".82":known?"1":".9"});
         style(cell.name,{color:state===false?"#a5a396":"#f6edd4"});
-        // One-time entitlements need no repeated 0/1 label; real stacks/caps and
-        // pending quantities retain their independent authoritative text.
-        cell.countHost.visible=!known||Number(item.count)>1||(current!=="points"&&(Number(item.target)>1||Number(item.max_owned)>1));
+        // Points use icon brightness alone; existing stack badges remain for goods.
+        cell.countHost.visible=!points&&(!known||Number(item.count)>1||Number(item.target)>1||Number(item.max_owned)>1);
         var compactName=String(item.name||"").replace(/\s*[（(]功能版[）)]\s*$/,"").replace(/[·・]\s*永久\s*$/,"");
         if(cell.count.text!==quantity)cell.count.text=quantity;if(cell.name.text!==compactName)cell.name.text=compactName;
     }
@@ -161,13 +175,13 @@
                 if(child.BHasClass("ArchiveEndlessEmblem")){pos(child,0,7,72,56);style(child,{transformOrigin:"0% 0%",transform:"scale3d(0.861111, 0.861111, 1)"});}
                 else if(child.SetImage||child.BHasClass("ArchiveRewardIcon")){pos(child,0,0,62,62);fillItemIcon(child,item);style(child,{horizontalAlign:"left",verticalAlign:"top",margin:"0px",padding:"0px",brightness:"1",saturation:"1",opacity:"1",transform:"none"});}
             });
-            var normal=component(host,"icon_ring",659,4,70,70);normal.AddClass("ArchiveParchmentIconRing");
+            var normal=iconRing(host,659,4,70);
             cell=card.__v10={host:host,artKey:artKey,sourceArtKey:JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style]),art:art,countHost:countHost,count:count,name:name,normal:normal,track:track,fill:fill,glint:glint,state:state};
         }
         if(cell.host.GetParent()!==card)cell.host.SetParent(card);cell.host.visible=true;
         if(current!=="titles")fillItemIcon(cell.art,item);
         card.Children().forEach(function(child){if(child!==cell.host&&!child.BHasClass("ArchivePromote"))child.visible=false;});
-        card.AddClass("ArchiveV10Cell");card.SetHasClass("ArchiveParchmentRowAlternate",slot%2===1);pos(card,0,slot*82,745,80);style(card,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",overflow:"noclip",flowChildren:"none",transform:"none"});
+        card.AddClass("ArchiveV10Cell");card.SetHasClass("ArchiveParchmentRowAlternate",slot%2===1);pos(card,0,slot*82,745,80);style(card,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",borderRadius:"0px",boxShadow:"none",overflow:"clip",flowChildren:"none",transform:"none"});
         var progress=S.Progress(item,current),countText=progress.text,nameText=String(item.name||"");
         if(cell.count.text!==countText)cell.count.text=countText;if(cell.name.text!==nameText)cell.name.text=nameText;
         cell.track.visible=progress.ratio!==null;cell.fill.visible=cell.track.visible&&progress.ratio>0;cell.fill.style.width=(302*(progress.ratio||0))+"px";
@@ -181,7 +195,7 @@
     function updateMonthlyFooter(data){
         var status=p("ArchiveStatus");if(!valid(status))return;
         var base=status.text||"",note=monthlyNotes[current];
-        if(current==="points"&&base==="效果自动生效")status.text="抽取、签到或兑换后自动点亮 · 悬停查看效果与重复转化积分";
+        if(current==="points"&&base==="效果自动生效")status.text="抽取、签到或兑换后自动解锁 · 悬停查看效果与重复转化积分";
         if(note&&base.indexOf(note)<0)status.text=base?base+"　·　"+note:note;
         if(current==="titles"&&!(data&&Number(data.pending)===1))status.text="";
         if(cfg.SurvivalArchiveFontV36)cfg.SurvivalArchiveFontV36.Render(status);
@@ -218,10 +232,10 @@
         if(current==="building"&&data&&data.buildings)details="信仰值："+data.buildings.faith;
         if(current==="fishing"&&data&&data.fishing&&data.fishing.faith!==undefined)details="信仰值："+data.fishing.faith;
         if(current==="starjoy_points"&&data&&data.starjoy)details="累计星悦积分 "+data.starjoy.earned+" · 可用余额 "+data.starjoy.balance;
-        if(current==="points")details="抽奖道具仅解锁一次 · 重复获得转为商城积分";
-        if(current==="points")p("ArchiveStatus").text="抽取、签到或兑换后自动点亮 · 悬停查看效果与重复转化积分";
         if(current==="commerce_goods")details="购买或兑换后自动点亮 · 悬停查看效果与解锁条件";
         if(current==="commerce_goods")p("ArchiveStatus").text="购买或兑换成功后点亮 · 效果沿用已有商品与存档记录";
+        if(current==="points")details="每种道具仅可解锁一次 · 重复获得转为商城积分";
+        if(current==="points")p("ArchiveStatus").text="抽取、签到或兑换后自动解锁 · 悬停查看效果与重复转化积分";
         context.text=details;context.visible=!!details;
         var empty=p("ArchiveEmpty");pos(empty,contentX(399),280,731,50);style(empty,{fontSize:"21px",color:"#d0c4aa",textAlign:"center"});empty.SetHasClass("ArchiveHidden",slot>0);empty.text=data&&Number(data.unavailable)===1?"该分类尚未启用，暂无已获得条目":!data?"正在读取存档…":slot===0?(mode!=="all"?"当前筛选下暂无存档":"当前分类暂无存档"):"";
         var grid=p("ArchiveGrid");pos(grid,0,0,767,draw?511:577);style(grid,{flowChildren:"none"});pos(gridHost,contentX(385),235,767,draw?511:577);

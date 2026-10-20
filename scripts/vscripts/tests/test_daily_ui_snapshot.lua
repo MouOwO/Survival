@@ -21,6 +21,14 @@ assert(next_day.count==7 and next_day.specials[1].id=="daily_wealth_talisman")
 
 local schedule=require("config/generated/archive_daily_schedule")
 local items=require("config/generated/archive_daily_items")
+local duplicate_rates={}
+for _,item in ipairs(require("config/lottery_config").items) do
+    if item.item_type=="积分道具" then
+        local quality=string.lower(item.quality)
+        assert(not duplicate_rates[quality] or duplicate_rates[quality]==item.duplicate_points)
+        duplicate_rates[quality]=item.duplicate_points
+    end
+end
 local function fixture(count,claimed_today)
     return {save={archive={daily_rewards={first_day=100,claimed=claimed_today and {["200"]=true} or {},
         count=count,item_counts={}}}},entitlements={}}
@@ -66,7 +74,9 @@ for _,case in ipairs(cases) do
         for reward_index,reward in ipairs(row.rewards) do
             local id=official.item_ids[reward_index]
             same(reward,{id=id,name=items.by_id[id].display_name,count=tonumber(official.item_counts[reward_index]),
-                description=items.by_id[id].description,quality=items.by_id[id].quality},"Calendar uses real configured rewards")
+                description=items.by_id[id].description,quality=items.by_id[id].quality,
+                max_owned=1,owned_count=0,duplicate_points=assert(duplicate_rates[string.lower(items.by_id[id].quality)]),
+                duplicate_currency="shop_points",converted_currency="shop_points"},"Calendar uses real configured rewards")
         end
     end
     assert(highlighted==1 and claimable==(claimed_today and 0 or 1))
@@ -96,13 +106,19 @@ assert(makeup_snapshot.count==28 and makeup_snapshot.claimed==0)
 assert(makeup_snapshot.calendar_start_count==28 and makeup_snapshot.calendar_current_day==1)
 assert(makeup_snapshot.calendar28[1].absolute_count==29 and makeup_snapshot.calendar28[1].status=="claimable")
 assert(makeup_snapshot.current_day==1 and makeup_snapshot.period_id=="4")
-assert(applied.daily_gold_gem==3,"The 28th claim still grants the ordinary seventh-day reward")
+assert(applied.daily_gold_gem==1 and makeup.save.archive.daily_rewards.item_counts.daily_gold_gem==1,
+    "The 28th claim unlocks its ordinary seventh-day reward once")
+assert(makeup.save.archive.commerce.balances.shop_points==2*duplicate_rates.r,
+    "The other two configured seventh-day copies convert into the formal quality-rate wallet")
 assert(applied.daily_wealth_talisman==1 and applied.daily_ancient_tree==1 and applied.daily_forest_origin==1)
 assert(daily.apply({kind="daily_claim",today=200,target_day=200},makeup.save.archive,{},true,record))
 local completed=daily.snapshot(makeup,200,true)
 assert(completed.count==29 and completed.calendar_start_count==28 and completed.calendar_current_day==1)
 assert(completed.calendar28[1].status=="claimed" and completed.calendar28[2].status=="not_open")
-assert(applied.daily_growth_gem==3,"The next claim still grants the ordinary first-day reward")
+assert(applied.daily_growth_gem==1 and makeup.save.archive.daily_rewards.item_counts.daily_growth_gem==1,
+    "The next claim unlocks its ordinary first-day reward once")
+assert(makeup.save.archive.commerce.balances.shop_points==4*duplicate_rates.r,
+    "Window rollover preserves the prior wallet and converts only the next two actual duplicates")
 assert(applied.daily_wealth_talisman==1 and applied.daily_ancient_tree==1 and applied.daily_forest_origin==1,
     "Changing calendar windows never renews one-time pass rewards")
 assert(not daily.apply({kind="daily_claim",today=200,target_day=200},makeup.save.archive,{},true,record),

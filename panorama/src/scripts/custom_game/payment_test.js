@@ -1,7 +1,7 @@
 var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, PaymentChannel, PaymentCancel, PaymentQuantityChange, PaymentQuantityInputChanged;
 (function () {
     "use strict";
-    var cfg = GameUI.CustomUIConfig(), disposed = false, subscriptions = [];
+    var cfg = GameUI.CustomUIConfig(), disposed = false, subscriptions = [], api = null;
     if (cfg.SurvivalPayments && cfg.SurvivalPayments.Dispose){try{cfg.SurvivalPayments.Dispose();}catch(error){if(!/Underlying panel is deleted|deleted Panel/i.test(String(error)))throw error;$.Msg("[CheckoutPurple] Previous payment panel was already deleted.");}}
     var products = [], selected = "", orders = {}, busy = false, opened = false, generation = 0, lastMatrix = "", ticks = 0;
     var gameValues={}, gameEntitlements={}, wallet={}, matchFrozen=false, catalog={products:[],categories:[]};
@@ -16,7 +16,9 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     var scrim=$("#PaymentScrim"), inputShield=$("#PaymentInputShield");
     var shell=null, menuView=null, shellShield=null,shellProps=null,root=$.GetContextPanel?$.GetContextPanel():null;
     function valid(p){return p&&(!p.IsValid||p.IsValid());}
-    function alive(){return !disposed&&(!root||valid(root))&&valid(dialog);}
+    var lifetime=valid(dialog)?$.CreatePanel("Panel",dialog,""):null;
+    if(lifetime){lifetime.visible=false;lifetime.hittest=false;lifetime.hittestchildren=false;}
+    function alive(){return !disposed&&(!root||valid(root))&&valid(dialog)&&valid(lifetime)&&(!api||cfg.SurvivalPayments===api);}
     function rewardNameText(value){var shared=cfg.SurvivalCommerceComponents;return shared&&shared.RewardNameText?shared.RewardNameText(value):String(value||"").replace(/U币/g,"G币");}
     function escapedLines(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\r?\n/g,"<br>");}
     function paintActions(){if(!alive())return;["PaymentBack","PaymentBuy","PaymentRefresh","PaymentCancel","PaymentQuantityMinus","PaymentQuantityPlus","PaymentWeChat","PaymentAlipay"].forEach(function(id){var b=$("#"+id);if(!valid(b))return;var primary=id==="PaymentBuy"||b.BHasClass&&b.BHasClass("Selected"),disabled=b.enabled===false;b.style.backgroundImage="none";b.style.backgroundColor=disabled?"#21172f":primary?"gradient(linear,0% 0%,0% 100%,from(#734a9e),to(#382346))":"#281b3e";b.style.border="1px solid "+(disabled?"#594363":"#b18a50");function paint(n){if(n.paneltype==="Label")n.style.color=disabled?"#a795b8":"#ffdc87";if(n.Children)n.Children().forEach(paint);}if(b.Children)b.Children().forEach(paint);});}
@@ -435,12 +437,33 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
     function closeShop() { setOpen(false); }
     PaymentToggle=function(){setOpen(!opened);if(opened)refreshCatalog();};
     function openShop() { if(!alive())return;closeShop();if(cfg.SurvivalCommerceView)cfg.SurvivalCommerceView.Open();else {setOpen(true);refreshCatalog();} }
-    PaymentShop=openShop;
+    PaymentShop=function(){
+        if(!alive())return;
+        closeShop();
+        var view=cfg.SurvivalCommerceView;
+        if(view){if(!view.IsOpen||!view.IsOpen())view.Open();}
+        else {setOpen(true);refreshCatalog();}
+    };
     function inspectCache(){return {ready:catalogReady,dirty:catalogDirty,pending:activeRequest?activeRequest.action:"",catalogRequests:catalogRequests,
         ageSeconds:catalogReady?Math.floor((Date.now()-catalogCheckedAt)/1000):null,quantity:quantity,maxQuantity:quantityMaximum(current()),opened:opened,layout:"compact_checkout",width:580,height:parseFloat(dialog.style.height)||334};}
-    cfg.SurvivalPayments={Open:openShop,GetCatalog:function(){return catalog;},RefreshCatalog:refreshCatalog,Inspect:inspectCache,
+    cfg.SurvivalPayments=api={Open:openShop,GetCatalog:function(){return catalog;},RefreshCatalog:refreshCatalog,Inspect:inspectCache,
         Checkout:function(sku){if(!alive())return false;if(orders[sku]&&terminal(orders[sku].state)&&orders[sku].state!=="paid_review")delete orders[sku];selected=sku;quantitySku=sku;quantity=1;quantityInputInvalid=false;setOpen(true);render();refreshCatalog();return true;},
-        Dispose:function(){if(disposed)return;closeShop();disposed=true;if(menuView)menuView.Dispose();if(valid(shellShield))shellShield.DeleteAsync(0);subscriptions.forEach(function(id){GameEvents.Unsubscribe(id);});}};
+        Dispose:function(){
+            if(disposed)return;
+            // Native panels can already be gone during a HUD rebuild. Retire
+            // callbacks first so a failed shell cleanup cannot keep them alive.
+            disposed=true;opened=false;busy=false;activeRequest=null;generation++;
+            var previousSubscriptions=subscriptions;subscriptions=[];
+            previousSubscriptions.forEach(function(id){GameEvents.Unsubscribe(id);});
+            try{if(menuView)menuView.Dispose();else if(shell)shell.Dispose();}
+            finally{
+                if(valid(dialog)){dialog.hittest=false;dialog.hittestchildren=false;dialog.SetHasClass("Open",false);}
+                if(valid(scrim)){scrim.hittest=false;scrim.hittestchildren=false;scrim.SetHasClass("Open",false);}
+                if(valid(inputShield)){inputShield.hittest=false;inputShield.hittestchildren=false;}
+                if(valid(shellShield))shellShield.DeleteAsync(0);
+                if(valid(lifetime))lifetime.DeleteAsync(0);
+            }
+        }};
     PaymentBuy=function(){
         if(!alive())return;
         var p=current(), order=orders[selected];
@@ -510,11 +533,20 @@ var PaymentToggle, PaymentBuy, PaymentOpen, PaymentRefresh, PaymentShop, Payment
         if(data.warning)setStatus(messages[data.warning]||"已恢复未完成订单，请核对数量和支付方式。");
     }));
     subscriptions.push(GameEvents.Subscribe("survival_payment_open",function(data){
+        if(!alive())return;
         if(data && typeof data.sku==="string" && /^[a-z0-9_]{4,64}$/.test(data.sku)){
-            if(cfg.SurvivalDaily && cfg.SurvivalDaily.Close)cfg.SurvivalDaily.Close();
-            cfg.SurvivalPayments.Checkout(data.sku);
+            api.Checkout(data.sku);
         }else openShop();
     }));
+    if(typeof Game!=="undefined"&&Game.IsInToolsMode&&Game.IsInToolsMode()&&Game.AddCommand){
+        var monthlyInspectCommand="survival_monthly_ui_inspect_"+Date.now();
+        Game.AddCommand(monthlyInspectCommand,function(){
+            var daily=cfg.SurvivalDaily,U=cfg.SurvivalUI,modal=U&&U.ModalManager&&U.ModalManager.Get("daily_rewards"),parents=[],node=modal&&modal.panel;
+            while(valid(node)&&parents.length<8){parents.push({id:node.id,visible:node.visible,visibility:node.style.visibility,opacity:node.style.opacity,z:node.style.zIndex,width:node.actuallayoutwidth,height:node.actuallayoutheight});node=node.GetParent();}
+            $.Msg("[MONTHLY_UI_STATE] "+JSON.stringify({alive:alive(),disposed:disposed,current:cfg.SurvivalPayments===api,daily:daily&&daily.Inspect?daily.Inspect():null,checkout:opened,top:cfg.SurvivalUILayers&&cfg.SurvivalUILayers.Top(),dailyParents:parents}));
+        },"Inspect daily and monthly checkout visibility; no orders",0);
+        $.Msg("[MONTHLY_UI_INSPECT_COMMAND] "+monthlyInspectCommand);
+    }
     // Read-only UI diagnostics: no prices, account identity, checkout tokens or grants.
     if(typeof Game!=="undefined" && Game.AddCommand)Game.AddCommand("survival_shop_open",function(){
         openShop();$.Msg("PAYMENT_UI_DIAG:"+JSON.stringify({checkout:opened,products:products.length,cache:inspectCache(),
