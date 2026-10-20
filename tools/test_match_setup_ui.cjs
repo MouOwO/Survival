@@ -9,6 +9,12 @@ const setup = (overrides = {}) => ({mode_selected: false, mode_id: "", selector_
         {mode_id: "fishing", display_name: "摸鱼模式", description: "不应显示在按钮中"}], ...overrides});
 const sent = (ui, name) => ui.requests.filter(request => request.name === name);
 const click = panel => panel.events.onactivate();
+function mode(ui, id) {
+    const names = {pure: "纯净模式", standard: "常规模式", fishing: "摸鱼模式"};
+    const button = ui.nodes.MatchModeOptions.children.find(row => row.children[0].text === names[id]);
+    assert(button, "rendered mode button exists: " + id);
+    return button;
+}
 function rows(ui) { return ui.nodes.DifficultySelectionButtons.children.filter(panel => panel.BHasClass("DifficultyOptionButton")); }
 function wave(overrides = {}) {
     return {status: "selecting_difficulty", mode_selected: true, game_mode: "pure", selector_player_id: 0,
@@ -53,11 +59,13 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     for (const enginePhase of [3, 4, 8]) {
         const noSnapshot = harness({enginePhase, engineWrapper: true});
         noSnapshot.advance(30);
-        assertHidden(noSnapshot, "engine has entered game: fresh phase without nettable or shared cache never flashes loading");
+        assertShown(noSnapshot, "post-team phase without a snapshot must cover the game until server admission");
+        assert.equal(noSnapshot.authoredFirstFrame.rootVisible, true, "XML covers even before the first script render");
+        assert.equal(noSnapshot.authoredFirstFrame.surfaceVisible, true);
         assert.equal(noSnapshot.requests.length, 0, "engine phase is not authentication or an invented readiness handshake");
         assert.equal(noSnapshot.nodes.StartupLoadingPercent.text, "0%", "engine phase does not fabricate progress");
         noSnapshot.setState(ready({admission_complete: true}));
-        assertHidden(noSnapshot, "real admitted state replaces presentation-only hiding");
+        assertHidden(noSnapshot, "real admitted state is required to release the loading cover");
         noSnapshot.setLocalId(2); noSnapshot.advance(0.5);
         assertShown(noSnapshot, "explicit late join denial remains visible after engine entered game");
     }
@@ -79,7 +87,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
         players: [{player_id: 0, authenticated: true, client_ready: true, ready: false}]}));
     assert.equal(ui.nodes.StartupLoadingProgressFill.style.width, "55.0%", "latest real target replaces in-flight animation in either direction");
     assert.equal(ui.nodes.StartupLoadingPercent.text, "55%");
-    assert.equal(ui.nodes.StartupLoadingStatus.text, "加载中……", "visual interpolation never asserts player readiness");
+    assertShown(ui, "visual interpolation never asserts player readiness or releases pending admission");
 }
 {
     const startup=ready({admission_complete:true,profiles_ready:false,
@@ -94,14 +102,14 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     for(const name of ["DifficultySelectionFooter","DifficultySelectionCurrent","DifficultySelectionMode",
         "DifficultySelectionConfirmHost","DifficultySelectionConfirm"]) assert.equal(ui.nodes[name],undefined,name+" is removed");
     for(const mode of modes){assert.equal(mode.children.length,1);assert(mode.children[0].BHasClass("MatchModeOptionName"));}
-    assert.equal(modes[0].children[0].text,"纯净模式");assert.equal(modes[1].children[0].text,"常规模式");
-    assert.equal(modes[2].children[0].text,"摸鱼模式");
+    assert.equal(mode(ui,"pure").children[0].text,"纯净模式");assert.equal(mode(ui,"standard").children[0].text,"常规模式");
+    assert.equal(mode(ui,"fishing").children[0].text,"摸鱼模式");
     assert(!ui.nodes.DifficultySelectionHint.visible);assert.equal(ui.nodes.DifficultySelectionError.text,"");
-    click(modes[0]);click(modes[0]);click(modes[1]);
+    click(mode(ui,"pure"));click(mode(ui,"pure"));click(mode(ui,"standard"));
     assert.equal(sent(ui,"survival_loading_mode_select").length,1,"single click submits, duplicate and other-mode clicks cannot race");
     assert.deepEqual(JSON.parse(JSON.stringify(sent(ui,"survival_loading_mode_select")[0].payload)),
         {session_id:"match-123",mode_id:"pure"});
-    assert(modes[0].BHasClass("UISelected")&&modes[0].BHasClass("UIBusy"));
+    assert(mode(ui,"pure").BHasClass("UISelected")&&mode(ui,"pure").BHasClass("UIBusy"));
     assert(modes.every(row=>row.enabled===false));assert.equal(ui.nodes.DifficultySelectionError.text,"");
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"246px","pending mode keeps the compact name-only layout");
     assert(ui.config.SurvivalUILayers.HandleEscape("survival_difficulty"));
@@ -110,13 +118,13 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     ui.setStartup({...startup});assert(!modal.IsOpen());
     click(ui.nodes.DifficultySelectionResume);
     assert(modal.IsOpen()&&!ui.nodes.DifficultySelectionResume.visible);
-    assert(modes[0].BHasClass("UISelected")&&modes[0].BHasClass("UIBusy"));
+    assert(mode(ui,"pure").BHasClass("UISelected")&&mode(ui,"pure").BHasClass("UIBusy"));
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"246px");
-    click(modes[1]);assert.equal(sent(ui,"survival_loading_mode_select").length,1,"resuming pending mode cannot submit again");
+    click(mode(ui,"standard"));assert.equal(sent(ui,"survival_loading_mode_select").length,1,"resuming pending mode cannot submit again");
     click(ui.nodes.DifficultySelectionOverlay.children.find(row=>row.BHasClass("UIModalHitArea")));
     assert(modal.IsOpen(),"outside click cannot dismiss mandatory setup");
     ui.emit("survival_loading_mode_result",{success:1,session_id:"old-match",mode_id:"pure"});
-    assert(ui.nodes.MatchModeOptions.visible&&modes[0].BHasClass("UIBusy"));
+    assert(ui.nodes.MatchModeOptions.visible&&mode(ui,"pure").BHasClass("UIBusy"));
     let closes=0;const close=modal.Close;modal.Close=function(){closes++;return close.apply(this,arguments);};
     ui.emit("survival_loading_mode_result",{success:1,session_id:"match-123",mode_id:"pure"});
     assert.equal(closes,0,"mode acknowledgement changes phase without closing the modal");
@@ -126,23 +134,25 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert.equal(ui.nodes.DifficultySelectionDialog.style.width,"275px");
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"670px");
     assert(!ui.nodes.DifficultySelectionDialog.BHasClass("MatchSetupMode"));
-    assert(ui.nodes.DifficultySelectionHint.visible&&ui.nodes.DifficultySelectionHint.text.includes("档案"));
+    assert(ui.nodes.DifficultySelectionHint.visible&&ui.nodes.DifficultySelectionHint.text.includes("通关进度"));
     click(rows(ui)[1]);assert(!rows(ui)[1].BHasClass("UISelected"));
     assert.equal(sent(ui,"ui_difficulty_select_request").length,0,"unready profile blocks difficulty even after successful mode");
-    click(modes[1]);assert.equal(sent(ui,"survival_loading_mode_select").length,1,"retired mode row cannot return from difficulty");
+    click(mode(ui,"standard"));assert.equal(sent(ui,"survival_loading_mode_select").length,1,"retired mode row cannot return from difficulty");
     ui.setStartup({...startup,setup:{...startup.setup,mode_selected:true,mode_id:"pure",error:"profile_load_failed"}});
     assert(ui.nodes.DifficultySelectionError.text.includes("玩家档案读取失败"));assert(ui.nodes.MatchSetupRetryHost.visible);
     click(ui.nodes.MatchSetupRetry);click(ui.nodes.MatchSetupRetry);
     assert.equal(sent(ui,"survival_loading_retry").length,1);assert.equal(sent(ui,"survival_loading_retry")[0].payload.session_id,"match-123");
     assert.equal(sent(ui,"survival_loading_client_ready").length,0);
     ui.setStartup({...startup,profiles_ready:true,setup:{...startup.setup,mode_selected:true,mode_id:"pure"}});
-    assert(!ui.nodes.MatchSetupRetryHost.visible&&!ui.nodes.DifficultySelectionHint.visible);
+    assert(!ui.nodes.MatchSetupRetryHost.visible&&ui.nodes.DifficultySelectionHint.visible);
+    assert(ui.nodes.DifficultySelectionHint.text.includes("队伍上限 N2")&&!ui.nodes.DifficultySelectionHint.text.includes("正在读取"));
     assert(rows(ui)[1].enabled&&!rows(ui)[1].BHasClass("UISelected"));
     assert.equal(sent(ui,"ui_difficulty_select_request").length,0,"profile readiness never submits an earlier blocked click");
     click(rows(ui)[1]);click(rows(ui)[1]);assert.equal(sent(ui,"ui_difficulty_select_request").length,1);
     assert.equal(sent(ui,"ui_difficulty_select_request")[0].payload.difficulty_id,"N2");
-    ui.emit("ui_difficulty_select_result",{success:1});assert(modal.IsOpen());
-    ui.setState(snapshot(1,wave({status:"countdown",difficulty_selected:true})));assert(!modal.IsOpen());
+    ui.emit("ui_difficulty_select_result",{success:1});assert(!modal.IsOpen(),"authoritative success acknowledgement completes difficulty selection");
+    ui.setState(snapshot(1,wave()));assert(!modal.IsOpen(),"an earlier wave snapshot cannot reopen acknowledged difficulty selection");
+    ui.setState(snapshot(2,wave({status:"countdown",difficulty_selected:true})));assert(!modal.IsOpen());
 }
 {
     const startup=ready({admission_complete:true,profiles_ready:true,
@@ -150,13 +160,13 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     const ui=harness({startupState:startup,hud:true,loadSharedUI:true});ui.advance(.11);
     const modes=ui.nodes.MatchModeOptions.children;
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"246px");
-    click(modes[0]);ui.advance(2);
+    click(mode(ui,"pure"));ui.advance(2);
     ui.emit("survival_loading_mode_result",{success:0,error:"mode_not_found",session_id:"match-123"});
     assert(ui.nodes.DifficultySelectionError.text.includes("该模式不可用"));
     assert(ui.nodes.DifficultySelectionError.visible);
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"304px","mode errors have room for the retry message");
     assert(modes.every(row=>row.enabled&&!row.BHasClass("UIBusy")));
-    click(modes[1]);click(modes[0]);assert.equal(sent(ui,"survival_loading_mode_select").length,2,"mode rejection enables one-click retry");
+    click(mode(ui,"standard"));click(mode(ui,"pure"));assert.equal(sent(ui,"survival_loading_mode_select").length,2,"mode rejection enables one-click retry");
     assert.equal(ui.nodes.DifficultySelectionError.text,"");assert(!ui.nodes.DifficultySelectionError.visible);
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"246px","retry clears the notice and restores compact height");
     ui.advance(10.01);assert(modes.every(row=>row.enabled===false),"old request timeout cannot release newer mode request");
@@ -166,7 +176,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert(ui.nodes.DifficultySelectionError.visible);
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"304px","timeout expands the popup for its actionable error");
     assert.equal(sent(ui,"survival_loading_mode_select").length,2,"mode timeout cannot silently retry");
-    click(modes[0]);click(modes[0]);click(modes[1]);assert.equal(sent(ui,"survival_loading_mode_select").length,3);
+    click(mode(ui,"pure"));click(mode(ui,"pure"));click(mode(ui,"standard"));assert.equal(sent(ui,"survival_loading_mode_select").length,3);
     assert.equal(ui.nodes.DifficultySelectionError.text,"");assert(!ui.nodes.DifficultySelectionError.visible);
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"246px");
     ui.emit("survival_loading_mode_result",{success:0,error:"match_session_mismatch",session_id:"match-123"});
@@ -178,8 +188,8 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
 {
     const startup=ready({admission_complete:true,profiles_ready:true,setup:setup()});
     const ui=harness({startupState:startup,hud:true,localId:1,loadSharedUI:true});ui.advance(.11);
-    click(ui.nodes.MatchModeOptions.children[0]);click(ui.nodes.MatchModeOptions.children[1]);
-    click(ui.nodes.MatchModeOptions.children[2]);
+    click(mode(ui,"pure"));click(mode(ui,"standard"));
+    click(mode(ui,"fishing"));
     assert.equal(sent(ui,"survival_loading_mode_select").length,0);
     assert(ui.nodes.DifficultySelectionHint.visible&&ui.nodes.DifficultySelectionHint.text.includes("等待房主"));
     assert.equal(ui.nodes.DifficultySelectionDialog.style.width,"275px");
@@ -190,7 +200,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
 {
     const startup=ready({admission_complete:true,profiles_ready:true,setup:setup()});
     const ui=harness({startupState:startup,hud:true,loadSharedUI:true});ui.advance(.11);
-    click(ui.nodes.MatchModeOptions.children[0]);ui.advance(1);
+    click(mode(ui,"pure"));ui.advance(1);
     ui.config.SurvivalUILayers.HandleEscape("survival_difficulty");
     ui.setStartup({...startup,session_id:"new-session"});
     const modes=ui.nodes.MatchModeOptions.children;
@@ -199,7 +209,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height,"246px");
     ui.emit("survival_loading_mode_result",{success:1,mode_id:"pure",session_id:"match-123"});
     assert(ui.nodes.MatchModeOptions.visible,"old-session success cannot select new-session mode");
-    click(modes[1]);assert.equal(sent(ui,"survival_loading_mode_select").length,2);
+    click(mode(ui,"standard"));assert.equal(sent(ui,"survival_loading_mode_select").length,2);
     assert.equal(sent(ui,"survival_loading_mode_select")[1].payload.session_id,"new-session");
     ui.emit("survival_loading_mode_result",{success:0,error:"mode_not_found",session_id:"match-123"});
     ui.advance(11.01);assert(modes.every(row=>row.enabled===false),"old-session timeout and rejection cannot release new pending mode");
@@ -209,7 +219,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert(!ui.nodes.DifficultySelectionDialog.BHasClass("MatchSetupMode"));
     ui.setStartup({...startup,session_id:"third-session",admission_complete:false});
     assert(ui.nodes.DifficultySelectionOverlay.BHasClass("DifficultySelectionHidden"));
-    click(modes[0]);assert.equal(sent(ui,"survival_loading_mode_select").length,2,"retired hidden row cannot bypass admission");
+    click(mode(ui,"pure"));assert.equal(sent(ui,"survival_loading_mode_select").length,2,"retired hidden row cannot bypass admission");
 }
 
 {
@@ -217,15 +227,15 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
         setup:setup({difficulty_options:wave().difficulty_options})});
     const ui=harness({startupState:startup,hud:true,loadSharedUI:true});ui.advance(.11);
     const modal=ui.config.SurvivalUI.ModalManager.Get("survival_difficulty"),modes=ui.nodes.MatchModeOptions.children;
-    click(modes[2]);click(modes[2]);click(modes[0]);
+    click(mode(ui,"fishing"));click(mode(ui,"fishing"));click(mode(ui,"pure"));
     assert.equal(sent(ui,"survival_loading_mode_select").length,1);
     assert.equal(sent(ui,"survival_loading_mode_select")[0].payload.mode_id,"fishing");
-    assert(modes[2].BHasClass("UIBusy")&&modes.every(mode=>!mode.enabled));
+    assert(mode(ui,"fishing").BHasClass("UIBusy")&&modes.every(mode=>!mode.enabled));
     ui.emit("survival_loading_mode_result",{success:1,mode_id:"fishing",session_id:"old-match"});
-    assert(modal.IsOpen()&&modes[2].BHasClass("UIBusy"),"old-session fishing result cannot finish setup");
+    assert(modal.IsOpen()&&mode(ui,"fishing").BHasClass("UIBusy"),"old-session fishing result cannot finish setup");
     ui.emit("survival_loading_mode_result",{success:0,error:"mode_not_found",session_id:"match-123"});
-    assert(modal.IsOpen()&&ui.nodes.DifficultySelectionError.visible&&modes[2].enabled);
-    click(modes[2]);click(modes[1]);
+    assert(modal.IsOpen()&&ui.nodes.DifficultySelectionError.visible&&mode(ui,"fishing").enabled);
+    click(mode(ui,"fishing"));click(mode(ui,"standard"));
     assert.equal(sent(ui,"survival_loading_mode_select").length,2,"fishing retry is deliberate and guarded");
     ui.emit("survival_loading_mode_result",{success:1,mode_id:"fishing",session_id:"match-123"});
     assert(!modal.IsOpen()&&!ui.nodes.MatchModeOptions.visible&&!ui.nodes.DifficultySelectionButtons.visible);
@@ -236,7 +246,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert(!modal.IsOpen(),"fishing profile preparation cannot turn into difficulty selection");
     ui.setStartup({...startup,profiles_ready:true,setup:{...startup.setup,mode_selected:true,mode_id:"fishing"}});
     ui.setState(snapshot(1,wave({status:"fishing",game_mode:"fishing",difficulty_selected:false,total_waves:0})));
-    ui.advance(13);click(modes[0]);click(modes[2]);
+    ui.advance(13);click(mode(ui,"pure"));click(mode(ui,"fishing"));
     assert(!modal.IsOpen()&&!ui.nodes.DifficultySelectionResume.visible);
     assert.equal(ui.nodes.WaveNumber.text,"摸鱼模式");assert.equal(ui.nodes.WaveState.text,"自动挂机");
     assert.equal(ui.nodes.WaveTimer.text,"");
@@ -273,7 +283,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     assert.equal(ui.nodes.DifficultySelectionDialog.style.transform, "scale3d(1,1,1)", "small window cannot enlarge through shared Fit");
     ui.root.actuallayoutwidth=1280; ui.root.actuallayoutheight=720; ui.advance(0.3);
     assert.equal(ui.nodes.DifficultySelectionDialog.style.transform, "scale3d("+(2/3)+","+(2/3)+",1)");
-    assert(!ui.nodes.DifficultySelectionHint.visible);
+    assert(ui.nodes.DifficultySelectionHint.visible&&ui.nodes.DifficultySelectionHint.text.includes("队伍上限 N2"));
     assert.equal(rows(ui)[0].children[0].children.at(-1).text, "", "unlocked cards omit redundant availability text");
     assert(!rows(ui)[0].children[0].children.at(-1).visible);
     click(rows(ui)[2]);
@@ -303,7 +313,7 @@ const snapshot = (sequence, value) => ({sequence, resources: {}, wave: value});
     click(rows(ui)[0]);
     assert.equal(sent(ui, "ui_difficulty_select_request").length, 2);
     ui.emit("ui_difficulty_select_result", {success: 1});
-    assert(modal.IsOpen() && !rows(ui)[0].enabled);
+    assert(!modal.IsOpen(), "authoritative success acknowledgement closes the mandatory selection");
     ui.setState(snapshot(4, wave({status: "countdown", difficulty_selected: true, difficulty_id: "N1"})));
     assert(!modal.IsOpen() && ui.nodes.DifficultySelectionOverlay.BHasClass("DifficultySelectionHidden"));
     click(rows(ui)[0]); assert.equal(sent(ui, "ui_difficulty_select_request").length, 2);

@@ -6,7 +6,7 @@ $taskContent=Join-Path $taskEngine 'content/dota_addons/Survival/panorama'
 $taskCompiler=Join-Path $taskEngine 'game/bin/win64/resourcecompiler.exe'
 $taskBackup=Join-Path $taskRepo ('output/loading_refine_20261016/compile_'+(Get-Date -Format yyyyMMdd_HHmmss_fff)+'_'+[guid]::NewGuid().ToString('N').Substring(0,8))
 $taskFiles=@('layout/custom_game/custom_ui_manifest.xml','styles/custom_game/startup_loading.css','scripts/custom_game/startup_loading.js','layout/custom_game/startup_loading.xml','layout/custom_game/custom_loading_screen.xml','images/custom_game/loading/dawnward_citadel_background.png','images/custom_game/loading/warcraft_loading_fill.png','images/custom_game/loading/warcraft_loading_frame_left.png','images/custom_game/loading/warcraft_loading_frame_center.png','images/custom_game/loading/warcraft_loading_frame_right.png')
-$taskSetupFiles=@('scripts/custom_game/native_team_setup.js','layout/custom_game/native_team_setup.xml','layout/custom_game/custom_ui_manifest.xml')
+$taskSetupFiles=@('scripts/custom_game/native_team_setup.js','layout/custom_game/native_team_setup.xml','layout/custom_game/startup_team_setup_loading.xml','layout/custom_game/custom_ui_manifest.xml')
 if($SetupManifestOnly){$taskFiles=$taskSetupFiles}else{$taskFiles=$taskSetupFiles+@($taskFiles | Where-Object {$_ -ne 'layout/custom_game/custom_ui_manifest.xml'})}
 $taskRecords=@()
 foreach($relative in $taskFiles){

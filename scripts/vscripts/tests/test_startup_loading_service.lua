@@ -741,7 +741,7 @@ for element in manifest:gmatch('<CustomUIElement%s+.-/>') do
         local layout = element:match('layoutfile="([^"]+)"')
         if layout == 'file://{resources}/layout/custom_game/native_team_setup.xml' then
             native_team_views = native_team_views + 1
-        elseif layout == 'file://{resources}/layout/custom_game/startup_loading.xml' then
+        elseif layout == 'file://{resources}/layout/custom_game/startup_team_setup_loading.xml' then
             handshake_views = handshake_views + 1
         end
     end

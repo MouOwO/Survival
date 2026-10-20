@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "problem": "The native team screen could disappear while the new startup context had no snapshot or an older team_setup snapshot, exposing the game HUD before admission.",
+  "behavior": [
+    "GameSetup uses its own explicitly tagged startup layout and leaves Valve team selection and Start controls available.",
+    "HeroSelection, PregameStrategy and Hud start with an opaque, input-blocking startup surface before the first script render.",
+    "Missing or stale team_setup snapshots never uncover the game in those later contexts.",
+    "Only the authoritative admission decision releases the cover; all_ready cannot override an explicit false admission_complete.",
+    "Completed-session memo, genuine image handshake, errors, retries, player identity checks and hidden-idle watchdog remain intact.",
+    "No native client GameRules or player-info queries were added."
+  ],
+  "source_files": {
+    "panorama/src/scripts/custom_game/startup_loading.js": "0e4759daef2ff9a4845b86a49fb0a2f31ff2fe33b816bfba032fdb23d55e8a4c",
+    "panorama/src/styles/custom_game/startup_loading.css": "8ae1f3e2345ac04ee41fc5e9732856667957744f839e31905d35205e615e32db",
+    "panorama/src/layout/custom_game/startup_loading.xml": "1c491a9949a5ad1bab8f175e11c2d603b0eb62ac690def09db6eaa0bcd05d6e3",
+    "panorama/src/layout/custom_game/startup_team_setup_loading.xml": "c0583e3e1e2977ff2b2c03c50055c31def3c67cbc77fdfcb6d41e36475a4faff",
+    "panorama/src/layout/custom_game/custom_ui_manifest.xml": "fd503cc76412165c66951d7cbf59fa2641e46d28bee53593e7ef4dce49e5bd27"
+  },
+  "runtime_files": {
+    "panorama/scripts/custom_game/startup_loading.vjs_c": "ecde60c9a03d3a645b80b36e097cb88bece8d8c3bd9285f4fd57c4edd0b6e947",
+    "panorama/styles/custom_game/startup_loading.vcss_c": "00e5689336b039a7d603eab9dbbc8ac7bcb7a27e21ff1ea7131650b4500dd468",
+    "panorama/layout/custom_game/startup_team_setup_loading.vxml_c": "11b258e441f5391b75a7ca26ded2d61a7fef702fae22b0698798a40f661b1c43",
+    "panorama/layout/custom_game/startup_loading.vxml_c": "be83c8d3d18cc1c00e1c0c1c0cf30724b3f2c670b418db0e9949cfa5c1bae4d9",
+    "panorama/layout/custom_game/custom_ui_manifest.vxml_c": "ba0c61962908840550364e83833d7fc3a6eaf5b0ed38bd084bba8a6b858742a0"
+  },
+  "checks": {
+    "tests_report": "output/loading_handoff_20261021/tests_report.json",
+    "native_compile": "output/loading_handoff_20261021/compile.json",
+    "native_files": 5,
+    "source_content_parity": true,
+    "feature_build_full_scope_check": true,
+    "feature_build_setup_scope_check": true,
+    "entrypoints_include_dedicated_team_layout": true
+  },
+  "server_admission_rules_changed": false,
+  "game_verified": false,
+  "limitation": "Native compilation and production-script regression checks passed; a new multiplayer lobby transition was not manually exercised.",
+  "preserved": "Existing map, material, generated-resource and local Python-cache changes are outside this scoped fix and remain in their respective working trees."
+}

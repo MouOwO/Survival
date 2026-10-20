@@ -10,7 +10,9 @@ if (-not (Test-Path -LiteralPath $content) -or -not (Test-Path -LiteralPath $com
 }
 $files = @(
     'layout/custom_game/startup_loading.xml',
+    'layout/custom_game/startup_team_setup_loading.xml',
     'layout/custom_game/custom_loading_screen.xml',
+    'layout/custom_game/custom_ui_manifest.xml',
     'layout/custom_game/survival_hud.xml',
     'scripts/custom_game/startup_loading.js',
     'scripts/custom_game/survival_ui.js',
@@ -35,7 +37,9 @@ foreach ($relative in @($files + $shared)) {
     Copy-Item -LiteralPath $inputFile -Destination $destination -Force
 }
 foreach ($relative in @($files + $shared)) {
-    $buildLog = @(& $compiler -i (Join-Path $content $relative) -game (Join-Path $engine 'game/dota') -nop4)
+    $compileArgs = @('-i', (Join-Path $content $relative), '-game', (Join-Path $engine 'game/dota'), '-nop4')
+    if ($relative -eq 'layout/custom_game/custom_ui_manifest.xml') { $compileArgs += '-fshallow' }
+    $buildLog = @(& $compiler @compileArgs)
     $buildLog | Where-Object { $_ -match 'RESOURCE COMPILE|ERROR:|FAIL|WARNING|OK:|Failed to' } | Write-Output
     if ($LASTEXITCODE -ne 0) { throw "Match setup compilation failed: $relative" }
 }
