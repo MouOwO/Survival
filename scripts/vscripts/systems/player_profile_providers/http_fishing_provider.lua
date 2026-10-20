@@ -22,7 +22,7 @@ end
 local function request(path, payload, on_success, on_error)
     if not active_rule then on_error("fishing_rule_missing") return end
     local setup = require("systems/match_setup_service")
-    if path ~= "/v1/session/authenticate" and not setup.is_mode_selected() then
+    if path ~= "/v1/session/authenticate" and path ~= "/v1/lottery/catalog" and not setup.is_mode_selected() then
         on_error("mode_not_selected") return
     end
     local session = setup.get_session_id()
@@ -173,6 +173,12 @@ end
 
 function M.lottery_snapshot(payload, on_success, on_error)
     request("/v1/lottery/snapshot", payload, on_success, on_error)
+end
+
+function M.lottery_catalog(payload, on_success, on_error)
+    -- Public display metadata is available during admission. Keep the same
+    -- authenticated HTTP transport; account snapshots remain mode-gated.
+    request("/v1/lottery/catalog", payload, on_success, on_error)
 end
 
 function M.rule()

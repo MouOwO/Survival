@@ -39,6 +39,8 @@ if '/v1/lottery/snapshot' not in text:
                 elif self.path == "/v1/archive/config":''')
 from patch_endless_batch_handler import patch_handler
 text = patch_handler(text)
+from patch_lottery_catalog_handler import patch_handler as patch_lottery_catalog
+text = patch_lottery_catalog(text)
 target=root/'server/staged/fishing_api/server.py'
 target.parent.mkdir(parents=True,exist_ok=True)
 target.write_text(text,encoding='utf-8')

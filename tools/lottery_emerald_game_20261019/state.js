@@ -8,6 +8,14 @@ window.syncLayout=()=>{lotterySyncLayout();function visit(node){const value=node
 previewGeometryModels.push('Production opacityMask maps to CSS mask-image using the same authored SVG alpha; native Source 2 compositing remains separately unverified.');
 function lotteryPity(id){return PREVIEW_FIXTURE.lottery.pity.filter(x=>x.pool_id===id).map(x=>({...x,threshold:Number(x.threshold),batch_size:Number(x.threshold),quality:x.target_quality,label:'十连保底 '+String(x.target_quality).toUpperCase()}));}
 window.lotteryPreviewSnapshot=(id='map',tickets=20,scope='main')=>{
+ const cache=cfg.SurvivalLotteryCache,base=cache&&cache.Snapshot(id);
+ if(base){
+  const snapshot=structuredClone(base),catalog=cache.Catalog();
+  snapshot.pools=snapshot.pools.map(pool=>({...pool,tickets,unlocked:true,unlock_progress:Number(pool.unlock_required)||100,update_unread:false,notice_unread:false}));
+  snapshot.selected_pool={...snapshot.selected_pool,tickets,unlocked:true,update_unread:false,notice_unread:false};
+  snapshot.items=snapshot.items.map(item=>({...item,owned:false,owned_count:0,at_max_owned:false}));
+  return {...snapshot,...LOTTERY_PREVIEW_OWNER,ok:1,sequence:++lotterySequence,cache_sequence:lotterySequence,snapshot_scope:scope,tickets,config_hash:catalog.config_hash,catalog_md5:catalog.md5,shop_points:825,starjoy_points:320,map_level:1,draws:0};
+ }
  const raw=PREVIEW_FIXTURE.lottery,pools=raw.pools.map(x=>({...x,id:x.pool_id,revision:"offline-qa-r1-"+x.pool_id,single_cost:Number(x.single_cost),ten_cost:Number(x.ten_cost),ui_order:Number(x.ui_order),unlocked:true,ticket_name:x.ticket_content_id==='special_lottery_ticket'?'金色抽奖券':'普通抽奖券',tickets,pity:lotteryPity(x.pool_id),unlock_progress:Number(x.unlock_draws)||0,unlock_required:Number(x.unlock_draws)||0})),selected=pools.find(x=>x.id===id);if(!selected)throw Error('Unknown real CSV pool '+id);
  const items=raw.members.filter(x=>x.pool_id===id).map(m=>raw.items.find(x=>x.item_id===m.item_id)).filter(Boolean).map(x=>({...x,id:x.item_id,name:x.display_name,duplicate_points:Number(x.duplicate_points),exchange_points:Number(x.exchange_points),exchange_enabled:Number(x.exchange_enabled),max_owned:Number(x.max_owned),owned:0,owned_count:0,at_max_owned:0}));
  // Match systems/lottery_http_settlement.lua's authoritative public ordering.
@@ -22,6 +30,9 @@ window.previewReady=(async()=>{
  // Keep only the real lottery and its ancestry in this isolated HUD capture.
  function retain(node){for(const child of node.Children()){if(child===lottery)continue;let contains=false;for(let p=lottery;p;p=p.GetParent())if(p===child)contains=true;if(contains)retain(child);else child.visible=false;}}retain(nodes.PreviewContext_survival_hud);
  const initial=new URLSearchParams(location.search).get('pool')||'map',tickets=Number(new URLSearchParams(location.search).get('tickets')??20);
+ const catalog=cfg.SurvivalLotteryCache.Catalog();
+ emit('ui_lottery_catalog',{ok:1,unchanged:1,catalog_sequence:1,catalog_md5:catalog.md5,config_hash:catalog.config_hash,session_id:LOTTERY_PREVIEW_OWNER.session_id});
+ for(const pool of catalog.pools)lotteryPreviewSend(pool,tickets,'cache');
  cfg.SurvivalLottery.Open();if(initial!=='map')cfg.SurvivalLottery.SelectPool(initial);lotteryPreviewSend(initial,tickets);
  syncLayout();await new Promise(resolve=>setTimeout(resolve,280));syncLayout();await document.fonts.ready;await Promise.all([...document.images].map(image=>image.decode().catch(()=>false)));previewState.ready=true;return true;
 })().catch(error=>{previewErrors.push({scope:'lottery final fixture',message:String(error),stack:error.stack});previewState.failure=String(error);return false;});

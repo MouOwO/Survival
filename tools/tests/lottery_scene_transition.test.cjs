@@ -17,7 +17,7 @@ function fade(){return ['LotteryPoolFadeA','LotteryPoolFadeB'].filter(c=>canvas.
 assert.equal(track.style.transform,'translate3d(0px,0px,0px)');
 assert.equal(track.style.transitionDuration,'0s','opening snaps to the selected page');
 assert.equal(fade().length,0,'opening does not hide already visible text');
-advance(.31); // Complete the UI's existing one-time background prefetch.
+advance(.31); // Allow the startup cache handshake to settle independently of UI entry.
 for(let i=1;i<pools.length;i++){
  const cached=snapshot(pools[i]);cached.snapshot_scope='cache';cached.cache_sequence=i;
  events.ui_lottery_snapshot(cached);
@@ -42,7 +42,7 @@ ui.SelectPool('dragon_knight');
 assert.equal(track.style.transform,'translate3d(-2226px,0px,0px)');
 assert.equal(track.style.transitionDuration,'0.2s','adjacent and distant switches have the same duration');
 assert.equal(fade()[0],firstFade);
-assert(requests.slice(requestStart).every(r=>r.p.snapshot_scope==='read'),'switching only acknowledges reads');
+assert(requests.slice(requestStart).every(r=>r.n==='ui_lottery_read_ack'),'switching only acknowledges reads; it never fetches a page');
 assert.equal(requests.filter(r=>r.n==='ui_lottery_draw_request').length,0,'animation never draws or grants');
 const queued=queue.length;
 for(let i=0;i<20;i++)config.LotterySceneTransition.Select(i%2?'map':'summer');

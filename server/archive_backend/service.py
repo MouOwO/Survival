@@ -45,6 +45,23 @@ class ArchiveService:
     slots=threading.BoundedSemaphore(4)
     def __init__(self, application, bundle: Bundle, lua: str):
         self.app,self.bundle,self.lua=application,bundle,lua
+        self._lottery_catalog = None
+        self._lottery_catalog_lock = threading.Lock()
+
+    def lottery_catalog(self, payload):
+        # Static public content has no account/profile dependency. Authentication
+        # remains the HTTP handler's normal Bearer-token boundary.
+        from .lottery_catalog import build_catalog
+        with self._lottery_catalog_lock:
+            if self._lottery_catalog is None:
+                self._lottery_catalog = build_catalog(self)
+            document = self._lottery_catalog
+        unchanged = payload.get("md5") == document["catalog_md5"]
+        response = {"ok": True, "unchanged": unchanged,
+                    "catalog_md5": document["catalog_md5"], "config_hash": document["config_hash"]}
+        if not unchanged:
+            response["catalog_json"] = document["catalog_json"]
+        return response
 
     def sync(self):
         config = {"configs": self.bundle.configs}

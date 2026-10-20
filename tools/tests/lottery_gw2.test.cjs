@@ -82,9 +82,9 @@ assert.equal(config.SurvivalUILayers.Top(),null,'presentation registration does 
 const coldOpenStart=requests.length;
 current.Open();assert(presentation.Inspect().open);assert.equal(config.SurvivalUILayers.Top(),'lottery');
 function snapshotRequestsSince(index){return requests.slice(index).filter(request=>request.n==='ui_lottery_snapshot_request');}
-function assertColdSnapshot(index,poolId,context){const sent=snapshotRequestsSince(index);assert.equal(sent.filter(request=>request.p.read_action==='visit'&&!request.p.revision).length,0,context+' must not visit an unknown revision');const reads=sent.filter(request=>request.p.pool_id===poolId&&!request.p.snapshot_scope&&!request.p.prefetch);assert.equal(reads.length,1,context+' sends exactly one plain snapshot request');assert.equal(reads[0].p.read_action,'',context+' fetches a snapshot without a visit side effect');}
-function assertVisitedRevision(index,poolId,revision,context){const visits=snapshotRequestsSince(index).filter(request=>request.p.pool_id===poolId&&request.p.read_action==='visit');assert.equal(visits.length,1,context+' marks this revision visited exactly once');assert.equal(visits[0].p.snapshot_scope,'read',context+' uses the dedicated read acknowledgement');assert.equal(visits[0].p.revision,revision,context+' acknowledges only the server-supplied revision');}
-assertColdSnapshot(coldOpenStart,'map','cold Open');
+function assertLocalPool(index,poolId,context){assert.equal(snapshotRequestsSince(index).length,0,context+' reads the login cache without fetching a page');assert(!/正在切换奖池|正在读取奖池/.test(nodes.LotteryStatus.text||''),context+' never flashes a switching/loading description');const unknownReads=requests.slice(index).filter(request=>request.n==='ui_lottery_read_ack'&&request.p.pool_id===poolId&&!request.p.revision);assert.equal(unknownReads.length,0,context+' must not acknowledge an unknown revision');}
+function assertVisitedRevision(index,poolId,revision,context){const visits=requests.slice(index).filter(request=>request.n==='ui_lottery_read_ack'&&request.p.pool_id===poolId&&request.p.read_action==='visit'&&request.p.revision===revision);assert.equal(visits.length,1,context+' marks this revision visited exactly once');assert.equal(visits[0].p.revision,revision,context+' acknowledges only the server-supplied revision');assertLocalPool(index,poolId,context);}
+assertLocalPool(coldOpenStart,'map','cold Open');
 function data(pool='map',tickets=20){const d=snapshot(pool,tickets);d.shop_points=825;d.pools=['map','cultivation','dragon_knight','summer'].map(id=>({id,display_name:id,ticket_name:id==='map'||id==='cultivation'?'普通抽奖券':'金色抽奖券'}));d.items=Array.from({length:17},(_,i)=>({id:'r'+i,name:'正式奖励'+i,quality:i%2?'sr':'n',icon:'item_blink',description:'效果'+i,owned_count:i===0?undefined:i===1?0:2,max_owned:i===2?5:undefined}));return d;}
 function ticketAlignment(){
  const host=nodes.LotteryGW2TicketCurrency,icon=nodes.LotteryGW2TicketIcon,count=nodes.LotteryGW2TicketBalance,plus=nativeTicketPurchase,close=nodes.LotteryCloseButton;
@@ -118,8 +118,8 @@ function drawAlignment(id){
   assert(!focus||focus.visible===false,'single draw suppresses its outer focus frame');
  }
 }
-function poolNavigation(active){
- assert.equal(nodes.LotteryGW2Fullscreen.style.backgroundImage,'url("file://{images}/custom_game/lottery_cinematic_v1/'+active+'.png")','fullscreen results reuse the active real pool scene');
+function poolNavigation(active,details=false){
+ if(details)assert.equal(nodes.LotteryGW2Fullscreen.visible,false,'detail navigation never reveals the main draw-result scene');else assert.equal(nodes.LotteryGW2Fullscreen.style.backgroundImage,'url("file://{images}/custom_game/lottery_cinematic_v1/'+active+'.png")','main navigation uses the real active-pool scene');
  assert.strictEqual(nodes.LotteryGW2OfficialFrame.parent,nodes.LotteryGW2DetailLayer,'the outer border shares the raised details ancestry');assert.equal(nodes.LotteryGW2OfficialFrame.hittest,false,'the border never intercepts navigation');
  const buttons=nodes.LotteryGW2Sidebar.children,selectedButtons=buttons.filter(button=>button.BHasClass('Selected'));assert.equal(selectedButtons.length,1);assert.equal(selectedButtons[0].id,'LotteryGW2Pool_'+active);
  const poolIcons=[];
@@ -137,7 +137,7 @@ function poolNavigation(active){
 }
 const coldOpenData=data();coldOpenData.selected_pool.revision='gw2-cold-map-r1';events.ui_lottery_snapshot(coldOpenData);assertVisitedRevision(coldOpenStart,'map','gw2-cold-map-r1','cold Open reply');
 events.ui_lottery_snapshot(coldOpenData);assertVisitedRevision(coldOpenStart,'map','gw2-cold-map-r1','repeated Open reply');
-const coldSwitchStart=requests.length;current.SelectPool('cultivation');assertColdSnapshot(coldSwitchStart,'cultivation','cold pool switch');
+const coldSwitchStart=requests.length;current.SelectPool('cultivation');assertLocalPool(coldSwitchStart,'cultivation','cold pool switch');
 const coldSwitchData=data('cultivation');coldSwitchData.selected_pool.revision='gw2-cold-cultivation-r2';events.ui_lottery_snapshot(coldSwitchData);assertVisitedRevision(coldSwitchStart,'cultivation','gw2-cold-cultivation-r2','cold switch reply');
 events.ui_lottery_snapshot(coldSwitchData);assertVisitedRevision(coldSwitchStart,'cultivation','gw2-cold-cultivation-r2','repeated switch reply');
 current.SelectPool('map');events.ui_lottery_snapshot(data());
@@ -185,7 +185,7 @@ function previewAlignment(){
 assert.equal(nodes.LotteryGW2PreviewCaption.style.fontSize,'18px','the preview heading is 1.5 times its original size');
 previewAlignment();
 const varied=data();varied.items=['ur','ssr','sr','r'].flatMap(quality=>Array.from({length:3},(_,i)=>({id:quality+i,name:quality+' 实际奖励 '+i,quality,icon:'item_blink'})));events.ui_lottery_snapshot(varied);
-const previewCards=nodes.LotteryGW2PreviewItems.children;assert.equal(previewCards.length,4);assert(previewCards.every(card=>varied.items.includes(card.__lotteryItem)),'preview cards use only rewards supplied by the current snapshot');
+const previewCards=nodes.LotteryGW2PreviewItems.children;assert.equal(previewCards.length,4);for(const card of previewCards){const sourceItem=varied.items.find(item=>item.id===card.__lotteryItem.id);assert(sourceItem,'preview cards use only rewards supplied by the current snapshot');assert.deepEqual(card.__lotteryItem,sourceItem,'cache cloning preserves every configured reward field');}
 assert.deepEqual(previewCards.map(card=>card.__lotteryItem.id),['ur0','ur1','ur2','ssr0'],'the four-item showcase selects the highest-rarity authoritative rewards');
 for(const card of previewCards){const well=card.children.find(child=>child.BHasClass('LotteryGW2PreviewWell'));assert.equal(well.__survivalItemGrade,config.SurvivalItemResources.Grade(card.__lotteryItem),'the actual snapshot rarity reaches the shared quality factory');}
 previewAlignment();
@@ -218,13 +218,10 @@ assert.equal(nodes.LotteryCelestialFooter.style.visibility,'collapse');
 const detailMainTitle=nodes.LotteryTitle.text,detailMainTickets=nodes.LotteryGW2TicketBalance.text,detailSwitchStart=requests.length;
 for(const id of ['map','cultivation','dragon_knight','summer']){
  const start=requests.length;nodes['LotteryGW2Pool_'+id].events.onactivate();
- const read=requests.slice(start).find(r=>r.n==='ui_lottery_snapshot_request'&&r.p.snapshot_scope==='details');
- if(read){
-  assert.equal(read.p.pool_id,id,'each uncached detail tab requests its own pool');
-  const sample=data(id);if(id==='cultivation')sample.items=Array.from({length:80},(_,i)=>({...sample.items[i%17],id:'scroll_reward_'+i}));
-  events.ui_lottery_snapshot({...sample,snapshot_scope:'details',snapshot_request_id:read.p.snapshot_request_id});
- }
- assert.equal(presentation.Inspect().selected,id,'each of the four detail tabs selects its authoritative pool');poolNavigation(id);ticketAlignment();infoBounds(18,true);
+ assertLocalPool(start,id,'details pool '+id);
+ const sample=data(id);if(id==='cultivation')sample.items=Array.from({length:80},(_,i)=>({...sample.items[i%17],id:'scroll_reward_'+i}));
+ events.ui_lottery_snapshot({...sample,snapshot_scope:'cache',cache_sequence:100+['map','cultivation','dragon_knight','summer'].indexOf(id)});
+ assert.equal(presentation.Inspect().selected,id,'each of the four detail tabs selects its authoritative pool');poolNavigation(id,true);ticketAlignment();infoBounds(18,true);
  if(id==='cultivation'){
   const scrollCards=nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow'));
   assert.equal(scrollCards.length,80,'a long prize list retains all controller-owned rewards');
@@ -330,12 +327,12 @@ scrollTip.events.onmouseover();assert(!scrollTip.visible,'Returning to short con
 delete env.GameUI.GetCursorPosition;
 const retiredModal=config.SurvivalUI.ModalManager.Get('lottery_info');assert(!retiredModal||!retiredModal.IsOpen(),'no second details modal');
 const mainTitle=nodes.LotteryTitle.text,mainTickets=nodes.LotteryGW2TicketBalance.text;
-nodes.LotteryGW2Pool_summer.events.onactivate();
-const detailReq=requests.at(-1).p;assert.equal(detailReq.snapshot_scope,'details');
-events.ui_lottery_snapshot({...data('summer',2),snapshot_scope:'details',snapshot_request_id:detailReq.snapshot_request_id});
+const lateDetailStart=requests.length;nodes.LotteryGW2Pool_summer.events.onactivate();
+assertLocalPool(lateDetailStart,'summer','detail switch');
+events.ui_lottery_snapshot({...data('summer',2),snapshot_scope:'cache',cache_sequence:200});
 assert.equal(nodes.LotteryTitle.text,mainTitle);assert.equal(nodes.LotteryGW2TicketBalance.text,mainTickets,'details retain the active draw-pool balance');
 current.CloseInfo();assert.equal(nodes.LotteryCelestialFooter.style.visibility,'visible');assert.equal(config.SurvivalUILayers.Top(),'lottery');
-nodes.LotterySkipAnimation.checked=true;current.SetSkipAnimation();nativeTen.events.onactivate();const drawReq=requests.at(-1);assert.equal(drawReq.n,'ui_lottery_draw_request');
+nodes.LotterySkipAnimation.checked=true;current.SetSkipAnimation();nativeTen.events.onactivate();const drawReq=requests.at(-1);assert.equal(drawReq.n,'ui_lottery_draw_request');assert.deepEqual(Object.keys(drawReq.p).sort(),['count','expected_config_hash','pool_id','request_id']);assert.equal(drawReq.p.expected_config_hash,config.SurvivalLotteryCache.Catalog().config_hash,'draw identifies the catalogue the player actually viewed');
 assert.equal(nodes.LotteryTenText.text,'请求中…');assert.equal(nativeSingle.enabled,false);assert.equal(nativeTen.enabled,false);drawAlignment('LotteryTenButton');
 nativeTen.events.onactivate();nodes.LotteryGW2Pool_summer.events.onactivate();assert.strictEqual(requests.at(-1),drawReq,'double click and pool switch remain blocked while drawing');
 current.Close();current.Open();nativeTen.events.onactivate();assert.equal(requests.filter(r=>r.n==='ui_lottery_draw_request').length,1,'ordinary reopen preserves controller pending');
@@ -343,6 +340,7 @@ events.ui_lottery_result({ok:1,request_id:drawReq.p.request_id,pool_id:'map',cou
 const rewards=nodes.LotteryItemList.children;assert.equal(rewards.length,10);assert(rewards.every(c=>c.__lotteryGW2Cell));
 assert.equal(new Set(rewards.map(c=>c.style.position)).size,10,'all ten server results retain distinct slots');
 function resultGeometry(count){
+ assert.equal(nodes.LotteryGW2Fullscreen.style.backgroundImage,'url("file://{images}/custom_game/lottery_cinematic_v1/map.png")','visible results use the actual draw pool after independent detail navigation');
  const single=count===1,cards=nodes.LotteryItemList.children;assert.equal(cards.length,count);
  assert.equal(nodes.LotteryResultHeading.style.position,'75px 55px 0px');assert.equal(nodes.LotteryResultHeading.style.fontSize,'33px');
  assert.equal(nodes.LotteryItemList.style.width,(single?242:920)+'px');assert.equal(nodes.LotteryItemList.style.position,single?'715px 270.44px 0px':'376px 231.86px 0px','the result grid is centered in its independent 1672px canvas');
@@ -440,7 +438,7 @@ function verifyReopenedController(previous){
  assert.notStrictEqual(replacement,previous,'controller initialization replaces the disposed API');
  assert(replacement.IsAlive());assert(!previous.IsAlive());
  const renderer=loadPresentation();const before=requests.length;
- replacement.Open();assert(requests.slice(before).some(r=>r.n==='ui_lottery_snapshot_request'),'a real entry click requests the uncached snapshot');
+ replacement.Open();assertLocalPool(before,'map','controller reopen');assert.equal(config.SurvivalLotteryCache.IsAuthoritative('map'),true,'reloaded controller uses the surviving authoritative login cache');
  assert(nodes.LotteryWindow.BHasClass('LotteryOpen'));assert(!nodes.LotteryWindow.BHasClass('LotteryClosed'));assert.equal(config.SurvivalUILayers.Top(),'lottery');
  events.ui_lottery_snapshot(data());assert(renderer.api.Inspect().open);assert(nodes.LotteryGW2Root.visible);
  replacement.Feature('details');assert.equal(nodes.LotteryInfoList.children.length,17);assert.equal(nodes.LotteryGW2Title.text,'奖池详情');assert.equal(config.SurvivalUILayers.Top(),'lottery_info');
@@ -481,16 +479,18 @@ for(const rejected of ['retired-version','foreign-owner','not-ready']){
  const gated=mountController(),start=requests.length;
  nodes.LotteryItemTooltip.RemoveClass('Hidden');gated.Open();gated.Open();gated.Feature('details');
  advance(.4);assertGateHidden(rejected+' stays hidden while awaiting the current renderer');
- assert.equal(requests.length,start,'waiting neither requests a snapshot nor submits a transaction');assert.equal(oldCalls,0);
+ const waitingRequests=requests.slice(start);
+ assert.equal(waitingRequests.filter(r=>['ui_lottery_snapshot_request','ui_lottery_draw_request','ui_lottery_exchange_request'].includes(r.n)).length,0,'waiting neither fetches a page nor submits a transaction');
+ assert(waitingRequests.every(r=>['ui_lottery_catalog_sync','ui_lottery_cache_resync'].includes(r.n)),'only the independent login cache may synchronize while the presenter is unavailable');assert.equal(oldCalls,0);
  assert.equal(gated.PresentationReady(stale),false,'an old readiness notification cannot complete the entry intent');
  const installed=loadPresentation();
  assert.equal(installed.api.Version,'lottery_current_20261018');assert(installed.api.Owns(root)&&installed.api.IsReady());
  assert(!installed.api.Owns(new Panel('Panel',root,'')),'owner equality is checked against the HUD root');
  assert(nodes.LotteryWindow.BHasClass('LotteryOpen')&&nodes.LotteryWindow.visible);
- assert.equal(mainReadsSince(start).length,1,'delayed registration resumes exactly one uncached open');
+ assert.equal(mainReadsSince(start).length,0,'delayed registration resumes from the existing login cache');
  gated.PresentationReady(installed.api);gated.Open();advance(.4);
- assert.equal(mainReadsSince(start).length,1,'repeat entry/readiness does not duplicate the request');
- assert(!requests.slice(start).some(r=>r.p.prefetch),'the first open subsumes the delayed prefetch');
+ assert.equal(mainReadsSince(start).length,0,'repeat entry/readiness never fetches page data');
+ assert(!requests.slice(start).some(r=>r.p.prefetch),'page entry never schedules a prefetch');
  assert.equal(allPanels(root).filter(n=>n.BHasClass('LotteryGW2Shell')).length,1,'only the current renderer shell is attached');
  gated.Close();gated.Dispose();installed.api.Dispose();
 }
@@ -504,7 +504,7 @@ for(const cancel of ['close','dispose','replace-controller','shop-open']){
  const replacement=cancel==='replace-controller'?mountController():null;
  const installed=loadPresentation();advance(.4);
  assertGateHidden(cancel+' cancels the waiting entry');assert.equal(mainReadsSince(start).length,0);
- if(replacement){replacement.Open();assert.equal(mainReadsSince(start).length,1);replacement.Close();replacement.Dispose();}
+ if(replacement){replacement.Open();assert.equal(mainReadsSince(start).length,0);replacement.Close();replacement.Dispose();}
  else waiting.Dispose();
  installed.api.Dispose();
 }
@@ -513,16 +513,16 @@ config.SurvivalMenuV10=savedMenu;config.SurvivalUI.ModalShell.Adopt=savedAdopt;c
 // another snapshot, even before the original reply or during an in-flight draw.
 config.SurvivalPurpleLottery=null;
 const preserved=mountController(),firstCurrent=loadPresentation(),preservedStart=requests.length;
-preserved.Open();assert.equal(mainReadsSince(preservedStart).length,1);
+preserved.Open();assert.equal(mainReadsSince(preservedStart).length,0);
 const beforeReply=loadPresentation();assert.strictEqual(config.SurvivalLottery,preserved);
 assert(!firstCurrent.api.IsAlive()&&beforeReply.api.IsAlive());assert(nodes.LotteryWindow.BHasClass('LotteryOpen'));
-assert.equal(mainReadsSince(preservedStart).length,1,'renderer-only reload keeps the original snapshot in flight');
+assert.equal(mainReadsSince(preservedStart).length,0,'renderer-only reload reuses the authoritative login cache');
 events.ui_lottery_snapshot(data('map',100));nodes.LotterySkipAnimation.checked=true;preserved.SetSkipAnimation();
 preserved.DrawTen();const pendingDraw=drawRequestsSince(preservedStart).at(-1);assert(pendingDraw);
 const whileDrawing=loadPresentation();preserved.Open();preserved.DrawTen();preserved.DrawSingle();
 assert.strictEqual(config.SurvivalLottery,preserved);assert(whileDrawing.api.Inspect().open);
 assert.equal(drawRequestsSince(preservedStart).length,1,'renderer reload and reopen retain the existing draw guard');
-assert.equal(mainReadsSince(preservedStart).length,1,'restoring presentation does not refetch the snapshot');
+assert.equal(mainReadsSince(preservedStart).length,0,'restoring presentation does not refetch the snapshot');
 const accepted={ok:1,request_id:pendingDraw.p.request_id,pool_id:'map',count:10,results:results(10),snapshot:data('map',90)};
 events.ui_lottery_result(accepted);events.ui_lottery_result(accepted);
 assert.equal(nodes.LotteryItemList.children.length,10);
@@ -532,11 +532,11 @@ assert.equal(allPanels(root).filter(n=>n.BHasClass('LotteryGW2Shell')).length,1)
 const historyPresentation=loadPresentation();
 assert.equal(config.SurvivalUILayers.Top(),'lottery_info','renderer-only reload restores the active inline details layer above the main window');
 assert.equal(nodes.LotteryInfoList.children.filter(n=>n.BHasClass('RHHistoryRow')).length,10);
-assert.equal(mainReadsSince(preservedStart).length,1,'restoring an inline view does not issue another page snapshot');
+assert.equal(mainReadsSince(preservedStart).length,0,'restoring an inline view does not issue another page snapshot');
 preserved.Close();preserved.Dispose();historyPresentation.api.Dispose();
 console.log('LOTTERY_REBORN_REFINE_PASS: 4 authoritative showcase items, shared rarity colors, distinct native pool artwork, R5 hero/navigation/footer/result geometry, live × prices/free draw, 0/1/9/10 balances, lock/pending guards, bounded currency/actions and independent menu/result tooltip scales');
 console.log('LOTTERY_CURRENT_RENDERER_GATE_PASS: live retired/foreign/unready rejection, one deferred open, close/dispose/reload cancellation, no legacy modal and pending draw/result identity through renderer-only replacement');
-console.log('LOTTERY_LAYOUT_RELOAD_PASS: dead production lifetime, controller-first XML order, disposed API replacement, fresh snapshot request, real shell/details/close and previous compiled renderer transition');
+console.log('LOTTERY_LAYOUT_RELOAD_PASS: dead production lifetime, controller-first XML order, disposed API replacement, surviving login cache, real shell/details/close and previous compiled renderer transition');
 console.log('LOTTERY_GW2_PASS: independent shell, native controls, four authoritative pools, scoped actual art/fallback/details, zero/unknown counts, ten results, pending/foreign-modal guards, 30 rebuilds without stale refs, seven fits, 12 opens, restored parents/factories and renderer reload');
 `;
 vm.runInNewContext(loader+'suite+='+JSON.stringify(setup)+';vm.runInNewContext(suite,{require:require("node:module").createRequire(require("path").resolve("tools/test_lottery_ui.js")),console});',{require:require('node:module').createRequire(path.resolve('tools/tests/lottery_gw2.test.cjs')),console});

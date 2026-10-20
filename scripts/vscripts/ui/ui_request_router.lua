@@ -1486,6 +1486,80 @@ local function register_rogue_reward_requests()
 end
 
 local function register_lottery_requests()
+    local catalog_transfer=0
+    local function public_player(player_id)
+        return player_id~=nil and player_id>=0 and PlayerResource:IsValidPlayerID(player_id)
+            and PlayerResource:GetPlayer(player_id) or nil
+    end
+    local function send_catalog(player_id,result)
+        local player=public_player(player_id)
+        if not player then return end
+        if not result or not result.ok then
+            CustomGameEventManager:Send_ServerToPlayer(player,'ui_lottery_catalog',
+                {ok=false,error=result and result.error or 'lottery_catalog_failed',
+                    session_id=tostring(require('systems/match_setup_service').get_session_id() or '')})
+            return
+        end
+        if result.unchanged then
+            CustomGameEventManager:Send_ServerToPlayer(player,'ui_lottery_catalog',
+                {ok=true,unchanged=1,catalog_md5=result.catalog_md5,config_hash=result.config_hash,
+                    catalog_sequence=result.catalog_sequence,session_id=result.session_id})
+            return
+        end
+        local document=result.catalog_json
+        if type(document)~='string' then return end
+        catalog_transfer=catalog_transfer+1
+        local chunks=math.max(1,math.ceil(#document/3500))
+        for chunk=1,chunks do
+            CustomGameEventManager:Send_ServerToPlayer(player,'ui_lottery_catalog',{
+                ok=true,unchanged=0,catalog_md5=result.catalog_md5,config_hash=result.config_hash,
+                catalog_sequence=result.catalog_sequence,
+                session_id=result.session_id,
+                transfer_id=catalog_transfer,chunk=chunk,chunks=chunks,
+                catalog_chunk=document:sub((chunk-1)*3500+1,chunk*3500)})
+        end
+    end
+    CustomGameEventManager:RegisterListener('ui_lottery_catalog_sync',function(_,payload)
+        local player_id=source_player_id(payload)
+        if not public_player(player_id) then return end
+        event_bus.request(events.LOTTERY_CATALOG_REQUEST,{
+            player_id=player_id,md5=tostring(payload and payload.md5 or ''),
+            complete=function(result)send_catalog(player_id,result)end})
+    end)
+    event_bus.subscribe(events.LOTTERY_CATALOG_CHANGED,function(payload)
+        local result=payload and payload.catalog
+        if not result then return end
+        for player_id=0,(DOTA_MAX_TEAM_PLAYERS or 24)-1 do send_catalog(player_id,result) end
+    end)
+    CustomGameEventManager:RegisterListener('ui_lottery_cache_resync',function(_,payload)
+        local player_id=source_player_id(payload)
+        if not public_player(player_id) then return end
+        -- A missing catalog chunk is repaired independently of mode/profile
+        -- admission, while its private projection keeps the gameplay gate.
+        event_bus.request(events.LOTTERY_CATALOG_REQUEST,{player_id=player_id,
+            md5=tostring(payload and payload.md5 or ''),complete=function(result)send_catalog(player_id,result)end})
+        if not valid_player_id(player_id,true) then return end
+        event_bus.request(events.LOTTERY_CACHE_RESYNC_REQUEST,{player_id=player_id,
+            pool_id=tostring(payload and payload.pool_id or 'map')})
+    end)
+    CustomGameEventManager:RegisterListener('ui_lottery_read_ack',function(_,payload)
+        local player_id=source_player_id(payload)
+        if not valid_player_id(player_id,true) then return end
+        local function complete(result)
+            local snapshot={}
+            for k,v in pairs(result and result.snapshot or {}) do snapshot[k]=v end
+            snapshot.snapshot_scope='read';snapshot.ok=result and result.ok==true or false
+            snapshot.selected_pool_id=tostring(payload and payload.pool_id or 'map')
+            snapshot.read_action=tostring(payload and payload.read_action or '')
+            snapshot.read_error=result and result.error or nil
+            send_to_player('ui_lottery_snapshot',player_id,snapshot)
+        end
+        local result=event_bus.request(events.LOTTERY_READ_ACK_REQUEST,{player_id=player_id,
+            pool_id=tostring(payload and payload.pool_id or 'map'),
+            read_action=tostring(payload and payload.read_action or ''),
+            revision=tostring(payload and payload.revision or ''),complete=complete})
+        if not (result and result.pending) then complete(result) end
+    end)
     CustomGameEventManager:RegisterListener("ui_lottery_snapshot_request", function(_, payload)
         local player_id = source_player_id(payload)
         if not valid_player_id(player_id, true) then return end
@@ -1515,6 +1589,7 @@ local function register_lottery_requests()
             pool_id = tostring(payload and payload.pool_id or "map"),
             count = tonumber(payload and payload.count) or 1,
             request_id = tostring(payload and payload.request_id or ""),
+            expected_config_hash = tostring(payload and payload.expected_config_hash or ""),
         }) or { ok = false, error = "lottery_draw_failed" }
         if not result.pending then send_to_player("ui_lottery_result", player_id, result) end
     end)
@@ -1527,6 +1602,7 @@ local function register_lottery_requests()
             pool_id = tostring(payload and payload.pool_id or "map"),
             item_id = tostring(payload and payload.item_id or ""),
             request_id = tostring(payload and payload.request_id or ""),
+            expected_config_hash = tostring(payload and payload.expected_config_hash or ""),
         }) or { ok = false, error = "lottery_exchange_failed" }
         if not result.pending then send_to_player("ui_lottery_exchange_result", player_id, result) end
     end)
@@ -1539,7 +1615,12 @@ end
 
 local function on_lottery_changed(payload)
     if not payload or not payload.snapshot then return end
-    send_to_player("ui_lottery_snapshot", payload.player_id, payload.snapshot)
+    -- The authenticated profile may finish loading before the gameplay UI
+    -- barrier opens. Cache its private lottery projection during admission.
+    local player_id=tonumber(payload.player_id)
+    if player_id==nil or player_id<0 or not PlayerResource:IsValidPlayerID(player_id) then return end
+    local player=PlayerResource:GetPlayer(player_id)
+    if player then CustomGameEventManager:Send_ServerToPlayer(player,"ui_lottery_snapshot",payload.snapshot) end
 end
 
 function M.init()

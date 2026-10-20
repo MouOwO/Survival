@@ -6,7 +6,7 @@ Panel.prototype.DeleteAsync=function(){this.deleted=true;if(this.parent)this.par
 Panel.prototype.MoveChildBefore=function(child,before){this.children.splice(this.children.indexOf(child),1);this.children.splice(this.children.indexOf(before),0,child);};
 // The XML fixture stores named panels in a flat index.
 Panel.prototype.FindChildTraverse=function(id){return nodes[id]||null;};
-['reference_windows','ui_snapshot_cache','lottery_scene_transition','lottery_handoff_bb9968eef7','remaining_5d5c1152eb','lottery_ui_remaining_5d5c1152eb'].forEach(function(file){vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);});`);
+['reference_windows','ui_snapshot_cache','common/lottery_cache','lottery_scene_transition','lottery_handoff_bb9968eef7','remaining_5d5c1152eb','lottery_ui_remaining_5d5c1152eb'].forEach(function(file){vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/'+file+'.js','utf8'),env);});`);
 // These are isolated business tests. Their presentation stub delegates to the
 // actual shared fit primitive; the production V10 renderer has its own suite.
 suite+=`config.SurvivalPurpleLottery={Version:'lottery_current_20261018',Owns(owner){return owner===root;},IsAlive(){return true;},IsReady(){return true;},Open(){},Close(){},Apply:function(){},Fit:function(){
@@ -18,7 +18,7 @@ suite+=`
 function updated(pool,rev){const x=snapshot(pool);x.selected_pool.revision=rev;x.selected_pool.update_unread=true;x.selected_pool.notice_unread=true;x.selected_pool.update_notice={title:'奖励更新公告',summary:'新奖池'};x.pools=[x.selected_pool];x.items=['n','sr','ur','r','ssr'].map(q=>({id:q,name:q,quality:q,icon:'item_blink'}));return x;}
 root.actuallayoutwidth=1920;root.actuallayoutheight=1080;root.actualuiscale_x=1.15;root.actualuiscale_y=1.15;
 nodes.LotteryWindow.actuallayoutwidth=0;nodes.LotteryWindow.actuallayoutheight=0;
-ui.Open();assert.equal(requests.at(-1).p.read_action,'visit');
+ui.Open();assert(!requests.some(r=>r.n==='ui_lottery_snapshot_request'),'opening uses login cache; it never requests a page');assert(!requests.some(r=>r.n==='ui_lottery_read_ack'&&!r.p.revision),'unknown revisions are never marked read');
 const firstScale=nodes.LotteryMainCanvas.style.transform;
 assert.equal(firstScale,'scale3d('+Math.min(1920/1.15/1672,1080/1.15/941)+','+Math.min(1920/1.15/1672,1080/1.15/941)+',1)');
 assert.equal(nodes.LotteryMainCanvas.style.opacity,'1');
@@ -28,10 +28,10 @@ events.ui_lottery_snapshot(updated('map','v1'));
 assert(nodes.LotteryInfoOverlay.BHasClass('LotteryInfoHidden'),'updates must only show a red dot');
 assert(nodes.LotteryUpdateDot.visible);
 assert(nodes.LotteryPoolTabs.children.every(t=>!t.children.some(c=>c.BHasClass('LotteryUpdateDot'))),'chest tabs must not contain dots');
-assert.equal(requests.at(-1).p.read_action,'visit');
+assert.equal(requests.at(-1).n,'ui_lottery_read_ack');assert.equal(requests.at(-1).p.read_action,'visit');
 ui.CloseInfo();ui.SelectPool('map');events.ui_lottery_snapshot(updated('map','v1'));
 assert(nodes.LotteryInfoOverlay.BHasClass('LotteryInfoHidden'),'same notice must not reopen');
-ui.Feature('details');assert.equal(requests.at(-1).p.read_action,'details');
+ui.Feature('details');assert.equal(requests.at(-1).n,'ui_lottery_read_ack');assert.equal(requests.at(-1).p.read_action,'details');
 assert(nodes.LotteryInfoTabs.children.every(t=>!t.children.some(c=>c.BHasClass('LotteryUpdateDot'))),'detail tabs must not contain dots');
 assert.deepEqual(nodes.LotteryInfoList.children.map(p=>p.children.find(c=>c.BHasClass('LotteryDetailCopy')).children[0].text.split(' · ')[0]),['UR','SSR','SR','R','N']);
 const read=updated('map','v1');read.selected_pool.update_unread=false;read.snapshot_scope='read';events.ui_lottery_snapshot(read);assert(!nodes.LotteryUpdateDot.visible);
@@ -51,10 +51,10 @@ assert(!requests.some(r=>r.p.read_action==='notice'),'no announcement acknowledg
 console.log('LOTTERY_UPDATES_PASS: details-only dots, four backgrounds, stable first-open scale, unmeasured viewport guard, independent read revisions, quality order');
 for(const [pool,seq] of [['map',1],['summer',2]]){const data=updated(pool,'cache-v1');data.snapshot_scope='cache';data.cache_sequence=seq;events.ui_lottery_snapshot(data);}
 ui.Open();const beforeCache=requests.length;ui.SelectPool('summer');ui.SelectPool('map');
-assert(requests.slice(beforeCache).every(r=>r.p.snapshot_scope==='read'),'cached switches only acknowledge reading, never fetch page data');
+assert(requests.slice(beforeCache).every(r=>r.n==='ui_lottery_read_ack'),'cached switches only acknowledge reading, never fetch page data');
 events.ui_lottery_snapshot({snapshot_scope:'cache_patch',selected_pool_id:'map',cache_sequence:3,base_sequence:1,chunk:1,chunks:1,changes:[{path:['selected_pool','tickets'],value:999}]});
 assert(nodes.LotteryTicketValue.text.includes('999'),'delta refreshes current pool');
-console.log('LOTTERY_CACHE_PASS: prefetched tab switching without data fetch and incremental ticket update');
+console.log('LOTTERY_CACHE_PASS: login-cached tab switching without data fetch and incremental ticket update');
 ui.CloseInfo();ui.SelectPool('map');
 let wallClock=2000;EmbeddedDate.now=()=>wallClock*1000;
 function timed(pool,stamp){const x=updated(pool,'time-'+stamp);x.selected_pool.updated_at=stamp;return x;}
@@ -75,31 +75,35 @@ assert.strictEqual(config.SurvivalLotteryDetailReads,savedReads,'panel reload pr
 config.SurvivalLottery.Open();events.ui_lottery_snapshot(timed('map',2001));assert(!nodes.LotteryUpdateDot.visible);
 console.log('LOTTERY_READ_TIME_PASS: immediate hide, stale response, equal/new timestamp, pool isolation, UI reload');
 
-// A rejected prefetch used to be forgotten when details opened later, leaving
-// an empty list and a permanent loading message even though the pool exists.
+// A rejected background refresh preserves the last valid local display. It
+// revokes authority until a replacement arrives; opening the UI never retries.
 const currentUI=config.SurvivalLottery;
 currentUI.CloseInfo();
-events.ui_lottery_snapshot({ok:false,error:'archive_config_mismatch'});
+const beforeFailure=requests.length;
+events.ui_lottery_snapshot({selected_pool_id:'map',ok:false,error:'archive_config_mismatch'});
 currentUI.Feature('details');
-assert.equal(nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow')).length,0,'loading/error copy is not a reward');
-assert(nodes.LotteryInfoRules.text.includes('游戏与服务器配置版本不一致'));
-assert.equal(nodes.LotterySelectedName.text,'奖池暂时无法加载');
-assert(!nodes.LotterySingleButton.enabled,'failed loading cannot enable drawing');
-currentUI.CloseInfo();currentUI.Feature('details');
-assert(nodes.LotteryInfoRules.text.includes('游戏与服务器配置版本不一致'),'reopening must preserve the actual failure');
+assert.equal(nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow')).length,5,'a failed refresh retains the verified local rewards');
+assert(!/正在加载|正在切换/.test(nodes.LotteryInfoRules.text||''),'local details never fall back to a loading page');
+assert(!nodes.LotterySingleButton.enabled,'failed authority cannot enable drawing');
+assert.equal(config.SurvivalLotteryCache.IsAuthoritative('map'),false);
+assert(requests.slice(beforeFailure).some(r=>r.n==='ui_lottery_cache_resync'&&r.p.pool_id==='map'),'recovery runs through the background cache transport');
+currentUI.CloseInfo();const beforeReopen=requests.length;currentUI.Feature('details');
+assert.equal(nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow')).length,5,'reopening still displays the valid local catalogue');
+assert(!requests.slice(beforeReopen).some(r=>r.n==='ui_lottery_snapshot_request'||r.n==='ui_lottery_cache_resync'),'opening does not fetch or retry');
 events.ui_lottery_snapshot(timed('map',2001));
-assert.equal(nodes.LotteryInfoList.children.length,5,'a successful response restores the existing rewards');
-assert(!nodes.LotteryInfoRules.text.includes('加载失败'));
+assert.equal(nodes.LotteryInfoList.children.length,5,'a successful push restores authoritative data');
+assert.equal(config.SurvivalLotteryCache.IsAuthoritative('map'),true);
 currentUI.SelectPool('summer');
-const failedDetailRequest=requests.at(-1).p;
-events.ui_lottery_snapshot({snapshot_scope:'details',snapshot_request_id:failedDetailRequest.snapshot_request_id,ok:false,error:'archive_config_mismatch'});
-assert.equal(nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow')).length,0,'failed detail tab must not retain another pool rewards');
-assert(nodes.LotteryInfoRules.text.includes('游戏与服务器配置版本不一致'));
+const summerFailure=requests.length;
+events.ui_lottery_snapshot({selected_pool_id:'summer',ok:false,error:'archive_config_mismatch'});
+assert.equal(nodes.LotteryInfoList.children.filter(c=>c.BHasClass('LotteryDetailRow')).length,5,'a failed detail-pool refresh preserves that pool local rewards');
+assert.equal(config.SurvivalLotteryCache.IsAuthoritative('summer'),false);
+assert(requests.slice(summerFailure).some(r=>r.n==='ui_lottery_cache_resync'&&r.p.pool_id==='summer'));
 currentUI.SelectPool('map');
-const recoveredRequest=requests.at(-1).p;
-events.ui_lottery_snapshot({...timed('map',2001),snapshot_scope:'details',snapshot_request_id:recoveredRequest.snapshot_request_id});
+events.ui_lottery_snapshot({...timed('map',2001),snapshot_scope:'cache',cache_sequence:4});
 assert.equal(nodes.LotteryInfoList.children.length,5,'a different valid tab is unaffected');
-console.log('LOTTERY_LOAD_ERROR_PASS: prefetch error, reopen, retry recovery and independent detail tabs');
+assert.equal(config.SurvivalLotteryCache.IsAuthoritative('map'),true);
+console.log('LOTTERY_REFRESH_RECOVERY_PASS: retained catalogue, authority guard, background recovery, reopen without fetching and independent detail tabs');
 currentUI.CloseInfo();currentUI.SelectPool('summer');events.ui_lottery_snapshot(timed('summer',2001));
 let ticketPool=null;
 config.SurvivalCommerceView={OpenTicketPurchase:pool=>{ticketPool=pool.id;return true;}};

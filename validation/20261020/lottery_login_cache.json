@@ -1,0 +1,108 @@
+{
+  "status": "PASS_LOGIN_MD5_CACHE_HOT_UPDATE_DEPLOYED",
+  "behavior": [
+    "HUD startup verifies the packed public catalogue against the remote MD5 independently of opening the lottery or selecting a mode.",
+    "An equal MD5 transfers metadata only; a different MD5 transfers bounded chunks and atomically replaces the verified HUD-session cache.",
+    "Open, pool switching and details use local content with no page snapshot request or switching/loading caption.",
+    "The game server checks the public catalogue every 30 seconds and broadcasts changed content to all clients; private balance/ownership pushes remain owner-scoped.",
+    "Catalogue/config mismatch suspends drawing; expected_config_hash prevents old-price requests from settling after an update.",
+    "Local content is the packed seed plus the verified in-memory hot catalogue; no arbitrary client filesystem writes are claimed."
+  ],
+  "catalogue": {
+    "md5": "4f2827b27ffe90fd79a07e8e27bb6851",
+    "config_hash": "0328f6ba83a13d309b8b6df84524814cf10ed5287c019282e35e286161d27bac",
+    "pools": 4,
+    "public_only": true,
+    "private_weights_or_player_state": false
+  },
+  "sourceFiles": {
+    "scripts/vscripts/core/events.lua": "7c31918cca51544234de28cef57e6cfa6807abe359f8387826ddf6a0258ce4f2",
+    "scripts/vscripts/systems/archive_http_adapter.lua": "bb94011ff1374183232ef97b0b0fe238796af8551b386c633992494f44bf36e9",
+    "scripts/vscripts/systems/lottery_http_service.lua": "0c66dd2db76e06b39d8fdecea921cc23563151bffdaf1b95f84acde3f5fd01dc",
+    "scripts/vscripts/systems/player_profile_providers/http_fishing_provider.lua": "b18dada1be0372ee6ddd66b1bd67b09a76a7e23bb38b11b95821ccc8dc3be944",
+    "scripts/vscripts/tests/test_lottery_active_hash.lua": "9c91a2227ca34ca12e5b545c22f080f36ea7a56302a4f1e0f7606c824e8102a5",
+    "scripts/vscripts/tests/test_lottery_catalog_provider.lua": "81e3397f37f9de5e6743258899179c0383a2fdff76ee2bbc0ddb382a145ca43f",
+    "scripts/vscripts/tests/test_lottery_catalog_router.lua": "a10a2097c5d14466651442bdb25a9b83fd18a0cfbbddf34f923a9a36bce4e022",
+    "scripts/vscripts/tests/test_lottery_catalog_sync.lua": "a3a22d8bacdd49c002870acef018795ddbaee91b77ba4bc372f46c22d0508d92",
+    "scripts/vscripts/tests/test_lottery_manifest_cache.lua": "0759b8e6b92fd5118d54645b1d251442d7c5be5e96ad63d8a3f0fa988e524b53",
+    "scripts/vscripts/tests/test_lottery_receipt_sequence.lua": "cc8f9bf63c439eefb6383f29756ea75288bb3503c9134cd97f321a72ea9a1161",
+    "scripts/vscripts/ui/ui_request_router.lua": "dee7941e36199f7a1af882fa5ae51797111a7a899120eaae3a0b930d4d4bea69",
+    "server/archive_backend/lottery_catalog.py": "1de5f30fcd9624301b4e03ce7cc5bb3e8f0bab5c8cb0b88de2329de2975595ea",
+    "server/archive_backend/service.py": "ee0fa50129b53dd0a61b0e86cc373bf0e7a02b3ed26b8b7e642ea6742a9395fd",
+    "server/tests/test_lottery_catalog.py": "902007e0aaa9de965b2d1121f4e398bd7e4a9aa425ba36b6741cbc48f215c381",
+    "tools/patch_lottery_catalog_handler.py": "a1ac5415acfeb45ab86abaee4aeabb9f7599fcb14a1f61b3f97fda0ade220439",
+    "tools/stage_archive_http_server.py": "5af907b63176ffdb2b9da10e153283147426d4221075a372da3a897aa8a04c95",
+    "tools/test_lottery_purchase_refresh.lua": "e674608ffde57d5144dcd743086d2b177172a743adfd571c86dfad94fb9d9792",
+    "panorama/src/layout/custom_game/survival_hud.xml": "3d4741546353faa086db52dac783c186c1fbabc0dfbff93e137b0652423d2f01",
+    "panorama/src/scripts/custom_game/common/lottery_cache.js": "ee838c04106774ef2db7f9265c197b3fe9c272ed1b206c717b87db53b3005661",
+    "panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js": "3783fa8a0d99990a8df16674665dc1a4a18fca7db29496304f3abc84b9eb0d9f",
+    "tools/tests/lottery_cache.test.cjs": "103ba308430c30fc7bda57560a0518f912f82547ab14f45169e20a7601b19d20",
+    "tools/test_lottery_ui.js": "b17df50d84bf721624c830c49b02e3d3cdc2131001d1b087f62c2073c6577fbc",
+    "tools/test_lottery_updates.cjs": "9a40f606073629d97a3e4a350e69be23e54e4a927ecc37573799b98a315c4612",
+    "tools/tests/lottery_cinematic_flow.test.cjs": "402d162ba64a1cd169ad1a10b593683c921270ef07a0393b9b9d0ca4b712bc05",
+    "tools/tests/lottery_gw2.test.cjs": "a1c4f941cadf377531b0917048778de78fadd6668e5cf9cdfc40ce13db346788",
+    "tools/tests/lottery_scene_transition.test.cjs": "871c04300367c5a33812abdb7fb9ab53272cd0ceae9dfac5c6c944ae17d4c5be",
+    "data/ui/lottery_catalog.json": "208c499979528c7f9390ce9a06e3274e786d8a58a136255a1c15c5580608d1d6",
+    "panorama/src/scripts/custom_game/lottery_catalog_seed.js": "d1e9c791291b28d82350cc711af8ed1aef5344d9733dccd71b8b38e0c4a3a5fa",
+    "scripts/vscripts/config/generated/lottery_catalog_manifest.lua": "f641b6e0a1cfe046fbd7a7fcaefa5b1816ffec4721ab5eddaac3890fde3b4d3a",
+    "tools/build_lottery_catalog.py": "2e8c584c6f5aa2388cd443b7aba042f9be4d53c36901974e7e66a5a0546385a7",
+    "tools/lottery_emerald_game_20261019/preview.cjs": "64b0c43467ba29baf8e1bd441a4e6f5245543d4c8d9f1f9de578d24b97348d62",
+    "tools/lottery_emerald_game_20261019/state.js": "e2543faa20542e852634ef730f1f4e3d0cf3cc23db0853d5d89a65e15d373c75",
+    "tools/lottery_emerald_game_20261019/verify.cjs": "6ad75217c64fddbdfb0677256d8ee139de5645e2708759049fd75051499e2873"
+  },
+  "tests": {
+    "client": 36,
+    "python": 4,
+    "lua_suites": 9,
+    "isolated": true,
+    "head": "1272747415bdb0cd9c4f06d70fda99f92f2dda96",
+    "report": "output/lottery_login_cache_20261020/isolated_tests.json",
+    "identity": "Lossless SteamID64 76561198000000000 -> provider account ID 39734272; mismatched accounts rejected.",
+    "races": [
+      "Out-of-order/partial catalogue chunks",
+      "Old session and profile-mode packets",
+      "Old receipt after newer balance push",
+      "Read failures and concurrent purchase refresh",
+      "Old configuration token after catalogue change"
+    ]
+  },
+  "nativeCompile": {
+    "candidate": true,
+    "installed": true,
+    "files": 4,
+    "reports": [
+      "output/lottery_login_cache_20261020/compile_candidate.json",
+      "output/lottery_login_cache_20261020/compile_live.json"
+    ]
+  },
+  "visual": {
+    "sizes": [
+      "1920x1080",
+      "1280x720"
+    ],
+    "pool_switches": 8,
+    "page_content_requests": 0,
+    "open_and_details_checked": true,
+    "report": "output/lottery_login_cache_20261020/browser_smoke.json",
+    "r5_parity": "output/lottery_r5_parity_20261019/report.json",
+    "gameVerified": false,
+    "limitation": "Native resources compiled; actual in-game multiplayer login/hot-update behavior was not exercised."
+  },
+  "cloud": {
+    "release": "20261020-lottery-catalog-v1",
+    "status": "ACTIVATED",
+    "backup_sha256": "1dbeec49c056555b691155888a163f35bd80a733093fef00c09192b25662d267",
+    "plan_sha256": "b2ff4004dc09fc8937591a89e4e4ee17ebe93cbfdcb7d5a1c2ff62e7bcc4a4f6",
+    "anonymous_catalog_status": 401,
+    "same_md5_omits_body": true,
+    "different_md5_returns_body": true,
+    "transaction_bundle_unchanged": true,
+    "new_database_migrations": 0,
+    "economic_changes": 0,
+    "existing_startup_sync_preserved": true,
+    "public_projection_checked": true,
+    "report": "output/lottery_login_cache_20261020/cloud_activate.json"
+  },
+  "known_baseline_failure": "Retired menus_v10_lottery renderer gate failure reproduced with pre-task HEAD; that test is unchanged.",
+  "preserved": "Existing unrelated working-tree changes and historical stashes retained; only this task delta and isolated compiled resources are committed."
+}

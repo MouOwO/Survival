@@ -20,6 +20,7 @@ function replaceObject(prefix,suffix,fn){const start=html.indexOf(prefix)+prefix
 const allow=new Set(['common/item_resources','ui_snapshot_cache','common/ui_typography','common/ui_registry','common/ui_components','common/reward_feedback','common/tooltip_dismiss','ui_layers','archive_v10_data','common/menu_v10','common/purple_shell','reward_presentation','native_ui_icons','item_art_remaining_5d5c1152eb','reference_windows','remaining_5d5c1152eb','lottery_scene_transition','lottery_handoff_bb9968eef7','lottery_cinematic_v1','lottery_ui_remaining_5d5c1152eb','lottery_gw2_data','lottery_gw2'].map(x=>'scripts/custom_game/'+x+'.js'));
 // The actual lottery tooltip reuses the market's shared frame renderer.
 ['black_lion_market_model','black_lion_market'].forEach(name=>allow.add('scripts/custom_game/'+name+'.js'));
+['lottery_catalog_seed','common/lottery_cache'].forEach(name=>allow.add('scripts/custom_game/'+name+'.js'));
 let activeScripts=[],excluded=[];
 replaceObject('window.PREVIEW_LAYOUTS=',';window.PREVIEW_SOURCES=',layouts=>{const hud=layouts.find(x=>x.rel==='layout/custom_game/survival_hud.xml');if(!hud)throw Error('Active lottery HUD absent');excluded=hud.scripts.filter(x=>!allow.has(x));hud.scripts=hud.scripts.filter(x=>allow.has(x));activeScripts=hud.scripts;for(const name of ['lottery_gw2.js','lottery_ui_remaining_5d5c1152eb.js'])if(!hud.scripts.some(x=>x.endsWith('/'+name)))throw Error('Missing active production '+name);return [hud];});
 replaceObject('window.PREVIEW_SOURCES=',';window.PREVIEW_FIXTURE=',sources=>{for(const key of Object.keys(sources))if(key.endsWith('.js')&&!allow.has(key))delete sources[key];return sources;});
@@ -32,6 +33,8 @@ replaceObject('window.PREVIEW_ASSET_PATHS=',';window.PREVIEW_BASELINE=',assets=>
 // these exact registered s2r backgrounds; the production scripts stay intact.
 const adapterTag='<script src="'+pathToFileURL(path.join(repo,'tools/archive_v10/adapter.js')).href+'"></script>';
 if(!html.includes(adapterTag))throw Error('Reusable browser adapter entry unavailable');
+// Explicit offline identity exercises the production catalogue/owner gate.
+html=html.replace(adapterTag,adapterTag+'<script>window.LOTTERY_PREVIEW_OWNER={session_id:"offline-lottery-session",account_id:"39734272",profile_mode:"standard"};const lotteryOriginalTable=CustomNetTables.GetTableValue;CustomNetTables.GetTableValue=function(table,key){if(table==="survival_loading"&&key==="state")return{session_id:LOTTERY_PREVIEW_OWNER.session_id,setup:{mode_id:LOTTERY_PREVIEW_OWNER.profile_mode}};return lotteryOriginalTable.call(this,table,key);};Game.GetLocalPlayerInfo=function(){return{player_steamid:"76561198000000000"};};</script>');
 html=html.replace(adapterTag,adapterTag+'<script>const lotteryNativeCSSValue=cssValue;cssValue=function(value){if(value==="medium")return "500";return lotteryNativeCSSValue(typeof value==="string"?value.replace(/s2r:\\/\\/panorama\\/images\\/[^"\')\\s]+/g,uri=>PREVIEW_ASSET_PATHS[uri]||uri):value);};</script>');
 const stateUrl=pathToFileURL(path.join(repo,'tools/menus_v10/state.js')).href,newState=pathToFileURL(path.join(__dirname,'state.js')).href;
 if(!html.includes('<script src="'+stateUrl+'"></script>'))throw Error('Reusable state entry unavailable');

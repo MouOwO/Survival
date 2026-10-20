@@ -5,12 +5,21 @@ function M.enabled()
     local p=profiles.get_provider()
     return p and p.archive_enabled and p.archive_enabled() or false
 end
-function M.submit(player_id,command,complete)
+function M.submit(player_id,command,complete,lottery_hash)
     local provider=profiles.get_provider()
     local account=provider and provider.resolve_account_id(player_id)
     if not account then complete({ok=false,error="account_id_unresolved"});return end
     if not provider or type(provider.archive_submit)~='function' then complete({ok=false,terminal=true,error='http_profile_required'});return end
-    provider.archive_submit({account_id=account,config_hash=bundle.hash,command=command},function(result)
+    local config_hash=bundle.hash
+    if tostring(command.kind or ''):match('^lottery_') and lottery_hash~=nil then
+        if type(lottery_hash)~='string' or #lottery_hash~=64 or lottery_hash:find('[^0-9a-f]') then
+            complete({ok=false,terminal=true,error='lottery_config_hash_invalid'});return
+        end
+        -- This argument is captured by the game-side lottery service from an
+        -- authenticated catalog response, never from a Panorama payload.
+        config_hash=lottery_hash
+    end
+    provider.archive_submit({account_id=account,config_hash=config_hash,command=command},function(result)
         if result.profile then
             if tostring(result.profile.account_id)~=tostring(account) then
                 complete({ok=false,terminal=true,error="account_id_mismatch"});return

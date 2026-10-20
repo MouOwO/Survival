@@ -396,7 +396,13 @@ test('multi-chunk purchase patches preserve version chain and prefetch reopens w
     for index = 2, #h.packets do client.accept(h.packets[index].snapshot) end
     equal(client.cache.map.tickets, 18)
     equal(client.cache.map.items[27].owned_count, 27)
-    equal(#delta.diff(client.cache.map, second), 0, 'packet reconstruction equals authoritative inventory')
+    local reconstructed=copy(client.cache.map)
+    equal(reconstructed.account_id,h.accounts[0],'private cache retains its account identity')
+    equal(reconstructed.session_id,h.match_session,'private cache retains its match identity')
+    equal(reconstructed.profile_mode,h.mode,'private cache retains its profile mode')
+    equal(reconstructed.config_hash,'regression_bundle','private cache retains its trusted rule hash')
+    for _,key in ipairs({'account_id','session_id','profile_mode','config_hash'}) do reconstructed[key]=nil end
+    equal(#delta.diff(reconstructed, second), 0, 'packet reconstruction equals authoritative inventory')
     local last = client.sequence.map
     h.changed(0)
     local third = copy(second); third.tickets = 19; third.pools[1].tickets = 19

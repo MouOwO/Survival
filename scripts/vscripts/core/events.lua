@@ -185,6 +185,10 @@ local M = {
     LOTTERY_EXCHANGE_REQUEST = "lottery.exchange.request",
     LOTTERY_SNAPSHOT_REQUEST = "lottery.snapshot.request",
     LOTTERY_CHANGED = "lottery.changed",
+    LOTTERY_CATALOG_REQUEST = "lottery.catalog.request",
+    LOTTERY_CATALOG_CHANGED = "lottery.catalog.changed",
+    LOTTERY_CACHE_RESYNC_REQUEST = "lottery.cache.resync.request",
+    LOTTERY_READ_ACK_REQUEST = "lottery.read.ack.request",
     INVENTORY_TRANSACTION_EXECUTE_REQUEST = "inventory.transaction.execute.request",
     INVENTORY_TRANSACTION_ROLLBACK_REQUEST = "inventory.transaction.rollback.request",
 

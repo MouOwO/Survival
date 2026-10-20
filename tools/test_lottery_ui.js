@@ -19,7 +19,13 @@ const xml=fs.readFileSync('panorama/src/layout/custom_game/survival_hud.xml','ut
 for(const m of xml.matchAll(/id="([^"]+)"/g))new Panel('Panel',root,m[1]);
 for(const id of ['LotteryItemTooltip','LotteryTooltipIconHost','LotteryTooltipName','LotteryTooltipType','LotteryTooltipDuration','LotteryTooltipDescription'])new Panel('Panel',root,id);
 function $(id){return nodes[id.slice(1)]} $.GetContextPanel=()=>root; $.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.Schedule=(seconds,cb)=>queue.push({at:now+seconds,cb});$.Msg=(message)=>logs.push(message);
-const config={};const env={Date:EmbeddedDate,Intl:undefined,$,GameUI:{CustomUIConfig:()=>config},GameEvents:{Subscribe:(n,cb)=>events[n]=cb,SendCustomGameEventToServer:(n,p)=>requests.push({n,p})}};
+// Panorama events are multicast. Keep a stable dispatch function while layout
+// controllers subscribe/unsubscribe so the login cache outlives UI reloads.
+const eventSubscribers=new Map();let nextSubscription=0;
+const config={};const env={Date:EmbeddedDate,Intl:undefined,$,GameUI:{CustomUIConfig:()=>config},GameEvents:{
+ Subscribe(n,cb){const id=++nextSubscription;eventSubscribers.set(id,{n,cb});events[n]=payload=>{for(const sub of [...eventSubscribers.values()])if(sub.n===n)sub.cb(payload);};return id;},
+ Unsubscribe(id){eventSubscribers.delete(id);},
+ SendCustomGameEventToServer:(n,p)=>requests.push({n,p})}};
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/ui_layers.js','utf8'),env);
 vm.runInNewContext(fs.readFileSync('panorama/src/scripts/custom_game/reward_presentation.js','utf8'),env);
 require('./load_shared_ui_test.cjs')(env,Panel,root);
