@@ -69,7 +69,7 @@ function tip(anchor,title,body){
   if(dailyTooltip.Show({name:String(title||"奖励说明"),description:String(body||"奖励说明待同步")},"daily",anchor,true)){
    p("DailyTooltipName").text=String(title||"奖励说明");p("DailyTooltipEffect").text=String(body||"奖励说明待同步");
   }
- });anchor.SetPanelEvent("onmouseout",function(){if(dailyTooltip)dailyTooltip.QueueHide();});
+ });anchor.SetPanelEvent("onmouseout",function(){if(dailyTooltip)dailyTooltip.QueueHide(anchor);});
 }
 function close(){
  if(rewardFX)rewardFX.Clear();if(waiting)waiting.present=false;
@@ -121,7 +121,7 @@ function build(){
  var rulesWidth=620,rulesHeight=Math.min(570,size[1]-80),rules=p("DailyRulesText");rect(rules,(size[0]-rulesWidth)/2,(size[1]-rulesHeight)/2,rulesWidth,rulesHeight);style(rules,{flowChildren:"down",overflow:"squish scroll",backgroundColor:"#181610fc",backgroundImage:"none",border:"1px solid #a7926b",padding:"24px",zIndex:"120"});rules.hittest=true;rules.hittestchildren=true;rules.AddClass("ArchiveHidden");rules.visible=false;
  style(p("DailyRulesBody"),{width:(rulesWidth-60)+"px",height:"fit-children",fontSize:"20px",color:"#eee6d2",whiteSpace:"normal",textOverflow:"clip",lineHeight:"28px"});p("DailyRulesBody").html=true;
  // Reuse the archive renderer, materials and hover lifecycle for every daily reward.
- dailyTooltip=cfg.SurvivalArchiveTooltip.Create({parent:canvas,root:dailyRoot,idPrefix:"DailyGW2Tooltip",
+ dailyTooltip=cfg.SurvivalArchiveTooltip.Create({parent:canvas,root:dailyRoot,idPrefix:"DailyGW2Tooltip",allowSourceSwitch:true,
   getBounds:function(){return size;},getScale:function(){return scale;},maxHeight:function(bounds){return Math.min(570,bounds.height-40);},watchAnchor:true,
   isAlive:function(){return active&&viewValid();},isActive:function(){return shell.IsOpen()&&p("DailyRulesText").BHasClass("ArchiveHidden");},
   position:function(info){var x=info.anchor.x+cellWidth+12-info.padding;if(x+info.width>info.bounds.width)x=info.anchor.x-info.surfaceWidth-12-info.padding;return {x:Math.max(0,Math.min(info.bounds.width-info.width,x)),y:Math.max(0,Math.min(info.bounds.height-info.height,info.anchor.y-info.padding))};}
@@ -178,7 +178,7 @@ function renderCards(){
   style(frame,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none"});
   var items=array(day.rewards),gap=0,width=items.length>1?(cellWidth-iconInset*2-gap)/2:cellWidth-iconInset*2,sharedQuantity=items.length>1?rewardQuantity(items[0]):null;
   if(sharedQuantity!==null&&!items.every(function(item){return rewardQuantity(item)!==null&&Number(item.count)===Number(sharedQuantity);}))sharedQuantity=null;
-  items.slice(0,2).forEach(function(item,j){reward(card,item,iconInset+j*(width+gap),iconInset,width,cellHeight-iconInset*2,undefined,sharedQuantity!==null);});
+  items.slice(0,2).forEach(function(item,j){var image=reward(card,item,iconInset+j*(width+gap),iconInset,width,cellHeight-iconInset*2,undefined,sharedQuantity!==null);image.hittest=false;image.hittestchildren=false;if(j===0)card.__dailyRewardIcon=image;});
   if(sharedQuantity!==null)quantity(card,sharedQuantity,cellWidth,cellHeight,cellPadding);
   if(status==="claimed")mark(card,"check");
   var summary=items.map(function(item){return item.name+(item.count!==undefined?" ×"+item.count:"")+"\n"+(item.description||"");}).join("\n\n");
@@ -241,8 +241,10 @@ function confirmedClaim(next,intent){
 function showClaim(intent){
  if(!rewardFX||!intent.present||!shell.IsOpen())return;
  var samePage=(Number(data.calendar_start_count)||0)===intent.calendarStart;
+ var anchor=samePage?p("DailyGW2Day_"+intent.slot):null,surface=valid(anchor)&&anchor.__dailyRewardIcon;
+ if(!valid(surface))return;
  rewardFX.Play({key:intent.period+":"+intent.target+":"+intent.count+":"+intent.ordinary+":"+intent.premium,
-  anchor:!intent.bonus&&samePage?p("DailyGW2Day_"+intent.slot):p("DailyClaim"),title:"领取成功",text:intent.text||"奖励已领取",tone:"gold"});
+  anchor:anchor,surface:surface,title:"领取成功",text:intent.text||"奖励已领取",tone:"gold"});
 }
 life.Subscribe("survival_daily_snapshot",function(next){
  if(!active)return;fetching=false;fetchSerial++;if(!(next.ok===true||Number(next.ok)===1)){errorText=next.error||"正在读取档案";render();return;}

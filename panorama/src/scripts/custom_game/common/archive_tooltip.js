@@ -110,14 +110,24 @@
             if (dismiss) dismiss.Hidden();
             if (options.onHide) options.onHide();
         }
-        function queueHide() {
+        function queueHide(source) {
+            if (options.allowSourceSwitch && dismiss && dismiss.SourceLeft) dismiss.SourceLeft(source);
+            // Native events from a retired card can arrive after the next Show.
+            if (source && source!==anchor) return;
             if (!active() || !panel.visible) return;
             var epoch=++hideEpoch;
             life.Later(.15,function () {
                 if (!active() || epoch!==hideEpoch) return;
-                if (tooltipOverflows() && (cursorInside(anchor) || cursorInside(surface))) return;
+                if (cursorInside(anchor) || (tooltipOverflows() && cursorInside(surface))) return;
                 hide();
             });
+        }
+        function reset() {
+            hide();
+            // Recreate only this policy owner. This also accepts owners retained
+            // from an older script version during a native HUD reload.
+            if (dismiss) dismiss.Dispose();
+            dismiss=alive() ? createDismiss() : null;
         }
         function tooltipRect(node) { var at=node.GetPositionWithinWindow(); return {x:at.x,y:at.y,width:node.actuallayoutwidth*fitScale,height:node.actuallayoutheight*fitScale}; }
         function tooltipOverflows() { return alive() && body.actuallayoutheight>viewport.actuallayoutheight+1; }
@@ -126,9 +136,17 @@
             var at=GameUI.GetCursorPosition(), box=tooltipRect(node);
             return at && at[0]>=box.x && at[0]<box.x+box.width && at[1]>=box.y && at[1]<box.y+box.height;
         }
-        dismiss=cfg.SurvivalTooltipDismiss.Create({panel:panel,surface:surface,getRect:tooltipRect,hide:hide,isAlive:alive,allowTooltipHover:tooltipOverflows,isVisible:function () { return active() && panel.visible; }});
-        surface.SetPanelEvent("onmouseover",function () { if (tooltipOverflows()) hideEpoch++; else dismiss.Dismiss(); });
-        surface.SetPanelEvent("onmouseout",queueHide);
+        function surfaceEnter() {
+            if (!active() || !panel.visible || (GameUI.GetCursorPosition && !cursorInside(surface))) return;
+            if (tooltipOverflows()) hideEpoch++; else dismiss.Dismiss();
+        }
+        function createDismiss() {
+            var owner=cfg.SurvivalTooltipDismiss.Create({panel:panel,surface:surface,getRect:tooltipRect,hide:hide,isAlive:alive,allowSourceSwitch:options.allowSourceSwitch===true,allowTooltipHover:tooltipOverflows,isVisible:function () { return active() && panel.visible; }});
+            surface.SetPanelEvent("onmouseover",surfaceEnter);
+            return owner;
+        }
+        dismiss=createDismiss();
+        surface.SetPanelEvent("onmouseout",function () { queueHide(); });
         function getBounds() {
             var value=options.getBounds ? options.getBounds() : {width:1200,height:900};
             return Array.isArray(value) ? {width:Number(value[0]),height:Number(value[1])} : {width:Number(value.width),height:Number(value.height)};
@@ -234,9 +252,9 @@
             return true;
         }
         return {
-            Show:show, Hide:hide, QueueHide:queueHide, IsVisible:function () { return alive() && panel.visible; }, panel:panel, elements:elements,
+            Show:show, Hide:reset, QueueHide:queueHide, IsVisible:function () { return alive() && panel.visible; }, panel:panel, elements:elements,
             Inspect:function () { return {visible:alive()&&panel.visible,category:currentCategory,itemId:currentItem&&currentItem.id,anchorId:anchor&&anchor.id,prefix:prefix,surfaceHeight:measuredHeight,nineSlices:{Backing:{count:pieces.Backing.length,asset:backing.__v10Slice.asset,insets:backing.__v10Slice.insets.slice()},Frame:{count:pieces.Frame.length,asset:frame.__v10Slice.asset,insets:frame.__v10Slice.insets.slice()}}}; },
-            Dispose:function () { if (disposed) return; hide(); dismiss.Dispose(); disposed=true; life.Dispose(); if (valid(panel)) panel.DeleteAsync(0); }
+            Dispose:function () { if (disposed) return; hide(); if (dismiss) dismiss.Dispose(); disposed=true; life.Dispose(); if (valid(panel)) panel.DeleteAsync(0); }
         };
     }
     cfg.SurvivalArchiveTooltip = {Create:create};

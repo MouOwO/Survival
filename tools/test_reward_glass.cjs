@@ -73,7 +73,7 @@ function harness(residentRewardFX) {
 
 const h = harness(), anchor = h.card();
 const fx = h.config.SurvivalUI.RewardFX.Create(h.owner, {channel: 'daily'});
-assert.equal(h.config.SurvivalUI.RewardFX.version, '1.2.1');
+assert.equal(h.config.SurvivalUI.RewardFX.version, '1.2.2');
 assert.equal(h.effects().length, 0); assert.equal(h.jobs.size, 0);
 assert.equal(fx.Play({key: 'missing-anchor'}), false, 'A card shine cannot fall back to a centered reward burst');
 anchor.valid = false;
@@ -183,11 +183,41 @@ assert.equal(fresh.jobs.size, 0);
 assert.equal(waiting.Play({key: 'root-deleted', anchor: freshCard}), false);
 waiting.Dispose();
 
-for (const version of ['1.1.0', '1.2.0']) {
+// The visual tile is smaller than its calendar card. The shine must follow
+// that explicit tile, including zero-layout frames, rather than the card date
+// and footer area. It must never regain pointer hit testing.
+{
+    const bounded = harness(), card = bounded.card('DailyGW2Day_4');
+    const icon = new bounded.Panel('Panel', card, 'DailyRewardIcon');
+    icon.style.position = '2px 25px 0px';
+    icon.style.width = '127px'; icon.style.height = '97px';
+    icon.actuallayoutwidth = icon.actuallayoutheight = 0;
+    const f = bounded.config.SurvivalUI.RewardFX.Create(bounded.owner, {channel:'daily'});
+    assert.equal(f.Play({key:'missing-surface',anchor:card,surface:null}),false,'A missing explicit icon cannot fall back to a larger card or button');
+    assert.equal(bounded.effects().length,0);
+    assert(f.Play({key:'icon-bounds',anchor:card,surface:icon}));
+    const glass = bounded.effects()[0];
+    assert.equal(glass.GetParent(),icon,'The clip host is parented directly to the reward tile');
+    assert.equal(glass.style.position,'0px 0px 0px');
+    assert.equal(glass.style.width,'100%'); assert.equal(glass.style.height,'100%');
+    assert.equal(glass.hittest,false);assert.equal(glass.hittestchildren,false);
+    assert(card.BHasClass('RewardGlassActive'),'Claim state belongs to the card independently of the shine rectangle');
+    assert(!icon.BHasClass('RewardGlassActive'));
+    icon.actuallayoutwidth=127;icon.actuallayoutheight=97;
+    assert.equal(glass.GetParent(),icon,'Native layout and Fit cannot expand the icon-local clip host');
+    const second = new bounded.Panel('Panel',card,'ReplacementRewardIcon');
+    assert(f.Play({key:'replacement-icon',anchor:card,surface:second}));
+    assert.equal(glass.IsValid(),false,'Changing the visual surface retires the old clip host');
+    assert.equal(bounded.effects().at(-1).GetParent(),second);
+    f.Clear();assert(!card.BHasClass('RewardGlassActive'));
+    assert.equal(bounded.jobs.size,0);f.Dispose();
+}
+
+for (const version of ['1.1.0', '1.2.0', '1.2.1']) {
     const staleCreate = () => assert.fail('Hot reload must not keep the resident reward implementation');
     const resident = {version, Create: staleCreate}, reload = harness(resident);
     assert.notEqual(reload.config.SurvivalUI.RewardFX, resident, 'Hot reload replaces resident '+version);
-    assert.equal(reload.config.SurvivalUI.RewardFX.version, '1.2.1');
+    assert.equal(reload.config.SurvivalUI.RewardFX.version, '1.2.2');
     const card = reload.card(); card.actuallayoutwidth = card.actuallayoutheight = 0;
     const effect = reload.config.SurvivalUI.RewardFX.Create(reload.owner, {channel:'daily'});
     assert(effect.Play({key:'resident-'+version,anchor:card}));
@@ -196,7 +226,7 @@ for (const version of ['1.1.0', '1.2.0']) {
 }
 
 {
-    const resident = {version:'1.2.1',Create:()=>null}, current = harness(resident);
+    const resident = {version:'1.2.2',Create:()=>null}, current = harness(resident);
     assert.equal(current.config.SurvivalUI.RewardFX,resident,'The matching version guard remains idempotent');
 }
 

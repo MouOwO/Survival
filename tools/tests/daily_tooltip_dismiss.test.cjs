@@ -13,7 +13,8 @@ for(let index=0;index<7;index++){
 const first=nodes.DailyGW2Day_1,second=nodes.DailyGW2Day_2,tip=nodes.DailyGW2Tooltip,surface=nodes.DailyGW2TooltipSurface;
 first.events.onmouseover();h.flushFinite();assert(tip.visible,'An open daily page keeps its real reward tooltip');
 const at=surface.GetPositionWithinWindow();h.setCursor(at.x+10,at.y+10);surface.events.onmouseover();assert(!tip.visible,'Entering the tooltip hides immediately');
-first.events.onmouseout();first.events.onmouseover();second.events.onmouseover();h.flushFinite();assert(!tip.visible,'Neither delayed measurement nor another source underneath the dismissed area reopens it');
+first.events.onmouseout();first.events.onmouseover();h.flushFinite();assert(!tip.visible,'Delayed measurement and the same dismissed source cannot reopen beneath the cursor');
+const secondAt=second.GetPositionWithinWindow();h.setCursor(secondAt.x+10,secondAt.y+40);second.events.onmouseover();h.flushFinite();assert(tip.visible,'Entering a different daily reward underneath the dismissed area opens that reward');assert(nodes.DailyGW2TooltipTitle.text.includes('第2天'));
 h.setCursor(0,0);h.flushFinite();first.events.onmouseover();assert(tip.visible,'Leaving the old source and tooltip area permits a new hover');
 let measuredBodyHeight=1000;
 Object.defineProperty(nodes.DailyGW2TooltipBody,'actuallayoutheight',{get(){return measuredBodyHeight;}});
@@ -29,4 +30,4 @@ measuredBodyHeight=24;first.events.onmouseover();h.flushFinite();const shortAt=s
 cfg.SurvivalDaily.Close();h.flushFinite();assert(!tip.visible,'Closing the page invalidates pending tooltip positioning');
 const retired=surface.events.onmouseover;cfg.SurvivalDaily.Dispose();assert.doesNotThrow(retired);assert.equal(cfg.SurvivalTooltipDismiss.Inspect().owners,0,'Disposal releases the daily hover policy');
 assert(!h.sent.some(row=>/claim|purchase|checkout/.test(row.name)),'Tooltip input never submits a transactional request');
-console.log('DAILY_TOOLTIP_DISMISS_PASS: real renderer, immediate hide, old-area suppression, rearm, measurement cancellation and disposal');
+console.log('DAILY_TOOLTIP_DISMISS_PASS: real renderer, immediate hide, same-source suppression, daily source switching, rearm, measurement cancellation and disposal');

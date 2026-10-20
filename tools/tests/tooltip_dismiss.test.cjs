@@ -48,7 +48,7 @@ cursor=[220,220];step();cursor=[20,20];assert(scrollOwner.CanShow(anchor));scrol
 cursor=[110,110];scrollPanel.events.onmouseover();assert(!scrollPanel.visible,'Passive surface entry still dismisses immediately');
 scrollOwner.Dispose();assert.equal(jobs.size,0,'Conditional hover disposal clears its blocked region and timer');
 const api=cfg.SurvivalTooltipDismiss;vm.runInContext(source,context);assert.equal(cfg.SurvivalTooltipDismiss,api,'Loading another layout reuses one policy');
-assert.equal(api.Inspect().version,'1.0.1','Native inspection identifies the active policy implementation');
+assert.equal(api.Inspect().version,'1.0.2','Native inspection identifies the active policy implementation');
 const retained=tooltip('same-version-owner',80,80);cursor=[20,20];assert(retained.show(anchor));
 const beforeReload=api.Inspect(),jobsBeforeReload=jobs.size;
 vm.runInContext(source,context);assert.equal(cfg.SurvivalTooltipDismiss,api);assert.equal(api.Inspect().owners,beforeReload.owners);assert.equal(api.Inspect().watching,beforeReload.watching);assert.equal(jobs.size,jobsBeforeReload,'Loading the same version cannot duplicate its active watcher');
@@ -57,6 +57,6 @@ const legacy={version:'1.0.0'},migrationCfg={SurvivalTooltipDismiss:legacy};let 
 const migrationContext={GameUI:{CustomUIConfig:()=>migrationCfg,GetCursorPosition:()=>[0,0]},$:{Schedule(){migrationJobs++;return migrationJobs;},CancelScheduled(){}}};
 vm.createContext(migrationContext);vm.runInContext(source,migrationContext);
 assert.notEqual(migrationCfg.SurvivalTooltipDismiss,legacy,'A preserved old-version config must load the new policy');
-assert.equal(migrationCfg.SurvivalTooltipDismiss.Inspect().version,'1.0.1');
+assert.equal(migrationCfg.SurvivalTooltipDismiss.Inspect().version,'1.0.2');
 const migrated=migrationCfg.SurvivalTooltipDismiss;vm.runInContext(source,migrationContext);assert.equal(migrationCfg.SurvivalTooltipDismiss,migrated);assert.equal(migrated.Inspect().owners,0);assert.equal(migrated.Inspect().watching,false);assert.equal(migrationJobs,0,'Initialization and repeated loads never start an idle watcher');
 console.log('TOOLTIP_DISMISS_PASS: passive entry/geometry, cross-window overlap guard, rapid leave/reentry, dynamic hover opt-in, owner isolation and no idle timers');

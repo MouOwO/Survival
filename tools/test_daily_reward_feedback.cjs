@@ -7,7 +7,7 @@ function setup(overrides={},realFX=false){
  if(realFX)h.load('common/reward_feedback.js');
  else h.cfg.SurvivalUI.RewardFX={Create(root,options){
   assert.equal(root.id,'DailyGW2Canvas');assert.equal(options.channel,'daily');
-  return {Play(value){assert(value.anchor.IsValid(),'feedback uses the newly rendered card');plays.push(value);},Clear(){cleared++;},Dispose(){disposed++;}};
+  return {Play(value){assert(value.anchor.IsValid(),'feedback uses the newly rendered card');assert(value.surface.IsValid(),'feedback requires a real reward icon');assert(value.surface.BHasClass('DailyGW2Reward'),'feedback never fills a claim button or calendar date area');assert.equal(value.surface.GetParent(),value.anchor);plays.push(value);},Clear(){cleared++;},Dispose(){disposed++;}};
  }};
  h.load('daily_gw2_data.js');h.load('daily_remaining_5d5c1152eb.js');h.cfg.SurvivalDaily.Open(false);
  const days=Array.from({length:28},(_,i)=>({day:i+1,status:i<3?'claimed':i===3?'claimable':'not_open',rewards:[{name:'木材',count:10,description:'奖励'}]}));
@@ -33,7 +33,7 @@ function setup(overrides={},realFX=false){
  const t=setup({ordinary_status:'claimed',premium:{status:'claimable'},count:4});t.claim();
  t.send({sequence:2});assert(t.h.cfg.SurvivalDaily.Inspect().waiting,'already claimed ordinary reward is not a premium success');assert.equal(t.plays.length,0);
  t.send({sequence:3,pending:1,premium:{status:'claimed'}});assert.equal(t.plays.length,0,'wait for pending save to finish');
- t.send({sequence:4,premium:{status:'claimed'}});assert.equal(t.plays.length,1);assert.equal(t.plays[0].anchor.id,'DailyClaim');
+ t.send({sequence:4,premium:{status:'claimed'}});assert.equal(t.plays.length,1);assert.equal(t.plays[0].anchor.id,'DailyGW2Day_4');
 }
 {
  const t=setup();t.claim();
@@ -64,6 +64,17 @@ function setup(overrides={},realFX=false){
  const t=setup();t.claim();t.send({sequence:2,today:25005,period_id:'period-2',count:4});assert.equal(t.plays.length,0,'day rollover cannot confirm the previous request');
  t.h.assertCleanDispose(t.h.cfg.SurvivalDaily);assert(t.disposed>0);
 }
+{
+ const emptyDays=Array.from({length:28},(_,i)=>({day:i+1,status:i===3?'claimable':'not_open',rewards:[]}));
+ const t=setup({calendar28:emptyDays});t.claim();
+ t.send({sequence:2,count:4,ordinary_status:'claimed'});
+ assert.equal(t.plays.length,0,'A missing reward icon cannot expand the shine to the calendar card or claim button');
+}
+{
+ const t=setup();t.claim();
+ t.send({sequence:2,count:4,ordinary_status:'claimed',calendar_start_count:28});
+ assert.equal(t.plays.length,0,'A replacement calendar page cannot redirect the old reward shine onto the claim button');
+}
 // Exercise the actual production effect module together with the active daily
 // controller. A stubbed Play call previously passed while native layout could
 // discard the real shine on the newly replaced claimed card.
@@ -77,9 +88,19 @@ function setup(overrides={},realFX=false){
  t.send({sequence:4,count:4,ordinary_status:'claimed',calendar28:t.snapshot.calendar28.map((row,index)=>index===3?{...row,status:'claimed'}:row),claim_result:{target_day:25004,ok:1}});
  const claimedCard=t.h.nodes.DailyGW2Day_4,glass=effects()[0];
  assert.notEqual(claimedCard,oldCard,'The actual successful render replaces the pending calendar card');
- assert(oldCard.deleted);assert.equal(effects().length,1);assert.equal(glass.GetParent(),claimedCard);
+ assert(oldCard.deleted);assert.equal(effects().length,1);
+ const rewardIcon=claimedCard.__dailyRewardIcon;
+ assert(rewardIcon&&rewardIcon.BHasClass('DailyGW2Reward'));
+ assert.equal(rewardIcon,claimedCard.Children().find(node=>node.BHasClass('DailyGW2Reward')),'The first actual reward icon is the effect surface');
+ assert.equal(rewardIcon.GetParent(),claimedCard);
+ const [iconX,iconY]=rewardIcon.style.position.split(' ').map(Number.parseFloat),iconWidth=parseFloat(rewardIcon.style.width),iconHeight=parseFloat(rewardIcon.style.height);
+ assert(iconWidth>0&&iconHeight>0&&iconX>=0&&iconY>=0,'The icon has a positive rectangle inside the card');
+ assert(iconX+iconWidth<=parseFloat(claimedCard.style.width)&&iconY+iconHeight<=parseFloat(claimedCard.style.height),'The shine surface remains inside the actual calendar card');
+ assert.equal(glass.GetParent(),rewardIcon,'The real shine fills only the icon, excluding date and calendar card spacing');
+ assert.equal(rewardIcon.hittest,false);assert.equal(rewardIcon.hittestchildren,false);assert.equal(rewardIcon.events.onactivate,undefined,'The icon remains a preview, never a claim button');
  assert(claimedCard.BHasClass('DailyGW2Claimed'));assert(claimedCard.BHasClass('RewardGlassActive'),'Claim dimming cannot hide the success pass');
- assert.equal(glass.style.width,'100%');assert.equal(glass.visible,true);assert.equal(glass.GetChildCount(),1);
+ assert.equal(glass.style.position,'0px 0px 0px');assert.equal(glass.style.width,'100%');assert.equal(glass.style.height,'100%');assert.equal(glass.visible,true);assert.equal(glass.GetChildCount(),1);
+ assert.equal(glass.hittest,false);assert.equal(glass.hittestchildren,false);
  t.send({sequence:5,count:4,ordinary_status:'claimed',calendar28:t.snapshot.calendar28.map((row,index)=>index===3?{...row,status:'claimed'}:row),claim_result:{target_day:25004,ok:1}});
  assert.equal(effects().length,1);assert.equal(effects()[0],glass,'A repeated success ACK does not create or restart an effect');
  api.Close();assert.equal(effects().length,0);assert(!claimedCard.BHasClass('RewardGlassActive'));
