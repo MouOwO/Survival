@@ -32,7 +32,7 @@
     function asset(key){return P.assets&&P.assets[key];}
     function skin(node,key){var value=asset(key);if(value)style(node,{backgroundImage:'url("'+(typeof value==="string"?value:value.file)+'")',backgroundColor:"transparent",backgroundSize:"100% 100%",backgroundRepeat:"no-repeat"});}
     function component(parent,key,x,y,w,h,id){var node=make("Panel",parent,id,"ArchiveV10Image");node.hittest=false;node.hittestchildren=false;pos(node,x,y,w,h);skin(node,key);return node;}
-    function serif(node){style(node,{fontFamily:'"SimSun"'});return node;}
+    function serif(node){style(node,{fontFamily:'"Source Han Sans SC"',fontWeight:"bold",textShadow:"none",letterSpacing:"0px"});return node;}
     function categoryIcon(id){
         if(id==="commerce_goods")return "file://{images}/custom_game/archive_polish_v1/nav/gift.svg";
         if(id==="shop")return "file://{images}/custom_game/archive_polish_v1/nav/endless.svg";
@@ -66,7 +66,7 @@
         filter.SetPanelEvent("onactivate",function(){if(alive()){hideTooltip();filterMenu.visible=!filterMenu.visible;}});
         component(canvas,"section_strip",36,234,narrow(310),34,"ArchiveV10SidebarStrip");serif(label(canvas,"分类",54,237,narrow(260),29,23,"#f4eeda"));
         sidebar=make("Panel",canvas,"ArchiveV10Sidebar","ArchiveV10Sidebar");pos(sidebar,42,270,narrow(302),575);sidebar.hittest=false;sidebar.hittestchildren=true;
-        headerIcon=icon(canvas,categoryIcon("clear"),contentX(394),95,68,68,"ArchiveV10CategoryIcon");component(canvas,"icon_ring",contentX(392),93,72,72);
+        headerIcon=icon(canvas,categoryIcon("clear"),contentX(394),95,68,68,"ArchiveV10CategoryIcon");component(canvas,"icon_ring",contentX(392),93,72,72).AddClass("ArchiveParchmentIconRing");
         serif(label(canvas,"存档",contentX(480),103,650,54,42,"#fff5df","left","ArchiveV10_page_title"));
         component(canvas,"section_strip",contentX(375),195,780,35,"ArchiveV10SectionStrip");serif(label(canvas,"收集条目",contentX(392),198,700,28,23,"#fff1d6","left","ArchiveV10SectionTitle"));
         gridHost=make("Panel",canvas,"ArchiveV10GridHost","ArchiveV10GridHost");pos(gridHost,contentX(385),235,767,577);gridHost.hittest=false;gridHost.hittestchildren=true;
@@ -86,7 +86,7 @@
     function renderSidebar(categories){
         var signature=JSON.stringify(categories||[]);if(signature!==sidebarKey){
             sidebar.RemoveAndDeleteChildren();sidebarButtons={};var ids=order.slice();list(categories).forEach(function(row){if(row.id!=="ex"&&row.id!=="friend"&&row.id!=="wife"&&row.id!=="beast"&&ids.indexOf(row.id)<0)ids.push(row.id);});
-            ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32);var text=serif(label(button,categoryName(id),47,5,narrow(231),29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text};});sidebarKey=signature;
+            ids.forEach(function(id){var button=make("Button",sidebar,"ArchiveV10Category_"+id,"ArchiveV10Button ArchiveParchmentCategory");button.hittestchildren=false;icon(button,categoryIcon(id),6,3,28,28);component(button,"icon_ring",4,1,32,32).AddClass("ArchiveParchmentIconRing");var text=serif(label(button,categoryName(id),47,5,narrow(231),29,21,"#f0eadb"));button.SetPanelEvent("onactivate",function(){if(!alive()||!valid(button))return;hideTooltip();filterMenu.visible=false;cfg.SurvivalArchive.SelectCategory(id);});sidebarButtons[id]={panel:button,text:text};});sidebarKey=signature;
         }
         layoutSidebar();
     }
@@ -122,12 +122,12 @@
         style(cell.name,{color:state===false?"#a5a396":"#f6edd4"});
         // One-time entitlements need no repeated 0/1 label; real stacks/caps and
         // pending quantities retain their independent authoritative text.
-        cell.countHost.visible=!known||Number(item.count)>1||Number(item.target)>1||Number(item.max_owned)>1;
+        cell.countHost.visible=!known||Number(item.count)>1||(current!=="points"&&(Number(item.target)>1||Number(item.max_owned)>1));
         var compactName=String(item.name||"").replace(/\s*[（(]功能版[）)]\s*$/,"").replace(/[·・]\s*永久\s*$/,"");
         if(cell.count.text!==quantity)cell.count.text=quantity;if(cell.name.text!==compactName)cell.name.text=compactName;
     }
     function decorate(card,item,slot){
-        if(current==="commerce_goods"){decorateCommerce(card,item,slot);return;}
+        if(current==="commerce_goods"||current==="points"){decorateCommerce(card,item,slot);return;}
         var resource=cfg.SurvivalItemResources&&cfg.SurvivalItemResources.Lookup(item);
         var nativeIcon=cfg.ArchiveV10Icons&&cfg.ArchiveV10Icons.Resolve(item,current),cell=card.__v10,artKey=JSON.stringify([current,item.id,item.icon,item.icon_type,item.icon_style,nativeIcon&&nativeIcon.iconKey,resource&&resource.id,resource&&resource.uri]);
         if(!cell||!valid(cell.host)||cell.artKey!==artKey){
@@ -177,10 +177,19 @@
         if(current==="work"||current==="building"){cell.state.visible=true;pos(cell.state,284,12,338,25);cell.state.text=Number(item.completed)===1?(current==="building"?"已满级":"已激活"):"点击"+(current==="building"?"升级":"激活")+" · "+item.cost+(current==="building"?" 信仰值":" 软妹币");cell.name.style.width="260px";}
     }
 
+    var monthlyNotes={shadow:"月卡玩家掉落+1",map_level:"月卡玩家双倍在线时长",work:"月卡玩家双倍效果",fragment:"每日上限20个，月卡玩家40个",pet:"每日上限30个，月卡玩家90个"};
+    function updateMonthlyFooter(data){
+        var status=p("ArchiveStatus");if(!valid(status))return;
+        var base=status.text||"",note=monthlyNotes[current];
+        if(current==="points"&&base==="效果自动生效")status.text="抽取、签到或兑换后自动点亮 · 悬停查看效果与重复转化积分";
+        if(note&&base.indexOf(note)<0)status.text=base?base+"　·　"+note:note;
+        if(current==="titles"&&!(data&&Number(data.pending)===1))status.text="";
+        if(cfg.SurvivalArchiveFontV36)cfg.SurvivalArchiveFontV36.Render(status);
+    }
     function render(data,category,mode,categories,options){
         if(!alive())return false;var changed=current!==category;if(changed)hideTooltip();current=category;categoryRows=list(categories);
         var signature=JSON.stringify([category,mode,data&&data.rows,data&&data.pending,data&&data.upgrade_pending,data&&data.social,data&&data.online,data&&data.buildings,data&&data.fishing,data&&data.starjoy,data&&data.daily_limits,data&&data.has_pass,data&&data.last_draw,data&&data.unavailable,categories,cfg.SurvivalArchiveColors]);
-        if(active&&signature===displayKey)return true;displayKey=signature;enter(options);renderSidebar(categories);
+        if(active&&signature===displayKey){updateMonthlyFooter(data);return true;}displayKey=signature;enter(options);renderSidebar(categories);
         p("ArchiveV10_page_title").text=categoryName(current);headerIcon.SetImage(headerEmblem(current));
         var leaderboard=current==="shop",leaderboardView=cfg.SurvivalEndlessLeaderboard;
         p("ArchiveV10FilterToggle").visible=!leaderboard;
@@ -209,6 +218,8 @@
         if(current==="building"&&data&&data.buildings)details="信仰值："+data.buildings.faith;
         if(current==="fishing"&&data&&data.fishing&&data.fishing.faith!==undefined)details="信仰值："+data.fishing.faith;
         if(current==="starjoy_points"&&data&&data.starjoy)details="累计星悦积分 "+data.starjoy.earned+" · 可用余额 "+data.starjoy.balance;
+        if(current==="points")details="抽奖道具仅解锁一次 · 重复获得转为商城积分";
+        if(current==="points")p("ArchiveStatus").text="抽取、签到或兑换后自动点亮 · 悬停查看效果与重复转化积分";
         if(current==="commerce_goods")details="购买或兑换后自动点亮 · 悬停查看效果与解锁条件";
         if(current==="commerce_goods")p("ArchiveStatus").text="购买或兑换成功后点亮 · 效果沿用已有商品与存档记录";
         context.text=details;context.visible=!!details;
@@ -216,7 +227,8 @@
         var grid=p("ArchiveGrid");pos(grid,0,0,767,draw?511:577);style(grid,{flowChildren:"none"});pos(gridHost,contentX(385),235,767,draw?511:577);
         var drawBar=p("ArchiveDrawBar");pos(drawBar,contentX(397),755,735,52);drawBar.SetHasClass("ArchiveHidden",!draw||!data||!data.social);drawBar.style.visibility=draw&&data&&data.social?"visible":"collapse";
         pos(p("ArchiveTickets"),0,0,515,23);pos(p("ArchiveDrawResult"),0,26,515,23);pos(p("ArchiveDraw"),537,4,190,42);
-        var footer=p("ArchiveFooter");pos(footer,contentX(390),815,748,24);style(footer,{flowChildren:"none",backgroundColor:"transparent",border:"0px",marginTop:"0px",marginBottom:"0px",marginLeft:"0px",marginRight:"0px"});footer.visible=true;pos(p("ArchiveStatus"),0,0,748,24);style(p("ArchiveStatus"),{fontSize:"15px",color:"#c4b89e",textOverflow:"ellipsis",marginTop:"0px",marginBottom:"0px",marginLeft:"0px",marginRight:"0px",horizontalAlign:"left",verticalAlign:"top"});p("ArchiveContext").visible=false;
+        var footer=p("ArchiveFooter");pos(footer,contentX(390),815,748,24);style(footer,{flowChildren:"none",backgroundColor:"transparent",border:"0px",marginTop:"0px",marginBottom:"0px",marginLeft:"0px",marginRight:"0px"});footer.visible=true;pos(p("ArchiveStatus"),0,0,748,24);style(p("ArchiveStatus"),{fontFamily:'"Source Han Sans SC"',fontWeight:"normal",textShadow:"none",fontSize:"15px",color:"#c4b89e",textOverflow:"ellipsis",marginTop:"0px",marginBottom:"0px",marginLeft:"0px",marginRight:"0px",horizontalAlign:"left",verticalAlign:"top"});p("ArchiveContext").visible=false;
+        updateMonthlyFooter(data);
         if(valid(hover)&&hover.visible&&hover.__archiveItem)showTooltip(hover.__archiveItem,current,hover);else if(hover)hideTooltip();
         if(A.HideCardText)A.HideCardText();
         if(Game.IsInToolsMode&&Game.IsInToolsMode()&&lastReportedCategory!==current){lastReportedCategory=current;$.Schedule(.15,function(){if(alive()&&active)$.Msg("ARCHIVE_V10_VIEW "+JSON.stringify(api.Inspect()));});}
@@ -239,7 +251,9 @@
     A.Hide=function(){hideTooltip();return originalHide();};
     var api=cfg.SurvivalArchiveV10={
         Render:render,Fit:fit,IsAlive:alive,RequestTooltipHide:queueTooltipHide,Leave:function(){hideTooltip();active=false;displayKey="";if(cfg.SurvivalEndlessLeaderboard)cfg.SurvivalEndlessLeaderboard.Hide();if(valid(filterMenu))filterMenu.visible=false;if(valid(canvas))canvas.visible=false;},
-        Inspect:function(){var win=p("ArchiveWindow"),cp=valid(canvas)?canvas.GetPositionWithinWindow():null,cards=valid(p("ArchiveGrid"))?p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}):[];return {active:active,category:current,categories:order.slice(),shellIdentity:canvas&&canvas.id,layout:current==="commerce_goods"?"commerce_goods_grid":"parchment_rows",rows:rows.map(function(item){return {id:item.id,count:item.count,quantity:S.Quantity(item,current),unlocked:S.State(item,current),name:item.name};}),geometry:{canvas:cp,window:valid(win)?win.GetPositionWithinWindow():null,width:valid(win)?win.actuallayoutwidth:0,height:valid(win)?win.actuallayoutheight:0,firstCount:cards.length?{position:cards[0].__v10.count.GetPositionWithinWindow(),width:cards[0].__v10.count.actuallayoutwidth,textAlign:cards[0].__v10.count.style.textAlign,font:cards[0].__v10.count.style.fontFamily,weight:cards[0].__v10.count.style.fontWeight}:null},tooltipVisible:valid(tip)&&tip.visible,missingIcons:Object.keys(missingIcons)};},
+        RegisterToolsProbe:function(){if(api.__consistencyProbe||!Game.IsInToolsMode||!Game.IsInToolsMode()||!Game.AddCommand)return;api.__consistencyProbe="archive_consistency_"+Date.now();Game.AddCommand(api.__consistencyProbe,function(){if(!alive())return;var data=api.Inspect(),legacy=p("ArchiveV10CategoryIcon"),glyph=legacy&&legacy.__archiveBlackGoldSymbol;$.Msg("ARCHIVE_CONSISTENCY "+JSON.stringify({build:data.build,category:current,layout:data.layout,rows:rows.length,owned:rows.filter(function(item){return S.State(item,current)===true;}).length,tooltip:tooltip?tooltip.Inspect():null,dismiss:cfg.SurvivalTooltipDismiss?cfg.SurvivalTooltipDismiss.Inspect():null,hoverTargets:p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}).slice(0,40).map(function(card){var at=card.GetPositionWithinWindow();return {id:card.__archiveItem&&card.__archiveItem.id,x:at.x,y:at.y,width:card.actuallayoutwidth*viewScale,height:card.actuallayoutheight*viewScale};}),firstCards:p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}).slice(0,2).map(function(card){return {position:card.style.position,width:card.style.width,height:card.style.height};}),headerGlyph:valid(glyph)?glyph.style.position:null,legacyHeader:valid(legacy)?legacy.style.position:null,headerRings:valid(canvas)?canvas.Children().filter(function(node){return node.BHasClass("ArchiveParchmentIconRing")&&node.visible;}).length:0}));},"",0);$.Msg("ARCHIVE_CONSISTENCY_COMMAND "+api.__consistencyProbe);},
+        ApplyTypography:function(){if(cfg.SurvivalArchiveFontV36){cfg.SurvivalArchiveFontV36.Scope(canvas);cfg.SurvivalArchiveFontV36.Render(p("ArchiveStatus"));}},
+        Inspect:function(){var win=p("ArchiveWindow"),cp=valid(canvas)?canvas.GetPositionWithinWindow():null,cards=valid(p("ArchiveGrid"))?p("ArchiveGrid").Children().filter(function(card){return card.visible&&card.__v10;}):[];return {build:"archive-consistency-20261020-v1",active:active,category:current,categories:order.slice(),shellIdentity:canvas&&canvas.id,layout:current==="commerce_goods"?"commerce_goods_grid":current==="points"?"points_grid":"parchment_rows",rows:rows.map(function(item){return {id:item.id,count:item.count,quantity:S.Quantity(item,current),unlocked:S.State(item,current),name:item.name};}),geometry:{canvas:cp,window:valid(win)?win.GetPositionWithinWindow():null,width:valid(win)?win.actuallayoutwidth:0,height:valid(win)?win.actuallayoutheight:0,firstCount:cards.length?{position:cards[0].__v10.count.GetPositionWithinWindow(),width:cards[0].__v10.count.actuallayoutwidth,textAlign:cards[0].__v10.count.style.textAlign,font:cards[0].__v10.count.style.fontFamily,weight:cards[0].__v10.count.style.fontWeight}:null},tooltipVisible:valid(tip)&&tip.visible,missingIcons:Object.keys(missingIcons)};},
         Dispose:function(){if(disposed)return;hideTooltip();if(tooltip)tooltip.Dispose();tooltip=null;active=false;disposed=true;subscriptions.forEach(function(id){if(GameEvents.Unsubscribe)GameEvents.Unsubscribe(id);});subscriptions=[];moved.forEach(function(entry){if(valid(entry.node)&&valid(entry.parent))entry.node.SetParent(entry.parent);});moved=[];if(valid(canvas))canvas.DeleteAsync(0);if(valid(marker))marker.DeleteAsync(0);canvas=null;balances=[];filters={};sidebarKey="";var win=p("ArchiveWindow");if(valid(win)){win.RemoveClass("ArchiveV10Page");win.RemoveClass("ArchiveParchmentPage");}}
     };
     return api;

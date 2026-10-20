@@ -43,7 +43,7 @@ test('Commerce hover is synchronous and informational with one active cancellabl
     assert.equal(h.jobs.size, 0);
 });
 
-test('Entering a scaled tooltip dismisses, blocks redisplay, and rearms only after physical exit', () => {
+test('Entering a scaled tooltip dismisses continuous hover and rearms on a fresh source entry', () => {
     const h = harness({nativeScale: .75, fitScale: .5}), first = h.bind(), second = h.bind({}, {y: 400});
     h.hover(first); h.advance(0);
     const tipBounds = first.surface.GetPositionWithinWindow();
@@ -56,7 +56,7 @@ test('Entering a scaled tooltip dismisses, blocks redisplay, and rearms only aft
     first.card.events.onmouseover(); second.card.events.onmouseover(); h.advance(.2);
     assert(!first.tip.BHasClass('Visible')); assert(!second.tip.BHasClass('Visible'));
     h.inside(first.card); first.card.events.onmouseover();
-    assert(!first.tip.BHasClass('Visible'), 'returning directly to the source does not rearm');
+    assert(first.tip.BHasClass('Visible'), 'Returning after leaving the source rearms without exiting the old tooltip footprint');
     const source = first.card.GetPositionWithinWindow();
     const sourceRight = source.x + first.card.actuallayoutwidth * h.fitScale;
     assert(sourceRight < tipBounds.x, 'fixture leaves a physical gap between source and tooltip');
@@ -421,7 +421,7 @@ test('Negative controls reproduce the old missed-fast-return and internally clip
         dismissTransform: code => oldDismiss(code.replace(/\r\n/g, '\n'))})),
         /Returning after a real physical exit/, 'The old race must be caught by the fast-return regression');
     assert.throws(() => wholeRowSwitch(harness({sourceTransform: oldSourceLeave}), {switches: 1}),
-        /before a watcher tick/, 'A whole-row entry underneath the old popup catches source-leave lock retention');
+        /Each real source exit releases its previous owner/, 'Even with shared source rearming, obsolete source owners must be disposed');
     const oldClamp = code => code + '\n.BLMarketDetail .RCProductEffect { max-height:600px; overflow:squish scroll; }';
     assert.throws(() => {
         const h = harness({cssTransform: oldClamp}), entry = actualBundle(h, 'video_bundle_b004');

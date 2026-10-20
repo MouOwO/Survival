@@ -184,6 +184,11 @@
             backing.Resize(padding,padding,surfaceWidth,measuredHeight); frame.Resize(padding,padding,surfaceWidth,measuredHeight);
             rect(surface,padding,padding,surfaceWidth,measuredHeight); rect(shadow,padding,padding,surfaceWidth,measuredHeight);
             style(viewport,{height:Math.max(1,measuredHeight-verticalGutter)+"px"});
+            // Passive descriptions must not consume entry into an icon behind
+            // their painted rectangle. Only real overflow needs mouse input.
+            var interactive=contentHeight>measuredHeight-verticalGutter+1 || tooltipOverflows();
+            panel.hittestchildren=interactive;surface.hittest=interactive;surface.hittestchildren=interactive;
+            viewport.hittest=interactive;viewport.hittestchildren=interactive;
         }
         function trackAnchor(epoch, origin) {
             if (!options.watchAnchor) return;
@@ -253,7 +258,7 @@
         }
         return {
             Show:show, Hide:reset, QueueHide:queueHide, IsVisible:function () { return alive() && panel.visible; }, panel:panel, elements:elements,
-            Inspect:function () { return {visible:alive()&&panel.visible,category:currentCategory,itemId:currentItem&&currentItem.id,anchorId:anchor&&anchor.id,prefix:prefix,surfaceHeight:measuredHeight,nineSlices:{Backing:{count:pieces.Backing.length,asset:backing.__v10Slice.asset,insets:backing.__v10Slice.insets.slice()},Frame:{count:pieces.Frame.length,asset:frame.__v10Slice.asset,insets:frame.__v10Slice.insets.slice()}}}; },
+            Inspect:function () { return {visible:alive()&&panel.visible,category:currentCategory,itemId:currentItem&&currentItem.id,anchorId:anchor&&anchor.id,prefix:prefix,surfaceHeight:measuredHeight,coordinateSpace:alive()?{fit:fitScale,parentX:parent.actualuiscale_x,parentY:parent.actualuiscale_y,rootX:root.actualuiscale_x,rootY:root.actualuiscale_y,parentPosition:parent.GetPositionWithinWindow(),hostPosition:panel.GetPositionWithinWindow(),hostStyle:panel.style.position,anchorWidth:valid(anchor)?anchor.actuallayoutwidth:0,anchorHeight:valid(anchor)?anchor.actuallayoutheight:0}:null,surfaceRect:alive()?tooltipRect(surface):null,anchorRect:valid(anchor)?tooltipRect(anchor):null,nineSlices:{Backing:{count:pieces.Backing.length,asset:backing.__v10Slice.asset,insets:backing.__v10Slice.insets.slice()},Frame:{count:pieces.Frame.length,asset:frame.__v10Slice.asset,insets:frame.__v10Slice.insets.slice()}}}; },
             Dispose:function () { if (disposed) return; hide(); if (dismiss) dismiss.Dispose(); disposed=true; life.Dispose(); if (valid(panel)) panel.DeleteAsync(0); }
         };
     }

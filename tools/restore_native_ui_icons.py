@@ -188,6 +188,13 @@ def main():
         mapping={r['icon_id']:(r['icon_type'],r['icon_name'],r['match_reason']) for r in rows(MAPPING)[1]
             if r.get('enabled')=='1' and not r['icon_id'].startswith('#')}
     paths=native_paths()
+    # Explicit reviewed ability bindings may use shipped custom art. Validate
+    # both source and compiled files; never add unlisted icons or change bindings.
+    for key,(kind,name,_) in mapping.items():
+        if key.startswith('ability:') and kind == 'ability' and re.fullmatch(r'survival/native/[A-Za-z0-9_]+', name):
+            source=ROOT/'panorama/src/images/spellicons'/(name+'.png')
+            compiled=ROOT/resource(kind,name)
+            if source.is_file() and compiled.is_file():paths.add(resource(kind,name))
     missing=[(key,resource(kind,name)) for key,(kind,name,_) in mapping.items() if resource(kind,name) not in paths]
     if missing:raise RuntimeError('Native icons missing: '+json.dumps(missing,ensure_ascii=False))
     if args.check:print('NATIVE_ICON_MAPPING_PASS '+str(len(mapping)));return

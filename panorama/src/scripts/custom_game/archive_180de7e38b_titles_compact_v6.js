@@ -404,7 +404,7 @@
         } else if (current === "work") {
             sourceText = "软妹币来源：实际在线每满 1 分钟 +1"
                 + "\n不足一分钟累计计算"
-                + "\n解锁消耗软妹币 · 通行证不翻倍";
+                + "\n软妹币不翻倍 · 月卡已激活福利效果双倍";
         }
         if (source) {source.__archivePlainText=sourceText;source.html=true;source.text=sourceText.replace(/\d+/g,function(n){return '<font color="'+GameUI.CustomUIConfig().SurvivalArchiveColors.number+'">'+n+'</font>';}).replace(/\n/g,'<br>');source.visible=!!sourceText;}
         panel("ArchiveContent").SetHasClass("ArchiveHasCurrencySource",!!sourceText);

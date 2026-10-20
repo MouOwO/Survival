@@ -1,0 +1,334 @@
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena Label { font-family:"Source Han Sans SC"; }
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena .ArchiveCard:hover { brightness:1.045; }
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena .ArchiveTab:hover { brightness:1.06; }
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveFilters RadioButton:hover { brightness:1.06; }
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveClose:hover { brightness:1.12; background-color:#4e3a6566; }
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveGrid .ArchiveNameHost,
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveGrid .ArchiveCountHost,
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveGrid .ArchiveCostHost,
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveGrid .ArchiveLevelHost {visibility:collapse;}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveGrid .PopupStudyText {width:fit-children;white-space:nowrap;text-overflow:clip;horizontal-align:center;font-family:"Source Han Sans SC";}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveGrid #PopupStudyCount {horizontal-align:right;margin-right:10px;}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveGrid VerticalScrollBar {width:5px;background-image:none;background-color:#161829;}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveGrid VerticalScrollBar .ScrollThumb {background-image:none;background-color:#786294;border:0px;border-radius:0px;}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveTabs VerticalScrollBar {width:4px;background-color:#161b30;}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveTabs VerticalScrollBar .ScrollThumb {background-color:#70628e;border:0px;}
+.PopupArenaHeroResource {background-image:url("file://{images}/custom_game/popup_study/arena_empty_v11.png");}
+
+.PopupArenaResource_heading_endless {background-image:url("file://{images}/custom_game/popup_study/arena_heading_endless.png");}
+.PopupArenaResource_nav_endless {background-image:url("file://{images}/custom_game/popup_study/arena_nav_endless.png");}
+.PopupArenaResource_heading_clear {background-image:url("file://{images}/custom_game/popup_study/arena_heading_clear.png");}
+.PopupArenaResource_nav_clear {background-image:url("file://{images}/custom_game/popup_study/arena_nav_clear.png");}
+.PopupArenaResource_heading_shadow {background-image:url("file://{images}/custom_game/popup_study/arena_heading_shadow.png");}
+.PopupArenaResource_nav_shadow {background-image:url("file://{images}/custom_game/popup_study/arena_nav_shadow.png");}
+.PopupArenaResource_heading_points {background-image:url("file://{images}/custom_game/popup_study/arena_heading_points.png");}
+.PopupArenaResource_nav_points {background-image:url("file://{images}/custom_game/popup_study/arena_nav_points.png");}
+.PopupArenaResource_heading_map_level {background-image:url("file://{images}/custom_game/popup_study/arena_heading_map_level.png");}
+.PopupArenaResource_nav_map_level {background-image:url("file://{images}/custom_game/popup_study/arena_nav_map_level.png");}
+.PopupArenaResource_heading_work {background-image:url("file://{images}/custom_game/popup_study/arena_heading_work.png");}
+.PopupArenaResource_nav_work {background-image:url("file://{images}/custom_game/popup_study/arena_nav_work.png");}
+.PopupArenaResource_heading_gift {background-image:url("file://{images}/custom_game/popup_study/arena_heading_gift.png");}
+.PopupArenaResource_nav_gift {background-image:url("file://{images}/custom_game/popup_study/arena_nav_gift.png");}
+.PopupArenaResource_heading_fragment {background-image:url("file://{images}/custom_game/popup_study/arena_heading_fragment.png");}
+.PopupArenaResource_nav_fragment {background-image:url("file://{images}/custom_game/popup_study/arena_nav_fragment.png");}
+.PopupArenaResource_heading_pet {background-image:url("file://{images}/custom_game/popup_study/arena_heading_pet.png");}
+.PopupArenaResource_nav_pet {background-image:url("file://{images}/custom_game/popup_study/arena_nav_pet.png");}
+.PopupArenaResource_heading_boss {background-image:url("file://{images}/custom_game/popup_study/arena_heading_boss.png");}
+.PopupArenaResource_nav_boss {background-image:url("file://{images}/custom_game/popup_study/arena_nav_boss.png");}
+.PopupArenaResource_heading_shop {background-image:url("file://{images}/custom_game/popup_study/arena_heading_shop.png");}
+.PopupArenaResource_nav_shop {background-image:url("file://{images}/custom_game/popup_study/arena_nav_shop.png");}
+.PopupArenaResource_heading_friend {background-image:url("file://{images}/custom_game/popup_study/arena_heading_friend.png");}
+.PopupArenaResource_nav_friend {background-image:url("file://{images}/custom_game/popup_study/arena_nav_friend.png");}
+.PopupArenaResource_heading_ex {background-image:url("file://{images}/custom_game/popup_study/arena_heading_ex.png");}
+.PopupArenaResource_nav_ex {background-image:url("file://{images}/custom_game/popup_study/arena_nav_ex.png");}
+.PopupArenaResource_heading_beast {background-image:url("file://{images}/custom_game/popup_study/arena_heading_beast.png");}
+.PopupArenaResource_nav_beast {background-image:url("file://{images}/custom_game/popup_study/arena_nav_beast.png");}
+.PopupArenaResource_heading_fishing {background-image:url("file://{images}/custom_game/popup_study/arena_heading_fishing.png");}
+.PopupArenaResource_nav_fishing {background-image:url("file://{images}/custom_game/popup_study/arena_nav_fishing.png");}
+.PopupArenaResource_heading_building {background-image:url("file://{images}/custom_game/popup_study/arena_heading_building.png");}
+.PopupArenaResource_nav_building {background-image:url("file://{images}/custom_game/popup_study/arena_nav_building.png");}
+.PopupArenaResource_heading_starjoy_points {background-image:url("file://{images}/custom_game/popup_study/arena_heading_starjoy_points.png");}
+.PopupArenaResource_nav_starjoy_points {background-image:url("file://{images}/custom_game/popup_study/arena_nav_starjoy_points.png");}
+.PopupArenaResource_heading_titles {background-image:url("file://{images}/custom_game/popup_study/arena_heading_titles.png");}
+.PopupArenaResource_nav_titles {background-image:url("file://{images}/custom_game/popup_study/arena_nav_titles.png");}
+.PopupArenaResource_heading_archive {background-image:url("file://{images}/custom_game/popup_study/arena_heading_archive.png");}
+.PopupArenaResource_nav_archive {background-image:url("file://{images}/custom_game/popup_study/arena_nav_archive.png");}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena .ArchiveCard.ArchiveHovered {brightness:1.045;}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena .ArchivePromote:hover {brightness:1.15;}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena .ArchivePromote:disabled {brightness:.68;}
+
+.PopupArenaStateResource_unlocked {background-image:url("file://{images}/custom_game/popup_study/arena_state_unlocked.png");}
+.PopupArenaStateResource_locked {background-image:url("file://{images}/custom_game/popup_study/arena_state_locked.png");}
+.PopupArenaStateResource_detail {background-image:url("file://{images}/custom_game/popup_study/arena_state_detail.png");}
+/* Quiet geometric edges; metadata, actions and titles retain their native meaning. */
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena .ArchiveCard {transition-property:brightness;transition-duration:.12s;}
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena .ArchiveCard:hover .PopupStudyCardTrace {brightness:1.25;}
+
+.PopupArenaV11Resource0 {background-image:url("file://{images}/custom_game/popup_study/arena_card_trace_v11.svg");}
+.PopupArenaV11Resource1 {background-image:url("file://{images}/custom_game/popup_study/arena_hero_trace_v11.svg");}
+.PopupArenaV11Resource2 {background-image:url("file://{images}/custom_game/popup_study/arena_field_trace_v11.svg");}
+.PopupArenaV12FontResource0 {background-image:url("file://{images}/custom_game/popup_study/arena_font_v12_0.png");}
+
+.PopupArenaV12FontResource1 {background-image:url("file://{images}/custom_game/popup_study/arena_font_v12_1.png");}
+
+.PopupArenaV19Asset95f5a498e8 {background-image:url("file://{images}/custom_game/popup_study/arena_font_v19_0.png");}
+
+.PopupArenaV19Asset66ff9a6083 {background-image:url("file://{images}/custom_game/popup_study/arena_font_v19_1.png");}
+
+.PopupArenaV19Asset8f8822b435 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_archive.svg");}
+
+.PopupArenaV19Assetf4b8294d24 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_beast.svg");}
+
+.PopupArenaV19Asset0764affc3e {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_boss.svg");}
+
+.PopupArenaV19Assetba3d2032cf {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_building.svg");}
+
+.PopupArenaV19Asset6719cd9e07 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_clear.svg");}
+
+.PopupArenaV19Asset576adf2782 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_endless.svg");}
+
+.PopupArenaV19Asset4c076c0be0 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_ex.svg");}
+
+.PopupArenaV19Asset542b523d46 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_fishing.svg");}
+
+.PopupArenaV19Assetf346abe9a2 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_fragment.svg");}
+
+.PopupArenaV19Asset8a19600fe5 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_friend.svg");}
+
+.PopupArenaV19Asset535b20ea39 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_gift.svg");}
+
+.PopupArenaV19Asset1ff171c0ab {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_map_level.svg");}
+
+.PopupArenaV19Asset59b0bef1a3 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_pet.svg");}
+
+.PopupArenaV19Asset6de6936d97 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_points.svg");}
+
+.PopupArenaV19Assetd73a748af8 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_shadow.svg");}
+
+.PopupArenaV19Asset6fbcafbd33 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_shadow_r2.svg");}
+
+.PopupArenaV19Asset91719fe9c5 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_shop.svg");}
+
+.PopupArenaV19Asset1380486084 {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_starjoy_points.svg");}
+
+.PopupArenaV19Asset198fef31ae {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_titles.svg");}
+
+.PopupArenaV19Assetb0b6d97abf {background-image:url("file://{images}/custom_game/popup_study/arena_navicon_v19_work.svg");}
+
+.PopupArenaV19Assetba8a822717 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_archive.png");}
+
+.PopupArenaV19Assetba67d021c3 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_beast.png");}
+
+.PopupArenaV19Assetf0b0f8986a {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_boss.png");}
+
+.PopupArenaV19Asset5643615139 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_building.png");}
+
+.PopupArenaV19Asset8aefdf62a1 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_clear.png");}
+
+.PopupArenaV19Asset1e5f847c7b {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_endless.png");}
+
+.PopupArenaV19Assetadc3b83757 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_ex.png");}
+
+.PopupArenaV19Asset9937e9f34c {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_fishing.png");}
+
+.PopupArenaV19Assetf82b6f4af6 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_fragment.png");}
+
+.PopupArenaV19Asset18aa498911 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_friend.png");}
+
+.PopupArenaV19Asset55506f9275 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_gift.png");}
+
+.PopupArenaV19Asset29de955dda {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_map_level.png");}
+
+.PopupArenaV19Asseted451c12d6 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_pet.png");}
+
+.PopupArenaV19Assetdd80b930ac {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_points.png");}
+
+.PopupArenaV19Asset93b8150f4f {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_shadow.png");}
+
+.PopupArenaV19Asset5eaf3c256d {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_shop.png");}
+
+.PopupArenaV19Asset5595e34156 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_starjoy_points.png");}
+
+.PopupArenaV19Assete74844bb9a {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_titles.png");}
+
+.PopupArenaV19Assetdad579340b {background-image:url("file://{images}/custom_game/popup_study/arena_v19_heading_work.png");}
+
+.PopupArenaV19Assetfb8187dc2a {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_archive.png");}
+
+.PopupArenaV19Asset7abe1809b5 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_beast.png");}
+
+.PopupArenaV19Assetf6bf20fe03 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_boss.png");}
+
+.PopupArenaV19Asset59648df8ce {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_building.png");}
+
+.PopupArenaV19Asset0168bd70c4 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_clear.png");}
+
+.PopupArenaV19Assetfb3ebd6f38 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_endless.png");}
+
+.PopupArenaV19Asset1e14524b36 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_ex.png");}
+
+.PopupArenaV19Asset33f29708cd {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_fishing.png");}
+
+.PopupArenaV19Asset468c103427 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_fragment.png");}
+
+.PopupArenaV19Asset1b149e609a {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_friend.png");}
+
+.PopupArenaV19Asset229c3f3e9d {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_gift.png");}
+
+.PopupArenaV19Assetb4a67e06ef {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_map_level.png");}
+
+.PopupArenaV19Asset51703f3d98 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_pet.png");}
+
+.PopupArenaV19Assetb27d7158e1 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_points.png");}
+
+.PopupArenaV19Asset5655b32deb {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_shadow.png");}
+
+.PopupArenaV19Asset13aeda6374 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_shop.png");}
+
+.PopupArenaV19Asset6ef616338f {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_starjoy_points.png");}
+
+.PopupArenaV19Asset69c3418d90 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_titles.png");}
+
+.PopupArenaV19Asset9d2fee1c4a {background-image:url("file://{images}/custom_game/popup_study/arena_v19_nav_work.png");}
+
+.PopupArenaV19Assetcbd9f90292 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_state_detail.png");}
+
+.PopupArenaV19Assetc1ce73c358 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_state_locked.png");}
+
+.PopupArenaV19Assetd03c0fb6c3 {background-image:url("file://{images}/custom_game/popup_study/arena_v19_state_unlocked.png");}
+
+
+
+.ArchiveRoot #ArchiveWindow.PopupStudy.PopupArena #ArchiveTabs .ArchiveTab:selected {border:1px solid #69607855;border-left:2px solid #b99be088;border-bottom:1px solid #9b6ed999;}
+
+/* White text assets, same project font and dimensions. */
+.PopupArenaV26TextAsset0 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_endless.png");}
+.PopupArenaV26TextAsset1 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_endless.png");}
+.PopupArenaV26TextAsset2 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_clear.png");}
+.PopupArenaV26TextAsset3 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_clear.png");}
+.PopupArenaV26TextAsset4 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_shadow.png");}
+.PopupArenaV26TextAsset5 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_shadow.png");}
+.PopupArenaV26TextAsset6 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_points.png");}
+.PopupArenaV26TextAsset7 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_points.png");}
+.PopupArenaV26TextAsset8 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_map_level.png");}
+.PopupArenaV26TextAsset9 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_map_level.png");}
+.PopupArenaV26TextAsset10 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_work.png");}
+.PopupArenaV26TextAsset11 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_work.png");}
+.PopupArenaV26TextAsset12 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_gift.png");}
+.PopupArenaV26TextAsset13 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_gift.png");}
+.PopupArenaV26TextAsset14 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_fragment.png");}
+.PopupArenaV26TextAsset15 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_fragment.png");}
+.PopupArenaV26TextAsset16 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_pet.png");}
+.PopupArenaV26TextAsset17 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_pet.png");}
+.PopupArenaV26TextAsset18 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_boss.png");}
+.PopupArenaV26TextAsset19 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_boss.png");}
+.PopupArenaV26TextAsset20 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_shop.png");}
+.PopupArenaV26TextAsset21 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_shop.png");}
+.PopupArenaV26TextAsset22 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_friend.png");}
+.PopupArenaV26TextAsset23 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_friend.png");}
+.PopupArenaV26TextAsset24 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_ex.png");}
+.PopupArenaV26TextAsset25 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_ex.png");}
+.PopupArenaV26TextAsset26 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_beast.png");}
+.PopupArenaV26TextAsset27 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_beast.png");}
+.PopupArenaV26TextAsset28 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_fishing.png");}
+.PopupArenaV26TextAsset29 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_fishing.png");}
+.PopupArenaV26TextAsset30 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_building.png");}
+.PopupArenaV26TextAsset31 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_building.png");}
+.PopupArenaV26TextAsset32 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_starjoy_points.png");}
+.PopupArenaV26TextAsset33 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_starjoy_points.png");}
+.PopupArenaV26TextAsset34 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_titles.png");}
+.PopupArenaV26TextAsset35 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_titles.png");}
+.PopupArenaV26TextAsset36 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_heading_archive.png");}
+.PopupArenaV26TextAsset37 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_nav_archive.png");}
+.PopupArenaV26TextAsset38 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_state_unlocked.png");}
+.PopupArenaV26TextAsset39 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_state_locked.png");}
+.PopupArenaV26TextAsset40 {background-image:url("file://{images}/custom_game/popup_study/arena_v26_state_detail.png");}
+
+/* Crisp white primary glyphs and captions; geometry unchanged. */
+.PopupArenaV28TextAsset0 {background-image:url("file://{images}/custom_game/popup_study/arena_font_v28_primary_0.png");}
+.PopupArenaV28TextAsset1 {background-image:url("file://{images}/custom_game/popup_study/arena_font_v28_primary_1.png");}
+.PopupArenaV28TextAsset2 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_endless.png");}
+.PopupArenaV28TextAsset3 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_endless.png");}
+.PopupArenaV28TextAsset4 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_clear.png");}
+.PopupArenaV28TextAsset5 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_clear.png");}
+.PopupArenaV28TextAsset6 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_shadow.png");}
+.PopupArenaV28TextAsset7 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_shadow.png");}
+.PopupArenaV28TextAsset8 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_points.png");}
+.PopupArenaV28TextAsset9 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_points.png");}
+.PopupArenaV28TextAsset10 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_map_level.png");}
+.PopupArenaV28TextAsset11 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_map_level.png");}
+.PopupArenaV28TextAsset12 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_work.png");}
+.PopupArenaV28TextAsset13 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_work.png");}
+.PopupArenaV28TextAsset14 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_gift.png");}
+.PopupArenaV28TextAsset15 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_gift.png");}
+.PopupArenaV28TextAsset16 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_fragment.png");}
+.PopupArenaV28TextAsset17 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_fragment.png");}
+.PopupArenaV28TextAsset18 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_pet.png");}
+.PopupArenaV28TextAsset19 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_pet.png");}
+.PopupArenaV28TextAsset20 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_boss.png");}
+.PopupArenaV28TextAsset21 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_boss.png");}
+.PopupArenaV28TextAsset22 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_shop.png");}
+.PopupArenaV28TextAsset23 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_shop.png");}
+.PopupArenaV28TextAsset24 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_friend.png");}
+.PopupArenaV28TextAsset25 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_friend.png");}
+.PopupArenaV28TextAsset26 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_ex.png");}
+.PopupArenaV28TextAsset27 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_ex.png");}
+.PopupArenaV28TextAsset28 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_beast.png");}
+.PopupArenaV28TextAsset29 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_beast.png");}
+.PopupArenaV28TextAsset30 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_fishing.png");}
+.PopupArenaV28TextAsset31 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_fishing.png");}
+.PopupArenaV28TextAsset32 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_building.png");}
+.PopupArenaV28TextAsset33 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_building.png");}
+.PopupArenaV28TextAsset34 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_starjoy_points.png");}
+.PopupArenaV28TextAsset35 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_starjoy_points.png");}
+.PopupArenaV28TextAsset36 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_titles.png");}
+.PopupArenaV28TextAsset37 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_titles.png");}
+.PopupArenaV28TextAsset38 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_heading_archive.png");}
+.PopupArenaV28TextAsset39 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_nav_archive.png");}
+.PopupArenaV28TextAsset40 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_state_unlocked.png");}
+.PopupArenaV28TextAsset41 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_state_locked.png");}
+.PopupArenaV28TextAsset42 {background-image:url("file://{images}/custom_game/popup_study/arena_v28_state_detail.png");}
+
+/* Sidebar-only Bold glyph dependencies. */
+.PopupArenaV30NavBoldAsset0 {background-image:url("file://{images}/custom_game/popup_study/arena_font_v30_navbold_0.png");}
+.PopupArenaV30NavBoldAsset1 {background-image:url("file://{images}/custom_game/popup_study/arena_font_v30_navbold_1.png");}
+
+/* Package V1 sidebar text image dependencies; existing visual styles are unchanged. */
+.PopupSidebarTypeV1Resource_normal_endless {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/endless.png");}
+.PopupSidebarTypeV1Resource_selected_endless {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/endless.png");}
+.PopupSidebarTypeV1Resource_normal_clear {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/clear.png");}
+.PopupSidebarTypeV1Resource_selected_clear {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/clear.png");}
+.PopupSidebarTypeV1Resource_normal_shadow {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/shadow.png");}
+.PopupSidebarTypeV1Resource_selected_shadow {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/shadow.png");}
+.PopupSidebarTypeV1Resource_normal_points {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/points.png");}
+.PopupSidebarTypeV1Resource_selected_points {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/points.png");}
+.PopupSidebarTypeV1Resource_normal_map_level {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/map_level.png");}
+.PopupSidebarTypeV1Resource_selected_map_level {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/map_level.png");}
+.PopupSidebarTypeV1Resource_normal_work {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/work.png");}
+.PopupSidebarTypeV1Resource_selected_work {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/work.png");}
+.PopupSidebarTypeV1Resource_normal_gift {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/gift.png");}
+.PopupSidebarTypeV1Resource_selected_gift {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/gift.png");}
+.PopupSidebarTypeV1Resource_normal_fragment {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/fragment.png");}
+.PopupSidebarTypeV1Resource_selected_fragment {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/fragment.png");}
+.PopupSidebarTypeV1Resource_normal_pet {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/pet.png");}
+.PopupSidebarTypeV1Resource_selected_pet {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/pet.png");}
+.PopupSidebarTypeV1Resource_normal_boss {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/boss.png");}
+.PopupSidebarTypeV1Resource_selected_boss {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/boss.png");}
+.PopupSidebarTypeV1Resource_normal_shop {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/shop.png");}
+.PopupSidebarTypeV1Resource_selected_shop {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/shop.png");}
+.PopupSidebarTypeV1Resource_normal_friend {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/friend.png");}
+.PopupSidebarTypeV1Resource_selected_friend {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/friend.png");}
+.PopupSidebarTypeV1Resource_normal_ex {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/ex.png");}
+.PopupSidebarTypeV1Resource_selected_ex {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/ex.png");}
+.PopupSidebarTypeV1Resource_normal_beast {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/beast.png");}
+.PopupSidebarTypeV1Resource_selected_beast {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/beast.png");}
+.PopupSidebarTypeV1Resource_normal_fishing {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/fishing.png");}
+.PopupSidebarTypeV1Resource_selected_fishing {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/fishing.png");}
+.PopupSidebarTypeV1Resource_normal_building {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/building.png");}
+.PopupSidebarTypeV1Resource_selected_building {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/building.png");}
+.PopupSidebarTypeV1Resource_normal_starjoy_points {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/starjoy_points.png");}
+.PopupSidebarTypeV1Resource_selected_starjoy_points {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/starjoy_points.png");}
+.PopupSidebarTypeV1Resource_normal_titles {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/titles.png");}
+.PopupSidebarTypeV1Resource_selected_titles {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/titles.png");}
+.PopupSidebarTypeV1Resource_normal_archive {background-image:url("file://{images}/custom_game/sidebar_type_v1/normal/archive.png");}
+.PopupSidebarTypeV1Resource_selected_archive {background-image:url("file://{images}/custom_game/sidebar_type_v1/selected/archive.png");}

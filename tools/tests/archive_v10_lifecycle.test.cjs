@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const {csv} = require('../shop_ui_12h/catalog.cjs');
 const repo = path.resolve(__dirname, '../..');
 const sourceRoot = path.join(repo, 'panorama/src/scripts/custom_game');
-const graph = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/tooltip_dismiss.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'archive_v10.js', 'archive_180de7e38b_titles_compact_v6.js'];
+const graph = ['ui_snapshot_cache.js', 'archive_purple.js', 'archive_v10_data.js', 'archive_parchment_data.js', 'common/tooltip_dismiss.js', 'common/menu_v10.js', 'archive_v10_semantics.js', 'common/archive_tooltip.js', 'common/archive_font_v36.js', 'archive_v10.js', 'archive_180de7e38b_titles_compact_v6.js'];
 const manifest = fs.readFileSync(path.join(repo, 'panorama/src/layout/custom_game/archive.xml'), 'utf8');
 graph.forEach(name => assert(manifest.includes('/' + name + '"'), 'Exercise the active production graph: ' + name));
 const sources = Object.fromEntries(graph.map(name => [name, fs.readFileSync(path.join(sourceRoot, name), 'utf8')]));
@@ -281,12 +281,15 @@ assert(nodes.get('ArchiveV10Overview').text.startsWith('已解锁 4 / 6 项'), '
 for (const [id, text] of [['points_unique_owned', '已解锁'], ['points_unique_locked', '未解锁'], ['points_unique_unknown', '状态待同步'], ['points_unique_legacy', '已解锁']]) {
     const row = cards().find(card => card.__archiveItem.id === id);
     assert.equal(row.__v10.count.text, text);
-    assert.equal(row.__v10.track.visible, false, 'Unique points rows never show a numeric completion track');
-    assert.equal(row.__v10.fill.visible, false);
+    assert.equal(row.__v10.track, undefined, 'Points use compact icons instead of completion tracks');
+    assert.equal(row.__v10.countHost.visible, id === 'points_unique_unknown' || id === 'points_unique_legacy');
 }
 const dailyPointsCard = cards().find(card => card.__archiveItem.id === 'daily_health_gem');
 assert.equal(dailyPointsCard.__v10.count.text, '3/999999');
-assert.equal(dailyPointsCard.__v10.track.visible, true, 'Daily gems retain quantity progress on the same points page');
+assert.equal(dailyPointsCard.__v10.track, undefined, 'Daily gems share the platform icon grid');
+assert.equal(dailyPointsCard.__v10.countHost.visible, true);
+assert.equal(cfg.SurvivalArchiveV10.Inspect().layout, 'points_grid');
+assert.equal(cards()[1].style.position, '106px 0px 0px');
 assert.equal(cards().find(card => card.__archiveItem.id === 'points_uncapped').__v10.count.text, '4');
 pointsApi.Filter('unlocked');
 assert.equal(nodes.get('ArchiveV10FilterText').text, '已解锁');
@@ -296,6 +299,18 @@ assert.equal(nodes.get('ArchiveV10FilterText').text, '未解锁');
 assert.deepEqual(cards().map(card => card.__archiveItem.id), ['points_unique_locked'], 'Unknown unique inventory never appears as locked');
 pointsApi.Filter('all');
 assert.equal(JSON.stringify(pointsRows), pointsBefore, 'Rendering and filtering never clamp historical counts or alter authoritative rows');
+// Monthly copy is applied after authoritative business rendering, on every refresh.
+for (const [category, note] of Object.entries({shadow:'月卡玩家掉落+1',map_level:'月卡玩家双倍在线时长',work:'月卡玩家双倍效果',fragment:'每日上限20个，月卡玩家40个',pet:'每日上限30个，月卡玩家90个'})) {
+    cfg.SurvivalArchive.SelectCategory(category);
+    snapshot(category, 50000, []);
+    assert(nodes.get('ArchiveStatus').text.includes(note));
+    snapshot(category, 50001, []);
+    assert.equal(nodes.get('ArchiveStatus').text.split(note).length - 1, 1, 'Refresh never duplicates the monthly note');
+}
+cfg.SurvivalArchive.SelectCategory('titles');snapshot('titles',50002,[]);
+assert.equal(nodes.get('ArchiveStatus').text,'','Title explanation removed');
+assert.equal(nodes.get('ArchiveV10WindowTitle').style.fontFamily,'"Source Han Sans SC"');
+assert.equal(nodes.get('ArchiveV10WindowTitle').style.fontWeight,'bold');
 const rootApi = cfg.SurvivalArchive; root.DeleteAsync();
 assert.doesNotThrow(() => { rootApi.Close(); rootApi.Dispose(); rootApi.Dispose(); advance(5); });
 cfg.SurvivalMenuV10.Dispose(); assert.equal(liveSubscriptions().length, 0);

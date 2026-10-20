@@ -92,7 +92,8 @@ function M.grant_ticket(command, save, pool, pass)
     local rule = rules.by_id[pool]
     if not rule or not rule.enabled then return false, "奖池无效" end
     local key = "social_" .. pool
-    local accepted = daily_limits.grant(save, key, 1, assert(command.day_key), pass)
+    local amount = 1 + (pass == true and (tonumber(rule.pass_extra_count) or 0) or 0)
+    local accepted = daily_limits.grant(save, key, amount, assert(command.day_key), pass)
     save.social_tickets[rule.currency_id] = (save.social_tickets[rule.currency_id] or 0) + accepted
     return true
 end

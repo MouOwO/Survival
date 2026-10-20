@@ -12,8 +12,8 @@ $taskRecords=@()
 foreach($relative in $taskFiles){
  $authored=Join-Path $taskRepo ('panorama/src/'+$relative)
  $source=$authored
- # Native bar crops are versioned under art; panorama/src/images is ignored.
- if($relative -like 'images/custom_game/loading/warcraft_loading_*.png'){$source=Join-Path $taskRepo ('art/ui/sources/'+($relative -replace '^images/',''))}
+ # Loading image sources are versioned under art; panorama/src/images is ignored.
+ if($relative -like 'images/custom_game/loading/warcraft_loading_*.png' -or $relative -eq 'images/custom_game/loading/dawnward_citadel_background.png'){$source=Join-Path $taskRepo ('art/ui/sources/'+($relative -replace '^images/',''))}
  if(-not(Test-Path -LiteralPath $source)){throw "Missing source $relative"}
  $compiled=$relative -replace '\.js$','.vjs_c' -replace '\.css$','.vcss_c' -replace '\.xml$','.vxml_c' -replace '\.png$','_png.vtex_c'
  $content=Join-Path $taskContent $relative

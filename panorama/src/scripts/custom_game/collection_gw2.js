@@ -12,12 +12,12 @@ var shared=cfg.SurvivalCollectionState||(cfg.SurvivalCollectionState={pages:{},v
 // Catalog probabilities and rarities require fresh authoritative snapshots.
 // Migrate only the cached view: an unresolved purchase keeps its original nonce.
 if(shared.raritySchema!==1){shared.pages={};shared.versions={};shared.raritySchema=1;}
-var active=true,opened=false,current="ex",assemblies={},resync={},fetchJob=null,fetching=false;
+var active=true,opened=false,current="beast",assemblies={},resync={},fetchJob=null,fetching=false;
 var canvas,grid,gridBody,empty,draw,drawText,drawCost,tickets,currencyName,summary,result,tooltip,tipPanel,ownershipFilter=0;
 var filterOpen=false,filterDismiss,filterMenu,filterItems=[];
 var rewardHighlight=null;
 var scale=1,cardsKey="",visibleRows=[],slots=[],tabs={},nodes={},api,createdRoots=[];
-var names={ex:"我的前女友",friend:"我的前男友",wife:"我的老婆",beast:"瑞兽赐福"};
+var names={beast:"瑞兽赐福",ex:"我的前女友",friend:"我的前男友",wife:"我的老婆"};
 var filterNames=["全部收藏","已拥有","未拥有"];
 var rarityColors={UR:"#ef5350",SSR:"#f5c65e",SR:"#b680ee",R:"#74c8f2",N:"#8fc47b"};
 function rarity(item){var quality=String(item.quality||"").trim().toUpperCase(),recognized=Object.prototype.hasOwnProperty.call(rarityColors,quality);return {quality:recognized?quality:"",color:recognized?rarityColors[quality]:"#88939b"};}
@@ -108,7 +108,8 @@ summary=label(canvas,"",80,68,600,24,15,"#debc6f","CollectionGW2Summary");
 image(canvas,"s2r://panorama/images/icon_ticket_png.vtex",80,size[1]-44,24,20,"CollectionGW2TicketIcon");
 currencyName=label(canvas,"",111,size[1]-45,72,24,15,"#aa9c7e","CollectionGW2CurrencyName");
 tickets=label(canvas,"",188,size[1]-49,100,30,18,"#debc6f","CollectionGW2Tickets");
-result=label(canvas,"",300,size[1]-44,420,26,14,"#a5987c","CollectionGW2Result");
+var monthlyNote=label(canvas,"月卡玩家每次胜利额外获取+1",280,size[1]-45,450,24,15,"#d3c8ae","CollectionGW2MonthlyNote");monthlyNote.hittest=false;
+result=label(canvas,"",280,size[1]-23,450,21,14,"#a5987c","CollectionGW2Result");
 draw=make("Button",canvas,"CollectionGW2Draw","CollectionGW2Button CollectionGW2Draw");rect(draw,size[0]-216,size[1]-54,176,40);style(draw,{backgroundImage:"none",backgroundColor:"transparent",border:"0px",boxShadow:"none"});draw.hittestchildren=false;
 nine(draw,"button",0,0,176,40,"CollectionGoldPrimary");
 var drawHover=make("Panel",draw,"","CollectionGW2Hover");rect(drawHover,0,0,176,40);style(drawHover,{backgroundColor:"#fff1bf0c",border:"1px solid #e8ce8555"});drawHover.hittest=false;
@@ -203,6 +204,7 @@ function render(){
  drawCost.visible=drawText.text==="抽取";rect(drawText,drawCost.visible?24:0,9,drawCost.visible?64:176,24);
  var outcome=shared.outcome&&shared.outcome.pool_id===current?shared.outcome:null;
  result.text=shared.pending?"奖励正在结算，请稍候…":outcome&&!outcome.ok?outcome.error||"抽取未完成，请稍后重试":"";
+ if(cfg.SurvivalArchiveFontV36)[monthlyNote,currencyName,tickets,result,summary,drawText,nodes.CollectionGW2Category,nodes.CollectionGW2FilterText].forEach(cfg.SurvivalArchiveFontV36.Render);
 }
 function request(full,category){
  if(!alive())return;fetching=true;category=category||current;

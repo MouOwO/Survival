@@ -3,7 +3,7 @@ local events = require("core/events")
 local M = class({})
 
 function M:GetAbilityTextureName()
-    return "furion_force_of_nature"
+    return "survival/native/train_lumberjack_01"
 end
 
 function M:GetBehavior() return DOTA_ABILITY_BEHAVIOR_NO_TARGET end

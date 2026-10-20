@@ -1,2 +1,2 @@
--- CANDIDATE ONLY
-return { protocol=1, hash="b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93" }
+-- Generated from verified live monthly archive overlay; previous cloud release retained.
+return { protocol = 1, hash = "0763266ab8d30552fe16b69b5f78c12e073509f525d6b6ad007db34163901b3e" }

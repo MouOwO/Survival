@@ -1,0 +1,22 @@
+{
+  "release": "20261020-monthly-archive-0763266ab8d3",
+  "bundle": "0763266ab8d30552fe16b69b5f78c12e073509f525d6b6ad007db34163901b3e",
+  "parent_release": "20261020-mode-chain-b3c342e1de0d-v1",
+  "fragment_daily_limits": [
+    20,
+    40
+  ],
+  "cage_daily_limits": [
+    30,
+    90
+  ],
+  "social_daily_limits": [
+    10,
+    20
+  ],
+  "monthly_challenge_extra_ticket": 1,
+  "map_pass_effect": "double_online_time_only",
+  "work_pass_effect": "double_activated_work_benefits",
+  "real_player_test_writes": 0,
+  "status": "already_deployed_and_verified_before_this_git_sync"
+}

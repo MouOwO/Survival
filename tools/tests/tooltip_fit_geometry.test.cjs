@@ -4,16 +4,21 @@ const base='panorama/src/scripts/custom_game/',helper=fs.readFileSync(base+'comm
 // Daily rewards now use the archive renderer directly; its former independent
 // geometry mapper no longer exists. The shared archive mapper remains covered.
 const files=['common/archive_tooltip.js','common/menu_v10.js','lottery_gw2.js','archive_handoff_180de7e38b.js'];
-function mapper(source,values){
- const start=source.indexOf('function tooltipRect('),brace=source.indexOf('{',start);assert(start>=0);let depth=1,end=brace+1;
+function declaration(source,name){
+ const start=source.indexOf('function '+name+'('),brace=source.indexOf('{',start);assert(start>=0);let depth=1,end=brace+1;
  for(;depth;end++){if(source[end]==='{')depth++;else if(source[end]==='}')depth--;}
- const context=vm.createContext(values);vm.runInContext(source.slice(start,end),context);return context.tooltipRect;
+ return source.slice(start,end);
 }
-function node(id,x,y,width,height,parent){return {id,style:{},visible:true,events:{},actuallayoutwidth:width,actuallayoutheight:height,actualuiscale_x:1.7,actualuiscale_y:1.7,IsValid:()=>true,GetParent:()=>parent,GetPositionWithinWindow:()=>({x,y}),SetPanelEvent(name,fn){this.events[name]=fn;}};}
+function mapper(source,values){
+ const context=vm.createContext(values);
+ if(source.includes('function canvasScale('))vm.runInContext(declaration(source,'canvasScale'),context);
+ vm.runInContext(declaration(source,'tooltipRect'),context);return context.tooltipRect;
+}
+function node(id,x,y,width,height,parent){return {id,style:{},visible:true,events:{},actuallayoutwidth:width,actuallayoutheight:height,actualuiscale_x:1.7,actualuiscale_y:1.7,IsValid:()=>true,GetParent:()=>parent,GetPositionWithinWindow:()=>({x,y}),SetPanelEvent(name,fn){this.events[name]=fn;},BHasClass(){return false;}};}
 for(const file of files)for(const fit of [.5,1.4]){
  const source=fs.readFileSync(base+file,'utf8');assert(source.includes('getRect:tooltipRect'),file+' supplies its mapper to the shared policy');
  const root=node('Root',0,0,1920,1080),window=node('ArchiveWindow',0,0,1200,900,root);window.style.transform='scale3d('+fit+','+fit+',1)';
- const read=mapper(source,{scale:fit,fitScale:fit,root});
+ const read=mapper(source,{scale:fit,fitScale:fit,root,p:id=>id==='LotteryMainCanvas'?window:null,valid:n=>!!n&&n.IsValid()});
  const anchor=node('Source',20,20,100,60,window),surface=node('Surface',400,200,320,198,window);
  // Actual layout dimensions already contain native UI scale. Apply only the
  // missing CSS Fit transform, while preserving the screen-space origin.
@@ -27,7 +32,7 @@ for(const file of files)for(const fit of [.5,1.4]){
  cursor=[21,21];assert(show());cursor=[box.x+box.width+1,box.y+4];tick();assert(surface.visible,file+' does not dismiss beyond the scaled right edge');
  cursor=[box.x+box.width-1,box.y+box.height-1];tick();assert(!surface.visible,file+' dismisses at the scaled bottom-right interior');assert.equal(hidden,1);
  assert(!show(),file+' freezes the scaled tooltip region after dismissal');
- const anchorBox=read(anchor);cursor=[anchorBox.x+anchorBox.width-1,anchorBox.y+anchorBox.height-1];assert(!show(),file+' also scales the source lock region');
+ const anchorBox=read(anchor);cursor=[anchorBox.x+anchorBox.width-1,anchorBox.y+anchorBox.height-1];assert(show(),file+' rearms at the actual scaled source after leaving it');
  cursor=[box.x+box.width+5,box.y+box.height+5];tick();assert(show(),file+' rearms outside both transformed regions');policy.Dispose();
  if(file==='archive_handoff_180de7e38b.js'){
   const rootTip=node('ArchiveTooltip',400,200,320,198,root),legacy=read(rootTip);assert.equal(legacy.width,320,'Root-level legacy tooltip does not inherit the source window Fit');

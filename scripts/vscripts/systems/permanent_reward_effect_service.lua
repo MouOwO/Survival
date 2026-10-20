@@ -11,6 +11,7 @@ local totals_by_player = {}
 local live_draw_ids = {}
 local minute_growth = {}
 local boss_effects_by_player = {}
+local monthly_effects_by_player = {}
 local hero_ticks_by_player = {}
 local tower_ticks_by_player = {}
 local hero_tick_attributes_by_player = {}
@@ -125,6 +126,16 @@ local function refresh(payload)
         add_values(totals_by_player[player_id], require('systems/commerce_effects').project(save, totals_by_player[player_id]))
         add_values(totals_by_player[player_id], lottery_dynamic_effects.project(save))
     end
+    -- Match-projected archive only: pure mode must not consult account history.
+    local monthly_effects = isolated_field and {} or apply_map_level_effects(
+        require("systems/archive_monthly_effects").project(profile))
+    if frozen then
+        for field,value in pairs(monthly_effects_by_player[player_id] or {}) do
+            totals_by_player[player_id][field]=(totals_by_player[player_id][field] or 0)-value
+        end
+    end
+    add_values(totals_by_player[player_id], monthly_effects)
+    monthly_effects_by_player[player_id] = monthly_effects
     local boss_effects
     if profile and profile.mode == "pure" then
         -- The backend projects newly crossed account thresholds relative to
@@ -617,6 +628,7 @@ function M.init()
     totals_by_player = {}
     live_draw_ids = {}
     boss_effects_by_player = {}
+    monthly_effects_by_player = {}
     minute_growth = {}
     hero_ticks_by_player = {}
     tower_ticks_by_player = {}

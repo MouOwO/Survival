@@ -15,6 +15,9 @@ function snapshot(category,sequence,items,extra){emit(packet(category,sequence,i
 function ack(pending,extra){h.emit('survival_archive_social_result',{pool_id:pending.pool_id,request_id:pending.request_id,ok:false,terminal:true,pending:false,...extra});}
 function draws(){return h.sent.filter(r=>r.name==='survival_archive_social_draw');}
 function images(node){return (node.paneltype==='Image'?[node]:[]).concat(node.Children().flatMap(images));}
+assert.equal(nodes.CollectionGW2MonthlyNote.text,'月卡玩家每次胜利额外获取+1');
+assert.equal(nodes.CollectionGW2MonthlyNote.hittest,false);
+for(const [index,id] of ['beast','ex','friend','wife'].entries())assert.equal(nodes['CollectionGW2Tab_'+id].style.position,'13px '+(68+index*54)+'px 0px','Requested collection ordering');
 let api=cfg.SurvivalCollection;
 function chooseOwnership(mode){h.click(nodes.CollectionGW2OwnershipFilter);assert(api.Inspect().filterMenuOpen);h.click(nodes['CollectionGW2FilterOption_'+mode]);assert.equal(api.Inspect().ownershipFilter,mode);assert.equal(api.Inspect().filterMenuOpen,false);assert.equal(nodes.CollectionGW2FilterMenu.visible,false);assert.equal(nodes.CollectionGW2FilterDismiss.visible,false);}
 assert.equal(nodes.CollectionScrim.style.backgroundColor,'#00000022','The flat inventory overrides the generic modal dark scrim after adoption');

@@ -1,0 +1,14 @@
+﻿const assert=require('node:assert/strict');
+const {createHarness}=require('./fixtures/menus_v10_harness.cjs');
+const h=createHarness(),Panel=h.root.constructor;
+h.load('common/archive_font_v36.js');const font=h.cfg.SurvivalArchiveFontV36;
+const label=new Panel('Label',h.root,'FontTest');label.text='通关存档 N1';Object.assign(label.style,{fontSize:'21px',color:'#e0e3d2',width:'180px',height:'29px'});
+font.Render(label);const run=label.FindChildTraverse('ArchiveFontV36Glyphs'),first=run.Children()[0];
+assert.equal(label.text,'通关存档 N1');assert.equal(label.style.color,'#ffffff00');assert(run.Children().length>4);assert.equal(run.hittest,false);assert(run.Children().every(p=>p.hittest===false&&p.hittestchildren===false));
+font.Render(label);assert.equal(run.Children()[0],first,'Stable render reuses glyph panels');
+label.style.color='rgba(255, 255, 255, 0)';font.Render(label);assert.equal(run.Children()[0],first,'Normalized transparent getter never makes glyphs transparent');
+label.style.color='#ad9853';font.Render(label);assert.equal(run.Children()[0].style.washColor,'#ad9853','Keep current black/gold text colors');
+label.text='属性<font color="#ffcc00">+10</font>';font.Render(label);assert(run.Children().some(p=>p.style.washColor==='#ffcc00'),'Retain effect number colors');
+label.text='不可识别😀';font.Render(label);assert.equal(run.visible,false);assert.equal(label.style.color,'#ad9853','Unknown glyphs retain readable native fallback');
+label.text='';font.Render(label);assert.equal(run.visible,false);
+console.log('ARCHIVE_FONT_V36_PASS: existing glyph resources; text/size/layout/colors retained; cached panels; non-interactive; rich colors; native fallback');

@@ -55,7 +55,7 @@ assert.equal(a.elements.Effect.text,mapEffects);assert(a.elements.Condition.text
 delete cfg.ArchiveHandoff.FormatEffects;
 assert(a.Show({...item,description:'累计有效在线时长：90小时\n攻击力+5'},'ex',firstCard));assert.equal(a.elements.Effect.text,'累计有效在线时长：90小时\n攻击力+5','Only map level tooltips move the online requirement');assert.equal(a.elements.Condition.text,'');assert.equal(a.elements.Condition.visible,false,'Changing categories clears the map unlock section');
 assert(a.Show(item,'ex',firstCard));
-assert.notEqual(a.panel,b.panel);assert.notEqual(a.elements.Backing,b.elements.Backing);assert.equal(a.elements.Surface.hittest,true);assert.equal(a.panel.hittest,false,'Shadow bounds do not steal card input');
+assert.notEqual(a.panel,b.panel);assert.notEqual(a.elements.Backing,b.elements.Backing);assert.equal(a.elements.Surface.hittest,false,'Short passive surfaces leave underlying icons reachable');assert.equal(a.panel.hittestchildren,false);assert.equal(a.panel.hittest,false,'Shadow bounds do not steal card input');
 assert.equal(a.elements.Frame.style.visibility,undefined,'Unskinned callers keep the default CSS frame visibility');assert.equal(a.elements.Backing.Children()[0].Children()[0].style.backgroundImage,'url("file://{images}/custom_game/gw2_tooltip_v1/background.png")','Unskinned callers keep their existing background artwork');
 function corners(tip){return ['Backing','Frame'].map(role=>tip.elements[role].Children().filter((_,index)=>[0,2,6,8].includes(index)).map(clip=>({width:clip.style.width,height:clip.style.height,artWidth:clip.Children()[0].style.width,artHeight:clip.Children()[0].style.height})));}
 const shortCorners=corners(a),shortHeight=a.Inspect().surfaceHeight;a.Show({...item,description:'长说明\n'.repeat(150)},'ex',firstCard);h.flushFinite();assert.deepEqual(corners(a),shortCorners,'Changing content height never stretches material corners');assert(a.Inspect().surfaceHeight>shortHeight,'Long content actually changes the material height');assert.equal(a.Inspect().nineSlices.Backing.count,9);assert.equal(a.Inspect().nineSlices.Frame.count,9);
@@ -69,7 +69,7 @@ const scroll=cfg.SurvivalArchiveTooltip.Create(options(firstParent,'ScrollableTi
 // Model native fit-children measurement of the actual populated content body.
 Object.defineProperty(scroll.elements.Body,'actuallayoutheight',{get(){return this.Children().filter(c=>c.visible!==false).reduce((sum,c)=>sum+c.actuallayoutheight+(parseFloat(c.style.marginBottom)||0),0);}});
 h.setCursor(1000,900);assert(scroll.Show({...item,description:'完整长说明\n'.repeat(100)},'ex',firstCard));h.flushFinite();
-assert(scroll.elements.Body.actuallayoutheight>scroll.elements.Viewport.actuallayoutheight,'The real content exceeds the bounded scroll viewport');
+assert(scroll.elements.Body.actuallayoutheight>scroll.elements.Viewport.actuallayoutheight,'The real content exceeds the bounded scroll viewport');assert(scroll.elements.Surface.hittest&&scroll.elements.Viewport.hittest&&scroll.panel.hittestchildren,'Overflow retains real scrollbar input');
 const scrollCreated=h.counts.created,scrollAt=scroll.elements.Surface.GetPositionWithinWindow();
 scroll.QueueHide();h.setCursor(scrollAt.x+10,scrollAt.y+10);scroll.elements.Surface.events.onmouseover();h.flushFinite();
 assert(scroll.IsVisible(),'A long tooltip remains open when crossing the card gap into its existing scroll viewport');

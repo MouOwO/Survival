@@ -26,7 +26,8 @@
         // The original view refreshes the hidden legacy image on each snapshot;
         // the official replacement keeps its own native texture and identity.
         if(glyph.__archiveBlackGoldImage!==image){glyph.SetImage(image);glyph.__archiveBlackGoldImage=image;}
-        paint(glyph,{position:large?"12px 12px 0px":"7px 7px 0px",width:large?"48px":"18px",height:large?"48px":"18px",opacity:large?".9":selected?"1":".62"});
+        var origin=String(legacy.style.position||"0px 0px 0px").split(/\s+/);
+        paint(glyph,{position:large?((parseFloat(origin[0])||0)+12)+"px "+((parseFloat(origin[1])||0)+12)+"px 0px":"7px 7px 0px",width:large?"48px":"18px",height:large?"48px":"18px",opacity:large?".9":selected?"1":".62"});
     }
     function navigationIcon(button,selected){
         var key=navigationIcons[String(button.id||"").replace(/^ArchiveV10Category_/,"")];
@@ -74,8 +75,8 @@
             paint(button,{position:"0px "+(y+(selected?0:2))+"px 0px",width:"100%",height:selected?"37px":"35px",overflow:"noclip",borderBottom:"0px"},true);
             button.Children().forEach(function(child){
                 if(is(child,"ArchiveParchmentCategoryBadge"))paint(child,{position:selected?"16px 3px 0px":"16px 1px 0px"},true);
-                // Compensate SimSun's baseline to center visible text on the glyph.
-                if(is(child,"ArchiveV10Text"))paint(child,{position:selected?"59px 3px 0px":"59px 1px 0px"},true);
+                // Keep the confirmed Source Han glyph baseline after remote synchronization.
+                if(is(child,"ArchiveV10Text"))paint(child,{position:selected?"59px 7px 0px":"59px 5px 0px"},true);
             });
             // Replace solid borders with decorative lines. The selected top line
             // takes over the preceding divider so the highlight meets it exactly.
@@ -124,7 +125,7 @@
         });
         frame(find("ArchiveV10Shell_Background"));
     }
-    function wrap(view){if(!view||views.some(function(entry){return entry.view===view;}))return view;var render=view.Render;var wrapped=function(){var result=render.apply(this,arguments);apply();return result;};view.Render=wrapped;views.push({view:view,render:render,wrapped:wrapped});apply();return view;}
+    function wrap(view){if(!view||views.some(function(entry){return entry.view===view;}))return view;var render=view.Render;var wrapped=function(){var result=render.apply(this,arguments);apply();if(view.ApplyTypography)view.ApplyTypography();return result;};view.Render=wrapped;views.push({view:view,render:render,wrapped:wrapped});apply();return view;}
     var factory=function(){return wrap(originalFactory.apply(this,arguments));};
     if(originalFactory)cfg.SurvivalArchiveV10Factory=factory;
     wrap(cfg.SurvivalArchiveV10);

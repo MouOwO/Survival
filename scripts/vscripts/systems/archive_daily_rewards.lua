@@ -87,9 +87,11 @@ end
 function M.points(profile)
     local counts=profile.save.archive and profile.save.archive.daily_rewards and profile.save.archive.daily_rewards.item_counts or {}
     local rows={}
-    for _,item in ipairs(items.rows) do if (counts[item.item_id] or 0)>0 then
+    -- A collection catalogue includes unowned definitions; account ownership
+    -- changes the state, never the capacity of the page. Read-only projection.
+    for _,item in ipairs(items.rows) do if item.enabled ~= false then
         rows[#rows+1]={id=item.item_id,name=item.display_name,description=item.description,quality=item.quality,
-            icon_type="custom",icon_style="seal",rune="签",count=counts[item.item_id],target=item.max_owned}
+            icon_type="custom",icon_style="seal",rune="签",count=counts[item.item_id] or 0,count_known=1,target=item.max_owned,source_kind="daily"}
     end end
     return rows
 end

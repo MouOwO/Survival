@@ -13,15 +13,20 @@ function tooltip(id,x,y,w=100,h=100){const p=panel(id,x,y,w,h);p.visible=false;l
 const anchor=panel('source',10,10,40,40),other=panel('covered-source',100,100,40,40),first=tooltip('passive',80,80),second=tooltip('another-window',260,80);
 cursor=[20,20];assert(first.show(anchor));step();assert(first.p.visible,'Hovering the source keeps its tooltip visible');
 cursor=[110,110];step();assert(!first.p.visible,'Entering a passive false/false tooltip hides it');assert.equal(first.hidden(),1);
-assert(!first.show(anchor),'The source cannot immediately redisplay after dismiss');
-assert(!second.show(other),'A covered source in another window cannot flash a replacement under the cursor');
-anchor.deleted=true;assert(!second.show(other),'Refreshing or replacing the original card preserves the dismissed area');anchor.deleted=false;
-step();step();assert.equal(first.hidden(),1,'Remaining inside dismissed area does not repeatedly hide');
-cursor=[20,20];assert(!first.show(anchor),'Returning directly to the original source remains blocked');
-cursor=[220,220];step();assert.equal(jobs.size,0,'No polling remains when the cursor leaves the tooltip and source');
-cursor=[20,20];assert(first.show(anchor),'A fresh hover works after leaving both areas');
-first.p.events.onmouseover();assert(!first.p.visible,'Hit tested tooltip entry follows the same immediate rule');
-assert.equal(first.hidden(),2);first.guard.Dispose();assert.equal(jobs.size,0,'Disposal clears the dismissed region and timer');
+assert(!first.show(anchor),'A background refresh cannot redisplay a source that is not under the cursor');
+assert(second.show(other),'A real hover on a different icon inside the old tooltip box must show its own detail');
+second.p.visible=false;second.guard.Hidden();
+// Keep the stale rectangle after an anchor refresh, without blocking a new icon.
+cursor=[20,20];assert(first.show(anchor));cursor=[110,110];step();anchor.deleted=true;
+assert(!first.show(anchor));assert(second.show(other),'Deleted old anchors cannot poison other live icon hovers');anchor.deleted=false;
+second.p.visible=false;second.guard.Hidden();
+// Returning to the source rearms after leaving it. No trip outside both rectangles is required.
+cursor=[20,20];assert(first.show(anchor));cursor=[110,110];step();
+cursor=[20,20];assert(first.show(anchor),'Returning from the tooltip region is a fresh source hover');
+first.p.events.onmouseover();assert(!first.p.visible,'Passive tooltip entry still dismisses immediately');
+assert(!first.show(anchor),'Continuous same-source hover stays blocked to prevent flashing');
+step();assert(!first.p.visible);cursor=[220,220];step();assert.equal(jobs.size,0,'No polling remains after all active regions are left');
+cursor=[20,20];assert(first.show(anchor));first.guard.Dispose();assert.equal(jobs.size,0,'Disposal clears the lock and timer');
 cursor=[110,110];assert(second.show(other));second.retire();step();assert.equal(jobs.size,0,'Retired owner stops scheduling');
 const shared=panel('shared-owner-surface',300,300,80,80);let owning='new',oldHidden=0,newHidden=0;
 const old=cfg.SurvivalTooltipDismiss.Create({panel:shared,isVisible:()=>owning==='old',hide(){oldHidden++;old.Hidden();}});
@@ -59,4 +64,4 @@ vm.createContext(migrationContext);vm.runInContext(source,migrationContext);
 assert.notEqual(migrationCfg.SurvivalTooltipDismiss,legacy,'A preserved old-version config must load the new policy');
 assert.equal(migrationCfg.SurvivalTooltipDismiss.Inspect().version,'1.0.2');
 const migrated=migrationCfg.SurvivalTooltipDismiss;vm.runInContext(source,migrationContext);assert.equal(migrationCfg.SurvivalTooltipDismiss,migrated);assert.equal(migrated.Inspect().owners,0);assert.equal(migrated.Inspect().watching,false);assert.equal(migrationJobs,0,'Initialization and repeated loads never start an idle watcher');
-console.log('TOOLTIP_DISMISS_PASS: passive entry/geometry, cross-window overlap guard, rapid leave/reentry, dynamic hover opt-in, owner isolation and no idle timers');
+console.log('TOOLTIP_DISMISS_PASS: passive entry/geometry, cross-icon rearm inside stale surface, same-source anti-flash, rapid leave/reentry, dynamic hover opt-in, owner isolation and no idle timers');
