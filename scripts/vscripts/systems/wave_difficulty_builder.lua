@@ -55,6 +55,9 @@ end
 function M.build(rows, difficulty_id, mode_id)
     local definition = difficulty_config.get(difficulty_id)
     if not definition then return nil, "difficulty_not_found" end
+    if mode_id == "cold" or mode_id == "scourge" then
+        return require("config/recorded_mode_balance").build_waves(definition, mode_id)
+    end
     if mode_id == "rich" then
         return require("systems/rich_wave_profile").build(definition)
     end

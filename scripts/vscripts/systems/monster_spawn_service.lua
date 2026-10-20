@@ -248,7 +248,7 @@ local function start_encounter(payload)
     end
     FindClearSpaceForUnit(unit, origin, true)
     local profile = combat_profile or archetype
-    if mode_id == "rich" and (difficulty_id == "N2" or difficulty_id == "N3") and combat_profile
+    if (mode_id == "rich" or mode_id == "cold" or mode_id == "scourge") and combat_profile
         and ((tonumber(profile.health) or 0) > 100000000
             or (tonumber(profile.attack) or 0) > 100000000) then
         profile = require("combat/endless_stat_projection").prepare(unit, profile)

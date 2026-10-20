@@ -938,7 +938,13 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     local defer_attack_cap = not class_ticket and definition.native_attack_speed_policy == "bat_only_v1"
         and (definition.passive_skill_ids == nil
             or (type(definition.passive_skill_ids) == "table" and next(definition.passive_skill_ids) == nil))
-    apply_stats(unit, row, definition, defer_attack_cap, true, native_range_ticket)
+    local combat_row = row
+    local mode_id = row.mode_id or state.game_mode
+    if (mode_id == "rich" or mode_id == "cold" or mode_id == "scourge")
+        and ((tonumber(row.health) or 0) > 100000000 or (tonumber(row.attack) or 0) > 100000000) then
+        combat_row = require("combat/endless_stat_projection").prepare(unit, row)
+    end
+    apply_stats(unit, combat_row, definition, defer_attack_cap, true, native_range_ticket)
     local resolved_visual = monster_visual_config.resolve(
         wave_number,
         row.member_role or "normal",

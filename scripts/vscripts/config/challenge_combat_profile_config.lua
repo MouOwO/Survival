@@ -42,6 +42,11 @@ local function clone(value)
 end
 
 function M.resolve(member_id, difficulty_id, mode_id)
+    if mode_id == "cold" or mode_id == "scourge" then
+        if not M.by_member[tostring(member_id or "")] then return nil, nil end
+        return require("config/recorded_mode_balance").resolve_member(
+            tostring(member_id or ""), tostring(difficulty_id or ""), mode_id)
+    end
     if mode_id == "rich" then
         local rich = rich_profiles()[tostring(member_id or "")]
         if not rich and not M.by_member[tostring(member_id or "")] then return nil, nil end

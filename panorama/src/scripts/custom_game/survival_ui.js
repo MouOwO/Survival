@@ -182,7 +182,7 @@
     function modeOptions() {
         var seen = {};
         return optionArray(setup() && setup().mode_options).filter(function (option) {
-            if (!option || ["pure", "standard", "fishing", "rich"].indexOf(option.mode_id) < 0 || seen[option.mode_id]) return false;
+            if (!option || ["pure", "standard", "fishing", "rich", "cold", "scourge"].indexOf(option.mode_id) < 0 || seen[option.mode_id]) return false;
             seen[option.mode_id] = true; return true;
         });
     }
@@ -266,7 +266,7 @@
                 var button = $.CreatePanel("Button", panel("MatchModeOptions"), ""); button.AddClass("MatchModeOption"); button.hittestchildren = false;
                 button.SetHasClass("MatchModeOptionLocked", !modeUnlocked(option));
                 var name = $.CreatePanel("Label", button, ""); name.AddClass("MatchModeOptionName"); name.html = false;
-                name.text = option.display_name || (option.mode_id === "pure" ? "纯净模式" : option.mode_id === "fishing" ? "摸鱼模式" : option.mode_id === "rich" ? "丰饶模式" : "常规模式");
+                name.text = option.display_name || ({pure:"纯净模式",standard:"常规模式",fishing:"摸鱼模式",rich:"丰饶模式",cold:"极寒模式",scourge:"天灾模式"}[option.mode_id] || "常规模式");
                 button.SetPanelEvent("onmouseover", function () {
                     if (syncActive() && !modeUnlocked(option)) $.DispatchEvent("DOTAShowTextTooltip", button, modeUnlockHint(option));
                 });
@@ -477,7 +477,7 @@
         setText("DifficultySelectionTitle", "难度选择");
         var optionRows = difficultyOptions(), highest = "";
         optionRows.forEach(function (option) {if (difficultyUnlocked(option) && Number(String(option.difficulty_id).slice(1)) > Number(highest.slice(1) || 0)) highest = String(option.difficulty_id);});
-        var modeNames = {pure:"纯净模式",standard:"常规模式",rich:"丰饶模式"};
+        var modeNames = {pure:"纯净模式",standard:"常规模式",rich:"丰饶模式",cold:"极寒模式",scourge:"天灾模式"};
         var hint = !difficultySelector() ? "等待房主选择难度" : !canConfirmDifficulty() ? "正在读取队伍通关进度……" : "";
         if (highest) hint = (modeNames[confirmedMode()] || "本局模式") + " · 队伍上限 " + highest + (hint ? "\n" + hint : "");
         setText("DifficultySelectionHint", hint);

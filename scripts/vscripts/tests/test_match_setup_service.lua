@@ -31,7 +31,7 @@ assert(setup.select_mode(2, "pure", "match-one").error == "selection_not_host")
 local snapshot = setup.snapshot()
 snapshot.mode_options[1].display_name = "tampered"
 assert(setup.snapshot().mode_options[1].display_name == "纯净模式")
-assert(#setup.snapshot().mode_options == 4)
+assert(#setup.snapshot().mode_options == 6)
 assert(setup.snapshot().mode_options[3].mode_id == "fishing"
     and setup.snapshot().mode_options[3].display_name == "摸鱼模式")
 setup.init("fishing-match")

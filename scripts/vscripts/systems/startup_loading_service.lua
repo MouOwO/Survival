@@ -242,10 +242,13 @@ local function setup_snapshot()
     -- Authentication already fetched all progression maps before mode choice.
     -- Publish every preview now; choosing a mode never needs a progression HTTP
     -- request or a combat profile in order to show the team's difficulty limit.
-    for _, mode in ipairs({ "standard", "pure", "rich" }) do by_mode[mode] = difficulty.snapshot(ids, mode) end
+    for _, mode in ipairs({ "standard", "pure", "rich", "cold", "scourge" }) do
+        by_mode[mode] = difficulty.snapshot(ids, mode)
+    end
     local current = by_mode[value.mode_id] or by_mode.standard
     value.difficulty_options_by_mode = { standard = by_mode.standard.options,
-        pure = by_mode.pure.options, rich = by_mode.rich.options }
+        pure = by_mode.pure.options, rich = by_mode.rich.options,
+        cold = by_mode.cold.options, scourge = by_mode.scourge.options }
     value.difficulty_options = current.options
     value.difficulty_data_ready = current.ready
     value.max_difficulty_id = current.max_difficulty_id

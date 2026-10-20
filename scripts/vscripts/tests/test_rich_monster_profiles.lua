@@ -50,7 +50,7 @@ for number = 1, 10 do
         end
     end
 end
-for _, difficulty in ipairs({"N1", "N4", "N5", "N6", "N10"}) do
+for _, difficulty in ipairs({"N1", "N5", "N6", "N10"}) do
     local rich = assert(profiles.resolve("practice_wood", difficulty, "rich"))
     local legacy = assert(profiles.resolve("practice_wood", difficulty))
     assert(rich ~= legacy, "every rich difficulty must return an independent row")
@@ -58,6 +58,10 @@ for _, difficulty in ipairs({"N1", "N4", "N5", "N6", "N10"}) do
         assert(rich[field] == legacy[field], "migration must retain existing unrecorded difficulty values")
     end
 end
+local n4_room = assert(profiles.resolve("practice_wood", "N4", "rich"))
+assert(n4_room.data_source == "data/balance/mode_monsters_20261020.json"
+    and n4_room.estimated == true and n4_room.field_sources.health.method ~= "video_panel",
+    "N4 rooms use explicitly sourced estimates after the new video import, not a fabricated observation")
 local missing, reason = profiles.resolve("practice_wood", "N999", "rich")
 assert(not missing and reason == "challenge_combat_profile_missing:practice_wood:N999")
 missing, reason = profiles.resolve("unconfigured_monster", "N2", "rich")

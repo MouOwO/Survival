@@ -406,8 +406,8 @@ local function spawn_member(session, member)
     if unit.Script_SetAttackRange and combat_archetype.attack_range then
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
-    if session.game_mode == "rich"
-        and (session.difficulty_id == "N2" or session.difficulty_id == "N3") and combat_profile
+    if (session.game_mode == "rich" or session.game_mode == "cold"
+        or session.game_mode == "scourge") and combat_profile
         and ((tonumber(combat_profile.health) or 0) > 100000000
             or (tonumber(combat_profile.attack) or 0) > 100000000) then
         combat_profile = require("combat/endless_stat_projection").prepare(unit, combat_profile)

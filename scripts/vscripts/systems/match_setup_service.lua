@@ -11,6 +11,10 @@ local mode_options = {
         description = "不选择难度、不生成波次，自动挂机；沿用常规档案并正常保存奖励。" },
     { mode_id = "rich", display_name = "丰饶模式",
         description = "沿用常规档案，丰饶模式难度通关进度独立保存。" },
+    { mode_id = "cold", display_name = "极寒模式",
+        description = "沿用常规档案与解锁进度，使用独立的极寒怪物属性。" },
+    { mode_id = "scourge", display_name = "天灾模式",
+        description = "沿用常规档案与解锁进度，使用独立的天灾怪物属性。" },
 }
 
 local function resource(method, id)
@@ -35,7 +39,10 @@ end
 
 function M.get_session_id() return session_id end
 function M.get_mode() return mode_id end
-function M.get_profile_mode() return (mode_id == "fishing" or mode_id == "rich") and "standard" or mode_id end
+function M.get_profile_mode()
+    return (mode_id == "fishing" or mode_id == "rich" or mode_id == "cold" or mode_id == "scourge")
+        and "standard" or mode_id
+end
 function M.is_fishing_mode() return mode_id == "fishing" end
 function M.is_rich_mode() return mode_id == "rich" end
 function M.is_mode_selected() return mode_id ~= nil end
@@ -86,7 +93,8 @@ function M.select_mode(id, requested, request_session)
         return { ok = false, error = "match_session_mismatch" }
     end
     if not M.is_selector(id) then return { ok = false, error = "selection_not_host" } end
-    if requested ~= "pure" and requested ~= "standard" and requested ~= "fishing" and requested ~= "rich" then
+    if requested ~= "pure" and requested ~= "standard" and requested ~= "fishing" and requested ~= "rich"
+        and requested ~= "cold" and requested ~= "scourge" then
         return { ok = false, error = "mode_not_found" }
     end
     if mode_id ~= nil then

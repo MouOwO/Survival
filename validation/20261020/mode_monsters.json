@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "status": "PASS_OFFLINE",
+  "date": "2026-10-20",
+  "observations": 380,
+  "source_videos": 7,
+  "supported_difficulties": {
+    "cold": [
+      "N1",
+      "N2",
+      "N3",
+      "N4"
+    ],
+    "scourge": [
+      "N1",
+      "N2"
+    ]
+  },
+  "reused_without_video_decode": [
+    "rich:N1",
+    "rich:N2",
+    "rich:N3"
+  ],
+  "coverage_rows": 813,
+  "recorded_wave_batches": 500,
+  "recorded_member_profiles": 180,
+  "recorded_variant_profiles": 12,
+  "updated_rich_difficulty": "N4",
+  "policies": {
+    "per_owner_wave_count": 60,
+    "models_and_timings": "existing",
+    "unobserved_stats": "explicit_field_level_estimates",
+    "account_mode": "standard"
+  },
+  "independent_checks": [
+    {
+      "command": "python tools/mode_monsters_20261020/test_data.py",
+      "tests": 5,
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_recorded_mode_catalog.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_recorded_mode_spawning.lua",
+      "result": "PASS",
+      "formal_births": 360,
+      "variant_births": 12,
+      "member_births": 120,
+      "rebirth_births": 60
+    },
+    {
+      "command": "node tools/tests/recorded_mode_selection.test.cjs",
+      "result": "PASS",
+      "reviewed_source_tested": true
+    },
+    {
+      "command": "python tools/rich_n2_n3_20261018/test_profiles.py",
+      "tests": 12,
+      "result": "PASS",
+      "note": "The managed subset regeneration case was rerun after adding the conditional recorded-mode validator."
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_rich_monster_profiles.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_rich_monster_catalog.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_rich_wave_stat_variants.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_rich_n2_n3_video_fixtures.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_practice_difficulty_profiles.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_difficulty_unlocks.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_match_setup_service.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "lua5.1 scripts/vscripts/tests/test_startup_loading_service.lua",
+      "result": "PASS"
+    },
+    {
+      "command": "node tools/tests/rich_mode_selection.test.cjs",
+      "result": "PASS",
+      "reviewed_source_tested": true
+    }
+  ],
+  "native_resource_compile": {
+    "verified": true,
+    "reviewed_source": "789a0e258684938ecdbcd1403d079b8f0c632a4992042af21e211130bdb888ec",
+    "reviewed_artifact": "dc3a90af37b0ca3c123020dc8e92fabb83a57acbc1a0277d0a1a23fa65bfeaf5"
+  },
+  "native_game_verified": false,
+  "limitations": [
+    "The cold N1 selected-stat panel is outside the recording. Missing rooms/material/sin stats and debuffed boss base armor are explicit estimates.",
+    "Offline production Lua with engine doubles and native UI compilation; no native game session."
+  ]
+}

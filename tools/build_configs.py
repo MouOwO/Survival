@@ -33,6 +33,9 @@ STRICT_CSV_SHAPE_FILES = {
     "rich_wave_definitions.csv",
     "rich_challenge_combat_profiles.csv",
     "rich_wave_stat_variants.csv",
+    "recorded_mode_wave_definitions.csv",
+    "recorded_mode_challenge_combat_profiles.csv",
+    "recorded_mode_wave_stat_variants.csv",
 }
 
 # These CSVs preserve values extracted from the original War3 map. Generated
@@ -867,6 +870,16 @@ def main() -> int:
     rich_builder = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(rich_builder)
     rich_builder.validate_tables(ROOT)
+
+    # Subset fixtures can build the existing rich tables independently. A full
+    # project with the mode consumer must require the complete recorded set.
+    if (ROOT / "scripts/vscripts/config/recorded_mode_balance.lua").exists() or any(
+        source.name.startswith("recorded_mode_") for source in files
+    ):
+        spec = importlib.util.spec_from_file_location("recorded_mode_csv_validation", ROOT / "tools/build_recorded_mode_configs.py")
+        recorded_builder = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(recorded_builder)
+        recorded_builder.validate_tables(ROOT)
 
     tooltip_builder = ROOT / "tools" / "build_tooltip_definitions.py"
     tooltip_built_separately = False
