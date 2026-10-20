@@ -6,6 +6,7 @@ local shadow = require("config/generated/archive_shadow_items")
 local shadow_drop_rules = require("config/generated/archive_shadow_challenge_drop_rules")
 local cage = require("config/generated/archive_cage_items")
 local rules = require("config/generated/archive_challenge_rules").by_id.default
+local daily_limits = require("systems/archive_daily_limits")
 local M = {}
 local function normalize(save)
     save.fragment_counts = save.fragment_counts or {}
@@ -13,12 +14,6 @@ local function normalize(save)
     save.fragment_levels = save.fragment_levels or {}
     save.cage_counts = save.cage_counts or {}
     save.daily = save.daily or {}
-end
-local function daily(save, key)
-    -- Retain day buckets so delayed settlement uses its original quota.
-    local day = save.daily[key]
-    if not day then day = {}; save.daily[key] = day end
-    return day
 end
 local function next_fragment_levels(save, stats, definition, apply)
     local id = definition.fragment_id
@@ -55,11 +50,9 @@ function M.apply(command, save, stats, pass, apply, random_int)
     if not definition or not definition.enabled then return false, "archive_challenge_unknown" end
     if definition.reward_kind == "fragment" then
         local fragment = fragments.by_id[definition.reward_key]
-        local day = daily(save, assert(command.day_key))
-        local limit = pass and fragment.pass_daily_limit or fragment.daily_limit
-        local remaining = math.max(0, limit - (day[fragment.fragment_id] or 0))
+        local remaining = daily_limits.remaining(save, fragment.fragment_id, assert(command.day_key), pass)
         local count = grant_fragment(save, stats, fragment, math.min(fragment.drop_count, remaining), apply)
-        day[fragment.fragment_id] = (day[fragment.fragment_id] or 0) + count
+        daily_limits.grant(save, fragment.fragment_id, count, command.day_key, pass)
     elseif definition.reward_kind == "shadow" then
         local drop_rule = shadow_drop_rules.by_id[definition.challenge_id]
         if not drop_rule or not drop_rule.enabled then
@@ -72,20 +65,20 @@ function M.apply(command, save, stats, pass, apply, random_int)
                 return row.source_boss_difficulty == drop_rule.source_boss_difficulty
             end, random_int)
         save.shadow_counts = save.shadow_counts or {}
+        local remaining = daily_limits.remaining(save, "shadow", assert(command.day_key), pass)
         for _, id in ipairs(command.drops) do
             local item = shadow.by_id[id]
             local count = save.shadow_counts[id] or 0
-            if count < item.max_owned then
+            if remaining > 0 and count < item.max_owned then
                 save.shadow_counts[id] = count + 1
+                remaining = remaining - daily_limits.grant(save, "shadow", 1, command.day_key, pass)
                 apply(stats, item)
             end
         end
     elseif definition.reward_kind == "social_ticket" then
-        return require("systems/archive_social_rewards").grant_ticket(command, save, definition.reward_key)
+        return require("systems/archive_social_rewards").grant_ticket(command, save, definition.reward_key, pass)
     elseif definition.reward_kind == "cage" then
-        local day = daily(save, assert(command.day_key))
-        local limit = pass and rules.pass_cage_daily_limit or rules.cage_daily_limit
-        local remaining = math.max(0, limit - (day.cage_total or 0))
+        local remaining = daily_limits.remaining(save, "cage", assert(command.day_key), pass)
         local count = rules.cage_drop_count + (pass and rules.pass_cage_extra_count or 0)
         command.drops = command.drops or roll(cage.rows, count,
             function(row) return row.pool_id == definition.reward_key end, random_int)
@@ -94,8 +87,7 @@ function M.apply(command, save, stats, pass, apply, random_int)
             local owned = save.cage_counts[id] or 0
             if remaining > 0 and owned < item.max_owned then
                 save.cage_counts[id] = owned + 1
-                remaining = remaining - 1
-                day.cage_total = (day.cage_total or 0) + 1
+                remaining = remaining - daily_limits.grant(save, "cage", 1, command.day_key, pass)
                 apply(stats, item)
             end
         end

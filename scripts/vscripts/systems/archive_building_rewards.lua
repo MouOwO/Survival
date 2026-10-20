@@ -1,15 +1,16 @@
 local items = require("config/generated/archive_building_items")
 local rules = require("config/generated/archive_building_rules").by_id.default
+local daily_limits = require("systems/archive_daily_limits")
 local M = {}
 local function state(archive)
     archive.buildings = archive.buildings or { faith = 0, levels = {}, earned_by_day = {} }
     return archive.buildings
 end
-function M.clear(archive, command)
+function M.clear(archive, command, pass)
     local s = state(archive)
     local day = tostring(assert(command.day_key or command.today, "archive_faith_day_missing"))
-    local earned = s.earned_by_day[day] or 0
-    local gain = math.max(0, math.min(rules.faith_per_clear * command.count, rules.faith_daily_cap - earned))
+    local earned = daily_limits.earned(archive, "faith", day)
+    local gain = daily_limits.grant(archive, "faith", rules.faith_per_clear * command.count, day, pass)
     s.faith = s.faith + gain
     s.earned_by_day[day] = earned + gain
 end
@@ -40,8 +41,8 @@ function M.apply(command, archive, stats, apply_effects)
 end
 function M.info(archive, day)
     local s = state(archive)
-    return { faith = s.faith, earned_today = s.earned_by_day[tostring(day)] or 0,
-        daily_cap = rules.faith_daily_cap, per_clear = rules.faith_per_clear }
+    return { faith = s.faith, earned_today = daily_limits.earned(archive, "faith", day),
+        daily_cap = daily_limits.limit("faith", false), per_clear = rules.faith_per_clear }
 end
 function M.rows(archive)
     local s, rows = state(archive), {}

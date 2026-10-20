@@ -30,7 +30,8 @@ function M.apply(command, archive, stats, apply_effects, save)
             local fifths=(tonumber(s.commerce_bonus_fifths) or 0)+earned
             extra=math.floor(fifths/5);s.commerce_bonus_fifths=fifths%5
         end
-        s.coins = s.coins + earned + extra
+        s.coins = s.coins + require("systems/archive_daily_limits").grant(
+            archive, "coins", earned + extra, command.day_key, false)
         s.cursors[command.session] = { actual_seconds = raw, map_seconds = weighted }
         for _, item in ipairs(levels.rows) do
             if item.enabled and item.level > s.map_level and s.map_seconds >= item.required_seconds then

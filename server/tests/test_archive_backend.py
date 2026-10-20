@@ -48,7 +48,7 @@ class Database:
                 op=self.ops[(a,i)]
                 if op['fingerprint']!=p['p_fingerprint']:return {'ok':False,'terminal':True,'error':'archive_id_conflict'}
                 return self.resume(a,i)
-            if name=='archive_resume':return self.resume(a,i)
+            if name=='archive_resume':return self.resume(a,i) if (a,i) in self.ops else {'ok':False,'terminal':True,'error':'archive_operation_missing'}
             if name in ('archive_commit','archive_commit_lottery'):
                 op=self.ops[(a,i)];profile=self.profile(a)
                 if op['done']:return self.resume(a,i)
@@ -178,8 +178,8 @@ class ArchiveTests(unittest.TestCase):
             payload['command']['id']='faithmatch'+str(n)+':clear'
             self.assertTrue(self.service.command(payload)['ok'])
         s=self.profile['save']['archive']['buildings']
-        self.assertEqual(s['faith'],4000)
-        self.assertEqual(s['earned_by_day'],{'20000':4000})
+        self.assertEqual(s['faith'],3000)
+        self.assertEqual(s['earned_by_day'],{'20000':3000})
     def test_conflict_preserves_other_writer(self):
         before=self.profile['save']['gameplay_stats']['initial_wood'];self.db.conflict=True
         self.assertTrue(self.send('clear',difficulty_id='n1',count=1)['ok'])

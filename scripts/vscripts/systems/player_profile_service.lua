@@ -23,6 +23,7 @@ local account_profiles_by_player = {}
 local authenticated_by_player = {}
 local authentication_generation_by_player = {}
 local pending_authentication_by_player = {}
+local daily_limit_views = {}
 
 local function active_session_id()
     if injected_provider then return "injected_fixture" end
@@ -135,6 +136,28 @@ local function validate_progression(progression)
         end
     end
     return true
+end
+
+-- Mode choice precedes loading the combat save. Retain only the authenticated
+-- daily entry permissions needed by that choice, never an entire provider save.
+local function mode_daily_limits(summary)
+    if type(summary) ~= "table" or summary == json_decoder.null then return nil end
+    local date = tonumber(summary.day_key)
+    if not integer(date) or date == math.huge then return nil end
+    local result = {day_key=tostring(date), by_key={}, rows={}}
+    local source = type(summary.by_key) == "table" and summary.by_key or {}
+    for _, key in ipairs({"clear", "mode_rich", "mode_cold", "mode_scourge"}) do
+        local row = source[key]
+        if type(row) == "table" and integer(row.limit) and row.limit < math.huge
+            and integer(row.earned) and row.earned < math.huge
+            and integer(row.remaining) and row.remaining < math.huge then
+            local entry = {key=key, limit=row.limit, earned=row.earned, remaining=row.remaining,
+                capped=row.remaining == 0 and 1 or 0}
+            result.by_key[key] = entry
+            result.rows[#result.rows+1] = entry
+        end
+    end
+    return result
 end
 
 local function current_account_id(player_id)
@@ -554,7 +577,7 @@ function M.authenticate_player(player_id, reason, callback)
     if not provider_ok then return immediate({ ok = false, error = tostring(provider_error) }) end
     local account = current_account_id(player_id)
     if not account then return immediate({ ok = false, error = "account_id_unavailable" }) end
-    if M.is_authenticated_for_account(player_id, account) then
+    if M.is_authenticated_for_account(player_id, account) and reason ~= "daily_limits_rollover" then
         local result = copy(authenticated_by_player[player_id])
         result.ok, result.cached = true, true
         return immediate(result)
@@ -588,7 +611,8 @@ function M.authenticate_player(player_id, reason, callback)
         end
         -- Copy an allowlist, never a provider's full response/save into this cache.
         local confirmed = { authenticated = true, account_id = account, match_session_id = session,
-            progression = copy(receipt.progression) }
+            progression = copy(receipt.progression),
+            daily_limits = mode_daily_limits(receipt.daily_limits or receipt.progression.daily_limits) }
         authenticated_by_player[player_id] = confirmed
         local outcome = copy(confirmed)
         outcome.ok = true
@@ -620,6 +644,15 @@ function M.get_authenticated_progression(player_id)
     player_id = tonumber(player_id)
     local entry = authenticated_by_player[player_id]
     if entry and M.is_authenticated_for_account(player_id, entry.account_id) then return copy(entry.progression) end
+    return nil
+end
+
+function M.get_authenticated_daily_limits(player_id)
+    player_id = tonumber(player_id)
+    local entry = authenticated_by_player[player_id]
+    if entry and M.is_authenticated_for_account(player_id, entry.account_id) then
+        return copy(entry.daily_limits)
+    end
     return nil
 end
 
@@ -925,6 +958,26 @@ function M.get_account_profile(player_id)
     return copy(account_profiles_by_player[tonumber(player_id)] or profile)
 end
 
+-- Ability painting asks for one permission frequently. Cache the small quota
+-- projection by authoritative profile revision/day instead of copying private
+-- inventories once for every ability in each challenge building.
+function M.get_daily_limit(player_id, key)
+    player_id = tonumber(player_id)
+    local loaded = loaded_profile(player_id)
+    if not loaded then return nil end
+    local profile = account_profiles_by_player[player_id] or loaded
+    local calendar = require("systems/archive_calendar")
+    local date, pass = tostring(calendar.day()), calendar.has_pass(profile)
+    local view = daily_limit_views[player_id]
+    if not view or view.profile ~= profile or view.revision ~= profile.revision
+        or view.day ~= date or view.pass ~= pass then
+        view = {profile=profile, revision=profile.revision, day=date, pass=pass,
+            summary=require("systems/archive_daily_limits").snapshot(profile, date)}
+        daily_limit_views[player_id] = view
+    end
+    return copy(view.summary.by_key[key])
+end
+
 function M.get_progression(player_id, mode)
     -- Startup publishes every mode preview each tick. Read only the permission
     -- subsection rather than copying the entire private gameplay save for each.
@@ -1035,6 +1088,7 @@ function M.init(options)
     authenticated_by_player = {}
     authentication_generation_by_player = {}
     pending_authentication_by_player = {}
+    daily_limit_views = {}
     account_profiles_by_player = {}
     player_by_account = {}
     load_generation_by_player = {}

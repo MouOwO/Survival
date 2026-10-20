@@ -20,6 +20,9 @@ FIELDS = {
     "clear": {"difficulty_id","count","day_key","cooperative_win"}, "boss_kill": set(),
     "standard_clear": {"difficulty_id","count","day_key","cooperative_win"},
     "rich_clear": {"difficulty_id","count","day_key","cooperative_win"},
+    "cold_clear": {"difficulty_id","count","day_key","cooperative_win"},
+    "scourge_clear": {"difficulty_id","count","day_key","cooperative_win"},
+    "mode_clear": {"difficulty_id","count","day_key","cooperative_win"},
     "endless": {"wave","difficulty"}, "endless_reconcile": set(), "starjoy_reconcile": set(), "welfare_reconcile": set(),
     "challenge": {"challenge_id","kill_sequence","difficulty_id","day_key"},
     "social_draw": {"pool_id"}, "promotion": {"fragment_id","day_key"},
@@ -91,9 +94,9 @@ class ArchiveService:
             v=c.get(key)
             if isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or int(v)!=v or not lo<=v<=hi: raise ArchiveError("archive_number_invalid:"+key)
             c[key]=int(v)
-        if kind in {"clear", "standard_clear", "rich_clear"}:
+        if kind in {"clear", "standard_clear", "rich_clear", "cold_clear", "scourge_clear", "mode_clear"}:
             if type(c.get("count")) is not int or c["count"]!=1 or not re.fullmatch(r"n(?:[1-9]|1[0-9]|20)",str(c.get("difficulty_id"))): raise ArchiveError("archive_clear_invalid")
-            if kind == "rich_clear" and int(c["difficulty_id"][1:]) > 10: raise ArchiveError("archive_clear_invalid")
+            if kind in {"rich_clear", "cold_clear", "scourge_clear"} and int(c["difficulty_id"][1:]) > 10: raise ArchiveError("archive_clear_invalid")
             if "cooperative_win" in c: integer("cooperative_win",0,1)
         if kind=="endless":
             integer("wave",1,1000);integer("difficulty",1,20)
@@ -187,6 +190,12 @@ class ArchiveService:
             return self.settle(profile, command, False)
         database_id=self.app._database_account_id(account)
         self.app._ensure_gameplay_stats(database_id)
+        from .clear_receipts import lookup
+        receipt = lookup(self, payload, command)
+        if receipt is not None:
+            result = self.finish_prepared(database_id, receipt.operation_id, receipt.prepared,
+                                          clear_mode=receipt.mode_id)
+            return self.app._public_response(result, database_id, account)
         if command['kind'] == 'starjoy_reconcile':
             # Cash grants can cross several tiers during one match. Derive a
             # stable receipt from saved progress, never a client-supplied score.
@@ -234,10 +243,17 @@ class ArchiveService:
                 return {"ok": False, "error": result.get("error"), "results": results, "profile": profile}
         return {"ok": True, "results": results, "profile": profile}
 
-    def finish_prepared(self,account,operation_id,prepared):
+    def finish_prepared(self,account,operation_id,prepared,clear_mode=None):
         for _ in range(4):
             if not prepared.get("ok") or prepared.get("done"): return prepared
             profile,command=prepared["profile"],prepared["command"]
+            if (clear_mode is None and getattr(self.app, "_archive_modes_active", False)
+                    and (command["kind"] in {"clear", "mode_clear"} or command["kind"].endswith("_clear"))):
+                from .clear_receipts import resolve_pending_mode
+                clear_mode = resolve_pending_mode(self, account, command)
+            if clear_mode is not None:
+                from .clear_receipts import bound_command
+                command = bound_command(command, clear_mode)
             reducer=self
             version=prepared.get("config_hash",self.bundle.hash)
             shared_roll = self.shared_challenge_roll(self.bundle)
@@ -247,6 +263,14 @@ class ArchiveService:
             if version!=self.bundle.hash:
                 if not re.fullmatch(r"[0-9a-f]{64}",version): raise ArchiveError("archive_config_invalid")
                 upgraded = upgrades(self.bundle, version, command.get("kind"))
+                # Outstanding reward intents must observe account quotas too.
+                # Completed receipts returned above remain immutable, and a
+                # challenge keeps its originally recorded shared-roll policy.
+                if "archive_daily_limits" in self.bundle.tables and command["kind"] in {
+                    "clear", "standard_clear", "rich_clear", "cold_clear", "scourge_clear",
+                    "mode_clear", "boss_kill", "endless", "challenge", "online_checkpoint",
+                }:
+                    upgraded = True
                 if command["kind"] == "challenge" or not upgraded:
                     recorded_bundle = Bundle(self.bundle.directory.parent/version)
                 # Even an explicitly upgraded reducer must retain the seed
@@ -319,6 +343,7 @@ class ArchiveService:
 def install(application,addon_root,lua):
     from .match_modes import install as install_match_modes
     install_match_modes()
+    application._archive_modes_active = True
     root=Path(addon_root)
     current=json.loads((root/"server/bundles/current.json").read_text(encoding="utf-8"))
     service=ArchiveService(application,Bundle(root/"server/bundles"/current["hash"]),lua)

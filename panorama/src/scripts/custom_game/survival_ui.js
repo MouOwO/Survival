@@ -193,7 +193,17 @@
         return option.unlocked === undefined ? option.mode_id !== "rich"
             : option.unlocked === true || Number(option.unlocked) === 1;
     }
+    function modeDailyCapped(option) {
+        return !!option && (option.daily_capped === true || Number(option.daily_capped) === 1
+            || option.daily_remaining !== undefined && Number(option.daily_remaining) === 0);
+    }
+    function modeSelectable(option) {
+        return modeUnlocked(option) && !modeDailyCapped(option)
+            && option.daily_pending !== true && Number(option.daily_pending) !== 1;
+    }
     function modeUnlockHint(option) {
+        if (option.daily_pending === true || Number(option.daily_pending) === 1) return option.daily_hint || "正在更新今日奖励额度……";
+        if (modeDailyCapped(option)) return option.daily_hint || "今日奖励已达上限";
         if (option.pending === true || Number(option.pending) === 1) return "正在读取解锁进度……";
         return option.unlock_hint || (option.mode_id === "rich" ? "通关常规模式 N10 后解锁" : "尚未解锁该模式");
     }
@@ -227,7 +237,7 @@
     function confirmMode() {
         if (!syncActive()) return;
         if (!admissionComplete() || !needsMode() || !modeSelector() || modePending || !setupSession
-            || !modeOptions().some(function (option) { return option.mode_id === modeChoice && modeUnlocked(option); })) return;
+            || !modeOptions().some(function (option) { return option.mode_id === modeChoice && modeSelectable(option); })) return;
         modePending = true; modeError = "";
         var serial = ++modeRequestSerial, requestedSession = setupSession;
         GameEvents.SendCustomGameEventToServer("survival_loading_mode_select", {session_id: setupSession, mode_id: modeChoice});
@@ -250,6 +260,8 @@
         var messages = {selection_not_host: "由房主统一选择本局模式。", mode_selector_required: "由房主统一选择本局模式。",
             mode_locked: "本局模式已选择，正在刷新。", invalid_mode: "该模式不可用，请重新选择。",
             mode_not_unlocked: "通关常规模式 N10 后解锁丰饶模式。", mode_profile_pending: "正在读取解锁进度，请稍候。",
+            mode_daily_limit_reached: "今日奖励已达上限",
+            mode_daily_limits_pending: "正在更新今日奖励额度，请稍候。",
             rich_mode_locked: "通关常规模式 N10 后解锁丰饶模式。", rich_progression_pending: "正在读取解锁进度，请稍候。",
             mode_not_found: "该模式不可用，请重新选择。", match_session_mismatch: "游戏状态已更新，请等待刷新后重试。",
             session_mismatch: "游戏状态已更新，请等待刷新后重试。", startup_not_ready: "入场准备尚未完成，请稍候。"};
@@ -258,28 +270,28 @@
     }
     function renderModeChoice(ui) {
         var options = modeOptions(), selector = modeSelector();
-        if (!options.some(function (option) { return option.mode_id === modeChoice && modeUnlocked(option); })) modeChoice = "";
+        if (!options.some(function (option) { return option.mode_id === modeChoice && modeSelectable(option); })) modeChoice = "";
         var signature = JSON.stringify(options);
         if (signature !== modeSignature) {
             modeSignature = signature; modeRows = {}; panel("MatchModeOptions").RemoveAndDeleteChildren();
             options.forEach(function (option) {
                 var button = $.CreatePanel("Button", panel("MatchModeOptions"), ""); button.AddClass("MatchModeOption"); button.hittestchildren = false;
-                button.SetHasClass("MatchModeOptionLocked", !modeUnlocked(option));
+                button.SetHasClass("MatchModeOptionLocked", !modeSelectable(option));
                 var name = $.CreatePanel("Label", button, ""); name.AddClass("MatchModeOptionName"); name.html = false;
                 name.text = option.display_name || ({pure:"纯净模式",standard:"常规模式",fishing:"摸鱼模式",rich:"丰饶模式",cold:"极寒模式",scourge:"天灾模式"}[option.mode_id] || "常规模式");
                 button.SetPanelEvent("onmouseover", function () {
-                    if (syncActive() && !modeUnlocked(option)) $.DispatchEvent("DOTAShowTextTooltip", button, modeUnlockHint(option));
+                    if (syncActive() && !modeSelectable(option)) $.DispatchEvent("DOTAShowTextTooltip", button, modeUnlockHint(option));
                 });
                 button.SetPanelEvent("onmouseout", function () { $.DispatchEvent("DOTAHideTextTooltip"); });
                 ui.State.Bind(button, function () {
-                    if (!admissionComplete() || !needsMode() || !modeSelector() || modePending || !modeUnlocked(option)) return;
+                    if (!admissionComplete() || !needsMode() || !modeSelector() || modePending || !modeSelectable(option)) return;
                     modeChoice = option.mode_id; modeError = ""; confirmMode();
                 });
                 modeRows[option.mode_id] = button;
             });
         }
         options.forEach(function (option) { ui.State.Set(modeRows[option.mode_id], {
-            selected: option.mode_id === modeChoice, enabled: selector && !modePending && modeUnlocked(option),
+            selected: option.mode_id === modeChoice, enabled: selector && !modePending && modeSelectable(option),
             busy: modePending && option.mode_id === modeChoice}); });
         setText("DifficultySelectionTitle", "模式选择");
         setText("DifficultySelectionHint", selector ? "" : "等待房主选择模式");

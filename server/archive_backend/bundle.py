@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 
 MODULES = ("archive_settlement", "archive_challenge_rewards", "archive_social_rewards",
-           "archive_daily_rewards", "archive_online_rewards", "archive_endless_config", "archive_endless_rewards", "archive_building_rewards", "lottery_http_settlement", "archive_starjoy_rewards", "archive_vip_rewards", "archive_calendar", "archive_welfare_rewards", "archive_titles", "commerce_settlement", "commerce_effects", "archive_cooperative_reward_policy")
+           "archive_daily_rewards", "archive_daily_limits", "archive_clear_progress", "archive_online_rewards", "archive_endless_config", "archive_endless_rewards", "archive_building_rewards", "lottery_http_settlement", "archive_starjoy_rewards", "archive_vip_rewards", "archive_calendar", "archive_welfare_rewards", "archive_titles", "commerce_settlement", "commerce_effects", "archive_cooperative_reward_policy")
 # Presentation tables have a different schema and never participate in settlement.
 PRESENTATION_CSV = {"archive_icon_presentation.csv", "archive_item_icons.csv", "archive_navigation_icons.csv"}
 
@@ -49,8 +49,12 @@ def build(root: Path, destination: Path | None = None, update_game_config: bool 
               if (root / 'data/csv/商城兑换系统' / (name + '.csv')).is_file()]
     files += [root / "data/csv/玩家档案系统" / (n+".csv") for n in ("player_gameplay_stats","map_level_effect_rules")]
     sources = {"systems/"+n+".lua": (root/"scripts/vscripts/systems"/(n+".lua")).read_text(encoding="utf-8-sig") for n in MODULES}
-    for name in ("lottery_config", "content_id_aliases"):
-        sources["config/"+name+".lua"] = (root/"scripts/vscripts/config"/(name+".lua")).read_text(encoding="utf-8-sig")
+    for name in ("lottery_config", "content_id_aliases", "difficulty_config", "mode_progression", "recorded_mode_balance"):
+        source = root/"scripts/vscripts/config"/(name+".lua")
+        # Older difficulty_config versions have no separate progression module.
+        if name == "mode_progression" and not source.is_file():
+            continue
+        sources["config/"+name+".lua"] = source.read_text(encoding="utf-8-sig")
     for name in ("json_encoder","json_decoder"):
         sources["core/"+name+".lua"] = (root/"scripts/vscripts/core"/(name+".lua")).read_text(encoding="utf-8-sig")
     sources["worker.lua"] = (root/"server/archive_backend/worker.lua").read_text(encoding="utf-8-sig")

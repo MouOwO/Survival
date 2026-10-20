@@ -28,6 +28,7 @@ TABLES = {
     "star_blessing_reward_definition_sets", "star_blessing_reward_definitions",
     "archive_config_sets", "player_archive_state", "archive_entitlements",
     "archive_operations", "archive_online_outbox", "survival_data_migrations", "match_profile_sessions", LEDGER,
+    "fishing_daily_limit_receipts",
 }
 FUNCTIONS = {
     "reject_fishing_immutable_mutation", "fishing_profile_json", "get_fishing_profile",
@@ -35,6 +36,9 @@ FUNCTIONS = {
     "grant_out_of_match_reward", "checkpoint_online_time", "archive_sync_config",
     "archive_resume", "archive_prepare", "archive_commit", "archive_capture_online",
     "archive_online_pending", "archive_pending", "archive_commit_lottery", "match_profile_login", "match_profile_context",
+    "archive_fishing_daily_limit", "archive_finalize_fishing_checkpoint",
+    "grant_out_of_match_reward_before_daily_limits", "checkpoint_online_time_before_daily_limits",
+    "fishing_profile_json_before_daily_limits",
 }
 RPC_SIGNATURES = (
     "get_fishing_profile(text)", "ensure_player_gameplay_stats(text,jsonb)",
@@ -358,16 +362,22 @@ def expected_prefix_objects(bundle, entries):
     tables, functions = set(), set()
     pattern = re.compile(r"\b(create(?:\s+or\s+replace)?|drop)\s+(table|function)\s+"
                          r"(?:if\s+(?:not\s+)?exists\s+)?public\.([a-z_][a-z0-9_]*)", re.I)
+    rename = re.compile(r"\balter\s+function\s+public\.([a-z_][a-z0-9_]*)\s*\([^)]*\)\s+"
+                        r"rename\s+to\s+([a-z_][a-z0-9_]*)", re.I)
     for entry in entries:
         raw = (Path(bundle) / entry["path"]).read_text(encoding="utf-8")
         # SQL comments cannot create an expected object.
         raw = re.sub(r"--[^\n]*|/\*.*?\*/", "", raw, flags=re.S)
-        for action, kind, name in pattern.findall(raw):
+        actions = [(match.start(), *match.groups(), None) for match in pattern.finditer(raw)]
+        actions += [(match.start(), "rename", "function", *match.groups()) for match in rename.finditer(raw)]
+        for _, action, kind, name, renamed in sorted(actions):
             objects = tables if kind.lower() == "table" else functions
             if action.lower().startswith("create"):
                 objects.add("public." + name.lower())
             else:
                 objects.discard("public." + name.lower())
+                if renamed:
+                    objects.add("public." + renamed.lower())
     return tables | {"public." + LEDGER}, functions
 
 

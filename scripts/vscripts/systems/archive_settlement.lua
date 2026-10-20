@@ -2,7 +2,11 @@
 local stats_config = require("config/generated/player_gameplay_stats")
 local achievements = require("config/generated/archive_achievements")
 local challenge_rewards = require("systems/archive_challenge_rewards")
+local daily_limits = require("systems/archive_daily_limits")
+local clear_progress = require("systems/archive_clear_progress")
 local M = {}
+local clear_fields = { clear = "clear_counts", standard_clear = "clear_counts",
+    rich_clear = "rich_clear_counts", cold_clear = "cold_clear_counts", scourge_clear = "scourge_clear_counts" }
 local function copy(value)
     if type(value) ~= "table" then return value end
     local result = {}; for k,v in pairs(value) do result[k]=copy(v) end; return result
@@ -28,7 +32,7 @@ function M.settle(profile, command, pass, context)
     archive.version = 1
     for _,key in ipairs({"clear_counts","completed","shadow_counts","processed"}) do archive[key]=archive[key] or {} end
     if archive.processed[command.id] then return {ok=true,duplicate=true,archive=archive,gameplay_stats=stats} end
-    if (command.kind == "clear" or command.kind == "standard_clear" or command.kind == "rich_clear")
+    if (clear_fields[command.kind] or command.kind == "mode_clear")
         and archive.standard_clear_counts == nil then
         -- Preserve pre-mode historical clears once. Later pure/rich wins cannot
         -- keep extending this compatibility baseline.
@@ -53,42 +57,79 @@ function M.settle(profile, command, pass, context)
     elseif command.kind == "starjoy_reconcile" then
         -- Reconcile above uses saved account points only; no client amount.
     elseif command.kind == "boss_kill" then
-        archive.boss_kills=(tonumber(archive.boss_kills) or 0)+1
+        archive.boss_kills=(tonumber(archive.boss_kills) or 0)
+            + daily_limits.grant(archive, "boss", 1, command.day_key, pass)
     elseif command.kind == "daily_init" or command.kind == "daily_claim" then
         local ok,reason=require("systems/archive_daily_rewards").apply(command,archive,stats,pass,apply_effects)
         if not ok then return {ok=false,terminal=true,error=reason} end
     elseif command.kind == "building_upgrade" or command.kind == "faith_cheat" then
         local ok, reason = require("systems/archive_building_rewards").apply(command, archive, stats, apply_effects)
         if not ok then return {ok=false,terminal=true,error=reason} end
-    elseif command.kind == "clear" or command.kind == "standard_clear" or command.kind == "rich_clear" then
+    elseif clear_fields[command.kind] or command.kind == "mode_clear" then
+        command=copy(command)
+        local mode = command.mode_id or ({standard_clear="standard",rich_clear="rich",
+            cold_clear="cold",scourge_clear="scourge"})[command.kind]
+        if command.kind == "mode_clear" and not clear_progress.is_mode(mode) then
+            return {ok=false,terminal=true,error="archive_mode_clear_invalid"}
+        end
+        if mode and clear_progress.max_available(mode) < (tonumber(command.difficulty_id:sub(2)) or math.huge) then
+            return {ok=false,terminal=true,error="archive_mode_difficulty_unavailable"}
+        end
         if require('systems/commerce_effects').has(profile.save,'double_clear') then
-            command=copy(command);command.count=command.count*2
+            command.count=command.count*2
         end
-        require("systems/archive_building_rewards").clear(archive, command)
-        if command.cooperative_win == 1 then
-            -- One per successful match, regardless of teammate count; shares clear dedup.
-            archive.cooperative_clear_count = require("systems/archive_welfare_rewards").cooperative_wins(archive) + 1
+        local accepted = math.min(command.count, daily_limits.remaining(archive,"clear",command.day_key,pass))
+        local mode_key = mode and "mode_" .. mode
+        if mode_key and (mode == "rich" or mode == "cold" or mode == "scourge") then
+            accepted = math.min(accepted, daily_limits.remaining(archive,mode_key,command.day_key,pass))
         end
-        local difficulty = command.difficulty_id
-        local key = command.kind == "rich_clear" and "rich_clear_counts" or "clear_counts"
-        archive[key] = archive[key] or {}
-        archive[key][difficulty] = (archive[key][difficulty] or 0) + command.count
-        if command.kind == "standard_clear" then
-            archive.standard_clear_counts = archive.standard_clear_counts or {}
-            archive.standard_clear_counts[difficulty] = (archive.standard_clear_counts[difficulty] or 0) + command.count
+        command.count = daily_limits.grant(archive,"clear",accepted,command.day_key,pass)
+        if mode_key and (mode == "rich" or mode == "cold" or mode == "scourge") then
+            daily_limits.grant(archive,mode_key,accepted,command.day_key,pass)
         end
-        for _, item in ipairs(achievements.rows) do
-            if item.enabled and item.difficulty_id == difficulty
-                and archive[key][difficulty] >= item.required_count
-                and not archive.completed[item.achievement_id] then
-                apply_effects(stats, item)
-                archive.completed[item.achievement_id] = true
+        if accepted > 0 then
+            require("systems/archive_building_rewards").clear(archive, command, pass)
+            if command.cooperative_win == 1 then
+                -- One per successful match, regardless of teammate count; shares clear dedup.
+                archive.cooperative_clear_count = require("systems/archive_welfare_rewards").cooperative_wins(archive) + 1
+            end
+            local difficulty = command.difficulty_id
+            local key = mode and mode ~= "pure" and mode ~= "standard" and (mode .. "_clear_counts")
+                or clear_fields[command.kind] or "clear_counts"
+            -- Seed only proven compatibility maps. Pure wins never inherit old
+            -- mixed history, and no history is copied to a different mode.
+            if mode then
+                archive.mode_clear_counts = archive.mode_clear_counts or {}
+                if archive.mode_clear_counts[mode] == nil and mode ~= "pure" then
+                    archive.mode_clear_counts[mode] = copy(archive[mode .. "_clear_counts"] or {})
+                end
+            end
+            archive[key] = archive[key] or {}
+            archive[key][difficulty] = (archive[key][difficulty] or 0) + command.count
+            if mode == "standard" or command.kind == "standard_clear" then
+                archive.standard_clear_counts = archive.standard_clear_counts or {}
+                archive.standard_clear_counts[difficulty] = (archive.standard_clear_counts[difficulty] or 0) + command.count
+            end
+            if mode then
+                command.mode_id = mode
+                local ok,reason = clear_progress.record(archive,command,stats,apply_effects)
+                if not ok then return {ok=false,terminal=true,error=reason} end
+            else
+                for _, item in ipairs(achievements.rows) do
+                    if item.enabled and (not item.mode_id or item.mode_id == "standard") and item.difficulty_id == difficulty
+                        and archive[key][difficulty] >= item.required_count
+                        and not archive.completed[item.achievement_id] then
+                        apply_effects(stats, item)
+                        archive.completed[item.achievement_id] = true
+                    end
+                end
             end
         end
     elseif command.kind == "endless" then
         local config = require("systems/archive_endless_config")
         if not config.wave(command.difficulty, command.wave) then return { ok = false, terminal = true, error = "endless_wave_invalid" } end
-        archive.endless_score = (tonumber(archive.endless_score) or 0) + config.score(command.wave)
+        archive.endless_score = (tonumber(archive.endless_score) or 0)
+            + daily_limits.grant(archive,"endless",config.score(command.wave),command.day_key,pass)
         archive.endless_best_wave = math.max(tonumber(archive.endless_best_wave) or 0, command.wave)
         require("systems/archive_endless_rewards").reconcile(archive, stats, apply_effects)
     elseif command.kind == "endless_reconcile" then

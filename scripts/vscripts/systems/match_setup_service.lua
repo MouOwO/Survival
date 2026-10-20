@@ -64,6 +64,45 @@ local function rich_permission(id)
         and count == math.floor(count), false
 end
 
+local mode_daily_keys = {pure="clear", standard="clear", rich="mode_rich",
+    cold="mode_cold", scourge="mode_scourge"}
+local function daily_capped(quota)
+    return quota and (quota.capped == true or tonumber(quota.capped) == 1
+        or tonumber(quota.remaining) == 0) or false
+end
+local function mode_daily_quota(id, requested)
+    local key = mode_daily_keys[requested]
+    if not key then return nil end
+    local ok, profiles = pcall(require, "systems/player_profile_service")
+    if not ok or type(profiles.get_authenticated_daily_limits) ~= "function" then return nil end
+    if type(profiles.is_authenticating) == "function" and profiles.is_authenticating(id) then return nil, true end
+    local valid, summary = pcall(profiles.get_authenticated_daily_limits, id)
+    if not valid or type(summary) ~= "table" or type(summary.by_key) ~= "table" then return nil end
+    local date = tostring(require("systems/archive_calendar").day())
+    if tostring(summary.day_key) ~= date then
+        if type(profiles.get_daily_limit) == "function" then
+            local global = profiles.get_daily_limit(id, "clear")
+            local quota = key == "clear" and global or profiles.get_daily_limit(id, key)
+            if global or quota then return daily_capped(global) and global or quota end
+        end
+        local profile = type(profiles.get_account_profile) == "function" and profiles.get_account_profile(id)
+        if profile then
+            summary = require("systems/archive_daily_limits").snapshot(profile, date)
+        else
+            -- A menu can remain open over midnight. Refresh on the server;
+            -- no local UI date/reset may grant permission to enter a mode.
+            if type(profiles.authenticate_player) == "function" then
+                profiles.authenticate_player(id, "daily_limits_rollover")
+            end
+            return nil, true
+        end
+    end
+    -- Every combat mode shares the global clear quota as well as any
+    -- independent mode quota. Either exhausted counter closes this entry.
+    if daily_capped(summary.by_key.clear) then return summary.by_key.clear end
+    return summary.by_key[key]
+end
+
 function M.selector_player_id()
     local first = nil
     for id = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
@@ -105,6 +144,11 @@ function M.select_mode(id, requested, request_session)
         local unlocked, pending = rich_permission(tonumber(id))
         if not unlocked then return { ok = false, error = pending and "rich_progression_pending" or "rich_mode_locked" } end
     end
+    local quota, daily_pending = mode_daily_quota(tonumber(id), requested)
+    if daily_pending then return {ok=false, error="mode_daily_limits_pending"} end
+    if daily_capped(quota) then
+        return {ok=false, error="mode_daily_limit_reached"}
+    end
     mode_id, selected_by = requested, tonumber(id)
     return { ok = true, mode_id = mode_id }
 end
@@ -119,6 +163,17 @@ function M.snapshot()
             options[#options].unlocked = unlocked and 1 or 0
             options[#options].pending = pending and 1 or 0
             options[#options].unlock_hint = hint or "常规模式N10通关后解锁"
+        end
+        local quota, daily_pending = mode_daily_quota(M.selector_player_id(), row.mode_id)
+        if daily_pending then
+            options[#options].daily_pending = 1
+            options[#options].daily_hint = "正在更新今日奖励额度……"
+        end
+        if quota then
+            local option = options[#options]
+            option.daily_key, option.daily_earned, option.daily_limit = quota.key, quota.earned, quota.limit
+            option.daily_remaining, option.daily_capped = quota.remaining, daily_capped(quota) and 1 or 0
+            option.daily_hint = "今日奖励已达上限"
         end
     end
     return { mode_selected = M.is_mode_selected(), mode_id = mode_id or "",

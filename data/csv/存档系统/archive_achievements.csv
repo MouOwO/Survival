@@ -1,47 +1,256 @@
-achievement_id,category_id,difficulty_id,required_count,display_name,description,effect_ids,effect_values,icon_style,enabled,source_row,notes
-#中文表头:成就ID,分页ID,难度ID,所需通关次数,名称,效果,词条ID数组,数值数组,自制图标样式,启用,来源行,来源备注
-#types:string,string,string,number,string,string,list,list,string,boolean,number,string
-"clear_n1_1","clear","n1","1","N1（1次）","木材+50","initial_wood","50","scroll","1","5","已核对"
-"clear_n1_3","clear","n1","3","N1（3次）","木材+80","initial_wood","80","scroll","1","6","已核对"
-"clear_n1_5","clear","n1","5","N1（5次）","木材+100","initial_wood","100","scroll","1","7","已核对"
-"clear_n2_1","clear","n2","1","N2（1次）","木材+100","initial_wood","100","scroll","1","8","未悬停显示"
-"clear_n2_3","clear","n2","3","N2（3次）","木材+120","initial_wood","120","scroll","1","9","已核对"
-"clear_n2_5","clear","n2","5","N2（5次）","墙伤害抵挡+50","wall_damage_block","50","scroll","1","10","中等置信"
-"clear_n2_10","clear","n2","10","N2（10次）","墙减伤+0.5%","wall_damage_reduction_pct","0.5","scroll","1","11","已核对"
-"clear_n3_1","clear","n3","1","N3（1次）","木材+120","initial_wood","120","scroll","1","12","未悬停显示"
-"clear_n3_3","clear","n3","3","N3（3次）","木材+120","initial_wood","120","scroll","1","13","已核对"
-"clear_n3_5","clear","n3","5","N3（5次）","每秒木材+1","wood_per_second","1","scroll","1","14","已核对"
-"clear_n3_10","clear","n3","10","N3（10次）","人口+1","initial_population_cap","1","scroll","1","15","已核对"
-"clear_n3_20","clear","n3","20","N3（20次）","伐木数量+2","lumberjack_attack_efficiency","2","scroll","1","16","中等置信"
-"clear_n4_1","clear","n4","1","N4（1次）","金币+140","initial_gold","140","scroll","1","17","未悬停显示"
-"clear_n4_3","clear","n4","3","N4（3次）","木材+160","initial_wood","160","scroll","1","18","未悬停显示"
-"clear_n4_5","clear","n4","5","N4（5次）","防御塔攻击+2%","tower_attack_bonus_pct","2","scroll","1","19","已核对"
-"clear_n4_10","clear","n4","10","N4（10次）","英雄攻击+5%","hero_attack_bonus_pct","5","scroll","1","20","已核对"
-"clear_n4_20","clear","n4","20","N4（20次）","英雄造成伤害攻击+1","hero_damage_attack_growth","1","scroll","1","21","中等置信"
-"clear_n5_1","clear","n5","1","N5（1次）","木材+160","initial_wood","160","scroll","1","22","已核对"
-"clear_n5_3","clear","n5","3","N5（3次）","木材+180","initial_wood","180","scroll","1","23","已核对"
-"clear_n5_5","clear","n5","5","N5（5次）","伐木数量+2","lumberjack_attack_efficiency","2","scroll","1","24","中等置信"
-"clear_n5_10","clear","n5","10","N5（10次）","箭塔攻速+5%","tower_attack_speed_bonus_pct","5","scroll","1","25","已核对"
-"clear_n5_20","clear","n5","20","N5（20次）","英雄攻击加成+2%","hero_attack_bonus_pct","2","scroll","1","26","已核对"
-"clear_n6_1","clear","n6","1","N6（1次）","木材+180","initial_wood","180","scroll","1","27","已核对"
-"clear_n6_3","clear","n6","3","N6（3次）","木材+200","initial_wood","200","scroll","1","28","已核对"
-"clear_n6_5","clear","n6","5","N6（5次）","箭塔攻击加成+1%","tower_attack_bonus_pct","1","scroll","1","29","已核对"
-"clear_n6_10","clear","n6","10","N6（10次）","英雄每级全属性+10","hero_attributes_per_level","10","scroll","1","30","已核对"
-"clear_n6_20","clear","n6","20","N6（20次）","墙每秒生命+10","wall_health_per_second","10","scroll","1","31","未悬停显示"
-"clear_n7_1","clear","n7","1","N7（1次）","木材+200","initial_wood","200","scroll","1","32","未悬停显示"
-"clear_n7_3","clear","n7","3","N7（3次）","金币+300","initial_gold","300","scroll","1","33","已核对"
-"clear_n7_5","clear","n7","5","N7（5次）","人口+1","initial_population_cap","1","scroll","1","34","已核对"
-"clear_n7_10","clear","n7","10","N7（10次）","伐木效率+2","lumberjack_efficiency","2","scroll","1","35","已核对"
-"clear_n7_20","clear","n7","20","N7（20次）","伐木工攻击成长+1","lumberjack_attack_growth","1","scroll","1","36","已核对"
-"clear_n8_1","clear","n8","1","N8（1次）","木材+300","initial_wood","300","scroll","1","37","已核对"
-"clear_n8_3","clear","n8","3","N8（3次）","木材+500","initial_wood","500","scroll","1","38","未悬停显示"
-"clear_n8_5","clear","n8","5","N8（5次）","箭塔攻击加成+3%","tower_attack_bonus_pct","3","scroll","1","39","未悬停显示"
-"clear_n8_10","clear","n8","10","N8（10次）","箭塔攻击加成+3%","tower_attack_bonus_pct","3","scroll","1","40","未悬停显示"
-"clear_n8_20","clear","n8","20","N8（20次）","英雄攻击加成+3%","hero_attack_bonus_pct","3","scroll","1","41","未悬停显示"
-"clear_n9_1","clear","n9","1","N9（1次）","木材+800","initial_wood","800","scroll","1","42","未悬停显示"
-"clear_n9_3","clear","n9","3","N9（3次）","人口+1","initial_population_cap","1","scroll","1","43","未悬停显示"
-"clear_n9_5","clear","n9","5","N9（5次）","英雄初始属性+5000","hero_initial_attributes","5000","scroll","1","44","已核对"
-"clear_n9_10","clear","n9","10","N9（10次）","英雄每秒属性+3","hero_attributes_per_second","3","scroll","1","45","已核对"
-"clear_n9_20","clear","n9","20","N9（20次）","金矿效率+5%","gold_mine_efficiency_pct","5","scroll","1","46","未悬停显示"
-"clear_n10_5","clear","n10","5","N10（5次）","箭塔攻击+5%","tower_attack_bonus_pct","5","scroll","1","47","仅名称/上限可见"
-"clear_n10_10","clear","n10","10","N10（10次）","箭塔攻速+5%","tower_attack_speed_bonus_pct","5","scroll","1","48","仅名称/上限可见"
+achievement_id,category_id,difficulty_id,required_count,display_name,description,effect_ids,effect_values,icon_style,enabled,source_row,notes,mode_id,reward_mode,reward_start,reward_limit,source_video_seconds,source_target
+# 每种模式独立计数；旧常规ID保留；尚未开放的奖励配置不删除。
+#types:string,string,string,number,string,string,list,list,string,boolean,number,string,string,string,number,number,number,number
+clear_n1_1,clear,n1,1,常规 N1（1次）,木材+50,initial_wood,50,scroll,1,5,已核对,standard,milestone,0,1,,
+clear_n1_3,clear,n1,3,常规 N1（3次）,木材+80,initial_wood,80,scroll,1,6,已核对,standard,milestone,0,1,,
+clear_n1_5,clear,n1,5,常规 N1（5次）,木材+100,initial_wood,100,scroll,1,7,已核对,standard,milestone,0,1,,
+clear_n2_1,clear,n2,1,常规 N2（1次）,木材+100,initial_wood,100,scroll,1,8,未悬停显示,standard,milestone,0,1,,
+clear_n2_3,clear,n2,3,常规 N2（3次）,木材+120,initial_wood,120,scroll,1,9,已核对,standard,milestone,0,1,,
+clear_n2_5,clear,n2,5,常规 N2（5次）,墙伤害抵挡+50,wall_damage_block,50,scroll,1,10,中等置信,standard,milestone,0,1,,
+clear_n2_10,clear,n2,10,常规 N2（10次）,墙减伤+0.5%,wall_damage_reduction_pct,0.5,scroll,1,11,已核对,standard,milestone,0,1,,
+clear_n3_1,clear,n3,1,常规 N3（1次）,木材+120,initial_wood,120,scroll,1,12,未悬停显示,standard,milestone,0,1,,
+clear_n3_3,clear,n3,3,常规 N3（3次）,木材+120,initial_wood,120,scroll,1,13,已核对,standard,milestone,0,1,,
+clear_n3_5,clear,n3,5,常规 N3（5次）,每秒木材+1,wood_per_second,1,scroll,1,14,已核对,standard,milestone,0,1,,
+clear_n3_10,clear,n3,10,常规 N3（10次）,人口+1,initial_population_cap,1,scroll,1,15,已核对,standard,milestone,0,1,,
+clear_n3_20,clear,n3,20,常规 N3（20次）,伐木数量+2,lumberjack_attack_efficiency,2,scroll,1,16,中等置信,standard,milestone,0,1,,
+clear_n4_1,clear,n4,1,常规 N4（1次）,金币+140,initial_gold,140,scroll,1,17,未悬停显示,standard,milestone,0,1,,
+clear_n4_3,clear,n4,3,常规 N4（3次）,木材+160,initial_wood,160,scroll,1,18,未悬停显示,standard,milestone,0,1,,
+clear_n4_5,clear,n4,5,常规 N4（5次）,防御塔攻击+2%,tower_attack_bonus_pct,2,scroll,1,19,已核对,standard,milestone,0,1,,
+clear_n4_10,clear,n4,10,常规 N4（10次）,英雄攻击+5%,hero_attack_bonus_pct,5,scroll,1,20,已核对,standard,milestone,0,1,,
+clear_n4_20,clear,n4,20,常规 N4（20次）,英雄造成伤害攻击+1,hero_damage_attack_growth,1,scroll,1,21,中等置信,standard,milestone,0,1,,
+clear_n5_1,clear,n5,1,常规 N5（1次）,木材+160,initial_wood,160,scroll,1,22,已核对,standard,milestone,0,1,,
+clear_n5_3,clear,n5,3,常规 N5（3次）,木材+180,initial_wood,180,scroll,1,23,已核对,standard,milestone,0,1,,
+clear_n5_5,clear,n5,5,常规 N5（5次）,伐木数量+2,lumberjack_attack_efficiency,2,scroll,1,24,中等置信,standard,milestone,0,1,,
+clear_n5_10,clear,n5,10,常规 N5（10次）,箭塔攻速+5%,tower_attack_speed_bonus_pct,5,scroll,1,25,已核对,standard,milestone,0,1,,
+clear_n5_20,clear,n5,20,常规 N5（20次）,英雄攻击加成+2%,hero_attack_bonus_pct,2,scroll,1,26,已核对,standard,milestone,0,1,,
+clear_n6_1,clear,n6,1,常规 N6（1次）,木材+180,initial_wood,180,scroll,1,27,已核对,standard,milestone,0,1,,
+clear_n6_3,clear,n6,3,常规 N6（3次）,木材+200,initial_wood,200,scroll,1,28,已核对,standard,milestone,0,1,,
+clear_n6_5,clear,n6,5,常规 N6（5次）,箭塔攻击加成+1%,tower_attack_bonus_pct,1,scroll,1,29,已核对,standard,milestone,0,1,,
+clear_n6_10,clear,n6,10,常规 N6（10次）,英雄每级全属性+10,hero_attributes_per_level,10,scroll,1,30,已核对,standard,milestone,0,1,,
+clear_n6_20,clear,n6,20,常规 N6（20次）,墙每秒生命+10,wall_health_per_second,10,scroll,1,31,未悬停显示,standard,milestone,0,1,,
+clear_n7_1,clear,n7,1,常规 N7（1次）,木材+200,initial_wood,200,scroll,1,32,未悬停显示,standard,milestone,0,1,,
+clear_n7_3,clear,n7,3,常规 N7（3次）,金币+300,initial_gold,300,scroll,1,33,已核对,standard,milestone,0,1,,
+clear_n7_5,clear,n7,5,常规 N7（5次）,人口+1,initial_population_cap,1,scroll,1,34,已核对,standard,milestone,0,1,,
+clear_n7_10,clear,n7,10,常规 N7（10次）,伐木效率+2,lumberjack_efficiency,2,scroll,1,35,已核对,standard,milestone,0,1,,
+clear_n7_20,clear,n7,20,常规 N7（20次）,伐木工攻击成长+1,lumberjack_attack_growth,1,scroll,1,36,已核对,standard,milestone,0,1,,
+clear_n8_1,clear,n8,1,常规 N8（1次）,木材+300,initial_wood,300,scroll,1,37,已核对,standard,milestone,0,1,,
+clear_n8_3,clear,n8,3,常规 N8（3次）,木材+500,initial_wood,500,scroll,1,38,未悬停显示,standard,milestone,0,1,,
+clear_n8_5,clear,n8,5,常规 N8（5次）,箭塔攻击加成+3%,tower_attack_bonus_pct,3,scroll,1,39,未悬停显示,standard,milestone,0,1,,
+clear_n8_10,clear,n8,10,常规 N8（10次）,箭塔攻击加成+3%,tower_attack_bonus_pct,3,scroll,1,40,未悬停显示,standard,milestone,0,1,,
+clear_n8_20,clear,n8,20,常规 N8（20次）,英雄攻击加成+3%,hero_attack_bonus_pct,3,scroll,1,41,未悬停显示,standard,milestone,0,1,,
+clear_n9_1,clear,n9,1,常规 N9（1次）,木材+800,initial_wood,800,scroll,1,42,未悬停显示,standard,milestone,0,1,,
+clear_n9_3,clear,n9,3,常规 N9（3次）,人口+1,initial_population_cap,1,scroll,1,43,未悬停显示,standard,milestone,0,1,,
+clear_n9_5,clear,n9,5,常规 N9（5次）,英雄初始属性+5000,hero_initial_attributes,5000,scroll,1,44,已核对,standard,milestone,0,1,,
+clear_n9_10,clear,n9,10,常规 N9（10次）,英雄每秒属性+3,hero_attributes_per_second,3,scroll,1,45,已核对,standard,milestone,0,1,,
+clear_n9_20,clear,n9,20,常规 N9（20次）,金矿效率+5%,gold_mine_efficiency_pct,5,scroll,1,46,未悬停显示,standard,milestone,0,1,,
+clear_n10_5,clear,n10,5,常规 N10（5次）,箭塔攻击+5%,tower_attack_bonus_pct,5,scroll,1,47,仅名称/上限可见,standard,milestone,0,1,,
+clear_n10_10,clear,n10,10,常规 N10（10次）,箭塔攻速+5%,tower_attack_speed_bonus_pct,5,scroll,1,48,仅名称/上限可见,standard,milestone,0,1,,
+clear_pure_n1,clear,n1,1,纯净 N1,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n2,clear,n2,1,纯净 N2,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n3,clear,n3,1,纯净 N3,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n4,clear,n4,1,纯净 N4,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n5,clear,n5,1,纯净 N5,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n6,clear,n6,1,纯净 N6,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n7,clear,n7,1,纯净 N7,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n8,clear,n8,1,纯净 N8,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n9,clear,n9,1,纯净 N9,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_pure_n10,clear,n10,1,纯净 N10,纯净模式独立通关次数,,,scroll,1,0,仅计数；录像未指定纯净模式奖励,pure,counter,0,1,,
+clear_cold_n1,clear,n1,10,极寒N1,伐木工攻速+1%（每次通关获得，最多10次）,lumberjack_attack_speed_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,95.5,10
+clear_cold_n2,clear,n2,10,极寒N2,金矿收益+1%（每次通关获得，最多10次）,gold_mine_efficiency_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,96.5,10
+clear_cold_n3,clear,n3,10,极寒N3,英雄最终伤害+1%（每次通关获得，最多10次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,97.5,10
+clear_cold_n4,clear,n4,10,极寒N4,英雄攻击成长+1（每次通关获得，最多10次）,hero_basic_attack_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,98,10
+clear_cold_n5,clear,n5,10,极寒N5,英雄三围加成+1%（每次通关获得，最多10次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,98.5,10
+clear_cold_n6,clear,n6,10,极寒N6,箭塔攻击加成+1%（每次通关获得，最多10次）,tower_attack_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,99,10
+clear_cold_n7,clear,n7,10,极寒N7,箭塔攻速+1%（每次通关获得，最多10次）,tower_attack_speed_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,100,10
+clear_cold_n8,clear,n8,10,极寒N8,墙每秒生命+30（每次通关获得，最多10次）,wall_health_per_second,30,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,100.5,10
+clear_cold_n9,clear,n9,10,极寒N9,英雄每秒全属性+3（每次通关获得，最多10次）,hero_attributes_per_second,3,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,101.5,10
+clear_cold_n10,clear,n10,10,极寒N10,英雄攻击减甲+0.5（每次通关获得，最多10次）,hero_attack_armor_reduction,0.5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,102,10
+clear_cold_n11,clear,n11,10,极寒N11,伐木工攻击成长+2（每次通关获得，最多10次）,lumberjack_attack_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,103,10
+clear_cold_n12,clear,n12,10,极寒N12,墙生命加成+1%（每次通关获得，最多10次）,wall_health_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,103.5,10
+clear_cold_n13,clear,n13,10,极寒N13,墙护甲加成+1%（每次通关获得，最多10次）,wall_armor_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,104,10
+clear_cold_n14,clear,n14,10,极寒N14,英雄造成伤害攻击+1（每次通关获得，最多10次）,hero_damage_attack_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,105,10
+clear_cold_n15,clear,n15,10,极寒N15,英雄造成伤害属性+1（每次通关获得，最多10次）,hero_attributes_per_damage,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,112,10
+clear_cold_n16,clear,n16,10,极寒N16,英雄最终伤害+1%（每次通关获得，最多10次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,113,10
+clear_cold_n17,clear,n17,20,极寒N17,箭塔最终伤害+1%（每次通关获得，最多20次）,tower_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,114,30
+clear_cold_n18,clear,n18,20,极寒N18,英雄攻击属性成长+1（每次通关获得，最多20次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,114.5,30
+clear_cold_n19,clear,n19,20,极寒N19,英雄三围加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,115.5,30
+clear_cold_n20,clear,n20,20,极寒N20,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,116,30
+clear_cold_n21,clear,n21,20,极寒N21,英雄每秒全属性+60（每次通关获得，最多20次）,hero_attributes_per_second,60,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,116.5,30
+clear_cold_n22,clear,n22,20,极寒N22,英雄三围加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,117.5,30
+clear_cold_n23,clear,n23,20,极寒N23,金矿收益+2%（每次通关获得，最多20次）,gold_mine_efficiency_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,123,30
+clear_cold_n24,clear,n24,20,极寒N24,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,122.5,30
+clear_cold_n25,clear,n25,20,极寒N25,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,122,30
+clear_cold_n26,clear,n26,20,极寒N26,英雄三围加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,121.5,30
+clear_cold_n27,clear,n27,20,极寒N27,英雄攻击减甲+1（每次通关获得，最多20次）,hero_attack_armor_reduction,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,120.6,30
+clear_cold_n28,clear,n28,20,极寒N28,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,120,30
+clear_cold_n29,clear,n29,20,极寒N29,英雄攻击属性成长+1（每次通关获得，最多20次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,119.5,30
+clear_cold_n30,clear,n30,20,极寒N30,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,118,30
+clear_cold_n31,clear,n31,10,极寒N31,英雄三围加成+2%（每次通关获得，最多10次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,123.5,30
+clear_cold_n32,clear,n32,20,极寒N32,墙生命加成+4%（每次通关获得，最多20次）,wall_health_bonus_pct,4,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,125,30
+clear_cold_n33,clear,n33,20,极寒N33,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,125.5,30
+clear_cold_n34,clear,n34,20,极寒N34,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,126,30
+clear_cold_n35,clear,n35,20,极寒N35,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,127,30
+clear_cold_n36,clear,n36,20,极寒N36,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,127.5,30
+clear_cold_n37,clear,n37,20,极寒N37,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,128,30
+clear_cold_n38,clear,n38,20,极寒N38,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,128.5,30
+clear_cold_n39,clear,n39,20,极寒N39,英雄造成伤害加攻击+5（每次通关获得，最多20次）,hero_damage_attack_growth,5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,133.5,30
+clear_cold_n40,clear,n40,10,极寒N40,英雄三围加成+2%（每次通关获得，最多10次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,133,30
+clear_cold_n41,clear,n41,20,极寒N41,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,132.5,30
+clear_cold_n42,clear,n42,10,极寒N42,英雄三围加成+2%（每次通关获得，最多10次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,132,30
+clear_cold_n43,clear,n43,20,极寒N43,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,131.6,30
+clear_cold_n44,clear,n44,10,极寒N44,英雄三围加成+2%（每次通关获得，最多10次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,131,30
+clear_cold_n45,clear,n45,20,极寒N45,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,130.5,30
+clear_cold_n46,clear,n46,10,极寒N46,英雄三围加成+2%（每次通关获得，最多10次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,10,129.5,30
+clear_cold_n47,clear,n47,20,极寒N47,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,135,30
+clear_cold_n48,clear,n48,20,极寒N48,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,136,30
+clear_cold_n49,clear,n49,20,极寒N49,英雄攻击加成+5%（每次通关获得，最多20次）,hero_attack_bonus_pct,5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,136.75,30
+clear_cold_n50,clear,n50,20,极寒N50,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,cold,per_clear,0,20,137,30
+clear_scourge_n1,clear,n1,10,天灾N1,每秒木材+1（每次通关获得，最多10次）,wood_per_second,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,138,10
+clear_scourge_n2,clear,n2,10,天灾N2,金矿收益+2%（每次通关获得，最多10次）,gold_mine_efficiency_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,138.5,10
+clear_scourge_n3,clear,n3,10,天灾N3,英雄最终伤害+1%（每次通关获得，最多10次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,139,10
+clear_scourge_n4,clear,n4,10,天灾N4,箭塔攻击加成+1%（每次通关获得，最多10次）,tower_attack_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,139.5,10
+clear_scourge_n5,clear,n5,10,天灾N5,伐木效率+1（每次通关获得，最多10次）,lumberjack_efficiency,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,143.5,10
+clear_scourge_n6,clear,n6,10,天灾N6,箭塔攻击加成+1%（每次通关获得，最多10次）,tower_attack_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,143,10
+clear_scourge_n7,clear,n7,10,天灾N7,箭塔攻速+1%（每次通关获得，最多10次）,tower_attack_speed_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,142.5,10
+clear_scourge_n8,clear,n8,10,天灾N8,墙每秒生命+40（每次通关获得，最多10次）,wall_health_per_second,40,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,142,10
+clear_scourge_n9,clear,n9,10,天灾N9,英雄攻击属性成长+1（每次通关获得，最多10次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,141.5,10
+clear_scourge_n10,clear,n10,10,天灾N10,英雄全属性加成+1%（每次通关获得，最多10次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,141,10
+clear_scourge_n11,clear,n11,10,天灾N11,箭塔攻击速度+1%（每次通关获得，最多10次）,tower_attack_speed_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,140.5,10
+clear_scourge_n12,clear,n12,10,天灾N12,英雄攻击减甲+0.5（每次通关获得，最多10次）,hero_attack_armor_reduction,0.5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,140,10
+clear_scourge_n13,clear,n13,10,天灾N13,英雄攻击属性成长+1（每次通关获得，最多10次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,144,10
+clear_scourge_n14,clear,n14,10,天灾N14,墙每秒生命+40（每次通关获得，最多10次）,wall_health_per_second,40,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,145.5,10
+clear_scourge_n15,clear,n15,10,天灾N15,箭塔攻击减甲+0.02（每次通关获得，最多10次）,tower_attack_armor_reduction,0.02,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,146,10
+clear_scourge_n16,clear,n16,10,天灾N16,英雄造成伤害加攻击+1（每次通关获得，最多10次）,hero_damage_attack_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,146.5,10
+clear_scourge_n17,clear,n17,20,天灾N17,英雄全属性加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,147,30
+clear_scourge_n18,clear,n18,20,天灾N18,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,147.5,30
+clear_scourge_n19,clear,n19,20,天灾N19,墙每秒护甲+0.03（每次通关获得，最多20次）,wall_armor_per_second,0.03,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,148,30
+clear_scourge_n20,clear,n20,20,天灾N20,英雄攻击属性成长+1（每次通关获得，最多20次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,148.5,30
+clear_scourge_n21,clear,n21,20,天灾N21,英雄全属性加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,152.5,30
+clear_scourge_n22,clear,n22,20,天灾N22,英雄攻击减甲+0.8（每次通关获得，最多20次）,hero_attack_armor_reduction,0.8,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,152,30
+clear_scourge_n23,clear,n23,20,天灾N23,英雄攻击属性成长+1（每次通关获得，最多20次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,151.65,30
+clear_scourge_n24,clear,n24,20,天灾N24,英雄三围加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,151.5,30
+clear_scourge_n25,clear,n25,20,天灾N25,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,151,30
+clear_scourge_n26,clear,n26,20,天灾N26,英雄攻击属性成长+1（每次通关获得，最多20次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,150.5,30
+clear_scourge_n27,clear,n27,20,天灾N27,英雄攻击减甲+1（每次通关获得，最多20次）,hero_attack_armor_reduction,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,150,30
+clear_scourge_n28,clear,n28,20,天灾N28,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,149.5,30
+clear_scourge_n29,clear,n29,20,天灾N29,英雄攻击属性成长+1（每次通关获得，最多20次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,153,30
+clear_scourge_n30,clear,n30,20,天灾N30,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,153.5,30
+clear_scourge_n31,clear,n31,20,天灾N31,英雄攻击加成+4%（每次通关获得，最多20次）,hero_attack_bonus_pct,4,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,154,30
+clear_scourge_n32,clear,n32,10,天灾N32,墙护甲加成+3%（每次通关获得，最多10次）,wall_armor_bonus_pct,3,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,154.5,30
+clear_scourge_n33,clear,n33,10,天灾N33,英雄最终伤害+2%（每次通关获得，最多10次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,155,30
+clear_scourge_n34,clear,n34,10,天灾N34,英雄造成伤害攻击+4（每次通关获得，最多10次）,hero_damage_attack_growth,4,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,155.5,30
+clear_scourge_n35,clear,n35,20,天灾N35,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,156,30
+clear_scourge_n36,clear,n36,20,天灾N36,英雄攻击加成+5%（每次通关获得，最多20次）,hero_attack_bonus_pct,5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,157,30
+clear_scourge_n37,clear,n37,10,天灾N37,英雄最终伤害+2%（每次通关获得，最多10次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,161,30
+clear_scourge_n38,clear,n38,20,天灾N38,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,160.5,30
+clear_scourge_n39,clear,n39,20,天灾N39,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,160.25,30
+clear_scourge_n40,clear,n40,20,天灾N40,英雄三围加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,159.75,30
+clear_scourge_n41,clear,n41,20,天灾N41,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,159.25,30
+clear_scourge_n42,clear,n42,20,天灾N42,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,159,30
+clear_scourge_n43,clear,n43,20,天灾N43,英雄三围加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,158.5,30
+clear_scourge_n44,clear,n44,20,天灾N44,英雄攻击加成+4%（每次通关获得，最多20次）,hero_attack_bonus_pct,4,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,158,30
+clear_scourge_n45,clear,n45,20,天灾N45,英雄三围加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,161.5,30
+clear_scourge_n46,clear,n46,20,天灾N46,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,162.5,30
+clear_scourge_n47,clear,n47,10,天灾N47,英雄最终伤害+2%（每次通关获得，最多10次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,10,163,30
+clear_scourge_n48,clear,n48,20,天灾N48,英雄三围加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,163.5,30
+clear_scourge_n49,clear,n49,20,天灾N49,英雄攻击加成+5%（每次通关获得，最多20次）,hero_attack_bonus_pct,5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,163.75,30
+clear_scourge_n50,clear,n50,20,天灾N50,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,scourge,per_clear,0,20,164,30
+clear_rich_n1,clear,n1,10,丰饶N1,木材+100（每次通关获得，最多10次）,initial_wood,100,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,164.75,10
+clear_rich_n2,clear,n2,10,丰饶N2,墙每秒生命+5（每次通关获得，最多10次）,wall_health_per_second,5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,165,10
+clear_rich_n3,clear,n3,10,丰饶N3,伐木工攻速+1%（每次通关获得，最多10次）,lumberjack_attack_speed_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,169.75,10
+clear_rich_n4,clear,n4,10,丰饶N4,每秒木材+1（每次通关获得，最多10次）,wood_per_second,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,169.25,10
+clear_rich_n5,clear,n5,10,丰饶N5,英雄攻击加成+1%（每次通关获得，最多10次）,hero_attack_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,169,10
+clear_rich_n6,clear,n6,10,丰饶N6,箭塔攻击加成+1%（每次通关获得，最多10次）,tower_attack_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,168.5,10
+clear_rich_n7,clear,n7,10,丰饶N7,箭塔攻速+1%（每次通关获得，最多10次）,tower_attack_speed_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,167.5,10
+clear_rich_n8,clear,n8,10,丰饶N8,墙生命加成+1%（每次通关获得，最多10次）,wall_health_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,167,10
+clear_rich_n9,clear,n9,10,丰饶N9,伐木效率+1（每次通关获得，最多10次）,lumberjack_efficiency,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,166.5,10
+clear_rich_n10,clear,n10,10,丰饶N10,人口+1（每次通关获得，最多10次）,initial_population_cap,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,166,10
+clear_rich_n11,clear,n11,10,丰饶N11,墙护甲+10（每次通关获得，最多10次）,wall_armor,10,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,170,10
+clear_rich_n12,clear,n12,10,丰饶N12,箭塔攻速+1%（每次通关获得，最多10次）,tower_attack_speed_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,171,10
+clear_rich_n13,clear,n13,10,丰饶N13,箭塔暴击几率+0.5%（每次通关获得，最多10次）,tower_critical_chance_pct,0.5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,171.5,10
+clear_rich_n14,clear,n14,10,丰饶N14,箭塔暴击伤害+1%（每次通关获得，最多10次）,tower_critical_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,171.75,10
+clear_rich_n15,clear,n15,10,丰饶N15,每秒金币+3（每次通关获得，最多10次）,gold_per_second,3,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,172,10
+clear_rich_n16,clear,n16,10,丰饶N16,英雄最终伤害+1%（每次通关获得，最多10次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,173.25,10
+clear_rich_n17,clear,n17,10,丰饶N17,金矿效率+2%（每次通关获得，最多10次）,gold_mine_efficiency_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,173.75,10
+clear_rich_n18,clear,n18,10,丰饶N18,英雄最终伤害+1%（每次通关获得，最多10次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,174,10
+clear_rich_n19,clear,n19,10,丰饶N19,墙生命加成+2%（每次通关获得，最多10次）,wall_health_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,178,10
+clear_rich_n20,clear,n20,10,丰饶N20,城墙防御加成+2%（每次通关获得，最多10次）,wall_armor_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,177.5,10
+clear_rich_n21,clear,n21,10,丰饶N21,伐木效率+1（每次通关获得，最多10次）,lumberjack_efficiency,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,177,10
+clear_rich_n22,clear,n22,10,丰饶N22,英雄造成伤害攻击+1（每次通关获得，最多10次）,hero_damage_attack_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,rich,per_clear,0,10,176.5,10
+clear_guixu_n1,clear,n1,20,归墟N1,英雄造成伤害攻击+2（每次通关获得，最多20次）,hero_damage_attack_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,176.1,30
+clear_guixu_n2,clear,n2,20,归墟N2,金矿收益+3%（每次通关获得，最多20次）,gold_mine_efficiency_pct,3,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,175.75,30
+clear_guixu_n3,clear,n3,20,归墟N3,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,175.5,30
+clear_guixu_n4,clear,n4,20,归墟N4,英雄攻击属性成长+1（每次通关获得，最多20次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,174.5,30
+clear_guixu_n5,clear,n5,20,归墟N5,英雄攻击减甲+0.8（每次通关获得，最多20次）,hero_attack_armor_reduction,0.8,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,178.5,30
+clear_guixu_n6,clear,n6,20,归墟N6,箭塔攻击加成+1%（每次通关获得，最多20次）,tower_attack_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,179.5,30
+clear_guixu_n7,clear,n7,20,归墟N7,伐木效率+1（每次通关获得，最多20次）,lumberjack_efficiency,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,180,30
+clear_guixu_n8,clear,n8,20,归墟N8,墙每秒生命+100（每次通关获得，最多20次）,wall_health_per_second,100,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,180.5,30
+clear_guixu_n9,clear,n9,20,归墟N9,英雄攻击属性成长+1（每次通关获得，最多20次）,hero_attribute_growth,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,180.75,30
+clear_guixu_n10,clear,n10,20,归墟N10,英雄全属性加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,181,30
+clear_guixu_n11,clear,n11,20,归墟N11,墙减伤+1%（每次通关获得，最多20次）,wall_damage_reduction_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,181.5,30
+clear_guixu_n12,clear,n12,20,归墟N12,英雄攻击减甲+0.8（每次通关获得，最多20次）,hero_attack_armor_reduction,0.8,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,182,30
+clear_guixu_n13,clear,n13,20,归墟N13,英雄造成伤害攻击+3（每次通关获得，最多20次）,hero_damage_attack_growth,3,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,185.5,30
+clear_guixu_n14,clear,n14,20,归墟N14,英雄每秒属性+100（每次通关获得，最多20次）,hero_attributes_per_second,100,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,185.25,30
+clear_guixu_n15,clear,n15,20,归墟N15,箭塔攻击减甲+0.02（每次通关获得，最多20次）,tower_attack_armor_reduction,0.02,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,185,30
+clear_guixu_n16,clear,n16,20,归墟N16,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,184.5,30
+clear_guixu_n17,clear,n17,20,归墟N17,英雄全属性加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,184,30
+clear_guixu_n18,clear,n18,20,归墟N18,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,183.5,30
+clear_guixu_n19,clear,n19,20,归墟N19,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,183.2,30
+clear_guixu_n20,clear,n20,20,归墟N20,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,182.5,30
+clear_guixu_n21,clear,n21,20,归墟N21,英雄攻击加成+3%（每次通关获得，最多20次）,hero_attack_bonus_pct,3,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,186,30
+clear_guixu_n22,clear,n22,20,归墟N22,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,188,30
+clear_guixu_n23,clear,n23,20,归墟N23,英雄暴击伤害+10%（每次通关获得，最多20次）,hero_critical_damage_bonus_pct,10,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,188.25,30
+clear_guixu_n24,clear,n24,20,归墟N24,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,188.6,30
+clear_guixu_n25,clear,n25,20,归墟N25,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,189,30
+clear_guixu_n26,clear,n26,20,归墟N26,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,189.5,30
+clear_guixu_n27,clear,n27,20,归墟N27,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,190,30
+clear_guixu_n28,clear,n28,20,归墟N28,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,190.5,30
+clear_guixu_n29,clear,n29,20,归墟N29,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,194,30
+clear_guixu_n30,clear,n30,20,归墟N30,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,193.5,30
+clear_guixu_n31,clear,n31,20,归墟N31,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,193,30
+clear_guixu_n32,clear,n32,20,归墟N32,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,192.75,30
+clear_guixu_n33,clear,n33,20,归墟N33,英雄攻击加成+5%（每次通关获得，最多20次）,hero_attack_bonus_pct,5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,192.5,30
+clear_guixu_n34,clear,n34,20,归墟N34,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,192,30
+clear_guixu_n35,clear,n35,20,归墟N35,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,191.5,30
+clear_guixu_n36,clear,n36,20,归墟N36,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,191,30
+clear_guixu_n37,clear,n37,20,归墟N37,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,194.5,30
+clear_guixu_n38,clear,n38,20,归墟N38,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,195,30
+clear_guixu_n39,clear,n39,20,归墟N39,英雄攻击加成+5%（每次通关获得，最多20次）,hero_attack_bonus_pct,5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,195.5,30
+clear_guixu_n40,clear,n40,20,归墟N40,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,195.75,30
+clear_guixu_n41,clear,n41,20,归墟N41,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,196,30
+clear_guixu_n42,clear,n42,20,归墟N42,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,197,30
+clear_guixu_n43,clear,n43,20,归墟N43,英雄攻击减甲+2（每次通关获得，最多20次）,hero_attack_armor_reduction,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,197.25,30
+clear_guixu_n44,clear,n44,20,归墟N44,英雄攻击加成+5%（每次通关获得，最多20次）,hero_attack_bonus_pct,5,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,197.6,30
+clear_guixu_n45,clear,n45,20,归墟N45,英雄攻击属性成长+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,guixu,per_clear,0,20,201.5,30
+clear_tianyu_n1,clear,n1,20,天域N1,金矿收益+3%（每次通关获得，最多20次）,gold_mine_efficiency_pct,3,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,201,30
+clear_tianyu_n2,clear,n2,20,天域N2,英雄最终伤害+1%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,200.5,30
+clear_tianyu_n3,clear,n3,20,天域N3,英雄攻击减甲+1（每次通关获得，最多20次）,hero_attack_armor_reduction,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,200,30
+clear_tianyu_n4,clear,n4,20,天域N4,墙每秒生命+100（每次通关获得，最多20次）,wall_health_per_second,100,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,199.5,30
+clear_tianyu_n5,clear,n5,20,天域N5,箭塔造成伤害攻击+2（每次通关获得，最多20次）,tower_damage_attack_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,199.25,30
+clear_tianyu_n6,clear,n6,20,天域N6,箭塔攻击减甲+0.02（每次通关获得，最多20次）,tower_attack_armor_reduction,0.02,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,199,30
+clear_tianyu_n7,clear,n7,20,天域N7,伐木效率+1（每次通关获得，最多20次）,lumberjack_efficiency,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,198,30
+clear_tianyu_n8,clear,n8,20,天域N8,英雄全属性加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,202,30
+clear_tianyu_n9,clear,n9,10,天域N9,箭塔攻击百分比+2%（每次通关获得，最多10次）,tower_attack_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,10,202.5,30
+clear_tianyu_n10,clear,n10,20,天域N10,英雄全属性加成+1%（每次通关获得，最多20次）,hero_attribute_bonus_pct,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,202.75,30
+clear_tianyu_n11,clear,n11,20,天域N11,箭塔攻击间隔-0.01（每次通关获得，最多20次）,tower_attack_interval_reduction,0.01,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,203.15,30
+clear_tianyu_n12,clear,n12,20,天域N12,英雄攻击减甲+1（每次通关获得，最多20次）,hero_attack_armor_reduction,1,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,203.5,30
+clear_tianyu_n13,clear,n13,20,天域N13,英雄造成伤害攻击+4（每次通关获得，最多20次）,hero_damage_attack_growth,4,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,204,30
+clear_tianyu_n14,clear,n14,20,天域N14,英雄每秒属性+100（每次通关获得，最多20次）,hero_attributes_per_second,100,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,204.6,30
+clear_tianyu_n15,clear,n15,20,天域N15,箭塔攻击减甲+0.02（每次通关获得，最多20次）,tower_attack_armor_reduction,0.02,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,205,30
+clear_tianyu_n16,clear,n16,20,天域N16,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,209,30
+clear_tianyu_n17,clear,n17,20,天域N17,英雄攻击全属性+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,208.5,30
+clear_tianyu_n18,clear,n18,20,天域N18,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,208,30
+clear_tianyu_n19,clear,n19,20,天域N19,英雄攻击全属性+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,207.5,30
+clear_tianyu_n20,clear,n20,20,天域N20,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,207,30
+clear_tianyu_n21,clear,n21,20,天域N21,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,206.75,30
+clear_tianyu_n22,clear,n22,20,天域N22,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,206.5,30
+clear_tianyu_n23,clear,n23,20,天域N23,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,205.5,30
+clear_tianyu_n24,clear,n24,20,天域N24,英雄攻击全属性+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,209.5,30
+clear_tianyu_n25,clear,n25,20,天域N25,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,210,30
+clear_tianyu_n26,clear,n26,20,天域N26,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,210.5,30
+clear_tianyu_n27,clear,n27,20,天域N27,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,210.75,30
+clear_tianyu_n28,clear,n28,20,天域N28,英雄攻击全属性+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,211.25,30
+clear_tianyu_n29,clear,n29,20,天域N29,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,211.5,30
+clear_tianyu_n30,clear,n30,20,天域N30,英雄最终伤害+2%（每次通关获得，最多20次）,hero_final_damage_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,212,30
+clear_tianyu_n31,clear,n31,20,天域N31,英雄全属性加成+2%（每次通关获得，最多20次）,hero_attribute_bonus_pct,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,212.5,30
+clear_tianyu_n32,clear,n32,20,天域N32,英雄攻击全属性+2（每次通关获得，最多20次）,hero_attribute_growth,2,scroll,1,0,录像悬停核对；未开放模式/难度由运行时隐藏,tianyu,per_clear,0,20,214,30

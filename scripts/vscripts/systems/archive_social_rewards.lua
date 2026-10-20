@@ -1,5 +1,6 @@
 local items = require("config/generated/archive_social_items")
 local rules = require("config/generated/archive_social_rules")
+local daily_limits = require("systems/archive_daily_limits")
 local M = {}
 local quality_order = {"N", "R", "SR", "SSR", "UR"}
 local function normalize(save)
@@ -86,17 +87,13 @@ function M.info(save, pool)
         rarity_probabilities=current.quality_probabilities, rarity_base_probabilities=initial.quality_probabilities,
         unlocked=save.social_unlocks.friend_100 and 1 or 0 }
 end
-function M.grant_ticket(command, save, pool)
+function M.grant_ticket(command, save, pool, pass)
     normalize(save)
     local rule = rules.by_id[pool]
     if not rule or not rule.enabled then return false, "奖池无效" end
-    local day = save.daily[command.day_key] or {}
-    save.daily[command.day_key] = day
     local key = "social_" .. pool
-    if (day[key] or 0) < rule.daily_limit then
-        day[key] = (day[key] or 0) + 1
-        save.social_tickets[rule.currency_id] = (save.social_tickets[rule.currency_id] or 0) + 1
-    end
+    local accepted = daily_limits.grant(save, key, 1, assert(command.day_key), pass)
+    save.social_tickets[rule.currency_id] = (save.social_tickets[rule.currency_id] or 0) + accepted
     return true
 end
 function M.apply(command, save, stats, apply_effects)

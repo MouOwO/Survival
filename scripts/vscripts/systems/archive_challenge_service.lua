@@ -10,12 +10,15 @@ local cooperative_rewards = require("systems/archive_cooperative_reward_service"
 local scheduler = require("core/scheduler")
 local hub_placement = require("systems/archive_hub_placement")
 local model_scale = require("visual/model_scale")
+local daily_limits = require("systems/archive_daily_limits")
+local calendar = require("systems/archive_calendar")
 local M = {}
 local players, hubs, bosses = {}, {}, {}
 local sequence, active = 0, false
 local deadline, ended, expired = nil, false, false
 local TIMER_ID = "archive_challenge_phase_timer"
 local SAVE_TIMER_ID = "archive_challenge_save_barrier"
+local DAILY_TIMER_ID = "archive_challenge_daily_rollover"
 local settling, winner_sent = false, false
 local finalization_started = false
 local function valid(unit) return unit and not unit:IsNull() end
@@ -36,6 +39,20 @@ end
 local function allowed(state, definition)
     return state and not state.finished and definition and definition.enabled
         and state.difficulty >= definition.min_difficulty
+end
+local function daily_quota(player_id, key)
+    if not key then return nil end
+    local profiles = require("systems/player_profile_service")
+    if type(profiles.get_daily_limit) == "function" then return profiles.get_daily_limit(player_id, key) end
+    local profile = type(profiles.get_account_profile) == "function" and profiles.get_account_profile(player_id)
+        or type(profiles.get_profile) == "function" and profiles.get_profile(player_id)
+    if not profile then return nil end
+    local summary = daily_limits.snapshot(profile)
+    return summary and summary.by_key and summary.by_key[key] or nil
+end
+local function capped(quota)
+    return quota and (quota.capped == true or tonumber(quota.capped) == 1
+        or tonumber(quota.remaining) == 0) or false
 end
 -- One authority serves the archive publisher and generic HUD refreshes.
 -- Complete identity lets event-driven and native HUD painting agree.
@@ -58,7 +75,9 @@ function M.ability_runtime(caster, ability_name)
     local boss = valid(state.active_boss) and state.active_boss:IsAlive()
     local challenge_id = tostring(ability_name):match("^ability_archive_(.+)$")
     local definition = challenge_id and definitions.by_id[challenge_id]
+    local quota
     if challenge_id == "endless" and hub.index == 2 then
+        quota = daily_quota(state.player_id, "endless")
         runtime.display_name = "开启无尽挑战"
         runtime.upgrade_description = "每波5只小怪，限时60秒，清空后立即下一波。每10波积分提高7分，首10波每波1分。每局仅可开启一次。"
         ready = ready and not state.used.endless and not busy and not boss
@@ -70,6 +89,7 @@ function M.ability_runtime(caster, ability_name)
         runtime.upgrade_description = "结束自己的挑战；所有玩家结束后胜利结算。未击败的BOSS不会获得奖励。"
         runtime.status_text = ready and "可以结束挑战" or "挑战已结束"
     elseif definition and definition.building_id == hub.index then
+        quota = daily_quota(state.player_id, daily_limits.challenge_key(definition))
         local unlocked = allowed(state, definition)
         local used = state.used[challenge_id] == true
         ready = ready and unlocked and not used and not boss and not busy
@@ -83,6 +103,11 @@ function M.ability_runtime(caster, ability_name)
     else
         ready = false
         runtime.status_text = "挑战入口无效"
+    end
+    if quota then
+        runtime.daily_key, runtime.daily_earned, runtime.daily_limit = quota.key, quota.earned, quota.limit
+        runtime.daily_remaining, runtime.daily_capped = quota.remaining, capped(quota) and 1 or 0
+        if capped(quota) then ready = false; runtime.status_text = "今日奖励已达上限" end
     end
     if not active or ended or state.finished or (deadline and now() >= deadline) then
         runtime.status_text = "挑战已结束"
@@ -124,6 +149,18 @@ local function publish(state)
             end
         end
     end
+end
+local function watch_daily_rollover()
+    local previous_day = tostring(calendar.day())
+    scheduler.every(5, function()
+        if not active or ended then return false end
+        local current_day = tostring(calendar.day())
+        if current_day == previous_day then return end
+        previous_day = current_day
+        for _, state in pairs(players) do
+            if not state.finished then publish(state) end
+        end
+    end, DAILY_TIMER_ID)
 end
 local function remove_boss(state)
     local unit = state.active_boss
@@ -197,6 +234,7 @@ local function end_phase(timed_out)
     require("systems/gameplay_phase_guard").freeze_for_settlement()
     active, ended, expired = false, true, timed_out == true
     scheduler.cancel(TIMER_ID)
+    scheduler.cancel(DAILY_TIMER_ID)
     -- Mark everyone finished before removing monsters; late death events cannot award rewards.
     for _, state in pairs(players) do state.finished = true end
     for _, state in pairs(players) do
@@ -301,6 +339,7 @@ function M.begin(payload)
     if not payload.player_ids or #payload.player_ids == 0 then return { ok = false } end
     cooperative_rewards.begin(payload.player_ids, payload.difficulty_id)
     active = true
+    watch_daily_rollover()
     print("[ArchiveChallenge] begin difficulty=" .. tostring(payload.difficulty_id)
         .. " players=" .. tostring(#payload.player_ids))
     deadline = now() + (tonumber(rule.phase_duration_seconds) or 1800)
@@ -333,6 +372,10 @@ function M.summon(caster, challenge_id, ability)
     if not allowed(state, definition) then return false, "需要当前关卡≥N" .. definition.min_difficulty end
     if valid(state.active_boss) and state.active_boss:IsAlive() then return false, "请先击败当前挑战BOSS" end
     if (state.cooldowns[challenge_id] or 0) > now() then return false, "挑战冷却中" end
+    if capped(daily_quota(state.player_id, daily_limits.challenge_key(definition))) then
+        publish(state)
+        return false, "今日奖励已达上限"
+    end
     local row = stats.by_id[challenge_id .. "_" .. state.difficulty_id]
     if not row or not row.enabled then return false, "挑战属性尚未配置" end
     local unit, reason = wave.spawn_challenge_monster(row, {
@@ -393,6 +436,10 @@ function M.start_endless(caster, ability)
     if state.finished or context.owner_player_id(caster) ~= state.player_id then return false, "无尽入口不可用" end
     if state.used.endless then return false, "本局已开启无尽挑战" end
     if state.active_boss then return false, "请先击败当前挑战BOSS" end
+    if capped(daily_quota(state.player_id, "endless")) then
+        publish(state)
+        return false, "今日奖励已达上限"
+    end
     local ok, reason = require("systems/archive_endless_service").start(state.player_id, state.difficulty)
     if ok then state.used.endless = true end
     publish(state)
@@ -447,12 +494,17 @@ function M.init()
     finalization_started = false
     scheduler.cancel(SAVE_TIMER_ID)
     scheduler.cancel(TIMER_ID)
+    scheduler.cancel(DAILY_TIMER_ID)
     bus.handle_request("archive.challenge_state", M.phase_snapshot)
     require("systems/archive_endless_service").init(function(id)
         if players[id] then publish(players[id]) end
     end)
     bus.handle_request("archive.challenge_begin", M.begin)
     bus.subscribe(events.ENGINE_ENTITY_KILLED, killed)
+    bus.subscribe(events.PLAYER_PROFILE_CHANGED, function(payload)
+        local state = players[tonumber(payload and payload.player_id)]
+        if state and active and not state.finished then publish(state) end
+    end)
     bus.subscribe(events.PLAYER_DISCONNECTED, function(payload)
         local state = players[tonumber(payload.player_id)]
         if not state then return end

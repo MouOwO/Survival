@@ -134,18 +134,8 @@ renderers.endless = function(_, archive)
 end
 renderers.fragment = challenge_rewards.fragment_rows
 renderers.pet = challenge_rewards.cage_rows
-renderers.clear = function(profile, archive)
-    local rows = {}
-    for _, item in ipairs(achievements.rows) do
-        if item.enabled then
-            rows[#rows + 1] = { id = item.achievement_id, name = item.display_name,
-                description = item.description, icon_style = item.icon_style,
-                rune = string.upper(item.difficulty_id), quality = "gold",
-                count = archive.clear_counts[item.difficulty_id] or 0,
-                target = item.required_count, completed = archive.completed[item.achievement_id] and 1 or 0 }
-        end
-    end
-    return rows
+renderers.clear = function(_, archive)
+    return require("systems/archive_clear_progress").rows(archive)
 end
 renderers.shadow = function(profile, archive)
     local rows = {}
@@ -209,6 +199,7 @@ local function snapshot_profile(player_id, category_id, profile)
     end
     return { ok = true, category_id = category_id, revision = profile.revision,
         fishing = fishing,
+        daily_limits = require("systems/archive_daily_limits").snapshot(profile),
         starjoy = category_id == "starjoy_points" and require("systems/archive_starjoy_rewards").info(profile) or nil,
         upgrade_pending = upgrade_pending(player_id, category_id),
         buildings = category_id == "building" and require("systems/archive_building_rewards").info(saved(profile), require("systems/archive_calendar").day()) or nil,
@@ -275,6 +266,14 @@ local function local_settle(player_id, command)
         return { ok = false, error = "archive_provider_required" }
     end
     local context
+    if command.kind == "clear" or command.kind:match("_clear$") then
+        local ok, setup = pcall(require, "systems/match_setup_service")
+        local mode = ok and type(setup.get_mode) == "function" and setup.get_mode() or nil
+        if require("systems/archive_clear_progress").is_mode(mode) then
+            command = copy(command)
+            command.mode_id = mode
+        end
+    end
     if command.kind == "challenge" then
         local policy = require("systems/archive_cooperative_reward_policy")
         if policy.shared_challenge_roll() then
@@ -540,7 +539,7 @@ function M.record_clear(player_id, difficulty_id, cooperative_win)
     local ok, setup = pcall(require, "systems/match_setup_service")
     local mode = ok and type(setup.get_mode) == "function" and setup.get_mode() or nil
     local rich_capability = type(profiles.supports_rich_mode) == "function" and profiles.supports_rich_mode(player_id)
-    local kind = mode == "rich" and "rich_clear"
+    local kind = (mode == "rich" or mode == "cold" or mode == "scourge") and (mode .. "_clear")
         or mode == "standard" and rich_capability and "standard_clear" or "clear"
     return enqueue(player_id, { id = session_id .. ":" .. kind, kind = kind,
         difficulty_id = difficulty, count = 1, cooperative_win = cooperative_win == 1 and 1 or 0,

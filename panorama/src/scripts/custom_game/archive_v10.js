@@ -179,7 +179,7 @@
 
     function render(data,category,mode,categories,options){
         if(!alive())return false;var changed=current!==category;if(changed)hideTooltip();current=category;categoryRows=list(categories);
-        var signature=JSON.stringify([category,mode,data&&data.rows,data&&data.pending,data&&data.upgrade_pending,data&&data.social,data&&data.online,data&&data.buildings,data&&data.fishing,data&&data.starjoy,data&&data.has_pass,data&&data.last_draw,data&&data.unavailable,categories,cfg.SurvivalArchiveColors]);
+        var signature=JSON.stringify([category,mode,data&&data.rows,data&&data.pending,data&&data.upgrade_pending,data&&data.social,data&&data.online,data&&data.buildings,data&&data.fishing,data&&data.starjoy,data&&data.daily_limits,data&&data.has_pass,data&&data.last_draw,data&&data.unavailable,categories,cfg.SurvivalArchiveColors]);
         if(active&&signature===displayKey)return true;displayKey=signature;enter(options);renderSidebar(categories);
         p("ArchiveV10_page_title").text=categoryName(current);headerIcon.SetImage(headerEmblem(current));
         var leaderboard=current==="shop",leaderboardView=cfg.SurvivalEndlessLeaderboard;
