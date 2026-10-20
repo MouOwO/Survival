@@ -2,6 +2,15 @@
 
 ## Git 提交与同步
 
+用户要求 **game 和 content 两个独立仓库都要提交、推送**，此约定持续适用于后续任务：
+
+- game 仓库：`D:\SteamLibrary\steamapps\common\dota 2 beta\game\dota_addons\survival`。
+- content 仓库：`D:\SteamLibrary\steamapps\common\dota 2 beta\content\dota_addons\Survival`。
+- 每次修改和交付都检查两边的分支、上游、改动和未推送提交，分别执行下述同步流程；不能只处理当前所在目录。
+- Panorama 源码、美术素材、地图可编辑源文件和 game 中对应的编译资源应配套检查、提交。遵守各仓库的 `.gitattributes`，地图等已有 LFS 文件继续使用 LFS。
+- 某一侧没有需要提交的改动时不创建空提交，但仍核对其同步状态；本机密钥、运行输出和缓存不加入提交。
+- 最终报告分别列出两个仓库的提交编号、推送分支和保留的未提交改动。
+
 用户要求的固定顺序：**stash → pull → pop → commit → push**。不能完成修改后直接提交、推送而跳过远端同步。
 
 1. 检查当前分支、上游分支、未提交改动、本地未推送提交和已有 stash。区分本次任务与用户原有改动。
