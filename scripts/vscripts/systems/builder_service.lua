@@ -25,7 +25,8 @@ local function publish_selection(player_id, unit, spawn)
             entindex = unit:entindex(),
             reason = "builder_ready",
         })
-        if spawn and (spawn.mode == "fishing" or spawn.mode == "rich") then
+        if spawn and (spawn.mode == "fishing" or spawn.mode == "rich"
+            or spawn.mode == "cold" or spawn.mode == "scourge") then
             -- One existing, non-locking camera jump to the visible builder;
             -- the native hero remains an isolated engine placeholder.
             local position = unit:GetAbsOrigin()
@@ -109,7 +110,8 @@ local function create_builder(payload)
         error("failed to register builder owner: " .. tostring(register_error))
     end
     presentation.apply(builder, config)
-    if spawn.mode == "fishing" or spawn.mode == "rich" then
+    if spawn.mode == "fishing" or spawn.mode == "rich"
+        or spawn.mode == "cold" or spawn.mode == "scourge" then
         -- The landing was already grounded and checked in its own player
         -- patch. This hull-free builder need not be displaced by clear-space.
         builder:SetAbsOrigin(position)
@@ -119,7 +121,7 @@ local function create_builder(payload)
     end
 
     builder_by_player[player_id] = builder
-    if spawn.mode == "rich" then
+    if spawn.mode == "rich" or spawn.mode == "cold" or spawn.mode == "scourge" then
         local attached, boundary_error = require("systems/rich_region_service").attach_builder(
             player_id, builder, spawn.slot_id)
         if not attached then

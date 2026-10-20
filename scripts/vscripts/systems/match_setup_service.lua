@@ -1,20 +1,21 @@
 -- Match-wide settings are chosen before any player's saved bonuses are loaded.
 -- Requests reach select_mode only after startup resolves the engine event actor.
 local M = {}
+local progression_rules = require("config/mode_progression")
 local session_id, mode_id, selected_by = "", nil, nil
 local mode_options = {
-    { mode_id = "pure", display_name = "纯净模式",
-        description = "默认属性开局，不继承已有存档加成；本局奖励正常获得并保存。" },
     { mode_id = "standard", display_name = "常规模式",
         description = "继承已有存档与永久加成；本局奖励正常获得并保存。" },
-    { mode_id = "fishing", display_name = "摸鱼模式",
-        description = "不选择难度、不生成波次，自动挂机；沿用常规档案并正常保存奖励。" },
     { mode_id = "rich", display_name = "丰饶模式",
         description = "沿用常规档案，丰饶模式难度通关进度独立保存。" },
     { mode_id = "cold", display_name = "极寒模式",
-        description = "沿用常规档案与解锁进度，使用独立的极寒怪物属性。" },
+        description = "沿用常规档案，极寒模式难度通关进度独立保存。" },
     { mode_id = "scourge", display_name = "天灾模式",
-        description = "沿用常规档案与解锁进度，使用独立的天灾怪物属性。" },
+        description = "沿用常规档案，天灾模式难度通关进度独立保存。" },
+    { mode_id = "fishing", display_name = "摸鱼模式",
+        description = "不选择难度、不生成波次，自动挂机；沿用常规档案并正常保存奖励。" },
+    { mode_id = "pure", display_name = "纯净模式",
+        description = "默认属性开局，不继承已有存档加成；本局奖励正常获得并保存。" },
 }
 
 local function resource(method, id)
@@ -47,21 +48,21 @@ function M.is_fishing_mode() return mode_id == "fishing" end
 function M.is_rich_mode() return mode_id == "rich" end
 function M.is_mode_selected() return mode_id ~= nil end
 
-local function rich_permission(id)
+local function mode_permission(id, requested)
     -- Entry authentication precedes profile loading. Never accept a client
     -- unlock flag, a combat projection, or a previous account/session's save.
     local ok, profiles = pcall(require, "systems/player_profile_service")
     if not ok or type(profiles.get_authenticated_progression) ~= "function" then return false, true end
     local valid, progress = pcall(profiles.get_authenticated_progression, id)
     if not valid or type(progress) ~= "table" or progress.loaded ~= true then return false, true end
-    if type(progress.rich_clear_counts) ~= "table" then
-        return false, true, "丰饶模式服务尚未就绪"
+    if type(progress[progression_rules.clear_field(requested)]) ~= "table" then
+        local name = ({rich="丰饶模式", cold="极寒模式", scourge="天灾模式"})[requested]
+        return false, true, name .. "服务尚未就绪"
     end
-    local counts = progress.standard_clear_counts
-    if counts == nil then counts = progress.clear_counts end -- Existing authoritative historical progression.
-    local count = type(counts) == "table" and counts.n10 or nil
-    return type(count) == "number" and count > 0 and count < math.huge
-        and count == math.floor(count), false
+    if not progression_rules.counts(progression_rules.parent_mode(requested), progress) then
+        return false, true, "正在读取前置模式通关进度"
+    end
+    return progression_rules.entry_unlocked(requested, progress), false
 end
 
 local mode_daily_keys = {pure="clear", standard="clear", rich="mode_rich",
@@ -140,9 +141,10 @@ function M.select_mode(id, requested, request_session)
         return { ok = requested == mode_id, mode_id = mode_id,
             error = requested ~= mode_id and "mode_locked" or nil }
     end
-    if requested == "rich" then
-        local unlocked, pending = rich_permission(tonumber(id))
-        if not unlocked then return { ok = false, error = pending and "rich_progression_pending" or "rich_mode_locked" } end
+    if progression_rules.parent_mode(requested) then
+        local unlocked, pending, hint = mode_permission(tonumber(id), requested)
+        if not unlocked then return { ok = false, error = pending and "mode_profile_pending" or "mode_not_unlocked",
+            unlock_hint = hint or progression_rules.entry_hint(requested) } end
     end
     local quota, daily_pending = mode_daily_quota(tonumber(id), requested)
     if daily_pending then return {ok=false, error="mode_daily_limits_pending"} end
@@ -157,12 +159,12 @@ function M.snapshot()
     local options = {}
     for _, row in ipairs(mode_options) do
         options[#options + 1] = { mode_id = row.mode_id, display_name = row.display_name,
-            description = row.description }
-        if row.mode_id == "rich" then
-            local unlocked, pending, hint = rich_permission(M.selector_player_id())
+            description = row.description, unlocked = 1, pending = 0, unlock_hint = "" }
+        if progression_rules.parent_mode(row.mode_id) then
+            local unlocked, pending, hint = mode_permission(M.selector_player_id(), row.mode_id)
             options[#options].unlocked = unlocked and 1 or 0
             options[#options].pending = pending and 1 or 0
-            options[#options].unlock_hint = hint or "常规模式N10通关后解锁"
+            options[#options].unlock_hint = hint or progression_rules.entry_hint(row.mode_id)
         end
         local quota, daily_pending = mode_daily_quota(M.selector_player_id(), row.mode_id)
         if daily_pending then

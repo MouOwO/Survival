@@ -137,8 +137,16 @@ function M.resolve(player_id, index, rule, context, wave, reserved)
             local position = nearby(player_id, wall:GetAbsOrigin(), index, rule, reserved)
             if position then return position, "player_wall" end
         end
-        local slot = context.slot and context.slot(player_id)
-        local origin = slot and marker(slot.builder_spawn_marker)
+        -- Dedicated modes resolve their own Hammer lawn; an absent mode marker
+        -- must never send this player's hubs back to the ordinary island.
+        local origin
+        if context.resolve_builder_spawn then
+            local spawn = context.resolve_builder_spawn(player_id)
+            origin = spawn and spawn.position
+        else
+            local slot = context.slot and context.slot(player_id)
+            origin = slot and marker(slot.builder_spawn_marker)
+        end
         if origin then
             local position = nearby(player_id, ground(origin), index, rule, reserved)
             if position then return position, "builder_spawn" end

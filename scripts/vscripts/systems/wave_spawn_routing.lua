@@ -54,18 +54,21 @@ end
 
 function M.refresh(channels, wall_by_player, hull_multiplier)
     local setup = package.loaded["systems/match_setup_service"]
-    if setup and setup.get_mode and setup.get_mode() == "rich" then
-        local rich_regions = require("systems/rich_region_service")
+    local mode = setup and setup.get_mode and setup.get_mode()
+    if mode == "rich" or mode == "cold" or mode == "scourge" then
+        local mode_spawns = require("systems/mode_spawn_service")
         for player_id, channel in pairs(channels) do
-            local position, reason = rich_regions.wave_spawn(player_id)
-            local center = origin(channel.marker)
+            local selected, reason = mode_spawns.wave_marker(player_id)
             channel.spawn_offset_x, channel.spawn_offset_y = 0, 0
-            if position and center then
-                channel.spawn_offset_x = position.x - center.x
-                channel.spawn_offset_y = position.y - center.y
+            channel.mode = mode
+            channel.spawn_side = nil
+            if selected then
+                channel.marker, channel.marker_name = selected.marker, selected.marker_name
+                channel.spawn_position = selected.position
                 channel.route_error = nil
             else
-                channel.marker, channel.route_error = nil, reason or "rich_wave_spawn_missing"
+                channel.marker, channel.spawn_position = nil, nil
+                channel.route_error = reason or "mode_wave_spawn_missing"
             end
         end
         return
@@ -76,6 +79,7 @@ function M.refresh(channels, wall_by_player, hull_multiplier)
         channel.default_marker = channel.default_marker or channel.marker
         channel.default_marker_name = channel.default_marker_name or channel.marker_name
         channel.marker, channel.marker_name = channel.default_marker, channel.default_marker_name
+        channel.mode, channel.spawn_position = nil, nil
         channel.spawn_side, channel.route_error = nil, nil
         channel.spawn_offset_x, channel.spawn_offset_y = 0, 0
         local wall_index = wall_by_player[player_id]
@@ -122,6 +126,11 @@ function M.refresh(channels, wall_by_player, hull_multiplier)
 end
 
 function M.position(channel)
+    if channel and channel.mode then
+        local position = channel.marker and channel.spawn_position
+        if not position or channel.route_error then return nil end
+        return Vector(position.x, position.y, position.z)
+    end
     local position = channel and origin(channel.marker)
     if not position then return nil end
     return Vector(position.x + (channel.spawn_offset_x or 0),

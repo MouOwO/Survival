@@ -12,13 +12,16 @@ const startup = (rich, overrides = {}) => ready({admission_complete: true, profi
         mode_options: modes(rich)}, ...overrides});
 const modeRequests = ui => ui.requests.filter(request => request.name === "survival_loading_mode_select");
 const difficultyRequests = ui => ui.requests.filter(request => request.name === "ui_difficulty_select_request");
-const richButton = ui => ui.nodes.MatchModeOptions.children[3];
+const modeButton = (ui, name) => ui.nodes.MatchModeOptions.children.find(button => button.children[0].text === name);
+const richButton = ui => modeButton(ui, "丰饶模式");
 const click = button => button.events.onactivate();
 
 {
     const ui = harness({startupState: startup({unlocked: 1, pending: 1}, {profiles_ready: false}), hud: true, loadSharedUI: true});
     ui.advance(0.11);
     assert.equal(ui.nodes.MatchModeOptions.children.length, 4);
+    assert.deepEqual(ui.nodes.MatchModeOptions.children.map(button => button.children[0].text),
+        ["常规模式", "丰饶模式", "摸鱼模式", "纯净模式"]);
     assert.equal(ui.nodes.DifficultySelectionDialog.style.height, "302px", "the fourth mode expands the compact popup by one row");
     assert.equal(richButton(ui).children.length, 1, "mode rows retain only the mode name");
     assert.equal(richButton(ui).children[0].text, "丰饶模式");
@@ -36,7 +39,7 @@ const click = button => button.events.onactivate();
     richButton(ui).events.onmouseout();
     assert.equal(ui.dispatched.at(-1)[0], "DOTAHideTextTooltip");
     click(richButton(ui)); assert.equal(modeRequests(ui).length, 0);
-    assert(ui.nodes.MatchModeOptions.children.slice(0, 3).every(button => button.enabled), "legacy modes remain selectable without eligibility fields");
+    assert(["常规模式", "摸鱼模式", "纯净模式"].every(name => modeButton(ui, name).enabled), "legacy modes remain selectable without eligibility fields");
 
     ui.setStartup(startup({}));
     assert.equal(richButton(ui).enabled, false, "missing rich eligibility fails closed");
@@ -48,7 +51,7 @@ const click = button => button.events.onactivate();
     const beforeHover = ui.dispatched.length;
     richButton(ui).events.onmouseover();
     assert.equal(ui.dispatched.length, beforeHover, "unlocked rows do not show stale unlock rules");
-    click(richButton(ui)); click(richButton(ui)); click(ui.nodes.MatchModeOptions.children[1]);
+    click(richButton(ui)); click(richButton(ui)); click(modeButton(ui, "常规模式"));
     assert.equal(modeRequests(ui).length, 1, "one click confirms rich mode and pending state prevents repeat requests");
     assert.equal(modeRequests(ui)[0].payload.mode_id, "rich");
     assert.equal(modeRequests(ui)[0].payload.session_id, "match-123");
@@ -77,7 +80,7 @@ const click = button => button.events.onactivate();
     assert.equal(ui.nodes.DifficultySelectionHint.text, "等待房主选择模式");
 }
 for (const [error, expected] of Object.entries({
-    mode_not_unlocked: "通关常规模式 N10 后解锁丰饶模式。",
+    mode_not_unlocked: "通关常规模式 N10 后解锁",
     rich_mode_locked: "通关常规模式 N10 后解锁丰饶模式。",
     rich_progression_pending: "正在读取解锁进度，请稍候。"
 })) {

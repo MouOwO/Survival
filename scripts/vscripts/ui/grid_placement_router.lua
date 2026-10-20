@@ -330,7 +330,8 @@ end
 local function send_profiles(player_id)
     local bounds, height = grid_config.build_bounds, tonumber(grid_config.build_ground_height) or 0
     local setup = package.loaded["systems/match_setup_service"]
-    local rich = setup and setup.get_mode and setup.get_mode() == "rich"
+    local mode = setup and setup.get_mode and setup.get_mode()
+    local rich = mode == "rich" or mode == "cold" or mode == "scourge"
     if rich then
         local region = require("systems/rich_region_service").region(player_id)
         if region then

@@ -30,10 +30,14 @@ assert(setup.select_mode(1, "standard", "match-one").error == "mode_locked")
 assert(setup.select_mode(2, "pure", "match-one").error == "selection_not_host")
 local snapshot = setup.snapshot()
 snapshot.mode_options[1].display_name = "tampered"
-assert(setup.snapshot().mode_options[1].display_name == "纯净模式")
+assert(setup.snapshot().mode_options[1].display_name == "常规模式")
 assert(#setup.snapshot().mode_options == 6)
-assert(setup.snapshot().mode_options[3].mode_id == "fishing"
-    and setup.snapshot().mode_options[3].display_name == "摸鱼模式")
+local order = {"standard", "rich", "cold", "scourge", "fishing", "pure"}
+for index, expected in ipairs(order) do assert(setup.snapshot().mode_options[index].mode_id == expected) end
+local function option(mode)
+    for _, row in ipairs(setup.snapshot().mode_options) do if row.mode_id == mode then return row end end
+    error("missing mode " .. mode)
+end
 setup.init("fishing-match")
 assert(setup.select_mode(0, "fishing", "fishing-match").error == "selection_not_host")
 assert(setup.select_mode(1, "fishing", "old-match").error == "match_session_mismatch")
@@ -52,29 +56,51 @@ package.loaded["systems/player_profile_service"] = {
     get_authenticated_progression = function(id) assert(id == 1); return progress end,
 }
 setup.init("rich-match")
-assert(setup.snapshot().mode_options[4].mode_id == "rich")
-assert(setup.snapshot().mode_options[4].pending == 1)
-assert(setup.select_mode(1, "rich", "rich-match").error == "rich_progression_pending")
+assert(option("rich").pending == 1)
+assert(setup.select_mode(1, "rich", "rich-match").error == "mode_profile_pending")
 progress = {loaded=true,clear_counts={n10=99}}
-assert(setup.snapshot().mode_options[4].pending == 1)
-assert(setup.snapshot().mode_options[4].unlock_hint:find("服务尚未就绪",1,true))
-assert(setup.select_mode(1,"rich","rich-match").error=="rich_progression_pending",
+assert(option("rich").pending == 1)
+assert(option("rich").unlock_hint:find("服务尚未就绪",1,true))
+assert(setup.select_mode(1,"rich","rich-match").error=="mode_profile_pending",
     "old backend capability cannot be inferred from a standard N10 alone")
 progress = {loaded=true,clear_counts={n10=99},standard_clear_counts={},rich_clear_counts={}}
-assert(setup.snapshot().mode_options[4].unlocked == 0)
-assert(setup.select_mode(1, "rich", "rich-match").error == "rich_mode_locked",
+assert(option("rich").unlocked == 0)
+assert(setup.select_mode(1, "rich", "rich-match").error == "mode_not_unlocked",
     "an explicit empty provenance map prevents historical mixed-counter fallback")
 for _, invalid in ipairs({true,"1",-1,0,0.5,math.huge}) do
     progress.standard_clear_counts.n10 = invalid
-    assert(setup.select_mode(1, "rich", "rich-match").error == "rich_mode_locked")
+    assert(setup.select_mode(1, "rich", "rich-match").error == "mode_not_unlocked")
 end
 progress = {loaded=true,clear_counts={n10=1},rich_clear_counts={}}
-assert(setup.snapshot().mode_options[4].unlocked == 1,
+assert(option("rich").unlocked == 1,
     "existing authoritative pre-mode history remains eligible")
 assert(setup.select_mode(1, "rich", "rich-match").ok)
 assert(setup.is_rich_mode() and setup.get_mode() == "rich" and setup.get_profile_mode() == "standard")
 assert(setup.select_mode(1, "rich", "rich-match").ok)
 assert(setup.select_mode(1, "standard", "rich-match").error == "mode_locked")
+local rules = require("config/mode_progression")
+for _, advanced in ipairs({"cold", "scourge"}) do
+    local session = advanced .. "-match"
+    setup.init(session)
+    local field, parent = rules.clear_field(advanced), rules.clear_field(rules.parent_mode(advanced))
+    progress = {loaded=true, clear_counts={n10=99}, standard_clear_counts={n10=99},
+        rich_clear_counts={}, cold_clear_counts={}, scourge_clear_counts={}}
+    progress[field].n10 = 99
+    assert(option(advanced).unlocked == 0 and option(advanced).pending == 0,
+        "neither ordinary nor same-mode N10 can replace the parent-mode clear")
+    local denial = setup.select_mode(1, advanced, session)
+    assert(denial.error == "mode_not_unlocked" and denial.unlock_hint == rules.entry_hint(advanced))
+    progress[field] = nil
+    progress[parent].n10 = 1
+    assert(option(advanced).pending == 1 and setup.select_mode(1, advanced, session).error == "mode_profile_pending",
+        "parent victory cannot imply missing backend mode support")
+    progress[field] = {}
+    assert(option(advanced).unlocked == 1 and option(advanced).pending == 0)
+    assert(setup.select_mode(1, advanced, session).ok)
+    assert(setup.get_mode() == advanced and setup.get_profile_mode() == "standard")
+    assert(setup.select_mode(1, advanced, session).ok, "same advanced selection remains idempotent")
+    assert(setup.select_mode(1, "standard", session).error == "mode_locked")
+end
 package.loaded["systems/player_profile_service"] = nil
 setup.init("match-two")
 assert(not setup.is_mode_selected() and setup.get_session_id() == "match-two")

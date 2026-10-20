@@ -8,6 +8,7 @@ local public_fields = require("config/generated/player_profile_public_fields")
 local gameplay_stats = require("config/generated/player_gameplay_stats")
 local achievement_definitions = require("config/generated/achievement_definitions")
 local entitlement_definitions = require("config/generated/entitlement_definitions")
+local mode_progression = require("config/mode_progression")
 
 local M = {}
 local profiles_by_player = {}
@@ -48,7 +49,9 @@ end
 local function matches_current_match(profile)
     if injected_provider then return true end
     local mode, session = selected_match()
+    local game_mode = require("systems/match_setup_service").get_mode()
     return mode ~= nil and profile and profile.mode == mode and profile.match_session_id == session
+        and (mode_progression.parent_mode(game_mode) == nil or profile.game_mode == game_mode)
 end
 
 local function register_server_convar(name, default_value)
@@ -124,7 +127,7 @@ local function validate_progression(progression)
         or type(progression.clear_counts) ~= "table" or progression.clear_counts == json_decoder.null then
         return false
     end
-    for _, field in ipairs({"clear_counts", "standard_clear_counts", "rich_clear_counts"}) do
+    for _, field in ipairs({"clear_counts", "standard_clear_counts", "rich_clear_counts", "cold_clear_counts", "scourge_clear_counts"}) do
         local counts = progression[field]
         if counts ~= nil then
             if type(counts) ~= "table" or counts == json_decoder.null then return false end
@@ -476,6 +479,7 @@ local function commit_snapshot(player_id, snapshot, reason)
         save = copy(snapshot.save),
         public = copy(snapshot.public),
         mode = snapshot.mode,
+        game_mode = snapshot.game_mode,
         match_session_id = snapshot.match_session_id,
         progression = copy(snapshot.progression),
         processed_update_ids = {},
@@ -656,12 +660,15 @@ function M.get_authenticated_daily_limits(player_id)
     return nil
 end
 
-function M.supports_rich_mode(player_id)
+function M.supports_mode_progression(player_id, mode)
     -- Capability comes from the authenticated server receipt, scoped to the
     -- current player/account/session. Old backends omit this map entirely.
     local progression = M.get_authenticated_progression(player_id)
-    return progression ~= nil and type(progression.rich_clear_counts) == "table"
+    return mode_progression.parent_mode(mode) ~= nil and progression ~= nil
+        and type(progression[mode_progression.clear_field(mode)]) == "table"
 end
+
+function M.supports_rich_mode(player_id) return M.supports_mode_progression(player_id, "rich") end
 
 local function fetch_player(player_id, reason, on_success, on_error, preserve_loaded)
     player_id = tonumber(player_id)
@@ -988,11 +995,20 @@ function M.get_progression(player_id, mode)
         local archive = profile.save.archive or {}
         result = { loaded = true, clear_counts = copy(archive.clear_counts or {}),
             standard_clear_counts = copy(archive.standard_clear_counts or {}),
-            rich_clear_counts = copy(archive.rich_clear_counts or {}) }
+            rich_clear_counts = copy(archive.rich_clear_counts or {}),
+            cold_clear_counts = copy(archive.cold_clear_counts or {}),
+            scourge_clear_counts = copy(archive.scourge_clear_counts or {}) }
     end
     local setup = require("systems/match_setup_service")
-    if result and (mode or setup.get_mode()) == "rich" then
-        result.clear_counts = copy(result.rich_clear_counts or {})
+    local selected = mode or setup.get_mode()
+    if result then result.mode_id = selected end
+    if result and mode_progression.parent_mode(selected) ~= nil then
+        -- Preserve an absent historical standard provenance before replacing
+        -- the ordinary permission view with this mode's independent counter.
+        if result.standard_clear_counts == nil then
+            result.standard_clear_counts = copy(result.clear_counts or {})
+        end
+        result.clear_counts = copy(result[mode_progression.clear_field(selected)] or {})
     end
     return result
 end

@@ -21,6 +21,34 @@ assert(not config.is_unlocked("N6", progression({ n5 = 0 / 0 })))
 assert(not config.is_unlocked("N6", { loaded = false, clear_counts = { n5 = 1 } }))
 assert(not config.is_unlocked("N10", { loaded = true, highest_difficulty = 10 }))
 assert(config.client_options(fresh)[6].unlock_hint == "通关 N5 解锁")
+local progression_rules = require("config/mode_progression")
+for _, mode_id in ipairs({"rich", "cold", "scourge"}) do
+    local progress = {loaded=true, mode_id=mode_id, clear_counts={n5=99,n9=99,n10=99},
+        standard_clear_counts={}, rich_clear_counts={}, cold_clear_counts={}, scourge_clear_counts={}}
+    local parent_field = progression_rules.clear_field(progression_rules.parent_mode(mode_id))
+    local own_field = progression_rules.clear_field(mode_id)
+    assert(not config.is_unlocked("N1", progress), "advanced N1 still requires the parent-mode N10")
+    assert(config.client_options(progress)[1].unlock_hint == progression_rules.entry_hint(mode_id))
+    progress[parent_field].n10 = 1
+    for number = 1, 10 do
+        assert(config.is_unlocked("N" .. number, progress) == (number <= 5),
+            "only the initial five levels open on mode entry")
+    end
+    assert(config.client_options(progress)[6].unlock_hint == progression_rules.difficulty_hint(mode_id, "N6"))
+    progress[own_field].n5 = 1
+    for number = 6, 10 do
+        assert(config.is_unlocked("N" .. number, progress), "own N5 opens the whole N6-N10 bracket")
+    end
+    for _, invalid in ipairs({true, "1", -1, 0.5, math.huge}) do
+        progress[own_field].n5 = invalid
+        assert(not config.is_unlocked("N10", progress), "invalid or cross-mode counts cannot unlock the bracket")
+    end
+    progress[own_field].n5 = 1
+    progress.mode_id = "standard"
+    assert(config.is_unlocked("N10", progress, mode_id), "the server-supplied mode overrides a legacy profile projection")
+    progress[parent_field].n10 = 0
+    assert(not config.is_unlocked("N1", progress, mode_id))
+end
 
 local bus = require("core/event_bus")
 local events = require("core/events")

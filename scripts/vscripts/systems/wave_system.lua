@@ -38,6 +38,12 @@ local function fishing_mode()
     return type(setup.get_mode) == "function" and setup.get_mode() == "fishing"
 end
 
+local function dedicated_region_mode()
+    local setup = package.loaded["systems/match_setup_service"]
+    local mode = setup and setup.get_mode and setup.get_mode()
+    return mode == "rich" or mode == "cold" or mode == "scourge"
+end
+
 local M = {}
 local state = {}
 local enemies = {}
@@ -361,13 +367,14 @@ local function configured_wave_channel(player_id)
     local slot = player_context.slot(player_id)
     local marker_name = tostring(slot and slot.wave_spawn_marker or "")
     local setup = package.loaded["systems/match_setup_service"]
-    if setup and setup.get_mode and setup.get_mode() == "rich" then
-        marker_name = "rich_start"
-        local position, reason = require("systems/rich_region_service").wave_spawn(player_id)
-        if not position then
-            print("[MonsterSpawnMarker] rich player=" .. tostring(player_id) .. " error=" .. tostring(reason))
-            return nil
+    local mode = setup and setup.get_mode and setup.get_mode()
+    if mode == "rich" or mode == "cold" or mode == "scourge" then
+        local channel, reason = require("systems/mode_spawn_service").wave_marker(player_id)
+        if not channel then
+            print("[MonsterSpawnMarker] mode=" .. tostring(mode) .. " player="
+                .. tostring(player_id) .. " error=" .. tostring(reason))
         end
+        return channel
     end
     if marker_name == "" or not Entities or not Entities.FindByName then return nil end
     local ok, marker = pcall(Entities.FindByName, Entities, nil, marker_name)
@@ -422,7 +429,7 @@ end
 -- client selection closed instead of treating unavailable data as a new save.
 local function selection_context()
     local ok, setup = pcall(require, "systems/match_setup_service")
-    if not ok or type(setup) ~= "table" then return nil, nil, nil end
+    if not ok or type(setup) ~= "table" or type(setup.get_mode) ~= "function" then return nil, nil, nil end
     local selector = type(setup.selector_player_id) == "function"
         and setup.selector_player_id() or nil
     local permission = require("systems/team_difficulty_service").current(setup.get_mode())
@@ -1004,6 +1011,18 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
     FindClearSpaceForUnit(unit, position, true)
+    if dedicated_region_mode() then
+        local allowed = require("systems/mode_spawn_service").validate_position(unit:GetAbsOrigin())
+        if not allowed then
+            unit.survival_wave_cleanup = true
+            pcall(monster_hero_visual_service.clear, unit)
+            if UTIL_Remove then pcall(UTIL_Remove, unit) end
+            state.failed_spawn = state.failed_spawn + 1
+            release_wave_model_resources(session, "spawn_outside_mode_region")
+            check_final_victory()
+            return
+        end
+    end
     local is_assault_boss = row.member_role == "assault_boss"
         or (row.member_role == nil and row.is_boss == true)
     unit.survival_is_boss = is_assault_boss
@@ -1991,6 +2010,10 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
             no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
         })
         FindClearSpaceForUnit(unit, position, true)
+        if dedicated_region_mode() then
+            local allowed, invalid = require("systems/mode_spawn_service").validate_position(unit:GetAbsOrigin())
+            if not allowed then error(invalid or "challenge_spawn_outside_mode_region") end
+        end
     end)
     if not setup_ok then
         unit.survival_wave_cleanup = true

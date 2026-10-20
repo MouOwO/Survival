@@ -120,10 +120,7 @@ def install(module=None):
         session = module._string(payload, "match_session_id", module.OPAQUE_ID)
         archive = getattr(application, "archive", None)
         raw = archive.profile({"account_id": account}) if archive else application.profile({"account_id": account})
-        # Preserve the existing rich entry rule. The shipped mode selector has
-        # no predecessor unlock chain for cold/scourge; adding durable identity
-        # must not introduce a new gate (cold N10 combat is not available yet).
-        if mode == "rich" and not progression(raw)["standard_clear_counts"].get("n10"):
+        if not progression(raw)[PARENT_MODES[mode] + "_clear_counts"].get("n10"):
             raise module.ApiError(mode + "_mode_locked", 409)
         database_id = application._database_account_id(account)
         result = application.rpc_client.rpc("match_profile_login", {

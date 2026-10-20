@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "status": "PASS",
+  "scope": "template_map three dedicated modes, marker positions and native navigation",
+  "map": {
+    "source": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\content\\dota_addons\\survival\\maps\\template_map.vmap",
+    "compiled": true,
+    "source_before_sha256": "655807B2D74D45BF391152D066FC0631E0998BB0562190AC38EB6AFEBD200DCF",
+    "backup": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\mode_spawn_progression_20261020\\map\\install_20261020_182430_609",
+    "package_sha256": "0F15C97493357662CEA06FB109717B6BE5F6F3B775A345DABE3569D9E5990EC9",
+    "source_after_sha256": "2DF86E9E66BDC00442DE100CC8D8E5BB504EB0654719E2A11A4BF8E26E356CB1"
+  },
+  "layout": "art/maps/mode_spawns/layout.json",
+  "mode_order": [
+    "standard",
+    "rich",
+    "cold",
+    "scourge",
+    "fishing",
+    "pure"
+  ],
+  "native": {
+    "summary": "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] SUMMARY ok=true markers=27 routes=12 modes=3 errors=0 restored=true spawned_units=0 account_writes=0 scheduled_jobs=0",
+    "markers": [
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=rich_start class=info_target ok=true x=-2752.0 y=-9984.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_rich_player_0_spawn class=info_target ok=true x=0.0 y=-9984.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_rich_monster_0_spawn class=info_target ok=true x=-2848.0 y=-9888.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_rich_player_1_spawn class=info_target ok=true x=-2752.0 y=-13184.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_rich_monster_1_spawn class=info_target ok=true x=-2656.0 y=-10080.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_rich_player_2_spawn class=info_target ok=true x=-5632.0 y=-9984.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_rich_monster_2_spawn class=info_target ok=true x=-2848.0 y=-10080.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_rich_player_3_spawn class=info_target ok=true x=-2752.0 y=-7040.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_rich_monster_3_spawn class=info_target ok=true x=-2656.0 y=-9888.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=cold_start class=info_target ok=true x=12672.0 y=9472.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_cold_player_0_spawn class=info_target ok=true x=14336.0 y=13056.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_cold_monster_0_spawn class=info_target ok=true x=12576.0 y=9568.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_cold_player_1_spawn class=info_target ok=true x=10752.0 y=10496.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_cold_monster_1_spawn class=info_target ok=true x=12768.0 y=9568.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_cold_player_2_spawn class=info_target ok=true x=14336.0 y=7936.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_cold_monster_2_spawn class=info_target ok=true x=12576.0 y=9376.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_cold_player_3_spawn class=info_target ok=true x=10752.0 y=5376.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_cold_monster_3_spawn class=info_target ok=true x=12768.0 y=9376.0 authored_z=16.0 ground_z=128.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=scourge_start class=info_target ok=true x=-12416.0 y=7168.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_scourge_player_0_spawn class=info_target ok=true x=-14080.0 y=13056.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_scourge_monster_0_spawn class=info_target ok=true x=-10368.0 y=13056.0 authored_z=656.0 ground_z=768.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_scourge_player_1_spawn class=info_target ok=true x=-14080.0 y=9216.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_scourge_monster_1_spawn class=info_target ok=true x=-10368.0 y=9216.0 authored_z=656.0 ground_z=768.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_scourge_player_2_spawn class=info_target ok=true x=-14080.0 y=5120.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_scourge_monster_2_spawn class=info_target ok=true x=-10112.0 y=5120.0 authored_z=656.0 ground_z=768.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_scourge_player_3_spawn class=info_target ok=true x=-14080.0 y=1024.0 authored_z=144.0 ground_z=256.0",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] MARKER name=mode_scourge_monster_3_spawn class=info_target ok=true x=-10112.0 y=1024.0 authored_z=656.0 ground_z=768.0"
+    ],
+    "routes": [
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=rich player=0 ok=true can_find_path=true length=2906.509765625 monster=mode_rich_monster_0_spawn home=mode_rich_player_0_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=rich player=1 ok=true can_find_path=true length=3098.509765625 monster=mode_rich_monster_1_spawn home=mode_rich_player_1_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=rich player=2 ok=true can_find_path=true length=2805.0192871094 monster=mode_rich_monster_2_spawn home=mode_rich_player_2_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=rich player=3 ok=true can_find_path=true length=2906.509765625 monster=mode_rich_monster_3_spawn home=mode_rich_player_3_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=cold player=0 ok=true can_find_path=true length=6014.1162109375 monster=mode_cold_monster_0_spawn home=mode_cold_player_0_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=cold player=1 ok=true can_find_path=true length=2569.0966796875 monster=mode_cold_monster_1_spawn home=mode_cold_player_1_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=cold player=2 ok=true can_find_path=true length=3886.5869140625 monster=mode_cold_monster_2_spawn home=mode_cold_player_2_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=cold player=3 ok=true can_find_path=true length=6098.193359375 monster=mode_cold_monster_3_spawn home=mode_cold_player_3_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=scourge player=0 ok=true can_find_path=true length=3712 monster=mode_scourge_monster_0_spawn home=mode_scourge_player_0_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=scourge player=1 ok=true can_find_path=true length=3712 monster=mode_scourge_monster_1_spawn home=mode_scourge_player_1_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=scourge player=2 ok=true can_find_path=true length=3968 monster=mode_scourge_monster_2_spawn home=mode_scourge_player_2_spawn",
+      "10/20 18:37:21 [VScript] [MODE_SPAWN_PROBE][native_startup_20261020_03] ROUTE mode=scourge player=3 ok=true can_find_path=true length=3968 monster=mode_scourge_monster_3_spawn home=mode_scourge_player_3_spawn"
+    ],
+    "spawned_units": 0,
+    "account_writes": 0,
+    "temporary_startup_hook_removed": true
+  },
+  "fixes": {
+    "rich_dry_land_navigation_cells_opened": 863,
+    "cold_third_platform": "Added a 512-wide collidable snow approach from z128 to z256; keeps the marked player position",
+    "unrelated_entities_and_meshes_preserved": true
+  },
+  "backend": {
+    "status": "DEPLOYED_AND_VERIFIED",
+    "bundle": "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+    "release": "20261020-mode-chain-b3c342e1de0d-v1",
+    "evidence": "validation/20261020/mode_release.json"
+  },
+  "evidence": {
+    "initial_native_failure": "output/mode_spawn_progression_20261020/native_startup_probe.log",
+    "final_native": "output/mode_spawn_progression_20261020/native_ramp_probe.log",
+    "mode_menu": "output/map_build_c6/mode_spawn_mode_menu.png"
+  }
+}

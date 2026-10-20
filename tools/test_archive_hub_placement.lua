@@ -101,6 +101,23 @@ local position, reason = placement.resolve(1, 1, rule, {}, wave, {})
 assert(position == nil and reason == "safe_hub_position_missing")
 assert(portal_lookups == 0 and #marker_lookups == 0)
 
+-- A mode-aware context owns the lawn, even while ordinary markers still exist.
+reset()
+local mode_context = {
+    slot = function() error("mode hub must not inspect ordinary slot markers") end,
+    resolve_builder_spawn = function(id)
+        assert(id == 2)
+        return {position = Vector(-12000, 8000, 384)}
+    end,
+}
+position, reason = placement.resolve(2, 2, rule, mode_context, wave, {})
+same(position, -12000, 8360, 384)
+assert(reason == "builder_spawn" and #marker_lookups == 0 and portal_lookups == 0)
+mode_context.resolve_builder_spawn = function() return nil, "mode_spawn_marker_missing" end
+position, reason = placement.resolve(2, 2, rule, mode_context, wave, {})
+assert(position == nil and reason == "safe_hub_position_missing")
+assert(#marker_lookups == 0 and portal_lookups == 0)
+
 -- Legacy configs retain their dedicated placement contract. With no nav API,
 -- their old wave offsets also remain unchanged.
 reset()

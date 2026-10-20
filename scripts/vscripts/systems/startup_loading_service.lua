@@ -506,7 +506,8 @@ function M.init(settings)
         if CustomGameEventManager and type(CustomGameEventManager.Send_ServerToPlayer) == "function" then
             CustomGameEventManager:Send_ServerToPlayer(resource("GetPlayer", entry.player_id),
                 "survival_loading_mode_result", { success = result.ok and 1 or 0,
-                    session_id = session_id, mode_id = result.mode_id or "", error = result.error or "" })
+                    session_id = session_id, mode_id = result.mode_id or "", error = result.error or "",
+                    unlock_hint = result.unlock_hint or "" })
         end
         if result.ok then
             local waves = package.loaded["systems/wave_system"]

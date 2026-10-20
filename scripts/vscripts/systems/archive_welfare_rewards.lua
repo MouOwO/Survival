@@ -8,7 +8,7 @@ local function nonnegative_integer(value)
 end
 function M.wins(archive)
     local total = 0
-    for _, key in ipairs({"clear_counts", "rich_clear_counts"}) do
+    for _, key in ipairs({"clear_counts", "rich_clear_counts", "cold_clear_counts", "scourge_clear_counts"}) do
         for _, count in pairs((archive or {})[key] or {}) do total = total + nonnegative_integer(count) end
     end
     return total

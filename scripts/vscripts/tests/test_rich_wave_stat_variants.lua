@@ -11,10 +11,15 @@ preload.STATE = {READY = "ready", FAILED = "failed", RETIRED = "retired"}
 preload.queue = function() return true end
 preload.status = function() return {status = preload.STATE.READY} end
 package.loaded["systems/monster_visual_service"].queue_wave = noop
-package.loaded["systems/rich_region_service"] = {wave_spawn = function(id) return Vector(id * 2000, 100, 32) end}
+package.loaded["config/mode_spawn_config"] = {map_name="fixture",modes={rich={
+    bounds={min_x=-10000,max_x=10000,min_y=-10000,max_y=10000},monster_markers={
+        [0]="mode_rich_monster_0_spawn",[1]="mode_rich_monster_1_spawn",
+        [2]="mode_rich_monster_2_spawn",[3]="mode_rich_monster_3_spawn"}}}}
+GridNav={IsTraversable=function() return true end,IsBlocked=function() return false end}
 local find_marker = Entities.FindByName
 Entities.FindByName = function(self, previous, name)
-    if name == "rich_start" then return marker(0) end
+    local id=tonumber(name:match("^mode_rich_monster_(%d+)_spawn$"))
+    if id then return marker(id) end
     return find_marker(self, previous, name)
 end
 local function copy(value)
@@ -56,6 +61,7 @@ assert(equal(input, before_input), "resolved variant rows and nested provenance 
 local create = CreateUnitByName
 CreateUnitByName = function(name, position, ...)
     local value = create(name, position, ...)
+    function value:GetAbsOrigin() return position end
     value.applied = {}
     function value:GetUnitName() return self.name end
     for method, key in pairs({SetBaseMaxHealth = "base_health", SetMaxHealth = "max_health",

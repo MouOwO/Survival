@@ -26,6 +26,13 @@ local function changed()
 end
 local function in_build_bounds(unit,p)
     local area=grid_config.build_bounds
+    local setup=package.loaded["systems/match_setup_service"]
+    local mode=setup and setup.get_mode and setup.get_mode()
+    if mode=="rich" or mode=="cold" or mode=="scourge" then
+        local config=require("systems/mode_spawn_service").config()
+        if not config then return false end
+        area=config.bounds
+    end
     if type(area)~="table" then return true end
     for _,name in ipairs({"min_x","max_x","min_y","max_y"}) do
         local v=tonumber(area[name]);if not v or v~=v or math.abs(v)==math.huge then return true end

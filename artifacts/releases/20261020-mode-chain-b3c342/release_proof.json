@@ -1,0 +1,102 @@
+{
+  "format": 1,
+  "role": "Immutable reviewed release artifact and offline reproduction inputs",
+  "captured_at": "2026-10-20T10:57:31.082906+00:00",
+  "verified_at": "2026-10-20T10:48:03.396970+00:00",
+  "deployment_state": "Current activation is recorded by operator logs; this proof records the validated bytes and makes no deployment-state assertion.",
+  "bundle": "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+  "parent": "ecf55dd6ba24d0b391a1640f7e25c06c50d79ec1eb37f0bfcdb86c28afde22f7",
+  "baseline_release": "20261020-archive-caps-v1",
+  "baseline_manifest_sha256": "30b3400ce2389c150290810097919e648beeae79dc96cbd4bd1ea27bb6310668",
+  "sealed_sha256": "3271354e33297ee4da9c25713037a8049fdd2be5548bed324f0911e095aaf4c3",
+  "changed_backend_files": [
+    "backend/archive_backend/match_modes.py",
+    "backend/archive_backend/unique_points.py"
+  ],
+  "changed_lua_sources": [
+    "config/recorded_mode_balance.lua",
+    "systems/archive_welfare_rewards.lua"
+  ],
+  "changed_configs": [],
+  "unique_pairs_preserved": [
+    [
+      "0328f6ba83a13d309b8b6df84524814cf10ed5287c019282e35e286161d27bac",
+      "ccc088836ff79f635a002095958f6bcd43f45361e71037c26bfe5054b42f1348"
+    ],
+    [
+      "ecf55dd6ba24d0b391a1640f7e25c06c50d79ec1eb37f0bfcdb86c28afde22f7",
+      "0328f6ba83a13d309b8b6df84524814cf10ed5287c019282e35e286161d27bac"
+    ],
+    [
+      "ecf55dd6ba24d0b391a1640f7e25c06c50d79ec1eb37f0bfcdb86c28afde22f7",
+      "ccc088836ff79f635a002095958f6bcd43f45361e71037c26bfe5054b42f1348"
+    ]
+  ],
+  "unique_pairs_added": [
+    [
+      "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+      "0328f6ba83a13d309b8b6df84524814cf10ed5287c019282e35e286161d27bac"
+    ],
+    [
+      "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+      "ccc088836ff79f635a002095958f6bcd43f45361e71037c26bfe5054b42f1348"
+    ],
+    [
+      "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+      "ecf55dd6ba24d0b391a1640f7e25c06c50d79ec1eb37f0bfcdb86c28afde22f7"
+    ]
+  ],
+  "migration004_sha256": "da1b05ef4398929735e1b08f093bb11f1fef6bbf92a43cd772b2c2d5ccac4ec5",
+  "applied002_sha256": "70a8ddb268ea419431630961653d61e4d2404bc7d1772fb7012e9495d25cf817",
+  "applied003_sha256": "522891724d0d1df7e105f5da4f508a87e4cdd53c4ea21768a1022f26895ce9b2",
+  "old_sync_sha256": "4b7f47f62b983770f9d02f81a772bda66e8e4433ba305b4fec6b89a8ed834b5d",
+  "new_sync_sha256": "8ceaf0d40f0e7a9a79189915a3079d2515ef2f73e2c366e80afba7998a3b051a",
+  "configuration_jsonb_sha256": "70330a4262311f77e1f5f10e54a34960c78dc9b765730616e905818ab8a26feb",
+  "post_function_hashes": {
+    "public.match_profile_login(text,text,text,jsonb)": "b38564d9260b0cfcbae69079635c062d925184f5627ddfcb603dcaa12165722e",
+    "public.archive_sync_config(text,jsonb)": "8ceaf0d40f0e7a9a79189915a3079d2515ef2f73e2c366e80afba7998a3b051a"
+  },
+  "verification_scope": {
+    "parent_configs_csv_daily_rules_and_unrelated_lua_preserved": "PASS",
+    "full_sql_chain_hardening_replay": {
+      "status": "PASS",
+      "migrations": 27,
+      "rpc_count": 14
+    },
+    "existing_catalog_http_cached_read_and_parent_contents": "PASS",
+    "database_direct_strict_predecessor_counts": {
+      "status": "PASS",
+      "cases": 21,
+      "invalid_counts": [
+        false,
+        true,
+        "1",
+        1.5,
+        -1,
+        0
+      ]
+    },
+    "actual_http_mode_chain_and_n10_temporary_targets": "PASS",
+    "cross_mode_rejected_and_duplicate_receipt": "PASS",
+    "durable_session_cannot_change_game_mode": "PASS",
+    "parent_hash_real_rpc_clear_compatibility": "PASS",
+    "backend_recreation_keeps_durable_mode_and_progress": "PASS",
+    "application_remains_minimum_privilege": {
+      "status": "PASS",
+      "exact_live_rpc_count": 16,
+      "ddl": false,
+      "table_access": false,
+      "role_membership": false
+    }
+  },
+  "private_data_included": false,
+  "tracked_inputs": {
+    "inputs/live_release_manifest.json": "30b3400ce2389c150290810097919e648beeae79dc96cbd4bd1ea27bb6310668",
+    "inputs/match_modes.before.py": "bb30bd75c8600ebfc8ad3d969a452cc554531d06c609697469fbfe16acdc51b5",
+    "inputs/unique_points.before.py": "0f6545dd2b9a61504343b768744b4104d33f010d67794b7287e99d53bcf6ee3d",
+    "inputs/recorded_mode_balance.lua": "c2619a0c45c421ecef8649d3d9474aa6f625e863236e3ee135c323769c399b45",
+    "README.md": "2f1c00fd6ef585a3f4669424b38ac710a2883aee1de5441ef63a403ca2205224",
+    "reproduce.py": "cc55231faf2cce1f0e6ecd8d842afe291b8372df1c1604b229c181366fc9e189",
+    ".gitattributes": "92519f7a639beae143240e81f4d77c6a5e910acfe5d5e3cdebdc24b7335aa709"
+  }
+}

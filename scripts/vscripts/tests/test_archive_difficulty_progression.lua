@@ -9,11 +9,13 @@ end
 local bus = require("core/event_bus")
 local events = require("core/events")
 local difficulty = require("config/difficulty_config")
+local progression_rules = require("config/mode_progression")
 local reducer = require("systems/archive_settlement")
 local stats = require("config/generated/player_gameplay_stats")
 local function empty_profile(account)
     local profile = { account_id = account, revision = 1, entitlements = {},
-        save = { archive = { clear_counts = {} }, gameplay_stats = {}, content_inventory = {} } }
+        save = { archive = { clear_counts = {}, rich_clear_counts = {}, cold_clear_counts = {}, scourge_clear_counts = {} },
+            gameplay_stats = {}, content_inventory = {} } }
     for _, row in ipairs(stats.rows) do profile.save.gameplay_stats[row.field_id] = row.default_value end
     return profile
 end
@@ -28,7 +30,7 @@ local provider = {
     resolve_account_id = function(id) return accounts[id] end,
     archive_submit = function(payload, success, failure)
         received[#received + 1] = copy(payload)
-        local expected = mode == "rich" and "rich_clear"
+        local expected = (mode == "rich" or mode == "cold" or mode == "scourge") and (mode .. "_clear")
             or mode == "standard" and rich_capability and "standard_clear" or "clear"
         assert(payload.command.kind == expected and payload.command.count == 1)
         assert(type(payload.config_hash) == "string" and #payload.config_hash > 0)
@@ -55,7 +57,12 @@ local profile_service = {
     end,
     get_progression = function(id)
         if not cached[id] then return nil end
-        return { loaded = true, clear_counts = copy(cached[id].save.archive.clear_counts) }
+        local progress = copy(cached[id].save.archive)
+        progress.loaded, progress.mode_id = true, mode
+        if progression_rules.parent_mode(mode) then
+            progress.clear_counts = copy(progress[progression_rules.clear_field(mode)])
+        end
+        return progress
     end,
     apply_snapshot = function(id, profile)
         assert(profile.account_id == accounts[id], "adapter must preserve account binding")
@@ -132,8 +139,33 @@ assert(database[accounts[0]].save.archive.standard_clear_counts.n10==1)
 local ordinary_n5=database[accounts[0]].save.archive.clear_counts.n5
 mode="rich"
 restart_match()
+assert(unlocked(0,"N5") and not unlocked(0,"N6"), "the acknowledged regular N10 opens rich N1-N5 only")
+down = true
 bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N5"})
+assert(not unlocked(0,"N6"), "an offline rich clear intent cannot open the upper bracket")
+down, lose_next_response = false, true
+tasks.archive_retry()
+assert(database[accounts[0]].save.archive.rich_clear_counts.n5==1 and not unlocked(0,"N6"),
+    "a committed rich clear with a lost response is still not a client-side unlock")
+tasks.archive_retry()
 assert(received[#received].command.kind=="rich_clear")
 assert(database[accounts[0]].save.archive.rich_clear_counts.n5==1)
 assert(database[accounts[0]].save.archive.clear_counts.n5==ordinary_n5)
+for number=6,10 do assert(unlocked(0,"N"..number), "one confirmed rich N5 opens all five upper levels") end
+for _,selected in ipairs({"cold","scourge"}) do
+    mode=progression_rules.parent_mode(selected)
+    restart_match()
+    bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N10"})
+    assert(received[#received].command.kind==mode.."_clear")
+    mode=selected
+    restart_match()
+    assert(unlocked(0,"N1") and unlocked(0,"N5") and not unlocked(0,"N6"),
+        "the parent-mode N10 opens the next mode's first bracket")
+    bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N5"})
+    assert(received[#received].command.kind==selected.."_clear")
+    assert(database[accounts[0]].save.archive[selected.."_clear_counts"].n5==1)
+    assert(database[accounts[0]].save.archive.clear_counts.n5==ordinary_n5,
+        "advanced victory cannot pollute ordinary unlocks")
+    for number=6,10 do assert(unlocked(0,"N"..number), "the advanced mode's own N5 opens its upper bracket") end
+end
 print("PASS test_archive_difficulty_progression: offline HTTP adapter/reducer boundary")

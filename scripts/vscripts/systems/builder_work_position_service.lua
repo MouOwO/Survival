@@ -43,6 +43,15 @@ local function near_units(caster, origin, radius)
 end
 local function grounded_clear(caster, candidate, reference_height, units)
     local bounds = grid_config.build_bounds
+    local setup = package.loaded["systems/match_setup_service"]
+    local mode = setup and setup.get_mode and setup.get_mode()
+    local local_mode = mode == "rich" or mode == "cold" or mode == "scourge"
+    local owner = tonumber(caster.survival_player_id)
+    if local_mode then
+        local config = require("systems/mode_spawn_service").config()
+        bounds = config and config.player_bounds and config.player_bounds[owner]
+        if not bounds then return nil end
+    end
     local margin = math.max(16, unit_hull(caster))
     if bounds and (candidate.x - margin < bounds.min_x or candidate.x + margin > bounds.max_x
         or candidate.y - margin < bounds.min_y or candidate.y + margin > bounds.max_y) then return nil end
@@ -54,6 +63,7 @@ local function grounded_clear(caster, candidate, reference_height, units)
         if current_height and math.abs(height - current_height) > 32 then return nil end
         current_height = current_height or height
         sample.z = height
+        if local_mode and not require("systems/rich_region_service").validate_position(owner, sample) then return nil end
         local checked, allowed = pcall(destination.validate, sample, caster)
         if not checked or not allowed or placement.is_position_occupied(sample) then return nil end
     end

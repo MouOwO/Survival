@@ -21,7 +21,8 @@ local attacked_targets = nil
 
 local function rich_mode()
     local setup = package.loaded["systems/match_setup_service"]
-    return setup and setup.get_mode and setup.get_mode() == "rich"
+    local mode = setup and setup.get_mode and setup.get_mode()
+    return mode == "rich" or mode == "cold" or mode == "scourge"
 end
 
 local function valid_entity(entity)
@@ -213,7 +214,7 @@ local function rich_socket(player_id, city, origin)
     local region, reason = regions.region(player_id)
     if not region then return nil, nil, nil, reason end
     release_ordinary_reservations()
-    local region_id = "rich:" .. region.id
+    local region_id = tostring(require("systems/mode_spawn_service").mode()) .. ":" .. region.id
     region_slots[region_id] = region_slots[region_id] or {}
     local slots, candidates = region_slots[region_id], {}
     local size = tonumber(config.grid_cell_size) or 64

@@ -104,6 +104,7 @@
     var difficultyDismissed = false, difficultyPhase = "", difficultyResume = null;
     var startupState = null, setupSession = "", modeChoice = "", modeAcknowledged = "";
     var modePending = false, modeError = "", modeRequestSerial = 0, modeSignature = "", modeRows = {};
+    var modeOrder = ["standard", "rich", "cold", "scourge", "fishing", "pure"];
     var profileRetry = null, profileRetryPending = false, profileRetrySerial = 0, profileErrorShown = false, profileRetryNotice = null;
     var initialBuilderSelectionFinished = false;
     var initialBuilderSelectionSerial = 0;
@@ -182,15 +183,17 @@
     function modeOptions() {
         var seen = {};
         return optionArray(setup() && setup().mode_options).filter(function (option) {
-            if (!option || ["pure", "standard", "fishing", "rich", "cold", "scourge"].indexOf(option.mode_id) < 0 || seen[option.mode_id]) return false;
+            if (!option || modeOrder.indexOf(option.mode_id) < 0 || seen[option.mode_id]) return false;
             seen[option.mode_id] = true; return true;
+        }).sort(function (left, right) {
+            return modeOrder.indexOf(left.mode_id) - modeOrder.indexOf(right.mode_id);
         });
     }
     function modeUnlocked(option) {
         if (!option || option.pending === true || Number(option.pending) === 1) return false;
-        // Older snapshots omit eligibility for the original modes. Rich mode
-        // requires an explicit server acknowledgement of its unlock condition.
-        return option.unlocked === undefined ? option.mode_id !== "rich"
+        // Original modes remain compatible with older snapshots. Progression
+        // modes always require explicit permission from the server.
+        return option.unlocked === undefined ? ["standard", "fishing", "pure"].indexOf(option.mode_id) >= 0
             : option.unlocked === true || Number(option.unlocked) === 1;
     }
     function modeDailyCapped(option) {
@@ -205,7 +208,8 @@
         if (option.daily_pending === true || Number(option.daily_pending) === 1) return option.daily_hint || "正在更新今日奖励额度……";
         if (modeDailyCapped(option)) return option.daily_hint || "今日奖励已达上限";
         if (option.pending === true || Number(option.pending) === 1) return "正在读取解锁进度……";
-        return option.unlock_hint || (option.mode_id === "rich" ? "通关常规模式 N10 后解锁" : "尚未解锁该模式");
+        return option.unlock_hint || ({rich:"通关常规模式 N10 后解锁", cold:"通关丰饶模式 N10 后解锁",
+            scourge:"通关极寒模式 N10 后解锁"}[option.mode_id] || "尚未解锁该模式");
     }
     function acceptStartup(next) {
         if (!next || typeof next.session_id !== "string" || !next.session_id) return;
@@ -259,13 +263,16 @@
         modePending = false; modeRequestSerial++;
         var messages = {selection_not_host: "由房主统一选择本局模式。", mode_selector_required: "由房主统一选择本局模式。",
             mode_locked: "本局模式已选择，正在刷新。", invalid_mode: "该模式不可用，请重新选择。",
-            mode_not_unlocked: "通关常规模式 N10 后解锁丰饶模式。", mode_profile_pending: "正在读取解锁进度，请稍候。",
+            mode_profile_pending: "正在读取解锁进度，请稍候。",
             mode_daily_limit_reached: "今日奖励已达上限",
             mode_daily_limits_pending: "正在更新今日奖励额度，请稍候。",
             rich_mode_locked: "通关常规模式 N10 后解锁丰饶模式。", rich_progression_pending: "正在读取解锁进度，请稍候。",
             mode_not_found: "该模式不可用，请重新选择。", match_session_mismatch: "游戏状态已更新，请等待刷新后重试。",
             session_mismatch: "游戏状态已更新，请等待刷新后重试。", startup_not_ready: "入场准备尚未完成，请稍候。"};
-        modeError = messages[payload && payload.error] || "模式选择失败，请重试。";
+        var rejectedOption = modeOptions().filter(function (option) { return option.mode_id === modeChoice; })[0];
+        modeError = payload && payload.error === "mode_not_unlocked"
+            ? payload.unlock_hint || modeUnlockHint(rejectedOption || {mode_id:modeChoice})
+            : messages[payload && payload.error] || "模式选择失败，请重试。";
         readStartup(); renderDifficultySelection(difficultyWave);
     }
     function renderModeChoice(ui) {
@@ -299,6 +306,11 @@
         setText("DifficultySelectionError", modeError);
     }
     function difficultyUnlocked(option) { return !!option && (option.unlocked === true || Number(option.unlocked) === 1); }
+    function difficultyTemporary(option) { return !!option && (option.temporary_config === true || Number(option.temporary_config) === 1); }
+    function difficultyTemporaryLabel(option) {
+        var source = String(option && option.source_difficulty_id || "");
+        return "临时配置" + (/^N(?:[1-9]|10)$/.test(source) ? " · 沿用 " + source : "");
+    }
     function difficultyUnlockHint(option, compact) {
         var text = String(option && option.unlock_hint || "通关前一级难度解锁");
         if (!compact) return text;
@@ -382,8 +394,8 @@
                 enabled: difficultyAvailable() && canConfirmDifficulty() && difficultySelector()
                     && difficultyUnlocked(row.option) && !difficultyRequestPending});
             row.availability.text = !difficultyUnlocked(row.option) ? difficultyUnlockHint(row.option, true)
-                : "";
-            row.availability.visible = !difficultyUnlocked(row.option);
+                : difficultyTemporary(row.option) ? difficultyTemporaryLabel(row.option) : "";
+            row.availability.visible = !difficultyUnlocked(row.option) || difficultyTemporary(row.option);
         });
     }
     function selectDifficulty() {
@@ -518,9 +530,14 @@
             var diamond = $.CreatePanel("Panel", header, ""); diamond.AddClass("DifficultyOptionDiamond");
             var code = $.CreatePanel("Label", header, ""); code.AddClass("DifficultyOptionCode"); code.html = false;
             code.text = String(option.difficulty_id);
+            if (difficultyTemporary(option)) { code.style.horizontalAlign = "left"; code.style.marginLeft = "14px"; }
             var availability = $.CreatePanel("Label", header, ""); availability.AddClass("DifficultyOptionAvailability"); availability.html = false;
             difficultyRows[option.difficulty_id] = {button: button, option: option, availability: availability};
-            button.SetPanelEvent("onmouseover", function(){if (!difficultyUnlocked(option)) $.DispatchEvent("DOTAShowTextTooltip", button, difficultyUnlockHint(option, false));});
+            button.SetPanelEvent("onmouseover", function(){
+                var text = !difficultyUnlocked(option) ? difficultyUnlockHint(option, false) : "";
+                if (difficultyTemporary(option)) text += (text ? "\n" : "") + (option.description || difficultyTemporaryLabel(option));
+                if (text) $.DispatchEvent("DOTAShowTextTooltip", button, text);
+            });
             button.SetPanelEvent("onmouseout", function(){ $.DispatchEvent("DOTAHideTextTooltip"); });
             ui.State.Bind(button, function () {
                 if (!difficultyAvailable() || !canConfirmDifficulty() || !difficultySelector()

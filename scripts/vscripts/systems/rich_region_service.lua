@@ -18,7 +18,8 @@ local origin, initialization_error, guard_active = nil, nil, false
 
 local function rich()
     local setup = package.loaded["systems/match_setup_service"]
-    return setup and type(setup.get_mode) == "function" and setup.get_mode() == "rich"
+    local mode = setup and type(setup.get_mode) == "function" and setup.get_mode()
+    return mode == "rich" or mode == "cold" or mode == "scourge"
 end
 
 local function number(value)
@@ -77,7 +78,57 @@ local function grounded(position)
     return nil
 end
 
+local function build_authored_regions()
+    local service = require("systems/mode_spawn_service")
+    local config, reason = service.config()
+    if not config then return nil, reason end
+    local marker, center, missing = service.marker(config.center_marker)
+    if not marker then return nil, missing end
+    if not service.contains(config.bounds, center) then return nil, "mode_center_outside_bounds" end
+    origin = center
+    local result, compiled = {}, {}
+    for index, direction in ipairs(DIRECTIONS) do
+        local player_id = index - 1
+        local bounds = config.player_bounds and config.player_bounds[player_id]
+        local name = config.player_markers and config.player_markers[player_id]
+        local entity, position, error = service.marker(name)
+        if not entity then return nil, error end
+        local landing, invalid = service.landing(position, bounds)
+        if not landing then return nil, invalid .. ":" .. tostring(name) end
+        if not service.contains(config.bounds, landing) then return nil, "mode_player_outside_bounds:" .. name end
+        -- Explicit Hammer courts remain separate even when walkable attack
+        -- roads join the central monster area. Connectivity is not ownership.
+        local region = { id = direction.id, player_index = player_id, marker = name,
+            position = landing, cells = {}, min_x = math.huge, min_y = math.huge,
+            max_x = -math.huge, max_y = -math.huge }
+        local min_x, max_x = math.ceil(bounds.min_x / CELL), math.floor(bounds.max_x / CELL) - 1
+        local min_y, max_y = math.ceil(bounds.min_y / CELL), math.floor(bounds.max_y / CELL) - 1
+        if (max_x - min_x + 1) * (max_y - min_y + 1) > MAX_REGION_CELLS then
+            return nil, "mode_player_region_too_large:" .. name
+        end
+        for x = min_x, max_x do for y = min_y, max_y do
+            local id = key(x, y)
+            if compiled[id] then return nil, "mode_player_regions_overlap:" .. name end
+            if traversable(point(x, y)) then
+                compiled[id] = direction.id
+                region.cells[#region.cells + 1] = { x, y }
+                region.min_x, region.max_x = math.min(region.min_x, x), math.max(region.max_x, x)
+                region.min_y, region.max_y = math.min(region.min_y, y), math.max(region.max_y, y)
+            end
+        end end
+        local sx, sy = cell(landing)
+        if compiled[key(sx, sy)] ~= direction.id then return nil, "mode_player_landing_outside_cells:" .. name end
+        region.cell_count = #region.cells
+        result[direction.id] = region
+    end
+    labels = compiled
+    return result
+end
+
 local function build_regions()
+    -- Old isolated-map fixtures have no engine map API. Live maps always use
+    -- the explicit marker/bounds contract and never fall back to radial rays.
+    if type(GetMapName) == "function" then return build_authored_regions() end
     if not Entities or type(Entities.FindByName) ~= "function" then return nil, "rich_start_missing" end
     local found, marker = pcall(Entities.FindByName, Entities, nil, "rich_start")
     if not found or not valid(marker) or not marker.GetAbsOrigin then return nil, "rich_start_missing" end
@@ -185,12 +236,17 @@ function M.resolve_spawn(player_id, slot_id)
         end
     end
     if not position then return nil, "rich_spawn_not_traversable" end
-    return { position = position, marker = "rich_start", source = "rich_region_navigation",
-        slot_id = region.id, mode = "rich" }
+    return { position = position, marker = region.marker or "rich_start",
+        source = region.marker and "mode_hammer_marker" or "rich_region_navigation",
+        slot_id = region.id, mode = require("systems/mode_spawn_service").mode() }
 end
 
 function M.wave_spawn(player_id)
     if not rich() then return nil, "rich_mode_inactive" end
+    if type(GetMapName) == "function" then
+        local channel, reason = require("systems/mode_spawn_service").wave_marker(player_id)
+        return channel and channel.position or nil, reason
+    end
     local region, reason = M.region(player_id)
     if not region then return nil, reason end
     if region.wave_position and traversable(region.wave_position) then return copy(region.wave_position) end

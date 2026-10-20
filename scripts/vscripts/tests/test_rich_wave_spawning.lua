@@ -19,19 +19,27 @@ package.loaded["systems/monster_visual_service"].queue_wave = noop
 local rich_marker_reads, rich_route_reads = 0, 0
 local original_find = Entities.FindByName
 local function rich_position(id)
-    return Vector(2000 + id * 1200, -800 - id * 300, 96)
+    return Vector(500 + (id % 2 - .5) * 192, -900 + (math.floor(id / 2) - .5) * 192, 96)
 end
-package.loaded["systems/rich_region_service"] = { wave_spawn = function(id)
+package.loaded["config/mode_spawn_config"] = {map_name="fixture",modes={rich={
+    bounds={min_x=-10000,max_x=10000,min_y=-10000,max_y=10000},monster_markers={
+        [0]="mode_rich_monster_0_spawn",[1]="mode_rich_monster_1_spawn",
+        [2]="mode_rich_monster_2_spawn",[3]="mode_rich_monster_3_spawn"}}}}
+GridNav={IsTraversable=function() return true end,IsBlocked=function() return false end}
+local mode_spawns=require("systems/mode_spawn_service")
+local resolve_wave=mode_spawns.wave_marker
+mode_spawns.wave_marker=function(id)
     rich_route_reads = rich_route_reads + 1
     assert(type(id) == "number" and id >= 0 and id <= 3)
-    return rich_position(id)
-end }
+    return resolve_wave(id)
+end
 Entities.FindByName = function(self, previous, name)
-    if name == "rich_start" then
+    local id=tonumber(name:match("^mode_rich_monster_(%d+)_spawn$"))
+    if id then
         rich_marker_reads = rich_marker_reads + 1
         if not markers_ready then return nil end
         return { IsNull = function() return false end,
-            GetAbsOrigin = function() return Vector(500, -900, 96) end }
+            GetAbsOrigin = function() return rich_position(id) end }
     end
     return original_find(self, previous, name)
 end
@@ -41,6 +49,8 @@ end
 local original_create = CreateUnitByName
 CreateUnitByName = function(name, position, ...)
     local value = original_create(name, position, ...)
+    value.position=position
+    function value:GetAbsOrigin() return self.position end
     value.applied = { position = {x = position.x, y = position.y, z = position.z} }
     function value:GetUnitName() return self.name end
     local setters = { SetBaseMaxHealth = "base_health", SetMaxHealth = "max_health",
@@ -192,6 +202,19 @@ for _, number in ipairs({1, 10, 20, 24, 25}) do
     assert(#winners == 0 and #finalized == 0 and #granted == 0,
         "Spawn integration must not settle a match or grant account rewards")
     total_verified = total_verified + spawn_events
+end
+-- Engine clear-space must not place a successful wave birth on another
+-- continent, even when its configured central marker was valid.
+restart("N1",true,{0,1,2,3},"rich")
+local ordinary_clear_space=FindClearSpaceForUnit
+FindClearSpaceForUnit=function(value) value.position=Vector(0,30000,32) end
+assert(wave.debug_spawn_wave_for_players(1,{0,1,2,3}))
+finish_preload_and_spawns()
+FindClearSpaceForUnit=ordinary_clear_space
+local rejected_state=upvalue("state")
+assert(rejected_state.failed_spawn==240 and rejected_state.spawned==0 and rejected_state.alive==0)
+for _,value in ipairs(created) do
+    assert(value.removed and value.survival_wave_cleanup,"out-of-mode native placement must be removed without registering an enemy")
 end
 print("RICH_WAVE_SPAWNING_PASS: 5 isolated production waves, " .. total_verified
     .. " births, 60 per owner, rich routes, estimated bosses, W24 groups, preserved models/roles and custom armor")

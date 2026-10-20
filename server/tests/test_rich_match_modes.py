@@ -71,8 +71,8 @@ class RichDatabase(Database):
             if key in self.sessions and self.sessions[key]["mode"] != mode:
                 return {"ok": False, "error": "match_mode_locked"}
             current = self.profile(account)
-            if mode == "rich" and not match_modes.progression(current)["standard_clear_counts"].get("n10"):
-                return {"ok": False, "error": "rich_mode_locked"}
+            if mode in match_modes.PARENT_MODES and not match_modes.progression(current)[match_modes.PARENT_MODES[mode] + "_clear_counts"].get("n10"):
+                return {"ok": False, "error": mode + "_mode_locked"}
             self.sessions.setdefault(key, {"ok": True, "account_id": account,
                 "match_session_id": session, "mode": mode, "baseline": deepcopy(current),
                 "defaults": deepcopy(payload["p_defaults"]), "created_at": 100})
@@ -150,6 +150,63 @@ class RichModeTests(unittest.TestCase):
                 self.module.login(self.app, {"account_id": self.account, "match_session_id": self.session,
                     "mode": "rich", "unlocked": True})
         self.assertEqual(self.database.sessions, {})
+
+    def test_predecessor_chain_uses_only_the_previous_mode_and_keeps_durable_identity(self):
+        archive = self.profile["save"]["archive"]
+        archive.update(clear_counts={"n10": 99}, standard_clear_counts={"n10": 1})
+        self.profile["save"]["gameplay_stats"]["initial_wood"] = 777
+        for mode in ("rich", "cold", "scourge"):
+            self.session = mode + "-chain-session-one"
+            parent_field = match_modes.PARENT_MODES[mode] + "_clear_counts"
+            if mode != "rich":
+                with self.assertRaisesRegex(ApiError, mode + "_mode_locked"):
+                    self.login(mode)
+                for invalid in (True, "1", 0, -1, 1.5, float("inf")):
+                    archive[parent_field] = {"n10": invalid}
+                    with self.subTest(mode=mode, value=invalid), self.assertRaisesRegex(ApiError, mode + "_mode_locked"):
+                        self.login(mode)
+                archive[parent_field] = {"n10": 1}
+            view = self.login(mode)
+            self.assertEqual((view["mode"], view["game_mode"]), ("standard", mode))
+            self.assertEqual(view["save"]["gameplay_stats"]["initial_wood"], 777)
+            context = self.database.sessions[(self.database_account, self.session)]
+            self.assertEqual(context["mode"], mode)
+            self.assertEqual(self.login(mode), view, "retry keeps the same immutable baseline")
+            for other in set(match_modes.PARENT_MODES) - {mode}:
+                self.assertNotEqual(context["mode"], other)
+
+    def test_advanced_clear_context_rejects_every_cross_mode_and_deduplicates_client_ids(self):
+        archive = self.profile["save"]["archive"]
+        archive.update(clear_counts={"n10": 1}, standard_clear_counts={"n10": 1},
+                       rich_clear_counts={"n10": 1}, cold_clear_counts={"n10": 1})
+        for mode in ("rich", "cold", "scourge"):
+            self.session = mode + "-independent-clear-session"
+            self.context(mode)
+            for kind in ("clear", "standard_clear", "rich_clear", "cold_clear", "scourge_clear"):
+                if kind == mode + "_clear":
+                    continue
+                before = deepcopy(self.profile)
+                with self.subTest(mode=mode, kind=kind), self.assertRaisesRegex(ArchiveError, "match_clear_mode_mismatch"):
+                    self.send(kind)
+                self.assertEqual(self.profile, before)
+            self.assertTrue(self.send(mode + "_clear")["ok"])
+            self.assertTrue(self.send(mode + "_clear", **{"id": "another-client-operation"})["ok"])
+            archive = self.profile["save"]["archive"]
+            self.assertEqual(archive[mode + "_clear_counts"]["n5"], 1)
+            with self.assertRaisesRegex(ArchiveError, "archive_clear_invalid"):
+                self.send(mode + "_clear", difficulty="n11")
+        self.assertEqual(archive["clear_counts"], {"n10": 1})
+        self.assertEqual(archive["standard_clear_counts"], {"n10": 1})
+        self.assertEqual(len(self.database.ops), 3)
+
+    def test_admitted_mode_cannot_rebind_an_existing_durable_session(self):
+        self.profile["save"]["archive"].update(standard_clear_counts={"n10": 1},
+                                               rich_clear_counts={"n10": 1}, cold_clear_counts={"n10": 1})
+        self.login("rich")
+        for mode in ("cold", "scourge"):
+            with self.subTest(mode=mode), self.assertRaisesRegex(ApiError, "match_mode_locked"):
+                self.login(mode)
+        self.assertEqual(self.database.sessions[(self.database_account, self.session)]["mode"], "rich")
 
     def test_clear_scope_requires_durable_matching_account_and_mode(self):
         with self.assertRaisesRegex(ArchiveError, "match_session_invalid"):
@@ -272,6 +329,32 @@ class RichModeTests(unittest.TestCase):
                     command=dict(command, kind="standard_clear")))
             self.assertEqual(rejected.exception.code, 400)
             rejected.exception.close()
+            for mode in ("cold", "scourge"):
+                payload["match_session_id"] = mode + "-http-chain-session"
+                with self.assertRaises(urllib.error.HTTPError) as rejected:
+                    post("/v1/session/login", dict(payload, mode=mode, unlocked=True))
+                self.assertEqual(rejected.exception.code, 409)
+                rejected.exception.close()
+                parent = match_modes.PARENT_MODES[mode]
+                self.profile["save"]["archive"][parent + "_clear_counts"]["n10"] = 1
+                admitted = post("/v1/session/authenticate", payload)
+                self.assertIn(mode + "_clear_counts", admitted["progression"])
+                expected_wood = self.profile["save"]["gameplay_stats"]["initial_wood"]
+                profile = post("/v1/session/login", dict(payload, mode=mode))
+                self.assertEqual((profile["mode"], profile["game_mode"]), ("standard", mode))
+                self.assertEqual(profile["save"]["gameplay_stats"]["initial_wood"], expected_wood)
+                command = {"id": mode + "-http-clear-one", "kind": mode + "_clear", "difficulty_id": "n5", "count": 1}
+                request = dict(payload, config_hash=self.bundle.hash, command=command)
+                result = post("/v1/archive/command", request)
+                self.assertTrue(result["ok"])
+                self.assertEqual(result["profile"]["game_mode"], mode)
+                self.assertEqual(result["profile"]["progression"][mode + "_clear_counts"], {"n5": 1})
+                self.assertTrue(post("/v1/archive/command", dict(request, command=dict(command, id="second-client-intent")))["ok"])
+                self.assertEqual(self.profile["save"]["archive"][mode + "_clear_counts"], {"n5": 1})
+                with self.assertRaises(urllib.error.HTTPError) as rejected:
+                    post("/v1/archive/command", dict(request, command=dict(command, kind="clear")))
+                self.assertEqual(rejected.exception.code, 400)
+                rejected.exception.close()
         finally:
             http.shutdown(); http.server_close(); thread.join()
 

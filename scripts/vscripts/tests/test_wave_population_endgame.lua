@@ -148,6 +148,7 @@ package.loaded["systems/player_profile_service"] = {
 package.loaded["systems/startup_loading_service"] = {
     is_gameplay_ready = function() return true end,
     is_player_ready = function() return true end,
+    is_difficulty_selection_ready = function() return true end,
 }
 package.loaded["systems/online_time_service"] = { disconnect = function(id) personal_finalized[#personal_finalized + 1] = id end, finish = function(reason)
     finalized[#finalized + 1] = reason

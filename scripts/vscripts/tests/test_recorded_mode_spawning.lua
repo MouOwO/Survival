@@ -119,8 +119,11 @@ local function check(value,expected,mode,label)
 end
 local formal_count,variant_count,member_count,rebirth_count=0,0,0,0
 local crossing=false
-for _,selection in ipairs({{"cold","N1"},{"cold","N2"},{"cold","N3"},{"cold","N4"},
-    {"scourge","N1"},{"scourge","N2"}}) do
+local selections={}
+for _,mode in ipairs({"cold","scourge"}) do
+    for number=1,10 do selections[#selections+1]={mode,"N"..number} end
+end
+for _,selection in ipairs(selections) do
     local mode,difficulty=selection[1],selection[2]
     selected_mode,selected_difficulty=mode,difficulty
     local built,reason=balance.build_waves(assert(difficulty_config.get(difficulty)),mode)
@@ -228,9 +231,9 @@ for _,mode in ipairs({"standard","pure","fishing"}) do
     local expected=assert(profiles.resolve("practice_wood","N2"))
     assert(profiles.resolve("practice_wood","N2",mode)==expected,"legacy mode profile changed")
 end
-local missing,reason=balance.build_waves(assert(difficulty_config.get("N3")),"scourge")
-assert(missing==nil and reason=="recorded_mode_difficulty_missing:scourge:N3",
-    "unsupported difficulty must not leak another mode's balance")
+local missing,reason=balance.build_waves({difficulty_id="N11",total_waves=30},"scourge")
+assert(missing==nil and reason=="recorded_mode_difficulty_missing:scourge:N11",
+    "temporary configuration must never open invalid difficulties")
 assert(equal(sources,source_before),"recorded spawn or mode lookup mutated generated data/provenance")
 print(string.format("RECORDED_MODE_SPAWNING_PASS formal=%d variants=%d members=%d rebirth=%d; all supported pairs, 60 counts, native limits, armor, immutable sources, mode isolation",
     formal_count,variant_count,member_count,rebirth_count))

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "status": "PASS",
+  "verified_at": "2026-10-20T11:05:21.957995+00:00",
+  "sealed_sha256": "3271354e33297ee4da9c25713037a8049fdd2be5548bed324f0911e095aaf4c3",
+  "operator_tar_sha256": "109190b5bb0dbd4aa4ca40e965c472a7ba8327aeefe4ab8a2e51823d1602ba9f",
+  "migration": "target/202610200004_mode_unlock_chain.sql",
+  "existing_migrations_changed": false,
+  "backend": {
+    "status": "MODE_RELEASE_VERIFIED",
+    "bundle": "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+    "archive_release": "20261020-mode-chain-b3c342e1de0d-v1",
+    "payment_release": "20261018-checkout-gcoin-v1",
+    "payment_unchanged": true,
+    "player_updates": 0,
+    "health": {
+      "database_ready": true,
+      "loaded_bundle": "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+      "running_release_matches": true,
+      "payment_healthy": true
+    }
+  },
+  "local_game_hash": "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+  "local_installed_bundle_files": 28,
+  "native_map_validation": "validation/20261020/mode_spawns.json",
+  "notes": "No player progress rows were edited for deployment or verification; existing daily caps, catalog and payment bytes preserved."
+}

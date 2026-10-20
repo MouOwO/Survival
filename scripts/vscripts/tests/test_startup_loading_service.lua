@@ -155,6 +155,23 @@ local function assert_admitted(service)
     assert(state.error == nil, "mode/profile errors must not reopen the loading page")
 end
 
+-- A rejected server-owned mode choice carries its precise unlock condition
+-- through the real listener, rather than dropping it before Panorama sees it.
+do
+    local hinted = fixture(1)
+    success(requests[1], {n10=99}, {})
+    authenticated[0].progression.cold_clear_counts = {}
+    modules.profiles.get_authenticated_progression = function(id) return authenticated[id].progression end
+    assets_done() ui(hinted, 0) hinted.tick()
+    assert_admitted(hinted)
+    select_mode(hinted, "cold")
+    local response = responses[#responses].payload
+    assert(response.success == 0 and response.error == "mode_not_unlocked")
+    assert(response.unlock_hint == require("config/mode_progression").entry_hint("cold"),
+        "mode-specific server hint survives the network response envelope")
+    assert(#profile_requests == 0, "a locked mode never starts gameplay profile loading")
+end
+
 -- Admission authenticates independently of mode. Mode profiles release a
 -- separate gameplay gate after the engine has already entered the game.
 local admitted, playable = 0, 0

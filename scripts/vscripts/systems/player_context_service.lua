@@ -133,7 +133,7 @@ function M.resolve_builder_spawn(player_id)
         return nil, "player_slot_not_configured"
     end
     local mode = require("systems/match_setup_service").get_mode()
-    if mode == "rich" then
+    if mode == "rich" or mode == "cold" or mode == "scourge" then
         return require("systems/rich_region_service").resolve_spawn(player_id, slot.slot_id)
     end
     if mode == "fishing" then

@@ -1,0 +1,102 @@
+{
+  "schema": 2,
+  "status": "PASS",
+  "scope": "Mode progression validated against the archive-caps baseline and deployed with game bundle activation",
+  "base_head": "6bc1f189b0badbfe6a8f7bb0c2fd1f8cbe8a9869",
+  "baseline_release": "20261020-archive-caps-v1",
+  "baseline_manifest_sha256": "30b3400ce2389c150290810097919e648beeae79dc96cbd4bd1ea27bb6310668",
+  "parent": "ecf55dd6ba24d0b391a1640f7e25c06c50d79ec1eb37f0bfcdb86c28afde22f7",
+  "bundle": "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+  "sealed_sha256": "3271354e33297ee4da9c25713037a8049fdd2be5548bed324f0911e095aaf4c3",
+  "report": "output/mode_progression_release_20261020/gate_fix/isolated_94cb5ae1e57d/report.json",
+  "rules": [
+    "standardN10 -> richN1-N5",
+    "richN5 -> richN6-N10",
+    "richN10 -> coldN1-N5",
+    "coldN5 -> coldN6-N10",
+    "coldN10 -> scourgeN1-N5",
+    "scourgeN5 -> scourgeN6-N10"
+  ],
+  "capability": "Authenticated account/session independent map; missing capability fails closed",
+  "temporary_balance": {
+    "coldN5-N10": "coldN4",
+    "scourgeN3-N10": "scourgeN2",
+    "saved_difficulty": "Selected target, never inherited source"
+  },
+  "migration": {
+    "new004_sha256": "da1b05ef4398929735e1b08f093bb11f1fef6bbf92a43cd772b2c2d5ccac4ec5",
+    "applied002_sha256": "70a8ddb268ea419431630961653d61e4d2404bc7d1772fb7012e9495d25cf817",
+    "applied003_sha256": "522891724d0d1df7e105f5da4f508a87e4cdd53c4ea21768a1022f26895ce9b2",
+    "existing_migrations_changed": false
+  },
+  "checks": {
+    "parent_configs_csv_daily_rules_and_unrelated_lua_preserved": "PASS",
+    "full_sql_chain_hardening_replay": {
+      "status": "PASS",
+      "migrations": 27,
+      "rpc_count": 14
+    },
+    "existing_catalog_http_cached_read_and_parent_contents": "PASS",
+    "database_direct_strict_predecessor_counts": {
+      "status": "PASS",
+      "cases": 21,
+      "invalid_counts": [
+        false,
+        true,
+        "1",
+        1.5,
+        -1,
+        0
+      ]
+    },
+    "actual_http_mode_chain_and_n10_temporary_targets": "PASS",
+    "cross_mode_rejected_and_duplicate_receipt": "PASS",
+    "durable_session_cannot_change_game_mode": "PASS",
+    "parent_hash_real_rpc_clear_compatibility": "PASS",
+    "backend_recreation_keeps_durable_mode_and_progress": "PASS",
+    "application_remains_minimum_privilege": {
+      "status": "PASS",
+      "exact_live_rpc_count": 16,
+      "ddl": false,
+      "table_access": false,
+      "role_membership": false
+    }
+  },
+  "current_source_regressions": {
+    "server_mode_tests": 10,
+    "dbtool_tests": 18,
+    "isolated_004_postgresql_checks": 7
+  },
+  "functions": {
+    "public.match_profile_login(text,text,text,jsonb)": "b38564d9260b0cfcbae69079635c062d925184f5627ddfcb603dcaa12165722e",
+    "public.archive_sync_config(text,jsonb)": "8ceaf0d40f0e7a9a79189915a3079d2515ef2f73e2c366e80afba7998a3b051a"
+  },
+  "configuration_jsonb_sha256": "70330a4262311f77e1f5f10e54a34960c78dc9b765730616e905818ab8a26feb",
+  "scope_preserved": [
+    "All live configs/CSV digests and quota reducers",
+    "Live catalogue, commerce, clear scope and HTTP backend",
+    "All13 historical compatibility entries",
+    "All pre-existing unique-lottery pairs"
+  ],
+  "formal_tools": [
+    "tools/mode_progression_release_20261020/build_gate_fix.py",
+    "tools/mode_progression_release_20261020/verify_gate_fix.py",
+    "tools/mode_progression_release_20261020/seal_gate_fix.py"
+  ],
+  "cluster_stopped": true,
+  "real_accounts": false,
+  "running_pointer_changed": true,
+  "not_tested": [
+    "Real account progression",
+    "VIP leaderboard/payment projection"
+  ],
+  "backend": {
+    "status": "DEPLOYED_AND_VERIFIED",
+    "bundle": "b3c342e1de0de5d8c5b21471eb87a6af288a177e88d1875e43d9fcae24c3af93",
+    "release": "20261020-mode-chain-b3c342e1de0d-v1",
+    "evidence": "validation/20261020/mode_release.json"
+  },
+  "remote_deploy_performed": true,
+  "generated_archive_bundle_hash_changed": true,
+  "isolated_tests_external_connections": 0
+}
