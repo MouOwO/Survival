@@ -176,7 +176,7 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(self.purchase()['error'],'attribute_limit_reached')
         self.assertEqual(self.profile,before)
 
-    def test_ember_is_unique_and_the_old_hundred_pack_is_paused(self):
+    def test_ember_stacks_and_the_old_hundred_pack_stays_paused(self):
         self.fund(shop_points=100000)
         before=copy.deepcopy(self.profile)
         self.assertEqual(self.purchase('video_p089','ember_100')['error'],'product_unavailable')
@@ -186,9 +186,11 @@ class CommerceTests(unittest.TestCase):
         before=copy.deepcopy(self.profile)
         self.assertTrue(self.purchase('video_p103','ember_001')['ok'])
         self.assertEqual(self.profile,before)
-        self.assertEqual(self.purchase('video_p103','ember_002')['error'],'already_owned')
-        self.assertEqual(self.profile,before)
-        self.assertAlmostEqual(self.profile['save']['gameplay_stats']['hero_basic_attack_growth'],.1)
+        self.assertTrue(self.purchase('video_p103','ember_002')['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'],2)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],99942)
+        self.assertAlmostEqual(self.profile['save']['gameplay_stats']['hero_basic_attack_growth'],0,
+                               msg='Stackable growth is projected from inventory rather than saved twice')
 
     def test_conditional_products_do_not_pregrant_collection_bonuses(self):
         for sku in ('video_p023','video_p025'):

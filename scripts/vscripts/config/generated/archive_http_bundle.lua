@@ -1,2 +1,2 @@
--- Generated from verified cultivation gold-ticket publication; previous cloud release retained.
-return { protocol = 1, hash = "bbaf4162a941449082f4c5ddcb6d02b056db54a656e08e681d4cae4adbdccf6d" }
+-- Verified 20261021 welfare publication; the compatible safe rollback retains stackable inventory.
+return { protocol = 1, hash = "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e" }

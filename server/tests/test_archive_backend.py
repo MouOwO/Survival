@@ -489,7 +489,7 @@ class ArchiveTests(unittest.TestCase):
         for row in rows:
             with self.subTest(item=row['item_id']):
                 self.assertEqual(row['duration_type'],'permanent')
-                self.assertEqual(row['max_owned'],1)
+                self.assertEqual(row['max_owned'],0 if row['item_id']=='lottery_ember_of_legacy' else 1)
                 self.assertIsInstance(row['duplicate_points'],int)
                 self.assertGreaterEqual(row['duplicate_points'],0)
 
@@ -633,7 +633,7 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(self.profile['save']['content_inventory'],normalized)
             self.assertEqual(self.profile['save']['gameplay_stats'],initial_stats)
             self.assertEqual(result['response']['unique_points_reconciliation'],{
-                'changed_items':97,'converted_points':expected['converted_points'],'converted_currency':'shop_points'})
+                'changed_items':96,'converted_points':expected['converted_points'],'converted_currency':'shop_points'})
             self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],
                              7+expected['converted_points']+item['duplicate_points'])
             second=self.send('lottery_draw',pool_id=pool,count=1,request_id='points_reconcile_again')

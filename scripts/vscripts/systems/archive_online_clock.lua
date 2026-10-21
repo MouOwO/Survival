@@ -22,7 +22,7 @@ local function checkpoint(id, s)
     -- Absolute counters make an older retry safe even after a newer checkpoint commits.
     s.sent = raw
     submit(id, { id = session .. ":online:" .. raw, kind = "online_checkpoint", session = session,
-        actual_seconds = raw, map_seconds = weighted })
+        actual_seconds = raw, map_seconds = weighted, event_at = math.floor(s.at) })
 end
 
 function M.observe(id, profile)
@@ -35,6 +35,11 @@ function M.sample(id, profile)
     M.observe(id, profile)
     local s, now = states[id], calendar.now()
     local online, elapsed = connected(id), now - states[id].at
+    if elapsed>5 or s.connected and not online then
+        -- Already observed seconds end at the previous sample. Flush before
+        -- moving that timestamp across a pause/disconnection (possibly 05:00).
+        checkpoint(id,s)
+    end
     if s.connected and online and elapsed > 0 and elapsed <= 5 then
         -- Split the last second at entitlement expiry; later purchases never double earlier time.
         local bonus = math.max(0, math.min(now, s.pass_until) - s.at)
@@ -53,8 +58,8 @@ end
 function M.disconnect(id)
     local s = states[id]
     if not s then return end
-    s.connected, s.at = false, calendar.now()
     checkpoint(id, s)
+    s.connected, s.at = false, calendar.now()
 end
 
 function M.init(match_session, callback)

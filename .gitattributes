@@ -61,3 +61,11 @@ tools/mode_progression_release_20261020/mode_release_*.py -text whitespace=blank
 
 # Preserve the sealed lottery deployment scripts byte-for-byte.
 tools/lottery_gold_20261021/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Welfare migration digests and sealed deployment inputs retain reviewed bytes.
+server/aliyun/database/target/202610210001_archive_benefits.sql text eol=lf
+server/aliyun/database/target/202610210002_archive_stackable_items.sql text eol=lf
+tools/benefits_release_20261021/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+server/tests/archive_benefits_database.sql text eol=lf
+tools/benefits_20261021/*.sql text eol=lf
+tools/benefits_release_20261021/README.md text eol=lf

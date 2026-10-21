@@ -1,0 +1,402 @@
+{
+  "date_beijing": "2026-10-21",
+  "status": "activated_and_verified",
+  "bundle": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+  "release": "20261021-benefits-47accd81d922",
+  "manifest_sha256": "39e845fd37a2966bbc57a616e661970a0736a0959ee9b00f2e1caf8ebdbae0fe",
+  "baseline": {
+    "archive_release": "20261021-lottery-gold-bbaf4162a941",
+    "archive_bundle": "bbaf4162a941449082f4c5ddcb6d02b056db54a656e08e681d4cae4adbdccf6d",
+    "archive_manifest_sha256": "8b2f70462802c09d8a5d23fae079f5e64bbd3188286eb9b3c591ce05c1237d1b",
+    "payment_release": "20261018-checkout-gcoin-v1",
+    "payment_manifest_sha256": "754926e3e7ef11603e3070eb5304cb778f55a5c8b7dfcc370d8f2612dfda4303"
+  },
+  "live_verification": {
+    "ok": true,
+    "phase": "LIVE_HTTP_DATABASE_VERIFIED",
+    "release": "20261021-benefits-47accd81d922",
+    "bundle": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "rollback_release": "20261021-benefits-safe-a08e9c87e917",
+    "rollback_bundle": "a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3",
+    "manifest_sha256": "39e845fd37a2966bbc57a616e661970a0736a0959ee9b00f2e1caf8ebdbae0fe",
+    "catalog_md5": "ca9954922ebfa93d83d646187d1068d1",
+    "payment_pid": "5427",
+    "payment_untouched": true,
+    "ledger_entries": 32,
+    "ledger_additions": 2,
+    "new_configurations": 2,
+    "functions_changed": [
+      "archive_capture_online",
+      "archive_commit_lottery",
+      "archive_fishing_daily_limit",
+      "archive_online_pending",
+      "archive_prepare",
+      "archive_resume",
+      "archive_sync_config",
+      "archive_unique_points_20261019_valid"
+    ],
+    "new_function": "archive_stackable_items_20261021_valid",
+    "new_constraint": "archive_stackable_items_20261021_check",
+    "existing_ledger_configurations_preserved": true,
+    "backup": {
+      "verified": true,
+      "includes_game_and_payments": true,
+      "custom_format": true,
+      "size": 4793363,
+      "sha256": "6768a33ec5cd753cfc47b049bed90b6cf023dd6b455dcf1e154127c1a577b3b5",
+      "downloaded": false,
+      "record": "/root/goufayu_upload/benefits-20261021-b53046e0fa1128d8/private_backup.json"
+    },
+    "real_player_reads": 0,
+    "real_player_writes": 0,
+    "database_writes": 0
+  },
+  "rollback": {
+    "command": "C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe tools/benefits_release_20261021/deploy.py rollback-safe",
+    "release": "20261021-benefits-safe-a08e9c87e917",
+    "bundle": "a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3",
+    "ui_tag": "rollback/benefits-before-20261021",
+    "preserves_stackable_items": true,
+    "preserves_player_inventory_and_statistics": true,
+    "restores_database": false,
+    "restores_old_unique_backend": false,
+    "restore_ui_only_not_old_item_lua": true,
+    "before_game_commit": "bca2b9ea6fc7a82ae5ca0be5be72fafc882682ad",
+    "before_content_commit": "a2c95d6b85af77eee0b902c8cc5eab8691e97969"
+  },
+  "validation": {
+    "same_transaction_migrations_and_config_registration": true,
+    "synthetic_native_sql_api_probe": true,
+    "synthetic_savepoint_rolled_back": true,
+    "outer_transaction_rolled_back": true,
+    "post_rollback_baseline_functions_constraints_ledger_configs_verified": true,
+    "real_player_rows_changed": 0,
+    "memory_worker_monthly_150": {
+      "lottery_ticket": 4,
+      "welfare_zongzi": 4,
+      "lottery_ember_of_legacy": 3,
+      "special_lottery_ticket": 2
+    },
+    "memory_worker_safe_rollback_rejects_new_benefit_claim": true,
+    "release_scope_guard_tests": 4,
+    "main_agent_suite_results": {
+      "python_tests": 21,
+      "frontend_tests": 14,
+      "lottery_icon_checks": 9,
+      "compiled_panorama_inputs": 5
+    }
+  },
+  "preserved_invariants": {
+    "online_rng_and_settle_method_ast_unchanged": true,
+    "online_archive_daily_limits_table_unchanged": true,
+    "legacy_migration_hashes_unchanged": true,
+    "legacy_configurations_unchanged": true,
+    "payment_process_restarted": false,
+    "payment_economics_changed": false
+  },
+  "changes": {
+    "lua_sources": [
+      "config/lottery_config.lua",
+      "systems/archive_benefit_rewards.lua",
+      "systems/archive_calendar.lua",
+      "systems/archive_daily_rewards.lua",
+      "systems/archive_online_rewards.lua",
+      "systems/archive_settlement.lua",
+      "systems/archive_stackable_items.lua",
+      "systems/commerce_effects.lua",
+      "systems/commerce_settlement.lua",
+      "systems/lottery_http_settlement.lua"
+    ],
+    "python_sources": [
+      "backend/archive_backend/bundle.py",
+      "backend/archive_backend/daily_limits.py",
+      "backend/archive_backend/daily_unique.py",
+      "backend/archive_backend/service.py",
+      "backend/archive_backend/stackable_effects.py",
+      "backend/archive_backend/unique_points.py",
+      "backend/fishing_api/match_profiles.py"
+    ],
+    "configurations": {
+      "commerce_products": {
+        "changed_row_count": 1,
+        "ids": [
+          "video_p103"
+        ],
+        "changed_fields": [
+          "description",
+          "purchase_limit"
+        ]
+      },
+      "archive_benefit_rewards": {
+        "changed_row_count": 19,
+        "ids": [
+          "daily_time_120",
+          "daily_time_150",
+          "daily_time_30",
+          "daily_time_60",
+          "daily_time_90",
+          "daily_win_1",
+          "daily_win_2",
+          "daily_win_3",
+          "daily_win_4",
+          "daily_win_5",
+          "weekly_time_1080",
+          "weekly_time_120",
+          "weekly_time_240",
+          "weekly_time_360",
+          "weekly_time_480",
+          "weekly_time_600",
+          "weekly_time_720",
+          "weekly_time_840",
+          "weekly_time_960"
+        ],
+        "changed_fields": [
+          "base_counts",
+          "base_item_ids",
+          "enabled",
+          "metric",
+          "pass_counts",
+          "pass_item_ids",
+          "period",
+          "required",
+          "reward_id",
+          "track"
+        ]
+      },
+      "archive_building_rules": {
+        "changed_row_count": 1,
+        "ids": [
+          "default"
+        ],
+        "changed_fields": [
+          "day_timezone_offset"
+        ]
+      },
+      "archive_challenge_rules": {
+        "changed_row_count": 1,
+        "ids": [
+          "default"
+        ],
+        "changed_fields": [
+          "day_timezone_offset"
+        ]
+      },
+      "archive_stackable_items": {
+        "changed_row_count": 22,
+        "ids": [
+          "ember_10",
+          "ember_100",
+          "ember_1000",
+          "ember_1500",
+          "ember_200",
+          "ember_300",
+          "ember_400",
+          "ember_50",
+          "ember_600",
+          "ember_800",
+          "ember_base",
+          "zongzi_10",
+          "zongzi_100",
+          "zongzi_20",
+          "zongzi_30",
+          "zongzi_40",
+          "zongzi_50",
+          "zongzi_60",
+          "zongzi_70",
+          "zongzi_80",
+          "zongzi_90",
+          "zongzi_base"
+        ],
+        "changed_fields": [
+          "description",
+          "display_name",
+          "effect_id",
+          "effect_value",
+          "enabled",
+          "item_id",
+          "max_owned",
+          "mode",
+          "notes",
+          "quality",
+          "rule_id",
+          "threshold"
+        ]
+      },
+      "lottery_item_definitions": {
+        "changed_row_count": 1,
+        "ids": [
+          "lottery_ember_of_legacy"
+        ],
+        "changed_fields": [
+          "description",
+          "duplicate_points",
+          "effect_ids",
+          "effect_status",
+          "effect_values",
+          "max_owned",
+          "notes"
+        ]
+      },
+      "commerce_catalog": {
+        "changed_row_count": 1,
+        "ids": [
+          "video_p103"
+        ],
+        "changed_fields": [
+          "description",
+          "effects",
+          "grants",
+          "purchase_limit"
+        ]
+      }
+    },
+    "source_diff_sha256": "4740ad1775accf5b866cc2e93ccea17c9bfdd888a15bb14124a388669038e17d",
+    "config_diff_sha256": "5b4447ec6d9261d5e08d07bea195534d1445dd04a215a5ac587a2b6afd84c5db",
+    "deployed_overlay_sha256": {
+      "addon/data/csv/商城兑换系统/commerce_products.csv": "48109b959fe593e8a281ca8eefd05bcf13c0ae5fa7d68d0397f326975bb8b63f",
+      "addon/data/csv/存档系统/archive_benefit_rewards.csv": "e8b260270b856b398c624f30fe1e9ef1aed840166aa52aca522db00d008e2138",
+      "addon/data/csv/存档系统/archive_building_rules.csv": "e4fe903b82f6b8902c4f0aac8eef50d0aed4a51e84bf1b130094009459717991",
+      "addon/data/csv/存档系统/archive_challenge_rules.csv": "ad0471c5d186d03e6aebf3b6eacb87835c2d3604efc8aa35e6c97eb2335cb403",
+      "addon/data/csv/存档系统/archive_stackable_items.csv": "1b452785ed4da468c55b884f8945da74f0f81b56f35b8573f1a622d5550fbba1",
+      "addon/data/csv/抽奖系统/lottery_item_definitions.csv": "c65464c4401e88e57e8ea8b5a6c65b72929c6db7840044c04652eb63df3561bc",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/bundle.json": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/config/content_id_aliases.lua": "2f5b2200baa6d2e45be9a55b2bcf8520d97d6ca9e62970bc13743801d7199f42",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/config/difficulty_config.lua": "ede6a846e4894e0f311358646af18341ad530fe83bcadc5eecc4c3ba91c86eea",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/config/lottery_config.lua": "a0b2e0b5bacb223342ab65e573ee8e9b40013935d001c17b7d681a9750494f59",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/config/recorded_mode_balance.lua": "c2619a0c45c421ecef8649d3d9474aa6f625e863236e3ee135c323769c399b45",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/core/json_decoder.lua": "e4210b0023f3a7627628ecdd736c418b9b6ed888240f871762cbbd98bcbd537c",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/core/json_encoder.lua": "6e10b53c76b9e8fbe00e4cd9e1734338b86febe60dc6948058b39e4af3b0390a",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_benefit_rewards.lua": "ad86a81df13221baf0fc9fd86c2793c8e817decb55a82df4742da27efe54cd40",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_building_rewards.lua": "59d7c7071b5c6e6efc4ed94b8e1603bc01650dc2672f17d571a8d1ae06819016",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_calendar.lua": "fcc826c5c2c8fc766a20af464b3f14e4aaf957ea06b0586b5bf3fe1f3b3557cd",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_challenge_rewards.lua": "d598786a42cf15cde975d089c37f2a6fb396bc77a6a73ec2be7de314cc38c93c",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_clear_progress.lua": "f2ad3b50872634d4c532947842ef68a078d385e69862500bd935b8b278d32898",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_daily_limits.lua": "3774de10ffd1b92e58885b411ce72777681b02d45d58a29460ea0bada88ceb65",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_daily_rewards.lua": "d1f4cd272028ffafe45216c55070da435a62e6a6e43bfb08bbd77bac9fc4e39d",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_endless_config.lua": "a69f1eb84a1ac0ad1ede52f257a0e378b08b61fd155ba10c8ed869525d9e75fa",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_endless_rewards.lua": "1d28651b52e1a5612186d7581b26c7a0e18a5143f9a358d2af17c4455a4ef42f",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_online_rewards.lua": "b69a99d737d83ca21a0bda6a605446f5834d40e982eb86f10717016359bfc2e9",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_settlement.lua": "acbd459a7d32847fa2ea96eafea2dd1ff575d1f4597216fa9d0e7fd508fe5b49",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_social_rewards.lua": "0f7fec2a142341a00214118c6456132a2bcf0de7d7b4340aa2b460b31427d1d1",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_stackable_items.lua": "1f64d142cdc46bf7ccbadcf6813f221d38bbfe10a8105eed9b9d29bdb3772215",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_starjoy_rewards.lua": "415253bedaab48a2aa740f8bebf28d959a80235eb7ccb4b1a1542729a259636a",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_titles.lua": "5e2c8d8e4ea07253ce2e49868c824c4f41f002fef1dbb371cf1074f73ded9a99",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_vip_rewards.lua": "a99844ce68e7d114b2d7dc1266f549d770f235cb77bfea40611af387051d0f42",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/archive_welfare_rewards.lua": "cf36d005f7513165713935d793817c438c5dff7ab44859a87349bdedd5c352dc",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/commerce_effects.lua": "8d3cbdfac76363f6fd06129fd71ed3057d75580d8e0c322c9dc00ba26c780e25",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/commerce_settlement.lua": "2fc7656e73380e7a580f3a9dce837822c093bef4e8c129845790d014964bc8b4",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/systems/lottery_http_settlement.lua": "66e169f1ce34b75458064cb81de47e415e1d0db461e18343db553bc279af2fba",
+      "addon/server/bundles/47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e/worker.lua": "412a47e21729947deb3684ee29319bcaf63cfa891c6aac57f97967a51d037a26",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/bundle.json": "a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/config/content_id_aliases.lua": "2f5b2200baa6d2e45be9a55b2bcf8520d97d6ca9e62970bc13743801d7199f42",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/config/difficulty_config.lua": "ede6a846e4894e0f311358646af18341ad530fe83bcadc5eecc4c3ba91c86eea",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/config/lottery_config.lua": "a0b2e0b5bacb223342ab65e573ee8e9b40013935d001c17b7d681a9750494f59",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/config/recorded_mode_balance.lua": "c2619a0c45c421ecef8649d3d9474aa6f625e863236e3ee135c323769c399b45",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/core/json_decoder.lua": "e4210b0023f3a7627628ecdd736c418b9b6ed888240f871762cbbd98bcbd537c",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/core/json_encoder.lua": "6e10b53c76b9e8fbe00e4cd9e1734338b86febe60dc6948058b39e4af3b0390a",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_benefit_rewards.lua": "ad86a81df13221baf0fc9fd86c2793c8e817decb55a82df4742da27efe54cd40",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_building_rewards.lua": "59d7c7071b5c6e6efc4ed94b8e1603bc01650dc2672f17d571a8d1ae06819016",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_calendar.lua": "fcc826c5c2c8fc766a20af464b3f14e4aaf957ea06b0586b5bf3fe1f3b3557cd",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_challenge_rewards.lua": "d598786a42cf15cde975d089c37f2a6fb396bc77a6a73ec2be7de314cc38c93c",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_clear_progress.lua": "f2ad3b50872634d4c532947842ef68a078d385e69862500bd935b8b278d32898",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_daily_limits.lua": "3774de10ffd1b92e58885b411ce72777681b02d45d58a29460ea0bada88ceb65",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_daily_rewards.lua": "d1f4cd272028ffafe45216c55070da435a62e6a6e43bfb08bbd77bac9fc4e39d",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_endless_config.lua": "a69f1eb84a1ac0ad1ede52f257a0e378b08b61fd155ba10c8ed869525d9e75fa",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_endless_rewards.lua": "1d28651b52e1a5612186d7581b26c7a0e18a5143f9a358d2af17c4455a4ef42f",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_online_rewards.lua": "b69a99d737d83ca21a0bda6a605446f5834d40e982eb86f10717016359bfc2e9",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_settlement.lua": "acbd459a7d32847fa2ea96eafea2dd1ff575d1f4597216fa9d0e7fd508fe5b49",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_social_rewards.lua": "0f7fec2a142341a00214118c6456132a2bcf0de7d7b4340aa2b460b31427d1d1",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_stackable_items.lua": "1f64d142cdc46bf7ccbadcf6813f221d38bbfe10a8105eed9b9d29bdb3772215",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_starjoy_rewards.lua": "415253bedaab48a2aa740f8bebf28d959a80235eb7ccb4b1a1542729a259636a",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_titles.lua": "5e2c8d8e4ea07253ce2e49868c824c4f41f002fef1dbb371cf1074f73ded9a99",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_vip_rewards.lua": "a99844ce68e7d114b2d7dc1266f549d770f235cb77bfea40611af387051d0f42",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/archive_welfare_rewards.lua": "cf36d005f7513165713935d793817c438c5dff7ab44859a87349bdedd5c352dc",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/commerce_effects.lua": "8d3cbdfac76363f6fd06129fd71ed3057d75580d8e0c322c9dc00ba26c780e25",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/commerce_settlement.lua": "2fc7656e73380e7a580f3a9dce837822c093bef4e8c129845790d014964bc8b4",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/systems/lottery_http_settlement.lua": "66e169f1ce34b75458064cb81de47e415e1d0db461e18343db553bc279af2fba",
+      "addon/server/bundles/a08e9c87e917ac98995a26d32055b090c4686844d140525813ba72b6aa3c1ba3/worker.lua": "412a47e21729947deb3684ee29319bcaf63cfa891c6aac57f97967a51d037a26",
+      "backend/archive_backend/bundle.py": "f450a5642fd01fc05f36b48c7d7fa116b1fd83650f7fe7c176e79908eddd971c",
+      "backend/archive_backend/daily_limits.py": "4850cf8006d6bd8ce34edbde3e3086b076a4f12954a6a2a95f8fff4c80fd0287",
+      "backend/archive_backend/daily_unique.py": "181c8d5a1dce68725d6088fb8fd6ad854b7fdac4de89631f201b39e872f46939",
+      "backend/archive_backend/service.py": "ac1d12a3909acf4c27d569cac125125b2a73c140e423f2454fe6b8df02c494dd",
+      "backend/archive_backend/stackable_effects.py": "d259ab5908cdc617a1c048a72ed78a6fe8d2e5a264de90a8892a52bca4105df3",
+      "backend/archive_backend/unique_points.py": "67bbee0597825c643a4e76e2fd9ee7534fd57cf475f2e2600ddc1b2285f6ab51",
+      "backend/fishing_api/match_profiles.py": "75c4e2fc5a9cbcc4ee1879696f0b09de119a31a0e03e99155cc1a26622af5241",
+      "database/migrations/target/202610210001_archive_benefits.sql": "44bdbb53fbe2114e74179a9f81795a8619b75ece3e61ea001b3db6ff32c61399",
+      "database/migrations/target/202610210002_archive_stackable_items.sql": "cf5bddf8961827ba38467641f7518822183f53e542fbe8227475dcc9e6479bbe",
+      "validation/archive_benefits_database.sql": "120e0196db03bb97e2c51880a607a31263db448bd32983d530b6bef893fe739a",
+      "validation/verify_stackable_constraints.sql": "6569d1da398919bd41617616254b7f52915fc637e434580c80bc59ccc9c2c65a"
+    },
+    "migrations": [
+      {
+        "id": "target/202610210001_archive_benefits.sql",
+        "path": "database/migrations/target/202610210001_archive_benefits.sql",
+        "sha256": "44bdbb53fbe2114e74179a9f81795a8619b75ece3e61ea001b3db6ff32c61399"
+      },
+      {
+        "id": "target/202610210002_archive_stackable_items.sql",
+        "path": "database/migrations/target/202610210002_archive_stackable_items.sql",
+        "sha256": "cf5bddf8961827ba38467641f7518822183f53e542fbe8227475dcc9e6479bbe"
+      }
+    ]
+  },
+  "publication_tools_sha256": {
+    "tools/benefits_release_20261021/deploy.py": "7fde7957e04964abb8696a0a0bfaa9fc6c4cf73ef0712c514e2f7d72754a185b",
+    "tools/benefits_release_20261021/post_verify.py": "861caab4896f3ca05b5d4eeb15d3d0a13d4ff9a08e66daf7434c4936c42283d5",
+    "tools/benefits_release_20261021/prepare.py": "6c61c59dd64d0328ca9a6ff621ce90427b35204c1375ac7bb4c85162f7f2aefc",
+    "tools/benefits_release_20261021/README.md": "1a1415a2ae340ce63eeacf60a873c390707835b854f4afefa8b5a85c548b894b",
+    "tools/benefits_release_20261021/remote_operator.py": "4d1857cb8f2bf6412a975db4a6c58e2f707fabe71b1bb132046329d6bbe59828",
+    "tools/benefits_release_20261021/test_prepare.py": "6c57b456ad8fe4d982a900f760ff74377e0f9cdb58e2a9d12ab94c23d5d551e0"
+  },
+  "sealed_plan_sha256": "b53046e0fa1128d845d63bf3015f353f7c63bb6be0e21f182bf4d52af353de9f",
+  "existing_regression_failures": [
+    {
+      "file": "server/tests/test_archive_daily_cap_settlement.py",
+      "cause": "Existing local cage quota 30/90 versus expected 60; online quota table preserved unchanged at 60.",
+      "introduced_by_this_task": false
+    },
+    {
+      "file": "scripts/vscripts/tests/test_commerce_runtime.lua:45",
+      "cause": "Existing combat/damage_service.lua:24 context nil, reproduced with before-task commerce_effects source.",
+      "introduced_by_this_task": false
+    }
+  ],
+  "frontend_assets": [
+    {
+      "source": "panorama/src/scripts/custom_game/daily_remaining_5d5c1152eb.js",
+      "source_sha256": "559f08407713bacc4d7707cf3d9d564efbfad37c5cf0b526dfaed89571f6236d",
+      "native": "panorama/scripts/custom_game/daily_remaining_5d5c1152eb.vjs_c",
+      "native_sha256": "cd1441b445b0b93b09b644bee2da160e6af37236c2e19b8e170c6ded50b5fa82",
+      "source_native_verified": true
+    },
+    {
+      "source": "panorama/src/styles/custom_game/daily_gw2.css",
+      "source_sha256": "b214bab726f71b83388ee818758aded938da85db52cb4c0478d226351ba8141f",
+      "native": "panorama/styles/custom_game/daily_gw2.vcss_c",
+      "native_sha256": "7bffb9a465b8655107808548f0d1affaf4c37361acb540071b17038064eabd03",
+      "source_native_verified": true
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/common/item_resources.js",
+      "source_sha256": "1bc9a20367b41a065065526e7b89a92e63baacf789e7694f900941520e680010",
+      "native": "panorama/scripts/custom_game/common/item_resources.vjs_c",
+      "native_sha256": "fc87ee42463ac10eb9d94d4f2602a3c5ec70763b5396cd56e5d0a0120367d6b2",
+      "source_native_verified": true
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/lottery_gw2.js",
+      "source_sha256": "552bd0c21b61ec49a175fb91822360b85c3431435c934574e5ee7f289cc8e82f",
+      "native": "panorama/scripts/custom_game/lottery_gw2.vjs_c",
+      "native_sha256": "9f518b2204f2bc6aae33883c2ba13a64d96244352393ce75c5bdb467537dcb44",
+      "source_native_verified": true
+    },
+    {
+      "source": "panorama/src/scripts/custom_game/lottery_catalog_seed.js",
+      "source_sha256": "550ae6a648dbfc61fbd1ccbe7ea70f1769c8a8667faf36a730b411007f9db81a",
+      "native": "panorama/scripts/custom_game/lottery_catalog_seed.vjs_c",
+      "native_sha256": "63bca01b9685c89df224f55580f837f9c8caf5f211835d89154f7c92cda29144",
+      "source_native_verified": true
+    }
+  ],
+  "frontend_whitespace_cleanup": "Removed one blank-line trailing space and recompiled the matching source/native pair after diff-check; no behavior change."
+}

@@ -8,7 +8,8 @@ local function duplicate_rate(item)
     -- the same quality rates as permanent lottery point items.
     local rate=nil
     for _,row in ipairs(require("config/lottery_config").items) do
-        if row.item_type=="积分道具" and string.lower(row.quality)==string.lower(item.quality) then
+        if row.item_type=="积分道具" and not require('systems/archive_stackable_items').definition(row.id)
+            and string.lower(row.quality)==string.lower(item.quality) then
             assert(rate==nil or rate==row.duplicate_points,"daily_duplicate_rate_conflict")
             rate=row.duplicate_points
         end
@@ -126,7 +127,7 @@ function M.snapshot(profile,day,pass)
         calendar28=calendar,calendar_current_day=calendar_current,calendar_start_count=calendar_start,
         ordinary_status=claimed_today and "claimed" or "claimable",
         premium={status="unconfigured",name="周末高级装备",description="周周期与装备候选池尚未配置；现有累计签到通行证奖励仍按原规则发放。"},
-        subtitle="每日领取 · 七次循环",rule_text="每日零点刷新；断签不重置累计进度。通行证奖励按累计签到次数发放。",
+        subtitle="每日领取 · 七次循环",rule_text="北京时间每日05:00刷新；断签不重置累计进度。通行证奖励按累计签到次数发放。",
         makeup_days=rules.makeup_days,
         next_day=daily.count%7+1,has_pass=pass and 1 or 0,expires_at=tostring(entitlement.expires_at or ""),
         missed=missed,cycle=cycle,specials=specials,price=rules.price_text,duration_days=rules.duration_days,

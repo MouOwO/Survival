@@ -36,14 +36,13 @@ class PointOfferTests(unittest.TestCase):
         self.assertEqual((bulk['price'], bulk['ownership_quantity']), (2500, 100))
         self.assertEqual(bulk['effects'], {'hero_basic_attack_growth': 10})
         self.assertTrue(single['enabled'])
-        self.assertEqual((single['price'], single['ownership_quantity'], single['purchase_limit']), (29, 1, 1))
+        self.assertEqual((single['price'], single['ownership_quantity'], single['purchase_limit']), (29, 1, 0))
         self.assertEqual(single['item_id'], bulk['item_id'])
-        self.assertEqual(single['effects'], {'hero_basic_attack_growth': .1})
+        self.assertEqual(single['effects'], {})
 
     def test_future_enabled_point_offers_cannot_reintroduce_unlimited_or_bulk_ownership(self):
-        for sku, edits in [('video_p103', {'purchase_limit': '0'}),
-                           ('video_p103', {'ownership_quantity': '2'}),
-                           ('video_p089', {'enabled': '1'})]:
+        for sku, edits in [('video_p117', {'purchase_limit': '0'}),
+                           ('video_p117', {'ownership_quantity': '2'})]:
             with self.subTest(sku=sku, edits=edits):
                 original = self.tables['commerce_products']
                 records = rows(original)
@@ -79,13 +78,13 @@ class PointPurchaseTests(unittest.TestCase):
         return self.service.command(dict(account_id='100', config_hash=self.bundle.hash,
             command=dict(id='unique_snapshot:' + str(self.seq), kind='commerce_catalog')))
 
-    def test_one_item_grants_once_and_same_receipt_replays_without_debit_or_effects(self):
+    def test_ember_stacks_and_same_receipt_replays_without_debit_or_effects(self):
         before = copy.deepcopy(self.profile['save']['gameplay_stats'])
         self.assertTrue(self.purchase()['ok'])
         save = self.profile['save']
         self.assertEqual(save['content_inventory']['lottery_ember_of_legacy'], 1)
         self.assertEqual(save['archive']['commerce']['balances']['shop_points'], 99971)
-        self.assertAlmostEqual(save['gameplay_stats']['hero_basic_attack_growth'], before['hero_basic_attack_growth'] + .1)
+        self.assertAlmostEqual(save['gameplay_stats']['hero_basic_attack_growth'], before['hero_basic_attack_growth'])
         lua = self.LuaRuntime(unpack_returned_tuples=True)
         lua.globals().INPUT = json.dumps(dict(configs=self.bundle.configs, save=save))
         lua.execute('package.path = ' + json.dumps(self.bundle.directory.as_posix() + '/?.lua'))
@@ -97,13 +96,14 @@ class PointPurchaseTests(unittest.TestCase):
             OUTPUT=require('core/json_encoder').encode(
                 require('systems/commerce_effects').project(input.save,input.save.gameplay_stats))
         ''')
-        self.assertIn(json.loads(lua.globals().OUTPUT), ({}, []),
-                      'One owned ember must not activate legacy stack thresholds or apply its base growth twice')
+        self.assertEqual(json.loads(lua.globals().OUTPUT), {'hero_basic_attack_growth': .1},
+                      'Per-copy attack growth is derived, never repeatedly persisted')
         after = copy.deepcopy(self.profile)
         self.assertTrue(self.purchase()['ok'])
         self.assertEqual(self.profile, after)
-        self.assertEqual(self.purchase(token='unique_second_0002')['error'], 'already_owned')
-        self.assertEqual(self.profile, after)
+        self.assertTrue(self.purchase(token='unique_second_0002')['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 2)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99942)
 
     def test_paused_bulk_offer_never_debits_or_grants_and_is_absent_from_catalog(self):
         before = copy.deepcopy(self.profile)
@@ -111,14 +111,16 @@ class PointPurchaseTests(unittest.TestCase):
         self.assertEqual(self.profile, before)
         self.assertNotIn('video_p089', {p['sku'] for p in self.snapshot()['products']})
 
-    def test_legacy_high_count_is_read_only_owned_one_and_cannot_be_rebought(self):
+    def test_legacy_ember_count_is_preserved_and_can_be_rebought(self):
         self.profile['save']['content_inventory'] = {'lottery_ember_of_legacy': 101, 'daily_growth_gem': 9}
         before = copy.deepcopy(self.profile)
         offer = next(p for p in self.snapshot()['products'] if p['sku'] == 'video_p103')
-        self.assertEqual(offer['owned'], 1)
-        self.assertEqual(offer['disabled_reason'], 'already_owned')
-        self.assertEqual(self.purchase()['error'], 'already_owned')
-        self.assertEqual(self.profile, before, 'Read-only listing and rejected purchases must not rewrite past grants')
+        self.assertEqual(offer['owned'], 101)
+        self.assertEqual(offer['disabled_reason'], '')
+        self.assertEqual(self.profile, before, 'Reading does not rewrite history')
+        self.assertTrue(self.purchase()['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 102)
+        self.assertEqual(self.profile['save']['gameplay_stats'], before['save']['gameplay_stats'])
 
     def test_alias_ownership_blocks_direct_and_bundle_items_even_with_stale_unlimited_limits(self):
         # Exercise every formal permanent point identity through the real
@@ -126,8 +128,8 @@ class PointPurchaseTests(unittest.TestCase):
         products = self.bundle.tables['commerce_catalog']
         product = products['video_p103']
         points = [r for r in self.bundle.configs['lottery_item_definitions']['rows']
-                  if r.get('enabled') and r['item_type'] == '积分道具']
-        self.assertEqual(len(points), 97)
+                  if r.get('enabled') and r['item_type'] == '积分道具' and r['item_id']!='lottery_ember_of_legacy']
+        self.assertEqual(len(points), 96)
         for item in points:
             with self.subTest(item=item['item_id']):
                 product.update(item_id=item['item_id'], purchase_limit=0)
@@ -147,7 +149,7 @@ class PointPurchaseTests(unittest.TestCase):
         self.assertEqual(self.purchase(token='unique_alias_bundle')['error'], 'component_already_owned')
         self.assertEqual(self.profile, before)
 
-    def test_concurrent_different_skus_for_one_item_only_commit_one_grant(self):
+    def test_concurrent_ember_offers_both_commit_once_and_preserve_inventory(self):
         other = copy.deepcopy(self.bundle.tables['commerce_catalog']['video_p103'])
         other['sku'] = 'unique_second_offer'
         self.bundle.configs['commerce_catalog']['rows'].append(other)
@@ -172,10 +174,9 @@ class PointPurchaseTests(unittest.TestCase):
             futures = [executor.submit(self.purchase, sku, 'unique_concurrent_' + str(index))
                        for index, sku in enumerate(('video_p103', other['sku']))]
             results = [future.result(timeout=20) for future in futures]
-        self.assertEqual(sum(r['ok'] is True for r in results), 1)
-        self.assertEqual([r['error'] for r in results if not r['ok']], ['already_owned'])
-        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 1)
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99971)
+        self.assertEqual(sum(r['ok'] is True for r in results), 2)
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 2)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99942)
 
     def historical_bundle(self):
         data = json.loads((self.bundle.directory / 'bundle.json').read_bytes())
@@ -223,8 +224,9 @@ class PointPurchaseTests(unittest.TestCase):
         self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99942,
                          'An unfinished old receipt retains its recorded 58-point price')
         settled = copy.deepcopy(self.profile)
-        self.assertEqual(self.resume_historical(old, 'video_p103', 'historical_one_0002')['error'], 'already_owned')
-        self.assertEqual(self.profile, settled)
+        self.assertTrue(self.resume_historical(old, 'video_p103', 'historical_one_0002')['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 2)
+        settled=copy.deepcopy(self.profile)
         self.assertTrue(self.resume_historical(old, 'video_p103', 'historical_one_0001')['ok'])
         self.assertEqual(self.profile, settled, 'Completed historical receipts remain immutable and replayable')
 

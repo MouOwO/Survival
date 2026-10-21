@@ -27,6 +27,7 @@ FIELDS = {
     "challenge": {"challenge_id","kill_sequence","difficulty_id","day_key"},
     "social_draw": {"pool_id"}, "promotion": {"fragment_id","day_key"},
     "daily_init": {"today"}, "daily_claim": {"today","target_day"},
+    "benefit_claim": {"track", "tier_id"},
     "vip_claim": {"reward_id"}, "vip_purchase": {"reward_id"},
     "title_equip": {"title_id"},
     "work_upgrade": {"item_id","expected_level"},
@@ -121,6 +122,12 @@ class ArchiveService:
             if not isinstance(title_id,str) or (title_id!="" and (not item or not item.get("enabled"))):
                 raise ArchiveError("archive_title_invalid")
         if kind=="daily_claim": integer("target_day",0,1000000)
+        if kind=="benefit_claim":
+            tier_id=c.get("tier_id")
+            tier = (self.bundle.tables.get("archive_benefit_rewards", {}).get(tier_id)
+                    if isinstance(tier_id,str) and isinstance(c.get("track"),str) else None)
+            if not tier or tier.get("enabled") is not True or tier.get("track") != c.get("track"):
+                raise ArchiveError("archive_benefit_invalid")
         if kind.startswith("lottery_"):
             if c.get("pool_id") not in self.bundle.tables["lottery_pool_definitions"]: raise ArchiveError("lottery_pool_invalid")
             if not isinstance(c.get("request_id"),str) or not re.fullmatch(r"[A-Za-z0-9_:.-]{1,96}",c["request_id"]): raise ArchiveError("lottery_request_id_invalid")
@@ -246,7 +253,13 @@ class ArchiveService:
     def finish_prepared(self,account,operation_id,prepared,clear_mode=None):
         for _ in range(4):
             if not prepared.get("ok") or prepared.get("done"): return prepared
-            profile,command=prepared["profile"],prepared["command"]
+            profile,command=prepared["profile"],dict(prepared["command"])
+            # This timestamp belongs to the durable database receipt, not the
+            # HTTP caller or the worker's retry time. It keeps late checkpoints
+            # and claims in the period where their operation was first accepted.
+            event_at=prepared.get("event_at")
+            if isinstance(event_at,(int,float)) and not isinstance(event_at,bool) and math.isfinite(event_at):
+                command["event_at"]=int(event_at)
             if (clear_mode is None and getattr(self.app, "_archive_modes_active", False)
                     and (command["kind"] in {"clear", "mode_clear"} or command["kind"].endswith("_clear"))):
                 from .clear_receipts import resolve_pending_mode
@@ -308,7 +321,7 @@ class ArchiveService:
                 "p_revision":profile["revision"],"p_archive":archive,"p_deltas":deltas,
                 "p_error":None if result.get("ok") else result.get("error","archive_rejected")}
             rpc="archive_commit"
-            if command["kind"].startswith("lottery_") or command['kind'] == 'commerce_purchase':
+            if command["kind"].startswith("lottery_") or command['kind'] in {'commerce_purchase','benefit_claim'}:
                 rpc="archive_commit_lottery"
                 commit_payload.update(p_inventory=result.get("content_inventory",{}),p_response=result.get("response",{}))
             committed=self.app.rpc_client.rpc(rpc,commit_payload)
@@ -323,11 +336,13 @@ class ArchiveService:
         canonical = lambda identity: aliases.get(identity, identity)
         marker = canonical(product.get('item_id'))
         components = product.get('grants', {}).get('items', {})
+        # A historical receipt must not reopen a product paused in the current
+        # catalog merely because its item changed from unique to stackable.
+        if not product.get('enabled'):
+            return 'product_unavailable'
         relevant = marker in unique or any(canonical(identity) in unique for identity in components)
         if not relevant:
             return ''
-        if not product.get('enabled'):
-            return 'product_unavailable'
         inventory = profile.get('save', {}).get('content_inventory', {})
 
         def owned(identity):

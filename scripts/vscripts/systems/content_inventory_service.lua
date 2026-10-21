@@ -28,6 +28,10 @@ local function copy_map(value)
     for key, child in pairs(value or {}) do result[tostring(key)] = child end
     return result
 end
+local function deep_copy(value)
+    if type(value)~='table' then return value end
+    local result={};for key,child in pairs(value) do result[key]=deep_copy(child) end;return result
+end
 
 local function finite_number(value)
     value = tonumber(value)
@@ -175,6 +179,24 @@ local function grant(payload)
         return { ok = false, error = "profile_not_loaded" }
     end
     local next_counts = copy_map(counts)
+    local stackable=require('systems/archive_stackable_items')
+    if stackable.definition(content_id) then
+        if apply_effects_only then return {ok=true,snapshot=snapshot(player_id),changes={},effect_applied=false,gameplay_stat_changes={}} end
+        local archive=deep_copy(profile.save.archive or {})
+        local accepted,overflow=stackable.grant({content_inventory=next_counts,
+            lottery_applied_item_effects=profile.save.lottery_applied_item_effects},
+            archive,profile.save.gameplay_stats,content_id,count)
+        local persisted=profile_service.update_save_sections(player_id,
+            {content_inventory=next_counts,archive=archive},payload.reason or 'stackable_item_grant')
+        if not persisted or persisted.ok~=true then
+            return {ok=false,error=persisted and persisted.error or 'inventory_persist_failed'}
+        end
+        inventory_by_player[player_id]=next_counts;hydrated_by_player[player_id]=true
+        local changes=accepted>0 and {[content_id]=accepted} or {}
+        publish(player_id,payload.reason or 'grant',changes)
+        return {ok=true,snapshot=snapshot(player_id),changes=changes,granted_count=accepted,overflow_count=overflow,
+            effect_applied=false,gameplay_stat_changes={}}
+    end
     next_counts[content_id] = before + count
     local inventory_changes = count > 0 and { [content_id] = count } or {}
     local replacements = { content_inventory = next_counts }
@@ -279,14 +301,29 @@ local function transaction(payload)
         counts[content_id] = (counts[content_id] or 0) - count
         changes[content_id] = (changes[content_id] or 0) - count
     end
+    local stackable=require('systems/archive_stackable_items')
+    local next_archive
     for content_id, count in pairs(grant_map) do
-        counts[content_id] = (counts[content_id] or 0) + count
-        changes[content_id] = (changes[content_id] or 0) + count
+        local accepted=count
+        if stackable.definition(content_id) then
+            local profile=profile_service.get_profile(player_id)
+            if not profile or not profile.save then return {ok=false,error='profile_not_loaded'} end
+            next_archive=next_archive or deep_copy(profile.save.archive or {})
+            accepted=stackable.grant({content_inventory=counts,
+                lottery_applied_item_effects=profile.save.lottery_applied_item_effects},
+                next_archive,profile.save.gameplay_stats,content_id,count)
+        else counts[content_id]=(counts[content_id] or 0)+count end
+        changes[content_id] = (changes[content_id] or 0) + accepted
     end
     if has_match then
         match_inventory_by_player[player_id] = counts
     else
-        local saved, save_error = persist(player_id, counts)
+        local saved, save_error
+        if next_archive then
+            local result=profile_service.update_save_sections(player_id,
+                {content_inventory=counts,archive=next_archive},payload.reason or 'stackable_item_transaction')
+            saved=result and result.ok==true;save_error=result and result.error
+        else saved,save_error=persist(player_id,counts) end
         if not saved then return { ok = false, error = save_error or "inventory_persist_failed" } end
         inventory_by_player[player_id] = counts
     end

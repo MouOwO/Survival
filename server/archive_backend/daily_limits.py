@@ -13,7 +13,7 @@ def number(value):
 
 def snapshot(profile, bundle, now=None):
     current = time.time() if now is None else now
-    day = str(math.floor((current + 28800) / 86400))
+    day = str(math.floor((current + 10800) / 86400))
     save = profile.get("save", {})
     archive = save.get("archive", {})
     bucket = archive.get("daily", {}).get(day, {})

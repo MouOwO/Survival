@@ -3,9 +3,10 @@ local catalog=require('config/generated/commerce_catalog')
 local definitions=require('config/generated/player_gameplay_stats')
 local vip=require('systems/archive_vip_rewards')
 local content_aliases=require('config/content_id_aliases')
+local stackable=require('systems/archive_stackable_items')
 local unique_points={}
 for _,item in ipairs(require('config/generated/lottery_item_definitions').rows) do
-    if item.enabled and item.item_type=='积分道具' then
+    if item.enabled and item.item_type=='积分道具' and not stackable.definition(item.item_id) then
         unique_points[content_aliases.canonical(item.item_id)]=true
     end
 end
@@ -52,7 +53,8 @@ local function blocked(p,inventory,stats,state,archive,profile)
         if (p.ownership_quantity or 1)~=1 then return 'ownership_limit_reached' end
     end
     if p.purchase_limit>0 and (tonumber(inventory[p.item_id]) or 0)>=p.purchase_limit then return 'already_owned' end
-    if (tonumber(inventory[p.item_id]) or 0)+(p.ownership_quantity or 1)>100000000 then return 'ownership_limit_reached' end
+    local maximum=stackable.definition(p.item_id) and stackable.MAX_INTEGER or 100000000
+    if (tonumber(inventory[p.item_id]) or 0)+(p.ownership_quantity or 1)>maximum then return 'ownership_limit_reached' end
     for id,n in pairs(p.grants.items) do
         local owned=owned_points(inventory,id)
         if owned~=nil and (owned>0 or n~=1) then return 'component_already_owned' end
@@ -101,8 +103,15 @@ function M.settle(profile,command)
     if reason~='' then return {ok=false,error=reason} end
     -- Never accept a price, balance, quantity or reward from the client.
     state.balances[p.currency]=balance(state,p.currency)-p.price
-    inventory[p.item_id]=(tonumber(inventory[p.item_id]) or 0)+(p.ownership_quantity or 1)
-    for id,n in pairs(p.grants.items) do inventory[id]=(tonumber(inventory[id]) or 0)+n end
+    if stackable.definition(p.item_id) then
+        stackable.grant({content_inventory=inventory,lottery_applied_item_effects=profile.save.lottery_applied_item_effects},
+            archive,stats,p.item_id,p.ownership_quantity or 1)
+    else inventory[p.item_id]=(tonumber(inventory[p.item_id]) or 0)+(p.ownership_quantity or 1) end
+    for id,n in pairs(p.grants.items) do
+        if stackable.definition(id) then
+            stackable.grant({content_inventory=inventory,lottery_applied_item_effects=profile.save.lottery_applied_item_effects},archive,stats,id,n)
+        else inventory[id]=(tonumber(inventory[id]) or 0)+n end
+    end
     local old_starjoy=tonumber(stats.starjoy_points) or 0
     local granted=effective_effects(p,archive,inventory)
     for field,n in pairs(granted) do

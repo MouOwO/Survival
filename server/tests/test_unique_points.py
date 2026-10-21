@@ -71,9 +71,9 @@ class UniquePointsTests(unittest.TestCase):
                         'commerce': {'balances': {'u_coin': 12, 'shop_points': 7, 'shop_gold': 33}}}},
             'synthetic-b': {'revision': 9, 'inventory': {'daily_growth_gem': 123}, 'archive': {}}}
 
-    def test_all_97_unique_rows_and_existing_quality_rates(self):
-        self.assertEqual(len(self.items), 97)
-        self.assertEqual(self.items['lottery_ember_of_legacy'], 1000)
+    def test_96_unique_rows_exclude_stackable_ember(self):
+        self.assertEqual(len(self.items), 96)
+        self.assertNotIn('lottery_ember_of_legacy', self.items)
         self.assertNotIn('daily_growth_gem', self.items)
         self.assertNotIn('material_synthesis_gem', self.items)
 
@@ -81,14 +81,14 @@ class UniquePointsTests(unittest.TestCase):
         state = self.fixture()['synthetic-a'];before = copy.deepcopy(state)
         plan = preview(state['inventory'], state['archive'], self.items, self.aliases)
         self.assertEqual(state, before, 'A preview cannot mutate its input')
-        self.assertEqual(plan['converted_points'], 99015)
-        self.assertEqual(plan['content_inventory']['lottery_ember_of_legacy'], 1)
+        self.assertEqual(plan['converted_points'], 15)
+        self.assertEqual(plan['content_inventory']['lottery_ember_of_legacy'], 100)
         self.assertEqual(plan['content_inventory']['lottery_nature_crystal'], 1)
         self.assertNotIn('lottery_flame_crystal', plan['content_inventory'])
         for key in ('daily_growth_gem', 'material_synthesis_gem', 'lottery_ticket'):
             self.assertEqual(plan['content_inventory'][key], before['inventory'][key])
         self.assertEqual(plan['archive']['daily_rewards'], before['archive']['daily_rewards'])
-        self.assertEqual(plan['archive']['commerce']['balances'], {'u_coin': 12, 'shop_points': 99022, 'shop_gold': 33})
+        self.assertEqual(plan['archive']['commerce']['balances'], {'u_coin': 12, 'shop_points': 22, 'shop_gold': 33})
         second = preview(plan['content_inventory'], plan['archive'], self.items, self.aliases)
         self.assertEqual(second['changed_items'], 0);self.assertEqual(second['converted_points'], 0)
         self.assertEqual(second['content_inventory'], plan['content_inventory'])
@@ -106,14 +106,14 @@ class UniquePointsTests(unittest.TestCase):
                 with self.assertRaises(ValueError):preview({'lottery_nature_crystal': 2}, archive, self.items, self.aliases)
                 self.assertEqual(archive, before)
 
-    def test_preview_summary_exposes_large_ember_compensation_without_account_ids(self):
+    def test_preview_summary_preserves_ember_and_reports_only_unique_compensation(self):
         conn = MemoryConnection(self.fixture())
         plans, digest = maintenance.plans(conn, self.bundle)
         self.assertEqual(len(digest), 64)
         self.assertEqual(conn.state, self.fixture())
         summary = maintenance.summary(plans)
-        self.assertEqual(summary[0], {'id': 'lottery_ember_of_legacy', 'affected_accounts': 1,
-            'previous_copies': 100, 'extra_copies': 99, 'converted_points': 99000})
+        self.assertEqual(summary[0], {'id': 'lottery_nature_crystal', 'affected_accounts': 1,
+            'previous_copies': 4, 'extra_copies': 3, 'converted_points': 15})
         self.assertNotIn('synthetic-a', json.dumps(summary))
 
     def test_apply_review_digest_backup_rollback_and_reapply_are_guarded(self):

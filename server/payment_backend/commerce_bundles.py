@@ -65,7 +65,7 @@ def compile_commerce(tables,reference,category_text,*,max_products=200):
             raise ValueError('unsupported_commerce_currency:'+sku)
         price(p,sku in by_bundle)
     unique_points={r['item_id'] for r in rows(reference[SOURCES[3]])
-                   if flag(r['enabled']) and r['item_type']=='积分道具'}
+                   if flag(r['enabled']) and r['item_type']=='积分道具' and r['item_id']!='lottery_ember_of_legacy'}
     for sku,p in products.items():
         # Disabled historical offers retain their exact price and reward data.
         # A live offer may never reintroduce stacked permanent lottery goods.
@@ -77,7 +77,7 @@ def compile_commerce(tables,reference,category_text,*,max_products=200):
     for p in leaves:
         product={key:p[key] for key in PRODUCT_FIELDS if key!='price_yuan'};product['price_yuan']='1.00'
         if p.get('source_id')=='P103':
-            if p['ownership_id']!='lottery_ember_of_legacy' or number(p['purchase_limit'],True)!=1:
+            if p['ownership_id']!='lottery_ember_of_legacy':
                 raise ValueError('commerce_ember_ownership_invalid')
             product['ownership_id']+='_single'
         converted.append(product)
@@ -85,6 +85,12 @@ def compile_commerce(tables,reference,category_text,*,max_products=200):
         'payment_products':csv_text(converted,PRODUCT_FIELDS),
         'payment_rewards':csv_text([r for r in reward_rows if r['sku'] not in by_bundle],REWARD_FIELDS)},reference,max_products=max_products) if leaves else {'products':[]}
     compiled={p['sku']:p for p in leaf_catalog['products']}
+    for sku,product in compiled.items():
+        # New ember quantities use the inventory-derived combat projection.
+        # Keep disabled historical bulk offers intact for immutable receipts.
+        if products[sku]['ownership_id']=='lottery_ember_of_legacy' and flag(products[sku]['enabled']):
+            product['effects'].pop('hero_basic_attack_growth',None)
+            product['grants']['effect_labels'].pop('hero_basic_attack_growth',None)
     # Validate all roots, including disabled ones; their marker and icon are never
     # exempted from the formal catalog contract.
     markers={}

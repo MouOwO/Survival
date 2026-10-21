@@ -84,7 +84,7 @@ for _, row in ipairs(item_rows.rows or {}) do
             duplicate_points = math.max(0, math.floor(tonumber(row.duplicate_points) or 0)),
             exchange_points = math.max(0, math.floor(tonumber(row.exchange_points) or 0)),
             exchange_enabled = row.exchange_enabled ~= false,
-            max_owned = math.max(1, math.floor(tonumber(row.max_owned) or 1)),
+            max_owned = tonumber(row.max_owned)==0 and 0 or math.max(1, math.floor(tonumber(row.max_owned) or 1)),
         }
         assert(item.id ~= "" and M.by_id[item.id] == nil,
             "lottery duplicate or empty item id: " .. tostring(item.id))

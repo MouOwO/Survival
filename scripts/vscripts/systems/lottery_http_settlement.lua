@@ -4,7 +4,8 @@ local definitions=require('config/generated/player_gameplay_stats')
 local aliases=require('config/content_id_aliases')
 local M={}
 local MAX_SAFE_INTEGER=9007199254740991
-local function unique_points(item) return item.item_type=='积分道具' end
+local stackable=require('systems/archive_stackable_items')
+local function unique_points(item) return item.item_type=='积分道具' and not stackable.definition(item.id) end
 local function ownership_limit(item) return unique_points(item) and 1 or item.max_owned end
 local function copy(v)
     if type(v)~='table' then return v end
@@ -34,7 +35,7 @@ local function public_item(item,counts)
     r.max_owned=ownership_limit(item)
     r.owned_count=owned_count(counts,item.id)
     if unique_points(item) then r.owned_count=math.min(r.owned_count,r.max_owned) end
-    r.owned=r.owned_count>0;r.at_max_owned=r.owned_count>=r.max_owned
+    r.owned=r.owned_count>0;r.at_max_owned=r.max_owned>0 and r.owned_count>=r.max_owned
     return r
 end
 local function pool_public(pool,counts,state)
@@ -115,8 +116,14 @@ local function reconcile_unique_points(counts,archive)
     if converted>0 then credit_shop_points(archive,converted) end
     return {changed_items=changed,converted_points=converted,converted_currency='shop_points'}
 end
-local function grant(item,counts,stats,archive)
+local function grant(item,counts,stats,archive,markers)
     local id=aliases.canonical(item.id);local owned=owned_count(counts,id)
+    if stackable.definition(id) then
+        local accepted,overflow=stackable.grant({content_inventory=counts,lottery_applied_item_effects=markers},archive,stats,id,1)
+        local result=public_item(item,counts)
+        result.duplicate=false;result.converted_points=0;result.granted_count=accepted;result.overflow_count=overflow
+        return result
+    end
     local result=public_item(item,counts);result.duplicate=owned>=ownership_limit(item);result.converted_points=0
     if result.duplicate then
         -- Duplicate rewards fund the commerce wallet, never the separate loyalty score.
@@ -161,7 +168,7 @@ function M.settle(profile,command)
         for _,rule in ipairs(pool.pity_rules) do if rule.trigger_mode=='batch_only' and rule.threshold==count and (not guarantee or config.quality_rank[rule.target_quality]>config.quality_rank[guarantee]) then guarantee=rule.target_quality end end
         for i=1,count do
             local item=roll(pool,i==count and not hit and guarantee or nil)
-            results[#results+1]=grant(item,counts,stats,archive)
+            results[#results+1]=grant(item,counts,stats,archive,profile.save.lottery_applied_item_effects)
             if guarantee and config.quality_rank[item.quality]>=config.quality_rank[guarantee] then hit=true end
         end
         current.draws=(tonumber(current.draws) or 0)+count
@@ -170,10 +177,10 @@ function M.settle(profile,command)
     elseif command.kind=='lottery_exchange' then
         local item=pool.by_id[command.item_id]
         if not item or item.exchange_enabled==false or item.exchange_points<=0 then return {ok=false,error='lottery_item_invalid'} end
-        if owned_count(counts,item.id)>=ownership_limit(item) then return {ok=false,error='lottery_item_owned'} end
+        if ownership_limit(item)>0 and owned_count(counts,item.id)>=ownership_limit(item) then return {ok=false,error='lottery_item_owned'} end
         if (tonumber(stats.starjoy_points) or 0)<item.exchange_points then return {ok=false,error='starjoy_points_insufficient'} end
         response.unique_points_reconciliation=reconcile_unique_points(counts,archive)
-        add(stats,'starjoy_points',-item.exchange_points);response.item=grant(item,counts,stats,archive);response.item.exchanged=true;response.cost=item.exchange_points
+        add(stats,'starjoy_points',-item.exchange_points);response.item=grant(item,counts,stats,archive,profile.save.lottery_applied_item_effects);response.item.exchanged=true;response.cost=item.exchange_points
     else return {ok=false,error='lottery_command_invalid'} end
     response.shop_points=tonumber(((archive.commerce or {}).balances or {}).shop_points) or 0
     return {ok=true,archive=archive,content_inventory=counts,gameplay_stats=stats,response=response}

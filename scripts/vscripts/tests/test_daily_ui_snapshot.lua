@@ -23,7 +23,7 @@ local schedule=require("config/generated/archive_daily_schedule")
 local items=require("config/generated/archive_daily_items")
 local duplicate_rates={}
 for _,item in ipairs(require("config/lottery_config").items) do
-    if item.item_type=="积分道具" then
+    if item.item_type=="积分道具" and not require("systems/archive_stackable_items").definition(item.id) then
         local quality=string.lower(item.quality)
         assert(not duplicate_rates[quality] or duplicate_rates[quality]==item.duplicate_points)
         duplicate_rates[quality]=item.duplicate_points

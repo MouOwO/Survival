@@ -155,15 +155,17 @@ def run_checks(conn,bundle,ddl=None):
                 conn.execute('RELEASE SAVEPOINT daily_unique_allowed_write')
         checks.append('all_12_daily_ids_reject_two_malformed_values_and_second_inventory_allow_canonical_zero_one')
         for row in bundle.configs['lottery_item_definitions']['rows']:
-            if row.get('enabled') is False or row.get('item_type')!='积分道具':continue
+            if (row.get('enabled') is False or row.get('item_type')!='积分道具'
+                    or row.get('item_id')=='lottery_ember_of_legacy'):continue
             rejected(contents={**inventory,row['item_id']:2})
         rejected(contents={'lottery_nature_crystal':1,'lottery_flame_crystal':1})
         rejected(contents={'lottery_bombardment_crystal':1,'lottery_burst_crystal':1})
         for contents in ({},inventory,{'lottery_nature_crystal':0,'lottery_flame_crystal':1},
-                         {'lottery_nature_crystal':1,'lottery_flame_crystal':0}):
+                         {'lottery_nature_crystal':1,'lottery_flame_crystal':0},
+                         {'lottery_ember_of_legacy':1600,'welfare_zongzi':150}):
             assert conn.execute('SELECT public.archive_unique_points_20261019_valid(%s::jsonb,%s::jsonb)',
                                 ('{}',json.dumps(contents))).fetchone()==(True,)
-        checks.append('all_97_lottery_ids_and_alias_aggregate_checked_unknown_stacks_preserved')
+        checks.append('all_96_unique_lottery_ids_and_alias_aggregate_checked_ember_stacks_preserved')
         # An update that changes only the allowed inventory still passes the
         # actual table CHECK, not merely a direct call of the predicate.
         conn.execute('UPDATE public.player_archive_state SET content_inventory=%s::jsonb WHERE account_id=%s',(json.dumps(inventory),account))

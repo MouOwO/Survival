@@ -6,6 +6,7 @@ import re
 
 MAX_INTEGER = 9007199254740991
 MIGRATION = '20261018_unique_lottery_points_v1'
+STACKABLE_POINT_ITEMS = frozenset({'lottery_ember_of_legacy'})
 
 # One reviewed daily-only update with identical lottery rules and reducer.
 IDENTICAL_LOTTERY_UPDATE = ('0328f6ba83a13d309b8b6df84524814cf10ed5287c019282e35e286161d27bac', 'ccc088836ff79f635a002095958f6bcd43f45361e71037c26bfe5054b42f1348')
@@ -49,7 +50,8 @@ def integer(value):
 
 def catalog(bundle):
     rows = [r for r in bundle.configs['lottery_item_definitions']['rows']
-            if r.get('enabled') is not False and r.get('item_type') == '积分道具']
+            if r.get('enabled') is not False and r.get('item_type') == '积分道具'
+            and r.get('item_id') not in STACKABLE_POINT_ITEMS]
     if not rows or any(r.get('max_owned') != 1 for r in rows):
         raise ValueError('lottery_unique_catalog_invalid')
     source = (bundle.directory / 'config/content_id_aliases.lua').read_text('utf-8')

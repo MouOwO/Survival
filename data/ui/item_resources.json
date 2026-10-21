@@ -7528,7 +7528,7 @@
     },
     {
       "id": "lottery_ember_of_legacy",
-      "name": "薪火余烬·1个",
+      "name": "薪火余烬",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/reward_art_v5/lottery_ember_of_legacy.vtex",
       "aliases": [
@@ -15691,6 +15691,22 @@
         130,
         95
       ]
+    },
+    {
+      "id": "welfare_zongzi",
+      "name": "粽子",
+      "kind": "image",
+      "uri": "s2r://panorama/images/items/tango_png.vtex",
+      "aliases": [],
+      "quality": "R",
+      "category_id": "welfare",
+      "native_type": "item",
+      "native_name": "tango",
+      "source_size": [
+        88,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "wife_01",

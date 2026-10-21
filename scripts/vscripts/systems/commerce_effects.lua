@@ -40,13 +40,6 @@ function M.owned(player_id,key)
     return profile and M.has(profile.save,key) or false
 end
 function M.invalidate(player_id) frame_profiles[tonumber(player_id)]=nil end
-local tiers={
-    {10,'hero_attributes_per_second',100},{50,'hero_attribute_growth',5},
-    {100,'hero_final_damage_bonus_pct',10},{200,'hero_attack_bonus_pct',30},
-    {300,'hero_attribute_bonus_pct',30},{400,'hero_attack_armor_reduction',30},
-    {600,'hero_attribute_growth',40},{800,'hero_final_damage_bonus_pct',120},
-    {1000,'hero_attack_armor_reduction',50},{1500,'hero_attribute_growth',80},
-}
 function M.project(save, base)
     save=save or {};base=base or {};local result={}
     local function add(field,n) result[field]=(result[field] or 0)+n end
@@ -80,8 +73,7 @@ function M.project(save, base)
         for _,n in pairs((save.archive or {}).clear_counts or {}) do total=total+math.max(0,tonumber(n) or 0) end
         add('hero_final_damage_bonus_pct',total*.07)
     end
-    local count=M.count(save,'ember')
-    for _,t in ipairs(tiers) do if count>t[1] then add(t[2],t[3]) end end
+    for field,n in pairs(require('systems/archive_stackable_items').project(save,base)) do add(field,n) end
     -- base consists exclusively of persisted archive/shop effects. Runtime
     -- research, weapons and per-match growth are added after this projection.
     if M.has(save,'longinus') then

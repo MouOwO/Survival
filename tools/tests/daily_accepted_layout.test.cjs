@@ -100,7 +100,7 @@ function dailyAccepted() {
     assert.equal(Number(dailyCloseIcon.style.opacity), 1, 'The close cross stays fully opaque');
     assert.equal(dailyClose.hittestchildren, false, 'The cross cannot intercept close-button activation');
     assert.deepEqual([parseFloat(canvas.style.width), parseFloat(canvas.style.height)], [1360, 844]);
-    assert.equal(nodes.DailyGW2Title.text, '每日登录奖励');
+    assert.equal(nodes.DailyGW2Title.text, '登录奖励');
     assert.deepEqual(Array.from({length: 7}, (_, index) => nodes['DailyGW2Weekday_' + index].text),
         ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', 'Ⅵ', 'Ⅶ']);
     assert.equal(nodes.DailyCards.GetChildCount(), 28);

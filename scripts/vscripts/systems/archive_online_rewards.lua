@@ -21,6 +21,7 @@ function M.apply(command, archive, stats, apply_effects, save)
         if raw <= previous.actual_seconds then return true end
         local elapsed, map_elapsed = raw - previous.actual_seconds, weighted - previous.map_seconds
         if map_elapsed < elapsed or map_elapsed > elapsed * 2 then return false, "online_checkpoint_invalid" end
+        require("systems/archive_benefit_rewards").record_online(archive,elapsed,command)
         local old_minutes = math.floor(s.actual_seconds / 60)
         s.actual_seconds = s.actual_seconds + elapsed
         s.map_seconds = s.map_seconds + map_elapsed

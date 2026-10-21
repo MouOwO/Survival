@@ -18,7 +18,8 @@ function M.now()
     end
     error("archive_server_clock_unavailable")
 end
-function M.day() return math.floor((M.now()+8*3600)/86400) end
+-- Beijing's daily reset is 05:00, equivalent to UTC +03:00 for a day index.
+function M.day(timestamp) return math.floor(((timestamp or M.now())+3*3600)/86400) end
 function M.has_pass(profile)
     local e=profile and profile.entitlements and profile.entitlements.archive_pass
     return e and e.active==true and (e.expires_at==nil or tonumber(e.expires_at) and tonumber(e.expires_at)>M.now()) or false

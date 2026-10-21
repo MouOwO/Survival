@@ -114,7 +114,7 @@ test('Normal ticket help uses the official exclamation icon and shows acquisitio
  assert.equal(h.dispatched.length,0,'painting a balance never opens the tooltip');
  help.events.onactivate();
  const shown=h.dispatched.at(-1);assert.equal(shown[0],'DOTAShowTitleTextTooltip');assert.strictEqual(shown[1],help);
- assert.equal(shown[2],'普通抽奖券 · 获取渠道');assert(shown[3].includes('具体产出暂未开放'));assert(shown[3].includes('不支持商城购买'));
+ assert.equal(shown[2],'普通抽奖券 · 获取渠道');assert(shown[3].includes('每日福利'));assert(shown[3].includes('每周福利'));assert(shown[3].includes('不支持商城购买'));
  help.events.onmouseout();assert.equal(h.dispatched.at(-1)[0],'DOTAHideTitleTextTooltip');
  help.events.onactivate();presentation.Pools(snapshot('cultivation').pools,'cultivation');presentation.Snapshot(snapshot('cultivation'));
  assert(!help.visible&&!help.enabled&&!help.hittest,'gold-ticket pools expose their purchase control instead');

@@ -160,13 +160,25 @@ renderers.points = function(profile)
     end
     for _, item in ipairs(lottery.items) do
         if item.item_type == "积分道具" then
-            local count = math.min(counts[content_aliases.canonical(item.id)] or 0, item.max_owned)
+            local stackable=require("systems/archive_stackable_items").definition(item.id)
+            local cap=stackable and stackable.max_owned or item.max_owned
+            local count = counts[content_aliases.canonical(item.id)] or 0
+            if cap>0 then count=math.min(count,cap) end
             rows[#rows + 1] = { id = item.id, name = item.name,
-                description = item.description, icon_style = "seal", icon = item.icon, icon_type = item.icon_type,
-                quality = item.quality, count = count, target = item.max_owned, max_owned = item.max_owned,
-                item_type = item.item_type, source_kind = "lottery", unlocked = count > 0 and 1 or 0, count_known = 1,
-                duplicate_points = item.duplicate_points, duplicate_currency = "shop_points", converted_currency = "shop_points" }
+                description = stackable and stackable.description or item.description, icon_style = "seal", icon = item.icon, icon_type = item.icon_type,
+                quality = item.quality, count = count, target = cap>0 and cap or nil, max_owned = cap,
+                item_type = item.item_type, source_kind = stackable and "benefit" or "lottery", unlocked = count > 0 and 1 or 0, count_known = 1,
+                duplicate_points = stackable and 0 or item.duplicate_points,
+                duplicate_currency = not stackable and "shop_points" or nil, converted_currency = not stackable and "shop_points" or nil }
         end
+    end
+    local stackables=require("systems/archive_stackable_items")
+    local zongzi=stackables.definition("welfare_zongzi")
+    if zongzi then
+        local count=math.min(stackables.count(profile.save,zongzi.id),zongzi.max_owned)
+        rows[#rows+1]={id=zongzi.id,name=zongzi.name,description=zongzi.description,quality=zongzi.quality,
+            icon_type="custom",icon_style="seal",count=count,target=zongzi.max_owned,max_owned=zongzi.max_owned,
+            item_type="积分道具",source_kind="benefit",unlocked=count>0 and 1 or 0,count_known=1}
     end
     return rows
 end
@@ -289,8 +301,9 @@ local function local_settle(player_id, command)
     for id in pairs(archive.processed) do
         if id:sub(1, #prefix) ~= prefix then archive.processed[id] = nil end
     end
-    return profiles.update_save_sections(player_id,
-        { archive = archive, gameplay_stats = stats }, "archive_" .. command.kind)
+    local sections={archive=archive,gameplay_stats=stats}
+    if result.content_inventory then sections.content_inventory=result.content_inventory end
+    return profiles.update_save_sections(player_id,sections,"archive_"..command.kind)
 end
 
 local flush
@@ -406,6 +419,10 @@ flush = function(player_id)
                 M.send_daily(player_id, command.kind=="daily_claim" and {
                     target_day=command.target_day,ok=result and result.ok==true,
                     error=result and result.error,terminal=result and result.terminal==true
+                } or nil,command.kind=="benefit_claim" and {
+                    track=command.track,tier_id=command.tier_id,ok=result and result.ok==true,
+                    pending=result and result.pending==true,error=result and result.error,
+                    terminal=result and result.terminal==true
                 } or nil)
             end
             if not endless_pending(player_id) then
@@ -510,6 +527,7 @@ function M.daily_snapshot(player_id)
     local profile=account_profile(player_id)
     if not profile then return {ok=false,error="档案尚未载入"} end
     local result=require("systems/archive_daily_rewards").snapshot(profile,require("systems/archive_calendar").day(),has_pass(profile))
+    result.benefits=require("systems/archive_benefit_rewards").snapshot(profile,has_pass(profile))
     result.ok=true
     daily_sequences[player_id]=(daily_sequences[player_id] or 0)+1
     result.sequence=daily_sequences[player_id]
@@ -517,12 +535,13 @@ function M.daily_snapshot(player_id)
     result.purchase_enabled=result.purchase_enabled==1 and purchase_provider and 1 or 0
     return result
 end
-function M.send_daily(player_id,claim_result)
+function M.send_daily(player_id,claim_result,benefit_claim_result)
     if not PlayerResource or not CustomGameEventManager then return end
     local player=PlayerResource:GetPlayer(player_id)
     if player then
         local snapshot=M.daily_snapshot(player_id)
         snapshot.claim_result=claim_result
+        snapshot.benefit_claim_result=benefit_claim_result
         CustomGameEventManager:Send_ServerToPlayer(player,"survival_daily_snapshot",snapshot)
     end
 end
@@ -531,6 +550,12 @@ function M.daily_claim(player_id,target)
     target=tonumber(target) or today
     if not integer(target) then return {ok=false,error="签到日期无效"} end
     return enqueue(player_id,{id=session_id..":daily:"..target,kind="daily_claim",today=today,target_day=target})
+end
+function M.benefit_claim(player_id,track,tier_id)
+    local row=require("config/generated/archive_benefit_rewards").by_id[tier_id]
+    if not row or not row.enabled or row.track~=track then return {ok=false,error="福利档位不存在"} end
+    serial=(serial or 0)+1
+    return enqueue(player_id,{id=session_id..":benefit:"..serial,kind="benefit_claim",track=track,tier_id=tier_id})
 end
 function M.set_purchase_provider(provider)
     assert(provider==nil or type(provider.open_checkout)=="function" or type(provider.create_order)=="function")
@@ -834,6 +859,18 @@ function M.init()
         local result=M.daily_claim(id,payload.target_day)
         if not result.ok then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
         M.send_daily(id,{target_day=payload.target_day,ok=result.ok==true,pending=result.pending==true,error=result.error})
+    end)
+    local benefit_times={}
+    CustomGameEventManager:RegisterListener("survival_benefit_claim",function(_,payload)
+        local id=tonumber(payload.PlayerID)
+        if not integer(id) or not PlayerResource:IsValidPlayerID(id) then return end
+        local now=GameRules:GetGameTime()
+        if benefit_times[id] and now-benefit_times[id]<0.3 then return end
+        benefit_times[id]=now;daily_viewers[id]=true;archive_players[id]=true
+        local result=M.benefit_claim(id,payload.track,payload.tier_id)
+        if not result.ok then bus.emit(events.UI_NOTIFICATION,{player_id=id,level="error",message=result.error}) end
+        M.send_daily(id,nil,{track=payload.track,tier_id=payload.tier_id,ok=result.ok==true,
+            pending=result.pending==true,error=result.error,terminal=result.terminal==true})
     end)
     local purchase_times={}
     CustomGameEventManager:RegisterListener("survival_pass_purchase",function(_,payload)

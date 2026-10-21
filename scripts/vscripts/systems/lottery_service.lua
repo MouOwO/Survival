@@ -142,7 +142,7 @@ local function sync_owned_item_effects(player_id)
         local owned_count = math.min(
             math.max(0, math.floor(tonumber(count) or 0)),
             item and math.max(1, math.floor(tonumber(item.max_owned) or 1)) or 0)
-        if item and owned_count > 0 then
+        if item and owned_count > 0 and not require('systems/archive_stackable_items').definition(canonical_id) then
             for copy_index = 1, owned_count do
                 local result = event_bus.request(events.CONTENT_INVENTORY_GRANT_REQUEST, {
                     player_id = player_id,
@@ -336,7 +336,7 @@ local function item_owned(counts, item)
 end
 
 local function item_at_limit(counts, item)
-    return item_owned_count(counts, item)
+    return tonumber(item.max_owned)~=0 and item_owned_count(counts, item)
         >= math.max(1, math.floor(tonumber(item.max_owned) or 1))
 end
 

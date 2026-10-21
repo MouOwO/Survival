@@ -29,6 +29,7 @@ end
 
 function M.settle(profile, command, pass, context)
     local archive, stats = copy(profile.save.archive or {}), copy(profile.save.gameplay_stats or {})
+    local inventory, response
     archive.version = 1
     for _,key in ipairs({"clear_counts","completed","shadow_counts","processed"}) do archive[key]=archive[key] or {} end
     if archive.processed[command.id] then return {ok=true,duplicate=true,archive=archive,gameplay_stats=stats} end
@@ -62,6 +63,11 @@ function M.settle(profile, command, pass, context)
     elseif command.kind == "daily_init" or command.kind == "daily_claim" then
         local ok,reason=require("systems/archive_daily_rewards").apply(command,archive,stats,pass,apply_effects)
         if not ok then return {ok=false,terminal=true,error=reason} end
+    elseif command.kind == "benefit_claim" then
+        inventory=copy(profile.save.content_inventory or {})
+        local ok, result=require("systems/archive_benefit_rewards").apply(command,archive,stats,inventory,pass,profile.save)
+        if not ok then return {ok=false,terminal=true,error=result} end
+        response=result
     elseif command.kind == "building_upgrade" or command.kind == "faith_cheat" then
         local ok, reason = require("systems/archive_building_rewards").apply(command, archive, stats, apply_effects)
         if not ok then return {ok=false,terminal=true,error=reason} end
@@ -75,6 +81,7 @@ function M.settle(profile, command, pass, context)
         if mode and clear_progress.max_available(mode) < (tonumber(command.difficulty_id:sub(2)) or math.huge) then
             return {ok=false,terminal=true,error="archive_mode_difficulty_unavailable"}
         end
+        require("systems/archive_benefit_rewards").record_win(archive,command)
         if require('systems/commerce_effects').has(profile.save,'double_clear') then
             command.count=command.count*2
         end
@@ -155,7 +162,7 @@ function M.settle(profile, command, pass, context)
     require("systems/archive_welfare_rewards").reconcile(archive, stats, apply_effects)
     -- Online checkpoints are deduplicated by their cumulative session cursor, without one saved ID per minute.
     if command.kind ~= "online_checkpoint" then archive.processed[command.id] = true end
-    return {ok=true,archive=archive,gameplay_stats=stats}
+    return {ok=true,archive=archive,gameplay_stats=stats,content_inventory=inventory,response=response}
 end
 M.apply_effects=apply_effects
 return M

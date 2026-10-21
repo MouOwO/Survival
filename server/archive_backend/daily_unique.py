@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 import uuid
-from .unique_points import MAX_INTEGER, integer, catalog as lottery_catalog
+from .unique_points import MAX_INTEGER, integer, catalog as lottery_catalog, STACKABLE_POINT_ITEMS
 
 MIGRATION='20261019_unique_daily_points_v1'
 
@@ -34,7 +34,8 @@ def catalog(bundle):
         raise ValueError('daily_unique_catalog_invalid')
     rates={}
     for row in bundle.configs['lottery_item_definitions']['rows']:
-        if row.get('enabled') is False or row.get('item_type')!='积分道具':continue
+        if (row.get('enabled') is False or row.get('item_type')!='积分道具'
+                or row.get('item_id') in STACKABLE_POINT_ITEMS):continue
         quality=row['quality'].lower();rate=integer(row['duplicate_points'])
         if rate<=0 or quality in rates and rates[quality]!=rate:
             raise ValueError('daily_duplicate_rate_conflict')

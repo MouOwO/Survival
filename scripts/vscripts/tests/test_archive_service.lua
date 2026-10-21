@@ -150,20 +150,24 @@ for _, item in ipairs(lottery_points.items) do
     end
 end
 local empty_points, empty_point_count = point_rows(0)
-assert(empty_point_count == point_definition_count+12,
-    "new profiles see every daily and lottery point item, including locked cards")
+assert(empty_point_count == point_definition_count+13,
+    "new profiles see every daily, lottery and stackable welfare point item, including locked cards")
 for id, item in pairs(point_definitions) do
     local row = assert(empty_points[id], "enabled point item missing: " .. id)
     assert(row.count == 0 and row.unlocked == 0 and row.count_known == 1,
         "absent inventory is a known locked unique item")
-    assert(row.max_owned == 1 and row.target == 1,
-        "lottery point cards show one permanent unlock")
-    assert(row.item_type == "积分道具" and row.source_kind == "lottery",
+    local stackable=require("systems/archive_stackable_items").definition(id)
+    assert(stackable and row.max_owned==0 and row.target==nil or not stackable and row.max_owned == 1 and row.target == 1,
+        "unique lottery cards retain one unlock; stackable embers have no quantity cap")
+    assert(row.item_type == "积分道具" and row.source_kind == (stackable and "benefit" or "lottery"),
         "point cards retain their formal acquisition source")
-    assert(row.duplicate_points == item.duplicate_points
+    assert(stackable and row.duplicate_points==0 and row.duplicate_currency==nil
+        or not stackable and row.duplicate_points == item.duplicate_points
         and row.duplicate_currency == "shop_points" and row.converted_currency == "shop_points",
         "duplicate conversion metadata must follow the item definition and commerce wallet")
 end
+assert(empty_points.welfare_zongzi.max_owned==150 and empty_points.welfare_zongzi.count==0,
+    "welfare zongzi is visible in archive without adding it to a lottery pool")
 for _, item in ipairs(require("config/generated/lottery_item_definitions").rows) do
     if item.enabled == false then assert(not empty_points[item.item_id], "disabled point rewards stay hidden") end
 end
@@ -184,7 +188,7 @@ profiles[0].save.fishing_inventory.star_blessing_001=4
 assert(archive.snapshot(0,"fishing").rows[1].count==4,"authoritative profile refresh updates counts")
 profiles[0].save.content_inventory.lottery_attribute_crystal = 1
 local owned_points, owned_point_count = point_rows(0)
-assert(owned_point_count == point_definition_count+12,
+assert(owned_point_count == point_definition_count+13,
     "unlocking an item changes its state without hiding other locked cards")
 assert(owned_points.lottery_attribute_crystal.count == 1
     and owned_points.lottery_attribute_crystal.unlocked == 1)
@@ -482,10 +486,10 @@ for _,row in ipairs(require("config/lottery_config").items) do assert(not row.id
 assert(#archive.snapshot(8,"boss").rows==34)
 print("ARCHIVE_BOSS_DAILY_PASS: pass expiry, dedup, day boundaries, makeup, 21-day rewards, point inventory")
 local calendar=require("systems/archive_calendar")
-timestamp=25000*86400+16*3600-1
+timestamp=25000*86400+21*3600-1
 assert(calendar.day()==25000)
 timestamp=timestamp+1
-assert(calendar.day()==25001,"UTC+8 midnight")
+assert(calendar.day()==25001,"Beijing 05:00 daily reset")
 
 -- Welfare purchases must remain available while unrelated boss rewards retry.
 profiles[9] = new_profile()

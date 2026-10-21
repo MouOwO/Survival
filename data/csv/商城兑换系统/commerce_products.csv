@@ -1,4 +1,4 @@
-﻿sku,display_name,category_id,product_type,currency,price,purchase_limit,enabled,sort_order,icon,description,ownership_id,source_id,source_current_price,source_original_price,source_time,price_date,description_date,ownership_quantity,price_policy,price_baseline
+sku,display_name,category_id,product_type,currency,price,purchase_limit,enabled,sort_order,icon,description,ownership_id,source_id,source_current_price,source_original_price,source_time,price_date,description_date,ownership_quantity,price_policy,price_baseline
 #types:string,string,string,string,string,number,number,boolean,number,string,string,string,string,number,number,number,string,string,number,string,number
 video_p001,金色抽奖券,item,single,u_coin,600,0,1,1,custom_game/lottery_handoff_v1/ticket_illustrated.png,获得1张特殊抽奖券，用于本项目特殊奖池。奖池道具及概率以游戏内公示为准。,commerce_p001,P001,1200,,0.0,2026-10-04,2026-09-29,1,half_current_20261017,1200
 video_p004,清暑符·永久,technology,single,u_coin,3400,1,1,4,custom_game/archive_items_v2/lottery_attribute_crystal.png,"开局木材+200
@@ -675,9 +675,7 @@ video_p102,全知赐福·永久,item,single,shop_points,2500,1,1,102,custom_game
 墙减伤+5%
 每1级地图等级，墙生命加成+1%，墙每秒生命+5
 购买后自动激活",lottery_omniscience_blessing,P102,5000,,115.867,2026-10-04,2026-09-29,1,half_current_20261017,5000
-video_p103,薪火余烬·1个,item,single,shop_points,29,1,1,103,custom_game/archive_items_v2/lottery_ember_of_legacy.png,"英雄普攻成长+0.1
-永久道具，每人只能拥有1个
-购买或抽奖获得后自动解锁；已拥有时不可重复购买",lottery_ember_of_legacy,P103,58,,115.867,2026-10-04,2026-09-29,1,half_current_20261017,58
+video_p103,薪火余烬·1个,item,single,shop_points,29,0,1,103,custom_game/archive_items_v2/lottery_ember_of_legacy.png,每个薪火余烬：每次普攻攻击力成长+0.1，可叠加，无持有上限；数量>10：英雄每秒属性+100；>50：英雄攻击全属性+100；>100：英雄最终伤害+10%；>200：英雄攻击加成+30%；>300：英雄全属性加成+30%；>400：英雄攻击减甲+30；>600：英雄攻击全属性改为+40；>800：英雄最终伤害改为+120%；>1000：英雄攻击减甲改为+50；>1500：英雄攻击全属性改为+60；同属性只生效已达最高档，严格大于门槛生效；不会转化为积分；获得后自动生效,lottery_ember_of_legacy,P103,58,,115.867,2026-10-04,2026-09-29,1,half_current_20261017,58
 video_p108,时间宝珠·永久,item,single,shop_points,2500,1,1,108,custom_game/archive_items_v2/lottery_time_orb.png,"伐木效率+3
 金矿建造上限+1
 防御塔攻击成长+1

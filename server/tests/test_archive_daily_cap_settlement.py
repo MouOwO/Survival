@@ -215,8 +215,8 @@ io.write(require("core/json_encoder").encode(require("systems/archive_daily_limi
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         return json.loads(result.stdout)
 
-    def test_python_and_lua_projection_agree_at_midnight_and_pass_expiry(self):
-        midnight = 20001 * 86400 - 28800
+    def test_python_and_lua_projection_agree_at_five_am_and_pass_expiry(self):
+        midnight = 20001 * 86400 - 10800
         profile = copy.deepcopy(self.profile)
         profile['save']['archive'] = {'daily': {'20000': {'cage_total': 70, 'fragment_01': 25, 'coins_total': 8000},
             '20001': {'cage_total': 1}}, 'buildings': {'earned_by_day': {'20000': 2900}}}
@@ -227,7 +227,7 @@ io.write(require("core/json_encoder").encode(require("systems/archive_daily_limi
                 python = snapshot(profile, self.bundle, now=now)
                 lua = self.lua_snapshot(profile, now)
                 self.assertEqual(python, lua)
-                self.assertEqual(python['day_key'], str(math.floor((now+28800)/86400)))
+                self.assertEqual(python['day_key'], str(math.floor((now+10800)/86400)))
                 self.assertEqual(python['by_key']['cage']['limit'], 60)
                 self.assertEqual(python['by_key']['fragment_01']['limit'], 20)
 
