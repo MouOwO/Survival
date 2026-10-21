@@ -131,7 +131,8 @@ assert(!h.tooltip.BHasClass('BuildAbility')); assert(node(h, 'CustomAbilityLevel
 assert.notEqual(resolved(node(h, 'CustomAbilityLevel'), 'visibility'), 'collapse', 'ordinary upgrade level is restored after construction');
 assert.equal(node(h, 'CustomAbilityType').text, '');
 assert.strictEqual(rows(h)[0], originalRows[0]);
-assert.notEqual(resolved(rows(h)[0].__iconHost, 'visibility'), 'collapse', 'construction-only CSS cannot override ordinary upgrade gutter behavior');
+assert.equal(resolved(rows(h)[0].__iconHost, 'visibility'), 'collapse', 'ordinary upgrade text also starts at the cost left edge');
+leftAligned(h, rows(h)[0]);
 for (const [extra, token] of [
     [{upgrade_in_progress: 1}, 'Survival_UpgradeTooltip_InProgress'],
     [{prerequisite_met: 0}, 'Survival_UpgradeTooltip_Unavailable'],
@@ -141,6 +142,55 @@ for (const [extra, token] of [
     h.setTable('survival_ability_runtime', upgrade, {...base, ability_entindex: upgrade, current_level: 3, ...extra}, true);
     assert.equal(node(h, 'CustomAbilityType').text, token ? localization.get(token) : '', 'only the generic ready/可升级 type is removed');
 }
+
+// Farm upgrades mix text-only metadata/requirements with a real population
+// icon. Refresh and another skill must not preserve an old pooled-row gutter.
+const farmFields = [
+    {label: '等级', value: '1 → 2'}, {label: '人口上限', value: '+3'},
+    {label: '升级前置', value: '主城LV2'}
+];
+function alignedFarm(expectedValues) {
+    const actual = rows(h);
+    assert.deepEqual(actual.map(row => row.__left.text), farmFields.map(field => field.label));
+    assert.deepEqual(actual.map(row => row.__right.text), expectedValues);
+    for (const row of actual) leftAligned(h, row);
+    for (const row of [actual[0], actual[2]]) {
+        assert(row.BHasClass('AbilityFieldTextRow'));
+        assert.equal(resolved(row.__iconHost, 'visibility'), 'collapse', 'upgrade metadata and prerequisites have no empty icon gutter');
+    }
+    const population = actual[1];
+    assert(!population.BHasClass('AbilityFieldTextRow'));
+    assert.notEqual(resolved(population.__iconHost, 'visibility'), 'collapse', 'real population artwork keeps its space');
+    assert.equal(population.__iconHost.visible, true);
+    assert.equal(population.__iconHost.style.opacity, '1');
+    assert.equal(population.__icons.DOTAAbilityImage.visible, true);
+    assert.equal(population.__icons.DOTAAbilityImage.abilityname, 'ability_train_population');
+}
+unitNames[827] = 'building_farm';
+const farmUpgrade = replace('ability_upgrade_farm', {cost_wood: 500, fields: farmFields});
+alignedFarm(['1 → 2', '+3', '主城LV2']);
+assert.equal(node(h, 'CustomAbilityWoodCost').text, '500');
+const farmRows = rows(h), farmAllocated = h.counters.created;
+const refreshedFarm = {...base, ability_entindex: farmUpgrade, fields: [
+    {label: '等级', value: '2 → 3'}, {label: '人口上限', value: '+4'},
+    {label: '升级前置', value: '主城LV3'}
+]};
+for (let i = 0; i < 20; i++) h.setTable('survival_ability_runtime', farmUpgrade, refreshedFarm, true);
+alignedFarm(['2 → 3', '+4', '主城LV3']);
+rows(h).forEach((row, index) => assert.strictEqual(row, farmRows[index]));
+assert.equal(h.counters.created, farmAllocated, 'farm refresh reuses its mixed icon/text rows');
+replace('ability_upgrade_city', {fields: [farmFields[1], farmFields[2], farmFields[0]]});
+assert.strictEqual(rows(h)[0], farmRows[0]);
+assert(!rows(h)[0].BHasClass('AbilityFieldTextRow'), 'the former level row now displays real artwork');
+assert.equal(rows(h)[0].__icons.DOTAAbilityImage.visible, true);
+assert.strictEqual(rows(h)[1], farmRows[1]);
+assert(rows(h)[1].BHasClass('AbilityFieldTextRow'), 'the former icon row becomes a left-aligned prerequisite');
+assert.equal(resolved(rows(h)[1].__iconHost, 'visibility'), 'collapse');
+assert.equal(rows(h)[1].__icons.DOTAAbilityImage.visible, false, 'the former population image is hidden on reuse');
+replace('ability_upgrade_farm', {fields: farmFields});
+alignedFarm(['1 → 2', '+3', '主城LV2']);
+rows(h).forEach((row, index) => assert.strictEqual(row, farmRows[index]));
+
 unitNames[827] = 'building_research_lab';
 replace('ability_research_lumberjack_speed', {research_upgrade: 1, current_level: 2, research_status_code: 'available'});
 assert(!h.tooltip.BHasClass('BuildAbility')); assert(node(h, 'CustomAbilityLevel').text.endsWith(' 2'));
@@ -203,7 +253,8 @@ statusPreserved(h.tooltip, refreshedPopulation.status_text, false);
 replace('ability_upgrade_farm', {fields: populationFields});
 assert(!h.tooltip.BHasClass('PopulationTraining'), 'switching skills clears the population-only layout');
 assert.deepEqual(labels(h), populationFields.map(field => field.label), 'identically named details on other abilities remain intact');
-assert.notEqual(resolved(rows(h)[0].__iconHost, 'visibility'), 'collapse', 'ordinary field gutters return after population training');
+assert.equal(resolved(rows(h)[0].__iconHost, 'visibility'), 'collapse', 'other abilities retain the universal text-only left alignment');
+leftAligned(h, rows(h)[0]);
 replace('ability_train_population', {...populationRuntime, available: 0, cost_wood: 0,
     status_text: '人口训练已全部完成', fields: populationFields.filter(field => populationHidden.includes(field.label))});
 assert(h.tooltip.BHasClass('PopulationTraining')); assert.deepEqual(labels(h), [], 'completed/older snapshots cannot leave obsolete pooled details visible');
@@ -255,6 +306,14 @@ for (const [name, level] of [['ability_upgrade_city', 3], ['ability_research_lum
     assert(!tip.BHasClass('BuildAbility'), name + ' clears stale construction styling');
     assert(t.nodes.CustomAbilityLevel.text.endsWith(' ' + level)); assert.notEqual(resolved(t.nodes.CustomAbilityLevel, 'visibility'), 'collapse');
 }
+showTakeover('ability_upgrade_farm', {fields: farmFields});
+for (const field of farmFields) {
+    const row = t.nodes.CustomAbilityFields.children.find(candidate => candidate.children[0].text === field.label);
+    assert(row, 'full takeover retains farm ' + field.label);
+    assert.equal(row.children[1].text, field.value);
+    assert.equal(row.children.length, 2, 'full takeover has no empty icon placeholder');
+    row.children.forEach(panel => assert.equal(resolved(panel, 'text-align'), 'left'));
+}
 showTakeover('ability_build_gold_mine', {available: 0, prerequisite_met: 0, status_text: '需要主城等级2'});
 assert(tip.BHasClass('BuildAbility')); assert.equal(t.nodes.CustomAbilityLevel.text, '');
 statusPreserved(tip, '需要主城等级2', true);
@@ -295,4 +354,4 @@ assert(t.nodes.CustomAbilityCostRow.BHasClass('Hidden'));
 statusPreserved(tip, '人口训练已全部完成', false);
 assert.equal(t.requests.length, 0, 'presentation tests never cast or buy');
 
-console.log('ABILITY_TOOLTIP_COMPACT_PASS: both real owners; no standalone unlock rows; compact population details/costs/status; scoped population gutter suppression and cross-skill restoration; red/green status preserved; no generic ready badge; construction-only level/gutter suppression; retained icons/costs; upgrade/hero/research reuse; pooled refresh; scoped left alignment (no pixel simulation).');
+console.log('ABILITY_TOOLTIP_COMPACT_PASS: both real owners; no standalone unlock rows; compact population details/costs/status; universal text-only gutter suppression; farm upgrade metadata/prerequisites align left while real population artwork remains; red/green status preserved; no generic ready badge; construction-only header level suppression; upgrade/hero/research reuse; mixed icon/text pooled refresh (no pixel simulation).');
