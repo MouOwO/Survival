@@ -3084,7 +3084,7 @@
     },
     {
       "id": "commerce_p001",
-      "name": "红色抽奖券",
+      "name": "金色抽奖券",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/lottery_ticket_user_v1/special_png.vtex",
       "aliases": [

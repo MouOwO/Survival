@@ -58,3 +58,6 @@ server/aliyun/database/target/202610200003_archive_daily_limits.sql text eol=lf
 server/aliyun/database/target/202610200004_mode_unlock_chain.sql text eol=lf
 # The reviewed deployment plan pins these scripts by raw byte SHA256.
 tools/mode_progression_release_20261020/mode_release_*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve the sealed lottery deployment scripts byte-for-byte.
+tools/lottery_gold_20261021/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

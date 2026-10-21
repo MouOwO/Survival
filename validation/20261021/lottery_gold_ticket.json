@@ -1,0 +1,166 @@
+{
+  "date": "2026-10-21",
+  "status": "LIVE_VERIFIED",
+  "base": {
+    "archive_release": "20261020-monthly-archive-0763266ab8d3",
+    "archive_bundle": "0763266ab8d30552fe16b69b5f78c12e073509f525d6b6ad007db34163901b3e",
+    "archive_manifest_sha256": "376cafc235c1c6398a68098e3d699d619822877928bc7039e4161bd4a035fdde",
+    "payment_release": "20261018-checkout-gcoin-v1",
+    "payment_manifest_sha256": "754926e3e7ef11603e3070eb5304cb778f55a5c8b7dfcc370d8f2612dfda4303",
+    "payment_pid": "5427",
+    "archive_sync_sha256": "9ad8410fb559261fd79ff9ed27ef710e3d786d6c1792b01a05a82babbe0bd8c9"
+  },
+  "candidate": {
+    "archive_release": "20261021-lottery-gold-bbaf4162a941",
+    "bundle": "bbaf4162a941449082f4c5ddcb6d02b056db54a656e08e681d4cae4adbdccf6d",
+    "catalog_md5": "ca9954922ebfa93d83d646187d1068d1",
+    "configuration_changes": {
+      "lottery_pool_definitions": {
+        "cultivation": [
+          "description",
+          "pool_group",
+          "ticket_content_id"
+        ]
+      },
+      "lottery_currency_definitions": {
+        "special_lottery_ticket": [
+          "notes"
+        ]
+      },
+      "commerce_products": {
+        "video_p001": [
+          "display_name"
+        ]
+      },
+      "commerce_import_status": {
+        "P001": [
+          "display_name",
+          "implementation_notes"
+        ]
+      },
+      "commerce_catalog": {
+        "video_p001": [
+          "title"
+        ]
+      }
+    },
+    "parent_compatibility": {
+      "hash": "0763266ab8d30552fe16b69b5f78c12e073509f525d6b6ad007db34163901b3e",
+      "upgrade_commands": []
+    },
+    "settlement_sources_unchanged": true
+  },
+  "deployment": {
+    "seal": {
+      "archive_sha256": "520a84317b9299b8468467ffea9dba3cde76f60dc4f4c378dce5e971776680d6",
+      "files": {
+        "plan.json": "eae0abf4a9df866356b010738b19e575a90c5fccecca3945c91d1729a738d1ef",
+        "bundle.json": "bbaf4162a941449082f4c5ddcb6d02b056db54a656e08e681d4cae4adbdccf6d",
+        "remote_operator.py": "4488fd46534eb42bd64584f1e0a66defe7116ca6653dd74ccebb2f10dfe18a40"
+      },
+      "plan_sha256": "eae0abf4a9df866356b010738b19e575a90c5fccecca3945c91d1729a738d1ef",
+      "stage": "/root/goufayu_upload/lottery-gold-20261021-bbaf4162a941"
+    },
+    "prepared": {
+      "ok": true,
+      "phase": "PREPARED",
+      "release": "20261021-lottery-gold-bbaf4162a941",
+      "bundle": "bbaf4162a941449082f4c5ddcb6d02b056db54a656e08e681d4cae4adbdccf6d",
+      "worker_checks": {
+        "cases": 8,
+        "synthetic_memory_only": true,
+        "real_player_writes": 0
+      }
+    },
+    "validation": {
+      "ok": true,
+      "phase": "VALIDATED",
+      "rolled_back": true,
+      "player_writes": 0,
+      "configuration_jsonb_sha256": "169fa5ce7362b7ab112b8f4b7a00d2766836b6b59cad87605d7f93340be5c913",
+      "sync_sha256": "fb01d4dbe9ea69001c4eee452d52da6a48d7908a25bc4cdc8bf0a3394d5a88a6",
+      "payment_title_only": true
+    },
+    "activation": {
+      "ok": true,
+      "phase": "ACTIVATED",
+      "release": "20261021-lottery-gold-bbaf4162a941",
+      "bundle": "bbaf4162a941449082f4c5ddcb6d02b056db54a656e08e681d4cae4adbdccf6d",
+      "player_writes": 0,
+      "historical_orders_changed": 0,
+      "payment_service_restarted": false,
+      "backup": {
+        "local_backup": "/var/backups/goufayu-payment/game-and-payments-20261021T031347Z.dump",
+        "includes_game_and_payments": true,
+        "offsite": false
+      },
+      "configuration_jsonb_sha256": "169fa5ce7362b7ab112b8f4b7a00d2766836b6b59cad87605d7f93340be5c913",
+      "sync_sha256": "fb01d4dbe9ea69001c4eee452d52da6a48d7908a25bc4cdc8bf0a3394d5a88a6",
+      "payment_title_only": true
+    },
+    "verification": {
+      "ok": true,
+      "phase": "LIVE_VERIFIED",
+      "release": "20261021-lottery-gold-bbaf4162a941",
+      "bundle": "bbaf4162a941449082f4c5ddcb6d02b056db54a656e08e681d4cae4adbdccf6d",
+      "catalog_md5": "ca9954922ebfa93d83d646187d1068d1",
+      "ticket_name": "金色抽奖券",
+      "ticket_content_id": "special_lottery_ticket",
+      "unlock_required": 100,
+      "payment_title": "金色抽奖券",
+      "payment_pid": "5427",
+      "player_writes": 0
+    }
+  },
+  "local_checks": {
+    "http_worker_regressions_passed": 6,
+    "overlay_guard_tests_passed": 4,
+    "narrow_generated_lua_matches_csv": true,
+    "legacy_contract_note": "tools/test_lottery_config_contract.ps1 has an earlier, unrelated failure: exactly eight lottery items should grant one map level."
+  },
+  "ordinary_ticket_acquisition_audit": {
+    "configured_policy": "gameplay_reward",
+    "normal_production_grant_entries_found": 0,
+    "debug_only": "debug/cheat_command_service.lua choujiang <amount>; tools mode or cheats required",
+    "paid_purchase_supported": false
+  },
+  "rollback": {
+    "command": "python -X utf8 tools/lottery_gold_20261021/deploy.py rollback",
+    "preserved_release": "20261020-monthly-archive-0763266ab8d3",
+    "stage": "/root/goufayu_upload/lottery-gold-20261021-bbaf4162a941",
+    "database_restore_required": false,
+    "additive_config_and_title_remain": true
+  },
+  "local_activation": {
+    "hash": "bbaf4162a941449082f4c5ddcb6d02b056db54a656e08e681d4cae4adbdccf6d",
+    "before_archive_http_bundle_sha256": "4efb5edf26e1dbf5e7e781f06d5868502ec29c4dcad170fac6ff1d088f5ce67a",
+    "before_current_pointer_sha256": "1dbb9263f42a7ef76b035074eedd8de142ed9542e526ff50958d2301dc1b74b9",
+    "immutable_bundle_copied": true,
+    "ordinary_ticket_inventory_migrated": false
+  },
+  "frontend": {
+    "official_help_icon": "file://{images}/status_icons/exclamation.psd",
+    "ordinary_ticket_help": "地图玩法奖励（具体产出暂未开放）。用于地图宝箱，不支持商城购买。",
+    "ordinary_grant_change": false,
+    "cultivation_purchase_plus": true,
+    "source_native_content_sets_verified": 5,
+    "ticket_ui_cases_passed": 9,
+    "cache_cases_passed": 20,
+    "ticket_rule_and_cinematic_and_notice_suites_passed": 3,
+    "archive_tooltip_font_and_shared_suites_passed": 2,
+    "existing_failures": [
+      {
+        "file": "tools/tests/lottery_gw2.test.cjs",
+        "line": 297,
+        "assertion": "same-source tooltip immediate reentry suppression",
+        "reproduced_with_before_source": true
+      },
+      {
+        "file": "tools/test_lottery_config_contract.ps1",
+        "line": 81,
+        "assertion": "eight map-level rewards versus existing nine",
+        "reproduced_with_before_configuration": true
+      }
+    ]
+  }
+}

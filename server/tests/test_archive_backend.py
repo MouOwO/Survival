@@ -792,9 +792,9 @@ class ArchiveTests(unittest.TestCase):
         projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
         selected=next(s for s in projection['snapshots'] if s['selected_pool_id']=='cultivation')['selected_pool']
         self.assertFalse(selected['unlocked']);self.assertEqual(selected['unlock_progress'],99)
-        self.assertEqual(selected['unlock_required'],100);self.assertEqual(selected['ticket_content_id'],'lottery_ticket')
+        self.assertEqual(selected['unlock_required'],100);self.assertEqual(selected['ticket_content_id'],'special_lottery_ticket')
 
-    def test_lottery_map_ten_unlocks_at_100_and_cultivation_spends_normal(self):
+    def test_lottery_map_ten_unlocks_at_100_and_cultivation_spends_gold(self):
         self.profile['save']['content_inventory']={'lottery_ticket':100,'special_lottery_ticket':17}
         self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':90}}}}
         payload=self.command('lottery_draw',pool_id='map',count=10,request_id='unlock_ten')
@@ -803,10 +803,22 @@ class ArchiveTests(unittest.TestCase):
         projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
         selected=next(s for s in projection['snapshots'] if s['selected_pool_id']=='cultivation')['selected_pool']
         self.assertTrue(selected['unlocked'])
-        self.assertTrue(self.send('lottery_draw',pool_id='cultivation',count=1,request_id='normal_one')['ok'])
-        self.assertTrue(self.send('lottery_draw',pool_id='cultivation',count=10,request_id='normal_ten')['ok'])
-        self.assertEqual(self.profile['save']['content_inventory']['lottery_ticket'],79)
-        self.assertEqual(self.profile['save']['content_inventory']['special_lottery_ticket'],17)
+        self.assertEqual(selected['ticket_content_id'],'special_lottery_ticket')
+        self.assertEqual(selected['ticket_name'],'金色抽奖券')
+        self.assertEqual(selected['tickets'],17)
+        self.assertTrue(self.send('lottery_draw',pool_id='cultivation',count=1,request_id='gold_one')['ok'])
+        self.assertTrue(self.send('lottery_draw',pool_id='cultivation',count=10,request_id='gold_ten')['ok'])
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ticket'],90)
+        self.assertEqual(self.profile['save']['content_inventory']['special_lottery_ticket'],6)
+        self.assertEqual(self.profile['save']['archive']['lottery_state']['pools']['cultivation']['draws'],11)
+
+    def test_lottery_cultivation_gold_shortage_preserves_normal_tickets(self):
+        self.profile['save']['content_inventory']={'lottery_ticket':100,'special_lottery_ticket':9}
+        self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':100}}}}
+        before=copy.deepcopy(self.profile)
+        result=self.send('lottery_draw',pool_id='cultivation',count=10,request_id='gold_ten_shortage')
+        self.assertFalse(result['ok']);self.assertEqual(result['error'],'lottery_ticket_insufficient')
+        self.assertEqual(self.profile,before)
 
     def test_lottery_gold_pools_have_no_progress_gate(self):
         self.profile['save']['content_inventory']={'lottery_ticket':17,'special_lottery_ticket':22}
@@ -819,13 +831,14 @@ class ArchiveTests(unittest.TestCase):
 
     def test_lottery_ticket_types_cannot_substitute_each_other(self):
         for pool in ('map','cultivation','dragon_knight','summer'):
-            normal=pool in ('map','cultivation')
+            normal=pool=='map'
             self.profile['save']['content_inventory']={'lottery_ticket':0 if normal else 99,'special_lottery_ticket':99 if normal else 0}
             self.profile['save']['archive']={'lottery_state':{'pools':{'map':{'draws':100}}}}
             before=copy.deepcopy(self.profile)
-            result=self.send('lottery_draw',pool_id=pool,count=1,request_id='wrong_'+pool)
-            self.assertFalse(result['ok']);self.assertEqual(result['error'],'lottery_ticket_insufficient')
-            self.assertEqual(self.profile,before)
+            for count in (1,10):
+                result=self.send('lottery_draw',pool_id=pool,count=count,request_id='wrong_'+pool+'_'+str(count))
+                self.assertFalse(result['ok']);self.assertEqual(result['error'],'lottery_ticket_insufficient')
+                self.assertEqual(self.profile,before)
 
     def test_lottery_pity_tiers_and_forced_ssr_fallback(self):
         # Seed zero selects the lowest available tier; cultivation and dragon_knight have no N in their screenshot pools.

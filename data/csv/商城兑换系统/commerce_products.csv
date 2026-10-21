@@ -1,6 +1,6 @@
 ﻿sku,display_name,category_id,product_type,currency,price,purchase_limit,enabled,sort_order,icon,description,ownership_id,source_id,source_current_price,source_original_price,source_time,price_date,description_date,ownership_quantity,price_policy,price_baseline
 #types:string,string,string,string,string,number,number,boolean,number,string,string,string,string,number,number,number,string,string,number,string,number
-video_p001,红色抽奖券,item,single,u_coin,600,0,1,1,custom_game/lottery_handoff_v1/ticket_illustrated.png,获得1张特殊抽奖券，用于本项目特殊奖池。奖池道具及概率以游戏内公示为准。,commerce_p001,P001,1200,,0.0,2026-10-04,2026-09-29,1,half_current_20261017,1200
+video_p001,金色抽奖券,item,single,u_coin,600,0,1,1,custom_game/lottery_handoff_v1/ticket_illustrated.png,获得1张特殊抽奖券，用于本项目特殊奖池。奖池道具及概率以游戏内公示为准。,commerce_p001,P001,1200,,0.0,2026-10-04,2026-09-29,1,half_current_20261017,1200
 video_p004,清暑符·永久,technology,single,u_coin,3400,1,1,4,custom_game/archive_items_v2/lottery_attribute_crystal.png,"开局木材+200
 伐木效率+1
 金矿效率+6%

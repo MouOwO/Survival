@@ -171,7 +171,7 @@ foreach ($poolId in @('cultivation', 'dragon_knight', 'summer')) {
     $urPity = $pity | Where-Object { $_.pool_id -eq $poolId -and $_.target_quality -eq $expectedPity }
     Check ($null -ne $urPity -and [int]$urPity.threshold -eq 10) `
         "$poolId must have a ten-draw $expectedPity guarantee"
-    $expectedTicket = if ($poolId -eq 'cultivation') {'lottery_ticket'} else {'special_lottery_ticket'}
+    $expectedTicket = 'special_lottery_ticket'
     Check (($pools | Where-Object pool_id -eq $poolId).ticket_content_id -eq
         $expectedTicket) "$poolId must consume its configured ticket type"
 }

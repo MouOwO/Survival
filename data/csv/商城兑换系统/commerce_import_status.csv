@@ -1,6 +1,6 @@
 ﻿source_id,display_name,assessment,status,batch,implementation_notes,source_differences
 #types:string,string,string,string,string,string,string
-P001,红色抽奖券,A,ready,第一批扩展,对应现有 special_lottery_ticket 和特殊奖池；可做红色券的本项目版本，奖池内容、概率沿用项目配置，不承诺视频奖池完全一致。,
+P001,金色抽奖券,A,ready,第一批扩展,对应现有 special_lottery_ticket 和特殊奖池；金色抽奖券沿用既有特殊券库存ID，奖池内容、概率沿用项目配置，不承诺视频奖池完全一致。,
 P002,抽奖券,C,needs_redesign,暂不进入实施清单,抽奖消耗与存档已实现；普通 lottery_ticket 当前仅允许玩法产出，通用付费接口拒绝售卖。可保留玩法券；照视频付费售卖需另行改变货币策略。,
 P003,经验书（特大）,D,deferred,暂不进入实施清单,当前地图成长以有效在线秒数结算，没有4000地图经验的消耗品链路。需要经验量与时长/等级换算、使用扣减、50级门槛和每日3次限制。,
 P004,清暑符*永久,A,ready,首批20件,所有实质效果可映射到现有永久属性字段；新增/调整商品及奖励配置，复用现有2D图标，按视频逐项核准数值。,

@@ -33,7 +33,7 @@ function fixture(){
   if(attrs.text)node.text=attrs.text;if(!match[4])stack.push(node);
  }
  const $=id=>document.FindChildTraverse(id.slice(1));$.GetContextPanel=()=>document;$.CreatePanel=(type,parent,id)=>new Panel(type,parent,id);
- $.Schedule=()=>1;$.CancelScheduled=()=>{};$.DispatchEvent=()=>{};
+ const dispatched=[];$.Schedule=()=>1;$.CancelScheduled=()=>{};$.DispatchEvent=(...args)=>dispatched.push(args);
  const config={SurvivalUI:{Fit:()=>1}},env={$,
   GameUI:{CustomUIConfig:()=>config,GetCursorPosition:()=>[600,400]},
   GameEvents:{SendCustomGameEventToServer:(name,payload)=>requests.push({name,payload})}};
@@ -44,9 +44,9 @@ function fixture(){
  for(const icon of icons())Object.assign(icon.style,{backgroundImage:'url("legacy_ticket.png")',opacityMask:'url("legacy_silhouette.svg")',washColor:'#f1cc72'});
  run('lottery_gw2');
  const createPanel=(type,parent,cls)=>{const panel=new Panel(type,parent,'');if(cls)panel.AddClass(cls);return panel;};
- return{config,nodes,requests,collect,icons,createPanel};
+ return{config,nodes,requests,dispatched,collect,icons,createPanel};
 }
-function pool(id){return{id,ticket_content_id:['map','cultivation'].includes(id)?'lottery_ticket':'special_lottery_ticket',tickets:23,unlocked:true};}
+function pool(id){return{id,ticket_content_id:id==='map'?'lottery_ticket':'special_lottery_ticket',tickets:23,unlocked:true};}
 function snapshot(id,items=[]){return{selected_pool_id:id,selected_pool:pool(id),pools:['map','cultivation','dragon_knight','summer'].map(pool),items};}
 function assertOriginalArt(node,uri){
  assert.equal(node.style.backgroundImage,'url("'+uri+'")');assert.equal(node.style.backgroundSize,'contain');
@@ -88,11 +88,11 @@ test('Purchase visibility follows the explicit ticket identity before pool fallb
  const activated=[],callback=()=>activated.push('purchase');purchase.SetPanelEvent('onactivate',callback);
  presentation.Open();
  for(const [id,ticket,expected]of [
-  ['map','lottery_ticket',false],['cultivation','lottery_ticket',false],
+  ['map','lottery_ticket',false],['cultivation','special_lottery_ticket',true],
   ['dragon_knight','special_lottery_ticket',true],['summer','special_lottery_ticket',true],
   ['summer','lottery_ticket',false],['map','special_lottery_ticket',true],
   ['summer','unknown_ticket',false],['dragon_knight',undefined,true],['map',undefined,false],
-  ['summer','',true],['cultivation','',false]
+  ['summer','',true],['cultivation','',true]
  ]){
   const data=snapshot(id);if(ticket===undefined)delete data.selected_pool.ticket_content_id;else data.selected_pool.ticket_content_id=ticket;
   const untouched=JSON.stringify(data);presentation.Pools(data.pools,id);presentation.Snapshot(data);
@@ -103,6 +103,27 @@ test('Purchase visibility follows the explicit ticket identity before pool fallb
  }
  assert.deepEqual(activated,[],'presentation alone never opens a purchase');
  assert.equal(h.requests.length,0);
+});
+
+test('Normal ticket help uses the official exclamation icon and shows acquisition rules only after clicking',()=>{
+ const h=fixture(),presentation=h.config.SurvivalPurpleLottery;
+ presentation.Open();presentation.Pools(snapshot('map').pools,'map');presentation.Snapshot(snapshot('map'));
+ const help=h.nodes.LotteryGW2TicketHelp,icon=h.nodes.LotteryGW2TicketHelpIcon;
+ assert(help.visible&&help.enabled&&help.hittest);assert.equal(help.hittestchildren,false);
+ assert.equal(icon.image,'file://{images}/status_icons/exclamation.psd');
+ assert.equal(h.dispatched.length,0,'painting a balance never opens the tooltip');
+ help.events.onactivate();
+ const shown=h.dispatched.at(-1);assert.equal(shown[0],'DOTAShowTitleTextTooltip');assert.strictEqual(shown[1],help);
+ assert.equal(shown[2],'普通抽奖券 · 获取渠道');assert(shown[3].includes('具体产出暂未开放'));assert(shown[3].includes('不支持商城购买'));
+ help.events.onmouseout();assert.equal(h.dispatched.at(-1)[0],'DOTAHideTitleTextTooltip');
+ help.events.onactivate();presentation.Pools(snapshot('cultivation').pools,'cultivation');presentation.Snapshot(snapshot('cultivation'));
+ assert(!help.visible&&!help.enabled&&!help.hittest,'gold-ticket pools expose their purchase control instead');
+ assert.equal(h.dispatched.at(-1)[0],'DOTAHideTitleTextTooltip');
+ const calls=h.dispatched.length;help.events.onactivate();assert.equal(h.dispatched.length,calls,'a stale normal-ticket click cannot open on the gold pool');
+ assert(h.nodes.LotteryTicketPurchase.visible,'cultivation has its plus button');
+ presentation.Pools(snapshot('map').pools,'map');presentation.Snapshot(snapshot('map'));help.events.onactivate();presentation.Close();
+ assert.equal(h.dispatched.at(-1)[0],'DOTAHideTitleTextTooltip');
+ assert.equal(h.requests.length,0,'help only explains the existing rules');
 });
 
 test('Main preview uses only the shared quality plate, transparent canonical art and larger names',()=>{
