@@ -527,8 +527,11 @@ for (const [unitName, abilityName, hero] of [
     ['npc_dota_hero_doom_bringer','ability_survival_doom_infernal',true]
 ]) {
     test(unitName + ' restores tooltip after cached rows are deleted', () => {
+        const field = abilityName === 'ability_upgrade_tower_lv01'
+            ? {label:'自动升级',value:'右键升级图标开启'}
+            : {label:'attack',value:'25'};
         const h=createHarness({unitName,hero,abilityNames:[abilityName],panelCount:1,
-            fields:[{label:'attack',value:'25'}]});
+            fields:[field]});
         h.runUntil(1.2);
         const binding=h.inspect().bindings[0];
         assert(binding,'Expected a managed tooltip binding');
@@ -545,7 +548,7 @@ for (const [unitName, abilityName, hero] of [
         assert(!h.tooltip.BHasClass('Hidden'));
         assert(fields.__fieldRows[0].IsValid());
         assert.notStrictEqual(fields.__fieldRows[0],old);
-        assert.equal(fields.__fieldRows[0].__right.text,'25');
+        assert.equal(fields.__fieldRows[0].__right.text,field.value);
         assert.deepEqual(h.logs.filter(line=>line.includes('[SURVIVAL_TOOLTIP_ERROR]')),[]);
     });
 }

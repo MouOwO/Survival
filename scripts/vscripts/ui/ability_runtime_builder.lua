@@ -542,6 +542,11 @@ local function tower_upgrade(ability_name, state, resources)
             current_level = state.level, display_current_level = display_level, status_text = "已达最高等级" }
     end
     local tower_name = tower_routes.display_name(row)
+    local display_target_level = row.level or target
+    local maximum_level = tonumber(row.max_level) or (not state.tower_class and 5 or nil)
+    local target_is_max = mode == "max"
+        or (maximum_level and tonumber(display_target_level) == maximum_level)
+    local target_level_label = target_is_max and "max" or tostring(display_target_level)
     local attack_delta = (row.base_attack_damage or 0)
         - (current_row and current_row.base_attack_damage or 0)
     local description = (mode == "max"
@@ -551,28 +556,14 @@ local function tower_upgrade(ability_name, state, resources)
         .. tostring(attack_delta) .. "。"
     local result = merge({
         available = 1, current_level = state.level, display_current_level = display_level, next_level = target,
-        status_text = (mode == "max" and "升满至" or "升级至")
-            .. tower_name,
+        status_text = "升级至" .. tower_name .. " lv" .. target_level_label,
         tower_name = tower_name, skill_ids = row.skill_ids,
         upgrade_description = description,
         target_level = target,
-        display_target_level = row.level or target,
+        display_target_level = display_target_level,
         upgrade_attack_delta = attack_delta,
         population = cost.population or 0,
-        fields = {
-            { label = "目标等级", value = row.level or target },
-            { label = "升级目标", value = tower_name },
-            { label = "攻击提升", value = "+" .. tostring(attack_delta) },
-            { label = "攻击速度", value = value_delta(
-                current_row and current_row.base_attack_speed,
-                row.base_attack_speed
-            ) },
-            { label = "人口消耗", value = (tonumber(cost.population) or 0) > 0
-                and tostring(cost.population)
-                or ((tonumber(row.population_occupied) or 0) > 0
-                    and ("0（当前占有" .. tostring(row.population_occupied) .. "）")
-                    or "0") },
-        },
+        fields = {},
     }, cost_data(cost))
     return mark_upgrade_state(with_cast_resource_check(result), state)
 end

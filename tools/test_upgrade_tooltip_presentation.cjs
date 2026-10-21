@@ -10,13 +10,58 @@ vm.runInNewContext(harnessSource.slice(0, harnessSource.indexOf('// An identical
     + '\nthis.createHarness = createHarness;', env);
 
 function show(fields, options = {}) {
-    const h = env.createHarness({abilityNames:['ability_upgrade_tower_lv01'], panelCount:1, fields, ...options});
+    const {runtime, ...harnessOptions} = options;
+    const h = env.createHarness({abilityNames:['ability_upgrade_city'], panelCount:1, fields, ...harnessOptions});
+    if (runtime) h.setTable('survival_ability_runtime', 828,
+        {owner_entindex:827, ability_entindex:828, available:1, fields, ...runtime});
     h.runUntil(1.2);
     const binding = h.inspect().bindings[0], xy = binding.proxy.GetPositionWithinWindow();
     h.setCursor([xy.x + 10, xy.y + 10]);
     binding.proxy.events.onmouseover();
     assert(!h.tooltip.BHasClass('Hidden'));
     return {h, rows:() => Array.from(h.fieldContainer().__fieldRows).filter(row => row.visible)};
+}
+
+const legacyTowerFields = [
+    {label:'目标等级', value:2}, {label:'升级目标', value:'【N】见习守望'},
+    {label:'攻击提升', value:'+79'}, {label:'攻击速度', value:'1 → 1.2 (+0.2)'},
+    {label:'生命', value:'1000 → 2000 (+1000)'}, {label:'人口消耗', value:'1（当前占有3）'},
+    {label:'等级', value:'1 → 2'}, {label:'模型状态', value:'changed'},
+    {label:'自动升级', value:'右键升级图标开启，每秒检查一次'},
+    {label:'前置条件', value:'英雄0转'}, {label:'路线数量', value:'0/5'}
+];
+for (const abilityName of ['ability_upgrade_tower', 'ability_upgrade_tower_lv01',
+    'ability_upgrade_tower_lv02', 'ability_upgrade_tower_max']) {
+    const target = abilityName.endsWith('_max') ? 'lvmax' : 'lv2';
+    const status = '升级至【N】见习守望 ' + target;
+    const tower = show(legacyTowerFields, {abilityNames:[abilityName], runtime:{
+        current_level:1, display_current_level:1, cost_wood:100,
+        upgrade_description:'按当前路线升级至下一等级。', status_text:status
+    }});
+    assert.deepEqual(tower.rows().map(row => row.__left.text), ['自动升级','前置条件','路线数量'],
+        abilityName + ' hides cached upgrade details while retaining controls and requirements');
+    const panel = id => tower.h.tooltip.FindChildTraverse(id);
+    assert.equal(panel('CustomAbilityStatus').text, status, 'The server owns the complete target footer');
+    assert.equal(panel('CustomAbilityLevel').text, 'Level 1', 'The current level stays in the header');
+    assert.equal(panel('CustomAbilityDescription').text, '按当前路线升级至下一等级。');
+    assert.equal(panel('CustomAbilityWoodCost').text, '100');
+    assert(!panel('CustomAbilityWoodCostBlock').BHasClass('Hidden'), 'Upgrade costs remain visible');
+
+    tower.h.setTable('survival_ability_runtime', 828, {owner_entindex:827, ability_entindex:828,
+        available:1, fields:legacyTowerFields, status_text:'升级至【N】见习守望 lvmax'}, true);
+    assert.equal(panel('CustomAbilityStatus').text, '升级至【N】见习守望 lvmax',
+        'A final target also keeps lvmax on the single-level upgrade button');
+    tower.h.setTable('survival_ability_runtime', 828, {owner_entindex:827, ability_entindex:828,
+        available:0, prerequisite_met:0, fields:legacyTowerFields, status_text:'请先选择一个转职方向'}, true);
+    assert.equal(panel('CustomAbilityStatus').text, '请先选择一个转职方向', 'An unavailable upgrade keeps its actual error');
+    tower.h.setTable('survival_ability_runtime', 828, {owner_entindex:827, ability_entindex:828,
+        available:1, upgrade_in_progress:1, fields:legacyTowerFields, status_text:'升级中（1秒）'}, true);
+    assert.equal(panel('CustomAbilityStatus').text, 'Upgrade completes in 1 second', 'Upgrade progress remains visible');
+    tower.h.setTable('survival_ability_runtime', 828, {owner_entindex:827, ability_entindex:828,
+        available:1, can_afford:0, fields:legacyTowerFields, status_text:status}, true);
+    assert.equal(panel('CustomAbilityStatus').text, 'Not enough resources · server validates the final cost',
+        'Existing resource errors take precedence over the target footer');
+    assert.deepEqual(tower.rows().map(row => row.__left.text), ['自动升级','前置条件','路线数量']);
 }
 
 const sample = show([
@@ -73,4 +118,4 @@ const css = fs.readFileSync('panorama/src/styles/custom_game/ability_tooltip.css
 assert(/\.AbilityFieldValue\s*\{[^}]*width:\s*fill-parent-flow/.test(css), 'Value column has a bounded remaining width');
 assert(/\.AbilityNumericFieldRow\s+\.AbilityFieldValue\s*\{[^}]*white-space:\s*nowrap/.test(css),
     'Numeric comparisons cannot wrap their delta onto another line');
-console.log('UPGRADE_TOOLTIP_PRESENTATION_PASS: endpoint comparisons, zero-cost hiding, compact w units, aligned pooled fields');
+console.log('UPGRADE_TOOLTIP_PRESENTATION_PASS: tower target footer, cached detail hiding, preserved controls, building stat formatting');
