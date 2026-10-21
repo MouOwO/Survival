@@ -29,14 +29,14 @@ class PointOfferTests(unittest.TestCase):
         return {p['sku']: p for p in compile_commerce(
             self.tables, self.reference, self.package['tables']['payment_categories'])['products']}
 
-    def test_hundred_pack_is_paused_without_changing_historical_rewards_or_prices(self):
+    def test_hundred_pack_is_paused_with_same_rewards_and_fixed_quality_price(self):
         products = self.compile()
         bulk, single = products['video_p089'], products['video_p103']
         self.assertFalse(bulk['enabled'])
-        self.assertEqual((bulk['price'], bulk['ownership_quantity']), (2500, 100))
+        self.assertEqual((bulk['price'], bulk['ownership_quantity']), (8000, 100))
         self.assertEqual(bulk['effects'], {'hero_basic_attack_growth': 10})
         self.assertTrue(single['enabled'])
-        self.assertEqual((single['price'], single['ownership_quantity'], single['purchase_limit']), (29, 1, 0))
+        self.assertEqual((single['price'], single['ownership_quantity'], single['purchase_limit']), (8000, 1, 0))
         self.assertEqual(single['item_id'], bulk['item_id'])
         self.assertEqual(single['effects'], {})
 
@@ -83,7 +83,7 @@ class PointPurchaseTests(unittest.TestCase):
         self.assertTrue(self.purchase()['ok'])
         save = self.profile['save']
         self.assertEqual(save['content_inventory']['lottery_ember_of_legacy'], 1)
-        self.assertEqual(save['archive']['commerce']['balances']['shop_points'], 99971)
+        self.assertEqual(save['archive']['commerce']['balances']['shop_points'], 92000)
         self.assertAlmostEqual(save['gameplay_stats']['hero_basic_attack_growth'], before['hero_basic_attack_growth'])
         lua = self.LuaRuntime(unpack_returned_tuples=True)
         lua.globals().INPUT = json.dumps(dict(configs=self.bundle.configs, save=save))
@@ -103,7 +103,7 @@ class PointPurchaseTests(unittest.TestCase):
         self.assertEqual(self.profile, after)
         self.assertTrue(self.purchase(token='unique_second_0002')['ok'])
         self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 2)
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99942)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 84000)
 
     def test_paused_bulk_offer_never_debits_or_grants_and_is_absent_from_catalog(self):
         before = copy.deepcopy(self.profile)
@@ -176,7 +176,7 @@ class PointPurchaseTests(unittest.TestCase):
             results = [future.result(timeout=20) for future in futures]
         self.assertEqual(sum(r['ok'] is True for r in results), 2)
         self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 2)
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99942)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 84000)
 
     def historical_bundle(self):
         data = json.loads((self.bundle.directory / 'bundle.json').read_bytes())
@@ -210,7 +210,7 @@ class PointPurchaseTests(unittest.TestCase):
             p_command=request, p_fingerprint=token, p_hash=old.hash))
         return self.service.finish_prepared(account, identity, prepared)
 
-    def test_unfinished_historical_offers_cannot_bypass_unique_rules_but_keep_recorded_price(self):
+    def test_unfinished_changed_prices_require_confirmation_and_completed_receipts_stay_immutable(self):
         old = self.historical_bundle()
         old_service = self.Service(self.app, old, 'local-lupa')
         self.assertTrue(old_service.settle(self.profile,
@@ -220,14 +220,16 @@ class PointPurchaseTests(unittest.TestCase):
         self.assertEqual(self.resume_historical(old, 'video_p089', 'historical_bulk_0001')['error'],
                          'product_unavailable')
         self.assertEqual(self.profile, before)
-        self.assertTrue(self.resume_historical(old, 'video_p103', 'historical_one_0001')['ok'])
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'], 99942,
-                         'An unfinished old receipt retains its recorded 58-point price')
-        settled = copy.deepcopy(self.profile)
-        self.assertTrue(self.resume_historical(old, 'video_p103', 'historical_one_0002')['ok'])
-        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'], 2)
+        self.assertEqual(self.resume_historical(old, 'video_p103', 'historical_one_0001')['error'],'commerce_price_changed')
+        self.assertEqual(self.profile,before,'An unfinished old price never silently debits the higher amount')
+        token='historical_completed_0002';account=self.app._database_account_id('100');identity='commerce:'+token
+        prepared=self.db.rpc('archive_prepare',dict(p_account=account,p_id=identity,
+            p_command=self.command('video_p103',token)['command'],p_fingerprint=token,p_hash=old.hash))
+        self.assertTrue(old_service.finish_prepared(account,identity,prepared)['ok'])
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],99942)
+        self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'],1)
         settled=copy.deepcopy(self.profile)
-        self.assertTrue(self.resume_historical(old, 'video_p103', 'historical_one_0001')['ok'])
+        self.assertTrue(self.resume_historical(old,'video_p103',token)['ok'])
         self.assertEqual(self.profile, settled, 'Completed historical receipts remain immutable and replayable')
 
 

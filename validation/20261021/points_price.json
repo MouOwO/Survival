@@ -1,0 +1,156 @@
+{
+  "status": "LOCAL_IMPLEMENTATION_VERIFIED_REMOTE_ACTIVATION_PENDING",
+  "requested_prices": {
+    "n": 200,
+    "r": 600,
+    "sr": 1500,
+    "ssr": 3000,
+    "ur": 8000
+  },
+  "currency": "shop_points",
+  "repriced_single_products": 86,
+  "quality_counts": {
+    "n": 10,
+    "r": 4,
+    "sr": 5,
+    "ssr": 35,
+    "ur": 32
+  },
+  "confirmed_ur": [
+    "video_p147",
+    "video_p151"
+  ],
+  "fishing_rod": {
+    "sku": "video_p096",
+    "quality": "ssr",
+    "price": 3000
+  },
+  "starjoy": {
+    "cumulative_only": true,
+    "exchange_disabled_definitions": 98,
+    "reward_tiers_unchanged": true,
+    "completed_receipts_preserved": true
+  },
+  "old_price_purchase": {
+    "changed_price_rejected": true,
+    "includes_compatibility_upgrade": true,
+    "new_explicit_confirmation_required": true
+  },
+  "display": {
+    "authoritative_catalog_price": true,
+    "no_synthetic_fixed_price_discount": true,
+    "actual_candidate_snapshot_model_integration_passed": true
+  },
+  "scope_review": {
+    "status": "PASS",
+    "repriced_points_products": 86,
+    "non_points_products_unchanged": 43,
+    "exchange_disabled_items": 98,
+    "only_service_method_changed": "finish_prepared",
+    "all_other_item_effects_and_properties_preserved": true
+  },
+  "compile": {
+    "status": "PASS",
+    "native_javascript_resources": 7,
+    "source_content_and_native_data_match": true,
+    "original_dirty_generated_resource_review": {
+      "resource": "panorama/scripts/custom_game/commerce_remaining_5d5c1152eb.vjs_c",
+      "previously_uncommitted": true,
+      "original_native_data_matches_original_game_source": false,
+      "normalized_match": true,
+      "content_match": true,
+      "original_native_sha256": "020703505ce3f66ae2298596c4cb3d30a9a2d96c900349431c212d76781a085a"
+    },
+    "content_baseline_review": {
+      "status": "PASS",
+      "line_endings_only_reviews": [
+        {
+          "relative": "scripts/custom_game/commerce_remaining_5d5c1152eb.js",
+          "difference": "line endings only",
+          "reviewedContentSha256": "a5e0c2161fa7a08905bfdd97cb47bec5d383ca5bca96d5522a92fa6a75fa7d92"
+        }
+      ],
+      "inputs": 7
+    }
+  },
+  "checks": {
+    "archive_backend_tests": 44,
+    "new_receipt_policy_tests": 6,
+    "commerce_and_price_tests": 35,
+    "starjoy_local_lua_tests": 1,
+    "frontend_tests": 33,
+    "candidate_lua_profile_receipt_and_points_checks": 30,
+    "item_resource_generator_check": "PASS",
+    "diff_check": "PASS"
+  },
+  "backend_sha256": {
+    "data/csv/商城兑换系统/commerce_products.csv": "20f3a9c0d78ed2355c6317595896e7ad3a91502cd894c12cc83b8b531dfaa19e",
+    "data/csv/抽奖系统/lottery_item_definitions.csv": "d91372374d7e02dff7410b255f8b8812fa652ddb09592122aaf32a037c9141c4",
+    "scripts/vscripts/config/generated/lottery_item_definitions.lua": "06ca3307df439269c75539a173635702a0d97bf7cbf6fbe46628af9c14aa453c",
+    "scripts/vscripts/systems/commerce_settlement.lua": "d0ee3cb9d0da7db0b114fb5aec12eec0ece8ae7b0693e7d535ba2e2d7174f888",
+    "scripts/vscripts/systems/lottery_http_settlement.lua": "ea39e586b0faa5fecf904c2b0669288b0baf53ba62959e448794a47774dc1339",
+    "scripts/vscripts/systems/lottery_service.lua": "faa39c0cf2dfb4c34e87210221d7ab4322bde67c5099f6266b7a9c79aec0e65c",
+    "scripts/vscripts/systems/archive_starjoy_rewards.lua": "88bf234278a1f506e65adc5317ecba8e7da7df9185935a128fcfb412939adeaa",
+    "server/payment_backend/csv_catalog.py": "bd025fd82ee5c4c22f567f6070952a65f12553139ca74d28eede977ff17c257d",
+    "server/payment_backend/commerce_bundles.py": "90e5951c9d147b965efef45b0e29062830bf3e7b6fede7f99aa5dae352d3064d",
+    "server/tests/test_points_price_20261021.py": "0849403852aae5ac608885880e7d9995749495cc98a57fc9f163f82e01965f59",
+    "scripts/vscripts/tests/test_starjoy_exchange_disabled.lua": "d59d20b59fec4072aecedb5cf7a589f4b58155e0ad8609ab999af2ef311ae2a5",
+    "server/tests/test_commerce.py": "d18706db0b616fcdae9b36d2b539ed7d9686cd147d2d8a7d9905537bc405492c",
+    "server/tests/test_commerce_unique_points.py": "d3359ca6448969f4a9d6c9949075e40acb50c74e4462d057207d3090aa587e8c",
+    "server/payment_backend/test_catalog_half_price.py": "04ee26bba68c2efa478e231f69f76fde219f6e109ccfa0cdd9799e7612047a57"
+  },
+  "frontend_sha256": {
+    "panorama/src/scripts/custom_game/black_lion_market_model.js": "acd82e9f517e5140b5148f8a87ad5aa89d09037de7468fc3f68ee693db54ca16",
+    "panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js": "72813a0b9d070720a38c12d05e75d724bf7e2e8eff7825219a2dfd68ab6ded8a",
+    "panorama/src/scripts/custom_game/commerce_wallet.js": "ac9aae5d9a912f8e5c94d7813ca8fd9a51a802857d89266a20c34c3fd1b28160",
+    "panorama/src/scripts/custom_game/archive_v10.js": "91f8819ea00d32ef97df69164dfb17e55cde73afad1f6dd8c490c92d0f52824b",
+    "panorama/src/scripts/custom_game/archive_180de7e38b_titles_compact_v6.js": "6e689197b4eeb64ec8701411472ac5258f4208136cfe58359b5104bf3eb3ba44",
+    "panorama/src/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js": "26737871e2a0e5508724857c4985cd93b2f6eea93023b6c72ae4b00f702eb324",
+    "tools/tests/points_price_display.test.cjs": "5799d21f0587476d67a21ac60d4278e3b3933b90ac78044e7e2397cb72e40871",
+    "data/ui/item_resources.json": "8810954e88f20dc003dcfaeb85aac953de8b29ad9f02b49e789a2416350460d5",
+    "panorama/src/scripts/custom_game/common/item_resources.js": "e41115a91539894b27b343c76eec60c9f2287a8b84ba3c03cc6d931edd1270e8",
+    "scripts/vscripts/config/generated/item_resources.lua": "a811a31d6db9f05c53e3798f45a55aa152d10a6cbf5f69218dabb076c2ebad8e"
+  },
+  "native_sha256": {
+    "panorama/scripts/custom_game/black_lion_market_model.vjs_c": "0ecf56b7af600c727fbf4bb49ff6724b052abbb0687f7c58b37e570dbdd61f68",
+    "panorama/scripts/custom_game/commerce_remaining_5d5c1152eb.vjs_c": "f8d7d509e27dbb3b31711ada6465caffb1bad670226bc38d246dd5c08285e383",
+    "panorama/scripts/custom_game/commerce_wallet.vjs_c": "394a84da002138bfae78d519b3719028d4a0e0a428f8c5ea862649c61047cdac",
+    "panorama/scripts/custom_game/archive_v10.vjs_c": "116adb4c9fd5c6a58b7fd434bcfd41f27a6bcdd2a147ccd23668f8b9edaf90cf",
+    "panorama/scripts/custom_game/archive_180de7e38b_titles_compact_v6.vjs_c": "23fdfca4a4d63c3b01d97288d56dd68953385ca508918eac41e1059f0d0542e6",
+    "panorama/scripts/custom_game/lottery_ui_remaining_5d5c1152eb.vjs_c": "6013d3dc12ff7558f8655e2b5b45ceba3e82ed09d144263f249e59d29c3b0ded",
+    "panorama/scripts/custom_game/common/item_resources.vjs_c": "ae020e1a1ebdbbec575b081d37959a7d0ddfcb148fb27e0dacac4eb2c2ce13a4"
+  },
+  "builder_sha256": "c65702ce8387bda3c665e176133a8302e40cf26f6dddc3ca16dfa69a7d70a746",
+  "readme_sha256": "2f6e9281d4842d769645a5ad00039e615ebf1e979bae2f6ad161e1cb49f144c7",
+  "candidate_report": "validation/20261021/points_price_candidate.json",
+  "candidate_bundle": "148a064fa9c201eb759c092664a5ed1a81de7994a83374edd089607048e242d8",
+  "safe_bundle": "6040b740843267667bc50c6238ad7f90f0363212d63f6a3ac48d25d0835838d9",
+  "service_overlay_sha256": "48267814332ab960fa15349e5460bbb337df409a2588718c75c3c2ec2dda2056",
+  "active_bundle_unchanged": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+  "active_declaration_files_preserved": [
+    "scripts/vscripts/config/generated/archive_http_bundle.lua",
+    "server/bundles/current.json",
+    "panorama/src/scripts/custom_game/lottery_catalog_seed.js",
+    "data/ui/lottery_catalog.json",
+    "scripts/vscripts/config/generated/lottery_catalog_manifest.lua"
+  ],
+  "remote": {
+    "actions_this_change": 0,
+    "deployed": false,
+    "pending_reason": "Previous automatic approval review rejected upload to 47.110.238.248 because explicit destination write authorization was absent; no retry or activation performed."
+  },
+  "publication": {
+    "required_repositories": [
+      "game/dev",
+      "content/master"
+    ],
+    "required_order": [
+      "stash --include-untracked",
+      "pull",
+      "pop exact own stash",
+      "commit task files",
+      "push"
+    ],
+    "method": "Isolated task worktrees preserve unrelated primary files and historical stashes; exact publication receipt retained in ignored task directory."
+  }
+}

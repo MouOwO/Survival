@@ -5,7 +5,7 @@ import csv
 from decimal import Decimal
 import io
 import re
-from .csv_catalog import ID, SOURCES, compile_catalog, flag, indexed, number, rows, validate_price_policy
+from .csv_catalog import ID, SOURCES, compile_catalog, flag, indexed, number, rows, validate_price_policy, FIXED_QUALITY_SHOP_POINTS_POLICY
 
 MEMBER_TABLE = 'commerce_bundle_members'
 EMPTY_MEMBERS = 'member_id,bundle_sku,member_type,target_id,quantity,sort_order,enabled\n'
@@ -64,6 +64,10 @@ def compile_commerce(tables,reference,category_text,*,max_products=200):
         if p['currency'] not in ('u_coin','shop_points','shop_gold'):
             raise ValueError('unsupported_commerce_currency:'+sku)
         price(p,sku in by_bundle)
+        if p.get('price_policy')==FIXED_QUALITY_SHOP_POINTS_POLICY:
+            definition=next((item for item in rows(reference[SOURCES[3]]) if item['item_id']==p['ownership_id']),None)
+            if definition and definition['quality'].lower()!=p.get('point_quality'):
+                raise ValueError('commerce_fixed_quality_mismatch:'+sku)
     unique_points={r['item_id'] for r in rows(reference[SOURCES[3]])
                    if flag(r['enabled']) and r['item_type']=='积分道具' and r['item_id']!='lottery_ember_of_legacy'}
     for sku,p in products.items():
@@ -210,5 +214,7 @@ def compile_commerce(tables,reference,category_text,*,max_products=200):
         p.update(currency=original['currency'],currency_name={'u_coin':'U币','shop_points':'积分','shop_gold':'金币'}[original['currency']],
             price=price(original,sku in by_bundle),source_id=original['source_id'],purchase_method='wallet',
             ownership_quantity=number(original.get('ownership_quantity') or 1,True,1,100))
+        if original.get('price_policy')==FIXED_QUALITY_SHOP_POINTS_POLICY:
+            p.update(price_policy=FIXED_QUALITY_SHOP_POINTS_POLICY,point_quality=original['point_quality'])
         if sku in by_bundle:p['original_price']=number(original.get('source_original_price') or original['price'],True,1,100000000)
     return dict(protocol=4,categories=leaf_catalog.get('categories') or [],products=sorted(compiled.values(),key=lambda p:p['sort_order']))

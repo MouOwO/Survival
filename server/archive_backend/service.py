@@ -270,7 +270,11 @@ class ArchiveService:
             reducer=self
             version=prepared.get("config_hash",self.bundle.hash)
             from .unique_points import legacy_lottery_error
-            legacy_error=legacy_lottery_error(self.bundle.hash,version,command.get('kind'))
+            # Starjoy is cumulative progression. Reject new and unfinished old
+            # exchanges through the existing terminal receipt commit; completed
+            # receipts already returned above remain immutable.
+            legacy_error=('starjoy_exchange_disabled' if command.get('kind')=='lottery_exchange'
+                          else legacy_lottery_error(self.bundle.hash,version,command.get('kind')))
             shared_roll = self.shared_challenge_roll(self.bundle)
             # Preserve the recorded hash and fingerprint for old-match replays.
             # Only explicitly approved archive updates use the current reducer.
@@ -296,12 +300,24 @@ class ArchiveService:
                 if not upgraded:
                     reducer=ArchiveService(self.app,recorded_bundle,self.lua)
             product = self.bundle.tables.get('commerce_catalog', {}).get(command.get('sku'), {})
+            recorded_price = product.get('price')
+            if (not legacy_error and command['kind'] == 'commerce_purchase'
+                    and version != self.bundle.hash and product.get('currency') == 'shop_points'):
+                price_bundle = reducer.bundle if reducer is not self else Bundle(self.bundle.directory.parent/version)
+                recorded_price = price_bundle.tables.get('commerce_catalog', {}).get(command.get('sku'), {}).get('price')
             if legacy_error:
                 result={'ok':False,'error':legacy_error}
             elif command['kind'] == 'commerce_purchase' and product.get('currency') == 'shop_gold':
                 # A currency pause applies to uncommitted older-client intents too.
                 # Completed receipts already returned above and remain immutable.
                 result = {'ok': False, 'error': 'shop_gold_not_open'}
+            elif (command['kind'] == 'commerce_purchase' and version != self.bundle.hash
+                  and product.get('currency') == 'shop_points'
+                  and product.get('price') != recorded_price):
+                # An old confirmation cannot authorize a newly increased price.
+                # Close the old intent without charging; a refreshed catalog and
+                # a fresh player confirmation are required for the current price.
+                result = {'ok': False, 'error': 'commerce_price_changed'}
             elif (command['kind'] == 'commerce_purchase' and reducer is not self
                   and (unique_block := self.commerce_unique_block(profile, product))):
                 # An unfinished historical intent cannot bypass today's shared

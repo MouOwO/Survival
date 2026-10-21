@@ -62,7 +62,7 @@ function M.snapshots(profile)
         table.sort(items,function(a,b) if a.quality==b.quality then return a.id<b.id end return config.quality_rank[a.quality]>config.quality_rank[b.quality] end)
         local snapshot={version=config.version,reason='http',selected_pool_id=pool.id,selected_pool=selected,pools=pools,items=items,
             shop_points=tonumber((((profile.save.archive or {}).commerce or {}).balances or {}).shop_points) or 0,
-            starjoy_points=tonumber(stats.starjoy_points) or 0,map_level=tonumber(stats.map_level) or 0,draws=tonumber((state.pools[pool.id] or {}).draws) or 0}
+            starjoy_points=math.max(tonumber(stats.starjoy_points) or 0,tonumber(stats.starjoy_points_earned) or 0),map_level=tonumber(stats.map_level) or 0,draws=tonumber((state.pools[pool.id] or {}).draws) or 0}
         for _,k in ipairs({'ticket_content_id','ticket_name','tickets','single_cost','ten_cost','pity'}) do snapshot[k]=selected[k] end
         snapshots[#snapshots+1]=snapshot
     end
@@ -146,6 +146,9 @@ local function roll(pool,forced)
     error('lottery_pool_empty')
 end
 function M.settle(profile,command)
+    -- Starjoy is lifetime progression, never an exchange wallet. Refuse old
+    -- callers before reconciliation, inventory changes or any balance debit.
+    if command.kind=='lottery_exchange' then return {ok=false,terminal=true,error='starjoy_exchange_disabled'} end
     if command.kind=='lottery_snapshot' then return {ok=true,snapshots=M.snapshots(profile)} end
     local pool=config.pools[command.pool_id];if not pool then return {ok=false,error='lottery_pool_invalid'} end
     local archive=copy(profile.save.archive or {});local counts=copy(profile.save.content_inventory or {});local stats=copy(profile.save.gameplay_stats or {})
@@ -174,13 +177,6 @@ function M.settle(profile,command)
         current.draws=(tonumber(current.draws) or 0)+count
         response.count=count;response.results=results;response.state_persisted=true
         response.guarantee_quality=guarantee or '';response.guarantee_satisfied=not guarantee or hit
-    elseif command.kind=='lottery_exchange' then
-        local item=pool.by_id[command.item_id]
-        if not item or item.exchange_enabled==false or item.exchange_points<=0 then return {ok=false,error='lottery_item_invalid'} end
-        if ownership_limit(item)>0 and owned_count(counts,item.id)>=ownership_limit(item) then return {ok=false,error='lottery_item_owned'} end
-        if (tonumber(stats.starjoy_points) or 0)<item.exchange_points then return {ok=false,error='starjoy_points_insufficient'} end
-        response.unique_points_reconciliation=reconcile_unique_points(counts,archive)
-        add(stats,'starjoy_points',-item.exchange_points);response.item=grant(item,counts,stats,archive,profile.save.lottery_applied_item_effects);response.item.exchanged=true;response.cost=item.exchange_points
     else return {ok=false,error='lottery_command_invalid'} end
     response.shop_points=tonumber(((archive.commerce or {}).balances or {}).shop_points) or 0
     return {ok=true,archive=archive,content_inventory=counts,gameplay_stats=stats,response=response}

@@ -1,5 +1,5 @@
 -- Deterministic account progression shared by local and HTTP settlements.
--- Balance is spendable; earned points and granted tiers never decrease on exchange.
+-- Starjoy accumulates account rewards; it is not a purchase or exchange wallet.
 local levels = require('config/generated/archive_starjoy_levels')
 local definitions = require('config/generated/player_gameplay_stats')
 local M = {}

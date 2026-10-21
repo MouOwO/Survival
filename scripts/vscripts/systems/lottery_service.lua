@@ -7,7 +7,6 @@ local profile_service = require("systems/player_profile_service")
 local M = {}
 local state_by_player = {}
 local request_cache = {}
-local exchange_cache = {}
 local busy_by_player = {}
 local hydrating_by_player = {}
 local random_seeded = false
@@ -495,7 +494,7 @@ local function snapshot(player_id, reason, requested_pool_id)
         selected_pool = selected,
         pools = pools,
         items = items,
-        starjoy_points = tonumber(stats[config.starjoy_stat_id]) or 0,
+        starjoy_points = math.max(tonumber(stats[config.starjoy_stat_id]) or 0, tonumber(stats.starjoy_points_earned) or 0),
         shop_points = shop_points(profile),
         map_level = tonumber(stats.map_level) or 0,
         -- Compatibility fields for the existing Panorama while it transitions
@@ -652,78 +651,8 @@ local function draw(payload)
 end
 
 local function exchange(payload)
-    local player_id = tonumber(payload and payload.player_id)
-    local request_id = tostring(payload and payload.request_id or "")
-    local item_id = tostring(payload and payload.item_id or "")
-    local pool = pool_config(payload and payload.pool_id)
-    if not valid_player_id(player_id) then return { ok = false, error = "player_id_invalid" } end
-    if not pool then return { ok = false, error = "lottery_pool_invalid" } end
-    if request_id == "" or #request_id > 96 then return { ok = false, error = "lottery_request_id_invalid" } end
-    local item = pool.by_id[item_id]
-    if not item or item.exchange_enabled == false then
-        return { ok = false, error = "lottery_item_invalid" }
-    end
-    exchange_cache[player_id] = exchange_cache[player_id] or {}
-    if exchange_cache[player_id][request_id] then return exchange_cache[player_id][request_id] end
-    if busy_by_player[player_id] then return { ok = false, error = "lottery_player_busy" } end
-    hydrate(player_id)
-    local inventory = inventory_snapshot(player_id)
-    if item_at_limit(inventory.counts or {}, item) then
-        local owned = { ok = false, error = "lottery_item_owned" }
-        exchange_cache[player_id][request_id] = owned
-        return owned
-    end
-    local profile = profile_service.get_profile(player_id)
-    local stats = profile and profile.save and profile.save.gameplay_stats or {}
-    local points = tonumber(stats[config.starjoy_stat_id]) or 0
-    local cost = math.max(0, math.floor(tonumber(item.exchange_points) or 0))
-    if cost <= 0 then return { ok = false, error = "lottery_exchange_cost_invalid" } end
-    if points < cost then
-        local result = { ok = false, error = "starjoy_points_insufficient",
-            required = cost, current = points }
-        exchange_cache[player_id][request_id] = result
-        return result
-    end
-    local copy_index = item_owned_count(inventory.counts or {}, item) + 1
-    busy_by_player[player_id] = true
-    local stats_order = require("systems/player_gameplay_stats_order_service")
-    local debit = stats_order.order(player_id, config.starjoy_stat_id, -cost)
-    if not debit or debit.ok ~= true then
-        busy_by_player[player_id] = nil
-        return { ok = false, error = "starjoy_points_debit_failed" }
-    end
-    local grant = event_bus.request(events.CONTENT_INVENTORY_GRANT_REQUEST, {
-        player_id = player_id, content_id = inventory_aliases.canonical(item.id),
-        count = 1,
-        effect_marker_id = item_effect_marker(item.id, copy_index),
-        additional_effect_marker_ids = additional_effect_markers(
-            item, copy_index),
-        gameplay_stat_effects = item.effects,
-        reason = "lottery_points_exchange:" .. pool.id,
-    })
-    if not grant or grant.ok ~= true then
-        stats_order.order(player_id, config.starjoy_stat_id, cost, true)
-        local failed = { ok = false, error = "lottery_exchange_grant_failed" }
-        exchange_cache[player_id][request_id] = failed
-        busy_by_player[player_id] = nil
-        return failed
-    end
-    local response = {
-        ok = true, request_id = request_id, pool_id = pool.id, cost = cost,
-        item = { id = item.id, name = item.name, quality = item.quality,
-            item_type = item.item_type,
-            duration_type = item.duration_type,
-            duration_text = item.duration_text,
-            icon_type = item.icon_type,
-            icon = item.icon, description = item.description,
-            duplicate = false, exchanged = true, converted_points = 0,
-            gameplay_stat_changes = grant.gameplay_stat_changes or {} },
-        snapshot = snapshot(player_id, "exchange", pool.id),
-    }
-    exchange_cache[player_id][request_id] = response
-    publish(player_id, "exchange", pool.id)
-    busy_by_player[player_id] = nil
-    return response
+    -- Starjoy only advances lifetime rewards; it is never a spendable wallet.
+    return { ok = false, error = "starjoy_exchange_disabled" }
 end
 
 local function get_snapshot(payload)
@@ -760,7 +689,7 @@ function M.init()
     require('systems/lottery_http_service').init()
     do return end
     sent_pools, cache_serial, publishing = {}, 0, {}
-    state_by_player, request_cache, exchange_cache, busy_by_player = {}, {}, {}, {}
+    state_by_player, request_cache, busy_by_player = {}, {}, {}
     hydrating_by_player = {}
     random_seeded = false
     event_bus.handle_request(events.LOTTERY_DRAW_REQUEST, draw)

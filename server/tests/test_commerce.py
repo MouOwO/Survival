@@ -10,7 +10,7 @@ sys.path.insert(0,str(ROOT/'server'))
 from tests import test_archive_backend as archive_tests
 from archive_backend.service import ArchiveError
 from archive_backend.commerce_catalog import build_catalog
-from payment_backend.csv_catalog import rows
+from payment_backend.csv_catalog import rows,FIXED_QUALITY_SHOP_POINTS_POLICY,QUALITY_SHOP_POINTS_PRICES
 
 class CommerceTests(unittest.TestCase):
     setUpClass = classmethod(archive_tests.ArchiveTests.setUpClass.__func__)
@@ -31,8 +31,12 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(set(products),{row['sku'] for row in source})
         for row in source:
             with self.subTest(sku=row['sku']):
-                self.assertEqual(row['price_policy'],'half_current_20261017')
-                self.assertEqual(products[row['sku']]['price']*2,int(row['price_baseline']))
+                if row['currency']=='shop_points':
+                    self.assertEqual(row['price_policy'],FIXED_QUALITY_SHOP_POINTS_POLICY)
+                    self.assertEqual(products[row['sku']]['price'],QUALITY_SHOP_POINTS_PRICES[row['point_quality']])
+                else:
+                    self.assertEqual(row['price_policy'],'half_current_20261017')
+                    self.assertEqual(products[row['sku']]['price']*2,int(row['price_baseline']))
         self.assertEqual(sum(p['product_type']=='bundle' for p in products.values()),15)
         self.assertEqual({p['sku'] for p in products.values() if not p['enabled']},{'video_p037','video_p038','video_p089','video_bundle_b005'})
         self.assertEqual(products['video_p037']['effects'],{'initial_wood':50})
@@ -40,7 +44,7 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(products['video_p033']['price'],50)
         self.assertEqual(products['video_p029']['price'],300)
         self.assertEqual(products['video_p037']['currency'],'shop_gold')
-        self.assertEqual(products['video_p116']['price'],294)
+        self.assertEqual(products['video_p116']['price'],QUALITY_SHOP_POINTS_PRICES[products['video_p116']['point_quality']])
         self.assertEqual(products['video_p140']['item_id'],'lottery_nature_spirit')
         self.assertEqual(products['video_p140']['effects'],{'wood_per_second':1})
         self.assertTrue(products['video_p140']['enabled'])
@@ -160,7 +164,7 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(self.purchase('video_p038')['error'],'shop_gold_not_open')
         self.assertEqual(self.profile,before,'Closed gold channel must neither debit nor grant')
         self.assertTrue(self.purchase('video_p113','points_0001')['ok'])
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],99706)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],100000-self.bundle.tables['commerce_catalog']['video_p113']['price'])
         self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_gold'],1000)
         self.assertEqual(self.profile['save']['gameplay_stats']['initial_gold'],500)
         self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],8000)
@@ -188,7 +192,7 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(self.profile,before)
         self.assertTrue(self.purchase('video_p103','ember_002')['ok'])
         self.assertEqual(self.profile['save']['content_inventory']['lottery_ember_of_legacy'],2)
-        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],99942)
+        self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],84000)
         self.assertAlmostEqual(self.profile['save']['gameplay_stats']['hero_basic_attack_growth'],0,
                                msg='Stackable growth is projected from inventory rather than saved twice')
 

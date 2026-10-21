@@ -88,6 +88,8 @@ function M.snapshot(profile)
                 purchase_method='wallet',purchase_limit=p.purchase_limit,owned=owned_points(inventory,p.item_id) or tonumber(inventory[p.item_id]) or 0,
                 enabled=reason=='',disabled_reason=reason,reward_lines=copy(p.grants.lines),source_id=p.source_id,
                 original_price=p.original_price,required_vip_level=p.grants.required_vip_level}
+            products[#products].price_policy=p.price_policy
+            products[#products].point_quality=p.point_quality
         end
     end
     return {ok=true,products=products,balances=wallet,categories={{id='technology',label='科技与服务'},{id='item',label='道具与材料'}}}

@@ -14,6 +14,8 @@ SOURCES=('商店系统/entitlement_definitions.csv','玩家档案系统/player_g
 TABLES=('payment_categories','payment_products','payment_rewards')
 SUPPORTED_ENTITLEMENTS={'vip','archive_pass'}
 HALF_PRICE_POLICY='half_current_20261017'
+FIXED_QUALITY_SHOP_POINTS_POLICY='fixed_quality_shop_points_20261021'
+QUALITY_SHOP_POINTS_PRICES={'n':200,'r':600,'sr':1500,'ssr':3000,'ur':8000}
 MONTHLY_FIXED_PRICE_POLICY='monthly_fixed_58_20261017'
 MONTHLY_FIXED_AMOUNT_FEN=5800
 
@@ -46,6 +48,17 @@ def validate_price_policy(product,value,baseline_field,*,scale=1,expected_baseli
     """
     policy=product.get('price_policy')
     baseline=product.get(baseline_field)
+    if policy==FIXED_QUALITY_SHOP_POINTS_POLICY:
+        quality=product.get('point_quality')
+        if (product.get('currency')!='shop_points' or product.get('product_type')!='single'
+                or baseline_field!='price_baseline' or scale!=1
+                or quality not in QUALITY_SHOP_POINTS_PRICES
+                or value!=QUALITY_SHOP_POINTS_PRICES.get(quality) or not baseline):
+            raise ValueError('catalog_fixed_quality_points_price_invalid:'+product['sku'])
+        # Historical source/baseline values remain evidence, never operands for
+        # applying the earlier one-time half-price migration to this fixed price.
+        number(baseline,True,1,100000000)
+        return True
     if product['sku']=='archive_pass_monthly' or policy==MONTHLY_FIXED_PRICE_POLICY:
         # The monthly pass is an explicitly approved fixed-price exception.
         # Keep its historical 20-yuan baseline; it is not a discount operand.

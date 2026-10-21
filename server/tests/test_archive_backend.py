@@ -643,29 +643,24 @@ class ArchiveTests(unittest.TestCase):
                              7+expected['converted_points']+2*item['duplicate_points'])
             self.assertEqual(self.profile['save']['gameplay_stats'],before['save']['gameplay_stats'])
 
-    def test_lottery_points_exchange_reconciles_other_legacy_items_only_after_validation(self):
+    def test_lottery_exchange_is_disabled_without_spending_or_reconciling_items(self):
         item,pool,ticket,weights=self._points_draw_fixture('ssr')
         self._seed_points_draw_profile(ticket)
         inventory=self.profile['save']['content_inventory']
         inventory['lottery_flame_crystal']=3
-        before=copy.deepcopy(self.profile)
         with weights:
-            failed=self.send('lottery_exchange',pool_id=pool,item_id=item['item_id'],request_id='reconcile_exchange_poor')
-            self.assertFalse(failed['ok']);self.assertEqual(failed['error'],'starjoy_points_insufficient')
-            self.assertEqual(self.profile,before,'Rejected transactions cannot compensate or normalize a save')
-            self.profile['save']['gameplay_stats']['starjoy_points']=item['exchange_points']+17
-            payload=self.command('lottery_exchange',pool_id=pool,item_id=item['item_id'],request_id='reconcile_exchange_ok')
-            result=self.service.command(payload)
-            self.assertTrue(result['ok'],result)
-            inventory=self.profile['save']['content_inventory']
-            self.assertNotIn('lottery_flame_crystal',inventory)
-            self.assertEqual(inventory['lottery_nature_crystal'],1)
-            self.assertEqual(inventory[item['item_id']],1)
-            self.assertEqual(self.profile['save']['archive']['commerce']['balances']['shop_points'],17)
-            self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],17)
-            after=copy.deepcopy(self.profile)
-            self.assertEqual(self.service.command(payload)['response'],result['response'])
-            self.assertEqual(self.profile,after)
+            for balance in (0, 1000000):
+                self.profile['save']['gameplay_stats']['starjoy_points']=balance
+                self.profile['save']['gameplay_stats']['starjoy_points_earned']=balance+2000
+                before=copy.deepcopy(self.profile)
+                payload=self.command('lottery_exchange',pool_id=pool,item_id=item['item_id'],
+                                     request_id='closed_exchange_'+str(balance))
+                result=self.service.command(payload)
+                self.assertFalse(result['ok']);self.assertTrue(result['terminal'])
+                self.assertEqual(result['error'],'starjoy_exchange_disabled')
+                self.assertEqual(self.profile,before,'Cumulative points and legacy inventory stay untouched')
+                self.assertEqual(self.service.command(payload),result)
+                self.assertEqual(self.profile,before)
 
     def test_lottery_points_reconciliation_overflow_preserves_the_whole_account(self):
         item,pool,ticket,weights=self._points_draw_fixture('n')
@@ -693,7 +688,8 @@ class ArchiveTests(unittest.TestCase):
             with patch('archive_backend.service.Bundle',side_effect=AssertionError('An old lottery reducer cannot run')):
                 result=self.service.finish_prepared(self.account,command['id'],prepared)
             self.assertFalse(result['ok']);self.assertTrue(result['terminal'])
-            self.assertEqual(result['error'],'lottery_config_refresh_required')
+            self.assertEqual(result['error'],'starjoy_exchange_disabled' if kind=='lottery_exchange'
+                             else 'lottery_config_refresh_required')
             self.assertEqual(self.profile,before,'A refresh rejection cannot normalize or award historical copies')
             again=self.service.finish_prepared(self.account,command['id'],self.db.resume(self.account,command['id']))
             self.assertEqual(again,result)
@@ -741,7 +737,7 @@ class ArchiveTests(unittest.TestCase):
                                  request_id='points_alias_exchange')
             result=self.service.command(payload)
             self.assertFalse(result['ok'],result)
-            self.assertEqual(result['error'],'lottery_item_owned')
+            self.assertEqual(result['error'],'starjoy_exchange_disabled')
             self.assertEqual(self.profile,before,'A legacy alias prevents a second purchase and any currency debit')
             self.assertFalse(self.service.command(payload)['ok'])
             self.assertEqual(self.profile,before)
@@ -753,7 +749,7 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(self.profile,before)
         with self.assertRaises(ArchiveError):self.send('lottery_draw',pool_id='map',count=10,request_id='forged_1',results=[])
 
-    def test_lottery_snapshot_and_read_and_exchange(self):
+    def test_lottery_snapshot_and_read_keep_starjoy_exchange_closed(self):
         projection=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
         self.assertTrue(projection['ok'],projection)
         snapshots=projection['snapshots'];self.assertEqual(len(snapshots),4)
@@ -766,11 +762,14 @@ class ArchiveTests(unittest.TestCase):
         self.assertTrue(self.send('lottery_read',pool_id='map',read_action='details',revision=selected['selected_pool']['revision'],request_id='read_1')['ok'])
         after=self.service.lottery_snapshot({'account_id':'100','config_hash':self.bundle.hash})
         self.assertFalse(next(s for s in after['snapshots'] if s['selected_pool_id']=='map')['selected_pool']['update_unread'])
-        item=next(i for i in selected['items'] if i['exchange_enabled'] and i['exchange_points']>0)
-        self.profile['save']['gameplay_stats']['starjoy_points']=item['exchange_points']
-        self.assertTrue(self.send('lottery_exchange',pool_id='map',item_id=item['id'],request_id='exchange_1')['ok'])
-        self.assertEqual(self.profile['save']['gameplay_stats']['starjoy_points'],0)
-        self.assertEqual(self.profile['save']['content_inventory'][item['id']],1)
+        self.assertTrue(all(not i['exchange_enabled'] and i['exchange_points']==0
+                            for snapshot in snapshots for i in snapshot['items']))
+        item=selected['items'][0]
+        self.profile['save']['gameplay_stats']['starjoy_points']=1000000
+        before=copy.deepcopy(self.profile)
+        rejected=self.send('lottery_exchange',pool_id='map',item_id=item['id'],request_id='exchange_1')
+        self.assertFalse(rejected['ok']);self.assertEqual(rejected['error'],'starjoy_exchange_disabled')
+        self.assertEqual(self.profile,before)
 
     def test_incomplete_recovery_never_returns_stale_profile(self):
         payload=self.command('clear',difficulty_id='n1',count=1)

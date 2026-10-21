@@ -3445,6 +3445,7 @@
     },
     {
       "id": "commerce_p147",
+      "quality": "ur",
       "name": "悲叹之种·永久",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_art_v1/lament_seed.vtex",
@@ -3456,6 +3457,7 @@
     },
     {
       "id": "commerce_p151",
+      "quality": "ur",
       "name": "斩魄刀·永久",
       "kind": "image",
       "uri": "s2r://panorama/images/custom_game/commerce_art_v1/spirit_katana.vtex",
