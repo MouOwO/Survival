@@ -379,7 +379,60 @@ class ArchiveService:
                 # A contested/incomplete settlement is not a successfully loaded save.
                 raise TimeoutError("archive_pending_retry")
         value=self.app.rpc_client.rpc("get_fishing_profile",{"p_account_id":account})
-        return self.app._public_response(value,account,payload["account_id"])
+        value=self.app._public_response(value,account,payload["account_id"])
+        return self._grant_login_benefits(payload["account_id"],value)
+
+    def _grant_login_benefits(self,account,profile):
+        """A trusted profile/login/checkpoint read automatically settles its login tier."""
+        tiers=[tier for tier in self.bundle.tables.get("archive_benefit_rewards",{}).values()
+               if tier.get("enabled") is True and tier.get("auto_claim") is True
+               and tier.get("period")=="day" and tier.get("required")==0]
+        if not tiers:
+            return profile
+        if not isinstance(profile,dict):
+            raise ArchiveError("benefit_profile_identity_invalid")
+        current=time.time()
+        entitlement=profile.get("entitlements",{}).get("archive_pass",{})
+        expiry=entitlement.get("expires_at")
+        starts=entitlement.get("starts_at")
+        valid_number=lambda value: isinstance(value,(int,float)) and not isinstance(value,bool) and math.isfinite(value)
+        has_pass=(entitlement.get("active") is True
+                  and (expiry is None or valid_number(expiry) and expiry>current)
+                  and (starts is None or valid_number(starts) and starts<=current))
+        if not has_pass and all(tier.get("monthly_only") for tier in tiers):
+            return profile
+        if profile.get("account_id")!=account:
+            raise ArchiveError("benefit_profile_identity_invalid")
+        day=str(math.floor((current+10800)/86400))
+        claimed=profile.get("save",{}).get("archive",{}).get("benefits",{}).get("days",{}).get(day,{}).get("claimed",{})
+        for tier in tiers:
+            if (tier.get("monthly_only") and not has_pass or tier["reward_id"] in claimed):
+                continue
+            # Stable per day/config/entitlement: reconnects and concurrent reads
+            # share one receipt, while a renewed card can recover an earlier
+            # expiry-race rejection. The reducer also checks the daily claim.
+            entitlement_key=hashlib.sha256(json.dumps({key:entitlement.get(key) for key in
+                ("active","starts_at","expires_at")},sort_keys=True,separators=(",",":")).encode()).hexdigest()[:12]
+            operation="benefit:auto:"+day+":"+tier["reward_id"]+":"+self.bundle.hash+":"+entitlement_key
+            result=self.command({"account_id":account,"config_hash":self.bundle.hash,
+                "command":{"id":operation,"kind":"benefit_claim","track":tier["track"],"tier_id":tier["reward_id"]}})
+            if not isinstance(result,dict) or result.get("ok") is not True:
+                # Another request may have claimed this period before this read
+                # reached the commit. Never invent a second inventory grant.
+                if isinstance(result,dict) and result.get("terminal") and result.get("error")=="该档福利已领取":
+                    latest=result.get("profile")
+                    if isinstance(latest,dict) and latest.get("account_id")==account:
+                        profile=latest
+                        continue
+                raise TimeoutError("benefit_login_reward_pending")
+            profile=result.get("profile")
+            if not isinstance(profile,dict) or profile.get("account_id")!=account:
+                raise TimeoutError("benefit_login_reward_unconfirmed")
+            receipt_day=str(result.get("command",{}).get("today",day))
+            recorded=profile.get("save",{}).get("archive",{}).get("benefits",{}).get("days",{}).get(receipt_day,{}).get("claimed",{})
+            if tier["reward_id"] not in recorded:
+                raise TimeoutError("benefit_login_reward_unconfirmed")
+        return profile
 
     def lottery_snapshot(self,payload):
         requested_hash = payload.get("config_hash")

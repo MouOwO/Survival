@@ -109,14 +109,15 @@ function M.snapshot(profile, pass, timestamp)
         local group={period_id=tostring(key),progress=progress,rows={}}
         for _,row in ipairs(config.rows) do if row.enabled and row.track==track then
             local claimed=(saved.claimed or {})[row.reward_id]~=nil
-            local ready=progress>=row.required
+            local ready=progress>=row.required and (not row.monthly_only or pass==true)
             local reserved={}
             local base=public_rewards(row.base_item_ids,row.base_counts,profile.save,reserved)
             local monthly=public_rewards(row.pass_item_ids,row.pass_counts,profile.save,reserved)
             group.rows[#group.rows+1]={id=row.reward_id,required=row.required,
                 base_rewards=base,monthly_rewards=monthly,
+                monthly_only=row.monthly_only and 1 or 0,auto_claim=row.auto_claim and 1 or 0,
                 status=claimed and "claimed" or ready and "claimable" or "locked",
-                can_claim=not claimed and ready and 1 or 0}
+                can_claim=not row.auto_claim and not claimed and ready and 1 or 0}
         end end
         result[track]=group
     end
@@ -139,6 +140,9 @@ end
 function M.apply(command, archive, stats, inventory, pass, source_save)
     local row=config.by_id[command.tier_id]
     if not row or not row.enabled or row.track~=command.track then return false,"福利档位不存在" end
+    -- An empty-base monthly login tier must never consume a free player's
+    -- daily claim; buying a month card later that day still earns the reward.
+    if row.monthly_only and pass~=true then return false,"该福利需要有效月卡" end
     local timestamp=event_time(command)
     local key=row.period=="week" and M.week(timestamp) or M.day(timestamp)
     local s=state(archive)

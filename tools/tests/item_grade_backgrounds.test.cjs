@@ -47,8 +47,8 @@ test('Reused panels reset old grades and restore backgrounds cleared by consumer
  const invalid=icon();invalid.IsValid=()=>false;r.FillIcon(invalid,{quality:'UR'});assert.deepEqual(invalid.style,{});
 });
 test('The runtime upgrade replaces a cached old API even when resource data hash is unchanged',()=>{
- const {cfg,context,resources:r}=runtime();cfg.SurvivalItemResources={sourceHash:r.sourceHash,apiVersion:2};
+ const {cfg,context,resources:r}=runtime();cfg.SurvivalItemResources={sourceHash:r.sourceHash,apiVersion:3};
  vm.runInContext(source,context);const upgraded=cfg.SurvivalItemResources;
- assert.equal(upgraded.apiVersion,3);assert.equal(typeof upgraded.Grade,'function');
+ assert.equal(upgraded.apiVersion,4);assert.equal(typeof upgraded.Grade,'function');
  vm.runInContext(source,context);assert.equal(cfg.SurvivalItemResources,upgraded,'Repeated current includes share one registry');
 });

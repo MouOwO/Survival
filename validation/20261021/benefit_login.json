@@ -1,0 +1,173 @@
+{
+  "date_beijing": "2026-10-21",
+  "status": "LOCAL_CODE_COMPILED_REMOTE_PUBLICATION_PENDING",
+  "item": {
+    "id": "lottery_reincarnation_immortal_stele",
+    "name": "轮回仙碑",
+    "change": "Remove round-parenthesis descriptions from canonical text and every current display consumer, including old server snapshots and receipts.",
+    "canonical_tables": [
+      "lottery_item_definitions",
+      "content_catalog",
+      "tooltip_definitions"
+    ],
+    "display_registry_api": 4,
+    "other_items_unchanged": true,
+    "server_receipts_not_modified": true
+  },
+  "monthly_login": {
+    "tier_id": "daily_time_0",
+    "gold_tickets": 1,
+    "monthly_only": true,
+    "automatic": true,
+    "base_rewards": [],
+    "existing_time_tiers_minutes": [
+      30,
+      60,
+      90,
+      120,
+      150
+    ],
+    "beijing_daily_refresh": "05:00",
+    "grant_trigger": "Trusted server profile/login and existing online checkpoints; local-provider profile event and daily clock.",
+    "duplicate_guard": "Atomic daily claimed flag plus durable deterministic operation receipt.",
+    "frontend_states": [
+      "需月卡",
+      "发放中",
+      "已领取"
+    ]
+  },
+  "validation": {
+    "backend_benefit_tests_passed": 21,
+    "backend_full_tests_reported_by_owner": 44,
+    "local_lua_suites": [
+      "test_archive_benefits.lua",
+      "test_archive_service.lua"
+    ],
+    "daily_frontend_tests_passed": 14,
+    "shared_tooltip_inventory_shop_commerce_tests_passed": 25,
+    "offline_candidate_lua_cases": 9,
+    "offline_candidate_old_receipt_cases": 2,
+    "stele_old_snapshot_display_probe": "passed for aliases, nested fullwidth/ASCII parentheses, actual shared tooltip and immutable snapshots",
+    "item_resource_generator_check": "passed",
+    "canonical_generation_check": {
+      "lottery_definition": "full generated Lua matches",
+      "content_catalog": "full generated Lua matches",
+      "tooltip_definition": "target stele CSV and Lua row matches generation; other pre-existing regeneration differences not applied"
+    },
+    "native_compile_inputs": 9,
+    "native_data_match_source": true,
+    "git_diff_check": "passed",
+    "known_preexisting_failure": {
+      "test": "tools/tests/lottery_gw2.test.cjs",
+      "assertion": "assert(!scrollTip.visible)",
+      "baseline_reproduced_using_exact_before_task_JS": true,
+      "changed_by_this_task": false
+    }
+  },
+  "native": [
+    {
+      "relative": "scripts/custom_game/common/item_resources.js",
+      "source_sha256": "2190e25fcb61fd6448af43ac498697bdefb2122ce0cea85cc398c0c31cded6da",
+      "runtime_sha256": "9300b09b7a40430c40d0d7cfdaac35b5642982bb5f515c9c8b3585317443f178",
+      "data_matches_source": true
+    },
+    {
+      "relative": "scripts/custom_game/common/archive_tooltip.js",
+      "source_sha256": "1b4792933835a06fa2d15f2c41b2fd1cb3162871f9609e8018ed1089791bca10",
+      "runtime_sha256": "f8888f247290bed710e507e14fb910ee166bb2b6cfde3aa5ee9c0be52f036455",
+      "data_matches_source": true
+    },
+    {
+      "relative": "scripts/custom_game/common/commerce_components.js",
+      "source_sha256": "9a2c400542e4d2b0674c0e07edc10207f2538dd045bf5103a1c2911aec9713ec",
+      "runtime_sha256": "eea86c8d596c33f43738b135e84a1876f040ff1205efebc2ffff61c96a6517f3",
+      "data_matches_source": true
+    },
+    {
+      "relative": "scripts/custom_game/archive_handoff_180de7e38b.js",
+      "source_sha256": "abe7003b1615db0420923e53e770a5cfde01bb2f1523b61f7fe6b91754fb5a75",
+      "runtime_sha256": "ee4e3879b216d706712a652cdc4c4774b4f17673cdc72e0308ad84728e8da71b",
+      "data_matches_source": true
+    },
+    {
+      "relative": "scripts/custom_game/inventory_tooltip.js",
+      "source_sha256": "8944cde3ef933a6f563e9a8962cc0442a4016abc375a473daa84ceb4e1614ae7",
+      "runtime_sha256": "66fecbe6a4f3f79bf78371782696e4266028dcf33544958d581dc6afac18fa89",
+      "data_matches_source": true
+    },
+    {
+      "relative": "scripts/custom_game/lottery_gw2.js",
+      "source_sha256": "82ce1ea41bc6ad4a36221c3632359179b963c7ffbae028d09e3f30a27d26168e",
+      "runtime_sha256": "49feb53186e7d8673e7e6de919515444e564ae3d332e8a18f810b8573d0ce753",
+      "data_matches_source": true
+    },
+    {
+      "relative": "scripts/custom_game/lottery_ui_remaining_5d5c1152eb.js",
+      "source_sha256": "03a128e4fd5e4aa739cefe018d30ba9fb0d72a51664e47da0012c2cee5067b11",
+      "runtime_sha256": "51404dede91822336bbabd604756a6d0afdfe16f92935ade3f424caf02f12464",
+      "data_matches_source": true
+    },
+    {
+      "relative": "scripts/custom_game/shop_tooltip_remaining_5d5c1152eb.js",
+      "source_sha256": "8cfd300fc34eb1b5d7d3aa6e7dcf46581d1bc951e8dc2611114d184e8b72aaa7",
+      "runtime_sha256": "b1fbf916c2775592f333becf95b131fb8a18b5e9d5a2c27b2f7eff968946d564",
+      "data_matches_source": true
+    },
+    {
+      "relative": "scripts/custom_game/daily_remaining_5d5c1152eb.js",
+      "source_sha256": "e6b6d540817b90acb9dcec7769c49206c1de1ea7ca1f155e4022caf72bd5c2da",
+      "runtime_sha256": "1b887a783ed13f88210588962787841ccff42783d6f4c29d35f3ab9c33034468",
+      "data_matches_source": true
+    }
+  ],
+  "content_baseline_review": {
+    "status": "PASS",
+    "mismatched_source": "scripts/custom_game/common/commerce_components.js",
+    "difference": "line endings only; same text before task",
+    "reviewedContentSha256": "afd00482a8e3186a471b9012e1339cc26b9041cb59e2ab75d1ec6e110d749db8",
+    "canonical_writes_in_first_attempt": 0
+  },
+  "candidate": {
+    "bundle": "56cb951a72bed4bf53ccf9f039117312c760b739e300ba71d90351b3e86043d6",
+    "parent_bundle": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "rollback_bundle": "e555e1b9addac4924cf7f1bf5a93bcbcd3279e65edf5fc9cd0f0f3b431c6600a",
+    "report": "validation/20261021/benefit_login_candidate.json",
+    "includes_prior_nine_reward_revisions": true,
+    "service_overlay_sha256": "05ea8ec75299c05a3c28975da8ff7d6dfc29333a134a2f24e27b45081a9a986d"
+  },
+  "publication": {
+    "remote_writes_this_task": 0,
+    "active_hash_preserved": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "lottery_seed_preserved": true,
+    "current_runtime_pointer_not_staged": true,
+    "authorization": "Existing server upload request remains pending; no retry after previous automatic-review rejection.",
+    "previous_approval_review_report": "validation/20261021/benefit_revision.json",
+    "remote_destination": "47.110.238.248"
+  },
+  "source_integrity": {
+    "backend": {
+      "data/csv/存档系统/archive_benefit_rewards.csv": "23ef7dc76ad79e515a8de8489a2a87dadad35fe1af9e83cfdaf81af56eb80462",
+      "scripts/vscripts/config/generated/archive_benefit_rewards.lua": "80264dda23237bda6023a479003b4bfba4c5bb0e60719027efe4a16be23747a7",
+      "scripts/vscripts/systems/archive_benefit_rewards.lua": "9642abb5d67f15d3242b188fc18babacf9a72b8626fd73e0c07d257a2416bc55",
+      "scripts/vscripts/systems/archive_service.lua": "b2540cc303409478a21c1975012adaef2a09c3f4cf6860ea75260c50b6f43e00",
+      "server/tests/test_archive_benefits.py": "bfad7656e670ea4b4cbfaed0c19deeafe1125da9c50916fcd6fa4c3040439c78",
+      "scripts/vscripts/tests/test_archive_benefits.lua": "9158273bafba95ac34d097057c0a5de9e4111e65466d547f4455301b89a9c362",
+      "scripts/vscripts/tests/test_archive_service.lua": "a117f543ea2fbbdb18fca34f54e86fc8aea0845e65b267ebb543ddbbda6feb85",
+      "server/archive_backend/service.py": "3408aae8eeeda3fca89f7698dcff1bef80297ef355a9cf6c8847b4bdc8e6b4d2"
+    },
+    "frontend": [
+      {
+        "file": "panorama/src/scripts/custom_game/daily_remaining_5d5c1152eb.js",
+        "sha256": "e6b6d540817b90acb9dcec7769c49206c1de1ea7ca1f155e4022caf72bd5c2da"
+      },
+      {
+        "file": "tools/tests/daily_benefits.test.cjs",
+        "sha256": "32c27ec75d250eb1021b4779ad797e239cb01d427b2f3965830de43428ea132a"
+      }
+    ],
+    "tools": {
+      "tools/benefit_login_20261021/build_candidate.py": "01b8065749daa1ac5e4b39f787b4409542e15daba6bd5b9653d7136e3409a92d",
+      "tools/benefit_login_20261021/README.md": "0b0f262cc82411c66f53a0ab11a2696adf2389b3e3806397450fe19d5b45de09"
+    }
+  }
+}

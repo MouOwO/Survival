@@ -491,6 +491,24 @@ assert(calendar.day()==25000)
 timestamp=timestamp+1
 assert(calendar.day()==25001,"Beijing 05:00 daily reset")
 
+-- Offline/local profile loading mirrors the HTTP profile reconciler. The
+-- reward does not depend on opening welfare or clicking a claim button.
+profiles[10]=new_profile()
+bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=10})
+assert(profiles[10].save.content_inventory.special_lottery_ticket==nil)
+profiles[10].entitlements.archive_pass={active=true,expires_at=timestamp+3*86400}
+bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=10})
+assert(profiles[10].save.content_inventory.special_lottery_ticket==1,"Month-card login automatically grants its first tier")
+bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=10})
+tasks.archive_daily_clock()
+assert(profiles[10].save.content_inventory.special_lottery_ticket==1,"Reload and repeated clock checks cannot grant twice")
+local login_snapshot=archive.daily_snapshot(10).benefits.daily_time.rows[1]
+assert(login_snapshot.id=="daily_time_0" and login_snapshot.status=="claimed" and login_snapshot.can_claim==0)
+timestamp=timestamp+86400
+tasks.archive_daily_clock()
+assert(profiles[10].save.content_inventory.special_lottery_ticket==2,"The next 05:00 period automatically grants once while still online")
+print("ARCHIVE_LOGIN_AUTO_PASS: local profile load, no click, repeated read, next 05:00 period")
+
 -- Welfare purchases must remain available while unrelated boss rewards retry.
 profiles[9] = new_profile()
 local manual_commands, manual_done = {}, nil

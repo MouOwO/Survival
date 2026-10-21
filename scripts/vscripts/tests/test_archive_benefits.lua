@@ -12,9 +12,11 @@ assert(calendar.day(boundary-5*3600-1)==calendar.day(boundary-1),"Midnight does 
 local profile={save={archive={},gameplay_stats={},content_inventory={}},entitlements={}}
 local before=encoder.encode(profile)
 local snapshot=benefits.snapshot(profile,false)
-assert(snapshot.daily_time.progress==0 and #snapshot.daily_time.rows==5)
+assert(snapshot.daily_time.progress==0 and #snapshot.daily_time.rows==6)
 assert(#snapshot.daily_wins.rows==5 and #snapshot.weekly_time.rows==9)
 assert(snapshot.daily_time.rows[1].status=="locked" and snapshot.daily_time.rows[1].can_claim==0)
+assert(snapshot.daily_time.rows[1].id=="daily_time_0" and snapshot.daily_time.rows[1].monthly_only==1
+ and snapshot.daily_time.rows[1].auto_claim==1 and #snapshot.daily_time.rows[1].base_rewards==0)
 assert(snapshot.refresh_at==boundary+86400 and snapshot.weekly_refresh_at==boundary+7*86400)
 assert(encoder.encode(profile)==before,"Read-only welfare snapshots cannot initialize saved state")
 local function apply(command,pass)
@@ -25,6 +27,13 @@ local function apply(command,pass)
  end
  return result
 end
+local login={id="local:login:0",kind="benefit_claim",track="daily_time",tier_id="daily_time_0",event_at=now}
+assert(not apply(login,false).ok and profile.save.archive.benefits==nil,
+ "A free player cannot consume an empty-base login claim")
+local automatic=benefits.snapshot(profile,true).daily_time.rows[1]
+assert(automatic.status=="claimable" and automatic.can_claim==0,"Login rewards are automatically issued, not clickable")
+assert(apply(login,true).ok and profile.save.content_inventory.special_lottery_ticket==1)
+assert(apply(login,true).duplicate and profile.save.content_inventory.special_lottery_ticket==1)
 now=boundary+30
 assert(apply({id="local:online:60",kind="online_checkpoint",session="local",
  actual_seconds=60,map_seconds=120,event_at=now}).ok)
@@ -38,20 +47,20 @@ now=boundary+1800
 assert(apply({id="local:online:1830",kind="online_checkpoint",session="local",
  actual_seconds=1830,map_seconds=3660,event_at=now}).ok)
 local snap=benefits.snapshot(profile,true)
-assert(snap.daily_time.progress==30 and snap.daily_time.rows[1].status=="claimable")
+assert(snap.daily_time.progress==30 and snap.daily_time.rows[2].status=="claimable")
 assert(snap.weekly_time.progress==30,"Weighted map-level time cannot double welfare time")
 local claim={id="local:claim:30",kind="benefit_claim",track="daily_time",tier_id="daily_time_30",event_at=now}
 assert(apply(claim,true).ok)
 assert(profile.save.content_inventory.lottery_ticket==2)
 assert(apply(claim,true).duplicate)
 assert(profile.save.content_inventory.lottery_ticket==2)
-assert(benefits.snapshot(profile,true).daily_time.rows[1].status=="claimed")
+assert(benefits.snapshot(profile,true).daily_time.rows[2].status=="claimed")
 assert(not apply({id="local:claim:repeat",kind="benefit_claim",track="daily_time",tier_id="daily_time_30",event_at=now},true).ok)
 now=boundary+86400
 assert(benefits.snapshot(profile,true).daily_time.progress==0)
 assert(benefits.snapshot(profile,true).weekly_time.progress==30,"Daily refresh retains weekly progress")
 profile.save.content_inventory.welfare_zongzi=149
-local near_cap=benefits.snapshot(profile,true).daily_time.rows[4]
+local near_cap=benefits.snapshot(profile,true).daily_time.rows[5]
 assert(near_cap.base_rewards[2].count==1 and near_cap.monthly_rewards[2].count==1,
  "Snapshot preserves configured base and month-card quantities")
 assert(near_cap.base_rewards[2].actual_count==1 and near_cap.monthly_rewards[2].actual_count==0,
@@ -82,4 +91,4 @@ benefits.record_online(paused,50,checkpoints[1]);benefits.record_online(paused,1
 assert(paused.benefits.days[tostring(benefits.day(boundary-1))].seconds==50)
 assert(paused.benefits.days[tostring(benefits.day(boundary))].seconds==10)
 package.loaded["systems/player_context_service"]=previous_context
-print("ARCHIVE_BENEFITS_PASS: 19 tiers, read-only snapshot, actual seconds, Monday 05:00 split, deduplicated claims, disabled rollout")
+print("ARCHIVE_BENEFITS_PASS: 20 tiers, monthly-only auto login, read-only snapshot, actual seconds, Monday 05:00 split, deduplicated claims")

@@ -258,7 +258,7 @@ inventory_item:lottery_pulse_conduction_turret,inventory_item,lottery_pulse_cond
 inventory_item:lottery_quick_dry_cement,inventory_item,lottery_quick_dry_cement,速干水泥,0,0,箭塔每秒攻击+1 英雄每秒属性+1 星悦积分+10,item_mjollnir,lottery_quick_dry_cement
 inventory_item:lottery_recovery_crystal,inventory_item,lottery_recovery_crystal,回复结晶,0,0,墙每秒回血+5,item_crimson_guard,lottery_recovery_crystal
 inventory_item:lottery_recovery_spirit,inventory_item,lottery_recovery_spirit,回复精神,0,0,墙每秒回血+10,item_crimson_guard,lottery_recovery_spirit
-inventory_item:lottery_reincarnation_immortal_stele,inventory_item,lottery_reincarnation_immortal_stele,轮回仙碑,0,0,英雄每秒属性+1500 英雄攻击加成+20% 英雄全属性加成+20 英雄最终伤害+20% 英雄攻击减甲+20 星悦积分+200 每获得1次胜利英雄最终伤害+0.07%（苟发育没说上限 但是咱默认个5000次吧）,item_greater_crit,lottery_reincarnation_immortal_stele
+inventory_item:lottery_reincarnation_immortal_stele,inventory_item,lottery_reincarnation_immortal_stele,轮回仙碑,0,0,英雄每秒属性+1500 英雄攻击加成+20% 英雄全属性加成+20 英雄最终伤害+20% 英雄攻击减甲+20 星悦积分+200 每获得1次胜利英雄最终伤害+0.07%,item_greater_crit,lottery_reincarnation_immortal_stele
 inventory_item:lottery_reincarnation_orb,inventory_item,lottery_reincarnation_orb,轮回宝珠,0,0,伐木效率+3 英雄攻速+20% 英雄最终伤害+20% 箭塔攻击加成10% 墙生命加成+10% 英雄每次转生全属性加成+2% 星悦积分+200,item_crimson_guard,lottery_reincarnation_orb
 inventory_item:lottery_resistance_crystal,inventory_item,lottery_resistance_crystal,抵抗结晶,0,0,墙伤害格挡+10,item_crimson_guard,lottery_resistance_crystal
 inventory_item:lottery_rift_implant,inventory_item,lottery_rift_implant,裂痕插件,0,0,英雄攻击全属性+8 英雄全属性加成+8% 英雄攻击减甲+8 英雄攻击加成+10% 英雄最终伤害10% 星悦积分+88 购买后自动激活,item_greater_crit,lottery_rift_implant

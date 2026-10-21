@@ -180,7 +180,7 @@ lottery_immortal_slaying_sword_array,,item,lottery_reward,诛仙剑阵,英雄暴
 lottery_investiture_of_gods,,item,lottery_reward,封神榜,英雄攻击属性效率+8% 箭塔攻击加成+35%；箭塔最终伤害+35%；箭塔攻击间隔-0.1；英雄最终伤害+30%；英雄全属性加成+30%；英雄攻击减甲+20；星悦积分+200；每10波获得一个封神榜，可以进阶魔导器为光明版。,item_mjollnir,1,积分道具,71,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
 lottery_heavenly_puppet,,item,lottery_reward,天道傀儡,墙减伤+10% 墙护甲+500 墙每秒护甲+0.1 英雄最终伤害+10% 英雄全属性加成+10% 农民工拥有自动训练功能 天狱模式下结算信仰值+30%（还没做） 星悦积分+200,item_crimson_guard,1,积分道具,72,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
 lottery_mountain_sea_kunpeng,,item,lottery_reward,山海鲲鹏,英雄初始属性+150000 英雄造成伤害加攻击+40 英雄暴击伤害+150% 英雄攻击减甲+20 英雄攻击全属性+20 英雄全属性加成+20% 英雄最终伤害+20% 星悦积分+200 每有一条鱼英雄额外获得全属性加成0.05%,item_greater_crit,1,积分道具,73,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
-lottery_reincarnation_immortal_stele,,item,lottery_reward,轮回仙碑,英雄每秒属性+1500 英雄攻击加成+20% 英雄全属性加成+20 英雄最终伤害+20% 英雄攻击减甲+20 星悦积分+200 每获得1次胜利英雄最终伤害+0.07%（苟发育没说上限 但是咱默认个5000次吧）,item_greater_crit,1,积分道具,74,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
+lottery_reincarnation_immortal_stele,,item,lottery_reward,轮回仙碑,英雄每秒属性+1500 英雄攻击加成+20% 英雄全属性加成+20 英雄最终伤害+20% 英雄攻击减甲+20 星悦积分+200 每获得1次胜利英雄最终伤害+0.07%,item_greater_crit,1,积分道具,74,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
 lottery_ancient_pine_fortification,,item,lottery_reward,苍松固城,墙护甲+30 墙每秒护甲+0.1 墙生命加成+10% 墙护甲加成+10% 墙每秒生命+10 星悦积分+88,item_crimson_guard,1,积分道具,75,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
 lottery_woodcraft_grandmaster,,item,lottery_reward,研木宗师,金矿效率+10% 伐木效率+2 每秒金币+10 每秒木材+10 伐木工攻速+10% 星悦积分+88,item_ogre_axe,1,积分道具,76,0,needs_confirmation,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
 lottery_forestcast_thousand_bolts,,item,lottery_reward,林铸千矢,箭塔攻速+15% 箭塔最终伤害+15% 箭塔攻击减甲+0.1 箭塔每秒攻击+20 箭塔造成伤害攻击+3 星悦积分+88,item_mjollnir,1,积分道具,77,0,ok,抽奖系统持久化内容ID；品质与效果由抽奖定义表维护。
