@@ -56,7 +56,7 @@ assert.equal(nodes.DailyGW2BenefitGroup_daily_time.GetChildCount(), 7, 'Two head
 assert.equal(nodes.DailyGW2BenefitGroup_daily_wins.GetChildCount(), 7, 'Two headers and all five victory tiers');
 assert.equal(nodes.DailyGW2BenefitClaim_daily_time_daily_time_30.enabled, true);
 assert.equal(nodes.DailyGW2BenefitClaim_daily_time_daily_time_90.enabled, false);
-assert.equal(nodes.DailyGW2FooterText.text.includes('北京时间每日 05:00'), true);
+assert.equal(nodes.DailyGW2FooterText.text.includes('每日 05:00'), true);
 const lastTime = nodes.DailyGW2Benefit_daily_time_daily_time_150;
 const icons = lastTime.Children().filter(node => node.BHasClass('DailyGW2BenefitReward'));
 assert.equal(icons.length, 7, '150 minutes shows all three base and four monthly additive rewards');
@@ -106,7 +106,7 @@ h.click(nodes.DailyGW2Tab_weekly);
 assert.equal(nodes.DailyGW2Benefits_daily.visible, false);
 assert.equal(nodes.DailyGW2Benefits_weekly.visible, true);
 assert.equal(nodes.DailyGW2Benefits_weekly.Children().filter(node => node.BHasClass('DailyGW2BenefitCard')).length, 9);
-assert(nodes.DailyGW2FooterText.text.includes('北京时间每周一 05:00'));
+assert(nodes.DailyGW2FooterText.text.includes('每周一 05:00'));
 assert(nodes.DailyGW2Benefits_weekly.Children().some(node => /双倍.*最后三档.*金色抽奖券/.test(node.text)),
     'Weekly page explains doubled base and gold only in the last three tiers');
 for (const minute of [120, 240, 360, 480, 600, 720, 840, 960, 1080]) {
@@ -245,3 +245,63 @@ assert.equal(manual.calendar28[0].rewards[0].description, '英雄伤害+10%（�
     'Display cleanup leaves the authoritative historical description untouched');
 loginHarness.assertCleanDispose(loginApi);
 console.log('monthly login benefits: six time tiers fit, explicit zero-minute manual claim, no auto-claim on reads, pending guard/retry/confirmation, shared stele description cleanup passed');
+
+// A missing archive response must not erase the formal reward list. Catalogue
+// rows are only a preview; even a stale/claimable catalogue cannot authorize it.
+const previewHarness = setup(), previewNodes = previewHarness.nodes;
+const previewDefinition = snapshot().benefits;
+previewDefinition.daily_time.rows.unshift({id: 'daily_time_0', required: 0,
+    monthly_only: 1, auto_claim: 0, base_rewards: [], monthly_rewards: [gold(1)],
+    status: 'claimable', can_claim: 1});
+previewHarness.cfg.SurvivalBenefitDefinitions = {version: 1, tracks: Object.fromEntries(
+    Object.entries(previewDefinition).map(([track, group]) => [track, group.rows]))};
+previewHarness.cfg.SurvivalDaily.Open(false);
+previewHarness.cfg.SurvivalDaily.SelectPage('daily');
+assert.equal(previewNodes.DailyGW2BenefitGroup_daily_time.Children().filter(node => node.BHasClass('DailyGW2BenefitCard')).length, 6);
+assert.equal(previewNodes.DailyGW2BenefitGroup_daily_wins.Children().filter(node => node.BHasClass('DailyGW2BenefitCard')).length, 5);
+assert.equal(previewNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.enabled, false);
+assert(previewNodes.DailyGW2BenefitClaim_daily_time_daily_time_30.Children().some(node => node.text === '同步中'));
+const previewClaimCount = () => previewHarness.sent.filter(event => event.name === 'survival_benefit_claim').length;
+assert.equal(previewClaimCount(), 0);
+// The server-event guard still rejects a preview if native enabled state changes.
+previewNodes.DailyGW2BenefitClaim_daily_time_daily_time_30.enabled = true;
+previewHarness.click(previewNodes.DailyGW2BenefitClaim_daily_time_daily_time_30);
+assert.equal(previewClaimCount(), 0);
+previewHarness.cfg.SurvivalDaily.SelectPage('weekly');
+assert.equal(previewNodes.DailyGW2Benefits_weekly.Children().filter(node => node.BHasClass('DailyGW2BenefitCard')).length, 9);
+assert(previewNodes.DailyGW2Benefits_weekly.Children().filter(node => node.BHasClass('DailyGW2BenefitCard')).every(card =>
+    card.Children().find(node => node.BHasClass('DailyGW2BenefitClaim')).enabled === false));
+const withoutBenefits = snapshot(); delete withoutBenefits.benefits;
+previewHarness.emit('survival_daily_snapshot', withoutBenefits);
+assert.equal(previewNodes.DailyGW2BenefitClaim_daily_time_daily_time_30.enabled, false);
+assert.equal(previewClaimCount(), 0);
+assert(previewNodes.DailyNotice.text.includes('新开一局'));
+assert(!previewNodes.DailyRulesBody.text.includes('北京时间'), 'The server rule text also hides the timezone prefix');
+// An actual older nineteen-tier response takes priority over local twenty-tier
+// definitions. It must not expose the not-yet-released monthly login milestone.
+const authoritativeNineteen = snapshot(); authoritativeNineteen.sequence = 2;
+previewHarness.emit('survival_daily_snapshot', authoritativeNineteen);
+previewHarness.cfg.SurvivalDaily.SelectPage('daily');
+assert.equal(previewNodes.DailyGW2BenefitGroup_daily_time.Children().filter(node => node.BHasClass('DailyGW2BenefitCard')).length, 5);
+assert.equal(previewNodes.DailyGW2Benefit_daily_time_daily_time_0, undefined);
+assert.equal(previewNodes.DailyGW2BenefitClaim_daily_time_daily_time_30.enabled, true);
+assert.equal(authoritativeNineteen.benefits.daily_time.progress, 60, 'Hiding time never changes authoritative recording');
+const textOf = node => [node.text, ...node.Children().flatMap(textOf)];
+for (const page of ['daily', 'weekly', 'login']) {
+    previewHarness.cfg.SurvivalDaily.SelectPage(page);
+    assert(!previewNodes.DailyGW2FooterText.text.includes('北京时间'));
+}
+assert(!textOf(previewNodes.DailyGW2Benefits_daily).some(text => /今日累计.*分钟|\d+\s*\/\s*\d+\s*分钟/.test(text)),
+    'Daily time totals and per-tier elapsed-time counters are hidden');
+assert(!textOf(previewNodes.DailyGW2Benefits_weekly).some(text => /本周累计|\d+\s*\/\s*\d+\s*分钟/.test(text)),
+    'Weekly time totals and per-tier elapsed-time counters are hidden');
+assert(textOf(previewNodes.DailyGW2Benefits_weekly).includes('游玩 1080 分钟'), 'Reward requirements remain visible');
+assert(textOf(previewNodes.DailyGW2BenefitGroup_daily_wins).some(text => text.includes('今日累计：1 场')), 'Victory totals remain visible');
+const disabledTrack = snapshot(); disabledTrack.sequence = 3; disabledTrack.benefits.daily_time.rows = [];
+previewHarness.emit('survival_daily_snapshot', disabledTrack);
+assert.equal(previewNodes.DailyGW2BenefitGroup_daily_time.Children().filter(node => node.BHasClass('DailyGW2BenefitCard')).length, 0,
+    'An explicitly empty authoritative track never falls back to local offers');
+assert(textOf(previewNodes.DailyGW2BenefitGroup_daily_time).includes('暂无开放档位'));
+assert.equal(previewClaimCount(), 0);
+previewHarness.assertCleanDispose(previewHarness.cfg.SurvivalDaily);
+console.log('daily benefits missing snapshot: formal locked preview, server tier priority, no preview claims, hidden time totals and timezone labels passed');

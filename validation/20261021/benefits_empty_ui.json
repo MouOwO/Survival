@@ -1,0 +1,64 @@
+{
+  "status": "PASS_LOCAL_UI_AND_NATIVE_COMPILE",
+  "problem": "Updated welfare renderer was paired with an older running server script that did not supply benefit rows; the empty-state renderer hid all offers and actions.",
+  "evidence": {
+    "log": "game/dota/console.log",
+    "daily_listeners_registered": "2026-10-21 10:40:16",
+    "benefit_claim_listener_registration_absent": true,
+    "authoritative_snapshot_source": "scripts/vscripts/systems/archive_service.lua:526",
+    "current_empty_profile_rows": {
+      "daily_time": 6,
+      "daily_wins": 5,
+      "weekly_time": 9
+    },
+    "parent_47acc_empty_profile_rows": {
+      "daily_time": 5,
+      "daily_wins": 5,
+      "weekly_time": 9
+    }
+  },
+  "changes": {
+    "missing_snapshot": "Read-only preview generated from maintained CSV/resource definitions; claim buttons remain disabled until authoritative rows arrive.",
+    "authoritative_rows": "Actual server rows and explicit empty tracks take priority over local preview.",
+    "remove_timezone_prefix": true,
+    "hide_elapsed_minutes": true,
+    "keep_reward_requirements": true,
+    "keep_monthly_status_and_victory_progress": true,
+    "time_recording_and_reset_schedule_unchanged": true,
+    "backend_or_reward_configuration_changed": false
+  },
+  "checks": {
+    "frontend_tests_passed": 19,
+    "generator_check": "PASS",
+    "archive_service_lua_test": "PASS",
+    "browser_preview": "PASS; real production components in a browser adapter, not an in-game capture",
+    "preview_daily_buttons": 11,
+    "preview_weekly_buttons": 9,
+    "preview_reward_images_loaded": 49,
+    "no_preview_claims": true,
+    "manual_login_claim_pending_retry_confirmation_preserved": true,
+    "native_compile_inputs": 3,
+    "javascript_native_data_matches_source": true,
+    "xml_native_source_crc_verified": true,
+    "source_and_content_bytes_match": true,
+    "original_modified_files_preserved": 100
+  },
+  "runtime_note": "Restart the custom match to load the already updated server Lua and authoritative benefit snapshot; no automatic match restart was performed.",
+  "screenshot_in_game": false,
+  "remote_writes": 0,
+  "active_bundle_or_seed_changed": false,
+  "source_sha256": {
+    "panorama/src/scripts/custom_game/daily_remaining_5d5c1152eb.js": "5de9254cd754f5b4e581bb60a7680a7c0942c19aa7c69aa91568684fddf3d1e4",
+    "tools/tests/daily_benefits.test.cjs": "7fe4e1a42d94cd46aa279181db7de7926c841200d5550f996f09bfaaf5a9ba5d",
+    "tools/build_benefit_presentation.py": "4de8052c89ca92e3b6ae7aa3414286d798d77af62f1e630c77387a98efc026cb",
+    "panorama/src/scripts/custom_game/benefit_presentation_data.js": "5d82f35a0da200b6a223778b66dd1938a9f5b71aace4bb0477bef598b9b61f54",
+    "panorama/src/layout/custom_game/archive.xml": "100cb438da68d67880d30d5b410245f93a543e19414ee906d6914e30d96aee7c",
+    "tools/tests/benefit_presentation.test.cjs": "e2ba92748c2c9c759553957f70fe004ff8a9cd21f89b58314f65ed0ff587a810"
+  },
+  "native_sha256": {
+    "panorama/scripts/custom_game/benefit_presentation_data.vjs_c": "11df9bd2eff8ec611543c0d9ce8d53d4f45b7dffee4963906277e3c9a1b7ec5d",
+    "panorama/scripts/custom_game/daily_remaining_5d5c1152eb.vjs_c": "819cee4b31a1ce1d974efd484a845805da9b6fdf697d7f176a9254a2ab316354",
+    "panorama/layout/custom_game/archive.vxml_c": "1784aa0d4a87b3e07207b65daadeebccc8754c549034bd94fba1906775ceae7b"
+  },
+  "browser_preview_artifact": "tmp/benefits_empty_20261021/browser_preview.json"
+}
