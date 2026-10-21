@@ -48,7 +48,7 @@ function harness() {
     $.CancelScheduled = id => timers.delete(id);
     $.Msg = () => {};
     $.DispatchEvent = (name, value) => { if (name === "ExternalBrowserGoToURL") urls.push(value); };
-    const cfg = { SurvivalUILayers: {
+    const cfg = { SurvivalDevelopmentPayments:true, SurvivalUILayers: {
         Open: id => { top = id; }, Close: id => { if (top === id) top = null; }, Top: () => top
     } };
     const env = { $, GameUI: { CustomUIConfig: () => cfg }, Game: {},

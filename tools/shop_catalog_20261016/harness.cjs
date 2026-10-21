@@ -54,7 +54,7 @@ function harness(options = {}) {
     }
     const root = new Panel('Panel', null, 'TestRoot');
     root.actuallayoutwidth = 1672; root.actuallayoutheight = 941;
-    const cfg = {SurvivalShopPresentation:options.presentation||{groups:{home:['paid_1']}}};
+    const cfg = {SurvivalDevelopmentPayments:options.developmentPayments!==false,SurvivalShopPresentation:options.presentation||{groups:{home:['paid_1']}}};
     function $(id) { return root.FindChildTraverse(id.replace(/^#/, '')); }
     $.GetContextPanel = () => root;
     $.CreatePanel = (type, parent, id) => new Panel(type, parent, id);
@@ -75,7 +75,7 @@ function harness(options = {}) {
     let paid = options.paid || {products: [{sku:'paid_1',title:'真实商品',category_id:'technology',product_type:'single',icon:'items/rapier.png',
         enabled:true,amount_fen:900,reward_lines:[{id:'initial_gold',kind:'stat',label:'初始金币',quantity:10}]}],
         categories:[{id:'technology',label:'科技与服务'}]};
-    cfg.SurvivalPayments = {GetCatalog: () => paid, RefreshCatalog() {}, Checkout(sku) { paidCheckouts.push(sku); return true; }};
+    cfg.SurvivalPayments = {IsRealMoneyEnabled:()=>cfg.SurvivalDevelopmentPayments===true,GetCatalog: () => paid, RefreshCatalog() {}, Checkout(sku) { paidCheckouts.push(sku); return true; }};
     if(options.homeCatalogFixture!==false){
         // Keep legacy synthetic presentation fixtures separate from the reviewed home catalog.
         const fixtureHome = ((cfg.SurvivalShopPresentation.groups || {}).home || []).slice();

@@ -2,6 +2,7 @@ local multiplayer_rules = require("config/generated/multiplayer_rules")
 local scheduler = require("core/scheduler")
 local event_bus = require("core/event_bus")
 local events = require("core/events")
+local test_access_policy = require("core/test_access_policy")
 
 local M = {}
 local player_states = {}
@@ -43,6 +44,7 @@ function M.assign_to_survival_team(player_id, source)
             .. " reason=invalid_player_id")
         return false, "invalid_player_id"
     end
+    if not test_access_policy.enforce(player_id) then return false, "test_access_denied" end
 
     local state = GameRules:State_Get()
     local current_team = PlayerResource.GetTeam
@@ -70,7 +72,7 @@ function M.assign_connected_players(source)
             or PlayerResource:IsValidPlayerID(player_id)
         local player = PlayerResource.GetPlayer
             and PlayerResource:GetPlayer(player_id) or nil
-        if valid and player then
+        if valid and player and test_access_policy.enforce(player_id) then
             M.mark_connected(player_id)
             local ok = M.assign_to_survival_team(player_id, source)
             if ok then assigned = assigned + 1 end
@@ -86,6 +88,7 @@ end
 function M.mark_connected(player_id)
     player_id = normalized_player_id(player_id)
     if player_id == nil then return false end
+    if not test_access_policy.enforce(player_id) then return false end
     local state = player_states[player_id] or {}
     if state.status ~= "defeated" then state.status = "active" end
     state.disconnected_at = nil

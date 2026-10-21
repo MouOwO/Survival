@@ -36,7 +36,7 @@ test('Only existing promotions get a 1.5x comparison; server grouping and price 
  assert.equal(JSON.stringify(m.Groups({products})),before,'The display helper cannot promote ordinary goods or move bundles');
  assert.equal(JSON.stringify(products),frozen,'Neither current nor historical price metadata is rewritten');
  assert.equal(m.PurchaseTypes().find(row=>row.id==='u_coin').label,'G币');
- assert.equal(m.ChannelLabel(products[2]),'人民币直购（G币计价）');
+ assert.equal(m.ChannelLabel(products[2]),'购买');
 });
 
 test('Promotion rows keep current prices and show a smaller crossed-out comparison beside them in every existing view',()=>{

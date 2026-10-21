@@ -60,7 +60,7 @@ function harness(options = {}) {
     $.Schedule = (delay, fn) => { timers.set(++serial, {delay, fn}); return serial; };
     $.CancelScheduled = id => timers.delete(id);
     $.Msg = $.DispatchEvent = $.RegisterEventHandler = $.RegisterForUnhandledEvent = () => {};
-    const cfg = {};
+    const cfg = {SurvivalDevelopmentPayments:true};
     const env = vm.createContext({$, GameUI: {CustomUIConfig: () => cfg}, Game: {GetLocalPlayerID: () => 0, GetGameTime: () => 0},
         GameEvents: {Subscribe(name, fn) { const list = handlers.get(name) || []; list.push(fn); handlers.set(name, list); return fn; },
             Unsubscribe(fn) { for (const [key, list] of handlers) handlers.set(key, list.filter(v => v !== fn)); },
@@ -156,24 +156,17 @@ for (const item of unique.values()) {
     const rewards = item.reward_lines || item.grants && item.grants.lines || [];
     const props = {index: 0, catalog: {categories: []}, rewards, action() { throw new Error('Rendering must not order'); }};
     const row = h.cfg.SurvivalBlackLionMarket.Row(h.panel, item, props);
-    if (item.product_type === 'bundle') {
-        // The current externally supplied market skin composes its bundle gift
-        // glyph from the reviewed asset manifest. Shared bundle cards and all
-        // checkout artwork still retain the authoritative product registry.
-        const image = classNode(row, 'BLMarketGiftIcon');
-        assert(image, item.sku + ' market bundle retains the declared gift artwork');
-        assert.deepEqual(image.images, [J.NormalizeIconURI(h.cfg.SurvivalShopV10.layers.vip4_gift.path)],
-            item.sku + ' market bundle uses the exact first-row manifest gift');
-    } else {
-        const image = classNode(row, 'BLMarketItemIcon');
-        assert(image, item.sku + ' market single retains its real product icon beside its decorative frame');
-        assertRenderedIcon(image, mappings.get(item.sku), item.sku + ' market loads exactly the selected icon');
-    }
+    // The shipped renderer uses the registered original art for every product,
+    // including bundles. A captured gift layer must never replace that identity.
+    const image = classNode(row, 'BLMarketItemIcon');
+    assert(image, item.sku + ' market retains its real product icon');
+    assertRenderedIcon(image, mappings.get(item.sku), item.sku + ' market loads exactly the selected icon');
+    assert.equal(classNode(row, 'BLMarketGiftIcon'), undefined, item.sku + ' is not replaced by screenshot gift art');
     const card = J[item.product_type === 'bundle' ? 'Bundle' : 'Product'](h.panel, item, {rewards});
     assertRenderedIcon(classNode(card, 'RCProductArt'), mappings.get(item.sku), item.sku + ' shared card uses the same art');
     if (item.product_type === 'bundle') {
         const effect = classNode(card.__purpleDetail, 'RCProductEffect').text;
-        for (const reward of rewards) assert(effect.includes(reward.label || reward.id), item.sku + ' retains every bundle reward label');
+        for (const reward of rewards) assert(effect.includes(J.RewardNameText(reward.label || reward.id)), item.sku + ' retains every normalized bundle reward label');
     }
     rendered.push({sku: item.sku, uri: expected, classification: mappings.get(item.sku).classification});
     if (card.__purpleDispose) card.__purpleDispose(); card.DeleteAsync();

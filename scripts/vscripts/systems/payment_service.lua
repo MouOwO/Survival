@@ -5,6 +5,7 @@ local decoder = require("core/json_decoder")
 local bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
+local cash_policy = require("core/commerce_release_policy")
 local M = {}
 local busy, last, orders, refreshed, resets = {}, {}, {}, {}, {}
 local catalogs = {}
@@ -53,6 +54,17 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
         local copy={};for key,value in pairs(result) do copy[key]=value end
         copy.request_id=correlation or request_id
         send(id,copy)
+    end
+    -- The public/test release keeps free play and in-game wallet commerce,
+    -- without requesting cash catalogues, orders, QR codes or checkout URLs.
+    if not cash_policy.real_money_allowed() then
+        if action=="catalog" then
+            reply({ok=true,action=action,real_money_enabled=false,catalog_hash="noncommercial_test",
+                products={},categories={},wechat=false,alipay=false})
+            return true
+        end
+        reply({ok=false,action=action,error="real_money_disabled"})
+        return false,"real_money_disabled"
     end
     local now = Time()
     local rate_key = tostring(id)..":"..action
@@ -115,6 +127,9 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
     http:Send(function(response)
         if busy[id]~=job then return end
         busy[id]=nil
+        if not cash_policy.real_money_allowed() then
+            reply({ok=false,action=action,error="real_money_disabled"});return
+        end
         if provider.resolve_account_id(id)~=account or session_id()~=session then return end
         local parsed,result=pcall(decoder.decode,tostring(response and response.Body or ""))
         if not parsed or type(result)~="table" then result={ok=false,error="payment_unavailable"} end
@@ -149,6 +164,9 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
                 busy[id]=nil
                 scheduler.cancel(timeout_key)
                 if provider.resolve_account_id(id)~=account or session_id()~=session then return end
+                if not cash_policy.real_money_allowed() then
+                    reply({ok=false,action=action,error="real_money_disabled"});return
+                end
                 catalogs[id]=nil
                 if not ok then
                     reply({ok=false,action=action,error="reward_refresh_pending",state=result.state,sku=sku})
@@ -217,6 +235,9 @@ function M.open_pass_checkout(id, selection, done)
         if done then done({ok=ok,message=message}) end
         return ok
     end
+    if not cash_policy.real_money_allowed() then
+        return finish(false,"测试版未开放月卡开通")
+    end
     if not id or id~=math.floor(id) or not PlayerResource:IsValidPlayerID(id) or PlayerResource:IsFakeClient(id) then
         return finish(false,"玩家尚未进入对局")
     end
@@ -242,7 +263,8 @@ function M.init()
     if initialized then return end
     initialized=true
     require("systems/commerce_service").init()
-    require("systems/archive_service").set_purchase_provider({open_checkout=M.open_pass_checkout})
+    require("systems/archive_service").set_purchase_provider(cash_policy.real_money_allowed()
+        and {open_checkout=M.open_pass_checkout} or nil)
     CustomGameEventManager:RegisterListener("survival_payment_request",function(_,payload) M.handle(payload or {}) end)
     require("debug/payment_test_commands").init()
 end

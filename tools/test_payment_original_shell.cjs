@@ -15,7 +15,7 @@ const root=new Panel("Panel",null,"testRoot");root.actuallayoutwidth=1600;root.a
 function $(id){return ids[id.slice(1)]||null;}
 $.CreatePanel=(t,p,id)=>new Panel(t,p,id);$.Schedule=(delay,fn)=>{timers.set(++timerId,fn);return timerId;};$.CancelScheduled=id=>timers.delete(id);$.Msg=()=>{};
 $.DispatchEvent=(name,url)=>urls.push(url);$.GetContextPanel=()=>root;
-const cfg={SurvivalUILayers:{Open:(id,p,close)=>{top=id;topClose=close;},Close:id=>{if(top===id){top=null;topClose=null;}},Top:()=>top,CloseTop:()=>topClose&&topClose('escape')}};
+const cfg={SurvivalDevelopmentPayments:true,SurvivalUILayers:{Open:(id,p,close)=>{top=id;topClose=close;},Close:id=>{if(top===id){top=null;topClose=null;}},Top:()=>top,CloseTop:()=>topClose&&topClose('escape')}};
 const env={$,GameUI:{CustomUIConfig:()=>cfg},GameEvents:{Subscribe:(name,fn)=>handlers[name]=fn,Unsubscribe:()=>{},SendCustomGameEventToServer:(name,data)=>requests.push(data)},Game:{}};
 vm.createContext(env);
 // Build the actual XML's controls, so missing IDs and changed event wiring fail this fixture.

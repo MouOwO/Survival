@@ -71,6 +71,7 @@ function harness() {
     make('VIPScrim', archiveRoot); make('VIPGrid', legacy); legacy.visible = false;
     let payments = 0, treasures = 0;
     const cfg = {
+        SurvivalDevelopmentPayments: true,
         HandoffAssets: new Proxy({}, {get: (_, key) => ({file: String(key) + '.png'})}),
         HandoffGeometry: require(path.join(scripts, 'geometry_remaining_5d5c1152eb.js')),
         HandoffCombat: {Entries: () => [], NativeEntries: () => [], Snapshot: () => ({}), RefreshSelection() {}, ApplyRuntime() {}},
@@ -321,7 +322,7 @@ function vip() {
     lateEffects.events.onmouseout(); assert.equal(late.dispatched.at(-1)[0], 'DOTAHideTextTooltip');
     lateButton.events.onmouseover();
     assert.equal(late.dispatched.at(-1)[0], 'DOTAShowTextTooltip'); assert.strictEqual(late.dispatched.at(-1)[1], lateButton);
-    assert(late.dispatched.at(-1)[2].includes('累计实付充值')); assert(!/\d+(?:\.\d+)?\s*元/.test(late.dispatched.at(-1)[2]));
+    assert(late.dispatched.at(-1)[2].includes('测试版未开放付费开通')); assert(!/\d+(?:\.\d+)?\s*元/.test(late.dispatched.at(-1)[2]));
     lateButton.events.onmouseout(); assert.equal(late.dispatched.at(-1)[0], 'DOTAHideTextTooltip', 'missing shared helper retains native hover fallback');
     late.load('vip_window.js'); late.emit('survival_vip_snapshot', {ok: true, level: 4}); late.advance(200);
     assert.equal(actualBadge(lateButton).number.text, '4', 'a late status module attaches through the real HUD refresh');

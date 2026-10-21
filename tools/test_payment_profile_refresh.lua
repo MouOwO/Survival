@@ -1,5 +1,6 @@
 -- Actual profile/payment/permanent/resource modules; only HTTP and engine are faked.
 package.path='scripts/vscripts/?.lua;'..package.path
+require("tests/development_release_profile")
 local bus=require('core/event_bus');local events=require('core/events')
 local mode,session='standard','payment_refresh_session_1'
 local accounts={[0]='123',[1]='456'}
@@ -28,7 +29,7 @@ Convars={RegisterConvar=function()end,GetStr=function(_,key)
  return ''
 end}
 Time=function()now=now+2;return now end
-IsInToolsMode=function()return false end
+IsInToolsMode=function()return true end
 ListenToGameEvent=function()end
 CreateHTTPRequestScriptVM=function(method,url)
  local request={url=url,method=method};requests[#requests+1]=request

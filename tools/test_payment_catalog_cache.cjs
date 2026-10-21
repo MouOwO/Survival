@@ -7,7 +7,7 @@ function panel(){return {style:{},children:[],events:{},SetHasClass(){},AddClass
 function $(id){return panels[id]||(panels[id]=panel());}
 $.CreatePanel=(_,p)=>{const c=panel();p.children.push(c);return c;};
 $.Schedule=(delay,fn)=>scheduled.push({at:now+delay*1000,fn});
-const cfg={SurvivalCommerceView:{
+const cfg={SurvivalDevelopmentPayments:true,SurvivalCommerceView:{
  Open(){visible=true;this.UpdateCatalog(cfg.SurvivalPayments.GetCatalog());cfg.SurvivalPayments.RefreshCatalog();},
  UpdateCatalog(data){snapshot=data;updates++;notice=data.error||"";},SetNotice(s){notice=s;},IsOpen:()=>visible
 }};

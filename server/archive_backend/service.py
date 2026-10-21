@@ -414,6 +414,9 @@ class ArchiveService:
         return projected
 
 def install(application,addon_root,lua):
+    # Opt-in host setting: fail before config sync or player RPCs if malformed.
+    from .test_access import install as install_test_access
+    install_test_access(application)
     from .match_modes import install as install_match_modes
     install_match_modes()
     application._archive_modes_active = True

@@ -42,7 +42,7 @@ function harness({legacyXML = false, market = false} = {}) {
     }
     const root = new Panel('Panel', null, 'TestRoot');
     root.actuallayoutwidth = 1672; root.actuallayoutheight = 941;
-    const cfg = {};
+    const cfg = {SurvivalDevelopmentPayments:true};
     function $(id) { return root.FindChildTraverse(id.replace(/^#/, '')); }
     $.GetContextPanel = () => root;
     $.CreatePanel = (type, parent, id) => new Panel(type, parent, id);
@@ -218,7 +218,7 @@ test('G币 products need an authenticated enabled payment row and valid G币 met
     let card = h.cards()[0];
     simpleDetail(h, card);
     h.buyCard(card); assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true);
-    assert(h.descendants(h.store().canvas).some(p => p.text === '人民币支付目录正在连接，请稍后重试。'));
+    assert(h.descendants(h.store().canvas).some(p => p.text === '商品目录正在连接，请稍后重试。'));
     h.cfg.SurvivalPayments.Checkout('u_item');
     assert.equal(h.$('#PaymentPrice').text, '合计 ', 'A wallet row cannot invent a payable quote');
     assert.equal(h.$('#PaymentBuy').enabled, false);
@@ -226,7 +226,7 @@ test('G币 products need an authenticated enabled payment row and valid G币 met
     h.paidSnapshot([], {catalog_hash:'ready-empty'}); card = h.cards()[0];
     simpleDetail(h, card);
     h.buyCard(card); assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true);
-    assert(h.descendants(h.store().canvas).some(p => p.text === '此商品的人民币购买尚未开放，请稍后重试。'));
+    assert(h.descendants(h.store().canvas).some(p => p.text === '此商品暂未开放，请稍后重试。'));
     assert.equal(h.$('#PaymentBuy').enabled, false);
     h.paidSnapshot([paidItem({enabled:0,owned:1,disabled_reason:'already_owned'})]);
     card = h.cards()[0]; simpleDetail(h, card);
@@ -335,7 +335,7 @@ test('Inconsistent G币 metadata cannot quote a payable amount or create an orde
         const card = h.cards()[0];
         simpleDetail(h, card);
         h.buyCard(card); assert.equal(h.cfg.SurvivalCommerceView.IsOpen(), true);
-        assert(h.descendants(h.store().canvas).some(p => p.text === '此商品的人民币购买尚未开放，请稍后重试。'));
+        assert(h.descendants(h.store().canvas).some(p => p.text === '此商品暂未开放，请稍后重试。'));
         h.paidSnapshot([paidItem(metadata)]); // Finish the refresh requested by the disabled shop action.
         h.cfg.SurvivalPayments.Checkout('u_item');
         assert.equal(h.cfg.SurvivalPayments.Inspect().pending, '');

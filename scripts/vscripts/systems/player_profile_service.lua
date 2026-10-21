@@ -9,6 +9,7 @@ local gameplay_stats = require("config/generated/player_gameplay_stats")
 local achievement_definitions = require("config/generated/achievement_definitions")
 local entitlement_definitions = require("config/generated/entitlement_definitions")
 local mode_progression = require("config/mode_progression")
+local test_access_policy = require("core/test_access_policy")
 
 local M = {}
 local profiles_by_player = {}
@@ -523,6 +524,7 @@ local function merge_section(target, patch)
 end
 
 function M.apply_snapshot(player_id, snapshot, reason)
+    if not test_access_policy.enforce(tonumber(player_id)) then return { ok=false, error="test_access_denied" } end
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
@@ -573,6 +575,9 @@ function M.authenticate_player(player_id, reason, callback)
         if type(callback) == "function" then callback(copy(result)) end
         return result
     end
+    if not test_access_policy.enforce(player_id) then
+        return immediate({ ok=false, error="test_access_denied" })
+    end
     if not integer(player_id) or player_id == math.huge then
         return immediate({ ok = false, error = "player_id_invalid" })
     end
@@ -606,7 +611,8 @@ function M.authenticate_player(player_id, reason, callback)
     end
     local called = pcall(provider.authenticate, account, function(receipt)
         if completed or authentication_generation_by_player[player_id] ~= generation then return end
-        if active_session_id() ~= session or current_account_id(player_id) ~= account
+        if not test_access_policy.allowed(player_id)
+            or active_session_id() ~= session or current_account_id(player_id) ~= account
             or type(receipt) ~= "table" or receipt.authenticated ~= true
             or receipt.account_id ~= account or receipt.match_session_id ~= session then
             finish({ ok = false, error = "authentication_identity_mismatch" }) return
@@ -640,6 +646,7 @@ end
 
 function M.is_authenticated_for_account(player_id, account_id)
     player_id = tonumber(player_id)
+    if not test_access_policy.allowed(player_id) then return false end
     local entry = authenticated_by_player[player_id]
     return entry ~= nil and entry.match_session_id == active_session_id()
         and entry.account_id == tostring(account_id) and entry.account_id == current_account_id(player_id)
@@ -673,6 +680,10 @@ function M.supports_rich_mode(player_id) return M.supports_mode_progression(play
 
 local function fetch_player(player_id, reason, on_success, on_error, preserve_loaded)
     player_id = tonumber(player_id)
+    if not test_access_policy.enforce(player_id) then
+        if type(on_error) == "function" then on_error("test_access_denied") end
+        return { ok=false, error="test_access_denied" }
+    end
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }
     end
@@ -710,7 +721,8 @@ local function fetch_player(player_id, reason, on_success, on_error, preserve_lo
     end
     local function binding_current()
         local next_mode, next_session = selected_match()
-        return current_account_id(player_id) == account_id
+        return test_access_policy.allowed(player_id)
+            and current_account_id(player_id) == account_id
             and next_mode == mode and next_session == session
     end
     local function reject_changed_binding()
@@ -817,6 +829,7 @@ function M.apply_incremental(update)
     end
     local account_id = tostring(update.account_id or "")
     local player_id = player_by_account[account_id]
+    if not test_access_policy.enforce(player_id) then return { ok=false, error="test_access_denied" } end
     local profile = player_id and profiles_by_player[player_id] or nil
     if not profile then
         return { ok = false, error = "profile_not_loaded", reload_required = true }
@@ -934,6 +947,7 @@ function M.is_loading(player_id)
 end
 
 local function loaded_profile(player_id)
+    if not test_access_policy.allowed(tonumber(player_id)) then return nil end
     local profile = profiles_by_player[tonumber(player_id)]
     return profile and matches_current_match(profile) and profile or nil
 end
@@ -1017,6 +1031,7 @@ end
 -- Readiness checks run on player orders; avoid copying the private save for a
 -- boolean account check. Never expose the mutable profile through this API.
 function M.is_loaded_for_account(player_id, account_id)
+    if not test_access_policy.allowed(tonumber(player_id)) then return false end
     local profile = profiles_by_player[tonumber(player_id)]
     return profile ~= nil and matches_current_match(profile) and tostring(profile.account_id) == tostring(account_id)
 end
@@ -1026,6 +1041,7 @@ end
 -- ownership and a lottery item's gameplay-stat deltas cannot split across
 -- two revisions.
 function M.update_save_sections(player_id, replacements, reason)
+    if not test_access_policy.enforce(tonumber(player_id)) then return { ok=false, error="test_access_denied" } end
     local mode_test = package.loaded["debug/mode_unlock_test"]
     if mode_test and mode_test.is_enabled() then
         return { ok = false, error = "mode_unlock_test_read_only" }
@@ -1090,6 +1106,7 @@ function M.update_save_section(player_id, section, value, reason)
 end
 
 function M.get_public_profile(player_id)
+    if not test_access_policy.allowed(tonumber(player_id)) then return nil end
     local profile = profiles_by_player[tonumber(player_id)]
     if not profile then
         return nil

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "date": "2026-10-21",
+  "status": "PREPARED_NOT_UPLOADED_REQUIRES_TEST_IDENTITIES_AND_CLOUD_CONNECTIVITY",
+  "public_map": "template_map",
+  "max_players": 4,
+  "production_real_money_checkout": false,
+  "wallet_commerce_preserved": true,
+  "existing_pass_entitlements_preserved": true,
+  "backend_real_payment_service_stopped": false,
+  "test_access": {
+    "lua_and_backend_implemented": true,
+    "real_testers_received": false,
+    "enabled_in_source_or_current_candidate": false,
+    "enabled_on_remote_backend": false,
+    "workshop_handoff_rejects_unconfigured_candidate": true,
+    "restricts_accounts_not_hardware": true
+  },
+  "candidate": {
+    "directory": "D:/Survival_发布候选/20261021_noncommercial_preflight_01",
+    "release_sequence": 2026102102,
+    "runtime_files": 6621,
+    "runtime_bytes": 3766549130,
+    "content_sha256": "44cba21d934e9475a8a0ef3f88516dbfd20ff74c9fefbe1a20d6758dd11706ea",
+    "all_lua_syntax_checked": 788,
+    "protected_lua_files": 180,
+    "full_file_verification_pass": true,
+    "pinned_key_signature_verified": true,
+    "ready_for_upload": false,
+    "requires_rebuild_after_account_configuration": true
+  },
+  "cover": {
+    "file": "publishing/workshop/gucheng_zhuxiao_workshop.jpg",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 605055,
+    "sha256": "220ab1bd4ea8156738f971ddff47535bab0df9f62da3b3f3e908dd5a6dc68749",
+    "method": "built-in imagegen; JPEG encoding copy",
+    "prompt": "publishing/workshop/cover_prompt.md"
+  },
+  "verification": {
+    "lua_test_access_assertions": 107,
+    "signed_handoff_tests": 14,
+    "runtime_manifest_tests": {"run": 20, "skipped": 1, "failed": 0},
+    "assembler_tests": 7,
+    "independently_repeated_node_tests": 31,
+    "backend_four_account_tests": 8,
+    "backend_wallet_batch_catalog_tests": 24,
+    "paired_ui_sources_compiled": 8,
+    "existing_user_changes_preserved_without_content_change": 102,
+    "native_final_candidate_test_performed": false,
+    "native_four_computer_test_performed": false
+  },
+  "cloud": {
+    "read_only_health_checked": true,
+    "archive_worker_slots": 4,
+    "configured_archive_endpoint": "http://127.0.0.1:8765",
+    "archive_https_gateway_and_trusted_host_auth_ready": false,
+    "remote_files_changed": false,
+    "database_migrated": false,
+    "services_restarted": false
+  },
+  "workshop": {
+    "listing_draft": "publishing/workshop/test_listing.json",
+    "mode_and_item_identity_confirmed": false,
+    "uploaded": false,
+    "visibility_changed": false
+  },
+  "follow_up": [
+    "Receive exactly four real SteamID64 strings and confirm first creation or the existing project Workshop item ID.",
+    "Configure the actual signed test runtime and isolated backend admission list; rebuild using a new release sequence.",
+    "Complete the official Tools handoff, restricted upload, and then subscribed-package testing in the requested order.",
+    "Provide an isolated archive HTTPS endpoint and trusted game-server authentication before claiming four-client cloud gameplay works."
+  ]
+}

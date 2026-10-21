@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-21",
+  "status": "LOCAL_GATE_TESTED_HOST_READ_ONLY_CHECKED",
+  "remote": {
+    "archive_release": "20261021-benefits-47accd81d922",
+    "archive_manifest_sha256": "39e845fd37a2966bbc57a616e661970a0736a0959ee9b00f2e1caf8ebdbae0fe",
+    "archive_bundle": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "archive_bundle_file_hash_matches": true,
+    "archive_service_active": true,
+    "archive_health_ok": true,
+    "archive_lua_worker_slots": 4,
+    "archive_bounded_http_server": true,
+    "payment_release": "20261018-checkout-gcoin-v1",
+    "payment_manifest_sha256": "754926e3e7ef11603e3070eb5304cb778f55a5c8b7dfcc370d8f2612dfda4303",
+    "payment_service_active": true,
+    "payment_health_ok": true,
+    "nginx_configuration_valid": true,
+    "nginx_server_names": ["pay.xiaofengnet.com"],
+    "nginx_local_proxy_ports": [8766],
+    "archive_https_route_present": false,
+    "remote_files_written": 0,
+    "database_queries": 0,
+    "player_profiles_read": 0,
+    "orders_created": 0,
+    "services_restarted": 0,
+    "credentials_exported": false
+  },
+  "opt_in_test_access": {
+    "environment_variable": "SURVIVAL_TEST_STEAM_IDS64",
+    "configuration": "Absent or blank leaves existing access unchanged. A nonblank value requires exactly four distinct valid public individual SteamID64 values separated by commas.",
+    "runtime_account_key": "Existing canonical decimal GetSteamAccountID string; SteamID64 is converted only when reading the host setting.",
+    "boundary": "FishingApplication._database_account_id before account SQL/RPC access",
+    "denial": "HTTP ApiError test_account_not_allowed, status 403",
+    "invalid_configuration": "Refuse archive startup before configuration sync",
+    "runtime_relaxation": "Refused; change the host setting and restart explicitly",
+    "configured_on_host": false,
+    "real_steam_ids_supplied": false,
+    "is_steam_identity_authentication": false,
+    "restrictions": "Account admission supplements trusted game-server Bearer authentication. It does not bind a physical computer or independently verify Steam identity."
+  },
+  "tests": {
+    "reproduction": {
+      "shell": "PowerShell",
+      "working_directory": "D:/SteamLibrary/steamapps/common/dota 2 beta/game/dota_addons/survival",
+      "python": "C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe",
+      "environment": {
+        "FISHING_BACKEND_ROOT": "D:/survival_database/backend",
+        "LUA_EXECUTABLE": "C:/Program Files/lua/bin/lua5.1.exe"
+      },
+      "pythonpath_required": false,
+      "commands": [
+        "$env:FISHING_BACKEND_ROOT='D:/survival_database/backend'",
+        "$env:LUA_EXECUTABLE='C:/Program Files/lua/bin/lua5.1.exe'",
+        "& 'C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe' -B -X utf8 -m unittest server.tests.test_four_player_test_access -v",
+        "& 'C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe' -B -X utf8 -m unittest server.tests.test_commerce server.tests.test_archive_endless_batch server.tests.test_lottery_catalog"
+      ],
+      "separate_processes_required": true,
+      "reason": "Use the two Python invocations exactly as separate processes. Combining these four suites in one invocation imports the external backend's regular tests package before the commerce suite's namespace import, producing an unrelated tests.test_archive_backend import collision. Do not add the external backend to PYTHONPATH for the commerce invocation; the suites use FISHING_BACKEND_ROOT when needed."
+    },
+    "server.tests.test_four_player_test_access": {"passed": 8, "failed": 0},
+    "wallet_batch_and_catalog": {
+      "suites": ["server.tests.test_commerce", "server.tests.test_archive_endless_batch", "server.tests.test_lottery_catalog"],
+      "passed": 24,
+      "failed": 0,
+      "uses_real_lua_worker": true,
+      "uses_live_database": false
+    },
+    "initial_broader_run": {
+      "tests_run": 83,
+      "errors": 4,
+      "preexisting_errors": [
+        "Two cold/scourge admission subtests and the cold-mode identity test expect unrestricted admission while the current implementation requires predecessor N10 clears.",
+        "The rich-mode actual HTTP test cannot import fishing_api.match_profiles from the old external D:/survival_database/backend source tree."
+      ],
+      "unrelated_rules_or_external_backend_modified": false
+    }
+  },
+  "wallet_review": {
+    "u_coin_supported": true,
+    "debit_inventory_and_effects_atomic": true,
+    "cash_payment_required_for_wallet_purchase": false,
+    "shop_gold_remains_paused": true,
+    "monthly_pass_is_existing_wallet_product": false
+  },
+  "workshop_blockers": [
+    "The addon HTTP rule still targets http://127.0.0.1:8765 and reads its existing trusted server token from a server ConVar. Valve-hosted games cannot reach this machine's localhost API.",
+    "The current public HTTPS proxy exposes payment routes only. A game archive HTTPS test endpoint and trusted server authentication/bootstrap are not configured.",
+    "Four real SteamID64 values are required before enabling the optional account list; this cannot strictly restrict four physical computers.",
+    "The ordinary lottery ticket has a gameplay-source description but no confirmed ordinary-ticket award in the production reward tables. Debug grants do not establish a release gameplay source."
+  ],
+  "native_four_computer_test_run": false,
+  "workshop_upload_performed": false,
+  "backend_deployment_performed": false
+}

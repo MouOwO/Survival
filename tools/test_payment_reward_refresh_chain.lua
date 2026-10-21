@@ -1,5 +1,6 @@
 -- Real payment -> profile -> inventory/lottery projections; only transports/engine are fixtures.
 package.path='scripts/vscripts/?.lua;'..package.path
+require("tests/development_release_profile")
 local bus,ev=require('core/event_bus'),require('core/events')
 local decoder,encoder=require('core/json_decoder'),require('core/json_encoder')
 local handlers,sent,http,fetches,lottery_reads={},{},{},{},{}
@@ -24,7 +25,7 @@ CustomGameEventManager={RegisterListener=function(_,name,fn)handlers[name]=fn en
  Send_ServerToPlayer=function(_,player,name,value)sent[#sent+1]={id=player.id,name=name,data=value} end}
 Convars={GetStr=function()return 'fixture_transport_token' end}
 Time=function()clock=clock+2;return clock end
-IsInToolsMode=function()return false end
+IsInToolsMode=function()return true end
 ListenToGameEvent=function()end
 CreateHTTPRequestScriptVM=function(method,url)
  local request={url=url}

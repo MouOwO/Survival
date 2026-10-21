@@ -1,4 +1,5 @@
 local event_bus = require("core/event_bus")
+local test_access_policy = require("core/test_access_policy")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local building_system = require("systems/building_system")
@@ -243,6 +244,7 @@ local function valid_player_id(player_id, allow_defeated, difficulty_selection)
     if player_id == nil or player_id < 0 or not PlayerResource:IsValidPlayerID(player_id) then
         return false
     end
+    if not test_access_policy.enforce(player_id) then return false end
     if not allow_defeated and require("systems/player_context_service").is_defeated(player_id) then return false end
     -- Custom events bypass engine unit-order filters. Hold all gameplay UI
     -- requests (building, rewards, etc.) behind the same barrier. Choosing a

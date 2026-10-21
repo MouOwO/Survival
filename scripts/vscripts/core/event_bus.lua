@@ -1,3 +1,4 @@
+local test_access_policy = require("core/test_access_policy")
 local M = {}
 
 local subscribers = {}
@@ -131,6 +132,13 @@ function M.handle_request(event_name, handler)
 end
 
 function M.request(event_name, payload)
+    -- World/system requests without an actor keep their normal semantics.
+    -- Restricted tests must also close internal reward/resource/purchase paths
+    -- while an unadmitted client is waiting for the engine disconnect.
+    if test_access_policy.enabled() and type(payload) == "table" and payload.player_id ~= nil
+        and not test_access_policy.enforce(payload.player_id) then
+        return { ok = false, error = "test_access_denied" }, "test_access_denied"
+    end
     local handler = request_handlers[event_name]
     if not handler then
         return nil, "no_request_handler:" .. tostring(event_name)

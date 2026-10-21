@@ -1,4 +1,5 @@
 local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
+local test_access_policy = require("core/test_access_policy")
 local multiplayer_rules = require("config/generated/multiplayer_rules")
 
 local function configured_max_players()
@@ -243,6 +244,8 @@ local pending_loading_heroes = {}
 local game_started_emitted = false
 
 local function configure_game_rules()
+    local access_ready, access_error = test_access_policy.enforce_connected()
+    assert(access_ready, "restricted test access unavailable: " .. tostring(access_error))
     local launch_rules_applied, launch_error = configure_survival_launch_rules()
     if not launch_rules_applied then
         error("survival launch rules unavailable during Activate: "
@@ -279,6 +282,7 @@ end
 local function on_player_connected(keys)
     local player_id, resolution, userid =
         multiplayer_player_service.resolve_player_id(keys)
+    if not test_access_policy.enforce(player_id) then return end
     local assigned, assignment_error =
         multiplayer_player_service.assign_to_survival_team(
             player_id,
@@ -341,6 +345,8 @@ local function initialize_survival_hero(hero)
     if not hero or hero:IsNull() then
         return
     end
+    local player_id = hero:GetPlayerOwnerID()
+    if not test_access_policy.enforce(player_id) then return end
 
     local loading = require("systems/startup_loading_service")
     if not loading.is_gameplay_ready() then
@@ -355,7 +361,6 @@ local function initialize_survival_hero(hero)
         return
     end
 
-    local player_id = hero:GetPlayerOwnerID()
     if multiplayer_player_service.reject_defeated_unit(hero) then return end
     -- The released roster is fixed; a late, unauthenticated arrival must not
     -- acquire a builder merely because the other players already started.
@@ -400,6 +405,7 @@ local function on_hero_picked(keys)
     if multiplayer_player_service.reject_defeated_unit(hero) then return end
 
     local player_id = hero:GetPlayerOwnerID()
+    if not test_access_policy.enforce(player_id) then return end
     -- deletehero owns this hidden native carrier. A late hero-picked event
     -- must not force another hero replacement or initialize another builder.
     if hero.survival_deleted_hero_placeholder == true then
@@ -435,6 +441,10 @@ end
 local function on_npc_spawned(keys)
     local unit = keys.entindex
         and EntIndexToHScript(keys.entindex) or nil
+    if unit and not unit:IsNull() and type(unit.GetPlayerOwnerID) == "function" then
+        local owner = unit:GetPlayerOwnerID()
+        if owner and owner >= 0 and not test_access_policy.enforce(owner) then return end
+    end
     if unit and not unit:IsNull() and multiplayer_player_service.reject_defeated_unit(unit) then return end
     hero_summon_system.on_npc_spawned(unit)
     if not unit or unit:IsNull()
@@ -552,6 +562,7 @@ local function on_item_picked_up(keys)
         ))
         return
     end
+    if not test_access_policy.enforce(hero:GetPlayerOwnerID()) then return end
 
     print(string.format(
         "[ITEM_PICKUP_HERO_RESOLVED] player=%s hero=%s source=%s item=%s slot=%s",
@@ -1049,6 +1060,8 @@ function M.activate()
     if initialized then
         return
     end
+    local access_ready, access_error = test_access_policy.init()
+    assert(access_ready, "restricted test access unavailable: " .. tostring(access_error))
     initialized = true
     replacing_forced_hero = {}
     ready_hero_entindex_by_player = {}

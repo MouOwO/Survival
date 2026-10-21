@@ -9,7 +9,7 @@ $.Schedule=(delay,fn)=>{scheduled.push({delay,fn});return scheduled.length;};
 $.DispatchEvent=(name,url)=>urls.push(url);
 $.GetContextPanel=()=>$("#Root");$.CancelScheduled=()=>{};
 let topLayer=null;
-const config={SurvivalUI:{},RemainingHandoff:{},SurvivalUILayers:{Open:(id)=>topLayer=id,Close:()=>topLayer=null,Top:()=>topLayer}};
+const config={SurvivalDevelopmentPayments:true,SurvivalUI:{},RemainingHandoff:{},SurvivalUILayers:{Open:(id)=>topLayer=id,Close:()=>topLayer=null,Top:()=>topLayer}};
 // This fixture exercises payment state; actual shared-modal geometry is covered by the XML fixture.
 config.SurvivalUI={ModalShell:{Adopt(props){
  assert.equal(props.id,"payment_shop");assert.equal(props.width,580);assert.equal(props.height,334);assert.equal(props.panel,$("#PaymentDialog"));

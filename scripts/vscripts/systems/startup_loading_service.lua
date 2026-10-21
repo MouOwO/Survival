@@ -4,6 +4,7 @@ local profiles = require("systems/player_profile_service")
 local multiplayer = require("systems/multiplayer_player_service")
 local assets = require("systems/startup_asset_preload_service")
 local match_setup = require("systems/match_setup_service")
+local test_access_policy = require("core/test_access_policy")
 
 local M = {}
 local generation, session_id, started_at = 0, "", 0
@@ -54,6 +55,7 @@ end
 
 local function human(id)
     if not resource("IsValidPlayerID", id) then return false end
+    if not test_access_policy.enforce(id) then return false end
     if resource("IsFakeClient", id) then return false end
     local team = resource("GetTeam", id)
     if team == (DOTA_TEAM_SPECTATOR or 1) then return false end

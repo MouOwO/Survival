@@ -1,13 +1,9 @@
 "AddonInfo"
 {
-    "maps"              "template_map survival_c6"
+    "maps"              "template_map"
     "IsPlayable"        "1"
     "EnablePickRules"   "0"
     "template_map"
-    {
-        "MaxPlayers"    "4"
-    }
-    "survival_c6"
     {
         "MaxPlayers"    "4"
     }

@@ -74,7 +74,7 @@ function harness() {
     $.CreatePanel = (type, parent, id) => new Panel(type, parent, id);
     $.Schedule = (delay, fn) => { timers.push({delay, fn}); return timers.length; };
     $.CancelScheduled = $.DispatchEvent = $.Msg = () => {};
-    const cfg = {RemainingHandoff: {}};
+    const cfg = {SurvivalDevelopmentPayments:true,RemainingHandoff: {}};
     const modal = () => ({Open() {}, Close() {}, Dispose() {}});
     cfg.SurvivalUI = {
         ModalShell: {Adopt: modal},

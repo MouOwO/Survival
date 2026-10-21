@@ -6,7 +6,7 @@ function $(id){return panels[id]||(panels[id]=panel());}
 $.CreatePanel=(_,parent)=>{const p=panel();p.parent=parent;parent.children.push(p);return p;};
 $.Schedule=(delay,fn)=>{scheduled.push({delay,fn});return scheduled.length;};
 $.DispatchEvent=()=>assert.fail("confirmation cannot launch a browser");
-const cfg={SurvivalDaily:{Close(){closedDaily++;}}};
+const cfg={SurvivalDevelopmentPayments:true,SurvivalDaily:{Close(){closedDaily++;}}};
 const scope={$,GameUI:{CustomUIConfig:()=>cfg},GameEvents:{Subscribe:(name,fn)=>events[name]=fn,Unsubscribe(){},SendCustomGameEventToServer:(name,payload)=>requests.push({name,...payload})}};
 vm.runInNewContext(fs.readFileSync("panorama/src/scripts/custom_game/payment_test.js","utf8"),scope);
 const sku="archive_pass_monthly",monthly={sku,title:"签到月卡（30天）",amount_fen:2000,u_coin_price:20000,u_coin_per_yuan:1000,enabled:1,purchase_limit:0,description:"20元开通30天，续费保留剩余天数",reward_lines:[{kind:"entitlement",id:"archive_pass",quantity:1,duration_days:30,label:"签到月卡30天"}]};
@@ -119,7 +119,7 @@ function lifecycleHarness(){
  function lookup(id){return nodes[id]||(nodes[id]=nativePanel());}
  lookup.GetContextPanel=()=>lookup("#Root");lookup.CreatePanel=(type,parent)=>nativePanel(type,parent);
  lookup.Schedule=(delay,fn)=>{jobs.push({delay,fn});return jobs.length;};lookup.CancelScheduled=()=>{};lookup.DispatchEvent=()=>assert.fail("lifecycle checks never open a browser");lookup.Msg=()=>{};
- const config={SurvivalDaily:{Close(){closed++;}},SurvivalUI:{ModalShell:{Adopt(){
+ const config={SurvivalDevelopmentPayments:true,SurvivalDaily:{Close(){closed++;}},SurvivalUI:{ModalShell:{Adopt(){
   const modal={throwOnClose:false,Open(){},Close(){if(this.throwOnClose)throw Error("Underlying panel is deleted");},Dispose(){this.Close();}};modals.push(modal);return modal;
  }}}};
  const context=vm.createContext({$:lookup,GameUI:{CustomUIConfig:()=>config},GameEvents:{
