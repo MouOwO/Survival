@@ -363,6 +363,8 @@ local function research_upgrade(ability_name, state, resources)
     prerequisite_met = prerequisite_met
         and (tonumber(state.reincarnation_level) or 0)
             >= (tonumber(required.reincarnation_level) or 0)
+    local description = research_description.sections(definition, current,
+        target > maximum and current or target)
     if target > maximum then
         return {
             completed = current >= maximum and 1 or 0,
@@ -382,6 +384,9 @@ local function research_upgrade(ability_name, state, resources)
             research_status_code = current >= maximum and "max_level" or "queued_max_level",
             status_text = current >= maximum and "科技已满级" or "已排队至最高等级",
             upgrade_description = research_description.build(definition, current, current),
+            research_effect_description = description.research_effect_description,
+            current_effect_text = description.current_effect_text,
+            next_effect_text = description.next_effect_text,
             cost_wood = 0,
             cost_gold = 0,
             research_effect_current = research_effect_value(definition, current),
@@ -402,16 +407,14 @@ local function research_upgrade(ability_name, state, resources)
     if not prerequisite_met then
         available = false
         status_code = "prerequisite_not_met"
-        status = "前置科技或转职要求未满足，不能加入研究队列"
+        status = "前置科技或转职要求未满足"
     elseif queue_count >= queue_capacity then
         available = false
         status_code = "research_queue_full"
-        status = "研究队列已满（1个研究中＋6个等待）"
+        status = "研究队列已满"
     elseif queue_count > 0 then
         status_code = "queue_available"
-        status = "可加入研究队列；开始研究时扣费"
-    else
-        status = "可以研究；开始研究时扣费"
+        status = "可以研究"
     end
     local data = {
         research_upgrade = 1,
@@ -431,7 +434,6 @@ local function research_upgrade(ability_name, state, resources)
         research_queue_count = queue_count,
         research_queue_capacity = queue_capacity,
         reserved_level = reserved,
-        cost_timing_text = "开始研究时扣费，排队未扣费",
         display_name = mapping.display_name,
         available = available and 1 or 0,
         current_level = current,
@@ -439,8 +441,10 @@ local function research_upgrade(ability_name, state, resources)
         max_level = maximum,
         research_status_code = status_code,
         status_text = status,
-        upgrade_description = research_description.build(definition, current, target)
-            .. "\n加入研究队列，开始研究时扣费。",
+        upgrade_description = research_description.build(definition, current, target),
+        research_effect_description = description.research_effect_description,
+        current_effect_text = description.current_effect_text,
+        next_effect_text = description.next_effect_text,
         fields = research_description.fields(definition, current, target),
         research_effect_current = research_effect_value(definition, current),
         research_effect_next = research_effect_value(definition, target),

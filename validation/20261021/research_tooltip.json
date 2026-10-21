@@ -1,0 +1,46 @@
+{
+  "status": "PASS",
+  "changes": {
+    "research_details": "Retain only 当前累计 with both label and value left aligned; remove fee timing, automatic research and other detail rows.",
+    "description": "Separate per-level effect, current level and after-upgrade lines; omit a nonexistent next-level line at maximum level.",
+    "removed_implementation_notes": true,
+    "status_language": "Chinese",
+    "cost_and_level_retained": true,
+    "meaningful_gameplay_limits_retained": true
+  },
+  "checks": {
+    "research_hover_tests": 6,
+    "merged_working_tree_frontend_tests": 8,
+    "lua_tests": 4,
+    "technology_definitions": 19,
+    "cost_queue_prerequisite_timer_and_automation_behaviour_preserved": true,
+    "old_runtime_compatibility": true,
+    "pooled_row_reuse_and_non_research_skills_verified": true,
+    "css_left_alignment_checked": true,
+    "native_compilations": 2,
+    "native_javascript_data_matches_source": true,
+    "native_css_source_crc_verified": true
+  },
+  "active_path": "ability_tooltip.js; full HUD takeover is disabled and excludes both research buildings",
+  "concurrent_change_review": {
+    "base_head": "2486139b8b078f8edddf8d8e72da4ec21e942fe3",
+    "population_training": "Already committed changes preserved in task snapshot.",
+    "committed_text_alignment": "Committed parallel text-only alignment is preserved; all other working changes remain outside this task."
+  },
+  "task_sha256": {
+    "panorama/src/scripts/custom_game/ability_tooltip.js": "2fba1657ed3a1371484cdaa02b2e8b683a06b53acafbaaf2823c6fe7163b598f",
+    "panorama/src/styles/custom_game/ability_tooltip.css": "ecc3294f548b3a50ee244b49f1bceb31839a54657366e06f54b27ed070659792",
+    "scripts/vscripts/ui/ability_runtime_builder.lua": "6924626727d724ece8cbae76a9e3a843f3171cf2cf3d010ba5ad25f78cc9b205",
+    "scripts/vscripts/research/research_technology_description.lua": "41d13d1d6f60e8029b8da26b47a862d5a2e8b15cb12c594869259e9af4daddb1",
+    "scripts/vscripts/tests/test_research_tooltip_description.lua": "82c8eb92f9f4c0c383f5c327898eaf4ff8e1a402431743c21196ffff25359f34",
+    "tools/tests/research_tooltip_display.test.cjs": "d0a12c46b38d99b7ec7e4e429b7ee99b4370573d4242c26919d0f2240bdc1d4d"
+  },
+  "native_sha256": {
+    "panorama/scripts/custom_game/ability_tooltip.vjs_c": "5fe8cfaa94559777c81a323ce1c644ee1897488bebbc38b64e0f9fd24fb3ad94",
+    "panorama/styles/custom_game/ability_tooltip.vcss_c": "364bdf63ded0824c5c40a056fba1774bccf45f07a78ae199349e02eccb33fa70"
+  },
+  "browser_screenshot_verified": false,
+  "visual_limit": "Local Chrome debugging endpoint unavailable; actual render and CSS tests passed. No game screenshot was claimed.",
+  "remote_deployment_actions": 0,
+  "archive_bundle_or_seed_changed": false
+}
