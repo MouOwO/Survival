@@ -122,7 +122,9 @@ for(const id of ['endless_51','endless_82']) {
  const parent=new Panel('Panel');cfg.ArchiveHandoff.Icon(parent,{id},'endless',{});
  const art=parent.children.find(p=>p.BHasClass('ArchiveArt'));assert(art);
  assert(art.children[0].BHasClass('ArchiveEndlessEmblem'));
- assert.equal(art.children[0].children.length,2);
+ assert.equal(art.children[0].paneltype,'Image');
+ assert.equal(art.children[0].image,'s2r://panorama/images/status_icons/infinity_png.vtex');
+ assert.equal(art.children[0].children.length,0);
 }
 assert.equal(catalog.filter(r=>r.category_id==='endless').length,82);
 console.log('ARCHIVE_ENDLESS_UI_PASS: 82 mapped icons, floor short names, shared readable counter layout');

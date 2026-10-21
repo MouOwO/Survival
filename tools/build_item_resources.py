@@ -54,6 +54,13 @@ function grade(item){
 }
 function applyBackground(icon,item){
     if(!icon||icon.IsValid&&!icon.IsValid()||!icon.style)return icon;
+    // Endless archive entries use a transparent status symbol, not an item tile.
+    var row=lookup(item);
+    if(row&&row.kind==="endless_emblem"){
+        icon.style.backgroundImage="none";icon.style.backgroundColor="transparent";
+        icon.style.border="0px";icon.__survivalItemGrade="";
+        return icon;
+    }
     var quality=grade(item),colors=gradeColors[quality];
     icon.style.backgroundImage='url("'+backgroundURI+'")';
     icon.style.backgroundSize="100% 100%";icon.style.backgroundRepeat="no-repeat";
@@ -69,7 +76,7 @@ function fillIcon(icon,item){
     // or change rarity while retaining the same item/image identity.
     applyBackground(icon,item||icon.__itemResourceId);
     var row=lookup(item)||lookup(icon.__itemResourceId);
-    if(row&&row.kind!=="image"&&row.kind!=="hero")return icon;
+    if(row&&row.kind!=="image"&&row.kind!=="hero"&&row.kind!=="endless_emblem")return icon;
     var fit=row&&row.fit==="contain"?"contain":"cover";
     if(icon.SetScaling&&icon.__survivalItemFill!==fit){
         icon.SetScaling(fit==="contain"?"stretch-to-fit-preserve-aspect":"stretch-to-cover-preserve-aspect");icon.__survivalItemFill=fit;

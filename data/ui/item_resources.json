@@ -3780,657 +3780,1067 @@
       "id": "endless_1",
       "name": "无尽存档1",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_10",
       "name": "无尽存档10",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_11",
       "name": "无尽存档11",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_12",
       "name": "无尽存档12",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_13",
       "name": "无尽存档13",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_14",
       "name": "无尽存档14",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_15",
       "name": "无尽存档15",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_16",
       "name": "无尽存档16",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_17",
       "name": "无尽存档17",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_18",
       "name": "无尽存档18",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_19",
       "name": "无尽存档19",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_2",
       "name": "无尽存档2",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_20",
       "name": "无尽存档20",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_21",
       "name": "无尽存档21",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_22",
       "name": "无尽存档22",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_23",
       "name": "无尽存档23",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_24",
       "name": "无尽存档24",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_25",
       "name": "无尽存档25",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_26",
       "name": "无尽存档26",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_27",
       "name": "无尽存档27",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_28",
       "name": "无尽存档28",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_29",
       "name": "无尽存档29",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_3",
       "name": "无尽存档3",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_30",
       "name": "无尽存档30",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_31",
       "name": "无尽存档31",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_32",
       "name": "无尽存档32",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_33",
       "name": "无尽存档33",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_34",
       "name": "无尽存档34",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_35",
       "name": "无尽存档35",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_36",
       "name": "无尽存档36",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_37",
       "name": "无尽存档37",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_38",
       "name": "无尽存档38",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_39",
       "name": "无尽存档39",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_4",
       "name": "无尽存档4",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_40",
       "name": "无尽存档40",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_41",
       "name": "无尽存档41",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_42",
       "name": "无尽存档42",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_43",
       "name": "无尽存档43",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_44",
       "name": "无尽存档44",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_45",
       "name": "无尽存档45",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_46",
       "name": "无尽存档46",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_47",
       "name": "无尽存档47",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_48",
       "name": "无尽存档48",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_49",
       "name": "无尽存档49",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_5",
       "name": "无尽存档5",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_50",
       "name": "无尽存档50",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_51",
       "name": "无尽层数10",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_52",
       "name": "无尽层数20",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_53",
       "name": "无尽层数30",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_54",
       "name": "无尽层数40",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_55",
       "name": "无尽层数50",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_56",
       "name": "无尽层数60",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_57",
       "name": "无尽层数70",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_58",
       "name": "无尽层数80",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_59",
       "name": "无尽层数90",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_6",
       "name": "无尽存档6",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_60",
       "name": "无尽层数100",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_61",
       "name": "无尽层数110",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_62",
       "name": "无尽层数120",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_63",
       "name": "无尽层数130",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_64",
       "name": "无尽层数140",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_65",
       "name": "无尽层数150",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_66",
       "name": "无尽层数160",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_67",
       "name": "无尽层数170",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_68",
       "name": "无尽层数180",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_69",
       "name": "无尽层数200",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_7",
       "name": "无尽存档7",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_70",
       "name": "无尽层数220",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_71",
       "name": "无尽层数240",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_72",
       "name": "无尽层数260",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_73",
       "name": "无尽层数280",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_74",
       "name": "无尽层数300",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_75",
       "name": "无尽层数320",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_76",
       "name": "无尽层数340",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_77",
       "name": "无尽层数360",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_78",
       "name": "无尽层数380",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_79",
       "name": "无尽层数400",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_8",
       "name": "无尽存档8",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_80",
       "name": "无尽层数420",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_81",
       "name": "无尽层数440",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_82",
       "name": "无尽层数460",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_9",
       "name": "无尽存档9",
       "kind": "endless_emblem",
-      "uri": "s2r://panorama/images/custom_game/archive_gpu_regular/portrait_achievement_closeup.vtex",
+      "uri": "s2r://panorama/images/status_icons/infinity_png.vtex",
       "aliases": [],
-      "category_id": "endless"
+      "category_id": "endless",
+      "source_size": [
+        64,
+        64
+      ],
+      "fit": "contain"
     },
     {
       "id": "endless_rebirth",

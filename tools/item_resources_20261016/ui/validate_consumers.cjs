@@ -58,8 +58,10 @@ for(const item of muramasa.filter(v=>typeof v==='object')){
 }
 const spirit=resource.Resolve({sku:'video_p151'});assert(spirit&&spirit!==expected,'Different katana SKU retains its own identity');
 const endless=presentation.CreateRegisteredIcon(backing,{id:'endless_51'},'ActualEndless');
-assert(endless.BHasClass('ArchiveEndlessEmblem'));assert.equal(endless.Children().length,2);
-assert(endless.Children().every(r=>r.BHasClass('ArchiveEndlessRing')),'The shared factory preserves both endless rings');
+assert(endless.BHasClass('ArchiveEndlessEmblem'));assert.equal(endless.Children().length,0);
+assert.equal(endless.paneltype,'Image');assert.equal(endless.image,'s2r://panorama/images/status_icons/infinity_png.vtex');
+assert.equal(endless.scaling,'stretch-to-fit-preserve-aspect');
+assert.equal(endless.style.backgroundImage,'none','The official status icon retains its transparent background');
 const unknown=presentation.CreateIcon(backing,{id:'not_a_formal_item',icon_type:'ability',icon:'test_unknown_ability'},'Fallback');assert.equal(unknown.paneltype,'DOTAAbilityImage');assert.equal(unknown.abilityname,'test_unknown_ability');
 cfg.SurvivalItemResources={Lookup:()=>({id:'isolated_hero',kind:'hero',hero_name:'npc_dota_hero_wisp',uri:'not-used'})};
 const hero=presentation.CreateRegisteredIcon(backing,{},'HeroResource');assert.equal(hero.paneltype,'DOTAHeroImage');assert.equal(hero.heroname,'npc_dota_hero_wisp');assert.equal(hero.image,undefined);
@@ -72,5 +74,5 @@ for(const file of ['archive.xml','survival_hud.xml','payment_test.xml','rogue_re
  assert.equal(scripts.filter(v=>v==='common/item_resources.js').length,1,file+' loads one registry');
  for(const consumer of ['reward_presentation.js','item_art_remaining_5d5c1152eb.js','common/commerce_components.js','native_ui_icons.js'])if(scripts.includes(consumer))assert(scripts.indexOf('common/item_resources.js')<scripts.indexOf(consumer),file+' loads registry before '+consumer);
 }
-const report={status:'PASS',sourceHash:resource.sourceHash,syntheticPanels:true,notGameCapture:true,productCount:products.size,products:results,muramasa:expected,distinctSpiritKatana:spirit,checks:['all formal wallet/cash products share canonical card/market art and real VIP numbers','server images cannot redirect registered goods','Muramasa commerce/archive/lottery identity consistency','distinct spirit katana identity','hero panel kind retained','endless shared two-ring emblem retained','layered title retains its dedicated renderer','unknown native ability fallback retained','XML loads one registry before consumers'],sources:loaded};
+const report={status:'PASS',sourceHash:resource.sourceHash,syntheticPanels:true,notGameCapture:true,productCount:products.size,products:results,muramasa:expected,distinctSpiritKatana:spirit,checks:['all formal wallet/cash products share canonical card/market art and real VIP numbers','server images cannot redirect registered goods','Muramasa commerce/archive/lottery identity consistency','distinct spirit katana identity','hero panel kind retained','endless official infinity status icon retained','layered title retains its dedicated renderer','unknown native ability fallback retained','XML loads one registry before consumers'],sources:loaded};
 const out=path.join(repo,'design_refs/item_resources_20261016');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'ui_consumer_validation.json'),JSON.stringify(report,null,2));console.log('ITEM_RESOURCE_UI_CONSUMERS_PASS '+products.size+' products');
