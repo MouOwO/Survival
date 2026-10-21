@@ -22,10 +22,13 @@ local function rich_position(id)
     return Vector(500 + (id % 2 - .5) * 192, -900 + (math.floor(id / 2) - .5) * 192, 96)
 end
 package.loaded["config/mode_spawn_config"] = {map_name="fixture",modes={rich={
-    bounds={min_x=-10000,max_x=10000,min_y=-10000,max_y=10000},monster_markers={
+    bounds={min_x=-10000,max_x=10000,min_y=-10000,max_y=10000},player_markers={
+        [0]="mode_rich_player_0_spawn",[1]="mode_rich_player_1_spawn",
+        [2]="mode_rich_player_2_spawn",[3]="mode_rich_player_3_spawn"},monster_markers={
         [0]="mode_rich_monster_0_spawn",[1]="mode_rich_monster_1_spawn",
         [2]="mode_rich_monster_2_spawn",[3]="mode_rich_monster_3_spawn"}}}}
-GridNav={IsTraversable=function() return true end,IsBlocked=function() return false end}
+GridNav={IsTraversable=function() return true end,IsBlocked=function() return false end,
+    CanFindPath=function() return true end}
 local mode_spawns=require("systems/mode_spawn_service")
 local resolve_wave=mode_spawns.wave_marker
 mode_spawns.wave_marker=function(id)
@@ -34,6 +37,11 @@ mode_spawns.wave_marker=function(id)
     return resolve_wave(id)
 end
 Entities.FindByName = function(self, previous, name)
+    local player_id=tonumber(name:match("^mode_rich_player_(%d+)_spawn$"))
+    if player_id then
+        return {IsNull=function() return false end,GetAbsOrigin=function()
+            return Vector(-1000,rich_position(player_id).y,96) end}
+    end
     local id=tonumber(name:match("^mode_rich_monster_(%d+)_spawn$"))
     if id then
         rich_marker_reads = rich_marker_reads + 1

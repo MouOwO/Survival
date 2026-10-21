@@ -68,6 +68,12 @@ return {
                 [2] = { min_x = -15360, min_y = 3584, max_x = -12800, max_y = 6656 },
                 [3] = { min_x = -15232, min_y = -256, max_x = -12800, max_y = 2560 },
             },
+            monster_bounds = {
+                [0] = { min_x = -10752, min_y = 12672, max_x = -9984, max_y = 13440 },
+                [1] = { min_x = -10752, min_y = 8832, max_x = -9984, max_y = 9600 },
+                [2] = { min_x = -10496, min_y = 4736, max_x = -9728, max_y = 5504 },
+                [3] = { min_x = -10496, min_y = 640, max_x = -9728, max_y = 1408 },
+            },
         },
     },
 }

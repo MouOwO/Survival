@@ -888,13 +888,18 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         return
     end
     monster_spawn_marker = marker
-    local position
-    if channel and type(wave_spawn_routing.position) == "function" then
+    local collision_profile = wave_monster_collision.profile(row, definition, true)
+    local spawn_radius = collision_profile.base_hull_radius * (tonumber(monster_hull_multiplier) or 1)
+    local position, placement_error
+    if dedicated_region_mode() then
+        position, placement_error = require("systems/mode_spawn_service").wave_position(channel, spawn_radius)
+    elseif channel and type(wave_spawn_routing.position) == "function" then
         position = wave_spawn_routing.position(channel)
     else position = marker:GetAbsOrigin() end
     if not position then
         state.failed_spawn = state.failed_spawn + 1
-        release_wave_model_resources(session, "spawn_route_missing")
+        publish(placement_error or "spawn_route_missing", channel and channel.player_id)
+        release_wave_model_resources(session, placement_error or "spawn_route_missing")
         check_final_victory()
         return
     end
@@ -939,7 +944,6 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
     monster_navigation.apply(unit)
     team_alignment.enforce(unit, DOTA_TEAM_BADGUYS, "wave_enemy")
     monster_corpse_lifecycle_service.track(unit, "wave")
-    local collision_profile = wave_monster_collision.profile(row, definition, true)
     -- Unknown/new archetypes and configured native skills keep the original
     -- cap installation point, before passive skill initialization.
     local defer_attack_cap = not class_ticket and definition.native_attack_speed_policy == "bat_only_v1"
@@ -1010,19 +1014,19 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         wall_target_player_id = channel and channel.player_id or nil,
         no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
     })
-    FindClearSpaceForUnit(unit, position, true)
     if dedicated_region_mode() then
-        local allowed = require("systems/mode_spawn_service").validate_position(unit:GetAbsOrigin())
+        local allowed, invalid = require("systems/mode_spawn_service").place_wave_unit(unit, channel, position, spawn_radius)
         if not allowed then
             unit.survival_wave_cleanup = true
             pcall(monster_hero_visual_service.clear, unit)
             if UTIL_Remove then pcall(UTIL_Remove, unit) end
             state.failed_spawn = state.failed_spawn + 1
-            release_wave_model_resources(session, "spawn_outside_mode_region")
+            publish(invalid or "spawn_outside_mode_region", channel and channel.player_id)
+            release_wave_model_resources(session, invalid or "spawn_outside_mode_region")
             check_final_victory()
             return
         end
-    end
+    else FindClearSpaceForUnit(unit, position, true) end
     local is_assault_boss = row.member_role == "assault_boss"
         or (row.member_role == nil and row.is_boss == true)
     unit.survival_is_boss = is_assault_boss
@@ -1949,10 +1953,14 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
     local channel = player_id and wave_channels[player_id] or nil
     local marker = channel and channel.marker or nil
     if not marker then return nil, "player_wave_spawn_marker_missing" end
-    local position
-    if type(wave_spawn_routing.position) == "function" then position = wave_spawn_routing.position(channel)
+    local spawn_profile = wave_monster_collision.profile({is_challenge_monster = true}, definition, definition.endless == true)
+    local spawn_radius = spawn_profile.base_hull_radius
+    local position, placement_error
+    if dedicated_region_mode() then
+        position, placement_error = require("systems/mode_spawn_service").wave_position(channel, spawn_radius)
+    elseif type(wave_spawn_routing.position) == "function" then position = wave_spawn_routing.position(channel)
     else position = marker:GetAbsOrigin() end
-    if not position then return nil, "player_wave_spawn_route_missing" end
+    if not position then return nil, placement_error or "player_wave_spawn_route_missing" end
     position.z = GetGroundHeight(position, nil) + 32
     local unit = CreateUnitByName(
         definition.unit_name,
@@ -2009,11 +2017,10 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
             wall_target_player_id = player_id,
             no_unit_collision = collision_profile.no_unit_collision and 1 or 0,
         })
-        FindClearSpaceForUnit(unit, position, true)
         if dedicated_region_mode() then
-            local allowed, invalid = require("systems/mode_spawn_service").validate_position(unit:GetAbsOrigin())
+            local allowed, invalid = require("systems/mode_spawn_service").place_wave_unit(unit, channel, position, spawn_radius)
             if not allowed then error(invalid or "challenge_spawn_outside_mode_region") end
-        end
+        else FindClearSpaceForUnit(unit, position, true) end
     end)
     if not setup_ok then
         unit.survival_wave_cleanup = true

@@ -1,0 +1,105 @@
+{
+  "status": "PASS",
+  "water_cleanup": {
+    "method": "Clear native automatic decorations only on pure water; retain coastline-sharing samples",
+    "cleared": {
+      "objectsTileSet": 1196,
+      "objectsPropType": 1,
+      "objectsPlantType": 995,
+      "objectsTreeType": 6,
+      "objectsTreeSize": 1,
+      "objectsRotation": 1541,
+      "objectsPitch": 0,
+      "objectsVariationId": 1002,
+      "objectConfiguration": 1002,
+      "objectConfigurationByName": 2,
+      "grassOpacity": 28440
+    },
+    "changed_object_sites": 1551,
+    "after_compilation_remaining_token_edits": 0,
+    "latest_saved_hammer_edits_preserved": true,
+    "entities_meshes_ground_water_and_navigation_not_changed_by_cleanup": true
+  },
+  "compilation": {
+    "compiled": 301,
+    "failed": 0,
+    "skipped": 1,
+    "crc_entries": 306,
+    "source_crc32": 736803486,
+    "source_sha256": "f9bece0055aa10a0ac127ae5c47e40fd752878b08fc4d3cfcc96483a2217d70d",
+    "package_sha256": "5f1dedad67c05440eee9b915924f10dbc12503b059809f007139d1570bf0221d",
+    "source_unchanged_during_final_compile": true,
+    "earlier_compile_superseded": "Saved and closed the open Hammer document, retained its latest edits, then reapplied cleanup and rebuilt"
+  },
+  "native_spawn_checks": {
+    "modes": [
+      "rich",
+      "cold",
+      "scourge"
+    ],
+    "channels": 12,
+    "samples": 1536,
+    "radii": [
+      32,
+      64
+    ],
+    "scourge_distinct_points_per_64_draws": {
+      "0": [
+        64,
+        64
+      ],
+      "1": [
+        64,
+        64
+      ],
+      "2": [
+        64,
+        64
+      ],
+      "3": [
+        64,
+        64
+      ]
+    },
+    "geometry_matches_final_compile_baseline": true,
+    "real_match_mode_unchanged": true
+  },
+  "native_scourge_movement": {
+    "units": 8,
+    "passed": 8,
+    "radius_per_owner": [
+      32,
+      64
+    ],
+    "distance_min": 840.9363776674,
+    "distance_max": 1129.3367657901,
+    "method": "Native creature initial-goal pathing in a Tools-only probe",
+    "scope": "Independent landing/path test; normal orders are blocked by the unselected startup gate; not a formal combat wave",
+    "removed_units": 8,
+    "removed_test_targets": 4
+  },
+  "native_portals": {
+    "modes": 3,
+    "portals": 12,
+    "ground_clearance": 12,
+    "xy_error_max": 0,
+    "z_error_max": 0,
+    "facing_up": true,
+    "original_standard_portals_restored_after_probe": true
+  },
+  "regressions": {
+    "water_cleanup_fixture": "PASS",
+    "mode_spawn_config_generation": "PASS",
+    "mode_spawn_safety": "PASS",
+    "valley_portal_lifecycle": "PASS",
+    "mode_spawn_regions": "PASS",
+    "rich_wave_spawning_1200_transactions": "PASS",
+    "monster_ground_navigation": "PASS",
+    "wave_population_endgame": "PASS"
+  },
+  "delivery": {
+    "game_branch": "dev",
+    "content_branch": "master",
+    "both_repository_stashes_restored": true
+  }
+}
