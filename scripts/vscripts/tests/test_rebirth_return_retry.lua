@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Integrated shop -> rebirth spawn -> F2 -> retry lifecycle, with engine-only
 -- stubs. Run from the addon root with Lua 5.1+.
 package.path = "scripts/vscripts/?.lua;" .. package.path

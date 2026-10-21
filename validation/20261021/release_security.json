@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-21",
+  "task": "reference quarantine, production cheat gate, release integrity and source/data protection",
+  "quarantine": {
+    "files": 21,
+    "bytes": 61300079,
+    "directory": "D:\\Survival_待删除\\20261021_security_01",
+    "manifest": "D:\\Survival_待删除\\20261021_security_01\\quarantine_manifest.json",
+    "restore_dry_run": {
+      "files": 21,
+      "conflicts": 0
+    },
+    "rule": "Preserve referenced files, internal reference islands and dynamic directories; no permanent deletion."
+  },
+  "production_cheats": {
+    "default_profile": "production",
+    "development_rule": "development AND IsServer()==true AND IsInToolsMode()==true",
+    "client_and_sv_cheats_override": false,
+    "policy_cases_passed": 250,
+    "actual_debug_entry_checks_passed": 89,
+    "related_regressions_passed": 32
+  },
+  "runtime_candidate": {
+    "destination": "D:\\Survival_发布候选\\20261021_secure_release_01",
+    "runtime_files": 6619,
+    "runtime_bytes": 3776907831,
+    "protected_lua_files": 180,
+    "all_lua_syntax_checked": 785,
+    "content_sha256": "2a270c16de7a4a26d289cbeb891bea877665ce3f203b4f965fee7234f096b406",
+    "release_sequence": 2026102101,
+    "native_smoke_test": "NOT_RUN",
+    "ready_for_upload": false,
+    "full_file_verification": true,
+    "signature_verification": {
+      "signature_valid": true,
+      "key_id": "77075eac0032a300aca694059dc47e93",
+      "content_sha256": "2a270c16de7a4a26d289cbeb891bea877665ce3f203b4f965fee7234f096b406",
+      "release_sequence": 2026102101
+    }
+  },
+  "runtime_protection_scope": {
+    "generated_tables": 176,
+    "business_modules": 4,
+    "other_plaintext_lua_modules": 605,
+    "data_values_exact": true,
+    "gameplay_rng_untouched": true,
+    "cryptographic_runtime_confidentiality": false,
+    "standalone_load_seconds": {
+      "files": 180,
+      "source_seconds": 0.071,
+      "protected_seconds": 0.821
+    },
+    "prometheus_commit": "a4efc5f381c50ae2a111bdbb9272fa3203685be3"
+  },
+  "source_csv": {
+    "files": 180,
+    "snapshot": "validation/20261021/source_csv_integrity.json",
+    "all_md5_and_sha256": true
+  },
+  "source_vault": {
+    "path": "D:/Survival_加密备份/20261021_source_01/survival_sources.svault",
+    "algorithm": "AES-256-GCM",
+    "files": 10500,
+    "source_bytes": 874857070,
+    "encrypted_bytes": 805565629,
+    "full_tag_and_file_verification": true,
+    "runtime_format": false
+  },
+  "key_storage": {
+    "directory": "D:/Survival_密钥/20261021_release_01",
+    "outside_git_and_release": true,
+    "acl": "current Windows account and SYSTEM only",
+    "private_key_values_in_report": false
+  },
+  "tools_tests": {
+    "quarantine": 13,
+    "runtime_manifest_cases": 20,
+    "runtime_manifest_skipped": 1,
+    "lua_builder": 7,
+    "full_assembly": 7,
+    "crypto": 11,
+    "crypto_independent": 16
+  },
+  "limitations": {
+    "native_dota_smoke": "not run; candidate cannot be treated as ready for Workshop upload",
+    "runtime_assets": "native compiled formats; no unsupported AES ciphertext substitution",
+    "update_scope": "full offline file verification; static Lua/assets use Workshop updates, existing lottery MD5 login/cache push preserved",
+    "payment_python_tests": "not run: optional test environment lacks psycopg; payment backend source unchanged"
+  },
+  "previous_local_candidate_diff": {
+    "added": 7,
+    "modified": 237,
+    "removed": 0
+  }
+}

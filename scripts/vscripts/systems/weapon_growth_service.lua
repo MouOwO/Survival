@@ -381,6 +381,8 @@ local function invalidate_inputs(payload)
 end
 
 local function debug_add(payload)
+    local policy = require("core/release_policy")
+    if not policy.development_allowed() then return policy.denied_result() end
     return add_attacks(
         tonumber(payload.player_id),
         tonumber(payload.count) or 1,

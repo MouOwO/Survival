@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Drive real profile -> permanent effects -> resource/building consumers.
 -- Engine units are stubs; reward arithmetic and event order remain real.
 package.path='scripts/vscripts/?.lua;'..package.path

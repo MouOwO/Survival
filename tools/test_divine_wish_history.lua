@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Exercise the production wish registry/runtime and reward history together.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 package.loaded["systems/player_context_service"] = {is_defeated=function() return false end}

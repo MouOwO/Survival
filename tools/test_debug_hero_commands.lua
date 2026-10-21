@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Actual chat parsing/dispatch and event bus; mock unrelated engine/services.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")

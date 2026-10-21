@@ -218,6 +218,9 @@ local function run_description_tests()
 end
 
 function M.run()
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local ok, error_message = pcall(function()
         run_config_tests()
         run_description_tests()

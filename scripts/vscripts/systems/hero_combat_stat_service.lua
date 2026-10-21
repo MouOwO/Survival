@@ -887,6 +887,8 @@ local function on_progression_changed(payload)
 end
 
 local function debug_set_attack(payload)
+    local policy = require("core/release_policy")
+    if not policy.development_allowed() then return policy.denied_result() end
     payload = payload or {}
     local player_id = tonumber(payload.player_id)
     local state = current(player_id)

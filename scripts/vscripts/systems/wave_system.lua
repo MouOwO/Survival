@@ -1369,6 +1369,9 @@ local function request_early_final()
 end
 
 function M.set_dev_mode(enabled)
+    if enabled == true and not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     dev_mode = enabled == true
     generation_token = generation_token + 1
     scheduler.cancel("wave_countdown")
@@ -1423,6 +1426,7 @@ local function debug_player_channels(player_ids, refresh)
 end
 
 local function begin_debug_wave_spawn(number, wave, token, preload_reason, player_ids)
+    if not require("core/release_policy").development_allowed() then return end
     if token ~= generation_token then return false end
     state.current_wave = number
     state.status = "dev_spawn"
@@ -1522,6 +1526,9 @@ local function debug_wave_model_asset_ids(wave)
 end
 
 function M.debug_spawn_wave(number, player_ids)
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     if fishing_mode() then return false, "fishing_mode_no_waves" end
     number = tonumber(number)
     local wave = number and waves[number] or nil
@@ -1745,6 +1752,8 @@ end
 do
     local clearing_for_comparison = false
     function M.debug_clear_wave_for_comparison()
+        local policy = require("core/release_policy")
+        if not policy.development_allowed() then return policy.denied_result() end
         if clearing_for_comparison then return {ok=false,error="comparison_clear_reentrant"} end
         local function reject(reason) error({reason=reason},0) end
         local checked, proof = pcall(function()

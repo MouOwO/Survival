@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Native overflow regression with the production hero service, stat adapter,
 -- attack/equipment modifiers, shared attack projection and damage filter.
 -- Run from addon root with Lua 5.1; only native/bootstrap and stat-source

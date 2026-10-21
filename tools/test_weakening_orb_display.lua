@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Real reward selection -> lifecycle targeting -> native modifier -> selected
 -- HUD and tooltip. Only Dota engine entities and event transport are simulated.
 package.path = "scripts/vscripts/?.lua;" .. package.path

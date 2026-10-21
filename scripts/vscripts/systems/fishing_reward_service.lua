@@ -7,7 +7,7 @@ local production_reward_definitions = require(
 local M = {}
 
 local function active_reward_definitions()
-    local tools_mode = type(IsInToolsMode) == "function" and IsInToolsMode()
+    local tools_mode = require("core/release_policy").development_allowed()
     local fixture = ""
     if tools_mode and Convars and type(Convars.GetStr) == "function" then
         fixture = tostring(Convars:GetStr("survival_fishing_reward_fixture") or "")

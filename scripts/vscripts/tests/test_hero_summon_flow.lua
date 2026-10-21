@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Integrated summon transaction: real event bus, summon system, placeholder
 -- lifecycle, catalog and native ability factory. Only engine/rendering and
 -- asynchronous resource/destination boundaries are mocked here; geometry has

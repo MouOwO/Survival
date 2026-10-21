@@ -651,9 +651,9 @@ function M.social_draw(player_id, pool_id, request_id)
 end
 
 function M.zaixian(context)
-    local allowed = type(IsInToolsMode) == "function" and IsInToolsMode()
-        or GameRules and GameRules.IsCheatMode and GameRules:IsCheatMode()
-    if not allowed then return false, "tools_mode_or_cheats_required" end
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local args = context.args or {}
     local minutes = tonumber(args[1])
     if #args ~= 1 or not integer(minutes) or minutes < 1 or minutes > 1000000 then
@@ -676,9 +676,9 @@ function M.zaixian(context)
 end
 
 function M.xinyang(context)
-    local allowed = type(IsInToolsMode) == "function" and IsInToolsMode()
-        or GameRules and GameRules.IsCheatMode and GameRules:IsCheatMode()
-    if not allowed then return false, "tools_mode_or_cheats_required" end
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local args = context.args or {}
     local amount = tonumber(args[1])
     if #args ~= 1 or not integer(amount) or amount < 1 or amount > 1000000000 then
@@ -695,9 +695,9 @@ function M.xinyang(context)
 end
 
 function M.yitie(context)
-    local allowed = type(IsInToolsMode) == "function" and IsInToolsMode()
-        or GameRules and GameRules.IsCheatMode and GameRules:IsCheatMode()
-    if not allowed then return false, "tools_mode_or_cheats_required" end
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local amount = tonumber(context.args[1])
     local pool = context.args[2] or "friend"
     if #context.args < 1 or #context.args > 2 or not integer(amount) or amount > 1000000
@@ -739,9 +739,9 @@ function M.work_upgrade(player_id, item_id, expected_level)
 end
 
 function M.cheat(context)
-    local allowed = type(IsInToolsMode) == "function" and IsInToolsMode()
-        or GameRules and GameRules.IsCheatMode and GameRules:IsCheatMode()
-    if not allowed then return false, "tools_mode_or_cheats_required" end
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local key = string.lower(tostring(context.args[1] or ""))
     local count = tonumber(context.args[2])
     if #context.args ~= 2 or not integer(count) or count < 1 or count > 100000 then

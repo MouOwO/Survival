@@ -1734,6 +1734,8 @@ local function get_technology_state(payload)
 end
 
 local function set_debug_unlock(payload)
+    local policy = require("core/release_policy")
+    if not policy.development_allowed() then return policy.denied_result() end
     local player_id = tonumber(payload and payload.player_id)
     if not valid_player_id(player_id) then
         return { ok = false, error = "player_id_invalid" }

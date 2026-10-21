@@ -207,6 +207,9 @@ local function emit_bridge_packet(packet)
 end
 
 function M.apply_packet(packet)
+    if not require("core/release_policy").development_allowed() then
+        return {ok = false, error = "release_debug_disabled"}
+    end
     if type(packet) == "string" then
         local decode_ok, decoded = pcall(json_decoder.decode, packet)
         if not decode_ok then
@@ -258,6 +261,9 @@ local function reset_applied_armor_reduction()
 end
 
 function M.order(player_id, field_id, delta, refund)
+    if not require("core/release_policy").development_allowed() then
+        return {ok = false, error = "release_debug_disabled"}
+    end
     player_id = tonumber(player_id)
     field_id = tostring(field_id or "")
     delta = finite_number(delta)
@@ -298,6 +304,9 @@ end
 -- to neutral values by player_profile_service, and permanent rewards are
 -- excluded from the runtime projection until reset/default order mode resumes.
 function M.test_order(player_id, field_id, value)
+    if not require("core/release_policy").development_allowed() then
+        return {ok = false, error = "release_debug_disabled"}
+    end
     player_id = tonumber(player_id)
     field_id = tostring(field_id or "")
     value = finite_number(value)
@@ -341,6 +350,9 @@ function M.test_order(player_id, field_id, value)
 end
 
 function M.reset_defaults(player_id)
+    if not require("core/release_policy").development_allowed() then
+        return {ok = false, error = "release_debug_disabled"}
+    end
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 then
         return { ok = false, error = "player_id_invalid" }

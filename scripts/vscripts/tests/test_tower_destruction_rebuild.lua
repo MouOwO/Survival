@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Real building lifecycle, route limits, event bus and placement grid; only
 -- engine entities and independent visual/economy services are substituted.
 package.path = "scripts/vscripts/?.lua;" .. package.path

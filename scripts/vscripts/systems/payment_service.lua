@@ -203,7 +203,9 @@ end
 function M.reset_player(context, kind)
     -- TODO(PAYMENT_TEST_ONLY): remove chat reset entry points before public release.
     -- Tools check + authenticated account + remote config + DB allowlist are required.
-    if not IsInToolsMode or not IsInToolsMode() then return false,"test_reset_disabled" end
+    if not require("core/release_policy").development_allowed() then
+        return false,"test_reset_disabled"
+    end
     if #context.args~=0 then return false,"usage: "..kind end
     if kind~="refreshdata" and kind~="refreshmoney" then return false,"reset_invalid" end
     local ok,err=request(tonumber(context.player_id),"reset",nil,kind)

@@ -60,6 +60,7 @@ local function notify(context, message)
 end
 
 function M.give_growth_sword(context)
+    if not require("core/release_policy").development_allowed() then return false, "release_debug_disabled" end
     local result = event_bus.request(
         events.CONTENT_INVENTORY_GRANT_REQUEST,
         {
@@ -74,6 +75,7 @@ function M.give_growth_sword(context)
 end
 
 function M.add_item(context)
+    if not require("core/release_policy").development_allowed() then return false, "release_debug_disabled" end
     local identifier = tostring(context.args[1] or "")
     local count = math.floor(tonumber(context.args[2]) or 1)
     if identifier == "" or count < 1 then
@@ -109,6 +111,7 @@ function M.add_item(context)
 end
 
 function M.list_items(context)
+    if not require("core/release_policy").development_allowed() then return false, "release_debug_disabled" end
     local result = event_bus.request(
         events.CONTENT_INVENTORY_GET_REQUEST,
         { player_id = context.player_id }
@@ -153,6 +156,7 @@ function M.list_items(context)
 end
 
 function M.grow_weapon(context)
+    if not require("core/release_policy").development_allowed() then return false, "release_debug_disabled" end
     local result = event_bus.request(
         events.WEAPON_GROWTH_DEBUG_REQUEST,
         {
@@ -165,6 +169,7 @@ function M.grow_weapon(context)
 end
 
 function M.give_forging_hammer(context)
+    if not require("core/release_policy").development_allowed() then return false, "release_debug_disabled" end
     local count = math.max(1, math.floor(tonumber(context.args[1]) or 1))
     local result = event_bus.request(
         events.CONTENT_INVENTORY_GRANT_REQUEST,
@@ -180,6 +185,7 @@ function M.give_forging_hammer(context)
 end
 
 function M.set_attack_40b(context)
+    if not require("core/release_policy").development_allowed() then return false, "release_debug_disabled" end
     local result = event_bus.request(
         events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST,
         { player_id = context.player_id, attack = 4000000000 }
@@ -192,6 +198,7 @@ function M.set_attack_40b(context)
 end
 
 function M.reset_attack(context)
+    if not require("core/release_policy").development_allowed() then return false, "release_debug_disabled" end
     local result = event_bus.request(
         events.HERO_COMBAT_STATS_DEBUG_ATTACK_REQUEST,
         { player_id = context.player_id, reset = true }
@@ -204,6 +211,7 @@ function M.reset_attack(context)
 end
 
 function M.weapon_stats(context)
+    if not require("core/release_policy").development_allowed() then return false, "release_debug_disabled" end
     local result = event_bus.request(
         events.HERO_COMBAT_STATS_GET_REQUEST,
         { player_id = context.player_id }

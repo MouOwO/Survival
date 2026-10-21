@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Real hero summon service/anchor and event bus; mock only engine/resource boundaries.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")

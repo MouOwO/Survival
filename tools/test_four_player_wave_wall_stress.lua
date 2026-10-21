@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Offline engine-boundary simulation. Production wave scheduling/factories,
 -- player context, collision policy, navigation boundary, contacts and wall AI.
 -- Native MOVE acceptance, delayed phase, straight-line terrain/hull movement

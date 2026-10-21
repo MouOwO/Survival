@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Real ability/research/shop event consumers and event bus. Only engine time,
 -- transport, and expensive view-model/research/catalog dependencies are mocked.
 -- Resource transactions and real FPS are outside this focused scheduling test.

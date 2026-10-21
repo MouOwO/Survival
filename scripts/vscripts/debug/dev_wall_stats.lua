@@ -9,6 +9,7 @@ local function valid_entity(entity)
 end
 
 function M.apply(state)
+    if not require("core/release_policy").development_allowed() then return false end
     if not enabled or not state or state.building_id ~= "wall"
         or not valid_entity(state.unit) then return false end
     local health = tonumber(global_rules.dev_wall_health)
@@ -25,6 +26,9 @@ function M.apply(state)
 end
 
 function M.enable(buildings)
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     enabled = true
     local applied = 0
     for _, state in pairs(buildings or {}) do

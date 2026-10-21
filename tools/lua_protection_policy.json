@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "offline_lua51_obfuscation_policy",
+  "dependency": {
+    "name": "Prometheus",
+    "repository": "https://github.com/prometheus-lua/Prometheus",
+    "commit": "a4efc5f381c50ae2a111bdbb9272fa3203685be3",
+    "source_tree_sha256": "2597b94bb1158961a46f459470e03ccb1603a07a24d780a11bda3b5c74814675",
+    "source_tree_files": 83,
+    "hash_recipe": "SHA256 of canonical ASCII JSON sorted records {path,bytes,sha256} for src/**/*.lua, cli.lua and LICENSE; exact checked-out bytes",
+    "license_sha256": "e86932af0e4e88b7e8793ed17608cf3b28002beb915b4ba1d6ec57fa730ea078",
+    "attribution": "Based on Prometheus by Elias Oelschner, https://github.com/prometheus-lua/Prometheus"
+  },
+  "language": "Lua51",
+  "generated_prefix": "scripts/vscripts/config/generated/",
+  "generated_exclusions": {
+    "index.lua": "Registry contains require paths, not CSV values; keep native module resolution transparent.",
+    "item_resources.lua": "Separate generated executable resource resolver; require dedicated behavioral coverage before protecting."
+  },
+  "business_modules": [
+    "scripts/vscripts/config/content_id_aliases.lua",
+    "scripts/vscripts/config/armor_balance.lua",
+    "scripts/vscripts/config/mode_progression.lua",
+    "scripts/vscripts/core/release_policy.lua"
+  ],
+  "always_plaintext": ["scripts/vscripts/config/release_profile.lua"],
+  "steps": ["ConstantArray", "NumbersToExpressions", "WrapInFunction"],
+  "forbidden_steps": ["AntiTamper", "Vmify", "WatermarkCheck"],
+  "optional_generated_string_obfuscation": {
+    "step": "EncryptStrings",
+    "position": "After ConstantArray deduplication, before NumbersToExpressions",
+    "runtime_math": "Lexically scoped copy with private Park-Miller PRNG; no use of the gameplay RNG state.",
+    "allowed_scope": "Generated pure table modules only; full exact-value verification is mandatory.",
+    "cryptographic_confidentiality": false
+  },
+  "forbidden_business_steps": ["EncryptStrings", "Vmify", "AntiTamper"],
+  "seed_rule": "Positive deterministic per-source SHA256-derived seed; avoids upstream OpenSSL subprocess fallback.",
+  "failure_policy": "Stop immediately, mark the new external candidate failed, do not substitute plaintext for a selected protected file.",
+  "claim": "Offline Lua AST obfuscation. This is reverse-engineering friction, not cryptographic confidentiality.",
+  "native_game_smoke_required": true
+}

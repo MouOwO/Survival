@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Real route limits, wallets, upgrade dispatch and UI router; mock only engine
 -- entities, rendering and the asynchronous upgrade process. Failed requests
 -- must not briefly publish a reservation, sync abilities or start a cooldown.

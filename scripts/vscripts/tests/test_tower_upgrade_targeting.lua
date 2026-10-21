@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
+package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")
 local events = require("core/events")
 local config = require("config/buildings_config")

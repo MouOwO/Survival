@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Production three-choice selection, native modifier callbacks, selected-unit
 -- custom-event routing and building presentation. Only Dota engine boundaries
 -- (entities, players, event delivery and NetTables) are simulated.

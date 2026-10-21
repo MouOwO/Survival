@@ -1,14 +1,10 @@
 -- Match-local mode testing. Never manufacture permanent clears or capabilities.
 local M = {}
+local release_policy = require("core/release_policy")
 local enabled, session_id = false, ""
 
 local function allowed()
-    if type(IsInToolsMode) == "function" and IsInToolsMode() then return true end
-    if GameRules and type(GameRules.IsCheatMode) == "function" then
-        local ok, cheats = pcall(GameRules.IsCheatMode, GameRules)
-        return ok and cheats == true
-    end
-    return false
+    return release_policy.development_allowed()
 end
 
 function M.reset(session)
@@ -23,7 +19,7 @@ function M.is_enabled()
 end
 
 function M.enable(player_id)
-    if not allowed() then return false, "tools_mode_or_cheats_required" end
+    if not allowed() then return false, "release_debug_disabled" end
     local setup = require("systems/match_setup_service")
     if not setup.is_selector(player_id) then return false, "selection_not_host" end
     if M.is_enabled() then return true end

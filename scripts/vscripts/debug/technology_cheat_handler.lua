@@ -16,6 +16,8 @@ function M.register(state, push_snapshot)
     event_bus.handle_request(
         events.TECHNOLOGY_CHEAT_SET_REQUEST,
         function(payload)
+            local policy = require("core/release_policy")
+            if not policy.development_allowed() then return policy.denied_result() end
             local player_id = tonumber(payload and payload.player_id)
             local technology_id = tostring(
                 payload and payload.technology_id or ""

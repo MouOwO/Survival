@@ -366,6 +366,10 @@ local function queue_pending_summon(payload, definition)
 end
 
 summon = function(payload)
+    if payload.debug_bypass == true then
+        local policy = require("core/release_policy")
+        if not policy.development_allowed() then return policy.denied_result() end
+    end
     local player_id = tonumber(payload.player_id)
     local hero_id = tostring(payload.hero_id or "")
     local altar, definition, error_code, position =
@@ -444,6 +448,8 @@ local function snapshot_request(payload)
 end
 
 local function delete_hero(payload)
+    local policy = require("core/release_policy")
+    if not policy.development_allowed() then return policy.denied_result() end
     local player_id = tonumber(payload and payload.player_id)
     if not valid_player_id(player_id) then
         return { ok = false, error = "player_id_invalid" }

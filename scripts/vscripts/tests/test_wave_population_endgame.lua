@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Lua 5.1 simulation: production wave/archival services and real CSV-generated rules.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus = require("core/event_bus")

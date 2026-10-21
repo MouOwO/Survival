@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
+package.path = "scripts/vscripts/?.lua;" .. package.path
 
 -- Keep the event bus, combat-stat calculation and cheat real. Only native
 -- entities and unrelated equipment/bootstrap services are replaced.

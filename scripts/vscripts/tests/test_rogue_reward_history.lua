@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Offline regression: history records successful choices, newest first, per player.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local fixtures = { rows = {}, by_id = {} }

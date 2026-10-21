@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Actual production public clear and public four-channel spawn, with an engine
 -- fixture reused from the existing lifecycle regression. No private clear call.
 local file=assert(io.open("scripts/vscripts/tests/test_wave_population_endgame.lua","rb"))
@@ -133,17 +135,17 @@ for _,scenario in ipairs({"A","B"}) do
     unchanged_protected(fixture,scene)
 end
 local fixture,scene=prepare("A","N2") -- Difficulty-independent metadata; no hard-coded N1 range/name.
-local function failed(edit,restore)
+local function failed(edit,restore,expected_error)
     local before=upvalue("generation_token");edit()
     local edited_pending=upvalue("state").pending
     local result=wave.debug_clear_wave_for_comparison()
-    assert(not result.ok and result.error=="comparison_clear_preflight_failed")
+    assert(not result.ok and result.error==(expected_error or "comparison_clear_preflight_failed"))
     assert(upvalue("generation_token")==before and upvalue("state").alive==244 and upvalue("state").pending==edited_pending)
     for _,value in ipairs(created) do assert(not value.removed and cleanup_order[value]==nil and release_calls[value]==nil) end
     assert_no_handles(result);restore();unchanged_protected(fixture,scene)
 end
-failed(function() tools=false end,function() tools=true end)
-failed(function() server=false end,function() server=true end)
+failed(function() tools=false end,function() tools=true end,"release_debug_disabled")
+failed(function() server=false end,function() server=true end,"release_debug_disabled")
 failed(function() map="foreign_map" end,function() map="template_map" end)
 failed(function() engine_state=8 end,function() engine_state=7 end)
 failed(function() fixture.status="preparing" end,function() fixture.status="ready" end)

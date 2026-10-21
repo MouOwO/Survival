@@ -79,7 +79,7 @@ local function convar(name)
 end
 
 local function active_definitions()
-    local tools_mode = type(IsInToolsMode) == "function" and IsInToolsMode()
+    local tools_mode = require("core/release_policy").development_allowed()
     local fixture = ""
     if tools_mode and Convars and type(Convars.GetStr) == "function" then
         fixture = tostring(Convars:GetStr("survival_fishing_reward_fixture") or "")
@@ -282,7 +282,7 @@ checkpoint = function(player_id, final, expected_state)
 end
 
 local function debug_checkpoint(_, player_id)
-    if type(IsInToolsMode) ~= "function" or not IsInToolsMode() then
+    if not require("core/release_policy").development_allowed() then
         print("[OnlineTime] debug_checkpoint_rejected reason=tools_mode_required")
         return
     end
@@ -384,7 +384,8 @@ function M.init()
     event_bus.subscribe(events.GAME_STARTED, function()
         for player_id in pairs(sessions) do checkpoint(player_id, false) end
     end)
-    if not debug_command_registered and Convars
+    if require("core/release_policy").development_allowed()
+        and not debug_command_registered and Convars
         and type(Convars.RegisterCommand) == "function" then
         Convars:RegisterCommand(
             "survival_online_checkpoint_now",

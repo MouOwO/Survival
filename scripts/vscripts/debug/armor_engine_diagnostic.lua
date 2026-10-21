@@ -60,6 +60,7 @@ local function create_unit(origin, team)
 end
 
 local function run_case(token, attacker, target, requested_armor, damage_case)
+    if not require("core/release_policy").development_allowed() then return end
     if token ~= generation or not valid(attacker) or not valid(target) then return end
     target:SetHealth(TEST_HEALTH)
     local base_armor = tonumber(target:GetPhysicalArmorBaseValue())
@@ -92,6 +93,9 @@ local function run_case(token, attacker, target, requested_armor, damage_case)
 end
 
 function M.run(options)
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     options = options or {}
     clear()
     local token = generation

@@ -16,6 +16,7 @@ local function notify(player_id, message)
 end
 
 local function apply(hero, attack_interval, player_id)
+    if not require("core/release_policy").development_allowed() then return false end
     if not hero or hero:IsNull() then
         return false
     end
@@ -59,6 +60,9 @@ local function on_hero_summoned(payload)
 end
 
 function M.set_rate(player_id, attacks_per_second)
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local rate = tonumber(attacks_per_second)
     if not rate or rate ~= rate or rate <= 0 or rate > 100 then
         return false, "fixed_attack_rate_invalid"
@@ -76,6 +80,9 @@ function M.set_rate(player_id, attacks_per_second)
 end
 
 function M.execute(context)
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local player_id = context.player_id
     local ok, error_code = M.set_rate(
         player_id,
@@ -93,6 +100,7 @@ end
 
 function M.init()
     interval_by_player = {}
+    if not require("core/release_policy").development_allowed() then return end
     event_bus.subscribe(events.HERO_SUMMONED, on_hero_summoned)
 end
 

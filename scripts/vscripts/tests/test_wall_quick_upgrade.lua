@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
+package.path = "scripts/vscripts/?.lua;" .. package.path
 local config = require("config/buildings_config")
 local rules = require("systems/wall_upgrade_rules")
 local quote = assert(rules.quote(config.wall, 1, true))

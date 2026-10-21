@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
+package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus, events = require("core/event_bus"), require("core/events")
 local noop = function() end
 for _, name in ipairs({"tower_skill_runtime", "building_population_service", "asset_preload_service",

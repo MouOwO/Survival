@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "channel": "production",
+  "integrity": {
+    "manifest_schema": 2,
+    "change_index": "md5",
+    "integrity_hash": "sha256",
+    "signature": "Ed25519",
+    "trusted_public_key": "tools/release_security/trusted_public_key.pem",
+    "trusted_key_id": "77075eac0032a300aca694059dc47e93",
+    "minimum_release_sequence": 2026102101,
+    "activation_requires_full_file_verification": true
+  },
+  "lua_distribution": {
+    "builder": "tools/protect_runtime_lua.py",
+    "policy": "tools/lua_protection_policy.json",
+    "require_generated_string_obfuscation": true,
+    "source_mutation_allowed": false,
+    "transform_is_cryptographic_confidentiality": false,
+    "release_profile_must_remain_plaintext_production": true,
+    "native_smoke_required_before_workshop_upload": true
+  },
+  "source_vault": {
+    "cipher": "AES-256-GCM",
+    "nonce_bytes": 12,
+    "include_all_csv": true,
+    "include_source_lua_and_panorama": true,
+    "include_original_ui_art": true,
+    "keys_must_be_outside_game_content_and_git": true,
+    "is_runtime_addon_format": false,
+    "maximum_uncompressed_bytes_per_vault": 8589934592
+  },
+  "resources": {
+    "distribution": "native compiled resources plus verified signed inventory",
+    "plaintext_csv_and_editable_art_in_distribution": false,
+    "runtime_aes_enabled": false,
+    "reason": "This project has no validated native resource ciphertext loader. AES vaults protect original sources; replacing engine textures or KV with ciphertext would break loading."
+  },
+  "updates": {
+    "static_code_and_assets": "Workshop version updates after complete offline verification",
+    "lottery_catalogue": "existing login MD5 comparison and server push cache",
+    "minimum_sequence_is_trusted_state_not_downloaded_from_an_untrusted_package": true
+  }
+}

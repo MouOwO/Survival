@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Reproduce expired handles and retained death-animation corpses.
 -- Keep the real upgrade event consumers, route config and reward arithmetic.
 package.path = "scripts/vscripts/?.lua;" .. package.path

@@ -1,4 +1,5 @@
 local M = {}
+local release_policy = require("core/release_policy")
 local damage_service = nil
 local rules = nil
 
@@ -22,7 +23,7 @@ local function print_result(name, result)
 end
 
 local function run(_, player_id)
-    if not IsInToolsMode() and not rules.debug_enabled then return end
+    if not release_policy.development_allowed() then return end
     local attacker = hero(tonumber(player_id) or 0)
     local victim = attacker and enemy_for(attacker) or nil
     local tests = {
@@ -52,6 +53,7 @@ local function run(_, player_id)
 end
 
 function M.init(service, config)
+    if not release_policy.development_allowed() then return end
     damage_service, rules = service, config
     Convars:RegisterCommand("damage_test", run,
         "Run Survival damage module tests", FCVAR_CHEAT)

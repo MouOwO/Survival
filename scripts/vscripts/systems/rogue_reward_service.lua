@@ -254,6 +254,8 @@ local function promote_next(player_id, reason, effects_changed)
 end
 
 function M.debug_offer(player_id, card_ids)
+    local policy = require("core/release_policy")
+    if not policy.development_allowed() then return policy.denied_result() end
     player_id = tonumber(player_id)
     if player_id == nil or player_id < 0 or not PlayerResource:GetPlayer(player_id) then
         return { ok = false, error = "player_invalid" }

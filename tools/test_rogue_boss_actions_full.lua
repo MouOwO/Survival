@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Production reward selection/runtime, local wallet and building-challenge
 -- settlement. Fixtures are limited to engine entities, profile input and the
 -- downstream technology projection sink; no online archive/payment requests.

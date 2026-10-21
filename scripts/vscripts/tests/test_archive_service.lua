@@ -1,4 +1,6 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
+package.path = "scripts/vscripts/?.lua;" .. package.path
 local function copy(v)
     if type(v) ~= "table" then return v end
     local r = {}; for k, x in pairs(v) do r[k] = copy(x) end; return r

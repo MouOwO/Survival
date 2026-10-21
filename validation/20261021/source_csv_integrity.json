@@ -1,0 +1,2123 @@
+{
+  "schema": 1,
+  "kind": "source_csv_hash_snapshot",
+  "hash_algorithms": [
+    "md5",
+    "sha256"
+  ],
+  "files": [
+    {
+      "path": "data/csv/公共规则/data_issues.csv",
+      "bytes": 1958,
+      "md5": "a1d581eac677799e822111be948896de",
+      "sha256": "39d62d26c83408a5a13d7293b1f259b374fb69af17f67745ac29fd8991dd04e7",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/data_issues.lua",
+        "bytes": 2989,
+        "md5": "6bc9f80b8b02d3b2e5c1ffe61431e309",
+        "sha256": "1488043d1200fe2717f5a784087cf95ab96340e41879231eca1ee7a1aa3f3654"
+      }
+    },
+    {
+      "path": "data/csv/公共规则/enums.csv",
+      "bytes": 4947,
+      "md5": "174328eb273e9b6acfe583232e385159",
+      "sha256": "6c0aa38b8a2a15af94dea5bfaf77da23034bc8f003d44b9212e9403994446b4d",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/enums.lua",
+        "bytes": 12763,
+        "md5": "c48b86cb8d556017cebc0ecaf32fb104",
+        "sha256": "1ea1ae91b8bac960441cc48c1b4640825cf42b27229d0a8f8411bd752e435b88"
+      }
+    },
+    {
+      "path": "data/csv/公共规则/global_rules.csv",
+      "bytes": 3489,
+      "md5": "7aa7e83dbdb2943f96994ce4d1096eb7",
+      "sha256": "0f8791f65301b42a9066da16606630bca5ea3806ead68af04a59cbad5da89b4b",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/global_rules.lua",
+        "bytes": 6065,
+        "md5": "7dd454afce36c5debcbb9bbbcad9be27",
+        "sha256": "2a1ce9506d1f77b28025b3c38e915910669f45772cc6aabdb42cd63b43d67fb4"
+      }
+    },
+    {
+      "path": "data/csv/公共规则/tooltip_definitions.csv",
+      "bytes": 92468,
+      "md5": "637b06733e928f338e5280901462ed2e",
+      "sha256": "962043730091c643edc94378c6528d4cf2cb6bbf2708528e226cbc7fb5ff9880",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tooltip_definitions.lua",
+        "bytes": 131919,
+        "md5": "6cd7d38c926a10b512d55fa5d4fb0749",
+        "sha256": "fa3f2712bb801ae9c7fcebffba027efc0489656bc8f25fe0990a74aa87192a21"
+      }
+    },
+    {
+      "path": "data/csv/公共规则/unit_display_names.csv",
+      "bytes": 381,
+      "md5": "8d99a0feb1ec1b40c89c52ee4cb7a2f2",
+      "sha256": "7872713bf3db2664dff4945ef623f6229918c189c5f4b338d97ae179ce69a0fa",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/unit_display_names.lua",
+        "bytes": 706,
+        "md5": "3aa411a473673c1e20a2c363354c3e0c",
+        "sha256": "d1f58e51f2041a93c08a2f1d585f420e6ade1cfc4cf7384a72144bd5870e19d3"
+      }
+    },
+    {
+      "path": "data/csv/公共规则/war3_damage_calculator_mystery_experiment.csv",
+      "bytes": 2840,
+      "md5": "6da646dd38f554bb4104fbe0c9c077c1",
+      "sha256": "a57b702b08040f76e9edc28c9bd38a3e959563b2bb57f70d7939fa9ec58f9505",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/war3_damage_calculator_mystery_experiment.lua",
+        "bytes": 10007,
+        "md5": "9c43bdb3ead177e2d77659e1d17b7cae",
+        "sha256": "e84e7b3364f8799a61b0d60307a7227f044b282a09271ec15a4a63f31af4dd63"
+      }
+    },
+    {
+      "path": "data/csv/公共规则/war3_damage_calculator_rules.csv",
+      "bytes": 631,
+      "md5": "aa976b7aa80bb7842e9f89526b50c968",
+      "sha256": "1967b8d312ac2a181fa1ce1159f027317eaafbcdb1b695c92834988fa8cfb278",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/war3_damage_calculator_rules.lua",
+        "bytes": 1150,
+        "md5": "321fb6b1db5104d3724988901a829ee9",
+        "sha256": "f394d39271ba2a3f794ceb69ab121c8f0b6d64a2698bdfb06cbf5c593b27f414"
+      }
+    },
+    {
+      "path": "data/csv/商城兑换系统/commerce_bundle_members.csv",
+      "bytes": 2862,
+      "md5": "ceacdd4726ec448701797d24d03ffffc",
+      "sha256": "0755314ef8c2d170c5c65a70da143506bc50ecdee57781e93c9f78cab2f4b6ca",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/商城兑换系统/commerce_import_status.csv",
+      "bytes": 53774,
+      "md5": "acbf65a10aa67f62112f760f280713f6",
+      "sha256": "ff27b1482594216ca40806343784a47ca474de2f65952a5a0be5bedcaefb6837",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/商城兑换系统/commerce_products.csv",
+      "bytes": 58746,
+      "md5": "475012f5d9848677b140f599225f894a",
+      "sha256": "20f3a9c0d78ed2355c6317595896e7ad3a91502cd894c12cc83b8b531dfaa19e",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/商城兑换系统/commerce_rewards.csv",
+      "bytes": 41189,
+      "md5": "011d6705fa70105961d5eb6853f681c3",
+      "sha256": "9d0530b1313226aafc1608398465cf1e01ae8834233d20c0b2963bacea201035",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/商城支付系统/payment_categories.csv",
+      "bytes": 299,
+      "md5": "b4c90c5ca22b5083b2db824aed3fce32",
+      "sha256": "889f947af0e8fff7146860f0f3c7adcb3e8b581b350dd07f6e951d2dad41bb3b",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/商城支付系统/payment_products.csv",
+      "bytes": 2848,
+      "md5": "536823be32160428963fda00bcceed9a",
+      "sha256": "497f6ee2b5e9a0af50b79801b518f35f11379d1c4e9cc0a56ac41d21ea5b1cfc",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/商城支付系统/payment_rewards.csv",
+      "bytes": 1431,
+      "md5": "3618c0bf6a54efbc0da762df8eda67e5",
+      "sha256": "736a01f96846e5cf40ba733675a0b5623b5e199d2c9c1b404792b8c6a93a3c8a",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/商店系统/altar_actions.csv",
+      "bytes": 1622,
+      "md5": "3118a317eaa0e4cc369d8dc547f9ed65",
+      "sha256": "b15c1ce6b593f49e0aa2f6338745c49af4bad43bc2af1f83b0d3899a55332714",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/altar_actions.lua",
+        "bytes": 2038,
+        "md5": "c4fd621add6eae2f3cd6f9825b412154",
+        "sha256": "be8127fb207d66811425614887d75069eb12c15acfc9d83138100d963148387e"
+      }
+    },
+    {
+      "path": "data/csv/商店系统/entitlement_definitions.csv",
+      "bytes": 499,
+      "md5": "c2f143c5b7e66450c1679da26d1d84e3",
+      "sha256": "a75c81690dd8244cd3d77f7195107780af2a9080077f357a4df7e9548a5346dd",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/entitlement_definitions.lua",
+        "bytes": 752,
+        "md5": "195c4da6f8e97179e8308e88e4fbb99d",
+        "sha256": "896d29a276728ba556fb708d432a93bc172ab3700497587f0ea8f8b7a0e9d005"
+      }
+    },
+    {
+      "path": "data/csv/商店系统/shop_aggregation_rules.csv",
+      "bytes": 1354,
+      "md5": "8c9caf3ea6b335a92582dbcac7562037",
+      "sha256": "15aad846fd6913cac8d1b83f0bbbee3aa98c28699abe1286bfa65fb0ce511176",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/shop_aggregation_rules.lua",
+        "bytes": 2396,
+        "md5": "24fb401cc2be3969630ae87688e05ec2",
+        "sha256": "5d1fd014d942a7aeb8cf94e82fb8513190317932215b670adffa64228b6214d7"
+      }
+    },
+    {
+      "path": "data/csv/商店系统/shop_categories.csv",
+      "bytes": 656,
+      "md5": "6d34929dba3a8dd901e4c54a3c54d79b",
+      "sha256": "5493dbf4ab83b63455a1326c14294aaa7d29cd13c85aaa53561f2ea1b9c25304",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/shop_categories.lua",
+        "bytes": 1244,
+        "md5": "625ee522f669358ac2dc9290dbc44a6b",
+        "sha256": "9cc617451a856f35bb0ea2dd231d62b11f9e886a651ae7c31fcd6afb0c15990b"
+      }
+    },
+    {
+      "path": "data/csv/商店系统/shop_condition_schema.csv",
+      "bytes": 865,
+      "md5": "b55ed5be6425473172ef06bf22a79ccc",
+      "sha256": "c84e202ad08f5a765d1610d3de5bf59ff864ebeed9c872a01ed5a7b4b342423d",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/shop_condition_schema.lua",
+        "bytes": 1854,
+        "md5": "f12f1e0c750cdf28c054983788f785e2",
+        "sha256": "8a2962d5c1fea6a930550679d1e24906c48244a2d0940eaa271669d00319816a"
+      }
+    },
+    {
+      "path": "data/csv/商店系统/shop_entries.csv",
+      "bytes": 9862,
+      "md5": "e84304b6077a4462017f8393419766eb",
+      "sha256": "8ee3918ca6fbee78f8712ea00a937a3018f86a53cea70df05d01b14908512c00",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/shop_entries.lua",
+        "bytes": 18050,
+        "md5": "ee847488306f0357f333dbbe392f4dec",
+        "sha256": "d7782efe02b03357f10d553e4dd44cf2782494f500397c05d6473d1c7a64e45b"
+      }
+    },
+    {
+      "path": "data/csv/多人系统/multiplayer_rules.csv",
+      "bytes": 593,
+      "md5": "613cbf16936c375931c2b1cd3d8c7ec5",
+      "sha256": "07ae0a8164bca29acd8a073ad49e8e4ad1943c301560bebca0f86bcd2d3760b3",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/multiplayer_rules.lua",
+        "bytes": 654,
+        "md5": "ddb7ceb190d0607808d9b25d76a9fe79",
+        "sha256": "7bb7fe314dc4f4d7e35ecf52c221037c4deb8900b246cf6de1c5ff94f8ab94de"
+      }
+    },
+    {
+      "path": "data/csv/多人系统/player_slots.csv",
+      "bytes": 1063,
+      "md5": "2940bd25bb3180e8e04cce02759c95f8",
+      "sha256": "8b2a77581659f970868dfaf79c9bc21c319ba0aa29320f5de2f08790e1595b57",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/player_slots.lua",
+        "bytes": 1765,
+        "md5": "77fbdaeddc13bb15cec1eb3f173f221c",
+        "sha256": "69c29d793af1e5ee0f738d658cdac2807e7de20cfeab38c54dcd17df48166c23"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_achievements.csv",
+      "bytes": 53158,
+      "md5": "38ba21ded314074b53bf3876fc81162f",
+      "sha256": "e5ff6b878de2622cda55b372d55b01d039ddc7f9010afb75fa3e1a1102021ca6",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_achievements.lua",
+        "bytes": 129685,
+        "md5": "afc872600098661a2a8788ae6b115567",
+        "sha256": "b244b8a2575b1db21e7172a31e38abd9d9c98090fb53bd83270a27d341e261d2"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_benefit_rewards.csv",
+      "bytes": 2043,
+      "md5": "b8fb4ca1da8b31985a257c45aa84209b",
+      "sha256": "f75f7270dfe511c971ab35f9a16097d4dffa4fceeac522916a84f66dc7afd112",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_benefit_rewards.lua",
+        "bytes": 5330,
+        "md5": "7c4a9de0fb0055c2f58354c2b0ec0c90",
+        "sha256": "3daf1000e2aef3cfcf09b0707388ae2b288c6f91fb26321a66e03479245be528"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_boss_achievements.csv",
+      "bytes": 3324,
+      "md5": "6bc78b2a9db2039d4cf6cf407d2f4b64",
+      "sha256": "f05ae3bbef01094d9be0e9dd717949659720b38ed9854d68ba5d96915f74b427",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_boss_achievements.lua",
+        "bytes": 8214,
+        "md5": "53998144c26c62529c2a14792d445d6a",
+        "sha256": "b6606b83fa7d89661386cf6a0b89c0afd3439d2bb9b9453803254018daa71cd9"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_building_items.csv",
+      "bytes": 1197,
+      "md5": "5b36e36e4e2ef4b1a4186897d2f17739",
+      "sha256": "8d63ea5f86e3792bd21fa5320af4a471720954ac32a58d72a54aca37ef6b99fb",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_building_items.lua",
+        "bytes": 2384,
+        "md5": "fce6fd8dbe20d87a8da37b29f1579cf6",
+        "sha256": "48f987ca1b8e8bbab150c0b69d8889ea07a0d0bf97f75548e01ea4e8c9a6e8ca"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_building_rules.csv",
+      "bytes": 195,
+      "md5": "e4c2aa4a8f3a624e3ff373838819cd60",
+      "sha256": "6bfa65b3e03328917834fd094202214f7015d669e05cc883000297a8652eab67",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_building_rules.lua",
+        "bytes": 359,
+        "md5": "d5a47f94c7ee73f2d1ae062d7dac1324",
+        "sha256": "98c3baec6f8f1a8a8e7699963b75ba61b69a0ba431d1df86700725b475bc9507"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_cage_items.csv",
+      "bytes": 5166,
+      "md5": "0329c74bdeec412c2c87e15a063cb0e0",
+      "sha256": "7859491fe5afa202b23afcba6aba0df0581b18563ce7b17b109aa835e4d340a8",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_cage_items.lua",
+        "bytes": 11605,
+        "md5": "f4151575b3b0d5ecebeb225725ad09b3",
+        "sha256": "77c715c08903505d1c81540cf49784feb42dc5ae0e311fedfb4fe75a8103f374"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_categories.csv",
+      "bytes": 1082,
+      "md5": "6abfa570ff3b67cf540253857a360f6c",
+      "sha256": "c5b04eb82f4886386e5b544b33e625daa61b6cee7b2d25dc0fdf789250634620",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_categories.lua",
+        "bytes": 2715,
+        "md5": "b02259ccaf2b1a1f28d8eb936b2f0e27",
+        "sha256": "47e7bca008a6f88d780a13d8a8ac3b7cebad80afdc2ea9f8d2dee36218279e2c"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_challenge_definitions.csv",
+      "bytes": 6565,
+      "md5": "ff00c7f0676f1c2875260f1e173361e0",
+      "sha256": "fc9d0a3a06163d3c81daf98c9e6f73be77fd3b4fa7f0d6857ec94bdc2d90fcd7",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_challenge_definitions.lua",
+        "bytes": 12999,
+        "md5": "aaaae02c963514f73871c453ca0a0338",
+        "sha256": "a232b6aef32be35485307a8881293d469640b0e7ecde2c048e65b169f4725d19"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_challenge_rules.csv",
+      "bytes": 1211,
+      "md5": "b60614edc004da0da436c496bfae593c",
+      "sha256": "f8a7a78b1ddb36fd7f74f6349ee39b68be03a7127dd3129395657f7aa29bb180",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_challenge_rules.lua",
+        "bytes": 982,
+        "md5": "81d7ab216fd3abcf402232039bc5dba6",
+        "sha256": "dcc7a03962d38dfba3f56759c4a2e301c4f1f3b4f80c0617db7716cce7ed99e5"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_challenge_stats.csv",
+      "bytes": 53307,
+      "md5": "d109a0ba991a20a286c1104dd3097097",
+      "sha256": "8696b6706593aae614292df8f6d04aceaa5f790dc16a59f2e480a04d44bb0c0b",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_challenge_stats.lua",
+        "bytes": 95049,
+        "md5": "1392935ec2db2601e1ba9c00585edba7",
+        "sha256": "74186db719eb61cadba654438055670c88d1a48133d4f4b1dac8f8b6f87be746"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_cooperative_reward_rules.csv",
+      "bytes": 175,
+      "md5": "1d731b5d90fc2220682a18e9b0a0a7d4",
+      "sha256": "2f6e286184ef5edbdf370a4c7f1e6b57d217c1881c797460ee2dd8d9f00d8104",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_cooperative_reward_rules.lua",
+        "bytes": 364,
+        "md5": "4a31f130e8e401a4cad09e35af4716a3",
+        "sha256": "bb7203fe2072d18450868c823879fedcee7d1ffb5ac703b649c1c5614341e4c1"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_daily_items.csv",
+      "bytes": 1953,
+      "md5": "08b30bc317c681456e98429d8167e947",
+      "sha256": "90febd7e81b3d0d1870d92925a75f7dfbb25dcb985a3147c336d021054cab187",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_daily_items.lua",
+        "bytes": 3593,
+        "md5": "8be4fcedd44b6631320ac2b46fe76abe",
+        "sha256": "1971bfa16a172008ccdae6ec69aaac3a736e9d7365c82304146632233b3aa86a"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_daily_limits.csv",
+      "bytes": 3510,
+      "md5": "427d353f75456c5cf739dac5fc07b365",
+      "sha256": "b3b5628eada12849260d64f326ce8cc1bb594e5568997802b091b4ecadcab672",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_daily_limits.lua",
+        "bytes": 8228,
+        "md5": "621d66433a6c5d3bfe8ae5cb6df1416b",
+        "sha256": "063aa19ffb8d6cebe11c6ff73f3aaaa887614299a92861ba7f8fb23f841a2fb5"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_daily_rules.csv",
+      "bytes": 340,
+      "md5": "b3f8612d5eb2c189830c54ab1b676d67",
+      "sha256": "ad4b765d0b1efba9ea72fcedc01c8464d566d01d8cb5d8418249ae9349606575",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_daily_rules.lua",
+        "bytes": 595,
+        "md5": "0720dde0f6d0d72f082f19e59f66a4f2",
+        "sha256": "aeb5c12ae598d074f4b5713f615e126666493ad369ff68f3f33e1b45e3eee785"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_daily_schedule.csv",
+      "bytes": 275,
+      "md5": "7348857986179ca28307fee0eb53f319",
+      "sha256": "9901fb56952152802c6b60c5b7f713bf4e9baff80b8f8680282d9e3a9b053689",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_daily_schedule.lua",
+        "bytes": 941,
+        "md5": "ec6e9fb7607aec8bc65fda5e53e092ca",
+        "sha256": "0c60dca767f2e0008e9a3d13bd4ac167769d547d7726c1ef1ee487fd26fb1520"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_drop_rules.csv",
+      "bytes": 566,
+      "md5": "2ed7d4e47970993088960b22ca2bcda9",
+      "sha256": "557ebce745e3e8852eec9aebe14cd421f9f51d02048be6b960b5d4da4ec107ad",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_drop_rules.lua",
+        "bytes": 1069,
+        "md5": "93297043721ad7361a26469411f189fd",
+        "sha256": "cc8fd9d66436546a9baec92beddbecfaff2900eddfb9787208edb22c082b82ff"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_endless_achievements.csv",
+      "bytes": 7142,
+      "md5": "2d56fbe6692e2b2ad3095dfa50a285bf",
+      "sha256": "c341c157cb80603b3c43c85376cb38469dbdd83d4e0610b8e4a4f080c273748a",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_endless_achievements.lua",
+        "bytes": 18130,
+        "md5": "486ff2eb9b1460053b831abaf4a45065",
+        "sha256": "fb533c077f3caeed666c0dd7bfe1008263a80cf94137eeb6369b32a5cbc7eac6"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_endless_groups.csv",
+      "bytes": 237,
+      "md5": "288a7f8b64f33bf25f20f382a3f1b7d5",
+      "sha256": "0c79c761af5c76926d45de461761849ce0d6a60b6db1fb9aeedaeb16197de5be",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_endless_groups.lua",
+        "bytes": 576,
+        "md5": "3ea3507c948c53a8802cfd40c35dc9a0",
+        "sha256": "79fdde624600058527c50f0ed5f74d9460f7ae6c883cb4fcd07fe103b48ff536"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_endless_rules.csv",
+      "bytes": 365,
+      "md5": "b621f36cc3d79ffda3100b37b037d55e",
+      "sha256": "eee52d0ffb741d4ffaedc1e66ae16db77398166d70f98ea50d4fff5c1c2ad0ba",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_endless_rules.lua",
+        "bytes": 580,
+        "md5": "f05d4fc699e49b51e98794fb6497f6d7",
+        "sha256": "521ece1fd59af306429bfe758349ebd8061f42048ac4a7ddb2f3169965aa57d9"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_endless_visual_components.csv",
+      "bytes": 20654,
+      "md5": "58e6652d0d224cde8a0e5fb27ca7c77c",
+      "sha256": "9d652f1715cd03ab78e7eb189957eb2e2fcdcf2796903ad7eb5d5d98b428ecd0",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_endless_visual_components.lua",
+        "bytes": 36249,
+        "md5": "baa977da79ae54be561c5de0c46248e1",
+        "sha256": "bb2d21ba822946b0e5200851278fb2ab51af80b3ec969c3bf248dd24b6b25746"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_endless_visual_ornaments.csv",
+      "bytes": 35605,
+      "md5": "0df3848fde5922ed12fc5c2b8643feac",
+      "sha256": "5483d567681eb6ae8a42179b24532877088646fd33ced9f8f3fc3fad3d666d0e",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_endless_visual_ornaments.lua",
+        "bytes": 71696,
+        "md5": "6c70c66a8e198ebcf70e7b594879c275",
+        "sha256": "6e86f76e75155be7a11c35abd1bb8ce1b81b2561dfc2481b6cd304a3636007be"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_endless_visuals.csv",
+      "bytes": 39787,
+      "md5": "32e5f859379cd16dd28e20b660dc93d6",
+      "sha256": "94d1317387dbc6e6941e4ddbfafaf9776c83b06c289e0b060145fe82db5fa676",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_endless_visuals.lua",
+        "bytes": 87992,
+        "md5": "f54bc297ecf1c8be364963181fa698a6",
+        "sha256": "a48cbaf4e8a0d0999ea86a47ee9221f8da88ffe89fc11d352cb6a9383fb7a4dd"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_endless_waves.csv",
+      "bytes": 101334,
+      "md5": "43a81e3af761aa84bc95597dcd290713",
+      "sha256": "3a15080cb72d74f5f59ab553373c2d3f6211235a9f8709952db961e0930c58f6",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_endless_waves.lua",
+        "bytes": 185468,
+        "md5": "53897fb0d144ce4e62b90de01953434f",
+        "sha256": "d5468afbc33a535e93b285d8980996527ecbd3ed641b92d9712fbd8754abe8c1"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_fishing_items.csv",
+      "bytes": 2397,
+      "md5": "e4d8f4ba7bed67563cec99248e9a6f21",
+      "sha256": "4bb70b91d152bb1b83e860309d74162d94821ad1d80288d0491bcfd8683aceea",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_fishing_items.lua",
+        "bytes": 5373,
+        "md5": "5fd377661fe7f7be4ec50528e2681af0",
+        "sha256": "342c4d5ed3254e54ee4c9f63287d24085659f7ae8b8a8903676d4e947b94f3de"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_fragment_definitions.csv",
+      "bytes": 3746,
+      "md5": "e22cce9f09b736179ce865e91f79cc85",
+      "sha256": "9f5a5e9867c99112763e2632e577439ee369a0360612b37f34e41efffc088b60",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_fragment_definitions.lua",
+        "bytes": 6810,
+        "md5": "9f28f8f9ccd04923fc527ecd2a029135",
+        "sha256": "61ec9bb0a80cc8c3d45bd786bffd7e4c85ce54106177702e321b74a290c24932"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_fragment_levels.csv",
+      "bytes": 19471,
+      "md5": "45afb855a8bae48b65b499f7d125b246",
+      "sha256": "e1207ad366905b6cf656b13790d5044a8e5bf405297cfb797c09c1309e0fb7e3",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_fragment_levels.lua",
+        "bytes": 41560,
+        "md5": "91b8190481432059a9276f49f7f0a81e",
+        "sha256": "a0347c5783c8495880a1edfdf878fe78d56b3fb2f0f38038ecaeb52c1e9fd493"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_icon_presentation.csv",
+      "bytes": 29419,
+      "md5": "15b4d64af572f46a74c885071432aedf",
+      "sha256": "580caa984ca01896fd81a268e298582231ac9de4d813ba41dcb70d7a11e75d98",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/存档系统/archive_item_icons.csv",
+      "bytes": 109436,
+      "md5": "890390f6051f8ef6846c24276f20c622",
+      "sha256": "2abaaf33738f7cce4d91662ea8b7f14029ffa23f68d22d5efa93c9bc9e73e7cc",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/存档系统/archive_map_levels.csv",
+      "bytes": 4160,
+      "md5": "d9f0dfda3bd0432c1d8866b9bc4ca981",
+      "sha256": "877ddeb07c093d44048da9703776116d295896fbb31ae0fe5adfb347f7747b2a",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_map_levels.lua",
+        "bytes": 8731,
+        "md5": "59a005670cc1bafc5c4b0cf1c12fdd37",
+        "sha256": "258d8c15968dae231cdec790217cbccde8770c2c804a2b2ef4fa47fcc9e0a055"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_navigation_icons.csv",
+      "bytes": 839,
+      "md5": "0e7933652b0981fccb3e3558a961e6a1",
+      "sha256": "e691f7e2cf0b498a7cec1d3d10b4b59e4fb0af2257529c0bf7d1384b9c3cbe49",
+      "generated_runtime_module": null
+    },
+    {
+      "path": "data/csv/存档系统/archive_shadow_challenge_drop_rules.csv",
+      "bytes": 704,
+      "md5": "abde97dd4dc8c4c002f8b8efbd716390",
+      "sha256": "3c69571c853816fa8c71206b7c6f08f7fe59d2d1d561d9604e76947ab68b31fd",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_shadow_challenge_drop_rules.lua",
+        "bytes": 1251,
+        "md5": "1745274a6e9a94063138143fc2cc9f71",
+        "sha256": "1c5b0ced2b6ec325e8fab6412a31b847735a921073e044e2ef3343f686bd99b0"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_shadow_items.csv",
+      "bytes": 2966,
+      "md5": "43f09c98d80a585222c0d0195cd8427e",
+      "sha256": "8602dcaf854f0528aa287c3d0a0172042262e93463e7d65f7fcb7cf8d5e22d90",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_shadow_items.lua",
+        "bytes": 6791,
+        "md5": "f9c998faa6d867ba1945a041cea3cd12",
+        "sha256": "99d298e139cab1067b403d99d8cac6f3c2f23ad6fc33ac7414dd1a1074084650"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_social_items.csv",
+      "bytes": 15019,
+      "md5": "ec669f522de72586d1c2bff1eb6359e6",
+      "sha256": "ef2904324c006b65c22605672dd75c9643b30de9a79a70aedce0120ab7171de2",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_social_items.lua",
+        "bytes": 36599,
+        "md5": "4f42a0082a74bd684784bbbbf36dae3b",
+        "sha256": "2a3a4e972d85c355c7aef28b0d29cb89234fa26a064e2d4c8eaf96b7587233fc"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_social_rules.csv",
+      "bytes": 628,
+      "md5": "125e6289fd46e32e02d15635ee00a569",
+      "sha256": "21e73dc1cb81f1ba0487b9112aff70ab42294d9052e936493fa0b54d43bf67de",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_social_rules.lua",
+        "bytes": 1671,
+        "md5": "14a9be2d9d7ee04c365b5dfb628d4353",
+        "sha256": "8d53e2a8f965f0c5d599b7f1d543d275be13ab81fa9187bcf894b2dfeb714b4d"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_stackable_items.csv",
+      "bytes": 4750,
+      "md5": "2f21fe56609ab8dd5d7623bb98c7fcb7",
+      "sha256": "52b0056595f7dc4d9190a4645793e892338f7565f1f677069dddf3e35e75e093",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_stackable_items.lua",
+        "bytes": 8117,
+        "md5": "69cfbbabdc6e0f6118afbbe26359ce20",
+        "sha256": "01e6e7c795b00ddb9af47960840b98128d484a173e4736883f74f77af1824216"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_starjoy_levels.csv",
+      "bytes": 7181,
+      "md5": "7cb782237197a4356f60815d83a8b5b2",
+      "sha256": "02030b0b27a3f1267a1ef0fe2b5ad222dd1510dd934cabdf57abeb073bc2fc84",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_starjoy_levels.lua",
+        "bytes": 11114,
+        "md5": "8c0535ef4c67fb85bb5431a0b64a0e25",
+        "sha256": "9b2969f996cb9438658d7305d58431a93060cd8bb1e2db171b18cceaa2e6490c"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_titles.csv",
+      "bytes": 1943,
+      "md5": "dce77781214ae6bea5e5e4f8dee6d80d",
+      "sha256": "60e02084e4f7e20d3532b014dfe7421add6b1b202fd8d6e17b0fc35867e5964f",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_titles.lua",
+        "bytes": 3321,
+        "md5": "5ce85325cdf5d41eabe820816a92d102",
+        "sha256": "c62ef88bea5fc80d12788bc83d1cf52f4f57eacc443e7c1d1d41ed492d080c6c"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_vip_levels.csv",
+      "bytes": 430,
+      "md5": "2aa676856fc6dbcfb31a05a51019717e",
+      "sha256": "6bdb0c7eb8aa3a5eacfe3028d7d15aed1945e9868a393b2bb9f6966107f84a56",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_vip_levels.lua",
+        "bytes": 1556,
+        "md5": "0439381856bdf9d598a9f6bffa991fb9",
+        "sha256": "43e81164a2dedf4ed86fa5303954d71c0131286802d7edbfd88fc14bfc558cfe"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_vip_rewards.csv",
+      "bytes": 16198,
+      "md5": "9b5c24f7ebf1d43ef2a14b24d7cd4e7c",
+      "sha256": "caa3d3a2a5ff9069557bfa49052cba0e7b4cd7485e47178dfb7c6a4af048e3cf",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_vip_rewards.lua",
+        "bytes": 22742,
+        "md5": "6802a01ee30aa9a14c167e9889b3e7bd",
+        "sha256": "212c584846a73d4155a8ba8bae64342200f1892a16fb5628b1c45c751fcfb8da"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_welfare_rewards.csv",
+      "bytes": 3835,
+      "md5": "c76eaf6b0b5cd299002b324f23221558",
+      "sha256": "a197dcab5ac3af25d656ad8003a10ba74cdf74f1c20087d4ea62d090fdaf7d56",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_welfare_rewards.lua",
+        "bytes": 9465,
+        "md5": "810db9ce945fcf0f5cb8cd95661566d6",
+        "sha256": "393dff9f9501783fa6eeea5009bcd2a4979bb508fa7c63680d55324e0d94a1cf"
+      }
+    },
+    {
+      "path": "data/csv/存档系统/archive_work_items.csv",
+      "bytes": 3152,
+      "md5": "f485ce209d0433585e06b6a991463231",
+      "sha256": "ce3c2ffec13369f3094d950f9cd05d89245336ad54fde3ec5df6240f3cbab705",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/archive_work_items.lua",
+        "bytes": 7137,
+        "md5": "c8de0842a133a826862378003e293483",
+        "sha256": "a0b4d8596df89dbae495652d52b7aebeddb82cd2449b8be859aceddd04fe9685"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/build_forbidden_regions.csv",
+      "bytes": 2160,
+      "md5": "057b2ef9737f73aae7859fb98a1386a6",
+      "sha256": "2c95a235a72c2a86b697cd744c38b1927619f8dab16b206189924d6845e40cef",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/build_forbidden_regions.lua",
+        "bytes": 1769,
+        "md5": "abe64d43b18eab9e29a68b902eebf6bc",
+        "sha256": "8398f881e28624fa1d911d851046c935c42d43691cd1ec8ea17240dc9b9b6d2f"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/builder_ability_rules.csv",
+      "bytes": 1040,
+      "md5": "cab0a339df47d55b7a70c040c51a9252",
+      "sha256": "cd0412d5c250eecb6c59312ab5a94b0d7660ebe3a7fbea3d47fe4b0263cd5a67",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/builder_ability_rules.lua",
+        "bytes": 1830,
+        "md5": "728366ab7a51818809c735b8733e1e05",
+        "sha256": "18f07f0de33b3dac7a6ea3243f3008b6a79a33a78ba49ae7518ec2fd6a9e2a3f"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/builder_ability_stages.csv",
+      "bytes": 2204,
+      "md5": "5521861d2c424fb33c66665f1b4eb12d",
+      "sha256": "1c327c2553f3f4ac6b298eb9dbbfd1d3642cd6c895b6b294c2bb9a41f042f3d8",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/builder_ability_stages.lua",
+        "bytes": 4150,
+        "md5": "daae71e0ff7382a8f5508732859f363e",
+        "sha256": "cd6fa1f632000ffc18f72b612ed6016907bccd759c821bf801c05d552c77fd8a"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/builder_definitions.csv",
+      "bytes": 841,
+      "md5": "b8eab340c2ccd306e163fb3519a0742f",
+      "sha256": "2e398385dfbbd206826d849176b111d46fc2f2bac7ba49098a840ccf5575d89f",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/builder_definitions.lua",
+        "bytes": 817,
+        "md5": "8573f6547edc13810a9736989fad6e29",
+        "sha256": "b7204a42976f6678174b67182be3f36c19376cb2829f242d60ce3f0c5ccf6d06"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/building_construction_rules.csv",
+      "bytes": 3617,
+      "md5": "4557b5df2119c787719c002117ff2851",
+      "sha256": "b00ab060d758927303bcbf6d7fb60ddd850bad191cdf3985ab5b36ee2591ea5a",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/building_construction_rules.lua",
+        "bytes": 5086,
+        "md5": "1340bc1728fefa29b7594d425b484a1c",
+        "sha256": "b8422f471e3ac295ea64239743aa37764afeb63f66b4ce8f657e655225d3a57b"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/building_definitions.csv",
+      "bytes": 2053,
+      "md5": "fef02f008883856f83846a597fe0ac50",
+      "sha256": "b5b8b6f51abc15e0380883460e0167c116fc20d64367f4f5dabf2133c973660b",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/building_definitions.lua",
+        "bytes": 3668,
+        "md5": "4e8306ef6dbcbe4857f174644bb2e2bf",
+        "sha256": "e54d4f79c10cc0312f83bd5a41f5a29c50363d767a1131e0cf2de00cf022f889"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/building_levels.csv",
+      "bytes": 13155,
+      "md5": "0ca5fcdafcdb1df5f33058648ab2381c",
+      "sha256": "4485507ac2c5d9da23f58881bfe6f7fba37304525157db9ec49ddffda44368ea",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/building_levels.lua",
+        "bytes": 29766,
+        "md5": "dd24d0736eab505f8ffa9d59eec0d719",
+        "sha256": "184ab19cf0093d92ae1053731338fda207e531146f65f391816ee9b6143ae016"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/building_sound_definitions.csv",
+      "bytes": 6180,
+      "md5": "b9f03a169e6e7c095137d2d149e149bc",
+      "sha256": "6258a790fa4e768e38a780f51c42ca7dd4a41aa9383cdcd568db0d1922f6bb52",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/building_sound_definitions.lua",
+        "bytes": 12066,
+        "md5": "ed9ff8c8ed948dcbb94fa024af3d7ab1",
+        "sha256": "2b00d7e4fac785ae02cab30a91fdc1abff6530f1f60d0d079696fd27efb7b782"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/building_visual_levels.csv",
+      "bytes": 8680,
+      "md5": "d28ad545f0ff9dbe391dc4af675a0875",
+      "sha256": "2cd01cda8843e21210f166ff030e39c5d83ed4372734971880210283d1ccc8bd",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/building_visual_levels.lua",
+        "bytes": 13998,
+        "md5": "53ce38bd32439d71bbc5663dbaa215ad",
+        "sha256": "92c60e9931805623f0ab82b16bbf5ebcdb952b2fdb0f67ef57c457864a9bc1ae"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/gold_mine_levels.csv",
+      "bytes": 2799,
+      "md5": "1920aa309906d3ada20836f9777ce8c4",
+      "sha256": "e95dcf98afe9cf4164f0793cc9022a07473210e3771c74e7d54697d133488e4a",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/gold_mine_levels.lua",
+        "bytes": 6714,
+        "md5": "8bac306a6272dca7fb4836b581acc9c5",
+        "sha256": "ebbc77b0be02b21929b964b82c8a3f7bbbb39431e13ab17f6ac8a298f89bfaf5"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/gold_mine_rules.csv",
+      "bytes": 232,
+      "md5": "c0a723073600db2e0449cfd292555c0c",
+      "sha256": "87a216e508cf13d84a0606c8e427f862dc21676c341a55e03d346ce0009e18f6",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/gold_mine_rules.lua",
+        "bytes": 395,
+        "md5": "ad312991c8c8fa3b7f867a2a51befc18",
+        "sha256": "0126cb93788046ee2b2cc9c73b738d29d27a8f9bc8d2e4938dfabdf9b722694a"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/lumberjack_fusion_definitions.csv",
+      "bytes": 5323,
+      "md5": "60b9147257e0d67451b75c678699abd7",
+      "sha256": "8b7259a8132ae534dbc7f2c881e04f2f9a6150a8413d2d9d20020e65d73d374e",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lumberjack_fusion_definitions.lua",
+        "bytes": 7306,
+        "md5": "dba6fa93eea38d839ba80d2e47136b92",
+        "sha256": "5ebff49c9a0a9f0cf49ce48660933245e9844041fcabae10545e60adfac4fa8a"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/lumberjack_personality_definitions.csv",
+      "bytes": 2423,
+      "md5": "7d36149196b28c66a1a87bd0aba9a9c6",
+      "sha256": "8e122a84755c0d24af5ab7dbb1fb93a7e9a565dd3e9065e10f53ba9ad61e9ae9",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lumberjack_personality_definitions.lua",
+        "bytes": 3946,
+        "md5": "0ba7c586e9ad04185045ec66b04fd6a9",
+        "sha256": "9b3c9aa4e686307ef97cdc7201f5105211f0081017a7c4f68805ca2bc86db547"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/research_lab_abilities.csv",
+      "bytes": 5628,
+      "md5": "8896d4d593268c70f53a35ffd02e5036",
+      "sha256": "245930576c6f2a15084eea04ae97a0929be59bbbe9837eaf365b028f77b1def0",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/research_lab_abilities.lua",
+        "bytes": 9355,
+        "md5": "2bf7dfc726a58b067bf98dd49f2ae500",
+        "sha256": "223c985741739f2a6ac31a2cfc5964b5f3d5fe2b11f241f24fe87e66347d03ca"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/technology_definitions.csv",
+      "bytes": 157516,
+      "md5": "8f451b5e14d320d7f1e775e5cc7e3581",
+      "sha256": "301d8beed179c355b2af89ad2f3f2ed4117c6abf80e416850aeaeca3a7cd447b",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/technology_definitions.lua",
+        "bytes": 412224,
+        "md5": "eb8e25029a7ca7b3d14aee754db8a261",
+        "sha256": "f5e51dfde6637262d8dfacb081e99478833e46a20dee0e2b4c4d1224239ade44"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/training_definitions.csv",
+      "bytes": 4912,
+      "md5": "8dbc977389798e694eef2ad3158c587a",
+      "sha256": "f3ea514c767e94b91ec4274c01159f37281781cea4713c3f88f76da9ff6f1c67",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/training_definitions.lua",
+        "bytes": 10175,
+        "md5": "84b6fec4c7fad4dd21d2e20777bd26da",
+        "sha256": "318d6f48fa475d5e3c9c9dc935d298c96b4f78681ba821f3c587e35685bdb8cd"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/ui_unlock_rules.csv",
+      "bytes": 684,
+      "md5": "a5dae5e7439849b1682cd2081c253b4b",
+      "sha256": "9b5e8a13ef94504d8c13c5ca255ffa623c6a8e25c286686313d0d7c2398f9907",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/ui_unlock_rules.lua",
+        "bytes": 1217,
+        "md5": "f3f681f691738199bab3e4c6535042d2",
+        "sha256": "8f8aa7c3395b09723418582e930414b8ad6186033ff627312bb312fa0c1330d5"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/worker_skill_definitions.csv",
+      "bytes": 330,
+      "md5": "6190d9ba4addc67f6ae7de87938d98f3",
+      "sha256": "e8ecac4bebc7684c3938835282e6643e41d2cba89bd9d563a1006ce67f65f4fc",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/worker_skill_definitions.lua",
+        "bytes": 515,
+        "md5": "7d46d392c2dd06ec1e86920bcccaa954",
+        "sha256": "46cf4dd115731a274f2682d9458c959721cae65d5592371fb2ca2b07d2838cce"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/worker_sound_definitions.csv",
+      "bytes": 819,
+      "md5": "85e4be7bcab2651691e8c250465f5551",
+      "sha256": "2c6e77b2e25941258aba4049ee9d43abfc63f2b74011bd54986a1b7fcf9353e6",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/worker_sound_definitions.lua",
+        "bytes": 828,
+        "md5": "f04ebd40dbe8db7bea5cb9aac2e5749a",
+        "sha256": "d78daf1802aed8683b7c50b03f7fa52a704d02e047fb62ef1606f3ac9ddaa8a6"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/arrow_tower_base.csv",
+      "bytes": 2482,
+      "md5": "f31415f5c1ecebee6e7fe45180bc8177",
+      "sha256": "f5a255f1cd950ee9c471e5dbaa6a9e0018361449dfc189726242266a9c70271d",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/arrow_tower_base.lua",
+        "bytes": 3813,
+        "md5": "278378c5f472c26815de48df63fd6015",
+        "sha256": "8983d5233e4070b1a8a76509e185db1fb3258503d37784f6147a588706713f64"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/buff_definitions.csv",
+      "bytes": 5063,
+      "md5": "c96f879ef05bb95ce524d79861ee197b",
+      "sha256": "5a1e0d677756bba2e5f56ce00cfe8fa363285035ee3d3ac312d5d5a3a5195a49",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/buff_definitions.lua",
+        "bytes": 8186,
+        "md5": "4fcc35ef6fcde35b1b4004f1c31923ce",
+        "sha256": "2027d98d10fd070cf094d94d25265391230b671b908c361507db91d8c00aa958"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_class_anti_air.csv",
+      "bytes": 9761,
+      "md5": "41d54627fcf408585c40748b8139770a",
+      "sha256": "2bc9ad66a51d66b22df792ca2432df28b175ca3ee808aec33e1e342bb28e921a",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_class_anti_air.lua",
+        "bytes": 16545,
+        "md5": "77be30d00f4b430f3adc95daf7256b77",
+        "sha256": "9b54785ae8d2162408abd843509f0f69588ee06b7644f823999b10ec8d7e5bef"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_class_death.csv",
+      "bytes": 9752,
+      "md5": "efbe3807457daa9d646efafb90043cd2",
+      "sha256": "31c247a16107ff06c0f31d667c6f3baab9808e04c3d2ea402634e81d580e5d7f",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_class_death.lua",
+        "bytes": 16542,
+        "md5": "d895c9e51118812d8a95730008427609",
+        "sha256": "537070b21bc0333f149de2659473f4b8d3788fa2407c192fdc39f5d041eabe8e"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_class_frost.csv",
+      "bytes": 8852,
+      "md5": "23af861c57c1d95ec82b289e35d01300",
+      "sha256": "4ad1e05430f3d5bd904732c744d4adc0b17159d763a4424fdabfabf6840f74b8",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_class_frost.lua",
+        "bytes": 15642,
+        "md5": "a48bfdc7fdccd06f7b0d96bd7a2edcef",
+        "sha256": "bfebcc616f59abbf7cb81b110ae3ad606f09c456f4eee20fbbcb73c2767af834"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_class_lightning.csv",
+      "bytes": 9347,
+      "md5": "83ab80c1b3d02dcb5cc854e7b13b351d",
+      "sha256": "93cd802e98d68001c0620b5511bab4824d5ff0bf85deb8ecef1121b1af15be42",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_class_lightning.lua",
+        "bytes": 16141,
+        "md5": "2edf527f87e2ef84e5f9194258e0178b",
+        "sha256": "b134f0468842e60a00230da5ebc10678f15dbbffa3957169f008bd17e341ae67"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_class_machine_gun.csv",
+      "bytes": 9815,
+      "md5": "7c156b16068595f2b03931d60ba63a66",
+      "sha256": "58003047498c9e3f8ba8825aa04fd5e9f2dd17c309febea828337adb4381c759",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_class_machine_gun.lua",
+        "bytes": 16248,
+        "md5": "af24efa76121047c5f7462888323e50a",
+        "sha256": "33c8001af9e6e9df85109d71392ebd873ac905e168f2fa22423a153b8c6d25ff"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_class_multi.csv",
+      "bytes": 10080,
+      "md5": "61cce40a6808a8a6bc3db2b36abc6e1f",
+      "sha256": "711662acdfe1b98433442f08a0425c58be0069c3cba0100e62927820abd90936",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_class_multi.lua",
+        "bytes": 16870,
+        "md5": "9f79a573b91f110e432a2af6f676aa58",
+        "sha256": "7e5d3d1207551a0adaf57f8bffbf8fa50e3cc43a011abc22da56976fbdadf72f"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_class_mystery.csv",
+      "bytes": 8560,
+      "md5": "aa4b24dea11d272b6049a8a20cd19eea",
+      "sha256": "4584e43f4cad4583c496e23f7a8096865284b255afcd136dba5c56ca1864b5c0",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_class_mystery.lua",
+        "bytes": 14989,
+        "md5": "0ec9d069cd9c64d9787c7ec7d17fa658",
+        "sha256": "1076f98c6b0cea97f5ca68638d546fa94b46ab28bd345c6a3b4ceafbc6aed56b"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_fusion_runtime.csv",
+      "bytes": 782,
+      "md5": "68fc50003cd4332eb95eb71fa4e4bf7e",
+      "sha256": "3ff0721d13530db8f49ba68fd7f3c2c3accdacfa4b88da22e7a65e6bfb656060",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_fusion_runtime.lua",
+        "bytes": 880,
+        "md5": "8f1d71248841d7f3e7193a0c5a24e804",
+        "sha256": "319871f9b6fca6c9854594dd15f16c4c31404aec07546454d6da457e0d814b8f"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_laser_effects.csv",
+      "bytes": 6627,
+      "md5": "bf09a14df93e162e022bb2f3a78ab4ba",
+      "sha256": "c7302dec0fd548d57fe2b2dd5600f47dfc3e53b48cffcbf7fa598b5de7573d20",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_laser_effects.lua",
+        "bytes": 13510,
+        "md5": "e8b0c435f83a81618f0cf880ebce503c",
+        "sha256": "4caa794fd2779981548437e4cedb096205d15aac69efb5f89dcdb4137071f9ef"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_lightning_effects.csv",
+      "bytes": 1186,
+      "md5": "0bcb7546bd82f99da25b05a7f4ebc20b",
+      "sha256": "8a99cff3ff82e4b10414312b99cd27870bb9d37e6067679f53b960aff7f852e8",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_lightning_effects.lua",
+        "bytes": 1514,
+        "md5": "bd7514181a42afe3c379e1d49801f11c",
+        "sha256": "476d6df2b7f57ce1a7b8df672f0702a29c0a096b33932ea88dec5c2bd861ee3c"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_skill_damage_rules.csv",
+      "bytes": 966,
+      "md5": "d2de24d9ac4fc0a7f6534ade9d8bf292",
+      "sha256": "3a27cf033840ef6bf5cc679da9b146dcab9de16521032c45a5de00dccf8619bf",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_skill_damage_rules.lua",
+        "bytes": 1494,
+        "md5": "29571482d660b41b9834abaf308b11b6",
+        "sha256": "f988982ebe4274b22325ab751bc29f103f575dd2ec28ed09802945346c060afc"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_skill_definitions.csv",
+      "bytes": 20661,
+      "md5": "63c52193f273a6da168459fae85f7356",
+      "sha256": "5f7485ff850b7d6b43c37e16cde32a3293d6f9a5fd7a18e665b4655ea0b337c5",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_skill_definitions.lua",
+        "bytes": 35024,
+        "md5": "c66e6a6a82bacc380ba769599b58ca4b",
+        "sha256": "747de507d0874527639120d0fbcca8597c0423433401391756b8e10971488c69"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/tower_skill_sound_definitions.csv",
+      "bytes": 6966,
+      "md5": "ed5fd5bca8079052087ce4d909b715e1",
+      "sha256": "2d0681708fe9d480cb2d2dd768c71d30627003a0cba2c29c764e0adabc39bd91",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_skill_sound_definitions.lua",
+        "bytes": 13408,
+        "md5": "559d12cdc722ff884bef7115e42c6c27",
+        "sha256": "8c09c27527a2456049bc02ce6b12cd1ae6880faf1eb0ec42ad49a572062e2ce1"
+      }
+    },
+    {
+      "path": "data/csv/建筑与工人系统/防御塔/ultimate_tower_skill_bindings.csv",
+      "bytes": 1961,
+      "md5": "1d724d9ffeeb9a9d5d6e03b2cba8df3a",
+      "sha256": "1555a49aadb06cd760776f8ad5f9af2ab664975ce45902feda9a2de57e70c630",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/ultimate_tower_skill_bindings.lua",
+        "bytes": 3731,
+        "md5": "03ded9085cd78c4a61f13b521ac00031",
+        "sha256": "b024df6b74192fdc30b21b3dd132d0f7c43839dedcca6687facf8bb473b431f9"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/monster_archetypes.csv",
+      "bytes": 26338,
+      "md5": "aeb0beb273bb044581832255d1e5a7ab",
+      "sha256": "da0b25142b3bca127aa5b833d3a44cd43c0d409c3b0ba3fe60ebd14e25cda38b",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/monster_archetypes.lua",
+        "bytes": 50244,
+        "md5": "6fd136ac45782ffa97b53701efbf2134",
+        "sha256": "e9fc031aad2e6d1faa6f800949a2baab1eb0b0e24b31e6505414286d2fc1dcb9"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/monster_encounters.csv",
+      "bytes": 4418,
+      "md5": "7c8afebafbaa2ab226c52f18a80b130c",
+      "sha256": "d70032ce29614f4f35384d61ddc2486936fa1b260a0ee2e6e75e150d80feac65",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/monster_encounters.lua",
+        "bytes": 9360,
+        "md5": "10352a8bb0f853f53e064bcaa7873db2",
+        "sha256": "95313e9f451f03a308f02ad46ba0be20783de5e2cb7aed8279b53bcdaa557607"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/monster_spawn_points.csv",
+      "bytes": 2067,
+      "md5": "7636ca60d9564962ccb39c1211ad256a",
+      "sha256": "1fd5ffc2c27cda9fd2477930754fbf789edabf0394578216f77bd4144b33ffb9",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/monster_spawn_points.lua",
+        "bytes": 4001,
+        "md5": "3323dc895c7404d652d8e3f2f529c7aa",
+        "sha256": "537957a969efa979fd3e70601c76a4a02f4e593788d31d3c445d24fcff450de0"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/monster_visual_assets.csv",
+      "bytes": 2962,
+      "md5": "e7d20d9e7d28a0ab9bcc5d81d07902fc",
+      "sha256": "c0aca7509989248dd9e38b7914f3e539c0b78feb00b1abe1f26bec7f0c13440a",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/monster_visual_assets.lua",
+        "bytes": 4700,
+        "md5": "c1b440e3ba3419449860bd33d34a8453",
+        "sha256": "5833bb8424f1b50563b5cae488e27f40c158cf1a9cdf4f203e3f735752e46475"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/monster_visual_components.csv",
+      "bytes": 205,
+      "md5": "5746cadc66887a78e98b84b21d100e98",
+      "sha256": "6f71c32af4aa8edd86d731fb1379e872cf8399252571a1247d562234810c4210",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/monster_visual_components.lua",
+        "bytes": 273,
+        "md5": "62c4d441f3a81e4130287d9ad3f4ea61",
+        "sha256": "8e0c2a7bea9d57469701d74b2133ad1f002539ce4249aeb88605f406d96923c0"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/monster_visual_effects.csv",
+      "bytes": 235,
+      "md5": "0c28fd781b1263578ce31c3043edb3de",
+      "sha256": "dc0f2eec443026e577ae9c90f7c2692e86e8551d580f013b5788a5b7ce732d53",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/monster_visual_effects.lua",
+        "bytes": 267,
+        "md5": "2fc2efe7240357dc456e2f07a5bbc70d",
+        "sha256": "8380f6f2aa0fa64c19db38d95c47dc59da2509fa10b14e55aae7a5a3bddcaaae"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/recorded_mode_wave_definitions.csv",
+      "bytes": 1104508,
+      "md5": "603cd465b24faac9edd7db23b099979a",
+      "sha256": "489e7282a5742a62b434a3f2c046a4f9a3c4b171f6bce841e82e9a584d0f2270",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/recorded_mode_wave_definitions.lua",
+        "bytes": 1389620,
+        "md5": "ec37a4e5b6f1662ef13993865aa37297",
+        "sha256": "14711fc9564ff673827b49b260b6adf8366911be64b568a0e1608ecc6e998b8a"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/recorded_mode_wave_stat_variants.csv",
+      "bytes": 24100,
+      "md5": "5097c15a1c6c9849bc3a0cac443d862b",
+      "sha256": "103ce0986e6dd735076e800b2d6e36402cfbbdf35ce4185ef9e984ecfd6ec151",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/recorded_mode_wave_stat_variants.lua",
+        "bytes": 27738,
+        "md5": "a6009ea3b703b8d64a61091c6b8b64e9",
+        "sha256": "5c8a35ae2342aa760e489cd6de30e2607deccad20dbba94ed8235266f020feca"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/rich_wave_definitions.csv",
+      "bytes": 762096,
+      "md5": "66e2c7f80de754f2caf406c7ca64e5c0",
+      "sha256": "1a8e3547918e46dee6ce62bdcd0e921e27a1f906cc2eb9d12194687a3a25a9a9",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rich_wave_definitions.lua",
+        "bytes": 1222474,
+        "md5": "7eb9eff84270a5c1f95110a746ee3364",
+        "sha256": "b2cc9e70a79cc05b3c374331d817987fe74ca3c5b95018fc9b92c682bea564b3"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/rich_wave_stat_variants.csv",
+      "bytes": 6727,
+      "md5": "0a978d505ec0132115b91100d9bc943e",
+      "sha256": "5988a4e0f44834d0052196104678e75e2dbb33c443ae2e98c7b390fc032c7324",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rich_wave_stat_variants.lua",
+        "bytes": 8270,
+        "md5": "5c30f2422ecd3827755ba32e702b4d1d",
+        "sha256": "8a2df9573862f63d3522f845f8fcaae7600556ad14bd8e695e67b08a5b850d19"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/wave_definitions.csv",
+      "bytes": 255125,
+      "md5": "90103bb30cd3ab91097b04e1eca85f44",
+      "sha256": "de441eea46931173ae41b3e56cb2355061b58acb8190b48047b7ab85bba4f8d2",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/wave_definitions.lua",
+        "bytes": 508842,
+        "md5": "86a8d420e2082a62d0610d412e3bf8aa",
+        "sha256": "7153cd451ff50912cf7d396bbd2880538f59cceb2e878dec20d15b0b5bf48e47"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/wave_timing_rules.csv",
+      "bytes": 735,
+      "md5": "c627b8ecf77c4b7a453663a580719cf1",
+      "sha256": "49af6104433699c46be75a1d88289e6b41bfdeb433e9ebea457ab45a1449c5ac",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/wave_timing_rules.lua",
+        "bytes": 732,
+        "md5": "5602563cb83c277a23c54ea3bbeb85af",
+        "sha256": "19e1b0fd9253426b2f8b0615d69a2db619577cc99c91618e0131baa00907f61a"
+      }
+    },
+    {
+      "path": "data/csv/怪物与波次系统/wave_visual_definitions.csv",
+      "bytes": 1247,
+      "md5": "e02d7832d12254061e604ee5c12d453f",
+      "sha256": "b8c948cd4ff13c793ff9640ce89652c840cc5dd1384f34f61fa0887ef87acf8d",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/wave_visual_definitions.lua",
+        "bytes": 1921,
+        "md5": "1854dbde35dd4ced117b3db9cc835eec",
+        "sha256": "0b0c98c03b43b0a826662e9005d389c702756fb43a8f4c5e59cc499d6d8baac2"
+      }
+    },
+    {
+      "path": "data/csv/抽奖系统/lottery_currency_definitions.csv",
+      "bytes": 578,
+      "md5": "a6865aecdc0c69d04adbab9d97743b97",
+      "sha256": "96f27b58fb76a49c6557b140589ff02c873cfae9c735b3acd7c2aefaa6a5239e",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lottery_currency_definitions.lua",
+        "bytes": 836,
+        "md5": "276c10e1044eefe61fd5a779aa0184fc",
+        "sha256": "9d8a269bfe68a4baee1e7dfd06443bf4043ed3c49fb78890ceaaf3b3476e0f26"
+      }
+    },
+    {
+      "path": "data/csv/抽奖系统/lottery_item_definitions.csv",
+      "bytes": 45379,
+      "md5": "4dbefe721eb88733a826b90915aaf31f",
+      "sha256": "d91372374d7e02dff7410b255f8b8812fa652ddb09592122aaf32a037c9141c4",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lottery_item_definitions.lua",
+        "bytes": 79448,
+        "md5": "80fa0e20aec47369e80ea39b9c6368af",
+        "sha256": "06ca3307df439269c75539a173635702a0d97bf7cbf6fbe46628af9c14aa453c"
+      }
+    },
+    {
+      "path": "data/csv/抽奖系统/lottery_pity_rules.csv",
+      "bytes": 856,
+      "md5": "4f499f5a3c44c67d7e2c1f1eb02ea3f9",
+      "sha256": "45e163be70ef75727d64628356f6ea53499313677e12cf6381c6aa151104c6bb",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lottery_pity_rules.lua",
+        "bytes": 1405,
+        "md5": "2250f7ac79e46d396ccd38d74206ea86",
+        "sha256": "271e24015e008b352a2e7b746677159db6f1252efffb95983b3b2148e5d33016"
+      }
+    },
+    {
+      "path": "data/csv/抽奖系统/lottery_pool_definitions.csv",
+      "bytes": 1328,
+      "md5": "cf12c38c22784529a88ad2b7504d3bcf",
+      "sha256": "ebce063830dbfebe7386b9f708e10d7081918048aa060e14391cd972b860298f",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lottery_pool_definitions.lua",
+        "bytes": 1950,
+        "md5": "4a47f1f7935cd25d8856ab278b5b42bd",
+        "sha256": "0a0d875a170f2f3bd6a4fa887fdf3f48c257080d7fe0561fa02ce8ce2a2a291b"
+      }
+    },
+    {
+      "path": "data/csv/抽奖系统/lottery_pool_items.csv",
+      "bytes": 14127,
+      "md5": "1230bb689914c43c5e30580b83f20ace",
+      "sha256": "c5ed4c619bcd2cc55a90e357b14718b4153306bedf9eff18bce9bf1b8610140f",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lottery_pool_items.lua",
+        "bytes": 26035,
+        "md5": "b5ed4d232826b446f91ed26fbb879aba",
+        "sha256": "fa069cd8677957095784a29135f49dd7b94054da9541e9fd009c0cc0d501e2a4"
+      }
+    },
+    {
+      "path": "data/csv/抽奖系统/lottery_pool_updates.csv",
+      "bytes": 1130,
+      "md5": "52ac66462c00810a58d98500bfb4d53f",
+      "sha256": "9e18b443ebbb7d07a361594336407fa361f9980ed7d2b4d9c61fa4583a564d13",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lottery_pool_updates.lua",
+        "bytes": 1351,
+        "md5": "df5b0999e7ddac28bdab9598061ac215",
+        "sha256": "bcc1fbd8211d5039b10bcff6dcd055940ec6cb680f05332339a5f26bbef75840"
+      }
+    },
+    {
+      "path": "data/csv/抽奖系统/lottery_quality_weights.csv",
+      "bytes": 2405,
+      "md5": "4bea8e23589b7e52fc021849fe81cd12",
+      "sha256": "6f7c7675447e9b60b5ddb5849a311e4a99cf8f06fabd18124172434f2f1d7f2c",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/lottery_quality_weights.lua",
+        "bytes": 4531,
+        "md5": "f2d512cd37152aad25d303be252bd480",
+        "sha256": "2912989c2bcd097531e777390fe8022289dce42a458bf53a184677ce5e242014"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/building_challenge_definitions.csv",
+      "bytes": 2283,
+      "md5": "968c1e2f145c31a70f04a56b0e0d99d7",
+      "sha256": "9bd1e9c427fafe6d95d822373a7d092554ffb75ca62e7497fac013cc5432906a",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/building_challenge_definitions.lua",
+        "bytes": 3604,
+        "md5": "6478136e6174278c7d51546b743f05e9",
+        "sha256": "7559d19521bf3704a79aec5d8655aa004effe20b6ec9e0ea7d4867531de9160c"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/building_challenge_waves.csv",
+      "bytes": 64149,
+      "md5": "bd97bb4849930f0eb1b5a73060a3f967",
+      "sha256": "34d7d8ced66fb4b59ffc4d209a2174baaf142ec4af883c4daf3288de4f0181aa",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/building_challenge_waves.lua",
+        "bytes": 165786,
+        "md5": "d7245c33be7de4398012e6cc1c6661b3",
+        "sha256": "f8fbd63a9ab23203514e228e3120f0f036055d6034a3dd4710c29b4a0214a461"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/challenge_combat_profiles.csv",
+      "bytes": 23629,
+      "md5": "b011c6b9662f0e28166a7b7bc13cb92c",
+      "sha256": "01af22b9a73386a692262888b3237116ac35648c32d65b940cb420edfb20aa2f",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/challenge_combat_profiles.lua",
+        "bytes": 46104,
+        "md5": "628baa6bc25ed46f7e12add7b57adb1a",
+        "sha256": "3360d59ab2417ca13a62d0715b8c90386b6091844b7d394d3214332ec2824e7b"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/challenge_definitions.csv",
+      "bytes": 5291,
+      "md5": "9b96e931075af164f2693e8997b96b41",
+      "sha256": "5fab8dbb05b5563b92926827ee988883ba2684d37cb40cb70bc09bd6d3923d36",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/challenge_definitions.lua",
+        "bytes": 10066,
+        "md5": "f88e76b8c77ac01d0dddc254b21f5be7",
+        "sha256": "820af41a28f644816190b5fbaf2ab7f39f6eb63fad3e190816847058f297ccc8"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/challenge_locations.csv",
+      "bytes": 4271,
+      "md5": "5bd3426bbf3f886b21f44ed5fe53a4d8",
+      "sha256": "e69716eebc05a791fc20148eb3efc854e8b006c4f6232506bfa1b57ffacd775e",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/challenge_locations.lua",
+        "bytes": 8259,
+        "md5": "c315495ea5a556e95c9b22a8272d895e",
+        "sha256": "b823666678227fc839cf2aac7ea05a39ac164df0798751eff0c95e58cf41908b"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/encounter_members.csv",
+      "bytes": 5257,
+      "md5": "bd2b3d04ef40849f6322b4be2102b807",
+      "sha256": "c61b3005bb7b2ba197930e36863eaf8b03073731791a9b9b20871c95492054c8",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/encounter_members.lua",
+        "bytes": 10506,
+        "md5": "0d0f58536a88437be1084acd52faf245",
+        "sha256": "669e20fb5ed5a7802846bcea5c2fe5051534273213f3e12e4be67b1a477ce0f4"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/encounter_reward_links.csv",
+      "bytes": 3608,
+      "md5": "4cef4c896262be62cb93ea4f6628138d",
+      "sha256": "3958dfb76466771b090555d8d9c863ee2b10a65033beaee62de5e33ce0a64d43",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/encounter_reward_links.lua",
+        "bytes": 5866,
+        "md5": "aed9339bef15b517c21d3e8ce53dd15f",
+        "sha256": "de92c405a3dfae731eff68d0c6e353b726fc1ed8455e5abf96befd462f48e8d8"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/fishing_reward_definitions.csv",
+      "bytes": 3002,
+      "md5": "b220a1421f21d5461d2d8ee78d14f1f6",
+      "sha256": "ce9df5204c3bb36f9067ca1fd07a02618416dde530082eddc14100938b0765c9",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/fishing_reward_definitions.lua",
+        "bytes": 8141,
+        "md5": "73126624197e964c4d477d471580eead",
+        "sha256": "f76d0795ff8859fd7a45e2f96f972b158f6ddf44280adaa71ec425a199f27978"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/fishing_system_rules.csv",
+      "bytes": 676,
+      "md5": "6330c4833c1fe2fc9c9e16227def5e83",
+      "sha256": "32d8c2b90ac25bfd3eb7242913782cec5090d140727c8ffc340db5c641954660",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/fishing_system_rules.lua",
+        "bytes": 901,
+        "md5": "3c58c6fc564f79aed50390bb3b6c3e73",
+        "sha256": "15cfa72047da76d6a49d09f7f4b604bd23baea8c81d6be34fb35f801392f9451"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/rebirth_challenges.csv",
+      "bytes": 3815,
+      "md5": "f6fe6f8cb363807480156b9a42ef4bd2",
+      "sha256": "416276a746e4c261e4599ad6dbbbab57971b2846b81e2dc02692842b424d34d9",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rebirth_challenges.lua",
+        "bytes": 7425,
+        "md5": "07855d9163842b126399934ef460757c",
+        "sha256": "22e9b8e8388e3fb5ea2d4f4411140dc085f17ea68885e49513674ab5bc2ac795"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/recorded_mode_challenge_combat_profiles.csv",
+      "bytes": 393779,
+      "md5": "48b8ebe1f1dd3b6d1a8bc6988a9f48af",
+      "sha256": "5afb22f83e7cfe9f8556a13caceb9275754f1fc2ca2c6736c0f4233181c7ad2a",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/recorded_mode_challenge_combat_profiles.lua",
+        "bytes": 454710,
+        "md5": "15fd4aef3a5aa721acb521385aa1fa34",
+        "sha256": "9815bb99d6007c888f02a2fbd317d0e51b21f0f22958e00a2c4b3947f16d0fc5"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/reward_effects.csv",
+      "bytes": 11299,
+      "md5": "2c98a73de5e2ed2aed7ad91f3602b167",
+      "sha256": "8f4764046ac60b12ce854d06bcf3c176f052869d147e83d7917d46641939f8fb",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/reward_effects.lua",
+        "bytes": 22506,
+        "md5": "eb30a20addca18a8fabf6ff862fdebf6",
+        "sha256": "043af154c34318b1e452e12e88381cbad7ca0e2ea3531aad73bb7edefb008fb0"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/reward_profiles.csv",
+      "bytes": 4259,
+      "md5": "a3de6c73c08e10541aa36539ee547ee8",
+      "sha256": "8100fd69f92c309f8f109527f648e0318a447d4b29473c2919ea2ff5b7b8b9ac",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/reward_profiles.lua",
+        "bytes": 7001,
+        "md5": "6b14995c6c817fe83f0c101bdab957f0",
+        "sha256": "899fde6c415554b1543865fce97fbcf7be882c256bfbbc4b980381bee14d1c26"
+      }
+    },
+    {
+      "path": "data/csv/挑战与奖励系统/rich_challenge_combat_profiles.csv",
+      "bytes": 208150,
+      "md5": "85884046693253b1316805d599430b30",
+      "sha256": "f00fbd398fa8517c16210e4a6e9bdac343e5ee9fbf1c95847aa288d32df89e87",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rich_challenge_combat_profiles.lua",
+        "bytes": 282291,
+        "md5": "af479a65d61c62f7e1bb3ffa4753f41d",
+        "sha256": "8b2973c5a2b31b1318c56ddd8d1e05f7a29d1c0b7214a0537668f97c76cd24eb"
+      }
+    },
+    {
+      "path": "data/csv/物品系统/content_catalog.csv",
+      "bytes": 60816,
+      "md5": "aa46f35eefd979d60b219b4688bf2dca",
+      "sha256": "ad7d3e6b27a556e4912dcf9500beeb8c9b31ac63033802d2f13875039453081d",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/content_catalog.lua",
+        "bytes": 101183,
+        "md5": "d62d1fe6402afed21bbd9c6f81cff00b",
+        "sha256": "a272f0fd8ac0528a0d5f82a6db4cc08c2e5fed4d84b65c3b12a5f51c6b6606f1"
+      }
+    },
+    {
+      "path": "data/csv/物品系统/content_effects.csv",
+      "bytes": 772,
+      "md5": "d03fa542d05d48591828283921f0102d",
+      "sha256": "c5367b08b16af93c97583fa2900afe8b0ab19e7c8ca02289d219df1229efd062",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/content_effects.lua",
+        "bytes": 1426,
+        "md5": "7037f1f505edf360b8bdfea01137c8f5",
+        "sha256": "ad2c183e10a85be2451455a27ba144f335dd3ab8175dbaecdcc93a1eebfdf96a"
+      }
+    },
+    {
+      "path": "data/csv/物品系统/item_definitions.csv",
+      "bytes": 5970,
+      "md5": "12803047e010cca3889bd8db7de032b4",
+      "sha256": "bef3e48a34d9ee19cfdd2404a1f07877de88455f7ac9c0daadeb9ee2e3c241a7",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/item_definitions.lua",
+        "bytes": 12707,
+        "md5": "c8f02b79dfbd2a3f3740d05647c85008",
+        "sha256": "0ffcf00bbf326bee1c079ba51195a8fba35d80426786d4bc256dd89a94de6da8"
+      }
+    },
+    {
+      "path": "data/csv/物品系统/progression_rules.csv",
+      "bytes": 6862,
+      "md5": "5df1dca025392b417c4c041170887c61",
+      "sha256": "6e921d4582d6e43e6007085fd842bc939c868e9b9a06432931cc361fa36d7aa3",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/progression_rules.lua",
+        "bytes": 14211,
+        "md5": "4e258f993536fe4a45758a68d132757b",
+        "sha256": "64674df50efff8569f6794b56e90e2a6c974b147e6511a1ee85b70ded1737889"
+      }
+    },
+    {
+      "path": "data/csv/物品系统/recipe_ingredients.csv",
+      "bytes": 1854,
+      "md5": "2400fd951c1e128993fdc25eb3a6e1b7",
+      "sha256": "dc8b54e0654d960ab427e9a4c6267ce47a0c2d0d281a95529294df7f70c2c48c",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/recipe_ingredients.lua",
+        "bytes": 4003,
+        "md5": "5cc6b714c184ade0a84f2ddfc2615bf8",
+        "sha256": "dbe08deaa7c2d8b4a240538c2ca5257a2e5d3bf9efeca5c4de0a9fa0164bab9d"
+      }
+    },
+    {
+      "path": "data/csv/物品系统/recipes.csv",
+      "bytes": 1274,
+      "md5": "2c1cd545ba2d9c001e32f3fc0f4ef5eb",
+      "sha256": "44eb70ebf2a8fbdd11947d783bdccac3f455f9e0e4c1b866914002f3d194e7c7",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/recipes.lua",
+        "bytes": 2426,
+        "md5": "a1ebd7826a5ee3f47318b9bb60e5edef",
+        "sha256": "92fb26e6b7f91dd0c6d8c4289bb00687a5dd0a546a04e1bd9bdcd33680f2af12"
+      }
+    },
+    {
+      "path": "data/csv/物品系统/weapon_definitions.csv",
+      "bytes": 36758,
+      "md5": "e13e2de9588d99e23fa57abc6aac5d94",
+      "sha256": "b07dee6f922dc29359ee1392884787c6b48de45265b91485e72e34a8d64eb437",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/weapon_definitions.lua",
+        "bytes": 73703,
+        "md5": "277988a0aaad76f26aacc1b93eec3b9e",
+        "sha256": "61fba99be921351e7287d2b7833e55332a89132daa33055ca3e4c74d9c530b49"
+      }
+    },
+    {
+      "path": "data/csv/物品系统/weapon_visual_profiles.csv",
+      "bytes": 1567,
+      "md5": "767724dfa24014fe37a3ab36c920a5a8",
+      "sha256": "3ff77eb73bf167b7c31f0863d14282a026c275f1f939e1f9f9a3038201ba2650",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/weapon_visual_profiles.lua",
+        "bytes": 2652,
+        "md5": "a6e69be3f24a9da3446da9d449e1251d",
+        "sha256": "539e4c46cb84290e3bb51417e36c596bd6126737e7b11a17feb332611a8618d5"
+      }
+    },
+    {
+      "path": "data/csv/玩家档案系统/achievement_definitions.csv",
+      "bytes": 437,
+      "md5": "fa1e21e5aa0b363788abdd9797a673f6",
+      "sha256": "afc0030efe44487d6b66037531738336f964c411f15b75947a27a8546c4803c0",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/achievement_definitions.lua",
+        "bytes": 712,
+        "md5": "b543c02e099551741f6490d107bd2fd1",
+        "sha256": "6decb27d568f5374851a72454a02fa556fe5481827938f7cf9a3b9592f4de1f9"
+      }
+    },
+    {
+      "path": "data/csv/玩家档案系统/fishing_system_rules.csv",
+      "bytes": 978,
+      "md5": "26abd3070c0d81179518ed6faef85450",
+      "sha256": "604021c0453a14fd95274173beb09895965978afa09fcc9f08356f011b6fc245",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/fishing_system_rules.lua",
+        "bytes": 901,
+        "md5": "3c58c6fc564f79aed50390bb3b6c3e73",
+        "sha256": "15cfa72047da76d6a49d09f7f4b604bd23baea8c81d6be34fb35f801392f9451"
+      }
+    },
+    {
+      "path": "data/csv/玩家档案系统/map_level_effect_rules.csv",
+      "bytes": 495,
+      "md5": "aff116ddaa27f120c236057f9af0bcf8",
+      "sha256": "4883c73edc0580234e4c7cac4d2363098b575299b02533c8aad670fdff283428",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/map_level_effect_rules.lua",
+        "bytes": 755,
+        "md5": "609b298f6803ba162fb5778a86cbcd2f",
+        "sha256": "25ae406487a7a54bb0fb75830e26007c52254815f57682381b416a48dbc7216a"
+      }
+    },
+    {
+      "path": "data/csv/玩家档案系统/mock_player_account_bindings.csv",
+      "bytes": 521,
+      "md5": "9593e43aaff83d20fcf70299885236f3",
+      "sha256": "1ea64cfcb847b33ffaca412af93e383b36ad621a77b390ceb82180ddec424cc6",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/mock_player_account_bindings.lua",
+        "bytes": 939,
+        "md5": "bc7e0d7045f8a8ff6dcf337be0daf112",
+        "sha256": "bdbad95a7d4d1d41a9e9cb0a80b2e52c7029457f16d32bf63cfc075ff223dbe6"
+      }
+    },
+    {
+      "path": "data/csv/玩家档案系统/player_gameplay_stats.csv",
+      "bytes": 12089,
+      "md5": "7a0993ed1d176c4b1d55534a3fc0271b",
+      "sha256": "8075f2ed936e1524a33eb2505e1312611cdf26e9780ba318742052da74acf4d2",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/player_gameplay_stats.lua",
+        "bytes": 22779,
+        "md5": "a6b1d4b41a875707e137c9ca6330708c",
+        "sha256": "02c6dfcba76e6651f790a92761109509263e60bb6ca5163432996c2ee3d35e2f"
+      }
+    },
+    {
+      "path": "data/csv/玩家档案系统/player_profile_public_fields.csv",
+      "bytes": 547,
+      "md5": "6373bd0a8ed188965ddf8260cd1d2609",
+      "sha256": "214d003420ed1f4ce74663843e4693d9ffb63358d0a99356fa31e595bf875fcd",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/player_profile_public_fields.lua",
+        "bytes": 1042,
+        "md5": "0a1283bd463631aa986a0922da1da0ee",
+        "sha256": "07b8a4a4866b6f7f98acb4c638b74d4f38b83827d9beb1a4d4b0cb2e55bef492"
+      }
+    },
+    {
+      "path": "data/csv/玩家档案系统/player_profile_rules.csv",
+      "bytes": 454,
+      "md5": "d479f9ef7b36435bb9c5fd2971ad3abc",
+      "sha256": "e6443c46c236b0876d36a8c24ca63166144b028872473d91667cda220f24fe6c",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/player_profile_rules.lua",
+        "bytes": 541,
+        "md5": "53f643d4ed9766bd6bcaf4b682274b37",
+        "sha256": "e8789e9e3240f30e29277317328815d7f125dce3a59de0804afad8b433e9cdb5"
+      }
+    },
+    {
+      "path": "data/csv/玩家档案系统/star_blessing_reward_definitions.csv",
+      "bytes": 3967,
+      "md5": "1c2da182365866e71099affea1fd655d",
+      "sha256": "8d527153b0e13f26ac5bd2a7636786e04ae20dcf6722e74af34ff718a842a5ed",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/star_blessing_reward_definitions.lua",
+        "bytes": 8774,
+        "md5": "9a7ef9c8b3caab059c4d5f4bd4b5aceb",
+        "sha256": "43418e8b01fbe8ddedfe82e4fe3613238b5b69d98b9d16da8ec654f854a4c1e5"
+      }
+    },
+    {
+      "path": "data/csv/肉鸽奖励系统/rogue_reward_cards.csv",
+      "bytes": 9495,
+      "md5": "61b40b49b5cef5ce46d55e911dabc68d",
+      "sha256": "247a0fc316656e29a56acd391d2d7c39d3f08db2a86fd670d5d9ddf4043c615d",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rogue_reward_cards.lua",
+        "bytes": 16421,
+        "md5": "4591512c354375af940ebaab9a4206a1",
+        "sha256": "e2774caa44e069605285dc87e1d15c29108d0d6069860ddde6085648baa3f2af"
+      }
+    },
+    {
+      "path": "data/csv/肉鸽奖励系统/rogue_reward_effect_lifecycle.csv",
+      "bytes": 7570,
+      "md5": "93979ac7be75341bdff346871a8d2103",
+      "sha256": "376918d0beb3d58435c9b1484525760e5d25b857bc421572dd1543dca34f7d99",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rogue_reward_effect_lifecycle.lua",
+        "bytes": 19293,
+        "md5": "f3997ae2535a6cc3fa4c7b629142dd65",
+        "sha256": "232e6c173f5908e0cf38473267da9790f2292b01e714ad2a7046b7254633a238"
+      }
+    },
+    {
+      "path": "data/csv/肉鸽奖励系统/rogue_reward_effect_params.csv",
+      "bytes": 6070,
+      "md5": "511f66c6c0eeb8c07d222f6375ca8b6a",
+      "sha256": "fbd370447f98e6fa702859399dc7502ecf5d613eb8fabf2a4c3dfae925a54a63",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rogue_reward_effect_params.lua",
+        "bytes": 13357,
+        "md5": "d0e07f4c059df28a8d3176320f60ec7c",
+        "sha256": "78a19a36e74cf0f700d3934e9ca52c085f81b2631462dce6f57373b93dc2fe64"
+      }
+    },
+    {
+      "path": "data/csv/肉鸽奖励系统/rogue_reward_effects.csv",
+      "bytes": 9321,
+      "md5": "0ca980cd2ac24f1720e4e4a4585c53a5",
+      "sha256": "dffb2fea36851d3dcc172ef6159823d140f50bbb454d1c24acfab945781063d7",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rogue_reward_effects.lua",
+        "bytes": 18197,
+        "md5": "3f0e3abe688992983b7c1c2c37e86d3e",
+        "sha256": "d6ee42b8a4e3fb99012d5caf7d04505c3b37e1d86b2bf7ce4c4674af58786b57"
+      }
+    },
+    {
+      "path": "data/csv/肉鸽奖励系统/rogue_reward_rules.csv",
+      "bytes": 589,
+      "md5": "01611da557815c1c59bb6c0abc63fd88",
+      "sha256": "345eea872a5f3187b1b571f01ae574b48cc7eb41092f3362758a668364889217",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/rogue_reward_rules.lua",
+        "bytes": 664,
+        "md5": "b0d928fbb65e3ea0381352ee87799339",
+        "sha256": "f737d1d53233e04991561a98c137f2ea36a7844de448991956d62bfaf1c97853"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/blademaster_exclusive_runtime.csv",
+      "bytes": 764,
+      "md5": "74b36351208686aba70b2b3dcb4af6c2",
+      "sha256": "0aa23a495f86440e4deeb22b09cda97f32c5b77177873fa1fea771a4141ea9ae",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/blademaster_exclusive_runtime.lua",
+        "bytes": 716,
+        "md5": "15acc50e2fafe1c910f2ddefc6445629",
+        "sha256": "514c692d3393039d7a62316b2825dad308ce50e1006846e40b4fe0bef0e84c60"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_attack_projectiles.csv",
+      "bytes": 839,
+      "md5": "4e4ca71a27d17b135a106c9c2126b254",
+      "sha256": "1abf9a2e2451bb02ca16811ae2b06a47a0759cebd05fa71f8bd2aa2daad7a619",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_attack_projectiles.lua",
+        "bytes": 1382,
+        "md5": "5f0c64dc6de8289fbb922cb69ffbf693",
+        "sha256": "98e1ab1e2cf804af452d7d22d3cc1eff719be3607fa473f56a49bb5bdd16d577"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_definitions.csv",
+      "bytes": 2569,
+      "md5": "4a731e7b55a5945b8c08798e37298664",
+      "sha256": "66c71cfdba94983d6d13f14f1b52e50fcee4cb571541a70fcc290cadde6a4051",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_definitions.lua",
+        "bytes": 5814,
+        "md5": "1c3ac27f3841b7a77e91d467ce890085",
+        "sha256": "00b9dcc07136bc3180bd4b6e3695a63b16db433d9a9297e45e825db6c02cab35"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_exclusive_skills.csv",
+      "bytes": 1468,
+      "md5": "8537f07f928527d8b9f8457661d866c5",
+      "sha256": "4b86e9ffe0c8a8b1764047fedc4e350fdfd5cbba8b0e600212c974570f7ce3b0",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_exclusive_skills.lua",
+        "bytes": 3337,
+        "md5": "b758cc36cd0c2d2c702ff8591f5836f2",
+        "sha256": "423de9851d3adac79566ac6a457454c65236dac0781a1f49466b088f0c4afc62"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_initial_skills.csv",
+      "bytes": 256,
+      "md5": "2f10c7b2684b4ce747d05c71b112bf53",
+      "sha256": "83240b7a9d3a5f63364b269758241fad211d5684725f8ff42c9653c6555dc890",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_initial_skills.lua",
+        "bytes": 271,
+        "md5": "3ac2ade60ec92add1fa7811554349648",
+        "sha256": "17a03667320b8ca49fb03aa49d212e30e3d437d5c00fca8cad34d70a48afeba5"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_skill_choice_rules.csv",
+      "bytes": 690,
+      "md5": "9ce8226e6567d4fe752149ea51a06f91",
+      "sha256": "731195e1ecaf660cb96ff13f34e7e62ae5e78ecf75d9b56357467ba573aba2ae",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_skill_choice_rules.lua",
+        "bytes": 699,
+        "md5": "0c26517042ae872252c7c6b325a97238",
+        "sha256": "8b177805503ba60ebe81410d4435f22ee93d83a8e1d1144c69712e8804279226"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_skill_definitions.csv",
+      "bytes": 17199,
+      "md5": "a83feaee38d2ed41171952a6212c22f8",
+      "sha256": "c6b2bfe202ad58fb75e476e34ca501179e8516f0ee9360b3c8c193b13f46bdc0",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_skill_definitions.lua",
+        "bytes": 22630,
+        "md5": "1fda6bd5402cd8301bd78183d384acaa",
+        "sha256": "fa35f27fc3ac7343fb3cd07801960c045c40a49967f599aa41579ffd2c6711d9"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_skill_pool_members.csv",
+      "bytes": 1382,
+      "md5": "bee1d35c93e83147215de07153718910",
+      "sha256": "7ffc1dd3b0d1161c83069d8ab49c94faa87161dbff8e21787553d68e3d85a20e",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_skill_pool_members.lua",
+        "bytes": 3105,
+        "md5": "a6e41c48d8e4b7c289b8d66e5751324b",
+        "sha256": "8d58d7030b2cd5a2b87063c71f75d2ba149cb6d0a6f388961f32411565be3462"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_skill_sound_definitions.csv",
+      "bytes": 8152,
+      "md5": "4b0130f6960b1dd32e2e95aacf67e7db",
+      "sha256": "6c3efe24de04b33c35d37dffc6b27c198f39190ddd1e379e285f2a9276f25d98",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_skill_sound_definitions.lua",
+        "bytes": 15442,
+        "md5": "ac72cde0da193e1e809d019abfe83790",
+        "sha256": "2c12a3100cea0b5068227512bc3980f9fd8adbe5c47e26ec31c36441d5ec4ed7"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_summon_rules.csv",
+      "bytes": 602,
+      "md5": "b8bf64cdaa54a30f0ffd63adab7eca0b",
+      "sha256": "e5647925572ee655149774f435645a6215f61b27a357c39be28cc9624a44aec8",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_summon_rules.lua",
+        "bytes": 654,
+        "md5": "40caa049a9cd686413a61b8b3a865f0c",
+        "sha256": "267885b98b56e40f3a55cc9f75f1b6c11734c8982f8b2cf0dc0d3b28a75a9ced"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_weapon_cosmetic_control_points.csv",
+      "bytes": 7702,
+      "md5": "559dbd71c9db84b1cc123deacd63396c",
+      "sha256": "80ed4aecc1e84319edf165b94662e8a6976f82e56ef9aa020ec17c06e430b5b9",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_weapon_cosmetic_control_points.lua",
+        "bytes": 13371,
+        "md5": "36121c207ce84ce91c3f9fbfb350d2fe",
+        "sha256": "e1b9f7eff32407f7a14cc74f9d57d3fcb73e007a96453e89e462913983fa8d4e"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_weapon_cosmetic_effects.csv",
+      "bytes": 1658,
+      "md5": "d6618c3fc4a039d19861949a73177608",
+      "sha256": "b04f8bd45f047a8f3e90ab54854a91d9f812b46b7edf7a4c78084f62d44cc395",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_weapon_cosmetic_effects.lua",
+        "bytes": 2320,
+        "md5": "4f8b183b4374897e35117156edefc06a",
+        "sha256": "aaee771d0ec8ef01d3928f7b22138bec4c1d432df5b127696de4eb50c8ee17e9"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/hero_weapon_cosmetics.csv",
+      "bytes": 3648,
+      "md5": "30fecf9b38caa1f25f4c385dfc93c37a",
+      "sha256": "48b9c485d1f39a178b1d9a2f10b2a0a309b52acf1e7cae3006584c826001c024",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/hero_weapon_cosmetics.lua",
+        "bytes": 5306,
+        "md5": "5b1eefa0be8145c10af2dafd1ffbf57f",
+        "sha256": "7b0138122f2ad063ead802eabb13071d4fecce379ab2d34843362c96e5d1b09f"
+      }
+    },
+    {
+      "path": "data/csv/英雄系统/monkey_king_exclusive_runtime.csv",
+      "bytes": 936,
+      "md5": "a37ee19b858a1ab544cb7fc65b1bd568",
+      "sha256": "4bca39a6ffd83affa7f91c10a85037ba8a466d740131d09057914d03dbfc59fd",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/monkey_king_exclusive_runtime.lua",
+        "bytes": 802,
+        "md5": "aa5ebe4c90fb6c4bc17fe212902f3983",
+        "sha256": "34ea1b01a86a780df329d581584164849ad4f1d946c26ded49d8f002949aefd8"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/asset_activity_modifiers.csv",
+      "bytes": 5174,
+      "md5": "adabcfc473382c3815655f11a0fbd3cd",
+      "sha256": "abcdb922a4dbd7cf926410aec426fe1897561fbf6e9b6e1b5581c387f5c86243",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/asset_activity_modifiers.lua",
+        "bytes": 9363,
+        "md5": "7d7c84b10b88127a8914920c3c0dddc7",
+        "sha256": "f42295870001097bc6a2841d15b35b275f0a7ebae8511c56c647c2004eb6d9bc"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/asset_bodygroups.csv",
+      "bytes": 218,
+      "md5": "fbc76e48ecd3743104a2f6a81778eb1e",
+      "sha256": "879a93762ac6681fdfd7f6565954c36711c1b94467bbe3a07724948fbbc332c4",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/asset_bodygroups.lua",
+        "bytes": 265,
+        "md5": "1f0de94b9471875b66e5f89fba8dfa92",
+        "sha256": "378ae92fb6975912cf81be3db2a9f7934341d905aee33a749b3968655ba2aacc"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/asset_catalog.csv",
+      "bytes": 71008,
+      "md5": "1a13fc828cf1d518afae5de200def856",
+      "sha256": "61cb20d76251b049b5e0a9dd36ba492847a01045c2bd9bd2a71a802f27f60064",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/asset_catalog.lua",
+        "bytes": 122956,
+        "md5": "34e20fa32f69c7a5a4780217b918fcf7",
+        "sha256": "5fe1ad6175ff9d84d0128b51c8a7b05b729929513b7e7c12392c2fa4857a1572"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/asset_components.csv",
+      "bytes": 147140,
+      "md5": "a6d3745ae73ae06e33cb414a7c16ea77",
+      "sha256": "a21a157acfdd22d430f00833a0649f6025ed46633037ec147151f3f1d1ce2875",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/asset_components.lua",
+        "bytes": 257737,
+        "md5": "c1519c0c56cc95496f66415d5073a585",
+        "sha256": "0cbb748de1f0f87179f826b922a8f75405d012006282fa4613e9f0e5a8149344"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/asset_effects.csv",
+      "bytes": 85362,
+      "md5": "2a5ca26b5c3c49a35a1e7b1f94be59d2",
+      "sha256": "ebbf9d9c41c8e95782b146dd1562bb86890af737bf664ec98de6d2211b677eaf",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/asset_effects.lua",
+        "bytes": 139211,
+        "md5": "03b5c4d3cf2833f4dc53f7fbc5a30022",
+        "sha256": "233f1606de358bd19e2e144e1ce59258954fa94c8cfce927527772f975a2f6bf"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/asset_native_wearable_stages.csv",
+      "bytes": 4741,
+      "md5": "78dd795db11fa9550fa05eb54dad2a33",
+      "sha256": "2e4e7e9d4f13dffc67887690c81df25cf18480de5d2fcf30ae96425216faeaeb",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/asset_native_wearable_stages.lua",
+        "bytes": 7465,
+        "md5": "5f3ed742e523e9b6f80a9130441bfd30",
+        "sha256": "0743407d2310255d9341a3a2c8f962d965f9fe7f796f998c8f7caa0c9dd0c50f"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/asset_native_wearables.csv",
+      "bytes": 21550,
+      "md5": "9c2a6d9b9a081f35159a31d80091f8b4",
+      "sha256": "3e7be9bb2cc4f4bffb63eda3ef425a59d5471b4eafd85e39c4c782c431142a84",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/asset_native_wearables.lua",
+        "bytes": 40623,
+        "md5": "c9037ea1363367e083f69bd54565ef17",
+        "sha256": "dd04fc1191552783ce17ecf509ce1b5de5a1c99a1f695aaa6d52c1df9170e6d3"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/asset_sounds.csv",
+      "bytes": 510,
+      "md5": "a503dcd5cfeb963451411e658cb6e866",
+      "sha256": "8b36c74d79510ca228c28090446f8ddf2c4912064fcfa48f6045d66dd356d7ed",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/asset_sounds.lua",
+        "bytes": 257,
+        "md5": "f85f629105cd8ead7ba2b1dd26d1ea5e",
+        "sha256": "9022ec4918043a424db72dc09a17b9f282ec6465fc233044744456858fc5d0e8"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/native_ui_icon_mapping.csv",
+      "bytes": 124256,
+      "md5": "bf322ea48877ee252133ee3af2a27096",
+      "sha256": "b09df3680ba5a262bbdd96cde6a256370f066550e175b07f39a7a02b3fb9d8ad",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/native_ui_icon_mapping.lua",
+        "bytes": 211073,
+        "md5": "7ae59e4b79058f3eaa87a7420a3b1dc9",
+        "sha256": "a3f50c77d83b3f399d3bf799ca09ee2c62bb10b71299d1bb7519f430fa2e5211"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/tower_visual_profiles.csv",
+      "bytes": 1159,
+      "md5": "2f6903e7e723ae03b79e97431b16bfd8",
+      "sha256": "58f67613168135b152bd6faaf45b1c230d38cfc61af4cb5a9139829079da1e18",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tower_visual_profiles.lua",
+        "bytes": 2063,
+        "md5": "bddef139ba49f9446888784f0ade6529",
+        "sha256": "5dad80260020a6928ea3ad11fb03eef4eb850ed70578263b1b9a7880dc8b02e8"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/tree_progression.csv",
+      "bytes": 13780,
+      "md5": "72035a568fb5a76c10576e3b39015d8b",
+      "sha256": "d21abcc7a9d28f752be437c86b6fcb0bc0e8b6b40ce44965eb094866adaddf18",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/tree_progression.lua",
+        "bytes": 25298,
+        "md5": "091ef75eeca28dbf90b6fef4f825c92d",
+        "sha256": "a74cd108186c545f0a6e9fdb293e86cefcb36d23c45cac20aa186d207b21c311"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/wall_visual_levels.csv",
+      "bytes": 4045,
+      "md5": "ea039dcc3357e67716d2ec8a31140847",
+      "sha256": "f5353af3b61ae1b5ddace88ace42a67f5e61782dc8f9f19f68573c90df968d56",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/wall_visual_levels.lua",
+        "bytes": 7201,
+        "md5": "8c0c418684af9313d3a711405dca6f0f",
+        "sha256": "82858d23a3653f79dbccfb33df467db06d3d5dd47495fe782815f0ce510e1bb2"
+      }
+    },
+    {
+      "path": "data/csv/资源系统/world_visual_definitions.csv",
+      "bytes": 267,
+      "md5": "dcb308159bf362fd465426b425353f8b",
+      "sha256": "2b7395d35f2c527352dabbfa306d4525e35623234989e0de611f8b194c65f01e",
+      "generated_runtime_module": {
+        "path": "scripts/vscripts/config/generated/world_visual_definitions.lua",
+        "bytes": 498,
+        "md5": "050f1dd42849ccc1a594695af5036e26",
+        "sha256": "cbe79e810887acc672d33a191ad1bdaa392ad4cc205f66b32cee12f413cb70f4"
+      }
+    }
+  ],
+  "file_count": 180,
+  "note": "Raw CSVs remain editable source and are excluded from the client candidate. A null direct module is not a missing-file verdict: backend/import/icon generators own those tables. This snapshot does not claim that generic CSV generation was rerun.",
+  "content_sha256": "7b7a98cf49a44528383f5d13a757540d0b553c9e8bb4fc6982b10934529dfe0a"
+}

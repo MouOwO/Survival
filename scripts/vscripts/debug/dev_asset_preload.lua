@@ -91,6 +91,9 @@ function M.collect_targets(minimum_wave)
 end
 
 function M.start(options)
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     options = options or {}
     local targets = M.collect_targets(options.minimum_wave)
     if #targets.missing > 0 then

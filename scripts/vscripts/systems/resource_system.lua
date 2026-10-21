@@ -233,6 +233,8 @@ local function handle_add(payload)
 end
 
 local function handle_debug_set(payload)
+    local policy = require("core/release_policy")
+    if not policy.development_allowed() then return policy.denied_result() end
     local account, player_id, error_code = require_account(payload)
     if not account then return { ok = false, error = error_code } end
     if phase_guard.post_clear_frozen() then return { ok = false, error = "post_clear_frozen" } end

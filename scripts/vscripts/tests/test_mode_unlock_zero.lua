@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Exercise the engine chat dispatcher, authenticated profile/HTTP flow and
 -- real selection permissions together. Only engine APIs and unrelated chat
 -- commands are stubbed; no fake permission or provider replaces the code under test.
@@ -75,7 +77,10 @@ local profiles = require("systems/player_profile_service")
 local test = require("debug/mode_unlock_test")
 local difficulty = require("config/difficulty_config")
 local team = require("systems/team_difficulty_service")
+-- Capture a legitimate development callback, then verify call-time revocation.
+tools = true
 require("debug/cheat_command_service").init()
+tools = false
 local serial = 0
 local function fresh()
     serial = serial + 1
@@ -132,8 +137,8 @@ end
 fresh()
 assert(type(chat) == "function" and not test.is_enabled())
 command("0")
-assert(not test.is_enabled() and notifications[#notifications].level == "error",
-    "a normal non-cheat match cannot enable this test command")
+assert(not test.is_enabled() and #notifications == 0,
+    "an invocation outside Tools is ignored before dispatch")
 tools = true
 command("0 extra")
 assert(not test.is_enabled(), "numeric command rejects extra arguments")
@@ -256,7 +261,12 @@ fresh(); tools, cheats = false, true
 command("0", 1)
 assert(not test.is_enabled(), "cheats do not grant a non-host selection authority")
 command("0")
-assert(test.is_enabled(), "host may use the command in an explicitly cheat-enabled match")
+assert(not test.is_enabled(), "sv_cheats cannot replace the Tools and development gate")
+tools = true
+command("0", 1)
+assert(not test.is_enabled(), "development Tools still requires the real selector")
+command("0")
+assert(test.is_enabled(), "development Tools host may enable the isolated test")
 authenticate_team()
 assert(setup.select_mode(0, "standard", setup.get_session_id()).ok)
 assert(profiles.load_player(0).pending)
@@ -264,7 +274,7 @@ respond(raw_snapshot(0, "standard"))
 assert(difficulty.is_unlocked("N10", profiles.get_progression(0, "standard"), "standard"))
 -- sv_cheats may be turned off while the already-unlocked wave runs. Revoking
 -- the permission gate must never re-enable settlement of this test match.
-cheats = false
+cheats, tools = false, false
 assert(test.is_enabled(), "the isolation grant stays latched until match reset even if cheats are disabled")
 local rejected, prior = nil, #requests
 profiles.get_provider().archive_submit({account_id=tostring(accounts[0]), command={kind="standard_clear"}},

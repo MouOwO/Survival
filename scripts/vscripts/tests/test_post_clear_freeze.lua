@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 package.path = "scripts/vscripts/?.lua;scripts/vscripts/?/init.lua;" .. package.path
 
 local tasks = {}

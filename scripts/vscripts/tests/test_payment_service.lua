@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 package.path='scripts/vscripts/?.lua;'..package.path
 -- Commerce has its own scheduler/runtime tests; this fixture tests the
 -- authenticated payment transport without starting an unrelated game loop.

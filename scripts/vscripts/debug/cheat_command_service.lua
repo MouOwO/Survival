@@ -1,4 +1,5 @@
 local event_bus = require("core/event_bus")
+local release_policy = require("core/release_policy")
 local monster_corpse_lifecycle_service = require(
     "systems/monster_corpse_lifecycle_service"
 )
@@ -245,16 +246,7 @@ local function add_wood(context)
 end
 
 local function lottery_cheat_allowed()
-    if type(IsInToolsMode) == "function" and IsInToolsMode() then
-        return true
-    end
-    if GameRules and type(GameRules.IsCheatMode) == "function" then
-        local ok, enabled = pcall(function()
-            return GameRules:IsCheatMode()
-        end)
-        return ok and enabled == true
-    end
-    return false
+    return release_policy.development_allowed()
 end
 
 local function unlock_test_modes(context)
@@ -272,7 +264,7 @@ end
 
 local function grant_lottery_tickets(context)
     if not lottery_cheat_allowed() then
-        return false, "tools_mode_or_cheats_required"
+        return false, "release_debug_disabled"
     end
     if #context.args ~= 1 then
         return false, "usage: choujiang <amount>"
@@ -677,6 +669,7 @@ local function add_test_hero(context, hero_id, display_name)
     hero_id = hero_id or "hero_monkey_king"
     display_name = display_name or "齐天大圣"
     local function finish_test_environment(result)
+        if not release_policy.development_allowed() then return false end
         if result and result.cancelled then return true end
         if not result or result.ok ~= true then
             notify(context, "英雄自动召唤失败："
@@ -788,6 +781,9 @@ local function grant_wudi_skill(
 end
 
 local function configure_wudi(context)
+    if not release_policy.development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local state_result = event_bus.request(
         events.HERO_SKILL_STATE_GET_REQUEST,
         { player_id = context.player_id }
@@ -882,8 +878,10 @@ local function configure_wudi(context)
 end
 
 local function schedule_wudi_setup(context)
+    if not release_policy.development_allowed() then return end
     local attempts = 0
     scheduler.after(0.05, function()
+        if not release_policy.development_allowed() then return false end
         attempts = attempts + 1
         local ok, result_or_error = configure_wudi(context)
         if ok then
@@ -911,7 +909,7 @@ end
 
 local function wudi(context)
     if not lottery_cheat_allowed() then
-        return false, "tools_mode_or_cheats_required"
+        return false, "release_debug_disabled"
     end
 
     local summoned = event_bus.request(events.HERO_SUMMON_GET_REQUEST, {
@@ -1247,6 +1245,7 @@ local function grant_fishing_reward(context)
 end
 
 local function on_scale_selection_changed(_, payload)
+    if not release_policy.development_allowed() then return end
     local player_id = tonumber(payload and payload.PlayerID)
     if not valid_player_id(player_id) then return end
     selected_entindex_by_player[player_id] = tonumber(payload.entindex) or -1
@@ -1305,6 +1304,7 @@ local COMMANDS = {
 }
 
 local function on_player_chat(keys)
+    if not release_policy.development_allowed() then return end
     local args = words(keys and keys.text)
     local command = string.gsub(args[1] or "", "^%-", "")
     local handler = COMMANDS[command]
@@ -1353,6 +1353,7 @@ end
 
 function M.init()
     selected_entindex_by_player = {}
+    if not release_policy.development_allowed() then return end
     attack_speed_cheat.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     CustomGameEventManager:RegisterListener(
@@ -1375,5 +1376,14 @@ M._test = {
     configure_wudi = configure_wudi,
     wudi = wudi,
 }
+
+for name, handler in pairs(M._test) do
+    M._test[name] = function(...)
+        if not release_policy.development_allowed() then
+            return false, "release_debug_disabled"
+        end
+        return handler(...)
+    end
+end
 
 return M

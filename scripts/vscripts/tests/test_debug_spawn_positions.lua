@@ -1,3 +1,5 @@
+package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
 -- Offline checks: debug commands follow this player's repaired map markers.
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local wave_markers, map_markers, lookups, created, cleared, diagnostics

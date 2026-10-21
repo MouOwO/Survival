@@ -26,6 +26,9 @@ function M.parse(argument)
 end
 
 function M.apply(unit, argument)
+    if not require("core/release_policy").development_allowed() then
+        return false, "release_debug_disabled"
+    end
     local change, error_code = M.parse(argument)
     if not change then return nil, error_code end
     if not unit or unit:IsNull() or not unit.GetHealth
