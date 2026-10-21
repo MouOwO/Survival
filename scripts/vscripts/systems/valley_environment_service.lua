@@ -79,6 +79,10 @@ local function create_portal(marker, lane, flat)
     local id = ParticleManager:CreateParticle(effect, PATTACH_ABSORIGIN_FOLLOW, prop)
     assert(type(id) == "number" and id >= 0, "Underlord portal particle creation failed")
     runtime.particles[#runtime.particles + 1] = id
+    -- These static map landmarks must keep their child emitters awake even
+    -- when the prop has no unit vision or the camera has visited another lane.
+    ParticleManager:SetParticleAlwaysSimulate(id)
+    ParticleManager:SetParticleShouldCheckFoW(id, false)
     ParticleManager:SetParticleControlEnt(id, 0, prop,
         PATTACH_ABSORIGIN_FOLLOW, "", position, true)
     -- Both modes retain the real attachment, including its model rotation.

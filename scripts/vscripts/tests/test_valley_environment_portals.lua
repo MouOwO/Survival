@@ -76,6 +76,8 @@ ParticleManager = {
         return id
     end,
     SetParticleControl = function(_, id, cp, value) particles[id].cp[cp] = value end,
+    SetParticleAlwaysSimulate = function(_, id) particles[id].always_simulate = true end,
+    SetParticleShouldCheckFoW = function(_, id, check) particles[id].check_fow = check end,
     SetParticleControlEnt = function(_, id, cp, owner, attach, name, fallback)
         assert(particles[id].owner == owner)
         particles[id].bindings[cp] = { attach = attach, name = name, fallback = fallback }
@@ -104,6 +106,8 @@ local function check_last_four(name)
     for lane, direction in ipairs(expected) do
         local prop, particle = props[#props - 4 + lane], particles[#particles - 4 + lane]
         local marker, axes = positions[name][lane], particle.orientation[0]
+        assert(particle.always_simulate and particle.check_fow == false,
+            "static spawn landmarks must remain visible after off-screen sleep or unit-vision culling")
         assert(prop.yaw == direction[3] and prop.pitch == (flat and -90 or 0))
         assert(prop.kv.angles == string.format("%d %d 0", prop.pitch, prop.yaw))
         local attachment = particle.bindings[1]
