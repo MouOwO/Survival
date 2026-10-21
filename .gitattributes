@@ -69,3 +69,7 @@ tools/benefits_release_20261021/*.py -text whitespace=blank-at-eol,blank-at-eof,
 server/tests/archive_benefits_database.sql text eol=lf
 tools/benefits_20261021/*.sql text eol=lf
 tools/benefits_release_20261021/README.md text eol=lf
+
+# Preserve the sealed welfare reward revision scripts byte-for-byte.
+tools/benefit_revision_20261021/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/benefit_revision_20261021/README.md text eol=lf

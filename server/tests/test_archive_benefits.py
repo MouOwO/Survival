@@ -106,7 +106,7 @@ class BenefitTests(unittest.TestCase):
         monthly = rows["daily_time_150"]
         self.assertEqual(dict(zip(monthly["pass_item_ids"], map(int, monthly["pass_counts"]))), {
             "lottery_ticket": 2, "welfare_zongzi": 2,
-            "special_lottery_ticket": 2, "lottery_ember_of_legacy": 2})
+            "special_lottery_ticket": 1, "lottery_ember_of_legacy": 2})
         self.assertIn("systems/archive_benefit_rewards.lua", (self.bundle.directory / "bundle.json").read_text(encoding="utf-8"))
 
     def test_multiple_sessions_accumulate_actual_seconds_not_month_card_weight(self):
@@ -125,7 +125,7 @@ class BenefitTests(unittest.TestCase):
         for minute in (30, 60, 90, 120, 150):
             self.assertTrue(self.claim("daily_time_" + str(minute))["ok"])
         self.assertEqual(self.inventory(), {"lottery_ticket": 14, "welfare_zongzi": 6,
-            "lottery_ember_of_legacy": 3, "special_lottery_ticket": 2})
+            "lottery_ember_of_legacy": 3, "special_lottery_ticket": 1})
         stats = copy.deepcopy(self.profile["save"]["gameplay_stats"])
         self.assertFalse(self.claim("daily_time_150")["ok"])
         self.assertEqual(self.inventory()["lottery_ember_of_legacy"], 3)
@@ -137,12 +137,15 @@ class BenefitTests(unittest.TestCase):
             self.assertTrue(self.claim("daily_time_" + str(minute))["ok"])
         self.assertEqual(self.inventory(), {"lottery_ticket": 7, "welfare_zongzi": 3, "lottery_ember_of_legacy": 1})
 
-    def test_weekly_tiers_have_double_base_and_one_gold_each_for_month_card(self):
+    def test_weekly_tiers_double_base_and_only_last_three_have_month_card_gold(self):
         self.month_card()
         self.credit_time(1080 * 60)
         for minute in (120, 240, 360, 480, 600, 720, 840, 960, 1080):
+            before=copy.deepcopy(self.inventory())
             self.assertTrue(self.claim("weekly_time_" + str(minute))["ok"])
-        self.assertEqual(self.inventory(), {"lottery_ticket": 78, "special_lottery_ticket": 9})
+            self.assertEqual(self.inventory().get("special_lottery_ticket",0)-before.get("special_lottery_ticket",0),
+                             1 if minute>=840 else 0)
+        self.assertEqual(self.inventory(), {"lottery_ticket": 78, "special_lottery_ticket": 3})
 
     def test_real_win_counts_once_before_double_clear_and_acquisition_cap(self):
         self.profile["save"]["content_inventory"] = {"commerce_p005": 1}
@@ -171,8 +174,39 @@ class BenefitTests(unittest.TestCase):
             self.assertTrue(self.service.command(request)["ok"])
         self.assertEqual(self.bucket()["wins"], 5)
         for win in range(1, 6):
+            before=copy.deepcopy(self.inventory())
             self.assertTrue(self.claim("daily_win_" + str(win))["ok"])
+            if win==3:
+                self.assertEqual(self.inventory()["lottery_ticket"]-before.get("lottery_ticket",0),2)
+                self.assertEqual(self.inventory()["special_lottery_ticket"]-before.get("special_lottery_ticket",0),1)
+            elif win==4:
+                self.assertEqual(self.inventory()["lottery_ticket"]-before.get("lottery_ticket",0),1)
+                self.assertEqual(self.inventory().get("special_lottery_ticket",0)-before.get("special_lottery_ticket",0),0)
         self.assertEqual(self.inventory(), {"lottery_ticket": 9, "special_lottery_ticket": 2})
+
+    def test_revised_schedule_preserves_claimed_tiers_and_completed_receipts(self):
+        self.month_card()
+        self.credit_time(150*60)
+        daily=self.bucket()
+        old_claim={"at":self.db.timestamp-60,"has_pass":1}
+        for tier in ("daily_time_150","daily_win_3","daily_win_4"):
+            daily["claimed"][tier]=copy.deepcopy(old_claim)
+        daily["wins"]=5
+        self.profile["save"]["content_inventory"]={"lottery_ticket":8,"special_lottery_ticket":3}
+        operation="oldschedule:benefit:claimed"
+        old_response={"ok":True,"tier_id":"daily_time_150","rewards":[{"id":"special_lottery_ticket","count":2}]}
+        self.db.ops[self.account,operation]={"command":{"id":operation,"kind":"benefit_claim",
+            "track":"daily_time","tier_id":"daily_time_150"},"done":True,"fingerprint":operation,
+            "hash":"a"*64,"pass":True,"event_at":self.db.timestamp-60,"response":copy.deepcopy(old_response)}
+        saved=copy.deepcopy(self.profile["save"])
+        result=self.service.finish_prepared(self.account,operation,self.db.resume(self.account,operation))
+        self.assertEqual(result["response"],old_response,"Completed historical receipts keep their recorded reward")
+        for tier in ("daily_time_150","daily_win_3","daily_win_4"):
+            self.assertFalse(self.claim(tier)["ok"],"A changed schedule cannot reopen a previously claimed tier")
+        self.assertEqual(self.profile["save"],saved,"No reset, top-up or retroactive deduction is allowed")
+        self.assertTrue(self.claim("weekly_time_120")["ok"])
+        self.assertEqual(self.inventory(),{"lottery_ticket":12,"special_lottery_ticket":3},
+                         "Unclaimed weekly tiers use the revised double-base reward without early gold")
 
     def test_online_receipt_lost_reply_and_claim_lost_reply_never_double(self):
         self.db.lose_reply = True

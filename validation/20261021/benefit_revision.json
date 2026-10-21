@@ -1,0 +1,220 @@
+{
+  "date_beijing": "2026-10-21",
+  "status": "local_candidate_ready_remote_prepare_rejected",
+  "live_version_last_observed": {
+    "release": "20261021-benefits-47accd81d922",
+    "bundle": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "manifest_sha256": "39e845fd37a2966bbc57a616e661970a0736a0959ee9b00f2e1caf8ebdbae0fe",
+    "sql_sync_sha256": "456dffadeb38fb7899f07d6778eb5e9d0b9b2b57b79be32988e34f0f4fbad9d0",
+    "ledger_entries": 32,
+    "payment_pid": "5427"
+  },
+  "candidate": {
+    "bundle": "e62df5c96ee353713b923a43b1167fab9c8bf25be4fbded74cbf8b8a57784d7f",
+    "safe_disabled_bundle": "271d9f09bb34fe577df58551b29d40fb7e0b6d8b9de018b81812729f65b3c3bf",
+    "release": "20261021-benefit-revision-e62df5c96ee3",
+    "safe_disabled_release": "20261021-benefit-revision-safe-271d9f09bb34",
+    "changed_table": "archive_benefit_rewards",
+    "changed_rows": 9,
+    "changed_fields": 17,
+    "row_changes": [
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "2|2|1|2",
+            "before": "2|2|2|2"
+          }
+        },
+        "reward_id": "daily_time_150"
+      },
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "1|1",
+            "before": "1"
+          },
+          "pass_item_ids": {
+            "after": "lottery_ticket|special_lottery_ticket",
+            "before": "lottery_ticket"
+          }
+        },
+        "reward_id": "daily_win_3"
+      },
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "",
+            "before": "1"
+          },
+          "pass_item_ids": {
+            "after": "",
+            "before": "special_lottery_ticket"
+          }
+        },
+        "reward_id": "daily_win_4"
+      },
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "2",
+            "before": "2|1"
+          },
+          "pass_item_ids": {
+            "after": "lottery_ticket",
+            "before": "lottery_ticket|special_lottery_ticket"
+          }
+        },
+        "reward_id": "weekly_time_120"
+      },
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "3",
+            "before": "3|1"
+          },
+          "pass_item_ids": {
+            "after": "lottery_ticket",
+            "before": "lottery_ticket|special_lottery_ticket"
+          }
+        },
+        "reward_id": "weekly_time_240"
+      },
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "4",
+            "before": "4|1"
+          },
+          "pass_item_ids": {
+            "after": "lottery_ticket",
+            "before": "lottery_ticket|special_lottery_ticket"
+          }
+        },
+        "reward_id": "weekly_time_360"
+      },
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "5",
+            "before": "5|1"
+          },
+          "pass_item_ids": {
+            "after": "lottery_ticket",
+            "before": "lottery_ticket|special_lottery_ticket"
+          }
+        },
+        "reward_id": "weekly_time_480"
+      },
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "5",
+            "before": "5|1"
+          },
+          "pass_item_ids": {
+            "after": "lottery_ticket",
+            "before": "lottery_ticket|special_lottery_ticket"
+          }
+        },
+        "reward_id": "weekly_time_600"
+      },
+      {
+        "fields": {
+          "pass_counts": {
+            "after": "5",
+            "before": "5|1"
+          },
+          "pass_item_ids": {
+            "after": "lottery_ticket",
+            "before": "lottery_ticket|special_lottery_ticket"
+          }
+        },
+        "reward_id": "weekly_time_720"
+      }
+    ],
+    "python_changed": false,
+    "lua_sources_changed": false,
+    "migrations": [],
+    "claims_and_counters_reset": false,
+    "retroactive_regrant_or_deduction": false
+  },
+  "local_validation": {
+    "sealed_payload_hashes_verified": true,
+    "scope_and_real_lua_tests_passed": 8,
+    "backend_tests_reported_passed": 16,
+    "parent_pending_intent_keeps_original_reward": true,
+    "claimed_flags_retained": true,
+    "cross_hash_new_benefit_requires_refresh": true,
+    "unrelated_quota_tampering_rejected": true,
+    "migration_tampering_rejected": true,
+    "disabled_bundle_rejects_new_claim": true,
+    "backend_tests_rerun_by_root_passed": 16,
+    "scope_and_real_lua_tests_rerun_by_root_passed": 8,
+    "panorama_renderer_test": "passed",
+    "git_diff_check": "passed",
+    "native_compile": {
+      "isolated": "passed",
+      "live": "passed",
+      "files": [
+        {
+          "relative": "scripts/custom_game/daily_remaining_5d5c1152eb.js",
+          "source_sha256": "290fa2dfedd3286e3601bcb429cc4e4ae9360d1c6585c5f514ea8245b44049c0",
+          "runtime_sha256": "c5c4d7929d53ac4df6f2c5af8acab05a984de1c7dbaf6dbff63a176dc6f7e29d",
+          "data_matches_source": true
+        }
+      ]
+    }
+  },
+  "remote": {
+    "baseline_read_only_fetch": "passed",
+    "prepare": "rejected_before_execution",
+    "uploaded": false,
+    "validate": "not_run",
+    "activate": "not_run",
+    "database_commits": 0,
+    "remote_files_written": false,
+    "payment_service_restarted": false
+  },
+  "approval_review": {
+    "action": "上传福利配置候选及回退目录到47.110.238.248既有测试服务器",
+    "decision": "rejected",
+    "reason_original": "该命令会把福利配置候选及回退目录上传到远程服务器，属于对未明确获用户授权目的地的敏感配置外发和远程写入；仅说明不激活不足以授权上传。",
+    "retries_after_rejection": 0,
+    "workaround_attempted": false,
+    "requires_explicit_user_authorization_for_destination": true
+  },
+  "client_state": {
+    "archive_http_bundle_and_current_pointer": "preserve_47acc_parent",
+    "lottery_seed_and_manifest": "preserve_47acc_parent",
+    "update_only_after_server_activation_and_verification": true,
+    "runtime_current_pointer_not_in_task_commit": true,
+    "pending_seed_candidate_saved_locally": true
+  },
+  "rollback": {
+    "command_after_authorized_activation": "C:/Users/Administrator/AppData/Local/Programs/Python/Python314/python.exe tools/benefit_revision_20261021/deploy.py rollback-safe",
+    "preserves_claims_inventory_counters_stackable_and_python": true,
+    "restores_old_unique_backend": false
+  },
+  "integrity": {
+    "plan_sha256": "a95bfd6dfd4160dad32e17c07219c904ca348a91214b8379db5aa7d85ecfc5d1",
+    "archive_sha256": "87fcc468d1dadb7816d8086c96075dd0f53e905ef69f27a2271df5ef9b94dc09",
+    "parent_bundle_sha256": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "tool_files_sha256": {
+      "tools/benefit_revision_20261021/deploy.py": "7ef41052a2c6bdbc1b803a000d1803ed844a0dd0f6621faeaf52e7906617f3d9",
+      "tools/benefit_revision_20261021/README.md": "ff1dd6dc5e1f400458ce9511a1fb9ebe6840fa366e78c5a506f2ec1d5d839a60",
+      "tools/benefit_revision_20261021/remote_operator.py": "70a307834417934bf2291b7f3465a160d39990c71ca57f12c42a033db7c6dca6",
+      "tools/benefit_revision_20261021/test_revision.py": "12a713ca486e74fb96ce2acef8dbc894cd0c13ea98464bd619485d716629b98d"
+    },
+    "local_reward_sources": {
+      "data/csv/存档系统/archive_benefit_rewards.csv": "11d9e59f3fb37d14a63c712e79b272b762fe247cf60e20a4a47003f972fd3ebf",
+      "scripts/vscripts/config/generated/archive_benefit_rewards.lua": "58792b581b0847ddf3fbc5727abce0ab129083c39fc68da8ed157cf9eb85c6a2",
+      "server/tests/test_archive_benefits.py": "b0d477cdfe43076ca96dd9405831653b52bbc070c9eb21c37849282c85cc38dc"
+    }
+  },
+  "delivery": {
+    "game_branch": "origin/dev",
+    "content_branch": "origin/master",
+    "existing_game_changes": "preserve outside task",
+    "server_publication": "await explicit remote destination authorization"
+  }
+}

@@ -16,7 +16,7 @@ const ordinary = count => ({id: 'lottery_ticket', name: '普通抽奖券', count
 const gold = count => ({id: 'special_lottery_ticket', name: '金色抽奖券', count, description: '用于修仙、龙骑与暑期宝箱'});
 const group = (track, targets, progress, counts) => ({period_id: '2026-10-21-05', progress,
     rows: targets.map((required, index) => ({id: `${track}_${required}`, required,
-        base_rewards: [ordinary(counts[index])], monthly_rewards: track === 'weekly_time' ? [ordinary(counts[index]), gold(1)] : [ordinary(1)],
+        base_rewards: [ordinary(counts[index])], monthly_rewards: track === 'weekly_time' ? [ordinary(counts[index]), ...(required >= 840 ? [gold(1)] : [])] : [ordinary(1)],
         status: progress >= required ? 'claimable' : 'locked', can_claim: progress >= required ? 1 : 0}))});
 function snapshot() {
     const f = fixture();
@@ -36,7 +36,10 @@ function snapshot() {
     snapshot.benefits.daily_time.rows[3].base_rewards = [ordinary(2), zongzi(1)];
     snapshot.benefits.daily_time.rows[3].monthly_rewards = [ordinary(2), zongzi(1)];
     snapshot.benefits.daily_time.rows[4].base_rewards = [ordinary(2), zongzi(2), ember(1)];
-    snapshot.benefits.daily_time.rows[4].monthly_rewards = [ordinary(2), zongzi(2), ember(2), gold(2)];
+    snapshot.benefits.daily_time.rows[4].monthly_rewards = [ordinary(2), zongzi(2), ember(2), gold(1)];
+    snapshot.benefits.daily_wins.rows[2].monthly_rewards = [ordinary(1), gold(1)];
+    snapshot.benefits.daily_wins.rows[3].monthly_rewards = [];
+    snapshot.benefits.daily_wins.rows[4].monthly_rewards = [gold(1)];
     return snapshot;
 }
 const h = setup(), {nodes, cfg} = h;
@@ -57,6 +60,11 @@ assert.equal(nodes.DailyGW2FooterText.text.includes('北京时间每日 05:00'),
 const lastTime = nodes.DailyGW2Benefit_daily_time_daily_time_150;
 const icons = lastTime.Children().filter(node => node.BHasClass('DailyGW2BenefitReward'));
 assert.equal(icons.length, 7, '150 minutes shows all three base and four monthly additive rewards');
+assert.equal(lastTime.__benefitRow.monthly_rewards.find(item => item.id === 'special_lottery_ticket').count, 1);
+for (const [tier, extra] of [[3, 2], [4, 0], [5, 1]]) {
+    const row = nodes['DailyGW2Benefit_daily_wins_daily_win_' + tier];
+    assert.equal(row.Children().filter(node => node.BHasClass('DailyGW2BenefitMonthlyReward')).length, extra, 'Each victory tier renders only the actual monthly extras, including no extras at four wins');
+}
 assert(icons.some(node => node.__dailyGW2Tooltip.body.includes('新的可叠加薪火属性')),
     'The server description is used for the newly stackable ember');
 assert(icons.every(node => !/只能拥有1|转化为.*积分/.test(node.__dailyGW2Tooltip.body)),
@@ -99,8 +107,12 @@ assert.equal(nodes.DailyGW2Benefits_daily.visible, false);
 assert.equal(nodes.DailyGW2Benefits_weekly.visible, true);
 assert.equal(nodes.DailyGW2Benefits_weekly.Children().filter(node => node.BHasClass('DailyGW2BenefitCard')).length, 9);
 assert(nodes.DailyGW2FooterText.text.includes('北京时间每周一 05:00'));
-assert(nodes.DailyGW2Benefits_weekly.Children().some(node => /双倍.*金色抽奖券/.test(node.text)),
-    'Weekly page explains the monthly doubled base plus extra gold ticket');
+assert(nodes.DailyGW2Benefits_weekly.Children().some(node => /双倍.*最后三档.*金色抽奖券/.test(node.text)),
+    'Weekly page explains doubled base and gold only in the last three tiers');
+for (const minute of [120, 240, 360, 480, 600, 720, 840, 960, 1080]) {
+    const row = nodes['DailyGW2Benefit_weekly_time_weekly_time_' + minute];
+    assert.equal(row.Children().filter(node => node.BHasClass('DailyGW2BenefitMonthlyReward')).length, minute >= 840 ? 2 : 1);
+}
 h.click(nodes.DailyGW2Tab_login);
 assert.equal(nodes.DailyGW2Title.text, '登录奖励');
 assert.equal(nodes.DailyCards.visible, true);
