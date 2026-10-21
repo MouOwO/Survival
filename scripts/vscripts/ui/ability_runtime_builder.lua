@@ -225,7 +225,6 @@ local function population_training(state, resources)
     local required = tonumber(training.requires_farm_level) or 1
     local farm_level = tonumber(state.level) or 1
     local unlocked = not completed and farm_level >= required
-    local progress_text = tostring(trained) .. "/" .. tostring(maximum)
     local cost = {
         wood = completed and 0 or (tonumber(training.wood_cost) or 0),
         gold = completed and 0 or (tonumber(training.gold_cost) or 0),
@@ -237,18 +236,11 @@ local function population_training(state, resources)
             .. tostring(trained + 1) .. "次）")
             or ("农场达到LV" .. tostring(required) .. "后解锁")
     end
-    local fields = {
-        { label = "当前阶段", value = training_name },
-        { label = "阶段进度", value = progress_text },
-    }
+    local fields = {}
     if not completed then
         fields[#fields + 1] = {
             label = "本次增加人口",
             value = "+" .. tostring(training.population_add or 0),
-        }
-        fields[#fields + 1] = {
-            label = "本次条件",
-            value = tostring(training.prerequisite_text or ("农场LV" .. tostring(required))),
         }
         fields[#fields + 1] = {
             label = "下一级条件",

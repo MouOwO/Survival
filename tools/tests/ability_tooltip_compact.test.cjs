@@ -157,6 +157,60 @@ replace('ability_building_blink', {current_level: 1});
 assert(!h.tooltip.BHasClass('BuildAbility'), 'building blink is an action, not a construction ability');
 assert(node(h, 'CustomAbilityLevel').text.endsWith(' 1')); assert.equal(node(h, 'CustomAbilityType').text, '主动');
 
+// Existing matches can still publish the old population-training fields. Both
+// owners must filter that snapshot while preserving its actual costs and state.
+const populationFields = [
+    {label: '当前阶段', value: '人口训练1'}, {label: '阶段进度', value: '0/5'},
+    {label: '本次增加人口', value: '+1'}, {label: '本次条件', value: '农场LV1'},
+    {label: '下一级条件', value: '农场LV1'}
+];
+const populationHidden = ['当前阶段', '阶段进度', '本次条件'];
+const populationKept = ['本次增加人口', '下一级条件'];
+const populationRuntime = {current_level: 1, cost_wood: 200, cost_gold: 0,
+    status_text: '人口训练1可训练（第1次）', fields: populationFields};
+function labels(h) { return rows(h).map(row => row.__left.text); }
+function compactPopulation(h, expectedValues) {
+    assert(h.tooltip.BHasClass('PopulationTraining'));
+    assert(!h.tooltip.BHasClass('BuildAbility'));
+    assert.deepEqual(labels(h), populationKept, 'only the two useful population details remain');
+    assert.deepEqual(rows(h).map(row => row.__right.text), expectedValues);
+    for (const row of rows(h)) {
+        assert(row.BHasClass('AbilityFieldTextRow'));
+        assert.equal(resolved(row.__iconHost, 'visibility'), 'collapse', 'population text starts at the description/cost left edge');
+        leftAligned(h, row);
+    }
+}
+unitNames[827] = 'building_farm';
+const populationAbility = replace('ability_train_population', populationRuntime);
+compactPopulation(h, ['+1', '农场LV1']);
+assert.equal(node(h, 'CustomAbilityWoodCost').text, '200');
+assert(!node(h, 'CustomAbilityCostRow').BHasClass('Hidden'));
+assert(node(h, 'CustomAbilityGoldCostBlock').BHasClass('Hidden'));
+statusPreserved(h.tooltip, populationRuntime.status_text, false);
+assert(node(h, 'CustomAbilityLevel').text.endsWith(' 1'), 'the existing header level remains visible');
+const populationRows = rows(h), populationAllocated = h.counters.created;
+const refreshedPopulation = {...base, ...populationRuntime, ability_entindex: populationAbility,
+    cost_wood: 250, status_text: '人口训练1可训练（第2次）', fields: populationFields.map(field =>
+        field.label === '阶段进度' ? {...field, value: '1/5'}
+            : field.label === '本次增加人口' ? {...field, value: '+2'}
+            : field.label === '下一级条件' ? {...field, value: '农场LV2'} : field)};
+for (let i = 0; i < 20; i++) h.setTable('survival_ability_runtime', populationAbility, refreshedPopulation, true);
+compactPopulation(h, ['+2', '农场LV2']);
+assert.strictEqual(rows(h)[0], populationRows[0]); assert.strictEqual(rows(h)[1], populationRows[1]);
+assert.equal(h.counters.created, populationAllocated, 'population refresh reuses its existing row panels');
+assert.equal(node(h, 'CustomAbilityWoodCost').text, '250');
+statusPreserved(h.tooltip, refreshedPopulation.status_text, false);
+replace('ability_upgrade_farm', {fields: populationFields});
+assert(!h.tooltip.BHasClass('PopulationTraining'), 'switching skills clears the population-only layout');
+assert.deepEqual(labels(h), populationFields.map(field => field.label), 'identically named details on other abilities remain intact');
+assert.notEqual(resolved(rows(h)[0].__iconHost, 'visibility'), 'collapse', 'ordinary field gutters return after population training');
+replace('ability_train_population', {...populationRuntime, available: 0, cost_wood: 0,
+    status_text: '人口训练已全部完成', fields: populationFields.filter(field => populationHidden.includes(field.label))});
+assert(h.tooltip.BHasClass('PopulationTraining')); assert.deepEqual(labels(h), [], 'completed/older snapshots cannot leave obsolete pooled details visible');
+assert(node(h, 'CustomAbilityCostRow').BHasClass('Hidden'));
+statusPreserved(h.tooltip, '人口训练已全部完成', false);
+replace('ability_train_population', populationRuntime); compactPopulation(h, ['+1', '农场LV1']);
+
 // The takeover fixture exposes the real owner before unrelated HUD survey loops.
 // Reuse that seam; no show/render function body is replaced or reimplemented.
 const takeoverFixture = fs.readFileSync(path.join(__dirname, 'hud_tooltip_dismiss.test.cjs'), 'utf8').replace(/\r\n/g, '\n');
@@ -208,6 +262,37 @@ showTakeover('ability_build_gold_mine', {available: 1, prerequisite_met: 1, stat
 statusPreserved(tip, '可建造', false);
 showTakeover('ability_build_gold_mine', {available: 0, prerequisite_met: 0, status_text: '需要先建造主城'});
 statusPreserved(tip, '需要先建造主城', true);
+function takeoverLabels() { return Array.from(t.nodes.CustomAbilityFields.children, row => row.children[0].text); }
+function compactTakeoverPopulation(values) {
+    assert(tip.BHasClass('PopulationTraining'));
+    assert(populationHidden.every(label => !takeoverLabels().includes(label)), 'full takeover removes the same three legacy population rows');
+    const kept = Array.from(t.nodes.CustomAbilityFields.children).filter(row => populationKept.includes(row.children[0].text));
+    assert.deepEqual(kept.map(row => row.children[0].text), populationKept);
+    assert.deepEqual(kept.map(row => row.children[1].text), values);
+    assert.equal(resolved(t.nodes.CustomAbilityCostRow, 'horizontal-align'), 'left');
+    for (const row of kept) {
+        assert.equal(row.children.length, 2, 'full takeover retains no empty icon placeholder');
+        row.children.forEach(panel => assert.equal(resolved(panel, 'text-align'), 'left'));
+    }
+}
+showTakeover('ability_train_population', populationRuntime);
+compactTakeoverPopulation(['+1', '农场LV1']);
+assert.equal(t.nodes.CustomAbilityWoodCost.text, '200');
+assert(!t.nodes.CustomAbilityCostRow.BHasClass('Hidden'));
+statusPreserved(tip, populationRuntime.status_text, false);
+showTakeover('ability_train_population', refreshedPopulation);
+compactTakeoverPopulation(['+2', '农场LV2']);
+assert.equal(t.nodes.CustomAbilityWoodCost.text, '250');
+statusPreserved(tip, refreshedPopulation.status_text, false);
+showTakeover('ability_upgrade_farm', {fields: populationFields});
+assert(!tip.BHasClass('PopulationTraining'), 'full takeover clears the population-only class on the next ability');
+for (const field of populationFields) assert(takeoverLabels().includes(field.label), 'full takeover preserves other abilities\' ' + field.label);
+showTakeover('ability_train_population', {...populationRuntime, available: 0, cost_wood: 0,
+    status_text: '人口训练已全部完成', fields: populationFields.filter(field => populationHidden.includes(field.label))});
+assert(tip.BHasClass('PopulationTraining'));
+assert(populationFields.every(field => !takeoverLabels().includes(field.label)), 'full takeover also discards prior population detail rows on completion');
+assert(t.nodes.CustomAbilityCostRow.BHasClass('Hidden'));
+statusPreserved(tip, '人口训练已全部完成', false);
 assert.equal(t.requests.length, 0, 'presentation tests never cast or buy');
 
-console.log('ABILITY_TOOLTIP_COMPACT_PASS: both real owners; no standalone unlock rows; red/green status preserved; no generic ready badge; construction-only level/gutter suppression; retained icons/costs; upgrade/hero/research reuse; pooled refresh; scoped left alignment (no pixel simulation).');
+console.log('ABILITY_TOOLTIP_COMPACT_PASS: both real owners; no standalone unlock rows; compact population details/costs/status; scoped population gutter suppression and cross-skill restoration; red/green status preserved; no generic ready badge; construction-only level/gutter suppression; retained icons/costs; upgrade/hero/research reuse; pooled refresh; scoped left alignment (no pixel simulation).');
