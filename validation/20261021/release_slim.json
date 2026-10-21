@@ -1,0 +1,246 @@
+{
+  "date": "2026-10-21",
+  "scope": "Five art rounds followed by five code rounds; game and content paired cleanup.",
+  "removed_files": 395609,
+  "removed_bytes": 40405529808,
+  "runtime_panorama_removed_files": 1265,
+  "runtime_panorama_removed_bytes": 385466851,
+  "rounds": [
+    {
+      "round": 1,
+      "name": "Remove superseded UI concepts and generated preview history",
+      "files": 6047,
+      "bytes": 3532879566,
+      "by_repo": {
+        "game": {
+          "files": 6047,
+          "bytes": 3532879566
+        },
+        "content": {
+          "files": 0,
+          "bytes": 0
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 2,
+      "name": "Remove old map-art and completed submission/compile snapshots",
+      "files": 31828,
+      "bytes": 10383318164,
+      "by_repo": {
+        "game": {
+          "files": 31828,
+          "bytes": 10383318164
+        },
+        "content": {
+          "files": 0,
+          "bytes": 0
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 3,
+      "name": "Remove byte-identical historical candidate art copies",
+      "files": 1580,
+      "bytes": 826646323,
+      "by_repo": {
+        "game": {
+          "files": 1580,
+          "bytes": 826646323
+        },
+        "content": {
+          "files": 0,
+          "bytes": 0
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 4,
+      "name": "退役 UI 美术与旧肉鸽、小图 GPU",
+      "files": 2503,
+      "bytes": 657805747,
+      "by_repo": {
+        "game": {
+          "files": 1932,
+          "bytes": 485214729
+        },
+        "content": {
+          "files": 571,
+          "bytes": 172591018
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 5,
+      "name": "旧头像 GPU 版本与未使用 CN 字体",
+      "files": 1531,
+      "bytes": 671329955,
+      "by_repo": {
+        "game": {
+          "files": 1048,
+          "bytes": 531326925
+        },
+        "content": {
+          "files": 483,
+          "bytes": 140003030
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 6,
+      "name": "清理已经替换的称号素材与动画描述脚本",
+      "files": 63,
+      "bytes": 501196,
+      "by_repo": {
+        "game": {
+          "files": 42,
+          "bytes": 340181
+        },
+        "content": {
+          "files": 21,
+          "bytes": 161015
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 7,
+      "name": "清理旧版世界称号投影与探针迭代脚本",
+      "files": 90,
+      "bytes": 1307974,
+      "by_repo": {
+        "game": {
+          "files": 60,
+          "bytes": 880628
+        },
+        "content": {
+          "files": 30,
+          "bytes": 427346
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 8,
+      "name": "移除已退役的 UI 业务控制器源码及编译副本",
+      "files": 12,
+      "bytes": 566177,
+      "by_repo": {
+        "game": {
+          "files": 8,
+          "bytes": 378598
+        },
+        "content": {
+          "files": 4,
+          "bytes": 187579
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 9,
+      "name": "移除不再 include 的旧 UI 样式",
+      "files": 27,
+      "bytes": 702610,
+      "by_repo": {
+        "game": {
+          "files": 20,
+          "bytes": 554291
+        },
+        "content": {
+          "files": 7,
+          "bytes": 148319
+        }
+      },
+      "guard": "PASS"
+    },
+    {
+      "round": 10,
+      "name": "清理退役概念生成器、闲置浏览器/Node/Python缓存及临时代码副本",
+      "files": 351928,
+      "bytes": 24330472096,
+      "by_repo": {
+        "game": {
+          "files": 351928,
+          "bytes": 24330472096
+        },
+        "content": {
+          "files": 0,
+          "bytes": 0
+        }
+      },
+      "guard": "PASS"
+    }
+  ],
+  "inventory": {
+    "game": {
+      "before_bytes": 83103183225,
+      "after_bytes": 43103680016,
+      "before_files": 575750,
+      "after_files": 181694,
+      "net_reduced_bytes": 39999503209,
+      "current_audit_output_bytes": 46387149,
+      "before_raw_bytes": 84228093186,
+      "before_alias_bytes_excluded": 1124909961
+    },
+    "content": {
+      "before_bytes": 4539354986,
+      "after_bytes": 4225785188,
+      "before_files": 8921,
+      "after_files": 7805,
+      "net_reduced_bytes": 313569798,
+      "current_audit_output_bytes": 0,
+      "before_raw_bytes": 4539354986,
+      "before_alias_bytes_excluded": 0
+    }
+  },
+  "measurement": "Same exclusions before/after: .git, links/junctions, and the same five inaccessible historical directories. Initial raw inventory double-counted one image junction; corrected by1124909961bytes.",
+  "runtime_candidate": {
+    "file_count": 6612,
+    "bytes": 3769501544,
+    "kind": "runtime_release_allowlist",
+    "workshop_upload_performed": false
+  },
+  "checks": {
+    "retained_vtex_recipes": 2319,
+    "active_closure_each_repo": 180,
+    "asset_uri_checks": 3166,
+    "new_missing_resources": 0,
+    "preloader_native_compiler": {
+      "compiled": 1,
+      "failed": 0
+    },
+    "node_regression": {
+      "pass": 49,
+      "existing_head_failure": 1
+    },
+    "release_tool_tests": {
+      "pass": 8,
+      "skip": 1,
+      "skip_reason": "Windows symlink creation permission"
+    },
+    "installed_game_smoke_test": "not performed"
+  },
+  "known_existing_failure": {
+    "test": "tools/tests/lottery_gw2.test.cjs",
+    "assertion": "assert(!scrollTip.visible)",
+    "source_head": "9d156cf07c9d86d7ed6a6fa1e201c5b3dad03c34",
+    "isolated_head_inputs": 24,
+    "same_failure_at": "evalmachine.<anonymous>:336:56"
+  },
+  "preserved": {
+    "git_history": true,
+    "current_maps_and_sources": true,
+    "production_data": true,
+    "backend_local_connections": true,
+    "unrelated_tooltip_and_lottery_work": "Preserved; excluded from cleanup staging.",
+    "inaccessible_historical_directories": 5,
+    "regenerated_pyc_after_round10": 16
+  },
+  "local_evidence": "output/release_slim_20261021/ (large exact manifests gzip-compressed; not included in runtime package)"
+}

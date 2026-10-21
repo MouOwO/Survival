@@ -1,3 +1,4 @@
+throw new Error('RETIRED_UI_WORKFLOW: this historical all-assets verification requires 607 superseded art entries removed on 2026-10-21. It cannot validate the current game. Use current UI regression suites and tools/build_runtime_release.py; hashes are not skipped and old art is not restored.');
 const fs=require('fs'),p=require('path'),crypto=require('crypto'),cp=require('child_process');
 const here=__dirname,repo=p.resolve(here,'../../../..'),hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 const build=JSON.parse(fs.readFileSync(p.join(here,'build.json'))),assets=JSON.parse(fs.readFileSync(p.join(here,'asset_audit.json')));

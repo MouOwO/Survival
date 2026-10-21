@@ -18,8 +18,8 @@ for r in csv_rows('data/csv/存档系统/archive_item_icons.csv'):
     NAMES.setdefault(r['icon_path'],[]).append(('02_存档/'+CATEGORY.get(r['category_id'],r['category_id']),r['item_id'],r['display_name']))
 for r in csv_rows('data/csv/存档系统/archive_navigation_icons.csv'):
     NAMES.setdefault(r['image_path'],[]).append(('02_存档/导航图标',r['category_id'],r['display_name']))
-for r in csv_rows('data/csv/肉鸽奖励系统/rogue_reward_art.csv'):
-    NAMES.setdefault(r['image_path'],[]).append(('07_肉鸽/卡牌插画',r['card_id'],r['display_name']))
+# The generated 52-card local illustration pack was retired for release.
+# Current rogue art uses official client resources in rogue_art_remaining_5d5c1152eb.js.
 
 def classification(rel):
     if rel in NAMES:return NAMES[rel][0][0]

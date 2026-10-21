@@ -1,3 +1,4 @@
+raise SystemExit('RETIRED_UI_WORKFLOW: this historical alpha audit depends on superseded art removed on 2026-10-21. Inspect maintained art/ui/sources and current UI resources instead; do not restore the candidate copy.')
 from pathlib import Path
 from PIL import Image
 import json

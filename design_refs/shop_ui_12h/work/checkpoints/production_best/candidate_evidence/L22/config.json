@@ -1,8 +1,0 @@
-{
-  "id": "L22",
-  "parent": "B17_production",
-  "changes": {
-    "longShade": 0.94
-  },
-  "scope": "real shared factory with original CSV art; no live inventory changes"
-}

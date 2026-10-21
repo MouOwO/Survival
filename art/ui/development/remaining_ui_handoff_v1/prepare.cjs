@@ -1,3 +1,4 @@
+throw new Error('RETIRED_UI_WORKFLOW: remaining_ui_handoff_v1 is a historical snapshot. Its duplicate and superseded art was removed on 2026-10-21. Use current panorama/src, art/ui/sources and tools/build_runtime_release.py; do not rebuild or restore the candidate copy.');
 const fs=require('fs'),p=require('path'),crypto=require('crypto');
 const here=__dirname,repo=p.resolve(here,'../../../..'),engine=p.resolve(repo,'../../..'),source=p.join(here,'baseline/content');
 const current=p.join(engine,'content/dota_addons/survival_ui_handoff_v1/panorama'),out=p.join(here,'candidate/panorama');

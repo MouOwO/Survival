@@ -1,4 +1,5 @@
 param([switch]$ReuseVerifiedTextures)
+throw 'RETIRED_UI_WORKFLOW: the historical survival_ui_handoff_v1 deployment is retired after the 2026-10-21 art cleanup. Compile the current panorama/src into Survival content; use tools/build_runtime_release.py for a reviewable runtime manifest. Do not restore or deploy the old candidate tree.'
 $ErrorActionPreference='Stop'
 $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../..'))
 $engine=[IO.Path]::GetFullPath((Join-Path $repo '../../..'))
