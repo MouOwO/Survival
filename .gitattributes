@@ -77,3 +77,7 @@ tools/benefit_revision_20261021/README.md text eol=lf
 # Offline login-reward candidates pin their reviewed builder bytes.
 tools/benefit_login_20261021/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tools/benefit_login_20261021/README.md text eol=lf
+
+# Preserve the reviewed manual-login reward candidate builder.
+tools/benefit_login_manual_20261021/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/benefit_login_manual_20261021/README.md text eol=lf

@@ -133,11 +133,11 @@ h.assertCleanDispose(cfg.SurvivalDaily);
 console.log('daily benefits: tabs, 19 tiers, server authority, claim failures, polling and 05:00 rollover passed');
 
 // A monthly-only login milestone is additional to all five time milestones.
-// It is granted by the backend and never becomes a manual client mutation.
+// Reading its snapshot never claims it; the player must click the first tier.
 const loginHarness = setup(), loginNodes = loginHarness.nodes, loginApi = loginHarness.cfg.SurvivalDaily;
 const loginSnapshot = snapshot();
 loginSnapshot.benefits.daily_time.rows.unshift({id: 'daily_time_0', required: 0,
-    monthly_only: 1, auto_claim: 1, base_rewards: [], monthly_rewards: [gold(1)],
+    monthly_only: 1, auto_claim: 0, base_rewards: [], monthly_rewards: [gold(1)],
     status: 'locked', can_claim: 0});
 loginApi.Open(false); loginApi.SelectPage('daily');
 loginHarness.emit('survival_daily_snapshot', loginSnapshot);
@@ -146,7 +146,7 @@ const loginCard = loginNodes.DailyGW2Benefit_daily_time_daily_time_0;
 assert(loginCard.Children().some(node => node.text === '每日登录'));
 assert(loginCard.Children().some(node => node.text === '月卡奖励'));
 assert(!loginCard.Children().some(node => /基础奖励|0\s*\/\s*0|游玩\s*0/.test(node.text)),
-    'The automatic login card has no empty base reward or artificial zero-minute progress');
+    'The login card has no empty base reward or artificial zero-minute progress');
 const loginButton = loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0;
 assert.equal(loginButton.enabled, false);
 assert(loginButton.Children().some(node => node.text === '需月卡'));
@@ -169,37 +169,79 @@ assert.equal(loginNodes.DailyGW2Benefit_daily_time_daily_time_150.Children().fil
     'The final time tier retains every base and monthly item');
 assert.equal(parseFloat(loginNodes.DailyGW2Benefit_daily_wins_daily_win_5.style.height), 108,
     'The five victory tiers keep their accepted geometry');
-const noManualLogin = () => assert.equal(loginHarness.sent.filter(event => event.name === 'survival_benefit_claim' && event.payload.tier_id === 'daily_time_0').length, 0);
-loginHarness.click(loginButton); noManualLogin();
-let automatic = JSON.parse(JSON.stringify(loginSnapshot)); automatic.sequence = 2; automatic.has_pass = 1;
-automatic.benefits.daily_time.rows[0].status = 'claimable'; automatic.benefits.daily_time.rows[0].can_claim = 0;
-loginHarness.emit('survival_daily_snapshot', automatic);
+const loginClaims = () => loginHarness.sent.filter(event => event.name === 'survival_benefit_claim' && event.payload.tier_id === 'daily_time_0');
+loginHarness.click(loginButton); assert.equal(loginClaims().length, 0, 'A player without a monthly card cannot claim the login tier');
+let manual = JSON.parse(JSON.stringify(loginSnapshot)); manual.sequence = 2; manual.has_pass = 1;
+manual.benefits.daily_time.progress = 0; manual.shop_points = 0;
+manual.benefits.daily_time.rows[0].status = 'claimable'; manual.benefits.daily_time.rows[0].can_claim = 1;
+loginHarness.emit('survival_daily_snapshot', manual);
+assert.equal(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.enabled, true,
+    'With zero playtime and zero points, the monthly login tier is ready for an explicit click');
+assert(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.Children().some(node => node.text === '领取'));
+assert(loginNodes.DailyGW2Benefit_daily_time_daily_time_0.__dailyGW2Tooltip.body.includes('请点击领取'));
+assert(!loginNodes.DailyGW2Benefit_daily_time_daily_time_0.__dailyGW2Tooltip.body.includes('自动发放'));
+assert.equal(loginClaims().length, 0, 'Snapshot reads do not auto-claim a ready login reward');
+manual = JSON.parse(JSON.stringify(manual)); manual.sequence = 3;
+manual.benefits.daily_time.rows[0].auto_claim = false;
+loginHarness.emit('survival_daily_snapshot', manual);
+assert.equal(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.enabled, true,
+    'Explicit auto_claim=false must not be inferred as automatic from monthly-only zero minutes');
+loginApi.Close(); loginApi.Open(false);
+assert.equal(loginClaims().length, 0, 'Opening and refreshing the profile do not claim the login reward');
+assert.equal(loginHarness.sent.filter(event => /claim/.test(event.name)).length, 0,
+    'Profile and snapshot reads do not trigger any reward-claim event');
+loginHarness.click(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0);
+assert.equal(loginClaims().length, 1);
+assert.deepEqual(JSON.parse(JSON.stringify(loginClaims()[0].payload)), {track: 'daily_time', tier_id: 'daily_time_0'},
+    'The click uses the existing benefit claim event with no currency charge fields');
+assert.equal(loginApi.Inspect().benefitWaiting, true);
 assert.equal(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.enabled, false);
-assert(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.Children().some(node => node.text === '发放中…'));
-loginHarness.click(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0); noManualLogin();
-automatic = JSON.parse(JSON.stringify(automatic)); automatic.sequence = 3;
-automatic.benefits.daily_time.rows[0].status = 'claimed';
-loginHarness.emit('survival_daily_snapshot', automatic);
+assert(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.Children().some(node => node.text === '领取中…'));
+assert(!loginNodes.DailyGW2Benefit_daily_time_daily_time_0.BHasClass('DailyGW2BenefitClaimed'),
+    'Clicking never marks a reward owned before server confirmation');
+loginHarness.click(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0);
+assert.equal(loginClaims().length, 1, 'Double clicks cannot send a second pending login claim');
+manual = JSON.parse(JSON.stringify(manual)); manual.sequence = 4; manual.pending = 1;
+manual.benefit_claim_result = {track: 'daily_time', tier_id: 'daily_time_0', ok: true, pending: true};
+loginHarness.emit('survival_daily_snapshot', manual);
+assert.equal(loginApi.Inspect().benefitWaiting, true, 'A pending save is not a confirmed login reward');
+manual = JSON.parse(JSON.stringify(manual)); manual.sequence = 5; manual.pending = 0;
+manual.benefit_claim_result = {track: 'daily_time', tier_id: 'daily_time_0', ok: false, error: '登录奖励保存失败'};
+loginHarness.emit('survival_daily_snapshot', manual);
+assert.equal(loginApi.Inspect().benefitWaiting, false);
+assert.equal(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.enabled, true);
+assert.equal(loginNodes.DailyNotice.text, '登录奖励保存失败');
+assert(!loginNodes.DailyGW2Benefit_daily_time_daily_time_0.BHasClass('DailyGW2BenefitClaimed'));
+loginHarness.click(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0);
+assert.equal(loginClaims().length, 2, 'A failed write is retried only by another player click');
+manual = JSON.parse(JSON.stringify(manual)); manual.sequence = 6;
+manual.benefits.daily_time.rows[0].status = 'claimed'; manual.benefits.daily_time.rows[0].can_claim = 0;
+manual.benefit_claim_result = {track: 'daily_time', tier_id: 'daily_time_0', ok: true, pending: false};
+loginHarness.emit('survival_daily_snapshot', manual);
 assert(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.Children().some(node => node.text === '已领取'));
-loginApi.Close(); loginApi.Open(false); noManualLogin();
-automatic = JSON.parse(JSON.stringify(automatic)); automatic.sequence = 4;
-automatic.benefits.daily_time.period_id = '2026-10-22-05'; automatic.benefits.daily_time.rows[0].status = 'claimable';
-loginHarness.emit('survival_daily_snapshot', automatic);
-assert(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.Children().some(node => node.text === '发放中…'),
-    'The next day waits for the new authoritative automatic grant');
-noManualLogin();
+assert(loginNodes.DailyGW2Benefit_daily_time_daily_time_0.BHasClass('DailyGW2BenefitClaimed'));
+assert.equal(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.enabled, false);
+loginApi.Close(); loginApi.Open(false); assert.equal(loginClaims().length, 2);
+manual = JSON.parse(JSON.stringify(manual)); manual.sequence = 7; delete manual.benefit_claim_result;
+manual.benefits.daily_time.period_id = '2026-10-22-05'; manual.benefits.daily_time.rows[0].status = 'claimable';
+manual.benefits.daily_time.rows[0].can_claim = 1;
+loginHarness.emit('survival_daily_snapshot', manual);
+assert.equal(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.enabled, true);
+assert(loginNodes.DailyGW2BenefitClaim_daily_time_daily_time_0.Children().some(node => node.text === '领取'),
+    'After the next 05:00 reset, a new login reward waits for a fresh click');
+assert.equal(loginClaims().length, 2);
 // The shared presentation cleanup applies to calendar bundles, icon tooltips,
 // and special reward tooltips without editing old snapshot data.
 const stele = {id: 'lottery_reincarnation_immortal_stele', name: '轮回仙碑', count: 1,
     description: '英雄伤害+10%（旧编辑说明）'};
-automatic = JSON.parse(JSON.stringify(automatic)); automatic.sequence = 5;
-automatic.calendar28[0].rewards = [stele]; automatic.specials = [{...stele, day: 7, owned: 0}];
-loginHarness.emit('survival_daily_snapshot', automatic);
+manual = JSON.parse(JSON.stringify(manual)); manual.sequence = 8;
+manual.calendar28[0].rewards = [stele]; manual.specials = [{...stele, day: 7, owned: 0}];
+loginHarness.emit('survival_daily_snapshot', manual);
 assert(loginNodes.DailyGW2Day_1.__dailyGW2Tooltip.body.includes('英雄伤害+10%'));
 assert(!loginNodes.DailyGW2Day_1.__dailyGW2Tooltip.body.includes('旧编辑说明'));
 assert(!loginNodes.DailyGW2Day_1.__dailyRewardIcon.__dailyGW2Tooltip.body.includes('旧编辑说明'));
 assert(!loginNodes.DailyGW2Special_lottery_reincarnation_immortal_stele.__dailyGW2Tooltip.body.includes('旧编辑说明'));
-assert.equal(automatic.calendar28[0].rewards[0].description, '英雄伤害+10%（旧编辑说明）',
+assert.equal(manual.calendar28[0].rewards[0].description, '英雄伤害+10%（旧编辑说明）',
     'Display cleanup leaves the authoritative historical description untouched');
 loginHarness.assertCleanDispose(loginApi);
-console.log('monthly login benefits: six time tiers fit, automatic server grant states, no client login claim, shared stele description cleanup passed');
+console.log('monthly login benefits: six time tiers fit, explicit zero-minute manual claim, no auto-claim on reads, pending guard/retry/confirmation, shared stele description cleanup passed');

@@ -1,0 +1,70 @@
+{
+  "status": "LOCAL_ONLY_PENDING_USER_AUTHORIZATION",
+  "candidate_bundle": "6984b185a619040e425add7a13ff31acd0f47559da67a48f6f1c7ea5058d683a",
+  "parent_bundle": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+  "rollback_bundle": "874b950250c5a4da60a8fa8867385e63590bc9d0982d521d01a2997659a68013",
+  "parent_evidence": "tmp/benefit_revision_20261021/release_candidate/baseline.json",
+  "changed_config_tables": [
+    "archive_benefit_rewards",
+    "lottery_item_definitions"
+  ],
+  "changed_lua_sources": [
+    "systems/archive_benefit_rewards.lua"
+  ],
+  "python_overlays": [],
+  "python_validation": {
+    "parent_sha256": "ac1d12a3909acf4c27d569cac125125b2a73c140e423f2454fe6b8df02c494dd",
+    "workspace_before_sha256": "a39e15a5c21cd9a6cedac8b711936399c2548d4b606a14004f1618819e86f191",
+    "workspace_current_sha256": "a39e15a5c21cd9a6cedac8b711936399c2548d4b606a14004f1618819e86f191",
+    "workspace_restored_to_before": true,
+    "automatic_login_helper_absent": true,
+    "preexisting_workspace_changes_excluded": true,
+    "overlays": []
+  },
+  "previous_nine_reward_revisions_retained": true,
+  "new_monthly_login_tier": "daily_time_0",
+  "login_reward_requires_explicit_click": true,
+  "login_reward_auto_claim": false,
+  "new_optional_flags": [
+    "monthly_only",
+    "auto_claim"
+  ],
+  "compatibility_excludes": [
+    "benefit_claim"
+  ],
+  "upgrade_commands": [],
+  "parent_bundle_retained": true,
+  "rollback_disables_all_benefits": true,
+  "stackable_rules_preserved": true,
+  "database_migrations": [],
+  "credentials_included": false,
+  "remote_actions_performed": 0,
+  "active_hash_or_seed_written": false,
+  "lua_validation": {
+    "passed": true,
+    "cases": [
+      "monthly_zero_minutes_manual_button_claimable",
+      "non_monthly_manual_button_locked",
+      "benefit_snapshot_preserves_inventory_and_claims",
+      "non_monthly_login_rejected",
+      "monthly_zero_minutes_grants_one_gold",
+      "same_local_receipt_once",
+      "new_receipt_same_day_rejected",
+      "next_beijing_five_am_claim_is_independent",
+      "thirty_minutes_retains_two_ordinary_for_monthly",
+      "150_minutes_keeps_four_normal_four_zongzi_three_ember_one_gold",
+      "parent_pending_keeps_old_two_gold",
+      "parent_has_no_new_login_tier"
+    ],
+    "network_calls": 0,
+    "real_account_writes": 0
+  },
+  "receipt_validation": {
+    "profile_read_does_not_grant": true,
+    "explicit_manual_claim_grants_one_gold": true,
+    "completed_receipt_returned_unchanged": true,
+    "parent_pending_dispatched_to_original_bundle": true,
+    "database_connections": 0,
+    "real_account_writes": 0
+  }
+}

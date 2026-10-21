@@ -1,0 +1,88 @@
+{
+  "date_beijing": "2026-10-21",
+  "status": "LOCAL_MANUAL_LOGIN_READY_REMOTE_PUBLICATION_PENDING",
+  "user_confirmed": {
+    "stele": "Only remove parenthetical descriptions; keep item and every display entry.",
+    "login": "An additional login reward; preserve all existing rewards.",
+    "claim": "Click the first daily-time tier to claim; no automatic grant."
+  },
+  "behavior": {
+    "tier_id": "daily_time_0",
+    "required_minutes": 0,
+    "monthly_only": true,
+    "auto_claim": false,
+    "gold_tickets": 1,
+    "existing_nineteen_reward_rows_unchanged": true,
+    "existing_time_minutes": [
+      30,
+      60,
+      90,
+      120,
+      150
+    ],
+    "manual_event": "survival_benefit_claim",
+    "automatic_python_and_local_service_hooks_removed": true,
+    "previous_daily_time_0_claim_records_preserved": true,
+    "beijing_reset": "05:00"
+  },
+  "checks": {
+    "backend_integration_tests_passed": 23,
+    "daily_frontend_tests_passed": 14,
+    "local_lua_suites_reported_passed": [
+      "test_archive_benefits.lua",
+      "test_archive_service.lua"
+    ],
+    "offline_real_lua_cases": 12,
+    "offline_profile_claim_and_receipt_cases": 4,
+    "scope_only_login_auto_flag_changed": true,
+    "python_and_local_service_match_exact_pre_auto_backup": true,
+    "git_diff_check": "PASS",
+    "source_and_content_and_native_compile": "PASS"
+  },
+  "native": [
+    {
+      "relative": "scripts/custom_game/daily_remaining_5d5c1152eb.js",
+      "source_sha256": "3bc16fd7ff8672f6f615dae725d77fecaaffa24f0febc5c9b51984c3aaaf2bfb",
+      "native_sha256": "6474579fcf2e16a0410f29d3a2ba33829cb0f6b8a86fd41ae1b18efe2ed73a1b",
+      "data_matches_source": true
+    }
+  ],
+  "candidate": {
+    "bundle": "6984b185a619040e425add7a13ff31acd0f47559da67a48f6f1c7ea5058d683a",
+    "rollback_bundle": "874b950250c5a4da60a8fa8867385e63590bc9d0982d521d01a2997659a68013",
+    "parent": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "python_overlays": [],
+    "report": "validation/20261021/benefit_login_manual_candidate.json"
+  },
+  "publication": {
+    "remote_actions": 0,
+    "active_hash_preserved": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "client_seed_and_runtime_pointer_preserved": true,
+    "pending_existing_test_server_authorization": true,
+    "previous_automatic_review_rejection": "validation/20261021/benefit_revision.json"
+  },
+  "integrity": {
+    "backend": {
+      "data/csv/存档系统/archive_benefit_rewards.csv": "f75f7270dfe511c971ab35f9a16097d4dffa4fceeac522916a84f66dc7afd112",
+      "scripts/vscripts/config/generated/archive_benefit_rewards.lua": "3daf1000e2aef3cfcf09b0707388ae2b288c6f91fb26321a66e03479245be528",
+      "scripts/vscripts/systems/archive_benefit_rewards.lua": "9642abb5d67f15d3242b188fc18babacf9a72b8626fd73e0c07d257a2416bc55",
+      "scripts/vscripts/systems/archive_service.lua": "acdd86905aa955d5ebf653db078d21bd7584c7f04879494e4ce614aec260fcf3",
+      "server/tests/test_archive_benefits.py": "b1f824006705656a52db8604d8d3c4d9d165bac97d7306447be41990d7f817d1",
+      "scripts/vscripts/tests/test_archive_benefits.lua": "43875118c40237bd6f38d6f5862b1353cc2afd24a42d4d5968f631e11c4450c8",
+      "scripts/vscripts/tests/test_archive_service.lua": "6fceb1c764a765a27310ed76b7303ad1b614adf49b28239213a3c49f203b2c4c",
+      "server/archive_backend/service.py": "55ee5de33835b10f6c7992820577da8ac5076093f9faee1bfdf126cd135384e2"
+    },
+    "frontend": [
+      {
+        "file": "panorama/src/scripts/custom_game/daily_remaining_5d5c1152eb.js",
+        "sha256": "3bc16fd7ff8672f6f615dae725d77fecaaffa24f0febc5c9b51984c3aaaf2bfb"
+      },
+      {
+        "file": "tools/tests/daily_benefits.test.cjs",
+        "sha256": "d11e80a8d415b1cb63bd9eaf7261a9159ea187a77d711760ccbc4cd7c30b6aad"
+      }
+    ],
+    "builder_sha256": "fdebfcc9f4d8fe475de16196dc7255017ecf9182712b5c178fb05b075d365fd4",
+    "readme_sha256": "b6f961c1c1937a325f2b405097e97e221c84701643af506d95c835d2846f390b"
+  }
+}

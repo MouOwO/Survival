@@ -16,7 +16,7 @@ assert(snapshot.daily_time.progress==0 and #snapshot.daily_time.rows==6)
 assert(#snapshot.daily_wins.rows==5 and #snapshot.weekly_time.rows==9)
 assert(snapshot.daily_time.rows[1].status=="locked" and snapshot.daily_time.rows[1].can_claim==0)
 assert(snapshot.daily_time.rows[1].id=="daily_time_0" and snapshot.daily_time.rows[1].monthly_only==1
- and snapshot.daily_time.rows[1].auto_claim==1 and #snapshot.daily_time.rows[1].base_rewards==0)
+ and snapshot.daily_time.rows[1].auto_claim==0 and #snapshot.daily_time.rows[1].base_rewards==0)
 assert(snapshot.refresh_at==boundary+86400 and snapshot.weekly_refresh_at==boundary+7*86400)
 assert(encoder.encode(profile)==before,"Read-only welfare snapshots cannot initialize saved state")
 local function apply(command,pass)
@@ -30,8 +30,8 @@ end
 local login={id="local:login:0",kind="benefit_claim",track="daily_time",tier_id="daily_time_0",event_at=now}
 assert(not apply(login,false).ok and profile.save.archive.benefits==nil,
  "A free player cannot consume an empty-base login claim")
-local automatic=benefits.snapshot(profile,true).daily_time.rows[1]
-assert(automatic.status=="claimable" and automatic.can_claim==0,"Login rewards are automatically issued, not clickable")
+local manual=benefits.snapshot(profile,true).daily_time.rows[1]
+assert(manual.status=="claimable" and manual.can_claim==1 and manual.auto_claim==0,"Login rewards require an explicit claim click")
 assert(apply(login,true).ok and profile.save.content_inventory.special_lottery_ticket==1)
 assert(apply(login,true).duplicate and profile.save.content_inventory.special_lottery_ticket==1)
 now=boundary+30
@@ -91,4 +91,4 @@ benefits.record_online(paused,50,checkpoints[1]);benefits.record_online(paused,1
 assert(paused.benefits.days[tostring(benefits.day(boundary-1))].seconds==50)
 assert(paused.benefits.days[tostring(benefits.day(boundary))].seconds==10)
 package.loaded["systems/player_context_service"]=previous_context
-print("ARCHIVE_BENEFITS_PASS: 20 tiers, monthly-only auto login, read-only snapshot, actual seconds, Monday 05:00 split, deduplicated claims")
+print("ARCHIVE_BENEFITS_PASS: 20 tiers, monthly-only manual login, read-only snapshot, actual seconds, Monday 05:00 split, deduplicated claims")

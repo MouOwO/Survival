@@ -120,7 +120,8 @@ class BenefitTests(unittest.TestCase):
         self.assertEqual(len(rows), 20)
         login=rows["daily_time_0"]
         self.assertEqual(login["required"],0)
-        self.assertTrue(login["monthly_only"] and login["auto_claim"])
+        self.assertTrue(login["monthly_only"])
+        self.assertFalse(login["auto_claim"])
         self.assertFalse(login.get("base_item_ids"))
         self.assertEqual(login["pass_item_ids"],["special_lottery_ticket"])
         monthly = rows["daily_time_150"]
@@ -142,6 +143,7 @@ class BenefitTests(unittest.TestCase):
     def test_every_time_tier_grants_once_and_month_card_full_totals(self):
         self.month_card()
         self.service.profile({"account_id":"100"})
+        self.assertTrue(self.claim("daily_time_0")["ok"])
         self.assertTrue(self.credit_time(150 * 60)["ok"])
         for minute in (30, 60, 90, 120, 150):
             self.assertTrue(self.claim("daily_time_" + str(minute))["ok"])
@@ -152,17 +154,28 @@ class BenefitTests(unittest.TestCase):
         self.assertEqual(self.inventory()["lottery_ember_of_legacy"], 3)
         self.assertEqual(self.profile["save"]["gameplay_stats"], stats, "Stackable effects are projected, not permanently added again")
 
-    def test_month_card_login_auto_grants_at_zero_time_once_across_reconnects(self):
+    def test_month_card_login_requires_explicit_zero_time_claim_once_across_reconnects(self):
         self.month_card()
         for _ in range(3):
             result=self.service.profile({"account_id":"100"})
-            self.assertEqual(result["save"]["content_inventory"],{"special_lottery_ticket":1})
+            self.assertFalse(result["save"].get("content_inventory"))
+        self.assertEqual(self.db.ops,{},"Loading a month-card profile cannot create a login receipt")
+        self.assertTrue(self.claim("daily_time_0")["ok"])
+        for _ in range(3):
+            self.service.profile({"account_id":"100"})
+            self.assertFalse(self.claim("daily_time_0")["ok"])
+        self.assertEqual(self.inventory(),{"special_lottery_ticket":1})
         self.assertEqual(self.bucket()["seconds"],0)
         self.assertIn("daily_time_0",self.bucket()["claimed"])
-        receipts=[op for op in self.db.ops.values() if op["command"].get("tier_id")=="daily_time_0"]
-        self.assertEqual(len(receipts),1)
-        self.assertTrue(receipts[0]["done"])
-        self.assertFalse(self.claim("daily_time_0")["ok"])
+
+    def test_online_checkpoint_records_time_without_issuing_login_reward(self):
+        self.month_card()
+        self.credit_time(60)
+        self.service.profile({"account_id":"100"})
+        self.assertEqual(self.inventory(),{})
+        self.assertNotIn("daily_time_0",self.bucket()["claimed"])
+        self.assertTrue(self.claim("daily_time_0")["ok"])
+        self.assertEqual(self.inventory(),{"special_lottery_ticket":1})
 
     def test_free_and_expired_accounts_cannot_consume_login_tier_before_activation(self):
         for entitlement in ({},{"active":False},{"active":True,"expires_at":self.db.timestamp}):
@@ -173,42 +186,63 @@ class BenefitTests(unittest.TestCase):
             self.assertEqual(self.inventory(),{})
         self.month_card()
         self.service.profile({"account_id":"100"})
-        self.assertEqual(self.inventory(),{"special_lottery_ticket":1},"Buying a card later in the day still earns its login tier")
+        self.assertEqual(self.inventory(),{},"Buying a card does not automatically issue a login reward")
+        self.assertTrue(self.claim("daily_time_0")["ok"])
+        self.assertEqual(self.inventory(),{"special_lottery_ticket":1},"Buying a card later in the day still allows its login tier")
 
-    def test_login_auto_grant_lost_reply_recovers_without_second_ticket(self):
+    def test_login_manual_claim_lost_reply_recovers_without_second_ticket(self):
         self.month_card()
+        request=self.command("benefit_claim",track="daily_time",tier_id="daily_time_0")
         self.db.lose_reply=True
         with self.assertRaises(TimeoutError):
-            self.service.profile({"account_id":"100"})
+            self.service.command(request)
         self.assertEqual(self.inventory(),{"special_lottery_ticket":1})
         self.service.profile({"account_id":"100"})
+        self.assertTrue(self.service.command(request)["ok"])
         self.assertEqual(self.inventory(),{"special_lottery_ticket":1})
 
-    def test_login_auto_grant_refreshes_at_five_not_midnight(self):
+    def test_login_manual_claim_refreshes_at_five_not_midnight(self):
         self.month_card()
         self.db.timestamp=stamp("2026-10-21T15:59:59")
         self.service.profile({"account_id":"100"})
+        self.assertTrue(self.claim("daily_time_0")["ok"])
         self.db.timestamp=stamp("2026-10-21T16:00:01")
         self.service.profile({"account_id":"100"})
+        self.assertFalse(self.claim("daily_time_0")["ok"])
         self.assertEqual(self.inventory(),{"special_lottery_ticket":1})
         self.db.timestamp=stamp("2026-10-21T21:00:00")
         self.service.profile({"account_id":"100"})
+        self.assertEqual(self.inventory(),{"special_lottery_ticket":1},"Refreshing the next day still waits for a click")
+        self.assertTrue(self.claim("daily_time_0")["ok"])
         self.assertEqual(self.inventory(),{"special_lottery_ticket":2})
 
-    def test_renewed_month_card_uses_new_auto_receipt_after_expiry_race(self):
+    def test_renewed_month_card_can_click_again_after_expiry_race(self):
         self.profile["entitlements"]["archive_pass"]={"active":True,"expires_at":self.db.timestamp+1}
         original=self.service.command
         def expire(request):
             self.db.timestamp+=2
             return original(request)
         self.service.command=expire
-        with self.assertRaises(TimeoutError):
-            self.service.profile({"account_id":"100"})
+        self.assertFalse(self.claim("daily_time_0")["ok"])
         self.assertEqual(self.inventory(),{})
         self.service.command=original
         self.profile["entitlements"]["archive_pass"]={"active":True,"expires_at":self.db.timestamp+86400}
         self.service.profile({"account_id":"100"})
+        self.assertEqual(self.inventory(),{})
+        self.assertTrue(self.claim("daily_time_0")["ok"])
         self.assertEqual(self.inventory(),{"special_lottery_ticket":1})
+
+    def test_existing_login_claim_marker_survives_switch_from_automatic_to_manual(self):
+        self.month_card()
+        day=str(math.floor((self.db.timestamp+10800)/86400))
+        old_marker={"at":self.db.timestamp-60,"has_pass":1}
+        self.profile["save"]["archive"]={"benefits":{"version":1,"days":{day:{"seconds":0,"wins":0,
+            "claimed":{"daily_time_0":copy.deepcopy(old_marker)}}},"weeks":{}}}
+        self.profile["save"]["content_inventory"]={"special_lottery_ticket":1}
+        before=copy.deepcopy(self.profile["save"])
+        self.service.profile({"account_id":"100"})
+        self.assertFalse(self.claim("daily_time_0")["ok"])
+        self.assertEqual(self.profile["save"],before,"Disabling auto delivery never resets or tops up today's existing claim")
 
     def test_base_time_tier_totals_without_month_card(self):
         self.credit_time(9000)

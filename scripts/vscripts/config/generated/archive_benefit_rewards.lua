@@ -2,7 +2,7 @@
 -- Source: archive_benefit_rewards.csv
 local M = {}
 M.rows = {
-    { reward_id = "daily_time_0", track = "daily_time", period = "day", metric = "minutes", required = 0, pass_item_ids = {"special_lottery_ticket"}, pass_counts = {"1"}, enabled = true, monthly_only = true, auto_claim = true },
+    { reward_id = "daily_time_0", track = "daily_time", period = "day", metric = "minutes", required = 0, pass_item_ids = {"special_lottery_ticket"}, pass_counts = {"1"}, enabled = true, monthly_only = true, auto_claim = false },
     { reward_id = "daily_time_30", track = "daily_time", period = "day", metric = "minutes", required = 30, base_item_ids = {"lottery_ticket"}, base_counts = {"1"}, pass_item_ids = {"lottery_ticket"}, pass_counts = {"1"}, enabled = true },
     { reward_id = "daily_time_60", track = "daily_time", period = "day", metric = "minutes", required = 60, base_item_ids = {"lottery_ticket"}, base_counts = {"1"}, pass_item_ids = {"lottery_ticket"}, pass_counts = {"1"}, enabled = true },
     { reward_id = "daily_time_90", track = "daily_time", period = "day", metric = "minutes", required = 90, base_item_ids = {"lottery_ticket"}, base_counts = {"1"}, pass_item_ids = {"lottery_ticket"}, pass_counts = {"1"}, enabled = true },

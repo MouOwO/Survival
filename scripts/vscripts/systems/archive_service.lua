@@ -557,21 +557,6 @@ function M.benefit_claim(player_id,track,tier_id)
     serial=(serial or 0)+1
     return enqueue(player_id,{id=session_id..":benefit:"..serial,kind="benefit_claim",track=track,tier_id=tier_id})
 end
-local function auto_login_benefits(player_id,profile)
-    -- Live HTTP profiles already reconcile this reward on the trusted backend.
-    if require("systems/archive_http_adapter").enabled() or busy[player_id] or not profile then return end
-    local pass=has_pass(profile)
-    local day=tostring(require("systems/archive_calendar").day())
-    local saved=profile.save.archive or {}
-    local claimed=((((saved.benefits or {}).days or {})[day] or {}).claimed or {})
-    for _,row in ipairs(require("config/generated/archive_benefit_rewards").rows) do
-        if row.enabled and row.auto_claim and row.period=="day" and row.required==0
-            and (not row.monthly_only or pass) and not claimed[row.reward_id] then
-            enqueue(player_id,{id=session_id..":benefit:auto:"..day..":"..row.reward_id,
-                kind="benefit_claim",track=row.track,tier_id=row.reward_id})
-        end
-    end
-end
 function M.set_purchase_provider(provider)
     assert(provider==nil or type(provider.open_checkout)=="function" or type(provider.create_order)=="function")
     purchase_provider=provider
@@ -806,7 +791,6 @@ function M.init()
             -- The server's saved best floor can unlock newly added milestones.
             -- Never trust a floor/count supplied by the UI or award it on reads.
             local profile = account_profile(id)
-            auto_login_benefits(id,profile)
             if profile and require("systems/archive_starjoy_rewards").needs_reconcile(profile.save.gameplay_stats) then
                 enqueue(id, {id=session_id..":starjoy_reconcile", kind="starjoy_reconcile"})
             end
@@ -915,7 +899,6 @@ function M.init()
             local profile=account_profile(id)
             if profile then
                 local pass=has_pass(profile)
-                auto_login_benefits(id,profile)
                 if pass_states[id]~=pass then
                     pass_states[id]=pass
                     bus.emit(events.PLAYER_PROFILE_CHANGED,{player_id=id,reason="archive_boss_refresh"})

@@ -1,6 +1,6 @@
 reward_id,track,period,metric,required,base_item_ids,base_counts,pass_item_ids,pass_counts,enabled,monthly_only,auto_claim
 #types:string,string,string,string,number,list,list,list,list,boolean,boolean,boolean
-daily_time_0,daily_time,day,minutes,0,,,special_lottery_ticket,1,1,1,1
+daily_time_0,daily_time,day,minutes,0,,,special_lottery_ticket,1,1,1,0
 daily_time_30,daily_time,day,minutes,30,lottery_ticket,1,lottery_ticket,1,1,,
 daily_time_60,daily_time,day,minutes,60,lottery_ticket,1,lottery_ticket,1,1,,
 daily_time_90,daily_time,day,minutes,90,lottery_ticket,1,lottery_ticket,1,1,,
