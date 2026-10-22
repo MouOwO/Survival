@@ -3,14 +3,15 @@
 local M = {}
 local states = {}
 local navigation = require('systems/wall_navigation_service')
+local rear_queue = require('systems/wall_melee_queue')
 local HALF, COUNT, ENGAGE_DISTANCE = 128, 4, 512
 -- Hull32 has padded radius42. Four centers fit a384 stair without shrinking
 -- any body; terrain may reject an outer contact on an offset placement.
 local LANE_PITCH, CONTACT_NORMAL = 88, 184
-local CONTACT_SHIFT_LIMIT, CONTACT_SHIFT_STEP = 48, 4
+local CONTACT_SHIFT_LIMIT, CONTACT_SHIFT_STEP = 192, 4
 local STALL_SECONDS, POSITION_CACHE_SECONDS = 3, 2
 local PATH_STEP_SECONDS, PATHS_PER_STEP = 0.5, 16
-local SETTLE_DISTANCE, WAIT_CLEARANCE, RETREAT_ALLOWANCE = 36, 8, 32
+local SETTLE_DISTANCE, WAIT_CLEARANCE = 36, 8
 local MAX_NATIVE_ROUTE = ENGAGE_DISTANCE*3
 local function alive(u) return u and not u:IsNull() and u:IsAlive() end
 local function distance(a,b)
@@ -95,6 +96,7 @@ retire_claim=function(s,id)
 end
 clear_state=function(s)
     for id in pairs(s.claims) do retire_claim(s,id) end
+    rear_queue.reset(s)
 end
 -- Only admission checks real bodies, after native MOVE has actually reached
 -- a contact. Cache one local snapshot per wall/observation; a dense queue must
@@ -159,63 +161,21 @@ local function contact_back_edge(origin,point,radius,face)
     return normal+radius
 end
 local function waiting_point(wall,unit,source,front_edge)
-    local point=source.point
-    local origin=wall:GetAbsOrigin()
-    local dx,dy=point.x-origin.x,point.y-origin.y
-    local x_axis=source.face<=2
-    local sign=(source.face==1 or source.face==3) and -1 or 1
-    local radius=hull(unit)
-    local body=body_radius(unit)
-    if front_edge<=0 then front_edge=contact_back_edge(origin,point,body,source.face) end
-    -- Leave one body diameter plus a small margin, not a fixed empty row.
-    -- Use the whole front's rear edge so a larger adjacent contact is safe too.
-    local normal=front_edge+body+WAIT_CLEARANCE
-    local current=unit:GetAbsOrigin()
-    local inside=sign*(x_axis and current.x-origin.x or current.y-origin.y)<normal
-    -- A unit retreating out of the front can stop short of its MOVE goal.
-    -- Only that unit needs extra retreat; rear arrivals must not inherit it.
-    local cache=source.wait_points
-    local stamp=now()
-    if not cache or cache.front_edge~=front_edge or stamp-cache.updated>=POSITION_CACHE_SECONDS then
-        cache={front_edge=front_edge,updated=stamp};source.wait_points=cache
-    end
-    local points=cache[radius]
-    if not points then points={};cache[radius]=points end
-    local key=inside and 2 or 1
-    if points[key]~=nil then return points[key] end
-    if inside then normal=normal+RETREAT_ALLOWANCE end
-    -- A larger waiter may not fit the small attacker's outer lane.
-    local lateral_min=(source.lateral_min or -HALF)+radius
-    local lateral_max=(source.lateral_max or HALF)-radius
-    local function candidate(along)
-        if lateral_min>lateral_max then return false end
-        along=math.max(lateral_min,math.min(lateral_max,along))
-        local p=x_axis and Vector(origin.x+sign*normal,origin.y+along,point.z)
-            or Vector(origin.x+along,origin.y+sign*normal,point.z)
-        p.z=GetGroundHeight(p,unit)
-        return clear_point(wall,unit,p) and p or false
-    end
-    local p=candidate(x_axis and dy or dx)
-    -- A blocked nearest lane must not leave an intruding waiter in the front
-    -- while another rear lane is open. This bounded check shares the existing
-    -- size/face geometry cache; stable rear units still do no path searches.
-    if not p and inside then
-        for lane=1,COUNT do
-            p=candidate((source.lateral_center or 0)+(lane-(COUNT+1)*0.5)*(source.lane_pitch or LANE_PITCH))
-            if p then break end
-        end
-        if not p then p=candidate(source.lateral_center or 0) end
-    end
-    points[key]=p
-    return points[key]
+    local s=states[wall:entindex()]
+    if not s or not source then return nil end
+    return rear_queue.reserve(s,wall,unit,source.face,front_edge,now())
 end
 local function state_for(wall)
     local id=wall:entindex()
     local s=states[id]
-    if not s or s.wall~=wall then
+    local p=wall:GetAbsOrigin()
+    local revision=tonumber(wall.survival_wall_relocation_revision) or 0
+    if not s or s.wall~=wall or s.wall_revision~=revision
+        or s.origin.x~=p.x or s.origin.y~=p.y or s.origin.z~=p.z then
         if s then clear_state(s) end
         s={wall=wall,claims={},waiters={},faces={},positions={},staging={},retries={},failed={},retry_sweep=0,
-            count=0,revision=0,layout=navigation.contact_layout and navigation.contact_layout(wall)}
+            count=0,revision=0,layout=navigation.contact_layout and navigation.contact_layout(wall),
+            origin=Vector(p.x,p.y,p.z),wall_revision=revision,path_limit=PATHS_PER_STEP}
         s.lane_pitch=LANE_PITCH
         for side=1,4 do s.faces[side]={claims={},slots={},count=0} end
         states[id]=s
@@ -223,7 +183,8 @@ local function state_for(wall)
     return s
 end
 local positions,face_for
-local function forget_waiter(s,id)
+local function forget_waiter(s,id,retain_queue)
+    if not retain_queue then rear_queue.release(s,id) end
     local record=s.waiters[id]
     if not record then return end
     s.waiters[id]=nil
@@ -353,7 +314,7 @@ local function replacement_owner(s,side,stamp)
         if eligible then consider(record.unit,p)
         elseif not alive(record.unit) or stamp-record.updated>2
             or distance(record.unit:GetAbsOrigin(),s.wall:GetAbsOrigin())>ENGAGE_DISTANCE then
-            forget_waiter(s,id)
+            forget_waiter(s,id,alive(record.unit))
         end
     end
     -- At most sixteen registered claim owners, never a map/body search.
@@ -378,10 +339,10 @@ positions=function(s,unit,stamp)
         local layout=s.layout
         local allowed=not layout or not layout.gate
             or (layout.axis==1 and side<=2) or (layout.axis==2 and side>=3)
-        -- Keep a valid authored row unchanged. A slightly offset stair may
-        -- reject just one outer endpoint even though four solid bodies fit.
-        -- Repair that one case within the same physical face, using actual
-        -- terrain rather than relying on a recognized rectangular doorway.
+        -- Keep a valid authored row unchanged. Moving a wall by one or two
+        -- cells can reject several original contacts while the same stair
+        -- still fits four native bodies. Fit that partial row on real terrain
+        -- without depending on a recognized rectangular doorway.
         local checked={}
         local normal=math.max(CONTACT_NORMAL,HALF+radius+24)
         local function endpoint(along)
@@ -394,35 +355,59 @@ positions=function(s,unit,stamp)
             checked[along]=clear_point(s.wall,unit,point,radius) and point or false
             return checked[along]
         end
-        local row,count,missing={},0,nil
+        local row,count,valid_along={},0,0
         if allowed then
             for lane=1,COUNT do
                 local point=endpoint((lane-(COUNT+1)*0.5)*s.lane_pitch)
                 row[lane]=point
-                if point then count=count+1 else missing=lane end
+                if point then
+                    count=count+1
+                    valid_along=valid_along+(lane-(COUNT+1)*0.5)*s.lane_pitch
+                end
             end
         end
         local center,pitch=0,s.lane_pitch
-        if count==COUNT-1 and (missing==1 or missing==COUNT)
-            and padded_radius*2<=s.lane_pitch then
-            local direction=missing==1 and 1 or -1
+        if count>0 and count<COUNT and padded_radius*2<=s.lane_pitch then
+            local direction=valid_along>=0 and 1 or -1
             local minimum_pitch=math.max(s.lane_pitch-4,padded_radius*2)
             local repaired=false
-            for trial_pitch=s.lane_pitch,minimum_pitch,-2 do
-                for offset=trial_pitch==s.lane_pitch and CONTACT_SHIFT_STEP or 0,
-                    CONTACT_SHIFT_LIMIT,CONTACT_SHIFT_STEP do
-                    local shift=direction*offset
-                    -- Reject bad outer endpoints before checking the middle.
-                    local first=endpoint(shift-1.5*trial_pitch)
-                    local last=first and endpoint(shift+1.5*trial_pitch)
-                    if last then
-                        local second=endpoint(shift-.5*trial_pitch)
-                        local third=second and endpoint(shift+.5*trial_pitch)
-                        if third then
-                            row={first,second,third,last};center,pitch=shift,trial_pitch
-                            repaired=true;break
+            local function continuous(low,high)
+                for along,point in pairs(checked) do
+                    if point==false and along>=low and along<=high then return false end
+                end
+                local previous=endpoint(low)
+                if not previous then return false end
+                -- Four valid endpoints alone can straddle an unwalkable bank
+                -- or a thin divider. The whole fitted row must be one native
+                -- corridor, with no sideways cliff or blocked body samples.
+                for along=low+CONTACT_SHIFT_STEP,high,CONTACT_SHIFT_STEP do
+                    local point=endpoint(along)
+                    if not point or math.abs(point.z-previous.z)>32 then return false end
+                    previous=point
+                end
+                local last=endpoint(high)
+                return last and math.abs(last.z-previous.z)<=32
+            end
+            -- Prefer the smallest displacement, then the wider safe pitch.
+            -- Inspect both signs so a surviving off-center endpoint cannot
+            -- send the repair towards a disconnected neighbouring floor.
+            for offset=0,CONTACT_SHIFT_LIMIT,CONTACT_SHIFT_STEP do
+                for _,sign in ipairs(offset==0 and {direction} or {direction,-direction}) do
+                    local shift=sign*offset
+                    for trial_pitch=s.lane_pitch,minimum_pitch,-2 do
+                        -- Reject bad outer endpoints before checking the middle.
+                        local first=endpoint(shift-1.5*trial_pitch)
+                        local last=first and endpoint(shift+1.5*trial_pitch)
+                        if last then
+                            local second=endpoint(shift-.5*trial_pitch)
+                            local third=second and endpoint(shift+.5*trial_pitch)
+                            if third and continuous(shift-1.5*trial_pitch,shift+1.5*trial_pitch) then
+                                row={first,second,third,last};center,pitch=shift,trial_pitch
+                                repaired=true;break
+                            end
                         end
                     end
+                    if repaired then break end
                 end
                 if repaired then break end
             end
@@ -559,6 +544,7 @@ local function waiting_plan(wall,unit,p,side,front_edge,point)
     local radius=hull(unit)
     return {point=point or p,claimed=false,wait_face=side,wait_envelope=front_edge,
         wait_radius=radius,waiting_blocked=not point,
+        wait_queue_key=point and string.format('%.17g:%.17g:%.17g',point.x,point.y,point.z) or nil,
         -- A missing rear endpoint does not authorize passing any live body.
         wait_retreat=front_edge>0 and normal<front_edge+body_radius(unit)+WAIT_CLEARANCE-0.01 or false}
 end
@@ -578,8 +564,22 @@ function M.resolve(wall,unit,preferred_face)
     local p,origin=unit:GetAbsOrigin(),wall:GetAbsOrigin()
     local id=unit:entindex()
     if distance(p,origin)>ENGAGE_DISTANCE then
-        M.release(wall:entindex(),id)
+        local s=state_for(wall)
+        retire_claim(s,id)
+        local point,queue_side=rear_queue.peek(s,unit)
         local route=unit.survival_wall_route
+        local verified=route and route.wall==wall and route.point
+            and route.revision==(tonumber(wall.survival_wall_relocation_revision) or 0)
+        local side=preferred_face or queue_side or face_for(p,origin)
+        -- Rear destinations extend into the real courtyard. Keep those
+        -- reservations outside the small attack-admission area so they do
+        -- not collapse back into the four verified front waypoints.
+        if point or (verified and distance(p,origin)<=1200) then
+            local front_edge=clean_face(s,side,origin,now())
+            point=rear_queue.reserve(s,wall,unit,side,front_edge,now()) or point
+            return waiting_plan(wall,unit,p,side,front_edge,point)
+        end
+        M.release(wall:entindex(),id)
         if route and route.wall==wall and route.point
             and route.revision==(tonumber(wall.survival_wall_relocation_revision) or 0) then
             -- Formal target selection has already checked this real contact's
@@ -663,7 +663,8 @@ function M.resolve(wall,unit,preferred_face)
     if preferred_face~=1 and preferred_face~=2 and preferred_face~=3 and preferred_face~=4 then
         preferred_face=nil
     end
-    local side=own and own.face or preferred_face or face_for(p,origin)
+    local queued_point,queue_side=rear_queue.peek(s,unit)
+    local side=own and own.face or preferred_face or queue_side or face_for(p,origin)
     local retry=s.retries[id]
     if retry and retry.unit==unit and stamp<retry.until_time then side=retry.face
     else s.retries[id]=nil;retry=nil end
@@ -699,7 +700,7 @@ function M.resolve(wall,unit,preferred_face)
     -- may route to another free face instead of holding every later arrival.
     -- Once all sixteen contacts are held, the normal waiting path remains
     -- constant work and does not search any routes or scan the waiting crowd.
-    if face.count>=COUNT and (preferred_face or retry or s.count>=COUNT*4) then
+    if face.count>=COUNT and (preferred_face or queue_side or retry or s.count>=COUNT*4) then
         local nearest=nearest_claim(face,p)
         return waiting_plan(wall,unit,p,side,front_edge,waiting_point(wall,unit,nearest,front_edge))
     end
@@ -707,7 +708,7 @@ function M.resolve(wall,unit,preferred_face)
     if failed and failed.unit==unit and failed.face==side
         and failed.revision==s.revision and failed.front_edge==front_edge
         and stamp<failed.until_time and not moved(p,failed.position) then
-        return waiting_plan(wall,unit,p,side,front_edge,failed.point)
+        return waiting_plan(wall,unit,p,side,front_edge,queued_point or failed.point)
     end
     s.failed[id]=nil
     path_budget(s,stamp)

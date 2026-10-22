@@ -175,4 +175,24 @@ controlled.stunned=false
 expect_clean_boundary=true;tick(controlled_owner)
 assert(not expect_clean_boundary)
 assert_cleaned(controlled,controlled_owner,before_stops,before_orders)
-print("WALL_RELOCATION_AI_PASS same-entity revision resets melee root/range/boundary/retreat and ranged hold; external control priority; stable revisions preserve native attacks and half-second cadence")
+-- A rear vacancy can change a waiting unit's destination without changing
+-- the front envelope, face, radius or wall entity. The old FSM ignored that
+-- change forever. A stable reservation must still avoid repeated MOVE orders.
+local queued,queued_owner=make_parent(6,1)
+plan={point=Vector(-300,-24,384),claimed=false,wait_face=1,
+    wait_envelope=226,wait_radius=32,waiting_blocked=false,wait_retreat=false,
+    wait_queue_key="-300:-24"}
+tick(queued_owner)
+assert(queued_owner.ai_state=="waiting" and queued.orders==1)
+for _=1,10 do tick(queued_owner) end
+assert(queued.orders==1,"a stable queue reservation must not reissue MOVE")
+plan={point=Vector(-388,64,384),claimed=false,wait_face=1,
+    wait_envelope=226,wait_radius=32,waiting_blocked=false,wait_retreat=false,
+    wait_queue_key="-388:64"}
+tick(queued_owner)
+assert(queued.orders==2 and queued.last_order.Position==plan.point,
+    "a new reserved rear goal must update the native MOVE exactly once")
+for _=1,10 do tick(queued_owner) end
+assert(queued.orders==2 and not queued_owner.contact_locked,
+    "rear reassignment must keep normal collision and stable orders")
+print("WALL_RELOCATION_AI_PASS same-entity revision resets melee root/range/boundary/retreat and ranged hold; external control priority; stable revisions preserve native attacks and half-second cadence; rear reservation changes issue one MOVE")

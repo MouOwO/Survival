@@ -5,6 +5,7 @@ package.path='scripts/vscripts/?.lua;'..package.path
 Vector=function(x,y,z) return {x=x,y=y,z=z or 256} end
 local clock,rotation,queries,paths,bodies,writes,hull_writes=0,0,0,0,0,0,0
 local lower,upper,interior_obstacle=-128,192,false
+local wall_lateral,divider_low,divider_high=0,nil,nil
 local origin=Vector(-896,-10112,256)
 local actors={}
 local function rotate(x,y,q)
@@ -21,11 +22,12 @@ end
 local function terrain(p)
     local n,l=local_point(p)
     if n<-128 and (l<lower or l>=upper) then return false end
+    if n<-128 and divider_low and l>=divider_low and l<divider_high then return false end
     return not (interior_obstacle and math.abs(n+184)<1 and math.abs(l+44)<1)
 end
 local function blocked(p)
     local n,l=local_point(p)
-    return math.abs(n)<128 and math.abs(l)<128
+    return math.abs(n)<128 and math.abs(l-wall_lateral)<128
 end
 GetGroundHeight=function(p)
     local n=local_point(p)
@@ -92,7 +94,7 @@ for q=0,3 do
     assert(#candidates==4,'the rich wall must offer four full-body contacts without a doorway layout')
     assert(paths==before_paths and bodies==before_bodies,
         'read-only fit must never search paths or scan live units')
-    assert(queries-before_queries<=1024,'one shared fit must keep a bounded terrain-query budget: '
+    assert(queries-before_queries<=4096,'one shared fit must keep a bounded terrain-query budget: '
         ..(queries-before_queries))
     local sign=(q==1 or q==2) and -1 or 1
     local seen={}
@@ -138,8 +140,9 @@ for q=0,3 do
     local fifth=actor(20,-400,-10)
     local wait=assert(contact.resolve(wall,fifth,face))
     assert(not wait.claimed and wait.point,'a fifth attacker must wait outside the four solid contacts')
-    local _,wait_l=local_point(wait.point)
-    assert(seen[wait_l],'waiting geometry must retain the fitted row center and pitch')
+    local wait_n=local_point(wait.point)
+    assert(full_body_clear(wait.point) and wait_n<=-276,
+        'the rear goal must use real terrain behind the front without sharing a front lane')
     local victim=front[2];victim.dead=true
     local refill=assert(contact.resolve(wall,fifth,face))
     assert(refill.claimed and refill.point==victim.p,'death must refill the exact vacated fitted contact')
@@ -150,33 +153,85 @@ for q=0,3 do
         assert(not contact.resolve(wall,u,face).claimed)
         waiters[#waiters+1]=u
     end
+    -- New destinations use a shared bounded native-path budget. Finish that
+    -- initial work before measuring stable crowd observation, while keeping
+    -- the four live front owners observed through their normal lease cadence.
+    for pass=1,16 do
+        clock=pass*.5
+        for _,u in ipairs(front) do assert(contact.resolve(wall,u,face).claimed) end
+        for _,u in ipairs(waiters) do assert(not contact.resolve(wall,u,face).claimed) end
+    end
     before_queries,before_paths,before_bodies=queries,paths,bodies
     for pass=1,30 do
-        clock=pass*.05
+        clock=8+pass*.05
+        for _,u in ipairs(front) do assert(contact.resolve(wall,u,face).claimed) end
         for _,u in ipairs(waiters) do assert(not contact.resolve(wall,u,face).claimed) end
     end
     assert(queries==before_queries and paths==before_paths and bodies==before_bodies,
         'stable ninety-unit fitted queues must add no terrain, path or body queries')
-    clock=2.1
+    clock=10.1
     before_queries,before_paths,before_bodies=queries,paths,bodies
     assert(#front_candidates(wall,scout)==4,'cache expiry must preserve the same legal four-body fit')
-    assert(queries-before_queries<=1024 and paths==before_paths and bodies==before_bodies,
+    assert(queries-before_queries<=4096 and paths==before_paths and bodies==before_bodies,
         'expired fit refresh must remain bounded and independent of the ninety waiting units')
 end
+-- Keep the actual stair fixed while moving the physical wall by one/two
+-- cells. Depending on direction the authored row retains only two contacts;
+-- one additional partial-row case retains one. All four fitted bodies still
+-- occupy the same continuous strip, rather than following the wall into a bank.
+local moved_cases=0
+for q=0,3 do for _,shift in ipairs({-160,-128,-64,0,64,128}) do
+    contact.reset();rotation=q;clock=0;actors={}
+    lower,upper,interior_obstacle=-128,192,false
+    wall_lateral,divider_low,divider_high=shift,nil,nil
+    local wall=actor(1,0,shift)
+    local scout=actor(2,-400,32)
+    local before_queries,before_paths,before_bodies=queries,paths,bodies
+    local candidates=front_candidates(wall,scout)
+    assert(#candidates==4,'moved wall must fit all four native front contacts: '..q..':'..shift)
+    assert(paths==before_paths and bodies==before_bodies,'fitting moved walls must remain read-only geometry')
+    assert(queries-before_queries<=8192,'large moved-wall fits retain a bounded shared query budget')
+    local sign=(q==1 or q==2) and -1 or 1
+    local seen={}
+    for _,candidate in ipairs(candidates) do
+        local n,l=local_point(candidate.point)
+        assert(n==-184 and (l==-94 or l==-10 or l==74 or l==158),
+            'moving the wall must not move the fitted row through the original stair bank')
+        assert(candidate.lateral_center==(32-shift)*sign and candidate.lane_pitch==84)
+        assert(full_body_clear(candidate.point),'all moved contacts retain their complete native hull')
+        assert(not seen[l],'only four exclusive front keys may exist');seen[l]=true
+    end
+    for i=1,4 do for j=i+1,4 do
+        local a,b=candidates[i].point,candidates[j].point
+        assert((a.x-b.x)^2+(a.y-b.y)^2>=84^2,'moved contacts preserve padded42 separation')
+    end end
+    local shared=contact.approach_points(wall,scout)
+    before_queries=queries
+    for _=1,90 do assert(contact.approach_points(wall,scout)==shared) end
+    assert(queries==before_queries,'moving walls must still share cached geometry across the crowd')
+    moved_cases=moved_cases+1
+end end
+wall_lateral=0
 -- Wider open fronts keep authored geometry. A smaller true opening, a larger
--- body, an interior obstacle or excessive wall offset must never force a fit.
+-- body or an interior obstacle must never force an unsafe fit. The thin divider
+-- lies between the four proposed hull samples; only continuous row validation
+-- detects it and prevents a row spanning two disconnected floor sections.
 for _,case in ipairs({
     {lower=-192,upper=192,count=4,pitch=88,center=0},
     {lower=-128,upper=186,count=3},
     {lower=-192,upper=96,count=3},
     {lower=-192,upper=192,interior=true,count=3},
+    {lower=-128,upper=192,divider_low=28,divider_high=36,count=3},
 }) do
     contact.reset();actors={};rotation=0;clock=0
     lower,upper,interior_obstacle=case.lower,case.upper,case.interior==true
+    divider_low,divider_high=case.divider_low,case.divider_high
     local wall=actor(1,0,0)
     local scout=actor(2,-400,0)
     local candidates=front_candidates(wall,scout)
-    assert(#candidates==case.count,'unsafe or unnecessary repair must retain the original terrain capacity')
+    assert(#candidates==case.count,'unsafe or unnecessary repair must retain the original terrain capacity: '
+        ..case.lower..':'..case.upper..':'..tostring(case.interior)..':'..tostring(case.divider_low)
+        ..' expected='..case.count..' actual='..#candidates)
     for _,candidate in ipairs(candidates) do
         assert(full_body_clear(candidate.point),'fallback contacts must still pass full-body terrain checks')
         if case.pitch then
@@ -187,5 +242,6 @@ for _,case in ipairs({
 end
 assert(writes==0 and hull_writes==0,'fitting contacts must never alter native positions or hull radii')
 print('RICH_WALL_CONTACT_FIT_PASS rotations=4 recorded_three_to_four pitch84 shift32 layout_nil'
+    ..' moved_wall_cases='..moved_cases..' partial_one_two_three continuous_divider_rejected'
     ..' full_native_bodies death_refill same_hull_different_padding ninety_waiters stable_queries=0'
     ..' cold_nav_budget='..cold_queries..' bounded_ttl_refresh partial_fallback unchanged_valid_rows no_position_or_hull_writes')

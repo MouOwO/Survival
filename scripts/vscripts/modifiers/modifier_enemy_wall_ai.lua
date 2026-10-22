@@ -42,7 +42,7 @@ local function target_controlled(self,parent)
 end
 local function same_wait_geometry(a,b)
     return b and a.wait_face==b.wait_face and a.wait_envelope==b.wait_envelope
-        and a.wait_radius==b.wait_radius
+        and a.wait_radius==b.wait_radius and a.wait_queue_key==b.wait_queue_key
 end
 local function movement_controlled(parent)
     return interrupted(parent) or (parent.IsRooted and parent:IsRooted())
@@ -258,6 +258,7 @@ function M:SetWallEntIndex(entindex,reset_position)
     self.goal_wall=nil
     self.goal_wall_revision=nil
     self.wait_blocked,self.wait_face,self.wait_envelope,self.wait_radius=nil,nil,nil,nil
+    self.wait_queue_key=nil
     self.retreat_failure,self.retreat_goal_safe,self.retreat_check_after,self.retreat_extend_after=nil,nil,nil,nil
     if not parent.GetForceAttackTarget or parent:GetForceAttackTarget()~=nil then
         parent:SetForceAttackTarget(nil)
@@ -322,14 +323,16 @@ function M:EnterState(state,parent,wall,point,plan)
     end
     if self.ai_state==state and self.goal_wall==wall then
         if state=="waiting" then
-            -- Hold a stable rear goal even when the nearest occupied lane or
-            -- retreat choice changes. Only real clearance/face changes renew it.
+            -- A reserved rear position stays stable between observations.
+            -- Its key changes only when a real vacancy or geometry change
+            -- assigns a new destination; issue that MOVE exactly once.
             local blocked=plan and plan.waiting_blocked
             local face=plan and plan.wait_face
             local envelope=plan and plan.wait_envelope
             local radius=plan and plan.wait_radius
             if self.wait_blocked==blocked and self.wait_face==face
-                and self.wait_envelope==envelope and self.wait_radius==radius then return false end
+                and self.wait_envelope==envelope and self.wait_radius==radius
+                and self.wait_queue_key==(plan and plan.wait_queue_key) then return false end
         elseif state=="attack" or state=="chase"
             or (same_point(point,self.contact_move) and (state~="retreat" or same_wait_geometry(self,plan))) then return false end
     end
@@ -341,8 +344,10 @@ function M:EnterState(state,parent,wall,point,plan)
     if (state=="waiting" or state=="retreat") and plan then
         self.wait_blocked,self.wait_face=plan.waiting_blocked,plan.wait_face
         self.wait_envelope,self.wait_radius=plan.wait_envelope,plan.wait_radius
+        self.wait_queue_key=plan.wait_queue_key
     else
         self.wait_blocked,self.wait_face,self.wait_envelope,self.wait_radius=nil,nil,nil,nil
+        self.wait_queue_key=nil
     end
     self.last_attack_activity=nil
     self.progress_position=parent:GetAbsOrigin()
@@ -537,7 +542,8 @@ function M:OnIntervalThink()
                                 point=retreat;desired="retreat"
                             else
                                 self.retreat_failure={wait_face=plan.wait_face,wait_envelope=plan.wait_envelope,
-                                    wait_radius=plan.wait_radius,position={x=position.x,y=position.y},until_time=stamp+2}
+                                    wait_radius=plan.wait_radius,wait_queue_key=plan.wait_queue_key,
+                                    position={x=position.x,y=position.y},until_time=stamp+2}
                             end
                         end
                     end

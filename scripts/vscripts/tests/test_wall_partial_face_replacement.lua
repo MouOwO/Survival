@@ -7,13 +7,17 @@ local clock,paths,path_rule=0,0,nil
 GameRules={GetGameTime=function() return clock end}
 GetGroundHeight=function() return 384 end
 GridNav={IsTraversable=function() return true end,
-    IsBlocked=function(_,p) return p.x< -100 and p.y< -100 end,
+    -- A bounded 276-wide opening really has only three full-body contacts.
+    -- An unbounded upper bank now permits a legitimate shifted four-slot fit.
+    IsBlocked=function(_,p) return p.x< -100 and (p.y< -100 or p.y>176) end,
     FindPathLength=function(_,a,b)
         paths=paths+1
         if path_rule then return path_rule(a,b) end
         -- Both approach ends are terrain-reachable; other-face detours are
         -- unavailable in this allocator fixture. Native tests cover routes.
-        if b.x~=-184 and b.x~=184 then return -1 end
+        -- Rear goals on this same approach also have a real native route;
+        -- perpendicular-face detours remain unavailable in this fixture.
+        if b.x~=-184 and b.x~=184 and not (a.x<0 and b.x< -184) then return -1 end
         return math.sqrt((a.x-b.x)^2+(a.y-b.y)^2)
     end}
 package.loaded['systems/wall_navigation_service']={}

@@ -104,18 +104,21 @@ for rotation=0,3 do for _,shift in ipairs({-64,0,64}) do
     assert(scout.hull_writes==hull_before and paths==path_before,
         'read-only approach candidates must not mutate hull or search paths')
     local front,seen=0,{}
-    local expected_center=shift==-64 and 4 or (shift==0 and -4 or 0)
-    local expected_front=shift==64 and 3 or 4
+    -- Independent corridor bounds: Hull32 leaves legal centers strictly
+    -- between -193 and129. Four padded42 bodies fit at pitch84; shifts-64/0
+    -- need no displacement, while shift64 needs the smallest grid shift-64.
+    local expected_center=shift==64 and -64 or 0
+    local expected_pitch,expected_front=84,4
     for _,c in ipairs(candidates) do
         local n,l=local_point(c.point)
         if n==-184 then
             front=front+1
             local relative=l-offset
             local authored=relative-expected_center
-            assert(authored==-132 or authored==-44 or authored==44 or authored==132,
+            assert(authored==-126 or authored==-42 or authored==42 or authored==126,
                 'repair must make only the smallest bounded shift of the solid native row')
             local world_center=expected_center*((rotation==1 or rotation==2) and -1 or 1)
-            assert(c.lateral_center==world_center and c.lane_pitch==88,
+            assert(c.lateral_center==world_center and c.lane_pitch==expected_pitch,
                 'a wider row must retain native padded-body spacing and its own wait geometry: rotation='
                     ..rotation..' wall_shift='..shift..' center='..c.lateral_center..' pitch='..c.lane_pitch)
             assert(clear(c.point,32),'offered contact intersects static terrain or wall body')
@@ -123,7 +126,7 @@ for rotation=0,3 do for _,shift in ipairs({-64,0,64}) do
         end
     end
     assert(front==expected_front,
-        'a small edge bias must fit four full bodies; a row needing more than48 shift must stay partial')
+        'the real offset staircase must retain four full native front bodies')
     local query_before=queries
     for _=1,100 do assert(contact.approach_points(wall,scout)==candidates) end
     assert(queries==query_before,'stable candidate reads must use shared geometry cache')
@@ -152,7 +155,9 @@ for rotation=0,3 do for _,shift in ipairs({-64,0,64}) do
         assert(next_plan.claimed and next_plan.point.x==old.x and next_plan.point.y==old.y,
             'the nearest observed remote owner must release its old route and refill exactly the physical vacant front slot')
     end
-    local distant=actor(40,world(-1200,offset))
+    -- Stay outside the rear-queue admission area; this assertion owns the
+    -- existing verified long-distance waypoint path, before local queueing.
+    local distant=actor(40,world(-1400,offset))
     local chosen=candidates[1].point
     distant.survival_wall_route={wall=wall,revision=0,point=chosen}
     local nav_before,path_before=queries,paths
@@ -176,9 +181,8 @@ for rotation=0,3 do for _,shift in ipairs({-64,0,64}) do
     cases=cases+1
 end end
 -- The installed native stair is symmetric384: centered64 seams close, while
--- one-cell tangent shifts leave a128 side route. A bounded36 row shift keeps
--- four full-body contacts without changing that physical route. A second
--- tangent cell exceeds the repair limit and retains two contacts.
+-- one-cell tangent shifts leave a128 side route. One/two-cell shifts fit four
+-- native bodies on the original floor without adding any physical blockers.
 bias=0
 for rotation=0,3 do for _,shift in ipairs({-128,-64,0,64,128}) do
     navigation.clear_all();contact.reset();obstacles={};q=rotation;offset=shift;clock=0
@@ -190,14 +194,23 @@ for rotation=0,3 do for _,shift in ipairs({-128,-64,0,64,128}) do
     assert(layout.gate==(offset==0),'one-sided128 gap must retain open-face routing')
     local scout=actor(102,world(-400,offset))
     local candidates=contact.approach_points(wall,scout)
-    local front=0
+    local front,front_points=0,{}
     for _,c in ipairs(candidates) do
         local n=local_point(c.point)
-        if n==-184 then front=front+1 end
+        if n==-184 then
+            front=front+1;front_points[#front_points+1]=c.point
+            local center=offset==0 and 0 or (offset<0 and 1 or -1)*(math.abs(offset)-32)
+            local sign=(rotation==1 or rotation==2) and -1 or 1
+            assert(c.lateral_center==center*sign and c.lane_pitch==(offset==0 and 88 or 84),
+                'centered valid rows stay authored; displaced rows use the smallest native-body fit')
+            assert(clear(c.point,32),'a fitted endpoint must retain its whole native hull on original terrain')
+        end
     end
-    local expected_front=math.abs(offset)<=64 and 4 or 2
-    assert(front==expected_front,
-        'native384 tangent offset must repair only a small full-body edge bias')
+    assert(front==4,'one/two-cell displacements must retain exactly four native front contacts')
+    for i=1,#front_points do for j=i+1,#front_points do
+        local a,b=front_points[i],front_points[j]
+        assert((a.x-b.x)^2+(a.y-b.y)^2>=84^2,'fitted front contacts preserve padded42 separation')
+    end end
     if offset==0 then
         assert(#candidates==8,'closed centered stair must expose only front/back contacts')
         assert(GridNav:IsBlocked(world(0,-192)) and GridNav:IsBlocked(world(0,192)),
@@ -209,7 +222,27 @@ for rotation=0,3 do for _,shift in ipairs({-128,-64,0,64,128}) do
     end
     cases=cases+1
 end end
+-- When both smaller pitches fit without moving the row, retain the wider
+-- native spacing: this324 opening rejects authored88 but safely admits86.
+width=324
+for rotation=0,3 do
+    navigation.clear_all();contact.reset();obstacles={};q=rotation;offset=0;clock=0
+    local wall=actor(201,world(0,0),128)
+    local count_before=created;navigation.create(wall)
+    assert(created-count_before==8,'the same bounded corner seams remain physical navigation')
+    local scout,front=actor(202,world(-400,0)),0
+    for _,c in ipairs(contact.approach_points(wall,scout)) do
+        local n=local_point(c.point)
+        if n==-184 then
+            front=front+1
+            assert(c.lane_pitch==86 and c.lateral_center==0,'equal-displacement fits prefer the wider safe pitch')
+            assert(clear(c.point,32),'pitch86 retains full terrain clearance')
+        end
+    end
+    assert(front==4,'the narrower opening still admits only four native front bodies')
+    cases=cases+1
+end
 navigation.clear_all();contact.reset()
 assert(created==removed,'physical registration or contact lifecycle leaked native blockers')
 assert(writes==0,'contact settlement or lifecycle must never write world coordinates')
-print('WALL_GATE_CONTACT_LAYOUT_PASS cases='..cases..' four_rotations Hull32 pitch88 centered64_seams_only tangent64_four_front tangent128_two_front bounded_minimal_shift terrain_filtered_slots real_side_route death_refill read_only_cached_candidates verified_far_route stale_route_rejected blocked_stage_fallback no_position_writes')
+print('WALL_GATE_CONTACT_LAYOUT_PASS cases='..cases..' four_rotations Hull32 padded42 pitch88_86_84 centered64_seams_only tangent64_and128_four_front bounded_minimal_shift terrain_filtered_slots real_side_route death_refill read_only_cached_candidates verified_far_route stale_route_rejected blocked_stage_fallback no_position_writes')
