@@ -6,15 +6,18 @@ settlement; only its response is projected for combat.
 """
 from __future__ import annotations
 
-PARENT_MODES = {"rich": "standard", "cold": "rich", "scourge": "cold"}
+PARENT_MODES = {"rich": "standard", "cold": "rich", "scourge": "cold",
+                "ruins": "scourge", "celestial": "ruins"}
 CLEAR_MODES = {"standard_clear": "standard", **{mode + "_clear": mode for mode in PARENT_MODES}}
-MODE_IDS = ("pure", "standard", "rich", "cold", "scourge")
+MODE_IDS = ("pure", "standard", "rich", "cold", "scourge", "ruins", "celestial")
+RELEASED_MODES = frozenset(("pure", "standard", "rich", "cold"))
+ENTRY_CLEAR = {"rich": 3, "cold": 5, "scourge": 9, "ruins": 9, "celestial": 11}
 
 
 def counts(value):
     if not isinstance(value, dict):
         return {}
-    return {"n" + str(n): value["n" + str(n)] for n in range(1, 21)
+    return {"n" + str(n): value["n" + str(n)] for n in range(1, 51)
             if type(value.get("n" + str(n))) is int and value["n" + str(n)] > 0}
 
 
@@ -35,6 +38,33 @@ def progression(profile):
                                   if isinstance(archive.get("mode_clear_counts"), dict)
                                   else {mode: {} for mode in MODE_IDS},
             "highest_difficulty": max((int(key[1:]) for key in ordinary), default=0)}
+
+
+def entry_unlocked(mode, progress):
+    """Admission uses exact, validated clear counters from the account profile.
+
+    These are global N3/N5/N9/N11 prerequisites, not a predecessor-mode chain
+    or a highest-difficulty inference. Unreleased modes remain closed even
+    when the account meets the future prerequisite.
+    """
+    if mode not in RELEASED_MODES or not isinstance(progress, dict) or progress.get("loaded") is not True:
+        return False
+    required = ENTRY_CLEAR.get(mode)
+    if required is None:
+        return mode in ("pure", "standard")
+    if not isinstance(progress.get(mode + "_clear_counts"), dict):
+        return False  # Missing capability map cannot authorize an advanced mode.
+    key = "n" + str(required)
+    # Match Lua mode_progression.counts: an explicit standard map replaces the
+    # historical mixed fallback, pure has only its proven session-scoped map,
+    # and advanced modes use their own named compatibility/progression maps.
+    maps = [progress.get("standard_clear_counts") if "standard_clear_counts" in progress
+            else progress.get("clear_counts")]
+    maps.extend(progress.get(mode_id + "_clear_counts") for mode_id in PARENT_MODES)
+    independent = progress.get("mode_clear_counts")
+    if isinstance(independent, dict):
+        maps.append(independent.get("pure"))
+    return any(counts(value).get(key, 0) > 0 for value in maps)
 
 
 def _archive_service(application):
@@ -71,7 +101,7 @@ def _daily_projection(application, response, result):
 def install(module=None):
     if module is None:
         from fishing_api import match_profiles as module
-    if getattr(module, "_archive_modes_version", 0) >= 3:
+    if getattr(module, "_archive_modes_version", 0) >= 4:
         return
     # Retain the original API even if install is called again after a module
     # hot reload, rather than nesting wrappers around previous mode wrappers.
@@ -114,13 +144,15 @@ def install(module=None):
 
     def login(application, payload):
         mode = payload.get("mode")
+        if isinstance(mode, str) and mode in {"scourge", "ruins", "celestial", "fishing"}:
+            raise module.ApiError("mode_not_released", 409)
         if not isinstance(mode, str) or mode not in PARENT_MODES:
             return original_login(application, payload)
         account = module._string(payload, "account_id", module.ACCOUNT_ID)
         session = module._string(payload, "match_session_id", module.OPAQUE_ID)
         archive = getattr(application, "archive", None)
         raw = archive.profile({"account_id": account}) if archive else application.profile({"account_id": account})
-        if not progression(raw)[PARENT_MODES[mode] + "_clear_counts"].get("n10"):
+        if not entry_unlocked(mode, progression(raw)):
             raise module.ApiError(mode + "_mode_locked", 409)
         database_id = application._database_account_id(account)
         result = application.rpc_client.rpc("match_profile_login", {
@@ -152,7 +184,7 @@ def install(module=None):
     if original_authenticate is not None:
         module.authenticate = authenticate
     module._rich_modes_installed = True
-    module._archive_modes_version = 3
+    module._archive_modes_version = 4
 
 
 def scope_clear(service, payload, command):

@@ -26,7 +26,8 @@ local function stat_tooltips(projected)
             unit = "logical_damage",
         },
         armor = {
-            display_value = tonumber(projected.armor) or 0,
+            display_value = projected.armor_display,
+            logical_value = tonumber(projected.armor) or 0,
             runtime_value = tonumber(projected.runtime_armor) or 0,
             unit = "war3_display",
             mapping_version = tonumber(projected.armor_mapping_version) or 1,
@@ -77,6 +78,9 @@ function M.for_ui(snapshot)
         projected.armor_unit = "war3_display"
         projected.stat_units_version = 2
     end
+    -- The displayed integer is separate from effective armor. Damage reduction
+    -- and subsequent stat refreshes must continue to use the precise value.
+    projected.armor_display = math.floor(tonumber(projected.armor) or 0)
     projected.stat_tooltips = stat_tooltips(projected)
     projected.attack_speed_percentage = projected.stat_tooltips.attack_speed.percentage
     return projected

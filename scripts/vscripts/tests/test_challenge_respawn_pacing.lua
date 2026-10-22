@@ -44,8 +44,9 @@ local practice_count = 0
 for _, member in ipairs(members.rows) do
  if member.spawn_mode == "maintain_count" then
   local encounter = assert(encounters.by_id[member.encounter_id])
-  assert(member.max_alive == 10 and member.spawn_count == 10 and member.respawn_seconds == 1)
-  assert(encounter.max_alive == 10 and encounter.respawn_seconds == 1)
+  local expected=require("config/human_challenge_balance").member_count(member.member_id) or 10
+  assert(member.max_alive == expected and member.spawn_count == expected and member.respawn_seconds == 1)
+  assert(encounter.max_alive == expected and encounter.respawn_seconds == 1)
   practice_count = practice_count + 1
  end
 end
@@ -56,6 +57,12 @@ local limit_end = assert(source:find("local function fill_current", limit_start,
 local respawn_start = assert(source:find("local function schedule_maintain_respawn", 1, true))
 local respawn_end = assert(source:find("local function on_killed", respawn_start, true))
 local clock, sessions, created, callbacks, notices, failures_remaining, spawn_attempts = 0, {}, 0, {}, {}, 0, 0
+local human_balance = require("config/human_challenge_balance")
+local function effective_count(member, encounter)
+ local authored=human_balance.member_count(member.member_id)
+ local maximum=authored or 10
+ return math.max(1,math.floor(math.min(maximum,member.max_alive or maximum,encounter.max_alive or maximum)))
+end
 GameRules = {GetGameTime = function() return clock end}
 local timer = require("core/scheduler")
 local function key(player, encounter) return tostring(player) .. ":" .. encounter end
@@ -71,7 +78,7 @@ local spawn_environment = setmetatable({
   if failures_remaining>0 then
    failures_remaining=failures_remaining-1;return nil, "spawn_failed_for_test"
   end
-  local cap = math.max(1, math.floor(math.min(10, member.max_alive or 10, s.encounter.max_alive or 10)))
+  local cap = effective_count(member, s.encounter)
   assert(#s.world < cap, "actual living population can never exceed its member/room cap")
   created = created + 1
   local unit = {spawned_at = clock, serial = created}
@@ -91,8 +98,8 @@ local function reset()
 end
 local function fresh(member, player, maximum)
  local s={player_id=player or 0,encounter_id=member.encounter_id,status="active",generation="generation-1",
-  encounter={max_alive=maximum or 10},monsters={},world={},monster_count=0}
- local cap=math.max(1,math.floor(math.min(10, member.max_alive or 10,s.encounter.max_alive)))
+  encounter={max_alive=maximum or (encounters.by_id[member.encounter_id] or {}).max_alive or 10},monsters={},world={},monster_count=0}
+ local cap=effective_count(member,s.encounter)
  for index=1,cap do s.world[index]={original=true} end
  s.monster_count=#s.world;sessions[key(s.player_id,s.encounter_id)]=s
  return s
@@ -197,12 +204,15 @@ reset()
 local owned={}
 for player=0,3 do
  for _,room in ipairs(members.rows) do if room.spawn_mode=="maintain_count" then
-  local s=fresh(room,player);owned[#owned+1]=s;kill(s,room,10)
+  local s=fresh(room,player);owned[#owned+1]={session=s,member=room};kill(s,room,#s.world)
  end end
 end
 assert(#owned==28 and timer.task_count()==28,"one pending timer per player room, not per monster")
 tick(0.999);assert(created==0)
-tick(1);assert(created==280,"four owners x seven rooms x ten deaths revive together")
-for _,s in ipairs(owned) do assert(#s.world==10 and s.monster_count==10) end
-tick(2);assert(created==280 and timer.task_count()==0,"all player/room death tickets are consumed exactly once and rooms return idle")
+tick(1);assert(created==296,"four owners x (four rooms40 + ice13 + molten10 + essence11) revive together")
+for _,entry in ipairs(owned) do
+ local s=entry.session;local cap=effective_count(entry.member,s.encounter)
+ assert(#s.world==cap and s.monster_count==cap)
+end
+tick(2);assert(created==296 and timer.task_count()==0,"all player/room death tickets are consumed exactly once and rooms return idle")
 print("PRACTICE_RESPAWN_LIMIT_PASS: seven room types, independent death+1s, AoE and staggered/overdue deaths, 4 owners, exact live caps, re-entry, cancellation/replacement/generation, independent failed-ticket retry, duplicate callbacks and idle timers")

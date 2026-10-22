@@ -56,6 +56,7 @@ end
 function M.prepare(unit, row)
     local health, attack = finite(row.health, "health"), finite(row.attack, "attack")
     assert(health > 0 and attack >= 0, "invalid health or attack")
+    unit.survival_exact_stat_projection = nil
     unit.survival_endless_health_scale = math.max(1, health / CAP)
     unit.survival_endless_attack_scale = math.max(1, attack / CAP)
     unit.survival_endless_health = health
@@ -64,6 +65,28 @@ function M.prepare(unit, row)
     for key, value in pairs(row) do result[key] = value end
     result.health = health / unit.survival_endless_health_scale
     result.attack = attack / unit.survival_endless_attack_scale
+    return result
+end
+
+-- Authored formulas keep their Lua doubles even when a native setter stores
+-- integers. Recover that logical value in DamageFilter/UI through the same
+-- scale boundary as endless units, including ordinary-sized fractional stats.
+function M.prepare_exact(unit, row)
+    local health, attack = tonumber(row.health), tonumber(row.attack)
+    assert(M.is_finite(health) and M.is_finite(attack)
+        and health > 0 and attack >= 0, "invalid health or attack")
+    local native_health = math.min(CAP, math.max(1, math.floor(health)))
+    -- Native damage events use floats: every integer through 2^24 is exact.
+    local native_attack = attack == 0 and 0
+        or math.min(16777216, math.max(1, math.floor(attack)))
+    unit.survival_exact_stat_projection = true
+    unit.survival_endless_health_scale = health / native_health
+    unit.survival_endless_attack_scale = attack == 0 and 1 or attack / native_attack
+    unit.survival_endless_health = health
+    unit.survival_endless_attack = attack
+    local result = {}
+    for key, value in pairs(row) do result[key] = value end
+    result.health, result.attack = native_health, native_attack
     return result
 end
 function M.outgoing(unit, damage, basic)

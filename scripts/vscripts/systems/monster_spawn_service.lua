@@ -248,7 +248,9 @@ local function start_encounter(payload)
     end
     FindClearSpaceForUnit(unit, origin, true)
     local profile = combat_profile or archetype
-    if (mode_id == "rich" or mode_id == "cold" or mode_id == "scourge") and combat_profile
+    if combat_profile and combat_profile.human_spec then
+        profile = require("combat/endless_stat_projection").prepare_exact(unit, profile)
+    elseif combat_profile
         and ((tonumber(profile.health) or 0) > 100000000
             or (tonumber(profile.attack) or 0) > 100000000) then
         profile = require("combat/endless_stat_projection").prepare(unit, profile)
@@ -290,7 +292,7 @@ local function start_encounter(payload)
     -- floor only for archetypes that explicitly opt into one.
     unit.survival_minimum_armor = nil
     unit.survival_minimum_war3_armor = minimum_war3_armor
-    local attack_speed = tonumber(archetype.attack_speed)
+    local attack_speed = tonumber(profile.attack_speed) or tonumber(archetype.attack_speed)
         or tonumber(archetype.base_attack_speed) or 0.5
     attack_speed = math.max(0.01, attack_speed)
     unit.survival_attack_speed = attack_speed

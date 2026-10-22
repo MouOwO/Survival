@@ -128,15 +128,25 @@ local function validate_progression(progression)
         or type(progression.clear_counts) ~= "table" or progression.clear_counts == json_decoder.null then
         return false
     end
-    for _, field in ipairs({"clear_counts", "standard_clear_counts", "rich_clear_counts", "cold_clear_counts", "scourge_clear_counts"}) do
-        local counts = progression[field]
-        if counts ~= nil then
-            if type(counts) ~= "table" or counts == json_decoder.null then return false end
-            for key, count in pairs(counts) do
-                local difficulty = tonumber(tostring(key):match("^n(%d+)$"))
-                if not difficulty or difficulty < 1 or difficulty > 20 or not integer(count)
-                    or count == math.huge then return false end
-            end
+    local function valid_counts(counts)
+        if type(counts) ~= "table" or counts == json_decoder.null then return false end
+        for key, count in pairs(counts) do
+            local difficulty = type(key) == "string" and tonumber(key:match("^n([1-9]%d*)$"))
+            if not difficulty or difficulty > 50 or not integer(count) or count == math.huge then return false end
+        end
+        return true
+    end
+    -- Keep authenticated historical counters, even beyond a mode's current
+    -- selectable range. Admission separately checks that mode's real limit.
+    for _, field in ipairs({"clear_counts", "standard_clear_counts", "pure_clear_counts",
+        "rich_clear_counts", "cold_clear_counts", "scourge_clear_counts", "ruins_clear_counts", "celestial_clear_counts"}) do
+        if progression[field] ~= nil and not valid_counts(progression[field]) then return false end
+    end
+    if progression.mode_clear_counts ~= nil then
+        if type(progression.mode_clear_counts) ~= "table" or progression.mode_clear_counts == json_decoder.null then return false end
+        local modes = require("config/human_monster_rules").data.modes
+        for mode, counts in pairs(progression.mode_clear_counts) do
+            if not modes[mode] or not valid_counts(counts) then return false end
         end
     end
     return true
@@ -1012,7 +1022,10 @@ function M.get_progression(player_id, mode)
             standard_clear_counts = copy(archive.standard_clear_counts or {}),
             rich_clear_counts = copy(archive.rich_clear_counts or {}),
             cold_clear_counts = copy(archive.cold_clear_counts or {}),
-            scourge_clear_counts = copy(archive.scourge_clear_counts or {}) }
+            scourge_clear_counts = copy(archive.scourge_clear_counts or {}),
+            ruins_clear_counts = copy(archive.ruins_clear_counts or {}),
+            celestial_clear_counts = copy(archive.celestial_clear_counts or {}),
+            mode_clear_counts = copy(archive.mode_clear_counts or {}) }
     end
     local setup = require("systems/match_setup_service")
     local selected = mode or setup.get_mode()

@@ -49,7 +49,8 @@ def build(root: Path, destination: Path | None = None, update_game_config: bool 
               if (root / 'data/csv/商城兑换系统' / (name + '.csv')).is_file()]
     files += [root / "data/csv/玩家档案系统" / (n+".csv") for n in ("player_gameplay_stats","map_level_effect_rules")]
     sources = {"systems/"+n+".lua": (root/"scripts/vscripts/systems"/(n+".lua")).read_text(encoding="utf-8-sig") for n in MODULES}
-    for name in ("lottery_config", "content_id_aliases", "difficulty_config", "mode_progression", "recorded_mode_balance"):
+    for name in ("lottery_config", "content_id_aliases", "difficulty_config", "mode_progression", "recorded_mode_balance",
+                 "human_monster_rules", "mode_release_config", "generated/human_monster_spec"):
         source = root/"scripts/vscripts/config"/(name+".lua")
         # Older difficulty_config versions have no separate progression module.
         if name == "mode_progression" and not source.is_file():

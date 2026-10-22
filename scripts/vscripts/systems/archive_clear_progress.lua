@@ -3,7 +3,7 @@
 local achievements = require("config/generated/archive_achievements")
 local M = {}
 local names = { pure = "纯净模式", standard = "常规模式", rich = "丰饶模式",
-    cold = "极寒模式", scourge = "天灾模式" }
+    cold = "极寒模式", scourge = "天灾模式", ruins = "归墟模式", celestial = "天域模式" }
 
 local function integer(value)
     return type(value) == "number" and value == value and value < math.huge
@@ -68,12 +68,9 @@ function M.mode_name(mode) return names[mode] end
 function M.max_available(mode)
     if not M.is_mode(mode) then return 0 end
     local config = require("config/difficulty_config")
-    local balance = (mode == "cold" or mode == "scourge") and require("config/recorded_mode_balance") or nil
     local maximum = 0
-    for _, option in ipairs(config.client_options()) do
-        if not balance or balance.has_difficulty(mode, option.difficulty_id) then
-            maximum = math.max(maximum, difficulty_number(option.difficulty_id) or 0)
-        end
+    for _, option in ipairs(config.client_options(nil, mode)) do
+        maximum = math.max(maximum, difficulty_number(option.difficulty_id) or 0)
     end
     return maximum
 end
@@ -100,7 +97,7 @@ function M.record(archive, command, stats, apply_effects, options)
     local mode, difficulty = command.mode_id, command.difficulty_id
     if type(difficulty) == "string" then difficulty = string.lower(difficulty) end
     local number = difficulty_number(difficulty)
-    if not M.is_mode(mode) or not number or number > 20
+    if not M.is_mode(mode) or not number
         or not integer(command.count) or command.count < 1 then
         return false, "archive_mode_clear_invalid"
     end

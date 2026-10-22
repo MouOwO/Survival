@@ -3,6 +3,7 @@
 local M = {}
 local progression_rules = require("config/mode_progression")
 local mode_test = require("debug/mode_unlock_test")
+local release_modes = require("config/mode_release_config")
 local session_id, mode_id, selected_by = "", nil, nil
 local mode_options = {
     { mode_id = "standard", display_name = "常规模式",
@@ -13,6 +14,10 @@ local mode_options = {
         description = "沿用常规档案，极寒模式难度通关进度独立保存。" },
     { mode_id = "scourge", display_name = "天灾模式",
         description = "沿用常规档案，天灾模式难度通关进度独立保存。" },
+    { mode_id = "ruins", display_name = "归墟模式",
+        description = "沿用常规档案，归墟模式难度通关进度独立保存。" },
+    { mode_id = "celestial", display_name = "天域模式",
+        description = "沿用常规档案，天域模式难度通关进度独立保存。" },
     { mode_id = "fishing", display_name = "摸鱼模式",
         description = "不选择难度、不生成波次，自动挂机；沿用常规档案并正常保存奖励。" },
     { mode_id = "pure", display_name = "纯净模式",
@@ -43,7 +48,7 @@ end
 function M.get_session_id() return session_id end
 function M.get_mode() return mode_id end
 function M.get_profile_mode()
-    return (mode_id == "fishing" or mode_id == "rich" or mode_id == "cold" or mode_id == "scourge")
+    return (mode_id == "fishing" or progression_rules.parent_mode(mode_id) ~= nil)
         and "standard" or mode_id
 end
 function M.is_fishing_mode() return mode_id == "fishing" end
@@ -59,11 +64,8 @@ local function mode_permission(id, requested)
     if not valid or type(progress) ~= "table" or progress.loaded ~= true then return false, true end
     if mode_test.is_enabled() then return true, false end
     if type(progress[progression_rules.clear_field(requested)]) ~= "table" then
-        local name = ({rich="丰饶模式", cold="极寒模式", scourge="天灾模式"})[requested]
+        local name = ({rich="丰饶模式", cold="极寒模式", scourge="天灾模式",ruins="归墟模式",celestial="天域模式"})[requested]
         return false, true, name .. "服务尚未就绪"
-    end
-    if not progression_rules.counts(progression_rules.parent_mode(requested), progress) then
-        return false, true, "正在读取前置模式通关进度"
     end
     return progression_rules.entry_unlocked(requested, progress), false
 end
@@ -137,9 +139,12 @@ function M.select_mode(id, requested, request_session)
         return { ok = false, error = "match_session_mismatch" }
     end
     if not M.is_selector(id) then return { ok = false, error = "selection_not_host" } end
-    if requested ~= "pure" and requested ~= "standard" and requested ~= "fishing" and requested ~= "rich"
-        and requested ~= "cold" and requested ~= "scourge" then
+    if not release_modes.is_known(requested) then
         return { ok = false, error = "mode_not_found" }
+    end
+    -- Release gating applies before debug unlocks and before accepting retries.
+    if not release_modes.is_released(requested) then
+        return { ok = false, error = "mode_not_released" }
     end
     if mode_id ~= nil then
         return { ok = requested == mode_id, mode_id = mode_id,
@@ -162,24 +167,26 @@ end
 function M.snapshot()
     local options = {}
     for _, row in ipairs(mode_options) do
-        options[#options + 1] = { mode_id = row.mode_id, display_name = row.display_name,
-            description = row.description, unlocked = 1, pending = 0, unlock_hint = "" }
-        if progression_rules.parent_mode(row.mode_id) then
-            local unlocked, pending, hint = mode_permission(M.selector_player_id(), row.mode_id)
-            options[#options].unlocked = unlocked and 1 or 0
-            options[#options].pending = pending and 1 or 0
-            options[#options].unlock_hint = hint or progression_rules.entry_hint(row.mode_id)
-        end
-        local quota, daily_pending = mode_daily_quota(M.selector_player_id(), row.mode_id)
-        if daily_pending then
-            options[#options].daily_pending = 1
-            options[#options].daily_hint = "正在更新今日奖励额度……"
-        end
-        if quota then
-            local option = options[#options]
-            option.daily_key, option.daily_earned, option.daily_limit = quota.key, quota.earned, quota.limit
-            option.daily_remaining, option.daily_capped = quota.remaining, daily_capped(quota) and 1 or 0
-            option.daily_hint = "今日奖励已达上限"
+        if release_modes.is_released(row.mode_id) then
+            options[#options + 1] = { mode_id = row.mode_id, display_name = row.display_name,
+                description = row.description, unlocked = 1, pending = 0, unlock_hint = "" }
+            if progression_rules.parent_mode(row.mode_id) then
+                local unlocked, pending, hint = mode_permission(M.selector_player_id(), row.mode_id)
+                options[#options].unlocked = unlocked and 1 or 0
+                options[#options].pending = pending and 1 or 0
+                options[#options].unlock_hint = hint or progression_rules.entry_hint(row.mode_id)
+            end
+            local quota, daily_pending = mode_daily_quota(M.selector_player_id(), row.mode_id)
+            if daily_pending then
+                options[#options].daily_pending = 1
+                options[#options].daily_hint = "正在更新今日奖励额度……"
+            end
+            if quota then
+                local option = options[#options]
+                option.daily_key, option.daily_earned, option.daily_limit = quota.key, quota.earned, quota.limit
+                option.daily_remaining, option.daily_capped = quota.remaining, daily_capped(quota) and 1 or 0
+                option.daily_hint = "今日奖励已达上限"
+            end
         end
     end
     return { mode_selected = M.is_mode_selected(), mode_id = mode_id or "",

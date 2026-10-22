@@ -4,6 +4,7 @@ local generated = require("config/generated/rich_challenge_combat_profiles")
 local ordinary = require("config/generated/challenge_combat_profiles")
 local members = require("config/generated/encounter_members").rows
 local encounters = require("config/generated/monster_encounters").rows
+local balance = require("config/human_challenge_balance")
 
 local function copy(value)
     if type(value) ~= "table" then return value end
@@ -34,36 +35,40 @@ for number = 1, 10 do
     local difficulty = "N" .. number
     for _, id in ipairs(ids) do
         local legacy = assert(profiles.resolve(id, difficulty))
-        local expected = assert(indexed[difficulty][id])
+        local expected = assert(balance.resolve_member(id, difficulty, "rich"))
         local rich, reason = profiles.resolve(id, difficulty, "rich")
         assert(rich and not reason, tostring(reason))
         for _, field in ipairs({"health", "attack", "war3_armor"}) do
-            assert(rich[field] == expected[field], "rich values must be final, with no extra multiplier")
+            assert(rich[field] == expected[field], "formula authority must replace historical recordings without extra scaling")
         end
         assert(rich.health > 0 and rich.attack >= 0 and rich.war3_armor >= 0)
         rich.health = -1
         if rich.field_sources then rich.field_sources.test_mutation = true end
         assert(equal(generated, before), "returned rich metadata must not mutate its source")
         assert(profiles.resolve(id, difficulty, "rich").health == expected.health)
-        for _, mode in ipairs({"standard", "pure", "fishing"}) do
-            assert(profiles.resolve(id, difficulty, mode) == legacy, mode .. " profiles changed")
+        for _, mode in ipairs({"standard", "pure"}) do
+            local resolved = assert(profiles.resolve(id, difficulty, mode))
+            local authoritative = assert(balance.resolve_member(id, difficulty, mode))
+            for _,field in ipairs({"health","attack","war3_armor"}) do
+                assert(resolved[field] == authoritative[field], mode .. " formulas changed")
+            end
         end
+        assert(profiles.resolve(id, "N1", "fishing").human_spec ~= true,
+            "unrelated fishing mode must retain its historical profile path")
     end
 end
 for _, difficulty in ipairs({"N1", "N5", "N6", "N10"}) do
     local rich = assert(profiles.resolve("practice_wood", difficulty, "rich"))
     local legacy = assert(profiles.resolve("practice_wood", difficulty))
     assert(rich ~= legacy, "every rich difficulty must return an independent row")
-    for _, field in ipairs({"health", "attack", "war3_armor"}) do
-        assert(rich[field] == legacy[field], "migration must retain existing unrecorded difficulty values")
-    end
+    assert(rich.human_spec and legacy.human_spec, "all authored difficulties use their own formulas")
 end
 local n4_room = assert(profiles.resolve("practice_wood", "N4", "rich"))
-assert(n4_room.data_source == "data/balance/mode_monsters_20261020.json"
-    and n4_room.estimated == true and n4_room.field_sources.health.method ~= "video_panel",
-    "N4 rooms use explicitly sourced estimates after the new video import, not a fabricated observation")
+assert(n4_room.health == 30000 * require("config/human_monster_rules").mode("rich", "N4").challenge_hp_multiplier
+    and n4_room.human_spec,
+    "N4 room must use the current specification instead of an old video estimate")
 local missing, reason = profiles.resolve("practice_wood", "N999", "rich")
-assert(not missing and reason == "challenge_combat_profile_missing:practice_wood:N999")
+assert(not missing and reason, "out-of-range difficulty must not inherit a recorded tier")
 missing, reason = profiles.resolve("unconfigured_monster", "N2", "rich")
 assert(missing == nil and reason == nil, "unconfigured members retain ordinary archetype fallback")
 assert(equal(ordinary, ordinary_before), "rich lookup must not change shared ordinary tables")
@@ -86,6 +91,7 @@ deps["config/generated/challenge_definitions"] = require("config/generated/chall
 deps["systems/destination_validation_service"] = {validate = function() return true end}
 local projection = require("combat/endless_stat_projection")
 deps["combat/endless_stat_projection"] = projection
+deps["config/human_challenge_balance"] = require("config/human_challenge_balance")
 local hero = {IsNull = function() return false end, IsAlive = function() return true end,
     entindex = function() return 99999 end, SetAbsOrigin = no_op, Stop = no_op}
 local selected_mode, selected_difficulty = "rich", "N2"
@@ -120,13 +126,13 @@ env.CreateUnitByName = function(...)
     function value:GetMaxHealth() return self.applied.max_health end
     return value
 end
-local resolve_calls = {}
+local resolve_calls, profile_overrides = {}, {}
 deps["config/challenge_combat_profile_config"] = {resolve = function(id, difficulty, mode)
     resolve_calls[#resolve_calls + 1] = {id = id, difficulty = difficulty, mode = mode}
-    return profiles.resolve(id, difficulty, mode)
+    return profile_overrides[id] or profiles.resolve(id, difficulty, mode)
 end}
 local function check(value, id, difficulty, mode)
-    local expected = assert(profiles.resolve(id, difficulty, mode))
+    local expected = assert(profile_overrides[id] or profiles.resolve(id, difficulty, mode))
     local health_scale = value.survival_endless_health_scale or 1
     local attack_scale = value.survival_endless_attack_scale or 1
     local function close(a, b) return math.abs(a - b) <= math.max(0.000001, math.abs(b) * 1e-14) end
@@ -139,9 +145,9 @@ local function check(value, id, difficulty, mode)
     assert(close(tonumber(projection.for_ui(value, value:GetMaxHealth(), "health")), expected.health)
         and close(tonumber(projection.for_ui(value, value.applied.attack_min, "attack")), expected.attack),
         "shared UI projection must restore exact authored stats")
-    if mode == "rich" and (expected.health > 100000000 or expected.attack > 100000000) then
+    if expected.human_spec or expected.health > 100000000 or expected.attack > 100000000 then
         assert(value.applied.max_health <= 100000000.000001 and value.applied.attack_min <= 100000000.000001,
-            "large rich values must use existing bounded native projection")
+            "authored values must use bounded exact native projection")
         assert(value.survival_endless_health == expected.health and value.survival_endless_attack == expected.attack)
     else
         assert(value.survival_endless_health_scale == nil and value.survival_endless_attack_scale == nil,
@@ -150,13 +156,17 @@ local function check(value, id, difficulty, mode)
     assert(value.applied.native_armor == 0 and value.survival_base_war3_armor == expected.war3_armor
         and value.survival_effective_war3_armor == expected.war3_armor,
         id .. " custom armor must be applied once")
+    if expected.attack_speed then
+        assert(math.abs(value.applied.bat - 1 / expected.attack_speed) < 1e-12,
+            "a combat archetype must not overwrite the spec attack interval")
+    end
     local called = resolve_calls[#resolve_calls]
     assert(called.id == id and called.difficulty == difficulty and called.mode == mode,
         "production resolver must receive the authoritative mode/difficulty pair")
 end
 local count, real_n3_rebirth10 = 0, nil
 for _, difficulty in ipairs({"N2", "N3"}) do
-    for _, mode in ipairs({"rich", "standard"}) do
+    for _, mode in ipairs({"rich", "standard", "cold", "pure", "scourge", "ruins", "celestial"}) do
         selected_difficulty, selected_mode = difficulty, mode
         local wilderness = load_service("monster_spawn_service")
         local start = find_function(wilderness, "start_encounter")
@@ -228,16 +238,13 @@ for _, difficulty in ipairs({"N2", "N3"}) do
         count = count + 10
     end
 end
-assert(count == 452, "all member, public room, rebirth and staged births must reach actual setters")
+assert(count == 1638, "all seven modes and all member/public room/rebirth/staged births including ice13/essence11 must reach actual setters")
 -- Force values above the native signed-integer limit through both real birth
 -- paths. The existing shared projection owns damage/UI recovery and keeps
 -- source data, kill bookkeeping and configured rewards unchanged.
-local rich_source = profiles.rich_by_member
-local original_rebirth = rich_source.encounter_rebirth_10.N3
-local original_practice = rich_source.practice_greater_attribute.N3
 local huge = {health = 3000000001, attack = 1000000007, war3_armor = 1234,
-    estimated = true, estimation_method = "large_native_boundary_fixture"}
-rich_source.encounter_rebirth_10.N3, rich_source.practice_greater_attribute.N3 = huge, huge
+    human_spec = true, estimation_method = "large_native_boundary_fixture"}
+profile_overrides.encounter_rebirth_10, profile_overrides.practice_greater_attribute = huge, huge
 selected_mode, selected_difficulty = "rich", "N3"
 local wilderness = load_service("monster_spawn_service")
 local result = find_function(wilderness, "start_encounter")({encounter_id = "encounter_rebirth_10", player_id = 0})
@@ -293,13 +300,13 @@ pending()
 check(created[#created], member.member_id, "N3", "rich")
 assert(session.monster_count == 1 and session.respawn_count == 0,
     "projected respawn must keep the original rich selection and consume its own death ticket")
-rich_source.encounter_rebirth_10.N3, rich_source.practice_greater_attribute.N3 = original_rebirth, original_practice
+profile_overrides.encounter_rebirth_10, profile_overrides.practice_greater_attribute = nil, nil
 assert(real_n3_rebirth10 and real_n3_rebirth10.logical > 2147483647
     and real_n3_rebirth10.native <= 100000000.000001,
     "the real generated N3 final rebirth profile must safely cross the native integer health boundary")
 print(string.format("RICH_N3_REBIRTH10_REAL_BOUNDARY_PASS logical_health=%.0f native_health=%.0f scale=%.17g",
     real_n3_rebirth10.logical, real_n3_rebirth10.native, real_n3_rebirth10.scale))
-print("RICH_MONSTER_SPAWNING_PASS: 455 production births, public entries/staging, native large-stat boundaries, reward/kill idempotence and original-profile respawn")
+print("RICH_MONSTER_SPAWNING_PASS: 1641 production births across seven modes, public entries/staging, exact native boundaries, reward/kill idempotence and original-selection respawn")
 ]=]
 assert(loadstring(fixture:sub(1, boundary - 1) .. cases, "test_rich_monster_spawn"))()
-print("RICH_MONSTER_PROFILES_PASS: all 30 members across independent N1-N10 CSV rows, other modes, immutable provenance")
+print("RICH_MONSTER_PROFILES_PASS: all 30 members across N1-N10 formulas, fishing preserved, immutable historical evidence")

@@ -98,7 +98,7 @@ local function check(value,expected,mode,label)
     assert(close(tonumber(projection.for_ui(value,value:GetMaxHealth(),"health")),expected.health)
         and close(tonumber(projection.for_ui(value,value.applied.attack_min,"attack")),expected.attack),
         label.." UI did not recover logical values")
-    local projected=(mode=="cold" or mode=="scourge")
+    local projected=expected.human_spec == true or (mode=="cold" or mode=="scourge")
         and (expected.health>100000000 or expected.attack>100000000)
     if projected then
         assert(value.applied.max_health<=100000000.00001
@@ -227,15 +227,23 @@ for _,mode in ipairs({"cold","scourge"}) do
     assert(value,err);check(value,huge,mode,"forced room "..mode)
     override=nil
 end
-for _,mode in ipairs({"standard","pure","fishing"}) do
-    local expected=assert(profiles.resolve("practice_wood","N2"))
-    assert(profiles.resolve("practice_wood","N2",mode)==expected,"legacy mode profile changed")
+local standard=assert(profiles.resolve("practice_wood","N2","standard"))
+local pure=assert(profiles.resolve("practice_wood","N2","pure"))
+assert(standard.human_spec and standard.health==75000 and standard.war3_armor==100 and standard.attack==11000)
+assert(pure.human_spec and pure.health==60000 and pure.war3_armor==50 and pure.attack==11000,
+    "pure and standard retain their distinct authored mode multipliers")
+local fishing_legacy
+for _,row in ipairs(sources[4].rows) do
+    if row.member_id=="practice_wood" and row.difficulty_id=="N2" then fishing_legacy=row end
 end
+assert(profiles.resolve("practice_wood","N2","fishing")==fishing_legacy,"noncombat legacy lookup changed")
 local missing,reason=balance.build_waves({difficulty_id="N11",total_waves=30},"scourge")
 assert(missing==nil and reason=="recorded_mode_difficulty_missing:scourge:N11",
-    "temporary configuration must never open invalid difficulties")
+    "the archived recording-only adapter still rejects a tier outside its archived scope")
+assert(require("systems/wave_difficulty_builder").build(require("config/generated/wave_definitions").rows,"N11","scourge"),
+    "production v3 waves must support configured tiers beyond the archived recordings")
 assert(equal(sources,source_before),"recorded spawn or mode lookup mutated generated data/provenance")
-print(string.format("RECORDED_MODE_SPAWNING_PASS formal=%d variants=%d members=%d rebirth=%d; all supported pairs, 60 counts, native limits, armor, immutable sources, mode isolation",
+print(string.format("RECORDED_MODE_SPAWNING_PASS legacy_formal=%d variants=%d normative_members=%d rebirth=%d; archived compatibility, native limits, armor, immutable sources, mode isolation",
     formal_count,variant_count,member_count,rebirth_count))
 ]=]
 assert(loadstring(fixture:sub(1,boundary-1)..cases,"test_recorded_mode_spawn"))()

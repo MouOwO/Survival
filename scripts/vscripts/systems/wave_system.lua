@@ -869,6 +869,9 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
         check_final_victory()
         return
     end
+    if row.human_spec_stats then
+        row = require("systems/human_wave_profile").resolve_spawn(row, RandomInt)
+    end
     local definition = archetypes.by_id[row.archetype_id]
     if not definition then
         state.failed_spawn = state.failed_spawn + 1
@@ -951,7 +954,12 @@ local function spawn_one(row, token, wave_number, normal_instance_index, session
             or (type(definition.passive_skill_ids) == "table" and next(definition.passive_skill_ids) == nil))
     local combat_row = row
     local mode_id = row.mode_id or state.game_mode
-    if (mode_id == "rich" or mode_id == "cold" or mode_id == "scourge")
+    if row.human_spec_stats then
+        combat_row = require("combat/endless_stat_projection").prepare_exact(unit, row)
+        unit.survival_human_spec = true
+        unit.survival_human_spec_position = row.human_spec_position
+        unit.survival_scourge_elite = row.human_spec_elite == true
+    elseif (mode_id == "rich" or mode_id == "cold" or mode_id == "scourge")
         and ((tonumber(row.health) or 0) > 100000000 or (tonumber(row.attack) or 0) > 100000000) then
         combat_row = require("combat/endless_stat_projection").prepare(unit, row)
     end
@@ -1877,7 +1885,9 @@ function M.set_difficulty(id)
         if id == difficulty_id then return true end
         return false, "difficulty_locked"
     end
-    if not difficulty_config.get(id) then
+    local setup = require("systems/match_setup_service")
+    local mode_id = type(setup.get_mode) == "function" and setup.get_mode() or "standard"
+    if not difficulty_config.get(id, mode_id) then
         return false, "difficulty_not_found"
     end
     difficulty_id = id
@@ -1918,7 +1928,9 @@ local function set_difficulty_request(payload)
     if not permission or not permission.ready then
         return { ok = false, error = "profile_not_loaded" }
     end
-    if not difficulty_config.get(id) then
+    local mode_id = type(setup.get_mode) == "function" and setup.get_mode() or "standard"
+    if mode_id == "fishing" then return { ok = false, error = "fishing_mode_no_difficulty" } end
+    if not difficulty_config.get(id, mode_id) then
         return { ok = false, error = "difficulty_not_found" }
     end
     local unlocked = false
@@ -1994,12 +2006,15 @@ function M.spawn_challenge_monster(row, challenge_definition, player_id)
             attack_speed = tonumber(row.attack_speed) or 1,
             is_boss = definition.endless ~= true,
             member_role = definition.endless and "normal" or "assault_boss",
+            human_spec = row.human_spec,
             is_challenge_monster = true,
         }
         local collision_profile = wave_monster_collision.profile(
             combat_row, definition, definition.endless == true
         )
-        if definition.endless or combat_row.health > 100000000 or combat_row.attack > 100000000 then
+        if combat_row.human_spec then
+            combat_row = require("combat/endless_stat_projection").prepare_exact(unit, combat_row)
+        elseif definition.endless or combat_row.health > 100000000 or combat_row.attack > 100000000 then
             combat_row = require("combat/endless_stat_projection").prepare(unit, combat_row)
         end
         apply_stats(unit, combat_row, definition)

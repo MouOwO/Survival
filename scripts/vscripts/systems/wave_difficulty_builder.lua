@@ -53,8 +53,12 @@ local function scaled_row(template, definition, wave_number, multiplier)
 end
 
 function M.build(rows, difficulty_id, mode_id)
-    local definition = difficulty_config.get(difficulty_id)
+    local definition = difficulty_config.get(difficulty_id, mode_id)
     if not definition then return nil, "difficulty_not_found" end
+    local human_rules = require("config/human_monster_rules")
+    if human_rules.mode(mode_id or "standard", difficulty_id) then
+        return require("systems/human_wave_profile").build(rows, definition, mode_id)
+    end
     if mode_id == "cold" or mode_id == "scourge" then
         return require("config/recorded_mode_balance").build_waves(definition, mode_id)
     end

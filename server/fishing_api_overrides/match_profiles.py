@@ -41,7 +41,7 @@ def progression(profile: dict[str, Any]) -> dict[str, Any]:
     raw = profile.get("save", {}).get("archive", {}).get("clear_counts", {})
     counts = {}
     if isinstance(raw, dict):
-        for difficulty in range(1, 21):
+        for difficulty in range(1, 51):
             value = raw.get("n" + str(difficulty))
             if type(value) is int and value > 0:
                 counts["n" + str(difficulty)] = value

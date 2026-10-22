@@ -74,12 +74,13 @@ end
 
 local original_rows = require("config/generated/wave_definitions").rows
 local archetypes = require("config/generated/monster_archetypes").by_id
-local preserved = {"archetype_id", "member_role", "movement_type_override",
-    "model_scale_multiplier", "attack_speed", "spawn_interval", "spawn_order",
+local preserved = {"archetype_id", "member_role", "model_scale_multiplier",
     "is_boss", "boss_warning", "enabled"}
 local original_n1 = {}
 for _, row in ipairs(original_rows) do
-    if row.difficulty_id == "N1" then original_n1[row.wave_id] = row end
+    if row.difficulty_id == "N1" then
+        original_n1[table.concat({row.wave_number,row.archetype_id,row.member_role or "normal"},":")] = row
+    end
 end
 local function expected_model(row)
     local definition = assert(archetypes[row.archetype_id])
@@ -93,16 +94,11 @@ local function expected_model(row)
 end
 local expected = {
     [1] = { normal = {7, 700, 6} },
-    [10] = { normal = {5602, 49000, 105}, wave_leader = {5602, 49000, 105},
-        assault_boss = {54777, 560035, 1644} },
-    [20] = { normal = {77002, 770000, 390}, wave_leader = {77002, 770000, 390},
-        assault_boss = {402502, 11025035, 2994} },
-    [24] = { wave_leader = {560002, 21000000, 900},
-        stitcher_large = {140002, 2100000, 450}, stitcher_small = {140002, 2100000, 450},
-        humanoid_red_sword = {161002, 2100000, 465},
-        flying_black_bone = {63002, 2450000, 435} },
-    [25] = { normal = {182002, 3500000, 480}, wave_leader = {182002, 3500000, 480},
-        assault_boss = {700002, 21000030, 2994} },
+    [10] = { normal = {5600, 49000, 105}, assault_boss = {28000, 210035, 1194} },
+    [20] = { normal = {77000, 770000, 390}, assault_boss = {424200, 3500035, 2994} },
+    [24] = { wave_leader = {560000, 21000000, 900}, normal = {140000, 2100000, 450},
+        special_2 = {161000, 2100000, 465}, special_3 = {63000, 2450000, 435} },
+    [25] = { normal = {182000, 3500000, 480}, assault_boss = {700000, 21000035, 2994} },
 }
 local function key(role, model, attack, health, armor, scale)
     return table.concat({role, model, attack, health, armor, scale}, "|")
@@ -131,23 +127,19 @@ for _, number in ipairs({1, 10, 20, 24, 25}) do
     local planned_keys, seen_keys, per_owner, spawn_events = {}, {}, {}, 0
     local one_owner_plan, expected_roles = 0, {}
     for _, row in ipairs(batches) do
-        local baseline = assert(original_n1[row.wave_id], "Original N1 model batch must survive")
+        local role = row.member_role or "normal"
+        local baseline = assert(original_n1[table.concat({number,row.archetype_id,role},":")],
+            "The authored formula must retain an existing model/role mapping")
         for _, field in ipairs(preserved) do
             assert(row[field] == baseline[field], "Rich spawn changed model/role contract: " .. field)
         end
-        local role = row.member_role or "normal"
-        local stats = assert((role ~= "normal" and expected[number][role])
-            or expected[number][row.archetype_id] or expected[number][role],
+        local stats_key = row.human_spec_rotation_position and ("special_"..row.human_spec_rotation_position) or role
+        local stats = assert(expected[number][stats_key],
             "Unreviewed attribute group in W" .. number .. ": " .. row.archetype_id)
         assert(row.attack == stats[1] and row.health == stats[2] and row.war3_armor == stats[3],
             "Builder did not route reviewed rich stats into production W" .. number .. "/" .. row.batch_id)
-        if number == 10 or number == 20 then
-            if role == "assault_boss" then
-                assert(row.rich_stats_estimated == true and row.rich_stats_source == "boss_interpolation"
-                    and row.rich_estimation_method == "linear_between_bosses",
-                    "Interpolated boss must remain labeled as an estimate")
-            end
-        end
+        assert(row.human_spec and row.stats_source == "human_monster_spec_v3"
+            and row.rich_stat_variants == nil, "legacy interpolated values must not overwrite authored formulas")
         local definition = assert(archetypes[row.archetype_id])
         local scale = (definition.model_scale or 1) * (row.model_scale_multiplier or 1)
         local bundle = key(role, expected_model(row), stats[1], stats[2], stats[3], scale)
@@ -176,7 +168,8 @@ for _, number in ipairs({1, 10, 20, 24, 25}) do
         local position = rich_position(payload.player_id)
         assert(actual.position.x == position.x and actual.position.y == position.y,
             "A formal rich birth must use that owner's rich region route")
-        local bundle = key(role, actual.model, actual.damage_min, actual.max_health,
+        local bundle = key(role, actual.model, actual.damage_min * (value.survival_endless_attack_scale or 1),
+            actual.max_health * (value.survival_endless_health_scale or 1),
             value.survival_base_war3_armor, actual.model_scale)
         assert(planned_keys[bundle], "Production setters produced an unplanned model/stat/role combination")
         seen_keys[bundle] = (seen_keys[bundle] or 0) + 1
@@ -225,6 +218,6 @@ for _,value in ipairs(created) do
     assert(value.removed and value.survival_wave_cleanup,"out-of-mode native placement must be removed without registering an enemy")
 end
 print("RICH_WAVE_SPAWNING_PASS: 5 isolated production waves, " .. total_verified
-    .. " births, 60 per owner, rich routes, estimated bosses, W24 groups, preserved models/roles and custom armor")
+    .. " births, 60 per owner, rich routes, v3 bosses/rotation groups, preserved model mappings and custom armor")
 ]=]
 assert(loadstring(source:sub(1, boundary - 1) .. cases, "test_rich_wave_spawning"))()

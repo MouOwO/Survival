@@ -20,12 +20,14 @@ local rows = {
     row("disabled", "pure", "n1", 1, {enabled=false}),
 }
 package.loaded["config/generated/archive_achievements"] = {rows=rows}
-package.loaded["config/difficulty_config"] = {client_options=function()
-    local result={}; for i=1,10 do result[#result+1]={difficulty_id="N"..i} end; return result
-end}
 local available_cold=4
-package.loaded["config/recorded_mode_balance"] = {has_difficulty=function(mode,id)
-    return tonumber(id:sub(2)) <= (mode=="cold" and available_cold or 2)
+package.loaded["config/difficulty_config"] = {client_options=function(progression,mode)
+    assert(progression == nil, "availability follows configured combat support, not unlock progress")
+    local maximum=mode=="cold" and available_cold or mode=="scourge" and 2 or 10
+    local result={}; for i=1,maximum do result[#result+1]={difficulty_id="N"..i} end; return result
+end}
+package.loaded["config/recorded_mode_balance"] = {has_difficulty=function()
+    error("recorded sample coverage must not override formula-mode availability")
 end}
 local progress = require("systems/archive_clear_progress")
 local function apply(stats,item) stats.wood=(stats.wood or 0)+item.effect_values[1] end
@@ -66,6 +68,12 @@ assert(progress.max_available("cold")==10,"availability must follow live balance
 local unchanged=archive.mode_clear_counts.cold.n20
 local ok,reason=progress.record(archive,{mode_id="cold",difficulty_id="n20",count=1},stats,apply)
 assert(not ok and reason=="archive_mode_difficulty_unavailable" and archive.mode_clear_counts.cold.n20==unchanged)
+available_cold=50
+assert(progress.max_available("cold")==50)
+record(archive,stats,"cold","N50",2)
+assert(archive.mode_clear_counts.cold.n50==2, "N50 progress must survive without a lower hard cap")
+ok,reason=progress.record(archive,{mode_id="cold",difficulty_id="n51",count=1},stats,apply)
+assert(not ok and reason=="archive_mode_difficulty_unavailable")
 for _,command in ipairs({{mode_id="fishing",difficulty_id="n1",count=1},
     {mode_id="pure",difficulty_id="n1",count=true},{mode_id="pure",difficulty_id="n1",count=-1},
     {mode_id="pure",difficulty_id="n0",count=1},{mode_id="pure",difficulty_id="n21",count=1}}) do

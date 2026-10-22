@@ -99,6 +99,13 @@ function M.build(batches, options)
     local enabled = options.enabled ~= false
     local movement_type = options.movement_type
 
+    -- Authored first-monster and three-slot rotation positions are already a
+    -- complete sequence. The legacy movement mixer must not reorder them.
+    if batches[1] and batches[1].human_spec_sequence == true then
+        for _, row in ipairs(batches) do append_repeated(result, row) end
+        return result
+    end
+
     while index <= #batches do
         local row = batches[index]
         if enabled and is_normal(row) then

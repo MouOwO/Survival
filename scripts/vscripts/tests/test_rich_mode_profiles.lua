@@ -1,5 +1,13 @@
 -- Real entry authentication, match choice, HTTP profile and progression APIs.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("tests/development_release_profile")
+-- An admitted offline actor still exercises real HTTP identity/session checks;
+-- no local Workshop allowlist or private account identifiers enter this test.
+package.loaded["core/test_access_policy"] = {
+    enabled=function() return true end,
+    allowed=function(id) return id==0 end,
+    enforce=function(id) return id==0 end,
+}
 local decoder, encoder = require("core/json_decoder"), require("core/json_encoder")
 local tasks, requests, account = {}, {}, 9000000123
 package.loaded["core/scheduler"] = {every=function(_,fn,key) tasks[key]=fn end}
@@ -54,18 +62,19 @@ assert(profiles.get_profile(0)==nil,"entry admission never loads combat bonuses"
 assert(setup.select_mode(0,"rich",setup.get_session_id()).error=="mode_not_unlocked")
 -- A fresh session cannot reuse the previously authenticated account binding.
 setup.init("rich-profile-session-two")
-auth({loaded=true,clear_counts={n10=1},rich_clear_counts={}})
+auth({loaded=true,clear_counts={n3=1},rich_clear_counts={}})
 assert(require("config/mode_progression").entry_unlocked("rich",profiles.get_progression(0,"rich")),
     "historical standard fallback survives replacing the advanced clear permission view")
 setup.init("rich-profile-session-two-confirmed")
-auth({loaded=true,clear_counts={n10=1,n5=12},standard_clear_counts={n10=1},rich_clear_counts={}})
+auth({loaded=true,clear_counts={n10=1,n5=12},standard_clear_counts={n3=1,n5=12},
+    mode_clear_counts={pure={n5=2}},rich_clear_counts={}})
 local auth_requests = #requests
 assert(difficulty.is_unlocked("N6", profiles.get_progression(0, "standard")))
 assert(difficulty.is_unlocked("N6", profiles.get_progression(0, "pure")))
 assert(not difficulty.is_unlocked("N6", profiles.get_progression(0, "rich")))
 assert(#requests == auth_requests and profiles.get_profile(0) == nil,
     "all difficulty previews use startup authentication before mode/login, without applying bonuses")
-local external=profiles.get_authenticated_progression(0);external.standard_clear_counts.n10=0
+local external=profiles.get_authenticated_progression(0);external.standard_clear_counts.n3=0
 assert(option("rich").unlocked==1,"returned permissions are copied")
 account=9000000456
 assert(not profiles.supports_rich_mode(0),"capability cannot transfer to a different account")
@@ -77,33 +86,37 @@ profiles.load_player(0)
 assert(requests[#requests].url:match("/v1/session/login$") and requests[#requests].body.mode=="rich")
 local snap={schema_version=1,account_id=tostring(account),revision=5,mode="standard",game_mode="rich",
     match_session_id=setup.get_session_id(),entitlements={},achievements={},public={},
-    progression={loaded=true,clear_counts={n5=12,n10=1},standard_clear_counts={n10=1},rich_clear_counts={n5=1}},
+    progression={loaded=true,clear_counts={n5=12,n10=1},standard_clear_counts={n3=1,n5=12},
+        mode_clear_counts={pure={n5=2}},rich_clear_counts={n5=1}},
     save={gameplay_stats={initial_wood=777},archive={},content_inventory={old_item=2}}}
 response(snap)
 assert(profiles.get_profile(0).save.gameplay_stats.initial_wood==777,"rich inherits standard combat bonuses")
 assert(profiles.get_profile(0).save.content_inventory.old_item==2)
 assert(difficulty.is_unlocked("N6",profiles.get_progression(0)))
-assert(difficulty.is_unlocked("N7",profiles.get_progression(0)),"rich N5 opens the whole N6-N10 bracket")
+assert(not difficulty.is_unlocked("N7",profiles.get_progression(0)),"rich N5 advances only to N6")
 assert(profiles.get_progression(0, "standard").clear_counts.n5 == 12
-    and profiles.get_progression(0, "rich").clear_counts.n5 == 1,
+    and profiles.get_progression(0, "rich").clear_counts.n5 == 1
+    and profiles.get_progression(0, "pure").mode_clear_counts.pure.n5 == 2,
     "explicit previews retain independent maps after the rich profile loads")
 setup.init("rich-profile-session-three")
 assert(not profiles.supports_rich_mode(0),"capability cannot transfer to a different match session")
 auth({loaded=true,clear_counts={},standard_clear_counts={n10="1"},rich_clear_counts={}})
 assert(profiles.get_authenticated_progression(0)==nil,"malformed trusted metadata is still rejected")
 assert(setup.select_mode(0,"rich",setup.get_session_id()).error=="mode_profile_pending")
-for index,mode in ipairs({"cold","scourge"}) do
+for index,mode in ipairs({"cold"}) do
     setup.init(mode.."-profile-session-one")
-    auth({loaded=true,clear_counts={n5=12,n10=1},standard_clear_counts={n10=1},
-        rich_clear_counts={n5=1,n10=1},cold_clear_counts={n5=1,n10=1},scourge_clear_counts={}})
+    auth({loaded=true,clear_counts={n5=12,n10=1},standard_clear_counts={n3=1,n5=12},
+        mode_clear_counts={pure={n5=2}},rich_clear_counts={n5=1,n10=1},
+        cold_clear_counts={n5=1,n49=1,n50=1},scourge_clear_counts={},ruins_clear_counts={},celestial_clear_counts={}})
     assert(profiles.supports_mode_progression(0,mode))
     assert(setup.select_mode(0,mode,setup.get_session_id()).ok)
     profiles.load_player(0)
     assert(requests[#requests].body.mode==mode,"durable HTTP login must retain the real advanced mode")
     local sample={schema_version=1,account_id=tostring(account),revision=10+index,mode="standard",game_mode="rich",
         match_session_id=setup.get_session_id(),entitlements={},achievements={},public={},
-        progression={loaded=true,clear_counts={n5=12,n10=1},standard_clear_counts={n10=1},
-            rich_clear_counts={n5=1,n10=1},cold_clear_counts={n5=1,n10=1},scourge_clear_counts={}},
+        progression={loaded=true,clear_counts={n5=12,n10=1},standard_clear_counts={n3=1,n5=12},
+            mode_clear_counts={pure={n5=2}},rich_clear_counts={n5=1,n10=1},
+            cold_clear_counts={n5=1,n49=1,n50=1},scourge_clear_counts={},ruins_clear_counts={},celestial_clear_counts={}},
         save={gameplay_stats={initial_wood=777},archive={},content_inventory={old_item=2}}}
     response(sample)
     assert(profiles.get_profile(0)==nil,"wrong game_mode cannot complete advanced login")
@@ -114,11 +127,21 @@ for index,mode in ipairs({"cold","scourge"}) do
     assert(profiles.get_progression(0).mode_id==mode)
     local expected=mode=="cold" and 1 or nil
     assert(profiles.get_progression(0).clear_counts.n5==expected,"advanced permissions read only their own permanent counter")
+    assert(difficulty.is_unlocked("N50",profiles.get_progression(0)),"authenticated N49 opens the configured cold N50")
+    assert(not difficulty.is_unlocked("N30",profiles.get_progression(0)),"higher clears do not fabricate missing preceding tiers")
     sample.game_mode="rich"
     assert(profiles.apply_snapshot(0,sample,"archive_fixture").error=="match_profile_mismatch",
         "archive receipt must retain game identity, not just standard combat projection")
     sample.game_mode=mode;sample.revision=sample.revision+1
     assert(profiles.apply_snapshot(0,sample,"archive_fixture").ok)
+    local invalid_pure=decoder.decode(encoder.encode(sample))
+    invalid_pure.revision=sample.revision+1
+    invalid_pure.progression.mode_clear_counts.pure.n5=0/0
+    assert(profiles.apply_snapshot(0,invalid_pure,"archive_fixture").error=="profile_progression_invalid",
+        "an in-memory NaN receipt cannot poison the authenticated pure map")
+    assert(profiles.get_profile(0).revision==sample.revision
+        and profiles.get_progression(0,"pure").mode_clear_counts.pure.n5==2,
+        "rejected progression receipts preserve the previous durable profile")
     account=9000000456
     assert(not profiles.supports_mode_progression(0,mode),"independent capability cannot transfer to another account")
     account=9000000123
@@ -126,4 +149,39 @@ for index,mode in ipairs({"cold","scourge"}) do
     assert(profiles.get_profile(0)==nil and not profiles.supports_mode_progression(0,mode),
         "advanced gameplay and capability are scoped to the authenticated match")
 end
-print("RICH_MODE_PROFILES_PASS: authenticated chain, independent counters, durable advanced identity and scoped receipts")
+local bad_progression={
+    {label="flat N51",change=function(p) p.cold_clear_counts={n51=1} end},
+    {label="nested N51",change=function(p) p.mode_clear_counts.pure.n51=1 end},
+    {label="unknown mode",change=function(p) p.mode_clear_counts.client_invented={n3=1} end},
+    {label="string count",change=function(p) p.mode_clear_counts.pure.n5="1" end},
+    {label="fractional count",change=function(p) p.mode_clear_counts.pure.n5=1.5 end},
+    {label="forged map",change=function(p) p.mode_clear_counts.pure="unlocked" end},
+}
+for index,bad in ipairs(bad_progression) do
+    setup.init("malformed-auth-progression-"..index)
+    local progress={loaded=true,clear_counts={},standard_clear_counts={n3=1},
+        rich_clear_counts={},mode_clear_counts={pure={n5=2}}}
+    bad.change(progress)
+    auth(progress)
+    assert(profiles.get_authenticated_progression(0)==nil,"HTTP receipt accepted "..bad.label)
+    assert(setup.select_mode(0,"rich",setup.get_session_id()).error=="mode_profile_pending",
+        "a malformed provider map must not grant mode entry")
+end
+for index,raw in ipairs({"NaN","1e999"}) do
+    setup.init("nonfinite-auth-progression-"..index)
+    assert(profiles.authenticate_player(0,"nonfinite_fixture").pending)
+    local body=encoder.encode({authenticated=true,account_id=tostring(account),match_session_id=setup.get_session_id(),
+        progression={loaded=true,clear_counts={},rich_clear_counts={},mode_clear_counts={pure={n5=0}}}})
+    local replacements
+    body,replacements=body:gsub('"n5":0','"n5":'..raw)
+    assert(replacements==1)
+    requests[#requests].complete({StatusCode=200,Body=body})
+    assert(profiles.get_authenticated_progression(0)==nil,"nonfinite JSON must never authenticate progression")
+end
+setup.init("unreleased-mode-profiles")
+for _,mode in ipairs({"scourge","ruins","celestial","fishing"}) do
+    assert(setup.select_mode(0,mode,setup.get_session_id()).error=="mode_not_released",
+        "configured future modes must remain inaccessible from public selection")
+    for _,row in ipairs(setup.snapshot().mode_options) do assert(row.mode_id~=mode) end
+end
+print("RICH_MODE_PROFILES_PASS: authenticated exact entry, independent sequential counters through N50, durable identity, scoped receipts and unreleased-mode gates")

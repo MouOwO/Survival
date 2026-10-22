@@ -208,6 +208,12 @@ assert(not state.hubs[1].abilities.ability_archive_hunt_02.active,'N6 requiremen
 local hub=state.hubs[1]
 local a=hub.abilities.ability_archive_shadow_1
 assert(archive.summon(hub,'shadow_1',a));verify(state,'active boss and used');interleave(state,'active boss and used')
+assert(last_spawn_stats.health==9000010 and last_spawn_stats.attack==189002
+    and last_spawn_stats.war3_armor==998 and last_spawn_stats.attack_speed==2.5
+    and last_spawn_stats.human_spec==true,
+    'Actual archive summon uses final workbook values at N5, with no scale/difficulty correction repeated')
+assert(last_spawn_visual.model_path==definitions.by_id.shadow_1.model_path,
+    'Numeric authority preserves the existing archive model')
 local boss=state.active_boss
 boss.alive=false
 bus.emit(events.ENGINE_ENTITY_KILLED,{victim=boss,victim_entindex=boss.id})

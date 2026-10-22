@@ -87,7 +87,8 @@ class ModeClearScopeTests(unittest.TestCase):
         self.assertEqual(projected["standard_clear_counts"], projected["clear_counts"])
         self.assertEqual(projected["rich_clear_counts"], {"n2": 7})
         self.assertEqual(projected["mode_clear_counts"], {
-            "pure": {"n1": 2}, "standard": {}, "rich": {}, "cold": {"n4": 3}, "scourge": {}})
+            "pure": {"n1": 2}, "standard": {}, "rich": {}, "cold": {"n4": 3}, "scourge": {},
+            "ruins": {}, "celestial": {}})
         self.assertEqual(archive, before)
         for invalid in (None, [], True, "invalid"):
             archive["mode_clear_counts"] = invalid
@@ -140,8 +141,8 @@ class ModeClearScopeTests(unittest.TestCase):
                 self.assertIn("daily_limits", result["progression"])
                 if mode in match_modes.PARENT_MODES:
                     self.assertEqual(result["game_mode"], mode)
-        self.assertEqual(calls, ["pure", "standard", "standard", "standard", "standard"])
-        self.assertEqual(seen, [(account, "fixture-bundle")] * 5)
+        self.assertEqual(calls, ["pure"] + ["standard"] * (len(match_modes.MODE_IDS) - 1))
+        self.assertEqual(seen, [(account, "fixture-bundle")] * len(match_modes.MODE_IDS))
 
     def test_authenticate_attaches_account_summary_without_creating_or_binding_a_session(self):
         class ApiError(ValueError):

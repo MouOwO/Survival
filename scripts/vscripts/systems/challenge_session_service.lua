@@ -263,7 +263,8 @@ local function apply_combat_stats(unit, archetype, profile)
     -- floor would silently block hero research armor reduction on normal mobs.
     unit.survival_minimum_armor = nil
     unit.survival_minimum_war3_armor = minimum_war3_armor
-    local attack_speed = math.max(0.01, tonumber(archetype.attack_speed) or 1)
+    local attack_speed = math.max(0.01, tonumber(profile.attack_speed)
+        or tonumber(archetype.attack_speed) or 1)
     unit:SetBaseAttackTime(1 / attack_speed)
     unit.survival_attack_speed = attack_speed
 end
@@ -406,8 +407,9 @@ local function spawn_member(session, member)
     if unit.Script_SetAttackRange and combat_archetype.attack_range then
         unit:Script_SetAttackRange(tonumber(combat_archetype.attack_range) or 128)
     end
-    if (session.game_mode == "rich" or session.game_mode == "cold"
-        or session.game_mode == "scourge") and combat_profile
+    if combat_profile and combat_profile.human_spec then
+        combat_profile = require("combat/endless_stat_projection").prepare_exact(unit, combat_profile)
+    elseif combat_profile
         and ((tonumber(combat_profile.health) or 0) > 100000000
             or (tonumber(combat_profile.attack) or 0) > 100000000) then
         combat_profile = require("combat/endless_stat_projection").prepare(unit, combat_profile)
@@ -674,9 +676,12 @@ local function fill_member(session, member)
 end
 
 local function maintain_count_limit(session, member)
-    return math.max(1, math.floor(math.min(10,
-        tonumber(member.max_alive) or 10,
-        tonumber(session.encounter and session.encounter.max_alive) or 10)))
+    local balance = require("config/human_challenge_balance")
+    local authored_count = balance.supports_mode(session.game_mode) and balance.member_count(member.member_id)
+    local maximum = authored_count or 10
+    return math.max(1, math.floor(math.min(maximum,
+        tonumber(member.max_alive) or maximum,
+        tonumber(session.encounter and session.encounter.max_alive) or maximum)))
 end
 
 local function fill_current(session)

@@ -96,8 +96,9 @@ class ArchiveService:
             if isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or int(v)!=v or not lo<=v<=hi: raise ArchiveError("archive_number_invalid:"+key)
             c[key]=int(v)
         if kind in {"clear", "standard_clear", "rich_clear", "cold_clear", "scourge_clear", "mode_clear"}:
-            if type(c.get("count")) is not int or c["count"]!=1 or not re.fullmatch(r"n(?:[1-9]|1[0-9]|20)",str(c.get("difficulty_id"))): raise ArchiveError("archive_clear_invalid")
-            if kind in {"rich_clear", "cold_clear", "scourge_clear"} and int(c["difficulty_id"][1:]) > 10: raise ArchiveError("archive_clear_invalid")
+            # Lua validates each authenticated mode against its configured
+            # range. The protocol must not truncate supported N21-N50 wins.
+            if type(c.get("count")) is not int or c["count"]!=1 or not re.fullmatch(r"n(?:[1-9]|[1-4][0-9]|50)",str(c.get("difficulty_id"))): raise ArchiveError("archive_clear_invalid")
             if "cooperative_win" in c: integer("cooperative_win",0,1)
         if kind=="endless":
             integer("wave",1,1000);integer("difficulty",1,20)
@@ -106,11 +107,11 @@ class ArchiveService:
             if not definition or not definition.get("enabled"): raise ArchiveError("archive_challenge_invalid")
             raw=c.get("difficulty_id")
             if isinstance(raw,str): raw=raw.lower().removeprefix("n")
-            if not re.fullmatch(r"(?:[1-9]|1[0-9]|20)",str(raw)): raise ArchiveError("archive_difficulty_invalid")
+            if not re.fullmatch(r"(?:[1-9]|[1-4][0-9]|50)",str(raw)): raise ArchiveError("archive_difficulty_invalid")
             try: difficulty=int(raw)
             except (ValueError,TypeError): raise ArchiveError("archive_difficulty_invalid")
             # Challenge definitions also drive the game's unlock buttons.
-            if not definition["min_difficulty"]<=difficulty<=20: raise ArchiveError("archive_challenge_locked")
+            if not definition["min_difficulty"]<=difficulty<=50: raise ArchiveError("archive_challenge_locked")
             c["difficulty_id"]="n"+str(difficulty);integer("kill_sequence",1,100000)
         if kind in {"vip_claim", "vip_purchase"}:
             item=self.bundle.tables["archive_vip_rewards"].get(c.get("reward_id"))

@@ -1,4 +1,4 @@
-"""New durable identities retain the admission rules of the shipped selector."""
+"""Authored mode prerequisites retain private, immutable session identities."""
 from copy import deepcopy
 import hashlib
 import importlib.util
@@ -65,36 +65,48 @@ class ModeAdmissionCompatibilityTests(unittest.TestCase):
     def login(self, mode):
         return self.module.login(self.app, {"account_id": "100", "match_session_id": self.session, "mode": mode})
 
-    def test_cold_and_scourge_keep_their_existing_entry_without_a_new_predecessor_gate(self):
-        for mode in ("cold", "scourge"):
+    def test_open_advanced_modes_use_exact_clear_prerequisites(self):
+        for mode, prerequisite in (("rich", "n3"), ("cold", "n5")):
             with self.subTest(mode=mode):
                 self.session = "compatibility-" + mode + "-session"
+                with self.assertRaisesRegex(ApiError, mode + "_mode_locked"):
+                    self.login(mode)
+                self.profile["save"]["archive"] = {"mode_clear_counts": {"pure": {prerequisite: 1}}}
                 result = self.login(mode)
                 self.assertEqual((result["mode"], result["game_mode"]), ("standard", mode))
                 self.assertEqual(result["save"]["gameplay_stats"]["initial_wood"], 777)
                 self.assertEqual(self.calls[-1]["p_mode"], mode)
                 key = self.app._database_account_id("100"), self.session
                 self.assertEqual(self.sessions[key]["mode"], mode)
-        self.assertEqual(self.profile["save"]["archive"], {}, "identity cannot fabricate prerequisite clears")
+        self.assertEqual(self.profile["save"]["archive"], {"mode_clear_counts": {"pure": {"n5": 1}}},
+                         "identity cannot fabricate prerequisite clears")
 
-    def test_rich_retains_the_existing_standard_n10_gate_and_established_empty_map_rule(self):
+    def test_rich_uses_global_exact_n3_including_valid_legacy_history(self):
         with self.assertRaisesRegex(ApiError, "rich_mode_locked"):
             self.login("rich")
         self.assertEqual(self.calls, [])
         archive = self.profile["save"]["archive"]
         archive["clear_counts"] = {"n10": 1}
+        with self.assertRaisesRegex(ApiError, "rich_mode_locked"):
+            self.login("rich")
+        archive["clear_counts"]["n3"] = 1
         self.assertEqual(self.login("rich")["game_mode"], "rich")
         self.session = "rich-established-empty-map-session"
         archive["standard_clear_counts"] = {}
         with self.assertRaisesRegex(ApiError, "rich_mode_locked"):
             self.login("rich")
-        archive["standard_clear_counts"] = {"n10": 1}
+        archive["clear_counts"] = {}
+        archive["standard_clear_counts"] = {"n3": 1}
         self.assertEqual(self.login("rich")["game_mode"], "rich")
 
-    def test_mode_identity_is_immutable_despite_unrestricted_cold_or_scourge_admission(self):
+    def test_mode_identity_is_immutable_and_unreleased_modes_stay_closed(self):
+        self.profile["save"]["archive"] = {"clear_counts": {"n3": 1, "n5": 1, "n9": 1, "n11": 1}}
         self.login("cold")
         with self.assertRaisesRegex(ApiError, "match_mode_locked"):
-            self.login("scourge")
+            self.login("rich")
+        for mode in ("scourge", "ruins", "celestial", "fishing"):
+            with self.subTest(mode=mode), self.assertRaisesRegex(ApiError, "mode_not_released"):
+                self.login(mode)
         key = self.app._database_account_id("100"), self.session
         self.assertEqual(self.sessions[key]["mode"], "cold")
 
@@ -103,15 +115,25 @@ class ModeAdmissionCompatibilityTests(unittest.TestCase):
             self.assertEqual(self.login(mode), {"ordinary_login": mode})
         self.assertEqual(self.calls, [])
 
-    def test_sql_admits_five_durable_modes_but_only_rich_has_the_existing_entry_gate(self):
-        path = ROOT / "server/aliyun/database/target/202610200002_archive_match_modes.sql"
+    def test_sql_prepares_seven_identities_but_only_four_modes_admit_new_sessions(self):
+        path = ROOT / "server/aliyun/database/target/202610220001_human_spec_mode_admission.sql"
         source = path.read_text(encoding="utf-8")
-        self.assertIn("CHECK (mode IN ('pure','standard','rich','cold','scourge'))", source)
-        self.assertRegex(source, r"IF\s+p_mode\s*=\s*'rich'\s+THEN")
-        self.assertNotIn("WHEN 'cold'", source)
-        self.assertNotIn("WHEN 'scourge'", source)
+        self.assertIn("CHECK (mode IN ('pure','standard','rich','cold','scourge','ruins','celestial'))", source)
+        self.assertIn("IF p_mode NOT IN ('pure','standard','rich','cold')", source)
+        self.assertIn("WHEN 'rich' THEN 'n3' WHEN 'cold' THEN 'n5'", source)
+        self.assertIn("WHEN 'pure' THEN archive->'mode_clear_counts'->'pure'", source)
+        self.assertIn("WHEN 'standard' THEN CASE WHEN archive ? 'standard_clear_counts'", source)
+        self.assertIn("THEN archive->'standard_clear_counts' ELSE archive->'clear_counts' END", source)
+        self.assertIn("ELSE archive->(source_mode||'_clear_counts') END", source)
+        self.assertNotIn("'pure_clear_counts'", source)
+        self.assertNotIn("archive->'mode_clear_counts'->source_mode", source)
+        self.assertEqual(source.count("FOREACH source_mode"), 1)
         self.assertIn("s.mode<>p_mode", source)
         self.assertIn("'match_mode_locked'", source)
+        self.assertLess(source.index("FROM public.player_gameplay_stats"), source.index("FROM public.survival_players"))
+        self.assertIn("ON CONFLICT DO NOTHING", source)
+        self.assertIn("REVOKE ALL ON FUNCTION", source)
+        self.assertNotRegex(source, r"(?i)UPDATE\s+public\.match_profile_sessions|DELETE\s+FROM")
 
 
 if __name__ == "__main__":

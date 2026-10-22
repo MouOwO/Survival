@@ -2,7 +2,7 @@ local event_bus = require("core/event_bus")
 local events = require("core/events")
 local scheduler = require("core/scheduler")
 local definitions = require("config/generated/building_challenge_definitions")
-local wave_rows = require("config/generated/building_challenge_waves")
+local human_balance = require("config/human_challenge_balance")
 local global_rules = require("config/global_rules")
 local wave_system = require("systems/wave_system")
 local monster_hero_visual_service = require("systems/monster_hero_visual_service")
@@ -26,7 +26,6 @@ local monster_meta = {}
 local alive_by_team = {}
 local challenge_count_by_team = {}
 local ordered_definitions = {}
-local waves_by_key = {}
 local next_lifecycle_id = 0
 
 local function valid(entity)
@@ -47,11 +46,6 @@ local function notify(state, message, level)
         message = message,
         level = level or "error",
     })
-end
-
-local function key(difficulty_id, challenge_id, wave_number)
-    return tostring(difficulty_id) .. ":" .. tostring(challenge_id)
-        .. ":" .. tostring(wave_number)
 end
 
 local function challenge_count(state, challenge_id)
@@ -102,7 +96,7 @@ local function wall_health_below_threshold(meta)
             local maximum = tonumber(wall:GetMaxHealth()) or 0
             local current = tonumber(wall:GetHealth()) or 0
             if maximum > 0 then
-                return current * 100 < maximum * WALL_FAILURE_HEALTH_PCT
+                return current * 100 <= maximum * WALL_FAILURE_HEALTH_PCT
             end
         end
     end
@@ -140,7 +134,7 @@ end
 local function fail_challenge(meta, reason, remove_unit)
     if not settle(meta, "failed") then return false end
     local message = reason == "wall_health"
-        and ("挑战失败：城墙生命低于"
+        and ("挑战失败：城墙生命不高于"
             .. tostring(WALL_FAILURE_HEALTH_PCT) .. "%")
         or ("挑战失败：挑战怪存活已满"
             .. tostring(LIFETIME_SECONDS) .. "秒")
@@ -189,14 +183,11 @@ local function summon(state, definition, source_ability)
     end
     local wave_number = challenge_count(state, definition.challenge_id) + 1
     local difficulty_id = wave_system.get_difficulty()
-    local maximum = tonumber(definition.max_challenge_waves) or 20
-    if wave_number > maximum then
-        return { ok = false, error = "challenge_wave_limit_reached" }
-    end
-    local row = waves_by_key[key(difficulty_id, definition.challenge_id, wave_number)]
-    if not row or row.enabled == false then
-        return { ok = false, error = "challenge_wave_missing" }
-    end
+    local setup = require("systems/match_setup_service")
+    local mode_id = setup.get_mode and setup.get_mode() or "standard"
+    local row, row_error = human_balance.building(definition.challenge_id,
+        wave_system.current_wave_number(), difficulty_id, mode_id)
+    if not row then return { ok = false, error = row_error } end
     local unit, spawn_error = wave_system.spawn_challenge_monster(
         row,
         definition,
@@ -369,7 +360,6 @@ function M.init()
     alive_by_team = {}
     challenge_count_by_team = {}
     ordered_definitions = {}
-    waves_by_key = {}
     next_lifecycle_id = 0
     for _, definition in ipairs(definitions.rows or {}) do
         if definition.enabled ~= false then
@@ -379,9 +369,6 @@ function M.init()
     table.sort(ordered_definitions, function(a, b)
         return (tonumber(a.sort_order) or 0) < (tonumber(b.sort_order) or 0)
     end)
-    for _, row in ipairs(wave_rows.rows or {}) do
-        waves_by_key[key(row.difficulty_id, row.challenge_id, row.wave_number)] = row
-    end
     event_bus.handle_request(events.BUILDING_CHALLENGE_SUMMON_REQUEST, summon_request)
     event_bus.handle_request(events.BUILDING_CHALLENGE_AUTO_REQUEST, auto_request)
     event_bus.subscribe(events.BUILDING_CREATED, on_building_created)

@@ -376,7 +376,17 @@ function M.summon(caster, challenge_id, ability)
         publish(state)
         return false, "今日奖励已达上限"
     end
-    local row = stats.by_id[challenge_id .. "_" .. state.difficulty_id]
+    -- Archived combat values are final for every difficulty. Keep movement,
+    -- range and other existing fields from the original per-entry definition.
+    local baseline = stats.by_id[challenge_id .. "_" .. state.difficulty_id]
+        or stats.by_id[challenge_id .. "_N1"]
+    local authored = require("config/human_challenge_balance").archive(challenge_id, state.difficulty_id)
+    local row = baseline
+    if authored then
+        row = {}
+        for field, value in pairs(baseline or {}) do row[field] = value end
+        for field, value in pairs(authored) do row[field] = value end
+    end
     if not row or not row.enabled then return false, "挑战属性尚未配置" end
     local unit, reason = wave.spawn_challenge_monster(row, {
         unit_name = "npc_survival_wave_monster", model_path = definition.model_path,

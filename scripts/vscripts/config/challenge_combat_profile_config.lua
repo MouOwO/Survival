@@ -1,5 +1,6 @@
 local generated = require("config/generated/challenge_combat_profiles")
 local difficulties = require("config/difficulty_config")
+local human_balance = require("config/human_challenge_balance")
 
 local M = {
     by_member = {},
@@ -42,6 +43,11 @@ local function clone(value)
 end
 
 function M.resolve(member_id, difficulty_id, mode_id)
+    -- Formula-backed values take precedence over historical recordings and
+    -- their temporary difficulty fallback. Never scale an already final row.
+    if human_balance.supports_mode(mode_id) and human_balance.has_member(member_id) then
+        return human_balance.resolve_member(member_id, difficulty_id, mode_id)
+    end
     if mode_id == "cold" or mode_id == "scourge" then
         if not M.by_member[tostring(member_id or "")] then return nil, nil end
         return require("config/recorded_mode_balance").resolve_member(
@@ -79,7 +85,8 @@ function M.resolve(member_id, difficulty_id, mode_id)
 end
 
 function M.has_member(member_id)
-    return M.by_member[tostring(member_id or "")] ~= nil
+    return human_balance.has_member(member_id)
+        or M.by_member[tostring(member_id or "")] ~= nil
 end
 
 return M

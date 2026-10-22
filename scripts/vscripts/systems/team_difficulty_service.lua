@@ -16,20 +16,13 @@ function M.snapshot(player_ids, mode)
             local ok, value = pcall(profiles.get_progression, id, mode)
             progression[id] = ok and value or nil
             if type(progression[id]) ~= "table" or progression[id].loaded ~= true then ready = false end
-            if not mode_test.is_enabled() and progression_rules.parent_mode(mode) and (not progression_rules.counts(mode, progression[id])
-                or not progression_rules.counts(progression_rules.parent_mode(mode), progression[id])) then ready = false end
+            if not mode_test.is_enabled() and progression_rules.parent_mode(mode)
+                and not progression_rules.counts(mode, progression[id]) then ready = false end
         end
     end
     table.sort(ids)
     ready = ready and #ids > 0
     local options, maximum, lowest, limits = config.client_options(nil, mode), "", nil, {}
-    if mode == "cold" or mode == "scourge" then
-        local balance, supported = require("config/recorded_mode_balance"), {}
-        for _, option in ipairs(options) do
-            if balance.has_difficulty(mode, option.difficulty_id) then supported[#supported + 1] = option end
-        end
-        options = supported
-    end
     for _, id in ipairs(ids) do
         local highest = 0
         for _, option in ipairs(options) do

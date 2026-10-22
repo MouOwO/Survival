@@ -110,7 +110,8 @@ local function filter(_, keys)
             or category_is_unknown)
     if attacker.survival_endless_attack_scale then
         local attack_scale = tonumber(attacker.survival_endless_attack_scale)
-        if not endless_projection.is_finite(attack_scale) or attack_scale < 1 then return false end
+        if not endless_projection.is_finite(attack_scale) or attack_scale <= 0
+            or (attack_scale < 1 and attacker.survival_exact_stat_projection ~= true) then return false end
         keys.damage = endless_projection.outgoing(attacker, keys.damage, is_basic_attack)
     end
     local diagnostic = should_diagnose(attacker)
@@ -348,7 +349,8 @@ local function filter(_, keys)
     end
     if not endless_projection.is_finite(keys.damage) or keys.damage < 0 then return false end
     local health_scale = tonumber(victim.survival_endless_health_scale) or 1
-    if not endless_projection.is_finite(health_scale) or health_scale < 1 then return false end
+    if not endless_projection.is_finite(health_scale) or health_scale <= 0
+        or (health_scale < 1 and victim.survival_exact_stat_projection ~= true) then return false end
     local payload = {
         transaction_id = transaction_id, engine_damage = keys.damage,
         attacker_entindex = attacker:entindex(),
