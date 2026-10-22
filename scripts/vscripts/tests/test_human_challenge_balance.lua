@@ -29,6 +29,59 @@ assert(hard_boss.attack == 375000)
 assert(balance.member_count("challenge_06_ice_wraith") == 13)
 assert(balance.member_count("seven_sins_minion") == 11)
 
+-- Fixed user acceptance values for standard N2, in the ten encounter slots.
+-- Resolve through the production profile authority so historical CSV rows or
+-- a misplaced name cannot silently replace these updated base values.
+local ten_commandments = {
+    {name="真实",health=47762400,attack=2200000,armor=1000,base_attack=1000000},
+    {name="信仰",health=62762400,attack=2640000,armor=1100,base_attack=1200000},
+    {name="安息",health=75262400,attack=3080000,armor=1200,base_attack=1400000},
+    {name="忍耐",health=87762400,attack=4400000,armor=1300,base_attack=2000000},
+    {name="无欲",health=100262400,attack=4840000,armor=1400,base_attack=2200000},
+    {name="戒杀",health=112762400,attack=5280000,armor=1500,base_attack=2400000},
+    {name="沉默",health=125250000,attack=5720000,armor=1600,base_attack=2600000},
+    {name="纯洁",health=137750000,attack=6160000,armor=2000,base_attack=2800000},
+    {name="敬神",health=150250000,attack=8800000,armor=2400,base_attack=4000000},
+    {name="慈爱",health=175250000,attack=11000000,armor=2800,base_attack=5000000},
+}
+local ten_names, ordered_ten = {}, {}
+for _, expected in ipairs(ten_commandments) do ten_names[expected.name] = true end
+for _, source in ipairs(rules.data.special_bosses) do
+    if ten_names[source.name] then ordered_ten[#ordered_ten + 1] = source end
+end
+assert(#ordered_ten == 10, "the special-boss source must contain exactly ten commandments")
+for index, expected in ipairs(ten_commandments) do
+    assert(ordered_ten[index].name == expected.name, "ten-commandment source order changed at " .. index)
+    local member_id = string.format("boss_ten_sin_%02d", index)
+    local row = assert(profiles.resolve(member_id, "N2", "standard"))
+    assert(row.human_spec and row.member_id == member_id and row.mode_id == "standard")
+    close(row.health, expected.health, expected.name .. " standard N2 HP")
+    close(row.attack, expected.attack, expected.name .. " standard N2 attack")
+    close(row.war3_armor, expected.armor, expected.name .. " standard N2 armor")
+    assert(row.count == 1 and row.attack_speed == 2)
+end
+-- Frozen points on the two existing attack curves: 1.8+0.2N for the other
+-- ordinary modes, 3+N for the three advanced modes. Check multiple tiers
+-- without deriving expected multipliers from the implementation under test.
+local ordinary_attack_cases = {{id="N1",multiplier=2},{id="N2",multiplier=2.2},{id="N10",multiplier=3.8}}
+local advanced_attack_cases = {{id="N1",multiplier=4},{id="N2",multiplier=5},{id="N10",multiplier=13}}
+for mode_id, cases in pairs({
+    cold=ordinary_attack_cases,rich=ordinary_attack_cases,pure=ordinary_attack_cases,
+    scourge=advanced_attack_cases,ruins=advanced_attack_cases,celestial=advanced_attack_cases,
+}) do
+    for _, case in ipairs(cases) do
+        for index, expected in ipairs(ten_commandments) do
+            local member_id = string.format("boss_ten_sin_%02d", index)
+            local row = assert(profiles.resolve(member_id, case.id, mode_id))
+            assert(row.human_spec and row.mode_id == mode_id and row.difficulty_id == case.id)
+            close(row.attack, expected.base_attack * case.multiplier,
+                expected.name .. " " .. mode_id .. " " .. case.id .. " attack")
+            assert(row.count == 1 and row.attack_speed == 2)
+        end
+    end
+end
+print("TEN_COMMANDMENTS_BALANCE_PASS: ordered ten bosses, literal standard N2 matrix, six other modes at N1/N2/N10")
+
 local archive_ids = {}
 for index = 1, 4 do archive_ids[#archive_ids + 1] = "shadow_" .. index end
 for index = 1, 12 do archive_ids[#archive_ids + 1] = string.format("hunt_%02d", index) end

@@ -2,7 +2,7 @@
 -- Values already include the source correction table; never apply it again.
 return {
     ["version"] = 3,
-    ["sources"] = { ["json"] = "human_spec.json", ["workbook"] = "接入规格_人话版_v3.xlsx", ["json_sha256"] = "7c8992e5ae8f4f0449f8af404db682ef832b7c2b02a111199751a9b4654d4f24", ["workbook_sha256"] = "c22320c66cd00a96955ffcc9ad80984d470d6c183fa07a9510eab367588565ef", ["cross_checked_cells"] = 2811, ["workbook_only_wave_bases"] = 30 },
+    ["sources"] = { ["json"] = "human_spec.json", ["workbook"] = "接入规格_人话版_v3.xlsx", ["json_sha256"] = "425c732f61670d21013ad5da83c419ffaa8ff7576c3f1abf894e7d9c9ea6d1c0", ["workbook_sha256"] = "39241c3c99c0477ff42b91114a197f449c4f9b9f93d232c1d680e74782156582", ["cross_checked_cells"] = 2811, ["workbook_only_wave_bases"] = 30 },
     ["modes"] = {
         ["standard"] = {
             [1] = { ["hp_multiplier"] = 2.0, ["armor_multiplier"] = 1.2, ["challenge_hp_multiplier"] = 2.0, ["challenge_armor_multiplier"] = 1.0, ["total_waves"] = 25, ["max_difficulty"] = 10 },
@@ -343,16 +343,16 @@ return {
         [4] = { ["name"] = "冰之幽魂", ["health"] = 20000.0, ["war3_armor"] = 300.0, ["attack"] = 3000.0, ["attack_interval"] = 1.0, ["count"] = 13 },
         [5] = { ["name"] = "概率掉落熔火核心", ["health"] = 120000.0, ["war3_armor"] = 300.0, ["attack"] = 8000.0, ["attack_interval"] = 1.0, ["count"] = 10 },
         [6] = { ["name"] = "概率掉落精华", ["health"] = 9104960.0, ["war3_armor"] = 400.0, ["attack"] = 500000.0, ["attack_interval"] = 0.5, ["count"] = 11 },
-        [7] = { ["name"] = "信仰", ["health"] = 25104960.0, ["war3_armor"] = 550.0, ["attack"] = 1200000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [8] = { ["name"] = "安息", ["health"] = 30104960.0, ["war3_armor"] = 600.0, ["attack"] = 1400000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [9] = { ["name"] = "忍耐", ["health"] = 35104960.0, ["war3_armor"] = 650.0, ["attack"] = 2000000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [10] = { ["name"] = "无欲", ["health"] = 40104960.0, ["war3_armor"] = 700.0, ["attack"] = 2200000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [11] = { ["name"] = "戒杀", ["health"] = 45104960.0, ["war3_armor"] = 750.0, ["attack"] = 2400000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [12] = { ["name"] = "沉默", ["health"] = 50104960.0, ["war3_armor"] = 800.0, ["attack"] = 2600000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [13] = { ["name"] = "纯洁", ["health"] = 55104960.0, ["war3_armor"] = 1000.0, ["attack"] = 2800000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [14] = { ["name"] = "敬神", ["health"] = 60104960.0, ["war3_armor"] = 1200.0, ["attack"] = 4000000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [15] = { ["name"] = "真实", ["health"] = 19104960.0, ["war3_armor"] = 500.0, ["attack"] = 1000000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
-        [16] = { ["name"] = "慈爱", ["health"] = 70104960.0, ["war3_armor"] = 1400.0, ["attack"] = 5000000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [7] = { ["name"] = "真实", ["health"] = 19104960.0, ["war3_armor"] = 500.0, ["attack"] = 1000000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [8] = { ["name"] = "信仰", ["health"] = 25104960.0, ["war3_armor"] = 550.0, ["attack"] = 1200000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [9] = { ["name"] = "安息", ["health"] = 30104960.0, ["war3_armor"] = 600.0, ["attack"] = 1400000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [10] = { ["name"] = "忍耐", ["health"] = 35104960.0, ["war3_armor"] = 650.0, ["attack"] = 2000000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [11] = { ["name"] = "无欲", ["health"] = 40104960.0, ["war3_armor"] = 700.0, ["attack"] = 2200000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [12] = { ["name"] = "戒杀", ["health"] = 45104960.0, ["war3_armor"] = 750.0, ["attack"] = 2400000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [13] = { ["name"] = "沉默", ["health"] = 50100000.0, ["war3_armor"] = 800.0, ["attack"] = 2600000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [14] = { ["name"] = "纯洁", ["health"] = 55100000.0, ["war3_armor"] = 1000.0, ["attack"] = 2800000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [15] = { ["name"] = "敬神", ["health"] = 60100000.0, ["war3_armor"] = 1200.0, ["attack"] = 4000000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
+        [16] = { ["name"] = "慈爱", ["health"] = 70100000.0, ["war3_armor"] = 1400.0, ["attack"] = 5000000.0, ["attack_interval"] = 0.5, ["count"] = 1 },
     },
     ["save_challenges"] = {
         [1] = { ["name"] = "虚空之影1", ["boss"] = "虚空之影1", ["health"] = 9000010, ["war3_armor"] = 998.0, ["attack"] = 189002.0, ["attack_speed"] = 250, ["count"] = 1, ["scale"] = 1.8, ["evidence"] = "实机验证" },
