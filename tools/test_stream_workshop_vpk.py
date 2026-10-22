@@ -271,6 +271,96 @@ class StreamingVPKTests(unittest.TestCase):
         self.assertEqual({entry["path"] for entry in vpk.read_tree(tree)}, set(names))
         self.assertEqual(total, 0)
 
+    def build_split(self):
+        with patch.object(vpk, "MAX_INLINE_BYTES", 64 * 1024), \
+                patch.object(vpk, "ARCHIVE_BYTES", vpk.CHUNK + 256):
+            return self.build()
+
+    def test_split_roundtrip_signed_payloads_and_independent_reader(self):
+        result = self.build_split()
+        self.assertEqual(result["layout"], "external_archives")
+        path = Path(result["output"])
+        self.assertGreater(result["verification"]["archive_count"], 1)
+        inventory = vpk.package_inventory(path)
+        self.assertEqual(inventory, result["package_files"])
+        self.assertEqual(sum(row["bytes"] for row in inventory), result["container_bytes"])
+        self.assertLess(path.stat().st_size, 64 * 1024)
+        self.assertTrue(all(row["bytes"] <= vpk.CHUNK + 256 for row in inventory[1:]))
+        script = ("const crypto=require('crypto');const p=require(process.argv[1]).open(process.argv[2]);"
+                  "process.stdout.write(JSON.stringify(p.entries.map(e=>({path:e.path,"
+                  "bytes:p.read(e).length,sha256:crypto.createHash('sha256').update(p.read(e)).digest('hex')}))));")
+        rows = json.loads(subprocess.check_output([shutil.which("node"), "-e", script,
+            str(Path(__file__).with_name("vpk_inspect.cjs").resolve()), str(path)], text=True))
+        expected = [{key: row[key] for key in ("path", "bytes", "sha256")}
+                    for row in self.manifest["files"]]
+        self.assertEqual(sorted(rows, key=lambda row: row["path"]), expected)
+
+    def test_split_missing_changed_extra_bytes_and_oversized_volume_rejected(self):
+        result = self.build_split()
+        path = Path(result["output"])
+        volume = vpk.package_paths(path)[-1]
+        original = volume.read_bytes()
+        volume.unlink()
+        with self.assertRaises(FileNotFoundError):
+            vpk.verify_vpk(path, self.manifest)
+        volume.write_bytes(bytes([original[0] ^ 1]) + original[1:])
+        with self.assertRaisesRegex(ValueError, "CRC32"):
+            vpk.verify_vpk(path, self.manifest)
+        volume.write_bytes(original + b"extra")
+        with self.assertRaisesRegex(ValueError, "archive size mismatch"):
+            vpk.verify_vpk(path, self.manifest)
+        volume.write_bytes(original)
+        with patch.object(vpk, "ARCHIVE_BYTES", 16):
+            with self.assertRaisesRegex(ValueError, "native-safe size"):
+                vpk.verify_vpk(path, self.manifest)
+
+    def test_split_existing_volume_and_publication_race_preserve_other_files(self):
+        occupied = self.output / "123456789_000.vpk"
+        occupied.write_bytes(b"keep")
+        with self.assertRaisesRegex(ValueError, "existing VPK/archive"):
+            self.build_split()
+        self.assertEqual(occupied.read_bytes(), b"keep")
+        occupied.unlink()
+        real_link = vpk.os.link
+        def race(source, destination):
+            if destination.name == "123456789.vpk":
+                destination.write_bytes(b"other producer")
+            return real_link(source, destination)
+        with patch.object(vpk.os, "link", side_effect=race):
+            with self.assertRaises(FileExistsError):
+                self.build_split()
+        self.assertEqual(list(self.output.iterdir()), [self.output / "123456789.vpk"])
+        self.assertEqual((self.output / "123456789.vpk").read_bytes(), b"other producer")
+
+    def test_native_safe_boundary_and_resource_too_large_rejected_without_allocation(self):
+        entry = {"row": {"bytes": vpk.ARCHIVE_BYTES + 1}}
+        with self.assertRaisesRegex(ValueError, "One resource"):
+            vpk.archive_plan([entry])
+        with tempfile.TemporaryFile() as stream:
+            with self.assertRaisesRegex(ValueError, "native-safe size"):
+                vpk.write_vpk(self.candidate, stream, bytearray(b"\0"), [], vpk.MAX_INLINE_BYTES)
+            self.assertEqual(stream.tell(), 0)
+
+    def test_existing_signed_package_repair_preserves_bytes_and_requires_published_hash(self):
+        import repair_workshop_vpk as repair
+        source = Path(self.build()["output"])
+        expected = vpk.runtime.digest(source)
+        output = self.base / "repair-output"
+        output.mkdir()
+        with patch.object(repair, "pack", vpk):
+            dry = repair.repair(source, self.candidate, output, expected)
+            self.assertTrue(dry["dry_run"])
+            self.assertEqual(list(output.iterdir()), [])
+            with self.assertRaisesRegex(ValueError, "published VPK SHA256"):
+                repair.repair(source, self.candidate, output, "0" * 64, build=True)
+            with patch.object(vpk, "MAX_INLINE_BYTES", 64 * 1024), \
+                    patch.object(vpk, "ARCHIVE_BYTES", vpk.CHUNK + 256):
+                result = repair.repair(source, self.candidate, output, expected, build=True)
+                self.assertGreater(result["verification"]["archive_count"], 1)
+            self.assertEqual(vpk.runtime.digest(source), expected)
+            self.assertEqual(result["content_sha256"], self.manifest["content_sha256"])
+            self.assertTrue(vpk.verify_vpk(Path(result["output"]), self.manifest)["manifest_dual_hashes_verified"])
+
     def test_metadata_limits_fail_before_build_or_tree_overallocation(self):
         with patch.object(vpk, "MAX_MANIFEST", 16):
             with self.assertRaisesRegex(ValueError, "bounded read limit"):

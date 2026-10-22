@@ -216,8 +216,9 @@ def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report
     vpk = pack.handoff.regular_path(vpk)
     if pack.runtime.within(vpk, pack.handoff.INSTALL) or pack.runtime.within(vpk, candidate):
         raise ValueError('Upload folder must be outside Dota and the signed source')
-    if list(vpk.parent.iterdir()) != [vpk] or vpk.suffix != '.vpk':
-        raise ValueError('Content folder must contain exactly one verified VPK')
+    members = pack.package_paths(vpk)
+    if set(vpk.parent.iterdir()) != set(members) or vpk.suffix != '.vpk':
+        raise ValueError('Content folder must contain exactly the verified VPK and its numbered archives')
     manifest = load(candidate / pack.handoff.MANIFEST)
     pack.runtime.validate_manifest(manifest)
     document = load(candidate / pack.handoff.SIGNATURE)
@@ -241,6 +242,9 @@ def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report
             or report['vpk_sha256'] != pack.runtime.digest(vpk)):
         raise ValueError('Built VPK differs from reviewed local package report')
     verification = pack.verify_vpk(vpk, manifest)
+    inventory = pack.package_inventory(vpk)
+    if (len(inventory) > 1 or 'package_files' in report) and report.get('package_files') != inventory:
+        raise ValueError('VPK archives differ from reviewed local package report')
     if not pack.runtime.verify(candidate, manifest)['ok']:
         raise ValueError('Candidate changed after signed build')
     cover = pack.handoff.regular_path(listing_path.parent / listing['cover'])
@@ -248,10 +252,11 @@ def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report
         raise ValueError('Preview must match reviewed cover and remain under 1 MiB')
     return listing, cover, {'content_sha256': manifest['content_sha256'],
             'release_sequence': signature['release_sequence'], 'vpk_sha256': report['vpk_sha256'],
-            'vpk_bytes': vpk.stat().st_size, 'verification': verification}
+            'vpk_bytes': vpk.stat().st_size, 'verification': verification,
+            'package_files': inventory}
 
 
-def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False):
+def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False, update_existing=False):
     if pack.runtime.within(state_path.resolve(), vpk.parent.resolve()):
         raise ValueError('Recovery journal must stay outside the uploaded content directory')
     owned = steam.owned()
@@ -261,6 +266,8 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
         return {'status': 'VERIFIED_NO_PUBLICATION', 'facts': facts, 'state': state,
                 'native_test': 'NOT_RUN', 'ready_for_public_release': False}
     if state is None:
+        if update_existing or len(facts.get('package_files', [])) > 1:
+            raise ValueError('A confirmed existing item journal and ID-named package are required')
         if owned:
             raise ValueError('Existing owned items found; choose/recover the intended item before creating another')
         state = {'schema': 1, 'owner': OWNER, 'app_id': APP, **facts,
@@ -282,7 +289,13 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
         if len(matching) != 1 or matching[0]['owner'] != OWNER:
             raise ValueError('Journal ID is not uniquely present in the current owner list; recover it before updating')
         if state.get('uploaded') is True:
-            return state
+            if (state.get('vpk_sha256') == facts['vpk_sha256']
+                    and state.get('package_files') == facts.get('package_files')):
+                return state
+            if not update_existing:
+                raise ValueError('Existing item has different package bytes; explicitly use --update-existing')
+            state.update(**facts, uploaded=False, status='PRIVATE_ITEM_UPDATE_PREPARED')
+            journal(state_path, state)
         if state.get('status') == 'SUBMIT_REQUEST_PENDING':
             raise ValueError('Prior submit result is unknown; query/download the confirmed item before explicitly retrying')
     if state.get('legal_agreement_required'):
@@ -291,12 +304,22 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
     # Set the official package basename only after a genuine ID was persisted.
     target = vpk.with_name(str(item) + '.vpk')
     if target != vpk:
+        if len(facts.get('package_files', [])) > 1:
+            raise ValueError('Multipart package basename must already match the confirmed Workshop ID')
         if target.exists():
             raise ValueError('Refusing to replace an existing ID-named package')
         vpk.rename(target)
         vpk = target
     if pack.runtime.digest(vpk) != facts['vpk_sha256']:
         raise ValueError('Package changed before SubmitItemUpdate')
+    if facts.get('package_files'):
+        actual = pack.package_inventory(vpk)
+        expected = facts['package_files']
+        if len(expected) == 1:
+            expected = [{**expected[0], 'name': vpk.name}]
+        if actual != expected or set(vpk.parent.iterdir()) != set(pack.package_paths(vpk)):
+            raise ValueError('Package archives changed before SubmitItemUpdate')
+        state['package_files'] = actual
     handle = steam.ug('StartItemUpdate', C.c_uint64, [C.c_uint32, C.c_uint64], APP, item)
     if handle in (0, INVALID):
         raise RuntimeError('Steam update handle is invalid')
@@ -342,6 +365,8 @@ def main():
     parser.add_argument('--build-report', type=Path)
     parser.add_argument('--state-file', type=Path, default=ROOT / 'output/four_accounts_20261022/steam_upload_state.json')
     parser.add_argument('--apply', action='store_true', help='Authorized external action: create/update ONE PRIVATE test item')
+    parser.add_argument('--update-existing', action='store_true',
+                        help='Explicitly replace package bytes for the confirmed existing private item')
     args = parser.parse_args()
     try:
         if args.inspect:
@@ -358,7 +383,8 @@ def main():
             raise ValueError('Recovery journal must remain outside upload content')
         with publication_lock(args.state_file) if args.apply else nullcontext():
             with Steam() as steam:
-                emit(publish(steam, listing, cover, args.vpk, facts, args.state_file, apply=args.apply))
+                emit(publish(steam, listing, cover, args.vpk, facts, args.state_file,
+                             apply=args.apply, update_existing=args.update_existing))
         return 0
     except Exception as error:
         emit({'status': 'BLOCKED_PRESERVE_RECOVERY_JOURNAL', 'error': type(error).__name__ + ': ' + str(error),

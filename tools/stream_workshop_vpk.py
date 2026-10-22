@@ -1,16 +1,18 @@
-"""Stream an authenticated runtime candidate into one standard Valve VPK v2.
+"""Stream an authenticated runtime candidate into native-safe Valve VPK v2 files.
 
-Default is read-only. --build creates <workshop-id>.vpk in an existing external
+Default is read-only. --build creates <workshop-id>.vpk and, for large payloads,
+numbered 1 GiB archives in an existing external
 directory, never in Dota or the candidate. No upload, compression, payload
 changes, private keys, or Valve binary modifications are performed. The VPK
 container has no RSA signature; authenticity comes from the pinned Ed25519
-release manifest verified BEFORE packaging. Native Dota >2 GiB compatibility
-is a separate, unperformed test, not a consequence of this format check.
+release manifest verified BEFORE packaging. Native map loading remains a
+separate test, not a consequence of this format check.
 """
 from __future__ import annotations
 
 import argparse
 import base64
+from contextlib import ExitStack
 import hashlib
 import json
 import os
@@ -29,6 +31,8 @@ protect_data = handoff.protect_data
 MAGIC = 0x55AA1234
 INLINE = 0x7FFF
 U32_MAX = 0xFFFFFFFF
+MAX_INLINE_BYTES = 0x7FFFFFFF
+ARCHIVE_BYTES = 1024 * 1024 * 1024
 CHUNK = 1024 * 1024
 MAX_TREE = 16 * 1024 * 1024
 MAX_MANIFEST = 16 * 1024 * 1024
@@ -186,6 +190,8 @@ def copy_payload(source: Path, stream, row: dict) -> int:
 
 
 def write_vpk(candidate: Path, stream, tree: bytearray, ordered: list[dict], total: int) -> None:
+    if HEADER.size + len(tree) + total + 48 > MAX_INLINE_BYTES:
+        raise ValueError("Inline VPK exceeds native-safe size; use external archives")
     # Inline data, no preload, no archive-MD5 table, complete other-MD5 section.
     # Official overthrow map VPKs use this same 0/48/0 section arrangement.
     stream.write(HEADER.pack(MAGIC, 2, len(tree), total, 0, 48, 0))
@@ -231,23 +237,25 @@ def read_tree(raw: bytes) -> list[dict]:
                     raise ValueError("Truncated VPK directory entry")
                 crc, preload, archive, offset, length, terminator = ENTRY.unpack_from(raw, position)
                 position += ENTRY.size
-                if preload != 0 or archive != INLINE or terminator != 0xFFFF:
-                    raise ValueError("Expected inline, zero-preload VPK entry with valid terminator")
+                if preload != 0 or archive > INLINE or terminator != 0xFFFF:
+                    raise ValueError("Expected zero-preload VPK entry with valid archive/terminator")
                 path = ("" if folder == " " else folder + "/") + base
                 path += "" if extension == " " else "." + extension
                 if not runtime.safe_relative(path) or path.casefold() in seen:
                     raise ValueError("Unsafe/duplicate VPK entry path")
                 seen.add(path.casefold())
-                entries.append({"path": path, "offset": offset, "bytes": length, "crc32": crc})
+                entries.append({"path": path, "offset": offset, "bytes": length,
+                                "crc32": crc, "archive": archive})
     if position != len(raw):
         raise ValueError("Unexpected trailing VPK tree bytes")
     return entries
 
 
-def verify_vpk(path: Path, manifest: dict) -> dict:
+def verify_vpk(path: Path, manifest: dict, *, allow_legacy_inline=False) -> dict:
     """Independently parse the written VPK, then stream every entry and digest."""
     expected = {row["path"]: row for row in manifest["files"]}
-    with path.open("rb") as stream:
+    with ExitStack() as opened:
+        stream = opened.enter_context(path.open("rb"))
         header = stream.read(HEADER.size)
         if len(header) != HEADER.size:
             raise ValueError("Truncated VPK header")
@@ -257,7 +265,9 @@ def verify_vpk(path: Path, manifest: dict) -> dict:
             raise ValueError("Unexpected VPK v2 header/section layout")
         data_start = HEADER.size + tree_size
         data_end = data_start + data_size
-        if os.fstat(stream.fileno()).st_size != data_end + 48 or data_size != manifest["bytes"]:
+        if data_end + 48 > MAX_INLINE_BYTES and not allow_legacy_inline:
+            raise ValueError("Inline VPK exceeds native-safe size; rebuild with external archives")
+        if os.fstat(stream.fileno()).st_size != data_end + 48:
             raise ValueError("VPK section/file size mismatch")
         raw = stream.read(tree_size)
         if len(raw) != tree_size:
@@ -265,19 +275,36 @@ def verify_vpk(path: Path, manifest: dict) -> dict:
         entries = read_tree(raw)
         if len(entries) != len(expected) or {entry["path"] for entry in entries} != set(expected):
             raise ValueError("VPK inventory differs from authenticated manifest")
-        offset = 0
+        offsets, archives = {}, {}
         for entry in entries:
             row = expected[entry["path"]]
+            archive = entry["archive"]
+            offset = offsets.get(archive, 0)
             if entry["offset"] != offset or entry["bytes"] != row["bytes"]:
                 raise ValueError("VPK entry size/offset/overlap mismatch")
             offset += entry["bytes"]
-            if offset > data_size:
-                raise ValueError("VPK entry outside inline data section")
-            stream.seek(data_start + entry["offset"])
+            offsets[archive] = offset
+            if archive == INLINE:
+                if offset > data_size:
+                    raise ValueError("VPK entry outside inline data section")
+                payload, base = stream, data_start
+            else:
+                if data_size or INLINE in offsets:
+                    raise ValueError("Mixed inline/external VPK layout")
+                if archive not in archives:
+                    archive_path = path.with_name(f"{path.stem}_{archive:03}.vpk")
+                    if archive_path.is_symlink():
+                        raise ValueError("VPK archive must be a regular file")
+                    payload = opened.enter_context(archive_path.open("rb"))
+                    if os.fstat(payload.fileno()).st_size > ARCHIVE_BYTES:
+                        raise ValueError("VPK archive exceeds native-safe size")
+                    archives[archive] = payload
+                payload, base = archives[archive], 0
+            payload.seek(base + entry["offset"])
             left, crc = entry["bytes"], 0
             hashes = {"md5": md5(), "sha256": hashlib.sha256()}
             while left:
-                block = stream.read(min(CHUNK, left))
+                block = payload.read(min(CHUNK, left))
                 if not block:
                     raise ValueError("Truncated VPK file data")
                 crc = zlib.crc32(block, crc)
@@ -288,8 +315,15 @@ def verify_vpk(path: Path, manifest: dict) -> dict:
                 raise ValueError("VPK entry CRC32 mismatch: " + entry["path"])
             if any(digest.hexdigest() != row[name] for name, digest in hashes.items()):
                 raise ValueError("VPK entry authenticated hash mismatch: " + entry["path"])
-        if offset != data_size:
+        if offsets.get(INLINE, 0) != data_size:
             raise ValueError("Unused VPK file-data bytes")
+        if sum(offsets.values()) != manifest["bytes"]:
+            raise ValueError("VPK total payload size mismatch")
+        if sorted(archives) != list(range(len(archives))):
+            raise ValueError("Noncontiguous VPK archives")
+        for index, payload in archives.items():
+            if os.fstat(payload.fileno()).st_size != offsets[index]:
+                raise ValueError("VPK archive size mismatch/unused bytes")
         stream.seek(data_end)
         tree_hash, archive_hash, whole_hash = (stream.read(16) for _ in range(3))
         if tree_hash != hashlib.md5(raw, usedforsecurity=False).digest() or archive_hash != md5().digest():
@@ -299,9 +333,103 @@ def verify_vpk(path: Path, manifest: dict) -> dict:
         hash_range(stream, data_end + 32, whole)
         if whole.digest() != whole_hash:
             raise ValueError("VPK whole-file MD5 mismatch")
-    return {"vpk_version": 2, "files": len(entries), "payload_bytes": data_size,
+    return {"vpk_version": 2, "files": len(entries), "payload_bytes": manifest["bytes"],
+            "archive_count": len(archives),
             "crc32_verified": True, "manifest_dual_hashes_verified": True,
             "section_md5s_verified": True, "whole_vpk_md5_verified": True}
+
+
+def package_paths(path: Path) -> list[Path]:
+    """Only derive sibling archives from a bounded, parsed directory tree."""
+    with path.open("rb") as stream:
+        header = stream.read(HEADER.size)
+        if len(header) != HEADER.size:
+            raise ValueError("Truncated VPK header")
+        magic, version, tree_size, *_ = HEADER.unpack(header)
+        if magic != MAGIC or version != 2 or not 1 <= tree_size <= MAX_TREE:
+            raise ValueError("Unexpected VPK header")
+        entries = read_tree(stream.read(tree_size))
+    indices = sorted({row["archive"] for row in entries} - {INLINE})
+    if indices != list(range(len(indices))):
+        raise ValueError("Noncontiguous VPK archives")
+    return [path] + [path.with_name(f"{path.stem}_{index:03}.vpk") for index in indices]
+
+
+def package_inventory(path: Path) -> list[dict]:
+    rows = []
+    for item in package_paths(path):
+        if item.is_symlink() or not item.is_file():
+            raise ValueError("VPK package member must be a regular file")
+        rows.append({"name": item.name, "bytes": item.stat().st_size,
+                     "sha256": runtime.digest(item)})
+    return rows
+
+
+def archive_plan(ordered: list[dict], limit: int = ARCHIVE_BYTES) -> list[list[dict]]:
+    archives = []
+    used = limit
+    for entry in ordered:
+        size = entry["row"]["bytes"]
+        if size > limit:
+            raise ValueError("One resource exceeds the native-safe archive size")
+        if not archives or used + size > limit:
+            archives.append([])
+            used = 0
+        archives[-1].append(entry)
+        used += size
+    return archives
+
+
+def build_archives(candidate, output_dir, workshop_id, tree, ordered, manifest, snapshots, result):
+    """Publish data volumes first and the mountable directory last, without clobbering."""
+    plan = archive_plan(ordered, ARCHIVE_BYTES)
+    targets = [output_dir / f"{workshop_id}_{i:03}.vpk" for i in range(len(plan))]
+    target = output_dir / f"{workshop_id}.vpk"
+    if any(item.exists() or item.is_symlink() for item in [target, *targets]):
+        raise ValueError("Refusing to replace an existing VPK/archive")
+    published = []
+    with tempfile.TemporaryDirectory(prefix=".vpk-volumes-", dir=output_dir) as temporary:
+        staging = Path(temporary)
+        staged = []
+        for index, group in enumerate(plan):
+            item = staging / targets[index].name
+            offset = 0
+            with item.open("xb") as stream:
+                for entry in group:
+                    crc = copy_payload(protect_data.source_path(candidate, entry["row"]["path"]),
+                                       stream, entry["row"])
+                    struct.pack_into("<IHHIIH", tree, entry["crc_position"], crc, 0, index,
+                                     offset, entry["row"]["bytes"], 0xFFFF)
+                    offset += entry["row"]["bytes"]
+                stream.flush()
+                os.fsync(stream.fileno())
+            staged.append(item)
+        directory = staging / target.name
+        prefix = (HEADER.pack(MAGIC, 2, len(tree), 0, 0, 48, 0) + tree
+                  + hashlib.md5(tree, usedforsecurity=False).digest() + md5().digest())
+        with directory.open("xb") as stream:
+            stream.write(prefix + hashlib.md5(prefix, usedforsecurity=False).digest())
+            stream.flush()
+            os.fsync(stream.fileno())
+        verification = verify_vpk(directory, manifest)
+        inventory = package_inventory(directory)
+        inventory_unchanged(candidate, snapshots)
+        if not runtime.verify(candidate, manifest)["ok"]:
+            raise ValueError("Source inventory changed while packaging")
+        inventory_unchanged(candidate, snapshots)
+        try:
+            for source, destination in zip([*staged, directory], [*targets, target]):
+                os.link(source, destination)
+                published.append(destination)
+        except BaseException:
+            # Only remove names we atomically created; never touch a competing writer's file.
+            for item in reversed(published):
+                item.unlink()
+            raise
+    result.update(status="BUILT_AND_VERIFIED_FOR_NATIVE_TEST_ONLY", dry_run=False,
+                  verification=verification, package_files=inventory,
+                  vpk_sha256=inventory[0]["sha256"])
+    return result
 
 
 def package(candidate: Path, output_dir: Path, workshop_id: str, *, build=False) -> dict:
@@ -320,17 +448,26 @@ def package(candidate: Path, output_dir: Path, workshop_id: str, *, build=False)
     if target.exists() or target.is_symlink():
         raise ValueError("Refusing to replace an existing VPK")
     tree, ordered, total = make_tree(manifest["files"])
+    container_bytes = HEADER.size + len(tree) + total + 48
+    multipart = container_bytes > MAX_INLINE_BYTES
+    if multipart:
+        archive_plan(ordered, ARCHIVE_BYTES)
     result = {"schema": 1, "status": "VERIFIED_DRY_RUN", "dry_run": not build,
               "output": str(target), "content_sha256": manifest["content_sha256"],
               "release_sequence": signature["release_sequence"], "files": len(ordered),
               "trusted_key_id": signature["key_id"],
-              "payload_bytes": total, "container_bytes": HEADER.size + len(tree) + total + 48,
+              "payload_bytes": total, "container_bytes": container_bytes,
+              "layout": "external_archives" if multipart else "inline",
+              "max_archive_bytes": ARCHIVE_BYTES,
               "signature_valid": True, "full_input_hash_verification": True,
               "payload_changed": False, "workshop_upload_performed": False,
               "native_dota_read_test": "NOT_RUN", "native_over_2gib_read_test": "NOT_RUN",
               "ready_for_upload": False}
     if not build:
         return result
+    if multipart:
+        return build_archives(candidate, output_dir, workshop_id, tree, ordered,
+                              manifest, snapshots, result)
     handle, temporary_name = tempfile.mkstemp(prefix=".vpk-stream-", suffix=".part", dir=output_dir)
     temporary = Path(temporary_name)
     published = False

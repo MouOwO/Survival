@@ -66,8 +66,8 @@ def verify_installed(result, candidate, state):
     folder = api.pack.handoff.regular_path(Path(result['install_folder']))
     files = list(folder.iterdir())
     target = folder / (state['workshop_id'] + '.vpk')
-    if files != [target]:
-        raise ValueError('Downloaded folder differs from the single submitted ID-named VPK')
+    if set(files) != set(api.pack.package_paths(target)):
+        raise ValueError('Downloaded folder differs from the submitted VPK and numbered archives')
     manifest = api.load(candidate / api.pack.handoff.MANIFEST)
     document = api.load(candidate / api.pack.handoff.SIGNATURE)
     policy, public_path = api.pack.handoff.trusted_policy()
@@ -78,9 +78,12 @@ def verify_installed(result, candidate, state):
     sha = api.pack.runtime.digest(target)
     if sha != state['vpk_sha256'] or target.stat().st_size != state['vpk_bytes']:
         raise ValueError('Downloaded VPK differs from submitted bytes')
+    inventory = api.pack.package_inventory(target)
+    if (len(inventory) > 1 or 'package_files' in state) and state.get('package_files') != inventory:
+        raise ValueError('Downloaded archives differ from submitted bytes')
     result.update(status='PRIVATE_WORKSHOP_DOWNLOAD_FULLY_VERIFIED', vpk=str(target),
                   vpk_sha256=sha, verification=api.pack.verify_vpk(target, manifest),
-                  signature_valid=True, ready_for_public_release=False)
+                  signature_valid=True, package_files=inventory, ready_for_public_release=False)
     return result
 
 

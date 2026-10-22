@@ -1,5 +1,6 @@
 """Offline SDK ABI and publication/recovery guard tests; no Steam is loaded."""
 import ctypes as C
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -128,6 +129,57 @@ class UploadGuards(unittest.TestCase):
                     **self.facts, 'workshop_id': '9876543210', 'status': 'SUBMIT_REQUEST_PENDING'})
         steam = FakeSteam([{'id': '9876543210', 'owner': api.OWNER}])
         with self.assertRaisesRegex(ValueError, 'Prior submit result is unknown'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+
+    def test_changed_uploaded_package_requires_explicit_update_and_reuses_confirmed_id(self):
+        initial = {'owner': api.OWNER, 'app_id': api.APP, **self.facts,
+                   'vpk_sha256': 'old', 'workshop_id': '9876543210',
+                   'status': 'SUBMITTED_PRIVATE_PENDING_DOWNLOAD_AND_NATIVE_TEST', 'uploaded': True}
+        api.journal(self.state, initial)
+        steam = FakeSteam([{'id': '9876543210', 'owner': api.OWNER}])
+        with self.assertRaisesRegex(ValueError, 'update-existing'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+        with patch.object(api, 'emit'), self.assertRaisesRegex(RuntimeError, 'Stop before update'):
+            api.publish(steam, {}, self.root / 'cover.jpg', self.vpk,
+                        self.facts, self.state, apply=True, update_existing=True)
+        state = json.loads(self.state.read_text(encoding='utf8'))
+        self.assertEqual(state['workshop_id'], '9876543210')
+        self.assertEqual(state['vpk_sha256'], self.facts['vpk_sha256'])
+        self.assertFalse(state['uploaded'])
+        self.assertEqual([name for name, _ in steam.calls], ['StartItemUpdate'])
+
+    def test_multipart_cannot_create_unknown_item(self):
+        self.facts['package_files'] = [{'name': '1.vpk'}, {'name': '1_000.vpk'}]
+        steam = FakeSteam()
+        with self.assertRaisesRegex(ValueError, 'confirmed existing'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+
+    def test_multipart_archive_tamper_and_extra_file_stop_before_sdk_update(self):
+        tree, ordered, _ = api.pack.make_tree([{'path': 'sample.txt', 'bytes': 4}])
+        import struct
+        import zlib
+        struct.pack_into('<IHHIIH', tree, ordered[0]['crc_position'], zlib.crc32(b'data'),
+                         0, 0, 0, 4, 0xFFFF)
+        prefix = (api.pack.HEADER.pack(api.pack.MAGIC, 2, len(tree), 0, 0, 48, 0) + tree
+                  + hashlib.md5(tree).digest() + hashlib.md5(b'').digest())
+        self.vpk.write_bytes(prefix + hashlib.md5(prefix).digest())
+        volume = self.folder / '1_000.vpk'
+        volume.write_bytes(b'data')
+        self.facts.update(vpk_sha256=api.pack.runtime.digest(self.vpk),
+                          package_files=api.pack.package_inventory(self.vpk))
+        api.journal(self.state, {'owner': api.OWNER, 'app_id': api.APP, **self.facts,
+                                'workshop_id': '1', 'status': 'PRIVATE_ITEM_UPDATE_PREPARED'})
+        steam = FakeSteam([{'id': '1', 'owner': api.OWNER}])
+        volume.write_bytes(b'edit')
+        with self.assertRaisesRegex(ValueError, 'archives changed'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+        volume.write_bytes(b'data')
+        (self.folder / 'extra.txt').write_text('unreviewed')
+        with self.assertRaisesRegex(ValueError, 'archives changed'):
             self.invoke(steam)
         self.assertFalse(steam.calls)
 
