@@ -1,6 +1,7 @@
 -- The release builder checks this trusted, server-side profile.
--- Development builds must explicitly select "development" before launching
--- Workshop Tools. Neither sv_cheats nor a client message can change it.
+-- Local testing is explicitly enabled at the owner's request on 2026-10-22.
+-- Developer commands still require a server running in Workshop Tools.
+-- The public release builder rejects this profile until it is production.
 return {
-    channel = "production",
+    channel = "development",
 }

@@ -38,6 +38,7 @@ local WUDI_ATTACK = 1111111111
 local WUDI_ATTACKS_PER_SECOND = 5
 local WUDI_SETUP_RETRY_COUNT = 40
 local selected_entindex_by_player = {}
+local initialized = false
 
 local HERO_ALIASES = {
     axe = "hero_axe",
@@ -1352,14 +1353,16 @@ local function on_player_chat(keys)
 end
 
 function M.init()
-    selected_entindex_by_player = {}
     if not release_policy.development_allowed() then return end
+    if initialized then return end
+    selected_entindex_by_player = {}
     attack_speed_cheat.init()
     ListenToGameEvent("player_chat", on_player_chat, nil)
     CustomGameEventManager:RegisterListener(
         "survival_scale_selection_changed",
         on_scale_selection_changed
     )
+    initialized = true
     logger.info(
         "CheatCommand",
         "ready: 0 (unlock test modes), wudi, xinyang <amount>, choujiang <amount>, addhero/addhero1 (monkey king), addhero2 (blademaster), deletehero, addskill, unlock e, blood, armortest, research_test, addtechnology, monster, rogue, fish, order <field_id> <delta>, order reset, ordertest <field_id> <absolute_value>, orderreset, items, hero, skill, weapon growth"

@@ -162,7 +162,7 @@ try {
         # This is the interactive gameplay launcher, so the game window is visible.
         Start-Process -FilePath $executable -WorkingDirectory (Join-Path $engineGame 'dota') -WindowStyle Normal -ArgumentList @(
             '-tools', '-noassetbrowser', '-addon', 'survival', '-dev', '-condebug', '-novid',
-            '+host_timescale', '1', '+r_drawpanorama', '1',
+            '+sv_cheats', '1', '+host_timescale', '1', '+r_drawpanorama', '1',
             '+dota_launch_custom_game', 'survival', 'template_map'
         )
     } else {

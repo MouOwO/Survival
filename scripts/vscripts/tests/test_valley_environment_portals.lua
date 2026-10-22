@@ -10,7 +10,7 @@ local function vector(x, y, z)
 end
 local function near(a, b) assert(math.abs(a - b) < 1e-8, tostring(a) .. " ~= " .. tostring(b)) end
 Vector = vector
-PATTACH_ABSORIGIN_FOLLOW, PATTACH_POINT_FOLLOW = 1, 2
+PATTACH_ABSORIGIN_FOLLOW, PATTACH_POINT_FOLLOW, PATTACH_WORLDORIGIN = 1, 2, 3
 local world, map, mode = {}, "template_map", nil
 GameRules = { GetGameModeEntity = function() return world end }
 GetMapName = function() return map end
@@ -70,7 +70,8 @@ ParticleManager = {
     CreateParticle = function(_, path, attach, owner)
         if fail_create then error("injected create failure") end
         assert(path == "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient.vpcf")
-        assert(attach == PATTACH_ABSORIGIN_FOLLOW and owner)
+        assert(attach == PATTACH_WORLDORIGIN and owner == nil,
+            "static spawn effects must not inherit a dormant prop's visibility or attachment")
         local id = #particles + 1
         particles[id] = { owner = owner, cp = {}, bindings = {}, orientation = {}, world = world }
         return id
@@ -78,9 +79,8 @@ ParticleManager = {
     SetParticleControl = function(_, id, cp, value) particles[id].cp[cp] = value end,
     SetParticleAlwaysSimulate = function(_, id) particles[id].always_simulate = true end,
     SetParticleShouldCheckFoW = function(_, id, check) particles[id].check_fow = check end,
-    SetParticleControlEnt = function(_, id, cp, owner, attach, name, fallback)
-        assert(particles[id].owner == owner)
-        particles[id].bindings[cp] = { attach = attach, name = name, fallback = fallback }
+    SetParticleControlEnt = function()
+        error("spawn landmarks must not depend on a prop attachment being evaluated")
     end,
     SetParticleControlOrientation = function(_, id, cp, forward, right, up)
         near(forward.x * right.x + forward.y * right.y + forward.z * right.z, 0)
@@ -110,8 +110,7 @@ local function check_last_four(name)
             "static spawn landmarks must remain visible after off-screen sleep or unit-vision culling")
         assert(prop.yaw == direction[3] and prop.pitch == (flat and -90 or 0))
         assert(prop.kv.angles == string.format("%d %d 0", prop.pitch, prop.yaw))
-        local attachment = particle.bindings[1]
-        assert(attachment.name == "attach_portal" and attachment.attach == PATTACH_POINT_FOLLOW)
+        local attachment = assert(particle.cp[1])
         -- Compute the real model attachment's transformed local Z, rather
         -- than accepting a centered fallback while the actual model is offset.
         local model_up = flat and vector(-direction[1], -direction[2], 0) or vector(0, 0, 1)
@@ -119,8 +118,14 @@ local function check_last_four(name)
             prop.position.y + model_up.y * 97.362, prop.position.z + model_up.z * 97.362)
         near(actual.x, marker.x); near(actual.y, marker.y)
         near(actual.z, GetGroundHeight(marker) + 12 + (flat and 0 or 97.362))
-        near(attachment.fallback.x, actual.x); near(attachment.fallback.y, actual.y)
-        near(attachment.fallback.z, actual.z)
+        near(attachment.x, actual.x); near(attachment.y, actual.y)
+        near(attachment.z, actual.z)
+        near(particle.orientation[1].forward.x, axes.forward.x)
+        near(particle.orientation[1].forward.y, axes.forward.y)
+        near(particle.orientation[1].forward.z, axes.forward.z)
+        near(particle.orientation[1].up.x, model_up.x)
+        near(particle.orientation[1].up.y, model_up.y)
+        near(particle.orientation[1].up.z, model_up.z)
         near(axes.forward.z, flat and 1 or 0)
         if not flat then near(axes.forward.x, direction[1]); near(axes.forward.y, direction[2]) end
         for _, cp in ipairs({0, 2}) do
@@ -189,4 +194,4 @@ map = "other_map"
 assert(service.apply() == 0)
 mode, map = nil, "valley_decor_review"
 assert(service.apply() == 4); check_last_four("standard"); service.clear()
-print("VALLEY_UNDERLORD_PORTALS_PASS upright standard; 12 upward centered advanced portals; selection; no collision; cleanup; hot reload; worlds")
+print("VALLEY_UNDERLORD_PORTALS_PASS world-anchored effects without prop attachments; upright standard; 12 upward centered advanced portals; selection; no collision; cleanup; hot reload; worlds")

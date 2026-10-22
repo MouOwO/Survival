@@ -1,0 +1,64 @@
+{
+  "status": "PASS_CODE_AND_REGRESSION_TESTS",
+  "construction": {
+    "confirmed_defect": "A delayed engine MOVE with the owner as issuer could be mistaken for a new player order, clearing the build task.",
+    "fix": "Task-bound, one-shot exact destination signature with 0.5-second expiry; player Stop/Attack/different moves and subsequent same-point moves retain cancellation behaviour.",
+    "ownership_and_startup_gates_preserved": true,
+    "construction_costs_and_reservations_preserved": true,
+    "baseline_negative_control": "FAIL as expected: deferred internal move must preserve originating build task",
+    "real_match_sole_cause_verified": false
+  },
+  "portals": {
+    "fix": "Static landmarks use world-origin particles with explicit CP0/1/2 transforms; no prop attachment dependency.",
+    "official_resource_closure": 29,
+    "missing_resources": 0,
+    "model_and_gameplay_positions_preserved": true,
+    "lifecycle_and_four_mode_transform_tests": "PASS",
+    "baseline_negative_control": "FAIL as expected",
+    "prop_dormancy_is_inference": true,
+    "native_visual_verified": false
+  },
+  "cheats": {
+    "trusted_local_profile": "development",
+    "requires_server_and_workshop_tools": true,
+    "tools_launch_sv_cheats": 1,
+    "chat_registration_idempotent": true,
+    "four_account_access_unchanged": true,
+    "production_release_builder_still_rejects_development": true
+  },
+  "checks": {
+    "build_order_lifecycle": "PASS",
+    "construction_end_to_end_fixture": "PASS",
+    "repair_order_lifecycle": "PASS",
+    "startup_order_gate": "PASS",
+    "builder_work_position": "PASS",
+    "portal_lifecycle": "PASS",
+    "cheat_chat_idempotency": "PASS",
+    "launcher_isolation_tests": 22,
+    "production_gate_combinations": 250,
+    "production_entrypoints": 89,
+    "test_admission_checks": 107
+  },
+  "live_validation": {
+    "current_match_exited": "2026-10-22 11:13:15 Asia/Shanghai",
+    "local_console_attempt": "Guarded probes did not run in a confirmed survival match; console disconnected. No new match was launched and no real inventory/account writes were performed.",
+    "next_tools_match_loads_changes": true,
+    "native_screenshot_verified": false
+  },
+  "task_sha256": {
+    "scripts/vscripts/systems/building_system.lua": "90b2f95b123f55f20401e1d9716a751a2148c5725c5cd67380ef14cf6f85fb06",
+    "scripts/vscripts/systems/repair_order_service.lua": "c300ca15af33b4f70e606e0ec48d22d782bea9cb06eae856c35e35157566ef59",
+    "scripts/vscripts/tests/test_builder_yield_construction.lua": "9fe34b65d181ea958360a1259e52d8c28ee976d09025acd97cb11ffe2985690e",
+    "scripts/vscripts/tests/test_build_internal_order_lifecycle.lua": "204211158405dc61ab156af562048aece4f8cbfa26119f0e36a5723a60cccc5b",
+    "scripts/vscripts/config/release_profile.lua": "573c8a6731e67c9b51a3839cd6a60b66695dfe11f3a7bf08d7f5cf729895881e",
+    "scripts/vscripts/debug/cheat_command_service.lua": "e1a131a755685cd6ca07cec7cf6893211388f97c7f3599046852aeb290719627",
+    "tools/launch_aliyun_test_game.ps1": "98c805eca9bb4f31173a0acde81c1a9549d13b08db570ff29317cee6350277b7",
+    "scripts/vscripts/tests/test_cheat_init_idempotent.lua": "464311d8d8a3cd3dac3771baf352c3b32c1846a6ad4fb0b360f99b3cda78b6ae",
+    "scripts/vscripts/systems/valley_environment_service.lua": "99353e1cf84a07c024106cedbb5aaa4de2a1549ede3fd8773244b2041852aba7",
+    "scripts/vscripts/tests/test_valley_environment_portals.lua": "433f129c5336ff5519e64e02a8d04db25e383b915c11984bf99be3c0a7abf173"
+  },
+  "line_ending_reviews": [],
+  "content_source_or_native_resources_changed": false,
+  "external_server_deployment_actions": 0,
+  "credentials_included": false
+}

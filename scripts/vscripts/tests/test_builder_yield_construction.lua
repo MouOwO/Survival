@@ -1,5 +1,8 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
 require("tests/development_release_profile")
+-- This isolated construction fixture owns its builder authentication and has
+-- no Steam/DisconnectClient engine APIs. Keep the live admission config intact.
+package.loaded["config/test_access"] = {enabled = false}
 package.path = "scripts/vscripts/?.lua;" .. package.path
 local bus, events = require("core/event_bus"), require("core/events")
 local noop = function() end
@@ -124,6 +127,9 @@ local function reset()
     ExecuteOrderFromTable=function(order)
         assert(order.UnitIndex==1 and order.OrderType==DOTA_UNIT_ORDER_MOVE_TO_POSITION)
         assert(caster.survival_build_internal_order==true,"automated move must not cancel its own task")
+        local signature = caster.survival_build_task.internal_move_order
+        assert(signature and signature.x == order.Position.x and signature.y == order.Position.y,
+            "queue binds its actual internal move before the engine can defer filtering")
         if failed_move then error("injected builder movement failure") end
         move=order.Position
     end

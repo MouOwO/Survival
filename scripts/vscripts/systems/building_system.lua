@@ -30,6 +30,7 @@ local building_count_limits = require("systems/building_count_limit_service")
 local building_defeat_rules = require("systems/building_defeat_rules")
 local online_time_service = require("systems/online_time_service")
 local builder_work = require("systems/builder_work_position_service")
+local repair_orders = require("systems/repair_order_service")
 local grid_config = require("config/grid_placement_config")
 local building_cost_quote = require("systems/building_cost_quote")
 local M = {}
@@ -1065,6 +1066,7 @@ local function queue_building(payload)
             (caster:GetAbsOrigin() - work_position):Length2D() / 100 + 5),
     }
     caster.survival_build_task = task
+    repair_orders.expect_build_move(caster, task, work_position)
     caster.survival_build_internal_order = true
     local order_ok, order_error = pcall(ExecuteOrderFromTable, {
         UnitIndex = caster:entindex(),

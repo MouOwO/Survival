@@ -76,20 +76,20 @@ local function create_portal(marker, lane, flat)
     prop:SetAbsOrigin(position)
     prop:SetAngles(pitch, yaw, 0)
     DoEntFireByInstanceHandle(prop, "SetAnimation", "au_portal_chanelling", 0, prop, prop)
-    local id = ParticleManager:CreateParticle(effect, PATTACH_ABSORIGIN_FOLLOW, prop)
+    -- These map landmarks never move. Keeping the effect independent of the
+    -- prop also keeps its emitters positioned when the client puts the prop
+    -- to sleep and stops evaluating attach_portal outside the camera/vision.
+    local id = ParticleManager:CreateParticle(effect, PATTACH_WORLDORIGIN, nil)
     assert(type(id) == "number" and id >= 0, "Underlord portal particle creation failed")
     runtime.particles[#runtime.particles + 1] = id
     -- These static map landmarks must keep their child emitters awake even
     -- when the prop has no unit vision or the camera has visited another lane.
     ParticleManager:SetParticleAlwaysSimulate(id)
     ParticleManager:SetParticleShouldCheckFoW(id, false)
-    ParticleManager:SetParticleControlEnt(id, 0, prop,
-        PATTACH_ABSORIGIN_FOLLOW, "", position, true)
-    -- Both modes retain the real attachment, including its model rotation.
-    ParticleManager:SetParticleControlEnt(id, 1, prop,
-        PATTACH_POINT_FOLLOW, "attach_portal", attachment, true)
-    for _, cp in ipairs({0, 2}) do
-        ParticleManager:SetParticleControl(id, cp, position)
+    -- CP1 is the same authored attachment transform, supplied explicitly:
+    -- a successful particle handle alone does not keep a prop's bones awake.
+    for _, cp in ipairs({0, 1, 2}) do
+        ParticleManager:SetParticleControl(id, cp, cp == 1 and attachment or position)
         ParticleManager:SetParticleControlOrientation(id, cp, forward, right, up)
     end
     -- CP4 is native size/channel state, not a position; CP61 selects the

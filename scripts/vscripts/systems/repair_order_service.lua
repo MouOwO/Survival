@@ -1,6 +1,7 @@
 local M = {}
 
 local REPAIR_MODIFIER = "modifier_repair_worker_ai"
+local BUILD_MOVE_SIGNATURE_LIFETIME = 0.5
 local repair_policy = require("systems/repair_target_policy")
 
 local function valid_entity(entity)
@@ -44,6 +45,39 @@ local function cancel_pending_build(unit)
     return false
 end
 
+-- Engine orders may be delivered after ExecuteOrderFromTable returns, with
+-- the owning player as issuer. Bind this one expected move to this exact task
+-- and destination instead of relying only on a synchronous issuing guard.
+function M.expect_build_move(unit, task, position)
+    if not valid_entity(unit) or unit.survival_build_task ~= task
+        or type(task) ~= "table" or not position then return false end
+    task.internal_move_order = {
+        x = position.x, y = position.y,
+        expires_at = GameRules:GetGameTime() + BUILD_MOVE_SIGNATURE_LIFETIME,
+    }
+    return true
+end
+
+local function consume_build_move(unit, keys)
+    local task = valid_entity(unit) and unit.survival_build_task
+    local expected = task and task.internal_move_order
+    if not expected then return false end
+    local now = GameRules:GetGameTime()
+    if task.constructing or now > expected.expires_at
+        or (task.timeout_at and now >= task.timeout_at) then
+        task.internal_move_order = nil
+        return false
+    end
+    local x, y = tonumber(keys.position_x), tonumber(keys.position_y)
+    if tonumber(keys.order_type) ~= tonumber(DOTA_UNIT_ORDER_MOVE_TO_POSITION)
+        or not x or not y or math.abs(x - expected.x) > 0.125
+        or math.abs(y - expected.y) > 0.125 or x ~= x or y ~= y then
+        return false
+    end
+    task.internal_move_order = nil
+    return true
+end
+
 local function same_owner(unit, target)
     local unit_player_id = tonumber(unit.survival_player_id)
     local target_player_id = tonumber(target.survival_player_id)
@@ -74,10 +108,13 @@ function M.process(keys)
         or tonumber(keys.issuer_player_id) or tonumber(keys.player_id)
     -- Engine orders may reach the filter after the synchronous issuing guard
     -- has cleared. They must not cancel a player's repair assignment.
-    if issuer and issuer < 0 then return false end
     local order_type = tonumber(keys.order_type)
     local units = ordered_units(keys)
     if #units == 0 then return false end
+    if issuer and issuer < 0 then
+        for _, unit in ipairs(units) do consume_build_move(unit, keys) end
+        return false
+    end
 
     local target = is_target_order(order_type)
         and entity(keys.entindex_target) or nil
@@ -85,7 +122,8 @@ function M.process(keys)
     local consumed = false
 
     for _, unit in ipairs(units) do
-        if unit.survival_repair_internal_order ~= true
+        local build_move = consume_build_move(unit, keys)
+        if not build_move and unit.survival_repair_internal_order ~= true
             and unit.survival_build_internal_order ~= true then
             cancel_pending_build(unit)
             local modifier = repair_modifier(unit)
