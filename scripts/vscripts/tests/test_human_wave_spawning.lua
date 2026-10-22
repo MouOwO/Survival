@@ -89,6 +89,50 @@ for mode_id,difficulties in pairs(rules.data.modes) do
         end
     end
 end
+-- Acceptance regression: N2's fourth-wave leader and ordinary monsters share
+-- appearances, but their authored stats differ. Exercise every physical birth
+-- after the same builder/sequence/variant boundaries used by start_wave, with
+-- fixed workbook values rather than expectations copied from generated rows.
+local builder=require("systems/wave_difficulty_builder")
+local sequence=require("systems/wave_spawn_sequence")
+local variants=require("systems/rich_stat_variant_row")
+local rich_second=assert(builder.build(source,"N2","rich"))
+local fourth=assert(rich_second.waves[4])
+local ordered=sequence.build(fourth,{enabled=true,movement_type=function(row)
+    return row.movement_type_override
+end})
+assert(#ordered==60 and ordered[1]==fourth[1],"N2 rich fourth-wave total/order changed")
+local leader_stats={health=80000,attack=1920,war3_armor=80,attack_speed=1}
+local normal_stats={health=8000,attack=480,war3_armor=40,attack_speed=1}
+local before_fourth_rolls=rolls
+for index,row in ipairs(ordered) do
+    local expected_role=index==1 and "wave_leader" or "normal"
+    assert(row.member_role==expected_role and row.human_spec_position==index,
+        "fourth-wave leader was dropped or reordered")
+    local target=check(variants.resolve(row,1),4,index==1 and leader_stats or normal_stats)
+    assert(target.survival_monster_role==expected_role)
+end
+assert(rolls==before_fourth_rolls,"rich fourth wave must not consume scourge elite rolls")
+local fifth=sequence.build(rich_second.waves[5],{enabled=true})
+assert(#fifth==60 and fifth[1].member_role=="assault_boss")
+local fifth_boss=check(variants.resolve(fifth[1],1),5,
+    {health=160080,attack=10400,war3_armor=490,attack_speed=1})
+assert(fifth_boss.survival_is_boss and fifth_boss.survival_monster_role=="assault_boss")
+-- Other released modes must retain their own N2 multiplier and the same
+-- leader/ordinary distinction, including pure mode's fractional armor.
+for mode_id,expected in pairs({
+    standard={leader={health=20000,attack=480,war3_armor=24,attack_speed=1},
+        normal={health=2000,attack=120,war3_armor=12,attack_speed=1}},
+    cold={leader={health=180000,attack=4320,war3_armor=112,attack_speed=1},
+        normal={health=18000,attack=1080,war3_armor=56,attack_speed=1}},
+    pure={leader={health=15000,attack=360,war3_armor=19.2,attack_speed=1},
+        normal={health=1500,attack=90,war3_armor=9.6,attack_speed=1}},
+}) do
+    local rows=assert(builder.build(source,"N2",mode_id)).waves[4]
+    assert(rows[1].member_role=="wave_leader" and rows[2].member_role=="normal")
+    check(variants.resolve(rows[1],1),4,expected.leader)
+    check(variants.resolve(rows[2],1),4,expected.normal)
+end
 -- A reusable queue row is rolled again for each physical birth/player channel.
 local disaster=assert(profile.build(source,{difficulty_id="N22"},"scourge"))
 local row=disaster.waves[1][1]

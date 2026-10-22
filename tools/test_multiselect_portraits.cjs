@@ -96,6 +96,41 @@ assert.equal(a.api.Inspect().selectedCount, 2);
 assert.equal(a.api.Inspect().mounted, false);
 a.throwSelection(true); assert.equal(a.api.IsActive(), false); a.throwSelection(false);
 
+// Enemy queries preserve the commanded multi-selection. The displayed enemy
+// must keep its single portrait and combat stats, then recover the grid when
+// the player returns to a selected unit, including a second enemy query.
+const query = setup();
+query.select([1, 2]);
+let displayed = 1;
+query.config.SurvivalSelectionResolver = {ResolveDisplayUnit: () => displayed};
+const queryCanvas = {...query.native.canvas.style};
+const queryHandlers = query.native.slots.map(slot => slot.nativeActivate);
+for (const [unit, active] of [[1, true], [77, false], [2, true], [88, false], ['1', true]]) {
+    displayed = unit;
+    assert.equal(query.api.IsActive(), active, 'query identity controls all portrait/stat consumers');
+    assert.equal(query.api.Apply(query.group, 264), active, 'Apply uses the same predicate as IsActive');
+    const report = query.api.Inspect();
+    assert.equal(report.selectedCount, 2, 'querying does not change the command selection');
+    assert.equal(report.active, active);
+    assert.equal(report.mounted, active);
+    assert.equal(query.container.style.opacity, active ? '0' : '0.8', 'enemy queries restore single-portrait pixels');
+    assert.equal(query.container.hittest, !active);
+    assert.equal(query.container.hittestchildren, false);
+    assert.equal(query.scene.style.opacity, '0.35', 'the native portrait leaf retains its opacity');
+    assert.deepEqual(query.native.canvas.style, queryCanvas);
+    query.native.slots.forEach((slot, index) => assert.equal(slot.nativeActivate, queryHandlers[index]));
+}
+for (const invalid of [undefined, null, '', -1, NaN]) {
+    displayed = invalid;
+    assert.equal(query.api.IsActive(), false);
+    assert.equal(query.api.Apply(query.group, 264), false);
+    assert.equal(query.container.style.opacity, '0.8');
+}
+query.config.SurvivalSelectionResolver.ResolveDisplayUnit = () => { throw Error('query transition'); };
+assert.equal(query.api.IsActive(), false);
+assert.equal(query.api.Apply(query.group, 264), false);
+assert.equal(query.api.Inspect().lastRestore.failed.length, 0);
+
 // #multiunit is a SIBLING of PortraitGroup. Fit its native common parent into
 // the portrait rect; preserve canvas pixels/frame dimensions and native events.
 a.select([1, 2, 3, 4]);
