@@ -259,7 +259,7 @@ local function unlock_test_modes(context)
     if type(wave_system.refresh_selection) == "function" then
         wave_system.refresh_selection("mode_unlock_test")
     end
-    notify(context, "本局测试已解锁全部模式及 N1–N10；测试进度不保存")
+    notify(context, "临时验收已开启：已开放模式的全部已配置难度可选，本局奖励和进度不保存")
     return true
 end
 

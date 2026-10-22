@@ -56,7 +56,8 @@ function M.snapshot(player_ids, mode)
         end
     end
     return { ready = ready, options = options, max_difficulty_id = maximum,
-        difficulty_access_policy = release.is_difficulty_open(mode) and "all_configured" or "progression",
+        difficulty_access_policy = mode_test.is_enabled() and "read_only_acceptance"
+            or release.is_difficulty_open(mode) and "all_configured" or "progression",
         limit_player_ids = ready and limits or {} }
 end
 

@@ -58,6 +58,39 @@ for _,engine in ipairs({"missing","false","throws"}) do
     assert(http==0 and sent[#sent].result.error=="real_money_disabled")
 end
 IsInToolsMode=function()return true end
+-- Acceptance isolation applies even to a developer Tools build. Use the real
+-- match-local latch: changing its configuration cannot reopen cash mid-match.
+local acceptance_config=require("config/mode_release_config")
+local original_acceptance=acceptance_config.all_difficulties_unlocked
+local acceptance=require("debug/mode_unlock_test")
+acceptance_config.all_difficulties_unlocked=true
+acceptance.reset("fixture_session")
+assert(acceptance.is_enabled())
+local function assert_acceptance_cash_closed()
+    local before_http=http
+    for _,action in ipairs({"catalog","create","status","cancel"}) do
+        payment.handle({PlayerID=0,action=action,sku="u_coin_recharge",quantity=1})
+        local result=sent[#sent].result
+        if action=="catalog" then
+            assert(result.ok and result.real_money_enabled==false and #result.products==0)
+        else assert(result.ok==false and result.error=="real_money_disabled") end
+    end
+    for _,kind in ipairs({"refreshdata","refreshmoney"}) do
+        local ok,reason=payment.reset_player({player_id=0,args={}},kind)
+        assert(ok==false and reason=="real_money_disabled",
+            "read-only acceptance must not reset a real account")
+    end
+    local completed
+    assert(payment.open_pass_checkout(0,{sku="archive_pass_monthly"},function(result)completed=result end)==false)
+    assert(completed and completed.ok==false and http==before_http,
+        "acceptance catalogues/orders/pass/resets must not contact a cash backend")
+end
+assert_acceptance_cash_closed()
+acceptance_config.all_difficulties_unlocked=false
+assert(acceptance.is_enabled(),"disabling the flag cannot end this match's write isolation")
+assert_acceptance_cash_closed()
+acceptance.reset("fixture_session")
+assert(not acceptance.is_enabled(),"a new normal match restores the normal cash policy")
 payment.handle({PlayerID=0,action="create",sku="u_coin_recharge",quantity=1})
 assert(http==1,"explicit development + server Tools may still exercise its payment transport")
 profile.channel="production"
@@ -73,4 +106,5 @@ profile_done()
 local final=sent[#sent].result
 assert(final.error=="real_money_disabled" and final.checkout_url==nil and final.order_id==nil,
     "revoking cash during profile refresh cannot publish a cash receipt or checkout URL")
-print("NONCOMMERCIAL_PAYMENT_RELEASE_PASS: closed production catalogue/orders/pass, spoofed flags ignored, no HTTP, developer-only transport, late response denied")
+acceptance_config.all_difficulties_unlocked=original_acceptance
+print("NONCOMMERCIAL_PAYMENT_RELEASE_PASS: closed production catalogue/orders/pass, acceptance cash/reset isolation and match latch, spoofed flags ignored, developer-only transport restored, late response denied")

@@ -190,6 +190,7 @@ function M.snapshot()
         end
     end
     return { mode_selected = M.is_mode_selected(), mode_id = mode_id or "",
+        read_only_acceptance = mode_test.is_enabled(),
         selector_player_id = M.selector_player_id(), mode_options = options }
 end
 

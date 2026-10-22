@@ -1,7 +1,8 @@
 -- Keep all combat formulas configured while admitting only the initial four modes.
 local M = {}
--- Acceptance testing: open configured tiers without changing saved clears or
--- mode admission. Set false to restore the normal sequential unlock policy.
+-- Temporary read-only acceptance: each new match opens all released-mode tiers,
+-- bypasses entry clears/quotas, and isolates account writes. Set false and start
+-- a new match to restore normal admission, progression and settlement.
 M.all_difficulties_unlocked = true
 local released = { standard = true, cold = true, rich = true, pure = true }
 local known = { standard = true, cold = true, rich = true, pure = true,

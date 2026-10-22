@@ -1,5 +1,9 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
-require("tests/development_release_profile")
+local release_profile = require("tests/development_release_profile")
+local release = require("config/mode_release_config")
+release.all_difficulties_unlocked = false
+local released_modes = {"standard", "rich", "cold", "pure"}
+local maximum = {standard=10, rich=30, cold=50, pure=10}
 -- Exercise the engine chat dispatcher, authenticated profile/HTTP flow and
 -- real selection permissions together. Only engine APIs and unrelated chat
 -- commands are stubbed; no fake permission or provider replaces the code under test.
@@ -11,6 +15,11 @@ local tools, cheats, host, clock = false, false, 0, 100
 local accounts = {[0] = 9000000123, [1] = 9000000456}
 local tasks, requests, notifications, chat, loading_ticks, refreshes = {}, {}, {}, nil, 0, {}
 local players = {[0] = {id=0}, [1] = {id=1}}
+package.loaded["core/test_access_policy"] = {
+    enabled=function() return true end,
+    allowed=function(id) return players[id] ~= nil end,
+    enforce=function(id) return players[id] ~= nil end,
+}
 DOTA_MAX_TEAM_PLAYERS = 2
 IsServer = function() return true end
 IsInToolsMode = function() return tools end
@@ -95,7 +104,8 @@ local function command(text, id)
 end
 local function empty_progress()
     return {loaded=true, clear_counts={}, standard_clear_counts={},
-        rich_clear_counts={}, cold_clear_counts={}, scourge_clear_counts={}}
+        rich_clear_counts={}, cold_clear_counts={}, scourge_clear_counts={},
+        ruins_clear_counts={}, celestial_clear_counts={}, mode_clear_counts={pure={}}}
 end
 local function quotas()
     local summary = {day_key=tostring(require("systems/archive_calendar").day()), by_key={}}
@@ -158,15 +168,18 @@ assert(not team.current("cold").ready, "one authenticated host cannot replace a 
 authenticate(1)
 local real_counts = encoder.encode(profiles.get_authenticated_progression(0))
 local real_quota = encoder.encode(profiles.get_authenticated_daily_limits(0))
-for _, mode in ipairs({"standard", "rich", "cold", "scourge", "fishing", "pure"}) do
+assert(#setup.snapshot().mode_options == #released_modes, "only released modes enter the UI")
+for _, mode in ipairs(released_modes) do
     local option = mode_option(mode)
     assert(option.unlocked == 1 and option.pending == 0,
-        "all six UI entries use the server's active test permission: " .. mode)
+        "all released UI entries use the server's active test permission: " .. mode)
     assert(option.daily_capped ~= 1 and option.daily_capped ~= true,
         "a capped reward counter must not close an isolated test entry")
-    if mode ~= "fishing" then
+    do
         local permission = team.current(mode)
-        assert(permission.ready and permission.max_difficulty_id == "N10" and #permission.options == 10)
+        assert(permission.ready and permission.max_difficulty_id == "N" .. maximum[mode]
+            and #permission.options == maximum[mode]
+            and permission.difficulty_access_policy == "read_only_acceptance")
         for number, row in ipairs(permission.options) do
             assert(row.difficulty_id == "N" .. number and row.unlocked == 1,
                 "test team must actually admit every supported difficulty")
@@ -180,10 +193,10 @@ assert(encoder.encode(profiles.get_authenticated_progression(0)) == real_counts
 local ok = test.enable(0)
 assert(ok and test.is_enabled(), "repeating the active grant is idempotent")
 
--- All six choices must enter through the real profile loader. The three
+-- Every released choice must enter through the real profile loader. The two
 -- advanced test sessions intentionally use a standard durable backend binding;
 -- only their local combat projection receives the true gameplay mode marker.
-for _, mode in ipairs({"standard", "rich", "cold", "scourge", "fishing", "pure"}) do
+for _, mode in ipairs(released_modes) do
     fresh(); authenticate_team()
     command("0")
     assert(test.is_enabled() and setup.select_mode(0, mode, setup.get_session_id()).ok,
@@ -287,6 +300,7 @@ assert(latched_clear.ok and latched_clear.skipped and not archive.has_pending(0)
 fresh(); tools, cheats = true, false
 local advanced_progress = empty_progress()
 advanced_progress.standard_clear_counts.n10 = 1
+advanced_progress.standard_clear_counts.n5 = 1
 advanced_progress.rich_clear_counts.n10 = 1
 advanced_progress.cold_clear_counts.n10 = 1
 -- Avoid daily exhaustion here to inspect the ordinary, non-test backend path.
@@ -306,4 +320,166 @@ assert(profiles.get_profile(0) and not profiles.get_profile(0).debug_mode_unlock
 assert(not difficulty.is_unlocked("N10", profiles.get_progression(0, "cold"), "cold"),
     "new match restores the real own-mode N5 difficulty requirement")
 assert(not test.enable(0), "an already-selected normal match cannot acquire a different durable test binding")
-print("MODE_UNLOCK_ZERO_PASS: real chat/auth/mode/team/difficulty/HTTP entry, six modes, N1-N10, UI refresh, reset and isolated writes")
+print("MODE_UNLOCK_ZERO_PASS: real chat/auth/mode/team/difficulty/HTTP entry, four released modes, N1-N50, UI refresh, reset and isolated writes")
+
+-- The configured acceptance arena also starts through the actual startup
+-- service in a production build, with no Tools/cheats/chat command. Keep the
+-- real authentication and profile HTTP flow; stub only native engine APIs,
+-- the completed asset preloader and multiplayer connection enumeration.
+release_profile.channel = "production"
+tools, cheats = false, false
+assert(require("core/release_policy").is_production())
+local startup_listeners = {}
+for _, player in pairs(players) do
+    function player:GetPlayerID() return self.id end
+    function player:IsNull() return false end
+end
+function players:SetContextThink(_, callback) self.startup_think = callback end
+GameRules.State_Get = function() return 3 end
+DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP = 2
+EntIndexToHScript = function(index) return players[index - 200] end
+CustomGameEventManager.RegisterListener = function(_, name, handler)
+    startup_listeners[name] = handler
+    return name
+end
+CustomGameEventManager.UnregisterListener = function(_, name) startup_listeners[name] = nil end
+package.loaded["systems/multiplayer_player_service"] = {
+    participating_player_ids=function() return {0,1} end,
+    is_disconnected=function() return false end,
+}
+package.loaded["systems/startup_asset_preload_service"] = {snapshot=function()
+    return {total=1, ready=1, failed=0, progress=100, complete=true}
+end}
+package.loaded["systems/startup_loading_service"] = nil
+local startup = require("systems/startup_loading_service")
+local function start_real_startup(automatic, without_quota)
+    release.all_difficulties_unlocked = automatic
+    bus.reset()
+    profiles.init()
+    local prior = #requests
+    startup.init()
+    assert(test.is_enabled() == automatic and setup.snapshot().read_only_acceptance == automatic,
+        "real startup owns the per-match automatic acceptance latch")
+    assert(not startup.is_ready() and not team.current("cold").ready,
+        "automatic acceptance still requires both authenticated accounts")
+    assert(#requests == prior + 2, "real startup must request both account authentications")
+    for index=prior+1,prior+2 do
+        local request = requests[index]
+        assert(request.url:match("/v1/session/authenticate$") and request.body.mode == nil)
+        local quota = not without_quota and quotas() or nil
+        respond({authenticated=true, account_id=request.body.account_id,
+            match_session_id=setup.get_session_id(), progression=empty_progress(), daily_limits=quota}, 200, index)
+    end
+    startup.tick()
+    assert(not startup.is_ready(), "HTTP authentication cannot replace the client UI handshake")
+    for _, id in ipairs({0,1}) do
+        startup_listeners.survival_loading_client_ready(200+id, {session_id=setup.get_session_id()})
+    end
+    assert(startup.is_ready() and not startup.is_gameplay_ready(),
+        "mode combat profiles still gate gameplay after authenticated admission")
+end
+local function assert_isolated_writes(mode)
+    local count = #requests
+    for _, id in ipairs({0,1}) do
+        local before = encoder.encode(profiles.get_profile(id))
+        for _, method in ipairs({"archive_submit", "online_checkpoint", "archive_submit_endless_batch"}) do
+            local failure
+            profiles.get_provider()[method]({account_id=tostring(accounts[id]),
+                commands={{id="acceptance:endless:1", kind="endless", wave=1, difficulty=1}},
+                command={kind="clear"}},
+                function() error("automatic acceptance persisted an account write: " .. method) end,
+                function(code) failure=code end)
+            if #requests == count + 1 then
+                assert(method == "archive_submit_endless_batch"
+                    and requests[#requests].url:match("/v1/archive/config$"))
+                respond({capabilities={endless_batch=1}})
+                count = #requests
+            end
+            assert(failure == "mode_unlock_test_read_only" and #requests == count,
+                "every account write transport is blocked before creating HTTP: " .. method)
+        end
+        local changed = profiles.update_save_sections(id,
+            {archive={clear_counts={n10=100}}}, "automatic_acceptance_must_not_save")
+        assert(not changed.ok and changed.error == "mode_unlock_test_read_only")
+        for _, result in ipairs({archive.record_clear(id, "N"..maximum[mode], 0),
+            archive.record_boss(id, "acceptance-boss"), archive.record_endless_wave(id, 1, 1)}) do
+            assert(result.ok and result.skipped and result.test_only and not result.receipt,
+                "test victories and rewards must never become durable receipts")
+        end
+        assert(not archive.has_pending(id) and encoder.encode(profiles.get_profile(id)) == before)
+    end
+    assert(#requests == count, "isolated rewards never create a write or retry transport")
+end
+for _, mode in ipairs(released_modes) do
+    start_real_startup(true)
+    assert(not test.enable(0), "production still rejects manually invoking the developer grant")
+    local snapshot = startup.snapshot().setup
+    assert(snapshot.read_only_acceptance and snapshot.difficulty_access_policy == "read_only_acceptance")
+    for _, candidate in ipairs(released_modes) do
+        local option, permission = mode_option(candidate), team.current(candidate)
+        assert(option.unlocked == 1 and option.pending == 0 and option.daily_capped ~= 1,
+            "empty clears and exhausted daily quotas cannot close acceptance modes")
+        assert(permission.ready and permission.max_difficulty_id == "N" .. maximum[candidate]
+            and #permission.options == maximum[candidate])
+        for _, row in ipairs(permission.options) do assert(row.unlocked == 1) end
+    end
+    for _, closed in ipairs({"scourge", "ruins", "celestial", "fishing"}) do
+        assert(setup.select_mode(0, closed, setup.get_session_id()).error == "mode_not_released",
+            "acceptance must retain the configured four-mode release boundary")
+    end
+    local prior = #requests
+    startup_listeners.survival_loading_mode_select(200,
+        {session_id=setup.get_session_id(), mode_id=mode})
+    assert(setup.get_mode() == mode and #requests == prior+2)
+    for index=prior+1,prior+2 do
+        local request = requests[index]
+        local expected = mode == "pure" and "pure" or "standard"
+        assert(request.url:match("/v1/session/login$") and request.body.mode == expected,
+            "acceptance uses an ordinary read binding without advanced backend entry gates")
+        local id = request.body.account_id == tostring(accounts[0]) and 0 or 1
+        respond(raw_snapshot(id, expected), 200, index)
+    end
+    startup.tick()
+    assert(startup.is_gameplay_ready() and startup.is_player_ready(0) and startup.is_player_ready(1),
+        "every acceptance mode reaches real HTTP-profile-ready gameplay")
+    assert(profiles.get_profile(0).game_mode == mode and profiles.get_profile(0).debug_mode_unlock == 1)
+    assert(next(profiles.get_authenticated_progression(0).standard_clear_counts) == nil
+        and next(profiles.get_authenticated_progression(0).rich_clear_counts) == nil
+        and next(profiles.get_authenticated_progression(0).cold_clear_counts) == nil,
+        "acceptance never fabricates permanent entry or tier clears")
+    assert(profiles.get_authenticated_daily_limits(0).by_key.mode_cold.capped == 1,
+        "opening acceptance entry leaves the account's authentic exhausted quota untouched")
+    archive.init()
+    assert_isolated_writes(mode)
+    release.all_difficulties_unlocked = false
+    assert(test.is_enabled() and setup.snapshot().read_only_acceptance
+        and team.current(mode).max_difficulty_id == "N"..maximum[mode],
+        "turning the switch off during play cannot change this match's admission or isolation")
+    assert_isolated_writes(mode)
+end
+start_real_startup(false)
+assert(not setup.snapshot().read_only_acceptance
+    and startup.snapshot().setup.difficulty_access_policy == "progression")
+assert(mode_option("cold").unlocked == 0 and team.current("standard").max_difficulty_id == "N4",
+    "a new normal match restores genuine mode and same-mode tier requirements")
+assert(setup.select_mode(0, "cold", setup.get_session_id()).error == "mode_not_unlocked")
+assert(setup.select_mode(0, "standard", setup.get_session_id()).error == "mode_daily_limit_reached",
+    "a new normal match restores the authentic exhausted daily quota")
+start_real_startup(false, true)
+local count = #requests
+startup_listeners.survival_loading_mode_select(200,
+    {session_id=setup.get_session_id(), mode_id="standard"})
+assert(#requests == count+2)
+for index=count+1,count+2 do
+    local id = requests[index].body.account_id == tostring(accounts[0]) and 0 or 1
+    respond(raw_snapshot(id, "standard"), 200, index)
+end
+startup.tick()
+assert(startup.is_gameplay_ready() and not profiles.get_profile(0).debug_mode_unlock)
+local normal_error
+count = #requests
+profiles.get_provider().archive_submit({account_id=tostring(accounts[0]), command={kind="standard_clear"}},
+    function() end, function(code) normal_error=code end)
+assert(not normal_error and #requests == count+1 and requests[#requests].url:match("/v1/archive/command$"),
+    "a new normal match restores the ordinary account-write transport")
+print("AUTOMATIC_ACCEPTANCE_PASS: production real startup, four modes N1-N50, auth/profile readiness, exhausted quotas, all account writes isolated, midmatch latch and normal new-match restoration")

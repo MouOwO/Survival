@@ -1,6 +1,7 @@
 -- Match-local mode testing. Never manufacture permanent clears or capabilities.
 local M = {}
 local release_policy = require("core/release_policy")
+local acceptance = require("config/mode_release_config")
 local enabled, session_id = false, ""
 
 local function allowed()
@@ -8,7 +9,11 @@ local function allowed()
 end
 
 function M.reset(session)
-    enabled, session_id = false, tostring(session or "")
+    session_id = tostring(session or "")
+    -- Explicit server configuration can open a read-only acceptance arena in
+    -- any release channel. Latch isolation until the next match: disabling the
+    -- flag halfway through a test must never turn its rewards into real saves.
+    enabled = session_id ~= "" and acceptance.all_difficulties_unlocked == true
 end
 
 function M.is_enabled()

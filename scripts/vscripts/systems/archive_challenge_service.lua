@@ -41,6 +41,7 @@ local function allowed(state, definition)
         and state.difficulty >= definition.min_difficulty
 end
 local function daily_quota(player_id, key)
+    if require("debug/mode_unlock_test").is_enabled() then return nil end
     if not key then return nil end
     local profiles = require("systems/player_profile_service")
     if type(profiles.get_daily_limit) == "function" then return profiles.get_daily_limit(player_id, key) end

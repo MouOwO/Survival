@@ -29,6 +29,8 @@ const boot = options => {
 const rows = ui => ui.nodes.DifficultySelectionButtons.children;
 const click = node => node.events.onactivate();
 const sent = ui => ui.requests.filter(request => request.name === "ui_difficulty_select_request");
+const modeSent = ui => ui.requests.filter(request => request.name === "survival_loading_mode_select");
+const acceptanceWarning = "临时验收 · 不保存奖励和进度";
 const closed = ui => {
     assert(ui.nodes.DifficultySelectionOverlay.BHasClass("DifficultySelectionHidden"));
     assert(!ui.nodes.DifficultySelectionDialog.visible);
@@ -109,6 +111,8 @@ for (const [mode, total] of [["rich", 30], ["cold", 50]]) {
         "canonical high difficulty IDs are sorted numerically and remain selectable");
     assert(!rows(ui).some(row => row.__difficultyId === "N" + (total + 1)), "the UI never invents unadvertised difficulties");
     assert(ui.nodes.DifficultySelectionHint.text.includes("全难度开放至 N" + total));
+    assert(!ui.nodes.DifficultySelectionHint.text.includes(acceptanceWarning),
+        "the existing all-configured policy does not claim that persistence is disabled");
     ui.nodes.DifficultySelectionHint.events.onmouseover();
     const tooltip = ui.dispatched.filter(event => event[0] === "DOTAShowTextTooltip").at(-1)[2];
     assert(tooltip.includes("全部已配置难度已开放") && !tooltip.includes("最低通关进度"),
@@ -155,4 +159,76 @@ for (const [mode, total] of [["rich", 30], ["cold", 50]]) {
     assert(ui.nodes.DifficultySelectionHint.text.includes("全难度开放至 N50"), "wave-only snapshots forward the same policy");
     click(rows(ui)[49]); assert.equal(sent(ui)[0].payload.difficulty_id, "N50");
 }
-console.log("DIFFICULTY_STARTUP_SELECTION_PASS: preloaded team permissions, configured N30/N50 tiers, canonical IDs, policy hints, host/readiness guards, immediate ACK and wave-only compatibility");
+{
+    // The setup flag is present before a mode has been chosen, so an acceptance
+    // session is visibly distinct even before its difficulty policy is ready.
+    const modeState = startup({mode_selected: false, mode_id: "", read_only_acceptance: true,
+        mode_options: modes.filter(option => option.mode_id !== "fishing")});
+    const ui = boot({startupState: modeState});
+    assert.equal(ui.nodes.DifficultySelectionTitle.text, "模式选择");
+    assert.equal(ui.nodes.DifficultySelectionHint.text, acceptanceWarning);
+    assert(ui.nodes.DifficultySelectionHint.visible);
+    assert.equal(ui.nodes.MatchModeOptions.children.length, 4);
+    assert(ui.nodes.MatchModeOptions.children.every(row => row.enabled), "the server-advertised acceptance modes can be chosen");
+    ui.nodes.DifficultySelectionHint.events.onmouseover();
+    const tooltip = ui.dispatched.filter(event => event[0] === "DOTAShowTextTooltip").at(-1)[2];
+    assert(tooltip.includes("无需前置通关") && tooltip.includes("不保存奖励和通关进度") && tooltip.includes("不消耗每日额度"));
+    click(ui.nodes.MatchModeOptions.children[0]);
+    assert.equal(modeSent(ui).length, 1);
+    assert.equal(modeSent(ui)[0].payload.mode_id, "standard");
+
+    const viewer = boot({startupState: modeState, localId: 1});
+    assert(viewer.nodes.DifficultySelectionHint.text.includes(acceptanceWarning));
+    assert(viewer.nodes.DifficultySelectionHint.text.includes("等待房主选择模式"));
+    assert(viewer.nodes.MatchModeOptions.children.every(row => !row.enabled));
+    viewer.nodes.MatchModeOptions.children.forEach(click);
+    assert.equal(modeSent(viewer).length, 0, "acceptance status never grants mode selection to a viewer");
+
+    const guarded = boot({startupState: startup({mode_selected: false, mode_id: "", read_only_acceptance: true,
+        mode_options: [{mode_id: "rich", display_name: "丰饶模式", unlocked: 0}]})});
+    assert(!guarded.nodes.MatchModeOptions.children[0].enabled, "the acceptance label cannot override a denied server mode option");
+    click(guarded.nodes.MatchModeOptions.children[0]); assert.equal(modeSent(guarded).length, 0);
+}
+for (const [mode, total] of [["standard", 10], ["pure", 10], ["rich", 30], ["cold", 50]]) {
+    const state = startup({mode_id: mode, read_only_acceptance: true, difficulty_access_policy: "read_only_acceptance",
+        max_difficulty_id: "N" + total, difficulty_limit_player_ids: [],
+        difficulty_options_by_mode: {[mode]: difficulties(total, total)}});
+    const ui = boot({startupState: state});
+    assert.equal(rows(ui).length, total);
+    assert(rows(ui).every(row => row.enabled));
+    assert(ui.nodes.DifficultySelectionHint.text.includes("全难度开放至 N" + total));
+    assert(ui.nodes.DifficultySelectionHint.text.includes(acceptanceWarning));
+    ui.nodes.DifficultySelectionHint.events.onmouseover();
+    const tooltip = ui.dispatched.filter(event => event[0] === "DOTAShowTextTooltip").at(-1)[2];
+    assert(tooltip.includes("无需前置通关") && tooltip.includes("不保存奖励和通关进度") && !tooltip.includes("最低通关进度"));
+    click(rows(ui)[total - 1]); assert.equal(sent(ui)[0].payload.difficulty_id, "N" + total);
+
+    const viewer = boot({startupState: state, localId: 1});
+    assert(rows(viewer).every(row => !row.enabled));
+    click(rows(viewer)[total - 1]); assert.equal(sent(viewer).length, 0);
+    const pending = boot({startupState: startup({...state.setup, can_confirm_difficulty: false})});
+    assert(rows(pending).every(row => !row.enabled), "acceptance still requires the server readiness gate");
+    click(rows(pending)[total - 1]); assert.equal(sent(pending).length, 0);
+}
+{
+    const ui = boot({startupState: startup({mode_id: "cold", read_only_acceptance: true,
+        difficulty_access_policy: "read_only_acceptance", difficulty_options_by_mode: {cold: difficulties(49, 50)}})});
+    assert(!rows(ui)[49].enabled, "the read-only policy label never invents server selection authority");
+    click(rows(ui)[49]); assert.equal(sent(ui).length, 0);
+}
+{
+    const wave = {status: "selecting_difficulty", mode_selected: true, game_mode: "cold", selector_player_id: 0,
+        difficulty_selected: false, can_confirm_difficulty: true, difficulty_access_policy: "read_only_acceptance",
+        difficulty_options: difficulties(50, 50)};
+    const ui = boot({state: {sequence: 1, resources: {}, wave}});
+    assert(ui.nodes.DifficultySelectionHint.text.includes(acceptanceWarning), "wave-only snapshots disclose read-only acceptance");
+    assert(ui.nodes.DifficultySelectionHint.text.includes("全难度开放至 N50"));
+    click(rows(ui)[49]); assert.equal(sent(ui)[0].payload.difficulty_id, "N50");
+}
+{
+    const ui = boot({startupState: startup({mode_selected: false, mode_id: "", read_only_acceptance: false}),
+        state: {sequence: 1, resources: {}, wave: {difficulty_access_policy: "read_only_acceptance"}}});
+    assert.equal(ui.nodes.DifficultySelectionHint.text, "", "an authoritative normal setup flag overrides stale acceptance wave state");
+    assert(!ui.nodes.DifficultySelectionHint.visible);
+}
+console.log("DIFFICULTY_STARTUP_SELECTION_PASS: preloaded team permissions, configured N30/N50 tiers, canonical IDs, progression/all-configured/read-only hints, host/readiness guards, immediate ACK and wave-only compatibility");
