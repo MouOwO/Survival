@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "problem": "The threefold rich portal lost its black hole interior while its bright layers remained visible on solid terrain.",
+  "fixes": [
+    "Scale the shadow before projecting it to ground+2, preventing the previous ground-18 result",
+    "Keep native renderer depth bias: void -10 and twirl -20; scale geometry rather than depth bias"
+  ],
+  "preserved": [
+    "One rich-mode portal at rich_start",
+    "No portal stone model",
+    "Threefold radius and spatial dimensions",
+    "Native colors, textures, alpha, emitter counts and timing",
+    "Existing connection and reconnect lifecycle"
+  ],
+  "verification": {
+    "compiled_resource_graph": "15 source/Content/compiled pairs, 14 scaled layers, 2 native depth biases, 1 corrected ground projection",
+    "native_comparison": "On solid rich terrain, official void displayed a black disk while the old scaled void was transparent. After restoring native depth bias in the same production resource path, the threefold black disk returned alongside the official reference.",
+    "screenshots": [
+      "output/map_build_c6/portal_black_core_void_compare_20261022.png",
+      "output/map_build_c6/portal_black_core_variants_precached_20261022.png"
+    ],
+    "scratch_variants": "Five newly named scratch resources did not appear in the client and were excluded from conclusions.",
+    "lifecycle_tests": "PASS; automatic initialization, joins/reconnects, mode changes, single rich effect, hot reload and cleanup",
+    "runtime_cleanup": "Returned UI/fog/camera to their previous defaults and disconnected the temporary comparison world; original Hammer backend helper resumed."
+  }
+}

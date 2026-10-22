@@ -28,7 +28,7 @@ for (const key of ['m_bScaleRadius', 'm_bScalePosition', 'm_bScaleVelocity']) {
   assert.equal(counterexample[key], false, 'Counterexample must prove native schema recognizes ' + key);
 }
 assert.equal(manifest.scale, 3); assert.equal(manifest.outputs.length, 15);
-let scales = 0, absoluteCurves = 0, checks = [];
+let scales = 0, absoluteCurves = 0, groundProjectedLayers = 0, nativeDepthRenderers = 0, checks = [];
 const targets = new Set(manifest.outputs.map(x => x.resource));
 for (const row of manifest.outputs) {
   const source = fs.readFileSync(path.join(art, 'source', row.resource));
@@ -47,20 +47,49 @@ for (const row of manifest.outputs) {
     { encoding: 'utf8', windowsHide: true, maxBuffer: 32 * 1024 * 1024 });
   fs.writeFileSync(path.join(base, path.basename(row.resource) + '.txt'), dump);
   const compiled = parse(extractData(dump));
+  if ((tree.m_Renderers || []).some(x => x.m_flDepthBias !== undefined)) {
+    const nativeFile = path.join(base, 'native_' + path.basename(row.native_resource) + '_c');
+    fs.writeFileSync(nativeFile, nativeBytes);
+    const native = readCompiled(nativeFile);
+    for (let index = 0; index < native.m_Renderers.length; index++) {
+      const expected = native.m_Renderers[index].m_flDepthBias;
+      if (expected === undefined) continue;
+      nativeDepthRenderers++;
+      assert.equal(n(compiled.m_Renderers[index].m_flDepthBias), n(expected),
+        'Scaling spatial geometry must preserve the native renderer depth bias: ' + row.resource);
+    }
+  }
   const rendered = n(tree.m_nMaxParticles) !== 0;
   const init = (compiled.m_Initializers || []).filter(x => x._class === 'C_INIT_GlobalScale');
   assert.equal(init.length, rendered ? 1 : 0, 'Every native particle layer scales exactly once');
   if (rendered) {
     scales++;
     const scale = plain(init[0]);
+    const sourceScale = plain(tree.m_Initializers.find(x => x._class === 'C_INIT_GlobalScale'));
     assert.equal(scale.m_flScale, 3); assert.equal(scale.m_nControlPointNumber, 1);
-    assert.equal(plain(tree.m_Initializers.at(-1)).m_nScaleControlPointNumber, -1);
+    assert.equal(sourceScale.m_nScaleControlPointNumber, -1);
     assert.equal(scale.m_nScaleControlPointNumber, undefined, 'External scale CP is the native -1 default');
     for (const key of ['m_bScaleRadius', 'm_bScalePosition', 'm_bScaleVelocity']) {
-      assert.equal(plain(tree.m_Initializers.at(-1))[key], true, key);
+      assert.equal(sourceScale[key], true, key);
       assert.equal(scale[key], undefined, 'Enabled scaling is native default: ' + key);
     }
-    assert.equal(compiled.m_Initializers.at(-1)._class, 'C_INIT_GlobalScale', 'GlobalScale must run after native initializers');
+    const globalAt = compiled.m_Initializers.findIndex(x => x._class === 'C_INIT_GlobalScale');
+    const groundAt = compiled.m_Initializers.findIndex(x => x._class === 'C_INIT_PositionPlaceOnGround');
+    if (groundAt >= 0) {
+      groundProjectedLayers++;
+      assert.equal(globalAt + 1, groundAt, 'Project to the ground immediately after scaling the native position');
+      assert.equal(n(compiled.m_Initializers[groundAt].m_flOffset), 2, 'Keep native ground offset');
+      // This dimensional regression represents the actual two operations:
+      // scaling around CP1 at ground+12 and projecting onto ground+2. The
+      // reversed native copy used to place the black shadow at ground-18.
+      const applyHeight = initializers => initializers.reduce((z, op) =>
+        op._class === 'C_INIT_GlobalScale' ? 12 + n(op.m_flScale) * (z - 12) :
+          op._class === 'C_INIT_PositionPlaceOnGround' ? n(op.m_flOffset) : z, 12);
+      assert.equal(applyHeight(compiled.m_Initializers), 2, 'Final shadow must remain above the floor');
+      const oldOrder = compiled.m_Initializers.filter(x => x._class !== 'C_INIT_GlobalScale');
+      oldOrder.push(init[0]);
+      assert.equal(applyHeight(oldOrder), -18, 'Negative control must reproduce the original underground shadow');
+    } else assert.equal(compiled.m_Initializers.at(-1)._class, 'C_INIT_GlobalScale', 'Other native layers keep their initializer order');
   }
   assert.deepEqual(plain(compiled.m_Emitters), plain(tree.m_Emitters), 'Compiler must retain native emitter rates and times');
   assert.equal((compiled.m_Children || []).length, row.native_children);
@@ -79,9 +108,11 @@ for (const row of manifest.outputs) {
   }
   checks.push({ resource: row.resource, compiled_sha256: sha(fs.readFileSync(path.join(root, row.resource + '_c'))), global_scale: init.length });
 }
-assert.equal(scales, 14); assert.equal(absoluteCurves, 2);
+assert.equal(scales, 14); assert.equal(absoluteCurves, 2); assert.equal(groundProjectedLayers, 1); assert.equal(nativeDepthRenderers, 2);
 const report = { status: 'PASS', native_nodes: 15, globally_scaled_layers: scales, scale: 3,
   absolute_radius_curves_verified: absoluteCurves, content_source_pairs: 15,
+  ground_projection: { layers: groundProjectedLayers, corrected_height_above_ground: 2, previous_order_negative_control: -18 },
+  native_depth_bias_preserved: { renderers: nativeDepthRenderers, void: -10, twirl: -20 },
   compiled_native_schema_round_trip: true, original_native_resources_preserved: true,
   runtime_visual_check: 'root agent owns live visual verification', checks };
 fs.writeFileSync(path.join(base, 'report.json'), JSON.stringify(report, null, 2) + '\n');

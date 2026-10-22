@@ -11,7 +11,7 @@
     "radius": true,
     "position": true,
     "velocity": true,
-    "appended_after_native_initializers": true
+    "initializer_order": "after native spatial attributes, before ground projection when present; otherwise last"
   },
   "schema_evidence": {
     "installed_dll": "game/bin/win64/particles.dll",
@@ -32,6 +32,7 @@
     "15 reachable native particle systems",
     "all native textures and materials",
     "colors and HSV controls",
+    "native renderer depth bias",
     "emitter rates and particle counts",
     "lifetimes, startup delays, fade and alpha curves",
     "child topology and repetitions"
@@ -50,21 +51,21 @@
       "resource": "particles/survival_environment/rich_portal/ambient_shadow.vpcf",
       "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_shadow.vpcf",
       "native_sha256": "384b5d7e057340a5dc0315586064944d8af9deedb66fbde4868bbeb0f3a4a18e",
-      "source_sha256": "b75ca0060e584f630c5ef4750fd26d7840095cd9a6f795159e1e76e1e1364724",
+      "source_sha256": "aa37d09e6a8e1445e88492b34fdae468f1330eeacaf0539302e698b3188cc4cb",
       "native_children": 0,
       "changes": [
-        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1"
+        "native C_INIT_GlobalScale x3 before final ground projection; preserve ground+2"
       ]
     },
     {
       "resource": "particles/survival_environment/rich_portal/ambient_void.vpcf",
       "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void.vpcf",
       "native_sha256": "b9e24dfc3e67aaac63a5aac5fff1c06bc6ee51b17a9452d441b249479d162656",
-      "source_sha256": "58f81cf6f61490b8094aebbd9dc2609d7799d783e812e07d1c9a61b3372aa3ab",
+      "source_sha256": "04e6a4d4560da07893c211cc100025170d040813370fa54bb56af72c7a4056d5",
       "native_children": 1,
       "changes": [
         "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
-        "m_flDepthBias x3 in world units"
+        "preserve native m_flDepthBias"
       ]
     },
     {
@@ -104,14 +105,14 @@
       "resource": "particles/survival_environment/rich_portal/ambient_void_twirl.vpcf",
       "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_twirl.vpcf",
       "native_sha256": "d8d9729c6f11f1d7c36ba2ad43634f7b3fe2f14c988d23ef70e0d43acd5baa4a",
-      "source_sha256": "11c5976483e901bdcdfbdba2926f1a33125c06c7908b5b30b4ba758698ed5a9e",
+      "source_sha256": "ad0b411d5d0e7b419df3af265519956d410c5f6be454cbc03dfd7372c1b6899e",
       "native_children": 0,
       "changes": [
         "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
         "absolute per-frame radius curve x3",
         "distance damping range x3",
         "m_flTextureVWorldSize x3 in world units",
-        "m_flDepthBias x3 in world units"
+        "preserve native m_flDepthBias"
       ]
     },
     {

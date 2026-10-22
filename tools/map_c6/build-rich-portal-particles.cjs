@@ -60,13 +60,22 @@ function adapt(tree, resource) {
   const changes = [];
   if (n(tree.m_nMaxParticles) !== 0) {
     // Native C_INIT_GlobalScale operates on already initialized radius,
-    // position about CP1, and velocity. Append last so all native initializers
-    // finish first. A negative scale CP disables external scaling input.
+    // position about CP1, and velocity. Ground-projected layers must project
+    // after spatial scaling; otherwise the CP1 height scales their ground
+    // offset through the floor. Other layers retain the final initializer.
+    // A negative scale CP disables external scaling input.
     tree.m_Initializers ||= [];
-    tree.m_Initializers.push({ _class: 'C_INIT_GlobalScale', m_flScale: number(SCALE),
+    const globalScale = { _class: 'C_INIT_GlobalScale', m_flScale: number(SCALE),
       m_nScaleControlPointNumber: integer(-1), m_nControlPointNumber: integer(1),
-      m_bScaleRadius: true, m_bScalePosition: true, m_bScaleVelocity: true });
-    changes.push('append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1');
+      m_bScaleRadius: true, m_bScalePosition: true, m_bScaleVelocity: true };
+    const groundAt = tree.m_Initializers.findIndex(init => init._class === 'C_INIT_PositionPlaceOnGround');
+    if (groundAt >= 0) {
+      tree.m_Initializers.splice(groundAt, 0, globalScale);
+      changes.push('native C_INIT_GlobalScale x3 before final ground projection; preserve ground+2');
+    } else {
+      tree.m_Initializers.push(globalScale);
+      changes.push('append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1');
+    }
   }
   for (const op of tree.m_Operators || []) {
     if (op._class === 'C_OP_SetFloat' && (op.m_nOutputField === undefined || n(op.m_nOutputField) === 3)
@@ -85,13 +94,14 @@ function adapt(tree, resource) {
     }
   }
   for (const renderer of tree.m_Renderers || []) {
-    for (const key of ['m_flTextureVWorldSize', 'm_flDepthBias']) if (renderer[key] !== undefined) {
+    for (const key of ['m_flTextureVWorldSize']) if (renderer[key] !== undefined) {
       if (renderer[key] && typeof renderer[key] === 'object' && !('__number' in renderer[key])) {
         assert.equal(renderer[key].m_nType, 'PF_TYPE_LITERAL');
         renderer[key].m_flLiteralValue = number(n(renderer[key].m_flLiteralValue) * SCALE);
       } else renderer[key] = number(n(renderer[key]) * SCALE);
       changes.push(key + ' x3 in world units');
     }
+    if (renderer.m_flDepthBias !== undefined) changes.push('preserve native m_flDepthBias');
   }
   for (const child of tree.m_Children || []) {
     assert(child.m_ChildRef.__resource.startsWith(nativePrefix), 'Unexpected non-native child');
@@ -136,11 +146,12 @@ function build() {
   const manifest = { root: targetPrefix + '.vpcf', native_root: nativePrefix + '.vpcf', scale: SCALE,
     transform: 'one horizontal native graph; caller sets CP0/1/2 to one ground center and their orientation basis; CP4/61/62 remain zero',
     global_scale: { class: 'C_INIT_GlobalScale', multiplier: SCALE, center_control_point: 1, external_scale_control_point: -1,
-      radius: true, position: true, velocity: true, appended_after_native_initializers: true },
+      radius: true, position: true, velocity: true,
+      initializer_order: 'after native spatial attributes, before ground projection when present; otherwise last' },
     schema_evidence: { installed_dll: 'game/bin/win64/particles.dll', sha256: sha(binary), verified_strings: schemaFields,
       compiler_round_trip: 'Run tools/build_rich_portal_particles.ps1 then tools/verify_rich_portal_particles.cjs',
       reference_schema: 'https://github.com/a2x/cs2-dumper/blob/main/output/particles_dll.hpp#L5990' },
-    preserved: ['15 reachable native particle systems', 'all native textures and materials', 'colors and HSV controls', 'emitter rates and particle counts', 'lifetimes, startup delays, fade and alpha curves', 'child topology and repetitions'],
+    preserved: ['15 reachable native particle systems', 'all native textures and materials', 'colors and HSV controls', 'native renderer depth bias', 'emitter rates and particle counts', 'lifetimes, startup delays, fade and alpha curves', 'child topology and repetitions'],
     original_resources_untouched: true, outputs: layers };
   fs.mkdirSync(output, { recursive: true }); fs.writeFileSync(path.join(output, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
   console.log('RICH_PORTAL_SOURCE_PASS native_nodes=15 scale=3 root=' + manifest.root);
