@@ -7,9 +7,10 @@ const modes = [
     {mode_id: "pure", display_name: "纯净模式"},
     {mode_id: "standard", display_name: "常规模式"},
     {mode_id: "fishing", display_name: "摸鱼模式"},
-    {mode_id: "rich", display_name: "丰饶模式", unlocked: 1}
+    {mode_id: "rich", display_name: "丰饶模式", unlocked: 1},
+    {mode_id: "cold", display_name: "极寒模式", unlocked: 1}
 ];
-const difficulties = cap => Array.from({length: 10}, (_, index) => ({
+const difficulties = (cap, total = 10) => Array.from({length: total}, (_, index) => ({
     difficulty_id: "N" + (index + 1), display_name: "N" + (index + 1),
     unlocked: index < cap ? 1 : 0,
     unlock_hint: index < cap ? "" : "队伍所有玩家通关 N" + index + " 后解锁"
@@ -95,4 +96,63 @@ const closed = ui => {
     assert(rows(ui).slice(0, 5).every(row => row.enabled));
     click(rows(ui)[0]); assert.equal(sent(ui)[0].payload.difficulty_id, "N1");
 }
-console.log("DIFFICULTY_STARTUP_SELECTION_PASS: preloaded mode/team permissions, profile-independent confirmation, immediate ACK completion, host/lock guards and wave-only compatibility");
+for (const [mode, total] of [["rich", 30], ["cold", 50]]) {
+    const configured = difficulties(total, total);
+    const invalid = ["N0", "N01", "n1", "N-1", "N1.5", "N1x"].map(difficulty_id => ({difficulty_id, unlocked: 1}));
+    const state = startup({mode_id: mode, difficulty_access_policy: "all_configured",
+        max_difficulty_id: "N" + total, difficulty_limit_player_ids: [],
+        difficulty_options: configured,
+        difficulty_options_by_mode: {[mode]: [...invalid, ...configured.slice().reverse()]}});
+    const ui = boot({startupState: state});
+    assert.equal(rows(ui).length, total, mode + " displays every configured difficulty and rejects malformed IDs");
+    assert(rows(ui).every((row, index) => row.__difficultyId === "N" + (index + 1) && row.enabled),
+        "canonical high difficulty IDs are sorted numerically and remain selectable");
+    assert(!rows(ui).some(row => row.__difficultyId === "N" + (total + 1)), "the UI never invents unadvertised difficulties");
+    assert(ui.nodes.DifficultySelectionHint.text.includes("全难度开放至 N" + total));
+    ui.nodes.DifficultySelectionHint.events.onmouseover();
+    const tooltip = ui.dispatched.filter(event => event[0] === "DOTAShowTextTooltip").at(-1)[2];
+    assert(tooltip.includes("全部已配置难度已开放") && !tooltip.includes("最低通关进度"),
+        "the all-configured policy describes the active server rule");
+    click(rows(ui)[total - 1]);
+    assert.equal(sent(ui).length, 1);
+    assert.equal(sent(ui)[0].payload.difficulty_id, "N" + total, "high difficulty requests use the selected real ID");
+    const viewer = boot({startupState: state, localId: 1});
+    assert(rows(viewer).every(row => !row.enabled), "opening all tiers never grants non-host selection authority");
+    click(rows(viewer)[total - 1]); assert.equal(sent(viewer).length, 0);
+}
+{
+    const configured = difficulties(49, 50);
+    const state = startup({mode_id: "cold", difficulty_access_policy: "all_configured",
+        difficulty_options_by_mode: {cold: configured}});
+    const ui = boot({startupState: state});
+    const last = rows(ui)[49];
+    assert(!last.enabled, "the policy label cannot override a locked server option");
+    const availability = last.children[0].children.find(node => node.BHasClass("DifficultyOptionAvailability"));
+    assert.equal(availability.text, "全员通关 N49 解锁", "higher-tier prerequisite text keeps the entire difficulty number");
+    click(last); assert.equal(sent(ui).length, 0);
+    ui.setStartup(startup({mode_id: "cold", difficulty_access_policy: "all_configured", can_confirm_difficulty: false,
+        difficulty_options_by_mode: {cold: difficulties(50, 50)}}));
+    assert(rows(ui).every(row => !row.enabled), "opening all tiers still waits for the server readiness gate");
+    click(rows(ui)[49]); assert.equal(sent(ui).length, 0);
+}
+{
+    const configured = difficulties(30, 30);
+    configured[29].temporary_config = 1;
+    configured[29].source_difficulty_id = "N30";
+    const ui = boot({startupState: startup({mode_id: "rich", difficulty_options_by_mode: {rich: configured}})});
+    const availability = rows(ui)[29].children[0].children.find(node => node.BHasClass("DifficultyOptionAvailability"));
+    assert.equal(availability.text, "临时配置 · 沿用 N30", "temporary high-tier profiles display their full source ID");
+    ui.nodes.DifficultySelectionHint.events.onmouseover();
+    assert(ui.dispatched.filter(event => event[0] === "DOTAShowTextTooltip").at(-1)[2].includes("最低通关进度"),
+        "servers without the all-configured policy retain their progression explanation");
+}
+{
+    const wave = {status: "selecting_difficulty", mode_selected: true, game_mode: "cold", selector_player_id: 0,
+        difficulty_selected: false, can_confirm_difficulty: true, difficulty_access_policy: "all_configured",
+        difficulty_options: difficulties(50, 50)};
+    const ui = boot({state: {sequence: 1, resources: {}, wave}});
+    assert.equal(rows(ui).length, 50);
+    assert(ui.nodes.DifficultySelectionHint.text.includes("全难度开放至 N50"), "wave-only snapshots forward the same policy");
+    click(rows(ui)[49]); assert.equal(sent(ui)[0].payload.difficulty_id, "N50");
+}
+console.log("DIFFICULTY_STARTUP_SELECTION_PASS: preloaded team permissions, configured N30/N50 tiers, canonical IDs, policy hints, host/readiness guards, immediate ACK and wave-only compatibility");

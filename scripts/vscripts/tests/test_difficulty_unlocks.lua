@@ -1,6 +1,8 @@
 -- Real difficulty config, wave request handler, event bus, and wave builder.
 -- Engine-only spawning/rendering dependencies are not involved in selection.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+local release = require("config/mode_release_config")
+release.all_difficulties_unlocked = false
 local config = require("config/difficulty_config")
 local function progression(counts)
     local values = {}; for key,value in pairs(counts or {}) do values[key]=value end
@@ -115,6 +117,13 @@ package.loaded["systems/player_profile_service"] = {
     get_profile = function() return { save = { archive = {} } } end,
 }
 GameRules = { GetGameTime = function() return 0 end }
+local builder = require("systems/wave_difficulty_builder")
+local original_build, last_build = builder.build, nil
+builder.build = function(...)
+    local built, reason = original_build(...)
+    last_build = built
+    return built, reason
+end
 local wave = require("systems/wave_system")
 local function request(id, player_id, extra)
     local payload = extra or {}
@@ -228,4 +237,77 @@ mode, loaded_profile[0] = nil, nil
 restart()
 assert(wave.set_difficulty("N10"), "existing internal Tools selection remains available")
 assert(snapshot().difficulty_id == "N10")
+
+-- Acceptance opens every configured tier, while the real request path keeps
+-- authentication, fixed-roster readiness, host authority and mode admission.
+release.all_difficulties_unlocked = true
+selector, admitted[0], admitted[1], gameplay_ready = 0, true, true, true
+local function acceptance_profile()
+    local value = progression({ n3=1, n5=1 })
+    value.rich_clear_counts, value.cold_clear_counts = {}, {}
+    return value
+end
+for _, case in ipairs({{"standard",10},{"pure",10},{"rich",30},{"cold",50}}) do
+    mode = case[1]
+    loaded_profile[0], loaded_profile[1] = acceptance_profile(), acceptance_profile()
+    restart()
+    local state = snapshot()
+    assert(state.difficulty_data_ready and state.difficulty_access_policy == "all_configured")
+    assert(state.max_difficulty_id == "N"..case[2] and #state.difficulty_options == case[2])
+    for _, option in ipairs(state.difficulty_options) do
+        assert(option.unlocked == 1 and option.unlock_hint == "", "every configured tier is selectable")
+    end
+    assert(published.difficulty_access_policy == "all_configured",
+        "wave updates publish the authoritative acceptance policy")
+    assert(request("N"..case[2],1).error == "difficulty_selector_required")
+    assert(request("N"..(case[2]+1),0).error == "difficulty_not_found")
+    assert(request("n"..case[2],0).error == "difficulty_not_found", "IDs remain canonical")
+    assert(request("N"..case[2],0).ok, "the host can request the highest tier without previous-tier clears")
+    assert(snapshot().difficulty_id == "N"..case[2] and snapshot().status == "countdown")
+    local rules = require("config/human_monster_rules")
+    local selected, base = rules.mode(mode,"N"..case[2]), rules.wave_base(1)
+    assert(last_build and last_build.mode_id == mode and last_build.difficulty.difficulty_id == "N"..case[2])
+    local first = last_build.waves[1][1]
+    assert(first.health == base.health * selected.hp_multiplier
+        and first.war3_armor == base.war3_armor * selected.armor_multiplier,
+        "the actual wave rebuild receives this mode's highest-tier HP and armor instead of a fallback")
+end
+
+mode = "cold"
+restart()
+admitted[0] = false
+assert(request("N50",0).error == "player_not_ready")
+admitted[0] = true
+assert(request("N50",99).error == "test_access_denied")
+loaded_profile[0] = nil
+assert(request("N50",0).error == "profile_not_loaded")
+loaded_profile[0] = acceptance_profile()
+loaded_profile[1].loaded = false
+assert(request("N50",0).error == "profile_not_loaded", "an unloaded frozen-roster teammate still blocks acceptance")
+loaded_profile[1] = nil
+assert(request("N50",0).error == "profile_not_loaded", "missing teammate profile is never fabricated")
+loaded_profile[1] = acceptance_profile()
+loaded_profile[1].cold_clear_counts = nil
+assert(request("N50",0).error == "profile_not_loaded", "independent mode capability remains mandatory")
+loaded_profile[1] = acceptance_profile()
+loaded_profile[1].standard_clear_counts.n5 = nil
+assert(request("N50",0).error == "difficulty_not_unlocked", "cold's exact mode-entry prerequisite is retained")
+assert(snapshot().difficulty_options[50].unlocked == 0)
+loaded_profile[1].standard_clear_counts.n5 = 1
+assert(request("N50",0).ok)
+
+mode = "rich"
+loaded_profile[0], loaded_profile[1] = acceptance_profile(), acceptance_profile()
+loaded_profile[1].standard_clear_counts.n3 = nil
+restart()
+assert(request("N30",0).error == "difficulty_not_unlocked", "rich admission is not bypassed by tier acceptance")
+loaded_profile[1].standard_clear_counts.n3 = 1
+assert(request("N30",0).ok)
+
+release.all_difficulties_unlocked = false
+mode = "standard"
+loaded_profile[0], loaded_profile[1] = progression(), progression()
+restart()
+assert(snapshot().difficulty_access_policy == "progression" and snapshot().max_difficulty_id == "N4")
+assert(request("N10",0).error == "difficulty_not_unlocked", "switching acceptance off restores normal tier rules")
 print("PASS test_difficulty_unlocks")

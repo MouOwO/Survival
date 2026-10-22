@@ -3,6 +3,7 @@
 -- lobby host changes. No client counters participate in these permissions.
 local config = require("config/difficulty_config")
 local progression_rules = require("config/mode_progression")
+local release = require("config/mode_release_config")
 local mode_test = require("debug/mode_unlock_test")
 local M = {}
 
@@ -55,6 +56,7 @@ function M.snapshot(player_ids, mode)
         end
     end
     return { ready = ready, options = options, max_difficulty_id = maximum,
+        difficulty_access_policy = release.is_difficulty_open(mode) and "all_configured" or "progression",
         limit_player_ids = ready and limits or {} }
 end
 

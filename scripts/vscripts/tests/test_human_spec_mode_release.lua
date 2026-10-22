@@ -21,12 +21,14 @@ local setup = require("systems/match_setup_service")
 local release = require("config/mode_release_config")
 local rules = require("config/human_monster_rules")
 local difficulties = require("config/difficulty_config")
+assert(release.all_difficulties_unlocked == true, "acceptance tiers are enabled in the shipped release configuration")
 setup.init("human_release_scope")
 local options = setup.snapshot().mode_options
 assert(#options==4)
 local seen = {}
 for _,row in ipairs(options) do assert(release.is_released(row.mode_id));seen[row.mode_id]=true end
 for _,mode in ipairs({"standard","cold","rich","pure"}) do
+    assert(release.is_difficulty_open(mode))
     assert(seen[mode]);setup.init("human_release_"..mode)
     local selected=setup.select_mode(0,mode,setup.get_session_id())
     assert(selected.ok and setup.get_mode()==mode)
@@ -34,6 +36,7 @@ end
 for _,debug in ipairs({false,true}) do
     developer_unlock=debug
     for _,mode in ipairs({"scourge","ruins","celestial","fishing"}) do
+        assert(not release.is_difficulty_open(mode), "tier acceptance cannot release an unreleased mode")
         setup.init("human_closed_"..mode)
         local selected=setup.select_mode(0,mode,setup.get_session_id())
         assert(not selected.ok and selected.error=="mode_not_released")

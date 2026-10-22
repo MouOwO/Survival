@@ -1,7 +1,14 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
+local release = require("config/mode_release_config")
+release.all_difficulties_unlocked = false
 
 local time, humans, disconnected, profiles, pending, requests, listeners, published, thinker
 local engine_state, authenticated, profile_pending, profile_requests, responses, history
+-- Only this fixture's synthetic roster is admitted, independent of local IDs.
+local function fixture_actor(id) return humans ~= nil and humans[id] ~= nil end
+package.loaded["core/test_access_policy"] = {
+    enabled=function() return true end, allowed=fixture_actor, enforce=fixture_actor,
+}
 local asset, mode, unique, modules, asset_retry_calls, asset_retry_result = nil, nil, 0, {}, 0, nil
 Time = function() return time end
 DoUniqueString = function(prefix) unique = unique + 1 return prefix .. "_" .. unique end
@@ -62,8 +69,7 @@ local function fixture(count, settings)
         get_progression = function(id, selected_mode)
             local record = authenticated[id]
             if record and modules.profiles.is_authenticated_for_account(id, tostring(humans[id].account)) then
-                return { loaded = true, clear_counts = selected_mode == "rich"
-                    and record.progression.rich_clear_counts or record.progression.clear_counts }
+                return record.progression
             end
         end,
         is_authenticated_for_account = function(id, account)
@@ -124,9 +130,14 @@ local function fixture(count, settings)
     return service
 end
 local function success(request, counts, rich_counts)
+    -- This fixture independently authenticates equal standard/pure counters;
+    -- returning the complete receipt preserves the real provenance contract.
+    local standard, pure = {}, {}
+    for key,value in pairs(counts or {}) do standard[key],pure[key]=value,value end
     local response = { ok = true, authenticated = true, account_id = request.account,
         match_session_id = request.session,
         progression = { loaded = true, clear_counts = counts or {},
+            standard_clear_counts = standard, mode_clear_counts = {pure=pure},
             rich_clear_counts = rich_counts or {}, highest_difficulty = 0 } }
     authenticated[request.id] = response
     pending[request.id] = false
@@ -205,6 +216,20 @@ assert(preloaded.difficulty_options_by_mode.standard[6].unlocked == 1
     "all mode previews are loaded before the first mode click, including independent rich progress")
 assert(#profile_requests == 0 and #requests == 2 and profiles[0] == nil and profiles[1] == nil,
     "difficulty preload neither repeats HTTP nor applies a gameplay profile")
+release.all_difficulties_unlocked = true
+choosing.tick()
+local acceptance = choosing.snapshot().setup
+assert(acceptance.difficulty_access_policy == "all_configured" and acceptance.max_difficulty_id == "N10")
+assert(acceptance.difficulty_options_by_mode.standard[10].unlocked == 1
+    and acceptance.difficulty_options_by_mode.pure[10].unlocked == 1,
+    "authenticated admission immediately previews all released-mode tiers")
+assert(acceptance.difficulty_options_by_mode.rich[30].unlocked == 0,
+    "the mode-entry prerequisite remains independent of open difficulty tiers")
+assert(#profile_requests == 0 and #requests == 2, "tier preview adds no mode-profile HTTP request")
+release.all_difficulties_unlocked = false
+choosing.tick()
+assert(choosing.snapshot().setup.difficulty_access_policy == "progression"
+    and choosing.snapshot().setup.max_difficulty_id == "N6")
 local selection_session = choosing.snapshot().session_id
 select_mode(choosing, "pure", 1)
 assert(not choosing.snapshot().setup.mode_selected and responses[#responses].payload.error == "selection_not_host")

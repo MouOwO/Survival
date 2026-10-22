@@ -456,6 +456,7 @@ local function refresh_selection_state()
         and startup.is_difficulty_selection_ready(selector) == true and permission ~= nil and permission.ready == true
     state.difficulty_options = permission and permission.options or difficulty_config.client_options()
     state.difficulty_data_ready = permission ~= nil and permission.ready == true
+    state.difficulty_access_policy = permission and permission.difficulty_access_policy or "progression"
     state.max_difficulty_id = permission and permission.max_difficulty_id or ""
     state.difficulty_limit_player_ids = permission and permission.limit_player_ids or {}
     if game_started and not difficulty_selected then
@@ -1306,6 +1307,7 @@ local function get_wave_state(payload)
         can_confirm_difficulty = state.can_confirm_difficulty,
         difficulty_options = state.difficulty_options,
         difficulty_data_ready = state.difficulty_data_ready,
+        difficulty_access_policy = state.difficulty_access_policy,
         max_difficulty_id = state.max_difficulty_id,
         difficulty_limit_player_ids = state.difficulty_limit_player_ids,
         current_wave = state.current_wave,

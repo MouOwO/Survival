@@ -1,6 +1,7 @@
 -- Real archive event/queue, HTTP adapter, settlement reducer and unlock config.
 -- The HTTP transport/database are a durable in-memory fixture, not an ECS test.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("config/mode_release_config").all_difficulties_unlocked = false
 local function copy(value)
     if type(value) ~= "table" then return value end
     local result = {}; for key, child in pairs(value) do result[key] = copy(child) end
@@ -20,6 +21,11 @@ local function empty_profile(account)
     return profile
 end
 local accounts = { [0] = "fixture-a", [1] = "fixture-b" }
+package.loaded["core/test_access_policy"] = {
+    enabled=function() return true end,
+    allowed=function(id) return accounts[id] ~= nil end,
+    enforce=function(id) return accounts[id] ~= nil end,
+}
 local database = { [accounts[0]] = empty_profile(accounts[0]), [accounts[1]] = empty_profile(accounts[1]) }
 local received, commits, tasks, cached = {}, 0, {}, {}
 local down, lose_next_response = false, false
@@ -36,7 +42,9 @@ local provider = {
         assert(type(payload.config_hash) == "string" and #payload.config_hash > 0)
         if down then failure("backend_unavailable", 503); return end
         local stored = assert(database[payload.account_id])
-        local result = reducer.settle(stored, payload.command, false)
+        -- A real backend binds the mode from its authenticated match session.
+        local command = copy(payload.command); command.mode_id = mode
+        local result = reducer.settle(stored, command, false)
         assert(result.ok)
         if not result.duplicate then
             stored.save.archive, stored.save.gameplay_stats = result.archive, result.gameplay_stats
@@ -135,11 +143,18 @@ mode, rich_capability = "standard", true
 restart_match()
 bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N10"})
 assert(received[#received].command.kind=="standard_clear")
-assert(database[accounts[0]].save.archive.standard_clear_counts.n10==1)
+assert(database[accounts[0]].save.archive.standard_clear_counts.n10==2,
+    "both legacy and new wire kinds inherit the authenticated standard session")
+restart_match()
+bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N3"})
+assert(database[accounts[0]].save.archive.standard_clear_counts.n3==1)
 local ordinary_n5=database[accounts[0]].save.archive.clear_counts.n5
 mode="rich"
 restart_match()
-assert(unlocked(0,"N5") and not unlocked(0,"N6"), "the acknowledged regular N10 opens rich N1-N5 only")
+assert(unlocked(0,"N4") and not unlocked(0,"N5"), "the acknowledged exact N3 opens rich's first four tiers")
+bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N4"})
+assert(unlocked(0,"N5") and not unlocked(0,"N6"), "rich N4 is required for its N5")
+restart_match()
 down = true
 bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N5"})
 assert(not unlocked(0,"N6"), "an offline rich clear intent cannot open the upper bracket")
@@ -151,21 +166,26 @@ tasks.archive_retry()
 assert(received[#received].command.kind=="rich_clear")
 assert(database[accounts[0]].save.archive.rich_clear_counts.n5==1)
 assert(database[accounts[0]].save.archive.clear_counts.n5==ordinary_n5)
-for number=6,10 do assert(unlocked(0,"N"..number), "one confirmed rich N5 opens all five upper levels") end
+assert(unlocked(0,"N6"))
+for number=7,10 do assert(not unlocked(0,"N"..number), "rich N5 advances only one tier") end
 for _,selected in ipairs({"cold","scourge"}) do
     mode=progression_rules.parent_mode(selected)
     restart_match()
-    bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N10"})
+    bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id=selected=="cold" and "N5" or "N9"})
     assert(received[#received].command.kind==mode.."_clear")
     mode=selected
     restart_match()
-    assert(unlocked(0,"N1") and unlocked(0,"N5") and not unlocked(0,"N6"),
-        "the parent-mode N10 opens the next mode's first bracket")
+    assert(unlocked(0,"N1") and unlocked(0,"N4") and not unlocked(0,"N5"),
+        "an exact authenticated N5/N9 opens the corresponding mode's first four tiers")
+    bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N4"})
+    assert(unlocked(0,"N5") and not unlocked(0,"N6"))
+    restart_match()
     bus.emit("archive.final_wave_cleared",{player_id=0,difficulty_id="N5"})
     assert(received[#received].command.kind==selected.."_clear")
     assert(database[accounts[0]].save.archive[selected.."_clear_counts"].n5==1)
     assert(database[accounts[0]].save.archive.clear_counts.n5==ordinary_n5,
         "advanced victory cannot pollute ordinary unlocks")
-    for number=6,10 do assert(unlocked(0,"N"..number), "the advanced mode's own N5 opens its upper bracket") end
+    assert(unlocked(0,"N6"))
+    for number=7,10 do assert(not unlocked(0,"N"..number), "the advanced mode's own N5 advances only one tier") end
 end
 print("PASS test_archive_difficulty_progression: offline HTTP adapter/reducer boundary")

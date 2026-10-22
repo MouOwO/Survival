@@ -1,5 +1,6 @@
 -- Real entry authentication, match choice, HTTP profile and progression APIs.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("config/mode_release_config").all_difficulties_unlocked = false
 require("tests/development_release_profile")
 -- An admitted offline actor still exercises real HTTP identity/session checks;
 -- no local Workshop allowlist or private account identifiers enter this test.

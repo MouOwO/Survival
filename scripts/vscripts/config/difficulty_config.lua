@@ -1,4 +1,5 @@
 local progression_rules = require("config/mode_progression")
+local release = require("config/mode_release_config")
 local rules = require("config/human_monster_rules")
 local names = { standard="常规", pure="纯净", rich="丰饶", cold="极寒",
     scourge="天灾", ruins="归墟", celestial="天域" }
@@ -32,6 +33,9 @@ function M.is_unlocked(difficulty_id, progression, mode_id)
     -- The standalone settlement worker never loads this engine-only service.
     local mode_test = package.loaded["debug/mode_unlock_test"]
     if mode_test and mode_test.is_enabled() then return true end
+    if release.is_difficulty_open(mode_id) then
+        return progression_rules.entry_unlocked(mode_id, progression) == true
+    end
     return progression_rules.difficulty_unlocked(mode_id, difficulty_id, progression) == true
 end
 

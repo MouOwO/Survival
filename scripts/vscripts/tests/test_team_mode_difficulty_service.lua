@@ -1,5 +1,6 @@
 -- Fixed-roster advanced-mode permissions use independent authenticated maps.
 package.path = "scripts/vscripts/?.lua;" .. package.path
+require("config/mode_release_config").all_difficulties_unlocked = false
 local function profile()
     return {loaded=true, clear_counts={n4=99,n9=99,n10=99}, standard_clear_counts={n3=1},
         mode_clear_counts={pure={}}, rich_clear_counts={}, cold_clear_counts={}, scourge_clear_counts={},

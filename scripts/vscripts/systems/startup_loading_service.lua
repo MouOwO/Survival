@@ -254,6 +254,7 @@ local function setup_snapshot()
         ruins = by_mode.ruins.options, celestial = by_mode.celestial.options }
     value.difficulty_options = current.options
     value.difficulty_data_ready = current.ready
+    value.difficulty_access_policy = current.difficulty_access_policy
     value.max_difficulty_id = current.max_difficulty_id
     value.difficulty_limit_player_ids = current.limit_player_ids
     value.can_confirm_difficulty = M.is_difficulty_selection_ready(value.selector_player_id)
