@@ -42,6 +42,7 @@ GATE_FILES = (
     "scripts/vscripts/core/event_bus.lua",
 )
 STEAM_BASE = 76561197960265728
+WINDOWS_PUBLISH_PATH_MAX = 259  # MAX_PATH includes its terminating NUL.
 
 
 def decode_json(raw: bytes):
@@ -212,8 +213,8 @@ def require_reviewed_gate(candidate: Path, manifest: dict) -> None:
 
 
 def destination_paths(addon_name: str, install: Path) -> tuple[Path, Path]:
-    if not re.fullmatch(r"survival_test_[a-z0-9_]{1,60}", addon_name):
-        raise ValueError("Use a new isolated addon name beginning with survival_test_")
+    if not re.fullmatch(r"(?:survival_test_[a-z0-9_]{1,60}|svt_[a-z0-9]{1,8})", addon_name):
+        raise ValueError("Use a new isolated addon name: survival_test_ plus lowercase letters/digits/underscores, or svt_ plus 1-8 lowercase letters/digits")
     install = regular_path(install)
     destinations = []
     for tree in ("game", "content"):
@@ -223,6 +224,26 @@ def destination_paths(addon_name: str, install: Path) -> tuple[Path, Path]:
             raise ValueError("Refusing to replace an existing game/content addon")
         destinations.append(target)
     return tuple(destinations)
+
+
+def require_publish_paths(game_target: Path, content_target: Path, manifest: dict) -> int:
+    """Preflight final GUI/packer paths before creating or copying anything.
+
+    Python can copy a longer Windows path that the native Workshop packer may
+    not accept. Count UTF-16 characters, including supplementary characters as
+    two, while keeping every byte in the signed runtime unchanged.
+    """
+    maximum = 0
+    for target in (game_target, content_target,
+                   *(game_target / row["path"] for row in manifest["files"])):
+        length = len(str(target).encode("utf-16-le")) // 2
+        if length > WINDOWS_PUBLISH_PATH_MAX:
+            raise ValueError(
+                f"Windows publish path exceeds {WINDOWS_PUBLISH_PATH_MAX} characters "
+                f"(MAX_PATH compatibility): {length}: {target}. "
+                "Use a safe short addon name such as svt_1022; do not alter signed resources.")
+        maximum = max(maximum, length)
+    return maximum
 
 
 def trusted_policy(policy_path=POLICY) -> tuple[dict, Path]:
@@ -270,6 +291,7 @@ def prepare(candidate: Path, addon_name: str, testers: list[str], publish_mode: 
     runtime.validate_manifest(manifest)
     for row in manifest["files"]:
         protect_data.source_path(candidate, row["path"])
+    max_publish_path = require_publish_paths(game_target, content_target, manifest)
     policy, public_path = trusted_policy(policy_path)
     if runtime.digest(manifest_path) != original_manifest or runtime.digest(signature_path) != original_signature:
         raise ValueError("Signed inventory changed before signature verification")
@@ -298,6 +320,9 @@ def prepare(candidate: Path, addon_name: str, testers: list[str], publish_mode: 
               "runtime_files": manifest["file_count"], "runtime_bytes": manifest["bytes"],
               "tester_count": 4, "testers_sha256": hashlib.sha256(runtime.canonical_bytes({"steamids": testers})).hexdigest(),
               "published_maps": ["template_map"], "max_players": 4,
+              "windows_publish_paths_checked": True,
+              "max_publish_path_length": max_publish_path,
+              "publish_path_limit": WINDOWS_PUBLISH_PATH_MAX,
               "signature_valid": True, "full_hash_verification": True,
               "runtime_metadata_copied": False, "candidate_changed": False,
               "native_smoke_test": "NOT_RUN", "ready_for_upload": False,

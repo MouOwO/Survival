@@ -5,20 +5,34 @@
   "map": "template_map",
   "max_players": 4,
   "visibility_requested": "private",
-  "workshop_id": null,
-  "tester_steamids64": [],
-  "cover": "gucheng_zhuxiao_workshop.jpg",
-  "cover_master": "gucheng_zhuxiao_cover_master.png",
-  "cover_sha256": "220ab1bd4ea8156738f971ddff47535bab0df9f62da3b3f3e908dd5a6dc68749",
-  "cover_master_sha256": "bc69274e3c625a12dd22eac47ea554c3343e8294205bbc75fa3eee1ba59e6260",
-  "cover_bytes": 605055,
+  "workshop_id": "3824360109",
+  "tester_steamids64": [
+    "76561198424163156",
+    "76561198845461206",
+    "76561198104787442",
+    "76561198974301984"
+  ],
+  "cover": "gucheng_zhuxiao_workshop_1024x768.jpg",
+  "cover_master": "gucheng_zhuxiao_cover_4x3_master.png",
+  "cover_sha256": "571cc75655cfa3db9cb6c05aca61d9522d65ee98ed827768f257b8d897d188fa",
+  "cover_master_sha256": "afa13381fddf56fc68804cf0791287bdcbff45016f654b5cef6eaa276ba2167e",
+  "cover_bytes": 412015,
+  "cover_width": 1024,
+  "cover_height": 768,
   "real_money_payments": false,
-  "status": "DRAFT_REQUIRES_TEST_ACCOUNTS_AND_WORKSHOP_HANDOFF",
-  "uploaded": false,
+  "status": "PRIVATE_UPLOADED_DOWNLOADED_FULLY_VERIFIED_NATIVE_PENDING",
+  "test_addon": "survival_test_20261022_v01",
+  "release_sequence": 2026102202,
+  "runtime_content_sha256": "1c09e562ada4586ba4c046616e94317bf062c308a0c0c507e5af59d7b9024b6d",
+  "uploaded": true,
   "notes": [
-    "This file is a local listing draft; it does not change Steam settings or upload anything.",
-    "Four trusted SteamID64 values must be configured in the signed runtime and backend before a four-account test can be opened.",
+    "This is the reviewed listing and actual private upload record; visibility and download bytes were verified through the current owner Steam SDK session.",
+    "The owner confirmed four SteamID64 values on 2026-10-22; the signed runtime admission list is enabled, while the remote backend gate is not yet deployed.",
     "Private or friends-only visibility alone does not enforce a four-account limit.",
-    "The current archive API loopback address is not reachable from a Valve-hosted game server."
-  ]
+    "The current archive API loopback address is not reachable from a Valve-hosted game server.",
+    "Native map loading and four-machine networking remain separate checks; the archive hosting mode is pending owner selection."
+  ],
+  "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
+  "visibility_verified": "private",
+  "download_sha256": "9060dcd81a53762366c8d8598911489983da6c85b5134d64022396aa8f60ad4d"
 }

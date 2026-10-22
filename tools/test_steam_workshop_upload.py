@@ -1,0 +1,136 @@
+"""Offline SDK ABI and publication/recovery guard tests; no Steam is loaded."""
+import ctypes as C
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import steam_workshop_upload as api
+
+
+class FakeSteam:
+    owner = api.OWNER
+
+    def __init__(self, items=None, legal=False):
+        self.items = items or []
+        self.calls = []
+        self.legal = legal
+
+    def owned(self):
+        return self.items
+
+    def ug(self, name, result, types, *args):
+        self.calls.append((name, args))
+        if name == 'CreateItem':
+            return 123
+        raise RuntimeError('Stop before update/content transfer')
+
+    def wait(self, call, cls, callback_id):
+        assert cls is api.Created and callback_id == 3403
+        response = cls()
+        response.result, response.item, response.legal = 1, 9876543210, self.legal
+        return response
+
+
+class UploadGuards(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.folder = self.root / 'content'
+        self.folder.mkdir()
+        self.vpk = self.folder / '1.vpk'
+        self.vpk.write_bytes(b'small verified-package fixture')
+        self.state = self.root / 'journal.json'
+        self.facts = {'content_sha256': 'a' * 64, 'vpk_sha256': api.pack.runtime.digest(self.vpk)}
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def invoke(self, steam, *, apply=True):
+        with patch.object(api, 'emit'):
+            return api.publish(steam, {}, self.root / 'cover.jpg', self.vpk,
+                               self.facts, self.state, apply=apply)
+
+    def test_official_win64_struct_layouts(self):
+        self.assertEqual((C.sizeof(api.Created), api.Created.item.offset, api.Created.legal.offset), (24, 8, 16))
+        self.assertEqual((C.sizeof(api.Submitted), api.Submitted.item.offset, api.Submitted.legal.offset), (16, 8, 4))
+        self.assertEqual((C.sizeof(api.Queried), api.Queried.cursor.offset), (280, 21))
+        self.assertEqual((C.sizeof(api.Strings), api.Strings.count.offset), (16, 8))
+
+    def test_default_only_reads_even_with_owned_items(self):
+        steam = FakeSteam([{'id': '456'}])
+        self.assertEqual(self.invoke(steam, apply=False)['status'], 'VERIFIED_NO_PUBLICATION')
+        self.assertFalse(steam.calls)
+        self.assertFalse(self.state.exists())
+
+    def test_existing_owner_items_prevent_duplicate_create(self):
+        steam = FakeSteam([{'id': '456'}])
+        with self.assertRaisesRegex(ValueError, 'Existing owned'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+
+    def test_unknown_pending_create_must_be_recovered(self):
+        api.journal(self.state, {'owner': api.OWNER, 'app_id': api.APP,
+                    **self.facts, 'workshop_id': None, 'status': 'CREATE_REQUEST_PENDING'})
+        steam = FakeSteam()
+        with self.assertRaisesRegex(ValueError, 'no confirmed ID'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+
+    def test_created_id_saved_before_legal_stop(self):
+        steam = FakeSteam(legal=True)
+        with self.assertRaisesRegex(ValueError, 'accept its Workshop agreement'):
+            self.invoke(steam)
+        state = json.loads(self.state.read_text(encoding='utf8'))
+        self.assertEqual(state['workshop_id'], '9876543210')
+        self.assertTrue(state['legal_agreement_required'])
+        self.assertEqual([name for name, _ in steam.calls], ['CreateItem'])
+        self.assertTrue(self.vpk.exists())
+
+    def test_created_id_survives_update_failure(self):
+        steam = FakeSteam()
+        with self.assertRaisesRegex(RuntimeError, 'Stop before update'):
+            self.invoke(steam)
+        self.assertEqual(json.loads(self.state.read_text(encoding='utf8'))['workshop_id'], '9876543210')
+        self.assertTrue((self.folder / '9876543210.vpk').exists())
+        self.assertEqual([name for name, _ in steam.calls], ['CreateItem', 'StartItemUpdate'])
+
+    def test_resume_requires_owned_confirmed_id(self):
+        api.journal(self.state, {'owner': api.OWNER, 'app_id': api.APP,
+                    **self.facts, 'workshop_id': '9876543210', 'status': 'PRIVATE_ITEM_CREATED'})
+        steam = FakeSteam()
+        with self.assertRaisesRegex(ValueError, 'current owner list'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+
+    def test_recovery_journal_never_in_content(self):
+        self.state = self.folder / 'journal.json'
+        steam = FakeSteam()
+        with self.assertRaisesRegex(ValueError, 'outside the uploaded'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+
+    def test_os_lock_blocks_concurrent_publication_and_releases(self):
+        if sys.platform != 'win32':
+            self.skipTest('Reviewed uploader targets Windows x64')
+        with api.publication_lock(self.state):
+            with self.assertRaises(OSError):
+                with api.publication_lock(self.state):
+                    self.fail('Second publisher obtained the same state lock')
+        with api.publication_lock(self.state):
+            pass
+
+    def test_unknown_submit_result_never_resubmits_automatically(self):
+        api.journal(self.state, {'owner': api.OWNER, 'app_id': api.APP,
+                    **self.facts, 'workshop_id': '9876543210', 'status': 'SUBMIT_REQUEST_PENDING'})
+        steam = FakeSteam([{'id': '9876543210', 'owner': api.OWNER}])
+        with self.assertRaisesRegex(ValueError, 'Prior submit result is unknown'):
+            self.invoke(steam)
+        self.assertFalse(steam.calls)
+
+
+if __name__ == '__main__':
+    unittest.main()

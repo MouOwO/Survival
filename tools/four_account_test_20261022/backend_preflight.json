@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "checked_at_utc": "2026-10-22T02:32:15Z",
+  "status": "FOUR_REAL_ACCOUNTS_VALIDATED_REMOTE_READ_ONLY",
+  "test_configuration": {
+    "allowed_steam_ids64": [
+      "76561198424163156",
+      "76561198845461206",
+      "76561198104787442",
+      "76561198974301984"
+    ],
+    "allowed_account_ids": [
+      "463897428",
+      "885195478",
+      "144521714",
+      "1014036256"
+    ],
+    "environment": {
+      "SURVIVAL_TEST_STEAM_IDS64": "76561198424163156,76561198845461206,76561198104787442,76561198974301984"
+    },
+    "validator": "server/archive_backend/test_access.py:TestAccountPolicy.from_environment",
+    "configured_on_host": false,
+    "contains_credentials": false,
+    "restriction": "Limits existing canonical GetSteamAccountID account keys. It does not identify physical computers or independently authenticate Steam users/game servers. A dedicated test service must refuse to start when this setting is absent or invalid."
+  },
+  "remote_observation": {
+    "archive_release": "20261021-benefits-47accd81d922",
+    "archive_manifest_sha256": "39e845fd37a2966bbc57a616e661970a0736a0959ee9b00f2e1caf8ebdbae0fe",
+    "archive_bundle": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "archive_service_active": true,
+    "archive_health_ok": true,
+    "four_account_backend_gate_deployed": false,
+    "payment_release": "20261018-checkout-gcoin-v1",
+    "payment_manifest_sha256": "754926e3e7ef11603e3070eb5304cb778f55a5c8b7dfcc370d8f2612dfda4303",
+    "payment_service_active": true,
+    "payment_health_ok": true,
+    "nginx_configuration_valid": true,
+    "nginx_server_names": [
+      "pay.xiaofengnet.com"
+    ],
+    "nginx_local_proxy_ports": [
+      8766
+    ],
+    "game_archive_https_proxy_present": false,
+    "independent_four_account_service_present": false,
+    "remote_files_written": 0,
+    "database_queries": 0,
+    "player_profiles_read": 0,
+    "orders_created": 0,
+    "services_restarted": 0,
+    "credentials_exported": false
+  },
+  "existing_reusable_components": [
+    {
+      "path": "tools/aliyun_test_connection.py",
+      "use": "Pinned-host SSH transport and ownership-checked loopback tunnel.",
+      "limit": "Currently fixes both local and remote port to 8765. Do not launch unchanged for an isolated 18765 service."
+    },
+    {
+      "path": "tools/aliyun_game_test_auth.py",
+      "use": "Private temporary KV injection of the server ConVar in a local Tools/template_map session; removes the temporary credential file and does not print the token.",
+      "limit": "Readiness is fixed to localhost:8765 and the temporary file is placed in the developer addon. It requires explicit isolated endpoint/addon adaptation and cannot provision secrets to Valve-hosted servers."
+    },
+    {
+      "path": "server/archive_backend/test_access.py",
+      "use": "Startup-parsed optional four-account gate at the account-to-database boundary.",
+      "limit": "An account allowlist supplements existing trusted server authentication. It does not make a public caller-supplied account_id trustworthy."
+    },
+    {
+      "path": "server/aliyun/deploy/nginx-https.conf.example",
+      "use": "Existing deny-all HTTPS proxy starting point.",
+      "limit": "The old route list omits current session, lottery, batch and leaderboard routes; do not enable it unchanged."
+    }
+  ],
+  "next_deployment_steps": [
+    "Record the actual Workshop item ID and selected hosting mode. Keep the current test upload restricted; an upload/download test is distinct from a successful four-client online test.",
+    "For a self-controlled test host, prepare a separate loopback-only archive process at 127.0.0.1:18765, a separate PostgreSQL instance at 127.0.0.1:15432 with a new volume/password, and independent /opt/goufayu-ws4 and /etc/goufayu-ws4 paths. Do not copy real player rows, payment data or production credentials.",
+    "Reuse exact audited backend source, verifying every copied file against the active release manifest first. tmp/benefits_20261021/release_candidate/backend contains the current-generation server/PostgreSQL/session code; the external D:/survival_database/backend tree is older. Preserve the approved settlement bundle and match its hash to the test client.",
+    "Include the four-account gate and the environment value above in the isolated service. Validate a nonempty list before any application startup RPC. Generate new credentials only inside private host configuration after the concrete deployment has been reviewed. Do not install or proxy a payment service for this test.",
+    "Configure and verify a separate test HTTPS hostname/certificate only when DNS and the trusted host egress are known. Keep ingress denied until the host authorization is ready. Proxy only the required game routes; keep health/readiness local, retain Bearer checks, bound requests, and exclude credentials/bodies from logs.",
+    "For a self-controlled host, adapt the existing tunnel/private-ConVar helper to the isolated service and actual test addon. Never run the unchanged 8765 bridge and claim it is isolated. The upload contains no secret.",
+    "For Valve hosting, the existing private-ConVar helper is unavailable. A Workshop-bound dedicated-server authentication/bootstrap mechanism must be reviewed and pinned before public archive access; the current project has no such implementation. Do not auto-trust the first anonymous key or copy a shared backend token into downloadable Lua/JS.",
+    "Before opening test ingress, exercise authentication failures, the four allowed account keys, rejection of a fifth account, operation replay, concurrent requests and restart persistence against the isolated database. Then test the uploaded template_map build on the actual four computers."
+  ],
+  "required_game_routes": [
+    "/v1/session/authenticate",
+    "/v1/session/login",
+    "/v1/profile",
+    "/v1/lottery/catalog",
+    "/v1/lottery/snapshot",
+    "/v1/archive/config",
+    "/v1/archive/command",
+    "/v1/archive/endless-batch",
+    "/v1/archive/endless-leaderboard",
+    "/v1/online-time/checkpoint",
+    "/v1/rewards/grant"
+  ],
+  "not_performed": [
+    "Backend deployment, database/container initialization, DNS/certificate changes or public interface activation.",
+    "Configuration of credentials on Valve-hosted game servers.",
+    "Four physical computer sessions or a successful uploaded-game end-to-end test."
+  ],
+  "workshop": {
+    "id": "3824360109",
+    "visibility": "private",
+    "uploaded": true,
+    "download_full_hash_verified": true,
+    "hosting_mode": "PENDING_OWNER_SELECTION",
+    "native_test": "NOT_RUN"
+  }
+}

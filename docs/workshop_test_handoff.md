@@ -44,12 +44,16 @@ return {
 & 'D:/Survival_安全工具/venv/Scripts/python.exe' -B -X utf8 `
   tools/publish_test_release.py `
   --candidate 'D:/Survival_发布候选/本次新候选' `
-  --addon-name survival_test_20261021_v01 `
+  --addon-name svt_1022 `
   --testers-json 'D:/Survival_测试配置/testers.json' `
   --publish-mode create
 ```
 
-addon 名必须为 `survival_test_` 加小写英文字母、数字、下划线。
+addon 名支持 `survival_test_` 加 1–60 个小写英文字母、数字、下划线，
+或短名 `svt_` 加 1–8 个小写英文字母、数字，例如 `svt_1022`。
+交接工具在创建 staging 或复制文件前检查最终目标的全部绝对路径，按 Windows UTF-16 字符数不得超过 259。
+较长的 addon 名会把原本可用的资源路径推过原生工具的兼容边界；遇到此错误应换新的短隔离名，保留签名运行文件原字节。
+这项检查用于排除路径兼容风险，不能据此认定某次提交崩溃的原因，也不代表包体大小或上传权限已通过。
 更新已有工坊条目时使用 `--publish-mode update --workshop-id 已确认的数字ID`。
 名单 JSON、候选内名单和条目操作有任何不确定项，应保留为待填，不要构造假数据执行。
 
@@ -72,11 +76,11 @@ addon 名必须为 `survival_test_` 加小写英文字母、数字、下划线�
 
 ## 在官方工具中测试、上传
 
-本机已找到 `game/bin/win64/tools/workshopmanager.dll`，Steam 与 Dota 进程也存在。
-没有读取 Steam 凭据，未发现本项目已确认的发布 ID，也未发现 SteamCMD。
+本机已验证 `-tools -tool workshopmanager -addon survival` 可以打开官方发布器；本轮测试隔离目录可选。
+没有读取 Steam 凭据。2026-10-22 的实际隐藏条目为 `3824360109`，详见[本轮交付记录](release_test_20261022.md)。
 
 启动官方 Workshop Tools 后，需实际检查新 addon 是否可选、Workshop Manager 是否关联正确目录。
-当前对空 content 目录的 GUI 识别尚未完成实机验证；如工具不识别，应停止并检查元数据，
+空 content 目录已在本机GUI识别；在其它安装中如工具不识别，应停止并检查元数据，
 不要改为选择开发用 `survival`，也不要把整个候选或开发目录直接上传。
 
 本轮遵循用户明确要求的顺序：先完成签名、全文件校验和四账号门禁，再受限上传，随后由测试账号下载做原生测试。
@@ -85,4 +89,5 @@ addon 名必须为 `survival_test_` 加小写英文字母、数字、下划线�
 成功安装只输出 `INSTALLED_FOR_NATIVE_TEST_ONLY`，始终保持 `ready_for_upload=false`。
 
 服务端账号白名单、原生运行测试、上传后由测试账号下载的联机测试必须分别验证。
+本次原生发布器在大包打包时崩溃，后改用已验签候选的流式VPK和官方Steam SDK上传；实际下载已全量验证，原生运行仍单独待验。
 具体官方发布入口参见 [Dota 2 自定义地图发布](https://www.dota2.com.cn/wiki/Dota_2_Workshop_Tools/Addon_Overview/Publishing_Addons.htm)。

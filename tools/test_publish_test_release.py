@@ -100,6 +100,38 @@ class HandoffTests(unittest.TestCase):
         self.assertFalse(result["ready_for_upload"])
         self.assertTrue((Path(result["receipt_directory"]) / "handoff.json").is_file())
 
+    def test_safe_short_name_installs_identical_signed_runtime(self):
+        result = self.prepare(name="svt_1022", apply=True)
+        target = self.install / "game/dota_addons/svt_1022"
+        self.assertTrue(handoff.runtime.verify(target, self.manifest)["ok"])
+        self.assertTrue(result["windows_publish_paths_checked"])
+        self.assertLessEqual(result["max_publish_path_length"], 259)
+        self.assertEqual(result["publish_path_limit"], 259)
+        self.assertFalse(result["workshop_upload_performed"])
+        self.assertEqual(result["content_sha256"], self.manifest["content_sha256"])
+
+    def test_long_publish_target_fails_before_staging_or_copy_and_short_name_keeps_bytes(self):
+        short = "svt_1022"
+        short_target = self.install / "game/dota_addons" / short
+        prefix = "panorama/images/publish_path_probe/"
+        # Make the short final filename exactly 259 characters on this host.
+        count = 259 - len(str(short_target / prefix / ".vtex_c"))
+        self.assertGreater(count, 0)
+        relative = prefix + "x" * count + ".vtex_c"
+        self.write(relative, b"signed native resource fixture")
+        self.seal()
+        long = "survival_test_" + "x" * 60
+        with patch.object(handoff.shutil, "copyfileobj") as copier:
+            with self.assertRaisesRegex(ValueError, "publish path exceeds 259.*MAX_PATH"):
+                self.prepare(name=long, apply=True)
+            copier.assert_not_called()
+        self.assertEqual(list((self.install / "game/dota_addons").iterdir()), [])
+        self.assertEqual(list((self.install / "content/dota_addons").iterdir()), [])
+        self.assertFalse((self.source / "output").exists())
+        result = self.prepare(name=short)
+        self.assertEqual(result["max_publish_path_length"], 259)
+        self.assertEqual(result["content_sha256"], self.manifest["content_sha256"])
+
     def test_missing_duplicate_invalid_and_mismatched_testers_never_install(self):
         for testers in ([], self.testers[:3], [self.testers[0]] * 4, ["not-steam-id"] * 4,
                         [str(handoff.STEAM_BASE + n) for n in (201, 202, 203, 204)]):
@@ -216,7 +248,8 @@ class HandoffTests(unittest.TestCase):
         self.assert_uninstalled()
 
     def test_traversal_and_development_addon_names_cannot_be_destinations(self):
-        for name in ("survival", "Survival", "../survival", "survival_test_../survival", "survival_test_bad:name"):
+        for name in ("survival", "Survival", "../survival", "survival_test_../survival", "survival_test_bad:name",
+                     "svt_", "svt_123456789", "svt_../survival", "svt_a/b", "svt_a:b", "svt_A", "svt_bad_name"):
             with self.subTest(name=name), self.assertRaisesRegex(ValueError, "isolated addon name"):
                 self.prepare(name=name, apply=True)
         self.assert_uninstalled()

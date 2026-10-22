@@ -399,6 +399,7 @@ local function invalidate_player(player_id, reason)
     end
     profiles_by_player[player_id] = nil
     account_profiles_by_player[player_id] = nil
+    daily_limit_views[player_id] = nil
     entitlement_service.replace_all(
         player_id,
         {},
@@ -413,6 +414,18 @@ local function invalidate_player(player_id, reason)
             reason = tostring(reason or "invalidated"),
         })
     end
+end
+
+local function bound_profile(player_id)
+    local profile = profiles_by_player[player_id]
+    -- Admission to the same test list does not preserve a previous account's
+    -- slot binding. Retire its derived permissions/public projections as well
+    -- as the private cache before any reader or writer can reuse that slot.
+    if profile and current_account_id(player_id) ~= profile.account_id then
+        invalidate_player(player_id, "profile_binding_changed")
+        return nil
+    end
+    return profile
 end
 
 local function publish_public_profile(player_id, reason)
@@ -543,6 +556,13 @@ function M.apply_snapshot(player_id, snapshot, reason)
         return { ok = false, error = "match_profile_mismatch" }
     end
     local account_id = tostring(snapshot and snapshot.account_id or "")
+    if not provider and not ensure_provider() then
+        return { ok = false, error = "account_id_unavailable" }
+    end
+    if account_id ~= current_account_id(player_id) then
+        bound_profile(player_id)
+        return { ok = false, error = "account_id_mismatch" }
+    end
     local ok, validation_error = validate_snapshot(snapshot, account_id)
     if not ok then
         return { ok = false, error = validation_error }
@@ -562,7 +582,7 @@ function M.apply_snapshot(player_id, snapshot, reason)
     if existing_player_id ~= nil and existing_player_id ~= player_id then
         return { ok = false, error = "account_already_bound" }
     end
-    local current = profiles_by_player[player_id]
+    local current = bound_profile(player_id)
     local high_water = tonumber(revision_high_water_by_account[account_id]) or 0
     if snapshot.revision < high_water then
         return {
@@ -840,7 +860,7 @@ function M.apply_incremental(update)
     local account_id = tostring(update.account_id or "")
     local player_id = player_by_account[account_id]
     if not test_access_policy.enforce(player_id) then return { ok=false, error="test_access_denied" } end
-    local profile = player_id and profiles_by_player[player_id] or nil
+    local profile = player_id and bound_profile(player_id) or nil
     if not profile then
         return { ok = false, error = "profile_not_loaded", reload_required = true }
     end
@@ -957,8 +977,9 @@ function M.is_loading(player_id)
 end
 
 local function loaded_profile(player_id)
-    if not test_access_policy.allowed(tonumber(player_id)) then return nil end
-    local profile = profiles_by_player[tonumber(player_id)]
+    player_id = tonumber(player_id)
+    if not test_access_policy.allowed(player_id) then return nil end
+    local profile = bound_profile(player_id)
     return profile and matches_current_match(profile) and profile or nil
 end
 
@@ -975,7 +996,7 @@ function M.get_content_inventory_count(player_id, content_id)
     if not integer(player_id) or player_id == math.huge
         or type(content_id) ~= "string" or content_id == "" then return nil end
     local profile = loaded_profile(player_id)
-    if not profile or current_account_id(player_id) ~= profile.account_id then return nil end
+    if not profile then return nil end
     local inventory = profile.save and profile.save.content_inventory
     local count = tonumber(type(inventory) == "table" and inventory[content_id]) or 0
     return count == count and count < math.huge and math.max(0, math.floor(count)) or 0
@@ -1044,8 +1065,9 @@ end
 -- Readiness checks run on player orders; avoid copying the private save for a
 -- boolean account check. Never expose the mutable profile through this API.
 function M.is_loaded_for_account(player_id, account_id)
-    if not test_access_policy.allowed(tonumber(player_id)) then return false end
-    local profile = profiles_by_player[tonumber(player_id)]
+    player_id = tonumber(player_id)
+    if not test_access_policy.allowed(player_id) then return false end
+    local profile = bound_profile(player_id)
     return profile ~= nil and matches_current_match(profile) and tostring(profile.account_id) == tostring(account_id)
 end
 
@@ -1067,7 +1089,7 @@ function M.update_save_sections(player_id, replacements, reason)
     if player_id == nil or player_id < 0 or type(replacements) ~= "table" then
         return { ok = false, error = "save_sections_invalid" }
     end
-    local profile = profiles_by_player[player_id]
+    local profile = bound_profile(player_id)
     if not profile or type(profile.save) ~= "table" then
         return { ok = false, error = "profile_not_loaded" }
     end
@@ -1119,8 +1141,9 @@ function M.update_save_section(player_id, section, value, reason)
 end
 
 function M.get_public_profile(player_id)
-    if not test_access_policy.allowed(tonumber(player_id)) then return nil end
-    local profile = profiles_by_player[tonumber(player_id)]
+    player_id = tonumber(player_id)
+    if not test_access_policy.allowed(player_id) then return nil end
+    local profile = bound_profile(player_id)
     if not profile then
         return nil
     end

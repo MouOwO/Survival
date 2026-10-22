@@ -1,4 +1,6 @@
 package.path = 'scripts/vscripts/?.lua;' .. package.path
+-- Synthetic-account business regression; admission is covered separately.
+package.loaded['config/test_access'] = { enabled = false, allowed_steamids = {} }
 local bus, events = require('core/event_bus'), require('core/events')
 local decoder = require('core/json_decoder')
 local mode, session, now = 'standard', 'commerce_reads_session_1', 100
@@ -122,7 +124,7 @@ assert(not effects.owned(0,'saw'))
 accounts[0]=nil
 assert(not effects.owned(0,'saw'))
 accounts[0]=account
-assert(effects.owned(0,'saw'))
+assert(not effects.owned(0,'saw'),'Returning to a retired account binding requires a fresh snapshot')
 assert(profiles.load_player(0,'explicit_reload').pending)
 assert(not effects.owned(0,'saw'),'Loading invalidates the old gameplay profile synchronously')
 fetches[1].failure('unauthorized')
