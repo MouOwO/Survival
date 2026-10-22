@@ -104,18 +104,26 @@ for rotation=0,3 do for _,shift in ipairs({-64,0,64}) do
     assert(scout.hull_writes==hull_before and paths==path_before,
         'read-only approach candidates must not mutate hull or search paths')
     local front,seen=0,{}
+    local expected_center=shift==-64 and 4 or (shift==0 and -4 or 0)
+    local expected_front=shift==64 and 3 or 4
     for _,c in ipairs(candidates) do
         local n,l=local_point(c.point)
         if n==-184 then
             front=front+1
             local relative=l-offset
-            assert(relative==-132 or relative==-44 or relative==44 or relative==132,
-                'terrain filtering must keep slots on their actual wall face')
+            local authored=relative-expected_center
+            assert(authored==-132 or authored==-44 or authored==44 or authored==132,
+                'repair must make only the smallest bounded shift of the solid native row')
+            local world_center=expected_center*((rotation==1 or rotation==2) and -1 or 1)
+            assert(c.lateral_center==world_center and c.lane_pitch==88,
+                'a wider row must retain native padded-body spacing and its own wait geometry: rotation='
+                    ..rotation..' wall_shift='..shift..' center='..c.lateral_center..' pitch='..c.lane_pitch)
             assert(clear(c.point,32),'offered contact intersects static terrain or wall body')
             seen[l]=true
         end
     end
-    assert(front==3,'the biased384 stair must reject the one outer Hull32 contact, never shrink or recenter')
+    assert(front==expected_front,
+        'a small edge bias must fit four full bodies; a row needing more than48 shift must stay partial')
     local query_before=queries
     for _=1,100 do assert(contact.approach_points(wall,scout)==candidates) end
     assert(queries==query_before,'stable candidate reads must use shared geometry cache')
@@ -134,7 +142,7 @@ for rotation=0,3 do for _,shift in ipairs({-64,0,64}) do
         local plan=assert(contact.resolve(wall,extra))
         assert(plan.claimed,'remaining enemy must route through a real gap to another attack face')
         local n,l=local_point(plan.point)
-        assert(n~=-184 and route(extra.p,plan.point)>=0,'fourth enemy must use a genuinely reachable other face')
+        assert(n~=-184 and route(extra.p,plan.point)>=0,'overflow must use a genuinely reachable other face')
         local victim=owners[2];local old=victim.p;victim.dead=true
         local replacement=actor(31,world(-400,offset))
         local next_plan=assert(contact.resolve(wall,replacement))
@@ -168,9 +176,9 @@ for rotation=0,3 do for _,shift in ipairs({-64,0,64}) do
     cases=cases+1
 end end
 -- The installed native stair is symmetric384: centered64 seams close, while
--- one-cell tangent shifts leave a128 side route and three full-body contacts.
--- A second tangent cell leaves two contacts; terrain never shrinks bodies or
--- slides the four authored lane centers to manufacture more attackers.
+-- one-cell tangent shifts leave a128 side route. A bounded36 row shift keeps
+-- four full-body contacts without changing that physical route. A second
+-- tangent cell exceeds the repair limit and retains two contacts.
 bias=0
 for rotation=0,3 do for _,shift in ipairs({-128,-64,0,64,128}) do
     navigation.clear_all();contact.reset();obstacles={};q=rotation;offset=shift;clock=0
@@ -187,9 +195,9 @@ for rotation=0,3 do for _,shift in ipairs({-128,-64,0,64,128}) do
         local n=local_point(c.point)
         if n==-184 then front=front+1 end
     end
-    local expected_front=offset==0 and 4 or (math.abs(offset)==64 and 3 or 2)
+    local expected_front=math.abs(offset)<=64 and 4 or 2
     assert(front==expected_front,
-        'native384 tangent offset must filter exactly the blocked outer slot')
+        'native384 tangent offset must repair only a small full-body edge bias')
     if offset==0 then
         assert(#candidates==8,'closed centered stair must expose only front/back contacts')
         assert(GridNav:IsBlocked(world(0,-192)) and GridNav:IsBlocked(world(0,192)),
@@ -204,4 +212,4 @@ end end
 navigation.clear_all();contact.reset()
 assert(created==removed,'physical registration or contact lifecycle leaked native blockers')
 assert(writes==0,'contact settlement or lifecycle must never write world coordinates')
-print('WALL_GATE_CONTACT_LAYOUT_PASS cases='..cases..' four_rotations Hull32 pitch88 centered64_seams_only tangent64_three_front tangent128_two_front terrain_filtered_slots real_side_route death_refill read_only_cached_candidates verified_far_route stale_route_rejected blocked_stage_fallback no_position_writes')
+print('WALL_GATE_CONTACT_LAYOUT_PASS cases='..cases..' four_rotations Hull32 pitch88 centered64_seams_only tangent64_four_front tangent128_two_front bounded_minimal_shift terrain_filtered_slots real_side_route death_refill read_only_cached_candidates verified_far_route stale_route_rejected blocked_stage_fallback no_position_writes')

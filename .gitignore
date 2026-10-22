@@ -99,6 +99,7 @@
 !/scripts/vscripts/tests/test_wall_open_face_routing.lua
 !/scripts/vscripts/tests/test_wall_open_face_ai.lua
 !/scripts/vscripts/tests/test_wall_gate_contact_layout.lua
+!/scripts/vscripts/tests/test_rich_wall_contact_fit.lua
 !/scripts/vscripts/tests/wall_native_redesign_probe.lua
 !/scripts/vscripts/tests/wall_native_redesign_ai.lua
 !/scripts/vscripts/tests/test_wall_contact_solid.lua

@@ -7,6 +7,7 @@ local HALF, COUNT, ENGAGE_DISTANCE = 128, 4, 512
 -- Hull32 has padded radius42. Four centers fit a384 stair without shrinking
 -- any body; terrain may reject an outer contact on an offset placement.
 local LANE_PITCH, CONTACT_NORMAL = 88, 184
+local CONTACT_SHIFT_LIMIT, CONTACT_SHIFT_STEP = 48, 4
 local STALL_SECONDS, POSITION_CACHE_SECONDS = 3, 2
 local PATH_STEP_SECONDS, PATHS_PER_STEP = 0.5, 16
 local SETTLE_DISTANCE, WAIT_CLEARANCE, RETREAT_ALLOWANCE = 36, 8, 32
@@ -313,9 +314,10 @@ local function replacement_owner(s,side,stamp)
     local function consider(unit,p,claim)
             local id=unit:entindex()
             local radius=hull(unit)
-            local candidates=by_radius[radius]
+            local size_key=radius..":"..body_radius(unit)
+            local candidates=by_radius[size_key]
             if not candidates then
-                candidates={};by_radius[radius]=candidates
+                candidates={};by_radius[size_key]=candidates
                 for _,candidate in ipairs(positions(s,unit,stamp)) do
                     if candidate.face==side and not face.slots[candidate.lane] then
                         local blocker
@@ -364,7 +366,9 @@ local function replacement_owner(s,side,stamp)
 end
 positions=function(s,unit,stamp)
     local radius=hull(unit)
-    local cached=s.positions[radius]
+    local padded_radius=body_radius(unit)
+    local by_padding=s.positions[radius]
+    local cached=by_padding and by_padding[padded_radius]
     if cached and stamp-cached.updated<POSITION_CACHE_SECONDS then return cached.points end
     local p=s.wall:GetAbsOrigin()
     local result={}
@@ -374,26 +378,65 @@ positions=function(s,unit,stamp)
         local layout=s.layout
         local allowed=not layout or not layout.gate
             or (layout.axis==1 and side<=2) or (layout.axis==2 and side>=3)
-        -- Slots belong to the actual wall face. Terrain may remove an outer
-        -- slot; it must not slide the row away from the wall to manufacture a
-        -- fourth attacker on an offset staircase.
-        local center,low,high=0,-(COUNT*s.lane_pitch)*.5,(COUNT*s.lane_pitch)*.5
-        for lane=1,COUNT do
-            local along=center+(lane-(COUNT+1)*0.5)*s.lane_pitch
-            -- Keep endpoints outside the engine's inflated navigation cell.
-            local normal=math.max(CONTACT_NORMAL,HALF+radius+24)
+        -- Keep a valid authored row unchanged. A slightly offset stair may
+        -- reject just one outer endpoint even though four solid bodies fit.
+        -- Repair that one case within the same physical face, using actual
+        -- terrain rather than relying on a recognized rectangular doorway.
+        local checked={}
+        local normal=math.max(CONTACT_NORMAL,HALF+radius+24)
+        local function endpoint(along)
+            if checked[along]~=nil then return checked[along] end
             local x,y
             if side<=2 then x=(side==1 and -normal or normal);y=along
             else x=along;y=(side==3 and -normal or normal) end
             local point=Vector(p.x+x,p.y+y,p.z)
             point.z=GetGroundHeight(point,unit)
-            if allowed and clear_point(s.wall,unit,point,radius) then
-                result[#result+1]={point=point,key=side..":"..lane,face=side,lane=lane,
-                    lateral_center=center,lateral_min=low,lateral_max=high,lane_pitch=s.lane_pitch}
+            checked[along]=clear_point(s.wall,unit,point,radius) and point or false
+            return checked[along]
+        end
+        local row,count,missing={},0,nil
+        if allowed then
+            for lane=1,COUNT do
+                local point=endpoint((lane-(COUNT+1)*0.5)*s.lane_pitch)
+                row[lane]=point
+                if point then count=count+1 else missing=lane end
+            end
+        end
+        local center,pitch=0,s.lane_pitch
+        if count==COUNT-1 and (missing==1 or missing==COUNT)
+            and padded_radius*2<=s.lane_pitch then
+            local direction=missing==1 and 1 or -1
+            local minimum_pitch=math.max(s.lane_pitch-4,padded_radius*2)
+            local repaired=false
+            for trial_pitch=s.lane_pitch,minimum_pitch,-2 do
+                for offset=trial_pitch==s.lane_pitch and CONTACT_SHIFT_STEP or 0,
+                    CONTACT_SHIFT_LIMIT,CONTACT_SHIFT_STEP do
+                    local shift=direction*offset
+                    -- Reject bad outer endpoints before checking the middle.
+                    local first=endpoint(shift-1.5*trial_pitch)
+                    local last=first and endpoint(shift+1.5*trial_pitch)
+                    if last then
+                        local second=endpoint(shift-.5*trial_pitch)
+                        local third=second and endpoint(shift+.5*trial_pitch)
+                        if third then
+                            row={first,second,third,last};center,pitch=shift,trial_pitch
+                            repaired=true;break
+                        end
+                    end
+                end
+                if repaired then break end
+            end
+        end
+        local low,high=center-COUNT*pitch*.5,center+COUNT*pitch*.5
+        for lane=1,COUNT do
+            if row[lane] then
+                result[#result+1]={point=row[lane],key=side..":"..lane,face=side,lane=lane,
+                    lateral_center=center,lateral_min=low,lateral_max=high,lane_pitch=pitch}
             end
         end
     end
-    s.positions[radius]={points=result,updated=stamp}
+    if not by_padding then by_padding={};s.positions[radius]=by_padding end
+    by_padding[padded_radius]={points=result,updated=stamp}
     return result
 end
 -- Shared read-only candidates for target reachability. This performs cached
@@ -434,7 +477,7 @@ local function grant_claim(s,unit,source,p,stamp)
     local id=unit:entindex()
     local claim={unit=unit,point=source.point,key=source.key,face=source.face,lane=source.lane,updated=stamp,
         lateral_center=source.lateral_center,lateral_min=source.lateral_min,
-        lateral_max=source.lateral_max,lane_pitch=s.lane_pitch,
+        lateral_max=source.lateral_max,lane_pitch=source.lane_pitch or s.lane_pitch,
         progress_position=p,progress_time=stamp,nav_checked=stamp,arrived=false,
         physical_face=face_for(p,s.wall:GetAbsOrigin())}
     s.claims[id]=claim
