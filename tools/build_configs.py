@@ -854,6 +854,24 @@ def build_index(files: list[Path], output: Path) -> None:
     output.write_text("\n".join(index), encoding="utf-8", newline="\n")
 
 
+def build_human_monster_spec() -> bool:
+    """Refresh formula inputs before any other generated outputs are changed."""
+    consumer = ROOT / "scripts/vscripts/config/human_monster_rules.lua"
+    if not consumer.exists():
+        # Older/subset config fixtures do not use the formula-backed rules.
+        return False
+    builder = ROOT / "tools/import_human_monster_spec.py"
+    source = ROOT / "data/balance/human_spec_v3"
+    required = (builder, source / "human_spec.json", source / "接入规格_人话版_v3.xlsx")
+    missing = [str(path.relative_to(ROOT)) for path in required if not path.is_file()]
+    if missing:
+        raise ValueError(f"human monster specification inputs missing: {missing}")
+    # The importer validates BOTH complementary sources before writing its
+    # normalized JSON and Lua. A mismatch must stop the full config rebuild.
+    subprocess.run([sys.executable, str(builder)], cwd=ROOT, check=True)
+    return True
+
+
 def main() -> int:
     files = sorted(CSV_ROOT.rglob("*.csv"))
     if not files:
@@ -881,6 +899,7 @@ def main() -> int:
         spec.loader.exec_module(recorded_builder)
         recorded_builder.validate_tables(ROOT)
 
+    human_spec_built = build_human_monster_spec()
     tooltip_builder = ROOT / "tools" / "build_tooltip_definitions.py"
     tooltip_built_separately = False
     if tooltip_builder.exists():
@@ -903,6 +922,8 @@ def main() -> int:
     expected_outputs.add("index.lua")
     # Asset builders own these modules; a CSV rebuild must keep their mappings.
     expected_outputs.update({"building_white_shells.lua", "wall_destruction_models.lua"})
+    if human_spec_built:
+        expected_outputs.add("human_monster_spec.lua")
     for old in OUT_ROOT.glob("*.lua"):
         if old.name not in expected_outputs:
             old.unlink()
