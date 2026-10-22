@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "cause": "Initial ParticleManager creation ran before connected recipients; same-mode readiness previously never replayed it.",
+  "changes": [
+    "Wait for a fully connected player before automatic creation",
+    "Replay on full connection/reconnection and first player readiness",
+    "Keep four upright standard portals",
+    "Rich uses one model-free horizontal portal at rich_start, with native-derived spatial scale 3"
+  ],
+  "checks": {
+    "hammer": "Source and compiled markers/entities matched; no missing native dependency or global particle toggle was found; user confirmed Run Map rather than editor",
+    "native_standard": "Unmodified placement/orientation becomes visible when recreated after client join; fresh valley_decor_review Run Map with fixed service automatically shows native effects",
+    "native_rich": "One center vortex, no prop, threefold scale visible after map reload; new resources added after process startup were not visible until map reload",
+    "lifecycle": "Lua tests pass for no recipients, joins/reconnects, readiness deduplication, modes, failure cleanup, hot reload, stale world handles/listeners",
+    "resources": "15 Content/source/compiled pairs; 14 scaled particle layers; original official resources untouched",
+    "environment": "Temporary fixtures removed; returned to template_map, restored UI/fog/camera and resumed Hammer backend helper"
+  },
+  "screenshots": [
+    "output/map_build_c6/portal_standard_late_20261022.png",
+    "output/map_build_c6/portal_standard_fresh_fixed_20261022.png",
+    "output/map_build_c6/portal_rich_single_fresh_20261022.png"
+  ],
+  "limitations": [
+    "New scaled resource requires reloading the map in an already running Tools session"
+  ]
+}

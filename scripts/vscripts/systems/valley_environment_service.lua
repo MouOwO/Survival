@@ -9,6 +9,7 @@ local runtime_key = "SURVIVAL_VALLEY_ENVIRONMENT_RUNTIME"
 local runtime = rawget(_G, runtime_key) or { particles = {}, props = {}, generation = 0 }
 rawset(_G, runtime_key, runtime)
 local effect = "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient.vpcf"
+local rich_effect = "particles/survival_environment/rich_portal/ambient.vpcf"
 local model = "models/heroes/abyssal_underlord/abyssal_underlord_portal_model.vmdl"
 -- Player slots are east, south, west, north. Monsters leave the central
 -- sanctuary along these outward lanes; the native door's normal is local X.
@@ -33,6 +34,7 @@ end
 function M.precache(context)
     if supported_map() then
         PrecacheResource("particle", effect, context)
+        PrecacheResource("particle", rich_effect, context)
         PrecacheResource("model", model, context)
     end
 end
@@ -48,6 +50,31 @@ function M.clear()
     for _, prop in ipairs(old_props) do
         if not prop:IsNull() then UTIL_Remove(prop) end
     end
+end
+
+local function create_effect(path, position, attachment, forward, right, up)
+    local id = ParticleManager:CreateParticle(path, PATTACH_WORLDORIGIN, nil)
+    assert(type(id) == "number" and id >= 0, "Underlord portal particle creation failed")
+    runtime.particles[#runtime.particles + 1] = id
+    ParticleManager:SetParticleAlwaysSimulate(id)
+    ParticleManager:SetParticleShouldCheckFoW(id, false)
+    for _, cp in ipairs({0, 1, 2}) do
+        ParticleManager:SetParticleControl(id, cp, cp == 1 and attachment or position)
+        ParticleManager:SetParticleControlOrientation(id, cp, forward, right, up)
+    end
+    -- These are native style/channel controls, rather than world positions.
+    for _, cp in ipairs({4, 61, 62}) do
+        ParticleManager:SetParticleControl(id, cp, Vector(0, 0, 0))
+    end
+end
+
+local function create_rich_portal(marker)
+    local origin = marker:GetAbsOrigin()
+    local center = Vector(origin.x, origin.y, GetGroundHeight(origin, nil) + ground_clearance)
+    -- One horizontal vortex serves the four rich-mode monster landings.
+    -- Its own resource scales the complete native effect by three.
+    create_effect(rich_effect, center, center,
+        Vector(0, 0, 1), Vector(1, 0, 0), Vector(0, -1, 0))
 end
 
 local function create_portal(marker, lane, flat)
@@ -79,23 +106,7 @@ local function create_portal(marker, lane, flat)
     -- These map landmarks never move. Keeping the effect independent of the
     -- prop also keeps its emitters positioned when the client puts the prop
     -- to sleep and stops evaluating attach_portal outside the camera/vision.
-    local id = ParticleManager:CreateParticle(effect, PATTACH_WORLDORIGIN, nil)
-    assert(type(id) == "number" and id >= 0, "Underlord portal particle creation failed")
-    runtime.particles[#runtime.particles + 1] = id
-    -- These static map landmarks must keep their child emitters awake even
-    -- when the prop has no unit vision or the camera has visited another lane.
-    ParticleManager:SetParticleAlwaysSimulate(id)
-    ParticleManager:SetParticleShouldCheckFoW(id, false)
-    -- CP1 is the same authored attachment transform, supplied explicitly:
-    -- a successful particle handle alone does not keep a prop's bones awake.
-    for _, cp in ipairs({0, 1, 2}) do
-        ParticleManager:SetParticleControl(id, cp, cp == 1 and attachment or position)
-        ParticleManager:SetParticleControlOrientation(id, cp, forward, right, up)
-    end
-    -- CP4 is native size/channel state, not a position; CP61 selects the
-    -- original orange style. Leaving both zero keeps a fully idle portal.
-    ParticleManager:SetParticleControl(id, 4, Vector(0, 0, 0))
-    ParticleManager:SetParticleControl(id, 61, Vector(0, 0, 0))
+    create_effect(effect, position, attachment, forward, right, up)
 end
 
 function M.apply()
@@ -105,17 +116,31 @@ function M.apply()
     local mode = selected_mode()
     local flat = dedicated_modes[mode] == true
     for i = 1, 4 do
-        local name = flat and ("mode_" .. mode .. "_monster_" .. (i - 1) .. "_spawn")
-            or ("monsterborn_player" .. i)
-        local marker = Entities:FindByName(nil, name)
         local old = Entities:FindByName(nil, "valley_decor_v1_fx_monsterborn_player" .. i)
         if old then DoEntFireByInstanceHandle(old, "Stop", "", 0, old, old) end
+    end
+    if mode == "rich" then
+        local marker = Entities:FindByName(nil, "rich_start")
         if marker then
-            local ok, err = pcall(create_portal, marker, i, flat)
+            local ok, err = pcall(create_rich_portal, marker)
             if not ok then
                 M.clear()
                 print("[ValleyEnvironment] portal setup failed: " .. tostring(err))
                 return 0
+            end
+        end
+    else
+        for i = 1, 4 do
+            local name = flat and ("mode_" .. mode .. "_monster_" .. (i - 1) .. "_spawn")
+                or ("monsterborn_player" .. i)
+            local marker = Entities:FindByName(nil, name)
+            if marker then
+                local ok, err = pcall(create_portal, marker, i, flat)
+                if not ok then
+                    M.clear()
+                    print("[ValleyEnvironment] portal setup failed: " .. tostring(err))
+                    return 0
+                end
             end
         end
     end
@@ -130,24 +155,53 @@ function M.init()
             runtime.bus.unsubscribe(subscription)
         end
     end
+    if runtime.world == current_world() then
+        for _, listener in ipairs(runtime.listeners or {}) do StopListeningToGameEvent(listener) end
+    end
     M.clear()
     local world = current_world()
     runtime.world = world
     runtime.generation = runtime.generation + 1
     local current_generation = runtime.generation
-    local function refresh()
-        if runtime.generation == current_generation and current_world() == world
-            and runtime.mode ~= selected_mode() then M.apply() end
+    local ready_players = {}
+    local function connected_player_present()
+        if not PlayerResource then return false end
+        for player_id = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
+            if PlayerResource:GetPlayer(player_id)
+                and PlayerResource:GetConnectionState(player_id) == DOTA_CONNECTION_STATE_CONNECTED then
+                return true
+            end
+        end
+        return false
     end
-    -- Selection publishes WAVE_CHANGED before profile/builders finish loading.
-    -- Builder readiness also recovers a service rebound during that sequence.
+    local function refresh(force)
+        if runtime.generation == current_generation and current_world() == world
+            and connected_player_present()
+            and (force or runtime.mode ~= selected_mode()) then M.apply() end
+    end
+    local function player_ready(payload)
+        local id = payload and payload.player_id
+        local first_ready = id ~= nil and not ready_players[id]
+        if id ~= nil then ready_players[id] = true end
+        refresh(first_ready)
+    end
+    -- Activate runs before clients connect. Particle messages sent then have no
+    -- recipients, although the prop entities subsequently replicate normally.
+    -- Create only for connected clients and replay after full connection (also
+    -- on reconnect); later readiness covers the client's loading barrier.
+    runtime.listeners = {
+        ListenToGameEvent("player_connect_full", function()
+            scheduler.after(0.2, function() refresh(true) end, "valley_environment_player_connected")
+        end, nil),
+    }
     runtime.bus = event_bus
     runtime.subscriptions = {
-        event_bus.subscribe(events.WAVE_CHANGED, refresh),
-        event_bus.subscribe(events.BUILDER_READY, refresh),
+        event_bus.subscribe(events.WAVE_CHANGED, function() refresh(false) end),
+        event_bus.subscribe(events.BUILDER_READY, player_ready),
+        event_bus.subscribe(events.HERO_READY, player_ready),
     }
     scheduler.after(0, function()
-        refresh()
+        refresh(false)
     end, "valley_environment_initialise")
 end
 

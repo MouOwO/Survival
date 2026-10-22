@@ -1,0 +1,202 @@
+{
+  "root": "particles/survival_environment/rich_portal/ambient.vpcf",
+  "native_root": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient.vpcf",
+  "scale": 3,
+  "transform": "one horizontal native graph; caller sets CP0/1/2 to one ground center and their orientation basis; CP4/61/62 remain zero",
+  "global_scale": {
+    "class": "C_INIT_GlobalScale",
+    "multiplier": 3,
+    "center_control_point": 1,
+    "external_scale_control_point": -1,
+    "radius": true,
+    "position": true,
+    "velocity": true,
+    "appended_after_native_initializers": true
+  },
+  "schema_evidence": {
+    "installed_dll": "game/bin/win64/particles.dll",
+    "sha256": "317894b67814c5c1ecbeb2df244fd82810029b5193455ba43f89d9cc9c9ae94c",
+    "verified_strings": [
+      "C_INIT_GlobalScale",
+      "m_flScale",
+      "m_nScaleControlPointNumber",
+      "m_nControlPointNumber",
+      "m_bScaleRadius",
+      "m_bScalePosition",
+      "m_bScaleVelocity"
+    ],
+    "compiler_round_trip": "Run tools/build_rich_portal_particles.ps1 then tools/verify_rich_portal_particles.cjs",
+    "reference_schema": "https://github.com/a2x/cs2-dumper/blob/main/output/particles_dll.hpp#L5990"
+  },
+  "preserved": [
+    "15 reachable native particle systems",
+    "all native textures and materials",
+    "colors and HSV controls",
+    "emitter rates and particle counts",
+    "lifetimes, startup delays, fade and alpha curves",
+    "child topology and repetitions"
+  ],
+  "original_resources_untouched": true,
+  "outputs": [
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient.vpcf",
+      "native_sha256": "0942b60326b56d628355e8872b0d7aa17f845b3a1b36e31de4482195bb0ba958",
+      "source_sha256": "46c18a6695f97244365128470d0048df8d11618e96a15acd24301cd2bccb3fed",
+      "native_children": 9,
+      "changes": []
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_shadow.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_shadow.vpcf",
+      "native_sha256": "384b5d7e057340a5dc0315586064944d8af9deedb66fbde4868bbeb0f3a4a18e",
+      "source_sha256": "b75ca0060e584f630c5ef4750fd26d7840095cd9a6f795159e1e76e1e1364724",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_void.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void.vpcf",
+      "native_sha256": "b9e24dfc3e67aaac63a5aac5fff1c06bc6ee51b17a9452d441b249479d162656",
+      "source_sha256": "58f81cf6f61490b8094aebbd9dc2609d7799d783e812e07d1c9a61b3372aa3ab",
+      "native_children": 1,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
+        "m_flDepthBias x3 in world units"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_void_edge.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge.vpcf",
+      "native_sha256": "0c211e4e0890967ff3f67de2d013d9e10ff21b37b287b0678a17851341db41ee",
+      "source_sha256": "df385a90c1d72d527a95756dc74db550b9a0ab65fb8d53f26099af653c5d2bf6",
+      "native_children": 1,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_void_edge_glow.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_glow.vpcf",
+      "native_sha256": "b5c473f2579dc72e105e290a3c24a214572a0a217a25e6f6003f00d7b4a60f99",
+      "source_sha256": "8a3af54c59d5c6a3b40e39722e80d68765b752fcabe775790f1d229e61d96fa3",
+      "native_children": 1,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
+        "m_flTextureVWorldSize x3 in world units"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_void_edge_glow_animated.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_glow_animated.vpcf",
+      "native_sha256": "020f2a2481bd91e14d2de441327ab52eb1f5311367b2a65babe3437ba55992a6",
+      "source_sha256": "d9aff200fc48f64357f93fd6d52d83a9ab481b5c86685e8bd1fad1040b40f72a",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
+        "absolute per-frame radius curve x3",
+        "m_flTextureVWorldSize x3 in world units"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_void_twirl.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_twirl.vpcf",
+      "native_sha256": "d8d9729c6f11f1d7c36ba2ad43634f7b3fe2f14c988d23ef70e0d43acd5baa4a",
+      "source_sha256": "11c5976483e901bdcdfbdba2926f1a33125c06c7908b5b30b4ba758698ed5a9e",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
+        "absolute per-frame radius curve x3",
+        "distance damping range x3",
+        "m_flTextureVWorldSize x3 in world units",
+        "m_flDepthBias x3 in world units"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_galaxy.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_galaxy.vpcf",
+      "native_sha256": "398682d2a153b5ae19a204f60aba0b9d6e0685f3d2fff19f45b9b7ad8471d7c9",
+      "source_sha256": "5c9761729fb63ce9bcc02da004f7fea5c9766de40839eae9f0f6f9c515e59c11",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_void_edge_spikes.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_void_edge_spikes.vpcf",
+      "native_sha256": "60ddddae3e34b636ab1f2f06fb50572261086f84026f06fad075aefa3c59e959",
+      "source_sha256": "2257e41256f203d0cd645fec3791e290b7c7197f32d79d9d452a0a60fdfe5960",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
+        "additive radius oscillation rates x3",
+        "m_flTextureVWorldSize x3 in world units"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_light.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_light.vpcf",
+      "native_sha256": "87743030451e00fbd3dbb544ecd4bca9c8c12fa933ad6674d33316a73a5bf9bd",
+      "source_sha256": "ed4706cfbf126d51f04f4c1bef0c1b0ce6803528cfa289df924bd53078831f8d",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_pointer.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer.vpcf",
+      "native_sha256": "70bb145782b7daf68eee4ff4c4fbf9fa8777c0b78ab8c375eedd2c96680797c0",
+      "source_sha256": "8883be2cc62fcd949df09151ff9bad6382127a5d3d6c9ad1d7fd8454b972014c",
+      "native_children": 4,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_pointer_core.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_core.vpcf",
+      "native_sha256": "26854c9262fed76e612505625239f68dcc80682a2530c644cc4d2fa28509f59b",
+      "source_sha256": "87f241c9bb67a85cba667fc79115335834caff53efdd453ecfb1c5e3f7532fa4",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_pointer_line.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_line.vpcf",
+      "native_sha256": "4332b6fc4944212c7d593cda0f84953fe228acd6e4c261d6bb2c74169f6b6590",
+      "source_sha256": "f482ace4bd2e44df31398a6cd8abfe9ffcdb3d727c8630a7d49497c858ab3578",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
+        "m_flTextureVWorldSize x3 in world units"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_pointer_stars.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_stars.vpcf",
+      "native_sha256": "eb989d58ac0f5dc0147f2fea087dc2756b30556d99697124184b2e5ee98a1bd7",
+      "source_sha256": "091831978da285ab38e5f8e01f25d010e8f000c198a846dee7fcabc213d6d214",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1"
+      ]
+    },
+    {
+      "resource": "particles/survival_environment/rich_portal/ambient_pointer_energy.vpcf",
+      "native_resource": "particles/units/heroes/heroes_underlord/abbysal_underlord_portal_ambient_pointer_energy.vpcf",
+      "native_sha256": "ad6a60ed15c1637b504280287082c7f60f9dcf136202fed0f645d9eaaea99ecc",
+      "source_sha256": "84837f7ef5e884643614478e82eb6defb1c1558ab4d4478d2c737c0c9385ebb8",
+      "native_children": 0,
+      "changes": [
+        "append native C_INIT_GlobalScale: radius/position/velocity x3 around CP1",
+        "m_flTextureVWorldSize x3 in world units"
+      ]
+    }
+  ]
+}
