@@ -386,7 +386,9 @@ def run(expected_players):
                 report(value)
                 summary=json.dumps(value,sort_keys=True)
                 if summary!=previous:
-                    if state.get('error'):
+                    if state.get('phase')=='team_setup':
+                        text='请切回 Dota，在原生队伍设置界面点击“开始游戏”，随后按界面选择模式和难度。'
+                    elif state.get('error'):
                         text='档案准备暂未完成：'+state['error']+'。请查看游戏中的重试提示。'
                     elif state.get('profiles_ready'):
                         text='玩家档案已载入，可以继续游戏。'
