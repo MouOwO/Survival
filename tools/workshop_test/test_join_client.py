@@ -13,6 +13,40 @@ import local_host as host
 
 
 class GuestPackageChecks(unittest.TestCase):
+    @unittest.skipUnless(os.name=='nt','Windows PowerShell full asset audit')
+    def test_audit_collects_all_missing_or_changed_files_without_dota_or_server(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=Path(temporary);source=folder/host.ADDON;source.mkdir()
+            expected=host.expected_manifest({'files':[]},{name:b'frozen' for name in
+                ('addoninfo.txt','same_size.txt','wrong_size.txt','missing.txt')})
+            (source/'addoninfo.txt').write_bytes(b'frozen')
+            (source/'same_size.txt').write_bytes(b'CHANGED'[:6])
+            (source/'wrong_size.txt').write_bytes(b'x')
+            marker=json.dumps({'kind':'WS4-LOCAL-1','base_content_sha256':host.BASE_SHA,'runtime':expected}).encode()
+            (folder/'client_manifest.json').write_bytes(marker)
+            script=(host.HERE/'join_client.ps1').read_text(encoding='utf8').replace('__MANIFEST_SHA256__',hashlib.sha256(marker).hexdigest())
+            (folder/'join_client.ps1').write_text(script,encoding='utf-8-sig')
+            (folder/'check_resources.cmd').write_bytes((host.HERE/'audit_client.cmd').read_bytes())
+            environment=dict(os.environ)
+            environment['PSModulePath']=';'.join((str(Path(os.environ['ProgramFiles'])/'WindowsPowerShell/Modules'),
+                str(Path(os.environ['SystemRoot'])/'System32/WindowsPowerShell/v1.0/Modules')))
+            def run():
+                return subprocess.run(['cmd.exe','/d','/c','call',str(folder/'check_resources.cmd')],input='\n',
+                    capture_output=True,text=True,encoding='utf8',errors='replace',timeout=15,env=environment)
+            checked=run();self.assertEqual(checked.returncode,1,checked.stdout+checked.stderr)
+            report=json.loads((folder/'client_resource_audit.json').read_text(encoding='utf8'))
+            self.assertEqual((report['files'],report['issue_count'],report['game_started']),(4,3,False))
+            issues={r['path']:r for r in report['issues']}
+            self.assertEqual(set(issues),{'same_size.txt','wrong_size.txt','missing.txt'})
+            self.assertEqual(issues['missing.txt']['error'],'guest_file_missing')
+            self.assertEqual(issues['wrong_size.txt']['actual_bytes'],1)
+            self.assertNotEqual(issues['same_size.txt']['actual_sha256'],issues['same_size.txt']['expected_sha256'])
+            self.assertEqual((source/'wrong_size.txt').read_bytes(),b'x')
+            for name in issues:(source/name).write_bytes(b'frozen')
+            checked=run();self.assertEqual(checked.returncode,0,checked.stdout+checked.stderr)
+            report=json.loads((folder/'client_resource_audit.json').read_text(encoding='utf8'))
+            self.assertEqual((report['ok'],report['issue_count'],report['issues']),(True,0,[]))
+
     @unittest.skipUnless(os.name=='nt','Windows PowerShell diagnostics')
     def test_guest_diagnostics_identify_missing_asset_and_sanitize_parser_failures(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -43,7 +77,7 @@ class GuestPackageChecks(unittest.TestCase):
                 return result,json.loads((folder/'join_diagnostic.json').read_text(encoding='utf8'))
             missing,data=run(marker)
             self.assertEqual((data['error'],data['stage'],data['file']),('guest_file_missing','check_resources','addoninfo.txt'))
-            self.assertEqual(data['revision'],'WS4-JOIN-05')
+            self.assertEqual(data['revision'],'WS4-JOIN-06')
             private='must-never-print-parser-input'
             failed,data=run(('{"example":"'+private+'", broken').encode())
             self.assertEqual(data['stage'],'read_manifest')

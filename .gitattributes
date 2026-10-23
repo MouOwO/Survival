@@ -8,6 +8,7 @@
 *.tga binary -text
 # Windows guest launchers are distributed verbatim in client ZIPs.
 tools/workshop_test/launch_join.cmd text eol=crlf
+tools/workshop_test/audit_client.cmd text eol=crlf
 *.tif binary -text
 *.psd binary -text
 output/survival_world_v2/survival_world_v2.vmap filter=lfs diff=lfs merge=lfs -text

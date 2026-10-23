@@ -1,12 +1,14 @@
-param([string]$Server, [string]$GamePath, [switch]$CheckOnly)
+param([string]$Server, [string]$GamePath, [switch]$CheckOnly, [switch]$AuditAll)
 $ErrorActionPreference = 'Stop'
 $expectedManifestHash = '__MANIFEST_SHA256__'
 $addonName = 'survival_ws4_local'
 $descriptorName = '_ws4_local_install.json'
 $stage = 'read_address'
 $currentFile = ''
-$revision = 'WS4-JOIN-05'
+$revision = 'WS4-JOIN-06'
 $pathLength = 0
+$actualBytes = $null
+$actualSha = $null
 $cacheNames = @('tools_asset_info.bin','tools_thumbnail_cache.sqlite3','tools_thumbnail_cache.sqlite3-journal','tools_thumbnail_cache.sqlite3-wal','tools_thumbnail_cache.sqlite3-shm')
 function Assert-PlainPath([string]$Path) {
     $script:pathLength = $Path.Length
@@ -25,8 +27,12 @@ function Assert-PlainPath([string]$Path) {
 }
 function Assert-File([string]$Path, $Row) {
     $script:currentFile = $Row.path
+    $script:actualBytes = $null; $script:actualSha = $null
     Assert-PlainPath $Path
-    if ((Get-Item -LiteralPath $Path).Length -ne $Row.bytes -or (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $Row.sha256) { throw 'client_runtime_bytes_changed' }
+    $script:actualBytes = (Get-Item -LiteralPath $Path -Force).Length
+    if ($actualBytes -ne $Row.bytes) { throw 'client_runtime_bytes_changed' }
+    $script:actualSha = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actualSha -ne $Row.sha256) { throw 'client_runtime_bytes_changed' }
 }
 function Assert-Layout([string]$Folder, $Rows, [bool]$PermitCaches) {
     Assert-PlainPath $Folder
@@ -61,6 +67,9 @@ function Resolve-DotaGame {
 }
 try {
     Write-Host ('加入器版本：' + $revision)
+    if ($AuditAll -and -not $CheckOnly) { throw 'audit_requires_check_only' }
+    # Auditing assets never needs a server address, game installation or VPN.
+    if ($AuditAll -and -not $Server) { $Server = '127.0.0.1:27015' }
     if (-not $Server) {
         $addressFile = Join-Path $PSScriptRoot 'server_address.txt'
         if (Test-Path -LiteralPath $addressFile) { $Server = (Get-Content -LiteralPath $addressFile -Raw).Trim() }
@@ -84,6 +93,31 @@ try {
     $source = Join-Path $PSScriptRoot $addonName
     $stage = 'check_layout'; $currentFile = $addonName
     if (-not (Test-Path -LiteralPath $source -PathType Container)) { throw 'guest_runtime_folder_missing' }
+    if ($AuditAll) {
+        Assert-PlainPath $source
+        $stage = 'check_resources'
+        $issues = New-Object 'System.Collections.Generic.List[object]'
+        Write-Host '正在逐一校验全部资源；此操作不会启动游戏或连接主机。'
+        foreach ($row in $rows) {
+            try { Assert-File (Join-Path $source $row.path) $row }
+            catch {
+                $code = $_.Exception.Message
+                if ($code -notmatch '^[a-z_]{1,100}$') { $code = 'guest_asset_read_failed' }
+                $issues.Add(@{path=$row.path;error=$code;expected_bytes=$row.bytes;actual_bytes=$actualBytes;
+                    expected_sha256=$row.sha256;actual_sha256=$actualSha})
+            }
+        }
+        $audit = @{ok=($issues.Count -eq 0);revision=$revision;status='CLIENT_RESOURCE_AUDIT_COMPLETE';
+            files=$rows.Count;issue_count=$issues.Count;issues=@($issues.ToArray());game_started=$false}
+        $auditPath = Join-Path $PSScriptRoot 'client_resource_audit.json'
+        if (Test-Path -LiteralPath $auditPath) { Assert-PlainPath $auditPath }
+        [IO.File]::WriteAllText($auditPath,($audit | ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding($false)))
+        Write-Host ('资源校验完成：' + $rows.Count + ' 份文件，异常 ' + $issues.Count + ' 份。完整报告：client_resource_audit.json')
+        $audit.issues = @($issues.ToArray() | Select-Object -First 25)
+        $audit | ConvertTo-Json -Depth 6 -Compress
+        if ($issues.Count -gt 0) { exit 1 }
+        exit 0
+    }
     Assert-Layout $source $rows $false
     $stage = 'check_resources'
     Write-Host '正在校验加入方测试资源……'
@@ -164,6 +198,11 @@ try {
     $diagnostic = @{ok=$false;revision=$revision;error=$message;stage=$stage;category=$category;
         exception_type=$exceptionType;line=$_.InvocationInfo.ScriptLineNumber;powershell=$PSVersionTable.PSVersion.ToString();path_chars=$pathLength}
     if ($currentFile -match '^[A-Za-z0-9_./ -]{1,220}$') { $diagnostic.file = $currentFile }
+    if ($message -eq 'client_runtime_bytes_changed') {
+        $row = $rows | Where-Object path -eq $currentFile | Select-Object -First 1
+        $diagnostic.expected_bytes = $row.bytes; $diagnostic.actual_bytes = $actualBytes
+        $diagnostic.expected_sha256 = $row.sha256; $diagnostic.actual_sha256 = $actualSha
+    }
     $encoded = $diagnostic | ConvertTo-Json -Compress
     try {
         Assert-PlainPath $PSScriptRoot
