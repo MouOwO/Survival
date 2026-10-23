@@ -157,6 +157,25 @@ class UploadGuards(unittest.TestCase):
             self.invoke(steam)
         self.assertFalse(steam.calls)
 
+    def test_new_signed_release_requires_explicit_update_and_exact_listing_id(self):
+        api.journal(self.state, {'owner': api.OWNER, 'app_id': api.APP,
+            'content_sha256': 'old-release', 'vpk_sha256': 'old-package',
+            'workshop_id': '9876543210', 'uploaded': True, 'status': 'SUBMITTED'})
+        steam=FakeSteam([{'id':'9876543210','owner':api.OWNER}])
+        with self.assertRaisesRegex(ValueError, 'new signed release'):
+            self.invoke(steam)
+        with patch.object(api,'emit'), self.assertRaisesRegex(ValueError, 'new signed release'):
+            api.publish(steam,{'workshop_id':'different'},self.root/'cover.jpg',self.vpk,
+                self.facts,self.state,apply=True,update_existing=True)
+        self.assertFalse(steam.calls)
+        with patch.object(api,'emit'), self.assertRaisesRegex(RuntimeError,'Stop before update'):
+            api.publish(steam,{'workshop_id':'9876543210'},self.root/'cover.jpg',self.vpk,
+                self.facts,self.state,apply=True,update_existing=True)
+        state=json.loads(self.state.read_text(encoding='utf8'))
+        self.assertEqual(state['previous_release']['content_sha256'],'old-release')
+        self.assertEqual(state['content_sha256'],self.facts['content_sha256'])
+        self.assertEqual([name for name,_ in steam.calls],['StartItemUpdate'])
+
     def test_multipart_archive_tamper_and_extra_file_stop_before_sdk_update(self):
         tree, ordered, _ = api.pack.make_tree([{'path': 'sample.txt', 'bytes': 4}])
         import struct

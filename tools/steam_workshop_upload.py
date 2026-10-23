@@ -281,13 +281,18 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
                      legal_agreement_required=bool(response.legal))
         journal(state_path, state)  # Persist the ID BEFORE any follow-up action.
         emit({'status': state['status'], 'workshop_id': state['workshop_id'], 'legal_agreement_required': bool(response.legal)})
-    elif (state.get('owner') != OWNER or state.get('app_id') != APP
-          or state.get('content_sha256') != facts['content_sha256'] or not state.get('workshop_id')):
+    elif (state.get('owner') != OWNER or state.get('app_id') != APP or not state.get('workshop_id')):
         raise ValueError('Recovery journal has no confirmed ID or differs from current reviewed candidate; do not create again')
     else:
         matching = [item for item in owned if item['id'] == state['workshop_id']]
         if len(matching) != 1 or matching[0]['owner'] != OWNER:
             raise ValueError('Journal ID is not uniquely present in the current owner list; recover it before updating')
+        if state.get('content_sha256') != facts['content_sha256']:
+            if (not update_existing or state.get('uploaded') is not True
+                    or listing.get('workshop_id') != state['workshop_id']):
+                raise ValueError('A new signed release requires explicit update of the confirmed listing/journal ID')
+            state['previous_release'] = {name: state.get(name) for name in
+                ('content_sha256', 'release_sequence', 'vpk_sha256', 'package', 'package_files')}
         if state.get('uploaded') is True:
             if (state.get('vpk_sha256') == facts['vpk_sha256']
                     and state.get('package_files') == facts.get('package_files')):

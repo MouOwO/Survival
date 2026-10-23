@@ -402,6 +402,10 @@ for (const phase of ["LoadingScreen", "GameSetup", "HeroSelection", "PregameStra
     rejected.setState(loading({session_id: "new-session-during-grace", phase: "error", error: "backend_authentication_failed"}));
     assertShown(rejected, "a new-session failure ends grace immediately, before one second");
     assert.equal(rejected.nodes.StartupLoadingError.text, "服务端认证失败，请检查测试连接后重试。");
+    rejected.setState(loading({session_id: "new-session-during-grace", phase: "error",
+        error: "workshop_pairing_0123456789abcdef"}));
+    assert.match(rejected.nodes.StartupLoadingError.text, /认证指纹 0123456789abcdef/);
+    assertShown(rejected, "pairing fingerprint never bypasses admission");
     assert.equal(rejected.nodes.TeamSelectContainer.visible, true);
     assert.equal(rejected.requests.length, 0, "new session must not inherit the previous image acknowledgement");
 

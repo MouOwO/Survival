@@ -2,6 +2,7 @@ local json_decoder = require("core/json_decoder")
 local json_encoder = require("core/json_encoder")
 local rules = require("config/generated/fishing_system_rules")
 local mode_test = require("debug/mode_unlock_test")
+local workshop = require("systems/workshop_connection")
 
 local M = {}
 local active_rule = nil
@@ -50,10 +51,11 @@ local function request(path, payload, on_success, on_error)
         -- an advanced durable session or submit test clears to the backend.
         if mode_test.is_enabled() then body.mode = profile_mode(setup) end
     end
-    local token = convar("survival_fishing_api_token")
+    local url, token, connection_error = workshop.resolve(active_rule.api_base_url, convar("survival_fishing_api_token"))
+    if connection_error then on_error(connection_error) return end
     if token == "" then on_error("fishing_api_token_missing") return end
     local http = CreateHTTPRequestScriptVM(
-        "POST", tostring(active_rule.api_base_url) .. path
+        "POST", tostring(url) .. path
     )
     if not http then on_error("http_request_create_failed") return end
     http:SetHTTPRequestHeaderValue("Authorization", "Bearer " .. token)
@@ -67,8 +69,7 @@ local function request(path, payload, on_success, on_error)
         local status = tonumber(response and response.StatusCode) or 0
         if status ~= 200 then
             local parsed, body = pcall(json_decoder.decode, tostring(response and response.Body or ""))
-            on_error(parsed and type(body) == "table" and type(body.error) == "string"
-                and body.error or "http_status_" .. tostring(status), status)
+            on_error(workshop.failure(parsed and body or nil, "http_status_" .. tostring(status)), status)
             return
         end
         local ok, decoded = pcall(

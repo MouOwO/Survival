@@ -128,6 +128,11 @@ end
 
 local function safe_error(reason)
     reason = tostring(reason or "")
+    if reason:match("^workshop_pairing_[0-9a-f]+$") and #reason == 33 then return reason end
+    if reason == "workshop_server_key_unavailable" or reason == "workshop_dedicated_server_required"
+        or reason == "workshop_connection_invalid" or reason == "workshop_server_not_authorized" then
+        return "backend_authentication_failed"
+    end
     if reason:find("token_missing", 1, true) or reason:find("unauthorized", 1, true)
         or reason:find("http_status_401", 1, true) or reason:find("http_status_403", 1, true) then
         return "backend_authentication_failed"
