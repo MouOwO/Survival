@@ -32,7 +32,7 @@ function Assert-Layout([string]$Folder, $Rows, [bool]$PermitCaches) {
 function Resolve-DotaGame {
     if ($GamePath) { return (Resolve-Path -LiteralPath $GamePath).Path }
     $steam = (Get-ItemProperty -LiteralPath 'HKCU:/Software/Valve/Steam' -ErrorAction SilentlyContinue).SteamPath
-    $libraries = @($steam, (Join-Path ${env:ProgramFiles(x86)} 'Steam')) | Where-Object { $_ }
+    $libraries = @(@($steam, (Join-Path ${env:ProgramFiles(x86)} 'Steam')) | Where-Object { $_ })
     foreach ($library in @($libraries)) {
         $config = Join-Path $library 'steamapps/libraryfolders.vdf'
         if (Test-Path -LiteralPath $config) {

@@ -14,6 +14,25 @@ import local_host as host
 
 class GuestPackageChecks(unittest.TestCase):
     @unittest.skipUnless(os.name=='nt','Windows PowerShell integration')
+    def test_repo_guest_entry_rejects_missing_package_and_changed_script(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=Path(temporary)
+            def run():
+                return subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass',
+                    '-File',str(host.HERE/'launch_guest.ps1'),'-PackagePath',str(folder),'-CheckOnly'],
+                    capture_output=True,text=True,encoding='utf8',errors='replace',timeout=30)
+            missing=run()
+            self.assertEqual(missing.returncode,1)
+            self.assertIn('guest_package_missing',missing.stdout)
+            sentinel=folder/'should_not_run.txt'
+            (folder/'join_client.ps1').write_text("Set-Content -LiteralPath '"+
+                str(sentinel).replace("'","''")+"' -Value 'unexpected'",encoding='utf-8-sig')
+            changed=run()
+            self.assertEqual(changed.returncode,1)
+            self.assertIn('guest_entrypoint_changed',changed.stdout)
+            self.assertFalse(sentinel.exists())
+
+    @unittest.skipUnless(os.name=='nt','Windows PowerShell integration')
     def test_guest_installs_resumes_and_preserves_changed_files_without_launching(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder=Path(temporary);stage=folder/'stage';stage.mkdir()
@@ -33,7 +52,7 @@ class GuestPackageChecks(unittest.TestCase):
             text=fixture_script.read_text(encoding='utf-8-sig')
             fixture_script.write_text(text.replace('$message = $_.Exception.Message',
                 "Write-Output ('FIXTURE_ERROR:' + $_.Exception.Message)\n    $message = $_.Exception.Message"),encoding='utf-8-sig')
-            game=folder/'dota 2 beta/game';exe=game/'bin/win64/dota2.exe'
+            game=folder/'library/steamapps/common/dota 2 beta/game';exe=game/'bin/win64/dota2.exe'
             exe.parent.mkdir(parents=True);exe.write_bytes(b'not executable - process launch is mocked')
             (game/'dota').mkdir()
             capture=folder/'captured_launch.json'
@@ -60,6 +79,19 @@ class GuestPackageChecks(unittest.TestCase):
             launch=json.loads(capture.read_text(encoding='utf-8-sig'))
             self.assertEqual(launch['args'][-2:],['+connect','26.1.2.3:27015'])
             self.assertNotIn('+dota_launch_custom_game',launch['args'])
+            # Without a Steam registry value only one initial library remains.
+            # Preserve array semantics while appending libraries from the VDF.
+            config=folder/'programfiles/Steam/steamapps/libraryfolders.vdf'
+            config.parent.mkdir(parents=True)
+            config.write_text('"libraryfolders" { "0" { "path" "'+
+                str(folder/'library').replace('\\','\\\\')+'" } }',encoding='utf8')
+            original_wrapper=wrapper.read_text(encoding='utf-8-sig')
+            wrapper.write_text("${env:ProgramFiles(x86)}="+quote(folder/'programfiles')+"\n"
+                "function Get-ItemProperty { [CmdletBinding()]param([string]$LiteralPath); return $null }\n"+
+                original_wrapper.replace(' -GamePath '+quote(game),''),encoding='utf-8-sig')
+            fallback=run()
+            self.assertEqual(fallback.returncode,0,fallback.stdout+fallback.stderr)
+            wrapper.write_text(original_wrapper,encoding='utf-8-sig')
             installed.unlink();resumed=run()
             self.assertEqual(resumed.returncode,0,resumed.stdout+resumed.stderr)
             self.assertEqual(installed.read_bytes(),raw)

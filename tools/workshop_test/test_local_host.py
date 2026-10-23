@@ -64,6 +64,12 @@ class ProxyChecks(unittest.TestCase):
 
 
 class FrozenChecks(unittest.TestCase):
+    def test_missing_host_release_has_role_specific_error_before_provision(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(local,'BASE',Path(temp)), \
+                patch.object(local,'existing_game',return_value=False), patch.object(local,'provision') as provision:
+            with self.assertRaisesRegex(local.LocalError,'^host_frozen_release_missing$'):local.run(2,True)
+            provision.assert_not_called()
+
     def test_direct_join_is_explicit_and_keeps_frozen_addon_and_map(self):
         normal=local.game_command()
         direct=local.game_command(True)
