@@ -4,10 +4,14 @@ const readline=require('node:readline');
 const crypto=require('node:crypto');
 const {ConsoleSession}=require('../map_c6/console-session.cjs');
 let session=null;
+let listenRequested=false;
+let listenRejected=false;
 const input=readline.createInterface({input:process.stdin,crlfDelay:Infinity});
 async function request(value){
-  if(!value || !Number.isInteger(value.id) || !['probe','apply'].includes(value.op))
+  if(!value || !Number.isInteger(value.id) || !['probe','apply','listen'].includes(value.op))
     return {id:value?.id,ok:false,error:'invalid_operation'};
+  if(value.op==='listen' && listenRejected)return {id:value.id,ok:false,error:'listen_map_request_rejected'};
+  if(value.op==='listen' && listenRequested)return {id:value.id,ok:true,state:{status:'listen_map_requested'}};
   try{
     if(!session){
       session=new ConsoleSession({port:29003,timeoutMs:6000,historyTimeoutMs:12000,
@@ -15,6 +19,17 @@ async function request(value){
       await session.connect();
     }
     const marker='WS4_LOCAL_CMD_'+crypto.randomBytes(12).toString('hex');
+    if(value.op==='listen'){
+      const result=await session.send([{name:'console_send',arguments:{commands:
+        'map template_map gamemode=15 customgamemode=survival_ws4_local loopback=false nomapvalidation=1\necho '+marker}}],marker,150);
+      listenRequested=result.sent>=1 || result.expected_output_received===true;
+      if(/invalid map name|[Cc]ouldn.t find map|[Uu]nknown command/.test(result.output)){
+        listenRejected=true;
+        return {id:value.id,ok:false,error:'listen_map_request_rejected'};
+      }
+      if(!listenRequested)return {id:value.id,ok:false,error:'listen_map_request_incomplete'};
+      return {id:value.id,ok:true,state:{status:'listen_map_requested'}};
+    }
     const file=value.op==='apply'?'apply':'probe';
     const r=await session.send([{name:'console_send',arguments:{commands:
       'script_reload_code ws4_local_launcher/'+file+'.lua\necho '+marker}}],marker,150);
@@ -30,9 +45,12 @@ async function request(value){
     for(const name of ['admission_complete','profiles_ready','credential_applied'])
       if(typeof raw[name]==='boolean')state[name]=raw[name];
     return {id:value.id,ok:true,state};
-  }catch(_){
+  }catch(error){
+    // A lost echo after the map CMND was written must not reload the room.
+    if(value.op==='listen' && error.sent>=1)listenRequested=true;
     if(session)await session.close().catch(()=>{});
     session=null;
+    if(value.op==='listen' && listenRequested)return {id:value.id,ok:true,state:{status:'listen_map_requested'}};
     return {id:value.id,ok:false,error:'console_unavailable'};
   }
 }

@@ -5,6 +5,8 @@ import http.client
 from http.server import ThreadingHTTPServer
 import json
 import os
+from contextlib import contextmanager, redirect_stdout
+import io
 from pathlib import Path
 import tempfile
 import threading
@@ -75,8 +77,92 @@ class FrozenChecks(unittest.TestCase):
         direct=local.game_command(True)
         self.assertNotIn('+sv_lan',normal)
         self.assertEqual(direct[direct.index('+sv_lan')+1],'0')
-        self.assertEqual(direct[-3:],['+dota_launch_custom_game','survival_ws4_local','template_map'])
+        self.assertEqual(normal[-3:],['+dota_launch_custom_game','survival_ws4_local','template_map'])
+        self.assertNotIn('+map',direct)
+        self.assertNotIn('+dota_launch_custom_game',direct)
+        self.assertEqual(direct[direct.index('+hostport')+1],'27015')
+        self.assertEqual(direct[direct.index('+sv_listen_directudp')+1],'1')
+        self.assertNotIn('loopback=false',normal)
+        self.assertNotIn('nomapvalidation=1',normal)
         self.assertIn('-vconport',direct)
+
+    def test_loaded_map_waits_for_second_player_past_ten_minutes_without_losing_proxy(self):
+        from unittest.mock import Mock
+        states=[{'status':'listen_map_requested'},
+            {'status':'waiting_for_players','phase':'team_setup','players':1},
+            {'status':'waiting_for_players','phase':'team_setup','players':1},
+            {'status':'connected','phase':'team_setup','players':2,'credential_applied':True}]
+        with tempfile.TemporaryDirectory() as temporary:
+            stage=Path(temporary);(stage/Path(local.PRIVATE_REL).parent).mkdir(parents=True)
+            proc=Mock();proc.pid=123;proc.poll.side_effect=[None,None,None,None,0]
+            console=Mock()
+            active=[]
+            @contextmanager
+            def proxy(_):
+                active.append(True)
+                try:yield 'a'*64
+                finally:active.pop()
+            operations=[];clock=[0]
+            def ask_state(op):
+                operations.append(op)
+                self.assertTrue(active)
+                return {'ok':True,'state':states.pop(0)}
+            def advance(_):clock[0]+=1200 if len(operations)>1 else 1
+            console.ask.side_effect=ask_state
+            output=io.StringIO()
+            with patch.object(local,'STAGE',stage),patch.object(local,'existing_game',return_value=False), \
+                    patch.object(local,'install'),patch.object(local,'provision',return_value='fixture'), \
+                    patch.object(local,'preflight'),patch.object(local,'proxy',side_effect=proxy), \
+                    patch.object(local,'private_write',side_effect=lambda p,s:p.write_text(s)), \
+                    patch.object(local,'Console',return_value=console),patch.object(local.subprocess,'Popen',return_value=proc), \
+                    patch.object(local,'report',side_effect=lambda value:value), \
+                    patch.object(local.time,'monotonic',side_effect=lambda:clock[0]), \
+                    patch.object(local.time,'sleep',side_effect=advance),redirect_stdout(output):
+                result=local.run(2,True)
+            self.assertEqual(result['status'],'LOCAL_GAME_EXITED_CONNECTOR_STOPPED')
+            self.assertIn('等待玩家加入：1/2',output.getvalue())
+            self.assertNotIn('请切回 Dota',output.getvalue().split('人数到齐后再点击开始游戏。')[0])
+            proc.terminate.assert_not_called();proc.kill.assert_not_called()
+            self.assertFalse((stage/local.PRIVATE_REL).exists())
+            console.close.assert_called_once()
+            self.assertEqual(operations,['listen','apply','apply','apply'])
+            self.assertGreater(clock[0],600)
+
+    def test_unknown_or_unloaded_map_still_times_out_without_closing_dota(self):
+        from unittest.mock import Mock
+        with tempfile.TemporaryDirectory() as temporary:
+            stage=Path(temporary);(stage/Path(local.PRIVATE_REL).parent).mkdir(parents=True)
+            proc=Mock();proc.pid=123;proc.poll.return_value=None
+            console=Mock();console.ask.return_value={'ok':False,'error':'waiting_for_tools_map'}
+            @contextmanager
+            def proxy(_):yield 'a'*64
+            with patch.object(local,'STAGE',stage),patch.object(local,'existing_game',return_value=False), \
+                    patch.object(local,'install'),patch.object(local,'provision',return_value='fixture'), \
+                    patch.object(local,'preflight'),patch.object(local,'proxy',side_effect=proxy), \
+                    patch.object(local,'private_write',side_effect=lambda p,s:p.write_text(s)), \
+                    patch.object(local,'Console',return_value=console),patch.object(local.subprocess,'Popen',return_value=proc), \
+                    patch.object(local,'report',side_effect=lambda value:value), \
+                    patch.object(local.time,'monotonic',side_effect=[0,1200]),redirect_stdout(io.StringIO()):
+                with self.assertRaisesRegex(local.LocalError,'local_map_or_party_wait_timeout'):local.run(2,True)
+            proc.terminate.assert_not_called();proc.kill.assert_not_called()
+            self.assertFalse((stage/local.PRIVATE_REL).exists())
+
+    def test_partial_session_write_is_cleaned_before_game_launch(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            stage=Path(temporary);(stage/Path(local.PRIVATE_REL).parent).mkdir(parents=True)
+            @contextmanager
+            def proxy(_):yield 'a'*64
+            def interrupted_write(path,_):
+                path.write_text('partial')
+                raise OSError('fixture_interrupted_write')
+            with patch.object(local,'STAGE',stage),patch.object(local,'existing_game',return_value=False), \
+                    patch.object(local,'install'),patch.object(local,'provision',return_value='fixture'), \
+                    patch.object(local,'preflight'),patch.object(local,'proxy',side_effect=proxy), \
+                    patch.object(local,'private_write',side_effect=interrupted_write), \
+                    patch.object(local.subprocess,'Popen') as launch,redirect_stdout(io.StringIO()):
+                with self.assertRaisesRegex(OSError,'fixture_interrupted_write'):local.run(2,True)
+            launch.assert_not_called()
+            self.assertFalse((stage/local.PRIVATE_REL).exists())
 
     def test_running_game_is_preserved_before_any_install_or_provision(self):
         with patch.object(local,'existing_game',return_value=True), patch.object(local,'install') as install, \

@@ -40,6 +40,7 @@ HERE=Path(__file__).resolve().parent
 URL='https://pay.xiaofengnet.com/ws4'
 PORT=18766
 CONSOLE_PORT=29003
+GAME_PORT=27015
 STEAMIDS=('76561198424163156','76561198845461206','76561198104787442','76561198974301984')
 ACCOUNTS={str(int(s)-76561197960265728) for s in STEAMIDS}
 OWNER_ACCOUNT=str(76561198845461206-76561197960265728)
@@ -361,8 +362,12 @@ def game_command(direct_join=False):
     command=[str(ROOT.parents[1]/'bin/win64/dota2.exe'),'-steam','-tools','-noassetbrowser','-addon',ADDON,
         '-dev','-novid','-vconport',str(CONSOLE_PORT),'+sv_cheats','1','+host_timescale','1',
         '+r_drawpanorama','1']
-    if direct_join:command+=['+sv_lan','0']
-    return command+['+dota_launch_custom_game',ADDON,'template_map']
+    if direct_join:
+        # Wait for the console's fresh readiness reply before requesting the
+        # native listen map; cold-start +map can run before custom maps are ready.
+        command+=['+sv_lan','0','+sv_listen_directudp','1','+hostport',str(GAME_PORT)]
+    else:command+=['+dota_launch_custom_game',ADDON,'template_map']
+    return command
 
 
 def run(expected_players,direct_join=False):
@@ -379,25 +384,33 @@ def run(expected_players,direct_join=False):
              'unrecognized_stale_session_file')
         private.unlink()
     with proxy(key) as local_key:
-        private_write(private,'"ws4_local_session"\n{\n "token" "'+local_key+'"\n "expected_players" "'+str(expected_players)+'"\n}\n')
         console=None
         try:
+            private_write(private,'"ws4_local_session"\n{\n "token" "'+local_key+'"\n "expected_players" "'+str(expected_players)+'"\n}\n')
             proc=subprocess.Popen(game_command(direct_join),
                 cwd=ROOT.parents[1]/'dota',stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-            console=Console();applied=False;previous=None;deadline=time.monotonic()+600
+            console=Console();applied=False;map_loaded=False;listen_requested=False;previous=None;deadline=time.monotonic()+600
             print('本机独立测试已启动。请保留此窗口；在游戏中等待载入，并按正常流程开始加载/选择模式。',flush=True)
             while proc.poll() is None:
-                result=console.ask('probe' if applied else 'apply')
+                op='listen' if direct_join and not listen_requested else ('probe' if applied else 'apply')
+                result=console.ask(op)
                 state=result.get('state',{})
+                if op=='listen' and result.get('ok') is True and state.get('status')=='listen_map_requested':
+                    listen_requested=True
+                if state.get('status') in ('waiting_for_players','waiting_for_credentials','connected'):
+                    map_loaded=True
                 if state.get('credential_applied') is True:
                     applied=True;private.unlink(missing_ok=True)
                 value={'ok':True,'status':state.get('status',result.get('error','waiting')),
                     'game_pid':proc.pid,'credential_applied':applied,'expected_players':expected_players,
+                    'direct_join':direct_join,'requested_game_udp_port':GAME_PORT if direct_join else None,
                     **{k:v for k,v in state.items() if k not in ('credential_applied','status')}}
                 report(value)
                 summary=json.dumps(value,sort_keys=True)
                 if summary!=previous:
-                    if state.get('phase')=='team_setup':
+                    if state.get('status')=='waiting_for_players':
+                        text='等待玩家加入：'+str(state.get('players',0))+'/'+str(expected_players)+'。人数到齐后再点击开始游戏。'
+                    elif state.get('phase')=='team_setup':
                         text='请切回 Dota，在原生队伍设置界面点击“开始游戏”，随后按界面选择模式和难度。'
                     elif state.get('error'):
                         text='档案准备暂未完成：'+state['error']+'。请查看游戏中的重试提示。'
@@ -405,11 +418,9 @@ def run(expected_players,direct_join=False):
                         text='玩家档案已载入，可以继续游戏。'
                     elif state.get('authenticated',0)>=expected_players:
                         text='测试账号认证通过。请在游戏中按正常流程开始/选择模式。'
-                    elif state.get('status')=='waiting_for_players':
-                        text='等待玩家加入：'+str(state.get('players',0))+'/'+str(expected_players)
                     else:text='正在等待冻结测试地图载入和账号认证……'
                     print(text,flush=True);previous=summary
-                if not applied and time.monotonic()>deadline:
+                if not applied and not map_loaded and time.monotonic()>deadline:
                     raise LocalError('local_map_or_party_wait_timeout')
                 time.sleep(3)
             return report({'ok':True,'status':'LOCAL_GAME_EXITED_CONNECTOR_STOPPED'})
