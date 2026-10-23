@@ -373,6 +373,30 @@ humans[2] = { valid = true, fake = false, account = 1002, player = outsider, sta
 profiles[2] = { account_id = "1002", revision = 1, mode = "standard", match_session_id = session }
 assert(not service.is_player_ready(2), "a fully loaded late entrant still was not admitted to this match")
 
+-- Safe Workshop diagnostics reach Panorama without opening admission or
+-- exposing arbitrary provider errors, keys, or malformed status strings.
+for _, code in ipairs({"workshop_dedicated_server_required", "workshop_key_api_unavailable",
+    "workshop_key_call_failed", "workshop_key_empty", "workshop_server_key_unavailable",
+    "workshop_key_state_Invalid_NotOnDedicatedServer", "workshop_connection_invalid",
+    "workshop_server_not_authorized", "workshop_backend_unreachable", "workshop_backend_rejected",
+    "workshop_pairing_0123456789abcdef", "backend_token_missing"}) do
+    local checked=fixture(1)
+    pending[0]=false
+    requests[1].callback({ok=false,error=code})
+    ui(checked,0); assets_done(); checked.tick()
+    assert(checked.snapshot().error==code, "diagnostic must not be collapsed: "..code)
+    assert(not checked.is_ready() and not checked.snapshot().admission_complete)
+end
+for _, code in ipairs({"workshop_key_state_Invalid_<script>", "workshop_key_state_"..string.rep("a",64),
+    "workshop_key_state_Invalid_"..string.rep("x",80), "private-runtime-error"}) do
+    local checked=fixture(1)
+    pending[0]=false
+    requests[1].callback({ok=false,error=code})
+    ui(checked,0); assets_done(); checked.tick()
+    assert(checked.snapshot().error=="profile_load_failed")
+    assert(not checked.is_ready())
+end
+
 -- Authentication errors remain closed and recover on real time while GameTime
 -- throws. Client retry is rate-limited and never impersonates another player.
 service = fixture(1, false)

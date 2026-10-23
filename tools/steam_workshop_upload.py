@@ -345,7 +345,8 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
     state.update(status='SUBMIT_REQUEST_PENDING', package=str(vpk), uploaded=False)
     journal(state_path, state)
     call = steam.ug('SubmitItemUpdate', C.c_uint64, [C.c_uint64, C.c_char_p], handle,
-                    b'Private four-account noncommercial test; signed runtime sequence 2026102202.')
+                    ('Private four-account noncommercial test; signed runtime sequence '
+                     + str(facts['release_sequence']) + '.').encode('ascii'))
     def progress():
         done, total = C.c_uint64(), C.c_uint64()
         stage = steam.ug('GetItemUpdateProgress', C.c_int32,

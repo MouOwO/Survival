@@ -7,6 +7,7 @@ gameplay/UI work is not pulled into the frozen test release.
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -22,7 +23,7 @@ CONTENT=ROOT.parents[2]/'content/dota_addons/Survival'
 PROFILE='scripts/vscripts/systems/player_profile_service.lua'
 PROFILE_HASH='ad2ba8edf96c45f8730df8f1d5289414f8e4f1a3bd05cd95827c9dc690e39a86'
 OLD_CONTENT='1c09e562ada4586ba4c046616e94317bf062c308a0c0c507e5af59d7b9024b6d'
-SEQUENCE=2026102301
+SEQUENCE=2026102302
 lf=lambda b:b.replace(b'\r\n',b'\n')
 crlf=lambda b:lf(b).replace(b'\n',b'\r\n')
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -38,6 +39,9 @@ def change(raw,before,after):
 
 
 def build(args):
+    sequence=args.release_sequence
+    assert sequence >= SEQUENCE, "Release sequence must advance beyond the first ws4 release"
+    args.report_dir.mkdir(parents=True,exist_ok=True)
     commit=subprocess.check_output(['git','rev-parse',args.reviewed_commit],cwd=ROOT,text=True).strip()
     for path in (args.destination,args.trusted_source,args.output_dir):
         path=path.resolve()
@@ -62,16 +66,14 @@ def build(args):
         patches[name]=git(commit,name)
     name='scripts/vscripts/config/workshop_connection.lua'
     patches[name]=change(patches[name],b'enabled = false',b'enabled = true')
-    addition=(b'    if reason:match("^workshop_pairing_[0-9a-f]+$") and #reason == 33 then return reason end\n'
-        b'    if reason == "workshop_server_key_unavailable" or reason == "workshop_dedicated_server_required"\n'
-        b'        or reason == "workshop_connection_invalid" or reason == "workshop_server_not_authorized" then\n'
-        b'        return "backend_authentication_failed"\n    end\n')
     startup='scripts/vscripts/systems/startup_loading_service.lua'
-    assert addition in lf(git(commit,startup))
     old_startup=crlf(git(BASE,startup))
     assert (ORIGINAL/startup).read_bytes()==old_startup
-    patches[startup]=crlf(change(lf(old_startup),b'    reason = tostring(reason or "")\n',
-                                b'    reason = tostring(reason or "")\n'+addition))
+    pattern=rb'local function safe_error\(reason\)\n.*?\nend\n'
+    original_safe=re.search(pattern,lf(old_startup),re.S).group()
+    reviewed_safe=re.search(pattern,lf(git(commit,startup)),re.S).group()
+    assert len(reviewed_safe)<3000 and b'workshop_key_state_' in reviewed_safe
+    patches[startup]=crlf(change(lf(old_startup),original_safe,reviewed_safe))
     args.destination.mkdir(parents=True)
     for row in manifest['files']:
         dest=args.destination/row['path']
@@ -93,8 +95,19 @@ def build(args):
     for name,(anchor,addition) in ui_additions.items():
         relative='panorama/src/scripts/custom_game/'+name
         current=lf(git(commit,relative)).decode('utf8')
+        key_lines=[line for line in current.splitlines() if line.startswith('        var keyState = ')
+                   or line.startswith('        if (keyState) preparationError = ')
+                   or line.startswith('        if (!profilesReady() && keyState) text = ')]
+        assert len(key_lines)==2
+        addition+='\n'+'\n'.join(key_lines)
         assert addition in current
+        diagnostic_lines=[line for line in current.splitlines() if line.strip().startswith(('workshop_', 'backend_token_missing:'))]
+        assert len(diagnostic_lines)==10
         source=lf(git(BASE,relative)).decode('utf8')
+        previous='backend_authentication_failed: "服务端认证失败，请检查测试连接后重试。",'
+        replacement='backend_authentication_failed: "服务端认证失败，请将此提示发给作者。（WS4-02/AUTH）",'
+        assert replacement in current and source.count(previous)==1
+        source=source.replace(previous,replacement+'\n'+'\n'.join(diagnostic_lines),1)
         assert source.count(anchor)==1
         patched=source.replace(anchor,anchor+'\n'+addition,1).encode('utf8')
         content=CONTENT/'panorama/scripts/custom_game'/name
@@ -103,7 +116,7 @@ def build(args):
         try:
             content.write_bytes(patched)
             result=subprocess.run([str(compiler),'-i',str(content),'-fshallow','-nop4'],capture_output=True)
-            (ROOT/'output/workshop_auth_20261023'/('frozen_compile_'+name+'.log')).write_bytes(result.stdout+result.stderr)
+            (args.report_dir/('frozen_compile_'+name+'.log')).write_bytes(result.stdout+result.stderr)
             assert result.returncode==0 and b'1 compiled, 0 failed' in result.stdout
             target=args.destination/compiled.relative_to(ROOT)
             target.write_bytes(compiled.read_bytes())
@@ -145,17 +158,17 @@ def build(args):
         if (ORIGINAL/name).is_file():shutil.copyfile(ORIGINAL/name,args.destination/name)
     pack.runtime.atomic_write_json(args.destination/pack.handoff.MANIFEST,new_manifest)
     pack.protect_data.sign_manifest(args.destination/pack.handoff.MANIFEST,args.signing_key,
-                                    args.destination/pack.handoff.SIGNATURE,SEQUENCE)
+                                    args.destination/pack.handoff.SIGNATURE,sequence)
     assert pack.runtime.verify(args.destination,new_manifest)['ok']
-    provenance.update(content_sha256=new_manifest['content_sha256'],release_sequence=SEQUENCE,changed=changed,
+    provenance.update(content_sha256=new_manifest['content_sha256'],release_sequence=sequence,changed=changed,
                       protected_modules_preserved=180,private_key_copied=False)
     pack.runtime.atomic_write_json(args.destination/'_ws4_patch_provenance.json',provenance)
     pack.handoff.ROOT=args.trusted_source
     pack.handoff.POLICY=args.trusted_source/'tools/release_security/protection_policy.json'
     result=pack.package(args.destination,args.output_dir,'3824360109',build=True)
-    pack.runtime.atomic_write_json(ROOT/'output/workshop_auth_20261023/build.json',result)
-    pack.runtime.atomic_write_json(ROOT/'output/workshop_auth_20261023/candidate_provenance.json',provenance)
-    print(json.dumps({'status':result['status'],'release_sequence':SEQUENCE,
+    pack.runtime.atomic_write_json(args.report_dir/'build.json',result)
+    pack.runtime.atomic_write_json(args.report_dir/'candidate_provenance.json',provenance)
+    print(json.dumps({'status':result['status'],'release_sequence':sequence,
         'content_sha256':new_manifest['content_sha256'],'changed_files':len(changed),'files':new_manifest['file_count']}))
 
 
@@ -166,6 +179,8 @@ def main():
     parser.add_argument('--trusted-source',type=Path,required=True)
     parser.add_argument('--output-dir',type=Path,required=True)
     parser.add_argument('--signing-key',type=Path,required=True)
+    parser.add_argument('--release-sequence',type=int,default=SEQUENCE)
+    parser.add_argument('--report-dir',type=Path,default=ROOT/'output/workshop_auth_diagnostics_20261023')
     build(parser.parse_args())
 
 

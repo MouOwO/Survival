@@ -12,10 +12,17 @@ function M.resolve(local_url, local_token)
         return nil, nil, "workshop_connection_invalid"
     end
     if type(GetDedicatedServerKeyV3) ~= "function" then
-        return nil, nil, "workshop_server_key_unavailable"
+        return nil, nil, "workshop_key_api_unavailable"
     end
     local ok, key = pcall(GetDedicatedServerKeyV3, config.key_seed)
-    if not ok or type(key) ~= "string" or #key < 24 or #key > 256
+    if not ok then return nil, nil, "workshop_key_call_failed" end
+    -- Only Valve's bounded Invalid_* sentinel may be shown to the owner.
+    -- Never publish any part of a valid credential or a thrown Lua error.
+    if type(key) == "string" and #key <= 64 and key:match("^Invalid_[A-Za-z0-9_]+$") then
+        return nil, nil, "workshop_key_state_" .. key
+    end
+    if key == "" then return nil, nil, "workshop_key_empty" end
+    if type(key) ~= "string" or #key < 24 or #key > 256
         or key:lower():match("^invalid") or key:find("[^%w_%-+/=]") then
         return nil, nil, "workshop_server_key_unavailable"
     end
@@ -28,7 +35,14 @@ function M.failure(body, fallback)
         and body.pairing_fingerprint:match("^[0-9a-f]+$") then
         return "workshop_pairing_" .. body.pairing_fingerprint
     end
-    return type(body) == "table" and type(body.error) == "string" and body.error or fallback
+    if type(body) == "table" and type(body.error) == "string" then return body.error end
+    if config.enabled == true and not (IsInToolsMode and IsInToolsMode()) then
+        if fallback == "http_status_0" then return "workshop_backend_unreachable" end
+        if fallback == "http_status_401" or fallback == "http_status_403" then
+            return "workshop_backend_rejected"
+        end
+    end
+    return fallback
 end
 
 return M

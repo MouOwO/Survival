@@ -279,8 +279,19 @@ function noVisibleWrite(ui, offset, message) {
 }
 {
     for (const [error, text] of Object.entries({
-        backend_authentication_failed: "服务端认证失败，请检查测试连接后重试。",
+        backend_authentication_failed: "服务端认证失败，请将此提示发给作者。（WS4-02/AUTH）",
         profile_load_failed: "玩家档案读取失败，请检查连接后重试。",
+        workshop_dedicated_server_required: "当前为本地主机，请在房间中选择线上服务器后重新开局。（WS4-02）",
+        workshop_key_api_unavailable: "线上服务器未提供凭据接口，请将此提示发给作者。（WS4-02/API）",
+        workshop_key_call_failed: "线上服务器生成凭据失败，请将此提示发给作者。（WS4-02/CALL）",
+        workshop_key_empty: "线上服务器返回空凭据，请将此提示发给作者。（WS4-02/EMPTY）",
+        workshop_server_key_unavailable: "线上服务器返回的凭据格式无效，请将此提示发给作者。（WS4-02/FORMAT）",
+        workshop_connection_invalid: "测试连接配置无效，请联系作者更新游廊。（WS4-02/CONFIG）",
+        workshop_server_not_authorized: "测试服务未登记服务器凭据，请将此提示发给作者。（WS4-02/PIN）",
+        workshop_backend_unreachable: "游戏服务器未能连接测试服务，请将此提示发给作者。（WS4-02/NETWORK）",
+        workshop_backend_rejected: "测试入口拒绝连接，请将此提示发给作者。（WS4-02/HTTP）",
+        backend_token_missing: "当前对局未启用游廊测试连接，请重新开局并将此提示发给作者。（WS4-02/ROUTE）",
+        workshop_key_state_Invalid_NotOnDedicatedServer: "Valve服务器凭据不可用，请将此状态发给作者。（WS4-02：Invalid_NotOnDedicatedServer）",
         profile_load_timeout: "玩家档案读取超时，请重试。"
     })) {
         const ui = harness({state: loading({phase: "error", error})}); ui.imageLoaded();
@@ -401,7 +412,7 @@ for (const phase of ["LoadingScreen", "GameSetup", "HeroSelection", "PregameStra
     rejected.advance(0.25);
     rejected.setState(loading({session_id: "new-session-during-grace", phase: "error", error: "backend_authentication_failed"}));
     assertShown(rejected, "a new-session failure ends grace immediately, before one second");
-    assert.equal(rejected.nodes.StartupLoadingError.text, "服务端认证失败，请检查测试连接后重试。");
+    assert.equal(rejected.nodes.StartupLoadingError.text, "服务端认证失败，请将此提示发给作者。（WS4-02/AUTH）");
     rejected.setState(loading({session_id: "new-session-during-grace", phase: "error",
         error: "workshop_pairing_0123456789abcdef"}));
     assert.match(rejected.nodes.StartupLoadingError.text, /认证指纹 0123456789abcdef/);
@@ -420,7 +431,7 @@ for (const phase of ["LoadingScreen", "GameSetup", "HeroSelection", "PregameStra
     assertShown(next, "new session cannot reuse shared completion");
     next.imageLoaded(); next.advance(20);
     assertShown(next, "new-session auth failure remains blocked despite old cache and loaded background");
-    assert.equal(next.nodes.StartupLoadingError.text, "服务端认证失败，请检查测试连接后重试。");
+    assert.equal(next.nodes.StartupLoadingError.text, "服务端认证失败，请将此提示发给作者。（WS4-02/AUTH）");
 }
 {
     const unacknowledged = ready({all_ready: false, phase: "loading",
@@ -523,7 +534,7 @@ for (const phase of ["LoadingScreen", "GameSetup", "HeroSelection", "PregameStra
     ui.setLocalId(0); ui.advance(0.5); assertHidden(ui, "original player still has its server-ready proof");
     ui.setState(loading({session_id: "new-auth-session", phase: "error", error: "backend_authentication_failed"}));
     assertShown(ui, "new session revokes previous readiness");
-    assert.equal(ui.nodes.StartupLoadingError.text, "服务端认证失败，请检查测试连接后重试。");
+    assert.equal(ui.nodes.StartupLoadingError.text, "服务端认证失败，请将此提示发给作者。（WS4-02/AUTH）");
     ui.imageLoaded(); ui.advance(25);
     assertShown(ui, "new-session authentication failure is never bypassed by the old completion latch");
 }
