@@ -538,6 +538,32 @@ def update_overlay():
     return {'ok':True,'phase':'ISOLATED_UNPAIRED_SERVICE_UPDATED','existing_services_unchanged':True}
 
 
+def register_local_host():
+    # The owner explicitly selected a local connector in the trusted session.
+    # Provision its independently generated key; never select a pending key.
+    unchanged()
+    need(isinstance(LOCAL_HOST_SHA256,str) and re.fullmatch('[a-f0-9]{64}',LOCAL_HOST_SHA256),
+         'local_host_digest_invalid')
+    path=CONFIG/'pins.json'
+    pins=json.loads(path.read_bytes())
+    need(pins.get('workshop_id')=='3824360109' and isinstance(pins.get('sha256'),list),'pins_state_invalid')
+    previous=pins.get('local_host_sha256')
+    if previous is not None:
+        need(previous==LOCAL_HOST_SHA256 and previous in pins['sha256'],'different_local_host_already_registered')
+    else:
+        need(len(pins['sha256'])<4 and LOCAL_HOST_SHA256 not in pins['sha256'],'local_host_pin_capacity_or_identity_conflict')
+        pins['sha256'].append(LOCAL_HOST_SHA256)
+        pins['local_host_sha256']=LOCAL_HOST_SHA256
+        pins['local_host_name']='owner-windows-ws4-local-v1'
+        temporary=CONFIG/'pins.local-host-new'
+        private(temporary,json.dumps(pins).encode(),group=pwd.getpwnam(USER).pw_gid,mode=0o640)
+        os.replace(temporary,path)
+    unchanged()
+    return {'ok':True,'phase':'OWNER_APPROVED_LOCAL_CONNECTOR_REGISTERED',
+            'local_host_registered':True,'valve_key_approved':False,'restart_required':False,
+            'existing_services_unchanged':True}
+
+
 def audit():
     unchanged()
     for service in ('goufayu-ws4.service','goufayu-ws4-db.service'):
@@ -549,6 +575,8 @@ def audit():
     return {'ok':True,'phase':'ISOLATED_DEPLOYMENT_AUDITED','existing_services_unchanged':True,
             'independent_api_active':True,'independent_database_active':True,'https_enabled':(STATE/'https-enabled.json').is_file(),
             'four_account_api_verified':(STATE/'api-verification.json').is_file(),'approved_server_keys':len(pins['sha256']),
+            'approved_local_host_keys':int(pins.get('local_host_sha256') in pins['sha256']),
+            'approved_valve_server_keys':len(pins['sha256'])-int(pins.get('local_host_sha256') in pins['sha256']),
             'original_player_rows_copied':0,'database':'goufayu_ws4','database_port':15432,'api_port':18765}
 
 
@@ -566,6 +594,7 @@ def main():
     elif MODE=='approve':result=pairing(approve=True)
     elif MODE=='update_overlay':result=update_overlay()
     elif MODE=='audit':result=audit()
+    elif MODE=='register_local_host':result=register_local_host()
     else:raise RuntimeError('unknown_operator_mode')
     print(json.dumps(result),flush=True)
 
