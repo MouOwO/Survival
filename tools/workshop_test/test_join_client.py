@@ -13,6 +13,31 @@ import local_host as host
 
 
 class GuestPackageChecks(unittest.TestCase):
+    @unittest.skipUnless(os.name=='nt','Windows junction safety')
+    def test_layout_rejects_junction_before_descending_into_it(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=Path(temporary);source=folder/host.ADDON;source.mkdir()
+            other=folder/'other';other.mkdir();(other/'asset.txt').write_bytes(b'keep this file')
+            expected=host.expected_manifest({'files':[]},{'nested/asset.txt':b'keep this file'})
+            marker=json.dumps({'kind':'WS4-LOCAL-1','base_content_sha256':host.BASE_SHA,'runtime':expected}).encode()
+            (folder/'client_manifest.json').write_bytes(marker)
+            script=(host.HERE/'join_client.ps1').read_text(encoding='utf8').replace('__MANIFEST_SHA256__',hashlib.sha256(marker).hexdigest())
+            (folder/'join_client.ps1').write_text(script,encoding='utf-8-sig')
+            quote=lambda p:"'"+str(p).replace("'","''")+"'"
+            wrapper=folder/'junction_fixture.ps1'
+            wrapper.write_text("$ErrorActionPreference='Stop'\nNew-Item -ItemType Junction -Path "+quote(source/'nested')+
+                ' -Target '+quote(other)+" | Out-Null\n& "+quote(folder/'join_client.ps1')+
+                ' -CheckOnly -Server 26.1.2.3:27015\nexit $LASTEXITCODE\n',encoding='utf-8-sig')
+            environment=dict(os.environ)
+            environment['PSModulePath']=';'.join((str(Path(os.environ['ProgramFiles'])/'WindowsPowerShell/Modules'),
+                str(Path(os.environ['SystemRoot'])/'System32/WindowsPowerShell/v1.0/Modules')))
+            checked=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',str(wrapper)],
+                capture_output=True,text=True,encoding='utf8',errors='replace',timeout=15,env=environment)
+            self.assertEqual(checked.returncode,1,checked.stdout+checked.stderr)
+            diagnostic=json.loads((folder/'join_diagnostic.json').read_text(encoding='utf8'))
+            self.assertEqual((diagnostic['stage'],diagnostic['error'],diagnostic['file']),('check_layout','linked_path_not_allowed','nested'))
+            self.assertEqual((other/'asset.txt').read_bytes(),b'keep this file')
+
     @unittest.skipUnless(os.name=='nt','Windows PowerShell full asset audit')
     def test_audit_collects_all_missing_or_changed_files_without_dota_or_server(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -57,34 +82,32 @@ class GuestPackageChecks(unittest.TestCase):
             template=(host.HERE/'join_client.ps1').read_text(encoding='utf8')
             def run(raw,listed_path=None):
                 (folder/'client_manifest.json').write_bytes(raw)
-                (folder/'join_client.ps1').write_text(template.replace('__MANIFEST_SHA256__',hashlib.sha256(raw).hexdigest()),encoding='utf-8-sig')
+                script=template.replace('__MANIFEST_SHA256__',hashlib.sha256(raw).hexdigest())
+                if listed_path:
+                    # Simulate a file disappearing between enumeration and stat.
+                    item='\\\\?\\'+str(folder/host.ADDON/listed_path)
+                    script=script.replace('[IO.Directory]::EnumerateFileSystemEntries($directory)',
+                        "@('"+item.replace("'","''")+"')")
+                (folder/'join_client.ps1').write_text(script,encoding='utf-8-sig')
                 environment=dict(os.environ)
                 environment['PSModulePath']=';'.join((str(Path(os.environ['ProgramFiles'])/'WindowsPowerShell/Modules'),
                     str(Path(os.environ['SystemRoot'])/'System32/WindowsPowerShell/v1.0/Modules')))
                 command=['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',
                     str(folder/'join_client.ps1'),'-Server','26.1.2.3:27015','-CheckOnly']
-                if listed_path:
-                    quote=lambda value:"'"+str(value).replace("'","''")+"'"
-                    wrapper=folder/'layout_fixture.ps1'
-                    wrapper.write_text('function Get-ChildItem { [CmdletBinding()]param([string]$LiteralPath,[switch]$Force,[switch]$Recurse); '
-                        '[pscustomobject]@{FullName='+quote(folder/host.ADDON/listed_path)+';PSIsContainer=$false} }\n'
-                        '$global:LASTEXITCODE=0\n& '+quote(folder/'join_client.ps1')+
-                        ' -Server 26.1.2.3:27015 -CheckOnly\nexit $LASTEXITCODE\n',encoding='utf-8-sig')
-                    command=['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',str(wrapper)]
                 result=subprocess.run(command,capture_output=True,
                     text=True,encoding='utf8',errors='replace',timeout=10,env=environment)
                 self.assertEqual(result.returncode,1,result.stdout+result.stderr)
                 return result,json.loads((folder/'join_diagnostic.json').read_text(encoding='utf8'))
             missing,data=run(marker)
             self.assertEqual((data['error'],data['stage'],data['file']),('guest_file_missing','check_resources','addoninfo.txt'))
-            self.assertEqual(data['revision'],'WS4-JOIN-06')
+            self.assertEqual(data['revision'],'WS4-JOIN-07')
             private='must-never-print-parser-input'
             failed,data=run(('{"example":"'+private+'", broken').encode())
             self.assertEqual(data['stage'],'read_manifest')
             self.assertIn('exception_type',data)
             self.assertNotIn(private,failed.stdout+failed.stderr+json.dumps(data))
             self.assertNotIn(str(folder),json.dumps(data))
-            for name,code in (('missing.vtex_c','guest_file_missing'),('x'*180+'.vtex_c','guest_path_too_long')):
+            for name,code in (('missing.vtex_c','guest_file_missing'),('x'*180+'.vtex_c','guest_file_missing')):
                 relative='panorama/images/'+name
                 failed,data=run(marker,relative)
                 self.assertEqual((data['error'],data['stage'],data['file']),(code,'check_layout',relative))
@@ -126,7 +149,8 @@ class GuestPackageChecks(unittest.TestCase):
     def test_guest_installs_resumes_and_preserves_changed_files_without_launching(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder=Path(temporary);stage=folder/'stage';stage.mkdir()
-            file_name='panorama/images/spell icon.vtex_c'
+            file_name=('panorama/images/spellicons/survival/native/building_main_city building_arrow_tower '
+                'building_wall building_hero_altar building_challenge ultimate_scepter ultimate_orb refresher_png.vtex_c')
             raw=b'frozen guest installation fixture'
             expected=host.expected_manifest({'files':[]},{file_name:raw,'addoninfo.txt':b'frozen fixture addon'})
             source=stage/file_name;source.parent.mkdir(parents=True);source.write_bytes(raw)
@@ -143,7 +167,8 @@ class GuestPackageChecks(unittest.TestCase):
             text=fixture_script.read_text(encoding='utf-8-sig')
             fixture_script.write_text(text.replace('$message = $_.Exception.Message',
                 "Write-Output ('FIXTURE_ERROR:' + $_.Exception.Message)\n    $message = $_.Exception.Message"),encoding='utf-8-sig')
-            game=folder/'library/steamapps/common/dota 2 beta/game';exe=game/'bin/win64/dota2.exe'
+            library=folder/'library'/('deep_library_'+'x'*90)
+            game=library/'steamapps/common/dota 2 beta/game';exe=game/'bin/win64/dota2.exe'
             exe.parent.mkdir(parents=True);exe.write_bytes(b'not executable - process launch is mocked')
             (game/'dota').mkdir()
             capture=folder/'captured_launch.json'
@@ -169,6 +194,7 @@ class GuestPackageChecks(unittest.TestCase):
                 self.assertFalse(capture.exists())
             first=run();self.assertEqual(first.returncode,0,first.stdout+first.stderr)
             installed=game/'dota_addons'/host.ADDON/file_name
+            self.assertGreater(len(str(installed)),400)
             self.assertTrue(installed.exists(),first.stdout+first.stderr)
             self.assertEqual(installed.read_bytes(),raw)
             self.assertEqual((game.parent/'content/dota_addons'/host.ADDON/'ws4_local_owner.txt').read_text(),'WS4-LOCAL-1\n')
@@ -180,7 +206,7 @@ class GuestPackageChecks(unittest.TestCase):
             config=folder/'programfiles/Steam/steamapps/libraryfolders.vdf'
             config.parent.mkdir(parents=True)
             config.write_text('"libraryfolders" { "0" { "path" "'+
-                str(folder/'library').replace('\\','\\\\')+'" } }',encoding='utf8')
+                str(library).replace('\\','\\\\')+'" } }',encoding='utf8')
             original_wrapper=wrapper.read_text(encoding='utf-8-sig')
             wrapper.write_text("${env:ProgramFiles(x86)}="+quote(folder/'programfiles')+"\n"
                 "function Get-ItemProperty { [CmdletBinding()]param([string]$LiteralPath); return $null }\n"+

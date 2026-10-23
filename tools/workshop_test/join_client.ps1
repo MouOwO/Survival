@@ -5,47 +5,91 @@ $addonName = 'survival_ws4_local'
 $descriptorName = '_ws4_local_install.json'
 $stage = 'read_address'
 $currentFile = ''
-$revision = 'WS4-JOIN-06'
+$revision = 'WS4-JOIN-07'
 $pathLength = 0
 $actualBytes = $null
 $actualSha = $null
 $cacheNames = @('tools_asset_info.bin','tools_thumbnail_cache.sqlite3','tools_thumbnail_cache.sqlite3-journal','tools_thumbnail_cache.sqlite3-wal','tools_thumbnail_cache.sqlite3-shm')
-function Assert-PlainPath([string]$Path) {
-    $script:pathLength = $Path.Length
-    try { $entry = Get-Item -LiteralPath $Path -Force -ErrorAction Stop }
+function ConvertTo-IOPath([string]$Path) {
+    $normal = $Path.Replace('/','\')
+    if ($normal.StartsWith('\\?\')) { return $normal }
+    if ($normal.StartsWith('\\')) { return '\\?\UNC\' + $normal.Substring(2) }
+    if ($normal -notmatch '^[A-Za-z]:\\') { throw 'guest_path_not_absolute' }
+    return '\\?\' + $normal
+}
+function ConvertFrom-IOPath([string]$Path) {
+    if ($Path.StartsWith('\\?\UNC\')) { return '\\' + $Path.Substring(8) }
+    if ($Path.StartsWith('\\?\')) { return $Path.Substring(4) }
+    return $Path
+}
+function Test-IOPath([string]$Path) {
+    try { [IO.File]::GetAttributes((ConvertTo-IOPath $Path)) | Out-Null; return $true }
     catch {
         $kind = $_.Exception.GetBaseException().GetType().FullName
-        if ($kind -match 'PathTooLongException$' -or ($Path.Length -ge 260 -and $_.CategoryInfo.Category -eq 'ObjectNotFound')) { throw 'guest_path_too_long' }
-        if ($_.CategoryInfo.Category -eq 'ObjectNotFound') { throw 'guest_file_missing' }
+        if ($kind -match '(File|Directory)NotFoundException$') { return $false }
+        throw
+    }
+}
+function Get-FileSHA256([string]$Path) {
+    $stream = [IO.File]::OpenRead((ConvertTo-IOPath $Path))
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try { return [BitConverter]::ToString($algorithm.ComputeHash($stream)).Replace('-','').ToLowerInvariant() }
+    finally { $algorithm.Dispose(); $stream.Dispose() }
+}
+function Assert-PlainPath([string]$Path) {
+    $script:pathLength = (ConvertFrom-IOPath $Path).Length
+    try {
+        $ioPath = ConvertTo-IOPath $Path
+        $attributes = [IO.File]::GetAttributes($ioPath)
+        if (($attributes -band [IO.FileAttributes]::Directory) -ne 0) { $entry = New-Object IO.DirectoryInfo($ioPath) }
+        else { $entry = New-Object IO.FileInfo($ioPath) }
+    }
+    catch {
+        $kind = $_.Exception.GetBaseException().GetType().FullName
+        if ($kind -match 'PathTooLongException$') { throw 'guest_path_too_long' }
+        if ($kind -match '(File|Directory)NotFoundException$') { throw 'guest_file_missing' }
         throw
     }
     while ($entry) {
-        if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'linked_path_not_allowed' }
+        if (([IO.File]::GetAttributes($entry.FullName) -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'linked_path_not_allowed' }
         if ($entry -is [IO.FileInfo]) { $entry = $entry.Directory }
         else { $entry = $entry.Parent }
     }
+}
+function New-PlainDirectory([string]$Path) {
+    $ancestor = ConvertTo-IOPath $Path
+    while (-not (Test-IOPath $ancestor)) { $ancestor = [IO.Directory]::GetParent($ancestor).FullName }
+    Assert-PlainPath $ancestor
+    [IO.Directory]::CreateDirectory((ConvertTo-IOPath $Path)) | Out-Null
+    Assert-PlainPath $Path
 }
 function Assert-File([string]$Path, $Row) {
     $script:currentFile = $Row.path
     $script:actualBytes = $null; $script:actualSha = $null
     Assert-PlainPath $Path
-    $script:actualBytes = (Get-Item -LiteralPath $Path -Force).Length
+    $script:actualBytes = (New-Object IO.FileInfo((ConvertTo-IOPath $Path))).Length
     if ($actualBytes -ne $Row.bytes) { throw 'client_runtime_bytes_changed' }
-    $script:actualSha = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+    $script:actualSha = Get-FileSHA256 $Path
     if ($actualSha -ne $Row.sha256) { throw 'client_runtime_bytes_changed' }
 }
 function Assert-Layout([string]$Folder, $Rows, [bool]$PermitCaches) {
     Assert-PlainPath $Folder
     $known = @{}
     foreach ($row in $Rows) { $known[$row.path] = $true }
-    foreach ($entry in Get-ChildItem -LiteralPath $Folder -Force -Recurse) {
-        $relative = $entry.FullName.Substring($Folder.Length + 1).Replace('\','/')
-        $script:currentFile = $relative
-        Assert-PlainPath $entry.FullName
-        if ($entry.PSIsContainer) { continue }
-        if ($relative -eq $descriptorName) { continue }
-        if ($PermitCaches -and $cacheNames -contains $relative) { continue }
-        if (-not $known.ContainsKey($relative)) { throw 'client_unexpected_file' }
+    $ioRoot = (ConvertTo-IOPath $Folder).TrimEnd('\')
+    $pending = New-Object 'System.Collections.Generic.Stack[string]'
+    $pending.Push($ioRoot)
+    while ($pending.Count -gt 0) {
+        $directory = $pending.Pop()
+        foreach ($entryPath in [IO.Directory]::EnumerateFileSystemEntries($directory)) {
+            $relative = $entryPath.Substring($ioRoot.Length + 1).Replace('\','/')
+            $script:currentFile = $relative
+            Assert-PlainPath $entryPath
+            if (([IO.File]::GetAttributes($entryPath) -band [IO.FileAttributes]::Directory) -ne 0) { $pending.Push($entryPath); continue }
+            if ($relative -eq $descriptorName) { continue }
+            if ($PermitCaches -and $cacheNames -contains $relative) { continue }
+            if (-not $known.ContainsKey($relative)) { throw 'client_unexpected_file' }
+        }
     }
 }
 function Resolve-DotaGame {
@@ -84,15 +128,15 @@ try {
     $stage = 'check_manifest'; $currentFile = 'client_manifest.json'
     $manifestPath = Join-Path $PSScriptRoot 'client_manifest.json'
     Assert-PlainPath $manifestPath
-    if ($expectedManifestHash -notmatch '^[a-f0-9]{64}$' -or (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedManifestHash) { throw 'use_generated_client_package' }
+    if ($expectedManifestHash -notmatch '^[a-f0-9]{64}$' -or (Get-FileSHA256 $manifestPath) -ne $expectedManifestHash) { throw 'use_generated_client_package' }
     $stage = 'read_manifest'
-    $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $manifest = [IO.File]::ReadAllText((ConvertTo-IOPath $manifestPath),[Text.Encoding]::UTF8) | ConvertFrom-Json
     if ($manifest.kind -ne 'WS4-LOCAL-1' -or $manifest.base_content_sha256 -ne 'a8ad3b474799bbc07821b568120ec442a2c25a74826fe2e0e92696a09ca36335') { throw 'client_identity_invalid' }
     $rows = @($manifest.runtime.files)
     foreach ($row in $rows) { if ($row.path -notmatch '^[A-Za-z0-9_./ -]+$' -or $row.path -match '(^|/)\.\.?(/|$)' -or $row.path.StartsWith('/') -or $row.sha256 -notmatch '^[a-f0-9]{64}$') { throw 'client_manifest_path_invalid' } }
     $source = Join-Path $PSScriptRoot $addonName
     $stage = 'check_layout'; $currentFile = $addonName
-    if (-not (Test-Path -LiteralPath $source -PathType Container)) { throw 'guest_runtime_folder_missing' }
+    if (-not (Test-IOPath $source) -or ([IO.File]::GetAttributes((ConvertTo-IOPath $source)) -band [IO.FileAttributes]::Directory) -eq 0) { throw 'guest_runtime_folder_missing' }
     if ($AuditAll) {
         Assert-PlainPath $source
         $stage = 'check_resources'
@@ -152,25 +196,27 @@ try {
     $addons = Join-Path $game 'dota_addons'
     if (-not (Test-Path -LiteralPath $addons)) { New-Item -ItemType Directory -Path $addons | Out-Null }
     Assert-PlainPath $addons
-    if (Test-Path -LiteralPath $target) {
+    if (Test-IOPath $target) {
         $existing = Join-Path $target $descriptorName
         Assert-PlainPath $existing
-        if ((Get-FileHash -LiteralPath $existing -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedManifestHash) { throw 'existing_addon_version_differs' }
+        if ((Get-FileSHA256 $existing) -ne $expectedManifestHash) { throw 'existing_addon_version_differs' }
         Assert-Layout $target $rows $true
     } else {
-        New-Item -ItemType Directory -Path $target | Out-Null
-        Copy-Item -LiteralPath $manifestPath -Destination (Join-Path $target $descriptorName)
+        New-PlainDirectory $target
+        [IO.File]::Copy((ConvertTo-IOPath $manifestPath),(ConvertTo-IOPath (Join-Path $target $descriptorName)),$false)
     }
     $stage = 'install_runtime'
     foreach ($row in $rows) {
         $currentFile = $row.path
         $destination = Join-Path $target $row.path
-        if (Test-Path -LiteralPath $destination) { Assert-File $destination $row }
+        $pathLength = $destination.Length
+        if (Test-IOPath $destination) { Assert-File $destination $row }
         else {
             $parent = Split-Path -Parent $destination
-            if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+            if (-not (Test-IOPath $parent)) { New-PlainDirectory $parent }
             Assert-PlainPath $parent
-            Copy-Item -LiteralPath (Join-Path $source $row.path) -Destination $destination
+            $pathLength = $destination.Length
+            [IO.File]::Copy((ConvertTo-IOPath (Join-Path $source $row.path)),(ConvertTo-IOPath $destination),$false)
             Assert-File $destination $row
         }
     }
