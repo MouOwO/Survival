@@ -84,6 +84,25 @@ class FrozenChecks(unittest.TestCase):
                 with self.assertRaisesRegex(local.LocalError,'bytes_changed'):local.verify_stage(expected)
                 (stage/'one.txt').write_bytes(raw);(stage/'unreviewed.lua').write_bytes(b'bad')
                 with self.assertRaisesRegex(local.LocalError,'file_set_changed'):local.verify_stage(expected)
+    def test_tools_root_caches_do_not_hide_changed_or_unreviewed_runtime(self):
+        with tempfile.TemporaryDirectory() as temp:
+            stage=Path(temp)
+            expected=local.expected_manifest({'files':[]},{'runtime.lua':b'return true'})
+            (stage/'runtime.lua').write_bytes(b'return true')
+            for name in local.TOOLS_CACHE_FILES:(stage/name).write_bytes(b'engine cache')
+            with patch.object(local,'STAGE',stage):
+                local.verify_stage(expected)
+                (stage/'runtime.lua').write_bytes(b'return false')
+                with self.assertRaisesRegex(local.LocalError,'bytes_changed'):local.verify_stage(expected)
+                (stage/'runtime.lua').write_bytes(b'return true')
+                for name in ('tools_injected.lua','tools_thumbnail_cache.sqlite3.lua',
+                             'nested/tools_asset_info.bin'):
+                    with self.subTest(name=name):
+                        path=stage/name;path.parent.mkdir(parents=True,exist_ok=True)
+                        path.write_bytes(b'not an allowed cache')
+                        with self.assertRaisesRegex(local.LocalError,'file_set_changed'):local.verify_stage(expected)
+                        path.unlink()
+
     def test_local_overlay_changes_only_tools_route_and_contains_no_host_key(self):
         with tempfile.TemporaryDirectory() as temp:
             base=Path(temp);name='scripts/vscripts/systems/workshop_connection.lua'

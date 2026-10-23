@@ -48,6 +48,11 @@ PATHS=frozenset('/v1/'+p for p in ('session/authenticate','session/login','profi
     'archive/endless-leaderboard','online-time/checkpoint','rewards/grant'))
 PRIVATE_REL='scripts/vscripts/ws4_local_launcher/session.kv'
 INSTALL_MANIFEST='_ws4_local_install.json'
+# Tools writes these root-level caches after opening an addon. They are not
+# runtime assets; still reject links, unknown files and any changed frozen byte.
+TOOLS_CACHE_FILES=frozenset(('tools_asset_info.bin','tools_thumbnail_cache.sqlite3',
+    'tools_thumbnail_cache.sqlite3-journal','tools_thumbnail_cache.sqlite3-wal',
+    'tools_thumbnail_cache.sqlite3-shm'))
 HIDDEN=getattr(subprocess,'CREATE_NO_WINDOW',0)
 
 
@@ -114,7 +119,7 @@ def verify_stage(data):
     for path in STAGE.rglob('*'):
         private_files.no_reparse(path)
         if path.is_file():actual.add(path.relative_to(STAGE).as_posix())
-    need(actual-{INSTALL_MANIFEST,PRIVATE_REL}==set(expected),'local_stage_file_set_changed')
+    need(actual-{INSTALL_MANIFEST,PRIVATE_REL}-TOOLS_CACHE_FILES==set(expected),'local_stage_file_set_changed')
     for name,row in expected.items():
         need(runtime.checksums(STAGE/name)=={k:row[k] for k in ('bytes','md5','sha256')},
              'local_stage_bytes_changed')
