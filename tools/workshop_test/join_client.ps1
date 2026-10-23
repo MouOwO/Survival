@@ -5,11 +5,18 @@ $addonName = 'survival_ws4_local'
 $descriptorName = '_ws4_local_install.json'
 $stage = 'read_address'
 $currentFile = ''
-$revision = 'WS4-JOIN-04'
+$revision = 'WS4-JOIN-05'
+$pathLength = 0
 $cacheNames = @('tools_asset_info.bin','tools_thumbnail_cache.sqlite3','tools_thumbnail_cache.sqlite3-journal','tools_thumbnail_cache.sqlite3-wal','tools_thumbnail_cache.sqlite3-shm')
 function Assert-PlainPath([string]$Path) {
-    if (-not (Test-Path -LiteralPath $Path)) { throw 'guest_file_missing' }
-    $entry = Get-Item -LiteralPath $Path -Force
+    $script:pathLength = $Path.Length
+    try { $entry = Get-Item -LiteralPath $Path -Force -ErrorAction Stop }
+    catch {
+        $kind = $_.Exception.GetBaseException().GetType().FullName
+        if ($kind -match 'PathTooLongException$' -or ($Path.Length -ge 260 -and $_.CategoryInfo.Category -eq 'ObjectNotFound')) { throw 'guest_path_too_long' }
+        if ($_.CategoryInfo.Category -eq 'ObjectNotFound') { throw 'guest_file_missing' }
+        throw
+    }
     while ($entry) {
         if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'linked_path_not_allowed' }
         if ($entry -is [IO.FileInfo]) { $entry = $entry.Directory }
@@ -26,9 +33,10 @@ function Assert-Layout([string]$Folder, $Rows, [bool]$PermitCaches) {
     $known = @{}
     foreach ($row in $Rows) { $known[$row.path] = $true }
     foreach ($entry in Get-ChildItem -LiteralPath $Folder -Force -Recurse) {
+        $relative = $entry.FullName.Substring($Folder.Length + 1).Replace('\','/')
+        $script:currentFile = $relative
         Assert-PlainPath $entry.FullName
         if ($entry.PSIsContainer) { continue }
-        $relative = $entry.FullName.Substring($Folder.Length + 1).Replace('\','/')
         if ($relative -eq $descriptorName) { continue }
         if ($PermitCaches -and $cacheNames -contains $relative) { continue }
         if (-not $known.ContainsKey($relative)) { throw 'client_unexpected_file' }
@@ -154,7 +162,7 @@ try {
     elseif ($message -eq 'guest_path_too_long') { Write-Host '文件路径过长，请将完整客户端移动到较短路径，例如 D:\WS4，再重试。' }
     else { Write-Host '加入准备未完成，请把下方诊断 JSON 发给作者。此时尚不能据此判断 VPN 连通性。' }
     $diagnostic = @{ok=$false;revision=$revision;error=$message;stage=$stage;category=$category;
-        exception_type=$exceptionType;line=$_.InvocationInfo.ScriptLineNumber;powershell=$PSVersionTable.PSVersion.ToString()}
+        exception_type=$exceptionType;line=$_.InvocationInfo.ScriptLineNumber;powershell=$PSVersionTable.PSVersion.ToString();path_chars=$pathLength}
     if ($currentFile -match '^[A-Za-z0-9_./ -]{1,220}$') { $diagnostic.file = $currentFile }
     $encoded = $diagnostic | ConvertTo-Json -Compress
     try {

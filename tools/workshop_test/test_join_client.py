@@ -21,26 +21,40 @@ class GuestPackageChecks(unittest.TestCase):
             expected=host.expected_manifest({'files':[]},{'addoninfo.txt':b'frozen'})
             marker=json.dumps({'kind':'WS4-LOCAL-1','base_content_sha256':host.BASE_SHA,'runtime':expected}).encode()
             template=(host.HERE/'join_client.ps1').read_text(encoding='utf8')
-            def run(raw):
+            def run(raw,listed_path=None):
                 (folder/'client_manifest.json').write_bytes(raw)
                 (folder/'join_client.ps1').write_text(template.replace('__MANIFEST_SHA256__',hashlib.sha256(raw).hexdigest()),encoding='utf-8-sig')
                 environment=dict(os.environ)
                 environment['PSModulePath']=';'.join((str(Path(os.environ['ProgramFiles'])/'WindowsPowerShell/Modules'),
                     str(Path(os.environ['SystemRoot'])/'System32/WindowsPowerShell/v1.0/Modules')))
-                result=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',
-                    str(folder/'join_client.ps1'),'-Server','26.1.2.3:27015','-CheckOnly'],capture_output=True,
+                command=['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',
+                    str(folder/'join_client.ps1'),'-Server','26.1.2.3:27015','-CheckOnly']
+                if listed_path:
+                    quote=lambda value:"'"+str(value).replace("'","''")+"'"
+                    wrapper=folder/'layout_fixture.ps1'
+                    wrapper.write_text('function Get-ChildItem { [CmdletBinding()]param([string]$LiteralPath,[switch]$Force,[switch]$Recurse); '
+                        '[pscustomobject]@{FullName='+quote(folder/host.ADDON/listed_path)+';PSIsContainer=$false} }\n'
+                        '$global:LASTEXITCODE=0\n& '+quote(folder/'join_client.ps1')+
+                        ' -Server 26.1.2.3:27015 -CheckOnly\nexit $LASTEXITCODE\n',encoding='utf-8-sig')
+                    command=['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',str(wrapper)]
+                result=subprocess.run(command,capture_output=True,
                     text=True,encoding='utf8',errors='replace',timeout=10,env=environment)
                 self.assertEqual(result.returncode,1,result.stdout+result.stderr)
                 return result,json.loads((folder/'join_diagnostic.json').read_text(encoding='utf8'))
             missing,data=run(marker)
             self.assertEqual((data['error'],data['stage'],data['file']),('guest_file_missing','check_resources','addoninfo.txt'))
-            self.assertEqual(data['revision'],'WS4-JOIN-04')
+            self.assertEqual(data['revision'],'WS4-JOIN-05')
             private='must-never-print-parser-input'
             failed,data=run(('{"example":"'+private+'", broken').encode())
             self.assertEqual(data['stage'],'read_manifest')
             self.assertIn('exception_type',data)
             self.assertNotIn(private,failed.stdout+failed.stderr+json.dumps(data))
             self.assertNotIn(str(folder),json.dumps(data))
+            for name,code in (('missing.vtex_c','guest_file_missing'),('x'*180+'.vtex_c','guest_path_too_long')):
+                relative='panorama/images/'+name
+                failed,data=run(marker,relative)
+                self.assertEqual((data['error'],data['stage'],data['file']),(code,'check_layout',relative))
+                self.assertEqual(data['path_chars'],len(str(folder/host.ADDON/relative)))
 
     @unittest.skipUnless(os.name=='nt','Windows CMD integration')
     def test_cmd_reports_missing_or_empty_script_without_starting_game(self):
