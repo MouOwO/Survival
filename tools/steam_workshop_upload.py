@@ -302,6 +302,10 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
             if not update_existing:
                 raise ValueError('Existing item has different package bytes; explicitly use --update-existing')
             state.update(**facts, uploaded=False, status='PRIVATE_ITEM_UPDATE_PREPARED')
+            # Validation of the previous bytes does not validate this update.
+            for name in list(state):
+                if name.startswith('download_') or name == 'native_four_archive_reads_verified':
+                    state.pop(name)
             journal(state_path, state)
         if state.get('status') == 'SUBMIT_REQUEST_PENDING':
             raise ValueError('Prior submit result is unknown; query/download the confirmed item before explicitly retrying')

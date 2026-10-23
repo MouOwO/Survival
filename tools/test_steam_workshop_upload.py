@@ -135,6 +135,8 @@ class UploadGuards(unittest.TestCase):
     def test_changed_uploaded_package_requires_explicit_update_and_reuses_confirmed_id(self):
         initial = {'owner': api.OWNER, 'app_id': api.APP, **self.facts,
                    'vpk_sha256': 'old', 'workshop_id': '9876543210',
+                   'download_manifest': 'old-manifest', 'download_verified': True,
+                   'native_four_archive_reads_verified': True,
                    'status': 'SUBMITTED_PRIVATE_PENDING_DOWNLOAD_AND_NATIVE_TEST', 'uploaded': True}
         api.journal(self.state, initial)
         steam = FakeSteam([{'id': '9876543210', 'owner': api.OWNER}])
@@ -148,6 +150,9 @@ class UploadGuards(unittest.TestCase):
         self.assertEqual(state['workshop_id'], '9876543210')
         self.assertEqual(state['vpk_sha256'], self.facts['vpk_sha256'])
         self.assertFalse(state['uploaded'])
+        self.assertNotIn('download_manifest', state)
+        self.assertNotIn('download_verified', state)
+        self.assertNotIn('native_four_archive_reads_verified', state)
         self.assertEqual([name for name, _ in steam.calls], ['StartItemUpdate'])
 
     def test_multipart_cannot_create_unknown_item(self):
