@@ -356,7 +356,15 @@ def existing_game():
     return int(p.stdout.strip())>0
 
 
-def run(expected_players):
+def game_command(direct_join=False):
+    command=[str(ROOT.parents[1]/'bin/win64/dota2.exe'),'-steam','-tools','-noassetbrowser','-addon',ADDON,
+        '-dev','-novid','-vconport',str(CONSOLE_PORT),'+sv_cheats','1','+host_timescale','1',
+        '+r_drawpanorama','1']
+    if direct_join:command+=['+sv_lan','0']
+    return command+['+dota_launch_custom_game',ADDON,'template_map']
+
+
+def run(expected_players,direct_join=False):
     need(not existing_game(),'close_dota_first')
     print('正在校验冻结测试资源……',flush=True)
     install()
@@ -373,10 +381,7 @@ def run(expected_players):
         private_write(private,'"ws4_local_session"\n{\n "token" "'+local_key+'"\n "expected_players" "'+str(expected_players)+'"\n}\n')
         console=None
         try:
-            exe=ROOT.parents[1]/'bin/win64/dota2.exe'
-            proc=subprocess.Popen([str(exe),'-steam','-tools','-noassetbrowser','-addon',ADDON,
-                '-dev','-novid','-vconport',str(CONSOLE_PORT),'+sv_cheats','1','+host_timescale','1',
-                '+r_drawpanorama','1','+dota_launch_custom_game',ADDON,'template_map'],
+            proc=subprocess.Popen(game_command(direct_join),
                 cwd=ROOT.parents[1]/'dota',stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             console=Console();applied=False;previous=None;deadline=time.monotonic()+600
             print('本机独立测试已启动。请保留此窗口；在游戏中等待载入，并按正常流程开始加载/选择模式。',flush=True)
@@ -417,6 +422,7 @@ def main():
     parser.add_argument('action',choices=('install','provision','preflight','run','status'))
     parser.add_argument('--refresh',action='store_true')
     parser.add_argument('--expected-players',type=int,choices=(1,2,3,4),default=1)
+    parser.add_argument('--direct-join',action='store_true',help='Allow direct game connections; configure the restricted VPN firewall first')
     args=parser.parse_args()
     try:
         need(os.name=='nt','windows_only')
@@ -427,7 +433,7 @@ def main():
                 elif args.action=='provision':
                     provision();value={'ok':True,'status':'LOCAL_CONNECTOR_PROVISIONED'}
                 elif args.action=='preflight':value=preflight(provision())
-                else:value=run(args.expected_players)
+                else:value=run(args.expected_players,args.direct_join)
         print(json.dumps(value,ensure_ascii=False),flush=True);return 0
     except KeyboardInterrupt:
         value=report({'ok':True,'status':'LOCAL_CONNECTOR_STOPPED_GAME_PRESERVED'})

@@ -64,6 +64,14 @@ class ProxyChecks(unittest.TestCase):
 
 
 class FrozenChecks(unittest.TestCase):
+    def test_direct_join_is_explicit_and_keeps_frozen_addon_and_map(self):
+        normal=local.game_command()
+        direct=local.game_command(True)
+        self.assertNotIn('+sv_lan',normal)
+        self.assertEqual(direct[direct.index('+sv_lan')+1],'0')
+        self.assertEqual(direct[-3:],['+dota_launch_custom_game','survival_ws4_local','template_map'])
+        self.assertIn('-vconport',direct)
+
     def test_running_game_is_preserved_before_any_install_or_provision(self):
         with patch.object(local,'existing_game',return_value=True), patch.object(local,'install') as install, \
                 patch.object(local,'provision') as provision:
