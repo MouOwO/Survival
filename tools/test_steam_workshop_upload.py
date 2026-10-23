@@ -16,7 +16,7 @@ class FakeSteam:
     owner = api.OWNER
 
     def __init__(self, items=None, legal=False):
-        self.items = items or []
+        self.items = [{'visibility': 2, **item} for item in (items or [])]
         self.calls = []
         self.legal = legal
 
@@ -154,6 +154,68 @@ class UploadGuards(unittest.TestCase):
         self.assertNotIn('download_verified', state)
         self.assertNotIn('native_four_archive_reads_verified', state)
         self.assertEqual([name for name, _ in steam.calls], ['StartItemUpdate'])
+
+    def test_unlisted_requires_existing_explicit_visibility_approval(self):
+        steam=FakeSteam()
+        listing={'visibility_requested':'unlisted','workshop_id':'9876543210'}
+        with patch.object(api,'emit'), self.assertRaisesRegex(ValueError,'Unlisted requires'):
+            api.publish(steam,listing,self.root/'cover.jpg',self.vpk,self.facts,self.state,apply=True)
+        self.assertFalse(steam.calls)
+        api.journal(self.state,{'owner':api.OWNER,'app_id':api.APP,**self.facts,
+            'workshop_id':'9876543210','visibility_requested':2,'uploaded':True})
+        with patch.object(api,'emit'), self.assertRaisesRegex(ValueError,'explicitly approved visibility'):
+            api.publish(steam,listing,self.root/'cover.jpg',self.vpk,self.facts,self.state,apply=True)
+        self.assertFalse(steam.calls)
+
+    def test_approved_unlisted_never_silently_reverts_to_private_or_public(self):
+        api.journal(self.state,{'owner':api.OWNER,'app_id':api.APP,**self.facts,
+            'workshop_id':'9876543210','visibility_requested':3,'uploaded':True})
+        steam=FakeSteam([{'id':'9876543210','owner':api.OWNER,'visibility':3}])
+        for requested in ('private','public','friends_only'):
+            with patch.object(api,'emit'), self.assertRaises(ValueError):
+                api.publish(steam,{'visibility_requested':requested,'workshop_id':'9876543210'},
+                    self.root/'cover.jpg',self.vpk,self.facts,self.state,apply=True)
+        self.assertFalse(steam.calls)
+        with patch.object(api,'emit'):
+            result=api.publish(steam,{'visibility_requested':'unlisted','workshop_id':'9876543210'},
+                self.root/'cover.jpg',self.vpk,self.facts,self.state,apply=True)
+        self.assertTrue(result['uploaded'])
+        self.assertFalse(steam.calls,'same bytes and approved visibility must be idempotent')
+        steam.items[0]['visibility']=0
+        with patch.object(api,'emit'), self.assertRaisesRegex(ValueError,'Remote visibility differs'):
+            api.publish(steam,{'visibility_requested':'unlisted','workshop_id':'9876543210'},
+                self.root/'cover.jpg',self.vpk,self.facts,self.state,apply=True)
+
+    def test_approved_unlisted_package_update_preserves_visibility_three(self):
+        class UpdatingSteam(FakeSteam):
+            def ug(self,name,result,types,*args):
+                self.calls.append((name,args))
+                if name=='StartItemUpdate': return 99
+                if name.startswith('SetItem'): return True
+                if name=='SubmitItemUpdate': raise RuntimeError('Stop before submit')
+                raise AssertionError(name)
+        api.journal(self.state,{'owner':api.OWNER,'app_id':api.APP,**self.facts,
+            'vpk_sha256':'old','workshop_id':'9876543210','visibility_requested':3,'uploaded':True})
+        steam=UpdatingSteam([{'id':'9876543210','owner':api.OWNER,'visibility':3}])
+        listing={'visibility_requested':'unlisted','workshop_id':'9876543210','title':'test','description':'test'}
+        with patch.object(api,'emit'), self.assertRaisesRegex(RuntimeError,'Stop before submit'):
+            api.publish(steam,listing,self.root/'cover.jpg',self.vpk,{**self.facts,'release_sequence':1},
+                self.state,apply=True,update_existing=True)
+        visibility_calls=[args for name,args in steam.calls if name=='SetItemVisibility']
+        self.assertEqual(visibility_calls,[(99,3)])
+        state=json.loads(self.state.read_text(encoding='utf8'))
+        self.assertEqual(state['visibility_requested'],3)
+        self.assertEqual(state['status'],'SUBMIT_REQUEST_PENDING')
+
+    def test_download_check_requires_approved_visibility(self):
+        import verify_workshop_download as verify
+        state={'owner':api.OWNER,'app_id':api.APP,'workshop_id':'9876543210',
+               'visibility_requested':3,'uploaded':True}
+        steam=FakeSteam([{'id':'9876543210','owner':api.OWNER,'visibility':3,'tags':'Custom Game'}])
+        self.assertEqual(verify.check(steam,state)['status'],'UNLISTED_ITEM_READ_ONLY_VERIFIED')
+        for visibility in (0,2):
+            with self.assertRaises(ValueError):verify.check(steam,{**state,'visibility_requested':visibility})
+        self.assertFalse(steam.calls,'read-only verification must not alter subscriptions or publish')
 
     def test_multipart_cannot_create_unknown_item(self):
         self.facts['package_files'] = [{'name': '1.vpk'}, {'name': '1_000.vpk'}]

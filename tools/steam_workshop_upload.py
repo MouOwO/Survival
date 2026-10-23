@@ -1,7 +1,8 @@
 """Upload an already reviewed signed test candidate with Valve's installed SDK.
 
 Default is read-only. --apply is an external publication action: it creates or
-updates ONE private item, journals its ID before upload, and never makes it public.
+updates ONE private/unlisted item and journals its ID before upload. Unlisted
+updates require an existing, explicitly approved visibility recovery journal.
 Uses the logged-in Steam client, not web cookies, passwords or extracted tokens.
 Native game and four-machine tests remain separate from successful transfer.
 """
@@ -231,7 +232,7 @@ def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report
     pack.runtime.require_production(candidate)
     ids = pack.handoff.configured_ids(candidate)
     listing = load(listing_path)
-    if (listing['real_money_payments'] is not False or listing['visibility_requested'] != 'private'
+    if (listing['real_money_payments'] is not False or listing['visibility_requested'] not in ('private', 'unlisted')
             or sorted(listing['tester_steamids64']) != ids or OWNER not in ids
             or listing['map'] != 'template_map' or listing['max_players'] != 4
             or listing['runtime_content_sha256'] != manifest['content_sha256']
@@ -264,6 +265,15 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
     owned = steam.owned()
     emit({'status': 'OWNER_ITEMS_VERIFIED', 'owner': steam.owner, 'app_id': APP, 'items': owned})
     state = load(state_path) if state_path.exists() else None
+    try:
+        visibility = {'private': 2, 'unlisted': 3}[listing.get('visibility_requested', 'private')]
+    except (KeyError, TypeError):
+        raise ValueError('Only private or explicitly approved unlisted tests are supported') from None
+    if state is not None and state.get('visibility_requested', 2) != visibility:
+        raise ValueError('Listing/journal visibility differs; perform an explicitly approved visibility change first')
+    if visibility == 3 and (state is None or not state.get('workshop_id')
+                           or listing.get('workshop_id') != state['workshop_id']):
+        raise ValueError('Unlisted requires an existing owner-approved item and visibility journal')
     if not apply:
         return {'status': 'VERIFIED_NO_PUBLICATION', 'facts': facts, 'state': state,
                 'native_test': 'NOT_RUN', 'ready_for_public_release': False}
@@ -289,6 +299,8 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
         matching = [item for item in owned if item['id'] == state['workshop_id']]
         if len(matching) != 1 or matching[0]['owner'] != OWNER:
             raise ValueError('Journal ID is not uniquely present in the current owner list; recover it before updating')
+        if matching[0].get('visibility') != visibility:
+            raise ValueError('Remote visibility differs from approved listing/journal; inspect before updating')
         if state.get('content_sha256') != facts['content_sha256']:
             if (not update_existing or state.get('uploaded') is not True
                     or listing.get('workshop_id') != state['workshop_id']):
@@ -301,7 +313,8 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
                 return state
             if not update_existing:
                 raise ValueError('Existing item has different package bytes; explicitly use --update-existing')
-            state.update(**facts, uploaded=False, status='PRIVATE_ITEM_UPDATE_PREPARED')
+            state.update(**facts, uploaded=False, status=('PRIVATE_ITEM_UPDATE_PREPARED' if visibility == 2
+                                                        else 'UNLISTED_ITEM_UPDATE_PREPARED'))
             # Validation of the previous bytes does not validate this update.
             for name in list(state):
                 if name.startswith('download_') or name == 'native_four_archive_reads_verified':
@@ -340,7 +353,7 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
     setter('SetItemUpdateLanguage', [C.c_char_p], b'schinese')
     setter('SetItemTitle', [C.c_char_p], listing['title'].encode('utf8'))
     setter('SetItemDescription', [C.c_char_p], listing['description'].encode('utf8'))
-    setter('SetItemVisibility', [C.c_int32], 2)
+    setter('SetItemVisibility', [C.c_int32], visibility)
     values = (C.c_char_p * 1)(b'Custom Game')
     tags = Strings(values, 1)
     setter('SetItemTags', [C.POINTER(Strings), C.c_bool], C.byref(tags), False)
@@ -361,7 +374,8 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
     response = steam.wait(call, Submitted, 3404, timeout=4 * 3600, progress=progress)
     if response.item != item:
         raise RuntimeError('Steam submitted item ID differs from journal')
-    state.update(status='SUBMITTED_PRIVATE_PENDING_DOWNLOAD_AND_NATIVE_TEST', uploaded=True,
+    state.update(status=('SUBMITTED_PRIVATE_PENDING_DOWNLOAD_AND_NATIVE_TEST' if visibility == 2
+                         else 'SUBMITTED_UNLISTED_PENDING_DOWNLOAD_AND_NATIVE_TEST'), uploaded=True,
                  legal_agreement_required=bool(response.legal), native_test='NOT_RUN',
                  ready_for_public_release=False)
     journal(state_path, state)
@@ -376,9 +390,9 @@ def main():
     parser.add_argument('--listing', type=Path, default=ROOT / 'publishing/workshop/test_listing.json')
     parser.add_argument('--build-report', type=Path)
     parser.add_argument('--state-file', type=Path, default=ROOT / 'output/four_accounts_20261022/steam_upload_state.json')
-    parser.add_argument('--apply', action='store_true', help='Authorized external action: create/update ONE PRIVATE test item')
+    parser.add_argument('--apply', action='store_true', help='Authorized external action: update one reviewed private/unlisted test item')
     parser.add_argument('--update-existing', action='store_true',
-                        help='Explicitly replace package bytes for the confirmed existing private item')
+                        help='Explicitly replace package bytes for the confirmed existing private/unlisted item')
     args = parser.parse_args()
     try:
         if args.inspect:

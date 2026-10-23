@@ -1,4 +1,4 @@
-"""Download the journaled private test item, then verify every signed VPK entry.
+"""Download the journaled private/unlisted test item and verify signed VPK entries.
 
 Default only inspects. --download subscribes the current authorized owner to
 the existing item and requests its Steam-managed download. No publication,
@@ -25,12 +25,15 @@ def check(steam, state, *, download=False):
             or state.get('app_id') != api.APP or not state.get('workshop_id')):
         raise ValueError('A successful reviewed upload journal is required')
     owned = [row for row in steam.owned() if row['id'] == state['workshop_id']]
+    visibility = state.get('visibility_requested', 2)
+    if visibility not in (2, 3):
+        raise ValueError('Only private or explicitly approved unlisted journals are supported')
     if (len(owned) != 1 or owned[0]['owner'] != api.OWNER
-            or owned[0]['visibility'] != 2 or 'Custom Game' not in owned[0]['tags'].split(',')):
-        raise ValueError('Current Steam item is not uniquely owned/private/tagged as the reviewed custom game')
+            or owned[0]['visibility'] != visibility or 'Custom Game' not in owned[0]['tags'].split(',')):
+        raise ValueError('Current Steam item differs from its reviewed owner/visibility/custom-game tags')
     item = int(state['workshop_id'])
     if not download:
-        return {'status': 'PRIVATE_ITEM_READ_ONLY_VERIFIED', 'item': owned[0],
+        return {'status': 'PRIVATE_ITEM_READ_ONLY_VERIFIED' if visibility == 2 else 'UNLISTED_ITEM_READ_ONLY_VERIFIED', 'item': owned[0],
                 'native_test': 'NOT_RUN', 'download_requested': False}
     subscribed = steam.wait(steam.ug('SubscribeItem', C.c_uint64, [C.c_uint64], item), Subscribed, 1313)
     if subscribed.item != item:
@@ -81,7 +84,8 @@ def verify_installed(result, candidate, state):
     inventory = api.pack.package_inventory(target)
     if (len(inventory) > 1 or 'package_files' in state) and state.get('package_files') != inventory:
         raise ValueError('Downloaded archives differ from submitted bytes')
-    result.update(status='PRIVATE_WORKSHOP_DOWNLOAD_FULLY_VERIFIED', vpk=str(target),
+    result.update(status=('PRIVATE_WORKSHOP_DOWNLOAD_FULLY_VERIFIED' if state.get('visibility_requested', 2) == 2
+                          else 'UNLISTED_WORKSHOP_DOWNLOAD_FULLY_VERIFIED'), vpk=str(target),
                   vpk_sha256=sha, verification=api.pack.verify_vpk(target, manifest),
                   signature_valid=True, package_files=inventory, ready_for_public_release=False)
     return result
