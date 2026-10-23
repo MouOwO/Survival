@@ -23,7 +23,7 @@ CONTENT=ROOT.parents[2]/'content/dota_addons/Survival'
 PROFILE='scripts/vscripts/systems/player_profile_service.lua'
 PROFILE_HASH='ad2ba8edf96c45f8730df8f1d5289414f8e4f1a3bd05cd95827c9dc690e39a86'
 OLD_CONTENT='1c09e562ada4586ba4c046616e94317bf062c308a0c0c507e5af59d7b9024b6d'
-SEQUENCE=2026102302
+SEQUENCE=2026102303
 lf=lambda b:b.replace(b'\r\n',b'\n')
 crlf=lambda b:lf(b).replace(b'\n',b'\r\n')
 sha=lambda b:hashlib.sha256(b).hexdigest()
@@ -105,7 +105,7 @@ def build(args):
         assert len(diagnostic_lines)==10
         source=lf(git(BASE,relative)).decode('utf8')
         previous='backend_authentication_failed: "服务端认证失败，请检查测试连接后重试。",'
-        replacement='backend_authentication_failed: "服务端认证失败，请将此提示发给作者。（WS4-02/AUTH）",'
+        replacement='backend_authentication_failed: "服务端认证失败，请将此提示发给作者。（WS4-03/AUTH）",'
         assert replacement in current and source.count(previous)==1
         source=source.replace(previous,replacement+'\n'+'\n'.join(diagnostic_lines),1)
         assert source.count(anchor)==1
@@ -180,7 +180,7 @@ def main():
     parser.add_argument('--output-dir',type=Path,required=True)
     parser.add_argument('--signing-key',type=Path,required=True)
     parser.add_argument('--release-sequence',type=int,default=SEQUENCE)
-    parser.add_argument('--report-dir',type=Path,default=ROOT/'output/workshop_auth_diagnostics_20261023')
+    parser.add_argument('--report-dir',type=Path,default=ROOT/'output/workshop_key_authority_20261023')
     build(parser.parse_args())
 
 

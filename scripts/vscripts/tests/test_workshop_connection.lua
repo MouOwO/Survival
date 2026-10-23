@@ -10,7 +10,14 @@ local url,token,err=connection.resolve("http://127.0.0.1:8765","private-tools-to
 assert(url=="http://127.0.0.1:8765" and token=="private-tools-token" and not err)
 mode=false
 url,token,err=connection.resolve("http://127.0.0.1:8765","private-tools-token")
-assert(not url and not token and err=="workshop_dedicated_server_required")
+assert(url==config.base_url and token==key and not err,
+    "a false generic server flag must not hide the actual Valve key result")
+IsDedicatedServer=function() error("generic server flag must not be queried") end
+url,token,err=connection.resolve("http://127.0.0.1:8765","")
+assert(url==config.base_url and token==key and not err)
+IsDedicatedServer=nil
+url,token,err=connection.resolve("http://127.0.0.1:8765","")
+assert(url==config.base_url and token==key and not err)
 dedicated=true
 url,token,err=connection.resolve("http://127.0.0.1:8765","")
 assert(url==config.base_url and token==key and not err)
@@ -62,4 +69,10 @@ provider.authenticate("885195478",function() error("Unpaired server must never a
 assert(request.url==config.base_url.."/v1/session/authenticate")
 assert(request.Authorization=="Bearer "..key)
 assert(error_code=="workshop_pairing_0123456789abcdef")
+request=nil
+key="Invalid_NotOnDedicatedServer"
+provider.authenticate("885195478",function() error("Invalid key must never authenticate") end,
+    function(code) error_code=code end)
+assert(request==nil and error_code=="workshop_key_state_Invalid_NotOnDedicatedServer",
+    "local/unofficial sentinel must never become an HTTP credential")
 print("workshop connection checks passed")

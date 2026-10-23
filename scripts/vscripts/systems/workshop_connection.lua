@@ -4,9 +4,9 @@ local M = {}
 function M.resolve(local_url, local_token)
     if IsInToolsMode and IsInToolsMode() then return local_url, local_token end
     if config.enabled ~= true then return local_url, local_token end
-    if not IsDedicatedServer or not IsDedicatedServer() then
-        return nil, nil, "workshop_dedicated_server_required"
-    end
+    -- The generic server flag is not an authentication result. Ask Valve for
+    -- the Workshop credential even when that flag is false or unavailable;
+    -- Invalid_* results still fail closed, and the API requires an owner pin.
     if type(config.base_url) ~= "string" or not config.base_url:match("^https://[%w%.%-]+/ws4$")
         or type(config.key_seed) ~= "string" or #config.key_seed > 64 then
         return nil, nil, "workshop_connection_invalid"
