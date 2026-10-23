@@ -3,8 +3,12 @@ $ErrorActionPreference = 'Stop'
 $expectedManifestHash = '__MANIFEST_SHA256__'
 $addonName = 'survival_ws4_local'
 $descriptorName = '_ws4_local_install.json'
+$stage = 'read_address'
+$currentFile = ''
+$revision = 'WS4-JOIN-04'
 $cacheNames = @('tools_asset_info.bin','tools_thumbnail_cache.sqlite3','tools_thumbnail_cache.sqlite3-journal','tools_thumbnail_cache.sqlite3-wal','tools_thumbnail_cache.sqlite3-shm')
 function Assert-PlainPath([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path)) { throw 'guest_file_missing' }
     $entry = Get-Item -LiteralPath $Path -Force
     while ($entry) {
         if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'linked_path_not_allowed' }
@@ -13,6 +17,7 @@ function Assert-PlainPath([string]$Path) {
     }
 }
 function Assert-File([string]$Path, $Row) {
+    $script:currentFile = $Row.path
     Assert-PlainPath $Path
     if ((Get-Item -LiteralPath $Path).Length -ne $Row.bytes -or (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $Row.sha256) { throw 'client_runtime_bytes_changed' }
 }
@@ -47,6 +52,7 @@ function Resolve-DotaGame {
     return (Resolve-Path -LiteralPath $entered).Path
 }
 try {
+    Write-Host ('加入器版本：' + $revision)
     if (-not $Server) {
         $addressFile = Join-Path $PSScriptRoot 'server_address.txt'
         if (Test-Path -LiteralPath $addressFile) { $Server = (Get-Content -LiteralPath $addressFile -Raw).Trim() }
@@ -56,18 +62,25 @@ try {
     $ipText = $Matches[1]; $port = [int]$Matches[2]
     $address = [Net.IPAddress]::None
     if (-not [Net.IPAddress]::TryParse($ipText,[ref]$address) -or $address.ToString() -ne $ipText -or $address.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetwork -or $port -ne 27015) { throw 'join_address_invalid' }
+    $stage = 'check_running_game'
     if (-not $CheckOnly -and (Get-Process -Name dota2 -ErrorAction SilentlyContinue)) { throw 'close_dota_first' }
+    $stage = 'check_manifest'; $currentFile = 'client_manifest.json'
     $manifestPath = Join-Path $PSScriptRoot 'client_manifest.json'
     Assert-PlainPath $manifestPath
     if ($expectedManifestHash -notmatch '^[a-f0-9]{64}$' -or (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedManifestHash) { throw 'use_generated_client_package' }
+    $stage = 'read_manifest'
     $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($manifest.kind -ne 'WS4-LOCAL-1' -or $manifest.base_content_sha256 -ne 'a8ad3b474799bbc07821b568120ec442a2c25a74826fe2e0e92696a09ca36335') { throw 'client_identity_invalid' }
     $rows = @($manifest.runtime.files)
     foreach ($row in $rows) { if ($row.path -notmatch '^[A-Za-z0-9_./ -]+$' -or $row.path -match '(^|/)\.\.?(/|$)' -or $row.path.StartsWith('/') -or $row.sha256 -notmatch '^[a-f0-9]{64}$') { throw 'client_manifest_path_invalid' } }
     $source = Join-Path $PSScriptRoot $addonName
+    $stage = 'check_layout'; $currentFile = $addonName
+    if (-not (Test-Path -LiteralPath $source -PathType Container)) { throw 'guest_runtime_folder_missing' }
     Assert-Layout $source $rows $false
+    $stage = 'check_resources'
     Write-Host '正在校验加入方测试资源……'
     foreach ($row in $rows) { Assert-File (Join-Path $source $row.path) $row }
+    $stage = 'locate_game'; $currentFile = ''
     $game = Resolve-DotaGame
     Assert-PlainPath $game
     $exe = Join-Path $game 'bin/win64/dota2.exe'
@@ -78,6 +91,7 @@ try {
         exit 0
     }
     if (Get-Process -Name dota2 -ErrorAction SilentlyContinue) { throw 'close_dota_first' }
+    $stage = 'prepare_content'
     $content = Join-Path (Split-Path $game) ('content/dota_addons/' + $addonName)
     $contentMarker = Join-Path $content 'ws4_local_owner.txt'
     $existingParent = Split-Path $content
@@ -92,6 +106,7 @@ try {
         New-Item -ItemType Directory -Path $content -Force | Out-Null
         [IO.File]::WriteAllText($contentMarker,"WS4-LOCAL-1`n",(New-Object Text.UTF8Encoding($false)))
     }
+    $stage = 'prepare_target'
     $addons = Join-Path $game 'dota_addons'
     if (-not (Test-Path -LiteralPath $addons)) { New-Item -ItemType Directory -Path $addons | Out-Null }
     Assert-PlainPath $addons
@@ -104,7 +119,9 @@ try {
         New-Item -ItemType Directory -Path $target | Out-Null
         Copy-Item -LiteralPath $manifestPath -Destination (Join-Path $target $descriptorName)
     }
+    $stage = 'install_runtime'
     foreach ($row in $rows) {
+        $currentFile = $row.path
         $destination = Join-Path $target $row.path
         if (Test-Path -LiteralPath $destination) { Assert-File $destination $row }
         else {
@@ -116,14 +133,37 @@ try {
         }
     }
     if (Get-Process -Name dota2 -ErrorAction SilentlyContinue) { throw 'close_dota_first' }
+    $stage = 'start_game'; $currentFile = ''
     Write-Host ('正在连接测试主机 ' + $Server + '。请保持 Steam 和 Radmin VPN 在线。')
     Start-Process -FilePath $exe -ArgumentList @('-steam','-tools','-noassetbrowser','-addon',$addonName,'-novid','+connect',$Server) -WorkingDirectory (Join-Path $game 'dota') | Out-Null
 } catch {
     $message = $_.Exception.Message
+    $category = $_.CategoryInfo.Category.ToString()
+    $exceptionType = $_.Exception.GetBaseException().GetType().FullName
+    if ($message -notmatch '^[a-z_]{1,100}$') {
+        if ($exceptionType -match 'CommandNotFoundException$') { $message = 'guest_powershell_command_missing' }
+        elseif ($exceptionType -match 'PathTooLongException$') { $message = 'guest_path_too_long' }
+        elseif ($category -eq 'PermissionDenied' -or $exceptionType -match 'UnauthorizedAccessException$') { $message = 'guest_access_denied' }
+        elseif ($category -eq 'ObjectNotFound' -or $exceptionType -match '(File|Directory)NotFoundException$') { $message = 'guest_file_missing' }
+        else { $message = 'guest_' + $stage + '_failed' }
+    }
     if ($message -eq 'close_dota_first') { Write-Host '请先退出这台电脑上的 Dota 2，保留 Steam，再运行加入入口。' }
     elseif ($message -eq 'existing_addon_version_differs') { Write-Host '这台电脑已存在不同版本测试副本，已保留原文件；请联系作者处理版本。' }
-    else { Write-Host '加入准备未完成，请把下方固定错误码发给作者。' }
-    if ($message -notmatch '^[a-z_]{1,100}$') { $message = 'guest_join_failed' }
-    @{ok=$false;error=$message} | ConvertTo-Json -Compress
+    elseif ($message -eq 'guest_file_missing' -or $message -eq 'guest_runtime_folder_missing') { Write-Host '发现缺少文件，请完整解压客户端；不要只复制启动文件或小修复包。' }
+    elseif ($message -eq 'guest_access_denied') { Write-Host '读取或写入测试文件被拒绝，请将完整客户端解压到自己可访问的普通文件夹。' }
+    elseif ($message -eq 'guest_path_too_long') { Write-Host '文件路径过长，请将完整客户端移动到较短路径，例如 D:\WS4，再重试。' }
+    else { Write-Host '加入准备未完成，请把下方诊断 JSON 发给作者。此时尚不能据此判断 VPN 连通性。' }
+    $diagnostic = @{ok=$false;revision=$revision;error=$message;stage=$stage;category=$category;
+        exception_type=$exceptionType;line=$_.InvocationInfo.ScriptLineNumber;powershell=$PSVersionTable.PSVersion.ToString()}
+    if ($currentFile -match '^[A-Za-z0-9_./ -]{1,220}$') { $diagnostic.file = $currentFile }
+    $encoded = $diagnostic | ConvertTo-Json -Compress
+    try {
+        Assert-PlainPath $PSScriptRoot
+        $diagnosticPath = Join-Path $PSScriptRoot 'join_diagnostic.json'
+        if (Test-Path -LiteralPath $diagnosticPath) { Assert-PlainPath $diagnosticPath }
+        [IO.File]::WriteAllText($diagnosticPath,$encoded,(New-Object Text.UTF8Encoding($false)))
+    } catch { }
+    Write-Host ('失败阶段：' + $stage)
+    $encoded
     exit 1
 }

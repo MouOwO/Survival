@@ -23,10 +23,10 @@ try {
     $code = $_.Exception.Message
     if ($code -eq 'guest_package_missing') {
         Write-Output '加入方需要完整客户端包，Git 源码不含冻结测试资源。'
-        Write-Output '请从主机复制 ws4_remote_client_20261023_v2.zip，完整解压后双击包内“加入测试.cmd”。'
+        Write-Output '请从主机复制完整 ws4_remote_client 客户端 ZIP，完整解压并应用最新启动修复包，再运行 join_game.cmd。'
         Write-Output '也可将解压目录拖到 join_ws4_game.cmd 上；直接双击该入口默认使用 output/ws4_remote_client_20261023。'
     } elseif ($code -eq 'guest_entrypoint_changed') {
-        Write-Output '客户端入口版本不一致或已被修改，请使用主机提供的原始完整客户端包。'
+        Write-Output '客户端入口版本不一致或已被修改，请使用主机提供的完整客户端并应用最新启动修复包。'
     } else { $code = 'guest_launcher_failed' }
     Write-Output $code
     exit 1

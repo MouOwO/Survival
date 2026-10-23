@@ -13,6 +13,35 @@ import local_host as host
 
 
 class GuestPackageChecks(unittest.TestCase):
+    @unittest.skipUnless(os.name=='nt','Windows PowerShell diagnostics')
+    def test_guest_diagnostics_identify_missing_asset_and_sanitize_parser_failures(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=Path(temporary)
+            (folder/host.ADDON).mkdir()
+            expected=host.expected_manifest({'files':[]},{'addoninfo.txt':b'frozen'})
+            marker=json.dumps({'kind':'WS4-LOCAL-1','base_content_sha256':host.BASE_SHA,'runtime':expected}).encode()
+            template=(host.HERE/'join_client.ps1').read_text(encoding='utf8')
+            def run(raw):
+                (folder/'client_manifest.json').write_bytes(raw)
+                (folder/'join_client.ps1').write_text(template.replace('__MANIFEST_SHA256__',hashlib.sha256(raw).hexdigest()),encoding='utf-8-sig')
+                environment=dict(os.environ)
+                environment['PSModulePath']=';'.join((str(Path(os.environ['ProgramFiles'])/'WindowsPowerShell/Modules'),
+                    str(Path(os.environ['SystemRoot'])/'System32/WindowsPowerShell/v1.0/Modules')))
+                result=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',
+                    str(folder/'join_client.ps1'),'-Server','26.1.2.3:27015','-CheckOnly'],capture_output=True,
+                    text=True,encoding='utf8',errors='replace',timeout=10,env=environment)
+                self.assertEqual(result.returncode,1,result.stdout+result.stderr)
+                return result,json.loads((folder/'join_diagnostic.json').read_text(encoding='utf8'))
+            missing,data=run(marker)
+            self.assertEqual((data['error'],data['stage'],data['file']),('guest_file_missing','check_resources','addoninfo.txt'))
+            self.assertEqual(data['revision'],'WS4-JOIN-04')
+            private='must-never-print-parser-input'
+            failed,data=run(('{"example":"'+private+'", broken').encode())
+            self.assertEqual(data['stage'],'read_manifest')
+            self.assertIn('exception_type',data)
+            self.assertNotIn(private,failed.stdout+failed.stderr+json.dumps(data))
+            self.assertNotIn(str(folder),json.dumps(data))
+
     @unittest.skipUnless(os.name=='nt','Windows CMD integration')
     def test_cmd_reports_missing_or_empty_script_without_starting_game(self):
         with tempfile.TemporaryDirectory() as temporary:

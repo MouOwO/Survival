@@ -56,6 +56,7 @@ def build(destination,address):
         '需要切换主机地址时修改 server_address.txt，格式为 IPv4:27015。\n'
         '本包不含云端凭据、SSH密钥、Radmin网络密码、开发工具或玩家存档。\n'
         '首次异地两人入场尚待现场验证，不能把本包校验当成已经联机成功。\n')
+    readme+='失败时请提供窗口中的诊断 JSON 或同目录 join_diagnostic.json；包含阶段及固定错误类型，不包含密码或存档。\n'
     (destination/'使用说明.txt').write_text(readme,encoding='utf-8-sig')
     forbidden=host.PRIVATE_REL
     host.need(not (addon/forbidden).exists(),'guest_bundle_contains_session')

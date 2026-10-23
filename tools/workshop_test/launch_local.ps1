@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 if (-not (Test-Path -LiteralPath 'D:/Survival_发布候选/20261023_ws4_auth_v03/_release_manifest.json' -PathType Leaf)) {
     Write-Output '这是创建房间的主机入口；本电脑缺少主机专用冻结测试包。仅拉取 Git 代码不会安装该资源。'
-    Write-Output '加入另一台主机：请完整解压 ws4_remote_client_20261023_v2.zip，运行包内“加入测试.cmd”。'
+    Write-Output '加入另一台主机：请完整解压 ws4_remote_client 客户端 ZIP，应用最新启动修复包，再运行 join_game.cmd。'
     Write-Output '也可将解压目录拖到项目根目录 join_ws4_game.cmd 上，无需 Python、Node 或主机凭据。'
     Write-Output 'host_frozen_release_missing'
     exit 1

@@ -447,7 +447,7 @@ def main():
         if code=='close_dota_first':print('请先退出 Dota 2，保留 Steam，再双击本机测试启动器。',flush=True)
         if code=='host_frozen_release_missing':
             print('这是创建房间的主机入口；本电脑缺少主机专用冻结测试包。仅拉取 Git 代码不会安装该资源。',flush=True)
-            print('如果这台电脑用于加入另一台主机，请完整解压 ws4_remote_client_20261023_v2.zip，运行包内“加入测试.cmd”。',flush=True)
+            print('如果这台电脑用于加入另一台主机，请完整解压 ws4_remote_client 客户端 ZIP，应用最新启动修复包，再运行 join_game.cmd。',flush=True)
             print('也可将解压目录拖到项目根目录 join_ws4_game.cmd 上。主机凭据不需要复制给加入方。',flush=True)
         print(json.dumps(value),flush=True);return 1
 
