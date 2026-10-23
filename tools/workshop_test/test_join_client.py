@@ -13,6 +13,19 @@ import local_host as host
 
 
 class GuestPackageChecks(unittest.TestCase):
+    @unittest.skipUnless(os.name=='nt','Windows CMD integration')
+    def test_cmd_reports_missing_or_empty_script_without_starting_game(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder=Path(temporary)
+            launcher=folder/'join_game.cmd'
+            launcher.write_bytes((host.HERE/'launch_join.cmd').read_bytes())
+            for empty in (False,True):
+                if empty:(folder/'join_client.ps1').write_bytes(b'')
+                result=subprocess.run(['cmd.exe','/d','/c',str(launcher)],input='\n',capture_output=True,
+                    text=True,encoding='utf8',errors='replace',timeout=10)
+                self.assertEqual(result.returncode,1,result.stdout+result.stderr)
+                self.assertIn('guest_files_missing_or_empty',result.stdout)
+
     @unittest.skipUnless(os.name=='nt','Windows PowerShell integration')
     def test_repo_guest_entry_rejects_missing_package_and_changed_script(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -38,8 +51,9 @@ class GuestPackageChecks(unittest.TestCase):
             folder=Path(temporary);stage=folder/'stage';stage.mkdir()
             file_name='panorama/images/spell icon.vtex_c'
             raw=b'frozen guest installation fixture'
-            expected=host.expected_manifest({'files':[]},{file_name:raw})
+            expected=host.expected_manifest({'files':[]},{file_name:raw,'addoninfo.txt':b'frozen fixture addon'})
             source=stage/file_name;source.parent.mkdir(parents=True);source.write_bytes(raw)
+            (stage/'addoninfo.txt').write_bytes(b'frozen fixture addon')
             (stage/host.INSTALL_MANIFEST).write_text(json.dumps({'kind':'WS4-LOCAL-1',
                 'base_content_sha256':host.BASE_SHA,'runtime':expected}),encoding='utf8')
             destination=folder/'guest'
@@ -63,14 +77,19 @@ class GuestPackageChecks(unittest.TestCase):
                 "function Start-Process { [CmdletBinding()]param([string]$FilePath,[string[]]$ArgumentList,[string]$WorkingDirectory); "
                 "@{args=$ArgumentList;exe=$FilePath} | ConvertTo-Json | Set-Content -Encoding UTF8 -LiteralPath "+quote(capture)+" }\n"
                 "$global:LASTEXITCODE=0\n& "+quote(destination/'join_client.ps1')+" -GamePath "+quote(game)+"\nexit $LASTEXITCODE\n",encoding='utf-8-sig')
-            def run():
+            def run(command=None):
                 environment=dict(os.environ)
                 # A Python child of pwsh inherits its incompatible PowerShell 7
                 # module path. Use Windows PowerShell's own standard modules.
                 environment['PSModulePath']=';'.join((str(Path(os.environ['ProgramFiles'])/'WindowsPowerShell/Modules'),
                     str(Path(os.environ['SystemRoot'])/'System32/WindowsPowerShell/v1.0/Modules')))
-                return subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',str(wrapper)],
+                return subprocess.run(command or ['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',str(wrapper)],
                     capture_output=True,text=True,encoding='utf8',errors='replace',timeout=30,env=environment)
+            for entry in ('加入测试.cmd','join_game.cmd'):
+                checked=run(['cmd.exe','/d','/c','call',str(destination/entry),'-CheckOnly','-GamePath',str(game)])
+                self.assertEqual(checked.returncode,0,checked.stdout+checked.stderr)
+                self.assertIn('CLIENT_PACKAGE_CHECKED_NO_GAME_STARTED',checked.stdout)
+                self.assertFalse(capture.exists())
             first=run();self.assertEqual(first.returncode,0,first.stdout+first.stderr)
             installed=game/'dota_addons'/host.ADDON/file_name
             self.assertTrue(installed.exists(),first.stdout+first.stderr)

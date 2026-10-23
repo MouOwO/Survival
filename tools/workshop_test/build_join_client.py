@@ -12,6 +12,10 @@ import local_host as host
 def build(destination,address):
     ip,port=address.rsplit(':',1)
     host.need(str(ipaddress.IPv4Address(ip))==ip and port=='27015','join_address_invalid')
+    launcher=(host.HERE/'launch_join.cmd').read_bytes()
+    host.need(launcher.startswith(b'@echo off\r\n') and b'\n' not in launcher.replace(b'\r\n',b'')
+        and b'join_client.ps1' in launcher and b'guest_files_missing_or_empty' in launcher,
+        'guest_launcher_invalid')
     descriptor=host.STAGE/host.INSTALL_MANIFEST
     data=host.json_file(descriptor)
     base=host.baseline()
@@ -36,13 +40,15 @@ def build(destination,address):
     source=(host.HERE/'join_client.ps1').read_text(encoding='utf8')
     host.need(source.count('__MANIFEST_SHA256__')==1,'guest_manifest_pin_not_unique')
     (destination/'join_client.ps1').write_text(source.replace('__MANIFEST_SHA256__',digest),encoding='utf-8-sig')
-    (destination/'加入测试.cmd').write_bytes((host.HERE/'launch_join.cmd').read_bytes())
+    for name in ('加入测试.cmd','join_game.cmd'):
+        (destination/name).write_bytes(launcher)
     (destination/'server_address.txt').write_text(address+'\n',encoding='ascii')
     readme=('WS4 异地加入方客户端\n\n'
         '1. 本电脑保持 Steam 在线，使用四个测试账号之一；安装 Dota 2 Workshop Tools。\n'
         '2. 安装官方 Radmin VPN，使用作者另行提供的网络名称和密码加入同一私有网络。\n'
         '3. 将整个本文件夹复制到加入电脑，完整保留其中的 survival_ws4_local 子目录。\n'
         '4. 退出这台电脑上的 Dota 2，双击“加入测试.cmd”。首次将校验并安装约3.77GB的冻结测试副本。\n'
+        '   若中文入口显示异常，可使用相同目录中的英文入口 join_game.cmd；不要在压缩包内直接运行。\n'
         '   若未找到 Dota，请按提示填写 dota 2 beta/game 的完整路径。\n'
         '5. 主机应重新使用“两人开局”入口，停在原生队伍设置；等两人都到齐后再开始并选模式。\n'
         '6. 加入方只连接主机，不创建自己的对局，不运行云端连接助手。\n\n'
@@ -56,6 +62,7 @@ def build(destination,address):
     report={'ok':True,'kind':'WS4-GUEST-1','runtime_files':expected['file_count'],'runtime_bytes':expected['bytes'],
         'runtime_content_sha256':expected['content_sha256'],'client_manifest_sha256':digest,
         'server_address':address,'cloud_credentials_in_bundle':False,'vpn_password_in_bundle':False,
+        'launcher_bytes':len(launcher),'launcher_sha256':hashlib.sha256(launcher).hexdigest(),
         'native_remote_join_verified':False,'bundle_directory':str(destination)}
     host.runtime.atomic_write_json(destination/'bundle_info.json',report)
     return report

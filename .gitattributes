@@ -6,6 +6,8 @@
 # Texture dependency CRCs include line endings; keep recipes identical across PCs.
 *.vtex text eol=lf
 *.tga binary -text
+# Windows guest launchers are distributed verbatim in client ZIPs.
+tools/workshop_test/launch_join.cmd text eol=crlf
 *.tif binary -text
 *.psd binary -text
 output/survival_world_v2/survival_world_v2.vmap filter=lfs diff=lfs merge=lfs -text
