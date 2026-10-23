@@ -200,6 +200,8 @@ class Steam:
                     items.append({'id': str(item), 'file_type': file_type,
                                   'title': data[24:153].split(b'\0')[0].decode('utf8'),
                                   'owner': owner, 'visibility': struct.unpack_from('<i', data, 8180)[0],
+                                  'time_updated': struct.unpack_from('<I', data, 8172)[0],
+                                  'total_files_bytes': struct.unpack_from('<Q', data, 9776)[0],
                                   'tags': data[8187:9212].split(b'\0')[0].decode('utf8', errors='replace')})
                 if len(items) >= response.total:
                     return items

@@ -237,6 +237,7 @@ ALTER ROLE goufayu_app NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATI
 GRANT USAGE ON SCHEMA public TO goufayu_app;
 '''
     database_command(CONTAINER,command,CONFIG/'admin-password',data=sql)
+    restore_ownership()
     private(STATE/'database-ready.json',json.dumps({'database':'goufayu_ws4','port':15432,'rows_copied':0}).encode())
     unchanged()
 
@@ -259,8 +260,41 @@ LOOP EXECUTE 'ALTER '||(CASE WHEN r.relkind='S' THEN 'SEQUENCE ' ELSE 'TABLE ' E
 END $$;'''
     database_command(CONTAINER,['psql','-h','127.0.0.1','-U','postgres','-d','goufayu_ws4','-v','ON_ERROR_STOP=1'],
                      CONFIG/'admin-password',data=sql)
+    restore_ownership()
     unchanged()
     return {'ok':True,'phase':'ISOLATED_RPC_PRIVILEGES_HARDENED'}
+
+
+def restore_ownership():
+    # pg_dump --no-owner omits implicit owner privileges. Reproduce only
+    # catalog ownership metadata in the new instance, never original rows.
+    unchanged()
+    query="""SELECT json_build_object(
+      'schemas',(SELECT json_agg(json_build_array(nspname,pg_get_userbyid(nspowner))) FROM pg_namespace WHERE nspname IN ('public','payments','extensions')),
+      'relations',(SELECT json_agg(json_build_array(n.nspname,c.relname,c.relkind,pg_get_userbyid(c.relowner))) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','payments','extensions') AND c.relkind IN ('r','S','v','m')),
+      'functions',(SELECT json_agg(json_build_array(p.oid::regprocedure::text,pg_get_userbyid(p.proowner))) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname IN ('public','payments','extensions') AND p.prokind='f' AND NOT EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e')))
+    """
+    raw=database_command('goufayu-db',['psql','-h','127.0.0.1','-U','postgres','-d','goufayu_test','-Atc',query],Path('/etc/goufayu/postgres-password'))
+    ownership=json.loads(raw)
+    import psycopg
+    from psycopg import sql
+    def owner(name):
+        need(re.fullmatch('goufayu_[a-z0-9_]+|postgres|pg_database_owner',name),'unexpected_owner_role')
+        return sql.Identifier(name)
+    with psycopg.connect(host='127.0.0.1',port=15432,user='postgres',
+              password=(CONFIG/'admin-password').read_text(),dbname='goufayu_ws4') as conn:
+        need(conn.info.dbname=='goufayu_ws4' and conn.info.port==15432,'isolated_database_required')
+        for schema,role in ownership['schemas']:
+            conn.execute(sql.SQL('ALTER SCHEMA {} OWNER TO {}').format(sql.Identifier(schema),owner(role)))
+        kinds={'r':'TABLE','S':'SEQUENCE','v':'VIEW','m':'MATERIALIZED VIEW'}
+        for schema,name,kind,role in ownership['relations'] or []:
+            conn.execute(sql.SQL('ALTER '+kinds[kind]+' {}.{} OWNER TO {}').format(sql.Identifier(schema),sql.Identifier(name),owner(role)))
+        for signature,role in ownership['functions'] or []:
+            canonical=conn.execute('SELECT to_regprocedure(%s)::text',(signature,)).fetchone()[0]
+            need(canonical is not None,'restored_function_missing')
+            conn.execute(sql.SQL('ALTER FUNCTION {} OWNER TO {}').format(sql.SQL(canonical),owner(role)))
+    unchanged()
+    return {'ok':True,'phase':'ISOLATED_SCHEMA_OWNERSHIP_RESTORED','player_rows_copied':0}
 
 
 def start_service():
@@ -348,13 +382,20 @@ def verify_api():
     need(request('885195478','Bearer '+key)[0]==403,'unregistered_request_accepted')
     pins(json.dumps({'workshop_id':'3824360109','sha256':[digest]}).encode())
     results=[]
+    diagnostics=[]
     try:
         for identity in ACCOUNTS.split(','):
             account=str(int(identity)-76561197960265728)
             status,body=request(account,'Bearer '+key)
             results.append(status==200 and body.get('authenticated') is True and body.get('account_id')==account)
+            error=body.get('error')
+            diagnostics.append({'status':status,'authenticated':body.get('authenticated') is True,
+                'account_matches':body.get('account_id')==account,
+                'error':error if isinstance(error,str) and re.fullmatch('[a-z_0-9]{1,80}',error) else None})
         status,body=request('42','Bearer '+key)
         need(status==403 and body.get('error')=='test_account_not_allowed','fifth_account_not_rejected')
+        if not all(results):
+            print(json.dumps({'phase':'ISOLATED_ACCOUNT_DIAGNOSTICS','results':diagnostics}),flush=True)
         need(all(results),'allowed_account_authentication_failed')
     finally:
         pins(original)
@@ -398,8 +439,7 @@ def https_enable():
     path,raw,close=candidates[0]
     need('/ws4' not in raw and 'goufayu-ws4.locations' not in raw,'ws4_location_already_present')
     locations=Path('/etc/nginx/goufayu-ws4.locations')
-    zone=Path('/etc/nginx/conf.d/goufayu-ws4-rate.conf')
-    need(not locations.exists() and not zone.exists(),'ws4_nginx_files_exist')
+    need(not locations.exists(),'ws4_nginx_files_exist')
     rules=r'''
 location ~ ^/ws4/v1/(session/(authenticate|login)|profile|lottery/(catalog|snapshot)|archive/(config|command|endless-batch|endless-leaderboard)|online-time/checkpoint|rewards/grant)$ {
     limit_except POST { deny all; }
@@ -419,21 +459,30 @@ location ~ ^/ws4/v1/(session/(authenticate|login)|profile|lottery/(catalog|snaps
 }
 location /ws4/ { return 404; }
 '''
-    private(STATE/'nginx.before',path.read_bytes())
-    private(STATE/'nginx-path',str(path).encode())
+    if (STATE/'nginx.before').exists():
+        need((STATE/'nginx.before').read_bytes()==path.read_bytes()
+             and (STATE/'nginx-path').read_text()==str(path),'nginx_retry_baseline_changed')
+    else:
+        private(STATE/'nginx.before',path.read_bytes())
+        private(STATE/'nginx-path',str(path).encode())
     private(locations,rules.encode(),mode=0o644)
-    private(zone,b'limit_req_zone $binary_remote_addr zone=goufayu_ws4:10m rate=10r/s;\n',mode=0o644)
     metadata=path.stat()
-    changed=(raw[:close]+'\n    include /etc/nginx/goufayu-ws4.locations;\n'+raw[close:]).encode()
+    changed=raw[:close]+'\n    include /etc/nginx/goufayu-ws4.locations;\n'+raw[close:]
+    # Keep the zone declaration in the same loaded HTTP configuration. Some
+    # hosts include a specific vhost file rather than conf.d/*.conf.
+    rate='\nlimit_req_zone $binary_remote_addr zone=goufayu_ws4:10m rate=10r/s;\n'
+    http=re.search(r'\bhttp\s*\{',changed)
+    changed=(changed[:http.end()]+rate+changed[http.end():] if http else rate+changed).encode()
     temporary=path.with_name(path.name+'.ws4-new')
     private(temporary,changed,group=metadata.st_gid,mode=metadata.st_mode & 0o777)
     os.replace(temporary,path)
-    try:
-        run(['nginx','-t'])
-    except BaseException:
+    test=subprocess.run(['nginx','-t'],capture_output=True)
+    if test.returncode!=0:
         path.write_bytes((STATE/'nginx.before').read_bytes())
-        locations.unlink();zone.unlink()
-        raise
+        locations.unlink()
+        error_path=STATE/'nginx-test-error.txt'
+        error_path.write_bytes(test.stderr);error_path.chmod(0o600)
+        raise RuntimeError('isolated_nginx_validation_failed_original_restored')
     run(['systemctl','reload','nginx'])
     unchanged()
     private(STATE/'https-enabled.json',json.dumps({'host':'pay.xiaofengnet.com','prefix':'/ws4',
@@ -489,18 +538,34 @@ def update_overlay():
     return {'ok':True,'phase':'ISOLATED_UNPAIRED_SERVICE_UPDATED','existing_services_unchanged':True}
 
 
+def audit():
+    unchanged()
+    for service in ('goufayu-ws4.service','goufayu-ws4-db.service'):
+        need(run(['systemctl','is-active',service]).strip()==b'active','isolated_service_not_active')
+    with urllib.request.urlopen('http://127.0.0.1:18765/health',timeout=3) as response:
+        need(json.load(response).get('ok') is True,'isolated_health_failed')
+    need(run(['nginx','-t']) is not None,'nginx_invalid')
+    pins=json.loads((CONFIG/'pins.json').read_bytes())
+    return {'ok':True,'phase':'ISOLATED_DEPLOYMENT_AUDITED','existing_services_unchanged':True,
+            'independent_api_active':True,'independent_database_active':True,'https_enabled':(STATE/'https-enabled.json').is_file(),
+            'four_account_api_verified':(STATE/'api-verification.json').is_file(),'approved_server_keys':len(pins['sha256']),
+            'original_player_rows_copied':0,'database':'goufayu_ws4','database_port':15432,'api_port':18765}
+
+
 def main():
     if MODE=='prepare':result=prepare()
     elif MODE=='finish_prepare':result=finish_prepare()
     elif MODE=='initialize_database':initialize_database();result={'ok':True,'phase':'ISOLATED_DATABASE_READY'}
     elif MODE=='finish_database':finish_database();result={'ok':True,'phase':'ISOLATED_DATABASE_READY'}
     elif MODE=='harden_database':result=harden_database()
+    elif MODE=='restore_ownership':result=restore_ownership()
     elif MODE=='start':result=start_service()
     elif MODE=='verify':result=verify_api()
     elif MODE=='https_enable':result=https_enable()
     elif MODE=='pending':result=pairing()
     elif MODE=='approve':result=pairing(approve=True)
     elif MODE=='update_overlay':result=update_overlay()
+    elif MODE=='audit':result=audit()
     else:raise RuntimeError('unknown_operator_mode')
     print(json.dumps(result),flush=True)
 

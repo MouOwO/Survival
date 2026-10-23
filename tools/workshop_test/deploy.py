@@ -14,7 +14,7 @@ spec.loader.exec_module(transport)
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode',choices=('prepare','finish_prepare','initialize_database','finish_database','harden_database','start','verify','https_enable','pending','approve','update_overlay'))
+    parser.add_argument('mode',choices=('prepare','finish_prepare','initialize_database','finish_database','harden_database','restore_ownership','start','verify','https_enable','pending','approve','update_overlay','audit'))
     parser.add_argument('--fingerprint',help='Only the fingerprint explicitly confirmed by the owner in their actual Workshop game')
     args=parser.parse_args()
     overlay={}
