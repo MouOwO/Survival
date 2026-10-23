@@ -5,7 +5,7 @@ $addonName = 'survival_ws4_local'
 $descriptorName = '_ws4_local_install.json'
 $stage = 'read_address'
 $currentFile = ''
-$revision = 'WS4-JOIN-07'
+$revision = 'WS4-JOIN-08'
 $pathLength = 0
 $actualBytes = $null
 $actualSha = $null
@@ -222,8 +222,35 @@ try {
     }
     if (Get-Process -Name dota2 -ErrorAction SilentlyContinue) { throw 'close_dota_first' }
     $stage = 'start_game'; $currentFile = ''
+    $runId = [Guid]::NewGuid().ToString('N')
+    $startedUtc = [DateTime]::UtcNow
+    $nativeLogName = 'ws4_join_' + $runId + '.log'
+    $nativeLogPath = Join-Path (Join-Path $game 'dota') $nativeLogName
+    Assert-PlainPath (Join-Path $game 'dota')
+    if (Test-IOPath $nativeLogPath) { throw 'network_log_path_already_exists' }
+    $fallbackPath = Join-Path (Join-Path $game 'dota') 'console.log'
+    $fallbackExisted = Test-IOPath $fallbackPath
+    $fallbackBytes = [long]0
+    $fallbackLastWrite = $null
+    if ($fallbackExisted) {
+        Assert-PlainPath $fallbackPath
+        $fallbackInfo = New-Object IO.FileInfo((ConvertTo-IOPath $fallbackPath))
+        $fallbackBytes = $fallbackInfo.Length
+        $fallbackLastWrite = $fallbackInfo.LastWriteTimeUtc.ToString('o')
+    }
+    $networkContext = @{
+        schema=1; kind='WS4-NETWORK-CAPTURE'; revision=$revision; run_id=$runId
+        game_path=$game; server=$Server; started_utc=$startedUtc.ToString('o')
+        dedicated_file=$nativeLogName; fallback_start_bytes=$fallbackBytes
+        fallback_existed=[bool]$fallbackExisted; fallback_last_write_utc=$fallbackLastWrite
+    }
+    $contextPath = Join-Path $PSScriptRoot 'join_network_context.json'
+    if (Test-IOPath $contextPath) { Assert-PlainPath $contextPath }
+    else { Assert-PlainPath $PSScriptRoot }
+    [IO.File]::WriteAllText($contextPath,($networkContext | ConvertTo-Json -Depth 4),(New-Object Text.UTF8Encoding($false)))
     Write-Host ('正在连接测试主机 ' + $Server + '。请保持 Steam 和 Radmin VPN 在线。')
-    Start-Process -FilePath $exe -ArgumentList @('-steam','-tools','-noassetbrowser','-addon',$addonName,'-novid','+connect',$Server) -WorkingDirectory (Join-Path $game 'dota') | Out-Null
+    Start-Process -FilePath $exe -ArgumentList @('-steam','-tools','-noassetbrowser','-addon',$addonName,'-novid','-condebug','-con_logfile',('"' + $nativeLogPath + '"'),'+connect',$Server) -WorkingDirectory (Join-Path $game 'dota') | Out-Null
+    Write-Host '若进入后断开，请正常退出本台 Dota，再回到客户端目录运行 collect_network.cmd，将 join_network_diagnostic.json 内容发给作者。'
 } catch {
     $message = $_.Exception.Message
     $category = $_.CategoryInfo.Category.ToString()

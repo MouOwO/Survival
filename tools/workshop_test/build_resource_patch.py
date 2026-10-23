@@ -39,6 +39,8 @@ def build(bundle,audit_path,archive,include=()):
     metadata['join_client.ps1']=b'\xef\xbb\xbf'+source.replace('__MANIFEST_SHA256__',MANIFEST_SHA256).encode('utf8')
     for target,source_name in (('加入测试.cmd','launch_join.cmd'),('join_game.cmd','launch_join.cmd'),('check_resources.cmd','audit_client.cmd')):
         metadata[target]=(host.HERE/source_name).read_bytes()
+    for name in ('collect_network.cmd','collect_join_network.ps1'):
+        metadata[name]=(host.HERE/name).read_bytes()
     metadata['server_address.txt']=b'26.34.7.221:27015\n'
     inventory={'kind':'WS4-RESOURCE-PATCH-1','client_manifest_sha256':MANIFEST_SHA256,'files':rows}
     metadata['patch_inventory.json']=json.dumps(inventory,ensure_ascii=False,indent=2).encode('utf8')

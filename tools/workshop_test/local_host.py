@@ -358,7 +358,14 @@ def existing_game():
     return int(p.stdout.strip())>0
 
 
-def game_command(direct_join=False):
+def prepare_native_log():
+    OUTPUT.mkdir(parents=True,exist_ok=True)
+    path=OUTPUT/('native_console_'+secrets.token_hex(12)+'.log')
+    private_write(path,'')
+    return path
+
+
+def game_command(direct_join=False,native_log=None):
     command=[str(ROOT.parents[1]/'bin/win64/dota2.exe'),'-steam','-tools','-noassetbrowser','-addon',ADDON,
         '-dev','-novid','-vconport',str(CONSOLE_PORT),'+sv_cheats','1','+host_timescale','1',
         '+r_drawpanorama','1']
@@ -366,6 +373,7 @@ def game_command(direct_join=False):
         # Wait for the console's fresh readiness reply before requesting the
         # native listen map; cold-start +map can run before custom maps are ready.
         command+=['+sv_lan','0','+sv_listen_directudp','1','+hostport',str(GAME_PORT)]
+        if native_log:command+=['-condebug','-con_logfile',str(native_log)]
     else:command+=['+dota_launch_custom_game',ADDON,'template_map']
     return command
 
@@ -387,7 +395,8 @@ def run(expected_players,direct_join=False):
         console=None
         try:
             private_write(private,'"ws4_local_session"\n{\n "token" "'+local_key+'"\n "expected_players" "'+str(expected_players)+'"\n}\n')
-            proc=subprocess.Popen(game_command(direct_join),
+            native_log=prepare_native_log() if direct_join else None
+            proc=subprocess.Popen(game_command(direct_join,native_log),
                 cwd=ROOT.parents[1]/'dota',stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             console=Console();applied=False;map_loaded=False;listen_requested=False;previous=None;deadline=time.monotonic()+600
             print('本机独立测试已启动。请保留此窗口；在游戏中等待载入，并按正常流程开始加载/选择模式。',flush=True)
@@ -404,6 +413,7 @@ def run(expected_players,direct_join=False):
                 value={'ok':True,'status':state.get('status',result.get('error','waiting')),
                     'game_pid':proc.pid,'credential_applied':applied,'expected_players':expected_players,
                     'direct_join':direct_join,'requested_game_udp_port':GAME_PORT if direct_join else None,
+                    'native_log_file':native_log.name if native_log else None,
                     **{k:v for k,v in state.items() if k not in ('credential_applied','status')}}
                 report(value)
                 summary=json.dumps(value,sort_keys=True)

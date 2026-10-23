@@ -43,6 +43,8 @@ def build(destination,address):
     for name in ('加入测试.cmd','join_game.cmd'):
         (destination/name).write_bytes(launcher)
     (destination/'check_resources.cmd').write_bytes((host.HERE/'audit_client.cmd').read_bytes())
+    for name in ('collect_network.cmd','collect_join_network.ps1'):
+        (destination/name).write_bytes((host.HERE/name).read_bytes())
     (destination/'server_address.txt').write_text(address+'\n',encoding='ascii')
     readme=('WS4 异地加入方客户端\n\n'
         '1. 本电脑保持 Steam 在线，使用四个测试账号之一；安装 Dota 2 Workshop Tools。\n'
@@ -59,6 +61,7 @@ def build(destination,address):
         '首次异地两人入场尚待现场验证，不能把本包校验当成已经联机成功。\n')
     readme+='失败时请提供窗口中的诊断 JSON 或同目录 join_diagnostic.json；包含阶段及固定错误类型，不包含密码或存档。\n'
     readme+='check_resources.cmd只校验全部冻结资源，一次列出所有缺失或不符的文件，并保存client_resource_audit.json，不启动游戏。\n'
+    readme+='若进入后断开，请正常退出加入方Dota让本轮日志刷盘，再运行collect_network.cmd，提供join_network_diagnostic.json。不要发送原始日志、上下文、票据或存档。\n'
     (destination/'使用说明.txt').write_text(readme,encoding='utf-8-sig')
     forbidden=host.PRIVATE_REL
     host.need(not (addon/forbidden).exists(),'guest_bundle_contains_session')

@@ -100,7 +100,7 @@ class GuestPackageChecks(unittest.TestCase):
                 return result,json.loads((folder/'join_diagnostic.json').read_text(encoding='utf8'))
             missing,data=run(marker)
             self.assertEqual((data['error'],data['stage'],data['file']),('guest_file_missing','check_resources','addoninfo.txt'))
-            self.assertEqual(data['revision'],'WS4-JOIN-07')
+            self.assertEqual(data['revision'],'WS4-JOIN-08')
             private='must-never-print-parser-input'
             failed,data=run(('{"example":"'+private+'", broken').encode())
             self.assertEqual(data['stage'],'read_manifest')
@@ -201,6 +201,18 @@ class GuestPackageChecks(unittest.TestCase):
             launch=json.loads(capture.read_text(encoding='utf-8-sig'))
             self.assertEqual(launch['args'][-2:],['+connect','26.1.2.3:27015'])
             self.assertNotIn('+dota_launch_custom_game',launch['args'])
+            network_context=json.loads((destination/'join_network_context.json').read_text(encoding='utf8'))
+            self.assertEqual((network_context['revision'],network_context['kind']),('WS4-JOIN-08','WS4-NETWORK-CAPTURE'))
+            self.assertEqual(network_context['server'],'26.1.2.3:27015')
+            self.assertRegex(network_context['run_id'],r'^[a-f0-9]{32}$')
+            native_log=game/'dota'/network_context['dedicated_file']
+            self.assertEqual(network_context['dedicated_file'],'ws4_join_'+network_context['run_id']+'.log')
+            log_argument=launch['args'][launch['args'].index('-con_logfile')+1]
+            self.assertEqual(log_argument,'"'+str(native_log)+'"')
+            self.assertIn('-condebug',launch['args'])
+            self.assertFalse(network_context['fallback_existed'])
+            self.assertEqual(network_context['fallback_start_bytes'],0)
+            self.assertFalse(native_log.exists(),'a mocked launch must not manufacture native log evidence')
             # Without a Steam registry value only one initial library remains.
             # Preserve array semantics while appending libraries from the VDF.
             config=folder/'programfiles/Steam/steamapps/libraryfolders.vdf'

@@ -113,6 +113,7 @@ class FrozenChecks(unittest.TestCase):
             with patch.object(local,'STAGE',stage),patch.object(local,'existing_game',return_value=False), \
                     patch.object(local,'install'),patch.object(local,'provision',return_value='fixture'), \
                     patch.object(local,'preflight'),patch.object(local,'proxy',side_effect=proxy), \
+                    patch.object(local,'prepare_native_log',return_value=None), \
                     patch.object(local,'private_write',side_effect=lambda p,s:p.write_text(s)), \
                     patch.object(local,'Console',return_value=console),patch.object(local.subprocess,'Popen',return_value=proc), \
                     patch.object(local,'report',side_effect=lambda value:value), \
@@ -139,6 +140,7 @@ class FrozenChecks(unittest.TestCase):
             with patch.object(local,'STAGE',stage),patch.object(local,'existing_game',return_value=False), \
                     patch.object(local,'install'),patch.object(local,'provision',return_value='fixture'), \
                     patch.object(local,'preflight'),patch.object(local,'proxy',side_effect=proxy), \
+                    patch.object(local,'prepare_native_log',return_value=None), \
                     patch.object(local,'private_write',side_effect=lambda p,s:p.write_text(s)), \
                     patch.object(local,'Console',return_value=console),patch.object(local.subprocess,'Popen',return_value=proc), \
                     patch.object(local,'report',side_effect=lambda value:value), \
