@@ -20,7 +20,7 @@
   "cover_width": 1024,
   "cover_height": 768,
   "real_money_payments": false,
-  "status": "PRIVATE_UPLOADED_DOWNLOADED_FULLY_VERIFIED_NATIVE_PENDING",
+  "status": "PRIVATE_SPLIT_UPDATE_DOWNLOADED_FULLY_VERIFIED",
   "test_addon": "survival_test_20261022_v01",
   "release_sequence": 2026102202,
   "runtime_content_sha256": "1c09e562ada4586ba4c046616e94317bf062c308a0c0c507e5af59d7b9024b6d",
@@ -30,9 +30,39 @@
     "The owner confirmed four SteamID64 values on 2026-10-22; the signed runtime admission list is enabled, while the remote backend gate is not yet deployed.",
     "Private or friends-only visibility alone does not enforce a four-account limit.",
     "The current archive API loopback address is not reachable from a Valve-hosted game server.",
-    "Native map loading and four-machine networking remain separate checks; the archive hosting mode is pending owner selection."
+    "Native map loading and four-machine networking remain separate checks; the archive hosting mode is pending owner selection.",
+    "Owner authorized the 2026-10-23 update of the existing private item. Native-safe multipart packaging preserves all signed runtime bytes; Steam redownload verified all five files and all 6621 entries."
   ],
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
   "visibility_verified": "private",
-  "download_sha256": "9060dcd81a53762366c8d8598911489983da6c85b5134d64022396aa8f60ad4d"
+  "download_sha256": "1d3b7aba3c5d0b0015b4fd33027dac0c077ac41170367179cdb7aafc22110276",
+  "package_layout": "external_archives",
+  "download_manifest": "3082359956653095025",
+  "download_package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 272936,
+      "sha256": "1d3b7aba3c5d0b0015b4fd33027dac0c077ac41170367179cdb7aafc22110276"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073317940,
+      "sha256": "b9058c240a42d587da23822523ad34ce3641e80c0471c309a3e2d148659c9b53"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552122163,
+      "sha256": "b3d6591353c2f26fd14e25b171f60461a2069c4e99f3af8281154f4655199094"
+    }
+  ]
 }
