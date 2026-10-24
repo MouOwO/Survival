@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "revision": "WS4-WEB-04",
+  "status": "PUBLISHED_DOWNLOADED_VERIFIED_ORIGINAL_ROOM_RETEST_PENDING",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "candidate": "20261024_ws4_web_auth_v04",
+  "release_sequence": 2026102404,
+  "content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+  "base_content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
+  "steam_manifest": "9118930541336613380",
+  "signature_verified": true,
+  "runtime_files": 6627,
+  "runtime_bytes": 3766585473,
+  "package_bytes": 3766858621,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273148,
+      "sha256": "d6566f525904056ca38729b77907d6c0bd738cbabdbd81db08724b9992822ad1"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073353249,
+      "sha256": "fb9d0c63e2d9008f8a2fe7caed2f88780527cf50cec925d4830795e23d7ed759"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552122253,
+      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+    }
+  ],
+  "submitted_at_utc": "2026-10-24T11:43:13.288874+00:00",
+  "download_full_verification": {
+    "vpk_version": 2,
+    "files": 6627,
+    "payload_bytes": 3766585473,
+    "archive_count": 4,
+    "crc32_verified": true,
+    "manifest_dual_hashes_verified": true,
+    "section_md5s_verified": true,
+    "whole_vpk_md5_verified": true
+  },
+  "native_resource_reads": [
+    {
+      "archive": 0,
+      "path": "materials/ascension_arenas/bronze_color_png_7afed1ed.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 1,
+      "path": "materials/survival_buildings/kingdom_arcane_r1_color_png_44a7b4ad.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 2,
+      "path": "materials/survival_buildings/kingdom_wall_stage4_r2_normal_png_f2749443.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/custom_game/archive_items_v2/beast_03_png.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/ui/shared/texture/teal_png.vtex_c",
+      "exit_code": 0
+    }
+  ],
+  "allowed_runtime_changes": [
+    "panorama/scripts/custom_game/player_web_auth.vjs_c",
+    "scripts/vscripts/systems/player_web_auth.lua"
+  ],
+  "protected_modules_preserved": 180,
+  "initial_observations": {
+    "git_and_v03_publication_synced": true,
+    "current_v03_directory_vpk_matched": true,
+    "service_active_and_health_passed": true,
+    "successful_challenges_in_15m_at_1928": 0,
+    "original_room_http_status": "UNKNOWN_PRE_DIAGNOSTIC",
+    "public_pc_post_negative_probe_status": 403
+  },
+  "fixes": [
+    "explicit Send=false denial; nil remains compatible",
+    "late callback and timeout handling",
+    "bounded private phase/stage/HTTP diagnostics",
+    "30 second duplicate diagnostic log limit"
+  ],
+  "sensitive_response_or_credentials_exposed": false,
+  "tests": {
+    "lua_auth_state_machine": "PASS",
+    "panorama_privacy_and_diagnostics": "PASS",
+    "scoped_candidate_tests": 11,
+    "panorama_compilation": "PASS"
+  },
+  "native_comparison": {
+    "tools_mode": false,
+    "isolated_addon": "svt_w24",
+    "ordinary_workshop_lobby": false,
+    "new_challenge_utc": "2026-10-24T11:39:03+00:00",
+    "real_browser_approval_utc": "2026-10-24T11:39:07+00:00",
+    "admission_complete": true,
+    "cloud_profile_loaded": true,
+    "observed_revisions": [
+      22,
+      23
+    ],
+    "entered_map": true,
+    "active_game_preserved": true
+  },
+  "original_workshop_room": "PENDING_RETEST",
+  "author_pc_tls_relay_required": true,
+  "four_account_only": true
+}

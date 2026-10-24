@@ -25,6 +25,7 @@ https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109
 进入后应显示网页登录卡和本局短码；用当前同一 Steam 账号确认授权后返回游戏。
 游廊玩家不用运行上述 CMD 或连接助手，仍限四个测试账号和独立测试存档。
 作者端当前的 Steam 验签中转需保持在线。
+若授权卡仍没有短码，请把 WS4-WEB-04 后面的完整阶段和状态码发给作者。
 
 内部维护仍保留 tools 下的 PowerShell、Python 和游戏内 debug 脚本。
 编译配置：tools/build_configs.py

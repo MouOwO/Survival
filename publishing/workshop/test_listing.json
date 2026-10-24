@@ -20,10 +20,10 @@
   "cover_width": 1024,
   "cover_height": 768,
   "real_money_payments": false,
-  "status": "UNLISTED_WEB_AUTH_V03_DOWNLOADED_NATIVE_RESOURCE_VERIFIED_PENDING_OWNER_MATCH",
+  "status": "PUBLISHED_DOWNLOADED_VERIFIED_ORIGINAL_ROOM_RETEST_PENDING",
   "test_addon": "svt_w24",
-  "release_sequence": 2026102403,
-  "runtime_content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
+  "release_sequence": 2026102404,
+  "runtime_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
   "uploaded": true,
   "notes": [
     "Updates the same owner-approved unlisted item. The title, description, cover, four-account roster and visibility remain the reviewed values.",
@@ -32,15 +32,16 @@
     "Profiles remain in the independent four-account WS4 test database. Real-money payments and trusted rankings remain disabled.",
     "The production release and protected server policy reject project cheat/debug mutations. Ordinary Workshop engine cheat settings still require native room verification.",
     "The author PC must stay online for the temporary fixed Steam TLS egress relay. Web authorization does not provide multiplayer hosting or remove host/VPN latency.",
-    "The frozen v03 candidate passed native Tools map/start/auth-UI checks. Download integrity, native VPK reads and ordinary Workshop login/profile gameplay are separate validation stages."
+    "The frozen v04 diagnostic candidate passed a native non-Tools isolated-addon test with real player approval, profile loading and map admission. Original Workshop lobby behavior remains a separate retest.",
+    "WS4-WEB-04 exposes only fixed request phase/stage/status diagnostics, handles explicit Send=false and callback timeouts, and never publishes device codes, bearer tokens or response bodies."
   ],
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
   "visibility_verified": "unlisted",
   "package_layout": "external_archives",
   "previous_release": {
-    "release_sequence": 2026102303,
-    "runtime_content_sha256": "a8ad3b474799bbc07821b568120ec442a2c25a74826fe2e0e92696a09ca36335",
-    "steam_manifest": "339511612929086093"
+    "release_sequence": 2026102403,
+    "runtime_content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
+    "steam_manifest": "9012039066284975703"
   },
   "archive_environment": "isolated_ws4",
   "archive_base_url": "https://pay.xiaofengnet.com/ws4-web",
@@ -52,19 +53,23 @@
   "online_cheats_allowed": false,
   "ordinary_workshop_match": "PENDING_OWNER_TEST",
   "native_four_archive_reads_verified": true,
-  "steam_manifest": "9012039066284975703",
-  "download_manifest": "9012039066284975703",
-  "download_sha256": "ec8e6c621058c64552fb0a95a6d486e0e4c2bea5b7464d57edd8fc785c3baa88",
+  "runtime_bytes": 3766585473,
+  "package_bytes": 3766858621,
+  "release_record": "publishing/workshop/web_auth_diagnostic_20261024.json",
+  "connection_diagnostics": "WS4-WEB-04",
+  "steam_manifest": "9118930541336613380",
+  "download_manifest": "9118930541336613380",
+  "download_sha256": "d6566f525904056ca38729b77907d6c0bd738cbabdbd81db08724b9992822ad1",
   "download_package_files": [
     {
       "name": "3824360109.vpk",
       "bytes": 273148,
-      "sha256": "ec8e6c621058c64552fb0a95a6d486e0e4c2bea5b7464d57edd8fc785c3baa88"
+      "sha256": "d6566f525904056ca38729b77907d6c0bd738cbabdbd81db08724b9992822ad1"
     },
     {
       "name": "3824360109_000.vpk",
-      "bytes": 1073349004,
-      "sha256": "f49c01d712354a86ce853f38eb24423965adbcf7f265f0720be8e37fd1df8bf3"
+      "bytes": 1073353249,
+      "sha256": "fb9d0c63e2d9008f8a2fe7caed2f88780527cf50cec925d4830795e23d7ed759"
     },
     {
       "name": "3824360109_001.vpk",
@@ -83,8 +88,5 @@
     }
   ],
   "download_verified_runtime_files": 6627,
-  "runtime_bytes": 3766581228,
-  "package_bytes": 3766854376,
-  "published_at_utc": "2026-10-24T10:51:16.475206+00:00",
-  "release_record": "publishing/workshop/web_auth_release_20261024.json"
+  "published_at_utc": "2026-10-24T11:43:13.288874+00:00"
 }

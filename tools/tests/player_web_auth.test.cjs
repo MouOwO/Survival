@@ -106,4 +106,51 @@ assert.strictEqual(native.opened.length, 1);
 native.root.valid = false;
 native.loading({session_id: session1, players: [{player_id: 0, authenticated: false}]});
 assert.strictEqual(native.unsubscribed.length, 2, "invalid-context callbacks retain cleanup without a native deletion hook");
-console.log("PLAYER_WEB_AUTH_UI_PASS: private session/player state, fixed browser origin, approval retirement, injection rejection and cleanup");
+
+// Diagnostics are a fixed, private enum tuple. They cannot revive a public
+// short code, open a URL, or copy arbitrary server/body/credential text.
+const diagnostic = fixture();
+const failed = {...pending, status: "failed", diagnostic_revision: "WS4-WEB-04",
+    diagnostic_phase: "start", diagnostic_stage: "http", diagnostic_status: 0,
+    error: "private-response-body", diagnostic_detail: "private-native-exception"};
+diagnostic.personal(failed);
+assert.strictEqual(diagnostic.shown(), true);
+assert(diagnostic.nodes.PlayerWebAuthStatus.text.endsWith("(WS4-WEB-04 / start / http / 0)"));
+assert.strictEqual(diagnostic.nodes.PlayerWebAuthCode.text, "");
+assert.strictEqual(diagnostic.nodes.PlayerWebAuthOpen.enabled, false);
+diagnostic.nodes.PlayerWebAuthOpen.events.onactivate();
+assert.strictEqual(diagnostic.opened.length, 0, "a diagnostic never grants browser navigation");
+assert(!diagnostic.texts().includes("private-"));
+for (const phase of ["start", "poll"]) {
+    for (const stage of ["API", "create", "send", "http", "json", "fields", "timeout"]) {
+        diagnostic.personal({...failed, diagnostic_phase: phase, diagnostic_stage: stage, diagnostic_status: 599});
+        assert(diagnostic.nodes.PlayerWebAuthStatus.text.endsWith(`(WS4-WEB-04 / ${phase} / ${stage} / 599)`));
+    }
+}
+for (const bad of [
+    {diagnostic_revision: "private-version"}, {diagnostic_phase: "private-phase"},
+    {diagnostic_stage: "private-stage"}, {diagnostic_phase: "toString"}, {diagnostic_stage: "__proto__"},
+    {diagnostic_phase: {start: true}}, {diagnostic_stage: ["http"]},
+    {diagnostic_status: "403"}, {diagnostic_status: -1}, {diagnostic_status: 600},
+    {diagnostic_status: 200.5}, {diagnostic_status: NaN}, {diagnostic_status: Infinity},
+    {diagnostic_status: null}, {diagnostic_status: {value: 403}}
+]) {
+    diagnostic.personal({...failed, ...bad});
+    assert(!diagnostic.nodes.PlayerWebAuthStatus.text.includes("WS4-WEB-04"), "reject malformed diagnostic fields");
+    assert(!diagnostic.texts().includes("private-"));
+    assert.strictEqual(diagnostic.nodes.PlayerWebAuthOpen.enabled, false);
+}
+diagnostic.personal({...failed, player_id: 1});
+diagnostic.personal({...failed, session_id: session2});
+assert(!diagnostic.nodes.PlayerWebAuthStatus.text.includes("WS4-WEB-04"), "other-player and stale diagnostics are ignored");
+for (const status of ["requesting", "pending", "approved", "expired"]) {
+    diagnostic.personal({...failed, status});
+    assert(!diagnostic.nodes.PlayerWebAuthStatus.text.includes("WS4-WEB-04"), "diagnostics belong only to failed state");
+    assert.strictEqual(diagnostic.nodes.PlayerWebAuthCode.text, status === "pending" ? "ABCD2345" : "");
+    assert.strictEqual(diagnostic.nodes.PlayerWebAuthOpen.enabled, status === "pending");
+}
+diagnostic.personal({...failed, status: "pending"});
+diagnostic.nodes.PlayerWebAuthOpen.events.onactivate();
+assert.deepStrictEqual(diagnostic.opened, [{name: "ExternalBrowserGoToURL", value: uri("ABCD2345")}],
+    "a legitimate pending short code keeps its original strict navigation behavior");
+console.log("PLAYER_WEB_AUTH_UI_PASS: private state, fixed origin, enum-only WS4-WEB-04 diagnostics, approval retirement and cleanup");

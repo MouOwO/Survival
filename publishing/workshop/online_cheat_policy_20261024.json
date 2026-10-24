@@ -4,6 +4,60 @@
   "online_cheats_allowed": false,
   "offline_cheats_allowed": true,
   "candidate": {
+    "name": "20261024_ws4_web_auth_v04",
+    "release_sequence": 2026102404,
+    "base_content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
+    "content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+    "runtime_policy_sha256": "9527373a7a27e7396e4e4418b38ce20045a60e1efb5eb320f9463259d2639061",
+    "release_profile_sha256": "f217f9a3a893433aa38d1b76afdb6b3dd319056cffec2ff9a9d37beaee7aa746",
+    "runtime_files": 6627,
+    "changed_runtime_paths": [
+      "panorama/scripts/custom_game/player_web_auth.vjs_c",
+      "scripts/vscripts/systems/player_web_auth.lua"
+    ],
+    "signature_valid": true,
+    "protected_module_count": 180,
+    "all_other_runtime_bytes_preserved": true,
+    "installed_full_runtime_verification": true,
+    "workshop_uploaded": true,
+    "workshop_download_verified": true,
+    "protected_modules_unchanged": 180,
+    "steam_manifest": "9118930541336613380"
+  },
+  "checks": {
+    "release_policy_cases": 1504,
+    "debug_entrypoint_and_callback_checks": 178,
+    "protected_plaintext_semantic_equivalence": "PASS",
+    "protected_behavior_cases": 48,
+    "launcher_boundary_tests": 6,
+    "native_online_smoke": "MAP_LOADED_AND_HOST_STARTED_AUTHORIZATION_UI_VISIBLE",
+    "native_engine_cheat_command_rejected_before_start": true,
+    "native_engine_cheat_command_rejected_after_start": true,
+    "native_online_probe_execution": "ENGINE_REJECTED_CHEAT_COMMAND_AS_EXPECTED",
+    "native_online_match_authorized": false,
+    "native_online_cloud_profile_written": false,
+    "native_offline_smoke": "PROJECT_CHEATS_TRUE_ENGINE_CHEATS_TRUE_CASH_FALSE",
+    "native_offline_probe_successful_receipt": true,
+    "offline_payment_nonempty_token_zero_http": true,
+    "offline_logic_and_startup_integration": "PASS",
+    "previous_native_candidate": "20261024_ws4_web_auth_v03",
+    "native_online_v04_smoke": "NON_TOOLS_ISOLATED_ADDON_REAL_APPROVAL_PROFILE_AND_MAP",
+    "native_online_v04_match_approved": true
+  },
+  "engine_launch_settings": {
+    "offline_sv_cheats": 1,
+    "online_sv_cheats": 0
+  },
+  "cloud_isolation": {
+    "offline_session_memory_only": true,
+    "offline_cash_routes_blocked_even_with_token": true,
+    "online_four_account_ws4_database_unchanged": true
+  },
+  "limits": [
+    "Local test hosts retain control of their own process; this is not trusted multiplayer hosting.",
+    "Ordinary Workshop login/profile gameplay and room engine cheat settings remain pending owner test."
+  ],
+  "previous_candidate": {
     "name": "20261024_ws4_web_auth_v03",
     "release_sequence": 2026102403,
     "base_content_sha256": "71beca29993e564be0def2e2251ef568c4ca2b52e3b7e340e711e6847dbbd9a3",
@@ -22,35 +76,5 @@
     "workshop_uploaded": true,
     "workshop_download_verified": true,
     "steam_manifest": "9012039066284975703"
-  },
-  "checks": {
-    "release_policy_cases": 1504,
-    "debug_entrypoint_and_callback_checks": 178,
-    "protected_plaintext_semantic_equivalence": "PASS",
-    "protected_behavior_cases": 48,
-    "launcher_boundary_tests": 6,
-    "native_online_smoke": "MAP_LOADED_AND_HOST_STARTED_AUTHORIZATION_UI_VISIBLE",
-    "native_engine_cheat_command_rejected_before_start": true,
-    "native_engine_cheat_command_rejected_after_start": true,
-    "native_online_probe_execution": "ENGINE_REJECTED_CHEAT_COMMAND_AS_EXPECTED",
-    "native_online_match_authorized": false,
-    "native_online_cloud_profile_written": false,
-    "native_offline_smoke": "PROJECT_CHEATS_TRUE_ENGINE_CHEATS_TRUE_CASH_FALSE",
-    "native_offline_probe_successful_receipt": true,
-    "offline_payment_nonempty_token_zero_http": true,
-    "offline_logic_and_startup_integration": "PASS"
-  },
-  "engine_launch_settings": {
-    "offline_sv_cheats": 1,
-    "online_sv_cheats": 0
-  },
-  "cloud_isolation": {
-    "offline_session_memory_only": true,
-    "offline_cash_routes_blocked_even_with_token": true,
-    "online_four_account_ws4_database_unchanged": true
-  },
-  "limits": [
-    "Local test hosts retain control of their own process; this is not trusted multiplayer hosting.",
-    "Ordinary Workshop login/profile gameplay and room engine cheat settings remain pending owner test."
-  ]
+  }
 }

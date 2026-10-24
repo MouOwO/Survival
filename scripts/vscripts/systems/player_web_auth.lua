@@ -6,6 +6,13 @@ local decoder = require("core/json_decoder")
 local access = require("core/test_access_policy")
 local M = {}
 local BASE = "https://pay.xiaofengnet.com/ws4-web"
+local DIAGNOSTIC_REVISION = "WS4-WEB-04"
+local DIAGNOSTIC_PHASES = { start = true, poll = true }
+local DIAGNOSTIC_STAGES = { API = true, create = true, send = true, http = true,
+    json = true, fields = true, timeout = true }
+local FAILURE_CODES = { player_web_auth_expired = true, player_web_auth_unavailable = true,
+    player_web_auth_invalid_response = true, player_web_auth_binding_changed = true,
+    player_web_auth_configuration_invalid = true }
 local epoch, active_session, records, listener = 0, nil, {}, nil
 
 local function server()
@@ -61,12 +68,17 @@ local function public_state(record)
     if not current(record) or not CustomGameEventManager
         or type(CustomGameEventManager.Send_ServerToPlayer) ~= "function" then return end
     -- An explicit allowlist keeps credentials out of event payloads and tables.
+    local diagnostic = record.status == "failed" and record.diagnostic or nil
     CustomGameEventManager:Send_ServerToPlayer(record.player, "survival_player_web_auth_state", {
         session_id = record.session, player_id = record.id,
-        status = record.status or "requesting", error = record.error or "",
+        status = record.status or "requesting", error = FAILURE_CODES[record.error] and record.error or "",
         user_code = record.status == "pending" and record.user_code or "",
         verification_uri = record.status == "pending" and record.verification_uri or "",
         expires_in = math.max(0, math.floor((record.code_expires or now()) - now())),
+        diagnostic_revision = diagnostic and DIAGNOSTIC_REVISION or "",
+        diagnostic_phase = diagnostic and diagnostic.phase or "",
+        diagnostic_stage = diagnostic and diagnostic.stage or "",
+        diagnostic_status = diagnostic and diagnostic.status or 0,
     })
 end
 
@@ -87,45 +99,68 @@ local function verification(code, uri)
     return uri == expected and expected or nil
 end
 
-local function fail(record, code, callback)
+local function http_status(value)
+    local status = tonumber(value)
+    if not status or status ~= status or status < 0 or status > 599 or status ~= math.floor(status) then return 0 end
+    return status
+end
+
+local function fail(record, code, callback, phase, stage, status)
     if not current(record) then return end
+    code = FAILURE_CODES[code] and code or "player_web_auth_unavailable"
     record.status, record.error = code == "player_web_auth_expired" and "expired" or "failed", code
+    record.diagnostic = nil
+    if DIAGNOSTIC_PHASES[phase] and DIAGNOSTIC_STAGES[stage] then
+        status = http_status(status)
+        record.diagnostic = { phase = phase, stage = stage, status = status }
+        local key = phase .. ":" .. stage .. ":" .. tostring(status)
+        if record.diagnostic_log_key ~= key or now() - (record.diagnostic_log_at or -100) >= 30 then
+            record.diagnostic_log_key, record.diagnostic_log_at = key, now()
+            print("[" .. DIAGNOSTIC_REVISION .. "] phase=" .. phase .. " stage=" .. stage .. " status=" .. tostring(status))
+        end
+    end
     public_state(record)
     callback(code)
 end
 
 local function request(record, path, payload, success, failure)
+    local phase = path == "/v1/player-auth/start" and "start" or "poll"
+    record.request_phase = phase
     if type(CreateHTTPRequestScriptVM) ~= "function" then
-        fail(record, "player_web_auth_unavailable", failure) return
+        fail(record, "player_web_auth_unavailable", failure, phase, "API", 0) return
     end
     local created, http = pcall(CreateHTTPRequestScriptVM, "POST", BASE .. path)
-    if not created or not http then fail(record, "player_web_auth_unavailable", failure) return end
+    if not created or not http then fail(record, "player_web_auth_unavailable", failure, phase, "create", 0) return end
     record.serial = (record.serial or 0) + 1
     local serial = record.serial
     record.inflight, record.deadline = true, now() + 15
-    local sent = pcall(function()
+    local sent, accepted = pcall(function()
       http:SetHTTPRequestRawPostBody("application/json; charset=utf-8", encoder.encode(payload))
       if type(http.SetHTTPRequestAbsoluteTimeoutMS) == "function" then http:SetHTTPRequestAbsoluteTimeoutMS(10000) end
-      http:Send(function(response)
-        if not current(record) or record.serial ~= serial then return end
+      return http:Send(function(response)
+        if not current(record) or record.serial ~= serial or not record.inflight then return end
         record.inflight = false
-        if type(response) ~= "table" or tonumber(response.StatusCode) ~= 200 then
-            fail(record, "player_web_auth_unavailable", failure) return
+        local status = http_status(type(response) == "table" and response.StatusCode or nil)
+        if type(response) ~= "table" or status ~= 200 then
+            fail(record, "player_web_auth_unavailable", failure, phase, "http", status) return
         end
         local raw = response.Body
         if type(raw) ~= "string" or #raw > 16384 then
-            fail(record, "player_web_auth_invalid_response", failure) return
+            fail(record, "player_web_auth_invalid_response", failure, phase, "json", status) return
         end
         local ok, body = pcall(decoder.decode, raw)
-        if not ok or type(body) ~= "table" or body.ok ~= true then
-            fail(record, "player_web_auth_invalid_response", failure) return
+        if not ok or type(body) ~= "table" then
+            fail(record, "player_web_auth_invalid_response", failure, phase, "json", status) return
+        end
+        if body.ok ~= true then
+            fail(record, "player_web_auth_invalid_response", failure, phase, "fields", status) return
         end
         success(body)
       end)
     end)
-    if not sent and current(record) and record.serial == serial and record.inflight then
+    if (not sent or accepted == false) and current(record) and record.serial == serial and record.inflight then
         record.inflight = false
-        fail(record, "player_web_auth_unavailable", failure)
+        fail(record, "player_web_auth_unavailable", failure, phase, "send", 0)
     end
 end
 
@@ -168,7 +203,10 @@ function M.resolve(account, session, success, failure)
     if record.inflight and now() < record.deadline then
         public_state(record) failure("player_web_auth_pending") return
     end
-    if record.inflight then record.serial, record.inflight = record.serial + 1, false end
+    if record.inflight then
+        record.serial, record.inflight = record.serial + 1, false
+        fail(record, "player_web_auth_unavailable", failure, record.request_phase, "timeout", 0) return
+    end
     if record.device_code and now() >= record.code_expires then
         record.device_code, record.user_code, record.verification_uri = nil, nil, nil
         fail(record, "player_web_auth_expired", failure) return
@@ -179,16 +217,16 @@ function M.resolve(account, session, success, failure)
         request(record, "/v1/player-auth/poll", { account_id = account, match_session_id = session,
             device_code = record.device_code }, function(body)
             if body.status == "pending" then
-                record.status, record.error = "pending", nil
+                record.status, record.error, record.diagnostic = "pending", nil, nil
                 public_state(record) failure("player_web_auth_pending") return
             end
             if body.status ~= "approved" or body.account_id ~= account or body.match_session_id ~= session
                 or not secret(body.access_token) or not bounded_number(body.expires_in, 5, 86400) then
-                fail(record, "player_web_auth_invalid_response", failure) return
+                fail(record, "player_web_auth_invalid_response", failure, "poll", "fields", 200) return
             end
             record.token, record.token_expires = body.access_token, now() + body.expires_in - 2
             record.device_code, record.user_code, record.verification_uri = nil, nil, nil
-            record.status, record.error = "approved", nil
+            record.status, record.error, record.diagnostic = "approved", nil, nil
             public_state(record)
             success(BASE, record.token)
         end, failure)
@@ -196,18 +234,18 @@ function M.resolve(account, session, success, failure)
     end
     if now() < (record.next_start or 0) then public_state(record) failure("player_web_auth_pending") return end
     record.next_start = now() + 3
-    record.status, record.error = "requesting", nil
+    record.status, record.error, record.diagnostic = "requesting", nil, nil
     public_state(record)
     request(record, "/v1/player-auth/start", { account_id = account, match_session_id = session }, function(body)
         local uri = verification(body.user_code, body.verification_uri)
         if body.status ~= "pending" or not secret(body.device_code) or not uri
             or not bounded_number(body.expires_in, 10, 3600)
             or not bounded_number(body.poll_interval, 1, 30) then
-            fail(record, "player_web_auth_invalid_response", failure) return
+            fail(record, "player_web_auth_invalid_response", failure, "start", "fields", 200) return
         end
         record.device_code, record.user_code, record.verification_uri = body.device_code, body.user_code, uri
         record.code_expires, record.poll_interval = now() + body.expires_in, math.max(3, body.poll_interval)
-        record.next_poll, record.status = now() + record.poll_interval, "pending"
+        record.next_poll, record.status, record.diagnostic = now() + record.poll_interval, "pending", nil
         public_state(record)
         failure("player_web_auth_pending")
     end, failure)

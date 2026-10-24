@@ -207,4 +207,127 @@ provider.authenticate("1001", function() end, failure)
 assert(requests[#requests].url:match("/v1/session/authenticate$"))
 assert(requests[#requests].url ~= config.base_url .. "/v1/session/authenticate")
 assert(requests[#requests].headers.Authorization == "Bearer legacy_fixture_server_bearer")
-print("PLAYER_WEB_AUTH_PASS: asynchronous approval, private state, provider routing, source identity, epochs and failures")
+
+-- Each failure phase exports only one bounded enum tuple to its own player.
+-- No HTTP body, native exception, account, session or capability is logged.
+local ordinary_print, diagnostics = print, {}
+print = function(value) diagnostics[#diagnostics + 1] = value end
+local diagnostic_case = 0
+local function reset_diagnostic()
+    diagnostic_case = diagnostic_case + 1
+    session, clock = "web_auth_diagnostic_" .. diagnostic_case, 30000
+    config.enabled = true
+    requests, events, errors, successes, diagnostics = {}, {}, {}, {}, {}
+    players[0].connected, players[1].connected = 2, 2
+    CreateHTTPRequestScriptVM = native_http
+    web.init(session)
+end
+local function expect_diagnostic(phase, stage, status)
+    local event = events[#events]
+    assert(event and event.id == 0 and event.body.status == "failed")
+    local body = event.body
+    assert(body.diagnostic_revision == "WS4-WEB-04" and body.diagnostic_phase == phase
+        and body.diagnostic_stage == stage and body.diagnostic_status == status)
+    assert(body.user_code == "" and body.verification_uri == "", "failure diagnostics never expose a stale short code")
+    assert(body.error == "player_web_auth_unavailable" or body.error == "player_web_auth_invalid_response")
+    assert(diagnostics[#diagnostics] == "[WS4-WEB-04] phase=" .. phase .. " stage=" .. stage .. " status=" .. status)
+    local exported = json.encode(events) .. table.concat(diagnostics, "\n")
+    for _, private in ipairs({"private-native-detail", "private-response-body", "device_fixture", "pwa1_"}) do
+        assert(not exported:find(private, 1, true), "diagnostic leaked private data")
+    end
+    for _, log in ipairs(diagnostics) do
+        assert(not log:find(session, 1, true) and not log:find("1001", 1, true))
+    end
+end
+local function send_behavior(behavior)
+    CreateHTTPRequestScriptVM = function(method, url)
+        local http = native_http(method, url)
+        function http:Send(callback)
+            self.complete = callback
+            return behavior(self, callback)
+        end
+        return http
+    end
+end
+
+reset_diagnostic(); CreateHTTPRequestScriptVM = nil; resolve()
+expect_diagnostic("start", "API", 0)
+for _, construct in ipairs({function() return nil end, function() error("private-native-detail") end}) do
+    reset_diagnostic(); CreateHTTPRequestScriptVM = construct; resolve()
+    expect_diagnostic("start", "create", 0)
+end
+for _, send in ipairs({function() return false end, function() error("private-native-detail") end}) do
+    reset_diagnostic(); send_behavior(send); resolve()
+    expect_diagnostic("start", "send", 0)
+    local before_late = #events
+    reply(1, pending())
+    assert(#events == before_late and #successes == 0, "a rejected send cannot later publish or approve")
+end
+
+for _, response in ipairs({{}, {StatusCode=0}, {StatusCode=403}, {StatusCode=429}, {StatusCode=502},
+    {StatusCode=-1}, {StatusCode=600}, {StatusCode=200.5}, {StatusCode="private-native-detail"}}) do
+    reset_diagnostic(); resolve()
+    response.Body = "private-response-body"
+    requests[1].complete(response)
+    local status = tonumber(response.StatusCode)
+    if not status or status < 0 or status > 599 or status ~= math.floor(status) then status = 0 end
+    expect_diagnostic("start", "http", status)
+end
+reset_diagnostic(); resolve(); requests[1].complete(nil)
+expect_diagnostic("start", "http", 0)
+for _, raw in ipairs({"private-response-body", string.rep("x", 16385), "true"}) do
+    reset_diagnostic(); resolve(); requests[1].complete({StatusCode=200, Body=raw})
+    expect_diagnostic("start", "json", 200)
+end
+reset_diagnostic(); resolve(); requests[1].complete({StatusCode=200})
+expect_diagnostic("start", "json", 200)
+reset_diagnostic(); resolve(); requests[1].complete({StatusCode=200, Body="null"})
+expect_diagnostic("start", "fields", 200)
+for _, body in ipairs({{ok=false,error="private-response-body"}, {ok=true,status="pending"}}) do
+    reset_diagnostic(); resolve(); reply(1, body)
+    expect_diagnostic("start", "fields", 200)
+end
+reset_diagnostic(); resolve()
+local injected_uri = pending(); injected_uri.verification_uri = "https://other.invalid/private-response-body"
+reply(1, injected_uri); expect_diagnostic("start", "fields", 200)
+
+-- A void/nil Send result is supported by the native API. Missing callbacks
+-- produce their own timeout, and a late callback cannot change that result.
+reset_diagnostic(); resolve()
+assert(#errors == 0, "void native Send is an accepted asynchronous request")
+clock = clock + 16; resolve()
+expect_diagnostic("start", "timeout", 0)
+local timed_events = #events
+reply(1, pending())
+assert(#events == timed_events and #successes == 0)
+resolve(); assert(#requests == 2, "a timeout permits a fresh request on the next retry")
+reply(2, pending())
+assert(events[#events].body.status == "pending" and events[#events].body.user_code == "ABCD2345")
+assert(events[#events].body.diagnostic_revision == "" and events[#events].body.diagnostic_stage == "")
+
+-- Poll diagnostics retain phase identity and hide codes while failed. A valid
+-- pending receipt restores only the original, strictly validated public code.
+clock = clock + 3; resolve(); requests[3].complete({StatusCode=403,Body="private-response-body"})
+expect_diagnostic("poll", "http", 403)
+clock = clock + 3; resolve(); reply(4, {ok=true,status="pending"})
+assert(events[#events].body.status == "pending" and events[#events].body.user_code == "ABCD2345"
+    and events[#events].body.diagnostic_revision == "")
+clock = clock + 3; resolve(); reply(5, approved("1002"))
+expect_diagnostic("poll", "fields", 200)
+clock = clock + 3; resolve(); reply(6, approved())
+assert(events[#events].body.status == "approved" and events[#events].body.diagnostic_revision == ""
+    and events[#events].body.user_code == "" and #successes == 1)
+
+-- The usual three-second startup retries must not flood native game logs.
+reset_diagnostic(); CreateHTTPRequestScriptVM = nil; resolve()
+expect_diagnostic("start", "API", 0)
+for _ = 1, 9 do clock = clock + 3; resolve() end
+assert(#diagnostics == 1, "identical failures are logged at most once in thirty seconds")
+clock = clock + 3; resolve()
+assert(#diagnostics == 2, "a persistent failure still emits a bounded periodic diagnostic")
+CreateHTTPRequestScriptVM = function() return nil end
+clock = clock + 3; resolve()
+expect_diagnostic("start", "create", 0)
+assert(#diagnostics == 3, "a changed failure stage is immediately distinguishable")
+CreateHTTPRequestScriptVM, print = native_http, ordinary_print
+print("PLAYER_WEB_AUTH_PASS: asynchronous approval, private state, provider routing, epochs and bounded WS4-WEB-04 diagnostics")

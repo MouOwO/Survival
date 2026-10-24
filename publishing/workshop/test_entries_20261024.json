@@ -27,7 +27,8 @@
     "both_cmd_read_only_checks_passed": true,
     "existing_game_preserved_by_launcher": true,
     "online_underlying_release_previously_verified": true,
-    "new_online_match_started_this_cleanup": false
+    "new_online_match_started_this_cleanup": false,
+    "validation_scope": "Historical two-entry cleanup and v03 baseline before the v04 diagnostic comparison."
   },
   "browser_identity": {
     "remembered_days": 30,
@@ -56,10 +57,25 @@
   ],
   "cheat_policy": {
     "record": "publishing/workshop/online_cheat_policy_20261024.json",
-    "online_candidate": "20261024_ws4_web_auth_v03",
+    "online_candidate": "20261024_ws4_web_auth_v04",
     "server_mutation_gates_enforced": true,
     "offline_cash_routes_disabled": true,
     "workshop_uploaded": true,
-    "workshop_release_record": "publishing/workshop/web_auth_release_20261024.json"
+    "workshop_release_record": "publishing/workshop/web_auth_diagnostic_20261024.json"
+  },
+  "native_diagnostic_comparison": {
+    "tools_mode": false,
+    "isolated_addon": "svt_w24",
+    "ordinary_workshop_lobby": false,
+    "new_challenge_utc": "2026-10-24T11:39:03+00:00",
+    "real_browser_approval_utc": "2026-10-24T11:39:07+00:00",
+    "admission_complete": true,
+    "cloud_profile_loaded": true,
+    "observed_revisions": [
+      22,
+      23
+    ],
+    "entered_map": true,
+    "active_game_preserved": true
   }
 }

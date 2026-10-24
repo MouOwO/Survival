@@ -59,14 +59,29 @@
     "The temporary Steam egress relay requires the test PC online; a stable cloud egress node is still needed for independent operation."
   ],
   "workshop_release": {
-    "candidate": "20261024_ws4_web_auth_v03",
-    "release_sequence": 2026102403,
-    "content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
+    "candidate": "20261024_ws4_web_auth_v04",
+    "release_sequence": 2026102404,
+    "content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
     "workshop_uploaded": true,
-    "steam_manifest": "9012039066284975703",
+    "steam_manifest": "9118930541336613380",
     "download_full_hash_verification": true,
     "native_resource_reads_passed": 5,
-    "ordinary_workshop_gameplay": "PENDING_OWNER_TEST",
-    "record": "publishing/workshop/web_auth_release_20261024.json"
+    "ordinary_workshop_gameplay": "PENDING_OWNER_RETEST",
+    "record": "publishing/workshop/web_auth_diagnostic_20261024.json"
+  },
+  "latest_native_comparison": {
+    "tools_mode": false,
+    "isolated_addon": "svt_w24",
+    "ordinary_workshop_lobby": false,
+    "new_challenge_utc": "2026-10-24T11:39:03+00:00",
+    "real_browser_approval_utc": "2026-10-24T11:39:07+00:00",
+    "admission_complete": true,
+    "cloud_profile_loaded": true,
+    "observed_revisions": [
+      22,
+      23
+    ],
+    "entered_map": true,
+    "active_game_preserved": true
   }
 }
