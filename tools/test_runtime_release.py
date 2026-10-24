@@ -49,6 +49,17 @@ class RuntimeReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Missing required"):
             release.manifest(self.root)
 
+    def test_entry_inventory_retains_only_its_fixed_internal_gameplay_map(self):
+        self.write("addoninfo.txt", b'"AddonInfo" { "maps" "ws4_entry" }')
+        for path in ("maps/ws4_entry.vpk", "maps/template_map.vpk", "maps/unrelated_review.vpk"):
+            self.write(path)
+        files, _ = release.select(self.root, check_critical=False)
+        self.assertIn("maps/ws4_entry.vpk", files)
+        self.assertIn("maps/template_map.vpk", files)
+        self.assertNotIn("maps/unrelated_review.vpk", files)
+        self.write("addoninfo.txt", b'"AddonInfo" { "maps" "another_entry" }')
+        self.assertNotIn("maps/template_map.vpk", release.map_files(self.root))
+
     def test_retired_lottery_compiled_fixture_is_retained_but_not_shipped(self):
         fixture = "panorama/styles/custom_game/lottery_fullscreen_v2.vcss_c"
         active = "panorama/styles/custom_game/lottery_gw2.vcss_c"

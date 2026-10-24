@@ -232,9 +232,12 @@ def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report
     pack.runtime.require_production(candidate)
     ids = pack.handoff.configured_ids(candidate)
     listing = load(listing_path)
+    addon = pack.handoff.kv((candidate / 'addoninfo.txt').read_text(encoding='utf-8-sig'))['addoninfo']
+    lobby_map = addon['maps']
+    lobby_capacity = int(addon[lobby_map]['maxplayers'])
     if (listing['real_money_payments'] is not False or listing['visibility_requested'] not in ('private', 'unlisted')
             or sorted(listing['tester_steamids64']) != ids or OWNER not in ids
-            or listing['map'] != 'template_map' or listing['max_players'] != 4
+            or listing['map'] != lobby_map or listing['max_players'] != lobby_capacity
             or listing['runtime_content_sha256'] != manifest['content_sha256']
             or listing['release_sequence'] != signature['release_sequence']):
         raise ValueError('Reviewed listing does not match the signed four-account production candidate')

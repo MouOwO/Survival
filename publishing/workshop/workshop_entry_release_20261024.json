@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "revision": "WS4-ENTRY-05",
+  "status": "PUBLISHED_DOWNLOADED_ORIGINAL_WORKSHOP_LOGIN_PROFILE_GAMEPLAY_VERIFIED",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "candidate": "20261024_ws4_workshop_entry_v05",
+  "release_sequence": 2026102405,
+  "content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+  "steam_manifest": "2955439000185399689",
+  "base_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+  "runtime_files": 6630,
+  "runtime_bytes": 3766734732,
+  "package_bytes": 3767007982,
+  "signature_valid": true,
+  "allowed_changes": [
+    "addoninfo.txt",
+    "maps/ws4_entry.vpk",
+    "scripts/vscripts/addon_game_mode.lua",
+    "scripts/vscripts/addon_game_mode_client.lua",
+    "scripts/vscripts/systems/workshop_entry.lua"
+  ],
+  "protected_modules_preserved": 180,
+  "frozen_main_body_preserved": true,
+  "online_authentication_changed": false,
+  "backend_code_changed": false,
+  "original_gameplay_map_changed": false,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273250,
+      "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073502508,
+      "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552122253,
+      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+    }
+  ],
+  "steam_official_download_full_verification": true,
+  "native_package_reads": [
+    {
+      "archive": 0,
+      "path": "materials/ascension_arenas/bronze_color_png_7afed1ed.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 1,
+      "path": "materials/survival_buildings/kingdom_arcane_r1_color_png_44a7b4ad.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 2,
+      "path": "materials/survival_buildings/kingdom_wall_stage4_r2_normal_png_f2749443.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/custom_game/archive_items_v2/beast_03_png.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/ui/shared/texture/teal_png.vtex_c",
+      "exit_code": 0
+    }
+  ],
+  "native_download_reads": [
+    {
+      "archive": 0,
+      "path": "materials/ascension_arenas/bronze_color_png_7afed1ed.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 1,
+      "path": "materials/survival_buildings/kingdom_arcane_r1_color_png_44a7b4ad.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 2,
+      "path": "materials/survival_buildings/kingdom_wall_stage4_r2_normal_png_f2749443.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/custom_game/archive_items_v2/beast_03_png.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/ui/shared/texture/teal_png.vtex_c",
+      "exit_code": 0
+    }
+  ],
+  "entry": {
+    "default_map": "ws4_entry",
+    "max_players": 1,
+    "runtime_map_bytes": 144203,
+    "fixed_target_workshop_id": "3824360109",
+    "fixed_target_map": "template_map",
+    "target_declared_capacity": 4,
+    "current_published_mode": "single_player_cloud_save",
+    "multiplayer_hosting_provided": false
+  },
+  "reference": {
+    "workshop_id": "3616205610",
+    "report": "publishing/workshop/dream_island_entry_review_20261024.json",
+    "readable_launcher_routing_only": true,
+    "protected_core_decrypted": false,
+    "third_party_business_code_copied": false
+  },
+  "diagnosis": {
+    "previous_observed_error": "WS4-WEB-04/start/create/0",
+    "failure_before_http_send": true,
+    "gameplay_phase_requirement_confirmed": false,
+    "observed_resolution": "same_item_standard_launch_context_restores_HTTP_creation",
+    "Valve_internal_cause": "NOT_CONFIRMED"
+  },
+  "prepublication_tests": {
+    "direct_original_v04": {
+      "tools": false,
+      "real_approval": true,
+      "cloud_profile_revisions": [
+        27,
+        28,
+        29,
+        30
+      ],
+      "entered_game": true
+    },
+    "local_entry_probe": {
+      "tools": false,
+      "server_ready": true,
+      "automatic_route_to_original_item": true,
+      "valid_challenge": true
+    }
+  },
+  "native_workshop_match": {
+    "scope": "ordinary_Steam_launch_original_Workshop_button",
+    "tools_mode": false,
+    "addon_launch_flag": false,
+    "insecure_launch_flag": false,
+    "current_pid": 28932,
+    "started_utc": "2026-10-24T13:02:13.609794Z",
+    "match_started_by": "owner",
+    "original_workshop_entry_confirmed_by_owner": true,
+    "verification": "agent_observed_active_N5_game_and_readonly_cloud_aggregates",
+    "new_challenge_utc": "2026-10-24T13:02:49+00:00",
+    "real_browser_approval_utc": "2026-10-24T13:02:54+00:00",
+    "cloud_profile_loaded": true,
+    "cloud_checkpoint_written": true,
+    "entered_game": true,
+    "observed_difficulty": "N5",
+    "project_cheats_allowed": false,
+    "current_room_engine_sv_cheats": "NOT_QUERIED",
+    "existing_active_match_preserved": true,
+    "multiplayer_hosting_verified": false
+  },
+  "isolated_database_aggregate": {
+    "database": "goufayu_ws4",
+    "profile_revision_max": 43,
+    "last_profile_updated_utc": "2026-10-24T13:07:19.392338+00:00",
+    "recent_profile_count": 1,
+    "recent_match_sessions": 1,
+    "last_match_created_utc": "2026-10-24T13:02:57.700372+00:00",
+    "last_online_checkpoint_utc": "2026-10-24T13:07:18.798192+00:00",
+    "ok": true,
+    "read_only": true,
+    "aggregate_only": true
+  },
+  "tests": {
+    "entry_lua_assertions": 87,
+    "python_release_and_scope_regressions": "PASS_WITH_ONE_PLATFORM_PERMISSION_SKIP",
+    "existing_lua_auth_state_machine": "PASS",
+    "existing_panorama_auth_privacy": "PASS",
+    "offline_and_online_entry_checks": "PASS",
+    "map_compiler_failed_resources": 0
+  },
+  "limits": [
+    "Single-player Workshop cloud-save entry; multiplayer hosting and latency remain separate work.",
+    "The temporary fixed Steam TLS relay still requires the author PC and current network online.",
+    "The four-account isolated test database remains separate; real payments and trusted rankings stay disabled.",
+    "The final ordinary match was opened by the owner and verified without disrupting it."
+  ],
+  "four_account_only": true,
+  "real_money_payments": false,
+  "trusted_rankings": false,
+  "author_pc_tls_relay_required": true,
+  "ready_for_public_release": false
+}

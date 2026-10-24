@@ -2,8 +2,8 @@
   "schema": 1,
   "title": "孤城逐晓 · 封闭测试",
   "description": "四人协作塔防与生存。建造城防、培养英雄，应对不断增强的怪物波次，并挑战无尽模式。本条目用于受限测试，暂不开放真实付费。",
-  "map": "template_map",
-  "max_players": 4,
+  "map": "ws4_entry",
+  "max_players": 1,
   "visibility_requested": "unlisted",
   "workshop_id": "3824360109",
   "tester_steamids64": [
@@ -20,28 +20,29 @@
   "cover_width": 1024,
   "cover_height": 768,
   "real_money_payments": false,
-  "status": "PUBLISHED_DOWNLOADED_VERIFIED_ORIGINAL_ROOM_RETEST_PENDING",
+  "status": "PUBLISHED_DOWNLOADED_ORIGINAL_WORKSHOP_LOGIN_PROFILE_GAMEPLAY_VERIFIED",
   "test_addon": "svt_w24",
-  "release_sequence": 2026102404,
-  "runtime_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+  "release_sequence": 2026102405,
+  "runtime_content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
   "uploaded": true,
   "notes": [
-    "Updates the same owner-approved unlisted item. The title, description, cover, four-account roster and visibility remain the reviewed values.",
-    "Contains only the signed game runtime. Author tools, CMD launchers, output caches, editable art, source CSV and local connector credentials are not distributed.",
-    "Steam web authorization uses the player account and explicit per-match consent; it does not require a Valve dedicated-server pairing key or a player-side connection assistant.",
-    "Profiles remain in the independent four-account WS4 test database. Real-money payments and trusted rankings remain disabled.",
-    "The production release and protected server policy reject project cheat/debug mutations. Ordinary Workshop engine cheat settings still require native room verification.",
-    "The author PC must stay online for the temporary fixed Steam TLS egress relay. Web authorization does not provide multiplayer hosting or remove host/VPN latency.",
-    "The frozen v04 diagnostic candidate passed a native non-Tools isolated-addon test with real player approval, profile loading and map admission. Original Workshop lobby behavior remains a separate retest.",
-    "WS4-WEB-04 exposes only fixed request phase/stage/status diagnostics, handles explicit Send=false and callback timeouts, and never publishes device codes, bearer tokens or response bodies."
+    "Updates the same approved unlisted item, preserving its title, description, cover and four-account roster.",
+    "The sole lobby map ws4_entry is a lightweight one-player entry. Its client reopens the same Workshop item with the fixed template_map target using the standard Dota command.",
+    "This entry fixes the observed lobby HTTP-constructor context failure; it is not multiplayer server hosting. The internal gameplay map retains its four-player declaration for separately managed tests.",
+    "All 180 protected modules, the production cheat gate, browser approval, HTTP profile provider and gameplay map remain byte-identical to signed v04.",
+    "Only five reviewed entry paths differ: addoninfo, a prefix before the frozen main addon body, and three new entry resources.",
+    "Only signed runtime resources are distributed. Author tools, source maps, CMD files, caches and connection credentials are excluded.",
+    "Profiles remain in the isolated four-account WS4 test database. Real payments and trusted rankings remain disabled.",
+    "The author PC must remain online for the temporary fixed Steam TLS egress relay.",
+    "Ordinary Steam original-Workshop entry, explicit browser approval, cloud profile loading, checkpoints and N5 gameplay were verified; the owner confirmed the entry and the agent preserved the active match."
   ],
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
   "visibility_verified": "unlisted",
   "package_layout": "external_archives",
   "previous_release": {
-    "release_sequence": 2026102403,
-    "runtime_content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
-    "steam_manifest": "9012039066284975703"
+    "release_sequence": 2026102404,
+    "runtime_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+    "steam_manifest": "9118930541336613380"
   },
   "archive_environment": "isolated_ws4",
   "archive_base_url": "https://pay.xiaofengnet.com/ws4-web",
@@ -51,25 +52,25 @@
   "anonymous_item_page_visible": true,
   "player_authentication": "STEAM_OPENID_AND_EXPLICIT_PER_MATCH_APPROVAL",
   "online_cheats_allowed": false,
-  "ordinary_workshop_match": "PENDING_OWNER_TEST",
+  "ordinary_workshop_match": "VERIFIED_SINGLE_PLAYER_LOGIN_PROFILE_GAMEPLAY",
   "native_four_archive_reads_verified": true,
-  "runtime_bytes": 3766585473,
-  "package_bytes": 3766858621,
-  "release_record": "publishing/workshop/web_auth_diagnostic_20261024.json",
+  "runtime_bytes": 3766734732,
+  "package_bytes": 3767007982,
+  "release_record": "publishing/workshop/workshop_entry_release_20261024.json",
   "connection_diagnostics": "WS4-WEB-04",
-  "steam_manifest": "9118930541336613380",
-  "download_manifest": "9118930541336613380",
-  "download_sha256": "d6566f525904056ca38729b77907d6c0bd738cbabdbd81db08724b9992822ad1",
+  "steam_manifest": "2955439000185399689",
+  "download_manifest": "2955439000185399689",
+  "download_sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039",
   "download_package_files": [
     {
       "name": "3824360109.vpk",
-      "bytes": 273148,
-      "sha256": "d6566f525904056ca38729b77907d6c0bd738cbabdbd81db08724b9992822ad1"
+      "bytes": 273250,
+      "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
     },
     {
       "name": "3824360109_000.vpk",
-      "bytes": 1073353249,
-      "sha256": "fb9d0c63e2d9008f8a2fe7caed2f88780527cf50cec925d4830795e23d7ed759"
+      "bytes": 1073502508,
+      "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
     },
     {
       "name": "3824360109_001.vpk",
@@ -87,6 +88,44 @@
       "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
     }
   ],
-  "download_verified_runtime_files": 6627,
-  "published_at_utc": "2026-10-24T11:43:13.288874+00:00"
+  "download_verified_runtime_files": 6630,
+  "published_at_utc": "2026-10-24T12:44:31.293309+00:00",
+  "gameplay_map": "template_map",
+  "gameplay_map_capacity": 4,
+  "current_workshop_mode": "single_player_cloud_save",
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273250,
+      "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073502508,
+      "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552122253,
+      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+    }
+  ],
+  "native_entry_revision": "WS4-ENTRY-05",
+  "earlier_release_history": [
+    {
+      "release_sequence": 2026102403,
+      "runtime_content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
+      "steam_manifest": "9012039066284975703"
+    }
+  ]
 }

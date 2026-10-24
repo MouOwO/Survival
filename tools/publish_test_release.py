@@ -41,6 +41,10 @@ GATE_FILES = (
     "scripts/vscripts/ui/ui_request_router.lua",
     "scripts/vscripts/core/event_bus.lua",
 )
+ENTRY_GATE_FILES = (
+    "scripts/vscripts/systems/workshop_entry.lua",
+    "scripts/vscripts/addon_game_mode_client.lua",
+)
 STEAM_BASE = 76561197960265728
 WINDOWS_PUBLISH_PATH_MAX = 259  # MAX_PATH includes its terminating NUL.
 
@@ -127,10 +131,16 @@ def kv(text: str) -> dict:
 def require_single_map(candidate: Path) -> None:
     data = kv(protect_data.source_path(candidate, "addoninfo.txt").read_text(encoding="utf-8-sig"))
     info = data.get("addoninfo")
-    if not isinstance(info, dict) or info.get("maps") != "template_map" or info.get("isplayable") != "1":
-        raise ValueError("Only template_map may be exposed as a playable map")
+    if not isinstance(info, dict) or info.get("maps") not in {"template_map", "ws4_entry"} or info.get("isplayable") != "1":
+        raise ValueError("Only template_map or ws4_entry may be exposed as a playable map")
     if not isinstance(info.get("template_map"), dict) or info["template_map"].get("maxplayers") != "4":
         raise ValueError("template_map must declare MaxPlayers 4")
+    if info["maps"] == "ws4_entry":
+        if not isinstance(info.get("ws4_entry"), dict) or info["ws4_entry"].get("maxplayers") != "1":
+            raise ValueError("ws4_entry must declare MaxPlayers 1")
+        for relative in ("maps/ws4_entry.vpk", "maps/template_map.vpk", *ENTRY_GATE_FILES):
+            if not protect_data.source_path(candidate, relative).is_file():
+                raise ValueError("Workshop entry runtime is missing: " + relative)
 
 
 def configured_ids(candidate: Path) -> list[str]:
@@ -202,10 +212,12 @@ def require_reviewed_gate(candidate: Path, manifest: dict) -> None:
     if protected later, bind the audited protection report's output instead.
     """
     entries = {row["path"]: row for row in manifest["files"]}
-    for relative in (*GATE_FILES, ACCESS_FILE):
+    info = kv(protect_data.source_path(candidate, "addoninfo.txt").read_text(encoding="utf-8-sig"))["addoninfo"]
+    gates = (*GATE_FILES, *ENTRY_GATE_FILES) if info.get("maps") == "ws4_entry" else GATE_FILES
+    for relative in (*gates, ACCESS_FILE):
         if relative not in entries:
             raise ValueError("Signed candidate is missing an admission guard: " + relative)
-    for relative in GATE_FILES:
+    for relative in gates:
         trusted = protect_data.source_path(ROOT, relative)
         current = protect_data.source_path(candidate, relative)
         if runtime.digest(current) != runtime.digest(trusted):

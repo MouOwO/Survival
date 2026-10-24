@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "review_date": "2026-10-24",
+  "workshop_id": "3616205610",
+  "installed_title": "Dota: Island of Dreams",
+  "local_vpk_name": "3616205610.vpk",
+  "package_bytes": 1040228730,
+  "package_entry_count": 8594,
+  "selected_resources": [
+    {
+      "path": "addoninfo.txt",
+      "bytes": 729,
+      "sha256": "53d7bf9edc04825f15005f6d96317c0f7a5c8f4adc2213c8e9c71e3c599b67bc",
+      "crc32": "b579dd4d",
+      "crc_verified": true,
+      "protected_wrapper_observed": false
+    },
+    {
+      "path": "scripts/vscripts/addon_game_mode.lua",
+      "bytes": 1870,
+      "sha256": "7074bae43d75218e12dbb12477417f79baf14d940a094f0e2d280a3fab312456",
+      "crc32": "12ba9298",
+      "crc_verified": true,
+      "protected_wrapper_observed": false
+    },
+    {
+      "path": "scripts/vscripts/addon_game_mode_client.lua",
+      "bytes": 1598,
+      "sha256": "8853d432c15cdac10df8b1cb8ee1304a5c2d59b87b8f6251b239c62eff082dbe",
+      "crc32": "5aa158a9",
+      "crc_verified": true,
+      "protected_wrapper_observed": false
+    },
+    {
+      "path": "scripts/vscripts/server/core/http.lua",
+      "bytes": 25476,
+      "sha256": "39c27d08602d3362714f810554cff1346909e8b1ee1c222c2ef56ab5cf8c1587",
+      "crc32": "ef97ffef",
+      "crc_verified": true,
+      "protected_wrapper_observed": true
+    },
+    {
+      "path": "scripts/vscripts/server/core/request.lua",
+      "bytes": 20356,
+      "sha256": "976ad46ec4ad2f655d7fb95e63925ea0f15be30e8b213f731b9b7a208cf4f224",
+      "crc32": "b24f5133",
+      "crc_verified": true,
+      "protected_wrapper_observed": true
+    },
+    {
+      "path": "scripts/vscripts/server/player_auth/playerauthapi.lua",
+      "bytes": 17956,
+      "sha256": "dd85cec182a80802781b62d6f9ac83242815542f7c8f1344aa89f318d1254b13",
+      "crc32": "6a84c1bb",
+      "crc_verified": true,
+      "protected_wrapper_observed": true
+    },
+    {
+      "path": "scripts/vscripts/modules/player_auth/playerauthgateway.lua",
+      "bytes": 29092,
+      "sha256": "f287a8ee82ff75adf6106b6cfcc4bf4ba0ebd1f422ee1f12e820ec9769c22711",
+      "crc32": "9175654a",
+      "crc_verified": true,
+      "protected_wrapper_observed": true
+    },
+    {
+      "path": "panorama/layout/custom_game/hud_loading/script.vjs_c",
+      "bytes": 789647,
+      "sha256": "fa3b637f370207611ffa23473c0acdbe109a2a26bdc171c55c44afa4a007aa4b",
+      "crc32": "504a088e",
+      "crc_verified": true,
+      "protected_wrapper_observed": false
+    }
+  ],
+  "observations": {
+    "default_entry_map": "neverland_launcher",
+    "entry_map_max_players": 1,
+    "real_map": "dota_mhd_solo",
+    "real_map_max_players": 4,
+    "client_uses_fixed_same_workshop_id": true,
+    "client_uses_standard_dota_launch_custom_game": true,
+    "client_relaunches_real_map_from_entry": true,
+    "launcher_server_calls_force_game_start": true,
+    "gameplay_modules_are_in_other_map_branch": true,
+    "ui_mount_ready_event_present": true,
+    "ui_game_password_submission_event_present": true,
+    "ui_clears_password_after_submission": true,
+    "ui_opens_server_supplied_https_browser_link": true,
+    "ui_offline_without_cloud_event_present": true,
+    "readable_login_ui_has_engine_game_in_progress_gate": false,
+    "readable_http_constructor_observed": false,
+    "http_and_auth_core_protected_by": "GameRules.XDecrypt"
+  },
+  "boundaries": {
+    "protected_modules_decrypted": false,
+    "third_party_scripts_executed": false,
+    "third_party_business_code_copied": false,
+    "third_party_business_endpoints_contacted": false,
+    "credentials_or_keys_extracted": false,
+    "full_package_payload_read": false,
+    "backend_auth_protocol_verified": false,
+    "session_persistence_verified": false,
+    "http_constructor_api_verified": false,
+    "http_engine_phase_requirement_verified": false
+  },
+  "method": "Stream only the VPK directory and eight explicitly selected resources; verify each selected CRC and SHA256; inspect readable entry and UI structure without executing or decrypting code.",
+  "application": "Independent implementation of a lightweight default entry that relaunches the same Workshop item's own gameplay map. No third-party authentication, transport or game business implementation is copied.",
+  "limitations": [
+    "The visible launcher ForceGameStart call does not establish that HTTP requires GAME_IN_PROGRESS.",
+    "The protected transport and authentication implementation does not reveal its actual HTTP constructor or timing.",
+    "Readable UI game-password events do not verify the external site's authentication or credential-storage behavior.",
+    "Reference routing observations do not prove our original Workshop lobby, cloud login or multiplayer behavior."
+  ],
+  "sources": [
+    "https://steamcommunity.com/sharedfiles/filedetails/?id=3616205610"
+  ]
+}

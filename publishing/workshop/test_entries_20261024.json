@@ -57,11 +57,11 @@
   ],
   "cheat_policy": {
     "record": "publishing/workshop/online_cheat_policy_20261024.json",
-    "online_candidate": "20261024_ws4_web_auth_v04",
+    "online_candidate": "20261024_ws4_workshop_entry_v05",
     "server_mutation_gates_enforced": true,
     "offline_cash_routes_disabled": true,
     "workshop_uploaded": true,
-    "workshop_release_record": "publishing/workshop/web_auth_diagnostic_20261024.json"
+    "workshop_release_record": "publishing/workshop/workshop_entry_release_20261024.json"
   },
   "native_diagnostic_comparison": {
     "tools_mode": false,
@@ -77,5 +77,26 @@
     ],
     "entered_map": true,
     "active_game_preserved": true
+  },
+  "native_workshop_entry": {
+    "scope": "ordinary_Steam_launch_original_Workshop_button",
+    "tools_mode": false,
+    "addon_launch_flag": false,
+    "insecure_launch_flag": false,
+    "current_pid": 28932,
+    "started_utc": "2026-10-24T13:02:13.609794Z",
+    "match_started_by": "owner",
+    "original_workshop_entry_confirmed_by_owner": true,
+    "verification": "agent_observed_active_N5_game_and_readonly_cloud_aggregates",
+    "new_challenge_utc": "2026-10-24T13:02:49+00:00",
+    "real_browser_approval_utc": "2026-10-24T13:02:54+00:00",
+    "cloud_profile_loaded": true,
+    "cloud_checkpoint_written": true,
+    "entered_game": true,
+    "observed_difficulty": "N5",
+    "project_cheats_allowed": false,
+    "current_room_engine_sv_cheats": "NOT_QUERIED",
+    "existing_active_match_preserved": true,
+    "multiplayer_hosting_verified": false
   }
 }

@@ -157,6 +157,48 @@ class HandoffTests(unittest.TestCase):
             self.prepare(apply=True)
         self.assert_uninstalled()
 
+    def entry_fixture(self):
+        self.write("addoninfo.txt", b'"AddonInfo" { "maps" "ws4_entry" "IsPlayable" "1" "ws4_entry" {"MaxPlayers" "1"} "template_map" {"MaxPlayers" "4"} }')
+        self.write("maps/ws4_entry.vpk", b"entry map fixture")
+        self.write("maps/template_map.vpk", b"gameplay map fixture")
+        for name in handoff.ENTRY_GATE_FILES:
+            raw = ("reviewed entry gate " + name).encode()
+            self.write(name, raw)
+            trusted = self.source / name
+            trusted.parent.mkdir(parents=True, exist_ok=True)
+            trusted.write_bytes(raw)
+
+    def test_single_player_entry_keeps_real_map_and_binds_both_extra_gates(self):
+        self.entry_fixture()
+        self.seal()
+        handoff.require_single_map(self.candidate)
+        handoff.require_reviewed_gate(self.candidate, self.manifest)
+        for name in handoff.ENTRY_GATE_FILES:
+            original = (self.candidate / name).read_bytes()
+            self.write(name, original + b" changed")
+            self.seal()
+            with self.assertRaisesRegex(ValueError, "differs from reviewed"):
+                handoff.require_reviewed_gate(self.candidate, self.manifest)
+            self.write(name, original)
+
+    def test_entry_rejects_missing_runtime_wrong_capacity_and_multiple_exposed_maps(self):
+        self.entry_fixture()
+        original = (self.candidate / "addoninfo.txt").read_bytes()
+        for raw in (original.replace(b'"MaxPlayers" "1"', b'"MaxPlayers" "4"'),
+                    original.replace(b'"MaxPlayers" "4"', b'"MaxPlayers" "1"'),
+                    original.replace(b'"maps" "ws4_entry"', b'"maps" "ws4_entry template_map"')):
+            self.write("addoninfo.txt", raw)
+            with self.assertRaises(ValueError):
+                handoff.require_single_map(self.candidate)
+        self.write("addoninfo.txt", original)
+        for name in ("maps/ws4_entry.vpk", "maps/template_map.vpk", *handoff.ENTRY_GATE_FILES):
+            path = self.candidate / name
+            raw = path.read_bytes()
+            path.unlink()
+            with self.assertRaises(ValueError):
+                handoff.require_single_map(self.candidate)
+            self.write(name, raw)
+
     def test_tampering_signature_rollback_and_extra_runtime_are_rejected(self):
         original = (self.candidate / handoff.ACCESS_FILE).read_bytes()
         self.write(handoff.ACCESS_FILE, original + b" -- byte changed")

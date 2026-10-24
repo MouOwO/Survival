@@ -59,15 +59,15 @@
     "The temporary Steam egress relay requires the test PC online; a stable cloud egress node is still needed for independent operation."
   ],
   "workshop_release": {
-    "candidate": "20261024_ws4_web_auth_v04",
-    "release_sequence": 2026102404,
-    "content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+    "candidate": "20261024_ws4_workshop_entry_v05",
+    "release_sequence": 2026102405,
+    "content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
     "workshop_uploaded": true,
-    "steam_manifest": "9118930541336613380",
+    "steam_manifest": "2955439000185399689",
     "download_full_hash_verification": true,
     "native_resource_reads_passed": 5,
-    "ordinary_workshop_gameplay": "PENDING_OWNER_RETEST",
-    "record": "publishing/workshop/web_auth_diagnostic_20261024.json"
+    "ordinary_workshop_gameplay": "OWNER_CONFIRMED_AND_AGENT_OBSERVED_N5_WITH_CLOUD_CHECKPOINT",
+    "record": "publishing/workshop/workshop_entry_release_20261024.json"
   },
   "latest_native_comparison": {
     "tools_mode": false,
@@ -83,5 +83,39 @@
     ],
     "entered_map": true,
     "active_game_preserved": true
+  },
+  "previous_workshop_releases": [
+    {
+      "candidate": "20261024_ws4_web_auth_v04",
+      "release_sequence": 2026102404,
+      "content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+      "workshop_uploaded": true,
+      "steam_manifest": "9118930541336613380",
+      "download_full_hash_verification": true,
+      "native_resource_reads_passed": 5,
+      "ordinary_workshop_gameplay": "FAILED_START_CREATE_0",
+      "record": "publishing/workshop/web_auth_diagnostic_20261024.json"
+    }
+  ],
+  "latest_native_workshop_match": {
+    "scope": "ordinary_Steam_launch_original_Workshop_button",
+    "tools_mode": false,
+    "addon_launch_flag": false,
+    "insecure_launch_flag": false,
+    "current_pid": 28932,
+    "started_utc": "2026-10-24T13:02:13.609794Z",
+    "match_started_by": "owner",
+    "original_workshop_entry_confirmed_by_owner": true,
+    "verification": "agent_observed_active_N5_game_and_readonly_cloud_aggregates",
+    "new_challenge_utc": "2026-10-24T13:02:49+00:00",
+    "real_browser_approval_utc": "2026-10-24T13:02:54+00:00",
+    "cloud_profile_loaded": true,
+    "cloud_checkpoint_written": true,
+    "entered_game": true,
+    "observed_difficulty": "N5",
+    "project_cheats_allowed": false,
+    "current_room_engine_sv_cheats": "NOT_QUERIED",
+    "existing_active_match_preserved": true,
+    "multiplayer_hosting_verified": false
   }
 }

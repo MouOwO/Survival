@@ -1,3 +1,14 @@
+-- Keep the Workshop entry independent of gameplay and cloud initialization.
+if type(GetMapName) == "function" and GetMapName() == "ws4_entry" then
+    local entry = require("systems/workshop_entry")
+    function Precache() end
+    function Activate()
+        local ok, reason = entry.activate()
+        if not ok then print("[WS4-ENTRY-05] server_unavailable reason=" .. tostring(reason)) end
+    end
+    return
+end
+
 local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
 local test_access_policy = require("core/test_access_policy")
 local offline_logic_test = require("debug/offline_logic_test")

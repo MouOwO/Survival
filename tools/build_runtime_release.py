@@ -207,6 +207,10 @@ def map_files(root: Path) -> set[str]:
         if not re.fullmatch(r"[A-Za-z0-9_/-]+", name) or ".." in name.split("/"):
             raise ValueError("Invalid AddonInfo map name")
         result.add("maps/" + name + ".vpk")
+    # The sole Workshop entry reopens this fixed internal gameplay map. Keep
+    # it in signed inventories even though it is not exposed in the lobby list.
+    if match.group(1) == "ws4_entry":
+        result.add("maps/template_map.vpk")
     return result
 
 

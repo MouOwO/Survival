@@ -120,7 +120,9 @@
     "entered_map": true,
     "active_game_preserved": true
   },
-  "original_workshop_room": "PENDING_RETEST",
+  "original_workshop_room": "FAILED_START_CREATE_0_REPLACED_BY_ENTRY_V05",
   "author_pc_tls_relay_required": true,
-  "four_account_only": true
+  "four_account_only": true,
+  "observed_diagnostic": "WS4-WEB-04/start/create/0",
+  "successor_record": "publishing/workshop/workshop_entry_release_20261024.json"
 }

@@ -1,8 +1,12 @@
 "AddonInfo"
 {
-    "maps"              "template_map"
+    "maps"              "ws4_entry"
     "IsPlayable"        "1"
     "EnablePickRules"   "0"
+    "ws4_entry"
+    {
+        "MaxPlayers"    "1"
+    }
     "template_map"
     {
         "MaxPlayers"    "4"
