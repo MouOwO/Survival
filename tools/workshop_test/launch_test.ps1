@@ -17,8 +17,8 @@ try {
         exit $code
     }
     if(-not $CheckOnly){
-        if($Mode -eq 'Offline'){Write-Output 'Offline logic test: memory-only test profile, no cloud login. In-game debug commands remain available.'}
-        else{Write-Output 'Online login test: confirm this match on the web page. Keep this PC and its Steam connection online.'}
+        if($Mode -eq 'Offline'){Write-Output 'Offline logic test: memory-only profile, no cloud login. Cheats and debug commands are enabled.'}
+        else{Write-Output 'Online login test: cheats and data-changing debug commands are disabled. Confirm this match on the web page. Keep this PC and its Steam connection online.'}
     }
 } catch {
     Write-Output 'test_entry_preparation_failed'

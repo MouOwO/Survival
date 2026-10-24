@@ -2,8 +2,22 @@
   "schema": 1,
   "date": "2026-10-24",
   "entrypoints": [
-    {"file": "离线逻辑测试.cmd", "mode": "offline", "addon": "survival", "storage": "session_memory", "cloud_access": false},
-    {"file": "联网登录测试.cmd", "mode": "online", "addon": "svt_w24", "storage": "isolated_ws4", "cloud_login_required": true}
+    {
+      "file": "离线逻辑测试.cmd",
+      "mode": "offline",
+      "addon": "survival",
+      "storage": "session_memory",
+      "cloud_access": false,
+      "cheats_allowed": true
+    },
+    {
+      "file": "联网登录测试.cmd",
+      "mode": "online",
+      "addon": "svt_w24",
+      "storage": "isolated_ws4",
+      "cloud_login_required": true,
+      "cheats_allowed": false
+    }
   ],
   "native_validation": {
     "offline_tools_option_recognized": true,
@@ -39,5 +53,11 @@
     "Online Steam verification still uses the temporary fixed TLS relay through this test PC.",
     "Offline archive state resets between matches; cloud-dependent systems require the online entry.",
     "The signed online addon is a frozen release; development changes do not silently modify it."
-  ]
+  ],
+  "cheat_policy": {
+    "record": "publishing/workshop/online_cheat_policy_20261024.json",
+    "online_candidate": "20261024_ws4_web_auth_v03",
+    "server_mutation_gates_enforced": true,
+    "offline_cash_routes_disabled": true
+  }
 }

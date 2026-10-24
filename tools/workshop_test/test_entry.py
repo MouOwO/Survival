@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import importlib.util
 import json
 import os
@@ -14,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 GAME = ROOT.parents[1]
 RUNTIME = ROOT / "output/test_entry_runtime"
 ONLINE_ADDON = "svt_w24"
+ONLINE_POLICY_RECORD = ROOT / "publishing/workshop/online_cheat_policy_20261024.json"
 
 
 def need(value, code):
@@ -65,11 +67,27 @@ def launch_arguments(mode, log):
     addon = ROOT.name if mode == "offline" else ONLINE_ADDON
     result = ["-steam", "-tools", "-noassetbrowser", "-addon", addon, "-dev", "-novid",
               "-vconport", "29006" if mode == "offline" else "29005",
-              "-condebug", "-con_logfile", str(log), "+sv_cheats", "1", "+host_timescale", "1"]
+              "-condebug", "-con_logfile", str(log), "+sv_cheats", "1" if mode == "offline" else "0",
+              "+host_timescale", "1"]
     if mode == "offline":
         result.extend(("+survival_offline_logic_test", "1"))
     result.extend(("+dota_launch_custom_game", addon, "template_map"))
     return result
+
+
+def check_online_policy(addon):
+    """Refuse a stale online copy that predates the reviewed server cheat gate."""
+    record = json.loads(ONLINE_POLICY_RECORD.read_text(encoding="utf-8"))
+    need(record.get("online_cheats_allowed") is False, "online_cheat_policy_not_verified")
+    candidate = record["candidate"]
+    installation = json.loads((addon / "_online_policy_install.json").read_text(encoding="utf-8"))
+    need(installation.get("content_sha256") == candidate["content_sha256"], "online_release_policy_outdated")
+    policy = addon / "scripts/vscripts/core/release_policy.lua"
+    need(hashlib.sha256(policy.read_bytes()).hexdigest() == candidate["runtime_policy_sha256"],
+         "online_cheat_policy_bytes_changed")
+    profile = (addon / "scripts/vscripts/config/release_profile.lua").read_bytes()
+    need(hashlib.sha256(profile).hexdigest() == candidate["release_profile_sha256"],
+         "online_release_profile_changed")
 
 
 def check(mode):
@@ -85,8 +103,10 @@ def check(mode):
         config = (addon / "scripts/vscripts/config/player_web_auth.lua").read_bytes()
         need(b"enabled = true" in config, "online_web_auth_not_enabled")
         need((ROOT / "publishing/workshop/player_web_auth_20261024.json").is_file(), "online_release_record_missing")
+        check_online_policy(addon)
     return {"ok": True, "mode": mode, "addon": addon.name,
             "status": "ENTRY_CHECKED", "cloud_login_required": mode == "online",
+            "cheats_allowed": mode == "offline",
             "offline_storage": "session_memory" if mode == "offline" else None,
             "game_started": False}
 

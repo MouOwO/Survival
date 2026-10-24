@@ -1,6 +1,11 @@
 package.path = "scripts/vscripts/?.lua;" .. package.path
-local profile = require("config/release_profile")
-assert(profile.channel == "production")
+local profile = { channel = "production" }
+local web_config = { enabled = false }
+package.loaded["config/release_profile"] = profile
+package.loaded["config/player_web_auth"] = web_config
+-- Admission has separate tests; this fixture reaches the real debug gate
+-- without depending on the owner's four-account roster.
+package.loaded["config/test_access"] = { enabled = false }
 IsServer, IsInToolsMode = function() return true end, function() return true end
 GameRules = {IsCheatMode=function() return true end}
 local bus, events = require("core/event_bus"), require("core/events")
@@ -19,12 +24,7 @@ Convars = {RegisterCommand=function(_, name)
     if name ~= "survival_perf_capture" then poison() end
 end}
 local cheats = require("debug/cheat_command_service")
-cheats.init()
-require("debug/payment_test_commands").init()
-require("combat/combat_debug_command").init(nil, {debug_enabled=true})
-assert(calls == 0 and chat == nil and next(listeners) == nil,
-    "production never registers chat, scale selection or combat test commands")
-
+require("debug/technology_cheat_handler").register({}, poison)
 local checked = 0
 local function denied_result(callback, ...)
     local result = callback(...)
@@ -45,48 +45,62 @@ local function upvalue(callback, wanted)
     end
     error("missing production callback upvalue " .. wanted)
 end
-for _, row in ipairs({
-    {"systems/resource_system", "handle_debug_set"},
-    {"systems/shop_system", "set_debug_unlock"},
-    {"systems/hero_combat_stat_service", "debug_set_attack"},
-    {"systems/weapon_growth_service", "debug_add"},
-    {"systems/hero_summon_system", "delete_hero"},
-}) do
-    denied_result(upvalue(require(row[1]).init, row[2]), payload)
+local function assert_denied_entrypoints()
+    local before = calls
+    cheats.init()
+    require("debug/payment_test_commands").init()
+    require("combat/combat_debug_command").init(nil, {debug_enabled=true})
+    assert(calls == before and chat == nil and next(listeners) == nil,
+        "restricted builds never register chat, scale selection or combat test commands")
+    for _, row in ipairs({
+        {"systems/resource_system", "handle_debug_set"},
+        {"systems/shop_system", "set_debug_unlock"},
+        {"systems/hero_combat_stat_service", "debug_set_attack"},
+        {"systems/weapon_growth_service", "debug_add"},
+        {"systems/hero_summon_system", "delete_hero"},
+    }) do
+        denied_result(upvalue(require(row[1]).init, row[2]), payload)
+    end
+    denied_result(function() return bus.request(events.TECHNOLOGY_CHEAT_SET_REQUEST, payload) end)
+    denied_result(require("systems/rogue_reward_service").debug_offer, nil, payload)
+    denied_result(upvalue(require("systems/hero_summon_system").init, "summon"),
+        {debug_bypass=true, player_id=0, hero_id="hero_doom"})
+    local wave = require("systems/wave_system")
+    denied_pair(wave.debug_spawn_wave, nil, payload)
+    denied_pair(wave.set_dev_mode, true)
+    if wave.debug_clear_wave_for_comparison then denied_result(wave.debug_clear_wave_for_comparison) end
+    denied_pair(require("debug/dev_wall_stats").enable, payload)
+    assert(require("debug/dev_wall_stats").apply(payload) == false)
+    denied_pair(require("debug/health_cheat").apply, payload, "100000")
+    denied_pair(require("debug/attack_speed_cheat").set_rate, 0, 100)
+    denied_pair(require("debug/attack_speed_cheat").execute, payload)
+    denied_pair(require("debug/dev_asset_preload").start, payload)
+    denied_pair(require("debug/armor_engine_diagnostic").run, payload)
+    denied_pair(require("debug/research_technology_test").run)
+    for _, method in pairs(require("debug/weapon_cheat_handlers")) do
+        if type(method) == "function" then denied_pair(method, payload) end
+    end
+    for _, method in pairs(cheats._test) do denied_pair(method, payload) end
+    local stats = require("systems/player_gameplay_stats_order_service")
+    denied_result(stats.order, nil, nil, nil)
+    denied_result(stats.test_order, nil, nil, nil)
+    denied_result(stats.reset_defaults, nil)
+    denied_result(stats.apply_packet, payload)
+    local archive = require("systems/archive_service")
+    for _, name in ipairs({"cheat", "xinyang", "yitie", "zaixian"}) do
+        denied_pair(archive[name], payload)
+    end
+    local reset_ok, reset_error = require("systems/payment_service").reset_player(payload, "refreshdata")
+    assert(reset_ok == false and reset_error == "test_reset_disabled")
+    assert(calls == before, "denials must precede grants, registrations, state reads and HTTP")
 end
-require("debug/technology_cheat_handler").register({}, poison)
-denied_result(function() return bus.request(events.TECHNOLOGY_CHEAT_SET_REQUEST, payload) end)
-denied_result(require("systems/rogue_reward_service").debug_offer, nil, payload)
-denied_result(upvalue(require("systems/hero_summon_system").init, "summon"),
-    {debug_bypass=true, player_id=0, hero_id="hero_doom"})
-local wave = require("systems/wave_system")
-denied_pair(wave.debug_spawn_wave, nil, payload)
-denied_pair(wave.set_dev_mode, true)
-if wave.debug_clear_wave_for_comparison then denied_result(wave.debug_clear_wave_for_comparison) end
-denied_pair(require("debug/dev_wall_stats").enable, payload)
-assert(require("debug/dev_wall_stats").apply(payload) == false)
-denied_pair(require("debug/health_cheat").apply, payload, "100000")
-denied_pair(require("debug/attack_speed_cheat").set_rate, 0, 100)
-denied_pair(require("debug/attack_speed_cheat").execute, payload)
-denied_pair(require("debug/dev_asset_preload").start, payload)
-denied_pair(require("debug/armor_engine_diagnostic").run, payload)
-denied_pair(require("debug/research_technology_test").run)
-for _, method in pairs(require("debug/weapon_cheat_handlers")) do
-    if type(method) == "function" then denied_pair(method, payload) end
-end
-for _, method in pairs(cheats._test) do denied_pair(method, payload) end
-local stats = require("systems/player_gameplay_stats_order_service")
-denied_result(stats.order, nil, nil, nil)
-denied_result(stats.test_order, nil, nil, nil)
-denied_result(stats.reset_defaults, nil)
-denied_result(stats.apply_packet, payload)
-local archive = require("systems/archive_service")
-for _, name in ipairs({"cheat", "xinyang", "yitie", "zaixian"}) do
-    denied_pair(archive[name], payload)
-end
-local reset_ok, reset_error = require("systems/payment_service").reset_player(payload, "refreshdata")
-assert(reset_ok == false and reset_error == "test_reset_disabled")
-assert(calls == 0, "denials must precede grants, registrations, state reads and HTTP")
+
+assert_denied_entrypoints()
+profile.channel = "development"
+web_config.enabled = true
+assert_denied_entrypoints()
+assert(calls == 0, "online development Tools deny the same entry points as production")
+web_config.enabled = false
 
 -- A captured callback cannot retain permission after a development world is
 -- revoked. Client debug fields, host privileges and sv_cheats stay irrelevant.
@@ -100,18 +114,25 @@ assert(type(payment_chat) == "function" and payment_chat ~= development_chat)
 local commands = upvalue(development_chat, "COMMANDS")
 local count = calls
 profile.channel = "production"
-for command in pairs(commands) do
-    development_chat({playerid=0, text=command .. " 999999999", debug=true,
-        debug_bypass=true, test_only=true, admin=true})
-    checked = checked + 1
+local function assert_captured_callbacks_denied()
+    for command in pairs(commands) do
+        development_chat({playerid=0, text=command .. " 999999999", debug=true,
+            debug_bypass=true, test_only=true, admin=true})
+        checked = checked + 1
+    end
+    for _, command in ipairs({"monster15", "pass100", "0"}) do
+        development_chat({playerid=0, text=command})
+    end
+    scale(nil, payload)
+    payment_chat({playerid=0, text="refreshdata"})
+    payment_chat({playerid=0, text="refreshmoney"})
+    assert(calls == count, "captured callbacks recheck the trusted build and online policy")
 end
-for _, command in ipairs({"monster15", "pass100", "0"}) do
-    development_chat({playerid=0, text=command})
-end
-scale(nil, payload)
-payment_chat({playerid=0, text="refreshdata"})
-payment_chat({playerid=0, text="refreshmoney"})
-assert(calls == count, "captured callbacks recheck the trusted build policy")
+assert_captured_callbacks_denied()
+profile.channel = "development"
+web_config.enabled = true
+assert_captured_callbacks_denied()
+profile.channel = "production"
 -- The normal client route remains usable in production and discards attacker
 -- supplied debug/price/identity fields instead of forwarding a whole payload.
 bus.reset()
@@ -136,4 +157,4 @@ end
 assert(fields == 2, "production normal summon keeps its existing field allowlist")
 profile.channel = "production"
 print("RELEASE_DEBUG_ENTRYPOINTS_PASS checked=" .. checked
-    .. " production plus Tools/sv_cheats, dedicated handlers and revoked callbacks")
+    .. " production and online development plus Tools/sv_cheats, dedicated handlers and revoked callbacks")
