@@ -19,7 +19,9 @@
     "other_protected_modules_unchanged": 179,
     "all_other_runtime_bytes_preserved": true,
     "installed_full_runtime_verification": true,
-    "workshop_uploaded": false
+    "workshop_uploaded": true,
+    "workshop_download_verified": true,
+    "steam_manifest": "9012039066284975703"
   },
   "checks": {
     "release_policy_cases": 1504,
@@ -49,6 +51,6 @@
   },
   "limits": [
     "Local test hosts retain control of their own process; this is not trusted multiplayer hosting.",
-    "Workshop item 3824360109 has not been updated by this change."
+    "Ordinary Workshop login/profile gameplay and room engine cheat settings remain pending owner test."
   ]
 }

@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "status": "PUBLISHED_DOWNLOADED_VERIFIED_PENDING_OWNER_GAMEPLAY",
+  "workshop_id": "3824360109",
+  "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
+  "visibility": "unlisted",
+  "new_item_created": false,
+  "public_metadata_preserved": true,
+  "test_account_count": 4,
+  "real_money_payments": false,
+  "candidate": "20261024_ws4_web_auth_v03",
+  "release_sequence": 2026102403,
+  "content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
+  "signature_verified": true,
+  "runtime_files": 6627,
+  "runtime_bytes": 3766581228,
+  "package_bytes": 3766854376,
+  "package_layout": "external_archives",
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273148,
+      "sha256": "ec8e6c621058c64552fb0a95a6d486e0e4c2bea5b7464d57edd8fc785c3baa88"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073349004,
+      "sha256": "f49c01d712354a86ce853f38eb24423965adbcf7f265f0720be8e37fd1df8bf3"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552122253,
+      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+    }
+  ],
+  "submitted_at_utc": "2026-10-24T10:51:16.475206+00:00",
+  "steam_manifest": "9012039066284975703",
+  "previous_steam_manifest": "339511612929086093",
+  "steam_download_full_verification": {
+    "vpk_version": 2,
+    "files": 6627,
+    "payload_bytes": 3766581228,
+    "archive_count": 4,
+    "crc32_verified": true,
+    "manifest_dual_hashes_verified": true,
+    "section_md5s_verified": true,
+    "whole_vpk_md5_verified": true
+  },
+  "native_download_resource_reads": [
+    {
+      "archive": 0,
+      "path": "materials/ascension_arenas/bronze_color_png_7afed1ed.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 1,
+      "path": "materials/survival_buildings/kingdom_arcane_r1_color_png_44a7b4ad.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 2,
+      "path": "materials/survival_buildings/kingdom_wall_stage4_r2_normal_png_f2749443.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/custom_game/archive_items_v2/beast_03_png.vtex_c",
+      "exit_code": 0
+    },
+    {
+      "archive": 3,
+      "path": "panorama/images/ui/shared/texture/teal_png.vtex_c",
+      "exit_code": 0
+    }
+  ],
+  "game_authentication": "STEAM_OPENID_AND_EXPLICIT_PER_MATCH_APPROVAL",
+  "player_connection_assistant_required": false,
+  "valve_dedicated_key_required_for_auth": false,
+  "author_pc_fixed_steam_tls_relay_required": true,
+  "web_auth_health_verified": true,
+  "server_project_cheats_enabled": false,
+  "ordinary_workshop_login_and_profile": "PENDING_OWNER_TEST",
+  "ordinary_workshop_engine_cheats": "PENDING_OWNER_ROOM_CHECK",
+  "multiplayer_hosting_and_latency": "SEPARATE_TEST",
+  "excluded_distribution": [
+    "output caches",
+    "author tools and CMD/PowerShell/Python launchers",
+    "editable art and map sources",
+    "source CSV",
+    "local connector credentials"
+  ],
+  "original_dirty_files_preserved": 102
+}

@@ -41,17 +41,32 @@
     "startup_phase": "ready",
     "entered_game_map": true,
     "online_checkpoint": "SUCCESSFUL_RECEIPT_WITH_REVISION_ADVANCE",
-    "observed_profile_revisions": [21, 22],
+    "observed_profile_revisions": [
+      21,
+      22
+    ],
     "active_approved_sessions": 1,
     "active_steam_verified_browsers": 1,
     "ordinary_workshop_launch": "NOT_YET_VERIFIED",
     "reopen_same_profile": "NOT_YET_VERIFIED",
-    "multiplayer_web_auth": "NOT_YET_VERIFIED"
+    "multiplayer_web_auth": "NOT_YET_VERIFIED",
+    "tested_candidate": "20261024_ws4_web_auth_v02"
   },
   "limitations": [
     "A local game host controls its own battle results; isolated progress is untrusted.",
     "Web authorization does not provide multiplayer hosting or remove host/VPN latency.",
     "Development configuration remains disabled; only the separate signed candidate enables the flow.",
     "The temporary Steam egress relay requires the test PC online; a stable cloud egress node is still needed for independent operation."
-  ]
+  ],
+  "workshop_release": {
+    "candidate": "20261024_ws4_web_auth_v03",
+    "release_sequence": 2026102403,
+    "content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
+    "workshop_uploaded": true,
+    "steam_manifest": "9012039066284975703",
+    "download_full_hash_verification": true,
+    "native_resource_reads_passed": 5,
+    "ordinary_workshop_gameplay": "PENDING_OWNER_TEST",
+    "record": "publishing/workshop/web_auth_release_20261024.json"
+  }
 }

@@ -58,6 +58,8 @@
     "record": "publishing/workshop/online_cheat_policy_20261024.json",
     "online_candidate": "20261024_ws4_web_auth_v03",
     "server_mutation_gates_enforced": true,
-    "offline_cash_routes_disabled": true
+    "offline_cash_routes_disabled": true,
+    "workshop_uploaded": true,
+    "workshop_release_record": "publishing/workshop/web_auth_release_20261024.json"
   }
 }
