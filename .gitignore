@@ -581,3 +581,6 @@ __pycache__/
 
 # Native wall contact and collision-oracle regression fixtures.
 !/scripts/vscripts/tests/test_wall_native_probe_oracle.lua
+
+# Browser authorization must retain its credential/identity regression checks.
+!/scripts/vscripts/tests/test_player_web_auth.lua

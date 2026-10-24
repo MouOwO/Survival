@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "review_date": "2026-10-24",
+  "scope": "four-account isolated WS4 player web authorization prototype",
+  "reference_workshop_id": "2234335140",
+  "target_workshop_id": "3824360109",
+  "public_base": "https://pay.xiaofengnet.com/ws4-web",
+  "deployment": {
+    "phase": "WEB_AUTH_VERIFIED",
+    "existing_services_unchanged": true,
+    "production_rows_copied": 0,
+    "four_account_only": true,
+    "isolated_database": "goufayu_ws4",
+    "real_payment_enabled": false,
+    "trusted_rankings_enabled": false
+  },
+  "candidate": {
+    "name": "20261024_ws4_web_auth_v02",
+    "release_sequence": 2026102402,
+    "content_sha256": "71beca29993e564be0def2e2251ef568c4ca2b52e3b7e340e711e6847dbbd9a3",
+    "runtime_files": 6627,
+    "changed_runtime_paths": 7,
+    "protected_modules_preserved": 180,
+    "signature_verified": true,
+    "workshop_uploaded": false
+  },
+  "native_test": {
+    "addon": "svt_w24",
+    "tools_mode": true,
+    "author_connector_started": false,
+    "full_runtime_hash_verified": true,
+    "authorization_card_visible": true,
+    "steam_login_and_explicit_approval": "WAITING_FOR_PLAYER",
+    "game_authentication_and_profile_load": "NOT_YET_VERIFIED",
+    "ordinary_workshop_launch": "NOT_YET_VERIFIED"
+  },
+  "limitations": [
+    "A local game host controls its own battle results; isolated progress is untrusted.",
+    "Web authorization does not provide multiplayer hosting or remove host/VPN latency.",
+    "Development configuration remains disabled; only the separate signed candidate enables the flow."
+  ]
+}

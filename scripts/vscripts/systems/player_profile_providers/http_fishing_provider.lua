@@ -3,6 +3,7 @@ local json_encoder = require("core/json_encoder")
 local rules = require("config/generated/fishing_system_rules")
 local mode_test = require("debug/mode_unlock_test")
 local workshop = require("systems/workshop_connection")
+local web_auth = require("systems/player_web_auth")
 
 local M = {}
 local active_rule = nil
@@ -51,36 +52,42 @@ local function request(path, payload, on_success, on_error)
         -- an advanced durable session or submit test clears to the backend.
         if mode_test.is_enabled() then body.mode = profile_mode(setup) end
     end
-    local url, token, connection_error = workshop.resolve(active_rule.api_base_url, convar("survival_fishing_api_token"))
-    if connection_error then on_error(connection_error) return end
-    if token == "" then on_error("fishing_api_token_missing") return end
-    local http = CreateHTTPRequestScriptVM(
-        "POST", tostring(url) .. path
-    )
-    if not http then on_error("http_request_create_failed") return end
-    http:SetHTTPRequestHeaderValue("Authorization", "Bearer " .. token)
-    http:SetHTTPRequestRawPostBody(
-        "application/json; charset=utf-8", json_encoder.encode(body)
-    )
-    if type(http.SetHTTPRequestAbsoluteTimeoutMS) == "function" then
-        http:SetHTTPRequestAbsoluteTimeoutMS(30000)
+    local function send(url, token)
+        if setup.get_session_id() ~= session then on_error("match_session_changed") return end
+        if token == "" then on_error("fishing_api_token_missing") return end
+        local http = CreateHTTPRequestScriptVM("POST", tostring(url) .. path)
+        if not http then on_error("http_request_create_failed") return end
+        http:SetHTTPRequestHeaderValue("Authorization", "Bearer " .. token)
+        http:SetHTTPRequestRawPostBody("application/json; charset=utf-8", json_encoder.encode(body))
+        if type(http.SetHTTPRequestAbsoluteTimeoutMS) == "function" then
+            http:SetHTTPRequestAbsoluteTimeoutMS(30000)
+        end
+        http:Send(function(response)
+            local status = tonumber(response and response.StatusCode) or 0
+            if status ~= 200 then
+                local parsed, response_body = pcall(json_decoder.decode, tostring(response and response.Body or ""))
+                on_error(workshop.failure(parsed and response_body or nil, "http_status_" .. tostring(status)), status)
+                return
+            end
+            local ok, decoded = pcall(json_decoder.decode, tostring(response.Body or ""))
+            if not ok or type(decoded) ~= "table" then on_error("http_json_invalid") return end
+            on_success(decoded)
+        end)
     end
-    http:Send(function(response)
-        local status = tonumber(response and response.StatusCode) or 0
-        if status ~= 200 then
-            local parsed, body = pcall(json_decoder.decode, tostring(response and response.Body or ""))
-            on_error(workshop.failure(parsed and body or nil, "http_status_" .. tostring(status)), status)
-            return
+    if web_auth.enabled() then
+        if path == "/v1/lottery/catalog" and body.account_id == nil then
+            local account, url, token = web_auth.authorized_account(session)
+            if not account then on_error("player_web_auth_pending") return end
+            body.account_id = account
+            send(url, token)
+        else
+            web_auth.resolve(body.account_id, session, send, on_error)
         end
-        local ok, decoded = pcall(
-            json_decoder.decode, tostring(response.Body or "")
-        )
-        if not ok or type(decoded) ~= "table" then
-            on_error("http_json_invalid")
-            return
-        end
-        on_success(decoded)
-    end)
+    else
+        local url, token, connection_error = workshop.resolve(active_rule.api_base_url, convar("survival_fishing_api_token"))
+        if connection_error then on_error(connection_error) return end
+        send(url, token)
+    end
 end
 
 function M.init()

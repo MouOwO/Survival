@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "review_date": "2026-10-24",
+  "workshop_id": "2234335140",
+  "title": "Tower Feast [Local Host Support]",
+  "package_entries": 3284,
+  "selected_resources": [
+    {
+      "path": "addoninfo.txt",
+      "bytes": 117,
+      "sha256": "a80e479fdcd6d87b59dd98d8aaab6c7b51891423073a7dada933d062cee9c233",
+      "crc_verified": true
+    },
+    {
+      "path": "resource/addon_schinese.txt",
+      "bytes": 615003,
+      "sha256": "0caf018d2da272d1ea604b70a17e28f851829e98adb13dfac061fa5095e6322e",
+      "crc_verified": true
+    },
+    {
+      "path": "panorama/layout/custom_game/component/login_loading/login_loading.vxml_c",
+      "bytes": 2913,
+      "sha256": "8238115e100c5b07d8d05019f1c469b8471d21762d394fc7aef9bea4835e8a6f",
+      "crc_verified": true
+    },
+    {
+      "path": "panorama/layout/custom_game/component/login_loading/login_loading.vjs_c",
+      "bytes": 13288,
+      "sha256": "7122229c4db85650c8e763a204d996af3633a4b2eb506bf3745d9ceba94dd616",
+      "crc_verified": true
+    },
+    {
+      "path": "panorama/layout/custom_game/component/login_loading/login_loading.vcss_c",
+      "bytes": 21235,
+      "sha256": "1ce0506eb5d10cc5e34c2d3fe1dc4fcf843923be2611d9d2324e9f954743d998",
+      "crc_verified": true
+    },
+    {
+      "path": "scripts/vscripts/module/server/servertransport.lua",
+      "bytes": 3225,
+      "sha256": "d4a23b5669d0c6395032fd422989f2ef3f942e48c64c661943e348b4f7c0e7df",
+      "crc_verified": true
+    },
+    {
+      "path": "scripts/vscripts/module/role/data/role_login_session.lua",
+      "bytes": 21017,
+      "sha256": "e116349ab2ea49f258be91ea215b0c1f94e7dce032451b9ebe6b647d16a279dd",
+      "crc_verified": true
+    },
+    {
+      "path": "scripts/vscripts/module/role/data/player_session_auth.lua",
+      "bytes": 3673,
+      "sha256": "8bff3f7e413a7219ad97cef84abca50cab860fe69b114e95c7f05d2e6d4fa4f6",
+      "crc_verified": true
+    }
+  ],
+  "observations": {
+    "external_authorization_site": "https://auth.fnightgame.com/",
+    "site_referenced_by_installed_ui": true,
+    "browser_navigation": true,
+    "custom_game_auth_event": true,
+    "login_ui_has_server_transfer": false,
+    "default_map_is_solo": true,
+    "max_players_one": true
+  },
+  "method": "Read VPK directory, verify selected entry CRCs, inspect readable UI strings and localization; no third-party code executed.",
+  "protected_server_modules_decrypted": false,
+  "third_party_authentication_performed": false,
+  "third_party_business_code_copied": false,
+  "backend_protocol_or_password_storage_verified": false,
+  "application": "Independent implementation of Steam browser approval and per-player, per-match short-lived sessions. No reusable game password is sent to a player host.",
+  "sources": [
+    "https://steamcommunity.com/sharedfiles/filedetails/?id=2234335140",
+    "https://steamcommunity.com/sharedfiles/filedetails/changelog/2234335140?p=2"
+  ]
+}

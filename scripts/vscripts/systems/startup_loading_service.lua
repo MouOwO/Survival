@@ -5,6 +5,7 @@ local multiplayer = require("systems/multiplayer_player_service")
 local assets = require("systems/startup_asset_preload_service")
 local match_setup = require("systems/match_setup_service")
 local test_access_policy = require("core/test_access_policy")
+local web_auth = require("systems/player_web_auth")
 
 local M = {}
 local generation, session_id, started_at = 0, "", 0
@@ -128,6 +129,12 @@ end
 
 local function safe_error(reason)
     reason = tostring(reason or "")
+    local web_errors = {
+        player_web_auth_pending = true, player_web_auth_expired = true,
+        player_web_auth_unavailable = true, player_web_auth_invalid_response = true,
+        player_web_auth_binding_changed = true, player_web_auth_configuration_invalid = true,
+    }
+    if web_errors[reason] then return reason end
     if reason:match("^workshop_pairing_[0-9a-f]+$") and #reason == 33 then return reason end
     if #reason <= 83 and reason:match("^workshop_key_state_Invalid_[A-Za-z0-9_]+$") then return reason end
     if reason == "workshop_server_key_unavailable" or reason == "workshop_dedicated_server_required"
@@ -155,7 +162,9 @@ local function begin_load(entry, current)
         if generation ~= epoch or entries[entry.player_id] ~= entry or entry.attempt ~= attempt then return end
         entry.inflight, entry.waiting_since = false, nil
         entry.next_retry = now() + options.retry_seconds
-        entry.error = reason and safe_error(reason) or nil
+        -- Waiting for the player's browser is an expected admission state.
+        -- It never authenticates the player or opens either gameplay barrier.
+        entry.error = reason ~= "player_web_auth_pending" and reason and safe_error(reason) or nil
     end
     local completed = false
     local ok, result = pcall(profiles.authenticate_player, entry.player_id, "startup_admission", function(response)
@@ -371,7 +380,7 @@ function M.tick()
         return options.tick_seconds
     end
     begin_loading()
-    if options.tools_backend_wait and Convars and type(Convars.GetStr) == "function"
+    if options.tools_backend_wait and not web_auth.enabled() and Convars and type(Convars.GetStr) == "function"
         and Convars:GetStr("survival_fishing_api_token") == "" then
         local public = {}
         for id, entry in pairs(entries) do
@@ -493,6 +502,7 @@ function M.init(settings)
     load_start = settings.on_load_start
     session_id = new_session_id()
     match_setup.init(session_id)
+    web_auth.init(session_id)
     started_at, initialized, released, gameplay_released = now(), true, false, false
     if type(settings.on_ready) == "function" then callbacks[1] = settings.on_ready end
     local function listen(name, callback, after_admission)

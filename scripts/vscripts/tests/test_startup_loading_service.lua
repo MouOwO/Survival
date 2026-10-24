@@ -166,6 +166,37 @@ local function assert_admitted(service)
     assert(state.error == nil, "mode/profile errors must not reopen the loading page")
 end
 
+-- Browser approval remains a normal wait and uses the existing retry clock;
+-- neither a pending receipt nor UI readiness can count as authentication.
+do
+    local waiting = fixture(1)
+    pending[0] = false
+    requests[1].callback({ ok = false, error = "player_web_auth_pending" })
+    assets_done() ui(waiting, 0) waiting.tick()
+    assert(not waiting.is_ready() and waiting.snapshot().error == nil)
+    assert(not waiting.snapshot().players[1].authenticated and #requests == 1)
+    time = 4; waiting.tick()
+    assert(#requests == 1, "pending browser approval must not create per-tick HTTP requests")
+    time = 5; waiting.tick()
+    assert(#requests == 2, "existing admission retry owns browser polling")
+end
+
+do
+    local web_config = require("config/player_web_auth")
+    local previous_server, previous_convars = IsServer, Convars
+    IsServer = function() return true end
+    Convars = { GetStr = function() return "" end }
+    web_config.enabled = true
+    local personal = fixture(1, { tools_backend_wait = true })
+    assert(#requests == 1 and personal.snapshot().phase ~= "connecting_backend" and not personal.is_ready(),
+        "player web authentication must begin without an author server token, while admission stays closed")
+    web_config.enabled = false
+    local original = fixture(1, { tools_backend_wait = true })
+    assert(#requests == 0 and original.snapshot().phase == "connecting_backend",
+        "disabling web authentication preserves the existing Tools credential wait")
+    IsServer, Convars = previous_server, previous_convars
+end
+
 -- A rejected server-owned mode choice carries its precise unlock condition
 -- through the real listener, rather than dropping it before Panorama sees it.
 do
