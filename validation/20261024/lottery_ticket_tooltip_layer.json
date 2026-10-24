@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "problem": "Lottery ticket acquisition title tooltip rendered behind the modal ancestry because it bypassed the shared native tooltip layer.",
+  "change": "Route title/body tooltips through the shared full-ancestor layer lease; preserve native art and anchor placement, restore on every dismissal, and isolate delayed hides by source and tooltip type.",
+  "checks": {
+    "native_tooltip_layer": "PASS including title/text switching, modal changes, asynchronous host creation, reload and deleted anchors",
+    "native_error_layer": "PASS",
+    "ticket_and_treasure_integration_tests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "official_resource_compiler": [
+      {
+        "source": "scripts/custom_game/tooltip_position.js",
+        "sha256": "421b9afdab4e6c9f1babfbccb011401b7a60b57f2c91b7266380a9c3d43c24dd",
+        "compiled_sha256": "8f7ef4ecf90582905c2ff906be63c07655ed7fb55c5f4693695827a106892c12",
+        "compiler_exit": 0
+      },
+      {
+        "source": "scripts/custom_game/lottery_gw2.js",
+        "sha256": "4c29bba02fa12f609a13aeddafa6ffdcc0372231f31db40283c65fcee530eb0d",
+        "compiled_sha256": "cda13129e30ffe675cc418996e1a3b4f46ab28313fd59f646f622b665b3d9742",
+        "compiler_exit": 0
+      }
+    ],
+    "source_content_compiled_pairing": "PASS"
+  },
+  "native_screenshot": "Not captured; the game was not running during this task."
+}

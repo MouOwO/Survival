@@ -64,7 +64,11 @@ function fixture(options = {}) {
         GameUI: {CustomUIConfig: () => config},
         $: {
             GetContextPanel: () => context,
-            DispatchEvent(...args) { calls.push(args); },
+            DispatchEvent(...args) {
+                if (args[0] === 'DOTAHideTitleTextTooltip')
+                    assert(args[1] && args[1].IsValid(), 'Do not dispatch a deleted native panel handle');
+                calls.push(args);
+            },
             Schedule(seconds, callback) { const job = {id: ++serial, seconds, callback}; schedules.push(job); return job.id; },
             CancelScheduled(id) { const job = schedules.find(item => item.id === id); if (job) job.cancelled = true; }
         }
@@ -73,6 +77,8 @@ function fixture(options = {}) {
     const api = config.SurvivalTooltipPosition;
     assert.equal(typeof api.ShowText, 'function', 'Shared positioner exposes native text display');
     assert.equal(typeof api.HideText, 'function', 'Shared positioner exposes owned native text dismissal');
+    assert.equal(typeof api.ShowTitleText, 'function', 'Shared positioner exposes native title/body display');
+    assert.equal(typeof api.HideTitleText, 'function', 'Shared positioner exposes owned native title/body dismissal');
     return {
         api, root, hud, lower, health, context, owner, otherOwner, panels, calls, writes, schedules,
         get host() { return nativeHost; }, createNativeHost,
@@ -221,4 +227,102 @@ for (const hideBeforeClose of [true, false]) {
     f.assertUntouched();
 }
 
-console.log('NATIVE_TOOLTIP_LAYER_PASS: ancestor stacking above native abilities/health, unchanged anchor/content/placement, owned release, one-frame lazy host, subtree replacement, modal coexistence and no native input/reparent changes');
+// Ticket acquisition help uses the official title/body widget and the same
+// native ancestor lease as ordinary text, with no custom placement or styling.
+{
+    const f = fixture(), title = '普通抽奖券 · 获取渠道', body = '每日福利。<br>每周福利。';
+    f.api.ShowTitleText(f.owner, title, body);
+    assert.deepEqual(f.calls.at(-1), ['DOTAShowTitleTextTooltip', f.owner, title, body]);
+    assert.equal(f.api.InspectTextLayer().source, f.owner.id);
+    assertNativeFront(f); f.flush();
+    const writes = f.writes.length;
+    f.api.ShowTitleText(f.owner, title, body); f.flush();
+    assert.equal(f.writes.length, writes, 'same-source title refresh does not churn the native lease');
+    assert(!f.writes.some(write => write.key !== 'zIndex'), 'native title layout and art stay engine-owned');
+    f.api.HideTitleText(f.owner);
+    assert.deepEqual(f.calls.at(-1), ['DOTAHideTitleTextTooltip', f.owner]);
+    assert.equal(f.hud.style.zIndex, '10'); assert.equal(f.host.style.zIndex, '12');
+    assert.equal(f.api.InspectTextLayer().raised, 0); f.assertUntouched();
+}
+
+// Native text/title are distinct show/hide event types but share one owner.
+// A delayed leave from an older source or widget type must not dismiss the new one.
+{
+    const f = fixture();
+    f.api.ShowTitleText(f.owner, 'A', 'body A');
+    let start = f.calls.length;
+    f.api.ShowText(f.otherOwner, 'B');
+    assert.deepEqual(f.calls.slice(start), [
+        ['DOTAHideTitleTextTooltip', f.owner], ['DOTAShowTextTooltip', f.otherOwner, 'B']
+    ], 'switching to text retires the previous native title widget');
+    let shown = f.calls.length;
+    f.api.HideTitleText(f.owner); f.api.HideTitleText(f.otherOwner);
+    assert.equal(f.calls.length, shown, 'neither stale source nor wrong type dispatches a global hide');
+    f.flush(); assertNativeFront(f); assert.equal(f.api.InspectTextLayer().source, f.otherOwner.id);
+
+    start = f.calls.length;
+    f.api.ShowTitleText(f.otherOwner, 'C', 'body C');
+    assert.deepEqual(f.calls.slice(start), [
+        ['DOTAHideTextTooltip'], ['DOTAShowTitleTextTooltip', f.otherOwner, 'C', 'body C']
+    ], 'same-source type changes retire the old widget before showing its replacement');
+    shown = f.calls.length; f.api.HideText(f.otherOwner); f.api.HideText(f.owner);
+    assert.equal(f.calls.length, shown, 'old text mouseout cannot dismiss a new title at the same anchor');
+    f.flush(); assertNativeFront(f); f.api.HideTitleText(f.otherOwner);
+    assert.equal(f.hud.style.zIndex, '10'); assert.equal(f.host.style.zIndex, '12'); f.assertUntouched();
+}
+
+// Engine-created title tooltips may appear only on the next layout frame.
+{
+    const f = fixture({lazy: true});
+    f.api.ShowTitleText(f.owner, 'lazy title', 'body');
+    assert.equal(f.schedules.length, 1, 'title discovery is bounded to one frame');
+    f.createNativeHost(); f.flush(); assertNativeFront(f);
+    assert.equal(f.schedules.length, 0); f.api.HideTitleText(f.owner); f.assertUntouched();
+}
+{
+    const f = fixture({lazy: true});
+    f.api.ShowTitleText(f.owner, 'closed title', 'body'); f.api.HideTitleText(f.owner);
+    f.createNativeHost(); f.flush();
+    assert.equal(f.hud.style.zIndex, '10'); assert.equal(f.host.style.zIndex, '12'); f.assertUntouched();
+}
+
+// Closing a renderer can invalidate its anchor before the hide reaches the
+// helper. Ownership release must not depend on the anchor remaining valid.
+{
+    const f = fixture(); f.api.ShowTitleText(f.owner, 'retired source', 'body'); assertNativeFront(f);
+    f.owner.alive = false; f.api.HideTitleText(f.owner); f.flush();
+    assert.equal(f.api.InspectTextLayer().source, ''); assert.equal(f.api.InspectTextLayer().raised, 0);
+    assert.equal(f.hud.style.zIndex, '10'); assert.equal(f.host.style.zIndex, '12'); f.assertUntouched();
+}
+
+// Modal apply suspends/reinstates both native tooltip kinds, and snapshots only
+// the underlying modal baseline so neither closure order leaves a raised HUD.
+for (const hideBeforeClose of [true, false]) {
+    const f = fixture(), layers = f.loadLayers(), modal = f.panel('LotteryWindow', f.hud, '21');
+    f.api.ShowTitleText(f.owner, '券来源', '福利奖励'); f.flush();
+    const dispatches = f.calls.length; layers.Open('lottery', modal, () => layers.Close('lottery'));
+    assert.equal(f.calls.length, dispatches, 'modal suspend/resume does not redispatch native content');
+    assert(Number(f.host.style.zIndex) > Number(modal.style.zIndex));
+    assert.equal(f.api.InspectTextLayer().source, f.owner.id);
+    if (hideBeforeClose) f.api.HideTitleText(f.owner);
+    layers.Close('lottery');
+    if (!hideBeforeClose) {
+        assert(Number(f.host.style.zIndex) > Number(f.lower.style.zIndex));
+        assert(Number(f.hud.style.zIndex) > Number(f.lower.style.zIndex));
+        f.api.HideTitleText(f.owner);
+    }
+    assert.equal(f.hud.style.zIndex, '10'); assert.equal(f.host.style.zIndex, '12');
+    assert.equal(modal.style.zIndex, '21'); f.assertUntouched();
+}
+
+// Reload invalidates a title tooltip's guarded next-frame discovery callback.
+{
+    const f = fixture({lazy: true}); f.api.ShowTitleText(f.owner, 'old layout', 'body');
+    const fresh = f.reload(); f.createNativeHost(); f.flush();
+    assert.notEqual(fresh, f.api); assert.equal(fresh.InspectTextLayer().source, '');
+    assert.equal(f.hud.style.zIndex, '10'); assert.equal(f.host.style.zIndex, '12');
+    fresh.ShowTitleText(f.otherOwner, 'new layout', 'new body'); f.flush(); assertNativeFront(f);
+    fresh.HideTitleText(f.otherOwner); f.assertUntouched();
+}
+
+console.log('NATIVE_TOOLTIP_LAYER_PASS: text/title native events, full ancestor lease, preserved native art/placement, source/type ownership, one-frame lazy host, invalid anchor release, subtree replacement, modal suspend/resume and reload without input/reparent changes');

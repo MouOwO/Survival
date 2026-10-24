@@ -5,7 +5,7 @@ const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 
 // Execute the real renderer and handoff against the active XML ancestry.
 // The harness supplies Panorama panel primitives and records outbound calls.
-function fixture(){
+function fixture(options={}){
  const nodes={},requests=[];
  class Panel{
   constructor(type,parent,id=''){
@@ -33,18 +33,28 @@ function fixture(){
   if(attrs.text)node.text=attrs.text;if(!match[4])stack.push(node);
  }
  const $=id=>document.FindChildTraverse(id.slice(1));$.GetContextPanel=()=>document;$.CreatePanel=(type,parent,id)=>new Panel(type,parent,id);
- const dispatched=[];$.Schedule=()=>1;$.CancelScheduled=()=>{};$.DispatchEvent=(...args)=>dispatched.push(args);
+ const dispatched=[],scheduled=new Map();let serial=0;
+ $.Schedule=(delay,callback)=>{const id=++serial;if(options.sharedTooltip)scheduled.set(id,{delay,callback});return id;};
+ $.CancelScheduled=id=>scheduled.delete(id);$.DispatchEvent=(...args)=>dispatched.push(args);
  const config={SurvivalUI:{Fit:()=>1}},env={$,
   GameUI:{CustomUIConfig:()=>config,GetCursorPosition:()=>[600,400]},
   GameEvents:{SendCustomGameEventToServer:(name,payload)=>requests.push({name,payload})}};
  const run=name=>vm.runInNewContext(read('panorama/src/scripts/custom_game/'+name+'.js'),env,{filename:name+'.js'});
+ let nativeBranch,nativeContainer,nativeTooltip;
+ if(options.sharedTooltip){
+  nativeBranch=new Panel('Panel',document,'NativeHudBranch');nativeBranch.style.zIndex='7';
+  nativeContainer=new Panel('Panel',nativeBranch,'NativeTooltipContainer');nativeContainer.style.zIndex='11';
+  nativeTooltip=new Panel('Panel',nativeContainer,'Tooltips');nativeTooltip.style.zIndex='13';
+  run('ui_layers');run('tooltip_position');
+ }
  for(const name of ['common/item_resources','reward_presentation','common/tooltip_dismiss','black_lion_market','lottery_gw2_data','lottery_handoff_bb9968eef7'])run(name);
  const collect=(node,cls)=>[...(node.BHasClass(cls)?[node]:[]),...node.Children().flatMap(n=>collect(n,cls))];
  const icons=()=>[...collect(nodes.LotteryWindow,'LHTicket'),...collect(nodes.LotteryWindow,'LHDrawTicket')];
  for(const icon of icons())Object.assign(icon.style,{backgroundImage:'url("legacy_ticket.png")',opacityMask:'url("legacy_silhouette.svg")',washColor:'#f1cc72'});
  run('lottery_gw2');
  const createPanel=(type,parent,cls)=>{const panel=new Panel(type,parent,'');if(cls)panel.AddClass(cls);return panel;};
- return{config,nodes,requests,dispatched,collect,icons,createPanel};
+ return{config,nodes,requests,dispatched,collect,icons,createPanel,document,nativeBranch,nativeContainer,nativeTooltip,
+  frame(){const jobs=[...scheduled].filter(([,job])=>job.delay===0);for(const[id,job]of jobs){scheduled.delete(id);job.callback();}}};
 }
 function pool(id){return{id,ticket_content_id:id==='map'?'lottery_ticket':'special_lottery_ticket',tickets:23,unlocked:true};}
 function snapshot(id,items=[]){return{selected_pool_id:id,selected_pool:pool(id),pools:['map','cultivation','dragon_knight','summer'].map(pool),items};}
@@ -124,6 +134,49 @@ test('Normal ticket help uses the official exclamation icon and shows acquisitio
  presentation.Pools(snapshot('map').pools,'map');presentation.Snapshot(snapshot('map'));help.events.onactivate();presentation.Close();
  assert.equal(h.dispatched.at(-1)[0],'DOTAHideTitleTextTooltip');
  assert.equal(h.requests.length,0,'help only explains the existing rules');
+});
+
+test('Normal ticket title tooltip leases its whole native branch above the lottery modal and releases on every exit',()=>{
+ for(const exit of ['toggle','mouseout','pool','close','dispose']){
+  const h=fixture({sharedTooltip:true}),presentation=h.config.SurvivalPurpleLottery,layers=h.config.SurvivalUILayers;
+  presentation.Open();presentation.Pools(snapshot('map').pools,'map');presentation.Snapshot(snapshot('map'));
+  layers.Open('lottery',h.nodes.LotteryWindow,()=>{presentation.Close();layers.Close('lottery');});
+  const help=h.nodes.LotteryGW2TicketHelp,position=h.config.SurvivalTooltipPosition;
+  help.events.onactivate();h.frame();
+  assert.equal(h.dispatched.at(-1)[0],'DOTAShowTitleTextTooltip');
+  assert.equal(position.InspectTextLayer().source,help.id,'the real click uses the shared native tooltip API');
+  assert.equal(position.InspectTextLayer().raised,3);
+  for(const native of [h.nativeTooltip,h.nativeContainer,h.nativeBranch]){
+   assert(Number(native.style.zIndex)>Number(h.nodes.LotteryWindow.style.zIndex),exit+': '+native.id+' overtakes the modal');
+   assert(Number(native.style.zIndex)>Number(h.nodes.LotteryWindow.GetParent().style.zIndex),exit+' overtakes the modal ancestry');
+  }
+  assert.strictEqual(h.nativeTooltip.GetParent(),h.nativeContainer);assert.strictEqual(h.nativeBranch.GetParent(),h.document);
+  if(exit==='toggle')help.events.onactivate();
+  else if(exit==='mouseout')help.events.onmouseout();
+  else if(exit==='pool'){presentation.Pools(snapshot('cultivation').pools,'cultivation');presentation.Snapshot(snapshot('cultivation'));}
+  else if(exit==='close')presentation.Close();
+  else presentation.Dispose();
+  h.frame();
+  assert.deepEqual(h.dispatched.at(-1),['DOTAHideTitleTextTooltip',help],exit+' uses owned official dismissal');
+  assert.equal(position.InspectTextLayer().source,'');assert.equal(position.InspectTextLayer().raised,0);
+  assert.equal(h.nativeBranch.style.zIndex,'7');assert.equal(h.nativeContainer.style.zIndex,'11');assert.equal(h.nativeTooltip.style.zIndex,'13');
+  layers.Close('lottery');assert.equal(layers.Top(),null);
+  assert.equal(h.requests.length,0,'checking acquisition help never draws, buys or claims');
+ }
+});
+
+test('A delayed normal-ticket mouseout cannot hide another widget sharing the native tooltip layer',()=>{
+ const h=fixture({sharedTooltip:true}),presentation=h.config.SurvivalPurpleLottery,position=h.config.SurvivalTooltipPosition;
+ presentation.Open();presentation.Pools(snapshot('map').pools,'map');presentation.Snapshot(snapshot('map'));
+ const help=h.nodes.LotteryGW2TicketHelp,other=h.createPanel('Panel',h.document);other.id='OtherTooltipOwner';
+ help.events.onactivate();position.ShowText(other,'其他界面的提示');
+ const shown=h.dispatched.length;help.events.onmouseout();h.frame();
+ assert.equal(h.dispatched.length,shown,'old ticket leave issues no global native hide');
+ assert.equal(position.InspectTextLayer().source,other.id);
+ assert.equal(h.dispatched.at(-1)[0],'DOTAShowTextTooltip');
+ presentation.Close();assert.equal(position.InspectTextLayer().source,other.id);
+ position.HideText(other);assert.equal(position.InspectTextLayer().raised,0);
+ assert.equal(h.requests.length,0);
 });
 
 test('Main preview uses only the shared quality plate, transparent canonical art and larger names',()=>{
