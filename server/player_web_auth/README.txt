@@ -39,8 +39,35 @@ Only the public user_code goes in the browser verification URL.
 Steam login occurs only at the official Steam Community OpenID endpoint.
 An explicit same-origin CSRF-protected confirmation authorizes the local game.
 Poll retries after approval reproduce the same token without storing raw tokens.
-Sessions expire after four hours. A newer approval revokes older account grants.
+Player grants expire after four hours. A newer approval revokes older account grants.
 Users never receive the WS4 server bearer or signing secret.
+
+The browser's verified Steam identity is separate from each game's player grant.
+By default the browser identity expires four hours after its creation. The
+authorization form offers an unchecked "remember this browser for 30 days"
+checkbox. Only a verified, matching Steam browser submitting that checkbox with
+the correct same-origin Origin and CSRF may extend its browser identity to 30
+days. Subsequent authorization pages preserve that selection; clearing it returns
+the browser to a four-hour lifetime. Every Set-Cookie Max-Age matches the remaining
+database browser lifetime, including Steam-login redirects. Browsers always use
+Secure, HttpOnly, SameSite=Lax cookies restricted to /ws4-web. The service stores
+only the cookie hash, not its raw value. Avoid remembering shared computers.
+
+A remembered browser skips repeated Steam official logins until it expires or
+is signed out. It never silently approves a new game: the player must still check
+the game's current code and submit "confirm this game". A previous game token is
+not usable for a new match, and remembering a browser does not extend a game
+token's four-hour lifetime. Steam/account mismatches still prevent approval.
+
+POST /authorize accepts code, csrf, and optionally remember=1; missing remember
+means unchecked. Other remember values and unexpected fields are rejected.
+POST /browser/logout accepts only csrf and requires the same original browser
+and Origin. It deletes that browser, its remember preference and Steam callback
+flows, then clears its cookie. Other browsers, existing approved game grants,
+cloud profiles and save data are not deleted. GET cannot remember or sign out a
+browser. No caller-supplied redirect or return URL is accepted by either action.
+The additive browser_preferences table leaves the deployed four-column browsers
+and six-column flows schemas intact for restarts and compatible old inserts.
 
 User-session routes are restricted to authentication, mode login, own profile,
 configuration, catalogue, and inventory snapshot. Payment, arbitrary paths,

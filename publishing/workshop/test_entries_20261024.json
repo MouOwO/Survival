@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "date": "2026-10-24",
+  "entrypoints": [
+    {"file": "离线逻辑测试.cmd", "mode": "offline", "addon": "survival", "storage": "session_memory", "cloud_access": false},
+    {"file": "联网登录测试.cmd", "mode": "online", "addon": "svt_w24", "storage": "isolated_ws4", "cloud_login_required": true}
+  ],
+  "native_validation": {
+    "offline_tools_option_recognized": true,
+    "offline_real_steam_identity_matches_startup": true,
+    "offline_entered_map": true,
+    "offline_in_game_addwood_command_observed": true,
+    "both_cmd_read_only_checks_passed": true,
+    "existing_game_preserved_by_launcher": true,
+    "online_underlying_release_previously_verified": true,
+    "new_online_match_started_this_cleanup": false
+  },
+  "browser_identity": {
+    "remembered_days": 30,
+    "explicit_opt_in_required": true,
+    "ordinary_hours": 4,
+    "per_match_token_hours": 4,
+    "per_match_consent_required": true,
+    "service_tests_passed": 53,
+    "deployment_verified": true,
+    "previous_services_unchanged": true,
+    "real_30_day_wait_tested": false
+  },
+  "cleanup": {
+    "retired_root_cmd_bat_files": 16,
+    "retired_guest_dispatcher_moved_to_internal_legacy": true,
+    "deleted_untracked_artifact_bytes": 43916455153,
+    "deleted_untracked_artifact_files": 20919,
+    "tracked_art_sources_deleted": 0,
+    "original_changed_files_preserved": 102,
+    "active_python_relay_and_logs_preserved": true
+  },
+  "retained_limits": [
+    "Online Steam verification still uses the temporary fixed TLS relay through this test PC.",
+    "Offline archive state resets between matches; cloud-dependent systems require the online entry.",
+    "The signed online addon is a frozen release; development changes do not silently modify it."
+  ]
+}

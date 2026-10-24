@@ -15,7 +15,8 @@ from unittest.mock import MagicMock, patch
 
 from .http_api import BoundedServer, handler, strict_pairs
 from .run import settings_from_environment
-from .service import (AuthError, BODY_LIMIT, OPENID_NS, PENDING_TTL, SESSION_TTL,
+from .service import (AuthError, BODY_LIMIT, BROWSER_TTL, OPENID_NS, PENDING_TTL,
+                      REMEMBERED_BROWSER_TTL, SESSION_TTL,
                       STEAM_ENDPOINT, Service, Settings, SteamRelayConnection,
                       digest, fixed_request, steam_check)
 
@@ -84,6 +85,138 @@ class ServiceTest(unittest.TestCase):
         self.assertNotIn(result["device_code"], result["verification_uri"])
         self.assertEqual(result["expires_in"], 600)
         self.assertEqual(self.service.poll(dict(self.identity, device_code=result["device_code"]), "peer")["status"], "pending")
+
+    def test_default_browser_has_four_hour_expiry_and_remember_is_unchecked(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        self.assertEqual(self.service.browser_cookie_age(sid), BROWSER_TTL)
+        self.service.callback(fields, sid, "peer")
+        _, _, page = self.service.page(started["user_code"], sid)
+        self.assertIn(b'name="remember" value="1">', page)
+        self.assertNotIn(b'name="remember" value="1" checked', page)
+        self.now += 60
+        self.service.approve({"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid)},
+                             sid, self.settings.origin, "peer")
+        self.assertEqual(self.service.browser_cookie_age(sid), BROWSER_TTL - 60)
+        self.assertEqual(self.service.db.execute("SELECT COUNT(*) FROM browser_preferences").fetchone()[0], 0)
+
+    def test_remembered_browser_survives_restart_but_new_match_needs_approval(self):
+        first = self.start()
+        sid, fields = self.assertion(first)
+        self.service.callback(fields, sid, "peer")
+        self.service.approve({"code": first["user_code"], "csrf": self.service._derived("csrf:" + sid), "remember": "1"},
+                             sid, self.settings.origin, "peer")
+        first_poll = dict(self.identity, device_code=first["device_code"])
+        token = self.service.poll(first_poll, "peer")["access_token"]
+        self.assertEqual(self.service.browser_cookie_age(sid), REMEMBERED_BROWSER_TTL)
+        self.now += SESSION_TTL + 1
+        self.service.close()
+        self.service = self.build()
+        second_identity = dict(self.identity, match_session_id="another-match-session-123")
+        second = self.start(second_identity)
+        kept_sid, browser, fresh = self.service.browser(sid)
+        self.assertEqual((kept_sid, browser["steam"], fresh), (sid, STEAMS[0], False))
+        self.assertEqual(self.service.browser_cookie_age(sid), REMEMBERED_BROWSER_TTL - SESSION_TTL - 1)
+        _, _, page = self.service.page(second["user_code"], sid)
+        self.assertIn(b'name="remember" value="1" checked', page)
+        second_poll = dict(second_identity, device_code=second["device_code"])
+        self.assertEqual(self.service.poll(second_poll, "peer")["status"], "pending")
+        self.fail_code("player_session_expired", lambda: self.service.proxy("/v1/profile", token, self.identity, "peer"))
+        self.service.approve({"code": second["user_code"], "csrf": self.service._derived("csrf:" + sid), "remember": "1"},
+                             sid, self.settings.origin, "peer")
+        approved = self.service.poll(second_poll, "peer")
+        self.assertEqual(approved["expires_in"], SESSION_TTL)
+        self.assertNotEqual(approved["access_token"], token)
+        self.fail_code("player_session_identity_mismatch", lambda: self.service.proxy(
+            "/v1/profile", approved["access_token"], self.identity, "peer"))
+        self.assertEqual(len(self.verifications), 1, "the new match reuses verified browser identity, not a fabricated Steam login")
+
+    def test_remember_selection_requires_verified_matching_steam_origin_and_csrf(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        values = {"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid), "remember": "1"}
+        self.fail_code("steam_login_required", lambda: self.service.approve(values, sid, self.settings.origin, "peer"))
+        self.service.callback(fields, sid, "peer")
+        for origin in (None, "null", "https://evil.invalid"):
+            self.fail_code("origin_rejected", lambda: self.service.approve(values, sid, origin, "peer"))
+        self.fail_code("csrf_rejected", lambda: self.service.approve(dict(values, csrf="forged"), sid, self.settings.origin, "peer"))
+        for invalid in ("0", "true", True, 1, None):
+            self.fail_code("authorization_fields_invalid", lambda: self.service.approve(dict(values, remember=invalid), sid, self.settings.origin, "peer"))
+        self.assertEqual(self.service.browser_cookie_age(sid), BROWSER_TTL)
+        self.assertEqual(self.service.db.execute("SELECT COUNT(*) FROM browser_preferences").fetchone()[0], 0)
+        other = dict(self.identity, account_id=str(int(STEAMS[1]) - 76561197960265728))
+        second = self.start(other)
+        self.fail_code("steam_account_mismatch", lambda: self.service.approve(dict(values, code=second["user_code"]), sid, self.settings.origin, "peer"))
+        self.assertEqual(self.service.browser_cookie_age(sid), BROWSER_TTL)
+
+    def test_unchecking_remember_returns_browser_to_four_hours_without_extending_match_token(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        self.service.callback(fields, sid, "peer")
+        values = {"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid)}
+        self.service.approve(dict(values, remember="1"), sid, self.settings.origin, "peer")
+        poll = dict(self.identity, device_code=started["device_code"])
+        token = self.service.poll(poll, "peer")["access_token"]
+        self.now += 60
+        self.service.approve(values, sid, self.settings.origin, "peer")
+        self.assertEqual(self.service.browser_cookie_age(sid), BROWSER_TTL)
+        self.assertEqual(self.service.poll(poll, "peer")["expires_in"], SESSION_TTL - 60)
+        self.assertEqual(self.service.poll(poll, "peer")["access_token"], token)
+        _, _, page = self.service.page(started["user_code"], sid)
+        self.assertNotIn(b'name="remember" value="1" checked', page)
+
+    def test_remembered_browser_expires_and_does_not_authenticate_a_new_browser(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        self.service.callback(fields, sid, "peer")
+        self.service.approve({"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid), "remember": "1"},
+                             sid, self.settings.origin, "peer")
+        self.now += REMEMBERED_BROWSER_TTL
+        self.fail_code("browser_session_invalid", lambda: self.service.browser_cookie_age(sid))
+        new_sid, browser, fresh = self.service.browser(sid)
+        self.assertNotEqual(new_sid, sid)
+        self.assertTrue(fresh)
+        self.assertIsNone(browser["steam"])
+        self.assertEqual(self.service.browser_cookie_age(new_sid), BROWSER_TTL)
+
+    def test_logout_is_csrf_protected_and_removes_only_its_browser_and_flows(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        self.service.callback(fields, sid, "peer")
+        csrf = self.service._derived("csrf:" + sid)
+        self.service.approve({"code": started["user_code"], "csrf": csrf, "remember": "1"},
+                             sid, self.settings.origin, "peer")
+        poll = dict(self.identity, device_code=started["device_code"])
+        token = self.service.poll(poll, "peer")["access_token"]
+        _, pending_fields = self.assertion(started, sid, suffix="pending-before-logout")
+        other_sid, _ = self.assertion(started, suffix="other-browser")
+        for origin in (None, "null", "https://evil.invalid"):
+            self.fail_code("origin_rejected", lambda: self.service.logout({"csrf": csrf}, sid, origin, "peer"))
+        self.fail_code("csrf_rejected", lambda: self.service.logout({"csrf": "forged"}, sid, self.settings.origin, "peer"))
+        self.fail_code("authorization_fields_invalid", lambda: self.service.logout({"csrf": csrf, "return_url": "https://evil.invalid"}, sid, self.settings.origin, "peer"))
+        self.assertEqual(self.service.logout({"csrf": csrf}, sid, self.settings.origin, "peer")["status"], "signed_out")
+        self.assertIsNone(self.service.db.execute("SELECT * FROM browsers WHERE sid_hash=?", (digest(sid),)).fetchone())
+        self.assertIsNone(self.service.db.execute("SELECT * FROM browser_preferences WHERE sid_hash=?", (digest(sid),)).fetchone())
+        self.assertEqual(self.service.db.execute("SELECT COUNT(*) FROM flows WHERE sid_hash=?", (digest(sid),)).fetchone()[0], 0)
+        self.assertEqual(self.service.db.execute("SELECT COUNT(*) FROM flow_results").fetchone()[0], 0)
+        self.assertEqual(self.service.browser(other_sid)[0], other_sid)
+        self.assertEqual(self.service.db.execute("SELECT COUNT(*) FROM flows WHERE sid_hash=?", (digest(other_sid),)).fetchone()[0], 1)
+        self.fail_code("steam_state_invalid", lambda: self.service.callback(pending_fields, sid, "peer"))
+        self.service.proxy("/v1/profile", token, self.identity, "peer")
+        self.service.close()
+        self.service = self.build()
+        self.fail_code("browser_session_invalid", lambda: self.service.browser_cookie_age(sid))
+        self.service.proxy("/v1/profile", token, self.identity, "peer")
+
+    def test_existing_browser_and_flow_schemas_remain_compatible(self):
+        self.assertEqual(len(self.service.db.execute("PRAGMA table_info(browsers)").fetchall()), 4)
+        self.assertEqual(len(self.service.db.execute("PRAGMA table_info(flows)").fetchall()), 6)
+        self.service.db.execute("INSERT INTO browsers VALUES(?,?,NULL,?)", (digest("x" * 43), digest("csrf-old"), self.now + 60))
+        self.service.db.execute("INSERT INTO flows VALUES(?,?,?,?,?,0)", (digest("state-old"), digest("x" * 43), "AAAAAAAA", digest("old-return"), self.now + 30))
+        self.service.db.commit()
+        self.service.close()
+        self.service = self.build()
+        self.assertEqual(self.service.browser_cookie_age("x" * 43), 60)
 
     def test_fifth_account_and_unexpected_fields_rejected(self):
         self.fail_code("test_account_not_allowed", lambda: self.start(dict(self.identity, account_id="42")))
@@ -397,9 +530,67 @@ class HttpTest(unittest.TestCase):
         self.assertEqual(headers["Cache-Control"], "no-store")
         self.assertEqual(headers["Referrer-Policy"], "same-origin")
         self.assertIn("Secure; HttpOnly; SameSite=Lax", headers["Set-Cookie"])
+        self.assertIn("; Max-Age=" + str(BROWSER_TTL) + ";", headers["Set-Cookie"])
         self.assertIn("frame-ancestors 'none'", headers["Content-Security-Policy"])
         self.assertNotIn(self.settings.secret.encode(), page)
         self.assertNotIn(started["device_code"].encode(), page)
+
+    def test_http_remember_is_explicit_and_cookie_expiry_matches_database(self):
+        started = self.start()
+        sid, fields = ServiceTest.assertion(self, started)
+        self.service.callback(fields, sid, "peer")
+        headers = {"Content-Type": "application/x-www-form-urlencoded", "Cookie": "ws4_browser=" + sid,
+                   "Origin": self.settings.origin}
+        form = {"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid)}
+        status, _, outgoing = self.request("POST", "/authorize", urlencode(form), headers)
+        self.assertEqual(status, 200)
+        self.assertIn("; Max-Age=" + str(BROWSER_TTL) + ";", outgoing["Set-Cookie"])
+        status, _, outgoing = self.request("POST", "/authorize", urlencode(dict(form, remember="1")), headers)
+        self.assertEqual(status, 200)
+        self.assertIn("; Max-Age=" + str(REMEMBERED_BROWSER_TTL) + ";", outgoing["Set-Cookie"])
+        self.assertEqual(self.service.browser_cookie_age(sid), REMEMBERED_BROWSER_TTL)
+        self.now += 90
+        status, _, outgoing = self.request("GET", "/steam/login?code=" + started["user_code"], headers={"Cookie": "ws4_browser=" + sid})
+        self.assertEqual(status, 303)
+        self.assertIn("; Max-Age=" + str(REMEMBERED_BROWSER_TTL - 90) + ";", outgoing["Set-Cookie"])
+        self.assertEqual(self.service.browser_cookie_age(sid), REMEMBERED_BROWSER_TTL - 90)
+
+    def test_http_remember_null_origin_and_get_parameters_cannot_extend_browser(self):
+        started = self.start()
+        sid, fields = ServiceTest.assertion(self, started)
+        self.service.callback(fields, sid, "peer")
+        form = urlencode({"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid), "remember": "1"})
+        for origin in ("null", "https://evil.invalid"):
+            status, raw, headers = self.request("POST", "/authorize", form,
+                 {"Content-Type": "application/x-www-form-urlencoded", "Cookie": "ws4_browser=" + sid, "Origin": origin})
+            self.assertEqual((status, json.loads(raw)["error"]), (403, "origin_rejected"))
+            self.assertNotIn("Set-Cookie", headers)
+        for path in ("/authorize?code=" + started["user_code"] + "&remember=1", "/browser/logout?remember=1"):
+            self.assertEqual(self.request("GET", path, headers={"Cookie": "ws4_browser=" + sid})[0], 404)
+        self.assertEqual(self.service.browser_cookie_age(sid), BROWSER_TTL)
+        self.assertEqual(self.service.poll(dict(self.identity, device_code=started["device_code"]), "peer")["status"], "pending")
+
+    def test_http_logout_requires_post_origin_csrf_and_clears_exact_cookie_path(self):
+        started = self.start()
+        sid, fields = ServiceTest.assertion(self, started)
+        self.service.callback(fields, sid, "peer")
+        cookie = "ws4_browser=" + sid
+        self.assertEqual(self.request("GET", "/browser/logout", headers={"Cookie": cookie})[0], 404)
+        for origin, csrf, expected in (("null", self.service._derived("csrf:" + sid), "origin_rejected"),
+                                        (self.settings.origin, "forged", "csrf_rejected")):
+            status, raw, headers = self.request("POST", "/browser/logout", urlencode({"csrf": csrf}),
+                {"Content-Type": "application/x-www-form-urlencoded", "Cookie": cookie, "Origin": origin})
+            self.assertEqual((status, json.loads(raw)["error"]), (403, expected))
+            self.assertNotIn("Set-Cookie", headers)
+        status, raw, headers = self.request("POST", "/browser/logout", urlencode({"csrf": self.service._derived("csrf:" + sid)}),
+            {"Content-Type": "application/x-www-form-urlencoded", "Cookie": cookie, "Origin": self.settings.origin})
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Set-Cookie"], "ws4_browser=; Path=/ws4-web; Max-Age=0; Secure; HttpOnly; SameSite=Lax")
+        self.assertNotIn(sid.encode(), raw)
+        self.assertNotIn("Location", headers)
+        _, page, headers = self.request("GET", "/authorize?code=" + started["user_code"], headers={"Cookie": cookie})
+        self.assertIn("Set-Cookie", headers)
+        self.assertNotIn(b'name="remember"', page)
 
     def test_only_successful_authorization_page_changes_referrer_policy(self):
         started = self.start()

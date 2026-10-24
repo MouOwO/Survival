@@ -1,5 +1,6 @@
 local SURVIVAL_FORCE_HERO = "npc_dota_hero_undying"
 local test_access_policy = require("core/test_access_policy")
+local offline_logic_test = require("debug/offline_logic_test")
 local multiplayer_rules = require("config/generated/multiplayer_rules")
 
 local function configured_max_players()
@@ -994,7 +995,8 @@ local function initialize_services()
     grid_system.init()
     resource_system.init()
     player_entitlement_service.init()
-    require("systems/player_profile_service").init()
+    offline_logic_test.configure()
+    require("systems/player_profile_service").init(offline_logic_test.profile_options())
     require("systems/online_time_service").init()
     require("systems/permanent_reward_effect_service").init()
     require("systems/fishing_reward_service").init()
@@ -1130,7 +1132,8 @@ function M.activate()
     require("systems/startup_loading_service").init({
         minimum_wait_seconds = 0,
         native_team_setup = true,
-        tools_backend_wait = type(IsInToolsMode) == "function" and IsInToolsMode(),
+        tools_backend_wait = not offline_logic_test.is_enabled()
+            and type(IsInToolsMode) == "function" and IsInToolsMode(),
         on_load_start = function() require("systems/startup_asset_preload_service").init() end,
         on_ready = function()
             require("systems/rebirth_scene_display_service").start()

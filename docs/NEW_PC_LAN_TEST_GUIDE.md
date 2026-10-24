@@ -1,5 +1,7 @@
 # 新电脑复制与局域网联调
 
+2026-10-24：日常测试已改为[两个测试入口](test_entries.md)，旧根 CMD 已退休。本文保留历史组队与 Hammer 维护记录，不再作为当前启动指南；底层 PowerShell 工具仍可供维护。
+
 更新：2026-10-11。适用于 Windows 上的 `survival/template_map` Workshop Tools 测试，后端为现有阿里云测试环境。
 
 ## 主机启动器认证确认缺失（2026-10-11）

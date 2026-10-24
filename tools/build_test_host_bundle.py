@@ -13,8 +13,7 @@ import aliyun_test_connection as tunnel
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = (
-    "setup_aliyun_test_host.cmd", "launch_aliyun_test_game.cmd", "launch_aliyun_lan_host.cmd",
-    "setup_hammer_backend.cmd", "join_lan_game.cmd", "tools/join_lan_game.ps1",
+    "tools/join_lan_game.ps1",
     "tools/aliyun_local_config.py", "tools/aliyun_test_host.py", "tools/aliyun_lan_probe.py",
     "tools/aliyun_game_test_auth.py", "tools/aliyun_test_connection.py", "tools/hammer_backend_bridge.py",
     "tools/setup_aliyun_test_host.ps1", "tools/launch_aliyun_test_game.ps1",

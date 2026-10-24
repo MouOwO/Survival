@@ -37,11 +37,17 @@ def handler(service):
             self.reply(code, {"ok": False, "error": "request_rejected"})
 
         def reply(self, status, body=b"", *, content_type="application/json; charset=utf-8", cookie=None,
-                  location=None, referrer_policy="no-referrer"):
+                  delete_cookie=False, location=None, referrer_policy="no-referrer"):
             if referrer_policy not in ("no-referrer", "same-origin"):
                 raise ValueError("referrer_policy_invalid")
             if not isinstance(body, bytes):
                 body = json.dumps(body, separators=(",", ":")).encode()
+            browser_cookie = None
+            if cookie or delete_cookie:
+                path = urlsplit(service.settings.public_base).path
+                age = 0 if delete_cookie else service.browser_cookie_age(cookie)
+                browser_cookie = ("ws4_browser=" + ("" if delete_cookie else cookie)
+                                  + "; Path=" + path + "; Max-Age=" + str(age) + "; Secure; HttpOnly; SameSite=Lax")
             self.send_response(status)
             self.send_header("Content-Type", content_type)
             self.send_header("Cache-Control", "no-store")
@@ -50,9 +56,8 @@ def handler(service):
             self.send_header("X-Frame-Options", "DENY")
             self.send_header("Content-Security-Policy", "default-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'")
             self.send_header("Content-Length", str(len(body)))
-            if cookie:
-                path = urlsplit(service.settings.public_base).path
-                self.send_header("Set-Cookie", "ws4_browser=" + cookie + "; Path=" + path + "; Secure; HttpOnly; SameSite=Lax")
+            if browser_cookie:
+                self.send_header("Set-Cookie", browser_cookie)
             if location:
                 self.send_header("Location", location)
             if status == 429:
@@ -158,8 +163,13 @@ def handler(service):
                 if query:
                     raise AuthError("request_query_not_allowed")
                 if path == "/authorize":
-                    service.approve(self.body(form=True), self.sid(), self.headers.get("Origin"), peer)
-                    self.reply(200, "<!doctype html><meta charset=utf-8><title>授权完成</title><p>授权完成，请返回游戏。若游戏仍等待，请让游戏重试校验。</p>".encode("utf-8"), content_type="text/html; charset=utf-8")
+                    sid = self.sid()
+                    service.approve(self.body(form=True), sid, self.headers.get("Origin"), peer)
+                    self.reply(200, "<!doctype html><meta charset=utf-8><title>授权完成</title><p>授权完成，请返回游戏。若游戏仍等待，请让游戏重试校验。</p>".encode("utf-8"), content_type="text/html; charset=utf-8", cookie=sid)
+                    return
+                if path == "/browser/logout":
+                    service.logout(self.body(form=True), self.sid(), self.headers.get("Origin"), peer)
+                    self.reply(200, "<!doctype html><meta charset=utf-8><title>已退出登录</title><p>已退出网页登录。请返回游戏重新打开授权页。</p>".encode("utf-8"), content_type="text/html; charset=utf-8", delete_cookie=True)
                     return
                 payload = self.body()
                 if path == "/v1/player-auth/start":

@@ -45,6 +45,8 @@ LOCAL_PROGRESS_PATHS = frozenset("/v1/" + name for name in (
 BODY_LIMIT = 16384
 PENDING_TTL = 600
 SESSION_TTL = 4 * 3600
+BROWSER_TTL = 4 * 3600
+REMEMBERED_BROWSER_TTL = 30 * 24 * 3600
 POLL_INTERVAL = 3
 CALLBACK_FAILURE_STATUS = {
     "steam_assertion_invalid": 403,
@@ -259,6 +261,12 @@ class Service:
         self.db.execute("CREATE TABLE IF NOT EXISTS flow_results("
                         "state_hash TEXT PRIMARY KEY REFERENCES flows(state_hash) ON DELETE CASCADE,"
                         "outcome TEXT NOT NULL CHECK(outcome IN (" + allowed_results + ")))")
+        # Keep the deployed four-column browsers schema compatible with older
+        # releases. This table records an explicit browser-only preference;
+        # the authoritative expiry remains browsers.expires.
+        self.db.execute("CREATE TABLE IF NOT EXISTS browser_preferences("
+                        "sid_hash TEXT PRIMARY KEY REFERENCES browsers(sid_hash) ON DELETE CASCADE,"
+                        "remembered INTEGER NOT NULL CHECK(remembered=1))")
         self.db.commit()
 
     def close(self):
@@ -342,9 +350,34 @@ class Service:
                     return sid, row, False
             sid = secrets.token_urlsafe(32)
             csrf = self._derived("csrf:" + sid)
-            self.db.execute("INSERT INTO browsers VALUES(?,?,NULL,?)", (digest(sid), digest(csrf), now + SESSION_TTL))
+            self.db.execute("INSERT INTO browsers VALUES(?,?,NULL,?)", (digest(sid), digest(csrf), now + BROWSER_TTL))
             row = self.db.execute("SELECT * FROM browsers WHERE sid_hash=?", (digest(sid),)).fetchone()
             return sid, row, True
+
+    def browser_cookie_age(self, sid):
+        """Remaining browser lifetime, never the player grant lifetime."""
+        if not isinstance(sid, str) or not OPAQUE.fullmatch(sid):
+            raise AuthError("browser_session_invalid", 403)
+        now = int(self.clock())
+        with self.lock:
+            row = self.db.execute("SELECT expires FROM browsers WHERE sid_hash=? AND expires>?",
+                                  (digest(sid), now)).fetchone()
+            if row is None:
+                raise AuthError("browser_session_invalid", 403)
+            return row["expires"] - now
+
+    def _browser_form(self, sid, origin, csrf, now):
+        if origin != self.settings.origin:
+            raise AuthError("origin_rejected", 403)
+        if not isinstance(sid, str) or not OPAQUE.fullmatch(sid):
+            raise AuthError("browser_session_invalid", 403)
+        browser = self.db.execute("SELECT * FROM browsers WHERE sid_hash=? AND expires>?",
+                                  (digest(sid), now)).fetchone()
+        if browser is None:
+            raise AuthError("browser_session_invalid", 403)
+        if not isinstance(csrf, str) or not equal(digest(csrf), browser["csrf_hash"]):
+            raise AuthError("csrf_rejected", 403)
+        return browser
 
     def challenge(self, code):
         if not isinstance(code, str) or not USER_CODE.fullmatch(code):
@@ -455,21 +488,28 @@ class Service:
         self.rate("approve", peer, 30)
         if origin != self.settings.origin:
             raise AuthError("origin_rejected", 403)
-        if not isinstance(payload, dict) or set(payload) != {"code", "csrf"}:
+        if (not isinstance(payload, dict) or set(payload) not in ({"code", "csrf"}, {"code", "csrf", "remember"})
+                or "remember" in payload and payload["remember"] != "1"):
             raise AuthError("authorization_fields_invalid")
         if not isinstance(sid, str) or not OPAQUE.fullmatch(sid):
             raise AuthError("browser_session_invalid", 403)
         now = int(self.clock())
         with self.lock, self.db:
-            browser = self.db.execute("SELECT * FROM browsers WHERE sid_hash=? AND expires>?", (digest(sid), now)).fetchone()
-            if browser is None or not browser["steam"]:
+            browser = self._browser_form(sid, origin, payload.get("csrf"), now)
+            if not browser["steam"]:
                 raise AuthError("steam_login_required", 403)
-            csrf = payload.get("csrf")
-            if not isinstance(csrf, str) or not equal(digest(csrf), browser["csrf_hash"]):
-                raise AuthError("csrf_rejected", 403)
             row = self.challenge(payload.get("code"))
             if browser["steam"] != self.settings.accounts[row["account"]]:
                 raise AuthError("steam_account_mismatch", 403)
+            remembered = self.db.execute("SELECT 1 FROM browser_preferences WHERE sid_hash=?",
+                                         (digest(sid),)).fetchone() is not None
+            if payload.get("remember") == "1":
+                self.db.execute("INSERT OR IGNORE INTO browser_preferences VALUES(?,1)", (digest(sid),))
+                self.db.execute("UPDATE browsers SET expires=? WHERE sid_hash=?",
+                                (now + REMEMBERED_BROWSER_TTL, digest(sid)))
+            elif remembered:
+                self.db.execute("DELETE FROM browser_preferences WHERE sid_hash=?", (digest(sid),))
+                self.db.execute("UPDATE browsers SET expires=? WHERE sid_hash=?", (now + BROWSER_TTL, digest(sid)))
             if row["approved_at"] is None:
                 token = self._token(row["device_hash"])
                 # A new approval for this account revokes older local game grants.
@@ -478,6 +518,21 @@ class Service:
                 self.db.execute("UPDATE challenges SET approved_steam=?,approved_at=?,token_hash=?,token_expires=? WHERE device_hash=?",
                                 (browser["steam"], now, digest(token), now + SESSION_TTL, row["device_hash"]))
         return {"ok": True, "status": "approved"}
+
+    def logout(self, payload, sid, origin, peer):
+        self.rate("browser-logout", peer, 30)
+        if origin != self.settings.origin:
+            raise AuthError("origin_rejected", 403)
+        if not isinstance(payload, dict) or set(payload) != {"csrf"}:
+            raise AuthError("authorization_fields_invalid")
+        now = int(self.clock())
+        with self.lock, self.db:
+            self._browser_form(sid, origin, payload.get("csrf"), now)
+            # Already approved match grants keep their existing expiry/revocation
+            # policy; logout removes only this browser and its pending flows.
+            self.db.execute("DELETE FROM flows WHERE sid_hash=?", (digest(sid),))
+            self.db.execute("DELETE FROM browsers WHERE sid_hash=?", (digest(sid),))
+        return {"ok": True, "status": "signed_out"}
 
     def principal(self, bearer, payload):
         if not isinstance(bearer, str) or not re.fullmatch(r"pwa1_[a-f0-9]{64}", bearer):
@@ -534,10 +589,18 @@ class Service:
             if browser["steam"] != self.settings.accounts[row["account"]]:
                 text += "<p>当前 Steam 与游戏账号不一致，不能授权。请切换 Steam 账号后重新登录。</p>"
             else:
+                with self.lock:
+                    remembered = self.db.execute("SELECT 1 FROM browser_preferences WHERE sid_hash=?",
+                                                 (digest(sid),)).fetchone() is not None
                 text += ('<form method="post" action="' + escape(base + "/authorize", quote=True) + '">'
                          '<input type="hidden" name="code" value="' + code + '">'
                          '<input type="hidden" name="csrf" value="' + self._derived("csrf:" + sid) + '">'
+                         '<p><label><input type="checkbox" name="remember" value="1"' + (' checked' if remembered else '') + '>'
+                         '记住此浏览器30天（下次免 Steam 登录，每局仍须核对授权码并确认）</label></p>'
                          '<button type="submit">确认授权本次对局</button></form>')
+            text += ('<form method="post" action="' + escape(base + "/browser/logout", quote=True) + '">'
+                     '<input type="hidden" name="csrf" value="' + self._derived("csrf:" + sid) + '">'
+                     '<button type="submit">退出网页登录</button></form>')
         text += '<p><a href="' + escape(base + "/steam/login?" + urlencode({"code": code}), quote=True) + '">前往 Steam 官方登录</a></p>'
         document = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WS4 测试授权</title><body>' + text + "</body></html>"
         return sid, fresh, document.encode("utf-8")

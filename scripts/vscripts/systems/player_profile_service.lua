@@ -17,6 +17,7 @@ local player_by_account = {}
 local provider = nil
 local provider_id = nil
 local injected_provider = false
+local offline_logic_provider = false
 local active_rule = nil
 local load_generation_by_player = {}
 local pending_load_generation_by_player = {}
@@ -28,14 +29,14 @@ local pending_authentication_by_player = {}
 local daily_limit_views = {}
 
 local function active_session_id()
-    if injected_provider then return "injected_fixture" end
+    if injected_provider and not offline_logic_provider then return "injected_fixture" end
     local session = require("systems/match_setup_service").get_session_id()
     return type(session) == "string" and #session >= 8 and session or nil
 end
 
 local function selected_match()
     -- Offline tests explicitly inject a provider; live HTTP has no default mode.
-    if injected_provider then return "standard", "injected_fixture" end
+    if injected_provider and not offline_logic_provider then return "standard", "injected_fixture" end
     local setup = require("systems/match_setup_service")
     if not setup.is_mode_selected() then return nil, nil, "mode_not_selected" end
     local mode = type(setup.get_profile_mode) == "function"
@@ -48,7 +49,7 @@ local function selected_match()
 end
 
 local function matches_current_match(profile)
-    if injected_provider then return true end
+    if injected_provider and not offline_logic_provider then return true end
     local mode, session = selected_match()
     local game_mode = require("systems/match_setup_service").get_mode()
     return mode ~= nil and profile and profile.mode == mode and profile.match_session_id == session
@@ -567,7 +568,7 @@ function M.apply_snapshot(player_id, snapshot, reason)
     if not ok then
         return { ok = false, error = validation_error }
     end
-    if not injected_provider then
+    if not injected_provider or offline_logic_provider then
         if not validate_progression(snapshot.progression) then
             return { ok = false, error = "profile_progression_invalid" }
         end
@@ -1185,6 +1186,11 @@ function M.init(options)
     provider = nil
     provider_id = nil
     injected_provider = options and options.provider ~= nil or false
+    offline_logic_provider = options and options.offline_logic_test == true or false
+    if offline_logic_provider then
+        assert(require("debug/offline_logic_test").is_provider(options.provider),
+            "offline_logic_tools_required")
+    end
     if injected_provider then
         provider = options.provider
         provider_id = "injected"

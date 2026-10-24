@@ -132,7 +132,7 @@ class GuestPackageChecks(unittest.TestCase):
             folder=Path(temporary)
             def run():
                 return subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass',
-                    '-File',str(host.HERE/'launch_guest.ps1'),'-PackagePath',str(folder),'-CheckOnly'],
+                    '-File',str(host.HERE/'legacy/launch_guest.ps1'),'-PackagePath',str(folder),'-CheckOnly'],
                     capture_output=True,text=True,encoding='utf8',errors='replace',timeout=30)
             missing=run()
             self.assertEqual(missing.returncode,1)
