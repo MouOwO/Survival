@@ -16,10 +16,16 @@ Defaults:
   PLAYER_WEB_AUTH_PUBLIC_BASE=https://pay.xiaofengnet.com/ws4-web
   PLAYER_WEB_AUTH_UPSTREAM=http://127.0.0.1:18765
   ISOLATED_LOCAL_PROGRESS=0
+  PLAYER_WEB_AUTH_STEAM_TLS_RELAY=0
 
 The state directory must be private (0700 on Linux); SQLite is 0600.
 Reverse proxy /ws4-web/ to loopback 18767 and strip the prefix.
 Disable access/query logging on this prefix and preserve the original Origin.
+Only the successful authorization HTML page uses Referrer-Policy: same-origin,
+so native same-origin form POSTs retain their real Origin. Callback redirects,
+JSON, and all other responses keep no-referrer. Cross-origin navigation still
+receives no Referer. Missing, null, or foreign Origins remain rejected even with
+a valid Steam browser session and CSRF value.
 The service does not use forwarded headers for authentication or return URLs.
 Only the loopback proxy may supply one strictly valid X-Forwarded-For IP for
 per-peer rate limiting. The proxy must overwrite it with $remote_addr, never
@@ -49,3 +55,25 @@ It never enables real payment or leaderboard routes.
 No real Steam-login integration is simulated by the production entry point.
 Tests inject a verifier only into in-process test objects. Final end-to-end
 verification requires one of the four owners to log in on the official page.
+
+Callback diagnostics keep only a fixed result enum in a separate flow_results
+table, retaining the original six-column flows schema for compatible restarts.
+An original, still-valid browser replaying a failed consumed state receives the
+stored first failure without repeating verification or granting identity. Wrong
+cookies and expired states remain rejected; successful/legacy consumed flows
+return steam_callback_already_used. Network failures, non-200 responses, and
+malformed OpenID verification responses return steam_verification_unavailable;
+only a complete official is_valid:false response is an assertion rejection.
+No assertion, raw state, browser cookie, user identity, or exception text is
+stored with the result. This diagnostic behavior does not retry consumed flows.
+
+Optional temporary four-account connectivity test only:
+PLAYER_WEB_AUTH_STEAM_TLS_RELAY=1 changes only the Steam verification TCP socket
+destination to the fixed 127.0.0.1:18768 relay. The HTTPS client still uses the
+official steamcommunity.com Host, SNI, system certificate trust chain, hostname
+verification, and /openid/login POST path. TLS terminates at official Steam,
+not at the relay. Redirects and alternate proxy/host/port settings are forbidden.
+The default 0 keeps the original direct HTTPS connection. If the temporary relay
+runs through the owner's computer, that computer must remain online; this is not
+an uptime solution for release. Replace it with reliable server connectivity
+before a public launch. No user callback or assertion should be manually replayed.

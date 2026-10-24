@@ -5,17 +5,19 @@ import http.client
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import sqlite3
+import ssl
 from pathlib import Path
 import tempfile
 import threading
 import unittest
 from urllib.parse import parse_qs, urlencode, urlsplit
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from .http_api import BoundedServer, handler, strict_pairs
 from .run import settings_from_environment
 from .service import (AuthError, BODY_LIMIT, OPENID_NS, PENDING_TTL, SESSION_TTL,
-                      STEAM_ENDPOINT, Service, Settings, fixed_request, steam_check)
+                      STEAM_ENDPOINT, Service, Settings, SteamRelayConnection,
+                      digest, fixed_request, steam_check)
 
 
 STEAMS = ("76561198424163156", "76561198845461206", "76561198104787442", "76561198974301984")
@@ -108,8 +110,68 @@ class ServiceTest(unittest.TestCase):
         sid, fields = self.assertion(started)
         self.fail_code("steam_state_invalid", lambda: self.service.callback(fields, "x" * 43, "peer"))
         self.assertEqual(self.service.callback(fields, sid, "peer"), started["user_code"])
-        self.fail_code("steam_state_invalid", lambda: self.service.callback(fields, sid, "peer"))
+        self.fail_code("steam_callback_already_used", lambda: self.service.callback(fields, sid, "peer"))
         self.assertEqual(len(self.verifications), 1)
+
+    def test_failed_callback_replay_returns_first_cause_without_verifying_again(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        def reject(values):
+            self.verifications.append(values)
+            return False
+        self.service.verify_steam = reject
+        self.fail_code("steam_assertion_rejected", lambda: self.service.callback(fields, sid, "peer"))
+        self.fail_code("steam_assertion_rejected", lambda: self.service.callback(fields, sid, "peer"))
+        self.assertEqual(len(self.verifications), 1)
+        self.fail_code("steam_state_invalid", lambda: self.service.callback(fields, "x" * 43, "peer"))
+        self.now += PENDING_TTL
+        self.fail_code("steam_state_invalid", lambda: self.service.callback(fields, sid, "peer"))
+
+    def test_first_failure_survives_restart_without_creating_a_steam_identity(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        fields["openid.op_endpoint"] = "https://untrusted.invalid/"
+        self.fail_code("steam_assertion_invalid", lambda: self.service.callback(fields, sid, "peer"))
+        self.service.close()
+        self.service = self.build()
+        self.fail_code("steam_assertion_invalid", lambda: self.service.callback(fields, sid, "peer"))
+        self.assertFalse(self.verifications)
+        browser = self.service.db.execute("SELECT steam FROM browsers WHERE sid_hash=?", (digest(sid),)).fetchone()
+        self.assertIsNone(browser["steam"])
+        self.fail_code("steam_login_required", lambda: self.service.approve(
+            {"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid)}, sid, self.settings.origin, "peer"))
+
+    def test_callback_result_migration_keeps_legacy_six_field_inserts_valid(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        with self.service.db:
+            self.service.db.execute("UPDATE flows SET used=1 WHERE state_hash=?", (digest(fields["state"]),))
+            self.service.db.execute("DROP TABLE flow_results")
+        self.service.close()
+        self.service = self.build()
+        self.assertEqual(len(self.service.db.execute("PRAGMA table_info(flows)").fetchall()), 6)
+        with self.service.db:
+            self.service.db.execute("INSERT INTO flows VALUES(?,?,?,?,?,0)",
+                                    ("f" * 64, "b" * 64, "ABCDEFGH", "a" * 64, self.now + 600))
+        self.fail_code("steam_callback_already_used", lambda: self.service.callback(fields, sid, "peer"))
+        self.assertFalse(self.verifications)
+
+    def test_callback_diagnostics_are_fixed_enums_and_expired_browser_cannot_read_them(self):
+        started = self.start()
+        sid, fields = self.assertion(started)
+        private = "unexpected-private-assertion-and-exception"
+        def broken(_):
+            raise AuthError(private, 499)
+        self.service.verify_steam = broken
+        self.fail_code("steam_callback_failed", lambda: self.service.callback(fields, sid, "peer"))
+        stored = self.service.db.execute("SELECT outcome FROM flow_results").fetchall()
+        self.assertEqual([row["outcome"] for row in stored], ["steam_callback_failed"])
+        self.assertNotIn(private.encode(), self.settings.database.read_bytes())
+        with self.assertRaises(sqlite3.IntegrityError), self.service.db:
+            self.service.db.execute("UPDATE flow_results SET outcome=?", (private,))
+        with self.service.db:
+            self.service.db.execute("UPDATE browsers SET expires=? WHERE sid_hash=?", (self.now, digest(sid)))
+        self.fail_code("steam_state_invalid", lambda: self.service.callback(fields, sid, "peer"))
 
     def test_wrong_return_to_or_provider_never_reaches_steam_verifier(self):
         started = self.start()
@@ -258,7 +320,13 @@ class ServiceTest(unittest.TestCase):
             self.assertNotIn("state", outgoing)
         for body in (b"is_valid:true\n", b"ns:x\nis_valid:true\n", b"is_valid:true\nis_valid:false\n", b"garbage"):
             with patch("player_web_auth.service.fixed_request", return_value=(200, body)):
-                self.assertFalse(steam_check({"openid.mode": "id_res"}))
+                self.fail_code("steam_verification_unavailable", lambda: steam_check({"openid.mode": "id_res"}))
+        with patch("player_web_auth.service.fixed_request", return_value=(200, ("ns:" + OPENID_NS + "\nis_valid:false\n").encode())):
+            self.assertFalse(steam_check({"openid.mode": "id_res"}))
+        with patch("player_web_auth.service.fixed_request", return_value=(503, b"unavailable")):
+            self.fail_code("steam_verification_unavailable", lambda: steam_check({"openid.mode": "id_res"}))
+        with patch("player_web_auth.service.fixed_request", side_effect=AuthError("upstream_unavailable", 502)):
+            self.fail_code("steam_verification_unavailable", lambda: steam_check({"openid.mode": "id_res"}))
 
     def test_settings_fail_closed_on_nonisolated_routing_and_weak_secret(self):
         for fields in ({"upstream": "http://evil.invalid:18765"}, {"bind": "0.0.0.0"},
@@ -268,6 +336,27 @@ class ServiceTest(unittest.TestCase):
                 replace(self.settings, **fields).validate()
         with self.assertRaises(ValueError):
             settings_from_environment({"ISOLATED_LOCAL_PROGRESS": "true"})
+
+    def test_relay_setting_defaults_off_and_accepts_only_boolean_env_values(self):
+        env = {"PLAYER_WEB_AUTH_DATABASE": str(self.settings.database), "PLAYER_WEB_AUTH_SECRET": self.settings.secret,
+               "PLAYER_WEB_AUTH_UPSTREAM_BEARER": self.settings.upstream_bearer,
+               "PLAYER_WEB_AUTH_STEAM_IDS": ",".join(STEAMS)}
+        self.assertFalse(settings_from_environment(env).steam_tls_relay)
+        for value, expected in (("0", False), ("1", True)):
+            self.assertIs(settings_from_environment(dict(env, PLAYER_WEB_AUTH_STEAM_TLS_RELAY=value)).steam_tls_relay, expected)
+        for value in ("true", "yes", "", "127.0.0.1:18768", "2"):
+            with self.assertRaises(ValueError):
+                settings_from_environment(dict(env, PLAYER_WEB_AUTH_STEAM_TLS_RELAY=value))
+        with self.assertRaises(ValueError):
+            replace(self.settings, steam_tls_relay=1).validate()
+
+    def test_default_verifier_uses_only_configured_transport_and_keeps_injection(self):
+        for enabled in (False, True):
+            self.service.close()
+            self.service = Service(replace(self.settings, steam_tls_relay=enabled), clock=lambda: self.now)
+            with patch("player_web_auth.service.steam_check", return_value=False) as verifier:
+                self.assertFalse(self.service.verify_steam({"openid.mode": "id_res"}))
+                verifier.assert_called_once_with({"openid.mode": "id_res"}, tls_relay=enabled)
 
 
 class HttpTest(unittest.TestCase):
@@ -306,17 +395,56 @@ class HttpTest(unittest.TestCase):
         status, page, headers = self.request("GET", "/authorize?code=" + started["user_code"])
         self.assertEqual(status, 200)
         self.assertEqual(headers["Cache-Control"], "no-store")
-        self.assertEqual(headers["Referrer-Policy"], "no-referrer")
+        self.assertEqual(headers["Referrer-Policy"], "same-origin")
         self.assertIn("Secure; HttpOnly; SameSite=Lax", headers["Set-Cookie"])
         self.assertIn("frame-ancestors 'none'", headers["Content-Security-Policy"])
         self.assertNotIn(self.settings.secret.encode(), page)
         self.assertNotIn(started["device_code"].encode(), page)
+
+    def test_only_successful_authorization_page_changes_referrer_policy(self):
+        started = self.start()
+        for path in ("/health", "/route-does-not-exist", "/authorize?code=INVALID",
+                     "/steam/callback?state=" + "x" * 43, "/steam/login?code=" + started["user_code"]):
+            _, _, headers = self.request("GET", path)
+            self.assertEqual(headers["Referrer-Policy"], "no-referrer")
+        _, _, headers = self.request("POST", "/v1/profile", json.dumps(self.identity), {"Content-Type": "application/json"})
+        self.assertEqual(headers["Referrer-Policy"], "no-referrer")
+
+    def test_native_form_null_origin_is_rejected_even_with_valid_steam_and_csrf(self):
+        started = self.start()
+        sid, fields = ServiceTest.assertion(self, started)
+        self.service.callback(fields, sid, "peer")
+        form = urlencode({"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid)})
+        status, raw, headers = self.request("POST", "/authorize", form,
+                                             {"Content-Type": "application/x-www-form-urlencoded",
+                                              "Cookie": "ws4_browser=" + sid, "Origin": "null"})
+        self.assertEqual((status, json.loads(raw)["error"]), (403, "origin_rejected"))
+        self.assertEqual(headers["Referrer-Policy"], "no-referrer")
+        self.assertEqual(self.service.poll(dict(self.identity, device_code=started["device_code"]), "peer")["status"], "pending")
 
     def test_http_callback_rejects_invalid_state_without_exposing_query(self):
         status, body, _ = self.request("GET", "/steam/callback?state=" + "x" * 43 + "&openid.sig=private-signature")
         self.assertEqual(status, 403)
         self.assertNotIn(b"private-signature", body)
         self.assertNotIn(b"Traceback", body)
+
+    def test_http_steam_network_failure_is_replayed_as_safe_original_error(self):
+        started = self.start()
+        sid, fields = ServiceTest.assertion(self, started)
+        self.service.verify_steam = steam_check
+        cookie = {"Cookie": "ws4_browser=" + sid}
+        path = "/steam/callback?" + urlencode(fields)
+        with patch("player_web_auth.service.fixed_request", side_effect=AuthError("upstream_unavailable", 502)) as verifier:
+            for _ in range(2):
+                status, body, _ = self.request("GET", path, headers=cookie)
+                self.assertEqual((status, json.loads(body)), (502, {"ok": False, "error": "steam_verification_unavailable"}))
+                self.assertNotIn(fields["state"].encode(), body)
+                self.assertNotIn(fields["openid.sig"].encode(), body)
+            self.assertEqual(verifier.call_count, 1)
+        with self.service.db:
+            self.service.db.execute("UPDATE browsers SET expires=? WHERE sid_hash=?", (self.now, digest(sid)))
+        status, body, _ = self.request("GET", path, headers=cookie)
+        self.assertEqual((status, json.loads(body)["error"]), (403, "steam_state_invalid"))
 
     def test_http_health_and_no_auth_proxy(self):
         status, body, _ = self.request("GET", "/health")
@@ -376,7 +504,9 @@ class HttpTest(unittest.TestCase):
                   "openid.response_nonce": datetime.fromtimestamp(self.now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ") + "http-flow",
                   "openid.assoc_handle": "association", "openid.sig": "test-signature",
                   "openid.signed": "op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle"}
-        self.assertEqual(self.request("GET", "/steam/callback?" + urlencode(fields), headers={"Cookie": cookie})[0], 303)
+        status, _, callback_headers = self.request("GET", "/steam/callback?" + urlencode(fields), headers={"Cookie": cookie})
+        self.assertEqual(status, 303)
+        self.assertEqual(callback_headers["Referrer-Policy"], "no-referrer")
         sid = cookie.split("=", 1)[1]
         status, _, _ = self.request("POST", "/authorize",
                                    urlencode({"code": started["user_code"], "csrf": self.service._derived("csrf:" + sid)}),
@@ -425,6 +555,63 @@ class FixedNetworkTest(unittest.TestCase):
             server.shutdown()
             server.server_close()
             thread.join()
+
+
+class SteamRelayTest(unittest.TestCase):
+    def test_loopback_socket_keeps_official_tls_sni_and_certificate_checks(self):
+        connection = SteamRelayConnection()
+        self.assertEqual((connection.host, connection.port, connection.timeout), ("steamcommunity.com", 443, 15))
+        self.assertTrue(connection._context.check_hostname)
+        self.assertEqual(connection._context.verify_mode, ssl.CERT_REQUIRED)
+        raw, encrypted = MagicMock(), MagicMock()
+        with patch("player_web_auth.service.socket.create_connection", return_value=raw) as tcp:
+            with patch.object(ssl.SSLContext, "wrap_socket", return_value=encrypted) as tls:
+                connection.connect()
+                tcp.assert_called_once_with(("127.0.0.1", 18768), timeout=15, source_address=None)
+                self.assertEqual(tls.call_args.kwargs["server_hostname"], "steamcommunity.com")
+                self.assertIs(connection.sock, encrypted)
+        connection.close()
+        with self.assertRaises(ValueError):
+            connection.set_tunnel("untrusted.invalid", 443)
+        with self.assertRaises(AuthError):
+            connection._relay_socket(("untrusted.invalid", 443), 15)
+        with self.assertRaises(TypeError):
+            SteamRelayConnection("untrusted.invalid")
+
+    def test_relay_posts_only_fixed_official_path_host_and_bounded_response(self):
+        connection = MagicMock()
+        response = connection.getresponse.return_value
+        response.status = 200
+        response.read.return_value = ("ns:" + OPENID_NS + "\nis_valid:false\n").encode()
+        with patch("player_web_auth.service.SteamRelayConnection", return_value=connection):
+            with patch("player_web_auth.service.fixed_request") as direct:
+                self.assertFalse(steam_check({"openid.mode": "id_res", "state": "not-forwarded"}, tls_relay=True))
+                direct.assert_not_called()
+        args, kwargs = connection.request.call_args
+        self.assertEqual(args, ("POST", "/openid/login"))
+        self.assertEqual(kwargs["headers"]["Host"], "steamcommunity.com")
+        self.assertEqual(parse_qs(kwargs["body"].decode())["openid.mode"], ["check_authentication"])
+        self.assertNotIn(b"not-forwarded", kwargs["body"])
+        response.read.assert_called_once_with(8193)
+        response.close.assert_called_once()
+        connection.close.assert_called_once()
+
+    def test_relay_redirect_oversize_and_tls_failures_are_closed(self):
+        for status, body, failure in ((302, b"redirect", None), (200, b"x" * 8193, None),
+                                       (200, b"", ssl.SSLCertVerificationError("private certificate detail")),
+                                       (200, b"", OSError("private socket detail"))):
+            connection = MagicMock()
+            connection.getresponse.return_value.status = status
+            connection.getresponse.return_value.read.return_value = body
+            if failure is not None:
+                connection.request.side_effect = failure
+            with patch("player_web_auth.service.SteamRelayConnection", return_value=connection):
+                with self.assertRaises(AuthError) as caught:
+                    steam_check({"openid.mode": "id_res"}, tls_relay=True)
+                self.assertEqual((caught.exception.code, caught.exception.status), ("steam_verification_unavailable", 502))
+            connection.close.assert_called_once()
+            self.assertEqual(connection.request.call_count, 1)
+            self.assertEqual(connection.getresponse.call_count, 0 if failure else 1)
 
 
 if __name__ == "__main__":

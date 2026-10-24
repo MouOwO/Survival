@@ -33,6 +33,7 @@ SERVICES = ('goufayu-api.service', 'goufayu-payment.service', 'goufayu-db.servic
             'goufayu-ws4.service', 'goufayu-ws4-db.service')
 SHA256 = re.compile(r'[a-f0-9]{64}\Z')
 FIXED_CODE = re.compile(r'[a-z][a-z0-9_]{1,95}\Z')
+STEAM_TLS_RELAY = globals().get('STEAM_TLS_RELAY')
 sha = lambda raw: hashlib.sha256(raw).hexdigest()
 
 
@@ -58,6 +59,15 @@ class ActivationFailure(RuntimeError):
         if health_error is not None:
             self.summary['loopback_health_error'] = failure_code(health_error)
         super().__init__('web_activation_failed')
+
+
+class ConfigurationFailure(RuntimeError):
+    def __init__(self, error, restored, restore_error=None):
+        self.summary = {'ok': False, 'phase': 'WEB_AUTH_TRANSPORT_CONFIGURATION_FAILED',
+                        'error': failure_code(error), 'configuration_restored': restored}
+        if restore_error is not None:
+            self.summary['restore_error'] = failure_code(restore_error)
+        super().__init__('web_transport_configuration_failed')
 
 
 def need(value, code):
@@ -333,6 +343,7 @@ def prepare():
         'PLAYER_WEB_AUTH_PUBLIC_BASE': PUBLIC_BASE, 'PLAYER_WEB_AUTH_UPSTREAM': 'http://127.0.0.1:18765',
         'PLAYER_WEB_AUTH_UPSTREAM_BEARER': bearer, 'PLAYER_WEB_AUTH_SECRET': secrets.token_hex(32),
         'PLAYER_WEB_AUTH_DATABASE': str(STATE / 'auth.sqlite3'), 'PLAYER_WEB_AUTH_STEAM_IDS': steam_ids,
+        'PLAYER_WEB_AUTH_STEAM_TLS_RELAY': '0',
         'ISOLATED_LOCAL_PROGRESS': '1', 'PYTHONDONTWRITEBYTECODE': '1', 'PYTHONUNBUFFERED': '1'}
     private(CONFIG / 'auth.env', ''.join(k + '=' + json.dumps(v) + '\n' for k, v in env.items()).encode(),
             gid=user.pw_gid, mode=0o640)
@@ -496,6 +507,78 @@ def activation_ready(plan):
         need(sock.connect_ex(('127.0.0.1', 18767)) != 0, 'web_port_occupied')
 
 
+def transport_environment(raw, relay):
+    """Change precisely one env assignment, preserving all other bytes/values."""
+    need(isinstance(relay, str) and relay in ('0', '1'), 'explicit_steam_tls_relay_required')
+    key = 'PLAYER_WEB_AUTH_STEAM_TLS_RELAY'
+    values = parse_env(raw)
+    current = values.get(key, '0')
+    need(current in ('0', '1'), 'existing_steam_tls_relay_invalid')
+    prefix = (key + '=').encode('ascii')
+    lines = raw.splitlines(keepends=True)
+    indices = [index for index, line in enumerate(lines) if line.startswith(prefix)]
+    need(len(indices) <= 1, 'duplicate_transport_environment_key')
+    if relay == current:
+        return raw, False
+    replacement = prefix + json.dumps(relay).encode('ascii')
+    if indices:
+        index = indices[0]
+        ending = b'\r\n' if lines[index].endswith(b'\r\n') else b'\n' if lines[index].endswith(b'\n') else b''
+        lines[index] = replacement + ending
+        return b''.join(lines), True
+    separator = b'' if not raw or raw.endswith(b'\n') else b'\n'
+    return raw + separator + replacement + b'\n', True
+
+
+def transport_environment_permissions(path, group):
+    metadata = path.stat()
+    need(metadata.st_uid == 0 and metadata.st_gid == group and stat.S_IMODE(metadata.st_mode) == 0o640,
+         'transport_environment_permissions_invalid')
+
+
+def configure_transport():
+    """Explicit stopped-candidate transport change; never starts a relay/service."""
+    import pwd
+    need(isinstance(STEAM_TLS_RELAY, str) and STEAM_TLS_RELAY in ('0', '1'),
+         'explicit_steam_tls_relay_required')
+    plan = prepared()
+    unchanged()
+    need((OPS / 'activation.json').is_file() and (OPS / 'rolled-back.json').is_file(),
+         'successful_rollback_required_before_transport_change')
+    activation_ready(plan)
+    environment = CONFIG / 'auth.env'
+    before_env = regular(environment)
+    need(sha(before_env) == plan['env_sha256'], 'prepared_environment_changed')
+    group = pwd.getpwnam(USER).pw_gid
+    transport_environment_permissions(environment, group)
+    after_env, changed = transport_environment(before_env, STEAM_TLS_RELAY)
+    if not changed:
+        return {'ok': True, 'phase': 'WEB_AUTH_TRANSPORT_UNCHANGED', 'candidate_updated': False,
+                'steam_tls_relay': STEAM_TLS_RELAY == '1', 'keys_and_state_preserved': True,
+                'existing_services_unchanged': True, 'public_enabled': False}
+    before_plan = regular(OPS / 'prepared.json')
+    backup = OPS / ('env-before-transport-' + secrets.token_hex(8))
+    backup.mkdir(mode=0o700)
+    private(backup / 'auth.env', before_env)
+    private(backup / 'prepared.json', before_plan)
+    try:
+        replace(environment, after_env, gid=group, mode=0o640)
+        record('prepared.json', {**plan, 'env_sha256': sha(after_env)})
+        final_plan = prepared()
+        unchanged()
+        activation_ready(final_plan)
+    except Exception as error:
+        try:
+            replace(environment, before_env, gid=group, mode=0o640)
+            replace(OPS / 'prepared.json', before_plan)
+        except Exception as restore_error:
+            raise ConfigurationFailure(error, False, restore_error) from None
+        raise ConfigurationFailure(error, True) from None
+    return {'ok': True, 'phase': 'WEB_AUTH_TRANSPORT_CONFIGURED_NOT_STARTED', 'candidate_updated': True,
+            'steam_tls_relay': STEAM_TLS_RELAY == '1', 'keys_and_state_preserved': True,
+            'private_backup_preserved': True, 'existing_services_unchanged': True, 'public_enabled': False}
+
+
 def activate():
     import pwd
     plan = prepared()
@@ -585,10 +668,12 @@ def audit():
 
 def main(mode):
     try:
-        need(mode in ('audit', 'prepare', 'activate', 'verify', 'rollback'), 'unknown_mode')
-        result = globals()[mode]()
+        actions = {'audit': audit, 'prepare': prepare, 'configure-transport': configure_transport,
+                   'activate': activate, 'verify': verify, 'rollback': rollback}
+        need(mode in actions, 'unknown_mode')
+        result = actions[mode]()
     except Exception as error:
-        result = error.summary if isinstance(error, ActivationFailure) else {
+        result = error.summary if isinstance(error, (ActivationFailure, ConfigurationFailure)) else {
             'ok': False, 'phase': 'WEB_AUTH_ACTION_FAILED', 'error': failure_code(error)}
         print(json.dumps(result, sort_keys=True))
         raise SystemExit(1) from None

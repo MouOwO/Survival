@@ -10,6 +10,9 @@ def settings_from_environment(env):
     progress = env.get("ISOLATED_LOCAL_PROGRESS", "0")
     if progress not in ("0", "1"):
         raise ValueError("isolated_local_progress_invalid")
+    relay = env.get("PLAYER_WEB_AUTH_STEAM_TLS_RELAY", "0")
+    if relay not in ("0", "1"):
+        raise ValueError("steam_tls_relay_invalid")
     return Settings(
         database=Path(env["PLAYER_WEB_AUTH_DATABASE"]),
         secret=env["PLAYER_WEB_AUTH_SECRET"],
@@ -19,7 +22,8 @@ def settings_from_environment(env):
         upstream=env.get("PLAYER_WEB_AUTH_UPSTREAM", "http://127.0.0.1:18765"),
         bind=env.get("PLAYER_WEB_AUTH_BIND", "127.0.0.1"),
         port=int(env.get("PLAYER_WEB_AUTH_PORT", "18767")),
-        isolated_local_progress=progress == "1")
+        isolated_local_progress=progress == "1",
+        steam_tls_relay=relay == "1")
 
 
 def main():

@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-MODES = ("audit", "prepare", "activate", "verify", "rollback")
+MODES = ("audit", "prepare", "configure-transport", "activate", "verify", "rollback")
 
 
 def overlay():
@@ -29,15 +29,27 @@ def overlay():
     return result
 
 
-def main():
+def arguments(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=MODES)
-    args = parser.parse_args()
+    parser.add_argument("--steam-tls-relay", choices=("0", "1"),
+                        help="Explicit transport setting; accepted only by configure-transport after rollback")
+    args = parser.parse_args(argv)
+    if args.mode == "configure-transport" and args.steam_tls_relay is None:
+        parser.error("configure-transport requires --steam-tls-relay 0 or 1")
+    if args.mode != "configure-transport" and args.steam_tls_relay is not None:
+        parser.error("--steam-tls-relay is accepted only by configure-transport")
+    return args
+
+
+def main():
+    args = arguments()
     spec = importlib.util.spec_from_file_location(
         "ws4_web_pinned_transport", ROOT / "tools/archive_caps_20261020/remote_driver.py")
     transport = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(transport)
     source = "MODE=" + repr(args.mode) + "\nOVERLAY=" + repr(overlay() if args.mode == "prepare" else {}) + "\n"
+    source += "STEAM_TLS_RELAY=" + repr(args.steam_tls_relay) + "\n"
     source += Path(__file__).with_name("remote_web_auth.py").read_text(encoding="utf-8")
     output = transport.remote(source, timeout=180)
     # The operator emits a fixed public summary, never HTTP bodies or env files.

@@ -1,6 +1,6 @@
 """Deployment boundary checks; no SSH, network, services or databases touched."""
 import base64
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, redirect_stderr
 import io
 import json
 from pathlib import Path
@@ -239,6 +239,134 @@ server { listen 443 ssl; server_name pay.xiaofengnet.com;
                     operator.refresh_prepared()
             replace.assert_not_called()
             private.assert_not_called()
+
+    def test_relay_setting_is_explicit_and_not_accepted_by_other_commands(self):
+        for mode in ('audit', 'prepare', 'activate', 'verify', 'rollback'):
+            self.assertIsNone(driver.arguments([mode]).steam_tls_relay)
+            with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                driver.arguments([mode, '--steam-tls-relay', '1'])
+        for value in ('0', '1'):
+            self.assertEqual(driver.arguments(['configure-transport', '--steam-tls-relay', value]).steam_tls_relay, value)
+        for arguments in (['configure-transport'], ['configure-transport', '--steam-tls-relay', 'true']):
+            with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                driver.arguments(arguments)
+
+    def test_transport_environment_changes_only_one_assignment(self):
+        raw = (b'PLAYER_WEB_AUTH_SECRET="retained-secret-test"\r\n'
+               b'PLAYER_WEB_AUTH_UPSTREAM_BEARER="retained-upstream-test"\r\n'
+               b'PLAYER_WEB_AUTH_STEAM_TLS_RELAY="0"\r\nPYTHONUNBUFFERED="1"\r\n')
+        result, changed = operator.transport_environment(raw, '1')
+        self.assertTrue(changed)
+        self.assertEqual(result, raw.replace(b'PLAYER_WEB_AUTH_STEAM_TLS_RELAY="0"',
+                                            b'PLAYER_WEB_AUTH_STEAM_TLS_RELAY="1"'))
+        self.assertEqual(operator.transport_environment(result, '1'), (result, False))
+        original = b'PLAYER_WEB_AUTH_SECRET="retained-secret-test"'
+        self.assertEqual(operator.transport_environment(original, '0'), (original, False))
+        appended, changed = operator.transport_environment(original, '1')
+        self.assertEqual(appended, original + b'\nPLAYER_WEB_AUTH_STEAM_TLS_RELAY="1"\n')
+        self.assertTrue(changed)
+
+    def test_transport_environment_rejects_duplicates_invalid_existing_or_nonexplicit_input(self):
+        cases = ((b'PLAYER_WEB_AUTH_STEAM_TLS_RELAY="0"\nPLAYER_WEB_AUTH_STEAM_TLS_RELAY="0"\n', '1'),
+                 (b'PLAYER_WEB_AUTH_STEAM_TLS_RELAY="yes"\n', '1'), (b'', None), (b'', True), (b'', '2'))
+        for raw, setting in cases:
+            with self.assertRaises(RuntimeError):
+                operator.transport_environment(raw, setting)
+
+    def test_transport_configuration_requires_successful_rollback_before_any_write(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            with patch.dict(sys.modules, {'pwd': SimpleNamespace()}), patch.object(operator, 'OPS', Path(temporary)), \
+                 patch.object(operator, 'STEAM_TLS_RELAY', '1'), patch.object(operator, 'prepared', return_value={}), \
+                 patch.object(operator, 'unchanged'), patch.object(operator, 'activation_ready') as ready, \
+                 patch.object(operator, 'replace') as replace, patch.object(operator, 'private') as private:
+                with self.assertRaisesRegex(RuntimeError, 'successful_rollback_required_before_transport_change'):
+                    operator.configure_transport()
+            ready.assert_not_called()
+            replace.assert_not_called()
+            private.assert_not_called()
+
+    def test_transport_environment_requires_private_root_group_permissions(self):
+        for mode, uid, gid, valid in ((0o100640, 0, 123, True), (0o100644, 0, 123, False),
+                                      (0o100640, 456, 123, False), (0o100640, 0, 456, False)):
+            path = SimpleNamespace(stat=lambda: SimpleNamespace(st_mode=mode, st_uid=uid, st_gid=gid))
+            if valid:
+                operator.transport_environment_permissions(path, 123)
+            else:
+                with self.assertRaisesRegex(RuntimeError, 'transport_environment_permissions_invalid'):
+                    operator.transport_environment_permissions(path, 123)
+
+    def transport_candidate(self, *, fail_after_write=False, requested='1'):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        ops, config = root/'ops', root/'config'
+        ops.mkdir();config.mkdir()
+        before_env = b'PLAYER_WEB_AUTH_SECRET="retained-secret-test"\nPLAYER_WEB_AUTH_UPSTREAM_BEARER="retained-upstream-test"\n'
+        (config/'auth.env').write_bytes(before_env)
+        state = root/'auth.sqlite3'
+        state.write_bytes(b'private-state-preserved')
+        plan = {'env_sha256': operator.sha(before_env), 'files': {'player_web_auth/run.py': 'a'*64}}
+        before_plan = json.dumps(plan).encode()
+        (ops/'prepared.json').write_bytes(before_plan)
+        (ops/'activation.json').write_text('{}')
+        (ops/'rolled-back.json').write_text('{"ok":true}')
+        count = [0]
+        def check_prepared():
+            count[0] += 1
+            if fail_after_write and count[0] > 1:
+                raise RuntimeError('prepared_source_changed')
+            current = json.loads((ops/'prepared.json').read_bytes())
+            self.assertEqual(current['env_sha256'], operator.sha((config/'auth.env').read_bytes()))
+            return current
+        def local_write(path, raw, **kwargs):
+            path.write_bytes(raw)
+        fake_pwd = SimpleNamespace(getpwnam=lambda name: SimpleNamespace(pw_gid=123))
+        with patch.dict(sys.modules, {'pwd': fake_pwd}), patch.object(operator, 'OPS', ops), \
+             patch.object(operator, 'CONFIG', config), patch.object(operator, 'STEAM_TLS_RELAY', requested), \
+             patch.object(operator, 'prepared', side_effect=check_prepared), patch.object(operator, 'unchanged'), \
+             patch.object(operator, 'transport_environment_permissions'), patch.object(operator, 'activation_ready') as ready, \
+             patch.object(operator, 'private', side_effect=local_write), patch.object(operator, 'replace', side_effect=local_write) as replace, \
+             patch.object(operator, 'run') as run:
+            if fail_after_write:
+                with self.assertRaises(operator.ConfigurationFailure) as caught:
+                    operator.configure_transport()
+                self.assertTrue(caught.exception.summary['configuration_restored'])
+                result = caught.exception.summary
+            else:
+                result = operator.configure_transport()
+        self.assertEqual(state.read_bytes(), b'private-state-preserved')
+        run.assert_not_called()
+        return ops, config, before_env, before_plan, result, replace.call_count, ready.call_count
+
+    def test_transport_configuration_preserves_secrets_state_and_private_backup(self):
+        ops, config, before_env, before_plan, result, writes, guards = self.transport_candidate()
+        self.assertEqual(result['phase'], 'WEB_AUTH_TRANSPORT_CONFIGURED_NOT_STARTED')
+        self.assertTrue(result['steam_tls_relay'])
+        self.assertEqual((config/'auth.env').read_bytes(), before_env + b'PLAYER_WEB_AUTH_STEAM_TLS_RELAY="1"\n')
+        backups = list(ops.glob('env-before-transport-*'))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual((backups[0]/'auth.env').read_bytes(), before_env)
+        self.assertEqual((backups[0]/'prepared.json').read_bytes(), before_plan)
+        self.assertEqual(guards, 2)
+        self.assertEqual(writes, 2)
+        self.assertNotIn('retained-secret-test', json.dumps(result))
+
+    def test_transport_configuration_restores_both_files_after_failed_verification(self):
+        ops, config, before_env, before_plan, result, writes, guards = self.transport_candidate(fail_after_write=True)
+        self.assertEqual((config/'auth.env').read_bytes(), before_env)
+        self.assertEqual((ops/'prepared.json').read_bytes(), before_plan)
+        self.assertEqual(result['error'], 'prepared_source_changed')
+        self.assertTrue(result['configuration_restored'])
+        self.assertEqual(writes, 4)
+
+    def test_default_direct_transport_noop_writes_nothing(self):
+        ops, config, before_env, before_plan, result, writes, guards = self.transport_candidate(requested='0')
+        self.assertEqual(result['phase'], 'WEB_AUTH_TRANSPORT_UNCHANGED')
+        self.assertFalse(result['steam_tls_relay'])
+        self.assertEqual(writes, 0)
+        self.assertEqual(list(ops.glob('env-before-transport-*')), [])
+        self.assertEqual((config/'auth.env').read_bytes(), before_env)
+        self.assertEqual((ops/'prepared.json').read_bytes(), before_plan)
 
 
 if __name__ == '__main__':

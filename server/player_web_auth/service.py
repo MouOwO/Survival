@@ -10,11 +10,14 @@ from datetime import datetime, timezone
 import hashlib
 import hmac
 import html
+import http.client
 import json
 import os
 from pathlib import Path
 import re
 import secrets
+import socket
+import ssl
 import sqlite3
 import stat
 import threading
@@ -26,6 +29,9 @@ import urllib.request
 
 STEAM_BASE = 76561197960265728
 STEAM_ENDPOINT = "https://steamcommunity.com/openid/login"
+STEAM_HOST = "steamcommunity.com"
+STEAM_PATH = "/openid/login"
+STEAM_RELAY_ADDRESS = ("127.0.0.1", 18768)
 OPENID_NS = "http://specs.openid.net/auth/2.0"
 IDENTIFIER_SELECT = OPENID_NS + "/identifier_select"
 SESSION = re.compile(r"[A-Za-z0-9_:.-]{8,200}\Z")
@@ -40,6 +46,20 @@ BODY_LIMIT = 16384
 PENDING_TTL = 600
 SESSION_TTL = 4 * 3600
 POLL_INTERVAL = 3
+CALLBACK_FAILURE_STATUS = {
+    "steam_assertion_invalid": 403,
+    "steam_identity_invalid": 403,
+    "test_account_not_allowed": 403,
+    "steam_nonce_invalid": 403,
+    "steam_nonce_expired": 403,
+    "steam_nonce_replayed": 403,
+    "steam_assertion_rejected": 403,
+    "steam_verification_unavailable": 502,
+    "steam_callback_failed": 503,
+}
+CALLBACK_PROCESSING = "steam_callback_processing"
+CALLBACK_SUCCEEDED = "steam_callback_succeeded"
+CALLBACK_RESULTS = frozenset((*CALLBACK_FAILURE_STATUS, CALLBACK_PROCESSING, CALLBACK_SUCCEEDED))
 
 
 class AuthError(Exception):
@@ -67,8 +87,11 @@ class Settings:
     bind: str = "127.0.0.1"
     port: int = 18767
     isolated_local_progress: bool = False
+    steam_tls_relay: bool = False
 
     def validate(self):
+        if type(self.steam_tls_relay) is not bool:
+            raise ValueError("steam_tls_relay_invalid")
         public = urlsplit(self.public_base)
         if (public.scheme != "https" or not public.hostname or public.username or public.password
                 or public.query or public.fragment or public.path != "/ws4-web"
@@ -119,25 +142,78 @@ def fixed_request(url, body, headers, limit, timeout=15):
     return status, result
 
 
-def steam_check(fields):
+class SteamRelayConnection(http.client.HTTPSConnection):
+    """Change only the TCP destination; official TLS host/SNI remain unchanged."""
+    def __init__(self):
+        context = ssl.create_default_context()
+        context.verify_mode = ssl.CERT_REQUIRED
+        context.check_hostname = True
+        super().__init__(STEAM_HOST, port=443, timeout=15, context=context)
+        self._create_connection = self._relay_socket
+
+    @staticmethod
+    def _relay_socket(address, timeout, source_address=None):
+        if address != (STEAM_HOST, 443) or source_address is not None:
+            raise AuthError("steam_verification_unavailable", 502)
+        return socket.create_connection(STEAM_RELAY_ADDRESS, timeout=timeout, source_address=None)
+
+    def set_tunnel(self, *args, **kwargs):
+        raise ValueError("steam_tls_relay_tunnel_forbidden")
+
+
+def steam_relay_request(body):
+    """The relay sees encrypted TCP only; no alternate URL, Host, or redirect."""
+    connection = None
+    try:
+        connection = SteamRelayConnection()
+        connection.request("POST", STEAM_PATH, body=body,
+                           headers={"Host": STEAM_HOST, "Content-Type": "application/x-www-form-urlencoded",
+                                    "Connection": "close"})
+        response = connection.getresponse()
+        try:
+            raw = response.read(8193)
+            if len(raw) > 8192:
+                raise AuthError("steam_verification_unavailable", 502)
+            return response.status, raw
+        finally:
+            response.close()
+    except (OSError, ValueError, http.client.HTTPException):
+        raise AuthError("steam_verification_unavailable", 502) from None
+    finally:
+        if connection is not None:
+            connection.close()
+
+
+def steam_check(fields, *, tls_relay=False):
     outgoing = {key: value for key, value in fields.items() if key.startswith("openid.")}
     outgoing["openid.mode"] = "check_authentication"
-    status, raw = fixed_request(STEAM_ENDPOINT, urlencode(outgoing).encode("ascii"),
-                                {"Content-Type": "application/x-www-form-urlencoded"}, 8192)
+    try:
+        encoded = urlencode(outgoing).encode("ascii")
+        if tls_relay:
+            status, raw = steam_relay_request(encoded)
+        else:
+            status, raw = fixed_request(STEAM_ENDPOINT, encoded,
+                                        {"Content-Type": "application/x-www-form-urlencoded"}, 8192)
+    except AuthError:
+        raise AuthError("steam_verification_unavailable", 502) from None
     try:
         pairs = [line.split(":", 1) for line in raw.decode("utf-8").splitlines() if line]
         if any(len(pair) != 2 for pair in pairs) or len({pair[0] for pair in pairs}) != len(pairs):
-            return False
+            raise ValueError()
         response = dict(pairs)
-        return status == 200 and response.get("is_valid") == "true" and response.get("ns") == OPENID_NS
+        if status != 200 or response.get("ns") != OPENID_NS or response.get("is_valid") not in ("true", "false"):
+            raise ValueError()
+        return response["is_valid"] == "true"
     except (ValueError, UnicodeError):
-        return False
+        raise AuthError("steam_verification_unavailable", 502) from None
 
 
 class Service:
-    def __init__(self, settings, *, clock=time.time, verify_steam=steam_check, forward=None):
+    def __init__(self, settings, *, clock=time.time, verify_steam=None, forward=None):
         settings.validate()
-        self.settings, self.clock, self.verify_steam = settings, clock, verify_steam
+        self.settings, self.clock = settings, clock
+        self.verify_steam = verify_steam if verify_steam is not None else (
+            lambda fields: steam_check(fields, tls_relay=settings.steam_tls_relay))
         self.forward = forward or self._forward
         self.lock = threading.RLock()
         target = settings.database
@@ -177,6 +253,12 @@ class Service:
                 key TEXT NOT NULL, bucket INTEGER NOT NULL, count INTEGER NOT NULL,
                 PRIMARY KEY(key,bucket));
         """)
+        # A separate additive table preserves existing six-column flows and old
+        # INSERT statements during restart/rollback. Never store assertion text.
+        allowed_results = ",".join("'" + code + "'" for code in sorted(CALLBACK_RESULTS))
+        self.db.execute("CREATE TABLE IF NOT EXISTS flow_results("
+                        "state_hash TEXT PRIMARY KEY REFERENCES flows(state_hash) ON DELETE CASCADE,"
+                        "outcome TEXT NOT NULL CHECK(outcome IN (" + allowed_results + ")))")
         self.db.commit()
 
     def close(self):
@@ -297,10 +379,37 @@ class Service:
         with self.lock, self.db:
             flow = self.db.execute("SELECT * FROM flows WHERE state_hash=?", (digest(state),)).fetchone()
             browser = self.db.execute("SELECT * FROM browsers WHERE sid_hash=? AND expires>?", (digest(sid), now)).fetchone()
-            if (flow is None or browser is None or flow["used"] or flow["expires"] <= now
+            if (flow is None or browser is None or flow["expires"] <= now
                     or not equal(flow["sid_hash"], digest(sid))):
                 raise AuthError("steam_state_invalid", 403)
+            if flow["used"]:
+                recorded = self.db.execute("SELECT outcome FROM flow_results WHERE state_hash=?", (digest(state),)).fetchone()
+                outcome = recorded["outcome"] if recorded else None
+                if outcome in CALLBACK_FAILURE_STATUS:
+                    raise AuthError(outcome, CALLBACK_FAILURE_STATUS[outcome])
+                raise AuthError("steam_callback_already_used", 403)
             self.db.execute("UPDATE flows SET used=1 WHERE state_hash=?", (digest(state),))
+            self.db.execute("INSERT INTO flow_results VALUES(?,?)", (digest(state), CALLBACK_PROCESSING))
+        try:
+            return self._verify_callback(fields, sid, flow, now)
+        except AuthError as error:
+            code = error.code if error.code in CALLBACK_FAILURE_STATUS else "steam_callback_failed"
+            self._callback_failure(digest(state), code)
+            raise AuthError(code, CALLBACK_FAILURE_STATUS[code]) from None
+        except sqlite3.Error:
+            raise
+        except Exception:
+            self._callback_failure(digest(state), "steam_callback_failed")
+            raise AuthError("steam_callback_failed", 503) from None
+
+    def _callback_failure(self, state_hash, outcome):
+        if outcome not in CALLBACK_FAILURE_STATUS:
+            outcome = "steam_callback_failed"
+        with self.lock, self.db:
+            self.db.execute("UPDATE flow_results SET outcome=? WHERE state_hash=? AND outcome=?",
+                            (outcome, state_hash, CALLBACK_PROCESSING))
+
+    def _verify_callback(self, fields, sid, flow, now):
         required = {"op_endpoint", "claimed_id", "identity", "return_to", "response_nonce", "assoc_handle"}
         signed = fields.get("openid.signed", "").split(",")
         if (fields.get("openid.ns") != OPENID_NS or fields.get("openid.mode") != "id_res"
@@ -336,6 +445,8 @@ class Service:
             with self.lock, self.db:
                 self.db.execute("INSERT INTO nonces VALUES(?,?)", (digest(nonce), now + 600))
                 self.db.execute("UPDATE browsers SET steam=? WHERE sid_hash=?", (steam, digest(sid)))
+                self.db.execute("UPDATE flow_results SET outcome=? WHERE state_hash=? AND outcome=?",
+                                (CALLBACK_SUCCEEDED, flow["state_hash"], CALLBACK_PROCESSING))
         except sqlite3.IntegrityError:
             raise AuthError("steam_nonce_replayed", 403) from None
         return flow["user_code"]

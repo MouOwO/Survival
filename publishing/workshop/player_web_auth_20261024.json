@@ -12,7 +12,11 @@
     "four_account_only": true,
     "isolated_database": "goufayu_ws4",
     "real_payment_enabled": false,
-    "trusted_rankings_enabled": false
+    "trusted_rankings_enabled": false,
+    "steam_transport": "TEMPORARY_FIXED_TLS_RELAY_THROUGH_TEST_PC",
+    "steam_official_tls_dummy_probe_passed": true,
+    "steam_relay_loopback_only": true,
+    "test_pc_must_remain_online": true
   },
   "candidate": {
     "name": "20261024_ws4_web_auth_v02",
@@ -30,13 +34,15 @@
     "author_connector_started": false,
     "full_runtime_hash_verified": true,
     "authorization_card_visible": true,
-    "steam_login_and_explicit_approval": "WAITING_FOR_PLAYER",
+    "steam_login": "VERIFIED_REAL_CALLBACK",
+    "explicit_approval": "WAITING_FOR_PLAYER",
     "game_authentication_and_profile_load": "NOT_YET_VERIFIED",
     "ordinary_workshop_launch": "NOT_YET_VERIFIED"
   },
   "limitations": [
     "A local game host controls its own battle results; isolated progress is untrusted.",
     "Web authorization does not provide multiplayer hosting or remove host/VPN latency.",
-    "Development configuration remains disabled; only the separate signed candidate enables the flow."
+    "Development configuration remains disabled; only the separate signed candidate enables the flow.",
+    "The temporary Steam egress relay requires the test PC online; a stable cloud egress node is still needed for independent operation."
   ]
 }

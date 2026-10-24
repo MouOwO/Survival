@@ -36,13 +36,16 @@ def handler(service):
         def send_error(self, code, message=None, explain=None):
             self.reply(code, {"ok": False, "error": "request_rejected"})
 
-        def reply(self, status, body=b"", *, content_type="application/json; charset=utf-8", cookie=None, location=None):
+        def reply(self, status, body=b"", *, content_type="application/json; charset=utf-8", cookie=None,
+                  location=None, referrer_policy="no-referrer"):
+            if referrer_policy not in ("no-referrer", "same-origin"):
+                raise ValueError("referrer_policy_invalid")
             if not isinstance(body, bytes):
                 body = json.dumps(body, separators=(",", ":")).encode()
             self.send_response(status)
             self.send_header("Content-Type", content_type)
             self.send_header("Cache-Control", "no-store")
-            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Referrer-Policy", referrer_policy)
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("X-Frame-Options", "DENY")
             self.send_header("Content-Security-Policy", "default-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'")
@@ -130,7 +133,8 @@ def handler(service):
                 elif path == "/authorize" and set(query) == {"code"}:
                     service.rate("authorize-page", peer, 60)
                     sid, fresh, page = service.page(query["code"], self.sid())
-                    self.reply(200, page, content_type="text/html; charset=utf-8", cookie=sid if fresh else None)
+                    self.reply(200, page, content_type="text/html; charset=utf-8", cookie=sid if fresh else None,
+                               referrer_policy="same-origin")
                 elif path == "/steam/login" and set(query) == {"code"}:
                     sid, location = service.login(query["code"], self.sid(), peer)
                     self.reply(303, cookie=sid, location=location)
