@@ -35,9 +35,18 @@
     "full_runtime_hash_verified": true,
     "authorization_card_visible": true,
     "steam_login": "VERIFIED_REAL_CALLBACK",
-    "explicit_approval": "WAITING_FOR_PLAYER",
-    "game_authentication_and_profile_load": "NOT_YET_VERIFIED",
-    "ordinary_workshop_launch": "NOT_YET_VERIFIED"
+    "explicit_approval": "VERIFIED_REAL_PLAYER_CONSENT",
+    "game_authentication_and_profile_load": "VERIFIED_NATIVE_HTTP_FISHING",
+    "admission_complete": true,
+    "startup_phase": "ready",
+    "entered_game_map": true,
+    "online_checkpoint": "SUCCESSFUL_RECEIPT_WITH_REVISION_ADVANCE",
+    "observed_profile_revisions": [21, 22],
+    "active_approved_sessions": 1,
+    "active_steam_verified_browsers": 1,
+    "ordinary_workshop_launch": "NOT_YET_VERIFIED",
+    "reopen_same_profile": "NOT_YET_VERIFIED",
+    "multiplayer_web_auth": "NOT_YET_VERIFIED"
   },
   "limitations": [
     "A local game host controls its own battle results; isolated progress is untrusted.",
