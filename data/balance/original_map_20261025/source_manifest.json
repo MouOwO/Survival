@@ -1,0 +1,231 @@
+{
+  "source_archive": "B788AA9B1C4C57E9ACCCE1BB6B0AE28D.w3x",
+  "source_sha256": "824c2a062c6e6e28bfa39cb048ca82b6710f0923f87fd3cb9fad5c72987dfef1",
+  "jass_sha256": "52e54249dbe147fbcb042636fe991ac493ed9eb96afee56403b9e0ba413448e3",
+  "members": [
+    {
+      "member": "Units\\UnitData.slk",
+      "mpq_record": {
+        "hash_index": 5279,
+        "block_index": 2395,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 301681,
+      "sha256": "0d441b81a4c71ac4dbeb11ec2c27ae04af1604c48deed6d0cc3152527b8a4987"
+    },
+    {
+      "member": "Units\\UnitBalance.slk",
+      "mpq_record": {
+        "hash_index": 6792,
+        "block_index": 2394,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 509580,
+      "sha256": "0b2a73fd257928f97f29cb791e01e54bd576494b7213c14a24324339f6a0a300"
+    },
+    {
+      "member": "Units\\UnitWeapons.slk",
+      "mpq_record": {
+        "hash_index": 4596,
+        "block_index": 2397,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 734049,
+      "sha256": "663444dcb0196798efa75e5f5f036d1f4d35233e8226c71aa41ae610c6c55fbf"
+    },
+    {
+      "member": "Units\\UnitUI.slk",
+      "mpq_record": {
+        "hash_index": 2246,
+        "block_index": 2396,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 589656,
+      "sha256": "fa8375f6e040d15fd6d180ec35f26b9ea1e613cfc1b408596d7dcb48868ba76d"
+    },
+    {
+      "member": "Units\\UnitAbilities.slk",
+      "mpq_record": {
+        "hash_index": 7380,
+        "block_index": 2393,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 63645,
+      "sha256": "95ffeab6211831148b95a96c4e551d85156f3fc37e82f4f765d2ec070d4538ab"
+    },
+    {
+      "member": "Units\\UnitStrings.txt",
+      "present": false
+    },
+    {
+      "member": "Units\\UnitSkin.txt",
+      "present": false
+    },
+    {
+      "member": "Units\\HumanUnitStrings.txt",
+      "mpq_record": {
+        "hash_index": 1478,
+        "block_index": 2361,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "member": "Units\\OrcUnitStrings.txt",
+      "mpq_record": {
+        "hash_index": 4307,
+        "block_index": 2384,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "member": "Units\\UndeadUnitStrings.txt",
+      "mpq_record": {
+        "hash_index": 3472,
+        "block_index": 2390,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "member": "Units\\NightElfUnitStrings.txt",
+      "mpq_record": {
+        "hash_index": 6900,
+        "block_index": 2378,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "member": "Units\\NeutralUnitStrings.txt",
+      "mpq_record": {
+        "hash_index": 3085,
+        "block_index": 2372,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "member": "Units\\CampaignUnitStrings.txt",
+      "mpq_record": {
+        "hash_index": 3941,
+        "block_index": 2348,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 586452,
+      "sha256": "10b0e77d88e6e2590774ee425af0512fe02b888d6577abbb85fce98cf4e49dac"
+    },
+    {
+      "member": "Units\\UnitMetaData.slk",
+      "present": false
+    },
+    {
+      "member": "war3map.w3u",
+      "mpq_record": {
+        "hash_index": 3056,
+        "block_index": 2408,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 1973,
+      "sha256": "feabaf76a5f4471145c13123aaa9aee2305041283b55dfad8d3fae00295c5c16"
+    },
+    {
+      "member": "war3map.wts",
+      "present": false
+    },
+    {
+      "member": "war3map.j",
+      "mpq_record": {
+        "hash_index": 7142,
+        "block_index": 2400,
+        "locale": 0,
+        "platform": 65280
+      },
+      "present": true,
+      "bytes": 7428174,
+      "sha256": "52e54249dbe147fbcb042636fe991ac493ed9eb96afee56403b9e0ba413448e3"
+    },
+    {
+      "member": "scripts\\war3map.j",
+      "present": false
+    },
+    {
+      "member": "war3mapUnits.doo",
+      "present": false
+    },
+    {
+      "member": "Units\\ItemData.slk",
+      "present": true,
+      "bytes": 582170,
+      "sha256": "34742c931f2616b635bae6bf8b86490e35fc87db9f84933e70d84835a2d1cbbd"
+    },
+    {
+      "member": "war3mapMisc.txt",
+      "present": true,
+      "bytes": 1624,
+      "sha256": "0a39e08d3a115e82f79b8d702130a1caaba7e28a34a19e82f78eedbedb1fdd01"
+    },
+    {
+      "member": "war3map.w3i",
+      "present": true,
+      "bytes": 560,
+      "sha256": "400efe1ee434735964d25448a403aa8f607519cbc4af55420998caf1f8bbbcef"
+    },
+    {
+      "member": "Units\\AbilityData.slk",
+      "present": true,
+      "bytes": 354102,
+      "sha256": "a9b5d3149d79f1a7853405fb6a858a3a768d497c2369e6f15afe61ab7a63ea05"
+    },
+    {
+      "member": "Units\\UpgradeData.slk",
+      "present": true,
+      "bytes": 34082,
+      "sha256": "a7be6a8bb0301b2f044d37e135f0bb971e85a678231b30cfea56b94b2466436c"
+    },
+    {
+      "member": "war3map.w3a",
+      "present": true,
+      "bytes": 3136,
+      "sha256": "8865b588d29e7fe80093a5dc7989eddba31fda2d056f2d6bbc352f52676de9f0"
+    },
+    {
+      "member": "war3map.w3q",
+      "present": false
+    },
+    {
+      "member": "war3map.w3t",
+      "present": false
+    }
+  ]
+}

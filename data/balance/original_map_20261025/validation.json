@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "reproducible": {
+    "reference.json": "f81f4f026046e45224e990ad3ec61610847f149b17c77f30b960460e8742f8ae",
+    "summary.json": "daa4762bbec94a1502cf6e605e6b5a07e22cf7f690986d3ce9a40a4203385515",
+    "comparison.json": "e22f3ddfc4c0be2ea8f8109373aacd09e909433c1eccc90a59eae5a6ff7cd04c",
+    "units/units_base.json": "f2b672c3aa33d62ee07bfe747d7ad7b4b1b14f10294dddab0ce75ab529d3e0aa",
+    "units/units_base.csv": "4900a7613b2b58fbd5489f07162c823dbfa1c147ce3a26bdbe4893b56c0baff0",
+    "challenges/archive_final_reference.json": "c837f144b97879990023d9547ef6543bcae6c443737013a936a682df902695d3"
+  },
+  "production_files_unchanged": {
+    "data\\balance\\human_spec_v3\\human_spec.json": "425c732f61670d21013ad5da83c419ffaa8ff7576c3f1abf894e7d9c9ea6d1c0",
+    "data\\balance\\human_spec_v3\\normalized.json": "f4aef83457254d23727ae42048fe1a66776fff5296d8069bdc05043a83734083",
+    "data\\balance\\human_spec_v3\\接入规格_人话版_v3.xlsx": "39241c3c99c0477ff42b91114a197f449c4f9b9f93d232c1d680e74782156582",
+    "scripts\\vscripts\\config\\generated\\human_monster_spec.lua": "66ae4b89c83539fd30ab1274871c4444026eab2aa44699e20fc1d0df739c741e"
+  },
+  "workbook_sheets": 18,
+  "truncated_cells": 0,
+  "native_engine_execution": false,
+  "unit_tests": {
+    "passed": 55,
+    "failed": 0,
+    "commands": [
+      "python -m unittest discover -s tools/tests -p test_war3*.py",
+      "python -m unittest discover -s tools/tests -p test_extract_original_monsters.py"
+    ]
+  },
+  "tool_sha256": {
+    "tools/extract_original_monsters.py": "f18246dd8220667ec8518221b7e7994def4d64cb0b74e9ca27a9c4766943b601",
+    "tools/war3_extract/__init__.py": "f2ed6da9fb671212b16475d0de6717261b3ce0faaa57a34f4ac60944590d6b63",
+    "tools/war3_extract/comparison.py": "e48391b1f5eb96804a3c19ca4bad3d0ead861c4ff4c285fa53eb2749df28296c",
+    "tools/war3_extract/mpq.py": "14743332c7994284c86f1613a5c415a608cca715374493c275ce8ee117742e55",
+    "tools/war3_extract/nonwave.py": "4c1bf3c71cc5356785dc44ebc3a75d15034456cd0db416cafd9ed748a9b769c4",
+    "tools/war3_extract/wave_reference.py": "077d3b96c395f1d2f47d27143435ee2e4b64167602a5f144978e1d0e81f736b8",
+    "tools/war3_extract/waves.py": "ba94945d1c757348030180526ab774c8427bb174eefe42ee947030fd3d02e4fc",
+    "tools/war3_extract/workbook.py": "4831efb0791880aaef4366cb2e09c6c13f077507af795b209a9cd669009f909b",
+    "tools/war3_extract_units.py": "189b6e47a3f68363a03e4fc0f43b15958f7a73b306c10f9713085eb2b4cb65de"
+  }
+}
