@@ -1,7 +1,7 @@
 {
   "date": "2026-10-25",
   "feature": "account-first-login-onboarding",
-  "status": "local_implementation_and_automated_validation_complete",
+  "status": "backend_deployed_and_automated_server_validation_complete",
   "first_login": {
     "authority": "survival_players AFTER INSERT trigger; existing accounts without metadata remain legacy",
     "outcomes": [
@@ -10,8 +10,8 @@
       "skipped"
     ],
     "terminal": "first durable result wins",
-    "production_migration_applied": false,
-    "production_backend_deployed": false
+    "production_migration_applied": true,
+    "production_backend_deployed": true
   },
   "progression": [
     "own staircase wall completed",
@@ -97,7 +97,9 @@
       "Add the two RPC signatures to the reviewed current fishing_api/postgres.py via onboarding_postgres.py",
       "Verify a fresh test account triggers the guide and a legacy account does not"
     ],
-    "approved": false,
-    "live_account_changes": false
+    "approved": true,
+    "live_account_changes": false,
+    "deployment_report": "validation/20261025/onboarding_deployment.json",
+    "release": "20261025-onboarding-1f75fd5b5648"
   }
 }

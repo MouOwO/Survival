@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-25",
+  "feature": "account-first-login-onboarding",
+  "status": "deployed_and_server_verified",
+  "user_authorization": "2026-10-25: 现在部署并验证新账号",
+  "host": "47.110.238.248",
+  "service": "goufayu-api.service",
+  "release": "20261025-onboarding-1f75fd5b5648",
+  "release_manifest_sha256": "671262e39a2cbebab1505db0d6df82196084ee208986766df013948a3167b281",
+  "parent_release": "20261021-benefits-47accd81d922",
+  "safe_rollback_release": "20261025-onboarding-safe-1f75fd5b5648",
+  "scope": {
+    "backend_files": 3,
+    "sql_migrations": [
+      {
+        "id": "target/202610250001_onboarding.sql",
+        "sha256": "e18a76b3954249dcc18c01a39328ae0d123cb685fe0f29679e585d9d3340ad9f"
+      },
+      {
+        "id": "security/harden_onboarding.sql",
+        "sha256": "1b5305651bd37cb67749030c0c3ba996ff87bc055d38e5520a64fac5e6c1f141"
+      }
+    ],
+    "new_tables": 1,
+    "new_functions": 3,
+    "reward_bundle": "47accd81d92265b93c243efc876cbd588e9f260ed8a8d7ff9e9afa1943ec9a9e",
+    "reward_bundle_changed": false,
+    "old_business_row_fingerprints_unchanged": true,
+    "old_functions_and_ledger_rows_preserved": true,
+    "payment_service_untouched": true
+  },
+  "backup": {
+    "private_server_backup_verified": true,
+    "encrypted_offsite_copy_verified": true,
+    "algorithm": "Windows DPAPI; restore requires the same Windows user identity",
+    "plaintext_sha256": "ea6e67ffedfa0811290901ac0562f7744cc1dacd3640442d8f4dc0fdda08a39d",
+    "encrypted_sha256": "7b847498d980d199c27ea6358bb8e944685efc71bef0118bb1439e7030d2e4ca",
+    "plaintext_saved_on_local_disk": false
+  },
+  "validation": {
+    "rollback_trial": {
+      "checks": {
+        "actual_app_session_passes_strict_transport_permission_checks": true,
+        "all_synthetic_accounts_and_temporary_sessions_rolled_back_authorization_restored": true,
+        "app_role_cannot_directly_read_onboarding_table": true,
+        "completion_retries_and_opposite_outcome_keep_first_terminal_result": true,
+        "existing_account_stays_legacy_and_cannot_finish_unrequired_tutorial": true,
+        "forged_first_login_progress_and_account_fields_reject_before_rpc": true,
+        "new_accounts_atomically_start_required": true,
+        "real_standard_and_pure_logins_both_require_tutorial_without_reward_hash": true,
+        "skip_survives_new_match_and_never_requires_tutorial_again": true,
+        "tutorial_rpcs_preserve_profiles_gameplay_stats_inventory_and_legacy_metadata": true,
+        "unknown_match_session_cannot_read_or_finish_metadata": true
+      },
+      "durable_player_changes": 0,
+      "groups": 11,
+      "ok": true,
+      "real_payments": 0,
+      "synthetic_players": 2
+    },
+    "post_deploy": {
+      "checks": {
+        "actual_app_session_passes_strict_transport_permission_checks": true,
+        "all_synthetic_accounts_and_temporary_sessions_rolled_back_authorization_restored": true,
+        "app_role_cannot_directly_read_onboarding_table": true,
+        "completion_retries_and_opposite_outcome_keep_first_terminal_result": true,
+        "existing_account_stays_legacy_and_cannot_finish_unrequired_tutorial": true,
+        "forged_first_login_progress_and_account_fields_reject_before_rpc": true,
+        "new_accounts_atomically_start_required": true,
+        "real_standard_and_pure_logins_both_require_tutorial_without_reward_hash": true,
+        "skip_survives_new_match_and_never_requires_tutorial_again": true,
+        "tutorial_rpcs_preserve_profiles_gameplay_stats_inventory_and_legacy_metadata": true,
+        "unknown_match_session_cannot_read_or_finish_metadata": true
+      },
+      "durable_player_changes": 0,
+      "groups": 11,
+      "ok": true,
+      "real_payments": 0,
+      "synthetic_players": 2
+    },
+    "http_handler": {
+      "ok": true,
+      "checks": {
+        "real_candidate_application_hmac_identity_and_strict_app_transport": true,
+        "http_standard_and_pure_required_responses_use_real_context_and_archive_dispatch": true,
+        "pure_metadata_is_preserved_without_profile_projection_or_reward_bundle_access": true,
+        "http_completed_and_skipped_accounts_no_longer_require_tutorial": true,
+        "wrong_bearer_token_returns_401_before_body_parse_or_rpc": true,
+        "unknown_session_returns_409_before_archive_onboarding_rpc": true,
+        "forged_command_fields_return_400_without_onboarding_rpc": true,
+        "http_auth_context_metadata_and_projection_preserve_gameplay_and_inventory": true,
+        "all_http_synthetic_accounts_sessions_and_writes_rolled_back_identity_restored": true
+      },
+      "groups": 9,
+      "synthetic_players": 2,
+      "durable_player_changes": 0,
+      "real_payments": 0,
+      "tcp_listeners": 0,
+      "full_database_fingerprints_unchanged": true
+    },
+    "deployment_tool_unit_tests": 11,
+    "health": "game API and payment health pass",
+    "existing_authenticated_catalog_unchanged": true,
+    "ledger_entries": 34,
+    "native_game_interaction_verified": false,
+    "native_limit": "This delivery validates the deployed server, real PostgreSQL application identity and actual authenticated HTTP handler; no Dota client interaction acceptance was performed."
+  },
+  "deployment_tools": {
+    "tools/onboarding_release_20261025/deploy.py": "f39226461279df46bb9e91cdc4411bce6715ecc16868a47eeb94c2a90ac681b6",
+    "tools/onboarding_release_20261025/fetch.py": "03a931ab72a791740a283f3ba111d99c6e00b51574c3545c32585db88d38f950",
+    "tools/onboarding_release_20261025/http_probe.py": "f900c536d71774562f5c766851e92382888de59e0086f5d7560630603327c77b",
+    "tools/onboarding_release_20261025/prepare.py": "fda3055f551b3b439134c94627513b44b0935dcea421d9115c9a549f69f367e1",
+    "tools/onboarding_release_20261025/remote_operator.py": "f28f651cd62b68bd2d7f29f9ffdcd8998d9c2c19c0fac5cb68967b14542b85d1",
+    "tools/onboarding_release_20261025/runtime_probe.py": "e0c7c47b1d3db7ddb413e8c647634d2064311561ba9f7cd0e492596b3d89c930",
+    "tools/onboarding_release_20261025/test_operator.py": "407bd5a5eda170cb8d3647ea93a26166965db055b8f2f3f28856fcce50f3e9c9",
+    "tools/onboarding_release_20261025/test_prepare.py": "251886c9ec2d65756ab669748ac2867573ed1ef676a40697ea32866bd3b31ba8"
+  }
+}
