@@ -6,6 +6,7 @@ local assets = require("systems/startup_asset_preload_service")
 local match_setup = require("systems/match_setup_service")
 local test_access_policy = require("core/test_access_policy")
 local web_auth = require("systems/player_web_auth")
+local offline_onboarding = require("debug/offline_onboarding_test")
 
 local M = {}
 local generation, session_id, started_at = 0, "", 0
@@ -52,6 +53,13 @@ local function resource(method, id)
     if not PlayerResource or type(PlayerResource[method]) ~= "function" then return nil end
     local ok, result = pcall(PlayerResource[method], PlayerResource, id)
     return ok and result or nil
+end
+
+local function account_id(id)
+    if offline_onboarding.is_enabled() then return offline_onboarding.account_id(id) end
+    local steam = tonumber(resource("GetSteamAccountID", id))
+    if not steam or steam <= 0 then return nil end
+    return string.format("%.0f", steam)
 end
 
 local function human(id)
@@ -187,9 +195,8 @@ local function update_player(entry, current)
         return
     end
     entry.ever_connected = true
-    local steam = tonumber(resource("GetSteamAccountID", id))
-    if not steam or steam <= 0 then entry.authenticated = false entry.status = "connecting" return end
-    local account = string.format("%.0f", steam)
+    local account = account_id(id)
+    if not account then entry.authenticated = false entry.status = "connecting" return end
     if entry.account and entry.account ~= account then
         entry.authenticated, entry.client_ready, entry.status = false, false, "auth_error"
         entry.error = "player_identity_changed"
@@ -297,8 +304,8 @@ local function tick_profiles()
     local current = now()
     for id, entry in pairs(entries) do
         count = count + 1
-        local steam = tonumber(resource("GetSteamAccountID", id))
-        local same_account = steam and steam > 0 and string.format("%.0f", steam) == entry.account
+        local account = account_id(id)
+        local same_account = account ~= nil and account == entry.account
         local eligible = human(id) and connected(id) and same_account
         local loaded = eligible and match_setup.is_mode_selected()
             and type(profiles.is_loaded_for_account) == "function"
@@ -448,8 +455,8 @@ local function admitted_entry(value)
     local id = player_id(value)
     local entry = id ~= nil and entries[id] or nil
     if not entry or not entry.ready or not entry.account or not human(id) or not connected(id) then return nil end
-    local steam = tonumber(resource("GetSteamAccountID", id))
-    if not steam or steam <= 0 or string.format("%.0f", steam) ~= entry.account then return nil end
+    local account = account_id(id)
+    if account == nil or account ~= entry.account then return nil end
     return id, entry
 end
 function M.is_difficulty_selection_ready(value)
@@ -521,9 +528,8 @@ function M.init(settings)
     end
     listen("survival_loading_client_ready", function(entry) entry.client_ready = true end)
     listen("survival_loading_mode_select", function(entry, payload)
-        local steam = tonumber(resource("GetSteamAccountID", entry.player_id))
-        local admitted = released and steam and steam > 0
-            and string.format("%.0f", steam) == entry.account
+        local account = account_id(entry.player_id)
+        local admitted = released and account ~= nil and account == entry.account
             and profiles.is_authenticated_for_account(entry.player_id, entry.account)
         local result = admitted and match_setup.select_mode(entry.player_id, payload.mode_id, payload.session_id)
             or { ok = false, error = "admission_not_complete" }

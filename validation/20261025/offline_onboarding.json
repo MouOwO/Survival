@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-25",
+  "feature": "offline-onboarding-preview",
+  "status": "implemented_and_first_step_seen_in_native_tools",
+  "entry": "离线新手引导测试.cmd",
+  "command": "tools/launch_offline_onboarding_test.ps1",
+  "console_port": 29008,
+  "behaviour": {
+    "storage": "match-session memory only",
+    "cloud_http": false,
+    "first_login_required": false,
+    "prior_guide_completion_ignored": true,
+    "each_new_match_starts_required": true,
+    "finish_and_skip": "terminal for current match only",
+    "any_real_account": true,
+    "steam_zero_identity": "offline-player-<pid>, memory only; identity changes invalidate prior admission",
+    "supported_modes": [
+      "standard",
+      "pure"
+    ],
+    "wave_spawning": false,
+    "unbuilt_wall_deadline": false,
+    "ordinary_offline_qa_unchanged": true,
+    "online_behaviour_unchanged": true
+  },
+  "guards": [
+    "trusted development profile",
+    "server running Workshop Tools",
+    "web authentication disabled",
+    "survival_offline_logic_test=1",
+    "survival_offline_onboarding_test=1",
+    "server launch choice latched before admission"
+  ],
+  "validation": {
+    "real_module_access_and_startup_groups": 7,
+    "launcher_unit_tests": 8,
+    "offline_provider_persistence_contract": "PASS",
+    "offline_startup_regression": "PASS",
+    "offline_payment_isolation": "PASS; zero HTTP",
+    "onboarding_service_groups": 11,
+    "first_native_launch_issue": "Resolved early read of unregistered master convar by registering both flags before latching",
+    "native": {
+      "dedicated_offline_game_started": true,
+      "pid": 28716,
+      "preview_enabled": true,
+      "wave_hold": true,
+      "actual_first_wall_guide_visible": true,
+      "green_footprint_visible": true,
+      "skip_button_visible": true,
+      "full_four_step_construction_native_acceptance": false
+    },
+    "known_existing_fixture": "test_startup_ui_request_gate line113 fails with new helper forced off too; unchanged actor-identity fixture does not map source 200 to player."
+  }
+}

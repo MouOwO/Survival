@@ -1,6 +1,7 @@
 -- Server-owned admission for restricted Workshop tests. Never read identity
 -- from a client payload; SteamID64 remains decimal text throughout conversion.
 local config = require("config/test_access")
+local offline_onboarding = require("debug/offline_onboarding_test")
 local M = {}
 local initialized, initialization_error = false, nil
 local allowed_accounts, disconnect_requested = {}, {}
@@ -40,6 +41,9 @@ end
 function M.init()
     if initialized then return initialization_error == nil, initialization_error end
     initialized = true
+    -- Latch the explicit preview choice before an online match can mutate a
+    -- server convar. The helper never loads or enables the offline provider.
+    offline_onboarding.requested()
     if not M.enabled() then return true end
     local function fail(reason)
         initialization_error = reason
@@ -81,6 +85,12 @@ function M.allowed(player_id)
     if valid then
         local ok, result = pcall(valid, PlayerResource, player_id)
         if not ok or result ~= true then return false, "test_access_player_invalid" end
+    end
+    if offline_onboarding.requested() then
+        if not offline_onboarding.is_human(player_id) then
+            return false, "test_access_player_invalid"
+        end
+        return true
     end
     local getter = resource_method("GetSteamAccountID")
     local account
