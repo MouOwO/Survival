@@ -29,6 +29,7 @@ TABLES = {
     "archive_config_sets", "player_archive_state", "archive_entitlements",
     "archive_operations", "archive_online_outbox", "survival_data_migrations", "match_profile_sessions", LEDGER,
     "fishing_daily_limit_receipts",
+    "player_onboarding_state",
 }
 FUNCTIONS = {
     "reject_fishing_immutable_mutation", "fishing_profile_json", "get_fishing_profile",
@@ -39,6 +40,7 @@ FUNCTIONS = {
     "archive_fishing_daily_limit", "archive_finalize_fishing_checkpoint",
     "grant_out_of_match_reward_before_daily_limits", "checkpoint_online_time_before_daily_limits",
     "fishing_profile_json_before_daily_limits",
+    "initialize_player_onboarding", "onboarding_state", "onboarding_finish",
 }
 RPC_SIGNATURES = (
     "get_fishing_profile(text)", "ensure_player_gameplay_stats(text,jsonb)",
@@ -51,6 +53,7 @@ RPC_SIGNATURES = (
     "archive_online_pending(text,text)", "archive_pending(text)",
     "archive_commit_lottery(text,text,bigint,jsonb,jsonb,text,jsonb,jsonb)",
     "match_profile_login(text,text,text,jsonb)", "match_profile_context(text,text)",
+    "onboarding_state(text,text)", "onboarding_finish(text,text,text)",
 )
 LEGACY_FILES = (
     "202608170001_fishing_rewards.sql", "202608200001_player_gameplay_stats.sql",
@@ -68,7 +71,7 @@ UPGRADE_FILES = (
     ("202609140003_remove_default_wood_income.sql", "202609200003_remove_default_wood_income.sql"),
     ("202609140004_remove_default_attack_growth.sql", "202609200004_remove_default_attack_growth.sql"),
 )
-HARDEN_PATCHES = ("harden_lottery.sql", "harden_match_sessions.sql")
+HARDEN_PATCHES = ("harden_lottery.sql", "harden_match_sessions.sql", "harden_onboarding.sql")
 # These two files were created with LF for test03. Git autocrlf can change the
 # checkout bytes; only restore the exact reviewed release hash, never accept
 # arbitrary normalization or mutate a deployed ledger to fit edited SQL.

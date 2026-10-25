@@ -189,6 +189,14 @@ class ArchiveService:
         requested_hash = payload.get("config_hash")
         raw_command = payload.get("command")
         kind = raw_command.get("kind") if isinstance(raw_command, dict) else None
+        # Account tutorial metadata has its own protocol and SQL persistence.
+        # It neither settles rewards nor depends on a reward configuration hash.
+        from .onboarding import KINDS as onboarding_kinds, command as onboarding_command
+        if isinstance(kind, str) and kind in onboarding_kinds:
+            try:
+                return onboarding_command(self.app, payload)
+            except ValueError as error:
+                raise ArchiveError(str(error)) from error
         if not accepts(self.bundle, requested_hash, kind): return {"ok":False,"terminal":True,"error":"archive_config_mismatch","config_hash":self.bundle.hash}
         command=self.validate(payload.get("command"))
         from .match_modes import scope_clear

@@ -158,6 +158,22 @@ function M.archive_submit(payload, on_success, on_error)
     request("/v1/archive/command", payload, on_success, on_error)
 end
 
+local function onboarding_request(payload, outcome, on_success, on_error)
+    local session = require("systems/match_setup_service").get_session_id()
+    local command = { kind = outcome and "onboarding_finish" or "onboarding_state", version = 1,
+        id = tostring(session) .. ":onboarding:" .. (outcome or "state") }
+    if outcome then command.outcome = outcome end
+    request("/v1/archive/command", {account_id=payload.account_id,command=command}, on_success, on_error)
+end
+
+function M.onboarding_state(payload, on_success, on_error)
+    onboarding_request(payload, nil, on_success, on_error)
+end
+
+function M.onboarding_finish(payload, on_success, on_error)
+    onboarding_request(payload, payload.outcome, on_success, on_error)
+end
+
 function M.endless_leaderboard(payload, on_success, on_error)
     request("/v1/archive/endless-leaderboard", payload, on_success, on_error)
 end

@@ -730,6 +730,14 @@ local function can_place(payload, require_clear_builder)
     if not grid or not grid.ok then
         return grid or { ok = false, error = "建造位置验证失败" }
     end
+    local onboarding = event_bus.request("onboarding.build_allowed.request", {
+        player_id = builder.player_id,
+        building_id = definition.id,
+        position = grid.world_position,
+    })
+    if onboarding and onboarding.ok == false then
+        return { ok = false, error = onboarding.error or "请在引导标记的位置建造" }
+    end
     return {
         ok = true,
         definition = definition,

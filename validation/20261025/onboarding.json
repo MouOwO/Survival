@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-25",
+  "feature": "account-first-login-onboarding",
+  "status": "local_implementation_and_automated_validation_complete",
+  "first_login": {
+    "authority": "survival_players AFTER INSERT trigger; existing accounts without metadata remain legacy",
+    "outcomes": [
+      "required",
+      "completed",
+      "skipped"
+    ],
+    "terminal": "first durable result wins",
+    "production_migration_applied": false,
+    "production_backend_deployed": false
+  },
+  "progression": [
+    "own staircase wall completed",
+    "own main city completed",
+    "own first lumberjack trained",
+    "tower completed at recommended position"
+  ],
+  "supported_maps": [
+    "template_map"
+  ],
+  "supported_modes": [
+    "standard",
+    "pure"
+  ],
+  "other_modes": "keep required metadata pending until next supported match",
+  "input": {
+    "shrinking_mask_seconds": 0.3,
+    "skip": "available at every step; release immediately and retry durable save",
+    "placement": "client screen/world confinement plus server snapped-grid gate",
+    "world_footprint": "green full footprint; separate allowed center region",
+    "modal": "bounded closure of ordinary modals; recoverable native ancestor foreground lease"
+  },
+  "recovery": {
+    "resume_same_match": true,
+    "restart_on_new_match": true,
+    "wrong_unique_wall": "explain blocked placement and allow skip; never relocate or delete the wall"
+  },
+  "tests": {
+    "new_lua_test_files": 5,
+    "service_behaviour_groups": 11,
+    "ui_controller": "PASS: real shipping controller in Node VM; modal branches, input, world targets, skip retry, generations and disposal",
+    "backend_contracts": 9,
+    "real_isolated_postgresql_groups": 6,
+    "dbtool": 18,
+    "existing_backend_regression": 61,
+    "daily_inventory_regression": 3,
+    "existing_queue_startup_tests": 3,
+    "existing_fixture_limit": "Two unchanged HEAD worker fixtures fail test_access_denied under enabled private-test policy; both pass with a process-local offline admission mock. No worker business code changed.",
+    "native_interactive_acceptance": false,
+    "native_limit": "Offline native console endpoint 127.0.0.1:29006 unavailable; no new-account production data or live client interaction was modified."
+  },
+  "compiler": {
+    "result": "PASS",
+    "resources": [
+      {
+        "source": "panorama/src/scripts/custom_game/onboarding.js",
+        "content": "panorama/scripts/custom_game/onboarding.js",
+        "compiled": "panorama/scripts/custom_game/onboarding.vjs_c",
+        "source_sha256": "7fa102c3e1f905bf2cb04200821a8bd4b03537cf578910f266f098fe5a845058",
+        "compiled_sha256": "6266ca135b0992207b71545739817d79c8a1fb8028a24662b8a7ff32ed1d464c",
+        "compiler_exit": 0
+      },
+      {
+        "source": "panorama/src/styles/custom_game/onboarding.css",
+        "content": "panorama/styles/custom_game/onboarding.css",
+        "compiled": "panorama/styles/custom_game/onboarding.vcss_c",
+        "source_sha256": "12101fff02cc5e98fe389a367ddfc899af4984bb830a2265515b189ee3135dfb",
+        "compiled_sha256": "1c6f50b27a2c72081b3c729508fa4f348962f5aba204e4ecd8e0dc7b2b126ae0",
+        "compiler_exit": 0
+      },
+      {
+        "source": "panorama/src/layout/custom_game/onboarding.xml",
+        "content": "panorama/layout/custom_game/onboarding.xml",
+        "compiled": "panorama/layout/custom_game/onboarding.vxml_c",
+        "source_sha256": "ea725396162c5727573a8338d6296ae2a76bdd0c8659fbbfdcc4bd0817b7827d",
+        "compiled_sha256": "ac44a8d686de0aa04e53d30fe946aaa4814e9bcdb4e7bad10cf8fe93d1a0d87b",
+        "compiler_exit": 0
+      },
+      {
+        "source": "panorama/src/layout/custom_game/custom_ui_manifest.xml",
+        "content": "panorama/layout/custom_game/custom_ui_manifest.xml",
+        "compiled": "panorama/layout/custom_game/custom_ui_manifest.vxml_c",
+        "source_sha256": "877167adf57c93fa96fed7cd5b82d56aaf13f0218eae115dee2b27bcfda22f3d",
+        "compiled_sha256": "a2767d36ad8b8036b137f929e1d4e42bcb63925b2f924030f5d14f54d541f396",
+        "compiler_exit": 0
+      }
+    ]
+  },
+  "rollout": {
+    "required": [
+      "Apply paired target SQL migration with historical database tooling and hardening",
+      "Deploy archive_backend/onboarding.py and the service.py dispatch",
+      "Add the two RPC signatures to the reviewed current fishing_api/postgres.py via onboarding_postgres.py",
+      "Verify a fresh test account triggers the guide and a legacy account does not"
+    ],
+    "approved": false,
+    "live_account_changes": false
+  }
+}
