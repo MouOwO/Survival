@@ -184,6 +184,21 @@
     "latest_waiting_screenshot": {
       "path": "output/arcade_two_player_20261025/native_arcade_ui/waiting_peer_13.png",
       "sha256": "6a4fe0d5c913f0d7494cf4b452a3c01a5487b4e50e2655e9168e22127b758b93"
+    },
+    "lobby_id": "30075111663150034",
+    "historical_only": true,
+    "current_active": false,
+    "lifecycle": {
+      "status": "INVALIDATED_AFTER_STEAM_RECONNECTION",
+      "steam_disconnected_utc": "2026-10-25T15:52:02Z",
+      "steam_disconnect_result": 3,
+      "steam_reconnected_utc": "2026-10-25T15:52:25Z",
+      "absence_observed_utc": "2026-10-25T16:14:11.5278615Z",
+      "absence_screenshot": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/waiting_peer_14.png",
+        "sha256": "e8d3d9b0a60687e64c22a0fba486a47d3e326fa81a8f7d495c683c00516e2736"
+      },
+      "scope": "The original 1/4 screenshots are historical; they do not show a currently live room after Steam reconnection."
     }
   },
   "checks": {
@@ -293,7 +308,7 @@
     "steam_cloud_retry": "Ordinary startup was blocked by Steam Cloud login=false; canceled, retried sync under temporary global mode, then Steam library showed synced.",
     "start_anyway_clicked": false,
     "steam_cloud_disabled": false,
-    "at_room_observation": "Temporary global mode was used for Cloud resync; root subsequently restored rule mode and returned Dota to the foreground while the room remained 1/4 and not started.",
+    "at_room_observation": "The original room became invalid after the rule-mode restoration caused Steam disconnect/reconnect; a new room was recreated later under stable rule mode.",
     "final_restoration": {
       "status": "RULE_MODE_RESTORED",
       "observed_utc": "2026-10-25T15:52:04Z",
@@ -305,6 +320,30 @@
       "dota_foreground_evidence": {
         "path": "output/arcade_two_player_20261025/native_arcade_ui/waiting_peer_13.png",
         "sha256": "6a4fe0d5c913f0d7494cf4b452a3c01a5487b4e50e2655e9168e22127b758b93"
+      },
+      "room_continuity_verified": false,
+      "dota_foreground_evidence_scope": "Historical foreground screenshot only; Steam disconnected at 15:52:02Z and the old room did not remain live."
+    },
+    "steam_reconnection": {
+      "disconnected_utc": "2026-10-25T15:52:02Z",
+      "result": 3,
+      "reconnected_utc": "2026-10-25T15:52:25Z",
+      "invalidated_lobby_id": "30075111663150034",
+      "old_room_absence": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/waiting_peer_14.png",
+        "sha256": "e8d3d9b0a60687e64c22a0fba486a47d3e326fa81a8f7d495c683c00516e2736"
+      },
+      "new_lobby_id": "30075111711572277",
+      "new_room_observation": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/recreated_room_19.png",
+        "sha256": "d7cad2d0181b52736b09caa0f48faaa2d7abbdf76e541b907b040e0f1f0f423b"
+      },
+      "log_path": "output/arcade_two_player_20261025/native_arcade.log",
+      "log_lines": {
+        "disconnect": 903,
+        "reconnect": 907,
+        "new_create_7038": 1015,
+        "new_lobby": 1017
       }
     }
   },
@@ -338,6 +377,63 @@
   "notes": [
     "This record does not inherit previous single-player web authentication, cloud-save or native VPK-read acceptance.",
     "The official download is fully verified; original Arcade validation has reached only one-player lobby creation.",
-    "Two-player entry, match start and gameplay remain pending. Real-money checkout is disabled."
-  ]
+    "Two-player entry, match start and gameplay remain pending. Real-money checkout is disabled.",
+    "The first native lobby was invalidated by Steam reconnection during network-mode restoration. Current room fields refer only to recreated lobby 30075111711572277 and its 16:19:51Z screenshot."
+  ],
+  "current_native_room": {
+    "status": "ORIGINAL_ARCADE_ROOM_RECREATED_WAITING_SECOND_PLAYER",
+    "observed_utc": "2026-10-25T16:19:51.2162302Z",
+    "pid": 37848,
+    "official_steam_applaunch": true,
+    "tools": false,
+    "cheats": false,
+    "route": [
+      "ordinary Dota Arcade library",
+      "original Workshop item",
+      "Create lobby after Steam reconnection"
+    ],
+    "map": "template_map",
+    "location": "Best location",
+    "description": "ws4-mp10-2p",
+    "real_players_observed": 1,
+    "capacity": 4,
+    "room_ui_label": "local room",
+    "host_observed": true,
+    "second_player_joined": false,
+    "game_started": false,
+    "http_health_in_arcade": "NOT_RUN",
+    "two_player_acceptance": "NOT_RUN",
+    "native_gameplay": "NOT_RUN",
+    "launch": {
+      "path": "output/arcade_two_player_20261025/native_arcade_launch.json",
+      "sha256": "83826abd502a362182242380ef45937ca7c4e74561c88f70a83a43caded3c5fb"
+    },
+    "screenshot": {
+      "path": "output/arcade_two_player_20261025/native_arcade_ui/recreated_room_19.png",
+      "sha256": "d7cad2d0181b52736b09caa0f48faaa2d7abbdf76e541b907b040e0f1f0f423b"
+    },
+    "scope": "New native room recreated under stable rule mode and visually observed at 1/4; no second player, match start or Arcade HTTP result observed.",
+    "lobby_id": "30075111711572277",
+    "current_active": true,
+    "created_request_utc": "2026-10-25T16:19:23Z",
+    "created_lobby_utc": "2026-10-25T16:19:24Z",
+    "public_room": true,
+    "password_required": false,
+    "network_mode_at_creation": "rule"
+  },
+  "lobby_operation_rule": "Complete any accelerator mode change before creating the room. After Steam disconnect/reconnect, treat the previous lobby as stale, verify the live native UI and recreate the room; an old lobby ID or screenshot is not current-liveness evidence.",
+  "source_delivery_before_documentation_followup": {
+    "game_commit": "8ecb4a2699de8418cb921ae939ffcd092e1758f6",
+    "game_branch": "dev",
+    "content_commit": "70a5aa88e4852221fd79d58ddc30d7ccdc5ad802",
+    "content_branch": "master",
+    "both_remote_heads_verified": true,
+    "relevant_suites_passed": 7,
+    "original_107_file_bytes_preserved": true,
+    "uncommitted_path_counts_before_this_followup": {
+      "game": 102,
+      "content": 0
+    },
+    "verification_source": "Root completed and verified the two-repository delivery before assigning this documentation-only correction."
+  }
 }

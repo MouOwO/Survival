@@ -107,7 +107,7 @@
   "four_account_only": true,
   "player_authentication": "ENGINE_STEAM_ID_WITH_EXISTING_FOUR_ACCOUNT_GATE",
   "player_web_auth_enabled": false,
-  "native_test": "ORIGINAL_ARCADE_ROOM_CREATED_WAITING_SECOND_PLAYER",
+  "native_test": "ORIGINAL_ARCADE_ROOM_RECREATED_WAITING_SECOND_PLAYER",
   "ordinary_workshop_match": "NOT_RUN_WAITING_SECOND_PLAYER",
   "two_player_acceptance": "NOT_RUN",
   "ordinary_arcade_http": "NOT_RUN",
@@ -132,7 +132,12 @@
     "game_started": false,
     "two_player_acceptance": "NOT_RUN",
     "evidence": "output/arcade_two_player_20261025/download_evidence/20261025T152536Z_309af6c491f340d583d0df54984c6663/verification.json",
-    "native_room_screenshot": "output/arcade_two_player_20261025/native_arcade_ui/room_state_12.png"
+    "native_room_screenshot": "output/arcade_two_player_20261025/native_arcade_ui/recreated_room_19.png",
+    "native_lobby_id": "30075111711572277",
+    "native_room_observed_utc": "2026-10-25T16:19:51.2162302Z",
+    "native_room_screenshot_sha256": "d7cad2d0181b52736b09caa0f48faaa2d7abbdf76e541b907b040e0f1f0f423b",
+    "native_room_status": "ORIGINAL_ARCADE_ROOM_RECREATED_WAITING_SECOND_PLAYER",
+    "network_mode_at_creation": "rule"
   },
   "previous_release": {
     "release_sequence": 2026102503,
@@ -155,6 +160,49 @@
     "MP10 r2 is uploaded to the same unlisted item and its official 6636-file/four-archive/five-VPK download is fully verified.",
     "The ordinary native original-item route currently has one real player in a four-slot room, waiting for a second account; no match start or Arcade HTTP result is claimed.",
     "This session-only test disables persistent archives, web authentication and real-money payments. The purchase window is a signed formal-CSV configuration preview only.",
-    "All previous listing facts and history are preserved in previous_release.original_listing and the referenced prior release record."
-  ]
+    "All previous listing facts and history are preserved in previous_release.original_listing and the referenced prior release record.",
+    "Current native lobby 30075111711572277 was recreated under stable rule mode after Steam reconnect invalidated the first lobby. Current evidence is recreated_room_19.png; old screenshots remain historical."
+  ],
+  "current_native_room": {
+    "status": "ORIGINAL_ARCADE_ROOM_RECREATED_WAITING_SECOND_PLAYER",
+    "lobby_id": "30075111711572277",
+    "observed_utc": "2026-10-25T16:19:51.2162302Z",
+    "pid": 37848,
+    "map": "template_map",
+    "location": "Best location",
+    "description": "ws4-mp10-2p",
+    "public_room": true,
+    "password_required": false,
+    "network_mode_at_creation": "rule",
+    "real_players_observed": 1,
+    "capacity": 4,
+    "second_player_joined": false,
+    "game_started": false,
+    "http_health_in_arcade": "NOT_RUN",
+    "two_player_acceptance": "NOT_RUN",
+    "screenshot": {
+      "path": "output/arcade_two_player_20261025/native_arcade_ui/recreated_room_19.png",
+      "sha256": "d7cad2d0181b52736b09caa0f48faaa2d7abbdf76e541b907b040e0f1f0f423b"
+    }
+  },
+  "native_room_history": [
+    {
+      "lobby_id": "30075111663150034",
+      "historical_only": true,
+      "current_active": false,
+      "status": "INVALIDATED_AFTER_STEAM_RECONNECTION",
+      "observed_utc": "2026-10-25T15:47:46.3721275Z",
+      "screenshot": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/room_state_12.png",
+        "sha256": "ee31b7be2deca203566557103a82f15e7c4639e039f6fc95892439591d51f065"
+      },
+      "absence_observed_utc": "2026-10-25T16:14:11.5278615Z",
+      "absence_screenshot": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/waiting_peer_14.png",
+        "sha256": "e8d3d9b0a60687e64c22a0fba486a47d3e326fa81a8f7d495c683c00516e2736"
+      },
+      "release_record": "publishing/workshop/arcade_two_player_20261025.json"
+    }
+  ],
+  "lobby_operation_rule": "Complete any accelerator mode change before creating the room. After Steam disconnect/reconnect, treat the previous lobby as stale, verify the live native UI and recreate the room; an old lobby ID or screenshot is not current-liveness evidence."
 }
