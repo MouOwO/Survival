@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "PUBLISHED_DOWNLOADED_ORIGINAL_ROOM_WAITING_SECOND_PLAYER",
+  "status": "NATIVE_ARCADE_TWO_PLAYER_BASIC_SMOKE_PASS_HTTP_UNAVAILABLE",
   "workshop_id": "3824360109",
   "release_sequence": 2026102507,
   "content_sha256": "d76cffd911f1680922b2ed91e244ea2179f6527d71c89c9d13c920ba13967161",
@@ -231,9 +231,16 @@
       "sha256": "7123fe748bb01d447dcaaf2bb3cfde07e53b92d5ab7996ee4e01eff1de7daea8"
     },
     "native_vpk_full_four_archive_read_coverage": "NOT_RUN",
-    "ordinary_arcade_two_player_gameplay": "NOT_RUN",
-    "ordinary_arcade_http_health": "NOT_RUN",
-    "real_checkout": "NOT_RUN"
+    "ordinary_arcade_two_player_gameplay": "BASIC_SMOKE_PASS",
+    "ordinary_arcade_http_health": "HUD_UNAVAILABLE_INITIAL_FACTORY_NIL_E2E_NOT_PASSED",
+    "real_checkout": "NOT_RUN",
+    "ordinary_arcade_purchase_window": "OPEN_SWITCH_CLOSE_FUNCTIONAL_PASS_WITH_WORLD_OVERLAY_DEFECT",
+    "two_player_native_log_review": {
+      "path": "output/arcade_two_player_20261025/two_player_native_log_review.json",
+      "sha256_at_this_documentation_read": "57c30ec63329f36fd3b2c0d1b4aa2fa1091d70a62cfd14923dc0abf3e9556130",
+      "reviewed_utc": "2026-10-25T17:27:03.196725+00:00",
+      "scope": "Snapshot review; a new report may be added after normal exit. This hash is not a full-game logging claim."
+    }
   },
   "purchase_window": {
     "status": "SIGNED_CONFIGURATION_PREVIEW_ONLY",
@@ -260,7 +267,45 @@
         "u_coin": 100
       }
     ],
-    "observed_scope": "Actual local non-Tools single-player window opened, switched SKU and closed; the original Arcade match window is not yet tested."
+    "observed_scope": "Actual two-player original Arcade N1 preview opened, switched monthly/ticket/recharge SKU and closed; second-machine user confirms movement and purchase-window controls. World title/star overlaps the price-label left side.",
+    "ordinary_arcade_functional_result": "BASIC_SMOKE_PASS_WITH_VISUAL_DEFECT",
+    "ordinary_arcade_evidence": {
+      "purchase_monthly_open": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_open_20261026_15.png",
+        "sha256": "c81f43f9a0b6f7cd95cd0b33616e502a341796863570e4d797fe41e1cd5ae6c6",
+        "captured_utc": "2026-10-25T17:21:48.1170465Z"
+      },
+      "purchase_ticket_25": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_ticket_20261026_16.png",
+        "sha256": "bccf53127a8f38d2e4a302a340ff527350dc0f287013b24dc0d660929500645d",
+        "captured_utc": "2026-10-25T17:23:29.5322954Z"
+      },
+      "purchase_recharge_1": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_recharge_20261026_17.png",
+        "sha256": "41e17af2fedf3cae58bf0a70e735c8d5a2d9921fddbb8abd9c0a2d33157e50ba",
+        "captured_utc": "2026-10-25T17:23:31.6764231Z"
+      },
+      "purchase_closed_paused_game": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_closed_20261026_18.png",
+        "sha256": "1aeb34963b8e68a88b59cafe2f04081ff38ddff35e9116111306c92684c3b9e7",
+        "captured_utc": "2026-10-25T17:23:33.8066113Z"
+      }
+    },
+    "visual_defect": {
+      "status": "CONFIRMED_NOT_FIXED",
+      "kind": "WORLD_TITLE_AND_STAR_OVER_PRICE_LINE_LEFT_SIDE",
+      "evidence": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_open_20261026_15.png",
+        "sha256": "c81f43f9a0b6f7cd95cd0b33616e502a341796863570e4d797fe41e1cd5ae6c6",
+        "captured_utc": "2026-10-25T17:21:48.1170465Z"
+      },
+      "observation": "World title/star paints over the left side of the price label; numeric monthly price remains legible, and SKU/close controls function.",
+      "basic_smoke_blocking": false,
+      "ui_fully_verified": false,
+      "must_fix_before_real_charges": true,
+      "source_changed_for_fix": false,
+      "fix_uploaded": false
+    }
   },
   "failed_upload_attempts": [
     {
@@ -348,14 +393,21 @@
     }
   },
   "acceptance": {
-    "two_real_players_same_match": "NOT_RUN",
-    "ordinary_arcade_gameplay": "NOT_RUN",
-    "ordinary_arcade_http": "NOT_RUN",
-    "ordinary_arcade_purchase_window": "NOT_RUN",
+    "two_real_players_same_match": "BASIC_SMOKE_PASS",
+    "ordinary_arcade_gameplay": "BASIC_SMOKE_PASS",
+    "ordinary_arcade_http": "HUD_UNAVAILABLE_E2E_NOT_PASSED",
+    "ordinary_arcade_purchase_window": "FUNCTIONAL_BASIC_SMOKE_PASS_WITH_VISUAL_DEFECT",
     "persistent_archive": "DISABLED_NOT_TESTED",
     "real_checkout": "DISABLED_NOT_TESTED",
     "native_four_archive_read_coverage": "NOT_RUN",
-    "ready_for_public_release": false
+    "ready_for_public_release": false,
+    "full_match_completion": "NOT_COMPLETED",
+    "long_duration": "NOT_RUN",
+    "four_real_players": "NOT_RUN",
+    "performance": "NOT_RUN",
+    "authentication_e2e": "DISABLED_NOT_TESTED",
+    "payment_and_reward_e2e": "DISABLED_NOT_TESTED",
+    "ui_complete_acceptance": "NOT_PASSED_VISUAL_DEFECT_REMAINS"
   },
   "previous_release": {
     "release_sequence": 2026102503,
@@ -375,51 +427,65 @@
     "history_preserved": "Complete original listing, including v05/v08/v09 acceptance and failure history, remains in the byte-identical backup and the Git snapshot."
   },
   "notes": [
-    "This record does not inherit previous single-player web authentication, cloud-save or native VPK-read acceptance.",
-    "The official download is fully verified; original Arcade validation has reached only one-player lobby creation.",
-    "Two-player entry, match start and gameplay remain pending. Real-money checkout is disabled.",
-    "The first native lobby was invalidated by Steam reconnection during network-mode restoration. Current room fields refer only to recreated lobby 30075111711572277 and its 16:19:51Z screenshot."
+    "The original Arcade match passed a basic two-real-player smoke test with N1 and early wave progression; complete gameplay, four-player, duration and performance acceptance are not claimed.",
+    "HTTP remained unavailable in the observed HUD; only the initial two nil request factories are logged. Later logging/probe coverage is unknown, so no full-phase failure or real callback is claimed.",
+    "Purchase preview open/SKU switch/close works on both machines according to host visual evidence and the second-machine user reply; an unresolved world-title/star overlap remains.",
+    "Local Dota normal exit is confirmed by one read-only process query at 2026-10-25T17:33:40Z; the second machine exit was not independently confirmed. The unsaved session last appeared paused; root did not unpause it.",
+    "Previous solo-lobby, unsuccessful search/password-join, publication failures and prior release evidence remain historical. No previous cloud/auth/native archive-read acceptance is inherited."
   ],
   "current_native_room": {
-    "status": "ORIGINAL_ARCADE_ROOM_RECREATED_WAITING_SECOND_PLAYER",
-    "observed_utc": "2026-10-25T16:19:51.2162302Z",
+    "status": "NATIVE_ARCADE_TWO_PLAYER_BASIC_SMOKE_PASS_HTTP_UNAVAILABLE",
+    "lobby_id": "30075111792112899",
+    "match_id": "9061760618",
     "pid": 37848,
+    "observed_utc": "2026-10-25T17:23:33.8066113Z",
     "official_steam_applaunch": true,
     "tools": false,
     "cheats": false,
-    "route": [
-      "ordinary Dota Arcade library",
-      "original Workshop item",
-      "Create lobby after Steam reconnection"
-    ],
     "map": "template_map",
-    "location": "Best location",
-    "description": "ws4-mp10-2p",
-    "real_players_observed": 1,
+    "real_players_observed": 2,
     "capacity": 4,
-    "room_ui_label": "local room",
-    "host_observed": true,
-    "second_player_joined": false,
-    "game_started": false,
-    "http_health_in_arcade": "NOT_RUN",
-    "two_player_acceptance": "NOT_RUN",
-    "native_gameplay": "NOT_RUN",
-    "launch": {
-      "path": "output/arcade_two_player_20261025/native_arcade_launch.json",
-      "sha256": "83826abd502a362182242380ef45937ca7c4e74561c88f70a83a43caded3c5fb"
-    },
+    "second_player_joined": true,
+    "game_started": true,
+    "difficulty": "N1",
+    "next_wave_observed": 2,
+    "population_observed": "4/10",
+    "native_gameplay": "BASIC_SMOKE_PASS",
+    "two_player_acceptance": "BASIC_SMOKE_PASS",
+    "http_health_in_arcade": "HUD_UNAVAILABLE_INITIAL_FACTORY_NIL_E2E_NOT_PASSED",
+    "host_steam_id64": "76561198845461206",
+    "guest_steam_id64": "76561198974301984",
+    "fake_client_values": [
+      0,
+      0
+    ],
     "screenshot": {
-      "path": "output/arcade_two_player_20261025/native_arcade_ui/recreated_room_19.png",
-      "sha256": "d7cad2d0181b52736b09caa0f48faaa2d7abbdf76e541b907b040e0f1f0f423b"
+      "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_live_20261026_14.png",
+      "sha256": "e849c8dd8a766323feacbdb62a2facab6a9c2cb08a6f5e357cba3a2ff1727f0b",
+      "captured_utc": "2026-10-25T17:19:17.2074112Z"
     },
-    "scope": "New native room recreated under stable rule mode and visually observed at 1/4; no second player, match start or Arcade HTTP result observed.",
-    "lobby_id": "30075111711572277",
-    "current_active": true,
-    "created_request_utc": "2026-10-25T16:19:23Z",
-    "created_lobby_utc": "2026-10-25T16:19:24Z",
-    "public_room": true,
-    "password_required": false,
-    "network_mode_at_creation": "rule"
+    "latest_capture": {
+      "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_closed_20261026_18.png",
+      "sha256": "1aeb34963b8e68a88b59cafe2f04081ff38ddff35e9116111306c92684c3b9e7",
+      "captured_utc": "2026-10-25T17:23:33.8066113Z"
+    },
+    "game_paused_at_last_capture": true,
+    "root_resumed_game": false,
+    "creation_start_n1_selection_attribution": "USER_OR_NATIVE_FLOW_NOT_RECORDED_PER_CLICK",
+    "scope": "Two real accounts in the same original Arcade match, N1 builder and early wave progression, functional preview open/SKU switch/close; not full-match, four-player, duration or performance acceptance.",
+    "liveness_after_last_capture": "LOCAL_DOTA_EXIT_CONFIRMED_SECOND_MACHINE_UNKNOWN",
+    "local_exit": {
+      "status": "LOCAL_DOTA_NORMAL_EXIT_CONFIRMED",
+      "observed_utc": "2026-10-25T17:33:40.287431Z",
+      "local_dota_process_count": 0,
+      "method": "ONE_READ_ONLY_CIM_PROCESS_QUERY",
+      "second_machine_exit": "NOT_INDEPENDENTLY_CONFIRMED",
+      "process_termination_by_audit": false,
+      "evidence": {
+        "path": "output/arcade_two_player_20261025/two_player_native_log_after_exit.json",
+        "sha256": "29b4fd2a8b60d6546276bf856f808cb2ebf846f5ad5e051495194152e414b686"
+      }
+    }
   },
   "lobby_operation_rule": "Complete any accelerator mode change before creating the room. After Steam disconnect/reconnect, treat the previous lobby as stale, verify the live native UI and recreate the room; an old lobby ID or screenshot is not current-liveness evidence.",
   "source_delivery_before_documentation_followup": {
@@ -435,5 +501,198 @@
       "content": 0
     },
     "verification_source": "Root completed and verified the two-repository delivery before assigning this documentation-only correction."
+  },
+  "native_room_history": [
+    {
+      "status": "ORIGINAL_ARCADE_ROOM_RECREATED_WAITING_SECOND_PLAYER",
+      "observed_utc": "2026-10-25T16:19:51.2162302Z",
+      "pid": 37848,
+      "official_steam_applaunch": true,
+      "tools": false,
+      "cheats": false,
+      "route": [
+        "ordinary Dota Arcade library",
+        "original Workshop item",
+        "Create lobby after Steam reconnection"
+      ],
+      "map": "template_map",
+      "location": "Best location",
+      "description": "ws4-mp10-2p",
+      "real_players_observed": 1,
+      "capacity": 4,
+      "room_ui_label": "local room",
+      "host_observed": true,
+      "second_player_joined": false,
+      "game_started": false,
+      "http_health_in_arcade": "NOT_RUN",
+      "two_player_acceptance": "NOT_RUN",
+      "native_gameplay": "NOT_RUN",
+      "launch": {
+        "path": "output/arcade_two_player_20261025/native_arcade_launch.json",
+        "sha256": "83826abd502a362182242380ef45937ca7c4e74561c88f70a83a43caded3c5fb"
+      },
+      "screenshot": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/recreated_room_19.png",
+        "sha256": "d7cad2d0181b52736b09caa0f48faaa2d7abbdf76e541b907b040e0f1f0f423b"
+      },
+      "scope": "New native room recreated under stable rule mode and visually observed at 1/4; no second player, match start or Arcade HTTP result observed.",
+      "lobby_id": "30075111711572277",
+      "current_active": false,
+      "created_request_utc": "2026-10-25T16:19:23Z",
+      "created_lobby_utc": "2026-10-25T16:19:24Z",
+      "public_room": true,
+      "password_required": false,
+      "network_mode_at_creation": "rule",
+      "historical_only": true,
+      "lifecycle": {
+        "status": "LEFT_SOLO_LOBBY_WITH_TWO_PERSON_PARTY",
+        "party_size_observed": 2,
+        "lobby_size_before_leaving": 1,
+        "party_two_lobby_one_screenshot": {
+          "path": "output/arcade_two_player_20261025/native_arcade_ui/party_joined_20261026_10.png",
+          "sha256": "21b45cda0dd8e5bbd7c4b245b62b2c7975af2c63058b3616b7aa698747d8876d",
+          "captured_utc": "2026-10-25T17:13:54.7458821Z"
+        },
+        "leave_solo_lobby_screenshot": {
+          "path": "output/arcade_two_player_20261025/native_arcade_ui/leave_single_lobby_keep_party_20261026_11.png",
+          "sha256": "3dd56294390010ba5e3c6231e290b8edc3198a7f979a996d2eb6013233768894",
+          "captured_utc": "2026-10-25T17:14:55.5200727Z"
+        }
+      }
+    }
+  ],
+  "two_player_basic_smoke": {
+    "status": "PASS",
+    "lobby_id": "30075111792112899",
+    "match_id": "9061760618",
+    "host_steam_id64": "76561198845461206",
+    "guest_steam_id64": "76561198974301984",
+    "registered_fake_client_values": [
+      0,
+      0
+    ],
+    "evidence": {
+      "party_two_lobby_one": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/party_joined_20261026_10.png",
+        "sha256": "21b45cda0dd8e5bbd7c4b245b62b2c7975af2c63058b3616b7aa698747d8876d",
+        "captured_utc": "2026-10-25T17:13:54.7458821Z"
+      },
+      "left_solo_lobby_party_retained": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/leave_single_lobby_keep_party_20261026_11.png",
+        "sha256": "3dd56294390010ba5e3c6231e290b8edc3198a7f979a996d2eb6013233768894",
+        "captured_utc": "2026-10-25T17:14:55.5200727Z"
+      },
+      "n1_builder_hud_two": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/party_room_transition_20261026_12.png",
+        "sha256": "4616ac71885b84462ceba82c9425d7c73fd38a35dbc5c8a5a40ade2dc394ac30",
+        "captured_utc": "2026-10-25T17:16:37.0069193Z"
+      },
+      "wave_two_population_four": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_live_20261026_14.png",
+        "sha256": "e849c8dd8a766323feacbdb62a2facab6a9c2cb08a6f5e357cba3a2ff1727f0b",
+        "captured_utc": "2026-10-25T17:19:17.2074112Z"
+      },
+      "purchase_monthly_open": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_open_20261026_15.png",
+        "sha256": "c81f43f9a0b6f7cd95cd0b33616e502a341796863570e4d797fe41e1cd5ae6c6",
+        "captured_utc": "2026-10-25T17:21:48.1170465Z"
+      },
+      "purchase_ticket_25": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_ticket_20261026_16.png",
+        "sha256": "bccf53127a8f38d2e4a302a340ff527350dc0f287013b24dc0d660929500645d",
+        "captured_utc": "2026-10-25T17:23:29.5322954Z"
+      },
+      "purchase_recharge_1": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_recharge_20261026_17.png",
+        "sha256": "41e17af2fedf3cae58bf0a70e735c8d5a2d9921fddbb8abd9c0a2d33157e50ba",
+        "captured_utc": "2026-10-25T17:23:31.6764231Z"
+      },
+      "purchase_closed_paused_game": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_closed_20261026_18.png",
+        "sha256": "1aeb34963b8e68a88b59cafe2f04081ff38ddff35e9116111306c92684c3b9e7",
+        "captured_utc": "2026-10-25T17:23:33.8066113Z"
+      }
+    },
+    "root_visually_reviewed_all_six_gameplay_and_purchase_captures": true,
+    "second_machine_user_confirmation": {
+      "quote": "移动和购买窗口都正常",
+      "source": "User reply from the second machine reported to root; not derived from the host log parser."
+    },
+    "navigation": {
+      "search_and_password_join": "NOT_FOUND_IN_ATTEMPTED_FLOW",
+      "party_two_lobby_one_observed": true,
+      "solo_lobby_left_party_two_retained": true,
+      "recommended_next_attempt": "Form a two-person Dota party before entering a match from the original Arcade item; verify two players in the live in-game HUD.",
+      "creation_start_n1_selection_attribution": "USER_OR_NATIVE_FLOW_NOT_RECORDED_PER_CLICK",
+      "complete_navigation_automation_certified": false
+    },
+    "http": {
+      "result": "HUD_UNAVAILABLE_E2E_NOT_PASSED",
+      "hud_online_players": 2,
+      "hud_http_phase": "unavailable",
+      "initial_scriptvm_factory": "ok_request_nil",
+      "initial_legacy_factory": "ok_request_nil",
+      "initial_send_attempted": false,
+      "actual_http_callback_verified": false,
+      "all_phase_sampling_proven": false,
+      "later_log_cutoff_cause": "UNKNOWN",
+      "later_probe_execution": "UNKNOWN_NOT_LOGGED",
+      "scope": "The reviewed snapshot records only initial sample 1 in phase other/state 0. No all-phase failure, remote HTTP rejection, authentication or real HTTP response is inferred.",
+      "review": {
+        "path": "output/arcade_two_player_20261025/two_player_native_log_review.json",
+        "sha256_at_this_documentation_read": "57c30ec63329f36fd3b2c0d1b4aa2fa1091d70a62cfd14923dc0abf3e9556130",
+        "reviewed_utc": "2026-10-25T17:27:03.196725+00:00",
+        "scope": "Snapshot review; a new report may be added after normal exit. This hash is not a full-game logging claim."
+      },
+      "post_exit_log_followup": {
+        "evidence": {
+          "path": "output/arcade_two_player_20261025/two_player_native_log_after_exit.json",
+          "sha256": "29b4fd2a8b60d6546276bf856f808cb2ebf846f5ad5e051495194152e414b686"
+        },
+        "console_bytes": 148761,
+        "same_snapshot_as_before_exit": true,
+        "new_probe_status_phase_or_callback_records": 0,
+        "post_exit_buffer_flush_observed": false,
+        "later_phase_probe_execution": "UNKNOWN_NOT_LOGGED",
+        "log_stall_cause": "UNKNOWN",
+        "scope": "No new output after exit does not prove that later in-game samples or callbacks did not execute."
+      }
+    },
+    "visual_defect": {
+      "status": "CONFIRMED_NOT_FIXED",
+      "kind": "WORLD_TITLE_AND_STAR_OVER_PRICE_LINE_LEFT_SIDE",
+      "evidence": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/two_player_purchase_open_20261026_15.png",
+        "sha256": "c81f43f9a0b6f7cd95cd0b33616e502a341796863570e4d797fe41e1cd5ae6c6",
+        "captured_utc": "2026-10-25T17:21:48.1170465Z"
+      },
+      "observation": "World title/star paints over the left side of the price label; numeric monthly price remains legible, and SKU/close controls function.",
+      "basic_smoke_blocking": false,
+      "ui_fully_verified": false,
+      "must_fix_before_real_charges": true,
+      "source_changed_for_fix": false,
+      "fix_uploaded": false
+    },
+    "shutdown": {
+      "normal_dota_exit_allowed": true,
+      "steam_may_remain_running": true,
+      "session_saved": false,
+      "game_paused_at_last_capture": true,
+      "root_resumed_game": false,
+      "exit_observed_by_this_record": true,
+      "local_exit": {
+        "status": "LOCAL_DOTA_NORMAL_EXIT_CONFIRMED",
+        "observed_utc": "2026-10-25T17:33:40.287431Z",
+        "local_dota_process_count": 0,
+        "method": "ONE_READ_ONLY_CIM_PROCESS_QUERY",
+        "second_machine_exit": "NOT_INDEPENDENTLY_CONFIRMED",
+        "process_termination_by_audit": false,
+        "evidence": {
+          "path": "output/arcade_two_player_20261025/two_player_native_log_after_exit.json",
+          "sha256": "29b4fd2a8b60d6546276bf856f808cb2ebf846f5ad5e051495194152e414b686"
+        }
+      },
+      "second_machine_exit": "NOT_INDEPENDENTLY_CONFIRMED"
+    }
   }
 }
