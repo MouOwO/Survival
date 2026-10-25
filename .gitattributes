@@ -126,3 +126,15 @@ tools/workshop_test/test_package_ui_stackable_v08.py -text whitespace=blank-at-e
 # The final publication receipt is bound by raw SHA256 in the QA report.
 publishing/workshop/ui_data_qa_release_20261025.json text eol=lf
 publishing/workshop/test_listing.json text eol=lf
+
+# Preserve the reviewed direct multiplayer entry and release helpers.
+addoninfo.txt text eol=crlf
+scripts/vscripts/addon_game_mode.lua text eol=crlf
+scripts/vscripts/systems/workshop_network_probe.lua text eol=crlf
+tools/test_workshop_network_probe.lua text eol=crlf
+tools/workshop_test/build_multiplayer_candidate.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_multiplayer_candidate.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/reconcile_workshop_pending.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_reconcile_workshop_pending.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/update_multiplayer_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_multiplayer_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

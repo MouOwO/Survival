@@ -1,6 +1,6 @@
 "AddonInfo"
 {
-    "maps"              "ws4_entry"
+    "maps"              "template_map"
     "IsPlayable"        "1"
     "EnablePickRules"   "0"
     "ws4_entry"

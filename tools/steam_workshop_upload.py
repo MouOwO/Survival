@@ -9,6 +9,7 @@ Native game and four-machine tests remain separate from successful transfer.
 from __future__ import annotations
 
 import argparse
+import copy
 import ctypes as C
 from contextlib import contextmanager, nullcontext
 from datetime import datetime, timezone
@@ -262,6 +263,30 @@ def validate_upload(candidate: Path, vpk: Path, listing_path: Path, build_report
             'package_files': inventory}
 
 
+def release_evidence(name):
+    return (name.startswith(('download_', 'native_', 'ordinary_workshop_', 'manifest_'))
+            or name.endswith('_manifest') or name in {
+                'manifest', 'ready_for_public_release', 'reconciliation', 'failed_attempts',
+                'multiplayer_acceptance', 'multiplayer_hosting_verified', 'four_machine_test'})
+
+
+def archive_release(state):
+    """Keep prior evidence under its prior identity before preparing new bytes."""
+    previous = state.get('previous_release')
+    if previous is not None:
+        history = state.get('release_history', [])
+        if not isinstance(previous, dict) or not isinstance(history, list):
+            raise ValueError('Release history must preserve prior release records')
+        state['release_history'] = copy.deepcopy(history) + [copy.deepcopy(previous)]
+    identity = {'content_sha256', 'release_sequence', 'vpk_sha256', 'vpk_bytes',
+                'package', 'package_files', 'verification', 'uploaded', 'status', 'updated_at_utc'}
+    state['previous_release'] = copy.deepcopy({name: value for name, value in state.items()
+                                             if name in identity or release_evidence(name)})
+    for name in list(state):
+        if release_evidence(name):
+            state.pop(name)
+
+
 def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False, update_existing=False):
     if pack.runtime.within(state_path.resolve(), vpk.parent.resolve()):
         raise ValueError('Recovery journal must stay outside the uploaded content directory')
@@ -304,24 +329,23 @@ def publish(steam: Steam, listing, cover, vpk, facts, state_path, *, apply=False
             raise ValueError('Journal ID is not uniquely present in the current owner list; recover it before updating')
         if matching[0].get('visibility') != visibility:
             raise ValueError('Remote visibility differs from approved listing/journal; inspect before updating')
-        if state.get('content_sha256') != facts['content_sha256']:
+        signed_release_changed = any(state.get(name) != facts.get(name)
+                                     for name in ('content_sha256', 'release_sequence'))
+        if signed_release_changed:
             if (not update_existing or state.get('uploaded') is not True
                     or listing.get('workshop_id') != state['workshop_id']):
                 raise ValueError('A new signed release requires explicit update of the confirmed listing/journal ID')
-            state['previous_release'] = {name: state.get(name) for name in
-                ('content_sha256', 'release_sequence', 'vpk_sha256', 'package', 'package_files')}
         if state.get('uploaded') is True:
-            if (state.get('vpk_sha256') == facts['vpk_sha256']
+            if (not signed_release_changed and state.get('vpk_sha256') == facts['vpk_sha256']
                     and state.get('package_files') == facts.get('package_files')):
                 return state
             if not update_existing:
                 raise ValueError('Existing item has different package bytes; explicitly use --update-existing')
-            state.update(**facts, uploaded=False, status=('PRIVATE_ITEM_UPDATE_PREPARED' if visibility == 2
-                                                        else 'UNLISTED_ITEM_UPDATE_PREPARED'))
-            # Validation of the previous bytes does not validate this update.
-            for name in list(state):
-                if name.startswith('download_') or name == 'native_four_archive_reads_verified':
-                    state.pop(name)
+            archive_release(state)
+            state.update(**facts, uploaded=False, package=str(vpk), native_test='NOT_RUN',
+                         ordinary_workshop_match='NOT_RUN', ready_for_public_release=False,
+                         status=('PRIVATE_ITEM_UPDATE_PREPARED' if visibility == 2
+                                 else 'UNLISTED_ITEM_UPDATE_PREPARED'))
             journal(state_path, state)
         if state.get('status') == 'SUBMIT_REQUEST_PENDING':
             raise ValueError('Prior submit result is unknown; query/download the confirmed item before explicitly retrying')

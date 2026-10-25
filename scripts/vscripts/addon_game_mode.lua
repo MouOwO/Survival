@@ -1179,4 +1179,18 @@ function Activate()
     end
 end
 
+-- BEGIN WS4-MP-09 NETWORK PROBE WRAPPER
+do
+    local previous_activate = Activate
+    local function pack(...) return { n = select("#", ...), ... } end
+    function Activate(...)
+        local result = pack(previous_activate(...))
+        pcall(function()
+            local probe = require("systems/workshop_network_probe")
+            if type(probe) == "table" and type(probe.activate) == "function" then probe.activate() end
+        end)
+        return unpack(result, 1, result.n)
+    end
+end
+-- END WS4-MP-09 NETWORK PROBE WRAPPER
 return M

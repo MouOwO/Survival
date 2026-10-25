@@ -167,6 +167,56 @@ class UploadGuards(unittest.TestCase):
             api.publish(steam,listing,self.root/'cover.jpg',self.vpk,self.facts,self.state,apply=True)
         self.assertFalse(steam.calls)
 
+    def test_update_preparation_archives_old_acceptance_before_any_sdk_failure(self):
+        older = {'content_sha256': 'earlier-release', 'native_test': 'EARLIER_PASS'}
+        evidence = {'native_test': 'VERIFIED_SINGLE_PLAYER_LOGIN_PROFILE_GAMEPLAY',
+                    'ordinary_workshop_match': 'VERIFIED_SINGLE_PLAYER_LOGIN_PROFILE_GAMEPLAY',
+                    'native_four_archive_reads_verified': True, 'ready_for_public_release': True,
+                    'download_verified': True, 'download_manifest': 'old-manifest',
+                    'remote_manifest': 'old-remote-manifest', 'reconciliation': {'verified': True},
+                    'failed_attempts': [{'release_sequence': 1}], 'multiplayer_acceptance': 'PASS'}
+        initial = {'owner': api.OWNER, 'app_id': api.APP, **self.facts, **evidence,
+                   'vpk_sha256': 'old-package', 'workshop_id': '9876543210', 'uploaded': True,
+                   'status': 'OLD_ACCEPTED_RELEASE', 'previous_release': older,
+                   'historical_acceptance': {'native_test': 'EXPLICITLY_HISTORICAL_PASS'}}
+        api.journal(self.state, initial)
+        steam = FakeSteam([{'id': '9876543210', 'owner': api.OWNER}])
+        with patch.object(api, 'emit'), self.assertRaisesRegex(RuntimeError, 'Stop before update'):
+            api.publish(steam, {}, self.root / 'cover.jpg', self.vpk,
+                        self.facts, self.state, apply=True, update_existing=True)
+        state = json.loads(self.state.read_text(encoding='utf8'))
+        self.assertEqual(state['status'], 'PRIVATE_ITEM_UPDATE_PREPARED')
+        self.assertEqual(state['native_test'], 'NOT_RUN')
+        self.assertEqual(state['ordinary_workshop_match'], 'NOT_RUN')
+        self.assertFalse(state['ready_for_public_release'])
+        self.assertEqual(state['release_history'], [older])
+        for name, value in evidence.items():
+            self.assertEqual(state['previous_release'][name], value)
+            if name not in ('native_test', 'ordinary_workshop_match', 'ready_for_public_release'):
+                self.assertNotIn(name, state)
+        self.assertEqual(state['previous_release']['vpk_sha256'], 'old-package')
+        self.assertEqual(state['historical_acceptance'], initial['historical_acceptance'])
+        self.assertEqual([name for name, _ in steam.calls], ['StartItemUpdate'])
+
+    def test_new_signature_sequence_cannot_reuse_same_package_acceptance(self):
+        initial = {'owner': api.OWNER, 'app_id': api.APP, **self.facts, 'release_sequence': 1,
+                   'workshop_id': '9876543210', 'uploaded': True, 'native_test': 'PASS',
+                   'ordinary_workshop_match': 'PASS'}
+        api.journal(self.state, initial)
+        steam = FakeSteam([{'id': '9876543210', 'owner': api.OWNER}])
+        facts = {**self.facts, 'release_sequence': 2}
+        with patch.object(api, 'emit'), self.assertRaisesRegex(ValueError, 'new signed release'):
+            api.publish(steam, {}, self.root / 'cover.jpg', self.vpk, facts, self.state, apply=True)
+        self.assertEqual(json.loads(self.state.read_text(encoding='utf8'))['native_test'], 'PASS')
+        with patch.object(api, 'emit'), self.assertRaisesRegex(RuntimeError, 'Stop before update'):
+            api.publish(steam, {'workshop_id': '9876543210'}, self.root / 'cover.jpg', self.vpk,
+                        facts, self.state, apply=True, update_existing=True)
+        state = json.loads(self.state.read_text(encoding='utf8'))
+        self.assertEqual(state['release_sequence'], 2)
+        self.assertEqual(state['native_test'], 'NOT_RUN')
+        self.assertEqual(state['ordinary_workshop_match'], 'NOT_RUN')
+        self.assertEqual(state['previous_release']['release_sequence'], 1)
+        self.assertEqual(state['previous_release']['native_test'], 'PASS')
     def test_approved_unlisted_never_silently_reverts_to_private_or_public(self):
         api.journal(self.state,{'owner':api.OWNER,'app_id':api.APP,**self.facts,
             'workshop_id':'9876543210','visibility_requested':3,'uploaded':True})
