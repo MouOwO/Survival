@@ -1,0 +1,1528 @@
+{
+  "schema": 2,
+  "report_id": "UI_DATA_QA_20261025",
+  "date": "2026-10-25",
+  "timezone": "Asia/Shanghai",
+  "generated_at_utc": "2026-10-25T01:03:36.880Z",
+  "status": "SCOPED_QA_VERIFIED_V08_WORKSHOP_PUBLICATION_FAILED",
+  "document": "docs/validation/UI_DATA_QA_20261025.md",
+  "scope": {
+    "requested": "UI layers and displayed data, repeated operations and simulated shopping, offline five-session key chains followed by real online login/read/refresh checks.",
+    "counting_rule": "Assertions, test files, synthetic account-sessions, images and native matches are separate evidence layers and must not be added together.",
+    "ten_hour_natural_play_endurance_verified": false,
+    "required_scope_interpretation": "Five accelerated native offline settlement chains plus real online regression; not five full natural clears plus another five mandatory online clears.",
+    "real_money_policy": "OFF throughout the WS4 four-account isolated-test release."
+  },
+  "acceptance": {
+    "verified_scope_results_complete": true,
+    "final_delivery_complete": false,
+    "remaining_owner": "subsequent_release_followup",
+    "remaining_groups": [
+      "v08_workshop_publication_failed_followup"
+    ],
+    "finalization_rule": "All current results are recorded and frozen. v08 Workshop publication failed; future release retry needs new reconciliation/results. Git completion is determined only by the external dual-repository delivery receipt.",
+    "git_completion_depends_on_external_receipt": true,
+    "git_receipt": "output/ui_qa_20261025/git_delivery.json",
+    "scoped_functional_qa_complete": true,
+    "v08_workshop_publication_complete": false,
+    "report_placeholders_remaining": false
+  },
+  "version_boundaries": {
+    "development_vs_signed_frozen": "Current development acceptance switches differ from signed frozen v05/v06/v07/v08; use the measured release and menu in each run.",
+    "four_account_only": true,
+    "isolated_test_archives": true,
+    "online_cheats_allowed": false,
+    "real_cash_payments_enabled": false,
+    "tools_probe_permissions_not_online_policy": true,
+    "baseline_v05": {
+      "release_sequence": 2026102405,
+      "content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60"
+    },
+    "runtime_files": 6630,
+    "protected_modules_preserved": 180,
+    "protected_modules_rebuilt": 0,
+    "development_economic_csv_synchronized_online_verified": false,
+    "frozen_business_configuration_and_existing_backend_preserved": true
+  },
+  "decisions": {
+    "monthly_bonus": {
+      "status": "USER_CONFIRMED_KEEP_CURRENT",
+      "date": "2026-10-25",
+      "fragment": {
+        "base": 20,
+        "monthly": 40
+      },
+      "cage": {
+        "base": 30,
+        "monthly": 90
+      },
+      "tickets_current_verified": {
+        "base": 10,
+        "monthly": 20
+      },
+      "protected_csv_generated_lua_or_economy_changed": false,
+      "legacy_no_bonus_notes_are_not_current_ui_contract": true
+    }
+  },
+  "evidence_layers": {
+    "payment_commerce_transport": {
+      "status": "PASS_SCOPED_REGRESSIONS_WITH_EXISTING_BASELINE_FAILURES",
+      "executions": 18,
+      "expected_negative_controls": 4,
+      "positive_passes": 14,
+      "all_results_match_expectation": true,
+      "payment_lua_assertions": 96,
+      "commerce_lua_assertions": 35,
+      "deadlines_seconds": {
+        "payment_http": 32,
+        "payment_profile_phase": 35,
+        "payment_catalog_ui": 32,
+        "payment_order_ui": 70,
+        "commerce_provider_http": 30,
+        "commerce_attempt": 32,
+        "commerce_three_attempts_with_retry_gaps": 98,
+        "commerce_ui": 105
+      },
+      "invariants": [
+        "Send false and exceptions release busy state; native void nil remains compatible",
+        "Stable request_id retained for recovery",
+        "Late attempt/job/session/account callbacks isolated",
+        "Closing checkout does not reopen on a late create result",
+        "No new deduction is created to recover an ambiguous old result"
+      ],
+      "known_preexisting_failures": 2,
+      "real_gateway_calls": 0,
+      "remote_writes": 0,
+      "transport_failure_injection_native_verified": false,
+      "evidence": [
+        "payment_regressions"
+      ]
+    },
+    "ui_owner_layers": {
+      "status": "PASS_NEW_SCENARIOS_WITH_EXISTING_BASELINE_FAILURES",
+      "new_scenarios": {
+        "modal_owner_lifecycle": 12,
+        "topnav_modal_identity": 3
+      },
+      "node_files": {
+        "total": 46,
+        "pass": 43,
+        "preexisting_fail": 3,
+        "report": "node_regressions.json"
+      },
+      "primary_fixes": [
+        "market_navigation_modal_identity",
+        "shared_owner_reload_and_stale_controller_ownership"
+      ],
+      "source_drift": [],
+      "limits": [
+        "Local Node fixtures do not prove native Cancelled/delete timing",
+        "Existing three failures retained; browser success does not delete their assertions"
+      ],
+      "evidence": [
+        "ui_owner_review"
+      ]
+    },
+    "wallet_refresh": {
+      "status": "PASS",
+      "new_scenarios": 12,
+      "before_passed": 5,
+      "after_passed": 12,
+      "without_daily_invalidation_passed": 6,
+      "without_busy_refresh_queue_passed": 11,
+      "production_bugfixes": 2,
+      "final_node_files_passed": 12,
+      "original_node_files_passed": 11,
+      "original_node_files_total": 12,
+      "fixture_corrections": 1,
+      "original_failures_retained": true,
+      "scope": "Production JS events in local fixtures; actual v06 eventual50 and v07 cross-session50/real purchase21 are separately evidenced.",
+      "evidence": [
+        "wallet_before",
+        "wallet_after",
+        "wallet_without_daily",
+        "wallet_without_busy_queue",
+        "wallet_regressions_final"
+      ]
+    },
+    "font": {
+      "status": "PASS_SCOPED_LOCAL_AND_NATIVE_VISIBLE_TIMELINES",
+      "new_scenarios": 10,
+      "additional_integration_modules": 5,
+      "old_source_negative_control_failed_as_expected": true,
+      "ready_only_after_both_pages": true,
+      "loading_failed_unavailable_unknown_glyph_retains_native_label": true,
+      "stale_owner_callback_isolated": true,
+      "native_event_branch_not_directly_proven": true,
+      "evidence": [
+        "font_regressions",
+        "native_normal_kill_font"
+      ]
+    },
+    "stackable_points": {
+      "status": "PASS_UI_SOURCE_AND_BROWSER",
+      "native_v08_evidence_ref": "root_final_update.v08_native_restart",
+      "changed_ui_sources": [
+        "archive_v10_semantics.js",
+        "archive_v10.js",
+        "common/archive_tooltip.js"
+      ],
+      "source_test_entrypoints_passed": 6,
+      "new_scenarios": 46,
+      "ember": {
+        "canonical": "lottery_ember_of_legacy",
+        "legacy_aliases": [
+          "P103",
+          "P089",
+          "video_p103",
+          "video_p089"
+        ],
+        "max_owned": 0,
+        "target": "omitted",
+        "source_kind": "benefit",
+        "duplicate_points": 0,
+        "quantity": "actual nonnegative count; no /0"
+      },
+      "zongzi": {
+        "id": "welfare_zongzi",
+        "cap": 150,
+        "quantity": "count/150"
+      },
+      "unique": {
+        "count": "0/1 entitlement",
+        "numeric_grid_badge": false,
+        "numeric_tooltip_metric": false,
+        "legacy_daily999999_stays_unique": true
+      },
+      "backend_save_prices_delivery_or_caps_changed": false,
+      "old_v07_browser_negative": "Input151 normalized/presented1; same frozen v08 fixture presents151.",
+      "evidence": [
+        "stackable_source_tests",
+        "browser_v08_stackable",
+        "browser_v08_comparison",
+        "online_v07"
+      ]
+    },
+    "browser": {
+      "status": "PASS",
+      "label": "after_stackable_v08",
+      "source_digest": "a209cba9e4b358c3be216e1c43107e47f2f132523dbcad380f6a5e113829c6c6",
+      "source_count": 177,
+      "current_source_graph_drift": 0,
+      "evidence_binding_errors": [],
+      "cases": 204,
+      "passed": 204,
+      "functional_failures": 0,
+      "asset_failures": 0,
+      "resolutions": [
+        "1280x720",
+        "1600x900",
+        "1920x1080",
+        "2560x1440"
+      ],
+      "flow_cases": 20,
+      "physical_dom_points": 44,
+      "short_tooltip": {
+        "cases": 4,
+        "roundTrips": 200,
+        "returnedVisible": 200,
+        "closedInsideRegion": 200,
+        "under30ms": 200,
+        "maxReturnMs": 19,
+        "report": "tooltip_trace.json",
+        "timingScope": "Old adapter-only whole-page syncLayout is suspended after stable geometry; actual production event handlers and DOM/style updates remain active. No sleep occurs between tooltip-region entry and same-icon return."
+      },
+      "long_tooltip": {
+        "cases": 4,
+        "roundTrips": 200,
+        "retainedInsideRegion": 200,
+        "returnedVisible": 200,
+        "scrollChecks": 4,
+        "report": "tooltip_trace.json",
+        "note": "Long scrollable cases retain the ordinary full-page adapter hook and use their separate pointer-retention/scroll policy."
+      },
+      "stackable_inventory": {
+        "report": "stackable_matrix.json",
+        "passed": true,
+        "cases": 24,
+        "physicalTooltipChecks": 72,
+        "staleReplyChecks": 24,
+        "reopenChecks": 24,
+        "contract": "Explicit synthetic inventory counts 0/1/2/151, unlimited ember cap0, capped zongzi150, unique growth gem1, legacy video_p103 alias and daily999999 cap; grid/quantity tooltip/header count owned types, presentation leaves supplied rows unchanged.",
+        "limits": "Presentation contract only; no actual purchase, inventory persistence, cap enforcement or backend reward transaction is proven."
+      },
+      "font_readiness": {
+        "casesWithFont": 204,
+        "allReportedCasesReady": true,
+        "eventScope": "Actual DOM image load/error delivered to production callbacks by task-owned snapshot adapter; no Dota native events or GPU texture residency are proven.",
+        "fallbackReport": "font_fallback.json",
+        "fallbackCases": 8,
+        "fallbackPassed": true
+      },
+      "resources": {
+        "records": 92,
+        "unique": 63,
+        "missing": 0
+      },
+      "safety": {
+        "pageNetworkAttempts": 0,
+        "realOrders": 0,
+        "realAccounts": 0,
+        "nativeGames": 0,
+        "publicNetworkBlocked": true,
+        "isolatedChromeProfile": true
+      },
+      "manual_visual_limit": "1280x720 explicit synthetic long title plus 12-digit price overlaps within a commerce row; no ordinary-catalogue or native reproduction established.",
+      "limits": [
+        "No claim of five native matches, actual cloud transactions or actual payment delivery.",
+        "Synthetic authoritative-style replies prove UI request_id/layer/replay behavior only, not backend crediting.",
+        "VIP is now a passive known-level status; the retired VIP modal is expected to stay hidden.",
+        "Treasure uses the native text-tooltip API. Chrome captures that API call, and does not invent native tooltip pixels.",
+        "The isolated browser helper launches headless with GPU disabled and a unique temporary profile; it does not attach the existing interactive browser.",
+        "Chrome cannot certify native font metrics, opacity masks, compositing, render performance or in-game latency.",
+        "Chrome font callback coverage uses actual DOM image decoding, not native Dota ImageLoaded or GPU texture residency.",
+        "The backdrop is a historical screenshot, including historical HUD numbers, not a live game or current tuning evidence."
+      ],
+      "evidence": [
+        "browser_v08_summary",
+        "browser_v08_stackable",
+        "browser_v08_comparison",
+        "browser_v08_manual",
+        "browser_v08_source_freeze"
+      ]
+    },
+    "payment_python": {
+      "status": "PASS",
+      "modules": 14,
+      "tests": 129,
+      "service_tests": 22,
+      "alipay_signature_callback_tests": 11,
+      "other_tests": 96,
+      "database_test_entrypoints_executed": false,
+      "external_calls_blocked": 0,
+      "real_db_calls_blocked": 0,
+      "real_payment": false,
+      "remote_writes": false,
+      "environment": {
+        "python": "3.14.7",
+        "cryptography": "50.0.2",
+        "psycopg": "3.2.13",
+        "qrcode": "8.2",
+        "repository_cryptography_46_0_5_lock_reproduced": false
+      },
+      "scope": "Mock gateway/fake DB/synthetic signatures and loopback HTTP only",
+      "evidence": [
+        "payment_python"
+      ]
+    },
+    "five_synthetic_sessions": {
+      "status": "PASS",
+      "python_tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "accounts": 4,
+      "sessions_per_account": 5,
+      "account_session_pairs": 20,
+      "modes": [
+        "standard",
+        "pure",
+        "rich",
+        "cold",
+        "standard"
+      ],
+      "persistent_synthetic_database_instances": 1,
+      "persistent_commits": 40,
+      "lua_checks": 871,
+      "cross_session_purchase_replays_without_mutation": 16,
+      "negative_scope_and_wallet": {
+        "passed": true,
+        "mode_rebinding_rejected": true,
+        "cross_account_session_rejected": true,
+        "cross_mode_clear_rejected": true,
+        "unfunded_purchase_atomic": true,
+        "client_price_rejected": true,
+        "permanent_commits": 0
+      },
+      "revision_conflict": {
+        "passed": true,
+        "concurrent_wood_delta_preserved": 100,
+        "revision_delta": 2,
+        "purchase_item_delta": 1,
+        "replay_changes": 0
+      },
+      "real_accounts": false,
+      "native_games": 0,
+      "network_connections": 0,
+      "actual_sql_execution": false,
+      "scope": "offline_synthetic_cross_layer_data_only",
+      "evidence": [
+        "synthetic_five_sessions"
+      ]
+    },
+    "real_local_postgresql": {
+      "status": "PASS",
+      "server_version": "PostgreSQL 17.11 x86_64 Windows",
+      "psycopg_version": "3.2.13",
+      "connection_scope": "New owned loopback cluster only",
+      "attempts_total": 5,
+      "earlier_failures_preserved": 4,
+      "final_report": "output/ui_qa_20261025/postgres/run_b6cad8a934e2/owner_report.json",
+      "business_migrations": 30,
+      "security_ledger_entries": 3,
+      "second_run_new_migrations": 0,
+      "inventory_tables": 18,
+      "inventory_functions": 26,
+      "runtime_permissions": {
+        "rpc_count": 14,
+        "table_access": false,
+        "ddl": false,
+        "role_membership": false
+      },
+      "checks": [
+        "full historical migration replay",
+        "idempotent rerun",
+        "real schema inventory",
+        "least privilege runtime RPC count",
+        "original grant helper effects and receipts",
+        "concurrent final fishing slot",
+        "eight-argument final checkpoint and retry",
+        "online clock continues at cap",
+        "no uncommitted reward announcements"
+      ],
+      "existing_database_connections": 0,
+      "cloud_connections": 0,
+      "existing_accounts_read": 0,
+      "real_payment_requests": 0,
+      "production_modified": false,
+      "source_drift": [],
+      "owned_clusters_stopped": true,
+      "owned_listener_port_rebindable": true,
+      "scope": "Real archival SQL migration/permission/concurrency/checkpoint tests; not full payment database or cloud acceptance",
+      "evidence": [
+        "postgres_summary",
+        "postgres_final_owner"
+      ]
+    },
+    "monthly_caps_ui_dto": {
+      "status": "PASS",
+      "checks": 3099,
+      "expected_negative_controls": 2,
+      "all_results_match_expectation": true,
+      "production_or_config_modified": false,
+      "network_or_game": false,
+      "test": "tools/test_ui_qa_daily_limits.lua",
+      "evidence": [
+        "monthly_caps"
+      ]
+    },
+    "native_offline": {
+      "status": "PASS_SCOPED_NATIVE_ACCELERATED_SETTLEMENT_AND_FONT",
+      "initial_cold_launch_menu_chains": 5,
+      "initial_modes": [
+        "standard",
+        "pure",
+        "rich",
+        "cold",
+        "standard"
+      ],
+      "initial_base_captures_saved": 105,
+      "initial_base_captures_explicitly_referenced_by_visual_reviews": 80,
+      "initial_all_clean_visual_pass": false,
+      "settlement": {
+        "count": 5,
+        "passed": 5,
+        "normal_kills": 360,
+        "method": "early final wave plus actual Kill(nil, valid allied hero)",
+        "all_alive_zero": true,
+        "all_victory_settled": true,
+        "all_post_clear_frozen": true,
+        "final_business_status": "archive_challenges",
+        "engine_state": 10,
+        "full_natural_defense_clears": 0,
+        "engine_post_game_proven": false,
+        "version_boundary": "First standard settlement before the font fix; next four modes use v07 font/daily/wallet compile. This is not five native matches on v08.",
+        "no_manual_entity_killed_or_registry_clear_or_SetGameWinner": true
+      },
+      "font": {
+        "actual_images_reviewed": 12,
+        "continuous_first_open_modes": 4,
+        "two_second_clear": 4,
+        "ten_second_clear": 4,
+        "half_second_window_not_visible": 4,
+        "all_500ms_content_ready": false,
+        "pages_native_event_state_directly_observed": false,
+        "native_fallback_branch_directly_observed": false,
+        "closed_between_samples": false
+      },
+      "harness_boundaries": [
+        "Tools+development+offline only: resource grants, early final, controlled timescale and canceled unbuilt-wall/normal-wave timers; no production rule files changed for the probe.",
+        "ForceKill failure retained as the wrong engine death path, not a confirmed normal-combat production defect.",
+        "No cloud saves, formal reward delivery, multiplayer, full-defense difficulty balance or native performance acceptance inferred."
+      ],
+      "retained_harness_failures": [
+        {
+          "file": "kill_series_font_ready.json",
+          "reason": "Get-FileHash未加载，仅首张500ms后工具中止；改.NET流SHA，用新tag保留重测。"
+        },
+        {
+          "file": "round_3_font_ready2.json",
+          "reason": "首窗三图完整，后续菜单ESC截图因foreground校验中止；未重复整局，当前局正常Kill恢复测试另存font_ready2_r3。"
+        },
+        {
+          "file": "final_wave_accelerated.json",
+          "reason": "早期ForceKill绕过entity_killed，未结算，继续保留失败。"
+        }
+      ],
+      "evidence": [
+        "native_initial_menu_summary",
+        "native_initial_visual_r1_r3",
+        "native_initial_visual_r2_r4",
+        "native_initial_visual_r5",
+        "native_normal_kill_font"
+      ]
+    },
+    "native_online": {
+      "status": "PASS_SCOPED_ACTUAL_SINGLE_PLAYER_V06_V07_V08_WITH_HOVER_RISK",
+      "scope": "Actual native UI and sanitized client receipts; no independent private cloud DB audit.",
+      "mode": "fishing",
+      "v06": {
+        "revision": "WS4-UI-QA-06",
+        "content_sha256": "1dd9d88f885f8e1617985f933bbdb450884f91a7cdb96b10e0315d2b0cdaa884",
+        "real_steam_login": true,
+        "explicit_match_browser_approval": true,
+        "password_read_or_entered": false,
+        "browser_remember_preference_changed": false,
+        "engine_cheats_disabled": true,
+        "engine_reload_cheat_rejected": true,
+        "profile_revision_first": 43,
+        "profile_revision_last": 88,
+        "client_checkpoint_success_receipts": 39,
+        "client_checkpoint_failure_receipts": 0,
+        "daily_count_before": 0,
+        "daily_count_after": 1,
+        "repeat_and_reopen_stayed_one": true,
+        "eventual_shop_points_visible": 50,
+        "positive_commerce_purchases": 0,
+        "normal_close_observed": true,
+        "evidence": [
+          "online_v06",
+          "v06_alias_apply"
+        ]
+      },
+      "v07": {
+        "revision": "WS4-UI-FONT-WALLET-07",
+        "content_sha256": "811170a2c77396faee948bf7a77021fe8ac07c2117a919a6c3eb7163e4525e7e",
+        "real_steam_session_reused": true,
+        "explicit_new_match_browser_approval": true,
+        "password_read_or_entered": false,
+        "browser_remember_preference_changed": false,
+        "engine_cheats_disabled": true,
+        "profile_revision_first": 89,
+        "profile_revision_last": 164,
+        "client_checkpoint_success_receipts": 68,
+        "client_checkpoint_failure_receipts": 0,
+        "daily_persisted_count": 1,
+        "daily_total_days": 28,
+        "daily_claim_disabled": true,
+        "purchase": {
+          "sku": "video_p103",
+          "canonical_item": "lottery_ember_of_legacy",
+          "quantity": 1,
+          "currency": "shop_points",
+          "price": 29,
+          "balance_before": 50,
+          "balance_after": 21,
+          "positive_confirm_clicks": 1,
+          "second_attempt": "insufficient points; balance remains21",
+          "admin_funding": false,
+          "cash_payments": 0,
+          "archive_owned_kinds_before": 1,
+          "archive_owned_kinds_after": 2,
+          "parent_balance": 21,
+          "pricing_scope": "29 is the actual frozen v07/existing-backend GUI quote; this run does not certify current development economic CSV synchronization or diagnose a price bug from CSV text."
+        },
+        "font_visible_clear": true,
+        "normal_close_observed": true,
+        "old_tooltip_defect_confirmed": true,
+        "archive_first_reopen_cause": "Unconfirmed; first click showed HUD, a second deliberate normal click opened archive.",
+        "purchase_cross_native_session": "PASS_V08_RETRY_UI_BALANCE21_EMBER1",
+        "evidence": [
+          "online_v07",
+          "v07_alias_apply"
+        ]
+      },
+      "real_cash_orders": 0,
+      "independent_cloud_db_audit": false,
+      "multiplayer_verified": false,
+      "online_five_consecutive_matches_verified": false,
+      "full_wave_clears": 0,
+      "limits": [
+        "Successful client profile/checkpoint receipts are not an independent row or ledger audit.",
+        "Legitimate online tests read and modify the test player's archive through normal game actions; the no-real-cloud-mutation boundary belongs only to the isolated synthetic test layers.",
+        "Observed native sv_cheats=false covers the sampled alias sessions, not every map or launch path."
+      ],
+      "v08": {
+        "revision": "WS4-UI-STACKABLE-08",
+        "content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
+        "scope": "Single-player Tools svt_w24 online alias, actual UI plus client receipts; ordinary Workshop entry separate.",
+        "explicit_new_match_browser_approval": true,
+        "password_read_or_entered": false,
+        "browser_remember_preference_changed": false,
+        "engine_cheats_disabled": true,
+        "engine_reload_cheat_rejected": true,
+        "profile_revision_first": 164,
+        "profile_revision_last": 209,
+        "client_profile_publications": 47,
+        "client_checkpoint_success_receipts": 42,
+        "client_checkpoint_failure_receipts": 0,
+        "daily_persisted_count": 1,
+        "daily_total_days": 28,
+        "daily_claim_enabled_property_observed": false,
+        "daily_repeat_claim_sent": false,
+        "shop_points_visible": 21,
+        "g_coin_visible": 0,
+        "archive_owned_kinds": 2,
+        "archive_owned_total": 110,
+        "ember_badge": 1,
+        "ember_tooltip_quantity": 1,
+        "ember_tooltip_stackable": true,
+        "ember_tooltip_unlimited": true,
+        "ember_tooltip_old_unique_wording": false,
+        "tooltip_center_hover_verified": false,
+        "tooltip_successful_right_edge_reentry": true,
+        "new_purchases": 0,
+        "native_multiple_copy_ownership_verified": false,
+        "normal_close_observed": true,
+        "forced_termination": false,
+        "first_unexpected_exit_retained": true,
+        "first_wallet_placeholder_retained": true,
+        "evidence": [
+          "root_v08_native",
+          "online_v08_final_client",
+          "v08_engine_cheats",
+          "v08_alias_apply"
+        ],
+        "independent_visual_review": "Actual daily, first wallet/archive frame and successful final ember tooltip read by report reviewer; no GUI/vconsole control."
+      }
+    }
+  },
+  "baseline_triage": {
+    "status": "HISTORICAL_BASELINE_RETAINED_WITH_NARROWED_BEHAVIOR_FOLLOWUP",
+    "total": 294,
+    "passed": 179,
+    "failed": 115,
+    "categories": {
+      "synthetic_admission": 74,
+      "missing_api_dependencies": 9,
+      "bom": 2,
+      "unicode_output": 1,
+      "optimized_operation_counts": 4,
+      "rule_asset_snapshots": 8,
+      "historical_economic_contracts": 2,
+      "wall_native_boundaries": 10,
+      "behavior_followups_original": 5
+    },
+    "admission_local_memory_complete_passes": 74,
+    "production_admission_changed": false,
+    "behavior_followup": {
+      "items": 5,
+      "probe_runs": 11,
+      "current_contract_complete_passes": 4,
+      "original_or_intermediate_failures_retained": 7,
+      "confirmed_production_blockers": [],
+      "dispositions": [
+        "current scheduler/model-scale contract",
+        "causal GetParent accounting without observed fanout",
+        "configured altar eligibility4 instead of old3",
+        "current released-mode/exact-receipt fixture",
+        "native APS priority and0.1s coalescing instead of old cache/immediate fixture"
+      ],
+      "native_summon_actual_cadence_measured": false
+    },
+    "historical_stress_labels_not_confirmed_bug_count": true,
+    "all_failures_declared_stale": false,
+    "evidence": [
+      "runtime_baseline",
+      "runtime_triage",
+      "behavior_classification",
+      "historical_stress_triage"
+    ]
+  },
+  "open_followups": [
+    {
+      "id": "v08_workshop_publication",
+      "priority": "P1",
+      "status": "FAILED_RELEASE_REQUIRES_SEPARATE_RECONCILED_RETRY",
+      "scope": "One official Steam update returned callback3404 EResult2/exit1. Preserve pending journal and backup; official remote and fresh full signed download still identify v05. Do not blindly retry, reset journal, or report v08 Workshop delivery. Reconcile current official state before a later reviewed retry.",
+      "evidence": [
+        "v08_failed_release_public",
+        "v08_remote_reconciliation",
+        "v05_official_redownload_after_failed_v08"
+      ]
+    },
+    {
+      "id": "native_archive_center_hover",
+      "priority": "P1",
+      "status": "FOLLOW_UP_CONFIRMED_OBSERVATION_CAUSE_UNKNOWN",
+      "scope": "Actual v08 Tools online: sampled card-center approaches repeatedly did not show a popup. Leaving to (900,550) then entering ember from right (732,260) displayed the correct complete tooltip. This proves content once, not every hitbox point or consistently correct hover.",
+      "failed_sample_points": [
+        [
+          688,
+          290
+        ],
+        [
+          690,
+          300
+        ]
+      ],
+      "successful_reentry_point": [
+        732,
+        260
+      ],
+      "root_cause_confirmed": false,
+      "evidence": [
+        "root_v08_native"
+      ],
+      "production_source_changed_for_this_risk": false
+    },
+    {
+      "id": "extreme_commerce_row",
+      "status": "FOLLOW_UP",
+      "scope": "Synthetic1280 long title plus12-digit price overlaps; ordinary catalogue/native impact unconfirmed.",
+      "priority": "P1"
+    },
+    {
+      "id": "native_hud_and_input",
+      "status": "FOLLOW_UP",
+      "scope": "Full native independent HUD rebuild/Cancelled/delete timing and every card hitbox point not certified by browser."
+    },
+    {
+      "id": "native_summon_cadence",
+      "status": "FOLLOW_UP",
+      "scope": "Measure real modifier/native APS/attack timestamps; do not replace native-priority UI with old cache solely for an old fixture."
+    },
+    {
+      "id": "wall_and_historical_economy",
+      "status": "FOLLOW_UP",
+      "scope": "Wall collision/queue transitions, faith4000-vs-current3000 and related historical contracts need separate current-rule/native evidence."
+    },
+    {
+      "id": "preexisting_tests",
+      "status": "RETAINED_FAILURES",
+      "scope": "Three historical Node failures plus old payment shell334-vs372 and wallet locator failures remain; no core assertions deleted."
+    },
+    {
+      "id": "long_play_multiplayer",
+      "status": "FOLLOW_UP",
+      "scope": "Natural full25-wave defense, multiplayer/remote latency and native endurance are not established by accelerated or synthetic sessions."
+    },
+    {
+      "id": "cash_and_private_db",
+      "status": "OUTSIDE_CURRENT_ACCEPTANCE",
+      "scope": "No real cash gateway or independent private-cloud DB audit; separate authorization and acceptance required."
+    }
+  ],
+  "release": {
+    "pre_v08_signed_installed_baseline": "v07",
+    "invariants": {
+      "runtime_files": 6630,
+      "protected_modules_preserved": 180,
+      "online_auth_provider_main_maps_cash_policy_preserved": true
+    },
+    "v06": {
+      "revision": "WS4-UI-QA-06",
+      "release_sequence": 2026102501,
+      "content_sha256": "1dd9d88f885f8e1617985f933bbdb450884f91a7cdb96b10e0315d2b0cdaa884",
+      "exact_changed_paths": 7,
+      "two_lua_five_compiled_js": true,
+      "signed": true,
+      "alias_applied_fully_verified": true,
+      "actual_native_online_verified": true,
+      "workshop_publication_not_proven_by_alias": true,
+      "evidence": [
+        "v06_build",
+        "v06_alias_apply",
+        "online_v06",
+        "compile_v06"
+      ]
+    },
+    "v07": {
+      "revision": "WS4-UI-FONT-WALLET-07",
+      "release_sequence": 2026102502,
+      "content_sha256": "811170a2c77396faee948bf7a77021fe8ac07c2117a919a6c3eb7163e4525e7e",
+      "exact_changes_from_v06": 3,
+      "cumulative_distinct_paths_from_v05": 9,
+      "signed": true,
+      "alias_applied_fully_verified": true,
+      "actual_native_online_verified": true,
+      "restricted_package_built_and_hash_verified": true,
+      "package_report_native_over2gib_read_test": "NOT_RUN",
+      "package_report_ready_for_upload": false,
+      "earlier_standard_pack_failed_closed_and_retained": true,
+      "evidence": [
+        "v07_build",
+        "v07_alias_apply",
+        "online_v07",
+        "v07_package_reviewed",
+        "v07_package_wrapper_tests",
+        "compile_v07"
+      ]
+    },
+    "v08": {
+      "revision": "WS4-UI-STACKABLE-08",
+      "release_sequence": 2026102503,
+      "base_content_sha256": "811170a2c77396faee948bf7a77021fe8ac07c2117a919a6c3eb7163e4525e7e",
+      "exact_allowed_changes": [
+        "panorama/scripts/custom_game/archive_v10.vjs_c",
+        "panorama/scripts/custom_game/archive_v10_semantics.vjs_c",
+        "panorama/scripts/custom_game/common/archive_tooltip.vjs_c"
+      ],
+      "compile_succeeded": true,
+      "game_content_sources_equal": true,
+      "compiled_DATA_matches_reviewed_source": true,
+      "read_only_builder_plan_passed": true,
+      "browser_v08_passed": true,
+      "final_execution_ref": "root_final_update",
+      "evidence": [
+        "compile_v08",
+        "v08_readonly_plan",
+        "stackable_source_tests",
+        "browser_v08_summary",
+        "v08_build",
+        "v08_alias_apply",
+        "v08_package",
+        "v08_package_native",
+        "v08_upload_preflight",
+        "root_v08_native",
+        "online_v08_final_client",
+        "v08_engine_cheats",
+        "v08_failed_release_public",
+        "v08_remote_reconciliation",
+        "v05_official_redownload_after_failed_v08"
+      ],
+      "content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
+      "signed": true,
+      "signature_valid": true,
+      "exact_changed_paths": 3,
+      "files": 6630,
+      "protected_modules_preserved": 180,
+      "alias_installed": true,
+      "full_installed_verification": true,
+      "packaged": true,
+      "package_index_sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5",
+      "package_native_reads_passed": 8,
+      "package_native_read_scope": "Valve resourceinfo8 local-package samples across4 archives plus3 changed JS; Dota not launched; not official downloaded-copy or gameplay acceptance.",
+      "native_online_alias_verified": true,
+      "native_online_alias_hover_risk_retained": true,
+      "publication_attempted": true,
+      "workshop_uploaded": false,
+      "workshop_official_download_verified": false,
+      "workshop_native_download_reads": "NOT_RUN_V08_NOT_PUBLISHED",
+      "ordinary_workshop_native_acceptance": "NOT_RUN_V08_NOT_PUBLISHED",
+      "publication_status": "FAILED_STEAM_SUBMIT_V05_REMAINS_PUBLISHED"
+    },
+    "tool_regressions": {
+      "v06_builder_tests": 58,
+      "v06_alias_related_tests": 50,
+      "overlap": 22,
+      "additive_total_claim": false,
+      "synthetic_temp_alias_tests_not_actual_apply_proof": true,
+      "evidence": [
+        "v06_builder_tests",
+        "v06_alias_tests"
+      ]
+    }
+  },
+  "safety": {
+    "real_cash_orders": 0,
+    "admin_funding": false,
+    "legitimate_native_online_archive_reads_and_writes": true,
+    "synthetic_layers_real_cloud_writes": 0,
+    "independent_private_db_queries": 0,
+    "private_db_aggregate_audit": {
+      "status": "AUTO_REVIEW_REJECTED_NOT_EXECUTED",
+      "reason": "Would require internally reading administrator password and accessing a private database without explicit authorization.",
+      "script_deleted": true,
+      "bypass_attempted": false
+    },
+    "public_https_health": "Reachability only; not proof of authentication, purchase or committed checkpoint rows.",
+    "passwords_real_cookies_tokens_or_openid_callbacks_in_this_report": false,
+    "chrome_scope": "Task-owned headless unique profiles, GPU disabled, page external network blocked; no attachment to existing interactive Chrome or Dota control."
+  },
+  "reconciliation": {
+    "source_report": "reconciliation",
+    "corrected_topics": [
+      "formal_status",
+      "cloud_scope",
+      "browser_graph",
+      "native_image_coverage",
+      "native_settlement",
+      "unknown_behavior",
+      "postgres_path",
+      "font_test_count",
+      "wallet_regression_count",
+      "v07_phase",
+      "package_failure",
+      "release_publication",
+      "git"
+    ],
+    "count": 13,
+    "point_in_time_rule": "The reconciliation report was a historical snapshot; its v07 pending stages and4 browser failures are superseded only by later separately hashed actual reports, not rewritten retroactively."
+  },
+  "root_final_update": {
+    "v08_signed_candidate": {
+      "status": "COMPLETE",
+      "content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
+      "build_evidence_id": "v08_build",
+      "signature_and_exact3_and_180_verified": true
+    },
+    "v08_alias_install": {
+      "status": "COMPLETE",
+      "apply_evidence_id": "v08_alias_apply",
+      "full_after_verification": true,
+      "receipt_and_backup_verified": true,
+      "transaction": "D:\\SteamLibrary\\steamapps\\common\\dota 2 beta\\game\\dota_addons\\survival\\output\\ui_qa_20261025\\release\\alias_updates\\v06_6de88891202f4d2bae99719f93adeb2c"
+    },
+    "v08_native_restart": {
+      "status": "COMPLETE_SCOPED_WITH_NATIVE_HOVER_RISK",
+      "evidence_id": "root_v08_native",
+      "explicit_new_match_approval": true,
+      "engine_cheats_disabled": true,
+      "daily1_of28_persisted": true,
+      "purchase_balance21_and_ember_persisted": true,
+      "stackable_quantity_tooltip_verified": true,
+      "client_revision_range": [
+        164,
+        209
+      ],
+      "client_checkpoint_success_receipts": 42,
+      "private_db_audit": false,
+      "retained_attempts": [
+        {
+          "status": "INTERRUPTED_NOT_ACCEPTED",
+          "client_summary_evidence_id": "online_v08_interrupted",
+          "profile_publications": 0,
+          "checkpoint_receipts": 0,
+          "normal_quit_observed": false,
+          "observation_source": "web native controller and cheat release gate report",
+          "observation": "Process exited unexpectedly after fishing-mode click; five native acceptance items not verified.",
+          "cause": "UNKNOWN; not a confirmed v08 production crash defect"
+        }
+      ],
+      "ui_three_files_as_exit_cause_confirmed": false,
+      "newly_purchased_P103_as_exit_cause_confirmed": false,
+      "client_profile_publications": 47,
+      "client_checkpoint_failure_receipts": 0,
+      "normal_close_observed": true,
+      "forced_termination": false,
+      "tools_alias_not_original_workshop": true,
+      "center_hover_verified": false,
+      "tooltip_success_method": "leave cards then enter from right edge"
+    },
+    "workshop_publication": {
+      "status": "FAILED_STEAM_SUBMIT_V05_REMAINS_PUBLISHED",
+      "workshop_id": "3824360109",
+      "uploaded": false,
+      "publication_attempted_once": true,
+      "official_callback_id": 3404,
+      "official_callback_result": 2,
+      "uploader_exit_code": 1,
+      "successful_submission_confirmed": false,
+      "journal_status": "SUBMIT_REQUEST_PENDING",
+      "journal_preserved": true,
+      "automatic_retry": false,
+      "journal_rolled_back": false,
+      "package_evidence_id": "v08_package",
+      "steam_manifest_id": null,
+      "download_integrity_verified": false,
+      "original_entry_native_test": "NOT_RUN_V08_NOT_PUBLISHED",
+      "v08_official_download_native_reads": "NOT_RUN_V08_NOT_PUBLISHED",
+      "current_published_sequence": 2026102405,
+      "current_published_content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+      "current_published_v05_steam_manifest_id": "2955439000185399689",
+      "steam_manifest_stored_as_string": true,
+      "current_published_v05_official_redownload_fully_verified": true,
+      "current_published_v05_download_files": 6630,
+      "current_published_v05_archive_count": 4,
+      "evidence_ids": [
+        "v08_failed_release_public",
+        "v08_remote_reconciliation",
+        "v05_official_redownload_after_failed_v08"
+      ],
+      "preparation_is_not_publication": true,
+      "old_v05_pass_not_transferred_to_v08": true
+    },
+    "git_game_content": {
+      "status": "EXTERNAL_RECEIPT_REFERENCE",
+      "receipt": "output/ui_qa_20261025/git_delivery.json",
+      "execution_claimed_in_tracked_report": false,
+      "embeds_own_commit": false,
+      "completion_rule": "Actual commits and remote equality are established only by the external receipt and final delivery message for both repositories.",
+      "required_order": [
+        "stash",
+        "pull",
+        "pop",
+        "validate",
+        "commit",
+        "push"
+      ],
+      "game": {
+        "expected_branch": "dev",
+        "expected_upstream": "origin/dev",
+        "original_uncommitted_preserved_count": 102,
+        "original_changes_excluded_from_commit": true
+      },
+      "content": {
+        "expected_branch": "master",
+        "expected_upstream": "origin/master",
+        "original_uncommitted_count": 0
+      },
+      "external_receipt_not_hash_bound_in_tracked_report": true,
+      "reason": "Avoid a self-referential commit/hash cycle; final delivery attaches the actual external receipt after both repository pushes."
+    }
+  },
+  "evidence_files": [
+    {
+      "id": "reconciliation",
+      "path": "output/ui_qa_20261025/report_reconciliation.json",
+      "bytes": 16587,
+      "sha256": "83cd7f7b5e9194b37f88f8033d609529f05859e3c59c7b93ccf98a45f1b76f9e",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "runtime_baseline",
+      "path": "output/ui_qa_20261025/runtime_baseline.json",
+      "bytes": 196745,
+      "sha256": "4b5f2ed1ad3e0063e145627b77d10960865aceb4d72a3572e353badbf7835c51",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "runtime_triage",
+      "path": "output/ui_qa_20261025/triage/runtime_failure_triage.json",
+      "bytes": 82762,
+      "sha256": "daecacc15f9164910d32b1673cb83982a81653ae2d451cf1b5232a24a362e69d",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "behavior_classification",
+      "path": "output/ui_qa_20261025/unknown_behavior/behavior_classification.json",
+      "bytes": 4178,
+      "sha256": "245c0379b60f38ec7742e091f8ab9470be14ffc72c0e6aedf2a91832a39752cd",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "payment_regressions",
+      "path": "output/ui_qa_20261025/payment/regressions.json",
+      "bytes": 5950,
+      "sha256": "4d426f103ffffdca56dc1f730383105d7b463aa8494e241e89f9558971828ec9",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "ui_owner_review",
+      "path": "output/ui_qa_20261025/ui/ui_review.json",
+      "bytes": 3619,
+      "sha256": "db5836d06e59b70b69671cb8c09cdc1db574d81a9ffff904e9b89624c35435e2",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "wallet_before",
+      "path": "output/ui_qa_20261025/display_data/wallet_refresh/before.json",
+      "bytes": 8949,
+      "sha256": "3e07b45a924d084e17288206711b4b5b5f8f85c36978128d395f390291e60731",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "wallet_after",
+      "path": "output/ui_qa_20261025/display_data/wallet_refresh/after.json",
+      "bytes": 2035,
+      "sha256": "e73ad503cd4fc8c681715fae9b63460d5996e3ecb0f7ecbaae087546f07fa694",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "wallet_without_daily",
+      "path": "output/ui_qa_20261025/display_data/wallet_refresh/without_daily_invalidation.json",
+      "bytes": 7993,
+      "sha256": "0209000761fcec8eec0a0d6b07ac2bff1d32624c2a53659f211c8542138773db",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "wallet_without_busy_queue",
+      "path": "output/ui_qa_20261025/display_data/wallet_refresh/without_busy_refresh_queue.json",
+      "bytes": 3140,
+      "sha256": "8c0c31679cf579cc358802ab4e62ce6cd7b16f516c6bec1c30d9b25bddbc4177",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "wallet_regressions_final",
+      "path": "output/ui_qa_20261025/display_data/wallet_refresh/regressions_final.json",
+      "bytes": 2778,
+      "sha256": "b109ca85c6671122a62674fddb57b3726d612393104e58e136a37054501e0fe7",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "font_regressions",
+      "path": "output/ui_qa_20261025/archive_font/font_regressions.json",
+      "bytes": 6373,
+      "sha256": "6db04a2f060934ef342735cd39bf4a41ca9122938e89a2738a1d160a733b7c13",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "stackable_source_tests",
+      "path": "output/ui_qa_20261025/stackable_fix/report.json",
+      "bytes": 5392,
+      "sha256": "cd83223ac13b4c0d42dd7c606da9891b4ef8393691d4dd7c23258dfb1a21f55c",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "browser_v08_summary",
+      "path": "output/ui_qa_20261025/browser/after_stackable_v08/summary.json",
+      "bytes": 60836,
+      "sha256": "9c808af6b035d41fd88870a829b8d130f65533b2a93c6ff3fe84bb6731fef900",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "browser_v08_stackable",
+      "path": "output/ui_qa_20261025/browser/after_stackable_v08/stackable_matrix.json",
+      "bytes": 251181,
+      "sha256": "fc347cee09601a65e29adf6416aeda073d76e35aa6b006308323d14ff15e2142",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "browser_v08_comparison",
+      "path": "output/ui_qa_20261025/browser/after_stackable_v08/stackable_reconciliation.json",
+      "bytes": 2467,
+      "sha256": "58fd6051821a1dd359c92524a7e1707881135d03c0059a49319dc8d570d4f594",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "browser_v08_manual",
+      "path": "output/ui_qa_20261025/browser/after_stackable_v08/manual_review.json",
+      "bytes": 2020,
+      "sha256": "d08fbeced5a655a2a376b86c7025a42dcd4ae31f50f3b326a7ae6c27526dce47",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "browser_v08_source_freeze",
+      "path": "output/ui_qa_20261025/browser/after_stackable_v08/source_freeze_check.json",
+      "bytes": 2168,
+      "sha256": "e5da1eb14383c822fe8ab6a221cee58d42d9e2a53be7b5eca2873f4867e0631c",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "browser_v07_first_failures",
+      "path": "output/ui_qa_20261025/browser/after_font_wallet/browser_matrix.json",
+      "bytes": 7192930,
+      "sha256": "2da82e982f0443aa134462f91eddb08d08936c42bacca6a9c3a5d39c32a58f07",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "browser_v07_verified",
+      "path": "output/ui_qa_20261025/browser/after_font_wallet_verified/summary.json",
+      "bytes": 59066,
+      "sha256": "a2117aef64808a73b8033bb80c4e097e8f6f698958e55c7898c885647db67008",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "browser_wallet_fixture_correction",
+      "path": "output/ui_qa_20261025/browser/after_font_wallet_verified/wallet_fixture_reconciliation.json",
+      "bytes": 2940,
+      "sha256": "197f790e5d6af4699b6dbfe8f11a0c8d03145b032241db89179e5a8f74d5e41e",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "native_initial_menu_summary",
+      "path": "output/ui_qa_20261025/native_review/summary.json",
+      "bytes": 32839,
+      "sha256": "f338f521a839417f569f6e4725ad73747ef72ef874207779e05244987f103c98",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "native_initial_visual_r1_r3",
+      "path": "output/ui_qa_20261025/native_review/independent_r1_r3_visual_review.json",
+      "bytes": 11629,
+      "sha256": "71615c62b9b6365d717207f557d67464ad54aeaa0ce8e99797654ff5c4116cb9",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "native_initial_visual_r2_r4",
+      "path": "output/ui_qa_20261025/native_review/independent_r2_r4_visual_review.json",
+      "bytes": 17417,
+      "sha256": "65a0772be71186357069f0e481195f12cafd3b7870df453acce1b0b8db1dc387",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "native_initial_visual_r5",
+      "path": "output/ui_qa_20261025/native_review/round_5_visual_review.json",
+      "bytes": 5721,
+      "sha256": "0e580a02e85138ac09f5f7689c07400caf5040f3c65a593e1979d3d1ede8a40b",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "native_normal_kill_font",
+      "path": "output/ui_qa_20261025/native_review/normal_kill_font_review.json",
+      "bytes": 17701,
+      "sha256": "fb7623da4c7d03af5349a78b635455f863d267b54bce82cf41f99d6a92f6c4be",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "online_v06",
+      "path": "output/ui_qa_20261025/online/review_v06.json",
+      "bytes": 3245,
+      "sha256": "3b2becceaf1041479baab516c46c59dfafa10d73eb1b47e185ee45e58d726cda",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "online_v07",
+      "path": "output/ui_qa_20261025/online/review_v07.json",
+      "bytes": 4030,
+      "sha256": "1bb309d1d510c447e9e5ba84d92c8275f88ced2b3174ce6f917f41b353f95697",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "payment_python",
+      "path": "output/ui_qa_20261025/triage/payment_python_results.json",
+      "bytes": 2734,
+      "sha256": "20d79b4f936bce6e08dd53e477370ad8a1d5d1a6aa8acda60d851fa535fc946d",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "synthetic_five_sessions",
+      "path": "output/ui_qa_20261025/data/five_match_data.json",
+      "bytes": 4962540,
+      "sha256": "f0ab1d23be43392c01f48ca6834c17a806996ea8bead20e741ea4e8d24a693a2",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "historical_stress_triage",
+      "path": "output/ui_qa_20261025/data/baseline_summary.json",
+      "bytes": 2499,
+      "sha256": "3079f8abaed1c190e178b3c93c55cdb33a399ffb6c5a2fa0ffa9c74830fa2424",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "postgres_summary",
+      "path": "output/ui_qa_20261025/postgres/postgres_summary.json",
+      "bytes": 4588,
+      "sha256": "752044e18f663a2e64ed485219533dda790f4aee22f867260e4a50b31b5531a1",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "postgres_final_owner",
+      "path": "output/ui_qa_20261025/postgres/run_b6cad8a934e2/owner_report.json",
+      "bytes": 8675,
+      "sha256": "25c823eea0f4d657a31bfcd6a1f76220cd07bf364f054556a848404726a69a80",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "monthly_caps",
+      "path": "output/ui_qa_20261025/display_data/daily_limits_regression.json",
+      "bytes": 2421,
+      "sha256": "8a22bf51bc575d63890a28662737e319a82e40de8ae1a8270c85ea3f0f283987",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v06_build",
+      "path": "output/ui_qa_20261025/release/v06_build.json",
+      "bytes": 6324,
+      "sha256": "19a844ca8473c70fafff41e1443076848338b7d28b0a36e52e6f245e2bb3f80d",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v06_alias_apply",
+      "path": "output/ui_qa_20261025/release/alias_apply.json",
+      "bytes": 1382,
+      "sha256": "d2271c8186580e37c375de8bd9c32265e42234aa39ee770a1819f540f509628b",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v06_builder_tests",
+      "path": "output/ui_qa_20261025/release/builder_checks.json",
+      "bytes": 3700,
+      "sha256": "269106a4cd3acac224ac150260fdcc6b5f02b95c5eec0e5b31a563eb95511023",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v06_alias_tests",
+      "path": "output/ui_qa_20261025/release/alias_checks.json",
+      "bytes": 1769,
+      "sha256": "2d737c7c7d61de1400b4a7546d77aceb8b04dee79336b778b871a671e8dd57c7",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v07_build",
+      "path": "output/ui_qa_20261025/release/v07_build.json",
+      "bytes": 3445,
+      "sha256": "71f4769916f8baf8c30a4018533f6f99699c20789392af3a6940372b2b88d6f6",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v07_alias_apply",
+      "path": "output/ui_qa_20261025/release/v07_alias_apply.json",
+      "bytes": 1359,
+      "sha256": "2930f6724187f89305ac060f3e88449b5de7beffa12239ab084aeb3a081d9f0d",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v07_package_reviewed",
+      "path": "output/ui_qa_20261025/release/v07_package_reviewed.json",
+      "bytes": 3921,
+      "sha256": "7867ba71c15e0e3ea1331d7cc611be7dfaaf1eb984fe7ac3da613739d1ebc662",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v07_package_wrapper_tests",
+      "path": "output/ui_qa_20261025/release/v07_package_wrapper_tests.json",
+      "bytes": 518,
+      "sha256": "9a85f968cff71ee5c2cfce2179aee4da5a0084851598501a24d04451977987f8",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v08_readonly_plan",
+      "path": "output/ui_qa_20261025/release/v08_readonly_plan.json",
+      "bytes": 1393,
+      "sha256": "c912d83931070c0a9eb3dd2b1d958394ccdeb2a21fc9c81a527ff941b26ae675",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "compile_v06",
+      "path": "output/ui_qa_20261025/compile/20261024T164024798Z/compile.json",
+      "bytes": 4301,
+      "sha256": "2565a9be6f1301295b520bced8755aeb39a690cd9bf29257060601c82127e22b",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "compile_v07",
+      "path": "output/ui_qa_20261025/compile/20261024T195348709Z/compile.json",
+      "bytes": 2765,
+      "sha256": "1ea69debc1d38a6914ca9b876793641a0c68423addcc7ad62efbb2a4a4c3d1b4",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "compile_v08",
+      "path": "output/ui_qa_20261025/compile/20261024T214452211Z/compile.json",
+      "bytes": 2735,
+      "sha256": "361ae02c4a9f9ab4a4a08d9c5c5e93010b251c7337b073edc117e80df710bb04",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v08_build",
+      "path": "output/ui_qa_20261025/release/v08_build.json",
+      "bytes": 3387,
+      "sha256": "80e113a0ae91b0eb2a4fbb3c7d004dda6c4b37c0ebf5739b94d87e74bd60fce2",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v08_alias_apply",
+      "path": "output/ui_qa_20261025/release/v08_alias_apply.json",
+      "bytes": 1356,
+      "sha256": "8b3b10adc56cd28123a5fee5981b2cd6f7e785a432c838b586f308b42963c78d",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v08_package",
+      "path": "output/ui_qa_20261025/release/v08_package_reviewed.json",
+      "bytes": 3877,
+      "sha256": "b5170bada9f5f70d64b7978de798de7b042facf107a31fa1b6639308c5e4fb26",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v08_package_native",
+      "path": "output/ui_qa_20261025/native_package_reads_v08/package_20261024T222829010556Z_7c5e43d4/report.json",
+      "bytes": 5601,
+      "sha256": "290f57d65fc1aeb886a95f53794fcca42cf2d5c25665463871ddd737d820ecff",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v08_upload_preflight",
+      "path": "output/ui_qa_20261025/release/v08_publication_preparation/uploader_readonly_validation.json",
+      "bytes": 3406,
+      "sha256": "6b7646f547db758c16fc124e75fb1a726a18244d2717678d34e715ca7fa2dd33",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "online_v08_interrupted",
+      "path": "output/ui_qa_20261025/online/v08_interrupted_client_summary.json",
+      "bytes": 789,
+      "sha256": "b86d8d2e6a539ee933a476a374bfc75b6e7614722e83eca4317bdcf3329efa5b",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "root_v08_native",
+      "path": "output/ui_qa_20261025/online/root_v08_visual_review.json",
+      "bytes": 1829,
+      "sha256": "c26ac22cc47ba2bcd35d48f241309fab6cd66ce788d332a269f036792f99619c",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "online_v08_final_client",
+      "path": "output/ui_qa_20261025/online/v08_final_client_summary.json",
+      "bytes": 6356,
+      "sha256": "dc6cd502cb3508db5b557819c96d4706f041828a56cf97e7d6f1870d1b4febe4",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v08_engine_cheats",
+      "path": "output/ui_qa_20261025/online/v08_engine_cheats.json",
+      "bytes": 362,
+      "sha256": "700b2fb54da1fdec96c824d2f7b55b8937eedb36c950024dadb2604fd429cc9a",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v08_failed_release_public",
+      "path": "publishing/workshop/ui_data_qa_release_20261025.json",
+      "bytes": 10017,
+      "sha256": "0ff5a53f0f33584d1ae19e5e48801453b28f59f64aff9c96db8100e617d44c0b",
+      "exists_at_review": true,
+      "storage": "tracked_repository_record"
+    },
+    {
+      "id": "v08_remote_reconciliation",
+      "path": "output/ui_qa_20261025/release/v08_remote_reconciliation.json",
+      "bytes": 1799,
+      "sha256": "59a67689cc623b8118c6253c55be3936059689011e6fcd419a8d52a2e2791f6d",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    },
+    {
+      "id": "v05_official_redownload_after_failed_v08",
+      "path": "output/ui_qa_20261025/release/v05_after_v08_failed_submit_download_verified.json",
+      "bytes": 1890,
+      "sha256": "3c64ce601a5703b7d68a7b9ae3dc5de2a6ffdf260538891bb00b64ff9ec6d34f",
+      "exists_at_review": true,
+      "storage": "ignored_local_output"
+    }
+  ],
+  "evidence_retention": {
+    "paths_relative_to": "game repository root",
+    "all_listed_reports_exist_at_review": true,
+    "sha256_over_raw_bytes": true,
+    "ignored_output_reports_not_included_just_because_docs_are_committed": true,
+    "retain_original_failed_runs_and_negative_controls": true,
+    "new_runs_require_new_report_paths_and_new_hashes": true
+  },
+  "delivery_scope_readonly_review": {
+    "game_js_sources": 10,
+    "game_compiled_js": 10,
+    "content_js_sources": 10,
+    "all_match_latest_compile_receipts": true,
+    "original_game_files": 102,
+    "original_byte_drift": 0,
+    "git_mutations_by_reviewer": false,
+    "planned_publication_record": "publishing/workshop/ui_data_qa_release_20261025.json",
+    "eol_protection": {
+      "game_gitattributes_changed": true,
+      "content_gitattributes_changed": true,
+      "pure_crlf_js_per_repo": 9,
+      "mixed_js_per_repo": 1,
+      "mixed_source": "common/archive_tooltip.js",
+      "mixed_eol_counts": {
+        "crlf": 274,
+        "independent_lf": 1
+      },
+      "js_rules": "Pure CRLF gets text eol=crlf; mixed source gets -text without byte conversion.",
+      "qa_tools_scope": "tools/ui_qa_20261025/*",
+      "new_release_tool_and_test_paths": 16,
+      "release_tool_rules": "-text; exact task paths only",
+      "global_core_autocrlf_changed": false,
+      "source_runtime_or_tool_bytes_changed": false,
+      "fingerprinted_files": 74,
+      "fingerprint_drift": 0,
+      "latest_compile_js_count": 10,
+      "latest_compile_pin_drift": 0,
+      "original102_byte_drift": 0,
+      "game_attribute_checks": 56,
+      "content_attribute_checks": 10,
+      "attribute_errors": 0,
+      "diff_check_passed": true,
+      "actual_stash_pop_roundtrip_verified_by": "external git_delivery.json receipt only",
+      "lua_source_rules": 2,
+      "lua_raw_hash_matches_v06_patches": true,
+      "checked_at_utc": "2026-10-24T23:59:37.391Z",
+      "fingerprint_scope": "Immediate attribute-only checks were zero-drift. Later intentional root diagnostic helper change is recorded separately with its current SHA; current source/compile/original102 checks remain zero. Actual stash/pop validation belongs to external git_delivery.json.",
+      "publication_record_rule": {
+        "path": "publishing/workshop/ui_data_qa_release_20261025.json",
+        "attributes": "text eol=lf",
+        "producer_encoding": "UTF-8 without BOM, LF",
+        "rule_does_not_claim_publication": true
+      },
+      "additional_listing_rule": {
+        "path": "publishing/workshop/test_listing.json",
+        "attributes": "text eol=lf",
+        "reason": "final failed-release listing is UTF-8 LF and raw SHA bound by metadata freeze"
+      }
+    },
+    "historical_plan_missing_before_final_allowlist": [
+      "publishing/workshop/test_listing.json",
+      "tools/ui_qa_20261025/launch_workshop.py",
+      "tools/ui_qa_20261025/test_launch_workshop.py",
+      "tools/ui_qa_20261025/workshop_window.ps1"
+    ],
+    "current_allowlist_method": "deliver_task.py fixed paths plus current task QA tool glob; includes new checker and failed-release public record",
+    "current_game_task_files": 98,
+    "current_content_task_files": 11,
+    "current_allowlist_missing_paths": [],
+    "current_allowlist_original102_overlap": 0,
+    "current_source_compile_raw_sha_drift": 0,
+    "current_original102_raw_sha_drift": 0,
+    "current_intentional_helper_change": {
+      "path": "tools/ui_qa_20261025/online_window.ps1",
+      "sha256": "0e9cdac86cb0c1c3b23ff2bf7d91c8f311c4c5bec73b1fad3cbd5ed3ba87a282",
+      "scope": "root optional NativeNudge diagnostic; source/runtime unchanged; old helper hash is not used for current helper"
+    }
+  }
+}

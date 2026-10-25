@@ -1,0 +1,243 @@
+{
+  "schema": 2,
+  "date": "2026-10-25",
+  "revision": "WS4-UI-STACKABLE-08",
+  "status": "FAILED_STEAM_SUBMIT_V05_REMAINS_PUBLISHED",
+  "workshop_id": "3824360109",
+  "visibility": "unlisted",
+  "uploaded": false,
+  "candidate": "20261025_ws4_ui_stackable_v08",
+  "release_sequence": 2026102503,
+  "content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
+  "base_content_sha256": "811170a2c77396faee948bf7a77021fe8ac07c2117a919a6c3eb7163e4525e7e",
+  "runtime_files": 6630,
+  "runtime_bytes": 3766747164,
+  "package_bytes": 3767020414,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273250,
+      "sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073514940,
+      "sha256": "04dce761000447907c36ffdf136d16cbfa605ea86bf2b643fd12ced133c40c8e"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552122253,
+      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+    }
+  ],
+  "signature_valid": true,
+  "allowed_changes_from_v07": [
+    "panorama/scripts/custom_game/archive_v10.vjs_c",
+    "panorama/scripts/custom_game/archive_v10_semantics.vjs_c",
+    "panorama/scripts/custom_game/common/archive_tooltip.vjs_c"
+  ],
+  "protected_modules_preserved": 180,
+  "all_other_runtime_bytes_preserved": true,
+  "online_authentication_changed": false,
+  "backend_code_changed": false,
+  "gameplay_rules_changed": false,
+  "economic_rules_changed": false,
+  "four_account_only": true,
+  "online_cheats_allowed": false,
+  "real_money_payments": false,
+  "trusted_rankings": false,
+  "author_pc_tls_relay_required": true,
+  "ready_for_public_release": false,
+  "local_acceptance": {
+    "scope": "single_player_Tools_online_alias_svt_w24_not_original_Workshop_or_independent_cloud_DB_audit",
+    "status": "PASS_WITH_HOVER_LIMITATION",
+    "pid": 35444,
+    "daily_count": "1/28",
+    "wallet_gcoin": 0,
+    "wallet_shop_points": 21,
+    "owned_kinds": 2,
+    "ember_badge": 1,
+    "ember_tooltip_quantity": 1,
+    "ember_tooltip_stackable": true,
+    "ember_tooltip_unlimited": true,
+    "ember_old_unique_wording": false,
+    "engine_sv_cheats": false,
+    "native_reload_command_rejected": true,
+    "normal_close": true,
+    "profile_publications": 47,
+    "profile_revision_max": 209,
+    "checkpoint_responses": 42,
+    "checkpoint_failures": 0,
+    "independent_cloud_database_verification": false,
+    "real_payments_attempted": false
+  },
+  "publication_attempt": {
+    "started_utc": "2026-10-25T00:55:52.630083+00:00",
+    "finished_utc": "2026-10-25T00:56:36.651240+00:00",
+    "official_sdk_update_existing": true,
+    "new_item_created": false,
+    "title_cover_visibility_or_roster_changed": false,
+    "last_observed_transfer_stage": 3,
+    "callback_id": 3404,
+    "callback_result": 2,
+    "reported_error": "RuntimeError: Steam API callback 3404 returned EResult=2",
+    "uploader_exit_code": 1,
+    "successful_submission_confirmed": false,
+    "journal_status": "SUBMIT_REQUEST_PENDING",
+    "journal_preserved": true,
+    "journal_sha256": "fddcd8ecb98cf8b1bfbbe1c4e4335d6a9709d759dbaf8e78db8df38c85adf308",
+    "original_journal_backup_sha256": "4d830db529a61ed78b9ab132e083d514e0ff1ae67c2fc2500dbbc124de08fb87",
+    "automatic_retry_performed": false,
+    "journal_rolled_back": false
+  },
+  "current_published_release": {
+    "candidate": "20261024_ws4_workshop_entry_v05",
+    "release_sequence": 2026102405,
+    "content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+    "steam_manifest": "2955439000185399689",
+    "remote_updated_utc": "2026-10-24T12:51:44+00:00",
+    "package_bytes": 3767007982,
+    "vpk_sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039",
+    "official_steam_redownload_requested": true,
+    "official_download_full_verification": {
+      "vpk_version": 2,
+      "files": 6630,
+      "payload_bytes": 3766734732,
+      "archive_count": 4,
+      "crc32_verified": true,
+      "manifest_dual_hashes_verified": true,
+      "section_md5s_verified": true,
+      "whole_vpk_md5_verified": true
+    },
+    "signature_valid": true,
+    "original_v05_receipt_unchanged": true,
+    "original_release_record": "publishing/workshop/workshop_entry_release_20261024.json",
+    "download_state_flags": 5,
+    "update_pending": false,
+    "downloading": false
+  },
+  "v08_download": {
+    "steam_manifest": null,
+    "official_download_verified": false,
+    "native_resource_reads": "NOT_RUN_V08_NOT_PUBLISHED",
+    "ordinary_original_workshop_acceptance": "NOT_RUN_V08_NOT_PUBLISHED",
+    "prepared_acceptance_method": "ordinary_direct_dota_launch_custom_game_3824360109_ws4_entry_not_Arcade_button",
+    "acceptance_tools_executed": false
+  },
+  "local_package_native_reads": {
+    "passed": 8,
+    "archives_sampled": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "failed_to_read_16_bytes": false,
+    "scope": "local_v08_package_resourceinfo_samples_not_Steam_download_or_gameplay"
+  },
+  "entry": {
+    "default_map": "ws4_entry",
+    "max_players": 1,
+    "fixed_target_workshop_id": "3824360109",
+    "fixed_target_map": "template_map",
+    "target_declared_capacity": 4,
+    "current_mode": "single_player_cloud_save",
+    "multiplayer_hosting_provided": false
+  },
+  "limitations": [
+    "Steam rejected the one v08 update attempt. Remote and official redownload still match signed v05; v08 Workshop download/native acceptance was not run.",
+    "The original uploader journal intentionally remains SUBMIT_REQUEST_PENDING. Preserve the backup and reconcile before any later explicitly reviewed retry; do not reset it to imply success.",
+    "Native ember center hover repeatedly did not open a tooltip. Leaving cards and reentering the card from its right edge displayed the complete stackable/unlimited/quantity1 tooltip. Hit-point or overlay cause remains unresolved.",
+    "Daily count1/28 was visible; the enabled property of the claim control was not directly observed in the retry.",
+    "The initial v08 client exited unexpectedly after mode selection; a fresh retry completed. The original exit cause remains unconfirmed.",
+    "Cloud profile/checkpoint counts are client receipts; no independent private database or ledger audit was performed.",
+    "The four-account isolated archive, disabled real cash and trusted rankings, author-PC relay dependency and unverified multiplayer hosting remain in force."
+  ],
+  "evidence": [
+    {
+      "path": "output/ui_qa_20261025/release/v08_build.json",
+      "bytes": 3387,
+      "sha256": "80e113a0ae91b0eb2a4fbb3c7d004dda6c4b37c0ebf5739b94d87e74bd60fce2"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_package_reviewed.json",
+      "bytes": 3877,
+      "sha256": "b5170bada9f5f70d64b7978de798de7b042facf107a31fa1b6639308c5e4fb26"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_upload_20261025T005552732855Z_c2f4b5c9/report.json",
+      "bytes": 3032,
+      "sha256": "29c01d52c754457d4d14a294658f8815bacc472f50acf69696ecf19a12a59f0d"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_upload_20261025T005552732855Z_c2f4b5c9/state_before.json",
+      "bytes": 3694,
+      "sha256": "4d830db529a61ed78b9ab132e083d514e0ff1ae67c2fc2500dbbc124de08fb87"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_upload_20261025T005552732855Z_c2f4b5c9/state_after.json",
+      "bytes": 3444,
+      "sha256": "fddcd8ecb98cf8b1bfbbe1c4e4335d6a9709d759dbaf8e78db8df38c85adf308"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_upload_20261025T005552732855Z_c2f4b5c9/uploader.stdout.log",
+      "bytes": 683,
+      "sha256": "01f4342b2391a9a20f6d985b7c6e197067bc4ee6eaef28aa2a68c4b389bad392"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_upload_20261025T005552732855Z_c2f4b5c9/uploader.stderr.log",
+      "bytes": 128,
+      "sha256": "a2eeaf79eceef9b7c25f21875cd72971f8cf652b5330e97a11ad6f3905ba447e"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_failed_submit_inspection_20261025T005811049265Z_67ba04c4/report.json",
+      "bytes": 1068,
+      "sha256": "b49934cf152c1b27594539f3c409b61a7b90cb1b0da1bae6e0efbd0792e9b6e0"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v05_after_v08_failed_submit_download_verified.json",
+      "bytes": 1890,
+      "sha256": "3c64ce601a5703b7d68a7b9ae3dc5de2a6ffdf260538891bb00b64ff9ec6d34f"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_upload_20261025T005552732855Z_c2f4b5c9/v05_reconcile_download_execution.json",
+      "bytes": 1384,
+      "sha256": "31cbebc9a1ec97f8f6c8fdab36f0acfa508e40c64d941d9e828e2892662a1bd5"
+    },
+    {
+      "path": "output/ui_qa_20261025/release/v08_remote_reconciliation.json",
+      "bytes": 1799,
+      "sha256": "59a67689cc623b8118c6253c55be3936059689011e6fcd419a8d52a2e2791f6d"
+    },
+    {
+      "path": "output/ui_qa_20261025/online/root_v08_visual_review.json",
+      "bytes": 1829,
+      "sha256": "c26ac22cc47ba2bcd35d48f241309fab6cd66ce788d332a269f036792f99619c"
+    },
+    {
+      "path": "output/ui_qa_20261025/online/v08_final_client_summary.json",
+      "bytes": 6356,
+      "sha256": "dc6cd502cb3508db5b557819c96d4706f041828a56cf97e7d6f1870d1b4febe4"
+    },
+    {
+      "path": "output/ui_qa_20261025/online/v08_engine_cheats.json",
+      "bytes": 362,
+      "sha256": "700b2fb54da1fdec96c824d2f7b55b8937eedb36c950024dadb2604fd429cc9a"
+    },
+    {
+      "path": "output/ui_qa_20261025/native_package_reads_v08/package_20261024T222829010556Z_7c5e43d4/report.json",
+      "bytes": 5601,
+      "sha256": "290f57d65fc1aeb886a95f53794fcca42cf2d5c25665463871ddd737d820ecff"
+    }
+  ]
+}

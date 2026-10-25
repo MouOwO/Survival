@@ -66,7 +66,12 @@ catalog(6800);assert(cfg.SurvivalCommerceWallet.Checkout(product.sku),'A refresh
 respond({ok:1,terminal:1,sku:product.sku,currency:'shop_points',price:6800,balance:0});
 // The real storefront keeps cash products and routes wallet products to the exchange controller.
 let cashCheckout=null,walletCheckout=null;
-cfg.SurvivalPayments={GetCatalog:()=>({products:[{sku:'cash_sku',title:'现金商品',amount_fen:5000,category_id:'technology',enabled:1}],categories:[{id:'technology',label:'科技'}]}),Checkout:sku=>cashCheckout=sku};
+// This routing fixture explicitly opts into the developer cash catalog. The
+// distributed disabled-cash branch is covered by test_daily_wallet_refresh.
+cfg.SurvivalDevelopmentPayments=true;
+cfg.SurvivalPayments={IsRealMoneyEnabled:()=>true,GetCatalog:()=>({products:[{sku:'cash_sku',title:'现金商品',amount_fen:5000,
+ currency:'u_coin',u_coin_price:5000,u_coin_per_yuan:100,category_id:'technology',enabled:1}],
+ categories:[{id:'technology',label:'科技'}]}),Checkout:sku=>cashCheckout=sku};
 cfg.SurvivalCommerceWallet.Checkout=sku=>{walletCheckout=sku;return true;};
 vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/common/commerce_components.js','utf8'),env);
 vm.runInContext(fs.readFileSync('panorama/src/scripts/custom_game/commerce_remaining_5d5c1152eb.js','utf8'),env);

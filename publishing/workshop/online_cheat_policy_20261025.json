@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "date": "2026-10-25",
+  "revision": "WS4-UI-STACKABLE-08",
+  "online_cheats_allowed": false,
+  "offline_cheats_allowed": true,
+  "previous_record": "publishing/workshop/online_cheat_policy_20261024.json",
+  "candidate": {
+    "name": "20261025_ws4_ui_stackable_v08",
+    "release_sequence": 2026102503,
+    "base_content_sha256": "811170a2c77396faee948bf7a77021fe8ac07c2117a919a6c3eb7163e4525e7e",
+    "content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
+    "runtime_policy_sha256": "9527373a7a27e7396e4e4418b38ce20045a60e1efb5eb320f9463259d2639061",
+    "release_profile_sha256": "f217f9a3a893433aa38d1b76afdb6b3dd319056cffec2ff9a9d37beaee7aa746",
+    "runtime_files": 6630,
+    "changed_runtime_paths": [
+      "panorama/scripts/custom_game/archive_v10.vjs_c",
+      "panorama/scripts/custom_game/archive_v10_semantics.vjs_c",
+      "panorama/scripts/custom_game/common/archive_tooltip.vjs_c"
+    ],
+    "signature_valid": true,
+    "protected_modules_unchanged": 180,
+    "all_other_runtime_bytes_preserved": true,
+    "installed_full_runtime_verification": true,
+    "workshop_uploaded": false,
+    "workshop_download_verified": false
+  },
+  "local_install": {
+    "addon": "svt_w24",
+    "status": "UPDATED_FULLY_VERIFIED",
+    "transaction": "output/ui_qa_20261025/release/alias_updates/v06_6de88891202f4d2bae99719f93adeb2c",
+    "receipt": "output/ui_qa_20261025/release/v08_alias_apply.json",
+    "old_files_backed_up": true,
+    "full_before_verification": true,
+    "full_after_verification": true,
+    "game_started_during_install": false
+  },
+  "native_online": {
+    "status": "NOT_RUN",
+    "independent_cloud_database_verification": false,
+    "real_money_payments_attempted": false
+  },
+  "engine_launch_settings": {
+    "offline_sv_cheats": 1,
+    "online_sv_cheats": 0
+  },
+  "limits": [
+    "This local frozen v08 update is not evidence of a Workshop upload; publication is recorded separately.",
+    "Four approved accounts and the isolated WS4 test database remain unchanged.",
+    "Cash payments and trusted rankings remain disabled.",
+    "The temporary fixed Steam TLS relay still requires the author PC and network online.",
+    "Client success receipts are not independent verification of the cloud database.",
+    "Multiplayer hosting and latency remain separate work."
+  ],
+  "previous_local_releases": [
+    {
+      "candidate": {
+        "name": "20261025_ws4_ui_qa_v06",
+        "release_sequence": 2026102501,
+        "base_content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+        "content_sha256": "1dd9d88f885f8e1617985f933bbdb450884f91a7cdb96b10e0315d2b0cdaa884",
+        "runtime_policy_sha256": "9527373a7a27e7396e4e4418b38ce20045a60e1efb5eb320f9463259d2639061",
+        "release_profile_sha256": "f217f9a3a893433aa38d1b76afdb6b3dd319056cffec2ff9a9d37beaee7aa746",
+        "runtime_files": 6630,
+        "changed_runtime_paths": [
+          "panorama/scripts/custom_game/commerce_wallet.vjs_c",
+          "panorama/scripts/custom_game/common/ui_components.vjs_c",
+          "panorama/scripts/custom_game/payment_test.vjs_c",
+          "panorama/scripts/custom_game/topnav_remaining_5d5c1152eb.vjs_c",
+          "panorama/scripts/custom_game/ui_layers.vjs_c",
+          "scripts/vscripts/systems/commerce_service.lua",
+          "scripts/vscripts/systems/payment_service.lua"
+        ],
+        "signature_valid": true,
+        "protected_modules_unchanged": 180,
+        "all_other_runtime_bytes_preserved": true,
+        "installed_full_runtime_verification": true,
+        "workshop_uploaded": false,
+        "workshop_download_verified": false
+      },
+      "local_install": {
+        "addon": "svt_w24",
+        "status": "UPDATED_FULLY_VERIFIED",
+        "transaction": "output/ui_qa_20261025/release/alias_updates/v06_11078a344d4d4ad6a89da79f4918440f",
+        "receipt": "output/ui_qa_20261025/release/alias_apply.json",
+        "old_files_backed_up": true,
+        "full_before_verification": true,
+        "full_after_verification": true,
+        "game_started_during_install": false
+      },
+      "native_online": {
+        "status": "NATIVE_LOGIN_PROFILE_FREE_CLAIM_UI_AND_CLIENT_RECEIPTS_VERIFIED",
+        "report": "output/ui_qa_20261025/online/review_v06.json",
+        "profile_revision_range": [
+          43,
+          88
+        ],
+        "checkpoint_success_receipts": 39,
+        "independent_cloud_database_verification": false,
+        "real_money_payments_attempted": false
+      }
+    },
+    {
+      "candidate": {
+        "name": "20261025_ws4_ui_font_wallet_v07",
+        "release_sequence": 2026102502,
+        "base_content_sha256": "1dd9d88f885f8e1617985f933bbdb450884f91a7cdb96b10e0315d2b0cdaa884",
+        "content_sha256": "811170a2c77396faee948bf7a77021fe8ac07c2117a919a6c3eb7163e4525e7e",
+        "runtime_policy_sha256": "9527373a7a27e7396e4e4418b38ce20045a60e1efb5eb320f9463259d2639061",
+        "release_profile_sha256": "f217f9a3a893433aa38d1b76afdb6b3dd319056cffec2ff9a9d37beaee7aa746",
+        "runtime_files": 6630,
+        "changed_runtime_paths": [
+          "panorama/scripts/custom_game/commerce_wallet.vjs_c",
+          "panorama/scripts/custom_game/common/archive_font_v36.vjs_c",
+          "panorama/scripts/custom_game/daily_remaining_5d5c1152eb.vjs_c"
+        ],
+        "signature_valid": true,
+        "protected_modules_unchanged": 180,
+        "all_other_runtime_bytes_preserved": true,
+        "installed_full_runtime_verification": true,
+        "workshop_uploaded": false,
+        "workshop_download_verified": false
+      },
+      "local_install": {
+        "addon": "svt_w24",
+        "status": "UPDATED_FULLY_VERIFIED",
+        "transaction": "output/ui_qa_20261025/release/alias_updates/v06_7ee92f8b6977482193aaf565b5d2a8a6",
+        "receipt": "output/ui_qa_20261025/release/v07_alias_apply.json",
+        "old_files_backed_up": true,
+        "full_before_verification": true,
+        "full_after_verification": true,
+        "game_started_during_install": false
+      },
+      "native_online": {
+        "status": "NATIVE_LOGIN_PROFILE_FREE_CLAIM_UI_AND_CLIENT_RECEIPTS_VERIFIED",
+        "report": "output/ui_qa_20261025/online/review_v07.json",
+        "profile_revision_range": [
+          89,
+          164
+        ],
+        "checkpoint_success_receipts": 68,
+        "independent_cloud_database_verification": false,
+        "real_money_payments_attempted": false
+      }
+    }
+  ]
+}

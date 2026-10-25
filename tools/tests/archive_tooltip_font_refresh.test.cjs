@@ -12,6 +12,7 @@ for (const file of [
     'archive_v10_semantics.js', 'common/archive_tooltip.js',
     'common/archive_font_v36.js'
 ]) h.load(file);
+require('./fixtures/archive_font_images.cjs').ready(h);
 
 const canvas = new Panel('Panel', root, 'ArchiveFontRefreshCanvas');
 const menu = new Panel('Label', canvas, 'ArchiveFontRefreshMenu');

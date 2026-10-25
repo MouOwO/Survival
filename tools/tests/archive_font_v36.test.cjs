@@ -2,6 +2,7 @@
 const {createHarness}=require('./fixtures/menus_v10_harness.cjs');
 const h=createHarness(),Panel=h.root.constructor;
 h.load('common/archive_font_v36.js');const font=h.cfg.SurvivalArchiveFontV36;
+require('./fixtures/archive_font_images.cjs').ready(h);
 const label=new Panel('Label',h.root,'FontTest');label.text='通关存档 N1';Object.assign(label.style,{fontSize:'21px',color:'#e0e3d2',width:'180px',height:'29px'});
 font.Render(label);const run=label.FindChildTraverse('ArchiveFontV36Glyphs'),first=run.Children()[0];
 assert.equal(label.text,'通关存档 N1');assert.equal(label.style.color,'#ffffff00');assert(run.Children().length>4);assert.equal(run.hittest,false);assert(run.Children().every(p=>p.hittest===false&&p.hittestchildren===false));

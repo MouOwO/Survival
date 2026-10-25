@@ -362,8 +362,33 @@ cards().forEach((card, index) => {
     contains(card, card.__v10.normal); contains(card, card.__v10.name); contains(card, card.__v10.countHost);
 });
 assert(parseFloat(cards().at(-1).style.position.split(' ')[1]) > parseFloat(nodes.get('ArchiveGrid').style.height), 'Configured items continue below the visible viewport');
+// The active production grid, tooltip and refresh agree on actual stack counts.
+for (const [index,count] of [0,1,2,1501].entries()) {
+    const zongzi=Math.min(count,150),live=Object.freeze([
+        Object.freeze({id:'lottery_ember_of_legacy',name:'薪火余烬',count,max_owned:0,source_kind:'benefit'}),
+        Object.freeze({id:'welfare_zongzi',name:'粽子',count:zongzi,max_owned:150,source_kind:'benefit'}),
+        Object.freeze({id:'daily_growth_gem',name:'成长宝石',count:3,target:999999})
+    ]),before=JSON.stringify(live);
+    snapshot('points',44+index,live);
+    const ember=cards().find(card=>card.__archiveItem.id==='lottery_ember_of_legacy');
+    const rice=cards().find(card=>card.__archiveItem.id==='welfare_zongzi');
+    const unique=cards().find(card=>card.__archiveItem.id==='daily_growth_gem');
+    assert.equal(ember.__archiveItem.count,count);assert.equal(ember.__v10.count.text,String(count));assert(ember.__v10.countHost.visible);
+    assert.equal(rice.__v10.count.text,zongzi+'/150');assert(rice.__v10.countHost.visible);
+    assert.equal(unique.__v10.count.text,'');assert.equal(unique.__v10.countHost.visible,false);
+    cfg.ArchiveHandoff.Show(ember.__archiveItem,'points',ember);advance(0);
+    assert.equal(nodes.get('ArchiveV10TooltipQuantity').text,String(count));assert(nodes.get('ArchiveV10TooltipMetric').visible);
+    assert(nodes.get('ArchiveV10TooltipCondition').text.includes('无持有上限'));
+    assert(!nodes.get('ArchiveV10TooltipCondition').text.includes('唯一持有'));
+    cfg.ArchiveHandoff.Show(rice.__archiveItem,'points',rice);advance(0);
+    assert.equal(nodes.get('ArchiveV10TooltipQuantity').text,zongzi+'/150');
+    assert(nodes.get('ArchiveV10TooltipCondition').text.includes('上限 150'));
+    assert(nodes.get('ArchiveV10Context').text.includes('可叠加道具按各自规则累计'));
+    assert(!nodes.get('ArchiveStatus').text.includes('自动解锁'));
+    assert.equal(JSON.stringify(live),before,'Grid/tooltip/refresh never edits live inventory');
+}
 // Switching away keeps the existing purchased-goods geometry and labels.
-pointsApi.SelectCategory('commerce_goods'); snapshot('commerce_goods', 44, [
+pointsApi.SelectCategory('commerce_goods'); snapshot('commerce_goods', 48, [
     {id: 'goods_unique', name: '商城唯一商品', count: 1, max_owned: 1},
     {id: 'goods_locked', name: '商城未拥有', count: 0, max_owned: 1}
 ]);

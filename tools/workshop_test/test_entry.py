@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 GAME = ROOT.parents[1]
 RUNTIME = ROOT / "output/test_entry_runtime"
 ONLINE_ADDON = "svt_w24"
-ONLINE_POLICY_RECORD = ROOT / "publishing/workshop/online_cheat_policy_20261024.json"
+ONLINE_POLICY_RECORD = ROOT / "publishing/workshop/online_cheat_policy_20261025.json"
 
 
 def need(value, code):

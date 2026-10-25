@@ -25,7 +25,11 @@ function M.handle(payload)
         reply({ok=false,terminal=true,error='profile_not_ready'});return
     end
     local setup=require('systems/match_setup_service');local session=setup.get_session_id()
-    local function same_player() return provider.resolve_account_id(id)==account and setup.get_session_id()==session end
+    local function same_player()
+        local account_ok,current_account=pcall(provider.resolve_account_id,id)
+        local session_ok,current_session=pcall(setup.get_session_id)
+        return account_ok and session_ok and current_account==account and current_session==session
+    end
     local command={id='commerce:'..token,kind='commerce_'..action}
     if action=='purchase' then
         if type(payload.sku)~='string' or #payload.sku>64 or not payload.sku:match('^[a-z][a-z0-9_]+$') then
@@ -35,9 +39,11 @@ function M.handle(payload)
     end
     local job={};busy[id]=job;last[id]=Time()
     local attempts=0
+    local timeout_key,retry_key='commerce_transport_'..id,'commerce_retry_'..id
     local function finish(result)
         if busy[id]~=job then return end
         busy[id]=nil
+        scheduler.cancel(timeout_key);scheduler.cancel(retry_key)
         if not same_player() then return end
         if action=='catalog' and result.ok then
             -- Bounded packets; swap the client catalog only after every row arrives.
@@ -52,18 +58,30 @@ function M.handle(payload)
         end
     end
     local function attempt()
-        if not same_player() then busy[id]=nil;return end
+        if busy[id]~=job then return end
+        if not same_player() then finish({ok=false,error='profile_not_ready'});return end
         attempts=attempts+1
-        if action=='catalog' then
-            provider.archive_submit({account_id=account,config_hash=bundle.hash,command=command},finish,
-                function(error) finish({ok=false,error=error}) end)
-        else
-            adapter.submit(id,command,function(result)
-                if not result.ok and not result.terminal and attempts<3 then
-                    scheduler.after(1,attempt,'commerce_retry_'..id)
-                else finish(result) end
-            end)
+        local completed=false
+        local function settled(result)
+            if completed or busy[id]~=job then return end
+            completed=true;scheduler.cancel(timeout_key)
+            if not same_player() then finish({ok=false,error='profile_not_ready'});return end
+            if type(result)~='table' then result={ok=false,error='commerce_busy'} end
+            if action=='purchase' and not result.ok and not result.terminal and attempts<3 then
+                scheduler.after(1,attempt,retry_key)
+            else finish(result) end
         end
+        -- Each provider attempt already has a 30s HTTP limit. Bound missing
+        -- callbacks without cutting short the existing same-ID recovery tries.
+        scheduler.after(32,function() settled({ok=false,terminal=false,error='commerce_busy'}) end,timeout_key)
+        local called,submitted=pcall(function()
+            if action=='catalog' then
+                return provider.archive_submit({account_id=account,config_hash=bundle.hash,command=command},settled,
+                    function(error) settled({ok=false,error=error}) end)
+            end
+            return adapter.submit(id,command,settled)
+        end)
+        if not called or submitted==false then settled({ok=false,terminal=false,error='commerce_busy'}) end
     end
     attempt()
 end

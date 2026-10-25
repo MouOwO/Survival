@@ -20,29 +20,98 @@
   "cover_width": 1024,
   "cover_height": 768,
   "real_money_payments": false,
-  "status": "PUBLISHED_DOWNLOADED_ORIGINAL_WORKSHOP_LOGIN_PROFILE_GAMEPLAY_VERIFIED",
+  "status": "V08_UPDATE_FAILED_STEAM_SUBMIT_V05_REMAINS_PUBLISHED",
   "test_addon": "svt_w24",
-  "release_sequence": 2026102405,
-  "runtime_content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
-  "uploaded": true,
+  "release_sequence": 2026102503,
+  "runtime_content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
+  "uploaded": false,
   "notes": [
-    "Updates the same approved unlisted item, preserving its title, description, cover and four-account roster.",
-    "The sole lobby map ws4_entry is a lightweight one-player entry. Its client reopens the same Workshop item with the fixed template_map target using the standard Dota command.",
-    "This entry fixes the observed lobby HTTP-constructor context failure; it is not multiplayer server hosting. The internal gameplay map retains its four-player declaration for separately managed tests.",
-    "All 180 protected modules, the production cheat gate, browser approval, HTTP profile provider and gameplay map remain byte-identical to signed v04.",
-    "Only five reviewed entry paths differ: addoninfo, a prefix before the frozen main addon body, and three new entry resources.",
-    "Only signed runtime resources are distributed. Author tools, source maps, CMD files, caches and connection credentials are excluded.",
-    "Profiles remain in the isolated four-account WS4 test database. Real payments and trusted rankings remain disabled.",
-    "The author PC must remain online for the temporary fixed Steam TLS egress relay.",
-    "Ordinary Steam original-Workshop entry, explicit browser approval, cloud profile loading, checkpoints and N5 gameplay were verified; the owner confirmed the entry and the agent preserved the active match."
+    "The one authorized v08 update attempt of the same unlisted item3824360109 failed at official SubmitItemUpdate callback3404 with EResult2. v08 is not marked uploaded; the original pending journal and full prior backup are preserved without retry or rollback.",
+    "The title, description, cover, four-account roster, production online cheat denial, isolated test archives and disabled real-money policy are preserved.",
+    "The sole lobby ws4_entry remains a one-player entry and reopens the same Workshop item with fixed template_map. The gameplay map retains its four-player declaration; this release does not add multiplayer hosting.",
+    "Compared with the last published v05, the cumulative v06-v08 update changes twelve distinct runtime paths: v06 seven transport/lifecycle/UI paths, v07 font/daily/wallet additions with wallet overlap, and v08 three archive display paths. All 180 protected Lua modules and every other runtime byte remain unchanged.",
+    "v06 hardens payment/exchange HTTP failure, timeout and late-reply cleanup and shared menu/owner lifecycle handling; v07 adds event-driven font fallback/readiness and authoritative daily/wallet cache invalidation. Business prices, balances and reward rules are preserved.",
+    "v08 changes only archive_v10_semantics, archive_v10 and common/archive_tooltip compiled JS relative to signed v07. Stackable ember retains actual count with max_owned=0, zongzi retains cap150, and unique items retain their unique contract. This is a presentation fix, not a backend inventory or economic change.",
+    "The signed local v08 has6630 runtime files, sequence2026102503,180 protected modules unchanged, complete package hashes and eight passing local resourceinfo samples. Official redownload after the failed update verified the existing signed v05, not v08.",
+    "Frozen v06/v07 native single-player tests verified explicit per-match Steam web approval, client profile/checkpoint success receipts, daily persistence and one legitimate 29-shop-point purchase reducing50 to21. These are client/native observations, not an independent private database or ledger audit.",
+    "Local v08 Tools-online native acceptance passed daily1/28, G0/shop-points21, ember quantity1/stackable/unlimited wording and cheats0, followed by normal Close. Client receipts reached profile revision209 with42 checkpoints and0 failures. v08 original Workshop acceptance was not run because its update failed.",
+    "Only signed runtime resources are distributed. Author tools, source maps, CMD files, caches and connection credentials are excluded. Real payments and trusted rankings remain disabled.",
+    "The author PC must remain online for the temporary fixed Steam TLS egress relay. No new hosting or always-on backend availability is claimed.",
+    "Native ember center hover was not reliable; leaving the cards and reentering from the right showed the complete tooltip. This unresolved hit-point/overlay risk is retained; all hover positions are not claimed to pass."
   ],
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
   "visibility_verified": "unlisted",
   "package_layout": "external_archives",
   "previous_release": {
-    "release_sequence": 2026102404,
-    "runtime_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
-    "steam_manifest": "9118930541336613380"
+    "release_sequence": 2026102405,
+    "runtime_content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+    "status": "PUBLISHED_DOWNLOADED_ORIGINAL_WORKSHOP_LOGIN_PROFILE_GAMEPLAY_VERIFIED",
+    "uploaded": true,
+    "steam_manifest": "2955439000185399689",
+    "download_manifest": "2955439000185399689",
+    "download_sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039",
+    "download_package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 273250,
+        "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1073502508,
+        "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1068730788,
+        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379183,
+        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 552122253,
+        "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+      }
+    ],
+    "download_verified_runtime_files": 6630,
+    "published_at_utc": "2026-10-24T12:44:31.293309+00:00",
+    "runtime_bytes": 3766734732,
+    "package_bytes": 3767007982,
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 273250,
+        "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1073502508,
+        "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1068730788,
+        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379183,
+        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 552122253,
+        "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+      }
+    ],
+    "release_record": "publishing/workshop/workshop_entry_release_20261024.json",
+    "ordinary_workshop_match": "VERIFIED_SINGLE_PLAYER_LOGIN_PROFILE_GAMEPLAY",
+    "native_four_archive_reads_verified": true,
+    "native_entry_revision": "WS4-ENTRY-05"
   },
   "archive_environment": "isolated_ws4",
   "archive_base_url": "https://pay.xiaofengnet.com/ws4-web",
@@ -52,44 +121,18 @@
   "anonymous_item_page_visible": true,
   "player_authentication": "STEAM_OPENID_AND_EXPLICIT_PER_MATCH_APPROVAL",
   "online_cheats_allowed": false,
-  "ordinary_workshop_match": "VERIFIED_SINGLE_PLAYER_LOGIN_PROFILE_GAMEPLAY",
+  "ordinary_workshop_match": "NOT_RUN_V08_UPDATE_FAILED",
   "native_four_archive_reads_verified": true,
-  "runtime_bytes": 3766734732,
-  "package_bytes": 3767007982,
-  "release_record": "publishing/workshop/workshop_entry_release_20261024.json",
+  "runtime_bytes": 3766747164,
+  "package_bytes": 3767020414,
+  "release_record": "publishing/workshop/ui_data_qa_release_20261025.json",
   "connection_diagnostics": "WS4-WEB-04",
-  "steam_manifest": "2955439000185399689",
-  "download_manifest": "2955439000185399689",
-  "download_sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039",
-  "download_package_files": [
-    {
-      "name": "3824360109.vpk",
-      "bytes": 273250,
-      "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
-    },
-    {
-      "name": "3824360109_000.vpk",
-      "bytes": 1073502508,
-      "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
-    },
-    {
-      "name": "3824360109_001.vpk",
-      "bytes": 1068730788,
-      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
-    },
-    {
-      "name": "3824360109_002.vpk",
-      "bytes": 1072379183,
-      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
-    },
-    {
-      "name": "3824360109_003.vpk",
-      "bytes": 552122253,
-      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
-    }
-  ],
-  "download_verified_runtime_files": 6630,
-  "published_at_utc": "2026-10-24T12:44:31.293309+00:00",
+  "steam_manifest": null,
+  "download_manifest": null,
+  "download_sha256": null,
+  "download_package_files": [],
+  "download_verified_runtime_files": 0,
+  "published_at_utc": null,
   "gameplay_map": "template_map",
   "gameplay_map_capacity": 4,
   "current_workshop_mode": "single_player_cloud_save",
@@ -97,12 +140,12 @@
     {
       "name": "3824360109.vpk",
       "bytes": 273250,
-      "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
+      "sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5"
     },
     {
       "name": "3824360109_000.vpk",
-      "bytes": 1073502508,
-      "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
+      "bytes": 1073514940,
+      "sha256": "04dce761000447907c36ffdf136d16cbfa605ea86bf2b643fd12ced133c40c8e"
     },
     {
       "name": "3824360109_001.vpk",
@@ -126,6 +169,25 @@
       "release_sequence": 2026102403,
       "runtime_content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
       "steam_manifest": "9012039066284975703"
+    },
+    {
+      "release_sequence": 2026102404,
+      "runtime_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
+      "steam_manifest": "9118930541336613380"
     }
-  ]
+  ],
+  "release_revision": "WS4-UI-STACKABLE-08",
+  "native_four_archive_reads_scope": "LOCAL_V08_PACKAGE_ONLY_V08_UPDATE_FAILED_V05_RECONFIRMED",
+  "currently_published_release_sequence": 2026102405,
+  "currently_published_content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
+  "currently_published_steam_manifest": "2955439000185399689",
+  "publication_failure": {
+    "callback_id": 3404,
+    "callback_result": 2,
+    "uploader_exit_code": 1,
+    "journal_status": "SUBMIT_REQUEST_PENDING",
+    "automatic_retry_performed": false,
+    "journal_rolled_back": false,
+    "record": "publishing/workshop/ui_data_qa_release_20261025.json"
+  }
 }

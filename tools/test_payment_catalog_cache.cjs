@@ -2,7 +2,7 @@
 const assert=require("node:assert/strict"),fs=require("node:fs"),vm=require("node:vm");
 let now=100000,visible=false,snapshot=null,notice="",updates=0;
 const panels={},requests=[],scheduled=[],handlers={};
-function panel(){return {style:{},children:[],events:{},SetHasClass(){},AddClass(){},
+function panel(){return {style:{},children:[],events:{},SetHasClass(){},AddClass(){},DeleteAsync(){this.deleted=true;},IsValid(){return !this.deleted;},
  RemoveAndDeleteChildren(){this.children=[];},SetPanelEvent(k,v){this.events[k]=v;}};}
 function $(id){return panels[id]||(panels[id]=panel());}
 $.CreatePanel=(_,p)=>{const c=panel();p.children.push(c);return c;};

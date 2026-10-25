@@ -1,6 +1,8 @@
 -- Real payment -> profile -> inventory/lottery projections; only transports/engine are fixtures.
 package.path='scripts/vscripts/?.lua;'..package.path
 require("tests/development_release_profile")
+-- Admission is covered separately; these transport fixtures use synthetic accounts.
+package.loaded['config/test_access']={enabled=false}
 local bus,ev=require('core/event_bus'),require('core/events')
 local decoder,encoder=require('core/json_decoder'),require('core/json_encoder')
 local handlers,sent,http,fetches,lottery_reads={},{},{},{},{}

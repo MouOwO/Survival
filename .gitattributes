@@ -89,3 +89,40 @@ tools/benefit_login_manual_20261021/README.md text eol=lf
 # Fixed points-price candidates verify exact reviewed builder bytes.
 tools/points_price_20261021/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tools/points_price_20261021/README.md text eol=lf
+
+# UI QA signed source bytes must survive Windows stash and checkout unchanged.
+panorama/src/scripts/custom_game/archive_v10.js text eol=crlf
+panorama/src/scripts/custom_game/archive_v10_semantics.js text eol=crlf
+panorama/src/scripts/custom_game/commerce_wallet.js text eol=crlf
+panorama/src/scripts/custom_game/common/archive_font_v36.js text eol=crlf
+panorama/src/scripts/custom_game/common/archive_tooltip.js -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+panorama/src/scripts/custom_game/common/ui_components.js text eol=crlf
+panorama/src/scripts/custom_game/daily_remaining_5d5c1152eb.js text eol=crlf
+panorama/src/scripts/custom_game/payment_test.js text eol=crlf
+panorama/src/scripts/custom_game/topnav_remaining_5d5c1152eb.js text eol=crlf
+panorama/src/scripts/custom_game/ui_layers.js text eol=crlf
+scripts/vscripts/systems/payment_service.lua text eol=crlf
+scripts/vscripts/systems/commerce_service.lua text eol=crlf
+
+# These task-owned QA and sealed release helpers are pinned by raw byte SHA256.
+tools/ui_qa_20261025/* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/build_ui_qa_candidate.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/update_ui_qa_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/build_archive_font_candidate.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/update_archive_font_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/package_ui_font_wallet_v07.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/build_ui_stackable_candidate.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/update_ui_stackable_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/package_ui_stackable_v08.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_ui_qa_candidate.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_update_ui_qa_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_archive_font_candidate.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_update_archive_font_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_package_ui_font_wallet_v07.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_ui_stackable_candidate.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_update_ui_stackable_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tools/workshop_test/test_package_ui_stackable_v08.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# The final publication receipt is bound by raw SHA256 in the QA report.
+publishing/workshop/ui_data_qa_release_20261025.json text eol=lf
+publishing/workshop/test_listing.json text eol=lf

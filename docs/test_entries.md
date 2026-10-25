@@ -15,9 +15,11 @@
 
 离线启动设置 `sv_cheats=1`，联网设置 `sv_cheats=0`。服务端中央开发策略还会读取受信的网页登录配置：只要启用网页登录，就拒绝聊天作弊、资源/英雄/科技/武器/波次/存档等调试修改，即使运行在 development 与 Tools 中也一样；已经注册过的回调同样重新核对权限。正常游戏购买、升级、召唤及只读诊断继续保留。配置缺失或错误时拒绝作弊，不影响正常初始化。
 
-联网实际冻结副本需包含同一门禁。入口按 `publishing/workshop/online_cheat_policy_20261024.json` 核对发布内容标识、受保护策略文件和 production 配置的 SHA-256，防止误用旧版本。完整签名和资源验证在候选构建与安装时执行。此设置不把本地主机变成可信托管服务器；原有独立测试库和战果可信度限制继续适用。
+联网实际冻结副本需包含同一门禁。入口按 `publishing/workshop/online_cheat_policy_20261025.json` 核对发布内容标识、受保护策略文件和 production 配置的 SHA-256，防止误用旧版本。完整签名和资源验证在候选构建与安装时执行。此设置不把本地主机变成可信托管服务器；原有独立测试库和战果可信度限制继续适用。
 
 `tools/workshop_test/launch_test.ps1 -Mode Offline|Online -CheckOnly` 只检查本地入口和依赖，不启动游戏或中转。实际进程与安全诊断保存在忽略的 `output/test_entry_runtime`。冻结联网包与当前开发源码不会自动相互覆盖。
+
+2026-10-25 的 UI/数据综合测试及候选交付状态见 [本轮验证报告](validation/UI_DATA_QA_20261025.md)。本机冻结副本、签名候选和工坊已发布版本分别记录，不能把本地入口通过当作原游廊条目已经更新。
 
 2026-10-24 原生离线此前已完成身份一致、加载就绪、模式/难度选择并进入地图，局内加木材命令已生效。两个根 CMD 的只读检查通过，联网 v02 此前已完成真实 Steam 登录、云端读档与在线进度回执。浏览器记住功能已通过53项服务测试并部署，跨日效果由明确 Cookie/数据库期限和重启测试验证，尚未经历实际30天。
 
@@ -25,7 +27,9 @@
 
 ## 从游廊测试联网版本
 
-沿用[孤城逐晓 · 封闭测试](https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109)，保持不公开列出、原封面与四账号限制。历史 v03／v04 分发记录继续保留；当前 WS4-ENTRY-05 自动入口与原游廊完整流程以[发布回执](../publishing/workshop/workshop_entry_release_20261024.json)为准。
+沿用[孤城逐晓 · 封闭测试](https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109)，保持不公开列出、原封面与四账号限制。历史 v03／v04 分发记录继续保留；最后一次成功验收的 WS4-ENTRY-05 自动入口与原游廊完整流程以[发布回执](../publishing/workshop/workshop_entry_release_20261024.json)为准。
+
+2026-10-25 的 v08 UI/数据修复已在本机冻结联网入口完成重进读档与数量显示验证。原条目更新申请收到 Steam 失败回调，不能把本机通过视作工坊已更新；上传现场、远端对账及下载验收状态分别见[本轮分发记录](../publishing/workshop/ui_data_qa_release_20261025.json)。长提示框中央悬停不稳定仍为待修项，完整范围见本轮 QA 报告。
 
 先正常退出旧 Dota，让 Steam 完成更新，再从原条目新建房间并开始，保持作弊关闭。默认 `ws4_entry` 入口只接收1人，自动重开同条目的 `template_map`；随后按原生界面正常开始，用当前同一 Steam 账号核对短码并在网页批准，再返回选择模式和难度。玩家无需 CMD 或连接助手；网页登录不依赖 `GetDedicatedServerKey`。若仍显示旧的 `WS4-03`／`Invalid_NotOnDedicatedServer`，先核对更新版本。
 

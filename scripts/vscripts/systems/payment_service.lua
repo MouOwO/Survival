@@ -116,16 +116,26 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
         end
         body.kind=kind; body.request_id=resets[id].request_id
     end
-    local http=CreateHTTPRequestScriptVM("POST","https://pay.xiaofengnet.com/v1/payments/"..action)
-    if not http then reply({ok=false,action=action,error="payment_unavailable"});return false,"payment_unavailable" end
+    local created,http=pcall(CreateHTTPRequestScriptVM,"POST","https://pay.xiaofengnet.com/v1/payments/"..action)
+    if not created or not http then reply({ok=false,action=action,error="payment_unavailable",sku=sku});return false,"payment_unavailable" end
     local job={account=account,session=session,action=action,waiters={request_id or ""}}
     busy[id]=job; last[rate_key]=now
     if action~="catalog" then catalogs[id]=nil end
-    http:SetHTTPRequestHeaderValue("Authorization","Bearer "..token)
-    http:SetHTTPRequestRawPostBody("application/json; charset=utf-8",encoder.encode(body))
-    if http.SetHTTPRequestAbsoluteTimeoutMS then http:SetHTTPRequestAbsoluteTimeoutMS(30000) end
-    http:Send(function(response)
-        if busy[id]~=job then return end
+    local transport_done=false
+    local transport_timeout="payment_transport:"..tostring(id)
+    local function fail_transport()
+        if transport_done or busy[id]~=job then return end
+        transport_done=true;busy[id]=nil;scheduler.cancel(transport_timeout)
+        if provider.resolve_account_id(id)~=account or session_id()~=session then return end
+        local result={ok=false,action=action,sku=sku,
+            error=cash_policy.real_money_allowed() and "payment_unavailable" or "real_money_disabled"}
+        if action=="catalog" then
+            for _,waiter in ipairs(job.waiters) do reply(result,waiter~="" and waiter or nil) end
+        else reply(result) end
+    end
+    local function received(response)
+        if transport_done or busy[id]~=job then return end
+        transport_done=true;scheduler.cancel(transport_timeout)
         busy[id]=nil
         if not cash_policy.real_money_allowed() then
             reply({ok=false,action=action,error="real_money_disabled"});return
@@ -189,7 +199,21 @@ local function request(id, action, sku, kind, channel, request_id, quantity)
             return
         end
         reply(result)
+    end
+    -- Native Send may return void; explicit false or an exception means no
+    -- callback is guaranteed. A separate deadline also retires lost requests.
+    -- Cancel it before waiting for the authoritative profile refresh below.
+    scheduler.after(32,fail_transport,transport_timeout)
+    local submitted,send_result=pcall(function()
+        http:SetHTTPRequestHeaderValue("Authorization","Bearer "..token)
+        http:SetHTTPRequestRawPostBody("application/json; charset=utf-8",encoder.encode(body))
+        if http.SetHTTPRequestAbsoluteTimeoutMS then http:SetHTTPRequestAbsoluteTimeoutMS(30000) end
+        return http:Send(received)
     end)
+    if (not submitted or send_result==false) and not transport_done then
+        fail_transport()
+        return false,"payment_unavailable"
+    end
     return true
 end
 function M.handle(payload)

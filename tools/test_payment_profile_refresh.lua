@@ -1,6 +1,8 @@
 -- Actual profile/payment/permanent/resource modules; only HTTP and engine are faked.
 package.path='scripts/vscripts/?.lua;'..package.path
 require("tests/development_release_profile")
+-- Synthetic accounts exercise the real profile chain without the production allowlist.
+package.loaded['config/test_access']={enabled=false}
 local bus=require('core/event_bus');local events=require('core/events')
 local mode,session='standard','payment_refresh_session_1'
 local accounts={[0]='123',[1]='456'}
