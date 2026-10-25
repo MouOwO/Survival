@@ -164,7 +164,19 @@ local function request(record, path, payload, success, failure)
     end
 end
 
-function M.enabled() return config.enabled == true end
+function M.enabled()
+    -- The independent lobby may authenticate identity without loading profiles
+    -- or granting access to cloud saves in the memory-only battle map.
+    if type(GetMapName) == "function" then
+        local ok, map = pcall(GetMapName)
+        if ok and map == "ws4_lobby" then
+            local loaded, lobby = pcall(require, "config/hosted_lobby")
+            return loaded and type(lobby) == "table" and lobby.enabled == true
+                and lobby.expected_map == "ws4_lobby" and lobby.base_url == BASE
+        end
+    end
+    return config.enabled == true
+end
 
 function M.authorized_account(session)
     if not server() or not M.enabled() or config.base_url ~= BASE or session ~= active_session then return nil end
@@ -177,6 +189,16 @@ function M.authorized_account(session)
     -- Only a server-side, read-only metadata caller may consume these extra
     -- return values. Looking up metadata never starts/polls an approval flow.
     return selected.account, BASE, selected.token
+end
+
+function M.invalidate(account, session)
+    -- Only a server-side owner of this exact binding may discard a rejected
+    -- grant. Old asynchronous callbacks fail current(record) after removal.
+    if not server() or session ~= active_session then return false end
+    local record = records[account]
+    if not record or not current(record) then return false end
+    records[account] = nil
+    return true
 end
 
 function M.resolve(account, session, success, failure)

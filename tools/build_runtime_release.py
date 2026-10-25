@@ -37,6 +37,7 @@ RULES = {
     "maps": {".vmdl_c", ".vmat_c", ".vtex_c", ".vphys_c", ".vanim_c", ".vmesh_c", ".vpcf_c"},
 }
 EXACT = {"addoninfo.txt", "scripts/custom_net_tables.txt"}
+OPTIONAL_EXACT = {"scripts/custom.gameevents"}
 EXCLUDED_EXACT = {
     # Historical base is rebuilt by offline regression helpers. It has no
     # shipping layout entry; retain the fixture in source, exclude its package.
@@ -211,12 +212,15 @@ def map_files(root: Path) -> set[str]:
     # it in signed inventories even though it is not exposed in the lobby list.
     if match.group(1) == "ws4_entry":
         result.add("maps/template_map.vpk")
+    if match.group(1) == "ws4_lobby":
+        result.add("maps/template_map.vpk")
     return result
 
 
 def select(root: Path, *, check_critical: bool = True) -> tuple[list[str], list[dict]]:
     root = root.resolve(strict=True)
     selected = set(EXACT) | map_files(root)
+    selected.update(name for name in OPTIONAL_EXACT if (root / name).is_file())
     excluded = []
     for folder, extensions in RULES.items():
         base = root / folder

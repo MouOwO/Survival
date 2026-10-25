@@ -11,4 +11,8 @@
     {
         "MaxPlayers"    "4"
     }
+    "ws4_lobby"
+    {
+        "MaxPlayers"    "1"
+    }
 }

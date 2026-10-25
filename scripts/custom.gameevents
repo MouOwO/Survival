@@ -1,0 +1,9 @@
+"custom"
+{
+    "survival_lobby_connect_local"
+    {
+        "address"       "string"
+        "match_id"      "string"
+        "build_sha256"  "string"
+    }
+}

@@ -26,12 +26,24 @@ def settings_from_environment(env):
         steam_tls_relay=relay == "1")
 
 
+def lobby_from_environment(service, env):
+    enabled = env.get("PLAYER_WEB_AUTH_LOBBY_ENABLED", "0")
+    if enabled not in ("0", "1"):
+        raise ValueError("lobby_enabled_invalid")
+    if enabled == "0":
+        return None
+    from lobby_backend.service import LobbyService
+    # No worker/readiness adapters or endpoints are assumed by this opt-in.
+    return LobbyService.from_auth_service(service)
+
+
 def main():
     os.umask(0o077)
     try:
         settings = settings_from_environment(os.environ)
         service = Service(settings)
-        server = BoundedServer((settings.bind, settings.port), handler(service))
+        server = BoundedServer((settings.bind, settings.port),
+                               handler(service, lobby=lobby_from_environment(service, os.environ)))
     except Exception:
         print("WS4_PLAYER_WEB_AUTH_STARTUP_ERROR", flush=True)
         return 2

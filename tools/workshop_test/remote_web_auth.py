@@ -4,7 +4,7 @@ Injected MODE/OVERLAY are trusted operator input, not HTTP input. No production
 database connection is made. Existing API/payment/database services and release
 pointers are observed and must retain the same PIDs and content hashes.
 """
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import base64
 import hashlib
 import json
@@ -35,6 +35,12 @@ SHA256 = re.compile(r'[a-f0-9]{64}\Z')
 FIXED_CODE = re.compile(r'[a-z][a-z0-9_]{1,95}\Z')
 STEAM_TLS_RELAY = globals().get('STEAM_TLS_RELAY')
 sha = lambda raw: hashlib.sha256(raw).hexdigest()
+RUNTIME_SOURCES = frozenset((
+    'player_web_auth/__init__.py', 'player_web_auth/http_api.py',
+    'player_web_auth/run.py', 'player_web_auth/service.py',
+    'lobby_backend/__init__.py', 'lobby_backend/http_api.py', 'lobby_backend/service.py',
+))
+LEGACY_SOURCES = frozenset(name for name in RUNTIME_SOURCES if name.startswith('player_web_auth/'))
 
 
 def failure_code(error):
@@ -276,18 +282,25 @@ WantedBy=multi-user.target
 
 
 def decoded_sources():
-    need(OVERLAY and len(OVERLAY) <= 30, 'web_source_missing')
+    need(isinstance(OVERLAY, dict) and OVERLAY, 'web_source_missing')
     sources = {}
     for name, encoded in OVERLAY.items():
-        relative = PurePosixPath(name)
-        need(not relative.is_absolute() and '..' not in relative.parts
-             and relative.parts[0] == 'player_web_auth' and relative.suffix == '.py', 'web_source_path_invalid')
+        need(isinstance(name, str) and name in RUNTIME_SOURCES, 'web_source_path_invalid')
         raw = base64.b64decode(encoded, validate=True)
         need(len(raw) <= 512 * 1024, 'web_source_too_large')
         compile(raw, name, 'exec')
         sources[name] = raw
-    need({'player_web_auth/__init__.py', 'player_web_auth/run.py'} <= sources.keys(), 'web_source_incomplete')
+    need(set(sources) == RUNTIME_SOURCES, 'web_source_incomplete')
     return sources
+
+
+def source_target(name):
+    """Only the two fixed packages may be read/written inside this release."""
+    need(isinstance(name, str) and name in RUNTIME_SOURCES, 'prepared_source_path_invalid')
+    target = RELEASE / name
+    need(RELEASE.is_dir() and not any(parent.is_symlink() for parent in (RELEASE, RELEASE.parent, BASE))
+         and target.parent.is_dir() and not target.parent.is_symlink(), 'prepared_source_path_invalid')
+    return target
 
 
 def prepare():
@@ -366,12 +379,17 @@ def prepare():
 def prepared():
     plan = document(OPS / 'prepared.json')
     need(plan['release'] == str(RELEASE), 'prepared_release_invalid')
+    files = plan.get('files')
+    need(isinstance(files, dict) and files, 'prepared_source_incomplete')
+    for name, digest in files.items():
+        need(isinstance(name, str) and name in RUNTIME_SOURCES
+             and isinstance(digest, str) and SHA256.fullmatch(digest), 'prepared_source_path_invalid')
+    # Preserve verification/rollback of the complete old four-file release.
+    # New preparation and activation require all seven runtime dependencies.
+    need(set(files) in (LEGACY_SOURCES, RUNTIME_SOURCES), 'prepared_source_incomplete')
     need(sha(regular(CONFIG / 'auth.env')) == plan['env_sha256'], 'prepared_environment_changed')
     for name, digest in plan['files'].items():
-        relative = PurePosixPath(name)
-        need(not relative.is_absolute() and '..' not in relative.parts and relative.parts[0] == 'player_web_auth',
-             'prepared_source_path_invalid')
-        need(sha(regular(RELEASE / name)) == digest, 'prepared_source_changed')
+        need(sha(regular(source_target(name))) == digest, 'prepared_source_changed')
     for kind in ('nginx', 'pins'):
         for state in ('before', 'after'):
             need(sha(regular(OPS / (kind + '.' + state))) == plan[kind + '_' + state + '_sha256'],
@@ -397,32 +415,76 @@ def refresh_prepared():
         return {'ok': True, 'phase': 'WEB_AUTH_PREPARED_UNCHANGED', 'source_files': len(sources),
                 'candidate_updated': False, 'keys_and_state_preserved': True,
                 'existing_services_unchanged': True}
-    need(set(hashes) == set(plan['files']), 'source_set_change_requires_new_release')
+    before_names, after_names = set(plan['files']), set(hashes)
+    need(after_names == RUNTIME_SOURCES and before_names in (LEGACY_SOURCES, RUNTIME_SOURCES),
+         'source_set_change_requires_new_release')
+    added = after_names - before_names
+    added_package = RELEASE / 'lobby_backend' if added else None
+    if added_package is not None:
+        need(not added_package.exists() and not added_package.is_symlink(), 'source_added_namespace_exists')
     need((OPS / 'activation.json').is_file() and (OPS / 'rolled-back.json').is_file(),
          'successful_rollback_required_before_refresh')
     activation_ready(plan)
     before_plan = regular(OPS / 'prepared.json')
+    need(json.loads(before_plan) == plan, 'prepared_plan_changed')
+    before_sources = {name: regular(source_target(name)) for name in plan['files']}
+    need(all(sha(raw) == plan['files'][name] for name, raw in before_sources.items()), 'prepared_source_changed')
     backup = OPS / ('source-before-refresh-' + secrets.token_hex(8))
     backup.mkdir(mode=0o700)
-    before_sources = {name: regular(RELEASE / name) for name in plan['files']}
     private(backup / 'prepared.json', before_plan)
     for name, raw in before_sources.items():
         target = backup / name
         target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         private(target, raw)
     group = pwd.getpwnam(USER).pw_gid
+    after_plan = json.dumps({**plan, 'files': hashes}, sort_keys=True).encode()
+    written, created_package = [], False
     try:
-        for name, raw in sources.items():
-            replace(RELEASE / name, raw, gid=group, mode=0o640)
+        need(regular(OPS / 'prepared.json') == before_plan, 'prepared_plan_changed')
+        if added_package is not None:
+            added_package.mkdir(mode=0o750)
+            created_package = True
+            os.chown(added_package, 0, group)
+            added_package.chmod(0o750)
+        for name, raw in sorted(sources.items()):
+            target = source_target(name)
+            if name in added:
+                private(target, raw, gid=group, mode=0o640)
+            else:
+                need(sha(regular(target)) == plan['files'][name], 'prepared_source_changed')
+                replace(target, raw, gid=group, mode=0o640)
+            written.append(name)
+        need(regular(OPS / 'prepared.json') == before_plan, 'prepared_plan_changed')
         record('prepared.json', {**plan, 'files': hashes})
         prepared()
         unchanged()
     except Exception:
-        # The service is stopped, so restoring the complete previous candidate
-        # cannot race an interpreter using this directory.
-        for name, raw in before_sources.items():
-            replace(RELEASE / name, raw, gid=group, mode=0o640)
-        replace(OPS / 'prepared.json', before_plan)
+        if not written and not created_package:
+            raise
+        # Restore only our own exact outputs. Concurrent administrator edits
+        # survive; never delete an unknown file or replace an external plan.
+        restored = True
+        for name in reversed(written):
+            try:
+                target = source_target(name)
+                need(regular(target) == sources[name], 'source_refresh_restore_conflict')
+                if name in added:
+                    target.unlink()
+                else:
+                    replace(target, before_sources[name], gid=group, mode=0o640)
+            except Exception:
+                restored = False
+        try:
+            current_plan = regular(OPS / 'prepared.json')
+            if current_plan == after_plan:
+                replace(OPS / 'prepared.json', before_plan)
+            else:
+                need(current_plan == before_plan, 'source_refresh_restore_conflict')
+            if created_package:
+                added_package.rmdir()
+        except Exception:
+            restored = False
+        need(restored, 'source_refresh_restore_conflict')
         raise
     return {'ok': True, 'phase': 'WEB_AUTH_CANDIDATE_REFRESHED_AFTER_ROLLBACK',
             'source_files': len(sources), 'candidate_updated': True, 'keys_and_state_preserved': True,
@@ -582,6 +644,7 @@ def configure_transport():
 def activate():
     import pwd
     plan = prepared()
+    need(set(plan['files']) == RUNTIME_SOURCES, 'prepared_source_incomplete')
     unchanged()
     activation_ready(plan)
     path = Path(plan['nginx_path'])

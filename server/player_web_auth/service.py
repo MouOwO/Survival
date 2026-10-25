@@ -551,6 +551,10 @@ class Service:
         if path not in allowed:
             raise AuthError("player_route_not_allowed", 403)
         row = self.principal(bearer, payload)
+        # Scope comes from the authenticated, persisted challenge, never the
+        # caller's latest body. The independent lobby gets identity only.
+        if row["match_id"].startswith("lobby_"):
+            raise AuthError("player_route_not_allowed", 403)
         self.rate("proxy", row["account"], 300)
         raw = json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
         if len(raw) > BODY_LIMIT:
@@ -579,7 +583,9 @@ class Service:
         text = "<h1>生存守城 · 测试授权</h1><p>登录将前往 Steam 官方页面；本站不收集 Steam 密码。</p>"
         text += "<p>游戏账号尾号：" + escape(row["account"][-4:]) + "</p>"
         text += "<p>授权码：" + escape(code) + "。只有当此码与你正在玩的游戏内显示一致时才继续。</p>"
-        if self.settings.isolated_local_progress:
+        if row["match_id"].startswith("lobby_"):
+            text += "<p>本次登录仅用于大厅建房、组队和连接测试。对局数据仅留在本局，不读取或写入云存档，不开放商城和支付。</p>"
+        elif self.settings.isolated_local_progress:
             text += "<p>确认后，本次游戏可以读取并保存你的独立测试进度。本地主机进度可能被房主修改，不作为可信战果。</p>"
         else:
             text += "<p>确认后，本次游戏可以读取你的测试存档和已有权益，不能上传战斗进度。</p>"

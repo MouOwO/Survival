@@ -21,7 +21,12 @@ def strict_pairs(raw, maximum=30):
         raise AuthError("request_fields_invalid") from None
 
 
-def handler(service):
+def handler(service, lobby=None):
+    lobby_errors, lobby_routes, lobby_post = (), frozenset(), None
+    if lobby is not None:
+        from lobby_backend.http_api import ROUTES, post
+        from lobby_backend.service import LobbyError
+        lobby_errors, lobby_routes, lobby_post = (LobbyError,), ROUTES, post
     class Handler(BaseHTTPRequestHandler):
         server_version = "WS4PlayerAuth"
         sys_version = ""
@@ -172,7 +177,17 @@ def handler(service):
                     self.reply(200, "<!doctype html><meta charset=utf-8><title>已退出登录</title><p>已退出网页登录。请返回游戏重新打开授权页。</p>".encode("utf-8"), content_type="text/html; charset=utf-8", delete_cookie=True)
                     return
                 payload = self.body()
-                if path == "/v1/player-auth/start":
+                if path.startswith("/v1/lobby/"):
+                    if lobby is None:
+                        self.reply(503, {"ok": False, "error": "lobby_disabled",
+                                         "worker_available": False, "build_sha256": None})
+                    elif path not in lobby_routes:
+                        raise LobbyError("lobby_route_not_found", 404)
+                    elif len(self.headers.get_all("Authorization", [])) != 1:
+                        raise LobbyError("lobby_identity_required", 401)
+                    else:
+                        self.reply(200, lobby_post(lobby, path, self.headers.get("Authorization"), payload))
+                elif path == "/v1/player-auth/start":
                     self.reply(200, service.start(payload, peer))
                 elif path == "/v1/player-auth/poll":
                     self.reply(200, service.poll(payload, peer))
@@ -181,8 +196,14 @@ def handler(service):
                     bearer = header[7:] if header.startswith("Bearer ") else ""
                     status, body = service.proxy(path, bearer, payload, peer)
                     self.reply(status, body)
+            except lobby_errors as error:
+                self.reply(error.status, {"ok": False, "error": error.code, **(error.context or lobby.response_context())})
             except AuthError as error:
-                self.reply(error.status, {"ok": False, "error": error.code})
+                body = {"ok": False, "error": error.code}
+                if self.path.startswith("/v1/lobby/"):
+                    body.update(lobby.response_context() if lobby is not None else
+                                {"worker_available": False, "build_sha256": None})
+                self.reply(error.status, body)
             except sqlite3.Error:
                 self.reply(503, {"ok": False, "error": "authentication_unavailable"})
             except Exception:

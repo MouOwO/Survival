@@ -12,21 +12,35 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MODES = ("audit", "prepare", "configure-transport", "activate", "verify", "rollback")
+RUNTIME_SOURCES = frozenset((
+    "player_web_auth/__init__.py", "player_web_auth/http_api.py",
+    "player_web_auth/run.py", "player_web_auth/service.py",
+    "lobby_backend/__init__.py", "lobby_backend/http_api.py", "lobby_backend/service.py",
+))
+
+
+def collect_sources():
+    server = ROOT / "server"
+    result = {}
+    for name in sorted(RUNTIME_SOURCES):
+        path = server / name
+        if any(parent.is_symlink() or getattr(parent, "is_junction", lambda: False)()
+               for parent in (server, path.parent, path)):
+            raise RuntimeError("web_auth_source_path_invalid")
+        if not path.is_file():
+            raise RuntimeError("web_auth_source_incomplete")
+        if not path.resolve().is_relative_to(server.resolve()):
+            raise RuntimeError("web_auth_source_path_invalid")
+        raw = path.read_bytes()
+        if len(raw) > 512 * 1024:
+            raise RuntimeError("web_auth_source_too_large")
+        compile(raw, name, "exec")
+        result[name] = base64.b64encode(raw).decode("ascii")
+    return result
 
 
 def overlay():
-    package = ROOT / "server/player_web_auth"
-    result = {}
-    for path in sorted(package.rglob("*.py")):
-        relative = path.relative_to(package)
-        if path.is_symlink() or "__pycache__" in relative.parts:
-            raise RuntimeError("web_auth_source_path_invalid")
-        if path.name.startswith("test_"):
-            continue
-        result["player_web_auth/" + relative.as_posix()] = base64.b64encode(path.read_bytes()).decode("ascii")
-    if not {"player_web_auth/__init__.py", "player_web_auth/run.py"} <= result.keys():
-        raise RuntimeError("web_auth_source_incomplete")
-    return result
+    return collect_sources()
 
 
 def arguments(argv=None):

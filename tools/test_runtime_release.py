@@ -17,6 +17,14 @@ spec.loader.exec_module(release)
 
 
 class RuntimeReleaseTests(unittest.TestCase):
+    def test_lobby_entry_retains_formal_map_and_own_local_event_schema(self):
+        self.write("addoninfo.txt", b'"AddonInfo" { "maps" "ws4_lobby" }')
+        self.write("scripts/custom.gameevents", b'"custom" {}')
+        self.write("maps/ws4_lobby.vpk")
+        self.write("maps/template_map.vpk")
+        selected, _ = release.select(self.root, check_critical=False)
+        self.assertTrue({"scripts/custom.gameevents", "maps/ws4_lobby.vpk", "maps/template_map.vpk"} <= set(selected))
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

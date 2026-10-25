@@ -1187,7 +1187,14 @@ function M.init(options)
     provider_id = nil
     injected_provider = options and options.provider ~= nil or false
     offline_logic_provider = options and options.offline_logic_test == true or false
-    if offline_logic_provider then
+    local session_multiplayer_provider = options and options.session_multiplayer_test == true or false
+    if session_multiplayer_provider then
+        assert(not offline_logic_provider and require("systems/session_multiplayer_test").is_provider(options.provider),
+            "session_multiplayer_provider_required")
+        -- Memory providers still follow real account, mode and match bindings.
+        offline_logic_provider = true
+    end
+    if offline_logic_provider and not session_multiplayer_provider then
         assert(require("debug/offline_logic_test").is_provider(options.provider),
             "offline_logic_tools_required")
     end

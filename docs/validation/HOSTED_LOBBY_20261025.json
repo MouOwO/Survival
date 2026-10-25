@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "date": "2026-10-25",
+  "status": "IMPLEMENTED_DISABLED_PENDING_NATIVE_WORKER",
+  "reference_workshop_id": "2637453327",
+  "original_workshop_id": "3824360109",
+  "published_new_package": false,
+  "deployed_lobby_backend": false,
+  "lobby_enabled_default": false,
+  "session_multiplayer_enabled_default": false,
+  "real_worker_ready": false,
+  "cloud_archive_enabled_in_new_match_profile": false,
+  "commerce_enabled_in_new_match_profile": false,
+  "native": {
+    "core_dota_dedicated_udp": "PASS_LOCAL_27025_ONLY",
+    "sv_cheats": false,
+    "own_custom_map_mount": "FAILED_INVALID_MAP_NAME",
+    "steam_game_server_identity": "NOT_VERIFIED_DISCONNECTED",
+    "own_map_http": "NOT_RUN_MAP_NOT_LOADED",
+    "lobby_to_match": "NOT_RUN_NO_READY_WORKER",
+    "tools_lobby_ui_preview": "BLOCKED_TOOLS_STARTUP_STALL",
+    "lobby_ui_visual": "NOT_RUN_MAP_LOAD_NOT_OBSERVED",
+    "two_accounts_two_machines": "NOT_RUN_SECOND_MACHINE_UNAVAILABLE",
+    "probe_processes": "EXITED"
+  },
+  "evidence": {
+    "dedicated_result": "output/hosted_lobby_20261025/dedicated_final_result.json",
+    "dedicated_result_sha256": "bf48106dbe2bdc577dba69058d279bde2c56abf5051f9c66f6cbc86dd6b946a5",
+    "lobby_map_source_sha256": "f9953d919bce926cc99f1aa7733d0af94e19aef4d57e74a496568957c5bcfdca",
+    "lobby_map_runtime_sha256": "32f1107e4f10d2e8aeeb5fda7548b2e5e0893b1459e7299c718439ec06734dd4",
+    "lobby_map_payload_crcs": 16,
+    "original_map_material_files_byte_preserved": 4487
+  },
+  "validation": {
+    "python_tests_passed": 140,
+    "python_tests_skipped": 2,
+    "staged_lua_suites_passed": 8,
+    "lobby_controller_cases": 18,
+    "lobby_client_checks": 29,
+    "old_entry_staged_checks": 87,
+    "panorama_mock_checks": 225,
+    "panorama_native_compiles": 4,
+    "working_tree_checks": "13_OF_14_GROUPS_PASS; OLD_ENTRY_FIXTURE_FAILS_ON_CONCURRENT_UNSTAGED_ONBOARDING_DEPENDENCY",
+    "staged_checks": "PASS_TASK_ONLY_SNAPSHOT",
+    "working_tree_evidence": "output/hosted_lobby_20261025/final_checks/result.json",
+    "staged_evidence": "output/hosted_lobby_20261025/staged_lua_result.json",
+    "deployment_bundle_review": "output/hosted_lobby_20261025/backend_bundle_review.json"
+  }
+}

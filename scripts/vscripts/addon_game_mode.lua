@@ -1,3 +1,14 @@
+-- Keep the independent lobby free from gameplay and cloud initialization.
+if type(GetMapName) == "function" and GetMapName() == "ws4_lobby" then
+    local lobby = require("systems/hosted_lobby")
+    function Precache() end
+    function Activate()
+        local ok, reason = lobby.activate()
+        if not ok then print("[WS4-LOBBY-01] unavailable reason=" .. tostring(reason)) end
+    end
+    return
+end
+
 -- Keep the Workshop entry independent of gameplay and cloud initialization.
 if type(GetMapName) == "function" and GetMapName() == "ws4_entry" then
     local entry = require("systems/workshop_entry")
@@ -1007,7 +1018,10 @@ local function initialize_services()
     resource_system.init()
     player_entitlement_service.init()
     offline_logic_test.configure()
-    require("systems/player_profile_service").init(offline_logic_test.profile_options())
+    local session_test = require("systems/session_multiplayer_test")
+    session_test.configure()
+    require("systems/player_profile_service").init(
+        session_test.profile_options() or offline_logic_test.profile_options())
     require("systems/online_time_service").init()
     require("systems/permanent_reward_effect_service").init()
     require("systems/fishing_reward_service").init()

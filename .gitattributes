@@ -138,3 +138,8 @@ tools/workshop_test/reconcile_workshop_pending.py -text whitespace=blank-at-eol,
 tools/workshop_test/test_reconcile_workshop_pending.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tools/workshop_test/update_multiplayer_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tools/workshop_test/test_multiplayer_alias.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Keep the new lobby UI source bytes paired with native compiled resources.
+panorama/src/layout/custom_game/survival_lobby.xml text eol=crlf
+panorama/src/scripts/custom_game/survival_lobby.js text eol=crlf
+panorama/src/styles/custom_game/survival_lobby.css text eol=crlf

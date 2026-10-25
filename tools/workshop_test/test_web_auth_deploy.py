@@ -4,6 +4,7 @@ from contextlib import redirect_stdout, redirect_stderr
 import io
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -12,6 +13,10 @@ from unittest.mock import patch
 
 import deploy_web_auth as driver
 import remote_web_auth as operator
+
+
+def fixture_sources(marker=b'# reviewed runtime\n', names=None):
+    return {name: marker for name in (operator.RUNTIME_SOURCES if names is None else names)}
 
 
 class DeploymentBoundaryChecks(unittest.TestCase):
@@ -87,12 +92,14 @@ server { listen 443 ssl; server_name pay.xiaofengnet.com;
             ops, release, config = root/'ops', root/'release', root/'config'
             for path in (ops, release, config):
                 path.mkdir()
-            (release/'player_web_auth').mkdir()
             source = b'# reviewed source\n'
-            (release/'player_web_auth/run.py').write_bytes(source)
+            for name in operator.RUNTIME_SOURCES:
+                target = release/name
+                target.parent.mkdir(exist_ok=True)
+                target.write_bytes(source)
             (config/'auth.env').write_bytes(b'private')
             plan = {'release': str(release), 'env_sha256': operator.sha(b'private'),
-                    'files': {'player_web_auth/run.py': operator.sha(source)}}
+                    'files': {name: operator.sha(source) for name in operator.RUNTIME_SOURCES}}
             for kind in ('nginx', 'pins'):
                 for state in ('before', 'after'):
                     raw = (kind + state).encode()
@@ -109,9 +116,9 @@ server { listen 443 ssl; server_name pay.xiaofengnet.com;
 
     def test_driver_only_packages_python_sources(self):
         payload = driver.overlay()
-        self.assertIn('player_web_auth/run.py', payload)
+        self.assertEqual(set(payload), operator.RUNTIME_SOURCES)
         for name, encoded in payload.items():
-            self.assertTrue(name.startswith('player_web_auth/'))
+            self.assertTrue(name.startswith(('player_web_auth/', 'lobby_backend/')))
             self.assertTrue(name.endswith('.py'))
             self.assertNotIn('test_', Path(name).name)
             compile(base64.b64decode(encoded), name, 'exec')
@@ -229,8 +236,8 @@ server { listen 443 ssl; server_name pay.xiaofengnet.com;
 
     def test_source_refresh_requires_rollback_before_any_write(self):
         with tempfile.TemporaryDirectory() as temporary:
-            sources = {'player_web_auth/run.py': b'# revised candidate\n'}
-            plan = {'files': {'player_web_auth/run.py': operator.sha(b'# original candidate\n')}}
+            sources = fixture_sources(b'# revised candidate\n')
+            plan = {'files': {name: operator.sha(b'# original candidate\n') for name in sources}}
             with patch.dict(sys.modules, {'pwd': SimpleNamespace()}), \
                  patch.object(operator, 'OPS', Path(temporary)), patch.object(operator, 'prepared', return_value=plan), \
                  patch.object(operator, 'unchanged'), patch.object(operator, 'decoded_sources', return_value=sources), \
@@ -367,6 +374,252 @@ server { listen 443 ssl; server_name pay.xiaofengnet.com;
         self.assertEqual(list(ops.glob('env-before-transport-*')), [])
         self.assertEqual((config/'auth.env').read_bytes(), before_env)
         self.assertEqual((ops/'prepared.json').read_bytes(), before_plan)
+
+
+class RuntimeBundleChecks(unittest.TestCase):
+    def payload(self):
+        return {name: base64.b64encode(raw).decode('ascii') for name, raw in fixture_sources().items()}
+
+    def test_fixed_runtime_lists_match_and_exclude_standalone_runner(self):
+        self.assertEqual(driver.RUNTIME_SOURCES, operator.RUNTIME_SOURCES)
+        self.assertEqual(len(operator.RUNTIME_SOURCES), 7)
+        self.assertEqual(len(operator.LEGACY_SOURCES), 4)
+        self.assertNotIn('lobby_backend/run.py', operator.RUNTIME_SOURCES)
+
+    def test_collection_excludes_tests_private_files_and_unknown_directories(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name, raw in fixture_sources().items():
+                path = root/'server'/name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(raw)
+            for name in ('lobby_backend/test_service.py', 'lobby_backend/private.py',
+                         'lobby_backend/run.py', 'player_web_auth/private.env', 'unknown/server.py'):
+                path = root/'server'/name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b'private fixture must never enter payload')
+            with patch.object(driver, 'ROOT', root):
+                self.assertEqual(set(driver.collect_sources()), operator.RUNTIME_SOURCES)
+
+    def test_collection_rejects_each_missing_lobby_dependency(self):
+        for missing in (operator.RUNTIME_SOURCES - operator.LEGACY_SOURCES):
+            with self.subTest(missing=missing), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                for name, raw in fixture_sources().items():
+                    if name == missing:
+                        continue
+                    path = root/'server'/name
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(raw)
+                with patch.object(driver, 'ROOT', root), self.assertRaisesRegex(RuntimeError, 'source_incomplete'):
+                    driver.collect_sources()
+
+    def test_remote_requires_every_runtime_dependency(self):
+        for missing in operator.RUNTIME_SOURCES:
+            payload = self.payload()
+            del payload[missing]
+            with self.subTest(missing=missing), patch.object(operator, 'OVERLAY', payload, create=True), self.assertRaisesRegex(RuntimeError, 'web_source_incomplete'):
+                operator.decoded_sources()
+
+    def test_remote_rejects_unknown_paths_traversal_tests_and_private_sources(self):
+        for name in ('other/run.py', 'lobby_backend/private.py', 'lobby_backend/run.py',
+                     'lobby_backend/test_service.py', 'player_web_auth/subdir/run.py',
+                     'player_web_auth/../lobby_backend/service.py', '../player_web_auth/run.py',
+                     '/player_web_auth/run.py', 'player_web_auth\\run.py', 'lobby_backend/service.py/../x.py',
+                     'player_web_auth//run.py', 'lobby_backend/README.md', ''):
+            payload = self.payload()
+            payload[name] = base64.b64encode(b'# not a runtime source\n').decode('ascii')
+            with self.subTest(name=name), patch.object(operator, 'OVERLAY', payload, create=True), self.assertRaisesRegex(RuntimeError, 'web_source_path_invalid'):
+                operator.decoded_sources()
+
+    def test_exact_real_bundle_imports_with_lobby_default_off(self):
+        payload = driver.collect_sources()
+        with patch.object(operator, 'OVERLAY', payload, create=True):
+            sources = operator.decoded_sources()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name, raw in sources.items():
+                path = root/name
+                path.parent.mkdir(exist_ok=True)
+                path.write_bytes(raw)
+            code = ('import sys;sys.path.insert(0,sys.argv[1]);'
+                    'from player_web_auth.run import lobby_from_environment;'
+                    'from player_web_auth.http_api import handler;'
+                    'from lobby_backend.http_api import ROUTES;'
+                    'from lobby_backend import LobbyService;'
+                    'assert lobby_from_environment(None,{}) is None;'
+                    'assert lobby_from_environment(None,{"PLAYER_WEB_AUTH_LOBBY_ENABLED":"0"}) is None;'
+                    'assert "/v1/lobby/join" in ROUTES')
+            result = subprocess.run([sys.executable, '-I', '-B', '-c', code, str(root)],
+                                    capture_output=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stderr.decode('utf8', 'replace'))
+            self.assertFalse(list(root.rglob('__pycache__')))
+
+    def candidate(self, names):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        ops, release, config = root/'ops', root/'release', root/'config'
+        for directory in (ops, release, config): directory.mkdir()
+        sources = fixture_sources(b'# original runtime\n', names)
+        for name, raw in sources.items():
+            target = release/name
+            target.parent.mkdir(exist_ok=True)
+            target.write_bytes(raw)
+        env = b'PLAYER_WEB_AUTH_LOBBY_ENABLED="0"\nPRIVATE_TEST_VALUE="retained"\n'
+        (config/'auth.env').write_bytes(env)
+        (root/'private-state.sqlite3').write_bytes(b'unchanged private fixture')
+        plan = {'release': str(release), 'files': {name: operator.sha(raw) for name, raw in sources.items()},
+                'env_sha256': operator.sha(env)}
+        for kind in ('nginx', 'pins'):
+            for state in ('before', 'after'):
+                raw = (kind+state).encode()
+                (ops/(kind+'.'+state)).write_bytes(raw)
+                plan[kind+'_'+state+'_sha256'] = operator.sha(raw)
+        with patch.object(operator, 'RELEASE', release), patch.object(operator, 'CONFIG', config):
+            (ops/'unit.candidate').write_bytes(operator.unit_source())
+        (ops/'locations.candidate').write_bytes(operator.proxy_rules())
+        before_plan = json.dumps(plan).encode()
+        (ops/'prepared.json').write_bytes(before_plan)
+        (ops/'activation.json').write_bytes(b'{}')
+        (ops/'rolled-back.json').write_bytes(b'{"ok":true}')
+        return SimpleNamespace(root=root, ops=ops, release=release, config=config, plan=plan,
+                               env=env, sources=sources, before_plan=before_plan)
+
+    def refresh(self, candidate, *, fail_after_write=False, concurrent_after_write=False, concurrent_before_write=False, concurrent_plan=False):
+        original_prepared = operator.prepared
+        calls = [0]
+        def check_prepared():
+            calls[0] += 1
+            if calls[0] > 1 and fail_after_write:
+                if concurrent_after_write:
+                    (candidate.release/'player_web_auth/run.py').write_bytes(b'# administrator edit\n')
+                raise RuntimeError('prepared_source_changed')
+            return original_prepared()
+        def private(path, raw, **kwargs):
+            self.assertFalse(path.exists())
+            path.write_bytes(raw)
+            if concurrent_plan and path.name == 'prepared.json' and path.parent.name.startswith('source-before-refresh-'):
+                (candidate.ops/'prepared.json').write_text(json.dumps({**candidate.plan, 'administrator_edit': True}))
+        def ready(plan):
+            if concurrent_before_write:
+                (candidate.release/'player_web_auth/run.py').write_bytes(b'# administrator edit\n')
+        fake_pwd = SimpleNamespace(getpwnam=lambda name: SimpleNamespace(pw_gid=123))
+        with patch.dict(sys.modules, {'pwd': fake_pwd}), patch.object(operator, 'OPS', candidate.ops), \
+             patch.object(operator, 'RELEASE', candidate.release), patch.object(operator, 'CONFIG', candidate.config), \
+             patch.object(operator, 'prepared', side_effect=check_prepared), patch.object(operator, 'unchanged'), \
+             patch.object(operator, 'decoded_sources', return_value=fixture_sources(b'# new runtime\n')), \
+             patch.object(operator, 'activation_ready', side_effect=ready), patch.object(operator, 'private', side_effect=private), \
+             patch.object(operator, 'replace', side_effect=lambda path, raw, **kwargs: path.write_bytes(raw)), \
+             patch.object(operator.os, 'chown', create=True), patch.object(operator, 'run') as run:
+            try:
+                return operator.refresh_prepared()
+            finally:
+                run.assert_not_called()
+
+    def test_stopped_legacy_migration_adds_exactly_three_files_and_preserves_backup(self):
+        candidate = self.candidate(operator.LEGACY_SOURCES)
+        result = self.refresh(candidate)
+        self.assertTrue(result['previous_candidate_backup_preserved'])
+        self.assertEqual(set(json.loads((candidate.ops/'prepared.json').read_bytes())['files']), operator.RUNTIME_SOURCES)
+        self.assertEqual(set(p.relative_to(candidate.release).as_posix() for p in candidate.release.rglob('*.py')), operator.RUNTIME_SOURCES)
+        backup, = candidate.ops.glob('source-before-refresh-*')
+        self.assertEqual((backup/'prepared.json').read_bytes(), candidate.before_plan)
+        for name, raw in candidate.sources.items(): self.assertEqual((backup/name).read_bytes(), raw)
+        self.assertEqual((candidate.config/'auth.env').read_bytes(), candidate.env)
+        self.assertEqual((candidate.root/'private-state.sqlite3').read_bytes(), b'unchanged private fixture')
+
+    def test_failed_migration_restores_old_plan_code_and_removes_only_own_additions(self):
+        candidate = self.candidate(operator.LEGACY_SOURCES)
+        with self.assertRaisesRegex(RuntimeError, 'prepared_source_changed'):
+            self.refresh(candidate, fail_after_write=True)
+        self.assertEqual((candidate.ops/'prepared.json').read_bytes(), candidate.before_plan)
+        for name, raw in candidate.sources.items(): self.assertEqual((candidate.release/name).read_bytes(), raw)
+        self.assertFalse((candidate.release/'lobby_backend').exists())
+        self.assertEqual((candidate.config/'auth.env').read_bytes(), candidate.env)
+
+    def test_unknown_added_namespace_is_preserved_before_any_migration_write(self):
+        candidate = self.candidate(operator.LEGACY_SOURCES)
+        package = candidate.release/'lobby_backend'
+        package.mkdir()
+        (package/'private.txt').write_bytes(b'external fixture')
+        with self.assertRaisesRegex(RuntimeError, 'source_added_namespace_exists'):
+            self.refresh(candidate)
+        self.assertEqual((package/'private.txt').read_bytes(), b'external fixture')
+        self.assertEqual(list(candidate.ops.glob('source-before-refresh-*')), [])
+
+    def test_compare_and_swap_rejects_concurrent_source_before_first_write(self):
+        candidate = self.candidate(operator.LEGACY_SOURCES)
+        with self.assertRaisesRegex(RuntimeError, 'prepared_source_changed'):
+            self.refresh(candidate, concurrent_before_write=True)
+        self.assertEqual((candidate.release/'player_web_auth/run.py').read_bytes(), b'# administrator edit\n')
+        self.assertFalse((candidate.release/'lobby_backend').exists())
+        self.assertEqual((candidate.ops/'prepared.json').read_bytes(), candidate.before_plan)
+
+    def test_failed_refresh_never_overwrites_external_edit_during_restore(self):
+        candidate = self.candidate(operator.RUNTIME_SOURCES)
+        with self.assertRaisesRegex(RuntimeError, 'source_refresh_restore_conflict'):
+            self.refresh(candidate, fail_after_write=True, concurrent_after_write=True)
+        self.assertEqual((candidate.release/'player_web_auth/run.py').read_bytes(), b'# administrator edit\n')
+        self.assertEqual((candidate.ops/'prepared.json').read_bytes(), candidate.before_plan)
+        self.assertEqual((candidate.config/'auth.env').read_bytes(), candidate.env)
+
+    def test_legacy_activation_requires_complete_new_runtime_before_any_action(self):
+        with patch.dict(sys.modules, {'pwd': SimpleNamespace()}), \
+             patch.object(operator, 'prepared', return_value={'files': fixture_sources(names=operator.LEGACY_SOURCES)}), \
+             patch.object(operator, 'unchanged') as unchanged, patch.object(operator, 'run') as run, \
+             patch.object(operator, 'private') as private, patch.object(operator, 'replace') as replace:
+            with self.assertRaisesRegex(RuntimeError, 'prepared_source_incomplete'):
+                operator.activate()
+        for operation in (unchanged, run, private, replace): operation.assert_not_called()
+
+    def test_prepared_plan_rejects_unknown_files_and_partial_new_package(self):
+        candidate = self.candidate(operator.RUNTIME_SOURCES)
+        for name in ('../private.py', 'lobby_backend/private.py', 'unknown/service.py', 'player_web_auth\\run.py'):
+            changed = {**candidate.plan, 'files': {**candidate.plan['files'], name: 'a'*64}}
+            (candidate.ops/'prepared.json').write_text(json.dumps(changed))
+            with patch.object(operator, 'OPS', candidate.ops), patch.object(operator, 'RELEASE', candidate.release), \
+                 patch.object(operator, 'CONFIG', candidate.config), self.assertRaisesRegex(RuntimeError, 'prepared_source_path_invalid'):
+                operator.prepared()
+        files = dict(candidate.plan['files'])
+        del files['lobby_backend/service.py']
+        (candidate.ops/'prepared.json').write_text(json.dumps({**candidate.plan, 'files': files}))
+        with patch.object(operator, 'OPS', candidate.ops), patch.object(operator, 'RELEASE', candidate.release), \
+             patch.object(operator, 'CONFIG', candidate.config), self.assertRaisesRegex(RuntimeError, 'prepared_source_incomplete'):
+            operator.prepared()
+
+    def test_prepared_runtime_hash_covers_lobby_dependencies(self):
+        candidate = self.candidate(operator.RUNTIME_SOURCES)
+        (candidate.release/'lobby_backend/service.py').write_bytes(b'# external dependency edit\n')
+        with patch.object(operator, 'OPS', candidate.ops), patch.object(operator, 'RELEASE', candidate.release), \
+             patch.object(operator, 'CONFIG', candidate.config), self.assertRaisesRegex(RuntimeError, 'prepared_source_changed'):
+            operator.prepared()
+
+    def test_plan_compare_and_swap_preserves_concurrent_administrator_plan(self):
+        candidate = self.candidate(operator.LEGACY_SOURCES)
+        with self.assertRaisesRegex(RuntimeError, 'prepared_plan_changed'):
+            self.refresh(candidate, concurrent_plan=True)
+        self.assertTrue(json.loads((candidate.ops/'prepared.json').read_bytes())['administrator_edit'])
+        self.assertFalse((candidate.release/'lobby_backend').exists())
+        for name, raw in candidate.sources.items(): self.assertEqual((candidate.release/name).read_bytes(), raw)
+
+    def test_collector_rejects_a_symlink_in_fixed_runtime_sources(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name, raw in fixture_sources().items():
+                path = root/'server'/name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(raw)
+            target = root/'private_fixture.py'
+            target.write_bytes(b'# never package this alias\n')
+            link = root/'server/lobby_backend/service.py'
+            link.unlink()
+            try:
+                link.symlink_to(target)
+            except OSError:
+                self.skipTest('symlink creation unavailable')
+            with patch.object(driver, 'ROOT', root), self.assertRaisesRegex(RuntimeError, 'source_path_invalid'):
+                driver.collect_sources()
 
 
 if __name__ == '__main__':
