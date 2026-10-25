@@ -4,37 +4,124 @@ const repo = path.resolve(__dirname, '../..');
 const base = (process.argv[2] || path.resolve(repo, '../../../content/dota_addons/Survival/panorama')) + path.sep;
 const source = fs.readFileSync(base + 'scripts/custom_game/survival_lobby.js', 'utf8');
 const xml = fs.readFileSync(base + 'layout/custom_game/survival_lobby.xml', 'utf8');
+const css = fs.readFileSync(base + 'styles/custom_game/survival_lobby.css', 'utf8');
 let checks = 0;
 function check(condition, message) { assert.ok(condition, message); checks++; }
+// Interpret the actual layout hierarchy, inline styles and matching CSS rules.
+// A writable root.visible property alone cannot model native HUD hosting.
+function declarations(value) {
+    const result = {};
+    for (const part of value.split(';')) {
+        const colon = part.indexOf(':');
+        if (colon >= 0) result[part.slice(0, colon).trim()] = part.slice(colon + 1).trim();
+    }
+    return result;
+}
+const cssRules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(m => ({selectors: m[1].trim().split(','), style: declarations(m[2])}));
+function matches(panel, selector) {
+    selector = selector.trim();
+    if (!selector || /[\s:>]/.test(selector)) return false;
+    const parts = [...selector.matchAll(/([.#])([A-Za-z0-9_-]+)/g)];
+    return parts.length > 0 && parts.map(m => m[0]).join('') === selector
+        && parts.every(m => m[1] === '#' ? panel.id === m[2] : panel.classes[m[2]]);
+}
+function computedStyle(panel) {
+    const value = {};
+    for (const rule of cssRules) if (rule.selectors.some(s => matches(panel, s))) Object.assign(value, rule.style);
+    return Object.assign(value, panel.style);
+}
+function visible(panel) {
+    for (let item = panel; item; item = item.parent) {
+        if (!item.valid || !item.visible || ['collapse', 'hidden'].includes(computedStyle(item).visibility)) return false;
+    }
+    return true;
+}
 function harness(mapInfo = {map_name: 'ws4_lobby'}, clock = 1, options = {}) {
-    const ids = {}, sent = [], subscriptions = {}, scheduled = [], browser = [], localEvents = [];
+    const ids = {}, sent = [], subscriptions = {}, subscriptionIds = new Map(), unsubscribed = [], scheduled = [], browser = [], localEvents = [];
+    let serial = 0;
     class Panel {
-        constructor(id, parent) { this.id = id; this.children = []; this.classes = {}; this.handlers = {}; this.text = ''; this.visible = true; this.enabled = true; if (parent) parent.children.push(this); if (id) ids[id] = this; }
-        FindChildTraverse(id) { return ids[id]; }
+        constructor(id, parent) {
+            this.id = id; this.parent = parent || null; this.children = []; this.classes = {}; this.style = {};
+            this.handlers = {}; this.text = ''; this.visible = true; this.enabled = true; this.valid = true;
+            this.hittest = true; this.hittestchildren = true;
+            if (parent) parent.children.push(this); if (id) ids[id] = this;
+        }
+        FindChildTraverse(id) {
+            for (const child of this.children) {
+                if (child.id === id) return child;
+                const found = child.FindChildTraverse(id); if (found) return found;
+            }
+            return null;
+        }
         AddClass(c) { this.classes[c] = true; }
         SetHasClass(c, b) { this.classes[c] = !!b; }
         RemoveAndDeleteChildren() { this.children = []; }
         SetPanelEvent(e, f) { this.handlers[e] = f; }
-        IsValid() { return true; }
+        IsValid() { return this.valid; }
     }
-    const root = new Panel('root');
-    for (const m of xml.matchAll(/\bid="([^"]+)"/g)) new Panel(m[1], root);
+    let root;
+    const stack = [];
+    for (const tag of xml.matchAll(/<(\/?)(Panel|Label|Button|TextEntry)\b([^>]*?)(\/?)>/g)) {
+        if (tag[1]) { stack.pop(); continue; }
+        const attrs = Object.fromEntries([...tag[3].matchAll(/([A-Za-z_][\w-]*)="([^"]*)"/g)].map(m => [m[1], m[2]]));
+        const item = new Panel(attrs.id || (root ? '' : 'root'), stack.at(-1));
+        if (!root) root = item;
+        for (const name of (attrs.class || '').split(/\s+/).filter(Boolean)) item.AddClass(name);
+        for (const name of ['visible', 'enabled', 'hittest', 'hittestchildren']) if (attrs[name]) item[name] = attrs[name] === 'true';
+        item.style = declarations(attrs.style || ''); item.text = attrs.text || '';
+        if (!tag[4]) stack.push(item);
+    }
+    if (options.missing) ids[options.missing].valid = false;
     const context = {
-        Game: {GetMapInfo() { if (mapInfo instanceof Error) throw mapInfo; return mapInfo; }, GetLocalPlayerID() { return 0; }, Time() { return clock; }},
-        GameEvents: {SendCustomGameEventToServer(name, payload) { sent.push({name, payload}); }, Subscribe(name, fn) { subscriptions[name] = fn; return 1; }, SendEventClientSide(name, payload) { localEvents.push({name, payload}); if (options.throwLocal) throw Error('native API unavailable'); }},
+        Game: {GetMapInfo() { if (mapInfo instanceof Error) throw mapInfo; return mapInfo; }, GetLocalPlayerID() { return 0; }, Time() { if (options.throwTime) throw Error('clock unavailable'); return clock; }},
+        GameEvents: {
+            SendCustomGameEventToServer(name, payload) { sent.push({name, payload}); },
+            Subscribe(name, fn) {
+                if (options.throwSubscribe) throw Error('events unavailable');
+                const id = ++serial; subscriptions[name] = fn; subscriptionIds.set(id, {name, fn}); return id;
+            },
+            Unsubscribe(id) {
+                unsubscribed.push(id); const item = subscriptionIds.get(id);
+                if (item && subscriptions[item.name] === item.fn) delete subscriptions[item.name]; subscriptionIds.delete(id);
+            },
+            SendEventClientSide(name, payload) { localEvents.push({name, payload}); if (options.throwLocal) throw Error('native API unavailable'); }
+        },
         $: {GetContextPanel() { return root; }, CreatePanel(type, parent, id) { return new Panel(id, parent); }, Schedule(seconds, fn) { scheduled.push({seconds, fn}); }, DispatchEvent(name, uri) { browser.push({name, uri}); }}
     };
-    vm.runInNewContext(source, context, {filename: 'survival_lobby.js'});
-    return {root, ids, sent, subscriptions, scheduled, browser, localEvents, context, advance(n) { clock += n; }, receive(s) { subscriptions.survival_lobby_state(s); }, receiveAuth(s) { subscriptions.survival_player_web_auth_state(s); }, receiveConnect(s) { subscriptions.survival_lobby_connect(s); }, click(id) { ids[id].handlers.onactivate(); }};
+    if (!options.skipScript) vm.runInNewContext(source, context, {filename: 'survival_lobby.js'});
+    return {root, ids, sent, subscriptions, unsubscribed, scheduled, browser, localEvents, context,
+        advance(n) { clock += n; }, setMap(value) { mapInfo = value; },
+        monitor(count = 1) { for (let i = 0; i < count; i++) { const next = scheduled.shift(); assert.ok(next, 'monitor scheduled'); next.fn(); } },
+        visible(id = 'SurvivalLobbyOverlay') { return visible(ids[id]); },
+        receive(s) { subscriptions.survival_lobby_state(s); }, receiveAuth(s) { subscriptions.survival_player_web_auth_state(s); }, receiveConnect(s) { subscriptions.survival_lobby_connect(s); },
+        click(id) { if (ids[id].handlers.onactivate) ids[id].handlers.onactivate(); },
+        pointerClick(id) {
+            const item = ids[id];
+            if (!visible(item) || !item.enabled || !item.hittest) return false;
+            for (let parent = item.parent; parent; parent = parent.parent) if (!parent.hittestchildren) return false;
+            if (!item.handlers.onactivate) return false; item.handlers.onactivate(); return true;
+        }
+    };
 }
+const unstarted = harness(undefined, 1, {skipScript: true});
+check(unstarted.ids.SurvivalLobbyOverlay.parent === unstarted.root, 'visual overlay is a distinct direct child of host context');
+check(unstarted.ids.LobbyCard.parent === unstarted.ids.SurvivalLobbyOverlay && unstarted.root.children.length === 1, 'all lobby content is inside independently hidden overlay');
+check(unstarted.ids.SurvivalLobbyOverlay.style.visibility === 'collapse', 'real XML defaults child to inline collapse before script');
+check(cssRules.some(rule => rule.selectors.includes('.SurvivalLobbyRoot') && rule.style.visibility === 'collapse'), 'real CSS independently defaults visual child to collapse');
+check(!computedStyle(unstarted.root)['background-color'] && !computedStyle(unstarted.root)['background-image'], 'host context has no painted background');
+check(!unstarted.root.hittest && !unstarted.root.hittestchildren, 'real XML context cannot capture default input');
+unstarted.root.visible = true;
+check(!unstarted.visible() && !unstarted.pointerClick('LobbyRefresh'), 'native host forcing root visible cannot expose unexecuted lobby XML');
 for (const info of [{map_name: 'template_map'}, {map_name: 'ws4_entry'}, {map_name: 'template_map', map_display_name: 'ws4_lobby'}, null, new Error('not mounted')]) {
     const h = harness(info);
-    check(!h.root.visible, 'ordinary/unknown map hidden');
+    h.root.visible = true;
+    check(!h.visible(), 'ordinary/unknown map stays collapsed even when native host forces context visible');
+    check(!h.root.hittest && !h.root.hittestchildren && !h.pointerClick('LobbyRefresh'), 'ordinary map does not intercept HUD input');
     check(h.sent.length === 0, 'ordinary map sends no requests');
     check(Object.keys(h.subscriptions).length === 0, 'ordinary map has no subscriptions');
 }
 let h = harness();
-check(h.root.visible && h.root.hittest, 'lobby alone visible');
+check(h.visible() && !h.root.hittest && h.root.hittestchildren && h.ids.SurvivalLobbyOverlay.hittest, 'only verified lobby inner panel is visible and receives input');
 check(h.sent.length === 1 && h.sent[0].payload.action === 'refresh', 'initial refresh only');
 check(!h.ids.LobbyStart.enabled && !h.ids.LobbyCreate.enabled, 'unknown service actions disabled');
 check(h.ids.LobbyPlayers.children.length === 4, 'four empty slots');
@@ -83,7 +170,7 @@ check(h.sent.at(-1).payload.action === 'reconnect', 'reconnect delegates to serv
 check(!source.includes('SendToConsole') && !source.includes('connect.command') && !source.includes('ticket'), 'UI has no console or ticket plumbing');
 h.receive({...baseState, room_id: 'room-A', revision: 8, players: {1: ready[0], 2: ready[1]}, self_is_host: true, self_ready: true});
 check(h.ids.LobbyPlayers.children[1].children[1].text === 'Peer', 'Lua numeric object player list supported');
-h.advance(17); h.scheduled.at(-1).fn();
+h.advance(17); h.monitor(10);
 check(!h.ids.LobbyStart.enabled, 'stale service state cannot start');
 check(h.ids.LobbyStatusTitle.text === '大厅服务暂不可用', 'stale service visibly unavailable');
 h.receive({...baseState, error: 'SECRET_BEARER_TOKEN', ticket: 'SECRET_TICKET', connect: {command: 'SECRET_CONNECT'}});
@@ -250,5 +337,70 @@ check(h.localEvents.length === 1, 'prototype-like valid identifier has safe dupl
 h = harness(); h.receive(allocatedState);
 for (let i = 0; i < 130; i++) h.receiveConnect({...connectFields, match_id: 'bounded_match_' + i});
 check(h.localEvents.length === 128, 'duplicate cache and accepted match count are bounded');
-const result = {status: 'PASS', checks, source_sha256: require('crypto').createHash('sha256').update(source).digest('hex'), scope: 'Panorama mocked DOM and event behavior; no game launched; no real server or two-player claim'};
+// Native host behavior and lifecycle regressions use real nested DOM/CSS semantics.
+for (const name of ['maps/ws4_lobby.vpk']) {
+    const test = harness({map_name: name});
+    check(test.visible() && test.sent.length === 1, 'only exact supported native map path enables inner panel');
+}
+for (const name of ['', 'WS4_LOBBY', 'prefix_ws4_lobby', 'ws4_lobby_extra', 'maps/ws4_lobby', 'maps/ws4_lobby.vpk;quit', '../ws4_lobby']) {
+    const test = harness({map_name: name, map_display_name: 'ws4_lobby'});
+    test.root.visible = true; test.monitor(3);
+    check(!test.visible() && test.sent.length === 0 && !Object.keys(test.subscriptions).length, 'untrusted or ambiguous map names cannot expose lobby');
+}
+for (const missing of ['SurvivalLobbyOverlay', 'LobbyStart', 'LobbyAuthOpen', 'LobbyInviteInput']) {
+    const test = harness(undefined, 1, {missing});
+    check(!test.visible() && test.sent.length === 0 && !Object.keys(test.subscriptions).length, 'incomplete layout remains hidden without requests or bindings');
+    test.ids[missing].valid = true; test.monitor();
+    check(test.visible() && test.sent.length === 1 && Object.keys(test.subscriptions).length === 3, 'fully created lobby layout mounts once after scheduled retry');
+}
+for (const options of [{throwSubscribe: true}, {throwTime: true}]) {
+    const test = harness(undefined, 1, options);
+    test.root.visible = true;
+    check(!test.visible() && !test.root.hittestchildren && test.sent.length === 0, 'initial native API failure leaves transparent inactive context');
+}
+h = harness();
+check(h.pointerClick('LobbyRefresh'), 'verified lobby buttons accept native-style pointer activation');
+const oldState = h.subscriptions.survival_lobby_state;
+const oldAuth = h.subscriptions.survival_player_web_auth_state;
+const oldConnect = h.subscriptions.survival_lobby_connect;
+const oldClick = h.ids.LobbyRefresh.handlers.onactivate;
+h.receive(allocatedState); h.receiveAuth(pending);
+const beforeLeave = h.sent.length;
+h.setMap({map_name: 'template_map'}); h.monitor();
+h.root.visible = true;
+check(!h.visible() && !h.root.hittestchildren && !h.ids.SurvivalLobbyOverlay.hittest, 'paused game clock does not prevent map monitor collapsing ordinary HUD overlay');
+check(Object.keys(h.subscriptions).length === 0 && h.unsubscribed.length === 3, 'leaving lobby unsubscribes every service event');
+check(!h.pointerClick('LobbyRefresh'), 'host-visible wrapper still cannot intercept ordinary HUD pointer input');
+oldState(allocatedState); oldAuth(pending); oldConnect(connectFields); oldClick();
+check(h.sent.length === beforeLeave && !h.localEvents.length && !h.browser.length && !h.visible(), 'in-flight old callbacks cannot reopen or act outside lobby');
+h.setMap({map_name: 'ws4_lobby'}); h.monitor();
+check(h.visible() && h.sent.length === beforeLeave + 1 && Object.keys(h.subscriptions).length === 3, 'return to lobby creates one fresh mount and refresh');
+check(!h.ids.LobbyStart.enabled && h.ids.LobbyAuthCode.text === '', 'new lobby mount discards old identity room and authorization display');
+h.advance(1);
+oldState(allocatedState); oldAuth(pending); oldConnect(connectFields); oldClick();
+check(!h.ids.LobbyStart.enabled && !h.localEvents.length && h.ids.LobbyAuthCode.text === '' && h.sent.length === beforeLeave + 1, 'previous mount callbacks remain invalid even after returning to lobby');
+for (const action of ['state', 'auth', 'connect', 'refresh', 'browser']) {
+    const test = harness(); test.receive(allocatedState); test.receiveAuth(pending);
+    if (action === 'browser') { test.receive({...baseState, authenticated: false}); test.receiveAuth(pending); check(test.ids.LobbyAuthOpen.enabled, 'valid browser action exists before map changes'); }
+    test.advance(1);
+    const before = test.sent.length; test.setMap(new Error('map API unavailable'));
+    if (action === 'state') test.receive(allocatedState);
+    if (action === 'auth') test.receiveAuth(pending);
+    if (action === 'connect') test.receiveConnect(connectFields);
+    if (action === 'refresh') test.click('LobbyRefresh');
+    if (action === 'browser') test.click('LobbyAuthOpen');
+    check(!test.visible() && test.sent.length === before && !test.browser.length && !test.localEvents.length, 'every event/action gates map before monitor or side effect');
+}
+const clockFailure = {};
+const clockTest = harness(undefined, 1, clockFailure);
+clockFailure.throwTime = true; clockTest.monitor(10);
+check(!clockTest.visible() && !Object.keys(clockTest.subscriptions).length, 'active native clock exception collapses child and removes service callbacks');
+h = harness({map_name: 'template_map'});
+h.setMap({map_name: 'ws4_lobby'}); h.monitor();
+check(h.visible() && h.sent.length === 1, 'initial ordinary map can later enter verified lobby without script reload');
+h.setMap(new Error('temporarily unavailable')); h.monitor();
+check(!h.visible() && !Object.keys(h.subscriptions).length, 'active map API exception promptly hides and unmounts lobby');
+h.root.valid = false; const queued = h.scheduled.length; h.monitor();
+check(h.scheduled.length === queued - 1 && !h.visible(), 'destroyed context stops scheduled lifecycle');
+const result = {status: 'PASS', checks, source_sha256: require('crypto').createHash('sha256').update(source).digest('hex'), scope: 'Actual XML hierarchy/inline defaults and CSS visibility with mocked Panorama lifecycle/events; no game launched; native visuals NOT_RUN'};
 console.log(JSON.stringify(result, null, 2));

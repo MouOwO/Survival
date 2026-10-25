@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-25",
+  "scope": "Local gameplay incorrectly covered by an inert hosted-lobby overlay",
+  "cause": "The global Hud layout painted static lobby content on template_map, while its script returned with pointer input disabled. Hiding the host context panel alone did not hide the content reliably.",
+  "repair": {
+    "default": "Transparent noninteractive host; all lobby content is inside a separate XML/CSS default-collapsed child.",
+    "activation": "Exact ws4_lobby or maps/ws4_lobby.vpk, after all required layout panels exist.",
+    "lifecycle": "Scheduled map checks and guarded actions/events deactivate the overlay on other maps. Generation guards discard callbacks from previous mounts.",
+    "unchanged": "Authentication, invite and typed-connect restrictions; hosted-lobby and session-multiplayer enable flags remain disabled."
+  },
+  "automated": {
+    "panorama_behavior_checks": 273,
+    "result": "PASS",
+    "command": "node tools/tests/test_survival_lobby.cjs",
+    "xml_parse": "PASS",
+    "javascript_syntax": "PASS",
+    "content_game_source_mirrors": "BYTE_IDENTICAL",
+    "native_resource_compile": "PASS: lobby XML, CSS and JS; 3 compiled, 0 failed",
+    "local_compile_receipt": "output/survival_lobby_hud_repair_20261025/verification.json"
+  },
+  "native_local_verification": {
+    "entry": "tools/launch_offline_onboarding_test.ps1",
+    "map": "template_map",
+    "cloud_storage": false,
+    "observed": [
+      "N1 gameplay is visible without the hosted-lobby overlay.",
+      "Physical click on the Archive label opens the archive window.",
+      "Physical click on the Map Level category changes the displayed archive category.",
+      "Physical click on the close button closes the archive window and returns to gameplay."
+    ],
+    "local_evidence": [
+      "design_refs/menus_v10/work/native/lobby_visibility_before.png",
+      "design_refs/menus_v10/work/native/lobby_visibility_new_local.png",
+      "design_refs/menus_v10/work/native/lobby_visibility_archive_label_click.png",
+      "design_refs/menus_v10/work/native/lobby_visibility_archive_tab_click.png",
+      "design_refs/menus_v10/work/native/lobby_visibility_archive_closed.png"
+    ],
+    "launch_receipt": "output/lobby_visibility_20261025/native_launch.json",
+    "scope_limit": "This verifies ordinary local gameplay visibility and menu input. It does not verify a native ws4_lobby session, worker allocation, remote multiplayer, cloud authentication or purchase flows."
+  },
+  "publication": {
+    "workshop_uploaded": false,
+    "backend_deployed": false,
+    "worker_enabled": false
+  }
+}
