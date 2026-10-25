@@ -142,9 +142,50 @@ rejected(function() map = "ws4_entry" end, function() map = "template_map" end, 
 rejected(function() config.expected_map = "ws4_entry" end, function() config.expected_map = "template_map" end,
     "configuration_invalid")
 rejected(function() config.enabled = "true" end, function() config.enabled = true end, "configuration_invalid")
-for _, invalid in ipairs({ true, 1, "1", "false" }) do
+for _, invalid in ipairs({ true, 1, "1", "true", "FALSE", " false ", "", 2, -1, {} }) do
     rejected(function() cheats = invalid end, function() cheats = false end, "cheats_must_be_disabled")
 end
+
+-- Normal Source 2 native capture: the same false cvar has three different
+-- representations. Every available getter must still explicitly report off.
+local original_convars = Convars
+local native_values = { GetBool = false, GetInt = 0, GetStr = "false" }
+Convars = {}
+for _, name in ipairs({ "GetBool", "GetInt", "GetStr" }) do
+    local getter = name
+    Convars[getter] = function(_, requested)
+        assert(requested == "sv_cheats")
+        return native_values[getter]
+    end
+end
+assert(session_test.configure() and session_test.is_enabled(), "real native false/0/string-false getter combination is allowed")
+for _, name in ipairs({ "GetBool", "GetInt", "GetStr" }) do
+    local getter, off = name, native_values[name]
+    for _, invalid in ipairs({ true, 1, "true", "1", "FALSE", " false ", "off" }) do
+        rejected(function() native_values[getter] = invalid end,
+            function() native_values[getter] = off end, "cheats_must_be_disabled")
+    end
+    rejected(function() native_values[getter] = nil end,
+        function() native_values[getter] = off end, "cheats_must_be_disabled")
+    local normal = Convars[getter]
+    rejected(function() Convars[getter] = function() error("getter unavailable") end end,
+        function() Convars[getter] = normal end, "cheats_must_be_disabled")
+end
+provider.init()
+assert(provider.resolve_account_id(0) == alpha)
+assert(provider.persist_gameplay_stats(alpha, { initial_wood = 88 }, 60))
+native_values.GetStr = "true"
+assert(not session_test.is_enabled() and session_test.profile_options() == nil,
+    "one native getter changing on revokes the session even when the other two still say off")
+native_values.GetStr = "false"
+assert(not session_test.is_enabled(), "returning to all-off cannot revive a revoked session")
+assert(session_test.configure())
+provider.init()
+assert(provider.resolve_account_id(0) == alpha and fetched(alpha).save.gameplay_stats.initial_wood == 10,
+    "native getter revocation clears the earlier in-memory profile")
+Convars = original_convars
+assert(session_test.configure())
+
 local convars = Convars
 rejected(function() Convars = nil end, function() Convars = convars end, "cheats_must_be_disabled")
 rejected(function() Convars.GetInt = function() return 1 end end,

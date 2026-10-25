@@ -36,7 +36,7 @@ local function cheats_disabled()
     for _, name in ipairs({ "GetBool", "GetInt", "GetStr" }) do
         if type(Convars[name]) == "function" then
             local ok, value = pcall(Convars[name], Convars, "sv_cheats")
-            if not ok or not (value == false or value == 0 or value == "0") then return false end
+            if not ok or not (value == false or value == 0 or value == "0" or value == "false") then return false end
             observed = true
         end
     end
@@ -97,6 +97,22 @@ function M.configure()
     assert(config and type(config.enabled) == "boolean", "session_multiplayer_configuration_invalid")
     if config.enabled == false then return false end
     local allowed, reason, fingerprint = guard()
+    if not allowed then
+        print("[SESSION_MULTIPLAYER_TEST] refused=" .. tostring(reason))
+        if reason == "session_multiplayer_cheats_must_be_disabled" then
+            for _, name in ipairs({"GetBool", "GetInt", "GetStr"}) do
+                if Convars and type(Convars[name]) == "function" then
+                    local ok, value = pcall(Convars[name],Convars,"sv_cheats")
+                    local shape = value == nil and "nil" or value == false and "boolean_false"
+                        or value == true and "boolean_true" or value == 0 and "number_zero"
+                        or value == 1 and "number_one" or value == "0" and "string_zero"
+                        or value == "1" and "string_one" or value == "false" and "string_false"
+                        or value == "true" and "string_true" or "other"
+                    print("[SESSION_MULTIPLAYER_TEST] cheat_getter="..name.." ok="..tostring(ok).." shape="..shape)
+                end
+            end
+        end
+    end
     assert(allowed, reason)
     enabled, admission_fingerprint = true, fingerprint
     print("[SESSION_MULTIPLAYER_TEST] enabled=true storage=session_memory cloud=false cheats=false")

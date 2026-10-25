@@ -1,0 +1,343 @@
+{
+  "schema": 1,
+  "status": "PUBLISHED_DOWNLOADED_ORIGINAL_ROOM_WAITING_SECOND_PLAYER",
+  "workshop_id": "3824360109",
+  "release_sequence": 2026102507,
+  "content_sha256": "d76cffd911f1680922b2ed91e244ea2179f6527d71c89c9d13c920ba13967161",
+  "steam_manifest": "189575976105625615",
+  "release_revision": "WS4-MP-10",
+  "candidate_revision": "v10r2",
+  "candidate": "D:\\Survival_发布候选\\20261025_ws4_arcade_two_player_v10r2",
+  "trusted_source": "D:\\Survival_发布候选\\20261025_ws4_arcade_two_player_v10r2_trusted_source",
+  "visibility": "unlisted",
+  "map": "template_map",
+  "max_players": 4,
+  "required_real_players_for_acceptance": 2,
+  "runtime_files": 6636,
+  "runtime_bytes": 3766654843,
+  "package_bytes": 3766928360,
+  "package_layout": "external_archives",
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273517,
+      "sha256": "36673951585e1ea65af2626c9512210805618fc6e61ecf2ce2b836943620eba4"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073420085,
+      "sha256": "12f26bd7d1821599eb216c82f02385dbda87048fad1e06efa1ddc8fa481deb71"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552124787,
+      "sha256": "90a6b32040794873a01d241304205a2743e60a05b7b244ae7752294994c86299"
+    }
+  ],
+  "vpk_sha256": "36673951585e1ea65af2626c9512210805618fc6e61ecf2ce2b836943620eba4",
+  "release_profile": "production",
+  "four_account_only": true,
+  "online_cheats_allowed": false,
+  "session_only": true,
+  "archive_enabled": false,
+  "cloud_archive_enabled": false,
+  "player_web_auth_enabled": false,
+  "player_identity": "ENGINE_STEAM_ID_WITH_EXISTING_FOUR_ACCOUNT_GATE",
+  "real_money_payments": false,
+  "architecture": {
+    "native_room": "Direct template_map with four slots; no per-client launch redirect.",
+    "profiles": "In-memory provider isolated by Steam account, mode and session; no persistent archive writes.",
+    "changes_from_signed_v08": {
+      "modified": 6,
+      "added": 7,
+      "removed": 1,
+      "removed_path": "maps/ws4_entry.vpk",
+      "protected_modules_preserved": 180
+    },
+    "hud": "Default collapsed; exact map name plus fresh validated eight-field server NetTable required.",
+    "http_probe": "Anonymous fixed GET https://pay.xiaofengnet.com/ws4-web/health only; no login, archive, order or payment request."
+  },
+  "candidate_verification": {
+    "path": "output/arcade_two_player_20261025/candidate_build_r2_verified.json",
+    "sha256": "964c2a2d4e2cf64ecad41455a43e441547420930d687a41688858bc4be997a9f"
+  },
+  "package_verification": {
+    "path": "output/arcade_two_player_20261025/package_build.json",
+    "sha256": "b6f5a315e930ca42f6a0b8d709a713c738b38e431b8788dcc918266326e55e84"
+  },
+  "publication": {
+    "status": "SUBMITTED_UNLISTED_CONFIRMED",
+    "attempt": 3,
+    "uploaded": true,
+    "callback_id": 3404,
+    "callback_result": 1,
+    "published_at_utc": "2026-10-25T15:22:58.328559+00:00",
+    "same_item": true,
+    "new_items_created": 0,
+    "log": {
+      "path": "output/arcade_two_player_20261025/upload_after_route_repair.log",
+      "sha256": "3b44b6ab23117cf9fdbadc59284f26002207e0b6c8888fc132bedc396ad7c7bd"
+    },
+    "canonical_after_submission": {
+      "path": "output/arcade_two_player_20261025/canonical_after_route_repair_upload.json",
+      "sha256": "8d96223c43d7d788e26b1a5874f3726fc1bf4c59bc0b67f1822a2857510ee10a"
+    }
+  },
+  "official_download": {
+    "status": "OFFICIAL_MP10_DOWNLOAD_FULLY_VERIFIED",
+    "observed_utc": "2026-10-25T15:25:36.745610+00:00",
+    "steam_manifest": "189575976105625615",
+    "manifest_is_string": true,
+    "subscription_refresh_callback_id": 1313,
+    "subscription_refresh_result": 1,
+    "unsubscribe_calls": 0,
+    "download_callback_id": 3406,
+    "download_result": 1,
+    "zero_cache_pre_and_post_queries": true,
+    "signature_valid": true,
+    "verification": {
+      "vpk_version": 2,
+      "files": 6636,
+      "payload_bytes": 3766654843,
+      "archive_count": 4,
+      "crc32_verified": true,
+      "manifest_dual_hashes_verified": true,
+      "section_md5s_verified": true,
+      "whole_vpk_md5_verified": true
+    },
+    "package_files": [
+      {
+        "name": "3824360109.vpk",
+        "bytes": 273517,
+        "sha256": "36673951585e1ea65af2626c9512210805618fc6e61ecf2ce2b836943620eba4"
+      },
+      {
+        "name": "3824360109_000.vpk",
+        "bytes": 1073420085,
+        "sha256": "12f26bd7d1821599eb216c82f02385dbda87048fad1e06efa1ddc8fa481deb71"
+      },
+      {
+        "name": "3824360109_001.vpk",
+        "bytes": 1068730788,
+        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+      },
+      {
+        "name": "3824360109_002.vpk",
+        "bytes": 1072379183,
+        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+      },
+      {
+        "name": "3824360109_003.vpk",
+        "bytes": 552124787,
+        "sha256": "90a6b32040794873a01d241304205a2743e60a05b7b244ae7752294994c86299"
+      }
+    ],
+    "evidence": {
+      "path": "output/arcade_two_player_20261025/download_evidence/20261025T152536Z_309af6c491f340d583d0df54984c6663/verification.json",
+      "sha256": "e43ee80b1ef524efe5c1e916a9eba5b1b9eef6b9de1da92c858ce9446151ec57"
+    }
+  },
+  "original_native_room": {
+    "status": "ORIGINAL_ARCADE_ROOM_CREATED_WAITING_SECOND_PLAYER",
+    "observed_utc": "2026-10-25T15:47:46.3721275Z",
+    "pid": 37848,
+    "official_steam_applaunch": true,
+    "tools": false,
+    "cheats": false,
+    "route": [
+      "ordinary Dota Arcade library",
+      "original Workshop item",
+      "Update",
+      "Create lobby"
+    ],
+    "map": "template_map",
+    "location": "Best location",
+    "description": "WS4-MP10-2P",
+    "real_players_observed": 1,
+    "capacity": 4,
+    "room_ui_label": "local room",
+    "host_observed": true,
+    "second_player_joined": false,
+    "game_started": false,
+    "http_health_in_arcade": "NOT_RUN",
+    "two_player_acceptance": "NOT_RUN",
+    "native_gameplay": "NOT_RUN",
+    "launch": {
+      "path": "output/arcade_two_player_20261025/native_arcade_launch.json",
+      "sha256": "83826abd502a362182242380ef45937ca7c4e74561c88f70a83a43caded3c5fb"
+    },
+    "screenshot": {
+      "path": "output/arcade_two_player_20261025/native_arcade_ui/room_state_12.png",
+      "sha256": "ee31b7be2deca203566557103a82f15e7c4639e039f6fc95892439591d51f065"
+    },
+    "scope": "Original native lobby creation and one real player observed; no second player or match start has been observed.",
+    "latest_waiting_screenshot": {
+      "path": "output/arcade_two_player_20261025/native_arcade_ui/waiting_peer_13.png",
+      "sha256": "6a4fe0d5c913f0d7494cf4b452a3c01a5487b4e50e2655e9168e22127b758b93"
+    }
+  },
+  "checks": {
+    "local_nontools_single_player": {
+      "status": "LOCAL_NONTOOLS_SINGLE_PLAYER_SMOKE_PASS",
+      "evidence": {
+        "path": "output/arcade_two_player_20261025/native_smoke_verified.json",
+        "sha256": "1598578e17d736aa17c5f4ce15124d147ea3b9341538a8ee6bc5cf1825a071ab"
+      },
+      "real_players_observed": 1,
+      "mode": "standard",
+      "difficulty": "N1",
+      "http_real_200_phases": [
+        "setup",
+        "pregame",
+        "ingame"
+      ],
+      "product_window_open_switch_close": true,
+      "runtime_equivalent_to_signed_candidate": true
+    },
+    "ui_simulated_regression": {
+      "cases": 64,
+      "evidence": {
+        "path": "output/arcade_multiplayer_test_20261025/verification.json",
+        "sha256": "7c2a8efbb5b3ab544f88cb4edd96e3983b5ed623b55a0c41e69eba6c47424e7b"
+      }
+    },
+    "compiled_resources": {
+      "path": "output/arcade_two_player_20261025/ui_compile.json",
+      "sha256": "7123fe748bb01d447dcaaf2bb3cfde07e53b92d5ab7996ee4e01eff1de7daea8"
+    },
+    "native_vpk_full_four_archive_read_coverage": "NOT_RUN",
+    "ordinary_arcade_two_player_gameplay": "NOT_RUN",
+    "ordinary_arcade_http_health": "NOT_RUN",
+    "real_checkout": "NOT_RUN"
+  },
+  "purchase_window": {
+    "status": "SIGNED_CONFIGURATION_PREVIEW_ONLY",
+    "live_quote": false,
+    "orders_created": false,
+    "real_money_paid": false,
+    "rewards_delivered": false,
+    "message": "商品配置预览；尚未连接支付后台，本局不可支付",
+    "catalog_sha256": "76bf5409b90ed58f6061745302411bf38c71a3c8eb52645364235a2a2a31f1b6",
+    "products": [
+      {
+        "sku": "archive_pass_monthly",
+        "price_cny": "58.00",
+        "term_days": 30
+      },
+      {
+        "sku": "special_lottery_ticket_single",
+        "price_cny": "25.00",
+        "quantity": 1
+      },
+      {
+        "sku": "u_coin_recharge",
+        "price_cny": "1.00",
+        "u_coin": 100
+      }
+    ],
+    "observed_scope": "Actual local non-Tools single-player window opened, switched SKU and closed; the original Arcade match window is not yet tested."
+  },
+  "failed_upload_attempts": [
+    {
+      "attempt": 1,
+      "status": "FAILED_MANIFEST_UPLOAD_TIMEOUT",
+      "historical_only": true,
+      "result": 2,
+      "callback_id": 3404,
+      "canonical_journal_restored_with_compare_and_swap": true,
+      "failure": {
+        "path": "output/arcade_two_player_20261025/failed_mp10_reconciliation/20261025T151018Z_412d645a1b36444da5063013e3db9350/failed_attempt_mp10.json",
+        "sha256": "a6a8d80d068817013187c2955f41319a6e2128cc8ca1931c41742d5470edc584"
+      },
+      "reconciliation": {
+        "path": "output/arcade_two_player_20261025/failed_mp10_reconciliation/20261025T151018Z_412d645a1b36444da5063013e3db9350/reconciliation_result.json",
+        "sha256": "b64a28e227f42bfacc31866e7aedf8152c3508c4c3da5bc4deb9e9d378d044a4"
+      },
+      "original_pending_preserved": true,
+      "fresh_official_prior_v08_verification_preserved": true
+    },
+    {
+      "attempt": 2,
+      "status": "FAILED_MANIFEST_UPLOAD_TIMEOUT",
+      "historical_only": true,
+      "result": 2,
+      "callback_id": 3404,
+      "canonical_journal_restored_with_compare_and_swap": true,
+      "failure": {
+        "path": "output/arcade_two_player_20261025/failed_mp10_no_proxy_reconciliation/20261025T152125Z_bb263784526d414e81797f94a5528b2f/failed_attempt_mp10_no_proxy.json",
+        "sha256": "7807b6874c8972eae0ddcf8cc97ba702846295b8701b50046416480f4a8d45ef"
+      },
+      "reconciliation": {
+        "path": "output/arcade_two_player_20261025/failed_mp10_no_proxy_reconciliation/20261025T152125Z_bb263784526d414e81797f94a5528b2f/reconciliation_result.json",
+        "sha256": "ed1df7b2d9113602b80bcf3a5ae405848051e9fae5833cf8b5d8050df74aa198"
+      },
+      "original_pending_preserved": true,
+      "fresh_official_prior_v08_verification_preserved": true
+    }
+  ],
+  "network_observation": {
+    "upload_route": "Existing iKuuu changed from rule mode to temporary global mode.",
+    "reachability": "Prior disconnects were followed by completed HTTP/TLS HEAD responses with 404 before successful third submission.",
+    "child_proxy_causation": "NOT_PROVEN",
+    "rule_mode_restored_after_upload": true,
+    "steam_cloud_retry": "Ordinary startup was blocked by Steam Cloud login=false; canceled, retried sync under temporary global mode, then Steam library showed synced.",
+    "start_anyway_clicked": false,
+    "steam_cloud_disabled": false,
+    "at_room_observation": "Temporary global mode was used for Cloud resync; root subsequently restored rule mode and returned Dota to the foreground while the room remained 1/4 and not started.",
+    "final_restoration": {
+      "status": "RULE_MODE_RESTORED",
+      "observed_utc": "2026-10-25T15:52:04Z",
+      "mode": "rule",
+      "evidence": {
+        "path": "output/arcade_two_player_20261025/vpn_rule_restored_after_cloud.png",
+        "sha256": "7e161b928427c59cb9e21e730150ad75831f9adc458da210fa945ac451f75bbe"
+      },
+      "dota_foreground_evidence": {
+        "path": "output/arcade_two_player_20261025/native_arcade_ui/waiting_peer_13.png",
+        "sha256": "6a4fe0d5c913f0d7494cf4b452a3c01a5487b4e50e2655e9168e22127b758b93"
+      }
+    }
+  },
+  "acceptance": {
+    "two_real_players_same_match": "NOT_RUN",
+    "ordinary_arcade_gameplay": "NOT_RUN",
+    "ordinary_arcade_http": "NOT_RUN",
+    "ordinary_arcade_purchase_window": "NOT_RUN",
+    "persistent_archive": "DISABLED_NOT_TESTED",
+    "real_checkout": "DISABLED_NOT_TESTED",
+    "native_four_archive_read_coverage": "NOT_RUN",
+    "ready_for_public_release": false
+  },
+  "previous_release": {
+    "release_sequence": 2026102503,
+    "runtime_content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
+    "release_revision": "WS4-UI-STACKABLE-08",
+    "steam_manifest": "3443060898060848239",
+    "status": "V08_RESTORED_DOWNLOADED_ORIGINAL_ENTRY_N1_OBSERVED",
+    "historical_only": true,
+    "release_record": "publishing/workshop/multiplayer_entry_20261025.json",
+    "original_listing": {
+      "path": "output/arcade_two_player_20261025/publish_inputs/listing_v08.original.json",
+      "sha256": "f69ff5654cde1bf03c1d0de191db4fd2767b7929a1452ed3f1db84026d6c8def",
+      "bytes": 20102,
+      "git_commit": "c88abc3d7cfa395c9a635d64464d032448b73ae6",
+      "git_path": "publishing/workshop/test_listing.json"
+    },
+    "history_preserved": "Complete original listing, including v05/v08/v09 acceptance and failure history, remains in the byte-identical backup and the Git snapshot."
+  },
+  "notes": [
+    "This record does not inherit previous single-player web authentication, cloud-save or native VPK-read acceptance.",
+    "The official download is fully verified; original Arcade validation has reached only one-player lobby creation.",
+    "Two-player entry, match start and gameplay remain pending. Real-money checkout is disabled."
+  ]
+}

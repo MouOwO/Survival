@@ -1129,6 +1129,9 @@ function M.activate()
     end)
     sound_service.init()
     initialize_services()
+    if require("systems/session_multiplayer_test").is_enabled() then
+        pcall(function() require("systems/arcade_multiplayer_test").activate() end)
+    end
 
     ListenToGameEvent(
         "game_rules_state_change",

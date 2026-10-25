@@ -35,5 +35,6 @@
         "survival_loading",
         "survival_commerce_wall",
         "survival_commerce_actions",
+        "survival_arcade_multiplayer_test",
     ]
 }

@@ -2,8 +2,6 @@
   "schema": 1,
   "title": "孤城逐晓 · 封闭测试",
   "description": "四人协作塔防与生存。建造城防、培养英雄，应对不断增强的怪物波次，并挑战无尽模式。本条目用于受限测试，暂不开放真实付费。",
-  "map": "ws4_entry",
-  "max_players": 1,
   "visibility_requested": "unlisted",
   "workshop_id": "3824360109",
   "tester_steamids64": [
@@ -19,155 +17,39 @@
   "cover_bytes": 412015,
   "cover_width": 1024,
   "cover_height": 768,
-  "real_money_payments": false,
-  "status": "V08_RESTORED_DOWNLOADED_ORIGINAL_ENTRY_N1_OBSERVED",
-  "test_addon": "svt_w24",
-  "release_sequence": 2026102503,
-  "runtime_content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
-  "uploaded": true,
-  "notes": [
-    "The same unlisted Workshop item has been restored to the existing signed v08 single-player ws4_entry route, sequence 2026102503, content 88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9 and new manifest 3443060898060848239. The restoration submission and official fresh download were fully verified; this is a new successful restoration, not a rewrite of the original failed v08 attempt.",
-    "The current advertised entry is ws4_entry with one slot; it reopens the same item on template_map. The internal gameplay declaration remains four, but direct playable multiplayer has not been delivered.",
-    "The v09 diagnostic was uploaded and its official 6630-file, four-volume, five-VPK download passed full signed CRC/hash verification after explicit existing-item subscription refresh. It was then rejected as a playable route because ordinary non-Tools GC authentication remained WS4-WEB-04/start/create/0 after normal Start and manual refresh.",
-    "The ordinary v09 test had one real player, four visible slots, sv_cheats=false and GAME_IN_PROGRESS with a genuine GC match. Initial ScriptVM and legacy factories returned nil request objects; later phase probe events were not observed. No all-phase coverage or real two-player success is claimed.",
-    "Bare changelevel template_map ended with CLIENT_NO_MAP and the owned Dota process exited. It is not offered as a way to retain multiplayer clients. The v09 source, signed candidate and diagnostic evidence remain preserved in multiplayer_entry_20261025.json.",
-    "The restored v08 original-entry handoff, GAME_IN_PROGRESS and single-player N1 gameplay were newly observed on manifest 3443060898060848239 in Steam-launched process 33636, which was left running. See output/arcade_multiplayer_20261025/ordinary_restored_v08/result.json. Per-click authorization attribution was not instrumented and specific cloud-save values were not reaudited; this observation does not inherit historical acceptance or verify two-player play.",
-    "Title, description, cover, visibility and four-account roster are preserved. Independent test archives, online cheat denial, disabled real-money payments and trusted rankings remain unchanged; temporary Steam TLS egress still requires the author PC online.",
-    "Original v05 receipts, the original failed v08 pending journal and raw failure evidence remain immutable. Restoration facts are recorded separately."
-  ],
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
-  "visibility_verified": "unlisted",
-  "package_layout": "external_archives",
-  "previous_release": {
-    "release_sequence": 2026102405,
-    "runtime_content_sha256": "b4750e433bdd1b1ea2fab0de98d13b3660ed5d3ef80a10c63c46512eab10bc60",
-    "status": "PUBLISHED_DOWNLOADED_ORIGINAL_WORKSHOP_LOGIN_PROFILE_GAMEPLAY_VERIFIED",
-    "uploaded": true,
-    "steam_manifest": "2955439000185399689",
-    "download_manifest": "2955439000185399689",
-    "download_sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039",
-    "download_package_files": [
-      {
-        "name": "3824360109.vpk",
-        "bytes": 273250,
-        "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
-      },
-      {
-        "name": "3824360109_000.vpk",
-        "bytes": 1073502508,
-        "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
-      },
-      {
-        "name": "3824360109_001.vpk",
-        "bytes": 1068730788,
-        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
-      },
-      {
-        "name": "3824360109_002.vpk",
-        "bytes": 1072379183,
-        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
-      },
-      {
-        "name": "3824360109_003.vpk",
-        "bytes": 552122253,
-        "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
-      }
-    ],
-    "download_verified_runtime_files": 6630,
-    "published_at_utc": "2026-10-24T12:44:31.293309+00:00",
-    "runtime_bytes": 3766734732,
-    "package_bytes": 3767007982,
-    "package_files": [
-      {
-        "name": "3824360109.vpk",
-        "bytes": 273250,
-        "sha256": "2d363a7d5ee2b96560d11536fa4be508e7b56c440dbbc88f35fcb88a5e99a039"
-      },
-      {
-        "name": "3824360109_000.vpk",
-        "bytes": 1073502508,
-        "sha256": "221565f108953f4384b44936c6044c95b784d98fb557ef65d0b337cdbc38e150"
-      },
-      {
-        "name": "3824360109_001.vpk",
-        "bytes": 1068730788,
-        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
-      },
-      {
-        "name": "3824360109_002.vpk",
-        "bytes": 1072379183,
-        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
-      },
-      {
-        "name": "3824360109_003.vpk",
-        "bytes": 552122253,
-        "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
-      }
-    ],
-    "release_record": "publishing/workshop/workshop_entry_release_20261024.json",
-    "ordinary_workshop_match": "VERIFIED_SINGLE_PLAYER_LOGIN_PROFILE_GAMEPLAY",
-    "native_four_archive_reads_verified": true,
-    "native_entry_revision": "WS4-ENTRY-05"
-  },
-  "archive_environment": "isolated_ws4",
-  "archive_base_url": "https://pay.xiaofengnet.com/ws4-web",
-  "backend_four_account_gate_deployed": true,
-  "valve_server_pairing": "NOT_REQUIRED_PLAYER_STEAM_WEB_AUTH",
   "owner_approved_unlisted_on": "2026-10-23",
-  "anonymous_item_page_visible": true,
-  "player_authentication": "STEAM_OPENID_AND_EXPLICIT_PER_MATCH_APPROVAL",
-  "online_cheats_allowed": false,
-  "ordinary_workshop_match": "SINGLE_PLAYER_N1_OBSERVED",
-  "native_four_archive_reads_verified": false,
-  "runtime_bytes": 3766747164,
-  "package_bytes": 3767020414,
-  "release_record": "publishing/workshop/multiplayer_entry_20261025.json",
-  "connection_diagnostics": "WS4-WEB-04",
-  "steam_manifest": "3443060898060848239",
-  "download_manifest": "3443060898060848239",
-  "download_sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5",
-  "download_package_files": [
-    {
-      "name": "3824360109.vpk",
-      "bytes": 273250,
-      "sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5"
-    },
-    {
-      "name": "3824360109_000.vpk",
-      "bytes": 1073514940,
-      "sha256": "04dce761000447907c36ffdf136d16cbfa605ea86bf2b643fd12ced133c40c8e"
-    },
-    {
-      "name": "3824360109_001.vpk",
-      "bytes": 1068730788,
-      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
-    },
-    {
-      "name": "3824360109_002.vpk",
-      "bytes": 1072379183,
-      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
-    },
-    {
-      "name": "3824360109_003.vpk",
-      "bytes": 552122253,
-      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
-    }
-  ],
-  "download_verified_runtime_files": 6630,
-  "published_at_utc": null,
+  "map": "template_map",
+  "max_players": 4,
   "gameplay_map": "template_map",
   "gameplay_map_capacity": 4,
-  "current_workshop_mode": "single_player_cloud_save",
+  "visibility_verified": "unlisted",
+  "status": "PUBLISHED_DOWNLOADED_ORIGINAL_ROOM_WAITING_SECOND_PLAYER",
+  "test_addon": "svt_m10",
+  "release_sequence": 2026102507,
+  "runtime_content_sha256": "d76cffd911f1680922b2ed91e244ea2179f6527d71c89c9d13c920ba13967161",
+  "release_revision": "WS4-MP-10",
+  "uploaded": true,
+  "steam_manifest": "189575976105625615",
+  "download_manifest": "189575976105625615",
+  "download_verified": true,
+  "download_sha256": "36673951585e1ea65af2626c9512210805618fc6e61ecf2ce2b836943620eba4",
+  "vpk_sha256": "36673951585e1ea65af2626c9512210805618fc6e61ecf2ce2b836943620eba4",
+  "runtime_files": 6636,
+  "download_verified_runtime_files": 6636,
+  "runtime_bytes": 3766654843,
+  "package_bytes": 3766928360,
+  "package_layout": "external_archives",
   "package_files": [
     {
       "name": "3824360109.vpk",
-      "bytes": 273250,
-      "sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5"
+      "bytes": 273517,
+      "sha256": "36673951585e1ea65af2626c9512210805618fc6e61ecf2ce2b836943620eba4"
     },
     {
       "name": "3824360109_000.vpk",
-      "bytes": 1073514940,
-      "sha256": "04dce761000447907c36ffdf136d16cbfa605ea86bf2b643fd12ced133c40c8e"
+      "bytes": 1073420085,
+      "sha256": "12f26bd7d1821599eb216c82f02385dbda87048fad1e06efa1ddc8fa481deb71"
     },
     {
       "name": "3824360109_001.vpk",
@@ -181,266 +63,98 @@
     },
     {
       "name": "3824360109_003.vpk",
-      "bytes": 552122253,
-      "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
+      "bytes": 552124787,
+      "sha256": "90a6b32040794873a01d241304205a2743e60a05b7b244ae7752294994c86299"
     }
   ],
-  "native_entry_revision": "WS4-ENTRY-05",
-  "earlier_release_history": [
+  "download_package_files": [
     {
-      "release_sequence": 2026102403,
-      "runtime_content_sha256": "549750458285ba1de04436dbeaa0249f5bd587dcf6f6cb914feb84d81d0587d9",
-      "steam_manifest": "9012039066284975703"
+      "name": "3824360109.vpk",
+      "bytes": 273517,
+      "sha256": "36673951585e1ea65af2626c9512210805618fc6e61ecf2ce2b836943620eba4"
     },
     {
-      "release_sequence": 2026102404,
-      "runtime_content_sha256": "f5be8205cd107797f75c5b930224933de8c15f10e9a9e17932b3d6d747f91eb7",
-      "steam_manifest": "9118930541336613380"
+      "name": "3824360109_000.vpk",
+      "bytes": 1073420085,
+      "sha256": "12f26bd7d1821599eb216c82f02385dbda87048fad1e06efa1ddc8fa481deb71"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552124787,
+      "sha256": "90a6b32040794873a01d241304205a2743e60a05b7b244ae7752294994c86299"
     }
   ],
-  "release_revision": "WS4-UI-STACKABLE-08",
-  "native_four_archive_reads_scope": "SINGLE_PLAYER_N1_OBSERVATION_DOES_NOT_VERIFY_SPECIAL_NATIVE_VPK_READ_TESTS",
-  "currently_published_release_sequence": 2026102503,
-  "currently_published_content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
-  "currently_published_steam_manifest": "3443060898060848239",
-  "download_verified": true,
-  "runtime_files": 6630,
-  "vpk_sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5",
-  "native_test": "SINGLE_PLAYER_N1_OBSERVED",
+  "published_at_utc": "2026-10-25T15:22:58.328559+00:00",
+  "currently_published_release_sequence": 2026102507,
+  "currently_published_content_sha256": "d76cffd911f1680922b2ed91e244ea2179f6527d71c89c9d13c920ba13967161",
+  "currently_published_steam_manifest": "189575976105625615",
+  "current_workshop_mode": "session_only_native_multiplayer_test",
+  "session_only": true,
+  "archive_enabled": false,
+  "cloud_archive_enabled": false,
+  "real_money_payments": false,
+  "online_cheats_allowed": false,
+  "four_account_only": true,
+  "player_authentication": "ENGINE_STEAM_ID_WITH_EXISTING_FOUR_ACCOUNT_GATE",
+  "player_web_auth_enabled": false,
+  "native_test": "ORIGINAL_ARCADE_ROOM_CREATED_WAITING_SECOND_PLAYER",
+  "ordinary_workshop_match": "NOT_RUN_WAITING_SECOND_PLAYER",
+  "two_player_acceptance": "NOT_RUN",
+  "ordinary_arcade_http": "NOT_RUN",
+  "native_four_archive_reads_verified": false,
+  "native_four_archive_reads_scope": "NOT_RUN_LOBBY_CREATION_DOES_NOT_VERIFY_FULL_NATIVE_ARCHIVE_READ_COVERAGE",
   "ready_for_public_release": false,
-  "release_record_scope": "rollback_to_v08",
-  "historical_v08_failed_attempt_record": "publishing/workshop/ui_data_qa_release_20261025.json",
+  "release_record": "publishing/workshop/arcade_two_player_20261025.json",
+  "release_record_scope": "current_mp10_session_only_two_player_validation",
+  "purchase_window_scope": "SIGNED_CONFIGURATION_PREVIEW_ONLY",
   "current_published_release": {
-    "status": "V08_RESTORED_DOWNLOADED_ORIGINAL_ENTRY_N1_OBSERVED",
+    "status": "PUBLISHED_DOWNLOADED_ORIGINAL_ROOM_WAITING_SECOND_PLAYER",
     "workshop_id": "3824360109",
-    "visibility": "unlisted",
-    "release_sequence": 2026102503,
-    "content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
-    "steam_manifest": "3443060898060848239",
+    "release_sequence": 2026102507,
+    "content_sha256": "d76cffd911f1680922b2ed91e244ea2179f6527d71c89c9d13c920ba13967161",
+    "steam_manifest": "189575976105625615",
     "uploaded": true,
     "official_download_verified": true,
-    "runtime_files": 6630,
-    "runtime_bytes": 3766747164,
-    "package_bytes": 3767020414,
-    "vpk_sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5",
-    "map": "ws4_entry",
-    "max_players": 1,
-    "gameplay_map": "template_map",
-    "gameplay_map_capacity": 4,
-    "verification_scope": "current_remote_and_official_installed_v08_fully_verified_original_entry_single_player_n1_observed",
-    "evidence": "output/arcade_multiplayer_20261025/v08_restored_download_evidence/20261025T050330Z_ece7de941c5f4d83ab8e1509fb2ed074/verification.json",
-    "current_native_recheck": {
-      "status": "RESTORED_V08_ORIGINAL_ENTRY_N1_GAMEPLAY_OBSERVED",
-      "observed_utc": "2026-10-25T05:27:10.685650+00:00",
-      "pid": 33636,
-      "original_entry_handoff_logged": true,
-      "engine_game_in_progress_logged": true,
-      "n1_gameplay_visually_observed": true,
-      "game_left_running": true,
-      "per_click_authorization_attribution": "NOT_INSTRUMENTED",
-      "cloud_save_values_reaudited": false,
-      "multiplayer_verified": false,
-      "real_players_observed": 1,
-      "native_result": "SINGLE_PLAYER_N1_OBSERVED",
-      "evidence": "output/arcade_multiplayer_20261025/ordinary_restored_v08/result.json",
-      "evidence_sha256": "e0c8a37a6c21d33dcabb466a35843a8cdb735a7c49b42bea6255b647b2f8019f",
-      "screenshot": "output/arcade_multiplayer_20261025/ordinary_restored_v08/ui/arcade_after_nudge.png"
-    }
-  },
-  "restoration": {
-    "status": "V08_RESTORED_DOWNLOADED_ORIGINAL_ENTRY_N1_OBSERVED",
-    "workshop_id": "3824360109",
-    "visibility": "unlisted",
-    "release_sequence": 2026102503,
-    "content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
-    "steam_manifest": "3443060898060848239",
-    "uploaded": true,
-    "official_download_verified": true,
-    "runtime_files": 6630,
-    "runtime_bytes": 3766747164,
-    "package_bytes": 3767020414,
-    "package_files": [
-      {
-        "name": "3824360109.vpk",
-        "bytes": 273250,
-        "sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5"
-      },
-      {
-        "name": "3824360109_000.vpk",
-        "bytes": 1073514940,
-        "sha256": "04dce761000447907c36ffdf136d16cbfa605ea86bf2b643fd12ced133c40c8e"
-      },
-      {
-        "name": "3824360109_001.vpk",
-        "bytes": 1068730788,
-        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
-      },
-      {
-        "name": "3824360109_002.vpk",
-        "bytes": 1072379183,
-        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
-      },
-      {
-        "name": "3824360109_003.vpk",
-        "bytes": 552122253,
-        "sha256": "b029127130dc54a0c98a9bb62beae30312c9b30f065ae19fa30e63949a53c3d5"
-      }
-    ],
-    "vpk_sha256": "374704e3be8ebed25e6bc936c95ea6039b9647c0beccacd428bf5105bb074dc5",
-    "submission_evidence": "output/arcade_multiplayer_20261025/rollback_v08_apply_once/result.json",
-    "official_download_evidence": "output/arcade_multiplayer_20261025/v08_restored_download_evidence/20261025T050330Z_ece7de941c5f4d83ab8e1509fb2ed074/verification.json",
-    "official_download_evidence_sha256": "71af6ac352d67f0be7fd116949a2d84ebde97e11bf7ba709be2960b23f300626",
-    "subscription_refresh_callback_id": 1313,
-    "download_callback_id": 3406,
-    "zero_cache_pre_and_post_queries": true,
-    "signature_valid": true,
-    "verification": {
-      "vpk_version": 2,
-      "files": 6630,
-      "payload_bytes": 3766747164,
-      "archive_count": 4,
-      "crc32_verified": true,
-      "manifest_dual_hashes_verified": true,
-      "section_md5s_verified": true,
-      "whole_vpk_md5_verified": true
-    },
-    "current_native_recheck": {
-      "status": "RESTORED_V08_ORIGINAL_ENTRY_N1_GAMEPLAY_OBSERVED",
-      "observed_utc": "2026-10-25T05:27:10.685650+00:00",
-      "pid": 33636,
-      "original_entry_handoff_logged": true,
-      "engine_game_in_progress_logged": true,
-      "n1_gameplay_visually_observed": true,
-      "game_left_running": true,
-      "per_click_authorization_attribution": "NOT_INSTRUMENTED",
-      "cloud_save_values_reaudited": false,
-      "multiplayer_verified": false,
-      "real_players_observed": 1,
-      "native_result": "SINGLE_PLAYER_N1_OBSERVED",
-      "evidence": "output/arcade_multiplayer_20261025/ordinary_restored_v08/result.json",
-      "evidence_sha256": "e0c8a37a6c21d33dcabb466a35843a8cdb735a7c49b42bea6255b647b2f8019f",
-      "screenshot": "output/arcade_multiplayer_20261025/ordinary_restored_v08/ui/arcade_after_nudge.png"
-    },
-    "old_v05_and_failed_v08_receipts_unchanged": true
-  },
-  "previous_candidate": {
-    "status": "FAILED_ARCADE_AUTH_ROLLED_BACK_TO_V08",
-    "release_sequence": 2026102504,
-    "runtime_content_sha256": "839fd6edb8373af2967d0cd7de93370fb737ed0e79200a9ae622624a27a6402d",
-    "release_revision": "WS4-MP-09",
-    "uploaded": true,
-    "steam_manifest": "1268500595793419792",
-    "official_download_verified": true,
-    "ordinary_workshop_match": "FAILED_WS4_WEB_04_START_CREATE_0",
-    "two_player_acceptance": "NOT_RUN_AUTH_BLOCKED",
-    "current_active_release": false,
-    "release_record": "publishing/workshop/multiplayer_entry_20261025.json"
-  },
-  "current_native_recheck": {
-    "status": "RESTORED_V08_ORIGINAL_ENTRY_N1_GAMEPLAY_OBSERVED",
-    "observed_utc": "2026-10-25T05:27:10.685650+00:00",
-    "pid": 33636,
-    "original_entry_handoff_logged": true,
-    "engine_game_in_progress_logged": true,
-    "n1_gameplay_visually_observed": true,
-    "game_left_running": true,
-    "per_click_authorization_attribution": "NOT_INSTRUMENTED",
-    "cloud_save_values_reaudited": false,
-    "multiplayer_verified": false,
+    "map": "template_map",
+    "max_players": 4,
+    "runtime_files": 6636,
     "real_players_observed": 1,
-    "native_result": "SINGLE_PLAYER_N1_OBSERVED",
-    "evidence": "output/arcade_multiplayer_20261025/ordinary_restored_v08/result.json",
-    "evidence_sha256": "e0c8a37a6c21d33dcabb466a35843a8cdb735a7c49b42bea6255b647b2f8019f",
-    "screenshot": "output/arcade_multiplayer_20261025/ordinary_restored_v08/ui/arcade_after_nudge.png"
+    "game_started": false,
+    "two_player_acceptance": "NOT_RUN",
+    "evidence": "output/arcade_two_player_20261025/download_evidence/20261025T152536Z_309af6c491f340d583d0df54984c6663/verification.json",
+    "native_room_screenshot": "output/arcade_two_player_20261025/native_arcade_ui/room_state_12.png"
   },
-  "listing_history": [
-    {
-      "release_sequence": 2026102503,
-      "runtime_content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
-      "release_revision": "WS4-UI-STACKABLE-08",
-      "status": "V08_UPDATE_FAILED_STEAM_SUBMIT_V05_REMAINS_PUBLISHED",
-      "uploaded": false,
-      "release_record": "publishing/workshop/ui_data_qa_release_20261025.json",
-      "publication_failure": {
-        "callback_id": 3404,
-        "callback_result": 2,
-        "uploader_exit_code": 1,
-        "journal_status": "SUBMIT_REQUEST_PENDING",
-        "automatic_retry_performed": false,
-        "journal_rolled_back": false,
-        "record": "publishing/workshop/ui_data_qa_release_20261025.json"
-      },
-      "original_listing_backup": "output/arcade_multiplayer_20261025/test_listing.before_v09.original.json",
-      "original_listing_sha256": "919f5c664efa779a66c24c7fbb2b6724adea1dab61e573f3476b6c1873a891fb"
+  "previous_release": {
+    "release_sequence": 2026102503,
+    "runtime_content_sha256": "88611d026e49c52b5bce7324818f36a11a60059a2844b8f646b884ba15debaa9",
+    "release_revision": "WS4-UI-STACKABLE-08",
+    "steam_manifest": "3443060898060848239",
+    "status": "V08_RESTORED_DOWNLOADED_ORIGINAL_ENTRY_N1_OBSERVED",
+    "historical_only": true,
+    "release_record": "publishing/workshop/multiplayer_entry_20261025.json",
+    "original_listing": {
+      "path": "output/arcade_two_player_20261025/publish_inputs/listing_v08.original.json",
+      "sha256": "f69ff5654cde1bf03c1d0de191db4fd2767b7929a1452ed3f1db84026d6c8def",
+      "bytes": 20102,
+      "git_commit": "c88abc3d7cfa395c9a635d64464d032448b73ae6",
+      "git_path": "publishing/workshop/test_listing.json"
     },
-    {
-      "status": "FAILED_ARCADE_AUTH_ROLLED_BACK_TO_V08",
-      "release_sequence": 2026102504,
-      "runtime_content_sha256": "839fd6edb8373af2967d0cd7de93370fb737ed0e79200a9ae622624a27a6402d",
-      "release_revision": "WS4-MP-09",
-      "uploaded": true,
-      "steam_manifest": "1268500595793419792",
-      "official_download_verified": true,
-      "ordinary_workshop_match": "FAILED_WS4_WEB_04_START_CREATE_0",
-      "two_player_acceptance": "NOT_RUN_AUTH_BLOCKED",
-      "current_active_release": false,
-      "release_record": "publishing/workshop/multiplayer_entry_20261025.json"
-    }
-  ],
-  "previous_publication_failure": {
-    "callback_id": 3404,
-    "callback_result": 2,
-    "uploader_exit_code": 1,
-    "journal_status": "SUBMIT_REQUEST_PENDING",
-    "automatic_retry_performed": false,
-    "journal_rolled_back": false,
-    "record": "publishing/workshop/ui_data_qa_release_20261025.json"
+    "history_preserved": "Complete original listing, including v05/v08/v09 acceptance and failure history, remains in the byte-identical backup and the Git snapshot."
   },
-  "v09_diagnostic_history": {
-    "status": "FAILED_ARCADE_AUTH_ROLLED_BACK_TO_V08",
-    "release_sequence": 2026102504,
-    "runtime_content_sha256": "839fd6edb8373af2967d0cd7de93370fb737ed0e79200a9ae622624a27a6402d",
-    "release_revision": "WS4-MP-09",
-    "uploaded": true,
-    "steam_manifest": "1268500595793419792",
-    "official_download_verified": true,
-    "ordinary_workshop_match": "FAILED_WS4_WEB_04_START_CREATE_0",
-    "two_player_acceptance": "NOT_RUN_AUTH_BLOCKED",
-    "current_active_release": false,
-    "release_record": "publishing/workshop/multiplayer_entry_20261025.json"
-  },
-  "prepublication_checks": {
-    "python_safety_suites": {
-      "result": "PASS",
-      "suites": 4,
-      "cases": 85,
-      "uploader_cases": 20,
-      "previous_three_suites_cases": 65
-    },
-    "network_probe_lua": {
-      "result": "PASS",
-      "assertions": 1332
-    },
-    "legacy_entry_lua": {
-      "result": "PASS",
-      "assertions": 87
-    },
-    "lua51_syntax": {
-      "result": "PASS",
-      "files": 3
-    },
-    "uploader_acceptance_history_isolation": {
-      "result": "PASS",
-      "new_release_native_test": "NOT_RUN",
-      "new_release_ordinary_workshop_match": "NOT_RUN",
-      "old_acceptance_archived_in_history": true
-    }
-  },
-  "derived_v07_package_cleanup": {
-    "result": "PASS",
-    "files_deleted": 5,
-    "bytes_reclaimed": 3767018374,
-    "signed_source_preserved": true,
-    "evidence": "output/arcade_multiplayer_20261025/v07_cleanup_result.json"
-  }
+  "notes": [
+    "MP10 r2 is uploaded to the same unlisted item and its official 6636-file/four-archive/five-VPK download is fully verified.",
+    "The ordinary native original-item route currently has one real player in a four-slot room, waiting for a second account; no match start or Arcade HTTP result is claimed.",
+    "This session-only test disables persistent archives, web authentication and real-money payments. The purchase window is a signed formal-CSV configuration preview only.",
+    "All previous listing facts and history are preserved in previous_release.original_listing and the referenced prior release record."
+  ]
 }
