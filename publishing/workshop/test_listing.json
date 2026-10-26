@@ -3,7 +3,6 @@
   "title": "孤城逐晓 · 封闭测试",
   "description": "四人协作塔防与生存。建造城防、培养英雄，应对不断增强的怪物波次，并挑战无尽模式。本条目用于受限测试，暂不开放真实付费。",
   "visibility_requested": "unlisted",
-  "workshop_id": "3824360109",
   "tester_steamids64": [
     "76561198424163156",
     "76561198845461206",
@@ -20,30 +19,29 @@
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3824360109",
   "owner_approved_unlisted_on": "2026-10-23",
   "map": "template_map",
-  "max_players": 4,
   "gameplay_map": "template_map",
   "gameplay_map_capacity": 4,
-  "release_revision": "WS4-SHOP-01",
-  "release_sequence": 2026102603,
-  "release_variant": "v03",
-  "content_sha256": "cf15590f4c0a93977a70a2357c3c94f5685040a1dbeea44d1cd4e6b00503b109",
-  "steam_manifest": "3165430046113318402",
+  "release_revision": "WS4-SHOP-02",
+  "release_sequence": 2026102604,
+  "workshop_id": "3824360109",
+  "runtime_content_sha256": "b38b10b76aaa4674c8a2d0ffc436922723a793f4b71665916956b4323f40b744",
+  "steam_manifest": "6642037826174811075",
+  "download_manifest": "6642037826174811075",
   "uploaded": true,
   "download_verified": true,
-  "vpk_sha256": "dce0909d6b38c6105553e236ec4233745d5347f21756559404856a95c41cf8be",
+  "vpk_sha256": "75a90c772844287890f58c156d08aba1680e3fba8ed69d89fc7a638e8c53845b",
+  "package_bytes": 3767101843,
   "runtime_files": 6637,
-  "runtime_bytes": 3766832990,
-  "package_bytes": 3767106545,
   "package_files": [
     {
       "name": "3824360109.vpk",
       "bytes": 273555,
-      "sha256": "dce0909d6b38c6105553e236ec4233745d5347f21756559404856a95c41cf8be"
+      "sha256": "75a90c772844287890f58c156d08aba1680e3fba8ed69d89fc7a638e8c53845b"
     },
     {
       "name": "3824360109_000.vpk",
-      "bytes": 1073597832,
-      "sha256": "2e6eceb90fd4115eaa3d3051870677cdedac1f084267595f889a401d6f83cb89"
+      "bytes": 1073593907,
+      "sha256": "22ab8ca03f51d2a522bbcc676fc26b03647215cbcc05e3feaa932d23f03c17ab"
     },
     {
       "name": "3824360109_001.vpk",
@@ -57,123 +55,21 @@
     },
     {
       "name": "3824360109_003.vpk",
-      "bytes": 552125187,
-      "sha256": "2ee65cd721c30c2758d32049352e24106b6216ac2760538f0f7f5375478c6774"
+      "bytes": 552124410,
+      "sha256": "c813a8b6a25e19a9d38dcb6a5e05421bc115d0b2d9af4869071ea18c1ca078a7"
     }
   ],
   "session_only": true,
   "cloud_archive_enabled": false,
   "real_money_payments": false,
   "online_cheats_allowed": false,
-  "four_account_only": true,
-  "player_web_auth_enabled": false,
+  "max_players": 4,
   "ready_for_public_release": false,
-  "status": "ORIGINAL_ARCADE_SINGLE_ACCOUNT_FULL_SHOP_UI_PASS_PAYMENT_CLOSED",
-  "runtime_content_sha256": "cf15590f4c0a93977a70a2357c3c94f5685040a1dbeea44d1cd4e6b00503b109",
-  "download_manifest": "3165430046113318402",
-  "download_sha256": "dce0909d6b38c6105553e236ec4233745d5347f21756559404856a95c41cf8be",
-  "download_verified_runtime_files": 6637,
-  "package_layout": "external_archives",
-  "visibility_verified": "unlisted",
-  "release_record": "publishing/workshop/arcade_shop_20261026.json",
-  "release_record_scope": "current_v3_single_account_readonly_shop_ui_only",
-  "native_test": "ORIGINAL_ARCADE_SINGLE_ACCOUNT_SHOP_UI_PASS",
-  "ordinary_workshop_match": "SINGLE_REAL_PLAYER_N1_ENTRY_PLUS_FISHING_SHOP_UI_PASS",
-  "two_player_acceptance": "NOT_RUN_FOR_CURRENT_UI_RELEASE",
+  "status": "ORIGINAL_ARCADE_NATIVE_MARKETPLACE_UI_VERIFIED_PAYMENT_CLOSED",
+  "release_record": "publishing/workshop/native_shop_qr_20261026.json",
+  "native_test": "SINGLE_ACCOUNT_ORIGINAL_ARCADE_FISHING_NATIVE_MARKET_UI_PASS",
   "native_new_ui_two_account_regression": "NOT_RUN",
-  "ordinary_arcade_http": "NO_AUTH_CLOUD_PAYMENT_E2E_ACCEPTANCE",
-  "purchase_window_scope": "FULL_READ_ONLY_CONFIGURATION_CATALOG_NO_ORDERS_OR_REWARDS",
-  "previous_verified_multiplayer": {
-    "path": "publishing/workshop/arcade_two_player_20261025.json",
-    "sha256": "ccd7ec73ca68ea2d1de5707065d4b28458f2cede0d38342dd2538a63cd1655f1",
-    "bytes": 32105,
-    "historical_only": true,
-    "release_sequence": 2026102507,
-    "scope": "Historical MP10 two-real-player basic smoke only; no v3 UI acceptance inherited."
-  },
-  "current_published_release": {
-    "workshop_id": "3824360109",
-    "release_revision": "WS4-SHOP-01",
-    "release_sequence": 2026102603,
-    "release_variant": "v03",
-    "content_sha256": "cf15590f4c0a93977a70a2357c3c94f5685040a1dbeea44d1cd4e6b00503b109",
-    "steam_manifest": "3165430046113318402",
-    "uploaded": true,
-    "download_verified": true,
-    "vpk_sha256": "dce0909d6b38c6105553e236ec4233745d5347f21756559404856a95c41cf8be",
-    "runtime_files": 6637,
-    "runtime_bytes": 3766832990,
-    "package_bytes": 3767106545,
-    "package_files": [
-      {
-        "name": "3824360109.vpk",
-        "bytes": 273555,
-        "sha256": "dce0909d6b38c6105553e236ec4233745d5347f21756559404856a95c41cf8be"
-      },
-      {
-        "name": "3824360109_000.vpk",
-        "bytes": 1073597832,
-        "sha256": "2e6eceb90fd4115eaa3d3051870677cdedac1f084267595f889a401d6f83cb89"
-      },
-      {
-        "name": "3824360109_001.vpk",
-        "bytes": 1068730788,
-        "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
-      },
-      {
-        "name": "3824360109_002.vpk",
-        "bytes": 1072379183,
-        "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
-      },
-      {
-        "name": "3824360109_003.vpk",
-        "bytes": 552125187,
-        "sha256": "2ee65cd721c30c2758d32049352e24106b6216ac2760538f0f7f5375478c6774"
-      }
-    ],
-    "map": "template_map",
-    "max_players": 4,
-    "session_only": true,
-    "cloud_archive_enabled": false,
-    "real_money_payments": false,
-    "online_cheats_allowed": false,
-    "four_account_only": true,
-    "player_web_auth_enabled": false,
-    "ready_for_public_release": false,
-    "status": "ORIGINAL_ARCADE_SINGLE_ACCOUNT_FULL_SHOP_UI_PASS_PAYMENT_CLOSED",
-    "real_players_observed": 1,
-    "native_acceptance": {
-      "path": "output/payment_shop_r3_20261026/native_shop_acceptance.json",
-      "sha256": "0b79537f7f2e97afba7839cec2f0879f8859da0a083972b9c37da20399784c12",
-      "bytes": 12959
-    },
-    "native_new_ui_two_account_regression": "NOT_RUN",
-    "official_download": {
-      "path": "output/payment_shop_r3_20261026/download_evidence/20261026T013422Z_0368460a3686404880a5942c06744ce4/verification.json",
-      "sha256": "e434147094d28bfe1c44fa72050acd1c06d0398276a10bc67819d33b2a54ecb9",
-      "bytes": 5064
-    }
-  },
-  "website": {
-    "url": "https://pay.xiaofengnet.com/ws4-shop/",
-    "static_only": true,
-    "checkout_enabled": false,
-    "deployment": {
-      "path": "output/payment_shop_20261026/web_deployment.json",
-      "sha256": "df3c6aae0e0b586b2b90ad342c2fe92b74c914c9fd977978505744e6afb14510",
-      "bytes": 828
-    },
-    "independent_public_chrome": {
-      "path": "output/payment_shop_20261026/public_chrome_20261025T235643158Z_79f563130d/verification.json",
-      "sha256": "007765be248c62ded173615c0600955ef15033c14f019d086b472e3ab379cc0e",
-      "bytes": 6457
-    },
-    "native_button_click": "NOT_RUN",
-    "cloud_delivery_or_game_sync": "NOT_CONNECTED"
-  },
-  "notes": [
-    "Current v3 acceptance is single-account native UI only; the prior MP10 two-player result is historical.",
-    "Cloud entitlement delivery is not connected and real payment remains disabled.",
-    "Complete earlier listing bytes and historical records are preserved in the finalization backup and previous verified MP10 record."
-  ]
+  "payment_acceptance": "DISABLED_NOT_TESTED",
+  "cloud_delivery": "NOT_PASSED",
+  "previous_release_record": "publishing/workshop/arcade_shop_20261026.json"
 }

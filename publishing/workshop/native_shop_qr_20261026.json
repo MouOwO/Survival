@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "status": "ORIGINAL_ARCADE_NATIVE_MARKETPLACE_UI_VERIFIED_PAYMENT_CLOSED",
+  "release_revision": "WS4-SHOP-02",
+  "release_sequence": 2026102604,
+  "workshop_id": "3824360109",
+  "runtime_content_sha256": "b38b10b76aaa4674c8a2d0ffc436922723a793f4b71665916956b4323f40b744",
+  "steam_manifest": "6642037826174811075",
+  "download_manifest": "6642037826174811075",
+  "uploaded": true,
+  "download_verified": true,
+  "vpk_sha256": "75a90c772844287890f58c156d08aba1680e3fba8ed69d89fc7a638e8c53845b",
+  "package_bytes": 3767101843,
+  "runtime_files": 6637,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273555,
+      "sha256": "75a90c772844287890f58c156d08aba1680e3fba8ed69d89fc7a638e8c53845b"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073593907,
+      "sha256": "22ab8ca03f51d2a522bbcc676fc26b03647215cbcc05e3feaa932d23f03c17ab"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552124410,
+      "sha256": "c813a8b6a25e19a9d38dcb6a5e05421bc115d0b2d9af4869071ea18c1ca078a7"
+    }
+  ],
+  "session_only": true,
+  "cloud_archive_enabled": false,
+  "real_money_payments": false,
+  "online_cheats_allowed": false,
+  "max_players": 4,
+  "ready_for_public_release": false,
+  "base_release": {
+    "sequence": 2026102603,
+    "content": "cf15590f4c0a93977a70a2357c3c94f5685040a1dbeea44d1cd4e6b00503b109",
+    "record": "publishing/workshop/arcade_shop_20261026.json"
+  },
+  "native_acceptance": {
+    "path": "output/native_shop_qr_20261026/native_acceptance.json",
+    "sha256": "f1094470945af2ea3acdbe2f62d1ba8fff1d5213ba99d0bbcd7bcad700dd03bf"
+  },
+  "evidence": {
+    "compile": {
+      "path": "output/native_shop_qr_20261026/compile.json",
+      "sha256": "b8a62765467df303fb2a0ee84665fa78dc7ca418d34bf8dc1e58aa37649e32ce"
+    },
+    "candidate_build": {
+      "path": "output/native_shop_qr_20261026/candidate_build.json",
+      "sha256": "cc8840bf76aaba01ab1b86629e0dabe9f5e506ca3b01a7f10422ae0a6c8e654f"
+    },
+    "package_build": {
+      "path": "output/native_shop_qr_20261026/package_build.json",
+      "sha256": "a80c617b66b1d093ce41f4612f5395f901839b296a975fb9453c5f1d1c69d01e"
+    },
+    "upload_success": {
+      "path": "output/native_shop_qr_20261026/upload_success.json",
+      "sha256": "22ec19a8af3bbbd9d4bde1f65f3de87e2600aa0c5f3130593fe9d6d6faa5bd23"
+    }
+  },
+  "official_download": {
+    "path": "output/native_shop_qr_20261026/download_evidence/20261026T050039Z_86eb97583b404695bb2f5968d8660946/verification.json",
+    "sha256": "483f3fe7af7c0f8203bc1d49563e937971e4554e46fb417774a1145901c5ad46"
+  },
+  "catalog": {
+    "offers": 173,
+    "cash_offers": 48,
+    "wallet_offers": 125,
+    "checkout_enabled": false
+  },
+  "modified_resources": [
+    "panorama/layout/custom_game/arcade_multiplayer_test.vxml_c",
+    "panorama/scripts/custom_game/arcade_multiplayer_test.vjs_c",
+    "panorama/scripts/custom_game/black_lion_market.vjs_c",
+    "panorama/scripts/custom_game/commerce_remaining_5d5c1152eb.vjs_c",
+    "panorama/scripts/custom_game/common/commerce_components.vjs_c",
+    "panorama/styles/custom_game/arcade_multiplayer_test.vcss_c"
+  ],
+  "native_checks": {
+    "original_market_artwork_and_rows": "PASS",
+    "monthly_cash_price_and_detail": "PASS",
+    "wallet_currency_filters": "PASS",
+    "scrolling": "PASS",
+    "bundle_and_vip_categories": "PASS",
+    "unknown_balances_and_ownership": "PASS",
+    "payment_and_exchange_disabled": "PASS",
+    "close_and_reopen": "PASS",
+    "collection_input_after_close": "PASS"
+  },
+  "real_qr_payment": {
+    "implementation": "EXISTS_BACKEND_AND_NATIVE_MATRIX_RENDERER",
+    "enabled": false,
+    "transaction_test": "NOT_RUN",
+    "blocker": "Original Arcade HTTP and authoritative WS4 entitlement readback unavailable; merchant native/precreate permission not verified."
+  },
+  "limitations": [
+    "Only one real account in the original Arcade built-in fishing mode; no new two-account acceptance.",
+    "Existing payment shell height assertion and three legacy commerce failures reproduce on baseline; not reported as new passes.",
+    "Historical 25-yuan and 6-yuan special-ticket SKU pricing retained pending review."
+  ]
+}
