@@ -1,0 +1,605 @@
+{
+  "schema": 1,
+  "status": "ORIGINAL_ARCADE_SINGLE_ACCOUNT_FULL_SHOP_UI_PASS_PAYMENT_CLOSED",
+  "workshop_id": "3824360109",
+  "release_revision": "WS4-SHOP-01",
+  "release_sequence": 2026102603,
+  "release_variant": "v03",
+  "content_sha256": "cf15590f4c0a93977a70a2357c3c94f5685040a1dbeea44d1cd4e6b00503b109",
+  "steam_manifest": "3165430046113318402",
+  "uploaded": true,
+  "download_verified": true,
+  "vpk_sha256": "dce0909d6b38c6105553e236ec4233745d5347f21756559404856a95c41cf8be",
+  "runtime_files": 6637,
+  "runtime_bytes": 3766832990,
+  "package_bytes": 3767106545,
+  "package_files": [
+    {
+      "name": "3824360109.vpk",
+      "bytes": 273555,
+      "sha256": "dce0909d6b38c6105553e236ec4233745d5347f21756559404856a95c41cf8be"
+    },
+    {
+      "name": "3824360109_000.vpk",
+      "bytes": 1073597832,
+      "sha256": "2e6eceb90fd4115eaa3d3051870677cdedac1f084267595f889a401d6f83cb89"
+    },
+    {
+      "name": "3824360109_001.vpk",
+      "bytes": 1068730788,
+      "sha256": "68cfc41f2c46f91ade8396ebe3f3597da03ab2d1f5bb06577feee49182cddff0"
+    },
+    {
+      "name": "3824360109_002.vpk",
+      "bytes": 1072379183,
+      "sha256": "94a2a3b26731ea2a15fe0fad8116eb9043cb8bf960139a26c95e810192d56141"
+    },
+    {
+      "name": "3824360109_003.vpk",
+      "bytes": 552125187,
+      "sha256": "2ee65cd721c30c2758d32049352e24106b6216ac2760538f0f7f5375478c6774"
+    }
+  ],
+  "map": "template_map",
+  "max_players": 4,
+  "session_only": true,
+  "cloud_archive_enabled": false,
+  "real_money_payments": false,
+  "online_cheats_allowed": false,
+  "four_account_only": true,
+  "player_web_auth_enabled": false,
+  "ready_for_public_release": false,
+  "catalog": {
+    "sha256": "0c227adb8b1d919c33b10b5a3eeed7f53828eb41099f117542f7874d41ce18b9",
+    "offers": 173,
+    "cash_offers": 48,
+    "wallet_offers": 125,
+    "checkout_enabled": false
+  },
+  "evidence": {
+    "candidate_build.json": {
+      "path": "output/payment_shop_r3_20261026/candidate_build.json",
+      "sha256": "9dc07d9c217d177a14a7a6198b9b3f81a2d28dd1b03f05d7d74a84db63ada295",
+      "bytes": 4754
+    },
+    "package_build.json": {
+      "path": "output/payment_shop_r3_20261026/package_build.json",
+      "sha256": "bad77070e51487c358555918e86b3d56ff59e75050f13a08f05665c59e0b91ac",
+      "bytes": 1902
+    },
+    "compile.json": {
+      "path": "output/payment_shop_r3_20261026/compile.json",
+      "sha256": "1e28566cb25adaa9cb57800c137fe0bcfb236a30adc1268cadc2d4dec319c861",
+      "bytes": 2455
+    },
+    "upload_success.json": {
+      "path": "output/payment_shop_r3_20261026/upload_success.json",
+      "sha256": "7496b795136fb2a7f987fea2ea59251c64ab17cfeaa98327e107c37e491cab1c",
+      "bytes": 532
+    },
+    "canonical_after_upload.json": {
+      "path": "output/payment_shop_r3_20261026/canonical_after_upload.json",
+      "sha256": "0ee47cd6b2a0f05b05b93013d73ed85bf8439dd9d7b34f1ac20cf887aea29098",
+      "bytes": 114112
+    },
+    "download_evidence/20261026T013422Z_0368460a3686404880a5942c06744ce4/verification.json": {
+      "path": "output/payment_shop_r3_20261026/download_evidence/20261026T013422Z_0368460a3686404880a5942c06744ce4/verification.json",
+      "sha256": "e434147094d28bfe1c44fa72050acd1c06d0398276a10bc67819d33b2a54ecb9",
+      "bytes": 5064
+    }
+  },
+  "compile_logs": [
+    {
+      "path": "output/payment_shop_r3_20261026/compile_99c811878eb040d686ebf787ce940162/arcade_shop_catalog.js.log",
+      "sha256": "92f7dc9753f1743c8d1eee46f702348934283d8d30be7e2785156b77400d77b8",
+      "bytes": 414
+    },
+    {
+      "path": "output/payment_shop_r3_20261026/compile_99c811878eb040d686ebf787ce940162/arcade_multiplayer_test.js.log",
+      "sha256": "866eecc4224304fc527c46a1f829b458207b55b8d42d9a46d68d38219fb42b2c",
+      "bytes": 418
+    },
+    {
+      "path": "output/payment_shop_r3_20261026/compile_99c811878eb040d686ebf787ce940162/arcade_multiplayer_test.css.log",
+      "sha256": "7cf19b5eb683f91f0f8e1c12047ced4d76e907f8c0c391d15a523e2e1a4c40b0",
+      "bytes": 418
+    },
+    {
+      "path": "output/payment_shop_r3_20261026/compile_99c811878eb040d686ebf787ce940162/arcade_multiplayer_test.xml.log",
+      "sha256": "a6c3f73db71aa1e8dd55c927e8d2b06b760d5834732430bcf92f74bf6c9abd37",
+      "bytes": 418
+    }
+  ],
+  "native_acceptance": {
+    "receipt": {
+      "path": "output/payment_shop_r3_20261026/native_shop_acceptance.json",
+      "sha256": "0b79537f7f2e97afba7839cec2f0879f8859da0a083972b9c37da20399784c12",
+      "bytes": 12959
+    },
+    "launch_receipt": {
+      "path": "output/payment_shop_r3_20261026/native_arcade_launch.json",
+      "sha256": "a7cc750aa4da17806b2dd3bf106a5d715df43cff409252ce66f85df4d64daec5",
+      "bytes": 846
+    },
+    "pid": 10556,
+    "observed_utc": "2026-10-26T02:12:55.019420+00:00",
+    "real_players_observed": 1,
+    "map": "template_map",
+    "tools": false,
+    "cheats": false,
+    "entry": "original_workshop_arcade",
+    "checks": {
+      "original_workshop_entry": {
+        "status": "PASS",
+        "evidence": [
+          "original_item",
+          "loaded_match",
+          "original_item_f"
+        ]
+      },
+      "n1_builder": {
+        "status": "PASS",
+        "evidence": [
+          "n1_selected"
+        ]
+      },
+      "status_card_flow_down_readable": {
+        "status": "PASS",
+        "evidence": [
+          "n1_selected",
+          "fishing_ready"
+        ]
+      },
+      "full_catalog_visible": {
+        "status": "PASS",
+        "evidence": [
+          "shop_topnav_f"
+        ]
+      },
+      "category_switch": {
+        "status": "PASS",
+        "evidence": [
+          "shop_topnav_f",
+          "technology_after_scroll_f",
+          "bundles_f"
+        ]
+      },
+      "offer_details_switch": {
+        "status": "PASS",
+        "evidence": [
+          "shop_topnav_f",
+          "special_ticket_f",
+          "details_scrolled_f",
+          "details_next_offer_f"
+        ]
+      },
+      "modal_world_overlay_hidden": {
+        "status": "PASS",
+        "evidence": [
+          "shop_topnav_f",
+          "technology_after_scroll_f"
+        ]
+      },
+      "modal_close_restores_gameplay": {
+        "status": "PASS",
+        "evidence": [
+          "scrim_closed_f",
+          "native_collection_after_close"
+        ]
+      },
+      "readonly_payment_notice": {
+        "status": "PASS",
+        "evidence": [
+          "shop_topnav_f",
+          "special_ticket_f"
+        ]
+      },
+      "category_change_resets_scroll_and_selected_offer_visible": {
+        "status": "PASS",
+        "evidence": [
+          "list_scrolled_f",
+          "technology_after_scroll_f"
+        ]
+      },
+      "modal_reopen_resets_scroll": {
+        "status": "PASS",
+        "evidence": [
+          "details_scrolled_f",
+          "details_next_offer_f",
+          "modal_closed_f",
+          "modal_reopened_f"
+        ]
+      }
+    },
+    "evidence": {
+      "bundles_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/bundles_f.png",
+          "sha256": "4d4b26ca4e13f2fe5c5e3477adb033e3775537a313bb641b4acc94cc75699df6",
+          "bytes": 1922263
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/bundles_f.png.json",
+          "sha256": "5f79d92f8705fbe1ef5c969a0294f570709d17fb440995fd80dda82f79ec6f19",
+          "bytes": 365
+        }
+      },
+      "details_next_offer_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/details_next_offer_f.png",
+          "sha256": "5cc3d0a88071468afdb1099f07776fd61609f1cba0b37c9713865beb79b1edd9",
+          "bytes": 1921560
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/details_next_offer_f.png.json",
+          "sha256": "87fe8669f188b27b04c43f7d4fd092d8dbeb9f1a0a7944cd771a39fec3c872bc",
+          "bytes": 376
+        }
+      },
+      "details_scrolled_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/details_scrolled_f.png",
+          "sha256": "473c9cf3a29740cb4607dff3603a99d17c2f94e2f998d9e9781472e4bca35ec3",
+          "bytes": 1921277
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/details_scrolled_f.png.json",
+          "sha256": "583ca2ce98d2499758f8eafcc666093539f263f84ab8bf4ba09d72866834847a",
+          "bytes": 374
+        }
+      },
+      "fishing_ready": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/fishing_ready.png",
+          "sha256": "86b5dc900fb43acf658796f20f574a21a0efb005d0a1bf142fb9146b0648c27a",
+          "bytes": 3072492
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/fishing_ready.png.json",
+          "sha256": "45ebb77dcd6bf4b6c90a54fb6a861840235ae4720db5db6f00970a4762642f2b",
+          "bytes": 369
+        }
+      },
+      "list_scrolled_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/list_scrolled_f.png",
+          "sha256": "abc94a026ded48567dd794a6bd8bd4912d842af0a560e1484aa6b9a06b2d8464",
+          "bytes": 1919665
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/list_scrolled_f.png.json",
+          "sha256": "f2e7d8f09bef1419cfbb2d996a8f8ba3226d160e2f1c4fe92ac67a20fee3d6ce",
+          "bytes": 371
+        }
+      },
+      "loaded_match": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/loaded_match.png",
+          "sha256": "b641852cc417c4dea1aff8adfcd00b9fb0338e143d047fe43462eb704f93fc62",
+          "bytes": 2028746
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/loaded_match.png.json",
+          "sha256": "48b2c95426716c598f8b54b38df4ba882af6dc77abe03bf469de5c526a021ce5",
+          "bytes": 368
+        }
+      },
+      "modal_closed_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/modal_closed_f.png",
+          "sha256": "fb1ca6e5771394a5aec830f8641298fbdb3be89aa67cbb583e3b765c34376316",
+          "bytes": 3071214
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/modal_closed_f.png.json",
+          "sha256": "b618897cd24c011fd170d0e8c8ce30f821240418f79572aef2cd360f028c74a4",
+          "bytes": 371
+        }
+      },
+      "modal_reopened_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/modal_reopened_f.png",
+          "sha256": "acf15daab33bec111779a78ac1b74ec32723523c0403497df53e8bcc6f37bb79",
+          "bytes": 1922043
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/modal_reopened_f.png.json",
+          "sha256": "e9438b5d6addda4f8a71d14936f76fe344d0c02de89e7d2956a050d8e9a07482",
+          "bytes": 373
+        }
+      },
+      "n1_selected": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/n1_selected.png",
+          "sha256": "b5c903c0e64653b69e70a1a98135f241117b6dde2b17badfa51744f8c5622f34",
+          "bytes": 2973427
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/n1_selected.png.json",
+          "sha256": "4f294a9553f3eb3848bf805327858c8d6f872a4654334705f3ef2a8bcc63cf6e",
+          "bytes": 367
+        }
+      },
+      "native_collection_after_close": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/native_collection_after_close.png",
+          "sha256": "a7f39b81cc7d42f6b4e2cecad88f91667eee2d8075aa2d28bd59922f80e413a3",
+          "bytes": 2680811
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/native_collection_after_close.png.json",
+          "sha256": "b3bf6ada71ee1b81b223ee9f2f19d2e39f34f705c0bf8dbba37ef8d2e3591517",
+          "bytes": 384
+        }
+      },
+      "original_item": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/original_item.png",
+          "sha256": "4d4a6649f9dcf7e7cdf7a766c76132a43aeac142aacf40eb14afc071738c1b7b",
+          "bytes": 1251198
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/original_item.png.json",
+          "sha256": "f4eaabf59447b10339833994fbe5a7a36bafee39d21deed3a87806711580c18d",
+          "bytes": 370
+        }
+      },
+      "original_item_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/original_item_f.png",
+          "sha256": "75f7ae6c63d0a3119264059150f8af13960899acddda86b89e194ec78a510ba0",
+          "bytes": 1297600
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/original_item_f.png.json",
+          "sha256": "08d0f4ebdb88f2bce413f369869bac6a9fd90e702f97235821fff33a96886bce",
+          "bytes": 372
+        }
+      },
+      "scrim_closed_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/scrim_closed_f.png",
+          "sha256": "cb6d5f778b44b8c3c9e296aab59609fc2ee4330161c9ffe36427bc9befbc48ba",
+          "bytes": 3071973
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/scrim_closed_f.png.json",
+          "sha256": "4b36eff7116daf785345ddc8099a31dac3af825048df61062e804e570c301eb6",
+          "bytes": 370
+        }
+      },
+      "shop_topnav_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/shop_topnav_f.png",
+          "sha256": "4c3a6a72fed659911daa4c4e0bcf6550aa1360b65c3d2560ccf861b743124e9e",
+          "bytes": 1922813
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/shop_topnav_f.png.json",
+          "sha256": "ac52cbcd66c8dca3772e0331af451f900a0d42bb91cc238ba12b26040fb92591",
+          "bytes": 368
+        }
+      },
+      "special_ticket_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/special_ticket_f.png",
+          "sha256": "0b482980906289a07be19a00d341ab06522a90368d9d97001d0c058f9d4fafec",
+          "bytes": 1918955
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/special_ticket_f.png.json",
+          "sha256": "69e9f1f8e621182765e4f821498b89aa28dc207ae4c6da02d025482e7e499070",
+          "bytes": 372
+        }
+      },
+      "technology_after_scroll_f": {
+        "image": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/technology_after_scroll_f.png",
+          "sha256": "6275cf9690fd6491655d858c25d3a9d2fc8f9f4a1ed7d8b40b43d941bf7a4d39",
+          "bytes": 1924466
+        },
+        "metadata": {
+          "path": "output/payment_shop_r3_20261026/native_arcade_ui/technology_after_scroll_f.png.json",
+          "sha256": "1e76863d841330b224ab718eb1395cbf5d8e62b26f5e057c057480ceac42fea1",
+          "bytes": 381
+        }
+      }
+    },
+    "browser_click": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "http_phase_observed_in_hud": "unavailable",
+    "cloud_read_or_payment_end_to_end": "NOT_PASSED",
+    "two_account_new_ui": "NOT_RUN",
+    "inspection_modes": {
+      "entry_smoke": "normal_n1",
+      "catalog_ui": "fishing"
+    },
+    "input_recovery": "Original collection panel reopened after shop scrim closed; builder movement in fishing not asserted."
+  },
+  "previous_canonical_before_v3_upload": {
+    "path": "output/payment_shop_r3_20261026/publish_inputs/canonical_before_upload.json",
+    "sha256": "11fe1364bdc9b29d15e0463039b3d5e7dabcdac84a0c71117d839c618bc29431",
+    "bytes": 112275
+  },
+  "ui_automated_checks": {
+    "checks": 112,
+    "evidence": {
+      "path": "output/payment_shop_r3_20261026/ui_tests.json",
+      "sha256": "1f352bddaedfe6f8d9a2d16c11a7e60bf45a3095a93d5e739971aec1b9410e3c",
+      "bytes": 1149
+    },
+    "scope": "Mocked Panorama only; no native or two-account acceptance inherited."
+  },
+  "uploaded_at_utc": "2026-10-26T01:28:16+00:00",
+  "official_download_observed_utc": "2026-10-26T01:34:22.940919+00:00",
+  "current_new_ui_two_account_regression": "NOT_RUN",
+  "previous_verified_multiplayer": {
+    "path": "publishing/workshop/arcade_two_player_20261025.json",
+    "sha256": "ccd7ec73ca68ea2d1de5707065d4b28458f2cede0d38342dd2538a63cd1655f1",
+    "bytes": 32105,
+    "historical_only": true,
+    "release_sequence": 2026102507,
+    "scope": "Historical MP10 two-real-player basic smoke only; no v3 UI acceptance inherited."
+  },
+  "previous_shop_v1": {
+    "historical_only": true,
+    "release_sequence": 2026102601,
+    "status_card_text_overlap": "OBSERVED_BY_ROOT_IN_V1",
+    "acceptance_scope": "Single-account N1/shop observation; not new-UI two-account regression.",
+    "v2_change": "Historical v2 CSS flow-children:down fixed status card stacking; v2 later failed scroll-position acceptance.",
+    "evidence": {
+      "candidate_build.json": {
+        "path": "output/payment_shop_20261026/candidate_build.json",
+        "sha256": "fab57ac81856a83ee4c52afa0e42f92b38f85929c929863f904f7a1a76055097",
+        "bytes": 4753
+      },
+      "package_build.json": {
+        "path": "output/payment_shop_20261026/package_build.json",
+        "sha256": "3289a56eb4a68dcdd006af97b8c7e81f8eba00c3ddaff5c99aa1f6a1dc3d71d2",
+        "bytes": 1902
+      },
+      "compile.json": {
+        "path": "output/payment_shop_20261026/compile.json",
+        "sha256": "4c182ba918166505ce2670bba46412219ce9bfe5dc43726d03b6dafc081d26f5",
+        "bytes": 2443
+      },
+      "upload_success.json": {
+        "path": "output/payment_shop_20261026/upload_success.json",
+        "sha256": "0e0fa537202e8cad53060b5f0822aa79ae8424c5baebde91dbc1340c2be6dd84",
+        "bytes": 532
+      },
+      "download_evidence/20261026T000811Z_9522c99bf2bd400ea0dc4a62789ba220/verification.json": {
+        "path": "output/payment_shop_20261026/download_evidence/20261026T000811Z_9522c99bf2bd400ea0dc4a62789ba220/verification.json",
+        "sha256": "3a2d4ebcb58b2988ce0e2ebdad567a74c08c344d73ef07f1099e641f6bcf4706",
+        "bytes": 5061
+      },
+      "native_arcade_ui/n1_entered.png": {
+        "path": "output/payment_shop_20261026/native_arcade_ui/n1_entered.png",
+        "sha256": "eef99e1d56c3602c6e23e4ec3dd6163f4a3a3d1e7daace15a001cde88c09f0fc",
+        "bytes": 2979861
+      },
+      "native_arcade_ui/n1_entered.png.json": {
+        "path": "output/payment_shop_20261026/native_arcade_ui/n1_entered.png.json",
+        "sha256": "b29ed394d1146088d6f202a4ebc28877a50498b242980bb92182dad3611f398b",
+        "bytes": 363
+      },
+      "native_arcade_ui/full_shop_topnav.png": {
+        "path": "output/payment_shop_20261026/native_arcade_ui/full_shop_topnav.png",
+        "sha256": "9a75426ca234951fce53ad9be982649db5649af0dd2c91a0f6dd02891a237033",
+        "bytes": 2725980
+      },
+      "native_arcade_ui/full_shop_topnav.png.json": {
+        "path": "output/payment_shop_20261026/native_arcade_ui/full_shop_topnav.png.json",
+        "sha256": "d9006d4a290bae6985207b811f958eb08d7d9cc36b9437efcaa75f9a8dae5c65",
+        "bytes": 368
+      }
+    }
+  },
+  "previous_shop_v2": {
+    "historical_only": true,
+    "release_sequence": 2026102602,
+    "official_download": "FULLY_VERIFIED_HISTORICAL_ONLY",
+    "native_ui_acceptance": "FAILED_SCROLL_POSITION_DEFECT_REPORTED_BY_ROOT",
+    "observed_defect": "After scrolling and changing category, the old list offset hid the newly selected first offer.",
+    "v3_change": "Only compiled JS differs from v2; category changes and reopening reset list/detail scroll and first-offer selection.",
+    "evidence": {
+      "candidate_build.json": {
+        "path": "output/payment_shop_r2_20261026/candidate_build.json",
+        "sha256": "9203ed1ad2a025f73b55f1e90a72ec43afaf6b58bf79bf3de7ce07e114b4135d",
+        "bytes": 4754
+      },
+      "package_build.json": {
+        "path": "output/payment_shop_r2_20261026/package_build.json",
+        "sha256": "d4bf4e636615dafc882b55d9aed35abd8c237261ac6ec0d1d5497ca6202a5ff7",
+        "bytes": 1902
+      },
+      "compile.json": {
+        "path": "output/payment_shop_r2_20261026/compile.json",
+        "sha256": "33b6f86c3495eb3213d048c69160990166fdba5ce948d4eaec6636079235f3e7",
+        "bytes": 2455
+      },
+      "upload_success.json": {
+        "path": "output/payment_shop_r2_20261026/upload_success.json",
+        "sha256": "9a18f65c229f96f0358c16bd8a82aa5fdeac2afe503c1aa82e6b8cd8ebe07ad0",
+        "bytes": 532
+      },
+      "canonical_after_upload.json": {
+        "path": "output/payment_shop_r2_20261026/canonical_after_upload.json",
+        "sha256": "11fe1364bdc9b29d15e0463039b3d5e7dabcdac84a0c71117d839c618bc29431",
+        "bytes": 112275
+      },
+      "download_evidence/20261026T003722Z_ab987e40c3ed40929a64597e4b05545b/verification.json": {
+        "path": "output/payment_shop_r2_20261026/download_evidence/20261026T003722Z_ab987e40c3ed40929a64597e4b05545b/verification.json",
+        "sha256": "fb5bcd7d70096df8d2bb5437e76d59eebc72f537969ab9766dd507adf2ccbb52",
+        "bytes": 5064
+      },
+      "native_arcade_launch.json": {
+        "path": "output/payment_shop_r2_20261026/native_arcade_launch.json",
+        "sha256": "a1957f56741df90ccf1866270260e23d42fa98d5e7b4a08ba6a7643d488b32f8",
+        "bytes": 845
+      },
+      "native_arcade_ui/list_scrolled.png": {
+        "path": "output/payment_shop_r2_20261026/native_arcade_ui/list_scrolled.png",
+        "sha256": "35a3abe33a6dc63404a3909b634ac5325d05b691e87179db378f2e37d794cb19",
+        "bytes": 1829408
+      },
+      "native_arcade_ui/list_scrolled.png.json": {
+        "path": "output/payment_shop_r2_20261026/native_arcade_ui/list_scrolled.png.json",
+        "sha256": "a8712141a645eaa75990a3a5291f084c647f2c739aea3a994a23b432a630150d",
+        "bytes": 368
+      },
+      "native_arcade_ui/technology_after_scroll.png": {
+        "path": "output/payment_shop_r2_20261026/native_arcade_ui/technology_after_scroll.png",
+        "sha256": "fc6a248b8a740801dbdd188c74c3abe183574aa3b24ffe9237e832212118d91f",
+        "bytes": 1833642
+      },
+      "native_arcade_ui/technology_after_scroll.png.json": {
+        "path": "output/payment_shop_r2_20261026/native_arcade_ui/technology_after_scroll.png.json",
+        "sha256": "0d74872f1a5aabebc3af366395582310761f482ac81f2ee4712ebb0e096be058",
+        "bytes": 378
+      }
+    }
+  },
+  "website": {
+    "url": "https://pay.xiaofengnet.com/ws4-shop/",
+    "static_only": true,
+    "checkout_enabled": false,
+    "deployment": {
+      "path": "output/payment_shop_20261026/web_deployment.json",
+      "sha256": "df3c6aae0e0b586b2b90ad342c2fe92b74c914c9fd977978505744e6afb14510",
+      "bytes": 828
+    },
+    "independent_public_chrome": {
+      "path": "output/payment_shop_20261026/public_chrome_20261025T235643158Z_79f563130d/verification.json",
+      "sha256": "007765be248c62ded173615c0600955ef15033c14f019d086b472e3ab379cc0e",
+      "bytes": 6457
+    },
+    "native_button_click": "NOT_RUN",
+    "cloud_delivery_or_game_sync": "NOT_CONNECTED"
+  },
+  "payment_acceptance": "NOT_RUN_PAYMENT_DISABLED",
+  "cloud_entitlement_delivery": "NOT_PASSED",
+  "pricing_review_required": [
+    {
+      "sku": "special_lottery_ticket_single",
+      "amount_fen": 2500,
+      "reward": "special_lottery_ticket",
+      "quantity": 1
+    },
+    {
+      "sku": "video_p001",
+      "amount_fen": 600,
+      "reward": "special_lottery_ticket",
+      "quantity": 1
+    }
+  ],
+  "scope_notes": [
+    "The website and native modal display a signed public configuration snapshot, not live account balances, ownership, remaining limits or a financial quote.",
+    "Upload callback 3404 success is recorded by the pinned uploader success receipt and uploaded journal; no nonexistent callback_result field is invented.",
+    "Current native acceptance is one real account. Historical MP10 two-player connectivity remains separately scoped.",
+    "Normal N1 entry was verified, then an empty-defense match ended. Detailed catalog UI checks used the built-in fishing mode in another original Arcade match, same downloaded v3/PID. Failed N1 catalog screenshots are excluded from PASS.",
+    "No full-match, four-player, duration, performance, new-UI two-account, cloud-login, cloud-delivery or real-payment acceptance is granted."
+  ]
+}

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>孤城逐晓 · 商城目录</title>
+  <link rel="stylesheet" href="shop.css">
+  <script defer src="catalog.js"></script>
+  <script defer src="shop.js"></script>
+</head>
+<body>
+  <main>
+    <header><p class="eyebrow">孤城逐晓 · 联机测试</p><h1>商城目录</h1>
+      <p class="notice">商品预览，支付暂未开放。当前游廊测试对局不读取云端购买权益。</p>
+      <p class="subtle">以下是本测试版本的商品配置快照，供核对售价和奖励；不代表实时成交报价、账号持有量或购买资格。</p>
+    </header>
+    <section aria-label="筛选商品" class="filters">
+      <label>搜索商品<input id="search" type="search" maxlength="80" placeholder="商品名称或奖励"></label>
+      <label>分类<select id="category"><option value="all">所有分类</option></select></label>
+      <label>支付币种<select id="currency"><option value="all">全部币种</option><option value="CNY">人民币</option><option value="u_coin">G币</option><option value="shop_points">商城积分</option><option value="shop_gold">商城金币</option></select></label>
+    </section>
+    <p id="status" role="status">正在加载商品目录…</p>
+    <div class="shop">
+      <section aria-label="商品列表" id="products" class="products"></section>
+      <aside id="detail" aria-label="商品详情"><h2 id="title">请选择商品</h2><p id="price" class="price"></p><p id="description"></p><p id="limit" class="subtle"></p><h3>配置奖励</h3><ul id="rewards"></ul><p class="notice">尚不支持下单或兑换</p><p class="subtle">页面不收集 Steam 账号密码，不会创建订单或扣除游戏货币。</p></aside>
+    </div>
+    <footer>目录编号 <span id="revision"></span> · 本局存档与商城云端权益尚未接通</footer>
+  </main>
+</body>
+</html>

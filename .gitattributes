@@ -145,6 +145,7 @@ panorama/src/scripts/custom_game/survival_lobby.js text eol=crlf
 panorama/src/styles/custom_game/survival_lobby.css text eol=crlf
 panorama/src/layout/custom_game/arcade_multiplayer_test.xml text eol=crlf
 panorama/src/scripts/custom_game/arcade_multiplayer_test.js text eol=crlf
+panorama/src/scripts/custom_game/arcade_shop_catalog.js text eol=crlf
 panorama/src/styles/custom_game/arcade_multiplayer_test.css text eol=crlf
 scripts/vscripts/systems/session_multiplayer_test.lua text eol=crlf
 scripts/vscripts/systems/arcade_multiplayer_test.lua text eol=lf
