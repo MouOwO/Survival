@@ -17,12 +17,12 @@ function M.wave_base(wave)
     return data.waves[tonumber(wave)]
 end
 
-function M.special_rotation_health(mode_id, difficulty_id, wave, position)
+function M.special_rotation_stats(mode_id, difficulty_id, wave, position)
     local difficulty = M.number(difficulty_id)
-    for _, row in ipairs(data.special_rotation_health_overrides or {}) do
+    for _, row in ipairs(data.special_rotation_stat_overrides or {}) do
         if row.mode_id == mode_id and row.difficulty == difficulty
             and row.wave_number == wave and row.position == position then
-            return row.health
+            return row
         end
     end
     return nil

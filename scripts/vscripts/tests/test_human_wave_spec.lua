@@ -88,15 +88,15 @@ local corrected=0
 for _,row in ipairs(rich_tenth) do
     if row.human_spec_rotation_position==2 then
         assert(row.archetype_id=="flying_red_gargoyle" and row.member_role=="normal")
-        assert(row.health==1420000 and row.attack==320400 and row.war3_armor==270)
+        assert(row.health==1420000 and row.attack==160000 and row.war3_armor==270)
         corrected=corrected+1
     elseif row.member_role=="wave_leader" then
-        assert(row.health==14240000)
+        assert(row.health==14240000 and row.attack==640800)
     else
-        assert(row.health==1424000)
+        assert(row.health==1424000 and row.attack==160200)
     end
 end
-assert(corrected==20,"all twenty flying rotation members must use the confirmed health")
+assert(corrected==20,"all twenty flying rotation members must use the confirmed health and attack")
 for _,case in ipairs({{"rich","N9"},{"rich","N11"},{"standard","N10"},
     {"cold","N10"},{"pure","N10"}}) do
     local rows=assert(builder.build(source,case[2],case[1])).waves[8]
@@ -104,6 +104,7 @@ for _,case in ipairs({{"rich","N9"},{"rich","N11"},{"standard","N10"},
     for _,row in ipairs(rows) do
         if row.human_spec_rotation_position==2 then
             assert(close(row.health,1105*multiplier),"health correction leaked into another mode/tier")
+            assert(close(row.attack,900*multiplier),"attack correction leaked into another mode/tier")
         end
     end
 end

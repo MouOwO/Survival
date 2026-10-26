@@ -94,10 +94,14 @@ function M.build(rows, definition, mode_id)
                 end
                 if rotation then
                     stats = combat(rotation,mode,1,1,1)
-                    -- Confirmed final health applies only to this mode/tier
-                    -- and rotation; attack and armor keep their authored scale.
-                    stats.health = rules.special_rotation_health(mode_id,difficulty_id,
-                        number,rotation.position) or stats.health
+                    -- Confirmed final stats apply after mode scaling, scoped
+                    -- to this mode/tier and rotation. Armor keeps its scale.
+                    local confirmed = rules.special_rotation_stats(mode_id,difficulty_id,
+                        number,rotation.position)
+                    if confirmed then
+                        stats.health = confirmed.health or stats.health
+                        stats.attack = confirmed.attack or stats.attack
+                    end
                     appearance = normals[rotation.position] or main
                 else
                     stats = mode_id=="scourge" and combat(base,mode,3,2,1) or combat(base,mode,1,1,1)

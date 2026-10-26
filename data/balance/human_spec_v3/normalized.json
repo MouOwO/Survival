@@ -3,9 +3,9 @@
   "sources": {
     "json": "human_spec.json",
     "workbook": "接入规格_人话版_v3.xlsx",
-    "json_sha256": "4b30f4c8f907abe8d905c9f8918cf955986164415081883649d8b096dae50a36",
-    "workbook_sha256": "dbc2b8301dddae94fa86dde6e5e8e5035cebdfe82855dbb5d20556a3911e68c7",
-    "cross_checked_cells": 2817,
+    "json_sha256": "61d238f735a567957cbaa5711fef31fff813ac4d0530090959c81e8380164a58",
+    "workbook_sha256": "23e866199395c52782a5c7f4e87abe1c0472dd4f6bb3aa9c83992f48508f0997",
+    "cross_checked_cells": 2818,
     "workbook_only_wave_bases": 30
   },
   "modes": {
@@ -2278,14 +2278,15 @@
       }
     ]
   },
-  "special_rotation_health_overrides": [
+  "special_rotation_stat_overrides": [
     {
       "mode_id": "rich",
       "difficulty": 10,
       "wave_number": 8,
       "position": 2,
       "health": 1420000,
-      "evidence": "用户确认2026-10-26丰饶N10第8波飞行小怪142万"
+      "attack": 160000,
+      "evidence": "用户确认2026-10-26丰饶N10第8波飞行小怪生命142万、攻击16万"
     }
   ],
   "rooms": [

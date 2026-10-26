@@ -96,7 +96,7 @@ end
 local builder=require("systems/wave_difficulty_builder")
 local sequence=require("systems/wave_spawn_sequence")
 local variants=require("systems/rich_stat_variant_row")
--- Verify the requested 1.42m survives the real variant/spawn/UI projection
+-- Verify the requested 1.42m HP and 160k attack survive variant/spawn/UI projection
 -- boundaries, while the ordinary and leading monsters retain their values.
 local rich_tenth=assert(builder.build(source,"N10","rich")).waves[8]
 local eighth_ordered=sequence.build(rich_tenth,{enabled=true})
@@ -104,7 +104,7 @@ local flight_count=0
 for _,row in ipairs(eighth_ordered) do
     if row.human_spec_rotation_position==2 then
         local target=check(variants.resolve(row,1),8,
-            {health=1420000,attack=320400,war3_armor=270,attack_speed=1})
+            {health=1420000,attack=160000,war3_armor=270,attack_speed=1})
         assert(row.archetype_id=="flying_red_gargoyle" and not target.survival_is_boss)
         flight_count=flight_count+1
     end

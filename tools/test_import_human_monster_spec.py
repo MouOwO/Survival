@@ -66,36 +66,41 @@ class HumanMonsterImportTests(unittest.TestCase):
         self.assertEqual(archive['神兽狩猎-黑龙王子']['health'], 10080000000)
         self.assertEqual(archive['神兽狩猎-黑龙王子']['attack'], 168000002)
 
-    def test_confirmed_wave_eight_health_is_scoped_to_rich_n10(self):
-        self.assertEqual(self.data['special_rotation_health_overrides'], [{
+    def test_confirmed_wave_eight_stats_are_scoped_to_rich_n10(self):
+        self.assertEqual(self.data['special_rotation_stat_overrides'], [{
             'mode_id': 'rich', 'difficulty': 10, 'wave_number': 8, 'position': 2,
-            'health': 1420000, 'evidence': '用户确认2026-10-26丰饶N10第8波飞行小怪142万',
+            'health': 1420000, 'attack': 160000,
+            'evidence': '用户确认2026-10-26丰饶N10第8波飞行小怪生命142万、攻击16万',
         }])
         self.assertEqual(self.data['special_rotation'][8][0]['health'], 1105)
+        self.assertEqual(self.data['special_rotation'][8][0]['attack'], 900)
         self.assertEqual(self.data['modes']['rich'][10]['hp_multiplier'], 356)
 
-    def test_health_override_documents_must_match(self):
+    def test_stat_override_documents_must_match(self):
         raw = json.loads(self.json_path.read_text(encoding='utf-8-sig'))
-        raw['special_rotation_health_overrides'][0]['最终HP'] = 1420001
         with tempfile.TemporaryDirectory() as folder:
             destination = Path(folder) / 'human.json'
-            destination.write_text(json.dumps(raw, ensure_ascii=False), encoding='utf-8')
-            with self.assertRaisesRegex(AssertionError, 'Conflicting sources: 轮换怪血量修正:2:最终HP'):
-                importer.load(destination, self.xlsx_path)
+            for field in ('最终HP', '最终攻击'):
+                with self.subTest(field=field):
+                    modified = copy.deepcopy(raw)
+                    modified['special_rotation_stat_overrides'][0][field] += 1
+                    destination.write_text(json.dumps(modified, ensure_ascii=False), encoding='utf-8')
+                    with self.assertRaisesRegex(AssertionError, f'Conflicting sources: 轮换怪属性修正:2:{field}'):
+                        importer.load(destination, self.xlsx_path)
 
-    def test_health_override_workbook_row_cannot_be_omitted(self):
+    def test_stat_override_workbook_row_cannot_be_omitted(self):
         with tempfile.TemporaryDirectory() as folder:
             destination = Path(folder) / 'workbook.xlsx'
             book = openpyxl.load_workbook(self.xlsx_path)
-            book['轮换怪血量修正'].delete_rows(2)
+            book['轮换怪属性修正'].delete_rows(2)
             book.save(destination)
             book.close()
-            with self.assertRaisesRegex(AssertionError, 'Conflicting row counts: special_rotation_health_overrides'):
+            with self.assertRaisesRegex(AssertionError, 'Conflicting row counts: special_rotation_stat_overrides'):
                 importer.load(self.json_path, destination)
 
-    def test_health_override_rejects_invalid_or_unused_targets(self):
+    def test_stat_override_rejects_invalid_or_unused_targets(self):
         raw = json.loads(self.json_path.read_text(encoding='utf-8-sig'))
-        row = raw['special_rotation_health_overrides'][0]
+        row = raw['special_rotation_stat_overrides'][0]
         rotation_modes = {
             (source['波次'], 3 if '第3只' in source['出现规则'] else 2):
                 {importer.MODE_IDS[name] for name in source['适用模式'].split('/')}
@@ -109,17 +114,22 @@ class HumanMonsterImportTests(unittest.TestCase):
             ('最终HP', 0, 'health'), ('最终HP', -1, 'health'),
             ('最终HP', float('nan'), 'health'), ('最终HP', float('inf'), 'health'),
             ('最终HP', True, 'health'), ('最终HP', '1420000', 'health'),
+            ('最终攻击', -1, 'attack'), ('最终攻击', float('nan'), 'attack'),
+            ('最终攻击', float('inf'), 'attack'), ('最终攻击', True, 'attack'),
+            ('最终攻击', '160000', 'attack'), ('最终攻击', None, 'attack'),
             ('证据', '', 'evidence'), ('证据', '  ', 'evidence'),
         ]
         for field, value, reason in cases:
             with self.subTest(field=field, value=value):
                 invalid = {**row, field: value}
                 with self.assertRaisesRegex(AssertionError, reason):
-                    importer.rotation_health_overrides([invalid], self.data['modes'], rotation_modes)
-        with self.assertRaisesRegex(AssertionError, 'Duplicate rotation health override'):
-            importer.rotation_health_overrides([row, copy.deepcopy(row)], self.data['modes'], rotation_modes)
+                    importer.rotation_stat_overrides([invalid], self.data['modes'], rotation_modes)
+        zero_attack = importer.rotation_stat_overrides([{**row, '最终攻击': 0}], self.data['modes'], rotation_modes)
+        self.assertEqual(zero_attack[0]['attack'], 0)
+        with self.assertRaisesRegex(AssertionError, 'Duplicate rotation stat override'):
+            importer.rotation_stat_overrides([row, copy.deepcopy(row)], self.data['modes'], rotation_modes)
         with self.assertRaisesRegex(AssertionError, 'columns'):
-            importer.rotation_health_overrides([{**row, '意外字段': 1}], self.data['modes'], rotation_modes)
+            importer.rotation_stat_overrides([{**row, '意外字段': 1}], self.data['modes'], rotation_modes)
 
 
 if __name__ == '__main__':
