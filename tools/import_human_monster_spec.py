@@ -18,7 +18,8 @@ SHEETS = {'modes': '模式与难度', 'counts': '数量与间隔', 'spawns': '�
           'attack_bosses': '进攻BOSS', 'challenge_building': '挑战建筑', 'rooms': '四房',
           'rebirth_bosses': '转生BOSS', 'special_bosses': '特殊BOSS', 'save_challenges': '存档挑战',
           'void_shadows': '虚空之影', 'overrides': '修正表', 'unlock': '解锁条件',
-          'examples': '示例', 'tianzai_combo': '天灾首怪与精英', 'special_rotation': '特殊轮换怪'}
+          'examples': '示例', 'tianzai_combo': '天灾首怪与精英', 'special_rotation': '特殊轮换怪',
+          'special_rotation_health_overrides': '轮换怪血量修正'}
 
 
 def equal(left, right):
@@ -73,6 +74,37 @@ def count_rule(row):
     return result
 
 
+def rotation_health_overrides(rows, modes, rotation_modes):
+    """Scope confirmed final HP to an existing mode, difficulty and rotation slot."""
+    result, identities = [], set()
+    columns = {'模式', '难度', '波次', '轮换位置', '最终HP', '证据'}
+    for row in rows:
+        assert set(row) == columns, 'Invalid rotation health override columns'
+        mode_id = MODE_IDS.get(row['模式'])
+        assert mode_id in modes, 'Invalid rotation health override mode'
+        for field in ('难度', '波次', '轮换位置'):
+            value = row[field]
+            assert type(value) in (int, float) and math.isfinite(value) \
+                and value == int(value) and value > 0, f'Invalid rotation health override {field}'
+        difficulty, wave, position = (int(row[field]) for field in ('难度', '波次', '轮换位置'))
+        mode = modes[mode_id].get(difficulty)
+        assert mode is not None, 'Invalid rotation health override difficulty'
+        assert wave <= mode['total_waves'], 'Invalid rotation health override wave'
+        assert mode_id in rotation_modes.get((wave, position), set()), \
+            'Invalid rotation health override rotation slot'
+        health = row['最终HP']
+        assert type(health) in (int, float) and math.isfinite(health) and health > 0, \
+            'Invalid rotation health override health'
+        assert isinstance(row['证据'], str) and row['证据'].strip(), \
+            'Missing rotation health override evidence'
+        identity = (mode_id, difficulty, wave, position)
+        assert identity not in identities, 'Duplicate rotation health override'
+        identities.add(identity)
+        result.append({'mode_id': mode_id, 'difficulty': difficulty, 'wave_number': wave,
+                       'position': position, 'health': health, 'evidence': row['证据']})
+    return result
+
+
 def load(json_path, workbook_path):
     raw = json.loads(json_path.read_text(encoding='utf-8-sig'))
     workbook = openpyxl.load_workbook(workbook_path, read_only=True, data_only=True)
@@ -102,10 +134,12 @@ def load(json_path, workbook_path):
         waves[row['波次']] = dict(base(row, '小怪名称'), flying=row['是否飞行'] == '是')
     assert set(waves) == set(range(1, 31)), 'Workbook must supply all thirty wave bases'
     attack_bosses = {row['波次']: base(row, '首领') for row in raw['attack_bosses']}
-    rotation = {}
+    rotation, rotation_modes = {}, {}
     for row in raw['special_rotation']:
         position = 3 if '第3只' in row['出现规则'] else 2
         rotation.setdefault(row['波次'], []).append(dict(base(row, '特殊怪'), position=position, evidence=row['证据']))
+        rotation_modes[(row['波次'], position)] = {MODE_IDS[name] for name in row['适用模式'].split('/')}
+    health_overrides = rotation_health_overrides(raw['special_rotation_health_overrides'], modes, rotation_modes)
     archive = [{'name': row['挑战名称'], 'boss': row['BOSS'], 'health': row['最终HP'],
                 'war3_armor': row['最终护甲'], 'attack': row['最终攻击'], 'attack_speed': row['攻速'],
                 'count': row['数量'], 'scale': row['倍率scale'], 'evidence': row['验证状态']}
@@ -117,6 +151,7 @@ def load(json_path, workbook_path):
                     'workbook_sha256': hashlib.sha256(workbook_path.read_bytes()).hexdigest(),
                     'cross_checked_cells': comparisons, 'workbook_only_wave_bases': len(waves)},
         'modes': modes, 'waves': waves, 'attack_bosses': attack_bosses, 'special_rotation': rotation,
+        'special_rotation_health_overrides': health_overrides,
         'rooms': [base(row, '房间') for row in raw['rooms']],
         'rebirth_bosses': [base(row, '转生BOSS') for row in raw['rebirth_bosses']],
         'special_bosses': [base(row, 'BOSS') for row in raw['special_bosses']],

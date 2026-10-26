@@ -2,7 +2,7 @@
 -- Values already include the source correction table; never apply it again.
 return {
     ["version"] = 3,
-    ["sources"] = { ["json"] = "human_spec.json", ["workbook"] = "接入规格_人话版_v3.xlsx", ["json_sha256"] = "425c732f61670d21013ad5da83c419ffaa8ff7576c3f1abf894e7d9c9ea6d1c0", ["workbook_sha256"] = "39241c3c99c0477ff42b91114a197f449c4f9b9f93d232c1d680e74782156582", ["cross_checked_cells"] = 2811, ["workbook_only_wave_bases"] = 30 },
+    ["sources"] = { ["json"] = "human_spec.json", ["workbook"] = "接入规格_人话版_v3.xlsx", ["json_sha256"] = "4b30f4c8f907abe8d905c9f8918cf955986164415081883649d8b096dae50a36", ["workbook_sha256"] = "dbc2b8301dddae94fa86dde6e5e8e5035cebdfe82855dbb5d20556a3911e68c7", ["cross_checked_cells"] = 2817, ["workbook_only_wave_bases"] = 30 },
     ["modes"] = {
         ["standard"] = {
             [1] = { ["hp_multiplier"] = 2.0, ["armor_multiplier"] = 1.2, ["challenge_hp_multiplier"] = 2.0, ["challenge_armor_multiplier"] = 1.0, ["total_waves"] = 25, ["max_difficulty"] = 10 },
@@ -317,6 +317,9 @@ return {
             [1] = { ["name"] = "第24波特殊轮换怪A", ["health"] = 300000, ["war3_armor"] = 155, ["attack"] = 23000, ["attack_interval"] = 1.0, ["position"] = 2, ["evidence"] = "实机/数据" },
             [2] = { ["name"] = "第24波特殊轮换怪B", ["health"] = 350000, ["war3_armor"] = 145, ["attack"] = 9000, ["attack_interval"] = 1.0, ["position"] = 3, ["evidence"] = "实机/数据" },
         },
+    },
+    ["special_rotation_health_overrides"] = {
+        [1] = { ["mode_id"] = "rich", ["difficulty"] = 10, ["wave_number"] = 8, ["position"] = 2, ["health"] = 1420000, ["evidence"] = "用户确认2026-10-26丰饶N10第8波飞行小怪142万" },
     },
     ["rooms"] = {
         [1] = { ["name"] = "木头房", ["health"] = 30000, ["war3_armor"] = 50, ["attack"] = 5000, ["count"] = 10 },

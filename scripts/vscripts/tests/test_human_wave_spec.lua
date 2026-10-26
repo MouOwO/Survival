@@ -81,6 +81,32 @@ local eighth=n1.waves[8]
 assert(eighth[1].member_role=="wave_leader" and eighth[2].health==8000
     and eighth[3].health==2210 and eighth[3].attack==1800
     and close(eighth[3].war3_armor,18) and eighth[4].health==8000)
+-- The confirmed rich N10 correction is a final value for the flying rotation,
+-- never a change to the shared base, the leader, or adjacent modes/tiers.
+local rich_tenth=assert(builder.build(source,"N10","rich")).waves[8]
+local corrected=0
+for _,row in ipairs(rich_tenth) do
+    if row.human_spec_rotation_position==2 then
+        assert(row.archetype_id=="flying_red_gargoyle" and row.member_role=="normal")
+        assert(row.health==1420000 and row.attack==320400 and row.war3_armor==270)
+        corrected=corrected+1
+    elseif row.member_role=="wave_leader" then
+        assert(row.health==14240000)
+    else
+        assert(row.health==1424000)
+    end
+end
+assert(corrected==20,"all twenty flying rotation members must use the confirmed health")
+for _,case in ipairs({{"rich","N9"},{"rich","N11"},{"standard","N10"},
+    {"cold","N10"},{"pure","N10"}}) do
+    local rows=assert(builder.build(source,case[2],case[1])).waves[8]
+    local multiplier=rules.mode(case[1],case[2]).hp_multiplier
+    for _,row in ipairs(rows) do
+        if row.human_spec_rotation_position==2 then
+            assert(close(row.health,1105*multiplier),"health correction leaked into another mode/tier")
+        end
+    end
+end
 local w24=n1.waves[24]
 assert(w24[2].human_spec_rotation_position==nil and w24[3].human_spec_rotation_position==2
     and w24[4].human_spec_rotation_position==3 and w24[5].human_spec_rotation_position==nil)
